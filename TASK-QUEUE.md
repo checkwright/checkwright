@@ -12,30 +12,6 @@
 
 ## New Features
 
-- **toolchain-floor-spawn-on-native-windows** [spec: SPEC-spawn-floor.md] — the published
-  toolchain floor carries a member no shipped construct forces, and its forcing grounds are stale.
-  **Re-scoped at spec, 2026-09-18 (lead decision, relayed), measured:** a git-only floor is not
-  reachable in this unit (bash is forced by the shipped shell surfaces and the binary's
-  consumer-command executors, coreutils by native `date -d`), and scope's "the roster and the
-  spawn set disagree both ways" was an artifact of its `proc::run`-only oracle. What remains is
-  making the roster true: `awk::GNU` narrows to `awk` (every shipped awk program is POSIX),
-  absorbing Icebox's `interpreter-floor-gawk-residue-empty`, and each constrained member cites a
-  live forcing construct. The remainder and the ARMS requirement-element mechanization are in the
-  gap inbox.
-  Filed 2026-09-09 by the consult session beside `windows-roster-join`; re-scoped that day at
-  scope; directed 2026-09-18 into `native-spawn-floor`; paired at spec.
-
-- **registry-needs-conflates-requirement-and-spawn** [spec: SPEC-spawn-floor.md] — the spawn
-  recorder notes the literal program string a spawn passed, so a member that resolves its
-  interpreter to a path cannot declare anything unit test A would match.
-  **Ruled at spec, 2026-09-18 (lead decision, relayed):** a declared `<program>` is a
-  requirement matched by name, and the recorder reduces a path to its final component minus the
-  executable suffix. Measured: `--needs` is read only by the CLI flag and port-blockers, not by
-  anything an adopter provisions from; no registry member spawns a resolved path today; and the
-  fixture-vacuity half is already a stated honest limit in gate-sdk/SPEC.md §The `# graph:`
-  manifest.
-  Filed 2026-09-03 by spec; joined `native-spawn-floor` 2026-09-18; paired at spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -3252,7 +3228,6 @@
 - **upgrade-contract-rename-routing-unstated** — One clause leans on it.
 - **md-refs-tree-link-resolution** — Unreachable while one generator produces.
 - **recurrence-judgment-vs-declaration** — The two share a noun, not a meaning.
-- **interpreter-floor-gawk-residue-empty** — Its ground died; awk stands.
 - **advisory-lane-draft-state-unswept** — GitHub's notifications are the sweep.
 - **amendment-done-move-assertions** — Zero cost while merges are hand-checked.
 - **guard-advise-jq-dependency** — Needs jq; the one consumer works around it.
@@ -3465,5 +3440,8 @@
 ## Done
 
 - ere-matcher-capture-groups-unowned
+- toolchain-floor-spawn-on-native-windows
+- registry-needs-conflates-requirement-and-spawn
+- interpreter-floor-gawk-residue-empty
 
 ## Lessons Learned

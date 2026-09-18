@@ -135,7 +135,7 @@ fn exe_candidates(program: &str, pathext: Option<&str>) -> Vec<String> {
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the spawn's own resolution, the same `which` the
 // probe answers from, so `on_path(P)` true means the spawn of `P` reaches the file `which(P)`
-// named; it runs AFTER `recorder::note`, which leaves every registry declaration matching
+// named
 #[cfg(windows)]
 fn spawn_target(program: &str) -> Result<std::borrow::Cow<'_, str>, String> {
     let dirs: Vec<std::path::PathBuf> = std::env::var_os("PATH")
@@ -987,11 +987,35 @@ pub mod recorder {
         OBSERVED.with(|o| o.borrow_mut().take()).unwrap_or_default()
     }
 
+    // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a declared `<program>` is a requirement
+    // named as `PATH` names it, so a path is noted as its final component minus the host's
+    // executable suffix and a bare name as passed
+    pub fn name_of(program: &str) -> String {
+        if !program.chars().any(std::path::is_separator) {
+            return program.to_string();
+        }
+        let last = program
+            .rsplit(std::path::is_separator)
+            .next()
+            .unwrap_or(program);
+        let suffix = std::env::consts::EXE_SUFFIX;
+        let cut = last.len().saturating_sub(suffix.len());
+        if !suffix.is_empty()
+            && last.len() > suffix.len()
+            && last.is_char_boundary(cut)
+            && last[cut..].eq_ignore_ascii_case(suffix)
+        {
+            return last[..cut].to_string();
+        }
+        last.to_string()
+    }
+
     pub fn note(program: &str) {
+        let name = name_of(program);
         OBSERVED.with(|o| {
             if let Some(v) = o.borrow_mut().as_mut() {
-                if !v.iter().any(|e| e == program) {
-                    v.push(program.to_string());
+                if !v.contains(&name) {
+                    v.push(name);
                 }
             }
         });
@@ -1063,6 +1087,27 @@ mod tests {
     use super::*;
     use crate::walk;
     use std::path::Path;
+
+    // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a spawn of a resolved path is noted as the
+    // name a declaration spells, so a member that resolves its interpreter stays declarable
+    #[test]
+    fn a_spawned_path_is_noted_as_its_program_name() {
+        let path = which("git").expect("git is absent — the crate's own test suite already requires it");
+        assert!(
+            path.chars().any(std::path::is_separator),
+            "which returned no path: {}",
+            path
+        );
+        recorder::start();
+        let spawned = run(&path, &["--version"]);
+        let noted = recorder::stop();
+        spawned.expect("git did not spawn through its resolved path");
+        assert_eq!(noted, vec!["git".to_string()], "the recorder kept the path it was handed");
+        let suffixed = format!("/opt/tools/bin/git{}", std::env::consts::EXE_SUFFIX);
+        assert_eq!(recorder::name_of(&suffixed), "git");
+        assert_eq!(recorder::name_of("git"), "git");
+        assert_eq!(recorder::name_of("git.exe"), "git.exe", "a bare name is noted as passed");
+    }
 
     // spec: gate-sdk/SPEC.md §Fail-closed contract — the wrapper is exercised directly,
     // because a gate's own fixture pair cannot prove it: no static input crashes a child.

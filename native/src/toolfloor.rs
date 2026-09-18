@@ -10,7 +10,7 @@ pub const PROBE_SET: &[&str] = &[
     "bash:4.3",
     "git",
     "jq",
-    "awk::GNU",
+    "awk",
     "sort::coreutils",
     "shellcheck",
     "cargo:1.71::contributor",
@@ -174,8 +174,8 @@ mod tests {
         }
         let p = parse("cargo:1.71::contributor");
         assert_eq!((p.min.as_str(), p.imp.as_str(), p.audience.as_str()), ("1.71", "", "contributor"));
-        let p = parse("awk::GNU:contributor:extra");
-        assert_eq!((p.imp.as_str(), p.audience.as_str()), ("GNU", "contributor"));
+        let p = parse("sort::coreutils:contributor:extra");
+        assert_eq!((p.imp.as_str(), p.audience.as_str()), ("coreutils", "contributor"));
     }
 
     // spec: context-kit/SPEC.md §bin/env-probe — the array is read out of the library as text, and
@@ -183,8 +183,8 @@ mod tests {
     #[test]
     fn the_roster_reads_out_of_the_librarys_array_line() {
         assert_eq!(
-            probe_set("x=1\nPROBE_SET=(bash:4.3 git awk::GNU)\ny=2\n"),
-            Some(vec!["bash:4.3".to_string(), "git".to_string(), "awk::GNU".to_string()])
+            probe_set("x=1\nPROBE_SET=(bash:4.3 git sort::coreutils)\ny=2\n"),
+            Some(vec!["bash:4.3".to_string(), "git".to_string(), "sort::coreutils".to_string()])
         );
         assert_eq!(probe_set("PROBE_SET=()\n"), Some(Vec::new()));
         assert_eq!(probe_set("nothing here\n"), None);
@@ -206,8 +206,9 @@ mod tests {
     #[test]
     fn the_predicate_answers_from_the_closed_verdict_set() {
         assert_eq!(check("bash:4.3", "").rendered(), "absent");
-        assert_eq!(check("awk::GNU", "GNU Awk 5.3.1").rendered(), "ok");
-        assert_eq!(check("awk::GNU", "mawk 1.3.4").rendered(), "wrong-impl mawk");
+        assert_eq!(check("sort::coreutils", "sort (GNU coreutils) 9.4").rendered(), "ok");
+        assert_eq!(check("sort::coreutils", "BusyBox v1.36.1").rendered(), "wrong-impl BusyBox");
+        assert_eq!(check("awk", "mawk 1.3.4").rendered(), "ok");
         assert_eq!(check("git", "git version 2.4").rendered(), "ok");
         assert_eq!(
             check("bash:4.3", "GNU bash, version 3.2.57(1)-release").rendered(),

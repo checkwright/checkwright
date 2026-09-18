@@ -71,9 +71,9 @@ Subsystem for Linux) is a route you may choose instead — the Linux line below
 serves it, and joining native Windows took nothing away from it.
 
 macOS runs it too, but as an adopter action rather than something the stock
-system delivers. Stock macOS ships bash 3.2 over a BSD userland whose `sort`,
-`date`, and `stat` reject the flags the gates pass. Install GNU bash together
-with coreutils and gawk, then put them ahead of `/usr/bin` on `PATH`. That last
+system delivers. Stock macOS ships bash 3.2 over a BSD userland whose `sort` and
+`date` reject the flags the gates pass. Install GNU bash together
+with coreutils, then put them ahead of `/usr/bin` on `PATH`. That last
 clause is the honest limit: the requirements below assert what `PATH` actually
 resolves, so a Mac carrying Homebrew coreutils that is not `PATH`-ordered
 reports below contract — correctly, since BSD `sort` is what the gates would
@@ -145,21 +145,16 @@ your `PATH`, and the note says what breaks without it:
   model is git-native end to end.
 - `jq` — the settings and evidence gates, and guard-kit's JSON tooling, parse
   their inputs with it.
-- `awk` (GNU) — the generated hooks do their line scanning and field extraction
-  with it, so it stays on the floor until that residue is gone. The shell gate
-  corpus that once shared the floor with them is empty: the member whose
-  3-argument `match()` was the originally-published ground for requiring **GNU**
-  awk specifically, `check-gate-assertions`, ported to the binary. Whether what
-  remains needs a GNU extension at all is unmeasured, and the re-probe with the
-  decision it feeds — narrow this to plain `awk`, or drop it — is
-  `interpreter-floor-gawk-residue-empty`'s. The floor stands unnarrowed until
-  that lands, because an adopter following a *wider* requirement is never broken
-  by it.
-- `sort` (coreutils) — the battery's file plumbing assumes GNU coreutils, and
-  `sort` is the member standing for that family. The binding construct is
-  `realpath --relative-to` in the gate library every check sources; the release,
-  drift and usage tooling reach for `sort -V`, `date -d` and `stat -c` besides.
-  No BSD equivalent carries those flags. A construct named here is what a
+- `awk` — the bash activation bootstrap reads its release digest with it, and the
+  shipped session-context, deprecated-surface KPI and gate-skeleton templates
+  run it. Every one of those programs is POSIX awk, so any implementation
+  serves. The generated hooks contain no awk, and `check-gate-assertions`, whose
+  3-argument `match()` was the one construct that required **GNU** awk, runs in
+  the binary.
+- `sort` (coreutils) — the battery assumes GNU coreutils, and `sort` is the
+  member standing for that family. The binding construct is GNU `date -d`, which
+  the gate binary's KPI and queue-index arms run; the floor check itself compares
+  versions with `sort -V`. No BSD equivalent carries those flags. A construct named here is what a
   `# portability-declared:` marker cites at the site that uses it, so the
   declaration and the enforcement are one fact with one owner rather than two
   lists that agree by habit — `check-portability-floor` reds a new undeclared

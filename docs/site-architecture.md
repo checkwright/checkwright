@@ -218,7 +218,7 @@ recoverable:
   `PROBE_SET` array both directions — name, version floor, implementation
   token, and audience, since each bullet's parenthetical renders its roster
   element verbatim
-  (`` - `bash` (≥ 4.3) — … ``, `` - `awk` (GNU) — … ``,
+  (`` - `bash` (≥ 4.3) — … ``, `` - `sort` (coreutils) — … ``,
   `` - `cargo` (≥ 1.71, @contributor) — … ``, the axes comma-joined,
   no parenthetical for an unconstrained member). The audience carries a leading
   `@` for the same reason the floor carries `≥`: the gate's reader is

@@ -403,6 +403,16 @@ spawned programs are `uname`, `date`, `sort`, and every roster member it probes.
 The roster is the kit's own and a consumer cannot shadow it, which is what keeps
 this set bounded by the paragraph below rather than by a consumer's file.
 
+**The roster is what doctor verifies, not the set the binary spawns.** `date`,
+`mktemp` and `cp` are spawned and not probed: they rest on
+`GATE_SDK_PROGRAM_FLOOR`'s assumption that the payload's host carries them
+(gate-sdk/SPEC.md §lib/gate.sh). `uname` (this arm), `ps` (the pid predicate's
+fallback leg) and `tar` and `npm` (the installer packer) are on neither set.
+Nothing yet holds the three sets in a checked relation — an `ARMS` row carries no
+requirement element to derive one from — so a census that finds a spawned
+program off the roster has found this honest limit, not drift, and the roster is
+not derived from the spawn set.
+
 **The roster and its floor axis (`native/src/toolfloor.rs`).** The roster lives
 beside the predicate that reads it, in the module the whole crate resolves it
 through, so the probe arm, `check-install-toolchain` and the installer's `doctor`
@@ -419,7 +429,7 @@ bare name keeps
 the original meaning — must be present, no version constraint — so the floor axis
 is **per-member** rather than a number demanded of every member. The fields are
 positional, so a member constrained by implementation alone carries an empty
-min-version field (`awk::GNU`), and an empty field means what an omitted trailing
+min-version field (`sort::coreutils`), and an empty field means what an omitted trailing
 field means: `awk`, `awk:`, `awk::` and `awk:::` are one unconstrained member. **A member
 gains a floor only where a construct the battery actually runs forces one**, and
 the forcing construct is recorded with it — a floor nobody's code forces is not
@@ -462,19 +472,15 @@ The constrained members and what forces each:
   consumer below it cannot run the battery at all. Recorded here because the
   earlier `4.0` was a fail-open: `env-probe` reported `ok` on a 4.2 box the
   battery would fail with an obscure syntax error.
-- `awk::GNU` — no version floor, one implementation constraint, whose last live
-  holder has since been retired; narrowing the element is owed rather than taken
-  (gate-sdk/SPEC.md §check-gate-assertions).
 - `sort::coreutils` — no version floor, one implementation constraint, and one
-  member standing for a whole package family: GNU coreutils is forced by
-  `realpath --relative-to` and its `-m` form (gate-sdk's shared gate library and
-  hook emitter, canon-kit's link and command resolvers), `sort -V`
-  (`check-release-bump`), `date -d` (drift-kit's KPIs and trajectory), and
-  `stat -c` (delegation-kit's usage verdict). None is BSD-portable, and the
-  first sits in the library every gate sources — so a box without it cannot run
-  the battery at all rather than failing one gate. The representative member is
-  the binary carrying a forcing construct, which is also the floor predicate's
-  own comparison tool.
+  member standing for a whole package family: GNU coreutils is forced by GNU
+  `date -d`, which the binary spawns in its KPI and queue-index arms
+  (`native/src/emit/kpi/mod.rs`, `native/src/emit/queue_index.rs`), and by the
+  floor predicate's own `sort -V`. Neither is BSD-portable. The representative
+  member is the binary carrying a forcing construct, which is also the floor
+  predicate's own comparison tool. `realpath --relative-to` and `stat -c` do
+  not force it: the binary computes relative paths lexically, and `stat -c` has
+  no live site.
 - `cargo:1.71::contributor` — a **contributor-side** floor, never a runtime one,
   and that reading is now declared on the element and read by name rather than
   left as an aside: the audience field is what the consumer-side predicate
@@ -511,10 +517,16 @@ The constrained members and what forces each:
   unaffected: git remains the sole runtime dependency of a ported gate, shelled out
   rather than embedded.
 Every other member is a bare name — no construct in the battery forces a version
-on it (the `jq` usage is 1.5-era throughout), so none is pinned.
+on it (the `jq` usage is 1.5-era throughout), so none is pinned. `awk` is among
+them: every awk program that ships is POSIX — the bash activation bootstrap's
+digest read, and the session-context, deprecated-surface KPI and gate-skeleton
+templates — the generated hooks contain none, and the binary spawns awk only as
+its ERE matcher's test oracle. The GNU constraint's last holder was
+`check-gate-assertions`' 3-argument `match()`, retired by its port
+(gate-sdk/SPEC.md §check-gate-assertions).
 
 An implementation token is matched as a **substring of the tool's own version
-banner** — gawk prints `GNU Awk`, GNU sort prints `sort (GNU coreutils)` — so the
+banner** — GNU sort prints `sort (GNU coreutils)` — so the
 constraint is checked against the binary actually on `PATH` rather than against a
 package name nothing can probe. Its honest limit is the same one: the roster
 asserts what `PATH` resolves at probe time, so an installed-but-not-`PATH`-ordered

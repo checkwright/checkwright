@@ -769,8 +769,7 @@ fn run_vendored(
     let mut argv: Vec<&str> = vec![&script_path];
     argv.extend_from_slice(args);
     // spec: gate-sdk/SPEC.md §check-graph — the bare name is spawned and `proc::run*` resolves it
-    // off the homonym roster; resolving here would hand `proc::recorder` a path, which is the
-    // disagreement a call-site resolution produces and the owner's cannot
+    // off the homonym roster, the owner rather than a call site
     let out = crate::proc::run_merged_in("bash", &argv, &[], Some(root))
         .map_err(|e| refuse(format!("{} failed: {}", script, e), "", 2))?;
     if !out.succeeded() {

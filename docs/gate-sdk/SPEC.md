@@ -1429,7 +1429,7 @@ in `proc.rs` so a cohort of wrappers buys them once:
   serves both, so the two cannot disagree. Without it the probe walked the
   `PATHEXT` candidate set and the platform walked its own rules, and a wrapper
   passed its preflight and then refused at the spawn on a program the host has,
-  which is the fail-open the probe exists to prevent. Three properties are
+  which is the fail-open the probe exists to prevent. Two properties are
   load-bearing. It is a **pass-through off Windows** on `resolve_floor_tool`'s own
   ground — resolving there would swap the spawned literal for an absolute path on
   every host the battery runs on — so every POSIX verdict is byte-identical. It
@@ -1439,11 +1439,9 @@ in `proc.rs` so a cohort of wrappers buys them once:
   deliberately the naming-dialect half's posture: §check-graph's refusing
   resolver answers a different question — a system-directory homonym rather than
   a naming dialect — and the roster is what keeps the two apart per name rather
-  than per call site. And it resolves **after** the spawn recorder's note, which is what
-  leaves every `# graph:` requirement declaration matching the recorded name by
-  construction — a call site that resolves first hands the recorder a path and
-  breaks that comparison, which is the second reason the resolution belongs to the
-  owner rather than to a caller. `dispatch` is outside the funnel and needs no
+  than per call site. Where it resolves relative to the spawn recorder's note is
+  not a third: the recorder notes a name either way (§The `# graph:` manifest).
+  `dispatch` is outside the funnel and needs no
   place in it: its `argv[0]` is a resolved binary or script **path** its caller
   computed, never a name for the platform to search.
 - **What `Command::new` does with a resolved `.cmd` is an observation, so the
@@ -1576,8 +1574,9 @@ kit roots through `realpath`.
 **That routing test is also what makes `--needs` trustworthy, which is why the
 spawn recorder lives here rather than beside the registry.** `proc.rs` carries a
 `#[cfg(test)]` recorder on the shape `walk.rs`'s read recorder has: **every**
-spawning entry point — `run`, `run_with_stdin`, `run_merged`, `run_streamed` — notes the program
-it is about to spawn, and §The `# graph:` manifest's unit test A reads the note
+spawning entry point — `run`, `run_with_stdin`, `run_merged`, `run_streamed` — notes the name
+of the program it is about to spawn, a path reduced to its final component (the
+requirement ground is §The `# graph:` manifest's `<program>` line kind), and §The `# graph:` manifest's unit test A reads the note
 back after running a member over a fixture case, inside the child that runs it
 (§lib/gate.sh). A face added to `proc.rs`
 that skipped the note would un-verify A silently, which is why the recorder is
@@ -2024,10 +2023,20 @@ line and no header, on §check-reads-couples' ground that a transcribed total is
 second source for something derivable from the lines. Three line kinds, each with
 a named reader at a named transition:
 
-- **`<program>`** — a program the member spawns. Read by §port-blockers' default
-  arm at its per-member row, filtered against `GATE_SDK_PROGRAM_FLOOR` exactly as
-  a shell member's scanned command word is, so an on-floor program is suppressed
-  on both substrates by one rule.
+- **`<program>`** — a **requirement**: a program a host must carry for the member
+  to run, named as `PATH` names it, never the literal `argv[0]` a spawn happened
+  to pass. Read by §port-blockers' default arm at its per-member row, filtered
+  against `GATE_SDK_PROGRAM_FLOOR` exactly as a shell member's scanned command
+  word is, so an on-floor program is suppressed on both substrates by one rule.
+  That reader is why the line is a name: the floor is a set of names, so a
+  resolved absolute path would never match it and a member that resolves its
+  interpreter would be reported off-floor on every host; and a path-shaped
+  declaration could not be written host-independently for exactly the members
+  that resolve. The spawn recorder therefore notes a name — a bare name as
+  passed, a value carrying a path separator as its final component minus the
+  host's executable suffix — so a member spawning `resolve_interpreter("bash")`'s
+  path declares `bash` and is covered, and a `?<TAB><knob>` declaration still
+  absorbs its knob's command word whatever form that word takes.
 - **`?<TAB><knob-name>`** — the requirement is the **command word of that knob's
   resolved value**. Read by the same arm at the knob resolution that precedes
   the floor filter, the path it already uses for a shell member's command-position
@@ -14918,18 +14927,16 @@ value is rendered in doctor's banner and the env-probe emitter rather than only
 spawned — the one identity the funnel cannot absorb.
 
 **Why the owner and not the call sites, which is the part a sweep would get
-wrong.** A call site that resolves first hands `proc::recorder::note` a path,
-and `every_registry_member_declares_the_programs_it_spawns` compares that record
-against the registry's declared requirement by **exact equality** — so a pointed
-repair is observably harmful in exactly the place it looks tidiest. Resolving
-inside the owner, after the note, leaves every declaration matching by
-construction. And a sweep is refused on measurement rather than on taste: the
+wrong.** A pointed repair cannot break the registry's requirement
+comparison — the recorder reduces a resolved path to its name (§The `# graph:`
+manifest) — so the owner's claim rests on cost and correctness. A sweep is
+refused on measurement rather than on taste: the
 shipped bare-literal spawn population is `git` and `bash` at two and three orders
 of magnitude past what a call-site sweep can be costed at, with nine other
 programs behind them. A lint forbidding the bare literal is refused on its own
 terms for the same reason — under the funnel the literal is **correct**, and such
-a lint would red every correct site and push each into the call-site resolution
-that broke the comparison. What enforcement-first is owed against instead is a
+a lint would red every correct site and push each into a call-site resolution
+the funnel already performs. What enforcement-first is owed against instead is a
 different predicate, and it is §Fail-closed contract's widened
 no-subprocess-outside-`proc.rs` assertion.
 

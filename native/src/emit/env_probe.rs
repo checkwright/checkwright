@@ -296,8 +296,8 @@ mod tests {
         assert_eq!(render_floor("jq", "ok"), "");
         assert_eq!(render_floor("bash:4.3", "ok"), " (floor 4.3, ok)");
         assert_eq!(
-            render_floor("awk::GNU", "wrong-impl mawk"),
-            " (requires GNU — below contract)"
+            render_floor("sort::coreutils", "wrong-impl 2.3-Apple"),
+            " (requires coreutils — below contract)"
         );
         assert_eq!(
             render_floor("cargo:1.71::contributor", "uncomparable"),

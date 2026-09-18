@@ -319,12 +319,12 @@ mod tests {
         assert!(!render_member(&mut out, "git", "git version 2.44.0"));
         assert!(render_member(&mut out, "git", ""));
         assert!(render_member(&mut out, "bash:9.9", "GNU bash, version 5.2.37"));
-        assert!(render_member(&mut out, "awk::GNU", "mawk 1.3.4"));
+        assert!(render_member(&mut out, "sort::coreutils", "2.3-Apple (190.100.2)"));
         assert!(render_member(&mut out, "bash:4.3", "GNU bash, no version"));
         assert!(out.contains("git          2.44.0"));
         assert!(out.contains("git          NOT FOUND"));
         assert!(out.contains("bash         5.2.37 (below the floor of 9.9)"));
-        assert!(out.contains("awk          1.3.4 (not the GNU implementation the contract requires)"));
+        assert!(out.contains("sort         2.3 (not the coreutils implementation the contract requires)"));
         assert!(out.contains("bash         could not be compared against the floor of 4.3"));
     }
 
