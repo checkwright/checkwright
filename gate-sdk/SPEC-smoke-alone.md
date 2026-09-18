@@ -98,10 +98,8 @@ reusing `smoke`'s pass rather than copying it. It also appends a release
 declaration bullet: a shipped arm now does more by default (lifecycle-kit's
 build template, *Declare what a vendoring consumer will meet*).
 
-**Inferred, cannot run before build:** the phase's wall-clock. The green union
-run takes 22s for 11 roots. Eleven repeats of a two-root tree should cost less
-than eleven full runs, but no green repeat exists yet to time. The phase line
-reports the cost from the first green run.
+**Inferred, cannot run before build:** the phase's wall-clock — no green repeat exists yet to time it against the green union run's 22s for 11 roots.
+Eleven repeats of a two-root tree should cost less than eleven full runs, and the phase line reports the cost from the first green run.
 
 ### (2) The per-kit contract states self-sufficiency and names its oracle {mechanical}
 
@@ -212,9 +210,10 @@ byte-for-byte this tree's line 1 of `.workflow/release-declarations.md`.
 
 **Probed:** a `.workflow/.gitkeep` does not work. It reds
 `check-workflow-tiering` assertion B, because every tracked member needs a
-`# contract:` header. **Inferred, cannot run before build:** whether that header
-file stays green under the full run's other `.workflow/` readers. Delta 1's phase
-and the union run are the oracle, and delta 7 covers a red.
+`# contract:` header.
+
+**Inferred, cannot run before build:** whether that header file stays green under the full run's other `.workflow/` readers — delta 1's phase and the union run are the oracle, and neither exists before build lands delta 1.
+Delta 7 covers a red.
 
 ### (6) canon-kit's leg writes the `docs/` page its gate reads {mechanical}
 
@@ -226,8 +225,9 @@ depending on that order.
 
 **Probed:** in the canon-kit scratch tree, adding `docs/index.md` with a single
 heading cleared `check-docs-link-convention`. The only remaining red was the
-`.gitkeep` from delta 5's refuted candidate. **Inferred, cannot run before
-build:** that the page stays green under site-kit's docs gates in the union run.
+`.gitkeep` from delta 5's refuted candidate.
+
+**Inferred, cannot run before build:** that the page stays green under site-kit's docs gates in the union run — no union run under delta 1's phase exists yet with delta 6's page and site-kit's registrations both landed.
 
 ### (7) Residual failures are landed in the owning kit's install {design-bearing}
 
