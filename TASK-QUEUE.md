@@ -31,19 +31,6 @@
   Filed 2026-08-13 by close. Joined `reach-ruling-lockstep` 2026-09-18 (operator direction,
   lead-relayed). Paired at spec.
 
-- **vendored-library-identifier-reach** [spec: SPEC-identifier-reach.md] — De-literalization
-  bans prose restating a source's internal identifiers but never says which are internal, so every
-  `internal-identifier-restatement` audit re-derives the fork, and two auditors can reach opposite
-  verdicts on the same prose.
-  **Directed 2026-09-18** (operator direction, lead-relayed; the native sentence came after an
-  advisory consult). Reach is judged at the file. The owning kit may name any function of its
-  shipped library. Another kit's underscore helper is a finding. A native item visible past its
-  module may be named; a private one belongs to its nearest `spec:` pointer's component. Reach is
-  checked before the citation test.
-  **Measured at spec:** three cross-component findings in gate-sdk/SPEC.md (lines 4627, 6964 and
-  14901), plus an off-class dead name at line 3633. guard-kit's 37 own-helper citations are clean.
-  Filed 2026-08-13 by close. Third population added 2026-08-14. Paired at spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -3464,5 +3451,7 @@
 - **readme-bin-roster-underived** — no gate holds a kit README's bin/ tool roster.
 
 ## Done
+
+- vendored-library-identifier-reach
 
 ## Lessons Learned

@@ -3630,8 +3630,8 @@ criteria, criterion 7).
 `EVIDENCE_KIT_RUN_*` and `EVIDENCE_KIT_PARSER_*`, the second of which this member
 mints the crate's first declaration of. Probed rather than assumed: every other
 family declaration in the crate is a single one. The families cost the arm no new
-mechanism, `_gate_knob_prefix_emit` resolving each inside the owning kit's
-already-sourced subshell, and a prefix matching nothing is an empty family that
+mechanism: `walk::knob_prefix` reads each as the owning kit's declared family in
+process (§The knob file), and a prefix matching nothing is an empty family that
 passes — which is what lets a consumer configure one family and not the other.
 
 **The test's *emitting* side is thin on worked instances and gains one at
@@ -4624,12 +4624,11 @@ that answers each is the one whose corpus matches its question.
    **guard-kit's three primitives are the fifth instance, and the first where the
    holder's `no-port` ground is about something other than the twinned
    predicates.** `guard_split_compound`, `guard_skeleton` and
-   `_guard_redirect_pairs` gained compiled twins when guard-kit's prompt ranker
+   guard-kit's redirect-pair scan gained compiled twins when guard-kit's prompt ranker
    ported (guard-kit/SPEC.md §The guard framework), while `lib/guard.sh` itself
    stays shell on its own declared ground — it is the API a consumer composes its
    own rules from. That ground does not reach these three: none resolves a knob,
-   and one of them is an `_`-prefixed internal helper outside the documented
-   surface. What a later port should read
+   and one of them is internal to guard-kit. What a later port should read
    off this instance is that a holder's `no-port` grounds are checked **against
    the twinned predicates**, not against the file — a file can be permanently
    shell for reasons that leave a predicate inside it perfectly portable, which is
@@ -6961,7 +6960,7 @@ Parity ran over both fixture pairs, the live tree at four scan-root spellings an
 a differential edge tree at nine knob settings — 30 comparisons, byte-identical on
 stdout, stderr and exit code, run while both implementations still existed. Two of
 those comparisons failed first: at a `..` scan root the shell prune kept **22**
-canonical specs where the compiled form kept 11. `_spec_prune_kit_roots` is a
+canonical specs where the compiled form kept 11. The shell prune was a
 prefix test, and it normalised neither the scan root nor the file paths, so a
 `..` component made every comparison fail and pruned nothing at all — the corpus
 silently widening rather than reddening. The rule it is measured against says a
@@ -14898,9 +14897,8 @@ no surface a consumer wrote. The graph emitter appends the same set, so the publ
 coupling graph draws the edge a derived couple creates.
 
 **A bare-name interpreter spawn is resolved, not named** — and it is
-resolved by the **owner**, not by the call site. The installer's `run_vendored`,
-which spawns `bash` for the vendored front-end on every `init`, is the standing
-instance: it spawns the bare literal `bash` exactly as every other spawn in the
+resolved by the **owner**, not by the call site. The installer's spawn of the
+vendored front-end, run on every `init`, is the standing instance: it spawns the bare literal `bash` exactly as every other spawn in the
 crate does, and `proc::run*` resolves it. The name-to-treatment question lives in one governed **roster** in
 `proc.rs`, `SYSTEM_DIR_HOMONYMS`, whose rows are a program **name** and a
 **disposition** — what a host offering that program nowhere but the system

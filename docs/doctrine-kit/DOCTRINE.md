@@ -70,14 +70,24 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    their owner, and prose names the knob or the roster rather than its value.
    The duty widens past values to *source identifiers*: prose names the public
    contract — the knob, the command, the entry point another surface calls —
-   never the source's internal identifier roster or its step-by-step algorithm.
-   A SPEC subsection that inventories internal helpers or narrates branch
-   conditions is the same defect as a copied knob value: a second source of a
-   fact the code owns, stale at the next refactor. The WHY, the invariant, and
-   the public contract stay SPEC prose; the WHAT and the how live in the source
-   behind a pointer. The judgment line: an identifier stays in prose iff a
-   consumer outside the file must type or configure it, and goes behind a
-   pointer iff only the source's own maintainer meets it.
+   never a source's internal identifiers or its step-by-step algorithm.
+   **Reach, judged at the file and not the kit, decides whether a name may
+   appear.** A shipped vendored library is a public contract by construction,
+   so its owning kit's SPEC may name any function it defines. Beyond that kit
+   only its exports may be named: an underscore-prefixed helper is private to
+   its kit, and another kit's prose naming one is a finding. The native crate
+   reads the same way, with the module in place of the file. An item visible
+   past its module (`pub`, `pub(crate)`, `pub(super)`) may be named. A private
+   item belongs to the component its nearest `spec:` pointer names (the item's
+   own pointer, else its module's first line), and any other component naming
+   it is a finding. **Reach is checked first.** Only a name it admits goes on
+   to the citation test, so a private name out of reach stays a finding even
+   when it is a decision's subject. Among admitted names, naming one as the
+   subject of a contract or decision is a citation. Inventorying a source's
+   helpers or narrating its branch conditions is the same defect as a copied
+   knob value: a second source of a fact the code owns, stale at the next
+   refactor. The WHY, the invariant and the public contract stay SPEC prose;
+   the WHAT and the how live in the source behind a pointer.
    *Under agent work:* a literal copied into prose is a second source of a
    number, and an agent that trusts the nearer copy ships the stale one; an
    internal-helper inventory rots the same way, read as ground truth after the
@@ -85,7 +95,8 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    *Enforced by:* for values, the bare-cardinal gate in
    [canon-kit/SPEC.md](../canon-kit/SPEC.md) §check-manifest-count; the
    source-identifier class cannot be gated cleanly — a SPEC legitimately names
-   public functions as contracts, so the Enforcement-first false-positive
+   an admitted identifier as a contract, and whether it cites one or inventories
+   them is a judgment — so the Enforcement-first false-positive
    carve-out applies — and it rides that carve-out's cadence as the
    `internal-identifier-restatement` seed member of the close-stage audit
    roster (lifecycle-kit/SPEC.md §The audit roster), a stated authoring duty due on
