@@ -12,22 +12,6 @@
 
 ## New Features
 
-- **ere-matcher-capture-groups-unowned** [spec: SPEC-ere-capture.md] — the crate's POSIX ERE
-  matcher cannot report a capture group, so the stage-entry path runs a second ERE interpreter.
-  `capture_group_one` (`native/src/emit/enter_stage.rs`) captures the worktree-lock pid through
-  `bash -c` and `BASH_REMATCH[1]`, and the knob validator reads compilability off bash's
-  `[[ =~ ]]` status, so one pattern is judged in the host `regcomp` dialect and nothing compares
-  it with `native/src/ere.rs`.
-  **Shape settled at spec, 2026-09-18 (lead decision, relayed):** no Pike-VM. A one-group capture
-  whose group stands in the top-level concatenation answers the POSIX subpattern rule with the
-  existing span engine, held by a bash differential oracle; the lock-pattern grammar narrows to
-  that shape, fail-closed and release-declared. Of the seven production `proc::run("bash"` sites
-  (an earlier count said six over a seven-item list) only these two are ERE sites; the two
-  `kill -0` probes need a `libc` route and are filed to the gap inbox, and the other three are
-  bash by subject.
-  Filed 2026-09-04 by build; directed 2026-09-18 as lead unit of `native-spawn-floor` (operator
-  direction, lead-relayed); paired at spec.
-
 - **toolchain-floor-spawn-on-native-windows** [spec: SPEC-spawn-floor.md] — the published
   toolchain floor carries a member no shipped construct forces, and its forcing grounds are stale.
   **Re-scoped at spec, 2026-09-18 (lead decision, relayed), measured:** a git-only floor is not
@@ -3479,5 +3463,7 @@
 - **readme-bin-roster-underived** — no gate holds a kit README's bin/ tool roster.
 
 ## Done
+
+- ere-matcher-capture-groups-unowned
 
 ## Lessons Learned

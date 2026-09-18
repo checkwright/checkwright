@@ -136,32 +136,6 @@ fn positive(v: &str) -> bool {
     v.bytes().next().is_some_and(|b| (b'1'..=b'9').contains(&b)) && v.bytes().all(|b| b.is_ascii_digit())
 }
 
-// spec: lifecycle-kit/SPEC.md §The stage-machine adapters — a compiled lock-reason pattern is read off
-// bash's own `[[ =~ ]]` status, the engine the consumer's pattern is matched with: 2 is a pattern it
-// could not compile, 0 and 1 both mean it compiled
-fn ere_compiles(re: &str) -> bool {
-    match crate::proc::run("bash", &["-c", "[[ \"\" =~ $1 ]]", "bash", re]) {
-        Ok(c) => c.code().is_some_and(|rc| rc <= 1),
-        Err(_) => false,
-    }
-}
-
-// spec: lifecycle-kit/SPEC.md §The stage-machine adapters — an escaped parenthesis is literal, so a
-// capture group is an unescaped `(`
-fn declares_group(re: &str) -> bool {
-    let mut chars = re.chars();
-    while let Some(c) = chars.next() {
-        match c {
-            '\\' => {
-                chars.next();
-            }
-            '(' => return true,
-            _ => {}
-        }
-    }
-    false
-}
-
 // spec: lifecycle-kit/SPEC.md §Layout and configuration — a broken machine gates nothing: the stage
 // relations, the switches, the journal placeholder and the lock-reason pattern
 fn validate(v: &Values) -> Vec<String> {
@@ -261,13 +235,13 @@ fn validate(v: &Values) -> Vec<String> {
             errs.push(format!("LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN '{}' carries no '<stage>' placeholder", p));
         }
     }
+    // spec: lifecycle-kit/SPEC.md §The stage-machine adapters — the lock-reason pattern is judged by
+    // the engine that will match it, and refused for any shape outside its one-group capture
     if let Some(re) = scalar(v, "LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE").filter(|r| !r.is_empty()) {
-        if !ere_compiles(re) {
-            errs.push(format!("LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE '{}' is not a valid POSIX ERE", re));
-        } else if !declares_group(re) {
+        if let Err(e) = crate::ere::EreCapture::compile(re) {
             errs.push(format!(
-                "LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE '{}' declares no capture group — the group is the holder's pid",
-                re
+                "LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE '{}' is refused — the group is the holder's pid: {}",
+                re, e
             ));
         }
     }
@@ -276,13 +250,33 @@ fn validate(v: &Values) -> Vec<String> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::ere::EreCapture;
 
     #[test]
-    fn a_lock_pattern_is_compiled_by_bash_and_needs_an_unescaped_group() {
-        assert!(ere_compiles("^held by pid ([0-9]+)$"));
-        assert!(!ere_compiles("(["));
-        assert!(declares_group("a ([0-9]+)"));
-        assert!(!declares_group("a \\([0-9]+\\)"));
+    fn a_lock_pattern_needs_one_group_the_engine_compiles() {
+        let no_group = EreCapture::compile("a \\([0-9]+\\)").err().expect("an escaped group compiled");
+        assert!(no_group.to_string().contains("no capture group"), "{}", no_group);
+        assert!(EreCapture::compile("([").is_err());
+    }
+
+    // spec: lifecycle-kit/SPEC.md §Layout and configuration — every pattern this tree ships must stay
+    // admitted and keep capturing its pid, so an engine change that would refuse one reds here
+    #[test]
+    fn every_shipped_lock_pattern_is_admitted_and_captures_its_pid() {
+        let knobs_file = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../scripts/lifecycle-config.knobs");
+        let knobs = std::fs::read_to_string(knobs_file)
+            .expect("cannot read this repo's lifecycle knob file");
+        let repo = knobs
+            .lines()
+            .find_map(|l| l.strip_prefix("LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE = "))
+            .expect("the repo knob file sets no lock pattern");
+        for (re, reason) in [
+            (repo, "claude agent a1b2 (pid 4321 start 99)"),
+            ("^held by pid ([0-9]+)$", "held by pid 4321"),
+            ("^testharness \\(pid ([0-9]+)\\)$", "testharness (pid 4321)"),
+        ] {
+            let cap = EreCapture::compile(re).unwrap_or_else(|e| panic!("{:?} refused: {}", re, e));
+            assert_eq!(cap.capture(reason).map(|(i, j)| &reason[i..j]), Some("4321"), "{:?}", re);
+        }
     }
 }

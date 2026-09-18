@@ -866,14 +866,15 @@ the clause's reader is a human or agent rather than a gate.
   than absent; a consumer with a standing long-lived worktree turns it off here
   rather than teaching the kit its paths.
 - `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` — a POSIX ERE with exactly one capture
-  group, matched against a linked worktree's git lock reason, the group being
-  the holder's pid (§bin/enter-stage.sh); **default empty**. Empty because a
+  group standing in the top-level concatenation (the admitted shape:
+  gate-sdk/SPEC.md §The POSIX ERE matcher), matched against a linked worktree's
+  git lock reason, the group being the holder's pid (§bin/enter-stage.sh); **default empty**. Empty because a
   lock reason is one harness's vocabulary and a kit literal spelling it would
   publish it, the same seam the residue-directory omission takes; empty also
   means *no classification is configured*, so an unconfigured consumer sees
   exactly the unclassified refusal it sees today. Setting it buys a dependency
-  on evidence-kit's liveness predicate; a pattern that will not compile, or one
-  declaring no capture group, is a fail-closed config refusal (§The stage-machine adapters).
+  on evidence-kit's liveness predicate; a pattern outside that shape is a
+  fail-closed config refusal (§The stage-machine adapters).
 - `LIFECYCLE_KIT_ENTRY_PREFLIGHT` — per-stage `<stage>=<command>` entries run
   alongside the built-in pre-flight (§bin/enter-stage.sh); default empty.
 - `LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE` — the committed one-shot valve ledger
@@ -2243,12 +2244,9 @@ reader passes on every skeleton rather than erroring (§bin/enter-stage.sh).
 the kit's first knob read in a process, collects every finding, and refuses at exit
 2 under the kit's malformed-config lead line (gate-sdk/SPEC.md §The knob file).
 `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` states the rule the others follow: a non-empty
-pattern must compile as a POSIX ERE and must declare a capture group, each refused
-with its own message. Compilation is read off bash's own `[[ =~ ]]` status, spawned
-by the validator — 2 for a pattern it could not compile, 0 and 1 both meaning it
-compiled — rather than off a second regex engine that could disagree with the one
-the consumer will actually run against, since the crate's matcher for that pattern
-is itself a `bash` spawn (§bin/enter-stage.sh). The refusal exists because the
+pattern is compiled by the engine that will match it — gate-sdk/SPEC.md §The POSIX
+ERE matcher's one-group capture — and refused for any shape outside that item's,
+the finding carrying the engine's own reason. The refusal exists because the
 failure it replaces is silent: an uncompilable pattern matches nothing and a
 group-less one captures nothing, and either would classify every worktree
 unclassified while looking configured. Exercised in `smoke/` with a pattern
@@ -2718,7 +2716,7 @@ mechanism now has one, and nothing about the signal is minted here.
 **The reason's format is consumer vocabulary, taking the same disposition the
 residue directory takes one paragraph up.**
 `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` is a POSIX ERE with exactly one capture
-group, matched against a lock reason, the group being the pid that consumer's
+group in the admitted shape (§Layout and configuration), matched against a lock reason, the group being the pid that consumer's
 harness writes there — **which this kit does not take for the holder's**. A
 harness may lock with the pid of the process *supervising* its agents rather
 than an agent's own, and no property of the reason distinguishes the two, so the
@@ -2752,20 +2750,15 @@ unconfigured consumer owed no second vendored kit — has no counterpart here, a
 neither does the exit-2 arm for a configured pattern with that library
 unreachable: that refusal has no cause it could fire on.
 
-**The lock pattern is consumer configuration, so it is *interpreted* and never
-transported.** The crate's own ERE engine reports a whole-match span and carries
-**no capture group at all** (gate-sdk/SPEC.md §The POSIX ERE matcher sizes it that
-way deliberately), while this classification turns on the *captured* pid. The
-match is therefore delegated to `bash` — the same reach the liveness predicate
-makes for `kill -0`, and on the program floor by the same ruling — which makes the
-dialect the incumbent one **by construction** rather than by comparison, since
-bash's `=~` is the matcher this tool used before the port and a port may not
-change a verdict across the seam. **The honest limit is stated with it:** this
-path now holds two ERE interpreters that can disagree, and their agreement is
-asserted at the cut rather than enforced afterward. That a pattern declares
-exactly one capture group is the table validator's fail-closed config check
-(§The stage-machine adapters), so the
-classifier is never reached with a pattern whose capture cannot be read.
+**The lock pattern is consumer configuration, captured by the engine's one-group
+item.** This classification turns on the *captured* pid, and the capture is
+gate-sdk/SPEC.md §The POSIX ERE matcher's one-group item, compiled once per run —
+one interpreter judges and matches the pattern, and its agreement with bash's
+`=~`, the matcher this tool used before the port, is held by that item's
+differential oracle rather than asserted at a cut. That the pattern has the
+admitted shape is the table validator's fail-closed config check (§The
+stage-machine adapters), so the classifier is never reached with a pattern whose
+capture cannot be read.
 
 **One capture group and not two.** The start-time field is matched and
 deliberately not captured. Parity is the first ground — the `.run` record grammar

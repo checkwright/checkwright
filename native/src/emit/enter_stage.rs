@@ -1,6 +1,7 @@
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the deterministic stamp half of a stage
 // transition, mechanized (judgment stays in the skill) spec: gate-sdk/SPEC.md §The non-gate arm —
 // an `Arm::Run` because the exit contract is three-state and every code is load-bearing: 0 a
+use crate::ere::EreCapture;
 use crate::proc;
 use crate::registry;
 use crate::stages;
@@ -59,8 +60,20 @@ struct Cfg {
     journal_pattern: String,
     journal_require: String,
     worktree_check: String,
-    worktree_re: String,
+    worktree_re: Option<EreCapture>,
     tmpdir: String,
+}
+
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the lock pattern compiles once per run through
+// the engine's one-group capture; empty is the unclassified default
+fn lock_capture() -> Result<Option<EreCapture>, String> {
+    let re = walk::knob_scalar("LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE")?;
+    if re.is_empty() {
+        return Ok(None);
+    }
+    EreCapture::compile(&re)
+        .map(Some)
+        .map_err(|e| format!("LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE '{}': {}", re, e))
 }
 
 fn cfg() -> Result<Cfg, String> {
@@ -81,7 +94,7 @@ fn cfg() -> Result<Cfg, String> {
         journal_pattern: walk::knob_scalar("LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN")?,
         journal_require: walk::knob_scalar("LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE")?,
         worktree_check: walk::knob_scalar("LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK")?,
-        worktree_re: walk::knob_scalar("LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE")?,
+        worktree_re: lock_capture()?,
         tmpdir: walk::knob_scalar("GATE_SDK_TMP_DIR")?,
     })
 }
@@ -894,7 +907,7 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the iteration-boundary linked-worktree
     // refusal: at an iteration boundary no linked worktree should be live.
     if first && c.worktree_check == "1" && inside_git() {
-        let rows = worktree_scan(&c.worktree_re);
+        let rows = worktree_scan(c.worktree_re.as_ref());
         if !rows.is_empty() {
             let mut lines: Vec<String> = Vec::new();
             let (mut live, mut orphaned, mut unclassified) = (0, 0, 0);
@@ -988,7 +1001,7 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the mid-iteration worktree advisory: the
     // same scan away from the boundary, orphaned paths only and never a refusal.
     if !first && c.worktree_check == "1" && inside_git() {
-        let adv: Vec<String> = worktree_scan(&c.worktree_re)
+        let adv: Vec<String> = worktree_scan(c.worktree_re.as_ref())
             .iter()
             .filter(|r| matches!(r.class, Class::Orphaned))
             .map(|r| format!("orphaned     {} — {}", r.path, worktree_loss(&r.path, &r.head)))
@@ -1561,7 +1574,7 @@ fn inside_git() -> bool {
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the linked-worktree scan: one porcelain parse
 // classified live/orphaned/unclassified, shared by the boundary refusal and the mid-iteration
 // advisory so the two cannot disagree about what a path is. The main checkout is skipped.
-fn worktree_scan(re: &str) -> Vec<Row> {
+fn worktree_scan(re: Option<&EreCapture>) -> Vec<Row> {
     let Ok(c) = proc::run("git", &["worktree", "list", "--porcelain"]) else {
         return Vec::new();
     };
@@ -1602,18 +1615,19 @@ fn worktree_scan(re: &str) -> Vec<Row> {
         .skip(1)
         .map(|(path, head, locked, reason)| {
             let mut pid = String::new();
-            let class = if re.is_empty() {
-                Class::Unclassified
-            } else if !locked {
-                Class::Orphaned
-            } else if let Some(captured) = capture_group_one(re, &reason) {
-                pid = captured;
-                match crate::evidence::pid_alive(&pid) {
-                    Ok(true) => Class::Live,
-                    _ => Class::Orphaned,
-                }
-            } else {
-                Class::Unclassified
+            let class = match re {
+                None => Class::Unclassified,
+                Some(_) if !locked => Class::Orphaned,
+                Some(re) => match re.capture(&reason) {
+                    Some((i, j)) => {
+                        pid = String::from_utf8_lossy(&reason.as_bytes()[i..j]).into_owned();
+                        match crate::evidence::pid_alive(&pid) {
+                            Ok(true) => Class::Live,
+                            _ => Class::Orphaned,
+                        }
+                    }
+                    None => Class::Unclassified,
+                },
             };
             Row {
                 class,
@@ -1623,16 +1637,6 @@ fn worktree_scan(re: &str) -> Vec<Row> {
             }
         })
         .collect()
-}
-
-// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the lock-reason pattern is **consumer
-// config**, so it is interpreted rather than transported: the crate's own ERE engine reports a
-// whole-match span and carries no capture group at all (gate-sdk/SPEC.md §The POSIX ERE matcher
-fn capture_group_one(re: &str, subject: &str) -> Option<String> {
-    let script = "[[ \"$2\" =~ $1 ]] || exit 1; printf '%s' \"${BASH_REMATCH[1]}\"";
-    let c = proc::run("bash", &["-c", script, "bash", re, subject]).ok()?;
-    c.stdout()
-        .map(|o| String::from_utf8_lossy(o).into_owned())
 }
 
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the loss report: the two facts that decide
@@ -2074,19 +2078,15 @@ mod tests {
         );
     }
 
-    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the lock-reason pattern is consumer config
-    // interpreted by bash, so the shipped pattern's capture group yields the holder's pid; the
-    // crate's own engine reports a whole-match span and would yield nothing
+    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the shipped lock pattern's group yields the
+    // holder's pid through the engine's one-group capture
     #[test]
-    fn the_consumer_lock_pattern_captures_the_holders_pid_through_bash() {
+    fn the_consumer_lock_pattern_captures_the_holders_pid() {
         let re = r"^claude agent [^ ]+ \(pid ([0-9]+) start [0-9]+\)$";
-        assert_eq!(
-            capture_group_one(re, "claude agent a1b2 (pid 4321 start 99)").as_deref(),
-            Some("4321")
-        );
-        assert_eq!(capture_group_one(re, "some other tool is holding this"), None);
-        let compiled = crate::ere::Ere::compile(re).expect("the shipped pattern must parse");
-        assert!(compiled.is_match("claude agent a1b2 (pid 4321 start 99)"));
+        let cap = EreCapture::compile(re).expect("the shipped pattern must compile");
+        let reason = "claude agent a1b2 (pid 4321 start 99)";
+        assert_eq!(cap.capture(reason).map(|(i, j)| &reason[i..j]), Some("4321"));
+        assert_eq!(cap.capture("some other tool is holding this"), None);
     }
 
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the slug grammar is a refusal because
@@ -2160,7 +2160,7 @@ mod tests {
             journal_pattern: "<stage>.md".into(),
             journal_require: "0".into(),
             worktree_check: "0".into(),
-            worktree_re: String::new(),
+            worktree_re: None,
             tmpdir: dir.display().to_string(),
         };
         assert!(valve.query(&c, "demo", "build").is_err(), "a malformed ledger must refuse");

@@ -7054,8 +7054,7 @@ inside the owed work, and it is wrong in the direction that costs the most.
 in the whole set runs over a pattern baked literally into awk source, which a
 port hand-compiles. That is the same ground that correctly screened
 `check-comment-tier` out of the roster. The owed engine is therefore **a POSIX
-ERE matcher with leftmost-longest span reporting, and no substitution engine or
-capture-group replacement**.
+ERE matcher with leftmost-longest span reporting, and no substitution engine**.
 
 A caller that substitutes composes the spans itself, as `--rewrite` (guard-kit/SPEC.md §rewrite)
 does through `find_from` below.
@@ -7065,9 +7064,11 @@ foreclosure §The canon-kit `spec_manifest_files` cohort states, on criterion 6'
 globs argument, binds the **grammar** the engine accepts: the config surface
 permits what this consumer happens not to write, and a narrow reader silently
 mis-scans the first consumer who writes one. What the sizing correction above
-touches is the **API** — what the members *do* with a pattern once it matches —
-which is fixed by their own source rather than by what a consumer may write, so
-no future consumer can turn a match test into a substitution. Reading the
+touches is the API's **substitution** half — whether a member rewrites text with
+a pattern once it matches — which is fixed by the member's own source rather than
+by what a consumer may write, so no future consumer can turn a match test into a
+substitution. A capture is a separate item with its own reader (below), not a
+widening of this foreclosure. Reading the
 foreclosure across both axes would buy a `gsub` implementation with no caller in
 the corpus that justifies the engine.
 
@@ -7089,7 +7090,7 @@ question with a real candidate set, not a cleanup a passing cohort performs.
 concatenation, `*` `+` `?`, intervals `{n}` `{n,}` `{n,m}`, grouping, `.`,
 anchors `^` `$`, bracket expressions with ranges, negation and the POSIX
 character classes, and backslash escaping of every special. Its public surface is
-four items and no more:
+five items and no more:
 
 - `Ere::compile(pattern) -> Result<Ere, EreError>`
 - `Ere::is_match(&self, hay: &str) -> bool` — awk's `$0 ~ p`
@@ -7101,11 +7102,44 @@ four items and no more:
   so `^` still holds only at its position 0; `find` is `find_from(hay, 0)`. Its
   reader is `--rewrite`, a born-native arm rather than a ported member, so it does
   not fire the promotion trigger below.
+- `EreCapture::compile(pattern) -> Result<EreCapture, EreError>` and
+  `EreCapture::capture(&self, hay: &str) -> Option<(usize, usize)>` — the
+  **one-group capture**: the group's byte span within the leftmost-longest whole
+  match, or `None` where the whole pattern does not match. Its readers are the
+  worktree lock classifier, which slices the pid out of a lock reason, and the
+  lifecycle-kit table validator, which reads only `compile`'s verdict
+  (lifecycle-kit/SPEC.md §bin/enter-stage.sh).
 
-There is no `replace`, no `replace_all`, and no capture-group accessor; adding
-one is a design decision with its own reader rather than an omission to fill in.
+There is no `replace` and no `replace_all`; adding one is a design decision with
+its own reader rather than an omission to fill in.
 
-**The promotion trigger for a fourth item, recorded rather than left to be
+**The one-group capture admits one shape, because one shape needs no submatch
+arbitration.** The pattern holds **exactly one** unescaped `(` outside a bracket
+expression; the group stands in the pattern's **top-level concatenation** — not
+the operand of a `*` `+` `?` or interval, not inside a top-level alternation — and
+its body is any accepted ERE **except an alternation**. Each other shape is an
+`EreError` naming the rule it broke: no group, a second group, a quantified group,
+a group inside an alternation, an alternation inside the group. The admitted
+shape splits the pattern into prefix, group and suffix, and the POSIX subpattern
+rule — *each subpattern, from left to right, shall match the longest possible
+string* — is then answered with the span engine alone. With `[s, e)` the
+whole match (`find`), the group span `[i, j)` takes the **largest** `i` in
+`[s, e]` such that the prefix matches exactly `[s, i)` and some `j` lets the group
+match exactly `[i, j)` and the suffix exactly `[j, e)`, then for that `i` the
+**largest** such `j`. An exact match honours `^` and `$` at their **absolute**
+subject positions, as `find_from` does, never at the sub-span's edges. The
+refusals are the fail-closed form of *not implemented*, never an approximation: a
+quantified group's POSIX span is its *last* iteration and an alternated group may
+not participate at all, both cases the split cannot answer; and an alternation
+inside the group is refused on the differential's evidence, since the host
+`regcomp` (glibc) resolves it by first alternative rather than longest —
+`(a|ab)[b-d]*` on `ab` captures `a` under bash and `ab` under the rule — so
+admitting it would change a consumer's captured pid silently. Every other admitted
+shape agrees with bash across the generated cross product. A general submatch
+engine (per-thread slot vectors, a Pike VM) is not owed: the one reader's pattern
+is specified with exactly one group.
+
+**The promotion trigger for a further item, recorded rather than left to be
 re-argued.** `check-queue-prose-precondition` ported with **one** reader for
 substitution, and took it as a private loop over `find` inside its own module
 rather than as a public engine API — `find` reports leftmost-longest, which *is*
@@ -7115,7 +7149,7 @@ the differential oracle below). One rule of that loop is owned here rather than
 there, and its `spec:` line cites back: **an empty match advances one
 character** — stated because its failure is a silent infinite loop rather than a
 wrong answer. A **second** ported member needing substitution is what
-promotes that loop into `ere.rs` as its fourth item, with the differential oracle
+promotes that loop into `ere.rs` as a further item, with the differential oracle
 below widened to `awk 'gsub(p,r){…}'`. Until then a private loop with one caller
 is cheaper than a public contract with one caller.
 The engine is **byte-wise**, the C-locale semantics the span arithmetic of its
@@ -7159,8 +7193,17 @@ vocabularies never exercise — intervals, nested alternation under a quantifier
 negated bracket ranges, anchors inside groups, the character classes — because
 those are exactly the branches no fixture pair and no live-tree run reaches. It
 is criterion 2's constructed-scenario form applied to a *mechanism*, the same
-move the canon-kit cohort made for the default walk. The arm runs under
-`check-crate-arms`, so a divergence is a commit-time red.
+move the canon-kit cohort made for the default walk. The one-group capture has
+the same oracle against bash: `capture` is compared, as the whole-match and group
+strings, with `[[ $s =~ $p ]]` and `BASH_REMATCH[0]`/`[1]` over a generated
+prefix × group × suffix × subject cross product, in one bash with every pattern and
+subject crossing in argv, never interpolated into the script, at `LC_ALL=C`. Its
+generator covers prefixes and suffixes that compete with the group for the same
+bytes, an empty group, anchors on either side, and bracket ranges. A divergence
+there is a design gap to resolve in this section, never a case to drop from the
+generator. The arms run under
+`check-crate-arms`, so a divergence is a commit-time red; both oracles are
+test-scoped, so the production binary spawns nothing for them.
 
 **The boundary the cohort applies: a pattern the kit owns is hand-compiled; a
 pattern a consumer supplies goes through the engine.** The prefix strip and the

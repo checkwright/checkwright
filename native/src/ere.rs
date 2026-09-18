@@ -66,6 +66,7 @@ enum Node {
     Cat(Vec<Node>),
     Alt(Vec<Node>),
     Rep(Box<Node>, usize, Option<usize>),
+    Group(Box<Node>),
     Bol,
     Eol,
 }
@@ -102,8 +103,14 @@ impl Ere {
                 p.i
             ));
         }
+        Ere::from_nodes(std::slice::from_ref(&node))
+    }
+
+    fn from_nodes(nodes: &[Node]) -> Result<Ere, EreError> {
         let mut prog: Vec<Inst> = Vec::new();
-        emit(&node, &mut prog)?;
+        for n in nodes {
+            emit(n, &mut prog)?;
+        }
         prog.push(Inst::Match);
         Ok(Ere { prog })
     }
@@ -174,19 +181,41 @@ impl Ere {
         seen: &mut [usize],
         gen: &mut usize,
     ) -> Option<usize> {
+        let mut best: Option<usize> = None;
+        self.ends_from(b, start, seen, gen, |pos| best = Some(pos));
+        best
+    }
+
+    // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — every end at which the pattern matches
+    // exactly from `start`, anchors held at their absolute subject positions
+    fn match_ends(&self, b: &[u8], start: usize) -> Vec<bool> {
+        let mut seen = vec![usize::MAX; self.prog.len()];
+        let mut gen = 0usize;
+        let mut ends = vec![false; b.len() + 1];
+        self.ends_from(b, start, &mut seen, &mut gen, |pos| ends[pos] = true);
+        ends
+    }
+
+    fn ends_from(
+        &self,
+        b: &[u8],
+        start: usize,
+        seen: &mut [usize],
+        gen: &mut usize,
+        mut on_end: impl FnMut(usize),
+    ) {
         let len = b.len();
         let mut clist: Vec<usize> = Vec::new();
         let mut nlist: Vec<usize> = Vec::new();
         *gen += 1;
         self.add(&mut clist, seen, *gen, 0, start, len);
-        let mut best: Option<usize> = None;
         let mut pos = start;
         loop {
             if clist.iter().any(|&pc| matches!(self.prog[pc], Inst::Match)) {
-                best = Some(pos);
+                on_end(pos);
             }
             if pos == len || clist.is_empty() {
-                return best;
+                return;
             }
             let c = b[pos];
             nlist.clear();
@@ -235,6 +264,108 @@ impl Ere {
     }
 }
 
+// spec: gate-sdk/SPEC.md §The POSIX ERE matcher — the one-group capture: the group stands in
+// the top-level concatenation, so the pattern splits into prefix, group and suffix and the
+// subpattern rule is answered with the span engine alone
+pub struct EreCapture {
+    whole: Ere,
+    prefix: Ere,
+    group: Ere,
+    suffix: Ere,
+}
+
+fn count_groups(n: &Node) -> usize {
+    match n {
+        Node::Group(inner) => 1 + count_groups(inner),
+        Node::Rep(inner, _, _) => count_groups(inner),
+        Node::Cat(v) | Node::Alt(v) => v.iter().map(count_groups).sum(),
+        Node::Empty | Node::Set(_) | Node::Bol | Node::Eol => 0,
+    }
+}
+
+fn contains_alt(n: &Node) -> bool {
+    match n {
+        Node::Alt(_) => true,
+        Node::Group(inner) | Node::Rep(inner, _, _) => contains_alt(inner),
+        Node::Cat(v) => v.iter().any(contains_alt),
+        Node::Empty | Node::Set(_) | Node::Bol | Node::Eol => false,
+    }
+}
+
+impl EreCapture {
+    // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — any shape outside the admitted one is a
+    // refusal naming the rule it broke, never an approximated span
+    pub fn compile(pattern: &str) -> Result<EreCapture, EreError> {
+        let bytes = pattern.as_bytes();
+        let mut p = Parser { b: bytes, i: 0 };
+        let node = p.parse_alt()?;
+        if p.i < bytes.len() {
+            return err(format!("unbalanced ')' at byte {} of the pattern", p.i));
+        }
+        match count_groups(&node) {
+            0 => return err("the pattern declares no capture group — exactly one is required".to_string()),
+            1 => {}
+            _ => return err("the pattern declares a second capture group — exactly one is admitted".to_string()),
+        }
+        let items: Vec<Node> = match node {
+            Node::Alt(_) => {
+                return err(
+                    "the capture group sits inside an alternation — it must stand in the \
+                     pattern's top-level concatenation"
+                        .to_string(),
+                )
+            }
+            Node::Cat(v) => v,
+            other => vec![other],
+        };
+        let k = match items.iter().position(|n| matches!(n, Node::Group(_))) {
+            Some(k) => k,
+            None => {
+                return err(
+                    "the capture group is quantified — its POSIX span would be its last \
+                     iteration, which the one-group capture does not implement"
+                        .to_string(),
+                )
+            }
+        };
+        // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — the host regcomp resolves an alternated
+        // group body by first alternative, not longest, so admitting one changes a consumer's pid
+        if let Node::Group(body) = &items[k] {
+            if contains_alt(body) {
+                return err(
+                    "the capture group's body contains an alternation — the one-group capture \
+                     admits none"
+                        .to_string(),
+                );
+            }
+        }
+        Ok(EreCapture {
+            whole: Ere::from_nodes(&items)?,
+            prefix: Ere::from_nodes(&items[..k])?,
+            group: Ere::from_nodes(&items[k..=k])?,
+            suffix: Ere::from_nodes(&items[k + 1..])?,
+        })
+    }
+
+    // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — within the leftmost-longest whole match,
+    // the largest group start the prefix can reach, then the largest group end the suffix
+    // can still finish from
+    pub fn capture(&self, hay: &str) -> Option<(usize, usize)> {
+        let (s, e) = self.whole.find(hay)?;
+        let b = hay.as_bytes();
+        let prefix_ends = self.prefix.match_ends(b, s);
+        for i in (s..=e).rev().filter(|&i| prefix_ends[i]) {
+            let group_ends = self.group.match_ends(b, i);
+            for j in (i..=e).rev().filter(|&j| group_ends[j]) {
+                if self.suffix.match_ends(b, j)[e] {
+                    return Some((i, j));
+                }
+            }
+        }
+        None
+    }
+}
+
 // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — Thompson construction: an interval
 // expands by copying its operand, which is why the bounds and the program are capped
 fn emit(n: &Node, prog: &mut Vec<Inst>) -> Result<(), EreError> {
@@ -250,6 +381,7 @@ fn emit(n: &Node, prog: &mut Vec<Inst>) -> Result<(), EreError> {
         Node::Bol => prog.push(Inst::Bol),
         Node::Eol => prog.push(Inst::Eol),
         Node::Set(s) => prog.push(Inst::Byte(s.clone())),
+        Node::Group(inner) => emit(inner, prog)?,
         Node::Cat(v) => {
             for c in v {
                 emit(c, prog)?;
@@ -455,7 +587,7 @@ impl Parser<'_> {
                     return err("unbalanced '(' — no closing ')'".to_string());
                 }
                 self.i += 1;
-                Ok(inner)
+                Ok(Node::Group(Box::new(inner)))
             }
             b'.' => {
                 self.i += 1;
@@ -746,6 +878,124 @@ mod tests {
             "only {} comparisons ran — the cross product collapsed",
             compared
         );
+    }
+
+    // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — prefixes and suffixes that compete with
+    // the group for the same bytes are the cases the subpattern rule exists to arbitrate
+    const CAPTURE_PREFIXES: &[&str] = &[
+        "", "a*", "^", "^a*", "[ab]*", "a", "ab?", "x?", ".*", "[[:alpha:]]*", "^x", "a?",
+        "a{0,2}", "[^c]*", "[ab]{0,3}", "b*a?",
+    ];
+    const CAPTURE_GROUPS: &[&str] = &[
+        "(a*)", "(a+)", "()", "(bcd?)", "(ab?)", "([0-9]+)", "([a-c]*)", "(.*)", "(a?b?)",
+        "(^a)", "(a$)", "(b*)", "(a*b*)", "([ab]*)", "(a{1,2})", "(b?)", "(.)", "([^b]*)",
+        "(a*$)", "(ab*)", "(.*b)", "([[:digit:]]*)", "(b?c?)",
+    ];
+    const CAPTURE_SUFFIXES: &[&str] = &[
+        "", "a*", "$", "a*$", "b", "c", "bcd", "[b-d]*", "d*$", ".*", "a?b?", "b?c?d?",
+    ];
+    const CAPTURE_SUBJECTS: &[&str] = &[
+        "", "a", "aa", "aaa", "ab", "abc", "abcd", "abbcd", "aabb", "xab", "b", "ba", "123",
+        "pid 42", "abab", "cab", "bcd", "xaaab", "held by pid 77",
+    ];
+
+    // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — one bash over the whole cross product,
+    // every pattern and subject crossing in argv, never interpolated into the script
+    const BASH_CAPTURE: &str = r#"n=$1; shift
+subjects=("${@:1:n}"); shift "$n"
+for p in "$@"; do
+  for s in "${subjects[@]}"; do
+    [[ $s =~ $p ]]; rc=$?
+    if [ "$rc" -eq 0 ]; then printf 'm\t%s\t%s\n' "${BASH_REMATCH[0]}" "${BASH_REMATCH[1]}"
+    else printf 'rc%s\t\t\n' "$rc"; fi
+  done
+done"#;
+
+    #[test]
+    fn the_one_group_capture_agrees_with_bash_rematch_on_a_generated_cross_product() {
+        let mut patterns: Vec<String> = Vec::new();
+        for p in CAPTURE_PREFIXES {
+            for g in CAPTURE_GROUPS {
+                for x in CAPTURE_SUFFIXES {
+                    patterns.push(format!("{}{}{}", p, g, x));
+                }
+            }
+        }
+        let out = Command::new("bash")
+            .arg("-c")
+            .arg(BASH_CAPTURE)
+            .arg("_")
+            .arg(CAPTURE_SUBJECTS.len().to_string())
+            .args(CAPTURE_SUBJECTS)
+            .args(&patterns)
+            .env("LC_ALL", "C")
+            .output()
+            .expect("cannot run bash — the differential oracle is not optional");
+        assert!(out.status.success(), "bash failed: {}", String::from_utf8_lossy(&out.stderr));
+        let stdout = String::from_utf8_lossy(&out.stdout);
+        let mut lines = stdout.split('\n');
+        let mut compared = 0usize;
+        let mut divergences: Vec<String> = Vec::new();
+        for p in &patterns {
+            let cap = EreCapture::compile(p).unwrap_or_else(|e| panic!("{:?} failed to compile: {}", p, e));
+            for s in CAPTURE_SUBJECTS {
+                let line = lines.next().expect("bash reported fewer verdicts than cases");
+                let f: Vec<&str> = line.split('\t').collect();
+                assert_eq!(f.len(), 3, "malformed bash verdict {:?}", line);
+                let theirs = match f[0] {
+                    "m" => Some((f[1].to_string(), f[2].to_string())),
+                    "rc1" => None,
+                    other => panic!("bash's regcomp refused {:?} ({})", p, other),
+                };
+                let mine = cap.capture(s).map(|(i, j)| {
+                    let (ws, we) = cap.whole.find(s).expect("a capture implies a whole match");
+                    (s[ws..we].to_string(), s[i..j].to_string())
+                });
+                if mine != theirs {
+                    divergences.push(format!("{:?} on {:?}: engine {:?}, bash {:?}", p, s, mine, theirs));
+                }
+                compared += 1;
+            }
+        }
+        assert!(
+            divergences.is_empty(),
+            "{} capture divergence(s) from BASH_REMATCH (whole, group):\n{}",
+            divergences.len(),
+            divergences.join("\n")
+        );
+        assert!(
+            compared > 10000,
+            "only {} comparisons ran — the cross product collapsed",
+            compared
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — each shape outside the admitted one is
+    // refused by the rule it broke
+    #[test]
+    fn a_capture_shape_outside_the_admitted_one_is_refused_by_name() {
+        for (p, why) in [
+            ("a \\([0-9]+\\)", "no capture group"),
+            ("[(]a", "no capture group"),
+            ("(a)(b)", "second capture group"),
+            ("((a))", "second capture group"),
+            ("(a)*", "quantified"),
+            ("x(a){2}", "quantified"),
+            ("(a)|b", "alternation"),
+            ("b|x(a)", "inside an alternation"),
+            ("(a|ab)b*", "body contains an alternation"),
+            ("x(a$|b)", "body contains an alternation"),
+            ("(c(a|b)*)", "second capture group"),
+            ("([ab]x|c)", "body contains an alternation"),
+        ] {
+            let e = match EreCapture::compile(p) {
+                Ok(_) => panic!("{:?} compiled", p),
+                Err(e) => e,
+            };
+            assert!(e.to_string().contains(why), "{:?} refused as {:?}, not {:?}", p, e.to_string(), why);
+        }
+        assert!(EreCapture::compile("([\"").is_err());
+        assert!(EreCapture::compile("(\\w+)").is_err());
     }
 
     // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — delta (3): the refusals awk would
