@@ -21,14 +21,6 @@
   limit and filed as `guard-powershell-tool-unguarded`. The oracle is the decision table run
   under Git Bash on `install-smoke-windows`.
 
-- **run-gates-ps1-windows-powershell-host-unexercised** [spec: SPEC-windows-powershell-host.md]
-  — gate-sdk/SPEC.md §run-gates claims the PowerShell twin runs under Windows PowerShell 5.1 and
-  PowerShell 7, but `--run-front-end-parity` spawns `pwsh` only, so the 5.1 half is never run.
-  **Ruled at spec:** keep the claim and run it — on a Windows host the arm compares the stub
-  against the twin under both `pwsh` and `powershell`, exit 2 if either is missing; `pwsh` alone
-  elsewhere. Narrowing to PowerShell 7 refused: 5.1 is the only PowerShell a stock Windows ships.
-  Lands before `init-next-block-bash-spelled-on-windows`, whose printed line runs under 5.1.
-
 - **init-next-block-bash-spelled-on-windows** [spec: SPEC-windows-follow-up.md] — `init`'s
   follow-up block prints bash-spelled lines on every host, so a native-Windows adopter in PowerShell
   types a bare `bash` that reaches the WSL launcher.
@@ -3371,5 +3363,7 @@
 - **readme-bin-roster-underived** — no gate holds a kit README's bin/ tool roster.
 
 ## Done
+
+- run-gates-ps1-windows-powershell-host-unexercised
 
 ## Lessons Learned

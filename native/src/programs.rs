@@ -62,6 +62,7 @@ roster! {
     NPM = "npm", "contributor";
     UNAME = "uname", "contributor";
     PWSH = "pwsh", "contributor";
+    POWERSHELL = "powershell", "contributor";
     CHECKWRIGHT_GATES = env!("CARGO_PKG_NAME"), "";
 }
 

@@ -471,7 +471,8 @@ jobs:
       # The front-end twin's held comparison on the platform the twin exists for
       # (gate-sdk/SPEC.md §run-gates): this host carries Git-for-Windows bash and
       # PowerShell both, so it measures the pair where a native-Windows adopter
-      # meets them. It runs the producer's artifact the step above placed.
+      # meets them, and it is the one run measuring the twin under Windows
+      # PowerShell 5.1. It runs the producer's artifact the step above placed.
       - name: front-end parity, bash stub against its PowerShell twin
         shell: bash
         run: bash gate-sdk/bin/run-gates.sh --run-front-end-parity

@@ -63,7 +63,7 @@ The spelling has four parts, each with its own ground:
   Linux build and keeps the bash block, which is correct for WSL.
 - **`powershell`, not `pwsh`.** Windows PowerShell 5.1 is the one PowerShell a
   stock Windows host ships. PowerShell 7 is an install. This line is what makes
-  `gate-sdk/SPEC-windows-powershell-host.md` a precondition of this delta.
+  the parity arm's 5.1 run (gate-sdk/SPEC.md §run-gates) a precondition of this delta.
 - **`-ExecutionPolicy Bypass`.** A Windows client's default execution policy
   refuses `-File` on a script. The flag is scoped to the one process it
   launches, and it changes no machine or user policy.

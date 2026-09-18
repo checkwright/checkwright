@@ -1611,9 +1611,9 @@ which arm or member spawns a program is recorded per member in `REGISTRY` for
 gates and in prose for arms (§The non-gate arm). A per-arm declaration nothing
 runs is the self-declaration §The `# graph:` manifest refuses. `which` stays a
 name-typed presence probe, since a name probed and never run is no
-requirement. `pwsh` is a `contributor` member: only `--run-front-end-parity`
-spawns it (§run-gates), on CI legs, so no adopter host needs it and the
-floor-or-probe relation does not bind it.
+requirement. `pwsh` and `powershell` are `contributor` members: only
+`--run-front-end-parity` spawns them (§run-gates), on CI legs, so no adopter host
+needs either and the floor-or-probe relation does not bind them.
 
 ### Fixture-pair discipline
 
@@ -10137,13 +10137,17 @@ environment stripped of every static kit's knobs, with `GATE_SDK_NATIVE_BIN`
 naming the running binary where a case needs one to run. Transcripts — exit
 status, stdout and stderr — must be byte-identical after CRLF becomes LF,
 PowerShell's console writer ending lines with CRLF on Windows being no contract
-difference. The arm exits 0 when every case is identical and 1 when one diverges,
-printing the case, both transcripts and the first differing line. It exits 2 when
-the check could not run: no `bash` or `pwsh` resolves, the sandbox cannot be
-built, or the bash stub itself does not do what a case names, so two halves
-failing the same way cannot pass as parity. It runs on the binding Windows
-install-smoke leg and on the `gates` job, never in the battery, whose host may
-carry no PowerShell. So a divergence reds at push, not at commit — the trade the
+difference. It runs the twin under every PowerShell host the platform ships:
+`pwsh` and Windows PowerShell 5.1 (`powershell`) on a Windows host, and `pwsh`
+alone elsewhere, since 5.1 exists only on Windows. The arm exits 0 when every
+case is identical under every host, naming the hosts on its clean line, and 1
+when one diverges, printing the case, the host that diverged, both transcripts
+and the first differing line. It exits 2 when the check could not run: `bash` or
+one of those hosts does not resolve, the sandbox cannot be built, or the bash
+stub itself does not do what a case names, so two halves failing the same way
+cannot pass as parity. It runs on the binding Windows install-smoke leg, the one
+site that measures 5.1, and on the `gates` job, never in the battery, whose host
+may carry no PowerShell. So a divergence reds at push, not at commit — the trade the
 macOS remedy block and the installer's PowerShell half already accept.
 
 **The positional is the whole of what the front-end still knows about argv, and

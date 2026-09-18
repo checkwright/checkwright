@@ -225,7 +225,8 @@ fn check() -> Result<bool, String> {
             return Err(format!("{} is not a file", f.display()));
         }
     }
-    for p in [&programs::BASH, &programs::PWSH] {
+    let hosts = twin_hosts();
+    for p in std::iter::once(&programs::BASH).chain(hosts.iter()) {
         if !proc::on_path(p) {
             return Err(format!("no {} resolves on PATH", p));
         }
@@ -257,10 +258,9 @@ fn check() -> Result<bool, String> {
         };
         let mut bash_argv: Vec<&str> = vec![stub_arg.as_str()];
         bash_argv.extend(case.argv);
-        let mut pwsh_argv: Vec<&str> = vec!["-NoProfile", "-NonInteractive", "-File", twin_arg.as_str()];
-        pwsh_argv.extend(case.argv);
+        let mut twin_argv: Vec<&str> = vec!["-NoProfile", "-NonInteractive", "-File", twin_arg.as_str()];
+        twin_argv.extend(case.argv);
         let bash = Transcript::of(&programs::BASH, &bash_argv, case, &env)?;
-        let pwsh = Transcript::of(&programs::PWSH, &pwsh_argv, case, &env)?;
         if bash.code != case.expect_code || !bash.text().contains(case.expect_text) {
             return Err(format!(
                 "case '{}': the bash stub did not do what the case names (want exit {} carrying {:?}), so the corpus exercised nothing\n{}",
@@ -270,20 +270,36 @@ fn check() -> Result<bool, String> {
                 bash.render("bash")
             ));
         }
-        if let Some(diff) = bash.first_difference(&pwsh) {
-            clean = false;
-            println!("{}: FAIL — case '{}' diverges: {}", VERDICT, case.name, diff);
-            print!("{}{}", bash.render("bash"), pwsh.render("pwsh"));
+        for host in &hosts {
+            let who = host.name();
+            let theirs = Transcript::of(host, &twin_argv, case, &env)?;
+            if let Some(diff) = bash.first_difference(&theirs, &who) {
+                clean = false;
+                println!("{}: FAIL — case '{}' diverges under {}: {}", VERDICT, case.name, who, diff);
+                print!("{}{}", bash.render("bash"), theirs.render(&who));
+            }
         }
     }
     if clean {
+        let names: Vec<String> = hosts.iter().map(|h| h.name()).collect();
         println!(
-            "{}: clean — {} cases, both front-ends identical after CRLF becomes LF",
+            "{}: clean — {} cases, both front-ends identical after CRLF becomes LF, the twin under {}",
             VERDICT,
-            CORPUS.len()
+            CORPUS.len(),
+            names.join(" and ")
         );
     }
     Ok(clean)
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — every PowerShell host the platform ships; `cfg!` rather than
+// `#[cfg]` keeps the Windows-only row referenced on every target
+fn twin_hosts() -> Vec<Program> {
+    if cfg!(windows) {
+        vec![programs::PWSH, programs::POWERSHELL]
+    } else {
+        vec![programs::PWSH]
+    }
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — a Windows path handed to both halves in the one spelling
@@ -398,9 +414,9 @@ impl Transcript {
 
     // spec: gate-sdk/SPEC.md §run-gates — the first place the two halves part: the status, else the
     // first differing line of stdout, then of stderr
-    fn first_difference(&self, other: &Transcript) -> Option<String> {
+    fn first_difference(&self, other: &Transcript, who: &str) -> Option<String> {
         if self.code != other.code {
-            return Some(format!("exit {} (bash) against {} (pwsh)", self.code, other.code));
+            return Some(format!("exit {} (bash) against {} ({})", self.code, other.code, who));
         }
         for (label, a, b) in [
             ("stdout", &self.stdout, &other.stdout),
@@ -415,11 +431,12 @@ impl Transcript {
                 .find(|i| al.get(*i) != bl.get(*i))
                 .unwrap_or(0);
             return Some(format!(
-                "{} line {}: {:?} (bash) against {:?} (pwsh)",
+                "{} line {}: {:?} (bash) against {:?} ({})",
                 label,
                 n + 1,
                 al.get(n).copied().unwrap_or("<end>"),
-                bl.get(n).copied().unwrap_or("<end>")
+                bl.get(n).copied().unwrap_or("<end>"),
+                who
             ));
         }
         None
@@ -459,10 +476,19 @@ mod tests {
             stdout: crlf_to_lf(out.as_bytes()),
             stderr: Vec::new(),
         };
-        assert!(t(0, "a\nb\n").first_difference(&t(0, "a\r\nb\r\n")).is_none());
-        let d = t(0, "a\nb\n").first_difference(&t(0, "a\nc\n")).expect("diverges");
+        assert!(t(0, "a\nb\n").first_difference(&t(0, "a\r\nb\r\n"), "pwsh").is_none());
+        let d = t(0, "a\nb\n").first_difference(&t(0, "a\nc\n"), "powershell").expect("diverges");
         assert!(d.starts_with("stdout line 2:"), "{}", d);
-        assert!(t(2, "").first_difference(&t(0, "")).expect("diverges").starts_with("exit 2"));
+        assert!(d.ends_with("(powershell)"), "{}", d);
+        assert!(t(2, "").first_difference(&t(0, ""), "pwsh").expect("diverges").starts_with("exit 2"));
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — Windows PowerShell joins the host set on Windows alone
+    #[test]
+    fn the_twin_runs_under_every_powershell_host_the_platform_ships() {
+        let names: Vec<String> = twin_hosts().iter().map(Program::name).collect();
+        let want: &[&str] = if cfg!(windows) { &["pwsh", "powershell"] } else { &["pwsh"] };
+        assert_eq!(names, want);
     }
 
     // spec: gate-sdk/SPEC.md §run-gates — every case is named, and no two share a name, so a red
