@@ -3372,8 +3372,4 @@
 
 ## Done
 
-- windows-build-dead-code-warnings-unheld
-- native-windows-bash-floor
-- windows-shellcheck-step-copies-page-route
-
 ## Lessons Learned
