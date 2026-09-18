@@ -10,3 +10,4 @@ native-spawn-floor align a7c0994f 2026-09-18 4c2216c4
 native-spawn-floor build ab401f21 2026-09-18 75a9f953
 native-spawn-floor build aa68c253 2026-09-18 f2f4d1cd
 native-spawn-floor validate a11b93f7 2026-09-18 97e6c585
+native-spawn-floor close a5849364 2026-09-18 c06e326d
