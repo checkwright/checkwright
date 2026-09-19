@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: adopter-floor-conditional-members
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -140,6 +140,7 @@
   **Cost while deferred:** a starter- or prose-profile adopter installs two tools no gate they
   vendor runs.
   Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 2, by operator direction.
+  Joins `adopter-floor-conditional-members` by operator direction (2026-09-19, lead-relayed): leads.
 
 - **floor-shellcheck-unconditional** [cost: event/high] [surface: gate-sdk] — `check-shellcheck`
   is `# install: zero-config`, so every profile, the prose one included, registers it and
@@ -150,6 +151,7 @@
   vendored kit shell) has to be enumerated first.
   **Cost while deferred:** a non-technical adopter installs a shell linter before first value.
   Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 3, by operator direction.
+  Joins `adopter-floor-conditional-members` by operator direction (2026-09-19, lead-relayed): axis.
 
 - **floor-bash-hooks-front-end** [cost: event/high] [surface: gate-sdk] — the generated git
   hooks and the bash front-end hold `bash:4.3` on the adopter floor; rung 4a of the adopter-floor
@@ -189,6 +191,7 @@
   Filed 2026-09-19 to the gap inbox at `adopter-floor-collapse`'s spec, promoted at its close
   drain. Owner lookup: `PROGRAM_FLOOR`, `mktemp`, `date -Is`, `coreutils` — matched only the
   rung entries above (curl, jq, shellcheck, bash: distinct members).
+  Joins `adopter-floor-conditional-members` by operator direction (2026-09-19, lead-relayed): floor.
 
 - **stamp-subject-merge-carve-out-unruled** [cost: event/low] [surface: lifecycle-kit] —
   `check-stamp-subject` reds a commit adding stamp lines under git's own `Merge …` subject, which
@@ -2502,6 +2505,7 @@
   refused (choosing among the three candidates is design work an amendment owes) and →icebox
   refused on the adopter witness above.
   not-icebox-eligible: portability-floor-adopter-on-ramp-unstated 2026-09-07 adopter witness above.
+  Joins `adopter-floor-conditional-members` by operator direction (2026-09-19, lead-relayed).
 
 - **substrate-parity-digest-assertion-stops-at-the-workflow-text** [cost: event/high] [surface: gate-sdk] — assertion F
   reads the publish workflow's own text for the digest producer, and the producer moved out into a
