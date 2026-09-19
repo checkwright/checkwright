@@ -161,8 +161,8 @@ pub const KNOBS: &[&str] = &[
 // spec: gate-sdk/SPEC.md §run-gates — one selected member: the name, and the positional arguments
 // the selection hands it — `--for`'s matching paths under a staged-mode member, and the argv after
 // `--only`'s `--` separator under a single-member selection. Empty under a bare run.
-struct Selected {
-    name: String,
+pub(crate) struct Selected {
+    pub(crate) name: String,
     args: Vec<String>,
 }
 
@@ -323,10 +323,10 @@ fn manifest(src: &str) -> Vec<(String, String)> {
 // spec: gate-sdk/SPEC.md §run-gates — `--for` selection: every member whose effective trigger
 // (`trigger=` else `couples=`, kit-expanded, then its derived knob files) matches a given path,
 // exactly as the generated hook would; an uncovered path is a note on stdout, never a failure.
-fn select_for(
+pub(crate) fn select_for(
     members: &[String],
     resolve_dirs: &[String],
-    kit_roots_rel: &[String],
+    kit_roots_here: &[String],
     paths: &[String],
 ) -> Result<Vec<Selected>, i32> {
     let mut covered = vec![false; paths.len()];
@@ -352,7 +352,7 @@ fn select_for(
         }
         // spec: gate-sdk/SPEC.md §Fail-closed contract — an unresolvable couples token is exit 2,
         // never a narrower selection: a silently lost trigger is a gate the selector stops running.
-        let trigger = registry::expand_couples(&trigger, kit_roots_rel).map_err(|e| {
+        let trigger = registry::expand_couples(&trigger, kit_roots_here).map_err(|e| {
             eprintln!("{}: --for cannot expand {}'s trigger: {}", TOOL, name, e);
             2
         })?;
@@ -744,14 +744,16 @@ pub fn run(args: &[String]) -> i32 {
             Err(c) => return c,
         }
     } else if !parsed.paths.is_empty() {
-        let kit_roots_rel = match walk::kit_roots_rel() {
+        // spec: gate-sdk/SPEC.md §run-gates — the hook's spelling of the kit roots, relative to the
+        // working directory the door set to the toplevel, since the given paths are repo-relative
+        let kit_roots_here = match walk::kit_roots() {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("{}: {}", TOOL, e);
                 return 2;
             }
         };
-        let s = match select_for(&members, &resolve_dirs, &kit_roots_rel, &parsed.paths) {
+        let s = match select_for(&members, &resolve_dirs, &kit_roots_here, &parsed.paths) {
             Ok(s) => s,
             Err(c) => return c,
         };

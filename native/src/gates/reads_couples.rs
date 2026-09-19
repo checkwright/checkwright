@@ -456,7 +456,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    let kit_roots_rel = walk::kit_roots_rel()?;
+    // spec: gate-sdk/SPEC.md §Layout and configuration — the working-directory spelling, the one the
+    // `git ls-files` corpus these globs are compared with is spelled in
+    let kit_roots_here = walk::kit_roots()?;
     let mut ctx = Ctx {
         prune: walk::prune_dirs()?,
         findings: Vec::new(),
@@ -482,7 +484,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         // reader rather than copied here: a token form one reader knows and the other does not
         // diverges the coverage reader from the selector silently
         let couples =
-            crate::registry::expand_couples(&manifest_field(&text, "couples"), &kit_roots_rel)?;
+            crate::registry::expand_couples(&manifest_field(&text, "couples"), &kit_roots_here)?;
         let globs: Vec<String> = couples.split(',').map(String::from).collect();
 
         // spec: gate-sdk/SPEC.md §check-reads-couples — a `.gate` member's walks are unreadable to
@@ -684,6 +686,108 @@ mod tests {
             "a kit literal couples= misses a read its guarded fallback branch takes on a tree that \
              leaves the selector empty (gate-sdk/SPEC.md §check-reads-couples):\n  {}",
             ctx.findings.join("\n  ")
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §Layout and configuration — under a subdirectory vendoring the hook,
+    // `--for` and this gate expand a `kit:` couple to the repository path, and the kit-parent
+    // spelling is the control proving the scratch tree tells the two spellings apart
+    #[test]
+    fn a_subdirectory_vendoring_expands_kit_couples_to_repository_paths_for_every_path_reader() {
+        let knobs = crate::knobenv::lock();
+        let scratch = std::env::temp_dir()
+            .join(format!("checkwright-subdir-vendoring.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&scratch);
+        let repo = walk::normalize_abs(&scratch.display().to_string());
+        let put = |rel: &str, body: &str| {
+            let p = scratch.join(rel);
+            std::fs::create_dir_all(p.parent().expect("a parent")).expect("mkdir");
+            std::fs::write(&p, body).expect("write");
+        };
+        let lib = Path::new(env!("CARGO_MANIFEST_DIR")).join("../gate-sdk/lib/gate.sh");
+        put("tools/gate-sdk/lib/gate.sh", &std::fs::read_to_string(&lib).expect("the shell library"));
+        put("tools/gate-sdk/checks/.keep", "");
+        let descriptor = "#!/usr/bin/env bash\n# graph: couples=kit:SPEC.md dir=one valve=none tier=precommit\n";
+        put("tools/alpha/checks/check-alpha.sh", descriptor);
+        put("tools/alpha/SPEC.md", "# alpha\n");
+        put("scripts/gates.list", "check-alpha\n");
+        for args in [&["-C", &repo, "init", "-q"][..], &["-C", &repo, "add", "-A"][..]] {
+            proc::run(&programs::GIT, args).expect("git runs").stdout().expect("git succeeds");
+        }
+        let gates_dir = format!("{}/scripts", repo);
+        knobs.set("GATE_SDK_ROOT", &format!("{}/tools/gate-sdk", repo));
+        knobs.set("GATE_SDK_GATES_DIR", &gates_dir);
+        knobs.set("GATE_SDK_HOOKS_DIR", &format!("{}/scripts/git-hooks", repo));
+        knobs.remove("GATE_SDK_KIT_DIRS");
+        crate::knobs::reset(&knobs);
+
+        type Seen = (String, Vec<String>, Vec<String>, Vec<String>, Vec<String>);
+        let run = || -> Result<Seen, String> {
+            let here = walk::kit_roots_at(&repo)?;
+            let parent = walk::kit_roots_rel()?;
+            let hook = crate::emit::git_hooks::pre_commit(&repo, &gates_dir)?;
+            let resolve_dirs = crate::registry::resolve_dirs(&gates_dir, &walk::kit_roots_abs()?);
+            let select = |roots: &[String]| -> Result<Vec<String>, String> {
+                let spec = "tools/alpha/SPEC.md".to_string();
+                Ok(crate::runner::select_for(&["check-alpha".to_string()], &resolve_dirs, roots, &[spec])
+                    .map_err(|c| format!("--for exited {}", c))?
+                    .into_iter()
+                    .map(|s| s.name)
+                    .collect())
+            };
+            let (selected, selected_parent) = (select(&here)?, select(&parent)?);
+            Ok((hook, here, parent, selected, selected_parent))
+        };
+        let result = run();
+        for var in ["GATE_SDK_ROOT", "GATE_SDK_GATES_DIR", "GATE_SDK_HOOKS_DIR"] {
+            knobs.remove(var);
+        }
+        crate::knobs::reset(&knobs);
+        let listing = tracked_under(Some(&repo), "tools/alpha/SPEC.md");
+        let _ = std::fs::remove_dir_all(&scratch);
+        let (hook, here, parent, selected, selected_parent) = result.expect("the scratch tree resolves");
+        let listing = listing.expect("the scratch tree lists");
+
+        assert!(
+            hook.contains("'tools/alpha/SPEC.md'"),
+            "the pre-commit emission does not match the member on its repository path:\n{}",
+            hook
+        );
+        assert_eq!(selected, vec!["check-alpha".to_string()], "--for did not select the member the hook runs");
+        assert!(
+            selected_parent.is_empty(),
+            "--for selected through the kit-parent spelling too, so the scratch tree does not tell the \
+             two spellings apart"
+        );
+
+        let coverage = |roots: &[String]| -> Vec<String> {
+            let couples = crate::registry::expand_couples(&manifest_field(descriptor, "couples"), roots)
+                .expect("the couple expands");
+            let globs: Vec<String> = couples.split(',').map(String::from).collect();
+            let mut ctx = Ctx { prune: Vec::new(), findings: Vec::new() };
+            ctx.cover_listing(
+                &Demand {
+                    root: "tools/alpha/SPEC.md",
+                    prune: false,
+                    filter: &Filter::Unfiltered,
+                    declared_prune: &[],
+                    gname: "check-alpha",
+                    where_: "its spec read",
+                    globs: &globs,
+                    couples: &couples,
+                },
+                &listing,
+            );
+            ctx.findings
+        };
+        assert!(listing.contains("tools/alpha/SPEC.md"), "the scratch index lists no SPEC.md: {}", listing);
+        let found = coverage(&here);
+        assert!(found.is_empty(), "the repository spelling leaves the read uncovered: {:?}", found);
+        assert!(
+            !coverage(&parent).is_empty(),
+            "the kit-parent spelling {:?} covered the read too, so the scratch tree does not tell the \
+             two spellings apart",
+            parent
         );
     }
 }

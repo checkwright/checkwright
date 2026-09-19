@@ -299,14 +299,22 @@ fn spelled(anchor: &str, root: &Root) -> String {
 }
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the kit roots spelled relative to the working directory,
-// the spelling `--emit kit-roots` prints and a reader naming a root to its user takes
+// the spelling `--emit kit-roots` prints, a reader naming a root to its user takes, and every
+// couples expansion matched against a tree path takes, since each door sets it to the toplevel
 pub fn kit_roots() -> Result<Vec<String>, String> {
-    let (here, roots) = roots()?;
+    kit_roots_at(&cwd()?)
+}
+
+// spec: gate-sdk/SPEC.md §Layout and configuration — the same spelling against a named anchor, the
+// form a reader asking about a tree it has not entered takes
+pub fn kit_roots_at(anchor: &str) -> Result<Vec<String>, String> {
+    let (here, roots) = roots_at(normalize_abs(anchor), &sdk_root(), &knob_scalar("GATE_SDK_KIT_DIRS")?)?;
     Ok(roots.iter().map(|r| spelled(&here, r)).collect())
 }
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the same roots relative to the gate-sdk root's parent, the
-// anchor the couples globs share, computed beside the absolute spelling so the two stay index-aligned
+// spelling a reader matching text that names kits from their common parent takes, computed beside
+// the absolute spelling so the two stay index-aligned
 pub fn kit_roots_rel() -> Result<Vec<String>, String> {
     kit_roots_rel_from(&sdk_root(), &knob_scalar("GATE_SDK_KIT_DIRS")?)
 }

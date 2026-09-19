@@ -120,6 +120,10 @@ pub struct Config {
     pub theme_dir: String,
     pub max_edges: String,
     pub vocab: crate::graph_vocab::Vocab,
+    // spec: gate-sdk/SPEC.md §Layout and configuration — the working-directory spelling for the
+    // artifact's labels, the globs the hook matches, and the kit-parent one for `check-graph`'s
+    // vocabulary match
+    pub kit_roots_here: Vec<String>,
     pub kit_roots_rel: Vec<String>,
     pub resolve_dirs: Vec<String>,
 }
@@ -135,6 +139,7 @@ impl Config {
             max_edges: walk::knob_scalar("GATE_SDK_GRAPH_MAX_EDGES")?,
             gates_dir,
             vocab,
+            kit_roots_here: walk::kit_roots()?,
             kit_roots_rel: walk::kit_roots_rel()?,
             resolve_dirs,
         })
@@ -174,7 +179,7 @@ pub fn projected_members(cfg: &Config) -> Result<Vec<Member>, String> {
         // spec: gate-sdk/SPEC.md §check-graph — a derived knob-file couple is an edge like an
         // authored one, so the published graph draws it
         let mut couples =
-            registry::expand_couples(&registry::field(&f, "couples"), &cfg.kit_roots_rel)?;
+            registry::expand_couples(&registry::field(&f, "couples"), &cfg.kit_roots_here)?;
         for p in registry::knob_files(&name, &cfg.resolve_dirs)? {
             if !couples.is_empty() {
                 couples.push(',');
@@ -366,6 +371,7 @@ mod tests {
                 ],
                 layer_default: "k_shared".into(),
             },
+            kit_roots_here: vec![],
             kit_roots_rel: vec![],
             resolve_dirs: vec![],
         };

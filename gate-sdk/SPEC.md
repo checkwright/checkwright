@@ -336,10 +336,22 @@ exports the locator for those calls, as it already exports `GATE_SDK_GATES_DIR` 
 relocated gates directory. **The crate derives the kit roots from it**: the gate-sdk
 root, then every sibling under the root's parent holding a `checks/` or a `smoke/`
 directory, in name order, with `GATE_SDK_KIT_DIRS` replacing the set when it is
-non-empty. `walk::kit_roots_abs` spells them absolute, `walk::kit_roots_rel` relative to
-the root's parent, the anchor the couples globs share, and `walk::kit_roots` relative to
-the working directory, the spelling `--emit kit-roots` prints (§The non-gate arm). The
-three are computed from one list, so they stay index-aligned by construction, and an
+non-empty. `walk::kit_roots_abs` spells them absolute, `walk::kit_roots` relative to
+the working directory, and `walk::kit_roots_rel` relative to the root's parent. **Which
+spelling a reader takes follows from what it matches against.** A reader matching an
+expanded glob or a spelled root against a path read from the tree — a staged path, a
+`--for` operand, a `git ls-files` line, a directory resolved off disk — takes the
+working-directory spelling, which every door sets to the repository toplevel, so the
+generated hook, `--for`, `check-reads-couples`, `check-core-files`' `kit:` lines, the
+port-blockers and `check-gate-substrate-parity` check-dir resolutions and the graph
+artifact's labels all expand a `kit:` couple to the one repository path. A reader
+matching text that names kits from their common parent — `check-graph`'s vocabulary
+layer rules — keeps the kit-parent spelling. The two agree at the root layout `init`
+vendors, and part only under a subdirectory vendoring (`GATE_SDK_ROOT=tools/gate-sdk`
+spells `tools/canon-kit` against `canon-kit`); a crate unit test vendors under a
+subdirectory and holds the hook, `--for` and `check-reads-couples` to the repository
+spelling. `--emit kit-roots` prints the working-directory spelling (§The non-gate arm).
+The three are computed from one list, so they stay index-aligned by construction, and an
 override's relative entry passes through each unchanged. A consumer-copied gate
 (`templates/check-skeleton.sh`) sources `lib/gate.sh` from the same locator. **A
 spawning arm absolutizes the locators it hands a child in another working directory**:
@@ -10643,7 +10655,9 @@ beyond that matcher: a `trigger=*` gate is selected for every path, and a
 subtree prefix), a second mechanism — is selected exactly when that branch would
 run it and receives its matching paths as positional args, as the staged branch
 does. A divergence between what the hook would run for a staged path and what
-`--for` runs for the same path is a bug against this contract. When no gate
+`--for` runs for the same path is a bug against this contract, and the two expand
+`kit:` against one spelling of the kit roots, relative to the repository root, so a
+subdirectory vendoring selects what the hook runs (§Layout and configuration). When no gate
 couples to a given path the selector prints an explicit `no registered gate
 couples to <path>` note and exits 0 — an ungoverned path is a fact, not a
 failure; the selector is a `bin/` tool, never a registered gate, but its own
@@ -11629,8 +11643,10 @@ of the arm roster, the thing §The non-gate arm refuses a front-end case for.
   roots are spelled relative to the repository root**, and the same root-relative
   spelling feeds the `kit:` expansion below: a hook glob is matched against a staged
   path, which git spells repo-relative, so anchoring at the gate-sdk root's parent
-  — the spelling the other expansion readers pass — would emit globs that never
-  match wherever the kits are not vendored at the root.
+  would emit globs that never match wherever the kits are not vendored at the root.
+  Every other reader matching a tree path passes this same spelling (§Layout and
+  configuration), and each manifest is read through the check dirs anchored at that
+  root, so the emission does not hang on the working directory.
 - **Manifest fields** — `registry::manifest_line` and `registry::manifest_fields`
   over the member's resolved declaration; a member that resolves nowhere reads every
   field empty.
@@ -16237,9 +16253,10 @@ carries no derivation at all, so it needs no root set and reads none.
 
 **The compiled form derives it from the crate's own root set rather than calling
 the shell expander**, which is criterion 6's discharge-by-construction and not a
-second implementation of the token: `walk::kit_roots_rel` is the one derivation of
-the roots (§Layout and configuration), so the root set is computed in exactly one
-place and the binary holds no default to drift from. What
+second implementation of the token: it takes `walk::kit_roots`, the working-directory
+spelling, because each expanded path is then tested on disk and with `git`
+(§Layout and configuration), and the root set behind every spelling is computed in
+exactly one place and the binary holds no default to drift from. What
 the crate carries is the join and the wildcard refusal — this reader's own rule,
 which the shared expander deliberately does not have.
 

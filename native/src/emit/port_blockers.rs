@@ -201,7 +201,7 @@ struct Registry {
     tests_dirs: Vec<String>,
     floor: BTreeSet<String>,
     kit_funcs: BTreeSet<String>,
-    kit_roots_rel: Vec<String>,
+    kit_roots_here: Vec<String>,
 }
 
 // spec: gate-sdk/SPEC.md §port-blockers — the resolution dirs taken through the *repo-relative*
@@ -212,7 +212,7 @@ fn resolve_registry(gates_dir: Option<String>) -> Result<Registry, String> {
         Some(d) => d,
         None => walk::knob_scalar("GATE_SDK_GATES_DIR")?,
     };
-    let kit_roots_rel = walk::kit_roots_rel()?;
+    let kit_roots_here = walk::kit_roots()?;
     let mut kit_funcs = BTreeSet::new();
     for root in walk::kit_roots_abs()? {
         for lib in walk::glob_entries(&format!("{}/lib/*.sh", root)) {
@@ -222,11 +222,11 @@ fn resolve_registry(gates_dir: Option<String>) -> Result<Registry, String> {
         }
     }
     Ok(Registry {
-        check_dirs: registry::resolve_dirs(&gates_dir, &kit_roots_rel),
-        tests_dirs: registry::fixture_dirs(&walk::knob_scalar("GATE_SDK_TESTS_DIR")?, &kit_roots_rel),
+        check_dirs: registry::resolve_dirs(&gates_dir, &kit_roots_here),
+        tests_dirs: registry::fixture_dirs(&walk::knob_scalar("GATE_SDK_TESTS_DIR")?, &kit_roots_here),
         floor: walk::knob_array("GATE_SDK_PROGRAM_FLOOR")?.into_iter().collect(),
         kit_funcs,
-        kit_roots_rel,
+        kit_roots_here,
         gates_dir,
     })
 }
@@ -609,7 +609,7 @@ fn registry_arm(mode: Mode, gates_dir: Option<String>) -> Result<String, String>
             let fields = registry::manifest_fields(registry::manifest_line(&text).unwrap_or(""));
             let tier = registry::field(&fields, "tier");
             let couples =
-                registry::expand_couples(&registry::field(&fields, "couples"), &reg.kit_roots_rel)?;
+                registry::expand_couples(&registry::field(&fields, "couples"), &reg.kit_roots_here)?;
             let key = format!(
                 "libs={} globs={}",
                 dash_if_empty(&lib_key),
@@ -781,7 +781,7 @@ mod tests {
             tests_dirs: vec!["scripts/gate-tests".to_string()],
             floor: ["bash", "git"].iter().map(|s| (*s).to_string()).collect(),
             kit_funcs: BTreeSet::new(),
-            kit_roots_rel: vec!["gate-sdk".to_string()],
+            kit_roots_here: vec!["gate-sdk".to_string()],
         }
     }
 

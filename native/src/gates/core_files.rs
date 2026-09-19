@@ -57,9 +57,10 @@ pub fn run(args: &[String]) -> i32 {
     }
 
     // spec: gate-sdk/SPEC.md §check-core-files — the kit-root set is resolved only where a
-    // `kit:` line asks for it, so a token-free manifest costs no kit-root derivation
+    // `kit:` line asks for it, so a token-free manifest costs no kit-root derivation; spelled
+    // against the working directory, since each expanded path is tested on disk and by `git`
     let roots = if lines.iter().any(|l| l.starts_with("kit:")) {
-        match walk::kit_roots_rel() {
+        match walk::kit_roots() {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-core-files: {}", e);

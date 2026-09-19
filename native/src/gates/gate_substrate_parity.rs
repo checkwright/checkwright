@@ -448,7 +448,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Err(format!("{} names no gates", list));
     }
 
-    let kit_roots = walk::kit_roots_rel()?;
+    // spec: gate-sdk/SPEC.md §Layout and configuration — the working-directory spelling, so the check
+    // dirs resolve off disk and the couples expansion paired with them matches tree paths
+    let kit_roots = walk::kit_roots()?;
     let (resolve_dirs, kit_names) = main_rule_dirs(&gates_dir, &kit_roots);
 
     let section_body = conservation_body(&read(&doc)?);

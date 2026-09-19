@@ -125,9 +125,12 @@ fn context(root: &str, gates_dir: &str) -> Result<Ctx, String> {
             names.push(m);
         }
     }
+    // spec: gate-sdk/SPEC.md §gen-pre-commit — each manifest is read through the dirs anchored at the
+    // root the emission names, so what the hook couples does not hang on the working directory
+    let anchored: Vec<String> = check_dirs.iter().map(|d| walk::abs_against(root, d)).collect();
     let mut members = Vec::new();
     for n in names {
-        let fields = match registry::resolve(&n, &check_dirs) {
+        let fields = match registry::resolve(&n, &anchored) {
             Some(src) => {
                 let body = std::fs::read(&src)
                     .map(|b| String::from_utf8_lossy(&b).into_owned())
