@@ -41,7 +41,7 @@ done
 shopt -u nullglob globstar
 
 count=0
-[[ ${#files[@]} -gt 0 ]] && count="$(grep -hE -- "$marker_re" "${files[@]}" 2>/dev/null | awk 'END { print NR }')"
+[[ ${#files[@]} -gt 0 ]] && count="$(( $(grep -hE -- "$marker_re" "${files[@]}" 2>/dev/null | wc -l) ))"
 
 if [[ "$trend" -eq 1 ]]; then
     [[ "$count" -gt 0 ]] && printf 'deprecated-surface %d\n' "$count"

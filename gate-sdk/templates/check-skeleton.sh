@@ -11,8 +11,8 @@ source "$SDK/lib/gate.sh"
 FILE="${1:-README.md}"
 [[ -f "$FILE" ]] || { echo "check-skeleton: not found: $FILE" >&2; exit 2; }  # exit 2: harness/usage error
 
-out="$(awk '/never-matching-placeholder/ { print FILENAME ":" FNR ": finding" }' "$FILE")"; st=$?
-fail_closed "$st" check-skeleton awk
+out="$(grep -Hn -- 'never-matching-placeholder' "$FILE")"; st=$?
+[[ "$st" -le 1 ]] || fail_closed "$st" check-skeleton grep   # grep exit 1 is no match, a verdict
 
 if [[ -n "$out" ]]; then
     echo "check-skeleton: <what is wrong>:"   # one line per finding (location + problem)

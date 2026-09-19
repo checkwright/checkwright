@@ -1,8 +1,6 @@
 // spec: context-kit/SPEC.md §bin/env-probe — the crate's holder of the probe roster's grammar and
 // its floor predicate. Promoted here from check-install-toolchain rather than copied, so the
 // roster keeps exactly one crate-side parser and the gate and the arm cannot disagree about it.
-use crate::{proc, programs};
-
 // spec: context-kit/SPEC.md §bin/env-probe — the roster itself, beside the predicate that reads it.
 // It carries no knob and never did, on that section's own ground, so holding it here rather than in
 // a sourceable file loses no affordance the kit ever offered.
@@ -11,8 +9,6 @@ pub const PROBE_SET: &[&str] = &[
     "git",
     "jq",
     "curl",
-    "awk",
-    "sort::coreutils",
     "shellcheck",
     "cargo:1.71::contributor",
 ];
@@ -23,7 +19,7 @@ pub const ROSTER: &str = "native/src/toolfloor.rs";
 
 // spec: context-kit/SPEC.md §bin/env-probe — `<name>[:<min-version>[:<impl-token>[:<audience>]]]`,
 // positional, an empty field meaning unconstrained on that axis exactly as an omitted trailing one
-// does, so `awk`, `awk:`, `awk::` and `awk:::` parse to one member.
+// does, so `jq`, `jq:`, `jq::` and `jq:::` parse to one member.
 pub struct Element {
     pub name: String,
     pub min: String,
@@ -69,8 +65,8 @@ pub fn probe_set(text: &str) -> Option<Vec<String>> {
 }
 
 // spec: context-kit/SPEC.md §bin/env-probe — the closed verdict set. `uncomparable` is the
-// fail-closed arm and carries no field: an unparseable banner and a `sort` without `-V` are one
-// verdict because the remedy is the same, which is to stop trusting the comparison.
+// fail-closed arm and carries no field: its one cause is a banner or token the predicate cannot
+// compare, whose remedy is to stop trusting the comparison.
 pub enum Verdict {
     Ok,
     Absent,
@@ -117,18 +113,27 @@ fn first_word(banner: &str) -> String {
     }
 }
 
-// spec: context-kit/SPEC.md §bin/env-probe — numeric comparison is `sort -V`, kept as a spawn
-// rather than replaced by a native comparator: `uncomparable`'s second cause is *a `sort` without
-// `-V`*, which no in-process comparison can reach, and the golden pins that cause.
+// spec: context-kit/SPEC.md §bin/env-probe — field-wise numeric, the shorter token padded with
+// zero fields; a field that is not an ASCII digit run, or overflows `u64`, answers `None`.
 pub fn floor_met(min: &str, found: &str) -> Option<bool> {
-    let body = format!("{}\n{}\n", min, found);
-    let sort = proc::resolve_floor_tool(&programs::SORT);
-    let out = proc::run_streamed(&sort, &["-V"], body.as_bytes(), proc::Stderr::Discard).ok()?;
-    if out.code() != 0 {
-        return None;
+    let fields = |t: &str| -> Option<Vec<u64>> {
+        t.split('.')
+            .map(|f| {
+                if f.is_empty() || !f.bytes().all(|b| b.is_ascii_digit()) {
+                    return None;
+                }
+                f.parse::<u64>().ok()
+            })
+            .collect()
+    };
+    let (m, f) = (fields(min)?, fields(found)?);
+    for i in 0..m.len().max(f.len()) {
+        let (a, b) = (m.get(i).copied().unwrap_or(0), f.get(i).copied().unwrap_or(0));
+        if a != b {
+            return Some(b > a);
+        }
     }
-    let text = String::from_utf8_lossy(out.stdout()).to_string();
-    Some(text.lines().next().unwrap_or("") == min)
+    Some(true)
 }
 
 // spec: context-kit/SPEC.md §bin/env-probe — `tool_floor_check <element> <banner>`, arm for arm
@@ -200,6 +205,20 @@ mod tests {
         assert_eq!(version("mawk 1.3.4 20240905"), "1.3.4");
         assert_eq!(version("GNU bash, no version here"), "");
         assert_eq!(version("12 items, 3.4 left"), "3.4");
+    }
+
+    // spec: context-kit/SPEC.md §bin/env-probe — numeric fields rather than a lexical comparison,
+    // and a token outside the digit-run grammar is uncomparable rather than ordered
+    #[test]
+    fn the_floor_compares_numeric_fields_padded_with_zeros() {
+        assert_eq!(floor_met("4.3", "5.2.21"), Some(true));
+        assert_eq!(floor_met("4.3", "4.2.46"), Some(false));
+        assert_eq!(check("bash:4.3", "GNU bash, version 4.2.46(1)-release").rendered(), "below 4.2.46 4.3");
+        assert_eq!(floor_met("1.71", "1.71"), Some(true));
+        assert_eq!(floor_met("4.3", "4.3.0"), Some(true));
+        assert_eq!(floor_met("4.10", "4.9"), Some(false));
+        assert_eq!(floor_met("4.3", "4.99999999999999999999999"), None);
+        assert_eq!(floor_met("4.3", "4.3-rc1"), None);
     }
 
     // spec: context-kit/SPEC.md §bin/env-probe — the closed verdict set, each arm reached: the

@@ -19,7 +19,12 @@ echo
 # spec: context-kit/SPEC.md §The session-context hook — the stage cursor is the state file's last data line; read from a named file, never stdin, which the session-role signal below consumes exactly once. An absent file or one with no data line yields empty, which falls to the existing non-close/non-scope branch.
 stage=""
 if [[ -f "$STATE_FILE" ]]; then
-    stage="$(awk '/^---[[:space:]]*$/ { f = 1; next } f && NF { l = $2 } END { print l }' "$STATE_FILE" 2>/dev/null)"
+    marker=""
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        if [[ "$line" =~ ^---[[:space:]]*$ ]]; then marker=1; stage=""; continue; fi
+        read -r f1 f2 _ <<< "$line"
+        [[ -n "$marker" && -n "${f1:-}" ]] && stage="${f2:-}"
+    done 2>/dev/null < "$STATE_FILE"
 fi
 if [[ -f "$RUN_GATES" ]]; then
     if [[ "$stage" == close || "$stage" == scope ]]; then
@@ -31,9 +36,9 @@ if [[ -f "$RUN_GATES" ]]; then
 fi
 
 mapfile -t changed < <(
-    git status --porcelain 2>/dev/null | awk '{ print $NF }' \
-        | awk -F/ 'NF>1 { print $1 }' | sort -u \
-        | while read -r d; do [[ -d "$d/src" ]] && echo "$d"; done
+    git status --porcelain 2>/dev/null \
+        | while read -r l; do p="${l##* }"; [[ "$p" == */* && -d "${p%%/*}/src" ]] && echo "${p%%/*}"; done \
+        | sort -u
 )
 # spec: context-kit/SPEC.md §The session-context hook — the public-surface block guards on the gate binary, not on a script path: the index tools are arms of it now, and `exec_arm` exits 2 with a diagnostic this call site swallows, so a guard taken *after* the header would print the header and nothing under it on every host the artifact roster does not cover. Read the binary first and the block is absent rather than empty — the way the deleted `-f` guard degraded. The lookup runs in a subshell because the kit library exits 2 on a malformed config, and this hook never fails a session.
 if [[ ${#changed[@]} -gt 0 && -n "$NATIVE_BIN" && -x "$NATIVE_BIN" ]]; then

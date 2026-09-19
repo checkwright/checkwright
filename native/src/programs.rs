@@ -49,8 +49,6 @@ roster! {
     DATE = "date", "";
     MKTEMP = "mktemp", "";
     CP = "cp", "";
-    AWK = "awk", "";
-    SORT = "sort", "";
     JQ = "jq", "";
     SHELLCHECK = "shellcheck", "";
     #[cfg(not(unix))]
@@ -68,8 +66,8 @@ roster! {
 
 // spec: gate-sdk/SPEC.md §The program roster — the members a `PROBE_SET` walk names; a unit test
 // holds this set equal to `PROBE_SET`'s names, so it keeps no row live that the walk never spawns
-fn probed() -> [Program; 8] {
-    [GIT, BASH, JQ, AWK, SORT, SHELLCHECK, CURL, CARGO]
+fn probed() -> [Program; 6] {
+    [GIT, BASH, JQ, SHELLCHECK, CURL, CARGO]
 }
 
 // spec: gate-sdk/SPEC.md §The program roster — an existing member or nothing; it constructs no
@@ -460,9 +458,9 @@ mod tests {
     // spec: gate-sdk/SPEC.md §The program roster — retargeting keeps the identity it was handed
     #[test]
     fn a_retargeted_member_keeps_its_name_and_spawns_its_path() {
-        let p = SORT.at("/opt/bin/sort");
-        assert_eq!(p.name(), "sort");
-        assert_eq!(p.invocation(), "/opt/bin/sort");
+        let p = JQ.at("/opt/bin/jq");
+        assert_eq!(p.name(), "jq");
+        assert_eq!(p.invocation(), "/opt/bin/jq");
         assert_eq!(p.ground(), None);
         let c = Program::consumer("EVIDENCE_KIT_PARSER", "scripts/parse.sh");
         assert_eq!(c.name(), "parse.sh");

@@ -71,15 +71,15 @@ Subsystem for Linux) is a route you may choose instead — the Linux line below
 serves it, and joining native Windows took nothing away from it.
 
 macOS runs it too, but as an adopter action rather than something the stock
-system delivers. Stock macOS ships bash 3.2 over a BSD userland whose `sort` and
-`date` reject the flags the gates pass. The remedy is the block below, and it
+system delivers. Stock macOS ships bash 3.2 over a BSD userland whose `date`
+rejects the flags the gates pass. The remedy is the block below, and it
 is the whole of it: this page names no other step for a Mac. Its first line
-installs GNU bash for the 4.3 floor, coreutils for `sort` and `date`, and
+installs GNU bash for the 4.3 floor, coreutils for `date`, and
 `shellcheck`, which `init` refuses a machine without. The other two put
 coreutils' `gnubin` directory and Homebrew's own `bin` ahead of `/usr/bin` on
-`PATH`; `gnubin` is what makes the GNU names resolve unprefixed, as `sort`
-rather than `gsort`, and without it every gate that sorts would still reach the
-BSD one.
+`PATH`; `gnubin` is what makes the GNU names resolve unprefixed, as `date`
+rather than `gdate`, and without it every gate that reads a date would still
+reach the BSD one.
 
 <!-- macos-remedy:begin -->
 
@@ -95,8 +95,8 @@ The block's middle line writes the ordering into `~/.zprofile`, the profile a
 new zsh Terminal window reads. If your login shell is bash, append the same line
 to `~/.bash_profile` instead. The last line orders the shell you are in. The
 requirements below assert what `PATH` actually resolves, so a Mac carrying
-Homebrew coreutils that is not `PATH`-ordered reports below contract. That is
-correct, since BSD `sort` is what the gates would invoke. The two macOS
+Homebrew coreutils that is not `PATH`-ordered is not what the gates invoke: they
+reach BSD `date` in its place. The two macOS
 install-smoke legs run this block verbatim and then open a fresh login shell, so
 both the ordering and its persistence are measured rather than suggested.
 
@@ -164,7 +164,13 @@ your `PATH`, and the note says what breaks without it:
   `Bash` tool and its hook commands under that shell. The floor is the highest construct the
   battery runs: a nameref (`local -n`) in the gate library the front-end sources.
   Associative arrays, `mapfile`, and the lowercasing case expansion are more
-  widespread but only reach 4.0.
+  widespread but only reach 4.0. The shipped shell also assumes the POSIX
+  userland `GATE_SDK_PROGRAM_FLOOR` names (gate-sdk/SPEC.md §lib/gate.sh). A
+  GNU-only construct it uses is named on this page and cited by a
+  `# portability-declared:` marker at its site, so the declaration and the
+  enforcement are one fact with one owner — `check-portability-floor` reds a new
+  undeclared use before it reaches this page. On Linux and macOS the gate
+  binary reads civil dates itself rather than through GNU `date -d`.
 - `git` — the gates read tracked files and the hooks fire at commit time; the
   model is git-native end to end.
 - `jq` — the settings and evidence gates, and guard-kit's JSON tooling, parse
@@ -173,21 +179,6 @@ your `PATH`, and the note says what breaks without it:
   where `curl` is absent. Like `shellcheck` below, it is part of the toolchain
   contract `checkwright doctor` decides, so `init` refuses a machine without it
   rather than half-installing.
-- `awk` — the bash activation bootstrap reads its release digest with it, and the
-  shipped session-context, deprecated-surface KPI and gate-skeleton templates
-  run it. Every one of those programs is POSIX awk, so any implementation
-  serves. The generated hooks contain no awk, and `check-gate-assertions`, whose
-  3-argument `match()` was the one construct that required **GNU** awk, runs in
-  the binary.
-- `sort` (coreutils) — the battery assumes GNU coreutils, and `sort` is the
-  member standing for that family. The binding construct is `sort -V`, with which
-  the floor check itself compares versions; no BSD equivalent carries that flag.
-  On Linux and macOS the gate binary reads civil dates itself rather than
-  through GNU `date -d`. A construct named here is what a
-  `# portability-declared:` marker cites at the site that uses it, so the
-  declaration and the enforcement are one fact with one owner rather than two
-  lists that agree by habit — `check-portability-floor` reds a new undeclared
-  use before it reaches this page.
 - `shellcheck` — an **adopter** requirement and not merely a contributor one,
   which is why it carries no audience token where `cargo` below does. You
   inherit the battery: the `check-shellcheck` meta-gate runs
@@ -269,28 +260,17 @@ Some requirements belong to an **install path** rather than to the battery, and
 no delivery-path tool joins the roster above. That roster asserts what the
 *battery* requires; how the payload reached your machine is not that, so the
 three paths carry their requirements here in prose instead. The **Release
-tarball** wants `curl` (or `wget`) plus `tar` and `sha256sum` — a GNU userland
-already has them, `sha256sum` being a coreutils member the roster asserts
-anyway. The **`npx` installer** wants Node. **Manual vendoring** wants nothing
+tarball** wants `curl` (or `wget`) plus `tar` and `sha256sum`, the last its own
+requirement for checking the tarball's digest. The **`npx` installer** wants Node. **Manual vendoring** wants nothing
 beyond the roster. Nothing in the gate battery uses Node on any of the three, so
 a consumer who would rather not add it takes either of the other two paths and
 loses nothing.
 
-Two requirements belong to the installer *itself* — to `init`, whichever
-transport delivered it — and they are stated here for the same reason: they are
-not what the battery asserts, so the roster above would be the wrong place to
-claim them.
+One requirement belongs to the installer *itself* — to `init`, whichever
+transport delivered it — and it is stated here for the same reason: it is not
+what the battery asserts, so the roster above would be the wrong place to claim
+it.
 
-- **A GNU `sort`.** The floor predicate compares two versions with `sort -V`,
-  and `checkwright doctor` runs that predicate on the install path. A stock BSD or
-  macOS userland can therefore fail the check that exists to tell you whether your
-  box qualifies, in the same way the thing it diagnoses would fail. So the
-  GNU-first instruction above is the install path's requirement too, not the
-  battery's alone. **It narrowed when the install steps moved behind the compiled
-  binary** and now has one site rather than two: the comparison is the crate's,
-  and the only shell left on the path is the bootstrap.
-  `check-portability-floor` holds it: a new site on the install path is a red
-  until its author has been here.
 - **`sha256sum` or `shasum`.** The bootstrap verifies the prebuilt gate binary
   against its published digest before it runs it, and it will take either hasher —
   `shasum` is there because stock macOS ships it instead. **Neither present is a

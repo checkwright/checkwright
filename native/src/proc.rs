@@ -185,16 +185,13 @@ fn spawn_resolution<F: Fn(&std::path::Path) -> bool>(
     if program.contains('/') || program.contains('\\') {
         return Ok(program.to_string());
     }
-    let disposition = homonym_disposition(program);
     // spec: gate-sdk/SPEC.md §check-graph — the system-directory rejection is program-class-
     // specific: a name the roster does not carry has no homonym there and earns no rejection
-    let root = match disposition {
-        Some(_) => system_root,
-        None => None,
-    };
+    let homonym = is_system_dir_homonym(program);
+    let root = if homonym { system_root } else { None };
     match resolve_outside_system_dir(program, dirs, pathext, root, exists) {
         Ok(p) => Ok(p),
-        Err(e) if disposition == Some(NoResolution::Refuse) => Err(e),
+        Err(e) if homonym => Err(e),
         Err(_) => Ok(program.to_string()),
     }
 }
@@ -237,33 +234,17 @@ fn resolve_on_path<F: Fn(&std::path::Path) -> bool>(
 // spelled with either of its siblings walking straight around the rejection
 const WINDOWS_SYSTEM_DIR_VIEWS: [&str; 3] = ["System32", "SysWOW64", "Sysnative"];
 
-// spec: gate-sdk/SPEC.md §check-graph — what a host offering only the system directory's homonym
-// earns. `spawn_target`'s funnel applies `Refuse` to every spawn and `FallBack` is also
-// `resolve_floor_tool`'s, so the roster below picks the face rather than a call site picking it
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
-#[cfg_attr(not(windows), allow(dead_code))]
-enum NoResolution {
-    Refuse,
-    FallBack,
-}
-
 // spec: gate-sdk/SPEC.md §check-graph — the governed roster: a name belongs here when the Windows
-// system directory ships a program of that name that is NOT the program the payload wants. It is a
-// fact about the platform, never about a consumer, so no knob widens it
+// system directory ships a program of that name that is NOT the program the payload wants, and a
+// host offering it nowhere else refuses; a platform fact, so no knob widens it
 #[cfg_attr(not(windows), allow(dead_code))]
-const SYSTEM_DIR_HOMONYMS: &[(&str, NoResolution)] = &[
-    ("bash", NoResolution::Refuse),
-    ("sort", NoResolution::FallBack),
-];
+const SYSTEM_DIR_HOMONYMS: &[&str] = &["bash"];
 
 // spec: gate-sdk/SPEC.md §check-graph — the roster's one lookup, by exact match against the
 // unresolved program name the caller passed
 #[cfg_attr(not(windows), allow(dead_code))]
-fn homonym_disposition(program: &str) -> Option<NoResolution> {
-    SYSTEM_DIR_HOMONYMS
-        .iter()
-        .find(|(name, _)| *name == program)
-        .map(|(_, d)| *d)
+fn is_system_dir_homonym(program: &str) -> bool {
+    SYSTEM_DIR_HOMONYMS.contains(&program)
 }
 
 // spec: gate-sdk/SPEC.md §check-graph — a directory folded the way Windows compares one, case and
@@ -321,9 +302,9 @@ fn resolve_outside_system_dir<F: Fn(&std::path::Path) -> bool>(
         })
 }
 
-// spec: context-kit/SPEC.md §bin/env-probe — the `FallBack` face of `SYSTEM_DIR_HOMONYMS`, and a
-// REPORTING resolver besides: its value is rendered in doctor's banner and the env-probe emitter,
-// which is the identity the funnel cannot absorb and why it keeps its own callers
+// spec: context-kit/SPEC.md §bin/env-probe — a REPORTING resolver: its value is rendered in
+// doctor's banner and the env-probe emitter, which is the identity the funnel cannot absorb and why
+// it keeps its own callers
 // spec: context-kit/SPEC.md §bin/env-probe — a host offering the tool nowhere outside the system
 // directory falls back to the bare name rather than refusing: the verdict is then the roster's own
 // absent or wrong-impl, which is the true reading of such a host and the fail-closed direction.
@@ -1366,37 +1347,13 @@ pub(crate) mod tests {
         }
     }
 
-    // spec: context-kit/SPEC.md §bin/env-probe — the floor probe's case, which the interpreter's
-    // does not cover: `sort` is on `PATH` in both directories and the resolution must reach the
-    // coreutils one, System32's being the line sorter that has no `-V` for the floor to compare with
-    #[test]
-    fn the_floor_probe_resolves_sort_past_the_system_directorys_line_sorter() {
-        let dirs = vec![
-            std::path::PathBuf::from(r"C:\Windows\System32"),
-            std::path::PathBuf::from(r"C:\Program Files\Git\usr\bin"),
-        ];
-        let got = resolve_outside_system_dir(
-            "sort",
-            &dirs,
-            Some(""),
-            Some(r"C:\Windows"),
-            |p: &Path| folded(&p.to_string_lossy()).ends_with("/sort.exe"),
-        )
-        .expect("nothing resolved on a PATH whose second entry holds a sort");
-        assert_eq!(
-            folded(&got),
-            "c:/program files/git/usr/bin/sort.exe",
-            "the resolution took System32's sort, which cannot version-compare"
-        );
-    }
-
     // spec: context-kit/SPEC.md §bin/env-probe — the passthrough arm, asserted on the host that
     // compiles it: resolving on POSIX would change the spawned literal every registry declaration
     // is compared against, so the name must come back unaltered
     #[cfg(not(windows))]
     #[test]
     fn a_posix_floor_tool_is_spawned_under_its_bare_name() {
-        assert_eq!(resolve_floor_tool(&crate::programs::SORT).invocation(), "sort");
+        assert_eq!(resolve_floor_tool(&crate::programs::JQ).invocation(), "jq");
     }
 
     // spec: gate-sdk/SPEC.md §check-graph — the half no resolver case reaches: that a BARE-NAME
@@ -1417,21 +1374,6 @@ pub(crate) mod tests {
             err.contains("WSL launcher") && err.contains("not clean"),
             "the funnel's refusal did not name its cause fail-closed: {}",
             err
-        );
-    }
-
-    // spec: context-kit/SPEC.md §bin/env-probe — the roster's other disposition through the same
-    // funnel: a `FallBack` member on the same PATH yields the bare name, so the verdict is the
-    // floor roster's own absent-or-wrong-impl rather than a refusal the probe cannot report
-    #[test]
-    fn a_funnelled_fallback_member_yields_the_bare_name_on_the_same_path() {
-        let dirs = vec![std::path::PathBuf::from(r"C:\Windows\System32")];
-        assert_eq!(
-            spawn_resolution("sort", &dirs, Some(""), Some(r"C:\Windows"), |p: &Path| {
-                folded(&p.to_string_lossy()).ends_with("/sort.exe")
-            }),
-            Ok("sort".to_string()),
-            "a FallBack member refused instead of falling back to the bare name"
         );
     }
 

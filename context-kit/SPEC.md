@@ -394,7 +394,7 @@ made.
 roster member's version and its floor verdict (below); the absent-tools list
 (roster members `PATH` does not resolve); and the below-contract list. The
 roster itself is owned by `native/src/toolfloor.rs` and never restated here. Its
-spawned programs are `uname`, `date`, `sort`, and every roster member it probes.
+spawned programs are `uname`, `date`, and every roster member it probes.
 The roster is the kit's own and a consumer cannot shadow it, which is what keeps
 this set bounded by the paragraph below rather than by a consumer's file.
 
@@ -425,8 +425,10 @@ bare name keeps
 the original meaning — must be present, no version constraint — so the floor axis
 is **per-member** rather than a number demanded of every member. The fields are
 positional, so a member constrained by implementation alone carries an empty
-min-version field (`sort::coreutils`), and an empty field means what an omitted trailing
-field means: `awk`, `awk:`, `awk::` and `awk:::` are one unconstrained member. **A member
+min-version field (`<name>::<impl-token>`), and an empty field means what an omitted trailing
+field means: `jq`, `jq:`, `jq::` and `jq:::` are one unconstrained member. No live
+member carries an implementation token; the axis stays in the grammar for a member
+a construct forces onto one implementation. **A member
 gains a floor only where a construct the battery actually runs forces one**, and
 the forcing construct is recorded with it — a floor nobody's code forces is not
 pinned, which is what stops a version number from rotting into an aspiration
@@ -468,15 +470,6 @@ The constrained members and what forces each:
   consumer below it cannot run the battery at all. Recorded here because the
   earlier `4.0` was a fail-open: `env-probe` reported `ok` on a 4.2 box the
   battery would fail with an obscure syntax error.
-- `sort::coreutils` — no version floor, one implementation constraint, and one
-  member standing for a whole package family: GNU coreutils is forced by the
-  floor predicate's own `sort -V`, which is not BSD-portable. GNU `date -d` does
-  not force it: the binary reads civil dates in-process on unix
-  (drift-kit/SPEC.md §Bundled KPIs). The representative member is the binary
-  carrying the forcing construct, which is the floor predicate's own comparison
-  tool. `realpath --relative-to` and `stat -c` do
-  not force it: the binary computes relative paths lexically, and `stat -c` has
-  no live site.
 - `cargo:1.71::contributor` — a **contributor-side** floor, never a runtime one,
   and that reading is now declared on the element and read by name rather than
   left as an aside: the audience field is what the consumer-side predicate
@@ -506,23 +499,24 @@ The constrained members and what forces each:
   the floor un-suppresses lints against code no change touched.
   `cargo` is the member rather than `rustc` because `cargo build` is what the
   contributor routine and the `gates` workflow actually invoke, and the two ship as
-  one toolchain sharing a version banner — the representative-member rule the
-  `sort::coreutils` entry above states. The floor tracks what the crate and its
+  one toolchain sharing a version banner — the representative-member rule: one
+  member stands for a whole package family, and it is the program the forcing
+  construct actually invokes. The floor tracks what the crate and its
   graph actually require, not whatever rustc a given box happens to carry; pinning
   the latter would be exactly the aspiration this section's rule forbids. Runtime is
   unaffected: git remains the sole runtime dependency of a ported gate, shelled out
   rather than embedded.
 Every other member is a bare name — no construct in the battery forces a version
-on it (the `jq` usage is 1.5-era throughout), so none is pinned. `awk` is among
-them: every awk program that ships is POSIX — the bash activation bootstrap's
-digest read, and the session-context, deprecated-surface KPI and gate-skeleton
-templates — the generated hooks contain none, and the binary spawns awk only as
-its ERE matcher's test oracle. The GNU constraint's last holder was
-`check-gate-assertions`' 3-argument `match()`, retired by its port
-(gate-sdk/SPEC.md §check-gate-assertions).
+on it (the `jq` usage is 1.5-era throughout), so none is pinned. No construct the
+shipped code runs forces GNU coreutils, so no member stands for that family: the
+floor predicate compares versions in-process, the binary reads civil dates
+in-process on unix (drift-kit/SPEC.md §Bundled KPIs) and computes relative paths
+lexically, and `stat -c` has no live site. `awk` and `sort` are off the roster:
+no shipped program runs awk, and the POSIX `sort -u` the shipped shell keeps rests
+on `GATE_SDK_PROGRAM_FLOOR`'s assumption (gate-sdk/SPEC.md §lib/gate.sh).
 
 An implementation token is matched as a **substring of the tool's own version
-banner** — GNU sort prints `sort (GNU coreutils)` — so the
+banner** — a GNU coreutils tool prints `(GNU coreutils)` in its own — so the
 constraint is checked against the binary actually on `PATH` rather than against a
 package name nothing can probe. Its honest limit is the same one: the roster
 asserts what `PATH` resolves at probe time, so an installed-but-not-`PATH`-ordered
@@ -531,11 +525,15 @@ will invoke.
 
 **The floor predicate.** `tool_floor_check <element> <banner>` returns one verdict
 from a closed set — `ok`, `absent` (an empty banner), `below <found> <floor>`,
-`wrong-impl <found>`, `uncomparable`. Numeric comparison is `sort -V`.
+`wrong-impl <found>`, `uncomparable`. The comparison is in-process and spawns
+nothing: field-wise numeric over the dotted digit runs, the shorter token padded
+with zero fields so `4.3` meets `4.3.0`, and `4.10` above `4.9`.
 `<found>` is the banner's first dotted-version token for `below` and its
 first word — the implementation's own name — for `wrong-impl`. `uncomparable` is
-the fail-closed arm: a banner the predicate cannot parse, or a `sort` without
-`-V`, is reported unverified and never silently as `ok` — the posture
+the fail-closed arm, with one cause: a banner or token the predicate cannot
+compare — no dotted-version token, a field that is not an ASCII digit run, or one
+that overflows a 64-bit integer — is reported unverified and never silently as
+`ok` — the posture
 gate-sdk/SPEC.md §The gate model requires of a gate, applied to a probe that is
 not one.
 
@@ -550,37 +548,22 @@ rule that a parity arm's caller is its second holder: one holder cannot be held
 equal to itself, and a harness that can only skip is the unreachable code that
 rule exists to refuse.
 
-**`sort -V` is preserved in the compiled holder rather than replaced by a native
-comparison.** The `uncomparable` verdict is fail-closed for two conditions, and
-the second — a `sort` without `-V` — is one no in-process comparison can reach.
-Removing the spawn would narrow the verdict's reachable conditions on one holder
-while they stay live on the other, and the population that disagreement lands on
-is exactly the BSD or stock-macOS userland the verdict exists for. The parity
-lane asserts this directly rather than trusting the reading: it puts a `sort`
-that rejects `-V` on `PATH` and requires `uncomparable` from both holders, a
-condition a canned corpus cannot express.
-
 **Every floor probe resolves its member to a path before spawning it, and only
 where the platform has a system-directory homonym.** Windows searches that
 directory *before* `PATH`, so a bare program name reaches whatever the platform
-ships under it rather than the implementation `PATH` offers — `sort` is the
-worked case, the shipped one being a line sorter with no `-V`. The presence
-probe walks `PATH` and the spawn does not, so the two disagree about a single
-tool, and one absent implementation renders as *two* symptoms: that member
-`wrong-impl`, and every **versioned** member `uncomparable`, the numeric
-comparison above being that same spawn. Both probes therefore resolve the member
-outside the system directory first, through the governed homonym roster
-gate-sdk/SPEC.md §check-graph owns — one roster, and the rejection covers every
-view the platform shows that directory through. **A host offering the member
-nowhere else falls back to the bare name rather than refusing, and that is now
-the member's own roster disposition rather than a property of the function that
-happens to resolve it**, because the floor roster's own `absent` or `wrong-impl`
-is then the true reading. Stating it per name is what stops the two dispositions
-diverging: before, a call site chose refuse-or-fall-back by choosing which
-resolver it called, so a third member could be added to one and forgotten in the
-other. The floor probe's resolver keeps its own callers even so — it is a
-**reporting** resolver, its value rendered in the banner below and in doctor's,
-not only spawned. Elsewhere the name passes through unaltered: a POSIX spawn already
+ships under it rather than the implementation `PATH` offers. The presence probe
+walks `PATH` and the spawn does not, so for a member the system directory ships a
+different program under, the two would disagree about a single tool and the
+verdict would describe the homonym. Both probes therefore resolve the member
+outside the system directory first, and the rejection covers every view the
+platform shows that directory through (gate-sdk/SPEC.md §check-graph). **A host
+offering the member nowhere else falls back to the bare name rather than
+refusing**, because the floor roster's own `absent` or `wrong-impl` is then the
+true reading. That fall-back is the floor probe's resolver's own and never reads
+gate-sdk's homonym roster, whose rows all refuse: a **reporting** resolver needs a
+reading of the host, not a refusal it cannot render. It keeps its own callers for
+the same reason — its value is rendered in the banner below and in doctor's, not
+only spawned. Elsewhere the name passes through unaltered: a POSIX spawn already
 searches `PATH` and nothing else, and resolving there would swap the spawned
 literal for an absolute path on every host the battery runs on, which is what a
 registry declaration is compared against.

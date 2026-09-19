@@ -784,19 +784,11 @@ jobs:
           # toolchain floor an adopter is told to have. Provisioning the runner up to
           # that floor is this leg's job and hiding a shortfall is not.
           #
-          # **`windows-latest` falls short in one place and it reports as two**, and a
-          # PATH prepend alone was measured NOT to fix it. The image ships Git bash
-          # and GNU awk, both of which resolve; `sort` does not, because it is the one
-          # roster member the platform ships a homonym for. Windows searches the
-          # system directory BEFORE PATH, so the floor comparator's spawn
-          # (`floor_met` in native/src/toolfloor.rs, kept as a spawn precisely so a
-          # `sort` without `-V` is reachable) reached that homonym whatever PATH said,
-          # and ONE missing implementation reported as `sort` wrong-impl AND as every
-          # versioned member being uncomparable. The repair is in the crate — the
-          # floor probes resolve outside that directory, context-kit/SPEC.md
-          # §bin/env-probe — and Git's userland on PATH remains its precondition,
-          # since the resolver walks PATH and reaches nothing PATH never carried.
-          # This leg puts nothing on PATH itself: docs/install.md's
+          # Windows searches the system directory BEFORE PATH, so the floor probes
+          # resolve their members outside that directory (context-kit/SPEC.md
+          # §bin/env-probe), and Git's userland on PATH is that resolution's
+          # precondition, since the resolver walks PATH and reaches nothing PATH
+          # never carried. This leg puts nothing on PATH itself: docs/install.md's
           # `windows-remedy` block is run verbatim, as an adopter following the
           # page would, and its session line is what orders Git's `usr\bin` and
           # `bin` here; `shellcheck` the image does not ship at all. An empty
@@ -820,13 +812,6 @@ jobs:
           if (-not (Get-Command shellcheck -ErrorAction SilentlyContinue)) {
               Write-Host "SCAFFOLDING FAILED -- shellcheck is still absent, so a doctor refusal below is THIS block's failure and not a new finding"
           }
-          # Printed rather than asserted, and printed unconditionally: the resolution
-          # order above is a claim about this image that no local host can check, so a
-          # round that greens must still leave behind what it greened ON, and a round
-          # that reds must not owe another one to learn where `sort` actually lives.
-          Write-Host "== every sort this image offers, in resolution order =="
-          Get-Command sort -All -ErrorAction SilentlyContinue |
-              ForEach-Object { Write-Host "  $($_.CommandType) $($_.Source)" }
           # The floor's roster is the binary's and never this file's, so the assertion
           # asks `doctor` rather than enumerating members here — a second copy would
           # drift the moment the roster moves. Asserting it BEFORE init also puts the
@@ -1281,8 +1266,9 @@ jobs:
       # the runner puts each `$GITHUB_PATH` line ahead of the ones before it.
       # That carry is the runner's and no adopter has it, so the second refusal
       # is the adopter's next terminal — a login zsh with no inherited `PATH` —
-      # resolving `sort` anywhere but coreutils' `gnubin`: the block's profile
-      # line is what must persist the ordering (docs/install.md §Requirements).
+      # resolving `date`, the member the block's coreutils is installed for,
+      # anywhere but coreutils' `gnubin`: the block's profile line is what must
+      # persist the ordering (docs/install.md §Requirements).
       - name: install the GNU userland docs/install.md names, and PATH-order it
         run: |
           set +e
@@ -1307,12 +1293,12 @@ jobs:
             i=$((i - 1))
             echo "${entries[$i]}" >> "$GITHUB_PATH"
           done
-          next="$(env -i HOME="$HOME" /bin/zsh -l -c 'command -v sort')"
-          echo "a fresh login shell resolves sort to: ${next:-<MISSING>}"
+          next="$(env -i HOME="$HOME" /bin/zsh -l -c 'command -v date')"
+          echo "a fresh login shell resolves date to: ${next:-<MISSING>}"
           case "$next" in
-            */coreutils/libexec/gnubin/sort) ;;
+            */coreutils/libexec/gnubin/date) ;;
             *)
-              echo "::error::a fresh login shell resolves sort to '${next:-<MISSING>}', not coreutils' gnubin — the block did not persist its PATH ordering for the adopter's next terminal"
+              echo "::error::a fresh login shell resolves date to '${next:-<MISSING>}', not coreutils' gnubin — the block did not persist its PATH ordering for the adopter's next terminal"
               exit 1
               ;;
           esac
@@ -1618,12 +1604,12 @@ jobs:
             i=$((i - 1))
             echo "${entries[$i]}" >> "$GITHUB_PATH"
           done
-          next="$(env -i HOME="$HOME" /bin/zsh -l -c 'command -v sort')"
-          echo "a fresh login shell resolves sort to: ${next:-<MISSING>}"
+          next="$(env -i HOME="$HOME" /bin/zsh -l -c 'command -v date')"
+          echo "a fresh login shell resolves date to: ${next:-<MISSING>}"
           case "$next" in
-            */coreutils/libexec/gnubin/sort) ;;
+            */coreutils/libexec/gnubin/date) ;;
             *)
-              echo "::error::a fresh login shell resolves sort to '${next:-<MISSING>}', not coreutils' gnubin — the block did not persist its PATH ordering for the adopter's next terminal"
+              echo "::error::a fresh login shell resolves date to '${next:-<MISSING>}', not coreutils' gnubin — the block did not persist its PATH ordering for the adopter's next terminal"
               exit 1
               ;;
           esac

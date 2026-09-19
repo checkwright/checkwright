@@ -274,7 +274,11 @@ placed before the "nothing to change" test would turn the pure idempotent path i
 a false hard failure.
 
 A payload older than the recorded install is refused as a
-silent downgrade — `--force` covers that refusal too, which is what makes a
+silent downgrade. "Older" is the floor predicate's comparison
+(context-kit/SPEC.md §bin/env-probe), which orders dotted digit runs only: a
+version carrying a prerelease or build suffix is unordered and never reads as a
+downgrade, because no ordering for one is ruled yet (docs/install.md
+§Versioning). `--force` covers that refusal too, which is what makes a
 rollback a thing you asked for rather than a thing that happened to you.
 `--force` means the same thing in all three places it appears — the changed-file
 protection here, the downgrade refusal above, and the kept files `uninstall`

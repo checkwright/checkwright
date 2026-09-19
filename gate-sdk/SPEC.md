@@ -3094,7 +3094,7 @@ heaviest set in the class** and is named because a reader sizing the gap below
 should meet the worst case rather than infer it: `git`, `bash`, `cargo`, `tar` and
 floor utilities, the middle two off `GATE_SDK_PROGRAM_FLOOR` and both ruled a
 requirement on that suite rather than on an adopter (§upgrade-smoke).
-**`--emit-env-probe`'s set is bounded but not short**: `uname`, `date`, `sort`,
+**`--emit-env-probe`'s set is bounded but not short**: `uname`, `date`,
 and every element of the probe roster, which is the crate's own and carries no
 knob a consumer could widen it with (context-kit/SPEC.md §bin/env-probe).
 **`--emit-always-loaded` is the class's one member whose set a consumer can
@@ -4655,7 +4655,9 @@ that answers each is the one whose corpus matches its question.
    relocation put `doctor` in the crate, which emptied that caller set**, so the
    library, its golden and the lane all retired together on §The non-gate arm's
    rule that a parity arm's caller is its second holder. The environmental
-   assertion survives as a unit test of the one holder left.
+   cause has since retired with the spawn that carried it: the one holder left
+   compares versions in-process, so no `sort` is reached and there is no
+   condition left to assert.
 
    **guard-kit's three primitives are the fifth instance, and the first where the
    holder's `no-port` ground is about something other than the twinned
@@ -15027,21 +15029,19 @@ coupling graph draws the edge a derived couple creates.
 resolved by the **owner**, not by the call site. The installer's spawn of the
 vendored front-end, run on every `init`, is the standing instance: it spawns the bare literal `bash` exactly as every other spawn in the
 crate does, and `proc::run*` resolves it. The name-to-treatment question lives in one governed **roster** in
-`proc.rs`, `SYSTEM_DIR_HOMONYMS`, whose rows are a program **name** and a
-**disposition** — what a host offering that program nowhere but the system
-directory earns. `bash` **refuses**, by name, saying what was skipped and why,
-because a shell that is not a shell is worse than not running; `sort` **falls
-back** to the bare name, because the verdict is then the floor roster's own
-absent-or-wrong-impl, which context-kit/SPEC.md §bin/env-probe owns and which is
-the true reading of such a host. **A name belongs on the roster when the Windows
+`proc.rs`, `SYSTEM_DIR_HOMONYMS`, whose rows are program **names**, and a host
+offering a row's program nowhere but the system directory is **refused**, by
+name, saying what was skipped and why. `bash` is the one row, because a shell
+that is not a shell is worse than not running. **A name belongs on the roster when the Windows
 system directory ships a program of that name that is not the program the
 payload wants** — a fact about the platform and not about a consumer, which is
 why no knob widens it, on `WINDOWS_SYSTEM_DIR_VIEWS`'s own ground. The funnel,
-`spawn_target`, applies the roster's disposition to every spawn.
-`proc::resolve_floor_tool` also keeps its own callers, because it is a
+`spawn_target`, applies the roster to every spawn.
+`proc::resolve_floor_tool` keeps its own callers, because it is a
 **reporting** resolver whose value is rendered in doctor's banner and in the
 env-probe emitter rather than only spawned. That is the one identity the funnel
-cannot absorb.
+cannot absorb, and its fall-back to the bare name is its own rather than a
+roster row's (context-kit/SPEC.md §bin/env-probe).
 
 **Why the owner and not the call sites, which is the part a sweep would get
 wrong.** A sweep is refused on measurement rather than on taste: the
@@ -15077,10 +15077,7 @@ resolving inside the Windows system directory — `%SystemRoot%\System32` and it
 `SysWOW64` and `Sysnative` views — is skipped, because that directory holds
 nothing else the payload wants. **The rejection is program-class-specific**: it
 applies to a roster member and to nothing else, since a name with no homonym
-there has no reason to be denied a directory that may legitimately hold it. That
-is also why `sort`'s membership needs no second argument — the system directory's
-`sort` is a line sorter with no `-V` rather than any coreutils, which is the
-membership criterion applied, not an extension of it.
+there has no reason to be denied a directory that may legitimately hold it.
 The comparison is **case- and separator-folded**,
 since `c:/windows/system32` names the same directory as `C:\Windows\System32` and
 a comparison that missed that would pass on every developer host and fail on the

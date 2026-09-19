@@ -279,8 +279,9 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         // spec: installer/SPEC.md §The manifest — the version field's re-run reader: a payload
         // older than the recorded install is a silent downgrade, so it refuses, and `--force` is
         // what makes a rollback deliberate.
-        // spec: context-kit/SPEC.md §bin/env-probe — the comparator is the crate's one `sort -V`
-        // holder, so the install path and the floor predicate cannot disagree about version order.
+        // spec: context-kit/SPEC.md §bin/env-probe — the comparator is the floor predicate's, so the
+        // install path and the floor cannot disagree about version order; a version outside its
+        // digit-run grammar is unordered and never reads as a downgrade.
         let downgrading = !f.force
             && !prior_version.is_empty()
             && prior_version != version

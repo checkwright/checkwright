@@ -134,7 +134,7 @@ verify_digest() {
         die "no SHA-256 hasher on this host, and nothing unverified is ever executed" \
             "install sha256sum (GNU coreutils) or shasum, then re-run. The bootstrap verifies the published digest before it runs the artifact, and there is no path here that skips that." 1
     fi
-    want="$(awk 'NR==1{print $1}' "$ARTIFACT.sha256")"
+    read -r want _ < "$ARTIFACT.sha256" || true
     case "$hasher" in
         sha256sum) got="$(sha256sum -- "$ARTIFACT" 2>/dev/null | cut -d' ' -f1)" ;;
         shasum)    got="$(shasum -a 256 -- "$ARTIFACT" 2>/dev/null | cut -d' ' -f1)" ;;
