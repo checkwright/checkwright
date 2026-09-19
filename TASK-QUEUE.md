@@ -12,6 +12,96 @@
 
 ## New Features
 
+- **binary-door-wide-sweep** [spec: SPEC-door-binding.md] — rung 4a
+  (`floor-bash-hooks-front-end`) re-pointed only the starter and prose adopter surfaces at the gate
+  binary. Every other kit's shipped procedure still tells a reader, a session or the harness to run
+  `bash gate-sdk/bin/run-gates.sh`. Re-pointing them needs a per-consumer door binding, because the
+  binary's path differs between an install and a source clone.
+  **Reach re-verified at promotion, and wider than filed (2026-09-20 scope):** `git grep -l
+  run-gates.sh` also names every kit's `*-config.knobs` template,
+  `gate-sdk/templates/gates-workflow.yml`, `guard-kit/templates/settings-allow.json` and
+  `close-triage.md`, `drift-kit/templates/kpi-deprecated-surface.sh`,
+  `context-kit/templates/close-brevity.md` and `lifecycle-kit/templates/lead.md`.
+  **Ruled at spec (2026-09-20):** the door binding is not an open choice — `GATE_SDK_NATIVE_BIN`
+  already is it, and installer/SPEC.md §The install boundary already names it the one owner. The
+  open call was how each surface class spells it, and the amendment rules three: shipped shell
+  calls a library accessor, harness-wired JSON takes an install-time substitution marker, and prose
+  cites the knob. Measured at spec: 39 kit-shipped files, three surface classes.
+  **Narrowed at spec:** the PowerShell twin, `--run-front-end-parity` and the fail-open set do
+  **not** retire with this unit. `FAIL_OPEN_ARMS='--hook --statusline'` exists so a harness arm
+  declines when the binary is absent, and an absent binary cannot decline — so the harness-wired
+  class keeps a front-end door by construction. The residue is filed at spec, not built here.
+  Filed 2026-09-19 at `adopter-floor-native-rungs`' spec (scope-gated intake), merged at its close
+  drain with that build's kit-README bullet. Joins this iteration by operator direction
+  (2026-09-20, lead-relayed) as the lead unit; amendment authored and paired at spec.
+
+- **bash-audience-hand-held** [spec: SPEC-bash-audience.md] [blocked-by: binary-door-wide-sweep] —
+  the bash element of the tool-floor
+  roster carries a hand-held kit-list audience,
+  `context-kit+delegation-kit+drift-kit+guard-kit+lifecycle-kit`, spelled at context-kit/SPEC.md's
+  roster, `docs/install.md`'s requirements, `native/src/programs.rs` and `native/src/toolfloor.rs`.
+  Nothing re-derives it, so a kit that later ships a bash surface without joining the list
+  under-declares its floor and doctor passes a bash-less host that then fails at first use.
+  **The limit is already realized, measured at spec (2026-09-20):** the declared list matches
+  neither candidate predicate. Under *ships a bash script* only context-kit, drift-kit and
+  guard-kit qualify, so it **over-declares** delegation-kit and lifecycle-kit; under *instructs
+  bash* all eleven kits qualify, so it **under-declares** canon-kit, doctrine-kit, evidence-kit,
+  queue-kit and site-kit. Rung 4a cleared evidence-kit and queue-kit as "reference text, not a
+  spawn", on a probe that excluded READMEs — `queue-kit/README.md:75-86` is a twelve-line block of
+  bash commands a reader is told to run.
+  **Ruled at spec:** the audience is derived, not listed, and the predicate is *ships a file the
+  adopter's host runs with bash* — prose a reader types is deliberately excluded, because after the
+  lead unit no kit ships it.
+  **Blocked on `binary-door-wide-sweep`:** while the two predicates disagree any derivation has to
+  pick one, and either pick publishes a floor the other reading contradicts. Once the door sweep
+  lands they converge on `{context-kit, drift-kit, guard-kit}`. A hard ordering constraint.
+  Filed 2026-09-19 at `adopter-floor-native-rungs`' spec, promoted at its close drain. Joins this
+  iteration by operator direction (2026-09-20, lead-relayed); amendment authored and paired at spec.
+
+- **kit-roots-rel-filesystem-readers** [spec: SPEC-root-dialect.md] — the couples-anchor amendment
+  moved the `kit:` couples readers that match repository paths onto `walk::kit_roots()`. Other
+  `walk::kit_roots_rel` callers resolve paths off disk or through a git pathspec with the
+  gate-sdk-parent spelling, and carry the same latent mismatch when kits are vendored under a
+  subdirectory.
+  **The filed inference is RUN (2026-09-20 spec), and confirmed, widened and re-shaped.** Probed
+  against a scratch tree with the kits under `vendor/` and `GATE_SDK_ROOT=vendor/gate-sdk`, each arm
+  paired against the same command run flat. The misread's dangerous class is **silent**, not loud:
+  `--emit enum-sets` emits zero kit-derived sets and exits 0 (its own `# spec:` comment claims it
+  fail-closes rather than emitting exactly that set); `--emit close-surfaces` emits 1 row against
+  12; the derived `EVIDENCE_KIT_SUITES` default changes identity outright; and
+  `check-kit-registration` and `check-knob-citation` both PASS with clean lines reading `0 shipping
+  gate-tests` and `3 manifest file(s)` against `10` and `93`.
+  **Wider than filed:** `git grep -n kit_roots_rel native/src` returns **18** call sites, not the 9
+  the entry named; five of the affected ones were unnamed, and the filed cost class was priced
+  against the subset.
+  **Re-shaped:** the call is per-USE, not per-site — `kit_registration.rs` takes a text match at
+  :132 and a git pathspec at :137 off one call, and three more sites mix the two the same way. The
+  delta is *split the mixed reads, then re-point only the path use*.
+  Filed 2026-09-19 at `adopter-floor-native-rungs`' spec; promoted at its close drain. Joined this
+  iteration by the same operator direction; its amendment was authored and paired at spec.
+
+- **vendored-kit-readme-spec-link-dangles** [spec: SPEC-packed-links.md] — a vendored kit README
+  still links a `SPEC.md` its installed tree no longer carries. This is the residual the
+  payload-withholding unit's ninth delta NARROWED rather than closed: each of the eleven kit READMEs
+  already carries one sentence naming the withholding and `GATE_SDK_SPEC_BASE_URL`, so a reader who
+  meets the dead link has the answer on the same page.
+  **Why the tracked links stay relative:** re-targeting them at the published location would put the
+  publisher's host in eleven kit files — the kit literal the `<KIT>_<KNOB>` convention exists to
+  prevent — and would break canon-kit/SPEC.md §The reference-link grammar's one-to-one mirror
+  topology, `docs/<kit>/README.md` being a byte projection of the source.
+  **Re-counted at promotion (2026-09-20 scope):** 18 `](SPEC.md` links across the kit READMEs.
+  **Ruled at spec (2026-09-20):** resolution at pack time, and nowhere else. Two premises corrected
+  by probe — `runner.rs`'s `resolved_location` **cannot** be reused (it requires `<dir>/SPEC.md`; a
+  bare `SPEC.md` falls through), and the packer already rewrites content once (`stamp()` on
+  `package.json`), so this is a second instance of a precedent, not a new class. Scope is
+  own-SPEC-only: zero cross-kit `](../<kit>/SPEC.md)` links exist.
+  **What the unit gained at spec:** no gate compares packed kit content to tracked content — the
+  consumer smoke vendors by direct copy, bypassing the packer — so the rewrite breaks nothing and
+  nothing would catch it regressing. The amendment owes the first gate in the battery to read a
+  packed README's bytes.
+  Filed 2026-09-16 at the lead's direction during `installer-front-door-cut`. Joins this iteration
+  by operator direction (2026-09-20, lead-relayed); amendment authored and paired at spec.
+
 ## Technical Debt
 
 ## Deferred
@@ -112,83 +202,6 @@
   from validate's observation. Owner lookup: `EVIDENCE_KIT_SUITES`, `validate-baseline`,
   `suite coverage`, `evidence-baseline`, `orphan` — matched `evidence-baseline-orphan-suite-row`,
   read and ruled distinct above.
-
-- **binary-door-wide-sweep** [cost: event/high] [surface: lifecycle-kit] — rung 4a
-  (`floor-bash-hooks-front-end`) re-pointed only the starter and prose adopter surfaces at the gate
-  binary. Every other kit's shipped procedures still tell a reader to run
-  `bash gate-sdk/bin/run-gates.sh`: the stage templates (`lifecycle-kit/templates/stages/*.md`),
-  `delegation-kit/templates/agent-execution.md`, `drift-kit/templates/economics.md`,
-  `guard-kit/templates/settings-hooks.json`, context-kit's `session-context.sh` (its `RUN_GATES`,
-  reached through `settings-sessionstart.json`) and the kit READMEs — `gate-sdk/README.md`'s
-  install block and `canon-kit/README.md`'s hook-regeneration line. Re-pointing them needs a
-  per-consumer door binding, because the binary's path differs between an install and a source
-  clone. Once no adopter surface names the front-end, the PowerShell twin
-  (`gate-sdk/bin/run-gates.ps1`), `--run-front-end-parity` and the front-end's fail-open set can
-  retire.
-  **Re-verified at the drain:** `git grep -l run-gates.sh` names each template above. The filing
-  named `context-kit/templates/settings-sessionstart.json` directly; it names no front-end itself,
-  it runs `session-context.sh`, which does.
-  **Why design-pending:** the door binding's shape (a knob, a derived path, or a substituted
-  literal at vendor time) is a spec-stage call reaching five kits.
-  **Cost while deferred:** `bash:4.3` stays owed by context, delegation, drift, guard and
-  lifecycle kits; the macOS Homebrew remedy stays on the delegation and full profiles; a starter or
-  prose adopter reading a kit README is shown a bash command for a job the binary does without bash.
-  Filed 2026-09-19 at `adopter-floor-native-rungs`' spec (scope-gated intake), merged at its close
-  drain with that build's kit-README bullet, which named itself part of this sweep. Owner lookup:
-  `door binding`, `run-gates.ps1`, `front-end-parity` — none.
-  **Reach re-verified at promotion, and wider than filed (2026-09-20 scope):** `git grep -l
-  run-gates.sh` also names every kit's `*-config.knobs` template,
-  `gate-sdk/templates/gates-workflow.yml`, `guard-kit/templates/settings-allow.json` and
-  `close-triage.md`, `drift-kit/templates/kpi-deprecated-surface.sh`,
-  `context-kit/templates/close-brevity.md` and `lifecycle-kit/templates/lead.md`.
-  Joins this iteration by operator direction (2026-09-20, lead-relayed): the lead unit, marked for
-  spec, which authors and promotes it.
-
-- **bash-audience-hand-held** [cost: event/low] [surface: context-kit] — the bash element of the
-  tool-floor roster carries a hand-held kit-list audience,
-  `context-kit+delegation-kit+drift-kit+guard-kit+lifecycle-kit`, spelled at
-  context-kit/SPEC.md's roster, `docs/install.md`'s requirements, `native/src/programs.rs` and
-  `native/src/toolfloor.rs`. It was enumerated at spec by a git grep for shipped bash surfaces and
-  front-end instructions, and nothing re-derives it. A kit that later ships a bash hook, template or
-  stage procedure without joining the list under-declares its floor, so doctor passes a bash-less
-  host that then fails at first use.
-  **Re-verified at the drain:** `git grep` finds the literal list at the four sites above and no
-  derivation of it.
-  **Why design-pending:** the candidate derives the reach (doctor or a gate reading each vendored
-  kit for a bash shebang, a `.sh` file or a front-end instruction). What counts as a bash surface,
-  and whether `binary-door-wide-sweep` shrinks the list to nothing first, are open.
-  **Cost while deferred:** an under-declared floor surfaces only as a runtime failure on the
-  adopter's host.
-  Filed 2026-09-19 at `adopter-floor-native-rungs`' spec, promoted at its close drain. Owner
-  lookup: `probe-roster`, `bash:4.3`, `audience` — none.
-  **Re-verified at promotion (2026-09-20 scope):** the literal list stands at context-kit/SPEC.md,
-  `docs/install.md`, `native/src/programs.rs` and `native/src/toolfloor.rs`, with no derivation.
-  Joins this iteration by operator direction (2026-09-20, lead-relayed): the lead unit shrinks the
-  audience this entry would derive, so both are designed together; marked for spec.
-
-- **kit-roots-rel-filesystem-readers** [cost: event/low] [surface: native] — the couples-anchor
-  amendment moved the `kit:` couples readers that match repository paths onto `walk::kit_roots()`.
-  Other `walk::kit_roots_rel` callers resolve paths off disk or through a git pathspec with the
-  gate-sdk-parent spelling, and carry the same latent mismatch when kits are vendored under a
-  subdirectory: `native/src/emit/enum_sets.rs`, `emit/close_surfaces.rs`,
-  `gates/gate_binary_fresh.rs`, `gates/install_platforms.rs`, `gates/knob_default_coupling.rs`
-  (its second loop), `emit/pack_installer.rs` (both loops), `gates/kit_enum.rs`, and evidence-kit's
-  derived suite default (`knobs/evidence_kit.rs`).
-  **Re-verified at the drain:** `git grep kit_roots_rel native/src` lists every site above; the
-  filing's line numbers for `kit_enum.rs` and `evidence_kit.rs` had moved, so the entry names the
-  files only.
-  **Inferred, not run:** that each listed reader misreads under a nested `GATE_SDK_ROOT`; no fixture
-  nests it, so none was run that way.
-  **Why design-pending:** each caller needs a per-site call on whether it matches repository paths
-  or kit-parent text, as the couples-anchor spec made for its set.
-  **Cost while deferred:** an adopter who hand-vendors under a subdirectory gets silently wrong or
-  empty reads from those members. Masked today because init vendors at the root.
-  Filed 2026-09-19 at `adopter-floor-native-rungs`' spec; promoted at its close drain. Owner
-  lookup: `kit_roots_rel`, `nested` — only `docs-cmd` knob-definition entry, a different defect.
-  Joins this iteration by operator direction (2026-09-20, lead-relayed): the lead unit's door
-  binding resolves the binary under a gate-sdk root a consumer may nest, which is this mismatch;
-  marked for spec. **Constraint on that spec, carried from the promotion:** the inferred marker
-  above is still unrun, so the per-reader misread is probed before any design rests on it.
 
 - **guard-read-path-windows-unexercised** [cost: event/low] [surface: .github] — no `gates.yml`
   step runs guard-kit's `gate-tests/guard-read-path.test.sh` (its verbatim-bytes and no-added-CR
@@ -2637,30 +2650,6 @@
   commit, which is how it was found.
   Filed 2026-09-16 by `installer-front-door-cut`'s close, as the gap generalization owed by the
   lesson that dispositioned to that SPEC section.
-
-- **vendored-kit-readme-spec-link-dangles** [cost: event/high] [surface: gate-sdk]
-  — a vendored kit README still links a `SPEC.md` its installed tree no longer carries. This is the
-  residual the payload-withholding unit's ninth delta NARROWED rather than closed.
-  **What already landed:** each of the eleven kit READMEs carries one sentence naming the
-  withholding and `GATE_SDK_SPEC_BASE_URL`, so a reader who meets the dead link has the answer on
-  the same page.
-  **Why the links themselves stay relative:** re-targeting them at the published location would put
-  the publisher's host in eleven kit files — the kit literal the `<KIT>_<KNOB>` convention exists to
-  prevent, and the cost gate-sdk/SPEC.md §Consumer payload already counts when it refuses a URL form
-  for the pointer grammar — and would break canon-kit/SPEC.md §The reference-link grammar's
-  one-to-one mirror topology, `docs/<kit>/README.md` being a byte projection of the source.
-  **Candidate, not ruled:** resolve a kit README's own-SPEC link target from
-  `GATE_SDK_SPEC_BASE_URL` **at pack time**, the way a shipped `# spec:` pointer already resolves,
-  so the packed README carries the published target while the tracked one keeps its relative link
-  and its mirror topology.
-  **Cost while deferred:** 18 links across 11 kit READMEs dangle in every installed tree; a reader
-  who clicks one gets a missing file and has to read the sentence beside it.
-  Filed 2026-09-16 at the lead's direction during `installer-front-door-cut`, so a later scope reads
-  a known limit rather than rediscovering a defect.
-  **Re-counted at promotion (2026-09-20 scope):** 18 `](SPEC.md` links across the kit READMEs.
-  Joins this iteration by operator direction (2026-09-20, lead-relayed): its pack-time resolution
-  is the same seam as the lead unit's door binding, and both rewrite the kit READMEs; marked for
-  spec.
 
 - **docs-cmd-knob-definition-site-withheld** [cost: event/low] [surface: gate-sdk]
   — `check-docs-cmd`'s defined-knob set loses every knob whose only tracked kit-root occurrence
