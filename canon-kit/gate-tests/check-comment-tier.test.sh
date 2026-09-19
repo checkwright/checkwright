@@ -162,9 +162,20 @@ mkcfg "$SANDBOX/wrapx-cfg.knobs"   'CANON_KIT_COMMENT_SURFACE[] = wrapx.sh'
 check_case "count-wrap-flagged" wrapped-cfg.knobs 1 "wrapped.sh:1: restated collection total: two comment gates"
 check_case "count-wrap-exempt-valve" wrapx-cfg.knobs 0 "COMMENT-TIER: clean"
 
+# A configured `**` never descends into a pruned directory: a concurrent build rewrites `target/`
+# under the walk, so an entry there that cannot be stat'd (here a listable, unsearchable dir; a
+# vanished temp dir on a busy build) is never reached. Vacuous as root, who searches any dir.
+mkdir -p "$SANDBOX/prune-root/target/deps/tmp"
+cp "$SANDBOX/ok.rs" "$SANDBOX/prune-root/ok.rs"
+chmod a-x "$SANDBOX/prune-root/target/deps"
+mkcfg "$SANDBOX/prune-cfg.knobs" 'CANON_KIT_COMMENT_SURFACE[] = **/*.rs' 'CANON_KIT_COMMENT_POSITIONAL[] = unsafe'
+check_case "configured-glob-skips-pruned-dir" prune-cfg.knobs 0 "COMMENT-TIER: clean (1 governed" \
+    "$SANDBOX/prune-root"
+chmod a+x "$SANDBOX/prune-root/target/deps"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-comment-tier.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-comment-tier.test.sh: clean (slash surface + positional rescue + txt restricted roster + templates/ governance + count override edges + paragraph-join wrap + workflow-dir markdown headings as structure with its single-hash lines still governed)"
+echo "check-comment-tier.test.sh: clean (slash surface + positional rescue + txt restricted roster + templates/ governance + count override edges + paragraph-join wrap + workflow-dir markdown headings as structure with its single-hash lines still governed + a configured ** kept out of pruned dirs)"
 exit 0

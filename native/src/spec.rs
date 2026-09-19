@@ -233,11 +233,10 @@ pub fn comment_surface(root: &str, with_templates: bool) -> Result<Vec<String>, 
     let selected: Vec<PathBuf> = if globs.is_empty() {
         walk::find_files(rootp, &["sh", "gate", "rs"])?
     } else {
-        // spec: gate-sdk/SPEC.md §Fail-closed contract — `glob_files` is bash-faithful and prunes
-        // nothing, so the prune set is applied to its result here rather than left to the glob: the
-        // two branches must reach one corpus, and a configured one that walked `target/` would not.
+        // spec: canon-kit/SPEC.md §check-comment-tier — the prune set bounds the `**` descent and
+        // then the result, the second for a glob that names a pruned directory outright
         let prune = walk::prune_dirs()?;
-        walk::glob_files(rootp, &globs)?
+        walk::glob_files_pruned(rootp, &globs, &|n| prune.iter().any(|d| d == n))?
             .into_iter()
             .filter(|f| f.is_file() && !walk::path_pruned(&f.display().to_string(), &prune))
             .collect()

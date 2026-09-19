@@ -798,20 +798,35 @@ fn entry_path(dir: &Path, ent: &fs::DirEntry) -> Option<PathBuf> {
 // knob's glob array, the semantics committed once there rather than re-decided per port.
 // Bash-faithful: no prune set applies, because pathname expansion has none.
 pub fn glob_files(root: &Path, globs: &[String]) -> Result<Vec<PathBuf>, String> {
+    glob_files_pruned(root, globs, &|_| false)
+}
+
+// spec: canon-kit/SPEC.md §check-comment-tier — the same expansion whose `**` never descends into a
+// directory the caller prunes, so a build tree a concurrent build is rewriting is never walked
+pub fn glob_files_pruned(
+    root: &Path,
+    globs: &[String],
+    prune: &dyn Fn(&str) -> bool,
+) -> Result<Vec<PathBuf>, String> {
     #[cfg(test)]
     recorder::note(&root.display().to_string());
     let mut out = Vec::new();
     for g in globs {
         let comps: Vec<&str> = g.split('/').filter(|c| !c.is_empty()).collect();
         let mut hits: Vec<PathBuf> = Vec::new();
-        expand(root, &comps, &mut hits)?;
+        expand(root, &comps, prune, &mut hits)?;
         hits.sort();
         out.extend(hits);
     }
     Ok(out)
 }
 
-fn expand(base: &Path, comps: &[&str], out: &mut Vec<PathBuf>) -> Result<(), String> {
+fn expand(
+    base: &Path,
+    comps: &[&str],
+    prune: &dyn Fn(&str) -> bool,
+    out: &mut Vec<PathBuf>,
+) -> Result<(), String> {
     if comps.is_empty() {
         if base.is_file() {
             out.push(base.to_path_buf());
@@ -820,14 +835,14 @@ fn expand(base: &Path, comps: &[&str], out: &mut Vec<PathBuf>) -> Result<(), Str
     }
     let (head, rest) = (comps[0], &comps[1..]);
     if head == "**" {
-        expand(base, rest, out)?;
-        for d in subdirs(base)? {
-            expand(&d, comps, out)?;
+        expand(base, rest, prune, out)?;
+        for d in subdirs(base, prune)? {
+            expand(&d, comps, prune, out)?;
         }
         return Ok(());
     }
     if !has_meta(head) {
-        return expand(&child(base, head), rest, out);
+        return expand(&child(base, head), rest, prune, out);
     }
     let rd = match fs::read_dir(base) {
         Ok(r) => r,
@@ -847,7 +862,7 @@ fn expand(base: &Path, comps: &[&str], out: &mut Vec<PathBuf>) -> Result<(), Str
             None => continue,
         };
         if match_component(head, name) {
-            expand(&p, rest, out)?;
+            expand(&p, rest, prune, out)?;
         }
     }
     Ok(())
@@ -920,7 +935,7 @@ pub fn dir_readable(p: &Path) -> bool {
     fs::read_dir(p).is_ok()
 }
 
-fn subdirs(base: &Path) -> Result<Vec<PathBuf>, String> {
+fn subdirs(base: &Path, prune: &dyn Fn(&str) -> bool) -> Result<Vec<PathBuf>, String> {
     let rd = match fs::read_dir(base) {
         Ok(r) => r,
         Err(_) => return Ok(Vec::new()),
@@ -931,6 +946,9 @@ fn subdirs(base: &Path) -> Result<Vec<PathBuf>, String> {
         let Some(p) = entry_path(base, &ent) else {
             continue;
         };
+        if p.file_name().and_then(|n| n.to_str()).is_some_and(prune) {
+            continue;
+        }
         let meta = fs::symlink_metadata(&p).map_err(|e| format!("cannot stat {}: {}", p.display(), e))?;
         if meta.is_dir() {
             let hidden = p

@@ -839,6 +839,12 @@ the same shapes:
   kit-root prune is the arm that reads like the culprit and cannot be it, being a no-op
   wherever `CANON_KIT_SCAN_KIT_ROOTS=1`. The knob is a corpus
   *selector*, never a corpus *replacement* with its own semantics.
+  **The prune set bounds the walk, not only its result.** The configured branch expands
+  through `walk::glob_files_pruned`, whose `**` never descends into a pruned directory, and
+  then drops any hit a glob reached by naming a pruned directory outright. Filtering the
+  result alone reads the same corpus but still stats every entry under `target/`, and a
+  build running beside the battery creates and deletes temporary directories there, so an
+  entry listed and then gone is a fail-closed exit 2 on a tree with nothing wrong in it.
 - **The canonical-spec finder prunes the generated on-site mirror**, as a directory
   prune beside the `templates/` one it already applies. A prose gate grading a generated
   page is unfixable at the file — the repair is to the source and the regeneration — so
