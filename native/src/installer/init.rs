@@ -408,40 +408,31 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     let _ = std::fs::create_dir_all(root.join(GATES_DIR));
     let _ = std::fs::create_dir_all(root.join(".workflow"));
     let gates_list = format!("{}/gates.list", GATES_DIR);
-    if claim(&root, &gates_list, &prior, f.force, &mut r) {
+    let registry = if claim(&root, &gates_list, &prior, f.force, &mut r) {
+        let text = plan_gates(pkg, &kits, &profile_name);
         if !f.dry {
-            std::fs::write(root.join(&gates_list), plan_gates(pkg, &kits, &profile_name))
+            std::fs::write(root.join(&gates_list), &text)
                 .map_err(|e| refuse(format!("could not write {}: {}", gates_list, e), "", 2))?;
         }
         r.record(&gates_list, None);
-    }
+        text
+    } else {
+        std::fs::read_to_string(root.join(&gates_list)).unwrap_or_default()
+    };
 
     for kit in &kits {
         let kit_payload = pkg.payload.join(kit);
         for (src, dest) in recipe::config_seam_plan(&kit_payload, GATES_DIR) {
             copy_in(&root, Path::new(&src), &dest, &prior, None, f, &mut r)?;
         }
-        // spec: installer/SPEC.md §init — `--dry-run` resolves the same seam plan the real run
-        // would, out of the same enumerator: the copy already writes nothing, so the plan needs no
-        // dry variant. What it cannot do is *seed*, so the seeded set is predicted below.
-        // spec: installer/SPEC.md §What init seeds — the agent file is predicted once over the
-        // whole kit set rather than once per kit that needs it, because the seeding arm below is
-        // guarded on the file's absence and therefore fires at most once for a run.
+        // spec: installer/SPEC.md §init — `--dry-run` walks the same seam plan and the same seeding
+        // arms the real run does, each arm withholding its write under `dry`: a second prediction of
+        // what the arms write is the divergence that rule exists to prevent.
+        // spec: installer/SPEC.md §What init seeds — the agent file is seeded once over the whole
+        // kit set rather than once per kit that needs it, because its guard is the file's absence.
         let seeds_agent = recipe::needs_agent_file(kit)
             && !root.join(AGENT_FILE).is_file()
             && !r.is_written.contains(AGENT_FILE);
-        if f.dry {
-            let mut planned = dry_seed_paths(kit);
-            if seeds_agent {
-                planned.insert(0, AGENT_FILE.to_string());
-            }
-            for rel in planned {
-                if claim(&root, &rel, &prior, f.force, &mut r) {
-                    r.record(&rel, None);
-                }
-            }
-            continue;
-        }
         if seeds_agent {
             // spec: installer/SPEC.md §What init seeds — the seeded agent file carries the
             // section heading context-kit's brevity gate reads by default, so the gate init
@@ -450,13 +441,15 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
                 "# {}\n\nResident instructions for agent sessions in this repository.\n\n## Shared conventions\n\n- **Terse:** one line per rule here; the mechanism behind the pointer.\n",
                 AGENT_FILE
             );
-            std::fs::write(root.join(AGENT_FILE), body)
-                .map_err(|e| refuse(format!("could not seed {}: {}", AGENT_FILE, e), "", 2))?;
+            if !f.dry {
+                std::fs::write(root.join(AGENT_FILE), body)
+                    .map_err(|e| refuse(format!("could not seed {}: {}", AGENT_FILE, e), "", 2))?;
+            }
             if claim(&root, AGENT_FILE, &prior, f.force, &mut r) {
                 r.record(AGENT_FILE, None);
             }
         }
-        for seeded in recipe::seed(kit, &kit_payload, &root)
+        for seeded in recipe::seed(kit, &kit_payload, &root, f.dry)
             .map_err(|e| refuse(e, "", 2))?
         {
             match seeded {
@@ -550,8 +543,18 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
             Some(&root.join(GATES_DIR).join("CHECK-GRAPH.html")),
         )?;
     }
-    if root.join(format!("{}/git-hooks/commit-msg", GATES_DIR)).is_file() {
-        generated.push(format!("{}/git-hooks/commit-msg", GATES_DIR));
+    // spec: installer/SPEC.md §init — the dry plan asks the generator's own conditional of the
+    // registry this run leaves and the kit sources it vendors, in the battery's resolve order.
+    let msg_hook = format!("{}/git-hooks/commit-msg", GATES_DIR);
+    let owes_msg = if f.dry {
+        let mut dirs = vec![root.join(GATES_DIR).to_string_lossy().into_owned()];
+        dirs.extend(kits.iter().map(|k| pkg.payload.join(k).join("checks").to_string_lossy().into_owned()));
+        crate::emit::git_hooks::owes_commit_msg(&registry, &dirs)
+    } else {
+        root.join(&msg_hook).is_file()
+    };
+    if owes_msg {
+        generated.push(msg_hook);
     }
     for g in &generated {
         if !f.dry && !root.join(g).is_file() {
@@ -755,23 +758,6 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
 // root-relative path, because both `sh` and PowerShell run a `./`-prefixed relative path
 fn follow_up_front_end(artifact_dest: &str) -> String {
     format!("./{}", artifact_dest)
-}
-
-// spec: installer/SPEC.md §What init seeds — the dry plan names the surfaces the recipe would
-// seed, read off the same membership predicates the seeding arms key on rather than a second
-// roster: a kit gains a seeded surface by gaining an arm, and both sides read the same fact.
-fn dry_seed_paths(kit: &str) -> Vec<String> {
-    let mut out: Vec<String> = Vec::new();
-    match kit {
-        "gate-sdk" => out.push(format!("{}/msg-patterns.list", GATES_DIR)),
-        "evidence-kit" => {
-            out.push(".workflow/validate-baseline.txt".to_string());
-            out.push(".workflow/validate-evidence.txt".to_string());
-        }
-        "lifecycle-kit" => out.push(".workflow/WORKFLOW-STATE.txt".to_string()),
-        _ => {}
-    }
-    out
 }
 
 // spec: installer/SPEC.md §init — the binary init just placed runs at the consumer's root with the

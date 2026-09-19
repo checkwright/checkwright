@@ -119,18 +119,29 @@ fn context(root: &str, gates_dir: &str) -> Result<Ctx, String> {
     for k in &kit_roots {
         check_dirs.push(format!("{}/checks", k));
     }
+    // spec: gate-sdk/SPEC.md §gen-pre-commit — each manifest is read through the dirs anchored at the
+    // root the emission names, so what the hook couples does not hang on the working directory
+    let anchored: Vec<String> = check_dirs.iter().map(|d| walk::abs_against(root, d)).collect();
+    let members = resolved_members(&text, &anchored);
+    Ok(Ctx {
+        gates_dir: gates_dir.to_string(),
+        members,
+        check_dirs,
+        kit_roots,
+        native_bin: walk::knob_scalar("GATE_SDK_NATIVE_BIN")?,
+    })
+}
+
+fn resolved_members(text: &str, anchored: &[String]) -> Vec<(String, Vec<(String, String)>)> {
     let mut names: Vec<String> = Vec::new();
-    for m in registry::members(&text) {
+    for m in registry::members(text) {
         if !names.contains(&m) {
             names.push(m);
         }
     }
-    // spec: gate-sdk/SPEC.md §gen-pre-commit — each manifest is read through the dirs anchored at the
-    // root the emission names, so what the hook couples does not hang on the working directory
-    let anchored: Vec<String> = check_dirs.iter().map(|d| walk::abs_against(root, d)).collect();
     let mut members = Vec::new();
     for n in names {
-        let fields = match registry::resolve(&n, &anchored) {
+        let fields = match registry::resolve(&n, anchored) {
             Some(src) => {
                 let body = std::fs::read(&src)
                     .map(|b| String::from_utf8_lossy(&b).into_owned())
@@ -143,13 +154,18 @@ fn context(root: &str, gates_dir: &str) -> Result<Ctx, String> {
         };
         members.push((n, fields));
     }
-    Ok(Ctx {
-        gates_dir: gates_dir.to_string(),
-        members,
-        check_dirs,
-        kit_roots,
-        native_bin: walk::knob_scalar("GATE_SDK_NATIVE_BIN")?,
-    })
+    members
+}
+
+fn is_commit_msg(fields: &[(String, String)]) -> bool {
+    registry::field(fields, "tier") == "commit-msg"
+}
+
+// spec: installer/SPEC.md §init — the conditional `commit_msg` emits on, asked of a registry text
+// and absolute resolve dirs, so a caller planning a tree that does not exist yet reads this
+// predicate rather than restating it.
+pub fn owes_commit_msg(registry: &str, anchored: &[String]) -> bool {
+    resolved_members(registry, anchored).iter().any(|(_, f)| is_commit_msg(f))
 }
 
 // spec: gate-sdk/SPEC.md §gen-pre-commit — shell-inert verbatim, anything else POSIX single-quoted
@@ -317,7 +333,7 @@ pub fn commit_msg(root: &str, gates_dir: &str) -> Result<Option<String>, String>
     let gates: Vec<&String> = ctx
         .members
         .iter()
-        .filter(|(_, f)| registry::field(f, "tier") == "commit-msg")
+        .filter(|(_, f)| is_commit_msg(f))
         .map(|(n, _)| n)
         .collect();
     if gates.is_empty() {

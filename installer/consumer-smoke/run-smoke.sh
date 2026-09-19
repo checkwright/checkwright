@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: installer/SPEC.md §The consumer smoke — builds the host gate binary, packs the package around it, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → every command init printed in its follow-up block resolves in the payload just written with every flag it names accepted → green battery → manifest agrees with the tree, a disagreement whose own operands are hashes failing at exit 1 as a verdict about the consumer while one that reached the comparison malformed refuses at exit 2 as a precondition of this harness → the seeded queue satisfies queue-kit's section contract, or none is seeded where none is owed — which of the two is owed read from the package through the --install queue-source op rather than derived a second time here → idempotent re-run → doctor clean, naming a registered member disarmed → a planted prose defect caught and cleared → diff clean → uninstall back to the pre-init tree object) plus the four profile-lattice assertions and the value assertion over the loop (some profile below the maximum catches that defect) (every named kit resolves, exactly one minimum and one maximum, the maximum is the payload-derived profile, and gate rosters are monotone across every comparable pair of the registries the installs wrote), an artifact-less refusal leg driving the packer's own artifact-free output and asserting that init, doctor, diff and a bare invocation all meet one bootstrap refusal that names the platform, carries a remedy and writes nothing, a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, whose first hop asserts a non-zero live-member count and a placed artifact in the consumer's registry before asserting the worktree is clean — so cleanliness is evidence over a hop that rewrote something rather than over one that rewrote nothing, a cross-version reversal arm carrying an unedited consumer across those same three versions and back to its pre-init tree object, so removability is asserted after a payload changed shape and the roster is asserted to cover an upgrade hop's write set rather than a first init's alone, a toolchain-free arm driving doctor and a full init with cargo and rustc masked off PATH, a jq-less arm asserting that diff, uninstall and init at the lattice minimum and at a guard-kit profile run clean with no jq on PATH, that the installed guard hook answers a payload there, and that doctor names jq nowhere, a bash-less arm installing every profile whose kit set owes no bash, running each printed follow-up command and committing through the installed hooks once clean and once refused with no bash on PATH, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it, a narrowing arm re-running init at a smaller profile so files[] outlives kits, and an artifact arm driving the selection outcomes a single install cannot show — the unrostered host's refusal, the tampered artifact's and the declared-but-absent target's, asserted to differ in message and remedy rather than only in exit status; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
+# spec: installer/SPEC.md §The consumer smoke — builds the host gate binary, packs the package around it, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (init --dry-run writing nothing and planning the file set the real run then records, once per profile and once more over a consumer already holding every seeded surface → install → every command init printed in its follow-up block resolves in the payload just written with every flag it names accepted → green battery → manifest agrees with the tree, a disagreement whose own operands are hashes failing at exit 1 as a verdict about the consumer while one that reached the comparison malformed refuses at exit 2 as a precondition of this harness → the seeded queue satisfies queue-kit's section contract, or none is seeded where none is owed — which of the two is owed read from the package through the --install queue-source op rather than derived a second time here → idempotent re-run → doctor clean, naming a registered member disarmed → a planted prose defect caught and cleared → diff clean → uninstall back to the pre-init tree object) plus the four profile-lattice assertions and the value assertion over the loop (some profile below the maximum catches that defect) (every named kit resolves, exactly one minimum and one maximum, the maximum is the payload-derived profile, and gate rosters are monotone across every comparable pair of the registries the installs wrote), an artifact-less refusal leg driving the packer's own artifact-free output and asserting that init, doctor, diff and a bare invocation all meet one bootstrap refusal that names the platform, carries a remedy and writes nothing, a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, whose first hop asserts a non-zero live-member count and a placed artifact in the consumer's registry before asserting the worktree is clean — so cleanliness is evidence over a hop that rewrote something rather than over one that rewrote nothing, a cross-version reversal arm carrying an unedited consumer across those same three versions and back to its pre-init tree object, so removability is asserted after a payload changed shape and the roster is asserted to cover an upgrade hop's write set rather than a first init's alone, a toolchain-free arm driving doctor and a full init with cargo and rustc masked off PATH, a jq-less arm asserting that diff, uninstall and init at the lattice minimum and at a guard-kit profile run clean with no jq on PATH, that the installed guard hook answers a payload there, and that doctor names jq nowhere, a bash-less arm installing every profile whose kit set owes no bash, running each printed follow-up command and committing through the installed hooks once clean and once refused with no bash on PATH, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it, a narrowing arm re-running init at a smaller profile so files[] outlives kits, and an artifact arm driving the selection outcomes a single install cannot show — the unrostered host's refusal, the tampered artifact's and the declared-but-absent target's, asserted to differ in message and remedy rather than only in exit status; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
 # no-port: installer/SPEC.md §The consumer smoke, The port disposition — ruled 2026-08-31 by the operator in consult. This is the repo's own acceptance harness for the installer and rides no payload: the --pack-installer arm assembles the tarball and the npm package out of the kit roots and never out of installer/consumer-smoke/, so no adopter receives or runs it, and its only callers are the evidence-kit installer_smoke validate suite and the gates workflow. It is the same shape gate-sdk/SPEC.md §Consumer smoke, The port disposition declares on its leg 3 — a smoke executed by no adopter path — reached one step further, for a harness the payload does not even carry; and it drives cargo, the packer and init as black boxes across every profile, so a crate-side form would test the binary from inside the binary. Structural, not a sizing judgment: its size was measured at the ruling and is not the ground.
 set -uo pipefail
 
@@ -861,14 +861,47 @@ assert_reversal() {   # $1 = profile, $2 = scratch consumer dir, $3 = the consum
     say "uninstall: $(sed -n 's/^UNINSTALL: //p' <<<"$out" | head -n1) tree object is back to its pre-init state"
 }
 
+# spec: installer/SPEC.md §The consumer smoke — the dry plan is read out of the manifest init --dry-run prints, the one place it names every path it would record, so the parity arm compares two manifests' key sets and never a second rendering of either
+dry_plan() {   # $1 = profile, $2 = consumer dir -> the sorted path keys of the manifest init --dry-run would write
+    local out rc
+    out="$( cd "$2" && PATH="$RUN_PATH" "${ENTRY[@]}" init --profile "$1" --dry-run 2>&1 )"; rc=$?
+    [[ "$rc" -eq 0 ]] || { printf '%s\n' "$out" >&2; fail "$1: init --dry-run exited $rc"; }
+    awk '/ that would be written:$/ { on = 1; next } /^DRY RUN:/ { on = 0 } on' <<<"$out" \
+        | jq -r '.files | keys[]' | LC_ALL=C sort \
+        || { printf '%s\n' "$out" >&2; blocked "$1: the manifest init --dry-run printed would not parse as one"; }
+}
+
+# spec: installer/SPEC.md §The consumer smoke — plan parity: the set init --dry-run names equals the set the real run records, both ways, so a path the plan promises and the run never writes reds exactly as a recorded path the plan omitted does
+assert_plan_parity() {   # $1 = label, $2 = the dry plan's keys, $3 = the manifest the real run wrote
+    local real
+    [[ -n "$2" ]] || fail "$1: init --dry-run planned no file, so parity would hold by vacuity"
+    real="$(jq -r '.files | keys[]' "$3" | LC_ALL=C sort)"
+    [[ "$2" == "$real" ]] \
+        || { diff <(printf '%s\n' "$2") <(printf '%s\n' "$real") >&2; fail "$1: init --dry-run planned a different file set from the one the real run recorded (< planned only, > recorded only)"; }
+    say "plan parity: init --dry-run named the $(wc -l <<<"$real" | tr -d ' ') file(s) the run recorded"
+}
+
+# spec: installer/SPEC.md §The consumer smoke — the seeded surfaces are read off what the maximum profile's install recorded rather than listed here: every recorded path outside a vendored kit and the gates directory is one init seeds into the consumer's own tree
+seeded_paths() {   # $1 = a manifest -> its recorded paths outside every payload kit and the gates dir
+    jq -r '.files | keys[]' "$1" | awk -v kits="${PAYLOAD_KITS[*]} $GATES_DIR" '
+        BEGIN { n = split(kits, k, " ") }
+        { for (i = 1; i <= n; i++) if (index($0, k[i] "/") == 1) next; print }'
+}
+
 ENTRY=("$CW")
 RUN_PATH="$PATH"
 VALUE_RED=()
+SEEDED=""
 for profile in "${PROFILES[@]}"; do
     printf '%s\n' "$profile"
     C="$(consumer "$profile")" || fail "could not build a scratch consumer for $profile"
     SEED="$(git -C "$C" rev-parse 'HEAD^{tree}')"
+    PLAN="$(dry_plan "$profile" "$C")"
+    [[ "$(git -C "$C" rev-parse 'HEAD^{tree}')" == "$SEED" && -z "$(git -C "$C" status --porcelain)" ]] \
+        || fail "$profile: init --dry-run wrote to the consumer"
     assert_install "$profile" "$C"
+    assert_plan_parity "$profile" "$PLAN" "$C/checkwright.lock"
+    [[ "$profile" == "$PROFILE_DERIVED" ]] && SEEDED="$(seeded_paths "$C/checkwright.lock")"
     assert_value "$profile" "$C"
     [[ "$VALUE_VERDICT" == red ]] && VALUE_RED+=("$profile")
     assert_reversal "$profile" "$C" "$SEED"
@@ -891,6 +924,20 @@ for pair in "${ORDER[@]}"; do
     contains "${REGISTRY[$b]}" "gate-roster monotonicity, $a ⊆ $b" "${REGISTRY[$a]}"
 done
 say "gate rosters are monotone across every comparable pair of installed registries"
+
+# spec: installer/SPEC.md §The consumer smoke — the held-seed parity arm: a fresh consumer already holding every surface init seeds, which is the one state where a seed's absence guard decides and a plan that predicted the seed a second way would name files the run never writes
+printf 'plan parity over held seeds (%s)\n' "$PROFILE_DERIVED"
+[[ -n "$SEEDED" ]] || fail "the $PROFILE_DERIVED install recorded no seeded surface, so the held-seed arm would plant nothing"
+C="$(consumer held-seeds)" || fail "could not build the held-seed consumer"
+while IFS= read -r p; do
+    mkdir -p "$C/$(dirname "$p")" && printf '# held by the adopter before init\n' > "$C/$p" \
+        || fail "could not plant $p in the held-seed consumer"
+done <<<"$SEEDED"
+git -C "$C" add -A && git -C "$C" commit -q -m "held seeds" || fail "could not commit the held seeds"
+PLAN="$(dry_plan "$PROFILE_DERIVED" "$C")"
+out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" init --profile "$PROFILE_DERIVED" 2>&1 )" \
+    || { printf '%s\n' "$out" >&2; fail "init failed on the held-seed consumer"; }
+assert_plan_parity "held seeds [$(tr '\n' ' ' <<<"$SEEDED")]" "$PLAN" "$C/checkwright.lock"
 
 # spec: installer/SPEC.md §The consumer smoke — the artifact-less refusal leg, which was a named INSTALL until selection was given one success path. It drives the packer's own artifact-free output, and that is what no other leg reaches: the artifact arm's two refusals are driven against a payload this smoke mutated by hand, so without this leg nothing asserts that a payload the publishing path actually produces without artifacts refuses rather than proceeding. It asserts a refusal that wrote NOTHING — the shape the artifact arm's tampered leg already uses — and it asserts it on the FIRST verb an adopter would reach for, because the refusal is the bootstrap's and precedes every verb rather than belonging to one. Naming a profile here is a scoping choice about which invocation to make, and the refusal is reached before the profile is ever read, which is itself part of what the leg says
 resolves_profile() { local p; for p in "${PROFILES[@]}"; do [[ "$p" == "$1" ]] && return 0; done; return 1; }

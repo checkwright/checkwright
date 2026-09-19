@@ -146,11 +146,11 @@ each verb is *for*.
 would have anything to preview. Every verb that does write has one, and it means
 the same thing in each: print the plan, write nothing, exit 0. That rule is
 asserted behaviorally rather than gated — §The consumer smoke holds
-`uninstall --dry-run` to leaving the tree object and the worktree unchanged,
-which is what a flag that parsed and then wrote anyway would fail and a flag
-that merely existed would pass. *The honest bound:* `init`'s and `update`'s
-`--dry-run` carry the same contract and are not held to it there yet, so the
-rule is asserted on one verb and documented on the other two.
+`uninstall --dry-run` and `init --dry-run` to leaving the tree object and the
+worktree unchanged, which is what a flag that parsed and then wrote anyway would
+fail and a flag that merely existed would pass. *The honest bound:* `update`'s
+`--dry-run` carries the same contract and is not held to it there yet, so the
+rule is asserted on two verbs and documented on the third.
 
 **Why `diff` is a verb of its own rather than a widening of `doctor`.**
 `doctor`'s exit status has exactly one owner — the toolchain contract — and
@@ -321,7 +321,14 @@ protect.
 nothing, and exits 0. The contract is **end to end, not caller-deep**: a step
 that runs behind the binary invoke is passed `--dry-run` and honors it there
 (§The install boundary), so the plan a dry run prints is produced by the same
-code the real run performs rather than by a second prediction of it.
+code the real run performs rather than by a second prediction of it. Each seed
+arm reads one absence test in both modes and withholds only its write. The one
+step a dry run cannot perform is generating the hooks, because the vendored
+binary is not placed yet. So the plan asks the hook generator's own conditional,
+whether a registered member is `tier=commit-msg`, of the registry the run leaves
+and the kit sources it vendors. *The honest bound:* a gate file the adopter
+changed is kept by the real run, and a kept file whose manifest names another
+tier is read at the payload's tier in the plan.
 
 ## What init seeds
 
@@ -2964,6 +2971,20 @@ directory list, so "moving up only ever adds" is a claim about gates, and
 kit-set containment stops implying it the moment a roster varies by profile.
 Nothing here counts profiles; a fourth is admitted exactly when it fits.
 
+**The plan-parity arm** holds `init --dry-run` to §init's rule that the plan is
+the run's own code and not a second prediction of it. Before each profile's
+`init`, it runs `init --dry-run` on the fresh consumer. That run must leave the
+tree object and `git status` unchanged. The key set of the manifest it prints
+must equal the key set of the `checkwright.lock` the real run then writes.
+The comparison runs both ways, so a planned path the run never writes reds, and
+so does a recorded path the plan left out. An empty plan reds too, so parity
+never holds by vacuity. One fresh consumer gets no seed decision to make: every
+seed is absent. So a second leg repeats the comparison at the payload-derived
+profile on a consumer already holding every surface `init` seeds. That set is
+read from what this loop's install at that profile recorded: every path outside
+a vendored kit and the gates directory. It is not listed in the smoke, so a kit
+that gains a seeded surface is planted with no edit here.
+
 **The reversal arm** then runs on that same consumer, so every profile is
 installed *and* reversed. In order: `diff` must exit 0 and report the freshly
 installed tree clean; `uninstall --dry-run` must name a non-zero removal count
@@ -2972,8 +2993,8 @@ while leaving the tree object and `git status` exactly as they were; then
 **before `init` ran**, the worktree must be clean, and no `checkwright.lock` may
 remain. The `--dry-run` step is where the writes/does-not-write rule in §The
 verbs is asserted for `uninstall`, and asserted behaviorally: a flag that parsed
-and then wrote anyway fails it, where a flag that merely existed would pass. It
-is the only verb this arm holds to that rule — §The verbs states the bound.
+and then wrote anyway fails it, where a flag that merely existed would pass.
+The plan-parity arm holds `init` to the same rule; §The verbs states the bound.
 
 **The tree-object equality is the load-bearing assertion, and it proves more
 than `uninstall`.** Nothing else here asserts that the manifest covers

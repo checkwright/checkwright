@@ -144,9 +144,15 @@ pub fn needs_agent_file(kit: &str) -> bool {
     matches!(kit, "context-kit" | "doctrine-kit")
 }
 
-fn seed_absent(root: &Path, rel: &str, body: &str, out: &mut Vec<Seeded>) -> Result<(), String> {
+// spec: installer/SPEC.md §init — the absence test is the one predicate the dry plan and the run
+// both read; `dry` withholds the write and nothing else.
+fn seed_absent(root: &Path, rel: &str, body: &str, dry: bool, out: &mut Vec<Seeded>) -> Result<(), String> {
     let dest = root.join(rel);
     if dest.is_file() {
+        return Ok(());
+    }
+    if dry {
+        out.push(Seeded::Path(rel.to_string()));
         return Ok(());
     }
     if let Some(parent) = dest.parent() {
@@ -157,7 +163,7 @@ fn seed_absent(root: &Path, rel: &str, body: &str, out: &mut Vec<Seeded>) -> Res
     Ok(())
 }
 
-pub fn seed(kit: &str, kit_payload: &Path, root: &Path) -> Result<Vec<Seeded>, String> {
+pub fn seed(kit: &str, kit_payload: &Path, root: &Path, dry: bool) -> Result<Vec<Seeded>, String> {
     let mut out: Vec<Seeded> = Vec::new();
     match kit {
         "gate-sdk" => {
@@ -174,12 +180,14 @@ pub fn seed(kit: &str, kit_payload: &Path, root: &Path) -> Result<Vec<Seeded>, S
                 root,
                 ".workflow/validate-baseline.txt",
                 "# contract: evidence-kit/SPEC.md §Baseline manifest — held-constant validate baseline: <suite> <scenario> <status> [<slug> [reproduces-at=<rev>]]\n",
+                dry,
                 &mut out,
             )?;
             seed_absent(
                 root,
                 ".workflow/validate-evidence.txt",
                 "# contract: evidence-manifest v1\n",
+                dry,
                 &mut out,
             )?;
         }
@@ -188,6 +196,7 @@ pub fn seed(kit: &str, kit_payload: &Path, root: &Path) -> Result<Vec<Seeded>, S
                 root,
                 ".workflow/WORKFLOW-STATE.txt",
                 "# contract: lifecycle-kit/SPEC.md §check-stage-evidence\n# One data line per stage-skill invocation: <iteration> <stage> <session-id> <date> <head>.\n\n---\n\n",
+                dry,
                 &mut out,
             )?;
         }
@@ -197,6 +206,10 @@ pub fn seed(kit: &str, kit_payload: &Path, root: &Path) -> Result<Vec<Seeded>, S
         // spec: doctrine-kit/SPEC.md §install-doctrine — the block is the kit's own installer's to
         // write, and that installer is this binary's `--install-doctrine` arm, called in-process.
         "doctrine-kit" => {
+            if dry {
+                out.push(Seeded::Path(AGENT_FILE.to_string()));
+                return Ok(out);
+            }
             // spec: doctrine-kit/SPEC.md §install-doctrine — the consumer root goes over as the BASE
             // and the two paths as consumer-relative spellings, because resolving them here would
             // commit this machine's absolute path into the adopter's own agent file.
