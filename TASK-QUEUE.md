@@ -12,6 +12,99 @@
 
 ## New Features
 
+- **scope-unit-set-ignores-deferred-inflow** [spec: SPEC-deferred-drain.md] — scope composes a
+  unit set with no view of the Deferred section's refill rate, so the pool falls about two net per
+  iteration (148 to 105 over twenty iterations to 2026-09-19).
+  **Ruled at spec:** candidates (a) and (b). A drift-kit `queue-flow` arm derives trailing
+  per-iteration inflow from pool slug sets at iteration-start commits, not filing dates, and the
+  Composition line compares it with the set's drain. The third ranking tier fills past the lead
+  unit's surface while drain is at or below inflow. (c) and (d) refused in the amendment.
+  Filed 2026-09-19 by the consult after `adopter-floor-collapse`'s close. Leads
+  `lifecycle-contract-drain`, admitted in full under the enhancement admission filter as
+  drain-serving machinery with candidate (a)'s arm allowed (operator direction, 2026-09-19,
+  lead-relayed), a reading of the filter and not a reversal.
+
+- **threshold-recurrence-routing-residency** [spec: SPEC-threshold-routing.md] — the
+  threshold-recurrence routing clause, *"a third threshold recurrence routes to the operator, not to
+  a third decline; two is where lead discretion ends"*, lives only in this entry.
+  **Ruled at spec:** it lands in scope.md's threshold paragraph, which it completes, with the count
+  read as declines of a threshold-proposed entry recorded on the entry. lead.md's routing carve-out
+  relays an operator-routed entry. The clause was ruled general at the 2026-08-19 scope under
+  the 2026-08-17 operator ruling that gave the home decision to scope; breached once, 2026-09-04.
+  Filed 2026-08-18 by close from the gap inbox. Joins `lifecycle-contract-drain` by operator
+  direction (2026-09-19, lead-relayed): clause home.
+
+- **push-budget-unshipped** [spec: SPEC-push-owner.md] — the push budget lives only in this repo's
+  CLAUDE.md, where no kit surface reads it and no adopter is prompted to set one.
+  **Ruled at spec:** a close.md `push-budget` slot, not a knob, because §The state machine already
+  rules the count consumer content and no arm observes a push. This repo's close binding carries the
+  numbers and CLAUDE.md points at it.
+  Filed 2026-09-15 by `config-seam-fourth-cut`'s close. Joins `lifecycle-contract-drain` by
+  operator direction (2026-09-19, lead-relayed): push count.
+
+- **mid-iteration-push-owner-unnamed** [spec: SPEC-push-owner.md] — no lifecycle surface names which
+  session makes an iteration's mid-iteration push.
+  **Ruled at spec:** the stage session whose next act reads the run pushes. For an entry tagged
+  observed-by, that is the session landing its work, which reads the run before the Done move.
+  The lead never pushes. A fixed validate owner is refused against the placement rule.
+  Kept distinct from `push-budget-unshipped` by operator direction (2026-09-19, lead-relayed): that
+  entry owns the count, this one the actor. Filed 2026-09-19 by the `windows-adopter-path` lead.
+
+- **stage-journal-path-unsourced-mid-stage** [spec: SPEC-batch-entry.md] — batch sessions of an
+  already-entered stage wrote `-batchN-` journals named by their dispatches, and the next entry
+  refused on the canonical path (attested 2026-09-10 and 2026-09-11, seven sessions).
+  **Ruled at spec:** the session's own `--enter-stage` report is the path's one source. The lead
+  names no path, and the agent contract drops "the dispatch names the journal path". A read-only
+  path arm is refused because no stage session goes without entering.
+  recurrence: stage-journal-path-unsourced-mid-stage 2026-09-11
+  Filed 2026-09-10 by close. Joins `lifecycle-contract-drain` by operator direction (2026-09-19,
+  lead-relayed): journal path.
+
+- **batch-split-stamp-ownership** [spec: SPEC-batch-entry.md] — a batch session could skip its own
+  stage entry, and one 2026-08-29 lead directed it, so the evidence file under-reported a stage's
+  sessions.
+  **Ruled at spec:** per batch, which §The state machine already rules. The binding half is the
+  journal-path ruling: entering is how a session gets its journal. No oracle is buildable, since no
+  tracked artifact names a session but the stamp, and that limit is written into the SPEC.
+  recurrence: batch-split-stamp-ownership 2026-08-29
+  Filed 2026-08-01 at close. Joins `lifecycle-contract-drain` by operator direction (2026-09-19,
+  lead-relayed): stamp fork.
+
+- **stage-commit-subject-scope-unowned** [spec: SPEC-stamp-subject.md] — no surface governs a stage
+  session's commit subject scope. 38 of 571 state-file commits since 2026-09-01 carry `workflow` or
+  `lifecycle`, so a recovery keyed on the stage name misses them.
+  **Ruled at spec:** the stamp commit's subject scope is the stamped stage. `--enter-stage` prints
+  the subject, and a new commit-msg gate, `check-stamp-subject`, holds it. Other commits keep their
+  component scope.
+  Filed 2026-09-16 by the iteration lead. Joins `lifecycle-contract-drain` by operator direction
+  (2026-09-19, lead-relayed): subject scope.
+
+- **lead-specifies-constraint-not-mechanism** [spec: SPEC-relay-discipline.md] — a lead that hands
+  down a mechanism spends a stage session's verification on the lead's own guess. Three worked
+  instances, the third (2026-08-23) destructive.
+  **Ruled at spec, with its two siblings:** lead.md's relay-never-assert rule is re-phrased to
+  carry claim tier, grant spent state, constraint-not-mechanism and role scope. The receiving half
+  lands in the stage-session agent definition. No gate can read a dispatch, as the SPEC records.
+  recurrence: lead-specifies-constraint-not-mechanism 2026-08-23
+  Filed 2026-08-18 by close. Joins `lifecycle-contract-drain` by operator direction (2026-09-19,
+  lead-relayed): generalizes.
+
+- **dispatch-claim-evidentiary-tier-unmarked** [spec: SPEC-relay-discipline.md] — a dispatch can
+  upgrade an inference into a finding, or relay a spent grant as unspent. Three instances, each
+  caught by the receiving session.
+  **Ruled at spec:** a relayed claim carries its tier, and a grant carries its spent state, read off
+  its target at relay time (see the sibling above).
+  recurrence: dispatch-claim-evidentiary-tier-unmarked 2026-08-24
+  Filed 2026-08-24. Joins `lifecycle-contract-drain` by operator direction (2026-09-19,
+  lead-relayed): claim tier.
+
+- **relayed-rule-role-scope-unchecked** [spec: SPEC-relay-discipline.md] — a rule relayed through a
+  dispatch can bind only the relayer's role. Two instances in `battery-runner-port`.
+  **Ruled at spec:** a rule travels only to a role its owning surface names (see the sibling above).
+  Filed 2026-08-23, iceboxed 2026-09-11, returned to Deferred and selected for
+  `lifecycle-contract-drain` at its scope (operator direction, 2026-09-19, lead-relayed): the claim
+  generalizes and all three siblings join.
+
 ## Technical Debt
 
 ## Deferred
@@ -189,40 +282,6 @@
   Filed 2026-09-19 to the gap inbox at `adopter-floor-collapse`'s spec, promoted at its close
   drain. Owner lookup: `PROGRAM_FLOOR`, `mktemp`, `date -Is`, `coreutils` — matched only the
   rung entries above (curl, jq, shellcheck, bash: distinct members).
-
-- **push-budget-unshipped** [cost: event/low] [surface: lifecycle-kit] — the push
-  budget (one to two pushes per iteration, two unasked hotfix pushes) lives only in this repo's
-  CLAUDE.md, so an adopting consumer cannot configure it and no kit surface reads it.
-  **Probed at promotion:** neither `lifecycle-kit/templates/stages/close.md` nor
-  `lifecycle-kit/templates/lead.md` states a push count, and lifecycle-kit's static knob table
-  carries no push knob.
-  **Candidate, not ruled:** two lifecycle-kit knobs, such as `LIFECYCLE_KIT_PUSH_BUDGET` and
-  `LIFECYCLE_KIT_HOTFIX_PUSHES`, defaulting to this repo's values, cited by close and the lead
-  template, with CLAUDE.md pointing at the knobs instead of stating numbers.
-  **Why design-pending:** it adds names, and whether the budget is a knob an arm reads or a
-  template binding a consumer fills is the seam call.
-  **Cost while deferred:** a consumer adopting the lead and close templates inherits no push
-  discipline, and this repo's numbers stay a restatement a kit cannot see.
-  Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, beside the hotfix-push
-  allowance it landed in CLAUDE.md; promoted at the next iteration's scope.
-  Joins `lifecycle-contract-drain` by operator direction (2026-09-19, lead-relayed): push count.
-
-- **mid-iteration-push-owner-unnamed** [cost: event/low] [surface: lifecycle-kit] — no
-  lifecycle surface names which session owns an iteration's mid-iteration push:
-  lifecycle-kit/SPEC.md §The state machine places the first push but names no actor, and
-  `lifecycle-kit/templates/lead.md` scopes the lead to dispatch and answers. The
-  `windows-adopter-path` lead routed it to validate as its remote oracle by lead decision.
-  **Candidate, not ruled:** validate as the owner, or the stage landing an entry whose
-  completion is observed on a remote run.
-  **Why design-pending:** naming an actor adds a contract to the state machine, a spec-stage
-  amendment rather than a drain fix.
-  **Cost while deferred:** every lead that needs a mid-iteration push re-derives who makes it.
-  **Adjacent to `push-budget-unshipped`**, deliberately not folded into it (operator direction,
-  2026-09-19, lead-relayed): that entry owns the push *count*, this one the *actor*.
-  Filed 2026-09-19 to the gap inbox by the `windows-adopter-path` lead; promoted at the next
-  iteration's scope. Owner lookup: `push owner`, `owns the push`, `who pushes`,
-  `mid-iteration push` — none.
-  Joins `lifecycle-contract-drain` by operator direction (2026-09-19, lead-relayed): push actor.
 
 - **gap-inbox-kit-ref-valve** [cost: event/low] [surface: canon-kit] —
   `check-kit-ref-liveness` valves the queue file out by basename because the queue is design-ahead
@@ -1009,57 +1068,6 @@
   Filed 2026-07-26 by close (`activation-path`), generalizing the
   knowledge-friction captures that surfaced the replace-vs-extend semantics.
 
-- **batch-split-stamp-ownership** [cost: event/low] [surface: lifecycle-kit] — who stamps the per-session
-  audit trail when a live lead splits one stage across several batch sessions is
-  unowned. This iteration recorded **one** `build` line in
-  `.workflow/WORKFLOW-STATE.txt` for five batch sessions.
-  **Premise corrected 2026-08-01 by the undirected scope survey — the filed
-  diagnosis was wrong and the next reader would otherwise re-derive it.** The entry said the two
-  surfaces disagree in effect. **They agree**, and have since 2026-07-17: build.md's
-  "Every session still stamps" paragraph and lead.md's batch paragraph carry the same instruction,
-  so the gap is **practice against instruction**, not instruction against instruction — the batches
-  simply did not run the entry. Nor is the id the obstacle: dispatched sessions resolve distinct
-  ids.
-  **Practice confirmed correct once, 2026-08-01.** This iteration's two build
-  batches each wrote their own stamp — two `build` lines with distinct session
-  ids in `.workflow/WORKFLOW-STATE.txt` — so a per-batch trail is achievable
-  under the instruction both templates already carry, and the fork below is a
-  live choice rather than a repair. A second limit confirmed alongside it:
-  `bin/enter-stage.sh --simulate` **cannot predict a distinct session's entry**,
-  so it never answers whether a sibling batch will stamp — it gates *this*
-  session's entry only, which bounds any lead-side pre-dispatch check.
-  **Not a defect today.** Nothing gates on the missing lines, and the stage
-  cursor is the *last* stamp, so it is correct either way — this is doctrine
-  drift, not breakage.
-  **The ruling the entry wants,** restated against the corrected diagnosis: is a
-  per-session trail worth restoring at all — the evidence file's stated contract
-  is one line per stage-skill invocation, which a batch session *is*, so the fork
-  is stamping per batch or narrowing the contract to per stage. If per batch, the
-  second half is what makes an instruction both templates already carry actually
-  bind, since prose alone demonstrably did not.
-  **Why design-pending:** it either narrows a shipped stamp contract and
-  `check-stage-evidence`'s reading of it, or adds an oracle where two templates
-  now rely on a dispatched session's compliance; and it recurs on every batched
-  stage, not just build.
-  **Regressed 2026-08-02:** nine build batches, one stamp — the once-correct
-  practice did not hold, and since economics attributes one row per transcript,
-  the lead binding's per-batch tier lever is unmeasurable while the trail is not.
-  Debt: one contract narrowed, or one oracle added; adds no governed name unless
-  the oracle lands.
-  **Recurred 2026-08-29 in a new sub-shape: directed, not omitted.** Three build batches, one
-  `build` stamp, under an explicit lead instruction not to re-stamp — the shape
-  `lifecycle-kit/templates/lead.md` has named as the failure since 2026-08-04, so prose has now
-  failed against a lead that had it in context. That is the second half of the fork's own argument.
-  **Cost while deferred** (re-costed 2026-09-17 at scope from `iteration/low` to `event/low`, on
-  the operator's direction): a batch that skips its stamp under-reports the stage's session count,
-  so the evidence file cannot answer "how many sessions did this stage take" for the drift KPIs.
-  No longer paid every iteration: each batched iteration since 2026-08-29 wrote one build stamp
-  per batch, by the stamp-commit subjects (owed-port-tail, guard-friction-reach,
-  couples-field-semantics and validate-red-holding among them).
-  recurrence: batch-split-stamp-ownership 2026-08-29
-  Filed 2026-08-01 at close from the gap inbox, filed by this iteration's build.
-  Joins `lifecycle-contract-drain` by operator direction (2026-09-19, lead-relayed): stamp fork.
-
 - **companion-toolkit-profile** [roadmap: next/ecosystem] [cost: event/high] [surface: lifecycle-kit] — the interop rung.
   roadmap-summary: Gate a tree whose specs another toolkit's workflow wrote.
   Govern a tree whose specs an **external spec-authoring toolkit produced** — a
@@ -1676,107 +1684,6 @@
   the claim was asserted and the compression-vs-eviction split checked against the entry it
   would otherwise have contradicted.
 
-- **threshold-recurrence-routing-residency** [cost: once/low] [surface: lifecycle-kit] — where the threshold-recurrence
-  routing clause lives, now that its only carrier has left the live tree.
-  **The clause, carried here verbatim so it does not spend by attrition:** *"a third threshold
-  recurrence routes to the operator, not to a third decline; two is where lead discretion
-  ends."*
-  **BREACHED ONCE (2026-09-04, `dated-measurement-restatement-class`): a lead ruled its third.**
-  **OPERATOR-RULED 2026-08-17: file for scope to decide a permanent home**, rather than leave it
-  in history or move it to TRAJECTORY.md now. It was exercised once in
-  `port-selector-permanence-and-batch` and ruled LIVE AND UNSPENT at the promotion relay, so
-  its disappearance from the live tree would spend it by attrition — the outcome that ruling
-  refused.
-  **ANSWERED 2026-08-19 at scope: the clause is GENERAL, not entry-specific** — a
-  threshold-recurrence routing rule every recurrence-carrying entry inherits, not prose belonging
-  to the entry whose subject (guard-kit rule 14) is resolved. Ruled by the iteration lead as a
-  routing call, not a fresh envelope one: the 2026-08-17 operator ruling delegated the home decision
-  to scope, so recording the answer here **discharges** it. Grounds: the clause completes the scope
-  contract's own threshold paragraph, which already puts a collision "in front of the authority
-  this stage already escalates to" and stops short
-  of saying where that authority changes. Its exercising instance,
-  `stage-stamp-ordering-unenforced`, has since landed and retired — recover it from git history.
-  **THE TWO-STEP READING IS SETTLED — `lead, own-authority` 2026-09-07 at scope, derived from the
-  surfaces and not from precedent:** the scope contract's "regardless of theme" governs the
-  PROPOSAL step, TRAJECTORY.md §PRIORITY DIRECTIVE's joining ground the PROMOTION step.
-  **What is NOT decided here, deliberately.** The clause is not landed in lifecycle-kit's scope
-  contract by this stage or this iteration; that stays a feature-shaped unit for a later one, and
-  this entry stays its carrier meanwhile.
-  **Two homes were probed and refused at build**, and the refusals are not rejections of the
-  options. A live queue entry was blocked at that build because the candidate host stood at zero
-  headroom under `check-queue-entry-budget`; **that host has since closed and left the live tree**,
-  so the option is absent rather than full — a stronger refusal on a different ground, corrected
-  2026-08-24 at close rather than left reading as a cap problem a reflow could solve.
-  TRAJECTORY.md is refused by CLAUDE.md's own scoping sentence, which admits **closed** operator
-  rulings while this one is explicitly open — choosing it means amending that sentence, a governance
-  edit rather than a move. lifecycle-kit's scope contract was refused as envelope-class: a **build
-  session correctly declining an envelope call it had no authority to make**, and with the
-  general/entry-specific question answered it is the live candidate home rather than a closed one.
-  **DISTINCT from `waiting-rule-fourth-firing-post-fix`**, which is Done: that entry owned the
-  residency rule's enforcement and got it; this owns where its escalation-routing clause lives,
-  which the Done move is what puts at risk.
-  **Cost while deferred:** low while this entry exists and unbounded without it — the entry IS
-  the carrier, so deferring the *home* decision costs only that a possibly-general rule reads
-  as one parked entry's prose; not filing at all would have cost the clause to git history.
-  **Out of the icebox until a permanent home lands:** the cost line prices the CARRY, never the
-  eviction, and eviction deletes the verbatim clause — the 2026-08-17 ruling's refused attrition.
-  not-icebox-eligible: threshold-recurrence-routing-residency 2026-08-17 eviction spends the clause
-  Filed 2026-08-18 by close from the gap inbox on the 2026-08-17 operator ruling; the drain
-  re-verified that no permanent surface carries the clause — the only hits were the inbox this
-  drain truncates and the survey record the next first-stage entry truncates.
-  Joins `lifecycle-contract-drain` by operator direction (2026-09-19, lead-relayed): clause home.
-
-- **lead-specifies-constraint-not-mechanism** [cost: event/high] [surface: lifecycle-kit] — whether the lead contract should
-  say that a lead states the constraint and a stage session finds the mechanism.
-  **The claim, which is what a later scope rules on:** a supervision layer that specifies
-  *mechanism* spends its sessions' verification discipline against its own unverified guess. The
-  asymmetry is already recorded at lifecycle-kit/templates/lead.md — the lead writes no state and
-  so has no verification discipline, while a stage session is held to oracle-first, fixture pairs
-  and a validate battery. A lead that hands down a fix converts a verified actor into a typist,
-  which spends the one asymmetry the split posture exists to exploit.
-  **Two earlier worked instances, both in `port-selector-permanence-and-batch` and both the
-  lead's own account.** Validate inverted the lead's diagnosis of the `upgrade` red — the defect
-  was in the check itself, in a hand-held allowlist older than the change the lead suspected;
-  build then rejected the derived form the lead gestured at and deleted the roster outright. In
-  both, the lead's contribution was the constraint and the session's was the mechanism.
-  recurrence: lead-specifies-constraint-not-mechanism 2026-08-23
-  **THIRD WORKED INSTANCE 2026-08-23, and the first where the over-specified mechanism was
-  DESTRUCTIVE rather than merely wrong** — again the lead's own same-turn self-report, which is
-  what makes it citable. Relaying three operator rulings at this iteration's scope, the lead
-  attached a mechanism: "re-enter scope as a sibling session (the cursor is still on scope; a
-  same-stage re-entry stamps its own row and moves nothing)". The constraint was right, the
-  mechanism was not. Probed rather than argued: `enter-stage.sh --simulate scope` exits 1, since
-  scope IS the iteration boundary, so a second scope entry is a NEW-ITERATION entry refused for
-  want of a release-disposition line naming the closing iteration. Forced, it would have truncated
-  `.workflow/WORKFLOW-STATE.txt` to its header and reset the queue header to the unnamed sentinel,
-  destroying the state the instruction existed to build on.
-  **IT SHARPENS THE HONESTY BOUNDARY BELOW RATHER THAN ONLY ADDING TO IT.** The cost was NOT
-  self-limiting: what was avoided was a state-file truncation, and what avoided it was the
-  receiving session running `--simulate` first — the scope template's own do-not-force-the-entry
-  rule, a STAGE-side control and not a lead-side one. So "recoverable" holds only where the
-  receiving stage happens to carry a refusal for that exact act; **where it does not there is no
-  backstop at all**, which is the generalizable form.
-  **Why design-pending, and it is the whole reason this is filed rather than landed:**
-  lifecycle-kit/templates/lead.md is a kit template binding every consumer, so a rule added there
-  is an envelope change. Close refused to make it alone and the lead adopted the refusal rather
-  than substituting its own call. What scope owes is whether the claim generalizes past this
-  repo's posture at all, and if so whether it belongs beside the relay-never-assert rule it is
-  the mirror of, or is too soft to sit in a contract.
-  `relayed-rule-role-scope-unchecked` and `dispatch-claim-evidentiary-tier-unmarked` want the same
-  template on the same envelope-change reasoning; a scope ruling any of the three should rule all.
-  **THE HONESTY BOUNDARY IS PART OF THE ENTRY, not a caveat on it.** Two instances is an
-  **anecdote, not a measurement**, and **nothing reds on a lead over-specifying** — the rule is
-  unenforceable by construction, since a dispatch never enters the tracked tree. Both instances
-  were caught because the sessions were bounded well, not because any mechanism fired.
-  **Cost while deferred:** low in frequency and **no longer self-limiting in the worst case** —
-  three instances in three iterations, and the third would have cost an iteration's lifecycle
-  state rather than a turn. The posture is already the lead contract's implicit shape, so what is
-  missing is the explicit statement, not the practice; the carry is that each lead re-derives it.
-  A longer narrative version is staged as operator material in the essay-harvest sink; the two
-  are different tiers and both stand. Filed 2026-08-18 by close on the lead's ruling, which
-  adopted close's own refusal to take the envelope change alone.
-  Joins `lifecycle-contract-drain` by operator direction (2026-09-19, lead-relayed): generalizes.
-
 - **projection-trigger-witness** [cost: event/low] [surface: docs] — the generated-projections roster states each
   projection's staleness trigger in prose, and nothing checks the prose against the emitter.
   **The missing check class, named because a staleness fix without one forfeits it.** This close
@@ -2065,82 +1972,6 @@
   recurrence: bespoke-test-path-knob-pinning 2026-09-05
   Filed 2026-08-23 by validate; the close drain re-ran the survey oracle and got 16/11/7 with the
   same seven names.
-
-- **dispatch-claim-evidentiary-tier-unmarked** [cost: event/high] [surface: lifecycle-kit] — a dispatch prompt can upgrade an
-  inference into a finding, and the receiving session cannot see the evidence base to discount it.
-  recurrence: dispatch-claim-evidentiary-tier-unmarked 2026-08-24
-  **THIRD INSTANCE, in a SUB-SHAPE the two below do not reach and the highest-stakes one yet: a
-  relayed one-shot AUTHORIZATION, carrying no spent/unspent state.** At the
-  `port-remainder-disposition-and-worktree-reclamation` close a dispatch relayed an operator
-  authorization for an outward-facing write against a named public artifact, declaring it "LIVE and
-  UNSPENT" and its target defective. Both halves were false at HEAD: the target had been repaired
-  and the authorization spent hours earlier, by the relaying side, and the tracked issue's own
-  comment thread records the fix with a probe. The write was NOT made. What differs from the two
-  instances below is that the claim was never an inference — it was a fact that had gone stale
-  between the act and the relay, so evidentiary-tier marking would not have caught it; a grant needs
-  a consumed state, not a tier. What is the SAME, for the third time, is that the receiving session
-  caught it by declining to trust the prompt, and nothing else could have. The stakes differ in kind
-  too: the two below cost a session's work, and this one would have been an unrecoverable write to a
-  public surface.
-  **Two attested instances, both self-reported by the lead and both caught by the RECEIVING stage
-  rather than by the lead.** (1) At build, a dispatch said "assume deltas 10 and 11 carry a false
-  premise", converting a verification instruction into a quota. The session came within ONE EDIT
-  of landing a fabricated premise correction into a governed surface and caught itself; a sibling
-  session had independently recorded the same mechanism one delta earlier with the expectation
-  supplied by a STREAK rather than a dispatch — "a fourth consecutive hit reads as a rule, and the
-  fifth check is what keeps it a measurement". (2) At validate, a dispatch asserted that
-  `installer_smoke`'s failure WOULD BE the ruled empty-registry outcome. It was not: the suite
-  died earlier at `checkwright init`'s `git add` on an already-filed defect and never reached the
-  ruled codepath. What build had MEASURED was that outcome from clean worktree checkouts; the lead
-  carried it forward as a prediction about a different run, which is a different claim.
-  **Why it is not self-correcting.** The lead writes no lifecycle state and is held to no oracle,
-  fixture pair or battery, while its dispatches steer what stage sessions land — so an unmarked
-  inference costs a stage session's work and nothing reds. Both instances were caught by a session
-  declining to trust the prompt, which is the discipline this repo teaches and not a mechanism.
-  The quota form is worse than the streak form only because it arrives with authority: the session
-  cannot see the base rate it is being handed.
-  **Deliverable, and the harder half is the second:** whether a dispatch prompt can be held to
-  marking a claim's evidentiary tier (measured / inferred / expected), and what if anything can
-  CHECK it, given that a dispatch is prose and lifecycle-kit/templates/lead.md is a kit surface. A
-  cheap shape is a stated relay discipline; it costs a template line and buys no detection.
-  **THE THIRD OF A FAMILY, ruled together:** `relayed-rule-role-scope-unchecked` is a RULE scoped
-  to the relayer's role; `lead-specifies-constraint-not-mechanism` a MECHANISM the relayer had no
-  standing to choose; this a CLAIM silently upgraded in transit. All three share the home, the
-  envelope-change blocker and the undecidability limit. A MERGE was DECLINED at the drain: each
-  carries independently attested evidence near the entry cap, which a merged entry would spend.
-  **Cost while deferred:** low frequency, high per occurrence, invisible from the receiving end —
-  a session that follows an upgraded inference produces work that looks compliant and is wrong.
-  Filed 2026-08-24 to the gap inbox by build and again by the lead; promoted 2026-08-24 at
-  `shell-gate-tail-port-and-completion-oracle`'s close, which judged the merge question the second
-  filing put to it.
-  Joins `lifecycle-contract-drain` by operator direction (2026-09-19, lead-relayed): claim tier.
-
-- **relayed-rule-role-scope-unchecked** [cost: event/high] [surface: lifecycle-kit] — a rule
-  relayed through a dispatch can be scoped to the relayer's role and bind nobody it is relayed to,
-  and nothing in the relay path checks that.
-  **Two attested instances, both from `battery-runner-port` and both the lead's self-report.**
-  (1) A dispatch instructed a stage to write `recurrence:` stamps in a shape queue-kit/SPEC.md
-  forbids that stage to write. (2) A dispatch told validate not to re-run `run-validate.sh`, a
-  lead-side verification rule; it produced a spliced evidence manifest the lead had to reject, and
-  the correct one needed a second full spine run. A rule arriving through the dispatch channel
-  reads as authoritative by construction, so the receiving session does the wrong thing confidently.
-  **The generalization, in the lead's own words:** before relaying a rule, check whose role it
-  binds.
-  **Why design-pending:** the home is lifecycle-kit/templates/lead.md, whose relay duties the rule
-  qualifies, so the wording is an envelope change. Whether anything can check it is harder: roles
-  are defined across lead.md, the stage templates and each kit's SPEC, so a scanner must resolve a
-  relayed sentence to a role. The cheaper shape is a stated relay discipline naming the surfaces a
-  lead consults before relaying, a template line that buys no detection.
-  **DISTINCT from its two siblings**, which share its home and envelope reasoning:
-  `lead-specifies-constraint-not-mechanism` hands down a mechanism, and
-  `dispatch-claim-evidentiary-tier-unmarked` a claim upgraded in transit; this hands down a rule
-  that was never the relayer's. A merge of the three was declined at the 2026-08-24 drain.
-  **Cost while deferred:** low frequency, high per occurrence, and invisible from the receiving
-  end — work that looks compliant and is wrong, which only the relayer can tell.
-  Filed 2026-08-23 to the gap inbox at `battery-runner-port`'s close; promoted 2026-08-23 at the
-  next scope; iceboxed 2026-09-11 in a pool triage. Returned to Deferred and selected for
-  `lifecycle-contract-drain` at its scope (operator direction, 2026-09-19, lead-relayed): the claim
-  generalizes and all three siblings join; spec authors and promotes.
 
 - **release-body-step-has-no-in-tree-witness** [cost: event/high] [surface: RELEASING.md] — the one release step whose
   product lives off the tree is the one that was skipped, and its only backstop is next-day.
@@ -2774,46 +2605,6 @@
   taking only the overclaim clause (the widening is a Rust change owing a `good/`+`bad/` fixture
   pair, which a close cannot land test-and-doc-complete) and →icebox refused on the live trigger.
 
-- **stage-journal-path-unsourced-mid-stage** [cost: event/high] [surface: lifecycle-kit] — a stage session dispatched into an
-  ALREADY-ENTERED stage has no mechanical source for that stage's journal path, so it invents a
-  discriminated filename and the successor's entry assertion then refuses.
-  **Attested twice, 2026-09-10 and again 2026-09-11:** each time `--enter-stage validate` refused
-  because `.tmp/build-journal.md` carried only its opening line while build's lead-cut batch
-  sessions had written `-batchN-` journals, three the first time and four the second, and each
-  time a batch paid a hand-written stand-in to clear it.
-  **Not a cardinality defect — that first reading was corrected the same day.**
-  lifecycle-kit/SPEC.md §The state machine already rules the multi-session case: one journal per
-  stage, every session appending under a heading naming itself, and the entry assertion satisfied
-  by ANY session of the predecessor having written. `--enter-stage`'s journal open appends and
-  never overwrites for exactly that reason, so nothing is owed on that axis.
-  **What IS owed is the seam:** the canonical path is printed by `--enter-stage` alone, and the
-  second or third batch of an already-entered stage never runs that arm.
-  **THE CHEAPEST CANDIDATE IS A MEASURED FAILED CONTROL, not an unbuilt option.** Obliging the
-  batch-dispatching lead to grant the derived path IS ALREADY IN THE TEMPLATE and has been since
-  2026-08-25: lifecycle-kit/templates/lead.md §Channel design says the lead "still spells it out
-  in the dispatch prompt" and refuses a per-batch filename by name. Seven batch sessions across
-  the two attestations violated it. The 2026-09-11 instance closes the last excuse available to
-  that shape — the dispatching lead RELAYED the resume-journal discipline into every prompt in
-  the same breath as naming the per-batch path, so the control did not fail for want of being
-  read, and a discoverability repair drafted at that close (a §Economics pointer to §Channel
-  design) was WITHDRAWN unlanded as an eighth instance of the same failing control.
-  **Why design-pending:** the surviving shapes differ in kind and none is costed — a read-only
-  `--emit stage-journal-path` arm any session can run without stamping; the same obligation moved
-  into the stage-session agent contract, where a non-entering session actually reads it; or a
-  detection half, now that the prompt-side rule is measured not to hold. Choosing is scope's.
-  **DISTINCT from the concurrency limit the same SPEC paragraph files** (two sessions of one stage
-  appending at once, untested and not claimed safe): this is a sequential session that does not
-  know the path at all.
-  **Cost while deferred:** the failure lands on the NEXT stage's entry, cold, holding only whatever
-  escape was written down — a session that did nothing wrong pays for one that did.
-  **NOT ICEBOX-ELIGIBLE on its `[cost:]` class:** `event/high` is outside the low class
-  queue-kit/SPEC.md §The icebox tier admits. The 2026-09-10 lead decision read the since-retired
-  prose opener and machinery-class conjunction; the class carries the same verdict now.
-  Filed 2026-09-10 by close, draining the gap inbox. →fix was refused on the re-verification above:
-  the obvious cheap fix is already landed, and already failed.
-  Joins `lifecycle-contract-drain` by operator direction (2026-09-19, lead-relayed): journal path.
-  recurrence: stage-journal-path-unsourced-mid-stage 2026-09-11
-
 - **align-in-session-absorption-tier-unruled** [cost: event/low] [surface: lifecycle-kit]
   — does a spec miss that build absorbs **in session** count against align's model tier?
   **OPERATOR-CLASS, and that is the whole reason it is filed rather than answered.** Answering it
@@ -2977,30 +2768,6 @@
   candidate owner and refused there for repairing one instance of a general class; drained and
   promoted at close, which falsified half its premise.
 
-- **stage-commit-subject-scope-unowned** [cost: event/low] [surface: lifecycle-kit]
-  — a stage session's commit subject scope is governed nowhere. An anchored grep across
-  lifecycle-kit, canon-kit and queue-kit for a `chore(<stage>)` spelling returns nothing, so every
-  stage session picks a scope by precedent.
-  **Measured at the drain, and the drift is wider than the filing said.** The filing recorded a
-  five-to-three split on the align stamp. A tabulation of every stage-entry stamp subject in
-  history returns four scopes on the align stamp alone — `chore(align)` 88, `chore(workflow)` 8,
-  `chore(spec)` 3, `chore(lifecycle)` 2 — and eight distinct scopes across all stages: spec 40,
-  build 34, align 22, validate 14, close 12, lifecycle 8, scope 5, workflow 1.
-  **Candidate deliverables:** (a) lifecycle-kit/SPEC.md states the subject scope as a per-stage
-  fact beside the stamp protocol; (b) a gate binds a stage session's own commits to its stage's
-  scope, checkable only for a commit carrying a stamp in the same commit; (c) rule it cosmetic and
-  say so, retiring the expectation rather than the drift.
-  **DISTINCT from `queue-recovery-pickaxe-wrong-oracle`**, which it cites for the failure shape
-  only: that entry is about recovery instructions naming an oracle that cannot answer, and it
-  stands whether or not any commit subject is governed; this is the stage machine leaving the
-  subject ungoverned, and it stands even where every recovery surface names the right oracle.
-  **Cost while deferred:** a `git log --grep` or pickaxe recovery keyed on a stage name silently
-  misses the commits that stage filed under a neighbouring scope, which the tabulation above
-  measures at a quarter of the align stamps.
-  Filed 2026-09-16 to the gap inbox by the iteration lead verifying align's own commits; no gate
-  reds on it. Drained and promoted at close, which re-ran the tabulation and widened the finding.
-  Joins `lifecycle-contract-drain` by operator direction (2026-09-19, lead-relayed): subject scope.
-
 - **isolation-oracle-cost-lacks-dispatcher-clause** [cost: event/high] [surface: delegation-kit]
   — agent-execution's isolation cost (4) carries no dispatcher-side clause, so a dispatch sending
   an oracle-running sweep into isolation is discovered unresolvable only after a full round trip.
@@ -3155,32 +2922,6 @@
   **Cost while deferred:** local-only surfaces drift until a consult happens to audit them.
   Filed 2026-09-18 to the gap inbox by the consult that audited the local-only files, after
   `external-install-evidence`'s close; promoted to Deferred at the next scope.
-
-- **scope-unit-set-ignores-deferred-inflow** [cost: iteration/high] [surface: lifecycle-kit]
-  — nothing in lifecycle-kit/templates/stages/scope.md weighs a proposed unit set against the rate
-  the Deferred section refills, so an iteration can close about as many entries as its own close
-  drain promotes and the section never trends to empty.
-  **Measured at filing, over the week to 2026-09-19:** twenty iterations closed and Deferred fell
-  148 to 105, about two net per iteration; re-verified at this scope, 105 Deferred entries of
-  which 57 carry a `Why design-pending` ground no close drain can clear.
-  **Operator direction, in a consult:** the adopter preview waits on a near-empty Deferred section
-  (TRAJECTORY.md, the enhancement admission filter's grounds), so depletion is the ranking's
-  purpose, not a side effect.
-  **Candidates, for spec to design:** (a) the Composition line gains a net-drain figure, units
-  promoted against trailing per-iteration inflow, derived by a tool arm from the queue's filing
-  dates and never hand-counted, and a set at or below inflow argues why; (b) the ranking's third
-  tier fills beyond the lead unit's surface where the lead already batches dispatches by surface
-  (lifecycle-kit/templates/lead.md §Economics); (c) a spec-led batch iteration per surface over
-  design-pending entries; (d) measure the close drain's fix-inline versus promote mix.
-  **Refused in the consult:** reversing the enhancement admission filter, and counting the Icebox
-  toward the preview gate.
-  **Cost while deferred:** each iteration's fixed stage-walk cost is amortized over too few
-  units, and the preview gate recedes at the inflow rate.
-  Filed 2026-09-19 to the gap inbox by the consult after `adopter-floor-collapse`'s close;
-  promoted at the next scope. Owner lookup: `inflow`, `net drain`, `refill` — none.
-  Selected to lead `lifecycle-contract-drain` at its scope and admitted in full under the
-  enhancement admission filter as drain-serving delivery machinery, candidate (a)'s arm allowed
-  (operator direction, 2026-09-19, lead-relayed) — a reading of the filter, not a reversal.
 
 ## Icebox
 
