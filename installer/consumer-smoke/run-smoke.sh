@@ -1533,6 +1533,28 @@ grep -q 'no adopter action to take' <<<"$undeclared_out" \
 say "host off the payload roster: refused naming the platform, no adopter action, nothing written"
 cp "$ROSTER_FILE" "$PAY_ART/targets.list" || fail "could not restore the payload roster"
 
+# spec: installer/SPEC.md §The consumer smoke — the shasum fallback: sha256sum is masked by absence so the bootstrap's step 4 can only verify through `shasum -a 256`, and the leg installs through it and later refuses the tampered artifact through it; a host with no shasum, or a native Windows host whose farm would relocate its runtime, says so and skips
+SHASUM_PATH=""
+case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*) say "shasum fallback skipped on a native Windows host: masking sha256sum there would farm the bundle's usr/bin" ;;
+    *)
+        if ! command -v shasum >/dev/null 2>&1; then
+            say "shasum fallback skipped: this host carries no shasum"
+        else
+            SHASUM_PATH="$(path_without sha256sum "$SCRATCH/shasumfarm")" || fail "could not build the shasum fallback's PATH farm"
+            [[ -z "$( PATH="$SHASUM_PATH" "$BASH" -c 'command -v sha256sum' 2>/dev/null )" ]] \
+                || fail "the mask did not take: sha256sum still resolves under the shasum fallback's PATH"
+            ( cd "$PAY_ART/$HOST_TARGET" && PATH="$SHASUM_PATH" shasum -a 256 -c "$NATIVE_BIN.sha256" ) >/dev/null 2>&1 \
+                || fail "the shasum farm's shasum -a 256 -c does not accept the payload's sidecar — either the farm's shasum will not run or it cannot read the <hex>  <name> line, and the fallback below would fail for a reason that is not the bootstrap's"
+            SC="$(consumer artifact-shasum)" || fail "could not build a scratch consumer for the shasum fallback"
+            out="$( cd "$SC" && PATH="$SHASUM_PATH" "${ENTRY[@]}" init --profile "$PROFILE_MIN" 2>&1 )" \
+                || { printf '%s\n' "$out" >&2; fail "init refused with sha256sum masked — the bootstrap's shasum branch did not verify an intact artifact"; }
+            [[ -f "$SC/checkwright.lock" ]] || fail "init with sha256sum masked exited 0 and wrote no manifest"
+            say "shasum fallback: sha256sum masked, the farm's shasum checks the sidecar, and init verified and installed through it"
+        fi
+        ;;
+esac
+
 # spec: installer/SPEC.md §The gate binary — the verification is pre-write, so the assertion is on the consumer's tree and not only on the exit code: a warn-then-install would exit non-zero too, and only an untouched tree tells the two apart
 printf 'tampered\n' >> "$PAY_ART/$HOST_TARGET/$NATIVE_BIN"
 TC="$(consumer artifact-tampered)" || fail "could not build a scratch consumer for the tampered-artifact leg"
@@ -1542,6 +1564,15 @@ out="$( cd "$TC" && "${ENTRY[@]}" init --profile "$PROFILE_MIN" 2>&1 )"; rc=$?
 [[ "$(git -C "$TC" rev-parse 'HEAD^{tree}')" == "$before" && -z "$(git -C "$TC" status --porcelain)" && ! -f "$TC/checkwright.lock" ]] \
     || fail "the digest refusal left the consumer changed — it was checked after something was written, not before"
 say "tampered artifact: refused with nothing written"
+if [[ -n "$SHASUM_PATH" ]]; then
+    out="$( cd "$TC" && PATH="$SHASUM_PATH" "${ENTRY[@]}" init --profile "$PROFILE_MIN" 2>&1 )" \
+        && { printf '%s\n' "$out" >&2; fail "init installed a tampered gate binary with sha256sum masked — the shasum branch compared nothing"; }
+    grep -q 'does not match its published digest' <<<"$out" \
+        || { printf '%s\n' "$out" >&2; fail "the tampered artifact was refused with sha256sum masked, but not by the digest comparison"; }
+    [[ "$(git -C "$TC" rev-parse 'HEAD^{tree}')" == "$before" && ! -f "$TC/checkwright.lock" ]] \
+        || fail "the shasum branch's digest refusal left the consumer changed"
+    say "tampered artifact, sha256sum masked: refused by the shasum branch's digest comparison, nothing written"
+fi
 
 # spec: installer/SPEC.md §The gate binary — a declared target whose artifact went missing is the outcome that must not collapse into the omission above: same host, same roster, and the only difference is the missing pair, so a run that omitted here would be reading a broken payload as a narrower one
 rm -f "$PAY_ART/$HOST_TARGET/$NATIVE_BIN" || fail "could not remove the declared target's binary"
@@ -1565,5 +1596,5 @@ PROVENANCE="the gate binary this run built"
 [[ -z "$PREBUILT_DIR" ]] || PROVENANCE="the gate binary adopted from the hand-off, unrebuilt"
 
 # spec: evidence-kit/SPEC.md §Layout and configuration — this line is the run's COMPLETION MARKER, derived positionally. A header printed after this line would silently become the marker and demote this one to an arm — the one hazard of that rule, and no gate catches it
-printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access, each carrying %s, each put in front of a real prose defect (caught by %s) and each reversed back to its pre-init tree object, with gate rosters monotone across every comparable pair of the registries those installs wrote, plus the artifact-less %s leg driving a payload the packer itself produced with no artifact and asserting one refusal for init, doctor, diff and a bare invocation alike, naming the platform and writing nothing, the extracted-tarball arm with node/npm masked and reversed the same way, the toolchain-free arm driving doctor and a full init with cargo/rustc masked, the jq-less arm asserting diff, uninstall and a lattice-minimum and a guard-kit init run clean with no jq on PATH, the installed guard hook answering a payload and doctor naming jq nowhere, the bash-less arm installing every profile that owes no bash and committing through its hooks clean and refused with no bash on PATH, the two-hop cross-version upgrade arm carrying the relinquish and re-add, the cross-version reversal arm reversing an unedited consumer back to its pre-init tree object after those same three hops, the same-version seam arm and the protection branch chained onto it, the narrowing arm re-running init at a smaller profile so files[] outlives kits, and the artifact arm driving the three selection outcomes on a mutated copy of that payload, with its two refusals asserted to differ in message and remedy)\n' "${#PROFILES[@]}" "$PROVENANCE" "${VALUE_RED[*]}" "$BARE_PROFILE"
+printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access, each carrying %s, each put in front of a real prose defect (caught by %s) and each reversed back to its pre-init tree object, with gate rosters monotone across every comparable pair of the registries those installs wrote, plus the artifact-less %s leg driving a payload the packer itself produced with no artifact and asserting one refusal for init, doctor, diff and a bare invocation alike, naming the platform and writing nothing, the extracted-tarball arm with node/npm masked and reversed the same way, the toolchain-free arm driving doctor and a full init with cargo/rustc masked, the jq-less arm asserting diff, uninstall and a lattice-minimum and a guard-kit init run clean with no jq on PATH, the installed guard hook answering a payload and doctor naming jq nowhere, the bash-less arm installing every profile that owes no bash and committing through its hooks clean and refused with no bash on PATH, the two-hop cross-version upgrade arm carrying the relinquish and re-add, the cross-version reversal arm reversing an unedited consumer back to its pre-init tree object after those same three hops, the same-version seam arm and the protection branch chained onto it, the narrowing arm re-running init at a smaller profile so files[] outlives kits, and the artifact arm driving the three selection outcomes on a mutated copy of that payload, with its two refusals asserted to differ in message and remedy, and the bootstrap'\''s shasum fallback verifying and refusing with sha256sum masked wherever the host carries shasum)\n' "${#PROFILES[@]}" "$PROVENANCE" "${VALUE_RED[*]}" "$BARE_PROFILE"
 exit 0

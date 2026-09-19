@@ -3327,6 +3327,18 @@ outcomes from collapsing into each other. Mutating an extracted package rather
 than adding a flag to the publishing path is deliberate: it leaves the publisher
 no way to ship a payload with a hole in it.
 
+**The arm also drives step 4's `shasum` fallback**, which no runner reaches on its
+own: every CI image, macOS's included, ships a `sha256sum`. It masks `sha256sum`
+by absence with the same farm the `bash`-less arm uses and proves the mask both
+ways: `sha256sum` resolves to nothing, and the farm's `shasum -a 256 -c` accepts the
+payload's sidecar. That control is a check and never a computation, so the smoke
+adds no second producer of the digest (gate-sdk/SPEC.md
+§check-gate-substrate-parity). Under that `PATH` an
+`init` through the bootstrap installs, and the tampered artifact is refused by the
+digest comparison with nothing written, so the branch is shown both to verify and
+to compare. A host with no `shasum`, and a native Windows host for the `bash`-less
+arm's farm reason, say so and skip.
+
 The arm gains nothing from this: the **smoke** builds and hands it a directory,
 while the publishing path still never builds a payload artifact, so a locally
 built binary can still never substitute for a released one.
