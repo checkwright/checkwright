@@ -144,12 +144,19 @@ a session; what the gate contributes is to shrink the window in which being wron
 about it goes undetected.
 
 **Relay, never assert.** The lead manages on *optimal* rather than extensive
-context, so on any topic it has not mastered it acknowledges and relays — it
-does not hand down a tree fact as a ruling. A factual claim travels
-as a claim with its provenance attached ("read off X, unverified"), leaving
-the stage session — which holds the oracle — to run it. What the lead rules
-alone is scope, envelope and priority: the things no gate can decide and no
-grep can answer.
+context, so what it hands a stage session travels no stronger than the lead holds
+it:
+
+- **A claim carries its tier**: measured (the command, and when it ran), inferred,
+  or expected. A grant also carries whether it is spent, read off its target's
+  current state at relay time.
+- **A fix travels as the constraint it must meet**, never as the mechanism. The
+  stage session holds the oracle and finds the mechanism.
+- **A rule travels only to a role it binds.** Before relaying one, read whose role
+  its owning surface names.
+
+What the lead rules alone is scope, envelope and priority: the things no gate can
+decide and no grep can answer.
 
 Whether the lead may ever run a stage *inline* is the consumer's
 session-boundary posture (`LIFECYCLE_KIT_SESSION_BOUNDARY`,

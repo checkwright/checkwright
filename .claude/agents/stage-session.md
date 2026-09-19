@@ -44,6 +44,10 @@ you act on it — the classes are lifecycle-kit/SPEC.md §The steering vocabular
   structure, a helper's name, test coverage.
 - Anything the governing spec already determines — run the oracle, never ask a
   question the gate answers.
+- How strongly to trust a dispatch. A claim with no tier is inferred, so run it
+  before building on it. A relayed mechanism is a proposal you verify against the
+  constraint. A relayed rule binds you only where its owning surface names your
+  role, so check before acting.
 
 ## How to escalate
 

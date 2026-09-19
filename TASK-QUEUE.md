@@ -12,32 +12,6 @@
 
 ## New Features
 
-- **lead-specifies-constraint-not-mechanism** [spec: SPEC-relay-discipline.md] — a lead that hands
-  down a mechanism spends a stage session's verification on the lead's own guess. Three worked
-  instances, the third (2026-08-23) destructive.
-  **Ruled at spec, with its two siblings:** lead.md's relay-never-assert rule is re-phrased to
-  carry claim tier, grant spent state, constraint-not-mechanism and role scope. The receiving half
-  lands in the stage-session agent definition. No gate can read a dispatch, as the SPEC records.
-  recurrence: lead-specifies-constraint-not-mechanism 2026-08-23
-  Filed 2026-08-18 by close. Joins `lifecycle-contract-drain` by operator direction (2026-09-19,
-  lead-relayed): generalizes.
-
-- **dispatch-claim-evidentiary-tier-unmarked** [spec: SPEC-relay-discipline.md] — a dispatch can
-  upgrade an inference into a finding, or relay a spent grant as unspent. Three instances, each
-  caught by the receiving session.
-  **Ruled at spec:** a relayed claim carries its tier, and a grant carries its spent state, read off
-  its target at relay time (see the sibling above).
-  recurrence: dispatch-claim-evidentiary-tier-unmarked 2026-08-24
-  Filed 2026-08-24. Joins `lifecycle-contract-drain` by operator direction (2026-09-19,
-  lead-relayed): claim tier.
-
-- **relayed-rule-role-scope-unchecked** [spec: SPEC-relay-discipline.md] — a rule relayed through a
-  dispatch can bind only the relayer's role. Two instances in `battery-runner-port`.
-  **Ruled at spec:** a rule travels only to a role its owning surface names (see the sibling above).
-  Filed 2026-08-23, iceboxed 2026-09-11, returned to Deferred and selected for
-  `lifecycle-contract-drain` at its scope (operator direction, 2026-09-19, lead-relayed): the claim
-  generalizes and all three siblings join.
-
 ## Technical Debt
 
 ## Deferred
@@ -3116,5 +3090,8 @@
 - mid-iteration-push-owner-unnamed
 - stage-journal-path-unsourced-mid-stage
 - batch-split-stamp-ownership
+- lead-specifies-constraint-not-mechanism
+- dispatch-claim-evidentiary-tier-unmarked
+- relayed-rule-role-scope-unchecked
 
 ## Lessons Learned

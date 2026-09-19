@@ -5398,7 +5398,18 @@ session writes lifecycle state under oracle-first, fixture pairs and a validate
 battery; the lead writes none and carries no verification discipline, yet its
 rulings steer what stage sessions land — so relaying an unverified duration or
 count into a dispatch converts one session's guess into standing instruction for
-every session after it, and nothing reds.
+every session after it, and nothing reds. The relay rule names four ways authority
+is added in transit: a claim sent above its tier, a grant sent as unspent after it
+was spent, a mechanism sent where only the constraint was the lead's to set, and a
+rule sent to a role its owning surface does not bind. None of the attested
+instances was caught by the lead before the relay; most were caught by the
+receiving session declining to trust the prompt, which is why the consumer's
+agent definition carries the receiving half. A grant takes a spent state rather
+than a tier because the attested one was a fact gone stale between act and relay:
+a tier would have marked it correctly and still carried it. **The honest limit:**
+no gate reads a dispatch, and a tier or spent marker is written by the party it
+constrains, so the rule is prose on both ends; a role-scope scanner would first
+have to resolve a relayed sentence to its owning surface, which is semantic.
 An earlier second assertion over the drain
 assertion's own population is **ruled out** on record: a batching roster has
 dropped a promoted unit in practice and `check-stage-entry` named
