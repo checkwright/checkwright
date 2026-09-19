@@ -2784,6 +2784,34 @@
   Filed 2026-09-18 to the gap inbox by the consult that audited the local-only files, after
   `external-install-evidence`'s close; promoted to Deferred at the next scope.
 
+- **armed-by-census-unrun** [cost: event/low] [surface: gate-sdk] — gate-sdk/SPEC.md §The
+  install disposition mints a `# armed-by: <KNOB>` directive so `doctor` names a registered
+  member that asserts nothing while its knob is empty, and one member declares it.
+  **Probed at the close drain:** `check-portability-floor.gate` is the only shipped declaration;
+  the other two hits are `check-install-disposition` fixture scripts.
+  **Deliverable:** a census of the zero-config members whose SPEC section states an
+  absent-config degradation to assert-nothing (the `check-graph` / `graph-vocab.knobs` pattern
+  is the first candidate), each either declaring `# armed-by:` or stated as always armed.
+  **Cost while deferred:** such a member ships to every adopter registered and silent, the
+  on-ramp gap the directive closes for one member.
+  Filed 2026-09-19 to the gap inbox at `adopter-floor-conditional-members`' spec; promoted at its
+  close because a roster-wide census with a per-member judgment is not a drain-sized fix.
+
+- **install-smoke-intel-mac-bash-path-assert-vacuous** [cost: event/low] [surface: .github] —
+  the `gates` workflow's macOS install-smoke legs assert that a fresh login zsh resolves `bash`
+  to `$(brew --prefix)/bin/bash` after the page's `macos-remedy` block runs. On the Intel leg
+  Homebrew's prefix is `/usr/local`, which `/etc/paths` already leads with, so the probe holds
+  with or without the block's profile line and cannot catch a missing one.
+  **Probed at the close drain:** the arm64 leg's own comment states the Intel vacuity, and the
+  `install-smoke-macos-intel` job runs the same probe unchanged.
+  **Deliverable:** an Intel-leg assertion that reds on a missing profile line (a probe that
+  skips the global rc's `path_helper` ordering, or one reading the persisted line itself),
+  proved on a pushed run.
+  **Cost while deferred:** a remedy regression that drops the profile line passes on Intel
+  and is caught only by the arm64 leg.
+  Filed 2026-09-19 to the gap inbox by build batch 1 of `adopter-floor-conditional-members`;
+  promoted at its close because the fix changes a CI oracle only a pushed run can prove.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no

@@ -198,3 +198,4 @@
 | windows-adopter-path | sc sp a b v c | 6f/4d | 4 · ≤1d | 41s clean | 117 |
 | adopter-floor-collapse | sc sp a b v c | 2f/1d | 1 · ≤0d | 20s clean | 117 |
 | lifecycle-contract-drain | sc sp a b v c | 7f/0d | 6 · ≤0d | 20s clean | 118 |
+| adopter-floor-conditional-members | sc sp a b v c | 4f/0d | 2 · ≤0d | 20s clean | 118 |
