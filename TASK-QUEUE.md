@@ -14,6 +14,54 @@
 
 ## Technical Debt
 
+- **init-dry-run-plan-parity** — `init --dry-run` predicts the evidence-kit and lifecycle-kit
+  seeds through a second spelling (`dry_seed_paths` in `native/src/installer/init.rs`) of what
+  the real arms write (`recipe::seed` in `native/src/installer/recipe.rs`), and the two still
+  disagree: the real arms write `.workflow/validate-baseline.txt`,
+  `.workflow/validate-evidence.txt` and `.workflow/WORKFLOW-STATE.txt` only when absent
+  (`seed_absent`), while the dry arm names all three whenever `claim` admits the path, which it
+  does for any path the prior manifest does not record. So `--dry-run` on a consumer already
+  holding one of those files names a file the run would not write.
+  **Done-state:** each seed has one predicate the dry plan and the run both read, the queue
+  arm's form, and an acceptor diffs the dry plan against the set the real run records, so a
+  re-divergence reds.
+  **Cost while deferred:** a `--dry-run` is a promise about what will happen, and it is the
+  first command a cautious adopter runs.
+  Filed 2026-08-09 by close, draining the build stage's bullet.
+  **Re-verified at promotion (2026-09-19 scope), read not run:** the filing's `init.sh` is now
+  the native `init.rs`. Its arm (c), the agent-file seed, is discharged: `init.rs` predicts it
+  on the seeding arm's own guard (`seeds_agent`). Arms (a) and (b) stand as read above. The
+  consumer smoke still asserts only `uninstall --dry-run` (`installer/consumer-smoke/run-smoke.sh`),
+  so no acceptor exists.
+  Joins this iteration by operator direction (2026-09-19, lead-relayed).
+
+- **hasher-shasum-fallback-unexercised** — the bootstrap (`installer/bin/checkwright.sh`), the
+  consumer smoke (`installer/consumer-smoke/run-smoke.sh`) and `scripts/ci-build-artifact.sh`
+  try `sha256sum` and fall back to `shasum -a 256`, but both macOS runner images ship
+  `/sbin/sha256sum`, so no CI leg reaches the fallback branch.
+  **Done-state:** a leg or smoke arm hides `sha256sum` from `PATH` and proves the `shasum` branch
+  verifies a digest end to end, on a pushed run; it proves the branch the POSIX bootstrap port
+  (`floor-bash-install-bootstrap`) ships.
+  **Cost while deferred:** a stock macOS older than 15 takes the branch unproven, at the one step
+  that verifies the binary before it runs.
+  Filed 2026-09-19 to the gap inbox at `adopter-floor-conditional-members`' close push; promoted
+  to Deferred at the next scope. Joins this iteration by operator direction (2026-09-19,
+  lead-relayed).
+
+- **install-smoke-intel-mac-bash-path-assert-vacuous** — the `gates` workflow's macOS
+  install-smoke legs assert that a fresh login zsh resolves `bash` to `$(brew --prefix)/bin/bash`
+  after the page's `macos-remedy` block runs. On the Intel leg Homebrew's prefix is `/usr/local`,
+  which `/etc/paths` already leads with, so the probe holds with or without the block's profile
+  line and cannot catch a missing one.
+  **Done-state:** an Intel-leg assertion that reds on a missing profile line (a probe that skips
+  the global rc's `path_helper` ordering, or one reading the persisted line itself), proved on a
+  pushed run.
+  **Cost while deferred:** a remedy regression that drops the profile line passes on Intel and is
+  caught only by the arm64 leg.
+  Filed 2026-09-19 to the gap inbox by build batch 1 of `adopter-floor-conditional-members`;
+  promoted to Deferred at its close. Joins this iteration by operator direction (2026-09-19,
+  lead-relayed): it edits the macOS install-smoke legs the hasher leg edits.
+
 ## Deferred
 
 - **inferred-marker-malformed-placement-passes-unseen** [cost: event/low] [surface: lifecycle-kit]
@@ -127,6 +175,8 @@
   discharge cannot fire.
   Filed 2026-09-19 at `adopter-floor-native-rungs`' spec by operator direction (lead-relayed):
   option (b) of the bootstrap question, not built this iteration.
+  Joins this iteration by operator direction (2026-09-19, lead-relayed): the lead unit, marked for
+  spec, which authors and promotes it.
 
 - **binary-door-wide-sweep** [cost: event/high] [surface: lifecycle-kit] — rung 4a
   (`floor-bash-hooks-front-end`) re-pointed only the starter and prose adopter surfaces at the gate
@@ -897,19 +947,19 @@
   First slice at promotion: a foreign-CLI executor for the already-pre-authorized
   read-heavy audit / mechanical-sweep class over a spawned non-interactive CLI process,
   one adapter per vendor as consumer config — not full stage dispatch.
-  Promotion-eligible at the next scope session.
-  **Design-memory amendment (2026-07-25):** the TUI-relay alternative was probed for
-  session resume and token efficiency. Ruling: those benefits live in the vendor's session
-  store, not the TUI — the APIs are stateless and both modes replay the same on-disk
-  transcript against the same server-side prompt cache, so interactive-vs-headless is a
-  rendering choice, not a state choice. Headless warm-resume by session id and JSONL turn
-  events ship today on the vendors probed, which is what makes (1) plumbing.
+  **Excluded by the enhancement admission filter (2026-09-19 scope):** idle budget headroom,
+  its strongest ground, is none of the three arms; only an operator exception admits it. Its
+  citers (`companion-toolkit-profile`, the credential-swap entries) block on none of it.
+  **Design-memory amendment (2026-07-25):** the TUI relay buys no session resume or token
+  efficiency — both live in the vendor's session store (stateless APIs, the same on-disk
+  transcript replayed against the same server-side prompt cache), so interactive-vs-headless
+  is rendering, not state. Headless warm-resume by session id and JSONL turn events ship on
+  the vendors probed, which makes (1) plumbing.
   **Verification capability (2026-08-02):** those probes ran against **installed binaries**
-  — the foreign CLIs are present on the development machine — so the executor is verifiable
-  rather than inferred from vendor documentation. Under oracle-first that is a change to
-  the unit's risk, not a convenience, and it sharpens the first slice: the executor ships
-  with a smoke that actually invokes them, the shape every kit already uses. The machine
-  profile (context-kit/SPEC.md §bin/env-probe, local-only) owns which CLIs and how.
+  (the foreign CLIs are on the development machine), so the executor is verifiable, not
+  inferred from vendor docs — a change to the unit's risk under oracle-first: the executor
+  ships with a smoke that invokes them. The machine profile (context-kit/SPEC.md
+  §bin/env-probe, local-only) owns which CLIs and how.
   **Cost while deferred:** the foregone lever is live — read-heavy audits and mechanical
   sweeps all bill against one vendor's budget while three subscriptions are held — and
   this design memory ages against fast-moving CLIs.
@@ -1320,31 +1370,6 @@
   whether the battery is worth keeping — the worst moment this project has to spend a
   false-feeling red.
   Filed 2026-08-09 by close, draining the bullet spec filed under scope-gated intake.
-
-- **init-dry-run-plan-parity** [cost: event/high] [surface: installer] — `init --dry-run` is a hand-maintained second
-  spelling of the seeds it predicts, and three of its four remaining arms already diverge.
-  **The queue arm was exactly this defect, and `install-queue-template-unreachable` removed it**
-  this iteration — one predicate, the write alone guarded by `(( DRY ))`. The four sibling arms
-  in the same `case` statement were left as they were.
-  **Measured divergences, 2026-08-09 at build.** *(a) evidence-kit* — the real arm writes
-  `.workflow/validate-baseline.txt` and `.workflow/validate-evidence.txt` only when absent; the
-  dry arm prints both unconditionally. *(b) lifecycle-kit* — the real arm returns early when
-  `.workflow/WORKFLOW-STATE.txt` exists; the dry arm prints it unconditionally. So `--dry-run`
-  on an already-installed consumer names files the run would not write. *(c) the agent-file
-  seed* — `init.sh`'s own `printf`, guarded by `recipe_needs_agent_file`, is predicted by **no
-  arm at all**. The doctrine-kit arm predicts the doctrine *block*, and the two coincide only
-  because every profile carrying context-kit also carries doctrine-kit. That is the same
-  coincidence-of-rosters that hid the queue defect, and it stops holding the day a profile
-  carries context-kit alone.
-  **Nothing catches any of it**, which is the half that makes this a unit rather than a patch:
-  the consumer smoke asserts `uninstall --dry-run` behaviorally and never compares `init`'s dry
-  plan against the run it predicts.
-  **Deliverable:** give each seed the one-predicate form the queue arm now has, and add the
-  missing acceptor — a dry plan diffed against the set the real run records.
-  **Cost while deferred:** a `--dry-run` is a promise about what will happen, so a wrong one is
-  worse than none — and it is the first command a cautious adopter runs, which is the same
-  first-contact surface the profile work is being bought to improve.
-  Filed 2026-08-09 by close, draining the build stage's bullet.
 
 - **kit-ref-liveness-stem-token-hole** [cost: event/high] [surface: canon-kit] — a typo'd knob name under
   a defined stem resolves and passes unchecked.
@@ -2521,6 +2546,9 @@
   two releases' assets apart costs a digest comparison.
   Surfaced 2026-09-14 by the lead into the gap inbox, after `config-bridge-floor`'s close; promoted
   at this iteration's scope.
+  Joins this iteration by operator direction (2026-09-19, lead-relayed), marked for spec: the
+  bootstrap port rewrites the asset lookup and digest source this reaches, so the whether is
+  spec's to settle or escalate.
 
 - **docs-cmd-retired-path-blind-to-queue** [cost: event/low] [surface: canon-kit]
   — canon-kit/SPEC.md §check-docs-cmd assertion (C) cannot see a retired path cited from the queue,
@@ -2770,34 +2798,6 @@
   on-ramp gap the directive closes for one member.
   Filed 2026-09-19 to the gap inbox at `adopter-floor-conditional-members`' spec; promoted at its
   close because a roster-wide census with a per-member judgment is not a drain-sized fix.
-
-- **install-smoke-intel-mac-bash-path-assert-vacuous** [cost: event/low] [surface: .github] —
-  the `gates` workflow's macOS install-smoke legs assert that a fresh login zsh resolves `bash`
-  to `$(brew --prefix)/bin/bash` after the page's `macos-remedy` block runs. On the Intel leg
-  Homebrew's prefix is `/usr/local`, which `/etc/paths` already leads with, so the probe holds
-  with or without the block's profile line and cannot catch a missing one.
-  **Probed at the close drain:** the arm64 leg's own comment states the Intel vacuity, and the
-  `install-smoke-macos-intel` job runs the same probe unchanged.
-  **Deliverable:** an Intel-leg assertion that reds on a missing profile line (a probe that
-  skips the global rc's `path_helper` ordering, or one reading the persisted line itself),
-  proved on a pushed run.
-  **Cost while deferred:** a remedy regression that drops the profile line passes on Intel
-  and is caught only by the arm64 leg.
-  Filed 2026-09-19 to the gap inbox by build batch 1 of `adopter-floor-conditional-members`;
-  promoted at its close because the fix changes a CI oracle only a pushed run can prove.
-
-- **hasher-shasum-fallback-unexercised** [cost: event/low] [surface: installer] — the bootstrap
-  (`installer/bin/checkwright.sh`) and the consumer smoke (`installer/consumer-smoke/run-smoke.sh`)
-  try `sha256sum` and fall back to `shasum -a 256`, but both macOS runner images ship
-  `/sbin/sha256sum` (the gates run's runner probe), so no CI leg reaches the fallback branch.
-  **Probed at promotion:** `scripts/ci-build-artifact.sh` carries the same fallback, equally
-  unreached.
-  **Deliverable:** a leg or smoke arm that hides `sha256sum` from `PATH` and proves the `shasum`
-  branch verifies a digest end to end, on a pushed run.
-  **Cost while deferred:** a stock macOS older than 15 takes the branch unproven, at the one step
-  that verifies the binary before it runs.
-  Filed 2026-09-19 to the gap inbox at `adopter-floor-conditional-members`' close push; promoted at
-  the next scope. Owner lookup: `shasum`, `hasher`, `sha256sum` — no entry matched.
 
 ## Icebox
 
