@@ -12,6 +12,16 @@
 
 ## New Features
 
+- **adopter-floor-collapse-rung-unqueued** [spec: SPEC-adopter-floor.md] — TRAJECTORY
+  objective 1 (the dependency floor collapses to git) had no queued rung. The amendment rules
+  each floor member's disposition and ranks the rungs; this unit lands rung 1: the floor
+  predicate compares versions in-process, and the shipped awk programs move to builtins, grep or
+  wc, so `sort` and `awk` leave `PROBE_SET`. Rungs 2 to 4b are filed as Deferred entries.
+  **Done-state:** the rendered floor is bash, git, jq, curl and shellcheck (plus the
+  contributor-side cargo), and the amendment is merged.
+  Filed 2026-09-18 at `windows-adopter-path`'s scope; promoted 2026-09-19 at
+  `adopter-floor-collapse`'s spec.
+
 ## Technical Debt
 
 - **glob-knob-walkers-unpruned** — `walk::glob_files` stays bash-faithful and unpruned, so a
@@ -188,22 +198,49 @@
   iteration's scope by operator direction, lead-relayed. Owner lookup: `PowerShell twin`,
   `hook twin`, `objective 6` — none.
 
-- **adopter-floor-collapse-rung-unqueued** [cost: event/high] [surface: native] — TRAJECTORY
-  objective 1 (the dependency floor collapses to git) has no queued rung: the adopter floor
-  `docs/install.md` renders is still bash, git, jq, curl, awk, sort and shellcheck, and no
-  deferred or icebox entry owns retiring any member.
-  **Probed at filing:** the binary spawns `sort -V` in `native/src/toolfloor.rs` (a spawn the
-  context-kit env-probe section keeps deliberately), `curl` in `native/src/hook/poll.rs`, `jq` in
-  `native/src/gates/settings_pins_parity.rs`, and `shellcheck` in `native/src/gates/shellcheck.rs`
-  and `action_run_shell.rs`; bash and awk ride the bootstrap, the generated hooks, guard-kit's
-  hook and the shipped templates.
-  **Why design-pending:** each member needs a per-site disposition — ported in-process, kept as
-  a rule that *is* an external program (shellcheck's likely case), or moved off the adopter
-  audience — and the rung order among them is a ranking call no survey has made.
-  **Cost while deferred:** the objective the queue ranks against has no rung to rank, so every
-  scope reads it as satisfied, and the git-only discharge condition cannot approach.
-  Filed 2026-09-18 at `windows-adopter-path`'s scope by operator direction, lead-relayed, from
-  that scope's ranking survey.
+- **floor-curl-jq-unconditional** [cost: event/high] [surface: native] — `doctor`, and
+  through it `init`, refuse every profile on a host without `curl` or `jq`, yet `curl`'s one
+  adopter reach is `--usage-poll` (delegation-kit's opt-in timer arm, which already refuses by
+  name) and `jq`'s is guard-kit's hook (`guard-kit/lib/guard.sh`); the binary's `jq` use is
+  test-only. Rung 2 of the ladder in `SPEC-adopter-floor.md`.
+  **Why design-pending:** a member owed only where the kit reaching it is selected needs an axis
+  the probe roster lacks (its audience value set is closed at `contributor`), and bare `doctor`
+  run outside `init` has no selection to read.
+  **Cost while deferred:** a starter- or prose-profile adopter installs two tools no gate they
+  vendor runs.
+  Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 2, by operator direction.
+
+- **floor-shellcheck-unconditional** [cost: event/high] [surface: gate-sdk] — `check-shellcheck`
+  is `# install: zero-config`, so every profile, the prose one included, registers it and
+  `doctor` refuses a host without `shellcheck`. Rung 3 of the ladder in `SPEC-adopter-floor.md`:
+  kept as a rule that *is* an external program, owed only where its gates are registered.
+  **Why design-pending:** `init` stops seeding `check-shellcheck` into every profile, which
+  re-rules its `zero-config` disposition; each registration trigger (the adopter's own shell, the
+  vendored kit shell) has to be enumerated first.
+  **Cost while deferred:** a non-technical adopter installs a shell linter before first value.
+  Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 3, by operator direction.
+
+- **floor-bash-hooks-front-end** [cost: event/high] [surface: gate-sdk] — the generated git
+  hooks and the bash front-end hold `bash:4.3` on the adopter floor; rung 4a of the ladder in
+  `SPEC-adopter-floor.md` has them reach the binary directly.
+  **Why design-pending:** the front-end's knob and dispatch duties and the hook generator's
+  output contract each need a native home ruled, and the PowerShell twin's fate rides the same
+  ruling.
+  **Cost while deferred:** bash stays a floor member on every platform, macOS's stock 3.2
+  included, which needs the Homebrew remedy.
+  Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 4a, by operator direction.
+
+- **floor-jq-guard-lib** [cost: event/high] [surface: guard-kit] — guard-kit's `lib/guard.sh`
+  spawns `jq` at seven sites plus one presence probe, so `jq` stays on every guard-kit adopter's
+  floor. The library is permanently shell (its `# no-port:`), so rung 4b of the ladder in
+  `SPEC-adopter-floor.md` moves those reads and renders to the gate binary, whose JSON parsing is
+  already in-process (`native/src/json.rs`), and keeps the shell seam.
+  **Why design-pending:** the hook runs on every tool call, so spawning the binary per field
+  prices latency the current `jq` pipes do not pay. The arm's shape (one call per payload or one
+  per field) and its fail-open posture, which must match the library's, need ruling.
+  **Cost while deferred:** `jq` cannot leave the floor for any guard-kit adopter.
+  Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 4b; mechanism from the
+  concurrent objective-1 consult, lead-relayed.
 
 - **push-budget-unshipped** [cost: event/low] [surface: lifecycle-kit] — the push
   budget (one to two pushes per iteration, two unasked hotfix pushes) lives only in this repo's
