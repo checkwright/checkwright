@@ -2153,22 +2153,21 @@ sweeps** bullet, which is the surface an agent loads. This section owns what
 that bullet cannot carry: the lifetime rule's reasoning, the attestation it was
 priced against, and the two readings the marker carries.
 
-**The grant clause stands and its status changed: it is now a restatement, not a
-source.** Where the consumer runs a stage machine, the journal's path is a
-**derivation from the stage** that the machine owns and can compute
-(lifecycle-kit/SPEC.md §The state machine); the supervisor still spells it out
-absolutely in the prompt, because an agent cannot read a knob it has no reason
-to look for. What that buys is that the grant becomes **checkable against the
-derivation** instead of being the only record of what was granted — the gap that
-left this whole channel unoracled. That sentence has a second true reading under a
-stage machine whose entry tool opens the journal: the derivation now has an
-**artifact on disk** beside it, so a granted path disagreeing with the derived one
-is visible rather than merely wrong. This kit owns the journal contract and states
-no path convention; that kit owns the path and states no contract.
+**The grant clause stands, with one standing exception: a stage session.** Where
+the consumer runs a stage machine, the journal's path is a **derivation from the
+stage** that the machine owns and computes, and its entry tool opens the journal
+and reports the path to the entering session (lifecycle-kit/SPEC.md §The state
+machine). That report is the path's one source, so the supervisor grants no path
+in a stage session's prompt: a restated grant is a second source the dispatched
+session prefers, which is how journals landed under names the next entry could
+not find. The derivation's **artifact on disk** is what replaces the grant as the
+record of what the session owes. Every other mutating child is still granted its
+path. This kit owns the journal contract and states no path convention; that kit
+owns the path and states no contract.
 
 **"Agent writes" acquires a case: the file may pre-exist the agent.** Under such a
 machine the shape is *the machine opens, the agent writes, the reset sweeps* — a
-journal found at the granted path may carry nothing but an opening line the
+journal found at its derived path may carry nothing but an opening line the
 machine wrote, naming the session that owes it. Nothing in the four clauses
 changes: the agent still lands each finding inline as it is confirmed and still
 appends `DONE` as the file's last line, and it appends under whatever the machine

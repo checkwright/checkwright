@@ -300,7 +300,9 @@ propagate.
   (audit, survey), the return value *is* the contract — don't rely on a journal.
   Reserve the **journal** for agents that **mutate files**, and for those grant
   the journal path explicitly before dispatch rather than assuming the write
-  succeeds. **Worktree isolation is not reserved with it** — the two answer
+  succeeds (a lifecycle-kit stage session is the standing exception — its
+  journal path is derived by its own `--enter-stage` entry, never granted;
+  lifecycle-kit/SPEC.md §The state machine). **Worktree isolation is not reserved with it** — the two answer
   different questions, and bundling them read as *a read-only fan-out needs no
   isolation*, which is the reading that licensed an unreviewed commit on the
   shared branch. A read-only fan-out takes isolation precisely *because* it is
@@ -360,7 +362,7 @@ propagate.
   returned child, not a running narration. The obligation is **durability**, and
   committing and journalling are two ways to discharge it — a session uses
   whichever is available to it. A dispatched session journals, to the path it was
-  granted, because it cannot commit. A top-level session commits, because it can.
+  granted or its stage entry reported, because it cannot commit. A top-level session commits, because it can.
   A top-level session that *cannot* commit right now — another session is holding
   the shared index, the normal condition while an iteration is running — journals
   for as long as that holds, and discharges by committing when the index frees.

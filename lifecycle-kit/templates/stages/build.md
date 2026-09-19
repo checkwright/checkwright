@@ -46,7 +46,8 @@ a fallback before a commit, never as the routine per-task reset.
 **Every session still stamps** — re-run `bash gate-sdk/bin/run-gates.sh --enter-stage build` each
 session: it appends a fresh `<iter> build <session-id> <date> <head>` line with this
 session's id, so WORKFLOW-STATE keeps the per-session audit trail
-(`check-stage-evidence` tolerates multiple `build` stamps). A sibling stamp
+(`check-stage-evidence` tolerates multiple `build` stamps). The entry is also
+where this session's journal path comes from; there is no other source. A sibling stamp
 naming `build` leaves the cursor where it already is, so there is no
 once-per-stage write to coordinate — only a re-run within one session that
 already stamped is reported as an idempotent no-op. Prefer committing the new

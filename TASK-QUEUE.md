@@ -12,26 +12,6 @@
 
 ## New Features
 
-- **stage-journal-path-unsourced-mid-stage** [spec: SPEC-batch-entry.md] — batch sessions of an
-  already-entered stage wrote `-batchN-` journals named by their dispatches, and the next entry
-  refused on the canonical path (attested 2026-09-10 and 2026-09-11, seven sessions).
-  **Ruled at spec:** the session's own `--enter-stage` report is the path's one source. The lead
-  names no path, and the agent contract drops "the dispatch names the journal path". A read-only
-  path arm is refused because no stage session goes without entering.
-  recurrence: stage-journal-path-unsourced-mid-stage 2026-09-11
-  Filed 2026-09-10 by close. Joins `lifecycle-contract-drain` by operator direction (2026-09-19,
-  lead-relayed): journal path.
-
-- **batch-split-stamp-ownership** [spec: SPEC-batch-entry.md] — a batch session could skip its own
-  stage entry, and one 2026-08-29 lead directed it, so the evidence file under-reported a stage's
-  sessions.
-  **Ruled at spec:** per batch, which §The state machine already rules. The binding half is the
-  journal-path ruling: entering is how a session gets its journal. No oracle is buildable, since no
-  tracked artifact names a session but the stamp, and that limit is written into the SPEC.
-  recurrence: batch-split-stamp-ownership 2026-08-29
-  Filed 2026-08-01 at close. Joins `lifecycle-contract-drain` by operator direction (2026-09-19,
-  lead-relayed): stamp fork.
-
 - **lead-specifies-constraint-not-mechanism** [spec: SPEC-relay-discipline.md] — a lead that hands
   down a mechanism spends a stage session's verification on the lead's own guess. Three worked
   instances, the third (2026-08-23) destructive.
@@ -3134,5 +3114,7 @@
 - threshold-recurrence-routing-residency
 - push-budget-unshipped
 - mid-iteration-push-owner-unnamed
+- stage-journal-path-unsourced-mid-stage
+- batch-split-stamp-ownership
 
 ## Lessons Learned

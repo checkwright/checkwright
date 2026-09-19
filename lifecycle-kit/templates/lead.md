@@ -336,14 +336,12 @@ channel it is meant to keep reading for the rest of the unit. It is swept with
 the rest of the scratch dir at the iteration boundary
 (delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps).
 
-**The lead does not name that path — it derives it.** A stage journal's path is
-a function of the stage (lifecycle-kit/SPEC.md §The state machine), so the lead
-still spells it out in the dispatch prompt but is restating a name the entering
-session computes for itself, not minting one. Two things follow for a lead
-splitting one stage across sessions: the batch discriminator belongs in a
-**heading inside** that stage's journal and never in its filename, and the
-lead therefore reads **one** pull channel per stage rather than one per
-dispatch.
+**The lead does not name that path.** A stage journal's path is a function of the
+stage (lifecycle-kit/SPEC.md §The state machine), and the entering session's own
+`--enter-stage` report is its one source, so a dispatch prompt carries no journal
+path. A lead splitting one stage across sessions puts the batch discriminator in a
+**heading inside** that stage's journal, never in a filename, and reads **one**
+pull channel per stage.
 
 ## A running session is asked, never instructed
 

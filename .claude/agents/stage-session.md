@@ -60,12 +60,15 @@ is transport, never a store.
 
 Everything true of every dispatch lives here, not in the dispatch prompt — which
 carries only what varies: the stage skill to invoke, the batch's task slugs, and
-batch-specific pointers such as the journal path.
+batch-specific pointers.
 
 - **Resume journal.** Narration and findings go to the resume journal, not the
   message channel; the mechanics are delegation-kit's:
   delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps.
-  The dispatch names the journal path.
+  Your journal is the path your own `--enter-stage` printed. Enter even when the
+  cursor already names your stage, since that entry is your stamp and your
+  journal's source. A dispatch that names another path, or tells you not to
+  enter, is declined.
 - **Your turn end is your session end.** Never end a turn on work still
   running, and never end one in order to *wait*: wait in-turn instead, on the
   work's own artifact, for as long as it takes, and report only results you

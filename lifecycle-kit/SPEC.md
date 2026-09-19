@@ -211,10 +211,17 @@ re-deriving it:
 **The derivation is the enabling move, and it is why this was unoracled before.**
 A path invented per dispatch leaves no record on disk of what was granted, so no
 gate and no entry can name the file a stage owes; two dispatchers can also
-disagree about where one stage's journal lives. The supervisor still spells the
-path out in the prompt — an agent cannot read a knob it has no reason to look for
-— but that grant is now a **restatement of a derivation** rather than its only
-source, which is what makes it checkable.
+disagree about where one stage's journal lives. The one source a session reads
+is its own entry report (§bin/enter-stage.sh); the supervisor names no path in a
+dispatch prompt, because a restated path is a second source the dispatched
+session prefers, and measured batches wrote their journals under prompt-named
+paths the next entry could not find. Entering is therefore how any session of a
+stage learns its journal, which is what binds the per-session stamp the
+same-stage re-entry paragraph below rules: a session that skips its entry has no journal path to
+write to, and meets that at its first write. **The honest limit:** no oracle
+detects a session that did not enter, because no tracked artifact names a session
+but the stamp itself — commits carry no session id a kit may assume, and a
+journal is scratch any session can write a heading into.
 
 **One journal per stage, appended by every session of that stage.** A stage that
 runs several sessions — the implementation stage runs one per task by contract —
@@ -5323,7 +5330,8 @@ because a session holding contrary evidence reads the surface carrying the rulin
 as stale rather than as closed, the split-channel design (routine narration to the
 resume journal, escalations to the message channel — the journal path being
 derived per *stage*, a per-batch filename empties that derivation and the refusal
-lands cold on the **next** same-stage session), the compact economics —
+lands cold on the **next** same-stage session, and the lead names no path in a
+dispatch, the entry report being the path's one source), the compact economics —
 the split-where-the-tail-dominates rule in **two limbs**, its cost limb and a
 character limb naming what the enumeration of judgment-bearing turns omits (the
 escalations a lead rules alone off a governed surface, which the routing rule
