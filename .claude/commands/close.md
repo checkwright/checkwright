@@ -131,3 +131,7 @@ not nothing: silence is not a disposition.
 
 Disposition evidence: `.workflow/release-disposition.txt` (committed,
 boundary-required and boundary-truncated per `scripts/lifecycle-config.knobs`).
+
+**push-budget** — one to two pushes per iteration; up to two hotfix pushes for a
+red push, unasked, and a third is asked for. Each push is watched to green on the
+`gates` workflow (`gh run watch`).

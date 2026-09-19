@@ -134,11 +134,21 @@ observed simply cannot drain in the iteration that bought it.
 
 **The seam is held deliberately.** *How many* pushes an iteration may spend is
 consumer content and this rule names no number; it constrains only **where** the
-first one falls, which is an ordering this machine already owns. **And the rule
-is not enforceable** — a push's timing is no tree state, so no arm in this kit
-observes that a push was or was not spent. It is a session obligation carried by
-prompts, and calling it gated would be the false claim; what the machine
-contributes is a refusal that names it (§check-stage-entry).
+first one falls, which is an ordering this machine already owns. The count's
+reader is a session, so it is close's `push-budget` slot and not a knob: no arm
+would read a knob, and a default would ship one consumer's policy as the kit's
+(§templates/stages/). **The actor is the stage session whose next act reads the
+run the push produces.** For an `[observed-by:]` entry that is the session landing
+the entry's work: it pushes after its landing commit, waits in-turn for the run,
+and reads it before the Done move. A stage using a remote run as its oracle pushes
+for itself. A fixed pushing stage would contradict the placement rule wherever a
+different stage lands the work. The lead never pushes, a push publishing the
+lifecycle state it never writes (the optional-lead paragraph below). Every push, at any stage, runs the per-push identity precondition close's
+push step names. **And the rule is not enforceable** — a push's timing and its
+actor are no tree state, so no arm in this kit observes that a push was or was not
+spent, or by whom. It is a session obligation carried by prompts, and calling it
+gated would be the false claim; what the machine contributes is a refusal that
+names it (§check-stage-entry).
 
 Where `<producer>` is a **release run** — tag-triggered, so no mid-iteration
 push can fire it — the placement is unsatisfiable, and the branch belongs to the
@@ -5117,7 +5127,10 @@ re-verification record already takes.
 The `close` template's **push-identity precondition** is per-push and not
 per-session, an identity selected at a session's start being no evidence about
 the moment a later push happens; no gate substitutes for it, since an identity
-check grades that a login exists and never which one is selected.
+check grades that a login exists and never which one is selected. It binds a
+mid-iteration pusher too (§The state machine). The same step carries the
+`push-budget` slot, on the ground the `drain-inputs` paragraph states: the count's
+reader is the pushing session, so the value is a slot and not a knob.
 
 The `align` template's surviving-surface rule and its read-site verification each
 carry a ground: an amendment is deleted at merge, so a correction written into one

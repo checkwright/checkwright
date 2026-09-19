@@ -429,7 +429,8 @@ ruling classes are stated.>*
 ## Stamps are authoritative (the load-bearing invariant)
 
 The lead writes **no** lifecycle state — no WORKFLOW-STATE stamps, no queue
-writes, no evidence files. Every stamp originates in the stage session via
+writes, no evidence files, no push — a push is the stage session's whose next act
+reads its run (lifecycle-kit/SPEC.md §The state machine). Every stamp originates in the stage session via
 `--enter-stage`. Lead-does-stamping is ruled out, not merely omitted
 (lifecycle-kit/SPEC.md §The state machine).
 

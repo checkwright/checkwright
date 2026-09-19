@@ -289,6 +289,9 @@ session.
    outside the tree, the release procedure's pointer to that local runbook is the
    one to follow here too, rather than a second formulation. **No gate
    substitutes for this.**
+   *<push-budget: how many pushes this consumer's iteration may spend, how many
+   hotfix pushes a red push earns before the operator is asked, and the remote run a
+   push is watched to — or a plain "no remote — nothing is pushed" line.>*
 
 **Last step — the resume journal.** This stage's exit artifact is the resume
 journal the `--enter-stage` arm named at the stamp; its path is a derivation

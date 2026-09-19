@@ -12,22 +12,6 @@
 
 ## New Features
 
-- **push-budget-unshipped** [spec: SPEC-push-owner.md] — the push budget lives only in this repo's
-  CLAUDE.md, where no kit surface reads it and no adopter is prompted to set one.
-  **Ruled at spec:** a close.md `push-budget` slot, not a knob, because §The state machine already
-  rules the count consumer content and no arm observes a push. This repo's close binding carries the
-  numbers and CLAUDE.md points at it.
-  Filed 2026-09-15 by `config-seam-fourth-cut`'s close. Joins `lifecycle-contract-drain` by
-  operator direction (2026-09-19, lead-relayed): push count.
-
-- **mid-iteration-push-owner-unnamed** [spec: SPEC-push-owner.md] — no lifecycle surface names which
-  session makes an iteration's mid-iteration push.
-  **Ruled at spec:** the stage session whose next act reads the run pushes. For an entry tagged
-  observed-by, that is the session landing its work, which reads the run before the Done move.
-  The lead never pushes. A fixed validate owner is refused against the placement rule.
-  Kept distinct from `push-budget-unshipped` by operator direction (2026-09-19, lead-relayed): that
-  entry owns the count, this one the actor. Filed 2026-09-19 by the `windows-adopter-path` lead.
-
 - **stage-journal-path-unsourced-mid-stage** [spec: SPEC-batch-entry.md] — batch sessions of an
   already-entered stage wrote `-batchN-` journals named by their dispatches, and the next entry
   refused on the canonical path (attested 2026-09-10 and 2026-09-11, seven sessions).
@@ -3148,5 +3132,7 @@
 - scope-unit-set-ignores-deferred-inflow
 - stage-commit-subject-scope-unowned
 - threshold-recurrence-routing-residency
+- push-budget-unshipped
+- mid-iteration-push-owner-unnamed
 
 ## Lessons Learned

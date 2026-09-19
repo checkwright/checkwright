@@ -112,7 +112,10 @@ soon as its subject exists, before the delta resting on it lands, and the
 merge carries what it returned. A change carrying an artifact surface — a change whose real output is a deployed
 or generated artifact — names that surface and exercises the artifact
 deployment-faithfully before the stage exits; a green battery is tree-correct,
-not artifact-correct (Oracle-first).
+not artifact-correct (Oracle-first). An entry carrying `[observed-by:]` is
+complete only when its run is read: after its landing commit, run close's push
+precondition, push, wait in-turn for the run, and read it before the Done move
+(lifecycle-kit/SPEC.md §The state machine).
 
 **Last step — the resume journal.** This stage's exit artifact is the resume
 journal the `--enter-stage` arm named at the stamp; its path is a derivation
