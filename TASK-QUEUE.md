@@ -33,16 +33,6 @@
   Filed 2026-09-05 to the gap inbox at spec and at build's batch 3; promoted 2026-09-19 at
   `adopter-floor-native-rungs`' spec.
 
-- **kit-token-anchor-hook-for-divergence** [spec: SPEC-couples-anchor.md] — a `kit:<glob>` couples
-  token expands against two anchors, so under a subdirectory vendoring `--for` selects against globs
-  no staged path matches. Every couples reader matching a repository path takes the
-  working-directory spelling the hook uses; `check-graph`'s vocabulary match keeps the kit-parent
-  one. A unit test vendors kits under a subdirectory.
-  **Done-state:** the subdirectory test passes for the hook, `--for` and `check-reads-couples`, and
-  the amendment is merged.
-  Filed 2026-09-15 to the gap inbox from the git-hooks port's sandbox byte-parity proof; promoted
-  2026-09-19 at `adopter-floor-native-rungs`' spec.
-
 - **substrate-parity-audits-one-producer-of-two** [spec: SPEC-release-workflow-set.md] —
   `check-gate-substrate-parity` assertion F audits one workflow, and `.github/workflows/gates.yml`
   also builds and hashes a release-shaped artifact. The knob becomes a list, this repo names both
@@ -3036,5 +3026,6 @@
 ## Done
 
 - floor-jq-guard-lib
+- kit-token-anchor-hook-for-divergence
 
 ## Lessons Learned
