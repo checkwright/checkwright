@@ -27,3 +27,10 @@
 - rev: 26192fcd1fceb6ccf2c8a0f86d30ff036a88d251
 - finding: jq read 1.68 ms/call; binary --version 0.60 ms; binary --hook agent-dispatch-guard with stdin 0.82 ms; whole hook on an allowed ls 52.4 ms with 3 jq spawns (guard_read_command, one guard_input_field, guard_allow); the library already spawns the binary once per call for --emit-knob-values (guard.sh:2075)
 - inferred: the per-call figures are one 14-core Linux host's, unrepeated elsewhere
+
+## 2026-09-19 align — Do the five adopter-floor-native-rungs amendments self-check: do their line/site citations match the current tree, and does every '## Existing sections updated' entry name the delta it belongs to?
+- corpus: SPEC-binary-door.md SPEC-guard-lib-native-reads.md SPEC-fail-open-set.md SPEC-couples-anchor.md SPEC-release-workflow-set.md
+- oracle: bash gate-sdk/bin/run-gates.sh, plus git grep -n on each amendment's cited symbols/line numbers against the files they name
+- rev: 9408f8f30f649385fb7a02852f4b758d3ef3aaca
+- finding: battery green (118/118) both before and after; binary-door, fail-open-set and release-workflow-set citations (toolfloor.rs, gate.sh, guard.sh, run-gates.sh/.ps1, gates.yml lines, gate_substrate_parity.rs, init.rs) all matched the tree byte-for-byte; couples-anchor's main table (kit_roots/kit_roots_rel callers) matched, but its filed non-couples list cited gates/kit_enum.rs:123 and knobs/evidence_kit.rs:44-49, neither of which calls kit_roots_rel — the survey oracle (git grep kit_roots_rel/expand_couples) lands on kit_enum.rs:45 and evidence_kit.rs:50, corrected in-place; guard-lib-native-reads' point 6 named only one of three toolfloor.rs:240-246 owed_names assertions jq's contributor move touches (245 undecided, 246 not-owed were unstated), and one roster bullet (guard-kit/SPEC.md :2338-2342/:2722-2725) attributed a delta-1-and-3 compound change to delta 3 alone — both amended; both fixes committed as 9408f8f3
+- inferred: which gates.yml Linux runners resolve /bin/sh to dash, and whether PowerShell 5.1/7 run a ./-prefixed binary path, are the amendments' own cannot-run-before-build markers, not re-verified here
