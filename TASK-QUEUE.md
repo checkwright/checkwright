@@ -12,6 +12,58 @@
 
 ## New Features
 
+- **floor-bash-hooks-front-end** [spec: SPEC-binary-door.md] — the generated git hooks and the
+  bash front-end hold `bash:4.3` on the adopter floor. Rung 4a of the adopter-floor ladder: the
+  hooks become POSIX sh, `init` runs the binary it placed instead of spawning bash, its follow-up
+  block and the starter and prose adopter text name the binary, and `bash` is owed only where a
+  selected kit reaches it. The shim refusal stands; the wider door sweep and the PowerShell twin's
+  retirement are filed, not built.
+  **Done-state:** the consumer smoke's bash-less arm installs the starter and prose profiles and
+  commits through the hook with no `bash` on `PATH`, and the amendment is merged.
+  Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 4a, by operator direction; promoted
+  2026-09-19 at `adopter-floor-native-rungs`' spec, where it leads the unit.
+
+- **floor-jq-guard-lib** [spec: SPEC-guard-lib-native-reads.md] — guard-kit's `lib/guard.sh`
+  spawns `jq` at seven sites plus one presence probe, so `jq` is on every guard-kit adopter's floor.
+  Rung 4b: the reads and renders move to a `--guard-json` flag of the gate binary, which the library
+  already needs, while the library stays shell. Code location and per-call latency are settled in
+  the amendment: beside guard-kit's compiled twins in `native/src/guard.rs`, one spawn per read,
+  measured at about half a `jq` spawn.
+  **Done-state:** `lib/guard.sh` spawns no `jq`, the guard suite passes with `jq` masked, a
+  guard-kit profile installs on a `jq`-less host, and the amendment is merged.
+  Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 4b; promoted 2026-09-19 onto its own
+  amendment.
+
+- **fail-open-arm-status-second-source** [spec: SPEC-fail-open-set.md] — both front-end stubs hold
+  the fail-open arm set (`--hook`, `--statusline`) as a two-name test, and nothing holds it to the
+  arms' contracts. The crate declares the set beside the arm table, each stub holds it on one
+  declaration line, and a new native gate, `check-front-end-fail-open`, holds both copies to the
+  declaration.
+  **Done-state:** the gate is registered and green, its fixture pair reds each direction in each
+  dialect, and the amendment is merged.
+  Filed 2026-09-05 to the gap inbox at spec and at build's batch 3; promoted 2026-09-19 at
+  `adopter-floor-native-rungs`' spec.
+
+- **kit-token-anchor-hook-for-divergence** [spec: SPEC-couples-anchor.md] — a `kit:<glob>` couples
+  token expands against two anchors, so under a subdirectory vendoring `--for` selects against globs
+  no staged path matches. Every couples reader matching a repository path takes the
+  working-directory spelling the hook uses; `check-graph`'s vocabulary match keeps the kit-parent
+  one. A unit test vendors kits under a subdirectory.
+  **Done-state:** the subdirectory test passes for the hook, `--for` and `check-reads-couples`, and
+  the amendment is merged.
+  Filed 2026-09-15 to the gap inbox from the git-hooks port's sandbox byte-parity proof; promoted
+  2026-09-19 at `adopter-floor-native-rungs`' spec.
+
+- **substrate-parity-audits-one-producer-of-two** [spec: SPEC-release-workflow-set.md] —
+  `check-gate-substrate-parity` assertion F audits one workflow, and `.github/workflows/gates.yml`
+  also builds and hashes a release-shaped artifact. The knob becomes a list, this repo names both
+  workflows, and F counts `sha256sum` only in command position, which the widening needs because
+  four presence-check loops in `gates.yml` read as digests today. Shares assertion F with the debt
+  unit `substrate-parity-digest-assertion-stops-at-the-workflow-text`; the two land together or
+  this one first.
+  **Done-state:** the battery's assertion F reads both workflows clean, and the amendment is merged.
+  Filed 2026-09-08 by close from the gap inbox; promoted 2026-09-19 at this iteration's spec.
+
 ## Technical Debt
 
 - **substrate-parity-digest-assertion-stops-at-the-workflow-text** — assertion F of
@@ -148,31 +200,6 @@
   `guard-hook-windows-substrate` was designed. Owner lookup: `PowerShell tool`,
   `USE_POWERSHELL_TOOL`, `Bash|PowerShell` — none.
 
-- **floor-bash-hooks-front-end** [cost: event/high] [surface: gate-sdk] — the generated git
-  hooks and the bash front-end hold `bash:4.3` on the adopter floor; rung 4a of the adopter-floor
-  ladder has them reach the binary directly.
-  **Why design-pending:** the front-end's knob and dispatch duties and the hook generator's
-  output contract each need a native home ruled, and the PowerShell twin's fate rides the same
-  ruling.
-  **Cost while deferred:** bash stays a floor member on every platform, macOS's stock 3.2
-  included, which needs the Homebrew remedy.
-  Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 4a, by operator direction.
-  Joins this iteration by operator direction (2026-09-19, lead-relayed): the lead unit.
-
-- **floor-jq-guard-lib** [cost: event/high] [surface: guard-kit] — guard-kit's `lib/guard.sh`
-  spawns `jq` at seven sites plus one presence probe, so `jq` stays on every guard-kit adopter's
-  floor. The library is permanently shell (its `# no-port:`), so rung 4b of the adopter-floor
-  ladder moves those reads and renders to the gate binary, whose JSON parsing is
-  already in-process (`native/src/json.rs`), and keeps the shell seam.
-  **Why design-pending:** the hook runs on every tool call, so spawning the binary per field
-  prices latency the current `jq` pipes do not pay. The arm's shape (one call per payload or one
-  per field) and its fail-open posture, which must match the library's, need ruling.
-  **Cost while deferred:** `jq` cannot leave the floor for any guard-kit adopter.
-  Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 4b; mechanism from the
-  concurrent objective-1 consult, lead-relayed.
-  Joins this iteration by operator direction (2026-09-19, lead-relayed); its code-location and
-  per-call spawn-latency questions ride in unruled, spec's to settle or escalate.
-
 - **stamp-subject-merge-carve-out-unruled** [cost: event/low] [surface: lifecycle-kit] —
   `check-stamp-subject` reds a commit adding stamp lines under git's own `Merge …` subject, which
   has no scope to parse (lifecycle-kit/SPEC.md §check-stamp-subject, honest limits), while
@@ -205,24 +232,6 @@
   **Cost while deferred:** a gap filer who names a proposed knob reds the battery and rewords.
   Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, from the red its own
   filing hit; promoted at the next iteration's scope.
-
-- **kit-token-anchor-hook-for-divergence** [cost: event/low] [surface: gate-sdk] — a
-  `kit:<glob>` couples token expands against two different anchors, so where kits are not vendored
-  at the repository root `run-gates --for` selects against globs no staged path matches.
-  **Read off the source at the drain:** the hook emitter (`native/src/emit/git_hooks.rs`, its
-  context) spells kit roots relative to the repository root, since hook globs match repo-relative
-  staged paths; `--for`'s selector (`native/src/runner.rs`), the graph emitter, port-blockers and
-  the substrate-parity pass expand through `walk::kit_roots_rel`, anchored at the gate-sdk root's
-  parent. In this tree both spell the same roots. gate-sdk/SPEC.md §run-gates rules any divergence
-  between what the hook runs for a staged path and what `--for` runs a bug.
-  **Why design-pending and not a drain fix:** only the `--for` reader's anchor is settled by
-  that rule; whether the graph, port-blockers and parity readers follow is a per-reader call, and
-  the proof needs a fixture vendoring kits under a subdirectory, which no suite carries.
-  **Cost while deferred:** paid by an adopter who hand-vendors kits under a subdirectory (`init`
-  vendors at the root) and asks `--for` what a path triggers: a silently wrong answer.
-  Filed 2026-09-15 to the gap inbox from the git-hooks port's sandbox byte-parity proof; promoted
-  at `owed-port-tail`'s close.
-  Joins this iteration by operator direction (2026-09-19, lead-relayed): 4a's hook generator.
 
 - **gate-tamper-default-library-path-unvendored** [cost: event/low] [surface: delegation-kit] — the kit
   default of `DELEGATION_KIT_GATE_FILES` (`native/src/knobs/delegation_kit.rs`,
@@ -601,29 +610,6 @@
   witness only, riding that unit's `run-smoke.sh` upgrade arm; green in 12 master runs since.
   **Re-costed iteration/high to event/high — operator direction, 2026-09-17, lead-relayed:** the
   cost is per firing, and the leg passed in the last 20 master `gates` runs.
-
-- **substrate-parity-audits-one-producer-of-two** [cost: event/high] [surface: gate-sdk] — the parity gate's release-path
-  assertions read a single named workflow, and the tree now has two workflows that build and hash a
-  published-shaped artifact.
-  **Verified at source 2026-09-08.** `native/src/gates/gate_substrate_parity.rs`:696 resolves
-  `GATE_SDK_NATIVE_PUBLISH_WORKFLOW` as a SCALAR, defaulted to the publish workflow, and both of
-  assertion F's checks sit inside the block guarded by that one path — the roster-derived-matrix
-  check at :706 and the one-producer-per-digest check at :711-713. `.github/workflows/gates.yml`
-  is never opened.
-  **What is unaudited, measured rather than asserted.** That workflow now carries a roster-derived
-  matrix (:737) and TWO digest-computing sites in different jobs, :494 and :819-822 — the filing
-  bullet said one. The assertions' stated subject is the publish path; the tree has two paths of
-  that shape and one of them is audited.
-  **Cheapest candidate shape, unpriced:** widen the knob from a scalar to a workflow SET rather
-  than adding a second gate. **Why that is not a small edit:** a knob's arity is an adopter-facing
-  contract, so the change reaches the kit's shell default, both SPEC declarations, the crate
-  registry, the member itself and both fixture trees' config files.
-  **Cost while deferred:** a second release-shaped producer can drift from the parity contract with
-  no verdict, and the gate reads green while covering half the corpus its own assertions name.
-  Filed 2026-09-08 by close from the gap inbox. Promoted rather than fixed because a knob-arity
-  change is adopter-facing design; promoted rather than iceboxed because the second producer is
-  live in the tree today.
-  Joins this iteration by operator direction (2026-09-19, lead-relayed): assertion F's pair.
 
 - **held-ci-leg-failure-reddens-a-binding-one** [cost: event/high] [surface: .github] — a held producer leg's failure
   fails the workflow through a binding consumer leg, so held-ness is defeated for the pair, and the
@@ -2401,37 +2387,6 @@
   promoted here at this iteration's scope, →fix refused (a new gate is build work, not scope's) and
   →icebox refused on the product witness above. Deferred and not active on scope's composition
   test, re-grounded 2026-09-11: no iteration since has shared its surface.
-
-- **fail-open-arm-status-second-source** [cost: event/high] [surface: gate-sdk] — the stub holds the non-gate arms'
-  unavailable exit status as a two-name shell test, and nothing holds that set in lockstep with
-  the status each arm's own contract prose states.
-  **Re-verified at the drain rather than taken from the bullets.** `gate-sdk/bin/run-gates.sh`
-  sets `ARM_UNAVAILABLE_STATUS=2` and flips it to `0` for `--hook | --statusline` alone, the
-  harness-integration arms. The shell must keep holding it: the value is read exactly when
-  the binary is absent and cannot be asked, so this duplication cannot be removed the way the
-  dispatch loop's was — only asserted.
-  **Two bullets, one gap.** This drain merged the spec filing, which names the crate's per-arm
-  contract prose as the second source, with batch 3's, which names each arm's own SPEC section.
-  They are two spellings of one second source and a single assertion closes both.
-  **Why →fix failed at the drain:** the closure is a parity assertion over the fail-open set, and
-  a new gate here is born native — a Rust module, a `.gate` descriptor and a `good/`+`bad/`
-  fixture pair — which is build work, not a close-session edit.
-  **Why →icebox failed:** the trigger is live. `--hook` and `--statusline` are the whole fail-open
-  set today and the port run keeps landing non-gate arms (gate-sdk/SPEC.md §The non-gate arm), so
-  the first harness-integration arm added without the two-name test wedges a binary-less adopter
-  at the exact point a hook grades a user action.
-  **Product-class on TRAJECTORY.md's 2026-08-30 witness discriminator**, which is what keeps this
-  off the one-line tier: `run-gates.sh` is the adopter entry point, so the demand witness is a
-  vendored tree with no binary rather than this repo's own accounting.
-  **Deliverable:** an assertion that the shell's fail-open name set equals the set of arms whose
-  owning SPEC section declares status 0, including which of the two surfaces is authoritative when
-  they disagree.
-  **Cost while deferred:** the set is two names and correct today, so the whole cost is future — a
-  divergence lands silently and is found by an adopter rather than by the battery.
-  Filed 2026-09-05 to the gap inbox at spec and again at build's batch 3; promoted at this close.
-  Deferred and not active on scope's composition test, re-grounded 2026-09-11: no iteration
-  since has shared its surface.
-  Joins this iteration by operator direction (2026-09-19, lead-relayed): 4a's front-end.
 
 - **kit-spec-seam-content-half-unswept** [cost: event/high] [surface: gate-sdk] — the provenance seam has two halves and
   the sweep that ran carried a discriminator for only one, so gate-sdk/SPEC.md is swept of private
