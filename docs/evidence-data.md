@@ -195,3 +195,4 @@
 | native-spawn-residue | sc sp a b v c | 5f/2d | 2 · ≤0d | 20s clean | 117 |
 | declined-target-audit | sc sp a b v c | 4f/0d | 3 · ≤0d | 20s clean | 117 |
 | windows-bash-floor | sc · a b v c | 2f/3d | 1 · ≤0d | 27s clean | 117 |
+| windows-adopter-path | sc sp a b v c | 6f/4d | 4 · ≤1d | 41s clean | 117 |
