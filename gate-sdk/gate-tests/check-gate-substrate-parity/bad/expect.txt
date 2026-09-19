@@ -15,6 +15,7 @@ malformed target triple: 'notatriple'
 matrix declaration not roster-derived: publish.yml
 digest recomputed: job 'build'
 digest computed by a consumer: job 'release'
+digest recomputed: job 'artifact' in ci.yml computes 2 digests
 hold ground unreachable: scripts/check-nospec.sh
 hold ground not in the pointed-at section: scripts/check-ungrounded.sh
 stale unregistered declaration: scripts/gates.list declares 'check-alpha' unregistered and registers it

@@ -1,0 +1,16 @@
+# Hermetic fixture: a CI workflow whose build step calls a shared body hashing
+# with a sha256sum-else-shasum pair (one producer), and a consumer job that only
+# names the hasher in a presence loop before verifying. Not a runnable workflow.
+jobs:
+  artifact:
+    steps:
+      - run: bash ci/build-artifact.sh "$TARGET" out
+      - uses: actions/upload-artifact@0000000000000000000000000000000000000000
+  smoke:
+    steps:
+      - uses: actions/download-artifact@0000000000000000000000000000000000000000
+      - run: |
+          for t in bash sha256sum shasum tar; do
+            command -v "$t" >/dev/null || echo "missing $t"
+          done
+          sha256sum -c "$binary.sha256"

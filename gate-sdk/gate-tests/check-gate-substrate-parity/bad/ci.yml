@@ -1,0 +1,9 @@
+# Hermetic fixture: a CI workflow re-adding an emission beside the call to a
+# shared body that already emits it — the second producer only a followed
+# script reveals.
+jobs:
+  artifact:
+    steps:
+      - run: bash ci/build-artifact.sh "$TARGET" out
+      - run: sha256sum "$binary" > "$binary.sha256"
+      - uses: actions/upload-artifact@0000000000000000000000000000000000000000

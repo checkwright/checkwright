@@ -1662,8 +1662,8 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-gate-substrate-parity",
         gate_substrate_parity::run,
         &[
-            ("?", "", "", "dynamic@src/gates/gate_substrate_parity.rs:703"),
-            ("?", "", "", "dynamic@src/gates/gate_substrate_parity.rs:728"),
+            ("?", "", "", "dynamic@src/gates/gate_substrate_parity.rs:788"),
+            ("?", "", "", "dynamic@src/gates/gate_substrate_parity.rs:813"),
         ],
         &[
             "GATE_SDK_GATES_DIR",

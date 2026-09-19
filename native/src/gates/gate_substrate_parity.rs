@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — one declaration per member,
 // descriptor/subcommand parity both ways, a disposition for every substrate-sensitive member,
 // no implementation source in the vendoring set, and one owner for the target roster
+use crate::bashscan::{self, Kind, Token};
 use crate::fresh;
 use crate::gates;
 use crate::registry;
@@ -337,20 +338,98 @@ fn uses_action(line: &str, action: &str) -> bool {
     false
 }
 
-fn computes_digest(line: &str) -> bool {
-    if ltrim(line).starts_with('#') || !line.contains("sha256sum") {
-        return false;
+// spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion F, a digest is computed by a
+// hasher in command position carrying no verification operand, never by a mention of its name
+const DIGEST_TOOLS: [&str; 2] = ["sha256sum", "shasum"];
+
+const SCRIPT_SHELLS: [&str; 2] = ["bash", "sh"];
+
+fn computes_digest(t: &Token) -> bool {
+    t.kind == Kind::Cmd
+        && DIGEST_TOOLS.contains(&t.word.as_str())
+        && !t.operands.iter().any(|o| o.starts_with("-c") || o == "--check")
+}
+
+fn called_script(t: &Token) -> Option<&str> {
+    if t.kind != Kind::Cmd || !SCRIPT_SHELLS.contains(&t.word.as_str()) {
+        return None;
     }
-    let mut from = 0usize;
-    while let Some(at) = line[from..].find("sha256sum") {
-        let after = &line[from + at + "sha256sum".len()..];
-        let spaced = after.trim_start_matches([' ', '\t']);
-        if spaced.len() < after.len() && spaced.starts_with("-c") {
-            return false;
+    let path = t.operands.iter().find(|o| !o.starts_with('-'))?;
+    Path::new(path).is_file().then_some(path.as_str())
+}
+
+fn add_producers(chains: &mut [Vec<usize>], top: &mut usize, n: usize) {
+    match chains.last_mut().and_then(|c| c.last_mut()) {
+        Some(arm) => *arm += n,
+        None => *top += n,
+    }
+}
+
+// spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion F, one producer per digest:
+// the alternatives of one `if` chain are one emission, and a `run:` step's called script is read
+// one hop deep with the same counter
+fn digest_producers(body: &str, follow: bool, followed: &mut Vec<String>) -> Result<usize, String> {
+    let mut chains: Vec<Vec<usize>> = Vec::new();
+    let mut top = 0usize;
+    for t in bashscan::command_words(body) {
+        match (t.kind, t.word.as_str()) {
+            (Kind::Keyword, "if") => chains.push(vec![0]),
+            (Kind::Keyword, "elif" | "else") => {
+                if let Some(c) = chains.last_mut() {
+                    c.push(0);
+                }
+            }
+            (Kind::Keyword, "fi") => {
+                if let Some(c) = chains.pop() {
+                    let n = c.into_iter().max().unwrap_or(0);
+                    add_producers(&mut chains, &mut top, n);
+                }
+            }
+            (Kind::Cmd, _) => {
+                if computes_digest(&t) {
+                    add_producers(&mut chains, &mut top, 1);
+                } else if let Some(script) = called_script(&t).filter(|_| follow) {
+                    let text = read(script)?;
+                    followed.push(script.to_string());
+                    let n = digest_producers(&text, false, followed)?;
+                    add_producers(&mut chains, &mut top, n);
+                }
+            }
+            _ => {}
         }
-        from += at + "sha256sum".len();
     }
-    true
+    while let Some(c) = chains.pop() {
+        let n = c.into_iter().max().unwrap_or(0);
+        add_producers(&mut chains, &mut top, n);
+    }
+    Ok(top)
+}
+
+// spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion F reads a step's shell body: the
+// inline value after `run:`, or the block under `run: |` or `run: >` indented past the key
+fn run_body(lines: &[&str], i: usize) -> Option<(String, usize)> {
+    let t = ltrim(lines[i]);
+    let t = t.strip_prefix("- ").map(ltrim).unwrap_or(t);
+    let value = trim(t.strip_prefix("run:")?);
+    let keycol = (lines[i].len() - t.len()) as i64;
+    if value.starts_with('|') || value.starts_with('>') {
+        let mut j = i + 1;
+        let mut body: Vec<&str> = Vec::new();
+        while j < lines.len() && (section::blank(lines[j]) || ind(lines[j]) > keycol) {
+            body.push(lines[j]);
+            j += 1;
+        }
+        return Some((body.join("\n"), j - i - 1));
+    }
+    let b = value.as_bytes();
+    let unquoted = if b.len() >= 2 && b[0] == b'\'' && b[b.len() - 1] == b'\'' {
+        value[1..value.len() - 1].replace("''", "'")
+    } else if b.len() >= 2 && b[0] == b'"' && b[b.len() - 1] == b'"' {
+        value[1..value.len() - 1].to_string()
+    } else {
+        value.to_string()
+    };
+    Some((unquoted, 0))
 }
 
 fn job_name(line: &str) -> Option<String> {
@@ -374,11 +453,15 @@ fn job_name(line: &str) -> Option<String> {
     }
 }
 
-fn workflow_digests(text: &str) -> Vec<JobDigests> {
+fn workflow_digests(text: &str, followed: &mut Vec<String>) -> Result<Vec<JobDigests>, String> {
     let mut out: Vec<JobDigests> = Vec::new();
     let mut injobs = false;
     let mut cur: Option<JobDigests> = None;
-    for line in section::split_lines(text) {
+    let lines = section::split_lines(text);
+    let mut i = 0usize;
+    while i < lines.len() {
+        let line = lines[i];
+        i += 1;
         if trim(line) == "jobs:" && line.starts_with("jobs:") {
             injobs = true;
             continue;
@@ -405,8 +488,10 @@ fn workflow_digests(text: &str) -> Vec<JobDigests> {
             }
         }
         if let Some(j) = cur.as_mut() {
-            if computes_digest(line) {
-                j.computed += 1;
+            if let Some((body, consumed)) = run_body(&lines, i - 1) {
+                j.computed += digest_producers(&body, true, followed)?;
+                i += consumed;
+                continue;
             }
             if uses_action(line, "download-artifact") {
                 j.downloads = true;
@@ -419,7 +504,7 @@ fn workflow_digests(text: &str) -> Vec<JobDigests> {
     if let Some(j) = cur.take() {
         out.push(j);
     }
-    out
+    Ok(out)
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
@@ -773,19 +858,25 @@ fn rule(args: &[String]) -> Result<i32, String> {
         ctx.findings.push(format!("no target roster: {} is absent, but {} registered member(s) dispatch to the binary and {} carries tracked source here — a tree that builds the artifact declares the platforms it carries one for", roster_file, dispatching, crate_dir));
     }
 
-    let workflow = walk::knob_scalar("GATE_SDK_NATIVE_PUBLISH_WORKFLOW")?;
-    let mut wf_state = "absent";
+    let workflows = walk::knob_words("GATE_SDK_NATIVE_PUBLISH_WORKFLOW")?;
+    let mut wf_read: Vec<&str> = Vec::new();
+    let mut wf_absent: Vec<&str> = Vec::new();
     let mut wf_matrix = 0usize;
     let mut wf_jobs = 0usize;
-    if Path::new(&workflow).is_file() {
-        wf_state = "read";
-        let text = read(&workflow)?;
+    let mut wf_followed: Vec<String> = Vec::new();
+    for workflow in &workflows {
+        if !Path::new(workflow).is_file() {
+            wf_absent.push(workflow);
+            continue;
+        }
+        wf_read.push(workflow);
+        let text = read(workflow)?;
         let (declarations, literals) = matrix_literals(&text);
-        wf_matrix = declarations;
+        wf_matrix += declarations;
         for (lno, line) in literals {
             ctx.findings.push(format!("matrix declaration not roster-derived: {}:{} '{}' is a literal where an expression over {} belongs — a hand-written platform in a build matrix is a second spelling of the support commitment", workflow, lno, ltrim(&line), roster_file));
         }
-        for j in workflow_digests(&text) {
+        for j in workflow_digests(&text, &mut wf_followed)? {
             wf_jobs += 1;
             if j.computed > 1 {
                 ctx.findings.push(format!("digest recomputed: job '{}' in {} computes {} digests — each is emitted once, where its bytes are produced, and moved thereafter", j.job, workflow, j.computed));
@@ -794,6 +885,12 @@ fn rule(args: &[String]) -> Result<i32, String> {
             }
         }
     }
+    wf_followed.sort();
+    wf_followed.dedup();
+    let list_or_none = |v: &[&str]| if v.is_empty() { "none".to_string() } else { v.join(" ") };
+    let wf_read_list = list_or_none(&wf_read);
+    let wf_absent_list = list_or_none(&wf_absent);
+    let wf_followed_n = wf_followed.len();
 
     if !ctx.findings.is_empty() {
         println!("check-gate-substrate-parity: the gate substrate seam is not conserved:");
@@ -807,7 +904,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     println!(
-        "GATE-SUBSTRATE-PARITY: clean ({declared} member(s) with one declaration each, {dispatching} of them dispatching to the binary; {noport_declared} of the {declpaths_shell} shell declaration(s) declare '# no-port:' with a cause and {portuntil_declared} declare '# port-until:' with a slug, neither on any descriptor nor both on one declaration; the tracked shell tree beyond that set {tree_state}, {tree_scanned} file(s) read for header-declaration shape and {tree_declared} of them declaring, counted apart from the declaration set so an empty one stays visible; {portuntil_grounded} of those held declaration(s) reach their ground in one hop, the section their own '# spec:' field names stating the hold; {ndesc} descriptor(s) in parity with the {nsub}-subcommand roster ({in_scope} in scope, {out_of_scope} out of scope — an unvendored kit, or a consumer declaration from another tree), {refonly} reference-only; {unregistered_declared} in-scope subcommand(s) unregistered in {list} with a declared reason and none undeclared, the reverse direction empty; {sensitive} substrate-sensitive member(s) all dispositioned; {impl_scanned} implementation source(s) free of manifest-class annotation; {kit_scanned} kit root(s) scanned for an implementation sibling, crate root {crate_dir} outside every kit root; target roster {roster_state} at {roster_file} with {roster_targets} well-formed target(s); publish workflow {wf_state} at {workflow}, {wf_matrix} matrix declaration(s) roster-derived across {wf_jobs} job(s) with one producer per digest)",
+        "GATE-SUBSTRATE-PARITY: clean ({declared} member(s) with one declaration each, {dispatching} of them dispatching to the binary; {noport_declared} of the {declpaths_shell} shell declaration(s) declare '# no-port:' with a cause and {portuntil_declared} declare '# port-until:' with a slug, neither on any descriptor nor both on one declaration; the tracked shell tree beyond that set {tree_state}, {tree_scanned} file(s) read for header-declaration shape and {tree_declared} of them declaring, counted apart from the declaration set so an empty one stays visible; {portuntil_grounded} of those held declaration(s) reach their ground in one hop, the section their own '# spec:' field names stating the hold; {ndesc} descriptor(s) in parity with the {nsub}-subcommand roster ({in_scope} in scope, {out_of_scope} out of scope — an unvendored kit, or a consumer declaration from another tree), {refonly} reference-only; {unregistered_declared} in-scope subcommand(s) unregistered in {list} with a declared reason and none undeclared, the reverse direction empty; {sensitive} substrate-sensitive member(s) all dispositioned; {impl_scanned} implementation source(s) free of manifest-class annotation; {kit_scanned} kit root(s) scanned for an implementation sibling, crate root {crate_dir} outside every kit root; target roster {roster_state} at {roster_file} with {roster_targets} well-formed target(s); publish workflow(s) read: {wf_read_list}; absent: {wf_absent_list}; {wf_matrix} matrix declaration(s) roster-derived across {wf_jobs} job(s) with one producer per digest, {wf_followed_n} called script(s) read one hop deep)",
         ndesc = descriptors.len(),
         nsub = roster.len(),
         in_scope = verdict.in_scope,
@@ -1134,11 +1231,36 @@ mod tests {
     #[test]
     fn a_digest_is_counted_per_job_and_verification_is_not_a_computation() {
         let wf = "jobs:\n  a:\n    steps:\n      - run: sha256sum x > x.sha256\n      - run: sha256sum y > y.sha256\n  b:\n    steps:\n      - uses: actions/download-artifact@v4\n      - run: sha256sum -c x.sha256\n";
-        let jobs = workflow_digests(wf);
+        let jobs = workflow_digests(wf, &mut Vec::new()).unwrap();
         assert_eq!(jobs.len(), 2);
         assert_eq!(jobs[0].computed, 2);
         assert_eq!(jobs[1].computed, 0);
         assert!(jobs[1].downloads && !jobs[1].uploads);
+    }
+
+    // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion F, a digest is an invocation:
+    // a presence-loop word, a string and a comment name the tool without running it, and a block
+    // body is read to the end of its indentation
+    #[test]
+    fn a_mention_of_the_hasher_is_not_a_computation() {
+        let wf = "jobs:\n  smoke:\n    steps:\n      - uses: actions/download-artifact@v4\n      - run: |\n          for t in bash sha256sum \\\n                   shasum tar; do\n            command -v \"$t\" || echo \"no sha256sum\"\n          done\n          # sha256sum x > x.sha256\n          shasum -a 256 -c x.sha256\n      - run: 'echo sha256sum'\n";
+        let jobs = workflow_digests(wf, &mut Vec::new()).unwrap();
+        assert_eq!(jobs.len(), 1);
+        assert_eq!(jobs[0].computed, 0);
+        let block = "jobs:\n  a:\n    steps:\n      - run: >\n          ( cd out && sha256sum \"$(basename \"$b\")\" > \"$b.sha256\" )\n      - run: shasum -a 256 y > y.sha256\n";
+        assert_eq!(workflow_digests(block, &mut Vec::new()).unwrap()[0].computed, 2);
+    }
+
+    // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion F, the alternatives of one
+    // `if` chain are one emission, while two emissions in one arm, or one beside the chain, are two
+    #[test]
+    fn a_hasher_branch_pair_is_one_producer() {
+        let pair = "if command -v sha256sum >/dev/null; then\n  ( sha256sum b > b.sha256 )\nelse\n  ( shasum -a 256 b > b.sha256 )\nfi\n";
+        assert_eq!(digest_producers(pair, false, &mut Vec::new()).unwrap(), 1);
+        let beside = format!("{}sha256sum b > b.sha256\n", pair);
+        assert_eq!(digest_producers(&beside, false, &mut Vec::new()).unwrap(), 2);
+        let twice = "if x; then sha256sum a > a.s; sha256sum b > b.s; else shasum a > a.s; fi\n";
+        assert_eq!(digest_producers(twice, false, &mut Vec::new()).unwrap(), 2);
     }
 
     #[test]

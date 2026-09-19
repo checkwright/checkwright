@@ -10,6 +10,7 @@ pub enum Kind {
     Cmd,
     Expansion,
     Guard,
+    Keyword,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -17,6 +18,7 @@ pub struct Token {
     pub kind: Kind,
     pub word: String,
     pub line: usize,
+    pub operands: Vec<String>,
 }
 
 // spec: gate-sdk/SPEC.md §port-blockers — `command -v <prog>` is this tree's convention for
@@ -38,6 +40,7 @@ struct Frame {
     inword: bool,
     wcmd: bool,
     wline: usize,
+    pending: Option<usize>,
 }
 
 #[derive(Default)]
@@ -57,6 +60,7 @@ struct Scan {
     stack: Vec<Frame>,
     case_state: Vec<u8>,
     line: usize,
+    pending: Option<usize>,
 }
 
 impl Scan {
@@ -65,6 +69,7 @@ impl Scan {
             kind,
             word: word.to_string(),
             line: self.wline,
+            operands: Vec::new(),
         });
     }
 
@@ -93,6 +98,11 @@ impl Scan {
         }
         if self.dbrack {
             return;
+        }
+        if self.wcmd {
+            self.pending = None;
+        } else if let Some(at) = self.pending {
+            self.out[at].operands.push(w.clone());
         }
         if w == "esac" {
             self.pop_case();
@@ -151,6 +161,7 @@ impl Scan {
             return;
         }
         if RESUMING_KEYWORDS.contains(&t) {
+            self.emit(Kind::Keyword, t);
             self.cmdpos = true;
             return;
         }
@@ -175,6 +186,7 @@ impl Scan {
         }
         if is_program_word(t) {
             self.emit(Kind::Cmd, t);
+            self.pending = Some(self.out.len() - 1);
         }
         self.cmdpos = false;
     }
@@ -186,6 +198,7 @@ impl Scan {
             inword: self.inword,
             wcmd: self.wcmd,
             wline: self.wline,
+            pending: self.pending.take(),
         });
         self.dq = false;
         self.inword = false;
@@ -199,6 +212,7 @@ impl Scan {
                 self.inword = f.inword;
                 self.wcmd = f.wcmd;
                 self.wline = f.wline;
+                self.pending = f.pending;
             }
             None => self.dq = false,
         }
@@ -325,6 +339,15 @@ fn expansion_name(t: &str) -> Option<String> {
 // the scan reads a member's own declaration text and does not follow a call into a kit library, so
 // a requirement reached through a shared helper stays invisible (port-blockers-library-mediated-scan).
 pub fn command_positions(text: &str) -> Vec<Token> {
+    let mut out = command_words(text);
+    out.retain(|t| t.kind != Kind::Keyword);
+    out
+}
+
+// spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion F's reader: every command word
+// with its operands, and the reserved words that reached command position, so a caller can see
+// which alternative of an `if` chain a command sits in
+pub fn command_words(text: &str) -> Vec<Token> {
     let mut s = Scan {
         cmdpos: true,
         ..Scan::default()
@@ -713,5 +736,21 @@ mod tests {
         assert_eq!(toks.len(), 2);
         assert_eq!(toks[0].line, 1);
         assert_eq!(toks[1].line, 3);
+    }
+
+    // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — a command carries its own operands and
+    // never a substitution's, and the reserved words reach command_words but not command_positions
+    #[test]
+    fn a_command_carries_its_operands_and_keywords_stay_out_of_the_program_scan() {
+        let toks = command_words("if x; then sha256sum \"$(basename a)\" -c y > z; fi\n");
+        let sha = toks.iter().find(|t| t.word == "sha256sum").expect("sha256sum scanned");
+        assert_eq!(sha.operands, vec!["\"$(\"", "-c", "y", "z"]);
+        let kw: Vec<&str> = toks
+            .iter()
+            .filter(|t| t.kind == Kind::Keyword)
+            .map(|t| t.word.as_str())
+            .collect();
+        assert_eq!(kw, vec!["if", "then", "fi"]);
+        assert_eq!(words("if x; then jq .; fi\n", Kind::Keyword), Vec::<String>::new());
     }
 }

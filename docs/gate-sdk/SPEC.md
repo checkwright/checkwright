@@ -305,11 +305,16 @@ file rather than an inline table in one workflow because a project with both a
 release path and a CI producer has **two** readers for it, and two copies is how
 a release comes to build a target on one runner class while CI measured it on
 another. And
-`GATE_SDK_NATIVE_PUBLISH_WORKFLOW` (default `.github/workflows/publish.yml`; the
-workflow §check-gate-substrate-parity assertion F holds roster-derived and
-one-producer-per-digest — a consumer whose release rides elsewhere points the
-knob at it, and a consumer with no such workflow is reported rather than red,
-because a publish path that does not exist is not one to audit). The roster and
+`GATE_SDK_NATIVE_PUBLISH_WORKFLOW` (a space-separated list, default
+`.github/workflows/publish.yml`; the workflows §check-gate-substrate-parity
+assertion F holds roster-derived and one-producer-per-digest — every workflow
+that builds and hashes the release-shaped artifact, so a tree whose CI producer
+builds it too names both; a consumer whose release rides elsewhere points the
+knob at it, and a named workflow that does not exist is reported rather than
+red, because a publish path that does not exist is not one to audit). The name
+is singular for a stated reason: a scalar value already in an adopter's knob
+file reads as a one-element list, where a plural rename would refuse that file
+at its first read. The roster and
 the workflow are **consumer config, never kit literals**: the knob, the line
 grammar and the assertions are gate-sdk mechanism, while *which* platforms a
 project commits to is that project's own support commitment — a kit literal
@@ -8621,11 +8626,13 @@ attaches, because every later hop moves the file rather than re-deriving its
 contents. A second `sha256sum` on a later job is exactly what lets a published
 digest and an installed digest diverge while both look computed, so the rule is
 held mechanically by §check-gate-substrate-parity assertion F rather than by
-review — **within that assertion's reach, which is the publish workflow's own
-text.** A tree that factors its build body out into a called script moves the
-emission outside what the assertion reads, and the invariant then rests on the
-shared body being the single producer: stronger by construction, weaker by
-enforcement. Per-artifact sidecars rather than a combined `SHA256SUMS` or a JSON
+review — **within that assertion's reach, which is the text of each workflow the
+knob names and the scripts its steps call, one hop deep.** A tree that factors
+its build body out into a called script keeps the emission inside what the
+assertion reads, so the shared body being the single producer is held by
+enforcement as well as by construction; a body reached a second hop down, or a
+hasher reached through an expansion, leaves it resting on construction alone.
+Per-artifact sidecars rather than a combined `SHA256SUMS` or a JSON
 manifest, because an attestation's subject list is `{name, digest}` pairs: a
 sidecar maps onto a subject one-to-one and a build attestation can later land
 *beside* these files with no migration and no digest value changing, where a
@@ -13536,22 +13543,46 @@ crate's dispatch roster joined to the battery's registration.
   `GATE_SDK_NATIVE_TARGETS_FILE` is a `<arch>-<vendor>-<os>[-<env>]` triple and
   the file is non-empty, because a roster asserting no platform support cannot be
   the surface that asserts it. **The build matrix is roster-derived:** every value
-  in a `matrix:` declaration of `GATE_SDK_NATIVE_PUBLISH_WORKFLOW` is a GitHub
-  expression, never a literal — a hand-written platform there is a second
-  spelling of the support commitment. The runner mapping is untouched by this and
+  in a `matrix:` declaration of each workflow `GATE_SDK_NATIVE_PUBLISH_WORKFLOW`
+  names is a GitHub expression, never a literal — a hand-written platform there
+  is a second spelling of the support commitment. The runner mapping is untouched by this and
   deliberately so: it is a *runner selection*, not a support declaration, and it
-  is the one place a platform name may appear in the workflow. **Each digest has
-  one producer:** a step *computes* a digest when it invokes `sha256sum` without
-  `-c`; no job may compute more than one, and a job that downloads a run artifact
-  and uploads none may compute none at all. Verification (`sha256sum -c`) is
+  is the one place a platform name may appear in the workflow. The check asks
+  only that a matrix value *is* an expression and does not follow it to its
+  source, so a workflow whose matrix derives from another surface than
+  `GATE_SDK_NATIVE_TARGETS_FILE` — a CI producer reading an install page's
+  platform block — reads roster-derived through a hop this check does not take;
+  that page's relation to the roster is §Consumer payload's to hold. **Each digest has
+  one producer:** a step *computes* a digest when its `run:` body — the inline
+  value, or the block under `run: |` or `run: >` — invokes `sha256sum` or
+  `shasum` **in command position** with no `-c` or `--check` operand; no job may
+  compute more than one, and a job that downloads a run artifact and uploads none
+  may compute none at all. Command position is the crate's one shell-word reader's
+  (§port-blockers), so a word naming the hasher as an argument — a toolchain
+  presence loop's `for t in … sha256sum …` — a string or a comment is a mention,
+  not an invocation. Both hashers count because a portable body resolves one at
+  run time (stock macOS carries `shasum` and no `sha256sum`), and so the
+  alternatives of one `if`/`elif`/`else` chain count as **one** emission, the
+  arm computing most, while two emissions in one arm, or one beside the chain,
+  are two. A `run:` body calling a script as `bash <path>` or `sh <path>`, the
+  path a file in the tree, has that script's own text counted at the call with
+  the same reader, so a shared build body sits inside the corpus and a step
+  re-adding an emission beside the call is a second producer. Every finding
+  names the workflow it read. Verification (`sha256sum -c`) is
   unrestricted — it is what the installer does, and what the `--pack-installer`
   arm now does in-crate rather than by spawning the program at all, and it is
-  the opposite of the failure being prevented.
+  the opposite of the failure being prevented. **The honest limit:** the follow
+  is one hop, so a script the called script calls is unread; a script invoked by
+  its path rather than through a shell word is not followed; a hasher reached
+  through an expansion (`"${HASHER[@]}"`) is a knob's value, not a command word,
+  and is not counted; and a `case` statement's alternatives are summed rather
+  than taken as one.
 
   Two absences are reported rather than red, and each for a stated reason. A
   **missing publish workflow** is not a publish path to audit: a consumer whose
   release rides elsewhere points the knob at it, and one with no release at all
-  has nothing here to get wrong. A **missing roster** is red only in a
+  has nothing here to get wrong — each absent member is reported by name beside
+  the members read, so a list whose every member is absent stays visible. A **missing roster** is red only in a
   **publishing** tree that also **dispatches** — both conditions, and each one
   removes a different false red. Dispatch, because a *declaration* needs no
   prebuilt binary and a descriptor-count trigger would red every vendored tree
