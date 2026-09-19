@@ -3379,9 +3379,4 @@
 
 ## Done
 
-- objective-6-guard-hook-twin-unruled
-- adopter-floor-collapse-rung-unqueued
-- glob-knob-walkers-unpruned
-- adopter-floor-gnu-date-and-awk-unheld
-
 ## Lessons Learned
