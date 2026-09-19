@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+windows-adopter-path release deferred:v0.26.0 — minor by the accumulated declarations since v0.25.0, this iteration adding two behavior changes (the parity arm runs the PowerShell twin under Windows PowerShell 5.1 too, and init spells its follow-up block for the host it runs on); no trigger fired: elapsed time is dormant under the preview channel, no decommission, no security or supply-chain fix (the guard CR-handling hotfixes repair this iteration's own unreleased Windows hook substrate), no operator direction, no audience arrival

@@ -3353,10 +3353,4 @@
 
 ## Done
 
-- run-gates-ps1-windows-powershell-host-unexercised
-- init-next-block-bash-spelled-on-windows
-- windows-remedy-path-step-undocumented
-- macos-remedy-path-lasts-one-shell
-- guard-hook-windows-substrate
-
 ## Lessons Learned
