@@ -125,7 +125,22 @@ opening "**Every session still stamps**" gains, after its first sentence:
 > The entry is also where this session's journal path comes from; there is no
 > other source.
 
-### (6) The generated mirror {mechanical}
+### (6) delegation-kit's generic grant note gets the stage-session pointer {mechanical}
+
+**Not yet applied.** Found at align, 2026-09-19: the point-6 probe below also hits
+`delegation-kit/templates/agent-execution.md`, which tells a dispatcher to "grant
+the journal path explicitly before dispatch" for any mutating child — the generic
+default this amendment carves a stage-session exception out of. No edit to that
+default is owed: `.claude/agents/stage-session.md` (delta 2) is the surface a stage
+session actually reads, and its amended text declines a dispatch that names or
+suppresses the path, so the generic grant is harmless there whether a dispatcher
+follows it or not. In `delegation-kit/templates/agent-execution.md`, the sentence
+ending "grant the journal path explicitly before dispatch rather than assuming the
+write succeeds" gains a parenthetical: "(a lifecycle-kit stage session is the
+standing exception — its journal path is derived by its own `--enter-stage` entry,
+never granted; lifecycle-kit/SPEC.md §The state machine)."
+
+### (7) The generated mirror {mechanical}
 
 `docs/lifecycle-kit/SPEC.md` is regenerated after deltas 3 and 4 land. Its
 freshness gate prints the command.
@@ -147,8 +162,10 @@ freshness gate prints the command.
   journal\|spells it out\|spell.*path" -- lifecycle-kit .claude/agents CLAUDE.md
   delegation-kit/templates`. Values: lead.md §Channel design → delta 1.
   stage-session.md (two lines) → delta 2. SPEC §The state machine → delta 3. SPEC
-  §templates/lead.md → delta 4. build.md → delta 5. The stage templates' last steps
-  already name the entry-tool path and are unchanged.
+  §templates/lead.md → delta 4. build.md → delta 5.
+  `delegation-kit/templates/agent-execution.md` (the generic grant sentence, a
+  different surface stating a different, non-conflicting default) → delta 6. The
+  stage templates' last steps already name the entry-tool path and are unchanged.
 
 ## Existing sections updated
 
@@ -160,7 +177,8 @@ lifecycle-kit/templates/stages/build.md`.
 - `lifecycle-kit/SPEC.md` §The state machine (delta 3)
 - `lifecycle-kit/SPEC.md` §templates/lead.md (delta 4)
 - `lifecycle-kit/templates/stages/build.md` (delta 5)
-- `docs/lifecycle-kit/SPEC.md` (delta 6)
+- `delegation-kit/templates/agent-execution.md` (delta 6)
+- `docs/lifecycle-kit/SPEC.md` (delta 7)
 
 ## Retired spellings
 

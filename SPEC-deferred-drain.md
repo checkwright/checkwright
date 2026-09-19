@@ -124,6 +124,14 @@ followed by a re-phrased ground for deltas 2-3:
 - The widened fill is gated on the figure, and its cost basis is the lead's
   surface batching.
 
+**Shares this anchor with `lifecycle-kit/SPEC-threshold-routing.md` delta 3**,
+which grounds the same paragraph with the decline-routing rule (found at align,
+2026-09-19). Neither delta rephrases the paragraph's own opening sentence, so
+either may land first: append this bullet block immediately after the base
+paragraph, and after threshold-routing's ground if it is already there; if this
+lands first, threshold-routing's session appends after this block in turn. Both
+blocks stand side by side — neither restates or supersedes the other.
+
 ### (5) The generated mirrors and the arm's roster readers {mechanical}
 
 `docs/drift-kit/SPEC.md` and `docs/lifecycle-kit/SPEC.md` are regenerated after

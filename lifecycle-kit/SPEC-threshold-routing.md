@@ -75,6 +75,13 @@ Declines are prose on the entry because the escalating scope session is their on
 reader. Also record the one breach the carrier entry names: a lead ruled a third
 decline on 2026-09-04, while the clause lived only in a queue entry.
 
+**Shares this anchor with `SPEC-deferred-drain.md` delta 4**, which grounds the
+same paragraph with the inflow-drain rule (found at align, 2026-09-19). "Re-phrase"
+here does not touch the paragraph's own opening sentence — it appends this ground
+after it, and after deferred-drain's bullet block if that has already landed; if
+this lands first, deferred-drain's session appends after this addition in turn.
+Both grounds stand side by side — neither restates or supersedes the other.
+
 ### (4) The generated mirror {mechanical}
 
 `docs/lifecycle-kit/SPEC.md` is regenerated after delta 3.
