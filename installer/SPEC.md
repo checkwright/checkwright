@@ -1091,14 +1091,29 @@ set — plus, where one was installed, the gate binary's target re-verified
 against its recorded digest **in place**, and any member the registry records as
 omitted, against whatever reason it carries. `doctor` invents no remedy for that
 reason: the class is reason-agnostic and the two install-time tokens that once had
-one are retired (§The gate binary).
+one are retired (§The gate binary). After the omitted lines it names each
+registry member that is **disarmed**: it resolves the member's declaration the
+way the battery does — the tree's gates directory, then each kit root's
+`checks/` — reads its `# armed-by:` line (gate-sdk/SPEC.md §The install
+disposition), and resolves that knob as a battery run from the repository root
+resolves it, without entering the tree. A knob resolving empty renders
 
-Those last two **report without setting the exit status**, and the asymmetry is
+      disarmed     check-portability-floor asserts nothing until GATE_SDK_PORTABILITY_PATHS is set
+
+with the member and knob read off the declaration, never spelled by `doctor`. A
+member whose declaration does not resolve, carries no single `# armed-by:` line,
+or whose knob refuses to resolve renders nothing: the battery reports each at its
+own run, and `doctor` is not a second runner.
+
+Those last three **report without setting the exit status**, and the asymmetry is
 deliberate rather than lenient. The status is the toolchain contract, and `init`
 gates its own precondition on it — so reddening here for a swapped or missing
 binary would block the `init` re-run that is the finding's own remedy. A binary
 that cannot be dispatched to is caught where it is dispatched from: the battery
-treats it as a harness error rather than a skip.
+treats it as a harness error rather than a skip. A disarmed member is neither a
+machine below contract nor an install that failed to verify — it is
+configuration the adopter has not written yet — so it takes the omitted lines'
+class and leaves the verdict line unchanged.
 
 Not setting the status is not the same as staying quiet about it, and the
 verdict line says which state it is in. A run carrying an artifact finding
@@ -1915,7 +1930,10 @@ then the **queue post-condition** — a profile whose kit set reads
 the queue file must have one, satisfying `check-queue-sections`, and a profile
 whose kit set does not must have none — then a re-run must leave the tree object
 identical, then `doctor`
-must exit 0 and name the installed profile, and then the **value arm** — the
+must exit 0, name the installed profile, and name at least one member disarmed —
+every one a member the install registered, read off `doctor`'s line rather than
+named by the harness, since a fresh install has set no arming knob (§doctor) —
+and then the **value arm** — the
 consumer authors one page of markdown carrying one real defect, a mistyped
 relative link in a `README.md`, and the battery's verdict on it is recorded
 before the link is corrected and the battery must be green again. The fix is the
