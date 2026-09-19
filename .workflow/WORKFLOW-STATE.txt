@@ -5,3 +5,4 @@
 ---
 
 posix-install-bootstrap scope a1d7be7e 2026-09-19 83a43866
+posix-install-bootstrap spec ab548d99 2026-09-19 385ed371
