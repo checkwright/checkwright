@@ -12,6 +12,44 @@
 
 ## New Features
 
+- **floor-curl-jq-unconditional** [spec: SPEC-conditional-floor.md] — `doctor`, and through
+  it `init`, refuse every profile on a host without `curl` or `jq`, though `curl`'s one adopter
+  reach is delegation-kit's `--usage-poll` and `jq`'s is guard-kit's hook. Rung 2 of the
+  adopter-floor ladder: the roster's audience axis gains a kit-name value, and doctor probes a
+  member only where the selection it reads (from `init`, or from the manifest) owes it.
+  **Done-state:** a starter install on a host without `jq` or `curl` succeeds, a guard-kit
+  profile refuses naming `jq`, and the amendment is merged.
+  Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 2; promoted the same day at
+  `adopter-floor-conditional-members`' spec, where it leads the unit.
+
+- **floor-shellcheck-unconditional** [spec: SPEC-conditional-floor.md] — `check-shellcheck` is
+  `zero-config`, so every profile registers it and `doctor` refuses a host without
+  `shellcheck`. Rung 3: the gate becomes `on-surface`, and `shellcheck` is owed only where a
+  registered gate's requirement element names it (the `registered` audience value).
+  **Done-state:** no profile's `init` registers `check-shellcheck`, a starter install needs no
+  `shellcheck`, the remedy blocks drop it, and the amendment is merged.
+  Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 3; promoted the same day, sharing
+  rung 2's amendment.
+
+- **floor-coreutils-residue-unowned** [spec: SPEC-conditional-floor.md] — the binary spawns
+  `date`, `mktemp`, `cp` and `ps` under `GATE_SDK_PROGRAM_FLOOR`'s host assumption, and nothing
+  probes or declares them. Dispositions: `date` goes in-process on unix, `mktemp` and `cp` are
+  contributor-only, and off unix `date` and `ps` ride Git for Windows' userland with `bash`. The
+  macOS remedy then drops coreutils; the earlier `date -Is` question is moot once that spawn
+  leaves unix.
+  **Done-state:** a unix build names `programs::DATE` nowhere, and the macOS install-smoke legs
+  pass on a remedy without coreutils.
+  Filed 2026-09-19 to the gap inbox at `adopter-floor-collapse`'s spec, promoted at its close
+  drain; promoted 2026-09-19 onto the rung-2 amendment.
+
+- **portability-floor-adopter-on-ramp-unstated** [spec: SPEC-armed-by.md] — a vendored
+  consumer gets `check-portability-floor` registered and disarmed, and nothing tells them that
+  naming their install path in `GATE_SDK_PORTABILITY_PATHS` arms it. A gate now declares its
+  arming knob (`# armed-by:`), and `doctor` names a registered gate whose knob is empty.
+  **Done-state:** doctor in a fresh starter install prints the disarmed line for
+  `check-portability-floor`, and the amendment is merged.
+  Filed 2026-09-07 by build batch B; promoted 2026-09-19 with its own amendment.
+
 ## Technical Debt
 
 ## Deferred
@@ -129,30 +167,6 @@
   `guard-hook-windows-substrate` was designed. Owner lookup: `PowerShell tool`,
   `USE_POWERSHELL_TOOL`, `Bash|PowerShell` — none.
 
-- **floor-curl-jq-unconditional** [cost: event/high] [surface: native] — `doctor`, and
-  through it `init`, refuse every profile on a host without `curl` or `jq`, yet `curl`'s one
-  adopter reach is `--usage-poll` (delegation-kit's opt-in timer arm, which already refuses by
-  name) and `jq`'s is guard-kit's hook (`guard-kit/lib/guard.sh`); the binary's `jq` use is
-  test-only. Rung 2 of the adopter-floor ladder, whose rank is these four `floor-*` entries' order.
-  **Why design-pending:** a member owed only where the kit reaching it is selected needs an axis
-  the probe roster lacks (its audience value set is closed at `contributor`), and bare `doctor`
-  run outside `init` has no selection to read.
-  **Cost while deferred:** a starter- or prose-profile adopter installs two tools no gate they
-  vendor runs.
-  Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 2, by operator direction.
-  Joins `adopter-floor-conditional-members` by operator direction (2026-09-19, lead-relayed): leads.
-
-- **floor-shellcheck-unconditional** [cost: event/high] [surface: gate-sdk] — `check-shellcheck`
-  is `# install: zero-config`, so every profile, the prose one included, registers it and
-  `doctor` refuses a host without `shellcheck`. Rung 3 of the adopter-floor ladder:
-  kept as a rule that *is* an external program, owed only where its gates are registered.
-  **Why design-pending:** `init` stops seeding `check-shellcheck` into every profile, which
-  re-rules its `zero-config` disposition; each registration trigger (the adopter's own shell, the
-  vendored kit shell) has to be enumerated first.
-  **Cost while deferred:** a non-technical adopter installs a shell linter before first value.
-  Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 3, by operator direction.
-  Joins `adopter-floor-conditional-members` by operator direction (2026-09-19, lead-relayed): axis.
-
 - **floor-bash-hooks-front-end** [cost: event/high] [surface: gate-sdk] — the generated git
   hooks and the bash front-end hold `bash:4.3` on the adopter floor; rung 4a of the adopter-floor
   ladder has them reach the binary directly.
@@ -174,24 +188,6 @@
   **Cost while deferred:** `jq` cannot leave the floor for any guard-kit adopter.
   Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 4b; mechanism from the
   concurrent objective-1 consult, lead-relayed.
-
-- **floor-coreutils-residue-unowned** [cost: event/low] [surface: native] — the gate binary
-  spawns `date` (`+%F` in `enter_stage`, `run_validate`, `env_probe` and the kpi arms; `-Is` in
-  the wakeup hook), `mktemp` and `cp` (the `demo` arm and the contributor smoke arms) and `ps`
-  (`evidence.rs`' producer-liveness probe) under `GATE_SDK_PROGRAM_FLOOR`'s host assumption.
-  None is on `PROBE_SET`, `docs/install.md` renders none, and no adopter-floor rung owns them, so
-  objective 1's floor has members nothing probes or declares.
-  **Why design-pending:** each member needs a disposition in the adopter-floor ladder's own terms
-  (declared floor member, in-process, or contributor-only), and the adopter/contributor split of
-  the spawn sites has to be enumerated first.
-  **Inferred, not run:** with `sort -V` gone, stock macOS still needs the Homebrew coreutils
-  remedy only if BSD `date` lacks `-Is` — `date -Is` on a stock macOS host.
-  **Cost while deferred:** an adopter host missing one of these fails at the spawn and not at
-  `doctor`, and the macOS remedy may prescribe a package nothing needs.
-  Filed 2026-09-19 to the gap inbox at `adopter-floor-collapse`'s spec, promoted at its close
-  drain. Owner lookup: `PROGRAM_FLOOR`, `mktemp`, `date -Is`, `coreutils` — matched only the
-  rung entries above (curl, jq, shellcheck, bash: distinct members).
-  Joins `adopter-floor-conditional-members` by operator direction (2026-09-19, lead-relayed): floor.
 
 - **stamp-subject-merge-carve-out-unruled** [cost: event/low] [surface: lifecycle-kit] —
   `check-stamp-subject` reds a commit adding stamp lines under git's own `Merge …` subject, which
@@ -2480,32 +2476,6 @@
   vendors the copy. Product-class.
   Surfaced 2026-09-05 by build batch A's provenance census, which flagged both and deliberately
   edited neither; drained here with both instances re-verified live.
-
-- **portability-floor-adopter-on-ramp-unstated** [cost: event/low] [surface: gate-sdk] — a vendored consumer gets
-  `check-portability-floor` registered and permanently disabled, and nothing tells them that naming
-  their install path is what turns it on.
-  **Probed, not inferred; RE-PROBED against the port 2026-09-09 and unchanged.**
-  `native/src/installer/recipe.rs:159-167` seeds `templates/msg-patterns.list` into an adopter's
-  gates dir and seeds no portability roster; a grep for the roster name across the five ported
-  verbs returns nothing, so `doctor` still reports nothing about the disabled state either.
-  `GATE_SDK_PORTABILITY_PATHS` defaults empty, so the gate's clean line reports the
-  disabled-and-unconfigured state on every run and nobody reads it as a cue.
-  **The not-seeding is ruled and is NOT the gap.** Build ruled it deliberate — a roster with no
-  corpus scans nothing, and the kit cannot know an adopter's install path — and gate-sdk/SPEC.md
-  §check-portability-floor states the degradation with its honest limit. What is unclosed is the
-  on-ramp: neither `init`, `doctor` nor the docs name the knob as the thing to set.
-  **Three candidate answers, none costed here:** seed the roster with an empty corpus; have `doctor`
-  report the disabled-and-unconfigured state; or a paragraph under docs/install.md §Requirements.
-  The second is the only one that reaches an adopter who never opens the SPEC.
-  **Product-class under TRAJECTORY.md's 2026-08-30 witness discriminator** — the install path is a
-  named witness, and the whole subject is what an adopter's tree does after `init`.
-  **Cost while deferred:** every adopter who vendors gate-sdk carries a registered gate asserting
-  nothing, and the failure mode is silence rather than a red.
-  Filed 2026-09-07 by build batch B; promoted here at this iteration's close drain, with →fix
-  refused (choosing among the three candidates is design work an amendment owes) and →icebox
-  refused on the adopter witness above.
-  not-icebox-eligible: portability-floor-adopter-on-ramp-unstated 2026-09-07 adopter witness above.
-  Joins `adopter-floor-conditional-members` by operator direction (2026-09-19, lead-relayed).
 
 - **substrate-parity-digest-assertion-stops-at-the-workflow-text** [cost: event/high] [surface: gate-sdk] — assertion F
   reads the publish workflow's own text for the digest producer, and the producer moved out into a
