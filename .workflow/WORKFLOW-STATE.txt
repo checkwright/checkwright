@@ -9,3 +9,4 @@ lifecycle-contract-drain spec a7017e17 2026-09-19 e19cce17
 lifecycle-contract-drain align a116e145 2026-09-19 8243df3d
 lifecycle-contract-drain build ac3f9db9 2026-09-19 9df8ad36
 lifecycle-contract-drain build a45cde60 2026-09-19 32be7047
+lifecycle-contract-drain validate adcf49d4 2026-09-19 7ebb5e41
