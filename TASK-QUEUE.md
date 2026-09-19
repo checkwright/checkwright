@@ -12,14 +12,6 @@
 
 ## New Features
 
-- **portability-floor-adopter-on-ramp-unstated** [spec: SPEC-armed-by.md] — a vendored
-  consumer gets `check-portability-floor` registered and disarmed, and nothing tells them that
-  naming their install path in `GATE_SDK_PORTABILITY_PATHS` arms it. A gate now declares its
-  arming knob (`# armed-by:`), and `doctor` names a registered gate whose knob is empty.
-  **Done-state:** doctor in a fresh starter install prints the disarmed line for
-  `check-portability-floor`, and the amendment is merged.
-  Filed 2026-09-07 by build batch B; promoted 2026-09-19 with its own amendment.
-
 ## Technical Debt
 
 ## Deferred
@@ -3048,5 +3040,6 @@
 - floor-curl-jq-unconditional
 - floor-shellcheck-unconditional
 - floor-coreutils-residue-unowned
+- portability-floor-adopter-on-ramp-unstated
 
 ## Lessons Learned
