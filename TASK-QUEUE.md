@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: adopter-floor-collapse
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,32 @@
 ## New Features
 
 ## Technical Debt
+
+- **glob-knob-walkers-unpruned** — `walk::glob_files` stays bash-faithful and unpruned, so a
+  gate whose consumer-configured glob knob carries a leading `**` (`measured_claim`,
+  `unmarked_claim`, `prose_tells`, `queue_slug_liveness`, and the `registry.rs` corpus-knob walk)
+  stats every entry under `target/`, and a cargo build running
+  beside the battery can delete one between listing and stat: a fail-closed exit 2 on a clean
+  tree. `check-comment-tier`'s configured branch had the same race, attested once in CI, and now
+  expands through `walk::glob_files_pruned` (canon-kit/SPEC.md §check-comment-tier).
+  **Done-state:** each such caller either expands through `glob_files_pruned` with the prune set
+  (gate-sdk/SPEC.md §Layout and configuration, `GATE_SDK_PRUNE_DIRS`) or states why its corpus
+  must reach a pruned directory, and each carries a behavioral case.
+  **Why not fixed at filing:** pruning narrows each reader's corpus, so each reader's red condition
+  has to be enumerated first, the same design-pending shape as
+  `manifest-files-configured-branch-unpruned`.
+  **Cost while deferred:** none in this repo. At close on 2026-09-19 the only `**` in
+  `scripts/*.knobs` was `CANON_KIT_COMMENT_SURFACE`, which is already fixed. A consumer that
+  configures `**` on one of these knobs meets an intermittent red. (inferred: no red observed on
+  these gates yet)
+  Filed 2026-09-19 to the gap inbox by `windows-adopter-path`'s validate hotfix; promoted at its
+  close. Owner lookup: `glob_files`, `glob_files_pruned`, `prune`, `native/target`. It matched
+  `manifest-files-configured-branch-unpruned`, which is a sibling on the manifest adapter and not
+  this finding, and the iceboxed `prune-set-*` entries, which are unrelated.
+  **Re-verified at promotion (2026-09-19, `adopter-floor-collapse` scope):** the five named callers
+  still reach `walk::glob_files`; other callers take configured globs too (`spec.rs`,
+  `close_surfaces.rs`, `scratch_citation.rs`), so the roster above is a lower bound and build
+  enumerates it from the call sites.
 
 ## Deferred
 
@@ -146,6 +172,22 @@
   `guard-hook-windows-substrate` was designed. Owner lookup: `PowerShell tool`,
   `USE_POWERSHELL_TOOL`, `Bash|PowerShell` — none.
 
+- **objective-6-guard-hook-twin-unruled** [cost: event/low] [surface: guard-kit] — TRAJECTORY.md
+  objective 6 reads "bash for Linux and macOS, PowerShell for Windows", but guard-kit's hook on
+  native Windows runs under Git for Windows' bash and guard-kit/SPEC.md §The hook on native Windows
+  refuses a PowerShell twin. That refusal landed in `windows-adopter-path` by operator direction
+  given in the lead session, not a `/consult` ruling, so the objective and the SPEC disagree.
+  **Why design-pending:** narrowing the objective or queuing the twin is the operator's call
+  through `/consult`, and no session may annotate the objective.
+  **Done-state:** a `/consult` ruling amends objective 6 or queues the twin.
+  **Cost while deferred:** a reader of the objective and a reader of the SPEC get opposite
+  answers about the Windows hook.
+  **DISTINCT from `guard-powershell-tool-unguarded`**, whose subject is the harness's
+  `PowerShell` tool bypassing the hook; this one is the hook's own implementation language.
+  Filed 2026-09-19 to the gap inbox at `windows-adopter-path`'s close; promoted at the next
+  iteration's scope by operator direction, lead-relayed. Owner lookup: `PowerShell twin`,
+  `hook twin`, `objective 6` — none.
+
 - **adopter-floor-collapse-rung-unqueued** [cost: event/high] [surface: native] — TRAJECTORY
   objective 1 (the dependency floor collapses to git) has no queued rung: the adopter floor
   `docs/install.md` renders is still bash, git, jq, curl, awk, sort and shellcheck, and no
@@ -178,6 +220,22 @@
   discipline, and this repo's numbers stay a restatement a kit cannot see.
   Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, beside the hotfix-push
   allowance it landed in CLAUDE.md; promoted at the next iteration's scope.
+
+- **mid-iteration-push-owner-unnamed** [cost: event/low] [surface: lifecycle-kit] — no
+  lifecycle surface names which session owns an iteration's mid-iteration push:
+  lifecycle-kit/SPEC.md §The state machine places the first push but names no actor, and
+  `lifecycle-kit/templates/lead.md` scopes the lead to dispatch and answers. The
+  `windows-adopter-path` lead routed it to validate as its remote oracle by lead decision.
+  **Candidate, not ruled:** validate as the owner, or the stage landing an entry whose
+  completion is observed on a remote run.
+  **Why design-pending:** naming an actor adds a contract to the state machine, a spec-stage
+  amendment rather than a drain fix.
+  **Cost while deferred:** every lead that needs a mid-iteration push re-derives who makes it.
+  **Adjacent to `push-budget-unshipped`**, deliberately not folded into it (operator direction,
+  2026-09-19, lead-relayed): that entry owns the push *count*, this one the *actor*.
+  Filed 2026-09-19 to the gap inbox by the `windows-adopter-path` lead; promoted at the next
+  iteration's scope. Owner lookup: `push owner`, `owns the push`, `who pushes`,
+  `mid-iteration push` — none.
 
 - **gap-inbox-kit-ref-valve** [cost: event/low] [surface: canon-kit] —
   `check-kit-ref-liveness` valves the queue file out by basename because the queue is design-ahead
@@ -2856,28 +2914,6 @@
   prose as manifest content, or enumerates single-level globs around the gap.
   Filed 2026-09-15 by `couples-field-semantics`' spec into the gap inbox; drained and promoted
   2026-09-15 at close.
-
-- **glob-knob-walkers-unpruned** [cost: event/low] [surface: native] — `walk::glob_files` stays
-  bash-faithful and unpruned, so a gate whose consumer-configured glob knob carries a leading `**`
-  (`measured_claim`, `unmarked_claim`, `prose_tells`, `queue_slug_liveness`, and the
-  `registry.rs` corpus-knob walk) stats every entry under `target/`, and a cargo build running
-  beside the battery can delete one between listing and stat: a fail-closed exit 2 on a clean
-  tree. `check-comment-tier`'s configured branch had the same race, attested once in CI, and now
-  expands through `walk::glob_files_pruned` (canon-kit/SPEC.md §check-comment-tier).
-  **Done-state:** each such caller either expands through `glob_files_pruned` with the prune set
-  (gate-sdk/SPEC.md §Layout and configuration, `GATE_SDK_PRUNE_DIRS`) or states why its corpus
-  must reach a pruned directory, and each carries a behavioral case.
-  **Why not fixed at filing:** pruning narrows each reader's corpus, so each reader's red condition
-  has to be enumerated first, the same design-pending shape as
-  `manifest-files-configured-branch-unpruned`.
-  **Cost while deferred:** none in this repo. At close on 2026-09-19 the only `**` in
-  `scripts/*.knobs` was `CANON_KIT_COMMENT_SURFACE`, which is already fixed. A consumer that
-  configures `**` on one of these knobs meets an intermittent red. (inferred: no red observed on
-  these gates yet)
-  Filed 2026-09-19 to the gap inbox by `windows-adopter-path`'s validate hotfix; promoted at its
-  close. Owner lookup: `glob_files`, `glob_files_pruned`, `prune`, `native/target`. It matched
-  `manifest-files-configured-branch-unpruned`, which is a sibling on the manifest adapter and not
-  this finding, and the iceboxed `prune-set-*` entries, which are unrelated.
 
 - **lead-line-blocked-by-spec-tag-width-collision** [cost: event/low] [surface: queue-kit]
   — an active lead line cannot carry both a spec tag and a blocked-by tag once the slugs are
