@@ -117,8 +117,8 @@ proves is not a gate.
   `emit/enum_sets.rs:79`, `emit/close_surfaces.rs:147`,
   `gates/gate_binary_fresh.rs:40`, `gates/install_platforms.rs:206`,
   `gates/knob_default_coupling.rs:360`, `emit/pack_installer.rs:196,295`,
-  `gates/kit_enum.rs:123`, and evidence-kit's derived suite default
-  (`knobs/evidence_kit.rs:44-49`). They carry the same latent mismatch under a
+  `gates/kit_enum.rs:45`, and evidence-kit's derived suite default
+  (`knobs/evidence_kit.rs:50`). They carry the same latent mismatch under a
   subdirectory vendoring. That class is filed to the gap inbox at this stage,
   costed, rather than folded in.
 

@@ -181,8 +181,13 @@ so the refusal and its paragraph are deleted.
 the `jq` element changes, and its satisfying value is `contributor`. The unit test
 holding the audience set closed (`toolfloor.rs`,
 `every_audience_value_is_closed_over_the_kit_roots`) accepts `contributor`.
-`owed_names`' test (`toolfloor.rs:240-245`) expects `jq` in the owed set under a
-guard-kit selection, so its expectation drops `jq`.
+`owed_names`' test (`toolfloor.rs:240-246`) makes three assertions this delta
+moves: it expects `jq` in the owed set under a guard-kit selection (`:242`), so
+that expectation drops `jq`; it expects `jq` in the undecided set with no
+selection (`:245`), because `contributor` now short-circuits the undecided
+branch, so that expectation drops `jq` too; and it expects the not-owed set with
+no selection to hold `cargo` alone (`:246`), which gains `jq` beside it, in
+`PROBE_SET` order.
 
 ### (4) The consumer smoke's `jq`-less arm asserts the guard-kit install succeeds {mechanical}
 
@@ -239,8 +244,8 @@ reading guard-kit/SPEC.md §The guard framework and §The hook on native Windows
   (delta 1).
 - `guard-kit/SPEC.md` `:2338-2342` and `:2722-2725`: the claims that the library
   "still shells to `jq`" and that "guard-kit's floor is unchanged". The library
-  stops shelling to it. The smoke recipe still does, as a contributor floor
-  (delta 3).
+  stops shelling to it (delta 1). The smoke recipe still does, as a contributor
+  floor (delta 3).
 - `guard-kit/SPEC.md` `:3245-3254`, `--run-guard-tests`' `jq` precondition, is
   deleted, and `:3419-3420`, which contrasts a sibling arm with it, is re-phrased
   (delta 3). `:3481-3482` follows delta 2.
