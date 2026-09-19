@@ -88,6 +88,22 @@ fn find(p: &Pool, slug: &str) -> Option<String> {
         .map(|(sec, _)| sec.clone())
 }
 
+// spec: drift-kit/SPEC.md §Bundled KPIs — *filed* and *drained* between two pools, one definition
+// for both readers (§The queue-flow arm); an icebox move counts as neither, being compression.
+pub fn flow(base: &Pool, now: &Pool) -> (i64, i64) {
+    let filed = now
+        .entries
+        .iter()
+        .filter(|(sec, s)| sec == "deferred" && find(base, s).is_none())
+        .count() as i64;
+    let drained = base
+        .entries
+        .iter()
+        .filter(|(_, s)| find(now, s).is_none())
+        .count() as i64;
+    (filed, drained)
+}
+
 pub fn run(ctx: &Ctx, trend: bool) -> Option<String> {
     let text = match read(&ctx.queue_file) {
         Some(t) => t,
@@ -113,20 +129,7 @@ pub fn run(ctx: &Ctx, trend: bool) -> Option<String> {
 
     let base = pool(&base_text, &ctx.deferred_section, &ctx.icebox_section);
     let now = pool(&text, &ctx.deferred_section, &ctx.icebox_section);
-
-    // spec: drift-kit/SPEC.md §Bundled KPIs — an icebox move counts as neither filed nor drained:
-    // it is compression, not intake and not closure, so a session that mass-evicted to flatter the
-    // delta row moves the weight row instead and the gaming is visible.
-    let filed = now
-        .entries
-        .iter()
-        .filter(|(sec, s)| sec == "deferred" && find(&base, s).is_none())
-        .count() as i64;
-    let drained = base
-        .entries
-        .iter()
-        .filter(|(_, s)| find(&now, s).is_none())
-        .count() as i64;
+    let (filed, drained) = flow(&base, &now);
 
     let delta = filed - drained;
     let weight = now.lines - base.lines;

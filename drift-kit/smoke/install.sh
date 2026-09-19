@@ -190,6 +190,40 @@ grep -q '^| iteration |' <<<"$traj" || fail "trajectory missing table header"
 [[ "$(grep -c '^| alpha ' <<<"$traj")" -ge 1 ]] || fail "trajectory emitted no closed-iteration row (expected alpha)"
 if grep -q '^| beta ' <<<"$traj"; then fail "trajectory emitted the in-flight (unclosed) beta row"; fi
 
+# spec: drift-kit/SPEC.md §The queue-flow arm — a hermetic history of three iteration starts over
+# a queue whose pool moves between them: two closed windows, the in-flight third never one.
+qrepo="$work/qflow-repo"
+git -C "$work" init -q qflow-repo
+mkdir -p "$qrepo/.workflow"
+qcommit() {
+    git -C "$qrepo" add -A
+    git -C "$qrepo" -c user.email=smoke@example.invalid -c user.name=smoke commit -q -m "$1"
+}
+qhead() { git -C "$qrepo" rev-parse --short HEAD; }
+qstamp() { printf '# hdr\n---\n\n%s scope %s 2025-01-01 %s\n' "$1" "$2" "$(qhead)" > "$qrepo/.workflow/WORKFLOW-STATE.txt"; qcommit "chore(scope): stamp $1"; }
+qflow() { ( cd "$qrepo" && GATE_SDK_NATIVE_BIN="$TRAJ_BIN" \
+    bash "$SMOKE_KIT_ROOT/../gate-sdk/bin/run-gates.sh" --emit queue-flow "$@" ); }
+printf '# Q\n## Deferred\n- **a** — x\n- **b** — x\n## Done\n' > "$qrepo/TASK-QUEUE.md"; qcommit "queue"
+qstamp one s1
+[[ "$(qflow)" == 'n/a (fewer than two iteration-start commits in reach)' ]] \
+    || fail "queue-flow over one iteration start did not degrade to its n/a line: $(qflow)"
+printf '# Q\n## Deferred\n- **b** — x\n- **c** — x\n## Done\n- a\n' > "$qrepo/TASK-QUEUE.md"; qcommit "drain a, file c"
+printf 'one build s1b 2025-01-01 %s\n' "$(qhead)" >> "$qrepo/.workflow/WORKFLOW-STATE.txt"; qcommit "chore(build): stamp one"
+qstamp two s2
+printf '# Q\n## Deferred\n- **c** — x\n- **d** — x\n- **e** — x\n## Done\n' > "$qrepo/TASK-QUEUE.md"; qcommit "drain b, file d e"
+qstamp three s3
+set +e
+qout="$(qflow)"; qrc=$?
+set -e
+[[ "$qrc" -eq 0 ]] || fail "the queue-flow arm exited $qrc (advisory emission must exit 0)"
+[[ "$qout" == $'one filed 1 drained 1\ntwo filed 2 drained 1\nmean-filed 1.5' ]] \
+    || fail "queue-flow rows or mean wrong (the in-flight iteration must not be a window): $qout"
+[[ "$(qflow 1)" == $'two filed 2 drained 1\nmean-filed 2.0' ]] \
+    || fail "queue-flow did not honour its trailing-window count: $(qflow 1)"
+if qflow 0 >/dev/null 2>&1; then fail "queue-flow accepted a zero window count"; fi
+[[ "$(DRIFT_KIT_STATE_FILE=.workflow/absent.txt qflow)" == 'n/a (no committed state file at .workflow/absent.txt)' ]] \
+    || fail "queue-flow over a state file with no history did not degrade to its n/a line"
+
 # spec: drift-kit/SPEC.md §Testing — the synthetic-transcript classifier smoke:
 # known category bytes in (smoke/overhead-fixture.jsonl), known percentages out.
 fixture="$SMOKE_KIT_ROOT/smoke/overhead-fixture.jsonl"

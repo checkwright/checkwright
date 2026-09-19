@@ -5113,6 +5113,18 @@ ruling that went the wrong way but a collision that reached nobody. Its split ru
 is safe only against the pool total, a split scattering an entry's weight across
 siblings that only the sum puts back together.
 
+The `scope` template weighs a unit set against the pool's refill rate, because a
+set draining no more than inflow leaves the pool unchanged however well it ranks.
+The inflow figure is derived by drift-kit's `queue-flow` arm from the pool's slug
+sets at iteration-start commits (drift-kit/SPEC.md §The queue-flow arm), not from
+filing dates, which miss an entry filed and drained inside the window. Like the
+rest of the Composition line, the figure travels on the message channel, read by
+the party ruling on the set and by no gate. The widened third-tier fill is gated
+on that figure, and its cost basis is the lead's surface batching: a further
+surface costs one more dispatch batch, where a further iteration costs another
+stage walk (templates/lead.md §Economics). The arm is a cross-kit citation, not a
+dependency: a consumer without drift-kit gets no figure, and the line says so.
+
 The `validate` template commits a repair before the suite roster starts or
 resumes: a suite asserting a clean worktree against the real checkout reads an
 uncommitted repair as the failure of the leg it guards, whose failure text names

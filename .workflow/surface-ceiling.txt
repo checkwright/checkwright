@@ -26,7 +26,7 @@
 105 lifecycle-kit/templates/stages/align.md
 121 lifecycle-kit/templates/stages/build.md
 297 lifecycle-kit/templates/stages/close.md
-243 lifecycle-kit/templates/stages/scope.md
+251 lifecycle-kit/templates/stages/scope.md
 134 lifecycle-kit/templates/stages/spec.md
 95 lifecycle-kit/templates/stages/validate.md
 41 lifecycle-kit/templates/upgrade.md

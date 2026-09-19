@@ -118,9 +118,13 @@ set does not already walk (a feature joining a debt-only set triggers the
 authoring stage, and a second component can trigger the audit stage). Otherwise
 it leads the next iteration's set, which its class arranges at that scope
 without a record. Second, a `[roadmap:]` entry, or one whose landing advances a
-roadmap item. Third, the window fills with rows whose `[surface:]` value matches
-the lead unit's, under the composition test below. Recurrence-threshold entries
-ride the escalation above regardless of rank. What an entry is *about* — the
+roadmap item. Third, the window fills with rows whose `[surface:]` matches the
+lead unit's, under the composition test below. Where the set so far drains no more
+than the trailing inflow (the composition line's figure), the fill continues with
+the surface carrying the most board rows, one whole surface at a time: a further
+surface costs the lead one batch, not an iteration
+(lifecycle-kit/templates/lead.md §Economics). Recurrence-threshold entries ride
+the escalation above regardless of rank. What an entry is *about* — the
 delivery machinery or the product — is not a rank axis; its cost while deferred
 and its impact are. The class rides the entry's `[cost:]` tag, and the impact
 rides its cost field's prose, which the shortlist's body read supplies. A
@@ -139,8 +143,12 @@ composition. Cite it and weigh it here; do not re-derive the economics.
 **Record the test's verdict in the unit-set escalation — on every proposed set,
 not only a lone unit.** The escalation's Recommendation carries one line in one
 of two forms: `Composition: bundled — <the deferred entries the set joins and
-the surface they share>`, or `Composition: stands alone — <why this unit
-justifies an iteration's fixed cost>`. Where the recommendation stands alone,
+the surface they share>; drain <k> against inflow <m>`, or `Composition: stands
+alone — <why this unit justifies an iteration's fixed cost>; drain <k> against
+inflow <m>`. Here `<k>` is the entries the set takes out of the design-pending
+pool and `<m>` is the `mean-filed` figure drift-kit's `--emit queue-flow` arm
+prints, never hand-counted (its `n/a` reason, or its absence, where it has no
+figure). Where `<k>` is not above `<m>`, the line adds why. Where the recommendation stands alone,
 Options also offers the bundle the test would have formed, so the party ruling
 on the set sees the cut it declines. The line is unconditional because the
 lone-unit case is itself a judgment: a requirement gated on it is skipped

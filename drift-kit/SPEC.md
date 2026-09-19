@@ -253,7 +253,9 @@ Lead:
   volunteers none, because intake is the axis a filing session can act on
   inside the session. With no iteration-start commit (no state file, the
   no-cursor window, or a head this clone cannot resolve) both rows degrade to
-  `n/a (no iteration baseline)`.
+  `n/a (no iteration baseline)`. The filed and drained definitions have a second
+  reader, §The queue-flow arm, which applies them over closed iterations; one
+  shared parse serves both.
 - **kpi-prompt-friction** — distinct/total prompting calls, read from guard-kit's
   ported ranker as **two integers in one process**: the member calls the counter
   in-crate, so there is no spawn, no stdout and no string between the producer
@@ -705,6 +707,41 @@ surface — the projection's content derives from the state files, not the
 queue, so `couples=` is unchanged and the couples⊆trigger parity holds); a
 close that skipped the regeneration is then red at that commit. CI's full
 battery stays the outer backstop (gate-sdk/SPEC.md §Enforcement tiers).
+
+## The queue-flow arm
+
+The `queue-flow` emit arm (gate-sdk/SPEC.md §The non-gate arm) reports how fast
+the design-pending pool refills, per closed iteration, so a unit set can be
+weighed against inflow (lifecycle-kit/SPEC.md §templates/stages/).
+
+- **Interface.** `bash gate-sdk/bin/run-gates.sh --emit queue-flow [<n>]`, where
+  `<n>` is a positive integer, default `5`, the number of trailing windows.
+  Anything else is a usage error, exit 2.
+- **Windows.** The iteration-start commits are the `<head>` of each boundary
+  stamp, the first data line after a truncation, read from the committed history
+  of `DRIFT_KIT_STATE_FILE`. A window runs from one iteration-start commit to the
+  next. Windows are keyed on those heads, never on an iteration's name, on §The
+  report skeleton's ground that a name search lands on the sentinel or a renamed
+  stamp. The row label is the name the iteration's last committed stamp carries.
+  The in-flight iteration is never a window, because its end has not happened.
+  The history is read newest first and stops at the `<n>+1`th start, so a long
+  history buys only the blobs of the windows printed.
+- **Rows.** One per window, oldest first: `<iteration> filed <f> drained <d>`,
+  where *filed* and *drained* are `kpi-queue-net-delta`'s definitions (§Bundled
+  KPIs) applied to the queue file (`DRIFT_KIT_QUEUE_FILE`) at the window's two
+  commits, over the same pool sections (`DRIFT_KIT_DEFERRED_SECTION`,
+  `DRIFT_KIT_ICEBOX_SECTION`). Slug sets at the two ends are diffed rather than
+  filing dates counted: dates at HEAD see only entries still deferred, so an entry
+  filed and drained inside the window would vanish from inflow by exactly the drain
+  it is compared with. The final row is `mean-filed <x>`, the mean of the rows'
+  *filed* to one decimal. The per-window rows are printed, not only the mean,
+  because a session arguing a set at or below inflow reads them.
+- **Degrade.** Fewer than two iteration-start commits in reach, no committed
+  state file, a window head this clone cannot resolve, or a window commit with no
+  queue file prints one `n/a (<reason>)` line and exits 0 — the fail-visible
+  discipline of §The published-evidence extractor; the arm registers no gate.
+- **Shared code.** The arm reuses the KPI's pool parse and its filed/drained
+  computation, so the two readers cannot disagree about what an entry is.
 
 ## The overhead meter
 
@@ -1774,8 +1811,8 @@ consumer knob rather than a refusal. Knobs:
   `Deferred` (queue-kit's).
 - `DRIFT_KIT_ICEBOX_SECTION` — the design-pending pool's second section,
   queue-kit's optional icebox tier; default **empty**, meaning the pool is the
-  deferred section alone. Read by `kpi-queue-net-delta` so an eviction reads as
-  compression rather than as closure. The same independent-knob shape
+  deferred section alone. Read by `kpi-queue-net-delta` and §The queue-flow arm
+  so an eviction reads as compression rather than as closure. The same independent-knob shape
   queue-kit and canon-kit carry: a consumer enabling the tier sets each, and
   one left unset degrades that kit to "no icebox".
 - `DRIFT_KIT_TRAJECTORY_SURFACES` — the state-file paths the trajectory
@@ -1850,7 +1887,8 @@ consumer knob rather than a refusal. Knobs:
   derivation §The stage-economics meter reads — the knob is still drift-kit's, and
   the sharing happens below the config layer, where it has already resolved to a
   value. `kpi-stage-economics-lag` reads its stamps through the meter's own
-  history ∪ live read (§Bundled KPIs).
+  history ∪ live read (§Bundled KPIs), and §The queue-flow arm reads the
+  committed history alone for its windows.
 
 Per-KPI couplings (which meter, which log, which scan flag) are the
 plugins' own headers, not knobs — a consumer retargeting one edits its copy
@@ -1893,7 +1931,11 @@ The trajectory extractor needs committed history the
 throwaway consumer lacks, so `smoke/install.sh` proves it against a hermetic
 fake-history repo — one closed, range-bounded iteration — and asserts the
 table parses, that iteration's row is emitted, and the in-flight iteration's
-is not. The overhead meter has a fixed classifier, so it *is* fixture-stable:
+is not. The queue-flow arm is proved against its own hermetic repo — three
+iteration starts over a queue whose pool moves between them — asserting the two
+closed windows' rows and mean, that the in-flight third is no window, that `<n>`
+trims to the trailing windows and `0` is refused, and the one-start and
+no-history degrades. The overhead meter has a fixed classifier, so it *is* fixture-stable:
 `smoke/overhead-fixture.jsonl` carries known category bytes, and
 `smoke/install.sh` drives the meter **through its arm** over it — every
 assertion below is unchanged by that re-pointing — and asserts the log-line grammar,

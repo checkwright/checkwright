@@ -12,18 +12,6 @@
 
 ## New Features
 
-- **scope-unit-set-ignores-deferred-inflow** [spec: SPEC-deferred-drain.md] — scope composes a
-  unit set with no view of the Deferred section's refill rate, so the pool falls about two net per
-  iteration (148 to 105 over twenty iterations to 2026-09-19).
-  **Ruled at spec:** candidates (a) and (b). A drift-kit `queue-flow` arm derives trailing
-  per-iteration inflow from pool slug sets at iteration-start commits, not filing dates, and the
-  Composition line compares it with the set's drain. The third ranking tier fills past the lead
-  unit's surface while drain is at or below inflow. (c) and (d) refused in the amendment.
-  Filed 2026-09-19 by the consult after `adopter-floor-collapse`'s close. Leads
-  `lifecycle-contract-drain`, admitted in full under the enhancement admission filter as
-  drain-serving machinery with candidate (a)'s arm allowed (operator direction, 2026-09-19,
-  lead-relayed), a reading of the filter and not a reversal.
-
 - **threshold-recurrence-routing-residency** [spec: SPEC-threshold-routing.md] — the
   threshold-recurrence routing clause, *"a third threshold recurrence routes to the operator, not to
   a third decline; two is where lead discretion ends"*, lives only in this entry.
@@ -3175,5 +3163,7 @@
 - **readme-bin-roster-underived** — no gate holds a kit README's bin/ tool roster.
 
 ## Done
+
+- scope-unit-set-ignores-deferred-inflow
 
 ## Lessons Learned

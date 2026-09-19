@@ -78,6 +78,7 @@ doc owned the fact (drift-kit/SPEC.md §The knowledge-friction loop). It shows
 bash gate-sdk/bin/run-gates.sh --emit drift-report          # full report: lead/lag rows under the honesty labels
 bash gate-sdk/bin/run-gates.sh --emit drift-report --trend  # one compact line (fragments joined with ·)
 bash gate-sdk/bin/run-gates.sh --emit trajectory   # governed-trajectory table (one row per closed iteration)
+bash gate-sdk/bin/run-gates.sh --emit queue-flow [<n>]  # design-pending pool filed/drained per trailing iteration, plus mean-filed
 bash gate-sdk/bin/run-gates.sh --emit overhead-meter   # governance-vs-task byte proxy for this session's transcript (a delegated session passes its transcript or stamp id)
 bash gate-sdk/bin/run-gates.sh --emit stage-economics  # real spend by stage × model × iteration (stamps ⋈ transcripts ⋈ price table)
 bash gate-sdk/bin/run-gates.sh --emit file-install [--] <kind> <field>...  # record one observed install, red or check-in (three kinds, three arities)
@@ -96,6 +97,11 @@ published-evidence extractor): a pure function of committed git history that
 emits one row per closed iteration — stages run, commit shape, amendment
 latency, validate attestations, gate-roster growth — for a consumer to pin
 behind a freshness gate.
+
+`--emit queue-flow` is the queue-flow arm (drift-kit/SPEC.md §The queue-flow
+arm): `kpi-queue-net-delta`'s filed and drained counts over each of the trailing
+closed iterations, and their mean inflow, the figure a scope session weighs a
+unit set against.
 
 `--emit stage-economics` is the stage-economics meter (drift-kit/SPEC.md §The
 stage-economics meter): it prices real spend by lifecycle stage × model ×

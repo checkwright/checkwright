@@ -41,6 +41,7 @@ pub mod pub_index;
 pub mod pub_lang;
 pub mod queue_counts;
 pub mod queue_edges;
+pub mod queue_flow;
 pub mod queue_index;
 pub mod reads_census;
 pub mod rewrite;
@@ -476,6 +477,14 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-stage-economics",
         Arm::Emit(stage_economics::emit),
         stage_economics::KNOBS,
+    ),
+    // spec: drift-kit/SPEC.md §The queue-flow arm — an `Arm::Emit` because exit is always 0 bar a
+    // usage error, so no `1` is load-bearing; its roster is the KPI's pool knobs plus the state
+    // file whose history the windows are read from.
+    (
+        "--emit-queue-flow",
+        Arm::Emit(queue_flow::emit),
+        queue_flow::KNOBS,
     ),
     // spec: lifecycle-kit/SPEC.md §The survey record — the citation affordance: it derives no stage
     // and stamps no rev, so its sibling's state-file knob is deliberately off this roster.
