@@ -2969,10 +2969,4 @@
 
 ## Done
 
-- init-dry-run-plan-parity
-- release-binary-archive-versioned-name
-- floor-bash-install-bootstrap
-- hasher-shasum-fallback-unexercised
-- install-smoke-intel-mac-bash-path-assert-vacuous
-
 ## Lessons Learned
