@@ -3065,9 +3065,4 @@
 
 ## Done
 
-- floor-curl-jq-unconditional
-- floor-shellcheck-unconditional
-- floor-coreutils-residue-unowned
-- portability-floor-adopter-on-ramp-unstated
-
 ## Lessons Learned
