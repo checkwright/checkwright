@@ -136,6 +136,18 @@ pub fn manifest_fields(man: &str) -> Vec<(String, String)> {
         .collect()
 }
 
+// spec: gate-sdk/SPEC.md §The install disposition — the arming declaration's one reader: the value
+// of every `# armed-by:` header line, in file order, so a count check and a lone read share it
+pub const ARMED_BY: &str = "# armed-by:";
+
+pub fn armed_by(text: &str) -> Vec<String> {
+    fresh::file_lines(text)
+        .iter()
+        .filter_map(|l| l.strip_prefix(ARMED_BY))
+        .map(|v| v.trim().to_string())
+        .collect()
+}
+
 // spec: gate-sdk/SPEC.md §The `# graph:` manifest — one field's value, empty when the field is
 // absent; never an error on a missing field
 pub fn field(fields: &[(String, String)], key: &str) -> String {

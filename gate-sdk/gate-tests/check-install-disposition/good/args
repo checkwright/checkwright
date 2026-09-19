@@ -1,8 +1,10 @@
 # Anchor the sweep at this case dir: gate-sdk-config.knobs (read at cwd)
 # names the synthetic kit via GATE_SDK_KIT_DIRS, and the positional root is what
 # the installer recipe path resolves against.
-# alpha-kit is a mixed kit — a .sh-declared and a .gate-declared member side by
+# site-kit is a mixed kit — a .sh-declared and a .gate-declared member side by
 # side — declaring all three vocabulary values, its one zero-config member is
 # registered in its smoke roster, and the tree ships no installer at all, which
 # is the vendored-consumer shape assertion C skips and reports on the clean line.
+# The kit root is named for a static kit so check-omega's arming declaration can
+# name a knob that kit declares (D).
 .

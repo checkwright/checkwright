@@ -142,6 +142,53 @@ fn omitted_block(out: &mut String, list_text: &str) {
     }
 }
 
+// spec: installer/SPEC.md §doctor — the disarmed line: a registry member whose declaration names an
+// arming knob that resolves empty. A member that does not resolve, declares no single knob, or whose
+// knob refuses renders nothing, because the battery reports each at its own run.
+fn disarmed_block(
+    out: &mut String,
+    list_text: &str,
+    decl_dirs: &[String],
+    resolve: impl Fn(&str) -> Result<String, String>,
+) {
+    for member in crate::registry::members(list_text) {
+        let member = member.trim();
+        let Some(src) = crate::registry::resolve(member, decl_dirs) else {
+            continue;
+        };
+        let Ok(text) = std::fs::read_to_string(&src) else {
+            continue;
+        };
+        let arming = crate::registry::armed_by(&text);
+        let [knob] = arming.as_slice() else {
+            continue;
+        };
+        if resolve(knob).is_ok_and(|v| v.is_empty()) {
+            let _ = writeln!(
+                out,
+                "  {:<12} {} asserts nothing until {} is set",
+                "disarmed", member, knob
+            );
+        }
+    }
+}
+
+// spec: installer/SPEC.md §doctor — the tree's own resolution, anchored at its root as the battery
+// run there anchors it: its gates directory first, then each kit root's `checks/`
+fn tree_disarmed_block(out: &mut String, root: &std::path::Path, list_text: &str) {
+    let gates = crate::knobs::gates_dir();
+    let gates = if std::path::Path::new(&gates).is_absolute() {
+        gates
+    } else {
+        root.join(&gates).display().to_string()
+    };
+    let Ok(kits) = crate::walk::kit_roots_abs_at(&root.display().to_string(), &gates) else {
+        return;
+    };
+    let dirs = crate::registry::resolve_dirs(&gates, &kits);
+    disarmed_block(out, list_text, &dirs, |k| crate::knobs::wire_in(&gates, k));
+}
+
 // spec: installer/SPEC.md §doctor — the toolchain block over the selection: an owed member is
 // probed and sets the verdict, a not-owed one is skipped outright (showing an adopter a tool they do
 // not need invites them to install it), and an undecided one is named unprobed and never fails.
@@ -294,6 +341,7 @@ pub fn diagnose(selection: Option<&Selection>) -> Report {
             if !list.is_empty() {
                 if let Ok(text) = std::fs::read_to_string(root.join(&list)) {
                     omitted_block(&mut out, &text);
+                    tree_disarmed_block(&mut out, &root, &text);
                 }
             }
         }
@@ -434,6 +482,32 @@ mod tests {
         let mut empty = String::new();
         omitted_block(&mut empty, "# gate-sdk\n# omitted: check-b local-policy\n");
         assert!(empty.contains("battery      no gate survives here"));
+    }
+
+    // spec: installer/SPEC.md §doctor — the disarmed line renders for a declaring member whose knob
+    // resolves empty, and for nothing else; the block writes the report alone, so no case moves the
+    // verdict
+    #[test]
+    fn a_registered_member_whose_arming_knob_is_empty_is_named_disarmed() {
+        let d = std::env::temp_dir().join(format!("checkwright-doctor-armed.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(&d).expect("scratch");
+        std::fs::write(d.join("check-alpha.gate"), "# install: zero-config\n# armed-by: PROBE_KNOB\n").expect("write");
+        std::fs::write(d.join("check-beta.gate"), "# install: zero-config\n").expect("write");
+        let dirs = vec![d.display().to_string()];
+        let list = "# probe-kit\ncheck-alpha\ncheck-beta\ncheck-absent\n";
+
+        let mut unset = String::new();
+        disarmed_block(&mut unset, list, &dirs, |_| Ok(String::new()));
+        let mut set = String::new();
+        disarmed_block(&mut set, list, &dirs, |_| Ok("install.sh".to_string()));
+        let mut refused = String::new();
+        disarmed_block(&mut refused, list, &dirs, |_| Err("malformed".to_string()));
+        let _ = std::fs::remove_dir_all(&d);
+
+        assert_eq!(unset, "  disarmed     check-alpha asserts nothing until PROBE_KNOB is set\n");
+        assert_eq!(set, "", "an armed member was named");
+        assert_eq!(refused, "", "a knob that refuses is the battery's to report");
     }
 
     // spec: installer/SPEC.md §The verbs — `--help` answers on its own and an unknown argument is

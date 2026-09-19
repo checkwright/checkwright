@@ -239,7 +239,10 @@ fn roots() -> Result<(String, Vec<Root>), String> {
 }
 
 fn roots_from(sdk_root: &str, kit_dirs: &str) -> Result<(String, Vec<Root>), String> {
-    let here = cwd()?;
+    roots_at(cwd()?, sdk_root, kit_dirs)
+}
+
+fn roots_at(here: String, sdk_root: &str, kit_dirs: &str) -> Result<(String, Vec<Root>), String> {
     let sdk = abs_against(&here, sdk_root.trim_end_matches('/'));
     let dirs: Vec<String> = kit_dirs.split_whitespace().map(String::from).collect();
     if !dirs.is_empty() {
@@ -346,12 +349,24 @@ fn knob_wire(knob: &str) -> Result<String, String> {
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the kit roots absolutized against the working directory
 pub fn kit_roots_abs() -> Result<Vec<String>, String> {
     let (here, roots) = roots()?;
-    Ok(roots
+    Ok(absolutized(&here, &roots))
+}
+
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the same roots a battery run from `anchor` derives, for a
+// reader asking about a tree it has not entered
+pub fn kit_roots_abs_at(anchor: &str, gates_dir: &str) -> Result<Vec<String>, String> {
+    let kit_dirs = crate::knobs::wire_in(gates_dir, "GATE_SDK_KIT_DIRS")?;
+    let (here, roots) = roots_at(normalize_abs(anchor), &sdk_root(), &kit_dirs)?;
+    Ok(absolutized(&here, &roots))
+}
+
+fn absolutized(here: &str, roots: &[Root]) -> Vec<String> {
+    roots
         .iter()
         .map(|r| match r {
-            Root::Given(p) | Root::Derived(p) => abs_against(&here, p.trim_end_matches('/')),
+            Root::Given(p) | Root::Derived(p) => abs_against(here, p.trim_end_matches('/')),
         })
-        .collect())
+        .collect()
 }
 
 // spec: gate-sdk/SPEC.md §The crate's crosser — the crate's only `std::env::current_dir()`, and

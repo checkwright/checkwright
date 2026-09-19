@@ -4,5 +4,6 @@
 # declares zero-config while alpha-kit's smoke registers nothing (B),
 # check-zeta.gate does the same through the descriptor spelling (B), and the
 # stand-in recipe carries literal gate names beside a §-prefixed section
-# citation that registers nothing (C).
+# citation that registers nothing (C), and check-eta arms on a knob no static
+# kit declares (D).
 .

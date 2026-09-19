@@ -1,2 +1,3 @@
 check-delta.sh: 0 '# install:' line(s) where a gate declares exactly one
+check-eta.sh: armed-by names 'ALPHA_KIT_ARMING', which no static kit declares
 check-zeta.gate: declares zero-config but alpha-kit/smoke/install.sh does not register it

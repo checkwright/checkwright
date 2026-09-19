@@ -13,6 +13,32 @@ const ZERO_CONFIG: &str = "zero-config";
 const RECIPE: &str = "native/src/installer/recipe.rs";
 const DECL: &str = "# install:";
 
+// spec: gate-sdk/SPEC.md §check-install-disposition — assertion D: a second line, a knob no static
+// kit declares, or one another kit declares is a finding, so a misspelled arming knob is red rather
+// than a doctor line that can never fire
+fn armed_by_finding(kit: &str, values: &[String]) -> Option<String> {
+    let [value] = values else {
+        return (values.len() > 1).then(|| {
+            format!(
+                "{} '{}' lines where a gate declares at most one",
+                values.len(),
+                crate::registry::ARMED_BY
+            )
+        });
+    };
+    match crate::knobs::static_owner(value) {
+        Some(k) if k.root == kit => None,
+        Some(k) => Some(format!(
+            "armed-by names {}, a {} knob — a gate is armed by a knob of its own kit",
+            value, k.root
+        )),
+        None => Some(format!(
+            "armed-by names '{}', which no static kit declares",
+            if value.is_empty() { "<empty>" } else { value.as_str() }
+        )),
+    }
+}
+
 fn basename(p: &str) -> &str {
     p.rsplit_once('/').map(|(_, b)| b).unwrap_or(p)
 }
@@ -140,7 +166,7 @@ pub fn run(args: &[String]) -> i32 {
     }
 
     let mut findings: Vec<String> = Vec::new();
-    let (mut declared, mut zeroconf, mut smokeless) = (0usize, 0usize, 0usize);
+    let (mut declared, mut zeroconf, mut smokeless, mut armed) = (0usize, 0usize, 0usize, 0usize);
     for abs in &kit_roots {
         let kit = basename(abs);
         if !Path::new(&format!("{}/checks", abs)).is_dir() {
@@ -200,6 +226,12 @@ pub fn run(args: &[String]) -> i32 {
                 continue;
             }
             declared += 1;
+            // assertion D: at most one arming declaration, naming a static knob of this kit's own
+            let arming = crate::registry::armed_by(&text);
+            match armed_by_finding(kit, &arming) {
+                Some(f) => findings.push(format!("{}/checks/{}: {}", kit, fname, f)),
+                None => armed += arming.len(),
+            }
             if value != ZERO_CONFIG {
                 continue;
             }
@@ -259,7 +291,11 @@ pub fn run(args: &[String]) -> i32 {
         );
         println!("        '# graph:' directive; register each zero-config gate in its kit's");
         println!(
-            "        smoke/install.sh; and keep {} free of literal",
+            "        smoke/install.sh; give at most one '{} <KNOB>' line, naming a",
+            crate::registry::ARMED_BY
+        );
+        println!(
+            "        declared knob of the gate's own kit; and keep {} free of literal",
             RECIPE
         );
         println!("        gate names — it derives the roster (gate-sdk/SPEC.md §The install disposition).");
@@ -267,11 +303,12 @@ pub fn run(args: &[String]) -> i32 {
     }
 
     println!(
-        "INSTALL-DISPOSITION: clean ({} gate(s) declared, {} zero-config of which {} registrable in their kit's smoke and {} skipped for a kit shipping none; recipe de-literalization checked: {})",
+        "INSTALL-DISPOSITION: clean ({} gate(s) declared, {} zero-config of which {} registrable in their kit's smoke and {} skipped for a kit shipping none; {} arming declaration(s) naming their kit's own knob; recipe de-literalization checked: {})",
         declared,
         zeroconf,
         zeroconf - smokeless,
         smokeless,
+        armed,
         recipe_checked
     );
     0
@@ -296,6 +333,24 @@ mod tests {
             declared_value("# install: never\n# install: sometimes\n"),
             "never"
         );
+    }
+
+    // spec: gate-sdk/SPEC.md §check-install-disposition — assertion D's three findings, and the
+    // absent and own-kit declarations it passes
+    #[test]
+    fn an_arming_declaration_names_one_declared_knob_of_its_own_kit() {
+        let one = |v: &str| vec![v.to_string()];
+        assert_eq!(armed_by_finding("gate-sdk", &[]), None);
+        assert_eq!(armed_by_finding("gate-sdk", &one("GATE_SDK_PORTABILITY_PATHS")), None);
+        assert!(armed_by_finding("site-kit", &one("GATE_SDK_PORTABILITY_PATHS"))
+            .unwrap()
+            .contains("a gate-sdk knob"));
+        assert!(armed_by_finding("gate-sdk", &one("PROBE_KIT_ARMING"))
+            .unwrap()
+            .contains("no static kit declares"));
+        assert!(armed_by_finding("gate-sdk", &one("")).unwrap().contains("<empty>"));
+        let two = one("GATE_SDK_PORTABILITY_PATHS").into_iter().chain(one("GATE_SDK_KIT_DIRS")).collect::<Vec<_>>();
+        assert!(armed_by_finding("gate-sdk", &two).unwrap().starts_with("2 '# armed-by:' lines"));
     }
 
     // spec: gate-sdk/SPEC.md §check-install-disposition — a `§`-prefixed occurrence is a

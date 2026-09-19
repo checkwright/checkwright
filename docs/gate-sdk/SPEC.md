@@ -2419,6 +2419,24 @@ The exposure this closes is that a kit adding a zero-config gate the installer
 never learned about shipped to adopters unregistered and silent. A gate cannot
 now reach an adopter undeclared, because the declaration is enforced present.
 
+**The arming declaration.** A gate's header may also carry one
+`# armed-by: <KNOB>` line beside `# install:`, in a `.sh` declaration or a
+`.gate` descriptor on the same terms. It declares that the gate **asserts
+nothing while that knob resolves empty**: the gate still runs and still prints
+its clean line, and `<KNOB>` is one declared static knob of the declaring kit's
+own table. The two directives answer independent questions — `# install:`
+whether a gate can register on the tree `init` makes, `# armed-by:` whether a
+registered gate is doing anything yet — so the arming declaration does not widen
+the disposition vocabulary. Its reader is `doctor`, which names a registered
+member whose knob is empty (installer/SPEC.md §doctor), so an adopter who never
+opens a SPEC still meets the knob that arms the gate; doctor carries no gate or
+knob name of its own, only the declaration it reads. `check-install-disposition`
+assertion D is the verifier that keeps the line from being the self-declaration
+§The `# graph:` manifest refuses: a misspelled or foreign knob is a red, never a
+silent no-op. **Honest limit:** the declaration is taken where a member's
+disarmed state has been found, not by census; another member degrading the same
+way takes it when its own disarmed state is found.
+
 **Where the directive deliberately does not reach.** The installer's *seeding*
 decisions stay keyed by kit, and they look like the same defect this section
 removed. They are not: they answer what a kit's install must **seed**, not what
@@ -14390,7 +14408,7 @@ expectations match substrings rather than pinning the report.
 
 ### check-install-disposition
 
-Three assertions over every kit root in `gate_kit_roots`, holding §The install
+Four assertions over every kit root in `gate_kit_roots`, holding §The install
 disposition.
 
 - **(A) Declared** — every `checks/` member, `check-*.sh` and `check-*.gate`
@@ -14419,6 +14437,16 @@ disposition.
   nothing, and registering is the only thing this assertion is about. The file is
   absent in a vendored consumer, which has no installer — that absence is a skip,
   reported on the clean line, never a finding.
+- **(D) Arming declaration placed** — every `checks/` member carries **at most
+  one** `# armed-by:` line, and its value is a declared static knob that
+  `knobs::owner` places in the kit whose root the gate sits under (the root's
+  basename is the kit's name). A second line, an empty value, a name no static
+  kit declares, or another kit's knob is a finding: the line's one reader is
+  `doctor`, and a knob it can never resolve empty would make its disarmed line
+  a silent no-op. The clean line counts the declarations verified. The fixture
+  pair carries the arm: `good/`'s kit root is named for a static kit and a member
+  declares a knob that kit owns, and `bad/` carries a member naming a knob no kit
+  declares.
 
 Fail-closed on a non-repo cwd with no root argument, an unreadable gate header,
 an empty kit roster, or kit roots that enumerate no gate at all. Configuration
@@ -17539,10 +17567,15 @@ pattern §The provenance seam names for exactly this case. The ground is
 that the kit cannot know any consumer's install path, so a fail-closed default
 would red every adopter's first commit on a roster only their project can write.
 **The honest limit, stated because the degradation is the whole risk:** an
-adopter who deletes the roster silently disables the gate, and no gate catches
-that. What bounds it is the detail line — a clean verdict saying *no corpus is
-configured* is a different sentence from one saying *no violation was found*, and
-a reader of a passing battery can tell them apart. **Absence and unreadability
+adopter who deletes the roster, or never names a corpus, disables the gate, and
+no gate catches that. Two things bound it. The detail line — a clean verdict
+saying *no corpus is configured* is a different sentence from one saying *no
+violation was found*, and a reader of a passing battery can tell them apart. And
+the member declares `# armed-by: GATE_SDK_PORTABILITY_PATHS` (§The install
+disposition), so `doctor` names it disarmed while the corpus is empty and an
+adopter meets the knob that arms it without reading a clean line closely. The
+declaration names the corpus, the half the kit ships empty; a deleted roster is
+still bounded by the detail line alone. **Absence and unreadability
 are different facts**: absence is how a consumer declines the gate, an unreadable
 *present* file is a machine that cannot answer, and only the second is exit 2.
 

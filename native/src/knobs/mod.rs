@@ -767,7 +767,10 @@ fn materialize(held: &Held) -> Result<(Value, bool), String> {
 // scalar only, the local overlay, the tracked file; `None` leaves the kit default to the caller
 fn layered(kit: &'static Kit, name: &str, shape: Shape) -> Result<Option<(Value, Origin, bool)>, String> {
     let l = layers(kit);
-    let l = l.as_ref().as_ref().map_err(String::clone)?;
+    layered_from(l.as_ref().as_ref().map_err(String::clone)?, name, shape)
+}
+
+fn layered_from(l: &Layers, name: &str, shape: Shape) -> Result<Option<(Value, Origin, bool)>, String> {
     if shape == Shape::Scalar {
         if let Ok(v) = std::env::var(name) {
             return Ok(Some((Value::Scalar(v), Origin::Env, false)));
@@ -786,13 +789,34 @@ fn layered(kit: &'static Kit, name: &str, shape: Shape) -> Result<Option<(Value,
 // an empty layered scalar, where every other row keeps the empty value
 fn lookup_held(name: &str) -> Result<(Value, Origin, bool), String> {
     let (kit, row) = static_row(name)?;
-    match layered(kit, row.name, row.shape)? {
+    or_default(row, layered(kit, row.name, row.shape)?)
+}
+
+fn or_default(row: &'static Row, got: Option<(Value, Origin, bool)>) -> Result<(Value, Origin, bool), String> {
+    match got {
         Some((Value::Scalar(s), _, _)) if s.is_empty() && row.empty_takes_default => {
             Ok((default_value(row, &input)?, Origin::Default, false))
         }
         Some(v) => Ok(v),
         None => Ok((default_value(row, &input)?, Origin::Default, false)),
     }
+}
+
+// spec: gate-sdk/SPEC.md §The knob file — a declared static knob's owning kit, and `None` for a name
+// the kit's prefix spells without declaring
+pub fn static_owner(name: &str) -> Option<&'static Kit> {
+    owner(name).filter(|k| k.row(name).is_some())
+}
+
+// spec: installer/SPEC.md §doctor — one static knob resolved as a battery run from a tree whose gates
+// directory is `gates_dir` resolves it, without entering that tree: the same precedence and legacy
+// refusals, read uncached because the process's own tree is a different one
+pub fn wire_in(gates_dir: &str, name: &str) -> Result<String, String> {
+    let (kit, row) = static_row(name)?;
+    let knob_file = std::env::var(kit.knob_file_var()).unwrap_or_default();
+    let config_file = std::env::var(format!("{}CONFIG_FILE", kit.prefix())).unwrap_or_default();
+    let l = load(kit, gates_dir, &knob_file, &config_file)?;
+    Ok(or_default(row, layered_from(&l, row.name, row.shape)?)?.0.wire())
 }
 
 fn lookup(name: &str) -> Result<(Value, Origin), String> {
@@ -1061,6 +1085,26 @@ mod tests {
         env.set("DOCTRINE_KIT_AGENT_FILE", "ENV.md");
         assert_eq!(resolve("DOCTRINE_KIT_AGENT_FILE").unwrap(), (Value::Scalar("ENV.md".into()), Origin::Env));
         clean(&env, &s.dir());
+        restore(&env);
+    }
+
+    // spec: installer/SPEC.md §doctor — a tree's knob read from its own gates directory, not the
+    // process's: the tracked file there answers, the environment still leads, and an empty tree
+    // answers the default
+    #[test]
+    fn a_knob_resolves_in_a_named_gates_directory_without_entering_it() {
+        let env = knobenv::lock();
+        let here = Scratch::new("wire-in-here");
+        let tree = Scratch::new("wire-in-tree");
+        clean(&env, &here.dir());
+        here.write("gate-sdk-config.knobs", "GATE_SDK_PORTABILITY_PATHS = here.sh\n");
+        assert_eq!(wire_in(&tree.dir(), "GATE_SDK_PORTABILITY_PATHS").unwrap(), "");
+        tree.write("gate-sdk-config.knobs", "GATE_SDK_PORTABILITY_PATHS = tree.sh\n");
+        assert_eq!(wire_in(&tree.dir(), "GATE_SDK_PORTABILITY_PATHS").unwrap(), "tree.sh");
+        env.set("GATE_SDK_PORTABILITY_PATHS", "env.sh");
+        assert_eq!(wire_in(&tree.dir(), "GATE_SDK_PORTABILITY_PATHS").unwrap(), "env.sh");
+        assert!(wire_in(&tree.dir(), "PROBE_KIT_ARMING").is_err());
+        clean(&env, &here.dir());
         restore(&env);
     }
 

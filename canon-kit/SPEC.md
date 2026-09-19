@@ -2175,9 +2175,10 @@ diagnostic is reproduced, and none was reproducible on either substrate.
 
 Invariant: every full-line comment on a governed source is one of — a
 machine directive (a comment a tool parses: `graph:`, `shellcheck`,
-`contract:`, `install:`, `smoke-unregistered:`, `portability-declared:` — the
-middle two read off a kit's
+`contract:`, `install:`, `armed-by:`, `smoke-unregistered:`,
+`portability-declared:` — the middle three read off a kit's
 vendored source, `install:` by the installer's recipe module and
+`check-install-disposition`, `armed-by:` by `doctor` and
 `check-install-disposition`, `smoke-unregistered:` by `--run-consumer-smoke`
 off `smoke/install.sh`, gate-sdk/SPEC.md §The install disposition and
 §Consumer smoke; `portability-declared: <reason>` is read at its own site by
