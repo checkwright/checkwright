@@ -170,9 +170,11 @@ Primitives a consumer guard composes; each emits the harness's
   is invoked as `cmd="$(guard_read_command)"`, so any cache it set died with the
   substitution's subshell and stdin was already consumed — a rule needing a
   second field could not get one.
-- `guard_input_field <jq-path>` — the value at `<jq-path>` in `GUARD_INPUT`, or
+- `guard_input_field <path>` — the value at `<path>` in `GUARD_INPUT`, or
   nothing when `GUARD_INPUT` is unset or empty or the path is absent. The
-  accessor a rule reaching past the headline fields uses.
+  accessor a rule reaching past the headline fields uses. `<path>` is jq's
+  path-expression subset — `.name`, `[N]` and `["key"]` steps — and anything
+  outside it, a jq filter included, reads as an absent field.
 - `guard_read_command` — parse the hook JSON, emit the command;
   **fail-open** on any parse problem (exit 0) so a guard can never wedge
   the agent.
@@ -343,7 +345,11 @@ primitives the file defines above it.
 **The load fails in one of two ways, and the hook answers each differently.** When
 the binary cannot be reached — no `gate-sdk/lib/gate.sh` beside the vendor root, or
 no executable at `GATE_SDK_NATIVE_BIN` — the knob read cannot run at all, and the
-hook emits a `guard_advise` naming the build command and exits 0. An advise carries
+hook prints an advisory envelope naming the build command and exits 0. That
+envelope is a fixed literal rather than a `guard_advise`, because `guard_advise`
+renders through the binary this branch has just found missing; it interpolates
+nothing, so it carries no character JSON must escape, and
+`gate-tests/guard-read-path.test.sh` parses it. An advise carries
 no permission decision, so every command still takes the harness's own permission
 path. Only the steering is lost, and every call says so. A block there would refuse
 the very command that builds the binary. When the binary runs and refuses the
@@ -351,6 +357,49 @@ config, with a malformed knob file or a set-but-missing `GUARD_KIT_KNOB_FILE`, t
 hook blocks with the refusal's own text, the loud posture a set-but-missing config
 file always had. The file is repaired with the Edit tool, which the guard does not
 intercept.
+
+**Every JSON read and render goes through the binary, one spawn per call.** The
+library spawns no JSON program of its own. The sourcing tail reads the binary's
+path once, where the knob load already needs it, and the seven sites that read the
+payload or print an envelope call `--guard-json <mode> [<arg>…]`, a top-level flag
+of the gate binary beside `--guard-lib-parity` that resolves no knob, since every
+value it needs arrives as argv or stdin:
+
+- **`field <path>`** reads a payload on stdin and prints the value at `<path>`: a
+  string bare, a number or boolean as JSON spells it, and nothing for null, an
+  absent path, an object, an array, or a path outside the grammar
+  `guard_input_field` names. The path is the crate's pin-path grammar
+  (context-kit/SPEC.md §check-settings-pins), and a step jq's own type rules
+  refuse reads as absent. `guard_input_field` calls it.
+- **`field-or-empty <path>`** is the same except that `false` also prints nothing —
+  `jq -r '<path> // empty'`. `guard_read_command` and `guard_read_path` call it.
+- **`allow-entries <settings-file>`** prints each string member of the file's
+  `permissions.allow`, one per line, and nothing when the file is absent,
+  unreadable or does not parse — §compare-settings-allow's in-crate read.
+  `_guard_allow_inners` filters its `Bash(...)` entries, and the list is read once
+  per hook process and settings path: `_guard_allow_load` fills a global that every
+  reader's call site loads first, directly, because each reader runs inside a
+  process substitution whose own assignments die with it.
+- **`advise <msg>`**, **`allow <reason>`** and **`rewrite <cmd> <reason>`** print
+  the envelope `guard_advise`, `guard_allow` and `guard_rewrite` always printed,
+  keys in the same order, every interpolated value serialized by the crate's
+  hook-JSON serializer (gate-sdk/SPEC.md §The non-gate arm) and never quoted by hand.
+
+Every mode exits 0 but a usage error, which exits 2, and writes LF on every host.
+**The library's fail-open posture carries over unchanged.** A read whose spawn
+fails or prints nothing is the absent field it always was, so its caller declines;
+a render whose spawn fails leaves stdout empty at exit 0, which is the harness's own
+permission path. A spawn costs well under a millisecond, less than the external
+parser it replaced, and the hook's latency is set by its sourcing and knob load.
+**One spawn per payload was refused**: `guard_input_field` takes whatever path a
+consumer's rule passes at call time, so batching would need the paths in advance or
+a second JSON encoding flattened into shell, either costing more than the spawns
+saved.
+
+**The honest limit: a consumer rule that passed `guard_input_field` a jq filter
+reads nothing.** The argument was once forwarded to `jq` whole, so a consumer copy
+could pass a pipe, `//` or a function. Such an argument is now outside the grammar
+and reads as an absent field, which fails open. No rule in this kit does it.
 
 **Five of these primitives are held twice, and a machine holds them equal.**
 `guard_split_compound`, `guard_skeleton` and `_guard_redirect_pairs` — the set
@@ -520,10 +569,11 @@ Passing silently is the opposite failure and the worse one, since it ships an
 unenforceable claim that reports success. So the guard **allows the call and
 emits an advisory naming the rule it could not enforce**: a degraded
 enforcement is visible, never silently folded. One delivery constraint comes
-with the posture and is easy to miss — `guard_advise` is itself jq-backed, so a
-guard degrading *because* `jq` is absent cannot reach for it and must emit the
-advisory envelope directly, or the loud half is lost in exactly the case it was
-written for.
+with the posture and is easy to miss — `guard_advise` renders through the gate
+binary, so a guard degrading *because* the binary is unreachable cannot reach for
+it and must emit the advisory envelope directly, or the loud half is lost in
+exactly the case it was written for. The library's own unreachable-binary branch
+is that case (§The guard framework (`lib/guard.sh`)).
 
 delegation-kit's agent-budget-guard and agent-dispatch-guard were this
 framework's second and third consumers, and did not cost the kit alike, before
@@ -547,9 +597,9 @@ owning the rule ships the guard**, riding `lib/guard.sh` through the
 arm) reproducing the same postures in their own compiled module, so none rides
 this library or the `GUARD_KIT_LIB` indirection any longer — ownership of the
 rule stayed with the kit that had it; only the mechanism moved off this shell
-framework, onto the crate's own hook-JSON serializer, which makes this library
-one of two independent producers of that envelope shape rather than the sole
-one. The state file's path still lives with lifecycle-kit, never here, so
+framework, onto the crate's own hook-JSON serializer. This library renders its
+envelopes through that same serializer (`--guard-json`, above), so the envelope
+shape has one producer on both substrates. The state file's path still lives with lifecycle-kit, never here, so
 guard-kit gains no dependency on a kit it does not otherwise know about
 (lifecycle-kit/SPEC.md §check-stage-evidence).
 
@@ -643,24 +693,15 @@ hook front would port the ruleset and delete that extension point, which the
 library's permanent-shell ground refuses (§The guard framework (`lib/guard.sh`)).
 Both are refused.
 
-The hook's floor on that host is the install page's: Git for Windows' bash plus
-`jq`, which Git for Windows does not ship. A host carrying MinGit or no Git Bash
+The hook's floor on that host is the install page's: Git for Windows' bash and the
+gate binary, which reads the payload and renders every envelope. A host carrying MinGit or no Git Bash
 is not claimed. On such a host the harness runs hook commands under PowerShell,
 where a bare `bash` reaches the system directory's WSL launcher.
 `checkwright doctor` refuses that host before any hook is wired.
 
-The library absorbs one substrate difference rather than branching on the host.
-A native Windows `jq` ends each output line with CR LF. `read` keeps the CR, so
-`_guard_allow_inners`, the one `jq` reader fed through `read`, strips one
-trailing CR from each entry; without it every `Bash(...)` entry fails its match
-and no grant loads. Git Bash's command substitution drops only the output's
-last CR, so the three substitution readers (`guard_read_command`,
-`guard_input_field`, `guard_read_path`) turn every CR LF back into LF through
-`_guard_lf`; without it a multi-line command keeps a CR on each inner line, a
-heredoc's terminator never matches, and the heredoc swallows the statements
-after it. On a host whose `jq` emits LF neither step changes a value, with one
-accepted exception: a command whose own text carries a CR LF is read with LF
-there, because the reader cannot tell that CR from the one `jq` wrote.
+The library has no substrate difference to absorb in what it reads: the binary
+writes LF on every host, so each reader hands the ruleset a payload's own bytes,
+and a command whose own text carries a CR LF is read verbatim everywhere.
 
 **The honest limit: the harness's `PowerShell` tool is not guarded.** On Windows
 the harness carries a second shell tool, named `PowerShell`, which is on by
@@ -777,7 +818,7 @@ by number ("rule 14's walk").
    over the dequoted view, matches a committed `Bash(…)` pattern through
    `guard_allow_match` with no backgrounding `&` ending it (the harness grants
    no backgrounded call), and the command passes rule 24's test taken as a
-   predicate. A missing `jq`, a missing settings file or a parse error fails the
+   predicate. A failed binary read, a missing settings file or a parse error fails the
    first test, so a grant resting on a settings read never turns a missing file
    into an allow, which is rule 18's contract for its own read. Otherwise the
    corrective block fires, and the re-issued relative command meets every later
@@ -1528,7 +1569,7 @@ by number ("rule 14's walk").
       it** (more than one segment): an undecorated allowlisted command already
       resolves on the static match, and intercepting it here would take it off
       the friction log for no gain. Reads `GUARD_KIT_SETTINGS`, and the
-      **fail-open contract travels with the read**: no `jq`, no settings file,
+      **fail-open contract travels with the read**: a failed binary read, no settings file,
       or a parse error and the lead-widening silently declines, leaving the rule
       exactly as it behaves without it. A grant that depends on a settings read
       must never turn a missing settings file into a grant, and declining is the
@@ -1713,7 +1754,7 @@ by number ("rule 14's walk").
     segment a backgrounding `&` ends fails to match whatever glob covers its
     words, since the harness grants no backgrounded call (§The guard framework,
     `guard_split_compound`). Reads
-    `GUARD_KIT_SETTINGS`; **fail-open** — no `jq`, no settings file, or a
+    `GUARD_KIT_SETTINGS`; **fail-open** — a failed binary read, no settings file, or a
     parse error and the rule silently declines and falls through. Placed after
     the auto-allow rules (16, 17, 18, 19) so a silently granted read-only pipeline never
     reaches it — which is also **why the allowlisted-lead grant lives in rule 18
@@ -1900,7 +1941,7 @@ by number ("rule 14's walk").
     since the matcher refuses every expansion; a pattern carrying `?` or a
     bracket class, which is skipped; a segment whose dequoted text carries a
     quoted statement separator, which is skipped; a heredoc-bearing command,
-    whose dequoted view cannot be aligned; and no `jq`, no settings file, or a
+    whose dequoted view cannot be aligned; and a failed binary read, no settings file, or a
     parse error, on `_guard_allow_inners`' fail-open read.
     **It closes two reaches without re-spelling a grant.** `rm -rf .tmp/../<file>`
     and `rm -rf .tmp/x <file>` block against a scratch-dir `rm` grant, and
@@ -2335,10 +2376,9 @@ a silent inflation and not merely a dependency: a settings read delegated to an
 external program fails *open* when the program is absent — the allowlist reads
 empty, every logged command reads as prompting, and the ranking reports a large,
 plausible, entirely wrong number at exit 0 for a KPI to record as a trend.
-**The claim is bounded to this reader and says nothing wider**: `lib/guard.sh`
-and `smoke/install.sh`
-still shell to `jq` — rule 20's own allowlist read and the settings-merge in the
-install recipe — and this member never joined the battery, so the
+**The claim is bounded to this reader and says nothing wider**: `smoke/install.sh`
+still shells to `jq` for the settings-merge in the install recipe, a contributor
+floor rather than an adopter one, and this member never joined the battery, so the
 battery's own program floor moves by nothing at all. **The arm's spawned-program
 set is empty**, which is stated here because nothing mechanical records it: a
 an arm-table row carries no requirement element and `--needs` answers for
@@ -2721,8 +2761,9 @@ passing every element-shape check.
 **The member spawns no external program at all — an empty set, the first in its
 class.** Both allow lists are read in-crate rather than through `jq`, which is
 what keeps an unreadable allowlist from reading as an empty one on a machine that
-merely lacks a tool. The scope of that claim is this member, not the kit: rule 20
-still runs `jq` for its own allowlist read, so guard-kit's floor is unchanged.
+merely lacks a tool. Rule 20's allowlist read takes the same in-crate reader through
+`--guard-json allow-entries` (§The guard framework (`lib/guard.sh`)), so no
+guard-kit reach an adopter runs needs `jq`.
 
 **The read distinguishes unreadable from absent, and that is a deliberate
 behaviour change.** An **absent** file is honestly zero entries, as before. An
@@ -3239,19 +3280,7 @@ keeping its specified behavior:
   granted forced `git rm` for its rule-22 predicate row to refuse. Rule 18's allowlisted-lead widening and rule 20 read the
   same file, so their rows are re-derived whenever it grows. A sandbox the
   arm could not build is exit 2, the harness-precondition code — the shell form
-  would have cascaded it into verdict mismatches naming the wrong cause, which is
-  the same reasoning as the `jq` refusal below.
-
-**`jq` stays a precondition, and the honest statement of what the port removed
-is the point.** The arm refuses at exit 2 with `jq not found on PATH` before it
-builds a single payload, exactly as the shell harness did — because the
-**subject** still spawns `jq`: `lib/guard.sh` reads the allowlist out of
-`GUARD_KIT_SETTINGS` with it, and the sandbox ships a `settings.json` precisely
-so the allowlist rules are exercised. With `jq` absent those rules stop firing
-and the affected rows fail as verdict mismatches, a red naming the wrong cause.
-What the port genuinely removes is **one process per case**, the harness's own
-`jq -nc` payload build times the row count of both tables; stating it as *the
-port drops the `jq` dependency* would be false.
+  would have cascaded it into verdict mismatches, a red naming the wrong cause.
 
 **The runner drives each case from inside the sandbox**, which decides how a
 target is spelled and is stated because getting it wrong reads as a rule defect
@@ -3416,12 +3445,12 @@ through the battery runner's `--emit` front-end, with `GUARD_KIT_KNOB_FILE` poin
 at a sandbox knob file and `GUARD_KIT_SETTINGS`/`GUARD_KIT_SETTINGS_LOCAL` set in the
 environment beside it, so the consumer's own probe array cannot leak into the fixture.
 
-**It carries no `jq` precondition, and that is the mirror image of the one
-`--run-guard-tests` keeps.** That refusal stands because its subject spawns `jq`;
-this subject spawns none — the arm reads both allow lists in-crate and the sandbox
-JSON is written with `printf` — so a precondition here would refuse a runnable suite
-on a machine that needs the tool for nothing this suite does, which is a false
-dividend in the other direction.
+**It carries no `jq` precondition, and neither does `--run-guard-tests`.** A
+precondition is owed only where the subject spawns the tool. This subject spawns
+none — the arm reads both allow lists in-crate and the sandbox JSON is written with
+`printf` — and neither does the guard `--run-guard-tests` drives, which reads its
+payload and allowlist through the binary, so a precondition in either would refuse a
+runnable suite on a machine that needs the tool for nothing the suite does.
 
 **The unit/seam split `--scratch-run` and the kfric port took is refused here, on the
 split's own discriminator.** That split moved pure functions over inputs into
@@ -3478,12 +3507,14 @@ keeps only the decline arm (a dead record present) and the test owns the
 process the firing arm needs. `gate-tests/guard-read-path.test.sh` asserts
 `guard_read_path`, the file-path counterpart of `guard_read_command`, whose
 discriminating case — an absent `file_path` — is an accessor return value, not
-a command a `cases.tsv` row can carry. The same file holds the four `jq` readers to
-their CR handling (§The hook on native Windows), fed a JSON `\r\n` so any `jq`
-emits the bytes a native Windows one does: a table row's payload is built
-in-crate and could only carry that CR as a command whose own text holds it, and
-the sandbox's `settings.json` is the table's fixed nine-entry allowlist, which a
-CR-ended entry would change for every allowlist row.
+a command a `cases.tsv` row can carry. The same file holds the four binary readers
+to reading bytes verbatim (§The hook on native Windows): a JSON `\r\n` reads back
+as itself, and a payload or allowlist carrying no CR reads back with none. A table
+row's payload is built in-crate and could only carry that CR as a command whose
+own text holds it, and the sandbox's `settings.json` is the table's fixed
+nine-entry allowlist, which a CR-ended entry would change for every allowlist row.
+It also parses the unreachable-binary advisory literal as JSON (§The guard
+framework (`lib/guard.sh`)).
 
 `gate-tests/guard-lib-parity.test.sh` takes the same lane on a third structural
 ground: it asserts nothing about *one* implementation's decision, so no

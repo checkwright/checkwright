@@ -62,11 +62,15 @@ pub fn members() -> Vec<&'static str> {
 // than composed by hand: this retires `agent-dispatch-guard.sh`'s degraded arm, which kept its
 // advisory literals free of any character JSON must escape by convention alone.
 pub fn advise(msg: &str) -> i32 {
-    println!(
+    println!("{}", advise_envelope(msg));
+    0
+}
+
+pub fn advise_envelope(msg: &str) -> String {
+    format!(
         r#"{{"hookSpecificOutput":{{"hookEventName":"PreToolUse","additionalContext":{}}}}}"#,
         quote(msg)
-    );
-    0
+    )
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the escaper the hand-written envelope never had. The

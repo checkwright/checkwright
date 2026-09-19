@@ -44,26 +44,48 @@ eq "garbage-output" "$got" ""
 got="$(guard_read_path <<<'{"tool_input":{"file_path":""}}')"; rc=$?
 eq "empty-status" "$rc" "1"
 
-# _guard_allow_inners reads jq through `read`, which keeps the CR a native Windows jq's text-mode
-# stdout ends each line with; an entry ending in a JSON "\r" makes any jq emit that byte stream
+# the binary writes LF on every host, so an allow entry reads back as its own text: one whose JSON
+# ends in a "\r" keeps it and so is no `Bash(...)` entry, and no other entry gains one
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 printf '{"permissions":{"allow":["Bash(git status)\\r","Bash(ls)","Read"]}}\n' >"$tmp/settings.json"
 got="$(GUARD_KIT_SETTINGS="$tmp/settings.json" _guard_allow_inners)"
-eq "allow-inners-crlf" "$got" "$(printf 'git status\nls')"
+eq "allow-inners-verbatim" "$got" "ls"
+printf '{"permissions":{"allow":["Bash(git status)","Bash(ls)"]}}\n' >"$tmp/plain.json"
+got="$(GUARD_KIT_SETTINGS="$tmp/plain.json" _guard_allow_inners)"
+eq "allow-inners-lf" "$got" "$(printf 'git status\nls')"
+[[ "$got" != *$'\r'* ]] || eq "allow-inners-no-cr" "a CR" "none"
 
-# the three substitution readers hand the ruleset LF where a native Windows jq wrote CR LF; a JSON
-# "\r\n" makes any jq emit those bytes, and a heredoc's terminator is the line a stray CR breaks
+# the three substitution readers hand the ruleset a payload's own bytes: a JSON "\r\n" reads back
+# verbatim, and a payload carrying no CR reads back with none
 crlf='{"tool_input":{"command":"cat <<EOF\r\nline\r\nEOF\r\n","file_path":"a\r\nb\r\n","run_in_background":"true\r\n"}}'
-eq "command-crlf" "$(guard_read_command <<<"$crlf")" "$(printf 'cat <<EOF\nline\nEOF')"
-eq "path-crlf" "$(guard_read_path <<<"$crlf")" "$(printf 'a\nb')"
+eq "command-crlf" "$(guard_read_command <<<"$crlf")" "$(printf 'cat <<EOF\r\nline\r\nEOF\r')"
+eq "path-crlf" "$(guard_read_path <<<"$crlf")" "$(printf 'a\r\nb\r')"
 GUARD_INPUT="$crlf"
-eq "field-crlf" "$(guard_input_field '.tool_input.run_in_background')" "true"
+eq "field-crlf" "$(guard_input_field '.tool_input.run_in_background')" "$(printf 'true\r')"
 unset GUARD_INPUT
+lf='{"tool_input":{"command":"cat <<EOF\nline\nEOF\n","file_path":"a\nb","run_in_background":true}}'
+for got in "$(guard_read_command <<<"$lf")" "$(guard_read_path <<<"$lf")" "$(GUARD_INPUT="$lf" guard_input_field '.tool_input.run_in_background')"; do
+    [[ "$got" != *$'\r'* ]] || eq "reader-added-cr" "a CR" "none"
+done
+eq "command-lf" "$(guard_read_command <<<"$lf")" "$(printf 'cat <<EOF\nline\nEOF')"
+GUARD_INPUT="$lf"
+eq "field-bool" "$(guard_input_field '.tool_input.run_in_background')" "true"
+eq "field-object" "$(guard_input_field '.tool_input')" ""
+eq "field-filter" "$(guard_input_field '.tool_input.command | length')" ""
+unset GUARD_INPUT
+
+# the unreachable-binary advisory is a fixed literal, so it is parsed here: the binary it cannot
+# reach at hook time is the parser this test has
+adv="$(GATE_SDK_NATIVE_BIN=/nonexistent/checkwright-gates bash -c 'source "$1"' _ "$DIR/lib/guard.sh" </dev/null)"; rc=$?
+eq "unreachable-status" "$rc" "0"
+ctx="$(printf '%s' "$adv" | "$_guard_bin" --guard-json field '.hookSpecificOutput.additionalContext')"
+[[ "$ctx" == "guard-kit's rules did not run on this call"* ]] || eq "unreachable-literal-parses" "$adv" "a JSON advisory"
+eq "unreachable-event" "$(printf '%s' "$adv" | "$_guard_bin" --guard-json field '.hookSpecificOutput.hookEventName')" "PreToolUse"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "guard-read-path.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "guard-read-path.test: ok ($checks assertions; path extraction plus the absent/unparseable/empty fall-through contract, and every jq reader's CRLF line ending)"
+echo "guard-read-path.test: ok ($checks assertions; path extraction plus the absent/unparseable/empty fall-through contract, every reader's payload bytes read back verbatim, and the unreachable-binary advisory parsed as JSON)"
 exit 0

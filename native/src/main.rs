@@ -188,6 +188,7 @@ const TOP_LEVEL_FLAGS: &[&str] = &[
     "--source-stamp",
     "--list",
     "--guard-lib-parity",
+    "--guard-json",
     "--install",
     "--init",
     "--doctor",
@@ -256,7 +257,7 @@ fn main() {
         None => {
             eprintln!("checkwright-gates: no subcommand given");
             eprintln!("  adopter verbs: {}", installer::VERBS.iter().map(|(f, _)| f.trim_start_matches('-')).collect::<Vec<_>>().join(", "));
-            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --source-stamp | --guard-lib-parity <mode> <arg>... | --install <op> [--<key> <value>]... | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --hook <member> | --emit-<arm> | <gate-name> [args...]");
+            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --source-stamp | --guard-lib-parity <mode> <arg>... | --guard-json <mode> <arg>... | --install <op> [--<key> <value>]... | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --hook <member> | --emit-<arm> | <gate-name> [args...]");
             eprintln!("  arms: {}", emit::arms().join(", "));
             exit(2);
         }
@@ -293,6 +294,12 @@ fn main() {
     // three modes resolve none. A top-level flag, like the arms around it.
     if first == "--guard-lib-parity" {
         exit(guard_lib_parity(&argv[1..]));
+    }
+
+    // spec: guard-kit/SPEC.md §The guard framework — a top-level flag for `--guard-lib-parity`'s
+    // reason: the library passes every value as argv or stdin, so no knob is resolved.
+    if first == "--guard-json" {
+        exit(guard::json_arm(&argv[1..]));
     }
 
     // spec: installer/SPEC.md §The install boundary — the install seam both bootstraps call,

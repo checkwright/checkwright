@@ -457,8 +457,8 @@ mod tests {
         assert!(!out.contains("bash"), "a prose selection reaches no bash:\n{}", out);
 
         let mut out = String::new();
-        assert!(toolchain_block(&mut out, Some(&sel(&["gate-sdk", "guard-kit"], &[])), only_floor));
-        assert!(out.contains("bash ") && out.contains("jq           NOT FOUND"));
+        assert!(!toolchain_block(&mut out, Some(&sel(&["gate-sdk", "guard-kit"], &[])), only_floor));
+        assert!(out.contains("bash ") && !out.contains("jq"), "a guard-kit selection owes no jq:\n{}", out);
 
         let mut out = String::new();
         assert!(toolchain_block(&mut out, Some(&sel(&["gate-sdk"], &["check-action-run-shell"])), only_floor));
@@ -469,13 +469,13 @@ mod tests {
         assert!(out.contains(
             "bash         not probed — owed where any of context-kit, delegation-kit, drift-kit, guard-kit, lifecycle-kit is selected"
         ));
-        assert!(out.contains("jq           not probed — owed where guard-kit is selected"));
+        assert!(!out.contains("jq"), "jq is a contributor member, never rendered:\n{}", out);
         assert!(out.contains("curl         not probed — owed where delegation-kit is selected"));
         assert!(out.contains("shellcheck   not probed — owed where a registered gate needs it"));
 
         let mut out = String::new();
         assert!(!toolchain_block(&mut out, Some(&sel(&["guard-kit", "delegation-kit"], &["check-shellcheck"])), present));
-        assert!(out.contains("jq           9.9.9") && out.contains("shellcheck   9.9.9"));
+        assert!(!out.contains("jq") && out.contains("shellcheck   9.9.9"));
     }
 
     // spec: installer/SPEC.md §The gate binary — the omitted block reports whatever reason it

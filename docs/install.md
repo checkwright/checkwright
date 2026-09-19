@@ -180,12 +180,10 @@ your `PATH`, and the note says what breaks without it:
   binary reads civil dates itself rather than through GNU `date -d`.
 - `git` — the gates read tracked files and the hooks fire at commit time; the
   model is git-native end to end.
-- `jq` (@guard-kit) — guard-kit's hook parses the harness's JSON payload with
-  it, so `checkwright doctor` requires it only where guard-kit is selected, and
-  `init` refuses a profile carrying guard-kit on a machine without it. Take it
-  from your distribution's package on Linux or WSL, from Homebrew
-  (`brew install jq`) on macOS, and from Chocolatey (`choco install jq`) on native
-  Windows.
+- `jq` (@contributor) — a **contributor** requirement: guard-kit's smoke recipe
+  and the installer's consumer smoke read JSON with it. No adopter needs it.
+  guard-kit's hook reads the harness's JSON payload through the gate binary, so
+  `checkwright doctor` never asks for `jq` and every profile installs without it.
 - `curl` (@delegation-kit) — delegation-kit's usage poller (`--usage-poll`)
   fetches its source with it, and refuses by name where `curl` is absent, so
   `checkwright doctor` requires it only where delegation-kit is selected. Most
@@ -246,7 +244,7 @@ A bullet whose parenthetical carries an `@` token names the **audience** that
 floor belongs to, and there are three kinds. `@contributor` is a tool nothing on
 an install path reaches, required of someone building Checkwright rather than of
 someone running it, and `checkwright doctor` leaves it out of its verdict
-entirely. A kit name, such as `@guard-kit`, is held only where the profile you
+entirely. A kit name, such as `@delegation-kit`, is held only where the profile you
 select carries that kit. Several kit names joined by `+` are held where it
 carries any of them. `@registered` is held only where a gate registered in
 your `gates.list` needs the tool. An unmarked bullet is what every adopter's

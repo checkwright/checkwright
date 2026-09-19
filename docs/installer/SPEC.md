@@ -54,20 +54,16 @@ delivery-path tool joins the toolchain roster, and the manual vendoring path
 documented on the site needs neither. The toolchain the battery does assert,
 with its version floors, is on the install page.
 
-**The verbs themselves need no `jq`.** They read JSON — this package's own
-version stamp and the `checkwright.lock` manifest — and behind the invoke they
-read it with the crate's own parser, so none of them refuses for want of an
-external one. The install page's toolchain block still names `jq`, and that claim
-is about **guard-kit's hook**, the one shipped reach that spawns it: a different
-program's users, and the one that survives.
-
-**A `jq`-less machine is refused an install only where the selection carries the
-kit that reaches `jq`.** `jq` carries guard-kit's audience on the toolchain
-floor, so `doctor` — which runs as `init`'s last precondition, still before any
-file is written — blocks a profile carrying guard-kit, naming the floor that kit
-needs, and owes nothing to a profile without it. What is lost is a refusal that
-named a verb's own dependency; what replaces it is the one that names the
-adopter's actual problem, and only where it is one.
+**Neither the verbs nor anything they install need `jq`.** The verbs read JSON —
+this package's own version stamp and the `checkwright.lock` manifest — and behind
+the invoke they read it with the crate's own parser, so none of them refuses for
+want of an external one. guard-kit's hook, once the one shipped reach that spawned
+`jq`, reads its payload and renders its envelopes through the gate binary
+(guard-kit/SPEC.md §The guard framework (`lib/guard.sh`)). So `jq` carries the
+contributor audience on the toolchain floor: `doctor` — which runs as `init`'s last
+precondition, still before any file is written — owes it to no selection, and every
+profile, guard-kit's included, installs on a machine without it. The install page's
+toolchain block names it for the smoke harnesses that still read JSON with it.
 
 `doctor` is the verb that **reaches its diagnosis** rather than refusing before it
 can report one: it renders its whole report, names every owed floor member that is
@@ -1079,7 +1075,7 @@ rendered and cannot set the verdict. It is left out rather than reported as
 informational on purpose: `doctor` is the adopter's verb, and showing an adopter a
 tool they do not need is an invitation to install it. An **undecided** one — a
 conditional member with no selection to read — is rendered unprobed, as
-`jq           not probed — owed where guard-kit is selected` (for a kit list,
+`curl         not probed — owed where delegation-kit is selected` (for a kit list,
 `owed where any of context-kit, delegation-kit, … is selected`, the names joined
 by a comma and a space; for `registered`, `owed where a registered gate needs
 it`), and never sets the
@@ -1140,8 +1136,7 @@ and renders whatever verdict that predicate
 returns, so the contract keeps one owner and this stays a display of it. Which
 members a selection owes — and so which absences set the verdict — is read off
 that roster through its owed-predicate, never listed here; §Requirements works
-the one case a reader arrives with, `jq`, and says where it is below contract and
-where it is outside it. The
+the one case a reader arrives with, `jq`, and says why no selection owes it. The
 roster is the binary's own rather than a copy in the tree it is inspecting:
 at `init` time nothing has been vendored there yet, so a tree copy would not
 exist at the moment the answer is needed.
@@ -3024,23 +3019,22 @@ a verb that runs clean where a verb shelling out to `jq` fails: on this `PATH` t
 two are distinguishable and nowhere else are they. That is what the arm is for,
 and it is why the arm outlives the `jq` preflight it was built around.
 
-So the arm splits its verbs by what each one actually meets, in this order:
+The claim reaches past the verbs to what they install: guard-kit's hook, the one
+shipped reach that once spawned `jq`, reads and renders through the gate binary,
+so `jq` is a contributor member no selection owes. In this order:
 
-- **`doctor` in a directory with no install** has no selection, so it exits 0 on
-  a host meeting `git` and renders `jq` as `not probed`, naming the kit
-  that owes it. That kit is read off the line and is the kit the next two
-  assertions use, so the harness names no kit and carries no second copy of the
-  roster's audience field.
-- **`init --profile` at the lattice minimum** exits 0 on the `jq`-less `PATH`:
-  the minimum selects no kit owing `jq` — asserted, not assumed — so the floor it
-  meets carries none.
-- **`init` at a profile whose kit set carries that kit**, found through the
-  harness's own profile reader and run in a fresh consumer, exits 1, names **the
-  toolchain floor** as the reason, renders `jq` as `NOT FOUND`, and leaves no
-  manifest behind: the refusal an adopter meets there is the floor's, delivered
-  before anything is written, rather than a JSON reader's.
-- **`doctor` inside the minimum's install** reads that install's selection, exits
-  0 and renders no `jq` line at all.
+- **`doctor` in a directory with no install** exits 0 and names `jq` nowhere.
+- **`init --profile` at the lattice minimum** exits 0 on the `jq`-less `PATH`,
+  and `doctor` inside that install exits 0 and names `jq` nowhere.
+- **`init` at a profile whose kit set carries guard-kit**, found through the
+  harness's own profile reader and run in a fresh consumer, exits 0, and `doctor`
+  inside it names `jq` nowhere. The arm names guard-kit because it drives that
+  kit's hook, not to restate an audience field.
+- **The installed guard answers a payload**: fed a read-only command, guard-kit's
+  vendored `templates/bash-guard.sh` exits 0 with an allow envelope on the
+  `jq`-less `PATH`. An allow is a payload read and a render, the two things the
+  hook once spawned `jq` for, and it is neither the unreachable-binary advisory nor
+  the empty stdout a failed render leaves.
 - **`diff` and `uninstall --dry-run`** run no `doctor` precondition, so they read
   the minimum's manifest and reach their answer: each must **exit 0** and say
   nothing about `jq`, which is the arm's positive evidence that the read itself is

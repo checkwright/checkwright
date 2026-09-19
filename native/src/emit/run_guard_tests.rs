@@ -51,12 +51,6 @@ fn execute(args: &[String]) -> Result<i32, String> {
             return Err(format!("{}: missing {}", NAME, f));
         }
     }
-    // spec: guard-kit/SPEC.md §Testing — the `jq` precondition survives the port because the
-    // *subject* still spawns it; the section states what an absent `jq` would red instead.
-    if !proc::on_path(&programs::JQ) {
-        return Err(format!("{}: jq not found on PATH", NAME));
-    }
-
     let sandbox = build_sandbox()?;
     let log = format!("{}/friction.log", sandbox.shell);
 

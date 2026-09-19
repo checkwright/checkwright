@@ -9,20 +9,17 @@ guard_read_input() {
     return 0
 }
 
-# spec: guard-kit/SPEC.md §The hook on native Windows — the CR LF a native Windows jq writes, turned back into the LF the ruleset reads, in the named variable
-_guard_lf() {
-    local -n _guard_lf_v="$1"
-    _guard_lf_v="${_guard_lf_v//$'\r\n'/$'\n'}"
-    _guard_lf_v="${_guard_lf_v%$'\r'}"
+# spec: guard-kit/SPEC.md §The guard framework — every read and render goes through the binary's --guard-json; a spawn that fails prints nothing, which each caller already reads as its fail-open answer
+_guard_json() {
+    [[ -n "${_guard_bin:-}" ]] || return 1
+    "$_guard_bin" --guard-json "$@" 2>/dev/null
 }
 
-# spec: guard-kit/SPEC.md §The guard framework — one field of the cached payload by jq path; an unset or empty GUARD_INPUT and an absent path alike print nothing, which is what keeps a guard that never opted in working unchanged
+# spec: guard-kit/SPEC.md §The guard framework — one field of the cached payload by path; an unset or empty GUARD_INPUT and an absent path alike print nothing, which is what keeps a guard that never opted in working unchanged
 guard_input_field() {
     local v
     [[ -n "${GUARD_INPUT:-}" ]] || return 0
-    v="$(printf '%s' "$GUARD_INPUT" | jq -r "$1" 2>/dev/null)" || return 0
-    _guard_lf v
-    [[ "$v" == "null" ]] && return 0
+    v="$(printf '%s' "$GUARD_INPUT" | _guard_json field "$1")" || return 0
     printf '%s' "$v"
 }
 
@@ -34,8 +31,7 @@ guard_read_command() {
     else
         input="$(cat 2>/dev/null)" || return 1
     fi
-    cmd="$(printf '%s' "$input" | jq -r '.tool_input.command // empty' 2>/dev/null)" || return 1
-    _guard_lf cmd
+    cmd="$(printf '%s' "$input" | _guard_json field-or-empty '.tool_input.command')" || return 1
     [[ -z "$cmd" ]] && return 1
     printf '%s' "$cmd"
 }
@@ -48,8 +44,7 @@ guard_read_path() {
     else
         input="$(cat 2>/dev/null)" || return 1
     fi
-    path="$(printf '%s' "$input" | jq -r '.tool_input.file_path // empty' 2>/dev/null)" || return 1
-    _guard_lf path
+    path="$(printf '%s' "$input" | _guard_json field-or-empty '.tool_input.file_path')" || return 1
     [[ -z "$path" ]] && return 1
     printf '%s' "$path"
 }
@@ -60,19 +55,17 @@ guard_block() {
 }
 
 guard_advise() {
-    printf '%s' "$1" | jq -Rc '{hookSpecificOutput:{hookEventName:"PreToolUse",additionalContext:.}}'
+    _guard_json advise "$1"
     exit 0
 }
 
 guard_allow() {
-    jq -nc --arg r "$1" \
-        '{hookSpecificOutput:{hookEventName:"PreToolUse",permissionDecision:"allow",permissionDecisionReason:$r}}'
+    _guard_json allow "$1"
     exit 0
 }
 
 guard_rewrite() {
-    jq -nc --arg c "$1" --arg r "$2" \
-        '{hookSpecificOutput:{hookEventName:"PreToolUse",permissionDecision:"allow",permissionDecisionReason:$r,updatedInput:{command:$c}}}'
+    _guard_json rewrite "$1" "$2"
     exit 0
 }
 
@@ -309,19 +302,26 @@ _guard_harness_view() {
     printf '%s' "$rest"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — the committed Bash(...) allow inners, one per line; the fail-open read rules 18 and 19 share, so a missing jq or settings file emits nothing and every reader declines
-_guard_allow_inners() {
-    command -v jq >/dev/null 2>&1 || return 0
+# spec: guard-kit/SPEC.md §The generic ruleset — the settings allowlist, read once per hook process and settings path; called directly before a reader's process substitution, since a cache set inside one dies with its subshell
+_guard_allow_load() {
+    [[ -n "${_guard_allow_for+x}" && "$_guard_allow_for" == "$GUARD_KIT_SETTINGS" ]] && return 0
+    _guard_allow_for="$GUARD_KIT_SETTINGS"
+    _guard_allow_list=''
     [[ -f "$GUARD_KIT_SETTINGS" ]] || return 0
+    _guard_allow_list="$(_guard_json allow-entries "$GUARD_KIT_SETTINGS")"
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — the committed Bash(...) allow inners, one per line; the fail-open read rules 18 and 19 share, so a failed binary read or a missing settings file emits nothing and every reader declines
+_guard_allow_inners() {
+    _guard_allow_load
     local e inner
     while IFS= read -r e; do
-        e="${e%$'\r'}"
         case "$e" in
             Bash\(*\)) inner="${e#Bash(}"; inner="${inner%)}" ;;
             *) continue ;;
         esac
         [[ -n "$inner" ]] && printf '%s\n' "$inner"
-    done < <(jq -r '.permissions.allow[]?' "$GUARD_KIT_SETTINGS" 2>/dev/null)
+    done <<<"$_guard_allow_list"
 }
 
 # spec: guard-kit/SPEC.md §The generic ruleset — a segment with its redirects removed and trimmed: what rules 18 and 19 compare against a committed bare allow entry
@@ -338,6 +338,7 @@ _guard_is_bare_allow() {
     local core bl
     core="$(_guard_segment_core "$1")"
     [[ -n "$core" ]] || return 1
+    _guard_allow_load
     while IFS= read -r bl; do
         case "$bl" in *'*'*) continue ;; esac
         [[ "$core" == "$bl" ]] && return 0
@@ -1400,6 +1401,7 @@ _guard_recorded_launch() {
     words="${words//$'\x03'/;}"
     words="${words//$'\x04'/|}"
     words="${words//$'\x05'/&}"
+    _guard_allow_load
     mapfile -t inners < <(_guard_allow_inners)
     for inner in ${inners[@]+"${inners[@]}"}; do
         guard_allow_match "$words" "$inner" && { hit=1; break; }
@@ -1490,6 +1492,7 @@ guard_rule_bounded_wait() {
 guard_rule_allowlist_chain() {
     local cmd="$1" inner
     local -a bare_leads=() pattern_inners=()
+    _guard_allow_load
     while IFS= read -r inner; do
         pattern_inners+=("$inner")
         case "$inner" in *'*'*) ;; *) bare_leads+=("$inner") ;; esac
@@ -1873,6 +1876,7 @@ _guard_slot_reach() {
     live="$(guard_skeleton "$raw" sq hdq)"
     case "$live" in *'$'* | *'<('* | *'>('*) return 2 ;; esac
     case "$raw" in *'`'*) return 2 ;; esac
+    _guard_allow_load
     mapfile -t inners < <(_guard_allow_inners)
     [[ "${#inners[@]}" -ge 1 ]] || return 1
     s="$(guard_skeleton "$raw" sq dq hd)"
@@ -1904,6 +1908,7 @@ _guard_slot_reach() {
 _guard_rewrite_granted() {
     local cmd="$1" s v seg inner hit rc=0
     local -a inners=()
+    _guard_allow_load
     mapfile -t inners < <(_guard_allow_inners)
     [[ "${#inners[@]}" -ge 1 ]] || return 1
     s="$(guard_skeleton "$cmd" sq dq hd)"
@@ -2064,8 +2069,12 @@ if [[ -f "${_guard_root}gate-sdk/lib/gate.sh" ]]; then
     # shellcheck source=../../gate-sdk/lib/gate.sh
     source "${_guard_root}gate-sdk/lib/gate.sh"
 fi
-if ! declare -F gate_knob_values >/dev/null || [[ ! -x "$(gate_native_bin)" ]]; then
-    guard_advise "guard-kit's rules did not run on this call: the gate binary its knobs are read from is not reachable, so the call takes the harness's own permission path with no steering. Build it: bash ${_guard_root}gate-sdk/bin/build-native.sh"
+_guard_bin=''
+declare -F gate_native_bin >/dev/null && _guard_bin="$(gate_native_bin)"
+# spec: guard-kit/SPEC.md §The guard framework (`lib/guard.sh`) — a fixed literal, because guard_advise renders through the binary this branch has just found missing; it interpolates nothing, so it carries no character JSON must escape
+if ! declare -F gate_knob_values >/dev/null || [[ ! -x "$_guard_bin" ]]; then
+    printf '%s\n' '{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"guard-kit'\''s rules did not run on this call: the gate binary its knobs and its payload reads come from is not reachable, so the call takes the harness'\''s own permission path with no steering. Build it: bash gate-sdk/bin/build-native.sh"}}'
+    exit 0
 fi
 _guard_knob_names=(
     GUARD_KIT_LOG GUARD_KIT_WAKEUP_LOG GUARD_KIT_SETTINGS GUARD_KIT_SETTINGS_LOCAL GUARD_KIT_BREADTH_PROBES

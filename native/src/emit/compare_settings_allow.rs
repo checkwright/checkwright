@@ -32,7 +32,7 @@ const DECLARED_HEADER: &str =
 // spec: guard-kit/SPEC.md §compare-settings-allow — the three readings of an allow list, kept
 // apart because an unreadable file must not degrade into an empty one and print a clean line the
 // document does not support.
-enum AllowRead {
+pub(crate) enum AllowRead {
     Absent,
     Unparseable,
     Entries(Vec<String>),
@@ -41,7 +41,7 @@ enum AllowRead {
 // spec: guard-kit/SPEC.md §compare-settings-allow — `.permissions.allow[]?` read in-crate with
 // `serde_json`: this member spawns no external program at all, so no machine that merely lacks a
 // tool can turn a populated allowlist into an empty one.
-fn read_allow(path: &str) -> AllowRead {
+pub(crate) fn read_allow(path: &str) -> AllowRead {
     let bytes = match std::fs::read(path) {
         Ok(b) => b,
         Err(_) => return AllowRead::Absent,

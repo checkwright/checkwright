@@ -50,7 +50,7 @@ roster! {
     DATE = "date", "";
     MKTEMP = "mktemp", "contributor";
     CP = "cp", "contributor";
-    JQ = "jq", "guard-kit";
+    JQ = "jq", "contributor";
     SHELLCHECK = "shellcheck", "registered";
     #[cfg(not(unix))]
     PS = "ps", "";

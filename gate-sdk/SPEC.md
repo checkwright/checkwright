@@ -2914,7 +2914,7 @@ recount is a step toward re-deciding a closed question.
 The binary is a multi-call binary whose *gate* subcommands are dispatched by
 name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
 `--list`, `--reads`, `--needs`, `--source-stamp`,
-`--guard-lib-parity`, `--install`, `--help`, and the installer's five adopter
+`--guard-lib-parity`, `--guard-json`, `--install`, `--help`, and the installer's five adopter
 verbs — `--init`, `--doctor`, `--diff`, `--update` and `--uninstall`
 (installer/SPEC.md §The verbs) — plus the
 `--emit-` family the arm table keys (`--emit-queue-counts` and
@@ -3049,7 +3049,9 @@ A **non-gate arm** is specified by three properties:
   its parity harness (holding guard-kit's twinned primitives to `lib/guard.sh`,
   whose callers are rules inside that same file — so it is the member whose
   second holder cannot empty even in principle, the property
-  `--declaration-parity` lacked) — and stating it is what
+  `--declaration-parity` lacked), `--guard-json` by `lib/guard.sh`'s payload
+  readers and envelope renderers (guard-kit/SPEC.md §The guard framework
+  (`lib/guard.sh`)) — and stating it is what
   stops the class becoming a place to park unreachable code. **A parity arm's
   caller is the second holder, so the arm retires with it**:
   `--declaration-parity` left this roster in the cut that deleted the
@@ -3847,7 +3849,7 @@ later reader meeting a non-gate arm that fails open should read a class that was
 never governed by it, rather than filing a defect against a contract that does
 not reach here. **The ground is guard-kit's own, not an invention:**
 `guard-kit/lib/guard.sh` already fails open on missing infrastructure, so a
-missing jq or settings file emits nothing and every reader declines. A guard that
+failed binary read or a missing settings file emits nothing and every reader declines. A guard that
 cannot run must decline, not brick. The alternative — fail closed, matching the
 gate battery — is refused because its blast radius is every tool call in the
 session and its trigger is an adopter's platform rather than an adopter's error.

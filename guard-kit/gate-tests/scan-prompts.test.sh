@@ -199,7 +199,11 @@ assert_has hd-over-bound '1 of them allowlist-unreachable' "$(hd_run "$hdLOG")"
 # one encoded line, and that line reads back as the command it recorded.
 wroteLOG="$sb/wrote.log"
 hd_cmd="$(printf "python3 - <<'PY'\nprint('a\\\\b;\\tc')\nPY")"
-jq -nc --arg c "$hd_cmd" '{tool_name:"Bash",tool_input:{command:$c}}' \
+hd_json="${hd_cmd//\\/\\\\}"
+hd_json="${hd_json//\"/\\\"}"
+hd_json="${hd_json//$'\n'/\\n}"
+hd_json="${hd_json//$'\t'/\\t}"
+printf '{"tool_name":"Bash","tool_input":{"command":"%s"}}' "$hd_json" \
     | GUARD_KIT_LOG="$wroteLOG" bash guard-kit/templates/bash-guard.sh >/dev/null 2>&1
 wrote="$(cat "$wroteLOG" 2>/dev/null)"
 # shellcheck disable=SC2016

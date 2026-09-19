@@ -382,8 +382,8 @@ jobs:
       # runs docs/install.md §Requirements' own block: it reads `windows-remedy`
       # with the macOS legs' awk program and runs the body verbatim under
       # PowerShell, the shell a native-Windows adopter types it into. The block
-      # installs no floor member — `shellcheck` and `jq` are conditional members
-      # and `starter` owes neither — and the runner image may carry them anyway,
+      # installs no floor member — `shellcheck` is a conditional member `starter`
+      # does not owe and `jq` a contributor one — and the runner image may carry them anyway,
       # so this leg asserts nothing about their absence. An empty extraction reds
       # by name.
       - name: run the page's windows-remedy block

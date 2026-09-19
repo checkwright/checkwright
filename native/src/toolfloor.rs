@@ -7,7 +7,7 @@
 pub const PROBE_SET: &[&str] = &[
     "bash:4.3::context-kit+delegation-kit+drift-kit+guard-kit+lifecycle-kit",
     "git",
-    "jq:::guard-kit",
+    "jq:::contributor",
     "curl:::delegation-kit",
     "shellcheck:::registered",
     "cargo:1.71::contributor",
@@ -249,13 +249,13 @@ mod tests {
         let prose = selection(&["gate-sdk", "canon-kit"], &[]);
         assert_eq!(owed_names(Some(&prose), Owing::Owed), vec!["git"]);
         let guarded = selection(&["gate-sdk", "guard-kit"], &[]);
-        assert_eq!(owed_names(Some(&guarded), Owing::Owed), vec!["bash", "git", "jq"]);
+        assert_eq!(owed_names(Some(&guarded), Owing::Owed), vec!["bash", "git"]);
         let staged = selection(&["gate-sdk", "lifecycle-kit"], &[]);
         assert_eq!(owed_names(Some(&staged), Owing::Owed), vec!["bash", "git"]);
         let linted = selection(&["gate-sdk"], &["check-action-run-shell"]);
         assert_eq!(owed_names(Some(&linted), Owing::Owed), vec!["git", "shellcheck"]);
-        assert_eq!(owed_names(None, Owing::Undecided), vec!["bash", "jq", "curl", "shellcheck"]);
-        assert_eq!(owed_names(None, Owing::NotOwed), vec!["cargo"]);
+        assert_eq!(owed_names(None, Owing::Undecided), vec!["bash", "curl", "shellcheck"]);
+        assert_eq!(owed_names(None, Owing::NotOwed), vec!["jq", "cargo"]);
     }
 
     // spec: context-kit/SPEC.md §bin/env-probe — a kit list is the union of its names, and a name

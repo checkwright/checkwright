@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: installer/SPEC.md §The consumer smoke — builds the host gate binary, packs the package around it, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → every command init printed in its follow-up block resolves in the payload just written with every flag it names accepted → green battery → manifest agrees with the tree, a disagreement whose own operands are hashes failing at exit 1 as a verdict about the consumer while one that reached the comparison malformed refuses at exit 2 as a precondition of this harness → the seeded queue satisfies queue-kit's section contract, or none is seeded where none is owed — which of the two is owed read from the package through the --install queue-source op rather than derived a second time here → idempotent re-run → doctor clean, naming a registered member disarmed → a planted prose defect caught and cleared → diff clean → uninstall back to the pre-init tree object) plus the four profile-lattice assertions and the value assertion over the loop (some profile below the maximum catches that defect) (every named kit resolves, exactly one minimum and one maximum, the maximum is the payload-derived profile, and gate rosters are monotone across every comparable pair of the registries the installs wrote), an artifact-less refusal leg driving the packer's own artifact-free output and asserting that init, doctor, diff and a bare invocation all meet one bootstrap refusal that names the platform, carries a remedy and writes nothing, a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, whose first hop asserts a non-zero live-member count and a placed artifact in the consumer's registry before asserting the worktree is clean — so cleanliness is evidence over a hop that rewrote something rather than over one that rewrote nothing, a cross-version reversal arm carrying an unedited consumer across those same three versions and back to its pre-init tree object, so removability is asserted after a payload changed shape and the roster is asserted to cover an upgrade hop's write set rather than a first init's alone, a toolchain-free arm driving doctor and a full init with cargo and rustc masked off PATH, a jq-less arm asserting that diff, uninstall and init at the lattice minimum run clean with no jq on PATH while init at a profile selecting the kit that owes jq is blocked by doctor's floor verdict, and that doctor names jq unprobed with no install and omits it inside an install that does not owe it, a bash-less arm installing every profile whose kit set owes no bash, running each printed follow-up command and committing through the installed hooks once clean and once refused with no bash on PATH, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it, a narrowing arm re-running init at a smaller profile so files[] outlives kits, and an artifact arm driving the selection outcomes a single install cannot show — the unrostered host's refusal, the tampered artifact's and the declared-but-absent target's, asserted to differ in message and remedy rather than only in exit status; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
+# spec: installer/SPEC.md §The consumer smoke — builds the host gate binary, packs the package around it, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → every command init printed in its follow-up block resolves in the payload just written with every flag it names accepted → green battery → manifest agrees with the tree, a disagreement whose own operands are hashes failing at exit 1 as a verdict about the consumer while one that reached the comparison malformed refuses at exit 2 as a precondition of this harness → the seeded queue satisfies queue-kit's section contract, or none is seeded where none is owed — which of the two is owed read from the package through the --install queue-source op rather than derived a second time here → idempotent re-run → doctor clean, naming a registered member disarmed → a planted prose defect caught and cleared → diff clean → uninstall back to the pre-init tree object) plus the four profile-lattice assertions and the value assertion over the loop (some profile below the maximum catches that defect) (every named kit resolves, exactly one minimum and one maximum, the maximum is the payload-derived profile, and gate rosters are monotone across every comparable pair of the registries the installs wrote), an artifact-less refusal leg driving the packer's own artifact-free output and asserting that init, doctor, diff and a bare invocation all meet one bootstrap refusal that names the platform, carries a remedy and writes nothing, a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, whose first hop asserts a non-zero live-member count and a placed artifact in the consumer's registry before asserting the worktree is clean — so cleanliness is evidence over a hop that rewrote something rather than over one that rewrote nothing, a cross-version reversal arm carrying an unedited consumer across those same three versions and back to its pre-init tree object, so removability is asserted after a payload changed shape and the roster is asserted to cover an upgrade hop's write set rather than a first init's alone, a toolchain-free arm driving doctor and a full init with cargo and rustc masked off PATH, a jq-less arm asserting that diff, uninstall and init at the lattice minimum and at a guard-kit profile run clean with no jq on PATH, that the installed guard hook answers a payload there, and that doctor names jq nowhere, a bash-less arm installing every profile whose kit set owes no bash, running each printed follow-up command and committing through the installed hooks once clean and once refused with no bash on PATH, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it, a narrowing arm re-running init at a smaller profile so files[] outlives kits, and an artifact arm driving the selection outcomes a single install cannot show — the unrostered host's refusal, the tampered artifact's and the declared-but-absent target's, asserted to differ in message and remedy rather than only in exit status; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
 # no-port: installer/SPEC.md §The consumer smoke, The port disposition — ruled 2026-08-31 by the operator in consult. This is the repo's own acceptance harness for the installer and rides no payload: the --pack-installer arm assembles the tarball and the npm package out of the kit roots and never out of installer/consumer-smoke/, so no adopter receives or runs it, and its only callers are the evidence-kit installer_smoke validate suite and the gates workflow. It is the same shape gate-sdk/SPEC.md §Consumer smoke, The port disposition declares on its leg 3 — a smoke executed by no adopter path — reached one step further, for a harness the payload does not even carry; and it drives cargo, the packer and init as black boxes across every profile, so a crate-side form would test the binary from inside the binary. Structural, not a sizing judgment: its size was measured at the ruling and is not the ground.
 set -uo pipefail
 
@@ -1067,66 +1067,45 @@ assert_jq_free() {   # $1 = a label for the message, $2 = consumer dir, $3.. = t
 
 ENTRY=("$CW")
 C="$(consumer jq-less)" || fail "could not build a scratch consumer for the jq-less arm"
-# spec: installer/SPEC.md §init — init refuses here only at a profile whose kit set carries the kit that reaches jq: jq is a kit-conditional member of the toolchain floor, so a jq-less machine is below the contract of that selection alone and init's last precondition is doctor's verdict over it. The refusal an adopter meets there is the floor's, delivered before anything is written, rather than a JSON reader's
-assert_jq_blocked() {   # $1 = a label for the message, $2 = consumer dir, $3.. = the verb and its argv
-    local label="$1" dir="$2"; shift 2
-    local out rc before status lock_before lock_after
-    # spec: installer/SPEC.md §init — "nothing written" is asserted as a DIFFERENCE across the refusal and never as the absence of a manifest, because this arm asserts the same refusal against a tree that already carries one: an absence test passes by accident on the first call and reds on the second for a manifest an earlier install wrote, which is a fact about the arm's ordering rather than about the refusal
-    before="$(git -C "$dir" rev-parse 'HEAD^{tree}')"
-    status="$(git -C "$dir" status --porcelain)"
-    lock_before=""; [[ ! -f "$dir/checkwright.lock" ]] || lock_before="$(digest_of "$dir/checkwright.lock")"
-    out="$( cd "$dir" && PATH="$JQ_PATH" "${ENTRY[@]}" "$@" 2>&1 )"; rc=$?
-    [[ "$rc" -eq 1 ]] \
-        || { printf '%s\n' "$out" >&2; fail "$label exited $rc on a jq-less machine, not the 1 doctor's below-contract verdict carries into it"; }
-    grep -q 'the toolchain is below contract — refusing to install' <<<"$out" \
-        || { printf '%s\n' "$out" >&2; fail "$label refused on a jq-less machine without naming the toolchain floor as the reason — it found some other objection ahead of the precondition an adopter must actually fix"; }
-    grep -qE '^  jq +NOT FOUND' <<<"$out" \
-        || { printf '%s\n' "$out" >&2; fail "$label refused on the floor without rendering the report that names jq as the missing member, so an adopter is told to fix a floor and not which part of it"; }
-    lock_after=""; [[ ! -f "$dir/checkwright.lock" ]] || lock_after="$(digest_of "$dir/checkwright.lock")"
-    [[ "$(git -C "$dir" rev-parse 'HEAD^{tree}')" == "$before" && "$(git -C "$dir" status --porcelain)" == "$status" && "$lock_before" == "$lock_after" ]] \
-        || fail "$label refused on the toolchain floor and changed the consumer — the verdict is a precondition, so the refusal writes nothing"
-    say "$label: blocked by doctor's floor verdict naming jq, consumer unchanged, exit 1"
+# spec: installer/SPEC.md §doctor — jq is a contributor member, so doctor names it nowhere: not unprobed with no install, and not inside any install
+assert_doctor_silent() {   # $1 = a label for the message, $2 = consumer dir
+    local out rc
+    out="$( cd "$2" && PATH="$JQ_PATH" "${ENTRY[@]}" doctor 2>&1 )"; rc=$?
+    [[ "$rc" -eq 0 ]] \
+        || { printf '%s\n' "$out" >&2; fail "doctor ($1) exited $rc with jq absent — no selection owes jq, so its absence cannot set the verdict"; }
+    grep -q 'jq' <<<"$out" \
+        && { printf '%s\n' "$out" >&2; fail "doctor ($1) named jq — a contributor member is skipped outright, so an adopter is told about a program nothing they install runs"; }
+    say "doctor ($1): clean, and names jq nowhere"
 }
+assert_doctor_silent "no install" "$C"
 
-# spec: installer/SPEC.md §doctor — doctor with no install has no selection, so it probes no conditional member: it exits 0 on git alone and names jq unprobed together with the kit that owes it. That kit is read off the line rather than named here, so the harness carries no second copy of the roster's audience field
-out="$( cd "$C" && PATH="$JQ_PATH" "${ENTRY[@]}" doctor 2>&1 )"; rc=$?
-[[ "$rc" -eq 0 ]] \
-    || { printf '%s\n' "$out" >&2; fail "doctor exited $rc with no install and jq absent — with no selection jq is undecided rather than owed, so it cannot set the verdict"; }
-JQ_KIT="$(sed -nE 's/^  jq +not probed — owed where ([^ ]+) is selected$/\1/p' <<<"$out")"
-[[ -n "$JQ_KIT" ]] \
-    || { printf '%s\n' "$out" >&2; fail "doctor with no install did not render jq as not probed, naming the kit that owes it — the adopter is not told where jq becomes their requirement"; }
-say "doctor (no install): clean on git, jq not probed, owed where $JQ_KIT is selected"
-
-# spec: installer/SPEC.md §init — the lattice minimum selects no kit owing jq, so init there meets a floor carrying none and installs on the jq-less PATH. The premise is asserted rather than assumed: a minimum carrying the kit would turn this into the refusal case below
-mapfile -t jq_min_kits < <(profile_kits "$PROFILE_MIN")
-for k in "${jq_min_kits[@]}"; do
-    [[ "$k" != "$JQ_KIT" ]] || fail "the lattice minimum $PROFILE_MIN carries $JQ_KIT, which owes jq — the arm has no jq-free profile to install"
-done
 out="$( cd "$C" && PATH="$JQ_PATH" "${ENTRY[@]}" init --profile "$PROFILE_MIN" 2>&1 )" \
-    || { printf '%s\n' "$out" >&2; fail "init --profile $PROFILE_MIN refused on a jq-less machine — the profile selects no kit owing jq, so the floor it meets carries none"; }
+    || { printf '%s\n' "$out" >&2; fail "init --profile $PROFILE_MIN refused on a jq-less machine — no profile's floor carries jq"; }
 say "init --profile $PROFILE_MIN: installs with no jq on PATH, exit 0"
+assert_doctor_silent "inside $PROFILE_MIN" "$C"
 
-# spec: installer/SPEC.md §init — a profile whose kit set carries the kit doctor named is the one that refuses, found through the harness's own profile reader. A fresh consumer keeps the refusal isolated from every manifest question
-JQ_PROFILE=""
+# spec: installer/SPEC.md §The consumer smoke — the kit whose hook once spawned jq is named here because the arm drives that hook, and the profile carrying it is found through the harness's own profile reader; a fresh consumer keeps the install isolated from every manifest question above
+GUARD_KIT=guard-kit
+GUARD_PROFILE=""
 for p in "${PROFILES[@]}"; do
-    mapfile -t jq_p_kits < <(profile_kits "$p")
-    for k in "${jq_p_kits[@]}"; do
-        [[ "$k" == "$JQ_KIT" ]] && { JQ_PROFILE="$p"; break 2; }
+    mapfile -t guard_p_kits < <(profile_kits "$p")
+    for k in "${guard_p_kits[@]}"; do
+        [[ "$k" == "$GUARD_KIT" ]] && { GUARD_PROFILE="$p"; break 2; }
     done
 done
-[[ -n "$JQ_PROFILE" ]] || fail "no profile carries $JQ_KIT, so the arm cannot assert the refusal jq-less machines meet where that kit is selected"
-C2="$(consumer jq-less-owed)" || fail "could not build a second scratch consumer for the jq-less arm"
-assert_jq_blocked "init --profile $JQ_PROFILE" "$C2" init --profile "$JQ_PROFILE"
-[[ ! -f "$C2/checkwright.lock" ]] \
-    || fail "init --profile $JQ_PROFILE refused on the toolchain floor and left a manifest behind"
+[[ -n "$GUARD_PROFILE" ]] || fail "no profile carries $GUARD_KIT, so the arm cannot assert that its hook runs on a jq-less machine"
+C2="$(consumer jq-less-guard)" || fail "could not build a second scratch consumer for the jq-less arm"
+out="$( cd "$C2" && PATH="$JQ_PATH" "${ENTRY[@]}" init --profile "$GUARD_PROFILE" 2>&1 )" \
+    || { printf '%s\n' "$out" >&2; fail "init --profile $GUARD_PROFILE refused on a jq-less machine — $GUARD_KIT's hook reads JSON through the gate binary, so the profile owes no jq"; }
+say "init --profile $GUARD_PROFILE: installs with no jq on PATH, exit 0"
+assert_doctor_silent "inside $GUARD_PROFILE" "$C2"
 
-# spec: installer/SPEC.md §doctor — inside the minimum's install doctor reads the manifest's selection, which owes no jq, so it neither probes nor renders it and the verdict stays clean
-out="$( cd "$C" && PATH="$JQ_PATH" "${ENTRY[@]}" doctor 2>&1 )"; rc=$?
-[[ "$rc" -eq 0 ]] \
-    || { printf '%s\n' "$out" >&2; fail "doctor exited $rc inside the $PROFILE_MIN install with jq absent — that selection owes no jq"; }
-grep -qE '^  jq ' <<<"$out" \
-    && { printf '%s\n' "$out" >&2; fail "doctor inside the $PROFILE_MIN install rendered a jq line — a member the selection does not owe is skipped outright, not shown"; }
-say "doctor (inside $PROFILE_MIN): clean, and silent about jq"
+# spec: installer/SPEC.md §The consumer smoke — the installed guard answers a payload with no jq on PATH: an allow envelope is a payload read AND a render, the two things the hook once spawned jq for, and it is neither the unreachable-binary advisory nor the empty stdout a failed render leaves
+guard_payload='{"tool_name":"Bash","tool_input":{"command":"cat one.md two.md"}}'
+out="$( cd "$C2" && printf '%s' "$guard_payload" | PATH="$JQ_PATH" bash "$GUARD_KIT/templates/bash-guard.sh" 2>&1 )"; rc=$?
+[[ "$rc" -eq 0 && "$out" == *'"permissionDecision":"allow"'* ]] \
+    || { printf '%s\n' "$out" >&2; fail "the installed $GUARD_KIT hook exited $rc on a jq-less machine without an allow envelope for a read-only command — its payload read or its render reached for a program that is not there"; }
+say "$GUARD_KIT hook: answers a payload with an allow envelope, no jq on PATH"
 
 # spec: installer/SPEC.md §The verbs — diff and uninstall run no doctor precondition, so on this machine they are the two verbs that both read the manifest and reach their answer: they are the arm's positive evidence that the JSON read itself no longer needs jq
 assert_jq_free "diff" "$C" diff
@@ -1584,5 +1563,5 @@ PROVENANCE="the gate binary this run built"
 [[ -z "$PREBUILT_DIR" ]] || PROVENANCE="the gate binary adopted from the hand-off, unrebuilt"
 
 # spec: evidence-kit/SPEC.md §Layout and configuration — this line is the run's COMPLETION MARKER, derived positionally. A header printed after this line would silently become the marker and demote this one to an arm — the one hazard of that rule, and no gate catches it
-printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access, each carrying %s, each put in front of a real prose defect (caught by %s) and each reversed back to its pre-init tree object, with gate rosters monotone across every comparable pair of the registries those installs wrote, plus the artifact-less %s leg driving a payload the packer itself produced with no artifact and asserting one refusal for init, doctor, diff and a bare invocation alike, naming the platform and writing nothing, the extracted-tarball arm with node/npm masked and reversed the same way, the toolchain-free arm driving doctor and a full init with cargo/rustc masked, the jq-less arm asserting diff, uninstall and a lattice-minimum init run clean with no jq on PATH while init is blocked by the toolchain floor verdict only where the selection carries the kit that owes jq, the bash-less arm installing every profile that owes no bash and committing through its hooks clean and refused with no bash on PATH, the two-hop cross-version upgrade arm carrying the relinquish and re-add, the cross-version reversal arm reversing an unedited consumer back to its pre-init tree object after those same three hops, the same-version seam arm and the protection branch chained onto it, the narrowing arm re-running init at a smaller profile so files[] outlives kits, and the artifact arm driving the three selection outcomes on a mutated copy of that payload, with its two refusals asserted to differ in message and remedy)\n' "${#PROFILES[@]}" "$PROVENANCE" "${VALUE_RED[*]}" "$BARE_PROFILE"
+printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access, each carrying %s, each put in front of a real prose defect (caught by %s) and each reversed back to its pre-init tree object, with gate rosters monotone across every comparable pair of the registries those installs wrote, plus the artifact-less %s leg driving a payload the packer itself produced with no artifact and asserting one refusal for init, doctor, diff and a bare invocation alike, naming the platform and writing nothing, the extracted-tarball arm with node/npm masked and reversed the same way, the toolchain-free arm driving doctor and a full init with cargo/rustc masked, the jq-less arm asserting diff, uninstall and a lattice-minimum and a guard-kit init run clean with no jq on PATH, the installed guard hook answering a payload and doctor naming jq nowhere, the bash-less arm installing every profile that owes no bash and committing through its hooks clean and refused with no bash on PATH, the two-hop cross-version upgrade arm carrying the relinquish and re-add, the cross-version reversal arm reversing an unedited consumer back to its pre-init tree object after those same three hops, the same-version seam arm and the protection branch chained onto it, the narrowing arm re-running init at a smaller profile so files[] outlives kits, and the artifact arm driving the three selection outcomes on a mutated copy of that payload, with its two refusals asserted to differ in message and remedy)\n' "${#PROFILES[@]}" "$PROVENANCE" "${VALUE_RED[*]}" "$BARE_PROFILE"
 exit 0
