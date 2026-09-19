@@ -74,6 +74,14 @@
   **Wider than filed:** `git grep -n kit_roots_rel native/src` returns **18** call sites, not the 9
   the entry named; five of the affected ones were unnamed, and the filed cost class was priced
   against the subset.
+  **Re-priced by operator direction (2026-09-20, lead-relayed): the cost class is event/high, not
+  the event/low it was filed at.** The probe the promotion demanded came back at 18 sites with a
+  per-use rather than a per-site call and a silent-pass failure mode, and the three cheap deltas are
+  unprovable without the nesting fixture — unnested the two spellings are byte-identical, so no
+  existing fixture can show the fix works or that it stays working. This prose is the cost class's
+  home while the entry is active, and the source a later demotion classes its board tag from: a
+  promotion drops the cost board tag and an active entry carrying one reds
+  (queue-kit/SPEC.md §check-deferred-board-tags).
   **Re-shaped:** the call is per-USE, not per-site — `kit_registration.rs` takes a text match at
   :132 and a git pathspec at :137 off one call, and three more sites mix the two the same way. The
   delta is *split the mixed reads, then re-point only the path use*.
