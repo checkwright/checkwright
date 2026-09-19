@@ -2580,7 +2580,7 @@ author. The `?` line exists for exactly that case: a gate whose author cannot bo
 a root declares `?` rather than guessing, and the reader counts it as undecidable
 instead of trusting it as empty. Test A holds a `?` to its arity, not to nothing —
 each one absorbs a single unmatched observed root, so a second undeclared walk still
-reds.
+reds — and one glob looped over two configured kit roots is two walks, owing two.
 
 **Where that verification runs, and where it does not.** Those unit tests are
 `cargo test` — and so is the third registry-data test,
