@@ -14,27 +14,6 @@
 
 ## Technical Debt
 
-- **init-dry-run-plan-parity** — `init --dry-run` predicts the evidence-kit and lifecycle-kit
-  seeds through a second spelling (`dry_seed_paths` in `native/src/installer/init.rs`) of what
-  the real arms write (`recipe::seed` in `native/src/installer/recipe.rs`), and the two still
-  disagree: the real arms write `.workflow/validate-baseline.txt`,
-  `.workflow/validate-evidence.txt` and `.workflow/WORKFLOW-STATE.txt` only when absent
-  (`seed_absent`), while the dry arm names all three whenever `claim` admits the path, which it
-  does for any path the prior manifest does not record. So `--dry-run` on a consumer already
-  holding one of those files names a file the run would not write.
-  **Done-state:** each seed has one predicate the dry plan and the run both read, the queue
-  arm's form, and an acceptor diffs the dry plan against the set the real run records, so a
-  re-divergence reds.
-  **Cost while deferred:** a `--dry-run` is a promise about what will happen, and it is the
-  first command a cautious adopter runs.
-  Filed 2026-08-09 by close, draining the build stage's bullet.
-  **Re-verified at promotion (2026-09-19 scope), read not run:** the filing's `init.sh` is now
-  the native `init.rs`. Its arm (c), the agent-file seed, is discharged: `init.rs` predicts it
-  on the seeding arm's own guard (`seeds_agent`). Arms (a) and (b) stand as read above. The
-  consumer smoke still asserts only `uninstall --dry-run` (`installer/consumer-smoke/run-smoke.sh`),
-  so no acceptor exists.
-  Joins this iteration by operator direction (2026-09-19, lead-relayed).
-
 ## Deferred
 
 - **inferred-marker-malformed-placement-passes-unseen** [cost: event/low] [surface: lifecycle-kit]
@@ -2990,6 +2969,7 @@
 
 ## Done
 
+- init-dry-run-plan-parity
 - release-binary-archive-versioned-name
 - floor-bash-install-bootstrap
 - hasher-shasum-fallback-unexercised
