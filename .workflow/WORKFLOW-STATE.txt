@@ -5,3 +5,4 @@
 ---
 
 adopter-floor-collapse scope a9f315ec 2026-09-19 d1e2632e
+adopter-floor-collapse spec a4f78496 2026-09-19 1365665d
