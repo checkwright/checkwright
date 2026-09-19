@@ -197,3 +197,4 @@
 | windows-bash-floor | sc · a b v c | 2f/3d | 1 · ≤0d | 27s clean | 117 |
 | windows-adopter-path | sc sp a b v c | 6f/4d | 4 · ≤1d | 41s clean | 117 |
 | adopter-floor-collapse | sc sp a b v c | 2f/1d | 1 · ≤0d | 20s clean | 117 |
+| lifecycle-contract-drain | sc sp a b v c | 7f/0d | 6 · ≤0d | 20s clean | 118 |
