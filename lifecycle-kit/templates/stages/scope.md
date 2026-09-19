@@ -105,7 +105,7 @@ does not promote, it puts the unit in front of the authority this stage already
 escalates to. A decline of such an entry is written on the entry, with its date
 and who ruled it. An entry already declined twice is escalated as
 operator-routed: a third threshold recurrence routes to the operator, not to a
-third decline, because two is where lead discretion ends.
+third decline (lifecycle-kit/SPEC.md §templates/stages/).
 
 **Rank the pool by what deferral costs and what landing buys, in this order,
 before composing.** The board's deferred rows carry each entry's `[cost:]` class

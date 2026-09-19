@@ -5217,8 +5217,6 @@ ruling party, rather than a declaration with a grammar, because the scope sessio
 composing the next escalation is their only reader and it already reads the
 entry's grounds. **The honest limit:** the operator-routed mark travels on the
 message channel, so no gate observes that a lead relayed it rather than ruled it.
-The clause was once breached, a lead ruling a third decline, while it lived only in
-a queue entry and no template carried it.
 
 The `validate` template commits a repair before the suite roster starts or
 resumes: a suite asserting a clean worktree against the real checkout reads an
