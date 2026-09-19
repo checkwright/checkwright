@@ -128,6 +128,83 @@
   Filed 2026-09-19 at `adopter-floor-native-rungs`' spec by operator direction (lead-relayed):
   option (b) of the bootstrap question, not built this iteration.
 
+- **binary-door-wide-sweep** [cost: event/high] [surface: lifecycle-kit] — rung 4a
+  (`floor-bash-hooks-front-end`) re-pointed only the starter and prose adopter surfaces at the gate
+  binary. Every other kit's shipped procedures still tell a reader to run
+  `bash gate-sdk/bin/run-gates.sh`: the stage templates (`lifecycle-kit/templates/stages/*.md`),
+  `delegation-kit/templates/agent-execution.md`, `drift-kit/templates/economics.md`,
+  `guard-kit/templates/settings-hooks.json`, context-kit's `session-context.sh` (its `RUN_GATES`,
+  reached through `settings-sessionstart.json`) and the kit READMEs — `gate-sdk/README.md`'s
+  install block and `canon-kit/README.md`'s hook-regeneration line. Re-pointing them needs a
+  per-consumer door binding, because the binary's path differs between an install and a source
+  clone. Once no adopter surface names the front-end, the PowerShell twin
+  (`gate-sdk/bin/run-gates.ps1`), `--run-front-end-parity` and the front-end's fail-open set can
+  retire.
+  **Re-verified at the drain:** `git grep -l run-gates.sh` names each template above. The filing
+  named `context-kit/templates/settings-sessionstart.json` directly; it names no front-end itself,
+  it runs `session-context.sh`, which does.
+  **Why design-pending:** the door binding's shape (a knob, a derived path, or a substituted
+  literal at vendor time) is a spec-stage call reaching five kits.
+  **Cost while deferred:** `bash:4.3` stays owed by context, delegation, drift, guard and
+  lifecycle kits; the macOS Homebrew remedy stays on the delegation and full profiles; a starter or
+  prose adopter reading a kit README is shown a bash command for a job the binary does without bash.
+  Filed 2026-09-19 at `adopter-floor-native-rungs`' spec (scope-gated intake), merged at its close
+  drain with that build's kit-README bullet, which named itself part of this sweep. Owner lookup:
+  `door binding`, `run-gates.ps1`, `front-end-parity` — none.
+
+- **bash-audience-hand-held** [cost: event/low] [surface: context-kit] — the bash element of the
+  tool-floor roster carries a hand-held kit-list audience,
+  `context-kit+delegation-kit+drift-kit+guard-kit+lifecycle-kit`, spelled at
+  context-kit/SPEC.md's roster, `docs/install.md`'s requirements, `native/src/programs.rs` and
+  `native/src/toolfloor.rs`. It was enumerated at spec by a git grep for shipped bash surfaces and
+  front-end instructions, and nothing re-derives it. A kit that later ships a bash hook, template or
+  stage procedure without joining the list under-declares its floor, so doctor passes a bash-less
+  host that then fails at first use.
+  **Re-verified at the drain:** `git grep` finds the literal list at the four sites above and no
+  derivation of it.
+  **Why design-pending:** the candidate derives the reach (doctor or a gate reading each vendored
+  kit for a bash shebang, a `.sh` file or a front-end instruction). What counts as a bash surface,
+  and whether `binary-door-wide-sweep` shrinks the list to nothing first, are open.
+  **Cost while deferred:** an under-declared floor surfaces only as a runtime failure on the
+  adopter's host.
+  Filed 2026-09-19 at `adopter-floor-native-rungs`' spec, promoted at its close drain. Owner
+  lookup: `probe-roster`, `bash:4.3`, `audience` — none.
+
+- **kit-roots-rel-filesystem-readers** [cost: event/low] [surface: native] — the couples-anchor
+  amendment moved the `kit:` couples readers that match repository paths onto `walk::kit_roots()`.
+  Other `walk::kit_roots_rel` callers resolve paths off disk or through a git pathspec with the
+  gate-sdk-parent spelling, and carry the same latent mismatch when kits are vendored under a
+  subdirectory: `native/src/emit/enum_sets.rs`, `emit/close_surfaces.rs`,
+  `gates/gate_binary_fresh.rs`, `gates/install_platforms.rs`, `gates/knob_default_coupling.rs`
+  (its second loop), `emit/pack_installer.rs` (both loops), `gates/kit_enum.rs`, and evidence-kit's
+  derived suite default (`knobs/evidence_kit.rs`).
+  **Re-verified at the drain:** `git grep kit_roots_rel native/src` lists every site above; the
+  filing's line numbers for `kit_enum.rs` and `evidence_kit.rs` had moved, so the entry names the
+  files only.
+  **Inferred, not run:** that each listed reader misreads under a nested `GATE_SDK_ROOT`; no fixture
+  nests it, so none was run that way.
+  **Why design-pending:** each caller needs a per-site call on whether it matches repository paths
+  or kit-parent text, as the couples-anchor spec made for its set.
+  **Cost while deferred:** an adopter who hand-vendors under a subdirectory gets silently wrong or
+  empty reads from those members. Masked today because init vendors at the root.
+  Filed 2026-09-19 at `adopter-floor-native-rungs`' spec; promoted at its close drain. Owner
+  lookup: `kit_roots_rel`, `nested` — only `docs-cmd` knob-definition entry, a different defect.
+
+- **guard-read-path-windows-unexercised** [cost: event/low] [surface: .github] — no `gates.yml`
+  step runs guard-kit's `gate-tests/guard-read-path.test.sh` (its verbatim-bytes and no-added-CR
+  assertions) on a Windows leg: fixture suites run only in the Linux `gates` job.
+  `floor-jq-guard-lib` deleted the `_guard_lf` CR strip on the ground that those reads return bytes
+  verbatim, so the Windows half of that claim is unproven.
+  **Re-verified at the drain:** `--run-gate-tests` appears once in `.github/workflows/gates.yml`,
+  in the `gates` job; gates run 35455364409's `install-smoke-windows` log has no hit for the test.
+  **Why promoted, not fixed:** the fix is a Windows workflow step whose outcome is unknown until a
+  Windows run. A red there reopens a landed unit, and the close's one remaining push cannot
+  absorb it.
+  **Cost while deferred:** if a Windows read adds CR, guard rules misread there, and no leg
+  shows it.
+  Filed 2026-09-19 by the lead at `adopter-floor-native-rungs`' build; promoted at its close drain.
+  Owner lookup: `guard-read-path`, `_guard_lf`, `Windows leg` — none.
+
 - **guard-powershell-tool-unguarded** [cost: event/high] [surface: guard-kit] — on native
   Windows the harness's `PowerShell` tool is on by default beside `Bash`, and guard-kit's hook
   matches `Bash` alone, so a PowerShell-tool call is neither steered nor logged to the friction log.
