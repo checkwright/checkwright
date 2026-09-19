@@ -3052,11 +3052,4 @@
 
 ## Done
 
-- substrate-parity-audits-one-producer-of-two
-- substrate-parity-digest-assertion-stops-at-the-workflow-text
-- floor-jq-guard-lib
-- kit-token-anchor-hook-for-divergence
-- floor-bash-hooks-front-end
-- fail-open-arm-status-second-source
-
 ## Lessons Learned
