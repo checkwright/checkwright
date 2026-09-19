@@ -52,8 +52,7 @@ with its version floors, is on the install page.
 **Neither the verbs nor anything they install need `jq`.** The verbs read JSON —
 this package's own version stamp and the `checkwright.lock` manifest — and behind
 the invoke they read it with the crate's own parser, so none of them refuses for
-want of an external one. guard-kit's hook, once the one shipped reach that spawned
-`jq`, reads its payload and renders its envelopes through the gate binary
+want of an external one. guard-kit's hook reads its payload and renders its envelopes through the gate binary
 (guard-kit/SPEC.md §The guard framework (`lib/guard.sh`)). So `jq` carries the
 contributor audience on the toolchain floor: `doctor` — which runs as `init`'s last
 precondition, still before any file is written — owes it to no selection, and every
@@ -3016,9 +3015,8 @@ a verb that runs clean where a verb shelling out to `jq` fails: on this `PATH` t
 two are distinguishable and nowhere else are they. That is what the arm is for,
 and it is why the arm outlives the `jq` preflight it was built around.
 
-The claim reaches past the verbs to what they install: guard-kit's hook, the one
-shipped reach that once spawned `jq`, reads and renders through the gate binary,
-so `jq` is a contributor member no selection owes. In this order:
+The claim reaches past the verbs to what they install
+(§Requirements). In this order:
 
 - **`doctor` in a directory with no install** exits 0 and names `jq` nowhere.
 - **`init --profile` at the lattice minimum** exits 0 on the `jq`-less `PATH`,
