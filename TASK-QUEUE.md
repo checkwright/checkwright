@@ -190,6 +190,23 @@
   Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 4b; mechanism from the
   concurrent objective-1 consult, lead-relayed.
 
+- **floor-coreutils-residue-unowned** [cost: event/low] [surface: native] — the gate binary
+  spawns `date` (`+%F` in `enter_stage`, `run_validate`, `env_probe` and the kpi arms; `-Is` in
+  the wakeup hook), `mktemp` and `cp` (the `demo` arm and the contributor smoke arms) and `ps`
+  (`evidence.rs`' producer-liveness probe) under `GATE_SDK_PROGRAM_FLOOR`'s host assumption.
+  None is on `PROBE_SET`, `docs/install.md` renders none, and no adopter-floor rung owns them, so
+  objective 1's floor has members nothing probes or declares.
+  **Why design-pending:** each member needs a disposition in the adopter-floor ladder's own terms
+  (declared floor member, in-process, or contributor-only), and the adopter/contributor split of
+  the spawn sites has to be enumerated first.
+  **Inferred, not run:** with `sort -V` gone, stock macOS still needs the Homebrew coreutils
+  remedy only if BSD `date` lacks `-Is` — `date -Is` on a stock macOS host.
+  **Cost while deferred:** an adopter host missing one of these fails at the spawn and not at
+  `doctor`, and the macOS remedy may prescribe a package nothing needs.
+  Filed 2026-09-19 to the gap inbox at `adopter-floor-collapse`'s spec, promoted at its close
+  drain. Owner lookup: `PROGRAM_FLOOR`, `mktemp`, `date -Is`, `coreutils` — matched only the
+  rung entries above (curl, jq, shellcheck, bash: distinct members).
+
 - **push-budget-unshipped** [cost: event/low] [surface: lifecycle-kit] — the push
   budget (one to two pushes per iteration, two unasked hotfix pushes) lives only in this repo's
   CLAUDE.md, so an adopting consumer cannot configure it and no kit surface reads it.
@@ -2896,7 +2913,12 @@
   reader's red condition is enumerated, a zero-count reader such as `check-install-claim` being
   the attested inversion. Whether any consumer relies on the unpruned form is unprobed.
   **Cost while deferred:** a consumer widening the knob with a multi-level glob governs fixture
-  prose as manifest content, or enumerates single-level globs around the gap.
+  prose as manifest content, or enumerates single-level globs around the gap; and both configured
+  expansions (`CANON_KIT_MANIFEST_FILES`, `CANON_KIT_PROSE_SURFACE_GLOBS`) still call
+  `walk::glob_files`, so a `**` there stats every entry under `target/` and a concurrent cargo
+  build can exit-2 every manifest reader on a clean tree. Repair route: `walk::glob_corpus`
+  (gate-sdk/SPEC.md §The port-candidate criteria). Verified 2026-09-19 at close:
+  `native/src/spec.rs` lines 197 and 215.
   Filed 2026-09-15 by `couples-field-semantics`' spec into the gap inbox; drained and promoted
   2026-09-15 at close.
 
