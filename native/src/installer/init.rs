@@ -445,19 +445,16 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
                 std::fs::write(root.join(AGENT_FILE), body)
                     .map_err(|e| refuse(format!("could not seed {}: {}", AGENT_FILE, e), "", 2))?;
             }
-            if claim(&root, AGENT_FILE, &prior, f.force, &mut r) {
-                r.record(AGENT_FILE, None);
-            }
+            // spec: installer/SPEC.md §What init seeds — a seed-once surface is written only where
+            // absent, so it is recorded unclaimed: a claim after the write would read init's own
+            // fresh body against a prior seed's hash and report it as the adopter's change.
+            r.record(AGENT_FILE, None);
         }
         for seeded in recipe::seed(kit, &kit_payload, &root, f.dry)
             .map_err(|e| refuse(e, "", 2))?
         {
             match seeded {
-                recipe::Seeded::Path(p) => {
-                    if claim(&root, &p, &prior, f.force, &mut r) {
-                        r.record(&p, None);
-                    }
-                }
+                recipe::Seeded::Path(p) => r.record(&p, None),
                 recipe::Seeded::Plan(src, dest) => {
                     copy_in(&root, Path::new(&src), &dest, &prior, None, f, &mut r)?
                 }
@@ -473,9 +470,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
             if !f.dry {
                 recipe::write_queue(&src, &root, QUEUE_FILE).map_err(|e| refuse(e, "", 2))?;
             }
-            if claim(&root, QUEUE_FILE, &prior, f.force, &mut r) {
-                r.record(QUEUE_FILE, None);
-            }
+            r.record(QUEUE_FILE, None);
         }
     }
 

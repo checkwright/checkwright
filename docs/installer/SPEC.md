@@ -374,7 +374,9 @@ because green cannot witness a set that quietly shrank.
 from whether `init` keeps rewriting the file.** A surface `init` creates once and
 then leaves to you — the queue file, the agent file, the evidence manifests, the
 workflow-state file — is written **only when it is absent**, so a re-run never
-disturbs a tree that has grown since. A surface `init` rewrites on every run —
+disturbs a tree that has grown since. Such a write is `init`'s own and is recorded
+unclaimed: a seed you deleted is re-seeded and recorded at its new hash, never
+reported as your change against a prior seed's. A surface `init` rewrites on every run —
 every kit's config seam, and gate-sdk's `msg-patterns.list` — is **claimed
 before it is written**, on the same non-destructive path as any vendored file:
 the recipe *plans* the copy and `init` performs it, so your edit is compared
@@ -991,11 +993,13 @@ decision as a kit narrowing. `doctor` reports whatever reason it finds there and
 invents no remedy for it (§doctor).
 
 
-**Placement is one call, and the bootstrap makes it.** Steps 1 to 4 above are
-the bootstrap's; placing the artifact is conditional install logic, so it sits
-behind the invoke as `--install place-artifact` (§The install boundary). The
-bootstrap runs the **payload** artifact it just verified, never the installed
-copy, which on a first install does not exist yet:
+**Placement is one op, and `init` calls it in-process.** Placing the artifact is
+conditional install logic, not a bootstrap step, so it sits behind the invoke as
+`--install place-artifact` (§The install boundary). `init` places the **payload**
+artifact the bootstrap just verified, never the installed copy, which on a first
+install does not exist yet. The wire form below is the same op's flag surface;
+its cross-boundary reader is the PowerShell install-smoke leg, which drives a
+real placement through that bootstrap:
 
 ```
 <artifact> --install place-artifact
@@ -2988,7 +2992,11 @@ seed is absent. So a second leg repeats the comparison at the payload-derived
 profile on a consumer already holding every surface `init` seeds. That set is
 read from what this loop's install at that profile recorded: every path outside
 a vendored kit and the gates directory. It is not listed in the smoke, so a kit
-that gains a seeded surface is planted with no edit here.
+that gains a seeded surface is planted with no edit here. A third leg re-seeds
+over that same set: an installed consumer's seeds are deleted and their recorded
+hashes made stale, as a seed body that changed across versions leaves them. The
+re-run must match its plan, record each re-seed at the hash of what it wrote, and
+report none as changed (§What init seeds).
 
 **The reversal arm** then runs on that same consumer, so every profile is
 installed *and* reversed. In order: `diff` must exit 0 and report the freshly
