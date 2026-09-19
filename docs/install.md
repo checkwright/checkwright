@@ -95,8 +95,9 @@ to `~/.bash_profile` instead. The last line orders the shell you are in. The
 requirements below assert what `PATH` actually resolves, so a Mac carrying
 Homebrew bash that is not `PATH`-ordered is not what the gates invoke: they
 reach the system's bash 3.2 in its place. The two macOS
-install-smoke legs run this block verbatim and then open a fresh login shell, so
-both the ordering and its persistence are measured rather than suggested.
+install-smoke legs run this block verbatim, then open a fresh login shell and
+source the profile line the block appended on its own, so both the ordering and
+its persistence are measured rather than suggested.
 
 Those are the platforms the **battery** runs on. A second and narrower fact sits
 beside them: whether a **prebuilt gate binary** is published for a platform,

@@ -1249,7 +1249,12 @@ jobs:
       # `$(brew --prefix)/bin`: the block's profile line is what must persist the
       # ordering (docs/install.md §Requirements). Where Homebrew's prefix is
       # `/usr/local`, `/etc/paths` already leads with its `bin`, so on an Intel
-      # host the probe holds with or without the profile line.
+      # host that probe holds with or without the profile line. The third refusal
+      # is the one that reds a dropped line on either architecture: it sources
+      # only what the block appended to `~/.zprofile`, in a zsh reading no
+      # startup file under a `PATH` with no Homebrew entry, and requires that
+      # alone to resolve `bash` to the prefix — after proving the same zsh
+      # without it does not, so the probe cannot pass vacuously.
       - name: install the bash docs/install.md names, and PATH-order it
         run: |
           set +e
@@ -1264,6 +1269,9 @@ jobs:
           fi
           printf '== docs/install.md macos-remedy block ==\n%s\n' "$block"
           before="$PATH"
+          profile="$HOME/.zprofile"
+          kept="$( { wc -c < "$profile"; } 2>/dev/null )"
+          kept=$(( ${kept:-0} + 0 ))
           eval "$block"
           echo "block exited $?"
           front="${PATH%"$before"}"
@@ -1279,6 +1287,21 @@ jobs:
           echo "a fresh login shell resolves bash to: ${next:-<MISSING>}"
           if [ "$next" != "$want" ]; then
             echo "::error::a fresh login shell resolves bash to '${next:-<MISSING>}', not $want — the block did not persist its PATH ordering for the adopter's next terminal"
+            exit 1
+          fi
+          added="$RUNNER_TEMP/zprofile-added"
+          tail -c +"$((kept + 1))" "$profile" > "$added" 2>/dev/null
+          printf '== what the block appended to %s ==\n' "$profile"
+          cat "$added"
+          bare="$(env -i HOME="$HOME" PATH=/usr/bin:/bin:/usr/sbin:/sbin /bin/zsh -f -c 'command -v bash')"
+          if [ "$bare" = "$want" ]; then
+            echo "::error::a zsh reading no profile already resolves bash to $want, so the probe below could not tell a missing profile line from a present one"
+            exit 1
+          fi
+          alone="$(env -i HOME="$HOME" PATH=/usr/bin:/bin:/usr/sbin:/sbin /bin/zsh -f -c '. "$1"; command -v bash' zsh "$added")"
+          echo "the appended lines alone, under no startup file and no Homebrew PATH, resolve bash to: ${alone:-<MISSING>}"
+          if [ "$alone" != "$want" ]; then
+            echo "::error::what the block appended to $profile resolves bash to '${alone:-<MISSING>}', not $want — the profile line that persists the ordering is missing or wrong"
             exit 1
           fi
           exit 0
@@ -1563,6 +1586,9 @@ jobs:
           fi
           printf '== docs/install.md macos-remedy block ==\n%s\n' "$block"
           before="$PATH"
+          profile="$HOME/.zprofile"
+          kept="$( { wc -c < "$profile"; } 2>/dev/null )"
+          kept=$(( ${kept:-0} + 0 ))
           eval "$block"
           echo "block exited $?"
           front="${PATH%"$before"}"
@@ -1578,6 +1604,21 @@ jobs:
           echo "a fresh login shell resolves bash to: ${next:-<MISSING>}"
           if [ "$next" != "$want" ]; then
             echo "::error::a fresh login shell resolves bash to '${next:-<MISSING>}', not $want — the block did not persist its PATH ordering for the adopter's next terminal"
+            exit 1
+          fi
+          added="$RUNNER_TEMP/zprofile-added"
+          tail -c +"$((kept + 1))" "$profile" > "$added" 2>/dev/null
+          printf '== what the block appended to %s ==\n' "$profile"
+          cat "$added"
+          bare="$(env -i HOME="$HOME" PATH=/usr/bin:/bin:/usr/sbin:/sbin /bin/zsh -f -c 'command -v bash')"
+          if [ "$bare" = "$want" ]; then
+            echo "::error::a zsh reading no profile already resolves bash to $want, so the probe below could not tell a missing profile line from a present one"
+            exit 1
+          fi
+          alone="$(env -i HOME="$HOME" PATH=/usr/bin:/bin:/usr/sbin:/sbin /bin/zsh -f -c '. "$1"; command -v bash' zsh "$added")"
+          echo "the appended lines alone, under no startup file and no Homebrew PATH, resolve bash to: ${alone:-<MISSING>}"
+          if [ "$alone" != "$want" ]; then
+            echo "::error::what the block appended to $profile resolves bash to '${alone:-<MISSING>}', not $want — the profile line that persists the ordering is missing or wrong"
             exit 1
           fi
           exit 0
