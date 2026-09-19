@@ -1,1 +1,8 @@
 # contract: lifecycle-kit/SPEC.md §The survey record — carried surveys, one block per survey; boundary-truncated, cited only behind a passing witness.
+
+## 2026-09-19 scope — Which deferred entries lead and fill this iteration's unit set under an undirected directive, the scope pool ranking and the enhancement admission filter?
+- corpus: TASK-QUEUE.md docs/install.md
+- oracle: bash gate-sdk/bin/run-gates.sh --emit queue-edges; bash gate-sdk/bin/run-gates.sh --emit queue-flow
+- rev: 743d2671e7c3c650d4392f45953e2a94ec47d8e4
+- finding: Board of 91 deferred lead lines carries no session-class row; heterogeneous-agent-delegation is the only iteration-class row and stays excluded by the enhancement admission filter; roadmap next rows companion-toolkit-profile and gate-authoring-sdk-surface are enhancements failing all three admission arms; no recurrence declaration carries two dates; queue-edges shows no hub, binary-door-wide-sweep's one inbound edge is bash-audience-hand-held; objective-advancing lead is binary-door-wide-sweep, whose run-gates.sh reach is wider than filed (every kit's config-knobs template, gate-sdk's gates-workflow.yml, guard-kit's settings-allow.json and close-triage.md, drift-kit's kpi-deprecated-surface.sh, context-kit's close-brevity.md, lifecycle-kit's lead.md); vendored-kit-readme-spec-link-dangles shares the kit-README and pack-time surface (18 SPEC.md links across the kit READMEs, re-counted); queue-flow mean-filed 3.0
+- inferred: none — the board, queue-edges, queue-flow, the door sweep's git grep -l run-gates.sh reach, the bash audience's four literal sites and the kit READMEs' SPEC.md link count were each run
