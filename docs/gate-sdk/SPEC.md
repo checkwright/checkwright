@@ -11609,7 +11609,12 @@ timestamps) so the committed hooks are byte-stable.
 **The hooks are POSIX sh and stay one implementation on every platform.** Each
 starts `#!/bin/sh` and uses only POSIX shell — `set -eu`, `[ ]`, `$(( ))`, `$( )`,
 `case`, here-documents, and no `local` — so on Linux and macOS they run under the
-`/bin/sh` git itself runs hooks with, and add no `bash` to that host's floor. On native
+`/bin/sh` git itself runs hooks with, and add no `bash` to that host's floor. The
+consumer smoke's `bash`-less arm commits through them with `bash` absent from
+`PATH` (installer/SPEC.md §The consumer smoke), and the `gates` workflow's Linux
+install-smoke leg prints what `/bin/sh` resolves to before running it; that
+runner resolves it to `dash`, so the arm's green there is a strict-shell proof
+rather than a bash one. On native
 Windows, git runs them under the shell Git for Windows bundles, whatever `PATH`
 carries, and they call nothing but shell builtins, `git` and the binary. So they
 add nothing to that host's floor beyond git. `install-smoke-powershell` holds

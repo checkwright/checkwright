@@ -210,7 +210,9 @@ each carrying its reason beside it. Every host is told to run the binary `init`
 placed, by its root-relative path prefixed `./`, with its executable suffix where
 the host's artifact carries one: both `sh` and PowerShell run a `./`-prefixed
 relative path, so one spelling serves every host and no interpreter precedes the
-target. The commands are deliberately **not spelled
+target. `install-smoke-powershell` executes the printed lines from PowerShell,
+`./scripts/checkwright-gates.exe` with forward slashes among them, and commits
+through the hooks they wire. The commands are deliberately **not spelled
 on this page** — what `init` prints is `init`'s to say, and a second copy here is
 a string a rename has to be remembered to move.
 

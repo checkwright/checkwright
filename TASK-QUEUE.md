@@ -12,17 +12,6 @@
 
 ## New Features
 
-- **floor-bash-hooks-front-end** [spec: SPEC-binary-door.md] — the generated git hooks and the
-  bash front-end hold `bash:4.3` on the adopter floor. Rung 4a of the adopter-floor ladder: the
-  hooks become POSIX sh, `init` runs the binary it placed instead of spawning bash, its follow-up
-  block and the starter and prose adopter text name the binary, and `bash` is owed only where a
-  selected kit reaches it. The shim refusal stands; the wider door sweep and the PowerShell twin's
-  retirement are filed, not built.
-  **Done-state:** the consumer smoke's bash-less arm installs the starter and prose profiles and
-  commits through the hook with no `bash` on `PATH`, and the amendment is merged.
-  Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 4a, by operator direction; promoted
-  2026-09-19 at `adopter-floor-native-rungs`' spec, where it leads the unit.
-
 - **fail-open-arm-status-second-source** [spec: SPEC-fail-open-set.md] — both front-end stubs hold
   the fail-open arm set (`--hook`, `--statusline`) as a two-name test, and nothing holds it to the
   arms' contracts. The crate declares the set beside the arm table, each stub holds it on one
@@ -3000,5 +2989,6 @@
 - substrate-parity-digest-assertion-stops-at-the-workflow-text
 - floor-jq-guard-lib
 - kit-token-anchor-hook-for-divergence
+- floor-bash-hooks-front-end
 
 ## Lessons Learned
