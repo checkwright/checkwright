@@ -639,7 +639,7 @@ Git Bash, so any session that has a call to guard already has the shell the
 guard needs. The harness also runs a command hook under Git Bash when it is
 installed. So the committed wiring (`templates/settings-hooks.json`) is the same
 on every host, which is what a settings file shared across a team's machines
-requires. A host-keyed hook command could not be committed at all. The ruleset
+requires. The ruleset
 models bash quoting, heredocs and the harness's per-segment matching of bash
 commands (§The generic ruleset). A PowerShell twin would re-implement a bash
 reader in PowerShell to guard bash commands, and it would double every consumer
@@ -669,9 +669,8 @@ there, because the reader cannot tell that CR from the one `jq` wrote.
 
 **The honest limit: the harness's `PowerShell` tool is not guarded.** On Windows
 the harness carries a second shell tool, named `PowerShell`, which is on by
-default beside `Bash`. A `Bash`-matched hook never sees its calls, and the
-ruleset could not read them anyway, because every rule is a claim about bash
-grammar. So on a Windows host, a command the agent sends through that tool
+default beside `Bash`. A `Bash`-matched hook never sees its calls, so on a
+Windows host, a command the agent sends through that tool
 reaches the harness's own permission path unguarded and unlogged, and the
 friction loop does not measure it. Widening the matcher to `Bash|PowerShell` is
 refused, because it would run bash-grammar rules over PowerShell commands. A
