@@ -1,0 +1,3 @@
+# graph: couples=kit:bin/run-gates.sh,kit:bin/run-gates.ps1,native/src/gates/front_end_fail_open.rs,native/src/emit/mod.rs dir=one valve=none tier=precommit
+# install: zero-config
+# spec: gate-sdk/SPEC.md §check-front-end-fail-open — each front-end stub's fail-open declaration line names exactly the crate's FAIL_OPEN_ARMS, so an arm exits 0 without the binary only where the crate rules it fails open

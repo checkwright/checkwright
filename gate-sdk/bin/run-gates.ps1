@@ -82,11 +82,12 @@ function Get-PrebinaryKnob {
 # spec: gate-sdk/SPEC.md §lib/gate.sh — gate_exe_suffix's host half
 $exeSuffix = if ($onWindows) { '.exe' } else { '' }
 
-# spec: gate-sdk/SPEC.md §run-gates — the stub's two-name test, read off the leading token before the grammar below rewrites it
+# spec: gate-sdk/SPEC.md §run-gates — the stub's fail-open set on its one declaration line, held to the crate by check-front-end-fail-open and read off the leading token before the grammar below rewrites it
 $argv = @($args)
 $lead = if ($argv.Count -gt 0) { [string] $argv[0] } else { '' }
 $unavailable = 2
-if ($lead -ceq '--hook' -or $lead -ceq '--statusline') { $unavailable = 0 }
+$FailOpenArms = @('--hook', '--statusline')
+if ($FailOpenArms -ccontains $lead) { $unavailable = 0 }
 
 # spec: gate-sdk/SPEC.md §run-gates — the stub's residual argv grammar, case for case
 switch -CaseSensitive -Regex ($lead) {

@@ -43,6 +43,7 @@ pub mod enforcement_fresh;
 pub mod evidence_baseline;
 pub mod evidence_manifest;
 pub mod footprint_fresh;
+pub mod front_end_fail_open;
 pub mod install_evidence_fresh;
 pub mod install_platforms;
 pub mod install_toolchain;
@@ -1946,6 +1947,16 @@ pub const REGISTRY: &[GateEntry] = &[
         &["GATE_SDK_NATIVE_SRC", "GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS"],
         "gate-sdk",
         &[("git", "")],
+    ),
+    // spec: gate-sdk/SPEC.md §check-front-end-fail-open — two named files under the gate-sdk root
+    // locator, so no walk root, and a reader that spawns nothing
+    (
+        "check-front-end-fail-open",
+        front_end_fail_open::run,
+        &[],
+        &[],
+        "gate-sdk",
+        &[],
     ),
 ];
 

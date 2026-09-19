@@ -1,0 +1,3 @@
+# Same layout as good/, one drift per direction and per dialect: the shell stub omits --statusline,
+# and the PowerShell stub names --usage-poll, whose caller is a timer and which keeps exit 2.
+gate-sdk

@@ -100,6 +100,10 @@ fi
 
 run_gate check-path-dialect native/target/release/checkwright-gates check-path-dialect
 
+if staged_matches 'gate-sdk/bin/run-gates.sh' 'canon-kit/bin/run-gates.sh' 'context-kit/bin/run-gates.sh' 'delegation-kit/bin/run-gates.sh' 'doctrine-kit/bin/run-gates.sh' 'drift-kit/bin/run-gates.sh' 'evidence-kit/bin/run-gates.sh' 'guard-kit/bin/run-gates.sh' 'lifecycle-kit/bin/run-gates.sh' 'queue-kit/bin/run-gates.sh' 'site-kit/bin/run-gates.sh' 'gate-sdk/bin/run-gates.ps1' 'canon-kit/bin/run-gates.ps1' 'context-kit/bin/run-gates.ps1' 'delegation-kit/bin/run-gates.ps1' 'doctrine-kit/bin/run-gates.ps1' 'drift-kit/bin/run-gates.ps1' 'evidence-kit/bin/run-gates.ps1' 'guard-kit/bin/run-gates.ps1' 'lifecycle-kit/bin/run-gates.ps1' 'queue-kit/bin/run-gates.ps1' 'site-kit/bin/run-gates.ps1' 'native/src/gates/front_end_fail_open.rs' 'native/src/emit/mod.rs'; then
+    run_gate check-front-end-fail-open native/target/release/checkwright-gates check-front-end-fail-open
+fi
+
 if staged_matches 'gate-sdk/smoke/*.sh' 'canon-kit/smoke/*.sh' 'context-kit/smoke/*.sh' 'delegation-kit/smoke/*.sh' 'doctrine-kit/smoke/*.sh' 'drift-kit/smoke/*.sh' 'evidence-kit/smoke/*.sh' 'guard-kit/smoke/*.sh' 'lifecycle-kit/smoke/*.sh' 'queue-kit/smoke/*.sh' 'site-kit/smoke/*.sh' 'gate-sdk/gate-tests/*.test.sh' 'canon-kit/gate-tests/*.test.sh' 'context-kit/gate-tests/*.test.sh' 'delegation-kit/gate-tests/*.test.sh' 'doctrine-kit/gate-tests/*.test.sh' 'drift-kit/gate-tests/*.test.sh' 'evidence-kit/gate-tests/*.test.sh' 'guard-kit/gate-tests/*.test.sh' 'lifecycle-kit/gate-tests/*.test.sh' 'queue-kit/gate-tests/*.test.sh' 'site-kit/gate-tests/*.test.sh' 'gate-sdk/bin/*.sh' 'canon-kit/bin/*.sh' 'context-kit/bin/*.sh' 'delegation-kit/bin/*.sh' 'doctrine-kit/bin/*.sh' 'drift-kit/bin/*.sh' 'evidence-kit/bin/*.sh' 'guard-kit/bin/*.sh' 'lifecycle-kit/bin/*.sh' 'queue-kit/bin/*.sh' 'site-kit/bin/*.sh' 'scripts/gate-sdk-config.knobs'; then
     run_gate check-assertion-strength native/target/release/checkwright-gates check-assertion-strength
 fi

@@ -3840,8 +3840,12 @@ on a tool call keeps exit 2 — `--usage-poll` is that case, its caller a timer.
 either.** `--statusline` declines at `0`, and neither branch reaches it: it gates
 no tool call, so the fail-open branch's ground is absent, and its caller is the
 harness, which **discards** its status, so an exit 2 would be a verdict with no
-reader. The status is fixed at the front-end and this paragraph records it.
-Whether that is a third branch of this rule — *a harness-integration arm whose
+reader. The status is fixed at the front-end, and the list both members are
+recorded in is the crate's `FAIL_OPEN_ARMS` beside the arm table: this rule and
+this paragraph state *why* an arm is in the set, the declaration is the one place
+the set is listed, and each front-end stub carries a copy `check-front-end-fail-open`
+holds to it (§run-gates). The declaration records `--statusline`'s status, which
+both readings below give as 0, and chooses neither. Whether that is a third branch of this rule — *a harness-integration arm whose
 status the harness ignores declines at 0* — or an instance of the fail-open one
 read more widely is **not settled here**; both readings produce today's behaviour
 and choosing between them shapes the next member rather than this one.
@@ -10295,14 +10299,19 @@ cannot be asked of an absent binary.** `ARM_UNAVAILABLE_STATUS` is read on
 precisely the path where the binary is absent or not executable — the branch that
 prints the build remedy naming `bash gate-sdk/bin/build-native.sh` — so a property
 the binary would have to be running to report is unavailable exactly when it is
-needed. Each half holds it as the same two-name test on the leading token, `--hook` and
-`--statusline` taking the fail-open `0`, not as a per-arm table. **It is a
-second source and this section says so rather than claiming otherwise**: each
-arm's contract prose states its own unavailable status and nothing holds the two
-halves in lockstep. What bounds the exposure is that the shell half is two names
-and a default, so it grows only when a new fail-open arm is minted; the honest
-closure is a parity assertion over the fail-open set, which the cut did not build
-and filed rather than flagged.
+needed. Each half holds the **fail-open set** — the arms taking the fail-open `0`,
+today `--hook` and `--statusline` — as one declaration line tested against the
+leading token, not as a per-arm table: `FAIL_OPEN_ARMS='<arm> <arm>'` in the shell
+stub, `$FailOpenArms = @('<arm>', '<arm>')` with a case-sensitive `-ccontains` in
+the PowerShell twin. **Each line is a copy, and the copy is held rather than
+trusted.** The shell copy cannot be deleted, because it is read exactly when the
+binary it would ask is absent; so the crate declares the set authoritatively as
+`FAIL_OPEN_ARMS` beside the arm table (§The harness-integration arm), and
+`check-front-end-fail-open` holds both stubs' lines to that declaration. The
+declaration is one line rather than the `case` arm or `-ceq` chain it replaced so
+that the gate reads an assignment by its name instead of parsing two dialects'
+control flow. `--run-front-end-parity` still holds the two stubs' transcripts
+equal; the gate holds their names to the crate, which the parity arm never did.
 
 **The split existed to delete per-member knob resolution in bash, and the
 arithmetic is why it was worth a port.** The loop the arm replaced resolved one
@@ -10819,7 +10828,7 @@ and every unit test it spawns, because each runs in another working directory. T
 needs no edit for any of this — `bin/run-gates.sh` hands every leading `--<token>`
 that is not one of the five forms it names straight to `exec_arm`, and
 `ARM_UNAVAILABLE_STATUS` stays 2 for this arm by falling outside that file's
-two-name test: a test runner whose binary is absent has not passed, and 0 is
+fail-open set: a test runner whose binary is absent has not passed, and 0 is
 reserved for a harness-integration arm gating a user action, which this is not.
 
 **The dispatch resolution `lib/gate.sh` owns stays there, reached by a bash
@@ -14683,6 +14692,48 @@ takes the same shape for the same reason). Its fixture pair exercises both corpu
 arms and every clearance, and its `bad/` case asserts the violation **count**, which
 is what gives the green files beside the violations a reader: a clearance arm that
 stopped clearing reds that case rather than passing quietly.
+
+### check-front-end-fail-open
+
+Invariant: **each front-end stub names exactly the crate's fail-open set.** The
+set is the arms a stub exits `0` for when the binary is absent or not executable
+(§The harness-integration arm rules who belongs in it); the crate declares it as
+`FAIL_OPEN_ARMS` beside the arm table, and each stub carries a copy on one
+declaration line (§run-gates). A harness-integration arm minted without its name
+in a stub wedges a binary-less adopter at the point a hook grades a user action,
+and a name the crate does not declare turns a verdict a timer or a battery reads
+into a silent `0`.
+
+**The crate's declaration is the reference, and the arm contracts are not.** Only
+the binary holds a declaration a test can check against the arms it names — the
+crate's own unit test holds each `FAIL_OPEN_ARMS` name to an arm-table row, so a
+renamed or deleted arm reds there first. Prose carries no declaration a gate could
+read without a grammar invented for the purpose, and a per-arm status sentence in
+each arm's section would be a third copy of the set; so the class rule stays in
+prose, stating why an arm is in the set, and the list lives in the one place a
+test can reach.
+
+It reads the `FAIL_OPEN_ARMS=` line of `<gate-sdk root>/bin/run-gates.sh` (one
+single-quoted value, split on blanks) and the `$FailOpenArms =` line of
+`<gate-sdk root>/bin/run-gates.ps1` (an `@(...)` array of single-quoted strings),
+the root being its one positional, defaulting to the gate-sdk root locator. A line
+that reads the name without assigning it — each stub's membership test — is not a
+declaration line. Exit **0** when every present stub names exactly the declared
+set, the clean line naming the set and each stub; **1** when a stub names an arm
+the crate does not declare or omits one it does, the finding naming the stub, the
+arm and the direction; **2** when a present stub carries no declaration line or
+two of them, or its line does not parse, since a stub the gate cannot read is not
+a clean one. **An absent stub is reported on the clean line, not red**: a consumer
+tree may drop the PowerShell twin, and a tree with no front-end has no copy to
+drift.
+
+**Its implementation is a compiled subcommand, born native** (§The port-candidate
+criteria): declaration path `check-front-end-fail-open.gate`, install disposition
+`zero-config` because its subject is the vendored `gate-sdk/bin/` that `init`
+writes, tier `precommit`, couples the two stubs (`kit:bin/run-gates.sh`,
+`kit:bin/run-gates.ps1`) beside its own module and the arm table's. Its fixture
+pair reds both directions in both dialects: `bad/`'s shell stub omits
+`--statusline` and its PowerShell stub adds `--usage-poll`.
 
 ### check-assertion-strength
 

@@ -37,10 +37,13 @@ exec_arm() {
     exec "$bin" "$@"
 }
 
-# spec: gate-sdk/SPEC.md §run-gates — the one piece of per-arm knowledge the stub keeps, and it is a two-name test rather than a table: the unavailable status is read on precisely the path where the binary is absent, so it is the one property that cannot be asked of the binary that would report it
-case "${1-}" in
-    --hook | --statusline) ARM_UNAVAILABLE_STATUS=0 ;;
-esac
+# spec: gate-sdk/SPEC.md §run-gates — the one piece of per-arm knowledge the stub keeps, the fail-open set on one declaration line check-front-end-fail-open holds to the crate's FAIL_OPEN_ARMS: the unavailable status is read on precisely the path where the binary is absent, so it cannot be asked of the binary that would report it
+FAIL_OPEN_ARMS='--hook --statusline'
+for arm in $FAIL_OPEN_ARMS; do
+    if [[ "${1-}" == "$arm" ]]; then
+        ARM_UNAVAILABLE_STATUS=0
+    fi
+done
 
 # spec: gate-sdk/SPEC.md §run-gates — the residual argv grammar, and the whole of it: the *gates-dir positional* is the one token the crate cannot tell from a gate name, so the front-end resolves it and spells it `--gates-dir`. Every other form of the battery's own grammar — the two selectors, the help request, the `--` escape and every refusal — travels to the `--run` arm untouched, and every other leading token is an arm name the crate's own parser normalizes
 case "${1-}" in

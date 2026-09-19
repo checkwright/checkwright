@@ -1,0 +1,2 @@
+gate-sdk/bin/run-gates.sh: omits '--statusline', which the crate's FAIL_OPEN_ARMS declares
+gate-sdk/bin/run-gates.ps1: names '--usage-poll', which the crate's FAIL_OPEN_ARMS does not declare

@@ -1,0 +1,4 @@
+# The positional is the gate-sdk root this case's two stubs sit under. Both declare the crate's
+# fail-open set, each in its own dialect, beside a membership test that reads the name and so is
+# no second declaration line.
+gate-sdk

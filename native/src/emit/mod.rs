@@ -748,6 +748,11 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     ),
 ];
 
+// spec: gate-sdk/SPEC.md §The harness-integration arm — the fail-open set, the arms a front-end
+// stub exits 0 for when the binary is absent; this declaration is authoritative and each stub's
+// declaration line is its copy, held to it by check-front-end-fail-open
+pub const FAIL_OPEN_ARMS: &[&str] = &["--hook", "--statusline"];
+
 pub fn lookup(arm: &str) -> Option<&'static Arm> {
     ARMS
         .iter()
@@ -781,5 +786,14 @@ mod tests {
         assert!(lookup("--emit-enum-sets").is_some());
         assert!(lookup("enum-sets").is_none());
         assert!(lookup("--emit-enum-set").is_none());
+    }
+
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — a renamed or deleted fail-open arm reds
+    // here, before a stub's copy can name an arm the binary no longer dispatches
+    #[test]
+    fn every_fail_open_arm_is_an_arm_table_row() {
+        for arm in FAIL_OPEN_ARMS {
+            assert!(lookup(arm).is_some(), "{} names no arm-table row", arm);
+        }
     }
 }
