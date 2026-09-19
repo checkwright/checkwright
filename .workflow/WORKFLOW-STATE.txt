@@ -9,3 +9,4 @@ adopter-floor-collapse spec a4f78496 2026-09-19 1365665d
 adopter-floor-collapse align a12c97ae 2026-09-19 7403b968
 adopter-floor-collapse build a670b0a8 2026-09-19 7a2483ff
 adopter-floor-collapse validate a5c895cf 2026-09-19 94b243e0
+adopter-floor-collapse close a88b7a78 2026-09-19 22abab80
