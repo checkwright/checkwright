@@ -22,6 +22,16 @@
   `adopter-floor-native-rungs`' spec by operator direction, option (b); joins this iteration by
   operator direction (2026-09-19, lead-relayed).
 
+- **release-binary-archive-versioned-name** [spec: SPEC-binary-archive.md] — each target's gate
+  binary reaches the Release as a flat `checkwright-gates-<target>` pair with no version, and its
+  sidecar names the bare payload name, so `sha256sum -c` on the downloaded pair fails (probed on
+  `v0.25.0`). **Ruled at spec:** it ships, in the operator's archive form:
+  `checkwright-gates-<version>-<target>.tar.gz`, one directory, both names unchanged, no outer
+  sidecar (a second digest producer in `pack`). The pack loop takes the target's `.exe` suffix,
+  fixing a Windows artifact the next tag's pack step would not find. No bootstrap reads a Release
+  asset. Surfaced 2026-09-14 by the lead; operator direction (2026-09-19, lead-relayed) joins it
+  to this iteration.
+
 ## Technical Debt
 
 - **init-dry-run-plan-parity** — `init --dry-run` predicts the evidence-kit and lifecycle-kit
@@ -2524,24 +2534,6 @@
   (lead.md or delegation-kit's journal mechanics) is a tiering call.
   **Cost while deferred:** a lead after compaction can abandon a live agent on a bad address.
   Filed 2026-09-12 during build, after a compaction; drained and promoted 2026-09-13 at close.
-
-- **release-binary-archive-versioned-name** [cost: event/low] [surface: installer]
-  — each per-target gate binary reaches the Release as a bare `checkwright-gates-<target>` plus its
-  `.sha256`, carrying no release version, so a hand download cannot tell releases apart.
-  **To consider, not a commitment** (operator direction, 2026-09-14, lead-relayed): ship each target
-  as one versioned archive holding the binary and its `.sha256` under their unchanged filenames.
-  **Refused:** renaming the binary or its sidecar, since every vendored reference and the upgrade
-  path key on them; the binary name itself stays.
-  **Why design-pending:** the reach is unpriced — the installer bootstraps' asset lookup and
-  digest verification (the digest's out-of-payload source is the release asset), `publish.yml`'s
-  release job, the install-smoke legs and RELEASING.md.
-  **Cost while deferred:** a hand-downloaded binary carries no version a reader can see, so telling
-  two releases' assets apart costs a digest comparison.
-  Surfaced 2026-09-14 by the lead into the gap inbox, after `config-bridge-floor`'s close; promoted
-  at this iteration's scope.
-  Joins this iteration by operator direction (2026-09-19, lead-relayed), marked for spec: the
-  bootstrap port rewrites the asset lookup and digest source this reaches, so the whether is
-  spec's to settle or escalate.
 
 - **docs-cmd-retired-path-blind-to-queue** [cost: event/low] [surface: canon-kit]
   — canon-kit/SPEC.md §check-docs-cmd assertion (C) cannot see a retired path cited from the queue,
