@@ -6,3 +6,4 @@
 
 adopter-floor-native-rungs scope a5b9ec10 2026-09-19 e917acfd
 adopter-floor-native-rungs spec a29c9d2a 2026-09-19 27cf4cb1
+adopter-floor-native-rungs align a5e5136c 2026-09-19 5c93ba63
