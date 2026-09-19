@@ -454,7 +454,7 @@ verdict set is, and a unit test in `toolfloor.rs` holds it closed:
 - **`contributor`** — a contributor-side floor with no install-time role.
 - **a kit name** — owed where that kit is selected; the value is the kit's
   directory name, and the test holds it to a kit root the authoring tree
-  carries (`walk::kit_roots`), since a misspelled name is a condition nothing
+  carries, since a misspelled name is a condition nothing
   satisfies and would silently drop the member from every floor.
 - **`registered`** — owed where a registered gate's requirement element (the
   data `--needs` prints, gate-sdk/SPEC.md §check-reads-couples) names the
