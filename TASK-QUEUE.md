@@ -190,6 +190,24 @@
   drain. Owner lookup: `PROGRAM_FLOOR`, `mktemp`, `date -Is`, `coreutils` — matched only the
   rung entries above (curl, jq, shellcheck, bash: distinct members).
 
+- **stamp-subject-merge-carve-out-unruled** [cost: event/low] [surface: lifecycle-kit] —
+  `check-stamp-subject` reds a commit adding stamp lines under git's own `Merge …` subject, which
+  has no scope to parse (lifecycle-kit/SPEC.md §check-stamp-subject, honest limits), while
+  `check-commit-subject` admits `Merge `, `Revert ` and `fixup! ` / `squash! ` as carve-outs never
+  to be reworded (gate-sdk/SPEC.md §check-commit-subject). A consumer merging branches that carry
+  state-file stamps meets two gates whose remedies conflict.
+  **Why design-pending:** the remedies are (a) exempt git-generated subjects in
+  `check-stamp-subject` on `check-commit-subject`'s precedent, or (b) keep the red and name the
+  merge-time remedy, a scoped subject supplied with `git merge -m`. Either narrows or holds the
+  landed envelope, so an envelope ruling is owed at this entry's scope.
+  **Inferred, not run:** that `git merge -m` with a scoped subject clears both gates on a
+  stamp-carrying merge.
+  **Cost while deferred:** none here, where internal work commits direct to master; a
+  multi-operator consumer's stamp-carrying merge is blocked until reworded.
+  Filed 2026-09-19 to the gap inbox at `lifecycle-contract-drain`'s build, promoted at its close
+  drain by lead decision. Owner lookup: `stamp-subject`, `merge subject`, `git-generated` —
+  no entry matched.
+
 - **gap-inbox-kit-ref-valve** [cost: event/low] [surface: canon-kit] —
   `check-kit-ref-liveness` valves the queue file out by basename because the queue is design-ahead
   and names future knobs and paths, but the gap inbox is design-ahead in the same way and is not
