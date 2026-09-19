@@ -4,4 +4,4 @@
 
 ---
 
-— scope a26b743c 2026-09-19 327fa4ac
+lifecycle-contract-drain scope a26b743c 2026-09-19 327fa4ac

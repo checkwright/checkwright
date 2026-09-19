@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: lifecycle-contract-drain
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -205,6 +205,7 @@
   discipline, and this repo's numbers stay a restatement a kit cannot see.
   Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, beside the hotfix-push
   allowance it landed in CLAUDE.md; promoted at the next iteration's scope.
+  Joins `lifecycle-contract-drain` by operator direction (2026-09-19, lead-relayed): push count.
 
 - **mid-iteration-push-owner-unnamed** [cost: event/low] [surface: lifecycle-kit] — no
   lifecycle surface names which session owns an iteration's mid-iteration push:
@@ -221,6 +222,7 @@
   Filed 2026-09-19 to the gap inbox by the `windows-adopter-path` lead; promoted at the next
   iteration's scope. Owner lookup: `push owner`, `owns the push`, `who pushes`,
   `mid-iteration push` — none.
+  Joins `lifecycle-contract-drain` by operator direction (2026-09-19, lead-relayed): push actor.
 
 - **gap-inbox-kit-ref-valve** [cost: event/low] [surface: canon-kit] —
   `check-kit-ref-liveness` valves the queue file out by basename because the queue is design-ahead
@@ -1056,6 +1058,7 @@
   couples-field-semantics and validate-red-holding among them).
   recurrence: batch-split-stamp-ownership 2026-08-29
   Filed 2026-08-01 at close from the gap inbox, filed by this iteration's build.
+  Joins `lifecycle-contract-drain` by operator direction (2026-09-19, lead-relayed): stamp fork.
 
 - **companion-toolkit-profile** [roadmap: next/ecosystem] [cost: event/high] [surface: lifecycle-kit] — the interop rung.
   roadmap-summary: Gate a tree whose specs another toolkit's workflow wrote.
@@ -1721,6 +1724,7 @@
   Filed 2026-08-18 by close from the gap inbox on the 2026-08-17 operator ruling; the drain
   re-verified that no permanent surface carries the clause — the only hits were the inbox this
   drain truncates and the survey record the next first-stage entry truncates.
+  Joins `lifecycle-contract-drain` by operator direction (2026-09-19, lead-relayed): clause home.
 
 - **lead-specifies-constraint-not-mechanism** [cost: event/high] [surface: lifecycle-kit] — whether the lead contract should
   say that a lead states the constraint and a stage session finds the mechanism.
@@ -1763,8 +1767,7 @@
   **THE HONESTY BOUNDARY IS PART OF THE ENTRY, not a caveat on it.** Two instances is an
   **anecdote, not a measurement**, and **nothing reds on a lead over-specifying** — the rule is
   unenforceable by construction, since a dispatch never enters the tracked tree. Both instances
-  were caught because the sessions were bounded well, not because any mechanism fired. A scope
-  reading this must not take the rule as established.
+  were caught because the sessions were bounded well, not because any mechanism fired.
   **Cost while deferred:** low in frequency and **no longer self-limiting in the worst case** —
   three instances in three iterations, and the third would have cost an iteration's lifecycle
   state rather than a turn. The posture is already the lead contract's implicit shape, so what is
@@ -1772,6 +1775,7 @@
   A longer narrative version is staged as operator material in the essay-harvest sink; the two
   are different tiers and both stand. Filed 2026-08-18 by close on the lead's ruling, which
   adopted close's own refusal to take the envelope change alone.
+  Joins `lifecycle-contract-drain` by operator direction (2026-09-19, lead-relayed): generalizes.
 
 - **projection-trigger-witness** [cost: event/low] [surface: docs] — the generated-projections roster states each
   projection's staleness trigger in prose, and nothing checks the prose against the emitter.
@@ -2099,19 +2103,44 @@
   marking a claim's evidentiary tier (measured / inferred / expected), and what if anything can
   CHECK it, given that a dispatch is prose and lifecycle-kit/templates/lead.md is a kit surface. A
   cheap shape is a stated relay discipline; it costs a template line and buys no detection.
-  **THE THIRD OF A FAMILY, AND A SCOPE RULING ON ONE SHOULD RULE ALL THREE.**
-  `relayed-rule-role-scope-unchecked` is a RULE scoped to the relayer's role;
-  `lead-specifies-constraint-not-mechanism` is a MECHANISM the relayer had no standing to choose;
-  this is a CLAIM whose evidentiary status was silently upgraded in transit. All three share the
-  home, the envelope-change blocker and the undecidability limit. A MERGE was asked for at the
-  drain and DECLINED with cause: each carries independently attested evidence near the entry cap,
-  so one entry would exceed it on arrival and the compression would spend exactly the evidence a
-  ruling needs.
+  **THE THIRD OF A FAMILY, ruled together:** `relayed-rule-role-scope-unchecked` is a RULE scoped
+  to the relayer's role; `lead-specifies-constraint-not-mechanism` a MECHANISM the relayer had no
+  standing to choose; this a CLAIM silently upgraded in transit. All three share the home, the
+  envelope-change blocker and the undecidability limit. A MERGE was DECLINED at the drain: each
+  carries independently attested evidence near the entry cap, which a merged entry would spend.
   **Cost while deferred:** low frequency, high per occurrence, invisible from the receiving end —
   a session that follows an upgraded inference produces work that looks compliant and is wrong.
   Filed 2026-08-24 to the gap inbox by build and again by the lead; promoted 2026-08-24 at
   `shell-gate-tail-port-and-completion-oracle`'s close, which judged the merge question the second
   filing put to it.
+  Joins `lifecycle-contract-drain` by operator direction (2026-09-19, lead-relayed): claim tier.
+
+- **relayed-rule-role-scope-unchecked** [cost: event/high] [surface: lifecycle-kit] — a rule
+  relayed through a dispatch can be scoped to the relayer's role and bind nobody it is relayed to,
+  and nothing in the relay path checks that.
+  **Two attested instances, both from `battery-runner-port` and both the lead's self-report.**
+  (1) A dispatch instructed a stage to write `recurrence:` stamps in a shape queue-kit/SPEC.md
+  forbids that stage to write. (2) A dispatch told validate not to re-run `run-validate.sh`, a
+  lead-side verification rule; it produced a spliced evidence manifest the lead had to reject, and
+  the correct one needed a second full spine run. A rule arriving through the dispatch channel
+  reads as authoritative by construction, so the receiving session does the wrong thing confidently.
+  **The generalization, in the lead's own words:** before relaying a rule, check whose role it
+  binds.
+  **Why design-pending:** the home is lifecycle-kit/templates/lead.md, whose relay duties the rule
+  qualifies, so the wording is an envelope change. Whether anything can check it is harder: roles
+  are defined across lead.md, the stage templates and each kit's SPEC, so a scanner must resolve a
+  relayed sentence to a role. The cheaper shape is a stated relay discipline naming the surfaces a
+  lead consults before relaying, a template line that buys no detection.
+  **DISTINCT from its two siblings**, which share its home and envelope reasoning:
+  `lead-specifies-constraint-not-mechanism` hands down a mechanism, and
+  `dispatch-claim-evidentiary-tier-unmarked` a claim upgraded in transit; this hands down a rule
+  that was never the relayer's. A merge of the three was declined at the 2026-08-24 drain.
+  **Cost while deferred:** low frequency, high per occurrence, and invisible from the receiving
+  end — work that looks compliant and is wrong, which only the relayer can tell.
+  Filed 2026-08-23 to the gap inbox at `battery-runner-port`'s close; promoted 2026-08-23 at the
+  next scope; iceboxed 2026-09-11 in a pool triage. Returned to Deferred and selected for
+  `lifecycle-contract-drain` at its scope (operator direction, 2026-09-19, lead-relayed): the claim
+  generalizes and all three siblings join; spec authors and promotes.
 
 - **release-body-step-has-no-in-tree-witness** [cost: event/high] [surface: RELEASING.md] — the one release step whose
   product lives off the tree is the one that was skipped, and its only backstop is next-day.
@@ -2782,6 +2811,7 @@
   prose opener and machinery-class conjunction; the class carries the same verdict now.
   Filed 2026-09-10 by close, draining the gap inbox. →fix was refused on the re-verification above:
   the obvious cheap fix is already landed, and already failed.
+  Joins `lifecycle-contract-drain` by operator direction (2026-09-19, lead-relayed): journal path.
   recurrence: stage-journal-path-unsourced-mid-stage 2026-09-11
 
 - **align-in-session-absorption-tier-unruled** [cost: event/low] [surface: lifecycle-kit]
@@ -2969,6 +2999,7 @@
   measures at a quarter of the align stamps.
   Filed 2026-09-16 to the gap inbox by the iteration lead verifying align's own commits; no gate
   reds on it. Drained and promoted at close, which re-ran the tabulation and widened the finding.
+  Joins `lifecycle-contract-drain` by operator direction (2026-09-19, lead-relayed): subject scope.
 
 - **isolation-oracle-cost-lacks-dispatcher-clause** [cost: event/high] [surface: delegation-kit]
   — agent-execution's isolation cost (4) carries no dispatcher-side clause, so a dispatch sending
@@ -3147,6 +3178,9 @@
   units, and the preview gate recedes at the inflow rate.
   Filed 2026-09-19 to the gap inbox by the consult after `adopter-floor-collapse`'s close;
   promoted at the next scope. Owner lookup: `inflow`, `net drain`, `refill` — none.
+  Selected to lead `lifecycle-contract-drain` at its scope and admitted in full under the
+  enhancement admission filter as drain-serving delivery machinery, candidate (a)'s arm allowed
+  (operator direction, 2026-09-19, lead-relayed) — a reading of the filter, not a reversal.
 
 ## Icebox
 
@@ -3309,7 +3343,6 @@
 - **breadth-declaration-stale-listing** — Spent breadth declarations stay silent.
 - **breadth-declaration-committed-glob-home** — Glob keep-rulings have no home.
 - **criterion-4-two-spellings-disagree** — Criterion 4 reads two ways.
-- **relayed-rule-role-scope-unchecked** — Relayed rules may bind the wrong role.
 - **substrate-parity-assertion-c-reach-unannounced** — C can shrink unannounced.
 - **promotion-commitment-stamp-latency** — At-ceiling stamps wait on promotion.
 - **recurrence-threshold-counts-dates-not-incidences** — Same-day firings merge.
