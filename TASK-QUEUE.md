@@ -182,22 +182,6 @@
   `guard-hook-windows-substrate` was designed. Owner lookup: `PowerShell tool`,
   `USE_POWERSHELL_TOOL`, `Bash|PowerShell` — none.
 
-- **objective-6-guard-hook-twin-unruled** [cost: event/low] [surface: guard-kit] — TRAJECTORY.md
-  objective 6 reads "bash for Linux and macOS, PowerShell for Windows", but guard-kit's hook on
-  native Windows runs under Git for Windows' bash and guard-kit/SPEC.md §The hook on native Windows
-  refuses a PowerShell twin. That refusal landed in `windows-adopter-path` by operator direction
-  given in the lead session, not a `/consult` ruling, so the objective and the SPEC disagree.
-  **Why design-pending:** narrowing the objective or queuing the twin is the operator's call
-  through `/consult`, and no session may annotate the objective.
-  **Done-state:** a `/consult` ruling amends objective 6 or queues the twin.
-  **Cost while deferred:** a reader of the objective and a reader of the SPEC get opposite
-  answers about the Windows hook.
-  **DISTINCT from `guard-powershell-tool-unguarded`**, whose subject is the harness's
-  `PowerShell` tool bypassing the hook; this one is the hook's own implementation language.
-  Filed 2026-09-19 to the gap inbox at `windows-adopter-path`'s close; promoted at the next
-  iteration's scope by operator direction, lead-relayed. Owner lookup: `PowerShell twin`,
-  `hook twin`, `objective 6` — none.
-
 - **floor-curl-jq-unconditional** [cost: event/high] [surface: native] — `doctor`, and
   through it `init`, refuse every profile on a host without `curl` or `jq`, yet `curl`'s one
   adopter reach is `--usage-poll` (delegation-kit's opt-in timer arm, which already refuses by
@@ -3425,5 +3409,7 @@
 - **readme-bin-roster-underived** — no gate holds a kit README's bin/ tool roster.
 
 ## Done
+
+- objective-6-guard-hook-twin-unruled
 
 ## Lessons Learned

@@ -17,12 +17,14 @@ as Deferred entries (delta 5).
 It is a root-level amendment because it spans `native/`, context-kit, installer,
 drift-kit, gate-sdk's templates and the site's `docs/install.md`.
 
-**Objective 1's discharge reading is open.** Rungs 2 and 3 below leave members
-that are owed only where the kit or gate reaching them is selected. Whether a
-floor that is git-only for the default selection, with per-kit members, meets
-*"docs/install.md declares a git-only floor"* is a reading of the objective. Only
-the operator can give it, through `/consult`. Nothing this amendment lands states
-the floor as git-only, and no delta rests on either reading.
+**Objective 1's discharge reading is ruled.** Rungs 2 and 3 below leave members
+that are owed only where the kit or gate reaching them is selected, and
+TRAJECTORY.md objective 1 now states that shape as the objective: git is the
+only unconditional member, a member a selected kit or arm spawns is that kit's
+declared requirement and not the floor, and the discharge fires when
+`docs/install.md` declares exactly that with the starter and prose profiles
+resolving to git alone. Nothing this amendment lands states the floor as
+git-only, and no delta rests on the reading; rungs 2 to 4a are what approach it.
 
 The tree does not already do this. `native/src/toolfloor.rs` `floor_met` spawns
 `programs::SORT` with `-V`, and `PROBE_SET` carries `awk` and `sort::coreutils`.
@@ -45,14 +47,18 @@ the binary's spawns by `grep -rnE "programs::<MEMBER>\b" native/src`.
 | 4a | `bash` | the front-end and both generated hooks | the hooks and the front-end reach the binary directly |
 | 4b | `jq` | `lib/guard.sh`'s seven spawn sites and one presence probe | the library stays shell (its `# no-port:`) and its JSON reads and renders go to the gate binary, whose parsing is in-process (`native/src/json.rs`) |
 
-guard-kit's hook keeps its `bash` reach on every rung. Whether that bash is the
-unavoidable interpreter objective 6 admits is `objective-6-guard-hook-twin-unruled`'s
-`/consult`, not a rung here.
+guard-kit's hook keeps its `bash` reach on every rung, and that reach is
+settled rather than open: TRAJECTORY.md objective 6 admits it as the shell the
+harness already runs the `Bash` tool under on every host, so no rung here owes
+a PowerShell twin of the hook (guard-kit/SPEC.md §The hook on native Windows
+states the refusal and its grounds). The hook's bash is a member the delegation
+profile declares, not the floor.
 
 **Where the ladder leaves a starter-profile adopter.** After rung 1 the floor
 `doctor` holds a starter adopter to is still `bash`, `git`, `jq`, `curl` and
-`shellcheck`. After rungs 2 and 3 it is `git` and `bash`, not git alone. That is
-why the objective-1 reading above stays open.
+`shellcheck`. After rungs 2 and 3 it is `git` and `bash`, not git alone; rung 4a
+is what takes the starter and prose profiles to the git-alone resolution the
+discharge names.
 
 **Interaction with `adopter-floor-gnu-date-and-awk-unheld`.** That Deferred
 entry's remaining half asks for a CI leg on a non-GNU awk. Delta 3 leaves no
