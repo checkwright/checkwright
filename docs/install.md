@@ -160,11 +160,9 @@ your `PATH`, and the note says what breaks without it:
   §bin/env-probe names each surface). The starter and prose profiles reach none of them. Both generated
   git hooks are POSIX sh, run by the `/bin/sh` git itself uses. `init`
   generates them and names its follow-up commands through the gate binary it
-  placed. On every profile, though, the unix install bootstrap
-  (`installer/bin/checkwright.sh`) is itself a bash script, so installing on
-  Linux or macOS still needs a `bash`. That reach runs before `checkwright doctor`
-  and outside this roster, and porting the bootstrap to POSIX sh is what removes
-  it. On native Windows, run a front-end battery from PowerShell through
+  placed. The unix install bootstrap (`installer/bin/checkwright.sh`) is POSIX sh
+  too, run by the OS's own `/bin/sh`, so installing a starter or prose profile
+  reaches no `bash` either. On native Windows, run a front-end battery from PowerShell through
   `gate-sdk/bin/run-gates.ps1`, the twin of `run-gates.sh`. Git for Windows'
   bundled bash serves guard-kit's hook there, because the harness runs both its
   `Bash` tool and its hook commands under that shell. The floor is the highest construct the
@@ -304,13 +302,13 @@ prebuilt rather than built on your machine, and the floor they aim at is **git
 alone** — git shelled out, never embedded. What survives is one small bootstrap
 that has to resolve your platform before any binary can run. It is deliberately
 small enough to exist twice, and it now does: a PowerShell half ships beside the
-bash one, exercised by its own CI leg.
+POSIX sh one, exercised by its own CI leg.
 
 **That was the interpreter half of a native Windows path, and the other half has
 since landed.** The prebuilt binaries are published for the roster's joined
 platforms and native Windows is one of them, so a Windows host resolves to an
-artifact and installs. Both bootstraps reach it — the bash one under Git for
-Windows (the path the install-smoke leg exercises) and the PowerShell one on its
+artifact and installs. Both bootstraps reach it — the POSIX one under Git for
+Windows' `sh` (the path the install-smoke leg exercises) and the PowerShell one on its
 own leg. WSL remains a route you may choose instead.
 
 <!-- measured: ported-gate-members=119 -->
@@ -338,7 +336,7 @@ curl -fsSL -o "$cw/checkwright-X.Y.Z.tgz.sha256" \
   https://github.com/checkwright/checkwright/releases/download/vX.Y.Z/checkwright-X.Y.Z.tgz.sha256
 ( cd "$cw" && sha256sum -c checkwright-X.Y.Z.tgz.sha256 && tar -xzf checkwright-X.Y.Z.tgz )
 
-bash "$cw/package/bin/checkwright.sh" init  # from your repository root
+sh "$cw/package/bin/checkwright.sh" init  # from your repository root
 ```
 
 `init` ends by printing the commands that finish the setup, each with its reason.

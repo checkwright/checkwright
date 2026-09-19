@@ -26,8 +26,8 @@ vendored keeps working — it needs nothing from a package registry again.
 
 ## Implementation
 
-Bash, up to the boundary §The install boundary rules — and that boundary is now
-the **bootstrap itself**. The two bootstraps are the whole of the shell: one bash,
+POSIX sh, up to the boundary §The install boundary rules — and that boundary is now
+the **bootstrap itself**. The two bootstraps are the whole of the shell: one POSIX sh,
 one PowerShell, twins rather than an original and a rewrite, because the host the
 second exists for may run no POSIX shell at all. Everything they hand to the
 verified gate binary is Rust, every verb included, so an install is written once
@@ -36,19 +36,46 @@ in one language instead of twice by hand in two.
 npm is the delivery vehicle, never the implementation: **both** `bin` entries are
 scripts, so a reader reviewing what they are about to run reads source rather than
 a build product, and the linter that governs every other script in the repository
-governs the bash one — the PowerShell half has no such linter here and its oracle
+governs the POSIX one, in the dialect its `#!/bin/sh` selects — the PowerShell
+half has no such linter here and its oracle
 is its own install-smoke leg instead, which is the trade §The install boundary's
 parity ruling accepts. What the two scripts amount to is small and fixed by that
-section's own step sequence, which the bash half labels step by step in its
+section's own step sequence, which the POSIX half labels step by step in its
 `# spec:` comments. There is no third thing a reader has to review before
 running an install.
+
+**The POSIX half is run by the host's own `/bin/sh`, so the unix install floor is
+git, `/bin/sh` and the base userland the bootstrap reads — no `bash`.** POSIX sh is
+the subset of bash the OS's `/bin/sh` runs as well, which is the reading of the
+bash-for-Linux-and-macOS policy the generated hooks already rest on
+(gate-sdk/SPEC.md §gen-pre-commit). Writing to that subset costs four things, each
+settled once here:
+
+- **The payload directory comes from `$0`.** The bootstrap is executed, never
+  sourced, so `$0` is its path, and npm's `bin` link is resolved with plain
+  `readlink`. `CDPATH` is unset before the first `cd`: a POSIX `cd` into a relative
+  path consults it and prints the directory it picked, which would corrupt the
+  `$( )` capturing `pwd`.
+- **No `local`.** POSIX has none and a `/bin/sh` that is not dash, bash or a BSD sh
+  may lack it, so the functions share the script's scope and every working name is
+  unique within the file.
+- **No `pipefail`.** No pipeline's verdict needs it: the libc probe reads `grep`'s
+  status, the roster test reads the last `grep`'s, and step 4 reads what it
+  captured — a hasher that fails leaves the computed digest empty, which the
+  empty-or-unequal test already refuses.
+- **Pattern tests are `case`, the rest `[ ]`**, and artifact selection is a glob
+  (§The gate binary), so no array, process substitution or `find` primary is used.
+
+macOS's `/bin/sh` is bash in POSIX mode, a lenient runner, so the dialect claim
+rests on `check-shellcheck` and on the Linux install-smoke legs, whose `/bin/sh` is
+dash.
 
 ## Requirements
 
 This package reaches a tree over two transports, and each carries its own
 requirement. Fetched from npm it needs Node, for `npx`. Fetched as the tarball
 attached to a GitHub Release it needs none — `curl`, `tar`, and `sha256sum`,
-then `bash package/bin/checkwright.sh init`. Both requirements belong to a
+then `sh package/bin/checkwright.sh init`. Both requirements belong to a
 delivery path alone: the gate battery this vendors does not use Node, no
 delivery-path tool joins the toolchain roster, and the manual vendoring path
 documented on the site needs neither. The toolchain the battery does assert,
@@ -73,12 +100,15 @@ set from being reported as a toolchain fault.
 
 ## Layout
 
-- `bin/checkwright.sh` — the bash bootstrap (§The install boundary), and the
-  package's `bin` entry.
+- `bin/checkwright.sh` — the POSIX sh bootstrap (§The install boundary), run by the
+  host's own `/bin/sh`, and the package's `bin` entry. npm's shim generator takes
+  the interpreter from its `#!/bin/sh` line, which the extension-less shim MSYS
+  runs resolves and the `.cmd` shim does not; a native Windows adopter is sent to
+  `checkwright-pwsh` below, so no supported path runs through that `.cmd` shim.
 - `bin/checkwright.ps1` — the PowerShell bootstrap (§The install boundary), the
   second `bin` entry, named `checkwright-pwsh` there. The name is not cosmetic:
   npm generates `<name>.cmd` and `<name>.ps1` shims itself, so a second entry
-  also called `checkwright` would collide with the shim npm writes for the bash
+  also called `checkwright` would collide with the shim npm writes for the sh
   target. **Its `#!/usr/bin/env pwsh` line is load-bearing rather than
   decorative** — npm's shim generator reads the target's shebang to pick the
   interpreter, and without one it writes a shim that invokes the `.ps1`
@@ -446,7 +476,7 @@ One part of an install must be written in whatever language the host already
 runs: the bootstrap that resolves, verifies and executes the gate binary.
 Everything else is **conditional install logic**, and the **interpreter policy**
 rules that everything conditional belongs on the far side of that invoke —
-written once, in Rust, rather than twice, in bash and in the PowerShell half a
+written once, in Rust, rather than twice, in POSIX sh and in the PowerShell half a
 native Windows install needs. The policy binds the bootstrap's *shape* rather
 than its existence: its whole job is resolve the platform, place the matching
 binary, invoke it, which is small enough to be written twice. **That relocation
@@ -458,7 +488,7 @@ rather than re-argued per step.
 
 **Two standing obligations survive the relocation**, and they bind every unit
 that touches the install path: **add no new shell-only install step**, and
-**assume no POSIX shell**. Both are the policy's, not this section's, and they
+**assume no POSIX shell on a host the PowerShell half serves**. Both are the policy's, not this section's, and they
 outlive the landing that discharged the relocation itself.
 
 **The bootstrap's job is the whole of what is written twice:**
@@ -529,7 +559,7 @@ against the five steps above, and the oracle that holds them equal is a
 per-**bootstrap** install-smoke leg. **Count those legs by bootstrap and never by
 platform.** `.github/workflows/gates.yml` carries an install-smoke job for each
 platform-and-architecture pair it measures, and every one of them drives the
-*bash* half, the Windows one through Git-for-Windows bash; exactly one further
+*POSIX* half, the Windows one through Git for Windows' `sh`; exactly one further
 job drives the PowerShell half under `pwsh`. Neither the platform side nor the
 set of pairs is enumerated here, and the omission is load-bearing rather than
 lazy: both move whenever the platform declaration does — this sentence named
@@ -731,10 +761,10 @@ in the consumer's tree is `init`'s, behind the invoke. Nothing builds and nothin
 fetches. The selection and verification steps below sit inside the irreducible
 bootstrap the vendoring ruling leaves outside the binary
 (gate-sdk/SPEC.md §Porting a gate to the binary substrate), and each is
-deliberately small enough to be written twice, in bash and in PowerShell.
+deliberately small enough to be written twice, in POSIX sh and in PowerShell.
 
 **Platform resolution is derived and never stored.** This paragraph describes the
-**bash** half; the PowerShell half answers the same question from its own runtime
+**POSIX sh** half; the PowerShell half answers the same question from its own runtime
 and is described at the end of it. `target_of_host()` maps
 `uname -s` and `uname -m` to one Rust target triple, and to the empty string on
 a host that maps to none. It runs once per invocation, before anything else
@@ -753,7 +783,7 @@ would be exactly the drift `check-install-platforms` exists to catch,
 reintroduced one line lower. So the gate reads the owner, and the owner's shape
 is stated here rather than guessed at:
 
-- **bash** — inside `target_of_host`'s body, every mapped triple is the **sole
+- **POSIX sh** — inside `target_of_host`'s body, every mapped triple is the **sole
   single-quoted operand of a `printf`** and appears nowhere else in the function.
 - **PowerShell** — inside `Get-HostTarget`'s body, every mapped triple is the
   **sole single-quoted operand of a `return`**, and the empty `return ''` is the
@@ -790,9 +820,9 @@ It asks the .NET runtime for the OS platform and the OS architecture rather than
 shelling out to `uname`, because the host this half exists for need carry no
 POSIX shell and therefore need carry no `uname` — the standing obligation is to
 assume none. On a native Windows x64 host it resolves `x86_64-pc-windows-msvc`,
-the same triple the bash half's `MINGW*`/`MSYS*`/`CYGWIN*` arm produces and for
+the same triple the POSIX half's `MINGW*`/`MSYS*`/`CYGWIN*` arm produces and for
 the same stated reason: the map answers *which published artifact fits this
-host*. **Its verdict is unchanged today for the same reason the bash arm's is** —
+host*. **Its verdict is unchanged today for the same reason the POSIX arm's is** —
 `native/targets.list` does not carry that triple, so selection still refuses the
 host as unrostered. Shipping this half is not a platform claim, and
 §Requirements still says what it says.
@@ -862,13 +892,20 @@ publisher defect into a silently smaller green battery. A payload assembled with
 no artifacts at all carries no `artifact/` directory, so it reads as the first
 row and never as a payload whose every target went missing.
 
+**"Its binary" is the one regular file in the target's directory not ending in
+`.sha256`**, and "its sidecar" is that name plus `.sha256`; zero or several such
+files is the broken-payload row. The POSIX half counts them with a glob over the
+directory rather than with `find`, so no primary can disagree between GNU and BSD
+userlands; the glob skips dotfiles, so a stray dotfile beside the binary is not a
+second artifact.
+
 **Why the first row refuses rather than omitting.** Once every step of an install
 is on the far side of the invoke, an artifact-less host has no code path at all,
 so *omit and declare* has nothing to declare into and nothing to proceed with
 (§The install boundary). A refusal that names the platform is the honest form of
 what that host was already getting. **Both bootstraps owe this table all three
 rows and now answer them identically**, which is a parity defect closed rather
-than one introduced: the PowerShell half used to declare-and-stop where the bash
+than one introduced: the PowerShell half used to declare-and-stop where the unix
 half declared-and-proceeded.
 
 
@@ -885,7 +922,7 @@ check. This is the only step an external hasher is still needed for — behind t
 invoke the binary hashes in-process, so the placement `init` performs verifies
 without one.
 
-**That hasher resolution is the bash half's, and the PowerShell half has none of
+**That hasher resolution is the POSIX half's, and the PowerShell half has none of
 it — a ruling, not an omission.** PowerShell carries `Get-FileHash`, so on that
 half there is no hasher to resolve between, no `sha256sum`/`shasum` fallback and
 no refusal to reach: the branch is vacuous there, which is
@@ -3070,9 +3107,11 @@ pass this arm on the wrong refusal. The farm is one helper shared with the
 installs and commits on a machine without one. It builds its `PATH` by the same
 absence farm, `bash` masked, and proves the mask both ways. `/bin/sh` is not
 masked: it is the shell git runs hooks with (gate-sdk/SPEC.md §gen-pre-commit).
-The unix bootstrap is itself a bash script (§The install boundary), so the arm
-runs it through the harness's own interpreter named by absolute path; nothing it
-or the binary spawns may find `bash` on `PATH`. In order:
+The arm runs the unix bootstrap as the page does, through `sh` resolved on the
+farm, so nothing from the bootstrap to the hooks can find `bash` on `PATH`; before
+the first verb it proves the farm's `sh` runs, as it proves the farm's `git` does,
+since a farm that dropped `sh` would fail every step for a reason that is not
+`bash`. In order:
 
 - **`doctor` with no install** exits 0 and renders `bash` as `not probed`, naming
   the kits that owe it. The profiles whose kit sets share no name with that list

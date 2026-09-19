@@ -549,7 +549,8 @@ jobs:
   # not in the position that bought the exemption.
   #
   # **The setup steps are bash and that is not a breach of the standing "assume no
-  # POSIX shell" obligation**, which binds the BOOTSTRAP and not the publisher.
+  # POSIX shell on a host the PowerShell half serves" obligation**, which binds the
+  # BOOTSTRAP and not the publisher.
   # Assembling a payload is the packer's job and the packer is bash (§The packer).
   # What must run on a host with no POSIX shell is the step that invokes
   # checkwright.ps1 — and that step is pwsh, reading only the packed tarball.
@@ -700,7 +701,7 @@ jobs:
           # one of them proceeds, because nothing remains behind the invoke for an
           # artifact-less host to proceed into. So neither is asserted on its exit
           # status alone — the pair below asserts each one's own message and remedy
-          # and then asserts that the two differ, which is the bound the bash half's
+          # and then asserts that the two differ, which is the bound the POSIX half's
           # own smoke leg asserts from the other side of the parity.
           Write-Host "== step 2 and step 3, outcome 1: a host off the roster is refused =="
           $f = New-Fixture 'fx-offroster'
@@ -1310,14 +1311,6 @@ jobs:
           for t in awk sed sort grep find tar; do
             printf '%-6s %s\n' "$t" "$("$t" --version 2>&1 | head -n1)"
           done
-          echo "== the construct the install path refuses to use, probed not reasoned about =="
-          # The construct the install path refuses to use — `installer/bin/checkwright.sh`
-          # strips the starting-point prefix in the loop instead — kept here as the
-          # measurement that says whether refusing it was necessary on this host. A non-zero is the BSD refusal the fix was for; a zero means this
-          # runner carries GNU findutils and the fix was owed to adopters rather
-          # than to this leg.
-          find . -maxdepth 1 -type f -printf '%P\n' >/dev/null 2>&1
-          echo "find -printf exited $? (non-zero is the BSD refusal delta 3 removed)"
           echo "== rust =="
           rustc -vV
           echo "== git =="

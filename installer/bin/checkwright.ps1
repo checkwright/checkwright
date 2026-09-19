@@ -124,7 +124,7 @@ function Select-Artifact {
     return [pscustomobject]@{ Path = $names[0].FullName; Sidecar = $names[0].FullName + '.sha256' }
 }
 
-# spec: installer/SPEC.md §The install boundary — step 4, and the one step where this half is simpler than the bash one rather than parallel to it: PowerShell carries Get-FileHash, so there is no hasher to resolve between and this half reaches no refusal the bash one owes a resolution first
+# spec: installer/SPEC.md §The install boundary — step 4, and the one step where this half is simpler than the POSIX one rather than parallel to it: PowerShell carries Get-FileHash, so there is no hasher to resolve between and this half reaches no refusal the POSIX one owes a resolution first
 function Test-ArtifactDigest {
     param([string] $Artifact, [string] $Sidecar)
     $want = (@(Get-Content -LiteralPath $Sidecar -TotalCount 1) -split '\s+')[0]

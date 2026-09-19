@@ -914,7 +914,7 @@ shopt -u nullglob
 
 C="$(consumer artifact-less)" || fail "could not build a scratch consumer for the artifact-less refusal leg"
 BARE_SEED="$(git -C "$C" rev-parse 'HEAD^{tree}')"
-out="$( cd "$C" && bash "$BARE/package/bin/checkwright.sh" init --profile "$BARE_PROFILE" 2>&1 )"; rc=$?
+out="$( cd "$C" && sh "$BARE/package/bin/checkwright.sh" init --profile "$BARE_PROFILE" 2>&1 )"; rc=$?
 [[ "$rc" -ne 0 ]] \
     || { printf '%s\n' "$out" >&2; fail "a payload the packer produced with no artifact directory installed anyway — selection has one success path, and this is not it"; }
 # spec: installer/SPEC.md §The gate binary — the outcome is asserted by its MESSAGE and its remedy rather than by the exit status alone, which is delta 1's own bound: an unrostered host and a broken payload are different answers to an adopter and the status is not what tells them apart
@@ -930,7 +930,7 @@ say "artifact-less payload: refused naming the platform, with a remedy, and noth
 # spec: installer/SPEC.md §The install boundary — the refusal precedes the invoke, so it cannot be a property of one verb: the same package is driven with a second verb and with a bare invocation, and all three answer alike. A leg asserting only init would pass on a bootstrap that had grown a per-verb branch, which is exactly what the branchless argv rule forbids
 bare_probe() {   # $@ = the argv to hand the artifact-less package's bootstrap
     local out rc
-    out="$( cd "$C" && bash "$BARE/package/bin/checkwright.sh" "$@" 2>&1 )"; rc=$?
+    out="$( cd "$C" && sh "$BARE/package/bin/checkwright.sh" "$@" 2>&1 )"; rc=$?
     [[ "$rc" -ne 0 ]] && grep -q 'maps to no target this payload declares' <<<"$out" \
         || { printf '%s\n' "$out" >&2; fail "'checkwright $*' on the artifact-less payload answered differently from init — the refusal is the bootstrap's and precedes every verb"; }
 }
@@ -961,7 +961,7 @@ for masked in node npm npx; do
     chmod +x "$MASK/$masked"
 done
 
-ENTRY=(bash "$DL_ENTRY")
+ENTRY=(sh "$DL_ENTRY")
 RUN_PATH="$MASK:$PATH"
 # spec: installer/SPEC.md §The consumer smoke — the mask is proved rather than assumed: an arm whose PATH silently failed to shadow the real interpreter would assert nothing while passing
 for masked in node npm npx; do
@@ -1126,10 +1126,12 @@ else
         || fail "the mask did not take: bash still resolves under the arm's PATH"
     PATH="$BASH_PATH" git --version >/dev/null 2>&1 \
         || fail "the bash-less farm's git will not run — the arm's PATH resolves entries this host cannot execute, so every step below would fail for a reason that is not bash"
-    say "mask: bash resolves to nothing, and the farm's git still runs"
+    # spec: installer/SPEC.md §The consumer smoke — the arm runs the bootstrap through the farm's own sh, so a farm that dropped sh would fail every step below for a reason that is not bash
+    PATH="$BASH_PATH" sh -c ':' >/dev/null 2>&1 \
+        || fail "the bash-less farm's sh will not run — the arm runs the bootstrap as the install page does, through sh on PATH, so every step below would fail for a reason that is not bash"
+    say "mask: bash resolves to nothing, and the farm's git and sh still run"
 
-    # spec: installer/SPEC.md §The install boundary — the unix bootstrap is itself a bash script, so it is run by the harness's own interpreter named absolutely; nothing it or the binary spawns may find bash on PATH
-    ENTRY=("$BASH" "$DL_ENTRY")
+    ENTRY=(sh "$DL_ENTRY")
     C="$(consumer bash-less-probe)" || fail "could not build a scratch consumer for the bash-less arm"
     # spec: installer/SPEC.md §doctor — with no install bash is undecided, so doctor exits 0 without it and names the kits that owe it; the list is read off that line rather than named here, so the harness carries no second copy of the roster's audience field
     out="$( cd "$C" && PATH="$BASH_PATH" "${ENTRY[@]}" doctor 2>&1 )"; rc=$?
@@ -1251,7 +1253,7 @@ rm -f "$UP/package/payload/$RELINQUISHED" \
 [[ ! -f "$UP/package/payload/$RELINQUISHED" ]] \
     || fail "the upgrade payload still ships $RELINQUISHED — the relinquish hop would assert nothing"
 
-out="$( cd "$C" && bash "$UP/package/bin/checkwright.sh" init 2>&1 )" \
+out="$( cd "$C" && sh "$UP/package/bin/checkwright.sh" init 2>&1 )" \
     || { printf '%s\n' "$out" >&2; fail "the cross-version re-run of init failed — the version check did not fall through in the upgrade direction"; }
 [[ "$(jq -r '.version' "$LOCK")" == "$UP_VERSION" ]] \
     || fail "the manifest records $(jq -r '.version' "$LOCK") after upgrading to $UP_VERSION"
@@ -1299,7 +1301,7 @@ shopt -u nullglob
 [[ ${#up2_tarballs[@]} -eq 1 ]] || fail "expected exactly one second-upgrade tarball, found ${#up2_tarballs[@]}"
 ( cd "$UP2" && tar -xzf "${up2_tarballs[0]##*/}" ) || fail "tar could not extract the second-upgrade tarball"
 
-out="$( cd "$C" && bash "$UP2/package/bin/checkwright.sh" init 2>&1 )" \
+out="$( cd "$C" && sh "$UP2/package/bin/checkwright.sh" init 2>&1 )" \
     || { printf '%s\n' "$out" >&2; fail "the second cross-version re-run of init failed"; }
 [[ "$(jq -r '.version' "$LOCK")" == "$UP2_VERSION" ]] \
     || fail "the manifest records $(jq -r '.version' "$LOCK") after upgrading to $UP2_VERSION"
@@ -1326,9 +1328,9 @@ out="$( cd "$C" && "$CW" init --profile "$PROFILE_MIN" 2>&1 )" \
 # spec: installer/SPEC.md §The consumer smoke — the arm proves its own premise, in the idiom the binary-less leg's disclosure count and the upgrade hop's omission count already use: the relinquish is a mutation of a package this arm only reads, so an arm re-ordered above it would drive three identical payloads and reverse an ordinary install under a cross-version name
 [[ ! -f "$UP/package/payload/$RELINQUISHED" ]] \
     || fail "the upgrade package still ships $RELINQUISHED, so this arm's three hops carry identical payloads and its reversal is an ordinary install wearing a cross-version name — keep the arm below the relinquish that the upgrade arm performs, never drop the assertion"
-out="$( cd "$C" && bash "$UP/package/bin/checkwright.sh" init 2>&1 )" \
+out="$( cd "$C" && sh "$UP/package/bin/checkwright.sh" init 2>&1 )" \
     || { printf '%s\n' "$out" >&2; fail "the cross-version reversal arm's relinquishing hop failed"; }
-out="$( cd "$C" && bash "$UP2/package/bin/checkwright.sh" init 2>&1 )" \
+out="$( cd "$C" && sh "$UP2/package/bin/checkwright.sh" init 2>&1 )" \
     || { printf '%s\n' "$out" >&2; fail "the cross-version reversal arm's re-adding hop failed"; }
 CROSS_LOCK="$C/checkwright.lock"
 [[ "$(jq -r '.version' "$CROSS_LOCK")" == "$UP2_VERSION" ]] \
@@ -1337,7 +1339,7 @@ CROSS_LOCK="$C/checkwright.lock"
     || fail "the cross-version reversal consumer's roster lost $RELINQUISHED across the payload hole, so uninstall has nothing cross-version to clear and this arm reverses an ordinary install — re-scope the relinquish subject onto a path the $PROFILE_MIN profile records, never drop the assertion"
 say "premise: three hops landed at $UP2_VERSION, the relinquished path crossed the payload hole and is on the roster"
 # spec: installer/SPEC.md §The consumer smoke — both globals are set here rather than inherited, and it is load-bearing: RUN_PATH still carries the toolchain-free arm's mask and ENTRY still names the first version's entry point, so an arm that inherited them would reverse with cargo and rustc masked off and drive the oldest verb, asserting something other than what it says. ENTRY is the latest package because that is what an adopter holds after an upgrade, and reversing with the newest verb against a roster three versions old is the case under test
-ENTRY=(bash "$UP2/package/bin/checkwright.sh")
+ENTRY=(sh "$UP2/package/bin/checkwright.sh")
 RUN_PATH="$PATH"
 assert_reversal "$PROFILE_MIN" "$C" "$SEED"
 say "cross-version reversal: $VERSION -> $UP_VERSION -> $UP2_VERSION reversed to the pre-init tree object"
@@ -1503,7 +1505,7 @@ PAY_ART="$ARTP/package/payload/artifact"
     || fail "the packed payload carries no complete $HOST_TARGET artifact beside a verbatim roster copy"
 say "the packed payload carries $NATIVE_BIN for $HOST_TARGET with the sidecar the build leg emitted"
 
-ENTRY=(bash "$ARTP/package/bin/checkwright.sh")
+ENTRY=(sh "$ARTP/package/bin/checkwright.sh")
 RUN_PATH="$PATH"
 C="$(consumer artifact)" || fail "could not build a scratch consumer for the artifact arm"
 assert_install "$PROFILE_MIN" "$C"

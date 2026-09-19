@@ -1,31 +1,40 @@
-#!/usr/bin/env bash
-# spec: installer/SPEC.md §The install boundary — the bash bootstrap, twin of the PowerShell half,
+#!/bin/sh
+# spec: installer/SPEC.md §The install boundary — the POSIX sh bootstrap, twin of the PowerShell half,
 # authored against that section's five steps: every install step is on the far side of the invoke
 # no-port: installer/SPEC.md §The install boundary — this file's whole body is `bootstrap`-
 # disposition steps, the one no-port cause installer/ may carry: the binary cannot select itself
 #
 # usage: checkwright <verb> [args...]
 #   checkwright --help    list the verbs the verified artifact carries
-set -uo pipefail
+set -u
+
+# spec: installer/SPEC.md §Implementation — POSIX has no `local`, so every working name in this
+# file is unique to the one function that uses it
 
 die() {
     printf 'checkwright: %s\n' "$1" >&2
-    [[ -n "${2:-}" ]] && printf '  help: %s\n' "$2" >&2
+    [ -n "${2:-}" ] && printf '  help: %s\n' "$2" >&2
     exit "${3:-2}"
 }
 
 # spec: installer/SPEC.md §The install boundary — step 1: the package's own payload directory,
 # resolved through the symlink chain, because npm installs the bin entry as a link in
 # node_modules/.bin and the unresolved path's parent is node_modules
-SELF="${BASH_SOURCE[0]}"
-while [[ -L "$SELF" ]]; do
+# spec: installer/SPEC.md §Implementation — a POSIX `cd` into a relative path consults CDPATH and
+# prints the directory it picks, which would corrupt every `$(cd … && pwd)` below
+unset CDPATH
+SELF="$0"
+while [ -L "$SELF" ]; do
     LINK_DIR="$(cd "$(dirname "$SELF")" && pwd)"
     SELF="$(readlink "$SELF")"
-    [[ "$SELF" == /* ]] || SELF="$LINK_DIR/$SELF"
+    case "$SELF" in
+        /*) : ;;
+        *) SELF="$LINK_DIR/$SELF" ;;
+    esac
 done
 INSTALLER="$(cd "$(dirname "$SELF")/.." && pwd)"
 PAYLOAD="$INSTALLER/payload"
-[[ -d "$PAYLOAD" ]] || die "this package carries no payload" \
+[ -d "$PAYLOAD" ] || die "this package carries no payload" \
     "the bootstrap runs the gate binary out of the package's own payload/, assembled at pack time — run it from an installed package, not from a source checkout."
 
 # spec: installer/SPEC.md §The gate binary — the detector's whole input, factored out so a refusal
@@ -58,9 +67,8 @@ target_of_host() {   # -> the Rust target triple this host is, empty when it map
 # rather than inside the detector: two questions, two places, and each verdict rests on a POSITIVE
 # signal, so an unidentifiable libc refuses rather than being read as glibc
 libc_flavour() {   # -> musl | gnu | unknown
-    local ld
-    for ld in /lib/ld-musl-*; do
-        [[ -e "$ld" ]] && { printf 'musl'; return; }
+    for libc_ld in /lib/ld-musl-*; do
+        [ -e "$libc_ld" ] && { printf 'musl'; return; }
     done
     if getconf GNU_LIBC_VERSION >/dev/null 2>&1 \
         || ldd --version 2>&1 | grep -qiE 'gnu libc|glibc'; then
@@ -75,71 +83,74 @@ libc_flavour() {   # -> musl | gnu | unknown
 # — an undeclared host and a broken payload remain different answers to an adopter
 ARTIFACT=""
 select_artifact() {
-    local dir roster target src n
-    local -a names
-    dir="$PAYLOAD/artifact"
-    target="$(target_of_host)"
-    if [[ ! -d "$dir" ]]; then
+    sel_dir="$PAYLOAD/artifact"
+    sel_target="$(target_of_host)"
+    if [ ! -d "$sel_dir" ]; then
         die "this host, detected as $(host_shape), maps to no target this payload declares" \
             "the support roster is fixed at pack time and this platform is not on it, so there is nothing to verify or run here and no adopter action to take."
     fi
-    roster="$dir/targets.list"
-    [[ -f "$roster" ]] || die "this payload carries prebuilt gate binaries but no target roster" \
+    sel_roster="$sel_dir/targets.list"
+    [ -f "$sel_roster" ] || die "this payload carries prebuilt gate binaries but no target roster" \
         "the roster is copied verbatim beside them at pack time; artifacts without one cannot be selected from and the payload is broken, not narrower."
     # spec: installer/SPEC.md §The gate binary — the one case where the roster grep cannot refuse
     # for us: `uname` cannot tell glibc from musl, so a musl host resolves to a triple that IS on
     # the roster and would be handed a binary that dies in the dynamic loader
-    if [[ "$target" == *-linux-gnu ]]; then
-        case "$(libc_flavour)" in
-            gnu) : ;;
-            musl)
-                die "this host, detected as $(host_shape), runs a musl C library, and every Linux artifact this payload carries is linked against glibc" \
-                    "musl and glibc are not interchangeable at the dynamic loader, so a glibc build would die there rather than run. This payload carries no musl artifact, so there is no adopter action to take."
-                ;;
-            *)
-                die "this host, detected as $(host_shape), did not identify its C library, and every Linux artifact this payload carries is linked against glibc" \
-                    "neither 'getconf GNU_LIBC_VERSION' nor 'ldd --version' identified a GNU libc here, and no musl loader was found under /lib — so nothing establishes that a glibc build would run, and this refuses rather than handing you one that may die in the loader. Install GNU libc's getconf or ldd so the probe can answer."
-                ;;
-        esac
-    fi
-    if [[ -z "$target" ]] || ! grep -Ev '^[[:space:]]*(#|$)' "$roster" | grep -qxF "$target"; then
+    case "$sel_target" in
+        *-linux-gnu)
+            case "$(libc_flavour)" in
+                gnu) : ;;
+                musl)
+                    die "this host, detected as $(host_shape), runs a musl C library, and every Linux artifact this payload carries is linked against glibc" \
+                        "musl and glibc are not interchangeable at the dynamic loader, so a glibc build would die there rather than run. This payload carries no musl artifact, so there is no adopter action to take."
+                    ;;
+                *)
+                    die "this host, detected as $(host_shape), did not identify its C library, and every Linux artifact this payload carries is linked against glibc" \
+                        "neither 'getconf GNU_LIBC_VERSION' nor 'ldd --version' identified a GNU libc here, and no musl loader was found under /lib — so nothing establishes that a glibc build would run, and this refuses rather than handing you one that may die in the loader. Install GNU libc's getconf or ldd so the probe can answer."
+                    ;;
+            esac
+            ;;
+    esac
+    if [ -z "$sel_target" ] || ! grep -Ev '^[[:space:]]*(#|$)' "$sel_roster" | grep -qxF "$sel_target"; then
         die "this host, detected as $(host_shape), maps to no target this payload declares" \
             "the support roster is fixed at pack time and this platform is not on it, so there is nothing to verify or run here and no adopter action to take."
     fi
-    src="$dir/$target"
-    # spec: installer/SPEC.md §The gate binary — the prefix is stripped here rather than with a
-    # `-printf '%P'` primary: that primary is GNU findutils, a BSD `find` refuses it, and the refusal
-    # lands in the same empty result a genuinely incomplete artifact does
-    names=()
-    while IFS= read -r n; do
-        n="${n#"$src/"}"
-        [[ -n "$n" ]] && names+=("$n")
-    done < <(find "$src" -maxdepth 1 -type f ! -name '*.sha256' | sort)
-    [[ ${#names[@]} -eq 1 && -f "$src/${names[0]}.sha256" ]] \
-        || die "the payload declares $target but carries no complete artifact for it" \
+    sel_src="$sel_dir/$sel_target"
+    # spec: installer/SPEC.md §The gate binary — a glob rather than `find`, so no primary can
+    # disagree between GNU and BSD; it skips dotfiles, so a stray one is not a second artifact
+    sel_count=0
+    sel_name=""
+    for sel_path in "$sel_src"/*; do
+        [ -f "$sel_path" ] || continue
+        case "$sel_path" in *.sha256) continue ;; esac
+        sel_count=$((sel_count + 1))
+        sel_name="${sel_path##*/}"
+    done
+    [ "$sel_count" -eq 1 ] && [ -f "$sel_src/$sel_name.sha256" ] \
+        || die "the payload declares $sel_target but carries no complete artifact for it" \
            "a declared target whose binary or .sha256 sidecar is missing is a publisher defect you cannot act on — refusing rather than running a battery that silently shrank." 1
-    ARTIFACT="$src/${names[0]}"
+    ARTIFACT="$sel_src/$sel_name"
 }
 
 # spec: installer/SPEC.md §The install boundary — step 4, the one step that cannot use the binary
 # to verify the binary: a host carrying neither `sha256sum` nor `shasum` is refused rather than
 # served an unverified artifact. Behind the invoke the crate hashes in-process
 verify_digest() {
-    local hasher want got
     if command -v sha256sum >/dev/null 2>&1; then
-        hasher=sha256sum
+        dig_hasher=sha256sum
     elif command -v shasum >/dev/null 2>&1; then
-        hasher=shasum
+        dig_hasher=shasum
     else
         die "no SHA-256 hasher on this host, and nothing unverified is ever executed" \
             "install sha256sum (GNU coreutils) or shasum, then re-run. The bootstrap verifies the published digest before it runs the artifact, and there is no path here that skips that." 1
     fi
-    read -r want _ < "$ARTIFACT.sha256" || true
-    case "$hasher" in
-        sha256sum) got="$(sha256sum -- "$ARTIFACT" 2>/dev/null | cut -d' ' -f1)" ;;
-        shasum)    got="$(shasum -a 256 -- "$ARTIFACT" 2>/dev/null | cut -d' ' -f1)" ;;
+    dig_want=""
+    dig_got=""
+    read -r dig_want _ < "$ARTIFACT.sha256" || true
+    case "$dig_hasher" in
+        sha256sum) dig_got="$(sha256sum -- "$ARTIFACT" 2>/dev/null | cut -d' ' -f1)" ;;
+        shasum)    dig_got="$(shasum -a 256 -- "$ARTIFACT" 2>/dev/null | cut -d' ' -f1)" ;;
     esac
-    [[ -n "$want" && "$want" == "$got" ]] \
+    [ -n "$dig_want" ] && [ "$dig_want" = "$dig_got" ] \
         || die "the prebuilt gate binary does not match its published digest" \
            "nothing unverified is ever executed, so this refuses rather than warning. Re-download the package; a persistent mismatch means the artifact was altered after it was built." 1
 }
@@ -152,9 +163,14 @@ verify_digest
 # `--` and everything after it is forwarded verbatim
 # spec: installer/SPEC.md §The verbs — the rule introduces no verb table into the bootstrap, which
 # is what the interpreter policy forbids here; the artifact owns which verbs exist
-if [[ $# -gt 0 && "$1" != -* ]]; then
-    VERB="--$1"
-    shift
-    exec "$ARTIFACT" "$VERB" "$@"
+if [ $# -gt 0 ]; then
+    case "$1" in
+        -*) : ;;
+        *)
+            VERB="--$1"
+            shift
+            exec "$ARTIFACT" "$VERB" "$@"
+            ;;
+    esac
 fi
 exec "$ARTIFACT" "$@"

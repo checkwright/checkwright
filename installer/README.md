@@ -50,7 +50,7 @@ curl -fsSL -o "$cw/checkwright-X.Y.Z.tgz.sha256" \
   https://github.com/checkwright/checkwright/releases/download/vX.Y.Z/checkwright-X.Y.Z.tgz.sha256
 ( cd "$cw" && sha256sum -c checkwright-X.Y.Z.tgz.sha256 && tar -xzf checkwright-X.Y.Z.tgz )
 
-bash "$cw/package/bin/checkwright.sh" init
+sh "$cw/package/bin/checkwright.sh" init
 ```
 
 With Node already present the same install is one command, `npx checkwright

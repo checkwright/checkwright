@@ -513,9 +513,7 @@ The constrained members and what forces each:
   CI runner; canon-kit's config template header names the binary. **Its honest
   limit:** the list is held by hand against the kits' shipped reach, so a kit
   that later ships a bash surface without joining it is under-declared and
-  nothing reds. The unix install bootstrap is a bash script on every profile, but
-  it runs before any reader of this roster and is no kit's surface, so it is
-  stated on the install page rather than here.
+  nothing reds.
 - `cargo:1.71::contributor` — a **contributor-side** floor, never a runtime one,
   and that reading is now declared on the element and read by name rather than
   left as an aside: the audience field is what the consumer-side predicate

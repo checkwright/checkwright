@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Hermetic fixture stand-in for the bash bootstrap's host detector, carrying arm E's forward defect
+# Hermetic fixture stand-in for the POSIX sh bootstrap's host detector, carrying arm E's forward defect
 # and it is the attested one rather than a synthetic case: `aarch64-unknown-linux-gnu` is DETECTED
 # WHILE THE PAGE DECLARES IT NOWHERE, which is how a triple came to be reachable by the installer
 # with nothing going red. The converse — a declared triple no detector emits — is carried by the
