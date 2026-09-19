@@ -542,10 +542,10 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         format!("{}/CHECK-GRAPH.html", GATES_DIR),
     ];
     if !f.dry {
-        run_vendored(&root, "gate-sdk/bin/run-gates.sh", &["--emit", "git-hooks", "--write"], None)?;
+        run_vendored(&root, &artifact_dest, &["--emit", "git-hooks", "--write"], None)?;
         run_vendored(
             &root,
-            "gate-sdk/bin/run-gates.sh",
+            &artifact_dest,
             &["--emit", "graph"],
             Some(&root.join(GATES_DIR).join("CHECK-GRAPH.html")),
         )?;
@@ -778,25 +778,23 @@ fn dry_seed_paths(kit: &str) -> Vec<String> {
     out
 }
 
-// spec: installer/SPEC.md §init — the vendored tool runs out of the consumer's own tree, so the
-// artifacts a consumer ends up with are the ones their own gate-sdk makes rather than ones this
-// arm restated.
+// spec: installer/SPEC.md §init — the binary init just placed runs at the consumer's root with the
+// gate-sdk root locator the front-end would have exported, so the artifacts a consumer ends up with
+// are the ones their own gate-sdk makes; no `bash` is spawned
 fn run_vendored(
     root: &Path,
-    script: &str,
+    artifact: &str,
     args: &[&str],
     capture_to: Option<&Path>,
 ) -> Result<(), Refusal> {
-    let script_path = root.join(script).to_string_lossy().into_owned();
-    let mut argv: Vec<&str> = vec![&script_path];
-    argv.extend_from_slice(args);
-    // spec: gate-sdk/SPEC.md §check-graph — the bare name is spawned and `proc::run*` resolves it
-    // off the homonym roster, the owner rather than a call site
-    let out = crate::proc::run_merged_in(&programs::BASH, &argv, &[], Some(root))
-        .map_err(|e| refuse(format!("{} failed: {}", script, e), "", 2))?;
+    let bin = programs::CHECKWRIGHT_GATES.at(root.join(artifact).to_string_lossy().into_owned());
+    let env = [("GATE_SDK_ROOT".to_string(), "gate-sdk".to_string())];
+    let what = format!("{} {}", artifact, args.join(" "));
+    let out = crate::proc::run_merged_in(&bin, args, &env, Some(root))
+        .map_err(|e| refuse(format!("{} failed: {}", what, e), "", 2))?;
     if !out.succeeded() {
         eprintln!("{}", String::from_utf8_lossy(out.output()));
-        return Err(refuse(format!("{} failed", script), "", 2));
+        return Err(refuse(format!("{} failed", what), "", 2));
     }
     if let Some(dest) = capture_to {
         if let Some(parent) = dest.parent() {

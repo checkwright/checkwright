@@ -12,65 +12,76 @@ pub const KNOBS: &[&str] = &[
 
 const USAGE: &str = "usage: --emit git-hooks pre-commit|commit-msg|--write";
 
-const PRE_COMMIT_HEAD: &str = r#"#!/usr/bin/env bash
+// spec: gate-sdk/SPEC.md §gen-pre-commit — each header names the binary the hook bakes as its
+// regeneration and install door
+fn pre_commit_head(bin: &str) -> String {
+    format!(
+        r#"#!/bin/sh
 # pre-commit - GENERATED, DO NOT EDIT (except gen=manual regions between sentinels).
 #
 # Emitted from the per-gate `# graph:` manifests by:
-#     bash gate-sdk/bin/run-gates.sh --emit git-hooks --write
+#     {bin} --emit git-hooks --write
 # Edit a gate's manifest (couples=/trigger=/mode=/gen=), or a gen=manual region
 # below, then regenerate. check-graph asserts this file equals
 # `--emit git-hooks pre-commit`. Each gate prints its own per-finding + `help:`
-# lines before this hook reports the failure.
+# lines before this hook reports the failure. The hook, a gen=manual region
+# included, is POSIX sh.
 #
-# Install (opt-in, per clone):   bash gate-sdk/bin/run-gates.sh --install-hooks
+# Install (opt-in, per clone):   {bin} --install-hooks
 # Bypass once (use sparingly):   git commit --no-verify
 #
 # This is the *triggered subset* of the gates.list battery: every check here
-# also runs whole-tree via gate-sdk/bin/run-gates.sh.
-set -euo pipefail
+# also runs whole-tree via `{bin} --run`.
+set -eu
 
-mapfile -t staged_all < <(git diff --cached --name-only --diff-filter=ACMR)
-[[ ${#staged_all[@]} -eq 0 ]] && exit 0
+staged_all=$(git diff --cached --name-only --diff-filter=ACMR)
+[ -n "$staged_all" ] || exit 0
 
-# True if any staged path matches one of the given globs (bash glob: `*` spans '/').
-staged_matches() {
-"#;
+# True if any staged path matches one of the given globs (a `case` pattern: `*` spans '/').
+staged_matches() {{
+"#
+    )
+}
 
 const RUN_GATE: &str = r#"
 GATE_SDK_VERBOSE="${GATE_SDK_VERBOSE:-}"
 _ran=0
 # Capture a gate's output; reprint it only on failure, or with GATE_SDK_VERBOSE.
 run_gate() {
-    local name="$1"; shift
-    local out ok=1
-    out="$("$@" 2>&1)" || ok=0
+    _rg_name=$1; shift
+    _rg_ok=1
+    _rg_out=$("$@" 2>&1) || _rg_ok=0
     _ran=$((_ran + 1))
-    if (( ! ok )); then
-        [[ -n "$out" ]] && printf '%s\n' "$out"
-        hook_fail "$name"
+    if [ "$_rg_ok" -eq 0 ]; then
+        if [ -n "$_rg_out" ]; then printf '%s\n' "$_rg_out"; fi
+        hook_fail "$_rg_name"
     fi
-    if [[ -n "$GATE_SDK_VERBOSE" ]]; then
-        [[ -n "$out" ]] && printf '%s\n' "$out"
-        printf '  PASS: %s\n' "$name"
+    if [ -n "$GATE_SDK_VERBOSE" ]; then
+        if [ -n "$_rg_out" ]; then printf '%s\n' "$_rg_out"; fi
+        printf '  PASS: %s\n' "$_rg_name"
     fi
 }
 "#;
 
-const COMMIT_MSG_HEAD: &str = r#"#!/usr/bin/env bash
+fn commit_msg_head(bin: &str) -> String {
+    format!(
+        r#"#!/bin/sh
 # commit-msg - GENERATED, DO NOT EDIT.
 #
 # Emitted from the tier=commit-msg `# graph:` manifests by:
-#     bash gate-sdk/bin/run-gates.sh --emit git-hooks --write
+#     {bin} --emit git-hooks --write
 # Edit a gate's manifest, then regenerate. check-graph asserts this file equals
 # `--emit git-hooks commit-msg`. git feeds the prospective message file as $1; each gate
 # prints its own per-finding + `help:` lines before this hook reports failure.
 #
-# Install (opt-in, per clone):   bash gate-sdk/bin/run-gates.sh --install-hooks
+# Install (opt-in, per clone):   {bin} --install-hooks
 # Bypass once (use sparingly):   git commit --no-verify
-set -euo pipefail
+set -eu
 
-msg_file="${1:?commit-msg: git did not pass the message-file path}"
-"#;
+msg_file="${{1:?commit-msg: git did not pass the message-file path}}"
+"#
+    )
+}
 
 fn hook_fail(hook: &str) -> String {
     format!(
@@ -138,19 +149,14 @@ fn context(root: &str, gates_dir: &str) -> Result<Ctx, String> {
     })
 }
 
-// spec: gate-sdk/SPEC.md §gen-pre-commit — shell-inert verbatim, anything else bash ANSI-C, by a
-// fixed escape set so the committed hook is byte-identical across clones
+// spec: gate-sdk/SPEC.md §gen-pre-commit — shell-inert verbatim, anything else POSIX single-quoted
+// by a fixed rule so the committed hook is byte-identical across clones
 fn quote_elem(s: &str) -> String {
     let inert = |c: char| c.is_ascii_alphanumeric() || "_./:=+,@%-".contains(c);
     if !s.is_empty() && s.chars().all(inert) {
         return s.to_string();
     }
-    let esc = s
-        .replace('\\', "\\\\")
-        .replace('\'', "\\'")
-        .replace('\t', "\\t")
-        .replace('\n', "\\n");
-    format!("$'{}'", esc)
+    format!("'{}'", s.replace('\'', "'\\''"))
 }
 
 fn invocation(ctx: &Ctx, name: &str) -> String {
@@ -257,15 +263,21 @@ fn block(ctx: &Ctx, name: &str, fields: &[(String, String)], manual: &[(String, 
     if trigger == "*" {
         out.push_str(&format!("run_gate {} {}\n", name, inv));
     } else if registry::field(fields, "mode") == "staged" {
+        out.push_str("_staged_run() {\n");
+        out.push_str("    set --\n");
+        out.push_str("    while IFS= read -r _sr_f; do\n");
+        out.push_str("        if [ -f \"$_sr_f\" ]; then set -- \"$@\" \"$_sr_f\"; fi\n");
+        out.push_str("    done <<_CHECKWRIGHT_STAGED_\n");
         out.push_str(&format!(
-            "mapfile -t _staged < <(git diff --cached --name-only --diff-filter=ACMR -- {})\n",
+            "$(git diff --cached --name-only --diff-filter=ACMR -- {})\n",
             quoted
         ));
-        out.push_str("_targets=()\n");
-        out.push_str("for _f in \"${_staged[@]}\"; do [[ -f \"$_f\" ]] && _targets+=(\"$_f\"); done\n");
-        out.push_str("if [[ ${#_targets[@]} -gt 0 ]]; then\n");
-        out.push_str(&format!("    run_gate {} {} \"${{_targets[@]}}\"\n", name, inv));
-        out.push_str("fi\n");
+        out.push_str("_CHECKWRIGHT_STAGED_\n");
+        out.push_str("    if [ \"$#\" -gt 0 ]; then\n");
+        out.push_str(&format!("        run_gate {} {} \"$@\"\n", name, inv));
+        out.push_str("    fi\n");
+        out.push_str("}\n");
+        out.push_str("_staged_run\n");
     } else {
         out.push_str(&format!("if staged_matches {}; then\n", quoted));
         out.push_str(&format!("    run_gate {} {}\n", name, inv));
@@ -281,7 +293,7 @@ fn hook_path(name: &str) -> Result<String, String> {
 pub fn pre_commit(root: &str, gates_dir: &str) -> Result<String, String> {
     let ctx = context(root, gates_dir)?;
     let manual = manual_regions(&hook_path("pre-commit")?);
-    let mut out = String::from(PRE_COMMIT_HEAD);
+    let mut out = pre_commit_head(&quote_elem(&ctx.native_bin));
     out.push_str(&matcher_body()?);
     out.push_str("}\n");
     out.push_str(&hook_fail("pre-commit"));
@@ -308,7 +320,7 @@ pub fn commit_msg(root: &str, gates_dir: &str) -> Result<Option<String>, String>
     if gates.is_empty() {
         return Ok(None);
     }
-    let mut out = String::from(COMMIT_MSG_HEAD);
+    let mut out = commit_msg_head(&quote_elem(&ctx.native_bin));
     out.push_str(&hook_fail("commit-msg"));
     out.push_str(RUN_GATE);
     for name in gates {
@@ -355,11 +367,11 @@ mod tests {
     use super::*;
 
     #[test]
-    fn an_inert_element_is_verbatim_and_any_other_takes_ansi_c() {
+    fn an_inert_element_is_verbatim_and_any_other_is_single_quoted() {
         assert_eq!(quote_elem("native/target/release/checkwright-gates"), "native/target/release/checkwright-gates");
-        assert_eq!(quote_elem(""), "$''");
-        assert_eq!(quote_elem("a b"), "$'a b'");
-        assert_eq!(quote_elem("t\ta'\\\n"), "$'t\\ta\\'\\\\\\n'");
+        assert_eq!(quote_elem(""), "''");
+        assert_eq!(quote_elem("a b"), "'a b'");
+        assert_eq!(quote_elem("t\ta'\\\n"), "'t\ta'\\''\\\n'");
     }
 
     #[test]

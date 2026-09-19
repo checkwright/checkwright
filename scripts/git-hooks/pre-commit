@@ -1,32 +1,34 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # pre-commit - GENERATED, DO NOT EDIT (except gen=manual regions between sentinels).
 #
 # Emitted from the per-gate `# graph:` manifests by:
-#     bash gate-sdk/bin/run-gates.sh --emit git-hooks --write
+#     native/target/release/checkwright-gates --emit git-hooks --write
 # Edit a gate's manifest (couples=/trigger=/mode=/gen=), or a gen=manual region
 # below, then regenerate. check-graph asserts this file equals
 # `--emit git-hooks pre-commit`. Each gate prints its own per-finding + `help:`
-# lines before this hook reports the failure.
+# lines before this hook reports the failure. The hook, a gen=manual region
+# included, is POSIX sh.
 #
-# Install (opt-in, per clone):   bash gate-sdk/bin/run-gates.sh --install-hooks
+# Install (opt-in, per clone):   native/target/release/checkwright-gates --install-hooks
 # Bypass once (use sparingly):   git commit --no-verify
 #
 # This is the *triggered subset* of the gates.list battery: every check here
-# also runs whole-tree via gate-sdk/bin/run-gates.sh.
-set -euo pipefail
+# also runs whole-tree via `native/target/release/checkwright-gates --run`.
+set -eu
 
-mapfile -t staged_all < <(git diff --cached --name-only --diff-filter=ACMR)
-[[ ${#staged_all[@]} -eq 0 ]] && exit 0
+staged_all=$(git diff --cached --name-only --diff-filter=ACMR)
+[ -n "$staged_all" ] || exit 0
 
-# True if any staged path matches one of the given globs (bash glob: `*` spans '/').
+# True if any staged path matches one of the given globs (a `case` pattern: `*` spans '/').
 staged_matches() {
-    local f pat
-    for f in "${staged_all[@]}"; do
-        for pat in "$@"; do
-            # shellcheck disable=SC2053
-            [[ "$f" == $pat ]] && return 0
+    while IFS= read -r _gsm_f; do
+        for _gsm_pat in "$@"; do
+            # shellcheck disable=SC2254
+            case "$_gsm_f" in $_gsm_pat) return 0 ;; esac
         done
-    done
+    done <<_CHECKWRIGHT_STAGED_
+$staged_all
+_CHECKWRIGHT_STAGED_
     return 1
 }
 
@@ -42,17 +44,17 @@ GATE_SDK_VERBOSE="${GATE_SDK_VERBOSE:-}"
 _ran=0
 # Capture a gate's output; reprint it only on failure, or with GATE_SDK_VERBOSE.
 run_gate() {
-    local name="$1"; shift
-    local out ok=1
-    out="$("$@" 2>&1)" || ok=0
+    _rg_name=$1; shift
+    _rg_ok=1
+    _rg_out=$("$@" 2>&1) || _rg_ok=0
     _ran=$((_ran + 1))
-    if (( ! ok )); then
-        [[ -n "$out" ]] && printf '%s\n' "$out"
-        hook_fail "$name"
+    if [ "$_rg_ok" -eq 0 ]; then
+        if [ -n "$_rg_out" ]; then printf '%s\n' "$_rg_out"; fi
+        hook_fail "$_rg_name"
     fi
-    if [[ -n "$GATE_SDK_VERBOSE" ]]; then
-        [[ -n "$out" ]] && printf '%s\n' "$out"
-        printf '  PASS: %s\n' "$name"
+    if [ -n "$GATE_SDK_VERBOSE" ]; then
+        if [ -n "$_rg_out" ]; then printf '%s\n' "$_rg_out"; fi
+        printf '  PASS: %s\n' "$_rg_name"
     fi
 }
 

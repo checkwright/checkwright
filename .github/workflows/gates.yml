@@ -131,6 +131,12 @@ jobs:
       # arms the run reached behaved as recorded, not that the install path is
       # sound on a platform this leg does not run.
       #
+      # The generated hooks are POSIX sh (gate-sdk/SPEC.md §gen-pre-commit), and the
+      # smoke below commits through them under the runner's `/bin/sh`. Printing what
+      # that link resolves to is what makes this leg's green a strict-shell proof
+      # rather than a bash one; read it off the log.
+      - name: name the shell the hooks run under
+        run: readlink -f /bin/sh
       # Stays a bash `run:` on the runner's preinstalled toolchain (no setup-node,
       # no setup-rust) to keep the checkout+bash tamper floor the steps above state.
       - name: install smoke, judged against the recorded baseline

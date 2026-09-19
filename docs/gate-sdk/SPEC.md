@@ -2343,9 +2343,11 @@ The manifest grammar:
 
 **The field has one matcher, and every reader that asks what a token reaches uses it.** The
 generated hook's `staged_matches` is spliced from `gate_staged_matches` in `lib/gate.sh`, whose
-`[[ "$f" == $pat ]]` leaves the pattern operand unquoted under a standing
-`# shellcheck disable=SC2053`: bash *string* matching, in which `*` spans `/`. **Do not "fix" the
-unquoting**: it is the semantics, and quoting it would break every trigger in the tree at once. The
+`case "$_gsm_f" in $_gsm_pat)` leaves the pattern unquoted under a standing
+`# shellcheck disable=SC2254`: POSIX `case` pattern matching, in which `*` spans `/` because the
+slash's special rule belongs to pathname expansion alone (XCU 2.13.3) — the same verdicts bash's
+`[[ == ]]` gave before the hook left bash. **Do not "fix" the unquoting**: it is the semantics, and
+quoting it would break every trigger in the tree at once. The
 crate's readers call its port, one function, rather than each carrying a matcher:
 
 - **`run-gates --for`** selects the members a path triggers.
@@ -9362,7 +9364,10 @@ It gives a gate author the fail-closed guard `fail_closed`, the walk adapters
 the registry helpers that resolve a check consumer-first across kit dirs
 (`gate_resolve`, `gate_kit_roots`, `gate_check_dirs` — the multi-kit resolution
 path other kits' gates ride), and the staged-path matcher `gate_staged_matches`
-the generated hook splices (§run-gates). It resolves no
+the generated hook splices (§run-gates) — the one POSIX sh body in the library,
+because the hook it is spliced into is POSIX sh: it reads the caller's
+newline-separated `staged_all` a line at a time from a here-document and matches
+each line with an unquoted `case` pattern (§Reading a `couples=` field's reach). It resolves no
 knob value of its own beyond the pre-binary accessors below: every other read asks
 the binary. How each derives its result lives in the source; the invariants a
 reader needs outlive the refactor that renames a helper:
@@ -11569,9 +11574,12 @@ is registered (`check-graph` compares the committed hooks against the same
 emission, in process). Adding a gate to either hook is manifest-only — there is
 no second hand-wiring step to drift. The emission is deterministic (no
 timestamps) so the committed hooks are byte-stable.
-**The hooks are bash and stay one implementation on every platform.** On native
+**The hooks are POSIX sh and stay one implementation on every platform.** Each
+starts `#!/bin/sh` and uses only POSIX shell — `set -eu`, `[ ]`, `$(( ))`, `$( )`,
+`case`, here-documents, and no `local` — so on Linux and macOS they run under the
+`/bin/sh` git itself runs hooks with, and add no `bash` to that host's floor. On native
 Windows, git runs them under the shell Git for Windows bundles, whatever `PATH`
-carries, and they call nothing but bash builtins, `git` and the binary. So they
+carries, and they call nothing but shell builtins, `git` and the binary. So they
 add nothing to that host's floor beyond git. `install-smoke-powershell` holds
 this by committing with every bash stripped from `PATH` — the system directory's
 WSL launcher, which is no shell, excepted — once through a clean change and once
@@ -11601,8 +11609,9 @@ subcommand word is an operand, never composed into the flag (§The non-gate arm)
 and `--emit docs-mirror --write` is the precedent for a document arm that writes.
 The name is `git-hooks`, the hooks dir's own default basename, because a bare
 `hooks` would read as the harness-integration `--hook` family. A caller that is
-itself shell — the kit `smoke/` recipes, `init`'s vendored step, the tree test —
-reaches the arm through the front-end, its one door to the binary; a retained
+itself shell — the kit `smoke/` recipes, the tree test — reaches the arm through
+the front-end, its one door to the binary, and `init`, which placed the binary,
+spawns it directly (installer/SPEC.md §init); a retained
 shell generator exec'ing the arm is refused, because it would be a second spelling
 of the arm roster, the thing §The non-gate arm refuses a front-end case for.
 
@@ -11633,15 +11642,20 @@ of the arm roster, the thing §The non-gate arm refuses a front-end case for.
   conflated with a resolution failure (§lib/gate.sh states that obligation for a
   shell caller of `gate_command`).
 - **Blocks** — the unconditional `run_gate` line for a `*` trigger, the
-  `mapfile … git diff --cached` staged block for `mode=staged`, and the
-  `staged_matches` block otherwise.
+  staged block for `mode=staged`, and the `staged_matches` block otherwise. The
+  staged block defines and calls a `_staged_run` function that builds the member's
+  file operands with `set --`, one per regular file `git diff --cached --name-only
+  -- <globs>` names, read a line at a time from a here-document, so a path with a
+  space stays one operand (a path with a newline was never one); it runs the
+  member only when the set is non-empty.
 - **`gen=manual`** — the current hook's `# >>> manual: <name>` and
   `# <<< manual: <name>` regions are read from `<hooks-dir>/pre-commit` before emission, each
   under its opening sentinel's name. A member with a stored region re-emits it
   verbatim, and one without re-emits the TODO placeholder line between the
   sentinels. A committed region edited in place therefore stays fresh: the manual
   region is the consumer's text, and assertion D compares against an emission that
-  carries it back.
+  carries it back. The region runs in the hook, so its contract is POSIX sh; a
+  region written in bash breaks at the regeneration that makes the hook `sh`.
 - **Matcher body** — the lines strictly between `gate_staged_matches() {` and the
   next line that is exactly `}` in `<GATE_SDK_ROOT>/lib/gate.sh`, read as text with
   trailing blank lines dropped. An absent function or an empty body is exit 2 naming
@@ -11649,8 +11663,14 @@ of the arm roster, the thing §The non-gate arm refuses a front-end case for.
   live shell function with two readers — the splice, and `runner.rs`'s standing
   cross-substrate comparison (§The port-candidate criteria, criterion 6).
 - **Header and tail** — both hooks' fixed text, carried as literals in the module;
-  each header names `bash gate-sdk/bin/run-gates.sh --emit git-hooks --write` as the
-  regeneration command and the operand `check-graph` compares against.
+  each header names the resolved `GATE_SDK_NATIVE_BIN`, quoted as an argv element
+  is, as the door for the regeneration command (`--emit git-hooks --write`) and
+  the per-clone opt-in (`--install-hooks`), and the operand `check-graph` compares
+  against. The binary is named rather than the front-end because it is the one door
+  a starter or prose adopter holds with no `bash`.
+- **Staged set** — the pre-commit hook reads `git diff --cached --name-only
+  --diff-filter=ACMR` into one newline-separated `staged_all` and exits 0 when it is
+  empty; `staged_matches` walks it.
 
 The emitter's knob roster is `GATE_SDK_HOOKS_DIR`, `GATE_SDK_NATIVE_BIN`,
 `GATE_SDK_KIT_DIRS` and the `registry::EVERY_COUPLES_KNOB` sentinel, held to what
@@ -11695,7 +11715,9 @@ the baked per-gate argv list is **retained**, and the install path's `--write`
 step stays un-relocated: the hook's shape does not change. §gen-pre-commit's
 closed refusal is what settles that, and the bootstrap's remaining work —
 relocation included — belongs to the installer-surface unit the port track's
-sequence names as the tail's one remaining member.
+sequence names as the tail's one remaining member. Moving the hooks from bash to
+POSIX sh changed their interpreter, not their shape, so each of the four reasons
+stands untouched.
 
 **This is not read against the standing two-line-shim sentence; the two are the
 same ruling at two corpus states.** That sentence states what *port complete*
@@ -11746,10 +11768,11 @@ it.
 
 Emitted argv elements are quoted **deterministically**: an element made only of
 `[A-Za-z0-9_./:=+,@%-]` is emitted verbatim, and anything else — an element
-carrying a tab or spaces — becomes bash ANSI-C `$'…'`, with backslash, single
-quote, tab and newline escaped. The hook is bash, so an element that is not
-shell-inert takes bash's ANSI-C form, and the emitter renders it with that fixed
-escape set rather than through any shell's own quoting, which is what keeps the
+carrying a tab or spaces — is single-quoted, each embedded `'` spelled `'\''`, which
+carries a tab or a newline verbatim. The hook is POSIX sh, which has no ANSI-C
+quoting, so an element that is not shell-inert takes the one POSIX quoting that
+needs no escape set, and the emitter renders it by that fixed rule rather than
+through any shell's own quoting, which is what keeps the
 committed hooks byte-identical across clones for the freshness comparison to mean
 anything. Both emitted hooks carry the quiet-green wrapper in their
 generated header (§run-gates owns the contract): each gate invocation's output

@@ -256,16 +256,17 @@ gate_check_dirs() {
     done <<<"$roots"
 }
 
-# spec: gate-sdk/SPEC.md §run-gates — the path/glob matcher shared by run-gates --for selection and the emitted pre-commit hook: true when a path in the caller's staged_all array matches one of the given globs (bash glob, `*` spans '/'). The hook emitter splices this body verbatim into the hook's staged_matches; check-graph's freshness assertion holds the two in sync.
-# shellcheck disable=SC2154  # staged_all is the caller's array: the hook's staged set, the selector's --for paths
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the staged-path matcher the emitted pre-commit hook splices verbatim, so its body is POSIX sh: true when a line of the caller's newline-separated staged_all matches one of the given globs as a `case` pattern (`*` spans '/').
+# shellcheck disable=SC2154  # staged_all is the caller's newline-separated staged set
 gate_staged_matches() {
-    local f pat
-    for f in "${staged_all[@]}"; do
-        for pat in "$@"; do
-            # shellcheck disable=SC2053
-            [[ "$f" == $pat ]] && return 0
+    while IFS= read -r _gsm_f; do
+        for _gsm_pat in "$@"; do
+            # shellcheck disable=SC2254
+            case "$_gsm_f" in $_gsm_pat) return 0 ;; esac
         done
-    done
+    done <<_CHECKWRIGHT_STAGED_
+$staged_all
+_CHECKWRIGHT_STAGED_
     return 1
 }
 

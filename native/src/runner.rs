@@ -307,7 +307,7 @@ fn pathspec_matches(p: &str, globs: &[&str]) -> bool {
         .any(|g| walk::pattern_match(g, p) || walk::pattern_match(&format!("{}/*", g), p))
 }
 
-// spec: gate-sdk/SPEC.md §run-gates — `gate_staged_matches`: bash's `[[ "$f" == $pat ]]` over the
+// spec: gate-sdk/SPEC.md §run-gates — `gate_staged_matches`: a POSIX `case` pattern over the
 // trigger globs, the matcher the generated hook's `staged_matches` splices from the same body
 fn staged_matches(p: &str, globs: &[&str]) -> bool {
     globs.iter().any(|g| registry::couple_matches(p, g))
@@ -1045,7 +1045,7 @@ mod tests {
         let script = concat!(
             "source \"$1\"; ",
             "while IFS=$'\\t' read -ra f; do ",
-            "  p=\"${f[0]#P}\"; staged_all=(\"$p\"); ",
+            "  staged_all=\"${f[0]#P}\"; ",
             "  if gate_staged_matches \"${f[@]:1}\"; then echo 1; else echo 0; fi; ",
             "done"
         );
