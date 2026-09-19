@@ -12,16 +12,6 @@
 
 ## New Features
 
-- **release-binary-archive-versioned-name** [spec: SPEC-binary-archive.md] — each target's gate
-  binary reaches the Release as a flat `checkwright-gates-<target>` pair with no version, and its
-  sidecar names the bare payload name, so `sha256sum -c` on the downloaded pair fails (probed on
-  `v0.25.0`). **Ruled at spec:** it ships, in the operator's archive form:
-  `checkwright-gates-<version>-<target>.tar.gz`, one directory, both names unchanged, no outer
-  sidecar (a second digest producer in `pack`). The pack loop takes the target's `.exe` suffix,
-  fixing a Windows artifact the next tag's pack step would not find. No bootstrap reads a Release
-  asset. Surfaced 2026-09-14 by the lead; operator direction (2026-09-19, lead-relayed) joins it
-  to this iteration.
-
 ## Technical Debt
 
 - **init-dry-run-plan-parity** — `init --dry-run` predicts the evidence-kit and lifecycle-kit
@@ -3000,6 +2990,7 @@
 
 ## Done
 
+- release-binary-archive-versioned-name
 - floor-bash-install-bootstrap
 - hasher-shasum-fallback-unexercised
 - install-smoke-intel-mac-bash-path-assert-vacuous

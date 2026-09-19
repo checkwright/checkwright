@@ -218,8 +218,8 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
    It then **builds** the gate binary that job's assemble step dispatches to, and
    **assembles** the package once with the binary's `--pack-installer` arm, which
    verifies each artifact against its sidecar before placing it. Two sibling jobs
-   then consume that one artifact — `release` attaches the tarball, the per-target
-   binaries and every `.sha256` to the GitHub Release (the primary channel), and
+   then consume that one artifact — `release` attaches the tarball, its `.sha256`
+   and one versioned archive per target (binary and sidecar) to the GitHub Release (the primary channel), and
    `npm` runs `npm publish --provenance` from the runner (the secondary one,
    held behind its approval environment). That hold is a **confirmation step
    that produces an approval record**, and claiming more would be an overclaim:

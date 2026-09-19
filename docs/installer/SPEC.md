@@ -952,8 +952,9 @@ is a file you genuinely do edit, and it is claimed like everything else.
 inside the same payload as the artifact, so it catches corruption and a
 substitution made to the artifact alone — not a compromised publisher, which no
 in-payload value can. What raises it above a self-check is that the identical
-bytes are published on the Release, so a human can cross-check the value out of
-band. The claim is **verified against a published digest**, never *reproducible*.
+bytes are published on the Release, in a versioned archive per target whose
+sidecar verifies with `sha256sum -c` once extracted, so a human can cross-check
+the value out of band. The claim is **verified against a published digest**, never *reproducible*.
 
 **The gate-sdk config seam rides this path and only this path, and it is written
 on every install.** `init` claims `scripts/gate-sdk-config.knobs` through the

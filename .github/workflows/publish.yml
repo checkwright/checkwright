@@ -197,15 +197,16 @@ jobs:
           # missing is the one outcome worse than a red run.
           source gate-sdk/lib/gate.sh
           art="$RUNNER_TEMP/artifact"
-          binary="$(gate_native_bin)"; binary="${binary##*/}"
+          binary="$(gate_native_bin)"; binary="${binary##*/}"; binary="${binary%.exe}"
           while IFS= read -r target; do
-            if [ -f "$art/$target/$binary" ]; then
+            name="$binary$(gate_exe_suffix "$target")"
+            if [ -f "$art/$target/$name" ]; then
               :                                   # already the layout pack reads
-            elif [ -f "$art/gate-binary-$target/$binary" ]; then
+            elif [ -f "$art/gate-binary-$target/$name" ]; then
               mv "$art/gate-binary-$target" "$art/$target"
-            elif [ -f "$art/$binary" ]; then
+            elif [ -f "$art/$name" ]; then
               mkdir -p "$art/$target"
-              mv "$art/$binary" "$art/$binary.sha256" "$art/$target/"
+              mv "$art/$name" "$art/$name.sha256" "$art/$target/"
             else
               echo "no downloaded artifact for target '$target' under $art:" >&2
               ls -R "$art" >&2
@@ -240,18 +241,20 @@ jobs:
           ( cd "$out" && sha256sum "$(basename "$tarball")" > "$(basename "$tarball").sha256" )
           echo "packed $(basename "$tarball") at version $packed"
 
-          # The Release's per-target assets are renamed here, in the one job that
+          # The Release's per-target assets are archived here, in the one job that
           # holds the roster, rather than again in the job that attaches them —
           # duplicating the normalization is how the release job came to carry
-          # this same defect unnoticed. Release assets are flat, so each carries
-          # its target in the filename; the bare filename inside each sidecar is
-          # left alone, because that is the name the file carries in the payload
-          # where the machine verification happens, and rewriting it would mint a
-          # second spelling of one published fact. A human cross-checks the hex,
-          # not the filename.
+          # this same defect unnoticed. Release assets are flat, so each target's
+          # pair travels as one archive named for version and target, and the
+          # sidecar keeps the name it verifies against. No outer digest: a second
+          # `sha256sum` here is a second producer in this job.
+          stage="$RUNNER_TEMP/release-archives"
           while IFS= read -r target; do
-            cp "$art/$target/$binary"        "$out/$binary-$target"
-            cp "$art/$target/$binary.sha256" "$out/$binary-$target.sha256"
+            name="$binary$(gate_exe_suffix "$target")"
+            dir="$binary-$version-$target"
+            mkdir -p "$stage/$dir"
+            cp "$art/$target/$name" "$art/$target/$name.sha256" "$stage/$dir/"
+            tar -czf "$out/$dir.tar.gz" -C "$stage" "$dir"
           done < <(gate_native_targets)
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -337,7 +340,8 @@ jobs:
           # The per-target binaries are published here so the digest an adopter's
           # installer verifies against has a source outside the payload it travels
           # in — a digest shipped only alongside its own artifact certifies nothing.
-          # They arrive already renamed for their target: this job checks out
+          # They arrive archived per target and version, the binary and its
+          # sidecar inside under their payload names: this job checks out
           # nothing, so it holds no roster to normalize an artifact layout against,
           # and pack — which does — is where that happens.
           for f in dist/*; do

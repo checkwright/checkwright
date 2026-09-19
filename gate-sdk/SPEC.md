@@ -8633,11 +8633,11 @@ sidecar maps onto a subject one-to-one and a build attestation can later land
 *beside* these files with no migration and no digest value changing, where a
 manifest would mint a schema and a version key for the same information.
 
-The Release publishes the per-target binaries and their sidecars alongside the
-tarball, renamed per target because Release assets are flat. The **content** of
-each sidecar is left alone — its bare filename is the name the file carries in
-the payload, where the machine verification happens, and rewriting it would mint
-a second spelling of one published fact. What that publication buys is that the
+The Release publishes each target's binary and sidecar alongside the tarball as
+one archive, `checkwright-gates-<version>-<target>.tar.gz`, because Release assets
+are flat. Inside it both files keep their payload names, so the sidecar verifies
+with `sha256sum -c` once extracted and no second spelling of the digest's subject
+is minted. What that publication buys is that the
 digest an installer verifies against has a source outside the payload it travels
 in; a digest shipped only alongside its own artifact certifies nothing.
 
