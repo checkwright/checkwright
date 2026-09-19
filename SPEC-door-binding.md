@@ -84,14 +84,24 @@ The three shipped shell surfaces of class 1 call it:
 
 - **`guard-kit/lib/guard.sh`'s `_guard_front_end` (`:581`)** stops printing
   `"$root"gate-sdk/bin/run-gates.sh` and prints the spelled binary. Every
-  `guard_block` message that interpolates it (`:615`, `:669`, `:685`, `:1676`)
-  therefore names the binary. The function's *name* retires with the spelling
-  (§Retired spellings): it no longer names a front end.
-- **`context-kit/templates/session-context.sh:11`** drops `RUN_GATES=` and its
-  three `bash "$RUN_GATES"` call sites (`:33`, `:35`, `:52`) exec the spelled
-  binary. Its `:12` `bash -c 'source gate-sdk/lib/gate.sh; gate_native_bin'`
-  subshell collapses into a direct source, because the script already runs under
-  bash and the subshell only ever existed to survive a `set -e`.
+  `guard_block` message that interpolates it (`:615`, `:669`, `:685`, `:1676`,
+  `:1678`, `:2031`) therefore names the binary — six sites, not four; `:1676` and
+  `:1678` interpolate it indirectly through `_guard_block_interpreter`'s `runner`
+  local (bound at `:1674`), and `:2031` was missed by the original probe because
+  it sits inside a third, unrelated rule's message rather than beside the other
+  three. The function's *name* retires with the spelling (§Retired spellings): it
+  no longer names a front end.
+- **`context-kit/templates/session-context.sh:11`** drops `RUN_GATES=` entirely.
+  Every one of its other **twelve** references collapses onto the spelled binary,
+  not the three the probe first named: the presence guards `-f "$RUN_GATES"`
+  (`:31`, `:58`, `:136`), the exec call sites `bash "$RUN_GATES" ...` (`:33`,
+  `:35`, `:52`, `:59`, `:136`), and the literal mentions inside printed help text
+  and an `[EDIT ME]` comment, themselves user-facing rather than executed
+  (`:61`, `:117`, `:118`, `:119`, `:135`). All of them are this one file's
+  concern, so they land in the same edit as the three call sites first named. Its
+  `:12` `bash -c 'source gate-sdk/lib/gate.sh; gate_native_bin'` subshell
+  collapses into a direct source, because the script already runs under bash and
+  the subshell only ever existed to survive a `set -e`.
 - **`drift-kit/templates/kpi-deprecated-surface.sh:11`** drops its kit-root walk
   for the library accessor. It is the one class-1 site that already searched, and
   the search is exactly the duplication this delta removes.
@@ -178,6 +188,15 @@ nine preflight rows, and `.claude/settings.json`'s allowlist and hook values.
 `scripts/gate-sdk-config.knobs:16`'s `GATE_SDK_PORTABILITY_PATHS` **does not** —
 it names `gate-sdk/bin/run-gates.sh` as a file whose shell portability is
 checked, which is the file, not the door.
+
+**This repo's own root `README.md` is the same class of surface as `CLAUDE.md`
+below, and the probe that found the latter missed the former.** It carries
+twenty `bash gate-sdk/bin/run-gates.sh` instructions (`:25`, `:122-135`,
+`:137-139`, `:141`, `:145`) — the demo (named twice, `:25` and `:141`), the
+fixture-suite roster, the consumer-smoke and upgrade-smoke lines, and the
+`--install-hooks` sentence. `scripts/core-files.list:15` already governs it at
+the same tier as the eleven kit READMEs (`:59`'s `kit:README.md` pattern), so it
+takes delta 4's rewrite alongside them rather than as a later find.
 
 Mechanical because every site takes one settled wording and the gate of delta 3
 is the oracle for whether the sweep is complete.
@@ -276,7 +295,7 @@ boundary and §init, and guard-kit/SPEC.md §The generic ruleset.
   ground, restated as *harness shim plus pre-build door* rather than *adopter
   front end* (delta 5).
 - `gate-sdk/lib/gate.sh`, `gate-sdk/bin/run-gates.ps1` (delta 1).
-- `guard-kit/lib/guard.sh` (`_guard_front_end` and the four messages
+- `guard-kit/lib/guard.sh` (`_guard_front_end` and the six messages
   interpolating it), `context-kit/templates/session-context.sh`,
   `drift-kit/templates/kpi-deprecated-surface.sh` (delta 1).
 - `guard-kit/templates/settings-hooks.json`, `guard-kit/templates/settings-allow.json`,
@@ -287,6 +306,10 @@ boundary and §init, and guard-kit/SPEC.md §The generic ruleset.
 - `scripts/gates.list`, a new `guard-kit/checks/check-door-binding.gate`, its
   native module and its `good/`+`bad/` fixture pair; guard-kit/README.md's gate
   roster block (delta 3).
+- Root `README.md`'s kit-map table: guard-kit's row states *"Registers no
+  gates"* today (`git grep -n "Registers no gates" README.md` — guard-kit and
+  drift-kit both carry the sentence; only guard-kit's goes stale here), which
+  `check-door-binding` makes false the moment it lands (delta 3).
 - The seven `templates/<kit>-config.knobs` headers; the eleven kit READMEs;
   `lifecycle-kit/templates/stages/*.md`, `lead.md`, `upgrade.md`;
   `delegation-kit/templates/agent-execution.md`; `drift-kit/templates/economics.md`;
@@ -302,6 +325,9 @@ boundary and §init, and guard-kit/SPEC.md §The generic ruleset.
   because BRIEF.local.md §Substrate trajectory rules that a surviving script
   surface is a cost to argue down, *this repo's own always-loaded instruction
   files included*.
+- `README.md`: its twenty `bash gate-sdk/bin/run-gates.sh` sites (delta 4) —
+  the same repo-root, `scripts/core-files.list`-governed tier as `CLAUDE.md`
+  above, missed by the same probe for the same reason.
 - `installer/consumer-smoke/run-smoke.sh` and installer/SPEC.md §The consumer
   smoke (delta 6).
 - `.workflow/release-declarations.md` §Behavior changes, appended by the landing

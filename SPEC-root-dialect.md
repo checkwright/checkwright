@@ -69,17 +69,23 @@ line independently shows the `{root}/checks` resolve-set narrowing that
 
 ## The two findings that re-shape the unit
 
-**1. The caller set is 18, not 9.** `git grep -n kit_roots_rel native/src` returns
-eighteen call sites. Five the entry does not name are measurably affected —
+**1. The caller set is 19, not 9.** `git grep -n kit_roots_rel native/src` returns
+nineteen call sites. Five the entry does not name are measurably affected —
 `kit_registration.rs:92`, `knob_citation.rs:22`, `docs_cmd.rs:50`,
-`kit_ref_liveness.rs:159`, and `registry.rs:104` through `fixture_suites`. Three
+`kit_ref_liveness.rs:159`, and `registry.rs:104` through `fixture_suites`. Four
 more the entry never examines — `gate_tamper.rs:194`, `shim_restatement.rs:106`,
-`emit/graph.rs:143`. The entry's roster is a subset, and its `[cost: event/low]`
-was priced against it.
+`emit/graph.rs:143`, and `gates/kit_enum.rs:45`. The last of those is **dormant**
+rather than measurably wrong: this repo's `gates.list` carries no multi-kit
+hand-listed `couples=` group large enough to reach its git-pathspec half, so the
+nested probe's clean line reads the same *"0 multi-kit hand-list group(s)
+complete"* both ways rather than a shrunk one — the defect follows from delta 1's
+rule, not from a run that caught it, which is exactly the residue a static read
+against a stated rule exists to close where a probe cannot. The entry's roster is
+a subset, and its `[cost: event/low]` was priced against it.
 
 **2. The call is per-USE, not per-site.** The entry frames the work as *"a
 per-site call on whether it matches repository paths or kit-parent text"*.
-Measured, at least four sites take **both** off one `kit_roots_rel()` call, so
+Measured, at least five sites take **both** off one `kit_roots_rel()` call, so
 moving a site wholesale would break its text half:
 
 - `gates/kit_registration.rs` — `:132` `registry_text.contains("]({root}/")` is a
@@ -92,11 +98,21 @@ moving a site wholesale would break its text half:
   path element, which is not.
 - `gates/docs_cmd.rs:50-58` — pushes `root` into `roots` (a path, consumed by
   `defined_knobs`) and a basename-derived prefix, in one loop.
+- `gates/kit_enum.rs` — `:107`'s `kit_roots.iter().any(|r| r == root)` matches a
+  `couples=` hand-listed root name against the enumerated set, a **text** match;
+  `:124`'s `format!("{}/{}", r, glob)`, fed straight to `git ls-files`, is a **git
+  pathspec**. One call, two dialects, the same shape as `kit_registration.rs`
+  above — and the same silent direction: an empty `git ls-files` result is read
+  as *this root doesn't carry the group* (`:139`), not as a violation, so a
+  nested mismatch would make every root's pathspec return empty and the check
+  would pass with nothing checked, the way `kit_registration.rs` does today.
+  Currently dormant only because no live `couples=` group is large enough to
+  reach the loop body.
 
 So the delta shape is **split the mixed reads, then re-point only the path use** —
 not *re-point the caller*.
 
-It is a root-level amendment because it spans `native/` (the eighteen sites and
+It is a root-level amendment because it spans `native/` (the nineteen sites and
 the fixture) and gate-sdk (§The path-dialect contract and §lib/gate.sh, which own
 the two spellings' documented meanings).
 
@@ -127,13 +143,13 @@ the two functions' `# spec:` comments today only imply:
 `walk::kit_roots()` and `walk::kit_roots_rel()`'s own `# spec:` comments are
 re-phrased to point at that rule rather than each restating half of it.
 
-**Why a stated rule and not eighteen corrected call sites alone.** Enforcement-
-first: the correction without the rule is eighteen edits and no reason the
-nineteenth reader chooses right. The rule is what delta 4 makes executable.
+**Why a stated rule and not nineteen corrected call sites alone.** Enforcement-
+first: the correction without the rule is nineteen edits and no reason the
+twentieth reader chooses right. The rule is what delta 4 makes executable.
 
 ### (2) The mixed callers are split {design-bearing}
 
-**Not yet applied.** Each of the four sites that takes both dialects off one call
+**Not yet applied.** Each of the five sites that takes both dialects off one call
 is split so that each dialect has its own binding, and neither is derived from the
 other:
 
@@ -189,6 +205,14 @@ gates above against a fixture tree whose kits sit under a subdirectory, and
 asserts each produces the **same corpus size** it produces against the same tree
 vendored at the root.
 
+**`check-kit-enum` needs a populated fixture, not a count comparison alone.**
+Every other listed gate already has live content in this repo's own tree to
+compare a nested count against a flat one; `check-kit-enum`'s dormant path half
+(delta 2) has none — its clean line reads `0` either way regardless of whether
+the split landed. The fixture's `gates.list` therefore carries one multi-kit
+`couples=` hand-list group (`>=2` roots sharing a glob) so the git-pathspec half
+has something to find, and the nested/flat comparison is over a non-zero count.
+
 - **`good/`** — kits at `vendor/`, `GATE_SDK_ROOT=vendor/gate-sdk`. Every arm's
   counted output matches the flat tree's.
 - **`bad/`** — the same tree with one reader deliberately left on the rel
@@ -210,11 +234,11 @@ rather than merely written.
 
 - **The dialect rule (delta 1).** Producer: gate-sdk/SPEC.md §The path-dialect
   contract. Consumers: `walk::kit_roots` and `walk::kit_roots_rel`'s `# spec:`
-  pointers, which `check-spec-pointer` resolves; every author of a nineteenth
+  pointers, which `check-spec-pointer` resolves; every author of a twentieth
   reader; and `check-kit-roots-dialect`, which is its executable form.
 - **`walk::kit_roots()`'s widened caller set (deltas 2 and 3).** Producer:
   `walk.rs`, unchanged in behaviour — this amendment adds no function and changes
-  no return value. Consumers: the thirteen re-pointed or split sites. Its enabling
+  no return value. Consumers: the fourteen re-pointed or split sites. Its enabling
   configuration is `GATE_SDK_ROOT` and `GATE_SDK_KIT_DIRS`, which `init` writes
   into every consumer's knob file — deployed, not test-only, and a nested value is
   reachable today by an adopter who hand-vendors under a subdirectory.
@@ -226,17 +250,19 @@ rather than merely written.
   generated pre-commit hook through its `# graph:` manifest (coupling `walk.rs`
   and each re-pointed module), and its fixture pair.
 
-**Point 6 — every member of the eighteen-site corpus has a satisfying value.**
-Thirteen sites take `kit_roots()` by deltas 2 and 3 (four of them as the path half
+**Point 6 — every member of the nineteen-site corpus has a satisfying value.**
+Fourteen sites take `kit_roots()` by deltas 2 and 3 (five of them as the path half
 of a split). Three stay on `kit_roots_rel()` and are named in delta 3 with the
 ground for each. The remaining two are `walk.rs`'s own definitions and
-`gates/reads_couples.rs`' tests, which call the `_from` variants with an
-explicitly resolved root and take neither dialect by default. No site is narrowed
-past unnamed.
+`gates/reads_couples.rs`' tests, which call the `_from` variants (one exception,
+`reads_couples.rs:727`, calls the bare function directly but under a
+test-resolved knob env exercising the dialect itself rather than reading it) with
+an explicitly resolved root and take neither dialect by default. No site is
+narrowed past unnamed.
 
 ## Existing sections updated
 
-Rosters produced by `git grep -n kit_roots_rel native/src` (18 call sites), by the
+Rosters produced by `git grep -n kit_roots_rel native/src` (19 call sites), by the
 nested-versus-flat probe described above, and by reading `native/src/walk.rs`,
 gate-sdk/SPEC.md §The path-dialect contract and §Layout and configuration.
 
@@ -246,7 +272,7 @@ gate-sdk/SPEC.md §The path-dialect contract and §Layout and configuration.
   saying which reader takes which (delta 1).
 - `native/src/walk.rs` — the two `# spec:` comments (delta 1).
 - `native/src/gates/kit_registration.rs`, `knob_citation.rs`,
-  `knob_default_coupling.rs`, `docs_cmd.rs` (delta 2).
+  `knob_default_coupling.rs`, `docs_cmd.rs`, `kit_enum.rs` (delta 2).
 - `native/src/emit/enum_sets.rs`, `close_surfaces.rs`, `pack_installer.rs`;
   `native/src/registry.rs`; `native/src/knobs/evidence_kit.rs`;
   `native/src/gates/gate_binary_fresh.rs`, `install_platforms.rs`,
@@ -283,7 +309,7 @@ gate-sdk/SPEC.md §The path-dialect contract and §Layout and configuration.
 - [ ] **Amendment deleted** — this file removed on merge (`ls SPEC-*.md`).
 - [ ] **Entry moved** — `kit-roots-rel-filesystem-readers` moves to Done in the
       merge commit, a stage before the drain stage, with its roster and cost
-      corrected to the measured eighteen sites.
+      corrected to the measured nineteen sites.
 - [ ] **The silent class is closed** — under the nested fixture, `--emit
       enum-sets`, `--emit close-surfaces` and the derived `EVIDENCE_KIT_SUITES`
       produce the same corpus they produce flat, and

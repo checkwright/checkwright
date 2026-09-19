@@ -71,11 +71,11 @@
   12; the derived `EVIDENCE_KIT_SUITES` default changes identity outright; and
   `check-kit-registration` and `check-knob-citation` both PASS with clean lines reading `0 shipping
   gate-tests` and `3 manifest file(s)` against `10` and `93`.
-  **Wider than filed:** `git grep -n kit_roots_rel native/src` returns **18** call sites, not the 9
+  **Wider than filed:** `git grep -n kit_roots_rel native/src` returns **19** call sites, not the 9
   the entry named; five of the affected ones were unnamed, and the filed cost class was priced
   against the subset.
   **Re-priced by operator direction (2026-09-20, lead-relayed): the cost class is event/high, not
-  the event/low it was filed at.** The probe the promotion demanded came back at 18 sites with a
+  the event/low it was filed at.** The probe the promotion demanded came back at 19 sites with a
   per-use rather than a per-site call and a silent-pass failure mode, and the three cheap deltas are
   unprovable without the nesting fixture — unnested the two spellings are byte-identical, so no
   existing fixture can show the fix works or that it stays working. This prose is the cost class's
