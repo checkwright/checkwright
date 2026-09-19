@@ -447,10 +447,12 @@ verdict set is, and a unit test in `toolfloor.rs` holds it closed:
   complement on every other member would be a roster maintained against itself —
   so the emptiness rule above carries it.
 - **`contributor`** — a contributor-side floor with no install-time role.
-- **a kit name** — owed where that kit is selected; the value is the kit's
-  directory name, and the test holds it to a kit root the authoring tree
-  carries, since a misspelled name is a condition nothing
-  satisfies and would silently drop the member from every floor.
+- **a kit name, or several joined by `+`** — owed where any named kit is
+  selected; each value is a kit's directory name, and the test holds each one
+  to a kit root the authoring tree carries, since a misspelled name is a
+  condition nothing satisfies and would silently drop the member from that
+  kit's floor. The joiner is `+` because the element must stay one shell word
+  and the install page's parenthetical already splits on `,`.
 - **`registered`** — owed where a registered gate's requirement element (the
   data `--needs` prints, gate-sdk/SPEC.md §check-reads-couples) names the
   member; derived from the registry, never listed. A registered name with no
@@ -460,9 +462,10 @@ verdict set is, and a unit test in `toolfloor.rs` holds it closed:
 
 **The owed-predicate.** `toolfloor` answers *is this member owed under this
 selection*, where a **selection** is a kit set and a registered gate set, from a
-closed three-value set: **owed** (an empty audience, a kit name the kit set
-carries, or `registered` where some gate-set member's `REGISTRY` row names the
-member), **not owed** (`contributor`, a kit name the kit set lacks, or
+closed three-value set: **owed** (an empty audience, a kit list — the union of
+its names — sharing a name with the kit set, or `registered` where some gate-set
+member's `REGISTRY` row names the member), **not owed** (`contributor`, a kit
+list sharing no name with the kit set, or
 `registered` with no such row), and **undecided** (a conditional value with no
 selection to read). It exists so no consumer-side reader re-implements that rule
 against a value set it does not own. A consumer-side reader — the installer's
@@ -477,20 +480,42 @@ that re-fires the day a second contributor-only member lands.
 
 The constrained members and what forces each:
 
-- `bash:4.3` — the floor is set by the **highest** construct the battery runs,
-  not the most numerous. Three bash-4.0 constructs are present — `declare -A`
+- `bash:4.3::context-kit+delegation-kit+drift-kit+guard-kit+lifecycle-kit` — the
+  floor is set by the **highest** construct the shipped shell runs, not the most
+  numerous. Three bash-4.0 constructs are present — `declare -A`
   (gate-sdk, guard-kit, evidence-kit, the installer's consumer smoke), `mapfile`
   (across the kits), case-modification expansion (gate-sdk's gate library and the
   installer's consumer smoke) — but the **nameref** (`local -n`, bash 4.3)
-  outranks them: `gate-sdk/lib/gate.sh`'s couples expander, which the gate runner
-  sources. The
+  outranks them: `_gate_prebinary_file_value` in `gate-sdk/lib/gate.sh`, which the
+  front-end, guard-kit's library and context-kit's session template source. The
   leaf gate that carried the second instance, `check-comment-tier`, has since
   ported to the binary substrate and its script is gone — which changes nothing
-  about the floor, because the nameref in the shared gate
-  library makes 4.3 universal rather than one leaf gate's requirement, so a
-  consumer below it cannot run the battery at all. Recorded here because the
+  about the floor, because the nameref in the shared gate library makes 4.3 the
+  floor of every shell surface that sources it. Recorded here because the
   earlier `4.0` was a fail-open: `env-probe` reported `ok` on a 4.2 box the
   battery would fail with an obscure syntax error.
+  **The audience is the kits whose shipped surfaces reach `bash`.** The generated
+  git hooks are POSIX sh (gate-sdk/SPEC.md §gen-pre-commit), `init` spawns the
+  binary it placed rather than the front-end, and its follow-up block names that
+  binary (installer/SPEC.md §init), so a selection reaches `bash` only through a
+  kit that ships a surface running it or telling a session or the harness to run
+  it: context-kit's session template and its SessionStart wiring,
+  delegation-kit's agent-execution procedure, drift-kit's KPI template and
+  economics procedure, guard-kit's library, guard template, settings wiring and
+  close-triage procedure, and lifecycle-kit's stage templates, lead and upgrade
+  procedures. The list was enumerated with
+  `git grep -l -e "bash gate-sdk/bin/run-gates.sh" -e "^#!/usr/bin/env bash" -- '*-kit/*' 'gate-sdk/*'`
+  less tests, smokes, fixtures, SPECs and READMEs. evidence-kit and queue-kit
+  appear there only through their config templates' header comments, which are
+  reference text and no spawn; gate-sdk's remaining bash surfaces are the
+  front-end no starter path needs, the contributor-side build script, the
+  adopter's own opt-in shell-gate skeleton and a workflow template that runs on a
+  CI runner; canon-kit's config template header names the binary. **Its honest
+  limit:** the list is held by hand against the kits' shipped reach, so a kit
+  that later ships a bash surface without joining it is under-declared and
+  nothing reds. The unix install bootstrap is a bash script on every profile, but
+  it runs before any reader of this roster and is no kit's surface, so it is
+  stated on the install page rather than here.
 - `cargo:1.71::contributor` — a **contributor-side** floor, never a runtime one,
   and that reading is now declared on the element and read by name rather than
   left as an aside: the audience field is what the consumer-side predicate

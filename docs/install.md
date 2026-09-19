@@ -71,9 +71,11 @@ Subsystem for Linux) is a route you may choose instead — the Linux line below
 serves it, and joining native Windows took nothing away from it.
 
 macOS runs it too, but as an adopter action rather than something the stock
-system delivers. Stock macOS ships bash 3.2, below the 4.3 floor. The remedy is
-the block below, and it is the whole of it: this page names no other step for a
-Mac. Its first line installs a current bash from Homebrew. The other two put
+system delivers. Stock macOS ships bash 3.2, below the 4.3 floor. That floor
+binds only where the profile you select carries a kit that owes `bash` (the
+toolchain list below names them); a starter or prose install needs no remedy. The
+remedy is the block below, and it is the whole of it: this page names no other
+step for a Mac. Its first line installs a current bash from Homebrew. The other two put
 Homebrew's own `bin` ahead of `/bin` on `PATH`, so `bash` resolves to that one
 rather than to the system's 3.2.
 
@@ -152,13 +154,22 @@ your `PATH`, and the note says what breaks without it:
 
 <!-- toolchain:begin -->
 
-- `bash` (≥ 4.3) — guard-kit's hook and the shipped session templates are
-  written in bash, and so are both generated git hooks, which git runs under its
-  own shell. On native Windows, run the battery from PowerShell through
+- `bash` (≥ 4.3, @context-kit+delegation-kit+drift-kit+guard-kit+lifecycle-kit)
+  — owed only where the profile you select carries one of those kits, because
+  each ships a surface that runs bash or tells a session to (context-kit/SPEC.md
+  §bin/env-probe names each surface). The starter and prose profiles reach none of them. Both generated
+  git hooks are POSIX sh, run by the `/bin/sh` git itself uses. `init`
+  generates them and names its follow-up commands through the gate binary it
+  placed. On every profile, though, the unix install bootstrap
+  (`installer/bin/checkwright.sh`) is itself a bash script, so installing on
+  Linux or macOS still needs a `bash`. That reach runs before `checkwright doctor`
+  and outside this roster, and porting the bootstrap to POSIX sh is what removes
+  it. On native Windows, run a front-end battery from PowerShell through
   `gate-sdk/bin/run-gates.ps1`, the twin of `run-gates.sh`. Git for Windows'
   bundled bash serves guard-kit's hook there, because the harness runs both its
   `Bash` tool and its hook commands under that shell. The floor is the highest construct the
-  battery runs: a nameref (`local -n`) in the gate library the front-end sources.
+  shipped shell runs: a nameref (`local -n`) in the gate library, which every
+  kit shell surface that reads a knob before locating the binary sources.
   Associative arrays, `mapfile`, and the lowercasing case expansion are more
   widespread but only reach 4.0. The shipped shell also assumes the POSIX
   userland `GATE_SDK_PROGRAM_FLOOR` names (gate-sdk/SPEC.md §lib/gate.sh). A
@@ -236,7 +247,8 @@ floor belongs to, and there are three kinds. `@contributor` is a tool nothing on
 an install path reaches, required of someone building Checkwright rather than of
 someone running it, and `checkwright doctor` leaves it out of its verdict
 entirely. A kit name, such as `@guard-kit`, is held only where the profile you
-select carries that kit. `@registered` is held only where a gate registered in
+select carries that kit. Several kit names joined by `+` are held where it
+carries any of them. `@registered` is held only where a gate registered in
 your `gates.list` needs the tool. An unmarked bullet is what every adopter's
 machine is held to; a kit-named or `@registered` bullet is held only where your
 selection reaches it, and `doctor` run outside an install names such a member as
@@ -465,10 +477,11 @@ your repo root and wire it in:
 2. Register the gates it ships in your `gates.list`, where the kit ships gates.
 3. Point the kit at your layout through its external configuration — consumers
    never edit vendored kit files, so configuration always lives outside them.
-4. Opt each clone into the generated pre-commit hook with
-   `bash gate-sdk/bin/run-gates.sh --install-hooks`. On native Windows, from
-   PowerShell:
-   `powershell -NoProfile -ExecutionPolicy Bypass -File gate-sdk/bin/run-gates.ps1 --install-hooks`.
+4. Opt each clone into the generated pre-commit hook by running the gate binary
+   — the path `GATE_SDK_NATIVE_BIN` names, which is where `init` places it — with
+   `--install-hooks`, for example `./scripts/checkwright-gates --install-hooks`
+   from the repository root. The same spelling runs from a POSIX shell and from
+   PowerShell, with the `.exe` suffix on native Windows.
 
 Where a kit ships adoptable skills, take each as a binding shim by default — a
 one-line directive that references the vendored template, so a re-vendor reaches
@@ -513,11 +526,12 @@ rather than trusting.
 
 ## Reviewing the pre-commit hook before you install it
 
-Step 4 above points a clone's git hooks at bash from this tree, which is worth
+Step 4 above points a clone's git hooks at POSIX sh from this tree, which is worth
 deciding with the files open. The account below aims at completeness over
 reassurance.
 
-**What the hook is.** A generated file. `bash gate-sdk/bin/run-gates.sh --emit git-hooks --write` emits
+**What the hook is.** A generated POSIX sh file. The gate binary's
+`--emit git-hooks --write` emits
 it from the per-gate `# graph:` manifests, so the hook carries the *triggered
 subset* of your registered battery: each gate fires under the path globs its
 own manifest declares, and the gates outside that subset run only in the full
@@ -531,8 +545,8 @@ byte-comparison. Installing points your clone at the hooks directory, so both
 hooks are what you are reviewing; everything this section says of the
 pre-commit hook holds of the commit-msg one.
 
-**What installing it changes in your clone.** `run-gates.sh --install-hooks`
-has three effects, and an audit of what the script touches wants all three:
+**What installing it changes in your clone.** `--install-hooks` has three
+effects, and an audit of what it touches wants all three:
 
 - `core.hooksPath` is repointed at the kit's hooks directory. That config write
   is what makes the generated hook fire at commit time.
@@ -542,10 +556,11 @@ has three effects, and an audit of what the script touches wants all three:
   mapping surfaces before your first commit. The gate's exit status becomes the
   installer's, so a failing identity check is visible to whatever ran it.
 
-**How to review before running.** The hook and every gate it invokes are
-tracked bash under the vendored kit directories and your own gates directory.
-Nothing is fetched at install time or at run time, so a vendoring or upgrade
-diff shows the whole of what you are agreeing to execute.
+**How to review before running.** The hook is tracked POSIX sh in your gates
+directory, and every gate it invokes is either the digest-verified gate binary
+beside it or tracked shell under the vendored kit directories and your own gates
+directory. Nothing is fetched at install time or at run time, so a vendoring or
+upgrade diff shows the whole of what you are agreeing to execute.
 
 **How to disable it.** Per commit, `git commit --no-verify` skips the hook. Per
 clone, `git config --unset core.hooksPath` removes it. Both are supported
@@ -596,7 +611,7 @@ Two honest limits:
   hook's per-gate trigger lists come from the gates' `# graph:` manifests, which
   carry the default `CLAUDE.md` literal. A nondefault agent file means adjusting
   the affected `# graph:` trigger lines and regenerating the hook, or relying on
-  full-battery runs (`bash gate-sdk/bin/run-gates.sh`), which read the knobs and
+  full-battery runs (the gate binary's `--run`), which read the knobs and
   are agent-file-agnostic.
 
 ## Versioning

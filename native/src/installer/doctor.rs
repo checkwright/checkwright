@@ -205,8 +205,11 @@ fn toolchain_block(
             Owing::NotOwed => {}
             Owing::Owed => failed |= render_member(out, element, &probe(&e.name)),
             Owing::Undecided => {
+                let kits = toolfloor::audience_kits(&e.audience);
                 let reach = if e.audience == toolfloor::REGISTERED {
                     "a registered gate needs it".to_string()
+                } else if kits.len() > 1 {
+                    format!("any of {} is selected", kits.join(", "))
                 } else {
                     format!("{} is selected", e.audience)
                 };
@@ -443,13 +446,19 @@ mod tests {
 
         let mut out = String::new();
         assert!(!toolchain_block(&mut out, Some(&sel(&["gate-sdk"], &["check-core-files"])), only_floor));
-        assert!(out.contains("bash ") && out.contains("git "));
-        assert!(!out.contains("jq") && !out.contains("curl") && !out.contains("shellcheck"));
+        assert!(out.contains("git "));
+        assert!(!out.contains("bash") && !out.contains("jq") && !out.contains("curl") && !out.contains("shellcheck"));
         assert!(!out.contains("cargo"));
 
         let mut out = String::new();
+        assert!(!toolchain_block(&mut out, Some(&sel(&["gate-sdk", "canon-kit"], &[])), |t: &str| {
+            if t == "git" { "git version 9.9.9".to_string() } else { String::new() }
+        }));
+        assert!(!out.contains("bash"), "a prose selection reaches no bash:\n{}", out);
+
+        let mut out = String::new();
         assert!(toolchain_block(&mut out, Some(&sel(&["gate-sdk", "guard-kit"], &[])), only_floor));
-        assert!(out.contains("jq           NOT FOUND"));
+        assert!(out.contains("bash ") && out.contains("jq           NOT FOUND"));
 
         let mut out = String::new();
         assert!(toolchain_block(&mut out, Some(&sel(&["gate-sdk"], &["check-action-run-shell"])), only_floor));
@@ -457,6 +466,9 @@ mod tests {
 
         let mut out = String::new();
         assert!(!toolchain_block(&mut out, None, only_floor));
+        assert!(out.contains(
+            "bash         not probed — owed where any of context-kit, delegation-kit, drift-kit, guard-kit, lifecycle-kit is selected"
+        ));
         assert!(out.contains("jq           not probed — owed where guard-kit is selected"));
         assert!(out.contains("curl         not probed — owed where delegation-kit is selected"));
         assert!(out.contains("shellcheck   not probed — owed where a registered gate needs it"));

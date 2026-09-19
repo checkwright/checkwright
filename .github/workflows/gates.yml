@@ -861,7 +861,7 @@ jobs:
           if ($script:fails -gt 0) { Write-Host "$($script:fails) assertion(s) failed"; exit 1 }
           Write-Host "the PowerShell bootstrap answered all five steps and carried an install end to end"
 
-      # The generated hooks stay one bash implementation on native Windows because
+      # The generated hooks stay one POSIX sh implementation on native Windows because
       # git runs them under the shell Git for Windows bundles, whatever PATH carries
       # (gate-sdk/SPEC.md §gen-pre-commit). This step is that claim's oracle, in the
       # consumer the step above initialised: it strips every directory holding a
@@ -870,7 +870,8 @@ jobs:
       # the WSL launcher and not a shell; git stays reachable through its own
       # `cmd` launcher directory, which holds no bash. The hooks are wired by
       # running the `--install-hooks` line init printed (installer/SPEC.md §init),
-      # so a bash-spelled block reds here by name, with no bash left to resolve it;
+      # which names the binary init placed by its `./`-prefixed root-relative path,
+      # so PowerShell executing it is the oracle for that spelling on this host;
       # then a clean change must commit with the pre-commit
       # hook's passed line, and a change binding an uncrossed repository root in a
       # shell file must be refused by name by check-path-dialect, a precommit
@@ -887,11 +888,6 @@ jobs:
               if ($cond) { Write-Host "ok   $label" }
               else { Write-Host "BAD  $label -- $detail"; $script:fails++ }
           }
-          if (-not (Test-Path -LiteralPath (Join-Path $consumer 'gate-sdk/bin/run-gates.ps1') -PathType Leaf)) {
-              Write-Host "BAD  the init consumer carries no vendored gate-sdk/bin/run-gates.ps1 -- nothing below can run"
-              exit 1
-          }
-
           Write-Host "== step 1: every bash stripped from PATH =="
           $sysDir = [Environment]::SystemDirectory.TrimEnd('\')
           $gitRoot = Split-Path (Split-Path (Split-Path (& git --exec-path)))
@@ -929,8 +925,8 @@ jobs:
               $ti = -1
               for ($i = 0; $i -lt $toks.Count; $i++) { if ($toks[$i] -like '*/*') { $ti = $i; break } }
               $target = if ($ti -ge 0) { $toks[$ti] } else { '<none>' }
-              Check "the follow-up line '$c' targets the PowerShell front-end" `
-                    ($target -eq 'gate-sdk/bin/run-gates.ps1') "target $target"
+              Check "the follow-up line '$c' runs the binary init placed, with no interpreter before it" `
+                    ($ti -eq 0 -and $target -like './*' -and (Test-Path -LiteralPath (Join-Path $consumer $target) -PathType Leaf)) "target $target"
               if ($ti -ge 0 -and (@($toks | Select-Object -Skip ($ti + 1)) -contains '--install-hooks')) { $hooksLine = $toks }
           }
           if ($null -eq $hooksLine) { Write-Host "BAD  init's follow-up block names no --install-hooks line -- nothing below can run"; exit 1 }
@@ -943,7 +939,7 @@ jobs:
               Check "the printed '$($hooksLine -join ' ')' wired the hooks" `
                     ($icode -eq 0 -and (git config --get core.hooksPath)) "exit $icode -- $iout"
 
-              Write-Host "== step 3: a clean change commits through the bash hook git runs itself =="
+              Write-Host "== step 3: a clean change commits through the sh hook git runs itself =="
               $head = git rev-parse HEAD
               [IO.File]::WriteAllText((Join-Path $consumer 'hooks-probe.txt'), "probe`n")
               git add hooks-probe.txt
@@ -964,7 +960,7 @@ jobs:
           } finally { Pop-Location }
 
           if ($script:fails -gt 0) { Write-Host "$($script:fails) assertion(s) failed"; exit 1 }
-          Write-Host "git ran the bash hooks with no bash on PATH, and they both passed and refused"
+          Write-Host "git ran the sh hooks with no bash on PATH, and they both passed and refused"
 
   # The RELEASE-SHAPED PRODUCER, and its whole reason for existing is that no leg
   # which builds from the host it runs on can ever discharge a roster join.

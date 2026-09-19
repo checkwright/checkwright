@@ -744,21 +744,17 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     // spec: installer/SPEC.md §init — the follow-up block is a STATED GRAMMAR with a named
     // reader, not a layout choice: the consumer smoke parses it out of what this prints, so
     // reflowing these lines reds that arm instead of silently un-covering the pair.
-    let front = follow_up_front_end();
+    let front = follow_up_front_end(&artifact_dest);
     println!("\nnext:");
     println!("  {} --install-hooks   # opt this clone into the generated pre-commit hook", front);
-    println!("  {}       # the battery, green on what was just vendored", front);
+    println!("  {} --run             # the battery, green on what was just vendored", front);
     Ok(0)
 }
 
-// spec: installer/SPEC.md §init — the follow-up block is keyed on the host `init` runs on: a
-// Windows host runs the PowerShell front-end through Windows PowerShell, every other the bash one
-fn follow_up_front_end() -> &'static str {
-    if cfg!(windows) {
-        "powershell -NoProfile -ExecutionPolicy Bypass -File gate-sdk/bin/run-gates.ps1"
-    } else {
-        "bash gate-sdk/bin/run-gates.sh"
-    }
+// spec: installer/SPEC.md §init — every host is told to run the binary init placed, by its
+// root-relative path, because both `sh` and PowerShell run a `./`-prefixed relative path
+fn follow_up_front_end(artifact_dest: &str) -> String {
+    format!("./{}", artifact_dest)
 }
 
 // spec: installer/SPEC.md §What init seeds — the dry plan names the surfaces the recipe would

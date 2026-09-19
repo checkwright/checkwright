@@ -97,6 +97,7 @@ installer_smoke artifact-less-refusal-leg pass
 installer_smoke download-arm pass
 installer_smoke toolchain-free-arm pass
 installer_smoke jq-less-arm pass
+installer_smoke bash-less-arm pass
 installer_smoke upgrade-arm pass
 installer_smoke cross-version-reversal-arm pass
 installer_smoke seam-arm pass

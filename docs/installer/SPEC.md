@@ -210,10 +210,11 @@ It writes the selected profile's kit directories, a `gates.list` seeded with
 each kit's starting gates, the config seam files those kits need, and the
 manifest. Then it makes **one commit** naming the profile and the version, and
 prints a **follow-up block**: the commands that finish the setup, one per line,
-each carrying its reason beside it. The block is keyed on the host `init` runs
-on. A Windows host is told to run the PowerShell front-end through Windows
-PowerShell, a spelling that runs from PowerShell and from Git Bash alike. Every
-other host is told to run the bash front-end. The commands are deliberately **not spelled
+each carrying its reason beside it. Every host is told to run the binary `init`
+placed, by its root-relative path prefixed `./`, with its executable suffix where
+the host's artifact carries one: both `sh` and PowerShell run a `./`-prefixed
+relative path, so one spelling serves every host and no interpreter precedes the
+target. The commands are deliberately **not spelled
 on this page** — what `init` prints is `init`'s to say, and a second copy here is
 a string a rename has to be remembered to move.
 
@@ -222,7 +223,7 @@ is exactly `next:`; each line after it that begins with whitespace and then a
 non-whitespace character is one command; the block ends at the first line that is
 not one of those, or at the end of the output. On a command line, everything from
 the first `#` is commentary for the adopter and is read by nothing else. The
-command's **target** is a repo-relative script path, so it is the first token
+command's **target** is a repo-relative path, so it is the first token
 containing a `/` — any token before it is the interpreter the line spells — and
 every token after the target beginning with `-` is a flag.
 
@@ -1078,8 +1079,10 @@ rendered and cannot set the verdict. It is left out rather than reported as
 informational on purpose: `doctor` is the adopter's verb, and showing an adopter a
 tool they do not need is an invitation to install it. An **undecided** one — a
 conditional member with no selection to read — is rendered unprobed, as
-`jq           not probed — owed where guard-kit is selected` (or, for
-`registered`, `owed where a registered gate needs it`), and never sets the
+`jq           not probed — owed where guard-kit is selected` (for a kit list,
+`owed where any of context-kit, delegation-kit, … is selected`, the names joined
+by a comma and a space; for `registered`, `owed where a registered gate needs
+it`), and never sets the
 verdict. So **`DOCTOR: clean` is a claim about this machine as a consumer of
 this selection**, not about the machine — which is the narrowing that makes the
 exit status usable as `init`'s precondition, since what `init` needs to know is
@@ -3024,7 +3027,7 @@ and it is why the arm outlives the `jq` preflight it was built around.
 So the arm splits its verbs by what each one actually meets, in this order:
 
 - **`doctor` in a directory with no install** has no selection, so it exits 0 on
-  a host meeting `bash` and `git` and renders `jq` as `not probed`, naming the kit
+  a host meeting `git` and renders `jq` as `not probed`, naming the kit
   that owes it. That kit is read off the line and is the kit the next two
   assertions use, so the harness names no kit and carries no second copy of the
   roster's audience field.
@@ -3066,7 +3069,35 @@ these verbs happen to use, so it cannot fall out of date the way such a list
 would, and the mask is proved in **both** directions: `jq` must resolve to
 nothing, and a control program must still resolve, since a farm that failed to
 populate would fail every verb for a reason that has nothing to do with `jq` and
-pass this arm on the wrong refusal.
+pass this arm on the wrong refusal. The farm is one helper shared with the
+`bash`-less arm below, keyed on the masked program's stem.
+
+**The `bash`-less arm** proves that a profile whose kit set owes no `bash`
+installs and commits on a machine without one. It builds its `PATH` by the same
+absence farm, `bash` masked, and proves the mask both ways. `/bin/sh` is not
+masked: it is the shell git runs hooks with (gate-sdk/SPEC.md §gen-pre-commit).
+The unix bootstrap is itself a bash script (§The install boundary), so the arm
+runs it through the harness's own interpreter named by absolute path; nothing it
+or the binary spawns may find `bash` on `PATH`. In order:
+
+- **`doctor` with no install** exits 0 and renders `bash` as `not probed`, naming
+  the kits that owe it. The profiles whose kit sets share no name with that list
+  are the arm's subjects, read off the line rather than named here, and the
+  lattice minimum must be among them.
+- **At each such profile**, in a fresh consumer: `init --profile` exits 0, each
+  command the follow-up block printed is executed and exits 0 — `--install-hooks`
+  among them, which wires the hooks the next two steps commit through — then one
+  clean commit lands with the pre-commit hook's summary line printed, and one
+  commit planting a home-directory path is refused, the refusing gate read off the
+  hook's own `pre-commit: <gate> failed` line and held to the consumer's registry.
+- **A native Windows host skips the arm**, saying so: git there runs every hook
+  through its bundled shell whatever `PATH` carries, so no `PATH` is bash-less for
+  git, and farming that bundle's `usr/bin` would relocate the runtime library its
+  programs load. `install-smoke-powershell` holds the bash-less commit on that
+  host.
+
+A `bash` lookup anywhere on that path fails the step that made it, and that step's
+message names the command.
 
 **The upgrade arm** drives a cross-version run, because every arm above installs
 at one version and re-runs at that same one. It packs a second tarball a patch

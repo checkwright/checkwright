@@ -45,7 +45,7 @@ macro_rules! roster {
 
 roster! {
     GIT = "git", "";
-    BASH = "bash", "";
+    BASH = "bash", "context-kit+delegation-kit+drift-kit+guard-kit+lifecycle-kit";
     #[cfg(not(unix))]
     DATE = "date", "";
     MKTEMP = "mktemp", "contributor";

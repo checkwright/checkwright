@@ -11786,9 +11786,10 @@ without a red.
 
 ### install-hooks
 
-`bash gate-sdk/bin/run-gates.sh --install-hooks` — or
-`pwsh -File gate-sdk/bin/run-gates.ps1 --install-hooks` on a host without bash on
-`PATH` — is the one-time per-clone opt-in: it sets `core.hooksPath → <hooks-dir>` (and
+The binary's `--install-hooks` arm — reached directly by the path
+`GATE_SDK_NATIVE_BIN` names, which is the spelling `init`'s follow-up block prints
+(installer/SPEC.md §init), or through either front-end — is the one-time per-clone
+opt-in: it sets `core.hooksPath → <hooks-dir>` (and
 `blame.ignoreRevsFile` when `.git-blame-ignore-revs` exists). The wiring is
 hooks-dir granular, so it enables every generated hook (`pre-commit` and, when
 present, `commit-msg`) with no per-hook step. Refuses to point at a nonexistent

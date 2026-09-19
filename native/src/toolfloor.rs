@@ -5,7 +5,7 @@
 // It carries no knob and never did, on that section's own ground, so holding it here rather than in
 // a sourceable file loses no affordance the kit ever offered.
 pub const PROBE_SET: &[&str] = &[
-    "bash:4.3",
+    "bash:4.3::context-kit+delegation-kit+drift-kit+guard-kit+lifecycle-kit",
     "git",
     "jq:::guard-kit",
     "curl:::delegation-kit",
@@ -16,6 +16,13 @@ pub const PROBE_SET: &[&str] = &[
 // spec: context-kit/SPEC.md §bin/env-probe — the two spelled audience values that name no kit
 pub const CONTRIBUTOR: &str = "contributor";
 pub const REGISTERED: &str = "registered";
+// spec: context-kit/SPEC.md §bin/env-probe — a kit-list audience joins its kit names with this
+pub const KIT_JOIN: char = '+';
+
+// spec: context-kit/SPEC.md §bin/env-probe — a kit-valued audience read as its kit names
+pub fn audience_kits(audience: &str) -> Vec<&str> {
+    audience.split(KIT_JOIN).collect()
+}
 
 // spec: context-kit/SPEC.md §bin/env-probe — what a consumer-side reader has selected: the kit set
 // and the registered gate set, each read by one arm of the owed-predicate
@@ -51,7 +58,8 @@ pub fn owed(element: &str, selection: Option<&Selection>) -> Owing {
             crate::gates::needs(g).is_some_and(|reqs| reqs.iter().any(|(p, _)| *p == e.name))
         })
     } else {
-        sel.kits.iter().any(|k| k == audience)
+        let owners = audience_kits(audience);
+        sel.kits.iter().any(|k| owners.contains(&k.as_str()))
     };
     if hit {
         Owing::Owed
@@ -237,17 +245,32 @@ mod tests {
     #[test]
     fn a_conditional_member_is_owed_only_where_the_selection_reaches_it() {
         let base = selection(&["gate-sdk"], &["check-core-files", "check-no-such-gate"]);
-        assert_eq!(owed_names(Some(&base), Owing::Owed), vec!["bash", "git"]);
+        assert_eq!(owed_names(Some(&base), Owing::Owed), vec!["git"]);
+        let prose = selection(&["gate-sdk", "canon-kit"], &[]);
+        assert_eq!(owed_names(Some(&prose), Owing::Owed), vec!["git"]);
         let guarded = selection(&["gate-sdk", "guard-kit"], &[]);
         assert_eq!(owed_names(Some(&guarded), Owing::Owed), vec!["bash", "git", "jq"]);
+        let staged = selection(&["gate-sdk", "lifecycle-kit"], &[]);
+        assert_eq!(owed_names(Some(&staged), Owing::Owed), vec!["bash", "git"]);
         let linted = selection(&["gate-sdk"], &["check-action-run-shell"]);
-        assert_eq!(owed_names(Some(&linted), Owing::Owed), vec!["bash", "git", "shellcheck"]);
-        assert_eq!(owed_names(None, Owing::Undecided), vec!["jq", "curl", "shellcheck"]);
+        assert_eq!(owed_names(Some(&linted), Owing::Owed), vec!["git", "shellcheck"]);
+        assert_eq!(owed_names(None, Owing::Undecided), vec!["bash", "jq", "curl", "shellcheck"]);
         assert_eq!(owed_names(None, Owing::NotOwed), vec!["cargo"]);
     }
 
-    // spec: context-kit/SPEC.md §bin/env-probe — the audience value set is closed: a kit-name value
-    // names a kit root the authoring tree carries, so a misspelling cannot leave every floor
+    // spec: context-kit/SPEC.md §bin/env-probe — a kit list is the union of its names, and a name
+    // that is only a substring of a listed one owes nothing
+    #[test]
+    fn a_kit_list_audience_is_owed_where_any_listed_kit_is_selected() {
+        let e = "tool:::alpha-kit+beta-kit";
+        assert_eq!(owed(e, Some(&selection(&["beta-kit"], &[]))), Owing::Owed);
+        assert_eq!(owed(e, Some(&selection(&["alpha-kit", "gamma-kit"], &[]))), Owing::Owed);
+        assert_eq!(owed(e, Some(&selection(&["alpha", "beta-kit-x"], &[]))), Owing::NotOwed);
+        assert_eq!(owed(e, None), Owing::Undecided);
+    }
+
+    // spec: context-kit/SPEC.md §bin/env-probe — the audience value set is closed: each kit name a
+    // value lists names a kit root the authoring tree carries, so a misspelling cannot leave every floor
     #[test]
     fn every_audience_value_is_closed_over_the_kit_roots() {
         let repo = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -263,7 +286,9 @@ mod tests {
         let offenders: Vec<String> = PROBE_SET
             .iter()
             .map(|e| parse(e).audience)
-            .filter(|a| !a.is_empty() && a != CONTRIBUTOR && a != REGISTERED && !kits.contains(a))
+            .filter(|a| !a.is_empty() && a != CONTRIBUTOR && a != REGISTERED)
+            .flat_map(|a| audience_kits(&a).into_iter().map(String::from).collect::<Vec<_>>())
+            .filter(|k| !kits.contains(k))
             .collect();
         assert!(offenders.is_empty(), "audience values naming no kit root: {:?}", offenders);
     }
