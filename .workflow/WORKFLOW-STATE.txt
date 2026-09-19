@@ -4,12 +4,4 @@
 
 ---
 
-adopter-floor-native-rungs scope a5b9ec10 2026-09-19 e917acfd
-adopter-floor-native-rungs spec a29c9d2a 2026-09-19 27cf4cb1
-adopter-floor-native-rungs align a5e5136c 2026-09-19 5c93ba63
-adopter-floor-native-rungs build ae6d79d2 2026-09-19 86c9714d
-adopter-floor-native-rungs build a5737514 2026-09-19 c11b44b8
-adopter-floor-native-rungs build ae35a808 2026-09-19 1b55f72d
-adopter-floor-native-rungs build a9b889b7 2026-09-19 577c2dcb
-adopter-floor-native-rungs validate ad5c89a4 2026-09-19 37b2f013
-adopter-floor-native-rungs close a3e57722 2026-09-19 5e33cb3c
+— scope a1d7be7e 2026-09-19 83a43866

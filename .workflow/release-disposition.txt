@@ -1,4 +1,3 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
-adopter-floor-native-rungs release deferred:v0.26.0 — minor (a new check-front-end-fail-open gate, a reworked check-gate-substrate-parity assertion F, behavior changes to the hook and floor surfaces, no decommission); no trigger fired: preview channel (elapsed limb dormant), no decommission, no security or supply-chain fix (the digest-producer tightening repairs no vulnerability or compromised artifact), no operator direction, audience not arrived
