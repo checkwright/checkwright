@@ -33,36 +33,7 @@
   Filed 2026-09-05 to the gap inbox at spec and at build's batch 3; promoted 2026-09-19 at
   `adopter-floor-native-rungs`' spec.
 
-- **substrate-parity-audits-one-producer-of-two** [spec: SPEC-release-workflow-set.md] —
-  `check-gate-substrate-parity` assertion F audits one workflow, and `.github/workflows/gates.yml`
-  also builds and hashes a release-shaped artifact. The knob becomes a list, this repo names both
-  workflows, and F counts `sha256sum` only in command position, which the widening needs because
-  four presence-check loops in `gates.yml` read as digests today. Shares assertion F with the debt
-  unit `substrate-parity-digest-assertion-stops-at-the-workflow-text`; the two land together or
-  this one first.
-  **Done-state:** the battery's assertion F reads both workflows clean, and the amendment is merged.
-  Filed 2026-09-08 by close from the gap inbox; promoted 2026-09-19 at this iteration's spec.
-
 ## Technical Debt
-
-- **substrate-parity-digest-assertion-stops-at-the-workflow-text** — assertion F of
-  `check-gate-substrate-parity` reads the publish workflow's own text for the digest producer,
-  and the producer moved out into a called script, so its per-job `computes_digest` count is 0
-  and a second emission added beside the call (0→1) passes clean. gate-sdk/SPEC.md §Consumer
-  payload already states that reach; the enforcement is what is owed.
-  **Done-state:** assertion F follows a `run:` line's called script, so a shared build body sits
-  inside the one-producer-per-digest corpus; a `good/`+`bad/` fixture pair proves it, the
-  §Consumer payload limit clause narrows to match, and the widened refusal set is declared as a
-  tightened gate.
-  **Cost while deferred:** the one-producer rule holds by construction alone; a workflow step
-  re-adding an emission, or a second `sha256sum` in the script, ships green.
-  Filed 2026-09-08 by build to the gap inbox; promoted to Deferred at that close.
-  **Re-verified at promotion (2026-09-19 scope):** both workflows call
-  `scripts/ci-build-artifact.sh` (`publish.yml:146`, `gates.yml:1155`), and the script now
-  carries a `sha256sum`-else-`shasum` pair (`:46-49`), so build must count alternative branches
-  of one emission as one producer, not two. `gates.yml:592` computes a digest inline in a job,
-  which `substrate-parity-audits-one-producer-of-two` owns.
-  Joins this iteration by operator direction (2026-09-19, lead-relayed).
 
 ## Deferred
 
@@ -3025,6 +2996,8 @@
 
 ## Done
 
+- substrate-parity-audits-one-producer-of-two
+- substrate-parity-digest-assertion-stops-at-the-workflow-text
 - floor-jq-guard-lib
 - kit-token-anchor-hook-for-divergence
 
