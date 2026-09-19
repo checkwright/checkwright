@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+posix-install-bootstrap release deferred:v0.26.0 — minor, floored by the outstanding deferral (behavior changes: the POSIX sh unix bootstrap, the versioned per-target Release archive replacing the flat binary pair, init --dry-run plan parity, the unclaimed re-seed; the asset rename is a pre-1.0 non-decommission break, so it rides the minor); no trigger fired: preview channel (elapsed limb dormant), no decommission, no security or supply-chain fix (the versioned archive repairs no vulnerability or compromised artifact), no operator direction, audience not arrived
