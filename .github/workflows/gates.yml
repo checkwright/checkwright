@@ -1332,9 +1332,7 @@ jobs:
           for t in awk sed sort grep find tar; do
             printf '%-6s %s\n' "$t" "$("$t" --version 2>&1 | head -n1)"
           done
-          echo "== the install path's own GNU-only constructs, probed not reasoned about =="
-          printf '1.2.3\n1.10.0\n' | sort -V; echo "sort -V exited $?"
-          realpath --relative-to=/ /usr/bin; echo "realpath --relative-to exited $?"
+          echo "== the construct the install path refuses to use, probed not reasoned about =="
           # The construct the install path refuses to use — `installer/bin/checkwright.sh`
           # strips the starting-point prefix in the loop instead — kept here as the
           # measurement that says whether refusing it was necessary on this host. A non-zero is the BSD refusal the fix was for; a zero means this
@@ -1643,9 +1641,6 @@ jobs:
           for t in awk sed sort grep find tar; do
             printf '%-6s %s\n' "$t" "$("$t" --version 2>&1 | head -n1)"
           done
-          echo "== the install path's own GNU-only constructs, probed not reasoned about =="
-          printf '1.2.3\n1.10.0\n' | sort -V; echo "sort -V exited $?"
-          realpath --relative-to=/ /usr/bin; echo "realpath --relative-to exited $?"
           echo "== rust =="
           rustc -vV
           echo "== git =="
@@ -1833,9 +1828,6 @@ jobs:
           for t in awk sed sort grep find tar; do
             printf '%-6s %s\n' "$t" "$("$t" --version 2>&1 | head -n1)"
           done
-          echo "== the install path's own GNU-only constructs, probed not reasoned about =="
-          printf '1.2.3\n1.10.0\n' | sort -V; echo "sort -V exited $?"
-          realpath --relative-to=/ /usr/bin; echo "realpath --relative-to exited $?"
           echo "== libc, the question the installer's own selection step now asks =="
           getconf GNU_LIBC_VERSION; echo "getconf GNU_LIBC_VERSION exited $?"
           ldd --version 2>&1 | head -n1; echo "ldd --version exited $?"

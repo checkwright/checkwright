@@ -55,23 +55,6 @@
   close drain. Owner lookup: `guard_skeleton`, `Declares`, `inert class`, `skeleton call` —
   none.
 
-- **adopter-floor-gnu-date-and-awk-unheld** [cost: event/low] [surface: .github] — no CI leg runs the
-  adopter floor on mawk or BusyBox awk, so `native-spawn-floor`'s narrowing of the awk member to
-  unconstrained is held by the site census, not by an execution. Both binding macOS install-smoke
-  legs run it on BSD awk since `macos-adopter-legs-brew-gawk` (Done), re-verified at that close's
-  push with the probe resolving `awk` to `/usr/bin/awk` and `gawk` missing.
-  **Re-verified at the drain:** a grep of `.github/workflows` for mawk, BusyBox, nawk or
-  original-awk returns nothing.
-  **Why design-pending:** a non-GNU awk leg is a CI-cost call against a claim no shipped construct
-  currently breaks.
-  **Cost while deferred:** the next GNU-only awk construct to ship reds nothing.
-  **The slug outlives its `date -d` half,** split out at `native-spawn-residue`'s scope as
-  `gnu-date-spawn-retired` (operator direction, 2026-09-18, lead-relayed), landed there — civil
-  dates are read in-process and no `date -d` spawn remains; only the awk half stays.
-  Filed 2026-09-18 to the gap inbox at `native-spawn-floor`'s spec, promoted at its close drain.
-  Owner lookup: `coreutils`, `PROBE_SET`, `mawk`, `awk::GNU` — matched
-  `macos-adopter-package-set-copied-per-leg` (brew set copying, distinct).
-
 - **residency-roster-template-reach-ungated** [cost: event/low] [surface: context-kit] —
   nothing asserts the roster↔template relation context-kit/SPEC.md §The consumer footprint rules:
   an obligation whose bound actor is any session is carried at the consumer's resident tier and is
@@ -3399,5 +3382,6 @@
 - objective-6-guard-hook-twin-unruled
 - adopter-floor-collapse-rung-unqueued
 - glob-knob-walkers-unpruned
+- adopter-floor-gnu-date-and-awk-unheld
 
 ## Lessons Learned
