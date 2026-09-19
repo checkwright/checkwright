@@ -2812,6 +2812,19 @@
   Filed 2026-09-19 to the gap inbox by build batch 1 of `adopter-floor-conditional-members`;
   promoted at its close because the fix changes a CI oracle only a pushed run can prove.
 
+- **hasher-shasum-fallback-unexercised** [cost: event/low] [surface: installer] — the bootstrap
+  (`installer/bin/checkwright.sh`) and the consumer smoke (`installer/consumer-smoke/run-smoke.sh`)
+  try `sha256sum` and fall back to `shasum -a 256`, but both macOS runner images ship
+  `/sbin/sha256sum` (the gates run's runner probe), so no CI leg reaches the fallback branch.
+  **Probed at promotion:** `scripts/ci-build-artifact.sh` carries the same fallback, equally
+  unreached.
+  **Deliverable:** a leg or smoke arm that hides `sha256sum` from `PATH` and proves the `shasum`
+  branch verifies a digest end to end, on a pushed run.
+  **Cost while deferred:** a stock macOS older than 15 takes the branch unproven, at the one step
+  that verifies the binary before it runs.
+  Filed 2026-09-19 to the gap inbox at `adopter-floor-conditional-members`' close push; promoted at
+  the next scope. Owner lookup: `shasum`, `hasher`, `sha256sum` — no entry matched.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
