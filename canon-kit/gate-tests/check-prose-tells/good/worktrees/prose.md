@@ -1,0 +1,17 @@
+# Sample Page
+
+Prose naming the `<!-- roster:begin -->` marker inline opens no generated region, so every tell below still counts.
+
+## First section
+
+It's worth noting that the pipeline runs green — every time — without fail — really, and XYZ is leaned on throughout while the reader never learns what XYZ stands for.
+
+The result is not slow — it's correct. The design is not clever, but it's plainly clear. Two contrast turns land inside one section.
+
+The gate runs fast. The gate blocks bugs. The gate reports sins. The gate exits clean.
+
+We ship the alpha, the beta, and the gamma. We test the north, the south, and the east. We log the red, the green, and the blue.
+
+## Second section
+
+Suffice it to say the consumer's own throat-clearing phrase trips the same assertion the bundled set does, because the gate reads the union of both.

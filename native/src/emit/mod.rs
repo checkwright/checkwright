@@ -187,6 +187,8 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Emit(close_surfaces::emit),
         &[
             "GATE_SDK_KIT_DIRS",
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
             "LIFECYCLE_KIT_ROSTER_BASENAME",
             "LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS",
             "GATE_SDK_WORKFLOW_DIR",

@@ -164,9 +164,26 @@ if [[ "$rc" -ne 1 ]] || ! grep -qF "passed at the iteration start" <<<"$out"; th
     echo "  FAIL: the knob-resolved state file did not arm the flip assertion (exit $rc): $out"; fails=$((fails + 1))
 fi
 
+# K — a scenario glob's `**` reaches a scenario under gate-tests/, a prune-set member,
+#     so the set-equality arm reds on a scenario there that no baseline line names.
+_prune_cfg() {
+    local d="$tmp/prunereach"; mkdir -p "$d/scripts" "$d/kit/gate-tests"
+    printf 'EVIDENCE_KIT_SCENARIO_GLOBS[sx] = **/*.test.sh\n' >"$d/scripts/evidence-config.knobs"
+    : >"$d/kit/gate-tests/a.test.sh"; : >"$d/kit/gate-tests/b.test.sh"
+    printf '# fixture\nsx a.test.sh pass\n' >"$d/base.txt"
+    ( cd "$d" && unset EVIDENCE_KIT_KNOB_FILE \
+        && gate_env GATE_SDK_GATES_DIR=scripts \
+        && gate_run check-evidence-baseline "$DIR/checks" base.txt 2>&1 )
+}
+if out="$(_prune_cfg)"; then
+    echo "  FAIL: a scenario under gate-tests/ was not reached by the scenario glob: $out"; fails=$((fails + 1))
+elif ! grep -qF "b.test.sh" <<<"$out"; then
+    echo "  FAIL: the unreached-scenario case reddened on the wrong finding: $out"; fails=$((fails + 1))
+fi
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-evidence-baseline.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-evidence-baseline.test: ok (done-stale + unknown + pass-with-slug + coverage-gap rejected; live-slug + permanent-marker accepted; no-suites disarms, unresolvable suites fail closed; flip assertion over positional and knob state)"
+echo "check-evidence-baseline.test: ok (done-stale + unknown + pass-with-slug + coverage-gap rejected; live-slug + permanent-marker accepted; no-suites disarms, unresolvable suites fail closed; a scenario under a pruned directory reached; flip assertion over positional and knob state)"
 exit 0

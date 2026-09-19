@@ -252,6 +252,8 @@ pub fn run(args: &[String]) -> i32 {
 
     for (suite, glob) in &globs {
         let parts: Vec<String> = glob.split_whitespace().map(String::from).collect();
+        // spec: evidence-kit/SPEC.md §check-evidence-baseline — unpruned: a suite's scenarios
+        // live under `gate-tests/`, a prune-set member
         let files = match walk::glob_files(Path::new("."), &parts) {
             Ok(f) => f,
             Err(e) => {

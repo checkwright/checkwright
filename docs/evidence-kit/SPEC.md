@@ -799,6 +799,17 @@ defect in the keyed read would pass it; the non-empty arm is exercised by the
 coverage case in this gate's own behavioral test, which is therefore the
 load-bearing evidence for it rather than an extra scenario.
 
+**A scenario glob expands unpruned, because its corpus lives where the prune set
+points.** A suite's scenarios are its test cases, and a kit keeps those in its
+tests directory, which the default prune set carries (gate-sdk/SPEC.md §Layout
+and configuration); bounding the `**`
+descent by the prune set, as gate-sdk/SPEC.md §The port-candidate criteria has
+every other corpus reader do, would drop each scenario a `**` glob reaches through
+that directory and red the set-equality arm on a tree with nothing wrong in it.
+The cost is the race that rule exists for: a `**` glob here stats every entry of a
+build directory it descends into, and a build deleting one mid-walk is exit 2. A
+glob whose first component is literal never descends into one.
+
 **The suite-coverage arm is a derived obligation and not a maintained roster,
 which is the whole of its justification.** Nothing in the gate enumerates
 suites — the roster is the configured one, so a suite added there acquires the

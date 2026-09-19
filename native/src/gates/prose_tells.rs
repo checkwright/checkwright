@@ -453,7 +453,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let globs = walk::knob_array("CANON_KIT_PROSE_TELL_GLOBS")?;
     let mut files: Vec<String> = Vec::new();
     if !globs.is_empty() {
-        for p in walk::glob_files(Path::new(root), &globs)? {
+        for p in walk::glob_corpus(Path::new(root), &globs)? {
             files.push(p.display().to_string());
         }
     }

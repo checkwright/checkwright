@@ -154,7 +154,7 @@ pub fn derive(args: &[String]) -> Result<Roster, String> {
         }
     }
     let globs = walk::knob_array("LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS")?;
-    for p in walk::glob_files(Path::new(&base), &globs)? {
+    for p in walk::glob_corpus(Path::new(&base), &globs)? {
         add_surface(&mut surfaces, relativize(&base, &p));
     }
 

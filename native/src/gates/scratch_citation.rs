@@ -152,7 +152,7 @@ pub fn run(args: &[String]) -> i32 {
     }
     let tchars: Vec<Vec<char>> = targets.iter().map(|t| t.chars().collect()).collect();
 
-    let files: Vec<String> = match walk::glob_files(Path::new("."), &globs) {
+    let files: Vec<String> = match walk::glob_corpus(Path::new("."), &globs) {
         Ok(v) => v
             .into_iter()
             .map(|p| spec::strip_dot_slash(&p.display().to_string()))

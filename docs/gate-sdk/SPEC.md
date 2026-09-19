@@ -4729,6 +4729,20 @@ that answers each is the one whose corpus matches its question.
    as a mandate to substitute a globstar matcher for the whole predicate flips
    verdicts on the live registry (§check-graph). Stated because this is the first
    ruling a porting session finds and it is the wrong one for such a reader.
+
+   **A reader that reads a corpus prunes the `**` descent; bash's expansion
+   does not.** Such a reader expands a consumer's glob through `walk::glob_corpus`,
+   whose `**` never descends into a directory the prune set (§lib/gate.sh) names,
+   while a literal component still reaches one a glob names outright. The ground
+   is a race, not taste: an unpruned `**` stats every entry under `target/`, and
+   a build running beside the battery deletes entries there between the listing
+   and the stat, which is a fail-closed exit 2 on a clean tree. A reader whose
+   corpus lives inside a pruned directory by layout states so at its own section
+   (evidence-kit/SPEC.md §check-evidence-baseline). `spec::manifest_files`'
+   configured globs apply no prune set yet: narrowing a corpus that many readers
+   share is canon-kit's to rule (canon-kit/SPEC.md §The shared spec adapters).
+   `walk::glob_files` stays bash-faithful for a reader resolving
+   roots rather than reading a corpus, and a single-level glob never descends.
 7. **Its rule invokes no external program the payload does not carry.** *Found
    at first-cohort selection.* The programs the payload is entitled to assume are
    `GATE_SDK_PROGRAM_FLOOR` (§lib/gate.sh); git is on it as the one sanctioned

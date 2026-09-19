@@ -171,7 +171,7 @@ fn surface_files(root: &Path, knob: &str) -> Result<Vec<PathBuf>, String> {
     if globs.is_empty() {
         return Ok(Vec::new());
     }
-    walk::glob_files(root, &globs).map_err(|e| {
+    walk::glob_corpus(root, &globs).map_err(|e| {
         format!(
             "{} — the check could not run; treating as failure (not clean)",
             e

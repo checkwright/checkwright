@@ -14,32 +14,6 @@
 
 ## Technical Debt
 
-- **glob-knob-walkers-unpruned** — `walk::glob_files` stays bash-faithful and unpruned, so a
-  gate whose consumer-configured glob knob carries a leading `**` (`measured_claim`,
-  `unmarked_claim`, `prose_tells`, `queue_slug_liveness`, and the `registry.rs` corpus-knob walk)
-  stats every entry under `target/`, and a cargo build running
-  beside the battery can delete one between listing and stat: a fail-closed exit 2 on a clean
-  tree. `check-comment-tier`'s configured branch had the same race, attested once in CI, and now
-  expands through `walk::glob_files_pruned` (canon-kit/SPEC.md §check-comment-tier).
-  **Done-state:** each such caller either expands through `glob_files_pruned` with the prune set
-  (gate-sdk/SPEC.md §Layout and configuration, `GATE_SDK_PRUNE_DIRS`) or states why its corpus
-  must reach a pruned directory, and each carries a behavioral case.
-  **Why not fixed at filing:** pruning narrows each reader's corpus, so each reader's red condition
-  has to be enumerated first, the same design-pending shape as
-  `manifest-files-configured-branch-unpruned`.
-  **Cost while deferred:** none in this repo. At close on 2026-09-19 the only `**` in
-  `scripts/*.knobs` was `CANON_KIT_COMMENT_SURFACE`, which is already fixed. A consumer that
-  configures `**` on one of these knobs meets an intermittent red. (inferred: no red observed on
-  these gates yet)
-  Filed 2026-09-19 to the gap inbox by `windows-adopter-path`'s validate hotfix; promoted at its
-  close. Owner lookup: `glob_files`, `glob_files_pruned`, `prune`, `native/target`. It matched
-  `manifest-files-configured-branch-unpruned`, which is a sibling on the manifest adapter and not
-  this finding, and the iceboxed `prune-set-*` entries, which are unrelated.
-  **Re-verified at promotion (2026-09-19, `adopter-floor-collapse` scope):** the five named callers
-  still reach `walk::glob_files`; other callers take configured globs too (`spec.rs`,
-  `close_surfaces.rs`, `scratch_citation.rs`), so the roster above is a lower bound and build
-  enumerates it from the call sites.
-
 ## Deferred
 
 - **inferred-marker-malformed-placement-passes-unseen** [cost: event/low] [surface: lifecycle-kit]
@@ -3402,5 +3376,6 @@
 
 - objective-6-guard-hook-twin-unruled
 - adopter-floor-collapse-rung-unqueued
+- glob-knob-walkers-unpruned
 
 ## Lessons Learned

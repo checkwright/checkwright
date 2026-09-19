@@ -821,6 +821,14 @@ pub fn glob_files_pruned(
     Ok(out)
 }
 
+// spec: gate-sdk/SPEC.md §The port-candidate criteria — a corpus reader's expansion of a
+// consumer's glob: the prune set bounds the `**` descent, and a literal component still reaches a
+// pruned directory the glob names outright
+pub fn glob_corpus(root: &Path, globs: &[String]) -> Result<Vec<PathBuf>, String> {
+    let prune = prune_dirs()?;
+    glob_files_pruned(root, globs, &|n| prune.iter().any(|d| d == n))
+}
+
 fn expand(
     base: &Path,
     comps: &[&str],

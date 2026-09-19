@@ -400,6 +400,8 @@ pub const REGISTRY: &[GateEntry] = &[
         measured_claim::run,
         &[(".", "glob:knob:CANON_KIT_MEASURED_SURFACE_GLOBS", "", "")],
         &[
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
             "CANON_KIT_MEASURED_CLAIMS_CMD",
             "CANON_KIT_MEASURED_SURFACE_GLOBS",
         ],
@@ -499,6 +501,8 @@ pub const REGISTRY: &[GateEntry] = &[
         unmarked_claim::run,
         &[(".", "glob:knob:CANON_KIT_MEASURED_SURFACE_GLOBS", "", "")],
         &[
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
             "CANON_KIT_CLAIM_CLASSES_CMD",
             "CANON_KIT_MEASURED_SURFACE_GLOBS",
         ],
@@ -661,6 +665,8 @@ pub const REGISTRY: &[GateEntry] = &[
         prose_tells::run,
         &[(".", "glob:knob:CANON_KIT_PROSE_TELL_GLOBS", "", "")],
         &[
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
             "CANON_KIT_PROSE_TELL_GLOBS",
             "CANON_KIT_PROSE_TELL_PHRASES",
             "CANON_KIT_PROSE_TELL_PHRASES_EXTRA",
@@ -924,6 +930,8 @@ pub const REGISTRY: &[GateEntry] = &[
             (".", "glob:knob:QUEUE_KIT_CITATION_SURFACE_GLOBS", "", ""),
         ],
         &[
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
             "QUEUE_KIT_QUEUE_FILE",
             "QUEUE_KIT_PROSE_SURFACE_GLOBS",
             "QUEUE_KIT_CITATION_SURFACE_GLOBS",
@@ -1128,6 +1136,8 @@ pub const REGISTRY: &[GateEntry] = &[
         &[("?", "", "", "dynamic@src/emit/close_surfaces.rs:157 via emit::close_surfaces::derive")],
         &[
             "GATE_SDK_KIT_DIRS",
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
             "LIFECYCLE_KIT_ROSTER_BASENAME",
             "LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS",
             "GATE_SDK_WORKFLOW_DIR",
@@ -1220,6 +1230,8 @@ pub const REGISTRY: &[GateEntry] = &[
         scratch_citation::run,
         &[(".", "glob:knob:LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS", "", "")],
         &[
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
             "LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS",
             "LIFECYCLE_KIT_STATE_FILE",
             "LIFECYCLE_KIT_LESSON_EVIDENCE_FILE",
@@ -2577,6 +2589,7 @@ mod tests {
         "find_with_prune",
         "find_link_entries_with_prune",
         "glob_files",
+        "glob_corpus",
         "manifest_files",
         "manifest_files_sorted_stripped",
         "canonical_specs",

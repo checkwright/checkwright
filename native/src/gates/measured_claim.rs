@@ -41,7 +41,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
     let roster = spec::measured_claims()?;
 
-    let mut files: Vec<String> = walk::glob_files(Path::new(root), &globs)?
+    let mut files: Vec<String> = walk::glob_corpus(Path::new(root), &globs)?
         .into_iter()
         .filter(|p| p.is_file())
         .map(|p| spec::strip_dot_slash(&p.display().to_string()))

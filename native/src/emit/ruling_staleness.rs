@@ -7,13 +7,15 @@ use std::path::Path;
 
 const WS: [char; 5] = [' ', '\t', '\x0b', '\x0c', '\r'];
 
-// spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — the declared roster;
-// all three default empty or inert kit-side, so an adopter keeping no ruling record reaches a
-// configured-off report rather than a broken arm.
+// spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — the declared roster; the arm's own
+// knobs default empty or inert kit-side, so an adopter keeping no ruling record reaches a
+// configured-off report rather than a broken arm, and the prune set bounds the citer walk.
 pub const KNOBS: &[&str] = &[
     "LIFECYCLE_KIT_RULING_RECORD",
     "LIFECYCLE_KIT_RULING_CITERS",
     "LIFECYCLE_KIT_RULING_ORACLE_TIMEOUT",
+    "GATE_SDK_PRUNE_DIRS",
+    "GATE_SDK_PRUNE_EXTRA_DIRS",
 ];
 
 // spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — the deliberately weak, FP-bearing prose
@@ -321,7 +323,7 @@ fn manual_prose(oracle: &str) -> Option<String> {
 fn cite_corpus(base: &str, record: &str) -> Result<Vec<String>, String> {
     let globs = walk::knob_array("LIFECYCLE_KIT_RULING_CITERS")?;
     let mut out: Vec<String> = Vec::new();
-    for p in walk::glob_files(Path::new(base), &globs)? {
+    for p in walk::glob_corpus(Path::new(base), &globs)? {
         let s = p.display().to_string();
         let rel = s
             .strip_prefix(&format!("{}/", base))
@@ -619,6 +621,37 @@ mod tests {
         assert_eq!(holes.len(), 1);
         assert_eq!(holes[0].line, 1);
         assert!(malformed(text).is_empty());
+    }
+
+    // spec: gate-sdk/SPEC.md §The port-candidate criteria — the citer glob's `**` never descends
+    // into a pruned directory, and a literal component still reaches one named outright
+    #[test]
+    fn the_citer_walk_prunes_its_descent_and_keeps_a_named_pruned_directory() {
+        let knobs = crate::knobenv::lock();
+        let dir = std::env::temp_dir().join(format!("cw-ruling-prune.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        for sub in ["cfg", "notes", "worktrees", "target/deep"] {
+            std::fs::create_dir_all(dir.join(sub)).unwrap();
+        }
+        for f in ["notes/a.md", "worktrees/b.md", "target/deep/c.md"] {
+            std::fs::write(dir.join(f), "cites\n").unwrap();
+        }
+        std::fs::write(
+            dir.join("cfg/lifecycle-config.knobs"),
+            "LIFECYCLE_KIT_RULING_CITERS[] = **/*.md\nLIFECYCLE_KIT_RULING_CITERS[] = worktrees/*.md\n",
+        )
+        .unwrap();
+        knobs.set("GATE_SDK_GATES_DIR", &dir.join("cfg").display().to_string());
+        knobs.remove("LIFECYCLE_KIT_KNOB_FILE");
+        crate::knobs::reset(&knobs);
+        let got = cite_corpus(&dir.display().to_string(), "record.md");
+        knobs.remove("GATE_SDK_GATES_DIR");
+        crate::knobs::reset(&knobs);
+        let _ = std::fs::remove_dir_all(&dir);
+        assert_eq!(
+            got.expect("the citer walk failed"),
+            vec!["notes/a.md".to_string(), "worktrees/b.md".to_string()]
+        );
     }
 
     // spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — escalation-only, proved rather than

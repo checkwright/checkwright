@@ -43,7 +43,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         println!("UNMARKED-CLAIM: clean (CANON_KIT_MEASURED_SURFACE_GLOBS empty — no scanned surface)");
         return Ok(0);
     }
-    let mut files: Vec<String> = walk::glob_files(Path::new(root), &globs)?
+    let mut files: Vec<String> = walk::glob_corpus(Path::new(root), &globs)?
         .into_iter()
         .filter(|p| p.is_file())
         .map(|p| spec::strip_dot_slash(&p.display().to_string()))
