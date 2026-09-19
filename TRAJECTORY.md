@@ -81,8 +81,11 @@ exception recorded for it. The objectives above qualify under the first two arms
 digest-verified prebuilt payload is trust work), so a scope session weighs their
 rungs' ordering, never their admissibility. It admits an explicit operator
 exception, carried with its reason on the queue entry it admits. Grounds: the
-bottleneck is observed external installs, not internal completeness. Refused: keeping the rule on the local-only brief, where it bound scope
-through an untracked read and nothing ever checked its discharge.
+project is exposed to adopters only once the queue's Deferred section is
+near-empty — the Icebox is not counted — and a reported issue can be answered;
+new capability breeds new gaps, so it stays out while that section drains.
+Refused: keeping the rule on the local-only brief, where it bound scope through
+an untracked read and nothing ever checked its discharge.
 discharge: enhancement-admission-filter  manual five external installs have been observed
 ruling: the enhancement admission filter  the unlaunched enhancement rule
 
