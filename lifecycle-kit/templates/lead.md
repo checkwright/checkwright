@@ -317,7 +317,9 @@ attention that ranks both.
 **One class the lead never rules, under either posture.** Reversing, demoting
 or re-scoping a **recorded operator ruling** or a stated objective is
 operator-class: the lead relays it, however well-grounded the escalating
-session's finding and however urgent the fix.
+session's finding and however urgent the fix. Nor does it decline a
+threshold-proposed entry that scope's escalation marks operator-routed. That
+entry has been declined twice, and it is relayed.
 
 ## Channel design
 

@@ -5183,6 +5183,18 @@ surface costs one more dispatch batch, where a further iteration costs another
 stage walk (templates/lead.md §Economics). The arm is a cross-kit citation, not a
 dependency: a consumer without drift-kit gets no figure, and the line says so.
 
+The recurrence override counts two different things for two different decisions.
+The dates on `recurrence:` decide when an entry is proposed; the declines of that
+proposal decide who may refuse it. Lead discretion is bounded at two declines so a
+counted recurrence cannot be deferred forever by the party it was escalated to: a
+third routes to the operator. Declines are prose on the entry, with date and
+ruling party, rather than a declaration with a grammar, because the scope session
+composing the next escalation is their only reader and it already reads the
+entry's grounds. **The honest limit:** the operator-routed mark travels on the
+message channel, so no gate observes that a lead relayed it rather than ruled it.
+The clause was once breached, a lead ruling a third decline, while it lived only in
+a queue entry and no template carried it.
+
 The `validate` template commits a repair before the suite roster starts or
 resumes: a suite asserting a clean worktree against the real checkout reads an
 uncommitted repair as the failure of the leg it guards, whose failure text names

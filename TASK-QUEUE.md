@@ -12,16 +12,6 @@
 
 ## New Features
 
-- **threshold-recurrence-routing-residency** [spec: SPEC-threshold-routing.md] — the
-  threshold-recurrence routing clause, *"a third threshold recurrence routes to the operator, not to
-  a third decline; two is where lead discretion ends"*, lives only in this entry.
-  **Ruled at spec:** it lands in scope.md's threshold paragraph, which it completes, with the count
-  read as declines of a threshold-proposed entry recorded on the entry. lead.md's routing carve-out
-  relays an operator-routed entry. The clause was ruled general at the 2026-08-19 scope under
-  the 2026-08-17 operator ruling that gave the home decision to scope; breached once, 2026-09-04.
-  Filed 2026-08-18 by close from the gap inbox. Joins `lifecycle-contract-drain` by operator
-  direction (2026-09-19, lead-relayed): clause home.
-
 - **push-budget-unshipped** [spec: SPEC-push-owner.md] — the push budget lives only in this repo's
   CLAUDE.md, where no kit surface reads it and no adopter is prompted to set one.
   **Ruled at spec:** a close.md `push-budget` slot, not a knob, because §The state machine already
@@ -3157,5 +3147,6 @@
 
 - scope-unit-set-ignores-deferred-inflow
 - stage-commit-subject-scope-unowned
+- threshold-recurrence-routing-residency
 
 ## Lessons Learned

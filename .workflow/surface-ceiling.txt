@@ -21,12 +21,12 @@
 54 drift-kit/templates/economics.md
 68 guard-kit/templates/close-triage.md
 69 lifecycle-kit/templates/consult.md
-605 lifecycle-kit/templates/lead.md
+607 lifecycle-kit/templates/lead.md
 33 lifecycle-kit/templates/release-sweep.md
 105 lifecycle-kit/templates/stages/align.md
 121 lifecycle-kit/templates/stages/build.md
 297 lifecycle-kit/templates/stages/close.md
-251 lifecycle-kit/templates/stages/scope.md
+254 lifecycle-kit/templates/stages/scope.md
 134 lifecycle-kit/templates/stages/spec.md
 95 lifecycle-kit/templates/stages/validate.md
 41 lifecycle-kit/templates/upgrade.md

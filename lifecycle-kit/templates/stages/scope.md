@@ -102,7 +102,10 @@ a number to sanity-check first. It is scoped to deferred entries
 because promotion is the decision it forces; an entry already active is being
 built. **The collision is decided, not resolved in the theme's favour**: the rule
 does not promote, it puts the unit in front of the authority this stage already
-escalates to.
+escalates to. A decline of such an entry is written on the entry, with its date
+and who ruled it. An entry already declined twice is escalated as
+operator-routed: a third threshold recurrence routes to the operator, not to a
+third decline, because two is where lead discretion ends.
 
 **Rank the pool by what deferral costs and what landing buys, in this order,
 before composing.** The board's deferred rows carry each entry's `[cost:]` class
