@@ -12,16 +12,6 @@
 
 ## New Features
 
-- **fail-open-arm-status-second-source** [spec: SPEC-fail-open-set.md] — both front-end stubs hold
-  the fail-open arm set (`--hook`, `--statusline`) as a two-name test, and nothing holds it to the
-  arms' contracts. The crate declares the set beside the arm table, each stub holds it on one
-  declaration line, and a new native gate, `check-front-end-fail-open`, holds both copies to the
-  declaration.
-  **Done-state:** the gate is registered and green, its fixture pair reds each direction in each
-  dialect, and the amendment is merged.
-  Filed 2026-09-05 to the gap inbox at spec and at build's batch 3; promoted 2026-09-19 at
-  `adopter-floor-native-rungs`' spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -2990,5 +2980,6 @@
 - floor-jq-guard-lib
 - kit-token-anchor-hook-for-divergence
 - floor-bash-hooks-front-end
+- fail-open-arm-status-second-source
 
 ## Lessons Learned
