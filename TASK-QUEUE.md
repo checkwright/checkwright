@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: adopter-floor-native-rungs
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,25 @@
 ## New Features
 
 ## Technical Debt
+
+- **substrate-parity-digest-assertion-stops-at-the-workflow-text** — assertion F of
+  `check-gate-substrate-parity` reads the publish workflow's own text for the digest producer,
+  and the producer moved out into a called script, so its per-job `computes_digest` count is 0
+  and a second emission added beside the call (0→1) passes clean. gate-sdk/SPEC.md §Consumer
+  payload already states that reach; the enforcement is what is owed.
+  **Done-state:** assertion F follows a `run:` line's called script, so a shared build body sits
+  inside the one-producer-per-digest corpus; a `good/`+`bad/` fixture pair proves it, the
+  §Consumer payload limit clause narrows to match, and the widened refusal set is declared as a
+  tightened gate.
+  **Cost while deferred:** the one-producer rule holds by construction alone; a workflow step
+  re-adding an emission, or a second `sha256sum` in the script, ships green.
+  Filed 2026-09-08 by build to the gap inbox; promoted to Deferred at that close.
+  **Re-verified at promotion (2026-09-19 scope):** both workflows call
+  `scripts/ci-build-artifact.sh` (`publish.yml:146`, `gates.yml:1155`), and the script now
+  carries a `sha256sum`-else-`shasum` pair (`:46-49`), so build must count alternative branches
+  of one emission as one producer, not two. `gates.yml:592` computes a digest inline in a job,
+  which `substrate-parity-audits-one-producer-of-two` owns.
+  Joins this iteration by operator direction (2026-09-19, lead-relayed).
 
 ## Deferred
 
@@ -138,6 +157,7 @@
   **Cost while deferred:** bash stays a floor member on every platform, macOS's stock 3.2
   included, which needs the Homebrew remedy.
   Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 4a, by operator direction.
+  Joins this iteration by operator direction (2026-09-19, lead-relayed): the lead unit.
 
 - **floor-jq-guard-lib** [cost: event/high] [surface: guard-kit] — guard-kit's `lib/guard.sh`
   spawns `jq` at seven sites plus one presence probe, so `jq` stays on every guard-kit adopter's
@@ -150,6 +170,8 @@
   **Cost while deferred:** `jq` cannot leave the floor for any guard-kit adopter.
   Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 4b; mechanism from the
   concurrent objective-1 consult, lead-relayed.
+  Joins this iteration by operator direction (2026-09-19, lead-relayed); its code-location and
+  per-call spawn-latency questions ride in unruled, spec's to settle or escalate.
 
 - **stamp-subject-merge-carve-out-unruled** [cost: event/low] [surface: lifecycle-kit] —
   `check-stamp-subject` reds a commit adding stamp lines under git's own `Merge …` subject, which
@@ -200,6 +222,7 @@
   vendors at the root) and asks `--for` what a path triggers: a silently wrong answer.
   Filed 2026-09-15 to the gap inbox from the git-hooks port's sandbox byte-parity proof; promoted
   at `owed-port-tail`'s close.
+  Joins this iteration by operator direction (2026-09-19, lead-relayed): 4a's hook generator.
 
 - **gate-tamper-default-library-path-unvendored** [cost: event/low] [surface: delegation-kit] — the kit
   default of `DELEGATION_KIT_GATE_FILES` (`native/src/knobs/delegation_kit.rs`,
@@ -600,6 +623,7 @@
   Filed 2026-09-08 by close from the gap inbox. Promoted rather than fixed because a knob-arity
   change is adopter-facing design; promoted rather than iceboxed because the second producer is
   live in the tree today.
+  Joins this iteration by operator direction (2026-09-19, lead-relayed): assertion F's pair.
 
 - **held-ci-leg-failure-reddens-a-binding-one** [cost: event/high] [surface: .github] — a held producer leg's failure
   fails the workflow through a binding consumer leg, so held-ness is defeated for the pair, and the
@@ -2407,6 +2431,7 @@
   Filed 2026-09-05 to the gap inbox at spec and again at build's batch 3; promoted at this close.
   Deferred and not active on scope's composition test, re-grounded 2026-09-11: no iteration
   since has shared its surface.
+  Joins this iteration by operator direction (2026-09-19, lead-relayed): 4a's front-end.
 
 - **kit-spec-seam-content-half-unswept** [cost: event/high] [surface: gate-sdk] — the provenance seam has two halves and
   the sweep that ran carried a discriminator for only one, so gate-sdk/SPEC.md is swept of private
@@ -2438,33 +2463,6 @@
   vendors the copy. Product-class.
   Surfaced 2026-09-05 by build batch A's provenance census, which flagged both and deliberately
   edited neither; drained here with both instances re-verified live.
-
-- **substrate-parity-digest-assertion-stops-at-the-workflow-text** [cost: event/high] [surface: gate-sdk] — assertion F
-  reads the publish workflow's own text for the digest producer, and the producer moved out into a
-  called script.
-  **Re-probed at this drain, and it fell harder than it was filed.** `grep -n sha256sum
-  .github/workflows/publish.yml` returns one hit, `:209`, and that is the release job's **tarball**
-  digest rather than the gate binary's; `grep -n sha256sum scripts/ci-build-artifact.sh` returns
-  `:44-45`. So the build job's per-job `computes_digest` count
-  (`native/src/gates/gate_substrate_parity.rs:285-299`, read at `:708-715`) is now **0** and not 1 —
-  which means the case the assertion used to catch, a second emission added beside the first at
-  1→2, is now 0→1 and passes clean. The filed bullet said the case was no longer caught; the count
-  is why.
-  **The honest half landed at this close and is NOT what stays deferred.** gate-sdk/SPEC.md
-  §Consumer payload claimed the rule was "held mechanically by §check-gate-substrate-parity
-  assertion F rather than by review" and stopped there; that clause now states the assertion's
-  reach and what factoring a build body out into a called script does to it. What stays open is the
-  ENFORCEMENT: widen assertion F to follow a `run:` line's called script, so a shared body sits
-  inside the corpus that holds one-producer-per-digest.
-  **Why the landed coverage limit is not the fix.** A stated limit on a gate whose whole subject is
-  a supply-chain invariant puts that invariant back on review, which is the thing the section's own
-  sentence says it is not on.
-  **Cost while deferred:** the one-producer rule holds by construction — one shared body, one
-  emission — and by nothing else, so a workflow step re-adding an emission beside the call, or a
-  second `sha256sum` inside the script, ships green.
-  Filed 2026-09-08 by build to the gap inbox; promoted here at this iteration's close drain, →fix
-  taking only the overclaim clause (the widening is a Rust change owing a `good/`+`bad/` fixture
-  pair, which a close cannot land test-and-doc-complete) and →icebox refused on the live trigger.
 
 - **align-in-session-absorption-tier-unruled** [cost: event/low] [surface: lifecycle-kit]
   — does a spec miss that build absorbs **in session** count against align's model tier?
