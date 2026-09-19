@@ -57,8 +57,8 @@ evidence earn the claim — stays with the human or the agent, undiluted.
 
 Where the project is heading, and what moves an item: [`ROADMAP.md`](ROADMAP.md),
 generated from the queue entries a maintainer marked for the page and
-freshness-gated on every commit. What is already *ruled* — the objectives that
-work serves, and the decisions closed against them — is
+freshness-gated on every commit. What is already *ruled* — the operator's
+standing overrides of business as usual — is
 [`TRAJECTORY.md`](TRAJECTORY.md), hand-authored rather than generated. Docs live
 at <https://checkwright.dev> — the same pages served in-repo under
 [`docs/`](docs/index.md).

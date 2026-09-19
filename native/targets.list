@@ -84,8 +84,9 @@
 #     the artifact-present branch at every profile and finished
 #     `INSTALLER-SMOKE: clean`. Both halves, one run, no host-built stand-in.
 #
-# This is not a narrowing of the trajectory — the objectives are the direction
-# and this roster is the tree. What keeps the UNROSTERED-HOST refusal the normal
+# This is not a narrowing of the direction — the adopter constraints
+# (gate-sdk/SPEC.md §The adopter constraints) are the direction and this roster
+# is the tree. What keeps the UNROSTERED-HOST refusal the normal
 # path — rather than the dead code the vacuous-green class exists to refuse —
 # is the DECLARED-AND-HELD platform plus the UNDECLARED COMPLEMENT, never the
 # roster's size: a native Windows host meets the refusal as a held platform

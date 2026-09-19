@@ -300,7 +300,9 @@ it was written to make easy.
 
 The direction: the battery moves off shell onto compiled gates. Those gates ship
 prebuilt rather than built on your machine, and the floor they aim at is **git
-alone** — git shelled out, never embedded. What survives is one small bootstrap
+alone** — git shelled out, never embedded. The toolchain list above already
+resolves the starter and prose profiles to that floor; a wider profile's members
+are its kits' declared requirements, marked there by audience. What survives is one small bootstrap
 that has to resolve your platform before any binary can run. It is deliberately
 small enough to exist twice, and it now does: a PowerShell half ships beside the
 POSIX sh one, exercised by its own CI leg.

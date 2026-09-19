@@ -891,8 +891,8 @@ fn steer(arg: &str, configured_dir: &str) {
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — the worker pool: `std::thread` and `std::sync` only, no new
-// crate dependency, since objective 4 makes footprint a cost paid per target on every adopter's
-// machine. Members are claimed off one shared cursor, so a slow member cannot starve the queue.
+// crate dependency, since §The adopter constraints makes footprint a cost paid per target on every
+// adopter's machine. Members are claimed off one shared cursor, so a slow member cannot starve the queue.
 fn dispatch_all(d: &Dispatch, selected: &[Selected]) -> Vec<Outcome> {
     let n = selected.len();
     let slots: Vec<Mutex<Option<Outcome>>> = (0..n).map(|_| Mutex::new(None)).collect();

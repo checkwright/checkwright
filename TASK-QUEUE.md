@@ -349,10 +349,11 @@
   a knob arms, disarms or reds before committing the knob.
   **Why design-pending:** the variant's declaration form (an env file or a config-dir overlay),
   whether the scratch copy is a worktree or a copy that carries untracked content, and whether
-  the diff or a full report is the product. Native, per the interpreter objective.
+  the diff or a full report is the product. Native, per the interpreter constraint
+  (gate-sdk/SPEC.md §The adopter constraints).
   **Refused:** repurposing the smoke scripts, which are install recipes read as text by the
   install-disposition gate and bound to this repo's harness; a shipped directory of shell tests,
-  which widens the interpreter surface the objectives shrink.
+  which widens the interpreter surface the adopter constraints shrink.
   **Cost while deferred:** an adopter evaluating a knob edits the seam, commits, and learns from
   the next red; the preview cohort's false-positive dispositions have no cheap rehearsal.
   Filed 2026-09-11 by consult as a direct entry, the test gap the operator named there.
@@ -2735,31 +2736,6 @@
   Filed 2026-09-19 to the gap inbox at `adopter-floor-conditional-members`' spec; promoted at its
   close because a roster-wide census with a per-member judgment is not a drain-sized fix.
 
-- **objective-1-discharge-unruled** [cost: iteration/low] [surface: TRAJECTORY.md] — the
-  objectives' single `discharge:` condition reads met on the toolchain roster, and retiring the
-  paragraph on that reading alone is not a session's act.
-  **Measured 2026-09-20 at scope:** `docs/install.md` carries `git` as its only unmarked
-  toolchain bullet, states that the starter and prose profiles reach none of the bash-owing kits
-  (l.161), and declares three platforms joined with `aarch64-unknown-linux-gnu` held.
-  **Three residues the condition does not settle.** The bootstrap's hasher is owed by every
-  install and is stated outside the roster as an install-path requirement (l.281-287); the page
-  still says the engine assumes the POSIX userland (l.63, l.173); and one `discharge:` line
-  covers objectives 1 to 6, so retiring the paragraph on objective 1's reading deletes objectives
-  3 to 6, which the enhancement admission filter cites as "the objectives above".
-  **Why design-pending:** retiring, narrowing or rewording the condition is operator-class
-  (TRAJECTORY.md's three acts), and no session may annotate the objective.
-  **Done-state:** a `/consult` ruling retires the condition, narrows it to the toolchain roster,
-  or re-homes objectives 3 to 6 under a condition of their own.
-  **DISTINCT from `design-partner-preview`**, which refused parking itself behind this same
-  discharge and owns no part of the condition.
-  **Cost while deferred:** every scope ranks objective rungs against an objective whose discharge
-  state is unknown.
-  Filed 2026-09-19 to the gap inbox by the close of `posix-install-bootstrap`, which no stage of
-  that iteration could drain; promoted at this iteration's scope, so the record is late and says
-  so. Owner lookup: `discharge`, `objective 1`, `git alone` — matched
-  `objective-6-guard-hook-twin-unruled` (Done 2026-09-19, consult `7403b968`), the same shape one
-  objective over, read and ruled distinct.
-
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -3012,5 +2988,7 @@
 - **readme-bin-roster-underived** — no gate holds a kit README's bin/ tool roster.
 
 ## Done
+
+- objective-1-discharge-unruled
 
 ## Lessons Learned

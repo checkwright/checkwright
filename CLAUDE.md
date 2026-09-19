@@ -108,6 +108,7 @@ an engineering-craft section behind the link:
 - **Config via env:** every kit takes `<KIT>_<KNOB>` with this repo's layout as the defaults; each kit's SPEC owns its knob roster and values.
 - **Self-contained artifacts:** emitted HTML inlines its CSS and no kit output references an asset outside the kit — the one sanctioned exception and its honest limit: gate-sdk/SPEC.md §check-graph.
 - **Kit-landing checklist:** README + SPEC.md, fixtures for every shipped gate, `smoke/`, and `gates.list` registration where applicable — gate-sdk/SPEC.md §Consumer smoke owns it.
+- **Adopter constraints:** git the only unconditional floor member, every major OS natively, opacity, footprint, no toolchain assumed, an interpreter surface shrunk to the dual-implemented unavoidable — gate-sdk/SPEC.md §The adopter constraints owns each with its grounds.
 
 ## Agent execution (all stages)
 

@@ -1480,7 +1480,7 @@ in `proc.rs` so a cohort of wrappers buys them once:
   guessing at a platform question the run already answers, and it would let a host
   silently take the wrong rung. **Raising the pin to 1.77.2 is the third option and
   it is declined on this SPEC's own two grounds**: it would raise a toolchain floor
-  the objectives exist to collapse (§build-native declines `trim-paths` on that
+  the substrate exists to collapse (§The adopter constraints; §build-native declines `trim-paths` on that
   same axis), and an MSRV bump un-suppresses clippy against unchanged code —
   §The settings cohort, and the crate's first dependency records the 1.56→1.71
   move surfacing four findings in modules the cohort never edited, by controlled
@@ -2912,13 +2912,14 @@ bash 3.2, which no shim reaches, and `mapfile` / `declare -A` appeared
 in 57 of the 96 checks the battery held when it was counted — so the floor buys
 BSD-userland tolerance and never a stock-macOS install.
 
-**That rejection stands on the substrate's objectives, and deliberately not on
+**That rejection stands on the adopter constraints (§The adopter constraints),
+and deliberately not on
 this section's own case for a port.** The port's own case ruled platform reach
 out as a ground for porting, so an argument from reach would contradict the case
-it sits under. The objectives reinstate reach: every major operating system is a
+it sits under. The constraints reinstate reach: every major operating system is a
 target and the non-technical adopter is a design constraint. Read against those,
-a floor reaching BSD userlands but not a stock macOS install fails an objective
-rather than a preference — and the objectives' own direction, shrinking the
+a floor reaching BSD userlands but not a stock macOS install fails a constraint
+rather than a preference — and the constraints' own direction, shrinking the
 interpreter surface to the unavoidable, is the one this costing already pointed,
 which makes the costing a step toward them rather than a casualty of them. The narrower
 installer-and-probe trade this does **not** close has since been settled the
@@ -3900,17 +3901,18 @@ reaches an external endpoint, and a reader sizing what the installed binary is
 entitled to do should meet that sentence here rather than derive it from a module
 list.** The capability is not new to the *product* — it ships today as kit shell
 an adopter vendors — but it is new to the *binary* an adopter installs.
-No objective governs the installed binary's capability surface, so the
+No adopter constraint governs the installed binary's capability surface, so the
 disposition is stated rather than derived: **the path is admitted, with the
 tradeoff stated.** No
 HTTP client enters the crate and no dependency is added: `curl` stays external and
 stays spawned through `proc::run`, exactly as the shell member spawned it.
-The objective that makes opacity a goal rather than a side effect reads
+The constraint that makes opacity a goal rather than a side effect (§The adopter
+constraints) reads
 *toward* this move rather than against it: a credential-reading path moving out
 of a vendored, readable shell file and into the binary is that goal working as
 stated. Recorded because the
 instinct on meeting a credential read inside a shipped binary is to reach for a
-capability-minimisation argument the objectives do not make.
+capability-minimisation argument the constraints do not make.
 
 **The port necessarily mints a second producer of the hook envelope**, in Rust,
 beside `guard-kit/lib/guard.sh`'s, because that library stays permanently shell
@@ -8240,6 +8242,52 @@ SSOT split is *enforced*, not trusted to habit
 outcome for a rule stated only in prose is that the first tired session breaks
 it.
 
+## The adopter constraints
+
+The constraints below bind what this kit ships to an adopter, and every design
+record in this SPEC that weighs a cost against reach, footprint or the
+interpreter surface weighs it against them. They are constraints on the payload,
+never a claim about a tree: a user-facing surface states a floor as reached only
+once it is, and a platform is declared **held** with the run that joins it, never
+left undeclared — docs/install.md §Requirements owns both grammars.
+
+- **The floor is git, shelled out rather than embedded.** git is the only
+  unconditional requirement of an install. A program a selected kit or arm
+  spawns is that kit's declared requirement, probed only where the kit is
+  selected, and is not the floor — the audience grammar context-kit/SPEC.md
+  §bin/env-probe owns, rendered by docs/install.md §Requirements. The profiles a
+  first install reaches (starter, prose) resolve to git alone, and no
+  user-facing surface says "git alone" of a profile whose resolved floor is
+  wider. A gate on the binary substrate spawns git (§The program roster) and
+  embeds nothing. Grounds: the dependency floor is the first cost an evaluator
+  pays and the one paid before any value is seen.
+- **Every major operating system, Windows natively.** A bash-only install path
+  fails the constraint; the joined and held platforms are docs/install.md
+  §Requirements' declaration block and `native/targets.list`. Grounds: a bash
+  floor excludes a platform's evaluators before they reach the front door.
+- **Opacity is a goal.** A gate's implementation is withheld so it is executed
+  rather than analysed by the agents it holds; §Consumer payload states the
+  disclosure class and exactly what it buys.
+- **Footprint is a first-class cost.** An adopter installs, tries and uninstalls
+  without growing their code base or dependency set: the install is a one-shot
+  vendoring that leaves no resolvable reference behind and reverses to the
+  tree it found (installer/SPEC.md §uninstall), the payload is one prebuilt
+  binary per declared target, and a crate dependency is a cost paid per target
+  on every adopter's machine, so the standard library is preferred wherever it
+  covers the need.
+- **The non-technical adopter is a design constraint.** No install step assumes
+  a developer machine or a toolchain: nothing builds at install (installer/SPEC.md
+  §The gate binary), and a host the roster does not carry is refused with its
+  reason rather than handed a build.
+- **The script-interpreter surface shrinks to the unavoidable, and the
+  unavoidable is dual-implemented** — a POSIX shell for Linux and macOS,
+  PowerShell for Windows — where a script stands between an adopter and the
+  install or the battery (installer/SPEC.md §The install boundary's two
+  bootstrap halves; §The port-candidate criteria for what may stay shell and on
+  what ground). A script that guards a shell the harness already runs is written
+  in that shell on every host, because a session with a call to guard already
+  has the shell the guard needs (guard-kit/SPEC.md §The hook on native Windows).
+
 ## Consumer payload
 
 What a gate on the binary substrate **discloses** to the consumer it judges.
@@ -8270,14 +8318,14 @@ withholds nothing *from* a consumer: the section is still disclosed, at a
 published location instead of inside the tarball. A change of transport is not a
 change of disclosure, and editing the marker would assert one.
 
-This serves a stated objective — that opacity is a goal and not a side effect,
+This serves a stated constraint (§The adopter constraints) — that opacity is a goal and not a side effect,
 because withholding a gate's implementation favours *execution* of it over
 *analysis* of it by the coding agents the gate exists to hold. It reverses the
 ground the dispatch seam was built under, where opacity was explicitly not
 claimed; the reversal is settled, and the earlier reading is void wherever it
 survives.
 
-**What the objective buys, stated precisely so it is not oversold.** The
+**What the constraint buys, stated precisely so it is not oversold.** The
 beneficiary is one failure mode: a coding agent told to make a battery green
 reads the gate blocking it and edits its way around the predicate instead of
 fixing the defect. Withholding the source removes the cheapest path to that. It
@@ -9299,7 +9347,7 @@ for each gate name. Deleting or de-textualizing these scripts therefore *adds*
 violations rather than removing them.
 
 **Leg 3 — the class costs an adopter no interpreter dependency, which is the
-objective the port serves.** A `smoke/` directory is kit-authored content
+constraint the port serves (§The adopter constraints).** A `smoke/` directory is kit-authored content
 (§Consumer payload's kit-authored roster names it) and vendors to an adopter with
 its kit — conceded rather than disputed — but it is **executed by no adopter
 path**: the entry-point guard above refuses a bare invocation, and the only
@@ -10497,7 +10545,7 @@ member is dispatched.
 
 **The concurrency contract.** Members run on a worker pool built from
 `std::thread` and `std::sync` alone — **no new crate dependency**, because
-objective 4 makes footprint a cost paid per target on every adopter's machine
+§The adopter constraints makes footprint a cost paid per target on every adopter's machine
 and a scheduler crate is a cost the standard library already covers. Four
 properties bind:
 
@@ -11978,7 +12026,8 @@ replacing them.
 **`--remap-path-prefix` rather than cargo's `trim-paths`, and the reason is the
 dependency floor.** `trim-paths` stabilised in 1.81 and this crate pins
 `rust-version = "1.71"`; taking it would raise the toolchain floor, which runs
-against the objective that exists to collapse that floor rather than raise it.
+against the constraint that exists to collapse that floor rather than raise it
+(§The adopter constraints).
 The cost accepted in exchange is that the setting lives in a
 build path rather than in the manifest, which is what the verification below
 exists to answer.

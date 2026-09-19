@@ -451,7 +451,8 @@ another uid exists but cannot be signalled. On unix the predicate calls `kill(2)
 and reads `EPERM` as held and `ESRCH` as gone. On a non-unix build it reaches the
 shell's `kill -0` builtin, whose exit status conflates the two, so `ps -p` runs as
 the fallback and any evidence of existence means held. Reading `/proc` to confirm process *identity*
-is rejected separately: it is unportable, and the OS-reach objective makes a
+is rejected separately: it is unportable, and the OS-reach constraint
+(gate-sdk/SPEC.md §The adopter constraints) makes a
 Linux-only predicate a cost rather than a refinement.
 
 **On a non-unix build, where `ps` is the fallback leg, an absent `ps` leaves the

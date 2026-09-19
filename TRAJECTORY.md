@@ -32,40 +32,8 @@ fired, or `manual` followed by the condition.
 
 ## The objectives
 
-The pivot, ruled by the operator: **port the battery to native binaries, and
-reduce what a consumer must have to git alone.** The gate corpus is ported; the
-objectives stay as the ground the remaining queue work is ranked against.
-
-1. **The dependency floor collapses to git**, shelled out rather than embedded:
-   git is the only unconditional member. A program a selected kit or arm spawns
-   is that kit's declared requirement, probed only where it is selected, and is
-   not the floor; the profiles a first install reaches (starter, prose) resolve
-   to git alone, and no user-facing surface says "git alone" of a profile whose
-   resolved floor is wider.
-2. **All major operating systems, Windows included**; a bash-only install path
-   fails the objective.
-3. **Opacity is a goal**: a gate's source is withheld so it is executed rather
-   than analysed by the agents it holds. This reversed the gate-dispatch seam's
-   earlier no-opacity stance.
-4. **Footprint is a first-class cost**: install, try, uninstall without growing
-   the adopter's code base or dependency set.
-5. **Non-technical adopters are a design constraint**: no step assumes a
-   developer machine or a toolchain.
-6. **The script-interpreter surface shrinks to the unavoidable**, and what is
-   unavoidable is dual-implementable — bash for Linux and macOS, PowerShell for
-   Windows — where the script stands between an adopter and the install or the
-   battery. A script that guards a shell the harness already runs is written in
-   that shell on every host: guard-kit's hook is bash everywhere because the
-   harness runs its `Bash` tool, and its hook commands, under Git Bash on
-   Windows, so a session with a call to guard already has the shell the guard
-   needs. "PowerShell for Windows" for a guard means a guard over the harness's
-   `PowerShell` tool, which is separate work, not a twin of the bash reader.
-
-The objectives are the direction, not a claim about the tree: no user-facing
-surface states the floor as reached before it is, and a platform an objective
-names is declared **held** with the run that joins it, never left undeclared.
-discharge: substrate-pivot  manual docs/install.md declares git as the only unconditional floor member, every other member conditional on a named kit or arm, and the starter and prose profiles resolving to git alone; and every platform objective 2 names reads held or supported there
-ruling: the objectives  the substrate pivot  the project-trajectory pivot
+No pivot is running. The constraints the substrate pivot left behind are
+business as usual, owned by gate-sdk/SPEC.md §The adopter constraints.
 
 ## The rulings
 
@@ -76,9 +44,10 @@ lifecycle-kit/templates/stages/scope.md's pool ranking (**Rank the pool by what
 deferral costs and what landing buys**), which admits whatever it ranks: the
 filter runs ahead of the rank, and the rank orders what passes. It reaches
 enhancements only — work adding no capability was never in its scope and needs no
-exception recorded for it. The objectives above qualify under the first two arms
+exception recorded for it. Work serving the adopter constraints (gate-sdk/SPEC.md
+§The adopter constraints) qualifies under the first two arms
 (install, try, uninstall on a git-only floor is time-to-first-value; a
-digest-verified prebuilt payload is trust work), so a scope session weighs their
+digest-verified prebuilt payload is trust work), so a scope session weighs such
 rungs' ordering, never their admissibility. It admits an explicit operator
 exception, carried with its reason on the queue entry it admits. Grounds: the
 project is exposed to adopters only once the queue's Deferred section is
