@@ -5,3 +5,4 @@
 ---
 
 door-binding-sweep scope a5f5ed94 2026-09-19 fe0b0798
+door-binding-sweep spec a47f74fe 2026-09-20 43da333e
