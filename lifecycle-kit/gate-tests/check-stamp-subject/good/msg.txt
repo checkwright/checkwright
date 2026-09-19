@@ -1,0 +1,4 @@
+chore(align): stamp the align stage entry
+
+The staged state file adds an align stamp and then a waiver line; the waiver
+is no stamp, so the align stamp decides and the scope matches it.

@@ -32,6 +32,21 @@ fn tail_parses(rest: &str) -> bool {
     }
 }
 
+// spec: lifecycle-kit/SPEC.md §check-stamp-subject — the scope token of a subject this grammar
+// parses, the type being any lowercase run: roster membership stays check-commit-subject's to judge.
+pub fn scope_token(subject: &str) -> Option<&str> {
+    let open = subject.find('(')?;
+    let ty = &subject[..open];
+    if ty.is_empty() || !ty.bytes().all(|b| b.is_ascii_lowercase()) {
+        return None;
+    }
+    let rest = &subject[open..];
+    if !tail_parses(rest) {
+        return None;
+    }
+    rest[1..].split(')').next()
+}
+
 // spec: gate-sdk/SPEC.md §check-commit-subject — the roster alternation, split on the single
 // space the shell's `tr ' ' '|'` splits on, so a roster spelling reaches the same alternatives
 // here as it reaches the shell form's ERE

@@ -1,0 +1,4 @@
+# <message-file> <staged-state> <head-state>
+msg.txt
+staged.txt
+head.txt

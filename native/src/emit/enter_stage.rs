@@ -445,6 +445,9 @@ fn rename(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
          requires them to agree.",
         c.queue, c.state
     );
+    if let Some(l) = stages::last_added_stamp(&new_state, &state_text, &c.stages) {
+        println!("  subject: {}", stages::rename_subject(stages::stamp_stage(l), name));
+    }
     Ok(0)
 }
 
@@ -1183,6 +1186,7 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
             "  next: commit {} and {} together (the boundary reset writes both), hook enabled.",
             c.queue, c.state
         );
+        println!("  subject: {}", stages::boundary_subject(&stage));
     } else {
         println!(
             "enter-stage: stamped '{}'; the cursor is now '{}' (no queue write — stage motion never \
@@ -1190,6 +1194,7 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
             stamp_line, stage
         );
         println!("  next: commit {}, hook enabled.", c.state);
+        println!("  subject: {}", stages::entry_subject(&stage));
     }
     if !truncated.is_empty() {
         println!(

@@ -1,0 +1,5 @@
+# contract: lifecycle-kit/SPEC.md §check-stage-evidence
+---
+
+demo scope a1b2c3d4 2026-01-01 1111111
+demo spec b2c3d4e5 2026-01-01 2222222

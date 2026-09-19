@@ -1,0 +1,4 @@
+chore(workflow): stamp the align stage entry
+
+An align stamp committed under the workflow scope: a recovery keyed on the
+stage name misses it.

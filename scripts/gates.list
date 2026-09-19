@@ -51,6 +51,7 @@ check-identity
 check-stage-evidence
 check-stage-entry
 check-stage-skill-coverage
+check-stamp-subject
 check-skill-binding
 check-shim-restatement
 check-lesson-disposition

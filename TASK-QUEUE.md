@@ -58,15 +58,6 @@
   Filed 2026-08-01 at close. Joins `lifecycle-contract-drain` by operator direction (2026-09-19,
   lead-relayed): stamp fork.
 
-- **stage-commit-subject-scope-unowned** [spec: SPEC-stamp-subject.md] — no surface governs a stage
-  session's commit subject scope. 38 of 571 state-file commits since 2026-09-01 carry `workflow` or
-  `lifecycle`, so a recovery keyed on the stage name misses them.
-  **Ruled at spec:** the stamp commit's subject scope is the stamped stage. `--enter-stage` prints
-  the subject, and a new commit-msg gate, `check-stamp-subject`, holds it. Other commits keep their
-  component scope.
-  Filed 2026-09-16 by the iteration lead. Joins `lifecycle-contract-drain` by operator direction
-  (2026-09-19, lead-relayed): subject scope.
-
 - **lead-specifies-constraint-not-mechanism** [spec: SPEC-relay-discipline.md] — a lead that hands
   down a mechanism spends a stage session's verification on the lead's own guess. Three worked
   instances, the third (2026-08-23) destructive.
@@ -3165,5 +3156,6 @@
 ## Done
 
 - scope-unit-set-ignores-deferred-inflow
+- stage-commit-subject-scope-unowned
 
 ## Lessons Learned

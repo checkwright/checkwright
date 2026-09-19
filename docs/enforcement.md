@@ -148,6 +148,7 @@ leaves its section absent.
 | [gate-sdk](gate-sdk/index.md) | check-template-registry-parity | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-commit-msg | commit-msg |
 | [gate-sdk](gate-sdk/index.md) | check-commit-subject | commit-msg |
+| [lifecycle-kit](lifecycle-kit/index.md) | check-stamp-subject | commit-msg |
 | [gate-sdk](gate-sdk/index.md) | check-gate-assertions | align-only |
 | [canon-kit](canon-kit/index.md) | check-spec-dod-singleton | align-only |
 | [canon-kit](canon-kit/index.md) | check-spec-derivable-section | align-only |

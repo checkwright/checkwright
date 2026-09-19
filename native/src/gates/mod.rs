@@ -104,6 +104,7 @@ pub mod spec_pointer;
 pub mod stage_entry;
 pub mod stage_evidence;
 pub mod stage_skill_coverage;
+pub mod stamp_subject;
 pub mod surface_duplication;
 pub mod surface_ratchet;
 pub mod survey_record;
@@ -1569,6 +1570,16 @@ pub const REGISTRY: &[GateEntry] = &[
         &["GATE_SDK_COMMIT_TYPES"],
         "gate-sdk",
         &[],
+    ),
+    // spec: lifecycle-kit/SPEC.md §check-stamp-subject — the message file plus the state file's
+    // staged and `HEAD` blobs, read through git rather than walked: the empty-walk-root shape
+    (
+        "check-stamp-subject",
+        stamp_subject::run,
+        &[],
+        &["LIFECYCLE_KIT_STATE_FILE", "LIFECYCLE_KIT_STAGES"],
+        "lifecycle-kit",
+        &[("git", "")],
     ),
     (
         "check-readme-roster",

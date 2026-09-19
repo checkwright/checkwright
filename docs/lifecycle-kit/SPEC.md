@@ -292,7 +292,12 @@ condition, when to enter it at all), and the stage gates stay the independent
 verifier. The tool takes no `--force` flag, so the compliant path is the easy
 one — an operator who intends to override writes the stamp by hand, exactly
 as before the tool existed. Committing the stamp remains the skill's
-business, on its own — with **one** exception, stated here rather than only
+business, and the commit that adds a stamp carries the stamped stage as its
+subject scope (`<type>(<stage>): …`): `--enter-stage` prints that subject and
+`check-stamp-subject` holds it. The stamp commit is bound because a recovery keyed
+on the stage name — `git log --grep`, a pickaxe — must find the entry; a stage
+session's other commits keep their component scope, because nothing in them
+identifies the stage that made them. The stamp commits on its own — with **one** exception, stated here rather than only
 where the valve is, because a session reads this rule at its entry step and the
 valve's contract several sections away: an entry the one-shot pre-flight valve
 admitted rewrites the valve ledger in the same motion as the stamp, so the two
@@ -2450,6 +2455,15 @@ status survives the front-end because it `exec`s the binary, so the arm's status
 the arms whose verdict a session reads rather than the decline-with-0 posture of
 a harness-integration arm.
 
+**Every stamp write's report ends in the commit to make and its subject.** After
+the `next: commit` line, a `subject:` line names the subject the commit carries
+(§The stamp protocol): `chore(<stage>): stamp the <stage> stage entry` for an
+entry, a valve-admitted entry included, and the same followed by `at the iteration
+boundary` for the boundary reset. The subject is scoped to the stamp the write
+added, so the writer hands the session the spelling `check-stamp-subject` asserts,
+from the same derivation (the last added stamp). `--simulate` writes nothing and
+prints no `next:` or `subject:` line.
+
 **A surplus argument is refused, never dropped, and the ground is that this
 tool's only flag is position-sensitive.** `<stage>` takes exactly one operand,
 `--rename` exactly one `<name>` and `--open-lead-journal` none; anything after it exits 2 naming the
@@ -3232,7 +3246,11 @@ reading `<name>` reports and exits 0 without writing. `--simulate --rename`
 relays what would change, prefixed `enter-stage (simulate):`, and writes nothing.
 The report names both written files and says to commit them together, which makes
 the one-commit coupling a property of the writer instead of a line of prose in
-the calling stage template.
+the calling stage template. Its `subject:` line is
+`chore(<stage>): name the iteration <name>`, where `<stage>` is the stage of the
+last stamp the rewrite changed — the stamp `check-stamp-subject` reads off the
+commit, and the first stage whenever the rename runs, as it does, before any later
+stamp exists.
 
 One reader is **invalidated** by a rename rather than served by it, and it is the
 reason the placeholder refusal exists: `LIFECYCLE_KIT_BOUNDARY_REQUIRE`'s check
@@ -4303,6 +4321,46 @@ the coupled surface. The `good/`+`bad/` pair drives the citation direction — a
 fixture stage set whose surfaces all carry it, and one where a single stage's does
 not; `gate-tests/check-stage-skill-coverage.test.sh` covers the forward and
 reverse directions and the bound-template resolution the one pair cannot hold.
+
+### check-stamp-subject
+
+Invariant: when the staged state file (`LIFECYCLE_KIT_STATE_FILE`) adds data lines
+whose stage field is a `LIFECYCLE_KIT_STAGES` member, the subject line of the
+message file parses with a `<scope>` equal to the **last** such line's stage —
+the cursor the commit leaves. Parsing is `check-commit-subject`'s grammar
+(gate-sdk/SPEC.md §check-commit-subject); roster membership of the type stays that
+gate's to judge. The rule and its ground are §The stamp protocol's.
+
+**What the gate reads.** A `tier=commit-msg` gate has the message file and the
+index, so the added stamps are the data lines of the staged state file absent from
+`HEAD`'s. That one read covers the ordinary entry, the boundary reset (which
+truncates, then stamps), the valve-admitted entry and `--rename` (whose rewritten
+lines are the added ones). A waiver line is not a stamp — its token cannot collide
+with a stage name (§Layout and configuration) — so the roster filter skips it. The
+derivation is the one `--enter-stage` names its printed subject from, so writer and
+asserter read the same stamp.
+
+- **Skips, clean.** A commit adding no stamp line; a no-argument run (the
+  whole-tree battery), on `check-commit-subject`'s ground that the message is not
+  a tracked surface; no staged state file. With no `HEAD` state file, every staged
+  data line is an addition.
+- **Fail-closed.** A message-file argument naming a missing file exits 2, as does
+  an argument count other than one or three.
+- **Red message.** It names the subject, the stamp line it read the stage from,
+  the expected scope, and the tool's printed subject as the fix.
+
+**The honest limits.** An amend of a stamp commit compares against the commit being
+amended, which already carries the stamp, so a mis-scoped stamp commit fixed by
+`--amend` is not re-checked. A git-generated subject (`Merge …`) on a commit adding
+stamps reds: it has no scope to parse.
+
+The fixture form takes the staged and `HEAD` state-file blobs as two further
+arguments, so the pair runs hermetically without a git index — the synthetic
+second argument `check-trajectory-fresh` takes (drift-kit/SPEC.md §The
+published-evidence extractor). The `bad/` case is an align stamp committed under
+`chore(workflow)`; the `good/` case an align entry followed by a waiver line.
+`gate-tests/check-stamp-subject.test.sh` covers the boundary reset, the rename
+subject, a commit adding no stamp, an unscoped subject and the argument edges.
 
 ### check-skill-binding
 

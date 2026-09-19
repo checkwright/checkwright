@@ -121,6 +121,34 @@ pub fn first_head(text: &str) -> String {
     }
 }
 
+// spec: lifecycle-kit/SPEC.md §check-stamp-subject — the stamp a write adds: the last data line of
+// `after` absent from `before` whose stage field is a roster member. The writer names its subject
+// from it and the gate asserts against it, so the two cannot disagree about which stage decides.
+pub fn last_added_stamp<'a>(after: &'a str, before: &str, stages: &[String]) -> Option<&'a str> {
+    let prior = data_lines(before);
+    data_lines(after)
+        .into_iter()
+        .rfind(|l| !prior.contains(l) && stage_known(stages, stamp_stage(l)))
+}
+
+pub fn stamp_stage(line: &str) -> &str {
+    line.split_whitespace().nth(1).unwrap_or("")
+}
+
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the subjects the writer prints, one per
+// stamp-writing path, each scoped to the stage the gate will read off the added stamp
+pub fn entry_subject(stage: &str) -> String {
+    format!("chore({}): stamp the {} stage entry", stage, stage)
+}
+
+pub fn boundary_subject(stage: &str) -> String {
+    format!("{} at the iteration boundary", entry_subject(stage))
+}
+
+pub fn rename_subject(stage: &str, name: &str) -> String {
+    format!("chore({}): name the iteration {}", stage, name)
+}
+
 pub fn commit_resolves(commit: &str) -> bool {
     proc::run(
         &programs::GIT,

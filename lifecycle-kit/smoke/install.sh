@@ -33,6 +33,7 @@ check-survey-record
 check-audit-roster
 check-gap-inbox-neutrality
 check-scratch-citation
+check-stamp-subject
 # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion I's own declaration grammar
 # (§The install disposition's `# smoke-unregistered:` sibling on a second roster). These four
 # read LIFECYCLE_KIT_SKILLS_DIR (default .claude/commands); this script vendors no skill files
