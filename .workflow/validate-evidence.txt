@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+lifecycle-contract-drain gates sha256=a3198d9edba410e6efd6e06aa343f28f59ef91a19120da43327c00ce3fa0252f pass=118 fail=0 ignore=0 verdict=clean 2026-09-19
+lifecycle-contract-drain gate_sdk sha256=daa0682db307a97ddcc088b14d9fa283dd3478f756d63c2cd411b860c9d80a88 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
+lifecycle-contract-drain canon_kit sha256=7fa6f15316eae59bac76441d7c44c7846b2a7d06de9311b07f68c0b041433f95 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
+lifecycle-contract-drain context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
+lifecycle-contract-drain delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
+lifecycle-contract-drain doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
+lifecycle-contract-drain evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
+lifecycle-contract-drain guard_kit sha256=7418de9de4572487cd88ef9d9415f87790a067e3d5dc68278afb7dfb8c61e109 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
+lifecycle-contract-drain lifecycle_kit sha256=bac54b43ac9a49c420f8020fda337dac934779dfe6701db269ad8ac2a89ceb81 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
+lifecycle-contract-drain queue_kit sha256=4d50cf613cf514a9f5c5f92ad7c46acf5d8f750aedc71c9e629514a415bad337 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
+lifecycle-contract-drain site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
+lifecycle-contract-drain scripts sha256=b87b46f3a812452329297073b7dd2c6181caadfc1461c4298e5c2c0f0f7044f6 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
+lifecycle-contract-drain guard_tests sha256=660ff1399386ea7ee064c052fbc5dd0fa4083498cc6ac70240f71fb571830e27 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
+lifecycle-contract-drain demo sha256=8469f23de9325b8eeabeb253c9e86d4db44d8934d6d6b20f5851dc7d08d0ad27 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
+lifecycle-contract-drain installer_smoke sha256=9afeb194126f8d59814868c016702c1be21bd345c88310df557cdbb19fa0efd8 pass=13 fail=0 ignore=0 verdict=clean 2026-09-19
+lifecycle-contract-drain consumer_smoke sha256=6cbb72c0cb51d38b938b3ce09b9346e46753ec903c0e1d721c29624c829250d3 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
+lifecycle-contract-drain upgrade sha256=fb46926bb4b9d1edb9d29a9b40de2e42f6c8753cc74cc0ce8390328d0e36eccf pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
+lifecycle-contract-drain agents_md_smoke sha256=a9744a69a4ca666667bda2807642c92c612ac21c9f9cff79630e2b0c8351991e pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
+lifecycle-contract-drain index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
+lifecycle-contract-drain native_crate sha256=2492f59f847dd10af29a37f2b857edb922ea4bf5cd65f7b38e4f3ace231803b6 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
