@@ -23,17 +23,6 @@
   Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 4a, by operator direction; promoted
   2026-09-19 at `adopter-floor-native-rungs`' spec, where it leads the unit.
 
-- **floor-jq-guard-lib** [spec: SPEC-guard-lib-native-reads.md] — guard-kit's `lib/guard.sh`
-  spawns `jq` at seven sites plus one presence probe, so `jq` is on every guard-kit adopter's floor.
-  Rung 4b: the reads and renders move to a `--guard-json` flag of the gate binary, which the library
-  already needs, while the library stays shell. Code location and per-call latency are settled in
-  the amendment: beside guard-kit's compiled twins in `native/src/guard.rs`, one spawn per read,
-  measured at about half a `jq` spawn.
-  **Done-state:** `lib/guard.sh` spawns no `jq`, the guard suite passes with `jq` masked, a
-  guard-kit profile installs on a `jq`-less host, and the amendment is merged.
-  Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 4b; promoted 2026-09-19 onto its own
-  amendment.
-
 - **fail-open-arm-status-second-source** [spec: SPEC-fail-open-set.md] — both front-end stubs hold
   the fail-open arm set (`--hook`, `--statusline`) as a two-name test, and nothing holds it to the
   arms' contracts. The crate declares the set beside the arm table, each stub holds it on one
@@ -3045,5 +3034,7 @@
 - **readme-bin-roster-underived** — no gate holds a kit README's bin/ tool roster.
 
 ## Done
+
+- floor-jq-guard-lib
 
 ## Lessons Learned
