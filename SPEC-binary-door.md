@@ -50,11 +50,14 @@ things:
 So the rung needs no front-end duty ported, only its starter and prose callers
 re-pointed at the binary.
 
-**What this amendment does not claim.** It does not call either profile git-only
-on any surface. The unix install bootstrap, `installer/bin/checkwright.sh`, is
-itself a bash script. Whether that counts against TRAJECTORY.md objective 1 is an
-interpretation of the objective, which is the operator's to make. It is escalated
-at this stage, and no surface here words the floor ahead of that ruling.
+**What this amendment does not claim.** After this rung, neither profile is
+git-only. The unix install bootstrap, `installer/bin/checkwright.sh`, is itself a
+bash script, and it stands between the adopter and the install. So `bash` is still
+needed to install on Linux and macOS, though no longer to run the battery. The
+claim becomes true only when the bootstrap is ported to POSIX sh. That is the
+Deferred rung `floor-bash-install-bootstrap`. No surface this unit writes calls a
+profile git-only, or says `bash` is off the install path. docs/install.md's
+`bash` bullet names the bootstrap as the remaining unix reach, on every profile.
 
 It is a root-level amendment because it spans gate-sdk (the hook emitter, the
 gate library's matcher), the installer (`init`, doctor's roster reading, the
@@ -225,9 +228,16 @@ and nothing reds. A derivation, meaning doctor or a gate reading the vendored ki
 for a bash reach, is filed to the gap inbox at this stage with its cost, not built
 here.
 
-docs/install.md's `bash` bullet is rewritten to name the kits and their reach, and
-to drop the generated hooks and the front-end from it. The macOS paragraph
-(`:73-97`) says the remedy block is needed only where a selected kit owes `bash`.
+docs/install.md's `bash` bullet is rewritten:
+
+- It names the kits and their reach, and drops the generated hooks and the
+  front-end.
+- It states that the unix install bootstrap is still a bash script on every
+  profile. That reach runs before `doctor` and outside the roster, and it is
+  what `floor-bash-install-bootstrap` removes.
+
+The macOS paragraph (`:73-97`) says the remedy block is needed only where a
+selected kit owes `bash`.
 The remedy block itself, and the two macOS install-smoke legs that run it
 verbatim, are unchanged. doctor's line for an undecided member (installer/SPEC.md
 §doctor, today `owed where guard-kit is selected`) names a list as `owed where any
@@ -369,7 +379,8 @@ on scope-gated intake:
 - [ ] **A bash-less starter and prose install** — the consumer smoke's bash-less
       arm passes on the `gates` job's Linux leg.
 - [ ] **No floor overclaim** — no surface this unit writes calls a profile
-      git-only while the bootstrap question is unruled.
+      git-only, and docs/install.md names the bash bootstrap as the install-time
+      reach `floor-bash-install-bootstrap` removes.
 - [ ] **Removals propagated** — `check-amendment-retired-spelling` runs the block
       above against the tracked tree.
 - [ ] **Gaps filed** — the wider door sweep and the derived audience are filed at

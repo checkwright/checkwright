@@ -184,6 +184,21 @@
   `suite coverage`, `evidence-baseline`, `orphan` — matched `evidence-baseline-orphan-suite-row`,
   read and ruled distinct above.
 
+- **floor-bash-install-bootstrap** [cost: event/high] [surface: installer] — the unix install
+  bootstrap `installer/bin/checkwright.sh` is a bash script (`#!/usr/bin/env bash`), and
+  docs/install.md tells an adopter to run it with `bash`. So after rung 4a, installing on Linux or
+  macOS still needs bash on every profile, though the starter and prose battery no longer does.
+  This is the rung after 4a: port the bootstrap to POSIX sh, so the unix install floor is git plus
+  the OS's own `/bin/sh`. That is 4a's argument for the hooks, and it keeps the objective's bash
+  (Linux and macOS) plus PowerShell (Windows) script policy.
+  **Why design-pending:** the bootstrap's five install steps (installer/SPEC.md §The install
+  boundary) each need a POSIX form, and so does its host detection and digest verification. Its
+  twin parity with the PowerShell half has to be re-held.
+  **Cost while deferred:** no profile is git-only, and no surface may call one so. Objective 1's
+  discharge cannot fire.
+  Filed 2026-09-19 at `adopter-floor-native-rungs`' spec by operator direction (lead-relayed):
+  option (b) of the bootstrap question, not built this iteration.
+
 - **guard-powershell-tool-unguarded** [cost: event/high] [surface: guard-kit] — on native
   Windows the harness's `PowerShell` tool is on by default beside `Bash`, and guard-kit's hook
   matches `Bash` alone, so a PowerShell-tool call is neither steered nor logged to the friction log.
