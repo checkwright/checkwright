@@ -12,36 +12,6 @@
 
 ## New Features
 
-- **floor-curl-jq-unconditional** [spec: SPEC-conditional-floor.md] — `doctor`, and through
-  it `init`, refuse every profile on a host without `curl` or `jq`, though `curl`'s one adopter
-  reach is delegation-kit's `--usage-poll` and `jq`'s is guard-kit's hook. Rung 2 of the
-  adopter-floor ladder: the roster's audience axis gains a kit-name value, and doctor probes a
-  member only where the selection it reads (from `init`, or from the manifest) owes it.
-  **Done-state:** a starter install on a host without `jq` or `curl` succeeds, a guard-kit
-  profile refuses naming `jq`, and the amendment is merged.
-  Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 2; promoted the same day at
-  `adopter-floor-conditional-members`' spec, where it leads the unit.
-
-- **floor-shellcheck-unconditional** [spec: SPEC-conditional-floor.md] — `check-shellcheck` is
-  `zero-config`, so every profile registers it and `doctor` refuses a host without
-  `shellcheck`. Rung 3: the gate becomes `on-surface`, and `shellcheck` is owed only where a
-  registered gate's requirement element names it (the `registered` audience value).
-  **Done-state:** no profile's `init` registers `check-shellcheck`, a starter install needs no
-  `shellcheck`, the remedy blocks drop it, and the amendment is merged.
-  Filed 2026-09-19 at `adopter-floor-collapse`'s spec as rung 3; promoted the same day, sharing
-  rung 2's amendment.
-
-- **floor-coreutils-residue-unowned** [spec: SPEC-conditional-floor.md] — the binary spawns
-  `date`, `mktemp`, `cp` and `ps` under `GATE_SDK_PROGRAM_FLOOR`'s host assumption, and nothing
-  probes or declares them. Dispositions: `date` goes in-process on unix, `mktemp` and `cp` are
-  contributor-only, and off unix `date` and `ps` ride Git for Windows' userland with `bash`. The
-  macOS remedy then drops coreutils; the earlier `date -Is` question is moot once that spawn
-  leaves unix.
-  **Done-state:** a unix build names `programs::DATE` nowhere, and the macOS install-smoke legs
-  pass on a remedy without coreutils.
-  Filed 2026-09-19 to the gap inbox at `adopter-floor-collapse`'s spec, promoted at its close
-  drain; promoted 2026-09-19 onto the rung-2 amendment.
-
 - **portability-floor-adopter-on-ramp-unstated** [spec: SPEC-armed-by.md] — a vendored
   consumer gets `check-portability-floor` registered and disarmed, and nothing tells them that
   naming their install path in `GATE_SDK_PORTABILITY_PATHS` arms it. A gate now declares its
@@ -3074,5 +3044,9 @@
 - **readme-bin-roster-underived** — no gate holds a kit README's bin/ tool roster.
 
 ## Done
+
+- floor-curl-jq-unconditional
+- floor-shellcheck-unconditional
+- floor-coreutils-residue-unowned
 
 ## Lessons Learned
