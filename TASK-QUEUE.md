@@ -136,6 +136,13 @@
   Filed 2026-09-19 at `adopter-floor-native-rungs`' spec (scope-gated intake), merged at its close
   drain with that build's kit-README bullet, which named itself part of this sweep. Owner lookup:
   `door binding`, `run-gates.ps1`, `front-end-parity` — none.
+  **Reach re-verified at promotion, and wider than filed (2026-09-20 scope):** `git grep -l
+  run-gates.sh` also names every kit's `*-config.knobs` template,
+  `gate-sdk/templates/gates-workflow.yml`, `guard-kit/templates/settings-allow.json` and
+  `close-triage.md`, `drift-kit/templates/kpi-deprecated-surface.sh`,
+  `context-kit/templates/close-brevity.md` and `lifecycle-kit/templates/lead.md`.
+  Joins this iteration by operator direction (2026-09-20, lead-relayed): the lead unit, marked for
+  spec, which authors and promotes it.
 
 - **bash-audience-hand-held** [cost: event/low] [surface: context-kit] — the bash element of the
   tool-floor roster carries a hand-held kit-list audience,
@@ -154,6 +161,10 @@
   adopter's host.
   Filed 2026-09-19 at `adopter-floor-native-rungs`' spec, promoted at its close drain. Owner
   lookup: `probe-roster`, `bash:4.3`, `audience` — none.
+  **Re-verified at promotion (2026-09-20 scope):** the literal list stands at context-kit/SPEC.md,
+  `docs/install.md`, `native/src/programs.rs` and `native/src/toolfloor.rs`, with no derivation.
+  Joins this iteration by operator direction (2026-09-20, lead-relayed): the lead unit shrinks the
+  audience this entry would derive, so both are designed together; marked for spec.
 
 - **kit-roots-rel-filesystem-readers** [cost: event/low] [surface: native] — the couples-anchor
   amendment moved the `kit:` couples readers that match repository paths onto `walk::kit_roots()`.
@@ -174,6 +185,10 @@
   empty reads from those members. Masked today because init vendors at the root.
   Filed 2026-09-19 at `adopter-floor-native-rungs`' spec; promoted at its close drain. Owner
   lookup: `kit_roots_rel`, `nested` — only `docs-cmd` knob-definition entry, a different defect.
+  Joins this iteration by operator direction (2026-09-20, lead-relayed): the lead unit's door
+  binding resolves the binary under a gate-sdk root a consumer may nest, which is this mismatch;
+  marked for spec. **Constraint on that spec, carried from the promotion:** the inferred marker
+  above is still unrun, so the per-reader misread is probed before any design rests on it.
 
 - **guard-read-path-windows-unexercised** [cost: event/low] [surface: .github] — no `gates.yml`
   step runs guard-kit's `gate-tests/guard-read-path.test.sh` (its verbatim-bytes and no-added-CR
@@ -2641,6 +2656,10 @@
   who clicks one gets a missing file and has to read the sentence beside it.
   Filed 2026-09-16 at the lead's direction during `installer-front-door-cut`, so a later scope reads
   a known limit rather than rediscovering a defect.
+  **Re-counted at promotion (2026-09-20 scope):** 18 `](SPEC.md` links across the kit READMEs.
+  Joins this iteration by operator direction (2026-09-20, lead-relayed): its pack-time resolution
+  is the same seam as the lead unit's door binding, and both rewrite the kit READMEs; marked for
+  spec.
 
 - **docs-cmd-knob-definition-site-withheld** [cost: event/low] [surface: gate-sdk]
   — `check-docs-cmd`'s defined-knob set loses every knob whose only tracked kit-root occurrence
@@ -2715,6 +2734,31 @@
   on-ramp gap the directive closes for one member.
   Filed 2026-09-19 to the gap inbox at `adopter-floor-conditional-members`' spec; promoted at its
   close because a roster-wide census with a per-member judgment is not a drain-sized fix.
+
+- **objective-1-discharge-unruled** [cost: iteration/low] [surface: TRAJECTORY.md] — the
+  objectives' single `discharge:` condition reads met on the toolchain roster, and retiring the
+  paragraph on that reading alone is not a session's act.
+  **Measured 2026-09-20 at scope:** `docs/install.md` carries `git` as its only unmarked
+  toolchain bullet, states that the starter and prose profiles reach none of the bash-owing kits
+  (l.161), and declares three platforms joined with `aarch64-unknown-linux-gnu` held.
+  **Three residues the condition does not settle.** The bootstrap's hasher is owed by every
+  install and is stated outside the roster as an install-path requirement (l.281-287); the page
+  still says the engine assumes the POSIX userland (l.63, l.173); and one `discharge:` line
+  covers objectives 1 to 6, so retiring the paragraph on objective 1's reading deletes objectives
+  3 to 6, which the enhancement admission filter cites as "the objectives above".
+  **Why design-pending:** retiring, narrowing or rewording the condition is operator-class
+  (TRAJECTORY.md's three acts), and no session may annotate the objective.
+  **Done-state:** a `/consult` ruling retires the condition, narrows it to the toolchain roster,
+  or re-homes objectives 3 to 6 under a condition of their own.
+  **DISTINCT from `design-partner-preview`**, which refused parking itself behind this same
+  discharge and owns no part of the condition.
+  **Cost while deferred:** every scope ranks objective rungs against an objective whose discharge
+  state is unknown.
+  Filed 2026-09-19 to the gap inbox by the close of `posix-install-bootstrap`, which no stage of
+  that iteration could drain; promoted at this iteration's scope, so the record is late and says
+  so. Owner lookup: `discharge`, `objective 1`, `git alone` — matched
+  `objective-6-guard-hook-twin-unruled` (Done 2026-09-19, consult `7403b968`), the same shape one
+  objective over, read and ruled distinct.
 
 ## Icebox
 
