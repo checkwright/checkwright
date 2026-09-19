@@ -4,11 +4,4 @@
 
 ---
 
-posix-install-bootstrap scope a1d7be7e 2026-09-19 83a43866
-posix-install-bootstrap spec ab548d99 2026-09-19 385ed371
-posix-install-bootstrap align a4499837 2026-09-19 a923dbbd
-posix-install-bootstrap build a2ed3d26 2026-09-19 1ba2ea74
-posix-install-bootstrap build a5583eda 2026-09-19 53f9580d
-posix-install-bootstrap build a7022322 2026-09-19 8a433030
-posix-install-bootstrap validate af708d7a 2026-09-19 75812d71
-posix-install-bootstrap close a077241f 2026-09-19 a1c2cc07
+— scope a5f5ed94 2026-09-19 fe0b0798
