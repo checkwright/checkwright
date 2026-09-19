@@ -2028,7 +2028,10 @@ later arm's commit — including the value arm's, which commits a deliberately
 defective page and expects the battery to catch it rather than the commit to be
 blocked. The arm would then decide the thing it exists to observe. The copy is
 made from the payload just installed, so the probe still runs against the tree
-under test and never against this repo's own.
+under test and never against this repo's own. Every scratch consumer sets
+`maintenance.auto` false and `gc.auto` 0 at creation: a commit may start a
+detached `git maintenance` run that repacks and prunes `.git/objects` while the
+copy reads it, and a BSD `cp` fails on each vanished path.
 
 *Its verdict classes are this file's existing line, not a second one.* A printed
 command that does not resolve, or a flag the target refuses, is a statement about

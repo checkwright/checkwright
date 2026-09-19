@@ -373,6 +373,9 @@ consumer() {   # $1 = profile -> a fresh scratch consumer repo, echoed
     git -C "$c" init -q
     git -C "$c" config user.email smoke@example.invalid
     git -C "$c" config user.name smoke
+    # spec: installer/SPEC.md §The consumer smoke — no background maintenance in a scratch consumer, so nothing repacks .git while the follow-up probe copies it
+    git -C "$c" config maintenance.auto false
+    git -C "$c" config gc.auto 0
     printf '.tmp/\n' > "$c/.gitignore"
     git -C "$c" add -A
     git -C "$c" commit -q -m "seed"
