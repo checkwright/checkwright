@@ -255,10 +255,10 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
     // module that also holds the floor predicate, so the probe and the verdict share one owner.
     let roster: Vec<String> = toolfloor::PROBE_SET.iter().map(|e| e.to_string()).collect();
 
-    let date = proc::run(&programs::DATE, &["+%F"])
-        .ok()
-        .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string()))
-        .ok_or_else(|| "cannot read the probe date (date +%F unavailable)".to_string())?;
+    let date = crate::emit::kpi::today_iso();
+    if date.is_empty() {
+        return Err("cannot read the probe date".to_string());
+    }
     let new_body = body(&roster, &date);
 
     // spec: context-kit/SPEC.md §bin/env-probe — seed the gotchas scaffold once, outside the

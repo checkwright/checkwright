@@ -46,14 +46,15 @@ macro_rules! roster {
 roster! {
     GIT = "git", "";
     BASH = "bash", "";
+    #[cfg(not(unix))]
     DATE = "date", "";
-    MKTEMP = "mktemp", "";
-    CP = "cp", "";
-    JQ = "jq", "";
-    SHELLCHECK = "shellcheck", "";
+    MKTEMP = "mktemp", "contributor";
+    CP = "cp", "contributor";
+    JQ = "jq", "guard-kit";
+    SHELLCHECK = "shellcheck", "registered";
     #[cfg(not(unix))]
     PS = "ps", "";
-    CURL = "curl", "";
+    CURL = "curl", "delegation-kit";
     CARGO = "cargo", "contributor";
     RUSTC = "rustc", "contributor";
     TAR = "tar", "contributor";
@@ -188,19 +189,19 @@ mod tests {
         toolfloor::PROBE_SET.iter().map(|e| toolfloor::parse(e)).collect()
     }
 
-    // spec: gate-sdk/SPEC.md §The program roster — assertion A: an adopter-side member is on the
-    // floor's default, on `PROBE_SET` unconstrained by audience, or is the payload itself
+    // spec: gate-sdk/SPEC.md §The program roster — assertion A: an adopter-side member, a
+    // conditional audience included, is on the floor's default, on `PROBE_SET`, or is the payload
     #[test]
     fn every_adopter_side_member_is_on_the_floor_the_probe_set_or_the_payload() {
         let floor = floor_default();
         let probed: Vec<String> = probe_elements()
             .into_iter()
-            .filter(|e| e.audience.is_empty())
+            .filter(|e| e.audience != toolfloor::CONTRIBUTOR)
             .map(|e| e.name)
             .collect();
         let offenders: Vec<String> = ALL
             .iter()
-            .filter(|p| p.audience() == Some(""))
+            .filter(|p| p.audience().is_some_and(|a| a != toolfloor::CONTRIBUTOR))
             .map(Program::name)
             .filter(|n| {
                 !floor.contains(&n.as_str())

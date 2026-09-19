@@ -2931,6 +2931,13 @@ reviewed and deleted in the same close-stage triage pass as the friction
 log. Deliberate scheduling stays possible by disabling the hook for a
 session — the block is the default, not a capability removal.
 
+Each attempt line is a local-zone stamp in GNU `date -Is`'s shape,
+`YYYY-MM-DDTHH:MM:SS±HH:MM`, then the payload's `session_id`, `tool_name` and
+`tool_input` as one JSON object in that key order, `null` for a field the payload
+lacks. The binary builds the stamp in-process on unix from the offset the C
+library reports for the instant, and spawns `date -Is` only off unix, where
+`date` rides the userland `bash` requires (gate-sdk/SPEC.md §The program roster).
+
 The attempt log is a capture-tier surface on the same terms as the friction log
 — gitignored, advisory, reclaimed by the triage pass named above — and it
 declares itself so whether or not the consumer wires the hook, because the tier

@@ -318,25 +318,34 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         ));
     }
 
-    // spec: installer/SPEC.md §init — doctor is the last precondition and still runs before any
-    // file is written; running it after the manifest and profile are resolved keeps a bad manifest
-    // from being reported as a toolchain fault.
-    let verdict = super::doctor::diagnose();
-    if verdict.code != 0 {
-        eprint!("{}{}", verdict.out, verdict.err);
-        return Err(refuse(
-            "the toolchain is below contract — refusing to install",
-            "the floors above are what the gate battery needs to run, so installing first would leave you a vendored tree that cannot be checked. Fix them and re-run.",
-            verdict.code,
-        ));
-    }
-
     let kits = profile::kits(&pkg.root, &profile_name);
     if kits.is_empty() {
         return Err(refuse(
             format!("profile '{}' resolves to no kit in this payload", profile_name),
             "every kit a profile names must exist in the package payload; this one names none that do.",
             2,
+        ));
+    }
+
+    // spec: installer/SPEC.md §init — doctor is the last precondition and still runs before any
+    // file is written; running it after the manifest and kit set are resolved keeps a bad manifest
+    // or an empty kit set from being reported as a toolchain fault.
+    // spec: installer/SPEC.md §doctor — the gate set unites the profile's with an on-disk registry
+    let mut gates = profile::gate_set(&pkg.root, &profile_name);
+    if let Ok(text) = std::fs::read_to_string(root.join(GATES_DIR).join("gates.list")) {
+        gates.extend(crate::registry::members(&text).iter().map(|m| m.trim().to_string()));
+    }
+    let selection = toolfloor::Selection {
+        kits: kits.clone(),
+        gates,
+    };
+    let verdict = super::doctor::diagnose(Some(&selection));
+    if verdict.code != 0 {
+        eprint!("{}{}", verdict.out, verdict.err);
+        return Err(refuse(
+            "the toolchain is below contract — refusing to install",
+            "the floors above are what the gate battery needs to run, so installing first would leave you a vendored tree that cannot be checked. Fix them and re-run.",
+            verdict.code,
         ));
     }
 

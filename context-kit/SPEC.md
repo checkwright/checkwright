@@ -394,19 +394,22 @@ made.
 roster member's version and its floor verdict (below); the absent-tools list
 (roster members `PATH` does not resolve); and the below-contract list. The
 roster itself is owned by `native/src/toolfloor.rs` and never restated here. Its
-spawned programs are `uname`, `date`, and every roster member it probes.
+spawned programs are `uname`, off unix `date`, and every roster member it probes.
 The roster is the kit's own and a consumer cannot shadow it, which is what keeps
 this set bounded by the paragraph below rather than by a consumer's file.
 
 **The roster is what doctor verifies, not the set the binary spawns;
 gate-sdk/SPEC.md §The program roster is that set, and a unit test holds the
-two in relation.** A spawned program with an empty audience is on this
-roster, on `GATE_SDK_PROGRAM_FLOOR`'s default, or is the payload itself;
-`date`, `mktemp`, `cp` and `ps` rest on the floor's assumption that the host
-carries them (gate-sdk/SPEC.md §lib/gate.sh). A contributor-side program —
-`uname` (this arm), `tar` and `npm` (the installer packer), `rustc` —
-carries the `contributor` audience on the program roster and need not be on
-either. Every element of this roster is a program-roster member, so the walk
+two in relation.** A spawned program with any audience but `contributor` is on
+this roster, on `GATE_SDK_PROGRAM_FLOOR`'s default, or is the payload itself.
+The binary spawns `date` and `ps` off unix only, where they resolve from Git for
+Windows' `usr/bin`, the userland the `bash` member already requires there, so
+they share `bash`'s package rather than joining the roster; `mktemp` and `cp`
+are spawned by source-clone arms alone. The floor keeps all four for the shipped
+shell's sake (gate-sdk/SPEC.md §lib/gate.sh). A contributor-side program —
+`uname` (this arm), `tar` and `npm` (the installer packer), `rustc`, `mktemp`
+and `cp` — carries the `contributor` audience on the program roster and need not
+be on either. Every element of this roster is a program-roster member, so the walk
 never probes a program the binary cannot name.
 
 **The roster and its floor axis (`native/src/toolfloor.rs`).** The roster lives
@@ -438,16 +441,34 @@ is provable).
 **The audience axis.** The fourth field names *whose* floor a member is, because
 the roster has two kinds of reader and one flat array gated both of them on all
 of it. Its value set is closed and kit-owned exactly as the floor predicate's
-verdict set is: the only declarable value is `contributor`, meaning *a
-contributor-side floor with no install-time role*. The unmarked case is not
-spelled — declaring the complement on every other member would be a roster
-maintained against itself — so the emptiness rule above carries it: an empty or
-omitted audience means every audience. The audience predicate
-answers the one question a consumer-side reader asks, and exists so no such
-reader re-implements that rule against a value set it does not own. A
-consumer-side reader — the installer's `doctor`, whose exit status is `init`'s
-last precondition — filters its roster walk through that predicate and does not
-probe, render or fail on a member the predicate excludes. A contributor-side
+verdict set is, and a unit test in `toolfloor.rs` holds it closed:
+
+- **empty** — every adopter. The unmarked case is not spelled — declaring the
+  complement on every other member would be a roster maintained against itself —
+  so the emptiness rule above carries it.
+- **`contributor`** — a contributor-side floor with no install-time role.
+- **a kit name** — owed where that kit is selected; the value is the kit's
+  directory name, and the test holds it to a kit root the authoring tree
+  carries (`walk::kit_roots`), since a misspelled name is a condition nothing
+  satisfies and would silently drop the member from every floor.
+- **`registered`** — owed where a registered gate's requirement element (the
+  data `--needs` prints, gate-sdk/SPEC.md §check-reads-couples) names the
+  member; derived from the registry, never listed. A registered name with no
+  crate `REGISTRY` row is a consumer-declared shell gate and contributes
+  nothing, a consumer command being the consumer's requirement
+  (gate-sdk/SPEC.md §The program roster).
+
+**The owed-predicate.** `toolfloor` answers *is this member owed under this
+selection*, where a **selection** is a kit set and a registered gate set, from a
+closed three-value set: **owed** (an empty audience, a kit name the kit set
+carries, or `registered` where some gate-set member's `REGISTRY` row names the
+member), **not owed** (`contributor`, a kit name the kit set lacks, or
+`registered` with no such row), and **undecided** (a conditional value with no
+selection to read). It exists so no consumer-side reader re-implements that rule
+against a value set it does not own. A consumer-side reader — the installer's
+`doctor`, whose exit status is `init`'s last precondition — probes and fails
+only on an owed member, skips a not-owed one outright, and renders an undecided
+one unprobed (installer/SPEC.md §doctor). A contributor-side
 reader — the env-probe arm — walks the roster whole and marks the audience
 instead, since a contributor-side floor is exactly what it is reporting on.
 The field is a grammar axis rather than a filter in the reader that needs it,
@@ -572,7 +593,8 @@ registry declaration is compared against.
 for a constrained member, the constraint and its verdict — `` (floor 4.3, ok) ``,
 `` (requires GNU — below contract) ``, `` (floor 4.3 — unverified) ``; an
 unconstrained member carries no parenthetical. A member carrying an audience
-carries it here too, as `` (floor 1.71, contributor-only, ok) ``, and every line
+carries it here too, as `<audience>-only` — `` (floor 1.71, contributor-only, ok) ``,
+`` (guard-kit-only, ok) ``, `` (registered-only, ok) `` — and every line
 that names such a member is marked the same way — the absent list and the
 below-contract list included, because those are the two lines on which *below a
 floor that is yours* and *below a floor you are not on the hook for* would

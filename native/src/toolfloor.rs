@@ -7,11 +7,58 @@
 pub const PROBE_SET: &[&str] = &[
     "bash:4.3",
     "git",
-    "jq",
-    "curl",
-    "shellcheck",
+    "jq:::guard-kit",
+    "curl:::delegation-kit",
+    "shellcheck:::registered",
     "cargo:1.71::contributor",
 ];
+
+// spec: context-kit/SPEC.md §bin/env-probe — the two spelled audience values that name no kit
+pub const CONTRIBUTOR: &str = "contributor";
+pub const REGISTERED: &str = "registered";
+
+// spec: context-kit/SPEC.md §bin/env-probe — what a consumer-side reader has selected: the kit set
+// and the registered gate set, each read by one arm of the owed-predicate
+pub struct Selection {
+    pub kits: Vec<String>,
+    pub gates: Vec<String>,
+}
+
+// spec: context-kit/SPEC.md §bin/env-probe — the owed-predicate's closed answer set
+#[derive(Debug, PartialEq, Eq)]
+pub enum Owing {
+    Owed,
+    NotOwed,
+    Undecided,
+}
+
+// spec: context-kit/SPEC.md §bin/env-probe — a registered name with no `REGISTRY` row is a
+// consumer-declared shell gate and contributes nothing
+pub fn owed(element: &str, selection: Option<&Selection>) -> Owing {
+    let e = parse(element);
+    let audience = e.audience.as_str();
+    if audience.is_empty() {
+        return Owing::Owed;
+    }
+    if audience == CONTRIBUTOR {
+        return Owing::NotOwed;
+    }
+    let Some(sel) = selection else {
+        return Owing::Undecided;
+    };
+    let hit = if audience == REGISTERED {
+        sel.gates.iter().any(|g| {
+            crate::gates::needs(g).is_some_and(|reqs| reqs.iter().any(|(p, _)| *p == e.name))
+        })
+    } else {
+        sel.kits.iter().any(|k| k == audience)
+    };
+    if hit {
+        Owing::Owed
+    } else {
+        Owing::NotOwed
+    }
+}
 
 // spec: context-kit/SPEC.md §bin/env-probe — the roster's home, named for the reports that cite
 // where a verdict came from; a caller handed no override reads `PROBE_SET` above directly.
@@ -169,6 +216,57 @@ pub fn check(element: &str, banner: &str) -> Verdict {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn selection(kits: &[&str], gates: &[&str]) -> Selection {
+        Selection {
+            kits: kits.iter().map(|s| s.to_string()).collect(),
+            gates: gates.iter().map(|s| s.to_string()).collect(),
+        }
+    }
+
+    fn owed_names(sel: Option<&Selection>, want: Owing) -> Vec<String> {
+        PROBE_SET
+            .iter()
+            .filter(|e| owed(e, sel) == want)
+            .map(|e| parse(e).name)
+            .collect()
+    }
+
+    // spec: context-kit/SPEC.md §bin/env-probe — the owed-predicate over each arm: an unselected
+    // kit and a gate set naming no requirement owe the unconditional members alone
+    #[test]
+    fn a_conditional_member_is_owed_only_where_the_selection_reaches_it() {
+        let base = selection(&["gate-sdk"], &["check-core-files", "check-no-such-gate"]);
+        assert_eq!(owed_names(Some(&base), Owing::Owed), vec!["bash", "git"]);
+        let guarded = selection(&["gate-sdk", "guard-kit"], &[]);
+        assert_eq!(owed_names(Some(&guarded), Owing::Owed), vec!["bash", "git", "jq"]);
+        let linted = selection(&["gate-sdk"], &["check-action-run-shell"]);
+        assert_eq!(owed_names(Some(&linted), Owing::Owed), vec!["bash", "git", "shellcheck"]);
+        assert_eq!(owed_names(None, Owing::Undecided), vec!["jq", "curl", "shellcheck"]);
+        assert_eq!(owed_names(None, Owing::NotOwed), vec!["cargo"]);
+    }
+
+    // spec: context-kit/SPEC.md §bin/env-probe — the audience value set is closed: a kit-name value
+    // names a kit root the authoring tree carries, so a misspelling cannot leave every floor
+    #[test]
+    fn every_audience_value_is_closed_over_the_kit_roots() {
+        let repo = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .expect("the crate sits under the repo root");
+        let sdk = repo.join("gate-sdk").display().to_string();
+        let kits: Vec<String> = crate::walk::kit_roots_rel_from(&sdk, "")
+            .expect("cannot derive the kit roots")
+            .iter()
+            .map(|r| r.rsplit('/').next().unwrap_or(r).to_string())
+            .collect();
+        assert!(kits.iter().any(|k| k == "guard-kit"), "the kit-root derivation found {:?}", kits);
+        let offenders: Vec<String> = PROBE_SET
+            .iter()
+            .map(|e| parse(e).audience)
+            .filter(|a| !a.is_empty() && a != CONTRIBUTOR && a != REGISTERED && !kits.contains(a))
+            .collect();
+        assert!(offenders.is_empty(), "audience values naming no kit root: {:?}", offenders);
+    }
 
     // spec: context-kit/SPEC.md §bin/env-probe — the three spellings of an unconstrained member
     // are one member, and a fifth field is dropped rather than folded into the audience

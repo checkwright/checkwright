@@ -58,22 +58,23 @@ with its version floors, is on the install page.
 version stamp and the `checkwright.lock` manifest — and behind the invoke they
 read it with the crate's own parser, so none of them refuses for want of an
 external one. The install page's toolchain block still names `jq`, and that claim
-is about the **gates in the battery being vendored**: a different program's users,
-and the one that survives.
+is about **guard-kit's hook**, the one shipped reach that spawns it: a different
+program's users, and the one that survives.
 
-**A `jq`-less machine is still refused an install, and by a better message.** `jq`
-is a consumer-audience member of the toolchain floor, so `doctor` — which runs as
-`init`'s last precondition, still before any file is written — blocks the install
-naming the floor the battery needs. What is lost is a refusal that named a verb's
-own dependency; what replaces it is the one that names the adopter's actual
-problem.
+**A `jq`-less machine is refused an install only where the selection carries the
+kit that reaches `jq`.** `jq` carries guard-kit's audience on the toolchain
+floor, so `doctor` — which runs as `init`'s last precondition, still before any
+file is written — blocks a profile carrying guard-kit, naming the floor that kit
+needs, and owes nothing to a profile without it. What is lost is a refusal that
+named a verb's own dependency; what replaces it is the one that names the
+adopter's actual problem, and only where it is one.
 
 `doctor` is the verb that **reaches its diagnosis** rather than refusing before it
-can report one: it renders its whole report, names every floor member that is
+can report one: it renders its whole report, names every owed floor member that is
 missing or below its floor, and only then returns the verdict. That is why it is
-the precondition `init` gates on, and why its ordering — last, after the manifest
-and the profile are resolved — keeps a bad manifest from being reported as a
-toolchain fault.
+the precondition `init` gates on, and why its ordering — last, after the manifest,
+the profile and its kit set are resolved — keeps a bad manifest or an empty kit
+set from being reported as a toolchain fault.
 
 ## Layout
 
@@ -188,10 +189,13 @@ a single file is written:
   files and leaves the commit to you, so an operator who wants to compose the
   change themselves has taken that guarantee on deliberately — and because it
   waives the precondition, it waives that attribution with it.
-- **`doctor` passes.** The contract it holds you to is the consumer-audience
-  subset of the roster — the tools the vendored battery runs, never a tool that
-  only builds Checkwright (§doctor) — so a machine with no Rust toolchain is
-  not below it. A machine that *is* below it blocks *before* any partial
+- **`doctor` passes.** The contract it holds you to is the floor the selected
+  profile owes — the tools the vendored battery and its kits run, never a tool
+  that only builds Checkwright (§doctor) — so a machine with no Rust toolchain is
+  not below it. `init` resolves the profile's kit set, and refuses a profile
+  resolving to no kit at exit 2 as a payload fault, *before* it calls `doctor`,
+  because the kit set is half the selection `doctor` reads; both still precede
+  any write. A machine that *is* below it blocks *before* any partial
   install, rather than halfway through one, which is why `doctor` ships in the
   same phase as `init` rather than as a later convenience.
 
@@ -1055,17 +1059,34 @@ step or `init`'s own precondition check gate on the answer without parsing a
 report — and it is why a below-contract machine is caught before any partial
 install rather than halfway through one.
 
-**Which toolchain: the consumer-audience subset of the roster.** The roster
-carries an audience axis (context-kit/SPEC.md §bin/env-probe), and a member
-declared contributor-side is one no install path and no vendored gate reaches —
-`cargo` is the case that exists. `doctor` walks the roster through that
-predicate and a contributor-audience member is not probed, not rendered and
-cannot set the verdict. It is left out rather than reported as informational on
-purpose: `doctor` is the adopter's verb, and showing an adopter a tool they do
-not need is an invitation to install it. So **`DOCTOR: clean` is a claim about
-this machine as a consumer**, not about the machine — which is the narrowing
-that makes the exit status usable as `init`'s precondition, since what `init`
-needs to know is exactly whether the tree it is about to vendor into will run.
+**Which toolchain: the members the selection owes.** The roster carries an
+audience axis (context-kit/SPEC.md §bin/env-probe), and `doctor` walks it through
+that section's owed-predicate over a **selection** — a kit set and a registered
+gate set — which each caller supplies:
+
+- **`init`** hands the profile's kit set, and a gate set uniting
+  `profile::gate_set` for that profile with the members of a registry already on
+  disk at `<gates-dir>/gates.list`, since `init` protects an edited registry
+  rather than rewriting it and a gate the adopter registered by hand still reaches
+  the battery.
+- **Bare `doctor` inside an install** reads the kit set from the manifest's
+  `kits` field and the gate set from the members of the registry the manifest
+  records, before rendering the toolchain block; the output keeps its order.
+- **Bare `doctor` with no install**, or over a residue, has no selection.
+
+An **owed** member is probed, rendered and sets the verdict. A **not owed** one —
+a contributor-side member such as `cargo`, a kit-named one whose kit is not
+selected, a `registered` one no registered gate needs — is not probed, not
+rendered and cannot set the verdict. It is left out rather than reported as
+informational on purpose: `doctor` is the adopter's verb, and showing an adopter a
+tool they do not need is an invitation to install it. An **undecided** one — a
+conditional member with no selection to read — is rendered unprobed, as
+`jq           not probed — owed where guard-kit is selected` (or, for
+`registered`, `owed where a registered gate needs it`), and never sets the
+verdict. So **`DOCTOR: clean` is a claim about this machine as a consumer of
+this selection**, not about the machine — which is the narrowing that makes the
+exit status usable as `init`'s precondition, since what `init` needs to know is
+exactly whether the tree it is about to vendor into will run.
 
 It has two behaviors, selected by where you run it rather than by a flag. Run
 anywhere, it reports the toolchain verdict. Run inside a repository that has
@@ -1102,9 +1123,10 @@ with the same remedy, a re-run of `init`.
 module that also holds the floor predicate (context-kit/SPEC.md §bin/env-probe)
 and renders whatever verdict that predicate
 returns, so the contract keeps one owner and this stays a display of it. Which
-members are consumer-audience — and so which absences set the verdict — is read
-off that roster, never listed here; §Requirements works the one case a reader
-arrives with, `jq`, and says why it is below contract rather than outside it. The
+members a selection owes — and so which absences set the verdict — is read off
+that roster through its owed-predicate, never listed here; §Requirements works
+the one case a reader arrives with, `jq`, and says where it is below contract and
+where it is outside it. The
 roster is the binary's own rather than a copy in the tree it is inspecting:
 at `init` time nothing has been vendored there yet, so a tree copy would not
 exist at the moment the answer is needed.
@@ -2385,8 +2407,8 @@ consumer alone.
 
 **The artifact digest is a filter-free control on the content question.** When
 the manifest records an `artifact` key, the report recomputes the artifact's
-SHA-256 from the tree — with `sha256sum`, already one of its own preflight
-tools — and prints it beside the recorded `artifact.digest`. It costs
+SHA-256 from the tree — with the hasher its own preflight resolves, `sha256sum`
+or else `shasum -a 256` in the bootstrap's order — and prints it beside the recorded `artifact.digest`. It costs
 nothing new and settles the content question outright, because SHA-256 over the
 file is taken by no git filter and in no repository context: equal digests mean
 the artifact's bytes are exactly the bytes `init` published, so a `files`-row
@@ -2981,23 +3003,27 @@ a verb that runs clean where a verb shelling out to `jq` fails: on this `PATH` t
 two are distinguishable and nowhere else are they. That is what the arm is for,
 and it is why the arm outlives the `jq` preflight it was built around.
 
-So the arm splits its verbs by what each one actually meets. `diff` and
-`uninstall --dry-run` run no `doctor` precondition, so on this machine they both
-read the manifest and reach their answer: each must **exit 0** and say nothing
-about `jq`, which is the arm's positive evidence that the read itself is
-`jq`-free. `init` is the one verb that still refuses, and not for a reason of its
-own — `jq` is a consumer-audience member of the toolchain floor, and `init`'s
-last precondition is `doctor`'s verdict. So it must exit 1, name **the toolchain
-floor** as the reason, render the report that says which member is missing, and
-leave no manifest behind: the refusal an adopter meets here is the floor's,
-delivered before anything is written, rather than a JSON reader's. That is
-asserted twice, on a tree with and without a manifest, because a verb that had
-grown a `jq`-shaped manifest read would answer differently in the two cases.
-`doctor` itself is asserted directly as well, and the difference is what each
-shows: `init`'s refusal proves the floor is a precondition, and `doctor`'s own run
-proves it **reaches its whole report** rather than refusing somewhere ahead of it.
-Exit 1 is the correct verdict there and asserting exit 0 would have been asserting
-the opposite of the contract.
+So the arm splits its verbs by what each one actually meets, in this order:
+
+- **`doctor` in a directory with no install** has no selection, so it exits 0 on
+  a host meeting `bash` and `git` and renders `jq` as `not probed`, naming the kit
+  that owes it. That kit is read off the line and is the kit the next two
+  assertions use, so the harness names no kit and carries no second copy of the
+  roster's audience field.
+- **`init --profile` at the lattice minimum** exits 0 on the `jq`-less `PATH`:
+  the minimum selects no kit owing `jq` — asserted, not assumed — so the floor it
+  meets carries none.
+- **`init` at a profile whose kit set carries that kit**, found through the
+  harness's own profile reader and run in a fresh consumer, exits 1, names **the
+  toolchain floor** as the reason, renders `jq` as `NOT FOUND`, and leaves no
+  manifest behind: the refusal an adopter meets there is the floor's, delivered
+  before anything is written, rather than a JSON reader's.
+- **`doctor` inside the minimum's install** reads that install's selection, exits
+  0 and renders no `jq` line at all.
+- **`diff` and `uninstall --dry-run`** run no `doctor` precondition, so they read
+  the minimum's manifest and reach their answer: each must **exit 0** and say
+  nothing about `jq`, which is the arm's positive evidence that the read itself is
+  `jq`-free.
 
 The gap that arm closes was total, and it is why this defect could be filed
 twice: the smoke's preflight requires `jq` and this harness reads every manifest

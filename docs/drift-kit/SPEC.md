@@ -997,7 +997,7 @@ priced cost, never the account the tokens billed to.
    residue countable rather than invisible. The transcript reader is **in-crate**:
    a line the parser cannot read is skipped rather than fatal, which is `jq -rc`'s
    own behavior under the pipeline it replaced, and a transcript with no
-   assistant-turn usage keeps its named skip line. The arm spawns `git` and `date`
+   assistant-turn usage keeps its named skip line. The arm spawns `git`, `date` off unix,
    and no interpreter, so the interpreter-absent degradation this input once
    carried has no branch left to enter and is not documented as one: a documented
    degradation that can never fire is worse than none.

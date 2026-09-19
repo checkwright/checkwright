@@ -27,8 +27,7 @@
 # name to resolve against. It also already satisfies the last clause several
 # times over, through gates that read the adopter's own tree rather than the
 # vendored source — a tracked script missing its exec bit, a mutable action ref
-# in their workflows, a malformed commit subject, a broken shell script under
-# their gates directory. So any second kit would make the set larger than the
+# in their workflows, a malformed commit subject. So any second kit would make the set larger than the
 # criterion asks for, and the first experience is the framework, not a reading
 # list.
 starter	gate-sdk
@@ -57,7 +56,7 @@ delegation	guard-kit
 delegation	doctrine-kit
 
 # prose — the smallest set that governs a repository whose artifacts are prose,
-# on a git-only floor. gate-sdk is forced in for the same reason it is forced in
+# on the floor docs/install.md §Requirements states for it. gate-sdk is forced in for the same reason it is forced in
 # starter: no runner, no hook generator, no registry. canon-kit is the kit whose
 # subject is authored documents; every other kit's subject is either the agent
 # session — which is delegation's criterion, and why these two are alternatives

@@ -364,11 +364,11 @@ fn spawn(
 }
 
 fn date_today() -> Result<String, String> {
-    let c = proc::run(&programs::DATE, &["+%F"])?;
-    match c.stdout() {
-        Some(o) => Ok(String::from_utf8_lossy(o).trim().to_string()),
-        None => Err("could not read today's date — nothing recorded.".to_string()),
+    let today = crate::emit::kpi::today_iso();
+    if today.is_empty() {
+        return Err("could not read today's date — nothing recorded.".to_string());
     }
+    Ok(today)
 }
 
 fn read_or_empty(path: &str) -> String {

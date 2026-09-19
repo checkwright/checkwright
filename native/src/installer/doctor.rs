@@ -2,7 +2,7 @@
 // CI step can gate on the verdict without parsing a report. The roster is the crate's own
 // (context-kit/SPEC.md §bin/env-probe), because at init time nothing is vendored in the tree yet.
 use super::{lock, GATES_DIR};
-use crate::toolfloor::{self, Verdict as Floor};
+use crate::toolfloor::{self, Owing, Selection, Verdict as Floor};
 use crate::{proc, programs, sha256};
 use std::fmt::Write as _;
 
@@ -142,29 +142,71 @@ fn omitted_block(out: &mut String, list_text: &str) {
     }
 }
 
-pub fn diagnose() -> Report {
-    let mut out = String::new();
-    let mut err = String::new();
+// spec: installer/SPEC.md §doctor — the toolchain block over the selection: an owed member is
+// probed and sets the verdict, a not-owed one is skipped outright (showing an adopter a tool they do
+// not need invites them to install it), and an undecided one is named unprobed and never fails.
+fn toolchain_block(
+    out: &mut String,
+    selection: Option<&Selection>,
+    probe: impl Fn(&str) -> String,
+) -> bool {
     let mut failed = false;
-    let mut artifact_finding = String::new();
-
     out.push_str("toolchain\n");
     for element in toolfloor::PROBE_SET {
-        // spec: installer/SPEC.md §doctor — a contributor-audience member is skipped outright
-        // rather than rendered as informational: doctor is the adopter's verb, and showing an
-        // adopter a tool the install path never reaches is an invitation to install it.
-        if toolfloor::parse(element).audience == "contributor" {
-            continue;
+        let e = toolfloor::parse(element);
+        match toolfloor::owed(element, selection) {
+            Owing::NotOwed => {}
+            Owing::Owed => failed |= render_member(out, element, &probe(&e.name)),
+            Owing::Undecided => {
+                let reach = if e.audience == toolfloor::REGISTERED {
+                    "a registered gate needs it".to_string()
+                } else {
+                    format!("{} is selected", e.audience)
+                };
+                let _ = writeln!(out, "  {:<12} not probed — owed where {}", e.name, reach);
+            }
         }
-        let banner = probe_banner(&toolfloor::parse(element).name);
-        failed |= render_member(&mut out, element, &banner);
     }
+    failed
+}
 
-    // spec: gate-sdk/SPEC.md §The crate's crosser — both producers go through the crosser, so a
-    // report run outside a work tree names the same dialect one run inside it does.
-    let root = super::repo_root()
+// spec: gate-sdk/SPEC.md §The crate's crosser — both producers go through the crosser, so a
+// report run outside a work tree names the same dialect one run inside it does.
+fn here() -> std::path::PathBuf {
+    super::repo_root()
         .or_else(|| crate::walk::cwd().ok().map(std::path::PathBuf::from))
-        .unwrap_or_else(|| std::path::PathBuf::from("."));
+        .unwrap_or_else(|| std::path::PathBuf::from("."))
+}
+
+// spec: installer/SPEC.md §doctor — bare doctor's selection is the install's own: the manifest's
+// kit set and the members of the registry it records. No install, or a residue, selects nothing.
+fn installed_selection(root: &std::path::Path) -> Option<Selection> {
+    let manifest = lock::Manifest::read(&lock::path(root)).filter(lock::Manifest::schema_ok)?;
+    if manifest.field("version").is_empty() {
+        return None;
+    }
+    let list = manifest.own_file(&format!("{}/gates.list", GATES_DIR));
+    let gates = if list.is_empty() {
+        Vec::new()
+    } else {
+        std::fs::read_to_string(root.join(&list))
+            .map(|t| crate::registry::members(&t).iter().map(|m| m.trim().to_string()).collect())
+            .unwrap_or_default()
+    };
+    Some(Selection {
+        kits: manifest.field("kits").split_whitespace().map(String::from).collect(),
+        gates,
+    })
+}
+
+pub fn diagnose(selection: Option<&Selection>) -> Report {
+    let mut out = String::new();
+    let mut err = String::new();
+    let mut artifact_finding = String::new();
+
+    let failed = toolchain_block(&mut out, selection, probe_banner);
+
+    let root = here();
     let lock_path = lock::path(&root);
 
     if !lock_path.is_file() {
@@ -304,7 +346,7 @@ pub fn run(args: &[String]) -> i32 {
     if let Some(outcome) = super::help_only(args, USAGE) {
         return super::finish("doctor", outcome);
     }
-    let r = diagnose();
+    let r = diagnose(installed_selection(&here()).as_ref());
     print!("{}", r.out);
     if !r.err.is_empty() {
         eprint!("{}", r.err);
@@ -331,6 +373,49 @@ mod tests {
         assert!(out.contains("bash         5.2.37 (below the floor of 9.9)"));
         assert!(out.contains("sort         2.3 (not the coreutils implementation the contract requires)"));
         assert!(out.contains("bash         could not be compared against the floor of 4.3"));
+    }
+
+    // spec: installer/SPEC.md §doctor — the block renders the selection's floor: a probe that
+    // answers nothing fails only an owed member, and no selection names the conditional members
+    // unprobed and leaves the verdict to the unconditional ones.
+    #[test]
+    fn the_toolchain_block_renders_the_floor_the_selection_owes() {
+        let sel = |kits: &[&str], gates: &[&str]| Selection {
+            kits: kits.iter().map(|s| s.to_string()).collect(),
+            gates: gates.iter().map(|s| s.to_string()).collect(),
+        };
+        let present = |t: &str| format!("{} version 9.9.9", t);
+        let only_floor = |t: &str| {
+            if t == "bash" || t == "git" {
+                format!("{} version 9.9.9", t)
+            } else {
+                String::new()
+            }
+        };
+
+        let mut out = String::new();
+        assert!(!toolchain_block(&mut out, Some(&sel(&["gate-sdk"], &["check-core-files"])), only_floor));
+        assert!(out.contains("bash ") && out.contains("git "));
+        assert!(!out.contains("jq") && !out.contains("curl") && !out.contains("shellcheck"));
+        assert!(!out.contains("cargo"));
+
+        let mut out = String::new();
+        assert!(toolchain_block(&mut out, Some(&sel(&["gate-sdk", "guard-kit"], &[])), only_floor));
+        assert!(out.contains("jq           NOT FOUND"));
+
+        let mut out = String::new();
+        assert!(toolchain_block(&mut out, Some(&sel(&["gate-sdk"], &["check-action-run-shell"])), only_floor));
+        assert!(out.contains("shellcheck   NOT FOUND"));
+
+        let mut out = String::new();
+        assert!(!toolchain_block(&mut out, None, only_floor));
+        assert!(out.contains("jq           not probed — owed where guard-kit is selected"));
+        assert!(out.contains("curl         not probed — owed where delegation-kit is selected"));
+        assert!(out.contains("shellcheck   not probed — owed where a registered gate needs it"));
+
+        let mut out = String::new();
+        assert!(!toolchain_block(&mut out, Some(&sel(&["guard-kit", "delegation-kit"], &["check-shellcheck"])), present));
+        assert!(out.contains("jq           9.9.9") && out.contains("shellcheck   9.9.9"));
     }
 
     // spec: installer/SPEC.md §The gate binary — the omitted block reports whatever reason it

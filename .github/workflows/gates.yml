@@ -188,10 +188,10 @@ jobs:
   #   - `shellcheck`'s bullet in docs/install.md §Requirements justified an
   #     ADOPTER floor member with contributor-only language, so nothing told an
   #     adopter why `init` refuses without it. Round 3 measured that refusal
-  #     here; the bullet now states the adopter's own stake and where each
-  #     platform takes the member from, and the step above supplies it on this
-  #     host. PRODUCED was discharged by that same round — the artifact built
-  #     natively and packed — so only EXERCISED is still owed.
+  #     here; the member is now owed only where a registered gate needs it, and
+  #     the bullet states where each platform takes it from. PRODUCED was
+  #     discharged by that same round — the artifact built natively and packed —
+  #     so only EXERCISED is still owed.
   # All three are CONFIRMED discharged by round 4 (run 33068870024): the step
   # below cleared the toolchain and `init` vendored and committed for the first
   # time ever on a Windows host. What remains is NOT merely the run — round 4
@@ -275,7 +275,7 @@ jobs:
                    sha256sum tar npm node cargo rustc rustup shellcheck ruby; do
             printf '%-11s %s\n' "$t" "$(command -v "$t" 2>/dev/null || echo '<MISSING>')"
           done
-          echo "== flavours, against the GNU-first floor docs/install.md asserts =="
+          echo "== flavours, against the POSIX floor docs/install.md asserts =="
           for t in awk sed sort grep find; do
             printf '%-6s %s\n' "$t" "$("$t" --version 2>&1 | head -n1)"
           done
@@ -372,26 +372,15 @@ jobs:
           fi
           exit 0
 
-      # `shellcheck` is an ADOPTER floor member (docs/install.md §Requirements,
-      # native/src/toolfloor.rs's PROBE_SET, where it carries no audience
-      # token) and windows-latest ships without it — so `checkwright init`
-      # refuses the toolchain and the suite never reaches the artifact. That is
-      # what round 3 measured on 2026-08-27, and it is a real adopter-facing
-      # defect rather than a CI one; the repair is the docs half, which now
-      # states the adopter's own stake in this member and where each platform
-      # takes it from.
-      #
-      # **This step stopped being scaffolding on the day the triple joined, and
-      # is now the ADOPTER's own step performed.** It used to carry a standing
-      # obligation — "when a native Windows path is supported, this step's route
-      # is what that section has to name, or the leg goes back to measuring
-      # nobody's path" — and that obligation is discharged: docs/install.md
-      # §Requirements' `shellcheck` bullet names Chocolatey for native Windows,
-      # citing this leg as what measures it. Like the macOS legs, this step runs
-      # the page's own block: it reads `windows-remedy` with the macOS legs' awk
-      # program and runs the body verbatim under PowerShell, the shell a
-      # native-Windows adopter types it into. An empty extraction reds by name.
-      - name: install the one adopter floor member this runner lacks
+      # **This step is the ADOPTER's own step performed.** Like the macOS legs, it
+      # runs docs/install.md §Requirements' own block: it reads `windows-remedy`
+      # with the macOS legs' awk program and runs the body verbatim under
+      # PowerShell, the shell a native-Windows adopter types it into. The block
+      # installs no floor member — `shellcheck` and `jq` are conditional members
+      # and `starter` owes neither — and the runner image may carry them anyway,
+      # so this leg asserts nothing about their absence. An empty extraction reds
+      # by name.
+      - name: run the page's windows-remedy block
         shell: bash
         run: |
           set +e
@@ -407,14 +396,6 @@ jobs:
           printf '== docs/install.md windows-remedy block ==\n%s\n' "$block"
           pwsh -NoProfile -Command "$block"
           echo "block exited $?"
-          hash -r
-          echo "shellcheck resolves to: $(command -v shellcheck || echo '<MISSING>')"
-          shellcheck --version
-          # Loud and specific rather than silent: if this did not land, the suite
-          # below fails at doctor exactly as it did in round 3, and the next
-          # reader must be told which of the two defects they are looking at.
-          command -v shellcheck >/dev/null 2>&1 \
-            || echo "SCAFFOLDING FAILED — shellcheck is still absent, so a doctor refusal below is THIS step's failure and not a new finding"
           exit 0
 
       # By PATTERN and not by name, for the reason the macOS siblings state: a
@@ -791,8 +772,7 @@ jobs:
           # never carried. This leg puts nothing on PATH itself: docs/install.md's
           # `windows-remedy` block is run verbatim, as an adopter following the
           # page would, and its session line is what orders Git's `usr\bin` and
-          # `bin` here; `shellcheck` the image does not ship at all. An empty
-          # extraction reds by name.
+          # `bin` here. An empty extraction reds by name.
           $remedy = @()
           $inBlock = $false
           foreach ($line in (Get-Content -LiteralPath docs/install.md)) {
@@ -808,10 +788,6 @@ jobs:
           $remedy | ForEach-Object { Write-Host $_ }
           Invoke-Expression ($remedy -join "`n") | Out-Host
           Write-Host "block exited $LASTEXITCODE"
-          Write-Host "shellcheck resolves to: $((Get-Command shellcheck -ErrorAction SilentlyContinue).Source)"
-          if (-not (Get-Command shellcheck -ErrorAction SilentlyContinue)) {
-              Write-Host "SCAFFOLDING FAILED -- shellcheck is still absent, so a doctor refusal below is THIS block's failure and not a new finding"
-          }
           # The floor's roster is the binary's and never this file's, so the assertion
           # asks `doctor` rather than enumerating members here — a second copy would
           # drift the moment the roster moves. Asserting it BEFORE init also puts the
@@ -1266,10 +1242,12 @@ jobs:
       # the runner puts each `$GITHUB_PATH` line ahead of the ones before it.
       # That carry is the runner's and no adopter has it, so the second refusal
       # is the adopter's next terminal — a login zsh with no inherited `PATH` —
-      # resolving `date`, the member the block's coreutils is installed for,
-      # anywhere but coreutils' `gnubin`: the block's profile line is what must
-      # persist the ordering (docs/install.md §Requirements).
-      - name: install the GNU userland docs/install.md names, and PATH-order it
+      # resolving `bash`, the member the block installs, anywhere but
+      # `$(brew --prefix)/bin`: the block's profile line is what must persist the
+      # ordering (docs/install.md §Requirements). Where Homebrew's prefix is
+      # `/usr/local`, `/etc/paths` already leads with its `bin`, so on an Intel
+      # host the probe holds with or without the profile line.
+      - name: install the bash docs/install.md names, and PATH-order it
         run: |
           set +e
           block="$(awk '
@@ -1293,15 +1271,13 @@ jobs:
             i=$((i - 1))
             echo "${entries[$i]}" >> "$GITHUB_PATH"
           done
-          next="$(env -i HOME="$HOME" /bin/zsh -l -c 'command -v date')"
-          echo "a fresh login shell resolves date to: ${next:-<MISSING>}"
-          case "$next" in
-            */coreutils/libexec/gnubin/date) ;;
-            *)
-              echo "::error::a fresh login shell resolves date to '${next:-<MISSING>}', not coreutils' gnubin — the block did not persist its PATH ordering for the adopter's next terminal"
-              exit 1
-              ;;
-          esac
+          next="$(env -i HOME="$HOME" /bin/zsh -l -c 'command -v bash')"
+          want="$(brew --prefix)/bin/bash"
+          echo "a fresh login shell resolves bash to: ${next:-<MISSING>}"
+          if [ "$next" != "$want" ]; then
+            echo "::error::a fresh login shell resolves bash to '${next:-<MISSING>}', not $want — the block did not persist its PATH ordering for the adopter's next terminal"
+            exit 1
+          fi
           exit 0
 
       # Reporting only, and it never fails. It is what makes a red suite below
@@ -1328,7 +1304,7 @@ jobs:
                    shasum tar npm node cargo rustc rustup shellcheck ruby brew; do
             printf '%-11s %s\n' "$t" "$(command -v "$t" 2>/dev/null || echo '<MISSING>')"
           done
-          echo "== flavours, against the GNU-first floor docs/install.md asserts =="
+          echo "== flavours, against the POSIX floor docs/install.md asserts =="
           for t in awk sed sort grep find tar; do
             printf '%-6s %s\n' "$t" "$("$t" --version 2>&1 | head -n1)"
           done
@@ -1577,7 +1553,7 @@ jobs:
       #
       # Its failure posture and its bash 3.2 body are the sibling's, for the
       # sibling's reasons.
-      - name: install the GNU userland docs/install.md names, and PATH-order it
+      - name: install the bash docs/install.md names, and PATH-order it
         shell: bash
         run: |
           set +e
@@ -1602,15 +1578,13 @@ jobs:
             i=$((i - 1))
             echo "${entries[$i]}" >> "$GITHUB_PATH"
           done
-          next="$(env -i HOME="$HOME" /bin/zsh -l -c 'command -v date')"
-          echo "a fresh login shell resolves date to: ${next:-<MISSING>}"
-          case "$next" in
-            */coreutils/libexec/gnubin/date) ;;
-            *)
-              echo "::error::a fresh login shell resolves date to '${next:-<MISSING>}', not coreutils' gnubin — the block did not persist its PATH ordering for the adopter's next terminal"
-              exit 1
-              ;;
-          esac
+          next="$(env -i HOME="$HOME" /bin/zsh -l -c 'command -v bash')"
+          want="$(brew --prefix)/bin/bash"
+          echo "a fresh login shell resolves bash to: ${next:-<MISSING>}"
+          if [ "$next" != "$want" ]; then
+            echo "::error::a fresh login shell resolves bash to '${next:-<MISSING>}', not $want — the block did not persist its PATH ordering for the adopter's next terminal"
+            exit 1
+          fi
           exit 0
 
       # Reporting only, never fails, and it runs AFTER the install so what it
@@ -1637,7 +1611,7 @@ jobs:
                    shasum tar npm node cargo rustc rustup shellcheck ruby brew; do
             printf '%-11s %s\n' "$t" "$(command -v "$t" 2>/dev/null || echo '<MISSING>')"
           done
-          echo "== flavours, against the GNU-first floor docs/install.md asserts =="
+          echo "== flavours, against the POSIX floor docs/install.md asserts =="
           for t in awk sed sort grep find tar; do
             printf '%-6s %s\n' "$t" "$("$t" --version 2>&1 | head -n1)"
           done
@@ -1824,7 +1798,7 @@ jobs:
                    shasum tar npm node cargo rustc rustup shellcheck ruby; do
             printf '%-11s %s\n' "$t" "$(command -v "$t" 2>/dev/null || echo '<MISSING>')"
           done
-          echo "== flavours, against the GNU-first floor docs/install.md asserts =="
+          echo "== flavours, against the POSIX floor docs/install.md asserts =="
           for t in awk sed sort grep find tar; do
             printf '%-6s %s\n' "$t" "$("$t" --version 2>&1 | head -n1)"
           done

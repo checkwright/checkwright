@@ -60,33 +60,29 @@ per kit, so the adoption decision weighs a number rather than a guess.
 
 ## Requirements
 
-Checkwright is **Unix-first**, and specifically **GNU-first**: the engine is
-portable to any Unix that presents a GNU userland on `PATH`, which Linux
-distributions do out of the box. Native Windows is a **joined** platform: the
+Checkwright is **Unix-first**: the engine assumes the Portable Operating System Interface (POSIX) userland
+`GATE_SDK_PROGRAM_FLOOR` names (gate-sdk/SPEC.md §lib/gate.sh), and no shipped
+adopter path needs GNU coreutils. Native Windows is a **joined** platform: the
 gate binary is published for it and a Windows install-smoke leg installs that
 published build on a Windows runner, so the requirements below are what a native
 Windows host has to satisfy rather than a promise about one. Git for Windows
-supplies the bash and the GNU userland they name. Windows through WSL (Windows
+supplies the bash and the userland they name. Windows through WSL (Windows
 Subsystem for Linux) is a route you may choose instead — the Linux line below
 serves it, and joining native Windows took nothing away from it.
 
 macOS runs it too, but as an adopter action rather than something the stock
-system delivers. Stock macOS ships bash 3.2 over a BSD userland whose `date`
-rejects the flags the gates pass. The remedy is the block below, and it
-is the whole of it: this page names no other step for a Mac. Its first line
-installs GNU bash for the 4.3 floor, coreutils for `date`, and
-`shellcheck`, which `init` refuses a machine without. The other two put
-coreutils' `gnubin` directory and Homebrew's own `bin` ahead of `/usr/bin` on
-`PATH`; `gnubin` is what makes the GNU names resolve unprefixed, as `date`
-rather than `gdate`, and without it every gate that reads a date would still
-reach the BSD one.
+system delivers. Stock macOS ships bash 3.2, below the 4.3 floor. The remedy is
+the block below, and it is the whole of it: this page names no other step for a
+Mac. Its first line installs a current bash from Homebrew. The other two put
+Homebrew's own `bin` ahead of `/bin` on `PATH`, so `bash` resolves to that one
+rather than to the system's 3.2.
 
 <!-- macos-remedy:begin -->
 
 ```sh
-brew install bash coreutils shellcheck
-echo "export PATH=\"$(brew --prefix)/opt/coreutils/libexec/gnubin:$(brew --prefix)/bin:\$PATH\"" >> ~/.zprofile
-export PATH="$(brew --prefix)/opt/coreutils/libexec/gnubin:$(brew --prefix)/bin:$PATH"
+brew install bash
+echo "export PATH=\"$(brew --prefix)/bin:\$PATH\"" >> ~/.zprofile
+export PATH="$(brew --prefix)/bin:$PATH"
 ```
 
 <!-- macos-remedy:end -->
@@ -95,8 +91,8 @@ The block's middle line writes the ordering into `~/.zprofile`, the profile a
 new zsh Terminal window reads. If your login shell is bash, append the same line
 to `~/.bash_profile` instead. The last line orders the shell you are in. The
 requirements below assert what `PATH` actually resolves, so a Mac carrying
-Homebrew coreutils that is not `PATH`-ordered is not what the gates invoke: they
-reach BSD `date` in its place. The two macOS
+Homebrew bash that is not `PATH`-ordered is not what the gates invoke: they
+reach the system's bash 3.2 in its place. The two macOS
 install-smoke legs run this block verbatim and then open a fresh login shell, so
 both the ordering and its persistence are measured rather than suggested.
 
@@ -173,27 +169,26 @@ your `PATH`, and the note says what breaks without it:
   binary reads civil dates itself rather than through GNU `date -d`.
 - `git` — the gates read tracked files and the hooks fire at commit time; the
   model is git-native end to end.
-- `jq` — the settings and evidence gates, and guard-kit's JSON tooling, parse
-  their inputs with it.
-- `curl` — the usage poller fetches its source with it, and it refuses by name
-  where `curl` is absent. Like `shellcheck` below, it is part of the toolchain
-  contract `checkwright doctor` decides, so `init` refuses a machine without it
-  rather than half-installing.
-- `shellcheck` — an **adopter** requirement and not merely a contributor one,
-  which is why it carries no audience token where `cargo` below does. You
-  inherit the battery: the `check-shellcheck` meta-gate runs
-  [ShellCheck](https://www.shellcheck.net/) over every shipped script, and once
-  the generated hooks are installed it runs over **your** scripts at commit time
-  too, where a lint finding blocks the commit. So `init` enforces it up front —
-  this member is part of the toolchain contract `checkwright doctor` decides
-  before any partial install (see the three preconditions under `init` below),
-  and a machine without ShellCheck is **refused rather than half-installed**.
-  Nothing in the install supplies it. Take it from your distribution on Linux or
-  on a Windows adopter's WSL where that is the chosen route. On macOS the remedy
-  block above installs it. On native Windows the source is Chocolatey, and the
-  Windows remedy block after this list is the command, typed into PowerShell.
-  Both Windows install-smoke legs run that block verbatim under PowerShell, so it
-  is measured rather than suggested.
+- `jq` (@guard-kit) — guard-kit's hook parses the harness's JSON payload with
+  it, so `checkwright doctor` requires it only where guard-kit is selected, and
+  `init` refuses a profile carrying guard-kit on a machine without it. Take it
+  from your distribution's package on Linux or WSL, from Homebrew
+  (`brew install jq`) on macOS, and from Chocolatey (`choco install jq`) on native
+  Windows.
+- `curl` (@delegation-kit) — delegation-kit's usage poller (`--usage-poll`)
+  fetches its source with it, and refuses by name where `curl` is absent, so
+  `checkwright doctor` requires it only where delegation-kit is selected. Most
+  hosts already carry it; where one does not, take it from your distribution's
+  package, from Homebrew on macOS, or from Chocolatey on native Windows.
+- `shellcheck` (@registered) — required only where a gate you register needs it,
+  so `checkwright doctor` owes it only then and no profile's `init` asks for it.
+  `check-shellcheck` arms when you register it for your own gate scripts under
+  your gates directory, and `check-action-run-shell` when you register it for
+  your workflows; either one then runs [ShellCheck](https://www.shellcheck.net/)
+  at commit time, where a lint finding blocks the commit. Take it from your
+  distribution's package on Linux or WSL, from Homebrew
+  (`brew install shellcheck`) on macOS, and from Chocolatey
+  (`choco install shellcheck`) on native Windows.
 - `cargo` (≥ 1.71, @contributor) — a **contributor** requirement with **no install-time role at
   all**: the `native/` crate carries the gate implementations that dispatch to a
   binary subcommand, and the floor is the highest MSRV in the crate's resolved
@@ -212,16 +207,15 @@ your `PATH`, and the note says what breaks without it:
 
 <!-- toolchain:end -->
 
-The Windows remedy block, typed into PowerShell. It installs the two floor
-members Git for Windows does not supply, `shellcheck` and `jq`. It then puts
-Git's own `usr\bin` and `bin` on `PATH`, for this session and, through your user
-`Path`, for every later one: Git's installer puts only its `cmd` directory there
-by default, and that directory holds no userland.
+The Windows remedy block, typed into PowerShell. It puts Git's own `usr\bin` and
+`bin` on `PATH`, for this session and, through your user `Path`, for every later
+one: Git's installer puts only its `cmd` directory there by default, and that
+directory holds no userland. Both Windows install-smoke legs run that block
+verbatim under PowerShell, so it is measured rather than suggested.
 
 <!-- windows-remedy:begin -->
 
 ```powershell
-choco install shellcheck jq -y
 $git = Split-Path (Split-Path (Split-Path ((git --exec-path) -replace '/', '\')))
 [Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + ";$git\usr\bin;$git\bin", 'User')
 $env:PATH = "$git\usr\bin;$git\bin;$env:PATH"
@@ -238,11 +232,15 @@ forces is an aspiration, and an aspiration is what rots; the rule is what keeps
 this list honest, not a promise to revisit it.
 
 A bullet whose parenthetical carries an `@` token names the **audience** that
-floor belongs to, and `@contributor` is the only one there is: a tool nothing on
+floor belongs to, and there are three kinds. `@contributor` is a tool nothing on
 an install path reaches, required of someone building Checkwright rather than of
-someone running it. `checkwright doctor` reads that field and leaves such a
-member out of its verdict entirely, so an unmarked bullet is the whole floor an
-adopter's machine is held to.
+someone running it, and `checkwright doctor` leaves it out of its verdict
+entirely. A kit name, such as `@guard-kit`, is held only where the profile you
+select carries that kit. `@registered` is held only where a gate registered in
+your `gates.list` needs the tool. An unmarked bullet is what every adopter's
+machine is held to; a kit-named or `@registered` bullet is held only where your
+selection reaches it, and `doctor` run outside an install names such a member as
+*not probed* rather than guessing a selection.
 
 Nor are the bullets maintained beside the code. The roster lives in
 `native/src/toolfloor.rs`, beside the floor predicate that reads it. This block renders it, and

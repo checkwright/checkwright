@@ -1600,7 +1600,8 @@ the payload's; a spawn failure names that ground beside the program. A resolved
 invocation path is taken with `Program::at`, which keeps the identity it
 retargets, so `current_exe()` and `GATE_SDK_NATIVE_BIN` spawn as the payload
 member rather than as a second name. Each roster member carries `toolfloor`'s
-audience field. Unit tests hold four relations: an adopter-side member is on
+audience field. Unit tests hold four relations: an adopter-side member — any
+audience but `contributor`, a conditional one included — is on
 `GATE_SDK_PROGRAM_FLOOR`'s default, on `PROBE_SET`, or is the payload itself;
 a member on both roster and `PROBE_SET` has one audience; every `PROBE_SET`
 element is a roster member; and every consumer command's ground names a knob
@@ -1618,7 +1619,13 @@ runs is the self-declaration §The `# graph:` manifest refuses. `which` stays a
 name-typed presence probe, since a name probed and never run is no
 requirement. `pwsh` and `powershell` are `contributor` members: only
 `--run-front-end-parity` spawns them (§run-gates), on CI legs, so no adopter host
-needs either and the floor-or-probe relation does not bind them.
+needs either and the floor-or-probe relation does not bind them. `mktemp` and
+`cp` are `contributor` members on the same ground: only source-clone arms spawn
+them — `--run-demo`, `--run-consumer-smoke`'s builder, `--upgrade-smoke` and
+`--agents-md-smoke` need the kit sources and a cargo-built binary, the payload
+withholds `smoke/` (`GATE_SDK_PAYLOAD_WITHHOLD`), and `--pack-installer` is the
+publisher's own; a later adopter-side spawn of either reclaims an adopter
+audience. `date` and `ps` are members on non-unix builds only.
 
 ### Fixture-pair discipline
 
@@ -2497,7 +2504,7 @@ holds for the same reason it always did.
 
 | Meta-gate | Disposition for a `.gate`-dispatched member |
 |---|---|
-| `check-shellcheck` | **Retired with cause, and the cause is per-member rather than about this gate.** For a `.gate`-dispatched member there is no shell file to lint, so this meta-gate makes no assertion about it; `cargo clippy` at deny-warnings is the substrate equivalent and runs in CI, not as a gate. Read as a statement about the *gate* the row would be false, and the distinction is worth the sentence: the gate is `zero-config`, an adopter cannot author a compiled gate, and a vendoring consumer's gate family is shell by construction — so what ends when a tree's last `.sh` leaves is that tree's registration, never the shipped gate (§check-shellcheck). **This member is itself `.gate`-dispatched **, ported as criterion 7's wrapper: its rule is an invocation of `shellcheck`, which stays a declared dependency the compiled form spawns and refuses at exit 2 without. Its own port moves nothing in the rule and one thing in its corpus — one fewer `.sh` to lint — which is this row's disposition measured rather than asserted. |
+| `check-shellcheck` | **Retired with cause, and the cause is per-member rather than about this gate.** For a `.gate`-dispatched member there is no shell file to lint, so this meta-gate makes no assertion about it; `cargo clippy` at deny-warnings is the substrate equivalent and runs in CI, not as a gate. Read as a statement about the *gate* the row would be false, and the distinction is worth the sentence: the gate is `on-surface`, an adopter cannot author a compiled gate, and a vendoring consumer's gate family is shell by construction — so what ends when a tree's last `.sh` leaves is that tree's registration, never the shipped gate (§check-shellcheck). **This member is itself `.gate`-dispatched **, ported as criterion 7's wrapper: its rule is an invocation of `shellcheck`, which stays a declared dependency the compiled form spawns and refuses at exit 2 without. Its own port moves nothing in the rule and one thing in its corpus — one fewer `.sh` to lint — which is this row's disposition measured rather than asserted. |
 | `check-gate-output` | **Ported and strengthened for the fixtured corpus; source-grep retained for the one member outside it, over the corpus that member's rule now lives in.** The source-grep for `: clean`/`help:` was always a proxy for behavior; for the fixtured members the assertion now runs in the `--run-gate-tests` arm (§run-gate-tests) against the case's real output, on **shell gates too**. The remaining member, `check-task-conservation` (`# no-fixture:` per queue-kit/SPEC.md §check-task-conservation — a HEAD-vs-worktree diff has no static-fixture representation), has no case for a runtime assertion to reach, so the source-grep stays its only oracle. Retiring the static half outright would zero out that member's output-contract coverage — the exact vacuity this table exists to close. **That member has since ported**, which is why this row is not "unchanged": its declaration path is now a descriptor, which by the closed field roster cannot hold the strings, so corpus *and* emitter alternation follow the rule to the implementation module, and a tree carrying no crate declares the member out of reach rather than reddening (§check-gate-output owns the resolution and its two branches). |
 | `check-gate-fail-closed` | **Retired with cause, and the cause is narrower than it first read.** For a member that reads files, the defect (branching on a captured value's emptiness when the subprocess died) is unrepresentable: there is no subprocess, and a fallible read returns a `Result` that cannot be ignored. A real substrate win, stated as one. **It is representable for a member that spawns one**, and queue-kit's port landed the first: `Command::output()` returning `Ok` means the *spawn* succeeded, never that the program did, so reading `stdout` while ignoring `status` reproduces the defect exactly. The disposition is unchanged — this gate's corpus is `check-*.sh` and it could not scan a Rust module either way — and the property is held crate-side rather than by review: the spawn wrapper and its unit tests (§Fail-closed contract) leave a gate module unable to construct a `Command` at all, and unable to reach stdout without the status having been read. Machine-held rather than remembered, which is the same answer the `check-reads-couples` row below gives to the same problem, and what keeps this retirement honest. |
 | `check-reads-couples` | **Retained, with a binary-side equivalent.** Its shell parser finds no walks in a binary gate and would print `clean` — the single worst vacuity available here — so the substrate answers instead of the parser: the binary carries a `--reads <name>` arm printing one line per walk root, a repo-relative path or `?` with its ground, and the gate consumes that report into its existing coverage assertion (§check-reads-couples). The declaration is **registry data held to executed behavior**, which is what separates it from the unbound self-declaration this gate exists to refuse: each gate's roots are declared beside its dispatch entry in the crate's registry (an entry added without them fails to compile), the crate's single sanctioned walk implementation records the roots it is invoked with, and three unit tests close the loop — **A**, every member run over its own `gate-tests/<name>/{good,bad}/` cases with recording on, each case in a child whose working directory is the case (§lib/gate.sh), observed roots a subset of declared **and declared prunes a subset of observed** — the two directions are not a symmetry to tidy: a root declaration widens the demand so an undeclared root is the fault, a prune declaration narrows it so an unapplied prune is, and a declared prune with no reader would be the self-certified narrowing this gate exists to refuse. A case that relocates a walk through its own positional argument, or whose guarded branch its configuration does not select, exercises no such walk and is held to nothing; the two halves each carry a global guard so neither can pass by holding over nothing. **B**, no module outside that walk implementation names a filesystem-walk API, because a direct walk would be invisible to the recorder and unverify A. **C**, no member answers a statically resolvable walk root with `?` — a property test over the gate modules' own source, whose honest limit is that it sees the root idioms it enumerates and a module may fall outside them; it is a floor the declaration rule is not. B's vendored half is held by an **allowlist over the resolved graph**: a spelling roster cannot catch a walker inside a dependency, so every crate in the tracked `Cargo.lock` — transitive included, since a transitive crate walks as visibly as a direct one — is admitted by name with the clause of the dependency bar it cleared (§The settings cohort, and the crate's first dependency), and the assertion reds both on an unadmitted crate and on an allowlist entry absent from the graph. Reading only the `[dependencies]` table would admit an entire subtree unexamined, which is why the lock is tracked rather than gitignored. The precedent is the `check-knob-default-coupling` row below: an executed assertion is the answer where a static gate would be vacuous. The refusal survives only where the gate still cannot see — a name the substrate does not carry, and an unresolvable filter knob — and there is deliberately no descriptor-level opt-out, which the consumption path does not reinstate: a port ends this assertion by answering it (§check-reads-couples). **This member is itself `.gate`-dispatched**, which is that closing clause discharging on the auditor: the compiled form reaches the read set in process rather than spawning the arm, so the absent-binary refusal is answered out of existence rather than retired, and the row now describes a ported member auditing ported members. What `--reads` verifies is unchanged and is worth restating because the natural reading is wrong: a member's declared roots are **registry data**, not a derivation from its Rust source, and the declaration-to-code link is held by unit test A. Both members ported alongside it with a non-empty root set carry `?` alone, and the auditor's own root set is empty and stays empty, so no self-assertion is lost. |
@@ -2928,7 +2935,7 @@ undecidable walk root (§check-reads-couples); and
 drift-kit's two meters, `--emit-overhead-meter`, the
 governance-overhead byte proxy (drift-kit/SPEC.md §The overhead meter), and
 `--emit-stage-economics`, the stage × model × iteration spend pricer
-(drift-kit/SPEC.md §The stage-economics meter) — which spawns `git` and `date`
+(drift-kit/SPEC.md §The stage-economics meter) — which spawns `git`, `date` off unix,
 and no interpreter, the shell form's `jq`, `awk` and `sed` all leaving with it;
 and `--emit-install-evidence`, the aggregate-only projection over that kit's
 install-observation record (drift-kit/SPEC.md §The install-evidence projection);
@@ -3082,7 +3089,7 @@ roster, and no requirement element at all. An arm's own set is therefore
 recorded in prose; the union of every arm's set, and the rest of the binary's,
 is §The program roster. The set is wider
 than a reader would guess: `git` under several `--emit-` arms and under the
-origin-URL lookup this table's own module makes, `date` under
+origin-URL lookup this table's own module makes, `date` off unix under
 `--emit-queue-index`, `--emit-file-gap`, `--emit-kfric`, `--emit-file-install`
 and `--emit-file-survey`
 (which spawns `git` too, for the
@@ -3099,7 +3106,7 @@ heaviest set in the class** and is named because a reader sizing the gap below
 should meet the worst case rather than infer it: `git`, `bash`, `cargo`, `tar` and
 floor utilities, the middle two off `GATE_SDK_PROGRAM_FLOOR` and both ruled a
 requirement on that suite rather than on an adopter (§upgrade-smoke).
-**`--emit-env-probe`'s set is bounded but not short**: `uname`, `date`,
+**`--emit-env-probe`'s set is bounded but not short**: `uname`, `date` off unix,
 and every element of the probe roster, which is the crate's own and carries no
 knob a consumer could widen it with (context-kit/SPEC.md §bin/env-probe).
 **`--emit-always-loaded` is the class's one member whose set a consumer can
@@ -12722,10 +12729,16 @@ probe alone. Recorded because the next wrapper meets the same shape.
 
 **What ends at the port is this tree's registration, not the kit's gate**, and
 the two are recorded as separate facts because collapsing them deletes an
-adopter's self-lint floor. The gate is `zero-config` and ships to every adopter,
-and an adopter **cannot author a compiled gate** — `native/` ships no `checks/`
-and no `smoke/`, so `gate_kit_roots` never selects it and `init` never vendors it
-(§The port-candidate criteria, the default's domain). A vendoring consumer's gate
+adopter's self-lint floor. The gate is `on-surface`: it ships to every adopter who
+vendors gate-sdk, and it arms when their own shell exists. For an adopter its
+subject is the shell they author under their gates directory — the vendored kit
+shell it would otherwise lint is the publisher's, which the publisher's own
+battery already lints — so `init` registers it in no profile, and an adopter who
+authors a gate script registers it, at which point `doctor` owes `shellcheck`
+through the `registered` audience (context-kit/SPEC.md §bin/env-probe). An adopter
+**cannot author a compiled gate** — `native/` ships no `checks/` and no `smoke/`,
+so `gate_kit_roots` never selects it and `init` never vendors it (§The
+port-candidate criteria, the default's domain). A vendoring consumer's gate
 family is shell by construction, which is the corpus this gate exists for. When
 *this tree's* last `.sh` leaves, its corpus here is empty and `scripts/gates.list`
 drops it; the kit keeps shipping it, doing exactly the job it does today on a tree
