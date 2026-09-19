@@ -3125,6 +3125,29 @@
   Filed 2026-09-18 to the gap inbox by the consult that audited the local-only files, after
   `external-install-evidence`'s close; promoted to Deferred at the next scope.
 
+- **scope-unit-set-ignores-deferred-inflow** [cost: iteration/high] [surface: lifecycle-kit]
+  — nothing in lifecycle-kit/templates/stages/scope.md weighs a proposed unit set against the rate
+  the Deferred section refills, so an iteration can close about as many entries as its own close
+  drain promotes and the section never trends to empty.
+  **Measured at filing, over the week to 2026-09-19:** twenty iterations closed and Deferred fell
+  148 to 105, about two net per iteration; re-verified at this scope, 105 Deferred entries of
+  which 57 carry a `Why design-pending` ground no close drain can clear.
+  **Operator direction, in a consult:** the adopter preview waits on a near-empty Deferred section
+  (TRAJECTORY.md, the enhancement admission filter's grounds), so depletion is the ranking's
+  purpose, not a side effect.
+  **Candidates, for spec to design:** (a) the Composition line gains a net-drain figure, units
+  promoted against trailing per-iteration inflow, derived by a tool arm from the queue's filing
+  dates and never hand-counted, and a set at or below inflow argues why; (b) the ranking's third
+  tier fills beyond the lead unit's surface where the lead already batches dispatches by surface
+  (lifecycle-kit/templates/lead.md §Economics); (c) a spec-led batch iteration per surface over
+  design-pending entries; (d) measure the close drain's fix-inline versus promote mix.
+  **Refused in the consult:** reversing the enhancement admission filter, and counting the Icebox
+  toward the preview gate.
+  **Cost while deferred:** each iteration's fixed stage-walk cost is amortized over too few
+  units, and the preview gate recedes at the inflow rate.
+  Filed 2026-09-19 to the gap inbox by the consult after `adopter-floor-collapse`'s close;
+  promoted at the next scope. Owner lookup: `inflow`, `net drain`, `refill` — none.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
