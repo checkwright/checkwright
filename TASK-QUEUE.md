@@ -3101,15 +3101,4 @@
 
 ## Done
 
-- scope-unit-set-ignores-deferred-inflow
-- stage-commit-subject-scope-unowned
-- threshold-recurrence-routing-residency
-- push-budget-unshipped
-- mid-iteration-push-owner-unnamed
-- stage-journal-path-unsourced-mid-stage
-- batch-split-stamp-ownership
-- lead-specifies-constraint-not-mechanism
-- dispatch-claim-evidentiary-tier-unmarked
-- relayed-rule-role-scope-unchecked
-
 ## Lessons Learned
