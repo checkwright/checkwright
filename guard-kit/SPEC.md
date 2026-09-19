@@ -650,12 +650,17 @@ where a bare `bash` reaches the system directory's WSL launcher.
 `checkwright doctor` refuses that host before any hook is wired.
 
 The library absorbs one substrate difference rather than branching on the host.
-A native Windows `jq` can end each output line with CR LF, and `read` keeps the
-CR, so `_guard_allow_inners`, the one `jq` reader fed through `read`, strips one
-trailing CR from each entry. Without it every `Bash(...)` entry fails its match
-there and no grant loads. On a host whose `jq` emits LF the strip removes
-nothing, since a well-formed entry ends in `)`. The library's command-substitution
-readers are held on this substrate by the oracle below rather than by a strip.
+A native Windows `jq` ends each output line with CR LF. `read` keeps the CR, so
+`_guard_allow_inners`, the one `jq` reader fed through `read`, strips one
+trailing CR from each entry; without it every `Bash(...)` entry fails its match
+and no grant loads. Git Bash's command substitution drops only the output's
+last CR, so the three substitution readers (`guard_read_command`,
+`guard_input_field`, `guard_read_path`) turn every CR LF back into LF through
+`_guard_lf`; without it a multi-line command keeps a CR on each inner line, a
+heredoc's terminator never matches, and the heredoc swallows the statements
+after it. On a host whose `jq` emits LF neither step changes a value, with one
+accepted exception: a command whose own text carries a CR LF is read with LF
+there, because the reader cannot tell that CR from the one `jq` wrote.
 
 **The honest limit: the harness's `PowerShell` tool is not guarded.** On Windows
 the harness carries a second shell tool, named `PowerShell`, which is on by
@@ -3467,10 +3472,12 @@ keeps only the decline arm (a dead record present) and the test owns the
 process the firing arm needs. `gate-tests/guard-read-path.test.sh` asserts
 `guard_read_path`, the file-path counterpart of `guard_read_command`, whose
 discriminating case — an absent `file_path` — is an accessor return value, not
-a command a `cases.tsv` row can carry. The same file holds `_guard_allow_inners`
-to its CR strip (§The hook on native Windows), because the sandbox's
-`settings.json` is the table's fixed nine-entry allowlist and a CR-ended entry
-would change what every allowlist row asserts.
+a command a `cases.tsv` row can carry. The same file holds the four `jq` readers to
+their CR handling (§The hook on native Windows), fed a JSON `\r\n` so any `jq`
+emits the bytes a native Windows one does: a table row's payload is built
+in-crate and could only carry that CR as a command whose own text holds it, and
+the sandbox's `settings.json` is the table's fixed nine-entry allowlist, which a
+CR-ended entry would change for every allowlist row.
 
 `gate-tests/guard-lib-parity.test.sh` takes the same lane on a third structural
 ground: it asserts nothing about *one* implementation's decision, so no

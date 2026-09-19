@@ -52,9 +52,18 @@ printf '{"permissions":{"allow":["Bash(git status)\\r","Bash(ls)","Read"]}}\n' >
 got="$(GUARD_KIT_SETTINGS="$tmp/settings.json" _guard_allow_inners)"
 eq "allow-inners-crlf" "$got" "$(printf 'git status\nls')"
 
+# the three substitution readers hand the ruleset LF where a native Windows jq wrote CR LF; a JSON
+# "\r\n" makes any jq emit those bytes, and a heredoc's terminator is the line a stray CR breaks
+crlf='{"tool_input":{"command":"cat <<EOF\r\nline\r\nEOF\r\n","file_path":"a\r\nb\r\n","run_in_background":"true\r\n"}}'
+eq "command-crlf" "$(guard_read_command <<<"$crlf")" "$(printf 'cat <<EOF\nline\nEOF')"
+eq "path-crlf" "$(guard_read_path <<<"$crlf")" "$(printf 'a\nb')"
+GUARD_INPUT="$crlf"
+eq "field-crlf" "$(guard_input_field '.tool_input.run_in_background')" "true"
+unset GUARD_INPUT
+
 if [[ "$fails" -gt 0 ]]; then
     echo "guard-read-path.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "guard-read-path.test: ok ($checks assertions; path extraction plus the absent/unparseable/empty fall-through contract, and the allow read's CRLF line ending)"
+echo "guard-read-path.test: ok ($checks assertions; path extraction plus the absent/unparseable/empty fall-through contract, and every jq reader's CRLF line ending)"
 exit 0

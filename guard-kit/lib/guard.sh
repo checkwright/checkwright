@@ -9,11 +9,19 @@ guard_read_input() {
     return 0
 }
 
+# spec: guard-kit/SPEC.md §The hook on native Windows — the CR LF a native Windows jq writes, turned back into the LF the ruleset reads, in the named variable
+_guard_lf() {
+    local -n _guard_lf_v="$1"
+    _guard_lf_v="${_guard_lf_v//$'\r\n'/$'\n'}"
+    _guard_lf_v="${_guard_lf_v%$'\r'}"
+}
+
 # spec: guard-kit/SPEC.md §The guard framework — one field of the cached payload by jq path; an unset or empty GUARD_INPUT and an absent path alike print nothing, which is what keeps a guard that never opted in working unchanged
 guard_input_field() {
     local v
     [[ -n "${GUARD_INPUT:-}" ]] || return 0
     v="$(printf '%s' "$GUARD_INPUT" | jq -r "$1" 2>/dev/null)" || return 0
+    _guard_lf v
     [[ "$v" == "null" ]] && return 0
     printf '%s' "$v"
 }
@@ -27,6 +35,7 @@ guard_read_command() {
         input="$(cat 2>/dev/null)" || return 1
     fi
     cmd="$(printf '%s' "$input" | jq -r '.tool_input.command // empty' 2>/dev/null)" || return 1
+    _guard_lf cmd
     [[ -z "$cmd" ]] && return 1
     printf '%s' "$cmd"
 }
@@ -40,6 +49,7 @@ guard_read_path() {
         input="$(cat 2>/dev/null)" || return 1
     fi
     path="$(printf '%s' "$input" | jq -r '.tool_input.file_path // empty' 2>/dev/null)" || return 1
+    _guard_lf path
     [[ -z "$path" ]] && return 1
     printf '%s' "$path"
 }
