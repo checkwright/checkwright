@@ -19,8 +19,11 @@ and macOS" policy and drops `bash` from the floor.
 - The bootstrap uses seven constructs POSIX sh lacks: `BASH_SOURCE`, `[[ ]]`,
   `local`, `set -o pipefail`, arrays, process substitution (`< <(find …)`) and
   `find -maxdepth`. `shellcheck -S warning` on a `#!/bin/sh` file carrying the
-  first six reports each as SC3028, SC3010, SC3043, SC3040, SC3054 and SC3001,
-  all at warning level. `find -maxdepth` is not a shellcheck finding.
+  first six reports SC3028, SC3010, SC3014, SC3043, SC3040, SC3030, SC3024,
+  SC3054 and SC3001, all at warning level — `[[ ]]`'s `==` pattern test takes
+  SC3014 beside SC3010, and the array construct's declaration, `+=` and
+  `${arr[@]}`/`${arr[0]}` references each take their own code (SC3030, SC3024,
+  SC3054) beside one another. `find -maxdepth` is not a shellcheck finding.
 - `check-shellcheck` already lints `installer/bin`
   (`GATE_SDK_LINT_EXTRA_DIRS` in `scripts/gate-sdk-config.knobs`), passes
   `-S warning` (`native/src/gates/shellcheck.rs:74`) and no `-s`. So shellcheck
@@ -36,7 +39,10 @@ and macOS" policy and drops `bash` from the floor.
   1331, 1340 and 1506. The bash-less arm runs `"$BASH" "$DL_ENTRY"` (line
   1132). Also `docs/install.md:341`, `installer/README.md:53` and
   `installer/SPEC.md:46`. Found with `git grep -n "checkwright\.sh"` over the
-  tracked tree.
+  tracked tree, plus tracing line 964's `ENTRY=(bash "$DL_ENTRY")` array to
+  `DL_ENTRY`'s assignment (line 951): the literal grep alone gives 917, 933,
+  951, 952, 1254, 1302, 1329, 1331, 1340 and 1506, and 951-952 are the
+  assignment and its existence check rather than invocation sites.
 
 ## What changes
 
@@ -74,10 +80,12 @@ unchanged. Every `die` message and remedy, every exit status, the
 `sha256sum`-then-`shasum -a 256` order and step 5's argv rule stay byte for byte.
 The file's `# no-port:` declaration still cites §The install boundary.
 
-**Not yet applied.** installer/SPEC.md §Implementation, first paragraph: "one
-bash, one PowerShell" becomes "one POSIX sh, one PowerShell". In its second
-paragraph, "governs the bash one" becomes "governs the POSIX one, in the dialect
-its `#!/bin/sh` selects".
+**Not yet applied.** installer/SPEC.md §Implementation, first paragraph: its
+opening word, "Bash, up to the boundary §The install boundary rules", becomes
+"POSIX sh, up to the boundary §The install boundary rules"; "one bash, one
+PowerShell" becomes "one POSIX sh, one PowerShell". In its second paragraph,
+"governs the bash one" becomes "governs the POSIX one, in the dialect its
+`#!/bin/sh` selects".
 
 **Not yet applied.** installer/SPEC.md §Layout: the first bullet reads
 "`bin/checkwright.sh` — the POSIX sh bootstrap (§The install boundary), run by the
