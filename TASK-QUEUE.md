@@ -12,16 +12,6 @@
 
 ## New Features
 
-- **floor-bash-install-bootstrap** [spec: SPEC-posix-bootstrap.md] — the unix install bootstrap
-  `installer/bin/checkwright.sh` is a bash script, and every page and smoke invocation spells
-  `bash`, so installing on Linux or macOS still reaches bash on every profile after rung 4a.
-  **Ruled at spec:** port it to POSIX sh (`#!/bin/sh`), keeping the five steps, the three
-  selection outcomes, every refusal message and the PowerShell twin. `check-shellcheck` lints it
-  as sh through its shebang. Every invocation spells `sh`, and the bash-less arm runs it through
-  the farm's `sh`, so on Linux the smoke runs it under dash. Filed 2026-09-19 at
-  `adopter-floor-native-rungs`' spec by operator direction, option (b); joins this iteration by
-  operator direction (2026-09-19, lead-relayed).
-
 - **release-binary-archive-versioned-name** [spec: SPEC-binary-archive.md] — each target's gate
   binary reaches the Release as a flat `checkwright-gates-<target>` pair with no version, and its
   sidecar names the bare payload name, so `sha256sum -c` on the downloaded pair fails (probed on
@@ -54,33 +44,6 @@
   consumer smoke still asserts only `uninstall --dry-run` (`installer/consumer-smoke/run-smoke.sh`),
   so no acceptor exists.
   Joins this iteration by operator direction (2026-09-19, lead-relayed).
-
-- **hasher-shasum-fallback-unexercised** — the bootstrap (`installer/bin/checkwright.sh`), the
-  consumer smoke (`installer/consumer-smoke/run-smoke.sh`) and `scripts/ci-build-artifact.sh`
-  try `sha256sum` and fall back to `shasum -a 256`, but both macOS runner images ship
-  `/sbin/sha256sum`, so no CI leg reaches the fallback branch.
-  **Done-state:** a leg or smoke arm hides `sha256sum` from `PATH` and proves the `shasum` branch
-  verifies a digest end to end, on a pushed run; it proves the branch the POSIX bootstrap port
-  (`floor-bash-install-bootstrap`) ships.
-  **Cost while deferred:** a stock macOS older than 15 takes the branch unproven, at the one step
-  that verifies the binary before it runs.
-  Filed 2026-09-19 to the gap inbox at `adopter-floor-conditional-members`' close push; promoted
-  to Deferred at the next scope. Joins this iteration by operator direction (2026-09-19,
-  lead-relayed).
-
-- **install-smoke-intel-mac-bash-path-assert-vacuous** — the `gates` workflow's macOS
-  install-smoke legs assert that a fresh login zsh resolves `bash` to `$(brew --prefix)/bin/bash`
-  after the page's `macos-remedy` block runs. On the Intel leg Homebrew's prefix is `/usr/local`,
-  which `/etc/paths` already leads with, so the probe holds with or without the block's profile
-  line and cannot catch a missing one.
-  **Done-state:** an Intel-leg assertion that reds on a missing profile line (a probe that skips
-  the global rc's `path_helper` ordering, or one reading the persisted line itself), proved on a
-  pushed run.
-  **Cost while deferred:** a remedy regression that drops the profile line passes on Intel and is
-  caught only by the arm64 leg.
-  Filed 2026-09-19 to the gap inbox by build batch 1 of `adopter-floor-conditional-members`;
-  promoted to Deferred at its close. Joins this iteration by operator direction (2026-09-19,
-  lead-relayed): it edits the macOS install-smoke legs the hasher leg edits.
 
 ## Deferred
 
@@ -3036,5 +2999,9 @@
 - **readme-bin-roster-underived** — no gate holds a kit README's bin/ tool roster.
 
 ## Done
+
+- floor-bash-install-bootstrap
+- hasher-shasum-fallback-unexercised
+- install-smoke-intel-mac-bash-path-assert-vacuous
 
 ## Lessons Learned
