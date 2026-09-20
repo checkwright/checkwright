@@ -62,8 +62,9 @@ doc owned the fact (drift-kit/SPEC.md §The knowledge-friction loop). It shows
    yourself re-deriving a fact off a non-owning surface, append*
    `<date> <fact> ← <surface>` *to `.workflow/knowledge-friction.log`.* That
    bullet is the loop's only hook — earn its cost by the log actually filling.
-   `run-gates.sh --emit kfric [--] "<fact>" "<surface>"` is the shipped
-   affordance that stamps that grammar prompt-free — both fields required
+   The `--emit kfric [--] "<fact>" "<surface>"` arm on the gate binary
+   `GATE_SDK_NATIVE_BIN` names is the shipped affordance that stamps that
+   grammar prompt-free — both fields required
    non-empty in that order, `--` files one beginning with a dash, and no per-arm
    `--help`: the usage is here and in the SPEC. Raw append stays legal
    (drift-kit/SPEC.md §The knowledge-friction loop).
@@ -74,15 +75,17 @@ doc owned the fact (drift-kit/SPEC.md §The knowledge-friction loop). It shows
 
 ## Use
 
+Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
+
 ```bash
-bash gate-sdk/bin/run-gates.sh --emit drift-report          # full report: lead/lag rows under the honesty labels
-bash gate-sdk/bin/run-gates.sh --emit drift-report --trend  # one compact line (fragments joined with ·)
-bash gate-sdk/bin/run-gates.sh --emit trajectory   # governed-trajectory table (one row per closed iteration)
-bash gate-sdk/bin/run-gates.sh --emit queue-flow [<n>]  # design-pending pool filed/drained per trailing iteration, plus mean-filed
-bash gate-sdk/bin/run-gates.sh --emit overhead-meter   # governance-vs-task byte proxy for this session's transcript (a delegated session passes its transcript or stamp id)
-bash gate-sdk/bin/run-gates.sh --emit stage-economics  # real spend by stage × model × iteration (stamps ⋈ transcripts ⋈ price table)
-bash gate-sdk/bin/run-gates.sh --emit file-install [--] <kind> <field>...  # record one observed install, red or check-in (three kinds, three arities)
-bash gate-sdk/bin/run-gates.sh --emit install-evidence  # the aggregate-only projection over that record, for a consumer to pin behind a freshness gate
+--emit drift-report          # full report: lead/lag rows under the honesty labels
+--emit drift-report --trend  # one compact line (fragments joined with ·)
+--emit trajectory   # governed-trajectory table (one row per closed iteration)
+--emit queue-flow [<n>]  # design-pending pool filed/drained per trailing iteration, plus mean-filed
+--emit overhead-meter   # governance-vs-task byte proxy for this session's transcript (a delegated session passes its transcript or stamp id)
+--emit stage-economics  # real spend by stage × model × iteration (stamps ⋈ transcripts ⋈ price table)
+--emit file-install [--] <kind> <field>...  # record one observed install, red or check-in (three kinds, three arities)
+--emit install-evidence  # the aggregate-only projection over that record, for a consumer to pin behind a freshness gate
 ```
 
 `--emit overhead-meter` is the overhead meter (drift-kit/SPEC.md §The overhead
@@ -145,6 +148,8 @@ both unchanged by the bundled set moving in-crate. The bundled set (drift-kit/SP
 
 ## Test
 
+Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+
 ```bash
-bash gate-sdk/bin/run-gates.sh --run-consumer-smoke drift-kit   # report contract: sections, per-KPI rows, degradation, one-line --trend
+--run-consumer-smoke drift-kit   # report contract: sections, per-KPI rows, degradation, one-line --trend
 ```

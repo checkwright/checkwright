@@ -2,7 +2,8 @@ Execute the template at lifecycle-kit/templates/stages/align.md, applying the bi
 
 ## Bindings
 
-**consistency-gate** — the full gate battery, `bash gate-sdk/bin/run-gates.sh`.
+**consistency-gate** — the full gate battery, the bare gate binary at
+`GATE_SDK_NATIVE_BIN`.
 
 **audit-fanout** — audit the drifted surfaces against each other: each kit's
 SPEC.md vs its code, README.md kit table vs reality, CLAUDE.md conventions vs

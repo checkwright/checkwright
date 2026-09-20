@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 # spec: gate-sdk/SPEC.md §run-gates — the PowerShell twin of bin/run-gates.sh, for a native-Windows host with no bash on PATH: the same residue in the same order, held to the stub by the executed comparison --run-front-end-parity rather than by reading
-# no-port: gate-sdk/SPEC.md §run-gates, The front-end's port disposition — the stub's own per-file bootstrap cause: the front-end locates the binary it runs, which the binary cannot do for itself. Structural, not a sizing judgment.
+# no-port: gate-sdk/SPEC.md §run-gates, The front-end's port disposition — the stub's own per-file bootstrap cause: the front-end locates the binary it runs, which the binary cannot do for itself. It serves a harness shim and a pre-build clone rather than an adopter door now, and neither audience leaves the binary able to answer for itself. Structural, not a sizing judgment.
 #
 # usage: run-gates.ps1 [gates-dir] | --only <name>... [-- <arg>...] | --for <path>... | --emit <arm> [args...] | -h | --help
 #        every arm, its refusals and the knobs print from the tool itself: run-gates.ps1 --help

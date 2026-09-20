@@ -12,30 +12,7 @@
 
 ## New Features
 
-- **binary-door-wide-sweep** [spec: SPEC-door-binding.md] — rung 4a
-  (`floor-bash-hooks-front-end`) re-pointed only the starter and prose adopter surfaces at the gate
-  binary. Every other kit's shipped procedure still tells a reader, a session or the harness to run
-  `bash gate-sdk/bin/run-gates.sh`. Re-pointing them needs a per-consumer door binding, because the
-  binary's path differs between an install and a source clone.
-  **Reach re-verified at promotion, and wider than filed (2026-09-20 scope):** `git grep -l
-  run-gates.sh` also names every kit's `*-config.knobs` template,
-  `gate-sdk/templates/gates-workflow.yml`, `guard-kit/templates/settings-allow.json` and
-  `close-triage.md`, `drift-kit/templates/kpi-deprecated-surface.sh`,
-  `context-kit/templates/close-brevity.md` and `lifecycle-kit/templates/lead.md`.
-  **Ruled at spec (2026-09-20):** the door binding is not an open choice — `GATE_SDK_NATIVE_BIN`
-  already is it, and installer/SPEC.md §The install boundary already names it the one owner. The
-  open call was how each surface class spells it, and the amendment rules three: shipped shell
-  calls a library accessor, harness-wired JSON takes an install-time substitution marker, and prose
-  cites the knob. Measured at spec: 39 kit-shipped files, three surface classes.
-  **Narrowed at spec:** the PowerShell twin, `--run-front-end-parity` and the fail-open set do
-  **not** retire with this unit. `FAIL_OPEN_ARMS='--hook --statusline'` exists so a harness arm
-  declines when the binary is absent, and an absent binary cannot decline — so the harness-wired
-  class keeps a front-end door by construction. The residue is filed at spec, not built here.
-  Filed 2026-09-19 at `adopter-floor-native-rungs`' spec (scope-gated intake), merged at its close
-  drain with that build's kit-README bullet. Joins this iteration by operator direction
-  (2026-09-20, lead-relayed) as the lead unit; amendment authored and paired at spec.
-
-- **bash-audience-hand-held** [spec: SPEC-bash-audience.md] [blocked-by: binary-door-wide-sweep] —
+- **bash-audience-hand-held** [spec: SPEC-bash-audience.md] —
   the bash element of the tool-floor
   roster carries a hand-held kit-list audience,
   `context-kit+delegation-kit+drift-kit+guard-kit+lifecycle-kit`, spelled at context-kit/SPEC.md's
@@ -47,14 +24,17 @@
   guard-kit qualify, so it **over-declares** delegation-kit and lifecycle-kit; under *instructs
   bash* all eleven kits qualify, so it **under-declares** canon-kit, doctrine-kit, evidence-kit,
   queue-kit and site-kit. Rung 4a cleared evidence-kit and queue-kit as "reference text, not a
-  spawn", on a probe that excluded READMEs — `queue-kit/README.md:75-86` is a twelve-line block of
+  spawn", on a probe that excluded READMEs — `queue-kit/README.md:75-86` was a twelve-line block of
   bash commands a reader is told to run.
   **Ruled at spec:** the audience is derived, not listed, and the predicate is *ships a file the
   adopter's host runs with bash* — prose a reader types is deliberately excluded, because after the
   lead unit no kit ships it.
-  **Blocked on `binary-door-wide-sweep`:** while the two predicates disagree any derivation has to
-  pick one, and either pick publishes a floor the other reading contradicts. Once the door sweep
-  lands they converge on `{context-kit, drift-kit, guard-kit}`. A hard ordering constraint.
+  **Unblocked (2026-09-20, `binary-door-wide-sweep` merged).** While the two predicates disagreed
+  any derivation had to pick one, and either pick published a floor the other reading contradicted;
+  the door sweep has landed, so they converge. **The measurements above are pre-sweep and are now
+  stale as evidence**: the `queue-kit/README.md` block that carried the *instructs-bash* reading has
+  been swept, along with every other kit README, template and knob header. Re-run the predicate
+  against the tree before building rather than carrying either list forward.
   Filed 2026-09-19 at `adopter-floor-native-rungs`' spec, promoted at its close drain. Joins this
   iteration by operator direction (2026-09-20, lead-relayed); amendment authored and paired at spec.
 
@@ -2987,5 +2967,6 @@
 ## Done
 
 - objective-1-discharge-unruled
+- binary-door-wide-sweep
 
 ## Lessons Learned

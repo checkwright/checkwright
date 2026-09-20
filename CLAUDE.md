@@ -25,9 +25,10 @@ before it is a design one: a kit literal carrying a private vocabulary publishes
 
 The gates in [`scripts/gates.list`](scripts/gates.list) run on this tree —
 dogfooding is day-one, not optional, though *which* gates register is a tuning
-decision here as for any consumer (`operator 2026-09-10`). Before committing, run
-the full battery (`bash gate-sdk/bin/run-gates.sh`) and the touched kit's fixture
-suite, whose per-kit runner is in [README.md](README.md) §This repo, governed.
+decision here as for any consumer (`operator 2026-09-10`). Every command below
+runs the gate binary at `GATE_SDK_NATIVE_BIN`; before committing, run the full
+battery (the bare binary) and the touched kit's fixture suite, whose per-kit
+runner is in [README.md](README.md) §This repo, governed.
 
 The git index is shared with any concurrent session: check `git status` for a
 foreign staged path before `git add`, or stage and commit in one motion.
@@ -59,7 +60,7 @@ The state machine, its stamp protocol, and the per-stage contracts:
 
 The pre-commit hook is **generated** — never hand-edit
 `scripts/git-hooks/pre-commit`; edit a gate's `# graph:` manifest and regenerate.
-Per-clone opt-in: `bash gate-sdk/bin/run-gates.sh --install-hooks`. Every generated
+Per-clone opt-in: `--install-hooks`. Every generated
 projection, that hook included, is rostered with its trigger, its regen command and
 the wide fan-outs in [docs/site-architecture.md](docs/site-architecture.md)
 §Generated projections and their freshness gates; each freshness gate prints its
@@ -157,10 +158,10 @@ load behind that trigger, so they are not resident here.
   activation surface; layout, boundary and packing: installer/SPEC.md.
 - **Knowledge-friction capture (any session):** re-deriving a fact no doc owns (off an
   implementation, a gate's source, a commit, or a prior/sibling deliverable)? stamp it in
-  the moment with `bash gate-sdk/bin/run-gates.sh --emit kfric "<fact>" "<surface>"` —
+  the moment with `--emit kfric "<fact>" "<surface>"` —
   deferred capture is no capture (drift-kit/SPEC.md §The knowledge-friction loop).
 - **Gap capture (any mid-iteration session):** a gap, task or defect goes to
-  `bash gate-sdk/bin/run-gates.sh --emit file-gap "<gap>"`, never a queue edit
+  `--emit file-gap "<gap>"`, never a queue edit
   (lifecycle-kit/SPEC.md §The committed gap inbox) — unless the operator directs a
   direct entry, staged and committed in one motion under the shared-index rule above.
 - **Recurrence stamping (any session that judges one):** a finding that recurred takes
@@ -169,7 +170,7 @@ load behind that trigger, so they are not resident here.
   gap bullet instead (lifecycle-kit/SPEC.md §The committed gap inbox).
 - **Survey capture (any stage session):** read the survey record and run its witness
   before buying a survey; land one a later stage will want before acting on it, with
-  `bash gate-sdk/bin/run-gates.sh --emit file-survey "<question>" "<corpus>" "<oracle>" "<inferred>" "<finding>"`
+  `--emit file-survey "<question>" "<corpus>" "<oracle>" "<inferred>" "<finding>"`
   (lifecycle-kit/SPEC.md §The survey record).
 - No per-user memory files: durable guidance goes in tracked manifests (this file,
   kit SPECs) or `BRIEF.local.md`. Harness auto-memory is enforced off; doctrine:

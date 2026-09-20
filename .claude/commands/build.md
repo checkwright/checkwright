@@ -2,7 +2,8 @@ Execute the template at lifecycle-kit/templates/stages/build.md, applying the bi
 
 ## Bindings
 
-**consistency-gate** — the full gate battery, `bash gate-sdk/bin/run-gates.sh`.
+**consistency-gate** — the full gate battery, the bare gate binary at
+`GATE_SDK_NATIVE_BIN`.
 
 **ritual** — land one self-contained task per session and commit it cleanly
 rather than forcing every active task into one changeset; the stage stays in

@@ -62,8 +62,8 @@ left linked-but-unqueued: the queue is the only place work waits.
   leaves `check-gate-binary-fresh` red on a stale build
   ([gate-sdk/SPEC.md](gate-sdk/SPEC.md) §check-gate-binary-fresh). A fresh clone
   cannot commit until it has built once.
-- **Battery-green in CI.** Run it locally first: `bash gate-sdk/bin/run-gates.sh`
-  for the full battery, then the fixture runners the
+- **Battery-green in CI.** Run it locally first: the bare gate binary at
+  `GATE_SDK_NATIVE_BIN` for the full battery, then the fixture runners the
   [README](README.md) lists — one of which builds and tests the `native/` crate,
   so a local run wants the whole toolchain roster in
   [docs/install.md](docs/install.md) §Requirements, `cargo` included. A red PR is

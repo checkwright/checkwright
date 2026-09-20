@@ -15,6 +15,7 @@ pub mod close_surfaces;
 pub mod comment_tier;
 pub mod commit_subject;
 pub mod doctrine_registration;
+pub mod door_binding;
 pub mod deferred_board_tags;
 pub mod deprecation_task;
 pub mod docs_cmd;
@@ -969,6 +970,17 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &["GATE_SDK_KIT_DIRS"],
         "gate-sdk",
+        &[("git", "")],
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — one walk, whose root is the repository toplevel
+    // or the positional a fixture case relocates it to: neither is a path this table can spell, which
+    // is the undecidable answer this line kind exists for
+    (
+        "check-door-binding",
+        door_binding::run,
+        &[("?", "", "", "dynamic@src/gates/door_binding.rs:90")],
+        &["GATE_SDK_KIT_DIRS"],
+        "guard-kit",
         &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because the listed directory set is the

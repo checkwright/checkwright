@@ -16,7 +16,7 @@
 # (guard tests, a language test suite) after the derived fixture step, and
 # require this workflow's status check before merge (branch-protection recipe:
 # the install-page docs). The fixture suites need no hand-list — they derive
-# from your gate-tests dirs (run-gates.sh --emit fixture-suites). A filled example is this
+# from your gate-tests dirs (the `--emit fixture-suites` arm). A filled example is this
 # repo's own .github/workflows/gates.yml.
 name: gates
 
@@ -40,21 +40,28 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           fetch-depth: 0
+      # The door has one owner, GATE_SDK_NATIVE_BIN. A CI runner has a checkout
+      # and no install, so it reads that knob through gate-sdk's own library and
+      # carries the result to the later steps rather than naming a path itself.
+      - name: resolve the gate binary
+        run: |
+          . gate-sdk/lib/gate.sh
+          echo "GATES=$(gate_native_bin_spelled)" >> "$GITHUB_ENV"
       - name: full battery
-        run: bash gate-sdk/bin/run-gates.sh
+        run: "$GATES"
       # Every dir with a gate-tests/ tree, run against its sibling checks/ — no
       # hand-list to drift as kits are added or renamed.
       - name: fixture suites (derived from */gate-tests)
         run: |
-          suites="$(bash gate-sdk/bin/run-gates.sh --emit fixture-suites)" || exit 2
+          suites="$("$GATES" --emit fixture-suites)" || exit 2
           rc=0
           while IFS=$'\t' read -r suite tests checks; do
             echo "== $suite =="
             # shellcheck disable=SC2086  # empty checks expands to no arg by design
-            bash gate-sdk/bin/run-gates.sh --run-gate-tests "$tests" $checks || rc=1
+            "$GATES" --run-gate-tests "$tests" $checks || rc=1
           done <<<"$suites"
           exit $rc
       # PLACEHOLDER — add one step per non-gate-tests runner your CLAUDE.md
       # names (a guard-test runner, a language test suite), e.g.
       #   - name: guard-kit decision table
-      #     run: bash gate-sdk/bin/run-gates.sh --run-guard-tests
+      #     run: "$GATES" --run-guard-tests

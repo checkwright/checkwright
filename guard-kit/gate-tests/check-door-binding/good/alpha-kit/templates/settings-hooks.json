@@ -1,0 +1,20 @@
+{
+  "//": "Fail-open arms keep the front end by construction: an absent binary cannot decline, so these two command values are exempt wherever they sit.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "bash gate-sdk/bin/run-gates.sh --hook wakeup-guard" }
+        ]
+      }
+    ]
+  },
+  "statusLine": { "command": "bash gate-sdk/bin/run-gates.sh --statusline" },
+  "permissions": {
+    "allow": [
+      "Bash(@GATE_SDK_NATIVE_BIN@ *)",
+      "Bash(bash gate-sdk/bin/run-gates.sh *)"
+    ]
+  }
+}

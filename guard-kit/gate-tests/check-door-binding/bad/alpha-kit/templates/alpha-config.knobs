@@ -1,0 +1,3 @@
+# An author pasted their own install location into a shipped template, which
+# publishes an adopter-specific path as if it were kit mechanism.
+GATE_SDK_NATIVE_BIN = scripts/checkwright-gates

@@ -4,8 +4,8 @@ guard-kit `close-triage.md` pattern). It reacts to the meter's *delta*, not
 its level: a file is not expected to grow each iteration, so growth since the
 iteration baseline is the worklist.
 
-1. **Measure the delta, then the growth.** Run
-   `bash gate-sdk/bin/run-gates.sh --emit always-loaded`
+1. **Measure the delta, then the growth.** Run `--emit always-loaded` on the
+   gate binary `GATE_SDK_NATIVE_BIN` names
    — it prints the total, the per-part split, and the delta against the committed
    baseline. Then run it with `--growth`: every governed prose file that grew net
    since the iteration started, largest first. Both lists are the worklist; a
@@ -28,10 +28,10 @@ iteration baseline is the worklist.
    surface is only the tier that pays most often. Walk every file the growth
    list names with the same two questions, and state the growth figure in the
    close commit beside the delta.
-5. **Re-baseline and commit.** Finish with
-   `bash gate-sdk/bin/run-gates.sh --emit always-loaded --update-baseline` (it
-   also lowers armed ratchet ceilings) and commit the baseline and ceiling files,
-   so next iteration measures from this close.
+5. **Re-baseline and commit.** Finish by running
+   `--emit always-loaded --update-baseline` on the gate binary `GATE_SDK_NATIVE_BIN`
+   names (it also lowers armed ratchet ceilings) and commit the baseline and
+   ceiling files, so next iteration measures from this close.
 
 Goal: a governed prose file grows only where re-phrasing could not carry the
 change, and every session pays for context that is still true and still terse.

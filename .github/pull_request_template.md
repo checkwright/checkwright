@@ -10,6 +10,6 @@ your vocabulary. -->
 
 ## Checklist
 
-- [ ] The gate battery passes locally (`bash gate-sdk/bin/run-gates.sh`) and CI is green.
+- [ ] The gate battery passes locally (the bare gate binary) and CI is green.
 - [ ] Gate changes ship the `good/`/`bad/` fixture pair that proves them.
 - [ ] Every commit is DCO-signed (`git commit -s`).

@@ -3,8 +3,8 @@ Execute the template at lifecycle-kit/templates/stages/close.md, applying the bi
 ## Bindings
 
 **harvest-routing** — harvest routing (`QUEUE_KIT_LESSON_TAGS`,
-`scripts/queue-config.knobs`): stream each tagged entry's body through `bash
-gate-sdk/bin/run-gates.sh --lesson-sink <tag>`, which resolves the sink from the local
+`scripts/queue-config.knobs`): stream each tagged entry's body through
+`--lesson-sink <tag>`, which resolves the sink from the local
 `QUEUE_KIT_LESSON_SINKS` overlay or falls open to the default
 `.workflow/<tag>-harvest.md` staging append.
   - `[essay]` — no sink command is configured here, so the body stages to
@@ -55,8 +55,8 @@ queue-kit/SPEC.md §The tag algebra.
 
     close-surface: .workflow/audit-roster.txt advisory
 
-  - **Backlog eviction** — the worklist is `bash gate-sdk/bin/run-gates.sh --emit
-    queue-index --icebox-candidates`; disposition each row: evict (rewrite the lead line
+  - **Backlog eviction** — the worklist is `--emit queue-index
+    --icebox-candidates`; disposition each row: evict (rewrite the lead line
     as a self-contained sentence dropping its `[cost:]` and `[surface:]` tags,
     delete the body, move it under `## Icebox`),
     rule wontfix (the ruling lands as a one-line boundary note in the owning
@@ -67,8 +67,8 @@ queue-kit/SPEC.md §The tag algebra.
     and the grammar are queue-kit/SPEC.md §The icebox tier; the worklist bounds
     how much to read, it does not decide.
   - **Trajectory projection** — after the template's Clear-Done step lands the
-    `close` stamp in history, regenerate the projection (`bash
-    gate-sdk/bin/run-gates.sh --emit trajectory > docs/evidence-data.md`) and commit it
+    `close` stamp in history, regenerate the projection
+    (`--emit trajectory > docs/evidence-data.md`) and commit it
     with the Done clear; the gate is blind at the enter-close commit by construction
     and the remote is not, so no push lands between (drift-kit/SPEC.md §The
     published-evidence extractor).

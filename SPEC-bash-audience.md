@@ -200,10 +200,15 @@ context-kit/SPEC.md §bin/env-probe and docs/install.md §Requirements.
 
 ## Blocked on
 
-`binary-door-wide-sweep` (`SPEC-door-binding.md`). Until its deltas 1, 2 and 4
-land, the *instructs-bash* reach makes all eleven kits qualify under the reading
-this amendment declines, and delta 1's measured value would be wrong on the day it
-landed. This is a hard ordering constraint, not a preference.
+**Cleared.** `binary-door-wide-sweep` has landed and merged — the door sweep it
+carried is stated at guard-kit/SPEC.md §check-door-binding, gate-sdk/SPEC.md
+§lib/gate.sh and §run-gates, and installer/SPEC.md §The install boundary. While
+it was open the *instructs-bash* reach made all eleven kits qualify under the
+reading this amendment declines, which was a hard ordering constraint rather
+than a preference. Now that no kit ships prose telling a reader to run bash, the
+two readings converge and the derivation this amendment specifies is safe to
+build. **Re-measure before building**: the predicate's value is a fact about the
+tree as it now stands, not the one recorded while the blocker was open.
 
 ## Retired spellings
 

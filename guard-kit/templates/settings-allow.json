@@ -1,7 +1,9 @@
 {
-  "//": "guard-kit recommended allow entries — merge by hand into .claude/settings.json. Review each entry against guard-kit/SPEC.md §The recommended allowlist first, then union the ones you accept into permissions.allow; never replace the array, which drops every grant you already have.",
+  "//": "guard-kit recommended allow entries — merge by hand into .claude/settings.json. Nothing merges it for you: review each entry against guard-kit/SPEC.md §The recommended allowlist first, then union the ones you accept into permissions.allow; never replace the array, which drops every grant you already have. Two doors are granted because two are spawned: the gate binary, which is what a session runs, and the shell front-end, which the fail-open hook wiring in settings-hooks.json still spawns and which a clone reaches before its first build. Replace @GATE_SDK_NATIVE_BIN@ with the value your gate-sdk-config.knobs gives that knob, spelled as a command (the binary prints it: --emit knob-values GATE_SDK_NATIVE_BIN). Left unreplaced the entry matches no command, so you meet a permission prompt rather than a silent grant.",
   "permissions": {
     "allow": [
+      "Bash(@GATE_SDK_NATIVE_BIN@)",
+      "Bash(@GATE_SDK_NATIVE_BIN@ *)",
       "Bash(bash gate-sdk/bin/run-gates.sh)",
       "Bash(bash gate-sdk/bin/run-gates.sh *)",
       "Bash(git rm -q *)",

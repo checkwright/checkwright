@@ -10346,6 +10346,25 @@ required byte-identical needs that answer rather than a silence. `--emit` never
 had the fallback and refused when the binary was absent, because an emitter had
 no shell half left to run; the whole front-end now behaves that way.
 
+**The front-end serves a harness shim and a pre-build clone rather than an
+adopter door, and that is a narrower role rather than a smaller file.** The door
+sweep re-pointed every kit
+README, template, knob header and stage procedure at the binary
+`GATE_SDK_NATIVE_BIN` names (guard-kit/SPEC.md §check-door-binding holds it
+there), so the stub's caller set narrows to two — and **narrowing it to zero is
+unreachable**. The fail-open arms below (`--hook`, `--statusline`) are wired
+into a harness as a literal argv, and the whole reason they take a fail-open
+status is that they are read when the binary that would answer for them is
+absent; an absent binary cannot decline, so a harness-wired arm keeps a shell
+door **by construction**. The second caller is a contributor clone before its
+first build, which has no binary to name. Both are callers the sweep does not
+touch. So the front end is now a **harness shim plus pre-build door**, and that
+is a change of role, not of code: nothing here was deleted for it, and the
+`no-port:` declarations below name the new audience while their ground — it
+locates the binary, which the binary cannot do for itself — is untouched.
+Whether a harness could instead be wired to a *binary* that fail-opens on its
+own absence is a separate design question this does not open.
+
 **The front-end's port disposition is landed: it is the stub, and the loop
 retired with the cut.** The loop's only served branch dispatched nothing once no
 `.sh` member was registered — an artifact-less host seeds a registry with no live

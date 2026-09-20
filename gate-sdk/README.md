@@ -20,7 +20,7 @@ honest:
   registry order; an unregistered name is a refusal), and `--for <path>...` runs
   the gates coupling to the paths you name, exactly as the generated hook would.
   On a native-Windows host with no bash on `PATH`, its PowerShell twin
-  `bin/run-gates.ps1` takes the same arguments: `pwsh -File gate-sdk/bin/run-gates.ps1`.
+  `bin/run-gates.ps1` takes the same arguments.
 - the `--run-gate-tests` arm — the golden-fixture runner: every gate proves it
   accepts a `good/` case and rejects a `bad/` case with the right error text.
 - the `--run-consumer-smoke` arm — the end-to-end check no fixture makes: builds a
@@ -79,16 +79,21 @@ check-graph
 EOF
 
 mkdir -p .workflow docs
-bash gate-sdk/bin/run-gates.sh --emit git-hooks --write          # generate the hooks
-bash gate-sdk/bin/run-gates.sh --emit graph > scripts/CHECK-GRAPH.html   # the coupling graph
-bash gate-sdk/bin/run-gates.sh --emit enforcement-map > docs/enforcement.md # the enforcement map (regenerate on any class-registry change)
-bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree        # the port report over the tracked shell tree
-bash gate-sdk/bin/run-gates.sh --install-hooks                    # opt in this clone
+```
 
-bash gate-sdk/bin/run-gates.sh                                    # the full battery
-bash gate-sdk/bin/run-gates.sh --only check-graph                 # one gate's verdict
-bash gate-sdk/bin/run-gates.sh --for scripts/gates.list           # the gates coupling to a path
-bash gate-sdk/bin/run-gates.sh --run-gate-tests gate-sdk/gate-tests gate-sdk/checks  # the kit's own tests
+Then run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names; with no
+arm at all it runs the full battery:
+
+```bash
+--emit git-hooks --write          # generate the hooks
+--emit graph > scripts/CHECK-GRAPH.html   # the coupling graph
+--emit enforcement-map > docs/enforcement.md # the enforcement map (regenerate on any class-registry change)
+--emit port-blockers --tree        # the port report over the tracked shell tree
+--install-hooks                    # opt in this clone
+
+--only check-graph                 # one gate's verdict
+--for scripts/gates.list           # the gates coupling to a path
+--run-gate-tests gate-sdk/gate-tests gate-sdk/checks  # the kit's own tests
 ```
 
 Write your first gate by copying `gate-sdk/templates/check-skeleton.sh` to

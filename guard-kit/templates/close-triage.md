@@ -2,9 +2,9 @@
 permission-friction loop a habit, not a one-off cleanup. Splice this into
 lifecycle-kit's close `housekeeping` slot (step 4), the prompt-friction row's.
 
-1. **Rank what nothing granted.** Run
-   `bash gate-sdk/bin/run-gates.sh --emit scan-prompts` — it
-   filters the friction log against the committed allowlist and the harness's
+1. **Rank what nothing granted.** Run `--emit scan-prompts` on the gate binary
+   `GATE_SDK_NATIVE_BIN` names — it filters the friction log against the
+   committed allowlist and the harness's
    built-in read-only auto-allows, then ranks the survivors by command pattern.
 2. **Resolve each recurring pattern by the triage criterion** — never default
    to the allowlist:
@@ -23,9 +23,9 @@ lifecycle-kit's close `housekeeping` slot (step 4), the prompt-friction row's.
    nothing while reading as a fix.
 3. **Review the wakeup log** if the wakeup-guard is wired: read
    `.workflow/wakeup-attempts.log`, act on any surfaced intent, then delete it.
-4. **Prune and narrow the local overlay.** Run
-   `bash gate-sdk/bin/run-gates.sh --emit compare-settings-allow` — it reports
-   three sets, and each has its own disposition.
+4. **Prune and narrow the local overlay.** Run `--emit compare-settings-allow`
+   on the same binary — it reports three sets, and each has its own
+   disposition.
    - **Redundant**: remove every listed `settings.local.json` entry (a committed
      glob already grants it).
    - **Dead path**: remove every listed entry — it grants a script that does not exist.

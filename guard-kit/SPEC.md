@@ -117,10 +117,32 @@ Nothing in the kit writes it, since a grant is the consumer's security decision
 (§compare-settings-allow's impact criterion rates a committed widening
 high-impact). Each entry is there for a stated reason and reaches a stated set:
 
-- **The front-end, bare and with arguments.** Every gate, every arm and the
-  ruleset's own front-end steer targets are reached through it: rule 8's section
-  extractor and `--rewrite` arm, and the `--scratch-run` runner rules 23 and 26
-  name. Its reach is the whole front-end. That includes:
+- **The gate binary, bare and with arguments, spelled as the placeholder
+  `@GATE_SDK_NATIVE_BIN@`.** This is what a session runs: every gate, every arm
+  and the ruleset's own steer targets are reached through it — rule 8's section
+  extractor, the `--rewrite` arm, and the `--scratch-run` runner rules 23 and 26
+  name, each of which now prints the binary rather than the front end
+  (§The generic ruleset). **It ships as a placeholder rather than a path, and
+  both halves of that are load-bearing.** `GATE_SDK_NATIVE_BIN` is per-consumer,
+  so a kit file carrying its resolved value would publish an adopter's install
+  location as if it were kit mechanism — the provenance seam, held by
+  `check-door-binding`'s seam assertion (§check-door-binding). And an entry the
+  adopter has not resolved must match **nothing**: a permission pattern is
+  compared against a literal command, `@GATE_SDK_NATIVE_BIN@` is no command, so
+  the failure mode of forgetting the step is a permission prompt rather than a
+  silent grant. Resolve it to the value your `gate-sdk-config.knobs` gives the
+  knob, spelled as a command — the binary prints it with
+  `--emit knob-values GATE_SDK_NATIVE_BIN`, and gate-sdk's
+  `gate_native_bin_spelled` is the one owner of that spelling
+  (gate-sdk/SPEC.md §lib/gate.sh).
+- **The front-end, bare and with arguments — kept, not replaced.** After the
+  door sweep two different programs get spawned, and granting one is not
+  granting the other. `templates/settings-hooks.json` wires its hooks to
+  `--hook` arms, which are the fail-open set and therefore keep naming the front
+  end by construction (gate-sdk/SPEC.md §run-gates), and a clone reaches the
+  front end before its first build, when there is no binary to name. Dropping
+  this pair would leave the kit's own hook wiring ungranted. Its reach is the
+  whole front-end. That includes:
   - `--scratch-run`, which runs a scratch script under that arm's echo control;
   - `--rewrite`, which rewrites files inside the repository under its own bounds
     (§rewrite);
@@ -156,7 +178,10 @@ assumes the kits are vendored at the repository root**, as `settings-hooks.json`
 does, and where `check-settings-paths` is registered it holds the front-end
 literal once merged. The set is hand-authored in the template, and the one
 invariant a hand-authored set can break — a rule blocking a form the template
-grants — is held by the consumer smoke (§Testing).
+grants — is held by the consumer smoke (§Testing), which resolves the
+placeholder the way an adopter does and then **executes** the door it granted:
+a grant that parses is not a grant that spawns, and the union assertion beside
+it proves only the former.
 
 ## The guard framework (`lib/guard.sh`)
 
@@ -2723,6 +2748,68 @@ exactly what they read before. The obligation above — record each step with it
 pre-change reading — is therefore discharged for that move by recording that
 there is **no** step, which is a reading a later trend reader can rely on only
 if it was taken while both holders were present.
+
+## check-door-binding
+
+Invariant, two assertions over the tracked tree: **no kit-shipped surface
+outside the fail-open set names a front-end stub as a command to run**, and **no
+kit template names a path to the gate binary**. The first holds the door sweep
+that re-pointed every adopter-facing surface at the binary; the second holds the
+provenance seam the first one's placeholder depends on.
+
+The corpus is every kit root's `README.md` and its `templates/`, `lib/` and
+`bin/` trees, minus `gate-tests/` and `smoke/` — fixture and harness corpora a
+sweep of adopter surfaces does not reach. The seam assertion is scoped to
+`templates/` alone, because a template is the only kit surface an adopter copies
+and fills.
+
+**The door/file discriminator is this gate's own, and it is the whole of what
+makes the first assertion decidable.** A mention of `run-gates.sh` or
+`run-gates.ps1` is a **door** when it is *spawned* — carried by an interpreter
+word (`bash`, `sh`, or PowerShell's `-File`) — or when an **arm** follows it.
+Every other mention names the program as its subject rather than invoking it:
+`` `run-gates.sh` runs gates, not tests `` is a sentence about a file, and a
+`GATE_SDK_PORTABILITY_PATHS` entry is a file whose shell dialect is checked.
+Those stay, and the amendment that landed this gate recorded one such site
+deliberately so the next reader sees a judgment rather than a gap. **A stub
+names itself**, so a file whose own basename is a door spelling is not swept:
+the spelling is retired as an *adopter-facing* door, not as the file's name.
+
+**A permission pattern is not an invocation.** A door inside a `Bash(…)` grant
+wrapper tells a harness what to *allow*, not what to run, and the recommended
+allowlist must name every door that actually gets spawned — which after the
+sweep is two, the binary and the front end the fail-open hook wiring still
+spawns (§The recommended allowlist). So an allowlist naming the front end is
+required rather than a violation. The wrapper shelters only what it encloses: a
+`Bash(…)` that has already closed earlier on the line does not exempt an
+invocation after it.
+
+**The exemption keys on the arm, never on the file.** The fail-open arms —
+today `--hook` and `--statusline` — keep naming the front end by construction,
+because they are read exactly when the binary that would answer is absent
+(gate-sdk/SPEC.md §run-gates). So a door carrying one of them is exempt
+*wherever it sits*, a JSON `command` value included, and the set is read from
+the crate's `FAIL_OPEN_ARMS` declaration rather than re-listed here — the same
+declaration `check-front-end-fail-open` holds both stubs to, so neither gate can
+disagree with the other about which arms those are.
+
+**The seam assertion replaced a stricter-looking one that could never pass.**
+The first authoring asserted that every substitution marker in a kit template is
+reached by an install arm that resolves it. No arm writes an adopter's settings
+and none is to be built (§The recommended allowlist), so that assertion would
+have redded on every marker it ever saw, for a reason no build could fix. An
+assertion that cannot pass is not a strict gate but a false one. What replaced
+it can fail for a real reason — an author pasting their own
+`scripts/checkwright-gates` into a shipped template — and no other gate covers
+it. It reads a path to the artifact, not the artifact's bare name, which is the
+kit's own vocabulary; the basename comes from the crate's package name, so the
+assertion and the binary it is about cannot drift apart.
+
+**Red** names the file and the violating line for the first assertion, the
+template and the path literal for the second, and exits 2 on a corpus it cannot
+read. **The clean line prints both counts** — surfaces swept and templates among
+them — so a corpus that silently shrank to nothing is visible on green rather
+than passing vacuously.
 
 ## compare-settings-allow
 

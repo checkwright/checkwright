@@ -60,7 +60,8 @@ reads the tag syntax [queue-kit](../queue-kit/) defines.
 
    They resolve through gate-sdk's registry path (your gates dir first, then
    each kit's `checks/`), and their `# graph:` manifests put the precommit-tier
-   ones in the generated hook: `bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`.
+   ones in the generated hook, which `--emit git-hooks --write` on the gate
+   binary `GATE_SDK_NATIVE_BIN` names writes.
 
 2. Adopt the amendment lifecycle — copy `templates/SPEC-amendment.md` when a
    designed-but-unimplemented change needs a home. Name it after the feature
@@ -84,6 +85,8 @@ code instead. Author amendments up front; merge and delete them at build.
 
 ## Test
 
+Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+
 ```bash
-bash gate-sdk/bin/run-gates.sh --run-gate-tests canon-kit/gate-tests canon-kit/checks
+--run-gate-tests canon-kit/gate-tests canon-kit/checks
 ```

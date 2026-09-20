@@ -8,6 +8,11 @@ set -euo pipefail
 cp "$SMOKE_KIT_ROOT/templates/bash-guard.sh"     scripts/bash-guard.sh
 cp "$SMOKE_KIT_ROOT/templates/guard-config.knobs" scripts/guard-config.knobs
 
+cat >> scripts/gates.list <<'EOF'
+# guard-kit
+check-door-binding
+EOF
+
 mkdir -p .claude
 if [[ -f .claude/settings.json ]]; then
     prior_events="$(jq -c '.hooks // {} | keys' .claude/settings.json)"
@@ -24,18 +29,46 @@ else
     jq 'del(.["//"])' "$SMOKE_KIT_ROOT/templates/settings-hooks.json" > .claude/settings.json
 fi
 
+# spec: guard-kit/SPEC.md §The recommended allowlist — the binary grant's placeholder, resolved the
+# way an adopter resolves it and then executed, because a grant that parses is not one that spawns
+# shellcheck source=/dev/null
+source "$SMOKE_KIT_ROOT/../gate-sdk/lib/gate.sh"
+door="$(gate_native_bin_spelled)"
+if [[ ! -x "$door" ]]; then
+    echo "guard-kit/smoke/install.sh: the allowlist's binary grant resolves to '$door', which is not an executable file — the sweep re-points every adopter surface at a door this consumer cannot spawn" >&2
+    exit 1
+fi
+if ! "$door" --emit knob-values GATE_SDK_NATIVE_BIN >/dev/null 2>&1; then
+    echo "guard-kit/smoke/install.sh: the granted door '$door' is executable but did not run an arm" >&2
+    exit 1
+fi
+allow=.claude/settings-allow.resolved.json
+jq --arg d "$door" '.permissions.allow |= map(gsub("@GATE_SDK_NATIVE_BIN@"; $d))' \
+    "$SMOKE_KIT_ROOT/templates/settings-allow.json" > "$allow"
+# spec: guard-kit/SPEC.md §The recommended allowlist — the grants alone, never the "//" header,
+# which names the placeholder because it is the surface telling the adopter to replace it
+if jq -e '[.permissions.allow[] | select(test("@GATE_SDK_NATIVE_BIN@"))] | length > 0' "$allow" >/dev/null; then
+    echo "guard-kit/smoke/install.sh: an unresolved @GATE_SDK_NATIVE_BIN@ placeholder survived into the merged allowlist" >&2
+    exit 1
+fi
+
+# spec: gate-sdk/SPEC.md §gen-pre-commit — the generated artifacts carry a row per registered gate,
+# so registering one above leaves them stale until they are re-emitted
+"$door" --emit-git-hooks --write >/dev/null
+"$door" --emit-graph > scripts/CHECK-GRAPH.html
+
 # spec: guard-kit/SPEC.md §The recommended allowlist — a union into permissions.allow, never a replacement
 sentinel='Bash(smoke-sentinel --prior-grant)'
 jq --arg s "$sentinel" '.permissions.allow = ((.permissions.allow // []) + [$s])' \
     .claude/settings.json > .claude/settings.json.new
 mv .claude/settings.json.new .claude/settings.json
-jq --slurpfile t "$SMOKE_KIT_ROOT/templates/settings-allow.json" \
+jq --slurpfile t "$allow" \
     '(.permissions.allow // []) as $a
      | .permissions.allow = ($a + [$t[0].permissions.allow[] | select(. as $e | $a | index([$e]) | not)])
      | del(.["//"])' \
     .claude/settings.json > .claude/settings.json.new
 mv .claude/settings.json.new .claude/settings.json
-if ! jq -e --arg s "$sentinel" --slurpfile t "$SMOKE_KIT_ROOT/templates/settings-allow.json" \
+if ! jq -e --arg s "$sentinel" --slurpfile t "$allow" \
     '.permissions.allow as $a | ($a | index([$s])) != null
      and ($t[0].permissions.allow - $a == [])
      and ($a | length) == ($a | unique | length)' .claude/settings.json >/dev/null; then
@@ -58,7 +91,9 @@ if [[ "$rc" -ne 2 || "$msg" != *"'cd'"* ]]; then
     exit 1
 fi
 
-# spec: guard-kit/SPEC.md §The recommended allowlist — the ruleset blocks no form the template grants
+# spec: guard-kit/SPEC.md §The recommended allowlist — the ruleset blocks no form the template
+# grants, read from the RESOLVED allowlist so the binary grant is exercised in the spelling an
+# adopter actually merges rather than as its placeholder
 while IFS= read -r entry; do
     cmd="${entry#Bash(}"
     cmd="${cmd%)}"
@@ -71,4 +106,4 @@ while IFS= read -r entry; do
         echo "guard-kit/smoke/install.sh: the installed guard blocks '$cmd', a form templates/settings-allow.json grants ($entry): $msg" >&2
         exit 1
     fi
-done < <(jq -r '.permissions.allow[]' "$SMOKE_KIT_ROOT/templates/settings-allow.json")
+done < <(jq -r '.permissions.allow[]' "$allow")

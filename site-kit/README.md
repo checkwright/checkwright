@@ -43,7 +43,8 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    ```
    <!-- gate-roster:end -->
 
-   Regenerate the hook + graph artifacts: `bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`.
+   Regenerate the hook + graph artifacts: `--emit git-hooks --write` on the
+   gate binary `GATE_SDK_NATIVE_BIN` names.
    `check-docs-render-fidelity` needs ruby plus the kramdown-parser-gfm gem (the
    Pages parser); a consumer without a published docs site simply omits it.
 
@@ -67,6 +68,8 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
 ## Test
 
+Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+
 ```bash
-bash gate-sdk/bin/run-gates.sh --run-gate-tests site-kit/gate-tests site-kit/checks
+--run-gate-tests site-kit/gate-tests site-kit/checks
 ```

@@ -2,8 +2,8 @@
 96 .claude/agents/audit-sweep.md
 129 .claude/agents/stage-session.md
 23 .claude/commands/agent-execution.md
-11 .claude/commands/align.md
-18 .claude/commands/build.md
+12 .claude/commands/align.md
+19 .claude/commands/build.md
 137 .claude/commands/close.md
 31 .claude/commands/consult.md
 24 .claude/commands/economics.md
@@ -12,7 +12,7 @@
 111 .claude/commands/scope.md
 19 .claude/commands/spec.md
 21 .claude/commands/validate.md
-176 CLAUDE.md
+177 CLAUDE.md
 109 canon-kit/templates/SPEC-amendment.md
 37 context-kit/templates/close-brevity.md
 492 delegation-kit/templates/agent-execution.md

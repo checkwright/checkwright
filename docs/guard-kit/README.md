@@ -25,9 +25,9 @@ An installer-vendored tree does not carry this file. The payload withholds each
 kit's `SPEC.md` and its `smoke/`, publishing the specification at the location
 `GATE_SDK_SPEC_BASE_URL` names instead (gate-sdk/SPEC.md §Consumer payload).
 
-Unlike the other kits, guard-kit registers **no gates**: its surfaces are
-hooks, a library and templates, so nothing joins `gates.list`. It follows
-gate-sdk's layout and smoke conventions without depending on its registry.
+Most of what guard-kit ships is not a gate: its surfaces are hooks, a library
+and templates. It registers exactly one, which holds the door binding its own
+steer messages and its settings templates depend on.
 
 ## Install
 
@@ -39,6 +39,18 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    cp guard-kit/templates/bash-guard.sh      scripts/bash-guard.sh
    cp guard-kit/templates/guard-config.knobs scripts/guard-config.knobs
    ```
+
+   Register the gate it ships in your `gates.list`:
+
+   <!-- gate-roster:begin -->
+   ```
+   check-door-binding
+   ```
+   <!-- gate-roster:end -->
+
+   It resolves through gate-sdk's registry path (your gates dir first, then each
+   kit's `checks/`), and its `# graph:` manifest puts it in the generated
+   pre-commit hook.
 
    The optional wakeup-guard and escalation-guard are **not** copied: they are
    binary arms, wired by pointing a hook's `command` field at
@@ -70,8 +82,8 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
 Configuration is a knob file — override any knob in `guard-config.knobs`, one
 `NAME = value`, `NAME[] = element` or `NAME[key] = value` line each
-(gate-sdk/SPEC.md §The knob file), and `bash gate-sdk/bin/run-gates.sh --emit
-knob-roster` prints every default (log paths, settings paths, `GUARD_KIT_RO_SCRIPTS`,
+(gate-sdk/SPEC.md §The knob file), and `--emit knob-roster` on the gate binary
+`GATE_SDK_NATIVE_BIN` names prints every default (log paths, settings paths, `GUARD_KIT_RO_SCRIPTS`,
 `GUARD_KIT_RO_BINS`, `GUARD_KIT_RO_FORMS`, `GUARD_KIT_SCRATCH_DIRS`,
 `GUARD_KIT_SEARCH_TOOLS`, `GUARD_KIT_BREADTH_PROBES`,
 `GUARD_KIT_BREADTH_DECLARED`); defaults are this
@@ -86,21 +98,25 @@ grant withholds it.
 
 ## Use
 
+Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
+
 ```bash
-bash gate-sdk/bin/run-gates.sh --emit scan-prompts          # rank what nothing granted, filtered by the allowlist
-bash gate-sdk/bin/run-gates.sh --emit scan-prompts --count  # <patterns>/<occurrences> token (drift KPI)
-bash gate-sdk/bin/run-gates.sh --emit compare-settings-allow  # local-overlay entries a committed glob already grants, those a probe proves too broad, and those naming a script that does not exist
-bash gate-sdk/bin/run-gates.sh --rewrite [--regex] [--expect <n>] [--] <find> <replace> <file>…  # replace text in tracked files, printing every changed span
+--emit scan-prompts          # rank what nothing granted, filtered by the allowlist
+--emit scan-prompts --count  # <patterns>/<occurrences> token (drift KPI)
+--emit compare-settings-allow  # local-overlay entries a committed glob already grants, those a probe proves too broad, and those naming a script that does not exist
+--rewrite [--regex] [--expect <n>] [--] <find> <replace> <file>…  # replace text in tracked files, printing every changed span
 ```
 
 `--emit scan-prompts` takes an optional log path, which overrides `GUARD_KIT_LOG`
 and composes with `--count` in either order; `--` ends option processing, so a
 log path spelled with a leading dash is still reachable. An unrecognized
 `-`-prefixed argument is a refusal at exit 2 — there is no per-arm `--help`,
-because a non-gate arm's usage lives here and in `run-gates.sh --help`.
+because a non-gate arm's usage lives here and under the gate binary's `--help`.
 
 ## Test
 
+Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+
 ```bash
-bash gate-sdk/bin/run-gates.sh --run-guard-tests    # decision-table over the generic ruleset
+--run-guard-tests    # decision-table over the generic ruleset
 ```

@@ -122,6 +122,7 @@ check-settings-paths
 check-memory-off
 check-template-copy-parity
 check-template-registry-parity
+check-door-binding
 
 # The binary carries members this battery deliberately does not register. Each
 # records its cause here, where the assertion that joins the two rosters reads it

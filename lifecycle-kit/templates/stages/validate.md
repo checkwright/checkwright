@@ -4,8 +4,8 @@ NEW failures against a committed baseline" over bare "all pass", which is
 unsatisfiable while any suite is tracked-red on a deferred blocker; each
 held-constant red line carries the live task slug that blocks it>*.
 
-**First step — stamp evidence.** Run the lifecycle arm,
-`bash gate-sdk/bin/run-gates.sh --enter-stage validate`: it appends `<iteration> validate <session-id> <date> <head>` to
+**First step — stamp evidence.** Run the lifecycle arm
+`--enter-stage validate` on the gate binary `GATE_SDK_NATIVE_BIN` names: it appends `<iteration> validate <session-id> <date> <head>` to
 `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp
 proves invocation, not faithful execution), reading `<session-id>` from
 the `--emit-session-id` arm

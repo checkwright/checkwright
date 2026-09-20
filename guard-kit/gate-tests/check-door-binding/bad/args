@@ -1,0 +1,5 @@
+# Same synthetic-tree steer as good/. alpha-kit's README reintroduces an
+# adopter-facing door (an arm that is not a fail-open one), and its template
+# pastes an install path to the gate binary — one finding for each assertion,
+# so neither can pass while the other reds.
+.

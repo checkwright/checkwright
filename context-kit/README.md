@@ -43,7 +43,8 @@ hook approximation and the session-context template also expect
 
    They resolve through gate-sdk's registry path (your gates dir first, then
    each kit's `checks/`), and their `# graph:` manifests put them in the
-   generated pre-commit hook: `bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`.
+   generated pre-commit hook, which `--emit git-hooks --write` on the gate
+   binary `GATE_SDK_NATIVE_BIN` names writes.
    The memory-off gates are inert until you opt in — `check-settings-pins`
    skips clean with no pins file, so create `settings-pins.conf` (one
    `<path> = <expected JSON>` per line, the path a dot/bracket path expression
@@ -55,7 +56,7 @@ hook approximation and the session-context template also expect
    `docs/footprint.md` against the footprint emitter it calls in-process;
    register it when you publish that projection. `check-surface-ratchet` arms
    once you stamp its ceilings —
-   `bash gate-sdk/bin/run-gates.sh --emit always-loaded --ceiling`, committed —
+   `--emit always-loaded --ceiling` on the gate binary, committed —
    and reds thereafter on a governed surface that grew past its row without a
    deliberate re-stamp (SPEC.md §The surface ratchet).
 
@@ -63,10 +64,11 @@ hook approximation and the session-context template also expect
    gates dir, edit its `[EDIT ME]` sections (layout judgment, not mechanism),
    and merge `templates/settings-sessionstart.json` into `.claude/settings.json`.
 
-3. Set the baseline — `bash gate-sdk/bin/run-gates.sh --emit always-loaded --update-baseline`
-   and commit `.workflow/always-loaded-baseline.txt`.
+3. Set the baseline — run `--emit always-loaded --update-baseline` on the gate
+   binary `GATE_SDK_NATIVE_BIN` names and commit
+   `.workflow/always-loaded-baseline.txt`.
 
-4. Seed your env profile — `bash gate-sdk/bin/run-gates.sh --emit env-probe`
+4. Seed your env profile — the gate binary's `--emit env-probe` arm
    writes a marker-bounded machine profile (OS, package manager, toolchain versions,
    absent tools) into `ENV.local.md` and seeds a hand-authored gotchas scaffold
    above the markers. The file is local-only (gitignore it); re-run on demand
@@ -79,19 +81,23 @@ hook approximation and the session-context template also expect
 
 ## Use
 
+Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
+
 ```bash
-bash gate-sdk/bin/run-gates.sh --emit md-index [paths…]            # markdown heading index + first sentences
-bash gate-sdk/bin/run-gates.sh --emit md-section <file> <heading>  # print one section by heading
-bash gate-sdk/bin/run-gates.sh --emit pub-index [paths…]           # public API surface (per-language extractors; ships rust, ts)
-bash gate-sdk/bin/run-gates.sh --emit always-loaded                 # standing surface vs baseline (one line)
-bash gate-sdk/bin/run-gates.sh --emit always-loaded --update-baseline   # a close-stage act
-bash gate-sdk/bin/run-gates.sh --emit footprint     # per-kit token footprint (the committed page)
-bash gate-sdk/bin/run-gates.sh --emit env-probe     # re-probe the local machine profile (ENV.local.md)
+--emit md-index [paths…]            # markdown heading index + first sentences
+--emit md-section <file> <heading>  # print one section by heading
+--emit pub-index [paths…]           # public API surface (per-language extractors; ships rust, ts)
+--emit always-loaded                 # standing surface vs baseline (one line)
+--emit always-loaded --update-baseline   # a close-stage act
+--emit footprint     # per-kit token footprint (the committed page)
+--emit env-probe     # re-probe the local machine profile (ENV.local.md)
 ```
 
 ## Test
 
+Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
+
 ```bash
-bash gate-sdk/bin/run-gates.sh --run-gate-tests context-kit/gate-tests context-kit/checks  # the gate fixture pairs
-bash gate-sdk/bin/run-gates.sh --run-index-tests                               # the advisory tools vs golden output
+--run-gate-tests context-kit/gate-tests context-kit/checks  # the gate fixture pairs
+--run-index-tests                               # the advisory tools vs golden output
 ```

@@ -34,8 +34,8 @@ well-formed per-rule trailer — `*Stages:*` routing on the craft register,
 `*Digest:*` on the methodology register — fail-closed when a scanned file or
 heading is missing.
 
-The emitter — `bash gate-sdk/bin/run-gates.sh --emit stage-rules <stage>` — reads
-those trailers and prints the
+The emitter — the `--emit stage-rules <stage>` arm on the gate binary
+`GATE_SDK_NATIVE_BIN` names — reads those trailers and prints the
 craft-rule pointers that bear on a stage, so a session entering it is reminded of
 the rules to follow before the matching action. It is derived, load-triggered
 data: context-kit's session-context hook is its consumer.
@@ -49,10 +49,11 @@ private rule content crosses the provenance seam.
 
 Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree/master/gate-sdk/) (required), then:
 
-1. Install the reference block — with your always-loaded agent file present:
+1. Install the reference block — with your always-loaded agent file present,
+   run this arm on the gate binary `GATE_SDK_NATIVE_BIN` names:
 
    ```
-   bash gate-sdk/bin/run-gates.sh --install-doctrine
+   --install-doctrine
    ```
 
    It writes (or updates) the `## Delivery doctrine` block in `CLAUDE.md`,
@@ -69,7 +70,8 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    ```
    <!-- gate-roster:end -->
 
-   Regenerate the hook + graph artifacts: `bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`.
+   Regenerate the hook + graph artifacts with `--emit git-hooks --write` on the
+   gate binary `GATE_SDK_NATIVE_BIN` names.
 
 3. Edit the digest — to drop a rule your project does not keep resident, declare
    the trim in place: `<!-- doctrine-digest-trim: <rule name> — <reason> -->`
@@ -84,6 +86,8 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
 ## Test
 
+Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+
 ```bash
-bash gate-sdk/bin/run-gates.sh --run-gate-tests doctrine-kit/gate-tests doctrine-kit/checks
+--run-gate-tests doctrine-kit/gate-tests doctrine-kit/checks
 ```

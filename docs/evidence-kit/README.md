@@ -40,7 +40,8 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    ```
    <!-- gate-roster:end -->
 
-   Regenerate the hook + graph artifacts: `bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`.
+   Regenerate the hook + graph artifacts by running `--emit git-hooks --write`
+   on the gate binary `GATE_SDK_NATIVE_BIN` names.
 
 2. Seed the two surfaces — `.workflow/validate-baseline.txt`:
 
@@ -62,8 +63,9 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    and the `EVIDENCE_KIT_PARSER` adapter (`exit-code` for a whole-suite pass/fail,
    `libtest` for per-test result logs, or your own log-parsing command).
 
-4. Record evidence at validate — run `bash gate-sdk/bin/run-gates.sh --run-validate`; it
-   runs each suite, diffs the baseline, and records one evidence line per suite —
+4. Record evidence at validate — run `--run-validate` on the gate binary
+   `GATE_SDK_NATIVE_BIN` names; it runs each suite, diffs the baseline, and
+   records one evidence line per suite —
    written to the manifest in a single fold once the whole roster has run, so a
    suite needing a clean worktree may sit anywhere in it.
 
@@ -83,6 +85,8 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
 ## Test
 
+Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+
 ```bash
-bash gate-sdk/bin/run-gates.sh --run-gate-tests evidence-kit/gate-tests evidence-kit/checks
+--run-gate-tests evidence-kit/gate-tests evidence-kit/checks
 ```

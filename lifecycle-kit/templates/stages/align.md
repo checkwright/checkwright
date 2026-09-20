@@ -3,8 +3,8 @@ The `align` (spec-alignment) stage of an iteration. Cross-spec audit, then
 battery>* as one gate. Exit condition: no unresolved conflicts or terminology
 drift.
 
-**First step — stamp evidence.** Run the lifecycle arm,
-`bash gate-sdk/bin/run-gates.sh --enter-stage align`: it appends `<iteration> align <session-id> <date> <head>` to
+**First step — stamp evidence.** Run the lifecycle arm
+`--enter-stage align` on the gate binary `GATE_SDK_NATIVE_BIN` names: it appends `<iteration> align <session-id> <date> <head>` to
 `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp
 proves invocation, not faithful execution), reading `<session-id>` from
 the `--emit-session-id` arm

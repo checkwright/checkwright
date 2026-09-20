@@ -14,13 +14,13 @@ changes where a stage session's escalations land: at a live lead that can
 rule and resume it, instead of at a cold restart.
 
 **First step — record the session role.** Write `lead <id>` — `<id>` from
-`bash gate-sdk/bin/run-gates.sh --emit session-id` — to the session-role marker
-(`CONTEXT_KIT_SESSION_ROLE_FILE`, default
+`--emit session-id` on the gate binary `GATE_SDK_NATIVE_BIN` names — to the
+session-role marker (`CONTEXT_KIT_SESSION_ROLE_FILE`, default
 `${GATE_SDK_TMP_DIR:-.tmp}/session-role`):
 
 ```bash
-mkdir -p "${GATE_SDK_TMP_DIR:-.tmp}" && \
-  echo "lead $(bash gate-sdk/bin/run-gates.sh --emit session-id)" \
+. gate-sdk/lib/gate.sh && mkdir -p "${GATE_SDK_TMP_DIR:-.tmp}" && \
+  echo "lead $("$(gate_native_bin_spelled)" --emit session-id)" \
   > "${CONTEXT_KIT_SESSION_ROLE_FILE:-${GATE_SDK_TMP_DIR:-.tmp}/session-role}"
 ```
 
@@ -33,8 +33,8 @@ lacks the harness session uuid, the id derivation's newest-transcript fallback
 can mis-pick a just-finished subagent's id — verify before writing the marker
 (lifecycle-kit/SPEC.md §bin/session-id.sh owns the limit).
 
-Then open your resume journal with
-`bash gate-sdk/bin/run-gates.sh --enter-stage --open-lead-journal` before writing to it; never overwrite the file.
+Then open your resume journal with `--enter-stage --open-lead-journal` on the gate
+binary `GATE_SDK_NATIVE_BIN` names before writing to it; never overwrite the file.
 
 ## The lead model
 

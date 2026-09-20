@@ -147,6 +147,7 @@ leaves its section absent.
 | [context-kit](context-kit/index.md) | check-memory-off | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-template-copy-parity | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-template-registry-parity | precommit |
+| [guard-kit](guard-kit/index.md) | check-door-binding | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-commit-msg | commit-msg |
 | [gate-sdk](gate-sdk/index.md) | check-commit-subject | commit-msg |
 | [lifecycle-kit](lifecycle-kit/index.md) | check-stamp-subject | commit-msg |

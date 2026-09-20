@@ -2,8 +2,8 @@ The `close` stage of an iteration. Harvest lessons, housekeep, optionally
 merge. Exit condition: Done and Lessons Learned sections cleared (harvestable
 lessons promoted first).
 
-**First step — stamp evidence.** Run the lifecycle arm,
-`bash gate-sdk/bin/run-gates.sh --enter-stage close`: it appends `<iteration> close <session-id> <date> <head>` to
+**First step — stamp evidence.** Run the lifecycle arm
+`--enter-stage close` on the gate binary `GATE_SDK_NATIVE_BIN` names: it appends `<iteration> close <session-id> <date> <head>` to
 `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp
 proves invocation, not faithful execution), reading `<session-id>` from
 the `--emit-session-id` arm
@@ -75,7 +75,7 @@ session.
    §The committed gap inbox) → disposition every `- <date> — <gap>` bullet,
    then **truncate the inbox to its `# contract:` header**.
    **Read the drain's inputs first.** Before the first bullet, run
-   `bash gate-sdk/bin/run-gates.sh --emit close-surfaces` and read each surface the
+   `--emit close-surfaces` on the gate binary `GATE_SDK_NATIVE_BIN` names and read each surface the
    slot below names whose row is not `empty` or `absent`. A fact there bearing on a
    bullet's claim is that bullet's re-verification input. The surface's own
    disposition and reclaim stay at step 4. Name the surfaces read in the drain's
@@ -172,8 +172,8 @@ session.
    disposition and says so in one line. The valve's own contract, including
    why a second reach in one iteration is the failure:
    lifecycle-kit/SPEC.md §bin/enter-stage.sh.
-4. **Sweep the inbound triage surfaces** — run
-   `bash gate-sdk/bin/run-gates.sh --emit close-surfaces` and disposition every row
+4. **Sweep the inbound triage surfaces** — run `--emit close-surfaces` on the
+   gate binary `GATE_SDK_NATIVE_BIN` names and disposition every row
    (§The close-surface roster). The roster is derived, not enumerated here or in
    the binding below: a `forced=` row has a structural forcing function and cannot
    be skipped silently; an `advisory` row may be skipped, but the skip is a

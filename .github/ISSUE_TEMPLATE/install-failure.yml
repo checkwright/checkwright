@@ -29,8 +29,8 @@ body:
       options:
         - checkwright doctor
         - checkwright init
-        - bash gate-sdk/bin/run-gates.sh --install-hooks
-        - bash gate-sdk/bin/run-gates.sh (the first battery)
+        - the gate binary, --install-hooks
+        - the gate binary, bare (the first battery)
         - Another step — name it in the output below
     validations:
       required: true

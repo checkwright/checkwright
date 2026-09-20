@@ -8,7 +8,7 @@ condition — e.g. every active feature entry spec-ready; your
 amendment-readiness gate green>*.
 
 **First step — reset + stamp evidence.** Run the lifecycle arm
-`bash gate-sdk/bin/run-gates.sh --enter-stage scope`. `scope` is the iteration boundary, so the tool
+`--enter-stage scope` on the gate binary `GATE_SDK_NATIVE_BIN` names. `scope` is the iteration boundary, so the tool
 *resets* the evidence file: it truncates `.workflow/WORKFLOW-STATE.txt` back
 to its header (dropping the prior iteration's stamps — git history is the
 permanent audit trail; the gates only ever read the current iteration), stamps
@@ -219,7 +219,7 @@ promotion dividend lives in the total and in no single entry, so splitting an
 entry is safe only against that total.
 
 When done, **set the iteration name without waiting for confirmation** and
-inform the user: run `bash gate-sdk/bin/run-gates.sh --enter-stage --rename <name>`,
+inform the user: run `--enter-stage --rename <name>` on the gate binary `GATE_SDK_NATIVE_BIN` names,
 which writes both surfaces — the queue header and column 1 of every stamp — in
 one motion and names them for the one commit they ride in. Never edit either by
 hand: `check-stage-evidence` requires every stamp's iteration to match the

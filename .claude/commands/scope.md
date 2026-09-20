@@ -28,7 +28,7 @@ bullet's length. A discard's cause rides the commit message that truncates.
 
 **ritual** — read `BRIEF.local.md` (local-only brief). Read the override
 ledger, TRAJECTORY.md, **only while it holds a standing ruling**: the native
-arm `bash gate-sdk/bin/run-gates.sh --emit ruling-staleness` settles it — an
+arm `--emit ruling-staleness` settles it — an
 empty discharge report means none stands and the file is skipped. The
 constraints work is ranked against live in gate-sdk/SPEC.md §The adopter
 constraints, not in the ledger. **A ruling is closed — never re-litigate one; the operator reopens one

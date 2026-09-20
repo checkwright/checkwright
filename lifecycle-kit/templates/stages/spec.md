@@ -19,8 +19,8 @@ file, and the bidirectional rule reds any `[spec:]` ref resolving to no file, so
 a skipped `spec` cannot ship a feature without its amendment (the same
 procedural-plus-one-gated-backstop shape as the audit stage's own trigger).
 
-**First step — stamp evidence.** Run the lifecycle arm,
-`bash gate-sdk/bin/run-gates.sh --enter-stage spec`:
+**First step — stamp evidence.** Run the lifecycle arm
+`--enter-stage spec` on the gate binary `GATE_SDK_NATIVE_BIN` names:
 it appends `<iteration> spec <session-id> <date> <head>` to
 `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp
 proves invocation, not faithful execution), reading `<session-id>` from

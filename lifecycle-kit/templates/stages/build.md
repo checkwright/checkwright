@@ -24,7 +24,7 @@ written **only on the user's explicit ruling** — never self-issued by this
 entering session.
 
 **First step — stamp evidence.** Run the lifecycle arm
-`bash gate-sdk/bin/run-gates.sh --enter-stage build`: it appends `<iteration> build <session-id> <date> <head>`
+`--enter-stage build` on the gate binary `GATE_SDK_NATIVE_BIN` names: it appends `<iteration> build <session-id> <date> <head>`
 to `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the
 stamp proves invocation, not faithful execution), reading `<session-id>` from
 the `--emit-session-id` arm
@@ -43,7 +43,7 @@ Build runs one fresh session per task. Prefer
 a session reset at a task boundary; reach for mid-task summarization only as
 a fallback before a commit, never as the routine per-task reset.
 
-**Every session still stamps** — re-run `bash gate-sdk/bin/run-gates.sh --enter-stage build` each
+**Every session still stamps** — re-run `--enter-stage build` on the gate binary `GATE_SDK_NATIVE_BIN` names each
 session: it appends a fresh `<iter> build <session-id> <date> <head>` line with this
 session's id, so WORKFLOW-STATE keeps the per-session audit trail
 (`check-stage-evidence` tolerates multiple `build` stamps). The entry is also

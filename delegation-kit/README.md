@@ -35,8 +35,8 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    <!-- gate-roster:end -->
 
    They resolve through gate-sdk's registry path and their `# graph:` manifests
-   put them in the generated pre-commit hook:
-   `bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`.
+   put them in the generated pre-commit hook, written by
+   `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names.
 
 2. Bind the protocol skill and add its resident pointer:
    - Create `.claude/commands/agent-execution.md` as a binding shim naming
@@ -49,8 +49,8 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
 3. Wire a `usage.txt` producer so `usage-verdict` has a snapshot to read — point
    your harness `statusLine` at `bash gate-sdk/bin/run-gates.sh --statusline`,
-   point `DELEGATION_KIT_REFRESH_CMD` at
-   `bash gate-sdk/bin/run-gates.sh --usage-poll` so every
+   point `DELEGATION_KIT_REFRESH_CMD` at the gate binary
+   `GATE_SDK_NATIVE_BIN` names with its `--usage-poll` arm so every
    verdict call refreshes the snapshot on demand (or wire the same poller under
    a timer), keeping it fresh while a supervising session sits static, or
    have any producer honour the snapshot contract (SPEC §The usage.txt contract).
@@ -81,12 +81,14 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
 ## Use
 
+Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
+
 ```bash
-bash gate-sdk/bin/run-gates.sh --usage-verdict            # budget verdict: exit 0 OK/RESET-OK, 1 PAUSE, 2 STALE
-bash gate-sdk/bin/run-gates.sh --usage-verdict <snapshot> # verdict for an explicit usage.txt (test injection)
-bash gate-sdk/bin/run-gates.sh --emit usage-trend          # footprint trend over the sample log (needs DELEGATION_KIT_USAGE_HISTORY)
-bash gate-sdk/bin/run-gates.sh --wait-probe sweep          # wait-primitive probe: the harness-uninvolved reproducer (sleeps for its declared sweep)
-bash gate-sdk/bin/run-gates.sh --wait-probe report         # classify the recorded trials and print the verdict (exit 1 when none are)
+--usage-verdict            # budget verdict: exit 0 OK/RESET-OK, 1 PAUSE, 2 STALE
+--usage-verdict <snapshot> # verdict for an explicit usage.txt (test injection)
+--emit usage-trend          # footprint trend over the sample log (needs DELEGATION_KIT_USAGE_HISTORY)
+--wait-probe sweep          # wait-primitive probe: the harness-uninvolved reproducer (sleeps for its declared sweep)
+--wait-probe report         # classify the recorded trials and print the verdict (exit 1 when none are)
 ```
 
 With `DELEGATION_KIT_USAGE_HISTORY` set, `usage-verdict` logs one sample per
@@ -98,8 +100,10 @@ directly with `--fixture <dir>` only for testing.
 
 ## Test
 
+Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+
 ```bash
-bash gate-sdk/bin/run-gates.sh --run-gate-tests delegation-kit/gate-tests delegation-kit/checks  # every gate's fixture pair
+--run-gate-tests delegation-kit/gate-tests delegation-kit/checks  # every gate's fixture pair
 ```
 
 The `usage-verdict` decision table and the `usage-trend` assertions are no

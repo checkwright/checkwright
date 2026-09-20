@@ -1,0 +1,7 @@
+# Anchor the sweep at this case dir: gate-sdk-config.knobs (read at cwd) names
+# the synthetic kits via GATE_SDK_KIT_DIRS; their relative roots resolve against
+# the positional root. Every surviving mention here is one the sweep leaves
+# standing on purpose — a fail-open arm's command, a subject-position file
+# mention, and the knob named as a knob — so a green line proves the
+# discriminator and the arm exemption, not an empty corpus.
+.

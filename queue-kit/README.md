@@ -54,7 +54,8 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
    They resolve through gate-sdk's registry path (your gates dir first, then
    each kit's `checks/`), and their `# graph:` manifests put them in the
-   generated pre-commit hook: `bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`.
+   generated pre-commit hook, written by `--emit git-hooks --write` on the gate
+   binary `GATE_SDK_NATIVE_BIN` names.
 
 2. Give your queue file the section skeleton — copy
    `templates/TASK-QUEUE.md` and fill it in (it shows one example entry per
@@ -66,24 +67,26 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 3. Optional — reshape the grammar: copy `templates/queue-config.knobs` into your
    gates dir and set section names, the wrap budget, prose-lead tokens, or the
    precondition trigger set, one `NAME = value` or `NAME[] = element` line each.
-   Defaults are this repo's layout; `bash gate-sdk/bin/run-gates.sh --emit
-   knob-roster` prints them.
+   Defaults are this repo's layout; `--emit knob-roster` on the gate binary
+   `GATE_SDK_NATIVE_BIN` names prints them.
 
 ## Use
 
+Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
+
 ```bash
-bash gate-sdk/bin/run-gates.sh --emit queue-index                       # header + active (• ready / ✗ blocked) + deferred + icebox tally
-bash gate-sdk/bin/run-gates.sh --emit queue-index --collapse-deferred   # deferred as a per-### tally
-bash gate-sdk/bin/run-gates.sh --emit queue-index --extent <slug>       # inclusive line range of one entry's subtree
-bash gate-sdk/bin/run-gates.sh --emit queue-index --icebox-candidates   # the closing stage's eviction worklist
-bash gate-sdk/bin/run-gates.sh --emit queue-counts                       # "<key><TAB><count>", one line per task section, in configured order
-bash gate-sdk/bin/run-gates.sh --emit queue-counts --by <tag>           # the same grammar keyed "<section>/<value>", one line per partition
-bash gate-sdk/bin/run-gates.sh --emit queue-edges                       # every live slug with inbound citations, then retired targets, each marked where its name is still a tracked file's stem
-bash gate-sdk/bin/run-gates.sh --emit queue-edges --inbound <slug>      # one slug's inbound set, each edge with its citing line verbatim
-bash gate-sdk/bin/run-gates.sh --emit entry-history <slug>              # commits where one entry's counted extent fell — live or departed slug; advisory, no verdict
-bash gate-sdk/bin/run-gates.sh --lesson-sink <tag>                      # route a lesson body on stdin to its configured sink
-bash gate-sdk/bin/run-gates.sh --emit roadmap          # the public roadmap block, to stdout
-bash gate-sdk/bin/run-gates.sh --emit roadmap --write   # splice it into the configured projection page
+--emit queue-index                       # header + active (• ready / ✗ blocked) + deferred + icebox tally
+--emit queue-index --collapse-deferred   # deferred as a per-### tally
+--emit queue-index --extent <slug>       # inclusive line range of one entry's subtree
+--emit queue-index --icebox-candidates   # the closing stage's eviction worklist
+--emit queue-counts                       # "<key><TAB><count>", one line per task section, in configured order
+--emit queue-counts --by <tag>           # the same grammar keyed "<section>/<value>", one line per partition
+--emit queue-edges                       # every live slug with inbound citations, then retired targets, each marked where its name is still a tracked file's stem
+--emit queue-edges --inbound <slug>      # one slug's inbound set, each edge with its citing line verbatim
+--emit entry-history <slug>              # commits where one entry's counted extent fell — live or departed slug; advisory, no verdict
+--lesson-sink <tag>                      # route a lesson body on stdin to its configured sink
+--emit roadmap          # the public roadmap block, to stdout
+--emit roadmap --write   # splice it into the configured projection page
 ```
 
 The roadmap projection is opt-in: it emits nothing until you set the horizon and
@@ -92,6 +95,8 @@ unconfigured consumer gets a clean skip rather than a kit-shaped roadmap.
 
 ## Test
 
+Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+
 ```bash
-bash gate-sdk/bin/run-gates.sh --run-gate-tests queue-kit/gate-tests queue-kit/checks
+--run-gate-tests queue-kit/gate-tests queue-kit/checks
 ```

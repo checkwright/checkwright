@@ -92,7 +92,7 @@ of checks.
 | [lifecycle-kit/](lifecycle-kit/) | The iteration stage state machine for stateless agent sessions: an iteration header + evidence-stamp file (its last stamp the stage cursor), stage-skill templates (scope/align/build/validate/close by default, plus an optional trigger-gated authoring stage — stages are config), and the gates that make skipping a stage — or clearing a lesson without dispositioning it — fail the commit. |
 | [queue-kit/](queue-kit/) | A git-native, agent-readable task tracker: the TASK-QUEUE format, one slug namespace, the tag algebra over tasks (blocked-by/spec/drain-exempt/roadmap/observed-by/cost/surface/precondition-ok) and over Lessons Learned (an in-iteration attention channel plus consumer-named harvest tags), the queue-reading arms the binary carries (queue-kit/SPEC.md rosters them), the `roadmap` one projecting the curated entries onto a generated public page, and the gates that hold the grammar an agent selects work by. |
 | [canon-kit/](canon-kit/) | Spec discipline for agent-authored components: one canonical spec per component, deltas as short-lived amendment files, a content-tiering star topology (one owner per fact; cite, never restate), and gates over the copy-shaped failure modes. |
-| [guard-kit/](guard-kit/) | Permission-friction tooling for agent sessions: a `PreToolUse` guard framework (block/steer/rewrite/auto-allow) with a harness-generic ruleset, a prompt-source scanner, tracked-vs-local allowlist curation, an optional wakeup-guard, and a close-stage friction-triage step. Registers no gates. |
+| [guard-kit/](guard-kit/) | Permission-friction tooling for agent sessions: a `PreToolUse` guard framework (block/steer/rewrite/auto-allow) with a harness-generic ruleset, a prompt-source scanner, tracked-vs-local allowlist curation, an optional wakeup-guard, and a close-stage friction-triage step. Registers `check-door-binding`. |
 | [delegation-kit/](delegation-kit/) | Safe delegated-agent execution for budget-bounded sessions: the supervisor protocol (serialize on the shared git index, one commit per unit, resume journal, verify after every agent commit), a trustworthy budget verdict (`usage-verdict`), a `SubagentStop` turn-end hook that refuses a turn ended over a live recorded producer, and `check-gate-tamper` — a commit-shape gate blocking the two attested gate-weakening shapes. |
 | [context-kit/](context-kit/) | Token-economics-aware context management: the index-first reading arms (`--emit md-index`/`md-section`/`pub-index`), a session-start hook that assembles a compact brief, an always-loaded meter with its committed baseline, and `check-brevity` over its governed always-loaded sections. |
 | [drift-kit/](drift-kit/) | Advisory drift reporting for stateless sessions: a `--emit drift-report` arm that collates pluggable KPIs from the other kits' governed surfaces under lead/lag honesty labels, a KPI plugin registry, a one-line trend summary the session hook injects, and the knowledge-friction loop. Registers no gates. |
@@ -130,7 +130,7 @@ bash gate-sdk/bin/run-gates.sh --run-gate-tests evidence-kit/gate-tests evidence
 bash gate-sdk/bin/run-gates.sh --run-gate-tests site-kit/gate-tests site-kit/checks             # site-kit fixtures
 bash gate-sdk/bin/run-gates.sh --run-gate-tests doctrine-kit/gate-tests doctrine-kit/checks     # doctrine-kit fixtures
 bash gate-sdk/bin/run-gates.sh --run-gate-tests scripts/gate-tests                              # consumer-gate fixtures
-bash gate-sdk/bin/run-gates.sh --run-gate-tests guard-kit/gate-tests                            # guard-kit bespoke + seam suites
+bash gate-sdk/bin/run-gates.sh --run-gate-tests guard-kit/gate-tests guard-kit/checks           # guard-kit fixtures + bespoke seam suites
 bash gate-sdk/bin/run-gates.sh --run-guard-tests                                                # guard-kit decision table
 bash gate-sdk/bin/run-gates.sh --run-index-tests                                                 # context-kit index tools
 cargo test --release --manifest-path native/Cargo.toml                                          # native crate unit tests
@@ -142,7 +142,7 @@ bash gate-sdk/bin/run-gates.sh --run-demo                                       
 ```
 <!-- battery-roster:end -->
 
-`bash gate-sdk/bin/run-gates.sh --install-hooks` opts this clone into the generated
+The gate binary's `--install-hooks` arm opts this clone into the generated
 pre-commit and commit-msg hooks. The repo also runs lifecycle-kit's own iteration state
 machine — [`TASK-QUEUE.md`](TASK-QUEUE.md) carries the iteration header, one
 iteration per hardening or roadmap unit.
