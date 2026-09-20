@@ -8357,6 +8357,16 @@ left undeclared — docs/install.md §Requirements owns both grammars.
   what ground). A script that guards a shell the harness already runs is written
   in that shell on every host, because a session with a call to guard already
   has the shell the guard needs (guard-kit/SPEC.md §The hook on native Windows).
+  **Two caller classes keep a script door permanently, and they are classes
+  rather than a file list because a list goes stale at the next surface.** A
+  **harness-configuration value carrying a fail-open arm** keeps one by
+  construction — its status is read exactly when the binary that would answer is
+  absent (§run-gates) — and so does the prose publishing that value for an
+  adopter to paste. A **pre-build door** keeps one because naming the binary
+  would name a path that does not exist yet; such a door **carries its
+  precondition at the site**, since a reader who cannot see that a build comes
+  first reads a clone-path floor as the install floor. Every other door names
+  the binary through `GATE_SDK_NATIVE_BIN`.
 
 ## Consumer payload
 
@@ -10458,8 +10468,18 @@ touch. So the front end is now a **harness shim plus pre-build door**, and that
 is a change of role, not of code: nothing here was deleted for it, and the
 `no-port:` declarations below name the new audience while their ground — it
 locates the binary, which the binary cannot do for itself — is untouched.
-Whether a harness could instead be wired to a *binary* that fail-opens on its
-own absence is a separate design question this does not open.
+**A harness cannot be wired to a binary that fail-opens on its own absence, and
+the residency is permanent.** An absent program does not run, so the fail-open
+can only come from a script standing in for it, from the harness, or from the
+harness's handling of a command that does not resolve. The first is what the
+stubs are. The third is reachable — the harness's documented contract proceeds on
+any non-zero status but 2 — and is refused, because it converts a loud decline
+carrying the build remedy into a policy hook silently disabled after one notice.
+Both are moot against the stub's own `# no-port:` cause: the front end *locates*
+the binary, and a settings file's literal `command` resolves no precedence, so a
+consumer who sets `GATE_SDK_NATIVE_BIN` would have a wiring that names the wrong
+path. And none of the three reaches the second caller — a clone with no built
+binary has no harness event at all.
 
 **The front-end's port disposition is landed: it is the stub, and the loop
 retired with the cut.** The loop's only served branch dispatched nothing once no
