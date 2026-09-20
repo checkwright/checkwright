@@ -5,3 +5,4 @@
 ---
 
 adopter-floor-door-remainder scope a5701725 2026-09-20 8747733b
+adopter-floor-door-remainder spec a4702eac 2026-09-20 30a07e1d
