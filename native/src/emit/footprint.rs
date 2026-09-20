@@ -155,11 +155,14 @@ pub fn table(f: &Footprint) -> String {
     out
 }
 
+// spec: guard-kit/SPEC.md §check-door-binding — the file-scoped declaration stands before the first
+// heading and is written by the emitter, one in emitted output being erased by the next regeneration
 const PREAMBLE: &str = r#"---
 title: Footprint
 nav_parent: value
 nav_child_order: 2
 ---
+<!-- door-contributor: a generated projection whose only door is the emitter command behind its own numbers, read by the contributor who regenerates it -->
 
 # Context footprint
 

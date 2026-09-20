@@ -19,6 +19,7 @@ const SHELL_COLON: &[&str] = &[
     "no-fixture:",
     "portability-declared:",
     "path-dialect-exempt:",
+    "door-contributor:",
     "no-port:",
     "port-until:",
     "permanent:",

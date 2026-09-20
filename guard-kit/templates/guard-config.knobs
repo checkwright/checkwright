@@ -6,6 +6,9 @@
 # spec: guard-kit/SPEC.md §compare-settings-allow — a breadth ruled intended, keyed on the exact local allow-rule string; the kit ships no declarations either
 # GUARD_KIT_BREADTH_DECLARED[Bash(mytool *)] = every subcommand is read-only
 
+# spec: guard-kit/SPEC.md §check-door-binding — your own surfaces assertion C sweeps for undeclared doors, each a tracked file or a directory; the kit ships none, and with none set the assertion is inert
+# GUARD_KIT_DOOR_ROOTS[] = README.md
+
 # spec: guard-kit/SPEC.md §Layout and configuration — the dedicated search tools your harness build carries (default Glob and Grep); an empty line drops both, so rules 9 and 11 never steer at a tool the build lacks
 # GUARD_KIT_SEARCH_TOOLS =
 

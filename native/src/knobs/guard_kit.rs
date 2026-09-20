@@ -21,6 +21,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("GUARD_KIT_SETTINGS", ".claude/settings.json"),
         Row::scalar("GUARD_KIT_SETTINGS_LOCAL", ".claude/settings.local.json"),
         Row::indexed("GUARD_KIT_BREADTH_PROBES", &[]),
+        Row::indexed("GUARD_KIT_DOOR_ROOTS", &[]),
         Row::keyed("GUARD_KIT_BREADTH_DECLARED", &[]),
         Row::indexed("GUARD_KIT_RO_SCRIPTS", &["check-*.sh"]),
         Row::indexed("GUARD_KIT_SCRATCH_DIRS", &[".tmp"]),

@@ -69,6 +69,7 @@ matching nothing (`gate-sdk/SPEC.md §check-tree-terms`).
 Point the tree scan at it — the pattern-file argument stands in for the standing
 `GATE_SDK_MSG_PATTERN_FILES` configuration:
 
+<!-- door-contributor: a worked example of a contributor's own tree scan, typed in a clone whose binary is built by construction -->
 ```bash
 GATE_SDK_MSG_PATTERN_FILES=cargo-terms.list \
     bash gate-sdk/bin/run-gates.sh --only check-tree-terms

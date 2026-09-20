@@ -313,6 +313,12 @@ fn theme_part(theme_dir: &str, part: &str) -> Option<String> {
 // run-gates' emit front-end, and `native/src/gates/graph.rs` in process.
 pub fn render(cfg: &Config, members: &[Member]) -> String {
     let mut out = String::from("<!DOCTYPE html>\n");
+    // spec: guard-kit/SPEC.md §check-door-binding — a page with no `#` heading takes the standalone
+    // declaration as whole-file scope, and the emitter writes it rather than the page
+    out.push_str(
+        "<!-- door-contributor: a generated artifact page whose doors are its own regeneration \
+         recipe, read by the contributor who regenerates it -->\n",
+    );
     out.push_str(COMMENT_HEAD);
     out.push_str(&format!(
         "  regenerate with:  {} > {}\n",

@@ -996,8 +996,8 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-door-binding",
         door_binding::run,
-        &[("?", "", "", "dynamic@src/gates/door_binding.rs:90")],
-        &["GATE_SDK_KIT_DIRS"],
+        &[("?", "", "", "dynamic@src/gates/door_binding.rs:243")],
+        &["GATE_SDK_KIT_DIRS", "GUARD_KIT_DOOR_ROOTS"],
         "guard-kit",
         &[("git", "")],
     ),

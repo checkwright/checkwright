@@ -177,6 +177,13 @@ fn emit_one(ctx: &Ctx, src: &str) -> Result<String, String> {
          Do not edit; run the generator. -->\n",
         src
     ));
+    // spec: guard-kit/SPEC.md §check-door-binding — the file-scoped declaration stands before the
+    // first heading, and the emitter writes it because one written into emitted output by hand is
+    // erased by the next regeneration
+    out.push_str(
+        "<!-- door-contributor: a generated mirror of a kit's own contributor source; every door on \
+         the page is that source's, and the banner above is the regeneration recipe -->\n",
+    );
     for line in fresh::file_lines(&text) {
         out.push_str(&rewrite_line(ctx, srcdir, line));
         out.push('\n');

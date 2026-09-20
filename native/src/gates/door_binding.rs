@@ -16,6 +16,14 @@ const DOORS: &[&str] = &["run-gates.sh", "run-gates.ps1"];
 // sweep of adopter surfaces does not reach
 const DIRS: &[&str] = &["templates", "lib", "bin"];
 
+// spec: guard-kit/SPEC.md §check-door-binding — assertion C's corpus knob, consumer-configured and
+// empty by default, so an upgrade moves no consumer's verdict
+const ROOTS: &str = "GUARD_KIT_DOOR_ROOTS";
+
+// spec: guard-kit/SPEC.md §check-door-binding — assertion C's site declaration; the reason is
+// mandatory on the `comment-tier-exempt:` convention and an empty one is malformed, not exempting
+const DECL: &str = "door-contributor:";
+
 // spec: guard-kit/SPEC.md §check-door-binding — a path token's characters, so an occurrence found by
 // basename expands to the whole spelling around it before either question is asked of it
 fn is_path_char(c: char) -> bool {
@@ -81,6 +89,151 @@ fn names_fail_open_arm(line: &str, end: usize) -> bool {
         .any(|t| FAIL_OPEN_ARMS.contains(&t))
 }
 
+// spec: guard-kit/SPEC.md §check-door-binding — a declaration's reason, or `None` on a line that
+// carries no declaration at all. An unterminated comment reads to end of line rather than matching
+// nothing, so a truncated `-->` cannot turn a malformed reason into a silent non-declaration.
+fn decl_reason(line: &str) -> Option<&str> {
+    let at = line.find(DECL)?;
+    let rest = &line[at + DECL.len()..];
+    let end = rest.find("-->").unwrap_or(rest.len());
+    Some(rest[..end].trim_matches([' ', '\t']))
+}
+
+// spec: guard-kit/SPEC.md §check-door-binding — a declaration standing alone on its line, which is
+// what opens a span; one sharing its line with anything else is site-scoped
+fn decl_alone(line: &str) -> bool {
+    let t = line.trim_matches([' ', '\t']);
+    t.starts_with("<!--") && t.ends_with("-->") && decl_reason(t).is_some()
+}
+
+fn is_fence(line: &str) -> bool {
+    let t = line.trim_start_matches([' ', '\t']);
+    t.starts_with("```") || t.starts_with("~~~")
+}
+
+// spec: guard-kit/SPEC.md §check-door-binding — the two declaration scopes resolved over one file:
+// whole-file when a standalone declaration stands before the first `#` heading, and the fenced
+// block a standalone declaration immediately precedes
+struct Scopes {
+    file: bool,
+    spans: Vec<(usize, usize)>,
+    declared: Vec<bool>,
+    malformed: Vec<usize>,
+}
+
+fn scopes(lines: &[&str]) -> Scopes {
+    let heading = lines.iter().position(|l| l.starts_with('#'));
+    let mut s = Scopes {
+        file: false,
+        spans: Vec::new(),
+        declared: vec![false; lines.len()],
+        malformed: Vec::new(),
+    };
+    for (i, line) in lines.iter().enumerate() {
+        let Some(reason) = decl_reason(line) else { continue };
+        if reason.is_empty() {
+            s.malformed.push(i);
+            continue;
+        }
+        s.declared[i] = true;
+        if !decl_alone(line) {
+            continue;
+        }
+        if heading.map_or(true, |h| i < h) {
+            s.file = true;
+            continue;
+        }
+        let Some(off) = lines[i + 1..]
+            .iter()
+            .position(|n| !n.trim_matches([' ', '\t']).is_empty())
+        else {
+            continue;
+        };
+        let open = i + 1 + off;
+        if !is_fence(lines[open]) {
+            continue;
+        }
+        let close = lines[open + 1..]
+            .iter()
+            .position(|n| is_fence(n))
+            .map(|k| open + 1 + k)
+            .unwrap_or(lines.len().saturating_sub(1));
+        s.spans.push((open, close));
+    }
+    s
+}
+
+impl Scopes {
+    fn exempts(&self, i: usize) -> bool {
+        self.file
+            || self.spans.iter().any(|(s, e)| i >= *s && i <= *e)
+            || self.declared[i]
+            || (i > 0 && self.declared[i - 1])
+    }
+}
+
+// spec: guard-kit/SPEC.md §check-door-binding — every door occurrence on one line, span-expanded,
+// with the corpus-wide fail-open arm exemption already applied
+fn doors_on(line: &str, base: &str) -> Vec<(usize, usize)> {
+    let mut out = Vec::new();
+    if DOORS.contains(&base) {
+        return out;
+    }
+    for needle in DOORS {
+        for at in occurrences(line, needle) {
+            let span = token_span(line, at, needle.len());
+            if is_door(line, span) && !names_fail_open_arm(line, span.1) {
+                out.push(span);
+            }
+        }
+    }
+    out
+}
+
+// spec: guard-kit/SPEC.md §check-door-binding — a configured entry's tracked members, the corpus
+// being the tracked tree: a filesystem walk would reach a local build artifact, which is no
+// governed surface
+fn tracked_under(root: &str, entry: &str) -> Result<Vec<String>, String> {
+    let listed = crate::proc::run(&crate::programs::GIT, &["-C", root, "ls-files", "--", entry])?;
+    let text = listed
+        .stdout()
+        .map(|o| String::from_utf8_lossy(o).into_owned())
+        .unwrap_or_default();
+    Ok(text.lines().map(str::to_string).collect())
+}
+
+// spec: guard-kit/SPEC.md §check-door-binding — assertion C's corpus: each configured entry as
+// (shown, path), a directory yielding its tracked members under A's own prune so a page added
+// under it is swept unedited, and anything else the misconfiguration answer rather than a clean
+fn configured(root: &str) -> Result<Vec<(String, String)>, String> {
+    let mut prune = walk::prune_dirs()?;
+    prune.push("gate-tests".to_string());
+    prune.push("smoke".to_string());
+    let base = root.trim_end_matches('/');
+    let mut out: Vec<(String, String)> = Vec::new();
+    for entry in walk::knob_array(ROOTS)?.iter().filter(|e| !e.is_empty()) {
+        let e = entry.trim_end_matches('/');
+        let mut members = tracked_under(base, e)?;
+        members.sort();
+        if Path::new(&format!("{}/{}", base, e)).is_dir() {
+            for m in members {
+                if walk::path_pruned(&m, &prune) {
+                    continue;
+                }
+                out.push((m.clone(), format!("{}/{}", base, m)));
+            }
+        } else if members.len() == 1 && members[0] == e {
+            out.push((e.to_string(), format!("{}/{}", base, e)));
+        } else {
+            return Err(format!(
+                "{} entry '{}' resolves to neither a tracked file nor a directory",
+                ROOTS, e
+            ));
+        }
+    }
+    Ok(out)
+}
+
 // spec: guard-kit/SPEC.md §check-door-binding — one walk from the root, the corpus a filter over it,
 // so the walked-root set is bounded at one whatever the kit roster holds; the prune composes the
 // configured set with this gate's own
@@ -142,8 +295,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     let mut doors: Vec<String> = Vec::new();
     let mut seam: Vec<String> = Vec::new();
+    let mut undeclared: Vec<String> = Vec::new();
+    let mut malformed: Vec<String> = Vec::new();
     let mut swept = 0usize;
     let mut templates = 0usize;
+    let mut configured_swept = 0usize;
 
     let mut tree = walk_tree(&root)?;
     tree.sort();
@@ -169,16 +325,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
             for (n, line) in text.lines().enumerate() {
                 // spec: guard-kit/SPEC.md §check-door-binding — a stub names itself; the retired
                 // spelling is retired as an ADOPTER-FACING door, and the file's own name is not one
-                if !DOORS.contains(&base) {
-                    for needle in DOORS {
-                        for at in occurrences(line, needle) {
-                            let span = token_span(line, at, needle.len());
-                            if !is_door(line, span) || names_fail_open_arm(line, span.1) {
-                                continue;
-                            }
-                            doors.push(format!("{}:{}: {}", shown, n + 1, line.trim()));
-                        }
-                    }
+                for _ in doors_on(line, base) {
+                    doors.push(format!("{}:{}: {}", shown, n + 1, line.trim()));
                 }
                 if in_templates {
                     for at in occurrences(line, artifact) {
@@ -192,7 +340,28 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    if !doors.is_empty() || !seam.is_empty() {
+    // spec: guard-kit/SPEC.md §check-door-binding — assertion C over the configured extra corpus,
+    // default-deny: every door reds unless its site declares itself contributor-facing
+    for (shown, path) in configured(&root)? {
+        let text = read(&path)?;
+        let base = Path::new(&path).file_name().and_then(|n| n.to_str()).unwrap_or("");
+        let lines: Vec<&str> = text.lines().collect();
+        let scope = scopes(&lines);
+        configured_swept += 1;
+        for i in &scope.malformed {
+            malformed.push(format!("{}:{}: {}", shown, i + 1, lines[*i].trim()));
+        }
+        for (n, line) in lines.iter().enumerate() {
+            if scope.exempts(n) {
+                continue;
+            }
+            for _ in doors_on(line, base) {
+                undeclared.push(format!("{}:{}: {}", shown, n + 1, line.trim()));
+            }
+        }
+    }
+
+    if !doors.is_empty() || !seam.is_empty() || !undeclared.is_empty() || !malformed.is_empty() {
         if !doors.is_empty() {
             println!("{}: kit-shipped surface(s) name a front-end stub as a command to run:", NAME);
             for d in &doors {
@@ -215,14 +384,47 @@ fn rule(args: &[String]) -> Result<i32, String> {
             println!("  help: the install location has exactly one owner, GATE_SDK_NATIVE_BIN, and a");
             println!("        kit file carrying an adopter's path publishes it. Name the knob.");
         }
+        if !undeclared.is_empty() {
+            if !doors.is_empty() || !seam.is_empty() {
+                println!();
+            }
+            println!("{}: configured surface(s) carry an undeclared door:", NAME);
+            for d in &undeclared {
+                println!("  {}", d);
+            }
+            println!("  help: a door on a consumer's own surface is adopter-facing unless its site says");
+            println!("        otherwise — there is no 'door-adopter:' twin, so the unmarked case defaults");
+            println!("        to deny. A contributor-facing door takes '<!-- door-contributor: <reason> -->'");
+            println!("        on its own line or the line above; standing alone, that line covers the fenced");
+            println!("        block it precedes, or the whole file before the first '#' heading. An");
+            println!("        adopter-facing door takes no declaration: name the gate binary through");
+            println!("        GATE_SDK_NATIVE_BIN instead, and where the binary does not exist yet carry");
+            println!("        the precondition at the site (gate-sdk/SPEC.md §The adopter constraints). A");
+            println!("        door inside a generated region takes its declaration from the emitter, never");
+            println!("        from the page, which the next regeneration would erase.");
+        }
+        if !malformed.is_empty() {
+            if !doors.is_empty() || !seam.is_empty() || !undeclared.is_empty() {
+                println!();
+            }
+            println!(
+                "{}: '{}' with an empty reason is malformed (the reason is the audit trail):",
+                NAME, DECL
+            );
+            for m in &malformed {
+                println!("  {}", m);
+            }
+            println!("  help: write the reason that says which contributor reads the door, on the");
+            println!("        'comment-tier-exempt:' convention. An empty reason reds rather than exempting.");
+        }
         return Ok(1);
     }
 
-    // spec: guard-kit/SPEC.md §check-door-binding — both counts on the clean line, so a corpus that
-    // silently shrank to nothing is visible on green rather than passing vacuously
+    // spec: guard-kit/SPEC.md §check-door-binding — all three counts on the clean line, so a corpus
+    // that silently shrank to nothing is visible on green rather than passing vacuously
     println!(
-        "DOOR-BINDING: clean ({} kit-shipped surface(s) name no front-end door, {} of them template file(s) naming no path to the binary)",
-        swept, templates
+        "DOOR-BINDING: clean ({} kit-shipped surface(s) name no front-end door, {} of them template file(s) naming no path to the binary, {} configured surface(s) swept)",
+        swept, templates, configured_swept
     );
     Ok(0)
 }
@@ -252,6 +454,54 @@ mod tests {
         assert!(!door("- `bin/run-gates.sh` — the aggregate battery", "run-gates.sh"));
         assert!(!door("`run-gates.sh`'s pre-push full battery", "run-gates.sh"));
         assert!(!door("rather than through bin/run-gates.sh. That front-end", "run-gates.sh"));
+    }
+
+    // spec: guard-kit/SPEC.md §check-door-binding — the declaration's mandatory reason: an empty one
+    // is malformed and reds, and a line carrying no declaration is not one
+    #[test]
+    fn the_declaration_reason_is_mandatory_and_an_empty_one_is_malformed() {
+        assert_eq!(decl_reason("<!-- door-contributor: a battery register -->"), Some("a battery register"));
+        assert_eq!(decl_reason("<!-- door-contributor: -->"), Some(""));
+        assert_eq!(decl_reason("<!-- door-contributor:"), Some(""));
+        assert_eq!(decl_reason("plain prose about a door"), None);
+        assert!(decl_alone("  <!-- door-contributor: r -->  "));
+        assert!(!decl_alone("text <!-- door-contributor: r --> more"));
+    }
+
+    // spec: guard-kit/SPEC.md §check-door-binding — the two scopes: a standalone declaration before
+    // the first heading covers the file, and one immediately preceding a fence covers that block
+    #[test]
+    fn a_standalone_declaration_covers_its_fence_or_the_whole_file() {
+        let fenced = [
+            "# Title",
+            "",
+            "<!-- door-contributor: the battery register -->",
+            "```bash",
+            "bash gate-sdk/bin/run-gates.sh --run-gate-tests x",
+            "```",
+            "bash gate-sdk/bin/run-gates.sh --run-demo",
+        ];
+        let s = scopes(&fenced);
+        assert!(!s.file, "a declaration after the first heading is not file-scoped");
+        assert!(s.exempts(4), "the fenced door rides the span");
+        assert!(!s.exempts(6), "a door past the fence classifies on its own");
+
+        let whole = [
+            "<!-- door-contributor: a generated mirror -->",
+            "# Title",
+            "bash gate-sdk/bin/run-gates.sh --emit graph",
+        ];
+        let s = scopes(&whole);
+        assert!(s.file && s.exempts(2), "before the first heading, the file is covered");
+
+        let site = ["# Title", "<!-- door-contributor: the banner -->", "bash gate-sdk/bin/run-gates.sh --emit footprint"];
+        let s = scopes(&site);
+        assert!(!s.file && s.exempts(1) && s.exempts(2), "site scope is the line and the line above");
+
+        let bad = ["# Title", "<!-- door-contributor: -->", "bash gate-sdk/bin/run-gates.sh --emit graph"];
+        let s = scopes(&bad);
+        assert_eq!(s.malformed, vec![1]);
+        assert!(!s.exempts(2), "a malformed declaration reds rather than exempting");
     }
 
     // spec: guard-kit/SPEC.md §check-door-binding — the exemption keys on the arm, so a hook command

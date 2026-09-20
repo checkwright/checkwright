@@ -124,6 +124,7 @@ validate runs and this block omits is red, and so is a line whose command runs
 no configured suite.
 
 <!-- battery-roster:begin -->
+<!-- door-contributor: the contributor battery register — every line is a suite the validate stage runs in full, typed in a clone whose binary is built by construction -->
 ```bash
 bash gate-sdk/bin/run-gates.sh                                                                  # full battery
 bash gate-sdk/bin/run-gates.sh --run-gate-tests gate-sdk/gate-tests gate-sdk/checks             # gate-sdk fixtures

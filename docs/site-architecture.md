@@ -1,6 +1,7 @@
 ---
 title: Site architecture
 ---
+<!-- door-contributor: maintainer governance, off-nav by design and reached only by citation; every door on the page is a regeneration command for a generated projection -->
 
 # The docs/ site architecture
 

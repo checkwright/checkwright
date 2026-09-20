@@ -1,0 +1,3 @@
+# spec: guard-kit/SPEC.md §check-door-binding — the same configured extra corpus as good/, so the
+# two C findings below are the only difference between the pair
+GUARD_KIT_DOOR_ROOTS[] = site
