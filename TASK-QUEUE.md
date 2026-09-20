@@ -26,14 +26,22 @@
   sweep each time.
   **Measured at this spec stage:** 59 door-shaped sites on non-generated pages under `README.md`
   plus `docs/`, and 126 more on the 25 `generated: true` mirrors, whose declaration one emitter
-  edit writes. Exactly two of the 59 are adopter-facing and are meant to stay red until the paired
-  debt entry repairs them, which is what stops a batch silencing them to reach green.
+  edit writes.
+  **Re-derived at this build stage, and the spec stage's classification was wrong by seventeen:**
+  the 59 split three ways, not two — 2 adopter-facing pre-build doors (repaired and closed), 40
+  contributor-facing on their face (declared, and the gate confirms they report nothing), and 17
+  on adopter-facing kit landing pages whose repair is a lead escalation rather than a declaration.
+  Those 17 are stale site copies of sections the door sweep already repaired in the kits' own
+  READMEs, so declaring them would be the silencing the amendment forbids. **This is the entry's
+  own failure class firing a third time** — a `docs/` count read wholesale as contributor-facing —
+  which is the case for default-deny over any roster of judged-adopter-facing sites.
+  **Landed so far:** deltas 1-4 and 6, and delta 5's forty declarations plus the five emitter
+  edits. Open: delta 5's two `GUARD_KIT_DOOR_ROOTS[]` entries, which stay unset until the 17 are
+  ruled, so assertion C is inert and the battery green rather than falsely green.
   **Judged a recurrence at this spec stage, and the recurrence is a misclassification rather than
   a miss:** the close before this one listed `docs/index.md` in its `docs/` count and read the
   whole of that count as contributor-facing, so line 27 — the site landing page's headline try-it
   command, the twin of `README.md`:25 — stayed invisible to the very measurement that named it.
-  That is this entry's own failure class firing one measurement later, which is the case for
-  default-deny over any roster of judged-adopter-facing sites.
   recurrence: door-binding-sweep-stops-at-the-kit-roots 2026-09-20
   Joins this iteration as its gate-reach unit, by operator direction (2026-09-20, lead-relayed) on
   the adopter-floor door remainder; promoted at this spec stage, which authored its amendment.
