@@ -12,36 +12,6 @@
 
 ## New Features
 
-- **kit-roots-rel-filesystem-readers** [spec: SPEC-root-dialect.md] — the couples-anchor amendment
-  moved the `kit:` couples readers that match repository paths onto `walk::kit_roots()`. Other
-  `walk::kit_roots_rel` callers resolve paths off disk or through a git pathspec with the
-  gate-sdk-parent spelling, and carry the same latent mismatch when kits are vendored under a
-  subdirectory.
-  **The filed inference is RUN (2026-09-20 spec), and confirmed, widened and re-shaped.** Probed
-  against a scratch tree with the kits under `vendor/` and `GATE_SDK_ROOT=vendor/gate-sdk`, each arm
-  paired against the same command run flat. The misread's dangerous class is **silent**, not loud:
-  `--emit enum-sets` emits zero kit-derived sets and exits 0 (its own `# spec:` comment claims it
-  fail-closes rather than emitting exactly that set); `--emit close-surfaces` emits 1 row against
-  12; the derived `EVIDENCE_KIT_SUITES` default changes identity outright; and
-  `check-kit-registration` and `check-knob-citation` both PASS with clean lines reading `0 shipping
-  gate-tests` and `3 manifest file(s)` against `10` and `93`.
-  **Wider than filed:** `git grep -n kit_roots_rel native/src` returns **19** call sites, not the 9
-  the entry named; five of the affected ones were unnamed, and the filed cost class was priced
-  against the subset.
-  **Re-priced by operator direction (2026-09-20, lead-relayed): the cost class is event/high, not
-  the event/low it was filed at.** The probe the promotion demanded came back at 19 sites with a
-  per-use rather than a per-site call and a silent-pass failure mode, and the three cheap deltas are
-  unprovable without the nesting fixture — unnested the two spellings are byte-identical, so no
-  existing fixture can show the fix works or that it stays working. This prose is the cost class's
-  home while the entry is active, and the source a later demotion classes its board tag from: a
-  promotion drops the cost board tag and an active entry carrying one reds
-  (queue-kit/SPEC.md §check-deferred-board-tags).
-  **Re-shaped:** the call is per-USE, not per-site — `kit_registration.rs` takes a text match at
-  :132 and a git pathspec at :137 off one call, and three more sites mix the two the same way. The
-  delta is *split the mixed reads, then re-point only the path use*.
-  Filed 2026-09-19 at `adopter-floor-native-rungs`' spec; promoted at its close drain. Joined this
-  iteration by the same operator direction; its amendment was authored and paired at spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -2922,5 +2892,6 @@
 - binary-door-wide-sweep
 - bash-audience-hand-held
 - vendored-kit-readme-spec-link-dangles
+- kit-roots-rel-filesystem-readers
 
 ## Lessons Learned
