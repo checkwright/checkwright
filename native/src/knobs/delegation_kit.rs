@@ -33,6 +33,9 @@ fn gate_files(resolve: Resolve) -> Result<Value, String> {
 fn meta_paths(resolve: Resolve) -> Result<Value, String> {
     let g = input_scalar(resolve, "GATE_SDK_GATES_DIR")?;
     let w = input_scalar(resolve, "GATE_SDK_WORKFLOW_DIR")?;
+    // path-dialect-exempt: this knob's declared value shape — a roster of directory prefixes
+    // spelled with a trailing separator, beside the `.claude/` literal that fixes the convention;
+    // its reader (`check-gate-tamper`) trims and compares by component
     Ok(Value::Indexed(vec![format!("{}/", g), format!("{}/", w), ".claude/".to_string()]))
 }
 

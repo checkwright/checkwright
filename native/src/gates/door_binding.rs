@@ -96,7 +96,7 @@ fn walk_tree(root: &str) -> Result<Vec<String>, String> {
 // spec: guard-kit/SPEC.md §check-door-binding — the corpus predicate over one kit root: its README,
 // and anything under the three shipped directories
 fn in_corpus(rel: &str) -> bool {
-    rel == "README.md" || DIRS.iter().any(|d| rel.starts_with(&format!("{}/", d)))
+    rel == "README.md" || DIRS.iter().any(|d| walk::under(d, rel))
 }
 
 fn read(path: &str) -> Result<String, String> {
@@ -152,13 +152,12 @@ fn rule(args: &[String]) -> Result<i32, String> {
         let r = raw.trim_end_matches('/');
         let abs = kit_abs(&root, r);
         let kit = kit_name(r);
-        let under = format!("{}/", abs);
         let files: Vec<&String> = tree
             .iter()
-            .filter(|f| f.strip_prefix(&under).is_some_and(in_corpus))
+            .filter(|f| walk::rel_under(&abs, f).is_some_and(in_corpus))
             .collect();
         for f in files {
-            let rel = f.strip_prefix(&under).unwrap_or(f);
+            let rel = walk::rel_under(&abs, f).unwrap_or(f);
             let shown = format!("{}/{}", kit, rel);
             let base = Path::new(f).file_name().and_then(|n| n.to_str()).unwrap_or("");
             let text = read(f)?;

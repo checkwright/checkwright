@@ -2,6 +2,7 @@
 // is a machine/reason directive, rides a directive's bounded window, is comment-tier-exempt,
 // or justifies a positional construct
 use crate::spec;
+use crate::walk;
 use std::path::Path;
 
 // spec: canon-kit/SPEC.md §check-comment-tier — the built-in kit-mechanism roster (the
@@ -17,6 +18,7 @@ const SHELL_COLON: &[&str] = &[
     "exception-list:",
     "no-fixture:",
     "portability-declared:",
+    "path-dialect-exempt:",
     "no-port:",
     "port-until:",
     "permanent:",
@@ -347,7 +349,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut errors: Vec<String> = Vec::new();
     let mut scanned = 0usize;
     for f in &surface {
-        let rel = spec::strip_dot_slash(f.strip_prefix(&format!("{}/", root)).unwrap_or(f));
+        let rel = spec::strip_dot_slash(walk::rel_under(root, f).unwrap_or(f));
         if spec::comment_whitelisted(&rel, &whitelist) {
             continue;
         }
@@ -400,8 +402,7 @@ fn classify<'a>(
     shell: &'a Bless,
     txt: &'a Bless,
 ) -> (Style, &'a Bless, bool, bool) {
-    let wfpfx = format!("{}/", wf);
-    if rel.starts_with(&wfpfx) {
+    if walk::under(wf, rel) {
         return (Style::Hash, txt, false, rel.ends_with(".md"));
     }
     if rel.ends_with(".sh") || rel.ends_with(".bash") {

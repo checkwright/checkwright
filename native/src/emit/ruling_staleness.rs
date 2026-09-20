@@ -325,8 +325,7 @@ fn cite_corpus(base: &str, record: &str) -> Result<Vec<String>, String> {
     let mut out: Vec<String> = Vec::new();
     for p in walk::glob_corpus(Path::new(base), &globs)? {
         let s = p.display().to_string();
-        let rel = s
-            .strip_prefix(&format!("{}/", base))
+        let rel = walk::rel_under(base, &s)
             .unwrap_or_else(|| s.trim_start_matches("./"))
             .to_string();
         if rel != record && !out.contains(&rel) {

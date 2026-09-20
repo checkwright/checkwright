@@ -138,10 +138,7 @@ pub fn corpus(targets: &[String], globs: &[&str]) -> Result<Vec<String>, String>
 // prefix strip; the toplevel is resolved once per run rather than per file.
 pub fn relative(root: &Option<String>, path: &str) -> String {
     match root {
-        Some(r) => path
-            .strip_prefix(&format!("{}/", r))
-            .unwrap_or(path)
-            .to_string(),
+        Some(r) => crate::walk::rel_under(r, path).unwrap_or(path).to_string(),
         None => path.to_string(),
     }
 }

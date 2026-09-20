@@ -89,12 +89,6 @@ pub fn run(args: &[String]) -> i32 {
         )
     };
 
-    let prefix = if scanroot == "." {
-        String::new()
-    } else {
-        format!("{}/", scanroot.trim_end_matches('/'))
-    };
-
     let ls = match proc::run(&programs::GIT, &["ls-files", "--", &scanroot]) {
         Ok(c) => c,
         Err(e) => {
@@ -119,7 +113,12 @@ pub fn run(args: &[String]) -> i32 {
         if path.is_empty() {
             continue;
         }
-        let rest = path.strip_prefix(prefix.as_str()).unwrap_or(path);
+        // spec: gate-sdk/SPEC.md §Porting to Rust does not retire dialect exposure — a `.` scan
+        // root prefixes nothing, which is an identity rather than a containment test
+        let rest = match scanroot.as_str() {
+            "." => path,
+            r => walk::rel_under(r, path).unwrap_or(path),
+        };
         let entry = rest.split('/').next().unwrap_or(rest).to_string();
         if seen.contains(&entry) {
             continue;

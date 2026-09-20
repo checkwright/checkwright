@@ -68,10 +68,14 @@ fn strip_quotes(t: &str) -> &str {
 
 // spec: RELEASING.md §The publish spec — npm's own path rule, then the proven-absolute-root arm
 fn spec_unambiguous(s: &str) -> bool {
+    // path-dialect-exempt: an npm package spec's own path-versus-registry-name discriminator —
+    // npm reads a leading `.` or `/` as "this spec is a path", which is a question about the
+    // argument's syntax rather than about a filesystem location
     if s.starts_with('.') || s.starts_with('/') {
         return true;
     }
     ABS_ROOTS.iter().any(|r| {
+        // path-dialect-exempt: the same npm spec syntax, over a `$VAR/`-rooted spec
         s.starts_with(&format!("${}/", r)) || s.starts_with(&format!("${{{}}}/", r))
     })
 }

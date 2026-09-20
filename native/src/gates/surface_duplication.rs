@@ -321,10 +321,7 @@ fn check(args: &[String]) -> Result<i32, String> {
     let mut errors: Vec<String> = Vec::new();
     for surface in &surfaces {
         let text = read(&surface.path)?;
-        let rel = surface
-            .path
-            .strip_prefix(&format!("{}/", root))
-            .unwrap_or(&surface.path);
+        let rel = crate::walk::rel_under(&root, &surface.path).unwrap_or(&surface.path);
         for hit in scan_surface(&text, surface.valve) {
             if hit.head.is_empty() || !terms.contains(&hit.head) {
                 continue;

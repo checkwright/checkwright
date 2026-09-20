@@ -21,6 +21,8 @@ const PAYLOAD: &str = "payload";
 fn payload_path(target: &str, leaf: &str) -> Option<(String, String)> {
     let target = target.split_whitespace().next().unwrap_or_default();
     let target = target.split('#').next().unwrap_or_default();
+    // path-dialect-exempt: a markdown link target — a root-absolute one names a location in the
+    // published site's namespace, never a path inside the payload
     if target.is_empty() || target.starts_with('/') {
         return None;
     }
@@ -58,7 +60,7 @@ fn payload_path(target: &str, leaf: &str) -> Option<(String, String)> {
 fn withheld<'a>(rest: &str, withhold: &'a [String]) -> Option<&'a str> {
     withhold.iter().map(String::as_str).find(|m| {
         let m = m.trim_matches('/');
-        !m.is_empty() && (rest == m || rest.starts_with(&format!("{}/", m)))
+        !m.is_empty() && crate::walk::at_or_under(m, rest)
     })
 }
 

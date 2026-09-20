@@ -148,15 +148,11 @@ fn basename(p: &str) -> &str {
 // against the invoking directory, which is what makes a link target comparable to a page path
 fn relative_to_cwd(joined: &str) -> Option<String> {
     let here = walk::cwd().ok()?;
-    let abs = if joined.starts_with('/') {
-        walk::normalize_abs(joined)
-    } else {
-        walk::normalize_abs(&format!("{}/{}", here, joined))
-    };
+    let abs = walk::abs_against(&here, joined);
     if abs == here {
         return Some(".".to_string());
     }
-    if let Some(r) = abs.strip_prefix(&format!("{}/", here)) {
+    if let Some(r) = walk::rel_under(&here, &abs) {
         return Some(r.to_string());
     }
     let (a, b): (Vec<&str>, Vec<&str>) = (

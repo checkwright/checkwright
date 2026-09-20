@@ -384,7 +384,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     // spec: installer/SPEC.md §The manifest — the kit files' hashes are taken before the first kit copy
     let kit_prior: Vec<(String, PathBuf)> = prior
         .keys()
-        .filter(|p| kits.iter().any(|k| p.starts_with(&format!("{}/", k))))
+        .filter(|p| kits.iter().any(|k| crate::walk::under(k, p)))
         .map(|p| (p.clone(), root.join(p)))
         .filter(|(_, file)| file.is_file())
         .collect();

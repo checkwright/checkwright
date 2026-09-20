@@ -2185,7 +2185,11 @@ off `smoke/install.sh`, gate-sdk/SPEC.md §The install disposition and
 `check-portability-floor`, and it joins the built-in roster rather than a
 consumer's extras for the reason the others do — the directive is kit mechanism,
 minted by the gate-sdk section that owns the gate, gate-sdk/SPEC.md
-§check-portability-floor), a reason directive (a spec pointer, usage synopsis, or
+§check-portability-floor; `path-dialect-exempt: <reason>` is read at its own site
+by `check-path-dialect` and joins the built-in roster on that same ground,
+gate-sdk/SPEC.md §check-path-dialect — it answers *this value is not a filesystem
+location*, which is why it is not `comment-tier-exempt:`, whose question is
+whether a comment earns its place), a reason directive (a spec pointer, usage synopsis, or
 positional justification: `spec:`, `usage:`, `exception-list:`,
 `no-fixture:`, `no-port:`, `port-until:`, `assertion`, `permanent:`, `TODO(task:`,
 `TODO(spec-ambiguity)`, which blesses a bounded window — its own line plus

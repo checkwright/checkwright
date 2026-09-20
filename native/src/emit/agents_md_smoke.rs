@@ -485,7 +485,7 @@ fn orientation_repo(scratch: &mut Scratch) -> Result<String, Outcome> {
 fn root_tiering_dispatch(consumer: &str) -> Result<Vec<String>, Outcome> {
     let mut bin = walk::knob_scalar("GATE_SDK_NATIVE_BIN")
         .map_err(|e| Outcome::Refuse(format!("{}: {}", NAME, e)))?;
-    if !bin.starts_with('/') {
+    if walk::path_root(&bin).is_none() {
         bin = format!("{}/{}", consumer, bin);
     }
     let done = spawn(

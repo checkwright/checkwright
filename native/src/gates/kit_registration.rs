@@ -57,7 +57,7 @@ pub fn run_captured(args: &[String], stdout: &mut Vec<String>, stderr: &mut Vec<
         // spec: gate-sdk/SPEC.md §check-kit-registration — the positional argument overrides the
         // knob, and an empty positional is the shell's `${1:-…}`: unset and null both fall back
         let given = args.get(n).filter(|a| !a.is_empty()).cloned();
-        let mut d = match given {
+        let d = match given {
             Some(a) => a,
             None => match walk::knob_scalar(knob) {
                 Ok(v) => v,
@@ -67,10 +67,7 @@ pub fn run_captured(args: &[String], stdout: &mut Vec<String>, stderr: &mut Vec<
                 }
             },
         };
-        if !d.starts_with('/') {
-            d = format!("{}/{}", repo_root, d);
-        }
-        docs.push(d);
+        docs.push(walk::abs_against(&repo_root, &d));
     }
     let (registry_doc, runner_doc) = (docs[0].clone(), docs[1].clone());
 

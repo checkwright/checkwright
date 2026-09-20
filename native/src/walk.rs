@@ -508,6 +508,64 @@ pub fn normalize_abs(abs: &str) -> String {
     format!("{}/{}", root, stack.join("/"))
 }
 
+// spec: gate-sdk/SPEC.md §Porting to Rust does not retire dialect exposure — the containment
+// primitive's single owner: segments split on either separator, so a `\`-spelled operand answers
+// as a `/`-spelled one does and a trailing separator on either side is immaterial
+pub fn under(parent: &str, p: &str) -> bool {
+    rel_under(parent, p).is_some()
+}
+
+// spec: gate-sdk/SPEC.md §Porting to Rust does not retire dialect exposure — the same primitive
+// where the parent itself satisfies the caller, the `x == root || x.starts_with(root/)` shape
+pub fn at_or_under(parent: &str, p: &str) -> bool {
+    same_path(parent, p) || under(parent, p)
+}
+
+// spec: gate-sdk/SPEC.md §Porting to Rust does not retire dialect exposure — the containment test
+// read for its remainder, the `strip_prefix(root/)` shape. An empty parent contains nothing and a
+// differing root answers None, so a relative path is never read as lying under an absolute one.
+pub fn rel_under<'a>(parent: &str, p: &'a str) -> Option<&'a str> {
+    if path_root(parent) != path_root(p) {
+        return None;
+    }
+    let mut at = 0usize;
+    let mut matched = false;
+    for w in segments(parent) {
+        matched = true;
+        at += p[at..].len() - p[at..].trim_start_matches(SEPS).len();
+        if !p[at..].starts_with(w) {
+            return None;
+        }
+        let end = at + w.len();
+        if end < p.len() && !p[end..].starts_with(SEPS) {
+            return None;
+        }
+        at = end;
+    }
+    if !matched {
+        return None;
+    }
+    let tail = p[at..].trim_start_matches(SEPS);
+    if tail.is_empty() {
+        return None;
+    }
+    Some(tail)
+}
+
+// spec: gate-sdk/SPEC.md §Porting to Rust does not retire dialect exposure — two spellings of one
+// location, the equality half `at_or_under` rides
+fn same_path(a: &str, b: &str) -> bool {
+    path_root(a) == path_root(b) && segments(a).eq(segments(b))
+}
+
+const SEPS: [char; 2] = ['/', '\\'];
+
+// spec: gate-sdk/SPEC.md §The crate's crosser — one segment split for every text-level path
+// question here, on the rule that section states: segments split on either separator
+fn segments(p: &str) -> impl Iterator<Item = &str> {
+    p.split(SEPS).filter(|c| !c.is_empty())
+}
+
 // spec: gate-sdk/SPEC.md §The port-candidate criteria — bash's `[[ str == pat ]]`: whole
 // string, no pathname semantics, so `*` and `?` cross `/`. `glob_files`' per-component
 // matcher is the pathname-expansion counterpart, and is a different rule from this one.
@@ -1286,6 +1344,27 @@ mod tests {
         assert_eq!(abs_against("/srv/x/repo", "../sib"), "/srv/x/sib");
         assert_eq!(abs_against("/srv/x/repo", "/opt/kit"), "/opt/kit");
         assert_eq!(abs_against("/srv/x/repo", "."), "/srv/x/repo");
+    }
+
+    // spec: gate-sdk/SPEC.md §Porting to Rust does not retire dialect exposure — the containment
+    // primitive on the injected spelling §How the claim is held requires, paired with the control
+    // that the composed-prefix idiom it replaces still misjudges the same operands.
+    #[test]
+    fn the_containment_primitive_answers_across_both_dialects() {
+        let root = "D:/w/kit";
+        let win = "D:\\w\\kit\\checks\\check-graph.gate";
+        assert!(under(root, win), "a `\\`-spelled operand lies under its own root");
+        assert!(
+            !win.starts_with(&format!("{}/", root)),
+            "the composed-prefix idiom answered the same as the primitive, so the pair is vacuous"
+        );
+        assert!(under("a/b", "a/b/c") && !under("a/b", "a/bc") && !under("a/b", "a/b"));
+        assert!(at_or_under("a/b", "a/b") && at_or_under("a/b", "a/b/c"));
+        assert_eq!(rel_under("/r", "/r/a/b"), Some("a/b"));
+        assert_eq!(rel_under("/r/a", "/r/a"), None);
+        assert_eq!(rel_under("a", "/a/b"), None, "a relative parent holds no absolute path");
+        assert_eq!(rel_under("", "x"), None, "an empty parent contains nothing");
+        assert_eq!(rel_under("D:/w", "D:\\w\\a"), Some("a"));
     }
 
     // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the shared authoring predicate, pinned

@@ -181,7 +181,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 }
 
 fn rel_of(root: &str, f: &str) -> String {
-    spec::strip_dot_slash(f.strip_prefix(&format!("{}/", root)).unwrap_or(f))
+    spec::strip_dot_slash(crate::walk::rel_under(root, f).unwrap_or(f))
 }
 
 // spec: canon-kit/SPEC.md §check-spec-pointer — the withheld predicate: the target is a kit root's

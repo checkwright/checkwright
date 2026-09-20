@@ -803,7 +803,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut kit_scanned = 0usize;
     for root in &kit_roots {
         let root = root.trim_end_matches('/');
-        if crate_dir == root || crate_dir.starts_with(&format!("{}/", root)) {
+        if walk::at_or_under(root, &crate_dir) {
             ctx.findings.push(format!("crate root inside the vendoring set: {} sits under kit root {} — a kit root vendors whole, so the implementation source would ship with it", crate_dir, root));
         }
         if descriptors.is_empty() || !fresh::is_dir(root) {

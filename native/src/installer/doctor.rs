@@ -177,7 +177,7 @@ fn disarmed_block(
 // run there anchors it: its gates directory first, then each kit root's `checks/`
 fn tree_disarmed_block(out: &mut String, root: &std::path::Path, list_text: &str) {
     let gates = crate::knobs::gates_dir();
-    let gates = if std::path::Path::new(&gates).is_absolute() {
+    let gates = if crate::walk::path_root(&gates).is_some() {
         gates
     } else {
         root.join(&gates).display().to_string()

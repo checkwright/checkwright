@@ -61,7 +61,6 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // spawn, so the roster the gate rules on and the roster close reads can never be two
     // computations that disagree
     let roster = close_surfaces::derive(args)?;
-    let wf_prefix = format!("{}/", roster.workflow_dir);
 
     let mut errors: Vec<String> = Vec::new();
     let mut declarations = 0usize;
@@ -104,7 +103,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
 
         // assertion C: a capture-tier declaration names its reclaim command
-        if path.starts_with(&wf_prefix) {
+        if crate::walk::under(&roster.workflow_dir, path) {
             let ci = proc::run(
                 &programs::GIT,
                 &["-C", &roster.base, "check-ignore", "-q", "--", path],

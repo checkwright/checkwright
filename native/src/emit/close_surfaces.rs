@@ -29,7 +29,7 @@ fn not_a_repo() -> String {
     "not a git repository — the capture tier is underivable".to_string()
 }
 
-fn under(base: &str, rel: &str) -> String {
+fn joined(base: &str, rel: &str) -> String {
     format!("{}/{}", base, rel)
 }
 
@@ -38,8 +38,7 @@ fn under(base: &str, rel: &str) -> String {
 // of the two ways that root was resolved.
 fn relativize(base: &str, p: &Path) -> String {
     let s = p.display().to_string();
-    let prefix = format!("{}/", base);
-    match s.strip_prefix(&prefix) {
+    match walk::rel_under(base, &s) {
         Some(r) => r.to_string(),
         None => s.trim_start_matches("./").to_string(),
     }
@@ -120,7 +119,7 @@ fn row_state(base: &str, locator: &str) -> &'static str {
         Some(i) => (&locator[..i], true),
         None => (locator, false),
     };
-    let p = under(base, file);
+    let p = joined(base, file);
     if !Path::new(&p).exists() {
         return "absent";
     }
@@ -151,7 +150,7 @@ pub fn derive(args: &[String]) -> Result<Roster, String> {
             continue;
         }
         let rel = format!("{}/{}", r.trim_end_matches('/'), roster_basename);
-        if Path::new(&under(&base, &rel)).is_file() {
+        if Path::new(&joined(&base, &rel)).is_file() {
             add_surface(&mut surfaces, rel);
         }
     }
@@ -163,7 +162,7 @@ pub fn derive(args: &[String]) -> Result<Roster, String> {
     let mut rows: Vec<String> = Vec::new();
     let mut declared: Vec<String> = Vec::new();
     for s in &surfaces {
-        let text = std::fs::read_to_string(under(&base, s))
+        let text = std::fs::read_to_string(joined(&base, s))
             .map_err(|e| format!("declaration surface not readable: {}: {}", s, e))?;
         for line in declaration_lines(&text) {
             let (path, mode, reclaim) = split_declaration(line);
@@ -177,11 +176,11 @@ pub fn derive(args: &[String]) -> Result<Roster, String> {
     // roster fail loudly: every gitignored member of the workflow directory is capture-tier by
     // definition, so one added with no declaration appears as `(undeclared)` rather than not at all
     let workflow_dir = walk::knob_scalar("GATE_SDK_WORKFLOW_DIR")?;
-    let wf_path = under(&base, &workflow_dir);
+    let wf_path = joined(&base, &workflow_dir);
     if Path::new(&wf_path).is_dir() {
         for (name, _) in walk::list_dir(Path::new(&wf_path))? {
             let rel = format!("{}/{}", workflow_dir, name);
-            if !Path::new(&under(&base, &rel)).is_file() {
+            if !Path::new(&joined(&base, &rel)).is_file() {
                 continue;
             }
             let ci = proc::run(&programs::GIT, &["-C", &base, "check-ignore", "-q", "--", &rel])?;

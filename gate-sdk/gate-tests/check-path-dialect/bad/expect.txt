@@ -1,7 +1,11 @@
-PATH-DIALECT: 5 violation(s):
+PATH-DIALECT: 9 violation(s):
 tree/bound-root.sh:3 — `git rev-parse --show-toplevel` binds a root that is never crossed
 tree/common-dir.sh:3 — `git rev-parse --git-common-dir` binds a root that is never crossed
 tree/logical-readback.sh:4 — the crossed `cd` at line 3 is read back with a logical `pwd`
+native/src/primitive.rs:4 — `starts_with('/')` spells a text-level path primitive outside the crate's speller
+native/src/primitive.rs:8 — `.is_absolute()` spells a text-level path primitive outside the crate's speller
+native/src/primitive.rs:12 — `format!("{}/"` spells a text-level path primitive outside the crate's speller
+native/src/primitive.rs:18 — `starts_with(&format!(` carries a `path-dialect-exempt:` declaration whose reason is empty
 native/src/producer.rs:2 — `env::current_dir(` is a platform-native producer outside the crate's crosser
 native/src/producer.rs:7 — `env!("CARGO_MANIFEST_DIR")` is a platform-native producer outside the crate's crosser
 help: cross at the producer

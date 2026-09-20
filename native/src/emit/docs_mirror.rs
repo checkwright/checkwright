@@ -217,11 +217,7 @@ fn context(root: &str) -> Result<Ctx, String> {
         return Err(format!("not a directory: {}", root));
     }
     let here = walk::cwd()?;
-    let abs_root = if root.starts_with('/') {
-        walk::normalize_abs(&root)
-    } else {
-        walk::normalize_abs(&format!("{}/{}", here, root))
-    };
+    let abs_root = walk::abs_against(&here, &root);
     let blob = self_repo_prefix(&walk::knob_scalar(BLOB_REF_KNOB)?);
     let tree = blob.replace("/blob/", "/tree/");
     Ok(Ctx {

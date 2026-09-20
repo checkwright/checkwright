@@ -33,7 +33,7 @@ pub fn scan_root(args: &[String], gate: &str) -> Option<String> {
 // working directory, so an absolute root passes through and a relative one resolves against the
 // positional root exactly as the shell resolves it
 pub fn kit_abs(root: &str, r: &str) -> String {
-    if r.starts_with('/') {
+    if crate::walk::path_root(r).is_some() {
         r.to_string()
     } else {
         format!("{}/{}", root, r)

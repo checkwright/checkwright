@@ -89,7 +89,7 @@ pub fn run(args: &[String]) -> i32 {
     let mut absolute: Vec<String> = Vec::new();
     for raw in &kit_roots {
         let r = raw.trim_end_matches('/');
-        if r.starts_with('/') {
+        if walk::path_root(r).is_some() {
             absolute.push(r.to_string());
         } else {
             relative.push(format!("{}/checks/*.sh", r));

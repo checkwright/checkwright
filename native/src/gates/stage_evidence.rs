@@ -104,7 +104,7 @@ fn provenance(
     };
     // spec: lifecycle-kit/SPEC.md §check-stage-evidence — an absolute knob value is rebased
     // onto the repo root rather than compared in a frame nothing else uses
-    let rel = |p: &str| match p.strip_prefix(&format!("{}/", root_c)) {
+    let rel = |p: &str| match walk::rel_under(&root_c, p) {
         Some(inside) => norm(inside),
         None => norm(&format!("{}/{}", prefix, p)),
     };

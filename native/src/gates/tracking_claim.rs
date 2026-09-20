@@ -48,11 +48,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let claims = extract(&manifest_files)?;
     let mut errors: Vec<String> = Vec::new();
     for c in &claims {
-        let rel = spec::strip_dot_slash(
-            c.file
-                .strip_prefix(&format!("{}/", root))
-                .unwrap_or(&c.file),
-        );
+        let rel = spec::strip_dot_slash(crate::walk::rel_under(root, &c.file).unwrap_or(&c.file));
 
         let ls = proc::run(&programs::GIT, &["-C", root, "ls-files", "--", &c.path])?;
         let tracked = match ls.stdout() {

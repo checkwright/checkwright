@@ -178,7 +178,7 @@ fn filter_token_selects(kind: &Kind, tok: &str, root: &str, path: &str) -> bool 
         Kind::Glob => {
             let rel = match root {
                 "." => path,
-                r => path.strip_prefix(&format!("{}/", r)).unwrap_or(path),
+                r => walk::rel_under(r, path).unwrap_or(path),
             };
             glob_path_match(tok, rel)
         }
@@ -295,7 +295,7 @@ fn resolve_filter(
 fn under_declared_prune(root: &str, path: &str, prune_globs: &[String]) -> bool {
     let rel = match root {
         "." => path,
-        r => path.strip_prefix(&format!("{}/", r)).unwrap_or(path),
+        r => walk::rel_under(r, path).unwrap_or(path),
     };
     let comps: Vec<&str> = rel.split('/').collect();
     (1..comps.len()).any(|n| {

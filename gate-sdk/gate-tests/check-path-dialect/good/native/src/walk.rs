@@ -12,3 +12,13 @@ pub fn toplevel_args() -> Vec<&'static str> {
 pub fn canonical(p: &str) -> bool {
     std::fs::canonicalize(p).is_ok()
 }
+
+// Standing guard for the locality arm: the text-level primitives are spelled here, in the
+// speller's own body, and are counted as the speller's rather than reported.
+pub fn path_root(p: &str) -> bool {
+    p.starts_with('/')
+}
+
+pub fn under(parent: &str, p: &str) -> bool {
+    p.starts_with(&format!("{}/", parent))
+}

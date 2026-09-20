@@ -57,6 +57,8 @@ fn by_top_dir(paths: &[String]) -> Vec<String> {
     let mut keys: Vec<String> = paths
         .iter()
         .map(|p| match p.split_once('/') {
+            // path-dialect-exempt: a printed grouping key for the removal plan's per-directory
+            // rollup, compared only against another key and never against a path
             Some((top, _)) => format!("{}/", top),
             None => p.clone(),
         })
@@ -182,10 +184,11 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
     if let Ok(hp) = super::git_capture(&root, &["config", "--get", "core.hooksPath"]) {
         let hp = hp.trim();
         if let Some((gates_dir, _)) = gates_list.rsplit_once('/') {
-            let rel = hp
-                .strip_prefix(&format!("{}/", root.display()))
-                .unwrap_or(hp);
-            if !hp.is_empty() && (rel == gates_dir || rel.starts_with(&format!("{}/", gates_dir))) {
+            // spec: gate-sdk/SPEC.md §Porting to Rust does not retire dialect exposure — the
+            // hooksPath is git's own `/`-spelled value and the root a `Path::display()` one, so
+            // the two are compared by component rather than by a composed prefix
+            let rel = crate::walk::rel_under(&root.display().to_string(), hp).unwrap_or(hp);
+            if !hp.is_empty() && crate::walk::at_or_under(gates_dir, rel) {
                 hooks_line = "git config --unset core.hooksPath".to_string();
             }
         }

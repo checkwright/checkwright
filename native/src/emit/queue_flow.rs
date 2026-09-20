@@ -33,9 +33,7 @@ fn windows_arg(args: &[String]) -> Result<usize, String> {
 // spec: drift-kit/SPEC.md §The queue-flow arm — a git path is repo-relative, so a knob spelled
 // absolute under the toplevel is re-rooted rather than handed to git as a path it cannot address.
 fn repo_path(top: &str, path: &str) -> String {
-    path.strip_prefix(&format!("{}/", top))
-        .unwrap_or(path)
-        .to_string()
+    crate::walk::rel_under(top, path).unwrap_or(path).to_string()
 }
 
 // spec: drift-kit/SPEC.md §The queue-flow arm — the iteration starts, newest first, keyed on the

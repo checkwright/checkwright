@@ -317,12 +317,7 @@ fn scan_file(path: &str, text: &str, kitroot: &str, scan: &mut Scan) -> Result<(
 // logically resolved so a relative dir and an absolute one land on the same place
 fn parent_abs(d: &str) -> Result<String, String> {
     let here = walk::cwd()?;
-    let joined = if d.starts_with('/') {
-        format!("{}/..", d)
-    } else {
-        format!("{}/{}/..", here.trim_end_matches('/'), d)
-    };
-    Ok(walk::normalize_abs(&joined))
+    Ok(walk::normalize_abs(&format!("{}/..", walk::abs_against(&here, d))))
 }
 
 pub fn run(args: &[String]) -> i32 {

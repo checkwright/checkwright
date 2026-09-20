@@ -12,6 +12,21 @@ const CITATION: &str = "The path-dialect contract";
 const GIT_FLAGS: &[&str] = &["--show-toplevel", "--git-dir", "--git-common-dir"];
 // spec: gate-sdk/SPEC.md §The path-dialect contract — the same verdict over the Rust half's forms
 const RUST_FORMS: &[&str] = &["env::current_dir(", "fs::canonicalize(", r#"env!("CARGO_MANIFEST_DIR")"#];
+// path-dialect-exempt: the locality scanner's own vocabulary — a roster of form literals, not a
+// path comparison, and the `spec:` verdict above cannot carry it because a recorded verdict does
+// not clear this arm (gate-sdk/SPEC.md §check-path-dialect)
+// spec: gate-sdk/SPEC.md §Porting to Rust does not retire dialect exposure — testing absoluteness
+// from a path's text: the leading-separator test the clause names wrong, and `std::path`'s own
+// answer, which disagrees with `walk::path_root` on a separator-rooted path under Windows
+const ABS_FORMS: &[&str] = &["starts_with('/')", r#"starts_with("/")"#, r"starts_with('\\')", r#"starts_with("\\")"#, ".is_absolute()"];
+// path-dialect-exempt: the same roster for the containment primitive, exempt on the same ground
+// spec: gate-sdk/SPEC.md §Porting to Rust does not retire dialect exposure — composing a prefix to
+// test containment: the bare trailing-slash composition, whose only consumer is a prefix test, and
+// a `format!` handed straight to one
+const PREFIX_FORM: &str = r#"format!("{}/""#;
+const PREFIX_TESTS: &[&str] = &["starts_with(&format!(", "strip_prefix(&format!("];
+// path-dialect-exempt: the token this gate reads, named once here rather than spelled at each read
+const EXEMPT: &str = "path-dialect-exempt:";
 
 pub fn run(args: &[String]) -> i32 {
     match rule(args) {
@@ -197,24 +212,37 @@ fn path_typed(code: &str, at: usize) -> bool {
     prefix.ends_with("Path::new(") || prefix.ends_with("PathBuf::from(")
 }
 
-// spec: gate-sdk/SPEC.md §check-path-dialect — a recorded verdict is canon-kit's `spec:` one-line
-// binding, read on the occurrence's own trailing comment or the contiguous comment run above it
-fn recorded_verdict(lines: &[Line], idx: usize) -> bool {
-    let cites = |c: &str| c.contains("spec:") && c.contains(CITATION);
-    if cites(&lines[idx].comment) {
-        return true;
+// spec: gate-sdk/SPEC.md §check-path-dialect — the declaration window both at-site tokens ride:
+// the occurrence's own trailing comment, else the contiguous comment run above it
+fn window<'a>(lines: &'a [Line], idx: usize, reads: &dyn Fn(&str) -> bool) -> Option<&'a str> {
+    if reads(&lines[idx].comment) {
+        return Some(&lines[idx].comment);
     }
     let mut i = idx;
     while i > 0 {
         i -= 1;
         if !lines[i].code.trim().is_empty() || lines[i].comment.is_empty() {
-            return false;
+            return None;
         }
-        if cites(&lines[i].comment) {
-            return true;
+        if reads(&lines[i].comment) {
+            return Some(&lines[i].comment);
         }
     }
-    false
+    None
+}
+
+// spec: gate-sdk/SPEC.md §check-path-dialect — a recorded verdict is canon-kit's `spec:` one-line
+// binding citing this contract, which clears the producer arm and never the locality one
+fn recorded_verdict(lines: &[Line], idx: usize) -> bool {
+    window(lines, idx, &|c: &str| c.contains("spec:") && c.contains(CITATION)).is_some()
+}
+
+// spec: gate-sdk/SPEC.md §check-path-dialect — the namespace declaration, whose reason is
+// mandatory: `None` is no declaration in the window and `Some(false)` one whose reason is empty,
+// which declares nothing and is malformed rather than clearing
+fn namespace_declared(lines: &[Line], idx: usize) -> Option<bool> {
+    window(lines, idx, &|c: &str| c.contains(EXEMPT))
+        .map(|c| c.split_once(EXEMPT).map(|(_, r)| !r.trim().is_empty()).unwrap_or(false))
 }
 
 // spec: gate-sdk/SPEC.md §check-path-dialect — the read-back arm, anchored to an already-cleared
@@ -242,6 +270,73 @@ struct Tally {
     verdict: usize,
     probe: usize,
     total: usize,
+    prim: usize,
+    local: usize,
+    namespace: usize,
+}
+
+// spec: gate-sdk/SPEC.md §check-path-dialect — which containment spelling a line carries: the bare
+// trailing-slash composition, else a `format!` handed straight to a prefix test whose template
+// composes a separator. A `{}=` or `{} ` template splits a key or a word, never a path.
+fn prefix_spelling(code: &str) -> Option<&'static str> {
+    if code.contains(PREFIX_FORM) {
+        return Some(PREFIX_FORM);
+    }
+    PREFIX_TESTS.iter().copied().find(|t| {
+        hits(code, t, false)
+            .iter()
+            .any(|at| template(code, at + t.len()).is_some_and(|s| s.contains('/')))
+    })
+}
+
+// spec: gate-sdk/SPEC.md §check-path-dialect — a `format!`'s own template, the first string literal
+// after the macro's open paren
+fn template(code: &str, from: usize) -> Option<&str> {
+    let rest = code.get(from..)?;
+    let open = rest.find('"')? + 1;
+    let end = rest.get(open..)?.find('"')? + open;
+    rest.get(open..end)
+}
+
+// spec: gate-sdk/SPEC.md §Porting to Rust does not retire dialect exposure — the locality arm: the
+// three text-level primitives are the crate speller's, and a module outside it reaches each through
+// a named `walk` helper or declares its value out of the filesystem namespace at the site
+fn scan_locality(path: &str, text: &str, is_crosser: bool, t: &mut Tally, findings: &mut Vec<String>) {
+    let lines = split_file(text, false);
+    for (idx, line) in lines.iter().enumerate() {
+        let owners = [
+            (
+                ABS_FORMS.iter().copied().find(|f| line.code.contains(f)),
+                "walk::path_root — or walk::abs_against, where the site's other arm joins onto an anchor",
+            ),
+            (
+                prefix_spelling(&line.code),
+                "walk::under / walk::at_or_under / walk::rel_under",
+            ),
+        ];
+        for (form, owner) in owners {
+            let form = match form {
+                Some(f) => f,
+                None => continue,
+            };
+            t.prim += 1;
+            if is_crosser {
+                t.local += 1;
+                continue;
+            }
+            match namespace_declared(&lines, idx) {
+                Some(true) => t.namespace += 1,
+                Some(false) => findings.push(format!(
+                    "{}:{} — `{}` carries a `{}` declaration whose reason is empty, so nothing is declared",
+                    path, idx + 1, form, EXEMPT
+                )),
+                None => findings.push(format!(
+                    "{}:{} — `{}` spells a text-level path primitive outside the crate's speller: route it through {}",
+                    path, idx + 1, form, owner
+                )),
+            }
+        }
+    }
 }
 
 fn scan_shell(path: &str, text: &str, t: &mut Tally, findings: &mut Vec<String>) {
@@ -333,6 +428,9 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         verdict: 0,
         probe: 0,
         total: 0,
+        prim: 0,
+        local: 0,
+        namespace: 0,
     };
     let mut findings: Vec<String> = Vec::new();
 
@@ -355,6 +453,7 @@ fn rule(_args: &[String]) -> Result<i32, String> {
             rust_files += 1;
             let text = read(&f)?;
             scan_rust(&p, &text, p == crosser, &mut t, &mut findings);
+            scan_locality(&p, &text, p == crosser, &mut t, &mut findings);
         }
     }
 
@@ -369,11 +468,16 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         println!("        Path::new(...) / PathBuf::from(...) so std::path carries the dialect");
         println!("  help: a site that deliberately does not cross records the verdict at the site — an adjacent");
         println!("        `spec:` comment citing gate-sdk/SPEC.md §The path-dialect contract");
+        println!("  help: a text-level path primitive — testing absoluteness, composing a prefix to test");
+        println!("        containment — is native/src/walk.rs's; reach it through the named helper rather than");
+        println!("        re-spelling it. A `/`-separated value naming something other than a filesystem");
+        println!("        location is outside the contract and says so at its own line or the one above, with");
+        println!("        `// path-dialect-exempt: <reason>`; a recorded verdict does not clear this arm");
         return Ok(1);
     }
     println!(
-        "PATH-DIALECT: clean ({} shell file(s), {} Rust file(s) scanned; {} producer occurrence(s) — {} in `cd` position, {} `Path`-typed, {} inside the crate's crosser, {} by recorded verdict, {} presence probe(s) binding no value)",
-        shell.len(), rust_files, t.total, t.cd, t.typed, t.crosser, t.verdict, t.probe
+        "PATH-DIALECT: clean ({} shell file(s), {} Rust file(s) scanned; {} producer occurrence(s) — {} in `cd` position, {} `Path`-typed, {} inside the crate's crosser, {} by recorded verdict, {} presence probe(s) binding no value; {} primitive spelling(s) — {} inside the crate's speller, {} declared out of the filesystem namespace)",
+        shell.len(), rust_files, t.total, t.cd, t.typed, t.crosser, t.verdict, t.probe, t.prim, t.local, t.namespace
     );
     Ok(0)
 }
@@ -440,6 +544,31 @@ mod tests {
         assert!(bare_pwd_readback(&ok, 0).is_none());
         let bad = split_file("cd \"$(p)\" || exit\n# note\nR=\"$(pwd)\"\n", true);
         assert_eq!(bare_pwd_readback(&bad, 0), Some(2));
+    }
+
+    // spec: gate-sdk/SPEC.md §check-path-dialect — the containment vocabulary is composed from the
+    // module's own constants: the bare prefix is the primitive wherever it sits, and a `format!`
+    // handed to a prefix test is one only where its template composes a separator
+    #[test]
+    fn a_prefix_test_is_the_primitive_only_where_its_template_composes_a_separator() {
+        assert_eq!(prefix_spelling(&format!("let p = {}, root);", PREFIX_FORM)), Some(PREFIX_FORM));
+        let keyed = format!("k.{}\"{{}}=\", name)", PREFIX_TESTS[1]);
+        assert_eq!(prefix_spelling(&keyed), None, "a `{{}}=` template splits a key, not a path");
+        let joined = format!("p.{}\"{{}}/{{}}\", a, b))", PREFIX_TESTS[0]);
+        assert_eq!(prefix_spelling(&joined), Some(PREFIX_TESTS[0]));
+        assert_eq!(prefix_spelling("p.starts_with(&prefix)"), None);
+    }
+
+    // spec: gate-sdk/SPEC.md §check-path-dialect — the declaration's three states: absent, present
+    // with a reason, and present with none, which is malformed rather than clearing
+    #[test]
+    fn a_namespace_declaration_without_a_reason_declares_nothing() {
+        let with = split_file(&format!("// {} a queue tag's field\nlet a = 1;\n", EXEMPT), false);
+        assert_eq!(namespace_declared(&with, 1), Some(true));
+        let empty = split_file(&format!("// {}\nlet a = 1;\n", EXEMPT), false);
+        assert_eq!(namespace_declared(&empty, 1), Some(false));
+        let none = split_file("// nothing declared here\nlet a = 1;\n", false);
+        assert_eq!(namespace_declared(&none, 1), None);
     }
 
     // spec: gate-sdk/SPEC.md §check-path-dialect — a verdict is read off the contiguous comment run

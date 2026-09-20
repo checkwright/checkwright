@@ -67,29 +67,11 @@ fn cwd() -> String {
     crate::walk::cwd().unwrap_or_else(|_| ".".to_string())
 }
 
-// spec: canon-kit/SPEC.md §The shared spec adapters — the scan root's absolute form on
-// `_spec_prune_kit_roots`' own four cases; a bare `.` is the cwd itself, and appending it
-// as a component instead makes every prefix test below fail silently
-fn root_to_abs(p: &str) -> String {
-    let abs = match p {
-        _ if p.starts_with('/') => p.to_string(),
-        "." => cwd(),
-        _ if p.starts_with("./") => format!("{}/{}", cwd(), &p[2..]),
-        _ => format!("{}/{}", cwd(), p),
-    };
-    // spec: gate-sdk/SPEC.md §lib/gate.sh — a root spelled relative to the invoking directory
-    // may climb out with `..`; normalising here recovers the absolute path the shell compares
-    normalize(abs.trim_end_matches('/'))
-}
-
-// spec: canon-kit/SPEC.md §The shared spec adapters — normalised on the same terms the scan root already is:
-// a walk anchored at a `..` root emits files carrying that `..`, and comparing one unnormalised
-// against a normalised kit root matches the invoking directory's own prefix, pruning everything
-fn file_to_abs(p: &str) -> String {
-    if p.starts_with('/') {
-        return normalize(p);
-    }
-    normalize(&format!("{}/{}", cwd(), p.strip_prefix("./").unwrap_or(p)))
+// spec: canon-kit/SPEC.md §The shared spec adapters — the absolute form both operands of
+// `_spec_prune_kit_roots`' prefix test take: one function rather than a root's and a file's,
+// because the four cases that separated them were `walk::abs_against`'s all along
+fn abs(p: &str) -> String {
+    walk::abs_against(&cwd(), p)
 }
 
 // spec: canon-kit/SPEC.md §The shared spec adapters — `_spec_prune_kit_roots`: exclude a file whose
@@ -99,14 +81,14 @@ pub fn prune_kit_roots(root: &str, files: Vec<PathBuf>) -> Result<Vec<PathBuf>, 
     if knob("CANON_KIT_SCAN_KIT_ROOTS")? == "1" {
         return Ok(files);
     }
-    let root_abs = root_to_abs(root);
+    let root_abs = abs(root);
     let mut roots: Vec<String> = Vec::new();
     for r in walk::kit_roots()? {
         if r.is_empty() {
             continue;
         }
-        let rabs = root_to_abs(&r);
-        if rabs.starts_with(&format!("{}/", root_abs)) {
+        let rabs = abs(&r);
+        if walk::under(&root_abs, &rabs) {
             roots.push(rabs);
         }
     }
@@ -116,8 +98,8 @@ pub fn prune_kit_roots(root: &str, files: Vec<PathBuf>) -> Result<Vec<PathBuf>, 
     Ok(files
         .into_iter()
         .filter(|f| {
-            let fabs = file_to_abs(&f.display().to_string());
-            !roots.iter().any(|r| fabs.starts_with(&format!("{}/", r)))
+            let fabs = abs(&f.display().to_string());
+            !roots.iter().any(|r| walk::under(r, &fabs))
         })
         .collect())
 }
@@ -268,14 +250,13 @@ fn workflow_tier(root: &str) -> Result<Vec<String>, String> {
         None => return Ok(Vec::new()),
     };
     let members: Vec<&str> = listing.lines().collect();
-    let prefix = format!("{}/", root);
     let mut out: Vec<String> = Vec::new();
     for f in walk::glob_files(Path::new(root), &[format!("{}/*", wf)])? {
         let p = f.display().to_string();
         if !f.is_file() {
             continue;
         }
-        let rel = strip_dot_slash(p.strip_prefix(&prefix).unwrap_or(&p));
+        let rel = strip_dot_slash(walk::rel_under(root, &p).unwrap_or(&p));
         if members.iter().any(|m| *m == rel) {
             out.push(p);
         }
@@ -407,41 +388,13 @@ pub fn spec_name() -> Result<String, String> {
 
 // spec: canon-kit/SPEC.md §check-md-refs — `realpath -m --relative-to=. -- <p>`, shared by
 // the two members that resolve a doc-relative token so neither carries a path algebra of
-// its own
+// its own — and now carrying none itself
+// spec: gate-sdk/SPEC.md §The crate's crosser — the absoluteness test and the join are
+// `abs_against`'s, the relativization `relative_to`'s, which also answers a differing root with
+// the target unchanged rather than climbing out of it with `..`
 pub fn relative_to_cwd(p: &str) -> String {
     let cwd = crate::walk::cwd().unwrap_or_else(|_| "/".to_string());
-    let abs = if p.starts_with('/') {
-        p.to_string()
-    } else {
-        format!("{}/{}", cwd, p)
-    };
-    let norm = normalize(&abs);
-    let base = normalize(&cwd);
-    if norm == base {
-        return ".".to_string();
-    }
-    let n: Vec<&str> = norm.split('/').filter(|s| !s.is_empty()).collect();
-    let bs: Vec<&str> = base.split('/').filter(|s| !s.is_empty()).collect();
-    let common = n.iter().zip(bs.iter()).take_while(|(a, b)| a == b).count();
-    let mut parts: Vec<String> = Vec::new();
-    for _ in common..bs.len() {
-        parts.push("..".to_string());
-    }
-    for seg in &n[common..] {
-        parts.push((*seg).to_string());
-    }
-    if parts.is_empty() {
-        ".".to_string()
-    } else {
-        parts.join("/")
-    }
-}
-
-// spec: gate-sdk/SPEC.md §lib/gate.sh — one normaliser, in the module that owns the kit-root
-// spelling this rule exists for; a second copy here would be the drift the kit-roots
-// cohort's own criterion-6 discharge argues against
-fn normalize(abs: &str) -> String {
-    walk::normalize_abs(abs)
+    walk::relative_to(&cwd, &walk::abs_against(&cwd, p))
 }
 
 pub fn knob_pub(name: &str) -> Result<String, String> {
@@ -573,11 +526,10 @@ pub fn governed_docs(root: &str, own_exclude: &str) -> Result<Vec<String>, Strin
         .collect();
     v.sort();
     v.dedup();
-    let prefix = format!("{}/", root);
     Ok(v.into_iter()
         .filter(|f| {
             let rel = strip_dot_slash(f);
-            let rel = rel.strip_prefix(&prefix).unwrap_or(&rel);
+            let rel = walk::rel_under(root, &rel).unwrap_or(&rel);
             !ex.iter().any(|g| walk::pattern_match(g, rel))
         })
         .collect())

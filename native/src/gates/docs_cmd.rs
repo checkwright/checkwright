@@ -319,8 +319,7 @@ fn resolutions(top: &str, cwd: &str, docdir: &str, tok: &str, roots: &[String]) 
 }
 
 fn under_top(top: &str, abs: &str) -> Option<String> {
-    let lead = format!("{}/", top.trim_end_matches('/'));
-    abs.strip_prefix(&lead).filter(|r| !r.is_empty()).map(str::to_string)
+    walk::rel_under(top, abs).filter(|r| !r.is_empty()).map(str::to_string)
 }
 
 // spec: canon-kit/SPEC.md §check-docs-cmd — an exact code occurrence, or for a family stem

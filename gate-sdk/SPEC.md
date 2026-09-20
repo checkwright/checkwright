@@ -865,14 +865,30 @@ rather than failing at the crossing — the same **whole roster unresolved** sha
 §The path-dialect contract opens with. The two horns together are the reason
 walk.rs owns a `child` speller: it is the crate's sole path **producer**
 (§The crate's crosser) and, by the same rule and for this second reason, its sole
-path **speller**. No module outside it composes a path, in either style. Measured
+path **speller**. **What that obliges is locality of the three text-level
+primitives, not abstinence from construction.** Testing whether a path is
+absolute, composing a prefix to test containment, and joining a root onto a
+segment are `walk.rs`'s; a module outside it reaches each through a named `walk`
+helper — `path_root`, `normalize_abs`, `abs_against`, `under`, `at_or_under`,
+`rel_under`, `child` — rather than re-spelling it. Building a `PathBuf` to
+*operate* on is untouched and ubiquitous: the subject is a spelling that
+**escapes into a value a reader prints, matches or prefix-tests**, which is where
+a `\` separator turns a wrong answer into a confident one. And the contract binds
+a value naming a **filesystem location** — a `/`-separated string in another
+namespace, a queue tag's `horizon/track` field or a markdown link target, is
+outside it and declares so at its site with
+`// path-dialect-exempt: <reason>`, because which namespace a string names is not
+decidable from its text. Measured
 on the 2026-08-30 Windows leg, where `check-install-disposition` read every
 zero-config gate-sdk member as unregistered in its own kit's smoke.
 
 ### The crate's crosser
 
-`native/src/walk.rs` holds the crate's single owner of absoluteness, `path_root`,
-and it is also the crate's **sole platform-native producer**: `std::env::current_dir()`,
+`native/src/walk.rs` holds the crate's single owner of absoluteness, `path_root` —
+**the test every module asks**, not a helper this one happens to use, because a
+leading-slash test spelled anywhere else answers *false* on a drive-rooted path
+whether or not that module ever touches a producer — and it is also the crate's
+**sole platform-native producer**: `std::env::current_dir()`,
 the `git rev-parse` spawn and `std::fs::canonicalize()` live there and nowhere
 else in the crate. Ownership of absoluteness without ownership of the producers
 only moves the question one call back, which is what this monopoly closes.
@@ -14793,7 +14809,9 @@ now looks for a `.gate`-declared member's.
 ### check-path-dialect
 
 Invariant: **every platform-native path producer in the tree converts at its own
-point of production, or records at the site why it does not** (§The path-dialect
+point of production, or records at the site why it does not — and every text-level
+path primitive in the crate is spelled in the crate's speller, or declares its value
+out of the filesystem namespace at the site** (§The path-dialect
 contract). It exists because the migration decays inside its own iteration
 otherwise: every newly ported file adds a producer to the remainder, and the port
 is still running. It is the record that replaced §Worked dispositions' per-site
@@ -14880,12 +14898,49 @@ reads the first non-blank, non-comment line after the `cd` and nothing else, so 
 gate's red set stays inside the producer roster rather than reaching a form the
 roster does not carry.
 
-**The exemption needs no new comment grammar.** It reuses canon-kit's `spec:`
-one-line binding, which already carries a mandatory cited section and is already
-gate-read on both sides; `walk.rs` writes exactly that form. A dedicated tag class
-was considered and refused — a second grammar for no error class the existing one
-does not catch. `check-comment-tier` is unchanged by this: the citation is a real
-binding to a real section, which is what that gate already requires.
+**The producer arm's exemption needs no new comment grammar.** It reuses canon-kit's
+`spec:` one-line binding, which already carries a mandatory cited section and is
+already gate-read on both sides; `walk.rs` writes exactly that form. A dedicated tag
+class was considered and refused for *that* arm — a second grammar for no error class
+the existing one does not catch. `check-comment-tier` is unchanged by this: the
+citation is a real binding to a real section, which is what that gate already requires.
+
+**A second arm asserts locality of the text-level primitives, and it is the one
+clause two of §The path-dialect contract was unenforced for.** §Porting to Rust does
+not retire dialect exposure states which spellings are `walk.rs`'s; this arm holds it
+over the crate source, reading one finding per line per primitive:
+
+- **testing absoluteness from a path's text** — a leading-separator test, and
+  `std::path`'s own `is_absolute`, which answers *false* on a separator-rooted path
+  under Windows where `walk::path_root` answers true;
+- **composing a prefix to test containment** — a bare trailing-slash composition,
+  whose only consumer is a prefix test, and a `format!` handed straight to
+  `starts_with` or `strip_prefix` with a separator in its template. The bound form is
+  in the vocabulary because the 2026-09-20 defect that broke both Windows
+  install-smoke legs had exactly that shape: a synthesized `<anchor>/` prefix-tested
+  a statement later.
+
+**Two clearances, and a recorded verdict is deliberately not one of them.** The site
+is `walk.rs` itself, or it declares its value out of the contract with
+`// path-dialect-exempt: <reason>` on its own line or in the contiguous comment run
+above it — the same window the producer arm's verdict rides, with a **mandatory**
+reason, an empty one reported as declaring nothing. The `spec:` verdict does not clear
+this arm, because a clause every site can cite its way out of is the review-held clause
+this arm replaced. The two tokens answer different questions — one says *this site
+deliberately does not cross*, the other *this value is not a filesystem location* — and
+a reader who found one token doing both jobs could not tell which claim a site makes
+(canon-kit/SPEC.md §check-comment-tier holds its roster row).
+
+**The third primitive is named as unasserted rather than left to a reader.** Joining a
+root onto a segment is the contract's too, and this arm does **not** hold it: delta 6's
+rule is that construction is lawful and only escape into a printed, matched or
+prefix-tested value is the subject, so lawfulness there turns on where the composed
+value goes — dataflow, which a form scan cannot see, and a scan of the form alone would
+red the hundreds of `Path`-bound joins the clause explicitly permits. What the arm does
+catch is every join that escapes *on its own line*, since a `format!` handed straight to
+a prefix test is the containment form above. The remainder — a join bound to a name
+whose escape is a statement away — is held by review, and by `walk.rs`'s monopoly on
+the producers those roots arrive through.
 
 **Its own vocabulary is a recorded verdict, and its unit tests compose from that
 one site.** The module names the forms it hunts, so it would red on itself; the two
@@ -14913,7 +14968,10 @@ port-candidate criteria's terms for a new gate: declaration path
 Tier `precommit` with `trigger=*` — the corpus is the whole tracked shell tree, so
 no couple glob covers it and the hook invocation is unconditional (§check-tree-terms
 takes the same shape for the same reason). Its fixture pair exercises both corpus
-arms and every clearance, and its `bad/` case asserts the violation **count**, which
+arms, both assertions and every clearance — the `good/` tree carries the primitives
+spelled in the speller's own body, a module reaching each through a named helper, and
+a declared namespace site; the `bad/` tree carries each vocabulary member and a
+declaration with no reason — and its `bad/` case asserts the violation **count**, which
 is what gives the green files beside the violations a reader: a clearance arm that
 stopped clearing reds that case rather than passing quietly.
 

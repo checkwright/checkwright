@@ -47,10 +47,9 @@ fn tracked_under(dir: &str, suffix: &str) -> Result<Vec<String>, String> {
         .stdout()
         .map(|o| String::from_utf8_lossy(o).into_owned())
         .unwrap_or_default();
-    let prefix = format!("{}/", dir);
     Ok(text
         .lines()
-        .filter(|p| match p.strip_prefix(&prefix) {
+        .filter(|p| match walk::rel_under(dir, p) {
             Some(rest) => !rest.contains('/') && rest.ends_with(suffix),
             None => false,
         })

@@ -78,7 +78,7 @@ pub fn run(args: &[String]) -> i32 {
     let mut absolute: Vec<String> = Vec::new();
     for raw in &kit_roots {
         let r = raw.trim_end_matches('/');
-        if r.starts_with('/') {
+        if walk::path_root(r).is_some() {
             absolute.push(r.to_string());
         } else {
             relative.push(format!("{}/templates/*.list", r));
@@ -187,10 +187,7 @@ pub fn run(args: &[String]) -> i32 {
             shipped.extend(n.iter().cloned());
         }
         registries += 1;
-        let rel_tpl = tpl
-            .strip_prefix(&format!("{}/", root))
-            .unwrap_or(tpl)
-            .to_string();
+        let rel_tpl = walk::rel_under(&root, tpl).unwrap_or(tpl).to_string();
 
         let shipped = sorted_unique(shipped);
         let registered = sorted_unique(list_members(&tpl_text));

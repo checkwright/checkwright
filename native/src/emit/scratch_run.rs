@@ -35,7 +35,7 @@ pub fn bash_family(interpreter: &str) -> bool {
 // spelling, so a symlink out of the scratch dir is refused where a lexical `..`-normalizing compare
 // would pass it. Both sides come from `walk::canonicalize`, so the compare is within one dialect.
 pub fn is_inside(root: &str, dir: &str) -> bool {
-    dir == root || dir.starts_with(&format!("{}/", root))
+    crate::walk::at_or_under(root, dir)
 }
 
 fn refuse(message: &str) -> i32 {

@@ -45,7 +45,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut unresolved: Vec<String> = Vec::new();
     let mut scanned = 0usize;
     for f in &surface {
-        let rel = spec::strip_dot_slash(f.strip_prefix(&format!("{}/", root)).unwrap_or(f));
+        let rel = spec::strip_dot_slash(crate::walk::rel_under(root, f).unwrap_or(f));
         scanned += 1;
         let text = spec::read_text(Path::new(f))?;
         for (idx, raw) in text.lines().enumerate() {

@@ -133,7 +133,7 @@ fn dead_paths(local: &[String], root: &Path) -> (Vec<String>, usize) {
             continue;
         };
         checked += 1;
-        let target = if cand.starts_with('/') {
+        let target = if walk::path_root(cand).is_some() {
             Path::new(cand).to_path_buf()
         } else {
             root.join(cand)

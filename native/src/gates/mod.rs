@@ -1015,7 +1015,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-assertion-strength",
         assertion_strength::run,
-        &[("?", "", "", "dynamic@src/gates/assertion_strength.rs:375")],
+        &[("?", "", "", "dynamic@src/gates/assertion_strength.rs:370")],
         &["GATE_SDK_KIT_DIRS"],
         "gate-sdk",
         &[],
@@ -1165,7 +1165,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-close-surfaces",
         close_surfaces::run,
-        &[("?", "", "", "dynamic@src/emit/close_surfaces.rs:159 via emit::close_surfaces::derive")],
+        &[("?", "", "", "dynamic@src/emit/close_surfaces.rs:158 via emit::close_surfaces::derive")],
         &[
             "GATE_SDK_KIT_DIRS",
             "GATE_SDK_PRUNE_DIRS",
@@ -1991,7 +1991,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-path-dialect",
         path_dialect::run,
-        &[("?", "", "", "dynamic@src/gates/path_dialect.rs:350")],
+        &[("?", "", "", "dynamic@src/gates/path_dialect.rs:448")],
         &["GATE_SDK_NATIVE_SRC", "GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS"],
         "gate-sdk",
         &[("git", "")],
@@ -2362,7 +2362,7 @@ mod tests {
                 .filter(|o| {
                     !relocations
                         .iter()
-                        .any(|r| *o == r || o.starts_with(&format!("{}/", r)))
+                        .any(|r| crate::walk::at_or_under(r, o))
                 })
                 .cloned()
                 .collect();

@@ -247,10 +247,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             continue;
         }
         pairs += 1;
-        let rel_copy = copy
-            .strip_prefix(&format!("{}/", root))
-            .unwrap_or(&copy)
-            .to_string();
+        let rel_copy = walk::rel_under(&root, &copy).unwrap_or(&copy).to_string();
 
         let tpl_text = read(&tpl).unwrap_or_default();
         let copy_text = read(&copy).unwrap_or_default();

@@ -75,7 +75,7 @@ fn relative_to(abs: &str, here: &str) -> String {
 
 fn resolve(base: &str, path: &str) -> Result<String, String> {
     let joined = format!("{}/{}", base, path);
-    if !joined.starts_with('/') {
+    if walk::path_root(&joined).is_none() {
         return Ok(normalize_rel(&joined));
     }
     let here = walk::cwd()?;
@@ -192,7 +192,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
                     }
                     continue;
                 }
-                if Path::new(&p).exists() && !p.starts_with(&format!("{}/", root)) {
+                if Path::new(&p).exists() && !walk::under(&root, &p) {
                     if !exempt(&lines, lno) {
                         bad.push(format!(
                             "{}:{}: off-root relative link '{}' → {} — resolves outside {}/, so it 404s on a site served from {}/ alone; cite it in the absolute self-repo blob form",

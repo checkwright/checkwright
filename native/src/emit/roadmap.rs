@@ -50,6 +50,9 @@ fn body(entries: &[RoadmapEntry], horizons: &[String]) -> String {
             if e.slug.is_empty() || e.tags != 1 {
                 continue;
             }
+            // path-dialect-exempt: a queue `[roadmap:]` tag's `horizon/track` field — the `/` is
+            // the tag grammar's field separator rather than a path separator, as the `split_once`
+            // below reads it (queue-kit/SPEC.md §The tag algebra)
             if !e.field.starts_with(&format!("{}/", h)) {
                 continue;
             }

@@ -11,8 +11,11 @@ fn is_space(c: char) -> bool {
 
 // spec: delegation-kit/SPEC.md §Verify after every agent commit — a meta-layer path is one of
 // the configured prefixes, or a root-level `*.md`
+// spec: gate-sdk/SPEC.md §Porting to Rust does not retire dialect exposure — a configured member
+// names a directory whether or not its value spells the trailing separator the knob's default
+// carries, so containment is asked by component rather than by text
 fn is_meta(p: &str, meta: &[String]) -> bool {
-    if meta.iter().any(|pre| p.starts_with(pre.as_str())) {
+    if meta.iter().any(|pre| walk::at_or_under(pre.trim_end_matches('/'), p)) {
         return true;
     }
     p.ends_with(".md") && !p.contains('/')
@@ -195,9 +198,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // `git diff --cached` prints, which are spelled against the toplevel whatever the cwd is, so
     // the root is spelled against it too
     for root in walk::kit_roots_under(&walk::toplevel()?)? {
-        let prefix = format!("{}/", root.trim_end_matches('/'));
-        if !root.is_empty() && !meta.contains(&prefix) {
-            meta.push(prefix);
+        let dir = root.trim_end_matches('/').to_string();
+        if !dir.is_empty() && !meta.contains(&dir) {
+            meta.push(dir);
         }
     }
 

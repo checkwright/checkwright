@@ -396,11 +396,10 @@ fn footprint(root: &str, artifacts: &str) -> Result<Vec<String>, Refusal> {
 fn inside(root: &str, path: &str) -> Option<String> {
     let root = root.trim_end_matches('/');
     let rel = if walk::path_root(path).is_some() {
-        let tail = path.strip_prefix(root)?;
-        if !tail.is_empty() && !tail.starts_with('/') {
+        if !walk::at_or_under(root, path) {
             return None;
         }
-        tail.trim_start_matches('/').to_string()
+        walk::rel_under(root, path).unwrap_or_default().to_string()
     } else {
         path.to_string()
     };

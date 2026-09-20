@@ -77,10 +77,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // contract states, not `sort`'s locale collation
     found.sort();
     for f in &found {
-        let rel = f
-            .strip_prefix(&format!("{}/", root))
-            .unwrap_or(f)
-            .to_string();
+        let rel = walk::rel_under(root, f).unwrap_or(f).to_string();
         if !expected.contains(&rel) {
             bad.push(format!(
                 "{}: orphaned — no source doc maps to this mirror page (delete it and rerun the generator)",

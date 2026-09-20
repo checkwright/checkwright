@@ -107,7 +107,7 @@ fn is_bash_surface(p: &std::path::Path) -> bool {
 // composes exactly the string no filesystem answers to that that section names.
 fn under(anchor: &str, root: &str) -> std::path::PathBuf {
     let r = std::path::Path::new(root);
-    if r.is_absolute() {
+    if crate::walk::path_root(root).is_some() {
         return r.to_path_buf();
     }
     std::path::Path::new(anchor).join(r)
