@@ -18,12 +18,18 @@ prompts, your harness. Add Checkwright where a claim has to be mechanically
 proven rather than asserted: the instructions shape, the gates enforce. Why that
 split is the whole design: [Where Checkwright sits](docs/positioning.md).
 
-One command runs the entire arc against a throwaway consumer repo, installing
-nothing and touching no tree but its own:
+One arm runs the entire arc against a throwaway consumer repo, installing
+nothing and touching no tree but its own. Run it on the gate binary
+`GATE_SDK_NATIVE_BIN` names:
 
 ```bash
-bash gate-sdk/bin/run-gates.sh --run-demo
+--run-demo
 ```
+
+The install puts that binary in place ([Quick start](#quick-start)) and needs
+neither `bash` nor a Rust toolchain. From a clone of this repository, which
+tracks no binary, `bash gate-sdk/bin/build-native.sh` builds one first — and
+that `bash` is the clone path's floor, never the install floor.
 
 It vendors the kits into a fresh git repo, passes the battery clean, introduces
 a defect and shows the gate that blocks it, then drops the defect and goes green

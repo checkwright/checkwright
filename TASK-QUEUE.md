@@ -64,54 +64,6 @@
 
 ## Technical Debt
 
-- **readme-front-door-is-adopter-facing-and-outside-every-sweep**
-  — `README.md` carries 19 `bash gate-sdk/bin/run-gates.sh` sites, and
-  line 25 is the landing page's headline try-it command, first screen. That makes it
-  **adopter-facing**, on a project whose adopter-constraint claim is git as the only
-  unconditional floor member.
-  **The corpus is TWO sites, not one, measured at this iteration's spec stage:** `docs/index.md`:27
-  carries the identical command as the served site's own headline. The close before this one listed
-  that file in its `docs/` count and read the whole count as contributor-facing, which is the same
-  misclassification stamped as a recurrence on `door-binding-sweep-stops-at-the-kit-roots`.
-  **Measured at `door-binding-sweep`'s close by the staleness read, after two earlier
-  measurements of the same corpus missed it** — the filing bullet's, and that close's own
-  drain re-grep, which covered `docs/` only. `check-door-binding` cannot see the file: its
-  assertion A walks `walk::kit_roots()`, and no gate reaches the repo root.
-  **Why a unit rather than a sweep:** re-pointing the line extends the door sweep's envelope
-  onto a surface that unit excluded, and a fresh clone carries no built binary, so which
-  spelling the line should carry interacts with the fail-open front-end constraint the sweep
-  itself ruled on. Routed here by the lead at that close as the scope-gated-intake default —
-  a routing call rather than a judgment on the merits, revisable by a later session.
-  **Cost class once/low, whose home is this prose while the entry is active, and the cost is worse
-  than filed:** both front pages hand every visitor `bash`, and — measured with the binary absent —
-  the command they hand over exits 2 with a build remedy, so a prospective adopter's first
-  interaction with the project is a failure that needs a toolchain to clear.
-  **Remedy, as delta 3's obligation rather than a re-pointing:** each of the two pre-build doors —
-  `README.md`:25 and `docs/index.md`:27 — must either state its precondition adjacently (the build
-  step, and that `bash` is the clone-path floor and not the install floor) or hand the reader the
-  install path instead; a line re-pointed at the binary is refused outright, because
-  `native/target/` is gitignored and no binary is tracked, so that spelling names a path a fresh
-  clone does not have.
-  The delta is `fail-open-front-end-residency-after-the-door-sweep`'s amendment, which names this
-  entry as its executing unit and names both sites as its corpus — so the second site has an
-  executing unit here rather than a pendency this iteration manufactured for itself.
-  Joins this iteration second in work order, by operator direction (2026-09-20, lead-relayed) on
-  the adopter-floor door remainder. Stays **debt**: the remedy is editorial and adds no name, the
-  `pre-build door` class being minted by the amendment rather than here. Lead decision
-  2026-09-20 — if satisfying it turns out to need new mechanism (a gate, an installer verb, a
-  generated banner), the new-names litmus reclassifies it and it goes back to the lead.
-  **BLOCKED, and the tag that would say so does not fit: do not pick this before
-  `fail-open-front-end-residency-after-the-door-sweep` has ruled** which spelling an adopter-facing
-  door may carry. A blocked-by tag naming that slug measures 130 columns against the
-  100-column budget on this slug's lead line alone, so `check-queue-wrap` refuses it and the
-  structured signal a first-unblocked selection reads is unavailable here — the second attestation
-  of `lead-line-blocked-by-spec-tag-width-collision`, stamped on that entry, which this prose is
-  the fallback for.
-  Filed 2026-09-20 at `door-binding-sweep`'s close on the staleness read; the corpus
-  correction itself landed inline in that iteration. Owner lookup: `README.md`, `--run-demo`,
-  `door`, `front end` — none. `door-binding-sweep-stops-at-the-kit-roots` is **adjacent and
-  distinct**: it owns the gate's reach, this owns the two adopter-facing sites' spelling.
-
 ## Deferred
 
 - **shell-cwd-anchor-clause-has-no-oracle** [cost: event/high] [surface: gate-sdk]
@@ -3057,5 +3009,6 @@
 ## Done
 
 - path-dialect-clauses-unenforced
+- readme-front-door-is-adopter-facing-and-outside-every-sweep
 
 ## Lessons Learned
