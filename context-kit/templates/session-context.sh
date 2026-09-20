@@ -7,9 +7,11 @@ set -uo pipefail
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null || exit 0
 REPO_ROOT="$(pwd -P)"
 
-# spec: context-kit/SPEC.md §The session-context hook — consumer layout: vendored kit tools + governed queue file, retarget to yours [EDIT ME]. The queue index and the three index arms are reached through the battery runner's --emit front-end rather than by tool path: the front-end locates the binary and runs it at the git toplevel, where the arm reads a consumer's section and cap overrides itself (gate-sdk/SPEC.md §The non-gate arm).
-RUN_GATES="gate-sdk/bin/run-gates.sh"
-NATIVE_BIN="$(bash -c 'source gate-sdk/lib/gate.sh; gate_native_bin' 2>/dev/null)"
+# spec: context-kit/SPEC.md §The session-context hook — consumer layout: the vendored gate-sdk library and a governed queue file, retarget to yours [EDIT ME]. The queue index and the three index arms are arms of the gate binary GATE_SDK_NATIVE_BIN names, spelled as a command by gate-sdk's own accessor; this hook already runs at the git toplevel, where each arm reads a consumer's section and cap overrides itself (gate-sdk/SPEC.md §The non-gate arm). The library is sourced rather than subshelled because it defines functions and runs nothing, so no read of it can fail a session.
+NATIVE_BIN=""
+# shellcheck source=/dev/null
+[[ -f gate-sdk/lib/gate.sh ]] && source gate-sdk/lib/gate.sh
+declare -F gate_native_bin_spelled >/dev/null && NATIVE_BIN="$(gate_native_bin_spelled)"
 DRIFT_ARM="${CONTEXT_KIT_DRIFT_REPORT:-}"
 STAGE_RULES="${CONTEXT_KIT_STAGE_RULES:-}"
 STATE_FILE="${CONTEXT_KIT_STATE_FILE:-${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt}"
@@ -28,11 +30,11 @@ if [[ -f "$STATE_FILE" ]]; then
         [[ -n "$marker" && -n "${f1:-}" ]] && stage="${f2:-}"
     done 2>/dev/null < "$STATE_FILE"
 fi
-if [[ -f "$RUN_GATES" ]]; then
+if [[ -x "$NATIVE_BIN" ]]; then
     if [[ "$stage" == close || "$stage" == scope ]]; then
-        bash "$RUN_GATES" --emit queue-index 2>/dev/null || echo "(queue-index unavailable)"
+        "$NATIVE_BIN" --emit queue-index 2>/dev/null || echo "(queue-index unavailable)"
     else
-        bash "$RUN_GATES" --emit queue-index --collapse-deferred 2>/dev/null || echo "(queue-index unavailable)"
+        "$NATIVE_BIN" --emit queue-index --collapse-deferred 2>/dev/null || echo "(queue-index unavailable)"
     fi
     echo
 fi
@@ -43,22 +45,22 @@ mapfile -t changed < <(
         | while read -r l; do p="${l##* }"; [[ "$p" == */* && -d "${p%%/*}/src" ]] && echo "${p%%/*}"; done \
         | sort -u
 )
-# spec: context-kit/SPEC.md §The session-context hook — the public-surface block guards on the gate binary, not on a script path: the index tools are arms of it now, and `exec_arm` exits 2 with a diagnostic this call site swallows, so a guard taken *after* the header would print the header and nothing under it on every host the artifact roster does not cover. Read the binary first and the block is absent rather than empty — the way the deleted `-f` guard degraded. The lookup runs in a subshell because the kit library exits 2 on a malformed config, and this hook never fails a session.
-if [[ ${#changed[@]} -gt 0 && -n "$NATIVE_BIN" && -x "$NATIVE_BIN" ]]; then
+# spec: context-kit/SPEC.md §The session-context hook — the public-surface block guards on the gate binary: the index tools are arms of it, and a missing binary would print the header and nothing under it on every host the artifact roster does not cover. Read the binary first and the block is absent rather than empty — the way the deleted `-f` guard degraded.
+if [[ ${#changed[@]} -gt 0 && -x "$NATIVE_BIN" ]]; then
     echo "Uncommitted changes touch: ${changed[*]}"
     echo "Public API surface of those components (pub-index — read the file for bodies):"
     echo
     for c in "${changed[@]}"; do
-        bash "$RUN_GATES" --emit pub-index "$c/src/" 2>/dev/null || true
+        "$NATIVE_BIN" --emit pub-index "$c/src/" 2>/dev/null || true
     done
     echo
 fi
 
-# spec: context-kit/SPEC.md §The session-context hook — step 3 drift line (drift-kit owns the report; the seam is this optional line). The knob names an **arm** of the battery runner's --emit front-end, not a script path: a `-f` test on an arm name is a test nothing can pass, so the guard is a non-empty name plus the front-end's own presence.
-if [[ -n "$DRIFT_ARM" && -f "$RUN_GATES" ]]; then
-    drift_line="$(bash "$RUN_GATES" --emit "$DRIFT_ARM" --trend 2>/dev/null)" || true
+# spec: context-kit/SPEC.md §The session-context hook — step 3 drift line (drift-kit owns the report; the seam is this optional line). The knob names an **arm** of the gate binary, not a script path: a `-f` test on an arm name is a test nothing can pass, so the guard is a non-empty name plus the binary's own presence.
+if [[ -n "$DRIFT_ARM" && -x "$NATIVE_BIN" ]]; then
+    drift_line="$("$NATIVE_BIN" --emit "$DRIFT_ARM" --trend 2>/dev/null)" || true
     if [[ -n "$drift_line" ]]; then
-        echo "$drift_line  (full: bash $RUN_GATES --emit $DRIFT_ARM)"
+        echo "$drift_line  (full: $NATIVE_BIN --emit $DRIFT_ARM)"
         echo
     fi
 fi
@@ -114,9 +116,9 @@ fi
 cat <<EOF
 Before opening source for a task, run the matching surface index first
 (index, then read the one you need):
-  • bash $RUN_GATES --emit pub-index <component>/src/    — public API surface (ships rust, ts)
-  • bash $RUN_GATES --emit md-index <file.md>            — large markdown / SPEC outline
-  • bash $RUN_GATES --emit md-section <file.md> "<head>" — extract one section by heading
+  • $NATIVE_BIN --emit pub-index <component>/src/    — public API surface (ships rust, ts)
+  • $NATIVE_BIN --emit md-index <file.md>            — large markdown / SPEC outline
+  • $NATIVE_BIN --emit md-section <file.md> "<head>" — extract one section by heading
 EOF
 
 # spec: context-kit/SPEC.md §The session-context hook — step 8 stage-routed craft-rule pointers; doctrine-kit owns the emitter, the seam is this optional block (drift-line precedent); suppressed for a lead (executor-facing)
@@ -132,8 +134,8 @@ fi
 # spec: context-kit/SPEC.md §The session-context hook — step 9 env profile; consumer-local machine profile re-probed then emitted verbatim when present (env-profile seam, drift-line precedent)
 ENV_PROFILE_FILE="${CONTEXT_KIT_ENV_PROFILE_FILE:-ENV.local.md}"
 if [[ -f "$ENV_PROFILE_FILE" ]]; then
-    # spec: context-kit/SPEC.md §The session-context hook — per-session auto-refresh: re-probe inside the file-present guard (never auto-seeds), output suppressed; reached through the --emit front-end like every other arm, so retarget $RUN_GATES to your layout [EDIT ME]
-    [[ -f "$RUN_GATES" ]] && bash "$RUN_GATES" --emit env-probe >/dev/null 2>&1 || true
+    # spec: context-kit/SPEC.md §The session-context hook — per-session auto-refresh: re-probe inside the file-present guard (never auto-seeds), output suppressed; an arm of the gate binary like every other, so retarget the library source above to your layout [EDIT ME]
+    [[ -x "$NATIVE_BIN" ]] && "$NATIVE_BIN" --emit env-probe >/dev/null 2>&1 || true
     echo
     echo "Local env profile ($ENV_PROFILE_FILE) — adapt commands to this box:"
     cat "$ENV_PROFILE_FILE" 2>/dev/null || true

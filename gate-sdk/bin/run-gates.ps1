@@ -79,6 +79,14 @@ function Get-PrebinaryKnob {
     return $Default
 }
 
+# spec: gate-sdk/SPEC.md §lib/gate.sh — gate_native_bin_spelled: the door as a command token, `./`-prefixed unless the value is already anchored
+function Get-NativeBinSpelled {
+    param([string] $Default)
+    $b = Get-PrebinaryKnob -Name 'GATE_SDK_NATIVE_BIN' -Default $Default
+    if ($b -cmatch '^(/|\./|\.\./|[A-Za-z]:[/\\])') { return $b }
+    return "./$b"
+}
+
 # spec: gate-sdk/SPEC.md §lib/gate.sh — gate_exe_suffix's host half
 $exeSuffix = if ($onWindows) { '.exe' } else { '' }
 
@@ -103,7 +111,7 @@ switch -CaseSensitive -Regex ($lead) {
     default { $argv = @('--run', '--gates-dir', $lead) }
 }
 
-$bin = Get-PrebinaryKnob -Name 'GATE_SDK_NATIVE_BIN' -Default "native/target/release/checkwright-gates$exeSuffix"
+$bin = Get-NativeBinSpelled -Default "native/target/release/checkwright-gates$exeSuffix"
 $exe = if ([System.IO.Path]::IsPathRooted($bin)) { $bin } else { Join-Path $here $bin }
 $runnable = Test-Path -LiteralPath $exe -PathType Leaf
 if ($runnable -and -not $onWindows) {

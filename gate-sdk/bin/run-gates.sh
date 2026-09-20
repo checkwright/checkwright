@@ -28,7 +28,7 @@ fi
 ARM_UNAVAILABLE_STATUS=2
 exec_arm() {
     local bin
-    bin="$(gate_native_bin)"
+    bin="$(gate_native_bin_spelled)"
     if [[ ! -x "$bin" ]]; then
         printf 'run-gates: %s dispatches to the native binary, but %s is absent or not ' "$1" "$bin" >&2
         printf 'executable — it could not run. Build it: bash gate-sdk/bin/build-native.sh\n' >&2

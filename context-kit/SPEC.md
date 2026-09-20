@@ -230,9 +230,12 @@ Steps, in order:
    swallows on both channels, so a guard taken after the header would print
    `Public API surface of those components…` followed by nothing on every host the
    artifact roster does not cover. Read first, the block is **absent rather than
-   empty** — the way the deleted script-path guard degraded. The lookup runs in a
-   subshell, because the kit library exits 2 on a malformed config and this hook
-   never fails a session.
+   empty** — the way the deleted script-path guard degraded. The hook sources
+   `gate-sdk/lib/gate.sh` directly and spells the door with
+   `gate_native_bin_spelled` (gate-sdk/SPEC.md §lib/gate.sh): the library
+   defines functions and runs nothing at load, so no read of it can fail a
+   session, and the door has one spelling across every step below rather than a
+   script path per call site.
 3. **Drift line** — one `--emit <arm> --trend` summary line when the
    consumer has a drift report; silently absent otherwise (drift-kit owns
    the report; the seam is this optional line).

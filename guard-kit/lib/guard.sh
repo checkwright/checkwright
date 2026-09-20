@@ -574,13 +574,6 @@ _guard_dequoted_view() {
     printf '%s' "$out"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — the runner path rules 8 and 23 print: gate-sdk's front end, derived from the vendor root GUARD_KIT_LIB already names rather than hardcoded, so a relocated tree still prints a path that resolves
-_guard_front_end() {
-    local root
-    _guard_vendor_root root
-    printf '%sgate-sdk/bin/run-gates.sh' "$root"
-}
-
 # spec: guard-kit/SPEC.md §The guard framework (`lib/guard.sh`) — the directory the kits are vendored under, with its trailing '/', or empty where guard-kit sits at the working directory; assigned by nameref so the load at this file's tail forks nothing
 _guard_vendor_root() {
     local -n _gvr_out="$1"
@@ -612,7 +605,7 @@ _guard_awk_read() {
             guard_block "don't read a line range through 'awk' — use the Read tool with offset/limit: it returns numbered lines and registers the file for a later Edit. An awk program carrying an action, read from a program file, given a second operand, or fed by a pipe is a transform or a filter and untouched. If you genuinely need awk, run it yourself with !<command>."
         fi
         if [[ "$prog" =~ $hd_re && "${prog_operands[0]}" == *.md ]]; then
-            guard_block "don't read a markdown section through an 'awk' range — use the section extractor: 'bash $(_guard_front_end) --emit md-section ${prog_operands[0]} \"<heading>\"' prints exactly the section under that heading, bounded by the next heading at its level. A range over a non-markdown file, a program carrying an action, or an awk fed by a pipe is untouched. If you genuinely need awk, run it yourself with !<command>."
+            guard_block "don't read a markdown section through an 'awk' range — use the section extractor: '$_guard_door --emit md-section ${prog_operands[0]} \"<heading>\"' prints exactly the section under that heading, bounded by the next heading at its level. A range over a non-markdown file, a program carrying an action, or an awk fed by a pipe is untouched. If you genuinely need awk, run it yourself with !<command>."
         fi
     done < <(sed -E 's/\|\||&&|;/\n/g' <<<"$v")
 }
@@ -666,7 +659,7 @@ _guard_python_rewrite() {
 }
 
 _guard_block_python() {
-    guard_block "don't rewrite a file with an inline python body — use the rewrite arm: 'bash $(_guard_front_end) --rewrite [--expect <n>] [--] <find> <replace> <file>…' replaces a literal across every named file and prints each changed span; --expect <n> is the count assertion, one call per find/replace pair, and '\\n' escapes carry a multi-line literal on one line. For a multi-line literal you would rather not escape, use the Edit tool. If the program is intended as written, run it yourself with !<command>."
+    guard_block "don't rewrite a file with an inline python body — use the rewrite arm: '$_guard_door --rewrite [--expect <n>] [--] <find> <replace> <file>…' replaces a literal across every named file and prints each changed span; --expect <n> is the count assertion, one call per find/replace pair, and '\\n' escapes carry a multi-line literal on one line. For a multi-line literal you would rather not escape, use the Edit tool. If the program is intended as written, run it yourself with !<command>."
 }
 
 guard_rule_sed_file() {
@@ -682,7 +675,7 @@ guard_rule_sed_file() {
         esac
         _guard_program_operands "$tool" "$seg" || continue
         if [[ "$inplace" == 1 && ( "$tool" == sed || "${#prog_operands[@]}" -ge 1 ) ]]; then
-            guard_block "don't rewrite a file with '$tool -i' — use the rewrite arm: 'bash $(_guard_front_end) --rewrite [--regex] [--expect <n>] [--] <find> <replace> <file>…' replaces a literal (or, with --regex, a line-scoped POSIX ERE) with fixed text across every named file and prints each changed span. For an edit a fixed replacement cannot express (a capture group, a deletion keyed on context), use the Edit tool. If you genuinely need the in-place edit, run it yourself with !<command>."
+            guard_block "don't rewrite a file with '$tool -i' — use the rewrite arm: '$_guard_door --rewrite [--regex] [--expect <n>] [--] <find> <replace> <file>…' replaces a literal (or, with --regex, a line-scoped POSIX ERE) with fixed text across every named file and prints each changed span. For an edit a fixed replacement cannot express (a capture group, a deletion keyed on context), use the Edit tool. If you genuinely need the in-place edit, run it yourself with !<command>."
         fi
         [[ "$tool" == sed ]] || continue
         if [[ "${#prog_operands[@]}" -ge 1 ]]; then
@@ -1668,14 +1661,14 @@ _guard_stdin_redirect() {
         | sed -E 's/^[^<]?<[[:space:]]*//'
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's two decisions: arm (a) steers to the runner, arm (b) states the bash-only rule, and both name the runner through _guard_front_end so a consumer that vendors the kit elsewhere is told where its own copy is
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's two decisions: arm (a) steers to the runner, arm (b) states the bash-only rule, and both name the runner through _guard_door so a consumer whose binary sits elsewhere is told a command that runs
 _guard_block_interpreter() {
     local arm="$1" word="$2" src="$3" runner
-    runner="$(_guard_front_end) --scratch-run"
+    runner="$_guard_door --scratch-run"
     if [[ "$arm" == a ]]; then
-        guard_block "run a scratch script through the runner: 'bash $runner <script> [args…]' (guard-kit/SPEC.md §scratch-run). This call takes the program body for '$word' from '$src', which sits in a scratch dir any session can rewrite, so the body reviewed at the permission decision need not be the body that runs. The runner is allowlistable and echoes the body as it executes, which is the compensating control a direct run has none of. A body carried in the command string — a '-c' argument, a heredoc, a herestring — is untouched. If you genuinely need the direct form, run it yourself with !<command>."
+        guard_block "run a scratch script through the runner: '$runner <script> [args…]' (guard-kit/SPEC.md §scratch-run). This call takes the program body for '$word' from '$src', which sits in a scratch dir any session can rewrite, so the body reviewed at the permission decision need not be the body that runs. The runner is allowlistable and echoes the body as it executes, which is the compensating control a direct run has none of. A body carried in the command string — a '-c' argument, a heredoc, a herestring — is untouched. If you genuinely need the direct form, run it yourself with !<command>."
     fi
-    guard_block "scratch execution is bash-only (guard-kit/SPEC.md §scratch-run) and '$word' is not bash: this call takes its program body from '$src' under a scratch dir, where no compensating control reaches it. Write the body as a shell script and run it through 'bash $runner <script> [args…]', which echoes the body as it executes; a script whose shebang names a non-bash interpreter is refused there too. A body carried in the command string — a '-c' argument, a heredoc, a herestring — is untouched, because the approver and the friction log both see it verbatim. If you genuinely need the direct run, run it yourself with !<command>."
+    guard_block "scratch execution is bash-only (guard-kit/SPEC.md §scratch-run) and '$word' is not bash: this call takes its program body from '$src' under a scratch dir, where no compensating control reaches it. Write the body as a shell script and run it through '$runner <script> [args…]', which echoes the body as it executes; a script whose shebang names a non-bash interpreter is refused there too. A body carried in the command string — a '-c' argument, a heredoc, a herestring — is untouched, because the approver and the friction log both see it verbatim. If you genuinely need the direct run, run it yourself with !<command>."
 }
 
 # spec: guard-kit/SPEC.md §The generic ruleset — rule 23's test, a block for rule 23 and a predicate for rule 19's arm (B): prints the first refusal as tab-separated arm, interpreter word and body source and returns 0, 1 when no interpreter takes its body from a scratch path
@@ -2028,7 +2021,7 @@ guard_rule_shell_wrapper() {
         rest="${seg#"$word"}"
         rest="${rest#"${rest%%[![:space:]]*}"}"
         [[ "${rest%%[[:space:]]*}" == -c ]] || continue
-        guard_block "don't wrap a command in '$word -c': the payload sits inside one quoted argument, so neither the allowlist nor any guard rule can read what it runs. Run the payload as the command itself, or, for a body that needs a shell of its own, write it to a scratch script and run it through 'bash $(_guard_front_end) --scratch-run <script>'. If you genuinely need the wrapper, run it yourself with !<command>."
+        guard_block "don't wrap a command in '$word -c': the payload sits inside one quoted argument, so neither the allowlist nor any guard rule can read what it runs. Run the payload as the command itself, or, for a body that needs a shell of its own, write it to a scratch script and run it through '$_guard_door --scratch-run <script>'. If you genuinely need the wrapper, run it yourself with !<command>."
     done < <(guard_split_compound "$(guard_skeleton "$1" sq dq hd)")
 }
 
@@ -2071,6 +2064,9 @@ if [[ -f "${_guard_root}gate-sdk/lib/gate.sh" ]]; then
 fi
 _guard_bin=''
 declare -F gate_native_bin >/dev/null && _guard_bin="$(gate_native_bin)"
+# spec: guard-kit/SPEC.md §The generic ruleset — the door rules 8 and 23 steer to, resolved once at load through gate-sdk's own accessor rather than rebuilt per message: a steer names the binary GATE_SDK_NATIVE_BIN resolves, so a consumer that vendored the kits elsewhere is still told a command that runs
+_guard_door=''
+declare -F gate_native_bin_spelled >/dev/null && _guard_door="$(gate_native_bin_spelled)"
 # spec: guard-kit/SPEC.md §The guard framework (`lib/guard.sh`) — a fixed literal, because guard_advise renders through the binary this branch has just found missing; it interpolates nothing, so it carries no character JSON must escape
 if ! declare -F gate_knob_values >/dev/null || [[ ! -x "$_guard_bin" ]]; then
     printf '%s\n' '{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"guard-kit'\''s rules did not run on this call: the gate binary its knobs and its payload reads come from is not reachable, so the call takes the harness'\''s own permission path with no steering. Build it: bash gate-sdk/bin/build-native.sh"}}'

@@ -9472,6 +9472,23 @@ reader needs outlive the refactor that renames a helper:
   risk of the member itself: a consumer whose own source lives under a directory
   named `worktrees` (or `target`, or `.tmp`) loses coverage with no red, and
   reaches for `GATE_SDK_PRUNE_DIRS` to restate the set without it.
+- **`gate_native_bin_spelled` is the one owner of how a door is *spelled*, as
+  `gate_native_bin` is the one owner of where it *is*.** The knob's value is a
+  path; a caller that prints it, or runs it, needs a **command token**, and the
+  two differ by an anchor: a relative value carrying no `./`, `../` or root
+  segment is a `PATH` lookup to `sh` and is not a command at all to PowerShell.
+  So the accessor returns `gate_native_bin`'s value `./`-prefixed when it is
+  relative and unchanged when it is already anchored — rooted, drive-rooted
+  (`X:/…`, `X:\…`), or already `./` or `../` — which makes the prefix idempotent
+  rather than something a second caller can double. The rule has one home
+  because it had two: the installer's `init` formatted its own follow-up lines
+  this way, and every shell surface that printed a door built its own path, so
+  a consumer could be told two spellings of one binary. Its callers are both
+  front-end halves, guard-kit's steer messages, context-kit's session-context
+  hook and drift-kit's KPI example (guard-kit/SPEC.md §The generic ruleset,
+  context-kit/SPEC.md §The session-context hook, drift-kit/SPEC.md §Out of
+  scope). A caller needing the path rather than the token — an `-x` test, a
+  `dirname` — reads `gate_native_bin` and is unaffected.
 - `gate_msg_pattern_files` is the shell reader of the banned-pattern set, a
   pre-binary accessor documented at its gate (§check-commit-msg). The commit-type
   roster has no shell reader: it is `GATE_SDK_COMMIT_TYPES` in gate-sdk's table
@@ -10244,10 +10261,17 @@ exits with its status. The twin exists for a native-Windows host with no bash on
 `PATH`, whose bare `bash` reaches the WSL launcher; it runs under Windows
 PowerShell 5.1 and PowerShell 7 and pins the installer bootstrap's two
 argument-passing settings on that bootstrap's ground (installer/SPEC.md §The
-install boundary). It sources nothing, so it re-holds the three accessors it
-needs — `_gate_prebinary_knob` for the one knob, `gate_sdk_gates_dir`, and the
-host half of `gate_exe_suffix` — and writes the stub's lines as UTF-8 bytes with
-a bare LF. That makes it a second holder of the stub's contract. Its argv is
+install boundary). It sources nothing, so it re-holds the four accessors it
+needs — `_gate_prebinary_knob` for the one knob, `gate_sdk_gates_dir`, the
+host half of `gate_exe_suffix`, and `gate_native_bin_spelled` (§lib/gate.sh) —
+and writes the stub's lines as UTF-8 bytes with
+a bare LF. That makes it a second holder of the stub's contract. **Each half
+names the binary in its absence diagnostic by the spelled form, and that is what
+holds the fourth accessor's twin**: the accessor has no PowerShell caller other
+than the diagnostic, so a twin the twin never called would be a second
+implementation held by nothing — the shape this section refuses everywhere
+else. Spelled, it rides the precedence corpus below, where each tier's expected
+text is the `./`-prefixed value, so a twin that drops the prefix diverges. Its argv is
 PowerShell's own `$args`, so the binder's rewrites happen before the twin sees a
 token: a `-name:value` token arrives split at its colon, and a `--%` token is
 consumed.

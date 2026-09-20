@@ -7,8 +7,10 @@ set -uo pipefail
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null || exit 0
 REPO_ROOT="$(pwd -P)"
 
-RUN_GATES="gate-sdk/bin/run-gates.sh"             # the --emit front-end: the queue surface and the three index arms
-NATIVE_BIN="$(bash -c 'source gate-sdk/lib/gate.sh; gate_native_bin' 2>/dev/null)"  # the binary those arms dispatch to
+NATIVE_BIN=""                                     # the gate binary: the queue surface, the index arms and the verdict
+# shellcheck source=/dev/null
+[[ -f gate-sdk/lib/gate.sh ]] && source gate-sdk/lib/gate.sh
+declare -F gate_native_bin_spelled >/dev/null && NATIVE_BIN="$(gate_native_bin_spelled)"
 DRIFT_ARM="${CONTEXT_KIT_DRIFT_REPORT:-drift-report}"  # drift-kit trend line: an --emit arm name
 STAGE_RULES="${CONTEXT_KIT_STAGE_RULES:-bash gate-sdk/bin/run-gates.sh --emit stage-rules}"  # doctrine-kit craft-rule router: a command, not a path
 STATE_FILE="${CONTEXT_KIT_STATE_FILE:-${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt}"  # lifecycle stage cursor
@@ -26,11 +28,11 @@ if [[ -f "$STATE_FILE" ]]; then
         [[ -n "$marker" && -n "${f1:-}" ]] && stage="${f2:-}"
     done 2>/dev/null < "$STATE_FILE"
 fi
-if [[ -f "$RUN_GATES" ]]; then
+if [[ -x "$NATIVE_BIN" ]]; then
     if [[ "$stage" == close || "$stage" == scope ]]; then
-        bash "$RUN_GATES" --emit queue-index 2>/dev/null || echo "(queue-index unavailable)"
+        "$NATIVE_BIN" --emit queue-index 2>/dev/null || echo "(queue-index unavailable)"
     else
-        bash "$RUN_GATES" --emit queue-index --collapse-deferred 2>/dev/null || echo "(queue-index unavailable)"
+        "$NATIVE_BIN" --emit queue-index --collapse-deferred 2>/dev/null || echo "(queue-index unavailable)"
     fi
     echo
 fi
@@ -40,30 +42,30 @@ mapfile -t changed < <(
         | while read -r l; do p="${l##* }"; [[ "$p" == */* && -d "${p%%/*}/src" ]] && echo "${p%%/*}"; done \
         | sort -u
 )
-# spec: context-kit/SPEC.md §The session-context hook — the public-surface block guards on the gate binary, not on a script path: the index tools are arms of it now, and `exec_arm` exits 2 with a diagnostic this call site swallows, so a guard taken *after* the header would print the header and nothing under it on every host the artifact roster does not cover. Read the binary first and the block is absent rather than empty — the way the deleted `-f` guard degraded. The lookup runs in a subshell because the kit library exits 2 on a malformed config, and this hook never fails a session.
-if [[ ${#changed[@]} -gt 0 && -n "$NATIVE_BIN" && -x "$NATIVE_BIN" ]]; then
+# spec: context-kit/SPEC.md §The session-context hook — the public-surface block guards on the gate binary: the index tools are arms of it, and a missing binary would print the header and nothing under it on every host the artifact roster does not cover. Read the binary first and the block is absent rather than empty — the way the deleted `-f` guard degraded.
+if [[ ${#changed[@]} -gt 0 && -x "$NATIVE_BIN" ]]; then
     echo "Uncommitted changes touch: ${changed[*]}"
     echo "Public API surface of those components (pub-index — read the file for bodies):"
     echo
     for c in "${changed[@]}"; do
-        bash "$RUN_GATES" --emit pub-index "$c/src/" 2>/dev/null || true
+        "$NATIVE_BIN" --emit pub-index "$c/src/" 2>/dev/null || true
     done
     echo
 fi
 
-# spec: context-kit/SPEC.md §The session-context hook — the knob names an arm of the --emit front-end, not a script path; a `-f` test on an arm name passes for nothing, which is how this line would have vanished with no red anywhere.
-if [[ -n "$DRIFT_ARM" && -f "$RUN_GATES" ]]; then
-    drift_line="$(bash "$RUN_GATES" --emit "$DRIFT_ARM" --trend 2>/dev/null)" || true
+# spec: context-kit/SPEC.md §The session-context hook — the knob names an arm of the gate binary, not a script path; a `-f` test on an arm name passes for nothing, which is how this line would have vanished with no red anywhere.
+if [[ -n "$DRIFT_ARM" && -x "$NATIVE_BIN" ]]; then
+    drift_line="$("$NATIVE_BIN" --emit "$DRIFT_ARM" --trend 2>/dev/null)" || true
     if [[ -n "$drift_line" ]]; then
-        echo "$drift_line  (full: bash $RUN_GATES --emit $DRIFT_ARM)"
+        echo "$drift_line  (full: $NATIVE_BIN --emit $DRIFT_ARM)"
         echo
     fi
 fi
 
-# spec: delegation-kit/SPEC.md §usage-verdict — the verdict is an arm now, so the brief dispatches
-# it through the front-end rather than testing for a path the port deleted
-if [[ -f "$RUN_GATES" ]]; then
-    budget_line="$(bash "$RUN_GATES" --usage-verdict 2>/dev/null)" || true
+# spec: delegation-kit/SPEC.md §usage-verdict — the verdict is an arm, so the brief dispatches
+# it to the binary rather than testing for a path the port deleted
+if [[ -x "$NATIVE_BIN" ]]; then
+    budget_line="$("$NATIVE_BIN" --usage-verdict 2>/dev/null)" || true
     if [[ -n "$budget_line" ]]; then
         echo "Budget (enforced per-dispatch by the Agent budget guard): $budget_line"
         echo
@@ -118,9 +120,9 @@ fi
 cat <<EOF
 Before opening source for a task, run the matching surface index first
 (index, then read the one you need):
-  • bash $RUN_GATES --emit pub-index <component>/src/    — public API surface (ships rust, ts)
-  • bash $RUN_GATES --emit md-index <file.md>            — large markdown / SPEC outline
-  • bash $RUN_GATES --emit md-section <file.md> "<head>" — extract one section by heading
+  • $NATIVE_BIN --emit pub-index <component>/src/    — public API surface (ships rust, ts)
+  • $NATIVE_BIN --emit md-index <file.md>            — large markdown / SPEC outline
+  • $NATIVE_BIN --emit md-section <file.md> "<head>" — extract one section by heading
 EOF
 
 # spec: context-kit/SPEC.md §The session-context hook — step 8 suppressed for a lead (executor-facing)
@@ -136,7 +138,7 @@ fi
 ENV_PROFILE_FILE="${CONTEXT_KIT_ENV_PROFILE_FILE:-ENV.local.md}"   # context-kit env-probe profile
 if [[ -f "$ENV_PROFILE_FILE" ]]; then
     # spec: context-kit/SPEC.md §The session-context hook — step 9 per-session auto-refresh: re-probe before emitting, inside the file-present guard (never auto-seeds), output suppressed so it never pollutes the brief
-    [[ -f "$RUN_GATES" ]] && bash "$RUN_GATES" --emit env-probe >/dev/null 2>&1 || true
+    [[ -x "$NATIVE_BIN" ]] && "$NATIVE_BIN" --emit env-probe >/dev/null 2>&1 || true
     echo
     echo "Local env profile ($ENV_PROFILE_FILE) — adapt commands to this box:"
     cat "$ENV_PROFILE_FILE" 2>/dev/null || true

@@ -6,14 +6,17 @@ set -uo pipefail
 trend=0
 [[ "${1:-}" == "--trend" ]] && trend=1
 
-front=""
+# spec: drift-kit/SPEC.md §Out of scope — the handoff's `gate-sdk` member locates the LIBRARY, and the library spells the door: gate_native_bin_spelled resolves GATE_SDK_NATIVE_BIN's own precedence, so this plugin carries no second copy of that order and no path of its own to the binary
+door=""
 while IFS= read -r root; do
-    [[ "${root##*/}" == gate-sdk && -f "$root/bin/run-gates.sh" ]] && front="$root/bin/run-gates.sh"
+    # shellcheck source=/dev/null
+    [[ "${root##*/}" == gate-sdk && -f "$root/lib/gate.sh" ]] && source "$root/lib/gate.sh"
 done <<< "${DRIFT_KIT_KIT_ROOTS:-}"
+declare -F gate_native_bin_spelled >/dev/null && door="$(gate_native_bin_spelled)"
 
 markers=()
 surface=()
-if [[ -z "$front" ]] || ! values="$(bash "$front" --emit knob-values CANON_KIT_DEPRECATION_MARKERS CANON_KIT_COMMENT_SURFACE 2>/dev/null)"; then
+if [[ ! -x "$door" ]] || ! values="$("$door" --emit knob-values CANON_KIT_DEPRECATION_MARKERS CANON_KIT_COMMENT_SURFACE 2>/dev/null)"; then
     [[ "$trend" -eq 1 ]] || printf 'lead\tdeprecated surface\tn/a (knob read failed)\n'
     exit 0
 fi

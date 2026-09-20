@@ -1831,14 +1831,17 @@ by number ("rule 14's walk").
     executes; arm **(b)**, the interpreter is a
     `GUARD_KIT_SCRIPT_INTERPRETERS` member, states the bash-only rule
     (§scratch-run) and names the same runner. Declares `sq dq hd`. The steer's
-    printed command is **derived**, not hardcoded: `lib/guard.sh` composes the
-    front end's path from the vendor root its own location already names, so a
-    relocated tree prints a path that resolves. That is a cross-kit path
-    coupling — a guard-kit library naming a gate-sdk
-    sibling — and it is admissible on a ground already in the tree: guard-kit
-    already depends on gate-sdk for `GATE_SDK_TMP_DIR`, the scratch dir the whole
-    rule is written about, and `lib/guard.sh` is `# no-port:` permanently, so the
-    coupling has one holder and no parity obligation.
+    printed command is **derived**, not hardcoded: `lib/guard.sh` resolves
+    `_guard_door` once at load through gate-sdk's `gate_native_bin_spelled`
+    (gate-sdk/SPEC.md §lib/gate.sh), so a steer names the binary
+    `GATE_SDK_NATIVE_BIN` resolves and a consumer whose binary sits anywhere is
+    told a command that runs. That is a cross-kit coupling — a guard-kit library
+    reading a gate-sdk accessor — and it is admissible on a ground already in
+    the tree: guard-kit already sources `lib/gate.sh` for the knob read every
+    rule depends on, and `lib/guard.sh` is `# no-port:` permanently, so the
+    coupling has one holder and no parity obligation. Resolving it at load
+    rather than per message also means the steers cannot disagree with each
+    other within one call.
     **The predicate is body visibility, and the discriminator is the same one
     that bought the runner its grant.** §scratch-run's whole argument is that a
     scratch path is rewritable by any session, so the body the operator approved

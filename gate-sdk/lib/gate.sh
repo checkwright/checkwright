@@ -80,6 +80,16 @@ gate_native_bin() {
     _gate_prebinary_knob GATE_SDK_NATIVE_BIN "native/target/release/checkwright-gates$(gate_exe_suffix)"
 }
 
+# spec: gate-sdk/SPEC.md §lib/gate.sh — GATE_SDK_NATIVE_BIN's value as a COMMAND TOKEN rather than as a path: a relative value takes the `./` prefix, because a token carrying no `.` or `/` anchor is a PATH lookup to sh and no command at all to PowerShell. An already-anchored value — rooted, drive-rooted, or already `./` or `../` — is returned unchanged, so the prefix is applied once and never twice
+gate_native_bin_spelled() {
+    local b
+    b="$(gate_native_bin)"
+    case "$b" in
+        /* | ./* | ../* | [A-Za-z]:/* | [A-Za-z]:\\*) printf '%s\n' "$b" ;;
+        *) printf './%s\n' "$b" ;;
+    esac
+}
+
 # spec: gate-sdk/SPEC.md §Layout and configuration — GATE_SDK_NATIVE_CRATE, its trailing `/` stripped where it resolves
 gate_native_crate() {
     local c

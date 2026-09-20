@@ -2081,8 +2081,10 @@ its `kpis.list` rather than a bundled member: the marker spelling
 is a consumer literal, and the kit stays deprecation-neutral. Registered, it
 trends the live-marker backlog between majors so it surfaces gradually instead
 of at one release. It reads `CANON_KIT_DEPRECATION_MARKERS` and
-`CANON_KIT_COMMENT_SURFACE` through `run-gates.sh --emit knob-values`, finding the
-front-end under the `gate-sdk` member of the `DRIFT_KIT_KIT_ROOTS` handoff; a
+`CANON_KIT_COMMENT_SURFACE` through the gate binary's `--emit knob-values` arm,
+sourcing `lib/gate.sh` from the `gate-sdk` member of the `DRIFT_KIT_KIT_ROOTS`
+handoff and spelling the door with `gate_native_bin_spelled` (gate-sdk/SPEC.md
+§lib/gate.sh) rather than building a path to it; a
 failed read prints an `n/a (knob read failed)` row, and it degrades to `n/a` when
 the roster is unset (the bundled plugins' fail-visible discipline — a plugin never
 blocks). The release-boundary disposition walk over
