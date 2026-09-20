@@ -16,6 +16,46 @@
 
 ## Deferred
 
+- **check-kit-roots-dialect-leaks-a-scratch-tree-per-run** [cost: once/low] [surface: gate-sdk]
+  — `check-kit-roots-dialect`'s `scratch()` (`native/src/gates/kit_roots_dialect.rs`) creates a
+  per-pid base under `GATE_SDK_TMP_DIR` and never removes it. The one `remove_dir_all` there runs
+  BEFORE the create, so it clears a same-pid collision only; the pid differs per run, so every
+  invocation leaves a tree behind. 47 had accumulated by the filing close, each holding two vendored
+  layouts with their own git repos — measured by `ls`, and re-verified at this scope by reading the
+  function: no `Drop` impl and no post-use removal anywhere in the file.
+  **Its own sibling under the same knob does it right,** which is the fix's shape: the upgrade-smoke
+  arm's `Scratch` struct (`native/src/emit/upgrade_smoke.rs`) carries an `impl Drop` reaping its
+  worktrees and trees in the shell trap's order. This gate has neither half.
+  **Why a gap and not a red:** `.tmp/` is gitignored disposable scratch with a named reclaim trigger
+  (the scope boundary wipes it, CLAUDE.md §Housekeeping), so the write-path has a paired
+  reclaim-path. What is wrong is the RATE — one tree per battery run against one wipe per iteration.
+  **Adjacent and distinct:** `upgrade-smoke-producer-leaks-worktrees-on-signal` is a SIGNALLED
+  producer leaking git worktrees; this is a clean exit leaving its own scratch base, so this is the
+  strictly weaker case and its ordinary-exit discipline is the cheaper of the two rulings.
+  **Cost while deferred:** every battery run in every session leaves residue only the iteration
+  boundary reclaims, and the gate the last iteration shipped for path-dialect defects is the leaker.
+  Filed 2026-09-20 to the gap inbox at `door-binding-sweep`'s close by its runtime-artifact
+  lifecycle check, after the drain had run; promoted at this scope's intake. Owner lookup:
+  `scratch`, `GATE_SDK_TMP_DIR`, `kit_roots_dialect`, `Drop` — none.
+
+- **sibling-stage-sessions-collide-on-a-shared-scratch-commit-message-file** [cost: event/low] [surface: delegation-kit]
+  — `.tmp/` survives across the sibling batch sessions one stage dispatches, so the conventional
+  `.tmp/commit-msg.txt` name is shared state between them.
+  **Measured, and it landed a wrong commit:** at `door-binding-sweep`'s build, batch 2 ran
+  `git commit -F .tmp/commit-msg.txt`, picked up batch 1's leftover file, and landed batch 1's
+  entire message on its own commit at exit 0. It was caught by reading the commit back, not by any
+  oracle. Every later batch was warned per dispatch, which is prompt-side and dies with the lead.
+  **Candidates, and the seam one of them crosses.** Naming the message file per session the way the
+  resume journal's path is derived would put that naming in delegation-kit — but that kit states the
+  journal contract and NO path convention, the path being the stage machine's derivation
+  (delegation-kit/SPEC.md §Resume journal, lifecycle-kit/SPEC.md §The state machine). So either the
+  derivation belongs beside the journal path in lifecycle-kit, or the remedy is a doctrine line
+  obliging a session to read back what it committed. Which of the two is the design question.
+  **Cost while deferred:** a wrong commit message can land at exit 0 whenever a stage dispatches
+  more than one batch, and the only thing between is a per-dispatch warning no surface holds.
+  Filed 2026-09-20 to the gap inbox by the lead at `door-binding-sweep`'s close; promoted at this
+  scope's intake. Owner lookup: `commit-msg`, `commit message file`, `journal path` — none.
+
 - **readme-front-door-is-adopter-facing-and-outside-every-sweep** [cost: once/low] [surface: README.md]
   — `README.md` carries 19 `bash gate-sdk/bin/run-gates.sh` sites, and
   line 25 is the landing page's headline try-it command, first screen. That makes it
@@ -855,6 +895,23 @@
   **Cost while deferred:** a Windows adopter's gate verdict, which is a cost already paid once —
   `check-install-disposition` read its whole corpus as unregistered on round 5 because a composed
   separator escaped into a compared value, and a Linux battery cannot show it.
+  **SECOND INSTANCE, 2026-09-20, and this one shipped to the remote.** The `door-binding-sweep`
+  close's watched push failed both Windows install-smoke legs: `native/src/toolfloor.rs` synthesized
+  `<anchor>/` and prefix-tested it against a backslash-spelled absolute root, so every kit root read
+  as outside the walk and `init` exited 2 — clause two's predicate exactly. Hotfixed minimal at
+  `88c7e9b4` under the impacting-failure carve-out and verified green on the next watched run; the
+  GATE half is this entry, which is what enforcement-first still owes.
+  **Corpus MEASURED at this scope, not estimated:** `git grep -n 'starts_with(&format!("{}/"' --
+  native/src` returns exactly 12 sites — that command is the roster, so no copy of it lands here.
+  **The sharpened predicate question, this entry's remaining design work.** A
+  host-absolute-versus-git-relative discriminator and clause two's own "escape into a reported or
+  compared value" are NOT the same test, and they disagree on `spec.rs`:109 and :120: both operands
+  are host-absolute yet already crossed once through `walk::cwd()` and never re-normalized, so the
+  first flags them while the second reads a speller-locality question that is benign today.
+  `emit/scratch_run.rs`:38 is clean under both and self-attested at the site. Judge the corpus
+  before shipping the assertion — a gate crying wolf on the git-relative majority is what
+  gate-sdk/SPEC.md §When a gate earns its place bars.
+  recurrence: path-dialect-clauses-unenforced 2026-09-20
   Filed 2026-08-31 by close, draining two 2026-08-30 gap bullets. Fix was tried first and refused
   (the assertion the second bullet proposes reds a benign population); icebox second, refused
   because a gate's verdict on an adopter's host is adopter-facing.
@@ -1068,16 +1125,15 @@
   Govern a tree whose specs an **external spec-authoring toolkit produced** — a
   consumer profile for when the specs Checkwright gates were written by a second
   toolkit's workflow, not by this one's `spec` stage. It cashes the claim below.
-  **The design is already decided and is not what this entry holds.** Two
-  rulings on record settle it: `prose-profile` (retired) ruled that a profile ships
-  as an adapter delivered as optional consumer config and never as a kit literal, and
-  `heterogeneous-agent-delegation` rules that a kit literal naming a vendor
-  crosses the provenance seam outright. So the shape is a consumer-side profile
-  over a declared artifact layout — the `check-graph` / `graph-vocab` pattern —
-  and any per-toolkit specifics stay in consumer config. What is open is the
-  *substance* — which lifecycle assumptions break when the amendment set is authored
-  elsewhere, and whether a tested two-toolkit consumer is buildable without a kit
-  ever naming one.
+  **The design is already decided and is not what this entry holds.** Two rulings on
+  record settle it: `prose-profile` (retired) ruled a profile ships as an adapter
+  delivered as optional consumer config and never as a kit literal, and
+  `heterogeneous-agent-delegation` rules a kit literal naming a vendor crosses the
+  provenance seam outright. So the shape is a consumer-side profile over a declared
+  artifact layout — the `check-graph` / `graph-vocab` pattern — with per-toolkit
+  specifics in consumer config. What is open is the *substance*: which lifecycle
+  assumptions break when the amendment set is authored elsewhere, and whether a tested
+  two-toolkit consumer is buildable without a kit ever naming one.
   **Survey run 2026-08-02 at scope — three corrections, so a spec pass starts here.**
   (1) *Cheaper than filed:* the load-bearing knobs already exist as consumer config
   (`CANON_KIT_SPEC_NAME`, `_AMENDMENT_GLOB`, `_QUEUE_FILE`, `_DOD_MODE`;
@@ -1095,12 +1151,13 @@
   compatibility claim says "This is tested, not asserted" and cites context-kit's
   `--agents-md-smoke` arm. That is the shape the three claims below owe.
   **Seam re-verified clean:** no tracked file names an external spec toolkit.
-  **Intake provenance:** never declined or costed — the opportunities half of the
-  same operator-commissioned external review whose *weaknesses* half was filed
-  2026-07-23 as six launch-facing rungs, all since landed. That intake's filter was
-  the review's "top pre-announcement gaps", so the growth half fell consciously
-  outside a stated filter rather than being missed; the gap here is the absent
-  intake record, not that session's judgment.
+  **Intake provenance:** never declined or costed — the opportunities half of the same
+  operator-commissioned review whose *weaknesses* half filed six launch-facing rungs
+  2026-07-23, all since landed; the growth half fell outside that intake's stated "top
+  pre-announcement gaps" filter rather than being missed, so the gap is the absent record.
+  **Enhancement admission filter, engaged 2026-09-20 at scope:** strongest ground is the
+  reputational carry below, and it reaches no arm — the trust arm means a gap in what an
+  adopter must trust, not a claim weaker than its proof; discharge it by qualifying the claim.
   **Cost while deferred — not zero, and this is the entry's sharpest fact.**
   `README.md`:16-17 and `docs/index.md`:17-18 both already assert, on the first
   screen, "It complements the workflow you already run. Keep your spec process, your
@@ -1213,6 +1270,14 @@
   **Cost while deferred:** each further port hardens substrate-specific assumptions
   by habit rather than by ruling, and the cheapest moment to keep the seam neutral is
   before the second language exists — not after.
+  **Enhancement admission filter, engaged 2026-09-20 at scope:** its strongest ground is
+  the cost-while-deferred line above — each further port hardening substrate assumptions
+  by habit — and that is an internal design cost, none of the three arms: it neither cuts
+  time-to-first-value, closes a trust or supply-chain gap, nor produces external proof.
+  Only an operator exception admits it. **Unlike `heterogeneous-agent-delegation`, one
+  citer does block on it:** `gate-tamper-exemption-reader-substrate` is design-pending
+  precisely on the ruling this entry holds, so declining this entry holds that one too —
+  a cost the decline carries knowingly, not a reason to admit it.
   Filed 2026-08-02 by build, on an operator ruling, during `native-gate-dispatch-seam`.
 
 - **gate-tamper-exemption-reader-substrate** [cost: event/low] [surface: gate-sdk] — `check-gate-tamper`'s
