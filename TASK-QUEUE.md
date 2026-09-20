@@ -45,14 +45,24 @@
   handing every adopter `bash gate-sdk/bin/run-gates.sh --emit env-probe` while its own bullet
   declared bash conditional — found and repaired under `bash-audience-hand-held` by operator ruling,
   one site at a time, because nothing enumerated them.
-  **Corpus re-measured at the drain, and the filing bullet under-counted it.** The bullet named
-  `docs/ddd.md` and nine sites in `docs/site-architecture.md`; a fresh grep returns thirteen there,
-  plus `docs/index.md`'s `--run-demo` line, which the bullet missed altogether, plus the generated
-  banners in `docs/enforcement.md`, `docs/footprint.md`, `docs/value.md` and `docs/check-graph.html`
-  that come from their emitters rather than from the page.
-  **Why design-pending:** every live site is contributor-facing, which is why none is an adopter
-  under-declaration today, and nothing holds that distinction. Widening assertion A past the kit
-  roots therefore needs an adopter/contributor discriminator the gate does not have, and the
+  **Corpus re-measured TWICE, and both earlier counts were wrong the same way.** The filing bullet
+  named `docs/ddd.md` and nine `docs/site-architecture.md` sites; this close's first re-measurement
+  grepped only `docs/` and returned fifteen there plus `docs/index.md`. A grep over the whole tree
+  outside the kit roots returns **README.md with 19 sites**, which neither earlier probe reached,
+  beside site-architecture's 15 and the emitter-written banners in `docs/enforcement.md`,
+  `docs/check-graph.html`, `docs/footprint.md` and `docs/value.md`. Records are excluded:
+  `.workflow/`, the queue, `docs/posts/` and the fixture trees are history or test data.
+  **README.md is the finding that changes this entry's class.** Line 25 is the landing page's
+  headline try-it command, first screen, and it hands a prospective adopter `bash` — on a project
+  whose adopter-constraint claim is git as the only unconditional floor member. That is an
+  adopter-facing door, not a contributor-facing one, so the "all live sites are contributor-facing"
+  reading below holds for `docs/` and NOT for the landing page.
+  **Escalated rather than fixed at this close:** re-pointing README.md extends the door sweep's
+  envelope to a surface it excluded, and a fresh clone has no built binary, so which spelling that
+  line should carry is a question the sweep's own constraint bears on.
+  **Why design-pending:** the `docs/` sites are contributor-facing, so widening assertion A past the
+  kit roots needs an adopter/contributor discriminator the gate does not have — and nothing holds
+  that distinction, which is how README.md's line stayed invisible to every oracle. The
   emitter-written banners need their emitters changed rather than their pages.
   **Cost while deferred:** a future adopter-facing page reintroduces the repaired defect and nothing
   reds; the repair stays a hand sweep each time.
