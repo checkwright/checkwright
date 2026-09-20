@@ -16,6 +16,27 @@
 
 ## Deferred
 
+- **readme-front-door-is-adopter-facing-and-outside-every-sweep** [cost: once/low] [surface: README.md]
+  — `README.md` carries 19 `bash gate-sdk/bin/run-gates.sh` sites, and
+  line 25 is the landing page's headline try-it command, first screen. That makes it
+  **adopter-facing**, on a project whose adopter-constraint claim is git as the only
+  unconditional floor member.
+  **Measured at `door-binding-sweep`'s close by the staleness read, after two earlier
+  measurements of the same corpus missed it** — the filing bullet's, and that close's own
+  drain re-grep, which covered `docs/` only. `check-door-binding` cannot see the file: its
+  assertion A walks `walk::kit_roots()`, and no gate reaches the repo root.
+  **Why a unit rather than a sweep:** re-pointing the line extends the door sweep's envelope
+  onto a surface that unit excluded, and a fresh clone carries no built binary, so which
+  spelling the line should carry interacts with the fail-open front-end constraint the sweep
+  itself ruled on. Routed here by the lead at that close as the scope-gated-intake default —
+  a routing call rather than a judgment on the merits, revisable by a later session.
+  **Cost while deferred:** the landing page's first command hands every visitor `bash`, while
+  the entry owning the class reads every live site as contributor-facing.
+  Filed 2026-09-20 at `door-binding-sweep`'s close on the staleness read; the corpus
+  correction itself landed inline in that iteration. Owner lookup: `README.md`, `--run-demo`,
+  `door`, `front end` — none. `door-binding-sweep-stops-at-the-kit-roots` is **adjacent and
+  distinct**: it owns the gate's reach, this owns one adopter-facing site's spelling.
+
 - **fail-open-front-end-residency-after-the-door-sweep** [cost: event/high] [surface: gate-sdk]
   — `SPEC-door-binding.md` delta 5 held `gate-sdk/bin/run-gates.sh` and its PowerShell twin back
   from the sweep on a stated constraint, and the constraint holds: gate-sdk/SPEC.md rules each
