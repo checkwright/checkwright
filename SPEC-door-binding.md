@@ -27,10 +27,16 @@ probe (`git grep -n run-gates.sh`, 39 kit-shipped files) separates exactly three
    `_guard_front_end` (`:581`), `context-kit/templates/session-context.sh:11`,
    `drift-kit/templates/kpi-deprecated-surface.sh:11` (which already resolves the
    front-end by walking kit roots, the nearest existing door search).
-2. **Harness-wired JSON**, which can resolve nothing — `guard-kit/templates/settings-hooks.json:14,20`,
-   `settings-allow.json:5,6`, and the `statusLine`/hook wiring
-   `delegation-kit/README.md:51,53,62,69` tells an adopter to write. A harness
-   spawns a literal argv; no knob is read on the way.
+2. **Harness-wired JSON**, which can resolve nothing — `settings-allow.json:5,6`
+   and the `statusLine` wiring `delegation-kit/README.md:51,53` tells an adopter
+   to write. A harness spawns or matches a literal argv; no knob is read on the
+   way, and **no arm writes these files** — the adopter merges them by hand, by a
+   published contract (delta 2, C2).
+   `guard-kit/templates/settings-hooks.json:14,20` and
+   `delegation-kit/README.md:62,69` look like this class but are **not**: their
+   commands are `--hook` arms, which delta 5's fail-open limit keeps on the front
+   end. The distinction is the amendment's own, and the first authoring of delta
+   2 missed it (§Rulings).
 3. **Prose a session or a reader types** — all eleven kit READMEs, the six stage
    templates, `lead.md`, `agent-execution.md`, `economics.md`, `close-brevity.md`,
    `close-triage.md`, and seven `templates/<kit>-config.knobs` headers.
@@ -52,7 +58,7 @@ the consequence that section does not yet draw, and the residue is filed below.
 
 It is a root-level amendment because it spans five kits' templates
 (context, delegation, drift, guard, lifecycle), eleven kit READMEs, gate-sdk's
-`lib/` and `bin/`, `native/` (the install-time substitution) and `installer/`.
+`lib/` and `bin/`, `native/` (the new gate) and `installer/`.
 
 **The tree does not already do this.** `git grep -n "bash gate-sdk/bin/run-gates.sh"`
 returns hits in all eleven kit READMEs, seven knob headers, six stage templates
@@ -64,9 +70,8 @@ is the one file already converted.
 **Batching.**
 
 - Delta 1 lands alone: it adds the shell accessor every later delta spells.
-- Deltas 2 and 3 land together — class 2's substitution and the gate that holds
-  it, because the emitted settings and the assertion about them have to agree in
-  one commit.
+- Deltas 2 and 3 land together — the allowlist's two grants and the gate that
+  holds the seam they must not cross have to agree in one commit.
 - Deltas 4 and 5 land together: the prose sweep and the limit it stops at.
 - Delta 6 rides with 4 and 5, because it is what proves them.
 
@@ -111,28 +116,47 @@ The three shipped shell surfaces of class 1 call it:
 can source; a per-caller resolution would be the fourth copy of a precedence
 order gate-sdk/SPEC.md §lib/gate.sh owns.
 
-### (2) The harness-wired templates carry a substitution marker, resolved at install {design-bearing}
+### (2) The allowlist grants both doors; the hook wiring keeps the front end {design-bearing}
 
-**Not yet applied.** A harness reads a JSON `command` string and spawns it; no
-knob resolves on that path. So the template ships a marker and the install arm
-resolves it, the way the generated hooks already bake their per-gate argv at
-generation time rather than at run time (gate-sdk/SPEC.md §gen-pre-commit).
+**Not yet applied. This delta was authored on a false premise and is rewritten
+here rather than carried; §Rulings records what changed and why.**
 
-`guard-kit/templates/settings-hooks.json` and `settings-allow.json` spell the
-door as `@GATE_SDK_NATIVE_BIN@`. The arms that write a consumer's settings —
-`--install-hooks` and `init` — substitute the resolved, spelled value as they
-copy. A template read by a human still names the knob rather than a path, so the
-provenance seam holds: no kit file carries an install location.
+**Constraint, not mechanism — build holds the tree and chooses the spelling.**
 
-**The allowlist entries are the reason this is not a knob read.** `settings-allow.json:5,6`
-are `"Bash(bash gate-sdk/bin/run-gates.sh)"` and its `*` twin — a permission
-*pattern* the harness matches a literal command against. A pattern naming a knob
-would match nothing. So substitution is forced here, not preferred.
+- **C1. `settings-hooks.json` is out of this delta's reach entirely.** Both its
+  door-naming `command` values (`:14`, `:20`) are `--hook` arms — `--hook
+  wakeup-guard` and `--hook workflow-state-guard`. `--hook` *is* the fail-open
+  set, so delta 5 already rules they keep naming the front end. The original
+  delta 2 would have substituted them, contradicting delta 5 inside one
+  amendment. They are not touched.
+- **C2. No arm writes an adopter's settings, and none is to be built.** The
+  adopter is the merging agent by a *published* contract, not merely by a missing
+  feature: `.workflow/release-declarations.md:234` declares of `settings-allow.json`
+  **"Nothing merges it for you: review the entries and union the ones you accept
+  into `.claude/settings.json`'s `permissions.allow`"**, and both templates' `"//"`
+  headers instruct the same hand merge. Any text asserting an install arm
+  substitutes is false of the tree and of the shipped declaration.
+- **C3. After the sweep, two different programs get spawned, and both must be
+  granted.** The fail-open hook wiring still spawns the front end (C1), and
+  sessions now type the binary (delta 4). The template must cover **both**;
+  dropping the front-end grant leaves delta 5's own hook wiring ungranted, and
+  omitting a binary grant leaves every swept surface ungranted. This is a
+  coverage constraint, and it is the one the original delta got wrong by treating
+  the two grants as one thing to replace.
+- **C4. The binary grant carries no install path.** `GATE_SDK_NATIVE_BIN` is
+  per-consumer, and a kit file naming an install location crosses the provenance
+  seam. The template names the knob, or a placeholder the adopter replaces — the
+  kit ships no adopter-specific literal either way.
+- **C5. The binary grant fails closed.** A grant the adopter has not resolved
+  must match *nothing*, so the adopter meets a permission prompt rather than a
+  silent grant, and it must not match more broadly than the front-end grant it
+  joins. An unresolved placeholder satisfies this; a widened glob does not.
 
-**`--hook` and `--statusline` keep naming the front end**, by delta 5's limit.
-Their `command` values are the fail-open set, and the marker does not reach them.
+Within those five, the spelling is build's. The `"//"` header is the surface that
+tells the adopter what to do with the grant, because it is already the surface
+that tells them to merge by hand.
 
-### (3) A gate holds the substitution, both directions {design-bearing}
+### (3) A gate holds the sweep and the seam {design-bearing}
 
 **Not yet applied.** `check-door-binding` (guard-kit, native substrate, with the
 `good/`+`bad/` fixture pair the four contracts require) asserts, over the tracked
@@ -144,14 +168,26 @@ tree:
   `gate-tests/` and `smoke/`; the exempted set is the arms
   `check-front-end-fail-open` already declares, read from that gate rather than
   re-listed.
-- **B.** Every `@GATE_SDK_NATIVE_BIN@` marker in a kit template is reached by an
-  install arm that substitutes it — the reverse direction, so a marker added to a
-  template no arm copies cannot sit unresolved in a consumer's settings.
+- **B is deleted, not weakened.** It asserted that every marker is reached by an
+  install arm that substitutes it. No such arm exists, none is to be built (delta
+  2, C2), so B could only ever have redded — on every marker it would ever see,
+  for a reason no build could fix. An assertion that cannot pass is not a strict
+  gate; it is a false one. **Replacing it:** no kit template names an install
+  path — the C4 seam, which *can* fail for a real reason (an author pasting their
+  own `scripts/checkwright-gates` into a template) and which no other gate covers.
 
-**Red condition, per reader.** A names a file and the line that violates it and
-exits 2; B names the unreached marker and exits 2. The clean line prints both
-counts, so a corpus that silently shrank to nothing is visible on green — the
-failure mode this iteration's sibling unit measured in `--emit enum-sets`.
+**Red condition, per reader.** A names the file and the violating line and exits
+2; the replacement for B names the template and the path literal and exits 2. The
+clean line prints both counts, so a corpus that silently shrank to nothing is
+visible on green — the failure mode this iteration's sibling unit measured in
+`--emit enum-sets`.
+
+**Assertion A's exempt set must cover the hook wiring.** A exempts the arms
+`check-front-end-fail-open` declares, read from that gate rather than re-listed;
+`settings-hooks.json`'s two `command` values are `--hook` arms, so they fall in
+that exemption by construction rather than by a second list. Build verifies that
+they do — if the exemption keys on the *arm* and not on the *file*, a `command`
+string containing `--hook` has to be recognised as such.
 
 **Why a gate and not the sweep alone.** Enforcement-first: the sweep without the
 gate is one commit of correct text and no reason it stays correct, and the
@@ -178,7 +214,7 @@ and no `bash` and no path literal:
   `guard-kit/templates/close-triage.md:6,27`.
 - **`gate-sdk/templates/gates-workflow.yml:19,44,49,54,60`** — a CI runner, which
   has a checkout and no install, so it resolves the knob's default through the
-  library rather than taking a substitution marker.
+  library rather than naming a per-consumer install path.
 
 This repo's own instantiations move with them, because it is a consumer of every
 one of these templates: `scripts/delegation-config.knobs:11`,
@@ -223,21 +259,29 @@ therefore answered rather than carried forward: they stay, on the ground
 §run-gates already states.
 
 `installer/SPEC.md` §The install boundary gains one sentence: the owner sentence
-quoted above now also governs what an install-time substitution writes into a
-consumer's settings, so the knob is the single owner for a *spawned* door as well
-as for the battery's dispatch.
+quoted above now also governs the door a kit's prose and shell name, so the knob
+is the single owner for a *spawned* door as well as for the battery's dispatch.
+It does not reach a consumer's settings, which no arm writes (delta 2, C2).
 
-### (6) The consumer smoke executes a substituted door {design-bearing}
+### (6) A smoke executes a swept door {design-bearing}
 
-**Not yet applied.** `installer/consumer-smoke/run-smoke.sh` gains an arm that,
-after `init` on a profile carrying guard-kit, reads the written settings, asserts
-no `@GATE_SDK_NATIVE_BIN@` marker survives in them, and **executes** the
-substituted hook `command` — proving the value the arm wrote is a path the host
-can actually spawn, which a string comparison does not prove.
+**Not yet applied. Re-aimed: the original arm's subject does not exist.** It read
+"the written settings" after `init`; `init` writes none (delta 2, C2), so there
+was nothing to read.
 
-**Point 5.** The arm reds on a surviving marker, on a `command` whose first token
-is not an executable file, and on a non-zero exit from the executed hook other
-than the hook's own declared decline status.
+**Constraint.** Something must *execute* a door this sweep re-points, on a host,
+rather than compare strings — a path that parses is not a path that spawns. The
+existing site for that is `guard-kit/smoke/install.sh`, which already merges both
+templates with `jq` and then exercises the installed guard against every grant in
+`settings-allow.json` (`:32-38`, `:71-74`). That smoke is the one place in the
+tree where a merged settings file exists and is run, so the coverage this delta
+owes belongs there and not in a consumer-smoke arm invented for it.
+
+**Point 5.** The arm reds when a door named by a swept surface is not an
+executable file on the host, and when a command the merged allowlist grants is
+nonetheless blocked by the installed guard — which is the assertion
+`guard-kit/smoke/install.sh:71` already makes and which this delta extends to
+the binary grant C3 adds.
 
 **Inferred, cannot run before build:** that the Windows install-smoke leg's harness settings accept a `./`-prefixed forward-slash path in a JSON `command` value — no Windows host is reachable from this stage; the `install-smoke-windows` leg exercises it once delta 2 lands.
 
@@ -250,12 +294,15 @@ than the hook's own declared decline status.
   which compares the two implementations by executing them. The enabling
   configuration is `GATE_SDK_NATIVE_BIN`, which `init` writes into every
   consumer's knob file today (`native/src/install.rs`) — deployed, not test-only.
-- **The `@GATE_SDK_NATIVE_BIN@` marker (delta 2).** Producer: the two guard-kit
-  settings templates. Consumers: `--install-hooks` and `init`, which substitute
-  it; `check-door-binding` assertion B, which holds the producer and the
-  consumers in lockstep; and the consumer smoke's arm (delta 6), which reads the
-  written result. No field is unread: the marker's only value is its own name,
-  and its reader is the substituting arm.
+- **The allowlist's binary grant (delta 2).** Producer:
+  `guard-kit/templates/settings-allow.json`, reviewed and merged **by the
+  adopter** — the one deployed configuration that puts it in force, and a
+  published contract rather than a gap (C2). Consumers: the harness's permission
+  matcher, at every Bash call a session makes; `check-door-binding`'s seam
+  assertion, which holds the template to naming no install path; and
+  `guard-kit/smoke/install.sh` (delta 6), which executes each granted form
+  against the installed guard. No field is unread, and the grant's failure mode
+  is a permission prompt rather than a silent allow (C5).
 - **`check-door-binding` (delta 3).** Producer: its `.gate` descriptor in
   guard-kit's `checks/`, registered in `gates.list`. Consumers: the battery, the
   generated pre-commit hook through the gate's `# graph:` manifest, and the
@@ -297,9 +344,10 @@ boundary and §init, and guard-kit/SPEC.md §The generic ruleset.
   `drift-kit/templates/kpi-deprecated-surface.sh` (delta 1).
 - `guard-kit/templates/settings-hooks.json`, `guard-kit/templates/settings-allow.json`,
   and guard-kit/SPEC.md §compare-settings-allow, whose allowlist grammar now
-  admits a substituted literal (delta 2).
-- `native/src/install.rs` and `native/src/installer/init.rs`: the substituting
-  copy, and installer/SPEC.md §The install boundary and §init (deltas 2 and 5).
+  admits the binary grant beside the front-end one (delta 2).
+- installer/SPEC.md §The install boundary and §init (delta 5). **`native/src/install.rs`
+  and `native/src/installer/init.rs` are NOT update targets** — the first authoring
+  named them for a substitution that does not exist (§Rulings).
 - `scripts/gates.list`, a new `guard-kit/checks/check-door-binding.gate`, its
   native module and its `good/`+`bad/` fixture pair; guard-kit/README.md's gate
   roster block (delta 3).
@@ -328,12 +376,45 @@ boundary and §init, and guard-kit/SPEC.md §The generic ruleset.
 - `installer/consumer-smoke/run-smoke.sh` and installer/SPEC.md §The consumer
   smoke (delta 6).
 - `.workflow/release-declarations.md` §Behavior changes, appended by the landing
-  session: one bullet that a kit's settings templates now carry a substitution
-  marker an install arm resolves (delta 2).
+  session: one bullet that `settings-allow.json` now recommends a grant for the
+  gate binary beside the front-end grant, and that both are still merged by hand
+  (delta 2).
 <!-- update-target-exempt: generated mirrors and projections, regenerated by their freshness gates' printed commands, never hand-edited -->
 - `docs/gate-sdk/SPEC.md`, `docs/guard-kit/SPEC.md`, `docs/installer/SPEC.md`,
   every `docs/<kit>/README.md`, `docs/enforcement.md`, `scripts/CHECK-GRAPH.html`,
   `scripts/git-hooks/pre-commit`.
+
+## Rulings
+
+**2026-09-20, spec as design oracle, on a build-batch-1 question.** Delta 2 as
+first authored asserted that `--install-hooks` and `init` substitute a marker as
+they write a consumer's settings. **That was false of the tree**, and build was
+right to stop rather than build against it. Verified here before ruling:
+`grep -rn "\.claude|settings\.json|settings-allow|settings-hooks"` over
+`native/src/installer/` and `native/src/install.rs` returns nothing, and
+`grep -c settings installer/SPEC.md` returns `0`.
+
+Two things the original delta missed, both now load-bearing:
+
+1. **The contract is published, not merely absent.**
+   `.workflow/release-declarations.md:234` states **"Nothing merges it for you"**
+   of `settings-allow.json`. So an install arm that wrote settings would not add a
+   missing feature — it would *reverse a shipped behaviour declaration*. That is
+   why the option of building one is refused here on its own merits and not only
+   on the scope boundary the lead imposed.
+2. **The contradiction was internal.** `settings-hooks.json`'s door-naming
+   commands are `--hook` arms, and delta 5 already rules the fail-open arms keep
+   the front end. Delta 2 would have substituted exactly what delta 5 preserves.
+   Two deltas of one amendment disagreed, and the class-2 definition in the
+   opening is what let them: it grouped a *permission pattern* with a *spawned
+   hook command* because both live in JSON, when what separates them is which arm
+   they name.
+
+The correction narrows delta 2 to `settings-allow.json` alone, deletes delta 3's
+assertion B as unpassable rather than weakening it, and re-aims delta 6 at the
+smoke that actually merges these templates. No envelope widened: the unit still
+re-points adopter-facing doors and still ships a gate, and no surface gains a
+capability it did not have.
 
 ## Filed at this stage, not built here
 
@@ -369,8 +450,11 @@ On scope-gated intake, filed to the gap inbox with its cost rather than started:
 - [ ] **The sweep is gated, not just done** — `check-door-binding` is registered,
       carries its fixture pair, and reds on a reintroduced adopter-facing
       front-end spelling.
-- [ ] **No unresolved marker reaches a consumer** — the consumer smoke's arm
-      executes a substituted hook command on the `gates` job's Linux leg.
+- [ ] **Both doors are granted and both are executable** — `guard-kit/smoke/install.sh`
+      runs every form the merged allowlist grants against the installed guard, the
+      binary grant included, on the `gates` job's Linux leg.
+- [ ] **No kit template names an install path** — the seam assertion replacing
+      the deleted B is green, and reds on a pasted `scripts/checkwright-gates`.
 - [ ] **Removals propagated** — `check-amendment-retired-spelling` runs the block
       above against the tracked tree.
 - [ ] **Gaps filed** — the fail-open door's own retirement is filed at spec; any
