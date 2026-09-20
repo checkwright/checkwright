@@ -4,9 +4,10 @@
 consumer's own surfaces — which is how `README.md`'s headline try-it command
 stayed invisible to every oracle across three measurements. This amendment mints
 the adopter/contributor discriminator the widening needs and adds the assertion
-that reads it. Its sibling `gate-sdk/SPEC-front-end-residency.md` rules *which
-spelling* an adopter-facing door may carry; this one rules *which surfaces a gate
-reads as doors*.
+that reads it. gate-sdk/SPEC.md §The adopter constraints rules *which spelling*
+an adopter-facing door may carry — its two admitted caller classes, the
+pre-build door among them; this one rules *which surfaces a gate reads as
+doors*.
 
 ## What changes
 
@@ -114,8 +115,9 @@ One implementation, because a second copy of the door/file discriminator is the
 shape §check-door-binding refuses everywhere else: two spellings of one
 predicate would let A and C disagree about whether a line is a door. The
 fail-open arm exemption in particular is corpus-wide and keys on the arm alone —
-the sibling amendment's delta 2 records the measurement that refuses narrowing
-it to configuration files.
+gate-sdk/SPEC.md §The adopter constraints' harness-configuration caller class
+is what refuses narrowing it to configuration files, the publication of the
+recommended value riding the same class.
 
 ### (5) This repo's configuration and its declaration sweep
 
@@ -128,12 +130,21 @@ so a copy here would be stale on landing. Run
 `git grep -nE "(bash|sh|-File) +[^ ]*run-gates\.(sh|ps1)|run-gates\.(sh|ps1)('|\`)? +-" -- README.md docs`
 and subtract the fail-open arms; `git grep -l "^generated: true" -- docs` names
 the mirror set whose declaration the emitter writes. **Measured at authoring:**
-59 door-shaped sites on non-generated pages and 126 on the 25 mirrors. **Exactly
-two of the 59 are adopter-facing and are deliberately left red**, being the
-paired debt entry's deliverable: `README.md`:25 and `docs/index.md`:27. Every
-other site is contributor-facing on its face — a regeneration banner, a battery
-register, a worked example in an architecture page — and takes a declaration
-whose reason says which.
+59 door-shaped sites on non-generated pages and 126 on the 25 mirrors.
+
+**Re-derived at the merge, and the authoring classification was wrong.** The
+authoring claim was that exactly two of the 59 were adopter-facing and every
+other site contributor-facing on its face. The 59 in fact split three ways, and
+§Producers and consumers' point 6 carries each class with its satisfying value:
+**two** adopter-facing pre-build doors, repaired and closed by the paired debt
+entry; **forty** contributor-facing on their face — a regeneration banner, a
+battery register, a worked example in an architecture page, a dated release post
+— each taking a declaration whose reason says which; and **seventeen** on
+adopter-facing kit landing pages whose repair is escalated rather than decided
+in-session, which is why the two `GUARD_KIT_DOOR_ROOTS[]` entries above are
+**not** set until that class is ruled. The declaration sweep is complete over
+the forty and over the generated mirrors; this delta does not close until the
+seventeen do.
 
 ### (6) The fixture pair grows an executable statement per new arm
 
@@ -208,13 +219,39 @@ than cleared by inspection:
 **Point 6 — every member's satisfying value.** The corpus delta 5 obliges is
 enumerable at authoring time, and the probe in that delta is the enumeration.
 Each member's satisfying value is a `door-contributor:` declaration at the
-narrowest scope that covers it, **except two members with none**:
-`README.md`:25 and `docs/index.md`:27 are adopter-facing, so no declaration
-satisfies them and the assertion is **not narrowed past them** — they are meant
-to red until the paired debt entry lands the sibling amendment's delta 3. That is
-the one case where a member's satisfying value is a *repair* rather than a
-declaration, and naming it here is what stops a build batch from silencing them
-with a declaration to make the battery green.
+narrowest scope that covers it, **except the members no declaration can
+satisfy**, whose satisfying value is a *repair*. Naming them is what stops a
+build batch from silencing them with a declaration to make the battery green.
+
+- **Two are repaired and closed.** `README.md`:25 and `docs/index.md`:27 were
+  adopter-facing pre-build doors; the paired debt entry
+  `readme-front-door-is-adopter-facing-and-outside-every-sweep` discharged
+  gate-sdk/SPEC.md §The adopter constraints' site obligation on both, taking
+  **both** satisfying forms — the headline now hands the reader the install path
+  and names the arm on the binary `GATE_SDK_NATIVE_BIN` names, while the clone
+  path's build step and its floor are stated adjacently. So neither line is a
+  door any more and neither needs a declaration.
+- **Seventeen are unruled, and the build must not decide them by convenience.**
+  This amendment's authoring claimed *exactly two* of the 59 were adopter-facing
+  and every other site contributor-facing on its face. **Re-derived against the
+  tree at the merge, that classification is false for seventeen**: the eleven
+  `docs/<kit>/index.md` pages' `## Quick start` fences (16 sites) and
+  `docs/doctrine-kit/index.md`'s prose `## Install` step. Each of those pages
+  opens with `## Install` — *vendor the `<kit>/` directory into your repo* — so
+  the page is an adopter/evaluator surface, and each command's counterpart in
+  the same kit's own `README.md`, which assertion A does sweep, already carries
+  the swept spelling (`doctrine-kit/README.md`, `context-kit/README.md` and
+  `canon-kit/README.md` each say *run this arm on the gate binary
+  `GATE_SDK_NATIVE_BIN` names*). They are therefore stale site copies of
+  sections the door sweep repaired at their source, which is this iteration's
+  own named defect class rather than a contributor corpus. Their satisfying
+  value is a repair, and **which repair — re-point at the binary, or state the
+  pre-build precondition at the site — is a user-facing-semantics call on public
+  adopter pages that this amendment did not settle**, so it is escalated rather
+  than taken in-session. Until it is ruled, delta 5's two
+  `GUARD_KIT_DOOR_ROOTS[]` entries stay unset, which keeps assertion C inert and
+  the verdict green rather than manufacturing a green over seventeen false
+  declarations.
 
 ## Existing sections updated
 
@@ -260,7 +297,7 @@ with a declaration to make the battery green.
       causal-completeness check holds for each new state, event, interface and
       obligation; points 5 and 6 are discharged in §Producers and consumers
       above, 5 by naming each reader's red condition against delta 3's prune and
-      6 by enumeration including the two members with no satisfying declaration.
+      6 by enumeration including every member no declaration can satisfy.
 - [ ] **Instruction surfaces: instruction only** — no template, agent definition
       or shim is touched; the knob-file row carries its `# spec:` pointer and no
       grounds, the grounds living in the SPEC row delta 3 adds.
@@ -268,14 +305,21 @@ with a declaration to make the battery green.
       and arm-exemption paragraphs survive verbatim in substance; the invariant
       and corpus paragraphs are re-phrased, not appended to.
 - [ ] **Amendment deleted** — this file removed on merge; none remain for the
-      component (`ls guard-kit/SPEC-*.md`), and any surviving filename citation
-      of `gate-sdk/SPEC-front-end-residency.md` is repointed at the canonical
-      section it merged into, per canon-kit/SPEC.md §check-amendment-queue arm
-      (e).
+      component (`ls guard-kit/SPEC-*.md`). Its filename citations of the merged
+      sibling amendment are already repointed at gate-sdk/SPEC.md §The adopter
+      constraints, that sibling having merged and been deleted first, per
+      canon-kit/SPEC.md §check-amendment-queue arm (e).
 - [ ] **Removals propagated** — declared negative above, re-run by
       `check-amendment-retired-spelling`.
-- [ ] **Gaps filed** — cross-component gaps filed to the gap inbox. One is
-      already visible: `docs/posts/` carries a door-shaped line and is immutable
-      release history, so whether a post takes a declaration or the corpus
-      excludes the tree is a disposition the build costs and files rather than
-      decides by whichever is easier.
+- [ ] **Gaps filed** — cross-component gaps filed to the gap inbox. The
+      `docs/posts/` disposition is **ruled and costed at the merge**: the post
+      takes a declaration. docs/site-architecture.md §Page-authoring rules
+      already holds dated posts *immutable, temporal-exempt but still
+      link/command-resolved*, so immutability bars editorial revision and not
+      mechanical conformance, and an HTML comment renders to nothing, leaving
+      the published artifact unchanged. The refused alternative is costed:
+      excluding the tree forces `GUARD_KIT_DOOR_ROOTS` to enumerate `docs`
+      subpaths instead of the tree, which rebuilds the configured roster of
+      judged sites delta 2 refuses — a page added tomorrow reds nowhere — and
+      surrenders delta 3's derivation-first walk. Cost of the chosen path: one
+      invisible line in one immutable file, once.

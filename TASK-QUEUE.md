@@ -12,28 +12,6 @@
 
 ## New Features
 
-- **fail-open-front-end-residency-after-the-door-sweep** [spec: SPEC-front-end-residency.md]
-  — `gate-sdk/bin/run-gates.sh` and its PowerShell twin stay permanently resident for the
-  fail-open arms after every other adopter surface was re-pointed at the binary.
-  The amendment rules the residency **permanent** on three independent grounds and mints the
-  **pre-build door** class, which is what this iteration's other two door units take as their
-  input: `readme-front-door-is-adopter-facing-and-outside-every-sweep` and
-  `door-binding-sweep-stops-at-the-kit-roots`. This entry carries no precondition of its own —
-  it is the input, never the dependent. The design record, the refused candidates and their
-  grounds are the amendment's, not this entry's.
-  **Cost class event/high, whose home is this prose while the entry is active:** every adopter
-  keeps a bash surface, and a PowerShell one beside it, on a floor that otherwise reaches git plus
-  the binary — the standing exception to the claim in gate-sdk/SPEC.md §The adopter constraints,
-  which the amendment states where the constraint is rather than leaving it to a reader.
-  **Measured at this spec stage, and it changes the deliverable:** this repo's two headline try-it
-  doors, `README.md`:25 and `docs/index.md`:27, exit 2 in a fresh clone — no binary is tracked and
-  no build step precedes them — so the defect is an unstated precondition rather than the `bash`
-  word, and re-pointing either at the binary would name a path that does not exist.
-  Joins this iteration as its ruling unit, by operator direction (2026-09-20, lead-relayed) on the
-  adopter-floor door remainder; promoted at this spec stage, which authored its amendment.
-  Filed 2026-09-20 to the gap inbox at `binary-door-wide-sweep`'s spec while ruling that unit's
-  fifth delta, against its own claim that the twin and the fail-open set retire with the sweep.
-
 - **door-binding-sweep-stops-at-the-kit-roots** [spec: SPEC-door-reach.md]
   — `check-door-binding`'s assertion A sweeps kit-shipped surfaces only, so no gate reaches
   `docs/` or any repo-root surface. That is how docs/install.md §Requirements kept handing every
@@ -3010,5 +2988,6 @@
 
 - path-dialect-clauses-unenforced
 - readme-front-door-is-adopter-facing-and-outside-every-sweep
+- fail-open-front-end-residency-after-the-door-sweep
 
 ## Lessons Learned
