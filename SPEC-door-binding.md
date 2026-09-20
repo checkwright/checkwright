@@ -220,10 +220,28 @@ This repo's own instantiations move with them, because it is a consumer of every
 one of these templates: `scripts/delegation-config.knobs:11`,
 `scripts/context-config.knobs:17`, `scripts/evidence-config.knobs`' nine command
 values, `scripts/canon-config.knobs:78`, `scripts/lifecycle-config.knobs:14-22`'s
-nine preflight rows, and `.claude/settings.json`'s allowlist and hook values.
-`scripts/gate-sdk-config.knobs:16`'s `GATE_SDK_PORTABILITY_PATHS` **does not** —
-it names `gate-sdk/bin/run-gates.sh` as a file whose shell portability is
-checked, which is the file, not the door.
+nine preflight rows, `.claude/settings.json`'s allowlist and hook values, and
+**the binding shims under `LIFECYCLE_KIT_SKILLS_DIR`** — this repo's
+instantiation of the kit-shipped stage templates, which is why sweeping the
+settings file while exempting the shims would split one class on directory name
+alone. Their nine door sites: `align.md:5`, `build.md:5`, `close.md:7,58,71`,
+`scope.md:31`, `validate.md:10`, `consult.md:27` (a door in the unprefixed
+spelling), `agent-execution.md:12`.
+
+**The door/file discriminator is applied per site here, and one mention is left
+standing:** `agent-execution.md:19` reads *"`run-gates.sh` runs gates, not …"* —
+it names the program as its subject rather than invoking it, so it is the file,
+not the door, and it stays. Recorded so the next reader sees a judgment rather
+than a gap. `scripts/gate-sdk-config.knobs:16`'s `GATE_SDK_PORTABILITY_PATHS`
+**does not** move for the same reason — it names `gate-sdk/bin/run-gates.sh` as a
+file whose shell portability is checked.
+
+**The shims take delta 4's text-only posture, not a gate.**
+`check-door-binding` assertion A's corpus stays kit-shipped surfaces (delta 3);
+no consumer instantiation in this bullet is gated, and the shims join that
+posture rather than widening the corpus. Kit `SPEC.md` prose door spellings are
+**not settled** by this and are outside this unit — a fresh boundary question if
+one is reached.
 
 **This repo's own root `README.md` is the same class of surface as `CLAUDE.md`
 below, and the probe that found the latter missed the former.** It carries
@@ -362,8 +380,12 @@ boundary and §init, and guard-kit/SPEC.md §The generic ruleset.
   `gate-sdk/templates/gates-workflow.yml` (delta 4).
 - `scripts/delegation-config.knobs`, `scripts/context-config.knobs`,
   `scripts/evidence-config.knobs`, `scripts/canon-config.knobs`,
-  `scripts/lifecycle-config.knobs`, `.claude/settings.json` — this repo's own
-  instantiations of the templates above (delta 4).
+  `scripts/lifecycle-config.knobs`, `.claude/settings.json`, and the binding
+  shims under `LIFECYCLE_KIT_SKILLS_DIR` at their nine door sites — this repo's
+  own instantiations of the templates above (delta 4). Ruled in scope by the
+  iteration's intent oracle (2026-09-20, lead-relayed): the amendment's silence
+  was a path-scoped reach probe that never enumerated the directory, the same
+  miss already recorded for `CLAUDE.md` and root `README.md`.
 - `CLAUDE.md`: every `bash gate-sdk/bin/run-gates.sh --emit …` capture line
   (knowledge-friction, gap capture, recurrence stamping, survey capture) and the
   battery line under §This repo is governed by its own kits (delta 4). Named
