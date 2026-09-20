@@ -3723,6 +3723,20 @@ which no row can reach because the runner always supplies a binary: an unreachab
 binary advises, exits 0 and runs no rule, and a missing or malformed knob file
 blocks with the refusal's own text.
 
+`gate-tests/door-binding-corpus.test.sh` takes the lane on a fifth structural
+ground, and this one is the **fixture pair's** shape rather than the decision
+table's: a `good/`+`bad/` pair asserts exit 0 against exit 1, so neither half can
+spell an **exit 2**. §check-door-binding's assertion C has two — a configured
+`GUARD_KIT_DOOR_ROOTS` entry resolving to neither a tracked file nor a directory,
+and a configured surface the gate cannot read — and both are the fail-closed
+posture rather than a finding, so a pair that could express them would have to
+call a misconfiguration clean. The suite drives the gate through `gate_run` in a
+sandbox repository of its own, one tracked kit root so assertions A and B pass on
+a corpus rather than vacuously, and carries the **tracked-file control** beside
+the two refusals — without it a refusal proves only that the entry form was
+rejected, not that the entry was. The unreadable case is skipped, saying so,
+for a caller that can read a mode-`000` file.
+
 A gateless kit shapes gate-sdk's discovery rule: `gate_kit_roots` recognizes a
 sibling kit by its `checks/` *or* `smoke/` directory. Keying on `checks/`
 alone would leave this kit undiscovered — its `smoke/install.sh` would never
