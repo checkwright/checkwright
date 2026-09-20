@@ -2947,10 +2947,4 @@
 
 ## Done
 
-- objective-1-discharge-unruled
-- binary-door-wide-sweep
-- bash-audience-hand-held
-- vendored-kit-readme-spec-link-dangles
-- kit-roots-rel-filesystem-readers
-
 ## Lessons Learned
