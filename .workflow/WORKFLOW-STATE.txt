@@ -13,3 +13,4 @@ door-binding-sweep build a12227d4 2026-09-20 47840284
 door-binding-sweep build a428a91b 2026-09-20 54ae7f80
 door-binding-sweep validate a7ab5163 2026-09-20 3bc24317
 door-binding-sweep validate a4aaf49d 2026-09-20 417ad149
+door-binding-sweep close a0c3d161 2026-09-20 73261895
