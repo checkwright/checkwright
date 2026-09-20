@@ -51,6 +51,7 @@ leaves its section absent.
 | [gate-sdk](gate-sdk/index.md) | check-reads-couples | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-kit-enum | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-kit-registration | precommit |
+| [gate-sdk](gate-sdk/index.md) | check-kit-roots-dialect | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-readme-roster | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-packed-links | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-smoke-entry-guard | precommit |

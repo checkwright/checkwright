@@ -1,0 +1,5 @@
+# The same tree, named relative to this case dir, carrying a GATE_SDK_KIT_DIRS
+# override hand-listed for the flat layout. Nested, the three names resolve to
+# nothing, the kit-root-derived corpora empty, and the arms still exit 0 — the
+# silent class. The gate must REJECT, naming the arm and both counts.
+tree

@@ -1,0 +1,7 @@
+# The divergence this case exists to catch: a consumer hand-lists its kit roots
+# instead of letting them derive, and spells them for a flat layout. Vendored at
+# the root the three names resolve; vendored under a subdirectory they name
+# nothing, every kit-root-derived corpus empties, and the arms that read them
+# exit 0 with a smaller number in the line. Nothing in this repository's own
+# config does this — the fixture is the only place the shape exists.
+GATE_SDK_KIT_DIRS = gate-sdk alpha-kit beta-kit

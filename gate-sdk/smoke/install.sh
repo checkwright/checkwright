@@ -35,6 +35,7 @@ check-exec-bit
 check-hook-exec-bit
 check-identity
 check-kit-enum
+check-kit-roots-dialect
 check-path-dialect
 check-front-end-fail-open
 check-packed-links

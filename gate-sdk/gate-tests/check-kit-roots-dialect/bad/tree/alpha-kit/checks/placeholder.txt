@@ -1,0 +1,3 @@
+A checks/ directory is what makes a sibling select as a kit root, so this file
+exists only to give git something to track under it. The gate under test never
+reads it.

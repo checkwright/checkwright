@@ -61,6 +61,7 @@ pub mod identity;
 pub mod install_claim;
 pub mod install_disposition;
 pub mod kit_registration;
+pub mod kit_roots_dialect;
 pub mod knob_citation;
 pub mod knob_default_coupling;
 pub mod lesson_disposition;
@@ -964,6 +965,22 @@ pub const REGISTRY: &[GateEntry] = &[
         ],
         "gate-sdk",
         &[("git", "")],
+    ),
+    // spec: gate-sdk/SPEC.md §check-kit-roots-dialect — the cohort's executable form: it vendors a
+    // kit tree twice and re-runs the arms through the binary itself, so the roots it walks are the
+    // scratch vendorings rather than this tree and the recorder observes none of this repo's
+    (
+        "check-kit-roots-dialect",
+        kit_roots_dialect::run,
+        &[],
+        &[
+            "GATE_SDK_KIT_DIRS",
+            "GATE_SDK_GATES_DIR",
+            "GATE_SDK_TMP_DIR",
+            "GATE_SDK_NATIVE_BIN",
+        ],
+        "gate-sdk",
+        &[("git", ""), ("?", "GATE_SDK_NATIVE_BIN")],
     ),
     (
         "check-smoke-entry-guard",

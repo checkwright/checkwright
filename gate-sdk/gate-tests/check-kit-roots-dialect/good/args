@@ -1,0 +1,7 @@
+# The tree to vendor both ways, named relative to this case dir, which is the
+# gate's cwd. Kit roots derive from the gate-sdk root's parent, so this tree's
+# corpora are identical whichever layout it sits in — which is true only while
+# every path-consuming reader takes the working-directory spelling. Move one
+# back to walk::kit_roots_rel() and this case reds: that is what makes the
+# dialect rule enforced rather than merely written.
+tree

@@ -1,0 +1,3 @@
+# The fixture tree's gates directory. Empty of members on purpose: the gate
+# under test compares kit-root-derived corpora between two layouts of THIS tree
+# and dispatches none of them.

@@ -21,6 +21,7 @@ check-graph
 check-reads-couples
 check-kit-enum
 check-kit-registration
+check-kit-roots-dialect
 check-readme-roster
 check-packed-links
 check-smoke-entry-guard

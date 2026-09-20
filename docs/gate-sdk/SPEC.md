@@ -16344,6 +16344,71 @@ invariant onto another registry doc reaches it through `gate_command`'s argv
 rather than by executing a path, which is the only spelling that survives the
 move; this consumer's `check-docs-kit-parity` is the live instance.
 
+### check-kit-roots-dialect
+
+Invariant: one kit tree yields one kit-root-derived corpus whether it is vendored
+at the repository root or under a subdirectory. That is the executable form of
+§Layout and configuration's dialect rule, and it is a gate rather than a
+convention because the rule is **unobservable in every tree that does not nest**:
+`walk::kit_roots` and `walk::kit_roots_rel` are byte-identical while the gate-sdk
+root is a direct child of the toplevel, which is this repository and, before this
+member, every fixture in the battery. A reader joining a root onto a path while
+holding the kit-parent spelling therefore passes every test there is, and reaches
+an adopter who hand-vendored under a subdirectory as a corpus that **shrank to
+nothing and exited 0** — measured, before the readers were corrected: `--emit
+enum-sets` dropped every kit-derived set, `--emit fixture-suites` went to one row,
+and `check-kit-registration` and `check-knob-citation` each printed a clean line
+with a smaller number in it.
+
+The gate vendors a kit tree twice under `GATE_SDK_TMP_DIR` — once flat, once with
+the kits under a subdirectory and the gates directory left at the toplevel, which
+is the whole difference between the two layouts — makes each a git repository,
+since the compared arms read git, and re-runs the arms **through the binary that
+is running**, from inside each vendoring, with only `GATE_SDK_ROOT` handed down.
+Re-running the deployed derivation rather than re-implementing it is what makes
+the comparison evidence; handing down anything further is not neutral, because an
+environment value outranks a knob file and would overwrite the config the
+vendoring's own gates directory carries.
+
+Two assertions. (A) **The derivation sees the layout it stands in** — the nested
+run must not answer the flat spelling. The nesting is proven structurally before
+any arm runs (the vendoring step refuses unless the subdirectory holds the
+gate-sdk root), so a nested run answering flat names is a violation rather than a
+fixture that failed to nest, and it is the defect itself ahead of any corpus it
+goes on to shrink. Root basenames must also match across the layouts, since only
+the anchor may differ. (B) **One corpus per arm** — each compared arm emits the
+same number of rows in both layouts.
+
+**A count, not a diff, and only over arms whose corpus is a bare kit-root join.**
+The failure this closes is a corpus that silently shrank rather than one whose
+rows changed, and an arm's rows carry the layout inside them, so a diff would
+report a difference on every run. The roster is `--emit fixture-suites` and
+`--emit enum-sets`: each reads kit roots and nothing path-shaped out of consumer
+config, so a difference between the layouts can only be the dialect. An arm whose
+corpus rides a consumer glob is deliberately excluded — measured, a one-level
+`*/SPEC.md` glob over a two-level layout moves `check-knob-citation`'s count on
+its own, with no reader on the wrong spelling, and an arm like that would make the
+gate report config drift under this member's name. Both counts print on green as
+well as red, so a fixture that vendored nothing is visible rather than vacuous.
+
+Config, the standard kit shape: `GATE_SDK_TMP_DIR` is the scratch base (shared
+with §upgrade-smoke, so a consumer repoints both with one value),
+`GATE_SDK_GATES_DIR` names the directory that stays at the toplevel in both
+layouts, and `GATE_SDK_KIT_DIRS` is read only to be *withheld* from the children.
+The tree defaults to the fixture this kit ships, resolved off the `GATE_SDK_ROOT`
+locator so a consumer that vendored gate-sdk elsewhere still finds it; a
+positional overrides it, which is how the fixture pair names its two trees.
+Fail-closed: a missing tree, a vendoring that carries no gate-sdk root, a failed
+git step, an arm exiting non-zero, or a flat vendoring that enumerates no root at
+all are each exit 2 — never a false clean.
+
+**The `good/` case is the regression guard, and that is its whole point.** It
+passes only while every path-consuming reader takes the working-directory
+spelling; moving one back to `walk::kit_roots_rel` reds it, naming the arm and
+both counts. `bad/` carries a `GATE_SDK_KIT_DIRS` override hand-listed for the
+flat layout — the same defect reached through consumer config rather than through
+crate source, and the one shape this repository's own config cannot supply.
+
 ### check-readme-roster
 
 Invariant: every kit README's register-the-gates block holds name-set parity

@@ -133,6 +133,7 @@ check-reads-couples
 check-enforcement-fresh
 check-kit-enum
 check-kit-registration
+check-kit-roots-dialect
 check-readme-roster
 check-packed-links
 check-smoke-entry-guard

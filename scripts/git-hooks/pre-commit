@@ -122,6 +122,10 @@ if staged_matches 'README.md' 'gate-sdk/gate-tests/*' 'canon-kit/gate-tests/*' '
     run_gate check-kit-registration native/target/release/checkwright-gates check-kit-registration
 fi
 
+if staged_matches 'native/src/gates/kit_roots_dialect.rs' 'native/src/walk.rs' 'scripts/gate-sdk-config.knobs'; then
+    run_gate check-kit-roots-dialect native/target/release/checkwright-gates check-kit-roots-dialect
+fi
+
 if staged_matches 'gate-sdk/README.md' 'canon-kit/README.md' 'context-kit/README.md' 'delegation-kit/README.md' 'doctrine-kit/README.md' 'drift-kit/README.md' 'evidence-kit/README.md' 'guard-kit/README.md' 'lifecycle-kit/README.md' 'queue-kit/README.md' 'site-kit/README.md' 'gate-sdk/checks/*' 'canon-kit/checks/*' 'context-kit/checks/*' 'delegation-kit/checks/*' 'doctrine-kit/checks/*' 'drift-kit/checks/*' 'evidence-kit/checks/*' 'guard-kit/checks/*' 'lifecycle-kit/checks/*' 'queue-kit/checks/*' 'site-kit/checks/*' 'scripts/gate-sdk-config.knobs'; then
     run_gate check-readme-roster native/target/release/checkwright-gates check-readme-roster
 fi
