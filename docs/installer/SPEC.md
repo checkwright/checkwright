@@ -1752,6 +1752,19 @@ gate names (gate-sdk/SPEC.md §Consumer payload). The value is the publisher's,
 never a kit literal, so the packer reads it from the packing tree's own knob file
 and mints nothing.
 
+**The packer mutates packed content in exactly two places, and they are one
+roster rather than one documented and one discovered.** The stamp above edits
+`{asm}/package.json`; inside the kit loop, immediately after a kit's tracked set
+is extracted, the packer rewrites `{asm}/payload/{leaf}/README.md` so an own-SPEC
+link resolves to the published location rather than to the `SPEC.md` the payload
+withholds. Both read the same resolved base, which is why it is resolved once
+**above** the loop rather than beside the stamp below it. gate-sdk/SPEC.md
+§Consumer payload owns the rewrite's rule and its four bounds and
+gate-sdk/SPEC.md §check-packed-links owns the gate that reads its output; what is
+this section's is that the mutation set is two and closed. Neither reaches a
+tracked file: both operate on the assembly scratch, which the pack step tears
+down.
+
 **The footprint has three members, and it is derived rather than listed.** A
 scoped refusal is unstateable without one, and a wrong scoping under-refuses
 silently on a genuinely dirty path — the failure the refusal exists to prevent —
