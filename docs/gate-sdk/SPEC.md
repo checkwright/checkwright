@@ -348,17 +348,28 @@ root, then every sibling under the root's parent holding a `checks/` or a `smoke
 directory, in name order, with `GATE_SDK_KIT_DIRS` replacing the set when it is
 non-empty. `walk::kit_roots_abs` spells them absolute, `walk::kit_roots` relative to
 the working directory, and `walk::kit_roots_rel` relative to the root's parent. **Which
-spelling a reader takes follows from what it matches against.** A reader matching an
-expanded glob or a spelled root against a path read from the tree — a staged path, a
-`--for` operand, a `git ls-files` line, a directory resolved off disk — takes the
-working-directory spelling, which every door sets to the repository toplevel, so the
+spelling a reader takes follows from what it does with the root, and the two relative
+spellings are not interchangeable.** A root **joined onto a path that is opened, statted,
+walked, or handed to git as a pathspec** takes `walk::kit_roots`, the working-directory
+spelling, because every door sets the working directory to the repository toplevel; so
+does a reader matching an expanded glob or a spelled root against a path read from the
+tree — a staged path, a `--for` operand, a `git ls-files` line, a directory resolved off
+disk — which is why the
 generated hook, `--for`, `check-reads-couples`, `check-core-files`' `kit:` lines, the
 port-blockers and `check-gate-substrate-parity` check-dir resolutions and the graph
-artifact's labels all expand a `kit:` couple to the one repository path. A reader
-matching text that names kits from their common parent — `check-graph`'s vocabulary
-layer rules — keeps the kit-parent spelling. The two agree at the root layout `init`
+artifact's labels all expand a `kit:` couple to the one repository path. A root matched
+against **text that names kits from their common parent** — a `couples=` field, a
+markdown link target, a knob prefix, `check-graph`'s vocabulary
+layer rules — takes `walk::kit_roots_rel`. **The choice is per use, not per call site:**
+a site taking both dialects off one call binds each half separately rather than deriving
+one from the other, and a basename read off a root is no third dialect, since either
+spelling yields the same token. The two agree at the root layout `init`
 vendors, and part only under a subdirectory vendoring (`GATE_SDK_ROOT=tools/gate-sdk`
-spells `tools/canon-kit` against `canon-kit`); a crate unit test vendors under a
+spells `tools/canon-kit` against `canon-kit`), so **the wrong choice is unobservable
+here and in every fixture that does not nest, and must be made from the reader's kind
+rather than from a passing run** — a path reader left on the kit-parent spelling reads an
+empty corpus and exits clean rather than failing. `check-kit-roots-dialect` is the rule's
+executable form, over a fixture that nests the root; a crate unit test vendors under a
 subdirectory and holds the hook, `--for` and `check-reads-couples` to the repository
 spelling. `--emit kit-roots` prints the working-directory spelling (§The non-gate arm).
 The three are computed from one list, so they stay index-aligned by construction, and an
@@ -788,6 +799,15 @@ whose only use of its own root is to pass it there — so
 the site that matters for that root's audit is the helper, not the caller. An
 exposed site is not thereby broken: exposure says its value must have reached it
 through a crosser, and the two halves are judged separately.
+
+**A second axis, orthogonal to this one, judged by a predicate of the same shape.**
+This section rules which *substrate* dialect a root is spelled in. Which **anchor** a
+kit root is spelled against — `walk::kit_roots` against `walk::kit_roots_rel` — is a
+separate question a reader arriving here for "dialect" will be carrying, and it is
+settled the same way, by what the reader does with the root rather than by where the
+root came from. §Layout and configuration owns it. Naming it here so the two are not
+conflated: a value can be correct on this axis and wrong on that one, and the second
+failure is silent where this one is loud.
 
 **A `|| pwd` fallback confers nothing, and believing otherwise is the trap.** It
 fires only when `git` **fails**; on MSYS `git` **succeeds**, in the wrong dialect.
