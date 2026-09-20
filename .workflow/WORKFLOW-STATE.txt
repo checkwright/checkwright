@@ -7,3 +7,4 @@
 door-binding-sweep scope a5f5ed94 2026-09-19 fe0b0798
 door-binding-sweep spec a47f74fe 2026-09-20 43da333e
 door-binding-sweep align ab1ec40f 2026-09-20 0fc00bfa
+door-binding-sweep build a9b4239e 2026-09-20 18dff836
