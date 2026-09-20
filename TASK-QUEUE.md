@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: adopter-floor-door-remainder
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,92 @@
 ## New Features
 
 ## Technical Debt
+
+- **path-dialect-clauses-unenforced** — the two clauses gate-sdk/SPEC.md §The
+  path-dialect contract gained 2026-08-30 are held by review alone, and neither is shaped like the
+  form scan `check-path-dialect` already runs.
+  **Clause one: the cwd anchor has no oracle.** That section obliges a script to anchor its own
+  shell in the crossed spelling. `check-path-dialect`'s vocabulary is platform-native PRODUCERS
+  (`GIT_FLAGS`, `RUST_FORMS` in `native/src/gates/path_dialect.rs`) and carries no `pwd` form, by
+  the contract's own reasoning that a shell builtin produces no foreign value. The hole is that a
+  builtin PROPAGATES one: an absolute `cd` leaves `$PWD` in the argument's dialect, and a later
+  relative `cd … && pwd` concatenates onto it. That is how `gen-pre-commit.sh`'s prologue died on
+  the Windows leg. A gate must pair two facts a script exhibits — it derives a root from
+  `BASH_SOURCE` with a relative `cd`, and it composes two roots by string arithmetic — rather than
+  scan for one form.
+  **Clause two, whose filed premise is CORRECTED here rather than carried forward.** The claim was
+  that `walk.rs` is the crate's sole path SPELLER and nothing holds it there. Re-verified at this
+  drain: it is not. `.join(` appears widely outside `walk.rs`, and a real share of those compose
+  filesystem paths — `proc.rs`'s program probe and its capture files, `marker.rs`'s scratch dir. An
+  assertion on that spelling, in the shape of the sibling unit test that bars a walk outside
+  `walk.rs`, would therefore red a large and overwhelmingly benign population. What DOES hold is
+  narrower and is the property worth enforcing: `walk.rs` is the sole producer of the path STRINGS
+  a gate reports or matches on, and `DirEntry::path` outside it is genuinely absent. The predicate
+  is escape into a reported or compared value, not composition.
+  **Why one entry rather than two.** Both are the same landed contract's unenforced half, both were
+  filed the same day by the unit that landed it, and both need a pairing predicate rather than a
+  form scan. Splitting them files one shape twice.
+  **Cost class event/high, whose home is this prose while the entry is active:** a Windows
+  adopter's gate verdict, which is a cost already paid once — `check-install-disposition` read its
+  whole corpus as unregistered on round 5 because a composed separator escaped into a compared
+  value, and a Linux battery cannot show it.
+  **SECOND INSTANCE, 2026-09-20, and this one shipped to the remote.** The `door-binding-sweep`
+  close's watched push failed both Windows install-smoke legs: `native/src/toolfloor.rs` synthesized
+  `<anchor>/` and prefix-tested it against a backslash-spelled absolute root, so every kit root read
+  as outside the walk and `init` exited 2 — clause two's predicate exactly. Hotfixed minimal at
+  `88c7e9b4` under the impacting-failure carve-out and verified green on the next watched run; the
+  GATE half is this entry, which is what enforcement-first still owes.
+  **Corpus MEASURED at this scope, not estimated:** `git grep -n 'starts_with(&format!("{}/"' --
+  native/src` returns exactly 12 sites — that command is the roster, so no copy of it lands here.
+  **The sharpened predicate question, this entry's remaining design work.** A
+  host-absolute-versus-git-relative discriminator and clause two's own "escape into a reported or
+  compared value" are NOT the same test, and they disagree on `spec.rs`:109 and :120: both operands
+  are host-absolute yet already crossed once through `walk::cwd()` and never re-normalized, so the
+  first flags them while the second reads a speller-locality question that is benign today.
+  `emit/scratch_run.rs`:38 is clean under both and self-attested at the site. Judge the corpus
+  before shipping the assertion — a gate crying wolf on the git-relative majority is what
+  gate-sdk/SPEC.md §When a gate earns its place bars.
+  recurrence: path-dialect-clauses-unenforced 2026-09-20
+  Joins this iteration as its LEAD unit by operator direction (2026-09-20, lead-relayed), the
+  adopter-floor door remainder. Promoted as debt rather than marked for spec: the contract is
+  already landed and named (gate-sdk/SPEC.md §The path-dialect contract, 2026-08-30) and the
+  deliverable adds an assertion to `check-path-dialect` under names the specs already carry, so
+  the new-names litmus makes it debt and no amendment is owed. The predicate question above is
+  calibration inside that contract, not a widening of it.
+  Filed 2026-08-31 by close, draining two 2026-08-30 gap bullets. Fix was tried first and refused
+  (the assertion the second bullet proposes reds a benign population); icebox second, refused
+  because a gate's verdict on an adopter's host is adopter-facing.
+
+- **readme-front-door-is-adopter-facing-and-outside-every-sweep**
+  — `README.md` carries 19 `bash gate-sdk/bin/run-gates.sh` sites, and
+  line 25 is the landing page's headline try-it command, first screen. That makes it
+  **adopter-facing**, on a project whose adopter-constraint claim is git as the only
+  unconditional floor member.
+  **Measured at `door-binding-sweep`'s close by the staleness read, after two earlier
+  measurements of the same corpus missed it** — the filing bullet's, and that close's own
+  drain re-grep, which covered `docs/` only. `check-door-binding` cannot see the file: its
+  assertion A walks `walk::kit_roots()`, and no gate reaches the repo root.
+  **Why a unit rather than a sweep:** re-pointing the line extends the door sweep's envelope
+  onto a surface that unit excluded, and a fresh clone carries no built binary, so which
+  spelling the line should carry interacts with the fail-open front-end constraint the sweep
+  itself ruled on. Routed here by the lead at that close as the scope-gated-intake default —
+  a routing call rather than a judgment on the merits, revisable by a later session.
+  **Cost class once/low, whose home is this prose while the entry is active:** the landing page's
+  first command hands every visitor `bash`, while the entry owning the class reads every live site
+  as contributor-facing.
+  Joins this iteration second in work order, by operator direction (2026-09-20, lead-relayed) on
+  the adopter-floor door remainder. Promoted as debt — re-pointing one line adds no name.
+  **BLOCKED, and the tag that would say so does not fit: do not pick this before
+  `fail-open-front-end-residency-after-the-door-sweep` has ruled** which spelling an adopter-facing
+  door may carry. A blocked-by tag naming that slug measures 130 columns against the
+  100-column budget on this slug's lead line alone, so `check-queue-wrap` refuses it and the
+  structured signal a first-unblocked selection reads is unavailable here — the second attestation
+  of `lead-line-blocked-by-spec-tag-width-collision`, stamped on that entry, which this prose is
+  the fallback for.
+  Filed 2026-09-20 at `door-binding-sweep`'s close on the staleness read; the corpus
+  correction itself landed inline in that iteration. Owner lookup: `README.md`, `--run-demo`,
+  `door`, `front end` — none. `door-binding-sweep-stops-at-the-kit-roots` is **adjacent and
+  distinct**: it owns the gate's reach, this owns one adopter-facing site's spelling.
 
 ## Deferred
 
@@ -56,27 +142,6 @@
   Filed 2026-09-20 to the gap inbox by the lead at `door-binding-sweep`'s close; promoted at this
   scope's intake. Owner lookup: `commit-msg`, `commit message file`, `journal path` — none.
 
-- **readme-front-door-is-adopter-facing-and-outside-every-sweep** [cost: once/low] [surface: README.md]
-  — `README.md` carries 19 `bash gate-sdk/bin/run-gates.sh` sites, and
-  line 25 is the landing page's headline try-it command, first screen. That makes it
-  **adopter-facing**, on a project whose adopter-constraint claim is git as the only
-  unconditional floor member.
-  **Measured at `door-binding-sweep`'s close by the staleness read, after two earlier
-  measurements of the same corpus missed it** — the filing bullet's, and that close's own
-  drain re-grep, which covered `docs/` only. `check-door-binding` cannot see the file: its
-  assertion A walks `walk::kit_roots()`, and no gate reaches the repo root.
-  **Why a unit rather than a sweep:** re-pointing the line extends the door sweep's envelope
-  onto a surface that unit excluded, and a fresh clone carries no built binary, so which
-  spelling the line should carry interacts with the fail-open front-end constraint the sweep
-  itself ruled on. Routed here by the lead at that close as the scope-gated-intake default —
-  a routing call rather than a judgment on the merits, revisable by a later session.
-  **Cost while deferred:** the landing page's first command hands every visitor `bash`, while
-  the entry owning the class reads every live site as contributor-facing.
-  Filed 2026-09-20 at `door-binding-sweep`'s close on the staleness read; the corpus
-  correction itself landed inline in that iteration. Owner lookup: `README.md`, `--run-demo`,
-  `door`, `front end` — none. `door-binding-sweep-stops-at-the-kit-roots` is **adjacent and
-  distinct**: it owns the gate's reach, this owns one adopter-facing site's spelling.
-
 - **fail-open-front-end-residency-after-the-door-sweep** [cost: event/high] [surface: gate-sdk]
   — `SPEC-door-binding.md` delta 5 held `gate-sdk/bin/run-gates.sh` and its PowerShell twin back
   from the sweep on a stated constraint, and the constraint holds: gate-sdk/SPEC.md rules each
@@ -94,6 +159,10 @@
   **Cost while deferred:** every adopter keeps a bash surface, and a PowerShell one beside it, on a
   floor that otherwise reaches git plus the binary — the standing exception to the claim in
   gate-sdk/SPEC.md §The adopter constraints.
+  Joins this iteration as its ruling unit, by operator direction (2026-09-20, lead-relayed) on the
+  adopter-floor door remainder; **marked for spec**, which authors its amendment and promotes it.
+  Both candidate shapes are new mechanism, so the new-names litmus makes it a feature,
+  and `readme-front-door-is-adopter-facing-and-outside-every-sweep` is blocked on its answer.
   Filed 2026-09-20 to the gap inbox at `binary-door-wide-sweep`'s spec while ruling delta 5, against
   that unit's own claim that the twin and the fail-open set retire with the sweep; promoted at this
   close drain. Owner lookup: `fail-open`, `front end`, `--statusline`, `run-front-end-parity` — none
@@ -127,6 +196,12 @@
   emitter-written banners need their emitters changed rather than their pages.
   **Cost while deferred:** a future adopter-facing page reintroduces the repaired defect and nothing
   reds; the repair stays a hand sweep each time.
+  Joins this iteration as its gate-reach unit, by operator direction (2026-09-20, lead-relayed) on
+  the adopter-floor door remainder; **marked for spec**, which authors its amendment and promotes
+  it. A feature: the adopter/contributor discriminator assertion A needs does not exist yet, so
+  the unit mints it. Designed alongside `fail-open-front-end-residency-after-the-door-sweep` — that
+  unit rules which spelling an adopter-facing door may carry, and this one rules which surfaces a
+  gate reads as doors, so the discriminator is one question answered from two sides.
   Filed 2026-09-20 to the gap inbox at `bash-audience-hand-held`'s build while locating the
   operator-ruled correction; promoted at this close drain. Owner lookup: `check-door-binding`,
   `kit_roots`, `door binding`, `adopter` — none.
@@ -867,54 +942,6 @@
   the consult and drained here into this entry rather than into a new one, the port-only run
   barring the drain's promote.
   recurrence: kit-knob-consumer-adapter-convention 2026-09-03
-
-- **path-dialect-clauses-unenforced** [cost: event/high] [surface: gate-sdk] — the two clauses gate-sdk/SPEC.md §The
-  path-dialect contract gained 2026-08-30 are held by review alone, and neither is shaped like the
-  form scan `check-path-dialect` already runs.
-  **Clause one: the cwd anchor has no oracle.** That section obliges a script to anchor its own
-  shell in the crossed spelling. `check-path-dialect`'s vocabulary is platform-native PRODUCERS
-  (`GIT_FLAGS`, `RUST_FORMS` in `native/src/gates/path_dialect.rs`) and carries no `pwd` form, by
-  the contract's own reasoning that a shell builtin produces no foreign value. The hole is that a
-  builtin PROPAGATES one: an absolute `cd` leaves `$PWD` in the argument's dialect, and a later
-  relative `cd … && pwd` concatenates onto it. That is how `gen-pre-commit.sh`'s prologue died on
-  the Windows leg. A gate must pair two facts a script exhibits — it derives a root from
-  `BASH_SOURCE` with a relative `cd`, and it composes two roots by string arithmetic — rather than
-  scan for one form.
-  **Clause two, whose filed premise is CORRECTED here rather than carried forward.** The claim was
-  that `walk.rs` is the crate's sole path SPELLER and nothing holds it there. Re-verified at this
-  drain: it is not. `.join(` appears widely outside `walk.rs`, and a real share of those compose
-  filesystem paths — `proc.rs`'s program probe and its capture files, `marker.rs`'s scratch dir. An
-  assertion on that spelling, in the shape of the sibling unit test that bars a walk outside
-  `walk.rs`, would therefore red a large and overwhelmingly benign population. What DOES hold is
-  narrower and is the property worth enforcing: `walk.rs` is the sole producer of the path STRINGS
-  a gate reports or matches on, and `DirEntry::path` outside it is genuinely absent. The predicate
-  is escape into a reported or compared value, not composition.
-  **Why one entry rather than two.** Both are the same landed contract's unenforced half, both were
-  filed the same day by the unit that landed it, and both need a pairing predicate rather than a
-  form scan. Splitting them files one shape twice.
-  **Cost while deferred:** a Windows adopter's gate verdict, which is a cost already paid once —
-  `check-install-disposition` read its whole corpus as unregistered on round 5 because a composed
-  separator escaped into a compared value, and a Linux battery cannot show it.
-  **SECOND INSTANCE, 2026-09-20, and this one shipped to the remote.** The `door-binding-sweep`
-  close's watched push failed both Windows install-smoke legs: `native/src/toolfloor.rs` synthesized
-  `<anchor>/` and prefix-tested it against a backslash-spelled absolute root, so every kit root read
-  as outside the walk and `init` exited 2 — clause two's predicate exactly. Hotfixed minimal at
-  `88c7e9b4` under the impacting-failure carve-out and verified green on the next watched run; the
-  GATE half is this entry, which is what enforcement-first still owes.
-  **Corpus MEASURED at this scope, not estimated:** `git grep -n 'starts_with(&format!("{}/"' --
-  native/src` returns exactly 12 sites — that command is the roster, so no copy of it lands here.
-  **The sharpened predicate question, this entry's remaining design work.** A
-  host-absolute-versus-git-relative discriminator and clause two's own "escape into a reported or
-  compared value" are NOT the same test, and they disagree on `spec.rs`:109 and :120: both operands
-  are host-absolute yet already crossed once through `walk::cwd()` and never re-normalized, so the
-  first flags them while the second reads a speller-locality question that is benign today.
-  `emit/scratch_run.rs`:38 is clean under both and self-attested at the site. Judge the corpus
-  before shipping the assertion — a gate crying wolf on the git-relative majority is what
-  gate-sdk/SPEC.md §When a gate earns its place bars.
-  recurrence: path-dialect-clauses-unenforced 2026-09-20
-  Filed 2026-08-31 by close, draining two 2026-08-30 gap bullets. Fix was tried first and refused
-  (the assertion the second bullet proposes reds a benign population); icebox second, refused
-  because a gate's verdict on an adopter's host is adopter-facing.
 
 - **plugin-marketplace** [roadmap: later/ecosystem] [cost: once/low] [surface: installer] — harness plugin packaging.
   roadmap-summary: The stage skills and guards installable as a harness plugin.
@@ -2610,8 +2637,15 @@
   blocker (which §check-tag-lead-line forbids today), or a slug-length cap are each a grammar call.
   **DISTINCT from `icebox-eviction-line-budget-squeeze`**, which is the icebox tier's one-line
   grammar against the same cap. Both share the unbounded slug length, so a scope may bundle them.
+  **SECOND ATTESTATION 2026-09-20, and it WIDENS the premise above rather than repeating it.** This
+  scope promoted `readme-front-door-is-adopter-facing-and-outside-every-sweep` with NO spec tag at
+  all, and the blocked-by tag alone measured 130 columns against the budget — so the collision needs
+  only two long slugs, not a spec tag beside the blocker as the lead line here still says. Same
+  disposition as the attested case, for want of another: the tag was dropped and the block written
+  into the dependent's prose, where no selection reads it.
   **Cost while deferred:** a dependent promoted beside its blocker loses the tag its selection
   reads, and the order survives only in amendment prose.
+  recurrence: lead-line-blocked-by-spec-tag-width-collision 2026-09-20
   Filed 2026-09-15 to the gap inbox at that spec stage, measured by `check-queue-wrap`'s red at its
   promotion commit; drained and promoted the same day at close.
 
