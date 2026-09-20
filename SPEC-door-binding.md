@@ -239,10 +239,7 @@ can actually spawn, which a string comparison does not prove.
 is not an executable file, and on a non-zero exit from the executed hook other
 than the hook's own declared decline status.
 
-**Inferred, cannot run before build:** that the Windows install-smoke leg's
-harness settings accept a `./`-prefixed forward-slash path in a JSON `command`
-value — no Windows host is reachable from this stage; the `install-smoke-windows`
-leg exercises it once delta 2 lands.
+**Inferred, cannot run before build:** that the Windows install-smoke leg's harness settings accept a `./`-prefixed forward-slash path in a JSON `command` value — no Windows host is reachable from this stage; the `install-smoke-windows` leg exercises it once delta 2 lands.
 
 ## Producers and consumers
 
