@@ -712,7 +712,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-knob-default-coupling",
         knob_default_coupling::run,
-        &[("?", "", "", "dynamic@src/gates/knob_default_coupling.rs:365")],
+        &[("?", "", "", "dynamic@src/gates/knob_default_coupling.rs:371")],
         &["GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS", "GATE_SDK_KIT_DIRS", "CANON_KIT_SPEC_NAME"],
         "canon-kit",
         &[("git", "")],
@@ -1148,7 +1148,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-close-surfaces",
         close_surfaces::run,
-        &[("?", "", "", "dynamic@src/emit/close_surfaces.rs:157 via emit::close_surfaces::derive")],
+        &[("?", "", "", "dynamic@src/emit/close_surfaces.rs:159 via emit::close_surfaces::derive")],
         &[
             "GATE_SDK_KIT_DIRS",
             "GATE_SDK_PRUNE_DIRS",
@@ -1222,8 +1222,8 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-shim-restatement",
         shim_restatement::run,
         &[
-            ("?", "", "", "dynamic@src/gates/shim_restatement.rs:122"),
-            ("?", "", "", "dynamic@src/gates/shim_restatement.rs:161"),
+            ("?", "", "", "dynamic@src/gates/shim_restatement.rs:124"),
+            ("?", "", "", "dynamic@src/gates/shim_restatement.rs:163"),
         ],
         &[
             "GATE_SDK_PRUNE_DIRS",

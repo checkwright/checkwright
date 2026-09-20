@@ -45,17 +45,23 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     // spec: canon-kit/SPEC.md §check-docs-cmd — the kit-prefix roster, derived from the kit
     // roots: a caps name carrying one is a namespaced knob to verify
-    let mut roots: Vec<String> = Vec::new();
+    // spec: gate-sdk/SPEC.md §Layout and configuration — two uses, bound apart: the prefix
+    // vocabulary is basename-derived off every root, since a kit vendored outside this repository
+    // still owns its knob namespace, while the grep corpus is the pathspec-able subset
     let mut prefixes: Vec<String> = Vec::new();
-    for root in walk::kit_roots_rel()? {
+    for root in walk::kit_roots()? {
         let root = root.trim_end_matches('/');
         if root.is_empty() {
             continue;
         }
-        roots.push(root.to_string());
         let base = root.rsplit('/').next().unwrap_or(root);
         prefixes.push(format!("{}_", base.to_ascii_uppercase().replace('-', "_")));
     }
+    let roots: Vec<String> = walk::kit_roots_under(&top)?
+        .into_iter()
+        .map(|r| r.trim_end_matches('/').to_string())
+        .filter(|r| !r.is_empty())
+        .collect();
 
     let mut defined = defined_knobs(&top, &roots, &prefixes)?;
     // spec: canon-kit/SPEC.md §check-docs-cmd — a static kit's knobs left kit-root source with its
@@ -154,6 +160,12 @@ fn defined_knobs(
     roots: &[String],
     prefixes: &[String],
 ) -> Result<HashSet<String>, String> {
+    // spec: gate-sdk/SPEC.md §Layout and configuration — no root lies inside this repository, so it
+    // tracks no kit source to define a knob; returning the empty set states that, where handing git
+    // no positive pathspec would silently widen the grep to the whole tree
+    if roots.is_empty() {
+        return Ok(HashSet::new());
+    }
     let pattern = format!("({})[A-Z0-9_]*", prefixes.join("|"));
     let mut argv: Vec<String> = vec![
         "-C".into(),

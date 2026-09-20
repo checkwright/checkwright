@@ -76,7 +76,10 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
     // spec: canon-kit/SPEC.md §check-prose-enum — the kit-root anchor for every derived family is
     // gate-sdk's own kit-root derivation, so the sets cannot enumerate a different tree than the
     // battery runs on
-    let kits: Vec<String> = walk::kit_roots_rel()?
+    // spec: gate-sdk/SPEC.md §Layout and configuration — every use below statts or lists a
+    // directory from the cwd, so the root takes the working-directory spelling, while the set name
+    // is bound apart from it off the basename, which either spelling yields alike
+    let kits: Vec<String> = walk::kit_roots()?
         .into_iter()
         .filter(|k| !k.is_empty())
         .map(|k| k.trim_end_matches('/').to_string())
@@ -86,6 +89,7 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
     }
 
     for kit in &kits {
+        let name = kit.rsplit('/').next().unwrap_or(kit.as_str());
         // spec: canon-kit/SPEC.md §check-prose-enum — a lib/ that tracks no top-level *.sh is a
         // layout this derivation can no longer read, so it fail-closes rather than emitting the
         // silently empty set
@@ -95,7 +99,7 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
             if libs.is_empty() {
                 return Err(format!("{}/lib tracks no top-level *.sh", kit));
             }
-            emit_set(&mut out, &format!("{}-lib", kit), &libs);
+            emit_set(&mut out, &format!("{}-lib", name), &libs);
         }
         // spec: canon-kit/SPEC.md §check-prose-enum — a gate-tests/ holding only good/bad fixture
         // directories ships no bespoke unit test; that empty set is a measured normal state, not a
@@ -103,7 +107,7 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
         let tests = format!("{}/gate-tests", kit);
         if std::path::Path::new(&tests).is_dir() {
             let found = tracked_under(&tests, ".test.sh")?;
-            emit_set(&mut out, &format!("{}-gate-test", kit), &found);
+            emit_set(&mut out, &format!("{}-gate-test", name), &found);
         }
     }
     emit_set(&mut out, KPI_BUILTIN, &kpi_builtin());

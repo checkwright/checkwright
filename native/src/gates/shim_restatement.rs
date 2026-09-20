@@ -103,7 +103,9 @@ pub fn run(args: &[String]) -> i32 {
                     return 2;
                 }
             };
-            let roots = match walk::kit_roots_rel() {
+            // spec: gate-sdk/SPEC.md §Layout and configuration — `{root}/templates` is statted and
+            // walked, so the root takes the working-directory spelling
+            let roots = match walk::kit_roots() {
                 Ok(v) => v,
                 Err(e) => {
                     eprintln!("check-shim-restatement: {}", e);

@@ -17,9 +17,12 @@ pub fn run(args: &[String]) -> i32 {
 // spec: canon-kit/SPEC.md §check-knob-citation — the knob-token vocabulary is derived from
 // the kit roots, never listed: two prefix forms per root map to the owning kit, so the gate
 // ships no term list and the provenance seam is untouched
+// spec: gate-sdk/SPEC.md §Layout and configuration — the prefix derives from the basename, which
+// either spelling yields alike, while the pair's other element is a path: joined in `is_owner`
+// against a walked file and named to the user as the value's home, so it takes `kit_roots`
 fn prefix_pairs() -> Result<Vec<(String, String)>, String> {
     let mut out = Vec::new();
-    for kr in walk::kit_roots_rel()? {
+    for kr in walk::kit_roots()? {
         let kr = kr.trim_end_matches('/');
         if kr.is_empty() {
             continue;

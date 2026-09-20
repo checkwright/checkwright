@@ -194,12 +194,14 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
     // rewrite inside the loop. Read below the loop it would have been a knob the loop could not see
     let spec_base_url = walk::knob_scalar("GATE_SDK_SPEC_BASE_URL").map_err(refuse)?;
 
-    // spec: installer/SPEC.md §The packer — the payload's kit set is `walk::kit_roots_rel`, the same
+    // spec: installer/SPEC.md §The packer — the payload's kit set is `walk::kit_roots`, the same
     // derivation the battery runs on, so the shipped set cannot drift from the governed one
+    // spec: gate-sdk/SPEC.md §Layout and configuration — statted and handed to an uncwd-anchored
+    // git, so the working-directory spelling, while the payload leaf stays the basename
     mkdir(&format!("{}/payload", asm))?;
     let mut packed = 0usize;
     let mut rewritten = 0usize;
-    for kit in walk::kit_roots_rel().map_err(refuse)? {
+    for kit in walk::kit_roots().map_err(refuse)? {
         let kit = kit.trim_end_matches('/');
         if kit.is_empty() || !std::path::Path::new(kit).is_dir() {
             continue;
@@ -369,7 +371,9 @@ fn footprint(root: &str, artifacts: &str) -> Result<Vec<String>, Refusal> {
     // spec: installer/SPEC.md §The packer — the pack loop's own on-disk `is_dir` test is
     // deliberately NOT applied here: filtering the pathspec by it would blind the refusal to the
     // one divergence only it can see
-    for kit in walk::kit_roots_rel().map_err(refuse)? {
+    // spec: gate-sdk/SPEC.md §Layout and configuration — a git pathspec, and the same resolver the
+    // pack loop takes, so the two cannot spell one kit two ways
+    for kit in walk::kit_roots().map_err(refuse)? {
         if let Some(p) = inside(root, kit.trim_end_matches('/')) {
             spec.push(p);
         }

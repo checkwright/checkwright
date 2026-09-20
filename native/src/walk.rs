@@ -319,6 +319,24 @@ pub fn kit_roots_rel() -> Result<Vec<String>, String> {
     kit_roots_rel_from(&sdk_root(), &knob_scalar("GATE_SDK_KIT_DIRS")?)
 }
 
+// spec: gate-sdk/SPEC.md §Layout and configuration — the roots a git pathspec against `anchor` can
+// name at all: spelled against it and narrowed to those lying under it, since a root elsewhere is
+// no path in that repository and passing it is the exit-128 refusal rather than an empty match
+pub fn kit_roots_under(anchor: &str) -> Result<Vec<String>, String> {
+    Ok(kit_roots_at(anchor)?
+        .into_iter()
+        .filter(|r| !r.is_empty() && !r.starts_with("../") && r != ".." && path_root(r).is_none())
+        .collect())
+}
+
+// spec: gate-sdk/SPEC.md §Layout and configuration — the working-directory spelling over a locator
+// and an override its caller already resolved: the twin of `kit_roots_rel_from` for a resolver
+// whose roots are joined onto paths rather than matched against kit-parent text
+pub fn kit_roots_from(sdk_root: &str, kit_dirs: &str) -> Result<Vec<String>, String> {
+    let (here, roots) = roots_from(sdk_root, kit_dirs)?;
+    Ok(roots.iter().map(|r| spelled(&here, r)).collect())
+}
+
 // spec: gate-sdk/SPEC.md §Layout and configuration — the same derivation over a locator and an
 // override its caller already resolved, the form a derived knob default reads through its resolver
 pub fn kit_roots_rel_from(sdk_root: &str, kit_dirs: &str) -> Result<Vec<String>, String> {

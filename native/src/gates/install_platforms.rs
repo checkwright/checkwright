@@ -201,9 +201,11 @@ fn detector_triples_in(text: &str, path: &str, d: &Detector) -> Result<Vec<Strin
 // binary-less residual is a count over the live registry rather than a number carried in prose
 fn omitted_members() -> Result<usize, String> {
     let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
+    // spec: gate-sdk/SPEC.md §Layout and configuration — the same opened `{root}/checks` resolve
+    // set `check-gate-binary-fresh` builds, and it takes the same spelling for the same reason
     let mut resolve_dirs = vec![gates_dir.clone()];
     resolve_dirs.extend(
-        walk::kit_roots_rel()?
+        walk::kit_roots()?
             .into_iter()
             .filter(|r| !r.is_empty())
             .map(|r| format!("{}/checks", r.trim_end_matches('/'))),

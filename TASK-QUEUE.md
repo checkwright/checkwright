@@ -2605,7 +2605,7 @@
   carry `env_only: &[]`, and drift-kit's own SPEC calls `DRIFT_KIT_SMOKE_CUSTOM` "a name no table
   declares".
   **Mechanism:** `native/src/gates/docs_cmd.rs`'s `defined_knobs()` greps raw kit roots
-  (`walk::kit_roots_rel`, unpruned) excluding only `*.md` and `*/gate-tests/*`, and unions
+  (`walk::kit_roots`, unpruned) excluding only `*.md` and `*/gate-tests/*`, and unions
   `knobs::static_names()`; a knob in neither is reported as "env knob X occurs in no tracked kit
   source".
   **NOTHING REDS TODAY and that is why it is filed rather than fixed** — a stock consumer's seeded

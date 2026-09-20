@@ -36,8 +36,11 @@ pub fn run(args: &[String]) -> i32 {
             return 2;
         }
     };
+    // spec: gate-sdk/SPEC.md §Layout and configuration — a `{root}/checks` resolve dir is opened,
+    // so it takes the working-directory spelling; on the kit-parent one the resolve set narrows
+    // silently and the member count shrinks on a clean line
     let mut resolve_dirs = vec![gates_dir.clone()];
-    match walk::kit_roots_rel() {
+    match walk::kit_roots() {
         Ok(v) => resolve_dirs.extend(
             v.into_iter()
                 .filter(|r| !r.is_empty())

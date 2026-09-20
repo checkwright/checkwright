@@ -47,7 +47,10 @@ fn suites(resolve: Resolve) -> Result<Vec<(String, String, String)>, String> {
     if origin == Origin::Placeholder {
         return Ok(Vec::new());
     }
-    let roots = crate::walk::kit_roots_rel_from(&root, &dirs)?;
+    // spec: gate-sdk/SPEC.md §Layout and configuration — `fixture_suites_in` statts both joins and
+    // its rows are the operands `--run-gate-tests` receives, so the roots arrive
+    // working-directory-spelled, matching the `spelled_here` root `run_members` prints beside them
+    let roots = crate::walk::kit_roots_from(&root, &dirs)?;
     Ok(crate::registry::fixture_suites_in(&roots, &gates))
 }
 

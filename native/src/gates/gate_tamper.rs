@@ -191,7 +191,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut meta = walk::knob_array("DELEGATION_KIT_META_PATHS")?;
     // spec: delegation-kit/SPEC.md §Layout and configuration — a vendored kit's edits are meta-layer by
     // definition: every kit root joins as a `<root>/` prefix the resolved value does not already hold
-    for root in walk::kit_roots_rel()? {
+    // spec: gate-sdk/SPEC.md §Layout and configuration — the prefix is matched against the names
+    // `git diff --cached` prints, which are spelled against the toplevel whatever the cwd is, so
+    // the root is spelled against it too
+    for root in walk::kit_roots_under(&walk::toplevel()?)? {
         let prefix = format!("{}/", root.trim_end_matches('/'));
         if !root.is_empty() && !meta.contains(&prefix) {
             meta.push(prefix);

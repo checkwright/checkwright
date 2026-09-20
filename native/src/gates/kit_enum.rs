@@ -42,7 +42,19 @@ pub fn run(args: &[String]) -> i32 {
         }
     };
 
+    // spec: gate-sdk/SPEC.md §Layout and configuration — this member takes both dialects, so it
+    // binds each: `kit_roots` names kits as a `couples=` field does, from their common parent;
+    // `kit_paths` is the pathspec `git -C <top> ls-files` receives, spelled against that toplevel
     let kit_roots: Vec<String> = match walk::kit_roots_rel() {
+        Ok(v) => v.into_iter().map(|r| r.trim_end_matches('/').to_string()).collect(),
+        Err(e) => {
+            eprintln!("check-kit-enum: {}", e);
+            return 2;
+        }
+    };
+    // spec: gate-sdk/SPEC.md §Layout and configuration — index-aligned with the roster above by
+    // construction, both deriving from one root order, so a name and its pathspec are one kit
+    let kit_paths: Vec<String> = match walk::kit_roots_under(&repo_root) {
         Ok(v) => v.into_iter().map(|r| r.trim_end_matches('/').to_string()).collect(),
         Err(e) => {
             eprintln!("check-kit-enum: {}", e);
@@ -51,6 +63,10 @@ pub fn run(args: &[String]) -> i32 {
     };
     if kit_roots.is_empty() {
         eprintln!("check-kit-enum: no kit roots enumerated");
+        return 2;
+    }
+    if kit_roots.len() != kit_paths.len() {
+        eprintln!("check-kit-enum: the two kit-root spellings disagree in length — the check could not run; treating as failure (not clean)");
         return 2;
     }
     let mut resolve_dirs = vec![gates_dir.clone()];
@@ -120,8 +136,8 @@ pub fn run(args: &[String]) -> i32 {
             }
             groups_checked += 1;
             let mut missing: Vec<String> = Vec::new();
-            for r in &kit_roots {
-                let spec = format!("{}/{}", r, glob);
+            for (i, r) in kit_roots.iter().enumerate() {
+                let spec = format!("{}/{}", kit_paths[i], glob);
                 let out = match proc::run(&programs::GIT, &["-C", &repo_root, "ls-files", "--", &spec]) {
                     Ok(c) => c,
                     Err(e) => {

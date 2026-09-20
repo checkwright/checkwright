@@ -89,7 +89,10 @@ pub fn run_captured(args: &[String], stdout: &mut Vec<String>, stderr: &mut Vec<
         return 2;
     }
 
-    let kit_roots = match walk::kit_roots_rel() {
+    // spec: gate-sdk/SPEC.md §Layout and configuration — both assertions are anchored at the git
+    // toplevel: assertion B's pathspec goes to `git -C <top>`, and the registry and runner doc are
+    // resolved against it too, so a link or an invocation in them spells a kit where it is
+    let kit_roots = match walk::kit_roots_under(&repo_root) {
         Ok(v) => v,
         Err(e) => {
             stderr.push(format!("check-kit-registration: {}", e));

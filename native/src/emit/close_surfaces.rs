@@ -144,7 +144,9 @@ pub fn derive(args: &[String]) -> Result<Roster, String> {
 
     let mut surfaces: Vec<String> = Vec::new();
     let roster_basename = walk::knob_scalar("LIFECYCLE_KIT_ROSTER_BASENAME")?;
-    for r in walk::kit_roots_rel()? {
+    // spec: gate-sdk/SPEC.md §Layout and configuration — the root is joined onto a path statted
+    // under the base and then carried as the surface's own path, so it takes `kit_roots`
+    for r in walk::kit_roots()? {
         if r.is_empty() {
             continue;
         }

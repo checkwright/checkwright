@@ -358,9 +358,33 @@ disk — which is why the
 generated hook, `--for`, `check-reads-couples`, `check-core-files`' `kit:` lines, the
 port-blockers and `check-gate-substrate-parity` check-dir resolutions and the graph
 artifact's labels all expand a `kit:` couple to the one repository path. A root matched
-against **text that names kits from their common parent** — a `couples=` field, a
-markdown link target, a knob prefix, `check-graph`'s vocabulary
-layer rules — takes `walk::kit_roots_rel`. **The choice is per use, not per call site:**
+against **text that names kits from their common parent** — a `couples=` field, a knob
+prefix, `check-graph`'s vocabulary
+layer rules — takes `walk::kit_roots_rel`. **A text match is not by itself the
+kit-parent case, and reading it that way is the trap this rule exists to close:** what
+decides is *what the text is anchored to*. A `couples=` field in a `.gate` descriptor
+names kits from their common parent and takes the kit-parent spelling; a markdown link
+or an invoked command in a **repository-root document** names a repository path and
+takes the working-directory spelling, because a doc at the toplevel spells a kit where
+the kit actually is. `check-kit-registration` reads its registry and runner doc against
+the git toplevel and so matches repository paths in both of its assertions.
+**A root the reader anchors somewhere other than its own cwd takes
+`walk::kit_roots_at(anchor)`, and a git pathspec is that case.** `git -C <top>` resolves
+a pathspec against `<top>`, and `git diff --cached` and `git ls-files` print names
+spelled against it whatever the cwd is, so a reader composing or matching one spells its
+roots against that toplevel rather than against where the process happens to stand. The
+two coincide at every door, which sets the cwd to the toplevel, and part wherever a
+reader is invoked from a subdirectory — a fixture case, a `--for` relocation — which is
+why the distinction is stated rather than folded into the working-directory spelling.
+**A root outside that toplevel is no pathspec at all**, and `walk::kit_roots_under`
+narrows to those that are: a kit vendored beside the repository rather than inside it
+tracks no file in it, so git refuses the climbing pathspec outright rather than matching
+nothing. A reader taking that narrowing owes the empty case its own arm — skip the spawn
+and state the empty corpus — because a git invocation handed no positive pathspec widens
+to the whole tree instead of narrowing to none. Membership and namespace questions
+(`live`, a knob prefix) are the *other* use and take the unnarrowed set, since such a kit
+is still live and still owns its prefix.
+**The choice is per use, not per call site:**
 a site taking both dialects off one call binds each half separately rather than deriving
 one from the other, and a basename read off a root is no third dialect, since either
 spelling yields the same token. The two agree at the root layout `init`
@@ -9545,7 +9569,7 @@ reader needs outlive the refactor that renames a helper:
   divergent identities; it ships no repo name — the provenance seam holds.
 - `registry::fixture_suites()` is the single fixture-suite derivation: one
   `(suite, tests-dir, checks-dir)` triple per directory carrying a `gate-tests/`
-  tree, the kit roots in `walk::kit_roots_rel` order then the gates directory,
+  tree, the kit roots in `walk::kit_roots` order then the gates directory,
   the suite named by the directory's basename with `-` turned to `_` and the
   checks directory the sibling `checks/` when one exists, else empty. A
   directory is tested at the path its row prints, which is the operand

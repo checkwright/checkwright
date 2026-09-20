@@ -156,15 +156,26 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut live: HashSet<String> = HashSet::new();
     let mut roots: Vec<String> = Vec::new();
     let mut prefixes: Vec<String> = Vec::new();
-    for root in walk::kit_roots_rel().map_err(|e| format!("check-kit-ref-liveness: {}", e))? {
+    // spec: gate-sdk/SPEC.md §Layout and configuration — `live` and `prefixes` name every kit root,
+    // basename-derived and so dialect-free, because a kit vendored outside this repository is still
+    // live and still owns its knob namespace
+    for root in walk::kit_roots().map_err(|e| format!("check-kit-ref-liveness: {}", e))? {
         if root.is_empty() {
             continue;
         }
         let root = root.trim_end_matches('/').to_string();
         live.insert(root.rsplit('/').next().unwrap_or(&root).to_string());
         prefixes.push(prefix_of(&root));
-        roots.push(root);
     }
+    // spec: gate-sdk/SPEC.md §Layout and configuration — the grep corpus is the separate use: a
+    // pathspec for `git -C <top>`, spelled against that toplevel and narrowed to what lies under it
+    roots.extend(
+        walk::kit_roots_under(&top)
+            .map_err(|e| format!("check-kit-ref-liveness: {}", e))?
+            .into_iter()
+            .map(|r| r.trim_end_matches('/').to_string())
+            .filter(|r| !r.is_empty()),
+    );
     if live.is_empty() {
         return Err("check-kit-ref-liveness: gate_kit_roots enumerated no roots".to_string());
     }
@@ -178,18 +189,26 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
     argv.push(":!*.md");
     argv.push(":!*/gate-tests/*");
-    let completed = proc::run(&programs::GIT, &argv).map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
-    let code = completed.code().unwrap_or(-1);
-    if code > 1 {
-        return Err(format!(
-            "check-kit-ref-liveness: git grep failed (exit {}) building the knob set",
-            code
-        ));
-    }
-    let hits = completed
-        .stdout()
-        .map(|o| String::from_utf8_lossy(o).into_owned())
-        .unwrap_or_default();
+    // spec: gate-sdk/SPEC.md §Layout and configuration — no root lies in this repository, so it
+    // tracks no kit source to read a knob from; the grep is skipped rather than run with no
+    // positive pathspec, which would widen it to the whole tree instead of narrowing it to none
+    let hits = if roots.is_empty() {
+        String::new()
+    } else {
+        let completed =
+            proc::run(&programs::GIT, &argv).map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
+        let code = completed.code().unwrap_or(-1);
+        if code > 1 {
+            return Err(format!(
+                "check-kit-ref-liveness: git grep failed (exit {}) building the knob set",
+                code
+            ));
+        }
+        completed
+            .stdout()
+            .map(|o| String::from_utf8_lossy(o).into_owned())
+            .unwrap_or_default()
+    };
     let mut defined: HashSet<String> = HashSet::new();
     for line in hits.lines() {
         for run in prefixed_knobs(line, &prefixes) {

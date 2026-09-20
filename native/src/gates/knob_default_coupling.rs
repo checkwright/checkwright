@@ -18,9 +18,12 @@ pub fn run(args: &[String]) -> i32 {
 // spec: canon-kit/SPEC.md §check-knob-default-coupling — the knob prefix is derived, never
 // listed: one SCREAMING_SNAKE form per kit root (dir uppercased, hyphens to underscores), so the
 // gate ships no term list and the provenance seam holds
+// spec: gate-sdk/SPEC.md §Layout and configuration — the prefix derives from the basename, which
+// either spelling yields alike, while the pair's other element is a path the record names and the
+// SPEC lookup opens, so it takes `kit_roots`
 fn prefix_pairs() -> Result<Vec<(String, String)>, String> {
     let mut out = Vec::new();
-    for kr in walk::kit_roots_rel()? {
+    for kr in walk::kit_roots()? {
         let kr = kr.trim_end_matches('/');
         if kr.is_empty() {
             continue;
@@ -357,7 +360,10 @@ fn rule(_args: &[String]) -> Result<i32, String> {
     }
 
     let mut sources: Vec<String> = Vec::new();
-    for kr in walk::kit_roots_rel()? {
+    // spec: gate-sdk/SPEC.md §Layout and configuration — the root is walked off disk, so it takes
+    // the working-directory spelling; on the kit-parent one this loop fail-closes under a nested
+    // root rather than reading an empty corpus, which is the only loud member of the cohort
+    for kr in walk::kit_roots()? {
         let kr = kr.trim_end_matches('/');
         if kr.is_empty() {
             continue;
