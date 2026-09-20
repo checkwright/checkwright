@@ -16,6 +16,124 @@
 
 ## Deferred
 
+- **fail-open-front-end-residency-after-the-door-sweep** [cost: event/high] [surface: gate-sdk]
+  — `SPEC-door-binding.md` delta 5 held `gate-sdk/bin/run-gates.sh` and its PowerShell twin back
+  from the sweep on a stated constraint, and the constraint holds: gate-sdk/SPEC.md rules each
+  front-end stub's fail-open copy is read exactly when the binary it would ask is absent, so an
+  absent binary cannot decline and the stub is the only process that runs. The residue is that the
+  front end, its twin, `--run-front-end-parity` and the whole fail-open set stay permanently
+  resident for `--hook` and `--statusline` after every other adopter surface is re-pointed.
+  **Re-verified at the drain:** gate-sdk/SPEC.md states the ground in its own words — those arms are
+  "wired into a harness as a literal argv, and the whole reason they take a fail-open" — and poses
+  the successor question this entry inherits, whether a harness can instead be wired to a *binary*
+  that fail-opens on its own absence.
+  **Why design-pending:** the two candidate shapes, a small wrapper the installer places beside the
+  artifact and a harness feature, are a design question the door sweep deliberately did not open,
+  and neither is costed. Ruling it is cheap; building either shape is not.
+  **Cost while deferred:** every adopter keeps a bash surface, and a PowerShell one beside it, on a
+  floor that otherwise reaches git plus the binary — the standing exception to the claim in
+  gate-sdk/SPEC.md §The adopter constraints.
+  Filed 2026-09-20 to the gap inbox at `binary-door-wide-sweep`'s spec while ruling delta 5, against
+  that unit's own claim that the twin and the fail-open set retire with the sweep; promoted at this
+  close drain. Owner lookup: `fail-open`, `front end`, `--statusline`, `run-front-end-parity` — none
+  live (`host-resolution-fail-open-cut` is retired, and was a host-resolution cut, not this).
+
+- **door-binding-sweep-stops-at-the-kit-roots** [cost: event/high] [surface: guard-kit]
+  — `check-door-binding`'s assertion A sweeps kit-shipped surfaces only: `door_binding.rs` walks
+  `walk::kit_roots()` and filters to each root's README and its SPEC-adjacent files, so no gate
+  reaches `docs/` or any repo-root surface. That is exactly how docs/install.md §Requirements kept
+  handing every adopter `bash gate-sdk/bin/run-gates.sh --emit env-probe` while its own bullet
+  declared bash conditional — found and repaired under `bash-audience-hand-held` by operator ruling,
+  one site at a time, because nothing enumerated them.
+  **Corpus re-measured at the drain, and the filing bullet under-counted it.** The bullet named
+  `docs/ddd.md` and nine sites in `docs/site-architecture.md`; a fresh grep returns thirteen there,
+  plus `docs/index.md`'s `--run-demo` line, which the bullet missed altogether, plus the generated
+  banners in `docs/enforcement.md`, `docs/footprint.md`, `docs/value.md` and `docs/check-graph.html`
+  that come from their emitters rather than from the page.
+  **Why design-pending:** every live site is contributor-facing, which is why none is an adopter
+  under-declaration today, and nothing holds that distinction. Widening assertion A past the kit
+  roots therefore needs an adopter/contributor discriminator the gate does not have, and the
+  emitter-written banners need their emitters changed rather than their pages.
+  **Cost while deferred:** a future adopter-facing page reintroduces the repaired defect and nothing
+  reds; the repair stays a hand sweep each time.
+  Filed 2026-09-20 to the gap inbox at `bash-audience-hand-held`'s build while locating the
+  operator-ruled correction; promoted at this close drain. Owner lookup: `check-door-binding`,
+  `kit_roots`, `door binding`, `adopter` — none.
+
+- **couples-knob-token-empty-expansion-passes-silently** [cost: once/low] [surface: gate-sdk]
+  — a `knob:` couples token whose expansion resolves to an **empty member set** is silently accepted
+  by `registry::expand_couples`, even though that function's own diagnostic says "an empty expansion
+  would be a lost trigger; treating as failure (not clean)".
+  **Re-verified at the drain, at the source:** in `native/src/registry.rs` that sentence is the text
+  of a `map_err` over the knob resolution, so it fires on a *resolution error* only. A knob that
+  resolves cleanly to zero members iterates zero times, pushes zero tokens, and returns `Ok`. A unit
+  test in the same file pins that behaviour as intended.
+  **The cost is attested rather than predicted:** `knob:GATE_SDK_KIT_DIRS` sat dead in
+  `check-kit-roots-dialect.gate` through a whole build stage and a green battery. Only the installer
+  smoke's `delegation` profile could see it, and it was deleted rather than made to work, because
+  `GATE_SDK_KIT_DIRS` is a scalar whitespace-joined list the token grammar cannot represent either
+  way.
+  **Deliverable:** expand each `knob:` token inside `check-graph`'s existing admissibility loop
+  (`native/src/gates/graph.rs`) and make a zero-member expansion a MANIFEST finding.
+  **Why design-pending rather than a drain fix:** it is a tightening with cross-consumer blast
+  radius — a consumer whose config leaves a kit-named knob empty newly reds — so it owes a
+  `good/`+`bad/` fixture pair and its own `## Tightened gates` declaration.
+  **Cost while deferred:** a `couples=` token can name a knob and trigger on nothing, and the gate
+  whose manifest carries it stops firing on the edits it declares it watches.
+  Filed 2026-09-20 to the gap inbox at this iteration's validate; promoted at this close drain.
+  Owner lookup: `expand_couples`, `couples=`, `knob:`, `empty expansion` — none carrying it.
+  `gates-must-not-bind-to-document-paths` is **adjacent and distinct**: which paths a manifest may
+  name, not whether a token expands to nothing.
+
+- **consumer-shaped-regressions-invisible-to-build-oracles** [cost: event/low] [surface: gate-sdk]
+  — both of this iteration's validate regressions were green in this tree and red only in a
+  consumer-shaped one: one under a set `GATE_SDK_KIT_DIRS`, one in a vendored copy at the previous
+  tag. Every oracle a build stage runs sees this tree only.
+  **Re-verified at the drain:** the two suites that see the other shape, `installer_smoke` and
+  `upgrade`, appear in `.workflow/validate-baseline.txt` and nowhere in the pre-commit battery, so a
+  defect authored in batch 1 or batch 4 was found four batches later — by a session that then had to
+  be re-tiered to author the fix.
+  **Why design-pending, and the trade is real rather than an obvious win.** The full installer smoke
+  runs in minutes and needs a clean worktree, so it cannot join a build-stage loop. The candidate is
+  a narrow build-time leg — regenerate the hooks once under a consumer-shaped `GATE_SDK_KIT_DIRS`
+  and assert the emission succeeds — which would have caught regression 1 in seconds. **It would not
+  have caught regression 2**, whose shape is TO's kits over FROM's tree and which has no cheap form.
+  So the deliverable buys one of the two, and whether half the class earns a new leg is the call
+  this entry holds.
+  **Cost while deferred:** a consumer-shaped defect keeps costing a whole iteration of latency plus
+  a re-tier, which is what it cost here.
+  Filed 2026-09-20 to the gap inbox at this iteration's validate by the session that repaired both
+  regressions; promoted at this close drain.
+  Owner lookup: `installer_smoke`, `upgrade smoke`, `GATE_SDK_KIT_DIRS`, `build-time leg` — none.
+
+- **probe-before-assertion-doctrine** [cost: event/low] [surface: doctrine-kit]
+  — **returned from the icebox on a judged recurrence.** The rule it asked for shipped:
+  CLAUDE.md §Delivery doctrine carries `Probe-before-assertion`, and the icebox line recorded the
+  remainder as "Rule shipped; mechanizing it is open". What re-fires it is that the shipped rule did
+  not hold, and did not hold seven times in one iteration.
+  **The seven, all one shape — a probe narrower than the claim it supported.** Three path-scoped
+  greps; two filters whose empty return was read as success; an amendment whose printed probe
+  over-returned; and a nested-tree probe whose first confirming run used an inconsistent tree. Two
+  of the seven produced regressions that reached validate, where they cost a re-tier.
+  **The sharpening is the finding, and it is new.** `Probe-before-assertion` asks whether a probe
+  was *run*; in all seven a probe ran. What failed is that its **corpus was narrower than the corpus
+  the claim ranged over**, which the rule as worded does not reach. The drain reproduced the shape
+  on its own inputs: the `door-sweep-reach-stops-at-the-kit-boundary` bullet named nine
+  `docs/site-architecture.md` sites where a fresh grep returns thirteen, and missed `docs/index.md`
+  altogether.
+  **Why design-pending:** whether this is a fourth always-loaded line, a re-wording of the existing
+  one, or something mechanizable is the open call — and it is a governed-surface widening, which a
+  close does not self-serve. The cheapest candidate worth beating is still the one the original
+  filing named: widen an existing rule rather than mint another.
+  **Cost while deferred:** measured at seven misses in one iteration, two of them reaching validate.
+  recurrence: probe-before-assertion-doctrine 2026-09-20
+  Filed 2026-08-07 by close as that iteration's candidate lesson; iceboxed in the machinery-class
+  triage slice; returned to the deferred section at `door-binding-sweep`'s close drain on the
+  recurrence above. Owner lookup: `probe`, `premise`, `unverified`, `corpus narrower` — this entry,
+  plus two **adjacent and distinct** icebox members: the cited-object token sweep's corpus (a
+  *gate's* corpus) and `dispatched-child-asserts-an-unverified-base` (a child inheriting a base it
+  never probed).
+
 - **inferred-marker-malformed-placement-passes-unseen** [cost: event/low] [surface: lifecycle-kit]
   — `check-stage-entry` assertion D reads an inferred marker only where the full spelling opens a
   physical line (`inferred_marker` in `native/src/gates/stage_entry.rs`), so a marker an author
@@ -409,10 +527,15 @@
   override) and the AGENTS.md adapter is ALREADY built and smoke-tested in `agents_md_smoke.rs`,
   which converts and then asserts always-loaded and footprint both measure `AGENTS.md`. A lead claim
   that `check-brevity` was correctly coupled to `CLAUDE.md` was FALSE and is corrected here.
-  **The real defect is the GRAPH FORMAT.** `couples=` tokens must be syntactically valid glob or
-  path — literals, globs, a `kit:` prefix, no knob indirection — so a configurable-target gate is
-  FORCED to freeze one consumer's filename in its manifest. Cheap fix is
-  `couples=CLAUDE.md,AGENTS.md`; the principled fix is knob indirection in the format.
+  **The real defect was the GRAPH FORMAT, and half of it has since been repaired.** `couples=`
+  tokens had to be syntactically valid glob or path — literals, globs, a `kit:` prefix, no knob
+  indirection — so a configurable-target gate was FORCED to freeze one consumer's filename in its
+  manifest. **Knob indirection has since landed** — `registry::expand_couples` resolves a
+  `knob:<NAME>` token against the consumer's knob file, and `check-graph.gate`'s own manifest
+  carries `knob:GATE_SDK_GRAPH_VOCAB` — so the format no longer forces the freeze. **Corrected
+  2026-09-20 at close, read off the source rather than recalled.** What survives is the survey
+  below: each frozen literal is now a per-gate choice the operator's discriminator decides, not a
+  format limitation. The cheap fix for `check-brevity` is still `couples=CLAUDE.md,AGENTS.md`.
   **The survey arm is the entry's first deliverable, and the class is larger than the two members
   the discriminator has been applied to.** Probed at this scope over every `.gate` manifest:
   `CLAUDE.md` appears in 14 `couples=` token positions, `TASK-QUEUE.md` in 23, `docs/install.md` in
@@ -2761,7 +2884,6 @@
 - **queue-tier-label-correction-cost** — Fixing a label at the cap costs a trim.
 - **rejected-compound-commit-relabel** — A bare retry mislabels staged work.
 - **survey-record-supersede-invisible** — Superseded survey blocks look live.
-- **probe-before-assertion-doctrine** — Rule shipped; mechanizing it is open.
 - **consumer-smoke-accounting-spelling-unpinned** — Dual-spelling count unpinned.
 - **release-runbook-identity-diagnosis** — Account check is prose, not a step.
 - **dispatch-cited-evidence-unverified** — A sweep's quotations go unverified.
