@@ -2462,73 +2462,6 @@
   Surfaced 2026-09-05 by build batch A's provenance census, which flagged both and deliberately
   edited neither; drained here with both instances re-verified live.
 
-- **align-in-session-absorption-tier-unruled** [cost: event/low] [surface: lifecycle-kit]
-  — does a spec miss that build absorbs **in session** count against align's model tier?
-  **OPERATOR-CLASS, and that is the whole reason it is filed rather than answered.** Answering it
-  re-scopes a recorded tiering reading, which lifecycle-kit/SPEC.md §The steering vocabulary puts
-  with the operator through `/consult` and with no session, lead or stage.
-  **What is on the record and what is not.** The revert signal in the lead binding (ruling-config)
-  names only a **build round-trip** as align's tier evidence. Nothing rules on a miss build absorbs
-  without one, so the two readings — a silently-absorbed miss is align failing, or it is align
-  working at the tier it was bought at — are both consistent with every surface today.
-  **DISTINCT from `align-checklist-fanout-calibration`, Done 2026-09-12**, which closed on the
-  checklist residue and left this half out of SPEC-align-claims.md on purpose.
-  **Cost while deferred:** every align tier decision is taken on an unstated reading, and the two
-  readings recommend opposite moves when the next miss lands.
-  Filed 2026-09-12 at spec to the gap inbox; promoted here by close, →fix refused as operator-class.
-
-- **push-account-selection-has-an-explicit-per-command-form** [cost: event/low] [surface: RELEASING.md]
-  — the pre-push account step is check-then-write, and the ops runbook's own open section measures
-  the active account re-arming between pushes inside one session, so the check narrows a window it
-  cannot close.
-  **Measured 2026-09-12, probed rather than reasoned:** the `GH_TOKEN` environment variable
-  overrides the keyring for `gh auth git-credential`, established by comparing the helper's answer
-  with and without the override — the tokens differed. A push can therefore name its identity
-  per-command while keeping the named remote, so `origin/master` still advances and the
-  stale-tracking-ref defect is not reintroduced, with no `-c credential.helper=` argument (which the
-  harness permission path refuses outright) and no credential in argv or a URL.
-  **Residual:** `bash-guard` refuses command substitution, so an agent reaches the form only through
-  `--scratch-run` or the operator's own shell.
-  **NOT SESSION-ACTIONABLE, and this entry does not ask for it to be.** The existing step is a
-  closed operator ruling (2026-08-27) and the runbook stating it is local-only, so superseding it is
-  a `/consult` and nothing else. What this entry asks for is a ranked decision on whether to take
-  the explicit form.
-  **Why design-pending:** the tracked half — a credential precondition at RELEASING.md — exists
-  only if the form is taken, so the design is downstream of a ruling no session may make.
-  **Cost while deferred:** the identity window the runbook measures stays open between pushes in one
-  session, with a probed remedy on record and unranked.
-  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its
-  release-transport read; drained and promoted at this iteration's scope.
-
-- **survey-locator-review-catches-after-loss** [cost: event/low] [surface: lifecycle-kit]
-  — the provenance-never-locator rule for survey-record citations is held by review, and the
-  review arrives after the cited content is gone.
-  lifecycle-kit/SPEC.md §The committed gap inbox refuses a gate on a measured rate of two
-  inbox locators, both caught by one read. A third instance, a survey-record locator on
-  `couples-dynamic-root-resolution`, was caught only after the boundary truncation had
-  destroyed the five dead repair options it pointed at; they were recovered from git and
-  restated on that entry at `registry-roster-oracles`' close.
-  **Why design-pending:** whether that rate now buys a write-time refusal (for example the
-  scratch-citation scan's corpus widened to queue prose for the two truncated surfaces)
-  reopens a stated refusal, which is not a build call.
-  **Cost while deferred:** a locator on a highly ranked entry loses its content silently at the
-  next boundary.
-  Filed 2026-09-12 by scope, from a truncated locator; drained and promoted 2026-09-13 at close.
-
-- **lead-agent-id-compaction-defense** [cost: event/low] [surface: lifecycle-kit]
-  — nothing tells a lead where a dispatched agent's id stays durable across a compaction.
-  A lead that reads an id back off the compaction summary, which is lossy and can drop a
-  character, gets an unreachable-agent error it can misread as the session being severed.
-  **Premise corrected at the drain:** the filing said lifecycle-kit/templates/lead.md tells a
-  lead to record subagent ids; `grep -n -i "task id\|agent id"` over that file finds no such
-  instruction, so the gap is the absence of one.
-  **Unverified claims carried openly:** that ids are fixed-width, that a listing shows only
-  running subagents, and that a failed send is evidence about the address, not the session.
-  **Why design-pending:** each claim needs a probe before it becomes a rule, and the home
-  (lead.md or delegation-kit's journal mechanics) is a tiering call.
-  **Cost while deferred:** a lead after compaction can abandon a live agent on a bad address.
-  Filed 2026-09-12 during build, after a compaction; drained and promoted 2026-09-13 at close.
-
 - **docs-cmd-retired-path-blind-to-queue** [cost: event/low] [surface: canon-kit]
   — canon-kit/SPEC.md §check-docs-cmd assertion (C) cannot see a retired path cited from the queue,
   from two sides: its corpus is the manifest set, which excludes TASK-QUEUE.md, and a
@@ -3007,6 +2940,10 @@
 - **artifact-substitution-remedy-has-no-end-to-end-arm** — untested end to end.
 - **uninstall-artifact-ownership-asymmetry** — uninstall leaves init's artifact.
 - **readme-bin-roster-underived** — no gate holds a kit README's bin/ tool roster.
+- **align-in-session-absorption-tier-unruled** — operator-class; awaits a consult.
+- **push-account-selection-has-an-explicit-per-command-form** — remedy probed, unranked.
+- **survey-locator-review-catches-after-loss** — a gate here reopens a stated refusal.
+- **lead-agent-id-compaction-defense** — each claim still wants its own probe.
 
 ## Done
 
