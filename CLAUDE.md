@@ -27,8 +27,9 @@ The gates in [`scripts/gates.list`](scripts/gates.list) run on this tree —
 dogfooding is day-one, not optional, though *which* gates register is a tuning
 decision here as for any consumer (`operator 2026-09-10`). Every command below
 runs the gate binary at `GATE_SDK_NATIVE_BIN`; before committing, run the full
-battery (the bare binary) and the touched kit's fixture suite, whose per-kit
-runner is in [README.md](README.md) §This repo, governed.
+battery (the bare binary) and the fixture suite of every kit the edit *reaches* —
+for a shared `native/src` module, every kit whose gates it implements, never the
+kit you edited; runner per kit in [README.md](README.md) §This repo, governed.
 
 The git index is shared with any concurrent session: check `git status` for a
 foreign staged path before `git add`, or stage and commit in one motion.
@@ -69,11 +70,10 @@ New gates here are **born native** — a Rust module, a `.gate` descriptor and a
 `good/`+`bad/` fixture pair; no gate is permanently shell, and a shell gate
 needs a cause from the live exception classes, stated in its own SPEC section
 (gate-sdk/SPEC.md §The port-candidate criteria). The four contracts (output,
-fail-closed, fixture-pair, self-lint) are
-[gate-sdk/SPEC.md](gate-sdk/SPEC.md)'s, enforced by the meta-gates, and the
-port oracle (gate-sdk/SPEC.md §port-blockers) answers for the battery and, with
-`--tree`, for the project. A red gate is fixed, never bypassed with
-`--no-verify` except as a one-off with cause.
+fail-closed, fixture-pair, self-lint) are [gate-sdk/SPEC.md](gate-sdk/SPEC.md)'s,
+enforced by the meta-gates, and the port oracle (gate-sdk/SPEC.md §port-blockers)
+answers for the battery and, with `--tree`, for the project. A red gate is fixed,
+never bypassed with `--no-verify` except as a one-off with cause.
 
 Comments are directives, else deleted — a passing `check-comment-tier` is the
 floor, not licence to keep a comment. Blessing a restatement (relocating prose

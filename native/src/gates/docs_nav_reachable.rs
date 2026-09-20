@@ -149,20 +149,7 @@ fn basename(p: &str) -> &str {
 fn relative_to_cwd(joined: &str) -> Option<String> {
     let here = walk::cwd().ok()?;
     let abs = walk::abs_against(&here, joined);
-    if abs == here {
-        return Some(".".to_string());
-    }
-    if let Some(r) = walk::rel_under(&here, &abs) {
-        return Some(r.to_string());
-    }
-    let (a, b): (Vec<&str>, Vec<&str>) = (
-        here.split('/').filter(|s| !s.is_empty()).collect(),
-        abs.split('/').filter(|s| !s.is_empty()).collect(),
-    );
-    let common = a.iter().zip(b.iter()).take_while(|(x, y)| x == y).count();
-    let mut parts: Vec<String> = vec!["..".to_string(); a.len() - common];
-    parts.extend(b[common..].iter().map(|s| s.to_string()));
-    Some(parts.join("/"))
+    Some(walk::relative_to(&here, &abs))
 }
 
 // spec: docs/site-architecture.md §Site chrome and the nav contract — each in-tree relative

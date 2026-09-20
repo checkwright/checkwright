@@ -16,6 +16,159 @@
 
 ## Deferred
 
+- **entry-line-cap-has-no-line-axis-relief** [cost: event/low] [surface: queue-kit]
+  — an entry at `QUEUE_KIT_ENTRY_LINE_CAP` buys room for a mandated write by
+  compressing prose a later reader needed, and nothing offers relief on the LINE
+  axis or rules that the trade is intended.
+  **Re-measured at this close off `check-queue-entry-budget`'s verbose headroom
+  read, and the squeezed set has GROWN since the filing:** FOUR entries sit at
+  exactly 0 lines of headroom — `record-stamp-encoding-compression`,
+  `companion-toolkit-profile`, `heterogeneous-agent-delegation` and
+  `worktree-isolated-agent-report-lost-to-a-failed-peer-send` — with two more at
+  1 and four at 2. The 2026-09-20 scope bullet that witnessed it named three at
+  0, one at 1 and one at 2.
+  **The witness is first-hand:** that scope had to land an operator-ruled
+  admission filter onto an entry at 0 headroom and compressed three load-bearing
+  paragraphs to make room, so the ruling shipped at three lines rather than the
+  two paragraphs its own gap bullet had costed.
+  **DISTINCT from `record-stamp-encoding-compression`, cited here rather than
+  re-filed.** That entry names both axes itself and its remedy is re-encoding
+  record STAMPS — which frees columns in stamp lines, never five lines of
+  paragraph prose. Its column axis is witnessed three times; its line axis had no
+  witness until 2026-09-20. No `recurrence:` date joins it: today's instance is
+  in its CLASS and outside its REMEDY, a neighbouring shape in the same family,
+  which files as a new finding on the same discrimination
+  `precondition-gate-direction-blindness` applies to its own sibling.
+  **DISTINCT from `icebox-eviction-line-budget-squeeze`** (the icebox tier's
+  one-line grammar against the column cap) and from
+  `lead-line-blocked-by-spec-tag-width-collision` (a lead line's COLUMN width).
+  **Deliverable — rule one of two, neither authored:** a line-axis relief the
+  owner entry does not propose (a discount class, a relocation rule, or a cap
+  read against entry class); or a recorded ruling that compression at the cap IS
+  the intended trade, so a squeezed session stops reading it as a defect.
+  **Cost while deferred:** every mandated write onto an entry at the cap pays in
+  prose, and the payment is invisible afterwards — the entry reads as though it
+  was always that terse.
+  Filed 2026-09-20 by close's drain as the second-order half of that scope
+  bullet; owner lookup ran over `line cap`, `headroom`, `entry budget` and
+  `squeeze` across the pool and returned the three entries distinguished above
+  and no owner.
+
+- **join-primitive-dataflow-unasserted** [cost: event/low] [surface: gate-sdk] —
+  `check-path-dialect`'s locality arm holds two of the path-dialect contract's
+  three text-level primitives; the third, joining a root onto a segment, is
+  asserted only where the join escapes on its own line.
+  **Declared, not inferred:** `gate-sdk/SPEC.md` §check-path-dialect names the
+  third primitive as unasserted rather than leaving it to a reader —
+  construction is lawful and only escape into a printed, matched or
+  prefix-tested value is the subject, so a form scan would red the hundreds of
+  `Path`-bound joins the clause explicitly permits. A join bound to a name whose
+  escape is a statement away is held by review, and by `walk.rs`'s monopoly on
+  the producers those roots arrive through.
+  **Deliverable:** a dataflow predicate — does this composed value reach a
+  printed, matched or prefix-tested reader — which is a different gate shape
+  from the form scan the arm is built on.
+  **Measured corpus bound:** 441 `format!("{}/"` lines under `native/src`, most
+  of them lawful construction, so the arm's own precision is what the design has
+  to buy.
+  **DISTINCT from `shell-cwd-anchor-clause-has-no-oracle`**, the other thing
+  that section declares unasserted: that is the SHELL cwd-anchor clause and this
+  is the CRATE's join primitive.
+  **Cost while deferred:** every crate edit composing a root relies on review to
+  catch an escaping join, which is the failure mode the locality arm was built
+  to stop relying on.
+  Filed 2026-09-20 by close's drain, off a build-stage gap bullet; owner lookup
+  ran over `join`, `dataflow`, `primitive` and `path-dialect` across the pool
+  and found only the shell half above.
+
+- **stage-evidence-prefix-doubles-a-separator** [cost: event/low] [surface: lifecycle-kit]
+  — `check-stage-evidence`'s path relativizer composes its not-under arm from
+  `git rev-parse --show-prefix`, which prints a TRAILING slash, onto a path with
+  a separator already between them.
+  **Latent rather than live, and that is why it is filed rather than fixed:**
+  the doubled separator is collapsed downstream by `walk::normalize_abs`, so no
+  verdict is wrong today. Removing the second separator is a behaviour change to
+  a COMPARED value, which wants its own measurement rather than a drive-by edit
+  at a close.
+  **Deliverable:** measure what the compared value is on each arm, then either
+  trim the prefix at the site or state at the site that the collapse is relied
+  on.
+  **Cost while deferred:** none paid today; the exposure is a later edit to
+  `normalize_abs`'s collapse turning a latent defect live with nothing asserting
+  the coupling.
+  Filed 2026-09-20 by close's drain, noticed at the build that routed the site's
+  prefix strip onto `walk::rel_under` and left as found; owner lookup ran over
+  `show-prefix`, `separator` and `stage-evidence` across the pool and returned
+  no owner.
+
+- **docs-index-front-door-restatement-ungenerated** [cost: event/low] [surface: docs]
+  — the eleven hand-authored `docs/<kit>/index.md` pages restate their kit
+  README's front-door content — the Install step and the Quick start arm list —
+  with NO generation and NO freshness gate.
+  **Measured, and the consequence already fired:**
+  `git grep -l '^generated: true' -- 'docs/*/index.md'` returns 0 of 11, and at
+  this iteration's build 17 of those restated lines still carried the pre-sweep
+  front-end spelling months after every kit README had been re-pointed. No
+  oracle saw it until `check-door-binding`'s assertion C reached past the kit
+  roots.
+  **DISTINCT from `door-binding-sweep-stops-at-the-kit-roots`, cited as evidence
+  rather than re-filed.** That entry owned the GATE'S REACH, and it landed; this
+  owns the RESTATEMENT that put a stale door there — a defect no door-shaped
+  predicate can see, and which survives that entry's close.
+  **Neither adjacent entry owns it, and reading the three together is the
+  point.** `generated-projections-roster-ungated` asserts a roster row exists
+  for each projection that already has a freshness gate, and
+  `projection-trigger-witness` asserts each such row's stated trigger is true —
+  both presuppose the page IS a generated projection, so a page generated by
+  nothing falls outside both corpora. This gap sits UPSTREAM of both: made
+  projections, these pages would enter both.
+  **Deliverable — rule one of two:** generate the restated blocks from each kit
+  README (a marker-bounded region plus a freshness gate, the shape `docs-mirror`
+  and `value-rollup` already take); or, where the site copy must stay
+  editorially distinct, a parity gate binding each index page's arm list to its
+  own kit README's.
+  **Cost while deferred:** every future kit-README front-door edit silently
+  diverges on eleven public adopter pages, and assertion C now catches only the
+  door-shaped subset — a changed knob name, arm name or install step stays
+  invisible to it.
+  Filed 2026-09-20 by close's drain off a build-stage gap bullet; owner lookup
+  ran over `index page`, `restate`, `parity` and `mirror` across the pool and
+  returned the two adjacent entries above and the iceboxed
+  `kit-index-page-vocabulary-ungated`, whose subject is index-page ENUMS, and no
+  owner.
+
+- **delta-instruction-batch-dependence-unmarked** [cost: once/low] [surface: lifecycle-kit]
+  — a spec amendment can state a delta instruction in the unconditional voice
+  when its satisfying act depends on which units share the build BATCH, and the
+  grammar has no way to say so.
+  **Attested twice in one iteration, both door amendments:** each carried
+  "exactly two of the 59 door sites are adopter-facing and are deliberately left
+  red, being the paired debt entry's deliverable" — true only of a batch
+  EXCLUDING that debt unit. The lead batched the debt unit IN on a
+  producer/consumer read, at which point the correct act was to REPAIR those two
+  sites.
+  **Measured, not projected:** the dispatched session reported it would have
+  left them red on the amendment's letter, and only an explicit prompt-side
+  inversion by the lead prevented it — which is prompt-side and dies with the
+  lead. A later session reading the merged amendment alone reaches the wrong act
+  and calls it correct.
+  **Deliverable — neither candidate authored:** a delta-authoring rule that a
+  batch-dependent instruction names its condition; or a spec-stage check that a
+  delta citing a sibling unit's deliverable states what happens when both land
+  together.
+  **DISTINCT from every live entry**, and the owner sweep over `delta`,
+  `amendment`, `batch` and `unconditional` found none:
+  `amendment-refusal-acceptance-parity` concerns an amendment's REFUSAL
+  rationale rather than its instruction voice, and
+  `amendment-dod-sibling-dependence` concerns a DoD item depending on an unnamed
+  sibling rather than a delta's voice.
+  **Cost while deferred:** once/low to rule, plus whatever the rule costs to
+  gate; until then every batch-dependent delta needs a lead present to invert
+  it.
+  Filed 2026-09-20 by the iteration lead to the gap inbox at the build batch-2
+  dispatch, where inverting the instruction was the act that surfaced it;
+  drained and promoted 2026-09-20 at close.
+
 - **shell-cwd-anchor-clause-has-no-oracle** [cost: event/high] [surface: gate-sdk]
   — Surfaced 2026-08-30. `gate-sdk/SPEC.md` §The path-dialect contract obliges a script that
   composes two roots to anchor its own cwd first, and nothing asserts it. The gate's own section
@@ -1975,6 +2128,7 @@
   the blocking grade on a bounded FP scope naming neither this shape nor the negated one.
   **Cost while deferred:** every entry that names itself as an upstream blocker pays one red and
   one valve, and the surface teaching the repair teaches three wrong ones.
+  recurrence: precondition-gate-direction-blindness 2026-09-20
   Filed 2026-08-24 to the gap inbox by scope, which reproduced the red; drained and promoted
   2026-08-25 at close, which read the gate's four help lines first-hand and corrected the filing.
 
@@ -2625,6 +2779,7 @@
   `gate-tests/` tree for the touched module's name and re-run each pair found
   (gate-sdk/SPEC.md §Fixture-pair discipline states it) — and missing it costs a stage-late repair
   commit, which is how it was found.
+  recurrence: gate-fixture-fanout-arm 2026-09-20
   Filed 2026-09-16 by `installer-front-door-cut`'s close, as the gap generalization owed by the
   lesson that dispositioned to that SPEC section.
 

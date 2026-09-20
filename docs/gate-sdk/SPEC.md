@@ -14958,8 +14958,8 @@ a reader who found one token doing both jobs could not tell which claim a site m
 (canon-kit/SPEC.md §check-comment-tier holds its roster row).
 
 **The third primitive is named as unasserted rather than left to a reader.** Joining a
-root onto a segment is the contract's too, and this arm does **not** hold it: delta 6's
-rule is that construction is lawful and only escape into a printed, matched or
+root onto a segment is the contract's too, and this arm does **not** hold it:
+construction is lawful and only escape into a printed, matched or
 prefix-tested value is the subject, so lawfulness there turns on where the composed
 value goes — dataflow, which a form scan cannot see, and a scan of the form alone would
 red the hundreds of `Path`-bound joins the clause explicitly permits. What the arm does
