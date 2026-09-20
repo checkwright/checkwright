@@ -346,7 +346,10 @@ exports the locator for those calls, as it already exports `GATE_SDK_GATES_DIR` 
 relocated gates directory. **The crate derives the kit roots from it**: the gate-sdk
 root, then every sibling under the root's parent holding a `checks/` or a `smoke/`
 directory, in name order, with `GATE_SDK_KIT_DIRS` replacing the set when it is
-non-empty. `walk::kit_roots_abs` spells them absolute, `walk::kit_roots` relative to
+non-empty. **A corpus over the kits is derived from those roots and never from a
+`*-kit/<file>` pathspec**, which over-returns badly: it also matches the on-site
+`docs/<kit>/` mirror and every `gate-tests/` fixture tree, so a count taken from it
+is a multiple of the real one. The derivation is the only reliable scoping. `walk::kit_roots_abs` spells them absolute, `walk::kit_roots` relative to
 the working directory, and `walk::kit_roots_rel` relative to the root's parent. **Which
 spelling a reader takes follows from what it does with the root, and the two relative
 spellings are not interchangeable.** A root **joined onto a path that is opened, statted,
@@ -2296,6 +2299,13 @@ The manifest grammar:
   name no static kit owns, and an empty value is a resolved-empty set, so a `knob:`
   naming an unowned name is exit 2 while a declared knob a consumer set empty
   expands to nothing — correct, because the gate then scans nothing either.
+  **Which knob *shapes* survive that grammar is the corollary, and it is stated here because
+  assembling it from the refusal plus the knob table cost a build stage.** Only a knob whose
+  members each carry no comma and no whitespace is representable, which excludes a `Row::scalar`
+  holding a whitespace-joined list outright and in *both* directions: unset it resolves empty and
+  the token is silently inert, set it becomes one member carrying spaces and the token refuses. A
+  `knob:` on such a row is therefore never right, and the row's shape — not the knob's name — is
+  what decides it.
   **A packed knob is addressed by a declared field, never whole.** Where a knob's row declares its
   element packing, `knob:<NAME>.<field>` names one field's members across its elements, read through
   the same parser the member's walk uses; a bare token on a packed knob is refused, since an element
@@ -2720,6 +2730,11 @@ into the same wall.
 measurement and the trade it defers are §build-native's. It is pointed at from
 this section because a session porting a member has its load trigger here and
 not there, which is the whole of what the pointer buys.
+
+**The build-then-stage order is §check-gate-binary-fresh's, and it is pointed at
+from here for that same reason.** A port that *adds* a crate source has to stage
+it before building, not after; that section owns the rule and why the stamp
+cannot see an untracked file. A session porting a member reads this one.
 
 **One of the grounds a port is argued on has changed since, and it changed by
 ruling rather than by drift.** That attempt was built under the constraint that

@@ -1136,8 +1136,11 @@ this selection**, not about the machine — which is the narrowing that makes th
 exit status usable as `init`'s precondition, since what `init` needs to know is
 exactly whether the tree it is about to vendor into will run.
 
-It has two behaviors, selected by where you run it rather than by a flag. Run
-anywhere, it reports the toolchain verdict. Run inside a repository that has
+It has two behaviors, selected by where you run it rather than by a flag. It
+takes **no** argument at all beyond `-h`/`--help` — `--profile` in particular is
+not one — so a per-profile toolchain verdict is observable only through `init`'s
+own refusal, which is the deployment-faithful path §The consumer smoke describes.
+Run anywhere, it reports the toolchain verdict. Run inside a repository that has
 been vendored into, it additionally reads `checkwright.lock` and reports the
 installed release, the upstream commit it came from, the profile, and the kit
 set — plus, where one was installed, the gate binary's target re-verified
