@@ -3172,9 +3172,22 @@ since a farm that dropped `sh` would fail every step for a reason that is not
 `bash`. In order:
 
 - **`doctor` with no install** exits 0 and renders `bash` as `not probed`, naming
-  the kits that owe it. The profiles whose kit sets share no name with that list
-  are the arm's subjects, read off the line rather than named here, and the
-  lattice minimum must be among them.
+  the audience it is owed by. That line is asserted and **no roster is taken out
+  of it**: which of §doctor's two renderings it carries — the resolved kit list or
+  the predicate — depends on whether the derivation reached a kit root, and a
+  harness that parses names out of it reads the predicate as a roster no kit
+  matches the moment the audience becomes derived, classifying every profile as
+  owing nothing while printing a larger count. The arm's subjects are instead the
+  profiles whose **own installed `doctor` report carried no probed `bash` row**,
+  recorded by the profile loop above. The rule is §doctor's verdict rule read
+  directly: an owed member is probed, rendered and sets the verdict, a not-owed one
+  is not rendered, and an undecided one is rendered unprobed and cannot set it —
+  which a selection whose derived audience reaches no kit root still produces, the
+  lattice minimum being exactly that case. The arm asks whether a machine with no
+  `bash` can install the profile, which is whether `bash` sets that selection's
+  verdict, so a probed row is the only rendering that means owed. Each selection's
+  own verdict is the answer, still read off doctor rather than named here, and the
+  lattice minimum must be among the subjects.
 - **At each such profile**, in a fresh consumer: `init --profile` exits 0, each
   command the follow-up block printed is executed and exits 0 — `--install-hooks`
   among them, which wires the hooks the next two steps commit through — then one

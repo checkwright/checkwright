@@ -230,6 +230,8 @@ PROFILE_DERIVED=full
 SEAM_FILES=("$GATES_DIR/gates.list" "$GATES_DIR/gate-sdk-config.knobs")
 # spec: installer/SPEC.md §Profiles — every install's own registry, keyed by profile, so the monotonicity assertion deferred out of the profile-invariant arm has the gate-set derivation's own output to run over
 declare -A REGISTRY=()
+# spec: installer/SPEC.md §The consumer smoke — every install's own bash verdict, keyed by profile: doctor renders an owed roster member and omits a not-owed one, so whether this profile's report carries a bash row IS the answer the bash-less arm needs, taken from the selection's own verdict rather than by intersecting kit names against a roster rendered with no selection to resolve against
+declare -A OWES_BASH=()
 
 seam_bin() {   # $1 = the knob-file seam -> the value of its GATE_SDK_NATIVE_BIN line, read in the knob-file line grammar (the head before the first `=`, blanks trimmed)
     local line head
@@ -795,6 +797,12 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
         grep -qxF "$member" <<<"${REGISTRY[$profile]}" \
             || fail "$profile: doctor named $member disarmed, but this install did not register it"
     done <<<"$disarmed"
+    # spec: installer/SPEC.md §doctor — an owed member is probed, rendered and sets the verdict; a not-owed one is not rendered; an undecided one is rendered unprobed and cannot set the verdict, which a selection whose derived audience reaches no kit root still produces. The bash-less arm's question is whether a machine with no bash can install this profile, which is exactly whether bash sets this selection's verdict, so a PROBED row is the only rendering that means owed
+    if grep -qE '^  bash( |$)' <<<"$out" && ! grep -qE '^  bash +not probed' <<<"$out"; then
+        OWES_BASH[$profile]=1
+    else
+        OWES_BASH[$profile]=0
+    fi
     say "doctor: clean, reports the installed profile and $(grep -c . <<<"$disarmed") disarmed member(s)"
 }
 
@@ -1206,25 +1214,22 @@ else
 
     ENTRY=(sh "$DL_ENTRY")
     C="$(consumer bash-less-probe)" || fail "could not build a scratch consumer for the bash-less arm"
-    # spec: installer/SPEC.md §doctor — with no install bash is undecided, so doctor exits 0 without it and names the kits that owe it; the list is read off that line rather than named here, so the harness carries no second copy of the roster's audience field
+    # spec: installer/SPEC.md §doctor — with no install bash is undecided, so doctor exits 0 without it and renders it unprobed; whether the line then names kits or states the predicate is that section's own case split, since a derived audience with no kit root to reach has no list to name, so this arm asserts the unprobed rendering and takes no roster out of it
     out="$( cd "$C" && PATH="$BASH_PATH" "${ENTRY[@]}" doctor 2>&1 )"; rc=$?
     [[ "$rc" -eq 0 ]] \
         || { printf '%s\n' "$out" >&2; fail "doctor exited $rc with no install and bash absent — with no selection bash is undecided rather than owed, so it cannot set the verdict"; }
-    BASH_KITS="$(sed -nE 's/^  bash +not probed — owed where (any of )?(.+) is selected$/\2/p' <<<"$out")"
-    [[ -n "$BASH_KITS" ]] \
-        || { printf '%s\n' "$out" >&2; fail "doctor with no install did not render bash as not probed, naming the kits that owe it"; }
-    say "doctor (no install): clean with no bash on PATH, bash owed where $BASH_KITS is selected"
+    grep -qE '^  bash +not probed — owed where .+ is selected$' <<<"$out" \
+        || { printf '%s\n' "$out" >&2; fail "doctor with no install did not render bash as not probed, naming the audience it is owed by"; }
+    say "doctor (no install): clean with no bash on PATH, bash rendered unprobed"
+    # spec: installer/SPEC.md §The consumer smoke — the subjects are the profiles whose own installed doctor report carried no bash row, recorded by the profile loop above; the verdict is read off each selection's own report rather than by intersecting kit names against an audience rendered with nothing to resolve against, which is a roster only while the audience is a static list and degrades to a sentence no kit name matches the moment it is derived
     BASHLESS_PROFILES=()
     for p in "${PROFILES[@]}"; do
-        owes=0
-        mapfile -t bl_kits < <(profile_kits "$p")
-        for k in "${bl_kits[@]}"; do
-            [[ ", $BASH_KITS, " == *", $k, "* ]] && { owes=1; break; }
-        done
-        [[ "$owes" -eq 0 ]] && BASHLESS_PROFILES+=("$p")
+        [[ -n "${OWES_BASH[$p]+set}" ]] \
+            || fail "the profile loop recorded no bash verdict for $p, so the bash-less arm cannot tell whether it owes bash"
+        [[ "${OWES_BASH[$p]}" -eq 0 ]] && BASHLESS_PROFILES+=("$p")
     done
     [[ " ${BASHLESS_PROFILES[*]} " == *" $PROFILE_MIN "* ]] \
-        || fail "the lattice minimum $PROFILE_MIN owes bash through [$BASH_KITS], so the arm has no bash-free profile to install"
+        || fail "the lattice minimum $PROFILE_MIN owes bash by its own doctor report, so the arm has no bash-free profile to install"
 
     for p in "${BASHLESS_PROFILES[@]}"; do
         C="$(consumer "bash-less-$p")" || fail "could not build a scratch consumer for the bash-less arm at $p"
