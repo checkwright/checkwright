@@ -112,9 +112,9 @@ kit is split out only if it earns independent adoption.
 ## This repo, governed
 
 The gates registered in [`scripts/gates.list`](scripts/gates.list) run on this
-tree. What a *commit* owes is the full battery plus the touched kit's fixture
-suite — that selection rule is [`CLAUDE.md`](CLAUDE.md)'s, stated there and not
-restated here.
+tree. What a *commit* owes is the full battery plus a selection of the fixture
+suites below — that selection rule is [`CLAUDE.md`](CLAUDE.md)'s, stated there
+and not restated here.
 
 The block below is a different thing: the **register of this repo's runnable
 verification suites**, the set the validate stage runs in full. It is held in
