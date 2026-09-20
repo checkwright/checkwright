@@ -12,6 +12,57 @@
 
 ## New Features
 
+- **path-dialect-clauses-unenforced** [spec: SPEC-path-speller-locality.md]
+  — the two clauses gate-sdk/SPEC.md §The path-dialect contract gained 2026-08-30 are held by
+  review alone, and neither is shaped like the form scan `check-path-dialect` already runs.
+  **Clause one: the cwd anchor has no oracle.** That section obliges a script to anchor its own
+  shell in the crossed spelling. `check-path-dialect`'s vocabulary is platform-native PRODUCERS
+  (`GIT_FLAGS`, `RUST_FORMS` in `native/src/gates/path_dialect.rs`) and carries no `pwd` form, by
+  the contract's own reasoning that a shell builtin produces no foreign value. The hole is that a
+  builtin PROPAGATES one: an absolute `cd` leaves `$PWD` in the argument's dialect, and a later
+  relative `cd … && pwd` concatenates onto it. That is how `gen-pre-commit.sh`'s prologue died on
+  the Windows leg. A gate must pair two facts a script exhibits — it derives a root from
+  `BASH_SOURCE` with a relative `cd`, and it composes two roots by string arithmetic — rather than
+  scan for one form.
+  **Clause two is not merely unenforced: as written it is FALSE**, which is why this stopped being
+  debt. The sentence at gate-sdk/SPEC.md:868 asserts "No module outside it composes a path, in
+  either style"; `git grep -c '\.join(' -- native/src` returns 137 files, and `proc.rs` and
+  `marker.rs` compose real filesystem paths. Restating it NARROWS what the contract asserts, which
+  is envelope work rather than calibration — lead decision 2026-09-20, taken against the contract
+  at its source rather than against precedent. The restatement, its grounds and the refused
+  alternatives are the amendment's; this entry owes the assertion.
+  **Why one entry rather than two.** Both are the same landed contract's unenforced half, both were
+  filed the same day by the unit that landed it, and both need a pairing predicate rather than a
+  form scan. Splitting them files one shape twice.
+  **Cost class event/high, whose home is this prose while the entry is active:** a Windows
+  adopter's gate verdict, which is a cost already paid once — `check-install-disposition` read its
+  whole corpus as unregistered on round 5 because a composed separator escaped into a compared
+  value, and a Linux battery cannot show it.
+  **SECOND INSTANCE, 2026-09-20, and this one shipped to the remote.** The `door-binding-sweep`
+  close's watched push failed both Windows install-smoke legs: `native/src/toolfloor.rs` synthesized
+  `<anchor>/` and prefix-tested it against a backslash-spelled absolute root, so every kit root read
+  as outside the walk and `init` exited 2 — clause two's predicate exactly. Hotfixed minimal under
+  the impacting-failure carve-out and verified green on the next watched run; the GATE half is this
+  entry, which is what enforcement-first still owes.
+  **The corpus is JUDGED, all twelve, at this iteration's spec stage** — the roster stays the
+  command `git grep -n 'starts_with(&format!("{}/"' -- native/src`, and the per-site verdicts are
+  the amendment's delta 3. Summary: one lawful, TWO comparing a non-filesystem namespace (a roadmap
+  `horizon/track` field, a markdown link target) which is the only crying-wolf class and takes a
+  declared exemption, five git-relative where routing through a `walk` helper is
+  correct-by-construction rather than a false positive, and four host-absolute.
+  **The filed host-absolute-versus-git-relative discriminator is DROPPED, not adjudicated:** it
+  returns the same verdict for the shipped `toolfloor.rs` defect and for `emit/scratch_run.rs`:38,
+  which is correct and self-attested, so it does not discriminate. The entry's former remaining
+  design question is answered by deletion.
+  recurrence: path-dialect-clauses-unenforced 2026-09-20
+  Joins this iteration as its LEAD unit by operator direction (2026-09-20, lead-relayed), the
+  adopter-floor door remainder; reclassified from debt to feature and promoted at this iteration's
+  spec stage by lead decision, on the narrowing above. The scope session raised this correction
+  against its own promotion premise.
+  Filed 2026-08-31 by close, draining two 2026-08-30 gap bullets. Fix was tried first and refused
+  (the assertion the second bullet proposes reds a benign population); icebox second, refused
+  because a gate's verdict on an adopter's host is adopter-facing.
+
 - **fail-open-front-end-residency-after-the-door-sweep** [spec: SPEC-front-end-residency.md]
   — `gate-sdk/bin/run-gates.sh` and its PowerShell twin stay permanently resident for the
   fail-open arms after every other adopter surface was re-pointed at the binary.
@@ -64,66 +115,15 @@
 
 ## Technical Debt
 
-- **path-dialect-clauses-unenforced** — the two clauses gate-sdk/SPEC.md §The
-  path-dialect contract gained 2026-08-30 are held by review alone, and neither is shaped like the
-  form scan `check-path-dialect` already runs.
-  **Clause one: the cwd anchor has no oracle.** That section obliges a script to anchor its own
-  shell in the crossed spelling. `check-path-dialect`'s vocabulary is platform-native PRODUCERS
-  (`GIT_FLAGS`, `RUST_FORMS` in `native/src/gates/path_dialect.rs`) and carries no `pwd` form, by
-  the contract's own reasoning that a shell builtin produces no foreign value. The hole is that a
-  builtin PROPAGATES one: an absolute `cd` leaves `$PWD` in the argument's dialect, and a later
-  relative `cd … && pwd` concatenates onto it. That is how `gen-pre-commit.sh`'s prologue died on
-  the Windows leg. A gate must pair two facts a script exhibits — it derives a root from
-  `BASH_SOURCE` with a relative `cd`, and it composes two roots by string arithmetic — rather than
-  scan for one form.
-  **Clause two, whose filed premise is CORRECTED here rather than carried forward.** The claim was
-  that `walk.rs` is the crate's sole path SPELLER and nothing holds it there. Re-verified at this
-  drain: it is not. `.join(` appears widely outside `walk.rs`, and a real share of those compose
-  filesystem paths — `proc.rs`'s program probe and its capture files, `marker.rs`'s scratch dir. An
-  assertion on that spelling, in the shape of the sibling unit test that bars a walk outside
-  `walk.rs`, would therefore red a large and overwhelmingly benign population. What DOES hold is
-  narrower and is the property worth enforcing: `walk.rs` is the sole producer of the path STRINGS
-  a gate reports or matches on, and `DirEntry::path` outside it is genuinely absent. The predicate
-  is escape into a reported or compared value, not composition.
-  **Why one entry rather than two.** Both are the same landed contract's unenforced half, both were
-  filed the same day by the unit that landed it, and both need a pairing predicate rather than a
-  form scan. Splitting them files one shape twice.
-  **Cost class event/high, whose home is this prose while the entry is active:** a Windows
-  adopter's gate verdict, which is a cost already paid once — `check-install-disposition` read its
-  whole corpus as unregistered on round 5 because a composed separator escaped into a compared
-  value, and a Linux battery cannot show it.
-  **SECOND INSTANCE, 2026-09-20, and this one shipped to the remote.** The `door-binding-sweep`
-  close's watched push failed both Windows install-smoke legs: `native/src/toolfloor.rs` synthesized
-  `<anchor>/` and prefix-tested it against a backslash-spelled absolute root, so every kit root read
-  as outside the walk and `init` exited 2 — clause two's predicate exactly. Hotfixed minimal at
-  `88c7e9b4` under the impacting-failure carve-out and verified green on the next watched run; the
-  GATE half is this entry, which is what enforcement-first still owes.
-  **Corpus MEASURED at this scope, not estimated:** `git grep -n 'starts_with(&format!("{}/"' --
-  native/src` returns exactly 12 sites — that command is the roster, so no copy of it lands here.
-  **The sharpened predicate question, this entry's remaining design work.** A
-  host-absolute-versus-git-relative discriminator and clause two's own "escape into a reported or
-  compared value" are NOT the same test, and they disagree on `spec.rs`:109 and :120: both operands
-  are host-absolute yet already crossed once through `walk::cwd()` and never re-normalized, so the
-  first flags them while the second reads a speller-locality question that is benign today.
-  `emit/scratch_run.rs`:38 is clean under both and self-attested at the site. Judge the corpus
-  before shipping the assertion — a gate crying wolf on the git-relative majority is what
-  gate-sdk/SPEC.md §When a gate earns its place bars.
-  recurrence: path-dialect-clauses-unenforced 2026-09-20
-  Joins this iteration as its LEAD unit by operator direction (2026-09-20, lead-relayed), the
-  adopter-floor door remainder. Promoted as debt rather than marked for spec: the contract is
-  already landed and named (gate-sdk/SPEC.md §The path-dialect contract, 2026-08-30) and the
-  deliverable adds an assertion to `check-path-dialect` under names the specs already carry, so
-  the new-names litmus makes it debt and no amendment is owed. The predicate question above is
-  calibration inside that contract, not a widening of it.
-  Filed 2026-08-31 by close, draining two 2026-08-30 gap bullets. Fix was tried first and refused
-  (the assertion the second bullet proposes reds a benign population); icebox second, refused
-  because a gate's verdict on an adopter's host is adopter-facing.
-
 - **readme-front-door-is-adopter-facing-and-outside-every-sweep**
   — `README.md` carries 19 `bash gate-sdk/bin/run-gates.sh` sites, and
   line 25 is the landing page's headline try-it command, first screen. That makes it
   **adopter-facing**, on a project whose adopter-constraint claim is git as the only
   unconditional floor member.
+  **The corpus is TWO sites, not one, measured at this iteration's spec stage:** `docs/index.md`:27
+  carries the identical command as the served site's own headline. The close before this one listed
+  that file in its `docs/` count and read the whole count as contributor-facing, which is the same
+  misclassification stamped as a recurrence on `door-binding-sweep-stops-at-the-kit-roots`.
   **Measured at `door-binding-sweep`'s close by the staleness read, after two earlier
   measurements of the same corpus missed it** — the filing bullet's, and that close's own
   drain re-grep, which covered `docs/` only. `check-door-binding` cannot see the file: its
@@ -133,11 +133,24 @@
   spelling the line should carry interacts with the fail-open front-end constraint the sweep
   itself ruled on. Routed here by the lead at that close as the scope-gated-intake default —
   a routing call rather than a judgment on the merits, revisable by a later session.
-  **Cost class once/low, whose home is this prose while the entry is active:** the landing page's
-  first command hands every visitor `bash`, while the entry owning the class reads every live site
-  as contributor-facing.
+  **Cost class once/low, whose home is this prose while the entry is active, and the cost is worse
+  than filed:** both front pages hand every visitor `bash`, and — measured with the binary absent —
+  the command they hand over exits 2 with a build remedy, so a prospective adopter's first
+  interaction with the project is a failure that needs a toolchain to clear.
+  **Remedy, as delta 3's obligation rather than a re-pointing:** each of the two pre-build doors —
+  `README.md`:25 and `docs/index.md`:27 — must either state its precondition adjacently (the build
+  step, and that `bash` is the clone-path floor and not the install floor) or hand the reader the
+  install path instead; a line re-pointed at the binary is refused outright, because
+  `native/target/` is gitignored and no binary is tracked, so that spelling names a path a fresh
+  clone does not have.
+  The delta is `fail-open-front-end-residency-after-the-door-sweep`'s amendment, which names this
+  entry as its executing unit and names both sites as its corpus — so the second site has an
+  executing unit here rather than a pendency this iteration manufactured for itself.
   Joins this iteration second in work order, by operator direction (2026-09-20, lead-relayed) on
-  the adopter-floor door remainder. Promoted as debt — re-pointing one line adds no name.
+  the adopter-floor door remainder. Stays **debt**: the remedy is editorial and adds no name, the
+  `pre-build door` class being minted by the amendment rather than here. Lead decision
+  2026-09-20 — if satisfying it turns out to need new mechanism (a gate, an installer verb, a
+  generated banner), the new-names litmus reclassifies it and it goes back to the lead.
   **BLOCKED, and the tag that would say so does not fit: do not pick this before
   `fail-open-front-end-residency-after-the-door-sweep` has ruled** which spelling an adopter-facing
   door may carry. A blocked-by tag naming that slug measures 130 columns against the
@@ -148,7 +161,7 @@
   Filed 2026-09-20 at `door-binding-sweep`'s close on the staleness read; the corpus
   correction itself landed inline in that iteration. Owner lookup: `README.md`, `--run-demo`,
   `door`, `front end` — none. `door-binding-sweep-stops-at-the-kit-roots` is **adjacent and
-  distinct**: it owns the gate's reach, this owns one adopter-facing site's spelling.
+  distinct**: it owns the gate's reach, this owns the two adopter-facing sites' spelling.
 
 ## Deferred
 
