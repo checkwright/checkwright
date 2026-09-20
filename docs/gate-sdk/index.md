@@ -25,10 +25,12 @@ external, so an upgrade replaces the directory losslessly.
 
 ## Quick start
 
+Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names; with no arm at
+all it runs the full battery:
+
 ```bash
-bash gate-sdk/bin/run-gates.sh                       # run the full battery
-bash gate-sdk/bin/run-gates.sh --run-gate-tests gate-sdk/gate-tests gate-sdk/checks
-bash gate-sdk/bin/run-gates.sh --install-hooks       # opt this clone into the hook
+--run-gate-tests gate-sdk/gate-tests gate-sdk/checks
+--install-hooks       # opt this clone into the hook
 ```
 
 ## Contracts

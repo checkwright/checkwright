@@ -35,16 +35,19 @@ rule content crosses the provenance seam.
 
 ## Install
 
-Vendor the `doctrine-kit/` directory into your repo, run
-`bash gate-sdk/bin/run-gates.sh --install-doctrine` to write the reference block into
-your always-loaded agent file, and register `check-doctrine-registration` in
-`gates.list`. Point `DOCTRINE_KIT_AGENT_FILE` / `DOCTRINE_KIT_DOCTRINE_FILE` at
-your own paths if they differ from the defaults.
+Vendor the `doctrine-kit/` directory into your repo, run the
+`--install-doctrine` arm on the gate binary `GATE_SDK_NATIVE_BIN` names to write
+the reference block into your always-loaded agent file, and register
+`check-doctrine-registration` in `gates.list`. Point
+`DOCTRINE_KIT_AGENT_FILE` / `DOCTRINE_KIT_DOCTRINE_FILE` at your own paths if
+they differ from the defaults.
 
 ## Quick start
 
+Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+
 ```bash
-bash gate-sdk/bin/run-gates.sh --run-gate-tests doctrine-kit/gate-tests doctrine-kit/checks
+--run-gate-tests doctrine-kit/gate-tests doctrine-kit/checks
 ```
 
 ## Contracts

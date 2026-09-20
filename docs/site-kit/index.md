@@ -41,8 +41,10 @@ the CNAME file, and declare your aliases in the kit's external config.
 
 ## Quick start
 
+Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+
 ```bash
-bash gate-sdk/bin/run-gates.sh --run-gate-tests site-kit/gate-tests site-kit/checks
+--run-gate-tests site-kit/gate-tests site-kit/checks
 ```
 
 ## Contracts

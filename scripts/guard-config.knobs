@@ -1,5 +1,9 @@
 # spec: guard-kit/SPEC.md §Layout and configuration — this repo's guard-kit consumer knob file; set only what this repo overrides beyond the kit defaults
 
+# spec: guard-kit/SPEC.md §check-door-binding — this repo's own surfaces beyond the kit roots that assertion C sweeps: the root README and the served docs tree, each entry a whole tree rather than a page roster so a page added later is swept unedited
+GUARD_KIT_DOOR_ROOTS[] = README.md
+GUARD_KIT_DOOR_ROOTS[] = docs
+
 # spec: guard-kit/SPEC.md §compare-settings-allow — witnesses that a local-overlay glob is too broad; probes, not a roster, so no completeness is claimed
 GUARD_KIT_BREADTH_PROBES[] = Bash(git reset --hard)
 GUARD_KIT_BREADTH_PROBES[] = Bash(git clean -fd)

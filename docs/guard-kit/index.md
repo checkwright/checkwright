@@ -24,8 +24,10 @@ harness's pre-tool hook. The ruleset and allowlists are external configuration.
 
 ## Quick start
 
+Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+
 ```bash
-bash gate-sdk/bin/run-gates.sh --run-guard-tests     # exercise the decision table
+--run-guard-tests    # decision-table over the generic ruleset
 ```
 
 ## Contracts

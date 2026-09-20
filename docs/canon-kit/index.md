@@ -24,8 +24,10 @@ configuration.
 
 ## Quick start
 
+Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+
 ```bash
-bash gate-sdk/bin/run-gates.sh --run-gate-tests canon-kit/gate-tests canon-kit/checks
+--run-gate-tests canon-kit/gate-tests canon-kit/checks
 ```
 
 ## Contracts

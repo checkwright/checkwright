@@ -24,8 +24,10 @@ Vendor the `delegation-kit/` directory into your repo, register its gate in
 
 ## Quick start
 
+Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+
 ```bash
-bash gate-sdk/bin/run-gates.sh --usage-verdict        # one budget verdict: OK / PAUSE / STALE
+--usage-verdict        # one budget verdict: OK / PAUSE / STALE
 ```
 
 ## Contracts

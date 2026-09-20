@@ -23,8 +23,10 @@ plugin list, and wire the trend summary into your session-start brief.
 
 ## Quick start
 
+Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+
 ```bash
-bash gate-sdk/bin/run-gates.sh --emit drift-report   # the full advisory report
+--emit drift-report   # the full advisory report
 ```
 
 ## Contracts
