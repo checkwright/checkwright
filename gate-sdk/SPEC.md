@@ -14942,6 +14942,21 @@ a prefix test is the containment form above. The remainder — a join bound to a
 whose escape is a statement away — is held by review, and by `walk.rs`'s monopoly on
 the producers those roots arrive through.
 
+**And the cwd-anchor clause is unasserted on the shell side, which is the other thing
+this gate does not hold.** §The path-dialect contract obliges a script that composes
+two roots to anchor its own cwd first, on the propagation this gate's own producer
+vocabulary cannot see: a builtin produces no foreign value but *propagates* one, so an
+absolute `cd` leaves `$PWD` foreign and a later relative `cd … && pwd` concatenates onto
+it. Neither half is a producer occurrence, and the `pwd -P` read-back arm above reaches
+only a `cd` this gate already cleared — so nothing here fires on a script that derives a
+root from `BASH_SOURCE` with a relative `cd` and then composes two roots by string
+arithmetic. Holding it needs a predicate that **pairs** those two facts rather than
+scanning for either, which is a different shape from both arms above and is filed rather
+than sketched here. There is also no shell counterpart of `walk::path_root` to route a
+shell-side absoluteness test through, and this contract refuses a shared shell
+normalizer on its own stated grounds, so the satisfying value is itself an open
+question rather than a known edit.
+
 **Its own vocabulary is a recorded verdict, and its unit tests compose from that
 one site.** The module names the forms it hunts, so it would red on itself; the two
 constants carrying the roster take the same `spec:` verdict any other deliberate
