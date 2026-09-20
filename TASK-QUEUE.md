@@ -3113,9 +3113,4 @@
 
 ## Done
 
-- path-dialect-clauses-unenforced
-- readme-front-door-is-adopter-facing-and-outside-every-sweep
-- fail-open-front-end-residency-after-the-door-sweep
-- door-binding-sweep-stops-at-the-kit-roots
-
 ## Lessons Learned

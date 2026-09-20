@@ -192,7 +192,14 @@ it proves only the former.
 ## The guard framework (`lib/guard.sh`)
 
 Primitives a consumer guard composes; each emits the harness's
-`PreToolUse` hook protocol:
+`PreToolUse` hook protocol, whose exit-status contract grounds every rule below:
+**exit 2** blocks the call and feeds stderr back to the agent, **exit 0** is no
+decision, and **every other non-zero status, 127 included, is a non-blocking
+error after which the call proceeds** — with a `hook error` notice on the first
+run alone, and a `statusLine` command's non-zero status only blanking the line.
+An absent hook command therefore *silently disables* a policy hook rather than
+refusing it, which is why a guard binary may not be allowed to fail open on its
+own absence.
 
 - `guard_read_input` — read stdin **once** into the global `GUARD_INPUT`,
   returning non-zero when stdin yielded nothing. Called **directly**, never in a
@@ -2804,6 +2811,16 @@ audience axis already rules for its own empty value. Default-deny is what closes
 the failure this assertion exists for — a future adopter-facing page
 reintroducing a repaired defect while nothing reds. Under it a new page's door
 reds the day it lands, with no roster to remember to update.
+
+**Default-deny admits no pre-build exemption, and the two satisfying forms are
+the only ones.** A door standing on a configured corpus reds even where the site
+states its own precondition — that the binary is not built yet, say — because a
+stated precondition is prose and the discriminator is the declaration token. The
+repairs are therefore exactly two: name the arm on the binary the
+`GATE_SDK_NATIVE_BIN` knob resolves, or declare the site contributor-facing.
+Stated here because the reading is not derivable from the assertion's own
+wording, and a session meeting a pre-build door will otherwise look for a third
+form that does not exist.
 
 **Two scopes, because a one-site-one-declaration grammar is unaffordable and an
 unaffordable gate does not land.** *Site scope* is the declaration on the door's
