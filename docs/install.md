@@ -273,7 +273,8 @@ Some requirements belong to an **install path** rather than to the battery, and
 no delivery-path tool joins the roster above. That roster asserts what the
 *battery* requires; how the payload reached your machine is not that, so the
 three paths carry their requirements here in prose instead. The **Release
-tarball** wants `curl` (or `wget`) plus `tar` and `sha256sum`, the last its own
+tarball** wants `curl` (or `wget`) plus `tar` and either hasher, `sha256sum` or
+the `shasum` stock macOS ships instead of it, the last its own
 requirement for checking the tarball's digest. The **`npx` installer** wants Node. **Manual vendoring** wants nothing
 beyond the roster. Nothing in the gate battery uses Node on any of the three, so
 a consumer who would rather not add it takes either of the other two paths and
@@ -343,7 +344,10 @@ curl -fsSL -o "$cw/checkwright-X.Y.Z.tgz" \
   https://github.com/checkwright/checkwright/releases/download/vX.Y.Z/checkwright-X.Y.Z.tgz
 curl -fsSL -o "$cw/checkwright-X.Y.Z.tgz.sha256" \
   https://github.com/checkwright/checkwright/releases/download/vX.Y.Z/checkwright-X.Y.Z.tgz.sha256
-( cd "$cw" && sha256sum -c checkwright-X.Y.Z.tgz.sha256 && tar -xzf checkwright-X.Y.Z.tgz )
+( cd "$cw" \
+  && { sha256sum -c checkwright-X.Y.Z.tgz.sha256 \
+       || shasum -a 256 -c checkwright-X.Y.Z.tgz.sha256; } \
+  && tar -xzf checkwright-X.Y.Z.tgz )
 
 sh "$cw/package/bin/checkwright.sh" init  # from your repository root
 ```
@@ -374,8 +378,8 @@ left to be discovered. npm builds the asset on the release runner; consuming it
 needs no Node.
 
 If Node is already on your machine the same install is one command —
-`npx checkwright init`, then the two `gate-sdk` lines above. Same payload, same
-`init`, same `checkwright.lock`; only the fetch differs.
+`npx checkwright init`. Same payload, same `init`, same `checkwright.lock`; only
+the fetch differs.
 
 `init` vendors the selected profile's kit directories and writes a `gates.list`
 seeded with each kit's starting gates, alongside the config seam those kits

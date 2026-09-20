@@ -30,7 +30,8 @@ install-time lifecycle script — the contract and what it costs are
 ## Before you run it
 
 Each transport carries its own requirement, and each belongs to the delivery
-path alone. The Release tarball needs `curl`, `tar` and `sha256sum`; npm needs
+path alone. The Release tarball needs `curl`, `tar` and either hasher
+(`sha256sum`, or the `shasum` stock macOS ships instead); npm needs
 Node, for `npx`. The gate battery this vendors uses none of them, and no
 delivery-path tool joins the toolchain roster.
 
@@ -53,7 +54,10 @@ curl -fsSL -o "$cw/checkwright-X.Y.Z.tgz" \
   https://github.com/checkwright/checkwright/releases/download/vX.Y.Z/checkwright-X.Y.Z.tgz
 curl -fsSL -o "$cw/checkwright-X.Y.Z.tgz.sha256" \
   https://github.com/checkwright/checkwright/releases/download/vX.Y.Z/checkwright-X.Y.Z.tgz.sha256
-( cd "$cw" && sha256sum -c checkwright-X.Y.Z.tgz.sha256 && tar -xzf checkwright-X.Y.Z.tgz )
+( cd "$cw" \
+  && { sha256sum -c checkwright-X.Y.Z.tgz.sha256 \
+       || shasum -a 256 -c checkwright-X.Y.Z.tgz.sha256; } \
+  && tar -xzf checkwright-X.Y.Z.tgz )
 
 sh "$cw/package/bin/checkwright.sh" init
 ```
