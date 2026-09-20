@@ -2,5 +2,12 @@
 # a bare name, a floor, an implementation token, and both axes comma-joined. The
 # roster's `jq:` proves an empty trailing field parses as the unconstrained `jq`.
 # Two args steer the gate onto hermetic fixture copies of each surface.
+#
+# The `bash` element's audience is `derived`, so the gate resolves it over this case
+# dir's synthetic kits (named by scripts/gate-sdk-config.knobs, read at cwd) and
+# compares the page against a MEASUREMENT rather than a literal. alpha-kit qualifies
+# through the settings-template arm alone and beta-kit through the shebang arm alone,
+# so a green line needs both; delta-kit qualifies under neither, so the green is not
+# the vacuous one a predicate matching everything would also give.
 install.md
 probe.sh

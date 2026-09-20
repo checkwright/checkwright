@@ -45,7 +45,9 @@ macro_rules! roster {
 
 roster! {
     GIT = "git", "";
-    BASH = "bash", "context-kit+delegation-kit+drift-kit+guard-kit+lifecycle-kit";
+    // spec: context-kit/SPEC.md §bin/env-probe — the audience is `toolfloor`'s own holder rather
+    // than a twin literal here, so the roster and `PROBE_SET` cannot be edited apart
+    BASH = "bash", crate::toolfloor::DERIVED;
     #[cfg(not(unix))]
     DATE = "date", "";
     MKTEMP = "mktemp", "contributor";

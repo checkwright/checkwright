@@ -467,6 +467,22 @@ verdict set is, and a unit test in `toolfloor.rs` holds it closed:
   crate `REGISTRY` row is a consumer-declared shell gate and contributes
   nothing, a consumer command being the consumer's requirement
   (gate-sdk/SPEC.md §The program roster).
+- **`derived`** — the kit list is not spelled at all: the reader evaluates the
+  member's own predicate over the kit roots and takes the kit-list arm above on
+  what it returns. It exists for the same reason `registered` does — a set that
+  can be measured is a set nothing should maintain (Derivation-first) — and it
+  is a *sentinel*, never a kit name, exactly as the two values above are. A
+  written-back value computed once and gated for freshness was the alternative
+  and is a copy; the audience is read by a process that already has the kit
+  roots in hand, so there is nothing to cache. Its resolution is the reader's,
+  not the roster's: the predicate opens files, and only the caller knows which
+  tree holds the kits a given report is about — the payload before an install,
+  the vendored tree after one. **A `derived` audience that resolves to nothing
+  is undecided, never not-owed.** An empty answer means the derivation reached
+  no kit root to read, and rendering that as *you do not owe this member* is
+  precisely the fail-open a derivation is here to close; every reader therefore
+  publishes the resolved kit names rather than the sentinel, and reports an
+  unresolvable one as unprobed.
 
 **The owed-predicate.** `toolfloor` answers *is this member owed under this
 selection*, where a **selection** is a kit set and a registered gate set, from a
@@ -475,7 +491,10 @@ its names — sharing a name with the kit set, or `registered` where some gate-s
 member's `REGISTRY` row names the member), **not owed** (`contributor`, a kit
 list sharing no name with the kit set, or
 `registered` with no such row), and **undecided** (a conditional value with no
-selection to read). It exists so no consumer-side reader re-implements that rule
+selection to read, or a `derived` value the selection carries no resolution
+for). A `derived` value resolves to its kit list first and then takes the
+kit-list arm unchanged, so the predicate gained a spelling and no fourth
+answer. It exists so no consumer-side reader re-implements that rule
 against a value set it does not own. A consumer-side reader — the installer's
 `doctor`, whose exit status is `init`'s last precondition — probes and fails
 only on an owed member, skips a not-owed one outright, and renders an undecided
@@ -488,7 +507,7 @@ that re-fires the day a second contributor-only member lands.
 
 The constrained members and what forces each:
 
-- `bash:4.3::context-kit+delegation-kit+drift-kit+guard-kit+lifecycle-kit` — the
+- `bash:4.3::derived` — the
   floor is set by the **highest** construct the shipped shell runs, not the most
   numerous. Three bash-4.0 constructs are present — `declare -A`
   (gate-sdk, guard-kit, evidence-kit, the installer's consumer smoke), `mapfile`
@@ -502,26 +521,44 @@ The constrained members and what forces each:
   floor of every shell surface that sources it. Recorded here because the
   earlier `4.0` was a fail-open: `env-probe` reported `ok` on a 4.2 box the
   battery would fail with an obscure syntax error.
-  **The audience is the kits whose shipped surfaces reach `bash`.** The generated
-  git hooks are POSIX sh (gate-sdk/SPEC.md §gen-pre-commit), `init` spawns the
-  binary it placed rather than the front-end, and its follow-up block names that
-  binary (installer/SPEC.md §init), so a selection reaches `bash` only through a
-  kit that ships a surface running it or telling a session or the harness to run
-  it: context-kit's session template and its SessionStart wiring,
-  delegation-kit's agent-execution procedure, drift-kit's KPI template and
-  economics procedure, guard-kit's library, guard template, settings wiring and
-  close-triage procedure, and lifecycle-kit's stage templates, lead and upgrade
-  procedures. The list was enumerated with
-  `git grep -l -e "bash gate-sdk/bin/run-gates.sh" -e "^#!/usr/bin/env bash" -- '*-kit/*' 'gate-sdk/*'`
-  less tests, smokes, fixtures, SPECs and READMEs. evidence-kit and queue-kit
-  appear there only through their config templates' header comments, which are
-  reference text and no spawn; gate-sdk's remaining bash surfaces are the
-  front-end no starter path needs, the contributor-side build script, the
-  adopter's own opt-in shell-gate skeleton and a workflow template that runs on a
-  CI runner; canon-kit's config template header names the binary. **Its honest
-  limit:** the list is held by hand against the kits' shipped reach, so a kit
-  that later ships a bash surface without joining it is under-declared and
-  nothing reds.
+  **The audience is derived, not listed, and this is the predicate a kit is
+  measured against:** a kit root is in the bash audience when it **ships a file
+  the adopter's host runs with bash** — a file under that root, outside
+  `gate-tests/` and `smoke/`, that either carries a **bash shebang** or is a
+  shipped **settings template whose hook command is spawned with a `bash`
+  word**. The second arm keys on the template and not on the script it names,
+  because the kit shipping the wiring is what makes the adopter's harness run
+  bash whichever root the target lies under. Both arms read a *spawn*: an
+  interpreter is matched as a path component, so `#!/usr/bin/env pwsh` does not
+  qualify on the `sh` inside `pwsh`, and `#!/bin/sh` does not qualify at all.
+  Prose telling a reader to **type** a bash command is deliberately **not** the
+  predicate. That exclusion is what makes the derivation decidable rather than
+  contested: while both readings were live they disagreed about which kit roots
+  qualify, and since the door sweep (guard-kit/SPEC.md §check-door-binding) no
+  kit ships such prose, so admitting it would re-open that disagreement. The
+  exclusion of `gate-tests/` and `smoke/` is the contributor boundary the
+  `contributor` audience above already draws, reused rather than restated.
+
+  **The floor-holding root is narrowed past**, named by the root the SDK
+  occupies rather than by a literal: `installer/profiles.list` puts it in every
+  profile by construction, so admitting it would make the member unconditional —
+  the floor the adopter constraints refuse (gate-sdk/SPEC.md §The adopter
+  constraints, *the floor is git*). Its own bash surfaces are the front-end stub
+  no starter path needs, the contributor-side build script and the adopter's
+  opt-in shell-gate skeleton, which the `contributor` audience and the door
+  surfaces already account for.
+
+  What the derivation replaces is a hand-held list whose honest limit had
+  already been realized: nothing re-derived it, so it had drifted in **both**
+  directions at once — over-declaring kits that ship no such file and
+  under-declaring kits that do. Neither direction can recur: the
+  derivation walks the kit roots, and a kit that later ships a bash surface
+  joins the audience with no edit anywhere. The generated git hooks stay POSIX
+  sh (gate-sdk/SPEC.md §gen-pre-commit) and `init` spawns the binary it placed
+  rather than the front-end (installer/SPEC.md §init), so neither puts a
+  selection on the bash floor. The derivation opens files, so it walks the
+  repository-path spelling of the kit roots and not the gate-sdk-parent one
+  (gate-sdk/SPEC.md §lib/gate.sh).
 - `cargo:1.71::contributor` — a **contributor-side** floor, never a runtime one,
   and that reading is now declared on the element and read by name rather than
   left as an aside: the audience field is what the consumer-side predicate

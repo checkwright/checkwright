@@ -1,0 +1,12 @@
+{
+  "//": "The hook command names the gate binary directly, with no interpreter word, so delta-kit puts nothing on the bash floor. Its prose mentions bash and is deliberately not the predicate: run bash yourself if you like.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          { "type": "command", "command": "scripts/checkwright-gates --hook delta-guard" }
+        ]
+      }
+    ]
+  }
+}

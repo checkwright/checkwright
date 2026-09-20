@@ -1121,10 +1121,17 @@ informational on purpose: `doctor` is the adopter's verb, and showing an adopter
 tool they do not need is an invitation to install it. An **undecided** one — a
 conditional member with no selection to read — is rendered unprobed, as
 `curl         not probed — owed where delegation-kit is selected` (for a kit list,
-`owed where any of context-kit, delegation-kit, … is selected`, the names joined
+`owed where any of context-kit, drift-kit, … is selected`, the names joined
 by a comma and a space; for `registered`, `owed where a registered gate needs
 it`), and never sets the
-verdict. So **`DOCTOR: clean` is a claim about this machine as a consumer of
+verdict. A **`derived`** audience is resolved to its kit list before that line is
+written, so the reader is told which kits reach the member and never the sentinel
+the roster spells the question with (context-kit/SPEC.md §bin/env-probe). The one
+case where there is no list to name is a derivation that reached no kit root: it
+is undecided by that section's own rule, and renders as
+`bash         not probed — owed where a kit that ships a bash surface is
+selected` — the predicate rather than an empty reach, a blank one reading as
+*owed by no one*. So **`DOCTOR: clean` is a claim about this machine as a consumer of
 this selection**, not about the machine — which is the narrowing that makes the
 exit status usable as `init`'s precondition, since what `init` needs to know is
 exactly whether the tree it is about to vendor into will run.

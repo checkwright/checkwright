@@ -5,7 +5,7 @@
 // It carries no knob and never did, on that section's own ground, so holding it here rather than in
 // a sourceable file loses no affordance the kit ever offered.
 pub const PROBE_SET: &[&str] = &[
-    "bash:4.3::context-kit+delegation-kit+drift-kit+guard-kit+lifecycle-kit",
+    "bash:4.3::derived",
     "git",
     "jq:::contributor",
     "curl:::delegation-kit",
@@ -13,9 +13,10 @@ pub const PROBE_SET: &[&str] = &[
     "cargo:1.71::contributor",
 ];
 
-// spec: context-kit/SPEC.md §bin/env-probe — the two spelled audience values that name no kit
+// spec: context-kit/SPEC.md §bin/env-probe — the three spelled audience values that name no kit
 pub const CONTRIBUTOR: &str = "contributor";
 pub const REGISTERED: &str = "registered";
+pub const DERIVED: &str = "derived";
 // spec: context-kit/SPEC.md §bin/env-probe — a kit-list audience joins its kit names with this
 pub const KIT_JOIN: char = '+';
 
@@ -24,11 +25,151 @@ pub fn audience_kits(audience: &str) -> Vec<&str> {
     audience.split(KIT_JOIN).collect()
 }
 
+// spec: context-kit/SPEC.md §bin/env-probe — a `derived` audience rendered as the kit list it
+// resolves to, so every reader publishes the kits rather than the sentinel; any other value is
+// itself. The empty answer is left empty rather than defaulted: its reader owes the undecided arm.
+pub fn resolved_audience(audience: &str, derived: &[String]) -> String {
+    if audience == DERIVED {
+        return derived.join(&KIT_JOIN.to_string());
+    }
+    audience.to_string()
+}
+
+// spec: context-kit/SPEC.md §bin/env-probe — a root's kit name, its final path component, the
+// spelling an audience value carries and `--emit kit-roots` prints a root as
+pub fn kit_name(root: &str) -> String {
+    let r = root.trim_end_matches('/');
+    r.rsplit(['/', '\\']).next().unwrap_or(r).to_string()
+}
+
+// spec: context-kit/SPEC.md §bin/env-probe — enough of a file to hold its shebang line, which is
+// all the first arm reads; a kit root carries SPEC-sized files the predicate has no reason to load
+const HEAD_BYTES: usize = 256;
+
+fn head_of(path: &std::path::Path) -> String {
+    use std::io::Read;
+    let Ok(f) = std::fs::File::open(path) else {
+        return String::new();
+    };
+    let mut buf = Vec::new();
+    if f.take(HEAD_BYTES as u64).read_to_end(&mut buf).is_err() {
+        return String::new();
+    }
+    String::from_utf8_lossy(&buf).into_owned()
+}
+
+// spec: context-kit/SPEC.md §bin/env-probe — the first arm: an interpreter line naming bash. The
+// interpreter is read as a path component rather than as a substring, so `#!/usr/bin/env pwsh`
+// does not qualify on the `sh` inside `pwsh` — the false positive a substring anchor hands you.
+fn is_bash_shebang(head: &str) -> bool {
+    let line = head.lines().next().unwrap_or("");
+    line.starts_with("#!")
+        && line
+            .split(|c: char| c == '/' || c == '\\' || c.is_ascii_whitespace())
+            .any(|w| w == "bash")
+}
+
+// spec: context-kit/SPEC.md §bin/env-probe — the second arm: a shipped settings template whose
+// hook `command` is spawned with a bash word. It keys on the template and not on the script it
+// names, that section's own reading, and `sh` is not bash.
+fn spawns_bash_in_settings(text: &str) -> bool {
+    const KEY: &str = "\"command\"";
+    for (at, _) in text.match_indices(KEY) {
+        let rest = &text[at + KEY.len()..];
+        let Some(colon) = rest.find(':') else { continue };
+        let after = &rest[colon + 1..];
+        let Some(open) = after.find('"') else { continue };
+        let value = &after[open + 1..];
+        let Some(close) = value.find('"') else { continue };
+        if value[..close].split_whitespace().next() == Some("bash") {
+            return true;
+        }
+    }
+    false
+}
+
+// spec: context-kit/SPEC.md §bin/env-probe — the predicate over one file: either arm, whichever
+// answers first. The answer is *whether* a kit ships one, never how many.
+fn is_bash_surface(p: &std::path::Path) -> bool {
+    if is_bash_shebang(&head_of(p)) {
+        return true;
+    }
+    p.extension().and_then(|e| e.to_str()) == Some("json")
+        && std::fs::read(p)
+            .map(|b| spawns_bash_in_settings(&String::from_utf8_lossy(&b)))
+            .unwrap_or(false)
+}
+
+// spec: context-kit/SPEC.md §bin/env-probe — a root under the anchor, as the walk's own paths
+// spell it; an absolute root passes through
+fn under(anchor: &str, root: &str) -> String {
+    let r = root.trim_end_matches('/');
+    if std::path::Path::new(r).is_absolute() {
+        return format!("{}/", r);
+    }
+    format!("{}/{}/", anchor.trim_end_matches('/'), r)
+}
+
+// spec: context-kit/SPEC.md §bin/env-probe — the derived audience over a caller's kit roots, in
+// kit-name order, the floor-holding root narrowed past on that section's ground and named by the
+// root the SDK occupies rather than by a literal, so a rename moves it.
+// spec: gate-sdk/SPEC.md §check-reads-couples — ONE walk from the anchor, the per-kit corpus a
+// filter over it, so the walked-root set is bounded at one whatever the kit roster holds
+pub fn derived_audience_at(
+    anchor: &str,
+    roots: &[String],
+    sdk_root: &str,
+) -> Result<Vec<String>, String> {
+    let configured = crate::walk::prune_dirs()?;
+    let prune = |n: &str| n == "gate-tests" || n == "smoke" || configured.iter().any(|d| d == n);
+    let tree = crate::walk::find_with_prune(std::path::Path::new(anchor), &prune)?;
+    let files: Vec<(String, &std::path::Path)> = tree
+        .iter()
+        .filter_map(|p| p.to_str().map(|s| (s.to_string(), p.as_path())))
+        .collect();
+    let floor = kit_name(sdk_root);
+    let mut out: Vec<String> = Vec::new();
+    for r in roots {
+        let name = kit_name(r);
+        if name == floor || out.contains(&name) {
+            continue;
+        }
+        // spec: context-kit/SPEC.md §bin/env-probe — a root outside the anchor's walk is refused
+        // rather than answered `no`: an unreachable root reads exactly like a kit shipping nothing,
+        // which is the fail-open the derivation exists to close. An absent one contributes nothing.
+        let prefix = under(anchor, r);
+        if !prefix.starts_with(&format!("{}/", anchor.trim_end_matches('/'))) {
+            return Err(format!(
+                "kit root {} lies outside the walked anchor {}",
+                r, anchor
+            ));
+        }
+        if !std::path::Path::new(prefix.trim_end_matches('/')).is_dir() {
+            continue;
+        }
+        if files.iter().any(|(s, p)| s.starts_with(&prefix) && is_bash_surface(p)) {
+            out.push(name);
+        }
+    }
+    out.sort();
+    Ok(out)
+}
+
+// spec: context-kit/SPEC.md §bin/env-probe — the derivation against the tree the reader stands in,
+// the form a contributor-side reader walking the roster whole takes. It takes `kit_roots()` and
+// not `kit_roots_rel()`: it opens files, so it takes the repository-path spelling.
+pub fn derived_audience_here() -> Result<Vec<String>, String> {
+    let here = crate::walk::cwd()?;
+    derived_audience_at(&here, &crate::walk::kit_roots()?, &crate::walk::sdk_root())
+}
+
 // spec: context-kit/SPEC.md §bin/env-probe — what a consumer-side reader has selected: the kit set
-// and the registered gate set, each read by one arm of the owed-predicate
+// and the registered gate set, each read by one arm of the owed-predicate, plus the derived
+// audience the caller resolved, that section's rule on whose resolution it is
 pub struct Selection {
     pub kits: Vec<String>,
     pub gates: Vec<String>,
+    pub derived: Vec<String>,
 }
 
 // spec: context-kit/SPEC.md §bin/env-probe — the owed-predicate's closed answer set
@@ -53,6 +194,14 @@ pub fn owed(element: &str, selection: Option<&Selection>) -> Owing {
     let Some(sel) = selection else {
         return Owing::Undecided;
     };
+    // spec: context-kit/SPEC.md §bin/env-probe — a `derived` audience that resolved to nothing is
+    // undecided, never not-owed: an empty answer is a derivation that reached no kit root to read,
+    // and reporting that as *you do not owe this* is the fail-open the derivation exists to close
+    if audience == DERIVED && sel.derived.is_empty() {
+        return Owing::Undecided;
+    }
+    let resolved = resolved_audience(audience, &sel.derived);
+    let audience = resolved.as_str();
     let hit = if audience == REGISTERED {
         sel.gates.iter().any(|g| {
             crate::gates::needs(g).is_some_and(|reqs| reqs.iter().any(|(p, _)| *p == e.name))
@@ -226,10 +375,35 @@ mod tests {
     use super::*;
 
     fn selection(kits: &[&str], gates: &[&str]) -> Selection {
+        derived_selection(kits, gates, &["context-kit", "drift-kit", "guard-kit"])
+    }
+
+    fn derived_selection(kits: &[&str], gates: &[&str], derived: &[&str]) -> Selection {
         Selection {
             kits: kits.iter().map(|s| s.to_string()).collect(),
             gates: gates.iter().map(|s| s.to_string()).collect(),
+            derived: derived.iter().map(|s| s.to_string()).collect(),
         }
+    }
+
+    // spec: context-kit/SPEC.md §bin/env-probe — the authoring tree's kit names and the audience
+    // derived over them, as absolute roots: the crate's own cwd is `native/`, so a root spelled
+    // relative to the repo is not one this process can open
+    fn authoring_tree() -> (Vec<String>, Vec<String>) {
+        let repo = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .expect("the crate sits under the repo root");
+        let sdk = repo.join("gate-sdk").display().to_string();
+        let kits: Vec<String> = crate::walk::kit_roots_rel_from(&sdk, "")
+            .expect("cannot derive the kit roots")
+            .iter()
+            .map(|r| r.rsplit('/').next().unwrap_or(r).to_string())
+            .collect();
+        let roots: Vec<String> =
+            kits.iter().map(|k| repo.join(k).display().to_string()).collect();
+        let derived = derived_audience_at(&repo.display().to_string(), &roots, &sdk)
+            .expect("the derivation could not run");
+        (kits, derived)
     }
 
     fn owed_names(sel: Option<&Selection>, want: Owing) -> Vec<String> {
@@ -250,8 +424,11 @@ mod tests {
         assert_eq!(owed_names(Some(&prose), Owing::Owed), vec!["git"]);
         let guarded = selection(&["gate-sdk", "guard-kit"], &[]);
         assert_eq!(owed_names(Some(&guarded), Owing::Owed), vec!["bash", "git"]);
+        // spec: context-kit/SPEC.md §bin/env-probe — the narrowing the derivation lands: a
+        // selection carrying lifecycle-kit alone reached `bash` under the hand-held list and
+        // reaches it under no derivation, lifecycle-kit shipping no file a host runs with bash
         let staged = selection(&["gate-sdk", "lifecycle-kit"], &[]);
-        assert_eq!(owed_names(Some(&staged), Owing::Owed), vec!["bash", "git"]);
+        assert_eq!(owed_names(Some(&staged), Owing::Owed), vec!["git"]);
         let linted = selection(&["gate-sdk"], &["check-action-run-shell"]);
         assert_eq!(owed_names(Some(&linted), Owing::Owed), vec!["git", "shellcheck"]);
         assert_eq!(owed_names(None, Owing::Undecided), vec!["bash", "curl", "shellcheck"]);
@@ -273,24 +450,72 @@ mod tests {
     // value lists names a kit root the authoring tree carries, so a misspelling cannot leave every floor
     #[test]
     fn every_audience_value_is_closed_over_the_kit_roots() {
-        let repo = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-            .parent()
-            .expect("the crate sits under the repo root");
-        let sdk = repo.join("gate-sdk").display().to_string();
-        let kits: Vec<String> = crate::walk::kit_roots_rel_from(&sdk, "")
-            .expect("cannot derive the kit roots")
-            .iter()
-            .map(|r| r.rsplit('/').next().unwrap_or(r).to_string())
-            .collect();
+        let _knobs = crate::knobenv::lock();
+        let (kits, derived) = authoring_tree();
         assert!(kits.iter().any(|k| k == "guard-kit"), "the kit-root derivation found {:?}", kits);
         let offenders: Vec<String> = PROBE_SET
             .iter()
             .map(|e| parse(e).audience)
-            .filter(|a| !a.is_empty() && a != CONTRIBUTOR && a != REGISTERED)
+            .map(|a| resolved_audience(&a, &derived))
+            .filter(|a| !a.is_empty() && a != CONTRIBUTOR && a != REGISTERED && a != DERIVED)
             .flat_map(|a| audience_kits(&a).into_iter().map(String::from).collect::<Vec<_>>())
             .filter(|k| !kits.contains(k))
             .collect();
         assert!(offenders.is_empty(), "audience values naming no kit root: {:?}", offenders);
+    }
+
+    // spec: context-kit/SPEC.md §bin/env-probe — the predicate is total over the kit roots and
+    // answers from the tree rather than from a list: the authoring tree's own value, measured
+    // here rather than spelled anywhere, and the floor-holder narrowed past
+    #[test]
+    fn the_bash_audience_derives_from_the_kit_roots_and_narrows_past_the_floor_holder() {
+        let _knobs = crate::knobenv::lock();
+        let (_, derived) = authoring_tree();
+        assert!(
+            derived.iter().all(|k| k != "gate-sdk"),
+            "the floor-holder joined the audience, which makes the member unconditional: {:?}",
+            derived
+        );
+        for owed in ["context-kit", "drift-kit", "guard-kit"] {
+            assert!(derived.iter().any(|k| k == owed), "{} left the audience: {:?}", owed, derived);
+        }
+        for clear in ["delegation-kit", "lifecycle-kit", "canon-kit", "queue-kit"] {
+            assert!(derived.iter().all(|k| k != clear), "{} joined the audience: {:?}", clear, derived);
+        }
+    }
+
+    // spec: context-kit/SPEC.md §bin/env-probe — the two arms read a spawn and not a substring: a
+    // `pwsh` interpreter carries `sh` and does not qualify, and a settings template qualifies its
+    // own kit on the interpreter word its hook command is spawned with
+    #[test]
+    fn each_arm_of_the_predicate_reads_a_spawn_rather_than_a_substring() {
+        assert!(is_bash_shebang("#!/usr/bin/env bash\nset -eu\n"));
+        assert!(is_bash_shebang("#!/bin/bash"));
+        assert!(!is_bash_shebang("#!/usr/bin/env pwsh"));
+        assert!(!is_bash_shebang("#!/bin/sh"));
+        assert!(!is_bash_shebang("# bash is discussed here, not run"));
+        assert!(spawns_bash_in_settings(
+            "{\"hooks\":[{\"type\":\"command\",\"command\":\"bash scripts/guard.sh\"}]}"
+        ));
+        assert!(!spawns_bash_in_settings(
+            "{\"hooks\":[{\"type\":\"command\",\"command\":\"scripts/checkwright-gates --hook x\"}]}"
+        ));
+        assert!(!spawns_bash_in_settings("{\"//\":\"run bash scripts/x.sh yourself\"}"));
+    }
+
+    // spec: context-kit/SPEC.md §bin/env-probe — a derived audience that resolved to nothing is
+    // undecided rather than not-owed, which is the fail-open the derivation exists to close
+    #[test]
+    fn an_underived_audience_is_undecided_rather_than_not_owed() {
+        let e = "bash:4.3::derived";
+        let empty = derived_selection(&["gate-sdk", "guard-kit"], &[], &[]);
+        assert_eq!(owed(e, Some(&empty)), Owing::Undecided);
+        let full = derived_selection(&["gate-sdk", "guard-kit"], &[], &["guard-kit"]);
+        assert_eq!(owed(e, Some(&full)), Owing::Owed);
+        let other = derived_selection(&["gate-sdk", "canon-kit"], &[], &["guard-kit"]);
+        assert_eq!(owed(e, Some(&other)), Owing::NotOwed);
+        assert_eq!(resolved_audience(DERIVED, &["a-kit".into(), "b-kit".into()]), "a-kit+b-kit");
+        assert_eq!(resolved_audience(CONTRIBUTOR, &["a-kit".into()]), CONTRIBUTOR);
     }
 
     // spec: context-kit/SPEC.md §bin/env-probe — the three spellings of an unconstrained member

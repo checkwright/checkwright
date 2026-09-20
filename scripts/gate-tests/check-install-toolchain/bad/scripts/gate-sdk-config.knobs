@@ -1,0 +1,3 @@
+# Fixture config: same synthetic-tree steer as good/, with one kit more. See
+# gate-sdk/SPEC.md §Layout and configuration.
+GATE_SDK_KIT_DIRS = alpha-kit beta-kit delta-kit gamma-kit

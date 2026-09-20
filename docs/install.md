@@ -155,10 +155,13 @@ your `PATH`, and the note says what breaks without it:
 
 <!-- toolchain:begin -->
 
-- `bash` (≥ 4.3, @context-kit+delegation-kit+drift-kit+guard-kit+lifecycle-kit)
+- `bash` (≥ 4.3, @context-kit+drift-kit+guard-kit)
   — owed only where the profile you select carries one of those kits, because
-  each ships a surface that runs bash or tells a session to (context-kit/SPEC.md
-  §bin/env-probe names each surface). The starter and prose profiles reach none of them. Both generated
+  each ships a file your host runs with bash. That list is **derived** from the
+  kits themselves at probe time rather than held by hand, so a kit that later
+  ships such a file joins it without anyone remembering to; context-kit/SPEC.md
+  §bin/env-probe states the predicate a kit is measured against. Prose telling
+  you to type a bash command is not that predicate, and no kit ships it. The starter and prose profiles reach none of them. Both generated
   git hooks are POSIX sh, run by the `/bin/sh` git itself uses. `init`
   generates them and names its follow-up commands through the gate binary it
   placed. The unix install bootstrap (`installer/bin/checkwright.sh`) is POSIX sh
@@ -258,8 +261,11 @@ implementation token and audience included — so the page cannot drift from wha
 the gates require.
 
 To see where your machine stands against it, seed a local profile with
-context-kit's env-probe — `bash gate-sdk/bin/run-gates.sh --emit env-probe`
-writes an `ENV.local.md` you keep untracked. It reports each tool's version *and* its
+context-kit's env-probe — the gate binary `GATE_SDK_NATIVE_BIN` names, run with
+`--emit env-probe`, writes an `ENV.local.md` you keep untracked. It is the binary
+and not a shell front end on purpose: the bullet above states `bash` as owed only
+by the kits that ship one, and a step here that spawned bash would be asking
+every reader for a tool that bullet says most of them do not need. It reports each tool's version *and* its
 verdict against the contract, so the profile answers whether this box qualifies,
 not only what it carries.
 

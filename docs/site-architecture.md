@@ -222,7 +222,7 @@ recoverable:
   unconstrained member takes no parenthetical:
 
   ```text
-  - `bash` (≥ 4.3) — …
+  - `<name>` (≥ <floor>) — …
   - `<name>` (<impl-token>) — …
   - `cargo` (≥ 1.71, @contributor) — …
   ```
@@ -231,7 +231,13 @@ recoverable:
   the gate's reader is positional, so an axis with no sigil would be
   indistinguishable from the implementation token. Elements are derivable and
   purpose clauses hand prose, so a roster edit reds the docs list without an
-  emitter handshake. The gate reads the crate's own constant by default. A
+  emitter handshake. The gate reads the crate's own constant by default — and,
+  where an element's audience is `derived` (context-kit/SPEC.md §bin/env-probe),
+  resolves it by walking the kit roots before comparing. That half is why this
+  contract is not satisfiable by editing both sides: one of them is a
+  measurement of the tree, so a kit shipping an undeclared surface reds the page
+  rather than joining it silently. A derived element the walk cannot resolve
+  exits 2 rather than comparing the page against an empty audience. A
   hermetic fixture may steer it onto a roster file instead, and that file is
   **parsed and never sourced**, because a fixture path is untrusted input and the
   reader that lints the array must not be made to execute the file it reads.

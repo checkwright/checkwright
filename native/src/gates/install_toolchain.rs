@@ -89,11 +89,15 @@ fn parenthetical(rest: &str) -> Option<&str> {
 // spec: docs/site-architecture.md §Generated projections and their freshness gates — the roster
 // grammar has one crate-side parser, `toolfloor::parse`, which this gate shares with the env-probe
 // arm rather than holding a second copy the two could disagree about
-fn roster_quad(element: &str) -> (String, String) {
+// spec: context-kit/SPEC.md §bin/env-probe — a derived audience is resolved before the comparison,
+// so the page renders the kits and the gate compares against a derivation rather than against a
+// literal. That is what makes the parity unsatisfiable by editing both sides: one side is measured.
+fn roster_quad(element: &str, derived: &[String]) -> (String, String) {
     let e = crate::toolfloor::parse(element);
+    let audience = crate::toolfloor::resolved_audience(&e.audience, derived);
     (
         e.name.clone(),
-        format!("{}:{}:{}:{}", e.name, e.min, e.imp, e.audience),
+        format!("{}:{}:{}:{}", e.name, e.min, e.imp, audience),
     )
 }
 
@@ -175,9 +179,29 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Err(format!("PROBE_SET array is empty in {}", roster));
     }
 
+    // spec: context-kit/SPEC.md §bin/env-probe — bought only where an element asks for it, so a
+    // roster carrying no derived audience needs no kit roots and a fixture may author one; an
+    // unresolvable derivation fails closed, on that section's undecided rule.
+    let derived = if elements
+        .iter()
+        .any(|e| crate::toolfloor::parse(e).audience == crate::toolfloor::DERIVED)
+    {
+        let d = crate::toolfloor::derived_audience_here()?;
+        if d.is_empty() {
+            return Err(format!(
+                "the roster carries a '{}' audience and no kit root under this tree satisfies its \
+                 predicate — the page's bullet cannot be compared against nothing",
+                crate::toolfloor::DERIVED
+            ));
+        }
+        d
+    } else {
+        Vec::new()
+    };
+
     let mut roster_by_name: BTreeMap<String, String> = BTreeMap::new();
     for e in &elements {
-        let (name, quad) = roster_quad(e);
+        let (name, quad) = roster_quad(e, &derived);
         roster_by_name.insert(name, quad);
     }
     let mut listed_by_name: BTreeMap<String, String> = BTreeMap::new();
@@ -243,10 +267,17 @@ mod tests {
     #[test]
     fn every_empty_trailing_field_normalizes_to_the_same_quadruple() {
         for e in ["jq", "jq:", "jq::", "jq:::"] {
-            assert_eq!(roster_quad(e).1, "jq:::");
+            assert_eq!(roster_quad(e, &[]).1, "jq:::");
         }
-        assert_eq!(roster_quad("cargo:1.71::contributor").1, "cargo:1.71::contributor");
-        assert_eq!(roster_quad("sort::coreutils").1, "sort::coreutils:");
+        assert_eq!(roster_quad("cargo:1.71::contributor", &[]).1, "cargo:1.71::contributor");
+        assert_eq!(roster_quad("sort::coreutils", &[]).1, "sort::coreutils:");
+        // spec: context-kit/SPEC.md §bin/env-probe — a derived element normalizes to the kit list
+        // it resolves to, which is the quadruple the page's bullet is held to
+        let derived = ["alpha-kit".to_string(), "beta-kit".to_string()];
+        assert_eq!(
+            roster_quad("bash:4.3::derived", &derived).1,
+            "bash:4.3::alpha-kit+beta-kit"
+        );
     }
 
     // spec: docs/site-architecture.md §Generated projections and their freshness gates — the

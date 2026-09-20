@@ -1339,11 +1339,14 @@ pub const REGISTRY: &[GateEntry] = &[
         "-",
         &[("git", "")],
     ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because the walked set is the kit roots the
+    // `derived` audience resolves over (context-kit/SPEC.md §bin/env-probe): which roots exist, and
+    // how many, is a fact about the tree rather than a path this table can spell
     (
         "check-install-toolchain",
         install_toolchain::run,
-        &[],
-        &[],
+        &[("?", "", "", "dynamic@src/toolfloor.rs:125 via toolfloor::derived_audience_here")],
+        &["GATE_SDK_KIT_DIRS"],
         "-",
         &[("git", "")],
     ),

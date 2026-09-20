@@ -111,8 +111,11 @@ fn package_manager() -> String {
 // spec: context-kit/SPEC.md §bin/env-probe — the audience marker, spelled once and appended by
 // every line that names a member, so a reader tells a floor that is theirs apart from one they are
 // not on the hook for.
-fn audience_mark(element: &str) -> String {
-    let a = toolfloor::parse(element).audience;
+fn audience_mark(element: &str, derived: &[String]) -> String {
+    // spec: context-kit/SPEC.md §bin/env-probe — a derived audience is marked as the kits it
+    // resolves to, never as the sentinel: the reader is told whose floor it is, not how the
+    // roster spells the question
+    let a = toolfloor::resolved_audience(&toolfloor::parse(element).audience, derived);
     if a.is_empty() {
         String::new()
     } else {
@@ -122,7 +125,7 @@ fn audience_mark(element: &str) -> String {
 
 // spec: context-kit/SPEC.md §bin/env-probe — the constrained member's parenthetical; an
 // unconstrained member carries none, so the roster's optional axis stays optional on the page too.
-fn render_floor(element: &str, verdict: &str) -> String {
+fn render_floor(element: &str, verdict: &str, derived: &[String]) -> String {
     let e = toolfloor::parse(element);
     let mut desc = String::new();
     if !e.min.is_empty() {
@@ -134,7 +137,7 @@ fn render_floor(element: &str, verdict: &str) -> String {
         }
         desc.push_str(&format!("requires {}", e.imp));
     }
-    let mark = audience_mark(element);
+    let mark = audience_mark(element, derived);
     if !mark.is_empty() {
         if !desc.is_empty() {
             desc.push_str(", ");
@@ -151,13 +154,13 @@ fn render_floor(element: &str, verdict: &str) -> String {
     }
 }
 
-fn body(roster: &[String], date: &str) -> String {
+fn body(roster: &[String], date: &str, derived: &[String]) -> String {
     let mut tool_lines = String::new();
     let mut absent: Vec<String> = Vec::new();
     let mut below: Vec<String> = Vec::new();
     for element in roster {
         let e = toolfloor::parse(element);
-        let mark = audience_mark(element);
+        let mark = audience_mark(element, derived);
         let suffix = |lead: &str| -> String {
             if mark.is_empty() {
                 String::new()
@@ -207,7 +210,7 @@ fn body(roster: &[String], date: &str) -> String {
             "  - `{}` — {}{}\n",
             e.name,
             ver,
-            render_floor(element, &verdict)
+            render_floor(element, &verdict, derived)
         ));
     }
     // spec: context-kit/SPEC.md §bin/env-probe — `printf '%s '` over the absent list leaves its
@@ -259,7 +262,10 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
     if date.is_empty() {
         return Err("cannot read the probe date".to_string());
     }
-    let new_body = body(&roster, &date);
+    // spec: context-kit/SPEC.md §bin/env-probe — a contributor-side reader walks the roster whole,
+    // so it derives the audience against the tree it is probing rather than against a selection
+    let derived = toolfloor::derived_audience_here()?;
+    let new_body = body(&roster, &date, &derived);
 
     // spec: context-kit/SPEC.md §bin/env-probe — seed the gotchas scaffold once, outside the
     // markers; every re-probe replaces only the block.
@@ -296,18 +302,25 @@ mod tests {
     // and every arm: an unconstrained member carries none at all
     #[test]
     fn the_parenthetical_renders_each_axis_and_each_verdict_arm() {
-        assert_eq!(render_floor("jq", "ok"), "");
-        assert_eq!(render_floor("bash:4.3", "ok"), " (floor 4.3, ok)");
+        let derived = ["alpha-kit".to_string(), "beta-kit".to_string()];
+        assert_eq!(render_floor("jq", "ok", &derived), "");
+        assert_eq!(render_floor("bash:4.3", "ok", &derived), " (floor 4.3, ok)");
         assert_eq!(
-            render_floor("sort::coreutils", "wrong-impl 2.3-Apple"),
+            render_floor("sort::coreutils", "wrong-impl 2.3-Apple", &derived),
             " (requires coreutils — below contract)"
         );
         assert_eq!(
-            render_floor("cargo:1.71::contributor", "uncomparable"),
+            render_floor("cargo:1.71::contributor", "uncomparable", &derived),
             " (floor 1.71, contributor-only — unverified)"
         );
-        assert_eq!(audience_mark("cargo:1.71::contributor"), "contributor-only");
-        assert_eq!(audience_mark("bash:4.3"), "");
+        assert_eq!(audience_mark("cargo:1.71::contributor", &derived), "contributor-only");
+        assert_eq!(audience_mark("bash:4.3", &derived), "");
+        // spec: context-kit/SPEC.md §bin/env-probe — the derived audience marks the kits it
+        // resolves to, never the sentinel the roster spells the question with
+        assert_eq!(
+            render_floor("bash:4.3::derived", "ok", &derived),
+            " (floor 4.3, alpha-kit+beta-kit-only, ok)"
+        );
     }
 
     // spec: context-kit/SPEC.md §bin/env-probe — the change-detection comparison drops the derived
@@ -329,7 +342,7 @@ mod tests {
             "checkwright-no-such-tool".to_string(),
             "checkwright-other-absent:::contributor".to_string(),
         ];
-        let out = body(&roster, "2026-09-03");
+        let out = body(&roster, "2026-09-03", &[]);
         assert!(out.starts_with("_Probed 2026-09-03 by context-kit env-probe — "), "{}", out);
         assert!(out.contains("\n- **OS:** "), "{}", out);
         assert!(out.contains("\n- **Package manager:** "), "{}", out);

@@ -1,0 +1,12 @@
+{
+  "//": "alpha-kit joins the bash audience through the settings-template arm alone: it ships no script of its own, and this wiring is what makes the adopter's harness spawn bash.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          { "type": "command", "command": "bash scripts/alpha-guard.sh" }
+        ]
+      }
+    ]
+  }
+}

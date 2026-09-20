@@ -335,9 +335,26 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     if let Ok(text) = std::fs::read_to_string(root.join(GATES_DIR).join("gates.list")) {
         gates.extend(crate::registry::members(&text).iter().map(|m| m.trim().to_string()));
     }
+    // spec: installer/SPEC.md §init — doctor is the last precondition and nothing is vendored yet,
+    // so the derived audience is resolved over the PAYLOAD's kit roots; against the tree it would
+    // resolve to nothing and stop `bash` binding at the one moment it has to.
+    // spec: context-kit/SPEC.md §bin/env-probe — every payload kit, not the selected ones: the
+    // audience is a fact about the kits, and the selection is what `owed` intersects it with
+    let payload = pkg.root.join("payload");
+    let payload_roots: Vec<String> = profile::payload_kits(&pkg.root)
+        .iter()
+        .map(|k| payload.join(k).display().to_string())
+        .collect();
+    let derived = toolfloor::derived_audience_at(
+        &payload.display().to_string(),
+        &payload_roots,
+        &crate::walk::sdk_root(),
+    )
+    .map_err(|e| refuse(format!("could not derive the bash audience: {}", e), "", 2))?;
     let selection = toolfloor::Selection {
         kits: kits.clone(),
         gates,
+        derived,
     };
     let verdict = super::doctor::diagnose(Some(&selection));
     if verdict.code != 0 {

@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # Behavioral test of check-install-toolchain — the arms the one
 # good/bad pair cannot hold. The pair covers whole-element parity and the
-# floor-divergence rejection; this covers the two name-set directions the
+# derived-audience under-declaration; this covers the two name-set directions the
 # widened assertion still owns, the three spellings of an unconstrained member,
-# the implementation-token axis diverging on its own, and the audience axis in
+# the implementation-token axis diverging on its own, the audience axis in
 # parity, diverging each way, and written without the sigil that tells it apart
-# from an implementation token.
+# from an implementation token, the floor divergence the pair used to carry, and
+# the fail-closed arm of a derived audience with no kit root to resolve.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -90,9 +91,32 @@ check_case "page-invents-an-audience" "$tmp/h" 1 "roster says (none), page says 
 write_case "$tmp/i" '- `cargo` (≥ 1.71, contributor) — builds the crate.' 'cargo:1.71::contributor'
 check_case "audience-without-its-sigil" "$tmp/i" 1 "page says (≥ 1.71, contributor)"
 
+# J — the floor-divergence case the good/bad pair used to carry before the pair
+# was re-pointed at the derived audience: name sets agree exactly, the page
+# states `bash` unconstrained while the roster pins a floor. Held here so the
+# re-point cost no coverage.
+write_case "$tmp/j" '- `bash` — runs the battery.
+- `git` — reads tracked files.' 'bash:4.0 git'
+check_case "floor-divergence" "$tmp/j" 1 "roster says (≥ 4.0), page says (none)"
+
+# K — a `derived` element whose derivation reaches no kit root fails CLOSED rather
+# than resolving to an empty audience: an empty one would compare equal to a page
+# bullet that declares none, which is the silent under-declaration this axis exists
+# to make impossible. The kit-dirs knob names a directory that is not there, which
+# is what an unresolvable derivation looks like from inside the gate.
+write_case "$tmp/k" '- `bash` — runs the battery.' 'bash:4.0::derived'
+out="$(cd "$tmp/k" \
+    && gate_env GATE_SDK_KIT_DIRS=checkwright-no-such-kit \
+    && gate_run check-install-toolchain "$GATES_DIR" install.md roster.sh 2>&1)"; rc=$?
+if [[ "$rc" -ne 2 ]]; then
+    echo "  FAIL [underived-audience-fails-closed]: want exit 2, got $rc -- $out"; fails=$((fails + 1))
+elif ! grep -qF -- "no kit root under this tree satisfies its predicate" <<<"$out"; then
+    echo "  FAIL [underived-audience-fails-closed]: exit 2 OK but output lacks the cause: $out"; fails=$((fails + 1))
+fi
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-install-toolchain.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-install-toolchain.test: ok (both name-set directions still red; a bare bullet, a trailing empty field and a doubled empty field are one unconstrained member; the implementation token and an invented floor each red on their own; the audience axis reaches parity, reds in both directions, and reds again when its sigil is dropped)"
+echo "check-install-toolchain.test: ok (both name-set directions still red; a bare bullet, a trailing empty field and a doubled empty field are one unconstrained member; the implementation token and an invented floor each red on their own; the audience axis reaches parity, reds in both directions, and reds again when its sigil is dropped; a floor divergence still reds; a derived audience with no kit root to resolve fails closed)"
 exit 0

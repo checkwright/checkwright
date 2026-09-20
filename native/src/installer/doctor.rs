@@ -194,6 +194,7 @@ fn tree_disarmed_block(out: &mut String, root: &std::path::Path, list_text: &str
 // not need invites them to install it), and an undecided one is named unprobed and never fails.
 fn toolchain_block(
     out: &mut String,
+    derived: &[String],
     selection: Option<&Selection>,
     probe: impl Fn(&str) -> String,
 ) -> bool {
@@ -205,13 +206,19 @@ fn toolchain_block(
             Owing::NotOwed => {}
             Owing::Owed => failed |= render_member(out, element, &probe(&e.name)),
             Owing::Undecided => {
-                let kits = toolfloor::audience_kits(&e.audience);
+                // spec: installer/SPEC.md §doctor — an undecided member names its reach as kits, so
+                // a derived audience resolves first, and one that resolved to nothing names the
+                // predicate instead of an empty list, on that section's stated ground
+                let audience = toolfloor::resolved_audience(&e.audience, derived);
+                let kits = toolfloor::audience_kits(&audience);
                 let reach = if e.audience == toolfloor::REGISTERED {
                     "a registered gate needs it".to_string()
+                } else if audience.is_empty() {
+                    "a kit that ships a bash surface is selected".to_string()
                 } else if kits.len() > 1 {
                     format!("any of {} is selected", kits.join(", "))
                 } else {
-                    format!("{} is selected", e.audience)
+                    format!("{} is selected", audience)
                 };
                 let _ = writeln!(out, "  {:<12} not probed — owed where {}", e.name, reach);
             }
@@ -243,9 +250,20 @@ fn installed_selection(root: &std::path::Path) -> Option<Selection> {
             .map(|t| crate::registry::members(&t).iter().map(|m| m.trim().to_string()).collect())
             .unwrap_or_default()
     };
+    // spec: context-kit/SPEC.md §bin/env-probe — the derived audience is read off the tree the
+    // install put the kits in, which is the one place a consumer-side reader can evaluate the
+    // predicate; an unreadable tree leaves it empty and the owed-predicate answers undecided
+    let here = root.display().to_string();
+    let derived = toolfloor::derived_audience_at(
+        &here,
+        &crate::walk::kit_roots_abs_at(&here, &crate::knobs::gates_dir()).unwrap_or_default(),
+        &crate::walk::sdk_root(),
+    )
+    .unwrap_or_default();
     Some(Selection {
         kits: manifest.field("kits").split_whitespace().map(String::from).collect(),
         gates,
+        derived,
     })
 }
 
@@ -254,7 +272,14 @@ pub fn diagnose(selection: Option<&Selection>) -> Report {
     let mut err = String::new();
     let mut artifact_finding = String::new();
 
-    let failed = toolchain_block(&mut out, selection, probe_banner);
+    // spec: installer/SPEC.md §doctor — the reach a report renders comes from the selection where
+    // there is one, since that is the tree the kits were resolved in; a bare report derives over
+    // the tree it is standing in, which is the only kit set a reader without an install has
+    let derived = match selection {
+        Some(s) => s.derived.clone(),
+        None => toolfloor::derived_audience_here().unwrap_or_default(),
+    };
+    let failed = toolchain_block(&mut out, &derived, selection, probe_banner);
 
     let root = here();
     let lock_path = lock::path(&root);
@@ -431,9 +456,14 @@ mod tests {
     // unprobed and leaves the verdict to the unconditional ones.
     #[test]
     fn the_toolchain_block_renders_the_floor_the_selection_owes() {
+        // spec: context-kit/SPEC.md §bin/env-probe — the derived audience is an input to the
+        // block, not a fact it re-derives, so these cases author it as the authoring tree measures
+        let derived: Vec<String> =
+            ["context-kit", "drift-kit", "guard-kit"].iter().map(|s| s.to_string()).collect();
         let sel = |kits: &[&str], gates: &[&str]| Selection {
             kits: kits.iter().map(|s| s.to_string()).collect(),
             gates: gates.iter().map(|s| s.to_string()).collect(),
+            derived: derived.clone(),
         };
         let present = |t: &str| format!("{} version 9.9.9", t);
         let only_floor = |t: &str| {
@@ -445,36 +475,38 @@ mod tests {
         };
 
         let mut out = String::new();
-        assert!(!toolchain_block(&mut out, Some(&sel(&["gate-sdk"], &["check-core-files"])), only_floor));
+        assert!(!toolchain_block(&mut out, &derived, Some(&sel(&["gate-sdk"], &["check-core-files"])), only_floor));
         assert!(out.contains("git "));
         assert!(!out.contains("bash") && !out.contains("jq") && !out.contains("curl") && !out.contains("shellcheck"));
         assert!(!out.contains("cargo"));
 
         let mut out = String::new();
-        assert!(!toolchain_block(&mut out, Some(&sel(&["gate-sdk", "canon-kit"], &[])), |t: &str| {
+        assert!(!toolchain_block(&mut out, &derived, Some(&sel(&["gate-sdk", "canon-kit"], &[])), |t: &str| {
             if t == "git" { "git version 9.9.9".to_string() } else { String::new() }
         }));
         assert!(!out.contains("bash"), "a prose selection reaches no bash:\n{}", out);
 
         let mut out = String::new();
-        assert!(!toolchain_block(&mut out, Some(&sel(&["gate-sdk", "guard-kit"], &[])), only_floor));
+        assert!(!toolchain_block(&mut out, &derived, Some(&sel(&["gate-sdk", "guard-kit"], &[])), only_floor));
         assert!(out.contains("bash ") && !out.contains("jq"), "a guard-kit selection owes no jq:\n{}", out);
 
         let mut out = String::new();
-        assert!(toolchain_block(&mut out, Some(&sel(&["gate-sdk"], &["check-action-run-shell"])), only_floor));
+        assert!(toolchain_block(&mut out, &derived, Some(&sel(&["gate-sdk"], &["check-action-run-shell"])), only_floor));
         assert!(out.contains("shellcheck   NOT FOUND"));
 
         let mut out = String::new();
-        assert!(!toolchain_block(&mut out, None, only_floor));
+        assert!(!toolchain_block(&mut out, &derived, None, only_floor));
+        // spec: context-kit/SPEC.md §bin/env-probe — the undecided line names the DERIVED kits,
+        // never the `derived` sentinel, so a reader with no install learns whose floor it is
         assert!(out.contains(
-            "bash         not probed — owed where any of context-kit, delegation-kit, drift-kit, guard-kit, lifecycle-kit is selected"
+            "bash         not probed — owed where any of context-kit, drift-kit, guard-kit is selected"
         ));
         assert!(!out.contains("jq"), "jq is a contributor member, never rendered:\n{}", out);
         assert!(out.contains("curl         not probed — owed where delegation-kit is selected"));
         assert!(out.contains("shellcheck   not probed — owed where a registered gate needs it"));
 
         let mut out = String::new();
-        assert!(!toolchain_block(&mut out, Some(&sel(&["guard-kit", "delegation-kit"], &["check-shellcheck"])), present));
+        assert!(!toolchain_block(&mut out, &derived, Some(&sel(&["guard-kit", "delegation-kit"], &["check-shellcheck"])), present));
         assert!(!out.contains("jq") && out.contains("shellcheck   9.9.9"));
     }
 

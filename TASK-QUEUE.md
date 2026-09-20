@@ -12,32 +12,6 @@
 
 ## New Features
 
-- **bash-audience-hand-held** [spec: SPEC-bash-audience.md] —
-  the bash element of the tool-floor
-  roster carries a hand-held kit-list audience,
-  `context-kit+delegation-kit+drift-kit+guard-kit+lifecycle-kit`, spelled at context-kit/SPEC.md's
-  roster, `docs/install.md`'s requirements, `native/src/programs.rs` and `native/src/toolfloor.rs`.
-  Nothing re-derives it, so a kit that later ships a bash surface without joining the list
-  under-declares its floor and doctor passes a bash-less host that then fails at first use.
-  **The limit is already realized, measured at spec (2026-09-20):** the declared list matches
-  neither candidate predicate. Under *ships a bash script* only context-kit, drift-kit and
-  guard-kit qualify, so it **over-declares** delegation-kit and lifecycle-kit; under *instructs
-  bash* all eleven kits qualify, so it **under-declares** canon-kit, doctrine-kit, evidence-kit,
-  queue-kit and site-kit. Rung 4a cleared evidence-kit and queue-kit as "reference text, not a
-  spawn", on a probe that excluded READMEs — `queue-kit/README.md:75-86` was a twelve-line block of
-  bash commands a reader is told to run.
-  **Ruled at spec:** the audience is derived, not listed, and the predicate is *ships a file the
-  adopter's host runs with bash* — prose a reader types is deliberately excluded, because after the
-  lead unit no kit ships it.
-  **Unblocked (2026-09-20, `binary-door-wide-sweep` merged).** While the two predicates disagreed
-  any derivation had to pick one, and either pick published a floor the other reading contradicted;
-  the door sweep has landed, so they converge. **The measurements above are pre-sweep and are now
-  stale as evidence**: the `queue-kit/README.md` block that carried the *instructs-bash* reading has
-  been swept, along with every other kit README, template and knob header. Re-run the predicate
-  against the tree before building rather than carrying either list forward.
-  Filed 2026-09-19 at `adopter-floor-native-rungs`' spec, promoted at its close drain. Joins this
-  iteration by operator direction (2026-09-20, lead-relayed); amendment authored and paired at spec.
-
 - **kit-roots-rel-filesystem-readers** [spec: SPEC-root-dialect.md] — the couples-anchor amendment
   moved the `kit:` couples readers that match repository paths onto `walk::kit_roots()`. Other
   `walk::kit_roots_rel` callers resolve paths off disk or through a git pathspec with the
@@ -2968,5 +2942,6 @@
 
 - objective-1-discharge-unruled
 - binary-door-wide-sweep
+- bash-audience-hand-held
 
 ## Lessons Learned
