@@ -1658,6 +1658,19 @@ to. A second copy under this key could disagree with the live one, so every
 reader asking *where is the binary* resolves it from the same owner: §doctor
 reads the knob and re-verifies whatever it finds there.
 
+**That ownership now governs the door a kit's prose and shell name, not just the
+one the battery dispatches to.** Every kit README, template, knob header and
+stage procedure names the binary through `GATE_SDK_NATIVE_BIN` rather than
+through a path of its own, and gate-sdk's `gate_native_bin_spelled` is the one
+owner of how that value is spelled when it is used as a *command* rather than
+read as a path (gate-sdk/SPEC.md §lib/gate.sh). So the knob is the single owner
+for a **spawned** door as well as for the battery's dispatch, and a kit file
+carrying a resolved location is a seam crossing a gate reds on
+(guard-kit/SPEC.md §check-door-binding). **It does not reach a consumer's
+settings**, which no arm here writes: the adopter merges guard-kit's recommended
+allowlist by hand, by a published contract, and resolves its placeholder
+themselves (guard-kit/SPEC.md §The recommended allowlist).
+
 **The `files` row is not that copy, even though it is a path.** It records where
 `init` wrote, which is a fact about the install and stays true when the knob is
 later repointed; the knob records where the battery dispatches. They coincide on
