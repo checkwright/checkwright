@@ -50,6 +50,13 @@
   plus `docs/`, and 144 more on the 25 `generated: true` mirrors, whose declaration one emitter
   edit writes. Exactly two of the 59 are adopter-facing and are meant to stay red until the paired
   debt entry repairs them, which is what stops a batch silencing them to reach green.
+  **Judged a recurrence at this spec stage, and the recurrence is a misclassification rather than
+  a miss:** the close before this one listed `docs/index.md` in its `docs/` count and read the
+  whole of that count as contributor-facing, so line 27 — the site landing page's headline try-it
+  command, the twin of `README.md`:25 — stayed invisible to the very measurement that named it.
+  That is this entry's own failure class firing one measurement later, which is the case for
+  default-deny over any roster of judged-adopter-facing sites.
+  recurrence: door-binding-sweep-stops-at-the-kit-roots 2026-09-20
   Joins this iteration as its gate-reach unit, by operator direction (2026-09-20, lead-relayed) on
   the adopter-floor door remainder; promoted at this spec stage, which authored its amendment.
   Filed 2026-09-20 to the gap inbox at `bash-audience-hand-held`'s build while locating the
