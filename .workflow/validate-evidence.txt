@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+door-binding-sweep gates sha256=eee88218f17420ff3319ab1c7d1652cc150734e8b81f5a42027554651d3dfe0c pass=122 fail=0 ignore=0 verdict=clean 2026-09-20
+door-binding-sweep gate_sdk sha256=fb4a7b906b53571bab9385b3a5ae0e1331e0bdd1764c4f46d1342738a680c88d pass=1 fail=0 ignore=0 verdict=clean 2026-09-20
+door-binding-sweep canon_kit sha256=7fa6f15316eae59bac76441d7c44c7846b2a7d06de9311b07f68c0b041433f95 pass=1 fail=0 ignore=0 verdict=clean 2026-09-20
+door-binding-sweep context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-20
+door-binding-sweep delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-20
+door-binding-sweep doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-20
+door-binding-sweep evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-20
+door-binding-sweep guard_kit sha256=e34c595e6b4e184ac2f16e9dd59d036284a895c33450cf8e99ccef93cc63c2e3 pass=1 fail=0 ignore=0 verdict=clean 2026-09-20
+door-binding-sweep lifecycle_kit sha256=bac54b43ac9a49c420f8020fda337dac934779dfe6701db269ad8ac2a89ceb81 pass=1 fail=0 ignore=0 verdict=clean 2026-09-20
+door-binding-sweep queue_kit sha256=4d50cf613cf514a9f5c5f92ad7c46acf5d8f750aedc71c9e629514a415bad337 pass=1 fail=0 ignore=0 verdict=clean 2026-09-20
+door-binding-sweep site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-20
+door-binding-sweep scripts sha256=b87b46f3a812452329297073b7dd2c6181caadfc1461c4298e5c2c0f0f7044f6 pass=1 fail=0 ignore=0 verdict=clean 2026-09-20
+door-binding-sweep guard_tests sha256=660ff1399386ea7ee064c052fbc5dd0fa4083498cc6ac70240f71fb571830e27 pass=1 fail=0 ignore=0 verdict=clean 2026-09-20
+door-binding-sweep demo sha256=b5f24cfc0cb1f5a24fe6b3f4a9f001b23e610ffdba5b5aab7e05be43c852a689 pass=1 fail=0 ignore=0 verdict=clean 2026-09-20
+door-binding-sweep installer_smoke sha256=368f92ed6a729359dca52a70e2efd3ad544798142989cf6238004884f4c35939 pass=3 fail=1 ignore=0 verdict=new-failures 2026-09-20
+door-binding-sweep consumer_smoke sha256=fcb8039b175c4d24097e36e33030a811acf25b903b05faea7c33f0061c2c7a5d pass=1 fail=0 ignore=0 verdict=clean 2026-09-20
+door-binding-sweep upgrade sha256=9372bcfd368c06ab3b51b4f5d085dffcdc1146c3d98844e521b0d4e085b9be76 pass=0 fail=1 ignore=0 verdict=new-failures 2026-09-20
+door-binding-sweep agents_md_smoke sha256=c46e2b8f1566773ec49dbf42b8180bfb850d2fd5e73d5c3605dacf0b1be0ccc9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-20
+door-binding-sweep index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-20
+door-binding-sweep native_crate sha256=00eee9c7533daf5d4e03f0e273238e23ddbbaab15b04ceb817051ac93415f28c pass=1 fail=0 ignore=0 verdict=clean 2026-09-20
