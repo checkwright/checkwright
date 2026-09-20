@@ -46,7 +46,7 @@ day it lands, with no roster to remember to update.
 
 **Two scopes, because a one-site-one-declaration grammar is unaffordable and an
 unaffordable gate does not land.** Measured over this repo's own candidate
-corpus, 57 door sites on 19 hand-authored files plus 144 on 25 generated mirrors
+corpus, 59 door sites on 20 hand-authored files plus 126 on 25 generated mirrors
 would each need a line.
 
 - **Site scope** — the declaration on the door's own line or the line above, the
@@ -128,7 +128,7 @@ so a copy here would be stale on landing. Run
 `git grep -nE "(bash|sh|-File) +[^ ]*run-gates\.(sh|ps1)|run-gates\.(sh|ps1)('|\`)? +-" -- README.md docs`
 and subtract the fail-open arms; `git grep -l "^generated: true" -- docs` names
 the mirror set whose declaration the emitter writes. **Measured at authoring:**
-59 door-shaped sites on non-generated pages and 144 on the 25 mirrors. **Exactly
+59 door-shaped sites on non-generated pages and 126 on the 25 mirrors. **Exactly
 two of the 59 are adopter-facing and are deliberately left red**, being the
 paired debt entry's deliverable: `README.md`:25 and `docs/index.md`:27. Every
 other site is contributor-facing on its face — a regeneration banner, a battery

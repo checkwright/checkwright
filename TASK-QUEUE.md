@@ -98,7 +98,7 @@
   adopter-facing page reintroduces the repaired defect and nothing reds; the repair stays a hand
   sweep each time.
   **Measured at this spec stage:** 59 door-shaped sites on non-generated pages under `README.md`
-  plus `docs/`, and 144 more on the 25 `generated: true` mirrors, whose declaration one emitter
+  plus `docs/`, and 126 more on the 25 `generated: true` mirrors, whose declaration one emitter
   edit writes. Exactly two of the 59 are adopter-facing and are meant to stay red until the paired
   debt entry repairs them, which is what stops a batch silencing them to reach green.
   **Judged a recurrence at this spec stage, and the recurrence is a misclassification rather than
