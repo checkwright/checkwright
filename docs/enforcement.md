@@ -52,6 +52,7 @@ leaves its section absent.
 | [gate-sdk](gate-sdk/index.md) | check-kit-enum | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-kit-registration | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-readme-roster | precommit |
+| [gate-sdk](gate-sdk/index.md) | check-packed-links | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-smoke-entry-guard | precommit |
 | (consumer) | check-docs-kit-parity | precommit |
 | (consumer) | check-docs-nav-reachable | precommit |

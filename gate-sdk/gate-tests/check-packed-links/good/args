@@ -1,0 +1,8 @@
+# Anchor the sweep at this case dir: gate-sdk-config.knobs (read at cwd) names
+# the synthetic kits via GATE_SDK_KIT_DIRS and pins a non-empty base; their
+# relative roots resolve against the positional root. alpha-kit carries both
+# own-SPEC shapes the packer rewrites, beta-kit carries every target class the
+# payload does carry, and gamma-kit ships no README — the skipped-and-counted
+# path. The pinned counts on the clean line are the non-vacuity evidence: a run
+# that rewrote nothing reads differently from this one.
+.

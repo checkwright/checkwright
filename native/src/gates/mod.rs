@@ -72,6 +72,7 @@ pub mod measured_claim;
 pub mod memory_off;
 pub mod merge_attrs;
 pub mod path_dialect;
+pub mod packed_links;
 pub mod payload_claim;
 pub mod portability_floor;
 pub mod producer_liveness;
@@ -1602,6 +1603,21 @@ pub const REGISTRY: &[GateEntry] = &[
         readme_roster::run,
         &[("?", "", "", "dynamic@src/gates/readme_roster.rs:101")],
         &["GATE_SDK_KIT_DIRS"],
+        "gate-sdk",
+        &[],
+    ),
+    // spec: gate-sdk/SPEC.md §check-packed-links — the walk roster is empty: every read is a
+    // `<kit-root>/README.md` the kit-roots knob already names, so the member opens no walk of its
+    // own and the withheld set is a knob read rather than a directory listing
+    (
+        "check-packed-links",
+        packed_links::run,
+        &[],
+        &[
+            "GATE_SDK_KIT_DIRS",
+            "GATE_SDK_PAYLOAD_WITHHOLD",
+            "GATE_SDK_SPEC_BASE_URL",
+        ],
         "gate-sdk",
         &[],
     ),

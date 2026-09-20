@@ -22,8 +22,10 @@ granted — the one thing that *is* recorded. See [SPEC.md](SPEC.md) for the
 framework, the generic ruleset, what the steering buys, and the triage criterion.
 
 An installer-vendored tree does not carry this file. The payload withholds each
-kit's `SPEC.md` and its `smoke/`, publishing the specification at the location
-`GATE_SDK_SPEC_BASE_URL` names instead (gate-sdk/SPEC.md §Consumer payload).
+kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is
+repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is
+packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer
+payload).
 
 Most of what guard-kit ships is not a gate: its surfaces are hooks, a library
 and templates. It registers exactly one, which holds the door binding its own

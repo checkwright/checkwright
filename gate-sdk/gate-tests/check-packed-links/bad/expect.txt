@@ -1,0 +1,2 @@
+alpha-kit: README.md:3: packed link target 'smoke/install.sh' resolves to payload/alpha-kit/smoke/install.sh, which the payload withholds ('smoke')
+beta-kit: README.md:3: packed link target '../alpha-kit/SPEC.md' resolves to payload/alpha-kit/SPEC.md, which the payload withholds ('SPEC.md')

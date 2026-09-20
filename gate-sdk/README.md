@@ -58,8 +58,9 @@ The design contracts, the manifest grammar, and each component's full contract
 live in [SPEC.md](SPEC.md).
 
 An installer-vendored tree does not carry this file. The payload withholds each
-kit's `SPEC.md` and its `smoke/`, publishing the specification at the location
-`GATE_SDK_SPEC_BASE_URL` names instead (SPEC.md §Consumer payload).
+kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is
+repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is
+packed; with no base set the link stays relative (SPEC.md §Consumer payload).
 
 ## Quick start
 
@@ -128,6 +129,7 @@ check-enforcement-fresh
 check-kit-enum
 check-kit-registration
 check-readme-roster
+check-packed-links
 check-smoke-entry-guard
 check-core-files
 check-identity

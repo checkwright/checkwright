@@ -8613,22 +8613,48 @@ statement at the commit a tree was vendored from. What resolves that exactly is
 the manifest's `commit`, against the public repository. No surface may present
 the mirror as version-pinned.
 
-**A kit README says where its SPEC is published and does not link it, which is a
-ruling and not an oversight.** Each kit's `README.md` ships, its `SPEC.md` does
-not, and the README's own relative links to that file therefore dangle in an
-installed tree. Re-targeting them at the published location was refused: the
-value is the publisher's host, so putting it in eleven kit files is the kit
-literal the `<KIT>_<KNOB>` convention exists to prevent — the same cost this
-section already counts when it refuses a URL form for the pointer grammar — and
-the site mirror is a byte projection of those same READMEs, which
-canon-kit/SPEC.md §The reference-link grammar requires to preserve the
-documents' cross-citation topology one-to-one. What each README carries instead
-is one sentence naming the withholding and the knob, no host in it. **The
-residual cost is accepted rather than closed:** the dangling link remains, and
-the sentence narrows the break by putting the answer on the same page as the
-dead link. Closing it would mean resolving a README's link target from the knob
-at pack time, the way a shipped pointer already resolves, and that is a
-separable unit rather than part of this one.
+**A kit README keeps its SPEC link relative in the tree and the packer resolves
+it in the payload, which is a ruling and not an oversight.** Each kit's
+`README.md` ships, its `SPEC.md` does not, and the README's own relative links to
+that file would therefore dangle in an installed tree. Re-targeting them *in the
+tracked file* was refused: the value is the publisher's host, so putting it in
+eleven kit files is the kit literal the `<KIT>_<KNOB>` convention exists to
+prevent — the same cost this section already counts when it refuses a URL form
+for the pointer grammar — and the site mirror is a byte projection of those same
+READMEs, which canon-kit/SPEC.md §The reference-link grammar requires to preserve
+the documents' cross-citation topology one-to-one. **So the resolution belongs at
+pack time and nowhere else.** Immediately after a kit's tracked set is extracted,
+the packer rewrites the *extracted copy* of `payload/<leaf>/README.md`: a
+markdown link whose target is exactly `SPEC.md`, or `SPEC.md#<fragment>`, becomes
+`<base>/<leaf>/SPEC` or `<base>/<leaf>/SPEC#<fragment>`. Four bounds make that
+safe to state as a contract rather than a convenience:
+
+- **`<leaf>` is the packer's own directory name for the kit it is packing**,
+  already bound by the pack loop. The packer never parses a kit name out of a
+  link, so a link it has no leaf for is a link it does not rewrite.
+- **The fragment passes through unchanged.** A README link's fragment is already
+  a markdown heading slug — the same value the pointer resolution's `§<heading>`
+  conversion produces — so running it through that converter would be a second,
+  lossy normalization of an already-normalized token.
+- **An empty base rewrites nothing**, which is exactly the knob's documented
+  *resolve in the tree* meaning. A publisher who sets no base ships the relative
+  link and the sentence beside it, so the rewrite cannot regress an unconfigured
+  packer.
+- **The tracked README and its docs mirror are never touched**, the rewrite
+  reaching only the extracted copy under the assembly scratch. That is what
+  leaves `check-docs-mirror-fresh`'s byte-freshness invariant and the mirror
+  topology above both intact.
+
+The sentence each README carries — naming the withholding and the knob, no host
+in it — stays, and is now the explanation of a link that **works** rather than
+the consolation for one that does not: a reader whose publisher set no base still
+meets the relative link, and needs it.
+
+**A rewrite no reader observes is a change nobody can catch regressing**, which
+is why the rewrite and §check-packed-links land together. Before it, nothing in
+the battery looked inside a packed README at all: the sidecar verification
+digests only the prebuilt artifacts, and the consumer smoke vendors by direct
+filesystem copy, bypassing the packer entirely.
 
 The artifacts are never produced from a working
 tree: the pack step takes them
@@ -16313,6 +16339,62 @@ unreadable README marker scan is exit 2, never a false clean.
 terms — declaration path `check-readme-roster.gate`, rule out of the gate
 binary, proved parity-identical before the shell gate was deleted, the
 criterion-4 fixture widening having preceded that proof.
+
+### check-packed-links
+
+`checks/check-packed-links.gate` (`precommit`, binary-dispatched,
+`# install: zero-config` — its corpus is the kit READMEs the payload itself
+carries, so it arms on the tree `init` makes).
+
+Invariant: the README the packer would put in the payload carries no link to a
+path the payload withholds. Two assertions, per kit root, over the packed bytes
+rather than the tracked ones: (A) under a non-empty base, no packed README's link
+target resolves to a withheld path — the withheld set read from
+`GATE_SDK_PAYLOAD_WITHHOLD` and never re-listed, so a member added to that knob
+extends the assertion with no gate edit; (B) under an **empty** base, the packed
+README is its tracked source byte for byte — the direction that proves the
+rewrite is conditional rather than unconditional, which A alone cannot show.
+
+**The gate packs its own corpus by calling the packer's rewrite, not by spawning
+the packer**, and the two rejected alternatives are why. Invoking
+`--pack-installer` would put a clean-worktree refusal, an `npm` spawn and a
+prebuilt artifact roster in a per-commit gate — preconditions a developer mid-edit
+cannot meet, so the member would red on a dirty tree for reasons that are not its
+rule. Extending the consumer smoke instead would re-point a surface whose
+copy-vendoring is its contract (installer/SPEC.md §The consumer smoke). Calling
+the one rewrite function leaves no second implementation to drift: the bytes the
+gate asserts on are the bytes the packer writes.
+
+**Where the configured base is empty the gate packs under its own probe base**,
+because an assertion that fires only for a configured publisher reads clean on
+every unconfigured tree — a vacuous green, not a narrower check. The probe value
+is the gate's own literal and reaches no output but a finding's resolved path.
+
+A target is judged **where it lands**, by resolving it lexically against the
+README's own payload directory: `SPEC.md` lands under the linking kit,
+`../<other>/SPEC.md` lands under a different one, and a target escaping the
+payload root, bearing a URL scheme, root-absolute or anchor-only is not a payload
+path and is passed over. A finding names the kit, the README line, the target as
+written and the path it resolves to; a link title after the target and a fragment
+after the path are both stripped before the judgement.
+
+Sweep: kit roots come from `gate_kit_roots`, the `check-readme-roster` sweep
+shape; a kit root with no `README.md` is skipped-and-counted. The clean line
+prints the swept-README count, the resolved-link count and the skipped count, so
+a run that packed nothing, or resolved nothing because the base was silently
+empty, is visible on green rather than indistinguishable from a clean one.
+Fail-closed: a non-repo cwd with no root argument, an empty kit roster, an empty
+withhold roster, or an unreadable README is exit 2, never a false clean.
+
+**Two honest limits.** Assertion B is falsifiable only by a code regression, not
+by fixture data — no README content can make a conditional rewrite unconditional
+— so the `bad/` case reds on A alone and B's coverage is the assertion itself
+plus the packer's own unit tests. And the member's `# graph:` manifest couples
+`kit:README.md` and the packer module but **not**
+`knob:GATE_SDK_PAYLOAD_WITHHOLD`, which it reads: a `knob:` token expands to path
+members and that knob's value carries whitespace, which §The `# graph:` manifest
+refuses as unrepresentable after expansion. The knob is read at run time
+regardless; what is lost is a hook trigger on a change to its value.
 
 ### check-smoke-entry-guard
 

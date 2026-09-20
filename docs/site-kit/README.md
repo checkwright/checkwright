@@ -32,8 +32,10 @@ none of what it asserts is in any checkout. See [SPEC.md](SPEC.md#the-monitor-bo
 for why that boundary is load-bearing.
 
 An installer-vendored tree does not carry this file. The payload withholds each
-kit's `SPEC.md` and its `smoke/`, publishing the specification at the location
-`GATE_SDK_SPEC_BASE_URL` names instead (gate-sdk/SPEC.md §Consumer payload).
+kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is
+repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is
+packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer
+payload).
 
 ## Install
 

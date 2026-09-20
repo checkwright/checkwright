@@ -42,28 +42,6 @@
   Filed 2026-09-19 at `adopter-floor-native-rungs`' spec; promoted at its close drain. Joined this
   iteration by the same operator direction; its amendment was authored and paired at spec.
 
-- **vendored-kit-readme-spec-link-dangles** [spec: SPEC-packed-links.md] — a vendored kit README
-  still links a `SPEC.md` its installed tree no longer carries. This is the residual the
-  payload-withholding unit's ninth delta NARROWED rather than closed: each of the eleven kit READMEs
-  already carries one sentence naming the withholding and `GATE_SDK_SPEC_BASE_URL`, so a reader who
-  meets the dead link has the answer on the same page.
-  **Why the tracked links stay relative:** re-targeting them at the published location would put the
-  publisher's host in eleven kit files — the kit literal the `<KIT>_<KNOB>` convention exists to
-  prevent — and would break canon-kit/SPEC.md §The reference-link grammar's one-to-one mirror
-  topology, `docs/<kit>/README.md` being a byte projection of the source.
-  **Re-counted at promotion (2026-09-20 scope):** 18 `](SPEC.md` links across the kit READMEs.
-  **Ruled at spec (2026-09-20):** resolution at pack time, and nowhere else. Two premises corrected
-  by probe — `runner.rs`'s `resolved_location` **cannot** be reused (it requires `<dir>/SPEC.md`; a
-  bare `SPEC.md` falls through), and the packer already rewrites content once (`stamp()` on
-  `package.json`), so this is a second instance of a precedent, not a new class. Scope is
-  own-SPEC-only: zero cross-kit `](../<kit>/SPEC.md)` links exist.
-  **What the unit gained at spec:** no gate compares packed kit content to tracked content — the
-  consumer smoke vendors by direct copy, bypassing the packer — so the rewrite breaks nothing and
-  nothing would catch it regressing. The amendment owes the first gate in the battery to read a
-  packed README's bytes.
-  Filed 2026-09-16 at the lead's direction during `installer-front-door-cut`. Joins this iteration
-  by operator direction (2026-09-20, lead-relayed); amendment authored and paired at spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -2943,5 +2921,6 @@
 - objective-1-discharge-unruled
 - binary-door-wide-sweep
 - bash-audience-hand-held
+- vendored-kit-readme-spec-link-dangles
 
 ## Lessons Learned

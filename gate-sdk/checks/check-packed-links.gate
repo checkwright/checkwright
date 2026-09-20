@@ -1,0 +1,3 @@
+# graph: couples=kit:README.md,native/src/emit/pack_installer.rs dir=one valve=none tier=precommit
+# install: zero-config
+# spec: gate-sdk/SPEC.md §check-packed-links — a packed kit README carries no link to a path the payload withholds, and with an empty base the packed README is its tracked source byte for byte

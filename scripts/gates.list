@@ -22,6 +22,7 @@ check-reads-couples
 check-kit-enum
 check-kit-registration
 check-readme-roster
+check-packed-links
 check-smoke-entry-guard
 check-docs-kit-parity
 check-docs-nav-reachable

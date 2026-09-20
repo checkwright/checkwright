@@ -1,0 +1,4 @@
+# Same synthetic-tree steer as good/, same non-empty base: the difference is in
+# the READMEs, so the red is the rule firing rather than a config change.
+GATE_SDK_KIT_DIRS = alpha-kit beta-kit
+GATE_SDK_SPEC_BASE_URL = https://fixture.test

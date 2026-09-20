@@ -37,6 +37,7 @@ check-identity
 check-kit-enum
 check-path-dialect
 check-front-end-fail-open
+check-packed-links
 check-readme-roster
 check-reads-couples
 check-smoke-entry-guard
