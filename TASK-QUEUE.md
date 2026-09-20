@@ -12,57 +12,6 @@
 
 ## New Features
 
-- **path-dialect-clauses-unenforced** [spec: SPEC-path-speller-locality.md]
-  — the two clauses gate-sdk/SPEC.md §The path-dialect contract gained 2026-08-30 are held by
-  review alone, and neither is shaped like the form scan `check-path-dialect` already runs.
-  **Clause one: the cwd anchor has no oracle.** That section obliges a script to anchor its own
-  shell in the crossed spelling. `check-path-dialect`'s vocabulary is platform-native PRODUCERS
-  (`GIT_FLAGS`, `RUST_FORMS` in `native/src/gates/path_dialect.rs`) and carries no `pwd` form, by
-  the contract's own reasoning that a shell builtin produces no foreign value. The hole is that a
-  builtin PROPAGATES one: an absolute `cd` leaves `$PWD` in the argument's dialect, and a later
-  relative `cd … && pwd` concatenates onto it. That is how `gen-pre-commit.sh`'s prologue died on
-  the Windows leg. A gate must pair two facts a script exhibits — it derives a root from
-  `BASH_SOURCE` with a relative `cd`, and it composes two roots by string arithmetic — rather than
-  scan for one form.
-  **Clause two is not merely unenforced: as written it is FALSE**, which is why this stopped being
-  debt. The sentence at gate-sdk/SPEC.md:868 asserts "No module outside it composes a path, in
-  either style"; `git grep -c '\.join(' -- native/src` returns 137 files, and `proc.rs` and
-  `marker.rs` compose real filesystem paths. Restating it NARROWS what the contract asserts, which
-  is envelope work rather than calibration — lead decision 2026-09-20, taken against the contract
-  at its source rather than against precedent. The restatement, its grounds and the refused
-  alternatives are the amendment's; this entry owes the assertion.
-  **Why one entry rather than two.** Both are the same landed contract's unenforced half, both were
-  filed the same day by the unit that landed it, and both need a pairing predicate rather than a
-  form scan. Splitting them files one shape twice.
-  **Cost class event/high, whose home is this prose while the entry is active:** a Windows
-  adopter's gate verdict, which is a cost already paid once — `check-install-disposition` read its
-  whole corpus as unregistered on round 5 because a composed separator escaped into a compared
-  value, and a Linux battery cannot show it.
-  **SECOND INSTANCE, 2026-09-20, and this one shipped to the remote.** The `door-binding-sweep`
-  close's watched push failed both Windows install-smoke legs: `native/src/toolfloor.rs` synthesized
-  `<anchor>/` and prefix-tested it against a backslash-spelled absolute root, so every kit root read
-  as outside the walk and `init` exited 2 — clause two's predicate exactly. Hotfixed minimal under
-  the impacting-failure carve-out and verified green on the next watched run; the GATE half is this
-  entry, which is what enforcement-first still owes.
-  **The corpus is JUDGED, all twelve, at this iteration's spec stage** — the roster stays the
-  command `git grep -n 'starts_with(&format!("{}/"' -- native/src`, and the per-site verdicts are
-  the amendment's delta 3. Summary: one lawful, TWO comparing a non-filesystem namespace (a roadmap
-  `horizon/track` field, a markdown link target) which is the only crying-wolf class and takes a
-  declared exemption, five git-relative where routing through a `walk` helper is
-  correct-by-construction rather than a false positive, and four host-absolute.
-  **The filed host-absolute-versus-git-relative discriminator is DROPPED, not adjudicated:** it
-  returns the same verdict for the shipped `toolfloor.rs` defect and for `emit/scratch_run.rs`:38,
-  which is correct and self-attested, so it does not discriminate. The entry's former remaining
-  design question is answered by deletion.
-  recurrence: path-dialect-clauses-unenforced 2026-09-20
-  Joins this iteration as its LEAD unit by operator direction (2026-09-20, lead-relayed), the
-  adopter-floor door remainder; reclassified from debt to feature and promoted at this iteration's
-  spec stage by lead decision, on the narrowing above. The scope session raised this correction
-  against its own promotion premise.
-  Filed 2026-08-31 by close, draining two 2026-08-30 gap bullets. Fix was tried first and refused
-  (the assertion the second bullet proposes reds a benign population); icebox second, refused
-  because a gate's verdict on an adopter's host is adopter-facing.
-
 - **fail-open-front-end-residency-after-the-door-sweep** [spec: SPEC-front-end-residency.md]
   — `gate-sdk/bin/run-gates.sh` and its PowerShell twin stay permanently resident for the
   fail-open arms after every other adopter surface was re-pointed at the binary.
@@ -164,6 +113,37 @@
   distinct**: it owns the gate's reach, this owns the two adopter-facing sites' spelling.
 
 ## Deferred
+
+- **shell-cwd-anchor-clause-has-no-oracle** [cost: event/high] [surface: gate-sdk]
+  — Surfaced 2026-08-30. `gate-sdk/SPEC.md` §The path-dialect contract obliges a script that
+  composes two roots to anchor its own cwd first, and nothing asserts it. The gate's own section
+  (§check-path-dialect) now states the hole rather than leaving it to a reader: a builtin produces
+  no foreign value but PROPAGATES one, so an absolute `cd` leaves `$PWD` foreign and a later
+  relative `cd … && pwd` concatenates onto it; neither half is a producer occurrence, and the
+  `pwd -P` read-back arm reaches only a `cd` the gate already cleared.
+  **Deliverable:** a predicate that PAIRS two facts a script exhibits — it derives a root from
+  `BASH_SOURCE` with a relative `cd`, and it composes two roots by string arithmetic — rather than
+  scanning for either. Scanning for either alone reds 7 of 7 files; the pairing reds 1.
+  **Why design-pending, and why it needs a spec stage rather than a build session:** the satisfying
+  value is itself unruled. `gate-sdk/lib/test-hermetic.sh`:25 also spells the shell absoluteness
+  test, there is no shell counterpart of `walk::path_root` to route it through, and this contract
+  refuses a shared shell normalizer on its own stated grounds — so what a red site is supposed to
+  become is an open question, not a known edit.
+  **Measured, so a later scope does not re-buy it** (filed whole in `.workflow/survey-record.md`,
+  2026-09-20 build, with its witness): of the 7 non-test tracked shell files deriving a root from
+  `BASH_SOURCE`, NONE uses `pwd -P`, and `gate-sdk/lib/test-hermetic.sh` is the witness exhibiting
+  both paired facts — `:4` and `:15` derive two roots with relative `cd`s, `:17` takes a suffix off
+  one and `:25` joins the other onto a leading-slash-tested path.
+  **Cost while deferred:** a Windows adopter's gate verdict on their own host, paid whenever a
+  composing script runs there, and a Linux battery cannot show it — the cost class the parent
+  carried, undiminished by the split because the split moved the enforced half out, not this one.
+  That is also why the icebox is refused rather than merely unavailable: a verdict on an adopter's
+  host is adopter-facing, which the `event/high` class already makes ineligible.
+  Filed 2026-09-20 by build, as the surviving half of `path-dialect-clauses-unenforced` — whose
+  clause two landed as §check-path-dialect's locality arm, and whose contract half is
+  §Porting to Rust does not retire dialect exposure. Split authorized by lead decision 2026-09-20
+  on §check-queue-entry-budget's split-candidate test, the parent's two deliverables having taken
+  different dispositions by demonstration.
 
 - **check-kit-roots-dialect-leaks-a-scratch-tree-per-run** [cost: once/low] [surface: gate-sdk]
   — `check-kit-roots-dialect`'s `scratch()` (`native/src/gates/kit_roots_dialect.rs`) creates a
@@ -3075,5 +3055,7 @@
 - **lead-agent-id-compaction-defense** — each claim still wants its own probe.
 
 ## Done
+
+- path-dialect-clauses-unenforced
 
 ## Lessons Learned
