@@ -12,7 +12,7 @@
 111 .claude/commands/scope.md
 19 .claude/commands/spec.md
 21 .claude/commands/validate.md
-177 CLAUDE.md
+176 CLAUDE.md
 109 canon-kit/templates/SPEC-amendment.md
 37 context-kit/templates/close-brevity.md
 492 delegation-kit/templates/agent-execution.md

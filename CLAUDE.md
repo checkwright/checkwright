@@ -60,11 +60,10 @@ The state machine, its stamp protocol, and the per-stage contracts:
 
 The pre-commit hook is **generated** — never hand-edit
 `scripts/git-hooks/pre-commit`; edit a gate's `# graph:` manifest and regenerate.
-Per-clone opt-in: `--install-hooks`. Every generated
-projection, that hook included, is rostered with its trigger, its regen command and
-the wide fan-outs in [docs/site-architecture.md](docs/site-architecture.md)
-§Generated projections and their freshness gates; each freshness gate prints its
-own command on red.
+Per-clone opt-in: `--install-hooks`. Every generated projection, that hook
+included, is rostered with its trigger, its regen command and the wide fan-outs in
+[docs/site-architecture.md](docs/site-architecture.md) §Generated projections and
+their freshness gates; each freshness gate prints its own command on red.
 
 New gates here are **born native** — a Rust module, a `.gate` descriptor and a
 `good/`+`bad/` fixture pair; no gate is permanently shell, and a shell gate
@@ -158,12 +157,12 @@ load behind that trigger, so they are not resident here.
   activation surface; layout, boundary and packing: installer/SPEC.md.
 - **Knowledge-friction capture (any session):** re-deriving a fact no doc owns (off an
   implementation, a gate's source, a commit, or a prior/sibling deliverable)? stamp it in
-  the moment with `--emit kfric "<fact>" "<surface>"` —
-  deferred capture is no capture (drift-kit/SPEC.md §The knowledge-friction loop).
+  the moment with `--emit kfric "<fact>" "<surface>"` — deferred capture is no capture
+  (drift-kit/SPEC.md §The knowledge-friction loop).
 - **Gap capture (any mid-iteration session):** a gap, task or defect goes to
-  `--emit file-gap "<gap>"`, never a queue edit
-  (lifecycle-kit/SPEC.md §The committed gap inbox) — unless the operator directs a
-  direct entry, staged and committed in one motion under the shared-index rule above.
+  `--emit file-gap "<gap>"`, never a queue edit (lifecycle-kit/SPEC.md §The committed
+  gap inbox) — unless the operator directs a direct entry, staged and committed in one
+  motion under the shared-index rule above.
 - **Recurrence stamping (any session that judges one):** a finding that recurred takes
   today's date on its entry's `recurrence:` declaration, in the commit you are already
   making; a session that may not write the queue files the judgment and its grounds as a
