@@ -12,6 +12,49 @@
 
 ## New Features
 
+- **fail-open-front-end-residency-after-the-door-sweep** [spec: SPEC-front-end-residency.md]
+  — `gate-sdk/bin/run-gates.sh` and its PowerShell twin stay permanently resident for the
+  fail-open arms after every other adopter surface was re-pointed at the binary.
+  The amendment rules the residency **permanent** on three independent grounds and mints the
+  **pre-build door** class, which is what this iteration's other two door units take as their
+  input: `readme-front-door-is-adopter-facing-and-outside-every-sweep` and
+  `door-binding-sweep-stops-at-the-kit-roots`. This entry carries no precondition of its own —
+  it is the input, never the dependent. The design record, the refused candidates and their
+  grounds are the amendment's, not this entry's.
+  **Cost class event/high, whose home is this prose while the entry is active:** every adopter
+  keeps a bash surface, and a PowerShell one beside it, on a floor that otherwise reaches git plus
+  the binary — the standing exception to the claim in gate-sdk/SPEC.md §The adopter constraints,
+  which the amendment states where the constraint is rather than leaving it to a reader.
+  **Measured at this spec stage, and it changes the deliverable:** this repo's two headline try-it
+  doors, `README.md`:25 and `docs/index.md`:27, exit 2 in a fresh clone — no binary is tracked and
+  no build step precedes them — so the defect is an unstated precondition rather than the `bash`
+  word, and re-pointing either at the binary would name a path that does not exist.
+  Joins this iteration as its ruling unit, by operator direction (2026-09-20, lead-relayed) on the
+  adopter-floor door remainder; promoted at this spec stage, which authored its amendment.
+  Filed 2026-09-20 to the gap inbox at `binary-door-wide-sweep`'s spec while ruling that unit's
+  fifth delta, against its own claim that the twin and the fail-open set retire with the sweep.
+
+- **door-binding-sweep-stops-at-the-kit-roots** [spec: SPEC-door-reach.md]
+  — `check-door-binding`'s assertion A sweeps kit-shipped surfaces only, so no gate reaches
+  `docs/` or any repo-root surface. That is how docs/install.md §Requirements kept handing every
+  adopter a bash front-end command while its own bullet declared bash conditional — repaired one
+  site at a time under `bash-audience-hand-held` because nothing enumerated them — and how
+  README.md line 25 survived three measurements of the same corpus.
+  The amendment mints the discriminator the widening needs: **assertion C** over a
+  consumer-configured corpus, default-deny with a `door-contributor:` site declaration, and it
+  records the two alternatives it refuses. The design record is the amendment's.
+  **Cost class event/high, whose home is this prose while the entry is active:** a future
+  adopter-facing page reintroduces the repaired defect and nothing reds; the repair stays a hand
+  sweep each time.
+  **Measured at this spec stage:** 59 door-shaped sites on non-generated pages under `README.md`
+  plus `docs/`, and 144 more on the 25 `generated: true` mirrors, whose declaration one emitter
+  edit writes. Exactly two of the 59 are adopter-facing and are meant to stay red until the paired
+  debt entry repairs them, which is what stops a batch silencing them to reach green.
+  Joins this iteration as its gate-reach unit, by operator direction (2026-09-20, lead-relayed) on
+  the adopter-floor door remainder; promoted at this spec stage, which authored its amendment.
+  Filed 2026-09-20 to the gap inbox at `bash-audience-hand-held`'s build while locating the
+  operator-ruled correction.
+
 ## Technical Debt
 
 - **path-dialect-clauses-unenforced** — the two clauses gate-sdk/SPEC.md §The
@@ -141,70 +184,6 @@
   more than one batch, and the only thing between is a per-dispatch warning no surface holds.
   Filed 2026-09-20 to the gap inbox by the lead at `door-binding-sweep`'s close; promoted at this
   scope's intake. Owner lookup: `commit-msg`, `commit message file`, `journal path` — none.
-
-- **fail-open-front-end-residency-after-the-door-sweep** [cost: event/high] [surface: gate-sdk]
-  — `SPEC-door-binding.md` delta 5 held `gate-sdk/bin/run-gates.sh` and its PowerShell twin back
-  from the sweep on a stated constraint, and the constraint holds: gate-sdk/SPEC.md rules each
-  front-end stub's fail-open copy is read exactly when the binary it would ask is absent, so an
-  absent binary cannot decline and the stub is the only process that runs. The residue is that the
-  front end, its twin, `--run-front-end-parity` and the whole fail-open set stay permanently
-  resident for `--hook` and `--statusline` after every other adopter surface is re-pointed.
-  **Re-verified at the drain:** gate-sdk/SPEC.md states the ground in its own words — those arms are
-  "wired into a harness as a literal argv, and the whole reason they take a fail-open" — and poses
-  the successor question this entry inherits, whether a harness can instead be wired to a *binary*
-  that fail-opens on its own absence.
-  **Why design-pending:** the two candidate shapes, a small wrapper the installer places beside the
-  artifact and a harness feature, are a design question the door sweep deliberately did not open,
-  and neither is costed. Ruling it is cheap; building either shape is not.
-  **Cost while deferred:** every adopter keeps a bash surface, and a PowerShell one beside it, on a
-  floor that otherwise reaches git plus the binary — the standing exception to the claim in
-  gate-sdk/SPEC.md §The adopter constraints.
-  Joins this iteration as its ruling unit, by operator direction (2026-09-20, lead-relayed) on the
-  adopter-floor door remainder; **marked for spec**, which authors its amendment and promotes it.
-  Both candidate shapes are new mechanism, so the new-names litmus makes it a feature,
-  and `readme-front-door-is-adopter-facing-and-outside-every-sweep` is blocked on its answer.
-  Filed 2026-09-20 to the gap inbox at `binary-door-wide-sweep`'s spec while ruling delta 5, against
-  that unit's own claim that the twin and the fail-open set retire with the sweep; promoted at this
-  close drain. Owner lookup: `fail-open`, `front end`, `--statusline`, `run-front-end-parity` — none
-  live (`host-resolution-fail-open-cut` is retired, and was a host-resolution cut, not this).
-
-- **door-binding-sweep-stops-at-the-kit-roots** [cost: event/high] [surface: guard-kit]
-  — `check-door-binding`'s assertion A sweeps kit-shipped surfaces only: `door_binding.rs` walks
-  `walk::kit_roots()` and filters to each root's README and its SPEC-adjacent files, so no gate
-  reaches `docs/` or any repo-root surface. That is exactly how docs/install.md §Requirements kept
-  handing every adopter `bash gate-sdk/bin/run-gates.sh --emit env-probe` while its own bullet
-  declared bash conditional — found and repaired under `bash-audience-hand-held` by operator ruling,
-  one site at a time, because nothing enumerated them.
-  **Corpus re-measured TWICE, and both earlier counts were wrong the same way.** The filing bullet
-  named `docs/ddd.md` and nine `docs/site-architecture.md` sites; this close's first re-measurement
-  grepped only `docs/` and returned fifteen there plus `docs/index.md`. A grep over the whole tree
-  outside the kit roots returns **README.md with 19 sites**, which neither earlier probe reached,
-  beside site-architecture's 15 and the emitter-written banners in `docs/enforcement.md`,
-  `docs/check-graph.html`, `docs/footprint.md` and `docs/value.md`. Records are excluded:
-  `.workflow/`, the queue, `docs/posts/` and the fixture trees are history or test data.
-  **README.md is the finding that changes this entry's class.** Line 25 is the landing page's
-  headline try-it command, first screen, and it hands a prospective adopter `bash` — on a project
-  whose adopter-constraint claim is git as the only unconditional floor member. That is an
-  adopter-facing door, not a contributor-facing one, so the "all live sites are contributor-facing"
-  reading below holds for `docs/` and NOT for the landing page.
-  **Escalated rather than fixed at this close:** re-pointing README.md extends the door sweep's
-  envelope to a surface it excluded, and a fresh clone has no built binary, so which spelling that
-  line should carry is a question the sweep's own constraint bears on.
-  **Why design-pending:** the `docs/` sites are contributor-facing, so widening assertion A past the
-  kit roots needs an adopter/contributor discriminator the gate does not have — and nothing holds
-  that distinction, which is how README.md's line stayed invisible to every oracle. The
-  emitter-written banners need their emitters changed rather than their pages.
-  **Cost while deferred:** a future adopter-facing page reintroduces the repaired defect and nothing
-  reds; the repair stays a hand sweep each time.
-  Joins this iteration as its gate-reach unit, by operator direction (2026-09-20, lead-relayed) on
-  the adopter-floor door remainder; **marked for spec**, which authors its amendment and promotes
-  it. A feature: the adopter/contributor discriminator assertion A needs does not exist yet, so
-  the unit mints it. Designed alongside `fail-open-front-end-residency-after-the-door-sweep` — that
-  unit rules which spelling an adopter-facing door may carry, and this one rules which surfaces a
-  gate reads as doors, so the discriminator is one question answered from two sides.
-  Filed 2026-09-20 to the gap inbox at `bash-audience-hand-held`'s build while locating the
-  operator-ruled correction; promoted at this close drain. Owner lookup: `check-door-binding`,
-  `kit_roots`, `door binding`, `adopter` — none.
 
 - **couples-knob-token-empty-expansion-passes-silently** [cost: once/low] [surface: gate-sdk]
   — a `knob:` couples token whose expansion resolves to an **empty member set** is silently accepted
