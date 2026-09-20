@@ -1363,7 +1363,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-install-toolchain",
         install_toolchain::run,
-        &[("?", "", "", "dynamic@src/toolfloor.rs:125 via toolfloor::derived_audience_here")],
+        &[("?", "", "", "dynamic@src/toolfloor.rs:128 via toolfloor::derived_audience_here")],
         &["GATE_SDK_KIT_DIRS"],
         "-",
         &[("git", "")],

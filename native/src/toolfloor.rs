@@ -101,13 +101,16 @@ fn is_bash_surface(p: &std::path::Path) -> bool {
 }
 
 // spec: context-kit/SPEC.md §bin/env-probe — a root under the anchor, as the walk's own paths
-// spell it; an absolute root passes through
-fn under(anchor: &str, root: &str) -> String {
-    let r = root.trim_end_matches('/');
-    if std::path::Path::new(r).is_absolute() {
-        return format!("{}/", r);
+// spell it; an absolute root passes through unaltered.
+// spec: gate-sdk/SPEC.md §The path-dialect contract — joined as a path and never as a
+// separator-joined string: a root can arrive backslash-separated, and a synthesized `/` then
+// composes exactly the string no filesystem answers to that that section names.
+fn under(anchor: &str, root: &str) -> std::path::PathBuf {
+    let r = std::path::Path::new(root);
+    if r.is_absolute() {
+        return r.to_path_buf();
     }
-    format!("{}/{}/", anchor.trim_end_matches('/'), r)
+    std::path::Path::new(anchor).join(r)
 }
 
 // spec: context-kit/SPEC.md §bin/env-probe — the derived audience over a caller's kit roots, in
@@ -123,10 +126,6 @@ pub fn derived_audience_at(
     let configured = crate::walk::prune_dirs()?;
     let prune = |n: &str| n == "gate-tests" || n == "smoke" || configured.iter().any(|d| d == n);
     let tree = crate::walk::find_with_prune(std::path::Path::new(anchor), &prune)?;
-    let files: Vec<(String, &std::path::Path)> = tree
-        .iter()
-        .filter_map(|p| p.to_str().map(|s| (s.to_string(), p.as_path())))
-        .collect();
     let floor = kit_name(sdk_root);
     let mut out: Vec<String> = Vec::new();
     for r in roots {
@@ -138,16 +137,16 @@ pub fn derived_audience_at(
         // rather than answered `no`: an unreachable root reads exactly like a kit shipping nothing,
         // which is the fail-open the derivation exists to close. An absent one contributes nothing.
         let prefix = under(anchor, r);
-        if !prefix.starts_with(&format!("{}/", anchor.trim_end_matches('/'))) {
+        if prefix.strip_prefix(anchor).is_err() {
             return Err(format!(
                 "kit root {} lies outside the walked anchor {}",
                 r, anchor
             ));
         }
-        if !std::path::Path::new(prefix.trim_end_matches('/')).is_dir() {
+        if !prefix.is_dir() {
             continue;
         }
-        if files.iter().any(|(s, p)| s.starts_with(&prefix) && is_bash_surface(p)) {
+        if tree.iter().any(|p| p.starts_with(&prefix) && is_bash_surface(p)) {
             out.push(name);
         }
     }
@@ -482,6 +481,20 @@ mod tests {
         for clear in ["delegation-kit", "lifecycle-kit", "canon-kit", "queue-kit"] {
             assert!(derived.iter().all(|k| k != clear), "{} joined the audience: {:?}", clear, derived);
         }
+    }
+
+    // spec: context-kit/SPEC.md §bin/env-probe — `under` synthesizes no separator, the property
+    // whose absence broke `init` on Windows. It pins the cause, not the symptom: no test on a
+    // POSIX host reproduces that failure, and the commit landing this says so rather than implying.
+    #[test]
+    fn under_appends_no_separator_and_joins_as_a_path() {
+        use std::path::PathBuf;
+        let anchor = "/a/b";
+        assert_eq!(under(anchor, "/x/y"), PathBuf::from("/x/y"));
+        assert_eq!(under(anchor, "c-kit"), PathBuf::from("/a/b").join("c-kit"));
+        assert!(under(anchor, "c-kit").strip_prefix(anchor).is_ok());
+        assert!(under(anchor, "/x/y").strip_prefix(anchor).is_err());
+        assert!(!PathBuf::from("/a/b/c-kit-extra/f").starts_with(under(anchor, "c-kit")));
     }
 
     // spec: context-kit/SPEC.md §bin/env-probe — the two arms read a spawn and not a substring: a
