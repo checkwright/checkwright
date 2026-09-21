@@ -16,6 +16,49 @@
 
 ## Deferred
 
+- **disclaimer-beside-its-own-restatement** [cost: event/low] [surface: canon-kit] — a surface
+  that disclaims carrying a rule ("stated there and not restated here") in the same sentence that
+  carries it is asserted by nothing, and the disclaimer tells every sweep the copy is not one.
+  **Attested once, fixed inline:** README.md §This repo, governed restated the commit-time
+  fixture-suite selection rule beside exactly that disclaimer, so correcting CLAUDE.md stranded
+  README's copy; `5e0e10f8` de-literalized it. What survives is the class, not the instance.
+  **Why reachable when general restatement is not:** the predicate is a disclaimer phrase
+  co-located with a content clause — does the sentence around it name the rule's substance
+  rather than only its owner. `check-surface-duplication` and `check-shim-restatement` hold
+  restatement for their own corpora; neither reads a disclaimer.
+  **Deliverable:** a gate, or an assertion joining an existing restatement gate, over that shape.
+  A feature by the new-names litmus, so it owes an amendment and passes the enhancement
+  admission filter only on an arm its authoring session argues.
+  **Cost while deferred:** each such disclaimer is a licence a later reader trusts, and the copy
+  beside it rots silently.
+  Filed 2026-09-20 to the gap inbox by the close of `adopter-floor-door-remainder`; promoted
+  2026-09-21 at the next scope's intake, so the record is late and says so. Owner lookup ran over
+  `disclaim`, `not restated here`, `restatement` and the two gates above and found no owner.
+
+- **lead-no-change-decision-has-no-landing-site** [cost: once/low] [surface: lifecycle-kit] — a
+  lead decision whose content is "make no change" is invisible to every later stage, because the
+  landing rule presupposes a ruling with something to write.
+  **Attested once:** a scope escalated whether a recurrence date was owed; the lead declined it
+  and told scope nothing further was owed, on the ground that scope's gap bullet carried the
+  grounds. That bullet recorded the question as escalated and unresolved, so close re-derived the
+  judgment from the owner doc three stages later. Same disposition, one re-derivation — but the
+  opposite call would have tripped the recurrence threshold and forced an entry into a unit set,
+  a queue change only the lead may rule.
+  lifecycle-kit/templates/lead.md already calls the message thread transport and already requires
+  a ruling whose acting session is not imminent to be filed durably; both clauses assume an act
+  that writes something.
+  **Deliverable — rule one of two, neither authored:** a no-change decision appends its
+  resolution to the gap bullet that raised it, so the drain reads a closed question; or the lead
+  template states that "nothing further is owed" is never the lead's to assert about a durable
+  record it did not read. The lead journal is scratch and is not the answer.
+  **Cost while deferred:** the next no-change ruling on a threshold-bearing question is
+  re-derived by a session that may not rule it.
+  **DISTINCT from `record-stamp-encoding-compression` and `precondition-gate-direction-blindness`**,
+  the entries the instance happened on; this is the lead protocol's landing rule.
+  Filed 2026-09-20 to the gap inbox by the lead of `adopter-floor-door-remainder`; promoted at
+  the 2026-09-21 scope intake, a late record that says so. Owner lookup ran over
+  `no-change`, `landing site`, `lead decision` and `transport` and found no owner.
+
 - **entry-line-cap-has-no-line-axis-relief** [cost: event/low] [surface: queue-kit]
   — an entry at `QUEUE_KIT_ENTRY_LINE_CAP` buys room for a mandated write by
   compressing prose a later reader needed, and nothing offers relief on the LINE
