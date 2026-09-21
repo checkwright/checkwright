@@ -12,56 +12,103 @@
 
 ## New Features
 
+- **install-md-adopter-page-overgrown** [spec: SPEC-install-page.md] — `docs/install.md` is an
+  adopter page carrying maintainer-tier grounds (980 lines), and nothing holds a `docs/` page to a
+  length, so it regrows.
+  **Deliverable, by operator direction (2026-09-21, lead session):** an adopter page of about 150
+  lines, with the gated marker blocks and the `install-primary:` declaration kept, plus a regrowth
+  guard whose reach is the whole `docs/` site.
+  **Ruled at spec (2026-09-21):** the grounds relocate to installer/SPEC.md under their existing
+  heading names: Versioning, the release channel, the upgrade contract, manual vendoring and hook
+  review. Their 41 path-bound citations are repointed in one commit, with `check-spec-pointer` as
+  the oracle. The guard is `check-surface-ratchet`, widened by config to the 51 non-mirror `docs/`
+  pages, and no new gate is added.
+  **Open, escalated to the lead:** the four gated blocks alone are 109 lines. The spec reads
+  "about 150" as prose around the blocks, which puts the page near 260 lines.
+  Filed 2026-09-21 to the gap inbox by the lead, and promoted into `docs-first-contact` by operator
+  direction; the amendment was authored and paired at this spec.
+  **DISTINCT from** `docs-index-front-door-restatement-ungenerated`.
+
+- **adopter-demo-verb-missing** [spec: SPEC-demo-verb.md] — the home page promises a walkthrough
+  with nothing installed, but `--run-demo` copies kit source from a clone. The installed front door
+  has no demo verb.
+  **The entry's inferred premise was run at spec (2026-09-21), and it is false where it matters.**
+  A packed master payload carries all 11 kit roots and no kit `smoke/`
+  (`GATE_SDK_PAYLOAD_WITHHOLD`). `--run-demo` needs `smoke/install.sh`, so it fails at act 1 from
+  the bootstrap and from the vendored front-end alike, and `checkwright demo` is refused as an
+  unknown arm. A starter battery stays green on the value-arm link typo. A `full` install reds on
+  it at `check-md-refs` and is green again once the typo is fixed; that install takes 0.4 s and
+  its battery 1.5 s.
+  **Ruling:** a `demo` verb that runs `init --profile full` from the package into its own scratch
+  repository. It shows green, fires the consumer smoke's value-arm defect and shows green again,
+  spawning only `git` and itself. The consumer smoke gains a demo arm as its oracle.
+  Filed 2026-09-21 to the gap inbox by the lead (operator shape: install, demo, uninstall), and
+  promoted into `docs-first-contact` by operator direction as its demo-verb unit.
+  **DISTINCT from** `fence-execution-gate`.
+
+- **fence-execution-gate** [spec: SPEC-fence-run.md] — `check-fence-command-head` is static, so
+  a wrong operand or an unassigned variable passes, and no documented fence is ever executed.
+  **Ruling (spec, 2026-09-21):** a `fence-runnable` HTML-comment marker, off by default, and an
+  align-only canon-kit gate, `check-fence-run`. The gate runs each marked fence under
+  `bash -euo pipefail` in a scratch copy of the tracked tree, with a fixed environment. No sandbox
+  exists to reuse on the three OSes, so "no network" is held by construction. The admitted heads
+  are builtins, the gate binary under a declared `FENCE_SAFE_ARMS` set (gate-sdk, beside the arm
+  table), and `CANON_KIT_FENCE_RUN_PROGRAMS` (default `git`). The crate's only network spawners are
+  `--usage-poll` and `--pack-installer`, and neither is admitted. `bash` is spawned only when a
+  fence is marked.
+  Filed 2026-09-21 to the gap inbox by the lead; it joined `docs-first-contact` as its fence unit
+  by operator direction.
+  **DISTINCT from** `check-docs-cmd` and `check-fence-command-head`.
+
+- **docs-index-front-door-restatement-ungenerated** [spec: SPEC-index-parity.md] — the eleven
+  hand-authored `docs/<kit>/index.md` pages restate their kit README's Install step and Quick start
+  arm list, with no generation and no freshness gate. At the door-binding build, 17 restated lines
+  still carried the retired front-end spelling.
+  **Spec ruled the parity gate (2026-09-21), and removes the prose restatement first.** Generation
+  is ruled out: only 5 to 8 of each page's 40 to 60 lines are verbatim, the headings diverge
+  (`Test` versus `Quick start`), and gate-sdk's page is a curated subset. The Install prose becomes
+  a pointer to the sibling README mirror. `check-docs-restatement-parity` (canon-kit) holds every
+  arm and kit-knob token in an index page's code to its sibling `docs/<kit>/README.md`. It is green
+  today, with 3 to 6 tokens per page and all of them present.
+  Filed 2026-09-20 by close's drain; it joined `docs-first-contact` as its index-page unit.
+
+- **projection-trigger-witness** [spec: SPEC-projection-witness.md] — the generated-projections
+  roster states each projection's staleness trigger in prose, and nothing checks the prose against
+  the emitter. Five false statements were measured in one roster at filing.
+  **Spec ruling, 2026-09-21:** the per-row trigger declaration is derived rather than written. A
+  freshness gate's `couples=`/`trigger=` already is that declaration, so the rows drop their
+  trigger sentences. `--projection-witness` (gate-sdk, run here as a validate suite) perturbs files
+  outside each projection's trigger set and reds if the gate goes red. A coupled but inert file is
+  reported and never red. Measured: an append to `CLAUDE.md` moves no footprint byte, while an
+  edit inside a kit marker block does, so couples are a sound superset.
+  Filed 2026-08-18 by close; it joined `docs-first-contact` as its trigger-witness unit.
+
+- **generated-projections-roster-ungated** [spec: SPEC-projection-roster.md] — the
+  generated-projections roster gains no checked row when a projection or gate lands.
+  **Ruled at this spec:** a `# projection: <globs>` header directive on each freshness gate (eight
+  in this repo) declares the population. `check-projection-roster` (gate-sdk, armed by
+  `GATE_SDK_PROJECTION_ROSTER`) holds the rows keyed by gate name to the declaring gates, in both
+  directions. Both directions hold today. The install-toolchain and install-platforms rows are
+  parity contracts with no emitter, so they take no key.
+  Filed 2026-09-18 by spec; it joined `docs-first-contact` as its roster unit.
+
+- **site-dark-token-palette-coverage-ungated** [spec: SPEC-highlight-coverage.md] — the dark-mode
+  Rouge palette in `docs/_layouts/default.html` remapped only some of the highlight classes the
+  theme colours, so `.o` (shell `&&`) rendered black on the dark code background (operator report,
+  2026-09-21). The lead hotfixed it, and nothing gates the coverage.
+  **Ruled on site-kit's monitor boundary (spec, 2026-09-21):** `check-docs-highlight-coverage`
+  (site-kit, armed by `SITE_KIT_HIGHLIGHT_TOKENS`) asserts that the layout overrides every class in
+  a tracked snapshot, and a `site-health` template arm holds the snapshot to the live theme CSS in
+  both directions.
+  **Found at spec:** counting grouped selectors, the live CSS colours 63 classes. The hotfix misses
+  `.cd`, `.kv`, `.mb` and `.mx`, because the check that cleared it read only each rule's first
+  selector.
+  Filed 2026-09-21 to the gap inbox by the lead, and entered directly by operator direction (lead
+  session). Cost event/high: every shell command on the public site was unreadable in dark mode.
+
 ## Technical Debt
 
 ## Deferred
-
-- **install-md-adopter-page-overgrown** [cost: event/high] [surface: docs] — `docs/install.md`
-  is an adopter page carrying maintainer-tier grounds, and nothing holds a `docs/` page to a length
-  or a reader tier, so it regrows.
-  **Re-verified at this scope:** 980 lines. The bullet measured 169 commits, 63 maintainer-tier
-  references, Requirements about 240 lines, the release channel about 175, the upgrade contract
-  about 165 and Quick start about 100. `check-surface-ratchet` and `check-brevity` (context-kit)
-  reach no `docs/` page.
-  **Deliverable, by operator direction (2026-09-21, lead session):** rewrite the page as an adopter
-  page of about 150 lines (intro, Requirements with its remedy blocks bare, Quick start, Managing,
-  Upgrading, pointers to installer/SPEC.md for the grounds). Keep the gated marker blocks and the
-  `install-primary:` declaration. Add a regrowth guard whose reach is the whole `docs/` site.
-  **Cost while deferred:** the adopter's first page after the front door stays unreadable.
-  Filed 2026-09-21 to the gap inbox by the lead after `delegation-seams`'s close; promoted
-  2026-09-21 into `docs-first-contact` by operator direction (lead-relayed); **marked for spec**.
-  **DISTINCT from** `docs-index-front-door-restatement-ungenerated` (a restatement, not a page's
-  length or tier). `gates-must-not-bind-to-document-paths` constrains the guard's design.
-
-- **adopter-demo-verb-missing** [cost: event/high] [surface: installer] — the home page promises
-  a walkthrough with nothing installed, but `--run-demo` copies kit source from the tree it runs in
-  (`GATE_SDK_KIT_DIRS`), so it works only from a clone. The installed front door has no demo verb.
-  **Measured by the lead on published 0.25.0 in a scratch repo:** `init` passed with 447 files,
-  `uninstall` removed 446 in one commit, and the demo failed at every door (`npx checkwright
-  --run-demo`, `run-gates.sh --run-demo`, the vendored binary's `--run-demo`).
-  **Deliverable:** a `checkwright demo` verb that runs the walkthrough from the installer's own
-  package, with no clone and nothing installed into the adopter's repo.
-  **Inferred, not run:** the packed payload already carries every kit root the walkthrough
-  copies (installer/SPEC.md §The packer). Spec settles it by packing master's installer and
-  running install, demo and uninstall in a scratch repo.
-  **Cost while deferred:** an adopter's first contact is a command they cannot run.
-  Filed 2026-09-21 to the gap inbox by the lead after `delegation-seams`'s close (operator shape:
-  install, demo, uninstall); promoted 2026-09-21 into `docs-first-contact` as its demo-verb unit
-  by operator direction (lead-relayed); **marked for spec**.
-  **DISTINCT from** `fence-execution-gate`, which executes documented fences.
-
-- **fence-execution-gate** [cost: event/high] [surface: canon-kit] — `check-fence-command-head`
-  is static: it proves a fence's command head can run and nothing more, so a wrong operand or an
-  unassigned variable passes, and no documented fence is ever executed.
-  **Deliverable:** execute the fences a doc marks runnable (a per-fence marker, default not
-  runnable) in a sandboxed scratch consumer, hermetic with no network, under a declared set of
-  arms safe to run there.
-  **Cost while deferred:** a pasted command can fail at an adopter's first contact.
-  Filed 2026-09-21 to the gap inbox by the lead after `delegation-seams`'s close and the
-  `check-fence-command-head` hotfix; joins `docs-first-contact` as its fence unit (operator
-  direction 2026-09-21, lead-relayed); **marked for spec**.
-  **DISTINCT from** `check-docs-cmd` (resolves invoked script paths) and
-  `check-fence-command-head` (the static check this extends).
 
 - **queue-citation-line-number-stales-within-its-own-session** [cost: event/low] [surface: queue-kit]
   — a `path:line` cite in a queue body goes stale when the cited file changes above the line, and
@@ -221,44 +268,6 @@
   prefix strip onto `walk::rel_under` and left as found; owner lookup ran over
   `show-prefix`, `separator` and `stage-evidence` across the pool and returned
   no owner.
-
-- **docs-index-front-door-restatement-ungenerated** [cost: event/low] [surface: docs]
-  — the eleven hand-authored `docs/<kit>/index.md` pages restate their kit
-  README's front-door content — the Install step and the Quick start arm list —
-  with NO generation and NO freshness gate.
-  **Measured, and the consequence already fired:**
-  `git grep -l '^generated: true' -- 'docs/*/index.md'` returns 0 of 11, and at
-  this iteration's build 17 of those restated lines still carried the pre-sweep
-  front-end spelling months after every kit README had been re-pointed. No
-  oracle saw it until `check-door-binding`'s assertion C reached past the kit
-  roots.
-  **DISTINCT from `door-binding-sweep-stops-at-the-kit-roots`, cited as evidence
-  rather than re-filed.** That entry owned the GATE'S REACH, and it landed; this
-  owns the RESTATEMENT that put a stale door there — a defect no door-shaped
-  predicate can see, and which survives that entry's close.
-  **Neither adjacent entry owns it, and reading the three together is the
-  point.** `generated-projections-roster-ungated` asserts a roster row exists
-  for each projection that already has a freshness gate, and
-  `projection-trigger-witness` asserts each such row's stated trigger is true —
-  both presuppose the page IS a generated projection, so a page generated by
-  nothing falls outside both corpora. This gap sits UPSTREAM of both: made
-  projections, these pages would enter both.
-  **Deliverable — rule one of two:** generate the restated blocks from each kit
-  README (a marker-bounded region plus a freshness gate, the shape `docs-mirror`
-  and `value-rollup` already take); or, where the site copy must stay
-  editorially distinct, a parity gate binding each index page's arm list to its
-  own kit README's.
-  **Cost while deferred:** every future kit-README front-door edit silently
-  diverges on eleven public adopter pages, and assertion C now catches only the
-  door-shaped subset — a changed knob name, arm name or install step stays
-  invisible to it.
-  Filed 2026-09-20 by close's drain off a build-stage gap bullet; owner lookup
-  ran over `index page`, `restate`, `parity` and `mirror` across the pool and
-  returned the two adjacent entries above and the iceboxed
-  `kit-index-page-vocabulary-ungated`, whose subject is index-page ENUMS, and no
-  owner.
-  **Joins `docs-first-contact`** as its index-page unit (operator direction 2026-09-21,
-  lead-relayed); **marked for spec**, which rules between generation and a parity gate.
 
 - **delta-instruction-batch-dependence-unmarked** [cost: once/low] [surface: lifecycle-kit]
   — a spec amendment can state a delta instruction in the unconditional voice
@@ -1767,67 +1776,6 @@
   Filed 2026-08-17 by close, from re-verifying a gap-inbox bullet; both probes were run before
   the claim was asserted and the compression-vs-eviction split checked against the entry it
   would otherwise have contradicted.
-
-- **projection-trigger-witness** [cost: event/low] [surface: docs] — the generated-projections roster states each
-  projection's staleness trigger in prose, and nothing checks the prose against the emitter.
-  **The missing check class, named because a staleness fix without one forfeits it.** This close
-  found five false trigger statements in `docs/site-architecture.md` §Generated projections, all
-  about `docs/footprint.md`: that a KPI script is new token cost, that a prose-only SPEC edit reds
-  it (stated twice, false both times), that a new gate script is new token cost, and a
-  staging-order hazard that in fact belongs to `check-gate-binary-fresh` alone. Each was settled
-  by one cheap perturbation — edit a file of the claimed class, re-emit, diff — and each had been
-  wrong long enough to be copied into a second row.
-  **Deliverable:** a differential witness. Per roster row, perturb one member of the class the row
-  says stales it and assert the projection's bytes move; and in the negative direction, perturb a
-  class the row excludes and assert they do not. This is a property test over the emitters rather
-  than a prose scanner, which is what makes it buildable where a claim-parity gate is not.
-  **Why design-pending:** the row-to-class binding is the open part. The roster names its
-  triggers in English, so the witness needs a machine-readable trigger declaration per row, and
-  adding one is a docs-surface change carrying its own freshness question.
-  **Adjacent to `gate-spec-claim-assertion-parity`**, iceboxed as a human-audit class: that asks
-  whether a SPEC's prose claim matches its gate in general. This is one bounded family with a
-  mechanical oracle — re-emit and diff — which is why it is deferred rather than iceboxed.
-  **Cost while deferred:** measured at five, in one roster, found only because a port made one of
-  them conspicuous. A wrong trigger costs either a regen nobody runs or a hunt for a red the named
-  command cannot clear. The negative direction is the expensive half to build and caught four of
-  the five errors here.
-  Surfaced 2026-08-18. Filed 2026-08-18 by close, as the gap generalization owed by the
-  `docs/site-architecture.md` staleness fixed in the same commit.
-  **Joins `docs-first-contact`** as its trigger-witness unit (operator direction 2026-09-21,
-  lead-relayed); **marked for spec**, which designs the per-row trigger declaration.
-
-- **generated-projections-roster-ungated** [cost: event/low] [surface: docs] — the
-  generated-projections roster names every projection and the wide new-gate and
-  new-tag-class fan-outs, and nothing asserts it gains a row when a new projection
-  or a new gate lands. Each rostered projection has its own freshness gate; the
-  roster itself has none.
-  **The instance, measured at the drain rather than recalled.** This iteration
-  landed `docs/install-evidence.md` and `check-install-evidence-fresh`; each took a
-  hand-written row, and the roster now stands at 12. Nothing would have reddened
-  had the build forgotten either — and that row is what a later author reads
-  *instead of* meeting the fan-out one red gate at a time, so an omission costs
-  exactly the discovery the roster exists to sell.
-  **Deliverable:** derive the population from the freshness gates' own `# graph:`
-  manifests — every rostered projection carries one, which is what makes the set
-  machine-readable — and assert a row per member, both directions.
-  **Why design-pending:** the row-to-member binding is the open part. Rows are
-  prose headed by a bold name rather than a declared key, so matching one to a
-  manifest needs either a per-row key or a path match into the row's body, and both
-  are docs-surface changes carrying their own freshness question.
-  **Adjacent to `projection-trigger-witness`**, whose subject is whether each row's
-  stated *trigger* is true, settled by perturbing the class and diffing the
-  emission. This one asserts the row *exists*, and a differential witness over
-  present rows cannot find an absent one. The machine-readable per-row declaration
-  that entry names as its own open part would serve both, which is why they are
-  read together rather than merged.
-  **Cost while deferred:** one unprompted hand edit per new projection or gate,
-  against a roster whose entire value is that the next author reads it rather than
-  rediscovering the fan-out.
-  Filed 2026-09-18 by spec while landing a new projection; drained at this
-  iteration's close, which re-measured the roster at 12 rows and confirmed no gate
-  reads it.
-  **Joins `docs-first-contact`** as its roster unit (operator direction 2026-09-21,
-  lead-relayed); **marked for spec**, which shares the per-row declaration with the witness.
 
 - **prose-tell-threshold-validation** [cost: event/high] [surface: canon-kit] — `check-prose-tells`' numeric thresholds
   are read unvalidated, so a typo turns a calibrated gate into a silent no-op
