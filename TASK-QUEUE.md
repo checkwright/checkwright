@@ -12,6 +12,209 @@
 
 ## New Features
 
+- **guard-rule-12-single-occurrence-pgrep-loop-passes** [spec: SPEC-pgrep-self-match.md] —
+  guard-kit/SPEC.md §The generic ruleset rule 12 (`guard_rule_pgrep_self_match`) fires only when a
+  `pgrep`/`pkill -f` pattern literal occurs ELSEWHERE in the command, yet its own grounds say the
+  harness wrapper's argv carries the literal, so a loop-headed spelling self-matches with one
+  occurrence. **Probed at this scope:** `while pgrep -f 'checkwright-gates --run-validate'; do sleep
+  5; done` passes `scripts/bash-guard.sh` at exit 0; the same loop with the literal repeated is
+  blocked at exit 2. The rule's clause "a pattern occurring nowhere else in the command is a
+  genuine query and passes" is what admits it.
+  **Attested:** that exact waiter held a `scratch-hermeticity` validate session active until the
+  operator confirmed a stop.
+  **Why design-pending:** a tightening of a shipped guard rule — which spellings (loop, `if`, `!`)
+  self-match with one occurrence and which a single foreground `pgrep` exec leaves clean — owes a
+  fixture arm and a Tightened-gates declaration.
+  **Cost while deferred:** a waiter that can never exit passes the guard written to refuse it.
+  Filed 2026-09-21 to the gap inbox after `scratch-hermeticity`'s close; promoted 2026-09-21 into
+  `delegation-seams` by operator direction (lead-relayed); **marked for spec**. Owner lookup:
+  guard-kit rule 12, delegation-kit/templates/agent-execution.md's pattern-match paragraph.
+  **Spec 2026-09-21:** probed, a lone foreground `pgrep -f` matches its own harness wrapper too;
+  ruled the predicate "the pattern, as pgrep's ERE, matches the command text", declared under
+  Behavior changes (a guard rule is no gate). The amendment holds the rows and text.
+
+- **sibling-stage-sessions-collide-on-a-shared-scratch-commit-message-file** [spec: SPEC-msgfile.md]
+  — `.tmp/` survives across the sibling batch sessions one stage dispatches, so the conventional
+  `.tmp/commit-msg.txt` name is shared state between them.
+  **Measured, and it landed a wrong commit:** at `door-binding-sweep`'s build, batch 2 ran
+  `git commit -F .tmp/commit-msg.txt`, picked up batch 1's leftover file, and landed batch 1's
+  entire message on its own commit at exit 0. It was caught by reading the commit back, not by any
+  oracle. Every later batch was warned per dispatch, which is prompt-side and dies with the lead.
+  **Candidates, and the seam one of them crosses.** Naming the message file per session the way the
+  resume journal's path is derived would put that naming in delegation-kit — but that kit states the
+  journal contract and NO path convention, the path being the stage machine's derivation
+  (delegation-kit/SPEC.md §Resume journal, lifecycle-kit/SPEC.md §The state machine). So either the
+  derivation belongs beside the journal path in lifecycle-kit, or the remedy is a doctrine line
+  obliging a session to read back what it committed. Which of the two is the design question.
+  **Cost while deferred:** a wrong commit message can land at exit 0 whenever a stage dispatches
+  more than one batch, and the only thing between is a per-dispatch warning no surface holds.
+  Filed 2026-09-20 to the gap inbox by the lead at `door-binding-sweep`'s close; promoted at this
+  scope's intake. Owner lookup: `commit-msg`, `commit message file`, `journal path` — none.
+  **Joins `delegation-seams`** as its shared-scratch unit (operator direction 2026-09-21,
+  lead-relayed); **marked for spec**, which rules between the lifecycle-kit path derivation and
+  the read-back doctrine line.
+  **Spec 2026-09-21:** ruled the doctrine line, as a re-phrase of doctrine rule 18 (message in the
+  command, a file-borne one read back) plus guard rule 21's advisory text; the derivation is
+  declined, since a stage-derived name is shared by same-stage siblings, the attested case.
+
+- **harness-moved-background-task-unrecorded** [spec: SPEC-harness-moved-producer.md]
+  — a command the harness moves to the background on its timeout is a live producer no liveness
+  record names.
+  **Split out of `backgrounded-shell-child-run-record-unenforced` — operator direction, 2026-09-11,
+  lead-relayed**, since landed, which kept the explicit-launch block and the recorded-launch grant.
+  **Attested twice.** At `installer-trial-lifecycle-repair`'s close, `stage-economics.sh` exceeded
+  its foreground timeout, the harness backgrounded it, and it kept writing `.metric/` with no `.run`
+  record; no session act could have written one, since the launch was never a session act. Spec
+  reproduced the move on 2026-09-11: the result reads "moved to the background (ID: …)", with its
+  output under the session scratchpad.
+  **Why no `PreToolUse` rule reaches it.** The call was a foreground call when the guard saw it, so
+  guard-kit rule 15 has no launch to refuse and rule 14 has no record to read. No `PreToolUse`
+  payload carries task state, and a search of that session's transcripts found no line recording
+  the move.
+  **Candidate, operator-class:** widen delegation-kit's turn-end hook to refuse while its payload's
+  `background_tasks` array shows a running harness `shell` task. §What `background_tasks` carries
+  rules that view a supplement to the record set and never a substitute, and it holds no pid; the
+  hook's refusal set took a separate authorization (§The turn-end liveness hook), so widening it is
+  the operator's to rule.
+  **Why design-pending:** whether a finished task leaves the array, and how often a running task at
+  an intermediate `SubagentStop` would refuse, are both unmeasured.
+  **Cost while deferred:** a harness-moved producer can outlive its session, and a commit can land
+  beside it; rule 14 and the stage-entry liveness check see neither, because nothing recorded it.
+  Filed 2026-09-11 by spec on the operator's split direction.
+  **Third attestation, 2026-09-14 validate:** `--run-validate` passed the 120s foreground timeout
+  and was moved. Its own `run-validate.lock` named the pid, so the stage-entry preflight would
+  have seen it; guard rule 14 reads only `*.run` records and would not have blocked a git write.
+  **Fourth attestation, same validate — a new shape: the session ended its turn on the moved
+  producer.** The stage session ended its turn twice while the moved `--run-validate` lived, first
+  on the move itself and then on its own backgrounded wait of the lock's pid; the turn-end hook's
+  log reads `decision=allow records=0` at both. It never wrote a `.run` record for the moved
+  producer, even after reading its pid. Later in the same session, a re-run launched with a `.run`
+  record was held at a real turn end: the hook's refusal reached the session as stop-hook feedback,
+  and the session kept working. **So a record written the moment a session learns a moved
+  producer's pid would have held both turn-ends.** That is a second candidate, beside widening the
+  hook: a steer at the move, which the tool result announces as "moved to the background (ID: …)".
+  Whether any hook payload carries that line is unmeasured. The liveness log records the
+  `background_tasks` key and not its contents.
+  **Leads `delegation-seams`** (operator direction 2026-09-21, lead-relayed); **marked for spec**.
+  Widening the turn-end hook's refusal set stays operator-class and escalates from spec.
+  **Spec 2026-09-21:** ruled the steer, in the template: size timeouts, record from a pid the moved
+  producer names, hold turn and tree until the notification the move promises (probed). The hook
+  widening is escalated to the operator and pending; the amendment records it.
+  recurrence: harness-moved-background-task-unrecorded 2026-09-14
+
+- **worktree-isolated-agent-report-lost-to-a-failed-peer-send** [spec: SPEC-isolation-seams.md]
+  — an isolated read-only sweep's final report reaches its dispatcher as a bare `.`, because the
+  child sends to a peer name it cannot resolve and the harness returns only the last assistant
+  message.
+  **Reproduced twice at one close, 2026-08-25, not predicted.** Two `audit-sweep` dispatches
+  carrying `isolation: worktree` each completed substantial work (46 and 49 tool uses, ~163k and
+  ~97k child tokens) and each returned a single period. Both had to be resumed with an explicit
+  "put it in your final assistant message, do not use SendMessage" instruction, after which both
+  reported in full. The work is not lost; it is paid for twice, and the second payment is a whole
+  extra dispatch round-trip.
+  **The cause is stated by the harness itself and is not a guess.** The agent-dispatch guard
+  already warns at dispatch time that a grandchild has no upward channel and that neither level
+  knows its own address; one child said so outright in its recovered report — it could not resolve
+  the dispatcher's name and had no roster tool to find a ref.
+  **NOT the guard's defect.** Its warning is accurate and fires at the right moment; what is
+  missing is that nothing carries the warning INTO the child, so the child learns its own
+  isolation only by failing.
+  **Deliverable — rule one of three.** The dispatch-shape guard appends a return-value-only
+  instruction to a prompt whose type is read-only and whose isolation is worktree, the one shape
+  that provably cannot message back; or delegation-kit/templates/agent-execution.md states the
+  return-value-only obligation as a contract the dispatching session spells into such a prompt,
+  which costs one line and no code; or the agent-type definition for read-only sweep types carries
+  it, which reaches every dispatch of that type without touching any dispatcher.
+  **DISTINCT from `worktree-isolated-dispatch-cannot-reach-the-main-checkout`**, deliberately not
+  re-filed here: that entry is about a child's WRITES (a gate it cannot resolve, a capture log in a
+  doomed worktree), bridged by `git rev-parse --git-common-dir`; this is the child's RETURN VALUE,
+  with no filesystem half. The two share the isolation flag and no fix.
+  **Cost while deferred:** one wasted dispatch round-trip per isolated sweep, paid by the
+  dispatcher at the moment it waits for the result — and silent, since a bare `.` reads as an
+  agent that found nothing rather than as an agent whose report was dropped. That last reading is
+  a correctness risk rather than an efficiency one, and it is the expensive half.
+  **The floor's coverage is measured: half of shape one.** The `agent-dispatch-guard` arm's D2
+  rule refuses a read-only type dispatched WITHOUT `isolation: worktree`; its D3 rule appends the
+  return-value-only advice only when the dispatcher is ITSELF a dispatched agent. A top-level lead
+  dispatching the same sweep gets the isolation refusal and no return-value instruction, so the
+  guard reaches the ISOLATION half of shape one and is silent on the CHANNEL half, this entry's.
+  **A further ground, three sessions paid for it 2026-08-26.** For a read-only fan-out the RETURN
+  VALUE is the contract; the resume-journal path a dispatcher grants is for agents that MUTATE, so
+  granting it to a read-only child buys nothing and makes the dropped return look like an offered
+  channel. `delegation-kit/templates/agent-execution.md` draws the distinction; nothing makes a
+  dispatcher pay it — shape two of the deliverable, restated as an observed cost.
+  **Re-measured 2026-09-21: the bare `.` has not reproduced twice** (2026-09-16, 2026-09-21) — an
+  isolated `audit-sweep` returned a full 46-tool-use report through `SubagentHandback`, whose duty
+  the harness states in the child's prompt; re-costed event/high to event/low (operator direction,
+  2026-09-21, lead-relayed). **Kept at the 2026-09-21 close's eviction:** the dated `recurrence:`
+  line below is live by queue-kit/SPEC.md §The icebox tier, which ages no recurrence line; whether
+  one should age is filed to the gap inbox. No wontfix is ruled; the operator may `/consult` one.
+  **Spec 2026-09-21:** ruled shape two, a prompt line in the template's disposition (2); the guard
+  rewrite and the kit-shipped agent type are declined.
+  recurrence: worktree-isolated-agent-report-lost-to-a-failed-peer-send 2026-08-26
+  Surfaced 2026-08-25, and promoted, by the `turn-end-liveness-seam-and-worktree-cause` close, which
+  reproduced it twice. **Joins `delegation-seams`** as its return-channel unit (operator direction
+  2026-09-21, lead-relayed); **marked for spec**, which rules one of the three deliverable shapes.
+
+- **isolation-oracle-cost-lacks-dispatcher-clause** [spec: SPEC-isolation-seams.md]
+  — agent-execution's isolation cost (4) carries no dispatcher-side clause, so a dispatch sending
+  an oracle-running sweep into isolation is discovered unresolvable only after a full round trip.
+  **The asymmetry is inside one rule set.** Cost (3) already carries a dispatcher clause — a sweep
+  whose corpus is untracked or gitignored is not delegable to an isolated agent; read it yourself
+  or pass its content in the prompt, and classify the corpus *before* dispatching. Cost (4) carries
+  only a post-hoc recovery note, "the parent's checkout has the binary and can run it", which a
+  parent reads after the round trip is already spent.
+  **Measured 2026-09-16** at `isolated-dispatch-obligations`' close: an `audit-sweep` dispatched
+  with `isolation: worktree` to run `--emit queue-edges` spent about 39k child tokens, 7 tool calls
+  and 70 seconds returning blindness, on a fact decidable before dispatch; re-dispatched with the
+  arm run in the main checkout and its stdout materialized under the scratch dir and named absolute
+  in the prompt, it completed the sweep. The child's half of the rule worked exactly as written —
+  it reported and refused to build.
+  **Why design-pending:** whether the remedy is one sentence on cost (4), a shared
+  classify-before-dispatch step both costs point at, or a guard assertion is a residency call.
+  **DISTINCT from `delegated-read-blind-to-gitignored-capture`, Done 2026-09-16**, which is cost
+  (3)'s composition with the dispatch guard's D2; this is cost (4)'s missing dispatcher half and
+  stands whatever (3) says.
+  **Cost while deferred:** every dispatch of an oracle-running sweep into isolation buys one wasted
+  round trip and a re-dispatch.
+  Filed 2026-09-16 to the gap inbox at `isolated-dispatch-obligations`' close, which could not
+  drain it; promoted at the following iteration's scope.
+  **Joins `delegation-seams`** as its dispatcher-clause unit (operator direction 2026-09-21,
+  lead-relayed); **marked for spec**, which makes the residency call.
+  **Spec 2026-09-21:** ruled one template sentence on cost (4), on (3)'s pattern; the guard
+  assertion and always-loaded residency are declined.
+
+- **isolated-dispatch-resume-loses-its-isolation** [spec: SPEC-isolation-seams.md]
+  — a `SendMessage` resume of an `isolation: worktree` read-only dispatch silently loses its
+  isolation, so the dispatch guard's claim-by-shape rule is evaluated once and never again.
+  **Measured 2026-09-16** at `isolated-dispatch-obligations`' close, on a later dispatch than the
+  one above: an `audit-sweep` under `isolation: worktree` handed back, the harness auto-cleaned its
+  worktree, and the resume
+  re-entered with cwd at the MAIN CHECKOUT — the child verified this itself, `pwd` at the repo root
+  and `git worktree list` showing one checkout on master.
+  **The hole is in the guard's own premise.** `agent-dispatch-guard`'s D2 refuses a
+  `DELEGATION_KIT_READONLY_TYPES` dispatch carrying no isolation, on the ground that a read-only
+  claim is made by isolation and not by sentence. The resume path re-enters that same read-only
+  type with full write reach on the shared branch and no second D2 evaluation. The child stopped
+  only because that dispatch prompt happened to carry an explicit if-your-worktree-was-cleaned-up
+  stop clause; nothing structural refuses it.
+  **Why design-pending:** three candidate shapes with no ruling between them — (a) the guard
+  evaluates D2 on a resume as it does on a dispatch, if the resume payload is reachable at the
+  pre-tool hook; (b) agent-execution states that a resumed isolated dispatch is a NEW dispatch
+  owing re-isolation, making re-dispatch the sanctioned shape; (c) the read-only agent types carry
+  a self-check on their own cwd.
+  **DISTINCT from `worktree-isolated-agent-report-lost-to-a-failed-peer-send`**, which is about a
+  child's RETURN VALUE being dropped and has no permission half.
+  **Cost while deferred:** every resume of an isolated read-only dispatch runs with write reach the
+  dispatch itself would have been refused, and nothing reds.
+  Filed 2026-09-16 to that same close's gap inbox, undrainable there; promoted at the following
+  iteration's scope.
+  **Joins `delegation-seams`** as its resume-isolation unit (operator direction 2026-09-21,
+  lead-relayed); **marked for spec**, which rules among (a)-(c). Re-verified at scope:
+  `native/src/hook/dispatch.rs` has no resume path.
+  **Spec 2026-09-21:** re-measured, a resume runs in the main checkout with its worktree gone.
+  Ruled (b) with (c) as its child-side clause; (a) is unreachable from the resume payload.
+
 ## Technical Debt
 
 - **lead-finished-but-active-session-unchecked** — lifecycle-kit/templates/lead.md recovers a
@@ -31,24 +234,6 @@
   `notification`, `still active` in lead.md and lifecycle-kit/SPEC.md; the paragraph above is it.
 
 ## Deferred
-
-- **guard-rule-12-single-occurrence-pgrep-loop-passes** [cost: event/low] [surface: guard-kit] —
-  guard-kit/SPEC.md §The generic ruleset rule 12 (`guard_rule_pgrep_self_match`) fires only when a
-  `pgrep`/`pkill -f` pattern literal occurs ELSEWHERE in the command, yet its own grounds say the
-  harness wrapper's argv carries the literal, so a loop-headed spelling self-matches with one
-  occurrence. **Probed at this scope:** `while pgrep -f 'checkwright-gates --run-validate'; do sleep
-  5; done` passes `scripts/bash-guard.sh` at exit 0; the same loop with the literal repeated is
-  blocked at exit 2. The rule's clause "a pattern occurring nowhere else in the command is a
-  genuine query and passes" is what admits it.
-  **Attested:** that exact waiter held a `scratch-hermeticity` validate session active until the
-  operator confirmed a stop.
-  **Why design-pending:** a tightening of a shipped guard rule — which spellings (loop, `if`, `!`)
-  self-match with one occurrence and which a single foreground `pgrep` exec leaves clean — owes a
-  fixture arm and a Tightened-gates declaration.
-  **Cost while deferred:** a waiter that can never exit passes the guard written to refuse it.
-  Filed 2026-09-21 to the gap inbox after `scratch-hermeticity`'s close; promoted 2026-09-21 into
-  `delegation-seams` by operator direction (lead-relayed); **marked for spec**. Owner lookup:
-  guard-kit rule 12, delegation-kit/templates/agent-execution.md's pattern-match paragraph.
 
 - **queue-citation-line-number-stales-within-its-own-session** [cost: event/low] [surface: queue-kit]
   — a `path:line` cite in a queue body goes stale when the cited file changes above the line, and
@@ -307,27 +492,6 @@
   §Porting to Rust does not retire dialect exposure. Split authorized by lead decision 2026-09-20
   on §check-queue-entry-budget's split-candidate test, the parent's two deliverables having taken
   different dispositions by demonstration.
-
-- **sibling-stage-sessions-collide-on-a-shared-scratch-commit-message-file** [cost: event/low] [surface: delegation-kit]
-  — `.tmp/` survives across the sibling batch sessions one stage dispatches, so the conventional
-  `.tmp/commit-msg.txt` name is shared state between them.
-  **Measured, and it landed a wrong commit:** at `door-binding-sweep`'s build, batch 2 ran
-  `git commit -F .tmp/commit-msg.txt`, picked up batch 1's leftover file, and landed batch 1's
-  entire message on its own commit at exit 0. It was caught by reading the commit back, not by any
-  oracle. Every later batch was warned per dispatch, which is prompt-side and dies with the lead.
-  **Candidates, and the seam one of them crosses.** Naming the message file per session the way the
-  resume journal's path is derived would put that naming in delegation-kit — but that kit states the
-  journal contract and NO path convention, the path being the stage machine's derivation
-  (delegation-kit/SPEC.md §Resume journal, lifecycle-kit/SPEC.md §The state machine). So either the
-  derivation belongs beside the journal path in lifecycle-kit, or the remedy is a doctrine line
-  obliging a session to read back what it committed. Which of the two is the design question.
-  **Cost while deferred:** a wrong commit message can land at exit 0 whenever a stage dispatches
-  more than one batch, and the only thing between is a per-dispatch warning no surface holds.
-  Filed 2026-09-20 to the gap inbox by the lead at `door-binding-sweep`'s close; promoted at this
-  scope's intake. Owner lookup: `commit-msg`, `commit message file`, `journal path` — none.
-  **Joins `delegation-seams`** as its shared-scratch unit (operator direction 2026-09-21,
-  lead-relayed); **marked for spec**, which rules between the lifecycle-kit path derivation and
-  the read-back doctrine line.
 
 - **couples-knob-token-empty-expansion-passes-silently** [cost: once/low] [surface: gate-sdk]
   — a `knob:` couples token whose expansion resolves to an **empty member set** is silently accepted
@@ -599,47 +763,6 @@
   adopter.
   Filed 2026-09-14 by `static-config-seam`'s close into the gap inbox; no stage of that iteration
   could drain it, and this scope promoted it, so the record is late and says so.
-
-- **harness-moved-background-task-unrecorded** [cost: event/high] [surface: delegation-kit] — a command the
-  harness moves to the background on its timeout is a live producer no liveness record names.
-  **Split out of `backgrounded-shell-child-run-record-unenforced` — operator direction, 2026-09-11,
-  lead-relayed**, since landed, which kept the explicit-launch block and the recorded-launch grant.
-  **Attested twice.** At `installer-trial-lifecycle-repair`'s close, `stage-economics.sh` exceeded
-  its foreground timeout, the harness backgrounded it, and it kept writing `.metric/` with no `.run`
-  record; no session act could have written one, since the launch was never a session act. Spec
-  reproduced the move on 2026-09-11: the result reads "moved to the background (ID: …)", with its
-  output under the session scratchpad.
-  **Why no `PreToolUse` rule reaches it.** The call was a foreground call when the guard saw it, so
-  guard-kit rule 15 has no launch to refuse and rule 14 has no record to read. No `PreToolUse`
-  payload carries task state, and a search of that session's transcripts found no line recording
-  the move.
-  **Candidate, operator-class:** widen delegation-kit's turn-end hook to refuse while its payload's
-  `background_tasks` array shows a running harness `shell` task. §What `background_tasks` carries
-  rules that view a supplement to the record set and never a substitute, and it holds no pid; the
-  hook's refusal set took a separate authorization (§The turn-end liveness hook), so widening it is
-  the operator's to rule.
-  **Why design-pending:** whether a finished task leaves the array, and how often a running task at
-  an intermediate `SubagentStop` would refuse, are both unmeasured.
-  **Cost while deferred:** a harness-moved producer can outlive its session, and a commit can land
-  beside it; rule 14 and the stage-entry liveness check see neither, because nothing recorded it.
-  Filed 2026-09-11 by spec on the operator's split direction.
-  **Third attestation, 2026-09-14 validate:** `--run-validate` passed the 120s foreground timeout
-  and was moved. Its own `run-validate.lock` named the pid, so the stage-entry preflight would
-  have seen it; guard rule 14 reads only `*.run` records and would not have blocked a git write.
-  **Fourth attestation, same validate — a new shape: the session ended its turn on the moved
-  producer.** The stage session ended its turn twice while the moved `--run-validate` lived, first
-  on the move itself and then on its own backgrounded wait of the lock's pid; the turn-end hook's
-  log reads `decision=allow records=0` at both. It never wrote a `.run` record for the moved
-  producer, even after reading its pid. Later in the same session, a re-run launched with a `.run`
-  record was held at a real turn end: the hook's refusal reached the session as stop-hook feedback,
-  and the session kept working. **So a record written the moment a session learns a moved
-  producer's pid would have held both turn-ends.** That is a second candidate, beside widening the
-  hook: a steer at the move, which the tool result announces as "moved to the background (ID: …)".
-  Whether any hook payload carries that line is unmeasured. The liveness log records the
-  `background_tasks` key and not its contents.
-  **Leads `delegation-seams`** (operator direction 2026-09-21, lead-relayed); **marked for spec**.
-  Widening the turn-end hook's refusal set stays operator-class and escalates from spec.
-  recurrence: harness-moved-background-task-unrecorded 2026-09-14
 
 - **config-variant-battery-harness** [cost: event/high] [surface: gate-sdk] — nothing shipped lets a customer run the
   battery under a named config-seam variant and see what changes; the fixture pairs prove each
@@ -2160,57 +2283,6 @@
   length is still unbounded, but its threshold moved; re-measure before ruling.
   recurrence: icebox-eviction-line-budget-squeeze 2026-09-03
 
-- **worktree-isolated-agent-report-lost-to-a-failed-peer-send** [cost: event/low] [surface: delegation-kit] — an isolated
-  read-only sweep's final report reaches its dispatcher as a bare `.`, because the child sends to
-  a peer name it cannot resolve and the harness returns only the last assistant message.
-  **Reproduced twice at one close, 2026-08-25, not predicted.** Two `audit-sweep` dispatches
-  carrying `isolation: worktree` each completed substantial work (46 and 49 tool uses, ~163k and
-  ~97k child tokens) and each returned a single period. Both had to be resumed with an explicit
-  "put it in your final assistant message, do not use SendMessage" instruction, after which both
-  reported in full. The work is not lost; it is paid for twice, and the second payment is a whole
-  extra dispatch round-trip.
-  **The cause is stated by the harness itself and is not a guess.** The agent-dispatch guard
-  already warns at dispatch time that a grandchild has no upward channel and that neither level
-  knows its own address; one child said so outright in its recovered report — it could not resolve
-  the dispatcher's name and had no roster tool to find a ref.
-  **NOT the guard's defect.** Its warning is accurate and fires at the right moment; what is
-  missing is that nothing carries the warning INTO the child, so the child learns its own
-  isolation only by failing.
-  **Deliverable — rule one of three.** The dispatch-shape guard appends a return-value-only
-  instruction to a prompt whose type is read-only and whose isolation is worktree, the one shape
-  that provably cannot message back; or delegation-kit/templates/agent-execution.md states the
-  return-value-only obligation as a contract the dispatching session spells into such a prompt,
-  which costs one line and no code; or the agent-type definition for read-only sweep types carries
-  it, which reaches every dispatch of that type without touching any dispatcher.
-  **DISTINCT from `worktree-isolated-dispatch-cannot-reach-the-main-checkout`**, deliberately not
-  re-filed here: that entry is about a child's WRITES (a gate it cannot resolve, a capture log in a
-  doomed worktree), bridged by `git rev-parse --git-common-dir`; this is the child's RETURN VALUE,
-  with no filesystem half. The two share the isolation flag and no fix.
-  **Cost while deferred:** one wasted dispatch round-trip per isolated sweep, paid by the
-  dispatcher at the moment it is waiting on the result — and silent, since a bare `.` reads as an
-  agent that found nothing rather than as an agent whose report was dropped. That last reading is
-  a correctness risk rather than an efficiency one, and it is the expensive half.
-  **The floor's coverage is measured: half of shape one.** The `agent-dispatch-guard` arm's D2
-  rule refuses a read-only type dispatched WITHOUT `isolation: worktree`; its D3 rule appends the
-  return-value-only advice only when the dispatcher is ITSELF a dispatched agent. A top-level lead
-  dispatching the same sweep gets the isolation refusal and no return-value instruction, so the
-  guard reaches the ISOLATION half of shape one and is silent on the CHANNEL half, this entry's.
-  **A further ground, three sessions paid for it 2026-08-26.** For a read-only fan-out the RETURN
-  VALUE is the contract; the resume-journal path a dispatcher grants is for agents that MUTATE, so
-  granting it to a read-only child buys nothing and makes the dropped return look like an offered
-  channel. `delegation-kit/templates/agent-execution.md` draws the distinction; nothing makes a
-  dispatcher pay it — shape two of the deliverable, restated as an observed cost.
-  **Re-measured 2026-09-21: the bare `.` has not reproduced twice** (2026-09-16, 2026-09-21) — an
-  isolated `audit-sweep` returned a full 46-tool-use report through `SubagentHandback`, whose duty
-  the harness states in the child's prompt; re-costed event/high to event/low (operator direction,
-  2026-09-21, lead-relayed). **Kept at the 2026-09-21 close's eviction:** the dated `recurrence:`
-  line below is live by queue-kit/SPEC.md §The icebox tier, which ages no recurrence line; whether
-  one should age is filed to the gap inbox. No wontfix is ruled; the operator may `/consult` one.
-  recurrence: worktree-isolated-agent-report-lost-to-a-failed-peer-send 2026-08-26
-  Surfaced 2026-08-25, and promoted, by the `turn-end-liveness-seam-and-worktree-cause` close, which
-  reproduced it twice. **Joins `delegation-seams`** as its return-channel unit (operator direction
-  2026-09-21, lead-relayed); **marked for spec**, which rules one of the three deliverable shapes.
-
 - **site-health-issue-venue-unwanted** [cost: event/low] [surface: site-kit] — the site-health probe files issues on
   the public repo for failures the iteration lifecycle resolves anyway, and the operator does not
   want that venue.
@@ -2536,61 +2608,6 @@
   Filed 2026-09-16 to the gap inbox by the spec stage, weighed as that iteration's second
   candidate owner and refused there for repairing one instance of a general class; drained and
   promoted at close, which falsified half its premise.
-
-- **isolation-oracle-cost-lacks-dispatcher-clause** [cost: event/high] [surface: delegation-kit]
-  — agent-execution's isolation cost (4) carries no dispatcher-side clause, so a dispatch sending
-  an oracle-running sweep into isolation is discovered unresolvable only after a full round trip.
-  **The asymmetry is inside one rule set.** Cost (3) already carries a dispatcher clause — a sweep
-  whose corpus is untracked or gitignored is not delegable to an isolated agent; read it yourself
-  or pass its content in the prompt, and classify the corpus *before* dispatching. Cost (4) carries
-  only a post-hoc recovery note, "the parent's checkout has the binary and can run it", which a
-  parent reads after the round trip is already spent.
-  **Measured 2026-09-16** at `isolated-dispatch-obligations`' close: an `audit-sweep` dispatched
-  with `isolation: worktree` to run `--emit queue-edges` spent about 39k child tokens, 7 tool calls
-  and 70 seconds returning blindness, on a fact decidable before dispatch; re-dispatched with the
-  arm run in the main checkout and its stdout materialized under the scratch dir and named absolute
-  in the prompt, it completed the sweep. The child's half of the rule worked exactly as written —
-  it reported and refused to build.
-  **Why design-pending:** whether the remedy is one sentence on cost (4), a shared
-  classify-before-dispatch step both costs point at, or a guard assertion is a residency call.
-  **DISTINCT from `delegated-read-blind-to-gitignored-capture`, Done 2026-09-16**, which is cost
-  (3)'s composition with the dispatch guard's D2; this is cost (4)'s missing dispatcher half and
-  stands whatever (3) says.
-  **Cost while deferred:** every dispatch of an oracle-running sweep into isolation buys one wasted
-  round trip and a re-dispatch.
-  Filed 2026-09-16 to the gap inbox at `isolated-dispatch-obligations`' close, which could not
-  drain it; promoted at the following iteration's scope.
-  **Joins `delegation-seams`** as its dispatcher-clause unit (operator direction 2026-09-21,
-  lead-relayed); **marked for spec**, which makes the residency call.
-
-- **isolated-dispatch-resume-loses-its-isolation** [cost: event/high] [surface: delegation-kit]
-  — a `SendMessage` resume of an `isolation: worktree` read-only dispatch silently loses its
-  isolation, so the dispatch guard's claim-by-shape rule is evaluated once and never again.
-  **Measured 2026-09-16** at `isolated-dispatch-obligations`' close, on a later dispatch than the
-  one above: an `audit-sweep` under `isolation: worktree` handed back, the harness auto-cleaned its
-  worktree, and the resume
-  re-entered with cwd at the MAIN CHECKOUT — the child verified this itself, `pwd` at the repo root
-  and `git worktree list` showing one checkout on master.
-  **The hole is in the guard's own premise.** `agent-dispatch-guard`'s D2 refuses a
-  `DELEGATION_KIT_READONLY_TYPES` dispatch carrying no isolation, on the ground that a read-only
-  claim is made by isolation and not by sentence. The resume path re-enters that same read-only
-  type with full write reach on the shared branch and no second D2 evaluation. The child stopped
-  only because that dispatch prompt happened to carry an explicit if-your-worktree-was-cleaned-up
-  stop clause; nothing structural refuses it.
-  **Why design-pending:** three candidate shapes with no ruling between them — (a) the guard
-  evaluates D2 on a resume as it does on a dispatch, if the resume payload is reachable at the
-  pre-tool hook; (b) agent-execution states that a resumed isolated dispatch is a NEW dispatch
-  owing re-isolation, making re-dispatch the sanctioned shape; (c) the read-only agent types carry
-  a self-check on their own cwd.
-  **DISTINCT from `worktree-isolated-agent-report-lost-to-a-failed-peer-send`**, which is about a
-  child's RETURN VALUE being dropped and has no permission half.
-  **Cost while deferred:** every resume of an isolated read-only dispatch runs with write reach the
-  dispatch itself would have been refused, and nothing reds.
-  Filed 2026-09-16 to that same close's gap inbox, undrainable there; promoted at the following
-  iteration's scope.
-  **Joins `delegation-seams`** as its resume-isolation unit (operator direction 2026-09-21,
-  lead-relayed); **marked for spec**, which rules among (a)-(c). Re-verified at scope:
-  `native/src/hook/dispatch.rs` has no resume path.
 
 - **gate-fixture-fanout-arm** [cost: event/low] [surface: gate-sdk] — nothing
   enumerates the fixture pairs a change to a shared implementation module has to re-run:
