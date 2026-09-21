@@ -1,6 +1,6 @@
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the SubagentStop member: it logs one
-// open key=value record per firing, emits no hook JSON at all, and speaks the protocol through its
-// exit status alone — 2 with a stderr reason on a red, corrupt or unresolved reading, 0 otherwise.
+// open key=value record per firing, emits no hook JSON, and speaks only through its exit status —
+// 2 with a stderr reason on a refusing reading or a running harness shell task, 0 otherwise.
 use crate::emit::kpi;
 use crate::hook;
 use crate::{proc, programs};
@@ -119,6 +119,12 @@ pub fn fire(
     if verdict == "unresolved" && continuing {
         decision = "allow";
     }
+    let reader_refused = decision == "refuse";
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the harness's task view refuses
+    // beside the reading, unconditionally like `red`, and leaves `verdict` what the reader said
+    if shell_task_running(payload) {
+        decision = "refuse";
+    }
 
     let values = [
         event.as_str(),
@@ -136,7 +142,27 @@ pub fn fire(
     if decision != "refuse" {
         return Firing { code: 0, stderr: String::new() };
     }
+    if !reader_refused {
+        return Firing { code: 2, stderr: TASK_REFUSAL.to_string() };
+    }
     Firing { code: 2, stderr: refusal(verdict, reader, run_dir, &runs) }
+}
+
+const TASK_REFUSAL: &str = "turn-end refused: the harness shows a background shell task of this session still running (a call moved to the background, or a backgrounded launch); await its completion notification before ending the turn.\n";
+
+// spec: delegation-kit/SPEC.md §The turn-end liveness hook — only an object element of an array
+// `background_tasks` with `type` `shell` and `status` `running` counts; anything else in the view
+// contributes nothing, so a malformed view degrades to the record-set decision
+fn shell_task_running(payload: Option<&Value>) -> bool {
+    payload
+        .and_then(|d| d.get("background_tasks"))
+        .and_then(Value::as_array)
+        .is_some_and(|tasks| {
+            tasks.iter().any(|t| {
+                t.get("type").and_then(Value::as_str) == Some("shell")
+                    && t.get("status").and_then(Value::as_str) == Some("running")
+            })
+        })
 }
 
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the record's line form: the stamp,
@@ -529,6 +555,41 @@ mod tests {
             !f.stderr.contains("does not parse"),
             "the unresolved arm reused the corrupt arm's wording over a case holding no record"
         );
+    }
+
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the task view: a green reader over
+    // an empty record set, varied only in `background_tasks`; a running `shell` element refuses
+    // beside the green verdict, even when the harness is already continuing, and nothing else does
+    #[test]
+    fn a_running_shell_task_refuses_beside_a_green_reading() {
+        let shell = r#"{"id":"t1","type":"shell","status":"running","description":"d","command":"c"}"#;
+        let with = |tasks: &str, active: bool| {
+            format!(
+                r#"{{"session_id":"s-1","hook_event_name":"SubagentStop","stop_hook_active":{},"background_tasks":{}}}"#,
+                active, tasks
+            )
+        };
+        for (case, src, rc) in [
+            ("shell-running", with(&format!("[{}]", shell), false), 2),
+            ("shell-completed", with(&format!("[{}]", shell.replace("running", "completed")), false), 0),
+            ("subagent-running", with(&format!("[{}]", shell.replace("shell", "subagent")), false), 0),
+            ("not-an-array", with(r#""running""#, false), 0),
+            ("shell-running-continuing", with(&format!("[{}]", shell), true), 2),
+        ] {
+            let s = Scratch::new(case);
+            let log = s.at(&format!("{}.log", case));
+            let f = fire(payload(&src).as_ref(), &log, Some(&s.reader("rg", 0)), &s.at("runs"));
+            let line = s.log(&format!("{}.log", case));
+            assert_eq!(f.code, rc, "case {}: {}", case, line);
+            let decision = if rc == 2 { "decision=refuse" } else { "decision=allow" };
+            want(&line, case, &["verdict=green", "records=0", decision]);
+            assert!(!line.contains("running"), "case {}: the log carried a value of the view: {}", case, line);
+            if rc == 2 {
+                want(&f.stderr, case, &["turn-end refused", "background shell task", "completion notification"]);
+            } else {
+                assert!(f.stderr.is_empty(), "case {}: an allow carries no reason", case);
+            }
+        }
     }
 
     // spec: delegation-kit/SPEC.md §The turn-end liveness hook — case F4: `unresolved` refuses

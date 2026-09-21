@@ -263,7 +263,18 @@ write stays uncheckable after the fact; what the launch chokepoint reads is
 whether the call is going to write one. The residue left is a command the
 harness moves to the background on its timeout: it was a foreground call when
 the guard saw it, it writes no record, and no `PreToolUse` payload carries task
-state.
+state. The template covers the recoverable half. It sizes a foreground call's
+timeout so the move does not happen, has a record written from a pid the moved
+producer names, and holds the turn and the tracked tree until the harness's
+completion notification, which the move itself promises. A moved producer that
+names no pid stays unrecorded, but the turn-end hook refuses a dispatched
+session's turn end while the harness's own task view shows it running (§The
+turn-end liveness hook). Guard rule 14 still cannot see it, so a tracked-tree
+write beside it is held only by the template. That leaves a dispatched session
+holding a moved producer with no pid without an in-turn primitive that ends on
+the notification: there is no pid for a `kill -0` loop, and a pattern match is
+refused, so it can keep working until the notification arrives but cannot wait
+for it idle.
 
 **The record's *write* is now reached at the launch chokepoint, and the refusal
 that stood here is discharged.** The candidate was a rule firing on the
@@ -1066,7 +1077,8 @@ reconstruct whether anyone ever looked.
 
 The `subagent-stop-liveness` hook is an opt-in `SubagentStop` hook, inert
 until a consumer registers it, that **refuses a dispatched session's turn end
-while the launch records under the scratch dir say a producer is live**. It
+while the launch records under the scratch dir say a producer is live, or while
+the harness's own task view shows a shell task of it still running**. It
 shipped as a probe first, and the probe's own result is what made it this: the
 question it was built to answer — **does the harness already defer a subagent's
 stop while a background child is live?** — came back *no* (§The probe is
@@ -1094,8 +1106,9 @@ the main-session turn end has no attested firing, so registering it would widen
 the subject past what the evidence carries. Enforcement inherits that boundary
 unchanged — the main session's turn end is still unreached.
 
-**The contract: exit 2 on `red`, `corrupt` or `unresolved`, exit 0 on every other
-path, and no hook JSON on either.** The hook reads its payload from stdin, asks
+**The contract: exit 2 on `red`, `corrupt` or `unresolved`, or while the payload's
+`background_tasks` shows a running `shell` task, exit 0 on every other path, and
+no hook JSON on either.** The hook reads its payload from stdin, asks
 the liveness reader whether any launch record under `${GATE_SDK_TMP_DIR:-.tmp}`
 names a live producer, appends one line to `DELEGATION_KIT_STOP_LOG`, and then
 either exits 0 or exits 2 with its refusal written to **stderr**.
@@ -1271,6 +1284,42 @@ class of `unavailable` and `error`, not of the reader's own fail-closed verdict.
 What the arm buys is a degradation that is not silent: `unstarted` and its `spawn`
 value are a distinct line the close-stage triage counts.
 
+**The harness's task view is a second refusing condition, beside the reading
+rather than in it.** An element of `background_tasks` with `type` `shell` and
+`status` `running` refuses whatever the reader said. It covers the producer no
+launch record names — a call the harness moved to the background on its
+timeout — which §What `background_tasks` carries measured the view as
+enumerating, since the harness launched it. It supplements the record set and
+substitutes for nothing: a detached producer the view does not enumerate is
+still the record set's. It logs nothing of the view. The condition is
+unconditional, like `red`: it reads nothing from `stop_hook_active`, because it
+resolves when the task ends. An element of `type` `subagent`, an element with
+any other `status`, an absent key, a non-array value and an element that is not
+an object all contribute nothing, so a malformed view degrades to the record-set
+decision alone — the quiet half of the fail-open-but-loud posture, since the
+view is a supplement and its absence must not refuse. The hook reads `type` and
+`status` to decide and logs neither, nor a count, nor any new field, so the
+grammar below and §What `background_tasks` carries' key-names-only ruling are
+untouched. A task-held refusal is still legible: the `verdict` stays what the
+reader said, so it shows as `decision=refuse` beside a non-refusing verdict
+(`green`, `unavailable`, `unstarted`, `error`), a pairing no other arm produces.
+Its stderr names the arm and tells the session to await the task's completion
+notification.
+
+**Whether a finished task leaves the array is not a premise of that condition.**
+It keys on `status` being `running`, so a finished task either leaves the array
+or carries another status, and both allow. The residual is a finished task still
+reporting `running`, which would hold the refusal across the session's retries.
+The log exposes that without logging a value: a run of `decision=refuse` beside
+a non-refusing verdict that outlasts the task's completion notification, and the
+first live firing measures it that way. **Honest limit:** until then the residual
+is unmeasured, and a session caught in it has no in-band way out; an
+operator-visible `decision=refuse` run in the log is the signature. How often a
+running task refuses at an intermediate firing costs nothing, since an
+intermediate exit 2 delivers nothing (below). A session's own backgrounded wait
+loop is itself a running `shell` task, so a turn end during it refuses — which is
+the waiting rule itself, and needs no exemption.
+
 **An unreadable payload does not disable enforcement, and this is the one place
 this hook is strictly better off than its `PreToolUse` siblings.** The verdict
 comes from the liveness reader over the run directory, so a payload that will not
@@ -1278,7 +1327,9 @@ parse costs the log line its `event`, `session` and `keys` columns and leaves th
 verdict exact. It does not leave the *decision* exact in every arm, and the
 exception is stated rather than rounded away: `stop_hook_active` is a payload
 field, and on the `unresolved` arm alone it flips a refusal into an allow (the
-already-continuing bound below). Every other arm decides on the verdict alone.
+already-continuing bound below), and the task-view condition above is read from
+the payload, so an unreadable one drops it and leaves the record-set decision.
+Every other arm decides on the verdict alone.
 The advisory-envelope problem the dispatch guard had to solve by hand does not
 arise here either way, and no separate JSON program is on this path at all.
 
@@ -1579,7 +1630,8 @@ list does not name one for:
   refusal countable, so the forcing function's own effectiveness is measurable —
   which is the defect §The probe is asymmetric spent a whole iteration recording
   about `live=no`. It cannot be derived from `live`: a `corrupt` refusal carries
-  `live=no decision=refuse`.
+  `live=no decision=refuse`. Nor from `verdict`: a task-view refusal carries a
+  non-refusing verdict beside it.
   **The honest limit on that countability, and it is a break in this contract
   rather than a caveat on it: the named reader cannot see a worktree-isolated
   agent's firings at all.** `DELEGATION_KIT_STOP_LOG` defaults under
@@ -2073,9 +2125,9 @@ red, appeared in no firing. That is precisely the residue §The probe is
 asymmetric names as one of `live=no`'s three readings, unrecorded, and the class
 guard-kit rule 15 refuses at the launch. So the blocking hook **cannot substitute** the
 harness's view for the `*.run` record set: the two disagree exactly on the class
-the waiting rule exists for. Supplementing is the most it could do — and now that
-the hook refuses on the record set alone (§The turn-end liveness hook),
-this is a constraint on a shipped mechanism rather than on a hypothetical one.
+the waiting rule exists for. Supplementing is the most it could do, and the hook
+now does: it refuses on a running `shell` element (§The turn-end liveness hook)
+and logs none of the view's values.
 
 **No entry carries a pid.** Those six field names are the whole schema, and a
 `shell` entry's `id` is the harness's own opaque task id. Joining this view to a

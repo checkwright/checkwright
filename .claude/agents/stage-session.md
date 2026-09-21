@@ -110,7 +110,11 @@ batch-specific pointers.
   **Delete it once its producer has exited, and not before** — while it names a
   live PID the bash guard blocks every `git` command that writes the index, the
   worktree or a ref, which is the rule catching the harm a premature commit under
-  a live producer does, not an obstacle to route around. Write
+  a live producer does, not an obstacle to route around. **A call the harness
+  moves to the background on its timeout is your own producer:** size a
+  foreground timeout above the command's run, record a moved call from any pid it
+  names, and end no turn and write nothing tracked until its completion
+  notification arrives. Write
   findings down to your resume journal *before* you act on
   them, never after. Both rules, their reasoning,
   and the mechanics of an in-turn wait live in

@@ -1,6 +1,6 @@
 # contract: context-kit/SPEC.md §The surface ratchet
-96 .claude/agents/audit-sweep.md
-129 .claude/agents/stage-session.md
+98 .claude/agents/audit-sweep.md
+133 .claude/agents/stage-session.md
 23 .claude/commands/agent-execution.md
 12 .claude/commands/align.md
 19 .claude/commands/build.md
@@ -15,7 +15,7 @@
 176 CLAUDE.md
 109 canon-kit/templates/SPEC-amendment.md
 37 context-kit/templates/close-brevity.md
-492 delegation-kit/templates/agent-execution.md
+501 delegation-kit/templates/agent-execution.md
 60 delegation-kit/templates/dispatch-checklists.md
 40 drift-kit/templates/close-knowledge.md
 54 drift-kit/templates/economics.md

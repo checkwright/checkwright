@@ -68,52 +68,6 @@
   gate files, so coverage holds by construction (removal outranks gating); a gate over all
   members would red every default consumer, whose globs miss the 106 kit-resident gates here.
 
-- **harness-moved-background-task-unrecorded** [spec: SPEC-harness-moved-producer.md]
-  — a command the harness moves to the background on its timeout is a live producer no liveness
-  record names.
-  **Split out of `backgrounded-shell-child-run-record-unenforced` — operator direction, 2026-09-11,
-  lead-relayed**, since landed, which kept the explicit-launch block and the recorded-launch grant.
-  **Attested twice.** At `installer-trial-lifecycle-repair`'s close, `stage-economics.sh` exceeded
-  its foreground timeout, the harness backgrounded it, and it kept writing `.metric/` with no `.run`
-  record; no session act could have written one, since the launch was never a session act. Spec
-  reproduced the move on 2026-09-11: the result reads "moved to the background (ID: …)", with its
-  output under the session scratchpad.
-  **Why no `PreToolUse` rule reaches it.** The call was a foreground call when the guard saw it, so
-  guard-kit rule 15 has no launch to refuse and rule 14 has no record to read. No `PreToolUse`
-  payload carries task state, and a search of that session's transcripts found no line recording
-  the move.
-  **Candidate, operator-class:** widen delegation-kit's turn-end hook to refuse while its payload's
-  `background_tasks` array shows a running harness `shell` task. §What `background_tasks` carries
-  rules that view a supplement to the record set and never a substitute, and it holds no pid; the
-  hook's refusal set took a separate authorization (§The turn-end liveness hook), so widening it is
-  the operator's to rule.
-  **Why design-pending:** whether a finished task leaves the array, and how often a running task at
-  an intermediate `SubagentStop` would refuse, are both unmeasured.
-  **Cost while deferred:** a harness-moved producer can outlive its session, and a commit can land
-  beside it; rule 14 and the stage-entry liveness check see neither, because nothing recorded it.
-  Filed 2026-09-11 by spec on the operator's split direction.
-  **Third attestation, 2026-09-14 validate:** `--run-validate` passed the 120s foreground timeout
-  and was moved. Its own `run-validate.lock` named the pid, so the stage-entry preflight would
-  have seen it; guard rule 14 reads only `*.run` records and would not have blocked a git write.
-  **Fourth attestation, same validate — a new shape: the session ended its turn on the moved
-  producer.** The stage session ended its turn twice while the moved `--run-validate` lived, first
-  on the move itself and then on its own backgrounded wait of the lock's pid; the turn-end hook's
-  log reads `decision=allow records=0` at both. It never wrote a `.run` record for the moved
-  producer, even after reading its pid. Later in the same session, a re-run launched with a `.run`
-  record was held at a real turn end: the hook's refusal reached the session as stop-hook feedback,
-  and the session kept working. **So a record written the moment a session learns a moved
-  producer's pid would have held both turn-ends.** That is a second candidate, beside widening the
-  hook: a steer at the move, which the tool result announces as "moved to the background (ID: …)".
-  Whether any hook payload carries that line is unmeasured. The liveness log records the
-  `background_tasks` key and not its contents.
-  **Leads `delegation-seams`** (operator direction 2026-09-21, lead-relayed); **marked for spec**.
-  Widening the turn-end hook's refusal set stays operator-class and escalates from spec.
-  **Spec 2026-09-21:** ruled the steer, in the template: size timeouts, record from a pid the moved
-  producer names, hold turn and tree until the notification the move promises (probed). The hook
-  widening was granted by operator direction (2026-09-21, lead-relayed) as delta 3: refuse on a
-  running `shell` element, reading `type`/`status` and logging no value of the view.
-  recurrence: harness-moved-background-task-unrecorded 2026-09-14
-
 - **worktree-isolated-agent-report-lost-to-a-failed-peer-send** [spec: SPEC-isolation-seams.md]
   — an isolated read-only sweep's final report reaches its dispatcher as a bare `.`, because the
   child sends to a peer name it cannot resolve and the harness returns only the last assistant
@@ -2929,5 +2883,6 @@
 
 - guard-rule-12-single-occurrence-pgrep-loop-passes
 - sibling-stage-sessions-collide-on-a-shared-scratch-commit-message-file
+- harness-moved-background-task-unrecorded
 
 ## Lessons Learned

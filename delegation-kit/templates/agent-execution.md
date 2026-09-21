@@ -96,6 +96,15 @@ propagate.
   in any other spelling costs a permission decision on its `$!`. Spell a wait
   inline so it meets that exemption; a wait behind a script or binary name is
   invisible to the guard's span walk and takes the record like any launch.
+  **A call the harness moves to the background on its timeout is a launch you
+  did not make, and it is yours.** The result says so ("moved to the
+  background"), and nothing recorded it, because the guard saw a foreground call.
+  Prevent it: give a foreground call a timeout above the command's run, and
+  launch anything that can outrun that timeout backgrounded, with its record, as
+  above. If a call is moved anyway, it is a live producer from that moment. Where
+  it names its own pid (a lock, a printed pid), write its `<key>.run` record from
+  that pid at once. Either way, end no turn and write nothing to the tracked tree
+  until its completion notification arrives.
   **A recorded wait owes one check before it starts: can my own record falsify my
   condition?** Such a wait is only safe where its condition is independent of the
   record set. A condition that *reads* the record set, directly or through a gate

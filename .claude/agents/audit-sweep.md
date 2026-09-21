@@ -80,8 +80,10 @@ reads it unchanged — and the `.run` suffix is what lets
 `check-producer-liveness .tmp` read the whole set — and that is how whoever
 arrives after you tells a live orphan from a finished one. Delete it once its
 producer has exited and not before: while it names a live PID the bash guard
-blocks every `git` command that writes the index, the worktree or a ref.
-Stating these
+blocks every `git` command that writes the index, the worktree or a ref. A call
+the harness moves to the background on its timeout is your own producer: record
+it from any pid it names, and end no turn on it until its completion
+notification arrives. Stating these
 here as imperatives is sanctioned by delegation-kit/SPEC.md §Operative residency;
 the rule, its reasoning and its mechanics are the **Background + notification,
 never poll** bullet in delegation-kit/templates/agent-execution.md.
