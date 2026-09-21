@@ -42,8 +42,10 @@ standing, and makes it permanent.
 
 **Why the sibling mirror is the comparand, not the kit README.** The mirror
 topology (canon-kit/SPEC.md §The reference-link grammar) puts
-`docs/<kit>/README.md` beside the index page, byte-identical to the source and
-held so by `check-docs-mirror-fresh`. Comparing with the sibling needs no path
+`docs/<kit>/README.md` beside the index page, a generated projection of the
+kit-root file (a frontmatter banner, relative links rewritten absolute) held
+byte-fresh to that projection by `check-docs-mirror-fresh` — not byte-identical
+to the kit-root README itself. Comparing with the sibling needs no path
 mapping at all: the pairing is "the `README.md` in the page's own directory".
 The gate therefore carries no layout knowledge beyond the page glob.
 

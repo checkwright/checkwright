@@ -12,7 +12,7 @@ entries were filed to be read together.
 **The survey, measured at this spec (2026-09-21).**
 
 - **The roster is prose.** `grep -n "^- \*\*" docs/site-architecture.md` gives 13
-  bold-led bullets. Nine describe a generated projection, and one of those rows
+  bold-led bullets. Seven describe a generated projection, and one of those rows
   covers two gates (enforcement and footprint). Two are parity contracts: the
   install-toolchain and install-platforms blocks, whose hand-authored content a
   gate compares against code, with no emitter behind them
@@ -154,7 +154,7 @@ Mechanical: the wording is fixed by delta 1.
   docs/site-architecture.md` and the section knob to `Generated projections and
   their freshness gates`.
 - `scripts/gates.list` registers `check-projection-roster`.
-- Each of the nine projection bullets gains its key or keys. The enforcement and
+- Each of the seven projection bullets gains its key or keys. The enforcement and
   footprint bullet carries both, which means B's "exactly one row per gate" holds
   while a row can serve two gates.
 - The new-gate fan-out bullet (docs/site-architecture.md, "the other wide
@@ -178,7 +178,7 @@ Mechanical: every value is enumerated above.
 - **`GATE_SDK_PROJECTION_ROSTER` and `_SECTION` (delta 2).** Producer: gate-sdk's
   static knob table defaults, and this repo's knob file (delta 4). Consumer: the
   gate. Roster-holding readers:
-  - `check-knob-citation`, satisfied by the SPEC row delta 3 writes;
+  - `check-knob-citation`, satisfied by the SPEC row delta 2 writes;
   - `check-install-disposition` assertion D, which verifies `# armed-by:` names
     a declared static knob, satisfied by the knob's table row;
   - doctor's disarmed-member line, which gains the gate on a fresh install with

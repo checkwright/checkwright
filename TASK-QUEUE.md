@@ -18,10 +18,11 @@
   **Deliverable, by operator direction (2026-09-21, lead session):** an adopter page of about 150
   lines, with the gated marker blocks and the `install-primary:` declaration kept, plus a regrowth
   guard whose reach is the whole `docs/` site.
-  **Ruled at spec (2026-09-21):** the grounds relocate to installer/SPEC.md under their existing
-  heading names: Versioning, the release channel, the upgrade contract, manual vendoring and hook
-  review. Their 41 path-bound citations are repointed in one commit, with `check-spec-pointer` as
-  the oracle. The guard is `check-surface-ratchet`, widened by config to the 51 non-mirror `docs/`
+  **Ruled at spec (2026-09-21):** the grounds relocate to installer/SPEC.md — Versioning, the
+  release channel and the upgrade contract under their existing heading names, manual vendoring and
+  hook review under new ones (`Vendoring without the installer`, `Reviewing the pre-commit hook`).
+  Their 41 path-bound citations are repointed in one commit, with `check-spec-pointer` as the
+  oracle. The guard is `check-surface-ratchet`, widened by config to the 51 non-mirror `docs/`
   pages, and no new gate is added.
   **Length, by operator direction (2026-09-21, lead session):** the four gated blocks alone are
   109 lines, so the target is about 150 prose lines around them, putting the page near 260. Build

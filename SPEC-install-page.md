@@ -183,7 +183,7 @@ rules.
   same commit, with docs/install.md's row at the rewritten page's length.
 - context-kit/SPEC.md §The surface ratchet's **"Why these files, per file"**
   bullet is re-phrased. It no longer says the governed set is only what "a
-  trigger loads whole". It says instead that the kit's case is trigger-loaded
+  trigger loads each whole". It says instead that the kit's case is trigger-loaded
   instruction surfaces, and that a consumer may govern any authored surface whose
   growth it wants to see in the growing commit. A public page whose reader tier
   must not regrow is the named second case.
@@ -192,10 +192,13 @@ rules.
 whose red is a governed file above its row *or a governed file with no row*. The
 widening adds 51 governed files, and the second clause reds all 51 until their
 rows land, which is why the rows ride in this commit. The meter is not affected:
-`--emit always-loaded` measures `CONTEXT_KIT_SURFACES`, and `governed()`
+`--emit always-loaded`'s `measure()` (`native/src/emit/always_loaded.rs:230`)
+sums only `CONTEXT_KIT_SURFACES`; `governed()`
 (`native/src/emit/always_loaded.rs:138`) adds ratchet paths to the ceiling set
-alone. `--update-baseline` at close rewrites one baseline row whose surface
-count grows by 51, and that is the count's own staleness witness, as designed.
+alone and is read only by the ratchet gate, never by `measure()`.
+`--update-baseline` at close rewrites the baseline row from that same figure,
+so its surface count is untouched by this widening — the ratchet's staleness
+witness is the ceiling file's own ledger, not the baseline.
 
 **The honest limit.** A ratchet stops silent growth. It does not stop a
 deliberate re-stamp, and it has no notion of reader tier. Close's brevity pass

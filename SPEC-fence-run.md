@@ -13,7 +13,18 @@ tracked tree, with no network, under a declared set of gate-binary arms.
 
 - **No sandbox exists to reuse.** `grep -rln "unshare\|firejail\|sandbox-exec\|network namespace" native/src gate-sdk` returns nothing. In this tree, "hermetic" has only ever meant config-isolated: gate-sdk/lib/test-hermetic.sh pins knob files and nothing more. There is no portable process sandbox on all three adopter operating systems (gate-sdk/SPEC.md §The adopter constraints), so this amendment gets "no network" by construction instead of from a kernel facility (delta 3).
 - **The crate's network reach is two arms.** `grep -rn "programs::\(CURL\|GH\|NPM\|NPX\)" native/src` hits two files. `native/src/hook/poll.rs` spawns `curl` for `--usage-poll`, and `native/src/emit/pack_installer.rs` spawns `npm` for `--pack-installer`. Both are `Arm::Run` rows. `grep -rn '"clone"\|"fetch"\|"push"\|"ls-remote"\|TcpStream' native/src` finds one spawn, `upgrade_smoke.rs:524`'s local `git clone --shared` (the `ls-remote` hit is a word list in `scan_prompts.rs`, which spawns nothing). So none of the arms the declared set of delta 2 admits reaches the network.
-- **Corpus.** The governed doc set's shell fences number 36. All of them are `bash`, and no `console` or `powershell` fence exists in it. The dominant idiom is the kit READMEs' and index pages' `. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"`, followed by `"$gates" <arm> …` lines. The fences that are not candidates are the ones that fetch: `docs/install.md`'s `curl` release download and the home page's `npx` lines.
+- **Corpus.** The governed doc set carries 39 shell-language fences: 38 `bash` and
+  one `sh` (`docs/install.md`'s macos-remedy block). The dominant idiom is the kit
+  READMEs' and index pages' `. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" &&
+  gates="$(gate_native_bin_spelled)"`, followed by `"$gates" <arm> …` lines. Three
+  are not candidates because they fetch: `docs/install.md`'s and
+  `installer/README.md`'s `curl` release downloads and the home page's `npx`
+  lines — leaving **36** candidates, the `sh` fence among them. One `powershell`
+  fence also exists, `docs/install.md`'s windows-remedy block; it and the `sh`
+  macos-remedy block already run under their own bespoke `.github/workflows/gates.yml`
+  extraction steps, outside `check-fence-command-head`'s `SHELL_LANGS` reach
+  (`bash`, `sh`, `shell` — no `powershell` member), and neither carries a
+  `fence-runnable` marker here.
 - **No per-fence marker exists.** The one valve is the info string (`text`, `console`), which removes a fence from scanning altogether.
 
 It is a root-level amendment because it spans canon-kit (the marker and the gate),
