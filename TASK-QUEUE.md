@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: release-declaration-coupling
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -1912,6 +1912,13 @@
   two-phase upgrade contract exists to convert into a worklist.
   Surfaced 2026-08-18 in the gap inbox by `freshness-cohort-roadmap-hold-and-batch`'s close,
   whose release-disposition step postdates the drain; promoted 2026-08-18 at scope.
+  **Joins `release-declaration-coupling`** as its deprecation-path unit, by operator direction
+  (2026-09-21, lead-relayed); **marked for spec**, which rules among the three shapes above — an
+  envelope-class choice, and two of the three mint mechanism, so a feature. Designed alongside
+  `release-note-removal-declaration-uncoupled`, which shares its instance class (a removed shipped
+  path) and owns the note half. **Enhancement admission filter, engaged 2026-09-21 at scope:**
+  admitted on the trust arm — an adopter who automated around a kit tool meets its removal as a
+  broken script, the break the upgrade contract promises to turn into a worklist.
 
 - **prose-tell-threshold-validation** [cost: event/high] [surface: canon-kit] — `check-prose-tells`' numeric thresholds
   are read unvalidated, so a typo turns a calibrated gate into a silent no-op
@@ -2140,6 +2147,11 @@
   standing fact that the release's most reader-facing artifact is the least witnessed one.
   Surfaced 2026-08-24 by GitHub issue #2 and promoted at this scope's boundary sweep, whose probe
   re-read the v0.25.0 Release body directly rather than trusting the issue text.
+  **Joins `release-declaration-coupling`** as its release-body unit, by operator direction
+  (2026-09-21, lead-relayed); **marked for spec**, which rules among the three shapes above, two
+  of them new mechanism. **Enhancement admission filter, engaged 2026-09-21 at scope:** admitted
+  on the trust arm — the Release body is what an evaluator reads first, and it is the release
+  artifact with the least witness.
 
 - **precondition-gate-direction-blindness** [cost: event/low] [surface: queue-kit] — `check-queue-prose-precondition`
   reds an entry whose prose says the entry IS the blocker, and three of the four remedies it
@@ -2268,9 +2280,9 @@
   read-only child buys nothing while making the dropped return look like a channel that was
   offered. `delegation-kit/templates/agent-execution.md` already draws the distinction; nothing
   makes a dispatcher pay it, which is shape two of the deliverable restated as an observed cost.
-  **The bare `.` did not reproduce 2026-09-16** — an isolated `audit-sweep` returned its report in
-  full through `SubagentHandback`, whose obligation the harness now states in the child's own
-  system prompt. The 2026-08-25 cost figure is retired and is re-measured before this is re-ranked.
+  **Re-measured 2026-09-21: the bare `.` has not reproduced twice** (2026-09-16, 2026-09-21) — an
+  isolated `audit-sweep` returned a full 46-tool-use report through `SubagentHandback`, whose duty
+  the harness states in the child's prompt. The 2026-08-25 cost figure is retired.
   recurrence: worktree-isolated-agent-report-lost-to-a-failed-peer-send 2026-08-26
   Surfaced 2026-08-25 by the `turn-end-liveness-seam-and-worktree-cause` close, which reproduced it
   twice dispatching its own sweeps and filed it to the gap inbox; promoted 2026-08-25 at that drain.
@@ -2347,6 +2359,13 @@
   one letter, and nobody reading the SPEC learns that — the section's stated scope reads as
   complete.
   Filed 2026-08-26 by close, triaging a build finding relayed through the lead.
+  **Joins `release-declaration-coupling`** as its first declaration subject, by operator
+  direction (2026-09-21, lead-relayed); **marked for spec**, which rules among the three moves
+  above. Two of them tighten a kit-shipped template, which is exactly the event
+  `shipped-config-tightening-undeclared` rules on, so this unit is spelled against that ruling.
+  **Enhancement admission filter, engaged 2026-09-21 at scope:** admitted on the trust arm — the
+  pattern is the identity-leak guard, and its section's stated scope reads as complete while the
+  plural passes.
 
 - **shipped-config-tightening-undeclared** [cost: event/high] [surface: gate-sdk] — a kit-shipped pattern-list change
   tightens two gates in an adopter's tree, and no surface says which release section owns it or
@@ -2395,6 +2414,8 @@
   it reaches a consumer only as a copied-out list diverging — a Behavior-changes subject — and
   `.workflow/release-declarations.md` carries no bullet for it. The landing session had ended, so
   the open call above is again what leaves it with no producer.
+  **Leads `release-declaration-coupling`** (operator direction 2026-09-21, lead-relayed); **marked
+  for spec**. Filter: trust arm — `3763bc3e` is unreleased and undeclared, so the next cut ships it.
   recurrence: shipped-config-tightening-undeclared 2026-09-18
 
 - **shellcheck-analyser-version-unpinned-in-ci** [cost: event/high] [surface: .github] — one battery member's verdict is
@@ -2631,6 +2652,11 @@
   promoted here at this iteration's scope, →fix refused (a new gate is build work, not scope's) and
   →icebox refused on the product witness above. Deferred and not active on scope's composition
   test, re-grounded 2026-09-11: no iteration since has shared its surface.
+  **Joins `release-declaration-coupling`** as its removal-coupling unit, by operator direction
+  (2026-09-21, lead-relayed); **marked for spec**, which authors its amendment and promotes it. A
+  feature — the unit mints a gate. **Enhancement admission filter, engaged 2026-09-21 at scope:**
+  admitted on the trust arm. An adopter trusts the release note to name every entry point a cut
+  removes, and nothing checks that it does, so the omission reaches them as a broken invocation.
 
 - **kit-spec-seam-content-half-unswept** [cost: event/high] [surface: gate-sdk] — the provenance seam has two halves and
   the sweep that ran carried a discriminator for only one, so gate-sdk/SPEC.md is swept of private
