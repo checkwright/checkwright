@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: scratch-hermeticity
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -14,9 +14,34 @@
 
 ## Technical Debt
 
-## Deferred
+- **check-kit-roots-dialect-leaks-a-scratch-tree-per-run**
+  — `check-kit-roots-dialect`'s `scratch()` (`native/src/gates/kit_roots_dialect.rs`) creates a
+  per-pid base under `GATE_SDK_TMP_DIR` and never removes it. The one `remove_dir_all` there runs
+  BEFORE the create, so it clears a same-pid collision only; the pid differs per run, so every
+  invocation leaves a tree behind. 47 had accumulated by the filing close, each holding two vendored
+  layouts with their own git repos — measured by `ls`, and re-verified at this scope by reading the
+  function: no `Drop` impl and no post-use removal anywhere in the file.
+  **Its own sibling under the same knob does it right,** which is the fix's shape: the upgrade-smoke
+  arm's `Scratch` struct (`native/src/emit/upgrade_smoke.rs`) carries an `impl Drop` reaping its
+  worktrees and trees in the shell trap's order. This gate has neither half.
+  **Why a gap and not a red:** `.tmp/` is gitignored disposable scratch with a named reclaim trigger
+  (the scope boundary wipes it, CLAUDE.md §Housekeeping), so the write-path has a paired
+  reclaim-path. What is wrong is the RATE — one tree per battery run against one wipe per iteration.
+  **Adjacent and distinct:** `upgrade-smoke-producer-leaks-worktrees-on-signal` is a SIGNALLED
+  producer leaking git worktrees; this is a clean exit leaving its own scratch base, so this is the
+  strictly weaker case and its ordinary-exit discipline is the cheaper of the two rulings.
+  **Cost while deferred:** every battery run in every session leaves residue only the iteration
+  boundary reclaims, and the gate the last iteration shipped for path-dialect defects is the leaker.
+  Re-classed `once/low` → `session/low` at the 2026-09-21 scope: the residue grows per battery
+  run, which `once` (a cost that does not grow) contradicts; 42 trees re-accumulated in one
+  iteration.
+  Filed 2026-09-20 to the gap inbox at `door-binding-sweep`'s close by its runtime-artifact
+  lifecycle check, after the drain had run; promoted at this scope's intake. Owner lookup:
+  `scratch`, `GATE_SDK_TMP_DIR`, `kit_roots_dialect`, `Drop` — none.
+  **Promoted 2026-09-21 as the lead of `scratch-hermeticity`** by operator direction
+  (lead-relayed); build-ready, the sibling `Scratch` shape above.
 
-- **boundary-wipe-note-enumerates-nested-paths** [cost: iteration/low] [surface: lifecycle-kit] —
+- **boundary-wipe-note-enumerates-nested-paths** —
   the scope entry's `boundary-wiped` note lists every file below each wiped scratch child, not the
   children the wipe deletes, so its length tracks whatever accumulated under `.tmp/`.
   **Measured 2026-09-21:** this iteration's `--enter-stage scope` printed 558.9KB on 11 lines,
@@ -32,6 +57,55 @@
   session's context; `check-kit-roots-dialect-leaks-a-scratch-tree-per-run` is today's multiplier.
   Filed 2026-09-21 by the scope after `release-declaration-coupling`, which measured it. Owner
   lookup ran over `boundary-wiped`, `removed set` and `wiped set`; it found the one paragraph above.
+  **Promoted 2026-09-21 into `scratch-hermeticity`** by operator direction (lead-relayed).
+
+- **bespoke-test-path-knob-pinning** — a bespoke gate-test's cwd sandbox is
+  isolated only while `GATE_SDK_TMP_DIR` and `GATE_SDK_WORKFLOW_DIR` happen to hold relative
+  values in the invoker's environment, which is an ambient default rather than anything the test
+  owns.
+  **Surveyed, and the survey re-run at the drain.** 16 bespoke `*/gate-tests/*.test.sh` build
+  cwd-relative `.tmp`/`.workflow` sandboxes; 11 pin one of those knobs explicitly, so pinning is
+  already the majority idiom. The 7 that do not: `canon-kit/check-comment-tier`,
+  `evidence-kit/producer-lock`, and lifecycle-kit's `check-stage-entry`, `check-merge-attrs`,
+  `check-survey-record`, `check-stage-evidence`, `check-close-surfaces`.
+  **Probed, not inferred (2026-08-23 validate).** With `GATE_SDK_TMP_DIR` pointed at an absolute
+  dir holding a live-pid `run-validate.lock`, `producer-lock.test.sh` reds on 4 assertions because
+  its inner run-validate reads the real lock; with `GATE_SDK_WORKFLOW_DIR` absolute it reds on 4
+  more, reading a foreign `validate-evidence.txt`. That is the same failure `c1375e99`'s
+  process-wide export produced and `80d74291` narrowed away — an export was one way to supply an
+  ambient absolute value, not the only one. `producer-lock` is the sharpest case: the evidence_kit
+  suite runs inside the spine *while a real run-validate producer is live by construction*.
+  **Why design-pending:** two fix shapes, and choosing is the deliverable. Have each exposed
+  test pin its own path knobs (~7 one-line edits, no new mechanism, conforming to the majority
+  idiom); or widen `gate-sdk/lib/test-hermetic.sh` to neutralize the path knobs the way it already
+  neutralizes `<KIT>_CONFIG_FILE` — one place, and precedented, since that file already pins
+  `GATE_SDK_NATIVE_BIN` absolute for the *same* reason (a relative default resolving to nothing
+  from a sandbox cwd) — but it changes a bootstrap every bespoke test sources and needs each
+  pinning test re-checked for an override it currently gets from the ambient value.
+  Distinct from `hermetic-bin-roster-config`, which is credential pinning in smoke scripts under
+  `check-test-hermetic` assertion B: a different knob class on a different surface.
+  **Cost while deferred:** low and conditional — nothing is red today and the spine is green with
+  the case-scoped pin; the exposure is that any future harness or operator exporting an absolute
+  `GATE_SDK_TMP_DIR` or `GATE_SDK_WORKFLOW_DIR` silently converts a test sandbox into live-state
+  access, which reads as a mystery red in an unrelated kit's suite rather than a configuration
+  fact.
+  **THE PREDICTED EXPOSURE FIRED, 2026-09-05, and it widens fix shape 2 rather than this entry.**
+  The cost field above said "nothing is red today"; this iteration produced the red — a bespoke
+  test's isolation defeated by ambient env it did not own, reaching `--run-validate`'s verdict.
+  The mechanism was a different knob class (a bridged `GATE_SDK_KNOB_*` scalar inherited from a
+  sibling arm, not an absolute path knob from an operator export), so the instance is filed as its
+  own entry, `run-validate-child-env-knob-leak`, since mooted: the bridge retirement at
+  `config-seam-fourth-cut` removed the `GATE_SDK_KNOB_*` class, so shape 2 — widening
+  `gate-sdk/lib/test-hermetic.sh` to neutralize the knobs — is back to covering one class. The
+  choice was made on 7 one-line edits against one bootstrap change; it should be re-made on that.
+  recurrence: bespoke-test-path-knob-pinning 2026-09-05
+  Filed 2026-08-23 by validate; the close drain re-ran the survey oracle and got 16/11/7 with the
+  same seven names.
+  **Promoted 2026-09-21 into `scratch-hermeticity`** by operator direction (lead-relayed). Debt:
+  both shapes converge on knobs the specs already carry. The shape is ruled at this iteration's
+  spec stage, which the set walks for `upgrade-smoke-producer-leaks-worktrees-on-signal`.
+
+## Deferred
 
 - **recurrence-line-never-ages** [cost: event/low] [surface: queue-kit] — a dated `recurrence:`
   line counts as a live icebox trigger with no age limb, so one recurrence pins a low-cost entry
@@ -274,31 +348,6 @@
   §Porting to Rust does not retire dialect exposure. Split authorized by lead decision 2026-09-20
   on §check-queue-entry-budget's split-candidate test, the parent's two deliverables having taken
   different dispositions by demonstration.
-
-- **check-kit-roots-dialect-leaks-a-scratch-tree-per-run** [cost: session/low] [surface: gate-sdk]
-  — `check-kit-roots-dialect`'s `scratch()` (`native/src/gates/kit_roots_dialect.rs`) creates a
-  per-pid base under `GATE_SDK_TMP_DIR` and never removes it. The one `remove_dir_all` there runs
-  BEFORE the create, so it clears a same-pid collision only; the pid differs per run, so every
-  invocation leaves a tree behind. 47 had accumulated by the filing close, each holding two vendored
-  layouts with their own git repos — measured by `ls`, and re-verified at this scope by reading the
-  function: no `Drop` impl and no post-use removal anywhere in the file.
-  **Its own sibling under the same knob does it right,** which is the fix's shape: the upgrade-smoke
-  arm's `Scratch` struct (`native/src/emit/upgrade_smoke.rs`) carries an `impl Drop` reaping its
-  worktrees and trees in the shell trap's order. This gate has neither half.
-  **Why a gap and not a red:** `.tmp/` is gitignored disposable scratch with a named reclaim trigger
-  (the scope boundary wipes it, CLAUDE.md §Housekeeping), so the write-path has a paired
-  reclaim-path. What is wrong is the RATE — one tree per battery run against one wipe per iteration.
-  **Adjacent and distinct:** `upgrade-smoke-producer-leaks-worktrees-on-signal` is a SIGNALLED
-  producer leaking git worktrees; this is a clean exit leaving its own scratch base, so this is the
-  strictly weaker case and its ordinary-exit discipline is the cheaper of the two rulings.
-  **Cost while deferred:** every battery run in every session leaves residue only the iteration
-  boundary reclaims, and the gate the last iteration shipped for path-dialect defects is the leaker.
-  Re-classed `once/low` → `session/low` at the 2026-09-21 scope: the residue grows per battery
-  run, which `once` (a cost that does not grow) contradicts; 42 trees re-accumulated in one
-  iteration.
-  Filed 2026-09-20 to the gap inbox at `door-binding-sweep`'s close by its runtime-artifact
-  lifecycle check, after the drain had run; promoted at this scope's intake. Owner lookup:
-  `scratch`, `GATE_SDK_TMP_DIR`, `kit_roots_dialect`, `Drop` — none.
 
 - **sibling-stage-sessions-collide-on-a-shared-scratch-commit-message-file** [cost: event/low] [surface: delegation-kit]
   — `.tmp/` survives across the sibling batch sessions one stage dispatches, so the conventional
@@ -2057,49 +2106,6 @@
   Filed 2026-08-23 by build; drained at that iteration's close, which re-counted the citations
   and confirmed no gate matches them.
 
-- **bespoke-test-path-knob-pinning** [cost: event/high] [surface: gate-sdk] — a bespoke gate-test's cwd sandbox is
-  isolated only while `GATE_SDK_TMP_DIR` and `GATE_SDK_WORKFLOW_DIR` happen to hold relative
-  values in the invoker's environment, which is an ambient default rather than anything the test
-  owns.
-  **Surveyed, and the survey re-run at the drain.** 16 bespoke `*/gate-tests/*.test.sh` build
-  cwd-relative `.tmp`/`.workflow` sandboxes; 11 pin one of those knobs explicitly, so pinning is
-  already the majority idiom. The 7 that do not: `canon-kit/check-comment-tier`,
-  `evidence-kit/producer-lock`, and lifecycle-kit's `check-stage-entry`, `check-merge-attrs`,
-  `check-survey-record`, `check-stage-evidence`, `check-close-surfaces`.
-  **Probed, not inferred (2026-08-23 validate).** With `GATE_SDK_TMP_DIR` pointed at an absolute
-  dir holding a live-pid `run-validate.lock`, `producer-lock.test.sh` reds on 4 assertions because
-  its inner run-validate reads the real lock; with `GATE_SDK_WORKFLOW_DIR` absolute it reds on 4
-  more, reading a foreign `validate-evidence.txt`. That is the same failure `c1375e99`'s
-  process-wide export produced and `80d74291` narrowed away — an export was one way to supply an
-  ambient absolute value, not the only one. `producer-lock` is the sharpest case: the evidence_kit
-  suite runs inside the spine *while a real run-validate producer is live by construction*.
-  **Why design-pending:** two fix shapes, and choosing is the deliverable. Have each exposed
-  test pin its own path knobs (~7 one-line edits, no new mechanism, conforming to the majority
-  idiom); or widen `gate-sdk/lib/test-hermetic.sh` to neutralize the path knobs the way it already
-  neutralizes `<KIT>_CONFIG_FILE` — one place, and precedented, since that file already pins
-  `GATE_SDK_NATIVE_BIN` absolute for the *same* reason (a relative default resolving to nothing
-  from a sandbox cwd) — but it changes a bootstrap every bespoke test sources and needs each
-  pinning test re-checked for an override it currently gets from the ambient value.
-  Distinct from `hermetic-bin-roster-config`, which is credential pinning in smoke scripts under
-  `check-test-hermetic` assertion B: a different knob class on a different surface.
-  **Cost while deferred:** low and conditional — nothing is red today and the spine is green with
-  the case-scoped pin; the exposure is that any future harness or operator exporting an absolute
-  `GATE_SDK_TMP_DIR` or `GATE_SDK_WORKFLOW_DIR` silently converts a test sandbox into live-state
-  access, which reads as a mystery red in an unrelated kit's suite rather than a configuration
-  fact.
-  **THE PREDICTED EXPOSURE FIRED, 2026-09-05, and it widens fix shape 2 rather than this entry.**
-  The cost field above said "nothing is red today"; this iteration produced the red — a bespoke
-  test's isolation defeated by ambient env it did not own, reaching `--run-validate`'s verdict.
-  The mechanism was a different knob class (a bridged `GATE_SDK_KNOB_*` scalar inherited from a
-  sibling arm, not an absolute path knob from an operator export), so the instance is filed as its
-  own entry, `run-validate-child-env-knob-leak`, since mooted: the bridge retirement at
-  `config-seam-fourth-cut` removed the `GATE_SDK_KNOB_*` class, so shape 2 — widening
-  `gate-sdk/lib/test-hermetic.sh` to neutralize the knobs — is back to covering one class. The
-  choice was made on 7 one-line edits against one bootstrap change; it should be re-made on that.
-  recurrence: bespoke-test-path-knob-pinning 2026-09-05
-  Filed 2026-08-23 by validate; the close drain re-ran the survey oracle and got 16/11/7 with the
-  same seven names.
-
 - **precondition-gate-direction-blindness** [cost: event/low] [surface: queue-kit] — `check-queue-prose-precondition`
   reds an entry whose prose says the entry IS the blocker, and three of the four remedies it
   prints are false for that shape.
@@ -2477,6 +2483,10 @@
   session has to be told about.
   Surfaced 2026-09-04 by the close of `wait-probe-cut-and-stage-journal-absence`; drained
   2026-09-04 at this iteration's scope entry, the boundary having carried it.
+  **Joins `scratch-hermeticity`** as its signalled-producer unit, by operator direction
+  (2026-09-21, lead-relayed); **marked for spec**, which rules the three shapes above (a trap's
+  cost against the dependency bar, producer versus reaper, the consumer-smoke twin) and states
+  whether the chosen shape mints a name. Stays Deferred until that stage pairs it.
 
 - **kit-spec-seam-content-half-unswept** [cost: event/high] [surface: gate-sdk] — the provenance seam has two halves and
   the sweep that ran carried a discriminator for only one, so gate-sdk/SPEC.md is swept of private
