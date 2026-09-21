@@ -397,14 +397,18 @@ link — an application of the load-trigger residency rule to the doctrine itsel
 18. **Re-verify volatile state before a git history rewrite.** Verify HEAD
     (`git log --oneline -3`) before an amend or squash; after a `git reset
     --soft`, re-stage and verify the staged content (`git show :<path>`) before
-    committing — the soft reset keeps the old index snapshot; write any `git
-    commit -F` message file fresh in the same turn (prefer `-m` for a short
-    message — a leftover file lands the wrong message with exit 0); and rewrite
-    the message when amending so it states the combined change.
+    committing — the soft reset keeps the old index snapshot; carry the commit
+    message in the command — `-m`, or `-F -` fed by a quoted heredoc — rather
+    than in a message file, because scratch outlives the session that wrote it
+    and a sibling session committing from the same name lands the wrong message
+    with exit 0; where a file is unavoidable, write it in the same command as the
+    commit and read the landed message back (`git log -1 --format=%B`); and
+    rewrite the message when amending so it states the combined change.
     *Under agent work:* the git index and HEAD are mutable state an agent
     reasons about from a stale in-context snapshot, and a rewrite acts on what
-    the working tree *now* holds, not what the transcript last recorded — so the
-    verification must be a fresh read, never a remembered one.
+    the working tree *now* holds, not what the transcript last recorded, and a
+    message file under scratch is state another session may have written last —
+    so the verification must be a fresh read, never a remembered one.
     *Enforced by:* guard-kit's advisory guard rule on `git commit --amend`, `git
     reset --soft`, and `git commit -F`
     ([guard-kit/SPEC.md](../guard-kit/SPEC.md) §The generic ruleset), which

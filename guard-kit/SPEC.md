@@ -1812,8 +1812,9 @@ by number ("rule 14's walk").
     or `--file`, or a `git reset --soft`, gets a `guard_advise` steer carrying
     the checklist from DOCTRINE.md's *Re-verify volatile state before a git
     history rewrite* rule (verify HEAD before amend/squash; re-stage and verify
-    staged content after a soft reset; write any `commit -F` message file fresh
-    this turn). Advisory, not a block: each is a legitimate command, so the rule
+    staged content after a soft reset; carry the message in the command (`-m`,
+    or `-F -` from a heredoc), and read a file-borne message back after the
+    commit). Advisory, not a block: each is a legitimate command, so the rule
     injects the re-verification context and lets the command proceed. The
     DOCTRINE.md rule is cited by **name**, not number — the doctrine's craft
     rules renumber as it grows, and this ruleset renumbers on its own account

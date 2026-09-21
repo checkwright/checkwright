@@ -68,30 +68,6 @@
   gate files, so coverage holds by construction (removal outranks gating); a gate over all
   members would red every default consumer, whose globs miss the 106 kit-resident gates here.
 
-- **sibling-stage-sessions-collide-on-a-shared-scratch-commit-message-file** [spec: SPEC-msgfile.md]
-  — `.tmp/` survives across the sibling batch sessions one stage dispatches, so the conventional
-  `.tmp/commit-msg.txt` name is shared state between them.
-  **Measured, and it landed a wrong commit:** at `door-binding-sweep`'s build, batch 2 ran
-  `git commit -F .tmp/commit-msg.txt`, picked up batch 1's leftover file, and landed batch 1's
-  entire message on its own commit at exit 0. It was caught by reading the commit back, not by any
-  oracle. Every later batch was warned per dispatch, which is prompt-side and dies with the lead.
-  **Candidates, and the seam one of them crosses.** Naming the message file per session the way the
-  resume journal's path is derived would put that naming in delegation-kit — but that kit states the
-  journal contract and NO path convention, the path being the stage machine's derivation
-  (delegation-kit/SPEC.md §Resume journal, lifecycle-kit/SPEC.md §The state machine). So either the
-  derivation belongs beside the journal path in lifecycle-kit, or the remedy is a doctrine line
-  obliging a session to read back what it committed. Which of the two is the design question.
-  **Cost while deferred:** a wrong commit message can land at exit 0 whenever a stage dispatches
-  more than one batch, and the only thing between is a per-dispatch warning no surface holds.
-  Filed 2026-09-20 to the gap inbox by the lead at `door-binding-sweep`'s close; promoted at this
-  scope's intake. Owner lookup: `commit-msg`, `commit message file`, `journal path` — none.
-  **Joins `delegation-seams`** as its shared-scratch unit (operator direction 2026-09-21,
-  lead-relayed); **marked for spec**, which rules between the lifecycle-kit path derivation and
-  the read-back doctrine line.
-  **Spec 2026-09-21:** ruled the doctrine line, as a re-phrase of doctrine rule 18 (message in the
-  command, a file-borne one read back) plus guard rule 21's advisory text; the derivation is
-  declined, since a stage-derived name is shared by same-stage siblings, the attested case.
-
 - **harness-moved-background-task-unrecorded** [spec: SPEC-harness-moved-producer.md]
   — a command the harness moves to the background on its timeout is a live producer no liveness
   record names.
@@ -2952,5 +2928,6 @@
 ## Done
 
 - guard-rule-12-single-occurrence-pgrep-loop-passes
+- sibling-stage-sessions-collide-on-a-shared-scratch-commit-message-file
 
 ## Lessons Learned
