@@ -313,20 +313,6 @@
 
 ## Technical Debt
 
-- **armed-by-census-unrun** — gate-sdk/SPEC.md §The install disposition mints a
-  `# armed-by: <KNOB>` directive so `doctor` names a registered member that asserts nothing while
-  its knob is empty, and no census has asked which other members owe it.
-  **Re-verified at this scope, and the filing's count has moved:** three shipped descriptors now
-  declare it (`check-portability-floor`, `check-projection-roster`,
-  `check-docs-highlight-coverage`), against the one the close drain found.
-  **Deliverable:** a census of the zero-config members whose SPEC section states an
-  absent-config degradation to assert-nothing (the `check-graph` / `graph-vocab.knobs` pattern
-  is the first candidate), each either declaring `# armed-by:` or stated as always armed.
-  **Cost while deferred:** such a member ships to every adopter registered and silent.
-  Filed 2026-09-19 to the gap inbox at `adopter-floor-conditional-members`' spec; promoted
-  2026-09-21 into `gate-sdk-surface-drain` by operator direction (lead-relayed). Debt: it applies a
-  directive the spec already carries and mints no name.
-
 ## Deferred
 
 - **fence-run-fixed-env-hides-user-gem-dir** [cost: event/low] [surface: canon-kit] — site-kit's
@@ -2501,5 +2487,6 @@
 - bridged-knob-owner-for-consumer-gate
 - bin-tool-help-arm-absent-tree-wide
 - docs-cmd-knob-definition-site-withheld
+- armed-by-census-unrun
 
 ## Lessons Learned
