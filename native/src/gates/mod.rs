@@ -1127,7 +1127,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-gate-tamper",
         gate_tamper::run,
         &[],
-        &["DELEGATION_KIT_GATE_FILES", "DELEGATION_KIT_META_PATHS", "GATE_SDK_KIT_DIRS"],
+        &["DELEGATION_KIT_GATE_FILES", "DELEGATION_KIT_META_PATHS", "GATE_SDK_KIT_DIRS", "GATE_SDK_GATES_DIR"],
         "delegation-kit",
         &[("git", "")],
     ),

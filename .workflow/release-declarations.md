@@ -131,6 +131,7 @@
 
 - `check-commit-msg` — the gate is unchanged; what moved is `gate-sdk/templates/msg-patterns.list`, the pattern list `init` seeds into your gates directory, which gains an account-identification pattern: a handle-shaped backticked token within a few characters of one of four account nouns (account, login, username or handle), singular or plural, in either order; a handle-shaped token carries at least one letter or digit and is not a short all-lowercase CLI name. If you never edited your seeded copy, `init` rewrites it on upgrade and a commit message naming an account that way now reds; cite the role instead of the account.
 - `check-tree-terms` — reads the same seeded `msg-patterns.list`, so the account-identification pattern above now also scans your tracked tree: a tracked line pairing an account noun with a handle-shaped backticked token reds until it is reworded to cite the role, or the token is un-backticked where it is not an account. A verb reading of *accounts* or *handles* beside such a token reds too; reword the sentence, or edit your own copy of the list, which `init` then keeps.
+- `check-gate-tamper` — every registered gate's declaration and the gate-sdk library are gate files whatever `DELEGATION_KIT_GATE_FILES` says, so a commit staging a vendored kit's `.gate`, or `lib/gate.sh`, beside product code now reds; split it. The default's unvendored `<gates-dir>/lib/gate.sh` element is dropped. The clean line's wording changed, so re-pin a log-matching tool.
 
 ## Renamed knobs
 

@@ -11,7 +11,7 @@ DELEGATION_KIT_REFRESH_CMD[] = bash
 DELEGATION_KIT_REFRESH_CMD[] = gate-sdk/bin/run-gates.sh
 DELEGATION_KIT_REFRESH_CMD[] = --usage-poll
 
-# comment-tier-exempt: the gate-file globs match with `*` spanning '/', so */checks/*.sh reaches every kit's gates; a file value replaces the kit default whole, so the default's scripts/check-*.sh glob is restated here rather than inherited — the repo's consumer-resident gates would otherwise fall outside tamper coverage
+# comment-tier-exempt: the gate-file globs match with `*` spanning '/', so */checks/*.sh reaches every kit's gates; a file value replaces the kit default whole, so the default's scripts/check-*.sh glob is restated here rather than inherited — check-gate-tamper already unions every registered gate and the library, so these globs are what covers a gate file not yet registered
 DELEGATION_KIT_GATE_FILES[] = */checks/*.sh
 DELEGATION_KIT_GATE_FILES[] = */checks/*.gate
 DELEGATION_KIT_GATE_FILES[] = scripts/check-*.sh

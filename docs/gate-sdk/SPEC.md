@@ -4268,18 +4268,18 @@ that answers each is the one whose corpus matches its question.
 
    **A verdict can flip on which *consumer configuration* is read, which makes
    this a property of a gate against a config rather than of a gate.**
-   `check-gate-tamper` is the worked instance, and
-   delegation-kit/SPEC.md owns what it cost that member.
-   Under the kit-shipped `DELEGATION_KIT_GATE_FILES`
-   default its corpus is the consumer's own gates directory, which holds no kit
-   declaration, and criterion 4 **clears**. Under a config widening those globs
-   to every kit's check dir — this repo's — the gate's own declaration falls
-   inside them, and staging it makes the gate read its own bytes, so criterion 4
-   **binds**. Reading the kit default is the natural first stop and gives the
-   wrong answer for the tree the port actually runs against. It produces the same
-   failure as the couple-clears-walk-binds instance above, a missed hold, through
-   a third route: not a wrong field and not a wrong walk, but the right walk over
-   somebody else's configuration.
+   A gate whose corpus is a consumer-configured path set clears criterion 4 under
+   a default that holds no kit declaration and binds under a config widening that
+   set to reach its own declaration. Reading the kit default is the natural first
+   stop and gives the wrong answer for the tree the port actually runs against.
+   It produces the same failure as the couple-clears-walk-binds instance above, a
+   missed hold, through a third route: not a wrong field and not a wrong walk, but
+   the right walk over somebody else's configuration. The answer is read against
+   every configuration the gate can run under, never the default alone.
+   `check-gate-tamper` shows the class's closure: its reader unions every
+   registered member's declaration into its gate files whatever the configured
+   globs say, so its own declaration is always in the corpus and criterion 4
+   binds on every tree (delegation-kit/SPEC.md §Verify after every agent commit).
 
    **A member with *no clearing configuration* is the register's last shape, and
    §The sixth budget batch produced the first.** `check-gate-exemption-tasks`

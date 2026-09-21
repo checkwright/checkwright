@@ -100,9 +100,30 @@ d="$(new_repo staged-deletion)"
 git -C "$d" rm -q scripts/check-sample.sh
 case_run "$d" a-staged-gate-file-deletion 0 "GATE-TAMPER: clean"
 
+# G — a registered gate that no configured glob matches is still a gate file: the reader unions
+#     every registered member's declaration, so co-staging product code with it is not isolated.
+registered_outside_globs() {
+    local d
+    d="$(new_repo "$1")"
+    printf 'check-sample\n' >"$d/scripts/gates.list"
+    printf 'DELEGATION_KIT_GATE_FILES[] = other/check-*.sh\n' >"$d/scripts/delegation-config.knobs"
+    git -C "$d" add scripts/gates.list scripts/delegation-config.knobs
+    git -C "$d" commit -q -m register
+    printf '# edited\n' >>"$d/scripts/check-sample.sh"
+    git -C "$d" add scripts/check-sample.sh
+    printf '%s\n' "$d"
+}
+d="$(registered_outside_globs registered-with-product)"
+printf 'x\n' >"$d/product/x.txt"
+git -C "$d" add product/x.txt
+case_run "$d" a-registered-gate-outside-every-glob 1 "gate edit not isolated"
+
+d="$(registered_outside_globs registered-alone)"
+case_run "$d" a-registered-gate-outside-every-glob-staged-alone 0 "registered gate file(s) covered"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-gate-tamper.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-gate-tamper.test: ok (live arm: HEAD-resident exemptions excluded, a newly added one excusing a co-staged file rejected, an unmatched one silent, a gate-file deletion read as empty)"
+echo "check-gate-tamper.test: ok (live arm: HEAD-resident exemptions excluded, a newly added one excusing a co-staged file rejected, an unmatched one silent, a gate-file deletion read as empty, a registered gate outside every glob covered)"
 exit 0

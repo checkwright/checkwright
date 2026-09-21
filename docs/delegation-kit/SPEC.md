@@ -2476,11 +2476,14 @@ gate that cannot exist.
 `check-gate-tamper` is the mechanical floor under the diff-every-gate-change
 duty. Two assertions, blocking the two attested tamper shapes:
 
-- **A — gate-edit isolation.** A commit that touches a gate file (the
-  `DELEGATION_KIT_GATE_FILES` globs) may touch only meta-layer paths
-  (`DELEGATION_KIT_META_PATHS` prefixes + root `*.md`); co-staging product
-  code with a gate edit is blocked. Split the gate change into its own
-  commit.
+- **A — gate-edit isolation.** A commit that touches a gate file may touch
+  only meta-layer paths (`DELEGATION_KIT_META_PATHS` prefixes + root `*.md`);
+  co-staging product code with a gate edit is blocked. Split the gate change
+  into its own commit. A gate file is a path a `DELEGATION_KIT_GATE_FILES` glob
+  matches, **or** a registered member's resolved declaration, **or** the
+  gate-sdk library. The reader unions the last two in, each spelled against the
+  toplevel, so no consumer value can leave a registered gate or the library
+  uncovered.
 - **B — no self-serving exemption.** A newly added path/glob entry in any
   gate's `# exception-list:` array must not match a file staged in the same
   commit — an exemption never excuses the very change it lands with.
@@ -2496,15 +2499,23 @@ capability); live mode reads `git diff --cached`.
 resolves, so it is not the arrives-too-late shape gate-sdk/SPEC.md §The non-gate
 arm deletes — the invocation delegation-kit/README.md documents stays true.
 
-**Criterion 4 binds on this gate as a property of the *consumer's* configured
-globs, not of the gate.** Under the kit-shipped `DELEGATION_KIT_GATE_FILES`
-default the corpus is the consumer's own gates directory, which holds no kit
-declaration, and the criterion clears. Under a config widening the globs to
-every kit's check dir — this repo's — the gate's own declaration falls inside
-them, and staging it makes the gate read its own bytes. Reading the kit default,
-which is the natural first stop, therefore gives the wrong answer for the tree
-the port actually runs against; gate-sdk/SPEC.md §The port-candidate criteria
-carries the instance class.
+The union is built in both modes (live and `--fixture`). A registered member
+resolves through the battery's own order — the gates dir first, then each kit
+root's `checks/`, `.sh` before `.gate` inside a dir; a member resolving nowhere
+adds nothing (resolving it is another gate's job), an absent `gates.list` adds
+nothing, and one that exists but cannot be read is exit 2. The library is
+`<GATE_SDK_ROOT>/lib/gate.sh`, dropped when the root lies outside the toplevel,
+where no staged path can name it. Each element is a literal, so matching it is
+equality; the union is additive and never filters a declared glob. The clean
+line reports the union's size (`<m> registered gate file(s) covered`), and
+assertion A's finding names the declared globs "plus every registered gate and
+the gate library".
+
+**Criterion 4 binds on this gate on every tree.** The union puts every
+registered kit declaration among the gate files, `check-gate-tamper.gate`
+among them, so staging the gate's own declaration makes it read its own bytes
+whatever the consumer's globs say, and no configuration clears it;
+gate-sdk/SPEC.md §The port-candidate criteria carries the class.
 
 **Two behaviours changed with the port, and both are decisions rather than
 drift.** Assertion B's report lines came out of the shell form in no
@@ -3430,24 +3441,22 @@ derived default below names the knob it reads as `${NAME}`, or as `${NAME:-<defa
   reports its counted-inert clean line (§check-agent-tier-explicit).
 - `DELEGATION_KIT_GATE_FILES` — globs naming gate files for tamper
   assertion A; default
-  `("${GATE_SDK_GATES_DIR}/check-*.sh" "${GATE_SDK_GATES_DIR}/check-*.gate" "${GATE_SDK_GATES_DIR}/lib/gate.sh")`.
+  `("${GATE_SDK_GATES_DIR}/check-*.sh" "${GATE_SDK_GATES_DIR}/check-*.gate")`.
   **Both declaration spellings are on the default**, because a gate's
   declaration path is `<name>.sh` *or* `<name>.gate`
-  (gate-sdk/SPEC.md §The `# graph:` manifest)
-  and a consumer on the default would otherwise receive a
-  ported gate whose edits escape the isolation rule entirely — the widening the
+  (gate-sdk/SPEC.md §The `# graph:` manifest) — the widening the
   `check-gate-tamper` row of
   gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate
-  mandates, come due at the first live descriptor.
-  A consumer declaration **replaces** this default outright rather
-  than extending it — a file value replaces the default whole, so the
-  default is the no-declaration fallback, not a base to append to. A consumer
-  adding kit-shipped globs must therefore restate any default glob it still
-  wants covered (this repo's config names `*/checks/*.sh` and `*/checks/*.gate`
-  **and** their `scripts/check-*` counterparts, because it has gates in both
-  places). Contrast
-  `DELEGATION_KIT_META_PATHS` below, whose kit-root union *is* additive — the
-  two knobs do not behave alike.
+  mandates. The knob names the gate files
+  **beyond** what the reader derives: `check-gate-tamper` unions every
+  registered member's resolved declaration and the gate-sdk library into the
+  resolved value (§Verify after every agent commit), for the reason it unions
+  kit roots into `DELEGATION_KIT_META_PATHS`: a file value replaces the default
+  whole, and a registered gate must stay covered under a consumer's own value.
+  A glob still covers a gate file not yet registered, such as a declaration
+  staged in the same commit that adds it to `gates.list`. The two knobs behave
+  alike: both are replaced whole by a file value, and both are widened by the
+  reader.
 - `DELEGATION_KIT_META_PATHS` — prefixes counted as meta-layer for
   assertion A; default `("${GATE_SDK_GATES_DIR}/"
   "${GATE_SDK_WORKFLOW_DIR:-.workflow}/" ".claude/")`; root-level `*.md` is

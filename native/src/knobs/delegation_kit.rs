@@ -26,7 +26,6 @@ fn gate_files(resolve: Resolve) -> Result<Value, String> {
     Ok(Value::Indexed(vec![
         format!("{}/check-*.sh", g),
         format!("{}/check-*.gate", g),
-        format!("{}/lib/gate.sh", g),
     ]))
 }
 

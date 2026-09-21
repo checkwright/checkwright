@@ -1,7 +1,7 @@
 // spec: delegation-kit/SPEC.md §Verify after every agent commit — a gate-weakening commit is
 // blocked by shape (A gate edits stay meta-isolated; B a new path-exemption can't excuse a
 // co-staged file)
-use crate::{proc, programs};
+use crate::{proc, programs, registry};
 use crate::walk;
 use std::path::Path;
 
@@ -189,15 +189,64 @@ pub fn run(args: &[String]) -> i32 {
     }
 }
 
+// spec: delegation-kit/SPEC.md §Verify after every agent commit — the gate files the reader derives:
+// every registered member's resolved declaration and the gate-sdk library, each spelled against
+// the toplevel and dropped where it lies outside it
+fn derived_gate_files(
+    top: &str,
+    gates_dir: &str,
+    kit_roots: &[String],
+    sdk_root: &str,
+) -> Result<Vec<String>, String> {
+    let mut out: Vec<String> = Vec::new();
+    let mut add = |abs: &str| {
+        if let Some(rel) = walk::rel_under(top, abs) {
+            if !rel.is_empty() && !out.iter().any(|o| o == rel) {
+                out.push(rel.to_string());
+            }
+        }
+    };
+    let list = registry::list_path(gates_dir);
+    if Path::new(&list).exists() {
+        let text = std::fs::read(&list)
+            .map(|b| String::from_utf8_lossy(&b).into_owned())
+            .map_err(|e| format!("cannot read {}: {}", list, e))?;
+        let dirs = registry::resolve_dirs(gates_dir, kit_roots);
+        for m in registry::members(&text) {
+            if let Some(p) = registry::resolve(m.trim(), &dirs) {
+                add(&p);
+            }
+        }
+    }
+    add(&format!("{}/lib/gate.sh", sdk_root.trim_end_matches('/')));
+    Ok(out)
+}
+
 fn rule(args: &[String]) -> Result<i32, String> {
-    let globs = walk::knob_array("DELEGATION_KIT_GATE_FILES")?;
+    let top = walk::toplevel()?;
+    let here = walk::cwd()?;
+    let kit_roots = walk::kit_roots_under(&top)?;
+    let mut globs = walk::knob_array("DELEGATION_KIT_GATE_FILES")?;
+    let kit_roots_abs: Vec<String> = kit_roots.iter().map(|r| walk::abs_against(&top, r)).collect();
+    let derived = derived_gate_files(
+        &top,
+        &walk::abs_against(&here, &walk::knob_scalar("GATE_SDK_GATES_DIR")?),
+        &kit_roots_abs,
+        &walk::abs_against(&here, &walk::sdk_root()),
+    )?;
+    let declared = globs.join(" ");
+    for d in &derived {
+        if !globs.contains(d) {
+            globs.push(d.clone());
+        }
+    }
     let mut meta = walk::knob_array("DELEGATION_KIT_META_PATHS")?;
     // spec: delegation-kit/SPEC.md §Layout and configuration — a vendored kit's edits are meta-layer by
     // definition: every kit root joins as a `<root>/` prefix the resolved value does not already hold
     // spec: gate-sdk/SPEC.md §Layout and configuration — the prefix is matched against the names
     // `git diff --cached` prints, which are spelled against the toplevel whatever the cwd is, so
     // the root is spelled against it too
-    for root in walk::kit_roots_under(&walk::toplevel()?)? {
+    for root in kit_roots {
         let dir = root.trim_end_matches('/').to_string();
         if !dir.is_empty() && !meta.contains(&dir) {
             meta.push(dir);
@@ -245,7 +294,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     if !viol_a.is_empty() || !viol_b.is_empty() {
         if !viol_a.is_empty() {
-            println!("check-gate-tamper: gate edit not isolated — a commit touching a gate file ({}) may touch only meta-layer paths; these co-staged paths are not:", globs.join(" "));
+            println!("check-gate-tamper: gate edit not isolated — a commit touching a gate file ({} plus every registered gate and the gate library) may touch only meta-layer paths; these co-staged paths are not:", declared);
             for v in &viol_a {
                 println!("  {}", v);
             }
@@ -261,7 +310,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Ok(1);
     }
 
-    println!("GATE-TAMPER: clean ({} staged path(s); gate edits meta-isolated, no self-serving path-exemption)", staged.len());
+    println!("GATE-TAMPER: clean ({} staged path(s); {} registered gate file(s) covered; gate edits meta-isolated, no self-serving path-exemption)", staged.len(), derived.len());
     Ok(0)
 }
 
@@ -289,6 +338,48 @@ BAR=(
     #[test]
     fn a_single_line_array_yields_nothing() {
         assert!(extract_exemptions("# exception-list:\nFOO=(a b c)\nd\n").is_empty());
+    }
+
+    #[test]
+    fn the_derived_gate_files_union_the_registry_and_an_in_tree_library() {
+        let scratch = std::env::temp_dir().join(format!("gate-tamper-union-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&scratch);
+        let top = walk::normalize_abs(&scratch.join("repo").display().to_string());
+        let outside = walk::normalize_abs(&scratch.join("beside").display().to_string());
+        let gates = format!("{}/scripts", top);
+        let kit = format!("{}/vendor/extra", top);
+        let sdk = format!("{}/vendor/gate-sdk", top);
+        for d in [&gates, &format!("{}/checks", kit), &format!("{}/lib", sdk), &format!("{}/lib", outside)] {
+            std::fs::create_dir_all(d).unwrap();
+        }
+        std::fs::write(format!("{}/check-local.sh", gates), "").unwrap();
+        std::fs::write(format!("{}/checks/check-kit.gate", kit), "").unwrap();
+        std::fs::write(format!("{}/checks/check-local.gate", kit), "").unwrap();
+
+        assert_eq!(
+            derived_gate_files(&top, &gates, std::slice::from_ref(&kit), &sdk).unwrap(),
+            vec!["vendor/gate-sdk/lib/gate.sh"]
+        );
+
+        std::fs::write(
+            format!("{}/gates.list", gates),
+            "# comment\ncheck-local\ncheck-kit\ncheck-nowhere\n",
+        )
+        .unwrap();
+        assert_eq!(
+            derived_gate_files(&top, &gates, std::slice::from_ref(&kit), &sdk).unwrap(),
+            vec![
+                "scripts/check-local.sh",
+                "vendor/extra/checks/check-kit.gate",
+                "vendor/gate-sdk/lib/gate.sh"
+            ]
+        );
+
+        assert_eq!(
+            derived_gate_files(&top, &gates, std::slice::from_ref(&kit), &outside).unwrap(),
+            vec!["scripts/check-local.sh", "vendor/extra/checks/check-kit.gate"]
+        );
+        let _ = std::fs::remove_dir_all(&scratch);
     }
 
     #[test]
