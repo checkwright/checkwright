@@ -1,4 +1,4 @@
-// spec: docs/install.md §The upgrade contract — every release note's Tightened-gates section
+// spec: installer/SPEC.md §The upgrade contract — every release note's Tightened-gates section
 // resolves to an explicit `None` or to a non-empty set of backticked bare gate names; a
 // non-`none` section yielding no tokens is the silently-empty declaration the smoke cannot see
 use crate::declaration;
@@ -84,7 +84,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         for e in &errors {
             println!("  {}", e);
         }
-        println!("  help: a Tightened-gates bullet's lead token is a backticked, unbolded bare gate name directly after the bullet marker (- `check-foo` — …); strip any bold emphasis and add the backticks. A release that tightened nothing states a bare \"None.\" body instead. docs/install.md §The upgrade contract owns the grammar; a mechanical consumer reads these tokens as the release's allowed-red set, so a section that parses to nothing disarms it silently.");
+        println!("  help: a Tightened-gates bullet's lead token is a backticked, unbolded bare gate name directly after the bullet marker (- `check-foo` — …); strip any bold emphasis and add the backticks. A release that tightened nothing states a bare \"None.\" body instead. installer/SPEC.md §The upgrade contract owns the grammar; a mechanical consumer reads these tokens as the release's allowed-red set, so a section that parses to nothing disarms it silently.");
         return Ok(1);
     }
     println!(

@@ -7,7 +7,7 @@ nav_children_key: release
 # Release notes
 
 Every tagged release carries one dated note — the phase-B checklist the
-[upgrade contract](install.md) names, its bump chosen by that page's
+[upgrade contract](installer/SPEC.md#the-upgrade-contract) names, its bump chosen by that file's
 §Versioning criteria. The list below derives at render time from the notes
 themselves: a note joins by carrying the `release:` front-matter key it
 already carries for the upgrade tooling, so there is no second copy to

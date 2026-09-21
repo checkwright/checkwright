@@ -1,4 +1,4 @@
-// spec: docs/install.md §The upgrade contract — while a release note is under composition each of
+// spec: installer/SPEC.md §The upgrade contract — while a release note is under composition each of
 // its three declaration-bearing sections' token sets equals the release declaration surface it was
 // composed from, both directions
 use crate::declaration;
@@ -28,7 +28,7 @@ pub fn run(args: &[String]) -> i32 {
     }
 }
 
-// spec: docs/install.md §The upgrade contract — the per-section cost of each direction, which the
+// spec: installer/SPEC.md §The upgrade contract — the per-section cost of each direction, which the
 // Tightened-gates pair states for the allowed-red set and the prose sections state for a reconstruction
 fn grounds(section: &str) -> (&'static str, &'static str) {
     if section == SECTIONS[0].0 {
@@ -105,7 +105,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     for (section, token_rule) in SECTIONS {
         let note_tokens = match declaration::section_tokens(&note_text, section, token_rule) {
             SectionVerdict::Absent => {
-                return Err(format!("note {} has no '{}' section, so there is nothing to hold against the surface (docs/install.md §The upgrade contract owns the note grammar)", note_f, section))
+                return Err(format!("note {} has no '{}' section, so there is nothing to hold against the surface (installer/SPEC.md §The upgrade contract owns the note grammar)", note_f, section))
             }
             SectionVerdict::Unparsed(b) => {
                 eprintln!("{}: note {}'s '{}' section does not parse, so it would compare as a silently wrong set:", NAME, note_f, section);

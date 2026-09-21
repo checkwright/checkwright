@@ -60,7 +60,7 @@ broad claim that would not survive contact:
   This is *tested*, not asserted: a shipped smoke stands up an `AGENTS.md`
   consumer, sets the agent-file knobs, and runs the full battery green
   (context-kit's `--agents-md-smoke` arm); the adapter recipe with its honest limits
-  is in [the install guide](install.md). What stays genuinely Claude-Code-native
+  is [below](#running-under-an-agentsmd-harness). What stays genuinely Claude-Code-native
   is the residue with no cross-harness target: the stage-skill auto-load bindings
   (the `.claude/` shims that point a `/build` at its template — one binding, not
   the mechanism, which is plain markdown run by path) and the settings pins, the
@@ -72,6 +72,49 @@ the always-loaded convention rides whichever agent file your harness already
 reads (by configuration); only the harness-native bindings and settings residue
 are adapter work, and the page names exactly that residue rather than a broad
 claim that would not survive contact.
+
+## Running under an AGENTS.md harness
+
+Checkwright defaults to `CLAUDE.md` as the always-loaded agent file, but no kit
+mechanism resolves that file by literal — each reads its kit's knob. A consumer
+whose harness reads `AGENTS.md` (or any other always-loaded agent file) runs
+every kit mechanism by pointing those knobs at that file. This path is not just
+asserted: context-kit's `--agents-md-smoke` arm stands up an `AGENTS.md`
+consumer, sets the knobs below, and runs the full battery green.
+
+Set the agent-file knobs in your kit config seams, each to your agent file:
+
+- `GATE_SDK_AGENT_FILE` — the root-tiering allowlist's agent-file entry
+  (gate-sdk).
+- `LIFECYCLE_KIT_AGENT_FILE` — the lifecycle registration + shim-restatement
+  corpus (lifecycle-kit).
+- `DOCTRINE_KIT_AGENT_FILE` — the always-loaded doctrine block's host
+  (doctrine-kit).
+- `CONTEXT_KIT_SURFACES` and `CONTEXT_KIT_BREVITY_FILE` — the measured
+  always-loaded surface and the brevity target (context-kit).
+- `CANON_KIT_MANIFEST_FILES` — the prose manifest that must govern the agent
+  file (canon-kit).
+
+The kit-injected always-loaded blocks (each kit's `<!-- kit:begin -->` /
+`<!-- kit:end -->` markers) land in whichever file `CONTEXT_KIT_SURFACES` names,
+so they inject into your agent file, not `CLAUDE.md`. The stage skills need no
+Claude shim grammar: the skill templates are plain markdown executed by path
+(`lifecycle-kit/templates/stages/*.md`), and the `.claude/` shims are one binding
+of that mechanism, not the mechanism itself — an `AGENTS.md` harness runs a stage
+by invoking its template directly.
+
+Two honest limits:
+
+- **Settings stay Claude-Code-native.** The settings pins, the session-context
+  hook wiring, and memory-off enforcement remain Claude Code's — no standard
+  cross-harness settings surface exists to port them to. This is the residue
+  the claim above names as harness-native.
+- **Generated trigger lists carry default literals.** The generated pre-commit
+  hook's per-gate trigger lists come from the gates' `# graph:` manifests, which
+  carry the default `CLAUDE.md` literal. A nondefault agent file means adjusting
+  the affected `# graph:` trigger lines and regenerating the hook, or relying on
+  full-battery runs (the gate binary's `--run`), which read the knobs and
+  are agent-file-agnostic.
 
 ## The memory-off position
 

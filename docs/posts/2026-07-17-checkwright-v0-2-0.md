@@ -9,7 +9,7 @@ release: v0.2.0
 The first upgrade. Checkwright is the verification layer under agent
 orchestration, and `v0.1.0` was a baseline nobody had to move off yet — this
 release is the first one that owes you a migration story. Everything below is
-that story, in the shape the [upgrade contract](../install.md) fixes.
+that story, in the shape the [upgrade contract](../installer/SPEC.md#the-upgrade-contract) fixes.
 
 This release also ships the contract's own proof. The upgrade smoke
 (`gate-sdk/bin/upgrade-smoke.sh`) drives both phases against a scratch consumer
@@ -99,7 +99,7 @@ announces itself as a red on a clean tree, so reconcile them by reading.
 
 ## Upgrading
 
-Run the two phases the [install guide](../install.md) §The upgrade contract
+Run the two phases the [installer record](../installer/SPEC.md) §The upgrade contract
 owns: sync the vendored kit directories wholesale at `v0.2.0`, regenerate the
 pre-commit hook and the graph projection, then run the full battery and
 disposition the red set against the tightened-gates bullets above. The

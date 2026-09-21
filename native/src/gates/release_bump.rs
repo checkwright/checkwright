@@ -1,4 +1,4 @@
-// spec: docs/install.md §Versioning — the derivable bump floor: a release note declaring
+// spec: installer/SPEC.md §Versioning — the derivable bump floor: a release note declaring
 // tightened gates or renamed knobs, or inheriting an outstanding deferred release's floor, may
 // not ride a patch-only bump over its predecessor
 use crate::declaration;
@@ -35,7 +35,7 @@ fn parse_version(token: &str, source: &str) -> Result<Version, String> {
         }
     }
     Err(format!(
-        "version token '{}' from {} is outside the grammar this gate orders ({}) — the ordering could not be derived; treating as failure (not clean).\n  help: a prerelease or build-metadata suffix has no ruled order here (docs/install.md §Versioning names where that ruling is owed); re-key the token to the triple, or land the ordering ruling first.",
+        "version token '{}' from {} is outside the grammar this gate orders ({}) — the ordering could not be derived; treating as failure (not clean).\n  help: a prerelease or build-metadata suffix has no ruled order here (installer/SPEC.md §Versioning names where that ruling is owed); re-key the token to the triple, or land the ordering ruling first.",
         token, source, GRAMMAR
     ))
 }
@@ -68,7 +68,7 @@ pub fn front_matter_release(text: &str) -> Option<String> {
     None
 }
 
-// spec: docs/install.md §Versioning — history ∪ live, the reader every truncated evidence file
+// spec: installer/SPEC.md §Versioning — history ∪ live, the reader every truncated evidence file
 // needs. The `git log` arm silences its own failure and yields no historical disposition, which
 // the shell holder does too; the branch is unreachable in a tree that has a repository.
 fn collect_dispositions(file: &str) -> Vec<String> {
@@ -207,7 +207,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let newest = &rows[rows.len() - 1];
     let prev = &rows[rows.len() - 2];
 
-    // spec: docs/install.md §The upgrade contract — the In brief presence assertion binds a note
+    // spec: installer/SPEC.md §The upgrade contract — the In brief presence assertion binds a note
     // under composition; a note published before the section existed is history and is not
     // retro-fitted
     let tag = format!("refs/tags/v{}", newest.raw);
@@ -215,19 +215,19 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let text = read_text(&newest.file)?;
     let in_brief_state = if under_composition {
         if declaration::section_bullets(&text, "In brief").is_none() {
-            return Err(format!("newest note {} is under composition (v{} carries no tag) and has no 'In brief' section — the 30-second human read is a fixed section, not optional (docs/install.md §The upgrade contract owns the note grammar)", newest.file, newest.raw));
+            return Err(format!("newest note {} is under composition (v{} carries no tag) and has no 'In brief' section — the 30-second human read is a fixed section, not optional (installer/SPEC.md §The upgrade contract owns the note grammar)", newest.file, newest.raw));
         }
         "asserted"
     } else {
         "dormant"
     };
 
-    // spec: docs/install.md §The upgrade contract — every fixed section must be present, and the
+    // spec: installer/SPEC.md §The upgrade contract — every fixed section must be present, and the
     // declaration-bearing ones derive the floor, where non-empty = at least one bullet
     let count = |section: &str| -> Result<usize, String> {
         declaration::section_bullets(&text, section)
             .map(|b| b.len())
-            .ok_or_else(|| format!("newest note {} has no '{}' section — the floor cannot be derived (docs/install.md §The upgrade contract owns the note grammar)", newest.file, section))
+            .ok_or_else(|| format!("newest note {} has no '{}' section — the floor cannot be derived (installer/SPEC.md §The upgrade contract owns the note grammar)", newest.file, section))
     };
     let tg = count("Tightened gates")?;
     let rk = count("Renamed knobs")?;
@@ -235,7 +235,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     let patch_only = newest.version.0 == prev.version.0 && newest.version.1 == prev.version.1;
     if patch_only && (tg > 0 || rk > 0 || bc > 0 || floor.is_some()) {
-        println!("check-release-bump: v{} is a patch-only bump over v{}, but its note carries phase-B work (docs/install.md §Versioning — the floor is minor):", newest.raw, prev.raw);
+        println!("check-release-bump: v{} is a patch-only bump over v{}, but its note carries phase-B work (installer/SPEC.md §Versioning — the floor is minor):", newest.raw, prev.raw);
         if tg > 0 {
             println!("  {}: {} tightened-gate bullet(s)", newest.file, tg);
         }
@@ -252,13 +252,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Ok(1);
     }
 
-    // spec: docs/install.md §Versioning — the floor's second input binds the next qualifying note
+    // spec: installer/SPEC.md §Versioning — the floor's second input binds the next qualifying note
     // numerically, gated on under_composition (the In brief assertion's own "not retro-fitted
     // against history" rule).
     if under_composition {
         if let Some(f) = floor {
             if f.0 > newest.version {
-                println!("check-release-bump: v{} falls below an outstanding deferred release (v{}) recorded in {} — docs/install.md §Versioning: a later note may not fall below that version:", newest.raw, f.1, disposition);
+                println!("check-release-bump: v{} falls below an outstanding deferred release (v{}) recorded in {} — installer/SPEC.md §Versioning: a later note may not fall below that version:", newest.raw, f.1, disposition);
                 println!("  help: bump to v{} or above, or discharge the deferral with a disposition line releasing at or above it.", f.1);
                 return Ok(1);
             }

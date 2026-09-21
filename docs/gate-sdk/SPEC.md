@@ -7761,7 +7761,7 @@ change smuggled through a substrate change. Refusing is the only disposition tha
 neither invents a rule nor ships a known-wrong one — §The POSIX ERE matcher's
 refusal shape applied to an ordering rather than to a parse. It forecloses
 nothing: the prerelease path stays exactly as open as the `--pack-installer` arm
-already leaves it, and docs/install.md §Versioning now names where the ordering
+already leaves it, and installer/SPEC.md §Versioning now names where the ordering
 ruling is owed. Measured against this tree, all 23 live `release:` keys are bare
 `vX.Y.Z` and the disposition file carries no data line, so the refusal is a guard
 for the future rather than a change to this repo today. The `sort -u` inside the
@@ -7886,7 +7886,7 @@ cohort's members, which do not run as scripts. `check-docs-cmd` reddened on
 named, and the roster rewrite this cohort already
 owed is what cleared it; that was real signal, exactly as the disposition table
 predicts for it. That roster names no shell path at all since the cut under that section. `check-measured-claim` reds because its oracle counts registry
-members resolving to a `.gate`, so the marked literal in docs/install.md moves
+members resolving to a `.gate`, so a marked literal counting them moves
 with the port — and the generated pre-commit hook bakes the same value, which is
 why the hook regen is owed with the doc edit rather than after it.
 
@@ -10136,7 +10136,7 @@ through a `--remove`/reinstall round trip beside it. lifecycle-kit's own
 The release declaration grammar — **one container arm over a token rule per
 declaration-bearing section**, held once, in `native/src/declaration.rs`. **This section's name is a
 path the tree does not carry, and that is deliberate**: the citations
-throughout this SPEC and in `docs/install.md` resolve against
+throughout this SPEC and in `installer/SPEC.md` resolve against
 `§lib/declaration.sh`, and renaming the heading strands every one of them. What
 the section owns is the grammar and its compiled holder. A release note and the
 release declaration surface (§upgrade-smoke) are both markdown in one grammar, so
@@ -11380,7 +11380,7 @@ derives, and asserts the baseline is green (a red FROM baseline is a broken tag 
 then replaces the vendored kit directories wholesale at a **TO** ref, retires the
 shell configs TO's kits replaced with knob files, and regenerates the generated
 artifacts — the contract's consumer phase-A steps
-(docs/install.md §The upgrade contract). It asserts **determinism** (the scratch
+(installer/SPEC.md §The upgrade contract). It asserts **determinism** (the scratch
 consumer's `git status` shows changes only under the kit roots) and then, over the
 phase-B battery, that the **red set is a subset of TO's Tightened-gates
 declaration**. A new N+1 gate
@@ -11445,7 +11445,7 @@ or `<stem>-config.local.sh` left beside it (§The knob file). The regen reads kn
 values, since the hook emitter expands every `couples=knob:` token, so it cannot
 run while such a file stands: seeding without this step made phase A refuse at
 exit 2, which no declaration contains. So the contract's phase A is three steps
-(docs/install.md §The upgrade contract): sync, retire each such shell config, and
+(installer/SPEC.md §The upgrade contract): sync, retire each such shell config, and
 regenerate. The arm performs the middle step by deleting each file, with the set
 derived through `recipe::config_seam_plan` over TO's kit roots. Deleting is one of
 the declared remedies, and the scratch consumer holds nothing an adopter set. The
@@ -11628,7 +11628,7 @@ against the recorded digest is not rewritten (installer/SPEC.md §The manifest).
 token predicate.** A **tagged TO** resolves its version from the `v*` tag
 pointing at it and its declaration from the `docs/posts/` note whose front-matter
 `release:` names that version — the Tightened-gates section's bullet lead tokens,
-whose grammar docs/install.md owns. An **untagged TO** — the `HEAD` default, and
+whose grammar installer/SPEC.md §The upgrade contract owns. An **untagged TO** — the `HEAD` default, and
 so every run of the standing pre-release assertion — reads the
 Tightened-gates section of `<workflow-dir>/release-declarations.md` out of TO's
 tree instead. It is *this* arm
@@ -11645,7 +11645,7 @@ file would add a way to configure the assertion away without adding a way to
 satisfy it honestly. Its first line is the `# contract:` header. Below that, it
 carries up to three `## ` sections named exactly as the note's
 declaration-bearing sections (**Tightened gates**, **Renamed knobs**, **Behavior
-changes**). Each holds bullets in the grammar docs/install.md §The upgrade
+changes**). Each holds bullets in the grammar installer/SPEC.md §The upgrade
 contract gives that section in a note. A section that is absent, or present with
 no bullet, is the empty set. The surface has no `None` body, so a drained surface
 is its header line alone and "absent" is never a state a reader must interpret.
@@ -11697,7 +11697,7 @@ template path. `init` rewrites the unmodified seeded copy on upgrade, so it reds
 it keeps an edited copy, which then diverges. Those are two populations, so the
 change takes two sections every time rather than a per-event judgment of which
 one it reaches. A template no `init` claims reaches an adopter only as a copy
-they took out, and its change takes Behavior changes alone (docs/install.md §The
+they took out, and its change takes Behavior changes alone (installer/SPEC.md §The
 upgrade contract).
 
 It **accumulates**, and that shape is chosen rather than inherited. Each of the
@@ -11858,7 +11858,7 @@ tool removed and every claimed template changed since the last tag
 gate, and the smoke reads it in Tightened gates only; its prose is read by the
 composing close. The upgrade skill reads the *note* as the consumer's registration
 checklist, and is unaffected: the note is unchanged as an artifact, and only its
-sections' source moved. The grammar's owner is docs/install.md §The upgrade
+sections' source moved. The grammar's owner is installer/SPEC.md §The upgrade
 contract; its implementation is §lib/declaration.sh, and this repo holds the
 published corpus's Tightened-gates sections to it with
 `check-tightened-gates-grammar`.
@@ -11916,7 +11916,7 @@ rename reading and every refusal are pinned against real tags and a real index i
 
 **Why classes R and T and nothing wider.** Each is decidable from a path and the
 diff, and each has a measured instance. A wider class would sweep in every
-stage-template edit: docs/install.md's folding makes each of those a Behavior
+stage-template edit: installer/SPEC.md §The upgrade contract's folding makes each of those a Behavior
 change in principle, but no release has declared them, so a gate over them would
 red on a rule nobody applies. Widening it is a scope question, not a calibration.
 

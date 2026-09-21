@@ -31,7 +31,7 @@ upgrading to it is the remedy. Releases otherwise defer by default, but a
 security or supply-chain fix is a release trigger and does not wait out the
 ordinary cadence — the trigger set is `.claude/commands/close.md`'s release
 policy. The two-phase upgrade contract
-([docs/install.md](docs/install.md)) is what makes that a mechanical move rather
+([installer/SPEC.md](installer/SPEC.md) §The upgrade contract) is what makes that a mechanical move rather
 than a migration.
 
 ## Threat boundary

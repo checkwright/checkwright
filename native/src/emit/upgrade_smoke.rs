@@ -208,7 +208,7 @@ fn smoke() -> Result<String, Fail> {
             r.push(format!("  {}", g));
         }
         r.push(format!(
-            "  each red must be named in {} — a bullet in the Tightened gates section of the note or of the release declaration surface — or the tree fixed (docs/install.md §The upgrade contract).",
+            "  each red must be named in {} — a bullet in the Tightened gates section of the note or of the release declaration surface — or the tree fixed (installer/SPEC.md §The upgrade contract).",
             decl_src
         ));
         return Err(finding(r));
@@ -657,7 +657,7 @@ fn determinism(consumer: &str, seen: &[String]) -> Result<(), Fail> {
         r.push(format!("  {}", p));
     }
     r.push(
-        "  the wholesale kit-sync must lose nothing a consumer owns (docs/install.md §The upgrade contract).".to_string(),
+        "  the wholesale kit-sync must lose nothing a consumer owns (installer/SPEC.md §The upgrade contract).".to_string(),
     );
     Err(finding(r))
 }
@@ -773,7 +773,7 @@ fn declared_set(repo: &str, to: &str, to_tree: &str) -> Result<(String, Vec<Stri
                             "{}: FAIL — TO ({}) resolves note {}, which carries no '{}' section:",
                             NAME, ver, note, SECTION
                         ),
-                        "  every release note carries the fixed sections its note grammar rosters (docs/install.md §The upgrade contract).".to_string(),
+                        "  every release note carries the fixed sections its note grammar rosters (installer/SPEC.md §The upgrade contract).".to_string(),
                     ]))
                 }
                 SectionVerdict::Unparsed(bad) => {
@@ -813,7 +813,7 @@ fn unparsed(named: &str, src: &str, bad: &[String]) -> Fail {
         r.push(format!("  {}", bad.join("\n")));
     }
     r.push(
-        "  a declaration is either an explicit 'None' or a non-empty set of bare gate names; in a note each is the backticked, unbolded lead token of a bullet (docs/install.md §The upgrade contract).".to_string(),
+        "  a declaration is either an explicit 'None' or a non-empty set of bare gate names; in a note each is the backticked, unbolded lead token of a bullet (installer/SPEC.md §The upgrade contract).".to_string(),
     );
     finding(r)
 }
@@ -900,7 +900,7 @@ fn no_declaration(repo: &str, to: &str, red: &[String]) -> Result<Fail, Fail> {
     }
     if !ver.is_empty() {
         r.push(format!(
-            "  no docs/posts note carries 'release: {}'; a red gate needs a note bullet (docs/install.md §The upgrade contract).",
+            "  no docs/posts note carries 'release: {}'; a red gate needs a note bullet (installer/SPEC.md §The upgrade contract).",
             ver
         ));
     } else {

@@ -201,8 +201,9 @@ recoverable:
   - the owning kit's `smoke/install.sh` expected-gate roster, hand-maintained, so
     a new gate is added there or carries a `smoke-unregistered:` declaration
     (`gate-sdk/SPEC.md` §Consumer smoke owns which);
-  - `docs/install.md`'s `ported-gate-members` measured claim, for a gate born
-    native, which every new gate now is;
+  - `.workflow/surface-ceiling.txt`, since `check-surface-ratchet` governs the
+    `docs/` pages and `docs/enforcement.md` grows by the new row
+    (`bash gate-sdk/bin/run-gates.sh --emit always-loaded --ceiling`);
   - for a hook-tier gate, the generated hooks
     (`bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`).
 

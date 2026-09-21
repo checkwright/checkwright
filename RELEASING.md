@@ -5,8 +5,8 @@ step** invoked at *every* iteration close (lifecycle-kit/templates/stages/close.
 this repo binds it in `.claude/commands/close.md`), not a separately
 operator-invoked ritual. Checkwright carries one semver line applied as git tags,
 the kits moving in lockstep — the versioning model is
-[docs/install.md](docs/install.md) §Versioning, and the two-phase contract a
-release serves is that page's §The upgrade contract. The release-note post is the
+[installer/SPEC.md](installer/SPEC.md) §Versioning, and the two-phase contract a
+release serves is that file's §The upgrade contract. The release-note post is the
 note's single home and the GitHub Release points at it.
 
 Like [CONTRIBUTING.md](CONTRIBUTING.md), this runbook is governed repo-meta:
@@ -26,7 +26,7 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
    entry carrying a `release: vX.Y.Z` front-matter key and every fixed section
    the upgrade contract's roster names; the skeleton below walks them in order.
    The parseable grammar (front-matter key, section names, bullet lead tokens) is
-   owned by [docs/install.md](docs/install.md) §The upgrade contract; "none" is a
+   owned by [installer/SPEC.md](installer/SPEC.md) §The upgrade contract; "none" is a
    valid section body and is stated, never omitted. The note joins the nav by its
    `release:` key with no further step — the [Releases page](docs/releases.md)
    names that key in `nav_children_key`, so the note renders as a derived nav
@@ -42,10 +42,10 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
      orchestration, and this release {one- or two-sentence summary}."*
    - **In brief (fixed, no `None` form)** — placed immediately after the
      Opener, ahead of the three variable sections below. Grammar owned by
-     [docs/install.md](docs/install.md) §The upgrade contract; cite it, never
+     [installer/SPEC.md](installer/SPEC.md) §The upgrade contract; cite it, never
      restate it.
    - **The three variable sections** — Tightened gates, Renamed knobs, and
-     Behavior changes, authored to [docs/install.md](docs/install.md) §The
+     Behavior changes, authored to [installer/SPEC.md](installer/SPEC.md) §The
      upgrade contract's grammar (a knob *removal* is expressed `old → ∅` under
      Renamed knobs); that pointer owns their grammar, this skeleton does not
      restate it. **All three are composed, not recalled** — their bullets come
@@ -70,7 +70,7 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
    - **Upgrading — allowed-red slot (two-way)** — state either "**No allowed
      reds.**" when Tightened gates is empty, or "**The allowed red[s].**" naming
      each red and the regen or step that clears it. The set itself — the
-     Tightened-gates lead tokens — is owned by [docs/install.md](docs/install.md)
+     Tightened-gates lead tokens — is owned by [installer/SPEC.md](installer/SPEC.md)
      §The upgrade contract's allowed-red-set grammar; cite it, never restate it.
    - **Closing tail (fixed, verbatim)** — "The behavior changes above are
      declared for reading, not a mechanical scan. If a gate reds that this note
@@ -79,7 +79,7 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
      that is a defect in the release rather than work for you."
 
 2. **Derive the bump off the note.** Choose the bump by
-   [docs/install.md](docs/install.md) §Versioning's criteria (the derivable floor
+   [installer/SPEC.md](installer/SPEC.md) §Versioning's criteria (the derivable floor
    is gated by `check-release-bump`), read off the note's three variable
    sections — `## In brief` feeds no bump criterion, so do not look for one
    there. An
@@ -231,7 +231,7 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
    `npm` job starts. Nothing is published by hand, and
    **there is no version to edit** — the pack arm stamps the version from the
    tag being packed and the job refuses a tarball whose stamp disagrees with it
-   (docs/install.md §Versioning owns the one-semver-line rule this derives from).
+   (installer/SPEC.md §Versioning owns the one-semver-line rule this derives from).
    Watch **both** jobs to green (`gh run watch`) before continuing; a red publish
    is fixed and the tag re-pushed, never worked around by publishing locally. The
    job's credential and approval are repository configuration rather than tree
@@ -259,7 +259,7 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
    **The repo shows no Latest badge, and that is the declared outcome — do not
    "fix" it.** While the version line is `0.x` the channel is `preview`, so
    every published Release carries the prerelease flag and none is Latest
-   (invariant C, docs/install.md §The release channel, which owns the rule).
+   (invariant C, installer/SPEC.md §The release channel, which owns the rule).
    Flipping the newest Release to non-prerelease from the web UI would look like
    a one-click improvement and would silently revert that decision — no gate
    sees the host, and nothing would attribute the change. It is also not all-or-

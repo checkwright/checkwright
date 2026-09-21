@@ -956,8 +956,12 @@ the gate's grammar.
   `--update-baseline` at close where the file exists.
 - **Why a ratchet:** no budget to calibrate; growth shows in the commit that
   causes it. A re-stamp makes it deliberate, not justified; close judges.
-- **Why these files, per file:** a trigger loads each whole. A SPEC is read by
-  section; close's growth walk reads it.
+- **Why these files, per file:** the kit's case is a trigger-loaded instruction
+  surface, which a trigger loads whole; a SPEC is read by section, and close's
+  growth walk reads it. A consumer may govern any authored surface whose growth
+  it wants shown in the growing commit — a public page whose reader tier must not
+  regrow is the second case. A generated copy is left out: its size is its
+  source's.
 - **Why its own file:** `--update-baseline` rewrites the baseline as one row, whose
   surface count is the meter's staleness witness.
 - **Why `on-surface`:** `init` writes no ceiling file; `--ceiling` arms the gate.

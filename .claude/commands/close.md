@@ -74,7 +74,7 @@ queue-kit/SPEC.md §The tag algebra.
     published-evidence extractor).
 
 **release-policy** — the procedure is RELEASING.md's reordered per-iteration
-close-stage steps; the bump criteria and the note grammar are docs/install.md
+close-stage steps; the bump criteria and the note grammar are installer/SPEC.md
 §Versioning and §The upgrade contract (cited, never restated here). Derive the
 bump off the dated `docs/posts/` note's fixed sections, whose roster and grammar
 that pointer owns; an all-None iteration stamps `none`.
@@ -83,17 +83,17 @@ that pointer owns; an all-None iteration stamps `none`.
 bump criterion says what a release would be worth; the cadence criterion says
 whether to cut it now. Without the second, every iteration earning a bump takes a
 tag and the tag history reads as churn to the pre-launch audience
-`docs/install.md` §Versioning declares the channel for. A qualifying iteration
+installer/SPEC.md §The release channel declares the channel for. A qualifying iteration
 runs RELEASING.md's tag / GitHub Release / badge steps (a major runs
 release-sweep first, its boundary-only sub-procedure) when any of:
 
 - **Elapsed time** — the newest tag's creator date is at least 7 days old
   (`git for-each-ref --sort=-creatordate --count=1 refs/tags`). A floor, never a
   schedule: it permits a release and never forces one — and **it is dormant
-  while `docs/install.md` §The release channel reads `preview`, ruled 2026-08-31
+  while the channel docs/install.md §Upgrading declares reads `preview`, ruled 2026-08-31
   by the operator through the lead**, on fourteen consecutive deferrals at one
-  version as the measured evidence that a permit-only limb never converts. That
-  section declares tag rhythm an artifact of internal iteration rather than a
+  version as the measured evidence that a permit-only limb never converts.
+  installer/SPEC.md §The release channel declares tag rhythm an artifact of internal iteration rather than a
   stability signal, so a tag cut on elapsed time alone reaches no audience, and
   accumulating costs nothing: the `deferred:vX.Y.Z` stamp is already a
   mechanical floor on the next note (§Versioning's second input, which

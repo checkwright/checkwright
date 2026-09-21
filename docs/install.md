@@ -5,112 +5,22 @@ nav_order: 3
 
 # Install and upgrade
 
-Checkwright is distributed git-native and vendored-committed: the kit
-directories live in your repository as committed source, with the one exception
-§What a gate discloses draws below — a gate whose implementation is compiled
-arrives as a verified binary instead. The gates read tracked files, and the audit
-story wants the governance layer inside the reviewed tree.
+This page gets the kits into your repository, keeps them current, and takes them
+out again. Checkwright is vendored: `init` copies the kit source into your tree
+and commits it, so what governs your repository is committed and reviewable.
+The gate binary is the one compiled piece, and it is checked against a published
+digest before anything runs.
 
-The two registries stand in different relations to that, and the distinction is
-worth drawing rather than blurring:
-
-- **crates.io holds the name only, never a dependency channel.** There is
-  nothing to `cargo add`.
-- **npm carries a real package, and it is an installer rather than a
-  dependency.** `npx checkwright init` copies pinned kit source out of its own
-  payload into your tree and commits it.
-- **The same payload downloads straight off the GitHub Release**, as a tarball
-  and its `.sha256`, attached to every tagged release. This strengthens the
-  doctrine rather than weakening it: a tarball you download, verify against its
-  published digest, and extract before anything runs is the most auditable form
-  of the same one-shot vendoring.
-
-The last two are two transports over one install model, not two products. Both
-reach the same `init`, write the same `checkwright.lock`, and leave the same
-vendored result; only the fetch differs. The tarball is the primary path because
-it removes a runtime dependency. That sentence is the reader-facing tier of a
-declared claim: its machine-readable tier is the `install-primary:` declaration
-under §Quick start, and
-[canon-kit/SPEC.md](canon-kit/SPEC.md#check-install-claim) owns what binds the
-two. npm is retained because it is the path that
-carries a build attestation — `npm publish --provenance` has the release runner
-sign a statement of what built the package, which a self-hosted asset cannot
-offer. Neither dominates, so both properties are named rather than one being
-called better.
-
-An installer is not a dependency channel, and the difference is mechanical
-rather than a matter of framing. Nothing resolves at *your* build time. The
-payload ships inside the published tarball, so nothing is fetched after the
-package itself. And nothing the installer writes is a resolvable reference —
-no `dependencies` entry, no lockfile pointing at a registry, no submodule, no
-install-time lifecycle script. Uninstall the package afterwards and the tree it
-vendored keeps working, needing nothing from a registry ever again.
-
-That is what a one-shot vendoring means, and it is why the doctrine survives the
-installer rather than being repealed by it: what governs your tree is still
-committed and auditable, on the terms §What a gate discloses sets out below.
-Both properties are asserted rather than claimed — the consumer smoke installs
-from a packed tarball with no registry access and runs the whole path from it, and
-`check-installer-no-deps` reds the package the moment it declares a dependency
-field or an install-time script.
-
-Before you vendor, the [footprint page](footprint.md) measures what each kit
-adds to a consumer's context budget — the always-loaded and load-triggered cost
-per kit, so the adoption decision weighs a number rather than a guess.
+You can fetch it two ways, and both run the same `init` and leave the same
+result. The Release tarball is the primary path, because it adds no runtime
+dependency. Have Node? Then `npx checkwright init` does the same install in one
+command, and it carries a build attestation the tarball cannot. See the
+[footprint page](footprint.md) for what each kit costs your agent's context.
 
 ## Requirements
 
-Checkwright is **Unix-first**: the engine assumes the Portable Operating System Interface (POSIX) userland
-`GATE_SDK_PROGRAM_FLOOR` names (gate-sdk/SPEC.md §lib/gate.sh), and no shipped
-adopter path needs GNU coreutils. Native Windows is a **joined** platform: the
-gate binary is published for it and a Windows install-smoke leg installs that
-published build on a Windows runner, so the requirements below are what a native
-Windows host has to satisfy rather than a promise about one. Git for Windows
-supplies the bash and the userland they name. Windows through WSL (Windows
-Subsystem for Linux) is a route you may choose instead — the Linux line below
-serves it, and joining native Windows took nothing away from it.
-
-macOS runs it too, but as an adopter action rather than something the stock
-system delivers. Stock macOS ships bash 3.2, below the 4.3 floor. That floor
-binds only where the profile you select carries a kit that owes `bash` (the
-toolchain list below names them); a starter or prose install needs no remedy. The
-remedy is the block below, and it is the whole of it: this page names no other
-step for a Mac. Its first line installs a current bash from Homebrew. The other two put
-Homebrew's own `bin` ahead of `/bin` on `PATH`, so `bash` resolves to that one
-rather than to the system's 3.2.
-
-<!-- macos-remedy:begin -->
-
-```sh
-brew install bash
-echo "export PATH=\"$(brew --prefix)/bin:\$PATH\"" >> ~/.zprofile
-export PATH="$(brew --prefix)/bin:$PATH"
-```
-
-<!-- macos-remedy:end -->
-
-The block's middle line writes the ordering into `~/.zprofile`, the profile a
-new zsh Terminal window reads. If your login shell is bash, append the same line
-to `~/.bash_profile` instead. The last line orders the shell you are in. The
-requirements below assert what `PATH` actually resolves, so a Mac carrying
-Homebrew bash that is not `PATH`-ordered is not what the gates invoke: they
-reach the system's bash 3.2 in its place. The two macOS
-install-smoke legs run this block verbatim, then open a fresh login shell and
-source the profile line the block appended on its own, so both the ordering and
-its persistence are measured rather than suggested.
-
-Those are the platforms the **battery** runs on. A second and narrower fact sits
-beside them: whether a **prebuilt gate binary** is published for a platform,
-which is what decides whether an install is possible there at all. A platform the
-roster does not carry is **refused** — the bootstrap verifies and runs that binary,
-and every step of an install is behind it, so there is nothing to proceed into and
-no adopter action to take (installer/SPEC.md §The gate binary). The block below declares it per supported platform — the Rust target
-triple the bootstrap resolves a host to, and one of two join states. The state `joined`
-means the triple is a live line in `native/targets.list`, so a release publishes
-an artifact for it. The state `held: <precondition>` means the platform is
-supported and carries no artifact yet, and names the run that would join it; the
-predicate that run has to satisfy is stated in full in `native/targets.list`'s
-own header.
+Checkwright runs on Linux, macOS and native Windows. Windows Subsystem for Linux
+(WSL) is served by the Linux line. Install is possible only where a prebuilt gate binary is published:
 
 <!-- platforms:begin -->
 
@@ -140,18 +50,13 @@ own header.
 
 <!-- platforms:end -->
 
-A platform this page does not state as supported is **absent** from that block
-rather than held, because a held entry is still a support claim. One platform is
-held today. The `held` state is in the grammar precisely so the next platform can
-be declared before it is published rather than appearing fully formed, and this
-is the first use of it: a held line is a stated precondition and an explicit
-*not yet*, never a support claim. A roster line may not exceed what
-this page states (gate-sdk/SPEC.md §Consumer payload), and this block is the
-surface that makes that bound readable rather than a matter of who remembered to
-check.
+`joined` means a binary is published for that platform. `held` means it is
+supported but not published yet, and names the run that would publish it. On any
+other platform `init` refuses.
 
-The battery leans on a small command-line toolchain; each tool below must be on
-your `PATH`, and the note says what breaks without it:
+Put these tools on your `PATH`. A bullet marked `@contributor` is only for
+building Checkwright itself. A bullet naming a kit is owed only if your profile
+includes that kit, and `@registered` only if a gate you register needs the tool:
 
 <!-- toolchain:begin -->
 
@@ -218,11 +123,30 @@ your `PATH`, and the note says what breaks without it:
 
 <!-- toolchain:end -->
 
-The Windows remedy block, typed into PowerShell. It puts Git's own `usr\bin` and
-`bin` on `PATH`, for this session and, through your user `Path`, for every later
-one: Git's installer puts only its `cmd` directory there by default, and that
-directory holds no userland. Both Windows install-smoke legs run that block
-verbatim under PowerShell, so it is measured rather than suggested.
+`init` also needs `sha256sum` or `shasum` to verify the binary, and refuses
+without one. The tarball path needs `curl` and `tar`; the npm path needs Node.
+To publish a docs site with site-kit's render-fidelity gate, you also need Ruby
+with the `kramdown-parser-gfm` gem. To check your machine, run the gate binary
+with `--emit env-probe`: it writes an untracked `ENV.local.md` with each tool's
+version and verdict.
+
+On macOS, stock bash is 3.2, below the floor. If your profile owes `bash`, run
+this block. It installs Homebrew's bash and puts it first on your `PATH`, now and
+in `~/.zprofile`. If your login shell is bash, use `~/.bash_profile` instead:
+
+<!-- macos-remedy:begin -->
+
+```sh
+brew install bash
+echo "export PATH=\"$(brew --prefix)/bin:\$PATH\"" >> ~/.zprofile
+export PATH="$(brew --prefix)/bin:$PATH"
+```
+
+<!-- macos-remedy:end -->
+
+On native Windows, install Git for Windows, then run this block in PowerShell. It
+puts Git's `usr\bin` and `bin` on your `PATH`, for this session and every later
+one:
 
 <!-- windows-remedy:begin -->
 
@@ -234,112 +158,21 @@ $env:PATH = "$git\usr\bin;$git\bin;$env:PATH"
 
 <!-- windows-remedy:end -->
 
-These lines change your machine, not your repository, so `checkwright uninstall`
-does not reverse them, just as it does not uninstall a Homebrew package.
-
-A member is pinned only where a construct the battery actually runs forces the
-pin, and each pinned member names that construct above. A floor nobody's code
-forces is an aspiration, and an aspiration is what rots; the rule is what keeps
-this list honest, not a promise to revisit it.
-
-A bullet whose parenthetical carries an `@` token names the **audience** that
-floor belongs to, and there are three kinds. `@contributor` is a tool nothing on
-an install path reaches, required of someone building Checkwright rather than of
-someone running it, and `checkwright doctor` leaves it out of its verdict
-entirely. A kit name, such as `@delegation-kit`, is held only where the profile you
-select carries that kit. Several kit names joined by `+` are held where it
-carries any of them. `@registered` is held only where a gate registered in
-your `gates.list` needs the tool. An unmarked bullet is what every adopter's
-machine is held to; a kit-named or `@registered` bullet is held only where your
-selection reaches it, and `doctor` run outside an install names such a member as
-*not probed* rather than guessing a selection.
-
-Nor are the bullets maintained beside the code. The roster lives in
-`native/src/toolfloor.rs`, beside the floor predicate that reads it. This block renders it, and
-`check-install-toolchain` holds the two in whole-element parity — floor,
-implementation token and audience included — so the page cannot drift from what
-the gates require.
-
-To see where your machine stands against it, seed a local profile with
-context-kit's env-probe — the gate binary `GATE_SDK_NATIVE_BIN` names, run with
-`--emit env-probe`, writes an `ENV.local.md` you keep untracked. It is the binary
-and not a shell front end on purpose: the bullet above states `bash` as owed only
-by the kits that ship one, and a step here that spawned bash would be asking
-every reader for a tool that bullet says most of them do not need. It reports each tool's version *and* its
-verdict against the contract, so the profile answers whether this box qualifies,
-not only what it carries.
-
-Some requirements belong to an **install path** rather than to the battery, and
-no delivery-path tool joins the roster above. That roster asserts what the
-*battery* requires; how the payload reached your machine is not that, so the
-three paths carry their requirements here in prose instead. The **Release
-tarball** wants `curl` (or `wget`) plus `tar` and either hasher, `sha256sum` or
-the `shasum` stock macOS ships instead of it, the last its own
-requirement for checking the tarball's digest. The **`npx` installer** wants Node. **Manual vendoring** wants nothing
-beyond the roster. Nothing in the gate battery uses Node on any of the three, so
-a consumer who would rather not add it takes either of the other two paths and
-loses nothing.
-
-One requirement belongs to the installer *itself* — to `init`, whichever
-transport delivered it — and it is stated here for the same reason: it is not
-what the battery asserts, so the roster above would be the wrong place to claim
-it.
-
-- **`sha256sum` or `shasum`.** The bootstrap verifies the prebuilt gate binary
-  against its published digest before it runs it, and it will take either hasher —
-  `shasum` is there because stock macOS ships it instead. **Neither present is a
-  refusal** rather than a smaller install. Nothing unverified is ever executed,
-  and this is the one step that cannot use the binary to verify the binary.
-  Behind the invoke the binary hashes in-process, so no external hasher is
-  reached again.
-
-Publishing a docs site is an optional wider tier. A consumer that registers
-site-kit's render-fidelity gate — which re-renders every page through the
-GitHub Pages parser — additionally needs Ruby with the `kramdown-parser-gfm`
-gem. A consumer that publishes no docs site never installs it.
-
-### Where this is heading
-
-Everything above is what the tree requires today, and today is what you install
-against. The direction is a separate thing and is stated separately, because a
-requirements page that quotes a floor it has not reached costs you the install
-it was written to make easy.
-
-The direction: the battery moves off shell onto compiled gates. Those gates ship
-prebuilt rather than built on your machine, and the floor they aim at is **git
-alone** — git shelled out, never embedded. The toolchain list above already
-resolves the starter and prose profiles to that floor; a wider profile's members
-are its kits' declared requirements, marked there by audience. What survives is one small bootstrap
-that has to resolve your platform before any binary can run. It is deliberately
-small enough to exist twice, and it now does: a PowerShell half ships beside the
-POSIX sh one, exercised by its own CI leg.
-
-**That was the interpreter half of a native Windows path, and the other half has
-since landed.** The prebuilt binaries are published for the roster's joined
-platforms and native Windows is one of them, so a Windows host resolves to an
-artifact and installs. Both bootstraps reach it — the POSIX one under Git for
-Windows' `sh` (the path the install-smoke leg exercises) and the PowerShell one on its
-own leg. WSL remains a route you may choose instead.
-
-<!-- measured: ported-gate-members=124 -->
-That direction is now underway rather than announced: 124 gates in the battery
-dispatch to the compiled binary today, which is every member the battery
-registers. The requirements above are still what those gates invoke. A gate whose
-rule *is* an external program keeps spawning it whatever the gate is written in,
-so they stand until the gates that invoke them do not. When a requirement drops it
-drops from that list, which is where you will see it rather than in this paragraph.
+Both blocks change your machine, not your repository, so `checkwright uninstall`
+does not undo them. Why each floor is what it is:
+[installer/SPEC.md](installer/SPEC.md#requirements) and context-kit's
+[env-probe](context-kit/SPEC.md#binenv-probe).
 
 ## Quick start
 
 <!-- install-primary: tarball -->
 
-From a clean git repository. Pick a version off the
-[releases](https://github.com/checkwright/checkwright/releases) page and
-substitute it for `X.Y.Z`. Four steps — download, then verify, then extract,
-then run — any of which you may stop after:
+Start from a clean git repository. Pick a version from the
+[releases](https://github.com/checkwright/checkwright/releases) page and put it
+in place of `X.Y.Z`. Download, verify, extract, then run:
 
 ```bash
-cw="$(mktemp -d)"   # unpack outside the repository — see the note below
+cw="$(mktemp -d)"   # unpack outside the repository
 curl -fsSL -o "$cw/checkwright-X.Y.Z.tgz" \
   https://github.com/checkwright/checkwright/releases/download/vX.Y.Z/checkwright-X.Y.Z.tgz
 curl -fsSL -o "$cw/checkwright-X.Y.Z.tgz.sha256" \
@@ -352,629 +185,78 @@ curl -fsSL -o "$cw/checkwright-X.Y.Z.tgz.sha256" \
 sh "$cw/package/bin/checkwright.sh" init  # from your repository root
 ```
 
-`init` ends by printing the commands that finish the setup, each with its reason.
-They are deliberately not copied here: what `init` prints is `init`'s to say, and
-a second copy is a string a rename has to be remembered to move
-(installer/SPEC.md §init).
+Unpack outside your repository: `init` refuses a worktree that is not clean. With
+Node, the same install is one command, `npx checkwright init`.
 
-Unpack outside the repository rather than inside it. `init` refuses a worktree
-that is not clean, and an extracted `package/` sitting in your root is untracked
-content that makes it exactly that — so a tarball unpacked in place blocks the
-install it was downloaded for.
+`init` vendors the kits, writes a `gates.list` and the config files they read,
+records the install in `checkwright.lock`, and makes one commit. It ends by
+printing the commands that finish the setup; run them.
 
-Four commands rather than one piped into a shell is deliberate. A
-`curl … | sh` one-liner would have this page contradicting the claim its own
-intro makes about what governs your tree, since an unreviewed remote script fed
-straight to a shell is that claim's counter-pattern.
+Choose a profile with `--profile`:
 
-The checksum is worth understanding for what it does not cover. It travels from
-the same origin over the same encrypted session as the tarball, so verifying it
-catches a corrupted or truncated download. It is not evidence that the release
-host was uncompromised; the property carrying that is a build attestation, which
-is what the npm channel's `--provenance` mints and this channel does not.
+- `starter` — the gate SDK on its own;
+- `delegation` — adds the kits for agent sessions;
+- `prose` — adds canon-kit, for a repository of documents;
+- `full` — everything.
 
-The `package/` prefix is `npm pack`'s doing, and it is named here rather than
-left to be discovered. npm builds the asset on the release runner; consuming it
-needs no Node.
+Moving to a profile that contains yours only adds. `init` refuses outside a git
+work tree, on a dirty worktree (`--no-commit` stages instead of committing), or
+when `checkwright doctor` finds a missing tool. Re-running it is safe: it reports
+files you have edited instead of overwriting them, unless you pass `--force`.
+`--dry-run` prints the plan and writes nothing.
 
-If Node is already on your machine the same install is one command —
-`npx checkwright init`. Same payload, same `init`, same `checkwright.lock`; only
-the fetch differs.
+## Managing
 
-`init` vendors the selected profile's kit directories and writes a `gates.list`
-seeded with each kit's starting gates, alongside the config seam those kits
-need. Then it makes **one commit** naming the profile and the version.
+Each verb answers in its exit status, so a CI step can gate on it.
 
-Its three preconditions all refuse rather than warn. You must be inside a git
-work tree. The worktree must be clean, with `--no-commit` as the valve for an
-operator who wants to stage the vendoring themselves. And the toolchain must
-meet the contract — which `checkwright doctor` decides *before* any partial
-install, rather than halfway through one.
+- `checkwright doctor` checks this machine against the requirements above and
+  reports what is installed.
+- `checkwright diff` lists the vendored files you have changed. Exit `0` means
+  none.
+- `checkwright update` upgrades the install to the version you are running.
+- `checkwright uninstall` reverses the install in one commit.
 
-You pick how much to meet first, and which part. `starter` is the framework:
-the gate SDK on its own. `delegation` adds the kits whose subject is the agent
-session itself. `prose` adds canon-kit instead, for a repository whose artifacts
-are documents. Its battery reads every `README.md` at any depth plus your agent
-file; widening it to the rest of your docs tree is one line in the canon-kit
-config seam. `full` is everything. The contract is kit-set containment rather
-than a chain, so moving to a profile that contains yours only ever adds. Two
-profiles containing neither the other, as `delegation` and `prose` do, are
-alternatives rather than steps.
+`uninstall` removes only files `init` wrote and you left untouched. It keeps and
+reports any you edited, and never removes a file you wrote. Run it with
+`--dry-run` first to see the plan.
 
-Re-running is idempotent and non-destructive: it reads the per-file hash
-recorded in `checkwright.lock`, rewrites what still matches, and **reports
-rather than overwrites** anything you have changed since, unless you pass
-`--force`. Every file `init` rewrites is claimed before it is written, so that
-covers each kit's config seam and the commit-message patterns — the files you are
-most expected to edit — as well as the vendored kit source. The gate binary is
-the single exception, because no version of a compiled artifact is yours to
-protect: one that fails its recorded digest is corrupt or substituted rather than
-edited, so `init` rewrites it from the copy it just verified, which is what makes
-`doctor`'s advice to re-run something a re-run performs. Nor does the
-protection expire: `init` owns a path because it wrote the file there, so the
-path keeps its recorded hash until the file leaves your tree, across later
-upgrades and across a release that stops shipping it. Idempotent is a claim about
-the tree, not about the commit: `init` regenerates the projections its vendored
-tools own on every run, so a re-run that reports nothing to change still commits
-anything it rewrote and had not already committed. **One commit** is a promise
-about what a run leaves behind, and the run never leaves its own work uncommitted
-for you to find. `--dry-run` prints the file
-plan and the manifest and writes nothing.
+The pre-commit hook is a local backstop anyone can skip. Make the gate battery a
+required status check in CI, so a red battery blocks the merge, and keep that
+check where the authors it holds cannot edit it.
 
-`checkwright.lock` is the install-ownership record — what was installed, from
-which upstream commit, and which files the installer owns. That commit field is
-what lets a reviewer resolve the tree in front of them to an exact upstream
-state, which is the difference between vendored source that is merely committed
-and vendored source that is auditable.
-
-## Managing an install
-
-`init` makes an install. Three more verbs manage one once it exists. Each
-answers in its **exit status** as well as its output, so a CI step can gate on
-the answer without parsing a report. What follows is what each verb is for;
-the mechanism behind it lives in the installer's own design record,
-[`installer/SPEC.md`](installer/SPEC.md).
-
-- **`checkwright update`** brings the install here up to the version the package
-  you are running carries. One added precondition separates it from `init`:
-  `checkwright.lock` must already exist, so `update` can manage an install but
-  never make the first one. Every `init` flag stays valid, `--dry-run` included.
-  That thinness is the design — `update` names an operation `init` already
-  performs instead of reimplementing it, so the two cannot drift apart. It
-  automates phase A of §The upgrade contract below. Phase B is still yours.
-- **`checkwright diff`** tells you which of the files `init` wrote you have
-  changed. It writes nothing. Exit `0` means the tree is exactly what `init`
-  wrote; `1` means at least one file has changed or gone missing — so *is our
-  vendored tree pristine?* becomes a CI check rather than a review habit. Your
-  edits are reported, never corrected. Editing a vendored file is sanctioned,
-  and this is the verb that tells you where you have done it.
-- **`checkwright uninstall`** reverses the install.
-
-**Reversibility, stated plainly, because it is the property you are
-evaluating.** `uninstall` removes the files `init` wrote into paths you left
-untouched, then makes one commit. It reads the same per-file hashes `init`
-recorded, so a file you have edited since is **kept and reported** rather than
-removed. It never removes a file you wrote. Where anything is kept,
-`checkwright.lock` is narrowed over the survivors rather than deleted, so a
-later `init` goes on protecting them instead of writing through your edits.
-`--dry-run` prints the plan first, down to which of your own files would be left
-behind inside a vendored directory.
-
-That reversal is asserted rather than promised. The consumer smoke installs each
-profile into a scratch repository and then reverses it, holding that the
-repository's git tree object afterwards is **identical to the one it had before
-`init` ran** — so an evaluation you decide against leaves nothing behind, and a
-file the installer wrote but failed to record would fail that assertion rather
-than survive it.
-
-## Vendoring the kits
-
-The installers above do this on your behalf; the manual path stays supported and
-is worth reading whether or not you take it. It is the audit story — the account
-of what lands in your tree, and the reason nothing above has to be taken on
-trust.
-
-Each kit is a self-contained top-level directory. To adopt one, copy it into
-your repo root and wire it in:
-
-1. Copy the kit directory (for example `gate-sdk/`) into your repository.
-
-   Copying a kit directory out of this repository gives you its `SPEC.md` and
-   its `smoke/` as well, which the installer's payload withholds; the manual
-   path is the same kits with more of the engineering record attached, never
-   fewer of the gates.
-2. Register the gates it ships in your `gates.list`, where the kit ships gates.
-3. Point the kit at your layout through its external configuration — consumers
-   never edit vendored kit files, so configuration always lives outside them.
-4. Opt each clone into the generated pre-commit hook by running the gate binary
-   — the path `GATE_SDK_NATIVE_BIN` names, which is where `init` places it — with
-   `--install-hooks`, for example `./scripts/checkwright-gates --install-hooks`
-   from the repository root. The same spelling runs from a POSIX shell and from
-   PowerShell, with the `.exe` suffix on native Windows.
-
-Where a kit ships adoptable skills, take each as a binding shim by default — a
-one-line directive that references the vendored template, so a re-vendor reaches
-it and its gates hold the shim thin. Copying the template and filling its slots
-is the sanctioned fork: kept for legitimate structural divergence, but you then
-own its prose and an upgrade won't reach it. The shipping kit's SPEC owns the
-shim↔template contract — see lifecycle-kit's
-[stage-skill modes](lifecycle-kit/SPEC.md#templatesstages).
-
-Start with [gate-sdk](gate-sdk/index.md) — the other kits register into its
-runner — then add kits in the order the [kit map](index.md#the-kits) lists them.
-
-### What a gate discloses
-
-Worth knowing before you adopt, because it qualifies the opening claim on this
-page. A gate whose implementation is a compiled binary ships four things,
-withholds one, and publishes one. It ships its declaration, which carries a
-one-line statement of the invariant the gate holds and is printed when the gate
-blocks you. It ships its `# spec:` pointer. It ships its `good/`+`bad/` fixture
-pair. It ships the binary itself, verified against a published digest before
-anything is written to your tree. What it does not ship is the implementation
-source. What it publishes rather than ships is the specification section the
-pointer names: it is read on this site, and the `commit` your `checkwright.lock`
-records resolves the exact text your tree was vendored from.
-[gate-sdk/SPEC.md](gate-sdk/SPEC.md#consumer-payload) is where that is ruled and
-bounded.
-
-Most of the battery is shell you can open and follow line by line. That is a
-statement about the corpus as it stands, not about the contract: what a gate
-discloses is set by the rule above, whatever the shape of the shipped set on the
-day you vendor it.
-
-The reason is narrow and worth stating as narrowly as it holds. A coding agent
-told to make your battery green will, if it can, read the gate blocking it and
-edit its way around the rule instead of fixing what the rule caught. Withholding
-the implementation raises the cost of analysing a gate relative to the cost of
-running it. It does not make the rule a secret. A binary can be taken apart. The
-fixture pair shows you what passes and what fails. The specification section
-states the invariant on purpose. What you keep is the ability to run the gate
-and to hold it to its own fixtures, which is what this page means by verifying
-rather than trusting.
-
-## Reviewing the pre-commit hook before you install it
-
-Step 4 above points a clone's git hooks at POSIX sh from this tree, which is worth
-deciding with the files open. The account below aims at completeness over
-reassurance.
-
-**What the hook is.** A generated POSIX sh file. The gate binary's
-`--emit git-hooks --write` emits
-it from the per-gate `# graph:` manifests, so the hook carries the *triggered
-subset* of your registered battery: each gate fires under the path globs its
-own manifest declares, and the gates outside that subset run only in the full
-battery. The emitted hook is tracked, so the diff you review is what will run,
-and `check-graph` holds it byte-fresh against its emitter — a hand-edited hook
-that has drifted from the manifests reddens rather than diverging quietly.
-
-The same emitter writes a second tracked hook, `commit-msg`, from the gates
-registered at that tier, and `check-graph` holds it fresh by the same
-byte-comparison. Installing points your clone at the hooks directory, so both
-hooks are what you are reviewing; everything this section says of the
-pre-commit hook holds of the commit-msg one.
-
-**What installing it changes in your clone.** `--install-hooks` has three
-effects, and an audit of what it touches wants all three:
-
-- `core.hooksPath` is repointed at the kit's hooks directory. That config write
-  is what makes the generated hook fire at commit time.
-- `blame.ignoreRevsFile` is set to `.git-blame-ignore-revs`, but only when the
-  repo carries that file; a repo without one is left untouched.
-- `check-identity` runs once at opt-in, so a wrong-identity or wrong-remote
-  mapping surfaces before your first commit. The gate's exit status becomes the
-  installer's, so a failing identity check is visible to whatever ran it.
-
-**How to review before running.** The hook is tracked POSIX sh in your gates
-directory, and every gate it invokes is either the digest-verified gate binary
-beside it or tracked shell under the vendored kit directories and your own gates
-directory. Nothing is fetched at install time or at run time, so a vendoring or
-upgrade diff shows the whole of what you are agreeing to execute.
-
-**How to disable it.** Per commit, `git commit --no-verify` skips the hook. Per
-clone, `git config --unset core.hooksPath` removes it. Both are supported
-positions and neither is an escape:
-[gate-sdk/SPEC.md](gate-sdk/SPEC.md#enforcement-tiers) rules the local hook a
-latency optimization whose guarantee lives in the CI tier, so skipping it costs
-an earlier signal and nothing beyond that, provided the outer tier exists.
-
-## Running under an AGENTS.md harness
-
-Checkwright defaults to `CLAUDE.md` as the always-loaded agent file, but no kit
-mechanism resolves that file by literal — each reads its kit's knob. A consumer
-whose harness reads `AGENTS.md` (or any other always-loaded agent file) runs
-every kit mechanism by pointing those knobs at that file. This path is not just
-asserted: context-kit's `--agents-md-smoke` arm stands up an `AGENTS.md`
-consumer, sets the knobs below, and runs the full battery green (see
-[the tiered compatibility claim](positioning.md#the-tiered-compatibility-claim)).
-
-Set the agent-file knobs in your kit config seams, each to your agent file:
-
-- `GATE_SDK_AGENT_FILE` — the root-tiering allowlist's agent-file entry
-  (gate-sdk).
-- `LIFECYCLE_KIT_AGENT_FILE` — the lifecycle registration + shim-restatement
-  corpus (lifecycle-kit).
-- `DOCTRINE_KIT_AGENT_FILE` — the always-loaded doctrine block's host
-  (doctrine-kit).
-- `CONTEXT_KIT_SURFACES` and `CONTEXT_KIT_BREVITY_FILE` — the measured
-  always-loaded surface and the brevity target (context-kit).
-- `CANON_KIT_MANIFEST_FILES` — the prose manifest that must govern the agent
-  file (canon-kit).
-
-The kit-injected always-loaded blocks (each kit's `<!-- kit:begin -->` /
-`<!-- kit:end -->` markers) land in whichever file `CONTEXT_KIT_SURFACES` names,
-so they inject into your agent file, not `CLAUDE.md`. The stage skills need no
-Claude shim grammar: the skill templates are plain markdown executed by path
-(`lifecycle-kit/templates/stages/*.md`), and the `.claude/` shims are one binding
-of that mechanism, not the mechanism itself — an `AGENTS.md` harness runs a stage
-by invoking its template directly.
-
-Two honest limits:
-
-- **Settings stay Claude-Code-native.** The settings pins, the session-context
-  hook wiring, and memory-off enforcement remain Claude Code's — no standard
-  cross-harness settings surface exists to port them to. This is the residue
-  [the compatibility claim](positioning.md#the-tiered-compatibility-claim) names
-  as harness-native.
-- **Generated trigger lists carry default literals.** The generated pre-commit
-  hook's per-gate trigger lists come from the gates' `# graph:` manifests, which
-  carry the default `CLAUDE.md` literal. A nondefault agent file means adjusting
-  the affected `# graph:` trigger lines and regenerating the hook, or relying on
-  full-battery runs (the gate binary's `--run`), which read the knobs and
-  are agent-file-agnostic.
-
-## Versioning
-
-The repository carries one semver line, applied as git tags, with the kits
-moving in lockstep: a kit earns its own version only if it is ever split out
-for independent adoption.
-
-### The release channel
+## Upgrading
 
 Release channel: **preview**
 
-The two admissible values are `preview` and `stable`. That line is prose a reader
-sees and a token a gate reads — read off a line of its own rather than a bracketed
-tag, the same one-line-declaration shape queue-kit's `roadmap-summary:` uses and
-for the same reason.
+While the channel reads `preview`, versions are `0.x`, a minor may break things,
+and every GitHub Release is marked pre-release, so none shows as Latest. Take a
+release from the releases list, or name an explicit version. Never rely on the
+Latest pointer.
 
-The channel is a statement about **audience and support expectations**, not a
-second artifact stream. While it reads `preview` the version line is 0.x, and
-breaking changes ride minors under the pre-1.0 qualifier below. The tag rhythm
-under `preview` is an artifact of internal iteration rather than a stability
-signal: the tags are preview-channel iteration artifacts, and a launch
-announcement is a separate, later event. The channel flips to `stable` at
-`v1.0.0`, the same deliberate cut this section calls the first stability promise —
-now with a surface that says so before a reader infers it from tag density.
+An upgrade has two phases:
 
-**Mechanized on two surfaces, on two different tiers.**
-`.github/workflows/publish.yml`'s `release` job creates the GitHub Release, and
-while the channel is `preview` that creation carries `--prerelease`, so every
-Release page states the posture without a human remembering to. That is the
-**creating** posture, held by a gate. The **accumulated** posture — the flag on
-every Release already published — is held by a monitor instead, because host
-state is out of a precommit gate's reach by construction. Neither subsumes the
-other: the creating step can be correct forever while an older Release
-contradicts it, which is exactly how the drift below went unnoticed.
+1. Run `checkwright update` from the new version, then run the commands it
+   prints. If a kit now ships a `.knobs` config in place of a `*-config.sh`, move
+   your settings into the `.knobs` file and delete the old one.
+2. Run the full battery. The gates that go red are your worklist. The release
+   note says why each one moved.
 
-Nothing else in the publish path changes. In particular the npm
-publish carries no `--tag`, and its absence is **load-bearing configuration**
-rather than an omission: a non-default dist-tag would make §Quick start's
-one-command install resolve to nothing until a reader learned to append the
-channel, trading an honest signal for a time-to-first-value regression on the
-front door. That trade was put to the operator in those terms and declined. It
-becomes the right call only once §Quick start stops promising a bare one-command
-install, or once a stable line exists to hold `latest` while preview moves off it.
-Neither holds today. Nothing forecloses the change either:
-the pack arm's version regex already admits a prerelease suffix.
+Every release note opens with **In brief**: a few plain bullets on what you get
+and whether you must act. Its **Tightened gates**, **Renamed knobs** and
+**Behavior changes** sections list what you reconcile. Each says "None." when
+there is nothing. All notes are on the [releases page](releases.md). The bump
+rules and the note grammar:
+[Versioning](installer/SPEC.md#versioning) and
+[The upgrade contract](installer/SPEC.md#the-upgrade-contract).
 
-**The same preference decides invariant C the other way, which is why the two
-sit side by side.** Both trades weigh an honest channel signal against a reader
-who follows a default pointer, and the dist-tag lost because `npm install`'s
-default tag *is* the documented front door — §Quick start resolves it. No
-documented install path resolves the GitHub Latest pointer at all: §Quick start
-runs the installer, and every explicit download URL below names its version. The
-front door is not on that path, so the cost that declined the dist-tag change is
-absent here. Same preference, opposite outcome. That is not a reversal; the
-dist-tag's own re-entry condition above is untouched.
+## Going further
 
-Three invariants hold the declaration, so it cannot become a comment. The first
-two are gate-held and read files off disk; the third is monitor-held and reads
-the host, and it is stated after the gate's own contract below rather than
-inside it. `check-release-channel-parity` (this repo's `scripts/`) owns A and B:
-
-- **Invariant A — channel ⟷ publish posture.** The channel and the prerelease
-  posture of the Release-creating step in `.github/workflows/publish.yml` agree:
-  `preview` demands `--prerelease` on that invocation, `stable` demands its
-  absence.
-- **Invariant B — channel ⟷ version line.** The channel agrees with the version
-  line, read from the newest tag by creator date: while that version is `0.x` the
-  channel must be `preview`; from `v1.0.0` onward it must be `stable`.
-
-B is not optional polish. The channel is *derived* from the version line, so
-without B a `v1.0.0` could ship with `preview` declared and `--prerelease` still
-set — A passes because both of its surfaces agree, and both are wrong. B also
-protects a second consumer: lifecycle-kit's knob-rename compat precedent reads
-this declaration as its general-availability threshold, so a stale `preview` would
-hold that compat window open past GA.
-
-The gate fails closed rather than passing whenever it cannot find a surface it
-needs. Exit 2, never a clean line, on each of:
-
-- a declaration line that is missing or duplicated;
-- a channel value it does not recognize;
-- a `publish.yml` with no recognizable Release-creating step;
-- a newest tag that does not parse as semver.
-
-A repository with **no tags at all** has no version line, so B is dormant there
-while A still asserts. The gate *reports* that dormancy in its clean output, so a
-reader can tell "checked and agreeing" from "nothing to check".
-
-- **Invariant C — channel ⟷ published Release history.** Every published
-  Release's prerelease flag agrees with the channel its own version line
-  implies: a `0.x` tag carries the flag, a `1.x`-or-later tag does not.
-
-C is A and B composed rather than a new policy. B already rules that a version
-line implies a channel; A already rules that `preview` implies the flag. The flag
-on *any* Release therefore follows from that Release's own tag. B only ever got
-checked against the newest tag because the gate had one version line to read;
-C is the same statement evaluated over the whole published history. That makes
-the desired host state **derived rather than stored** — there is no tag-to-flag
-roster to maintain anywhere, and the rule keeps working across the `v1.0.0` flip
-with no edit, because at that flip the newest tag stops being `0.x` on its own.
-
-**C is held by a monitor, not by the battery** — the release-channel arm of
-`.github/workflows/site-health.yml`, which reads the Release list from the API
-on its schedule and files a `site-health` issue naming every Release whose flag
-disagrees with its own version line. A precommit gate cannot reach host state,
-and weakening the tier to reach it is the one change this design refuses; this
-is the same tier ruling `RELEASING.md` step 6 already makes for the Release
-body, over the same objects.
-
-**What this means for a reader, stated because it is what you see.** Every
-release this project has published is `0.x`, so under C **no Release is
-Latest**: the repo front page shows no green Latest badge and the releases list
-labels every entry `Pre-release`. Resolving the pointer itself yields no release
-— the API's `releases/latest` endpoint answers 404, while the browser URL
-redirects to the releases list. That is the honest presentation of a channel
-whose tags are preview-channel iteration artifacts. **Take a release from the
-releases list, or name an explicit version — never resolve the Latest
-pointer**, which advertises no release at all while the line is `0.x`. Nothing
-documented here depends on it: §Quick start runs the installer and every
-download URL below carries its own version.
-
-What earns each bump derives from the release note itself — its
-declaration-bearing sections (§The upgrade contract below) already declare
-everything phase B must reconcile, so the floor is read off the note rather than
-maintained beside it:
-
-- **Patch** — every declaration-bearing section is "None": a phase-A-only sync,
-  fixes and docs that tighten nothing a consumer must reconcile.
-- **Minor** — any section is non-empty: the release carries phase-B work —
-  a new or stricter gate, a knob rename riding its deprecation path, or a
-  behavior change a consumer's tree may depend on (blind-upgrade-safe is exactly
-  what such a change breaks, the same reasoning that floors the other two).
-- **Major** — a decommission: a release that *removes* a deprecated surface
-  (a release-sweep disposition executed as decommission), or any change the
-  two-phase upgrade contract cannot reconcile from the note alone. This
-  criterion is absolute: a decommission earns a major even while the line is
-  0.x, outranking the pre-1.0 qualifier below rather than riding a minor.
-  Majors are where the deprecation promises come due — the release-sweep
-  constraint that no marker rides into the next major undispositioned binds
-  here. A kit `bin/` tool is not a deprecation-marked surface: deleting one is
-  not a decommission. It rides a minor and is declared by path under Behavior
-  changes, where a script of yours that called it finds its worklist item. In
-  this repository `check-release-change-declared` holds that declaration.
-- **Pre-1.0 qualifier** — while the line is 0.x, breaking changes *other than
-  decommissions* may ride minors (the semver 0.x convention), each still
-  declared in the note; a decommission still earns a major (above), and that
-  is what keeps release-sweep's no-marker-rides-past-the-major constraint
-  anchored while 0.x. `v1.0.0` is the first stability promise and is cut
-  deliberately, never earned mechanically.
-
-The floor has a **second input**: a note also inherits the floor of any
-outstanding deferred release. When an iteration's criteria were met but the
-release was held back, its disposition line records the earned version as
-`deferred:vX.Y.Z` (lifecycle-kit/SPEC.md §templates/stages/), and
-those criteria stay unconsumed until a release at or above that version ships.
-The next qualifying note carries them in its declaration-bearing sections, composed
-from the release declaration surface that carried them across every deferral. That
-note may not fall below that version, so a note's floor is the higher of what its own sections
-derive and what an outstanding deferral carries. `check-release-bump` reads both.
-
-The derivable half is gated: `check-release-bump` (this repo's `scripts/`, a
-compiled subcommand since gate-sdk/SPEC.md §The declaration cohort)
-orders the release notes by version and reds a patch-only bump whose note
-declares tightened gates, renamed knobs, or behavior changes (and fails closed
-if any fixed section is absent). That presence assertion binds the **newest**
-note only, so adding a fixed section to the roster above costs no historical
-backfill across the published corpus. The major criteria stay judgment —
-a decommission is a semantic fact no section grammar carries — so the gate
-holds only the floor.
-
-**The gate orders `<major>.<minor>.<patch>` and refuses anything else**, naming
-in its refusal the offending token, where that token came from, plus the grammar
-it failed. That is a guard rather than a closure. A prerelease or build-metadata
-suffix stays exactly as admissible as the pack arm already leaves
-it; what is missing is an *ordering* for one, because the candidate rules
-disagree — `sort -V` puts `1.0.0` *before* `1.0.0-rc1` where semver puts it
-after. A gate whose subject is this section's one semver line must not pick
-between them by accident. **That ruling is owed by the session that first cuts
-such a release.** Until then the first note using one reds loudly here instead of
-mis-ordering silently.
-
-## The upgrade contract
-
-An upgrade runs in two phases.
-
-**Phase A — deterministic.** Replace the vendored kit directories wholesale at
-the target tag. Because consumers never edit kit files, this sync loses
-nothing. Next, retire each shell config the target's kits replaced with a knob
-file. A kit that now ships `templates/<stem>-config.knobs` in place of
-`<stem>-config.sh` refuses the old `<stem>-config.sh` or `<stem>-config.local.sh`
-in your gates directory. The regeneration reads those knobs, so it refuses too.
-Rewrite what you set in each file into its `.knobs` file, then delete it. A copy
-`init` seeded that you never edited is simply deleted. Then regenerate the
-generated artifacts.
-*Which* artifacts those are is a property of the kits you vendored rather than a list to carry here: each one's
-freshness gate names its own regen command when it reds, so phase B is what tells
-you about any you skipped.
-
-**Phase B — gate-driven.** Run the full battery. The set of gates that go red
-*is* your migration worklist: each red gate names the surface that moved, and
-the release note supplies the intent behind the move. Reconcile the red set and
-you are current.
-
-Two shipped tools carry this contract. [The upgrade smoke](gate-sdk/SPEC.md#upgrade-smoke)
-is its executable proof — it drives both phases against a scratch consumer,
-asserting the phase-A sync is deterministic and the red set stays within `TO`'s
-Tightened-gates declaration — the target note's when `TO` is a tag, and the
-release declaration surface in `TO`'s own tree when it is
-not. [The upgrade skill](lifecycle-kit/SPEC.md#templatesupgrademd)
-is the phase-B disposition ritual a consumer runs to register the note's newly
-declared gates and disposition each red.
-
-Release notes are dated posts under `docs/posts/`. Each carries a
-`release: vX.Y.Z` key in its front matter — the key that resolves a version to
-its note — and these sections under fixed names. This list is the roster: **In
-brief** is the human read, and the sections after it are the
-**declaration-bearing** ones a mechanical consumer reconciles. Prose elsewhere
-names those classes rather than counting their members, so adding a section
-here does not silently falsify a sentence somewhere else.
-
-- **In brief** — placed first, immediately after the opener and ahead of
-  Tightened gates. Three to five bullets of plain language, each answering *what
-  you get* or *whether you must act*. A bullet lead here is a plain phrase, never
-  a gate or knob name. The declaration-bearing sections below already carry those
-  tokens; this section exists to be readable without them. **In brief has no
-  "None" form**, unlike every section below it. A release with nothing worth
-  saying to a human is a patch, and says that in one bullet. It bears no
-  declaration. It feeds no bump criterion and no allowed-red set, and nothing
-  reads it but the human upgrader. Its position ahead of the migration detail is
-  deliberate: the opener's one-sentence slot is a lede, and in practice it
-  summarizes the engineering instead of answering whether the reader must act.
-
-  What holds it is `check-release-bump`'s presence assertion, and that assertion
-  **binds a note under composition** — the newest note whose declared version
-  carries no tag yet. A note published before this section existed is history. It
-  is not retro-fitted with a fabricated summary, and the assertion goes dormant
-  on it, reporting which state it is in rather than going quiet. The
-  predicate is `check-release-declaration-parity`'s, adopted so that release
-  state is read one way across the corpus. Its residual is that sibling's too: a
-  note authored and drained inside a single commit is never seen under
-  composition, so what carries the section into existence is the split
-  choreography the release runbook prescribes, whose chrome skeleton holds its
-  slot.
-- **Tightened gates** — one bullet per gate that landed new or got stricter, the
-  gate name the bullet's lead token. A mechanical consumer reads these lead
-  tokens as the release's allowed-red set: the gates a clean upgrade may turn
-  red, each named here with the intent behind the move. The token has one
-  canonical spelling. It is a **backticked, unbolded** bare gate name, directly
-  after the bullet marker (``- `check-foo` ``, then the prose). Backticks because
-  the token is a code identifier and this tree spells identifiers in backticks;
-  unbolded because bold is a rendering choice carrying no semantics, and it
-  collides with the one token a machine reads. So the section resolves to an
-  explicit empty set (a "None" body) or to a non-empty token set. Nothing else.
-  A non-"None" section that yields no token is a **defect in the release** rather
-  than a declaration of nothing: the parse would otherwise compile a note naming
-  several gates into an empty allowed-red set, passing vacuously on a green
-  battery and failing with a false message on a red one.
-  `check-tightened-gates-grammar` (this repo's `scripts/`, a compiled subcommand
-  since gate-sdk/SPEC.md §The declaration cohort) holds that over the
-  whole corpus, with no version cutoff — `GATE_SDK_UPGRADE_FROM` and
-  `GATE_SDK_UPGRADE_TO` make any historical pair a supported run, so any note may
-  be the one the smoke resolves. Registry membership is deliberately not
-  asserted. A gate renamed or retired since a note shipped would make membership
-  false about history without the record being wrong.
-
-  **A sibling gate makes a separate claim, and neither is the other's coverage.**
-  The grammar gate holds each note's section *well-formed*.
-  `check-release-declaration-parity` (also this repo's `scripts/`) holds a note
-  *under composition* **equal to the release declaration surface it was composed
-  from**, in all three declaration-bearing sections, as set equality of lead
-  tokens in both directions — both, because each direction costs something
-  different. In Tightened gates, a name on the surface and missing from the note is
-  a gate that tightened and shipped undeclared, licensing a red the upgrade smoke
-  would wave through, while a name in the note and missing from the surface
-  declares a gate that never tightened and sends consumers hunting a reconcile
-  that does not exist. In Renamed knobs and Behavior changes, a token on the
-  surface and missing from the note is a declared change the note dropped, while a
-  token in the note and missing from the surface is a change close reconstructed
-  instead of the landing session declaring it: the composing session appends it to
-  the surface in the composing commit, then transcribes. It arms on a note whose declared version carries no tag yet and disarms
-  once tagged, reporting its dormancy rather than letting a drained surface read
-  as verification. It is a compiled subcommand
-  (gate-sdk/SPEC.md §The declaration cohort) and rides that cohort's holder of the
-  shared grammar rather than a private parser — the grammar's one holder, a
-  shell twin having been held equal to it by a standing parity oracle until both
-  retired together (gate-sdk/SPEC.md §lib/declaration.sh). The upgrade smoke
-  reads that grammar through the same compiled holder, so the two cannot drift
-  apart and read different token sets from the same bytes.
-
-  **A declaration precedes its release.** Because the upgrade smoke's untagged
-  arm reads a working tree's release declaration surface rather than a note
-  (gate-sdk/SPEC.md §upgrade-smoke), an allowed-red set is owed from the moment a
-  gate is landed or tightened, not from the tag. The surface carries every
-  section, so a behavior change or a rename is owed from the moment it lands too.
-  Running the smoke against your checkwright clone at an untagged `TO` is what
-  reads it.
-- **Renamed knobs** — one bullet per rename, `old → new`; a knob *removal* is
-  the same residue class (own-config orphaned) and is expressed `old → ∅`. The
-  lead token is the old name, backticked and unbolded, directly after the bullet
-  marker (``- `OLD_NAME` → `NEW_NAME` ``). The arrow, the new name and any prose
-  follow it.
-- **Behavior changes** — one bullet per shipped change that alters what the kits
-  *do* without landing or tightening a battery gate: a fail-closed convergence
-  in a shared library, a runner's semantics, a skill or template behavior, a
-  default's effect. The bullet's lead token is the changed surface's name (the
-  script, knob, template, or file), bolded; the rest states what moved and what,
-  if anything, the consumer reconciles. This section keeps its own spelling — its
-  lead tokens are legitimately prose phrases rather than identifiers, so the
-  Tightened-gates rule above does not reach it. Its lead token is read verbatim.
-  It is the bolded span directly after the bullet marker, so a surface or phrase
-  inside the bold is the token and whatever follows the closing `**` is prose.
-
-  These two lead-token pins bind the **note under composition** only. No gate
-  reads a published note's Renamed knobs or Behavior changes tokens, and notes
-  published before the pins spelled their leads several ways and are not
-  retro-fitted.
-
-"None" is a valid body for any of the three sections and must be stated, not
-omitted — a release that tightens nothing, renames nothing, and changes no
-out-of-gate behavior says so on each. Its form is a bare "None."; add a
-trailing clause only where it rules out a near-miss the reader would otherwise
-mis-classify (an advisory KPI that never joins the gate registry, knobs added
-but not renamed). A clause that only restates the heading's own negation is a
-restatement to delete. This consumer-owned residue Phase A
-cannot touch (gates you have shadowed, templates you have copied out, knob
-renames in your own config, behavior your tree depends on) is that note's
-checklist.
-
-Those four residue classes map onto the three sections by design: **shadowed
-gates** → Tightened gates; **own-config knob renames and removals** → Renamed
-knobs; **copied-out templates and depended-on behavior** → Behavior changes. The
-copied-out-template class earns no section of its own because a template you have
-copied out that then changed *is* depended-on behavior diverging from your copy —
-it is behavior-folded, not dropped. Four classes, three sections, by that
-folding. A template `init` seeded that you never edited is the one exception,
-because `init` rewrites it on upgrade: you take the change rather than diverge
-from it. So a change that tightens a gate through such a template is declared
-under Tightened gates as well.
-
-Honest limit on Behavior changes: **its bullets are declared for
-the human upgrader, not smoke-asserted.** A non-gate change cannot red the
-battery, so the upgrade smoke's containment assertion (defined over battery
-reds) does not read this section — it fixes where such changes are stated and
-`check-release-bump` fixes that they are stated, but neither makes them
-executable. Tightened-gates bullets stay the mechanical allowed-red set;
-behavior-changes bullets are reconciled by reading.
-
-## Branch protection
-
-The pre-commit hook is a local backstop a contributor can bypass. Server-side
-enforcement makes the battery a required status check: run the gate battery in
-CI on every pull request, and mark that check required in your host's
-branch-protection settings so a red battery blocks the merge. Keep the
-verifier neutral — enforcement that an author can edit is not enforcement.
+- **Vendoring by hand**, and what a compiled gate discloses:
+  [Vendoring without the installer](installer/SPEC.md#vendoring-without-the-installer).
+- **Reviewing the hook** before you install it:
+  [Reviewing the pre-commit hook](installer/SPEC.md#reviewing-the-pre-commit-hook).
+- **Running under an `AGENTS.md` harness**:
+  [the adapter recipe](positioning.md#running-under-an-agentsmd-harness).
+- **How the installer works**: [installer/SPEC.md](installer/SPEC.md).
 
 Back to the [kit map](index.md#the-kits) or [why Checkwright](methodology.md).

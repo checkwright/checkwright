@@ -773,7 +773,7 @@ mod tests {
     }
 
     // spec: installer/SPEC.md §The packer — the version regex admits a prerelease suffix, which
-    // is the property docs/install.md rests its prerelease claim on.
+    // is the property installer/SPEC.md §Versioning rests its prerelease claim on.
     #[test]
     fn the_version_regex_admits_a_prerelease_suffix() {
         assert!(resolve_version("1.2.3").is_ok());

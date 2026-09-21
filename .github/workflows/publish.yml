@@ -407,7 +407,7 @@ jobs:
           # and the note pointer are on it from the moment it exists. On a re-run,
           # rewrite the body only when it lacks the URL: that repairs an empty body
           # and keeps a hand-edited one that still points at the note.
-          # spec: docs/install.md §Versioning — the declared release channel is `preview`, so the Release states that posture; check-release-channel-parity holds the two in agreement
+          # spec: installer/SPEC.md §Versioning — the declared release channel is `preview`, so the Release states that posture; check-release-channel-parity holds the two in agreement
           if ! gh release view "$TAG" >/dev/null 2>&1; then
             gh release create "$TAG" --title "$TAG" --prerelease --notes-file "$body"
           else

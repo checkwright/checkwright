@@ -1,4 +1,4 @@
-// spec: docs/install.md §Versioning — the declared release channel agrees with the publish
+// spec: installer/SPEC.md §Versioning — the declared release channel agrees with the publish
 // workflow's prerelease posture (A) and with the project's own version line (B)
 use crate::fresh;
 use crate::{proc, programs};
@@ -17,7 +17,7 @@ pub fn run(args: &[String]) -> i32 {
     }
 }
 
-// spec: docs/install.md §Versioning — sed's `s/^Release channel:[[:space:]]*\*\*([a-z]+)\*\*
+// spec: installer/SPEC.md §Versioning — sed's `s/^Release channel:[[:space:]]*\*\*([a-z]+)\*\*
 // [[:space:]]*$/\1/p`, hand-compiled: a pattern the gate itself owns is not routed through the
 // engine (gate-sdk/SPEC.md §The POSIX ERE matcher's boundary)
 fn declared_channel(line: &str) -> Option<&str> {
@@ -38,7 +38,7 @@ fn declared_channel(line: &str) -> Option<&str> {
     Some(value)
 }
 
-// spec: docs/install.md §Versioning — `^v?([0-9]+)\.([0-9]+)\.([0-9]+)([-+].*)?$`, hand-compiled
+// spec: installer/SPEC.md §Versioning — `^v?([0-9]+)\.([0-9]+)\.([0-9]+)([-+].*)?$`, hand-compiled
 // for the same reason; only the major is read
 fn semver_major(v: &str) -> Option<u64> {
     let s = v.strip_prefix('v').unwrap_or(v);
@@ -86,7 +86,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     if decls.is_empty() {
         return Err(format!(
-            "{} carries no 'Release channel:' declaration line — the channel cannot be established (docs/install.md §Versioning owns the declaration)",
+            "{} carries no 'Release channel:' declaration line — the channel cannot be established (installer/SPEC.md §Versioning owns the declaration)",
             install_md
         ));
     }
@@ -112,7 +112,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             channel
         };
         return Err(format!(
-            "{} declares an unrecognized channel value ({}); the two admissible values are 'preview' and 'stable' (docs/install.md §Versioning)",
+            "{} declares an unrecognized channel value ({}); the two admissible values are 'preview' and 'stable' (installer/SPEC.md §Versioning)",
             install_md, shown
         ));
     }
@@ -147,7 +147,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         findings.push(indent4(&create_step));
     }
 
-    // spec: docs/install.md §Versioning — invariant B is dormant, and says so, where no tag exists
+    // spec: installer/SPEC.md §Versioning — invariant B is dormant, and says so, where no tag exists
     let version = if version_arg.is_empty() {
         newest_tag()
     } else {
@@ -185,7 +185,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     if !findings.is_empty() {
-        println!("check-release-channel-parity: the declared release channel disagrees with a surface it governs (docs/install.md §Versioning):");
+        println!("check-release-channel-parity: the declared release channel disagrees with a surface it governs (installer/SPEC.md §Versioning):");
         for f in &findings {
             println!("{}", f);
         }
@@ -215,7 +215,7 @@ fn indent4(lines: &[String]) -> String {
         .join("\n")
 }
 
-// spec: docs/install.md §Versioning — the newest tag by creator date. The shell form silences
+// spec: installer/SPEC.md §Versioning — the newest tag by creator date. The shell form silences
 // this probe and lets an unanswerable one yield no version line, so invariant B goes dormant
 // rather than red; the conflation is preserved, because a port proves parity.
 fn newest_tag() -> String {
@@ -238,7 +238,7 @@ fn newest_tag() -> String {
 mod tests {
     use super::*;
 
-    // spec: docs/install.md §Versioning — the declaration line is exact: the value is bolded,
+    // spec: installer/SPEC.md §Versioning — the declaration line is exact: the value is bolded,
     // lower-case, and nothing but whitespace follows it
     #[test]
     fn the_declaration_grammar_admits_only_a_bolded_lowercase_value() {
@@ -250,7 +250,7 @@ mod tests {
         assert_eq!(declared_channel("  Release channel: **preview**"), None);
     }
 
-    // spec: docs/install.md §Versioning — the semver line, with an optional `v` and an optional
+    // spec: installer/SPEC.md §Versioning — the semver line, with an optional `v` and an optional
     // prerelease or build suffix; only the major decides the channel
     #[test]
     fn only_a_semver_triple_parses_and_the_major_is_what_is_read() {

@@ -214,7 +214,7 @@ jobs:
           echo "release-body: $n_found note(s) found, $n_keyed keyed '$RELEASE_NOTE_TAG_KEY:', $n_released released of $n_tags remote tag(s), $n_checked checked"
 
           # 7. every published Release's prerelease flag agrees with the channel
-          #    its own version line implies (invariant C, docs/install.md §The
+          #    its own version line implies (invariant C, installer/SPEC.md §The
           #    release channel). It lives here rather than in the battery because
           #    host state is out of a precommit gate's reach by construction —
           #    the tier ruling RELEASING.md step 6 already makes for the Release

@@ -12,25 +12,6 @@
 
 ## New Features
 
-- **install-md-adopter-page-overgrown** [spec: SPEC-install-page.md] — `docs/install.md` is an
-  adopter page carrying maintainer-tier grounds (980 lines), and nothing holds a `docs/` page to a
-  length, so it regrows.
-  **Deliverable, by operator direction (2026-09-21, lead session):** an adopter page of about 150
-  lines, with the gated marker blocks and the `install-primary:` declaration kept, plus a regrowth
-  guard whose reach is the whole `docs/` site.
-  **Ruled at spec (2026-09-21):** the grounds relocate to installer/SPEC.md — Versioning, the
-  release channel and the upgrade contract under their existing heading names, manual vendoring and
-  hook review under new ones (`Vendoring without the installer`, `Reviewing the pre-commit hook`).
-  Their 41 path-bound citations are repointed in one commit, with `check-spec-pointer` as the
-  oracle. The guard is `check-surface-ratchet`, widened by config to the 51 non-mirror `docs/`
-  pages, and no new gate is added.
-  **Length, by operator direction (2026-09-21, lead session):** the four gated blocks alone are
-  109 lines, so the target is about 150 prose lines around them, putting the page near 260. Build
-  may also split a long docs page into sub-pages; that is sanctioned, not required.
-  Filed 2026-09-21 to the gap inbox by the lead, and promoted into `docs-first-contact` by operator
-  direction; the amendment was authored and paired at this spec.
-  **DISTINCT from** `docs-index-front-door-restatement-ungenerated`.
-
 - **adopter-demo-verb-missing** [spec: SPEC-demo-verb.md] — the home page promises a walkthrough
   with nothing installed, but `--run-demo` copies kit source from a clone. The installed front door
   has no demo verb.
@@ -2698,5 +2679,7 @@
 - **lead-agent-id-compaction-defense** — each claim still wants its own probe.
 
 ## Done
+
+- install-md-adopter-page-overgrown
 
 ## Lessons Learned

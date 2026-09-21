@@ -5252,7 +5252,7 @@ the stage templates: it invokes no `--enter-stage` and stamps no state, so
 their vendored kits from one release to the next — the judgment half of the
 two-phase upgrade contract whose deterministic half (the wholesale kit-sync) and
 whose executable proof both live in gate-sdk (gate-sdk/SPEC.md §upgrade-smoke),
-against the release-note grammar docs/install.md §The upgrade contract owns. Its
+against the release-note grammar installer/SPEC.md §The upgrade contract owns. Its
 ritual registers the target note's newly-declared gates (a new gate's only
 delivery channel to an upgrading consumer — the phase-A sync never re-runs the
 installer), dispositions each red gate (fix-the-tree or exempt-with-cause, never

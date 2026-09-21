@@ -26,7 +26,7 @@ None — first release; no behavior changed outside the gate battery.
 ## Upgrading
 
 There is nothing to upgrade from yet. From the next release on, these three
-sections are your phase-B checklist (the [install guide](../install.md) §The
+sections are your phase-B checklist (the [installer record](../installer/SPEC.md) §The
 upgrade contract owns the shape): the tightened-gates bullets name the gates a
 clean upgrade may turn red, each with the intent behind the move, the
 renamed-knobs bullets the config you re-point, and the behavior-changes bullets

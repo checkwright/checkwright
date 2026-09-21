@@ -17,7 +17,46 @@ What this package is not: a dependency channel. Nothing resolves at your build
 time, nothing is fetched after this package itself, and the installer writes no
 dependency reference, no lockfile entry pointing at a registry, and no
 install-time lifecycle script. Remove the installer afterwards and the tree it
-vendored keeps working — it needs nothing from a package registry again.
+vendored keeps working — it needs nothing from a package registry again. That is
+what a one-shot vendoring means, and it is why the vendored-committed doctrine
+survives the installer rather than being repealed by it. Both properties are
+asserted rather than claimed: §The consumer smoke installs from a packed tarball
+with no registry access and runs the whole path from it, and
+`check-installer-no-deps` reds the package the moment it declares a dependency
+field or an install-time script.
+
+**The two registries stand in different relations to that.** crates.io holds the
+name only (`reserve/`), never a dependency channel — there is nothing to
+`cargo add`. npm carries a real package, and it is an installer rather than a
+dependency. The same payload also downloads straight off the GitHub Release, as a
+tarball and its `.sha256`, attached to every tagged release; a tarball downloaded,
+verified against its published digest and extracted before anything runs is the
+most auditable form of the same one-shot vendoring. Those two are two transports
+over one install model, not two products: both reach the same `init`, write the
+same `checkwright.lock` and leave the same vendored result, and only the fetch
+differs.
+
+**The tarball is the primary path because it removes a runtime dependency.**
+docs/install.md states that in prose, and its `install-primary:` declaration
+under §Quick start is the machine-readable tier of the same claim
+(canon-kit/SPEC.md §check-install-claim binds the two). npm is retained because it
+is the path that carries a build attestation — `npm publish --provenance` has the
+release runner sign a statement of what built the package, which a self-hosted
+asset cannot offer. Neither dominates, so both properties are named rather than
+one being called better.
+
+**The tarball recipe's shape.** The install page's recipe is four steps —
+download, verify, extract, run — rather than a `curl … | sh` one-liner, because
+an unreviewed remote script fed straight to a shell is the counter-pattern of the
+claim the page opens with. It unpacks outside the repository, because `init`
+refuses a worktree that is not clean and an extracted `package/` in the root is
+exactly such untracked content. The `package/` prefix is `npm pack`'s doing: npm
+builds the asset on the release runner, and consuming it needs no Node. **The
+checksum's honest limit:** it travels from the same origin over the same
+encrypted session as the tarball, so verifying it catches a corrupted or
+truncated download and is no evidence that the release host was uncompromised;
+the property carrying that is a build attestation, which the npm channel's
+`--provenance` mints and this channel does not.
 
 ## Implementation
 
@@ -69,12 +108,79 @@ dash.
 
 This package reaches a tree over two transports, and each carries its own
 requirement. Fetched from npm it needs Node, for `npx`. Fetched as the tarball
-attached to a GitHub Release it needs none — `curl`, `tar`, and `sha256sum`,
-then `sh package/bin/checkwright.sh init`. Both requirements belong to a
-delivery path alone: the gate battery this vendors does not use Node, no
-delivery-path tool joins the toolchain roster, and the manual vendoring path
-documented on the site needs neither. The toolchain the battery does assert,
-with its version floors, is on the install page.
+attached to a GitHub Release it needs none — `curl` (or `wget`), `tar`, and
+either hasher, `sha256sum` or the `shasum` stock macOS ships instead, then
+`sh package/bin/checkwright.sh init`. Both requirements belong to a
+delivery path alone: the gate battery this vendors does not use Node on any
+path, no delivery-path tool joins the toolchain roster, and the manual vendoring
+path (§Vendoring without the installer) needs nothing beyond that roster. So a
+consumer who would rather not add Node takes either other path and loses
+nothing. The toolchain the battery does assert, with its version floors, is on
+the install page.
+
+**One requirement belongs to `init` itself, whichever transport delivered it**:
+`sha256sum` or `shasum`. The bootstrap verifies the gate binary against its
+published digest before it runs it, and neither hasher present is a refusal
+rather than a smaller install (§The install boundary) — this is the one step that
+cannot use the binary to verify the binary, and behind the invoke the binary
+hashes in-process. It is stated beside the roster rather than in it because the
+roster asserts what the battery requires, which this is not.
+
+**The install page's requirement blocks, and why each reads as it does.** The
+page renders four marker blocks bare, each held by a reader
+(docs/site-architecture.md §Generated projections and their freshness gates owns
+the platform and toolchain parity contracts and the remedy blocks' legs); the
+grounds its prose leaves out are these.
+
+- **Platform posture.** Checkwright is Unix-first: the engine assumes the POSIX
+  userland `GATE_SDK_PROGRAM_FLOOR` names (gate-sdk/SPEC.md §lib/gate.sh), and no
+  shipped adopter path needs GNU coreutils. Native Windows is a joined platform —
+  the gate binary is published for it and a Windows install-smoke leg installs
+  that published build — so the requirements are what a native Windows host must
+  satisfy rather than a promise about one; Git for Windows supplies the bash and
+  the userland. WSL is a route an adopter may choose instead, served by the Linux
+  line. Whether an install is possible at all is the narrower fact the platform
+  block declares: a platform the roster does not carry is refused, because every
+  step of an install is behind the binary (§The gate binary).
+- **The macOS remedy.** Stock macOS ships bash 3.2, below the 4.3 floor, and that
+  floor binds only where the selected profile carries a kit that owes `bash`, so
+  a starter or prose install needs no remedy. The block is the whole remedy: it
+  installs a current bash from Homebrew and puts Homebrew's `bin` ahead of `/bin`
+  on `PATH` — in `~/.zprofile`, the profile a new zsh Terminal reads, and in the
+  running shell. The requirements assert what `PATH` actually resolves, so a Mac
+  carrying Homebrew bash that is not `PATH`-ordered reaches the system's 3.2. The
+  two macOS install-smoke legs run the block verbatim, then open a fresh login
+  shell and source the line it appended, so both the ordering and its
+  persistence are measured rather than suggested.
+- **The Windows remedy.** Git's installer puts only its `cmd` directory on `PATH`
+  by default, and that directory holds no userland, so the block adds Git's
+  `usr\bin` and `bin` for the session and, through the user `Path`, for every
+  later one. Both Windows install-smoke legs run it verbatim under PowerShell.
+  Neither remedy is reversed by `uninstall`, which touches the repository and not
+  the machine.
+- **The pin rule.** A toolchain member is pinned only where a construct the
+  battery actually runs forces the pin, and each pinned member names that
+  construct. A floor nobody's code forces is an aspiration, and an aspiration is
+  what rots.
+- **The audience token.** A toolchain bullet's `@` token names whose floor it is.
+  `@contributor` is a tool nothing on an install path reaches, and `doctor` leaves
+  it out of its verdict entirely. A kit name is held only where the selected
+  profile carries that kit, several joined by `+` where it carries any of them.
+  `@registered` is held only where a gate registered in `gates.list` needs the
+  tool. An unmarked bullet binds every adopter's machine, and `doctor` run outside
+  an install names a selection-bound member as *not probed* rather than guessing
+  a selection. The roster lives in `native/src/toolfloor.rs` beside the floor
+  predicate that reads it, and the block renders it.
+- **The self-check is the binary.** The page's machine check is the gate binary's
+  `--emit env-probe` (context-kit/SPEC.md §bin/env-probe) and not a shell front
+  end, because the toolchain block states `bash` as owed only by the kits that
+  ship one, and a step that spawned bash would ask every reader for a tool most of
+  them do not need. It reports each tool's version *and* its verdict against the
+  contract, so the profile answers whether the box qualifies.
+- **The docs-site tier.** Publishing a docs site is an optional wider tier: a
+  consumer registering site-kit's render-fidelity gate, which re-renders every
+  page through the GitHub Pages parser, also needs Ruby with the
+  `kramdown-parser-gfm` gem, and one publishing no site never installs it.
 
 **Neither the verbs nor anything they install need `jq`.** The verbs read JSON —
 this package's own version stamp and the `checkwright.lock` manifest — and behind
@@ -309,8 +415,7 @@ A payload older than the recorded install is refused as a
 silent downgrade. "Older" is the floor predicate's comparison
 (context-kit/SPEC.md §bin/env-probe), which orders dotted digit runs only: a
 version carrying a prerelease or build suffix is unordered and never reads as a
-downgrade, because no ordering for one is ruled yet (docs/install.md
-§Versioning). `--force` covers that refusal too, which is what makes a
+downgrade, because no ordering for one is ruled yet (§Versioning). `--force` covers that refusal too, which is what makes a
 rollback a thing you asked for rather than a thing that happened to you.
 `--force` means the same thing in all three places it appears — the changed-file
 protection here, the downgrade refusal above, and the kept files `uninstall`
@@ -3537,6 +3642,466 @@ missing the kit `doctor` sources its toolchain roster from fails the smallest
 profile rather than passing unnoticed. The honest residue is that no assertion
 compares the two sets element by element — a kit dropped from the payload that
 nothing in the smoke's path reads would not be caught here.
+
+## Vendoring without the installer
+
+`init` does this on an adopter's behalf; the manual path stays supported and is
+worth reading whether or not you take it. It is the audit story — the account
+of what lands in your tree, and the reason nothing the installer does has to be
+taken on trust.
+
+Each kit is a self-contained top-level directory. To adopt one, copy it into
+your repo root and wire it in:
+
+1. Copy the kit directory (for example `gate-sdk/`) into your repository.
+
+   Copying a kit directory out of this repository gives you its `SPEC.md` and
+   its `smoke/` as well, which the installer's payload withholds; the manual
+   path is the same kits with more of the engineering record attached, never
+   fewer of the gates.
+2. Register the gates it ships in your `gates.list`, where the kit ships gates.
+3. Point the kit at your layout through its external configuration — consumers
+   never edit vendored kit files, so configuration always lives outside them.
+4. Opt each clone into the generated pre-commit hook by running the gate binary
+   — the path `GATE_SDK_NATIVE_BIN` names, which is where `init` places it — with
+   `--install-hooks`, for example `./scripts/checkwright-gates --install-hooks`
+   from the repository root. The same spelling runs from a POSIX shell and from
+   PowerShell, with the `.exe` suffix on native Windows.
+
+Where a kit ships adoptable skills, take each as a binding shim by default — a
+one-line directive that references the vendored template, so a re-vendor reaches
+it and its gates hold the shim thin. Copying the template and filling its slots
+is the sanctioned fork: kept for legitimate structural divergence, but you then
+own its prose and an upgrade won't reach it. The shipping kit's SPEC owns the
+shim↔template contract — lifecycle-kit/SPEC.md §templates/stages/ states the
+stage-skill modes.
+
+Start with gate-sdk — the other kits register into its runner — then add kits
+in the order the kit map (`README.md`) lists them.
+
+### What a gate discloses
+
+Worth knowing before you adopt, because it qualifies the vendored-committed
+claim docs/install.md opens with. A gate whose implementation is a compiled
+binary ships four things, withholds one, and publishes one. It ships its
+declaration, which carries a one-line statement of the invariant the gate holds
+and is printed when the gate blocks you. It ships its `# spec:` pointer. It
+ships its `good/`+`bad/` fixture pair. It ships the binary itself, verified
+against a published digest before anything is written to your tree. What it
+does not ship is the implementation source. What it publishes rather than ships
+is the specification section the pointer names: it is read on the project site,
+and the `commit` your `checkwright.lock` records resolves the exact text your
+tree was vendored from. gate-sdk/SPEC.md §Consumer payload is where that is
+ruled and bounded.
+
+Most of the battery is shell you can open and follow line by line. That is a
+statement about the corpus as it stands, not about the contract: what a gate
+discloses is set by the rule above, whatever the shape of the shipped set on the
+day you vendor it.
+
+The reason is narrow and worth stating as narrowly as it holds. A coding agent
+told to make your battery green will, if it can, read the gate blocking it and
+edit its way around the rule instead of fixing what the rule caught. Withholding
+the implementation raises the cost of analysing a gate relative to the cost of
+running it. It does not make the rule a secret. A binary can be taken apart. The
+fixture pair shows you what passes and what fails. The specification section
+states the invariant on purpose. What you keep is the ability to run the gate
+and to hold it to its own fixtures, which is what the install page means by
+verifying rather than trusting.
+
+## Reviewing the pre-commit hook
+
+Step 4 of §Vendoring without the installer — and `init`'s own follow-up block —
+points a clone's git hooks at POSIX sh from this tree, which is worth deciding
+with the files open. The account below aims at completeness over reassurance.
+
+**What the hook is.** A generated POSIX sh file. The gate binary's
+`--emit git-hooks --write` emits
+it from the per-gate `# graph:` manifests, so the hook carries the *triggered
+subset* of your registered battery: each gate fires under the path globs its
+own manifest declares, and the gates outside that subset run only in the full
+battery. The emitted hook is tracked, so the diff you review is what will run,
+and `check-graph` holds it byte-fresh against its emitter — a hand-edited hook
+that has drifted from the manifests reddens rather than diverging quietly.
+
+The same emitter writes a second tracked hook, `commit-msg`, from the gates
+registered at that tier, and `check-graph` holds it fresh by the same
+byte-comparison. Installing points your clone at the hooks directory, so both
+hooks are what you are reviewing; everything this section says of the
+pre-commit hook holds of the commit-msg one.
+
+**What installing it changes in your clone.** `--install-hooks` has three
+effects, and an audit of what it touches wants all three:
+
+- `core.hooksPath` is repointed at the kit's hooks directory. That config write
+  is what makes the generated hook fire at commit time.
+- `blame.ignoreRevsFile` is set to `.git-blame-ignore-revs`, but only when the
+  repo carries that file; a repo without one is left untouched.
+- `check-identity` runs once at opt-in, so a wrong-identity or wrong-remote
+  mapping surfaces before your first commit. The gate's exit status becomes the
+  installer's, so a failing identity check is visible to whatever ran it.
+
+**How to review before running.** The hook is tracked POSIX sh in your gates
+directory, and every gate it invokes is either the digest-verified gate binary
+beside it or tracked shell under the vendored kit directories and your own gates
+directory. Nothing is fetched at install time or at run time, so a vendoring or
+upgrade diff shows the whole of what you are agreeing to execute.
+
+**How to disable it.** Per commit, `git commit --no-verify` skips the hook. Per
+clone, `git config --unset core.hooksPath` removes it. Both are supported
+positions and neither is an escape: gate-sdk/SPEC.md §Enforcement tiers rules
+the local hook a latency optimization whose guarantee lives in the CI tier, so
+skipping it costs an earlier signal and nothing beyond that, provided the outer
+tier exists — which is why the install page asks for the battery as a required
+status check.
+
+## Versioning
+
+The repository carries one semver line, applied as git tags, with the kits
+moving in lockstep: a kit earns its own version only if it is ever split out
+for independent adoption.
+
+### The release channel
+
+The declaration is one line, `Release channel: **<value>**`, and it lives on
+docs/install.md §Upgrading, where an adopter reads it; this section owns its
+rule and names no value, so the page is the channel's one statement.
+
+The two admissible values are `preview` and `stable`. That line is prose a reader
+sees and a token a gate reads — read off a line of its own rather than a bracketed
+tag, the same one-line-declaration shape queue-kit's `roadmap-summary:` uses and
+for the same reason.
+
+The channel is a statement about **audience and support expectations**, not a
+second artifact stream. While it reads `preview` the version line is 0.x, and
+breaking changes ride minors under the pre-1.0 qualifier below. The tag rhythm
+under `preview` is an artifact of internal iteration rather than a stability
+signal: the tags are preview-channel iteration artifacts, and a launch
+announcement is a separate, later event. The channel flips to `stable` at
+`v1.0.0`, the same deliberate cut this section calls the first stability promise —
+now with a surface that says so before a reader infers it from tag density.
+
+**Mechanized on two surfaces, on two different tiers.**
+`.github/workflows/publish.yml`'s `release` job creates the GitHub Release, and
+while the channel is `preview` that creation carries `--prerelease`, so every
+Release page states the posture without a human remembering to. That is the
+**creating** posture, held by a gate. The **accumulated** posture — the flag on
+every Release already published — is held by a monitor instead, because host
+state is out of a precommit gate's reach by construction. Neither subsumes the
+other: the creating step can be correct forever while an older Release
+contradicts it, which is exactly how the drift below went unnoticed.
+
+Nothing else in the publish path changes. In particular the npm
+publish carries no `--tag`, and its absence is **load-bearing configuration**
+rather than an omission: a non-default dist-tag would make docs/install.md
+§Quick start's one-command install resolve to nothing until a reader learned to
+append the channel, trading an honest signal for a time-to-first-value
+regression on the front door. That trade was put to the operator in those terms
+and declined. It becomes the right call only once docs/install.md §Quick start
+stops promising a bare one-command install, or once a stable line exists to hold
+`latest` while preview moves off it. Neither holds today. Nothing forecloses the
+change either: the pack arm's version regex already admits a prerelease suffix.
+
+**The same preference decides invariant C the other way, which is why the two
+sit side by side.** Both trades weigh an honest channel signal against a reader
+who follows a default pointer, and the dist-tag lost because `npm install`'s
+default tag *is* the documented front door — docs/install.md §Quick start
+resolves it. No documented install path resolves the GitHub Latest pointer at
+all: that section runs the installer, and every explicit download URL it prints
+names its version. The front door is not on that path, so the cost that declined
+the dist-tag change is absent here. Same preference, opposite outcome. That is
+not a reversal; the dist-tag's own re-entry condition above is untouched.
+
+Three invariants hold the declaration, so it cannot become a comment. The first
+two are gate-held and read files off disk; the third is monitor-held and reads
+the host, and it is stated after the gate's own contract below rather than
+inside it. `check-release-channel-parity` (this repo's `scripts/`) owns A and B:
+
+- **Invariant A — channel ⟷ publish posture.** The channel and the prerelease
+  posture of the Release-creating step in `.github/workflows/publish.yml` agree:
+  `preview` demands `--prerelease` on that invocation, `stable` demands its
+  absence.
+- **Invariant B — channel ⟷ version line.** The channel agrees with the version
+  line, read from the newest tag by creator date: while that version is `0.x` the
+  channel must be `preview`; from `v1.0.0` onward it must be `stable`.
+
+B is not optional polish. The channel is *derived* from the version line, so
+without B a `v1.0.0` could ship with `preview` declared and `--prerelease` still
+set — A passes because both of its surfaces agree, and both are wrong. B also
+protects a second consumer: lifecycle-kit's knob-rename compat precedent reads
+this declaration as its general-availability threshold, so a stale `preview` would
+hold that compat window open past GA.
+
+The gate fails closed rather than passing whenever it cannot find a surface it
+needs. Exit 2, never a clean line, on each of:
+
+- a declaration line that is missing or duplicated;
+- a channel value it does not recognize;
+- a `publish.yml` with no recognizable Release-creating step;
+- a newest tag that does not parse as semver.
+
+A repository with **no tags at all** has no version line, so B is dormant there
+while A still asserts. The gate *reports* that dormancy in its clean output, so a
+reader can tell "checked and agreeing" from "nothing to check".
+
+- **Invariant C — channel ⟷ published Release history.** Every published
+  Release's prerelease flag agrees with the channel its own version line
+  implies: a `0.x` tag carries the flag, a `1.x`-or-later tag does not.
+
+C is A and B composed rather than a new policy. B already rules that a version
+line implies a channel; A already rules that `preview` implies the flag. The flag
+on *any* Release therefore follows from that Release's own tag. B only ever got
+checked against the newest tag because the gate had one version line to read;
+C is the same statement evaluated over the whole published history. That makes
+the desired host state **derived rather than stored** — there is no tag-to-flag
+roster to maintain anywhere, and the rule keeps working across the `v1.0.0` flip
+with no edit, because at that flip the newest tag stops being `0.x` on its own.
+
+**C is held by a monitor, not by the battery** — the release-channel arm of
+`.github/workflows/site-health.yml`, which reads the Release list from the API
+on its schedule and files a `site-health` issue naming every Release whose flag
+disagrees with its own version line. A precommit gate cannot reach host state,
+and weakening the tier to reach it is the one change this design refuses; this
+is the same tier ruling `RELEASING.md` step 6 already makes for the Release
+body, over the same objects.
+
+**What this means for a reader, stated because it is what they see.** Every
+release this project has published is `0.x`, so under C **no Release is
+Latest**: the repo front page shows no green Latest badge and the releases list
+labels every entry `Pre-release`. Resolving the pointer itself yields no release
+— the API's `releases/latest` endpoint answers 404, while the browser URL
+redirects to the releases list. That is the honest presentation of a channel
+whose tags are preview-channel iteration artifacts, and docs/install.md
+§Upgrading tells an adopter to take a release from the releases list or name an
+explicit version, never the Latest pointer. Nothing documented depends on it:
+docs/install.md §Quick start runs the installer and every download URL it prints
+carries its own version.
+
+What earns each bump derives from the release note itself — its
+declaration-bearing sections (§The upgrade contract below) already declare
+everything phase B must reconcile, so the floor is read off the note rather than
+maintained beside it:
+
+- **Patch** — every declaration-bearing section is "None": a phase-A-only sync,
+  fixes and docs that tighten nothing a consumer must reconcile.
+- **Minor** — any section is non-empty: the release carries phase-B work —
+  a new or stricter gate, a knob rename riding its deprecation path, or a
+  behavior change a consumer's tree may depend on (blind-upgrade-safe is exactly
+  what such a change breaks, the same reasoning that floors the other two).
+- **Major** — a decommission: a release that *removes* a deprecated surface
+  (a release-sweep disposition executed as decommission), or any change the
+  two-phase upgrade contract cannot reconcile from the note alone. This
+  criterion is absolute: a decommission earns a major even while the line is
+  0.x, outranking the pre-1.0 qualifier below rather than riding a minor.
+  Majors are where the deprecation promises come due — the release-sweep
+  constraint that no marker rides into the next major undispositioned binds
+  here. A kit `bin/` tool is not a deprecation-marked surface: deleting one is
+  not a decommission. It rides a minor and is declared by path under Behavior
+  changes, where a script of yours that called it finds its worklist item. In
+  this repository `check-release-change-declared` holds that declaration.
+- **Pre-1.0 qualifier** — while the line is 0.x, breaking changes *other than
+  decommissions* may ride minors (the semver 0.x convention), each still
+  declared in the note; a decommission still earns a major (above), and that
+  is what keeps release-sweep's no-marker-rides-past-the-major constraint
+  anchored while 0.x. `v1.0.0` is the first stability promise and is cut
+  deliberately, never earned mechanically.
+
+The floor has a **second input**: a note also inherits the floor of any
+outstanding deferred release. When an iteration's criteria were met but the
+release was held back, its disposition line records the earned version as
+`deferred:vX.Y.Z` (lifecycle-kit/SPEC.md §templates/stages/), and
+those criteria stay unconsumed until a release at or above that version ships.
+The next qualifying note carries them in its declaration-bearing sections, composed
+from the release declaration surface that carried them across every deferral. That
+note may not fall below that version, so a note's floor is the higher of what its own sections
+derive and what an outstanding deferral carries. `check-release-bump` reads both.
+
+The derivable half is gated: `check-release-bump` (this repo's `scripts/`, a
+compiled subcommand since gate-sdk/SPEC.md §The declaration cohort)
+orders the release notes by version and reds a patch-only bump whose note
+declares tightened gates, renamed knobs, or behavior changes (and fails closed
+if any fixed section is absent). That presence assertion binds the **newest**
+note only, so adding a fixed section to the roster above costs no historical
+backfill across the published corpus. The major criteria stay judgment —
+a decommission is a semantic fact no section grammar carries — so the gate
+holds only the floor.
+
+**The gate orders `<major>.<minor>.<patch>` and refuses anything else**, naming
+in its refusal the offending token, where that token came from, plus the grammar
+it failed. That is a guard rather than a closure. A prerelease or build-metadata
+suffix stays exactly as admissible as the pack arm already leaves
+it; what is missing is an *ordering* for one, because the candidate rules
+disagree — `sort -V` puts `1.0.0` *before* `1.0.0-rc1` where semver puts it
+after. A gate whose subject is this section's one semver line must not pick
+between them by accident. **That ruling is owed by the session that first cuts
+such a release.** Until then the first note using one reds loudly here instead of
+mis-ordering silently.
+
+## The upgrade contract
+
+An upgrade runs in two phases.
+
+**Phase A — deterministic.** Replace the vendored kit directories wholesale at
+the target tag. Because consumers never edit kit files, this sync loses
+nothing. Next, retire each shell config the target's kits replaced with a knob
+file. A kit that now ships `templates/<stem>-config.knobs` in place of
+`<stem>-config.sh` refuses the old `<stem>-config.sh` or `<stem>-config.local.sh`
+in your gates directory. The regeneration reads those knobs, so it refuses too.
+Rewrite what you set in each file into its `.knobs` file, then delete it. A copy
+`init` seeded that you never edited is simply deleted. Then regenerate the
+generated artifacts.
+*Which* artifacts those are is a property of the kits you vendored rather than a list to carry here: each one's
+freshness gate names its own regen command when it reds, so phase B is what tells
+you about any you skipped. `checkwright update` automates this phase (§update).
+
+**Phase B — gate-driven.** Run the full battery. The set of gates that go red
+*is* your migration worklist: each red gate names the surface that moved, and
+the release note supplies the intent behind the move. Reconcile the red set and
+you are current.
+
+Two shipped tools carry this contract. The upgrade smoke
+(gate-sdk/SPEC.md §upgrade-smoke) is its executable proof — it drives both
+phases against a scratch consumer, asserting the phase-A sync is deterministic
+and the red set stays within `TO`'s Tightened-gates declaration — the target
+note's when `TO` is a tag, and the release declaration surface in `TO`'s own
+tree when it is not. The upgrade skill (lifecycle-kit/SPEC.md
+§templates/upgrade.md) is the phase-B disposition ritual a consumer runs to
+register the note's newly declared gates and disposition each red.
+
+Release notes are dated posts under `docs/posts/`. Each carries a
+`release: vX.Y.Z` key in its front matter — the key that resolves a version to
+its note — and these sections under fixed names. This list is the roster: **In
+brief** is the human read, and the sections after it are the
+**declaration-bearing** ones a mechanical consumer reconciles. Prose elsewhere
+names those classes rather than counting their members, so adding a section
+here does not silently falsify a sentence somewhere else.
+
+- **In brief** — placed first, immediately after the opener and ahead of
+  Tightened gates. Three to five bullets of plain language, each answering *what
+  you get* or *whether you must act*. A bullet lead here is a plain phrase, never
+  a gate or knob name. The declaration-bearing sections below already carry those
+  tokens; this section exists to be readable without them. **In brief has no
+  "None" form**, unlike every section below it. A release with nothing worth
+  saying to a human is a patch, and says that in one bullet. It bears no
+  declaration. It feeds no bump criterion and no allowed-red set, and nothing
+  reads it but the human upgrader. Its position ahead of the migration detail is
+  deliberate: the opener's one-sentence slot is a lede, and in practice it
+  summarizes the engineering instead of answering whether the reader must act.
+
+  What holds it is `check-release-bump`'s presence assertion, and that assertion
+  **binds a note under composition** — the newest note whose declared version
+  carries no tag yet. A note published before this section existed is history. It
+  is not retro-fitted with a fabricated summary, and the assertion goes dormant
+  on it, reporting which state it is in rather than going quiet. The
+  predicate is `check-release-declaration-parity`'s, adopted so that release
+  state is read one way across the corpus. Its residual is that sibling's too: a
+  note authored and drained inside a single commit is never seen under
+  composition, so what carries the section into existence is the split
+  choreography the release runbook prescribes, whose chrome skeleton holds its
+  slot.
+- **Tightened gates** — one bullet per gate that landed new or got stricter, the
+  gate name the bullet's lead token. A mechanical consumer reads these lead
+  tokens as the release's allowed-red set: the gates a clean upgrade may turn
+  red, each named here with the intent behind the move. The token has one
+  canonical spelling. It is a **backticked, unbolded** bare gate name, directly
+  after the bullet marker (``- `check-foo` ``, then the prose). Backticks because
+  the token is a code identifier and this tree spells identifiers in backticks;
+  unbolded because bold is a rendering choice carrying no semantics, and it
+  collides with the one token a machine reads. So the section resolves to an
+  explicit empty set (a "None" body) or to a non-empty token set. Nothing else.
+  A non-"None" section that yields no token is a **defect in the release** rather
+  than a declaration of nothing: the parse would otherwise compile a note naming
+  several gates into an empty allowed-red set, passing vacuously on a green
+  battery and failing with a false message on a red one.
+  `check-tightened-gates-grammar` (this repo's `scripts/`, a compiled subcommand
+  since gate-sdk/SPEC.md §The declaration cohort) holds that over the
+  whole corpus, with no version cutoff — `GATE_SDK_UPGRADE_FROM` and
+  `GATE_SDK_UPGRADE_TO` make any historical pair a supported run, so any note may
+  be the one the smoke resolves. Registry membership is deliberately not
+  asserted. A gate renamed or retired since a note shipped would make membership
+  false about history without the record being wrong.
+
+  **A sibling gate makes a separate claim, and neither is the other's coverage.**
+  The grammar gate holds each note's section *well-formed*.
+  `check-release-declaration-parity` (also this repo's `scripts/`) holds a note
+  *under composition* **equal to the release declaration surface it was composed
+  from**, in all three declaration-bearing sections, as set equality of lead
+  tokens in both directions — both, because each direction costs something
+  different. In Tightened gates, a name on the surface and missing from the note is
+  a gate that tightened and shipped undeclared, licensing a red the upgrade smoke
+  would wave through, while a name in the note and missing from the surface
+  declares a gate that never tightened and sends consumers hunting a reconcile
+  that does not exist. In Renamed knobs and Behavior changes, a token on the
+  surface and missing from the note is a declared change the note dropped, while a
+  token in the note and missing from the surface is a change close reconstructed
+  instead of the landing session declaring it: the composing session appends it to
+  the surface in the composing commit, then transcribes. It arms on a note whose declared version carries no tag yet and disarms
+  once tagged, reporting its dormancy rather than letting a drained surface read
+  as verification. It is a compiled subcommand
+  (gate-sdk/SPEC.md §The declaration cohort) and rides that cohort's holder of the
+  shared grammar rather than a private parser — the grammar's one holder, a
+  shell twin having been held equal to it by a standing parity oracle until both
+  retired together (gate-sdk/SPEC.md §lib/declaration.sh). The upgrade smoke
+  reads that grammar through the same compiled holder, so the two cannot drift
+  apart and read different token sets from the same bytes.
+
+  **A declaration precedes its release.** Because the upgrade smoke's untagged
+  arm reads a working tree's release declaration surface rather than a note
+  (gate-sdk/SPEC.md §upgrade-smoke), an allowed-red set is owed from the moment a
+  gate is landed or tightened, not from the tag. The surface carries every
+  section, so a behavior change or a rename is owed from the moment it lands too.
+  Running the smoke against your checkwright clone at an untagged `TO` is what
+  reads it.
+- **Renamed knobs** — one bullet per rename, `old → new`; a knob *removal* is
+  the same residue class (own-config orphaned) and is expressed `old → ∅`. The
+  lead token is the old name, backticked and unbolded, directly after the bullet
+  marker (``- `OLD_NAME` → `NEW_NAME` ``). The arrow, the new name and any prose
+  follow it.
+- **Behavior changes** — one bullet per shipped change that alters what the kits
+  *do* without landing or tightening a battery gate: a fail-closed convergence
+  in a shared library, a runner's semantics, a skill or template behavior, a
+  default's effect. The bullet's lead token is the changed surface's name (the
+  script, knob, template, or file), bolded; the rest states what moved and what,
+  if anything, the consumer reconciles. This section keeps its own spelling — its
+  lead tokens are legitimately prose phrases rather than identifiers, so the
+  Tightened-gates rule above does not reach it. Its lead token is read verbatim.
+  It is the bolded span directly after the bullet marker, so a surface or phrase
+  inside the bold is the token and whatever follows the closing `**` is prose.
+
+  These two lead-token pins bind the **note under composition** only. No gate
+  reads a published note's Renamed knobs or Behavior changes tokens, and notes
+  published before the pins spelled their leads several ways and are not
+  retro-fitted.
+
+"None" is a valid body for any of the three sections and must be stated, not
+omitted — a release that tightens nothing, renames nothing, and changes no
+out-of-gate behavior says so on each. Its form is a bare "None."; add a
+trailing clause only where it rules out a near-miss the reader would otherwise
+mis-classify (an advisory KPI that never joins the gate registry, knobs added
+but not renamed). A clause that only restates the heading's own negation is a
+restatement to delete. This consumer-owned residue Phase A
+cannot touch (gates you have shadowed, templates you have copied out, knob
+renames in your own config, behavior your tree depends on) is that note's
+checklist.
+
+Those four residue classes map onto the three sections by design: **shadowed
+gates** → Tightened gates; **own-config knob renames and removals** → Renamed
+knobs; **copied-out templates and depended-on behavior** → Behavior changes. The
+copied-out-template class earns no section of its own because a template you have
+copied out that then changed *is* depended-on behavior diverging from your copy —
+it is behavior-folded, not dropped. Four classes, three sections, by that
+folding. A template `init` seeded that you never edited is the one exception,
+because `init` rewrites it on upgrade: you take the change rather than diverge
+from it. So a change that tightens a gate through such a template is declared
+under Tightened gates as well.
+
+Honest limit on Behavior changes: **its bullets are declared for
+the human upgrader, not smoke-asserted.** A non-gate change cannot red the
+battery, so the upgrade smoke's containment assertion (defined over battery
+reds) does not read this section — it fixes where such changes are stated and
+`check-release-bump` fixes that they are stated, but neither makes them
+executable. Tightened-gates bullets stay the mechanical allowed-red set;
+behavior-changes bullets are reconciled by reading.
 
 ## Docs
 
