@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+delegation-seams gates sha256=01a89df46b4d11bc5e59433b4609aab7e1acf7b2cec9ce807d0baa0058eb20e4 pass=123 fail=0 ignore=0 verdict=clean 2026-09-21
+delegation-seams gate_sdk sha256=fb4a7b906b53571bab9385b3a5ae0e1331e0bdd1764c4f46d1342738a680c88d pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+delegation-seams canon_kit sha256=7fa6f15316eae59bac76441d7c44c7846b2a7d06de9311b07f68c0b041433f95 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+delegation-seams context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+delegation-seams delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+delegation-seams doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+delegation-seams evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+delegation-seams guard_kit sha256=01d94b4120e133665e01946fe44d31a730d2c6cdfd1570e5ce6b96a7a1b30e1b pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+delegation-seams lifecycle_kit sha256=bac54b43ac9a49c420f8020fda337dac934779dfe6701db269ad8ac2a89ceb81 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+delegation-seams queue_kit sha256=4d50cf613cf514a9f5c5f92ad7c46acf5d8f750aedc71c9e629514a415bad337 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+delegation-seams site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+delegation-seams scripts sha256=79ed7aac215203e28c16d151e43d18867b9d53aa24afc2c79947e252882e97b7 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+delegation-seams guard_tests sha256=2e9a22131559a27d70c1ffe7f075649ff0a18e7ddacf4aaee09130cdf20bd345 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+delegation-seams demo sha256=a004fbdbc714b5b420d968280c2e341d12b438871e260443b5bd97706cbd682a pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+delegation-seams installer_smoke sha256=da28f366335ecab4c385213ffc85cf8fd53c361c1a0cf03d827ead475c6540e8 pass=16 fail=0 ignore=0 verdict=clean 2026-09-21
+delegation-seams consumer_smoke sha256=44f5f1b8da77ea2ddf5fb30467aefb50630ace6c9aa9704fe722ec2218045e75 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+delegation-seams upgrade sha256=d978df87a86eefce05c17418d4ffcf53e3932eb95ccb994ee7eaa0cf5366cd88 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+delegation-seams agents_md_smoke sha256=fe914a9b17e53f8e11b72cb47f0f6561de44739113b28da31e2ce9ef192dd942 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+delegation-seams index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+delegation-seams native_crate sha256=709615d644b2a298ff026dada66e84c6d7e0e57f6e1b7c2b9abd238fecf33d4c pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
