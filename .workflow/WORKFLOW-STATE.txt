@@ -9,3 +9,4 @@ gate-sdk-surface-drain spec ac297ce8 2026-09-21 6d874623
 gate-sdk-surface-drain align a0802fc5 2026-09-21 abdff8d6
 gate-sdk-surface-drain build aaef19c7 2026-09-21 d927328a
 gate-sdk-surface-drain build a2313ff8 2026-09-22 d1ff25f5
+gate-sdk-surface-drain build a0e34134 2026-09-22 86429f6a
