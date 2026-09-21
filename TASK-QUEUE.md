@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: docs-first-contact
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -15,6 +15,53 @@
 ## Technical Debt
 
 ## Deferred
+
+- **install-md-adopter-page-overgrown** [cost: event/high] [surface: docs] — `docs/install.md`
+  is an adopter page carrying maintainer-tier grounds, and nothing holds a `docs/` page to a length
+  or a reader tier, so it regrows.
+  **Re-verified at this scope:** 980 lines. The bullet measured 169 commits, 63 maintainer-tier
+  references, Requirements about 240 lines, the release channel about 175, the upgrade contract
+  about 165 and Quick start about 100. `check-surface-ratchet` and `check-brevity` (context-kit)
+  reach no `docs/` page.
+  **Deliverable, by operator direction (2026-09-21, lead session):** rewrite the page as an adopter
+  page of about 150 lines (intro, Requirements with its remedy blocks bare, Quick start, Managing,
+  Upgrading, pointers to installer/SPEC.md for the grounds). Keep the gated marker blocks and the
+  `install-primary:` declaration. Add a regrowth guard whose reach is the whole `docs/` site.
+  **Cost while deferred:** the adopter's first page after the front door stays unreadable.
+  Filed 2026-09-21 to the gap inbox by the lead after `delegation-seams`'s close; promoted
+  2026-09-21 into `docs-first-contact` by operator direction (lead-relayed); **marked for spec**.
+  **DISTINCT from** `docs-index-front-door-restatement-ungenerated` (a restatement, not a page's
+  length or tier). `gates-must-not-bind-to-document-paths` constrains the guard's design.
+
+- **adopter-demo-verb-missing** [cost: event/high] [surface: installer] — the home page promises
+  a walkthrough with nothing installed, but `--run-demo` copies kit source from the tree it runs in
+  (`GATE_SDK_KIT_DIRS`), so it works only from a clone. The installed front door has no demo verb.
+  **Measured by the lead on published 0.25.0 in a scratch repo:** `init` passed with 447 files,
+  `uninstall` removed 446 in one commit, and the demo failed at every door (`npx checkwright
+  --run-demo`, `run-gates.sh --run-demo`, the vendored binary's `--run-demo`).
+  **Deliverable:** a `checkwright demo` verb that runs the walkthrough from the installer's own
+  package, with no clone and nothing installed into the adopter's repo.
+  **Inferred, not run:** the packed payload already carries every kit root the walkthrough
+  copies (installer/SPEC.md §The packer). Spec settles it by packing master's installer and
+  running install, demo and uninstall in a scratch repo.
+  **Cost while deferred:** an adopter's first contact is a command they cannot run.
+  Filed 2026-09-21 to the gap inbox by the lead after `delegation-seams`'s close (operator shape:
+  install, demo, uninstall); promoted 2026-09-21 into `docs-first-contact` as its demo-verb unit
+  by operator direction (lead-relayed); **marked for spec**.
+  **DISTINCT from** `fence-execution-gate`, which executes documented fences.
+
+- **fence-execution-gate** [cost: event/high] [surface: canon-kit] — `check-fence-command-head`
+  is static: it proves a fence's command head can run and nothing more, so a wrong operand or an
+  unassigned variable passes, and no documented fence is ever executed.
+  **Deliverable:** execute the fences a doc marks runnable (a per-fence marker, default not
+  runnable) in a sandboxed scratch consumer, hermetic with no network, under a declared set of
+  arms safe to run there.
+  **Cost while deferred:** a pasted command can fail at an adopter's first contact.
+  Filed 2026-09-21 to the gap inbox by the lead after `delegation-seams`'s close and the
+  `check-fence-command-head` hotfix; joins `docs-first-contact` as its fence unit (operator
+  direction 2026-09-21, lead-relayed); **marked for spec**.
+  **DISTINCT from** `check-docs-cmd` (resolves invoked script paths) and
+  `check-fence-command-head` (the static check this extends).
 
 - **queue-citation-line-number-stales-within-its-own-session** [cost: event/low] [surface: queue-kit]
   — a `path:line` cite in a queue body goes stale when the cited file changes above the line, and
@@ -210,6 +257,8 @@
   returned the two adjacent entries above and the iceboxed
   `kit-index-page-vocabulary-ungated`, whose subject is index-page ENUMS, and no
   owner.
+  **Joins `docs-first-contact`** as its index-page unit (operator direction 2026-09-21,
+  lead-relayed); **marked for spec**, which rules between generation and a parity gate.
 
 - **delta-instruction-batch-dependence-unmarked** [cost: once/low] [surface: lifecycle-kit]
   — a spec amendment can state a delta instruction in the unconditional voice
@@ -1744,6 +1793,8 @@
   the five errors here.
   Surfaced 2026-08-18. Filed 2026-08-18 by close, as the gap generalization owed by the
   `docs/site-architecture.md` staleness fixed in the same commit.
+  **Joins `docs-first-contact`** as its trigger-witness unit (operator direction 2026-09-21,
+  lead-relayed); **marked for spec**, which designs the per-row trigger declaration.
 
 - **generated-projections-roster-ungated** [cost: event/low] [surface: docs] — the
   generated-projections roster names every projection and the wide new-gate and
@@ -1775,6 +1826,8 @@
   Filed 2026-09-18 by spec while landing a new projection; drained at this
   iteration's close, which re-measured the roster at 12 rows and confirmed no gate
   reads it.
+  **Joins `docs-first-contact`** as its roster unit (operator direction 2026-09-21,
+  lead-relayed); **marked for spec**, which shares the per-row declaration with the witness.
 
 - **prose-tell-threshold-validation** [cost: event/high] [surface: canon-kit] — `check-prose-tells`' numeric thresholds
   are read unvalidated, so a typo turns a calibrated gate into a silent no-op

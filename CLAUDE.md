@@ -27,7 +27,7 @@ The gates in [`scripts/gates.list`](scripts/gates.list) run on this tree —
 dogfooding is day-one, not optional, though *which* gates register is a tuning
 decision here as for any consumer (`operator 2026-09-10`). Every command below
 runs the gate binary at `GATE_SDK_NATIVE_BIN`; before committing, run the full
-battery (the bare binary) and the fixture suite of every kit the edit *reaches* —
+battery (`--run`) and the fixture suite of every kit the edit *reaches* —
 for a shared `native/src` module, every kit whose gates it implements, never the
 kit you edited; runner per kit in [README.md](README.md) §This repo, governed.
 
