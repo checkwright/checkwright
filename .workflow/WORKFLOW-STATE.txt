@@ -5,3 +5,4 @@
 ---
 
 release-declaration-coupling scope ac7a5749 2026-09-21 4a73be44
+release-declaration-coupling spec ae17fa5a 2026-09-21 187fd9e7
