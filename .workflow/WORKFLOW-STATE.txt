@@ -12,3 +12,4 @@ gate-sdk-surface-drain build a2313ff8 2026-09-22 d1ff25f5
 gate-sdk-surface-drain build a0e34134 2026-09-22 86429f6a
 gate-sdk-surface-drain build a1da1547 2026-09-22 acf5f6ca
 gate-sdk-surface-drain validate a012ae64 2026-09-22 2bab7fa4
+gate-sdk-surface-drain close ac8f2617 2026-09-22 6ce15115
