@@ -5,3 +5,4 @@
 ---
 
 delegation-seams scope a9520f7d 2026-09-21 c4f65fc0
+delegation-seams spec a9dfc58e 2026-09-21 0d2ebdaf
