@@ -68,27 +68,6 @@
   gate files, so coverage holds by construction (removal outranks gating); a gate over all
   members would red every default consumer, whose globs miss the 106 kit-resident gates here.
 
-- **guard-rule-12-single-occurrence-pgrep-loop-passes** [spec: SPEC-pgrep-self-match.md] —
-  guard-kit/SPEC.md §The generic ruleset rule 12 (`guard_rule_pgrep_self_match`) fires only when a
-  `pgrep`/`pkill -f` pattern literal occurs ELSEWHERE in the command, yet its own grounds say the
-  harness wrapper's argv carries the literal, so a loop-headed spelling self-matches with one
-  occurrence. **Probed at this scope:** `while pgrep -f 'checkwright-gates --run-validate'; do sleep
-  5; done` passes `scripts/bash-guard.sh` at exit 0; the same loop with the literal repeated is
-  blocked at exit 2. The rule's clause "a pattern occurring nowhere else in the command is a
-  genuine query and passes" is what admits it.
-  **Attested:** that exact waiter held a `scratch-hermeticity` validate session active until the
-  operator confirmed a stop.
-  **Why design-pending:** a tightening of a shipped guard rule — which spellings (loop, `if`, `!`)
-  self-match with one occurrence and which a single foreground `pgrep` exec leaves clean — owes a
-  fixture arm and a Tightened-gates declaration.
-  **Cost while deferred:** a waiter that can never exit passes the guard written to refuse it.
-  Filed 2026-09-21 to the gap inbox after `scratch-hermeticity`'s close; promoted 2026-09-21 into
-  `delegation-seams` by operator direction (lead-relayed); **marked for spec**. Owner lookup:
-  guard-kit rule 12, delegation-kit/templates/agent-execution.md's pattern-match paragraph.
-  **Spec 2026-09-21:** probed, a lone foreground `pgrep -f` matches its own harness wrapper too;
-  ruled the predicate "the pattern, as pgrep's ERE, matches the command text", declared under
-  Behavior changes (a guard rule is no gate). The amendment holds the rows and text.
-
 - **sibling-stage-sessions-collide-on-a-shared-scratch-commit-message-file** [spec: SPEC-msgfile.md]
   — `.tmp/` survives across the sibling batch sessions one stage dispatches, so the conventional
   `.tmp/commit-msg.txt` name is shared state between them.
@@ -2971,5 +2950,7 @@
 - **lead-agent-id-compaction-defense** — each claim still wants its own probe.
 
 ## Done
+
+- guard-rule-12-single-occurrence-pgrep-loop-passes
 
 ## Lessons Learned

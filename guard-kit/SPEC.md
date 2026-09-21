@@ -1097,18 +1097,25 @@ by number ("rule 14's walk").
     fallback beside the tool: `grep -rn <pattern> <path>` searches the same
     working tree.
 12. **Self-matching process-liveness predicate** (`guard_rule_pgrep_self_match`)
-    — a `pgrep`/`pkill -f` whose
-    pattern literal the command's own text repeats is **blocked**. `-f` matches
-    against full argv, and the waiter's own argv — the harness's wrapper included
-    — carries that literal, so `until ! pgrep -f '<script>'; do …; done` has a
-    permanently-true condition and never exits. It reds nothing: the work
-    completes correctly and the only symptom is the foreground cap absorbing an
-    unbounded loop, which reads from outside as a fixed cap-length wait. Fires on
-    the conjunction no allowlist glob expresses: a segment whose **command word**
-    is `pgrep` or `pkill` — read past a leading `until`/`while`/`if`/`!`, which do
-    not change which binary runs, so the loop-headed spelling the rule exists for
-    is reached — carrying `-f` (bare or bundled in a short cluster), whose pattern
-    operand is a literal occurring **elsewhere** in the same command. The
+    — a `pgrep`/`pkill -f` whose pattern matches the command's own text is
+    **blocked**. `-f` matches against full argv, and the harness runs a command
+    through a wrapper whose argv carries the whole command text — the command is
+    not the last word of the wrapper's `-c` string, so no `exec` replaces it — so
+    such a pattern always finds at least the wrapper: `until ! pgrep -f
+    '<script>'; do …; done` has a permanently-true condition and never exits, a
+    one-shot query always answers *running*, and a `pkill -f` signals its own
+    wrapper. It reds nothing: the work completes correctly and the only symptom
+    is the foreground cap absorbing an unbounded loop, which reads from outside
+    as a fixed cap-length wait. Fires on the conjunction no allowlist glob
+    expresses: a segment whose **command word** is `pgrep` or `pkill` — read past
+    a leading `until`/`while`/`if`/`!`, which do not change which binary runs —
+    carrying `-f` (bare or bundled in a short cluster), whose pattern operand (a
+    quoted operand read whole across its blanks), read as the ERE `pgrep`
+    compiles, matches the raw command text (case-insensitively under `-i`, as
+    `pgrep`'s own match is). A pattern that does not match its own text cannot
+    self-match and passes; the bracket trick (`'[r]un-smoke.sh'`, whose regex
+    needs text the command does not hold) is that case, and it passes this rule
+    while staying refused as the sanctioned form (below). The
     corrective names both sanctioned forms: wait on the work's own artifact, or
     `kill -0` against a **recorded PID** where liveness genuinely is the condition
     — whoever started that producer, a child the session backgrounded itself
@@ -1127,8 +1134,10 @@ by number ("rule 14's walk").
     directions: an expansion or substitution anywhere in the command declines
     outright (rule 6 already blocks those shapes); a `pgrep` without `-f` matches
     process **names** rather than argv and is untouched; an unrecognized option, an
-    option whose argument cannot be walked, or a second bare operand declines; and
-    a pattern occurring nowhere else in the command is a genuine query and passes.
+    option whose argument cannot be walked, a second bare operand, `-x`/`--exact`
+    (the pattern must then match the whole argv line, which the wrapper's always
+    exceeds), `-v`/`--inverse` (the predicate is inverted, so the self-match
+    argument does not apply), and a pattern that is no valid ERE all decline.
     Each biases toward passing rather than toward a false block. **Placed with the
     read-steer rules and before both auto-allow rules**, on rule 8's stated
     reasoning: `pgrep` is a plausible member of a widened `GUARD_KIT_RO_BINS` — it

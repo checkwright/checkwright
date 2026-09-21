@@ -849,16 +849,23 @@ _guard_command_word() {
     printf '%s' "$seg"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 12's pattern operand: the literal '-f' will scan argv for, or non-zero where the segment's options cannot be walked without guessing
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 12's pattern operand: the ERE '-f' will scan argv for, a quoted operand read whole across its blanks, prefixed 'i ' under -i or '- ' otherwise, or non-zero where the segment's options cannot be walked without guessing or -x/-v void the self-match argument
 _guard_pgrep_pattern() {
-    local seg="$1" tok rest k pat='' have_f=0 skip=0
+    local seg="$1" tok rest k pat='' have_f=0 skip=0 icase=- open=''
     local -a toks
     read -ra toks <<<"$seg"
     for tok in "${toks[@]:1}"; do
+        if [[ -n "$open" ]]; then
+            pat+=" $tok"
+            [[ "$tok" == *"$open" ]] && open=''
+            continue
+        fi
         if [[ "$skip" == 1 ]]; then skip=0; continue; fi
         case "$tok" in
             --full) have_f=1 ;;
-            --exact | --inverse | --count | --newest | --oldest | --ignore-case | --list-name | --list-full | --lightweight) ;;
+            --exact | --inverse) return 1 ;;
+            --ignore-case) icase=i ;;
+            --count | --newest | --oldest | --list-name | --list-full | --lightweight) ;;
             --signal | --parent | --pgroup | --group | --session | --terminal | --euid | --uid | --delimiter) skip=1 ;;
             --*) return 1 ;;
             -[0-9]*) ;;
@@ -868,34 +875,45 @@ _guard_pgrep_pattern() {
                 for ((k = 0; k < ${#rest}; k++)); do
                     case "${rest:k:1}" in
                         f) have_f=1 ;;
-                        a | c | i | l | n | o | v | x | w) ;;
+                        i) icase=i ;;
+                        v | x) return 1 ;;
+                        a | c | l | n | o | w) ;;
                         *) return 1 ;;
                     esac
                 done ;;
-            *) [[ -z "$pat" ]] || return 1; pat="$tok" ;;
+            *)
+                [[ -z "$pat" ]] || return 1
+                pat="$tok"
+                case "$tok" in
+                    \'*) [[ ${#tok} -gt 1 && "$tok" == *\' ]] || open=\' ;;
+                    \"*) [[ ${#tok} -gt 1 && "$tok" == *\" ]] || open=\" ;;
+                esac ;;
         esac
     done
-    [[ "$have_f" == 1 && -n "$pat" ]] || return 1
+    [[ "$have_f" == 1 && -n "$pat" && -z "$open" ]] || return 1
     case "$pat" in
         \'*\') pat="${pat#\'}"; pat="${pat%\'}" ;;
         \"*\") pat="${pat#\"}"; pat="${pat%\"}" ;;
     esac
     [[ -n "$pat" ]] || return 1
     case "$pat" in *\'* | *\"*) return 1 ;; esac
-    printf '%s' "$pat"
+    printf '%s %s' "$icase" "$pat"
 }
 
 guard_rule_pgrep_self_match() {
-    local raw="$1" seg cmdseg pat occurrences
+    local raw="$1" seg cmdseg pat icase
+    local -a grep_opts
     grep -qE '\$\(|<\(|>\(|\$\{|\$[A-Za-z_]' <<<"$raw" && return 0
     case "$raw" in *'`'*) return 0 ;; esac
     while IFS= read -r seg; do
         cmdseg="$(_guard_command_word "$seg")"
         case "${cmdseg%%[[:space:]]*}" in pgrep | pkill) ;; *) continue ;; esac
         pat="$(_guard_pgrep_pattern "$cmdseg")" || continue
-        occurrences="$(grep -oF -- "$pat" <<<"$raw" | wc -l)"
-        [[ "$occurrences" -ge 2 ]] || continue
-        guard_block "don't wait on process liveness with 'pgrep -f $pat' — '-f' matches full argv, and this command's own argv (the harness's wrapper included) carries that same literal, so the predicate is permanently true and the loop never exits. Nothing reds: the work finishes and the only symptom is the foreground cap absorbing an unbounded wait. Wait on the work's own artifact instead (an evidence file, a lock, an exit marker the work itself writes), or — where liveness genuinely is the condition — 'kill -0 <pid>' against a PID you recorded, whoever started that producer: a child you backgrounded yourself counts, and its PID is the one you recorded at launch, one line 'pid=<n> run=<key>' in a '<key>.run' file under your gitignored scratch dir. A pattern is a guess about a process table that includes the guesser; a PID is an identity. If you genuinely need pgrep, run it yourself with !<command>."
+        icase="${pat%% *}"; pat="${pat#* }"
+        grep_opts=(-qE)
+        [[ "$icase" == i ]] && grep_opts=(-qiE)
+        grep "${grep_opts[@]}" -e "$pat" <<<"$raw" 2>/dev/null || continue
+        guard_block "don't query process liveness with 'pgrep -f $pat' — '-f' matches full argv, and the harness runs this command through a wrapper whose argv carries the whole command text, pattern included, so the pattern always finds at least that wrapper: a wait loop never exits, a one-shot query always answers running, and a pkill signals its own wrapper. Nothing reds: the work finishes and the only symptom is the foreground cap absorbing an unbounded wait. Wait on the work's own artifact instead (an evidence file, a lock, an exit marker the work itself writes), or — where liveness genuinely is the condition — 'kill -0 <pid>' against a PID you recorded, whoever started that producer: a child you backgrounded yourself counts, and its PID is the one you recorded at launch, one line 'pid=<n> run=<key>' in a '<key>.run' file under your gitignored scratch dir. A pattern is a guess about a process table that includes the guesser; a PID is an identity. If you genuinely need pgrep, run it yourself with !<command>."
     done < <(guard_split_compound "$raw" | tr '&' '\n')
 }
 

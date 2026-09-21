@@ -167,14 +167,21 @@ block	git grep needle -- src
 fallthrough	git grep foo HEAD
 fallthrough	git grep --cached foo
 
-# rule 12 — self-matching process-liveness predicate: a `pgrep -f` pattern the
-#           command's own text repeats can never go false, since `-f` scans the
-#           waiter's own argv. A lone query, a `pgrep` without `-f`, and a pattern
-#           occurring nowhere else are genuine queries and pass.
+# rule 12 — self-matching process-liveness predicate: a `pgrep -f` pattern that
+#           matches the command's own text can never go false, since `-f` scans the
+#           harness wrapper's argv, which carries the whole command. A `pgrep`
+#           without `-f`, `-x`/`-v`, and a pattern that does not match its own
+#           text pass.
 block	bash run-smoke.sh & until ! pgrep -f run-smoke.sh; do sleep 5; done
 block	pkill -f run-smoke.sh; bash run-smoke.sh
-fallthrough	pgrep -f run-smoke.sh
+block	pgrep -f run-smoke.sh
+block	while pgrep -f 'checkwright-gates --run-validate'; do sleep 5; done
+block	if pgrep -f worker; then echo up; fi
+block	bash run.sh; pgrep -if 'R[U]N'
+fallthrough	bash run.sh; pgrep -f 'R[U]N'
 fallthrough	pgrep run-smoke.sh; bash run-smoke.sh
+fallthrough	until ! pgrep -f '[r]un-smoke.sh'; do sleep 5; done
+fallthrough	pgrep -xf run-smoke.sh
 
 # rule 13 — bare foreground sleep steered to a condition wait. The non-firing
 #           cases are the load-bearing ones: a sleep inside an `until … do … done`
@@ -318,7 +325,7 @@ fallthrough	echo start; until grep -q DONE .tmp/smoke.log; do sleep 5; done
 fallthrough	until grep -q DONE .tmp/smoke.log; do grep -c x .tmp/smoke.log; sleep 5; done
 # clause (c) — the two stated non-targets: a pattern match where a PID belongs,
 # and a network tool that already has a blocking primitive
-fallthrough	while pgrep -f worker >/dev/null 2>&1; do sleep 20; done; echo waited
+fallthrough	while pgrep worker >/dev/null 2>&1; do sleep 20; done; echo waited
 fallthrough	until gh run view 12 --json status 2>/dev/null | grep -q completed; do sleep 30; done
 # clause (d) — a tail statement rule 18 would not have granted standing alone
 fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done; git commit -m done
