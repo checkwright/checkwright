@@ -157,8 +157,12 @@ change here.
   SPEC's knob bullet against the table, which is why both are edited together.
   Probe:
   `grep -rn '}/lib/gate.sh' --include=*.md --include=*.rs --include=*.knobs .`
-  matched `native/src/knobs/delegation_kit.rs:29`, delegation-kit/SPEC.md:3325
-  and its `docs/` mirror, and nothing else.
+  matched `native/src/knobs/delegation_kit.rs:29`, delegation-kit/SPEC.md:3325,
+  its `docs/` mirror, and one substring false-positive: `native/src/emit/git_hooks.rs:242`'s
+  `format!("{}/lib/gate.sh", walk::sdk_root()...)`, `gen-pre-commit`'s own splice of the
+  matcher body from the gate-sdk root's library — a different mechanism reading the
+  library at its actual root rather than at the knob default's unvendored
+  `<gates-dir>/lib/gate.sh`, so delta 2 leaves it untouched.
 
 ## Existing sections updated
 
