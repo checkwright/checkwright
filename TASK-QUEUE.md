@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: canon-gate-precision
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,41 @@
 ## New Features
 
 ## Technical Debt
+
+- **kit-spec-singleton-consumer-config-quotes** — kit SPECs quote single values of this repo's
+  knob configuration, which gate-sdk/SPEC.md §The provenance seam rules consumer rule content, and
+  `check-provenance-seam`'s consumer-roster arm cannot see a singleton.
+  **Re-verified at this scope:** canon-kit/SPEC.md §Layout and configuration quotes the four
+  claim-command argv values (`scripts/install-transports.sh`, `scripts/payload-claims.sh`,
+  `scripts/measured-claims.sh`, `scripts/claim-classes.sh`); gate-sdk/SPEC.md names
+  `scripts/measured-claims.sh` on eight lines, not the seven sites filed, and names this repo's
+  plugin files as knob values.
+  **Deliverable:** sweep every kit SPEC under the voice-not-content discriminator, replacing each
+  value with its knob's name or moving it to the consumer config it quotes.
+  **Cost while deferred:** each quote publishes one tree's configuration in every vendored copy
+  and goes stale against it.
+  Filed 2026-09-21 to the gap inbox by gate-sdk-surface-drain's spec session; promoted 2026-09-22
+  into `canon-gate-precision` by operator direction (lead-relayed). Debt: it applies the seam rule
+  the spec already carries and mints no name.
+
+- **partitive-exemption-line-scope** — `check-manifest-count` is stricter than its own spec, and
+  the gap is one line break wide: prose reading "appeared in 57 of" / "the 96 checks counted that
+  day" reds as a restated collection total because the line broke between the partitive marker
+  and the cardinal, while the same sentence on one line passes.
+  **Re-verified at this scope:** the shared spec adapter (`native/src/spec.rs`) slices the
+  partitive prefix from the current line's bytes alone, while canon-kit/SPEC.md
+  §check-manifest-count states the exemption as a partitive marker "on either side of the match"
+  with no line qualifier — the comparator exemption beside it is the one scoped to the same line.
+  **Deliverable:** the partitive test sees a marker across a line break, in the shared adapter so
+  `check-prose-enum` (same adapter, same defect) is fixed with it, plus a `good/` fixture case
+  pinning a wrapped partitive. How far across is calibration inside the spec's wording: joining the
+  whole paragraph widens the exemption to any partitive anywhere in it, a false-negative surface a
+  one-line lookback does not open.
+  **Cost while deferred:** an author whose partitive wraps pays a red and is offered the exemption
+  tag as the remedy, which would bless a non-violation permanently.
+  Filed 2026-08-03 at close from the gap inbox (found by build batch 4); promoted 2026-09-22 into
+  `canon-gate-precision` by operator direction (lead-relayed). Debt: it converges the gate on the
+  exemption the spec already states.
 
 ## Deferred
 
@@ -28,6 +63,8 @@
   the audit roster's provenance-seam-residue scope naming the shape.
   **Cost while deferred:** a commit reference in a kit SPEC ships in every vendored copy.
   Filed 2026-09-22 to the gap inbox by gate-sdk-surface-drain's close; promoted at the next scope.
+  Feature — a new arm changes the gate's asserted behavior; `/spec` authors and promotes it.
+  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its SHA-shape unit.
 
 - **installer-spec-provenance-residue** [cost: event/low] [surface: canon-kit] — installer/SPEC.md
   carries dated operator and lead rulings and CI run ids, job ids and head commit SHAs as
@@ -42,6 +79,8 @@
   **Cost while deferred:** publisher provenance on a public surface.
   Filed 2026-09-22 to the gap inbox by gate-sdk-surface-drain's close sweep, which reported it out
   of corpus; promoted at the next scope.
+  Feature — a corpus-reach ruling changes a gate's scope; `/spec` authors and promotes it.
+  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its residue unit.
 
 - **shell-textual-absoluteness-single-dialect** [cost: event/low] [surface: gate-sdk] — tracked
   shell sites test a path for absoluteness by a leading `/` alone, so a caller-supplied Windows
@@ -57,21 +96,6 @@
   promoted at its close because →fix needs a new shell-side oracle the cwd-anchor amendment kept
   out of its envelope. Owner lookup ran over `absolute` and `locality` in gate-sdk/SPEC.md;
   §check-path-dialect owns the crate-side arm and names no shell arm.
-
-- **kit-spec-singleton-consumer-config-quotes** [cost: event/low] [surface: canon-kit] — kit SPECs
-  quote single values of this repo's knob configuration, which gate-sdk/SPEC.md §The provenance
-  seam rules consumer rule content, and `check-provenance-seam`'s consumer-roster arm cannot see a
-  singleton. Instances measured 2026-09-22: canon-kit/SPEC.md §Layout and configuration quotes the
-  four claim-command argv values (`scripts/install-transports.sh`, `scripts/payload-claims.sh`,
-  `scripts/measured-claims.sh`, `scripts/claim-classes.sh`); gate-sdk/SPEC.md quotes
-  `scripts/measured-claims.sh` at seven sites and names this repo's plugin files as knob values.
-  **Deliverable:** sweep every kit SPEC under the voice-not-content discriminator, replacing each
-  value with its knob's name or moving it to the consumer config it quotes.
-  **Cost while deferred:** each quote publishes one tree's configuration in every vendored copy and
-  goes stale against it. Filed 2026-09-21 to the gap inbox by the spec session; promoted at close
-  because the corpus is every kit SPEC, an audit rather than a drain fix. Owner lookup ran over
-  `singleton` and `consumer roster` in canon-kit/SPEC.md; §check-provenance-seam owns the roster
-  arm.
 
 - **armed-by-content-emptiness-shape** [cost: event/low] [surface: gate-sdk] — `check-commit-msg`
   and `check-tree-terms` share `GATE_SDK_MSG_PATTERN_FILES`, a required tracked pattern file, and
@@ -485,6 +509,8 @@
   **Cost while deferred:** a gap filer who names a proposed knob reds the battery and rewords.
   Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, from the red its own
   filing hit; promoted at the next iteration's scope.
+  Feature — either limb changes a scanned corpus or a filer rule; `/spec` authors and promotes it.
+  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its valve unit.
 
 - **config-variant-battery-harness** [cost: event/high] [surface: gate-sdk] — nothing shipped lets a customer run the
   battery under a named config-seam variant and see what changes; the fixture pairs prove each
@@ -820,6 +846,8 @@
   Filed 2026-09-04 by the close of `enter-stage-cut-and-file-authoring-act` into the gap inbox,
   which no stage of that iteration could drain; carried into this iteration's scope intake and
   promoted here, so the record is late and says so.
+  Feature — a mid-paragraph marker is new marker grammar; `/spec` authors and promotes it.
+  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its marker unit.
 
 - **kit-knob-consumer-adapter-convention** [cost: event/low] [surface: evidence-kit] — whether a kit may ship
   a knob whose only working configuration requires the consumer to author an adapter, and whether
@@ -1231,39 +1259,6 @@
   Filed 2026-08-02 at close from the gap inbox; found by build. Split out 2026-08-09
   at scope.
 
-- **partitive-exemption-line-scope** [cost: event/high] [surface: canon-kit] — `check-manifest-count` is stricter
-  than its own spec, and the gap is one line break wide.
-  Verified 2026-08-03 by build batch 4: prose reading "appeared in 57 of" / "the 96 checks
-  counted that day" reds as a restated collection total purely because the line broke
-  between the partitive marker and the cardinal — the same sentence reflowed onto one line
-  passes.
-  **Root cause, decidable and narrow.** The partitive exemption in the shared spec adapter
-  (`native/src/spec.rs`, re-read at `config-seam-third-cut`'s close) tests a *same-line* prefix
-  against the text preceding the cardinal, so a partitive marker on the previous line is
-  invisible to it — while canon-kit/SPEC.md
-  §check-manifest-count states the exemption as a property of the *sentence*, a partitive
-  marker on either side of the match, with no line-scoped qualifier. The gate being
-  stricter than its own spec is the defect, not the reverse.
-  **The cost is paid quietly and then paid wrongly.** It is invisible until it fires, and
-  the remedy the help line offers is the exemption tag — which would bless a non-violation
-  permanently and corrupt the exemption's meaning for every later reader. A low-FP-contract
-  violation that converts into a corrupted exemption set.
-  **Deliverable, and the machinery already exists:** `check-manifest-count` already
-  carries a wrapped-paragraph hook beside the line hook, so the paragraph-joined text is
-  available at the match site. Test the partitive prefix against the joined paragraph
-  rather than the raw line, or carry a one-line lookback for the prefix window. The fix
-  belongs in the shared spec adapter where both gates read it — `check-prose-enum` shares
-  the same adapter and inherits the same defect — not in either gate. Plus a `good/`
-  fixture case pinning a wrapped partitive, the regression the current pair does not carry.
-  **Why design-pending:** paragraph-joined and one-line-lookback are not the same
-  contract. Joining widens the exemption to any partitive anywhere in the paragraph, a real
-  false-negative surface; the lookback is narrower and arbitrary. The spec says sentence,
-  and neither implements a sentence.
-  **Cost while deferred:** every author whose partitive happens to wrap pays a red gate and
-  is offered an exemption tag as the remedy, so each occurrence risks permanently corrupting
-  the exemption set rather than merely costing a reflow.
-  Filed 2026-08-03 at close from the gap inbox; found by build batch 4.
-
 - **session-model-identity-verification** [cost: event/high] [surface: delegation-kit] — a session cannot report or
   verify the model tier it is running at.
   The session-context hook prints iteration, budget and drift; `drift-report` prints neither.
@@ -1415,6 +1410,8 @@
   while binding nothing — the failure mode is a knob silently never applied, which
   surfaces as behavior, not as a red.
   Filed 2026-08-10 by close, from the residual batch 2 identified and did not file.
+  Feature — either limb changes how the gate resolves a token; `/spec` authors and promotes it.
+  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its stem unit.
 
 - **baseline-row-prose-coupling-gate** [cost: event/low] [surface: canon-kit] — governed prose asserts what
   `.workflow/validate-baseline.txt` holds, and nothing checks it against the file.
@@ -1536,6 +1533,8 @@
   failure mode names its cause.
   Filed 2026-08-19 by close from the gap inbox, which carried it twice — once from the sixth
   batch's port survey and once from the port itself; the drain read the validator and counted.
+  Feature — the SPEC states thresholds coerced, not validated; `/spec` authors and promotes it.
+  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its threshold unit.
 
 - **settings-hook-command-path-gate** [cost: event/high] [surface: context-kit] — a hook registration in
   `.claude/settings.json` whose `command` names a renamed or deleted script reds nowhere and
