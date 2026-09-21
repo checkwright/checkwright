@@ -4,4 +4,4 @@
 
 ---
 
-— scope a9520f7d 2026-09-21 c4f65fc0
+delegation-seams scope a9520f7d 2026-09-21 c4f65fc0

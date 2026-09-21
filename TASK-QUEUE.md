@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: delegation-seams
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -14,7 +14,57 @@
 
 ## Technical Debt
 
+- **lead-finished-but-active-session-unchecked** — lifecycle-kit/templates/lead.md recovers a
+  completion notification that never arrives, and not the reverse: a stage session that reported
+  and ended its journal with `DONE` can still read as active because a background child of its own
+  is still running, and the lead waits on a notification instead of inspecting what holds it.
+  **Attested once:** at `scratch-hermeticity`'s validate a finished session stayed active about nine
+  minutes after its report; the holder was a self-matching waiter
+  (`guard-rule-12-single-occurrence-pgrep-loop-passes`).
+  **Re-verified at this scope:** lead.md's paragraph on the undelivered notification names the
+  roster, the `DONE` last line and asking the session, and has no clause for DONE-but-active.
+  **Deliverable, settled by operator direction (2026-09-21 lead session):** on DONE-but-active the
+  lead checks the session's leftover processes (waiters, shells, worktrees) and reports them.
+  Filed 2026-09-21 to the gap inbox by the lead after `scratch-hermeticity`'s close; promoted
+  2026-09-21 into `delegation-seams` by operator direction (lead-relayed). Debt: build-ready, one
+  template clause beside the existing recovery paragraph. Owner lookup ran over `DONE`,
+  `notification`, `still active` in lead.md and lifecycle-kit/SPEC.md; the paragraph above is it.
+
 ## Deferred
+
+- **guard-rule-12-single-occurrence-pgrep-loop-passes** [cost: event/low] [surface: guard-kit] —
+  guard-kit/SPEC.md §The generic ruleset rule 12 (`guard_rule_pgrep_self_match`) fires only when a
+  `pgrep`/`pkill -f` pattern literal occurs ELSEWHERE in the command, yet its own grounds say the
+  harness wrapper's argv carries the literal, so a loop-headed spelling self-matches with one
+  occurrence. **Probed at this scope:** `while pgrep -f 'checkwright-gates --run-validate'; do sleep
+  5; done` passes `scripts/bash-guard.sh` at exit 0; the same loop with the literal repeated is
+  blocked at exit 2. The rule's clause "a pattern occurring nowhere else in the command is a
+  genuine query and passes" is what admits it.
+  **Attested:** that exact waiter held a `scratch-hermeticity` validate session active until the
+  operator confirmed a stop.
+  **Why design-pending:** a tightening of a shipped guard rule — which spellings (loop, `if`, `!`)
+  self-match with one occurrence and which a single foreground `pgrep` exec leaves clean — owes a
+  fixture arm and a Tightened-gates declaration.
+  **Cost while deferred:** a waiter that can never exit passes the guard written to refuse it.
+  Filed 2026-09-21 to the gap inbox after `scratch-hermeticity`'s close; promoted 2026-09-21 into
+  `delegation-seams` by operator direction (lead-relayed); **marked for spec**. Owner lookup:
+  guard-kit rule 12, delegation-kit/templates/agent-execution.md's pattern-match paragraph.
+
+- **queue-citation-line-number-stales-within-its-own-session** [cost: event/low] [surface: queue-kit]
+  — a `path:line` cite in a queue body goes stale when the cited file changes above the line, and
+  nothing reads it; stale on write when the citing session edits that file itself.
+  **Recurred 2026-09-21, across iterations:** `shell-cwd-anchor-clause-has-no-oracle` cited
+  `gate-sdk/lib/test-hermetic.sh` at lines that moved +4 when `bespoke-test-path-knob-pinning`
+  inserted a block above them; corrected by hand grep at `scratch-hermeticity`'s close.
+  **Why not obviously gateable:** resolving a cite to its referent is semantic; the decidable half
+  is a cite whose file changed above the cited line since the cite landed. The no-gate
+  alternative: cite by content, never by number.
+  **Cost while deferred:** each instance costs a later reader a wrong resolution until a hand grep.
+  Filed 2026-09-08 by close from the gap inbox and iceboxed; returned to Deferred 2026-09-21 at
+  this scope's intake on the real recurrence above (gap bullet dated 2026-09-21, filed after
+  `scratch-hermeticity`'s close). Body before eviction: `git log -p -S'<slug>' -- TASK-QUEUE.md`.
+  **DISTINCT from `docs-cmd-retired-path-blind-to-queue`**, where the whole cited path is retired.
+  recurrence: queue-citation-line-number-stales-within-its-own-session 2026-09-21
 
 - **recurrence-line-never-ages** [cost: event/low] [surface: queue-kit] — a dated `recurrence:`
   line counts as a live icebox trigger with no age limb, so one recurrence pins a low-cost entry
@@ -275,6 +325,9 @@
   more than one batch, and the only thing between is a per-dispatch warning no surface holds.
   Filed 2026-09-20 to the gap inbox by the lead at `door-binding-sweep`'s close; promoted at this
   scope's intake. Owner lookup: `commit-msg`, `commit message file`, `journal path` — none.
+  **Joins `delegation-seams`** as its shared-scratch unit (operator direction 2026-09-21,
+  lead-relayed); **marked for spec**, which rules between the lifecycle-kit path derivation and
+  the read-back doctrine line.
 
 - **couples-knob-token-empty-expansion-passes-silently** [cost: once/low] [surface: gate-sdk]
   — a `knob:` couples token whose expansion resolves to an **empty member set** is silently accepted
@@ -527,6 +580,9 @@
   **Cost while deferred:** a consumer's gate-library edit co-staged with product code escapes the
   isolation rule.
   Filed 2026-09-14 by `config-seam-third-cut`'s build (batch 2); drained at its close.
+  **Joins `delegation-seams`** as its tamper-default unit (operator direction 2026-09-21,
+  lead-relayed); **marked for spec**, which picks the root knob. Re-verified at scope:
+  `native/src/knobs/delegation_kit.rs` still derives the element from `GATE_SDK_GATES_DIR`.
 
 - **fixture-suites-never-run-history-less** [cost: event/low] [surface: .github] — no
   CI leg or smoke runs a kit's fixture suites outside this repo's full git history, so a pair that
@@ -581,6 +637,8 @@
   hook: a steer at the move, which the tool result announces as "moved to the background (ID: …)".
   Whether any hook payload carries that line is unmeasured. The liveness log records the
   `background_tasks` key and not its contents.
+  **Leads `delegation-seams`** (operator direction 2026-09-21, lead-relayed); **marked for spec**.
+  Widening the turn-end hook's refusal set stays operator-class and escalates from spec.
   recurrence: harness-moved-background-task-unrecorded 2026-09-14
 
 - **config-variant-battery-harness** [cost: event/high] [surface: gate-sdk] — nothing shipped lets a customer run the
@@ -1202,6 +1260,10 @@
   now documents but does not enforce.
   Filed 2026-07-26 by close (`activation-path`), generalizing the
   knowledge-friction captures that surfaced the replace-vs-extend semantics.
+  **Joins `delegation-seams`** as its tamper-coverage unit (operator direction 2026-09-21,
+  lead-relayed); **marked for spec**, which authors its amendment — a feature, the unit mints a
+  gate. **Enhancement admission filter, engaged 2026-09-21 at scope:** trust arm — an adopter
+  trusts `check-gate-tamper` to cover every gate, and nothing holds that it does.
 
 - **companion-toolkit-profile** [roadmap: next/ecosystem] [cost: event/high] [surface: lifecycle-kit] — the interop rung.
   roadmap-summary: Gate a tree whose specs another toolkit's workflow wrote.
@@ -2121,10 +2183,9 @@
   which costs one line and no code; or the agent-type definition for read-only sweep types carries
   it, which reaches every dispatch of that type without touching any dispatcher.
   **DISTINCT from `worktree-isolated-dispatch-cannot-reach-the-main-checkout`**, deliberately not
-  re-filed here: that entry is about a child's WRITES — a binary-dispatched gate it cannot resolve
-  and a capture log it writes into a doomed worktree — and its bridge is `git rev-parse
-  --git-common-dir`. This is the child's RETURN VALUE, it has no filesystem half, and that bridge
-  does not touch it. The two share the isolation flag and share no fix.
+  re-filed here: that entry is about a child's WRITES (a gate it cannot resolve, a capture log in a
+  doomed worktree), bridged by `git rev-parse --git-common-dir`; this is the child's RETURN VALUE,
+  with no filesystem half. The two share the isolation flag and no fix.
   **Cost while deferred:** one wasted dispatch round-trip per isolated sweep, paid by the
   dispatcher at the moment it is waiting on the result — and silent, since a bare `.` reads as an
   agent that found nothing rather than as an agent whose report was dropped. That last reading is
@@ -2146,8 +2207,9 @@
   line below is live by queue-kit/SPEC.md §The icebox tier, which ages no recurrence line; whether
   one should age is filed to the gap inbox. No wontfix is ruled; the operator may `/consult` one.
   recurrence: worktree-isolated-agent-report-lost-to-a-failed-peer-send 2026-08-26
-  Surfaced 2026-08-25 by the `turn-end-liveness-seam-and-worktree-cause` close, which reproduced it
-  twice dispatching its own sweeps and filed it to the gap inbox; promoted 2026-08-25 at that drain.
+  Surfaced 2026-08-25, and promoted, by the `turn-end-liveness-seam-and-worktree-cause` close, which
+  reproduced it twice. **Joins `delegation-seams`** as its return-channel unit (operator direction
+  2026-09-21, lead-relayed); **marked for spec**, which rules one of the three deliverable shapes.
 
 - **site-health-issue-venue-unwanted** [cost: event/low] [surface: site-kit] — the site-health probe files issues on
   the public repo for failures the iteration lifecycle resolves anyway, and the operator does not
@@ -2498,6 +2560,8 @@
   round trip and a re-dispatch.
   Filed 2026-09-16 to the gap inbox at `isolated-dispatch-obligations`' close, which could not
   drain it; promoted at the following iteration's scope.
+  **Joins `delegation-seams`** as its dispatcher-clause unit (operator direction 2026-09-21,
+  lead-relayed); **marked for spec**, which makes the residency call.
 
 - **isolated-dispatch-resume-loses-its-isolation** [cost: event/high] [surface: delegation-kit]
   — a `SendMessage` resume of an `isolation: worktree` read-only dispatch silently loses its
@@ -2524,6 +2588,9 @@
   dispatch itself would have been refused, and nothing reds.
   Filed 2026-09-16 to that same close's gap inbox, undrainable there; promoted at the following
   iteration's scope.
+  **Joins `delegation-seams`** as its resume-isolation unit (operator direction 2026-09-21,
+  lead-relayed); **marked for spec**, which rules among (a)-(c). Re-verified at scope:
+  `native/src/hook/dispatch.rs` has no resume path.
 
 - **gate-fixture-fanout-arm** [cost: event/low] [surface: gate-sdk] — nothing
   enumerates the fixture pairs a change to a shared implementation module has to re-run:
@@ -2761,7 +2828,6 @@
 - **ruling-record-prose-staleness-unreachable** — Old rulings evade the probe.
 - **close-surface-reclaim-uncoupled-from-read** — Reclaim may wipe unread rows.
 - **iceboxed-recurrence-judgment-unrecordable** — No room for a recurrence stamp.
-- **queue-citation-line-number-stales-within-its-own-session** — Line cites stale.
 - **post-scope-admission-has-no-promotion-route** — Late debt has no promoter.
 - **declaration-shape-outside-header-unreadable** — Inert literals read as live.
 - **boundary-preserve-covers-names-not-lifetimes** — Keep-list lists names only.
