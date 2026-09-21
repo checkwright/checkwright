@@ -157,15 +157,8 @@ holds it to what the gate reads.
   destroys the prose above it.
 - **The graph artifact** <!-- projection: check-graph --> — `docs/check-graph.html` and the generated `pre-commit`
   and `commit-msg` hooks form one set, held fresh by one gate. Kit config sits in
-  that gate's `couples=` because a ported member's invocation bakes its resolved
-  knob values in (gate-sdk/SPEC.md §gen-pre-commit). **Two edits stale the hooks
-  outside that declaration, and the witness samples one file per class, so it
-  reaches neither.** The first is adding a kit `gate-tests/*.test.sh`, whose
-  basename `--emit-enum-sets` derives into the `check-prose-enum` roster the hooks
-  bake verbatim. The second is any tree edit that *moves* a measured claim, since
-  the baked invocation carries `check-measured-claim`'s resolved values; a script
-  header gaining a `# no-port:` cause moves the `tree-shell-owed` key this way.
-  Regenerate the hooks first
+  that gate's `couples=` because a knob edit moves a hook's triggers
+  (gate-sdk/SPEC.md §gen-pre-commit). Regenerate the hooks first
   (`bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`), then the artifact
   (`bash gate-sdk/bin/run-gates.sh --emit graph > docs/check-graph.html`).
   Never hand-edit a hook: that rule is resident in `CLAUDE.md`, because a session
@@ -176,9 +169,7 @@ holds it to what the gate reads.
   members, so `check-prose-enum` reds every hand-written prose enumeration of
   the queue's tag set — `README.md`, `queue-kit/README.md` and
   `docs/queue-kit/index.md`, none of them generated, each repaired by hand. The
-  generated hooks bake that same derived roster verbatim and stale with it
-  (`bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`, then the graph artifact the
-  row above pairs with them). The new-gate row is the fan-out this file already
+  new-gate row is the fan-out this file already
   rostered; this is the other one, and nothing derived it for the author.
 - **The new-gate fan-out** — the other wide trigger, and the one with no single
   owner elsewhere. `gate-sdk/SPEC.md`'s kit-landing checklist covers the kit-side

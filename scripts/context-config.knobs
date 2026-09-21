@@ -30,8 +30,12 @@ CONTEXT_KIT_RATCHET_PATHS[] = .claude/agents/*.md
 CONTEXT_KIT_RATCHET_PATHS[] = .claude/commands/*.md
 CONTEXT_KIT_RATCHET_PATHS[] = :(exclude)*/gate-tests/*
 
-# comment-tier-exempt: the public site's authored pages, so a page's regrowth shows in the growing commit; the on-site SPEC, README and DOCTRINE mirrors are excluded because their size is their sources'
+# comment-tier-exempt: the public site's authored pages, so a page's regrowth shows in the growing commit; the on-site SPEC, README and DOCTRINE mirrors and the whole-file projections are excluded because their size is their sources'
 CONTEXT_KIT_RATCHET_PATHS[] = docs/*.md
 CONTEXT_KIT_RATCHET_PATHS[] = :(exclude)docs/*/SPEC.md
 CONTEXT_KIT_RATCHET_PATHS[] = :(exclude)docs/*/README.md
 CONTEXT_KIT_RATCHET_PATHS[] = :(exclude)docs/doctrine-kit/DOCTRINE.md
+CONTEXT_KIT_RATCHET_PATHS[] = :(exclude)docs/evidence-data.md
+CONTEXT_KIT_RATCHET_PATHS[] = :(exclude)docs/enforcement.md
+CONTEXT_KIT_RATCHET_PATHS[] = :(exclude)docs/footprint.md
+CONTEXT_KIT_RATCHET_PATHS[] = :(exclude)docs/install-evidence.md

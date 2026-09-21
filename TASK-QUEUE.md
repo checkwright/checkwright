@@ -16,6 +16,23 @@
 
 ## Deferred
 
+- **fence-run-fixed-env-hides-user-gem-dir** [cost: event/low] [surface: canon-kit] — site-kit's
+  fixture-suite fence stays unmarked for `check-fence-run`, so the command an adopter pastes from it
+  runs unwitnessed. canon-kit/SPEC.md §check-fence-run pins `HOME` inside the scratch and inherits
+  only `PATH`, and a Ruby user install keeps `kramdown-parser-gfm` under `HOME`'s user gem dir, so
+  the suite finds no gems there. **Measured 2026-09-21:** `gem env gempath` lists the user gem dir
+  first and the only kramdown gems sit there.
+  **Deliverable — rule one of two:** a declared, consumer-named environment passthrough in the fixed
+  environment (a `GEM_PATH`-shaped knob, stated beside the proxy honest limit), or a stated refusal
+  naming why a toolchain resolving through `HOME` stays outside fence execution. Then mark the
+  fence.
+  **Cost while deferred:** one adopter-facing command unwitnessed; the render-fidelity gate itself
+  still runs in the battery. Filed 2026-09-21 to the gap inbox by build batch 3 of
+  `docs-first-contact`; promoted at its close because →fix needs an envelope change to the fixed
+  environment. Owner lookup ran over `fixed environment`, `HOME` and `GEM_` in canon-kit/SPEC.md;
+  §check-fence-run item 4 owns the variable list and names no passthrough.
+  **DISTINCT from `fence-execution-gate` (landed)**, which built the gate this member cannot reach.
+
 - **queue-citation-line-number-stales-within-its-own-session** [cost: event/low] [surface: queue-kit]
   — a `path:line` cite in a queue body goes stale when the cited file changes above the line, and
   nothing reads it; stale on write when the citing session edits that file itself.
