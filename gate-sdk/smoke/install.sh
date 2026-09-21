@@ -38,6 +38,7 @@ check-identity
 check-kit-enum
 check-kit-roots-dialect
 check-path-dialect
+check-pipe-membership
 check-front-end-fail-open
 check-packed-links
 check-readme-roster

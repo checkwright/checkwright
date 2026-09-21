@@ -123,6 +123,7 @@ check-crate-arms
 check-install-disposition
 check-test-hermetic
 check-path-dialect
+check-pipe-membership
 check-front-end-fail-open
 check-assertion-strength
 check-gate-exemption-tasks

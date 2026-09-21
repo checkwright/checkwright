@@ -100,6 +100,8 @@ fi
 
 run_gate check-path-dialect native/target/release/checkwright-gates check-path-dialect
 
+run_gate check-pipe-membership native/target/release/checkwright-gates check-pipe-membership
+
 if staged_matches 'gate-sdk/bin/run-gates.sh' 'canon-kit/bin/run-gates.sh' 'context-kit/bin/run-gates.sh' 'delegation-kit/bin/run-gates.sh' 'doctrine-kit/bin/run-gates.sh' 'drift-kit/bin/run-gates.sh' 'evidence-kit/bin/run-gates.sh' 'guard-kit/bin/run-gates.sh' 'lifecycle-kit/bin/run-gates.sh' 'queue-kit/bin/run-gates.sh' 'site-kit/bin/run-gates.sh' 'gate-sdk/bin/run-gates.ps1' 'canon-kit/bin/run-gates.ps1' 'context-kit/bin/run-gates.ps1' 'delegation-kit/bin/run-gates.ps1' 'doctrine-kit/bin/run-gates.ps1' 'drift-kit/bin/run-gates.ps1' 'evidence-kit/bin/run-gates.ps1' 'guard-kit/bin/run-gates.ps1' 'lifecycle-kit/bin/run-gates.ps1' 'queue-kit/bin/run-gates.ps1' 'site-kit/bin/run-gates.ps1' 'native/src/emit/mod.rs' 'native/src/gates/front_end_fail_open.rs' 'native/src/fresh.rs'; then
     run_gate check-front-end-fail-open native/target/release/checkwright-gates check-front-end-fail-open
 fi

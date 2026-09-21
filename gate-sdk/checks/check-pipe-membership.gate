@@ -1,0 +1,3 @@
+# graph: couples=knob:GATE_SDK_GATES_DIR/*.sh,kit:*.sh,kit:bin/*.sh,kit:lib/*.sh,kit:checks/*.sh,kit:templates/*.sh dir=one valve=none tier=precommit trigger=*
+# install: zero-config
+# spec: gate-sdk/SPEC.md §check-pipe-membership — no set producer (an array expansion or a loop) feeds a short-circuiting reader in a tracked shell file under pipefail

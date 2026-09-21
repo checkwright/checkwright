@@ -77,6 +77,7 @@ pub mod measured_claim;
 pub mod memory_off;
 pub mod merge_attrs;
 pub mod path_dialect;
+pub mod pipe_membership;
 pub mod packed_links;
 pub mod payload_claim;
 pub mod portability_floor;
@@ -2094,6 +2095,16 @@ pub const REGISTRY: &[GateEntry] = &[
         path_dialect::run,
         &[("?", "", "", "dynamic@src/gates/path_dialect.rs:532")],
         &["GATE_SDK_NATIVE_SRC", "GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS"],
+        "gate-sdk",
+        &[("git", "")],
+    ),
+    // spec: gate-sdk/SPEC.md §check-pipe-membership — no walk root: the corpus is `git ls-files`,
+    // which §check-reads-couples rules outside the walk class
+    (
+        "check-pipe-membership",
+        pipe_membership::run,
+        &[],
+        &["GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS"],
         "gate-sdk",
         &[("git", "")],
     ),

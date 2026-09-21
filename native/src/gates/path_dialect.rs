@@ -44,9 +44,9 @@ pub fn run(args: &[String]) -> i32 {
 // spec: gate-sdk/SPEC.md §check-path-dialect — a line's code half and its comment half, kept apart
 // once per line: a producer named in prose is not an occurrence, and a recorded verdict is read out
 // of the same split rather than by a second pass
-struct Line {
-    code: String,
-    comment: String,
+pub(crate) struct Line {
+    pub(crate) code: String,
+    pub(crate) comment: String,
 }
 
 fn cut(line: &str, at: Option<usize>) -> Line {
@@ -64,7 +64,7 @@ fn cut(line: &str, at: Option<usize>) -> Line {
 
 // spec: gate-sdk/SPEC.md §check-path-dialect — an unquoted '#' opening a word. A '#' inside quotes
 // or mid-word is parameter expansion or content, never a comment, so neither ends the code half.
-fn shell_split(line: &str) -> Line {
+pub(crate) fn shell_split(line: &str) -> Line {
     let b = line.as_bytes();
     let (mut i, mut sq, mut dq) = (0usize, false, false);
     while i < b.len() {

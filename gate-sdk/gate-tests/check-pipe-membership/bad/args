@@ -1,0 +1,3 @@
+# No positional arguments: the corpus is the tracked shell tree (git ls-files, scoped to this
+# case dir by cwd). One file per producer shape, all under pipefail; the count is asserted so a
+# shape that stopped reddening reds this case.

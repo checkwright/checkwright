@@ -10905,7 +10905,7 @@ membership is a `for` loop, never a pipeline. **The rule a member is measured
 against: a short-circuiting consumer may not be fed by a producer inside the same
 gate.** The find is worth more than the fix — a pool does not create such a
 defect, it converts a silent one into a visible one, which is what a battery
-should do.
+should do. The rule is held by `check-pipe-membership` (§check-pipe-membership).
 
 **The dispatch capture holds the two streams apart, and it is `gate_command`'s
 contract rather than the battery's.** `gate_command`'s stdout *is* the invocation
@@ -15260,6 +15260,66 @@ arithmetic; the `bad/` tree carries each vocabulary member, a declaration with n
 reason, an unanchored two-root file and one anchored after its first binding — and its `bad/` case asserts the violation **count**, which
 is what gives the green files beside the violations a reader: a clearance arm that
 stopped clearing reds that case rather than passing quietly.
+
+### check-pipe-membership
+
+Invariant: **no set producer feeds a short-circuiting reader in a shell file under
+`pipefail`.** It holds §run-gates' rule — a short-circuiting consumer may not be fed
+by a producer inside the same gate — at the one shape that rule's defect takes. The
+reader exits on its first match while the writer is still writing, the writer takes
+`SIGPIPE`, and `pipefail` makes the signal the pipeline's status, so a present member
+reads as **absent**. The onset is a roster size rather than a race on every run,
+which is why review does not hold it: a sweep that counted two sites while five
+existed is the evidence.
+
+**The corpus** is `walk::tracked_shell_tree`, the corpus and prune set
+§check-path-dialect walks, read on the same code-and-comment split. **A file is in
+scope** when a code line sets `pipefail`: `set -o pipefail`, or a combined flag word
+ending in `o` (`set -euo pipefail`). A line whose code half ends in `\` or `|`
+continues onto the next, so a pipe broken across lines is one pipeline.
+
+**The predicate is keyed on the producer, and that is what keeps it narrow.** A
+pipeline reds when its **last** stage is a short-circuiting reader and its **first**
+stage is a set producer.
+
+- **A short-circuiting reader** is `head`, or `grep` carrying `-q`, `--quiet`,
+  `--silent`, `-m`/`--max-count`, or a short flag cluster holding `q` or `m`.
+- **A set producer** is `printf` or `echo` with an array expansion (`[@]` or `[*]`,
+  never a `${#…}` length) among its arguments, or a loop whose `done` feeds the pipe.
+  That is an in-shell write loop issuing one `write(2)` per element, which is what
+  keeps writing after the reader has exited.
+- **Whether the status is consumed is not asked**, since a membership pipe exists to
+  be tested. A nested command substitution or subshell is read as a pipeline of its
+  own, and quoted text is content, so a `|` inside a pattern splits nothing.
+
+A structural scan for any pipe into a short-circuiting reader, measured over the
+tree's `pipefail` files, finds fifteen in a consumed position, each safe or benign:
+its producer writes at most one line (`find … -print -quit`, `head -1`), reads a small
+fixed input, or feeds a verdict nobody reads. A gate reddening those would teach the
+tree to ignore it. A pipe whose producer is a set is the membership idiom, because
+membership is the only reason to stream a set into a short-circuiting reader; the
+array-producer pipes the tree does carry all feed a full reader (`paste`, `sort`,
+`git hash-object`), which the predicate leaves alone.
+
+**No valve.** A deliberate early-exit pipe is outside the predicate by construction,
+because its producer is not a set; a site that needs a set tested against a value has
+the loop form. The finding names the file and line, and the remedy is the rule's own:
+membership is a `for` loop over the set, or a `[[ ]]` test, never a pipeline.
+
+**Honest limit.** A producer that is a command reading a large file or roster, such
+as `grep -Ev … "$roster" | grep -qxF …`, passes: its writes are the command's own
+buffered output rather than a per-element loop, and judging its size is dataflow.
+The live instance of that shape runs under `/bin/sh` with no `pipefail`, outside the
+hazard's precondition. `*.test.sh` suites are outside the corpus by the corpus rule
+above.
+
+**Fail-closed.** Outside a work tree the corpus degrades to empty, so the repository
+is probed first and an absent one refuses with exit 2; an unreadable tracked file is
+exit 2. Its implementation is a compiled subcommand, born native, `precommit` with
+`trigger=*` for §check-path-dialect's reason, and `install: zero-config`. Its fixture
+pair carries each producer shape under `pipefail` in `bad/`, with the count asserted,
+and in `good/` an array pipe with no `pipefail`, an array pipe into a full reader, a
+one-line producer into a quiet `grep`, and the loop form.
 
 ### check-front-end-fail-open
 

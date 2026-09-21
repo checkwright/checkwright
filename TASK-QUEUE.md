@@ -12,45 +12,6 @@
 
 ## New Features
 
-- **pipeline-membership-idiom-latent** [spec: SPEC-pipe-membership.md] —
-  the SIGPIPE-under-pipefail membership
-  idiom that produced `installer-init-noop-regen-conflict` has no gate, so nothing stops the next
-  site being written.
-  recurrence: pipeline-membership-idiom-latent 2026-08-23
-  **The idiom.** A quiet `grep` reading an array printed into a pipe under `set -o pipefail`:
-  `grep` exits on its first match while the writer is still writing, the writer takes SIGPIPE,
-  and `pipefail` makes the pipeline's status the signal rather than `grep`'s zero — so a present
-  member reads as **absent**.
-  **The 2026-08-23 recurrence, and what it falsified.** This entry's 2026-08-19 drain recorded a
-  sweep of every shell file returning "exactly two survivors", both latent. `battery-runner-port`
-  found and fixed **five** sites — the then-shell `check-gate-substrate-parity` (3, at a
-  declaration path `shell-gate-tail-port`'s delta 4 has since deleted),
-  `gate-sdk/bin/upgrade-smoke.sh` (1), `gate-sdk/gate-tests/lib-gate.test.sh` (1) — so the sweep
-  undercounted by three, and one of them was not latent at all: it produced a 1-in-3 red at that
-  iteration's build once the worker pool raised the load. The rule is now stated at
-  gate-sdk/SPEC.md §run-gates. Re-probed at this drain: a tree sweep for the
-  `printf … | grep -q` shape returns nothing, so **zero sites remain and still no gate exists**.
-  **What remains is now the whole deliverable.** The 2026-08-19 filing left one open call —
-  whether the mechanical repair was the deliverable, or whether enforcement-first made it a gate
-  over the idiom. `battery-runner-port` took the repair and could not take the gate inside its
-  envelope, which settles the call by elimination: the gate is what is owed, and it is the only
-  shape that stops a seventh site.
-  **Why design-pending:** born-native per CLAUDE.md — a Rust module matching a
-  producer-into-consumer pipe over an array/set membership idiom under `set -o pipefail`, a
-  `.gate` descriptor, a `good/`+`bad/` fixture pair, and `gates.list` registration. The design is
-  the predicate: separating this idiom from a deliberate early-exit pipe without flooding.
-  **Cost while deferred:** a correctness cliff with no warning track, now demonstrated rather than
-  reasoned. Nothing degrades gradually; a check reports a present member as absent on the run
-  where its roster crosses the 64K pipe buffer (onset measured between 400 and 800 single-token
-  members), and in a **parity** gate that false absence reads as a real parity finding rather than
-  as a fault in the check. The port is what grows the subcommand roster, and the port is the
-  tree's standing direction.
-  Filed 2026-08-19 by close from the gap inbox; recurrence judged and stamped at
-  `battery-runner-port`'s close, whose drain re-ran the sweep and found the corpus empty.
-  **Ruled at spec (2026-09-21):** the predicate keys on the producer: an array expansion or a loop
-  feeding a short-circuiting reader under `pipefail`. It reds nothing today, where a structural
-  scan reds fifteen benign pipes. Born native as `check-pipe-membership`.
-
 - **gate-fixture-fanout-arm** [spec: SPEC-fixture-discharge.md] — nothing
   enumerates the fixture pairs a change to a shared implementation module has to re-run:
   `--run-gate-tests` takes one tests-dir per invocation, and a gate's `# graph:` manifest names its
@@ -2263,5 +2224,6 @@
 - kit-spec-consumer-config-literal
 - kit-spec-seam-content-half-unswept
 - shell-cwd-anchor-clause-has-no-oracle
+- pipeline-membership-idiom-latent
 
 ## Lessons Learned
