@@ -220,7 +220,8 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
    **assembles** the package once with the binary's `--pack-installer` arm, which
    verifies each artifact against its sidecar before placing it. Two sibling jobs
    then consume that one artifact — `release` attaches the tarball, its `.sha256`
-   and one versioned archive per target (binary and sidecar) to the GitHub Release (the primary channel), and
+   and one versioned archive per target (binary and sidecar) to the GitHub Release
+   and writes the Release body step 6 verifies (the primary channel), and
    `npm` runs `npm publish --provenance` from the runner (the secondary one,
    held behind its approval environment). That hold is a **confirmation step
    that produces an approval record**, and claiming more would be an overclaim:
@@ -238,23 +239,18 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
    missing token rather than publishing unattested. What the job may pass npm as
    a package spec is §The publish spec below, held by `check-npm-publish-spec`.
 
-6. **Fill in the GitHub Release body.** Step 5's `release` job already created
-   the Release and attached its assets, so this step writes the body rather than
-   the Release. That body points at the post's
-   `https://checkwright.dev/` URL — the post is the note's single home, the
-   Release a pointer to it, never a second copy of the note. Write the post URL
-   **without a trailing slash** (`…/posts/<slug>`, not `…/posts/<slug>/`): the
-   site serves the bare form and 404s the slashed one. Open the link once the
-   Release is published. The body lives on the host, out of the battery's reach,
-   so its backstop is a monitor rather than a gate: `site-health.yml`'s
-   release-body arm asserts daily that each note's Release body carries that URL,
-   and separately that every apex URL the body *actually carries* resolves —
-   two assertions over two different strings, which is exactly what catches the
-   slashed form a presence check alone lets through — filing a `site-health`
-   issue when either fails (site-kit/SPEC.md §templates/site-health.yml). That arm's latency is exactly
-   why this hand-check stays — it is next-day and issue-shaped, while you are the
-   only actor who can fix the body before anyone reads it. Verify by hand here;
-   the arm is what catches the release where you did not.
+6. **Verify the GitHub Release body.** Step 5's `release` job created the
+   Release with its body already written: one pointer sentence and the post's
+   `https://checkwright.dev/` URL, derived from the note whose `release:` key
+   names the tag. The post is the note's single home, and the Release is a
+   pointer to it. A tag with no note, or with two, fails that job before the
+   Release exists, so step 5's watch is where a missing note surfaces. Open the
+   Release and follow the link. The body lives on the host, out of the
+   battery's reach, so its backstop is a monitor rather than a gate:
+   `site-health.yml`'s release-body arm asserts daily that each note's Release
+   body carries that URL, and separately that every apex URL the body carries
+   resolves (site-kit/SPEC.md §templates/site-health.yml). It is what catches a
+   body edited after the cut.
 
 7. **Verify the version badge.** Confirm the README release-version badge
    resolves the new tag. It is sourced from the GitHub tag list, so each release

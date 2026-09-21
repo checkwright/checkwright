@@ -12,37 +12,6 @@
 
 ## New Features
 
-- **release-body-step-has-no-in-tree-witness** [spec: SPEC-release-body.md] — the one release
-  step whose product lives off the tree is the one that was skipped, and its only backstop is
-  next-day.
-  RELEASING.md step 6 fills the GitHub Release body with the note post's apex URL by hand. It is
-  the only release step whose artifact never touches the tree, so no gate, no fixture and no
-  validate suite can see it; the runbook says exactly that and installs a monitor instead —
-  `site-health.yml`'s release-body arm, daily and issue-shaped
-  (site-kit/SPEC.md §templates/site-health.yml).
-  **The step was skipped at the v0.25.0 cut, measured rather than inferred.**
-  `gh release view v0.25.0 --json body` returns an **empty** body, against v0.24.0's well-formed
-  one, while `docs/posts/2026-08-23-checkwright-v0-25-0.md` has been on the site since the cut.
-  The monitor fired as designed and filed the issue the following morning.
-  **What the firing proves, and what it does not.** It proves the backstop works. It does not
-  close the gap, because the latency is precisely the window the runbook itself names as the
-  reason the hand-check stays — "you are the only actor who can fix the body before anyone reads
-  it". A cut whose session skips step 6 is public, wrong and unnoticed for up to a day, on the
-  surface an evaluator reaches first.
-  **DISTINCT from `release-drain-ordering-contradiction`** (step 4's drain/tag ordering) and from
-  `release-runbook-identity-diagnosis` (which account is active); neither reads step 6, and both
-  concern steps whose evidence is in the tree.
-  **Shape ruled at spec on 2026-09-21:** the `release` job composes the body. The copy-ready
-  artifact and the faster monitor were refused (SPEC-release-body.md delta 1).
-  **Cost while deferred:** one wrong public front door per skipped cut, for up to a day, plus the
-  standing fact that the release's most reader-facing artifact is the least witnessed one.
-  Surfaced 2026-08-24 by GitHub issue #2 and promoted at this scope's boundary sweep, whose probe
-  re-read the v0.25.0 Release body directly rather than trusting the issue text.
-  **Joins `release-declaration-coupling`** as its release-body unit, by operator direction
-  (2026-09-21, lead-relayed); **promoted 2026-09-21 at spec**. **Enhancement admission filter,
-  engaged 2026-09-21 at scope:** admitted on the trust arm — the Release body is what an
-  evaluator reads first, and it is the release artifact with the least witness.
-
 ## Technical Debt
 
 ## Deferred
@@ -3013,5 +2982,6 @@
 - release-note-removal-declaration-uncoupled
 - shipped-bin-removal-deprecation-path
 - account-noun-plural-slips-the-shape
+- release-body-step-has-no-in-tree-witness
 
 ## Lessons Learned
