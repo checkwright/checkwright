@@ -12,34 +12,6 @@
 
 ## New Features
 
-- **gate-fixture-fanout-arm** [spec: SPEC-fixture-discharge.md] — nothing
-  enumerates the fixture pairs a change to a shared implementation module has to re-run:
-  `--run-gate-tests` takes one tests-dir per invocation, and a gate's `# graph:` manifest names its
-  **corpus**, never its own pair, so re-deriving readers off `couples=` reaches every coupled file
-  and never the case dir that proves the rule.
-  **Measured, not asserted:** `check-docs-nav-reachable`'s descriptor is consumer-owned
-  (`scripts/check-docs-nav-reachable.gate`) while its implementation is in the shared binary at
-  `native/src/gates/docs_nav_reachable.rs`, and its only case dir is
-  `scripts/gate-tests/check-docs-nav-reachable/` — no kit tests-dir carries that name. The README's
-  per-kit runner roster is 11 hand-maintained invocation lines.
-  **Candidate, not ruled:** a `--gate-fixtures <gate>` fan-out that resolves every registered
-  tests-dir and runs each `<tests-dir>/<gate>/` pair it finds, so a behaviour change's discharge is
-  one command rather than a grep the author has to remember; a second candidate is deriving the
-  README's runner roster from the same resolution instead of maintaining it.
-  **Why design-pending:** whether the fan-out is a new arm, an argument shape on the existing
-  one, or a widening of what the pre-commit battery runs is the seam call, and the third option
-  buys commit-time enforcement at a runtime-budget cost nobody has measured.
-  **Cost while deferred:** every gate-behaviour change carries a manual obligation — grep every
-  `gate-tests/` tree for the touched module's name and re-run each pair found
-  (gate-sdk/SPEC.md §Fixture-pair discipline states it) — and missing it costs a stage-late repair
-  commit, which is how it was found.
-  recurrence: gate-fixture-fanout-arm 2026-09-20
-  Filed 2026-09-16 by `installer-front-door-cut`'s close, as the gap generalization owed by the
-  lesson that dispositioned to that SPEC section.
-  **Ruled at spec (2026-09-21):** the battery, scoped. `check-crate-arms` runs every derived
-  fixture suite (16.1 s measured) when the crate source changed. No new arm is minted, since the
-  suite roster is already `registry::fixture_suites()`.
-
 ## Technical Debt
 
 ## Deferred
@@ -2225,5 +2197,6 @@
 - kit-spec-seam-content-half-unswept
 - shell-cwd-anchor-clause-has-no-oracle
 - pipeline-membership-idiom-latent
+- gate-fixture-fanout-arm
 
 ## Lessons Learned

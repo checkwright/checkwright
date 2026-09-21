@@ -67,6 +67,37 @@ fn arm(label: &str, crate_dir: &str, argv: &[&str]) -> Result<bool, String> {
     Ok(false)
 }
 
+// spec: gate-sdk/SPEC.md §check-crate-arms — the fixture arm: every derived suite through the
+// runner, a failing suite's report printed whole with its one-suite re-run command, and a suite
+// whose tests dir holds the working directory skipped, since that is a case of its own run
+fn fixture_arm(runner: &Program, suites: &[(String, String, String)], here: &str) -> Result<(bool, usize), String> {
+    let (mut ok, mut ran) = (true, 0usize);
+    for (suite, tests, checks) in suites {
+        if walk::at_or_under(&walk::abs_against(here, tests), here) {
+            continue;
+        }
+        ran += 1;
+        let mut argv = vec!["--run-gate-tests", tests.as_str()];
+        if !checks.is_empty() {
+            argv.push(checks.as_str());
+        }
+        let m = proc::run_merged(runner, &argv)?;
+        if m.succeeded() {
+            continue;
+        }
+        ok = false;
+        println!(
+            "{}: fixture suite {} failed (exit {}):",
+            NAME,
+            suite,
+            m.reported_code()
+        );
+        println!("{}", String::from_utf8_lossy(m.output()).trim_end_matches('\n'));
+        println!("  re-run: {} {}", runner.invocation(), argv.join(" "));
+    }
+    Ok((ok, ran))
+}
+
 pub fn run(_args: &[String]) -> i32 {
     let crate_dir = match walk::knob_scalar("GATE_SDK_NATIVE_CRATE") {
         Ok(v) => v,
@@ -179,10 +210,27 @@ pub fn run(_args: &[String]) -> i32 {
         }
     }
 
+    // spec: gate-sdk/SPEC.md §check-crate-arms — the third arm runs under the same predicate and
+    // whatever the first two said, through the binary every suite already runs
+    let suites = crate::registry::fixture_suites()
+        .and_then(|s| Ok((s, walk::knob_scalar("GATE_SDK_NATIVE_BIN")?, walk::cwd()?)))
+        .and_then(|(s, bin, here)| fixture_arm(&programs::CHECKWRIGHT_GATES.at(bin), &s, &here));
+    let suites = match suites {
+        Ok((ok, n)) => {
+            fail |= !ok;
+            n
+        }
+        Err(e) => {
+            eprintln!("{}: {}", NAME, e);
+            return 2;
+        }
+    };
+
     if fail {
         println!("  help: fix the finding above. These are the arms CI runs, and this gate is now their");
         println!("        only spelling — the battery plus bash gate-sdk/bin/build-native.sh is the whole");
-        println!("        commit-time obligation, and neither discharges the other.");
+        println!("        commit-time obligation, and neither discharges the other. A fixture suite runs");
+        println!("        the binary GATE_SDK_NATIVE_BIN names, so rebuild it before reading a suite's red.");
         return 1;
     }
 
@@ -194,8 +242,8 @@ pub fn run(_args: &[String]) -> i32 {
         }
     }
     println!(
-        "CRATE-ARMS: clean (cargo clippy --all-targets at -D warnings and cargo test, both --release over {}, build scratch {})",
-        crate_dir, target_dir
+        "CRATE-ARMS: clean (cargo clippy --all-targets at -D warnings and cargo test, both --release over {}, build scratch {}; {} fixture suite(s) green)",
+        crate_dir, target_dir, suites
     );
     0
 }
@@ -217,6 +265,37 @@ mod tests {
              for the other's arms"
         );
         assert!(a.starts_with(".tmp/crate-arms-") && a.ends_with(".green"), "{}", a);
+    }
+
+    // spec: gate-sdk/SPEC.md §check-crate-arms — a failing suite reds the fixture arm whatever its
+    // siblings said, and a suite holding the working directory is skipped; the stub stands in for
+    // the binary, whose case verdicts §run-gate-tests' own pair holds
+    #[cfg(unix)]
+    #[test]
+    fn a_failing_fixture_suite_reds_the_arm_and_a_suite_never_reenters_itself() {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = std::env::temp_dir().join(format!("crate-arms-fixture-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        for d in ["passing/gate-tests", "failing/gate-tests", "own/gate-tests/check-x/bad"] {
+            std::fs::create_dir_all(dir.join(d)).expect("synthetic suite dir");
+        }
+        let stub = dir.join("runner");
+        std::fs::write(
+            &stub,
+            "#!/bin/sh\ncase \"$2\" in *failing*) echo '  FAIL: check-x bad expected exit 1, got 0'; exit 1;; esac\necho 'GATE-TESTS: clean (1 pairs, 0 unit tests)'\n",
+        )
+        .expect("stub runner");
+        std::fs::set_permissions(&stub, std::fs::Permissions::from_mode(0o755)).expect("exec bit");
+        let root = dir.display().to_string();
+        let row = |s: &str| (s.to_string(), format!("{}/{}/gate-tests", root, s), String::new());
+        let runner = programs::CHECKWRIGHT_GATES.at(stub.display().to_string());
+        let here = format!("{}/own/gate-tests/check-x/bad", root);
+
+        let green = fixture_arm(&runner, &[row("passing")], &here).expect("arm ran");
+        assert_eq!(green, (true, 1));
+        let red = fixture_arm(&runner, &[row("passing"), row("failing"), row("own")], &here).expect("arm ran");
+        assert_eq!(red, (false, 2), "the failing suite must red the arm, and the suite holding the cwd must not run");
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     // spec: gate-sdk/SPEC.md §check-crate-arms — an absent program contributes an empty version
