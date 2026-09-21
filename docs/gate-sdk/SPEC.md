@@ -11892,9 +11892,7 @@ red on a rule nobody applies. Widening it is a scope question, not a calibration
 **Consumer-declared, and why.** Only the repository that authors kits deletes a
 kit `bin/` tool or edits a kit template; an adopter's tree receives those changes
 at upgrade and never makes them. So no kit ships the gate, and it reads the
-surface path the way §The declaration cohort does, fixed at `.workflow/`, leaving
-that cohort's knob-ownership question open rather than answering it for one
-member.
+surface path the way §The declaration cohort does, fixed at `.workflow/`.
 
 **Honest limits.** The gate checks that a path is **named**, not that the
 bullet's prose is right. It cannot check the Tightened-gates half of the

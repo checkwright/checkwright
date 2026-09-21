@@ -76,9 +76,8 @@ judge it.
 
 **Stage N+1 is dispatched on stage N's agent completion notification — never on
 its hand-back report, commit, stamp, a clean tree, a green battery, or a cleared
-`--simulate`.** Completion is a fact about a *session*; the hand-back is sent
-before its turn ends and can precede the notification, and every other is a fact
-about an *artifact*, none distinguishing "finished" from "still writing".
+`--simulate`.** Completion is a fact about a *session*, and none of those others
+distinguishes "finished" from "still writing".
 
 **When the notification does not arrive, no single read distinguishes a
 finished-but-unreported session from a live one.** Delivery can fail, and the

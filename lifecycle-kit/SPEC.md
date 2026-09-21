@@ -391,7 +391,8 @@ ban and not this reasoning.
 **Honest limit on the lead's dispatch precondition.** A lead dispatches stage
 N+1 on stage N's **agent completion notification**, never on an artifact — not
 its commit, its stamp, a clean tree, a green battery, or a cleared `--simulate`
-(§templates/lead.md). That precondition is **prose-only and human-enforced**, and
+(§templates/lead.md) — nor on its hand-back report, which the session sends
+before its turn ends and so can arrive ahead of the notification. That precondition is **prose-only and human-enforced**, and
 the cause is structural rather than budgetary. The signal's **producer is the
 harness**, emitting it when the dispatched session's turn ends — outside every
 governed tree, which is not a gap to close but the direct reason no gate can read
