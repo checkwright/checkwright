@@ -551,20 +551,6 @@
   Filed 2026-09-14 by `static-config-seam`'s close into the gap inbox; no stage of that iteration
   could drain it, and this scope promoted it, so the record is late and says so.
 
-- **agent-file-paragraph-sections-ungoverned** [cost: event/low] [surface: context-kit] — `check-brevity`,
-  widened to a section set and every top-level item (context-kit/SPEC.md §The brevity gate),
-  reads list items only, so the agent file's paragraph sections carry no brevity bound — its
-  kit-governance section alone runs about sixty lines of rule prose, beside the provenance-seam
-  and agent-execution sections. Re-verified at the drain: the gate's item predicate admits list
-  items and nothing else.
-  **Candidate shapes:** a paragraph arm with a per-paragraph budget and the same pointer
-  conjunct, or restructuring those sections as bullets so the widened gate reaches them. Either
-  reds on first run and wants the clause-to-owner tracing the Housekeeping cut needed.
-  **Cost while deferred:** the largest resident rule prose in the tree is guarded only by the
-  close brevity pass and the always-loaded ratchet.
-  Filed 2026-09-13 at `resident-tier-restatement`'s spec, from the brevity-reach amendment;
-  drained at its close.
-
 - **harness-moved-background-task-unrecorded** [cost: event/high] [surface: delegation-kit] — a command the
   harness moves to the background on its timeout is a live producer no liveness record names.
   **Split out of `backgrounded-shell-child-run-record-unenforced` — operator direction, 2026-09-11,
@@ -2206,8 +2192,9 @@
   **Re-measured 2026-09-21: the bare `.` has not reproduced twice** (2026-09-16, 2026-09-21) — an
   isolated `audit-sweep` returned a full 46-tool-use report through `SubagentHandback`, whose duty
   the harness states in the child's prompt; re-costed event/high to event/low (operator direction,
-  2026-09-21, lead-relayed). **OPEN, routed to close's eviction:** is the dated `recurrence:` line
-  below still a live trigger? No wontfix is ruled; the operator may take one to `/consult`.
+  2026-09-21, lead-relayed). **Kept at the 2026-09-21 close's eviction:** the dated `recurrence:`
+  line below is live by queue-kit/SPEC.md §The icebox tier, which ages no recurrence line; whether
+  one should age is filed to the gap inbox. No wontfix is ruled; the operator may `/consult` one.
   recurrence: worktree-isolated-agent-report-lost-to-a-failed-peer-send 2026-08-26
   Surfaced 2026-08-25 by the `turn-end-liveness-seam-and-worktree-cause` close, which reproduced it
   twice dispatching its own sweeps and filed it to the gap inbox; promoted 2026-08-25 at that drain.
@@ -2251,6 +2238,7 @@
   accurate and self-clearing, so no outage goes unseen while this waits.
   Filed 2026-08-25 by scope, operator-directed and relayed through the lead; the tree read
   behind it was re-run here rather than taken on the relay.
+  not-icebox-eligible: site-health-issue-venue-unwanted 2026-09-21 operator-ruled, cron-armed
 
 - **shellcheck-analyser-version-unpinned-in-ci** [cost: event/high] [surface: .github] — one battery member's verdict is
   a function of the host, so a green local battery is not evidence of a green CI battery.
@@ -2732,6 +2720,7 @@
   the evicting commit (`git log -p -S'<slug>' -- TASK-QUEUE.md`).
 
 - **lead-held-block-no-sanctioned-surface** — No route records a lead-held block.
+- **agent-file-paragraph-sections-ungoverned** — Brevity gate skips paragraphs.
 - **survey-record-filed-after-the-fact** — Order to the work goes wholly unread.
 - **amendment-prose-misnumbers-its-delta** — Cites Delta 3 for delta 4's subject.
 - **battery-timing-file-overwritten-by-only-run** — A filtered run reports as all.
@@ -2978,11 +2967,5 @@
 - **lead-agent-id-compaction-defense** — each claim still wants its own probe.
 
 ## Done
-
-- shipped-config-tightening-undeclared
-- release-note-removal-declaration-uncoupled
-- shipped-bin-removal-deprecation-path
-- account-noun-plural-slips-the-shape
-- release-body-step-has-no-in-tree-witness
 
 ## Lessons Learned

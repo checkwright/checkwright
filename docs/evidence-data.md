@@ -203,3 +203,4 @@
 | posix-install-bootstrap | sc sp a b v c | 4f/1d | 2 · ≤0d | 20s clean | 119 |
 | door-binding-sweep | sc sp a b v c | 4f/5d | 4 · ≤0d | 27s 2✗ | 122 |
 | adopter-floor-door-remainder | sc sp a b v c | 3f/4d | 3 · ≤0d | 20s clean | 122 |
+| release-declaration-coupling | sc sp a b v c | 2f/1d | 4 · ≤0d | 20s clean | 123 |
