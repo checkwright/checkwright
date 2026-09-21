@@ -31,7 +31,7 @@
 40 docs/guard-kit/index.md
 116 docs/index.md
 35 docs/install-evidence.md
-262 docs/install.md
+265 docs/install.md
 36 docs/kits.md
 40 docs/lifecycle-kit/index.md
 74 docs/methodology.md

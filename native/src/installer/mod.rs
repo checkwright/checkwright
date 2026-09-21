@@ -1,6 +1,7 @@
-// spec: installer/SPEC.md §The verbs — the five adopter verbs, behind the invoke: each a
+// spec: installer/SPEC.md §The verbs — the adopter verbs, behind the invoke: each a
 // top-level `--`-prefixed arm resolved before the registry lookup and absent from `--list`, taking
 // every value as argv because the caller is a bootstrap that may run no POSIX shell.
+pub mod demo;
 pub mod diff;
 pub mod doctor;
 pub mod init;
@@ -25,6 +26,7 @@ pub const VERBS: &[(&str, Verb)] = &[
     ("--diff", diff::run),
     ("--update", update::run),
     ("--uninstall", uninstall::run),
+    ("--demo", demo::run),
 ];
 
 // spec: installer/SPEC.md §What init seeds — the consumer-layout names the verbs write against,

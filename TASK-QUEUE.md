@@ -12,23 +12,6 @@
 
 ## New Features
 
-- **adopter-demo-verb-missing** [spec: SPEC-demo-verb.md] — the home page promises a walkthrough
-  with nothing installed, but `--run-demo` copies kit source from a clone. The installed front door
-  has no demo verb.
-  **The entry's inferred premise was run at spec (2026-09-21), and it is false where it matters.**
-  A packed master payload carries all 11 kit roots and no kit `smoke/`
-  (`GATE_SDK_PAYLOAD_WITHHOLD`). `--run-demo` needs `smoke/install.sh`, so it fails at act 1 from
-  the bootstrap and from the vendored front-end alike, and `checkwright demo` is refused as an
-  unknown arm. A starter battery stays green on the value-arm link typo. A `full` install reds on
-  it at `check-md-refs` and is green again once the typo is fixed; that install takes 0.4 s and
-  its battery 1.5 s.
-  **Ruling:** a `demo` verb that runs `init --profile full` from the package into its own scratch
-  repository. It shows green, fires the consumer smoke's value-arm defect and shows green again,
-  spawning only `git` and itself. The consumer smoke gains a demo arm as its oracle.
-  Filed 2026-09-21 to the gap inbox by the lead (operator shape: install, demo, uninstall), and
-  promoted into `docs-first-contact` by operator direction as its demo-verb unit.
-  **DISTINCT from** `fence-execution-gate`.
-
 - **fence-execution-gate** [spec: SPEC-fence-run.md] — `check-fence-command-head` is static, so
   a wrong operand or an unassigned variable passes, and no documented fence is ever executed.
   **Ruling (spec, 2026-09-21):** a `fence-runnable` HTML-comment marker, off by default, and an
@@ -2670,5 +2653,6 @@
 
 - install-md-adopter-page-overgrown
 - docs-index-front-door-restatement-ungenerated
+- adopter-demo-verb-missing
 
 ## Lessons Learned

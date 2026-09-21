@@ -855,10 +855,28 @@ jobs:
                 ((git -C $consumer log --oneline -1) -match 'vendor Checkwright kits' -and -not (git -C $consumer status --porcelain)) `
                 "log=$(git -C $consumer log --oneline -1) status=$(git -C $consumer status --porcelain)"
 
+          # The demo verb's Windows oracle (installer/SPEC.md §demo): the full
+          # battery it runs has only been measured on POSIX hosts, and this is the
+          # one leg a PowerShell adopter's path takes. Run from the consumer above,
+          # so a verb that wrote into its invoking tree would also show here.
+          Write-Host "== demo: the adoption arc from the package, in a scratch repository =="
+          $mout = Join-Path $scratch 'demo-out.txt'
+          Push-Location $consumer
+          try {
+              & pwsh -NoProfile -File (Join-Path $pkg 'bin/checkwright.ps1') demo 1> $mout 2>&1
+              $mcode = $LASTEXITCODE
+          } finally { Pop-Location }
+          $demoOut = (Get-Content -Raw -LiteralPath $mout -ErrorAction SilentlyContinue)
+          Check "checkwright demo exited 0 and printed its clean verdict" `
+                ($mcode -eq 0 -and $demoOut -match 'DEMO: clean') "exit $mcode out=$demoOut"
+          Check "checkwright demo left the invoking consumer's worktree clean" `
+                (-not (git -C $consumer status --porcelain)) "status=$(git -C $consumer status --porcelain)"
+
           Write-Host "== verdict =="
           Write-Host "This leg asserts both halves of the two-part oracle: the five bootstrap"
           Write-Host "steps, and a whole 'checkwright init' completing through PowerShell into a"
-          Write-Host "scratch consumer. Nothing in that oracle is owed."
+          Write-Host "scratch consumer. Nothing in that oracle is owed. It also runs 'checkwright demo'"
+          Write-Host "once, the demo verb's only oracle on a PowerShell adopter's path."
           if ($script:fails -gt 0) { Write-Host "$($script:fails) assertion(s) failed"; exit 1 }
           Write-Host "the PowerShell bootstrap answered all five steps and carried an install end to end"
 

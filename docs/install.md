@@ -182,11 +182,14 @@ curl -fsSL -o "$cw/checkwright-X.Y.Z.tgz.sha256" \
        || shasum -a 256 -c checkwright-X.Y.Z.tgz.sha256; } \
   && tar -xzf checkwright-X.Y.Z.tgz )
 
+sh "$cw/package/bin/checkwright.sh" demo  # optional, from anywhere: installs nothing
 sh "$cw/package/bin/checkwright.sh" init  # from your repository root
 ```
 
-Unpack outside your repository: `init` refuses a worktree that is not clean. With
-Node, the same install is one command, `npx checkwright init`.
+`demo` runs the whole arc — install, a green battery, one mistyped link caught,
+the fix — in a scratch repository of its own, then removes it. Unpack outside
+your repository: `init` refuses a worktree that is not clean. With Node, the
+same install is one command, `npx checkwright init`.
 
 `init` vendors the kits, writes a `gates.list` and the config files they read,
 records the install in `checkwright.lock`, and makes one commit. It ends by

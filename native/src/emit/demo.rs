@@ -4,10 +4,10 @@
 // spec: gate-sdk/SPEC.md §Consumer smoke — the binary placement calls the in-crate scratch-consumer
 // builder's own placement, so the walkthrough holds no second copy of it.
 use crate::emit::csmoke;
-use crate::ere::Ere;
 use crate::proc::{self, Sink, Stderr};
 use crate::programs;
 use crate::walk;
+use crate::walkthrough::{banner, ends_with_newline, excerpt, say, Scratch};
 
 // spec: gate-sdk/SPEC.md §Consumer smoke — the roster is the *consumer's*: which kits the
 // walkthrough vendors, and the binary the scratch consumer receives. `DEMO_TMP_DIR` is read below
@@ -17,7 +17,6 @@ pub const KNOBS: &[&str] = &["GATE_SDK_KIT_DIRS", "GATE_SDK_NATIVE_BIN"];
 const NAME: &str = "run-demo";
 const VERDICT: &str = "DEMO";
 const USAGE: &str = "usage: --run-demo";
-const RULE: &str = "════════════════════════════════════════════════════════════";
 
 // spec: gate-sdk/SPEC.md §Consumer smoke — the three exit classes as a type, so a finding about the
 // adoption arc cannot be raised on a precondition's spelling or the reverse.
@@ -25,21 +24,6 @@ enum Outcome {
     Clean,
     Fail(String),
     Refuse(String),
-}
-
-// spec: gate-sdk/SPEC.md §Consumer smoke — the shell form's `trap cleanup EXIT`, which removed the
-// scratch on every exit path. The walkthrough narrates and tears down its own scratch as part of
-// its arc, so there is no mode to keep and no `--keep` to suppress this.
-struct Scratch {
-    dir: String,
-}
-
-impl Drop for Scratch {
-    fn drop(&mut self) {
-        if !self.dir.is_empty() {
-            let _ = std::fs::remove_dir_all(&self.dir);
-        }
-    }
 }
 
 // spec: gate-sdk/SPEC.md §Consumer smoke — an operand is a refusal rather than a silently ignored
@@ -50,9 +34,7 @@ pub fn run(args: &[String]) -> i32 {
         eprintln!("{}: unknown option: {}; {}", NAME, a, USAGE);
         return 2;
     }
-    let mut scratch = Scratch {
-        dir: String::new(),
-    };
+    let mut scratch = Scratch { dir: None };
     match walkthrough(&mut scratch) {
         Outcome::Clean => {
             banner("DEMO: clean — the full adoption arc behaved");
@@ -68,16 +50,6 @@ pub fn run(args: &[String]) -> i32 {
             2
         }
     }
-}
-
-fn banner(title: &str) {
-    println!("\n{}", RULE);
-    println!("  {}", title);
-    println!("{}", RULE);
-}
-
-fn say(line: &str) {
-    println!("  {}", line);
 }
 
 macro_rules! step {
@@ -251,7 +223,7 @@ fn make_scratch(scratch: &mut Scratch) -> Result<String, Outcome> {
                 NAME, base
             ))
         })?;
-    scratch.dir = dir.clone();
+    scratch.dir = Some(dir.clone().into());
     Ok(dir)
 }
 
@@ -353,20 +325,8 @@ fn run_battery(consumer: &str) -> Result<(i32, String), Outcome> {
     ))
 }
 
-// spec: gate-sdk/SPEC.md §Consumer smoke — the positive green token, matched on the summary line's
-// own grammar rather than on a gate count, and echoed back as the act's one-line result.
 fn green_line(out: &str) -> Result<String, Outcome> {
-    let re = Ere::compile("All [0-9]+ gates passed").map_err(|e| refuse(e.to_string()))?;
-    let hits: Vec<&str> = out.lines().filter(|l| re.is_match(l)).collect();
-    Ok(hits.join("\n"))
-}
-
-fn ends_with_newline(out: &str) -> String {
-    if out.ends_with('\n') {
-        out.to_string()
-    } else {
-        format!("{}\n", out)
-    }
+    crate::walkthrough::green_line(out).map_err(refuse)
 }
 
 // spec: gate-sdk/SPEC.md §Consumer smoke — the crafted violation runs under the same cwd/env
@@ -382,33 +342,6 @@ fn fire_violation(consumer: &str, sdk_kit: &str) -> Result<String, Outcome> {
         .next()
         .unwrap_or("")
         .to_string())
-}
-
-// spec: gate-sdk/SPEC.md §Consumer smoke — the reddened gate's own block quoted back, from its
-// section header through its `FAIL:` line and the invariant line beneath it, so the reader sees the
-// finding, the help line and the remedy rather than being told they exist
-fn excerpt(out: &str, gate: &str) -> Vec<String> {
-    let head = format!("===== {} =====", gate);
-    let tail = format!("FAIL: {}", gate);
-    let mut quoted = Vec::new();
-    let mut on = false;
-    let mut past_verdict = false;
-    for line in out.lines() {
-        if line.contains(&head) {
-            on = true;
-        }
-        if !on {
-            continue;
-        }
-        if past_verdict && !line.starts_with(crate::runner::SPEC_LINE_PREFIX) {
-            break;
-        }
-        quoted.push(format!("  | {}", line));
-        if line.contains(&tail) {
-            past_verdict = true;
-        }
-    }
-    quoted
 }
 
 #[cfg(test)]
@@ -433,54 +366,5 @@ mod tests {
         assert!(gate_sdk_root(&["/a/b/drift-kit".to_string()]).is_err());
         assert!(matches!(parent_of("/a/b/gate-sdk"), Ok(ref h) if h == "/a/b"));
         assert!(parent_of("/gate-sdk").is_err(), "a root-level kit has no host checkout");
-    }
-
-    // spec: gate-sdk/SPEC.md §Consumer smoke — the excerpt runs from the gate's section header
-    // through its own `FAIL:` line AND the invariant line beneath it, and stops there, so the
-    // remedy joins the quote and a later gate's block never does.
-    #[test]
-    fn the_excerpt_stops_after_its_own_fail_lines_invariant() {
-        let spec = format!("{}gate-sdk/SPEC.md §Whatever — the rule", crate::runner::SPEC_LINE_PREFIX);
-        let out = format!(
-            "before\n===== check-x =====\nfinding\nFAIL: check-x (exit 1)\n{}\n\
-             ===== check-y =====\nFAIL: check-y (exit 1)\n",
-            spec
-        );
-        assert_eq!(
-            excerpt(&out, "check-x"),
-            vec![
-                "  | ===== check-x =====".to_string(),
-                "  | finding".to_string(),
-                "  | FAIL: check-x (exit 1)".to_string(),
-                format!("  | {}", spec),
-            ]
-        );
-        // comment-tier-exempt: a descriptor carrying no `# spec:` line is already a red under the
-        // self-lint contract, so this case pins a shape the battery cannot otherwise reach
-        let bare = "===== check-x =====\nfinding\nFAIL: check-x (exit 1)\n\
-                    ===== check-y =====\nFAIL: check-y (exit 1)\n";
-        assert_eq!(
-            excerpt(bare, "check-x"),
-            vec![
-                "  | ===== check-x =====".to_string(),
-                "  | finding".to_string(),
-                "  | FAIL: check-x (exit 1)".to_string(),
-            ]
-        );
-        assert!(excerpt(&out, "check-absent").is_empty());
-    }
-
-    // spec: gate-sdk/SPEC.md §Consumer smoke — the green token is the summary line's own grammar
-    // and not a gate count, so a battery whose roster grew still matches and a red one does not.
-    #[test]
-    fn the_green_token_matches_the_summary_grammar_alone() {
-        assert!(matches!(
-            green_line("noise\nAll 108 gates passed\n"),
-            Ok(ref l) if l == "All 108 gates passed"
-        ));
-        assert!(matches!(
-            green_line("1 of 108 gates FAILED: check-x\n"),
-            Ok(ref l) if l.is_empty()
-        ));
     }
 }

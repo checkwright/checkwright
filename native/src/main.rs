@@ -37,6 +37,7 @@ mod toolfloor;
 #[cfg(test)]
 mod usage_tests;
 mod walk;
+mod walkthrough;
 
 use std::process::exit;
 
@@ -195,6 +196,7 @@ const TOP_LEVEL_FLAGS: &[&str] = &[
     "--diff",
     "--update",
     "--uninstall",
+    "--demo",
     "--reads",
     "--needs",
 ];
@@ -308,7 +310,7 @@ fn main() {
         exit(install::run(&argv[1..]));
     }
 
-    // spec: installer/SPEC.md §The verbs — the five adopter verbs, resolved before the registry
+    // spec: installer/SPEC.md §The verbs — the adopter verbs, resolved before the registry
     // lookup and absent from `--list` like the arms around them. Each takes every value as argv and
     // reads no knob: the caller is the bootstrap, not assumed to be a POSIX shell.
     if let Some(verb) = installer::VERBS.iter().find(|(flag, _)| *flag == first) {

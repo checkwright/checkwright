@@ -3025,9 +3025,8 @@ recount is a step toward re-deciding a closed question.
 The binary is a multi-call binary whose *gate* subcommands are dispatched by
 name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
 `--list`, `--reads`, `--needs`, `--source-stamp`,
-`--guard-lib-parity`, `--guard-json`, `--install`, `--help`, and the installer's five adopter
-verbs — `--init`, `--doctor`, `--diff`, `--update` and `--uninstall`
-(installer/SPEC.md §The verbs) — plus the
+`--guard-lib-parity`, `--guard-json`, `--install`, `--help`, and the installer's adopter
+verbs (installer/SPEC.md §The verbs) — plus the
 `--emit-` family the arm table keys (`--emit-queue-counts` and
 `--emit-queue-edges`; `--emit-entry-history`, queue-kit's advisory report of the
 commits at which one entry's counted extent fell
@@ -9105,7 +9104,10 @@ verdict. The counts are populated for every caller and read by one: the installe
 count is `--run-consumer-smoke`'s clean line alone.
 
 **The adoption walkthrough is this section's other member, and this is the
-mechanism owner its own header pointed elsewhere for.** `--run-demo` narrates
+mechanism owner its own header pointed elsewhere for.** It is the
+**contributor's** walkthrough: it vendors every kit root the source tree resolves
+and runs the kits' shell recipes; the adopter's is installer/SPEC.md §demo.
+`--run-demo` narrates
 the arc a new adopter walks — vendor the kits and run each installer, commit clean
 and watch the battery pass, craft one violation and watch the battery turn red naming
 the gate that caught it, drop the change and watch green return — and exit 0 asserts

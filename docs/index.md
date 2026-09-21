@@ -20,13 +20,13 @@ proven rather than asserted: the instructions shape, the gates enforce. Why that
 split is the whole design is the layer model on
 [Where Checkwright sits](positioning.md).
 
-Try it in a scratch repository, where nothing of yours is at stake. With Node on
-the machine the install is one command; [Install](install.md) covers the other
-ways to fetch it.
+Try it with Node on the machine; [Install](install.md) covers the other ways to
+fetch it. `demo` installs nothing: it runs the whole arc in a scratch repository
+of its own and removes it. The three lines after it are the real install, run
+from the root of a clean repository, and its reversal.
 
 ```bash
-git init try-checkwright && cd try-checkwright
-git commit --allow-empty -m "start"
+npx checkwright demo        # needs no repository: install, a caught defect, the fix
 npx checkwright init        # adds the kits as one commit
 git show --stat HEAD        # everything the install brought in
 npx checkwright uninstall   # takes it back out, or delete the directory

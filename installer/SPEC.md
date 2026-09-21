@@ -246,10 +246,13 @@ each verb is *for*.
 | `diff` | which of the files `init` wrote have I changed? | the manifest's `files` hashes, against the tree |
 | `update` | bring the install here up to the version this package carries | the manifest, then everything `init` reads |
 | `uninstall` | reverse the install, keeping anything I have edited | the manifest's `files` roster, against the tree |
+| `demo` | show me the adoption arc without touching my repository | the payload, in a scratch repository of its own |
 
 **The classifier is writes / does not write, and it is what decides
 `--dry-run`.** `doctor` and `diff` write nothing, so neither has one and neither
-would have anything to preview. Every verb that does write has one, and it means
+would have anything to preview. `demo` writes nothing the adopter owns:
+everything it writes lives in a scratch repository it makes and removes (§demo),
+so it has no plan to preview and takes no `--dry-run` either. Every verb that does write has one, and it means
 the same thing in each: print the plan, write nothing, exit 0. That rule is
 asserted behaviorally rather than gated — §The consumer smoke holds
 `uninstall --dry-run` and `init --dry-run` to leaving the tree object and the
@@ -818,7 +821,7 @@ smoke). Minting a contract for that reader was refused — the op takes this
 family's existing grammar, channels and exit statuses, so the seam the
 bootstraps already call is the seam the smoke calls.
 
-**The five verbs are not ops of this family, and the reason is a channel conflict
+**The adopter verbs are not ops of this family, and the reason is a channel conflict
 rather than taste.** This family specifies stdout as a *wire* — tab-separated
 records, one per line — while `init`'s stdout carries the adopter-facing
 follow-up block whose grammar §init states and whose reader is the consumer
@@ -1486,6 +1489,82 @@ the same reasoning that keeps `init`'s written set and its recorded roster
 apart. A run with nothing to remove says so and exits 0 without narrowing the
 manifest: the install is still there, so disowning it would be false.
 
+## demo
+
+`checkwright demo` runs the adoption arc out of this package into a scratch
+repository of its own, and never reads or writes the directory it was invoked
+from. It is the **adopter's** walkthrough; the contributor's, `--run-demo`
+(gate-sdk/SPEC.md §Consumer smoke), vendors kit source from the tree it runs in
+and runs each kit's `smoke/` recipes, which the payload withholds
+(`GATE_SDK_PAYLOAD_WITHHOLD`), so from a package it stops at its first act. This
+verb is built on the path an adopter actually takes instead.
+
+**It takes no operand.** `-h`/`--help` answers on its own (§The verbs); any other
+word is refused with the usage line and exit 2 — the verb fixes its own profile
+and its own scratch, so an operand has nothing to select. Run from a source
+checkout it meets the no-payload refusal (§The install boundary), whose help
+names `--run-demo` as the walkthrough a checkout has.
+
+**The arc.**
+
+1. **The scratch repository is made in-process.** Its base is `DEMO_TMP_DIR` when
+   set and non-empty, else the platform's temporary directory; the directory is
+   created with the standard library, never with `mktemp`, a `contributor`
+   program (gate-sdk/SPEC.md §The program roster) this adopter-floor verb may not
+   spawn. A drop guard removes it on every exit path, the teardown `--run-demo`
+   established. The scratch gets `git init`, a fixed demo identity and
+   `maintenance.auto` false / `gc.auto` 0 in its **local** config, then an empty
+   seed commit. The identity is local rather than per-command so that an
+   unconfigured host's missing `user.name` stops neither the seed commit nor the
+   one `init` makes; the maintenance settings keep a detached repack off the
+   objects the teardown is removing.
+2. **Act 1, install.** The verb spawns its own executable as
+   `--init --profile full`, with the scratch as its working directory, and
+   `init`'s own narration goes to the terminal: what is shown is exactly what an
+   adopter's `init` does. `full` is the payload-derived profile (§Profiles), so the
+   choice names no roster member. It is chosen because it reddens on the defect
+   below where the lattice minimum does not.
+3. **Act 2, a clean battery.** The verb spawns the door `init` placed,
+   `<gates-dir>/checkwright-gates --run` (§The gate binary), in the scratch. It
+   must exit 0 and print the summary's `All <N> gates passed` token. The battery is
+   spawned rather than run in-process because its subject is the installed
+   consumer's own door.
+4. **Act 3, a caught defect.** The verb commits the consumer smoke's value-arm
+   defect — a `README.md` carrying one mistyped relative link, beside the page it
+   meant (§The consumer smoke). The battery must exit non-zero and some reddened
+   block must name `README.md`. **No gate is named**: the claim is that the defect
+   was caught, not which member caught it, on the value arm's ground. Every
+   reddened block is quoted back through its invariant line by `--run-demo`'s
+   excerpt rule. The commit passes `--no-verify`, because the battery run is what
+   the act shows catching it.
+5. **Act 4, fixed.** The verb corrects the link, commits, and re-runs the battery,
+   which must be green again. The fix is the link and never the corpus, as in the
+   value arm.
+
+**The verdict is §Consumer smoke's 0/1/2** (gate-sdk/SPEC.md), so a reader of
+either walkthrough reads one grammar: 0 every act held; 1 with `DEMO: FAIL — <act>`
+on stdout when the battery is not green after install, the defect is not caught,
+or it is not green after the fix; 2 with `DEMO: FAIL(env) — <cause>` on stderr
+when the harness could not be stood up — no payload, a scratch that could not be
+created, a failed `git`, or `init` exiting non-zero.
+
+**What it spawns.** The verb itself spawns `git` and its own executable, and
+nothing else: `git` is the adopter floor and the executable is the binary the
+bootstrap just verified, so the verb adds no member to the tool-floor roster. The
+battery it runs spawns whatever the `full` profile's registered gates spawn,
+which is that profile's own floor (context-kit/SPEC.md §bin/env-probe). A gate
+whose program is missing exits 2 under the fail-closed contract, so act 2 fails
+loudly rather than passing quietly.
+
+**Its oracles** are the consumer smoke's demo arm (§The consumer smoke) — the one
+place a packed payload meets a walkthrough at all — and the PowerShell
+install-smoke leg in the `gates` workflow, which runs the verb once on a host
+whose adopter path is PowerShell, where the POSIX runs cannot answer for the
+`full` battery.
+
+The banner, the green-token matcher and the excerpt are one module both
+walkthroughs call; each keeps its own acts.
+
 ## Profiles
 
 You pick how much of the methodology to meet first, and *which part* of it —
@@ -2128,6 +2207,17 @@ first apart from the typo, so the green is the defect being gone rather than the
 scan having narrowed, and a profile green on the first run must still be green
 on the second. The arm restores the consumer to the commit it found, so the
 reversal below still runs against the tree `init` wrote.
+
+**The demo arm** runs once after the profile loop, not per profile, because the
+verb fixes its own profile (§demo). It runs `checkwright demo` through the
+installed package's entry point, inside a fresh consumer `init` just wrote at the
+lattice minimum, with `DEMO_TMP_DIR` pointed at a directory the harness owns. It
+asserts exit 0 and the `DEMO: clean` line; that consumer's tree object and
+`git status --porcelain` identical before and after; the `DEMO_TMP_DIR` directory
+empty afterwards; and `checkwright demo extra` refused at exit 2 with the usage
+line. Each is its own named failure line: a verb that ran green and left its
+scratch behind is a red and never a pass, and so is one that wrote into the
+invoking tree.
 
 **The withholding arm's second assertion is not symmetry with its first.** The
 suite's standing assertion is that the battery is **green**, and a kit root that

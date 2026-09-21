@@ -95,8 +95,10 @@ not implement.
 | `diff` | which of the files `init` wrote have I changed? |
 | `update` | bring the install here up to the version this package carries |
 | `uninstall` | reverse the install, keeping anything I have edited |
+| `demo` | show me the adoption arc without touching my repository |
 
-`doctor` and `diff` write nothing, so neither takes a `--dry-run`. Every verb
+`doctor` and `diff` write nothing, so neither takes a `--dry-run`, and nor does
+`demo`, whose only writes are to a scratch repository it removes. Every verb
 that does write takes one, and it means the same thing in each: print the plan,
 write nothing, exit 0.
 
