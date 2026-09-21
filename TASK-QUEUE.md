@@ -2620,12 +2620,4 @@
 
 ## Done
 
-- site-dark-token-palette-coverage-ungated
-- projection-trigger-witness
-- generated-projections-roster-ungated
-- install-md-adopter-page-overgrown
-- docs-index-front-door-restatement-ungenerated
-- adopter-demo-verb-missing
-- fence-execution-gate
-
 ## Lessons Learned
