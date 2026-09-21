@@ -9,3 +9,4 @@ release-declaration-coupling spec ae17fa5a 2026-09-21 187fd9e7
 release-declaration-coupling align a535b7d8 2026-09-21 54a94441
 release-declaration-coupling build ad9e7863 2026-09-21 d23a298a
 release-declaration-coupling build abb9c8e9 2026-09-21 cbcfba48
+release-declaration-coupling build a13720ff 2026-09-21 fd45484b
