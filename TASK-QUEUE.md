@@ -16,6 +16,38 @@
 
 ## Deferred
 
+- **boundary-wipe-note-enumerates-nested-paths** [cost: iteration/low] [surface: lifecycle-kit] —
+  the scope entry's `boundary-wiped` note lists every file below each wiped scratch child, not the
+  children the wipe deletes, so its length tracks whatever accumulated under `.tmp/`.
+  **Measured 2026-09-21:** this iteration's `--enter-stage scope` printed 558.9KB on 11 lines,
+  nearly all of it the nested `.git/` contents of leaked `check-kit-roots-dialect-*` trees; the
+  harness spilled it to a file and showed a 2KB preview, so the stamp's own `next:` line had to be
+  grepped back out. lifecycle-kit/SPEC.md §The state machine's wipe paragraph deletes each
+  immediate child "with everything below it" and says the report names the removed set — the unit
+  deleted is the child, and the per-file listing is a port of `find`'s walk, not a stated contract.
+  **Deliverable:** report the removed immediate children (a directory once, with a count if
+  wanted); the failed-removal note keeps its per-path form, since a residue path is the finding.
+  Debt: it converges the report on the unit the spec already names.
+  **Cost while deferred:** every iteration boundary prints scratch volume into the entering
+  session's context; `check-kit-roots-dialect-leaks-a-scratch-tree-per-run` is today's multiplier.
+  Filed 2026-09-21 by the scope after `release-declaration-coupling`, which measured it. Owner
+  lookup ran over `boundary-wiped`, `removed set` and `wiped set`; it found the one paragraph above.
+
+- **recurrence-line-never-ages** [cost: event/low] [surface: queue-kit] — a dated `recurrence:`
+  line counts as a live icebox trigger with no age limb, so one recurrence pins a low-cost entry
+  out of the icebox indefinitely, even after later re-measurements fail to reproduce it.
+  queue-kit/SPEC.md §The icebox tier lists a dated `recurrence:` line among live triggers and ages
+  only the entry itself (`QUEUE_KIT_ICEBOX_AGE_DAYS`), never the recurrence date.
+  **Attested once:** `worktree-isolated-agent-report-lost-to-a-failed-peer-send` recurred
+  2026-08-26, did not reproduce 2026-09-16 or 2026-09-21, was re-costed `event/low`, and stays
+  Deferred on that one date. It is the instance, not a recurrence of this finding.
+  **Deliverable — rule one of two:** an age limb on the recurrence date mirroring the icebox age
+  knob, or a stated refusal naming why a single recurrence stays live forever.
+  **Cost while deferred:** each close's eviction re-judges such entries by hand and keeps them.
+  Filed 2026-09-21 to the gap inbox at `release-declaration-coupling`'s close eviction; promoted at
+  the next scope's intake the same day. Owner lookup ran over `recurrence:`, `live trigger` and
+  `age limb`; §The icebox tier owns the trigger list and states no age rule for it.
+
 - **disclaimer-beside-its-own-restatement** [cost: event/low] [surface: canon-kit] — a surface
   that disclaims carrying a rule ("stated there and not restated here") in the same sentence that
   carries it is asserted by nothing, and the disclaimer tells every sweep the copy is not one.
@@ -243,7 +275,7 @@
   on §check-queue-entry-budget's split-candidate test, the parent's two deliverables having taken
   different dispositions by demonstration.
 
-- **check-kit-roots-dialect-leaks-a-scratch-tree-per-run** [cost: once/low] [surface: gate-sdk]
+- **check-kit-roots-dialect-leaks-a-scratch-tree-per-run** [cost: session/low] [surface: gate-sdk]
   — `check-kit-roots-dialect`'s `scratch()` (`native/src/gates/kit_roots_dialect.rs`) creates a
   per-pid base under `GATE_SDK_TMP_DIR` and never removes it. The one `remove_dir_all` there runs
   BEFORE the create, so it clears a same-pid collision only; the pid differs per run, so every
@@ -261,6 +293,9 @@
   strictly weaker case and its ordinary-exit discipline is the cheaper of the two rulings.
   **Cost while deferred:** every battery run in every session leaves residue only the iteration
   boundary reclaims, and the gate the last iteration shipped for path-dialect defects is the leaker.
+  Re-classed `once/low` → `session/low` at the 2026-09-21 scope: the residue grows per battery
+  run, which `once` (a cost that does not grow) contradicts; 42 trees re-accumulated in one
+  iteration.
   Filed 2026-09-20 to the gap inbox at `door-binding-sweep`'s close by its runtime-artifact
   lifecycle check, after the drain had run; promoted at this scope's intake. Owner lookup:
   `scratch`, `GATE_SDK_TMP_DIR`, `kit_roots_dialect`, `Drop` — none.
