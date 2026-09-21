@@ -16,6 +16,33 @@
 
 ## Deferred
 
+- **provenance-seam-commit-sha-shape** [cost: event/low] [surface: canon-kit] — neither
+  `check-provenance-seam`'s arms nor the provenance-seam-residue audit class name a commit-SHA
+  shape, so a backticked commit reference in a kit SPEC, template or README is caught only by a
+  human reviewer; gate-sdk/SPEC.md §Consumer smoke carried two until a brevity pass cut them.
+  Probe: a `git grep -E` for a backticked 7-40 hex token over `*/SPEC.md`, `*/templates/*` and
+  `*/README.md`, excluding `docs/`.
+  **Re-measured at promotion:** one hit, evidence-kit/SPEC.md's `2147483646` — a decimal literal,
+  so a bare hex-class arm false-fires on numbers and needs a letter or a length discriminator.
+  **Deliverable:** an arm or a stated honest limit in canon-kit/SPEC.md §check-provenance-seam, and
+  the audit roster's provenance-seam-residue scope naming the shape.
+  **Cost while deferred:** a commit reference in a kit SPEC ships in every vendored copy.
+  Filed 2026-09-22 to the gap inbox by gate-sdk-surface-drain's close; promoted at the next scope.
+
+- **installer-spec-provenance-residue** [cost: event/low] [surface: canon-kit] — installer/SPEC.md
+  carries dated operator and lead rulings and CI run ids, job ids and head commit SHAs as
+  measurement records, which CLAUDE.md's public-repo rule bars from every tracked file; installer/
+  is not a kit, so `check-provenance-seam`'s corpus and the provenance-seam-residue audit class
+  both skip it. Probes over installer/SPEC.md: a `git grep -E` for `ruled <year>-` or `by the
+  operator|lead` (6 hits at promotion), and one for a backticked hex token or nine-digit run id
+  (15). The file is off `installer/package.json`'s `files` roster, so it rides no payload, but it
+  is public on the repository.
+  **Deliverable:** the sweep, plus a ruling on corpus reach — whether the seam gate or the audit
+  class covers a repo-root-governed SPEC.
+  **Cost while deferred:** publisher provenance on a public surface.
+  Filed 2026-09-22 to the gap inbox by gate-sdk-surface-drain's close sweep, which reported it out
+  of corpus; promoted at the next scope.
+
 - **shell-textual-absoluteness-single-dialect** [cost: event/low] [surface: gate-sdk] — tracked
   shell sites test a path for absoluteness by a leading `/` alone, so a caller-supplied Windows
   drive-letter path is joined onto a root as if relative. Sites (re-measured 2026-09-22):
