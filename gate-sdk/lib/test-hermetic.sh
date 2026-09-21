@@ -1,6 +1,9 @@
 # shellcheck shell=bash
 # spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — pin every kit's <KIT>_KNOB_FILE (and its retired <KIT>_CONFIG_FILE) to one shared empty file so a bespoke gate-tests/*.test.sh runs on kit defaults, never the invoker's cwd config; knob-free by design (a config-pinning tool cannot be configured by the surface it pins)
 # no-port: gate-sdk/SPEC.md §lib/test-hermetic.sh — this library's whole API is three shell functions, gate_env, gate_run and gate_arm_run, called *inside* the caller's own shell, and a binary arm cannot be sourced into bash: the */gate-tests/*.test.sh suites source this file as their first act, and there is no in-crate arm a source line can name. gate_env exists rather than an env prefix because env cannot invoke a shell function. It resolves no knob of its own and computes no default. Structural, not a sizing judgment.
+# spec: gate-sdk/SPEC.md §The path-dialect contract — anchor the sourcing shell's cwd before the two roots below are derived and composed
+# shellcheck disable=SC2164 # the anchor is the contract's bare builtin, which check-path-dialect clears only as the whole line; a failed chdir leaves the cwd where it was
+cd "$(pwd -P)"
 _th_root="$(cd "${BASH_SOURCE[0]%/*}/../.." && pwd)"
 _th_empty="${TMPDIR:-/tmp}/gate-sdk-hermetic-empty.sh"
 : >"$_th_empty"

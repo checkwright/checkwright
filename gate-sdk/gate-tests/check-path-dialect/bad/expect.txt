@@ -1,6 +1,8 @@
-PATH-DIALECT: 9 violation(s):
+PATH-DIALECT: 11 violation(s):
 tree/bound-root.sh:3 — `git rev-parse --show-toplevel` binds a root that is never crossed
 tree/common-dir.sh:3 — `git rev-parse --git-common-dir` binds a root that is never crossed
+tree/late-anchor.sh:3 — the file binds 2 roots, one from `BASH_SOURCE`, and composes them by string arithmetic with no cwd anchor
+tree/two-root.sh:3 — the file binds 2 roots, one from `BASH_SOURCE`, and composes them by string arithmetic with no cwd anchor
 tree/logical-readback.sh:4 — the crossed `cd` at line 3 is read back with a logical `pwd`
 native/src/primitive.rs:4 — `starts_with('/')` spells a text-level path primitive outside the crate's speller
 native/src/primitive.rs:8 — `.is_absolute()` spells a text-level path primitive outside the crate's speller

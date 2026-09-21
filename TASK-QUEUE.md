@@ -12,40 +12,6 @@
 
 ## New Features
 
-- **shell-cwd-anchor-clause-has-no-oracle** [spec: SPEC-cwd-anchor.md]
-  — Surfaced 2026-08-30. `gate-sdk/SPEC.md` §The path-dialect contract obliges a script that
-  composes two roots to anchor its own cwd first, and nothing asserts it. The gate's own section
-  (§check-path-dialect) now states the hole rather than leaving it to a reader: a builtin produces
-  no foreign value but PROPAGATES one, so an absolute `cd` leaves `$PWD` foreign and a later
-  relative `cd … && pwd` concatenates onto it; neither half is a producer occurrence, and the
-  `pwd -P` read-back arm reaches only a `cd` the gate already cleared.
-  **Deliverable:** a predicate that PAIRS two facts a script exhibits — it derives a root from
-  `BASH_SOURCE` with a relative `cd`, and it composes two roots by string arithmetic — rather than
-  scanning for either. Scanning for either alone reds 7 of 7 files; the pairing reds 1.
-  **Why design-pending, and why it needs a spec stage rather than a build session:** the satisfying
-  value is itself unruled. `gate-sdk/lib/test-hermetic.sh`:29 also spells the shell absoluteness
-  test, there is no shell counterpart of `walk::path_root` to route it through, and this contract
-  refuses a shared shell normalizer on its own stated grounds — so what a red site is supposed to
-  become is an open question, not a known edit.
-  **Measured, so a later scope does not re-buy it** (filed whole in `.workflow/survey-record.md`,
-  2026-09-20 build, with its witness): of the 7 non-test tracked shell files deriving a root from
-  `BASH_SOURCE`, NONE uses `pwd -P`, and `gate-sdk/lib/test-hermetic.sh` is the witness exhibiting
-  both paired facts — `:4` and `:19` derive two roots with relative `cd`s, `:21` takes a suffix off
-  one and `:29` joins the other onto a leading-slash-tested path.
-  **Cost while deferred:** a Windows adopter's gate verdict on their own host, paid whenever a
-  composing script runs there, and a Linux battery cannot show it — the cost class the parent
-  carried, undiminished by the split because the split moved the enforced half out, not this one.
-  That is also why the icebox is refused rather than merely unavailable: a verdict on an adopter's
-  host is adopter-facing, which the `event/high` class already makes ineligible.
-  Filed 2026-09-20 by build, as the surviving half of `path-dialect-clauses-unenforced` — whose
-  clause two landed as §check-path-dialect's locality arm, and whose contract half is
-  §Porting to Rust does not retire dialect exposure. Split authorized by lead decision 2026-09-20
-  on §check-queue-entry-budget's split-candidate test, the parent's two deliverables having taken
-  different dispositions by demonstration.
-  **Ruled at spec (2026-09-21):** a red site becomes an anchored one, with `cd "$(pwd -P)"` as its
-  first act, held by a two-root pairing arm on `check-path-dialect`. The textual absoluteness test
-  at `:29` is a different primitive, filed apart.
-
 - **pipeline-membership-idiom-latent** [spec: SPEC-pipe-membership.md] —
   the SIGPIPE-under-pipefail membership
   idiom that produced `installer-init-noop-regen-conflict` has no gate, so nothing stops the next
@@ -2296,5 +2262,6 @@
 - gates-must-not-bind-to-document-paths
 - kit-spec-consumer-config-literal
 - kit-spec-seam-content-half-unswept
+- shell-cwd-anchor-clause-has-no-oracle
 
 ## Lessons Learned

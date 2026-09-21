@@ -27,6 +27,9 @@ const PREFIX_FORM: &str = r#"format!("{}/""#;
 const PREFIX_TESTS: &[&str] = &["starts_with(&format!(", "strip_prefix(&format!("];
 // path-dialect-exempt: the token this gate reads, named once here rather than spelled at each read
 const EXEMPT: &str = "path-dialect-exempt:";
+// spec: gate-sdk/SPEC.md §check-path-dialect — the cwd-anchor arm's sole clearance, matched as a
+// line's whole code half
+const ANCHOR: &str = r#"cd "$(pwd -P)""#;
 
 pub fn run(args: &[String]) -> i32 {
     match rule(args) {
@@ -273,6 +276,7 @@ struct Tally {
     prim: usize,
     local: usize,
     namespace: usize,
+    anchored: usize,
 }
 
 // spec: gate-sdk/SPEC.md §check-path-dialect — which containment spelling a line carries: the bare
@@ -375,6 +379,84 @@ fn scan_shell(path: &str, text: &str, t: &mut Tally, findings: &mut Vec<String>)
     }
 }
 
+// spec: gate-sdk/SPEC.md §check-path-dialect — a root binding on one line: a name assigned a
+// substitution that `cd`s and captures `pwd`, from `BASH_SOURCE` or after a toplevel `cd`;
+// `Some(true)` marks the `BASH_SOURCE` kind
+fn root_binding(code: &str) -> Option<(String, bool)> {
+    let mut s = code.trim_start();
+    for p in ["export ", "local ", "readonly "] {
+        if let Some(r) = s.strip_prefix(p) {
+            s = r.trim_start();
+        }
+    }
+    let eq = s.find('=')?;
+    let name = &s[..eq];
+    let first = name.chars().next()?;
+    if !(first.is_ascii_alphabetic() || first == '_') || !name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_') {
+        return None;
+    }
+    let value = s[eq + 1..].trim_start_matches('"');
+    if !value.starts_with("$(") || !value.contains("cd ") || !value.contains("pwd") {
+        return None;
+    }
+    let from_source = value.contains("BASH_SOURCE");
+    if from_source || value.contains(GIT_FLAGS[0]) {
+        Some((name.to_string(), from_source))
+    } else {
+        None
+    }
+}
+
+// spec: gate-sdk/SPEC.md §check-path-dialect — string arithmetic on a root: a join inside a word,
+// quoted or braced, or a suffix or prefix strip
+fn composes(code: &str, name: &str) -> bool {
+    [
+        format!("${}/", name),
+        format!("${{{}}}/", name),
+        format!("\"${}\"/", name),
+        format!("\"${{{}}}\"/", name),
+        format!("${{{}%", name),
+        format!("${{{}#", name),
+    ]
+    .iter()
+    .any(|f| code.contains(f.as_str()))
+}
+
+// spec: gate-sdk/SPEC.md §check-path-dialect — the cwd-anchor arm: a file binding two roots, one from
+// `BASH_SOURCE`, that composes either by string arithmetic anchors its cwd before the first binding
+fn scan_anchor(path: &str, text: &str, t: &mut Tally, findings: &mut Vec<String>) {
+    let lines = split_file(text, true);
+    let mut anchored = false;
+    let mut first: Option<usize> = None;
+    let mut roots: Vec<(String, bool)> = Vec::new();
+    for (idx, line) in lines.iter().enumerate() {
+        if first.is_none() && line.code.trim() == ANCHOR {
+            anchored = true;
+        }
+        if let Some(r) = root_binding(&line.code) {
+            first.get_or_insert(idx);
+            if !roots.iter().any(|(n, _)| *n == r.0) {
+                roots.push(r);
+            }
+        }
+    }
+    let first = match first {
+        Some(f) if roots.len() >= 2 && roots.iter().any(|(_, s)| *s) => f,
+        _ => return,
+    };
+    if !lines.iter().any(|l| roots.iter().any(|(n, _)| composes(&l.code, n))) {
+        return;
+    }
+    if anchored {
+        t.anchored += 1;
+        return;
+    }
+    findings.push(format!(
+        "{}:{} — the file binds {} roots, one from `BASH_SOURCE`, and composes them by string arithmetic with no cwd anchor: anchor the cwd with `{}` before deriving the first root",
+        path, first + 1, roots.len(), ANCHOR
+    ));
+}
+
 fn scan_rust(path: &str, text: &str, is_crosser: bool, t: &mut Tally, findings: &mut Vec<String>) {
     let lines = split_file(text, false);
     let mut forms: Vec<&str> = RUST_FORMS.to_vec();
@@ -431,6 +513,7 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         prim: 0,
         local: 0,
         namespace: 0,
+        anchored: 0,
     };
     let mut findings: Vec<String> = Vec::new();
 
@@ -438,6 +521,7 @@ fn rule(_args: &[String]) -> Result<i32, String> {
     for f in &shell {
         let text = read(Path::new(f))?;
         scan_shell(f, &text, &mut t, &mut findings);
+        scan_anchor(f, &text, &mut t, &mut findings);
     }
 
     let src = walk::knob_scalar("GATE_SDK_NATIVE_SRC")?;
@@ -473,11 +557,13 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         println!("        re-spelling it. A `/`-separated value naming something other than a filesystem");
         println!("        location is outside the contract and says so at its own line or the one above, with");
         println!("        `// path-dialect-exempt: <reason>`; a recorded verdict does not clear this arm");
+        println!("  help: a shell file composing two roots anchors its cwd with `{}` before its first", ANCHOR);
+        println!("        root binding; nothing else clears that arm");
         return Ok(1);
     }
     println!(
-        "PATH-DIALECT: clean ({} shell file(s), {} Rust file(s) scanned; {} producer occurrence(s) — {} in `cd` position, {} `Path`-typed, {} inside the crate's crosser, {} by recorded verdict, {} presence probe(s) binding no value; {} primitive spelling(s) — {} inside the crate's speller, {} declared out of the filesystem namespace)",
-        shell.len(), rust_files, t.total, t.cd, t.typed, t.crosser, t.verdict, t.probe, t.prim, t.local, t.namespace
+        "PATH-DIALECT: clean ({} shell file(s), {} Rust file(s) scanned; {} producer occurrence(s) — {} in `cd` position, {} `Path`-typed, {} inside the crate's crosser, {} by recorded verdict, {} presence probe(s) binding no value; {} primitive spelling(s) — {} inside the crate's speller, {} declared out of the filesystem namespace; {} two-root file(s) anchored)",
+        shell.len(), rust_files, t.total, t.cd, t.typed, t.crosser, t.verdict, t.probe, t.prim, t.local, t.namespace, t.anchored
     );
     Ok(0)
 }
@@ -579,5 +665,29 @@ mod tests {
         assert!(recorded_verdict(&near, 1));
         let far = split_file("// spec: x §The path-dialect contract\n\nlet a = 1;\n", false);
         assert!(!recorded_verdict(&far, 2));
+    }
+
+    // spec: gate-sdk/SPEC.md §check-path-dialect — a root is a one-line `cd … pwd` capture of either
+    // kind, a prefix keyword binds the same name, and a capture from neither source is no root
+    #[test]
+    fn a_root_binding_is_read_from_its_own_line() {
+        let src = r#"local KIT="$(cd "${BASH_SOURCE[0]%/*}/.." && pwd)""#;
+        assert_eq!(root_binding(src), Some(("KIT".to_string(), true)));
+        let top = format!(r#"REPO="$(cd "$(git rev-parse {})" && pwd -P)""#, GIT_FLAGS[0]);
+        assert_eq!(root_binding(&top), Some(("REPO".to_string(), false)));
+        assert_eq!(root_binding(r#"FE="$(cd "$DIR/../bin" && pwd)""#), None);
+        assert_eq!(root_binding(r#"out="$(cd "$SANDBOX" && run)""#), None);
+    }
+
+    // spec: gate-sdk/SPEC.md §check-path-dialect — arithmetic is a join or a strip on the name
+    // itself, never on a longer name it prefixes
+    #[test]
+    fn string_arithmetic_is_a_join_or_a_strip_on_the_root() {
+        assert!(composes(r#"echo "$R/x""#, "R"));
+        assert!(composes(r#"for k in "$R"/*-kit"#, "R"));
+        assert!(composes(r#"x="${R%/lib}""#, "R"));
+        assert!(composes(r#"x="${R#pre}""#, "R"));
+        assert!(!composes(r#"echo "$RX/x""#, "R"));
+        assert!(!composes(r#"cd "$R""#, "R"));
     }
 }

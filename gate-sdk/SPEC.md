@@ -809,7 +809,8 @@ two builtins:
 
 Both are no-ops on a single-dialect host, and both are the same `-P` crossing the
 idiom above already rules — applied to the shell's cwd rather than to a name.
-The idiom was written from the shell hook generator, since ported
+A script with no git producer of its own owes the first builtin alone, and
+`check-path-dialect`'s cwd-anchor arm holds it. The idiom was written from the shell hook generator, since ported
 (§gen-pre-commit): it was the one entry point that spelled a kit root **relative
 to** a repo root, and its refusal on a Windows runner reported only that the
 generator "failed". A script
@@ -15055,9 +15056,10 @@ now looks for a `.gate`-declared member's.
 ### check-path-dialect
 
 Invariant: **every platform-native path producer in the tree converts at its own
-point of production, or records at the site why it does not — and every text-level
+point of production, or records at the site why it does not — every text-level
 path primitive in the crate is spelled in the crate's speller, or declares its value
-out of the filesystem namespace at the site** (§The path-dialect
+out of the filesystem namespace at the site — and every shell file composing two
+roots anchors its cwd first** (§The path-dialect
 contract). It exists because the migration decays inside its own iteration
 otherwise: every newly ported file adds a producer to the remainder, and the port
 is still running. It is the record that replaced §Worked dispositions' per-site
@@ -15189,20 +15191,35 @@ tracking, which gives up the one-occurrence locality this gate is built on. It i
 held by review and by `walk.rs`'s monopoly on the producers those roots arrive
 through, and a defect found in it reopens the question with its instance.
 
-**And the cwd-anchor clause is unasserted on the shell side, which is the other thing
-this gate does not hold.** §The path-dialect contract obliges a script that composes
-two roots to anchor its own cwd first, on the propagation this gate's own producer
-vocabulary cannot see: a builtin produces no foreign value but *propagates* one, so an
-absolute `cd` leaves `$PWD` foreign and a later relative `cd … && pwd` concatenates onto
-it. Neither half is a producer occurrence, and the `pwd -P` read-back arm above reaches
-only a `cd` this gate already cleared — so nothing here fires on a script that derives a
-root from `BASH_SOURCE` with a relative `cd` and then composes two roots by string
-arithmetic. Holding it needs a predicate that **pairs** those two facts rather than
-scanning for either, which is a different shape from both arms above and is filed rather
-than sketched here. There is also no shell counterpart of `walk::path_root` to route a
-shell-side absoluteness test through, and this contract refuses a shared shell
-normalizer on its own stated grounds, so the satisfying value is itself an open
-question rather than a known edit.
+**A third arm asserts the cwd-anchor clause on the shell side.** §The path-dialect
+contract obliges a script that composes two roots to anchor its own cwd first, on the
+propagation the producer vocabulary cannot see: a builtin produces no foreign value but
+*propagates* one, so an absolute `cd` leaves `$PWD` foreign and a later relative
+`cd … && pwd` concatenates onto it. Neither half is a producer occurrence, and the
+`pwd -P` read-back arm above reaches only a `cd` this gate already cleared, so the arm
+**pairs** the two facts the hazard needs rather than scanning for either — either fact
+alone reds files that compose nothing foreign. It reads the producer arm's shell corpus
+one file at a time, on the same code-and-comment split, because the contract judges
+consumption within a file.
+
+- **A root** is a name bound on one line from a command substitution that `cd`s and
+  captures `pwd`: to a path derived from `BASH_SOURCE`, or after a
+  `git rev-parse --show-toplevel` `cd`. An `export`, `local` or `readonly` prefix binds
+  the same name.
+- **Red** when a file binds **two or more** roots, at least one from `BASH_SOURCE`, and
+  applies string arithmetic to any of them: a join inside a word — `$<root>/`,
+  `${<root>}/`, or either quoted and followed by `/`, which is one shell word — or a
+  `${<root>%…}` or `${<root>#…}` strip.
+- **The sole clearance is the anchor itself**: a line whose code half is exactly
+  `cd "$(pwd -P)"`, before the file's first root binding. No `spec:` verdict or exempt
+  token clears this arm, on the locality arm's ground — a clause every site can cite its
+  way out of is the review-held clause it replaced. The finding names the file and its
+  first root binding, and the anchor as the remedy.
+
+**Its honest limit:** a file composing **one** root with a caller's foreign absolute
+path passes. That shape turns on testing a caller-supplied value's absoluteness from its
+text — a different primitive, with no shell counterpart of `walk::path_root` to route it
+through, and this contract refuses a shared shell normalizer on its own stated grounds.
 
 **Its own vocabulary is a recorded verdict, and its unit tests compose from that
 one site.** The module names the forms it hunts, so it would red on itself; the two
@@ -15232,8 +15249,9 @@ no couple glob covers it and the hook invocation is unconditional (§check-tree-
 takes the same shape for the same reason). Its fixture pair exercises both corpus
 arms, both assertions and every clearance — the `good/` tree carries the primitives
 spelled in the speller's own body, a module reaching each through a named helper, and
-a declared namespace site; the `bad/` tree carries each vocabulary member and a
-declaration with no reason — and its `bad/` case asserts the violation **count**, which
+a declared namespace site, plus an anchored two-root file and a one-root file doing
+arithmetic; the `bad/` tree carries each vocabulary member, a declaration with no
+reason, an unanchored two-root file and one anchored after its first binding — and its `bad/` case asserts the violation **count**, which
 is what gives the green files beside the violations a reader: a clearance arm that
 stopped clearing reds that case rather than passing quietly.
 
