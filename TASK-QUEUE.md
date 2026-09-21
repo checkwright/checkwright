@@ -1592,6 +1592,8 @@
   **Cost while deferred:** a friction tax that scales with how carefully a bullet is written,
   which taxes exactly the good filings.
   Filed 2026-08-14 by close, from the prompt-friction triage.
+  **Held Deferred:** the `--from` arm, this entry's whole deliverable, is excluded by the
+  enhancement admission filter (operator direction 2026-09-21, lead-relayed).
 
 - **bridged-knob-owner-for-consumer-gate** [cost: event/high] [surface: gate-sdk] — every knob resolves against a static
   kit table, so a consumer-declared ported gate that needs a consumer-owned knob is refused on
