@@ -5,3 +5,4 @@
 ---
 
 scratch-hermeticity scope ab0fa046 2026-09-21 aa579105
+scratch-hermeticity spec ae9203bb 2026-09-21 7b7b6122
