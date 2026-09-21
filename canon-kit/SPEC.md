@@ -514,8 +514,8 @@ Knobs:
   `check-fence-command-head`. The toolchain a tree's recipes name — a compiler, a
   fetch tool, a package manager — is that tree's own vocabulary, so it rides the
   extra rather than a kit literal (the provenance seam). This repo adds its
-  crate toolchain, its fetch and checksum tools and one platform's package
-  manager.
+  crate toolchain, its fetch and checksum tools, one platform's package manager
+  and the npm runner.
 - `CANON_KIT_RETIRED_SPELLING_EXCLUDE` — array of globs, default empty: tracked
   paths held out of `check-amendment-retired-spelling`'s reconciliation corpus.
   Which surfaces are **history-bearing** is a consumer fact, not a kit one — a

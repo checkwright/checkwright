@@ -18,25 +18,6 @@ prompts, your harness. Add Checkwright where a claim has to be mechanically
 proven rather than asserted: the instructions shape, the gates enforce. Why that
 split is the whole design: [Where Checkwright sits](docs/positioning.md).
 
-One arm runs the entire arc against a throwaway consumer repo, installing
-nothing and touching no tree but its own. Run it on the gate binary
-`GATE_SDK_NATIVE_BIN` names:
-
-```bash
-. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && "$(gate_native_bin_spelled)" --run-demo
-```
-
-The install puts that binary in place ([Quick start](#quick-start)) and needs
-neither `bash` nor a Rust toolchain. From a clone of this repository, which
-tracks no binary, `bash gate-sdk/bin/build-native.sh` builds one first — and
-that `bash` is the clone path's floor, never the install floor.
-
-It vendors the kits into a fresh git repo, passes the battery clean, introduces
-a defect and shows the gate that blocks it, then drops the defect and goes green
-again. The walkthrough is the `--run-demo` arm, specified in
-[gate-sdk/SPEC.md](gate-sdk/SPEC.md) §Consumer smoke, and it runs on every
-validate stage, so it cannot rot.
-
 ## What that buys you
 
 **Before.** A session finishes a task and marks it done; the evidence is the
@@ -148,6 +129,14 @@ bash installer/consumer-smoke/run-smoke.sh                                      
 bash gate-sdk/bin/run-gates.sh --run-demo                                                        # the adoption walkthrough
 ```
 <!-- battery-roster:end -->
+
+The last line, `--run-demo`, is the adoption walkthrough, and it runs from a
+checkout because it copies the kits out of this tree: against a throwaway
+consumer repo, touching no tree but its own, it vendors the kits, passes the
+battery clean, introduces a defect and shows the gate that blocks it, then drops
+the defect and goes green again. A checkout tracks no binary, so
+`bash gate-sdk/bin/build-native.sh` builds one first. The arm is specified in
+[gate-sdk/SPEC.md](gate-sdk/SPEC.md) §Consumer smoke.
 
 The gate binary's `--install-hooks` arm opts this clone into the generated
 pre-commit and commit-msg hooks. The repo also runs lifecycle-kit's own iteration state

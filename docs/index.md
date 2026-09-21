@@ -20,17 +20,17 @@ proven rather than asserted: the instructions shape, the gates enforce. Why that
 split is the whole design is the layer model on
 [Where Checkwright sits](positioning.md).
 
-One arm runs the entire arc against a throwaway consumer repo, installing
-nothing. It runs on an installed gate binary ([Install](install.md)); from the
-repository root:
+Try it in a scratch repository, where nothing of yours is at stake. With Node on
+the machine the install is one command; [Install](install.md) covers the other
+ways to fetch it.
 
 ```bash
-. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && "$(gate_native_bin_spelled)" --run-demo
+git init try-checkwright && cd try-checkwright
+git commit --allow-empty -m "start"
+npx checkwright init        # adds the kits as one commit
+git show --stat HEAD        # everything the install brought in
+npx checkwright uninstall   # takes it back out, or delete the directory
 ```
-
-It vendors the kits into a fresh git repo, passes the battery clean, introduces
-a defect and shows the gate that blocks it, then drops the defect and goes green
-again.
 
 ## What that buys you
 
