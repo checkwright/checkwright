@@ -546,8 +546,7 @@ The constrained members and what forces each:
   when the anchor's fence-run corpus carries a marked fence. A kit list, or
   `registered`, would owe `bash` to every selection carrying that kit, the `prose`
   profile included, marked fence or not; and the corpus the gate executes lies in
-  no kit root — at the default `CANON_KIT_SCAN_KIT_ROOTS` it prunes the kit roots,
-  so what runs is the adopter's own first-party docs. The owning kit is read off
+  no kit root (that section's corpus). The owning kit is read off
   the registry's owner column, never written as a literal, and joins only when it
   is among the reader's kit roots; the corpus and the marker test are the gate's own
   functions, so the arm and the gate cannot disagree about whether a spawn can

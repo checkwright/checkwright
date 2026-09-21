@@ -3084,10 +3084,9 @@ the construction above rather than by a kernel facility.
 
 1. **One scratch per doc**, under `DEMO_TMP_DIR`, else the platform temp
    directory — the base §Consumer smoke's builder takes. The copy is gate-sdk's
-   tracked-tree scratch (gate-sdk/SPEC.md §Consumer smoke): the index's tracked
-   set under the gate's working directory, copied with `std::fs` from the working
-   tree, then `git init` and a seed commit under a fixed identity, so a fence that
-   reads git sees a repository. At the repository root that is the whole tracked
+   tracked-tree scratch (gate-sdk/SPEC.md §Consumer smoke) over the gate's working
+   directory, seeded under a fixed identity so a fence that reads git sees a
+   repository. At the repository root that is the whole tracked
    tree; in a fixture case dir it is the case dir alone.
 2. **The binary is placed.** `GATE_SDK_NATIVE_BIN` is resolved against the
    scratch root, and where that lands inside the scratch the running binary is
