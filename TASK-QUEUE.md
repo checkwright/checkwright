@@ -2221,8 +2221,9 @@
   on `v0.22.0` and 2026-08-24 on `v0.25.0`, each cleared by the probe's own recovery path.
   **Those dates sit in this prose deliberately.** The operator has since deleted both issues —
   probed here, `gh issue list --state all` returns nothing — so the tracker is empty, two dead
-  run-log URLs are all that survives of the evidence, and the underlying defect is tracked at
-  `release-body-step-has-no-in-tree-witness` rather than at any issue that still resolves. The
+  run-log URLs are all that survives of the evidence, and the underlying defect's repair landed
+  as `release-body-step-has-no-in-tree-witness` — the publish job now composes the Release body,
+  unwitnessed until the first tagged publish run — rather than at any issue that resolves. The
   `site-health` label survives and is harmless: the workflow's label creation is idempotent and
   its open-issue lookup returns empty either way.
   **The deletion is not the fix, and an empty tracker is not the problem going away.** The

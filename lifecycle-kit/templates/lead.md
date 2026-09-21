@@ -75,10 +75,10 @@ rule and the harm each misroute does). Read the manifest the stage committed and
 judge it.
 
 **Stage N+1 is dispatched on stage N's agent completion notification — never on
-its commit, its stamp, a clean tree, a green battery, or a cleared
-`--simulate`.** Completion is a fact about a *session*; every one of those others
-is a fact about an *artifact*, and no artifact distinguishes "finished" from
-"still writing".
+its hand-back report, commit, stamp, a clean tree, a green battery, or a cleared
+`--simulate`.** Completion is a fact about a *session*; the hand-back is sent
+before its turn ends and can precede the notification, and every other is a fact
+about an *artifact*, none distinguishing "finished" from "still writing".
 
 **When the notification does not arrive, no single read distinguishes a
 finished-but-unreported session from a live one.** Delivery can fail, and the
