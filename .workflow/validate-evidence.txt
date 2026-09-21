@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+gate-sdk-surface-drain gates sha256=a28aeed72d4b9ee5eebe8a24ae76584a272b08bca42616959f77386168db8642 pass=129 fail=0 ignore=0 verdict=clean 2026-09-22
+gate-sdk-surface-drain gate_sdk sha256=4c72e5b4dd4d6322d2e1b461762c03cd42010e912100f2ff2dc2ffb984cc9ba6 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+gate-sdk-surface-drain canon_kit sha256=948c56dfeca28e1485d1993bdd731f2bd6434ad15a0a23b18eab7c6d82df5cee pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+gate-sdk-surface-drain context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+gate-sdk-surface-drain delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+gate-sdk-surface-drain doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+gate-sdk-surface-drain evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+gate-sdk-surface-drain guard_kit sha256=01d94b4120e133665e01946fe44d31a730d2c6cdfd1570e5ce6b96a7a1b30e1b pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+gate-sdk-surface-drain lifecycle_kit sha256=bac54b43ac9a49c420f8020fda337dac934779dfe6701db269ad8ac2a89ceb81 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+gate-sdk-surface-drain queue_kit sha256=4d50cf613cf514a9f5c5f92ad7c46acf5d8f750aedc71c9e629514a415bad337 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+gate-sdk-surface-drain site_kit sha256=48d3335dd0d627713fd607013b1cc6a0049e60b8f4a1905b441b7699d4c844c2 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+gate-sdk-surface-drain scripts sha256=79ed7aac215203e28c16d151e43d18867b9d53aa24afc2c79947e252882e97b7 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+gate-sdk-surface-drain guard_tests sha256=2e9a22131559a27d70c1ffe7f075649ff0a18e7ddacf4aaee09130cdf20bd345 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+gate-sdk-surface-drain demo sha256=ea3b5362177d7448083a95c3579914bd0b24472a090d5f944d200d31c33a9e81 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+gate-sdk-surface-drain installer_smoke sha256=4cdfeeb29ba8c1b93afcf3632f62ace1c65a95fdac44231ad65fb2f5d71f5010 pass=17 fail=0 ignore=0 verdict=clean 2026-09-22
+gate-sdk-surface-drain consumer_smoke sha256=14619ca118d4a40c41d84b5cb2fe788528cdb7cd6be950c244a4538853aa6eb8 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+gate-sdk-surface-drain upgrade sha256=7501e4de75f6c8bdf42c3e1af4c9ce068d5e51b260b30091559a17de1f5074b6 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+gate-sdk-surface-drain agents_md_smoke sha256=75e652c2db31c25fe6a4610ae45bb389ed0335fe645c325e984088d0af37cea4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+gate-sdk-surface-drain index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+gate-sdk-surface-drain native_crate sha256=80e34bc1174de8570632a406360bfb10e5765b779f403f55b7ce75f6c1b9318b pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+gate-sdk-surface-drain projection_witness sha256=275400308ff695585144bcd6478fc552af763227d51b0f1f02ff3c902afe55b8 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
