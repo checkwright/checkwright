@@ -459,22 +459,6 @@
   Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, from the red its own
   filing hit; promoted at the next iteration's scope.
 
-- **fixture-suites-never-run-history-less** [cost: event/low] [surface: .github] — no
-  CI leg or smoke runs a kit's fixture suites outside this repo's full git history, so a pair that
-  reads the host repo's history passes here and fails in a consumer tree or a depth-1 clone.
-  **Attested once:** check-docs-cmd's assertion-C cases did, until `static-config-seam`'s close
-  moved them into a scratch-history test; a depth-1 clone printed FAIL for that bad case first.
-  **Probed at promotion, no live instance:** every suite `gate_fixture_suites` derives ran clean
-  in a depth-1 clone of HEAD, so the class is unguarded rather than red.
-  **Why design-pending:** the gates workflow checks out at full depth for a battery gate that
-  reads the commit graph, so the candidate — the fixture step run from a history-less copy, or a
-  consumer-smoke arm doing the same — decides which job pays the copy and whether the template
-  ships it.
-  **Cost while deferred:** the next history-reading fixture ships green here and red for an
-  adopter.
-  Filed 2026-09-14 by `static-config-seam`'s close into the gap inbox; no stage of that iteration
-  could drain it, and this scope promoted it, so the record is late and says so.
-
 - **config-variant-battery-harness** [cost: event/high] [surface: gate-sdk] — nothing shipped lets a customer run the
   battery under a named config-seam variant and see what changes; the fixture pairs prove each
   gate's arm against fixed trees, and the smoke scripts are this repo's harness legs.
@@ -2008,6 +1992,7 @@
   the way in and on the way back out. The removed body is recoverable from
   the evicting commit (`git log -p -S'<slug>' -- TASK-QUEUE.md`).
 
+- **fixture-suites-never-run-history-less** — No leg runs fixtures history-less.
 - **lead-held-block-no-sanctioned-surface** — No route records a lead-held block.
 - **agent-file-paragraph-sections-ungoverned** — Brevity gate skips paragraphs.
 - **survey-record-filed-after-the-fact** — Order to the work goes wholly unread.
@@ -2255,21 +2240,5 @@
 - **lead-agent-id-compaction-defense** — each claim still wants its own probe.
 
 ## Done
-
-- join-primitive-dataflow-unasserted
-- install-disposition-smoke-accounting-split
-- bridged-knob-owner-for-consumer-gate
-- bin-tool-help-arm-absent-tree-wide
-- docs-cmd-knob-definition-site-withheld
-- armed-by-census-unrun
-- couples-knob-token-empty-expansion-passes-silently
-- consumer-shaped-regressions-invisible-to-build-oracles
-- in-crate-module-coupling-derivation
-- gates-must-not-bind-to-document-paths
-- kit-spec-consumer-config-literal
-- kit-spec-seam-content-half-unswept
-- shell-cwd-anchor-clause-has-no-oracle
-- pipeline-membership-idiom-latent
-- gate-fixture-fanout-arm
 
 ## Lessons Learned
