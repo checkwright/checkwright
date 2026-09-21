@@ -12,6 +12,170 @@
 
 ## New Features
 
+- **shipped-config-tightening-undeclared** [spec: SPEC-release-change-declared.md] —
+  a kit-shipped pattern-list change tightens two gates in an adopter's tree, and no surface says
+  which release section owns it or
+  who may declare it once the landing stage is gone.
+  `3763bc3e` added an account-identification pattern to `gate-sdk/templates/msg-patterns.list`,
+  the config template the installer's `init` seeds into a consumer's gates dir. **The gate code
+  did not change** — that commit's `native/src/gates/commit_msg.rs` diff is entirely inside
+  `mod tests`, so the whole tightening is data. `.workflow/release-declarations.md` carries
+  neither `check-commit-msg` nor `check-tree-terms`: its seed from past deferrals took Tightened
+  gates from the old bare-name surface only, which never held them.
+  **CALL 1 IS RULED — BOTH SECTIONS, ALWAYS. Operator ruling 2026-08-26**, relayed through the
+  iteration lead at this scope's escalation. A tightening that ships as kit template data
+  declares in **both** `Tightened gates` **and** `Behavior changes`. The ground is the adopter
+  split below: it is real, so the ruling removes the choice rather than making it, at one extra
+  line per event. Executing it — the edits to gate-sdk/SPEC.md §upgrade-smoke and
+  docs/install.md — is a spec stage's act when this entry promotes, deliberately not taken here.
+  **Call 1 CANNOT BE EXECUTED until call 2 is filled, and this coupling is why the ruling is not
+  self-discharging.** "Declare in both sections" names no one who may append when the discovering
+  stage is not build, so `3763bc3e`'s tightening stays undeclared until a producer exists and
+  surfaces at the next release tag as an adopter meeting a red the note never named.
+  **The adopter split the ruling rests on.** `claim()`
+  (`native/src/installer/init.rs:123`) rewrites a seeded path whose recorded hash still matches,
+  so
+  an adopter who never edited their copy TAKES the new pattern on upgrade and both gates can red
+  on
+  a clean run — the Tightened-gates allowed-red set's subject exactly. An adopter who did edit it
+  keeps their copy and diverges, which docs/install.md folds into Behavior changes by name:
+  "a template you have copied out that then changed *is* depended-on behavior diverging from your
+  copy — it is behavior-folded, not dropped". That folding rule reaches the edited population
+  only; it never contemplated the unmodified-seeded-copy case, where init writes through. Two
+  populations, two sections; the ruling above now requires both.
+  **Call 2, who may declare a late-discovered tightening, was filled at spec on 2026-09-21.** The
+  session that discovers the omission declares it (SPEC-release-change-declared.md delta 2).
+  **Cost while deferred:** nothing can red for it. `check-release-declaration-parity` compares
+  the note against the declaration surface, never against the tree, so an omission passes now and
+  passes again at composition. It surfaces as an adopter meeting a red the release note never
+  named — the defect docs/install.md assigns to the release rather than to the adopter's work.
+  Surfaced 2026-08-26 to the gap inbox by the close of the `platform-reach-and-target-roster`
+  iteration, while re-probing that close's release disposition; promoted 2026-08-26 at scope.
+  **Recurred 2026-09-18, judged at `windows-bash-floor`'s close.** That iteration's validate fix
+  added a banned construct (`cd` onto a `git` command substitution) to
+  `gate-sdk/templates/portability-patterns.list`, a kit-shipped template `init` does not seed, so
+  it reaches a consumer only as a copied-out list diverging — a Behavior-changes subject — and
+  `.workflow/release-declarations.md` carries no bullet for it. The landing session had ended, so
+  the open call above is again what leaves it with no producer.
+  **Leads `release-declaration-coupling`** (operator direction 2026-09-21, lead-relayed);
+  **promoted
+  2026-09-21 at spec**, sharing one amendment with `release-note-removal-declaration-uncoupled`.
+  Filter: trust arm — `3763bc3e` is unreleased and undeclared, so the next cut ships it.
+  recurrence: shipped-config-tightening-undeclared 2026-09-18
+
+- **release-note-removal-declaration-uncoupled** [spec: SPEC-release-change-declared.md] —
+  no oracle couples a removed adopter-facing entry point to its release-note declaration, so a
+  note that omits one passes
+  green and the adopter meets the omission as a broken invocation at upgrade time.
+  **The instance is measured, not predicted.** The `evidence-runner-trend-and-install-hooks-cuts`
+  iteration deleted four documented kit `bin/` tools — `evidence-kit/bin/run-validate.sh`,
+  `evidence-kit/bin/diff-baseline.sh`, `delegation-kit/bin/usage-trend.sh`,
+  `gate-sdk/bin/install-hooks.sh` — and re-spelled each as a bridged arm.
+  **Why the version contract does not catch it.** Under docs/install.md §Versioning that is a
+  MINOR under the pre-1.0 qualifier and not a major: decommission is scoped there to removing a
+  DEPRECATED surface over the `CANON_KIT_DEPRECATION_MARKERS` roster, and none of the four carried
+  a marker. So the whole protection an adopter gets is that the note declares the move and phase B
+  of the upgrade contract reconciles it — and nothing checks that the note actually declares it.
+  **Probed rather than assumed.** `check-release-bump`'s subject is note ordering and section
+  presence: it reds a patch-only bump whose note declares behavior changes, and never reads the
+  DIFF. `check-docs-cmd`'s invoked-path scan runs only inside a fence, so it cannot see a removal
+  at all.
+  **The candidate oracle is cheap and derivable:** diff the tracked `*/bin/*.sh` set between the
+  newest released tag and the release commit, and require every disappeared path to appear in the
+  unreleased note's declaration-bearing sections.
+  **DISTINCT from the printed-follow-up unit LANDED 2026-09-07** (installer/SPEC.md §The consumer
+  smoke): that owned a printed command inside installer shell source with no gate corpus reaching
+  it, and this owns the coupling between a REMOVAL and a NOTE — another surface, another oracle.
+  **Product-class under TRAJECTORY.md's 2026-08-30 witness discriminator**, which is what keeps it
+  off the one-line icebox tier: it blocks no stage entry and no push, but its demand witness is an
+  adopter upgrade rather than this repo's own accounting.
+  **Cost while deferred:** each release that decommissions an entry point re-buys a hand review
+  nobody is obliged to run, and the failure surfaces in an adopter's tree rather than in ours.
+  Filed 2026-09-05 to the gap inbox by the close of
+  `evidence-runner-trend-and-install-hooks-cuts`;
+  promoted here at this iteration's scope, →fix refused (a new gate is build work, not scope's)
+  and
+  →icebox refused on the product witness above. Deferred and not active on scope's composition
+  test, re-grounded 2026-09-11: no iteration since has shared its surface.
+  **Joins `release-declaration-coupling`** as its removal-coupling unit, by operator direction
+  (2026-09-21, lead-relayed); **promoted 2026-09-21 at spec**. It mints the gate in
+  SPEC-release-change-declared.md delta 3.
+  **Enhancement admission filter, engaged 2026-09-21 at scope:** admitted on the trust arm. An
+  adopter trusts the release note to name every entry point a cut
+  removes, and nothing checks that it does, so the omission reaches them as a broken invocation.
+
+- **account-noun-plural-slips-the-shape** [spec: SPEC-account-noun-plural.md] —
+  the account-identification pattern matches a singular account noun only, so the plural form
+  passes both readers.
+  **Probed rather than reasoned, at this close.** Feeding a three-line sample through
+  `grep -nE -f scripts/msg-patterns.list` matches the singular line and matches NEITHER plural:
+  the
+  noun alternation is `(account|login|username|handle)` followed by a required non-letter, and a
+  trailing `s` is a letter, so the boundary fails in BOTH orderings of the shape. The reach is
+  wider than the limit was reported as — `accounts` slips with `logins`.
+  **THE HOLE IN THE FORM THAT MATTERS, because the plural is not an exotic phrasing but the
+  natural way to write the exact leak this pattern exists to catch.** A sentence of the shape
+  *"the accounts were X and Y"*, with X and Y handle-shaped and backticked, passes both readers
+  clean — while the singular *"the account is X"* reds. So the guard is strongest against the
+  phrasing that names ONE identity and weakest against the phrasing that names SEVERAL, which is
+  the correlation case, and inverts the pattern's own stated rationale that naming an account
+  correlates identities. The bad-fixture sentence a fix should pin is that one, not a contrived
+  minimal pair.
+  **Where the limit currently lives, and why that is the filing's whole point.** It is stated in
+  commit `3763bc3e`'s body ("the plural form slips: tolerating it was measured and still costs
+  three rewordings of prose that is not wrong") and NOWHERE in `gate-sdk/SPEC.md`
+  §check-commit-msg, which records only the OTHER limit that commit names — that account topology
+  is a proposition no token pattern reaches. Verified by grepping that commit's own SPEC diff. So
+  the limit is held in history, and history answers what happened, never what is correct
+  (CLAUDE.md §Delivery doctrine, spec-over-precedent).
+  **The tolerance was a measured choice, not an oversight.** Extending the noun set to plurals
+  reddened tracked sentences that were not wrong, and the tree-exact calibration counts that cost.
+  **Ruled at spec on 2026-09-21: move one**, plurals on both readers
+  (SPEC-account-noun-plural.md). The re-measure found one rewording where the filing recorded
+  three.
+  **Cost while deferred:** the leak class the pattern was built for reaches public history through
+  one letter, and nobody reading the SPEC learns that — the section's stated scope reads as
+  complete.
+  Filed 2026-08-26 by close, triaging a build finding relayed through the lead.
+  **Joins `release-declaration-coupling`** as its first declaration subject, by operator
+  direction (2026-09-21, lead-relayed); **promoted 2026-09-21 at spec**. The chosen move tightens
+  a kit-shipped template, which is exactly the event `shipped-config-tightening-undeclared` rules
+  on, so this unit is spelled against that ruling.
+  **Enhancement admission filter, engaged 2026-09-21 at scope:** admitted on the trust arm — the
+  pattern is the identity-leak guard, and its section's stated scope reads as complete while the
+  plural passes.
+
+- **release-body-step-has-no-in-tree-witness** [spec: SPEC-release-body.md] — the one release
+  step whose product lives off the tree is the one that was skipped, and its only backstop is
+  next-day.
+  RELEASING.md step 6 fills the GitHub Release body with the note post's apex URL by hand. It is
+  the only release step whose artifact never touches the tree, so no gate, no fixture and no
+  validate suite can see it; the runbook says exactly that and installs a monitor instead —
+  `site-health.yml`'s release-body arm, daily and issue-shaped
+  (site-kit/SPEC.md §templates/site-health.yml).
+  **The step was skipped at the v0.25.0 cut, measured rather than inferred.**
+  `gh release view v0.25.0 --json body` returns an **empty** body, against v0.24.0's well-formed
+  one, while `docs/posts/2026-08-23-checkwright-v0-25-0.md` has been on the site since the cut.
+  The monitor fired as designed and filed the issue the following morning.
+  **What the firing proves, and what it does not.** It proves the backstop works. It does not
+  close the gap, because the latency is precisely the window the runbook itself names as the
+  reason the hand-check stays — "you are the only actor who can fix the body before anyone reads
+  it". A cut whose session skips step 6 is public, wrong and unnoticed for up to a day, on the
+  surface an evaluator reaches first.
+  **DISTINCT from `release-drain-ordering-contradiction`** (step 4's drain/tag ordering) and from
+  `release-runbook-identity-diagnosis` (which account is active); neither reads step 6, and both
+  concern steps whose evidence is in the tree.
+  **Shape ruled at spec on 2026-09-21:** the `release` job composes the body. The copy-ready
+  artifact and the faster monitor were refused (SPEC-release-body.md delta 1).
+  **Cost while deferred:** one wrong public front door per skipped cut, for up to a day, plus the
+  standing fact that the release's most reader-facing artifact is the least witnessed one.
+  Surfaced 2026-08-24 by GitHub issue #2 and promoted at this scope's boundary sweep, whose probe
+  re-read the v0.25.0 Release body directly rather than trusting the issue text.
+  **Joins `release-declaration-coupling`** as its release-body unit, by operator direction
+  (2026-09-21, lead-relayed); **promoted 2026-09-21 at spec**. **Enhancement admission filter,
+  engaged 2026-09-21 at scope:** admitted on the trust arm — the Release body is what an
+  evaluator reads first, and it is the release artifact with the least witness.
+
 ## Technical Debt
 
 ## Deferred
@@ -2119,40 +2283,6 @@
   Filed 2026-08-23 by validate; the close drain re-ran the survey oracle and got 16/11/7 with the
   same seven names.
 
-- **release-body-step-has-no-in-tree-witness** [cost: event/high] [surface: RELEASING.md] — the one release step whose
-  product lives off the tree is the one that was skipped, and its only backstop is next-day.
-  RELEASING.md step 6 fills the GitHub Release body with the note post's apex URL by hand. It is
-  the only release step whose artifact never touches the tree, so no gate, no fixture and no
-  validate suite can see it; the runbook says exactly that and installs a monitor instead —
-  `site-health.yml`'s release-body arm, daily and issue-shaped
-  (site-kit/SPEC.md §templates/site-health.yml).
-  **The step was skipped at the v0.25.0 cut, measured rather than inferred.**
-  `gh release view v0.25.0 --json body` returns an **empty** body, against v0.24.0's well-formed
-  one, while `docs/posts/2026-08-23-checkwright-v0-25-0.md` has been on the site since the cut.
-  The monitor fired as designed and filed the issue the following morning.
-  **What the firing proves, and what it does not.** It proves the backstop works. It does not
-  close the gap, because the latency is precisely the window the runbook itself names as the
-  reason the hand-check stays — "you are the only actor who can fix the body before anyone reads
-  it". A cut whose session skips step 6 is public, wrong and unnoticed for up to a day, on the
-  surface an evaluator reaches first.
-  **DISTINCT from `release-drain-ordering-contradiction`** (step 4's drain/tag ordering) and from
-  `release-runbook-identity-diagnosis` (which account is active); neither reads step 6, and both
-  concern steps whose evidence is in the tree.
-  **Why design-pending:** three shapes trade real properties. Generate the body from the note
-  post inside the `release` job — retires the hand step, but puts release-note text on a CI path
-  the battery never runs. Have the release-sweep skill emit the exact body text as a copy-ready
-  artifact — cheap, keeps the human in the loop, still skippable. Or move the monitor's cadence
-  toward the cut, which shortens the window without closing it.
-  **Cost while deferred:** one wrong public front door per skipped cut, for up to a day, plus the
-  standing fact that the release's most reader-facing artifact is the least witnessed one.
-  Surfaced 2026-08-24 by GitHub issue #2 and promoted at this scope's boundary sweep, whose probe
-  re-read the v0.25.0 Release body directly rather than trusting the issue text.
-  **Joins `release-declaration-coupling`** as its release-body unit, by operator direction
-  (2026-09-21, lead-relayed); **marked for spec**, which rules among the three shapes above, two
-  of them new mechanism. **Enhancement admission filter, engaged 2026-09-21 at scope:** admitted
-  on the trust arm — the Release body is what an evaluator reads first, and it is the release
-  artifact with the least witness.
-
 - **precondition-gate-direction-blindness** [cost: event/low] [surface: queue-kit] — `check-queue-prose-precondition`
   reds an entry whose prose says the entry IS the blocker, and three of the four remedies it
   prints are false for that shape.
@@ -2324,98 +2454,6 @@
   accurate and self-clearing, so no outage goes unseen while this waits.
   Filed 2026-08-25 by scope, operator-directed and relayed through the lead; the tree read
   behind it was re-run here rather than taken on the relay.
-
-- **account-noun-plural-slips-the-shape** [cost: event/high] [surface: gate-sdk] — the account-identification pattern
-  matches a singular account noun only, so the plural form passes both readers.
-  **Probed rather than reasoned, at this close.** Feeding a three-line sample through
-  `grep -nE -f scripts/msg-patterns.list` matches the singular line and matches NEITHER plural: the
-  noun alternation is `(account|login|username|handle)` followed by a required non-letter, and a
-  trailing `s` is a letter, so the boundary fails in BOTH orderings of the shape. The reach is
-  wider than the limit was reported as — `accounts` slips with `logins`.
-  **THE HOLE IN THE FORM THAT MATTERS, because the plural is not an exotic phrasing but the
-  natural way to write the exact leak this pattern exists to catch.** A sentence of the shape
-  *"the accounts were X and Y"*, with X and Y handle-shaped and backticked, passes both readers
-  clean — while the singular *"the account is X"* reds. So the guard is strongest against the
-  phrasing that names ONE identity and weakest against the phrasing that names SEVERAL, which is
-  the correlation case, and inverts the pattern's own stated rationale that naming an account
-  correlates identities. The bad-fixture sentence a fix should pin is that one, not a contrived
-  minimal pair.
-  **Where the limit currently lives, and why that is the filing's whole point.** It is stated in
-  commit `3763bc3e`'s body ("the plural form slips: tolerating it was measured and still costs
-  three rewordings of prose that is not wrong") and NOWHERE in `gate-sdk/SPEC.md`
-  §check-commit-msg, which records only the OTHER limit that commit names — that account topology
-  is a proposition no token pattern reaches. Verified by grepping that commit's own SPEC diff. So
-  the limit is held in history, and history answers what happened, never what is correct
-  (CLAUDE.md §Delivery doctrine, spec-over-precedent).
-  **The tolerance was a measured choice, not an oversight**, and it is the reason this is
-  design-pending rather than a patch: extending the noun set to plurals reds three tracked
-  sentences that are not wrong, and the same tree-exact calibration that governs the singular form
-  says rewriting prose to satisfy a heuristic inverts the rule the heuristic serves. The open call
-  is which of the three moves to take — accept the three rewordings, add a plural arm scoped to the
-  MESSAGE reader only (whose over-refusal economics differ, per §check-commit-msg), or leave the
-  gap and record it in the SPEC where the sibling limit already sits.
-  **Cost while deferred:** the leak class the pattern was built for reaches public history through
-  one letter, and nobody reading the SPEC learns that — the section's stated scope reads as
-  complete.
-  Filed 2026-08-26 by close, triaging a build finding relayed through the lead.
-  **Joins `release-declaration-coupling`** as its first declaration subject, by operator
-  direction (2026-09-21, lead-relayed); **marked for spec**, which rules among the three moves
-  above. Two of them tighten a kit-shipped template, which is exactly the event
-  `shipped-config-tightening-undeclared` rules on, so this unit is spelled against that ruling.
-  **Enhancement admission filter, engaged 2026-09-21 at scope:** admitted on the trust arm — the
-  pattern is the identity-leak guard, and its section's stated scope reads as complete while the
-  plural passes.
-
-- **shipped-config-tightening-undeclared** [cost: event/high] [surface: gate-sdk] — a kit-shipped pattern-list change
-  tightens two gates in an adopter's tree, and no surface says which release section owns it or
-  who may declare it once the landing stage is gone.
-  `3763bc3e` added an account-identification pattern to `gate-sdk/templates/msg-patterns.list`,
-  the config template the installer's `init` seeds into a consumer's gates dir. **The gate code
-  did not change** — that commit's `native/src/gates/commit_msg.rs` diff is entirely inside
-  `mod tests`, so the whole tightening is data. `.workflow/release-declarations.md` carries
-  neither `check-commit-msg` nor `check-tree-terms`: its seed from past deferrals took Tightened
-  gates from the old bare-name surface only, which never held them.
-  **CALL 1 IS RULED — BOTH SECTIONS, ALWAYS. Operator ruling 2026-08-26**, relayed through the
-  iteration lead at this scope's escalation. A tightening that ships as kit template data
-  declares in **both** `Tightened gates` **and** `Behavior changes`. The ground is the adopter
-  split below: it is real, so the ruling removes the choice rather than making it, at one extra
-  line per event. Executing it — the edits to gate-sdk/SPEC.md §upgrade-smoke and
-  docs/install.md — is a spec stage's act when this entry promotes, deliberately not taken here.
-  **Call 1 CANNOT BE EXECUTED until call 2 is filled, and this coupling is why the ruling is not
-  self-discharging.** "Declare in both sections" names no one who may append when the discovering
-  stage is not build, so `3763bc3e`'s tightening stays undeclared until a producer exists and
-  surfaces at the next release tag as an adopter meeting a red the note never named.
-  **The adopter split the ruling rests on.** `claim()`
-  (`native/src/installer/init.rs:123`) rewrites a seeded path whose recorded hash still matches, so
-  an adopter who never edited their copy TAKES the new pattern on upgrade and both gates can red on
-  a clean run — the Tightened-gates allowed-red set's subject exactly. An adopter who did edit it
-  keeps their copy and diverges, which docs/install.md folds into Behavior changes by name:
-  "a template you have copied out that then changed *is* depended-on behavior diverging from your
-  copy — it is behavior-folded, not dropped". That folding rule reaches the edited population
-  only; it never contemplated the unmodified-seeded-copy case, where init writes through. Two
-  populations, two sections; the ruling above now requires both.
-  **OPEN CALL — who may declare a late-discovered tightening. Left open 2026-08-26 by lead ruling**
-  for a later spec stage: it is a hole inside the existing envelope, and filling a hole in an owner
-  doc is spec's work rather than the operator's. gate-sdk/SPEC.md §upgrade-smoke
-  names the session that lands the change the producer, on the ground that it is "the only one
-  that knows what it changed at the moment it changes it". A tightening found after its landing
-  session ended therefore has **no declared producer at all**, and every later session that could
-  append is out of contract.
-  **Cost while deferred:** nothing can red for it. `check-release-declaration-parity` compares
-  the note against the declaration surface, never against the tree, so an omission passes now and
-  passes again at composition. It surfaces as an adopter meeting a red the release note never
-  named — the defect docs/install.md assigns to the release rather than to the adopter's work.
-  Surfaced 2026-08-26 to the gap inbox by the close of the `platform-reach-and-target-roster`
-  iteration, while re-probing that close's release disposition; promoted 2026-08-26 at scope.
-  **Recurred 2026-09-18, judged at `windows-bash-floor`'s close.** That iteration's validate fix
-  added a banned construct (`cd` onto a `git` command substitution) to
-  `gate-sdk/templates/portability-patterns.list`, a kit-shipped template `init` does not seed, so
-  it reaches a consumer only as a copied-out list diverging — a Behavior-changes subject — and
-  `.workflow/release-declarations.md` carries no bullet for it. The landing session had ended, so
-  the open call above is again what leaves it with no producer.
-  **Leads `release-declaration-coupling`** (operator direction 2026-09-21, lead-relayed); **marked
-  for spec**. Filter: trust arm — `3763bc3e` is unreleased and undeclared, so the next cut ships it.
-  recurrence: shipped-config-tightening-undeclared 2026-09-18
 
 - **shellcheck-analyser-version-unpinned-in-ci** [cost: event/high] [surface: .github] — one battery member's verdict is
   a function of the host, so a green local battery is not evidence of a green CI battery.
@@ -2619,43 +2657,6 @@
   session has to be told about.
   Surfaced 2026-09-04 by the close of `wait-probe-cut-and-stage-journal-absence`; drained
   2026-09-04 at this iteration's scope entry, the boundary having carried it.
-
-- **release-note-removal-declaration-uncoupled** [cost: event/high] [surface: gate-sdk] — no oracle couples a removed
-  adopter-facing entry point to its release-note declaration, so a note that omits one passes
-  green and the adopter meets the omission as a broken invocation at upgrade time.
-  **The instance is measured, not predicted.** The `evidence-runner-trend-and-install-hooks-cuts`
-  iteration deleted four documented kit `bin/` tools — `evidence-kit/bin/run-validate.sh`,
-  `evidence-kit/bin/diff-baseline.sh`, `delegation-kit/bin/usage-trend.sh`,
-  `gate-sdk/bin/install-hooks.sh` — and re-spelled each as a bridged arm.
-  **Why the version contract does not catch it.** Under docs/install.md §Versioning that is a
-  MINOR under the pre-1.0 qualifier and not a major: decommission is scoped there to removing a
-  DEPRECATED surface over the `CANON_KIT_DEPRECATION_MARKERS` roster, and none of the four carried
-  a marker. So the whole protection an adopter gets is that the note declares the move and phase B
-  of the upgrade contract reconciles it — and nothing checks that the note actually declares it.
-  **Probed rather than assumed.** `check-release-bump`'s subject is note ordering and section
-  presence: it reds a patch-only bump whose note declares behavior changes, and never reads the
-  DIFF. `check-docs-cmd`'s invoked-path scan runs only inside a fence, so it cannot see a removal
-  at all.
-  **The candidate oracle is cheap and derivable:** diff the tracked `*/bin/*.sh` set between the
-  newest released tag and the release commit, and require every disappeared path to appear in the
-  pending note's declaration-bearing sections.
-  **DISTINCT from the printed-follow-up unit LANDED 2026-09-07** (installer/SPEC.md §The consumer
-  smoke): that owned a printed command inside installer shell source with no gate corpus reaching
-  it, and this owns the coupling between a REMOVAL and a NOTE — another surface, another oracle.
-  **Product-class under TRAJECTORY.md's 2026-08-30 witness discriminator**, which is what keeps it
-  off the one-line icebox tier: it blocks no stage entry and no push, but its demand witness is an
-  adopter upgrade rather than this repo's own accounting.
-  **Cost while deferred:** each release that decommissions an entry point re-buys a hand review
-  nobody is obliged to run, and the failure surfaces in an adopter's tree rather than in ours.
-  Filed 2026-09-05 to the gap inbox by the close of `evidence-runner-trend-and-install-hooks-cuts`;
-  promoted here at this iteration's scope, →fix refused (a new gate is build work, not scope's) and
-  →icebox refused on the product witness above. Deferred and not active on scope's composition
-  test, re-grounded 2026-09-11: no iteration since has shared its surface.
-  **Joins `release-declaration-coupling`** as its removal-coupling unit, by operator direction
-  (2026-09-21, lead-relayed); **marked for spec**, which authors its amendment and promotes it. A
-  feature — the unit mints a gate. **Enhancement admission filter, engaged 2026-09-21 at scope:**
-  admitted on the trust arm. An adopter trusts the release note to name every entry point a cut
-  removes, and nothing checks that it does, so the omission reaches them as a broken invocation.
 
 - **kit-spec-seam-content-half-unswept** [cost: event/high] [surface: gate-sdk] — the provenance seam has two halves and
   the sweep that ran carried a discriminator for only one, so gate-sdk/SPEC.md is swept of private
