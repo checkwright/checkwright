@@ -17,6 +17,19 @@ struct Layout {
     root: String,
 }
 
+// spec: gate-sdk/SPEC.md §check-kit-roots-dialect — the per-run scratch base is reaped on every
+// ordinary exit, the upgrade-smoke `Scratch` shape: `Drop` runs on every return path `rule`
+// takes, `?`-propagated ones included
+struct ScratchGuard {
+    base: String,
+}
+
+impl Drop for ScratchGuard {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_dir_all(&self.base);
+    }
+}
+
 pub fn run(args: &[String]) -> i32 {
     match rule(args) {
         Ok(rc) => rc,
@@ -52,6 +65,7 @@ fn tree_of(args: &[String]) -> Result<String, String> {
 fn rule(args: &[String]) -> Result<i32, String> {
     let tree = tree_of(args)?;
     let base = scratch()?;
+    let _guard = ScratchGuard { base: base.clone() };
     let layouts = [
         vendor(&tree, &base, "flat")?,
         vendor(&tree, &base, "nested")?,

@@ -14,33 +14,6 @@
 
 ## Technical Debt
 
-- **check-kit-roots-dialect-leaks-a-scratch-tree-per-run**
-  — `check-kit-roots-dialect`'s `scratch()` (`native/src/gates/kit_roots_dialect.rs`) creates a
-  per-pid base under `GATE_SDK_TMP_DIR` and never removes it. The one `remove_dir_all` there runs
-  BEFORE the create, so it clears a same-pid collision only; the pid differs per run, so every
-  invocation leaves a tree behind. 47 had accumulated by the filing close, each holding two vendored
-  layouts with their own git repos — measured by `ls`, and re-verified at this scope by reading the
-  function: no `Drop` impl and no post-use removal anywhere in the file.
-  **Its own sibling under the same knob does it right,** which is the fix's shape: the upgrade-smoke
-  arm's `Scratch` struct (`native/src/emit/upgrade_smoke.rs`) carries an `impl Drop` reaping its
-  worktrees and trees in the shell trap's order. This gate has neither half.
-  **Why a gap and not a red:** `.tmp/` is gitignored disposable scratch with a named reclaim trigger
-  (the scope boundary wipes it, CLAUDE.md §Housekeeping), so the write-path has a paired
-  reclaim-path. What is wrong is the RATE — one tree per battery run against one wipe per iteration.
-  **Adjacent and distinct:** `upgrade-smoke-producer-leaks-worktrees-on-signal` is a SIGNALLED
-  producer leaking git worktrees; this is a clean exit leaving its own scratch base, so this is the
-  strictly weaker case and its ordinary-exit discipline is the cheaper of the two rulings.
-  **Cost while deferred:** every battery run in every session leaves residue only the iteration
-  boundary reclaims, and the gate the last iteration shipped for path-dialect defects is the leaker.
-  Re-classed `once/low` → `session/low` at the 2026-09-21 scope: the residue grows per battery
-  run, which `once` (a cost that does not grow) contradicts; 42 trees re-accumulated in one
-  iteration.
-  Filed 2026-09-20 to the gap inbox at `door-binding-sweep`'s close by its runtime-artifact
-  lifecycle check, after the drain had run; promoted at this scope's intake. Owner lookup:
-  `scratch`, `GATE_SDK_TMP_DIR`, `kit_roots_dialect`, `Drop` — none.
-  **Promoted 2026-09-21 as the lead of `scratch-hermeticity`** by operator direction
-  (lead-relayed); build-ready, the sibling `Scratch` shape above.
-
 - **boundary-wipe-note-enumerates-nested-paths** —
   the scope entry's `boundary-wiped` note lists every file below each wiped scratch child, not the
   children the wipe deletes, so its length tracks whatever accumulated under `.tmp/`.
@@ -2985,5 +2958,6 @@
 ## Done
 
 - upgrade-smoke-producer-leaks-worktrees-on-signal
+- check-kit-roots-dialect-leaks-a-scratch-tree-per-run
 
 ## Lessons Learned
