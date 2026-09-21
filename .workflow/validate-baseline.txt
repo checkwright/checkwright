@@ -93,6 +93,9 @@ installer_smoke build pass
 installer_smoke pack pass
 installer_smoke install pass
 installer_smoke profile-invariant pass
+installer_smoke demo-arm pass
+installer_smoke plan-parity-over-held-seeds pass
+installer_smoke plan-parity-over-deleted-seeds-with-stale-hashes pass
 installer_smoke artifact-less-refusal-leg pass
 installer_smoke download-arm pass
 installer_smoke toolchain-free-arm pass
