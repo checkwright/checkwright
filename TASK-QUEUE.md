@@ -2236,7 +2236,7 @@
   length is still unbounded, but its threshold moved; re-measure before ruling.
   recurrence: icebox-eviction-line-budget-squeeze 2026-09-03
 
-- **worktree-isolated-agent-report-lost-to-a-failed-peer-send** [cost: event/high] [surface: delegation-kit] — an isolated
+- **worktree-isolated-agent-report-lost-to-a-failed-peer-send** [cost: event/low] [surface: delegation-kit] — an isolated
   read-only sweep's final report reaches its dispatcher as a bare `.`, because the child sends to
   a peer name it cannot resolve and the harness returns only the last assistant message.
   **Reproduced twice at one close, 2026-08-25, not predicted.** Two `audit-sweep` dispatches
@@ -2267,22 +2267,21 @@
   dispatcher at the moment it is waiting on the result — and silent, since a bare `.` reads as an
   agent that found nothing rather than as an agent whose report was dropped. That last reading is
   a correctness risk rather than an efficiency one, and it is the expensive half.
-  **The floor's coverage is now measured, and it is half of shape one.**
-  The `agent-dispatch-guard` arm's D2 rule refuses a read-only type dispatched WITHOUT
-  `isolation: worktree`, and its D3 rule appends the return-value-only advice — but that second
-  branch fires only when the dispatcher is ITSELF a dispatched agent (a nested dispatch). A
-  top-level lead dispatching the same read-only sweep gets the isolation refusal and no
-  return-value instruction at all. So the guard already reaches the ISOLATION half of shape one and
-  is silent on the CHANNEL half, which is the half this entry is about.
+  **The floor's coverage is measured: half of shape one.** The `agent-dispatch-guard` arm's D2
+  rule refuses a read-only type dispatched WITHOUT `isolation: worktree`; its D3 rule appends the
+  return-value-only advice only when the dispatcher is ITSELF a dispatched agent. A top-level lead
+  dispatching the same sweep gets the isolation refusal and no return-value instruction, so the
+  guard reaches the ISOLATION half of shape one and is silent on the CHANNEL half, this entry's.
   **A further ground, three sessions paid for it 2026-08-26.** For a read-only fan-out the RETURN
-  VALUE is the contract; the resume-journal path a dispatcher grants is for agents that MUTATE.
-  Worktree isolation and the journal answer different questions, and granting the journal to a
-  read-only child buys nothing while making the dropped return look like a channel that was
-  offered. `delegation-kit/templates/agent-execution.md` already draws the distinction; nothing
-  makes a dispatcher pay it, which is shape two of the deliverable restated as an observed cost.
+  VALUE is the contract; the resume-journal path a dispatcher grants is for agents that MUTATE, so
+  granting it to a read-only child buys nothing and makes the dropped return look like an offered
+  channel. `delegation-kit/templates/agent-execution.md` draws the distinction; nothing makes a
+  dispatcher pay it — shape two of the deliverable, restated as an observed cost.
   **Re-measured 2026-09-21: the bare `.` has not reproduced twice** (2026-09-16, 2026-09-21) — an
   isolated `audit-sweep` returned a full 46-tool-use report through `SubagentHandback`, whose duty
-  the harness states in the child's prompt. The 2026-08-25 cost figure is retired.
+  the harness states in the child's prompt; re-costed event/high to event/low (operator direction,
+  2026-09-21, lead-relayed). **OPEN, routed to close's eviction:** is the dated `recurrence:` line
+  below still a live trigger? No wontfix is ruled; the operator may take one to `/consult`.
   recurrence: worktree-isolated-agent-report-lost-to-a-failed-peer-send 2026-08-26
   Surfaced 2026-08-25 by the `turn-end-liveness-seam-and-worktree-cause` close, which reproduced it
   twice dispatching its own sweeps and filed it to the gap inbox; promoted 2026-08-25 at that drain.
