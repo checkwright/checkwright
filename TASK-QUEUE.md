@@ -12,25 +12,6 @@
 
 ## New Features
 
-- **upgrade-smoke-producer-leaks-worktrees-on-signal** [spec: SPEC-scratch-registers-nothing.md]
-  — the upgrade-smoke arm builds each ref's binary in a linked worktree and removes it in `Drop`,
-  which Rust never runs on a signal. So a run killed from outside leaves a registration in the
-  host's `.git/worktrees/`, and the next iteration-boundary entry refuses behind it.
-  **Ruled at spec 2026-09-21:** a shared local clone under the scratch base replaces the worktree.
-  That designs the leak away, SIGKILL included, and it settles all three questions the entry
-  carried. No signal handler is needed, so no dependency or `unsafe` is spent. The pre-spec
-  premise was stale anyway: `libc` is already admitted on unix. No reaper is needed, because the
-  residue becomes plain scratch. The consumer-smoke twin owes nothing, because its residue was
-  always scratch. The shape mints one rule, that a scratch-writing member registers nothing
-  outside its scratch base, held by a crate unit test. That rule makes this unit a feature. The
-  grounds and the priced alternatives are in the amendment.
-  Distinct from `upgrade-smoke-refuses-inside-a-worktree` (running inside one) and from the
-  worktree-detector entries.
-  Filed 2026-09-04 at the close of `wait-probe-cut-and-stage-journal-absence`. Joined
-  `scratch-hermeticity` by operator direction (2026-09-21, lead-relayed) and was promoted at its
-  spec stage. **DoD:** the amendment's own list, and the entry moves to Done before the drain
-  stage.
-
 ## Technical Debt
 
 - **check-kit-roots-dialect-leaks-a-scratch-tree-per-run**
@@ -3002,5 +2983,7 @@
 - **lead-agent-id-compaction-defense** — each claim still wants its own probe.
 
 ## Done
+
+- upgrade-smoke-producer-leaks-worktrees-on-signal
 
 ## Lessons Learned

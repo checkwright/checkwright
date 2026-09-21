@@ -2734,8 +2734,8 @@ deliberately a property of the boundary rather than a path: **at an iteration
 boundary no linked worktree should be live**, an in-flight dispatch being
 something that must not straddle a boundary and everything else being residue.
 So it fires on every entry of `git worktree list` beyond the main checkout — a
-harness's isolated-agent tree, a leaked per-ref worktree, any future producer —
-and no knob names a residue directory, because a kit default spelling one
+harness's isolated-agent tree, any future producer — and no knob names a
+residue directory, because a kit default spelling one
 harness's layout would publish it. It is read off `git worktree list` and
 **never off `git status`**: a gitignored worktree leaves the status clean while
 it still stands, so a status-derived check reports success on exactly the state

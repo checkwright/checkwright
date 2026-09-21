@@ -57,23 +57,17 @@ fn knob(name: &str) -> Result<String, Fail> {
     walk::knob_scalar(name).map_err(|e| broken(one(format!("{}: {}", NAME, e))))
 }
 
-// spec: gate-sdk/SPEC.md §upgrade-smoke — the per-ref worktrees, the extracted trees and the
-// scratch consumer are trap-removed in the shell form; `Drop` is that trap, in the same order
+// spec: gate-sdk/SPEC.md §upgrade-smoke — the extracted trees, the per-ref clones and the
+// scratch consumer all lie under `work` or `consumer`, so `Drop` removing those two removes
+// everything a run wrote, a killed run's residue included
 struct Scratch {
     repo: String,
-    worktrees: Vec<String>,
     work: String,
     consumer: String,
 }
 
 impl Drop for Scratch {
     fn drop(&mut self) {
-        for w in &self.worktrees {
-            let _ = proc::run(
-                &programs::GIT,
-                &["-C", &self.repo, "worktree", "remove", "--force", w],
-            );
-        }
         if !self.work.is_empty() {
             let _ = std::fs::remove_dir_all(&self.work);
         }
@@ -116,7 +110,6 @@ fn smoke() -> Result<String, Fail> {
     let work = mktemp_dir(&base)?;
     let mut env = Scratch {
         repo: repo.clone(),
-        worktrees: Vec::new(),
         work: work.clone(),
         consumer: String::new(),
     };
@@ -501,9 +494,9 @@ fn place_binary(consumer: &str, host: &str, roots: &[String], to: &str) -> Resul
     })
 }
 
-// spec: gate-sdk/SPEC.md §upgrade-smoke — a ref's binary is built from a **detached worktree** at
-// that ref and never from the archive its kits come from: `native/build.rs` stamps its source with
-// `git ls-files` and panics outside a checkout, which would read as a broken tag.
+// spec: gate-sdk/SPEC.md §upgrade-smoke — a ref's binary is a shared local clone under the
+// scratch base checked out at that ref, never a linked worktree: a clone registers nothing
+// outside scratch for a killed run to leave behind
 fn ref_binary_tree(
     env: &mut Scratch,
     git_ref: &str,
@@ -517,21 +510,37 @@ fn ref_binary_tree(
         ))));
     }
     let wt = format!("{}/checkout-{}", work, label);
-    let added = proc::run(
+    let commit_spec = format!("{}^{{commit}}", git_ref);
+    let commit = proc::run(
         &programs::GIT,
-        &[
-            "-C", &env.repo, "worktree", "add", "--detach", "-q", &wt, git_ref,
-        ],
+        &["-C", &env.repo, "rev-parse", "--verify", "-q", &commit_spec],
     )
-    .map(|c| c.stdout().is_some())
-    .unwrap_or(false);
-    if !added {
+    .ok()
+    .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string()));
+    let checked_out = match &commit {
+        Some(commit) => {
+            let cloned = proc::run(
+                &programs::GIT,
+                &["clone", "-q", "--shared", "--no-checkout", &env.repo, &wt],
+            )
+            .map(|c| c.stdout().is_some())
+            .unwrap_or(false);
+            cloned
+                && proc::run(
+                    &programs::GIT,
+                    &["-C", &wt, "checkout", "-q", "--detach", commit],
+                )
+                .map(|c| c.stdout().is_some())
+                .unwrap_or(false)
+        }
+        None => false,
+    };
+    if !checked_out {
         return Err(broken(one(format!(
-            "{}: FAIL(env) — could not add a detached worktree at the {} ref ({})",
+            "{}: FAIL(env) — could not check out the {} ref ({})",
             NAME, label, git_ref
         ))));
     }
-    env.worktrees.push(wt.clone());
     // spec: gate-sdk/SPEC.md §upgrade-smoke — a ref that dispatches and carries no crate is a tag
     // fact; the one thing this must not do is fall back to the host's binary
     if !Path::new(&format!("{}/native", wt)).is_dir() {

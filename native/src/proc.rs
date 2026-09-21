@@ -1610,4 +1610,39 @@ pub(crate) mod tests {
             valved
         );
     }
+
+    // spec: gate-sdk/SPEC.md §upgrade-smoke — a member writing scratch registers nothing
+    // outside the scratch base; a linked worktree fails this. The scan is a floor, never a
+    // proof: a worktree added through a variable or through `bash -c` evades it.
+    #[test]
+    fn no_crate_source_adds_a_linked_worktree() {
+        let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+        let files = walk::find_files(&src, &["rs"]).expect("cannot enumerate the crate modules");
+        assert!(!files.is_empty(), "no module found to scan");
+        let needle = "\"worktree\"";
+        let mut offenders: Vec<String> = Vec::new();
+        for f in &files {
+            let text = std::fs::read_to_string(f)
+                .unwrap_or_else(|e| panic!("cannot read {}: {}", f.display(), e));
+            let mut start = 0;
+            while let Some(rel) = text[start..].find(needle) {
+                let at = start + rel;
+                let after = at + needle.len();
+                let rest = text[after..].trim_start_matches(|c: char| c.is_whitespace() || c == ',');
+                if rest.starts_with("\"add\"") {
+                    let line = text[..at].matches('\n').count() + 1;
+                    offenders.push(format!("{}:{}", f.display(), line));
+                }
+                start = after;
+            }
+        }
+        assert!(
+            offenders.is_empty(),
+            "crate source adds a linked worktree ({:?}) — a linked worktree registers itself in \
+             the host's .git/worktrees/, and Rust runs no destructor on a signal, so a killed run \
+             leaves that registration behind. Take the shared local clone shape §upgrade-smoke's \
+             ref_binary_tree uses instead",
+            offenders
+        );
+    }
 }

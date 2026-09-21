@@ -146,8 +146,10 @@ extension rule are §The workflow directory, and the governed-comment corpus tak
 this directory's tracked tier), `GATE_SDK_GRAPH_ARTIFACT` (default
 `<gates-dir>/CHECK-GRAPH.html`; the emitted coupling-graph artifact's path,
 read by `check-graph` assertion E — set it to republish the artifact elsewhere,
-e.g. a served docs page), `GATE_SDK_TMP_DIR` (default `.tmp`; the battery
-runner declares it beside every member writing scratch), `GATE_SDK_JOBS`
+e.g. a served docs page), `GATE_SDK_TMP_DIR` (default `.tmp`; the battery runner
+declares it beside every member writing scratch, and such a member keeps all of
+its residue inside it — it registers nothing in a repository outside it, so a
+killed run's leftovers are scratch the reclaimers own, §upgrade-smoke), `GATE_SDK_JOBS`
 (default unset = `available_parallelism()`; the battery's worker count, `1`
 restoring a serial run — env rather than argv because worker count is execution
 configuration and changes no member's membership, see §run-gates),
@@ -11499,17 +11501,32 @@ swaps the kit directories, because that swap *is* the upgrade transition. Phase
 B's claim — TO's shell against TO's binary — then holds by construction rather
 than by the host tree happening to be TO.
 
-**A ref's binary comes from a detached worktree at that ref, never from the
-archive its kits come from.** `native/build.rs` stamps the crate's source by
-running `git ls-files` and panics where that fails, saying why: the crate builds
-inside its own git checkout by construction and is never vendored. An
-archive-and-build therefore dies in the build script rather than in the compiler —
-a failure mode that reads as a broken tag if it is met at implementation time
-instead of ruled here. The worktree is added under the scratch base and
-trap-removed, so its `native/target/` is scratch as well and the host's build
-output — what `check-gate-binary-fresh` judges — is untouched. The cost is not
-what it looks like, and the figure is **measured rather than argued from the
-manifest**: a cold `cargo build --release` of this crate from an empty target
+**A ref's binary comes from a git checkout of that ref, never from the archive
+its kits come from.** `native/build.rs` stamps the crate's source by running
+`git ls-files` and panics, saying why, when that fails: the crate builds inside
+its own git checkout by construction and is never vendored. An archive-and-build
+therefore dies in the build script rather than in the compiler, a failure that
+reads as a broken tag. The checkout is a **shared local clone** under the
+scratch base (`git clone --shared --no-checkout`, then a detached checkout of
+the commit the ref resolves to *in the host*). It is never a linked worktree,
+because a linked worktree registers itself in the host's `.git/worktrees/`, and
+a registration outlives the process that made it. Rust runs no destructor on a
+signal, so a run killed from outside would leave the registration behind, and
+the iteration-boundary entry refuses on any linked worktree
+(lifecycle-kit/SPEC.md §bin/enter-stage.sh). A clone registers nothing: a killed
+run leaves only scratch, which the scratch reclaimers already own. Its
+`native/target/` is scratch as well, so the host's build output, which
+`check-gate-binary-fresh` judges, is untouched.
+
+**The two alternatives were priced and declined.** A signal handler covers
+SIGTERM and SIGINT but never SIGKILL. It would also be the crate's first
+process-global signal writer (§lib/gate.sh's process-global rule, which states
+the crate spells none), and on Windows only a console control handler exists. A
+reaper at the boundary would reverse lifecycle-kit's ruling that the reap is a
+session act. The clone leaves nothing for either one to handle.
+
+The cost is not what it looks like, and the figure is **measured rather than
+argued from the manifest**: a cold `cargo build --release` of this crate from an empty target
 directory took **≈4.1 s** (2026-08-14, one Linux machine, `--offline`, warm
 registry cache), against a suite that vendors, installs and runs the whole battery
 twice. It was ≈2.5 s immediately before the crate took `serde_json`, and
@@ -11524,7 +11541,7 @@ any dependency the crate takes.
 hard rather than slow.** Measured: an empty cargo home plus `--offline` now
 **fails outright** (`no matching package named serde_json`), where before that
 dependency that leg succeeded because an empty dependency table needs no registry
-at all. The worktree build shares the host's cargo home, so a contributor who has
+at all. The clone build shares the host's cargo home, so a contributor who has
 built the crate once is warm and unaffected; a fresh machine and every CI runner
 are cold, and neither `.github/workflows/publish.yml` nor `gates.yml` provisions
 a cargo cache. Whether to provision one, vendor the graph, or accept the fetch is
@@ -11689,7 +11706,8 @@ each read exactly once at the resolve step:
   exit 2, not a skip).
 - `GATE_SDK_UPGRADE_TO` — the TO ref (default: `HEAD`).
 - Scratch base is the existing `GATE_SDK_TMP_DIR` knob; the extracted trees, the
-  per-ref worktrees and the consumer are created under it and trap-removed.
+  per-ref clones and the consumer are created under it and removed on every
+  ordinary exit, and a killed run leaves nothing outside it.
 - The declaration path derives from `GATE_SDK_WORKFLOW_DIR`, resolved at the same
   step. `GATE_SDK_NATIVE_BIN` is declared beside it and read by the in-crate
   builder the arm calls, which places each ref's binary at that path and names it
@@ -11721,8 +11739,8 @@ and the first binds only for a ref that dispatches a member to the binary.
 sentence for the same reason `cargo` does: neither is a gate rule's invocation and
 neither reaches an adopter. Both are off `GATE_SDK_PROGRAM_FLOOR`, and the
 alternative for `tar` was considered and declined — replacing `git archive | tar
--x` with a per-ref detached worktree would drop it, and the machinery is present
-since the binary build adds worktrees per ref, but the archive's
+-x` with a per-ref checkout would drop it, and the machinery is present
+since the binary build checks out each ref, but the archive's
 committed-content-only property is exactly what the untagged-`TO` declaration arm
 reads against, and swapping an extraction mechanism is a rewrite inside a port.
 Recorded as declined rather than unconsidered. `upgrade-smoke` is a
