@@ -2696,14 +2696,4 @@
 
 ## Done
 
-- guard-rule-12-single-occurrence-pgrep-loop-passes
-- sibling-stage-sessions-collide-on-a-shared-scratch-commit-message-file
-- harness-moved-background-task-unrecorded
-- worktree-isolated-agent-report-lost-to-a-failed-peer-send
-- isolation-oracle-cost-lacks-dispatcher-clause
-- isolated-dispatch-resume-loses-its-isolation
-- lead-finished-but-active-session-unchecked
-- gate-tamper-default-library-path-unvendored
-- gate-file-coverage-closure
-
 ## Lessons Learned
