@@ -1,0 +1,4 @@
+# graph: couples=native/src/gates/docs_highlight_coverage.rs,knob:SITE_KIT_HIGHLIGHT_TOKENS,knob:SITE_KIT_HIGHLIGHT_OVERRIDES dir=one valve=none tier=precommit
+# install: zero-config
+# armed-by: SITE_KIT_HIGHLIGHT_TOKENS
+# spec: site-kit/SPEC.md §check-docs-highlight-coverage — every token class the tracked snapshot declares the theme colours has an override rule in the layout, a selector ending in '<scope> .<class>' after the selector list is split on commas

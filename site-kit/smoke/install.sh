@@ -9,6 +9,7 @@ SDK="$SMOKE_KIT_ROOT/../gate-sdk"   # the vendored gate-sdk beside this kit
 cat >> scripts/gates.list <<'EOF'
 # site-kit
 check-docs-cname-parity
+check-docs-highlight-coverage
 check-docs-render-fidelity
 EOF
 

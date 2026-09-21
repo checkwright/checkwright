@@ -40,6 +40,9 @@ The kit is vendored beside gate-sdk (conventionally at `site-kit/`); its gate
 is registered in the consumer's `gates.list` by name and resolves through
 gate-sdk's multi-kit path. `check-docs-cname-parity` registers where a docs
 site with a gated host exists; a consumer without one simply omits it.
+`check-docs-highlight-coverage` registers anywhere, because it is disarmed until
+`SITE_KIT_HIGHLIGHT_TOKENS` names a snapshot, and a site whose layout restyles
+code highlighting arms it.
 
 Config is a **knob file**: write a `site-config.knobs` in the gates dir (or point
 `SITE_KIT_KNOB_FILE` elsewhere) setting any knob §Knob defaults lists; defaults
@@ -49,8 +52,8 @@ environment-over-file precedence for a scalar, and the refusals — a set
 non-empty file named by the retired `SITE_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md
 §The knob file's.
 
-`templates/site-health.yml` is governed by none of these. Its knobs — `ALT_DOMAIN`
-and the three `RELEASE_NOTE_*` below — are **step-level workflow env** set in the
+`templates/site-health.yml` is governed by none of these. Its knobs — `ALT_DOMAIN`,
+the three `RELEASE_NOTE_*` and the two `HIGHLIGHT_*` below — are **step-level workflow env** set in the
 copied file itself, not `SITE_KIT_*` knobs, and no knob file names them.
 The template is copied and edited rather than read as config, so reaching into
 the gates dir would couple a monitor to it and hard-code a vendored kit path into
@@ -75,6 +78,14 @@ shape and rendered default.
   aliases, and dated posts are immutable published artifacts.
 - `SITE_KIT_DOCS_DIR` — the docs-site root `check-docs-render-fidelity` walks
   for tracked markdown pages, default `docs`.
+- `SITE_KIT_HIGHLIGHT_TOKENS` — the tracked snapshot of the token classes the
+  site theme's highlight CSS colours, default empty, which disarms
+  `check-docs-highlight-coverage`. Which theme a site uses and which classes it
+  colours is one project's content, so the list is consumer config.
+- `SITE_KIT_HIGHLIGHT_OVERRIDES` — array of pathspecs listing the tracked files
+  whose CSS overrides the theme, default `("docs/_layouts/*.html")`.
+- `SITE_KIT_HIGHLIGHT_SCOPE` — the selector the theme scopes its highlight
+  classes under, default `.highlight`.
 - `SITE_KIT_RENDERER` — array, the stdin→stdout **single-document** GFM-to-HTML
   command, default the kramdown CLI invocation with GFM input —
   `ruby -e '…Kramdown::Document…input: "GFM"…'`, the parser GitHub Pages pins.
@@ -489,14 +500,71 @@ its own pair: the two defaults are asserted byte-identical over a corpus by
 fixture, so the zero-config path is covered by construction rather than by
 assumption.
 
+## check-docs-highlight-coverage
+
+`checks/check-docs-highlight-coverage.gate` (`precommit`, binary-dispatched,
+`install: zero-config`, armed by `SITE_KIT_HIGHLIGHT_TOKENS`). A site that
+restyles code highlighting has to override every token class the theme's own
+highlight CSS colours. A class it misses keeps the theme's colour, and on a dark
+code background that can be an unreadable token: Rouge marks a shell `&&` with
+`.o`, and a light theme colours `.o` black.
+
+**The invariant splits along §The monitor boundary.** Two objects are involved,
+and they live in two places. The layout's overrides are in the tree, so that the
+layout covers a declared class list is a tree property, and this gate asserts
+it. The theme's coloured class set lives on the host: it is served from the
+deployment, at a theme version the platform chooses, and no commit contains it.
+That the declared list still matches the live theme is deployment truth, which
+the theme-drift arm of `templates/site-health.yml` asserts. The tracked
+**snapshot** is the seam between the two: this gate reads it as its oracle, and
+the monitor holds it to the live CSS.
+
+- **The snapshot** is the file `SITE_KIT_HIGHLIGHT_TOKENS` names. Its first line
+  is a `# contract:` header; below it, one class per line, written as `.o`. A `#`
+  line and a blank line are ignored, and any other line that is not one
+  `.<class>` token is a finding. Empty, the knob disarms the gate, which still
+  prints its clean line saying nothing was asserted.
+- **The overrides** are the tracked files `git ls-files` lists for each
+  `SITE_KIT_HIGHLIGHT_OVERRIDES` pathspec. A file carrying a `<style` element is
+  read for its `<style>` bodies only, so a template brace elsewhere in the page
+  opens no rule; any other file is CSS throughout. Comments are stripped, and a
+  rule's selector list is the text since the previous `{`, `}` or `;`, so the
+  inner rule of an at-rule is a rule.
+- **Covered.** A class is covered when some rule has a selector that, after the
+  selector list is **split on commas** and its whitespace collapsed, ends in
+  `<scope> .<class>`, where `<scope>` is `SITE_KIT_HIGHLIGHT_SCOPE`. Any ancestor
+  prefix before the scope is admitted, joined by a space or `>`, so
+  `.site-content .markdown-body .highlight .o` covers `.o`. The split is to the
+  comma because a grouped rule's later members are the ones a first-selector
+  reading misses: in `.highlight .k,.highlight .kv{…}` only the split reaches
+  `.kv`.
+- **Assertion:** every snapshot class is covered.
+
+Findings, each on its own line:
+
+- each uncovered class, naming the class and its snapshot line;
+- an armed snapshot holding **zero** classes. A capture that extracted nothing
+  is the extraction's failure, not an empty theme, so this reader reds on finding
+  none;
+- an override pathspec listing no tracked file, since the covering file is gone;
+- a snapshot line that is not one class.
+
+The clean line counts snapshot classes, override files and covering rules. Exit
+2 when the snapshot is named but does not exist or cannot be read, and when
+`git ls-files` fails. The remedy for an uncovered class is an override taking its
+token family's colour, and for a stale snapshot the monitor's printed list. The
+window the split leaves open is stated with the monitor's arm
+(§templates/site-health.yml, the theme-drift arm).
+
 ## templates/site-health.yml
 
 The scheduled live-site probe, copied verbatim into a consumer's
 `.github/workflows/`. It reads the apex host from the CNAME file (the same
 source the gate trusts), then checks: the apex answers 200 over HTTPS, `www`
 and `http` redirect to the canonical origin, an optional `ALT_DOMAIN` redirect
-keeps its path, the certificate is at least a fortnight from expiry, and every
-published release note is pointed at by a resolving URL in its Release body. A
+keeps its path, the certificate is at least a fortnight from expiry, every
+published release note is pointed at by a resolving URL in its Release body, and
+an optional theme-drift arm holds the highlight snapshot to the live theme. A
 failure opens or updates a single `site-health` issue and reds the run;
 recovery closes it. The `ALT_DOMAIN` value is a bare hostname, never a `://`
 literal, so it does not itself trip the parity gate. A `# enforce:` marker rides
@@ -655,6 +723,53 @@ and one resolution request per distinct apex URL in each body — linear in rele
 count, on a daily schedule, well inside the authenticated rate limit.
 Deliberately uncapped and unknobbed: a "newest N only" bound would stop probing
 exactly the old releases where this class of defect has actually been found.
+
+**The theme-drift arm** is the monitor half of §check-docs-highlight-coverage.
+It is optional, on the set-the-env-or-delete-the-arm pattern, and takes two
+step-level env values:
+
+- `HIGHLIGHT_CSS_PATH` — the site path of the theme stylesheet;
+- `HIGHLIGHT_TOKENS_FILE` — the tracked snapshot, the same file
+  `SITE_KIT_HIGHLIGHT_TOKENS` names.
+
+The arm fetches `https://<apex><HIGHLIGHT_CSS_PATH>`, the apex read from the
+CNAME file as the other arms read it, and extracts the class set by **the
+extraction rule**:
+
+- **Rules.** Comments are stripped and the stylesheet is split into rules at `}`.
+- **Colour-bearing.** A rule is kept when its declaration block sets `color`,
+  `background` or `background-color`.
+- **Selectors.** Its selector list is split on `,`.
+- **Classes.** Each selector that is exactly `.highlight .<class>`, one class
+  after the scope, is kept.
+- **Result.** Sorted and de-duplicated.
+
+It compares that set with the snapshot's classes (`#` and blank lines dropped)
+in **both directions**. A class the theme colours and the snapshot lacks is a
+finding, because the gate would never ask for its override. A class the snapshot
+lists and the theme does not colour is a finding, because the snapshot is a
+copy and a copy must match. On either, it prints the added and removed classes
+**and the full new list**, so the remedy is a paste into the snapshot, followed
+by whatever overrides the gate then reds on.
+
+The zero-cases:
+
+- a fetch failure is a finding, asserted on the call's own exit status with
+  `curl -f`, so an HTTP error is a failure rather than an error page parsed;
+- a fetched stylesheet yielding **zero** classes is a finding, since the
+  extraction or the theme's structure broke;
+- an unreadable snapshot, or only one of the two values set, is a finding;
+- with both values empty the arm is skipped, with a census line saying so. The
+  template ships them empty.
+
+The census prints fetched bytes, colour-bearing rules, extracted classes and
+snapshot classes. The fetch is anonymous HTTPS, so the arm needs no new
+`permissions:` scope.
+
+**The honest limit.** The gate cannot see a theme bump, and this arm sees it on
+its next scheduled run. Between a bump and that run the live site can show
+uncovered tokens. The daily schedule bounds how long that lasts, and the pre-bump
+tree cannot prevent it.
 
 The kit's `smoke/install.sh` installs the template verbatim into the scratch tree
 as governed surface, and registers the gates that read it. The scratch battery is

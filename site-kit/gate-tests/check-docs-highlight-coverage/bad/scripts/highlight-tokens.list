@@ -1,0 +1,7 @@
+# contract: site-kit/SPEC.md §check-docs-highlight-coverage — one class per line, written as .<class>
+.c
+.cd
+.k
+.kv
+.go
+highlight-o

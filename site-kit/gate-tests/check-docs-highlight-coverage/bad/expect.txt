@@ -1,0 +1,4 @@
+scripts/highlight-tokens.list:5: class '.kv' has no '.highlight .kv' override
+scripts/highlight-tokens.list:6: class '.go' has no '.highlight .go' override
+scripts/highlight-tokens.list:7: 'highlight-o' is not one class written as .<class>
+override glob 'docs/assets/*.css' (SITE_KIT_HIGHLIGHT_OVERRIDES) matches no tracked file

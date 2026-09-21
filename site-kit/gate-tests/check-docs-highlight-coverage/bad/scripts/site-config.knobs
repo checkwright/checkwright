@@ -1,0 +1,3 @@
+SITE_KIT_HIGHLIGHT_TOKENS = scripts/highlight-tokens.list
+SITE_KIT_HIGHLIGHT_OVERRIDES[] = docs/_layouts/*.html
+SITE_KIT_HIGHLIGHT_OVERRIDES[] = docs/assets/*.css

@@ -112,6 +112,7 @@ leaves its section absent.
 | [canon-kit](canon-kit/index.md) | check-md-refs | precommit |
 | [canon-kit](canon-kit/index.md) | check-docs-link-convention | precommit |
 | [site-kit](site-kit/index.md) | check-docs-cname-parity | precommit |
+| [site-kit](site-kit/index.md) | check-docs-highlight-coverage | precommit |
 | [site-kit](site-kit/index.md) | check-docs-render-fidelity | precommit |
 | [canon-kit](canon-kit/index.md) | check-docs-cmd | precommit |
 | [canon-kit](canon-kit/index.md) | check-docs-restatement-parity | precommit |
@@ -227,5 +228,5 @@ leaves its section absent.
 
 | kit | surface |
 | --- | --- |
-| (consumer) | live docs-site deployment — apex/www/http HTTPS, redirects, cert expiry, release-body note pointers, and each published Release's prerelease flag against its own version line |
+| (consumer) | live docs-site deployment — apex/www/http HTTPS, redirects, cert expiry, release-body note pointers, each published Release's prerelease flag against its own version line, and theme highlight-class drift against the tracked snapshot |
 

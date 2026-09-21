@@ -6,3 +6,6 @@ SITE_KIT_ALIASES[] = www.checkwright.dev
 SITE_KIT_ALIASES[] = checkwright.com
 SITE_KIT_ALIASES[] = www.checkwright.com
 SITE_KIT_ALIASES[] = checkwright.github.io
+
+# spec: site-kit/SPEC.md §check-docs-highlight-coverage — this repo's snapshot of the classes the Pages theme's highlight CSS colours, which the site-health theme-drift arm holds to the live stylesheet
+SITE_KIT_HIGHLIGHT_TOKENS = scripts/highlight-tokens.list

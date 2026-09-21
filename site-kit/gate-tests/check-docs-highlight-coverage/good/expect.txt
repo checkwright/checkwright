@@ -1,0 +1,1 @@
+DOCS-HIGHLIGHT-COVERAGE: clean (5 snapshot class(es), 1 override file(s), 3 covering rule(s)

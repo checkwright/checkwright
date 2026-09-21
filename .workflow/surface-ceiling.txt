@@ -23,7 +23,7 @@
 40 docs/delegation-kit/index.md
 57 docs/doctrine-kit/index.md
 41 docs/drift-kit/index.md
-231 docs/enforcement.md
+232 docs/enforcement.md
 208 docs/evidence-data.md
 41 docs/evidence-kit/index.md
 58 docs/footprint.md

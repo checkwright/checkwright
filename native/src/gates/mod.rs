@@ -19,6 +19,7 @@ pub mod door_binding;
 pub mod deferred_board_tags;
 pub mod deprecation_task;
 pub mod docs_cmd;
+pub mod docs_highlight_coverage;
 pub mod docs_restatement_parity;
 pub mod fence_command_head;
 pub mod fence_run;
@@ -1915,6 +1916,20 @@ pub const REGISTRY: &[GateEntry] = &[
             "SITE_KIT_EXEMPT_PATHS",
             "GATE_SDK_PRUNE_DIRS",
             "GATE_SDK_PRUNE_EXTRA_DIRS",
+        ],
+        "site-kit",
+        &[("git", "")],
+    ),
+    // spec: site-kit/SPEC.md §check-docs-highlight-coverage — no walk root: the corpus is one
+    // knob-named snapshot and the tracked files the override pathspecs list
+    (
+        "check-docs-highlight-coverage",
+        docs_highlight_coverage::run,
+        &[],
+        &[
+            "SITE_KIT_HIGHLIGHT_TOKENS",
+            "SITE_KIT_HIGHLIGHT_OVERRIDES",
+            "SITE_KIT_HIGHLIGHT_SCOPE",
         ],
         "site-kit",
         &[("git", "")],

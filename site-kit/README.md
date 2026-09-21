@@ -19,9 +19,15 @@ GitHub Pages' parser is not github.com's. It fails closed when the renderer is
 absent; the dependency joins a consumer's toolchain only when the gate is
 registered.
 
+`check-docs-highlight-coverage` holds a layout that restyles code highlighting
+to the theme it restyles: every token class a tracked snapshot says the theme
+colours must have an override rule, or it keeps the theme's colour — black on a
+dark code background, for one. It is disarmed until `SITE_KIT_HIGHLIGHT_TOKENS`
+names the snapshot.
+
 The template — `templates/site-health.yml` — is a scheduled probe of the live
-site (apex/www/http HTTPS, redirects, certificate expiry, and release-body note
-pointers). It verifies a *deployment*, not a tree, so it ships as a workflow a
+site (apex/www/http HTTPS, redirects, certificate expiry, release-body note
+pointers, and theme highlight-class drift against that snapshot). It verifies a *deployment*, not a tree, so it ships as a workflow a
 consumer copies, never a gate: the line is where the asserted object lives, and
 none of what it asserts is in any checkout. See [SPEC.md](SPEC.md#the-monitor-boundary)
 for why that boundary is load-bearing.
@@ -41,6 +47,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    <!-- gate-roster:begin -->
    ```
    check-docs-cname-parity
+   check-docs-highlight-coverage
    check-docs-render-fidelity
    ```
    <!-- gate-roster:end -->
@@ -58,12 +65,19 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    docs host (www subdomains, redirect domains, the pre-CNAME Pages host). With
    no such line the gate holds on defaults and finds nothing.
 
-4. Optional live monitor — copy `templates/site-health.yml` verbatim into
-   `.github/workflows/`, then set two groups of step env or delete the arm each
+4. Optional highlight coverage — if your layout restyles code highlighting, track
+   a snapshot of the classes your theme's stylesheet colours (one `.<class>` per
+   line under a `# contract:` header) and set `SITE_KIT_HIGHLIGHT_TOKENS` to it
+   in `site-config.knobs`. The monitor's theme-drift arm prints the list to paste.
+
+5. Optional live monitor — copy `templates/site-health.yml` verbatim into
+   `.github/workflows/`, then set three groups of step env or delete the arm each
    belongs to: `ALT_DOMAIN` (drop the alternate-host probe if you serve no
-   redirect alias), and `RELEASE_NOTE_GLOB` / `RELEASE_NOTE_TAG_KEY` /
+   redirect alias), `RELEASE_NOTE_GLOB` / `RELEASE_NOTE_TAG_KEY` /
    `RELEASE_NOTE_URL_PATH` (drop the release-body arm if you publish no release
-   notes). It opens/updates/closes a `site-health` issue on its own schedule.
+   notes), and `HIGHLIGHT_CSS_PATH` / `HIGHLIGHT_TOKENS_FILE` (the theme-drift
+   arm, skipped while both are empty). It opens/updates/closes a `site-health`
+   issue on its own schedule.
    The release-body arm needs the template's `contents: read` permission — it is
    an allowlist, not an addition — and `RELEASE_NOTE_URL_PATH` is the value worth
    checking twice: site-kit/SPEC.md §templates/site-health.yml names the trap.

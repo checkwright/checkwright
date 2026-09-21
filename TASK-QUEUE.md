@@ -12,20 +12,6 @@
 
 ## New Features
 
-- **site-dark-token-palette-coverage-ungated** [spec: SPEC-highlight-coverage.md] — the dark-mode
-  Rouge palette in `docs/_layouts/default.html` remapped only some of the highlight classes the
-  theme colours, so `.o` (shell `&&`) rendered black on the dark code background (operator report,
-  2026-09-21). The lead hotfixed it, and nothing gates the coverage.
-  **Ruled on site-kit's monitor boundary (spec, 2026-09-21):** `check-docs-highlight-coverage`
-  (site-kit, armed by `SITE_KIT_HIGHLIGHT_TOKENS`) asserts that the layout overrides every class in
-  a tracked snapshot, and a `site-health` template arm holds the snapshot to the live theme CSS in
-  both directions.
-  **Found at spec:** counting grouped selectors, the live CSS colours 63 classes. The hotfix's
-  first draft missed `.cd`, `.kv`, `.mb` and `.mx`, because the check that cleared it read only
-  each rule's first selector. The committed hotfix covers all 63.
-  Filed 2026-09-21 to the gap inbox by the lead, and entered directly by operator direction (lead
-  session). Cost event/high: every shell command on the public site was unreadable in dark mode.
-
 ## Technical Debt
 
 ## Deferred
@@ -2617,6 +2603,7 @@
 
 ## Done
 
+- site-dark-token-palette-coverage-ungated
 - projection-trigger-witness
 - generated-projections-roster-ungated
 - install-md-adopter-page-overgrown

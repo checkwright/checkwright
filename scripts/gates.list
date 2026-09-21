@@ -86,6 +86,7 @@ check-spec-fence-balance
 check-md-refs
 check-docs-link-convention
 check-docs-cname-parity
+check-docs-highlight-coverage
 check-docs-render-fidelity
 check-docs-cmd
 check-docs-restatement-parity

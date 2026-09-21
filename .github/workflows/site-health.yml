@@ -6,7 +6,7 @@
 # inside it: a failed probe opens (or updates, never duplicates) a site-health
 # issue and reds this run, never a merge. Recovery self-clears (a green run
 # closes the open issue). No README badge, by the standing ruling.
-# enforce: class=monitor live docs-site deployment — apex/www/http HTTPS, redirects, cert expiry, release-body note pointers, and each published Release's prerelease flag against its own version line
+# enforce: class=monitor live docs-site deployment — apex/www/http HTTPS, redirects, cert expiry, release-body note pointers, each published Release's prerelease flag against its own version line, and theme highlight-class drift against the tracked snapshot
 name: site-health
 
 on:
@@ -52,6 +52,10 @@ jobs:
           # /posts/{slug}.html: the generator emits the .html form and the host
           # also serves this one, which is what RELEASING.md pins bodies to.
           RELEASE_NOTE_URL_PATH: '/posts/{slug}'
+          # Theme-drift arm (#8): the Pages theme stylesheet, and the snapshot
+          # SITE_KIT_HIGHLIGHT_TOKENS names in scripts/site-config.knobs.
+          HIGHLIGHT_CSS_PATH: '/assets/css/style.css'
+          HIGHLIGHT_TOKENS_FILE: 'scripts/highlight-tokens.list'
           FORCE_FAIL: ${{ inputs.force_fail }}
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -260,6 +264,61 @@ jobs:
           # While the line is 0.x this reports every Release as flagged, and so
           # no Release is Latest — the declared outcome, not a fault.
           echo "release-channel: $n_rel published Release(s) checked against their own version lines"
+
+          # 8. the classes the live theme stylesheet colours under .highlight
+          #    match the tracked snapshot check-docs-highlight-coverage reads, in
+          #    both directions. On a finding, paste the printed list into the
+          #    snapshot below its header, then add the overrides that gate reds
+          #    on in docs/_layouts/default.html.
+          if [ -z "${HIGHLIGHT_CSS_PATH:-}${HIGHLIGHT_TOKENS_FILE:-}" ]; then
+            echo "theme-drift: skipped (HIGHLIGHT_CSS_PATH and HIGHLIGHT_TOKENS_FILE unset)"
+          elif [ -z "${HIGHLIGHT_CSS_PATH:-}" ] || [ -z "${HIGHLIGHT_TOKENS_FILE:-}" ]; then
+            failures+=("theme-drift: set both HIGHLIGHT_CSS_PATH and HIGHLIGHT_TOKENS_FILE, or neither")
+          elif [ ! -r "$HIGHLIGHT_TOKENS_FILE" ]; then
+            failures+=("theme-drift: snapshot $HIGHLIGHT_TOKENS_FILE is not a readable tracked file")
+          else
+            css="$(mktemp)"
+            css_err="$(mktemp)"
+            curl -sS -f -m 20 -o "$css" "https://$apex$HIGHLIGHT_CSS_PATH" 2>"$css_err"
+            css_rc=$?
+            if [ "$css_rc" -ne 0 ]; then
+              failures+=("theme-drift: could not fetch https://$apex$HIGHLIGHT_CSS_PATH (curl exit $css_rc): $(tr '\n' ' ' < "$css_err")")
+            else
+              # The extraction rule: rules split at }, kept when the declaration
+              # block sets color, background or background-color; each selector
+              # list split on , and kept when exactly .highlight .<class>.
+              extracted="$(tr '\n' ' ' < "$css" | sed -E 's#/\*([^*]|\*+[^*/])*\*+/##g' | awk '
+                BEGIN { RS = "}" }
+                {
+                  n = split($0, part, "{")
+                  if (n < 2) next
+                  if (part[n] !~ /(^|[;[:space:]])(color|background|background-color)[[:space:]]*:/) next
+                  print "rule"
+                  m = split(part[n - 1], sel, ",")
+                  for (i = 1; i <= m; i++) {
+                    s = sel[i]
+                    gsub(/[[:space:]]+/, " ", s); sub(/^ /, "", s); sub(/ $/, "", s)
+                    if (s ~ /^\.highlight \.[A-Za-z0-9_-]+$/) print "class " substr(s, 12)
+                  }
+                }')"
+              theme="$(sed -n 's/^class //p' <<<"$extracted" | sort -u)"
+              snap="$(grep -v '^[[:space:]]*#' "$HIGHLIGHT_TOKENS_FILE" | tr -d '[:blank:]\r' | grep . | sort -u)"
+              n_theme="$(grep -c . <<<"$theme")"
+              echo "theme-drift: $(wc -c < "$css" | tr -d ' ') byte(s) fetched, $(grep -c '^rule$' <<<"$extracted") colour-bearing rule(s), $n_theme class(es) extracted, $(grep -c . <<<"$snap") in the snapshot"
+              if [ "$n_theme" -eq 0 ]; then
+                failures+=("theme-drift: https://$apex$HIGHLIGHT_CSS_PATH yielded zero .highlight classes — the extraction or the theme's structure broke")
+              else
+                added="$(comm -23 <(printf '%s\n' "$theme") <(printf '%s\n' "$snap") | paste -sd ' ' -)"
+                removed="$(comm -13 <(printf '%s\n' "$theme") <(printf '%s\n' "$snap") | paste -sd ' ' -)"
+                if [ -n "$added$removed" ]; then
+                  [ -z "$added" ] || failures+=("theme-drift: the theme colours class(es) the snapshot lacks: $added")
+                  [ -z "$removed" ] || failures+=("theme-drift: the snapshot lists class(es) the theme does not colour: $removed")
+                  failures+=("theme-drift: the full new list for $HIGHLIGHT_TOKENS_FILE:"$'\n'"$theme")
+                fi
+              fi
+            fi
+            rm -f "$css" "$css_err"
+          fi
 
           # DoD hook: a workflow_dispatch with force_fail=true exercises the issue
           # path on demand without waiting for a real outage.
