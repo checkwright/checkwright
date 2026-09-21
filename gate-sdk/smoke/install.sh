@@ -72,7 +72,7 @@ cp "$SDK/templates/gates-workflow.yml" .github/workflows/gates.yml
 
 # spec: gate-sdk/SPEC.md §Consumer smoke — this leg's one tracked .workflow/ member: the drained release declaration surface, so the directory check-workflow-tiering reads survives the restore's clean
 cat > .workflow/release-declarations.md <<'EOF'
-# contract: gate-sdk/SPEC.md §upgrade-smoke — the accumulating release declaration surface; the note's three declaration-bearing sections in the note's grammar, appended by the session landing a kit-shipped change, composed into the release note and drained to this header at the tag.
+# contract: gate-sdk/SPEC.md §upgrade-smoke — the accumulating release declaration surface; the note's three declaration-bearing sections in the note's grammar, appended by the session landing a kit-shipped change or the one discovering its omission, composed into the release note and drained to this header at the tag.
 EOF
 
 bash "$SDK/bin/run-gates.sh" --emit git-hooks --write >/dev/null

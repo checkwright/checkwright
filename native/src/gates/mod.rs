@@ -121,6 +121,7 @@ pub mod template_registry_parity;
 pub mod test_hermetic;
 pub mod tightened_gates_grammar;
 pub mod release_declaration_parity;
+pub mod release_change_declared;
 pub mod tracking_claim;
 pub mod tree_terms;
 pub mod unmarked_claim;
@@ -1316,6 +1317,14 @@ pub const REGISTRY: &[GateEntry] = &[
         release_declaration_parity::run,
         &[("docs/posts", "glob:lit:*.md", "", "")],
         &[],
+        "-",
+        &[("git", "")],
+    ),
+    (
+        "check-release-change-declared",
+        release_change_declared::run,
+        &[],
+        &["GATE_SDK_KIT_DIRS"],
         "-",
         &[("git", "")],
     ),

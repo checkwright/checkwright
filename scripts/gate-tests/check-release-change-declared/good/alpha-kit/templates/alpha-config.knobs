@@ -1,0 +1,2 @@
+# alpha-kit knobs — the header comment was reworded since the base.
+ALPHA_KIT_MODE = strict

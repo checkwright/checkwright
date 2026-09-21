@@ -96,8 +96,8 @@ the delta needs, a missing passage included, is a missed site you land in this
 unit. Never write an edit a met need does not call for, nor drop a target silently.
 
 **Declare what a vendoring consumer will meet, in the unit that lands it.** A unit
-that lands or tightens a gate, renames or removes a knob, or changes what a kit
-script, template or default does appends one bullet to the matching section of
+that lands or tightens a gate, renames or removes a knob, or removes a kit tool
+or changes what a kit script, template or default does appends one bullet to the matching section of
 the release declaration surface, `<workflow-dir>/release-declarations.md`
 (gate-sdk/SPEC.md §upgrade-smoke), in the same commit, written as the release
 note's bullet: the lead token that section takes, then what moved and what the

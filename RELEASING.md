@@ -55,7 +55,8 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
      the same section, each section's lead tokens carried unchanged; the prose
      may be edited for the reader. An empty section means a stated "None." A
      change the composing session finds undeclared is appended to the surface
-     first, then transcribed. Because the surface accumulates across every
+     first, then transcribed — the discovering session is the producer
+     (gate-sdk/SPEC.md §upgrade-smoke). Because the surface accumulates across every
      iteration since the last tag, a release batching several iterations inherits
      all of their declarations here.
      **Held by a gate, not by review:** `check-release-declaration-parity`

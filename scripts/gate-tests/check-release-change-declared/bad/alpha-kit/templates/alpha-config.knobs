@@ -1,0 +1,4 @@
+# alpha-kit knobs.
+
+ALPHA_KIT_MODE = strict
+ALPHA_KIT_PATTERN = tighter

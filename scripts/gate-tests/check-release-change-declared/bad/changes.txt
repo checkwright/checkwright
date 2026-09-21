@@ -1,0 +1,7 @@
+# One undeclared tool removal (class R), one named only outside its dir-and-basename bullet,
+# one covered by that bullet, and a data change to a claimed template (class T).
+base v1.0.0
+D	alpha-kit/bin/gone.sh
+D	alpha-kit/bin/one.sh
+D	alpha-kit/bin/two.sh
+M	alpha-kit/templates/alpha-config.knobs

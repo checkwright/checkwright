@@ -392,6 +392,10 @@ if staged_matches 'docs/posts/*.md' '.workflow/release-declarations.md' 'native/
     run_gate check-release-declaration-parity native/target/release/checkwright-gates check-release-declaration-parity
 fi
 
+if staged_matches '.workflow/release-declarations.md' 'gate-sdk/bin/*' 'canon-kit/bin/*' 'context-kit/bin/*' 'delegation-kit/bin/*' 'doctrine-kit/bin/*' 'drift-kit/bin/*' 'evidence-kit/bin/*' 'guard-kit/bin/*' 'lifecycle-kit/bin/*' 'queue-kit/bin/*' 'site-kit/bin/*' 'gate-sdk/templates/*' 'canon-kit/templates/*' 'context-kit/templates/*' 'delegation-kit/templates/*' 'doctrine-kit/templates/*' 'drift-kit/templates/*' 'evidence-kit/templates/*' 'guard-kit/templates/*' 'lifecycle-kit/templates/*' 'queue-kit/templates/*' 'site-kit/templates/*' 'native/src/gates/release_change_declared.rs' 'native/src/installer/recipe.rs' 'scripts/gate-sdk-config.knobs'; then
+    run_gate check-release-change-declared native/target/release/checkwright-gates check-release-change-declared
+fi
+
 if staged_matches '.github/workflows/*.yml' '.github/workflows/*.yaml' 'native/src/gates/npm_publish_spec.rs' 'native/src/fresh.rs'; then
     run_gate check-npm-publish-spec native/target/release/checkwright-gates check-npm-publish-spec
 fi

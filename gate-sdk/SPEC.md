@@ -7830,6 +7830,12 @@ the literals in the members of this cohort and that arm's resolved value stands
 unchanged and is not repaired here. What this paragraph does **not** claim is that
 a compiled reader is structurally barred from the knob.
 
+**`check-release-change-declared` is the family's fourth member, and not a cohort
+member by the port record** — it was born native rather than ported. It rides the
+cohort's `.workflow/` literal and leaves the knob-ownership question above open
+rather than answering it for one member; the only knob it declares is gate-sdk's
+own `GATE_SDK_KIT_DIRS` (§check-release-change-declared).
+
 **Assertion C's derivation was re-run at the cut, in both directions: zero
 transitions.** The declaration paths moved from `<gates-dir>/<name>.sh` to
 `<gates-dir>/<name>.gate`; every member reaching these three through a
@@ -11625,14 +11631,18 @@ solely in the consumer's own tree cannot reach a vendored tree and belongs to no
 release's declaration. Being tracked is load-bearing: the smoke reads the file
 out of a `git archive` of TO, which carries tracked content only.
 
-Its **producer** is the session that lands the change, in the same commit. That
-is the build stage, for every section (lifecycle-kit/templates/stages/build.md),
-and any other session whose commit ships such a change, such as a close fixing a
-drained bullet inline, on the same obligation. The landing session is the only
-one that knows what it changed at the moment it changes it, so the declaration is
-written from knowledge rather than reconstructed from commits or from a red. A
-gate that lands **new** or gets stricter takes a Tightened-gates bullet, and an
-assertion that discovers its allowed-red set from the gate it was meant to check
+Its **producer** is the session that lands the change, in the same commit: the
+build stage for every section (lifecycle-kit/templates/stages/build.md), and any
+other session whose commit ships such a change on the same obligation. The
+landing session knows what it changed at the moment it changes it, so it
+declares from knowledge rather than reconstructing from commits or from a red.
+**Where that session has ended, the session that discovers the omission is the
+producer**, whatever its stage, in the commit that discovers it. Appending
+records a fact that has already shipped. It is not a scope decision and writes
+no queue entry. For a removed kit `bin/` tool and a data change to a template
+`init` claims, discovery is mechanical: `check-release-change-declared` reds
+the committing session until the surface names the path. A gate that lands
+**new** or gets stricter takes a Tightened-gates bullet, and an assertion that discovers its allowed-red set from the gate it was meant to check
 is its own trigger. A knob renamed or removed takes a Renamed-knobs bullet. Any
 other change to what the kits do takes a Behavior-changes bullet. Where a
 consumer must act, the bullet's prose carries the remedy.
@@ -11645,6 +11655,14 @@ vendored tree meets on upgrade, not a diff inside the gate — so "lands or
 tightens" names the common producers rather than the boundary, and a build
 reading it as the boundary declares nothing and hands the consumer an undeclared
 red. The bullet's prose carries the one-line remedy such a red needs.
+**A template `init` claims declares in both sections when its change tightens a
+gate**: Tightened gates for each gate it can red, and Behavior changes on the
+template path. `init` rewrites the unmodified seeded copy on upgrade, so it reds;
+it keeps an edited copy, which then diverges. Those are two populations, so the
+change takes two sections every time rather than a per-event judgment of which
+one it reaches. A template no `init` claims reaches an adopter only as a copy
+they took out, and its change takes Behavior changes alone (docs/install.md §The
+upgrade contract).
 
 It **accumulates**, and that shape is chosen rather than inherited. Each of the
 three declaration-bearing sections is a *release*-level aggregate, not an
@@ -11788,14 +11806,18 @@ read only at the resolve step, resolved by the arm itself. The declaration path 
 derived from `GATE_SDK_WORKFLOW_DIR`
 at the same step. The release declaration surface is produced by the session that
 lands a kit-shipped change, appending a bullet to the matching section in the
-landing commit, and composed by close into the note at the release boundary. It
-is read at three named transitions: here at the resolve step, where the untagged
+landing commit, or, once that session has ended, by the session that discovers
+the omission, and composed by close into the note at the release boundary. It
+is read at four named transitions: here at the resolve step, where the untagged
 arm reads the Tightened-gates lead tokens as the allowed-red set; by close, which
 composes all three note sections by transcription and drains the surface at the
-tag; and by `check-release-declaration-parity` at pre-commit, which compares every
+tag; by `check-release-declaration-parity` at pre-commit, which compares every
 section against the note composed from it while that note is still untagged, so
 the compose-then-drain flow specified here is held equal at its one comparable
-moment rather than by review. Every bullet's lead token has a reader in the parity
+moment rather than by review; and by `check-release-change-declared` at
+pre-commit, which reads the Behavior-changes bullets for the path of every kit
+tool removed and every claimed template changed since the last tag
+(§check-release-change-declared). Every bullet's lead token has a reader in the parity
 gate, and the smoke reads it in Tightened gates only; its prose is read by the
 composing close. The upgrade skill reads the *note* as the consumer's registration
 checklist, and is unaffected: the note is unchanged as an artifact, and only its
@@ -11803,6 +11825,78 @@ sections' source moved. The grammar's owner is docs/install.md §The upgrade
 contract; its implementation is §lib/declaration.sh, and this repo holds the
 published corpus's Tightened-gates sections to it with
 `check-tightened-gates-grammar`.
+
+### check-release-change-declared
+
+**A removed kit tool and a changed claimed template must be named on the release
+declaration surface.** Two kit-shipped changes surface only in an adopter's tree:
+a kit `bin/` tool deleted, which a script of theirs still calls, and a template
+`init` claims changed as pure data, which tightens gates with no gate code moving.
+This gate is the mechanical discovery route §upgrade-smoke's producer clause
+names for both. It is consumer-declared, in this repo's `scripts/`, at
+`tier=precommit`, and compiled like the declaration cohort's members.
+
+- **Base.** The nearest `v*` tag reachable from `HEAD`, the tag
+  `git describe --tags --abbrev=0 --match 'v*'` names. Whether one exists is
+  decided before describe runs, by `HEAD` resolving and by a `for-each-ref
+  --merged HEAD` listing of `refs/tags/v*`, so no verdict rests on describe's
+  localized message. No commit, or no such tag, is **dormant**: the clean line
+  says nothing was checked and never reports "checked".
+- **Changed set.** `git diff --cached --no-renames --name-status <base>`, the
+  index against the base. Reading the index is what lets the commit that deletes
+  a tool red at its own pre-commit; in the battery the index equals `HEAD`, so the
+  two readings agree. `--no-renames` makes a rename a deletion of its old path.
+- **Class R, a removed tool.** A path with status `D` lying under `<root>/bin/`
+  for a resolved kit root (`GATE_SDK_KIT_DIRS`, the kit-root resolver). Every
+  file there counts, not only `*.sh`, because the packer ships the whole kit root.
+- **Class T, a changed claimed template.** A path present both at the base and in
+  the index, claimed by `init`, whose non-comment, non-blank lines differ as a
+  multiset between the two. The claimed set is the installer recipe's own
+  derivation, `config_seam_plan` plus every `Seeded::Plan` source `recipe::seed`
+  returns, never a list. A seam added or deleted is outside class T, and so is a
+  comment-only or reordering edit.
+- **Declared.** A top-level bullet under `## Behavior changes` of
+  `<workflow-dir>/release-declarations.md`, read from the index, contains the
+  path verbatim, or contains both the path's directory with a trailing `/` and
+  its basename. The second form admits a directory-level bullet naming its files.
+- **Red.** One finding per undeclared path, naming the path, its class and the
+  remedy: for class R a Behavior-changes bullet naming the path, for class T that
+  bullet plus a Tightened-gates bullet for each gate the change can red
+  (§upgrade-smoke, the both-sections rule).
+- **Exit 2.** A surface absent from the index or lacking its `# contract:`
+  header, a failed `git` call, or a kit-root set that resolves empty.
+
+**Argument mode (fixture capability):** `check-release-change-declared
+[<surface> [<change-dump> <base-dir>]]`. With a dump, the surface is read as a
+file, the dump's first record is `base <tag>` or `base -` (dormant), each further
+record is one tab-separated `--name-status` line, the base tree is `<base-dir>`
+and the working directory stands in for the index. The fixture pair holds the
+canned readings — the bad side one case per class plus the dir-and-basename form,
+the good side a comment-only template edit, a seam add and a declared removal.
+A case can hold only one verdict, so the dormant case, the live index read, the
+rename reading and every refusal are pinned against real tags and a real index in
+`scripts/gate-tests/check-release-change-declared.test.sh`.
+
+**Why classes R and T and nothing wider.** Each is decidable from a path and the
+diff, and each has a measured instance. A wider class would sweep in every
+stage-template edit: docs/install.md's folding makes each of those a Behavior
+change in principle, but no release has declared them, so a gate over them would
+red on a rule nobody applies. Widening it is a scope question, not a calibration.
+
+**Consumer-declared, and why.** Only the repository that authors kits deletes a
+kit `bin/` tool or edits a kit template; an adopter's tree receives those changes
+at upgrade and never makes them. So no kit ships the gate, and it reads the
+surface path the way §The declaration cohort does, fixed at `.workflow/`, leaving
+that cohort's knob-ownership question open rather than answering it for one
+member.
+
+**Honest limits.** The gate checks that a path is **named**, not that the
+bullet's prose is right. It cannot check the Tightened-gates half of the
+both-sections rule, because no derivation maps a template to the gates that read
+it; that half is held by the producer and by the upgrade smoke, and only for
+gates that actually red. A copied-out template outside the claimed set, a template
+edit anywhere else, and any semantic change stay on §upgrade-smoke's producer
+clause.
 
 ### gen-pre-commit
 

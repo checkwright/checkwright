@@ -84,8 +84,9 @@ shapes gain the same rows. **{mechanical}**
 
 The landing commit appends Tightened-gates bullets for `check-commit-msg` and
 `check-tree-terms` and a Behavior-changes bullet on
-`gate-sdk/templates/msg-patterns.list`. That is `SPEC-release-change-declared.md`
-delta 1's rule, whose class-T arm reds this commit otherwise. The remedy the
+`gate-sdk/templates/msg-patterns.list`. That is gate-sdk/SPEC.md §upgrade-smoke's
+both-sections rule, and §check-release-change-declared's class-T arm reds this
+commit otherwise. The remedy the
 bullets carry for an adopter whose tree reds is to reword the sentence or edit
 their own copy of the list, which `init` then keeps. **{mechanical}**
 

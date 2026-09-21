@@ -321,8 +321,8 @@ artifact and installs. Both bootstraps reach it — the POSIX one under Git for
 Windows' `sh` (the path the install-smoke leg exercises) and the PowerShell one on its
 own leg. WSL remains a route you may choose instead.
 
-<!-- measured: ported-gate-members=122 -->
-That direction is now underway rather than announced: 122 gates in the battery
+<!-- measured: ported-gate-members=123 -->
+That direction is now underway rather than announced: 123 gates in the battery
 dispatch to the compiled binary today, which is every member the battery
 registers. The requirements above are still what those gates invoke. A gate whose
 rule *is* an external program keeps spawning it whatever the gate is written in,
@@ -761,7 +761,10 @@ maintained beside it:
   0.x, outranking the pre-1.0 qualifier below rather than riding a minor.
   Majors are where the deprecation promises come due — the release-sweep
   constraint that no marker rides into the next major undispositioned binds
-  here.
+  here. A kit `bin/` tool is not a deprecation-marked surface: deleting one is
+  not a decommission. It rides a minor and is declared by path under Behavior
+  changes, where a script of yours that called it finds its worklist item. In
+  this repository `check-release-change-declared` holds that declaration.
 - **Pre-1.0 qualifier** — while the line is 0.x, breaking changes *other than
   decommissions* may ride minors (the semver 0.x convention), each still
   declared in the note; a decommission still earns a major (above), and that
@@ -953,7 +956,10 @@ knobs; **copied-out templates and depended-on behavior** → Behavior changes. T
 copied-out-template class earns no section of its own because a template you have
 copied out that then changed *is* depended-on behavior diverging from your copy —
 it is behavior-folded, not dropped. Four classes, three sections, by that
-folding.
+folding. A template `init` seeded that you never edited is the one exception,
+because `init` rewrites it on upgrade: you take the change rather than diverge
+from it. So a change that tightens a gate through such a template is declared
+under Tightened gates as well.
 
 Honest limit on Behavior changes: **its bullets are declared for
 the human upgrader, not smoke-asserted.** A non-gate change cannot red the

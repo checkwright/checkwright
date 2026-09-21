@@ -12,98 +12,6 @@
 
 ## New Features
 
-- **shipped-config-tightening-undeclared** [spec: SPEC-release-change-declared.md] —
-  a kit-shipped pattern-list change tightens two gates in an adopter's tree, and no surface says
-  which release section owns it or
-  who may declare it once the landing stage is gone.
-  `3763bc3e` added an account-identification pattern to `gate-sdk/templates/msg-patterns.list`,
-  the config template the installer's `init` seeds into a consumer's gates dir. **The gate code
-  did not change** — that commit's `native/src/gates/commit_msg.rs` diff is entirely inside
-  `mod tests`, so the whole tightening is data. `.workflow/release-declarations.md` carries
-  neither `check-commit-msg` nor `check-tree-terms`: its seed from past deferrals took Tightened
-  gates from the old bare-name surface only, which never held them.
-  **CALL 1 IS RULED — BOTH SECTIONS, ALWAYS. Operator ruling 2026-08-26**, relayed through the
-  iteration lead at this scope's escalation. A tightening that ships as kit template data
-  declares in **both** `Tightened gates` **and** `Behavior changes`. The ground is the adopter
-  split below: it is real, so the ruling removes the choice rather than making it, at one extra
-  line per event. Executing it — the edits to gate-sdk/SPEC.md §upgrade-smoke and
-  docs/install.md — is a spec stage's act when this entry promotes, deliberately not taken here.
-  **Call 1 CANNOT BE EXECUTED until call 2 is filled, and this coupling is why the ruling is not
-  self-discharging.** "Declare in both sections" names no one who may append when the discovering
-  stage is not build, so `3763bc3e`'s tightening stays undeclared until a producer exists and
-  surfaces at the next release tag as an adopter meeting a red the note never named.
-  **The adopter split the ruling rests on.** `claim()`
-  (`native/src/installer/init.rs:123`) rewrites a seeded path whose recorded hash still matches,
-  so
-  an adopter who never edited their copy TAKES the new pattern on upgrade and both gates can red
-  on
-  a clean run — the Tightened-gates allowed-red set's subject exactly. An adopter who did edit it
-  keeps their copy and diverges, which docs/install.md folds into Behavior changes by name:
-  "a template you have copied out that then changed *is* depended-on behavior diverging from your
-  copy — it is behavior-folded, not dropped". That folding rule reaches the edited population
-  only; it never contemplated the unmodified-seeded-copy case, where init writes through. Two
-  populations, two sections; the ruling above now requires both.
-  **Call 2, who may declare a late-discovered tightening, was filled at spec on 2026-09-21.** The
-  session that discovers the omission declares it (SPEC-release-change-declared.md delta 2).
-  **Cost while deferred:** nothing can red for it. `check-release-declaration-parity` compares
-  the note against the declaration surface, never against the tree, so an omission passes now and
-  passes again at composition. It surfaces as an adopter meeting a red the release note never
-  named — the defect docs/install.md assigns to the release rather than to the adopter's work.
-  Surfaced 2026-08-26 to the gap inbox by the close of the `platform-reach-and-target-roster`
-  iteration, while re-probing that close's release disposition; promoted 2026-08-26 at scope.
-  **Recurred 2026-09-18, judged at `windows-bash-floor`'s close.** That iteration's validate fix
-  added a banned construct (`cd` onto a `git` command substitution) to
-  `gate-sdk/templates/portability-patterns.list`, a kit-shipped template `init` does not seed, so
-  it reaches a consumer only as a copied-out list diverging — a Behavior-changes subject — and
-  `.workflow/release-declarations.md` carries no bullet for it. The landing session had ended, so
-  the open call above is again what leaves it with no producer.
-  **Leads `release-declaration-coupling`** (operator direction 2026-09-21, lead-relayed);
-  **promoted
-  2026-09-21 at spec**, sharing one amendment with `release-note-removal-declaration-uncoupled`.
-  Filter: trust arm — `3763bc3e` is unreleased and undeclared, so the next cut ships it.
-  recurrence: shipped-config-tightening-undeclared 2026-09-18
-
-- **release-note-removal-declaration-uncoupled** [spec: SPEC-release-change-declared.md] —
-  no oracle couples a removed adopter-facing entry point to its release-note declaration, so a
-  note that omits one passes
-  green and the adopter meets the omission as a broken invocation at upgrade time.
-  **The instance is measured, not predicted.** The `evidence-runner-trend-and-install-hooks-cuts`
-  iteration deleted four documented kit `bin/` tools — `evidence-kit/bin/run-validate.sh`,
-  `evidence-kit/bin/diff-baseline.sh`, `delegation-kit/bin/usage-trend.sh`,
-  `gate-sdk/bin/install-hooks.sh` — and re-spelled each as a bridged arm.
-  **Why the version contract does not catch it.** Under docs/install.md §Versioning that is a
-  MINOR under the pre-1.0 qualifier and not a major: decommission is scoped there to removing a
-  DEPRECATED surface over the `CANON_KIT_DEPRECATION_MARKERS` roster, and none of the four carried
-  a marker. So the whole protection an adopter gets is that the note declares the move and phase B
-  of the upgrade contract reconciles it — and nothing checks that the note actually declares it.
-  **Probed rather than assumed.** `check-release-bump`'s subject is note ordering and section
-  presence: it reds a patch-only bump whose note declares behavior changes, and never reads the
-  DIFF. `check-docs-cmd`'s invoked-path scan runs only inside a fence, so it cannot see a removal
-  at all.
-  **The candidate oracle is cheap and derivable:** diff the tracked `*/bin/*.sh` set between the
-  newest released tag and the release commit, and require every disappeared path to appear in the
-  unreleased note's declaration-bearing sections.
-  **DISTINCT from the printed-follow-up unit LANDED 2026-09-07** (installer/SPEC.md §The consumer
-  smoke): that owned a printed command inside installer shell source with no gate corpus reaching
-  it, and this owns the coupling between a REMOVAL and a NOTE — another surface, another oracle.
-  **Product-class under TRAJECTORY.md's 2026-08-30 witness discriminator**, which is what keeps it
-  off the one-line icebox tier: it blocks no stage entry and no push, but its demand witness is an
-  adopter upgrade rather than this repo's own accounting.
-  **Cost while deferred:** each release that decommissions an entry point re-buys a hand review
-  nobody is obliged to run, and the failure surfaces in an adopter's tree rather than in ours.
-  Filed 2026-09-05 to the gap inbox by the close of
-  `evidence-runner-trend-and-install-hooks-cuts`;
-  promoted here at this iteration's scope, →fix refused (a new gate is build work, not scope's)
-  and
-  →icebox refused on the product witness above. Deferred and not active on scope's composition
-  test, re-grounded 2026-09-11: no iteration since has shared its surface.
-  **Joins `release-declaration-coupling`** as its removal-coupling unit, by operator direction
-  (2026-09-21, lead-relayed); **promoted 2026-09-21 at spec**. It mints the gate in
-  SPEC-release-change-declared.md delta 3.
-  **Enhancement admission filter, engaged 2026-09-21 at scope:** admitted on the trust arm. An
-  adopter trusts the release note to name every entry point a cut
-  removes, and nothing checks that it does, so the omission reaches them as a broken invocation.
-
 - **account-noun-plural-slips-the-shape** [spec: SPEC-account-noun-plural.md] —
   the account-identification pattern matches a singular account noun only, so the plural form
   passes both readers.
@@ -175,49 +83,6 @@
   (2026-09-21, lead-relayed); **promoted 2026-09-21 at spec**. **Enhancement admission filter,
   engaged 2026-09-21 at scope:** admitted on the trust arm — the Release body is what an
   evaluator reads first, and it is the release artifact with the least witness.
-
-- **shipped-bin-removal-deprecation-path** [spec: SPEC-bin-removal-minor.md] —
-  deleting a kit-shipped `bin/` tool needs no deprecation marker, so that arm of the major-bump
-  criterion is unreachable by design.
-  **The instance, probed rather than assumed.** The `freshness-cohort-roadmap-hold-and-batch`
-  iteration deleted `drift-kit/bin/trajectory.sh` and `queue-kit/bin/roadmap.sh`. Both shipped:
-  the `--pack-installer` arm recursively copies each enumerated kit root into the payload, `bin/`
-  included, so a consumer who scripted a direct invocation now gets file-not-found. And
-  `CANON_KIT_DEPRECATION_MARKERS` defaults empty in canon-kit's knob table, so no marker ever
-  rode either script and none could.
-  **Why the criterion cannot see it.** docs/install.md §Versioning defines a major as removing a
-  DEPRECATED surface, or a change the two-phase upgrade contract cannot reconcile from the release
-  note alone. Neither half fires. The first presupposes a marker that never existed; the second is
-  satisfied because phase A replaces kit directories wholesale, so the deletion propagates with no
-  consumer action, and the residual breakage is a consumer's OWN script calling the removed path,
-  which no phase-B gate scans. The bump was a correct minor — the defect is that the release-sweep
-  constraint that no marker rides into the next major undispositioned is anchored to a roster that
-  has always been empty in this tree.
-  **The gap is the missing path, not the bump.** Nothing obliges a session deleting a shipped
-  `bin/` tool to mint a deprecation marker for it, so the roster stays empty by construction.
-  **Three candidate shapes; the choice was envelope-class.** A gate asserting that
-  a path deleted under a kit root's `bin/` was marker-covered in a prior release; a widening of
-  the major criterion to name shipped-surface removal directly; or an explicit ruling that a
-  `bin/` tool is not a declared surface and its removal rides a minor forever, which would at
-  least make today's behaviour intentional rather than accidental.
-  **Distinct from `cited-script-path-liveness-inline`, landed** (canon-kit/SPEC.md §check-docs-cmd
-  assertion (C)), which shares the instance and not the axis: that one was governed prose still
-  naming a deleted path, a staleness question inside this tree; this one is about what an ADOPTER
-  is owed when a shipped path disappears.
-  **Cost while deferred:** silent and consumer-side. It lands on an adopter who automated around
-  a kit tool, and it lands as a broken script rather than a red gate — the failure class the
-  two-phase upgrade contract exists to convert into a worklist.
-  Surfaced 2026-08-18 in the gap inbox by `freshness-cohort-roadmap-hold-and-batch`'s close,
-  whose release-disposition step postdates the drain; promoted 2026-08-18 at scope.
-  **Joins `release-declaration-coupling`** as its deprecation-path unit, by operator direction
-  (2026-09-21, lead-relayed); **promoted 2026-09-21 at spec**. **Shape (c), by operator direction
-  (2026-09-21, lead-relayed; a direction, not a ruling):** a kit `bin/` tool is not a
-  deprecation-marked surface; its removal rides a minor, declared in Behavior changes, which
-  `check-release-change-declared` enforces (SPEC-bin-removal-minor.md). Designed alongside
-  `release-note-removal-declaration-uncoupled`, which shares its instance class (a removed shipped
-  path) and owns the note half. **Enhancement admission filter, engaged 2026-09-21 at scope:**
-  admitted on the trust arm — an adopter who automated around a kit tool meets its removal as a
-  broken script, the break the upgrade contract promises to turn into a worklist.
 
 ## Technical Debt
 
@@ -3184,5 +3049,9 @@
 - **lead-agent-id-compaction-defense** — each claim still wants its own probe.
 
 ## Done
+
+- shipped-config-tightening-undeclared
+- release-note-removal-declaration-uncoupled
+- shipped-bin-removal-deprecation-path
 
 ## Lessons Learned

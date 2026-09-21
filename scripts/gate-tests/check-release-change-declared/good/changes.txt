@@ -1,0 +1,7 @@
+# A declared tool removal, a comment-only edit to a claimed template, a config seam
+# added since the base, and a non-bin deletion — none of them undeclared.
+base v1.0.0
+D	alpha-kit/bin/old.sh
+M	alpha-kit/templates/alpha-config.knobs
+A	alpha-kit/templates/beta-config.knobs
+D	alpha-kit/lib/helper.sh

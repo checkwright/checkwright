@@ -1,0 +1,2 @@
+# argument mode: <surface> <change dump> <base-tree dir>; the case dir stands in for the index
+release-declarations.md changes.txt base

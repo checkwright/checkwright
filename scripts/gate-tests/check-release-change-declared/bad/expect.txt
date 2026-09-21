@@ -1,0 +1,4 @@
+3 kit-shipped change(s) since v1.0.0 are not named
+alpha-kit/bin/gone.sh — class R
+alpha-kit/bin/two.sh — class R
+alpha-kit/templates/alpha-config.knobs — class T

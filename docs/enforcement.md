@@ -122,6 +122,7 @@ leaves its section absent.
 | (consumer) | check-release-channel-parity | precommit |
 | (consumer) | check-tightened-gates-grammar | precommit |
 | (consumer) | check-release-declaration-parity | precommit |
+| (consumer) | check-release-change-declared | precommit |
 | (consumer) | check-npm-publish-spec | precommit |
 | [canon-kit](canon-kit/index.md) | check-manifest-temporal | precommit |
 | [canon-kit](canon-kit/index.md) | check-manifest-count | precommit |
