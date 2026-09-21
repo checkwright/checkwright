@@ -12,6 +12,25 @@
 
 ## New Features
 
+- **upgrade-smoke-producer-leaks-worktrees-on-signal** [spec: SPEC-scratch-registers-nothing.md]
+  — the upgrade-smoke arm builds each ref's binary in a linked worktree and removes it in `Drop`,
+  which Rust never runs on a signal. So a run killed from outside leaves a registration in the
+  host's `.git/worktrees/`, and the next iteration-boundary entry refuses behind it.
+  **Ruled at spec 2026-09-21:** a shared local clone under the scratch base replaces the worktree.
+  That designs the leak away, SIGKILL included, and it settles all three questions the entry
+  carried. No signal handler is needed, so no dependency or `unsafe` is spent. The pre-spec
+  premise was stale anyway: `libc` is already admitted on unix. No reaper is needed, because the
+  residue becomes plain scratch. The consumer-smoke twin owes nothing, because its residue was
+  always scratch. The shape mints one rule, that a scratch-writing member registers nothing
+  outside its scratch base, held by a crate unit test. That rule makes this unit a feature. The
+  grounds and the priced alternatives are in the amendment.
+  Distinct from `upgrade-smoke-refuses-inside-a-worktree` (running inside one) and from the
+  worktree-detector entries.
+  Filed 2026-09-04 at the close of `wait-probe-cut-and-stage-journal-absence`. Joined
+  `scratch-hermeticity` by operator direction (2026-09-21, lead-relayed) and was promoted at its
+  spec stage. **DoD:** the amendment's own list, and the entry moves to Done before the drain
+  stage.
+
 ## Technical Debt
 
 - **check-kit-roots-dialect-leaks-a-scratch-tree-per-run**
@@ -102,8 +121,20 @@
   Filed 2026-08-23 by validate; the close drain re-ran the survey oracle and got 16/11/7 with the
   same seven names.
   **Promoted 2026-09-21 into `scratch-hermeticity`** by operator direction (lead-relayed). Debt:
-  both shapes converge on knobs the specs already carry. The shape is ruled at this iteration's
-  spec stage, which the set walks for `upgrade-smoke-producer-leaks-worktrees-on-signal`.
+  both shapes converge on knobs the specs already carry.
+  **Shape ruled at spec 2026-09-21: shape 2.** `gate-sdk/lib/test-hermetic.sh` unsets
+  `GATE_SDK_TMP_DIR` and `GATE_SDK_WORKFLOW_DIR`, so a sourcing test resolves both to their
+  relative kit defaults against its sandbox cwd. Grounds: the library's own header says a test
+  "runs on kit defaults, never the invoker's cwd config", and these two knobs are the hole in that
+  contract. Shape 1 would leave the next unpinned test exposed.
+  **Probed at spec:** every explicit pin of either knob in a bespoke test sits after that test's
+  `source …/test-hermetic.sh` line, so the unset overrides no pin. No unpinned test reads either
+  knob. `--run-validate` spawns suites with inherited env and exports neither knob. evidence-kit's
+  path knobs derive from the two roots. **Honest limit:** a derived knob exported directly
+  (e.g. `EVIDENCE_KIT_LOCK_FILE`) still reaches a test; state it in the section's merge text.
+  **DoD:** the unset lands with its §lib/test-hermetic.sh sentence. `producer-lock.test.sh` passes
+  with an absolute `GATE_SDK_TMP_DIR` pointed at a directory holding a live-pid lock (the
+  2026-08-23 reproduction). The entry moves to Done before the drain stage.
 
 ## Deferred
 
@@ -2446,47 +2477,6 @@
   Census command and count landed 2026-09-05 by close, on the lead's ruling that a close moving
   the number without landing its measurement pattern reproduces the defect one iteration later;
   both re-derived 2026-09-05 by build when its own cuts moved the corpus.
-- **upgrade-smoke-producer-leaks-worktrees-on-signal** [cost: event/high] [surface: gate-sdk] — the upgrade-smoke arm
-  removes its worktrees on its own exit paths and traps no signal, so a run killed from outside
-  leaks every checkout it created.
-  **The producer is in-crate and its cleanup is `Drop`.** `native/src/emit/upgrade_smoke.rs`
-  declares `impl Drop for Scratch` (:65-78) over a `worktrees: Vec<String>`, and its own comment
-  at :56-57 says the shell form's `trap` is what that `Drop` replaces. Rust runs no destructor on
-  SIGTERM or SIGKILL, so the claimed equivalence holds on every ordinary exit and fails on exactly
-  the case a trap exists for. The `--run-consumer-smoke` arm shares the shape: its scratch cleanup
-  is `impl Drop for Teardown` (`native/src/emit/run_consumer_smoke.rs`).
-  **Re-verified at the drain rather than taken on the filer's word**, which is what the filing
-  bullet itself asked for: a grep for `trap` and `signal` over both surfaces establishes it, and
-  the two orphans the filing close reaped were stranded by a self-imposed timeout SIGTERM.
-  **Not free residue.** The `--enter-stage` arm's boundary refusal
-  (lifecycle-kit/SPEC.md §bin/enter-stage.sh) REFUSES an iteration-boundary
-  entry behind any linked worktree, writing nothing, while away from the boundary the same scan is a
-  mid-iteration advisory — so one killed run converts into a blocked boundary for whoever arrives
-  next, which is why the filing close met it only as a warning.
-  **DISTINCT from every open worktree entry, checked rather than asserted.**
-  `worktree-lock-pid-is-not-agent-liveness` (retired), `worktree-lock-start-time-guard-untaken` and
-  `worktree-cleanliness-assertion-scopes-to-checkout` are all about the DETECTOR's judgment, and
-  `upgrade-smoke-refuses-inside-a-worktree` is about running INSIDE one. This is the PRODUCER
-  never cleaning up. It re-files none of them and adds no recurrence date to any.
-  **Why design-pending, and it is why this is not fix-shaped.** `native/src/` carries no
-  signal handling anywhere and `native/Cargo.toml:14-16` lists one dependency, `serde_json` — so a
-  SIGTERM trap costs either a new dependency or raw unsafe `sigaction`, and the crate's dependency
-  BAR is engineering judgment gate-sdk/SPEC.md owns, which removes the no-dependency prohibition
-  without touching that bar. Two further undecided shapes: whether cleanup belongs to the producer
-  at all rather than to a reaper the boundary check already implies, and whether the
-  consumer-smoke library owes the same trap.
-  **Deferred, not active, on scope's composition test** (re-grounded 2026-09-11): no iteration
-  since its filing has shared its surface. The icebox tier cannot take it either, because it
-  blocks an iteration-boundary entry and the machinery-class default is conjunctive.
-  **Cost while deferred:** every externally killed validate spine converts one lost run into a
-  refused iteration boundary for the next session, and the remedy is a two-`--force` reap that
-  session has to be told about.
-  Surfaced 2026-09-04 by the close of `wait-probe-cut-and-stage-journal-absence`; drained
-  2026-09-04 at this iteration's scope entry, the boundary having carried it.
-  **Joins `scratch-hermeticity`** as its signalled-producer unit, by operator direction
-  (2026-09-21, lead-relayed); **marked for spec**, which rules the three shapes above (a trap's
-  cost against the dependency bar, producer versus reaper, the consumer-smoke twin) and states
-  whether the chosen shape mints a name. Stays Deferred until that stage pairs it.
 
 - **kit-spec-seam-content-half-unswept** [cost: event/high] [surface: gate-sdk] — the provenance seam has two halves and
   the sweep that ran carried a discriminator for only one, so gate-sdk/SPEC.md is swept of private
