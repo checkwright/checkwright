@@ -12,6 +12,97 @@
 
 ## New Features
 
+- **provenance-seam-commit-sha-shape** [spec: SPEC-seam-reach.md] — neither
+  `check-provenance-seam`'s arms nor the provenance-seam-residue audit class name a commit or
+  digest shape, so a hex object name in a kit SPEC, template or README is caught only by a human
+  reviewer; gate-sdk/SPEC.md §Consumer smoke carried two until a brevity pass cut them.
+  **Re-measured at spec:** the kit SPECs and READMEs carry no lowercase 7-40 hex token with both a
+  letter and a digit, bare or backticked; the one bare-hex hit, evidence-kit/SPEC.md's
+  `2147483646`, is decimal, and the two template hits are pinned action digests (mechanism).
+  **Ruled at spec (2026-09-22):** a hex-reference arm requiring a letter and a digit, bare prose
+  and inline code alike, its all-digit, uppercase and decimal-id misses stated as honest limits;
+  the audit class names the shape over the payload surfaces the gate does not scan.
+  **Cost while deferred:** a commit reference in a kit SPEC ships in every vendored copy.
+  Filed 2026-09-22 to the gap inbox by gate-sdk-surface-drain's close; promoted at the next scope.
+  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its SHA-shape unit.
+
+- **installer-spec-provenance-residue** [spec: SPEC-seam-reach.md] — installer/SPEC.md carries
+  dated operator and lead rulings and CI run ids, job ids, head SHAs and a digest prefix as
+  measurement records, which CLAUDE.md's public-repo rule bars from every tracked file; installer/
+  is not a kit, so `check-provenance-seam`'s corpus and the provenance-seam-residue audit class
+  both skip it. It rides no payload but is public on the repository and on the docs mirror.
+  **Re-measured at spec:** six dated-attribution sentences (plus two later citations of one),
+  seven letter-and-digit hex tokens and fourteen run or job id lines; zero queue slugs,
+  private-surface or agent-file pointers; it is the only repo-root-governed SPEC.
+  **Ruled at spec (2026-09-22), the corpus reach:** the gate takes it, through a consumer glob knob
+  holding the tree's own published records to the provenance arms (never the consumer-roster arm),
+  scanned whatever `CANON_KIT_SCAN_KIT_ROOTS` says; review alone and a hardcoded path were refused.
+  This tree declares installer/SPEC.md in the sweep's commit or after it, never before.
+  **Cost while deferred:** publisher provenance on a public surface.
+  Filed 2026-09-22 to the gap inbox by gate-sdk-surface-drain's close sweep, which reported it out
+  of corpus; promoted at the next scope.
+  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its residue unit.
+
+- **gap-inbox-kit-ref-valve** [spec: SPEC-kit-ref-resolution.md] — `check-kit-ref-liveness` valves
+  the queue file out because the queue is design-ahead and names future knobs and paths, but the
+  gap inbox is design-ahead in the same way and is not valved.
+  **Attested:** a bullet proposing an unminted lifecycle-kit knob by its full prefixed name redded
+  the battery at `config-seam-fourth-cut`'s close, and the filed prose had to describe the knobs
+  instead of naming them.
+  **Ruled at spec (2026-09-22):** the valve limb. The inbox is truncated every close, so a dangling
+  name cannot outlive the boundary; its path is read by `LIFECYCLE_KIT_GAP_INBOX_FILE`, a static
+  row the gate can resolve in process. A filer rule was refused: it keeps the red. The survey
+  record is not valved: it records measurements, and no red there is attested.
+  **Cost while deferred:** a gap filer who names a proposed knob reds the battery and rewords.
+  Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, from the red its own
+  filing hit; promoted at the next iteration's scope.
+  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its valve unit.
+
+- **kit-ref-liveness-stem-token-hole** [spec: SPEC-kit-ref-resolution.md] — a typo'd knob name under
+  a stem kit source spells resolves and passes unchecked, because any token under a defined stem
+  resolves through it.
+  **Premise moved, re-measured at spec:** the composed family the filing cited and the binary's
+  `--knobs` arm it proposed resolving against were both removed. The live hole is two
+  non-family stems, `CANON_KIT_PROSE_TELL_` and `CANON_KIT_COMMENT_`, spelled only as wildcards
+  in a help line and a comment; the real composed families are declared in evidence-kit's static
+  knob table.
+  **Ruled at spec (2026-09-22):** a member resolves through a stem only when a static table declares
+  that stem a family, or when no static table owns the prefix; the narrowing reds nothing on the
+  current tree. A typo'd consumer suffix under a declared family stays a stated limit.
+  **Cost while deferred:** a typo'd knob reference reads as governed and checked while binding
+  nothing — a knob silently never applied, surfacing as behavior, not as a red.
+  Filed 2026-08-10 by close, from the residual build batch 2 identified and did not file.
+  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its stem unit.
+
+- **measured-marker-cannot-sit-mid-paragraph** [spec: SPEC-inline-marker.md] —
+  `check-measured-claim` binds its marker as a full-line comment above a paragraph, so a claim
+  standing mid-paragraph can carry no marker and goes stale unwatched.
+  **Premise moved, re-measured at spec:** the attested instance, TRAJECTORY.md's port-figure
+  paragraph, was retired at a later close, and the file carries no figure now; the contract limit
+  still ships to every adopter, which is what the entry's not-icebox witness rested on.
+  **Ruled at spec (2026-09-22):** an inline marker, written inside a prose line, binds the one
+  sentence it follows; a code-span occurrence is a specimen, not a marker. Which figures to mark
+  stays consumer policy (frozen attestations are not marked), so no sweep rides this unit.
+  **Cost while deferred:** a mid-paragraph measured claim in governed prose goes stale where no
+  gate reaches it, and only a hand sweep finds it.
+  Filed 2026-09-04 by the close of `enter-stage-cut-and-file-authoring-act` into the gap inbox;
+  promoted at a later scope intake.
+  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its marker unit.
+
+- **prose-tell-threshold-validation** [spec: SPEC-threshold-shape.md] — `check-prose-tells`' five
+  numeric thresholds are read through a prefix coercion and never validated, so a typo turns a
+  calibrated gate into a silent no-op or a wall of noise, confidently and with no diagnostic.
+  **Re-measured at spec:** canon-kit's knob-table validator names none of the five, and no tree
+  config or fixture sets one, so every member takes its default.
+  **Ruled at spec (2026-09-22):** refuse at exit 2, the rule canon-kit/SPEC.md §Layout and
+  configuration already states for the table; the fallback was refused as the table's one
+  exception. Maxes are non-negative integers, the rhythm floor an integer of at least two, the
+  variation floor a non-negative decimal.
+  **Cost while deferred:** a consumer typo produces a confidently wrong verdict, and neither
+  failure mode names its cause.
+  Filed 2026-08-19 by close from the gap inbox, which carried it twice.
+  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its threshold unit.
+
 ## Technical Debt
 
 - **kit-spec-singleton-consumer-config-quotes** — kit SPECs quote single values of this repo's
@@ -50,37 +141,6 @@
   exemption the spec already states.
 
 ## Deferred
-
-- **provenance-seam-commit-sha-shape** [cost: event/low] [surface: canon-kit] — neither
-  `check-provenance-seam`'s arms nor the provenance-seam-residue audit class name a commit-SHA
-  shape, so a backticked commit reference in a kit SPEC, template or README is caught only by a
-  human reviewer; gate-sdk/SPEC.md §Consumer smoke carried two until a brevity pass cut them.
-  Probe: a `git grep -E` for a backticked 7-40 hex token over `*/SPEC.md`, `*/templates/*` and
-  `*/README.md`, excluding `docs/`.
-  **Re-measured at promotion:** one hit, evidence-kit/SPEC.md's `2147483646` — a decimal literal,
-  so a bare hex-class arm false-fires on numbers and needs a letter or a length discriminator.
-  **Deliverable:** an arm or a stated honest limit in canon-kit/SPEC.md §check-provenance-seam, and
-  the audit roster's provenance-seam-residue scope naming the shape.
-  **Cost while deferred:** a commit reference in a kit SPEC ships in every vendored copy.
-  Filed 2026-09-22 to the gap inbox by gate-sdk-surface-drain's close; promoted at the next scope.
-  Feature — a new arm changes the gate's asserted behavior; `/spec` authors and promotes it.
-  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its SHA-shape unit.
-
-- **installer-spec-provenance-residue** [cost: event/low] [surface: canon-kit] — installer/SPEC.md
-  carries dated operator and lead rulings and CI run ids, job ids and head commit SHAs as
-  measurement records, which CLAUDE.md's public-repo rule bars from every tracked file; installer/
-  is not a kit, so `check-provenance-seam`'s corpus and the provenance-seam-residue audit class
-  both skip it. Probes over installer/SPEC.md: a `git grep -E` for `ruled <year>-` or `by the
-  operator|lead` (6 hits at promotion), and one for a backticked hex token or nine-digit run id
-  (15). The file is off `installer/package.json`'s `files` roster, so it rides no payload, but it
-  is public on the repository.
-  **Deliverable:** the sweep, plus a ruling on corpus reach — whether the seam gate or the audit
-  class covers a repo-root-governed SPEC.
-  **Cost while deferred:** publisher provenance on a public surface.
-  Filed 2026-09-22 to the gap inbox by gate-sdk-surface-drain's close sweep, which reported it out
-  of corpus; promoted at the next scope.
-  Feature — a corpus-reach ruling changes a gate's scope; `/spec` authors and promotes it.
-  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its residue unit.
 
 - **shell-textual-absoluteness-single-dialect** [cost: event/low] [surface: gate-sdk] — tracked
   shell sites test a path for absoluteness by a leading `/` alone, so a caller-supplied Windows
@@ -495,23 +555,6 @@
   drain by lead decision. Owner lookup: `stamp-subject`, `merge subject`, `git-generated` —
   no entry matched.
 
-- **gap-inbox-kit-ref-valve** [cost: event/low] [surface: canon-kit] —
-  `check-kit-ref-liveness` valves the queue file out by basename because the queue is design-ahead
-  and names future knobs and paths, but the gap inbox is design-ahead in the same way and is not
-  valved.
-  **Attested:** a bullet proposing an unminted lifecycle-kit knob by its full prefixed name redded
-  the battery at `config-seam-fourth-cut`'s close, and the filed prose had to describe the knobs
-  instead of naming them. The valve reads `GATE_SDK_QUEUE_FILE`
-  (`native/src/gates/kit_ref_liveness.rs`), so the inbox has no knob read to join it by today.
-  **Why design-pending:** either the inbox joins the valve (it is truncated every close, so a
-  dangling name cannot outlive a boundary), or the rule that capture prose not spell unminted names
-  is stated where filers read it; the first changes a gate's scanned corpus, the second is prose.
-  **Cost while deferred:** a gap filer who names a proposed knob reds the battery and rewords.
-  Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, from the red its own
-  filing hit; promoted at the next iteration's scope.
-  Feature — either limb changes a scanned corpus or a filer rule; `/spec` authors and promotes it.
-  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its valve unit.
-
 - **config-variant-battery-harness** [cost: event/high] [surface: gate-sdk] — nothing shipped lets a customer run the
   battery under a named config-seam variant and see what changes; the fixture pairs prove each
   gate's arm against fixed trees, and the smoke scripts are this repo's harness legs.
@@ -813,41 +856,6 @@
   Filed 2026-09-08 by close from the gap inbox. Promoted rather than fixed because it is an
   envelope question the operator has already declined once in its wider form; promoted rather than
   iceboxed because the coupling is structural and inherited, which no single green run retires.
-
-- **measured-marker-cannot-sit-mid-paragraph** [cost: event/low] [surface: canon-kit] — `check-measured-claim` binds its
-  marker to the line above the claim, so a claim standing mid-paragraph can carry no marker and
-  goes stale unwatched; TRAJECTORY.md's port figures are the attested instance.
-  **The staleness is attested, not predicted.** The ordering paragraph read "thirty-five owed
-  files" and "28.6 per cent" while a sibling sentence in the same file, edited the same iteration,
-  had already moved to 34. A hand sweep at the 2026-09-04 close caught it; no gate did.
-  **The oracle already exists**, which is what makes this a contract question and not a build:
-  `scripts/measured-claims.sh` emits `tree-shell-owed` off `--emit port-blockers --tree`, and
-  `CANON_KIT_MEASURED_SURFACE_GLOBS` reaches TRAJECTORY.md through `CANON_KIT_MANIFEST_FILES` — yet
-  the file carries ZERO `measured:` markers.
-  **THE DESIGN QUESTION.** canon-kit/SPEC.md §check-measured-claim binds the marker as a full-line
-  HTML comment on the line immediately above the claim, and every shipped instance sits above a
-  bullet or a paragraph. This claim is MID-PARAGRAPH: inserting the comment there splits the
-  rendered paragraph, and hoisting it to the paragraph's top attaches it to a sentence about
-  reopenability rather than to the count. Neither placement is available without a contract change,
-  which is why the fix is not a marker add.
-  **THE SECOND HALF, which a blanket marking policy would lose.** Most TRAJECTORY.md figures are
-  deliberately FROZEN dated attestations, so marking by figure would fight that file's own rule
-  that a dated attestation freezes the claim. The discriminator is a paragraph that self-declares
-  as corrected where it stands at each later reading — which this one does in its own text and its
-  neighbours do not. A sweep keyed on the figure rather than on that declaration is wrong.
-  **Cost while deferred:** low as a carry — a stale port figure in the ruling record misleads the
-  next session sizing a cut, and only a hand sweep finds it.
-  not-icebox-eligible: measured-marker-cannot-sit-mid-paragraph 2026-09-12 witness discriminator.
-  TRAJECTORY.md's own instance is machinery-class, but the contract limit is canon-kit's and ships:
-  an adopter whose governed prose carries a mid-paragraph measured claim receives a gate that
-  silently does not reach it, and a gate's verdict is a product witness under TRAJECTORY.md's
-  2026-08-30 discriminator. The one-line tier would also drop the second half above, which is the
-  half a later ruling turns on.
-  Filed 2026-09-04 by the close of `enter-stage-cut-and-file-authoring-act` into the gap inbox,
-  which no stage of that iteration could drain; carried into this iteration's scope intake and
-  promoted here, so the record is late and says so.
-  Feature — a mid-paragraph marker is new marker grammar; `/spec` authors and promotes it.
-  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its marker unit.
 
 - **kit-knob-consumer-adapter-convention** [cost: event/low] [surface: evidence-kit] — whether a kit may ship
   a knob whose only working configuration requires the consumer to author an adapter, and whether
@@ -1389,30 +1397,6 @@
   false-feeling red.
   Filed 2026-08-09 by close, draining the bullet spec filed under scope-gated intake.
 
-- **kit-ref-liveness-stem-token-hole** [cost: event/high] [surface: canon-kit] — a typo'd knob name under
-  a defined stem resolves and passes unchecked.
-  Build batch 2 widened `check-kit-ref-liveness` so that a dispatch-composed knob
-  name resolves against its defined *stem* rather than requiring a full literal
-  match — the right fix, since names like `GATE_SDK_KNOB_<GATE>_<KNOB>` are
-  composed at dispatch and no full literal exists to match. The residual: any
-  token under a defined stem now resolves, so a misspelling such as
-  `GATE_SDK_KNOB_PRUNE_DIRZ` passes.
-  **Inherent to the shape, not a defect in the fix** — which is why it is filed
-  rather than reverted. A composed name has no enumerable literal set, so tightening
-  means reconstructing the composition rule inside the gate.
-  **Deliverable, and why design-pending:** the candidates are to have the
-  binary answer the question (`--knobs` already reports a gate's knob set, so the
-  gate could resolve a composed token against the live answer rather than a stem)
-  or to constrain the tail to a declared per-gate knob roster. The first is
-  stronger and reuses a seam this iteration just built; it also makes the gate
-  depend on a built binary, which is the trade to weigh.
-  **Cost while deferred:** a typo'd knob reference reads as governed and checked
-  while binding nothing — the failure mode is a knob silently never applied, which
-  surfaces as behavior, not as a red.
-  Filed 2026-08-10 by close, from the residual batch 2 identified and did not file.
-  Feature — either limb changes how the gate resolves a token; `/spec` authors and promotes it.
-  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its stem unit.
-
 - **baseline-row-prose-coupling-gate** [cost: event/low] [surface: canon-kit] — governed prose asserts what
   `.workflow/validate-baseline.txt` holds, and nothing checks it against the file.
   **The instance that bought this entry** was fixed at this close, not deferred: `gate-sdk/SPEC.md`
@@ -1509,32 +1493,6 @@
   Filed 2026-08-17 by close, from re-verifying a gap-inbox bullet; both probes were run before
   the claim was asserted and the compression-vs-eviction split checked against the entry it
   would otherwise have contradicted.
-
-- **prose-tell-threshold-validation** [cost: event/high] [surface: canon-kit] — `check-prose-tells`' numeric thresholds
-  are read unvalidated, so a typo turns a calibrated gate into a silent no-op
-  or a wall of noise, confidently and with no diagnostic.
-  **The count in the filing was wrong and the drain corrected it: five, not six.**
-  canon-kit's static knob table (`native/src/knobs/canon_kit.rs`) defaults
-  `CANON_KIT_PROSE_TELL_EMDASH_MAX`, `_CONTRAST_MAX`, `_RHYTHM_MIN_SENTENCES`, `_RHYTHM_CV_MIN`
-  and `_TRICOLON_MAX` and its validator checks none of them, while it checks other knobs for
-  range and shape (re-read at `config-seam-third-cut`'s close, after the shell library left).
-  `_GLOBS` is the sixth knob the bullet counted and it is an array, not a threshold — a different
-  validation question.
-  **The failure is silent in both directions.** The value is coerced by its leading numeric
-  prefix, so a non-numeric max becomes zero and every paragraph reds, and a non-numeric minimum
-  becomes zero and its assertion can never fire. The compiled form reproduces the coercion
-  **deliberately** — a refusal the shell never made would be a verdict change across the seam.
-  **Why design-pending:** the repair is one validation in canon-kit's knob-table validator,
-  which every reader shares. What is not
-  settled is what a malformed threshold should *do*: refuse the gate at exit 2, matching every
-  other knob in that validator, or fall back to the documented default and report. The first is
-  consistent; the second is kinder to an adopter mid-edit.
-  **Cost while deferred:** a consumer typo produces a confidently wrong verdict, and neither
-  failure mode names its cause.
-  Filed 2026-08-19 by close from the gap inbox, which carried it twice — once from the sixth
-  batch's port survey and once from the port itself; the drain read the validator and counted.
-  Feature — the SPEC states thresholds coerced, not validated; `/spec` authors and promotes it.
-  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its threshold unit.
 
 - **settings-hook-command-path-gate** [cost: event/high] [surface: context-kit] — a hook registration in
   `.claude/settings.json` whose `command` names a renamed or deleted script reds nowhere and
