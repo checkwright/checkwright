@@ -7867,34 +7867,45 @@ tokens into the refusal output (§lib/declaration.sh, where the surviving holder
 carries it and the repair is re-priced). Both are filed as gaps so the debt
 is costed rather than implicit.
 
-**The three declare no knobs, and the `.workflow/` asymmetry that exposes is
-preserved rather than repaired** — because repairing it needs an answer this
-tranche does not have. Both `.workflow/` defaults are hardcoded in the gates while
-the upgrade suite, a reader of the *same* declaration file, resolves the
-directory through `GATE_SDK_WORKFLOW_DIR`. Honouring the knob in the compiled form
+**The three declare no knobs, and the knob-ownership question that leaves open is
+now answered.** A knob no static kit's prefix owns is declared on the `.gate`
+descriptor of the consumer gate that reads it — the row is the name, its shape
+and its default. The name carries no static kit's prefix: a prefixed name is that
+kit's, and a consumer's value there would be a kit literal. It resolves from the
+environment and then the descriptor default; a knob-file layer is not ruled here,
+and the first member that needs file-setting owns that addition, in its own unit,
+together with the descriptor line's grammar. Until that member lands, the
+`knobs::wire` refusal of an unowned name stays as the fail-closed state — loud
+and correct, because no gate in the tree reads such a name yet. The refusal
+fires on a name no kit owns, and also, the door `GATE_SDK_QUEUE_FILE` once opened
+before its repair gave it a row, on a name the **right** kit's prefix spells and
+its table does not declare — a knob whose name carries a live kit's prefix
+resolves is a necessary and not a sufficient condition. That door belongs to the
+first **consumer-owned** knob name, not to `check-installer-no-deps`, which reads
+no knob at all; no member of the thirteen consumer-declared gates has one yet.
+Honouring the `.workflow/` default through its own knob rather than a literal
 would make it a **declared** knob, resolved against the one kit its own name's
-prefix names, never the declaring gate's location (§lib/gate.sh). A knob the
-*consumer* owns has no kit table to resolve against, and `knobs::wire` refuses it
-on every invocation. That is the knob-ownership question the consumer-declared
-tranche must answer for its first knob-declaring member; it is **named here and
-deliberately not answered**, because answering it inside a port whose members need
-no knob would be designing against no case. Keeping the literals leaves the
-asymmetry exactly as visible as it is today.
+prefix names, never the declaring gate's location (§lib/gate.sh) — so the three
+members below now read it that way, repairing the asymmetry with the upgrade
+suite, a reader of the *same* declaration file, that this cohort once left
+standing.
 
-**The open question this paragraph leaves is narrower than its wording suggests,
-and §upgrade-smoke's arm is why.** That reader is an arm-table arm, and it **can**
-declare `GATE_SDK_WORKFLOW_DIR` — it does, and the crate resolves it from
-gate-sdk's table. So what stays open is the narrower question of a knob no kit's
-prefix owns. The asymmetry between
-the literals in the members of this cohort and that arm's resolved value stands
-unchanged and is not repaired here. What this paragraph does **not** claim is that
-a compiled reader is structurally barred from the knob.
+**The open question the previous paragraph leaves is narrower than its wording
+once suggested, and §upgrade-smoke's arm is why.** That reader is an arm-table
+arm, and it **can** declare `GATE_SDK_WORKFLOW_DIR` — it does, and the crate
+resolves it from gate-sdk's table. So what stays open is the narrower question of
+a knob no kit's prefix owns. The asymmetry between the literals in the members of
+this cohort and that arm's resolved value is repaired below, in `check-release-bump`
+and `check-release-declaration-parity` (§lib/declaration.sh), each declaring
+`GATE_SDK_WORKFLOW_DIR` too — a gate-sdk row every reader resolves alike, needing
+no consumer-owned knob at all. What repairing it does **not** claim is that a
+compiled reader was ever structurally barred from the knob.
 
 **`check-release-change-declared` is the family's fourth member, and not a cohort
-member by the port record** — it was born native rather than ported. It rides the
-cohort's `.workflow/` literal and leaves the knob-ownership question above open
-rather than answering it for one member; the only knob it declares is gate-sdk's
-own `GATE_SDK_KIT_DIRS` (§check-release-change-declared).
+member by the port record** — it was born native rather than ported. It once rode
+the cohort's `.workflow/` literal too and now declares `GATE_SDK_WORKFLOW_DIR`
+beside gate-sdk's own `GATE_SDK_KIT_DIRS`, so all three hardcoded readers of this
+directory take the knob (§check-release-change-declared).
 
 **Assertion C's derivation was re-run at the cut, in both directions: zero
 transitions.** The declaration paths moved from `<gates-dir>/<name>.sh` to
@@ -7973,23 +7984,6 @@ member has port work owed rather than a waiver — three held on an unported
 emitter and one on an undetermined criterion 7. **§The consumer remainder cohort
 takes all ten**, folding the first mover in with them, so both clauses are spent
 rather than standing.
-
-**The knob-ownership question this section named is re-pointed rather than
-answered here, and the re-pointing corrects which member owes it.** The text
-above attributes it to `check-installer-no-deps`; probed at the remainder
-cohort, that gate reads **no** knob at all — its only environment read is the
-`GATE_SDK_ROOT` bootstrap every gate script carries to locate `lib/gate.sh`,
-which has no compiled counterpart because a compiled gate sources nothing. The
-question belongs to **the first consumer-owned knob name**, and no member of the
-thirteen has one. What the remainder cohort did meet is the hazard's *other*
-door, and it is worth separating from the one this section described: the
-undeclared-knob refusal fires not only on a name no kit owns, but on a name the
-**right** kit's prefix spells and its defaults do not declare.
-`GATE_SDK_QUEUE_FILE` carried gate-sdk's prefix and was an environment-only
-override every reader spelled inline as `${GATE_SDK_QUEUE_FILE:-…}`, so prefix
-attribution succeeded and no default was found. The repair gave the knob a
-default in its kit, a row of gate-sdk's table now, and it is why *a knob whose name carries a live kit's
-prefix resolves* is a necessary and not a sufficient condition.
 
 ### The consumer remainder cohort
 

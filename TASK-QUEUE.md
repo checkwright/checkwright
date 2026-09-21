@@ -135,39 +135,6 @@
   the counts above. The format change is owed as one rooted form, `knob:<NAME>/<glob>`, and every
   consumer-path literal becomes a token by a four-class rule.
 
-- **bridged-knob-owner-for-consumer-gate** [spec: SPEC-consumer-knob-row.md] —
-  every knob resolves against a static
-  kit table, so a consumer-declared ported gate that needs a consumer-owned knob is refused on
-  every invocation with no table able to answer it.
-  **RE-GROUNDED 2026-09-15 at `config-seam-fourth-cut`'s close, which retired the bridge this
-  entry was first written against.** `knobs::wire` (native/src/knobs/mod.rs) answers a locator
-  from the environment and any other name from its owning kit's table, and refuses a name no
-  static kit owns — including one spelled with the right kit's prefix that its table does not
-  declare (gate-sdk/SPEC.md §The declaration cohort states the open question as belonging to the
-  first consumer-owned knob name). The gate's *location* still plays no part: a consumer gate
-  declaring `GATE_SDK_WORKFLOW_DIR` resolves. What is absent is a consumer-owned row set.
-  **Visible today as an asymmetry rather than a red.** `native/src/gates/release_bump.rs` and
-  `native/src/gates/release_declaration_parity.rs` each hardcode a workflow-dir const while
-  `native/src/emit/upgrade_smoke.rs` resolves the same file through `GATE_SDK_WORKFLOW_DIR`, a
-  knob it declares. The tenth cohort's three members declare no knobs, so nothing fails yet.
-  **DISTINCT from `consumer-gate-port-disposition`, landed, which it cites rather than re-files.**
-  That entry owned the *declaration* question — the owner column and conservation row, authored
-  this iteration — and this owns the *dispatch* question, which that amendment names and
-  deliberately leaves unanswered because no member of its first tranche declares a knob.
-  **Why design-pending:** the three candidates filed here were bridge-shaped (widen a sourced
-  search path, borrow a kit prefix, name a resolving library) and none survives the static table:
-  the prefix borrow is refused as undeclared too. The fork is unre-derived — where a consumer
-  declares a row (its own knob table, or the `.gate` descriptor) — and that is the design owed.
-  **Cost while deferred:** paid in full by the first knob-declaring member of the remaining
-  consumer tranche, and paid as exit 2 on every invocation — a gate that cannot run rather than
-  one that answers wrongly, so it surfaces loudly rather than silently. Zero until then, which
-  is why it files rather than fixes: nothing is wrong in the tree today.
-  Filed 2026-08-15 by close, draining the gap inbox; mechanism re-derived against
-  `gate-sdk/lib/gate.sh` at the drain and the bullet's account corrected here.
-  **Ruled at spec (2026-09-21):** a consumer-owned row is declared on the descriptor of the gate
-  that reads it. Nothing is built until a member needs one. The `.workflow/` asymmetry is repaired
-  now, through `GATE_SDK_WORKFLOW_DIR`.
-
 - **in-crate-module-coupling-derivation** [spec: SPEC-module-couples.md] —
   a ported gate's descriptor can omit
   the crate modules its own verdict depends on, and no gate says so.
@@ -2615,5 +2582,6 @@
 
 - join-primitive-dataflow-unasserted
 - install-disposition-smoke-accounting-split
+- bridged-knob-owner-for-consumer-gate
 
 ## Lessons Learned

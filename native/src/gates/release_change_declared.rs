@@ -8,7 +8,6 @@ use crate::{proc, programs};
 use std::path::Path;
 
 const NAME: &str = "check-release-change-declared";
-const DEFAULT_DECL: &str = ".workflow/release-declarations.md";
 const SECTION: &str = "Behavior changes";
 
 pub fn run(args: &[String]) -> i32 {
@@ -203,11 +202,11 @@ fn declared(bullets: &[&str], path: &str) -> bool {
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let decl_file = args
-        .first()
-        .filter(|a| !a.is_empty())
-        .map(String::as_str)
-        .unwrap_or(DEFAULT_DECL);
+    let decl_file = match args.first().filter(|a| !a.is_empty()) {
+        Some(a) => a.clone(),
+        None => format!("{}/release-declarations.md", walk::knob_scalar("GATE_SDK_WORKFLOW_DIR")?),
+    };
+    let decl_file = decl_file.as_str();
     let canned = match (args.get(1), args.get(2)) {
         (Some(d), Some(b)) => Some(Canned {
             dump: read_opt(d)?.ok_or_else(|| format!("canned change dump not found: {}", d))?,

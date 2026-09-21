@@ -11,7 +11,6 @@ use std::path::Path;
 
 const NAME: &str = "check-release-declaration-parity";
 const DEFAULT_POSTS: &str = "docs/posts";
-const DEFAULT_DECL: &str = ".workflow/release-declarations.md";
 const SECTIONS: [(&str, TokenRule); 3] = [
     ("Tightened gates", TokenRule::GateName),
     ("Renamed knobs", TokenRule::Backticked),
@@ -50,11 +49,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
         .filter(|a| !a.is_empty())
         .map(String::as_str)
         .unwrap_or(DEFAULT_POSTS);
-    let decl_file = args
-        .get(1)
-        .filter(|a| !a.is_empty())
-        .map(String::as_str)
-        .unwrap_or(DEFAULT_DECL);
+    let decl_file = match args.get(1).filter(|a| !a.is_empty()) {
+        Some(a) => a.clone(),
+        None => format!("{}/release-declarations.md", walk::knob_scalar("GATE_SDK_WORKFLOW_DIR")?),
+    };
+    let decl_file = decl_file.as_str();
     if !Path::new(posts).is_dir() {
         return Err(format!("posts dir not found: {}", posts));
     }
