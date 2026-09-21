@@ -4,3 +4,7 @@ claude\.com/claude-code
 
 claude\.ai/
 ^[A-Za-z][A-Za-z-]*: .*[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}
+
+# Account-identification class — a handle-shaped backticked token near an
+# account noun. Cite the role, never the account; a CLI name is not a handle.
+(^|[^A-Za-z])(accounts?|logins?|usernames?|handles?)[^A-Za-z`-][^`]{0,6}`([a-z]*[0-9A-Z][A-Za-z0-9_.-]*|[a-z]+[_.-][A-Za-z0-9_.-]*|[_.-]+[A-Za-z0-9][A-Za-z0-9_.-]*|[a-z]{6,})`|`([a-z]*[0-9A-Z][A-Za-z0-9_.-]*|[a-z]+[_.-][A-Za-z0-9_.-]*|[_.-]+[A-Za-z0-9][A-Za-z0-9_.-]*|[a-z]{6,})`[^A-Za-z`][^`]{0,6}(accounts?|logins?|usernames?|handles?)([^A-Za-z-]|$)

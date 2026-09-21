@@ -183,7 +183,7 @@ mod tests {
         let pats = [
             "/(home|Users)/[A-Za-z0-9._-]+",
             "^[A-Za-z][A-Za-z-]*: .*[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
-            "(^|[^A-Za-z])(account|login|username|handle)[^A-Za-z`-][^`]{0,6}`([a-z]*[0-9A-Z_.-][A-Za-z0-9_.-]*|[a-z]{6,})`|`([a-z]*[0-9A-Z_.-][A-Za-z0-9_.-]*|[a-z]{6,})`[^A-Za-z`][^`]{0,6}(account|login|username|handle)([^A-Za-z-]|$)",
+            "(^|[^A-Za-z])(accounts?|logins?|usernames?|handles?)[^A-Za-z`-][^`]{0,6}`([a-z]*[0-9A-Z][A-Za-z0-9_.-]*|[a-z]+[_.-][A-Za-z0-9_.-]*|[_.-]+[A-Za-z0-9][A-Za-z0-9_.-]*|[a-z]{6,})`|`([a-z]*[0-9A-Z][A-Za-z0-9_.-]*|[a-z]+[_.-][A-Za-z0-9_.-]*|[_.-]+[A-Za-z0-9][A-Za-z0-9_.-]*|[a-z]{6,})`[^A-Za-z`][^`]{0,6}(accounts?|logins?|usernames?|handles?)([^A-Za-z-]|$)",
         ];
         let res: Vec<Ere> = pats
             .iter()
@@ -195,12 +195,16 @@ mod tests {
         assert!(hit(&format!("see /{}/someone/x for the log", "home")));
         assert!(hit("Session-Id: 3f2504e0-4f89-41d3-9a0c-0305e82c3301"));
         // spec: gate-sdk/SPEC.md §check-commit-msg — the account-identification class matches a
-        // handle-shaped token in both directions, and leaves alone both the role spelling it
-        // steers prose toward and the CLI name a short all-lowercase token is
+        // handle-shaped token either side of a singular or plural noun, never a role, CLI name
+        // or punctuation-only token
         let noun = ["account", "login"];
         assert!(hit(&format!("the active forge {} was `acct-0`", noun[0])));
         assert!(hit(&format!("the `acct-1` {} was the other one", noun[1])));
+        assert!(hit(&format!("the {}s were `acct-0` and `acct-1`", noun[0])));
+        assert!(hit(&format!("two {}s: `acct-0`, `acct-1`", noun[1])));
         assert!(!hit("the account carrying `workflow` scope pushed the tag"));
+        assert!(!hit("the guard handles a `..` traversal"));
+        assert!(!hit("the wrapper handles `gh` before the push"));
         assert!(!hit("check the login with `gh` before pushing the tag"));
         assert!(!hit("the `usage-verdict` login-window reroute is the case"));
         assert!(!hit("Co-Authored-By: A Contributor <noreply@example.com>"));

@@ -1,0 +1,2 @@
+Near misses for the account-identification shape: the resolver handles a `..`
+traversal segment, and the wrapper handles `gh` before it pushes the tag.

@@ -107,6 +107,7 @@ fi
 out="$( cd "$CASES/bad" && gate_run check-tree-terms "$CHECKS" tree patterns.list 2>&1 )"; rc=$?
 got="$(grep -E '^tree/' <<<"$out")"
 want="$(printf '%s\n' \
+    'tree/accounts.txt:1:' \
     'tree/leak.txt:1:' \
     'tree/multi.txt:1:' \
     'tree/multi.txt:3:' \

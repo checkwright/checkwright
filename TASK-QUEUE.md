@@ -12,47 +12,6 @@
 
 ## New Features
 
-- **account-noun-plural-slips-the-shape** [spec: SPEC-account-noun-plural.md] —
-  the account-identification pattern matches a singular account noun only, so the plural form
-  passes both readers.
-  **Probed rather than reasoned, at this close.** Feeding a three-line sample through
-  `grep -nE -f scripts/msg-patterns.list` matches the singular line and matches NEITHER plural:
-  the
-  noun alternation is `(account|login|username|handle)` followed by a required non-letter, and a
-  trailing `s` is a letter, so the boundary fails in BOTH orderings of the shape. The reach is
-  wider than the limit was reported as — `accounts` slips with `logins`.
-  **THE HOLE IN THE FORM THAT MATTERS, because the plural is not an exotic phrasing but the
-  natural way to write the exact leak this pattern exists to catch.** A sentence of the shape
-  *"the accounts were X and Y"*, with X and Y handle-shaped and backticked, passes both readers
-  clean — while the singular *"the account is X"* reds. So the guard is strongest against the
-  phrasing that names ONE identity and weakest against the phrasing that names SEVERAL, which is
-  the correlation case, and inverts the pattern's own stated rationale that naming an account
-  correlates identities. The bad-fixture sentence a fix should pin is that one, not a contrived
-  minimal pair.
-  **Where the limit currently lives, and why that is the filing's whole point.** It is stated in
-  commit `3763bc3e`'s body ("the plural form slips: tolerating it was measured and still costs
-  three rewordings of prose that is not wrong") and NOWHERE in `gate-sdk/SPEC.md`
-  §check-commit-msg, which records only the OTHER limit that commit names — that account topology
-  is a proposition no token pattern reaches. Verified by grepping that commit's own SPEC diff. So
-  the limit is held in history, and history answers what happened, never what is correct
-  (CLAUDE.md §Delivery doctrine, spec-over-precedent).
-  **The tolerance was a measured choice, not an oversight.** Extending the noun set to plurals
-  reddened tracked sentences that were not wrong, and the tree-exact calibration counts that cost.
-  **Ruled at spec on 2026-09-21: move one**, plurals on both readers
-  (SPEC-account-noun-plural.md). The re-measure found one rewording where the filing recorded
-  three.
-  **Cost while deferred:** the leak class the pattern was built for reaches public history through
-  one letter, and nobody reading the SPEC learns that — the section's stated scope reads as
-  complete.
-  Filed 2026-08-26 by close, triaging a build finding relayed through the lead.
-  **Joins `release-declaration-coupling`** as its first declaration subject, by operator
-  direction (2026-09-21, lead-relayed); **promoted 2026-09-21 at spec**. The chosen move tightens
-  a kit-shipped template, which is exactly the event `shipped-config-tightening-undeclared` rules
-  on, so this unit is spelled against that ruling.
-  **Enhancement admission filter, engaged 2026-09-21 at scope:** admitted on the trust arm — the
-  pattern is the identity-leak guard, and its section's stated scope reads as complete while the
-  plural passes.
-
 - **release-body-step-has-no-in-tree-witness** [spec: SPEC-release-body.md] — the one release
   step whose product lives off the tree is the one that was skipped, and its only backstop is
   next-day.
@@ -3053,5 +3012,6 @@
 - shipped-config-tightening-undeclared
 - release-note-removal-declaration-uncoupled
 - shipped-bin-removal-deprecation-path
+- account-noun-plural-slips-the-shape
 
 ## Lessons Learned

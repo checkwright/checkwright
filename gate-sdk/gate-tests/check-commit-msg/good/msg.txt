@@ -6,5 +6,7 @@ Pushed by the account carrying `workflow` scope, cited by role rather than
 by handle, which is the spelling the account-identification pattern leaves
 alone. Mechanism prose is left alone too: check the login with `gh` before
 pushing, because a short all-lowercase token is a CLI name, not a handle.
+The resolver handles a `..` traversal, and the wrapper handles `gh` first:
+a token of punctuation alone is not a handle either.
 
 Co-Authored-By: A Contributor <noreply@example.com>

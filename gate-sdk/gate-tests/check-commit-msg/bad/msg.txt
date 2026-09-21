@@ -4,5 +4,6 @@ Adjust the debounce so a fast drag coalesces into one layout pass.
 
 The active forge account was `fixture-acct-0`, the non-writer, and the
 `fixture-acct-1` login was the other one.
+The accounts were `fixture-acct-0` and `fixture-acct-1`, one per machine.
 
 Session-Id: 3f2504e0-4f89-41d3-9a0c-0305e82c3301

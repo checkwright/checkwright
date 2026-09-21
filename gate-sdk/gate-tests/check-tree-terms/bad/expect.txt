@@ -4,3 +4,4 @@ tree/multi.txt:1:two leaks on one line: /home/alice/one and /home/bob/two
 tree/multi.txt:3:one leak on its own line: /home/carol/three
 tree/multi.txt:4:one leak on its own line: /home/carol/three
 tree/second-leak.txt:2:a single line: the promo URL claude.com/claude-code is banned here too.
+tree/accounts.txt:1:The forge accounts were `fixture-acct-0` and `fixture-acct-1`, one per machine.

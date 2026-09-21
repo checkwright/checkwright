@@ -1049,7 +1049,7 @@ files.
 projection** (tracked, committed, gate-read) or **local capture** (gitignored,
 advisory, drained by a named reclaim path). A member that is neither tracked nor
 ignored is the drift state `check-workflow-tiering` refuses: an uncommitted file
-no reviewer sees and no `.gitignore` line accounts for.
+no reviewer sees and no `.gitignore` line covers.
 
 **The header requirement follows tracking, and it must.** Local capture's
 reclaim path is whole-file truncation (`: > <file>`, the shape every capture
@@ -17889,12 +17889,17 @@ account filling it, because forge accounts are volatile and naming one
 correlates identities. A denylist of names cannot carry that rule: it catches
 only a name someone already thought to list, and the attested leak was a handle
 nobody had listed. So the shipped pattern matches the shape — a **handle-shaped**
-backticked token within a few characters of an account noun, in either order —
-and spells no handle, domain or project term of its own, which is what lets it
-ship tracked rather than local (§The provenance seam) and hold in a
-fresh clone carrying no private list. Handle-shaped **excludes a short
-all-lowercase token**, which is a CLI name — `gh`, `git`, `npm`, `cargo`, `ssh`
-— rather than an account.
+backticked token within a few characters of an account noun, **singular or
+plural**, in either order — and spells no handle, domain or project term of its
+own, which is what lets it ship tracked rather than local (§The provenance seam)
+and hold in a fresh clone carrying no private list. The plural is not optional
+coverage: a sentence naming several identities at once is the correlation case
+itself, so a singular-only noun would leave the guard weakest exactly where its
+reason for existing is strongest. Handle-shaped **excludes a short all-lowercase
+token**, which is a CLI name — `gh`, `git`, `npm`, `cargo`, `ssh` — rather than
+an account, and **requires at least one letter or digit**, since no forge handle
+is punctuation alone. POSIX ERE has no lookahead, so that requirement is spelled
+by splitting the token on its first non-lowercase character.
 
 **That exclusion is what makes it tree-exact, and tree-exact is a stricter
 calibration than a message-only guard would take.** One pattern source feeds two
@@ -17904,7 +17909,13 @@ worth paying for a guard that must not under-refuse. An over-refusal in the
 *tree* is a standing red clearable only by rewriting prose that was never wrong,
 and rewriting a tracked sentence to satisfy a heuristic inverts the rule the
 heuristic serves — flatly so where that sentence is a quotation, which editing
-would falsify. So where the two tolerances disagree the tree's wins.
+would falsify. So where the two tolerances disagree the tree's wins. The plural
+was weighed against that rule rather than exempted from it: with the
+letter-or-digit requirement it matched one tracked sentence, which was not a
+quotation and was reworded once, and the over-refusal it accepts is a verb
+reading of *accounts* or *handles* beside a handle-shaped token. That single
+rewording bought back the correlation case. It is not licence to reword prose
+whenever the heuristic reds; a sentence that is a quotation still wins.
 
 **Its honest limit, stated rather than discovered:** the scope is handle
 identification and nothing wider. Account *topology* — that one machine holds

@@ -202,13 +202,17 @@ mod tests {
     #[test]
     fn the_fixture_patterns_compile_and_the_anchored_shape_stays_anchored() {
         let res = fixture_patterns("good");
-        assert_eq!(res.len(), 4, "the good case's blank line is not a pattern");
+        assert_eq!(res.len(), 5, "the good case's blank lines and comments are not patterns");
         let hit = |s: &str| res.iter().any(|r| r.is_match(s));
         assert!(hit(&banned_home_path()));
         let uuid = "3f2504e0-4f89-41d3-9a0c-0305e82c3301";
         assert!(hit(&format!("Session-Id: {}", uuid)));
         assert!(!hit(&format!("  Session-Id: {}", uuid)));
         assert!(!hit(&format!("a-bare-uuid {} with no trailer key", uuid)));
+        let noun = "account";
+        assert!(hit(&format!("the forge {}s were `acct-0` and `acct-1`", noun)));
+        assert!(!hit("the resolver handles a `..` traversal segment"));
+        assert!(!hit("the wrapper handles `gh` before it pushes the tag"));
     }
 
     // spec: gate-sdk/SPEC.md §check-tree-terms — a GNU escape in a consumer's pattern file is
