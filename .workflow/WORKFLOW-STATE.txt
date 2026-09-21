@@ -11,3 +11,4 @@ release-declaration-coupling build ad9e7863 2026-09-21 d23a298a
 release-declaration-coupling build abb9c8e9 2026-09-21 cbcfba48
 release-declaration-coupling build a13720ff 2026-09-21 fd45484b
 release-declaration-coupling validate a365a4e1 2026-09-21 4274257f
+release-declaration-coupling close a70c0366 2026-09-21 d53b9d11
