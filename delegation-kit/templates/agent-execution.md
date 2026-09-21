@@ -11,14 +11,14 @@ For a **deletion, rename, or heavy cross-spec audit** dispatch, also load the
 mechanical pre-flight in [dispatch-checklists.md](dispatch-checklists.md) — a
 reach-through, not a change to this protocol; every rule below still applies.
 
-Three passages below — the **Background + notification, never poll** and
+Four passages below — the **Background + notification, never poll** and
 **Findings you will act on are durable before you act on them** bullets, and the
-child-side clause of isolation cost **(3)** — bind a dispatched role that
-fires no trigger loading this template, so each is also stated as a bare
-imperative in the consumer's always-loaded agent definition under
-delegation-kit/SPEC.md §Operative residency. That copy is sanctioned rather than
-drift: do not delete it on sight, and when any of the three changes here,
-propagate.
+child-side clauses of isolation cost **(3)**, the resume check included — bind a
+dispatched role that fires no trigger loading this template, so each is also
+stated as a bare imperative in the consumer's always-loaded agent definition
+under delegation-kit/SPEC.md §Operative residency. That copy is sanctioned
+rather than drift: do not delete it on sight, and when any of the four changes
+here, propagate.
 
 - **Supervisor owns rulings; agents surface, never guess.** SECURITY and design
   rulings (e.g. a privileged caller set, a naming collision) are decided by the
@@ -228,7 +228,11 @@ propagate.
   `git check-ignore` decides it. **And the child's side of it, on cost (4)'s
   pattern:** a target absent inside isolation because it is untracked or
   gitignored is a **blindness**, never a finding of absence — name the path, say
-  it was unreadable at this rev, and return.
+  it was unreadable at this rev, and return. And one more check on the child's
+  side, at every resume as well as at the start: dispatched under isolation,
+  confirm that your top level is a linked worktree (`git rev-parse --git-dir`
+  differs from `git rev-parse --git-common-dir`). If it is not, your isolation
+  is gone: stop, say so, and return without running the work.
   **(4) A gate dispatched to a compiled binary does not resolve inside an
   isolated worktree, and the lawful response is to report it, never to build
   one.** Build output is gitignored and in no commit, so by (3) a fresh worktree
@@ -238,7 +242,11 @@ propagate.
   repair**: do not read it as a verdict, and **do not build the binary** — a build
   is a mutation, and it is exactly the mutation isolation was bought to prevent
   for an agent dispatched read-only. Name the gate that could not run, say why,
-  and return; the parent's checkout has the binary and can run it.
+  and return. **The dispatcher's half, on (3)'s pattern:** a sweep whose work
+  includes a binary-dispatched gate or arm is not delegable into isolation as an
+  oracle-running sweep. Run the arm in your own checkout, write its output under
+  your scratch dir, and name that file absolute into the main checkout in the
+  prompt. Classify before you dispatch, never after you read the answer.
   **One exception, and it is the consumer's to supply rather than yours to
   assume**: the **turn-end liveness reader** may already be resolved for you by
   the consumer's adapter (delegation-kit/SPEC.md §The turn-end liveness hook
@@ -331,7 +339,10 @@ propagate.
   returning. A **stop signal takes the same shape** — a sentinel the child
   checks — so it is cooperative by construction and a wedged child stays out of
   reach. **(2) Return-value only, otherwise** — a fan-out needing no mid-run
-  channel needs no artifact, which is the read-only carve-out above. **(3) The
+  channel needs no artifact, which is the read-only carve-out above. Say so in
+  the prompt of every isolated read-only dispatch: its report is its final
+  message, or the harness's hand-back where it has one, and it sends to no peer.
+  **(3) The
   downward half is a dispatch-shape rule** — a dispatcher that wants control
   over its fan-out dispatches in the background and keeps the handle; what
   actually failed was a dispatcher blocked on a foreground dispatch, holding
@@ -352,7 +363,11 @@ propagate.
 - **A finished child is addressed by the task-id its completion notification
   carried, never by its name.** Resuming a returned agent to correct or extend
   its work is the cheap alternative to a cold re-dispatch, and it is the one
-  that keeps the child's own reasoning instead of paying to rebuild it. The name
+  that keeps the child's own reasoning instead of paying to rebuild it. A child
+  dispatched under isolation comes back without it: the resume runs in the main
+  checkout, with its worktree gone. Resume an isolated child only to have it
+  re-emit what it already holds, as isolation cost (5)'s recovery does; work
+  that needs the tree again is a new isolated dispatch. The name
   is not a durable address for that: a name live at dispatch stops resolving once
   the dispatching session is compacted, while the task-id from the notification
   resumes the same child from its transcript and is the handle the

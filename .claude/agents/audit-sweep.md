@@ -23,6 +23,10 @@ half: deciding whether each candidate actually violates the stated rule.
   gitignored is the same shape: report a **blindness**, never a finding of
   absence — name the path, say it was unreadable at this rev, and return (isolation cost
   (3), same surface).
+- **Confirm your isolation at every start and every resume.** Dispatched under
+  isolation, your top level must be a linked worktree (`git rev-parse --git-dir`
+  differs from `git rev-parse --git-common-dir`); if it is not, stop, say so, and
+  return without running the work (isolation cost (3), same surface).
 - **Report a verdict per finding, not a grep dump.** Each finding names its
   file and location, what the rule requires, how the text departs from it, and
   how confident you are. A candidate you inspected and cleared is worth one

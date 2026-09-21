@@ -733,7 +733,22 @@ third cost carried no such clause, so an isolated child asked to read a
 gitignored path reports **absence** as a finding, which is the exact shape a
 parent cannot tell from a true empty. With an empty roster the *not delegable at
 all* clause is simply never reached, which is the correct inert behavior and
-needs no second knob to express.
+needs no second knob to express. Cost (4) carries the matching dispatcher half:
+an oracle-running sweep is classified before dispatch, and the arm's output is
+handed over as a file named absolute into the main checkout, which an isolated
+child reads as it writes its journal. That is not the gitignored surface cost
+(3) rules out: cost (3) is about a path the child resolves inside its worktree,
+which carries no gitignored file, while a path named absolute into the main
+checkout reaches the main checkout's file, the resume-journal rule's route for a
+child's writes. Measured: an isolated sweep sent to run a binary-dispatched arm
+spent a full round trip returning blindness on a fact decidable before dispatch,
+and finished once re-dispatched with the arm's stdout materialized that way. A
+guard assertion is declined on cost (3)'s ground — the payload carries the
+prompt and never the oracles a sweep will run — and always-loaded residency by
+§Operative residency's condition (a), since the dispatcher fires the trigger
+that loads the template. A shared classify-before-dispatch step across (3) and
+(4) was weighed and not taken: it would re-phrase (3)'s *not delegable at all*
+ruling for a D2-held type.
 
 **Two candidate owners were weighed and both refused.** *At this guard*: the
 payload carries `subagent_type`, `isolation` and prompt text and never the
@@ -747,6 +762,25 @@ a delegable sweep's corpus is frequently not that roster. The constraint
 therefore belongs where the dispatcher reads its protocol, and the narrower
 emitter-side repair stays available rather than being absorbed here.
 
+**D2 is evaluated once, at dispatch, and a resume does not re-enter it.** D2
+holds a read-only claim to isolation because isolation makes the claim. A
+`SendMessage` resume of an isolated read-only child runs in the main checkout,
+its worktree gone, with the write reach D2 would have refused at dispatch —
+measured: a child that reported its own linked worktree at dispatch, resumed
+after it handed back, printed the main checkout as `pwd` and toplevel, with the
+main checkout alone in `git worktree list`. Nothing in the resume's `PreToolUse`
+payload names the recipient's type or isolation, and the dispatch payload
+carries a `tool_use_id` but not the agent id a resume addresses, so the guard
+cannot see the resume. A join would need a second, post-dispatch hook writing a
+map from agent id to dispatch shape, and a state file, for one class; that is
+declined as the heavier shape, whatever the post-dispatch payload carries. The
+template therefore treats a resumed isolated dispatch as a new dispatch for any
+work over the tree. It restricts the resume to re-emitting what the child holds,
+and has the child confirm its own linked worktree at every start. The child's
+check is a request, delivered where the child reads it (§Operative residency).
+What it removes is a resume running the work unconfined; nothing refuses a child
+that skips it.
+
 **D3 advises rather than blocks**, and both halves are deliberate. It cannot
 block: a nested dispatch is legitimate and common — a stage session's own
 read-only fan-out *is* a grandchild dispatch — so blocking would remove a
@@ -758,6 +792,20 @@ out for D3: keying on whether the prompt text "names a path" — that fires on
 the word and teaches dispatchers to game the wording, buying a green hook and
 no channel. The `agent_id` trigger is exact and unforgeable; the message
 carries the judgment the trigger cannot.
+
+**The return-value obligation of an isolated read-only child is carried by the
+dispatcher's prompt, not by this guard and not by the kit.** Nothing carries
+D3's warning into the child: an isolated read-only child whose report went to a
+peer name it could not resolve returned a bare `.`, twice at one close, and a
+bare `.` reads as a sweep that found nothing. The template's disposition (2) has
+the dispatcher say so in the prompt. Two other carriers were weighed. **The
+guard rewriting the prompt** was declined: it would make this guard an author of
+dispatch text rather than a judge of dispatch shape, for a class that has not
+reproduced since the harness began stating the hand-back duty in the child's
+own prompt (re-measured twice, the second time on a 46-tool-use isolated sweep).
+**The agent-type definition** is the consumer's surface, since the kit ships no
+agent-type names (§Layout and configuration, `DELEGATION_KIT_READONLY_TYPES`); a
+consumer may carry the line there as well, in the type's own return contract.
 
 **Degradation — fail-open, but loud**, the posture guard-kit/SPEC.md §The guard
 framework names for a deny-guard whose matcher proves the tool but whose rule
@@ -1015,7 +1063,9 @@ section records for the provenance floor. The isolated child's blindness clause
 goes the other way and qualifies on its own (a)–(c) reading: it binds a
 dispatched read-only agent, which fires no trigger that loads the template, and
 the carrier already stating the sibling gate-unavailability clause takes the new
-one beside it.
+one beside it. The child's linked-worktree check at start and at resume
+qualifies on the same reading and rides the same carrier: it binds the same
+child, and neither its start nor a resume loads the template.
 
 **No gate is owed *over the act*, and not for budget — but one is now owed over
 its harm, and it exists.** No check can read a session's choice to end a turn:
