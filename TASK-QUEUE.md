@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: gate-sdk-surface-drain
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,20 @@
 ## New Features
 
 ## Technical Debt
+
+- **armed-by-census-unrun** — gate-sdk/SPEC.md §The install disposition mints a
+  `# armed-by: <KNOB>` directive so `doctor` names a registered member that asserts nothing while
+  its knob is empty, and no census has asked which other members owe it.
+  **Re-verified at this scope, and the filing's count has moved:** three shipped descriptors now
+  declare it (`check-portability-floor`, `check-projection-roster`,
+  `check-docs-highlight-coverage`), against the one the close drain found.
+  **Deliverable:** a census of the zero-config members whose SPEC section states an
+  absent-config degradation to assert-nothing (the `check-graph` / `graph-vocab.knobs` pattern
+  is the first candidate), each either declaring `# armed-by:` or stated as always armed.
+  **Cost while deferred:** such a member ships to every adopter registered and silent.
+  Filed 2026-09-19 to the gap inbox at `adopter-floor-conditional-members`' spec; promoted
+  2026-09-21 into `gate-sdk-surface-drain` by operator direction (lead-relayed). Debt: it applies a
+  directive the spec already carries and mints no name.
 
 ## Deferred
 
@@ -171,6 +185,7 @@
   Filed 2026-09-20 by close's drain, off a build-stage gap bullet; owner lookup
   ran over `join`, `dataflow`, `primitive` and `path-dialect` across the pool
   and found only the shell half above.
+  **Marked for spec** (operator direction, 2026-09-21): the join arm's dataflow predicate and reach.
 
 - **stage-evidence-prefix-doubles-a-separator** [cost: event/low] [surface: lifecycle-kit]
   — `check-stage-evidence`'s path relativizer composes its not-under arm from
@@ -254,6 +269,7 @@
   §Porting to Rust does not retire dialect exposure. Split authorized by lead decision 2026-09-20
   on §check-queue-entry-budget's split-candidate test, the parent's two deliverables having taken
   different dispositions by demonstration.
+  **Marked for spec** (operator direction, 2026-09-21): what a red cwd-anchor site becomes.
 
 - **couples-knob-token-empty-expansion-passes-silently** [cost: once/low] [surface: gate-sdk]
   — a `knob:` couples token whose expansion resolves to an **empty member set** is silently accepted
@@ -279,6 +295,7 @@
   Owner lookup: `expand_couples`, `couples=`, `knob:`, `empty expansion` — none carrying it.
   `gates-must-not-bind-to-document-paths` is **adjacent and distinct**: which paths a manifest may
   name, not whether a token expands to nothing.
+  **Marked for spec** (operator direction, 2026-09-21): the tightening and its declaration.
 
 - **consumer-shaped-regressions-invisible-to-build-oracles** [cost: event/low] [surface: gate-sdk]
   — both of this iteration's validate regressions were green in this tree and red only in a
@@ -300,6 +317,7 @@
   Filed 2026-09-20 to the gap inbox at this iteration's validate by the session that repaired both
   regressions; promoted at this close drain.
   Owner lookup: `installer_smoke`, `upgrade smoke`, `GATE_SDK_KIT_DIRS`, `build-time leg` — none.
+  **Marked for spec** (operator direction, 2026-09-21): whether half the class earns a leg.
 
 - **probe-before-assertion-doctrine** [cost: event/low] [surface: doctrine-kit]
   — **returned from the icebox on a judged recurrence.** The rule it asked for shipped:
@@ -523,6 +541,8 @@
   **Cost while deferred:** an adopter evaluating a knob edits the seam, commits, and learns from
   the next red; the preview cohort's false-positive dispositions have no cheap rehearsal.
   Filed 2026-09-11 by consult as a direct entry, the test gap the operator named there.
+  **Held Deferred by the enhancement admission filter, operator direction 2026-09-21
+  (lead-relayed):** a shipped adopter arm reaching none of the three arms.
 
 - **gate-binary-platform-roster-holes** [cost: once/low] [surface: native] — the shipped platform roster held four
   joined triples and two more the installed base plainly wants; **one of the two is discharged and
@@ -670,6 +690,7 @@
   how many gates move and whether the format change is owed.
   Surfaced 2026-09-10 as above; the full probed body via
   `git log -p -S'GATES MUST NOT BIND TO DOCUMENT TYPES' -- .workflow/gap-inbox.md`.
+  **Marked for spec** (operator direction, 2026-09-21): the per-gate survey over frozen paths.
 
 - **install-smoke-leg-names-mix-two-axes** [cost: event/low] [surface: .github] — the `install-smoke` legs in
   `.github/workflows/gates.yml` spend one suffix slot on two different axes, and two tracked
@@ -1471,7 +1492,7 @@
   registration for `zero-config` gates only, so an `on-surface` gate's missing registration is
   caught one stage late, at validate.
   `check-install-disposition` skips every non-`zero-config` disposition outright
-  (`native/src/gates/install_disposition.rs:203` — `if value != ZERO_CONFIG { continue }`; the
+  (`native/src/gates/install_disposition.rs` — `if value != ZERO_CONFIG { continue }`; the
   member became a `.gate` descriptor plus that module at `shell-gate-tail-port`'s delta 3, and the
   skip survives the port verbatim), and its clean line counts only the zero-config half. The full
   accounting — every shipped gate
@@ -1509,6 +1530,8 @@
   recurrence: install-disposition-smoke-accounting-split 2026-08-27
   Filed 2026-08-22 by close, draining the gap inbox; the lead filed the bullet at validate and this
   drain re-verified the skip at its source rather than off the gate's `spec:` line.
+  **Marked for spec** (operator direction, 2026-09-21): which tier holds the full accounting.
+  The skip was re-verified live at this scope; its line cite was dropped, the line having moved.
 
 - **baseline-row-prose-coupling-gate** [cost: event/low] [surface: canon-kit] — governed prose asserts what
   `.workflow/validate-baseline.txt` holds, and nothing checks it against the file.
@@ -1598,6 +1621,7 @@
   is why it files rather than fixes: nothing is wrong in the tree today.
   Filed 2026-08-15 by close, draining the gap inbox; mechanism re-derived against
   `gate-sdk/lib/gate.sh` at the drain and the bullet's account corrected here.
+  **Marked for spec** (operator direction, 2026-09-21): where a consumer declares a knob row.
 
 - **in-crate-module-coupling-derivation** [cost: event/low] [surface: gate-sdk] — a ported gate's descriptor can omit
   the crate modules its own verdict depends on, and no gate says so.
@@ -1638,6 +1662,7 @@
   **feature**; debt only as an assertion folded into an existing meta-gate.
   Filed 2026-08-16 by close, from the lesson the porting cohort generalized rather than from a
   fresh finding — the two instances are already fixed.
+  **Marked for spec** (operator direction, 2026-09-21): where the transitive-coupling cut sits.
 
 - **kit-spec-consumer-config-literal** [cost: event/high] [surface: gate-sdk] — nothing stops a kit SPEC from spelling
   out a value that belongs to a consumer's config, so the seam leaks by worked example.
@@ -1664,6 +1689,7 @@
   Class: lands as a gate, so canon-kit's litmus makes it a **feature**.
   Filed 2026-08-17 by close from its own audit-roster review; the instance was fixed at this
   close and the absent-gate claim probed against `scripts/gates.list` before it was asserted.
+  **Marked for spec** (operator direction, 2026-09-21): the false-positive boundary.
 
 - **queue-recovery-pickaxe-wrong-oracle** [cost: event/high] [surface: queue-kit] — every surface that tells a reader how
   to recover an evicted queue body names `git log -S`, which is blind to exactly the eviction it
@@ -1758,6 +1784,7 @@
   tree's standing direction.
   Filed 2026-08-19 by close from the gap inbox; recurrence judged and stamped at
   `battery-runner-port`'s close, whose drain re-ran the sweep and found the corpus empty.
+  **Marked for spec** (operator direction, 2026-09-21): the idiom predicate without flooding.
 
 - **settings-hook-command-path-gate** [cost: event/high] [surface: context-kit] — a hook registration in
   `.claude/settings.json` whose `command` names a renamed or deleted script reds nowhere and
@@ -2095,7 +2122,7 @@
   committed in one motion. FILED AND NOT BUILT: it rides no cut, no iteration since has shared its
   surface (scope's composition test, re-grounded 2026-09-11), and this is no hotfix.
 
-- **bin-tool-help-arm-absent-tree-wide** [cost: event/low] [surface: gate-sdk] — most shipped `bin/` tools answer
+- **bin-tool-help-arm-absent-tree-wide** [cost: event/low] [surface: gate-sdk] — a shipped `bin/` tool can answer
   `-h`/`--help` with something other than usage on stdout at exit 0; the count is derived below
   and deliberately not frozen in this sentence.
   **THE CENSUS IS DERIVABLE AND THIS IS ITS COMMAND**, stated on the entry because a count whose
@@ -2105,11 +2132,8 @@
   bound** — a file merely mentioning `--help` in a comment counts as having an arm — but it was
   checked exact at the 2026-09-05 reading: the only matching tools, `gate-sdk/bin/run-gates.sh`
   and `installer/bin/checkwright.sh`, each carry a real `-h | --help)` dispatch branch.
-  **RE-DERIVED 2026-09-06 at close, and the drift is this entry's own lesson landing on itself:**
-  the command returns **5 of 7**, in **three** kits (context-kit, doctrine-kit, gate-sdk). The
-  corpus was already 9 at that iteration's start, so two tools had left before the port cuts took
-  the other two, and guard-kit has now left the `bin/` corpus entirely as drift-kit did. The lead
-  line's frozen count was falsified twice over and is de-literalized here. Run the command.
+  **RE-DERIVED 2026-09-21 at scope: 1 of 3**, `gate-sdk/bin/build-native.sh` alone (it was 5 of 7
+  on 2026-09-06): the port cuts emptied context-kit's and doctrine-kit's `bin/`. Run the command.
   **Every earlier figure on this entry is superseded by that command and none is restated**, which
   is the whole reason the command is here: a 2026-09-04 measurement stated no pattern and no later
   session could reproduce it: re-derive rather than compare a bare number.
@@ -2129,8 +2153,9 @@
   **Why design-pending: the contract's own scope is the design question.** §The bin/-tool
   contract states its three behaviors under a free-text-positional rule, yet
   `gate-sdk/bin/run-gates.sh --enter-stage`'s own note reads the HELP half as binding on a
-  membership-validated tool too. Whether it binds on a tool taking **no** positionals — which is
-  most of the census — is unstated, and the answer sets the corpus before any member is fixed.
+  membership-validated tool too. Whether it binds on a tool taking **no** positionals, or on one
+  forwarding its argv (`build-native.sh` passes its own to `cargo`), is unstated, and the answer
+  sets the corpus before any member is fixed.
   **Cost while deferred:** one wrong answer instead of usage per session that probes a tool for its
   modes, and the attested shapes are silently-wrong rather than merely unhelpful.
   not-icebox-eligible: bin-tool-help-arm-absent-tree-wide 2026-09-12 live per-session trigger.
@@ -2145,6 +2170,7 @@
   Census command and count landed 2026-09-05 by close, on the lead's ruling that a close moving
   the number without landing its measurement pattern reproduces the defect one iteration later;
   both re-derived 2026-09-05 by build when its own cuts moved the corpus.
+  **Marked for spec** (operator direction, 2026-09-21): the contract's scope on no-positional tools.
 
 - **kit-spec-seam-content-half-unswept** [cost: event/high] [surface: gate-sdk] — the provenance seam has two halves and
   the sweep that ran carried a discriminator for only one, so gate-sdk/SPEC.md is swept of private
@@ -2176,6 +2202,7 @@
   vendors the copy. Product-class.
   Surfaced 2026-09-05 by build batch A's provenance census, which flagged both and deliberately
   edited neither; drained here with both instances re-verified live.
+  **Marked for spec** (operator direction, 2026-09-21): whether each instance is private content.
 
 - **docs-cmd-retired-path-blind-to-queue** [cost: event/low] [surface: canon-kit]
   — canon-kit/SPEC.md §check-docs-cmd assertion (C) cannot see a retired path cited from the queue,
@@ -2289,6 +2316,7 @@
   recurrence: gate-fixture-fanout-arm 2026-09-20
   Filed 2026-09-16 by `installer-front-door-cut`'s close, as the gap generalization owed by the
   lesson that dispositioned to that SPEC section.
+  **Marked for spec** (operator direction, 2026-09-21): new arm, argument shape, or battery.
 
 - **docs-cmd-knob-definition-site-withheld** [cost: event/low] [surface: gate-sdk]
   — `check-docs-cmd`'s defined-knob set loses every knob whose only tracked kit-root occurrence
@@ -2317,6 +2345,7 @@
   Filed 2026-09-16 at the lead's decision during `installer-front-door-cut`'s build; its sizing
   corrected from five to three at that iteration's close drain, by re-probing the static tables the
   filing asserted were empty.
+  **Marked for spec** (operator direction, 2026-09-21): whether a smoke-only knob needs a site.
 
 - **queue-backlog-vocabulary-undeclared** [cost: once/low] [surface: queue-kit] — the tree uses
   "queue" for the governed file and its drain mechanics (`--emit queue-counts`, the drain-entry
@@ -2350,19 +2379,6 @@
   **Cost while deferred:** local-only surfaces drift until a consult happens to audit them.
   Filed 2026-09-18 to the gap inbox by the consult that audited the local-only files, after
   `external-install-evidence`'s close; promoted to Deferred at the next scope.
-
-- **armed-by-census-unrun** [cost: event/low] [surface: gate-sdk] — gate-sdk/SPEC.md §The
-  install disposition mints a `# armed-by: <KNOB>` directive so `doctor` names a registered
-  member that asserts nothing while its knob is empty, and one member declares it.
-  **Probed at the close drain:** `check-portability-floor.gate` is the only shipped declaration;
-  the other two hits are `check-install-disposition` fixture scripts.
-  **Deliverable:** a census of the zero-config members whose SPEC section states an
-  absent-config degradation to assert-nothing (the `check-graph` / `graph-vocab.knobs` pattern
-  is the first candidate), each either declaring `# armed-by:` or stated as always armed.
-  **Cost while deferred:** such a member ships to every adopter registered and silent, the
-  on-ramp gap the directive closes for one member.
-  Filed 2026-09-19 to the gap inbox at `adopter-floor-conditional-members`' spec; promoted at its
-  close because a roster-wide census with a per-member judgment is not a drain-sized fix.
 
 - **install-smoke-powershell-demo-runs-before-bash-strip** [cost: event/low] [surface: .github] —
   the `install-smoke-powershell` leg runs `checkwright demo` (the `full` battery) in the step BEFORE
