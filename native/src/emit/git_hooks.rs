@@ -259,12 +259,12 @@ fn block(ctx: &Ctx, name: &str, fields: &[(String, String)], manual: &[(String, 
     let authored = registry::field(fields, "trigger");
     let authored = if authored.is_empty() { couples } else { authored };
     let mut trigger = registry::expand_couples(&authored, &ctx.kit_roots)?;
-    let knob_files = registry::knob_files(name, &ctx.check_dirs)?;
-    if trigger != "*" && !knob_files.is_empty() {
+    let derived = registry::derived_couples(name, &ctx.check_dirs)?;
+    if trigger != "*" && !derived.is_empty() {
         if !trigger.is_empty() {
             trigger.push(',');
         }
-        trigger.push_str(&knob_files.join(","));
+        trigger.push_str(&derived.join(","));
     }
     let mut out = String::from("\n");
     if registry::field(fields, "gen") == "manual" {

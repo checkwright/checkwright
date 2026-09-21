@@ -321,7 +321,7 @@ fn manifest(src: &str) -> Vec<(String, String)> {
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — `--for` selection: every member whose effective trigger
-// (`trigger=` else `couples=`, kit-expanded, then its derived knob files) matches a given path,
+// (`trigger=` else `couples=`, kit-expanded, then its derived couples) matches a given path,
 // exactly as the generated hook would; an uncovered path is a note on stdout, never a failure.
 pub(crate) fn select_for(
     members: &[String],
@@ -353,7 +353,7 @@ pub(crate) fn select_for(
             2
         })?;
         let mode = registry::field(&f, "mode");
-        let derived = registry::knob_files(name, resolve_dirs).map_err(|e| {
+        let derived = registry::derived_couples(name, resolve_dirs).map_err(|e| {
             eprintln!("{}: --for cannot derive {}'s knob files: {}", TOOL, name, e);
             2
         })?;

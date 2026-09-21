@@ -2432,16 +2432,22 @@ The manifest grammar:
   reader of the derivation. The staged hook passes matched paths to the gate as
   arguments, so a derived knob file would reach the gate as a file to scan. No
   staged member reads a static knob.
-  **Every trigger reader appends the set**: a member's trigger is its expanded
+  **A compiled member's crate modules are the second derived couple.**
+  `registry::module_files` returns the member's cut (§The non-gate arm) as paths
+  under `GATE_SDK_NATIVE_SRC`. Where that directory is absent, which is every vendored
+  tree since the payload ships the binary and not the crate, the cut is empty: there
+  is nothing there to edit.
+  **Every trigger reader appends both sets**: a member's trigger is its expanded
   `trigger=`, or its expanded `couples=` when `trigger=` is absent, followed by
-  `registry::knob_files(member)`, and a `trigger=*` member is unchanged. The four
-  readers are `run-gates --for` (§run-gates), `check-graph`'s manifest loop and the
-  graph emitter (§check-graph), and hook generation (§gen-pre-commit). The three
-  readers that take `registry::expand_couples` for another purpose do not append it:
-  `check-reads-couples` asks about walk roots and a knob file is a named-file read;
-  `check-gate-substrate-parity` assertion C asks about gate declaration paths, which
-  a knob file never is; and `port-blockers` prints the descriptor's own field as
-  evidence.
+  `registry::derived_couples(member)` — its knob files, then its module files — and a
+  `trigger=*` member is unchanged. The five readers are `run-gates --for`
+  (§run-gates), `check-graph`'s manifest loop and the graph emitter (§check-graph),
+  hook generation (§gen-pre-commit) and §projection-witness. The three readers that
+  take `registry::expand_couples` for another purpose do not append them:
+  `check-reads-couples` asks about walk roots, and a knob file is a named-file read
+  and a module file no read at all; `check-gate-substrate-parity` assertion C asks
+  about gate declaration paths, which neither set ever is; and `port-blockers` prints
+  the descriptor's own field as evidence.
 - `dir=` — `bi` for a coupling bijection (both sides must agree), `one` for a
   one-way audit.
 - `valve=` — `PROPOSED` marks a cycle valve: a coupling where a leading
@@ -4084,23 +4090,43 @@ invisible to the `# graph:` manifest — a coupling nothing could have declared,
 because the manifest names tracked paths and a subprocess is not one. In the
 compiled form the same relationship is a function call across crate modules, and
 it *is* nameable: the callee's module is a tracked source file whose edit changes
-the caller's verdict. So the porting session owes the descriptor every module its
-gate reaches, transitively, including a module shared by both sides of a compare.
+the caller's verdict. **The derivation supplies the modules; the descriptor names
+the corpus.** `registry::module_files` computes each member's cut from the crate
+source and it joins the member's effective `couples=` and `trigger=` as a derived
+couple (§The `# graph:` manifest), so a porting session writes no crate-file token
+the cut already carries. A wider crate token — `native/src/*.rs` on a gate that
+reads the crate as text — names a corpus the gate reads rather than a module it
+calls, and stays hand-declared.
 
-**"Transitively" stops at the universal layers, and the tree is what says so.**
-Read at face value the rule reaches `walk.rs`, `proc.rs` and `registry.rs` — the
-knob-reading, spawn and registry layers every gate module reaches — and no
-descriptor in the tree names any of them,
-correctly: coupling a universal layer into every descriptor spells one
-fact once per ported member and re-runs the whole battery from the generated hook
-on any edit to it, which is de-literalization inverted. What the rule reaches is
-the modules whose edit can change **this** member's verdict and nothing else's —
-its own module, and the shared rule-carrying modules beside it (`fresh.rs`,
-`declaration.rs`, an emitter it calls in-process). The universal layers are held
-by §check-crate-arms and by the binary's own source stamp instead, which is the
-same coverage through a mechanism that does not scale by descriptor count. Stated
-here rather than left to each porting session, because the sentence above invites
-the literal reading and the tree silently contradicts it.
+**The cut is one hop, plus one hop through an in-process emitter — not a
+transitive closure.** A member's cut is its own module, its direct first-party
+imports, and the direct imports of each `emit/` module among them, since an emitter
+called in process is part of the verdict. A literal transitive reading does not
+discriminate: measured over the crate, about 28 modules form one strongly connected
+core that 113 of 131 gate modules reach, so a transitive closure has a median of
+29 modules and couples nearly every gate to nearly every crate edit, where the cut
+has a median of 2. The cut is read statically: every `crate::` and `super::` path
+outside comments and the test module, braced `use` groups expanded, and every path
+through a name a `use` bound to a module, so `use crate::emit;` then
+`emit::footprint::measure()` reaches `emit/footprint.rs`. The member-to-module map
+is read at build time off each `REGISTRY` row's `<module>::run` path, so the registry
+stays the one table.
+
+**It stops at the universal layers**: `walk.rs`, `proc.rs` and `registry.rs` — the
+knob-reading, spawn and registry layers every gate module reaches — and the three
+table roots `gates/mod.rs`, `emit/mod.rs` and `knobs/mod.rs`, named as
+`registry::UNIVERSAL_MODULES`. Coupling a universal layer into every member spells
+one fact once per member and re-runs the whole battery from the generated hook on
+any edit to it, which is de-literalization inverted. What the cut reaches is the
+modules whose edit can change **this** member's verdict — its own module and the
+shared rule-carrying modules beside it (`fresh.rs`, `declaration.rs`, an emitter it
+calls in-process). The universal layers are held by §check-crate-arms and by the
+binary's own source stamp instead, the same coverage through a mechanism that does
+not scale by member count; a universal emitter root is never expanded through.
+**Honest limits:** a `mode=staged` member takes no cut, since the staged hook would
+hand it a crate file as a path to scan — no member is staged today. A member whose
+`couples=` holds only its own module keeps that token, because `couples=` may not be
+empty.
 
 **`registry.rs` is the third such layer and it arrived by collapse rather than by
 design.** It owns the `gates.list` member grammar, `gate_resolve`'s declaration
@@ -4117,8 +4143,8 @@ is derived from `couples=` — the gate simply never runs on the edit that broke
 it, and only a full battery finds it. Stated here rather than in a member's own
 row because it is a property of the port, not of any one gate. The freshness
 family discharged it in full: every member's emitter now lives in the crate
-beside its comparator, and each descriptor carries the modules the call reaches
-— two of them acquired from behind, `check-docs-mirror-fresh` having *triggered*
+beside its comparator, and each descriptor carried the modules the call reaches by
+hand until the cut derived them — two of them acquired from behind, `check-docs-mirror-fresh` having *triggered*
 on its generator without coupling it and `check-trajectory-fresh` having named
 its extractor in neither field.
 
@@ -9926,9 +9952,9 @@ The derivation, `registry::knob_files`, answers for one member over the resolve 
 its caller already holds, gates directory first, because the sentinel's expansion and
 the staged refusal read the descriptor corpus. A member deriving none gets nothing, an
 environment-only name (§The knob file) reaches no knob file, and a `mode=staged`
-member that reaches a static kit is refused. Its callers are the trigger readers
-§The `# graph:` manifest names, each in process: `run-gates --for`, `check-graph`'s
-manifest loop, the graph emitter and the hook emitter.
+member that reaches a static kit is refused. Its one caller is
+`registry::derived_couples`, which the trigger readers §The `# graph:` manifest
+names each call in process.
 
 **So a knob has exactly one producer: its owning kit's defaults table in the
 crate, under that kit's knob files** (§The knob file). Every kit is static, so
@@ -10993,7 +11019,7 @@ single-sourced.
 agent-callable half of the oracle-first rule: it resolves the registry exactly
 as a bare run, then runs only the members whose *effective trigger* (`trigger=`
 else `couples=`, expanded through `registry::expand_couples`, followed by the
-member's derived knob files per §The `# graph:` manifest) glob-matches at least
+member's derived couples per §The `# graph:` manifest) glob-matches at least
 one given repo-relative path. Registry order and per-gate output are unchanged;
 a bare `run-gates.sh` keeps its behavior. The loop this buys — edit → run
 coupled gates → read the verdict+help — is strictly cheaper than reading gate
@@ -12116,8 +12142,8 @@ of the arm roster, the thing §The non-gate arm refuses a front-end case for.
   over the member's resolved declaration; a member that resolves nowhere reads every
   field empty.
 - **Trigger** — `trigger=`, else `couples=`, expanded by `registry::expand_couples`,
-  and, unless the trigger is `*`, followed by the member's derived knob files from
-  `registry::knob_files` over the same check dirs. Globs split on `,` with one
+  and, unless the trigger is `*`, followed by the member's derived couples from
+  `registry::derived_couples` over the same check dirs. Globs split on `,` with one
   trailing empty field dropped, and each is emitted single-quoted.
 - **Invocation** — `registry::resolve` over the check dirs. A `.gate` declaration
   emits `<GATE_SDK_NATIVE_BIN> <name>` with the knob's value as resolved; a `.sh`
@@ -12270,9 +12296,9 @@ wrapper lives in the emitter's literals, so the freshness assertion carries any
 change into the committed hooks. A `trigger=`/`couples=` `kit:<glob>` token is emitted *expanded*
 (via `registry::expand_couples`), so adding a kit later reddens `check-graph`
 (committed hook ≠ its emission) until regeneration — the freshness gate keeps the
-static hooks honest across a kit-set change. A member's derived knob files
+static hooks honest across a kit-set change. A member's derived couples
 (§The `# graph:` manifest) follow its expanded trigger, read in process through
-`registry::knob_files` over the emitter's check dirs (§lib/gate.sh);
+`registry::derived_couples` over the emitter's check dirs (§lib/gate.sh);
 assertion D regenerates the hook, so the hook and `--for` cannot diverge on them
 without a red.
 
@@ -15730,8 +15756,8 @@ is the same on every tree and the fixture pair reaches it through `--amend-only`
 **Couples-to-hook parity is unaffected by either token**, and the reason is
 structural rather than measured: both operands of that comparison pass through the
 same expansion, so they agree by construction whatever the token set is.
-**The derived knob files join both fields after the vocabulary check.** The loop
-appends a member's derived knob files (§The `# graph:` manifest) to its expanded
+**The derived couples join both fields after the vocabulary check.** The loop
+appends a member's derived knob and module files (§The `# graph:` manifest) to its expanded
 `couples=` and `trigger=` alike, so couples-within-trigger parity is unchanged; the
 `GRAPH_VOCAB` surface check reads the authored field alone, because a derived path is
 no surface a consumer wrote. The graph emitter appends the same set, so the published
@@ -16499,7 +16525,7 @@ a 0/1/2 exit, and the dynamic complement of §check-reads-couples' static
 reads-within-couples half: it holds a generated projection's **declared trigger**
 against what its freshness gate actually reads, by perturbing the tree and
 re-running the gate. A projection's trigger is its gate's `trigger=`, else its
-`couples=`, plus the derived knob files — the set `run-gates --for` computes and
+`couples=`, plus the derived couples — the set `run-gates --for` computes and
 the generated hook fires on (§The `# graph:` manifest). That declaration is the
 trigger; a roster restating it in prose is a second source, and the witness is
 what holds the declaration honest instead.

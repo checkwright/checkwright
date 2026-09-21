@@ -103,7 +103,7 @@ pub fn run(args: &[String]) -> i32 {
 }
 
 // spec: gate-sdk/SPEC.md §projection-witness — the members and their expanded trigger sets, the one
-// `run-gates --for` computes: the effective field kit-expanded, then the derived knob files
+// `run-gates --for` computes: the effective field kit-expanded, then the derived couples
 fn members() -> Result<Vec<Member>, String> {
     let gates_dir = crate::knobs::gates_dir();
     let kit_roots = walk::kit_roots()?;
@@ -117,7 +117,7 @@ fn members() -> Result<Vec<Member>, String> {
         let trigger = registry::expand_couples(&registry::effective_trigger(&fields), &kit_roots)
             .map_err(|e| format!("cannot expand {}'s trigger: {}", d.name, e))?;
         let mut globs: Vec<String> = trigger.split(',').filter(|g| !g.is_empty()).map(String::from).collect();
-        globs.extend(registry::knob_files(&d.name, &resolve_dirs)?);
+        globs.extend(registry::derived_couples(&d.name, &resolve_dirs)?);
         out.push(Member {
             everything: trigger == "*",
             name: d.name,

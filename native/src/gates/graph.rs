@@ -599,9 +599,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
             }
         }
 
-        // spec: gate-sdk/SPEC.md §The `# graph:` manifest — the derived knob files join both fields
+        // spec: gate-sdk/SPEC.md §The `# graph:` manifest — the derived knob and module files join both fields
         // after the vocabulary check, which reads the authored field alone
-        let derived = registry::knob_files(c, &cfg.resolve_dirs)?;
+        let derived = registry::derived_couples(c, &cfg.resolve_dirs)?;
         let append = |field: &str| -> String {
             let mut out = field.to_string();
             for p in &derived {

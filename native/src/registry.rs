@@ -322,6 +322,235 @@ pub fn knob_files(member: &str, resolve_dirs: &[String]) -> Result<Vec<String>, 
         .collect())
 }
 
+include!(concat!(env!("OUT_DIR"), "/gate_modules.rs"));
+
+// spec: gate-sdk/SPEC.md §The non-gate arm — the layers every member reaches, held by
+// §check-crate-arms and the source stamp rather than by any one descriptor
+pub const UNIVERSAL_MODULES: &[&str] =
+    &["walk.rs", "proc.rs", "registry.rs", "gates/mod.rs", "emit/mod.rs", "knobs/mod.rs"];
+
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — a member's derived couples: its knob files, then
+// its crate modules
+pub fn derived_couples(member: &str, resolve_dirs: &[String]) -> Result<Vec<String>, String> {
+    let mut out = knob_files(member, resolve_dirs)?;
+    out.extend(module_files(member, resolve_dirs)?);
+    Ok(out)
+}
+
+// spec: gate-sdk/SPEC.md §The non-gate arm — the member's cut: its own module, its direct
+// first-party imports, and the direct imports of each `emit/` module among them, less the universal
+// layers; empty where the crate source is absent or the member is `mode=staged`
+pub fn module_files(member: &str, resolve_dirs: &[String]) -> Result<Vec<String>, String> {
+    let Some((_, module)) = GATE_MODULES.iter().find(|(n, _)| *n == member) else {
+        return Ok(Vec::new());
+    };
+    let src = crate::walk::knob_scalar("GATE_SDK_NATIVE_SRC")?;
+    let src = src.trim_end_matches('/');
+    if src.is_empty() || !Path::new(src).is_dir() {
+        return Ok(Vec::new());
+    }
+    if let Some(desc) = resolve(member, resolve_dirs) {
+        let text = std::fs::read(&desc).map(|b| String::from_utf8_lossy(&b).into_owned()).unwrap_or_default();
+        if manifest_line(&text).map(|m| field(&manifest_fields(m), "mode") == "staged").unwrap_or(false) {
+            return Ok(Vec::new());
+        }
+    }
+    Ok(cut(src, module).into_iter().map(|m| format!("{}/{}", src, m)).collect())
+}
+
+// spec: gate-sdk/SPEC.md §The non-gate arm — the cut over a crate source, as module paths relative to it
+fn cut(src: &str, module: &str) -> Vec<String> {
+    let Some(own) = module_file(src, &format!("gates/{}", module)) else {
+        return Vec::new();
+    };
+    let mut cut: Vec<String> = vec![own.clone()];
+    for m in module_imports(src, &own) {
+        if !cut.contains(&m) {
+            cut.push(m.clone());
+        }
+        if m.starts_with("emit/") && !UNIVERSAL_MODULES.contains(&m.as_str()) {
+            for e in module_imports(src, &m) {
+                if !cut.contains(&e) {
+                    cut.push(e);
+                }
+            }
+        }
+    }
+    cut.retain(|m| !UNIVERSAL_MODULES.contains(&m.as_str()));
+    cut
+}
+
+// spec: gate-sdk/SPEC.md §The non-gate arm — a module path's file, relative to the crate source
+fn module_file(src: &str, module: &str) -> Option<String> {
+    [format!("{}.rs", module), format!("{}/mod.rs", module)]
+        .into_iter()
+        .find(|f| Path::new(&format!("{}/{}", src, f)).is_file())
+}
+
+// spec: gate-sdk/SPEC.md §The non-gate arm — the deepest module a path names from `base`, with the
+// module path it reached and whether every segment was a module
+fn deepest(src: &str, base: &str, segs: &[&str]) -> Option<(String, String, bool)> {
+    let mut best: Option<(String, String)> = None;
+    let mut at = base.to_string();
+    let mut consumed = 0;
+    for seg in segs {
+        let next = if at.is_empty() { seg.to_string() } else { format!("{}/{}", at, seg) };
+        match module_file(src, &next) {
+            Some(f) => {
+                best = Some((f, next.clone()));
+                at = next;
+                consumed += 1;
+            }
+            None => break,
+        }
+    }
+    match best {
+        Some((f, m)) => Some((f, m, consumed == segs.len())),
+        None if base.is_empty() => None,
+        None => module_file(src, base).map(|f| (f, base.to_string(), segs.is_empty())),
+    }
+}
+
+// spec: gate-sdk/SPEC.md §The non-gate arm — a module file's direct first-party imports: every
+// `crate::` and `super::` path outside comments and the test module, braced `use` groups expanded,
+// and every path through a name a path imported as a module
+fn module_imports(src: &str, file: &str) -> Vec<String> {
+    let Ok(text) = std::fs::read_to_string(format!("{}/{}", src, file)) else {
+        return Vec::new();
+    };
+    let own = file.strip_suffix("/mod.rs").or_else(|| file.strip_suffix(".rs")).unwrap_or(file);
+    let parent = own.rsplit_once('/').map(|(p, _)| p).unwrap_or("");
+    let mut code = String::new();
+    for line in text.lines() {
+        let t = line.trim_start();
+        if t.starts_with("#[cfg(test)]") {
+            break;
+        }
+        if !t.starts_with("//") {
+            code.push_str(line);
+            code.push('\n');
+        }
+    }
+    let mut out: Vec<String> = Vec::new();
+    let mut aliases: Vec<(String, String)> = Vec::new();
+    let push = |f: String, out: &mut Vec<String>| {
+        if f != file && !out.contains(&f) {
+            out.push(f);
+        }
+    };
+    for (path, alias) in use_paths(&code, &["crate", "super"]) {
+        let segs: Vec<&str> = path.split("::").filter(|s| !s.is_empty() && *s != "self").collect();
+        let found = match segs.split_first() {
+            Some((&"crate", rest)) => deepest(src, "", rest),
+            Some((&"super", rest)) => deepest(src, parent, rest),
+            _ => None,
+        };
+        if let Some((f, m, whole)) = found {
+            if whole {
+                let name = alias.unwrap_or_else(|| m.rsplit('/').next().unwrap_or(&m).to_string());
+                if !aliases.iter().any(|(n, _)| *n == name) {
+                    aliases.push((name, m));
+                }
+            }
+            push(f, &mut out);
+        }
+    }
+    let names: Vec<&str> = aliases.iter().map(|(n, _)| n.as_str()).collect();
+    for (path, _) in use_paths(&code, &names) {
+        let segs: Vec<&str> = path.split("::").filter(|s| !s.is_empty() && *s != "self").collect();
+        let Some((head, rest)) = segs.split_first() else {
+            continue;
+        };
+        let Some((_, m)) = aliases.iter().find(|(n, _)| n == head) else {
+            continue;
+        };
+        if let Some((f, _, _)) = deepest(src, m, rest) {
+            push(f, &mut out);
+        }
+    }
+    out
+}
+
+// spec: gate-sdk/SPEC.md §The non-gate arm — each path in the code whose first segment is one of
+// `heads`, a braced group spelling one path per leaf, with the name an `as` binds it to
+fn use_paths(code: &str, heads: &[&str]) -> Vec<(String, Option<String>)> {
+    let b = code.as_bytes();
+    let mut out = Vec::new();
+    let mut i = 0;
+    while i < b.len() {
+        let rest = &code[i..];
+        let boundary = i == 0 || !(b[i - 1].is_ascii_alphanumeric() || b[i - 1] == b'_' || b[i - 1] == b':');
+        let head = heads.iter().find(|h| rest.starts_with(&format!("{}::", h)));
+        match head.filter(|_| boundary) {
+            Some(_) => {
+                let len = path_len(rest);
+                let alias = rest[len..]
+                    .strip_prefix(" as ")
+                    .map(|a| a.chars().take_while(|c| c.is_alphanumeric() || *c == '_').collect::<String>())
+                    .filter(|a| !a.is_empty());
+                let start = out.len();
+                expand_group(&rest[..len], &mut out);
+                if out.len() == start + 1 && out[start].1.is_none() {
+                    out[start].1 = alias;
+                }
+                i += len.max(1);
+            }
+            None => i += rest.chars().next().map(char::len_utf8).unwrap_or(1),
+        }
+    }
+    out
+}
+
+// spec: gate-sdk/SPEC.md §The non-gate arm — a path's extent: identifiers, `::` and balanced braces
+fn path_len(s: &str) -> usize {
+    let mut depth = 0usize;
+    for (i, c) in s.char_indices() {
+        match c {
+            '{' => depth += 1,
+            '}' if depth == 0 => return i,
+            '}' => depth -= 1,
+            c if c.is_alphanumeric() || c == '_' || c == ':' || c == '*' => {}
+            c if depth > 0 && (c == ',' || c.is_whitespace()) => {}
+            _ => return i,
+        }
+    }
+    s.len()
+}
+
+fn expand_group(p: &str, out: &mut Vec<(String, Option<String>)>) {
+    let Some(open) = p.find('{') else {
+        let mut words = p.split_whitespace();
+        let leaf = words.next().unwrap_or("").trim_end_matches("::").to_string();
+        let alias = match (words.next(), words.next()) {
+            (Some("as"), Some(a)) => Some(a.to_string()),
+            _ => None,
+        };
+        out.push((leaf, alias));
+        return;
+    };
+    let prefix = &p[..open];
+    let inner = &p[open + 1..p.rfind('}').unwrap_or(p.len())];
+    let mut depth = 0usize;
+    let mut start = 0;
+    let mut items: Vec<&str> = Vec::new();
+    for (i, c) in inner.char_indices() {
+        match c {
+            '{' => depth += 1,
+            '}' => depth = depth.saturating_sub(1),
+            ',' if depth == 0 => {
+                items.push(&inner[start..i]);
+                start = i + 1;
+            }
+            _ => {}
+        }
+    }
+    items.push(&inner[start..]);
+    for item in items.into_iter().map(str::trim).filter(|s| !s.is_empty()) {
+        expand_group(&format!("{}{}", prefix, item), out);
+    }
+}
+
+
 // spec: gate-sdk/SPEC.md §Reading a `couples=` field's reach — the field's one matcher, which every
 // reader asking what an expanded token reaches calls by this name
 pub fn couple_matches(path: &str, token: &str) -> bool {
@@ -561,6 +790,57 @@ mod tests {
             .map(|r| repo.join(r).display().to_string())
             .collect();
         resolve_dirs(&repo.join(crate::knobs::GATES_DIR_DEFAULT).display().to_string(), &roots)
+    }
+
+    // spec: gate-sdk/SPEC.md §The non-gate arm — the universal layers and every member's own module
+    // name existing files, and the attested member's cut is the set its fixing session found
+    #[test]
+    fn the_module_cut_reads_the_crate_source() {
+        let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("src").display().to_string();
+        for m in UNIVERSAL_MODULES {
+            assert!(Path::new(&format!("{}/{}", src, m)).is_file(), "universal layer {} is no file", m);
+        }
+        for (name, _, _, _, _, _) in crate::gates::REGISTRY {
+            let (_, module) = GATE_MODULES
+                .iter()
+                .find(|(n, _)| n == name)
+                .unwrap_or_else(|| panic!("{} has no module in the build-time map", name));
+            assert!(module_file(&src, &format!("gates/{}", module)).is_some(), "{} maps to no module file", name);
+        }
+        assert_eq!(GATE_MODULES.len(), crate::gates::REGISTRY.len(), "the map carries a row the registry does not");
+        let (_, module) = GATE_MODULES.iter().find(|(n, _)| *n == "check-value-rollup-fresh").expect("mapped");
+        let mut got = cut(&src, module);
+        got.sort();
+        let mut want = vec![
+            format!("gates/{}.rs", module),
+            "emit/value_rollup.rs".to_string(),
+            "emit/enforcement_map.rs".to_string(),
+            "emit/footprint.rs".to_string(),
+            "fresh.rs".to_string(),
+            "marker.rs".to_string(),
+        ];
+        want.sort();
+        assert_eq!(got, want);
+    }
+
+    #[test]
+    fn a_braced_use_group_spells_one_path_per_leaf() {
+        let got = use_paths(
+            "use crate::{walk, emit::{graph as g, self}};\nuse crate::emit::footprint as fp;\nlet x = super::field(crate::fresh::y);\n",
+            &["crate", "super"],
+        );
+        let want: Vec<(String, Option<String>)> = [
+            ("crate::walk", None),
+            ("crate::emit::graph", Some("g")),
+            ("crate::emit::self", None),
+            ("crate::emit::footprint", Some("fp")),
+            ("super::field", None),
+            ("crate::fresh::y", None),
+        ]
+        .into_iter()
+        .map(|(p, a)| (p.to_string(), a.map(String::from)))
+        .collect();
+        assert_eq!(got, want);
     }
 
     // spec: gate-sdk/SPEC.md §The `# graph:` manifest — the derivation over every registry member:

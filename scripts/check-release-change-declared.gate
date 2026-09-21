@@ -1,2 +1,2 @@
-# graph: couples=.workflow/release-declarations.md,kit:bin/*,kit:templates/*,native/src/gates/release_change_declared.rs,native/src/installer/recipe.rs dir=one valve=none tier=precommit
+# graph: couples=.workflow/release-declarations.md,kit:bin/*,kit:templates/* dir=one valve=none tier=precommit
 # spec: gate-sdk/SPEC.md §check-release-change-declared — every kit bin/ path removed and every template init claims changed since the nearest reachable v* tag is named on the release declaration surface's Behavior-changes section, so an adopter never meets an undeclared removal or claimed-template tightening at upgrade

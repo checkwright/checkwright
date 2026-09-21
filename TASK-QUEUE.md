@@ -83,50 +83,6 @@
   the counts above. The format change is owed as one rooted form, `knob:<NAME>/<glob>`, and every
   consumer-path literal becomes a token by a four-class rule.
 
-- **in-crate-module-coupling-derivation** [spec: SPEC-module-couples.md] —
-  a ported gate's descriptor can omit
-  the crate modules its own verdict depends on, and no gate says so.
-  recurrence: in-crate-module-coupling-derivation 2026-08-19
-  **THE CORPUS IS 51 OF 89, measured 2026-08-19 at build and re-derived at this drain**: 51 `.gate`
-  descriptors carry a `couples=` naming no `native/` path and no `*.rs` glob, and every one of the
-  51 has a like-named crate module — so the hook never re-runs them on the edit that moves their
-  verdict. `check-manifest-count` is the worked case: trigger `*SPEC*.md,*README.md,CLAUDE.md`,
-  rule in `native/src/gates/manifest_count.rs`. §The fourth budget batch records eight descriptors
-  written against the tree's older reading; nothing owns the retro-fit and the count has grown with
-  each ported cohort. The retro-fit is mechanical per descriptor — the member's own module plus the
-  shared rule-carrying modules it reaches, stopping at the universal layers — but 51 hand edits
-  will not stay correct, so the gate this entry is designing is what makes it durable.
-  **Attested this iteration, twice, and neither instance was found by a gate.**
-  `check-value-rollup-fresh`'s module calls `enforcement_map::measure()` and
-  `footprint::measure()` in-process, but its `couples=` named none of the three `emit/` modules;
-  the lead found it by reading, and the fixing session found a **fourth** module the lead had
-  missed (`native/src/marker.rs`, used on both sides of the compare, so a `read_block` change
-  moves the verdict). Its two sibling members had their descriptors updated at port time, so the
-  omission was inconsistent with the pattern the same cohort established.
-  **Why it is silent rather than loud:** the generated pre-commit hook derives its
-  `staged_matches` trigger from `couples=`, so an under-declared descriptor means the gate never
-  runs on the edit that broke its projection. It passes because it did not execute. Only a full
-  battery reaches it, and `run-gates.sh --for <path>` targeting misses it too.
-  **`check-reads-couples` does not reach this**, and the distinction is the design's crux: that
-  gate covers **walk roots** — what a gate reads off the filesystem — and an in-process call to a
-  sibling module changes no walk root at all. This is a *source* coupling, a different axis.
-  **Why design-pending, though the derivation looks easy:** a `--deps` arm reporting each
-  gate module's transitive in-crate dependencies is the obvious producer and has a precedent in
-  `--reads` (§The non-gate arm), but transitive closure over a shared crate reaches `walk.rs`,
-  `proc.rs` and every common helper, so a literal reading couples every gate to most of the
-  crate and the trigger set stops discriminating. Where to cut — a declared boundary set, or
-  first-party modules only, or the emit/marker layer alone — is the unit's real question.
-  **Cost while deferred:** paid for each remaining member of the freshness family as its emitter
-  lands in the crate beside it, and paid as a stale published projection rather than a red. The
-  interim is prose: gate-sdk/SPEC.md §The non-gate arm now states the obligation.
-  Class: mints a gate name if it lands as one, so canon-kit/SPEC.md's litmus makes it a
-  **feature**; debt only as an assertion folded into an existing meta-gate.
-  Filed 2026-08-16 by close, from the lesson the porting cohort generalized rather than from a
-  fresh finding — the two instances are already fixed.
-  **Ruled at spec (2026-09-21):** the transitive closure measures useless, at a median of 29
-  modules. The cut is one hop, plus one through an in-process emitter (median 2), derived into the
-  effective couples the way derived knob files are. 78 of 130 members are uncovered today.
-
 - **kit-spec-consumer-config-literal** [spec: SPEC-seam-content.md] —
   nothing stops a kit SPEC from spelling
   out a value that belongs to a consumer's config, so the seam leaks by worked example.
@@ -2438,5 +2394,6 @@
 - armed-by-census-unrun
 - couples-knob-token-empty-expansion-passes-silently
 - consumer-shaped-regressions-invisible-to-build-oracles
+- in-crate-module-coupling-derivation
 
 ## Lessons Learned

@@ -102,4 +102,37 @@ fn main() {
     }
     let gitdir = git(&dir, &["rev-parse", "--absolute-git-dir"], None);
     println!("cargo:rerun-if-changed={}/index", gitdir.trim());
+
+    gate_modules(&dir);
+}
+
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — the member-to-module map, read off each
+// `REGISTRY` row's `<module>::run` path, so the registry stays the one table
+fn gate_modules(dir: &str) {
+    let path = format!("{}/src/gates/mod.rs", dir);
+    let text = match std::fs::read_to_string(&path) {
+        Ok(t) => t,
+        Err(e) => panic!("checkwright-gates build: cannot read {}: {}", path, e),
+    };
+    let mut out = String::from("pub const GATE_MODULES: &[(&str, &str)] = &[\n");
+    let mut name: Option<&str> = None;
+    for line in text.lines().map(str::trim) {
+        if let Some(n) = line.strip_prefix('"').and_then(|l| l.strip_suffix("\",")) {
+            name = Some(n);
+        } else if let (Some(n), Some(m)) = (name, line.strip_suffix("::run,")) {
+            out.push_str(&format!("    ({:?}, {:?}),\n", n, m));
+            name = None;
+        } else if !line.is_empty() && !line.starts_with("//") {
+            name = None;
+        }
+    }
+    out.push_str("];\n");
+    let out_dir = match std::env::var("OUT_DIR") {
+        Ok(d) => d,
+        Err(_) => panic!("checkwright-gates build: OUT_DIR is unset"),
+    };
+    let dest = format!("{}/gate_modules.rs", out_dir);
+    if let Err(e) = std::fs::write(&dest, out) {
+        panic!("checkwright-gates build: cannot write {}: {}", dest, e);
+    }
 }

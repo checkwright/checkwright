@@ -176,11 +176,11 @@ pub fn projected_members(cfg: &Config) -> Result<Vec<Member>, String> {
             None => continue,
         };
         let f = registry::manifest_fields(man);
-        // spec: gate-sdk/SPEC.md §check-graph — a derived knob-file couple is an edge like an
+        // spec: gate-sdk/SPEC.md §check-graph — a derived couple is an edge like an
         // authored one, so the published graph draws it
         let mut couples =
             registry::expand_couples(&registry::field(&f, "couples"), &cfg.kit_roots_here)?;
-        for p in registry::knob_files(&name, &cfg.resolve_dirs)? {
+        for p in registry::derived_couples(&name, &cfg.resolve_dirs)? {
             if !couples.is_empty() {
                 couples.push(',');
             }
