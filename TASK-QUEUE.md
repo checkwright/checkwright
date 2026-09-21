@@ -70,22 +70,6 @@
 
 ## Technical Debt
 
-- **lead-finished-but-active-session-unchecked** — lifecycle-kit/templates/lead.md recovers a
-  completion notification that never arrives, and not the reverse: a stage session that reported
-  and ended its journal with `DONE` can still read as active because a background child of its own
-  is still running, and the lead waits on a notification instead of inspecting what holds it.
-  **Attested once:** at `scratch-hermeticity`'s validate a finished session stayed active about nine
-  minutes after its report; the holder was a self-matching waiter
-  (`guard-rule-12-single-occurrence-pgrep-loop-passes`).
-  **Re-verified at this scope:** lead.md's paragraph on the undelivered notification names the
-  roster, the `DONE` last line and asking the session, and has no clause for DONE-but-active.
-  **Deliverable, settled by operator direction (2026-09-21 lead session):** on DONE-but-active the
-  lead checks the session's leftover processes (waiters, shells, worktrees) and reports them.
-  Filed 2026-09-21 to the gap inbox by the lead after `scratch-hermeticity`'s close; promoted
-  2026-09-21 into `delegation-seams` by operator direction (lead-relayed). Debt: build-ready, one
-  template clause beside the existing recovery paragraph. Owner lookup ran over `DONE`,
-  `notification`, `still active` in lead.md and lifecycle-kit/SPEC.md; the paragraph above is it.
-
 ## Deferred
 
 - **queue-citation-line-number-stales-within-its-own-session** [cost: event/low] [surface: queue-kit]
@@ -2774,5 +2758,6 @@
 - worktree-isolated-agent-report-lost-to-a-failed-peer-send
 - isolation-oracle-cost-lacks-dispatcher-clause
 - isolated-dispatch-resume-loses-its-isolation
+- lead-finished-but-active-session-unchecked
 
 ## Lessons Learned

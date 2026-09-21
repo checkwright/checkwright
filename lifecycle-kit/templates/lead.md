@@ -91,6 +91,13 @@ a sharp edge worth stating rather than rediscovering: it is valid only as the
 journal's **last line**, so any out-of-order append silently invalidates it
 while leaving the marker plainly visible.
 
+**The reverse case is inspected, never waited out: a session that reported and
+ended its journal with `DONE` yet still reads as active.** Something of its own
+is holding it — a background child outliving the work, a self-matching waiter
+the attested one. Check the session's leftover processes (waiters, shells,
+worktrees) and report them, rather than waiting on a notification the holder
+may keep from arriving.
+
 **Any prompt-answered signal is a start signal, never a completion one.** An
 approval prompt gates a command **starting**, so an operator's note about having
 just answered one timestamps a beginning
