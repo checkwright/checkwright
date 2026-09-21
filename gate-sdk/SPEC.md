@@ -14736,7 +14736,7 @@ where the battery's verdict arrives only once a build exists to compare against.
 The crate's **lint and test arms** run at commit time, as a registered member of
 the battery:
 
-```bash
+```text
 cargo clippy --release --manifest-path "$CRATE/Cargo.toml" --target-dir "$TARGET_DIR" --all-targets -- -D warnings
 cargo test --release --manifest-path "$CRATE/Cargo.toml" --target-dir "$TARGET_DIR"
 ```
