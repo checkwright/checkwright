@@ -93,8 +93,8 @@ while leaving the marker plainly visible.
 
 **The reverse case is inspected, never waited out: a session that reported and
 ended its journal with `DONE` yet still reads as active.** Something of its own
-is holding it — a background child outliving the work, a self-matching waiter
-the attested one. Check the session's leftover processes (waiters, shells,
+is holding it — a background child outliving the work, of which a
+self-matching waiter is the attested kind. Check the session's leftover processes (waiters, shells,
 worktrees) and report them, rather than waiting on a notification the holder
 may keep from arriving.
 

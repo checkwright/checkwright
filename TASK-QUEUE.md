@@ -38,8 +38,8 @@
   queue-kit/SPEC.md §The icebox tier lists a dated `recurrence:` line among live triggers and ages
   only the entry itself (`QUEUE_KIT_ICEBOX_AGE_DAYS`), never the recurrence date.
   **Attested once:** `worktree-isolated-agent-report-lost-to-a-failed-peer-send` recurred
-  2026-08-26, did not reproduce 2026-09-16 or 2026-09-21, was re-costed `event/low`, and stays
-  Deferred on that one date. It is the instance, not a recurrence of this finding.
+  2026-08-26, did not reproduce 2026-09-16 or 2026-09-21, was re-costed `event/low`, and stayed
+  Deferred on that one date until `delegation-seams` landed it. The instance, not a recurrence.
   **Deliverable — rule one of two:** an age limb on the recurrence date mirroring the icebox age
   knob, or a stated refusal naming why a single recurrence stays live forever.
   **Cost while deferred:** each close's eviction re-judges such entries by hand and keeps them.
@@ -98,7 +98,7 @@
   read, and the squeezed set has GROWN since the filing:** FOUR entries sit at
   exactly 0 lines of headroom — `record-stamp-encoding-compression`,
   `companion-toolkit-profile`, `heterogeneous-agent-delegation` and
-  `worktree-isolated-agent-report-lost-to-a-failed-peer-send` — with two more at
+  `worktree-isolated-agent-report-lost-to-a-failed-peer-send` (landed since) — with two more at
   1 and four at 2. The 2026-09-20 scope bullet that witnessed it named three at
   0, one at 1 and one at 2.
   **The witness is first-hand:** that scope had to land an operator-ruled

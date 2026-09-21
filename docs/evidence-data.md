@@ -205,3 +205,4 @@
 | adopter-floor-door-remainder | sc sp a b v c | 3f/4d | 3 · ≤0d | 20s clean | 122 |
 | release-declaration-coupling | sc sp a b v c | 2f/1d | 4 · ≤0d | 20s clean | 123 |
 | scratch-hermeticity | sc sp a b v c | 1f/3d | 1 · ≤0d | 20s clean | 123 |
+| delegation-seams | sc sp a b v c | 8f/0d | 5 · ≤0d | 20s clean | 123 |
