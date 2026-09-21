@@ -7580,8 +7580,9 @@ dependency premise the bar rests on.
 **The second dependency is `libc`, taken on unix targets only.** It cleared the
 bar with an empty transitive set and an MSRV below the floor, and it is what lets
 the pid predicate read `EPERM` in-process (evidence-kit/SPEC.md §The
-producer-liveness lock). Its one `unsafe` call is `kill(pid, 0)`, which touches no
-memory the crate owns. The target scoping is the point of the admission and not a
+producer-liveness lock), and the local-time conversions. Its `unsafe` calls are
+`kill(pid, 0)`, which touches no memory the crate owns, and `localtime_r` and
+`mktime`, each over a zeroed stack-local `tm`. The target scoping is the point of the admission and not a
 size trim: the native Windows build resolves pids in a shell's namespace, where the
 crate's `kill` would read the wrong processes.
 
