@@ -790,13 +790,12 @@ carries the judgment the trigger cannot.
 **The return-value obligation of an isolated read-only child is carried by the
 dispatcher's prompt, not by this guard and not by the kit.** Nothing carries
 D3's warning into the child: an isolated read-only child whose report went to a
-peer name it could not resolve returned a bare `.`, twice at one close, and a
-bare `.` reads as a sweep that found nothing. The template's disposition (2) has
-the dispatcher say so in the prompt. Two other carriers were weighed. **The
-guard rewriting the prompt** was declined: it would make this guard an author of
-dispatch text rather than a judge of dispatch shape, for a class that has not
-reproduced since the harness began stating the hand-back duty in the child's
-own prompt (re-measured twice, the second time on a 46-tool-use isolated sweep).
+peer name it could not resolve returned a bare `.`, which reads as a sweep that
+found nothing. The template's disposition (2) has the dispatcher say so in the
+prompt. Two other carriers were weighed. **The guard rewriting the prompt** was
+declined: it would make this guard an author of dispatch text rather than a
+judge of dispatch shape, for a class that has not reproduced since the harness
+began stating the hand-back duty in the child's own prompt.
 **The agent-type definition** is the consumer's surface, since the kit ships no
 agent-type names (§Layout and configuration, `DELEGATION_KIT_READONLY_TYPES`); a
 consumer may carry the line there as well, in the type's own return contract.

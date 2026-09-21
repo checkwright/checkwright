@@ -98,10 +98,9 @@ here, propagate.
   invisible to the guard's span walk and takes the record like any launch.
   **A call the harness moves to the background on its timeout is a launch you
   did not make, and it is yours.** The result says so ("moved to the
-  background"), and nothing recorded it, because the guard saw a foreground call.
-  Prevent it: give a foreground call a timeout above the command's run, and
-  launch anything that can outrun that timeout backgrounded, with its record, as
-  above. If a call is moved anyway, it is a live producer from that moment. Where
+  background"), and nothing recorded it. Prevent it: give a foreground call a
+  timeout above the command's run, and launch anything that can outrun that
+  timeout backgrounded, with its record, as above. If a call is moved anyway, it is a live producer from that moment. Where
   it names its own pid (a lock, a printed pid), write its `<key>.run` record from
   that pid at once. Either way, end no turn and write nothing to the tracked tree
   until its completion notification arrives.
@@ -363,9 +362,8 @@ here, propagate.
 - **A finished child is addressed by the task-id its completion notification
   carried, never by its name.** Resuming a returned agent to correct or extend
   its work is the cheap alternative to a cold re-dispatch, and it is the one
-  that keeps the child's own reasoning instead of paying to rebuild it. A child
-  dispatched under isolation comes back without it: the resume runs in the main
-  checkout, with its worktree gone. Resume an isolated child only to have it
+  that keeps the child's own reasoning instead of paying to rebuild it. A resumed
+  isolated child runs in the main checkout, so resume it only to have it
   re-emit what it already holds, as isolation cost (5)'s recovery does; work
   that needs the tree again is a new isolated dispatch. The name
   is not a durable address for that: a name live at dispatch stops resolving once

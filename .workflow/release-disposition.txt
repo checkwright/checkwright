@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+delegation-seams release deferred:v0.26.0 — declarations since v0.25.0 still derive a minor with no decommission (this iteration adds one tightened gate, check-gate-tamper's registered-gate union, and six behavior changes, guard rule 12's self-match block among them); no trigger fired: elapsed-time limb dormant under preview, no security or supply-chain fix (the tamper union closes a gate-coverage gap, not a vulnerability or compromised artifact), no operator direction, audience not arrived

@@ -45,14 +45,14 @@ host repository's residue.
 | --- | --- | --- |
 | canon-kit | — | 109l · ~1548t |
 | context-kit | — | 37l · ~607t |
-| delegation-kit | — | 576l · ~10362t |
+| delegation-kit | — | 574l · ~10331t |
 | doctrine-kit | 18l · ~413t | — |
 | drift-kit | — | 94l · ~1646t |
 | evidence-kit | — | — |
 | gate-sdk | — | — |
 | guard-kit | — | 68l · ~1120t |
 | installer | — | — |
-| lifecycle-kit | 5l · ~76t | 1775l · ~28880t |
+| lifecycle-kit | 5l · ~76t | 1775l · ~28875t |
 | queue-kit | — | 47l · ~464t |
 | site-kit | — | — |
-| **total** | 23l · ~489t | 2706l · ~44629t |
+| **total** | 23l · ~489t | 2704l · ~44593t |

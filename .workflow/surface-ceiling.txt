@@ -15,7 +15,7 @@
 176 CLAUDE.md
 109 canon-kit/templates/SPEC-amendment.md
 37 context-kit/templates/close-brevity.md
-516 delegation-kit/templates/agent-execution.md
+514 delegation-kit/templates/agent-execution.md
 60 delegation-kit/templates/dispatch-checklists.md
 40 drift-kit/templates/close-knowledge.md
 54 drift-kit/templates/economics.md
