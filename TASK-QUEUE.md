@@ -2881,9 +2881,4 @@
 
 ## Done
 
-- upgrade-smoke-producer-leaks-worktrees-on-signal
-- check-kit-roots-dialect-leaks-a-scratch-tree-per-run
-- boundary-wipe-note-enumerates-nested-paths
-- bespoke-test-path-knob-pinning
-
 ## Lessons Learned
