@@ -1,5 +1,5 @@
 # contract: evidence-manifest v1
-docs-first-contact gates sha256=94570f6d179f2b20712ff0ac8d7c6ab37a89bbc223d2e87c41bbd4937bc4e572 pass=128 fail=0 ignore=0 verdict=clean 2026-09-21
+docs-first-contact gates sha256=5ceed9fd098468d7c19792880b04653865677db4de5758187c432411541c7bef pass=128 fail=0 ignore=0 verdict=clean 2026-09-21
 docs-first-contact gate_sdk sha256=59ccdb9f9ffbb782a8789872fd2d318133a7e548d9ac296a0cecacb37cd32338 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
 docs-first-contact canon_kit sha256=948c56dfeca28e1485d1993bdd731f2bd6434ad15a0a23b18eab7c6d82df5cee pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
 docs-first-contact context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
@@ -12,11 +12,11 @@ docs-first-contact queue_kit sha256=4d50cf613cf514a9f5c5f92ad7c46acf5d8f750aedc7
 docs-first-contact site_kit sha256=48d3335dd0d627713fd607013b1cc6a0049e60b8f4a1905b441b7699d4c844c2 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
 docs-first-contact scripts sha256=79ed7aac215203e28c16d151e43d18867b9d53aa24afc2c79947e252882e97b7 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
 docs-first-contact guard_tests sha256=2e9a22131559a27d70c1ffe7f075649ff0a18e7ddacf4aaee09130cdf20bd345 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
-docs-first-contact demo sha256=879ad4facb35ca619f9ea1131fc7826e39dab97da1677adf8e64ac6b39799c0b pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
-docs-first-contact installer_smoke sha256=34ad4766c471ad692bbeb094665282fd7bb5a0d4396059b875871dd01dd415e3 pass=17 fail=0 ignore=0 verdict=clean 2026-09-21
-docs-first-contact consumer_smoke sha256=7d26109c668f70f2b5a018d590ab02c86f1d3c0cc61c50cbf665aeb35e3e7071 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
-docs-first-contact upgrade sha256=9504d570547b4ebab57e9d628197702508db169dc06c8e85bc12f1bac810a99d pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
-docs-first-contact agents_md_smoke sha256=9e58822004fc35305166acc60100daa517d1d80c7acca2b0f064e1cb10e348a4 pass=0 fail=1 ignore=0 verdict=new-failures 2026-09-21
+docs-first-contact demo sha256=7d8e00d1fc11d22338761c2fa79f6d723ec29040630debaa4d54fc18f265f774 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+docs-first-contact installer_smoke sha256=83e3fd5445f920496efda8eac15c7b3dd212796a0f50290ad6a22062ef0a4692 pass=17 fail=0 ignore=0 verdict=clean 2026-09-21
+docs-first-contact consumer_smoke sha256=9532b5268295c025bf5f83eb5e446c0b778b7f875d9f2867a1c0c5bafe783e20 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+docs-first-contact upgrade sha256=ee1088c9dea18b4bb788047d78e10434084e16d544682f9e488e7457af65072f pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+docs-first-contact agents_md_smoke sha256=e85f3823971dfb61db10529fa5bd3bdcfbb5e879c0fdab21cc2bb68fe78cde90 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
 docs-first-contact index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
-docs-first-contact native_crate sha256=fa43f99c0d05d2b4160c641349c140805f2991462e278ceb80a8f572acd2249a pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+docs-first-contact native_crate sha256=da715dbc0c8c53c206b10e03055ae4d27f439447e0cf07f1c90e2fd1d1da4212 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
 docs-first-contact projection_witness sha256=32d921d32804671eb9cdb4720e70c0830bb8509afae3d994d39409d00960be73 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
