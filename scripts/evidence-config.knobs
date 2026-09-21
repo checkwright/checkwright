@@ -10,6 +10,7 @@ EVIDENCE_KIT_SUITES[] = upgrade
 EVIDENCE_KIT_SUITES[] = agents_md_smoke
 EVIDENCE_KIT_SUITES[] = index_tests
 EVIDENCE_KIT_SUITES[] = native_crate
+EVIDENCE_KIT_SUITES[] = projection_witness
 
 # spec: evidence-kit/SPEC.md §Layout and configuration — per-gate scenarios for the gates suite; the verbose run is what emits the per-gate tails the parser reads
 # spec: evidence-kit/SPEC.md §Layout and configuration — every RUN and PARSER value below is split and exec'd as a literal argv with no interpreter word, which is why they keep naming the front end after the door sweep: an exec'd argv reads no knob, so GATE_SDK_NATIVE_BIN spelled here would pass literally, and its resolved value would copy into nine rows what the knob owns. The front end resolves it for a caller that cannot (gate-sdk/SPEC.md §run-gates)
@@ -27,3 +28,4 @@ EVIDENCE_KIT_RUN_upgrade = bash gate-sdk/bin/run-gates.sh --upgrade-smoke
 EVIDENCE_KIT_RUN_agents_md_smoke = bash gate-sdk/bin/run-gates.sh --agents-md-smoke
 EVIDENCE_KIT_RUN_index_tests = bash gate-sdk/bin/run-gates.sh --run-index-tests
 EVIDENCE_KIT_RUN_native_crate = cargo test --release --manifest-path native/Cargo.toml
+EVIDENCE_KIT_RUN_projection_witness = bash gate-sdk/bin/run-gates.sh --projection-witness

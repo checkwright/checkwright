@@ -98,15 +98,64 @@ pub fn place_artifact(from: &str, to: &str) -> Result<(), String> {
 // spec: gate-sdk/SPEC.md §Consumer smoke — the tracked-tree scratch, returned as its removal guard
 // so every exit path tears it down
 pub fn tracked_scratch(base: &Path, label: &str) -> Result<crate::walkthrough::Scratch, String> {
-    let listed = proc::run(&programs::GIT, &["ls-files", "-z"])?;
+    let here = Path::new(".");
+    let files = tracked_files(here)?;
+    let (guard, dir) = scratch_dir(base, label)?;
+    copy_tracked(here, &files, &dir)?;
+    let d = dir.display().to_string();
+    git(&d, &["init", "-q"])?;
+    commit(&d, "--allow-empty", "seed")?;
+    Ok(guard)
+}
+
+// spec: gate-sdk/SPEC.md §Consumer smoke — the tracked-tree scratch that also carries the source's
+// history and `origin` URL, for a caller whose subject reads either: a shared no-checkout clone of
+// the toplevel, the working-tree content of the tracked set laid over it, then the seed
+pub fn tracked_history_scratch(
+    source: &Path,
+    base: &Path,
+    label: &str,
+) -> Result<crate::walkthrough::Scratch, String> {
+    let src = source.display().to_string();
+    let top = walk::toplevel_in(&src).map_err(|e| format!("{}: {}", src, e))?;
+    let top_path = Path::new(&top);
+    let files = tracked_files(top_path)?;
+    let origin = proc::run(&programs::GIT, &["-C", &top, "remote", "get-url", "origin"])?;
+    let origin = origin
+        .stdout()
+        .map(|o| String::from_utf8_lossy(o).trim().to_string())
+        .unwrap_or_default();
+    let (guard, dir) = scratch_dir(base, label)?;
+    let d = dir.display().to_string();
+    let cloned = proc::run(&programs::GIT, &["clone", "-q", "--shared", "--no-checkout", &top, &d])?;
+    if let Some(r) = cloned.failure_report() {
+        return Err(format!("git clone of {} into the scratch failed — {}", top, r));
+    }
+    git(&d, &["reset", "-q"])?;
+    if origin.is_empty() {
+        git(&d, &["remote", "remove", "origin"])?;
+    } else {
+        git(&d, &["remote", "set-url", "origin", &origin])?;
+    }
+    copy_tracked(top_path, &files, &dir)?;
+    commit(&d, "--allow-empty", "seed")?;
+    Ok(guard)
+}
+
+fn tracked_files(source: &Path) -> Result<Vec<String>, String> {
+    let src = source.display().to_string();
+    let listed = proc::run(&programs::GIT, &["-C", &src, "ls-files", "-z"])?;
     if let Some(r) = listed.failure_report() {
         return Err(format!("git ls-files failed listing the tracked set — {}", r));
     }
-    let files: Vec<String> = String::from_utf8_lossy(listed.stdout().unwrap_or(&[]))
+    Ok(String::from_utf8_lossy(listed.stdout().unwrap_or(&[]))
         .split('\0')
         .filter(|s| !s.is_empty())
         .map(str::to_string)
-        .collect();
+        .collect())
+}
+
+fn scratch_dir(base: &Path, label: &str) -> Result<(crate::walkthrough::Scratch, std::path::PathBuf), String> {
     let mut guard = crate::walkthrough::Scratch { dir: None };
     let mut seq = 0u32;
     let dir = loop {
@@ -118,8 +167,13 @@ pub fn tracked_scratch(base: &Path, label: &str) -> Result<crate::walkthrough::S
         }
     };
     guard.dir = Some(dir.clone());
-    for f in &files {
-        let from = Path::new(f);
+    Ok((guard, dir))
+}
+
+fn copy_tracked(source: &Path, files: &[String], dir: &Path) -> Result<(), String> {
+    for f in files {
+        let from_buf = source.join(f);
+        let from = from_buf.as_path();
         let meta = match std::fs::symlink_metadata(from) {
             Ok(m) => m,
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,
@@ -137,10 +191,7 @@ pub fn tracked_scratch(base: &Path, label: &str) -> Result<crate::walkthrough::S
                 .map_err(|e| format!("cannot copy {} to {}: {}", f, to.display(), e))?;
         }
     }
-    let d = dir.display().to_string();
-    git(&d, &["init", "-q"])?;
-    commit(&d, "--allow-empty", "seed")?;
-    Ok(guard)
+    Ok(())
 }
 
 #[cfg(unix)]

@@ -1,4 +1,4 @@
-# graph: couples=scripts/gates.list,scripts/*.sh,kit:*.sh,scripts/git-hooks/pre-commit,scripts/git-hooks/commit-msg,knob:GATE_SDK_GRAPH_ARTIFACT,docs/check-graph.html,SPEC-*.md,*/SPEC-*.md,native/src/gates/graph.rs,native/src/emit/graph.rs,native/src/emit/git_hooks.rs,kit:templates/SPEC-*.md,native/src/graph_vocab.rs,knob:GATE_SDK_GRAPH_VOCAB dir=one valve=none tier=precommit
+# graph: couples=scripts/gates.list,scripts/*.sh,kit:*.sh,scripts/git-hooks/pre-commit,scripts/git-hooks/commit-msg,knob:GATE_SDK_GRAPH_ARTIFACT,docs/check-graph.html,scripts/graph-theme/*,scripts/*-config.knobs,SPEC-*.md,*/SPEC-*.md,native/src/gates/graph.rs,native/src/emit/graph.rs,native/src/emit/git_hooks.rs,kit:templates/SPEC-*.md,native/src/graph_vocab.rs,knob:GATE_SDK_GRAPH_VOCAB dir=one valve=none tier=precommit
 # projection: docs/check-graph.html,scripts/git-hooks/pre-commit,scripts/git-hooks/commit-msg
 # install: zero-config
 # spec: gate-sdk/SPEC.md §check-graph — manifest well-formedness, trigger parity, cycle valves, artifact drift, and amendment-body manifest validation (assertion G); the emitter is native/src/emit/graph.rs, reached in process rather than spawned

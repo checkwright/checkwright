@@ -36,6 +36,7 @@ pub mod parse_gates_log;
 pub mod overhead_meter;
 pub mod pack_installer;
 pub mod parse_smoke_log;
+pub mod projection_witness;
 pub mod port_blockers;
 pub mod pub_index;
 pub mod pub_lang;
@@ -727,6 +728,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--run-consumer-smoke",
         Arm::Run(run_consumer_smoke::run),
         run_consumer_smoke::KNOBS,
+    ),
+    // spec: gate-sdk/SPEC.md §projection-witness — an `Arm::Run` because the contract is the 0/1/2
+    // split of clean, a gate red outside its trigger, and a witness that could not run
+    (
+        "--projection-witness",
+        Arm::Run(projection_witness::run),
+        projection_witness::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §Consumer payload — the payload assembler, an `Arm::Run` because its
     // product is a tarball plus a receipt rather than a document, and a table member because all

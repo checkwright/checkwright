@@ -23,13 +23,13 @@ pub fn run(args: &[String]) -> i32 {
 
 // spec: gate-sdk/SPEC.md §check-projection-roster — the declaring set: every registered member whose
 // header carries `# projection:`, with that member's expanded `couples=` beside it for assertion A
-struct Declaring {
-    name: String,
+pub(crate) struct Declaring {
+    pub(crate) name: String,
     lines: Vec<String>,
     couples: Vec<String>,
 }
 
-fn declaring_gates() -> Result<Vec<Declaring>, String> {
+pub(crate) fn declaring_gates() -> Result<Vec<Declaring>, String> {
     let gates_dir = crate::knobs::gates_dir();
     let list = registry::list_path(&gates_dir);
     let text = std::fs::read_to_string(&list).map_err(|e| format!("cannot read the registry at {}: {}", list, e))?;

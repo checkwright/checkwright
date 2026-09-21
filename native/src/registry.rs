@@ -172,6 +172,16 @@ pub fn field(fields: &[(String, String)], key: &str) -> String {
         .unwrap_or_default()
 }
 
+// spec: gate-sdk/SPEC.md §run-gates — a member's effective trigger field: `trigger=`, else `couples=`
+pub fn effective_trigger(fields: &[(String, String)]) -> String {
+    let trigger = field(fields, "trigger");
+    if trigger.is_empty() {
+        field(fields, "couples")
+    } else {
+        trigger
+    }
+}
+
 // spec: gate-sdk/SPEC.md §The `# graph:` manifest — the closed set of special `couples=` prefixes,
 // read from here by every reader that recognises one, because a prefix one reader knows and another
 // does not falls through as an inert literal glob

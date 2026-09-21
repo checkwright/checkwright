@@ -2556,8 +2556,9 @@ the gate's own `couples=`** under the field's one matcher (§Reading a `couples=
 field's reach), since a projection whose output the gate does not couple is one
 whose staleness the hook never triggers on. `check-projection-roster` assertion A
 is the verifier that keeps the line from being the self-declaration §The `# graph:`
-manifest refuses. Its reader is that gate, which holds a consumer's roster of
-projections to the declaring set. It is not a `# graph:` field, so no hook or
+manifest refuses. Its readers are that gate, which holds a consumer's roster of
+projections to the declaring set, and `--projection-witness`, which takes its
+members from it (§projection-witness). It is not a `# graph:` field, so no hook or
 graph reader reads it.
 
 **Where the directive deliberately does not reach.** The installer's *seeding*
@@ -3109,6 +3110,7 @@ whose port **removes** a grant naming its own path rather than relocating one),
 `--agents-md-smoke` and `--run-index-tests` (context-kit/SPEC.md §Testing),
 `--run-demo`, the adoption walkthrough, and `--run-consumer-smoke`, the
 scratch-consumer harness (both §Consumer smoke),
+`--projection-witness`, the differential trigger witness (§projection-witness),
 and `--pack-installer`, the payload assembler (§Consumer payload; the route a
 consumer's release path invokes it by is that consumer's own surface and not a
 kit's — installer/SPEC.md §The packer is this repo's), and
@@ -9159,6 +9161,13 @@ already taken), copies each tracked path's working-tree content into it with
 tree skipped), then runs `git init` and makes the seed commit. It returns the removal
 guard, so the directory is gone on every exit path, and a failed listing, copy or
 `git init` is an `Err`. canon-kit/SPEC.md §check-fence-run is its first caller.
+`tracked_history_scratch(source, base, label)` is its variant for a caller whose
+subject reads git history or the `origin` URL, as the trajectory and self-repo-link
+emitters do: it makes a shared, no-checkout clone of `source`'s toplevel in place of
+`git init`, copies the source's `origin` URL onto the clone (or removes `origin`
+where the source has none), lays the same working-tree content over it and makes
+the seed commit on top, so history up to the source's `HEAD` is present and the
+seed carries any uncommitted difference. §projection-witness is its caller.
 
 **The adoption walkthrough is this section's other member, and this is the
 mechanism owner its own header pointed elsewhere for.** It is the
@@ -16430,6 +16439,73 @@ crate source by ruling, so there is no edit for it to catch and a glob matching
 nothing is the correct outcome rather than a hole. The hermetic fixture affordance: positional gate-source arguments make
 the gate analyze the given source(s) with `git ls-files` anchored to the case
 dir, instead of walking the real `gates.list`.
+
+### projection-witness
+
+`--projection-witness` is a non-gate arm (§The non-gate arm), an `Arm::Run` with
+a 0/1/2 exit, and the dynamic complement of §check-reads-couples' static
+reads-within-couples half: it holds a generated projection's **declared trigger**
+against what its freshness gate actually reads, by perturbing the tree and
+re-running the gate. A projection's trigger is its gate's `trigger=`, else its
+`couples=`, plus the derived knob files — the set `run-gates --for` computes and
+the generated hook fires on (§The `# graph:` manifest). That declaration is the
+trigger; a roster restating it in prose is a second source, and the witness is
+what holds the declaration honest instead.
+
+1. **Members.** Every registered gate carrying `# projection:` (§The install
+   disposition). With none, the arm prints `0 projections` and exits 0.
+2. **Scratch.** One history-bearing tracked-tree scratch (§Consumer smoke,
+   `tracked_history_scratch`). A history-less copy is not enough: an emitter
+   reading git history or the `origin` URL reds at baseline there, so the scratch
+   is a shared clone with the working tree laid over it. The running binary is
+   placed where `GATE_SDK_NATIVE_BIN` resolves in the scratch, through
+   `place_artifact`, and the scratch is removed on every exit path.
+3. **Baseline.** Each member is spawned by name, the arm's own executable with the
+   scratch as its working directory and the gate-sdk locator blanked so the child
+   resolves the scratch's own root. A member red at baseline is exit 2 naming it,
+   since the projection is already stale and nothing can be witnessed.
+4. **Classes.** The tracked set grouped by first path segment and extension, a
+   root file's segment empty. For each member, each class's first member in byte
+   order that the member's expanded trigger set does not match (under the field's
+   one matcher) is its out-of-trigger sample.
+5. **Two perturbations per class.** An **edit** appends one line to the sample,
+   and the file's bytes are restored after. A **create** stages a new file
+   `<segment>/.projection-witness.<ext>`, skipped where the trigger set matches that
+   path, and is unstaged and removed after. The member runs after each.
+6. **Verdict.** A member **red** after an out-of-trigger perturbation read a file
+   its manifest does not declare, so the hook never re-runs it when that file
+   changes: a finding, exit 1, one `WITNESS: FAIL` line naming the gate, the
+   perturbation, the path and the gate's first red line.
+
+**The positive direction is a report, never a red.** For each member and each
+class its trigger set does match, the arm also edits that class's first matching
+member; a gate that stays green prints `coupled but inert: <gate> <path>`. A
+`couples=` is a sound superset of a gate's reads and never a minimal set — the
+over-approximation §The `# graph:` manifest sanctions, since an extra trigger runs
+a green gate while a missing one skips a red — so the line serves a person
+tightening a trigger, and no suite parses it.
+
+Exit 2 carries `WITNESS: FAIL(env)` for a member red at baseline, a scratch that
+could not be built and a spawn failure. The clean line counts members, classes,
+perturbations and inert couples, so a run whose class set came out empty prints
+zeros rather than passing as coverage.
+
+**Honest limits.** An append can miss a read confined to a marker block, so an
+out-of-trigger file read only inside markers passes; the create does not share
+that blind spot for an emitter that enumerates files. Classes are sampled one
+member each, so a read of one specific file in an otherwise-unread class is
+missed. Both limits under-report and never over-report: a red is always real.
+Each gate run is a spawn and each class costs up to three, so the arm is a
+validate suite rather than a battery member; a consumer registers it as an
+evidence-kit suite whose exit code is the verdict (evidence-kit/SPEC.md
+§bin/run-validate.sh).
+
+Its consumers are that suite and a person reading the inert lines. Its knob
+declaration names `GATE_SDK_NATIVE_BIN` for the placement and the two knobs its
+member resolution reads. A crate test witnesses a known defect: a toy projection
+whose emitter reads a file outside its declared trigger, run through the same
+scratch, class and verdict machinery with the gate spawn injected, reds naming
+that file.
 
 ### enforcement-map
 

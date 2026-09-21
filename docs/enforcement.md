@@ -221,6 +221,7 @@ leaves its section absent.
 | [gate-sdk](gate-sdk/index.md) | agents_md_smoke |
 | [gate-sdk](gate-sdk/index.md) | index_tests |
 | (consumer) | native_crate |
+| [gate-sdk](gate-sdk/index.md) | projection_witness |
 
 ## Monitors
 

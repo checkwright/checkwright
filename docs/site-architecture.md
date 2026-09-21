@@ -79,17 +79,20 @@ Render a page through the parser that actually serves it before filing.
 
 Several docs surfaces are generated and byte-gated for freshness; each gate's red
 output names its own regen command, so the command need not stay resident to be
-recoverable:
+recoverable. A projection's trigger is its gate's `trigger=` (else `couples=`)
+and never a row's prose. `bash gate-sdk/bin/run-gates.sh --for <path>` answers it
+for any path; `--projection-witness`, the `projection_witness` validate suite,
+holds it to what the gate reads.
 
 - **The on-site SPEC mirror** <!-- projection: check-docs-mirror-fresh --> (`docs/<dir>/SPEC.md`, `docs/<dir>/README.md`,
   `docs/doctrine-kit/DOCTRINE.md`, for every top-level directory holding a
-  `SPEC.md` — the kits and `installer/`) — regenerate after editing any mirrored
-  SPEC/README/DOCTRINE: `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write`
+  `SPEC.md` — the kits and `installer/`):
+  `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write`
   (`check-docs-mirror-fresh` byte-gates it).
 - **The value rollup** <!-- projection: check-value-rollup-fresh --> — `docs/value.md` is hand-framed prose around one
   generated marker block that joins the enforcement-map's per-kit class counts to
-  the footprint's per-kit token cost. Regenerate on any change either emitter
-  reports: `bash gate-sdk/bin/run-gates.sh --emit value-rollup --write`
+  the footprint's per-kit token cost:
+  `bash gate-sdk/bin/run-gates.sh --emit value-rollup --write`
   (`check-value-rollup-fresh` byte-gates the block, the byte-fresh projection of
   the same arm without `--write`). The join reads the two emitters live, never
   the committed detail pages, so a stale page cannot poison the rollup; it reads
@@ -114,27 +117,22 @@ recoverable:
   fan-out is known. Knowing it in advance is the part nothing else states.
   `docs/footprint.md` is **not** in this fan-out, though the shape of the list
   invites the guess: the footprint measures no script, so a KPI's bytes never
-  reach it. Its actual trigger is the row below.
+  reach it; the row below says why.
 - **The enforcement map** <!-- projection: check-enforcement-fresh --> <!-- projection: check-footprint-fresh --> — `docs/enforcement.md` is the class registry's
-  projection, stale on any **class-registry** change rather than on a content
-  edit: a gate's `tier=`, a `scripts/kpis.list` entry, the settings hooks, a
-  `# enforce:` marker. `check-enforcement-fresh` byte-compares it (`bash
+  projection, moved by a class-registry change rather than by a content edit.
+  `check-enforcement-fresh` byte-compares it (`bash
   gate-sdk/bin/run-gates.sh --emit enforcement-map > docs/enforcement.md`). Its sibling
   `docs/footprint.md` is the per-kit token cost (`bash
   gate-sdk/bin/run-gates.sh --emit footprint > docs/footprint.md`, the emitter
   having ported to a non-gate arm the runner resolves config for). **Its measured
   set is narrower than "any kit file", and that misreading is the standing mistake
-  here**. context-kit/SPEC.md §bin/footprint owns the set, and what follows from
-  it is this row's business: the trigger is an injected-block edit, a `templates/`
-  markdown edit, or a kit joining or leaving the roster. A SPEC body edit is
-  **not** a trigger, nor is any script under `bin/`, `checks/` or `scripts/`,
-  since the set contains none of those. It reads the worktree rather
-  than the index, so no staging order binds its regen. Both are `docs/value.md`'s
-  inputs, so a red in either implies a rollup regen.
+  here**: context-kit/SPEC.md §bin/footprint owns the set, which holds injected
+  blocks and `templates/` markdown and no SPEC body or script. It reads the
+  worktree rather than the index, so no staging order binds its regen. Both are
+  `docs/value.md`'s inputs, so a red in either implies a rollup regen.
 - **The trajectory projection** <!-- projection: check-trajectory-fresh --> — `docs/evidence-data.md` is the published
   evidence extractor's output (`bash gate-sdk/bin/run-gates.sh --emit trajectory >
-  docs/evidence-data.md`, `check-trajectory-fresh` byte-gates it), stale on a
-  stage stamp or a release disposition. Its regen rides the close stage's
+  docs/evidence-data.md`, `check-trajectory-fresh` byte-gates it). Its regen rides the close stage's
   Clear-Done commit, because the gate is blind at the enter-close commit by
   construction. **The name collides and the two surfaces are unrelated:**
   `check-trajectory-fresh` and the `trajectory` arm govern *this* generated page, never
@@ -142,9 +140,8 @@ recoverable:
 - **The install-evidence projection** <!-- projection: check-install-evidence-fresh --> — `docs/install-evidence.md` is the
   install-evidence arm's output (`bash gate-sdk/bin/run-gates.sh --emit
   install-evidence > docs/install-evidence.md`,
-  `check-install-evidence-fresh` byte-gates it), stale on any capture into the
-  install-observation record and on a `scripts/gates.list` edit, that roster
-  being the classifier the per-gate block sorts a red's gate name against
+  `check-install-evidence-fresh` byte-gates it); `scripts/gates.list` is the
+  classifier the per-gate block sorts a red's gate name against
   (drift-kit/SPEC.md §The install-evidence projection). **Its gate is inert
   everywhere but the observing machine, by construction**: the record is
   gitignored, so in CI, in a fresh clone and in an adopter's tree there is
@@ -154,26 +151,25 @@ recoverable:
   above it names a file that is there.
 - **The roadmap projection** <!-- projection: check-roadmap-fresh --> — `ROADMAP.md` is a root projection of the queue's
   curated `[roadmap:]` tags (`bash gate-sdk/bin/run-gates.sh --emit roadmap --write`,
-  `check-roadmap-fresh` byte-gates its marker block), stale on any `[roadmap:]`
-  tag edit. Never hand-edited, and never regenerated by the whole-file redirect
+  `check-roadmap-fresh` byte-gates its marker block). Never hand-edited, and never
+  regenerated by the whole-file redirect
   the trajectory projection takes: the arm emits only the block, so a redirect
   destroys the prose above it.
 - **The graph artifact** <!-- projection: check-graph --> — `docs/check-graph.html` and the generated `pre-commit`
-  and `commit-msg` hooks are one set with one trigger, a gate's `# graph:`
-  manifest. The hooks also stale on three edits no manifest names. A kit-config
-  edit stales them, since a ported member's invocation bakes its resolved knob
-  values in (gate-sdk/SPEC.md §gen-pre-commit). Adding a kit
-  `gate-tests/*.test.sh` stales them: `--emit-enum-sets` derives its basename into
-  the `check-prose-enum` roster the hooks bake verbatim. Any tree edit that
-  *moves* a measured claim stales them, since the baked invocation carries
-  `check-measured-claim`'s resolved values; a script header gaining a
-  `# no-port:` cause moves the `tree-shell-owed` key this way. One command emits
-  both hooks
+  and `commit-msg` hooks form one set, held fresh by one gate. Kit config sits in
+  that gate's `couples=` because a ported member's invocation bakes its resolved
+  knob values in (gate-sdk/SPEC.md §gen-pre-commit). **Two edits stale the hooks
+  outside that declaration, and the witness samples one file per class, so it
+  reaches neither.** The first is adding a kit `gate-tests/*.test.sh`, whose
+  basename `--emit-enum-sets` derives into the `check-prose-enum` roster the hooks
+  bake verbatim. The second is any tree edit that *moves* a measured claim, since
+  the baked invocation carries `check-measured-claim`'s resolved values; a script
+  header gaining a `# no-port:` cause moves the `tree-shell-owed` key this way.
+  Regenerate the hooks first
   (`bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`), then the artifact
-  (`bash gate-sdk/bin/run-gates.sh --emit graph > docs/check-graph.html`), which
-  `check-graph` asserts fresh together. The hooks are never hand-edited;
-  that rule is resident in `CLAUDE.md` because a session about to edit it is not
-  looking at a red gate.
+  (`bash gate-sdk/bin/run-gates.sh --emit graph > docs/check-graph.html`).
+  Never hand-edit a hook: that rule is resident in `CLAUDE.md`, because a session
+  about to edit one is not looking at a red gate.
 - **The new-tag-class-member fan-out** — adding a member to
   `check-tag-lead-line`'s class table is a one-line edit with a four-surface
   wake, and it is invisible from the edit: `--emit enum-sets` derives the tag

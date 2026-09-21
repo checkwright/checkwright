@@ -12,17 +12,6 @@
 
 ## New Features
 
-- **projection-trigger-witness** [spec: SPEC-projection-witness.md] — the generated-projections
-  roster states each projection's staleness trigger in prose, and nothing checks the prose against
-  the emitter. Five false statements were measured in one roster at filing.
-  **Spec ruling, 2026-09-21:** the per-row trigger declaration is derived rather than written. A
-  freshness gate's `couples=`/`trigger=` already is that declaration, so the rows drop their
-  trigger sentences. `--projection-witness` (gate-sdk, run here as a validate suite) perturbs files
-  outside each projection's trigger set and reds if the gate goes red. A coupled but inert file is
-  reported and never red. Measured: an append to `CLAUDE.md` moves no footprint byte, while an
-  edit inside a kit marker block does, so couples are a sound superset.
-  Filed 2026-08-18 by close; it joined `docs-first-contact` as its trigger-witness unit.
-
 - **site-dark-token-palette-coverage-ungated** [spec: SPEC-highlight-coverage.md] — the dark-mode
   Rouge palette in `docs/_layouts/default.html` remapped only some of the highlight classes the
   theme colours, so `.o` (shell `&&`) rendered black on the dark code background (operator report,
@@ -2628,6 +2617,7 @@
 
 ## Done
 
+- projection-trigger-witness
 - generated-projections-roster-ungated
 - install-md-adopter-page-overgrown
 - docs-index-front-door-restatement-ungenerated

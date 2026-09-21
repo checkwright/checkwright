@@ -108,3 +108,4 @@ upgrade upgrade pass
 agents_md_smoke agents_md_smoke pass
 index_tests index_tests pass
 native_crate native_crate pass
+projection_witness projection_witness pass

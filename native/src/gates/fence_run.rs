@@ -414,7 +414,7 @@ fn execute(fences: &[Runnable], bin: &str) -> Result<Vec<Option<String>>, String
 
 // spec: canon-kit/SPEC.md §check-fence-run — `DEMO_TMP_DIR`, then the platform temp directory, the
 // base §Consumer smoke's builder takes
-fn scratch_base() -> PathBuf {
+pub(crate) fn scratch_base() -> PathBuf {
     std::env::var_os("DEMO_TMP_DIR")
         .filter(|v| !v.is_empty())
         .map(PathBuf::from)

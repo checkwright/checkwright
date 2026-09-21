@@ -127,6 +127,7 @@ bash gate-sdk/bin/run-gates.sh --run-consumer-smoke                             
 bash gate-sdk/bin/run-gates.sh --upgrade-smoke                                                  # a vendored tree upgrades in place
 bash installer/consumer-smoke/run-smoke.sh                                                      # the activation path, per profile
 bash gate-sdk/bin/run-gates.sh --run-demo                                                        # the adoption walkthrough
+bash gate-sdk/bin/run-gates.sh --projection-witness                                              # each projection's declared trigger, perturbed
 ```
 <!-- battery-roster:end -->
 

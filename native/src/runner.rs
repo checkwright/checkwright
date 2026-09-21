@@ -345,11 +345,7 @@ pub(crate) fn select_for(
             }
         };
         let f = manifest(&src);
-        let couples = registry::field(&f, "couples");
-        let mut trigger = registry::field(&f, "trigger");
-        if trigger.is_empty() {
-            trigger = couples;
-        }
+        let trigger = registry::effective_trigger(&f);
         // spec: gate-sdk/SPEC.md §Fail-closed contract — an unresolvable couples token is exit 2,
         // never a narrower selection: a silently lost trigger is a gate the selector stops running.
         let trigger = registry::expand_couples(&trigger, kit_roots_here).map_err(|e| {
