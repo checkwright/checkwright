@@ -11,6 +11,7 @@ pub const KIT: Kit = Kit {
             inputs: &[],
             empty_takes_default: false,
             packing: None,
+            words: false,
         },
         Row {
             name: "DOCTRINE_KIT_DOCTRINE_FILE",
@@ -19,6 +20,7 @@ pub const KIT: Kit = Kit {
             inputs: &[],
             empty_takes_default: false,
             packing: None,
+            words: false,
         },
         Row {
             name: "DOCTRINE_KIT_DIGEST_SECTION",
@@ -27,6 +29,7 @@ pub const KIT: Kit = Kit {
             inputs: &[],
             empty_takes_default: false,
             packing: None,
+            words: false,
         },
     ],
     validate: None,

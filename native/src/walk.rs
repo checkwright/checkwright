@@ -13,8 +13,14 @@ pub fn prune_dirs() -> Result<Vec<String>, String> {
 }
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — a whitespace-list knob's words, split by its reader and
-// expanded by nothing
+// expanded by nothing; a row not declared `.words()` is refused, so a list-scalar cannot go undeclared
 pub fn knob_words(knob: &str) -> Result<Vec<String>, String> {
+    if !crate::knobs::is_words(knob) {
+        return Err(format!(
+            "{} is read as a word list but its row is not declared `.words()` — declare it in its kit's knob table; treating as failure (not clean)",
+            knob
+        ));
+    }
     Ok(knob_scalar(knob)?.split_whitespace().map(String::from).collect())
 }
 

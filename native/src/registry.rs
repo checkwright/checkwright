@@ -360,7 +360,7 @@ pub fn expand_couples(field: &str, kit_roots_rel: &[String]) -> Result<String, S
                 for m in members.map_err(|e| {
                     format!(
                         "couples token 'knob:{}' could not be resolved: {} — a knob token expands \
-                         to the knob's members, and an empty expansion would be a lost trigger; \
+                         to the knob's members, and an unresolvable knob would be a lost trigger; \
                          treating as failure (not clean).\n  help: name a knob a static kit declares, \
                          and declare the '{}' sentinel on the expanding member",
                         name, e, EVERY_COUPLES_KNOB

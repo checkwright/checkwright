@@ -63,7 +63,7 @@ pub const KIT: Kit = Kit {
     rows: &[
         Row::scalar("CONTEXT_KIT_SETTINGS_FILE", ".claude/settings.json"),
         Row::derived("CONTEXT_KIT_SETTINGS_PINS", Shape::Scalar, settings_pins, &["GATE_SDK_GATES_DIR"]),
-        Row::scalar("CONTEXT_KIT_MEMORY_DIRS", ""),
+        Row::scalar("CONTEXT_KIT_MEMORY_DIRS", "").words(),
         Row::scalar("CONTEXT_KIT_BREVITY_FILE", "CLAUDE.md"),
         Row::indexed("CONTEXT_KIT_BREVITY_SECTIONS", &["## Shared conventions"]),
         Row::scalar("CONTEXT_KIT_BREVITY_BUDGET", "4"),

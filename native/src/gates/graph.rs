@@ -308,6 +308,29 @@ fn validate_amend_manifest(file: &str, span: &str, errors: &mut Vec<String>) {
             }
         }
     }
+    for name in words_tokens(&couples).into_iter().chain(words_tokens(&trigger)) {
+        errors.push(format!("{}: {}", where_, words_finding(name)));
+    }
+}
+
+// spec: gate-sdk/SPEC.md §check-graph — a `knob:` token whose row is declared `.words()`, read off the
+// row table alone, so the verdict is the same on every tree
+fn words_tokens(field: &str) -> Vec<&str> {
+    field
+        .split(',')
+        .filter_map(|t| t.strip_prefix("knob:"))
+        .map(|t| crate::knobs::reference(t).0)
+        .filter(|n| crate::knobs::is_words(n))
+        .collect()
+}
+
+fn words_finding(name: &str) -> String {
+    format!(
+        "couples token 'knob:{}' names a row declared `.words()` — its members carry whitespace after \
+         expansion, so the token is inert when unset and refused when set; name the corpus by literal \
+         or by an indexed knob",
+        name
+    )
 }
 
 // spec: gate-sdk/SPEC.md §check-graph (assertion G) — the amendment corpus: every SPEC-*.md under
@@ -511,6 +534,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
                          field '{}' — a projection names a field the knob's element packing declares",
                         script, token, name, f
                     ));
+                } else if crate::knobs::is_words(name) {
+                    errors.push(format!("MANIFEST: {} {}", script, words_finding(name)));
                 }
             }
         }

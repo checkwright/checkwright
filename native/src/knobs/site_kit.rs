@@ -34,6 +34,7 @@ pub const KIT: Kit = Kit {
             inputs: &[],
             empty_takes_default: false,
             packing: None,
+            words: false,
         },
         Row {
             name: "SITE_KIT_SCAN_ROOT",
@@ -42,6 +43,7 @@ pub const KIT: Kit = Kit {
             inputs: &[],
             empty_takes_default: false,
             packing: None,
+            words: false,
         },
         Row {
             name: "SITE_KIT_DOCS_DIR",
@@ -50,6 +52,7 @@ pub const KIT: Kit = Kit {
             inputs: &[],
             empty_takes_default: false,
             packing: None,
+            words: false,
         },
         Row {
             name: "SITE_KIT_ALIASES",
@@ -58,6 +61,7 @@ pub const KIT: Kit = Kit {
             inputs: &[],
             empty_takes_default: false,
             packing: None,
+            words: false,
         },
         Row {
             name: "SITE_KIT_EXEMPT_PATHS",
@@ -66,6 +70,7 @@ pub const KIT: Kit = Kit {
             inputs: &[],
             empty_takes_default: false,
             packing: None,
+            words: false,
         },
         Row {
             name: "SITE_KIT_HIGHLIGHT_TOKENS",
@@ -74,6 +79,7 @@ pub const KIT: Kit = Kit {
             inputs: &[],
             empty_takes_default: false,
             packing: None,
+            words: false,
         },
         Row {
             name: "SITE_KIT_HIGHLIGHT_OVERRIDES",
@@ -82,6 +88,7 @@ pub const KIT: Kit = Kit {
             inputs: &[],
             empty_takes_default: false,
             packing: None,
+            words: false,
         },
         Row {
             name: "SITE_KIT_HIGHLIGHT_SCOPE",
@@ -90,6 +97,7 @@ pub const KIT: Kit = Kit {
             inputs: &[],
             empty_takes_default: false,
             packing: None,
+            words: false,
         },
         Row {
             name: "SITE_KIT_RENDERER",
@@ -98,6 +106,7 @@ pub const KIT: Kit = Kit {
             inputs: &[],
             empty_takes_default: false,
             packing: None,
+            words: false,
         },
         Row {
             name: "SITE_KIT_RENDERER_BATCH",
@@ -106,6 +115,7 @@ pub const KIT: Kit = Kit {
             inputs: &["SITE_KIT_RENDERER"],
             empty_takes_default: false,
             packing: None,
+            words: false,
         },
     ],
     validate: None,

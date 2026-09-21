@@ -46,58 +46,6 @@
   first act, held by a two-root pairing arm on `check-path-dialect`. The textual absoluteness test
   at `:29` is a different primitive, filed apart.
 
-- **couples-knob-token-empty-expansion-passes-silently** [spec: SPEC-knob-token-shape.md]
-  — a `knob:` couples token whose expansion resolves to an **empty member set** is silently accepted
-  by `registry::expand_couples`, even though that function's own diagnostic says "an empty expansion
-  would be a lost trigger; treating as failure (not clean)".
-  **Re-verified at the drain, at the source:** in `native/src/registry.rs` that sentence is the text
-  of a `map_err` over the knob resolution, so it fires on a *resolution error* only. A knob that
-  resolves cleanly to zero members iterates zero times, pushes zero tokens, and returns `Ok`. A unit
-  test in the same file pins that behaviour as intended.
-  **The cost is attested rather than predicted:** `knob:GATE_SDK_KIT_DIRS` sat dead in
-  `check-kit-roots-dialect.gate` through a whole build stage and a green battery. Only the installer
-  smoke's `delegation` profile could see it, and it was deleted rather than made to work, because
-  `GATE_SDK_KIT_DIRS` is a scalar whitespace-joined list the token grammar cannot represent either
-  way.
-  **Deliverable:** expand each `knob:` token inside `check-graph`'s existing admissibility loop
-  (`native/src/gates/graph.rs`) and make a zero-member expansion a MANIFEST finding.
-  **Why design-pending rather than a drain fix:** it is a tightening with cross-consumer blast
-  radius — a consumer whose config leaves a kit-named knob empty newly reds — so it owes a
-  `good/`+`bad/` fixture pair and its own `## Tightened gates` declaration.
-  **Cost while deferred:** a `couples=` token can name a knob and trigger on nothing, and the gate
-  whose manifest carries it stops firing on the edits it declares it watches.
-  Filed 2026-09-20 to the gap inbox at this iteration's validate; promoted at this close drain.
-  Owner lookup: `expand_couples`, `couples=`, `knob:`, `empty expansion` — none carrying it.
-  `gates-must-not-bind-to-document-paths` is **adjacent and distinct**: which paths a manifest may
-  name, not whether a token expands to nothing.
-  **Ruled at spec (2026-09-21):** the tightening is on the row's shape, not on an empty expansion,
-  which is a stock consumer's designed state for twelve kit-empty knobs. It lands as a `.words()`
-  row marker plus a static `check-graph` finding.
-
-- **consumer-shaped-regressions-invisible-to-build-oracles** [spec: SPEC-knob-token-shape.md]
-  — both of this iteration's validate regressions were green in this tree and red only in a
-  consumer-shaped one: one under a set `GATE_SDK_KIT_DIRS`, one in a vendored copy at the previous
-  tag. Every oracle a build stage runs sees this tree only.
-  **Re-verified at the drain:** the two suites that see the other shape, `installer_smoke` and
-  `upgrade`, appear in `.workflow/validate-baseline.txt` and nowhere in the pre-commit battery, so a
-  defect authored in batch 1 or batch 4 was found four batches later — by a session that then had to
-  be re-tiered to author the fix.
-  **Why design-pending, and the trade is real rather than an obvious win.** The full installer smoke
-  runs in minutes and needs a clean worktree, so it cannot join a build-stage loop. The candidate is
-  a narrow build-time leg — regenerate the hooks once under a consumer-shaped `GATE_SDK_KIT_DIRS`
-  and assert the emission succeeds — which would have caught regression 1 in seconds. **It would not
-  have caught regression 2**, whose shape is TO's kits over FROM's tree and which has no cheap form.
-  So the deliverable buys one of the two, and whether half the class earns a new leg is the call
-  this entry holds.
-  **Cost while deferred:** a consumer-shaped defect keeps costing a whole iteration of latency plus
-  a re-tier, which is what it cost here.
-  Filed 2026-09-20 to the gap inbox at this iteration's validate by the session that repaired both
-  regressions; promoted at this close drain.
-  Owner lookup: `installer_smoke`, `upgrade smoke`, `GATE_SDK_KIT_DIRS`, `build-time leg` — none.
-  **Ruled at spec (2026-09-21):** half the class earns a leg, as a zero-name unit test that emits
-  the hooks under every install profile inside `check-crate-arms`' `cargo test`. It is not
-  `bin/build-native.sh`, which never tests. Regression 2's shape has no build-time form.
-
 - **gates-must-not-bind-to-document-paths** [spec: SPEC-doc-path-tokens.md] —
   a gate may know a document's SHAPE
   and never its PATH; path is always config. The discriminator is the operator's, ruled 2026-09-10,
@@ -2488,5 +2436,7 @@
 - bin-tool-help-arm-absent-tree-wide
 - docs-cmd-knob-definition-site-withheld
 - armed-by-census-unrun
+- couples-knob-token-empty-expansion-passes-silently
+- consumer-shaped-regressions-invisible-to-build-oracles
 
 ## Lessons Learned

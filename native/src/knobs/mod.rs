@@ -98,6 +98,9 @@ pub struct Row {
     // spec: gate-sdk/SPEC.md §The `# graph:` manifest — the named fields an indexed row's elements
     // pack, `None` on a row whose element is itself the pattern
     pub packing: Option<&'static Packing>,
+    // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a scalar row whose value is a whitespace-joined
+    // word list, which no `knob:` token can expand
+    pub words: bool,
 }
 
 // spec: gate-sdk/SPEC.md §The `# graph:` manifest — an element's field separator, and each field's
@@ -109,15 +112,15 @@ pub struct Packing {
 
 impl Row {
     pub const fn scalar(name: &'static str, v: &'static str) -> Row {
-        Row { name, shape: Shape::Scalar, default: Default::Scalar(v), inputs: &[], empty_takes_default: false, packing: None }
+        Row { name, shape: Shape::Scalar, default: Default::Scalar(v), inputs: &[], empty_takes_default: false, packing: None, words: false }
     }
 
     pub const fn indexed(name: &'static str, v: &'static [&'static str]) -> Row {
-        Row { name, shape: Shape::Indexed, default: Default::Indexed(v), inputs: &[], empty_takes_default: false, packing: None }
+        Row { name, shape: Shape::Indexed, default: Default::Indexed(v), inputs: &[], empty_takes_default: false, packing: None, words: false }
     }
 
     pub const fn keyed(name: &'static str, v: &'static [(&'static str, &'static str)]) -> Row {
-        Row { name, shape: Shape::Keyed, default: Default::Keyed(v), inputs: &[], empty_takes_default: false, packing: None }
+        Row { name, shape: Shape::Keyed, default: Default::Keyed(v), inputs: &[], empty_takes_default: false, packing: None, words: false }
     }
 
     pub const fn derived(
@@ -126,7 +129,7 @@ impl Row {
         f: fn(Resolve) -> Result<Value, String>,
         inputs: &'static [&'static str],
     ) -> Row {
-        Row { name, shape, default: Default::Derived(f), inputs, empty_takes_default: false, packing: None }
+        Row { name, shape, default: Default::Derived(f), inputs, empty_takes_default: false, packing: None, words: false }
     }
 
     pub const fn empty_takes_default(self) -> Row {
@@ -135,6 +138,10 @@ impl Row {
 
     pub const fn packed(self, packing: &'static Packing) -> Row {
         Row { packing: Some(packing), ..self }
+    }
+
+    pub const fn words(self) -> Row {
+        Row { words: true, ..self }
     }
 }
 
@@ -149,6 +156,11 @@ pub fn reference(r: &str) -> (&str, Option<&str>) {
 
 fn row_packing(name: &str) -> Option<&'static Packing> {
     owner(name).and_then(|k| k.row(name)).and_then(|r| r.packing)
+}
+
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — whether a knob's row is declared a word list
+pub fn is_words(name: &str) -> bool {
+    owner(name).and_then(|k| k.row(name)).is_some_and(|r| r.words)
 }
 
 // spec: gate-sdk/SPEC.md §The `# graph:` manifest — whether a knob's row declares the named field
@@ -1392,6 +1404,34 @@ mod tests {
 
         clean(&env, &s.dir());
         restore(&env);
+    }
+
+    // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a scalar whose static default holds whitespace is a
+    // word list and declares `.words()`, unless named here as one value — a heading, a regex
+    #[test]
+    fn a_whitespace_default_scalar_is_declared_words() {
+        const ONE_VALUE: &[&str] = &["CANON_KIT_DOD_HEADING", "DOCTRINE_KIT_DIGEST_SECTION", "QUEUE_KIT_PRECONDITION_REGEX"];
+        let mut undeclared: Vec<&str> = Vec::new();
+        for kit in STATIC_KITS {
+            for row in kit.rows {
+                if let Default::Scalar(v) = row.default {
+                    if v.contains(char::is_whitespace) && !ONE_VALUE.contains(&row.name) && !row.words {
+                        undeclared.push(row.name);
+                    }
+                }
+            }
+        }
+        assert!(undeclared.is_empty(), "defaulting to a word list and not declared `.words()`: {:?}", undeclared);
+        for p in ONE_VALUE {
+            assert!(owner(p).and_then(|k| k.row(p)).is_some_and(|r| !r.words), "{} is no longer an undeclared one-value row", p);
+        }
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — the word splitter refuses a row not declared `.words()`
+    #[test]
+    fn knob_words_refuses_an_undeclared_row() {
+        let e = crate::walk::knob_words("GATE_SDK_QUEUE_FILE").unwrap_err();
+        assert!(e.contains("GATE_SDK_QUEUE_FILE") && e.contains(".words()"), "{}", e);
     }
 
     // spec: gate-sdk/SPEC.md §The knob file — a row flagged `empty_takes_default` answers its default for

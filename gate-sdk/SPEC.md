@@ -2352,14 +2352,21 @@ The manifest grammar:
   silently. Fail-closed is inherited rather than authored: `knobs::wire` refuses a
   name no static kit owns, and an empty value is a resolved-empty set, so a `knob:`
   naming an unowned name is exit 2 while a declared knob a consumer set empty
-  expands to nothing — correct, because the gate then scans nothing either.
+  expands to nothing — correct, because the gate then scans nothing either, and it is a
+  consumer's designed state for every kit-empty indexed knob, so it is never a finding.
   **Which knob *shapes* survive that grammar is the corollary, and it is stated here because
   assembling it from the refusal plus the knob table cost a build stage.** Only a knob whose
   members each carry no comma and no whitespace is representable, which excludes a `Row::scalar`
   holding a whitespace-joined list outright and in *both* directions: unset it resolves empty and
-  the token is silently inert, set it becomes one member carrying spaces and the token refuses. A
-  `knob:` on such a row is therefore never right, and the row's shape — not the knob's name — is
-  what decides it.
+  the token is silently inert, set it becomes one member carrying spaces and the token refuses.
+  Such a row declares `.words()`, and `check-graph` reds a `knob:` token naming one, so the rule is
+  an oracle rather than a reader's duty. The shape is static, so the finding is config-independent
+  and reds on every tree, where a finding on the empty expansion would red a stock consumer. The
+  declaration is held twice: `walk::knob_words`, the word splitter, refuses a row not declared
+  `.words()`, and a crate unit test holds every scalar whose static default carries whitespace to
+  it, less a named roster of one-value rows — a heading, a regex — whose whitespace is content
+  rather than a separator. **Honest limit:** a word-list scalar with an empty default, split
+  outside `knob_words`, is held by review.
   **A packed knob is addressed by a declared field, never whole.** Where a knob's row declares its
   element packing, `knob:<NAME>.<field>` names one field's members across its elements, read through
   the same parser the member's walk uses; a bare token on a packed knob is refused, since an element
@@ -14808,6 +14815,16 @@ Windows leg compiles the crate's `cfg(not(unix))` code, so a dead item there is
 invisible to this gate on every contributor host. The test half stays this gate's
 alone.
 
+**The test arm holds one consumer-shaped leg.** A unit test in
+`native/src/emit/git_hooks.rs` emits the pre-commit hook under every profile in
+`installer/profiles.list` and the payload-derived `full`, each kit set written as
+`GATE_SDK_KIT_DIRS` into a knob file in a scratch gates dir rather than the process
+environment, and asserts the emission succeeds; a tree without the profile roster has
+nothing to hold. Emission costs milliseconds, so the leg mints no gate. It covers a
+consumer-*shaped* kit set over this tree's kits only. A defect whose shape is one
+release's kits over another's tree has no build-time form, and §upgrade-smoke at
+validate is its earliest oracle.
+
 **The predicate is the crate's presence, not cargo's**, and that is what keeps the
 gate simple:
 
@@ -15707,6 +15724,9 @@ member, against the member's registry declaration: a token naming a knob the
 member does not declare is a finding. That is the assertion that turns the hard
 authoring rule into an oracle for this class, because the crate declares only the
 knobs its own code reads, so an admissible token is provably a corpus the gate reads.
+A `knob:` token whose row is declared `.words()` is a finding in that loop and in
+assertion G's amendment manifests alike, read off the row table alone, so the verdict
+is the same on every tree and the fixture pair reaches it through `--amend-only`.
 **Couples-to-hook parity is unaffected by either token**, and the reason is
 structural rather than measured: both operands of that comparison pass through the
 same expansion, so they agree by construction whatever the token set is.

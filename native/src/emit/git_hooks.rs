@@ -416,4 +416,64 @@ mod tests {
         let _ = std::fs::remove_dir_all(&d);
         assert_eq!(got, vec![("check-a".to_string(), "  body one\n\n".to_string())]);
     }
+
+    // spec: gate-sdk/SPEC.md §check-crate-arms — the hook emits under every shipped install
+    // profile's kit set, set through a knob file in a scratch gates dir; a tree without the
+    // installer's profile roster has nothing to hold
+    #[test]
+    fn the_pre_commit_hook_emits_under_every_install_profile() {
+        let repo = Path::new(env!("CARGO_MANIFEST_DIR")).parent().expect("repo root").to_path_buf();
+        let Ok(roster) = std::fs::read_to_string(repo.join("installer/profiles.list")) else {
+            return;
+        };
+        let mut profiles: Vec<(String, Vec<String>)> = Vec::new();
+        for line in roster.lines().filter(|l| !l.trim().is_empty() && !l.starts_with('#')) {
+            let (p, kit) = line.split_once('\t').expect("a `<profile><TAB><kit>` row");
+            match profiles.iter_mut().find(|(n, _)| n == p) {
+                Some((_, kits)) => kits.push(kit.to_string()),
+                None => profiles.push((p.to_string(), vec![kit.to_string()])),
+            }
+        }
+        assert!(!profiles.is_empty(), "no profile parsed from installer/profiles.list");
+        let mut full: Vec<String> = walk::list_dir(&repo)
+            .expect("repo root")
+            .into_iter()
+            .map(|(n, _)| n)
+            .filter(|n| repo.join(n).join("checks").is_dir() || repo.join(n).join("smoke").is_dir())
+            .collect();
+        full.sort();
+        profiles.push(("full".to_string(), full));
+
+        let env = crate::knobenv::lock();
+        let d = std::env::temp_dir().join(format!("checkwright-hook-profiles.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(&d).expect("scratch");
+        std::fs::copy(repo.join("scripts/gates.list"), d.join("gates.list")).expect("registry");
+        let saved: Vec<(&str, Option<String>)> = ["GATE_SDK_GATES_DIR", "GATE_SDK_KIT_DIRS", "GATE_SDK_ROOT"]
+            .into_iter()
+            .map(|k| (k, std::env::var(k).ok()))
+            .collect();
+        env.set("GATE_SDK_GATES_DIR", &d.display().to_string());
+        env.remove("GATE_SDK_KIT_DIRS");
+        env.set("GATE_SDK_ROOT", &repo.join("gate-sdk").display().to_string());
+        let mut failed: Vec<String> = Vec::new();
+        for (name, kits) in &profiles {
+            let dirs: Vec<String> = kits.iter().map(|k| repo.join(k).display().to_string()).collect();
+            std::fs::write(d.join("gate-sdk-config.knobs"), format!("GATE_SDK_KIT_DIRS = {}\n", dirs.join(" ")))
+                .expect("knob file");
+            crate::knobs::reset(&env);
+            if let Err(e) = pre_commit(&repo.display().to_string(), &d.display().to_string()) {
+                failed.push(format!("{}: {}", name, e));
+            }
+        }
+        for (k, v) in saved {
+            match v {
+                Some(v) => env.set(k, &v),
+                None => env.remove(k),
+            }
+        }
+        crate::knobs::reset(&env);
+        let _ = std::fs::remove_dir_all(&d);
+        assert!(failed.is_empty(), "the pre-commit hook does not emit under: {:?}", failed);
+    }
 }
