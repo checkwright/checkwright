@@ -6,3 +6,4 @@
 
 docs-first-contact scope a5f80a39 2026-09-21 adb3a316
 docs-first-contact spec a142a72f 2026-09-21 fcc6ee36
+docs-first-contact align a1b0e1b3 2026-09-21 ddd9110a
