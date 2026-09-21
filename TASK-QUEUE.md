@@ -14,64 +14,6 @@
 
 ## Technical Debt
 
-- **bespoke-test-path-knob-pinning** — a bespoke gate-test's cwd sandbox is
-  isolated only while `GATE_SDK_TMP_DIR` and `GATE_SDK_WORKFLOW_DIR` happen to hold relative
-  values in the invoker's environment, which is an ambient default rather than anything the test
-  owns.
-  **Surveyed, and the survey re-run at the drain.** 16 bespoke `*/gate-tests/*.test.sh` build
-  cwd-relative `.tmp`/`.workflow` sandboxes; 11 pin one of those knobs explicitly, so pinning is
-  already the majority idiom. The 7 that do not: `canon-kit/check-comment-tier`,
-  `evidence-kit/producer-lock`, and lifecycle-kit's `check-stage-entry`, `check-merge-attrs`,
-  `check-survey-record`, `check-stage-evidence`, `check-close-surfaces`.
-  **Probed, not inferred (2026-08-23 validate).** With `GATE_SDK_TMP_DIR` pointed at an absolute
-  dir holding a live-pid `run-validate.lock`, `producer-lock.test.sh` reds on 4 assertions because
-  its inner run-validate reads the real lock; with `GATE_SDK_WORKFLOW_DIR` absolute it reds on 4
-  more, reading a foreign `validate-evidence.txt`. That is the same failure `c1375e99`'s
-  process-wide export produced and `80d74291` narrowed away — an export was one way to supply an
-  ambient absolute value, not the only one. `producer-lock` is the sharpest case: the evidence_kit
-  suite runs inside the spine *while a real run-validate producer is live by construction*.
-  **Why design-pending:** two fix shapes, and choosing is the deliverable. Have each exposed
-  test pin its own path knobs (~7 one-line edits, no new mechanism, conforming to the majority
-  idiom); or widen `gate-sdk/lib/test-hermetic.sh` to neutralize the path knobs the way it already
-  neutralizes `<KIT>_CONFIG_FILE` — one place, and precedented, since that file already pins
-  `GATE_SDK_NATIVE_BIN` absolute for the *same* reason (a relative default resolving to nothing
-  from a sandbox cwd) — but it changes a bootstrap every bespoke test sources and needs each
-  pinning test re-checked for an override it currently gets from the ambient value.
-  Distinct from `hermetic-bin-roster-config`, which is credential pinning in smoke scripts under
-  `check-test-hermetic` assertion B: a different knob class on a different surface.
-  **Cost while deferred:** low and conditional — nothing is red today and the spine is green with
-  the case-scoped pin; the exposure is that any future harness or operator exporting an absolute
-  `GATE_SDK_TMP_DIR` or `GATE_SDK_WORKFLOW_DIR` silently converts a test sandbox into live-state
-  access, which reads as a mystery red in an unrelated kit's suite rather than a configuration
-  fact.
-  **THE PREDICTED EXPOSURE FIRED, 2026-09-05, and it widens fix shape 2 rather than this entry.**
-  The cost field above said "nothing is red today"; this iteration produced the red — a bespoke
-  test's isolation defeated by ambient env it did not own, reaching `--run-validate`'s verdict.
-  The mechanism was a different knob class (a bridged `GATE_SDK_KNOB_*` scalar inherited from a
-  sibling arm, not an absolute path knob from an operator export), so the instance is filed as its
-  own entry, `run-validate-child-env-knob-leak`, since mooted: the bridge retirement at
-  `config-seam-fourth-cut` removed the `GATE_SDK_KNOB_*` class, so shape 2 — widening
-  `gate-sdk/lib/test-hermetic.sh` to neutralize the knobs — is back to covering one class. The
-  choice was made on 7 one-line edits against one bootstrap change; it should be re-made on that.
-  recurrence: bespoke-test-path-knob-pinning 2026-09-05
-  Filed 2026-08-23 by validate; the close drain re-ran the survey oracle and got 16/11/7 with the
-  same seven names.
-  **Promoted 2026-09-21 into `scratch-hermeticity`** by operator direction (lead-relayed). Debt:
-  both shapes converge on knobs the specs already carry.
-  **Shape ruled at spec 2026-09-21: shape 2.** `gate-sdk/lib/test-hermetic.sh` unsets
-  `GATE_SDK_TMP_DIR` and `GATE_SDK_WORKFLOW_DIR`, so a sourcing test resolves both to their
-  relative kit defaults against its sandbox cwd. Grounds: the library's own header says a test
-  "runs on kit defaults, never the invoker's cwd config", and these two knobs are the hole in that
-  contract. Shape 1 would leave the next unpinned test exposed.
-  **Probed at spec:** every explicit pin of either knob in a bespoke test sits after that test's
-  `source …/test-hermetic.sh` line, so the unset overrides no pin. No unpinned test reads either
-  knob. `--run-validate` spawns suites with inherited env and exports neither knob. evidence-kit's
-  path knobs derive from the two roots. **Honest limit:** a derived knob exported directly
-  (e.g. `EVIDENCE_KIT_LOCK_FILE`) still reaches a test; state it in the section's merge text.
-  **DoD:** the unset lands with its §lib/test-hermetic.sh sentence. `producer-lock.test.sh` passes
-  with an absolute `GATE_SDK_TMP_DIR` pointed at a directory holding a live-pid lock (the
-  2026-08-23 reproduction). The entry moves to Done before the drain stage.
-
 ## Deferred
 
 - **recurrence-line-never-ages** [cost: event/low] [surface: queue-kit] — a dated `recurrence:`
@@ -2942,5 +2884,6 @@
 - upgrade-smoke-producer-leaks-worktrees-on-signal
 - check-kit-roots-dialect-leaks-a-scratch-tree-per-run
 - boundary-wipe-note-enumerates-nested-paths
+- bespoke-test-path-knob-pinning
 
 ## Lessons Learned

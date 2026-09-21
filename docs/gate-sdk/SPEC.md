@@ -10309,6 +10309,21 @@ default) — ordering wins, no opt-in flag needed. **The honest limit:** the loc
 overlay, `<gates-dir>/<stem>-config.local.knobs`, is not pinned, so a suite run
 from a tree carrying one still reads it.
 
+**The library also unsets `GATE_SDK_TMP_DIR` and `GATE_SDK_WORKFLOW_DIR`**, so a
+sourcing test resolves both to their relative kit defaults against its own
+sandbox cwd rather than an ambient absolute value the invoker's environment
+happens to carry: this file's own header says a test "runs on kit defaults,
+never the invoker's cwd config," and an inherited absolute path knob was the
+hole in that contract — a test built to isolate itself under a *relative*
+scratch or workflow directory instead reads the invoker's live state (a real
+`run-validate.lock`, a foreign `validate-evidence.txt`) once either knob is
+exported absolute around it. The unset runs after every bespoke test's own
+explicit pin of either knob, since a pin sits after that test's `source` line
+by construction, so it overrides no test's deliberate choice; it only
+neutralizes the ambient case. **The honest limit:** a knob derived from either
+root and exported directly (`EVIDENCE_KIT_LOCK_FILE`, for one) still reaches a
+test that does not also unset it.
+
 **The binary pin is an *absolutization of the accessor's answer*, never a second
 default.** A bespoke test runs its gate from a sandbox cwd where the knob's
 deliberately repo-relative default resolves to nothing (§Layout and
