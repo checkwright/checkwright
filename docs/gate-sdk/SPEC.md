@@ -588,14 +588,25 @@ test spawns `lib/gate.sh` and holds `gate_sdk_gates_dir` equal to the crate's
 literal. The files are read once per process per kit and the environment at every
 read.
 
-**Some names under a kit's prefix are set in the environment only.** A kit's table
-may list them, and a file line naming one is refused at exit 2 with *set it in the
-environment*, where the generic undeclared-name refusal would only name the roster.
-gate-sdk lists four: the two locators, `GATE_SDK_GATES_DIR` and `GATE_SDK_ROOT`, and
-the two execution settings the runner reads from its own environment,
-`GATE_SDK_JOBS` and `GATE_SDK_VERBOSE` (§run-gates). None is a row, each counts
-among `check-docs-cmd`'s static names, and none reaches a knob file in the
-knob-file derivation.
+**Some names under a kit's prefix resolve from the environment only** — set there
+by a caller, or exported by the kit to a process it spawns. A kit's table may list
+them, and a file line naming one is refused at exit 2 — *it is read from the
+environment, never from a knob file* — where the generic undeclared-name refusal
+would only name the roster. A name a kit reads or hands through the environment
+takes an `env_only` entry, because `smoke/` is withheld from the payload
+(§Consumer payload) and is therefore no definition site; a name that exists only
+as smoke test data takes none. gate-sdk lists four: the two locators,
+`GATE_SDK_GATES_DIR` and `GATE_SDK_ROOT`, and the two execution settings the
+runner reads from its own environment, `GATE_SDK_JOBS` and `GATE_SDK_VERBOSE`
+(§run-gates). lifecycle-kit lists one, `LIFECYCLE_KIT_SESSIONS_DIR`, an operator
+override lifecycle-kit/SPEC.md refuses as a row because a knob file must never
+set a session identity. drift-kit lists one, `DRIFT_KIT_ITERATION_START`, computed
+by the drift driver and exported to every plugin it spawns; `DRIFT_KIT_SMOKE_CUSTOM`
+is a sibling name in the same family that takes no entry, since drift-kit/SPEC.md
+already calls it a name no table declares and declaring it would falsify the
+property its smoke demonstrates. None of these is a row, each counts among
+`check-docs-cmd`'s static names, and none reaches a knob file in the knob-file
+derivation.
 
 **The environment beats the file, on purpose.** A shell config's own spelling
 decided, and a bare assignment won, so a harness could not make a knob

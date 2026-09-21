@@ -2382,7 +2382,9 @@ one session that calls it directly is a lead writing its own session-role marker
 `LIFECYCLE_KIT_SESSION_ID` nor `LIFECYCLE_KIT_SESSIONS_DIR` is a row in the kit's
 static table, and declaring a name its owning kit does not declare is the
 undeclared-name refusal (gate-sdk/SPEC.md §The knob file) — the arm would
-fail-close on every invocation. Table membership is nonetheless what makes the arm
+fail-close on every invocation. `LIFECYCLE_KIT_SESSIONS_DIR` is, however, an
+`env_only` name (gate-sdk/SPEC.md §The knob file), so an adopter's docs may cite
+it though no table row backs it. Table membership is nonetheless what makes the arm
 *reachable*, so the row exists with an empty roster, the second such member after
 `--emit-md-section`. Adding the two as rows so the names could be declared is
 refused: a knob file must never be able to set a stamp-id override, because every

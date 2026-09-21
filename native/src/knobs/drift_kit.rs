@@ -114,7 +114,10 @@ pub const KIT: Kit = Kit {
     open_family: true,
     families: &[],
     retired: &[],
-    env_only: &[],
+    // spec: gate-sdk/SPEC.md §The knob file — DRIFT_KIT_ITERATION_START is a name the driver hands
+    // through the environment (native/src/emit/drift_report.rs), taking this entry since `smoke/` is
+    // withheld and is no definition site. DRIFT_KIT_SMOKE_CUSTOM owes none: smoke test data only.
+    env_only: &["DRIFT_KIT_ITERATION_START"],
 };
 
 // spec: drift-kit/SPEC.md §Layout and configuration — the registry a consumer set to a path that is

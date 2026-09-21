@@ -153,7 +153,9 @@ recomputes it every run.
 `DRIFT_KIT_ITERATION_START` is the same *class* of handoff as
 `DRIFT_KIT_KIT_ROOTS` — computed by the driver every run, reaching every plugin
 as exported environment and every built-in as the same resolved value, never a
-consumer knob. What it does not share is the
+consumer knob. It is, however, an `env_only` name (gate-sdk/SPEC.md §The knob
+file), so an adopter's docs may cite it though no table row backs it. What it
+does not share is the
 parity hazard: it introduces no fixed export list that could drift out of step
 with the knob set it travels beside. A plugin reading it gets the empty string
 when there is no iteration-start commit (lifecycle-kit/SPEC.md §The state

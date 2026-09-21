@@ -548,7 +548,7 @@ fn layer(kit: &'static Kit, path: &str, text: &str) -> Result<Layer, String> {
         if kit.is_env_only(&e.name) {
             return Err(at(
                 e.lno,
-                format!("{} is not read from a knob file — set it in the environment", e.name),
+                format!("{} is not read from a knob file — it is read from the environment, never from a knob file", e.name),
             ));
         }
         let Some(row) = kit.row(&e.name) else {
@@ -1354,7 +1354,7 @@ mod tests {
             let p = s.write("gate-sdk-config.knobs", &format!("{} = x\n", name));
             reset(&env);
             let e = resolve("GATE_SDK_TMP_DIR").unwrap_err();
-            assert!(e.starts_with(&format!("{}:1: ", p)) && e.contains("set it in the environment"), "{}", e);
+            assert!(e.starts_with(&format!("{}:1: ", p)) && e.contains("read from the environment, never from a knob file"), "{}", e);
         }
         std::fs::remove_file(s.0.join("gate-sdk-config.knobs")).unwrap();
         env.set("GATE_SDK_GRAPH_THEME", "old.sh");
@@ -1364,6 +1364,32 @@ mod tests {
         s.write("gate-sdk-config.sh", "GATE_SDK_TMP_DIR=x\n");
         reset(&env);
         assert!(resolve("GATE_SDK_TMP_DIR").unwrap_err().contains("gate-sdk-config.knobs"));
+        clean(&env, &s.dir());
+        restore(&env);
+    }
+
+    // spec: gate-sdk/SPEC.md §The knob file — a name a kit reads or hands through the environment
+    // takes an `env_only` entry, so LIFECYCLE_KIT_SESSIONS_DIR and DRIFT_KIT_ITERATION_START are both
+    // in `static_names()` (§check-docs-cmd's defined set) and refused at exit 2 in a knob file
+    #[test]
+    fn the_two_environment_resolved_names_are_defined_and_refused_in_a_file() {
+        assert!(static_names().contains(&"LIFECYCLE_KIT_SESSIONS_DIR".to_string()));
+        assert!(static_names().contains(&"DRIFT_KIT_ITERATION_START".to_string()));
+
+        let env = knobenv::lock();
+        let s = Scratch::new("env-only-handed-through");
+        clean(&env, &s.dir());
+        s.write("lifecycle-config.knobs", "LIFECYCLE_KIT_SESSIONS_DIR = x\n");
+        reset(&env);
+        let e = resolve("LIFECYCLE_KIT_FIRST_STAGE").unwrap_err();
+        assert!(e.contains("read from the environment, never from a knob file"), "{}", e);
+        std::fs::remove_file(s.0.join("lifecycle-config.knobs")).unwrap();
+
+        s.write("drift-config.knobs", "DRIFT_KIT_ITERATION_START = x\n");
+        reset(&env);
+        let e = resolve("DRIFT_KIT_STAGES").unwrap_err();
+        assert!(e.contains("read from the environment, never from a knob file"), "{}", e);
+
         clean(&env, &s.dir());
         restore(&env);
     }

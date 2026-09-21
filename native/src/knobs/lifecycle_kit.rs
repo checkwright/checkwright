@@ -129,7 +129,10 @@ pub const KIT: Kit = Kit {
     open_family: false,
     families: &[],
     retired: &[],
-    env_only: &[],
+    // spec: gate-sdk/SPEC.md §The knob file — LIFECYCLE_KIT_SESSIONS_DIR resolves from the process
+    // environment only (`--emit session-id`); a knob file must never set a session identity, and
+    // `smoke/` is withheld from the payload, so this is its one definition site.
+    env_only: &["LIFECYCLE_KIT_SESSIONS_DIR"],
 };
 
 fn positive(v: &str) -> bool {

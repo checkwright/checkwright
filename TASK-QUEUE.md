@@ -311,37 +311,6 @@
   fixture suite (16.1 s measured) when the crate source changed. No new arm is minted, since the
   suite roster is already `registry::fixture_suites()`.
 
-- **docs-cmd-knob-definition-site-withheld** [spec: SPEC-env-only-names.md]
-  — `check-docs-cmd`'s defined-knob set loses every knob whose only tracked kit-root occurrence
-  lives in `smoke/`, now that the payload withholds `smoke/`. The subject is where a kit's knob
-  names are DEFINED, not what the payload carries.
-  **Measured THREE members, not the five this was filed with.** The filing named five knobs whose
-  only kit-root occurrence is under `smoke/`; re-probed at the close drain, two of them are static-
-  table rows after all and `knobs::static_names()` covers them — `CONTEXT_KIT_BREVITY_SECTIONS` is
-  `Row::indexed` in `native/src/knobs/context_kit.rs` and `CANON_KIT_GLOSSARY_FILE` is `Row::scalar`
-  in `native/src/knobs/canon_kit.rs`. **The exposed set is `LIFECYCLE_KIT_SESSIONS_DIR`,
-  `DRIFT_KIT_ITERATION_START` and `DRIFT_KIT_SMOKE_CUSTOM`**: no row for any of the three occurs
-  anywhere under `native/src/knobs/` outside test bodies, `lifecycle_kit.rs` and `drift_kit.rs` both
-  carry `env_only: &[]`, and drift-kit's own SPEC calls `DRIFT_KIT_SMOKE_CUSTOM` "a name no table
-  declares".
-  **Mechanism:** `native/src/gates/docs_cmd.rs`'s `defined_knobs()` greps raw kit roots
-  (`walk::kit_roots`, unpruned) excluding only `*.md` and `*/gate-tests/*`, and unions
-  `knobs::static_names()`; a knob in neither is reported as "env knob X occurs in no tracked kit
-  source".
-  **NOTHING REDS TODAY and that is why it is filed rather than fixed** — a stock consumer's seeded
-  docs cite none of the five, and `check-docs-cmd` is green in this tree (run, not assumed).
-  **Why design-pending:** whether a knob a kit reads must have a shipped non-smoke definition
-  site at all is the ruling, and only after it is whether the repair is table rows, an `env_only`
-  entry, or widening what `docs_cmd` counts as a definition.
-  **Cost while deferred:** an adopter who documents one of the three meets a hard fail they cannot
-  satisfy — the knob is real, and documented in a kit SPEC they do not have.
-  Filed 2026-09-16 at the lead's decision during `installer-front-door-cut`'s build; its sizing
-  corrected from five to three at that iteration's close drain, by re-probing the static tables the
-  filing asserted were empty.
-  **Ruled at spec (2026-09-21):** a name a kit reads or hands through the environment takes an
-  `env_only` entry: `LIFECYCLE_KIT_SESSIONS_DIR` and `DRIFT_KIT_ITERATION_START`.
-  `DRIFT_KIT_SMOKE_CUSTOM` is smoke test data and owes none.
-
 ## Technical Debt
 
 - **armed-by-census-unrun** — gate-sdk/SPEC.md §The install disposition mints a
@@ -2531,5 +2500,6 @@
 - install-disposition-smoke-accounting-split
 - bridged-knob-owner-for-consumer-gate
 - bin-tool-help-arm-absent-tree-wide
+- docs-cmd-knob-definition-site-withheld
 
 ## Lessons Learned
