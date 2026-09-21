@@ -23,8 +23,9 @@
   review. Their 41 path-bound citations are repointed in one commit, with `check-spec-pointer` as
   the oracle. The guard is `check-surface-ratchet`, widened by config to the 51 non-mirror `docs/`
   pages, and no new gate is added.
-  **Open, escalated to the lead:** the four gated blocks alone are 109 lines. The spec reads
-  "about 150" as prose around the blocks, which puts the page near 260 lines.
+  **Length, by operator direction (2026-09-21, lead session):** the four gated blocks alone are
+  109 lines, so the target is about 150 prose lines around them, putting the page near 260. Build
+  may also split a long docs page into sub-pages; that is sanctioned, not required.
   Filed 2026-09-21 to the gap inbox by the lead, and promoted into `docs-first-contact` by operator
   direction; the amendment was authored and paired at this spec.
   **DISTINCT from** `docs-index-front-door-restatement-ungenerated`.
@@ -100,9 +101,9 @@
   (site-kit, armed by `SITE_KIT_HIGHLIGHT_TOKENS`) asserts that the layout overrides every class in
   a tracked snapshot, and a `site-health` template arm holds the snapshot to the live theme CSS in
   both directions.
-  **Found at spec:** counting grouped selectors, the live CSS colours 63 classes. The hotfix misses
-  `.cd`, `.kv`, `.mb` and `.mx`, because the check that cleared it read only each rule's first
-  selector.
+  **Found at spec:** counting grouped selectors, the live CSS colours 63 classes. The hotfix's
+  first draft missed `.cd`, `.kv`, `.mb` and `.mx`, because the check that cleared it read only
+  each rule's first selector. The committed hotfix covers all 63.
   Filed 2026-09-21 to the gap inbox by the lead, and entered directly by operator direction (lead
   session). Cost event/high: every shell command on the public site was unreadable in dark mode.
 

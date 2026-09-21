@@ -68,10 +68,17 @@ its citation sweep, and `check-spec-pointer` is its oracle.
 **The ~150-line figure against the gated floor, measured.** The four blocks are
 109 lines that no rewrite can shorten. They are parity- and workflow-held. So
 "about 150 lines" leaves about 40 lines for the intro, Quick start, Managing and
-Upgrading. **This amendment reads the figure as about 150 lines of prose around
-the gated blocks, so a page near 260 lines. That reading is escalated to the lead
-and awaits a ruling.** Build lands the ceiling at whatever the ruled budget
-yields, so the guard's number is not fixed here.
+Upgrading. **Settled by operator direction (2026-09-21, lead session): about 150
+lines of prose around the gated blocks, so the page lands near 260 lines.** Build
+sets docs/install.md's ceiling row at the rewritten page's actual length.
+
+**A sanctioned option, not a requirement.** The same direction added that a long
+docs page may be split into sub-pages. Build may do that here or on any page the
+ratchet governs. A split page's parts each take their own ceiling row in the same
+commit. The gated blocks stay on the page their readers name: the workflow legs
+awk `docs/install.md`, `check-install-claim` reads a Quick start or Install
+heading, and the two parity gates read `docs/install.md` by default. So a split
+leaves those blocks where they are, or it repoints each reader in the same commit.
 
 It is a root-level amendment because it spans the `docs/` site, installer/SPEC.md
 (which receives the grounds), context-kit (the ratchet's stated scope), `native/`
@@ -280,8 +287,9 @@ ratchet, `native/src/emit/always_loaded.rs` `governed()`, and canon-kit/SPEC.md
 - [ ] **Amendment deleted.** This file is removed on merge (`ls SPEC-*.md`).
 - [ ] **Entry moved.** `install-md-adopter-page-overgrown` moves to Done in the
       merge commit, at a stage before the drain stage.
-- [ ] **Budget ruled.** The page's length is the budget the lead's ruling set, and
-      its ceiling row is that length.
+- [ ] **Budget met.** The page carries about 150 prose lines around the gated
+      blocks, per the operator direction, and its ceiling row, or each
+      sub-page's row if build split it, is the landed length.
 - [ ] **Removals propagated.** `check-amendment-retired-spelling` runs the block
       above against the tracked tree.
 - [ ] **Gaps filed.** Any cross-component gap build discovers is resolved that

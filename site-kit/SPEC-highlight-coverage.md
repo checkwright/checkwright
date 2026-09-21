@@ -27,13 +27,13 @@ The gate reads it as its oracle and the monitor holds it to the live CSS. It is
 consumer config: which theme a site uses and which classes that theme colours is
 one project's content. The kit ships only the mechanism.
 
-**Measured at this spec (2026-09-21), and it changes the hotfix.**
+**Measured at this spec (2026-09-21), and it changed the hotfix.**
 `curl https://checkwright.dev/assets/css/style.css` returned 76,559 bytes. From
 it, every rule whose declaration sets `color` or `background` was taken. Its
 selector list was **split on commas**, and each `.highlight .<class>` was kept.
-That gives **63** classes. The same extraction run over the uncommitted hotfix
-layout, followed by `comm -23`, leaves **four uncovered**: `.cd`, `.kv`, `.mb`
-and `.mx`. Each is the second or later member of a grouped rule:
+That gives **63** classes. The same extraction run over the first draft of the
+hotfix layout, followed by `comm -23`, left **four uncovered**: `.cd`, `.kv`,
+`.mb` and `.mx`. Each is the second or later member of a grouped rule:
 
 - `.highlight .c,.highlight .cd{color:#999988;…}`
 - `.highlight .k,.highlight .kv{color:#000000;…}` — `.kv` is black, the
@@ -42,8 +42,10 @@ and `.mx`. Each is the second or later member of a grouped rule:
 
 The lead's check, which found none uncovered, read only each rule's first
 selector. So the extraction rule below is specified to the comma, because the
-one-selector reading is the error it already produced once. Against HEAD, before
-the hotfix, the same comm leaves 18 uncovered.
+one-selector reading is the error it already produced once. Before the hotfix,
+the same comm left 18 uncovered. The committed hotfix, `57761a4d`, covers all
+four as well, and the comm over it comes back empty. The lead measured that, and
+it was re-run here against HEAD. So the layout satisfies the snapshot on landing.
 
 ## What changes
 
@@ -145,10 +147,10 @@ lasts, and the pre-bump tree cannot prevent it.
   the arm, with `HIGHLIGHT_CSS_PATH=/assets/css/style.css` and
   `HIGHLIGHT_TOKENS_FILE=scripts/highlight-tokens.list`.
 - **`docs/_layouts/default.html` gains overrides for any class the gate reds on,
-  in the same commit.** As measured above, that is `.cd`, `.kv`, `.mb` and
-  `.mx`, unless the lead's hotfix commit has already added them. Each joins its
-  family's palette variable: `.cd` joins comment, `.kv` joins keyword, and
-  `.mb` and `.mx` join variable, matching `.c`, `.k` and `.m`.
+  in the same commit.** At `57761a4d` that set is empty, since the layout covers
+  all 63 classes. A class that joins the theme between spec and build takes its
+  family's palette variable, the way the hotfix mapped `.cd`, `.kv`, `.mb` and
+  `.mx`.
 
 Mechanical: every value is enumerated.
 
@@ -181,9 +183,8 @@ Mechanical: every value is enumerated.
   in site-kit's smoke (§templates/site-health.yml, last paragraph), so a
   regression in the arm's bash reds the smoke.
 - **Point 6.** The corpus is the 63 snapshot classes, and each one's satisfying
-  value is a covering selector in `docs/_layouts/default.html`. 59 are covered by
-  the uncommitted hotfix, and the four named above are covered by delta 3's
-  layout edit. No member is narrowed past.
+  value is a covering selector in `docs/_layouts/default.html`. All 63 are covered
+  at `57761a4d`. No member is narrowed past.
 
 ## Existing sections updated
 
