@@ -4,11 +4,4 @@
 
 ---
 
-delegation-seams scope a9520f7d 2026-09-21 c4f65fc0
-delegation-seams spec a9dfc58e 2026-09-21 0d2ebdaf
-delegation-seams align ae798ca3 2026-09-21 833cb696
-delegation-seams build aace24dc 2026-09-21 fac66e95
-delegation-seams build a7ca75ad 2026-09-21 cb2143a1
-delegation-seams build aa1ee114 2026-09-21 20e60c29
-delegation-seams validate aec987e6 2026-09-21 e0eeced3
-delegation-seams close a3b81a76 2026-09-21 d0bf747e
+— scope a5f80a39 2026-09-21 adb3a316
