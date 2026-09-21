@@ -12,6 +12,62 @@
 
 ## New Features
 
+- **gate-tamper-default-library-path-unvendored** [spec: SPEC-tamper-union.md] — the kit
+  default of `DELEGATION_KIT_GATE_FILES` (`native/src/knobs/delegation_kit.rs`,
+  delegation-kit/SPEC.md §Layout and configuration) names `<gates-dir>/lib/gate.sh` as its third
+  element, a path no vendored tree carries — the gate library sits under the vendored gate-sdk
+  root — so a consumer on the default leaves the library outside `check-gate-tamper`'s gate-file
+  roster. Carried verbatim from the retired shell loader into the static table; this repo's own
+  knob file names the right path, which is why the battery here never showed it. Distinct from
+  `gate-file-coverage-closure`, which enumerates registered gate files and would not reach the
+  library.
+  **Why design-pending:** the fix derives the element from a gate-sdk root input rather than the
+  gates dir, and which root knob (relative to what `check-gate-tamper` matches) is a choice; it
+  widens the gate's refusal set for every consumer on the default, so it owes a fixture arm and a
+  Tightened-gates declaration.
+  **Cost while deferred:** a consumer's gate-library edit co-staged with product code escapes the
+  isolation rule.
+  Filed 2026-09-14 by `config-seam-third-cut`'s build (batch 2); drained at its close.
+  **Joins `delegation-seams`** as its tamper-default unit (operator direction 2026-09-21,
+  lead-relayed); **marked for spec**, which picks the root knob. Re-verified at scope:
+  `native/src/knobs/delegation_kit.rs` still derives the element from `GATE_SDK_GATES_DIR`.
+  **Merged with `gate-file-coverage-closure` by operator direction (2026-09-21, lead-relayed;
+  option B):** no root knob is picked, the tamper reader unions `<GATE_SDK_ROOT>/lib/gate.sh`
+  itself and the default drops the element. Both entries pair one amendment; land them together.
+
+- **gate-file-coverage-closure** [spec: SPEC-tamper-union.md] — the missing check class behind a
+  hole this close fixed inline: nothing asserts that every gate script in the
+  tree is matched by some `DELEGATION_KIT_GATE_FILES` glob, so a gate can sit
+  outside `check-gate-tamper`'s assertion-A coverage silently. It did: this
+  repo's consumer config declares the array, which **replaces** the kit default
+  rather than extending it (a knob-file value replaces the default whole),
+  and the declaration named only `*/checks/*.sh` — leaving all nine
+  `scripts/check-*.sh` consumer-resident gates uncovered. Close restated the
+  default's glob in this repo's delegation config and corrected
+  delegation-kit/SPEC.md §Layout and configuration, which had described the
+  knob as *widening* the default — the inverse of the mechanism.
+  **The gate:** enumerate gate scripts (the `gates.list` registry resolved to
+  files), and red any whose path no `DELEGATION_KIT_GATE_FILES` glob matches.
+  Cheap and mechanically decidable — the coverage set and the glob set are both
+  already in hand at gate time. Needs a `gate-sdk` fixture pair and a home
+  (delegation-kit, since it reads that kit's knob).
+  **Why design-pending:** it makes coverage-completeness a delegation-kit
+  contract, which is a SPEC assertion, not just a new script.
+  **Cost while deferred:** the config is correct today but unheld — the next
+  consumer-resident gate, or the next kit-glob edit, can reopen the identical
+  hole with nothing to catch it. Exactly the replace-vs-extend footgun the SPEC
+  now documents but does not enforce.
+  Filed 2026-07-26 by close (`activation-path`), generalizing the
+  knowledge-friction captures that surfaced the replace-vs-extend semantics.
+  **Joins `delegation-seams`** as its tamper-coverage unit (operator direction 2026-09-21,
+  lead-relayed); **marked for spec**, which authors its amendment — a feature, the unit mints a
+  gate. **Enhancement admission filter, engaged 2026-09-21 at scope:** trust arm — an adopter
+  trusts `check-gate-tamper` to cover every gate, and nothing holds that it does.
+  **Deliverable changed by operator direction (2026-09-21, lead-relayed; option B): no new gate.**
+  `check-gate-tamper`'s reader unions every registered member's resolved declaration into its
+  gate files, so coverage holds by construction (removal outranks gating); a gate over all
+  members would red every default consumer, whose globs miss the 106 kit-resident gates here.
+
 - **guard-rule-12-single-occurrence-pgrep-loop-passes** [spec: SPEC-pgrep-self-match.md] —
   guard-kit/SPEC.md §The generic ruleset rule 12 (`guard_rule_pgrep_self_match`) fires only when a
   `pgrep`/`pkill -f` pattern literal occurs ELSEWHERE in the command, yet its own grounds say the
@@ -99,7 +155,8 @@
   Widening the turn-end hook's refusal set stays operator-class and escalates from spec.
   **Spec 2026-09-21:** ruled the steer, in the template: size timeouts, record from a pid the moved
   producer names, hold turn and tree until the notification the move promises (probed). The hook
-  widening is escalated to the operator and pending; the amendment records it.
+  widening was granted by operator direction (2026-09-21, lead-relayed) as delta 3: refuse on a
+  running `shell` element, reading `type`/`status` and logging no value of the view.
   recurrence: harness-moved-background-task-unrecorded 2026-09-14
 
 - **worktree-isolated-agent-report-lost-to-a-failed-peer-send** [spec: SPEC-isolation-seams.md]
@@ -728,26 +785,6 @@
   Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, from the red its own
   filing hit; promoted at the next iteration's scope.
 
-- **gate-tamper-default-library-path-unvendored** [cost: event/low] [surface: delegation-kit] — the kit
-  default of `DELEGATION_KIT_GATE_FILES` (`native/src/knobs/delegation_kit.rs`,
-  delegation-kit/SPEC.md §Layout and configuration) names `<gates-dir>/lib/gate.sh` as its third
-  element, a path no vendored tree carries — the gate library sits under the vendored gate-sdk
-  root — so a consumer on the default leaves the library outside `check-gate-tamper`'s gate-file
-  roster. Carried verbatim from the retired shell loader into the static table; this repo's own
-  knob file names the right path, which is why the battery here never showed it. Distinct from
-  `gate-file-coverage-closure`, which enumerates registered gate files and would not reach the
-  library.
-  **Why design-pending:** the fix derives the element from a gate-sdk root input rather than the
-  gates dir, and which root knob (relative to what `check-gate-tamper` matches) is a choice; it
-  widens the gate's refusal set for every consumer on the default, so it owes a fixture arm and a
-  Tightened-gates declaration.
-  **Cost while deferred:** a consumer's gate-library edit co-staged with product code escapes the
-  isolation rule.
-  Filed 2026-09-14 by `config-seam-third-cut`'s build (batch 2); drained at its close.
-  **Joins `delegation-seams`** as its tamper-default unit (operator direction 2026-09-21,
-  lead-relayed); **marked for spec**, which picks the root knob. Re-verified at scope:
-  `native/src/knobs/delegation_kit.rs` still derives the element from `GATE_SDK_GATES_DIR`.
-
 - **fixture-suites-never-run-history-less** [cost: event/low] [surface: .github] — no
   CI leg or smoke runs a kit's fixture suites outside this repo's full git history, so a pair that
   reads the host repo's history passes here and fails in a consumer tree or a depth-1 clone.
@@ -1358,35 +1395,6 @@
   is the budget-oracle prerequisite cluster heterogeneous-agent-delegation
   cross-references. Surfaced 2026-07-17 in the release-in-lifecycle session
   (kfric plus one operator-raised refinement).
-
-- **gate-file-coverage-closure** [cost: event/high] [surface: delegation-kit] — the missing check class behind a
-  hole this close fixed inline: nothing asserts that every gate script in the
-  tree is matched by some `DELEGATION_KIT_GATE_FILES` glob, so a gate can sit
-  outside `check-gate-tamper`'s assertion-A coverage silently. It did: this
-  repo's consumer config declares the array, which **replaces** the kit default
-  rather than extending it (a knob-file value replaces the default whole),
-  and the declaration named only `*/checks/*.sh` — leaving all nine
-  `scripts/check-*.sh` consumer-resident gates uncovered. Close restated the
-  default's glob in this repo's delegation config and corrected
-  delegation-kit/SPEC.md §Layout and configuration, which had described the
-  knob as *widening* the default — the inverse of the mechanism.
-  **The gate:** enumerate gate scripts (the `gates.list` registry resolved to
-  files), and red any whose path no `DELEGATION_KIT_GATE_FILES` glob matches.
-  Cheap and mechanically decidable — the coverage set and the glob set are both
-  already in hand at gate time. Needs a `gate-sdk` fixture pair and a home
-  (delegation-kit, since it reads that kit's knob).
-  **Why design-pending:** it makes coverage-completeness a delegation-kit
-  contract, which is a SPEC assertion, not just a new script.
-  **Cost while deferred:** the config is correct today but unheld — the next
-  consumer-resident gate, or the next kit-glob edit, can reopen the identical
-  hole with nothing to catch it. Exactly the replace-vs-extend footgun the SPEC
-  now documents but does not enforce.
-  Filed 2026-07-26 by close (`activation-path`), generalizing the
-  knowledge-friction captures that surfaced the replace-vs-extend semantics.
-  **Joins `delegation-seams`** as its tamper-coverage unit (operator direction 2026-09-21,
-  lead-relayed); **marked for spec**, which authors its amendment — a feature, the unit mints a
-  gate. **Enhancement admission filter, engaged 2026-09-21 at scope:** trust arm — an adopter
-  trusts `check-gate-tamper` to cover every gate, and nothing holds that it does.
 
 - **companion-toolkit-profile** [roadmap: next/ecosystem] [cost: event/high] [surface: lifecycle-kit] — the interop rung.
   roadmap-summary: Gate a tree whose specs another toolkit's workflow wrote.
