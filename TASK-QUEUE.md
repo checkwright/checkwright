@@ -2364,6 +2364,23 @@
   Filed 2026-09-19 to the gap inbox at `adopter-floor-conditional-members`' spec; promoted at its
   close because a roster-wide census with a per-member judgment is not a drain-sized fix.
 
+- **install-smoke-powershell-demo-runs-before-bash-strip** [cost: event/low] [surface: .github] —
+  the `install-smoke-powershell` leg runs `checkwright demo` (the `full` battery) in the step BEFORE
+  the one that strips every bash from PATH, so the full profile on Windows is witnessed with bash
+  present and never without; the no-bash step exercises only the starter init's hooks.
+  **Re-verified at this scope:** in `.github/workflows/gates.yml` the demo block sits in the init
+  step, ahead of the step named "commit through the generated hooks with no bash on PATH"; gates
+  run 35632734000 (`58908d02`) showed both green in that order. installer/SPEC.md §demo claims only
+  that the leg runs the verb on a PowerShell adopter's path, so no tracked sentence is false.
+  **Deliverable — rule one of two:** run the demo after the strip (or a second demo there), or
+  state in installer/SPEC.md §demo that the Windows oracle holds bash on PATH.
+  **Why promoted, not fixed:** moving the demo is a Windows step whose verdict is unknown until a
+  Windows run — a `full` member spawning bash would red it — and the other limb narrows a claim.
+  **Cost while deferred:** a `full`-profile gate needing bash on Windows ships unseen.
+  Filed 2026-09-21 to the gap inbox by `docs-first-contact`'s close, reading its push run; promoted
+  at the next scope. Owner lookup: `install-smoke-powershell`, `demo`, `bash stripped` — the two
+  entries naming that leg own its name and its exemption keying, not its step order.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
