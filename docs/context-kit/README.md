@@ -92,13 +92,14 @@ hook approximation and the session-context template also expect
 Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ```bash
---emit md-index [paths…]            # markdown heading index + first sentences
---emit md-section <file> <heading>  # print one section by heading
---emit pub-index [paths…]           # public API surface (per-language extractors; ships rust, ts)
---emit always-loaded                 # standing surface vs baseline (one line)
---emit always-loaded --update-baseline   # a close-stage act
---emit footprint     # per-kit token footprint (the committed page)
---emit env-probe     # re-probe the local machine profile (ENV.local.md)
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+"$gates" --emit md-index [paths…]            # markdown heading index + first sentences
+"$gates" --emit md-section <file> <heading>  # print one section by heading
+"$gates" --emit pub-index [paths…]           # public API surface (per-language extractors; ships rust, ts)
+"$gates" --emit always-loaded                 # standing surface vs baseline (one line)
+"$gates" --emit always-loaded --update-baseline   # a close-stage act
+"$gates" --emit footprint     # per-kit token footprint (the committed page)
+"$gates" --emit env-probe     # re-probe the local machine profile (ENV.local.md)
 ```
 
 ## Test
@@ -106,6 +107,7 @@ Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
 Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ```bash
---run-gate-tests context-kit/gate-tests context-kit/checks  # the gate fixture pairs
---run-index-tests                               # the advisory tools vs golden output
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+"$gates" --run-gate-tests context-kit/gate-tests context-kit/checks  # the gate fixture pairs
+"$gates" --run-index-tests                               # the advisory tools vs golden output
 ```

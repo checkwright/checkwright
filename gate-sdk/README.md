@@ -86,15 +86,16 @@ Then run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names; with no
 arm at all it runs the full battery:
 
 ```bash
---emit git-hooks --write          # generate the hooks
---emit graph > scripts/CHECK-GRAPH.html   # the coupling graph
---emit enforcement-map > docs/enforcement.md # the enforcement map (regenerate on any class-registry change)
---emit port-blockers --tree        # the port report over the tracked shell tree
---install-hooks                    # opt in this clone
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+"$gates" --emit git-hooks --write          # generate the hooks
+"$gates" --emit graph > scripts/CHECK-GRAPH.html   # the coupling graph
+"$gates" --emit enforcement-map > docs/enforcement.md # the enforcement map (regenerate on any class-registry change)
+"$gates" --emit port-blockers --tree        # the port report over the tracked shell tree
+"$gates" --install-hooks                    # opt in this clone
 
---only check-graph                 # one gate's verdict
---for scripts/gates.list           # the gates coupling to a path
---run-gate-tests gate-sdk/gate-tests gate-sdk/checks  # the kit's own tests
+"$gates" --only check-graph                 # one gate's verdict
+"$gates" --for scripts/gates.list           # the gates coupling to a path
+"$gates" --run-gate-tests gate-sdk/gate-tests gate-sdk/checks  # the kit's own tests
 ```
 
 Write your first gate by copying `gate-sdk/templates/check-skeleton.sh` to

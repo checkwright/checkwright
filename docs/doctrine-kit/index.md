@@ -47,7 +47,8 @@ they differ from the defaults.
 Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ```bash
---run-gate-tests doctrine-kit/gate-tests doctrine-kit/checks
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+"$gates" --run-gate-tests doctrine-kit/gate-tests doctrine-kit/checks
 ```
 
 ## Contracts

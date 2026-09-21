@@ -1,0 +1,5 @@
+doc.md:6: '--run-demo' is a flag
+doc.md:7: '--emit' is a flag
+doc.md:13: '$' is a copied shell prompt
+doc.md:14: 'widgetctl' names no builtin
+doc.md:15: 'bin/ghost.sh' is a path the repository does not track

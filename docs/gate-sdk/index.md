@@ -29,8 +29,9 @@ Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names; with no arm at
 all it runs the full battery:
 
 ```bash
---run-gate-tests gate-sdk/gate-tests gate-sdk/checks
---install-hooks       # opt this clone into the hook
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+"$gates" --run-gate-tests gate-sdk/gate-tests gate-sdk/checks
+"$gates" --install-hooks       # opt this clone into the hook
 ```
 
 ## Contracts

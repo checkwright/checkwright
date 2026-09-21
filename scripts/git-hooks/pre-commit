@@ -356,6 +356,10 @@ if staged_matches '*SPEC*.md' '*README.md' '*CLAUDE.md' 'scripts/*.sh' 'gate-sdk
     run_gate check-docs-cmd native/target/release/checkwright-gates check-docs-cmd
 fi
 
+if staged_matches '*SPEC*.md' '*README.md' '*CLAUDE.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' '*CLAUDE.md' '*README.md' '*CONTRIBUTING.md' '*CODE_OF_CONDUCT.md' '*SECURITY.md' '*RELEASING.md' '*ROADMAP.md' '*TRAJECTORY.md' '*/SPEC.md' '*/README.md' '*reserve/*/README.md' '*doctrine-kit/DOCTRINE.md' '*docs/*.md' '*docs/*/index.md' '*docs/posts/*.md' '*/templates/*.md' '*.claude/agents/*.md' '*SPEC.md' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs'; then
+    run_gate check-fence-command-head native/target/release/checkwright-gates check-fence-command-head
+fi
+
 if staged_matches 'docs/install.md' 'native/src/toolfloor.rs' 'native/src/gates/install_toolchain.rs' 'native/src/fresh.rs' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'gate-sdk/*/*.sh' 'canon-kit/*/*.sh' 'context-kit/*/*.sh' 'delegation-kit/*/*.sh' 'doctrine-kit/*/*.sh' 'drift-kit/*/*.sh' 'evidence-kit/*/*.sh' 'guard-kit/*/*.sh' 'lifecycle-kit/*/*.sh' 'queue-kit/*/*.sh' 'site-kit/*/*.sh' 'gate-sdk/templates/*.json' 'canon-kit/templates/*.json' 'context-kit/templates/*.json' 'delegation-kit/templates/*.json' 'doctrine-kit/templates/*.json' 'drift-kit/templates/*.json' 'evidence-kit/templates/*.json' 'guard-kit/templates/*.json' 'lifecycle-kit/templates/*.json' 'queue-kit/templates/*.json' 'site-kit/templates/*.json' 'scripts/gate-sdk-config.knobs'; then
     run_gate check-install-toolchain native/target/release/checkwright-gates check-install-toolchain
 fi

@@ -53,6 +53,16 @@ pub const KIT: Kit = Kit {
         Row::scalar("CANON_KIT_GLOSSARY_FILE", "GLOSSARY.md"),
         Row::indexed("CANON_KIT_DUP_SURFACES", &["VISION.md"]),
         Row::indexed("CANON_KIT_MDREF_EXCLUDE", &[]),
+        Row::indexed(
+            "CANON_KIT_FENCE_PROGRAMS",
+            &[
+                "awk", "basename", "bash", "cat", "chmod", "cmp", "cp", "cut", "date", "diff",
+                "dirname", "env", "expr", "find", "git", "grep", "head", "ln", "ls", "mkdir",
+                "mktemp", "mv", "nohup", "od", "paste", "rm", "rmdir", "sed", "sh", "sleep",
+                "sort", "tail", "tar", "tee", "touch", "tr", "uname", "uniq", "wc", "xargs",
+            ],
+        ),
+        Row::indexed("CANON_KIT_FENCE_PROGRAMS_EXTRA", &[]),
         Row::indexed("CANON_KIT_RETIRED_SPELLING_EXCLUDE", &[]),
         Row::scalar("CANON_KIT_LINK_ROOT", "docs"),
         Row::scalar("CANON_KIT_DOCS_BLOB_REF", "master"),

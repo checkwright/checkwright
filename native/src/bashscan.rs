@@ -11,6 +11,7 @@ pub enum Kind {
     Expansion,
     Guard,
     Keyword,
+    Other,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -184,10 +185,12 @@ impl Scan {
             self.probe = 1;
             return;
         }
-        if is_program_word(t) {
-            self.emit(Kind::Cmd, t);
-            self.pending = Some(self.out.len() - 1);
-        }
+        // spec: canon-kit/SPEC.md §check-fence-command-head — a command-position word that is no
+        // program name (a path, a flag, a substitution's opener, `.`) is kept as its own kind with its
+        // operands, which the two program readers below drop and the head reader judges
+        let kind = if is_program_word(t) { Kind::Cmd } else { Kind::Other };
+        self.emit(kind, t);
+        self.pending = Some(self.out.len() - 1);
         self.cmdpos = false;
     }
 
@@ -348,6 +351,14 @@ pub fn command_positions(text: &str) -> Vec<Token> {
 // with its operands, and the reserved words that reached command position, so a caller can see
 // which alternative of an `if` chain a command sits in
 pub fn command_words(text: &str) -> Vec<Token> {
+    let mut out = command_heads(text);
+    out.retain(|t| t.kind != Kind::Other);
+    out
+}
+
+// spec: canon-kit/SPEC.md §check-fence-command-head — every word the scan reached in command
+// position, whatever its shape, so a word that names no program is visible rather than dropped
+pub fn command_heads(text: &str) -> Vec<Token> {
     let mut s = Scan {
         cmdpos: true,
         ..Scan::default()

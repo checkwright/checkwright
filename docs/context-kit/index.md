@@ -29,8 +29,9 @@ hook, and register its gate in `gates.list`.
 Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ```bash
---emit md-index <file.md>          # outline before body
---emit pub-index <component>/src/  # public API surface
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+"$gates" --emit md-index <file.md>          # outline before body
+"$gates" --emit pub-index <component>/src/  # public API surface
 ```
 
 ## Contracts

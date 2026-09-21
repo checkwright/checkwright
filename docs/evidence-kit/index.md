@@ -26,7 +26,8 @@ Vendor the `evidence-kit/` directory into your repo, register its gates in
 Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ```bash
---run-gate-tests evidence-kit/gate-tests evidence-kit/checks
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+"$gates" --run-gate-tests evidence-kit/gate-tests evidence-kit/checks
 ```
 
 ## Contracts

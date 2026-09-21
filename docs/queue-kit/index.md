@@ -30,8 +30,9 @@ Vendor the `queue-kit/` directory into your repo, register its gates in
 Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ```bash
---emit queue-index    # list selectable work
---run-gate-tests queue-kit/gate-tests queue-kit/checks
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+"$gates" --emit queue-index    # list selectable work
+"$gates" --run-gate-tests queue-kit/gate-tests queue-kit/checks
 ```
 
 ## Contracts

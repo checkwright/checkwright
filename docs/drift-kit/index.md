@@ -26,7 +26,8 @@ plugin list, and wire the trend summary into your session-start brief.
 Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ```bash
---emit drift-report   # the full advisory report
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+"$gates" --emit drift-report   # the full advisory report
 ```
 
 ## Contracts

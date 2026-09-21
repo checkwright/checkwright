@@ -48,6 +48,7 @@ reads the tag syntax [queue-kit](https://github.com/checkwright/checkwright/tree
    check-spec-pointer           # resolves spec:/contract: pointer targets
    check-todo-task-liveness     # resolves TODO(task:) slugs against the queue
    check-docs-cmd               # invoked paths + kit knobs in docs resolve
+   check-fence-command-head     # every shell-fence command starts with a word that can run
    check-knob-citation          # knob values stated only in the owning SPEC
    check-knob-default-coupling  # source knob defaults agree with the owning SPEC
    check-manifest-count         # no bare cardinal over a governed collection
@@ -96,5 +97,6 @@ code instead. Author amendments up front; merge and delete them at build.
 Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ```bash
---run-gate-tests canon-kit/gate-tests canon-kit/checks
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+"$gates" --run-gate-tests canon-kit/gate-tests canon-kit/checks
 ```

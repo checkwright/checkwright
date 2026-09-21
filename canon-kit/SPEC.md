@@ -507,6 +507,15 @@ Knobs:
 - `CANON_KIT_MDREF_EXCLUDE` — array of globs, default empty: manifest-set docs
   `check-md-refs` skips (a consumer's generated documentation whose links a
   build tool owns).
+- `CANON_KIT_FENCE_PROGRAMS` — array of program names a shell fence may start a
+  command with, default a bundled generic utility set (`cat`, `grep`, `git`, …;
+  `--emit knob-roster` prints it whole); extended through
+  `CANON_KIT_FENCE_PROGRAMS_EXTRA` under the `_EXTRA` semantics below. Read by
+  `check-fence-command-head`. The toolchain a tree's recipes name — a compiler, a
+  fetch tool, a package manager — is that tree's own vocabulary, so it rides the
+  extra rather than a kit literal (the provenance seam). This repo adds its
+  crate toolchain, its fetch and checksum tools and one platform's package
+  manager.
 - `CANON_KIT_RETIRED_SPELLING_EXCLUDE` — array of globs, default empty: tracked
   paths held out of `check-amendment-retired-spelling`'s reconciliation corpus.
   Which surfaces are **history-bearing** is a consumer fact, not a kit one — a
@@ -626,13 +635,14 @@ Knobs:
   (`It's worth noting`, `That said`, …); `CANON_KIT_PROSE_TELL_ABBR_ALLOW` —
   array of abbreviations exempt from the undefined-abbreviation tell, default a
   bundled universal set (`API`, `CLI`, `URL`, …). A consumer extends any
-  bundled vocabulary — these two, `CANON_KIT_TEMPORAL_MARKERS` and
-  `CANON_KIT_SEAM_AUTHORITY_MARKERS` above — with its own through the matching
-  `_EXTRA` knob:
+  bundled vocabulary — these two, `CANON_KIT_TEMPORAL_MARKERS`,
+  `CANON_KIT_SEAM_AUTHORITY_MARKERS` and `CANON_KIT_FENCE_PROGRAMS` above — with
+  its own through the matching `_EXTRA` knob:
   `CANON_KIT_PROSE_TELL_PHRASES_EXTRA`,
   `CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA`,
-  `CANON_KIT_TEMPORAL_MARKERS_EXTRA` and
-  `CANON_KIT_SEAM_AUTHORITY_MARKERS_EXTRA`, all default empty, which each reader
+  `CANON_KIT_TEMPORAL_MARKERS_EXTRA`,
+  `CANON_KIT_SEAM_AUTHORITY_MARKERS_EXTRA` and
+  `CANON_KIT_FENCE_PROGRAMS_EXTRA`, all default empty, which each reader
   unions onto the resolved base (`spec::vocabulary`): the effective set is the
   base followed by the extra. The union is the reader's rather than a derived
   default's, because a file value replaces a knob whole and a derived default fires
@@ -2892,6 +2902,68 @@ consumer config re-fires the gate over the docs. The two valve knobs take no
 `knob:` token: the path valve narrows the corpus and the section valve names
 headings rather than paths, and neither is a walk filter's pattern set
 (gate-sdk/SPEC.md §gen-pre-commit).
+
+### check-fence-command-head
+
+Invariant: every command in a `bash`, `sh` or `shell` fence of the governed doc
+set starts with a word that can run when the fence is pasted, as written, into a
+shell at the repository root. A reader copies a shell fence whole, so a line
+that opens on an arm's flag — the binary's name left to the prose above it —
+fails at the reader's prompt with no gate having seen it. `check-docs-cmd` (A)
+resolves an invoked script path and says nothing of a head that is no path at
+all; this gate is the other half.
+
+**Command position is gate-sdk's scanner's**, the one the port report reads
+(gate-sdk/SPEC.md §port-blockers): the first word of each command after `;`,
+`&`, `|`, `&&`, `||`, a newline or a subshell or group opener, and after a
+resuming reserved word (`if`, `then`, `do`, `!`, …) or an assignment prefix. A
+heredoc body, a `case` pattern, a continuation line and a quoted word are never
+a head; a command inside `$(…)` is, and is judged like any other. **A head runs
+when it is** one of these, in order:
+
+- a word beginning with `-` **never** runs: a flag names no command, and no
+  valve below admits it;
+- an **expansion** — a `$`-led or backquoted word, quoted or bare — whose value
+  the fence's reader holds, so `"$gates"` and `"$(tool)"` both run;
+- an **elision** (`...`, `…`) or a **placeholder** (`<name>`);
+- a **shell builtin or reserved word**, the bash set, a literal of the shell's
+  grammar rather than config;
+- a **function** the fence defines (`name()` or `function name`) or a file it
+  sources defines. A `.` or `source` operand resolves like a path below, its
+  `${NAME:-default}` read as the default, the value a tree that sets no locator
+  runs with; an operand still an expansion after that contributes nothing;
+- a **configured program**: `CANON_KIT_FENCE_PROGRAMS` followed by
+  `CANON_KIT_FENCE_PROGRAMS_EXTRA` (§Layout and configuration). A rooted or
+  `~/` path is judged by its basename against the same set, since its location
+  is one machine's;
+- a **tracked path**: a relative word carrying a `/` that names a file the index
+  tracks, tried against the doc's directory first and the working directory
+  second, the (A) order. Tracked rather than present, so an untracked build
+  output that happens to exist in one clone reds in every clone alike.
+
+Anything else reds, a bare program name the configured set lacks included, which
+is what catches a binary named by its basename with nothing putting it on
+`PATH`. A copied prompt (`$ cmd`) reds by the same rule, because the `$` is the
+head.
+
+**The valve is the info string.** A fence written to be read rather than pasted —
+output, a transcript, a grammar sketch — takes another language (`text`,
+`console`), which is also what renders it truthfully; there is no line marker
+and no path knob. The corpus is `check-md-refs`' governed doc set, the same one
+(A) reads, and the one knob pair is a vocabulary rather than a walk filter, so it
+takes no `knob:` couples token (gate-sdk/SPEC.md §gen-pre-commit).
+
+**What it does not attempt.** A head that runs is not a command that succeeds:
+the gate never executes a fence, so a wrong operand, a missing environment and a
+variable the fence reads but never assigned all pass. A command led by a
+redirection (`>out cmd`) is not judged, because the scanner leaves command
+position at the operator. Executing a fence needs a sandbox and a way for a doc
+to mark which fences are hermetic, and it is not built here.
+
+**Red** names each doc, line and head with the rule it failed; the clean line
+counts docs, shell fences and heads, so an empty corpus shows as zero rather
+than passing silently. The tracked set is one repository-root-anchored
+`git ls-files`, and a failed read, or no repository, exits 2.
 
 ### check-install-claim
 

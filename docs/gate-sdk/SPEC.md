@@ -1324,6 +1324,7 @@ subprocess **exit status**. The wrapper is centralized in `lib/gate.sh`; source
 it and call `fail_closed` right after a capture:
 
 ```bash
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh"
 out="$(awk '…' "$FILE")"; st=$?
 fail_closed "$st" check-foo awk     # non-zero status -> exit 2, never a false clean
 ```

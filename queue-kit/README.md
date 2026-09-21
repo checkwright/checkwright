@@ -77,18 +77,19 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ```bash
---emit queue-index                       # header + active (• ready / ✗ blocked) + deferred + icebox tally
---emit queue-index --collapse-deferred   # deferred as a per-### tally
---emit queue-index --extent <slug>       # inclusive line range of one entry's subtree
---emit queue-index --icebox-candidates   # the closing stage's eviction worklist
---emit queue-counts                       # "<key><TAB><count>", one line per task section, in configured order
---emit queue-counts --by <tag>           # the same grammar keyed "<section>/<value>", one line per partition
---emit queue-edges                       # every live slug with inbound citations, then retired targets, each marked where its name is still a tracked file's stem
---emit queue-edges --inbound <slug>      # one slug's inbound set, each edge with its citing line verbatim
---emit entry-history <slug>              # commits where one entry's counted extent fell — live or departed slug; advisory, no verdict
---lesson-sink <tag>                      # route a lesson body on stdin to its configured sink
---emit roadmap          # the public roadmap block, to stdout
---emit roadmap --write   # splice it into the configured projection page
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+"$gates" --emit queue-index                       # header + active (• ready / ✗ blocked) + deferred + icebox tally
+"$gates" --emit queue-index --collapse-deferred   # deferred as a per-### tally
+"$gates" --emit queue-index --extent <slug>       # inclusive line range of one entry's subtree
+"$gates" --emit queue-index --icebox-candidates   # the closing stage's eviction worklist
+"$gates" --emit queue-counts                       # "<key><TAB><count>", one line per task section, in configured order
+"$gates" --emit queue-counts --by <tag>           # the same grammar keyed "<section>/<value>", one line per partition
+"$gates" --emit queue-edges                       # every live slug with inbound citations, then retired targets, each marked where its name is still a tracked file's stem
+"$gates" --emit queue-edges --inbound <slug>      # one slug's inbound set, each edge with its citing line verbatim
+"$gates" --emit entry-history <slug>              # commits where one entry's counted extent fell — live or departed slug; advisory, no verdict
+"$gates" --lesson-sink <tag>                      # route a lesson body on stdin to its configured sink
+"$gates" --emit roadmap          # the public roadmap block, to stdout
+"$gates" --emit roadmap --write   # splice it into the configured projection page
 ```
 
 The roadmap projection is opt-in: it emits nothing until you set the horizon and
@@ -100,5 +101,6 @@ unconfigured consumer gets a clean skip rather than a kit-shaped roadmap.
 Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ```bash
---run-gate-tests queue-kit/gate-tests queue-kit/checks
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+"$gates" --run-gate-tests queue-kit/gate-tests queue-kit/checks
 ```

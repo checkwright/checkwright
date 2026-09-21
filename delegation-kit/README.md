@@ -87,11 +87,12 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ```bash
---usage-verdict            # budget verdict: exit 0 OK/RESET-OK, 1 PAUSE, 2 STALE
---usage-verdict <snapshot> # verdict for an explicit usage.txt (test injection)
---emit usage-trend          # footprint trend over the sample log (needs DELEGATION_KIT_USAGE_HISTORY)
---wait-probe sweep          # wait-primitive probe: the harness-uninvolved reproducer (sleeps for its declared sweep)
---wait-probe report         # classify the recorded trials and print the verdict (exit 1 when none are)
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+"$gates" --usage-verdict            # budget verdict: exit 0 OK/RESET-OK, 1 PAUSE, 2 STALE
+"$gates" --usage-verdict <snapshot> # verdict for an explicit usage.txt (test injection)
+"$gates" --emit usage-trend          # footprint trend over the sample log (needs DELEGATION_KIT_USAGE_HISTORY)
+"$gates" --wait-probe sweep          # wait-primitive probe: the harness-uninvolved reproducer (sleeps for its declared sweep)
+"$gates" --wait-probe report         # classify the recorded trials and print the verdict (exit 1 when none are)
 ```
 
 With `DELEGATION_KIT_USAGE_HISTORY` set, `usage-verdict` logs one sample per
@@ -106,7 +107,8 @@ directly with `--fixture <dir>` only for testing.
 Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ```bash
---run-gate-tests delegation-kit/gate-tests delegation-kit/checks  # every gate's fixture pair
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+"$gates" --run-gate-tests delegation-kit/gate-tests delegation-kit/checks  # every gate's fixture pair
 ```
 
 The `usage-verdict` decision table and the `usage-trend` assertions are no

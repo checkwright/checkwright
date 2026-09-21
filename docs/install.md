@@ -321,8 +321,8 @@ artifact and installs. Both bootstraps reach it — the POSIX one under Git for
 Windows' `sh` (the path the install-smoke leg exercises) and the PowerShell one on its
 own leg. WSL remains a route you may choose instead.
 
-<!-- measured: ported-gate-members=123 -->
-That direction is now underway rather than announced: 123 gates in the battery
+<!-- measured: ported-gate-members=124 -->
+That direction is now underway rather than announced: 124 gates in the battery
 dispatch to the compiled binary today, which is every member the battery
 registers. The requirements above are still what those gates invoke. A gate whose
 rule *is* an external program keeps spawning it whatever the gate is written in,

@@ -89,6 +89,13 @@ CANON_KIT_COMMENT_SURFACE[] = **/*.gate
 CANON_KIT_COMMENT_SURFACE[] = **/*.rs
 CANON_KIT_COMMENT_SURFACE[] = **/*.knobs
 
+# comment-tier-exempt: the programs this repo's shell fences name beyond the bundled generic utility set — the crate toolchain its contributor battery runs, the fetch and checksum tools its install recipes use, and the package manager one platform's install recipe names; a tree's toolchain is its own vocabulary, never a kit literal (the provenance seam)
+CANON_KIT_FENCE_PROGRAMS_EXTRA[] = cargo
+CANON_KIT_FENCE_PROGRAMS_EXTRA[] = curl
+CANON_KIT_FENCE_PROGRAMS_EXTRA[] = sha256sum
+CANON_KIT_FENCE_PROGRAMS_EXTRA[] = shasum
+CANON_KIT_FENCE_PROGRAMS_EXTRA[] = brew
+
 # comment-tier-exempt: this repo's reader-facing prose surfaces for check-prose-tells — the hand-authored top-level docs living pages only; the single-level docs/*.md glob deliberately excludes the generated kit mirror (docs/<kit>/) and the immutable dated posts (docs/posts/), since a prose gate forcing edits to generated or immutable pages contradicts them; consumer editorial scope, never a kit literal (the provenance seam)
 CANON_KIT_PROSE_TELL_GLOBS[] = docs/*.md
 

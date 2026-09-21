@@ -1,0 +1,2 @@
+# Fixture config: this tree's fences name one program beyond the bundled set. See canon-kit/SPEC.md §Layout and configuration.
+CANON_KIT_FENCE_PROGRAMS_EXTRA[] = widgetctl

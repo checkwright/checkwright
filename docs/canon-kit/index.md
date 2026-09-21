@@ -27,7 +27,8 @@ configuration.
 Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ```bash
---run-gate-tests canon-kit/gate-tests canon-kit/checks
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+"$gates" --run-gate-tests canon-kit/gate-tests canon-kit/checks
 ```
 
 ## Contracts

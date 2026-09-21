@@ -21,16 +21,12 @@ split is the whole design is the layer model on
 [Where Checkwright sits](positioning.md).
 
 One arm runs the entire arc against a throwaway consumer repo, installing
-nothing. Run it on the gate binary `GATE_SDK_NATIVE_BIN` names:
+nothing. It runs on an installed gate binary ([Install](install.md)); from the
+repository root:
 
 ```bash
---run-demo
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && "$(gate_native_bin_spelled)" --run-demo
 ```
-
-The install puts that binary in place ([Install](install.md)) and needs neither
-`bash` nor a Rust toolchain. From a clone of the repository, which tracks no
-binary, `bash gate-sdk/bin/build-native.sh` builds one first — and that `bash`
-is the clone path's floor, never the install floor.
 
 It vendors the kits into a fresh git repo, passes the battery clean, introduces
 a defect and shows the gate that blocks it, then drops the defect and goes green

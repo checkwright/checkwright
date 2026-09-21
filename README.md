@@ -23,7 +23,7 @@ nothing and touching no tree but its own. Run it on the gate binary
 `GATE_SDK_NATIVE_BIN` names:
 
 ```bash
---run-demo
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && "$(gate_native_bin_spelled)" --run-demo
 ```
 
 The install puts that binary in place ([Quick start](#quick-start)) and needs

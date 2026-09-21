@@ -27,8 +27,9 @@ external configuration you point the kit at.
 Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ```bash
---enter-stage <stage>          # stamp a stage entry (the transition itself)
---run-gate-tests lifecycle-kit/gate-tests lifecycle-kit/checks
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+"$gates" --enter-stage <stage>          # stamp a stage entry (the transition itself)
+"$gates" --run-gate-tests lifecycle-kit/gate-tests lifecycle-kit/checks
 ```
 
 ## Contracts

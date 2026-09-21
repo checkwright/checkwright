@@ -18,6 +18,7 @@ check-comment-tier
 check-deprecation-task
 check-docs-cmd
 check-docs-link-convention
+check-fence-command-head
 check-install-claim
 check-knob-citation
 check-knob-default-coupling

@@ -87,6 +87,7 @@ check-docs-link-convention
 check-docs-cname-parity
 check-docs-render-fidelity
 check-docs-cmd
+check-fence-command-head
 check-install-toolchain
 check-install-platforms
 check-install-claim

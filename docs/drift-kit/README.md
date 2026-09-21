@@ -86,14 +86,15 @@ doc owned the fact (drift-kit/SPEC.md §The knowledge-friction loop). It shows
 Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ```bash
---emit drift-report          # full report: lead/lag rows under the honesty labels
---emit drift-report --trend  # one compact line (fragments joined with ·)
---emit trajectory   # governed-trajectory table (one row per closed iteration)
---emit queue-flow [<n>]  # design-pending pool filed/drained per trailing iteration, plus mean-filed
---emit overhead-meter   # governance-vs-task byte proxy for this session's transcript (a delegated session passes its transcript or stamp id)
---emit stage-economics  # real spend by stage × model × iteration (stamps ⋈ transcripts ⋈ price table)
---emit file-install [--] <kind> <field>...  # record one observed install, red or check-in (three kinds, three arities)
---emit install-evidence  # the aggregate-only projection over that record, for a consumer to pin behind a freshness gate
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+"$gates" --emit drift-report          # full report: lead/lag rows under the honesty labels
+"$gates" --emit drift-report --trend  # one compact line (fragments joined with ·)
+"$gates" --emit trajectory   # governed-trajectory table (one row per closed iteration)
+"$gates" --emit queue-flow [<n>]  # design-pending pool filed/drained per trailing iteration, plus mean-filed
+"$gates" --emit overhead-meter   # governance-vs-task byte proxy for this session's transcript (a delegated session passes its transcript or stamp id)
+"$gates" --emit stage-economics  # real spend by stage × model × iteration (stamps ⋈ transcripts ⋈ price table)
+"$gates" --emit file-install [--] <kind> <field>...  # record one observed install, red or check-in (three kinds, three arities)
+"$gates" --emit install-evidence  # the aggregate-only projection over that record, for a consumer to pin behind a freshness gate
 ```
 
 `--emit overhead-meter` is the overhead meter (drift-kit/SPEC.md §The overhead
@@ -159,5 +160,6 @@ both unchanged by the bundled set moving in-crate. The bundled set (drift-kit/SP
 Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ```bash
---run-consumer-smoke drift-kit   # report contract: sections, per-KPI rows, degradation, one-line --trend
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+"$gates" --run-consumer-smoke drift-kit   # report contract: sections, per-KPI rows, degradation, one-line --trend
 ```

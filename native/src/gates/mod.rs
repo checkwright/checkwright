@@ -19,6 +19,7 @@ pub mod door_binding;
 pub mod deferred_board_tags;
 pub mod deprecation_task;
 pub mod docs_cmd;
+pub mod fence_command_head;
 pub mod gate_assertions;
 pub mod gate_exemption_tasks;
 pub mod gate_fail_closed;
@@ -553,6 +554,25 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_TEMPORAL_EXEMPT_SECTIONS",
             "CANON_KIT_TEMPORAL_EXEMPT_PATHS",
             "CANON_KIT_AMENDMENT_GLOB",
+        ],
+        "canon-kit",
+        &[("git", "")],
+    ),
+    (
+        "check-fence-command-head",
+        fence_command_head::run,
+        MANIFEST_ROOTS,
+        &[
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+            "GATE_SDK_KIT_DIRS",
+            "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_MANIFEST_FILES",
+            "CANON_KIT_PROSE_SURFACE_GLOBS",
+            "CANON_KIT_MDREF_EXCLUDE",
+            "CANON_KIT_FENCE_PROGRAMS",
+            "CANON_KIT_FENCE_PROGRAMS_EXTRA",
         ],
         "canon-kit",
         &[("git", "")],

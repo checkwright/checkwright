@@ -107,10 +107,11 @@ grant withholds it.
 Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ```bash
---emit scan-prompts          # rank what nothing granted, filtered by the allowlist
---emit scan-prompts --count  # <patterns>/<occurrences> token (drift KPI)
---emit compare-settings-allow  # local-overlay entries a committed glob already grants, those a probe proves too broad, and those naming a script that does not exist
---rewrite [--regex] [--expect <n>] [--] <find> <replace> <file>…  # replace text in tracked files, printing every changed span
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+"$gates" --emit scan-prompts          # rank what nothing granted, filtered by the allowlist
+"$gates" --emit scan-prompts --count  # <patterns>/<occurrences> token (drift KPI)
+"$gates" --emit compare-settings-allow  # local-overlay entries a committed glob already grants, those a probe proves too broad, and those naming a script that does not exist
+"$gates" --rewrite [--regex] [--expect <n>] [--] <find> <replace> <file>…  # replace text in tracked files, printing every changed span
 ```
 
 `--emit scan-prompts` takes an optional log path, which overrides `GUARD_KIT_LOG`
@@ -124,5 +125,6 @@ because a non-gate arm's usage lives here and under the gate binary's `--help`.
 Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ```bash
---run-guard-tests    # decision-table over the generic ruleset
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+"$gates" --run-guard-tests    # decision-table over the generic ruleset
 ```

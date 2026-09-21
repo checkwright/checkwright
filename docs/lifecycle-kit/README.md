@@ -136,13 +136,14 @@ by design.
 Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ```bash
---enter-stage <stage>          # stamp a stage entry (the transition itself)
---install-lifecycle    # (re)write the registration and merge-attribute blocks
---emit file-gap "<gap>"   # route a work-shaped finding to the gap inbox
---emit file-survey "<question>" "<corpus>" "<oracle>" "<inferred>" "<finding>"
---emit cite-survey "<heading-substring>"   # one carried survey, inline-ready
---emit session-id                       # the canonical stamp id, by the derivation order
---emit ruling-staleness ["<ruling name>"…]  # fired conditions, undeclared ones, citing sites
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+"$gates" --enter-stage <stage>          # stamp a stage entry (the transition itself)
+"$gates" --install-lifecycle    # (re)write the registration and merge-attribute blocks
+"$gates" --emit file-gap "<gap>"   # route a work-shaped finding to the gap inbox
+"$gates" --emit file-survey "<question>" "<corpus>" "<oracle>" "<inferred>" "<finding>"
+"$gates" --emit cite-survey "<heading-substring>"   # one carried survey, inline-ready
+"$gates" --emit session-id                       # the canonical stamp id, by the derivation order
+"$gates" --emit ruling-staleness ["<ruling name>"…]  # fired conditions, undeclared ones, citing sites
 ```
 
 `--emit session-id` is [SPEC.md](SPEC.md) §bin/session-id.sh's derivation order,
@@ -164,5 +165,6 @@ gate-sdk/SPEC.md §The bin/-tool contract, which outlives the port.
 Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ```bash
---run-gate-tests lifecycle-kit/gate-tests lifecycle-kit/checks
+. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+"$gates" --run-gate-tests lifecycle-kit/gate-tests lifecycle-kit/checks
 ```
