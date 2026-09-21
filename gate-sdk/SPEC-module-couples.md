@@ -48,7 +48,12 @@ read of tracked source, so it needs no runtime recording, unlike walk roots.
 
 **Batching.** Delta 1 lands before delta 2. This amendment's descriptor edits touch
 the same first lines that the document-path unit of this iteration edits, and the
-two land in either order, one after the other.
+two land in either order, one after the other: each edits its own tokens in the
+`couples=`/`trigger=` comma list — this delta dropping a crate-file token the
+derivation now supplies, that one converting a consumer-path literal to a
+`knob:` token — and the align audit confirmed the two classes never name the
+same token on one descriptor, so neither edit's list-splice depends on the other
+having landed first.
 
 ### (1) A member's crate modules are a derived couple {design-bearing}
 
