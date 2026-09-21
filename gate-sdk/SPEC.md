@@ -601,13 +601,9 @@ takes an `env_only` entry, because `smoke/` is withheld from the payload
 as smoke test data takes none. gate-sdk lists four: the two locators,
 `GATE_SDK_GATES_DIR` and `GATE_SDK_ROOT`, and the two execution settings the
 runner reads from its own environment, `GATE_SDK_JOBS` and `GATE_SDK_VERBOSE`
-(§run-gates). lifecycle-kit lists one, `LIFECYCLE_KIT_SESSIONS_DIR`, an operator
-override lifecycle-kit/SPEC.md refuses as a row because a knob file must never
-set a session identity. drift-kit lists one, `DRIFT_KIT_ITERATION_START`, computed
-by the drift driver and exported to every plugin it spawns; `DRIFT_KIT_SMOKE_CUSTOM`
-is a sibling name in the same family that takes no entry, since drift-kit/SPEC.md
-already calls it a name no table declares and declaring it would falsify the
-property its smoke demonstrates. None of these is a row, each counts among
+(§run-gates). lifecycle-kit lists `LIFECYCLE_KIT_SESSIONS_DIR` and drift-kit
+lists `DRIFT_KIT_ITERATION_START`, each owning its grounds in its own SPEC, where
+drift-kit also owns why `DRIFT_KIT_SMOKE_CUSTOM` takes no entry. None of these is a row, each counts among
 `check-docs-cmd`'s static names, and none reaches a knob file in the knob-file
 derivation.
 
@@ -9410,9 +9406,9 @@ hand-declared / unaccounted on every run, and it is the only authority for them.
 gates only, because that half is a static read; the full accounting above is a
 **probe** — it runs each unregistered gate against a scratch consumer and reads
 its exit code — and no precommit member can hold a probe result without paying
-the whole smoke's cost at every commit. Two attested instances (`1e18d154`,
-`d0b496fa`) each cost one stage of latency and a misattributed defect, both
-closed here rather than by moving the tier: the session that adds a kit-shipped
+the whole smoke's cost at every commit. A late accounting costs a stage of
+latency and a misattributed defect, so it is closed here rather than by moving
+the tier: the session that adds a kit-shipped
 gate, or changes one's `# install:` disposition, runs `--run-consumer-smoke`
 before the commit that lands it and repairs any unaccounted line in that
 commit — about 49 s, paid once per gate landing rather than at every commit. A

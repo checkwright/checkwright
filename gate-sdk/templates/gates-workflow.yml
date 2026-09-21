@@ -6,8 +6,8 @@
 #
 # Scope boundary: consumer-owned CI stops *bypass* — it cannot stop an agent
 # editing this workflow itself in the same change. A tamper-proof verifier
-# (verifier neutrality) is the deferred hosted-attestation-service rung, out of
-# scope here rather than overclaimed.
+# (verifier neutrality) is a hosted service's job, out of scope here rather
+# than overclaimed.
 #
 # Copied out like every gate-sdk template. Checkout + bash only: no caching, no
 # matrix, no third-party actions, so the surface an agent could tamper with

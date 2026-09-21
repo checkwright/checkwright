@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # spec: drift-kit/SPEC.md §Out of scope — kpi-deprecated-surface (example template): live deprecation-marker count over the canon-kit roster, trending the between-major backlog
-# no-port: CLAUDE.md §The provenance seam (never cross it) — the seam's **worked example**. It ships as a template rather than as a bundled member precisely because its marker spelling is a consumer literal and it reads consumer array knobs through the knob-values arm; porting it would publish consumer rule content as kit mechanism in every adopter's binary. Structural, not a sizing judgment.
+# no-port: gate-sdk/SPEC.md §The provenance seam — the seam's **worked example**. It ships as a template rather than as a bundled member precisely because its marker spelling is a consumer literal and it reads consumer array knobs through the knob-values arm; porting it would publish consumer rule content as kit mechanism in every adopter's binary. Structural, not a sizing judgment.
 set -uo pipefail
 
 trend=0
