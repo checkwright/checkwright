@@ -18,10 +18,8 @@ harness, the `# graph:` coupling manifests, and a generated pre-commit hook.
 
 ## Install
 
-gate-sdk is vendored whole: copy the `gate-sdk/` directory into your repo,
-keep a `gates.list` registry naming the gates you run, and opt each clone into
-the generated hook. Consumers never edit vendored kit files — configuration is
-external, so an upgrade replaces the directory losslessly.
+The steps are the kit README's [Quick start](README.md#quick-start) section.
+`checkwright init` does them for you — see the [install page](../install.md).
 
 ## Quick start
 

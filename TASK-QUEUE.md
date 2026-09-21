@@ -43,18 +43,6 @@
   by operator direction.
   **DISTINCT from** `check-docs-cmd` and `check-fence-command-head`.
 
-- **docs-index-front-door-restatement-ungenerated** [spec: SPEC-index-parity.md] — the eleven
-  hand-authored `docs/<kit>/index.md` pages restate their kit README's Install step and Quick start
-  arm list, with no generation and no freshness gate. At the door-binding build, 17 restated lines
-  still carried the retired front-end spelling.
-  **Spec ruled the parity gate (2026-09-21), and removes the prose restatement first.** Generation
-  is ruled out: only 5 to 8 of each page's 40 to 60 lines are verbatim, the headings diverge
-  (`Test` versus `Quick start`), and gate-sdk's page is a curated subset. The Install prose becomes
-  a pointer to the sibling README mirror. `check-docs-restatement-parity` (canon-kit) holds every
-  arm and kit-knob token in an index page's code to its sibling `docs/<kit>/README.md`. It is green
-  today, with 3 to 6 tokens per page and all of them present.
-  Filed 2026-09-20 by close's drain; it joined `docs-first-contact` as its index-page unit.
-
 - **projection-trigger-witness** [spec: SPEC-projection-witness.md] — the generated-projections
   roster states each projection's staleness trigger in prose, and nothing checks the prose against
   the emitter. Five false statements were measured in one roster at filing.
@@ -2681,5 +2669,6 @@
 ## Done
 
 - install-md-adopter-page-overgrown
+- docs-index-front-door-restatement-ungenerated
 
 ## Lessons Learned

@@ -1,0 +1,2 @@
+# spec: canon-kit/SPEC.md §check-docs-restatement-parity — fixture config: 'widget-kit' is the sole kit root, so WIDGET_KIT_ is the one kit-knob prefix the matcher derives
+GATE_SDK_KIT_DIRS = widget-kit

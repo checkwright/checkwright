@@ -1,0 +1,3 @@
+# graph: couples=*/README.md,knob:CANON_KIT_RESTATEMENT_PAGES dir=one valve=none tier=precommit
+# install: zero-config
+# spec: canon-kit/SPEC.md §check-docs-restatement-parity — every arm and kit-knob token a declared restating page carries in its code occurs in the README.md beside it

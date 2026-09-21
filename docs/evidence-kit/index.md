@@ -18,8 +18,8 @@ gates over baseline grammar, slug liveness, and manifest grammar.
 
 ## Install
 
-Vendor the `evidence-kit/` directory into your repo, register its gates in
-`gates.list`, and declare your validate suites in its external config.
+The steps are the kit README's [Install](README.md#install) section.
+`checkwright init` does them for you — see the [install page](../install.md).
 
 ## Quick start
 

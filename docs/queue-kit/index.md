@@ -22,8 +22,8 @@ selects work by.
 
 ## Install
 
-Vendor the `queue-kit/` directory into your repo, register its gates in
-`gates.list`, and keep your queue in the tracked file the kit points at.
+The steps are the kit README's [Install](README.md#install) section.
+`checkwright init` does them for you — see the [install page](../install.md).
 
 ## Quick start
 

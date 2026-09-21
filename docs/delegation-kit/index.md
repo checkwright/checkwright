@@ -19,8 +19,8 @@ gate-weakening shapes.
 
 ## Install
 
-Vendor the `delegation-kit/` directory into your repo, register its gate in
-`gates.list`, and point the budget tool at your usage source.
+The steps are the kit README's [Install](README.md#install) section.
+`checkwright init` does them for you — see the [install page](../install.md).
 
 ## Quick start
 

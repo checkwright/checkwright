@@ -19,8 +19,8 @@ no gates.
 
 ## Install
 
-Vendor the `guard-kit/` directory into your repo and wire its guard as your
-harness's pre-tool hook. The ruleset and allowlists are external configuration.
+The steps are the kit README's [Install](README.md#install) section.
+`checkwright init` does them for you — see the [install page](../install.md).
 
 ## Quick start
 

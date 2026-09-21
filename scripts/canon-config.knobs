@@ -62,6 +62,9 @@ CANON_KIT_PAYLOAD_CLAIMS_CMD[] = bash
 CANON_KIT_PAYLOAD_CLAIMS_CMD[] = scripts/payload-claims.sh
 CANON_KIT_PAYLOAD_CLAIM_EXCLUDE[] = docs/posts/*
 
+# comment-tier-exempt: the site's per-kit index pages, each restating part of the kit README mirrored beside it; which pages restate a source is this site's layout, never a kit literal
+CANON_KIT_RESTATEMENT_PAGES[] = docs/*/index.md
+
 # comment-tier-exempt: this repo's measured-claim oracle and the surface its markers are read from — the keys and the facts behind them are consumer config for the same provenance-seam reason the transport and payload vocabularies are, and the surface is the governed manifest set widened by the stage-skill shims, which carry governed prose no other surface reaches (the prose surface excludes them by an ownership decision about copy shape, which is not the ownership this gate's rule needs), and by the work queue, which takes the marker without taking the manifest tier's bare-cardinal ban (canon-kit/SPEC.md §check-manifest-count)
 CANON_KIT_MEASURED_CLAIMS_CMD[] = bash
 CANON_KIT_MEASURED_CLAIMS_CMD[] = scripts/measured-claims.sh

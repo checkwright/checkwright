@@ -42,6 +42,7 @@ reads the tag syntax [queue-kit](../queue-kit/) defines.
    check-spec-pointer           # resolves spec:/contract: pointer targets
    check-todo-task-liveness     # resolves TODO(task:) slugs against the queue
    check-docs-cmd               # invoked paths + kit knobs in docs resolve
+   check-docs-restatement-parity # needs restating pages (their code tokens held to the README beside each)
    check-fence-command-head     # every shell-fence command starts with a word that can run
    check-knob-citation          # knob values stated only in the owning SPEC
    check-knob-default-coupling  # source knob defaults agree with the owning SPEC
@@ -74,8 +75,8 @@ reads the tag syntax [queue-kit](../queue-kit/) defines.
    spec and delete it when the work completes.
 
 3. Optional — reshape the config: copy `templates/canon-config.knobs` into your
-   gates dir and override the spec/amendment names, section set, the
-   Definition-of-Done mode (`exactly-one` / `at-most-one`), the banned-heading
+   gates dir and override the manifest set, the spec/amendment names, section
+   set, the Definition-of-Done mode (`exactly-one` / `at-most-one`), the banned-heading
    set and density budget, the embedded-source language map, or the glossary
    surface list. Defaults are this repo's layout.
 

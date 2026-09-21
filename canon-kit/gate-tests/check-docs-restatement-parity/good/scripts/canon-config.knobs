@@ -1,0 +1,2 @@
+# spec: canon-kit/SPEC.md §check-docs-restatement-parity — fixture consumer config: one restating page per kit directory, held to the README beside it
+CANON_KIT_RESTATEMENT_PAGES[] = */index.md

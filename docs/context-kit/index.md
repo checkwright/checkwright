@@ -21,8 +21,8 @@ are defined in the kit's
 
 ## Install
 
-Vendor the `context-kit/` directory into your repo, wire its session-start
-hook, and register its gate in `gates.list`.
+The steps are the kit README's [Install](README.md#install) section.
+`checkwright init` does them for you — see the [install page](../install.md).
 
 ## Quick start
 

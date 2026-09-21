@@ -34,10 +34,8 @@ it asserts is in any checkout.
 
 ## Install
 
-Vendor the `site-kit/` directory into your repo, register `check-docs-cname-parity`
-(and, if a Pages-style stack renders your site, `check-docs-render-fidelity` —
-it needs the parser on the machine) in `gates.list`, name your host in
-the CNAME file, and declare your aliases in the kit's external config.
+The steps are the kit README's [Install](README.md#install) section.
+`checkwright init` does them for you — see the [install page](../install.md).
 
 ## Quick start
 

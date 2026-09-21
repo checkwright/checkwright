@@ -70,7 +70,9 @@ packed; with no base set the link stays relative (SPEC.md §Consumer payload).
 
 ## Quick start
 
-Vendor the kit into your repo at `gate-sdk/`, then:
+Vendor the kit into your repo at `gate-sdk/`. Never edit a vendored kit file:
+configuration lives outside it, so an upgrade replaces the directory losslessly.
+Then:
 
 ```bash
 mkdir -p scripts                     # your gates dir (GATE_SDK_GATES_DIR to relocate)

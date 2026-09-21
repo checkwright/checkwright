@@ -19,6 +19,7 @@ pub mod door_binding;
 pub mod deferred_board_tags;
 pub mod deprecation_task;
 pub mod docs_cmd;
+pub mod docs_restatement_parity;
 pub mod fence_command_head;
 pub mod gate_assertions;
 pub mod gate_exemption_tasks;
@@ -557,6 +558,21 @@ pub const REGISTRY: &[GateEntry] = &[
         ],
         "canon-kit",
         &[("git", "")],
+    ),
+    // spec: canon-kit/SPEC.md §check-docs-restatement-parity — the page corpus is the knob's glob
+    // walk, each page's source the README beside it
+    (
+        "check-docs-restatement-parity",
+        docs_restatement_parity::run,
+        &[(".", "glob:knob:CANON_KIT_RESTATEMENT_PAGES", "", "")],
+        &[
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+            "GATE_SDK_KIT_DIRS",
+            "CANON_KIT_RESTATEMENT_PAGES",
+        ],
+        "canon-kit",
+        &[],
     ),
     (
         "check-fence-command-head",

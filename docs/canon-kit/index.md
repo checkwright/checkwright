@@ -18,9 +18,8 @@ copy-shaped failure modes directly.
 
 ## Install
 
-Vendor the `canon-kit/` directory into your repo and register its gates in
-`gates.list`. The manifest set, section names, and tiering knobs are external
-configuration.
+The steps are the kit README's [Install](README.md#install) section.
+`checkwright init` does them for you — see the [install page](../install.md).
 
 ## Quick start
 

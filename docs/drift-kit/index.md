@@ -18,8 +18,8 @@ re-derived fact the moment it costs a session time. It registers no gates.
 
 ## Install
 
-Vendor the `drift-kit/` directory into your repo, register your KPIs in its
-plugin list, and wire the trend summary into your session-start brief.
+The steps are the kit README's [Install](README.md#install) section.
+`checkwright init` does them for you — see the [install page](../install.md).
 
 ## Quick start
 

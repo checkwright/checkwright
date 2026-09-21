@@ -43,20 +43,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             .collect()
     };
 
-    // spec: canon-kit/SPEC.md §check-docs-cmd — the kit-prefix roster, derived from the kit
-    // roots: a caps name carrying one is a namespaced knob to verify
-    // spec: gate-sdk/SPEC.md §Layout and configuration — two uses, bound apart: the prefix
-    // vocabulary is basename-derived off every root, since a kit vendored outside this repository
-    // still owns its knob namespace, while the grep corpus is the pathspec-able subset
-    let mut prefixes: Vec<String> = Vec::new();
-    for root in walk::kit_roots()? {
-        let root = root.trim_end_matches('/');
-        if root.is_empty() {
-            continue;
-        }
-        let base = root.rsplit('/').next().unwrap_or(root);
-        prefixes.push(format!("{}_", base.to_ascii_uppercase().replace('-', "_")));
-    }
+    let prefixes = kit_knob_prefixes()?;
     let roots: Vec<String> = walk::kit_roots_under(&top)?
         .into_iter()
         .map(|r| r.trim_end_matches('/').to_string())
@@ -150,6 +137,33 @@ fn rule(args: &[String]) -> Result<i32, String> {
         shallow
     );
     Ok(0)
+}
+
+// spec: canon-kit/SPEC.md §check-docs-cmd — the kit-prefix roster, derived from the kit
+// roots: a caps name carrying one is a namespaced knob to verify
+// spec: gate-sdk/SPEC.md §Layout and configuration — two uses, bound apart: the prefix
+// vocabulary is basename-derived off every root, since a kit vendored outside this repository
+// still owns its knob namespace, while the grep corpus is the pathspec-able subset
+pub(crate) fn kit_knob_prefixes() -> Result<Vec<String>, String> {
+    let mut prefixes: Vec<String> = Vec::new();
+    for root in walk::kit_roots()? {
+        let root = root.trim_end_matches('/');
+        if root.is_empty() {
+            continue;
+        }
+        let base = root.rsplit('/').next().unwrap_or(root);
+        prefixes.push(format!("{}_", base.to_ascii_uppercase().replace('-', "_")));
+    }
+    Ok(prefixes)
+}
+
+// spec: canon-kit/SPEC.md §check-docs-cmd — (B)'s knob matcher: every caps run carrying a
+// kit prefix, the one spelling check-docs-restatement-parity reuses
+pub(crate) fn kit_knob_runs(text: &str, prefixes: &[String]) -> Vec<String> {
+    caps_runs(text, 1)
+        .into_iter()
+        .filter(|run| prefixes.iter().any(|p| run.starts_with(p.as_str())))
+        .collect()
 }
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — `git grep` grades its own outcome by exit
@@ -411,7 +425,7 @@ fn scan(
     out
 }
 
-fn inline_code_spans(line: &str) -> Vec<String> {
+pub(crate) fn inline_code_spans(line: &str) -> Vec<String> {
     let b = line.as_bytes();
     let mut out = Vec::new();
     let mut i = 0usize;
@@ -429,10 +443,8 @@ fn inline_code_spans(line: &str) -> Vec<String> {
 }
 
 fn scan_b(text: &str, ln: usize, prefixes: &[String], out: &mut Vec<Token>) {
-    for run in caps_runs(text, 1) {
-        if prefixes.iter().any(|p| run.starts_with(p.as_str())) {
-            out.push(Token::Knob(ln, run));
-        }
+    for run in kit_knob_runs(text, prefixes) {
+        out.push(Token::Knob(ln, run));
     }
 }
 

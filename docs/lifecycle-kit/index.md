@@ -18,9 +18,8 @@ themselves are configuration, not code.
 
 ## Install
 
-Vendor the `lifecycle-kit/` directory into your repo and register its stage
-gates in `gates.list`. The stage set, the header file, and the stamp file are
-external configuration you point the kit at.
+The steps are the kit README's [Install](README.md#install) section.
+`checkwright init` does them for you — see the [install page](../install.md).
 
 ## Quick start
 
