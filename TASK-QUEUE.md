@@ -283,59 +283,6 @@
   feeding a short-circuiting reader under `pipefail`. It reds nothing today, where a structural
   scan reds fifteen benign pipes. Born native as `check-pipe-membership`.
 
-- **bin-tool-help-arm-absent-tree-wide** [spec: SPEC-help-arm-scope.md] —
-  a shipped `bin/` tool can answer
-  `-h`/`--help` with something other than usage on stdout at exit 0; the count is derived below
-  and deliberately not frozen in this sentence.
-  **THE CENSUS IS DERIVABLE AND THIS IS ITS COMMAND**, stated on the entry because a count whose
-  oracle is unstated is unmaintainable by anyone but its author. Run
-  `git ls-files '*/bin/*.sh' | grep -v '/gate-tests/' | xargs grep -L -- '--help'`. Dropping the
-  `grep -v` re-admits the gate fixtures the census excludes. The proxy is static and a **lower
-  bound** — a file merely mentioning `--help` in a comment counts as having an arm — but it was
-  checked exact at the 2026-09-05 reading: the only matching tools, `gate-sdk/bin/run-gates.sh`
-  and `installer/bin/checkwright.sh`, each carry a real `-h | --help)` dispatch branch.
-  **RE-DERIVED 2026-09-21 at scope: 1 of 3**, `gate-sdk/bin/build-native.sh` alone (it was 5 of 7
-  on 2026-09-06): the port cuts emptied context-kit's and doctrine-kit's `bin/`. Run the command.
-  **Every earlier figure on this entry is superseded by that command and none is restated**, which
-  is the whole reason the command is here: a 2026-09-04 measurement stated no pattern and no later
-  session could reproduce it: re-derive rather than compare a bare number.
-  **Measured behaviourally, 2026-09-04, and two of the three probes have since left the corpus.**
-  `scratch-run.sh --help` answered `scratch-run: no such script: --help` at exit 2;
-  `compare-settings-allow.sh --help` prints usage on **stderr** at exit 2, the unrecognized-option
-  refusal branch and not a help arm; `stage-economics.sh --help` **ignored the argument entirely
-  and ran the full meter**. ALL THREE shell paths are now deleted (the first and third 2026-09-05,
-  the middle 2026-09-06), so all three stay as attested shapes and none is a current instance.
-  **Why they survived, and it is not "no gate reads the contract".** That is ruled and deliberate
-  (gate-sdk/SPEC.md §The bin/-tool contract), and the ruling names its own substitute in the same
-  breath — *"Each member's coverage follows it"*, behavioral coverage in `smoke/`, on the
-  `enter-stage.sh --simulate` precedent. gate-sdk, lifecycle-kit and drift-kit smokes each carry it;
-  **context-kit's and doctrine-kit's smokes carry none**, one `bin/` tool each, measured at the
-  2026-09-06 close; guard-kit's carried none either and its `bin/` left with the cut. The gap
-  is the kits that never took the ruled substitute, not a missing scanner.
-  **Why design-pending: the contract's own scope is the design question.** §The bin/-tool
-  contract states its three behaviors under a free-text-positional rule, yet
-  `gate-sdk/bin/run-gates.sh --enter-stage`'s own note reads the HELP half as binding on a
-  membership-validated tool too. Whether it binds on a tool taking **no** positionals, or on one
-  forwarding its argv (`build-native.sh` passes its own to `cargo`), is unstated, and the answer
-  sets the corpus before any member is fixed.
-  **Cost while deferred:** one wrong answer instead of usage per session that probes a tool for its
-  modes, and the attested shapes are silently-wrong rather than merely unhelpful.
-  not-icebox-eligible: bin-tool-help-arm-absent-tree-wide 2026-09-12 live per-session trigger.
-  **The remainder is also owed to the port**, so a cut can apply the split per member — but only
-  once the scope question is answered, since it decides which members owe an arm. `build-native.sh`
-  and `run-gates.sh` are declared `no-port` and will never ride a cut,
-  so their arm has no cut to ride and needs its own. That split re-derives off the census command
-  joined with `--emit port-blockers --tree`.
-  Filed 2026-09-04 to the gap inbox at spec as a guard-kit-local two-tool finding; WIDENED at that
-  drain from 2 tools to a tree-wide census and from "no gate" to "no smoke coverage", after →fix
-  failed on the unsettled scope question and →icebox failed on the live per-session trigger.
-  Census command and count landed 2026-09-05 by close, on the lead's ruling that a close moving
-  the number without landing its measurement pattern reproduces the defect one iteration later;
-  both re-derived 2026-09-05 by build when its own cuts moved the corpus.
-  **Ruled at spec (2026-09-21):** the help half binds every `bin/` tool except a total forwarder,
-  and `build-native.sh` is the one member owing an arm. The claim above that `checkwright.sh`
-  carries a help branch is stale: it forwards to the artifact, which answers.
-
 - **gate-fixture-fanout-arm** [spec: SPEC-fixture-discharge.md] — nothing
   enumerates the fixture pairs a change to a shared implementation module has to re-run:
   `--run-gate-tests` takes one tests-dir per invocation, and a gate's `# graph:` manifest names its
@@ -2583,5 +2530,6 @@
 - join-primitive-dataflow-unasserted
 - install-disposition-smoke-accounting-split
 - bridged-knob-owner-for-consumer-gate
+- bin-tool-help-arm-absent-tree-wide
 
 ## Lessons Learned

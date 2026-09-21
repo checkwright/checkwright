@@ -1163,6 +1163,15 @@ already validates shape. Three behaviors:
 - `--` ends option processing, so every remaining argument is taken as free text
   however it is spelled.
 
+**The help half binds every `bin/` tool; the refusal and `--` halves bind
+free-text positionals.** Help is discoverability, owed whatever a tool's
+positionals are, including none and including a forwarded argv. The one exemption
+is a **total forwarder** — a tool whose whole contract is its target's, so the
+target's own help is the answer (installer/SPEC.md §The verbs rules the bootstrap
+one). A forwarder that adds behavior of its own is not total, and takes `-h` /
+`--help` as its first argument before anything is forwarded. A `.ps1` twin
+follows its `.sh` member.
+
 An arity check is not a shape check. A tool taking exactly one free-text
 argument accepts `--help` *as* that argument, and a tool taking two accepts a
 flag in either slot; arity makes the single-argument case worst and the others

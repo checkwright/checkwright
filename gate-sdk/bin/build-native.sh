@@ -7,6 +7,21 @@
 #   per-target build passes --target <triple>. Exit status is cargo's.
 set -uo pipefail
 
+# spec: gate-sdk/SPEC.md §The bin/-tool contract — not a total forwarder (its own toolchain floor,
+# remap flags and verification step), so it answers help before gate.sh is sourced or cargo is
+# reached
+case "${1:-}" in
+    -h | --help)
+        cat <<'EOF'
+usage: build-native.sh [cargo-arg…]
+  Run from the repo root. Trailing arguments reach cargo unchanged, so a
+  per-target build passes --target <triple>. Exit status is cargo's.
+  cargo's own help is `cargo build --help`, which this tool no longer forwards.
+EOF
+        exit 0
+        ;;
+esac
+
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=../lib/gate.sh
 source "$SDK/lib/gate.sh"

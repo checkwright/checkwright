@@ -135,6 +135,12 @@ if err="$(bash "$SDK/bin/run-gates.sh" --smoke-nope 2>&1 >/dev/null)"; then echo
 grep -q 'unrecognized option: --smoke-nope' <<<"$err" || { echo "smoke(refusal): refusal did not name the option" >&2; exit 1; }
 grep -q '^usage: run-gates.sh' <<<"$err" || { echo "smoke(refusal): usage did not reach stderr" >&2; exit 1; }
 
+# spec: gate-sdk/SPEC.md §The bin/-tool contract — the help half binds `build-native.sh` too, and
+# answers before the crate is probed: this scratch consumer carries no crate and, where the host has
+# none, no cargo, so a clean exit here proves the branch precedes both refusals.
+out="$(bash "$SDK/bin/build-native.sh" --help 2>/dev/null)" || { echo "smoke(build-native --help): a help request did not exit 0" >&2; exit 1; }
+grep -q '^usage: build-native.sh' <<<"$out" || { echo "smoke(build-native --help): usage did not reach stdout" >&2; exit 1; }
+
 # spec: gate-sdk/SPEC.md §gen-pre-commit — the emitted hook's capture wrapper: green is one summary line, a red gate's output reprints verbatim
 cat > scripts/smoke-hook-probe.sh <<'EOF'
 #!/usr/bin/env bash
