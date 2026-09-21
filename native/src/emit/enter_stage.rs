@@ -1707,9 +1707,9 @@ struct Wiped {
     failed: Vec<String>,
 }
 
-// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the spare test reads the scratch root's
-// immediate children only, and a spared child is never descended, so a spared directory is kept
-// whole and nothing below the root is spared
+// spec: lifecycle-kit/SPEC.md §The state machine — the report names the removed set the way it
+// names the truncated set: one line per immediate child the wipe deletes, never the nested paths
+// `remove_member`'s recursion touches to delete it
 fn wipe(dir: &str, preserve: &[String]) -> Wiped {
     let mut out = Wiped::default();
     let root = Path::new(dir);
@@ -1720,27 +1720,35 @@ fn wipe(dir: &str, preserve: &[String]) -> Wiped {
         if base == ".gitkeep" || preserve.contains(&base) {
             continue;
         }
-        remove_member(&root.join(&base), is_dir, &mut out);
+        let child = root.join(&base);
+        let mut failed: Vec<String> = Vec::new();
+        remove_member(&child, is_dir, &mut failed);
+        if failed.is_empty() {
+            out.removed.push(child.display().to_string());
+        } else {
+            out.failed.extend(failed);
+        }
     }
     out
 }
 
-fn remove_member(p: &Path, is_dir: bool, out: &mut Wiped) {
+// spec: lifecycle-kit/SPEC.md §The state machine — a residue path is the finding, so a failure
+// keeps its own path however deep it sits; only a wholly-removed child's own path reaches the
+// caller's removed set
+fn remove_member(p: &Path, is_dir: bool, failed: &mut Vec<String>) {
     let dir = is_dir && !p.is_symlink();
     if dir {
         // spec: gate-sdk/SPEC.md §The crate's crosser — the listing goes through `walk`, the crate's
         // one filesystem-walking module, and `list_dir` sorts, which keeps the report order stable
         if let Ok(kids) = walk::list_dir(p) {
             for (base, kid_dir) in kids {
-                remove_member(&p.join(&base), kid_dir, out);
+                remove_member(&p.join(&base), kid_dir, failed);
             }
         }
     }
     let res = if dir { std::fs::remove_dir(p) } else { std::fs::remove_file(p) };
-    let name = p.display().to_string();
-    match res {
-        Ok(()) => out.removed.push(name),
-        Err(_) => out.failed.push(name),
+    if res.is_err() {
+        failed.push(p.display().to_string());
     }
 }
 
@@ -2065,26 +2073,84 @@ mod tests {
         assert!(!dir.join("doomed.log").exists(), "an unlisted file survived");
         assert!(!dir.join("doomed-sub").exists(), "an all-unlisted subdir survived");
         assert!(dir.is_dir(), "the scratch dir itself was removed");
-        assert!(wiped.removed.iter().any(|w| w.ends_with("doomed.log")));
-        assert!(wiped.removed.iter().any(|w| w.ends_with("x/y/.gitkeep")));
-        assert!(!wiped.removed.iter().any(|w| w.ends_with("/keep-me") && !w.contains("mixed-sub")));
+        let removed_leaf: Vec<String> = wiped
+            .removed
+            .iter()
+            .map(|w| w.rsplit('/').next().unwrap_or(w).to_string())
+            .collect();
+        let mut got = removed_leaf.clone();
+        got.sort();
+        let mut expected = vec![
+            "doomed.log".to_string(),
+            "doomed-sub".to_string(),
+            "mixed-sub".to_string(),
+            "x".to_string(),
+        ];
+        expected.sort();
+        assert_eq!(
+            got, expected,
+            "the removed set names {:?}, not the four immediate children",
+            wiped.removed
+        );
+        assert!(
+            !wiped.removed.iter().any(|w| w.contains("x/y") || w.contains("nested.txt")),
+            "a nested path leaked into the removed set: {:?}",
+            wiped.removed
+        );
         assert!(wiped.failed.is_empty(), "a removal failed: {:?}", wiped.failed);
         let _ = std::fs::remove_dir_all(&dir);
     }
 
-    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — a failed removal is reported apart from
-    // the removed set, never folded into it
+    // spec: lifecycle-kit/SPEC.md §The state machine — the leaf-level contract: a missing path is
+    // named at its own path, never rolled into a parent's name
     #[test]
-    fn a_removal_that_fails_is_reported_as_failed_and_not_as_wiped() {
-        let mut out = Wiped::default();
+    fn a_removal_that_fails_is_named_at_its_own_path() {
+        let mut failed: Vec<String> = Vec::new();
         let missing = std::env::temp_dir().join(format!("enter-stage-absent-{}", std::process::id()));
-        remove_member(&missing, false, &mut out);
-        assert!(out.removed.is_empty());
-        assert_eq!(out.failed, vec![missing.display().to_string()]);
+        remove_member(&missing, false, &mut failed);
+        assert_eq!(failed, vec![missing.display().to_string()]);
         assert_eq!(
             non_root_preserve(&["session-role".to_string(), "a/b".to_string()]),
             vec!["a/b".to_string()]
         );
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The state machine — a child failing partway is never folded
+    // into the removed set: only a wholly-removed child's own name reaches it, and the failure
+    // keeps the nested path that actually failed
+    #[test]
+    #[cfg(unix)]
+    fn a_partially_failed_child_is_absent_from_removed_and_named_at_its_failed_path() {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = std::env::temp_dir().join(format!("enter-stage-wipe-mixed-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(dir.join("ok-child")).expect("mk");
+        std::fs::write(dir.join("ok-child/file"), "").expect("w");
+        std::fs::create_dir_all(dir.join("locked-child")).expect("mk");
+        std::fs::write(dir.join("locked-child/file"), "").expect("w");
+        std::fs::set_permissions(dir.join("locked-child"), std::fs::Permissions::from_mode(0o555))
+            .expect("chmod");
+        let wiped = wipe(&dir.display().to_string(), &[]);
+        let _ = std::fs::set_permissions(
+            dir.join("locked-child"),
+            std::fs::Permissions::from_mode(0o755),
+        );
+        assert!(
+            wiped.removed.iter().any(|w| w.ends_with("ok-child")),
+            "a wholly-removed child was not named once: {:?}",
+            wiped.removed
+        );
+        assert!(
+            !wiped.removed.iter().any(|w| w.contains("locked-child")),
+            "a partially-failed child's own name leaked into removed: {:?}",
+            wiped.removed
+        );
+        assert!(
+            wiped.failed.iter().any(|w| w.ends_with("locked-child/file")),
+            "the failed leaf kept no path of its own: {:?}",
+            wiped.failed
+        );
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the shipped lock pattern's group yields the

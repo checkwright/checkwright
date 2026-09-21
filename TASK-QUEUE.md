@@ -14,24 +14,6 @@
 
 ## Technical Debt
 
-- **boundary-wipe-note-enumerates-nested-paths** —
-  the scope entry's `boundary-wiped` note lists every file below each wiped scratch child, not the
-  children the wipe deletes, so its length tracks whatever accumulated under `.tmp/`.
-  **Measured 2026-09-21:** this iteration's `--enter-stage scope` printed 558.9KB on 11 lines,
-  nearly all of it the nested `.git/` contents of leaked `check-kit-roots-dialect-*` trees; the
-  harness spilled it to a file and showed a 2KB preview, so the stamp's own `next:` line had to be
-  grepped back out. lifecycle-kit/SPEC.md §The state machine's wipe paragraph deletes each
-  immediate child "with everything below it" and says the report names the removed set — the unit
-  deleted is the child, and the per-file listing is a port of `find`'s walk, not a stated contract.
-  **Deliverable:** report the removed immediate children (a directory once, with a count if
-  wanted); the failed-removal note keeps its per-path form, since a residue path is the finding.
-  Debt: it converges the report on the unit the spec already names.
-  **Cost while deferred:** every iteration boundary prints scratch volume into the entering
-  session's context; `check-kit-roots-dialect-leaks-a-scratch-tree-per-run` is today's multiplier.
-  Filed 2026-09-21 by the scope after `release-declaration-coupling`, which measured it. Owner
-  lookup ran over `boundary-wiped`, `removed set` and `wiped set`; it found the one paragraph above.
-  **Promoted 2026-09-21 into `scratch-hermeticity`** by operator direction (lead-relayed).
-
 - **bespoke-test-path-knob-pinning** — a bespoke gate-test's cwd sandbox is
   isolated only while `GATE_SDK_TMP_DIR` and `GATE_SDK_WORKFLOW_DIR` happen to hold relative
   values in the invoker's environment, which is an ambient default rather than anything the test
@@ -2959,5 +2941,6 @@
 
 - upgrade-smoke-producer-leaks-worktrees-on-signal
 - check-kit-roots-dialect-leaks-a-scratch-tree-per-run
+- boundary-wipe-note-enumerates-nested-paths
 
 ## Lessons Learned
