@@ -7,3 +7,4 @@
 gate-sdk-surface-drain scope a35a30f1 2026-09-21 a38b20e7
 gate-sdk-surface-drain spec ac297ce8 2026-09-21 6d874623
 gate-sdk-surface-drain align a0802fc5 2026-09-21 abdff8d6
+gate-sdk-surface-drain build aaef19c7 2026-09-21 d927328a
