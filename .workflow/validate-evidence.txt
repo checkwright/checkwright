@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+scratch-hermeticity gates sha256=4ff5743ed78bc68cee10c6e7181c23ff09309d17cd5e3acd2b155975c8fdb5bd pass=123 fail=0 ignore=0 verdict=clean 2026-09-21
+scratch-hermeticity gate_sdk sha256=fb4a7b906b53571bab9385b3a5ae0e1331e0bdd1764c4f46d1342738a680c88d pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+scratch-hermeticity canon_kit sha256=7fa6f15316eae59bac76441d7c44c7846b2a7d06de9311b07f68c0b041433f95 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+scratch-hermeticity context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+scratch-hermeticity delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+scratch-hermeticity doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+scratch-hermeticity evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+scratch-hermeticity guard_kit sha256=01d94b4120e133665e01946fe44d31a730d2c6cdfd1570e5ce6b96a7a1b30e1b pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+scratch-hermeticity lifecycle_kit sha256=bac54b43ac9a49c420f8020fda337dac934779dfe6701db269ad8ac2a89ceb81 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+scratch-hermeticity queue_kit sha256=4d50cf613cf514a9f5c5f92ad7c46acf5d8f750aedc71c9e629514a415bad337 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+scratch-hermeticity site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+scratch-hermeticity scripts sha256=79ed7aac215203e28c16d151e43d18867b9d53aa24afc2c79947e252882e97b7 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+scratch-hermeticity guard_tests sha256=660ff1399386ea7ee064c052fbc5dd0fa4083498cc6ac70240f71fb571830e27 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+scratch-hermeticity demo sha256=ab70c3635ee86cc8eb2f6bd21f9b461781bef92365bdd60e8a46b818c9fe6d69 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+scratch-hermeticity installer_smoke sha256=a6cf28205db039c9f9f14acf866b6083e3e35c92c152cdaa70b26fad706f6618 pass=16 fail=0 ignore=0 verdict=clean 2026-09-21
+scratch-hermeticity consumer_smoke sha256=b0561cdd6f10daca5c959ae8c58f9d94f70f76b64c7a4d4563320535a7f794e8 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+scratch-hermeticity upgrade sha256=d03f499315101178c0038762665fd2c3f540db9c88d788ac48f170e1939b72e3 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+scratch-hermeticity agents_md_smoke sha256=c14f9842bd6d2bc335206085fdbbb092d6a8b0c8fb0534d053c24d0b093c19e2 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+scratch-hermeticity index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
+scratch-hermeticity native_crate sha256=849a4516973f770e265329f68d38b0c3f64f6e44f28723dbd3d148365f66deec pass=1 fail=0 ignore=0 verdict=clean 2026-09-21
