@@ -4,12 +4,4 @@
 
 ---
 
-gate-sdk-surface-drain scope a35a30f1 2026-09-21 a38b20e7
-gate-sdk-surface-drain spec ac297ce8 2026-09-21 6d874623
-gate-sdk-surface-drain align a0802fc5 2026-09-21 abdff8d6
-gate-sdk-surface-drain build aaef19c7 2026-09-21 d927328a
-gate-sdk-surface-drain build a2313ff8 2026-09-22 d1ff25f5
-gate-sdk-surface-drain build a0e34134 2026-09-22 86429f6a
-gate-sdk-surface-drain build a1da1547 2026-09-22 acf5f6ca
-gate-sdk-surface-drain validate a012ae64 2026-09-22 2bab7fa4
-gate-sdk-surface-drain close ac8f2617 2026-09-22 6ce15115
+— scope a7d94962 2026-09-22 c2f789df
