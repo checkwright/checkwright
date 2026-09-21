@@ -20,6 +20,7 @@ check-docs-cmd
 check-docs-link-convention
 check-docs-restatement-parity
 check-fence-command-head
+check-fence-run
 check-install-claim
 check-knob-citation
 check-knob-default-coupling

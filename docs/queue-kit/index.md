@@ -29,6 +29,7 @@ The steps are the kit README's [Install](README.md#install) section.
 
 Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
+<!-- fence-runnable -->
 ```bash
 . "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
 "$gates" --emit queue-index    # list selectable work

@@ -399,6 +399,27 @@ pub fn run_merged_in(
     env: &[(String, String)],
     cwd: Option<&std::path::Path>,
 ) -> Result<Merged, String> {
+    merged(program, args, env, cwd, false)
+}
+
+// spec: canon-kit/SPEC.md §check-fence-run — `run_merged_in` whose child inherits no variable at
+// all: the environment is exactly `env`, the fixed one a documented fence runs under
+pub fn run_merged_isolated(
+    program: &Program,
+    args: &[&str],
+    env: &[(String, String)],
+    cwd: &std::path::Path,
+) -> Result<Merged, String> {
+    merged(program, args, env, Some(cwd), true)
+}
+
+fn merged(
+    program: &Program,
+    args: &[&str],
+    env: &[(String, String)],
+    cwd: Option<&std::path::Path>,
+    isolated: bool,
+) -> Result<Merged, String> {
     #[cfg(test)]
     recorder::note(program.invocation());
     let spawn_err = |e: std::io::Error| {
@@ -419,6 +440,9 @@ pub fn run_merged_in(
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::from(out))
         .stderr(std::process::Stdio::from(err));
+    if isolated {
+        cmd.env_clear();
+    }
     for (k, v) in env {
         cmd.env(k, v);
     }

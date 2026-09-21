@@ -175,8 +175,11 @@ impl Scan {
             self.cmdpos = false;
             return;
         }
+        // spec: canon-kit/SPEC.md §check-fence-run — an expansion head carries its operands too, the
+        // first of which names the arm a fence runs the gate binary under
         if let Some(knob) = expansion_name(t) {
             self.emit(Kind::Expansion, &knob);
+            self.pending = Some(self.out.len() - 1);
             self.cmdpos = false;
             return;
         }

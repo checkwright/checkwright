@@ -186,7 +186,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         .iter()
         .any(|e| crate::toolfloor::parse(e).audience == crate::toolfloor::DERIVED)
     {
-        let d = crate::toolfloor::derived_audience_here()?;
+        let d = crate::toolfloor::derived_kit_audience_here()?;
         if d.is_empty() {
             return Err(format!(
                 "the roster carries a '{}' audience and no kit root under this tree satisfies its \

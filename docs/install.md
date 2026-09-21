@@ -66,7 +66,9 @@ includes that kit, and `@registered` only if a gate you register needs the tool:
   kits themselves at probe time rather than held by hand, so a kit that later
   ships such a file joins it without anyone remembering to; context-kit/SPEC.md
   §bin/env-probe states the predicate a kit is measured against. Prose telling
-  you to type a bash command is not that predicate, and no kit ships it. The starter and prose profiles reach none of them. Both generated
+  you to type a bash command is not that predicate, and no kit ships it. The starter and prose profiles reach none of them,
+  until your own docs mark a fence runnable: canon-kit's `check-fence-run` then runs it
+  with `bash`, and canon-kit joins the list from the next `doctor`. Both generated
   git hooks are POSIX sh, run by the `/bin/sh` git itself uses. `init`
   generates them and names its follow-up commands through the gate binary it
   placed. The unix install bootstrap (`installer/bin/checkwright.sh`) is POSIX sh

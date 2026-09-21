@@ -112,6 +112,7 @@ directly with `--fixture <dir>` only for testing.
 
 Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
+<!-- fence-runnable -->
 ```bash
 . "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
 "$gates" --run-gate-tests delegation-kit/gate-tests delegation-kit/checks  # every gate's fixture pair

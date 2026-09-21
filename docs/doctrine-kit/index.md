@@ -42,6 +42,7 @@ The steps are the kit README's [Install](README.md#install) section.
 
 Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
+<!-- fence-runnable -->
 ```bash
 . "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
 "$gates" --run-gate-tests doctrine-kit/gate-tests doctrine-kit/checks

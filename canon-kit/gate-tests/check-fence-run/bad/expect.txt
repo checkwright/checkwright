@@ -1,0 +1,7 @@
+doc.md:4: fence exited 1, declared 0
+doc.md:9: fence exited 1, declared 0
+never_assigned: unbound variable
+doc.md:15: 'curl' names no builtin
+doc.md:18: marker is not immediately above a bash, sh or shell fence
+doc.md:24: '<!-- fence-runable -->' is a misspelled fence-runnable marker
+doc.md:29: marker operand 'exit=one' is not exit=<decimal>

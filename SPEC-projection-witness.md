@@ -73,10 +73,11 @@ because it reads `# projection:`. Deltas 2 and 3 ride with it.
    arm prints `0 projections` and exits 0, which is visible and not a silent
    pass.
 2. **Scratch.** One tracked-tree scratch: the index's tracked set copied with
-   `std::fs`, then `git init` and a seed commit. The helper is shared with
-   SPEC-fence-run.md, and whichever lands first writes it. The running binary is
-   placed where `GATE_SDK_NATIVE_BIN` resolves in the scratch. It is removed on
-   every exit path.
+   `std::fs`, then `git init` and a seed commit — gate-sdk's tracked-tree scratch
+   (gate-sdk/SPEC.md §Consumer smoke), already landed with `check-fence-run`, which
+   this arm calls. The running binary is placed where `GATE_SDK_NATIVE_BIN`
+   resolves in the scratch, through that section's `place_artifact`. It is removed
+   on every exit path.
 3. **Baseline.** Each member gate is spawned by name in the scratch, the arm's
    own executable with the scratch as its working directory, and it must exit 0.
    A member red at baseline is exit 2 naming it, since the projection was
@@ -171,7 +172,7 @@ Mechanical: two knob lines.
     `GATE_SDK_NATIVE_BIN` in its `KNOBS` for the placement, and that knob is
     already documented.
 - **The tracked-tree scratch (delta 1).** It is internal, shared in-crate with
-  SPEC-fence-run.md's gate, and no other component reads it.
+  `check-fence-run`, and no other component reads it.
 - **The class grouping (delta 1).** The arm's own computation. Its one reader is
   the arm's loop.
 - **The suite (delta 3).** Producer: the knob lines. Consumer: `--run-validate`,
@@ -190,7 +191,7 @@ and §The non-gate arm.
 - gate-sdk/SPEC.md: a new section for `--projection-witness` beside §check-reads-couples,
   whose static reads⊆couples half this is the dynamic complement of, and
   §The non-gate arm's roster (delta 1).
-- `native/src/emit/mod.rs`'s arm table, a new arm module, and the shared
+- `native/src/emit/mod.rs`'s arm table and a new arm module, which calls the shared
   tracked-tree scratch helper (delta 1).
 - docs/site-architecture.md §Generated projections: the section intro and seven
   row sentences (delta 2).

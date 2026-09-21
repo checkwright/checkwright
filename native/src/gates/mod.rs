@@ -21,6 +21,7 @@ pub mod deprecation_task;
 pub mod docs_cmd;
 pub mod docs_restatement_parity;
 pub mod fence_command_head;
+pub mod fence_run;
 pub mod gate_assertions;
 pub mod gate_exemption_tasks;
 pub mod gate_fail_closed;
@@ -592,6 +593,27 @@ pub const REGISTRY: &[GateEntry] = &[
         ],
         "canon-kit",
         &[("git", "")],
+    ),
+    // spec: canon-kit/SPEC.md §check-fence-run — `bash` is spawned only when a marked fence exists,
+    // and the running binary is placed rather than spawned by this member
+    (
+        "check-fence-run",
+        fence_run::run,
+        MANIFEST_ROOTS,
+        &[
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+            "GATE_SDK_KIT_DIRS",
+            "GATE_SDK_NATIVE_BIN",
+            "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_MANIFEST_FILES",
+            "CANON_KIT_PROSE_SURFACE_GLOBS",
+            "CANON_KIT_MDREF_EXCLUDE",
+            "CANON_KIT_FENCE_RUN_PROGRAMS",
+        ],
+        "canon-kit",
+        &[("bash", ""), ("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — `?` for the reason spelled out at
     // check-spec-fence-balance below: the walk root does not bound the read set
@@ -1408,7 +1430,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-install-toolchain",
         install_toolchain::run,
-        &[("?", "", "", "dynamic@src/toolfloor.rs:128 via toolfloor::derived_audience_here")],
+        &[("?", "", "", "dynamic@src/toolfloor.rs:141 via toolfloor::derived_kit_audience_here")],
         &["GATE_SDK_KIT_DIRS"],
         "-",
         &[("git", "")],

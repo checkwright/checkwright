@@ -160,6 +160,7 @@ leaves its section absent.
 | [gate-sdk](gate-sdk/index.md) | check-gate-assertions | align-only |
 | [canon-kit](canon-kit/index.md) | check-spec-dod-singleton | align-only |
 | [canon-kit](canon-kit/index.md) | check-spec-derivable-section | align-only |
+| [canon-kit](canon-kit/index.md) | check-fence-run | align-only |
 
 ## Advisory KPIs
 

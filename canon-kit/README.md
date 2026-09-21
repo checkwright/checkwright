@@ -44,6 +44,7 @@ reads the tag syntax [queue-kit](../queue-kit/) defines.
    check-docs-cmd               # invoked paths + kit knobs in docs resolve
    check-docs-restatement-parity # needs restating pages (their code tokens held to the README beside each)
    check-fence-command-head     # every shell-fence command starts with a word that can run
+   check-fence-run              # every shell fence marked runnable runs and exits as declared
    check-knob-citation          # knob values stated only in the owning SPEC
    check-knob-default-coupling  # source knob defaults agree with the owning SPEC
    check-manifest-count         # no bare cardinal over a governed collection
@@ -91,6 +92,7 @@ code instead. Author amendments up front; merge and delete them at build.
 
 Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
+<!-- fence-runnable -->
 ```bash
 . "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
 "$gates" --run-gate-tests canon-kit/gate-tests canon-kit/checks

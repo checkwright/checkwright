@@ -100,6 +100,7 @@ unconfigured consumer gets a clean skip rather than a kit-shaped roadmap.
 
 Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
+<!-- fence-runnable -->
 ```bash
 . "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
 "$gates" --run-gate-tests queue-kit/gate-tests queue-kit/checks

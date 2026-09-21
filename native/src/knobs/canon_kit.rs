@@ -64,6 +64,7 @@ pub const KIT: Kit = Kit {
             ],
         ),
         Row::indexed("CANON_KIT_FENCE_PROGRAMS_EXTRA", &[]),
+        Row::indexed("CANON_KIT_FENCE_RUN_PROGRAMS", &["git"]),
         Row::indexed("CANON_KIT_RETIRED_SPELLING_EXCLUDE", &[]),
         Row::scalar("CANON_KIT_LINK_ROOT", "docs"),
         Row::scalar("CANON_KIT_DOCS_BLOB_REF", "master"),

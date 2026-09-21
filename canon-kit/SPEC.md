@@ -520,6 +520,13 @@ Knobs:
   extra rather than a kit literal (the provenance seam). This repo adds its
   crate toolchain, its fetch and checksum tools, one platform's package manager
   and the npm runner.
+- `CANON_KIT_FENCE_RUN_PROGRAMS` — array of program names a fence
+  `check-fence-run` executes may start a command with, default `("git")`. It is
+  the whole set, not an extra over `CANON_KIT_FENCE_PROGRAMS`: every name in it
+  is a program that runs with the scratch's network reach, so the default admits
+  only the one program the fixed environment confines to local protocols. A
+  vocabulary rather than a walk filter, so it takes no `knob:` couples token, on
+  the fence-program pair's own ground. This repo sets nothing.
 - `CANON_KIT_RETIRED_SPELLING_EXCLUDE` — array of globs, default empty: tracked
   paths held out of `check-amendment-retired-spelling`'s reconciliation corpus.
   Which surfaces are **history-bearing** is a consumer fact, not a kit one — a
@@ -3011,13 +3018,120 @@ takes no `knob:` couples token (gate-sdk/SPEC.md §gen-pre-commit).
 the gate never executes a fence, so a wrong operand, a missing environment and a
 variable the fence reads but never assigned all pass. A command led by a
 redirection (`>out cmd`) is not judged, because the scanner leaves command
-position at the operator. Executing a fence needs a sandbox and a way for a doc
-to mark which fences are hermetic, and it is not built here.
+position at the operator. Executing a fence is `check-fence-run`'s, for the
+fences a doc marks runnable.
 
 **Red** names each doc, line and head with the rule it failed; the clean line
 counts docs, shell fences and heads, so an empty corpus shows as zero rather
 than passing silently. The tracked set is one repository-root-anchored
 `git ls-files`, and a failed read, or no repository, exits 2.
+
+### check-fence-run
+
+Invariant: every shell fence a governed doc marks runnable passes a narrowed
+static pass, then runs, and exits with the status it declares.
+`check-fence-command-head` shows that a fence's command head can run and nothing
+else, so a wrong operand or an unassigned variable passes it. This gate executes
+the fences a doc opts in, and it is `tier=align-only`: it runs in the full battery
+and stays out of the generated pre-commit hook, the class gate-sdk/SPEC.md
+§check-graph reserves for gates pre-commit cannot afford.
+
+**The marker.** A doc marks a `bash`, `sh` or `shell` fence runnable with a
+`<!-- fence-runnable -->` line **immediately above** the fence's opening line, or
+declares a non-zero status with `<!-- fence-runnable: exit=<n> -->` for a fence
+that shows a failure (`n` a decimal from 0 to 255; the default is 0). With no
+marker a fence is not runnable, so a tree that marks nothing executes nothing. A
+misspelled marker that silently disarms is the failure a marker exists to
+prevent, so the marker is judged strictly, and each of these reds:
+
+- a marker whose next line is not a `bash`, `sh` or `shell` fence opener;
+- a marker operand other than `exit=<decimal>`;
+- a line that looks like the marker and misses the grammar — one whose text,
+  after indentation, opens `<!--`, optional space, then `fence-run`.
+
+A marker-shaped line inside a fence is fence content and is not read, and prose
+naming the marker mid-line marks nothing. `check-fence-command-head` treats a
+marked fence exactly as any other, since the comment sits outside the fence body.
+The corpus is `check-md-refs`' governed doc set, the one both fence gates read, and
+at the default `CANON_KIT_SCAN_KIT_ROOTS` it prunes the kit roots, so what runs in a
+consumer is its own first-party docs.
+
+**The static pass, before anything runs.** Every command in a marked fence must
+have a head `check-fence-command-head` admits, narrowed:
+
+- a **configured program** must be in `CANON_KIT_FENCE_RUN_PROGRAMS` (§Layout
+  and configuration), never `CANON_KIT_FENCE_PROGRAMS`;
+- an **expansion** head (`"$gates"`), or a path naming the gate binary
+  `GATE_SDK_NATIVE_BIN` resolves to, has its first operand checked against the
+  fence-safe arm set (gate-sdk/SPEC.md §The non-gate arm): a `-`-led operand is a
+  member, `--emit <name>` names a member of that family, and a bare word is a
+  registered gate;
+- any **other tracked path** reds, because a script's body is outside the pass;
+- a builtin that **runs its operand as a command** — `exec`, `eval`, `trap`, and
+  `command` other than its `-v`/`-V` probe — reds, because the head scan never
+  sees the command it runs.
+
+A red head is reported and its fence is not executed. The pass is what makes *no
+network* hold for the shipped defaults: no admitted head dials out, and the
+crate's only network-spawning arms are outside the fence-safe set. **Honest
+limit:** a function the fence sources is admitted as a function, so the pass
+trusts what a sourced library runs.
+
+**The run.** No portable process sandbox exists on the three adopter operating
+systems (gate-sdk/SPEC.md §The adopter constraints), so *no network* is held by
+the construction above rather than by a kernel facility.
+
+1. **One scratch per doc**, under `DEMO_TMP_DIR`, else the platform temp
+   directory — the base §Consumer smoke's builder takes. The copy is gate-sdk's
+   tracked-tree scratch (gate-sdk/SPEC.md §Consumer smoke): the index's tracked
+   set under the gate's working directory, copied with `std::fs` from the working
+   tree, then `git init` and a seed commit under a fixed identity, so a fence that
+   reads git sees a repository. At the repository root that is the whole tracked
+   tree; in a fixture case dir it is the case dir alone.
+2. **The binary is placed.** `GATE_SDK_NATIVE_BIN` is resolved against the
+   scratch root, and where that lands inside the scratch the running binary is
+   copied there through the builder's own placement, which a source clone's
+   untracked build output needs. A value pointing outside the scratch is used as
+   it stands.
+3. **Marked fences run in document order**, each as its own `bash -euo pipefail`
+   process with the scratch root as its working directory. Files carry over from
+   one fence to the next and shell state does not: a reader pasting a later fence
+   into a fresh shell has no variable an earlier one set either, and `-u` turns
+   that unassigned variable into a red.
+4. **The environment is fixed and not inherited.** It carries the host's `PATH`
+   value, `LC_ALL=C`, `HOME` at a directory inside the scratch's `.git`,
+   `GIT_CONFIG_NOSYSTEM=1`, `GIT_CONFIG_GLOBAL` at an empty file there,
+   `GIT_ALLOW_PROTOCOL=file`, the proxy variables `http_proxy`, `https_proxy`
+   and `all_proxy` in both cases at an unroutable loopback port,
+   `GATE_SDK_NATIVE_BIN` at the placed binary, a nesting marker, and on Windows the
+   system root a process cannot start without. **Honest limit:** this is defense
+   in depth for a consumer-added program that honors proxies, not a sandbox; a
+   program named in `CANON_KIT_FENCE_RUN_PROGRAMS` that ignores proxy variables can
+   reach the network, and naming it is the consumer's act.
+5. **The scratch is removed on every exit path.**
+
+**The nesting marker.** A fence may run the battery, whose `check-fence-run`
+would re-enter the same fences in a scratch of the scratch without end. The marker
+carries how many fence scratches deep a run sits: a corpus walk at any depth
+executes nothing and says so on its clean line, while a run over named docs — this
+gate's own fixture suite, run by a fence — still executes, until a backstop depth of
+three ends a doc that names itself.
+
+**Red** is a fence whose exit status differs from the declared one, naming the
+doc, the fence's opening line, both statuses and the last twenty lines of the
+fence's merged output; a static-pass red names the doc, the line, the head and
+the rule it failed, and a marker red the doc, the line and the defect. The clean
+line counts docs, marked fences, executed commands and scratches, so a tree with
+no marked fence prints `0 marked fence(s)` — nothing executed, not a quiet pass. A
+failed copy, a missing `bash` or a failed `git init` exits 2.
+
+**On a host with no `bash`, and on Windows.** The gate spawns `bash` only when a
+marked fence passes the static pass. With zero markers it spawns nothing and is
+clean on every host, so an adopter who never marks a fence takes on no
+interpreter; marking one is the act that takes the dependency, and the fence is a
+`bash` fence by its own info string. The bash audience's third `derived` arm
+records that spawn (context-kit/SPEC.md §bin/env-probe), calling this gate's
+corpus and marker functions rather than copies of them.
 
 ### check-install-claim
 

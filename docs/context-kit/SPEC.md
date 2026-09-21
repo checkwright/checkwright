@@ -469,8 +469,9 @@ verdict set is, and a unit test in `toolfloor.rs` holds it closed:
   nothing, a consumer command being the consumer's requirement
   (gate-sdk/SPEC.md §The program roster).
 - **`derived`** — the kit list is not spelled at all: the reader evaluates the
-  member's own predicate over the kit roots and takes the kit-list arm above on
-  what it returns. It exists for the same reason `registered` does — a set that
+  member's own predicate over the kit roots — and, where the predicate has an arm
+  keyed on document content, over the reader's anchor — and takes the kit-list arm
+  above on what it returns. It exists for the same reason `registered` does — a set that
   can be measured is a set nothing should maintain (Derivation-first) — and it
   is a *sentinel*, never a kit name, exactly as the two values above are. A
   written-back value computed once and gated for freshness was the alternative
@@ -539,6 +540,24 @@ The constrained members and what forces each:
   kit ships such prose, so admitting it would re-open that disagreement. The
   exclusion of `gate-tests/` and `smoke/` is the contributor boundary the
   `contributor` audience above already draws, reused rather than restated.
+
+  **The third arm is read over the anchor, not per kit root:** the kit that owns
+  the fence-executing gate (canon-kit/SPEC.md §check-fence-run) joins the audience
+  when the anchor's fence-run corpus carries a marked fence. A kit list, or
+  `registered`, would owe `bash` to every selection carrying that kit, the `prose`
+  profile included, marked fence or not; and the corpus the gate executes lies in
+  no kit root — at the default `CANON_KIT_SCAN_KIT_ROOTS` it prunes the kit roots,
+  so what runs is the adopter's own first-party docs. The owning kit is read off
+  the registry's owner column, never written as a literal, and joins only when it
+  is among the reader's kit roots; the corpus and the marker test are the gate's own
+  functions, so the arm and the gate cannot disagree about whether a spawn can
+  happen. A marked fence is not the *typed* prose excluded above: the gate executes
+  it, so it is a spawn, the thing the other two arms read. A **bash surface** is
+  whatever any of the three arms reads. **Honest limit:** a verdict holds for the
+  moment it is read. `init` resolves over the payload, which holds no adopter
+  content, so a marker the adopter writes later is owed from the next `doctor` or
+  env-probe read; until then the gate's fail-closed exit 2 on a missing `bash` keeps
+  the gap loud.
 
   **The floor-holding root is narrowed past**, named by the root the SDK
   occupies rather than by a literal: `installer/profiles.list` puts it in every

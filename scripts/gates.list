@@ -89,6 +89,7 @@ check-docs-render-fidelity
 check-docs-cmd
 check-docs-restatement-parity
 check-fence-command-head
+check-fence-run
 check-install-toolchain
 check-install-platforms
 check-install-claim

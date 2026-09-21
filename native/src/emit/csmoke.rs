@@ -81,14 +81,80 @@ pub fn place_binary(consumer: &str, host: &str, roots: &[String]) -> Result<(), 
             path: from,
         });
     }
-    let to = format!("{}/{}", consumer, bin);
-    if let Some(parent) = Path::new(&to).parent() {
+    place_artifact(&from, &format!("{}/{}", consumer, bin)).map_err(PlaceError::Io)
+}
+
+// spec: gate-sdk/SPEC.md §Consumer smoke — the placement itself, shared by every caller that puts a
+// gate binary into a scratch: the parent directories, then the copy, which keeps the mode bits
+pub fn place_artifact(from: &str, to: &str) -> Result<(), String> {
+    if let Some(parent) = Path::new(to).parent() {
         std::fs::create_dir_all(parent)
-            .map_err(|e| PlaceError::Io(format!("cannot create {}: {}", parent.display(), e)))?;
+            .map_err(|e| format!("cannot create {}: {}", parent.display(), e))?;
     }
-    std::fs::copy(&from, &to)
-        .map_err(|e| PlaceError::Io(format!("cannot copy {} to {}: {}", from, to, e)))?;
+    std::fs::copy(from, to).map_err(|e| format!("cannot copy {} to {}: {}", from, to, e))?;
     Ok(())
+}
+
+// spec: gate-sdk/SPEC.md §Consumer smoke — the tracked-tree scratch, returned as its removal guard
+// so every exit path tears it down
+pub fn tracked_scratch(base: &Path, label: &str) -> Result<crate::walkthrough::Scratch, String> {
+    let listed = proc::run(&programs::GIT, &["ls-files", "-z"])?;
+    if let Some(r) = listed.failure_report() {
+        return Err(format!("git ls-files failed listing the tracked set — {}", r));
+    }
+    let files: Vec<String> = String::from_utf8_lossy(listed.stdout().unwrap_or(&[]))
+        .split('\0')
+        .filter(|s| !s.is_empty())
+        .map(str::to_string)
+        .collect();
+    let mut guard = crate::walkthrough::Scratch { dir: None };
+    let mut seq = 0u32;
+    let dir = loop {
+        let d = base.join(format!("{}.{}.{}", label, std::process::id(), seq));
+        match std::fs::create_dir(&d) {
+            Ok(()) => break d,
+            Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => seq += 1,
+            Err(e) => return Err(format!("cannot create a scratch under {}: {}", base.display(), e)),
+        }
+    };
+    guard.dir = Some(dir.clone());
+    for f in &files {
+        let from = Path::new(f);
+        let meta = match std::fs::symlink_metadata(from) {
+            Ok(m) => m,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,
+            Err(e) => return Err(format!("cannot read {}: {}", f, e)),
+        };
+        let to = dir.join(f);
+        if let Some(parent) = to.parent() {
+            std::fs::create_dir_all(parent)
+                .map_err(|e| format!("cannot create {}: {}", parent.display(), e))?;
+        }
+        if meta.file_type().is_symlink() {
+            copy_link(from, &to)?;
+        } else if meta.is_file() {
+            std::fs::copy(from, &to)
+                .map_err(|e| format!("cannot copy {} to {}: {}", f, to.display(), e))?;
+        }
+    }
+    let d = dir.display().to_string();
+    git(&d, &["init", "-q"])?;
+    commit(&d, "--allow-empty", "seed")?;
+    Ok(guard)
+}
+
+#[cfg(unix)]
+fn copy_link(from: &Path, to: &Path) -> Result<(), String> {
+    let target = std::fs::read_link(from).map_err(|e| format!("cannot read {}: {}", from.display(), e))?;
+    std::os::unix::fs::symlink(&target, to)
+        .map_err(|e| format!("cannot link {}: {}", to.display(), e))
+}
+
+#[cfg(not(unix))]
+fn copy_link(from: &Path, to: &Path) -> Result<(), String> {
+    std::fs::copy(from, to)
+        .map(|_| ())
+        .map_err(|e| format!("cannot copy {} to {}: {}", from.display(), to.display(), e))
 }
 
 fn basename(p: &str) -> &str {

@@ -1709,7 +1709,10 @@ them — `--run-demo`, `--run-consumer-smoke`'s builder, `--upgrade-smoke` and
 `--agents-md-smoke` need the kit sources and a cargo-built binary, the payload
 withholds `smoke/` (`GATE_SDK_PAYLOAD_WITHHOLD`), and `--pack-installer` is the
 publisher's own; a later adopter-side spawn of either reclaims an adopter
-audience. `date` and `ps` are members on non-unix builds only.
+audience. `date` and `ps` are members on non-unix builds only. `bash`'s spawners
+include canon-kit's `check-fence-run`, which spawns it only when a doc marks a
+fence runnable and records it on its `REGISTRY` row; the bash audience's third
+`derived` arm is what owes that spawn (context-kit/SPEC.md §bin/env-probe).
 
 ### Fixture-pair discipline
 
@@ -3843,6 +3846,23 @@ member's knob refusal is raised inside that member at its first read, so a knob
 that an *unselected* member declares, and that cannot resolve, fails a bare run
 and a `--only` naming that member. The runner does not invoke an unselected
 member, so its knobs are a read nobody consumes.
+
+**The fence-safe arm set is declared beside the arm table.** `FENCE_SAFE_ARMS`
+names the arms a documented fence may run the binary under when
+canon-kit/SPEC.md §check-fence-run executes it: an arm belongs when it spawns **no
+program that reaches the network** and **writes nowhere but its working tree and
+stdout**. It is one declaration of a property of arms, on `FAIL_OPEN_ARMS`'
+precedent, and not a knob, so it joins no knob roster. Spelled are `--help`,
+`--list`, the battery `--run` and `--run-gate-tests`; every `--emit` family member
+and every registered gate name join by derivation off the table and the registry.
+Each member's spawns stay inside the tree it runs in, and the crate's only network
+spawners are `--usage-poll` (`curl`) and `--pack-installer` (`npm`), neither
+admitted: a crate unit test holds the set and those two arms disjoint, so admitting
+a network-spawning arm reds the build rather than an adopter's scratch. The set is
+gate-sdk's and not canon-kit's because it is a property of the binary's arms, read
+by a gate that happens to live in canon-kit; a consumer needing a further program
+in a runnable fence names it in `CANON_KIT_FENCE_RUN_PROGRAMS` and never widens
+this set.
 
 #### The harness-integration arm
 
@@ -9102,6 +9122,20 @@ output: `--run-consumer-smoke` keeps it on stdout, and `--upgrade-smoke` and
 `--agents-md-smoke` route it to stderr, where each arm's stdout carries its
 verdict. The counts are populated for every caller and read by one: the installed
 count is `--run-consumer-smoke`'s clean line alone.
+
+`place_artifact(from, to)` is the placement itself — the parent directories,
+then a mode-preserving copy — which `place_binary` calls and which a caller placing
+a binary it did not take from a checkout calls directly.
+
+**The tracked-tree scratch** sits beside the builder, for a caller that needs the
+tree it stands in rather than a consumer built from kit roots:
+`tracked_scratch(base, label)` lists the index's tracked set under the working
+directory, creates `<label>.<pid>.<n>` under `base` (`n` counting past a name
+already taken), copies each tracked path's working-tree content into it with
+`std::fs` (a symlink as a symlink, and a tracked path absent from the working
+tree skipped), then runs `git init` and makes the seed commit. It returns the removal
+guard, so the directory is gone on every exit path, and a failed listing, copy or
+`git init` is an `Err`. canon-kit/SPEC.md §check-fence-run is its first caller.
 
 **The adoption walkthrough is this section's other member, and this is the
 mechanism owner its own header pointed elsewhere for.** It is the

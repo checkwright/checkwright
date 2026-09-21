@@ -750,6 +750,16 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
 // declaration line is its copy, held to it by check-front-end-fail-open
 pub const FAIL_OPEN_ARMS: &[&str] = &["--hook", "--statusline"];
 
+// spec: gate-sdk/SPEC.md §The non-gate arm — the fence-safe arm set; the `--emit-` family and every
+// registered gate join by derivation in `fence_safe`, so only the rest are spelled here
+pub const FENCE_SAFE_ARMS: &[&str] = &["--help", "--list", "--run", "--run-gate-tests"];
+
+pub fn fence_safe(arm: &str) -> bool {
+    FENCE_SAFE_ARMS.contains(&arm)
+        || emit_names().contains(&arm)
+        || crate::gates::lookup(arm).is_some()
+}
+
 pub fn lookup(arm: &str) -> Option<&'static Arm> {
     ARMS
         .iter()
@@ -787,6 +797,27 @@ mod tests {
 
     // spec: gate-sdk/SPEC.md §The harness-integration arm — a renamed or deleted fail-open arm reds
     // here, before a stub's copy can name an arm the binary no longer dispatches
+    // spec: gate-sdk/SPEC.md §The non-gate arm — the crate's network spawners, the arms reaching
+    // `curl` and `npm`, are never fence-safe: admitting one reds here rather than in an adopter's
+    // scratch
+    #[test]
+    fn no_network_spawning_arm_is_fence_safe() {
+        const NETWORK_ARMS: &[&str] = &["--usage-poll", "--pack-installer"];
+        for arm in NETWORK_ARMS {
+            assert!(lookup(arm).is_some(), "{} names no arm-table row", arm);
+            assert!(!fence_safe(arm), "{} spawns a network program and is fence-safe", arm);
+        }
+        for arm in FENCE_SAFE_ARMS {
+            assert!(
+                lookup(arm).is_some() || ["--help", "--list"].contains(arm),
+                "{} is fence-safe and names no arm",
+                arm
+            );
+        }
+        assert!(fence_safe("--emit-knob-roster"));
+        assert!(!fence_safe("--emit"));
+    }
+
     #[test]
     fn every_fail_open_arm_is_an_arm_table_row() {
         for arm in FAIL_OPEN_ARMS {

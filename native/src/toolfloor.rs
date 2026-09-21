@@ -123,6 +123,19 @@ pub fn derived_audience_at(
     roots: &[String],
     sdk_root: &str,
 ) -> Result<Vec<String>, String> {
+    let mut out = kit_arms_at(anchor, roots, sdk_root)?;
+    if let Some(owner) = fence_executor(anchor, roots, &kit_name(sdk_root))? {
+        if !out.contains(&owner) {
+            out.push(owner);
+        }
+    }
+    out.sort();
+    Ok(out)
+}
+
+// spec: context-kit/SPEC.md §bin/env-probe — the two per-kit-root arms alone, the audience a
+// payload carries before any adopter content exists
+fn kit_arms_at(anchor: &str, roots: &[String], sdk_root: &str) -> Result<Vec<String>, String> {
     let configured = crate::walk::prune_dirs()?;
     let prune = |n: &str| n == "gate-tests" || n == "smoke" || configured.iter().any(|d| d == n);
     let tree = crate::walk::find_with_prune(std::path::Path::new(anchor), &prune)?;
@@ -154,12 +167,41 @@ pub fn derived_audience_at(
     Ok(out)
 }
 
+// spec: context-kit/SPEC.md §bin/env-probe — the third arm, over the anchor: the registry owner of
+// the fence-executing gate, among the reader's roots, joins on a marked fence in its corpus
+fn fence_executor(anchor: &str, roots: &[String], floor: &str) -> Result<Option<String>, String> {
+    use crate::gates::fence_run;
+    let Some(owner) = crate::gates::names_with_owners()
+        .into_iter()
+        .find(|(n, _)| *n == fence_run::NAME)
+        .map(|(_, o)| o.to_string())
+    else {
+        return Ok(None);
+    };
+    if owner == floor || !roots.iter().any(|r| kit_name(r) == owner) {
+        return Ok(None);
+    }
+    let marked = fence_run::corpus_at(anchor, roots)?.iter().any(|d| {
+        std::fs::read(d)
+            .map(|b| fence_run::carries_marked_fence(&String::from_utf8_lossy(&b)))
+            .unwrap_or(false)
+    });
+    Ok(marked.then_some(owner))
+}
+
 // spec: context-kit/SPEC.md §bin/env-probe — the derivation against the tree the reader stands in,
 // the form a contributor-side reader walking the roster whole takes. It takes `kit_roots()` and
 // not `kit_roots_rel()`: it opens files, so it takes the repository-path spelling.
 pub fn derived_audience_here() -> Result<Vec<String>, String> {
     let here = crate::walk::cwd()?;
     derived_audience_at(&here, &crate::walk::kit_roots()?, &crate::walk::sdk_root())
+}
+
+// spec: context-kit/SPEC.md §bin/env-probe — the kit-root arms against the tree the reader stands
+// in: the payload's floor, the one a page stating what an install owes is compared against
+pub fn derived_kit_audience_here() -> Result<Vec<String>, String> {
+    let here = crate::walk::cwd()?;
+    kit_arms_at(&here, &crate::walk::kit_roots()?, &crate::walk::sdk_root())
 }
 
 // spec: context-kit/SPEC.md §bin/env-probe — what a consumer-side reader has selected: the kit set
@@ -465,11 +507,18 @@ mod tests {
 
     // spec: context-kit/SPEC.md §bin/env-probe — the predicate is total over the kit roots and
     // answers from the tree rather than from a list: the authoring tree's own value, measured
-    // here rather than spelled anywhere, and the floor-holder narrowed past
+    // here rather than spelled anywhere over the kit-root arms, and the floor-holder narrowed past
     #[test]
     fn the_bash_audience_derives_from_the_kit_roots_and_narrows_past_the_floor_holder() {
         let _knobs = crate::knobenv::lock();
-        let (_, derived) = authoring_tree();
+        let repo = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .expect("the crate sits under the repo root");
+        let sdk = repo.join("gate-sdk").display().to_string();
+        let (kits, _) = authoring_tree();
+        let roots: Vec<String> = kits.iter().map(|k| repo.join(k).display().to_string()).collect();
+        let derived = kit_arms_at(&repo.display().to_string(), &roots, &sdk)
+            .expect("the derivation could not run");
         assert!(
             derived.iter().all(|k| k != "gate-sdk"),
             "the floor-holder joined the audience, which makes the member unconditional: {:?}",
@@ -481,6 +530,28 @@ mod tests {
         for clear in ["delegation-kit", "lifecycle-kit", "canon-kit", "queue-kit"] {
             assert!(derived.iter().all(|k| k != clear), "{} joined the audience: {:?}", clear, derived);
         }
+    }
+
+    // spec: context-kit/SPEC.md §bin/env-probe — the third arm: the fence-executing gate's owner
+    // joins exactly when the anchor's own docs carry a marked fence, and a marker inside a kit root
+    // is pruned as the gate prunes it
+    #[test]
+    fn a_marked_fence_in_the_anchors_docs_brings_the_gates_owner_into_the_audience() {
+        let _knobs = crate::knobenv::lock();
+        let anchor = std::env::temp_dir().join(format!("toolfloor-fence.{}", std::process::id()));
+        let kit = anchor.join("canon-kit");
+        std::fs::create_dir_all(&kit).unwrap();
+        let marked = "# x\n\n<!-- fence-runnable -->\n```bash\ntrue\n```\n";
+        std::fs::write(kit.join("README.md"), marked).unwrap();
+        std::fs::write(anchor.join("README.md"), "# x\n\n```bash\ntrue\n```\n").unwrap();
+        let a = anchor.display().to_string();
+        let roots = vec![kit.display().to_string()];
+        let sdk = anchor.join("gate-sdk").display().to_string();
+        assert!(derived_audience_at(&a, &roots, &sdk).unwrap().is_empty());
+        std::fs::write(anchor.join("README.md"), marked).unwrap();
+        assert_eq!(derived_audience_at(&a, &roots, &sdk).unwrap(), vec!["canon-kit"]);
+        assert!(derived_audience_at(&a, &[], &sdk).unwrap().is_empty());
+        let _ = std::fs::remove_dir_all(&anchor);
     }
 
     // spec: context-kit/SPEC.md §bin/env-probe — `under` synthesizes no separator, the property

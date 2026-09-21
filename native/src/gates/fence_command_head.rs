@@ -17,11 +17,11 @@ pub fn run(args: &[String]) -> i32 {
 
 // spec: canon-kit/SPEC.md §check-fence-command-head — the fence languages whose body is a command
 // sequence a reader pastes into a shell
-const SHELL_LANGS: [&str; 3] = ["bash", "sh", "shell"];
+pub(crate) const SHELL_LANGS: [&str; 3] = ["bash", "sh", "shell"];
 
 // spec: canon-kit/SPEC.md §check-fence-command-head — the shell's own grammar: bash's builtins and
 // reserved words, which run with nothing on PATH
-const SHELL_WORDS: &[&str] = &[
+pub(crate) const SHELL_WORDS: &[&str] = &[
     ".", ":", "[", "[[", "!", "{", "}", "alias", "bg", "bind", "break", "builtin", "caller",
     "case", "cd", "command", "compgen", "complete", "continue", "declare", "dirs", "disown", "do",
     "done", "echo", "elif", "else", "enable", "esac", "eval", "exec", "exit", "export", "false",
@@ -32,11 +32,11 @@ const SHELL_WORDS: &[&str] = &[
     "unalias", "unset", "until", "wait", "while",
 ];
 
-struct Ctx {
-    top: String,
-    cwd: String,
-    tracked: HashSet<String>,
-    programs: HashSet<String>,
+pub(crate) struct Ctx {
+    pub(crate) top: String,
+    pub(crate) cwd: String,
+    pub(crate) tracked: HashSet<String>,
+    pub(crate) programs: HashSet<String>,
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
@@ -103,7 +103,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the tracked set is read from the repository
 // toplevel, and a failed listing is the check that could not run
-fn tracked_files(top: &str) -> Result<HashSet<String>, String> {
+pub(crate) fn tracked_files(top: &str) -> Result<HashSet<String>, String> {
     let out = proc::run(&programs::GIT, &["-C", top, "ls-files", "-z"])?;
     match out.code() {
         Some(0) => Ok(String::from_utf8_lossy(out.stdout().unwrap_or(&[]))
@@ -118,7 +118,7 @@ fn tracked_files(top: &str) -> Result<HashSet<String>, String> {
 
 // spec: canon-kit/SPEC.md §check-fence-command-head — a fence toggles on the shared fence shape, and
 // its info string's first word, case-folded, is its language
-fn shell_fences(text: &str) -> Vec<(usize, String)> {
+pub(crate) fn shell_fences(text: &str) -> Vec<(usize, String)> {
     let mut out = Vec::new();
     let mut open: Option<(usize, bool, String)> = None;
     for (idx, raw) in text.lines().enumerate() {
@@ -173,42 +173,76 @@ fn judge_fence(
 // spec: canon-kit/SPEC.md §check-fence-command-head — the accepted heads, in the section's order;
 // `None` is a head that runs, `Some` the reason one does not
 fn verdict(ctx: &Ctx, docdir: &str, funcs: &HashSet<String>, raw: &str) -> Option<&'static str> {
+    classify(ctx, docdir, funcs, raw).err()
+}
+
+// spec: canon-kit/SPEC.md §check-fence-run — the accepted class a head falls in, so the executing
+// gate narrows this order rather than keeping a second copy of it
+#[derive(Debug, PartialEq, Eq)]
+pub(crate) enum Head {
+    Expansion,
+    Elision,
+    Builtin,
+    Function,
+    Program,
+    TrackedPath,
+}
+
+pub(crate) fn classify(
+    ctx: &Ctx,
+    docdir: &str,
+    funcs: &HashSet<String>,
+    raw: &str,
+) -> Result<Head, &'static str> {
     if raw.starts_with('-') {
-        return Some("is a flag, and a flag names no command");
+        return Err("is a flag, and a flag names no command");
     }
     let lead = raw.trim_start_matches('"');
     if lead.starts_with('`') || (lead.starts_with('$') && lead.len() > 1) {
-        return None;
+        return Ok(Head::Expansion);
     }
     if raw == "$" {
-        return Some("is a copied shell prompt, which runs nothing");
+        return Err("is a copied shell prompt, which runs nothing");
     }
-    let w: String = raw.chars().filter(|c| *c != '"' && *c != '\'').collect();
+    let w = unquoted(raw);
     if w == "..." || w == "…" || (w.starts_with('<') && w.ends_with('>')) {
-        return None;
+        return Ok(Head::Elision);
     }
-    if SHELL_WORDS.contains(&w.as_str()) || funcs.contains(&w) || ctx.programs.contains(&w) {
-        return None;
+    if SHELL_WORDS.contains(&w.as_str()) {
+        return Ok(Head::Builtin);
+    }
+    if funcs.contains(&w) {
+        return Ok(Head::Function);
+    }
+    if ctx.programs.contains(&w) {
+        return Ok(Head::Program);
     }
     if let Some(rest) = w.strip_prefix('/').or_else(|| w.strip_prefix("~/")) {
         let base = rest.rsplit('/').next().unwrap_or(rest);
-        if ctx.programs.contains(base) || SHELL_WORDS.contains(&base) {
-            return None;
+        if ctx.programs.contains(base) {
+            return Ok(Head::Program);
         }
-        return Some("is a machine path naming no configured program");
+        if SHELL_WORDS.contains(&base) {
+            return Ok(Head::Builtin);
+        }
+        return Err("is a machine path naming no configured program");
     }
     if w.contains('/') {
         if tracked_path(ctx, docdir, &w).is_some() {
-            return None;
+            return Ok(Head::TrackedPath);
         }
-        return Some("is a path the repository does not track");
+        return Err("is a path the repository does not track");
     }
-    Some("names no builtin, configured program, fence-defined or sourced function, or tracked path")
+    Err("names no builtin, configured program, fence-defined or sourced function, or tracked path")
+}
+
+pub(crate) fn unquoted(raw: &str) -> String {
+    raw.chars().filter(|c| *c != '"' && *c != '\'').collect()
 }
 
 // spec: canon-kit/SPEC.md §check-fence-command-head — a relative path resolves against the doc's own
 // directory first and the working directory second, the `check-docs-cmd` order
-fn tracked_path(ctx: &Ctx, docdir: &str, tok: &str) -> Option<String> {
+pub(crate) fn tracked_path(ctx: &Ctx, docdir: &str, tok: &str) -> Option<String> {
     let tok = tok.strip_prefix("./").unwrap_or(tok);
     let docabs = if walk::path_root(docdir).is_some() {
         docdir.to_string()
@@ -229,7 +263,7 @@ fn tracked_path(ctx: &Ctx, docdir: &str, tok: &str) -> Option<String> {
 // spec: canon-kit/SPEC.md §check-fence-command-head — a sourced operand's `${NAME:-default}` reads as
 // its default, the value a tree that sets no locator runs with; an operand that stays an expansion
 // after that, or names no tracked file, contributes no function
-fn sourced_text(ctx: &Ctx, docdir: &str, t: &Token) -> Result<Option<String>, String> {
+pub(crate) fn sourced_text(ctx: &Ctx, docdir: &str, t: &Token) -> Result<Option<String>, String> {
     let op = match t.operands.iter().find(|o| !o.starts_with('-')) {
         Some(o) => o,
         None => return Ok(None),
@@ -274,7 +308,7 @@ fn defaulted(s: &str) -> String {
 
 // spec: canon-kit/SPEC.md §check-fence-command-head — a function is defined by `name()` or
 // `function name` at the start of a line
-fn defined_functions(text: &str) -> HashSet<String> {
+pub(crate) fn defined_functions(text: &str) -> HashSet<String> {
     let mut out = HashSet::new();
     for line in text.lines() {
         let l = line.trim_start();
@@ -296,7 +330,7 @@ fn defined_functions(text: &str) -> HashSet<String> {
     out
 }
 
-fn dirname(p: &str) -> String {
+pub(crate) fn dirname(p: &str) -> String {
     match p.rfind('/') {
         Some(0) => "/".to_string(),
         Some(i) => p[..i].to_string(),

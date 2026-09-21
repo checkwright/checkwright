@@ -12,20 +12,6 @@
 
 ## New Features
 
-- **fence-execution-gate** [spec: SPEC-fence-run.md] — `check-fence-command-head` is static, so
-  a wrong operand or an unassigned variable passes, and no documented fence is ever executed.
-  **Ruling (spec, 2026-09-21):** a `fence-runnable` HTML-comment marker, off by default, and an
-  align-only canon-kit gate, `check-fence-run`. The gate runs each marked fence under
-  `bash -euo pipefail` in a scratch copy of the tracked tree, with a fixed environment. No sandbox
-  exists to reuse on the three OSes, so "no network" is held by construction. The admitted heads
-  are builtins, the gate binary under a declared `FENCE_SAFE_ARMS` set (gate-sdk, beside the arm
-  table), and `CANON_KIT_FENCE_RUN_PROGRAMS` (default `git`). The crate's only network spawners are
-  `--usage-poll` and `--pack-installer`, and neither is admitted. `bash` is spawned only when a
-  fence is marked.
-  Filed 2026-09-21 to the gap inbox by the lead; it joined `docs-first-contact` as its fence unit
-  by operator direction.
-  **DISTINCT from** `check-docs-cmd` and `check-fence-command-head`.
-
 - **projection-trigger-witness** [spec: SPEC-projection-witness.md] — the generated-projections
   roster states each projection's staleness trigger in prose, and nothing checks the prose against
   the emitter. Five false statements were measured in one roster at filing.
@@ -2654,5 +2640,6 @@
 - install-md-adopter-page-overgrown
 - docs-index-front-door-restatement-ungenerated
 - adopter-demo-verb-missing
+- fence-execution-gate
 
 ## Lessons Learned

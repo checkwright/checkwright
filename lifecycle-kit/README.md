@@ -158,6 +158,7 @@ gate-sdk/SPEC.md §The bin/-tool contract, which outlives the port.
 
 Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
+<!-- fence-runnable -->
 ```bash
 . "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
 "$gates" --run-gate-tests lifecycle-kit/gate-tests lifecycle-kit/checks
