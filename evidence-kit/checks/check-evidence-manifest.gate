@@ -1,3 +1,3 @@
-# graph: couples=.workflow/validate-evidence.txt,TASK-QUEUE.md,.workflow/WORKFLOW-STATE.txt dir=one valve=none tier=precommit
+# graph: couples=knob:EVIDENCE_KIT_MANIFEST_FILE,knob:EVIDENCE_KIT_QUEUE_FILE,knob:EVIDENCE_KIT_STATE_FILE dir=one valve=none tier=precommit
 # install: zero-config
 # spec: evidence-kit/SPEC.md §check-evidence-manifest — (B) manifest grammar + current-iteration scoping; with lifecycle configured also (A) close-entry green block and (C) validate-stamp↔evidence coupling

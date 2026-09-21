@@ -154,6 +154,36 @@ pub fn reference(r: &str) -> (&str, Option<&str>) {
     }
 }
 
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — a rooted token's knob and glob, split at the
+// first `/`, which no knob name carries
+pub fn rooted(r: &str) -> Option<(&str, &str)> {
+    r.split_once('/')
+}
+
+// spec: gate-sdk/SPEC.md §The knob file — the two locators, answered env-or-default rather than
+// from a knob file
+pub fn is_locator(name: &str) -> bool {
+    matches!(name, "GATE_SDK_GATES_DIR" | "GATE_SDK_ROOT")
+}
+
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — why a name cannot root a glob: a root is one
+// directory, so only a locator or a declared scalar row that is no word list roots one
+pub fn root_refusal(name: &str) -> Option<String> {
+    if is_locator(name) {
+        return None;
+    }
+    let Some(row) = owner(name).and_then(|k| k.row(name)) else {
+        return Some(format!("{} is no knob a static kit declares", name));
+    };
+    if row.shape != Shape::Scalar || row.packing.is_some() {
+        return Some(format!("{}'s row is {}, and a root is one directory", name, row.shape.word()));
+    }
+    if row.words {
+        return Some(format!("{}'s row is declared `.words()`, and a root is one directory", name));
+    }
+    None
+}
+
 fn row_packing(name: &str) -> Option<&'static Packing> {
     owner(name).and_then(|k| k.row(name)).and_then(|r| r.packing)
 }

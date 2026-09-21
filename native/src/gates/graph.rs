@@ -152,10 +152,7 @@ fn valid_glob_token(tok: &str) -> bool {
         .iter()
         .find_map(|p| tok.strip_prefix(p))
         .unwrap_or(tok);
-    !t.is_empty()
-        && t.chars().all(|c| {
-            c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '*' | '?' | '/' | '-')
-        })
+    registry::literal_glob(t)
 }
 
 // spec: gate-sdk/SPEC.md §check-graph (assertion G) — the `# graph:` manifests in an amendment
@@ -311,17 +308,39 @@ fn validate_amend_manifest(file: &str, span: &str, errors: &mut Vec<String>) {
     for name in words_tokens(&couples).into_iter().chain(words_tokens(&trigger)) {
         errors.push(format!("{}: {}", where_, words_finding(name)));
     }
+    for (token, why) in root_findings(&couples).into_iter().chain(root_findings(&trigger)) {
+        errors.push(format!("{}: {}", where_, root_finding(token, &why)));
+    }
 }
 
 // spec: gate-sdk/SPEC.md §check-graph — a `knob:` token whose row is declared `.words()`, read off the
-// row table alone, so the verdict is the same on every tree
+// row table alone, so the verdict is the same on every tree; a rooted token's shape is judged apart
 fn words_tokens(field: &str) -> Vec<&str> {
     field
         .split(',')
         .filter_map(|t| t.strip_prefix("knob:"))
+        .filter(|t| crate::knobs::rooted(t).is_none())
         .map(|t| crate::knobs::reference(t).0)
         .filter(|n| crate::knobs::is_words(n))
         .collect()
+}
+
+// spec: gate-sdk/SPEC.md §check-graph — a rooted token whose knob cannot root a glob, read off the
+// row table alone
+fn root_findings(field: &str) -> Vec<(&str, String)> {
+    field
+        .split(',')
+        .filter_map(|t| t.strip_prefix("knob:"))
+        .filter_map(|t| crate::knobs::rooted(t).and_then(|(n, _)| crate::knobs::root_refusal(n)).map(|w| (t, w)))
+        .collect()
+}
+
+fn root_finding(token: &str, why: &str) -> String {
+    format!(
+        "couples token 'knob:{}' cannot root its glob: {} — a rooted token names a locator or a \
+         declared scalar row holding one directory",
+        token, why
+    )
 }
 
 fn words_finding(name: &str) -> String {
@@ -518,10 +537,27 @@ fn rule(args: &[String]) -> Result<i32, String> {
         // spec: gate-sdk/SPEC.md §check-graph — the `knob:` token's admissibility rule, read against
         // the member's declared set, static names included: a token naming a knob the member does
         // not declare is a finding, never a wider trigger
+        let mut unrootable = false;
         for field in [&couples, &trigger] {
             for token in field.split(',').filter_map(|t| t.strip_prefix("knob:")) {
-                let (name, projected) = crate::knobs::reference(token);
                 let declared = crate::gates::declared(c).unwrap_or(&[]);
+                if let Some((name, _)) = crate::knobs::rooted(token) {
+                    // spec: gate-sdk/SPEC.md §check-graph — a rooted token is admissible on the bare
+                    // token's test or as a locator, and its knob must hold one directory
+                    if !crate::knobs::is_locator(name) && !declared.contains(&name) {
+                        errors.push(format!(
+                            "MANIFEST: {} carries couples token 'knob:{}', but {} declares no knob \
+                             {} — a knob token is admissible only for a knob the gate reads",
+                            script, token, c, name
+                        ));
+                        unrootable = true;
+                    } else if let Some(why) = crate::knobs::root_refusal(name) {
+                        errors.push(format!("MANIFEST: {} {}", script, root_finding(token, &why)));
+                        unrootable = true;
+                    }
+                    continue;
+                }
+                let (name, projected) = crate::knobs::reference(token);
                 if !declared.contains(&name) {
                     errors.push(format!(
                         "MANIFEST: {} carries couples token 'knob:{}', but {} declares no such \
@@ -538,6 +574,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
                     errors.push(format!("MANIFEST: {} {}", script, words_finding(name)));
                 }
             }
+        }
+        if unrootable {
+            continue;
         }
         couples = registry::expand_couples(&couples, &cfg.kit_roots_rel)?;
         if !trigger.is_empty() {

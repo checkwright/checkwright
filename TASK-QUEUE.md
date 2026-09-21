@@ -46,43 +46,6 @@
   first act, held by a two-root pairing arm on `check-path-dialect`. The textual absoluteness test
   at `:29` is a different primitive, filed apart.
 
-- **gates-must-not-bind-to-document-paths** [spec: SPEC-doc-path-tokens.md] —
-  a gate may know a document's SHAPE
-  and never its PATH; path is always config. The discriminator is the operator's, ruled 2026-09-10,
-  and it REPLACES the lead's earlier one.
-  **The lead's refused reading, recorded because it is the trap.** The lead's discriminator was that
-  a grammar-reading gate belongs to its document — which quietly licensed freezing a consumer's
-  filename into a gate manifest. The operator's is that grammar-coupling justifies knowing the
-  shape, never the path.
-  **The worked case.** `check-queue-wrap`'s logic knows nothing about queues — `cplen`, `is_fence`,
-  `is_table_row` — and reaches `queue::` only for config, so it is generic mechanism MISFILED in
-  queue-kit and should be a `check-line-length` over a configurable target with a configurable
-  budget. `check-brevity` is ALREADY that lego (`CONTEXT_KIT_BREVITY_FILE` plus an argument
-  override) and the AGENTS.md adapter is ALREADY built and smoke-tested in `agents_md_smoke.rs`,
-  which converts and then asserts always-loaded and footprint both measure `AGENTS.md`. A lead claim
-  that `check-brevity` was correctly coupled to `CLAUDE.md` was FALSE and is corrected here.
-  **The real defect was the GRAPH FORMAT, and half of it has since been repaired.** `couples=`
-  tokens had to be syntactically valid glob or path — literals, globs, a `kit:` prefix, no knob
-  indirection — so a configurable-target gate was FORCED to freeze one consumer's filename in its
-  manifest. **Knob indirection has since landed** — `registry::expand_couples` resolves a
-  `knob:<NAME>` token against the consumer's knob file, and `check-graph.gate`'s own manifest
-  carries `knob:GATE_SDK_GRAPH_VOCAB` — so the format no longer forces the freeze. **Corrected
-  2026-09-20 at close, read off the source rather than recalled.** What survives is the survey
-  below: each frozen literal is now a per-gate choice the operator's discriminator decides, not a
-  format limitation. The cheap fix for `check-brevity` is still `couples=CLAUDE.md,AGENTS.md`.
-  **The survey arm is the entry's first deliverable, and the class is larger than the two members
-  the discriminator has been applied to.** Probed at this scope over every `.gate` manifest:
-  `CLAUDE.md` appears in 14 `couples=` token positions, `TASK-QUEUE.md` in 23, `docs/install.md` in
-  3, `.workflow/WORKFLOW-STATE.txt` in 4, `scripts/gates.list` in 5, beside further per-file
-  literals. Apply the operator's discriminator across that corpus rather than case by case.
-  **Cost while deferred:** bounded for the survey; unbounded until it runs, since its own output
-  how many gates move and whether the format change is owed.
-  Surfaced 2026-09-10 as above; the full probed body via
-  `git log -p -S'GATES MUST NOT BIND TO DOCUMENT TYPES' -- .workflow/gap-inbox.md`.
-  **Ruled at spec (2026-09-21):** the survey ran over every kit-shipped descriptor and supersedes
-  the counts above. The format change is owed as one rooted form, `knob:<NAME>/<glob>`, and every
-  consumer-path literal becomes a token by a four-class rule.
-
 - **kit-spec-consumer-config-literal** [spec: SPEC-seam-content.md] —
   nothing stops a kit SPEC from spelling
   out a value that belongs to a consumer's config, so the seam leaks by worked example.
@@ -2395,5 +2358,6 @@
 - couples-knob-token-empty-expansion-passes-silently
 - consumer-shaped-regressions-invisible-to-build-oracles
 - in-crate-module-coupling-derivation
+- gates-must-not-bind-to-document-paths
 
 ## Lessons Learned

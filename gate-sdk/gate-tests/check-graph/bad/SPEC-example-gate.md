@@ -13,11 +13,13 @@ until build re-typed the manifest into a real gate.
       (`# graph: couples=gate-tests,check-*.sh dir=mono valve=no-fixture tier=precommit`);
       registered in `gates.list`.
 
-The remaining three are fenced, so the fenced extraction path reds as well as the
-inline one; the third names a knob whose row is a word list:
+The remaining four are fenced, so the fenced extraction path reds as well as the
+inline one; the third names a knob whose row is a word list, and the fourth roots
+a glob at a knob no kit declares and at an indexed row:
 
 ```sh
 # graph: couples= dir=one valve=none tier=postcommit gen=auto
 # graph: couples=docs/[a].md trigger=docs/(x).md dir=one valve=none tier=precommit
 # graph: couples=docs/*.md,knob:GATE_SDK_KIT_DIRS dir=one valve=none tier=precommit
+# graph: couples=knob:GATE_SDK_NO_SUCH_DIR/*.md,knob:GATE_SDK_PROGRAM_FLOOR/*.md dir=one valve=none tier=precommit
 ```

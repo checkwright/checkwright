@@ -187,6 +187,21 @@ pub fn effective_trigger(fields: &[(String, String)]) -> String {
 // does not falls through as an inert literal glob
 pub const COUPLES_PREFIXES: &[&str] = &["knob:", "kit:"];
 
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — the character set a literal glob, and a prefixed
+// token's remainder, is held to
+pub fn literal_glob(t: &str) -> bool {
+    !t.is_empty() && t.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '*' | '?' | '/' | '-'))
+}
+
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — the knob a `knob:` token's remainder names,
+// rooted or projected
+pub fn knob_token_name(r: &str) -> &str {
+    match crate::knobs::rooted(r) {
+        Some((name, _)) => name,
+        None => crate::knobs::reference(r).0,
+    }
+}
+
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the couples-knob sentinel: the name a member declares in
 // place of knobs written on the descriptor corpus rather than in its own entry
 pub const EVERY_COUPLES_KNOB: &str = "@every-couples-knob";
@@ -222,7 +237,7 @@ fn corpus_knob_tokens(resolve_dirs: &[String]) -> Result<Vec<String>, String> {
                 tokens.extend(
                     v.split(',')
                         .filter_map(|t| t.strip_prefix("knob:"))
-                        .map(|r| crate::knobs::reference(r).0.to_string()),
+                        .map(|r| knob_token_name(r).to_string()),
                 );
             }
         }
@@ -550,7 +565,6 @@ fn expand_group(p: &str, out: &mut Vec<(String, Option<String>)>) {
     }
 }
 
-
 // spec: gate-sdk/SPEC.md §Reading a `couples=` field's reach — the field's one matcher, which every
 // reader asking what an expanded token reaches calls by this name
 pub fn couple_matches(path: &str, token: &str) -> bool {
@@ -571,12 +585,44 @@ fn covering_pattern(member: &str) -> String {
     }
 }
 
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — a `knob:<NAME>/<glob>` token's covering pattern:
+// the one directory the knob resolves to, then the glob; an empty root is a refusal, since it would
+// re-root the glob at the repository root
+fn rooted_pattern(token: &str) -> Result<String, String> {
+    let Some((name, glob)) = crate::knobs::rooted(token) else {
+        return Err(format!("couples token 'knob:{}' is not rooted", token));
+    };
+    let refuse = |why: String| {
+        format!(
+            "couples token 'knob:{}' cannot be expanded: {} — a rooted token is one glob under the \
+             directory its knob resolves to; treating as failure (not clean)",
+            token, why
+        )
+    };
+    if let Some(why) = crate::knobs::root_refusal(name) {
+        return Err(refuse(why));
+    }
+    if !literal_glob(glob) {
+        return Err(refuse(format!("'{}' is not a literal glob", glob)));
+    }
+    let root = crate::walk::knob_scalar(name).map_err(&refuse)?;
+    let root = root.trim_end_matches('/');
+    if root.is_empty() {
+        return Err(refuse(format!("{} resolves to no directory", name)));
+    }
+    if root.contains(',') || root.chars().any(char::is_whitespace) {
+        return Err(refuse(format!("{}'s value '{}' carries a comma or whitespace", name, root)));
+    }
+    Ok(covering_pattern(&format!("{}/{}", root, glob)))
+}
+
 // spec: gate-sdk/SPEC.md §The `# graph:` manifest — the couples/trigger expansion every reader
 // shares: two passes in a fixed order, `knob:` then `kit:` over the result, one pass each
 pub fn expand_couples(field: &str, kit_roots_rel: &[String]) -> Result<String, String> {
     let mut once: Vec<String> = Vec::new();
     for tok in field.split(',') {
         match tok.strip_prefix("knob:") {
+            Some(name) if crate::knobs::rooted(name).is_some() => once.push(rooted_pattern(name)?),
             Some(name) => {
                 // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a `<NAME>.<field>` token expands to
                 // the field's members across the elements, and a bare token on a packed knob is refused
@@ -979,5 +1025,30 @@ mod tests {
             );
             unscratch(&knobs, &d);
         }
+    }
+
+    // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a rooted token is its knob's one directory
+    // with any trailing `/` trimmed, then its glob, covering-converted; an empty root, a row holding
+    // more than one directory and an undeclared name each refuse
+    #[test]
+    fn a_rooted_token_expands_under_its_directory_and_refuses_what_is_no_directory() {
+        let knobs = crate::knobenv::lock();
+        let roots = vec!["gate-sdk".to_string()];
+        let d = scratch_corpus(&knobs, "rooted", "");
+        knobs.remove("GATE_SDK_WORKFLOW_DIR");
+        std::fs::write(d.join("gate-sdk-config.knobs"), "GATE_SDK_WORKFLOW_DIR = wf/\n").expect("write");
+        crate::knobs::reset(&knobs);
+        assert_eq!(
+            expand_couples("knob:GATE_SDK_GATES_DIR/gates.list,knob:GATE_SDK_WORKFLOW_DIR/*.md", &roots).unwrap(),
+            format!("*{}/gates.list,*wf/*.md", d.display())
+        );
+        for bad in ["knob:GATE_SDK_PROGRAM_FLOOR/x", "knob:GATE_SDK_KIT_DIRS/x", "knob:PROBE_ABSENT_DIR/x", "knob:GATE_SDK_WORKFLOW_DIR/a b"] {
+            assert!(expand_couples(bad, &roots).is_err(), "{} must refuse", bad);
+        }
+        std::fs::write(d.join("gate-sdk-config.knobs"), "GATE_SDK_WORKFLOW_DIR =\n").expect("write");
+        crate::knobs::reset(&knobs);
+        let e = expand_couples("knob:GATE_SDK_WORKFLOW_DIR/*.md", &roots).unwrap_err();
+        assert!(e.contains("resolves to no directory"), "{}", e);
+        unscratch(&knobs, &d);
     }
 }

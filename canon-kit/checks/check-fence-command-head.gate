@@ -1,3 +1,3 @@
-# graph: couples=*SPEC*.md,*README.md,*CLAUDE.md,scripts/*.sh,kit:*.sh,knob:CANON_KIT_MANIFEST_FILES,knob:CANON_KIT_PROSE_SURFACE_GLOBS,knob:CANON_KIT_SPEC_NAME dir=one valve=none tier=precommit
+# graph: couples=*SPEC*.md,*README.md,*CLAUDE.md,knob:GATE_SDK_GATES_DIR/*.sh,kit:*.sh,knob:CANON_KIT_MANIFEST_FILES,knob:CANON_KIT_PROSE_SURFACE_GLOBS,knob:CANON_KIT_SPEC_NAME dir=one valve=none tier=precommit
 # install: zero-config
 # spec: canon-kit/SPEC.md §check-fence-command-head — every command in a governed doc's shell fence starts with a word that can run, and a word beginning with `-` never can

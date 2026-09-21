@@ -1,3 +1,3 @@
-# graph: couples=.tmp/run-validate.lock,.tmp/*.run dir=one valve=none tier=align-only
+# graph: couples=knob:EVIDENCE_KIT_LOCK_FILE,.tmp/*.run dir=one valve=none tier=align-only
 # install: never
 # spec: evidence-kit/SPEC.md §check-producer-liveness — a stage entry is refused while a producer named by the record, or by any '*.run' record in the directory, is still alive

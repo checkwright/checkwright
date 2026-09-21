@@ -2371,6 +2371,32 @@ The manifest grammar:
   element packing, `knob:<NAME>.<field>` names one field's members across its elements, read through
   the same parser the member's walk uses; a bare token on a packed knob is refused, since an element
   is not a pattern. The field is the row's to declare, so a reordered packing moves no token.
+  **`knob:<NAME>/<glob>` roots a glob at a directory-valued knob.** It expands to the knob's value,
+  any trailing `/` trimmed, then `/`, then `<glob>`, and the result takes the covering conversion
+  below; it shares the bare token's resolution order and one-pass bound, and the emitter bakes it
+  into the hook the same way, so an adopter who relocates the directory and regenerates the hook
+  gets triggers under the new one. `<NAME>` is a scalar row the member declares that is no word
+  list, or one of the two locators, `GATE_SDK_GATES_DIR` and `GATE_SDK_ROOT`: every member resolves
+  its gates dir, so declaring a locator would add a declaration no reader could fail. An indexed,
+  packed or `.words()` row is refused in rooted position, since a root is one directory. `<glob>`
+  is held to the literal-glob character set a prefixed token's remainder takes. An empty value is
+  a refusal at expansion, not an empty expansion, because a root resolving to nothing would
+  silently re-root the glob at the repository root. The token exists because most consumer paths
+  sit under a directory some knob already configures, and a row per path would mint many knobs for
+  one fact configured once; the bare token expands a knob's members and cannot append a segment.
+  **A kit-shipped descriptor names a consumer path through a token, never as a literal**, because
+  a literal freezes one consumer's layout into every adopter's trigger set and the hook then never
+  fires on the adopter's real file. A gate may know a document's shape, never its path. A literal
+  stays in three cases: a path fixed by a tool outside the kits (git's `.gitignore` and
+  `.gitattributes`, GitHub's `.github/` tree and `SECURITY.md`); a path inside a kit root, which is
+  kit content; and any path in a descriptor the consumer owns, which is that consumer's
+  configuration. For each other literal the first rule that yields a value applies: a file knob
+  the member declares whose value is exactly the literal becomes `knob:<NAME>`; a directory knob
+  or locator plus a remainder that is exactly the literal becomes `knob:<NAME>/<remainder>`; a
+  literal neither reaches is a member reading a consumer path no knob configures — a code defect
+  beneath the descriptor, so the literal stays and the member is filed as a gap. `check-graph`'s
+  admissibility loop reds a token naming a knob the member does not declare, so a mis-mapped
+  member cannot land green.
   **What the token adds is a conversion, not a matcher.** A knob's member is a pattern in its
   walker's discipline, relative to its walk's root, so each member expands to its covering string
   pattern — every `**/` collapsed to `*`, and a leading `*` added unless present — which contains
@@ -15753,6 +15779,12 @@ knobs its own code reads, so an admissible token is provably a corpus the gate r
 A `knob:` token whose row is declared `.words()` is a finding in that loop and in
 assertion G's amendment manifests alike, read off the row table alone, so the verdict
 is the same on every tree and the fixture pair reaches it through `--amend-only`.
+A rooted token (§The `# graph:` manifest) is admitted on the bare token's test or as a
+locator; its knob must hold one directory, so a name no static kit declares and an
+indexed, packed or `.words()` row are findings in both places too, while the
+member-declaration test is the loop's alone, since an amendment manifest has no member.
+A member carrying an unrootable token is not expanded, so its finding is reported rather
+than masked by the expansion's refusal.
 **Couples-to-hook parity is unaffected by either token**, and the reason is
 structural rather than measured: both operands of that comparison pass through the
 same expansion, so they agree by construction whatever the token set is.
