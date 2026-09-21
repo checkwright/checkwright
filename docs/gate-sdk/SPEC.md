@@ -15163,16 +15163,17 @@ deliberately does not cross*, the other *this value is not a filesystem location
 a reader who found one token doing both jobs could not tell which claim a site makes
 (canon-kit/SPEC.md §check-comment-tier holds its roster row).
 
-**The third primitive is named as unasserted rather than left to a reader.** Joining a
-root onto a segment is the contract's too, and this arm does **not** hold it:
-construction is lawful and only escape into a printed, matched or
-prefix-tested value is the subject, so lawfulness there turns on where the composed
-value goes — dataflow, which a form scan cannot see, and a scan of the form alone would
-red the hundreds of `Path`-bound joins the clause explicitly permits. What the arm does
-catch is every join that escapes *on its own line*, since a `format!` handed straight to
-a prefix test is the containment form above. The remainder — a join bound to a name
-whose escape is a statement away — is held by review, and by `walk.rs`'s monopoly on
-the producers those roots arrive through.
+**The third primitive is held by review, and that is ruled rather than deferred.**
+Joining a root onto a segment is the contract's too, but lawfulness there turns on
+where the composed value goes. That is dataflow, and a form scan of the join would
+red the hundreds of `Path`-bound and diagnostic joins the clause permits. The
+escape this contract fears most is already a red: a join handed to a prefix test,
+directly or through a bound trailing-slash prefix, is the containment form above.
+What stays unheld is a joined value bound to a name and printed or compared a
+statement later. Telling that from a lawful diagnostic needs per-function taint
+tracking, which gives up the one-occurrence locality this gate is built on. It is
+held by review and by `walk.rs`'s monopoly on the producers those roots arrive
+through, and a defect found in it reopens the question with its instance.
 
 **And the cwd-anchor clause is unasserted on the shell side, which is the other thing
 this gate does not hold.** §The path-dialect contract obliges a script that composes

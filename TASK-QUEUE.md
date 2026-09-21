@@ -12,36 +12,6 @@
 
 ## New Features
 
-- **join-primitive-dataflow-unasserted** [spec: SPEC-join-limit.md] —
-  `check-path-dialect`'s locality arm holds two of the path-dialect contract's
-  three text-level primitives; the third, joining a root onto a segment, is
-  asserted only where the join escapes on its own line.
-  **Declared, not inferred:** `gate-sdk/SPEC.md` §check-path-dialect names the
-  third primitive as unasserted rather than leaving it to a reader —
-  construction is lawful and only escape into a printed, matched or
-  prefix-tested value is the subject, so a form scan would red the hundreds of
-  `Path`-bound joins the clause explicitly permits. A join bound to a name whose
-  escape is a statement away is held by review, and by `walk.rs`'s monopoly on
-  the producers those roots arrive through.
-  **Deliverable:** a dataflow predicate — does this composed value reach a
-  printed, matched or prefix-tested reader — which is a different gate shape
-  from the form scan the arm is built on.
-  **Measured corpus bound:** 441 `format!("{}/"` lines under `native/src`, most
-  of them lawful construction, so the arm's own precision is what the design has
-  to buy.
-  **DISTINCT from `shell-cwd-anchor-clause-has-no-oracle`**, the other thing
-  that section declares unasserted: that is the SHELL cwd-anchor clause and this
-  is the CRATE's join primitive.
-  **Cost while deferred:** every crate edit composing a root relies on review to
-  catch an escaping join, which is the failure mode the locality arm was built
-  to stop relying on.
-  Filed 2026-09-20 by close's drain, off a build-stage gap bullet; owner lookup
-  ran over `join`, `dataflow`, `primitive` and `path-dialect` across the pool
-  and found only the shell half above.
-  **Ruled at spec (2026-09-21):** no dataflow arm is built. The join remainder is a settled,
-  review-held limit, since the prefix-test escape already reds. The corpus bound is 418,
-  re-measured.
-
 - **shell-cwd-anchor-clause-has-no-oracle** [spec: SPEC-cwd-anchor.md]
   — Surfaced 2026-08-30. `gate-sdk/SPEC.md` §The path-dialect contract obliges a script that
   composes two roots to anchor its own cwd first, and nothing asserts it. The gate's own section
@@ -2690,5 +2660,7 @@
 - **lead-agent-id-compaction-defense** — each claim still wants its own probe.
 
 ## Done
+
+- join-primitive-dataflow-unasserted
 
 ## Lessons Learned
