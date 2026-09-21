@@ -1,0 +1,12 @@
+# Fixture config: the consumer inserts a spec stage into its stage graph, keeping two default pairs. See lifecycle-kit/SPEC.md §Layout and configuration.
+LIFECYCLE_KIT_STAGES[] = scope
+LIFECYCLE_KIT_STAGES[] = spec
+LIFECYCLE_KIT_STAGES[] = align
+LIFECYCLE_KIT_STAGES[] = build
+LIFECYCLE_KIT_STAGES[] = validate
+LIFECYCLE_KIT_STAGES[] = close
+LIFECYCLE_KIT_PREDECESSOR[spec] = scope
+LIFECYCLE_KIT_PREDECESSOR[align] = spec
+LIFECYCLE_KIT_PREDECESSOR[build] = scope
+LIFECYCLE_KIT_PREDECESSOR[validate] = build
+LIFECYCLE_KIT_PREDECESSOR[close] = validate

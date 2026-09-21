@@ -46,71 +46,6 @@
   first act, held by a two-root pairing arm on `check-path-dialect`. The textual absoluteness test
   at `:29` is a different primitive, filed apart.
 
-- **kit-spec-consumer-config-literal** [spec: SPEC-seam-content.md] —
-  nothing stops a kit SPEC from spelling
-  out a value that belongs to a consumer's config, so the seam leaks by worked example.
-  The provenance seam (CLAUDE.md) forbids a kit literal carrying consumer content, and
-  de-literalization forbids prose owning a value. Both were crossed by one sentence this
-  iteration: gate-sdk/SPEC.md illustrated the keyed wire by enumerating this repo's live
-  `LIFECYCLE_KIT_PREDECESSOR` pairs, so a *vendoring* consumer read another tree's stage graph
-  asserted as the shape of their own. Fixed in place at this close; the class is what is filed.
-  **Why nothing caught it.** `check-tree-terms` is a banned-pattern leak guard and the leaked
-  string is not a banned term; no other gate reads a kit SPEC against a consumer config at all.
-  Found instead by the close-stage `internal-identifier-restatement` audit, which is rostered
-  un-gateable for a *different* reason (public contract names are legitimate citations) — that
-  reason does not reach this narrower shape, which is why the gap is filed rather than absorbed.
-  **Why it looks buildable, and where the design is owed.** The two tiers are already separate
-  files: a kit's own default lives in `<kit>/lib/*.sh` and a consumer's override in the
-  consumer's config dir, so a kit SPEC quoting a value that appears only in the *override* tier
-  is mechanically decidable. What is owed is the false-positive boundary — a kit SPEC that
-  documents its own default legitimately, and a consumer whose override happens to equal it,
-  are the same two strings — plus whether the subject is any value or only a multi-element
-  roster, the shape actually found here.
-  **Cost while deferred:** one leaked example per authoring session that reaches for a live
-  value to illustrate a wire format, each one shipping a consumer's configuration inside a kit
-  and going stale against it silently.
-  Class: lands as a gate, so canon-kit's litmus makes it a **feature**.
-  Filed 2026-08-17 by close from its own audit-roster review; the instance was fixed at this
-  close and the absent-gate claim probed against `scripts/gates.list` before it was asserted.
-  **Ruled at spec (2026-09-21):** the boundary is a consumer-set roster, not a single value: two
-  or more path- or pair-shaped elements of one knob, each a whole code span, in one paragraph. It
-  has zero hits today and lands as an arm of `check-provenance-seam`.
-
-- **kit-spec-seam-content-half-unswept** [spec: SPEC-seam-content.md] —
-  the provenance seam has two halves and
-  the sweep that ran carried a discriminator for only one, so gate-sdk/SPEC.md is swept of private
-  VOICE and unswept of private CONTENT.
-  **The discriminator that ran was ATTRIBUTION** — an authority, a date, a channel, an internal
-  identifier — which by construction cannot see a block that attributes nothing. CLAUDE.md §The
-  provenance seam bars "private rule content" as well: term lists, coupling vocabularies, product
-  constant sets, and a consumer's configuration where a kit literal should be optional config.
-  **TWO INSTANCES, both re-verified live at HEAD by this drain rather than carried from the
-  filing.** (1) gate-sdk/SPEC.md §Porting a gate to the binary substrate documents THIS REPO'S
-  QUEUE PRACTICE as gate-sdk mechanism — which entry a cut rides, the scoping stage's promote
-  and the entry's own build-stage demotion, lead-line amendment-tag arithmetic against
-  `check-queue-wrap`'s column budget, and a `git log -S` re-derivation — and survived the sweep
-  fully de-attributed. It is a content-tier fault independently of the seam: queue practice is
-  queue-kit's subject, not gate-sdk's. (2) gate-sdk/SPEC.md §The first budget batch enumerates
-  six literal `couples=` values of this consumer (`scripts/git-hooks/*`, `.claude/agents/*.md`,
-  two delegation-kit files, `CLAUDE.md` plus `doctrine-kit/DOCTRINE.md`, `.workflow/*,.gitignore`)
-  inside a kit SPEC.
-  **Why design-pending rather than a sweep:** each instance has a real defence and they differ.
-  The queue-practice block exists because only half of it was derivable, so deleting it re-buys a
-  `git log -S` at every cut; the `couples=` list is a RECORD of one past batch's derivation, so
-  de-literalizing it destroys the thing it is for. Whether either is "private rule content" at all
-  is the seam question, and answering it SETS an envelope rather than applying one.
-  **DISTINCT from `kit-spec-provenance-seam-sweep-remainder`, landed**, which swept every kit SPEC
-  under the attribution discriminator; this is gate-sdk/SPEC.md under the other discriminator,
-  and the two share no test. Both instances re-verified live at the landing's close.
-  **Cost while deferred:** the seam is a privacy boundary before it is a design one and this repo
-  is public — a kit literal carrying a consumer's configuration publishes it, and every adopter
-  vendors the copy. Product-class.
-  Surfaced 2026-09-05 by build batch A's provenance census, which flagged both and deliberately
-  edited neither; drained here with both instances re-verified live.
-  **Ruled at spec (2026-09-21):** instance 1 is private content, one tree's queue practice that
-  has directed nothing since the port finished, and it leaves, with its tag arithmetic moving to
-  queue-kit. Instance 2 is kit content restated, de-literalized to its negative claim.
-
 - **pipeline-membership-idiom-latent** [spec: SPEC-pipe-membership.md] —
   the SIGPIPE-under-pipefail membership
   idiom that produced `installer-init-noop-regen-conflict` has no gate, so nothing stops the next
@@ -2359,5 +2294,7 @@
 - consumer-shaped-regressions-invisible-to-build-oracles
 - in-crate-module-coupling-derivation
 - gates-must-not-bind-to-document-paths
+- kit-spec-consumer-config-literal
+- kit-spec-seam-content-half-unswept
 
 ## Lessons Learned

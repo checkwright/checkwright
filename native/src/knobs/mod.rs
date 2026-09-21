@@ -844,6 +844,33 @@ fn or_default(row: &'static Row, got: Option<(Value, Origin, bool)>) -> Result<(
     }
 }
 
+// spec: canon-kit/SPEC.md §check-provenance-seam — every static indexed or keyed knob a consumer set,
+// beside the elements its default does not carry, a keyed pair spelled `<key>=<value>`
+pub fn consumer_elements() -> Result<Vec<(&'static str, Vec<String>)>, String> {
+    let els = |v: &Value| -> Vec<String> {
+        match v {
+            Value::Scalar(_) => Vec::new(),
+            Value::Indexed(e) => e.clone(),
+            Value::Keyed(m) => m.iter().map(|(k, v)| format!("{}={}", k, v)).collect(),
+        }
+    };
+    let mut out = Vec::new();
+    for kit in STATIC_KITS {
+        for row in kit.rows.iter().filter(|r| r.shape != Shape::Scalar) {
+            let (value, origin) = resolve(row.name)?;
+            if !origin.is_set() {
+                continue;
+            }
+            let default = els(&default_value(row, &input)?);
+            let fresh: Vec<String> = els(&value).into_iter().filter(|e| !default.contains(e)).collect();
+            if !fresh.is_empty() {
+                out.push((row.name, fresh));
+            }
+        }
+    }
+    Ok(out)
+}
+
 // spec: gate-sdk/SPEC.md §The knob file — a declared static knob's owning kit, and `None` for a name
 // the kit's prefix spells without declaring
 pub fn static_owner(name: &str) -> Option<&'static Kit> {

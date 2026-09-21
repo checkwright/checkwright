@@ -2030,6 +2030,12 @@ fenced-code blocks, and lines whose own longest token itself exceeds the budget
 token": a 101-column line whose longest token is 55 is **not** exempt, because
 the token still wraps. Width is Unicode code points, not bytes.
 
+**A lead line's tag capacity is per-entry arithmetic, never a flat count.** A
+lead-line-scoped tag costs its bracketed width plus one space against the budget,
+an entry's fixed part is its slug lead plus every tag it carries permanently, and
+trailing prose reflows onto continuation lines — so how many refs one lead line
+holds is measured on the entry, never assumed.
+
 **A deferred lead line's two board tags go uncounted.** On a top-level lead line
 in the deferred section the gate removes one `[cost:]` tag whose value parses
 and one `[surface:]` tag naming an existing top-level root entry, each with one

@@ -8,4 +8,7 @@ attestation is written as a specimen — *verified 2026-08-30: the three sites a
 The ledger path rides `WIDGET_LEDGER_FILE`, and a `SUBLEDGER.md` is a different
 file from the configured one.
 
+A keyed pair such as `spec=scope` is one element. The wire's default pairs
+`build=scope` and `validate=build` are the kit's own.
+
 widget-toolkit ships one gate. The operator reads its report close-over-close.

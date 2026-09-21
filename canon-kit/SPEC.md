@@ -1442,12 +1442,15 @@ trips or does not. `precommit` tier.
 ### check-provenance-seam
 
 `checks/check-provenance-seam.gate` (`precommit`, binary-dispatched).
-Invariant: no kit SPEC carries a publisher-provenance marker — the class
-gate-sdk/SPEC.md §The provenance seam bars from a kit file. A kit SPEC is
-vendored and rendered wherever the kit goes, so an attribution publishes who
-decided what and when, and a pointer into the publisher's tree is dead in every
-copy. The gate holds the lexical shapes of that class; the voice-not-content
-judgement behind it stays a review concern.
+Invariant: no kit SPEC carries a publisher-provenance marker or quotes a roster
+one consumer configured — the two classes gate-sdk/SPEC.md §The provenance seam
+bars from a kit file. A kit SPEC is vendored and rendered wherever the kit goes,
+so an attribution publishes who decided what and when, a pointer into the
+publisher's tree is dead in every copy, and a configured roster reads to a
+second consumer as the shape of its own. The gate holds the lexical shapes of the
+provenance class and the one roster shape of the content class that an oracle
+can hold without flooding; the voice-not-content judgement and the
+whose-truth discriminator behind them stay a review concern.
 
 **Corpus.** The canonical spec (`CANON_KIT_SPEC_NAME`) at the root of every kit
 root (gate-sdk/SPEC.md §Layout and configuration), derived rather than listed. It
@@ -1492,6 +1495,17 @@ a finding reports its first physical line.
   `gates.list` member. That exclusion is structural, not a valve: a unit named
   after the gate or kit it mints would otherwise red that gate's own section while
   the unit's entry is live.
+- **consumer-roster** — two or more distinct candidates of one knob in one
+  paragraph, each as a whole inline-code span, reported at the paragraph's first
+  line with the knob and the matched spans. A candidate is an element of a static
+  indexed or keyed knob whose layered value the consumer set, absent from that
+  row's default, spelled `<key>=<value>` for a keyed pair, and carrying a `/` or
+  `=`. The shape is the attested leak's: a kit SPEC illustrating a keyed wire by
+  enumerating one tree's configured pairs. Matching any single configured value
+  floods, because most have a lawful reading — a kit default, a generic noun, a
+  kit's own path — and so does co-occurrence of bare values, on word-valued
+  elements; a whole-span quote of two slash- or pair-shaped consumer-only elements
+  measured zero hits over the kit SPECs while firing on the attested instance.
 
 The possessive shape is one class with the section citation — both point into the
 publisher's always-loaded file — so leaving it out would carve an exemption by
@@ -1509,7 +1523,10 @@ omission into a gate that ships exemption-free.
 - an attributive agent-file pointer (*the agent file's ban*) passes, because
   telling it from a consumer-side mention (*the consumer's agent file carries …*)
   is judgement;
-- kit templates, kit READMEs and a kit's doctrine file are outside the corpus.
+- kit templates, kit READMEs and a kit's doctrine file are outside the corpus;
+- a singleton roster quote passes, as do a word-valued element, an unbackticked
+  mention and a scalar knob's value — the content class beyond the roster shape
+  is judged by gate-sdk/SPEC.md §The provenance seam's discriminator at review.
 
 Those shapes are held by the close-stage review, not by this gate.
 
@@ -1517,6 +1534,11 @@ Those shapes are held by the close-stage review, not by this gate.
 a kit SPEC reds the commit that files it, naming the SPEC line; renaming a fresh
 slug costs nothing. The descriptor therefore couples `knob:CANON_KIT_QUEUE_FILE`
 beside `kit:SPEC.md`, so the hook fires on the commit that introduces the finding.
+**A consumer knob edit can too**, which is why the member declares every static
+indexed and keyed row: the declaration reaches every static kit, so each kit's
+knob file joins its `couples=` as a derived couple (gate-sdk/SPEC.md §The
+`# graph:` manifest) and the hook fires on the knob edit with no path literal in
+the descriptor.
 
 **Fail-closed (exit 2):** a kit SPEC or the queue file that exists but cannot be
 read; an authority marker that does not compile (every pattern compiles before the
@@ -1530,8 +1552,10 @@ Producer: the generated pre-commit hook and `run-gates.sh`, on a commit touching
 kit SPEC or the queue file; consumer: the committing session via the output
 contract, each finding read once at the scan transition (file, line, arm, span),
 no persistent state. The arm names the remedy: delete an attribution, restate what
-a pointer stood for, or rename a fresh slug. The fixture pair trips each arm and
-carries a fenced copy of every trip that must add no finding;
+a pointer stood for, rename a fresh slug, or name the knob rather than quote its
+configured roster. The fixture pair trips each arm and carries a fenced copy of
+every trip that must add no finding; its consumer knob file sets a keyed knob,
+and `good/` quotes one configured pair and two pairs equal to the default;
 `check-provenance-seam.test.sh` holds the paths a pair cannot spell — the
 kit-roots-off default, an absent queue file and the `_EXTRA` union.
 

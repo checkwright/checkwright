@@ -1,5 +1,5 @@
 // spec: canon-kit/SPEC.md §check-provenance-seam — no kit SPEC carries a publisher-provenance
-// marker: a dated attribution, an agent-file pointer, a private-surface mention or a live queue slug
+// marker or quotes a roster one consumer configured
 use crate::ere::Ere;
 use crate::registry;
 use crate::spec::{self, compile_pattern as compile, Para, ProseSink};
@@ -84,22 +84,29 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         }
     }
 
+    let rosters: Vec<(&str, Vec<String>)> = crate::knobs::consumer_elements()?
+        .into_iter()
+        .map(|(k, v)| (k, v.into_iter().filter(|e| e.contains('/') || e.contains('=')).collect::<Vec<_>>()))
+        .filter(|(_, v)| v.len() >= 2)
+        .collect();
+
     let mut sink = Seam {
         markers: &markers,
         agent_files: &agent_files,
         private: &private,
         slugs: slugs.as_deref().unwrap_or(&[]),
+        rosters: &rosters,
         out: Vec::new(),
     };
     spec::walk_prose_multi(&files, &[], &mut sink)?;
 
     if !sink.out.is_empty() {
-        println!("check-provenance-seam: publisher-provenance marker(s) in a kit SPEC — a kit SPEC states its rule undated and impersonally, and a pointer that resolves only in the publisher's tree is dead in every vendored copy:");
+        println!("check-provenance-seam: provenance-seam finding(s) in a kit SPEC — a kit SPEC states its rule undated and impersonally, a pointer that resolves only in the publisher's tree is dead in every vendored copy, and a roster one consumer configured is that tree's content:");
         println!();
         for l in &sink.out {
             println!("{}", l);
         }
-        println!("  help: dated-attribution — delete the attribution and keep the rule; agent-file-pointer or private-surface — state the rule the pointer stood for, or cite the kit SPEC section that owns it; queue-slug — name what the slug denoted, or rename a freshly filed slug (gate-sdk/SPEC.md §The provenance seam)");
+        println!("  help: dated-attribution — delete the attribution and keep the rule; agent-file-pointer or private-surface — state the rule the pointer stood for, or cite the kit SPEC section that owns it; queue-slug — name what the slug denoted, or rename a freshly filed slug; consumer-roster — name the knob rather than quote its configured roster (gate-sdk/SPEC.md §The provenance seam)");
         return Ok(1);
     }
     let mut notes: Vec<&str> = Vec::new();
@@ -115,7 +122,7 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         format!("; {}", notes.join("; "))
     };
     println!(
-        "PROVENANCE-SEAM: clean ({} kit SPEC(s); no publisher-provenance marker{})",
+        "PROVENANCE-SEAM: clean ({} kit SPEC(s); no publisher-provenance marker or quoted consumer roster{})",
         files.len(),
         suffix
     );
@@ -191,6 +198,7 @@ struct Seam<'a> {
     agent_files: &'a [String],
     private: &'a [String],
     slugs: &'a [String],
+    rosters: &'a [(&'a str, Vec<String>)],
     out: Vec<String>,
 }
 
@@ -237,6 +245,7 @@ impl ProseSink for Seam<'_> {
         self.agent_file_pointer(&j, &mut hits);
         self.private_surface(&j, &mut hits);
         self.queue_slug(&j, &mut hits);
+        self.consumer_roster(&j, para.fnr[0], &mut hits);
         hits.sort_by_key(|h| h.0);
         for (ln, msg) in hits {
             self.out.push(format!("  {}:{}  {}", file, ln, msg));
@@ -327,6 +336,40 @@ impl Seam<'_> {
     }
 }
 
+impl Seam<'_> {
+    // spec: canon-kit/SPEC.md §check-provenance-seam — arm E: two or more distinct candidates of one
+    // knob in one paragraph, each a whole inline-code span, reported at the paragraph's first line
+    fn consumer_roster(&self, j: &Joined, first: usize, hits: &mut Vec<(usize, String)>) {
+        let spans = code_spans(&j.text);
+        for (knob, candidates) in self.rosters {
+            let mut matched: Vec<&str> = candidates
+                .iter()
+                .filter(|c| spans.contains(&c.as_str()))
+                .map(String::as_str)
+                .collect();
+            matched.sort();
+            matched.dedup();
+            if matched.len() >= 2 {
+                let quoted: Vec<String> = matched.iter().map(|m| format!("`{}`", m)).collect();
+                hits.push((first, format!("consumer-roster: {} {}", knob, quoted.join(", "))));
+            }
+        }
+    }
+}
+
+// spec: canon-kit/SPEC.md §check-provenance-seam — each single-backtick inline-code span's content
+fn code_spans(t: &str) -> Vec<&str> {
+    let mut out = Vec::new();
+    let mut rest = t;
+    while let Some(a) = rest.find('`') {
+        let after = &rest[a + 1..];
+        let Some(b) = after.find('`') else { break };
+        out.push(&after[..b]);
+        rest = &after[b + 1..];
+    }
+    out
+}
+
 // spec: canon-kit/SPEC.md §check-provenance-seam — `[0-9]{4}-[0-9]{2}-[0-9]{2}` with no digit on
 // either side, a kit literal that hand-compiles
 fn iso_date(s: &str) -> Option<&str> {
@@ -357,6 +400,11 @@ mod tests {
         assert_eq!(iso_date("on 2026-09-16, ruled"), Some("2026-09-16"));
         assert_eq!(iso_date("12026-09-16"), None);
         assert_eq!(iso_date("2026-9-16"), None);
+    }
+
+    #[test]
+    fn code_spans_read_each_backticked_content() {
+        assert_eq!(code_spans("a `x/y` and `k=v` then `open"), vec!["x/y", "k=v"]);
     }
 
     #[test]

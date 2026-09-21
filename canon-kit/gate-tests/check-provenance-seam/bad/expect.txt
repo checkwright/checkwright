@@ -3,3 +3,4 @@ widget-toolkit/SPEC.md:6  agent-file-pointer: CLAUDE.md (section citation)
 widget-toolkit/SPEC.md:7  agent-file-pointer: CLAUDE.md (possessive)
 widget-toolkit/SPEC.md:9  private-surface: LEDGER.md
 widget-toolkit/SPEC.md:11  queue-slug: sprocket-rework-unit
+widget-toolkit/SPEC.md:13  consumer-roster: LIFECYCLE_KIT_PREDECESSOR `align=spec`, `spec=scope`

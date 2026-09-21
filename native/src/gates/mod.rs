@@ -764,6 +764,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_SEAM_AGENT_FILES",
             "CANON_KIT_SEAM_PRIVATE_SURFACES",
             "CANON_KIT_SEAM_SLUG_MIN_LEN",
+            EVERY_COLLECTION_KNOB,
         ],
         "canon-kit",
         &[],
@@ -2234,6 +2235,10 @@ pub fn filter_reference(spec: &str) -> Option<&str> {
 // the registry carries
 pub const EVERY_FILTER_KNOB: &str = "@every-filter-knob";
 
+// spec: canon-kit/SPEC.md §check-provenance-seam — the consumer-roster arm resolves every static
+// indexed or keyed row, so it declares them all and its declaration reaches every static kit
+pub const EVERY_COLLECTION_KNOB: &str = "@every-collection-knob";
+
 // spec: gate-sdk/SPEC.md §check-reads-couples — the expansion is a crate-internal carrier: the
 // arm's own output stays one knob name per line, and no `.gate` descriptor field moves.
 fn expanded_knobs() -> &'static [(&'static str, Vec<&'static str>)] {
@@ -2254,16 +2259,33 @@ fn expanded_knobs() -> &'static [(&'static str, Vec<&'static str>)] {
             .collect();
         filters.sort();
         filters.dedup();
+        let collections: Vec<&'static str> = crate::knobs::STATIC_KITS
+            .iter()
+            .flat_map(|k| k.rows.iter())
+            .filter(|r| r.shape != crate::knobs::Shape::Scalar)
+            .map(|r| r.name)
+            .collect();
         REGISTRY
             .iter()
-            .filter(|(_, _, _, k, _, _)| k.contains(&EVERY_FILTER_KNOB))
+            .filter(|(_, _, _, k, _, _)| k.contains(&EVERY_FILTER_KNOB) || k.contains(&EVERY_COLLECTION_KNOB))
             .map(|(n, _, _, k, _, _)| {
-                let mut out: Vec<&'static str> =
-                    k.iter().copied().filter(|x| *x != EVERY_FILTER_KNOB).collect();
-                for f in &filters {
-                    if !out.contains(f) {
-                        out.push(f);
+                let mut out: Vec<&'static str> = k
+                    .iter()
+                    .copied()
+                    .filter(|x| *x != EVERY_FILTER_KNOB && *x != EVERY_COLLECTION_KNOB)
+                    .collect();
+                let mut add = |set: &[&'static str]| {
+                    for f in set {
+                        if !out.contains(f) {
+                            out.push(f);
+                        }
                     }
+                };
+                if k.contains(&EVERY_FILTER_KNOB) {
+                    add(&filters);
+                }
+                if k.contains(&EVERY_COLLECTION_KNOB) {
+                    add(&collections);
                 }
                 (*n, out)
             })

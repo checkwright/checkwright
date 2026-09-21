@@ -10,7 +10,11 @@ The history is recorded in LEDGER.md for later readers.
 
 The retry cap is the `sprocket-rework-unit` entry's to settle.
 
+The keyed wire reads, for example, `spec=scope` and
+`align=spec`.
+
 ```text
+The keyed wire reads `spec=scope` and `align=spec`.
 The operator ruled (2026-08-12, consult) that it stays that way.
 CLAUDE.md §Delivery doctrine and CLAUDE.md's ban
 LEDGER.md and sprocket-rework-unit

@@ -48,8 +48,17 @@ the other side: the SPEC names the release that carried the change, which a
 vendoring consumer resolves against its own pin, never the landing date, which
 is provenance and is false for every consumer that upgraded later.
 
+**What makes a literal consumer rule content is whose truth it is.** A value
+true only of one tree's configuration or practice is that tree's content,
+however it is voiced, and it leaves the kit: as optional config where the kit
+needs it, otherwise into the publisher's own record. A value the kit itself
+ships — its descriptors, its table defaults, its templates — is kit content,
+and quoting it is a restatement that de-literalization governs rather than the
+seam.
+
 canon-kit's `check-provenance-seam` holds the publisher-provenance class's
-lexical shapes over the kit SPECs of a tree that authors its kits; its honest limits, the shapes it cannot see,
+lexical shapes and the content class's consumer-roster shape over the kit SPECs
+of a tree that authors its kits; its honest limits, the shapes it cannot see,
 are recorded in canon-kit/SPEC.md §check-provenance-seam.
 
 ## Layout and configuration
@@ -2855,93 +2864,6 @@ predicate a goal, which makes opacity a ground a port may argue on — bounded
 exactly as that section bounds it, raised cost of analysis and never
 confidentiality. A later session weighing a port weighs that ruling, not the
 constraint set this record was written under.
-
-**Which queue entry a cut rides, stated because only half of it was written
-down.** A cut files no per-cut residue entry: the scoping stage promotes the
-standing composer entry itself, carrying
-that cut's own `[spec:]` amendment ref, and that entry states its own
-build-stage demotion. The demotion half has always been on the entry; the
-promotion half was derivable only from `git log -S` over the queue, which is a
-re-derivation every cut's scoping session paid.
-
-**The rule reads as *the composer entry always*, and the case it does not cover
-is a cut that has its own.** A cut deferred behind a design fork may already have
-been filed as an entry of its own — named by the composer's own text as what
-holds that file — and such a cut hosts **there**, carrying its `[spec:]` ref on
-that entry. The composer entry is the host for a cut with no other, which is what
-the rule was always for: it exists because a cut ordinarily has nowhere else to
-live, never as a claim that a dedicated host is wrong. A dedicated host also
-changes the terminal move, and it changes it in the direction the bullet below
-already distinguishes: an entry whose whole deliverable is that one cut is
-**done** when the cut lands, where the composer entry is demoted. Nothing about
-the composer's own demotion contract changes.
-
-**The rule above presumes one cut per iteration, and the resolution for an
-iteration holding more is stated here rather than re-derived.** Three facts, in
-the order they bind.
-
-- **How many `[spec:]` tags a lead line carries is arithmetic, and the
-  arithmetic resolves per entry rather than once for the queue.** `[spec:]` and
-  `[roadmap:]` are lead-line-scoped and `check-queue-wrap`'s budget resolves to
-  100 columns; a tag costs `9 + len(basename)`; and an entry's **fixed**
-  lead-line part is its `- **<slug>**` plus any tag it permanently carries,
-  because trailing prose reflows onto the continuation lines and a tags-only lead
-  line is legal (queue-kit/SPEC.md §check-queue-entry-budget states what that
-  costs a reader — the entry renders as a bare slug). Nothing mechanical caps the
-  count either: `check-amendment-queue` collects every match on a
-  line (canon-kit/SPEC.md §check-amendment-queue). So the number is measured on the
-  entry a cut is actually hosting on, never assumed.
-
-  **The composer entry's answer is one, and it is structural rather than a naming
-  choice.** Its fixed part is 66 columns — 39 for the slug plus 27 for the
-  `[roadmap:]` tag it carries permanently — leaving 34. One tag fits at a basename
-  up to 25 characters; a second cannot at *any* naming, the shortest legal
-  basename being `SPEC-a.md` at 9 for a cost of 18 against the 16 that remain. The
-  `[roadmap:]` tag is what decides it: drop that tag and two would fit, and
-  dropping it is refused because it drops the entry out of the generated public
-  roadmap while the work stands. So for **this** host the presumption above is
-  unsatisfiable, not merely inconvenient, the moment an iteration holds two cuts.
-
-  **Another entry resolves differently, and one worked instance grounds it.** An
-  entry whose fixed part is 30 columns and which carries no permanent tag fits
-  two `[spec:]` refs at basenames up to 29 and 30 characters, with its trailing
-  prose reflowed off the lead line — which is how one iteration hosted two cuts
-  on a single entry.
-  **Stated as an arithmetic and not as a conclusion because the flat form of this
-  bullet — *one lead line carries at most one tag* — was read as a general rule
-  and cost a spec session an escalation**. The correction is what the bullet's
-  own first clause already said: it is arithmetic, so run it.
-- **A two-cut iteration is lawful and needs no waiver.** The port-candidate
-  criteria *constrain selection, not iteration packaging* — the clauses say what
-  makes **one** cut well-formed; how many an iteration holds is owned elsewhere.
-- **So a second cut hosts on an existing entry whose own text names that cut's
-  subject as its blocker.** The composer entry hosts a cut that has no other
-  host; an entry already waiting on this cut's subject is the better host rather
-  than the leftover one, because that entry's text changes *because of* the cut.
-  §upgrade-smoke's port is the worked instance: the hosting entry's
-  `declaration.sh` paragraph said in as many words that
-  `bin/upgrade-smoke.sh` kept the shell caller set non-empty, and that cut is the <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
-  event the sentence was waiting on.
-
-**A host that discharges a blocker is not a host that delivers an increment, and
-the two are recorded differently.** canon-kit's corpus branch speaks of an
-amendment delivering one increment of a corpus; a blocker discharge is narrower,
-and a cut taking that ground says so rather than dressing it as delivery — the
-member roster is corrected to *unblocked and takeable*, never to *done*, and the
-terminal move is a demotion (canon-kit/SPEC.md §Merging an amendment). **The
-delivery ground has its worked instance too**, and it is the same host one
-iteration later: the same entry hosted §lib/declaration.sh's cut, taking the
-member the earlier hosting had only unblocked. That
-member leaves the roster outright and its paragraph states a delivery instead of
-an *unblocked and takeable* correction. The two hostings are recorded separately
-on purpose — a reader averaging them would read the earlier one as a delivery.
-
-**This paragraph exists because the same resolution was reached and lost twice.**
-The ruling that first did this arithmetic lived only in an amendment's
-delta and went with the file at merge step 3, because step 2 — relocating design
-rationale into the spec's prose, its permanent home — was not performed on it.
-That is a merge defect rather than a property of amendments, and it cost a third
-re-derivation. Stated here so there is no fourth.
 
 **A section is a cut's outer bound, never its minimum.** The composer's *the owed
 files behind one specification section* bounds what a cut may bundle: it refuses
@@ -6411,11 +6333,9 @@ adds no member.** A port moves declaration paths — `<kit>/checks/<name>.sh`
 becoming `<name>.gate` — which can move other members into or out of the
 derived set, so assertion C was run fresh after all six descriptors landed
 rather than inherited from an earlier cohort's table reading. None of the
-six reaches a gate declaration path through its own `couples=`:
-`scripts/git-hooks/*`, `.claude/agents/*.md`, the two named delegation-kit
-files, `CLAUDE.md` plus `doctrine-kit/DOCTRINE.md`, and `.workflow/*,.gitignore`
-each name a corpus outside `<kit>/checks/`, `native/src/gates/*.rs` and
-`native/src/*.rs` alike. §Meta-gate conservation for the binary substrate
+six reaches a gate declaration path through its own `couples=`: each names a
+corpus outside `<kit>/checks/`, `native/src/gates/*.rs` and `native/src/*.rs`,
+which assertion C's derivation re-establishes whenever it is re-run. §Meta-gate conservation for the binary substrate
 gains no row from this batch.
 
 ### The second budget batch
