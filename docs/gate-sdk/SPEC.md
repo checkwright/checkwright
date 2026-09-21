@@ -7588,8 +7588,8 @@ bar with an empty transitive set and an MSRV below the floor, and it is what let
 the pid predicate read `EPERM` in-process (evidence-kit/SPEC.md §The
 producer-liveness lock), and the local-time conversions. Its `unsafe` calls are
 `kill(pid, 0)`, which touches no memory the crate owns, and `localtime_r` and
-`mktime`, each over a zeroed stack-local `tm`. The target scoping is the point of the admission and not a
-size trim: the native Windows build resolves pids in a shell's namespace, where the
+`mktime`, each over a zeroed stack-local `tm`. The target scoping is the point
+of the admission and not a size trim: the native Windows build resolves pids in a shell's namespace, where the
 crate's `kill` would read the wrong processes.
 
 **An MSRV bump is a `check-crate-arms` input, which no surface said.** Clippy
@@ -10312,16 +10312,12 @@ from a tree carrying one still reads it.
 
 **The library also unsets `GATE_SDK_TMP_DIR` and `GATE_SDK_WORKFLOW_DIR`**, so a
 sourcing test resolves both to their relative kit defaults against its own
-sandbox cwd rather than an ambient absolute value the invoker's environment
-happens to carry: this file's own header says a test "runs on kit defaults,
-never the invoker's cwd config," and an inherited absolute path knob was the
-hole in that contract — a test built to isolate itself under a *relative*
-scratch or workflow directory instead reads the invoker's live state (a real
-`run-validate.lock`, a foreign `validate-evidence.txt`) once either knob is
-exported absolute around it. The unset runs after every bespoke test's own
-explicit pin of either knob, since a pin sits after that test's `source` line
-by construction, so it overrides no test's deliberate choice; it only
-neutralizes the ambient case. **The honest limit:** a knob derived from either
+sandbox cwd: an inherited absolute value would point a test that isolates itself
+under a *relative* scratch or workflow directory at the invoker's live state (a
+real `run-validate.lock`, a foreign `validate-evidence.txt`). The unset runs
+before every bespoke test's own explicit pin of either knob, since a pin sits
+after that test's `source` line by construction, so it overrides no test's
+deliberate choice and neutralizes only the ambient case. **The honest limit:** a knob derived from either
 root and exported directly (`EVIDENCE_KIT_LOCK_FILE`, for one) still reaches a
 test that does not also unset it.
 

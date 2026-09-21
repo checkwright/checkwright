@@ -14,7 +14,7 @@ for _th_kit in "$_th_root"/gate-sdk "$_th_root"/*-kit; do
 done
 # spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — neutralizes an ambient absolute path knob so a
 # sourcing test resolves both to their relative kit defaults against its own sandbox cwd; runs
-# after a test's own explicit pin, which by construction sits after this library's source line
+# before a test's own explicit pin, which by construction sits after this library's source line
 unset GATE_SDK_TMP_DIR GATE_SDK_WORKFLOW_DIR
 GATE_SDK_TEST_LIB_DIR="$(cd "${BASH_SOURCE[0]%/*}" && pwd)"
 # spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the gate-sdk root locator, absolute from this library's own anchor, because a suite drives its subject from a sandbox cwd the default cannot reach

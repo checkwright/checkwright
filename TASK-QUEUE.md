@@ -238,15 +238,15 @@
   `BASH_SOURCE` with a relative `cd`, and it composes two roots by string arithmetic — rather than
   scanning for either. Scanning for either alone reds 7 of 7 files; the pairing reds 1.
   **Why design-pending, and why it needs a spec stage rather than a build session:** the satisfying
-  value is itself unruled. `gate-sdk/lib/test-hermetic.sh`:25 also spells the shell absoluteness
+  value is itself unruled. `gate-sdk/lib/test-hermetic.sh`:29 also spells the shell absoluteness
   test, there is no shell counterpart of `walk::path_root` to route it through, and this contract
   refuses a shared shell normalizer on its own stated grounds — so what a red site is supposed to
   become is an open question, not a known edit.
   **Measured, so a later scope does not re-buy it** (filed whole in `.workflow/survey-record.md`,
   2026-09-20 build, with its witness): of the 7 non-test tracked shell files deriving a root from
   `BASH_SOURCE`, NONE uses `pwd -P`, and `gate-sdk/lib/test-hermetic.sh` is the witness exhibiting
-  both paired facts — `:4` and `:15` derive two roots with relative `cd`s, `:17` takes a suffix off
-  one and `:25` joins the other onto a leading-slash-tested path.
+  both paired facts — `:4` and `:19` derive two roots with relative `cd`s, `:21` takes a suffix off
+  one and `:29` joins the other onto a leading-slash-tested path.
   **Cost while deferred:** a Windows adopter's gate verdict on their own host, paid whenever a
   composing script runs there, and a Linux battery cannot show it — the cost class the parent
   carried, undiminished by the split because the split moved the enforced half out, not this one.
