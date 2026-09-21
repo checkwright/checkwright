@@ -1,3 +1,4 @@
 # graph: couples=*.sh,*.gate,*.rs,knob:GATE_SDK_WORKFLOW_DIR/*,knob:CANON_KIT_QUEUE_FILE,knob:CANON_KIT_COMMENT_SURFACE dir=one valve=none tier=precommit
 # install: on-surface
+# armed-by: CANON_KIT_DEPRECATION_MARKERS
 # spec: canon-kit/SPEC.md §check-deprecation-task — every deprecation marker on a governed source binds task: <slug> to a live queue task

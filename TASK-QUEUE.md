@@ -16,6 +16,79 @@
 
 ## Deferred
 
+- **shell-textual-absoluteness-single-dialect** [cost: event/low] [surface: gate-sdk] — tracked
+  shell sites test a path for absoluteness by a leading `/` alone, so a caller-supplied Windows
+  drive-letter path is joined onto a root as if relative. Sites (re-measured 2026-09-22):
+  `gate-sdk/lib/test-hermetic.sh`, `gate-sdk/smoke/install.sh`, `installer/bin/checkwright.sh`,
+  `installer/consumer-smoke/run-smoke.sh`, `lifecycle-kit/smoke/install.sh`,
+  `guard-kit/lib/guard.sh` and `guard-kit/gate-tests/guard-lib-parity.test.sh`.
+  Probe: `git grep -n -E '== /\*|/\*\)' -- '*.sh'`.
+  **Deliverable:** one shell absoluteness helper both dialects satisfy, the sites routed through it,
+  and the shell half of `check-path-dialect`'s locality arm (today crate-only) holding it.
+  **Cost while deferred:** a wrong root on a Windows adopter host whenever a caller exports a
+  drive-letter path. Filed 2026-09-21 to the gap inbox by gate-sdk-surface-drain's spec session;
+  promoted at its close because →fix needs a new shell-side oracle the cwd-anchor amendment kept
+  out of its envelope. Owner lookup ran over `absolute` and `locality` in gate-sdk/SPEC.md;
+  §check-path-dialect owns the crate-side arm and names no shell arm.
+
+- **kit-spec-singleton-consumer-config-quotes** [cost: event/low] [surface: canon-kit] — kit SPECs
+  quote single values of this repo's knob configuration, which gate-sdk/SPEC.md §The provenance
+  seam rules consumer rule content, and `check-provenance-seam`'s consumer-roster arm cannot see a
+  singleton. Instances measured 2026-09-22: canon-kit/SPEC.md §Layout and configuration quotes the
+  four claim-command argv values (`scripts/install-transports.sh`, `scripts/payload-claims.sh`,
+  `scripts/measured-claims.sh`, `scripts/claim-classes.sh`); gate-sdk/SPEC.md quotes
+  `scripts/measured-claims.sh` at seven sites and names this repo's plugin files as knob values.
+  **Deliverable:** sweep every kit SPEC under the voice-not-content discriminator, replacing each
+  value with its knob's name or moving it to the consumer config it quotes.
+  **Cost while deferred:** each quote publishes one tree's configuration in every vendored copy and
+  goes stale against it. Filed 2026-09-21 to the gap inbox by the spec session; promoted at close
+  because the corpus is every kit SPEC, an audit rather than a drain fix. Owner lookup ran over
+  `singleton` and `consumer roster` in canon-kit/SPEC.md; §check-provenance-seam owns the roster
+  arm.
+
+- **armed-by-content-emptiness-shape** [cost: event/low] [surface: gate-sdk] — `check-commit-msg`
+  and `check-tree-terms` share `GATE_SDK_MSG_PATTERN_FILES`, a required tracked pattern file, and
+  both pass vacuously when that file trims to no non-comment line. `# armed-by:` reads a knob's
+  resolved value, never a tracked file's parsed content (gate-sdk/SPEC.md §The install
+  disposition), so `doctor` cannot name this disarmed state. **Deliverable — rule one of two:** an
+  arming shape reading content emptiness, or a stated refusal naming why a content-emptied pattern
+  file stays outside `doctor`. No design is proposed here.
+  **Cost while deferred:** an adopter who empties the pattern file gets a silent clean pass with no
+  doctor warning. Filed 2026-09-22 to the gap inbox by the census discharging
+  `armed-by-census-unrun`; promoted at close because →fix needs a new declaration shape. Owner
+  lookup ran over `armed-by` in gate-sdk/SPEC.md; §The install disposition owns the declaration.
+
+- **doc-path-hardcoded-reads** [cost: event/low] [surface: gate-sdk] — eighteen kit-shipped
+  `couples=` literals across thirteen members name a consumer path the member reads that no knob it
+  declares configures, so each trigger stays frozen to this repo's layout and a vendoring adopter's
+  hook never fires on their real file. Members (re-measured 2026-09-22 by
+  `git grep -n couples= -- '*/checks/*.gate'`): the four `check-action-*` gates
+  (`docs/_config.yml`), `check-install-claim`, `check-payload-claim`, `check-prose-tells`
+  (`docs/*.md`), `check-close-surfaces` (`.claude/commands/*.md`), `check-scratch-citation`
+  (`TASK-QUEUE.md`), `check-footprint-fresh`, `check-enforcement-fresh`, `check-surface-ratchet`,
+  `check-graph`, `check-surface-duplication` (`VISION.md`) and `check-producer-liveness`
+  (`.tmp/*.run`).
+  **Deliverable:** per member, a knob the code reads and the registry declares (the literal then
+  converts by gate-sdk/SPEC.md §The # graph: manifest's rule), or an undeclared read declared.
+  **Cost while deferred:** those triggers stay pinned to this layout in every vendored tree.
+  Filed 2026-09-22 to the gap inbox from the doc-path-tokens survey's class 4; promoted at close
+  because each member's module needs reading. **DISTINCT from**
+  **`check-graph-trigger-consumer-path-reach`** (icebox), whose subject is a `couples=` missing
+  `installer/`, not a frozen consumer literal.
+
+- **pipe-membership-corpus-omits-test-suites** [cost: event/low] [surface: gate-sdk] —
+  `check-pipe-membership` reads `walk::tracked_shell_tree`, which excludes `*.test.sh`, so the
+  tracked suites setting `pipefail` sit outside the gate. Measured 2026-09-22 by the filer: 107 of
+  111 tracked suites set `pipefail`; one of the five historically fixed membership sites was a
+  suite, `gate-sdk/gate-tests/lib-gate.test.sh`. **Deliverable:** widen the corpus to tracked
+  `*.test.sh`, still excluding the pruned fixture trees (their `bad/` cases hold deliberate
+  violations), and restate gate-sdk/SPEC.md §check-pipe-membership's corpus sentence; the landing
+  amendment's own probe over all `*.sh` finds no current site, so the widened gate lands green.
+  **Cost while deferred:** a new membership pipe written in a suite goes unflagged until it flips a
+  verdict under load. Filed 2026-09-22 by build batch 4 of gate-sdk-surface-drain on a lead ruling;
+  promoted at close because §check-pipe-membership states the suites outside its corpus, so the
+  widening is an envelope change for spec, not a drain fix.
+
 - **fence-run-fixed-env-hides-user-gem-dir** [cost: event/low] [surface: canon-kit] — site-kit's
   fixture-suite fence stays unmarked for `check-fence-run`, so the command an adopter pastes from it
   runs unwitnessed. canon-kit/SPEC.md §check-fence-run pins `HOME` inside the scratch and inherits

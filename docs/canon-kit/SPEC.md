@@ -2567,6 +2567,8 @@ against the governed comment surface. A language's marker spelling is never a
 kit literal: the roster ships empty, so a repo that sets none is clean-skipped
 (the `check-graph`/`graph-vocab` seam — the kit ships the resolution mechanism,
 the consumer names its own `#[deprecated]`, `@deprecated`, or `@Deprecated`).
+The descriptor declares `# armed-by:` on the roster, so `doctor` names a
+registered member still skipping (gate-sdk/SPEC.md §The install disposition).
 The scan itself stays consumer toolchain — a clippy/ESLint-class linter already
 inventories deprecation markers; this gate adds the governance coupling no
 linter ships: a deprecated surface that names no decommission task, or names a

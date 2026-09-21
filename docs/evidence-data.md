@@ -207,3 +207,4 @@
 | scratch-hermeticity | sc sp a b v c | 1f/3d | 1 · ≤0d | 20s clean | 123 |
 | delegation-seams | sc sp a b v c | 8f/0d | 5 · ≤0d | 20s clean | 123 |
 | docs-first-contact | sc sp a b v c | 8f/4d | 7 · ≤0d | 28s 1✗ | 128 |
+| gate-sdk-surface-drain | sc sp a b v c | 13f/0d | 12 · ≤1d | 21s clean | 129 |
