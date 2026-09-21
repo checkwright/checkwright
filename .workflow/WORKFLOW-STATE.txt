@@ -11,3 +11,4 @@ delegation-seams build aace24dc 2026-09-21 fac66e95
 delegation-seams build a7ca75ad 2026-09-21 cb2143a1
 delegation-seams build aa1ee114 2026-09-21 20e60c29
 delegation-seams validate aec987e6 2026-09-21 e0eeced3
+delegation-seams close a3b81a76 2026-09-21 d0bf747e
