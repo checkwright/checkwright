@@ -246,16 +246,7 @@ fn pass(sdk: &str, roots: &[String], teardown: &mut Teardown, sink: &Sink, verbo
             "{}: FAIL — the registration accounting is not satisfied",
             VERDICT
         ));
-        for l in &acct.unaccounted {
-            report.push(format!("  unaccounted: {}", l));
-        }
-        for l in &acct.stale {
-            report.push(format!("  stale declaration: {}", l));
-        }
-        report.push(String::new());
-        report.push("  help: register the gate in that kit's smoke/install.sh, or declare the omission".to_string());
-        report.push("        beside its registration block with '# smoke-unregistered: <gate-name> — <reason>'".to_string());
-        report.push("        (gate-sdk/SPEC.md §Consumer smoke).".to_string());
+        report.extend(accounting_failure_lines(&acct));
         return Outcome::Fail(report);
     }
     for l in &report {
@@ -470,6 +461,24 @@ fn install_token(checks: &str, gate: &str) -> String {
     String::new()
 }
 
+// spec: gate-sdk/SPEC.md §Consumer smoke — each `unaccounted:` line gains its own `help:`
+// continuation naming its remedy, since the reader is a validate session and the build session
+// that owns the defect, one stage removed from the landing obligation
+fn accounting_failure_lines(acct: &Accounting) -> Vec<String> {
+    let mut lines = Vec::new();
+    for l in &acct.unaccounted {
+        lines.push(format!("  unaccounted: {}", l));
+        lines.push("  help: register it in the smoke/install.sh of the kit that seeds this gate's subject surface — which need not be the shipping kit named above — or in the shipping kit's own smoke/install.sh with '# smoke-unregistered: <gate-name> — <reason>' for a vacuous pass (gate-sdk/SPEC.md §Consumer smoke).".to_string());
+    }
+    for l in &acct.stale {
+        lines.push(format!("  stale declaration: {}", l));
+    }
+    if !acct.stale.is_empty() {
+        lines.push("  help: a stale '# smoke-unregistered:' line names a gate that is now registered, mis-shipped, or already probe-exempt — correct or remove it (gate-sdk/SPEC.md §Consumer smoke).".to_string());
+    }
+    lines
+}
+
 // spec: gate-sdk/SPEC.md §Consumer smoke — the registration accounting: one pass over the union of
 // the vendored kits' declarations against the scratch registry, probe first and reasons second
 fn account(scratch: &str, host: &str, roots: &[String]) -> Result<Accounting, Outcome> {
@@ -638,5 +647,25 @@ mod tests {
             Ok(Probe::HarnessError(_))
         ));
         let _ = std::fs::remove_dir_all(&base);
+    }
+
+    // spec: gate-sdk/SPEC.md §Consumer smoke — the landing obligation's remedy: an unaccounted
+    // line names its own help, a stale one names a different help, and a clean field adds neither
+    #[test]
+    fn an_unaccounted_gate_names_its_own_help_line() {
+        let acct = Accounting {
+            registered: 0,
+            probed: 1,
+            self_declared: 0,
+            hand_declared: 0,
+            ms: 0,
+            unaccounted: vec!["some-kit ships check-x — scratch exit 1".to_string()],
+            stale: Vec::new(),
+            contradicted: Vec::new(),
+        };
+        let lines = accounting_failure_lines(&acct);
+        assert_eq!(lines[0], "  unaccounted: some-kit ships check-x — scratch exit 1");
+        assert!(lines[1].starts_with("  help: register it in the smoke/install.sh"));
+        assert!(!lines.iter().any(|l| l.contains("stale '# smoke-unregistered:'")));
     }
 }

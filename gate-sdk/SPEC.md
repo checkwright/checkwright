@@ -9409,6 +9409,20 @@ derivation's share of the sweep is a minority. The live figures are deliberately
 not restated here: the accounting line prints registered / self-declared /
 hand-declared / unaccounted on every run, and it is the only authority for them.
 
+**Validate holds the accounting, ruled rather than left split with precommit.**
+`check-install-disposition` assertion B holds registration for `zero-config`
+gates only, because that half is a static read; the full accounting above is a
+**probe** — it runs each unregistered gate against a scratch consumer and reads
+its exit code — and no precommit member can hold a probe result without paying
+the whole smoke's cost at every commit. Two attested instances (`1e18d154`,
+`d0b496fa`) each cost one stage of latency and a misattributed defect, both
+closed here rather than by moving the tier: the session that adds a kit-shipped
+gate, or changes one's `# install:` disposition, runs `--run-consumer-smoke`
+before the commit that lands it and repairs any unaccounted line in that
+commit — about 49 s, paid once per gate landing rather than at every commit. A
+landing session that skips it is caught at validate, exactly as before, but the
+unaccounted line now names its own remedy (below).
+
 **Not derived from the README roster.** The kit's `<!-- gate-roster:begin -->`
 block already carries full `checks/` parity (`check-readme-roster`) and
 per-gate annotations naming each gate's subject surface, so deriving
@@ -14930,7 +14944,10 @@ disposition.
   presupposes. The case is a vendored consumer's, every one of them, the payload
   withholding `smoke/` (§Consumer payload); in a tree that authors kits the skip
   count is zero and the assertion is unchanged, so this narrows what the gate can
-  see nowhere that it could see anything.
+  see nowhere that it could see anything. The non-`zero-config` half is held
+  elsewhere, at landing and at validate, because its verdict is a probe result
+  (§Consumer smoke, *the registration accounting*) rather than a static read
+  this assertion can hold.
 - **(C) No second copy** — the installer's `lib/common/recipe.sh` carries no
   literal gate name, so the de-literalization holds going forward rather than
   only at the commit that landed it. A `§`-prefixed occurrence is a spec-section

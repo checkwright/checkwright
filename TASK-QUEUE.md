@@ -135,54 +135,6 @@
   the counts above. The format change is owed as one rooted form, `knob:<NAME>/<glob>`, and every
   consumer-path literal becomes a token by a four-class rule.
 
-- **install-disposition-smoke-accounting-split** [spec: SPEC-smoke-accounting-tier.md] —
-  the precommit gate checks smoke
-  registration for `zero-config` gates only, so an `on-surface` gate's missing registration is
-  caught one stage late, at validate.
-  `check-install-disposition` skips every non-`zero-config` disposition outright
-  (`native/src/gates/install_disposition.rs` — `if value != ZERO_CONFIG { continue }`; the
-  member became a `.gate` descriptor plus that module at `shell-gate-tail-port`'s delta 3, and the
-  skip survives the port verbatim), and its clean line counts only the zero-config half. The full
-  accounting — every shipped gate
-  either registered in its kit's `smoke/install.sh` or carrying a `# smoke-unregistered:` line with
-  a reason — lives in the `--run-consumer-smoke` arm (`native/src/emit/run_consumer_smoke.rs`),
-  which this repo runs as the evidence-kit `consumer_smoke` validate suite and never at precommit.
-  **The instance, measured 2026-08-22.** Batch A landed `check-unmarked-claim` (`install:
-  on-surface`) without registering it in `canon-kit/smoke/install.sh`. The precommit battery passed
-  at 105 and then at 106 across four commits and three independent lead verifications; validate's
-  `consumer_smoke` caught it, fixed in one line at `1e18d154`. The same iteration's batch-B gate was
-  `zero-config` and WAS registered, so the seam is the disposition split rather than a careless
-  batch.
-  **Why design-pending:** the fix shape needs a ruling, not a build. Either widen
-  `check-install-disposition` to run the full accounting for every disposition, or move the
-  accounting out of `consumer_smoke` into a precommit member — the second buys the coverage but may
-  re-buy smoke cost at every commit, which is the trade nothing here settles.
-  **Distinct from `consumer-smoke-targeted-mode-registrar-scope`** (merged 2026-09-11 into the
-  `consumer-smoke-subset-accounting-verdict`, mooted since), whose axis is the targeted
-  single-kit mode severing a cross-kit registrar. This one is about which TIER holds the accounting
-  at all, and it fires on the untargeted run that neighbour reports clean.
-  **Cost while deferred:** one stage of latency on a mechanical zero-judgement condition a precommit
-  gate could hold, plus a validate red that presents as a build defect — the batch session reads a
-  registration omission as its own gate misbehaving.
-  **RECURRED 2026-08-27**, and the recurrence is exact rather than analogous.
-  `check-action-permissions` landed at `windows-artifact-proof` build batch 1 carrying
-  `install: on-surface`, unregistered; the precommit battery passed across five commits and
-  validate's `consumer_smoke` caught it, fixed in one line at `d0b496fa`. Two independent
-  instances now, both `on-surface`, both one line, both one stage late — so the seam is the
-  disposition split and nothing about either batch. What the second instance ADDS to the
-  first: the registrar was a *different kit* from the shipping one (gate-sdk ships the
-  `check-action-*` family; site-kit registers it, being the kit that writes the workflow
-  surface those gates read), so whichever tier ends up holding the full accounting must
-  resolve registration cross-kit rather than in the gate's own kit — a constraint the
-  2026-08-22 instance did not expose.
-  recurrence: install-disposition-smoke-accounting-split 2026-08-27
-  Filed 2026-08-22 by close, draining the gap inbox; the lead filed the bullet at validate and this
-  drain re-verified the skip at its source rather than off the gate's `spec:` line.
-  **Ruled at spec (2026-09-21):** validate keeps the accounting. It is a probe, and a static
-  widening reds ten probe-exempt gates. The landing session runs it before its commit, and an
-  unaccounted line names its remedy.
-  The skip was re-verified live at this scope; its line cite was dropped, the line having moved.
-
 - **bridged-knob-owner-for-consumer-gate** [spec: SPEC-consumer-knob-row.md] —
   every knob resolves against a static
   kit table, so a consumer-declared ported gate that needs a consumer-owned knob is refused on
@@ -2662,5 +2614,6 @@
 ## Done
 
 - join-primitive-dataflow-unasserted
+- install-disposition-smoke-accounting-split
 
 ## Lessons Learned
