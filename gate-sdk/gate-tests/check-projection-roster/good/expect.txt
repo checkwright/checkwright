@@ -1,0 +1,1 @@
+PROJECTION-ROSTER: clean (2 gate(s) declaring a projection, 2 keyed row key(s) in docs/roster.md

@@ -23,7 +23,7 @@
 40 docs/delegation-kit/index.md
 57 docs/doctrine-kit/index.md
 41 docs/drift-kit/index.md
-229 docs/enforcement.md
+230 docs/enforcement.md
 208 docs/evidence-data.md
 41 docs/evidence-kit/index.md
 58 docs/footprint.md
@@ -65,7 +65,7 @@
 121 docs/posts/2026-08-23-checkwright-v0-25-0.md
 44 docs/queue-kit/index.md
 22 docs/releases.md
-388 docs/site-architecture.md
+391 docs/site-architecture.md
 56 docs/site-kit/index.md
 49 docs/value.md
 40 drift-kit/templates/close-knowledge.md

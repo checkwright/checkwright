@@ -79,6 +79,7 @@ pub mod path_dialect;
 pub mod packed_links;
 pub mod payload_claim;
 pub mod portability_floor;
+pub mod projection_roster;
 pub mod producer_liveness;
 pub mod prose_enum;
 pub mod prose_tells;
@@ -2022,6 +2023,23 @@ pub const REGISTRY: &[GateEntry] = &[
         &["GATE_SDK_PORTABILITY_PATTERNS", "GATE_SDK_PORTABILITY_PATHS"],
         "gate-sdk",
         &[("git", "")],
+    ),
+    // spec: gate-sdk/SPEC.md §check-projection-roster — no walk root: the corpus is the registry's
+    // members resolved by name and one knob-named roster file, and expanding each member's couples=
+    // reads the knobs the descriptor corpus names
+    (
+        "check-projection-roster",
+        projection_roster::run,
+        &[],
+        &[
+            "GATE_SDK_PROJECTION_ROSTER",
+            "GATE_SDK_PROJECTION_ROSTER_SECTION",
+            "GATE_SDK_GATES_DIR",
+            "GATE_SDK_KIT_DIRS",
+            crate::registry::EVERY_COUPLES_KNOB,
+        ],
+        "gate-sdk",
+        &[],
     ),
     // spec: canon-kit/SPEC.md §check-surface-duplication — the one walk is the canonical-spec find,
     // so the bounding knob is the spec name and **not** `CANON_KIT_DUP_SURFACES`, whose members this

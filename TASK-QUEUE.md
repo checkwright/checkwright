@@ -23,15 +23,6 @@
   edit inside a kit marker block does, so couples are a sound superset.
   Filed 2026-08-18 by close; it joined `docs-first-contact` as its trigger-witness unit.
 
-- **generated-projections-roster-ungated** [spec: SPEC-projection-roster.md] — the
-  generated-projections roster gains no checked row when a projection or gate lands.
-  **Ruled at this spec:** a `# projection: <globs>` header directive on each freshness gate (eight
-  in this repo) declares the population. `check-projection-roster` (gate-sdk, armed by
-  `GATE_SDK_PROJECTION_ROSTER`) holds the rows keyed by gate name to the declaring gates, in both
-  directions. Both directions hold today. The install-toolchain and install-platforms rows are
-  parity contracts with no emitter, so they take no key.
-  Filed 2026-09-18 by spec; it joined `docs-first-contact` as its roster unit.
-
 - **site-dark-token-palette-coverage-ungated** [spec: SPEC-highlight-coverage.md] — the dark-mode
   Rouge palette in `docs/_layouts/default.html` remapped only some of the highlight classes the
   theme colours, so `.o` (shell `&&`) rendered black on the dark code background (operator report,
@@ -2637,6 +2628,7 @@
 
 ## Done
 
+- generated-projections-roster-ungated
 - install-md-adopter-page-overgrown
 - docs-index-front-door-restatement-ungenerated
 - adopter-demo-verb-missing

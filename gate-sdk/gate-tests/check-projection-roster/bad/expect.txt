@@ -1,0 +1,6 @@
+check-alpha: projection glob 'docs/alpha.md' is not covered by its own couples=
+check-alpha: declares '# projection:' but 0 row(s) in docs/roster.md carry its key
+check-beta: declares '# projection:' but 2 row(s) in docs/roster.md carry its key (lines 5, 6)
+docs/roster.md:7: key 'check-plain' names no registered gate declaring '# projection:'
+docs/roster.md:8: key 'check-ghost' names no registered gate declaring '# projection:'
+docs/roster.md:10: key 'check-alpha' is not on a top-level bullet's first line, so it keys no row

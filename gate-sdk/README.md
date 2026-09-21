@@ -149,6 +149,7 @@ check-commit-msg
 check-commit-subject
 check-tree-terms
 check-portability-floor
+check-projection-roster
 check-template-copy-parity
 check-template-registry-parity
 ```

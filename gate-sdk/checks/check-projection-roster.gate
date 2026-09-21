@@ -1,0 +1,4 @@
+# graph: couples=scripts/gates.list,scripts/*.gate,scripts/*.sh,kit:*.gate,kit:*.sh,native/src/gates/projection_roster.rs,knob:GATE_SDK_PROJECTION_ROSTER dir=one valve=none tier=precommit
+# install: zero-config
+# armed-by: GATE_SDK_PROJECTION_ROSTER
+# spec: gate-sdk/SPEC.md §check-projection-roster — every registered gate declaring '# projection:' has exactly one keyed row in the configured roster section, every key names such a gate, and each declared output is inside its gate's own couples=

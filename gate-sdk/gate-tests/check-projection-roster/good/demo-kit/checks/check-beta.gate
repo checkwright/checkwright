@@ -1,0 +1,2 @@
+# graph: couples=docs/*.md,kit:*.txt dir=one valve=none tier=precommit
+# projection: docs/beta.md,docs/gamma.md

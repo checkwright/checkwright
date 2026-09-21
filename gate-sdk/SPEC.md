@@ -232,6 +232,12 @@ naming that gate's install-path corpus. Empty is the shipped default because the
 kit cannot know any consumer's install path, and an empty corpus disables the
 assertion rather than failing it closed — the degradation and its honest limit
 are §check-portability-floor's),
+`GATE_SDK_PROJECTION_ROSTER` (default **empty**; the consumer's roster file of
+generated projections that `check-projection-roster` holds to the gates declaring
+`# projection:` — empty disarms that gate, since the kit cannot know where any
+consumer keeps its roster, see there) and `GATE_SDK_PROJECTION_ROSTER_SECTION`
+(default **empty**, meaning the whole file; the heading text of the section holding
+that roster's rows),
 `GATE_SDK_COMMIT_TYPES` (default
 `feat fix refactor perf docs test build ci chore style`; the shared
 commit-type roster — see §check-commit-subject), `GATE_SDK_EXEC_GLOBS`
@@ -1955,7 +1961,9 @@ already identifies the gate everywhere else. **The field roster is closed**, and
 every field on it has a named reader — `# graph:` by the manifest readers below,
 `# spec:` by canon-kit's `check-spec-pointer`, `# install:` by
 §check-install-disposition (ruled at §The install disposition, *and in a `.gate`
-descriptor on the same terms*), `# no-fixture:` by
+descriptor on the same terms*), `# armed-by:` by `doctor` and
+§check-install-disposition, `# projection:` by §check-projection-roster (both
+ruled at §The install disposition on the same terms), `# no-fixture:` by
 §check-gate-fixture-coverage. The descriptor carries no field that lacks one,
 reserving nothing against a future reader.
 
@@ -2536,6 +2544,22 @@ silent no-op. **Honest limit:** the declaration is taken where a member's
 disarmed state has been found, not by census; another member degrading the same
 way takes it when its own disarmed state is found.
 
+**The projection declaration.** A gate's header may also carry one
+`# projection: <globs>` line beside `# install:` and `# armed-by:`, in a `.sh`
+declaration or a `.gate` descriptor on the same terms. It declares that the gate
+**byte-compares the tracked paths `<globs>` names against a live emitter**, so those
+paths are a generated projection and this gate is its freshness gate. `<globs>` is
+comma-separated in `couples=`' literal-glob syntax and carries no `kit:` or `knob:`
+token, because an output path is the consumer's tree rather than a kit-relative
+read; it is read through `registry::PROJECTION`. **Every glob must be covered by
+the gate's own `couples=`** under the field's one matcher (§Reading a `couples=`
+field's reach), since a projection whose output the gate does not couple is one
+whose staleness the hook never triggers on. `check-projection-roster` assertion A
+is the verifier that keeps the line from being the self-declaration §The `# graph:`
+manifest refuses. Its reader is that gate, which holds a consumer's roster of
+projections to the declaring set. It is not a `# graph:` field, so no hook or
+graph reader reads it.
+
 **Where the directive deliberately does not reach.** The installer's *seeding*
 decisions stay keyed by kit, and they look like the same defect this section
 removed. They are not: they answer what a kit's install must **seed**, not what
@@ -2639,6 +2663,7 @@ holds for the same reason it always did.
 | `check-gate-binary-fresh` | **Retained by construction — and recorded here before the derivation reaches it, deliberately.** It reads declaration paths as a *set*, to decide whether the binary is load-bearing, and never reads a gate's source, so a port is its trigger rather than its blind spot: a ported member is exactly the case that switches it on. Its couples name `kit:checks/*.gate` specifically, so it was **not yet substrate-sensitive** by assertion C's runtime derivation when this row was written, with zero descriptors then on disk, and the row was not yet owed — it was written ahead of the trigger rather than left to be discovered. Descriptors have since landed, so the gate is sensitive and the row is owed; the commit that landed them would have reddened on a missing disposition, and that commit's session was the worst possible one to be learning this table exists. That is the foresight paying, and it is the same reasoning as the gate itself: the oracle ahead of the hole (§check-gate-binary-fresh). |
 | `check-gate-substrate-parity` | **Retained by construction, and `.gate`-dispatched** — it is substrate-sensitive by the same derivation it performs, and it reads declaration paths both as text and as a *set*, which is precisely what it exists to see, so this row now describes the auditor of the dispatch relation auditing itself. It ported under the ruling that retired born-native exception class (a): the shell form already read one side of its comparison through `--list`, so the auditor's independence from the binary was never more than the absent-binary case, which the fail-closed contract owns — and compiled, that case has no reachable input, the binary being the process the assertion runs in. The port moves nothing in the rule: the descriptor set is still globbed off the resolve dirs and the roster is still the binary's, reached in process rather than through a spawn (§check-gate-substrate-parity). Its own row is written out rather than left to the section's prose mention: assertion C is satisfied by any occurrence of a member's name in this section, and a gate passing its own assertion by being *discussed* is a coincidence, not a disposition. Assertion G's widening to the tracked shell tree adds **no** member here, and the absence is a ruling rather than an omission: the corpus is one this gate now walks itself, so there is no further member whose disposition the widening puts in question. |
 | `check-install-disposition` | **Retained, and substrate-blind by construction** — it reads both declaration spellings as text, taking the `# install:` header line off a `.gate` descriptor exactly as off a `.sh` implementation, because a ported gate is still a gate a kit ships and its disposition is a property of the gate rather than of its substrate (§The install disposition). A port therefore moves nothing here: the declaration travels with the descriptor, which is the same file the installer's payload already carries. It is **`.gate`-dispatched**, ported with its sibling auditor under the ruling that retired born-native exception class (a): the assertion that a gate declares itself is a text walk over both declaration spellings, and a binary that is absent cannot pass it silently — the battery exits 2 rather than skipping (§Fail-closed contract). What its own port moved is one number rather than any part of its rule — its clean line counts one fewer `.sh` and one more `.gate`, which is the substrate-blindness above measured rather than asserted. |
+| `check-projection-roster` | **Born native and substrate-blind** — it reads the `# projection:` header line as text off whichever declaration spelling the registry's resolve order finds, exactly as `check-install-disposition` reads `# install:`, so a port moves nothing in its rule. Its `couples=` names the declaration paths only because a new or edited declaration is its subject (§check-projection-roster). |
 | `check-docs-cmd`, `check-install-claim`, `check-payload-claim`, `check-queue-slug-liveness` | **Survive unchanged — reverse triggers.** Each names `scripts/*.sh`/`kit:*.sh` in `couples=` only so that a script change re-runs it; the corpus each actually scans is the governed-doc set, and none reads a gate script's *content* as its assertion target. `check-docs-cmd` is worth naming: it correctly — not vacuously — reds on a doc that still fences an invocation of a deleted `.sh` path after a port, and on an inline citation of any retired path outside a history valve (canon-kit/SPEC.md §check-docs-cmd assertion C). A mention written outside every code span stays unscanned, and that residue is the close-stage audit roster's. The citation arm exists because the fenced scan alone once let a port whose deleted tool had roughly fifty unfenced doc mentions pass with zero reds. Every member of this row is a ported one, so the row describes `.gate`-declared gates throughout; the reasoning is unaffected, because what they scan is the governed-doc set rather than any gate's content. |
 | `check-settings-paths` | **Survives unchanged — reverse trigger, and a port is its subject rather than its blind spot.** Its `couples=` names `kit:checks/*.sh` only so that a check-script edit re-runs it; what it scans is the committed permission allow-list, never a gate script's content. A port is the event it exists for: replacing `checks/<gate>.sh` with a descriptor strands every allow entry naming the old path, so the gate reddens *because* of a port rather than falling silent after one — the shape `check-docs-cmd` has in the row above. Two limits are recorded rather than left to be re-derived. The glob is deliberately not widened to `*.gate`, because a descriptor path is not something a `Bash(…)` grant invokes and the widening would add no assertion. And the trigger is a **partial route by construction**: the generated hook matches staged `ACMR` paths, so a *deleted* `.sh` never fires it; what catches a cohort's stranded grants is the whole-tree battery, which runs with no trigger filter. The trigger still earns its place — it catches the ordinary edit that strands a grant — but it is not what makes the gate's landing order necessary (context-kit/SPEC.md §check-settings-paths). **This member is itself `.gate`-dispatched**, so the row describes a ported gate: the reverse trigger and both limits above are properties of its rule, not of its substrate, and survived the port unchanged. |
 | `check-prose-enum` | **Corpus extended to the Rust module — it was never a pure reverse trigger.** This gate was grouped with the reverse triggers above on the ground that none of them reads a gate's *content*; that ground was **false for this one**, and the queue-kit port is what exposed it. Its enum derivation (`--emit-enum-sets`) reads the queue tag vocabulary out of `check-tag-lead-line`'s own class table, deliberately — *"read from the gate rather than re-listed here, so a rename cannot leave the two spellings disagreeing"* — so deleting that gate's script broke the derivation and the gate exited 2 rather than passing vacuously, which is the fail-closed behavior working. The corpus follows the rule to where it now lives, `native/src/gates/tag_lead_line.rs`'s `CLASSES` table. **The derivation has gone in-crate and *references* that table rather than reading the module as text**, so the read-from-the-owner property holds by construction and the one-table fail-closed anchor retires with the text parse whose ambiguity it existed to refuse. **The gate is itself a ported member**, so a gate whose input is a gate's content is now gate content — and its own derivation still reads the configured producer's output as *data* rather than as an in-process call, because resolving the bundled producer for a consumer who configured a different one would void the extension point the knob protects. |
@@ -5943,11 +5968,15 @@ have gone **green over an arm with no implementation** — the same vacuity the
 door. A cohort is sized off what its members *execute*, never off what their
 fixtures reach.
 
-**The generated-projection freshness family, derived per member rather than
-labelled.** Its members byte-compare a tracked projection against a live
-`bash <emitter> --emit`: `check-footprint-fresh`, `check-trajectory-fresh`,
-`check-enforcement-fresh`, `check-value-rollup-fresh`, `check-docs-mirror-fresh`,
-`check-roadmap-fresh`. **The family is closed 6/6.** On the per-member key the
+**The generated-projection freshness family, declared rather than derived in
+prose.** Its members byte-compare a tracked projection against a live emitter,
+and each one says so in its own header's `# projection:` line (§The install
+disposition), which `check-projection-roster` reads. The port record below
+covers the six whose emitters were shell: `check-footprint-fresh`,
+`check-trajectory-fresh`, `check-enforcement-fresh`, `check-value-rollup-fresh`,
+`check-docs-mirror-fresh`, `check-roadmap-fresh`. The other two declaring members,
+`check-install-evidence-fresh` and `check-graph`, sit outside that record.
+**The family is closed 6/6.** On the per-member key the
 relabel above fixes — *is this gate's emitter ported?* — no shell emitter is left:
 footprint, enforcement-map and the value-rollup join went first, and
 `scripts/gen-docs-mirror.sh` (127 lines), `drift-kit/bin/trajectory.sh` (242) and <!-- manifest-temporal-exempt: port record of the retired shell emitters -->
@@ -18375,6 +18404,66 @@ CI, and the `--run-gate-tests` arm through the fixture pair. Its inputs are the
 two knobs, whose producer is `lib/gate.sh`'s resolution and whose enabling
 configuration this repo actually sets, so the gate is live in this tree and not
 only in fixtures.
+
+### check-projection-roster
+
+`checks/check-projection-roster.gate` (`precommit`, binary-dispatched, `# install:
+zero-config`, `# armed-by: GATE_SDK_PROJECTION_ROSTER`). Invariant: a consumer's
+roster of generated projections gains a checked row whenever a projection lands.
+The population is declared at its source, each freshness gate's `# projection:`
+line (§The install disposition), and the roster is the section
+`GATE_SDK_PROJECTION_ROSTER_SECTION` names in the file `GATE_SDK_PROJECTION_ROSTER`
+names (§Layout and configuration). The corpus is every registered member's header,
+resolved by name through the gates dir and the kit roots, and that one section.
+
+- **A.** A declaring member carries one `# projection:` line with at least one
+  glob, no glob carries a `couples=` prefix, and every glob is covered by the
+  member's own expanded `couples=` under the field's one matcher (§Reading a
+  `couples=` field's reach).
+- **B.** Every declaring member has **exactly one** row carrying its key. A row
+  is a top-level `- ` bullet, and its key is `<!-- projection: <gate> -->` on the
+  bullet's first line. One row may carry several keys, so a row describing
+  several gates serves each of them.
+- **C.** Every key on a row's first line names a registered member that declares
+  `# projection:`, so a row keyed to a renamed or deregistered gate, or to one
+  that declares no projection, reds. A key anywhere else in the section keys no row, and it reds too.
+
+Rows without a key are not constrained: advisory fan-outs, parity contracts with
+no emitter, and ungated notes sit in the same section. Exit 1 names, per finding,
+the gate and the uncovered glob (A), the gate and the count of keyed rows found
+with their lines (B), or the key and its line (C). The clean line counts declaring
+gates and keyed rows, so an armed roster over zero declarations prints `0` rather
+than passing silently. Exit 2 is the fail-closed set: the roster file absent, the
+section heading not found, a registered member that does not resolve or cannot be
+read, and a `couples=` that does not expand. The section is the heading whose text
+equals the knob, bounded by the next heading of its level or shallower; an empty
+section knob means the whole file.
+
+**The file path is config, never a kit literal.** The kit cannot know where a
+consumer keeps its roster, so the kit ships the mechanism and an empty default,
+and an empty `GATE_SDK_PROJECTION_ROSTER` disarms the gate: it still runs and
+prints a clean line saying nothing was asserted, and `doctor` names it disarmed
+(§The install disposition). Assertion A runs only while the gate is armed, since
+its only consumer is the roster the knob names.
+
+**Honest limit.** The gate holds the roster's rows to the declarations; it cannot
+tell a freshness gate that should declare and does not. That half rests on the
+declaration being the author's step when a projection lands, which is why a
+consumer's roster names it in its new-gate fan-out.
+
+Fixtures: `good/` holds a declaring member in the gates dir and one under a kit
+root whose row keys two outputs, an undeclaring member, unkeyed rows, a deeper
+heading inside the section and a key outside it that is not read. `bad/` holds an
+uncovered glob, a declaring member with no row, one with two rows, a key naming an
+undeclaring member, one naming an unregistered name and a key off a bullet's first
+line, each its own `expect.txt` line.
+
+Producer of nothing but a verdict; its consumers are the committing session
+through the output contract, on the generated pre-commit hook, `run-gates.sh` and
+CI, and the `--run-gate-tests` arm through the fixture pair. Its `couples=`
+carries `knob:GATE_SDK_PROJECTION_ROSTER` beside the descriptor globs, so a roster
+edit re-runs it. This repo sets both knobs, so the gate is live here and not only
+in fixtures.
 
 ### check-template-copy-parity
 

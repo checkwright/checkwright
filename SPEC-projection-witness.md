@@ -12,8 +12,9 @@ This amendment makes two changes:
 - It adds a differential witness that tests that declaration against the
   emitter by perturbing the tree and re-running the gate.
 
-The witness reads the `# projection:` membership that SPEC-projection-roster.md
-mints, so the two share one declaration, as their entries anticipated.
+The witness reads the `# projection:` membership that gate-sdk/SPEC.md §The
+install disposition declares and §check-projection-roster holds, so the two share
+one declaration, as their entries anticipated.
 
 **The open part the entry named, the row-to-class binding, is derived and not
 written.** A freshness gate's manifest already declares the paths whose change
@@ -61,8 +62,8 @@ config) and this repo's `docs/` roster.
 
 ## What changes
 
-**Batching.** Delta 1 lands first, or with SPEC-projection-roster.md's delta 1,
-because it reads `# projection:`. Deltas 2 and 3 ride with it.
+**Batching.** Delta 1 lands after the `# projection:` declaration, which has
+landed, because it reads it. Deltas 2 and 3 ride with it.
 
 ### (1) `--projection-witness` perturbs outside each projection's trigger set and asserts the gate stays green {design-bearing}
 
@@ -128,7 +129,7 @@ run whose class set came out empty prints zeros and is not mistaken for coverage
 ### (2) The roster rows stop restating the trigger {mechanical}
 
 **Not yet applied.** In docs/site-architecture.md §Generated projections, each
-keyed projection row (SPEC-projection-roster.md delta 4) is re-phrased so it
+keyed projection row (gate-sdk/SPEC.md §check-projection-roster) is re-phrased so it
 drops its trigger-class sentence. It keeps:
 
 - the output;
@@ -158,8 +159,7 @@ Mechanical: two knob lines.
 ## Producers and consumers
 
 - **`--projection-witness` (delta 1).** Producer: the arm table row. Enabling
-  configuration: `# projection:` lines, which SPEC-projection-roster.md delta 4
-  sets on eight gates in this repo. So the arm is live here and not dead outside
+  configuration: `# projection:` lines, which eight gates in this repo carry. So the arm is live here and not dead outside
   its tests. Consumers:
   - the `projection_witness` validate suite (delta 3), which reads the exit code;
   - a person reading the `coupled but inert` lines.
@@ -177,7 +177,7 @@ Mechanical: two knob lines.
   the arm's loop.
 - **The suite (delta 3).** Producer: the knob lines. Consumer: `--run-validate`,
   at the validate stage.
-- **Point 6.** The member corpus is SPEC-projection-roster.md's eight gates, and
+- **Point 6.** The member corpus is the eight declaring gates, and
   each one's satisfying value is its own baseline-green state. That holds at HEAD,
   because the battery is green. No member is narrowed past.
 
