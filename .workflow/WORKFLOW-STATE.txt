@@ -8,3 +8,4 @@ delegation-seams scope a9520f7d 2026-09-21 c4f65fc0
 delegation-seams spec a9dfc58e 2026-09-21 0d2ebdaf
 delegation-seams align ae798ca3 2026-09-21 833cb696
 delegation-seams build aace24dc 2026-09-21 fac66e95
+delegation-seams build a7ca75ad 2026-09-21 cb2143a1
