@@ -327,10 +327,11 @@ fn scratch_root() -> Result<PathBuf, String> {
 // repository locators, is stripped from both halves' environment: the case sets what it measures
 fn inherited_knobs() -> Vec<String> {
     let prefixes: Vec<String> = crate::knobs::STATIC_KITS.iter().map(|k| k.prefix()).collect();
-    let git = ["GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_PREFIX", "GIT_COMMON_DIR"];
     std::env::vars_os()
         .filter_map(|(k, _)| k.into_string().ok())
-        .filter(|k| prefixes.iter().any(|p| k.starts_with(p.as_str())) || git.contains(&k.as_str()))
+        .filter(|k| {
+            prefixes.iter().any(|p| k.starts_with(p.as_str())) || crate::proc::GIT_REPO_LOCATORS.contains(&k.as_str())
+        })
         .collect()
 }
 

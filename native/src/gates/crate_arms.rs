@@ -68,8 +68,8 @@ fn arm(label: &str, crate_dir: &str, argv: &[&str]) -> Result<bool, String> {
 }
 
 // spec: gate-sdk/SPEC.md §check-crate-arms — the fixture arm: every derived suite through the
-// runner, a failing suite's report printed whole with its one-suite re-run command, and a suite
-// whose tests dir holds the working directory skipped, since that is a case of its own run
+// runner under an environment stripped of git's repository locators, a failing suite's report
+// printed whole with its re-run command, and a suite holding the working directory skipped
 fn fixture_arm(runner: &Program, suites: &[(String, String, String)], here: &str) -> Result<(bool, usize), String> {
     let (mut ok, mut ran) = (true, 0usize);
     for (suite, tests, checks) in suites {
@@ -81,7 +81,7 @@ fn fixture_arm(runner: &Program, suites: &[(String, String, String)], here: &str
         if !checks.is_empty() {
             argv.push(checks.as_str());
         }
-        let m = proc::run_merged(runner, &argv)?;
+        let m = proc::run_merged_without(runner, &argv, proc::GIT_REPO_LOCATORS)?;
         if m.succeeded() {
             continue;
         }
@@ -267,28 +267,45 @@ mod tests {
         assert!(a.starts_with(".tmp/crate-arms-") && a.ends_with(".green"), "{}", a);
     }
 
+    // spec: gate-sdk/SPEC.md §check-crate-arms — the stub is exec'd only once no process can hold
+    // it open for writing: a sibling test thread forking while it was being written keeps a copy
+    // of the write descriptor until that child execs, and a spawn meanwhile fails ETXTBSY
+    #[cfg(unix)]
+    fn stub_runner(dir: &std::path::Path, body: &str) -> Program {
+        use std::os::unix::fs::PermissionsExt;
+        let stub = dir.join("runner");
+        std::fs::write(&stub, body).expect("stub runner");
+        std::fs::set_permissions(&stub, std::fs::Permissions::from_mode(0o755)).expect("exec bit");
+        const ETXTBSY: i32 = 26;
+        for _ in 0..200 {
+            match std::process::Command::new(&stub).arg("--probe").output() {
+                Err(e) if e.raw_os_error() == Some(ETXTBSY) => {
+                    std::thread::sleep(std::time::Duration::from_millis(10))
+                }
+                Err(e) => panic!("cannot run the stub runner: {}", e),
+                Ok(_) => return programs::CHECKWRIGHT_GATES.at(stub.display().to_string()),
+            }
+        }
+        panic!("the stub runner stayed busy for two seconds");
+    }
+
     // spec: gate-sdk/SPEC.md §check-crate-arms — a failing suite reds the fixture arm whatever its
     // siblings said, and a suite holding the working directory is skipped; the stub stands in for
     // the binary, whose case verdicts §run-gate-tests' own pair holds
     #[cfg(unix)]
     #[test]
     fn a_failing_fixture_suite_reds_the_arm_and_a_suite_never_reenters_itself() {
-        use std::os::unix::fs::PermissionsExt;
         let dir = std::env::temp_dir().join(format!("crate-arms-fixture-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         for d in ["passing/gate-tests", "failing/gate-tests", "own/gate-tests/check-x/bad"] {
             std::fs::create_dir_all(dir.join(d)).expect("synthetic suite dir");
         }
-        let stub = dir.join("runner");
-        std::fs::write(
-            &stub,
+        let runner = stub_runner(
+            &dir,
             "#!/bin/sh\ncase \"$2\" in *failing*) echo '  FAIL: check-x bad expected exit 1, got 0'; exit 1;; esac\necho 'GATE-TESTS: clean (1 pairs, 0 unit tests)'\n",
-        )
-        .expect("stub runner");
-        std::fs::set_permissions(&stub, std::fs::Permissions::from_mode(0o755)).expect("exec bit");
+        );
         let root = dir.display().to_string();
         let row = |s: &str| (s.to_string(), format!("{}/{}/gate-tests", root, s), String::new());
-        let runner = programs::CHECKWRIGHT_GATES.at(stub.display().to_string());
         let here = format!("{}/own/gate-tests/check-x/bad", root);
 
         let green = fixture_arm(&runner, &[row("passing")], &here).expect("arm ran");
@@ -296,6 +313,35 @@ mod tests {
         let red = fixture_arm(&runner, &[row("passing"), row("failing"), row("own")], &here).expect("arm ran");
         assert_eq!(red, (false, 2), "the failing suite must red the arm, and the suite holding the cwd must not run");
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: gate-sdk/SPEC.md §check-crate-arms — a suite never inherits the hook's repository
+    // locators. `GIT_PREFIX` stands in for the set because nothing in the tree, git included,
+    // reads it, so writing it process-wide cannot perturb a sibling test's git.
+    #[cfg(unix)]
+    #[test]
+    fn a_fixture_suite_never_inherits_the_hooks_repository_locators() {
+        let dir = std::env::temp_dir().join(format!("crate-arms-locators-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(dir.join("suite/gate-tests")).expect("synthetic suite dir");
+        let runner = stub_runner(
+            &dir,
+            "#!/bin/sh\n[ -n \"${GIT_PREFIX+set}\" ] && { echo 'inherited GIT_PREFIX'; exit 1; }\nexit 0\n",
+        );
+        let row = (
+            "suite".to_string(),
+            format!("{}/suite/gate-tests", dir.display()),
+            String::new(),
+        );
+        let verdict = {
+            let knobs = crate::knobenv::lock();
+            knobs.set("GIT_PREFIX", "leaked/");
+            let v = fixture_arm(&runner, &[row], &dir.display().to_string());
+            knobs.remove("GIT_PREFIX");
+            v
+        };
+        let _ = std::fs::remove_dir_all(&dir);
+        assert_eq!(verdict.expect("arm ran"), (true, 1), "the suite saw a repository locator the hook exported");
     }
 
     // spec: gate-sdk/SPEC.md §check-crate-arms — an absent program contributes an empty version

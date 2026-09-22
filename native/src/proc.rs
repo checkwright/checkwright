@@ -390,6 +390,16 @@ pub fn run_merged(program: &Program, args: &[&str]) -> Result<Merged, String> {
     run_merged_in(program, args, &[], None)
 }
 
+// spec: gate-sdk/SPEC.md §check-crate-arms — the variables git exports to a hook that name a
+// repository; a child inheriting them reads the hook's repository instead of its own
+pub const GIT_REPO_LOCATORS: &[&str] = &["GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_PREFIX", "GIT_COMMON_DIR"];
+
+// spec: gate-sdk/SPEC.md §check-crate-arms — `run_merged` with names stripped from the child's
+// environment, the one shape it cannot carry: a suite spawned under a hook must not inherit it
+pub fn run_merged_without(program: &Program, args: &[&str], unset: &[&str]) -> Result<Merged, String> {
+    merged(program, args, &[], None, false, unset)
+}
+
 // spec: gate-sdk/SPEC.md §run-gate-tests — `run_merged` with the child's own working directory and
 // environment additions, the one shape `run_merged` cannot carry: a fixture case runs *inside* its
 // own case dir, and setting the caller's cwd instead would be process-global.
@@ -399,7 +409,7 @@ pub fn run_merged_in(
     env: &[(String, String)],
     cwd: Option<&std::path::Path>,
 ) -> Result<Merged, String> {
-    merged(program, args, env, cwd, false)
+    merged(program, args, env, cwd, false, &[])
 }
 
 // spec: canon-kit/SPEC.md §check-fence-run — `run_merged_in` whose child inherits no variable at
@@ -410,7 +420,7 @@ pub fn run_merged_isolated(
     env: &[(String, String)],
     cwd: &std::path::Path,
 ) -> Result<Merged, String> {
-    merged(program, args, env, Some(cwd), true)
+    merged(program, args, env, Some(cwd), true, &[])
 }
 
 fn merged(
@@ -419,6 +429,7 @@ fn merged(
     env: &[(String, String)],
     cwd: Option<&std::path::Path>,
     isolated: bool,
+    unset: &[&str],
 ) -> Result<Merged, String> {
     #[cfg(test)]
     recorder::note(program.invocation());
@@ -442,6 +453,9 @@ fn merged(
         .stderr(std::process::Stdio::from(err));
     if isolated {
         cmd.env_clear();
+    }
+    for k in unset {
+        cmd.env_remove(k);
     }
     for (k, v) in env {
         cmd.env(k, v);
