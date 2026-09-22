@@ -1,6 +1,6 @@
 # SPEC amendment: queue-headings
 
-**Merge order:** after `SPEC-md-unwrap.md`. The first entry below is blocked on that amendment's entry, and delta 6 unwraps the queue with that amendment's arm.
+**Merge order:** after the md-unwrap amendment, merged into canon-kit/SPEC.md §check-md-unwrapped and queue-kit/SPEC.md §check-queue-entry-budget. Delta 6 unwraps the queue with the `--emit md-unwrap` arm canon-kit/SPEC.md §check-md-unwrapped owns.
 
 This amendment pairs three entries.
 
@@ -75,7 +75,7 @@ Each binding keeps its one clause and gains no grounds.
 
 canon-kit/SPEC.md §The amendment lifecycle's attribute paragraph, "What no lead-line reader consumes stays a body declaration, which is why `recurrence:` is one: its readers scan a line of its own", becomes "What no lead-line reader consumes stays prose".
 
-§check-queue-entry-budget's declaration discount is retired: with no declaration lines left, the size is the whole extent, the tag line included. A recurrence tag costs one date per re-filing, under 1% of the cap. The `SPEC-md-unwrap.md` default of `4300cp` admits every entry measured with every line counted. Assertion (D) ("no body line led by `ruled:`") becomes "no `[ruled:` tag".
+§check-queue-entry-budget's declaration discount is retired: with no declaration lines left, the size is the whole extent, the tag line included. A recurrence tag costs one date per re-filing, under 1% of the cap. The `QUEUE_KIT_ENTRY_CAP` default of `4300cp` admits every entry measured with every line counted. Assertion (D) ("no body line led by `ruled:`") becomes "no `[ruled:` tag".
 
 ### (3) The shared adapters and every in-crate reader re-key onto the heading grammar {design-bearing}
 
@@ -141,7 +141,7 @@ In §The tag algebra's `[drain-exempt:]` bullet, "while `check-queue-wrap` caps 
 - **The roadmap link** (delta 5). Produced by the roadmap arm. Consumed by the public page reader, with `check-md-refs` as its liveness.
 - **The three former declarations as tags** (delta 2). Their producers are unchanged: the filing session for `[roadmap-summary:]`, a session judging a recurrence (close's drain among them) for `[recurrence:]`, and a session recording a standing fact for `[not-icebox-eligible:]`. Their readers are named in delta 3, and the recurrence array is read twice. Its **count** is read by the scope pre-emption threshold and `kpi-incident-recurrence`. Its **last element** is read by the icebox age limb. Every field has a reader. The dropped slug field lost both of its readers, the hygiene duplicate axis and the one-grep resolution, which is why it goes.
 - **The migration arm** (delta 6). Its consumers are this repo's conversion and a consumer's upgrade. Its postcondition is its test.
-- **Point 5, narrowing.** Retiring the deferred `###` subsections narrows the grammar. The only reader of a subsection was `queue_index.rs`'s tally, which is deleted with it, and that reader asserted no count. The `Lessons` exclusion in the gap resolver drops because the grammar now excludes lessons. Its red condition (none; it prompts) is unchanged. Deregistering `check-queue-wrap` here removes a red condition deliberately, and no other reader counts on it, since the entry cap is in code points under `SPEC-md-unwrap.md`.
+- **Point 5, narrowing.** Retiring the deferred `###` subsections narrows the grammar. The only reader of a subsection was `queue_index.rs`'s tally, which is deleted with it, and that reader asserted no count. The `Lessons` exclusion in the gap resolver drops because the grammar now excludes lessons. Its red condition (none; it prompts) is unchanged. Deregistering `check-queue-wrap` here removes a red condition deliberately, and no other reader counts on it, since this repo's entry cap is in code points (queue-kit/SPEC.md §check-queue-entry-budget).
 - **Point 6.** Delta 5's obligation over the 44 citations and delta 6's over the fixture corpus are enumerated by the named probes, with each member's value named.
 
 ## Existing sections updated
@@ -198,7 +198,7 @@ Rosters from the reader sweep named above, `git grep -n -E "\- \*\*<slug>\*\*|- 
 - [ ] **Causal completeness.** Every point of canon-kit/SPEC.md §The causal-completeness check holds for the ratchet, the heading grammar, assertion R, the link claim and the migration arm.
 - [ ] **Instruction surfaces: instruction only.** The two bindings gain one clause each, with no grounds.
 - [ ] **Merged with no information lost.** Each grammar passage is re-phrased, not appended to. The migration loses no slug, tag, declaration or prose, and its postcondition test holds that.
-- [ ] **Order held.** Delta 1 lands before any heading exists. Delta 6's conversion lands after deltas 2 to 5, and after `SPEC-md-unwrap.md` merges.
+- [ ] **Order held.** Delta 1 lands before any heading exists. Delta 6's conversion lands after deltas 2 to 5, and after the md-unwrap amendment merged.
 - [ ] **Amendment deleted.** This file is removed on merge (`ls queue-kit/SPEC-*.md`).
 - [ ] **Entries moved.** `queue-entry-shape-slugs-headings-links`, `icebox-eviction-line-budget-squeeze` and `lead-line-blocked-by-spec-tag-width-collision` move to Done in the merge commit, at a stage before the drain stage, and their links rewrite per delta 5.
 - [ ] **Removals propagated.** `check-amendment-retired-spelling` runs the block above.

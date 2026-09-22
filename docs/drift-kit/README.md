@@ -6,32 +6,13 @@ generated: true
 <!-- door-contributor: a generated mirror of a kit's own contributor source; every door on the page is that source's, and the banner above is the regeneration recipe -->
 # drift-kit
 
-Drift reporting for coding-agent sessions. Gates block what a single diff makes
-mechanically decidable; **drift is what accumulates between commits** — a
-backlog ages, an always-loaded surface swells, friction recurs, and every
-stateless session looks fine because none of them ever sees the slope. drift-kit
-is that trend surface: an advisory `--emit drift-report` arm that collates pluggable
-KPIs from the other kits' governed surfaces, groups them under honest weight
-labels (**lead** — act before drift compounds; **lag** — undercounts by
-construction), and emits a one-line trend summary the session-start hook injects,
-so every session opens seeing the slope it cannot otherwise see.
+Drift reporting for coding-agent sessions. Gates block what a single diff makes mechanically decidable; **drift is what accumulates between commits** — a backlog ages, an always-loaded surface swells, friction recurs, and every stateless session looks fine because none of them ever sees the slope. drift-kit is that trend surface: an advisory `--emit drift-report` arm that collates pluggable KPIs from the other kits' governed surfaces, groups them under honest weight labels (**lead** — act before drift compounds; **lag** — undercounts by construction), and emits a one-line trend summary the session-start hook injects, so every session opens seeing the slope it cannot otherwise see.
 
-Advisory by construction: the report exits 0, never fails a session, and reads
-**trend, not level** — a KPI's absolute value is noise; its direction across
-sessions is the signal. See [SPEC.md](SPEC.md) for the report frame, the plugin
-contract, the bundled KPI set, and the knowledge-friction loop.
+Advisory by construction: the report exits 0, never fails a session, and reads **trend, not level** — a KPI's absolute value is noise; its direction across sessions is the signal. See [SPEC.md](SPEC.md) for the report frame, the plugin contract, the bundled KPI set, and the knowledge-friction loop.
 
-An installer-vendored tree does not carry this file. The payload withholds each
-kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is
-repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is
-packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer
-payload).
+An installer-vendored tree does not carry this file. The payload withholds each kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
 
-Like [guard-kit](https://github.com/checkwright/checkwright/tree/master/guard-kit/), drift-kit registers **no gates**: its surface
-is a set of advisory `--emit` arms and a KPI registry, so nothing joins
-`gates.list`. It
-follows gate-sdk's resolution and smoke conventions without depending on its
-registry.
+Like [guard-kit](https://github.com/checkwright/checkwright/tree/master/guard-kit/), drift-kit registers **no gates**: its surface is a set of advisory `--emit` arms and a KPI registry, so nothing joins `gates.list`. It follows gate-sdk's resolution and smoke conventions without depending on its registry.
 
 ## Install
 
@@ -44,42 +25,18 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    cp drift-kit/templates/drift-config.knobs scripts/drift-config.knobs   # optional
    ```
 
-   Prune `scripts/kpis.list` to the KPIs whose surfaces your repo has; each
-   bundled KPI degrades to a visible `n/a` row when its surface is absent, so an
-   over-broad registry is safe but noisy.
+   Prune `scripts/kpis.list` to the KPIs whose surfaces your repo has; each bundled KPI degrades to a visible `n/a` row when its surface is absent, so an over-broad registry is safe but noisy.
 
-2. Wire the trend line — point context-kit's session-context hook at the report
-   by setting `CONTEXT_KIT_DRIFT_REPORT` to the arm name `drift-report` (or the
-   `DRIFT_ARM` default in your hook copy). The hook runs the arm with `--trend`
-   and prints one line; absent the variable, the line is silently skipped.
+2. Wire the trend line — point context-kit's session-context hook at the report by setting `CONTEXT_KIT_DRIFT_REPORT` to the arm name `drift-report` (or the `DRIFT_ARM` default in your hook copy). The hook runs the arm with `--trend` and prints one line; absent the variable, the line is silently skipped.
 
-Configuration follows the established kit pattern — override any knob in
-`drift-config.knobs` (registry path, extra KPI dirs, the queue/log/timings surfaces,
-the metric dir holding the persistent trend logs, the Done/Deferred section
-headings); defaults are this repo's layout. Keep the metric dir
-(`DRIFT_KIT_METRIC_DIR`; drift-kit/SPEC.md §Layout and configuration owns the
-default) gitignored — its trend samples carry account and session identifiers.
+Configuration follows the established kit pattern — override any knob in `drift-config.knobs` (registry path, extra KPI dirs, the queue/log/timings surfaces, the metric dir holding the persistent trend logs, the Done/Deferred section headings); defaults are this repo's layout. Keep the metric dir (`DRIFT_KIT_METRIC_DIR`; drift-kit/SPEC.md §Layout and configuration owns the default) gitignored — its trend samples carry account and session identifiers.
 
 ### The knowledge-friction loop (optional)
 
-`kpi-knowledge-friction` measures re-derivations a session had to make because no
-doc owned the fact (drift-kit/SPEC.md §The knowledge-friction loop). It shows
-`n/a` until you install the capture half:
+`kpi-knowledge-friction` measures re-derivations a session had to make because no doc owned the fact (drift-kit/SPEC.md §The knowledge-friction loop). It shows `n/a` until you install the capture half:
 
-1. Add one bullet to your always-loaded instructions file: *the moment you catch
-   yourself re-deriving a fact off a non-owning surface, append*
-   `<date> <fact> ← <surface>` *to `.workflow/knowledge-friction.log`.* That
-   bullet is the loop's only hook — earn its cost by the log actually filling.
-   The `--emit kfric [--] "<fact>" "<surface>"` arm on the gate binary
-   `GATE_SDK_NATIVE_BIN` names is the shipped affordance that stamps that
-   grammar prompt-free — both fields required
-   non-empty in that order, `--` files one beginning with a dash, and no per-arm
-   `--help`: the usage is here and in the SPEC. Raw append stays legal
-   (drift-kit/SPEC.md §The knowledge-friction loop).
-2. Gitignore the log (per-iteration scratch), and splice
-   `templates/close-knowledge.md` into your close skill so each entry is
-   re-verified, becomes the tiering edit or the correction that outcome selects,
-   and the log is cleared — its reclaim path.
+1. Add one bullet to your always-loaded instructions file: *the moment you catch yourself re-deriving a fact off a non-owning surface, append* `<date> <fact> ← <surface>` *to `.workflow/knowledge-friction.log`.* That bullet is the loop's only hook — earn its cost by the log actually filling. The `--emit kfric [--] "<fact>" "<surface>"` arm on the gate binary `GATE_SDK_NATIVE_BIN` names is the shipped affordance that stamps that grammar prompt-free — both fields required non-empty in that order, `--` files one beginning with a dash, and no per-arm `--help`: the usage is here and in the SPEC. Raw append stays legal (drift-kit/SPEC.md §The knowledge-friction loop).
+2. Gitignore the log (per-iteration scratch), and splice `templates/close-knowledge.md` into your close skill so each entry is re-verified, becomes the tiering edit or the correction that outcome selects, and the log is cleared — its reclaim path.
 
 ## Use
 
@@ -97,63 +54,17 @@ Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
 "$gates" --emit install-evidence  # the aggregate-only projection over that record, for a consumer to pin behind a freshness gate
 ```
 
-`--emit overhead-meter` is the overhead meter (drift-kit/SPEC.md §The overhead
-meter): a byte-proxy over a session transcript that reports what fraction of the
-volume was governance versus task work, logging one line per session for
-`kpi-overhead` — the methodology's own cost, measured so efficiency claims cut
-both ways. Advisory and content-free: it emits counts only, never transcript
-text.
+`--emit overhead-meter` is the overhead meter (drift-kit/SPEC.md §The overhead meter): a byte-proxy over a session transcript that reports what fraction of the volume was governance versus task work, logging one line per session for `kpi-overhead` — the methodology's own cost, measured so efficiency claims cut both ways. Advisory and content-free: it emits counts only, never transcript text.
 
-The `trajectory` emit arm is the published-evidence extractor (drift-kit/SPEC.md §The
-published-evidence extractor): a pure function of committed git history that
-emits one row per closed iteration — stages run, commit shape, amendment
-latency, validate attestations, gate-roster growth — for a consumer to pin
-behind a freshness gate.
+The `trajectory` emit arm is the published-evidence extractor (drift-kit/SPEC.md §The published-evidence extractor): a pure function of committed git history that emits one row per closed iteration — stages run, commit shape, amendment latency, validate attestations, gate-roster growth — for a consumer to pin behind a freshness gate.
 
-`--emit queue-flow` is the queue-flow arm (drift-kit/SPEC.md §The queue-flow
-arm): `kpi-queue-net-delta`'s filed and drained counts over each of the trailing
-closed iterations, and their mean inflow, the figure a scope session weighs a
-unit set against.
+`--emit queue-flow` is the queue-flow arm (drift-kit/SPEC.md §The queue-flow arm): `kpi-queue-net-delta`'s filed and drained counts over each of the trailing closed iterations, and their mean inflow, the figure a scope session weighs a unit set against.
 
-`--emit stage-economics` is the stage-economics meter (drift-kit/SPEC.md §The
-stage-economics meter): it prices real spend by lifecycle stage × model ×
-iteration by joining WORKFLOW-STATE stamps to their session transcripts to a
-consumer-supplied price table, keeping the cache-read burn lever visible
-close-over-close. Copy `templates/price-table.tsv` beside your gates dir and fill
-your model roster (the roster is consumer config, never a kit literal — the
-provenance seam); absent it, cost degrades to `n/a` and tokens still report. The
-`/economics` skill (`templates/economics.md`, materialized as
-`.claude/commands/economics.md`) chains overhead-meter → stage-economics into
-one post-iteration cost narrative — a reporting ritual the close skill may
-invoke, not a lifecycle stage and not a gate. If your decisions read the log, run
-the meter at your terminal stage — its rows are dated by their stamps, so a re-run
-at every close re-dates nothing — and `kpi-stage-economics-lag` shows how many
-closes have gone unpriced when that feed is skipped.
+`--emit stage-economics` is the stage-economics meter (drift-kit/SPEC.md §The stage-economics meter): it prices real spend by lifecycle stage × model × iteration by joining WORKFLOW-STATE stamps to their session transcripts to a consumer-supplied price table, keeping the cache-read burn lever visible close-over-close. Copy `templates/price-table.tsv` beside your gates dir and fill your model roster (the roster is consumer config, never a kit literal — the provenance seam); absent it, cost degrades to `n/a` and tokens still report. The `/economics` skill (`templates/economics.md`, materialized as `.claude/commands/economics.md`) chains overhead-meter → stage-economics into one post-iteration cost narrative — a reporting ritual the close skill may invoke, not a lifecycle stage and not a gate. If your decisions read the log, run the meter at your terminal stage — its rows are dated by their stamps, so a re-run at every close re-dates nothing — and `kpi-stage-economics-lag` shows how many closes have gone unpriced when that feed is skipped.
 
-`--emit file-install` and `--emit install-evidence` are the two halves of the
-install-observation channel (drift-kit/SPEC.md §The install-observation record
-and §The install-evidence projection): the first appends one dated line per
-install, per red a non-author hit, and per retention check-in to a private,
-gitignored record under your metric dir; the second emits an aggregate-only
-markdown table set over it — every figure with its denominator, no row keyed to
-a single install, and `<id>`, `<profile>` and `<floor>` never published. The
-field set is fixed before the first observation on purpose: a red nobody wrote
-down was never observed, so the evidence cannot be collected retrospectively.
-Closed-set fields are enforced at capture, so the arm's refusals are the whole
-observation protocol.
+`--emit file-install` and `--emit install-evidence` are the two halves of the install-observation channel (drift-kit/SPEC.md §The install-observation record and §The install-evidence projection): the first appends one dated line per install, per red a non-author hit, and per retention check-in to a private, gitignored record under your metric dir; the second emits an aggregate-only markdown table set over it — every figure with its denominator, no row keyed to a single install, and `<id>`, `<profile>` and `<floor>` never published. The field set is fixed before the first observation on purpose: a red nobody wrote down was never observed, so the evidence cannot be collected retrospectively. Closed-set fields are enforced at capture, so the arm's refusals are the whole observation protocol.
 
-A KPI plugin is `kpi-<name>.sh`, resolved through `kpis.list` against your KPI
-dirs, then each vendored kit's `kpis/`, then the binary's built-in members —
-three tiers, consumer-first. Add your own by dropping a plugin in your gates dir
-and naming it in the registry; shadow a bundled one with a same-named file. Your
-plugin is executed directly and reads the exported `DRIFT_KIT_*` environment,
-both unchanged by the bundled set moving in-crate. The bundled set (drift-kit/SPEC.md §Bundled KPIs) carries, as lead KPIs,
-`kpi-task-split`, `kpi-queue-net-delta`, `kpi-gate-backlog`,
-`kpi-amendment-age`, `kpi-deferred-age`, `kpi-prompt-friction`,
-`kpi-always-loaded`, `kpi-settings-local`, `kpi-gate-runtime`, `kpi-overhead`,
-`kpi-price-table-age` and `kpi-stage-economics-lag`; and as lag KPIs,
-`kpi-knowledge-friction` (fed by the loop below) and `kpi-incident-recurrence`
-(fed by the queue's `recurrence:` declarations).
+A KPI plugin is `kpi-<name>.sh`, resolved through `kpis.list` against your KPI dirs, then each vendored kit's `kpis/`, then the binary's built-in members — three tiers, consumer-first. Add your own by dropping a plugin in your gates dir and naming it in the registry; shadow a bundled one with a same-named file. Your plugin is executed directly and reads the exported `DRIFT_KIT_*` environment, both unchanged by the bundled set moving in-crate. The bundled set (drift-kit/SPEC.md §Bundled KPIs) carries, as lead KPIs, `kpi-task-split`, `kpi-queue-net-delta`, `kpi-gate-backlog`, `kpi-amendment-age`, `kpi-deferred-age`, `kpi-prompt-friction`, `kpi-always-loaded`, `kpi-settings-local`, `kpi-gate-runtime`, `kpi-overhead`, `kpi-price-table-age` and `kpi-stage-economics-lag`; and as lag KPIs, `kpi-knowledge-friction` (fed by the loop below) and `kpi-incident-recurrence` (fed by the queue's `recurrence:` declarations).
 
 ## Test
 

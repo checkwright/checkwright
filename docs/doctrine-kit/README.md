@@ -6,64 +6,29 @@ generated: true
 <!-- door-contributor: a generated mirror of a kit's own contributor source; every door on the page is that source's, and the banner above is the regeneration recipe -->
 # doctrine-kit
 
-The experience-packaging rung: the cross-kit delivery doctrine the other kits
-enforce piecemeal, stated once in a customer-deliverable rules file and carried
-into a consumer's project by reference.
+The experience-packaging rung: the cross-kit delivery doctrine the other kits enforce piecemeal, stated once in a customer-deliverable rules file and carried into a consumer's project by reference.
 
-The deliverable — [`DOCTRINE.md`](DOCTRINE.md) — carries each rule as its
-statement, why it holds under coding-agent work, and a pointer to the kit
-mechanism that enforces it. It is referenced in place, never copy-installed: a
-consumer's always-loaded agent file gains a one-line-per-rule digest and a
-markdown link to the vendored doctrine, and re-vendoring the kit *is* the
-doctrine upgrade. See [SPEC.md](SPEC.md#the-doctrine-deliverable) for why that
-reference-not-copy boundary is the mechanism.
+The deliverable — [`DOCTRINE.md`](DOCTRINE.md) — carries each rule as its statement, why it holds under coding-agent work, and a pointer to the kit mechanism that enforces it. It is referenced in place, never copy-installed: a consumer's always-loaded agent file gains a one-line-per-rule digest and a markdown link to the vendored doctrine, and re-vendoring the kit *is* the doctrine upgrade. See [SPEC.md](SPEC.md#the-doctrine-deliverable) for why that reference-not-copy boundary is the mechanism.
 
-An installer-vendored tree does not carry this file. The payload withholds each
-kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is
-repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is
-packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer
-payload).
+An installer-vendored tree does not carry this file. The payload withholds each kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
 
-The installer — the gate binary's `--install-doctrine` arm — inserts or replaces the reference
-block between fixed markers, idempotently. It does not carry the digest: each
-bullet is derived from the summary its rule states in a `*Digest:*` trailer, so
-the digest names every methodology rule by construction and a rule cannot land
-in the doctrine but miss the block every consumer installs. The gate —
-`check-doctrine-registration` — holds the block honest: it asserts the
-always-loaded file carries the markdown link *and* keeps its methodology-rule
-digest in per-rule lockstep with the doctrine (each rule digested or declared
-trimmed, no digest bullet orphaned), and that each rule carries its one
-well-formed per-rule trailer — `*Stages:*` routing on the craft register,
-`*Digest:*` on the methodology register — fail-closed when a scanned file or
-heading is missing.
+The installer — the gate binary's `--install-doctrine` arm — inserts or replaces the reference block between fixed markers, idempotently. It does not carry the digest: each bullet is derived from the summary its rule states in a `*Digest:*` trailer, so the digest names every methodology rule by construction and a rule cannot land in the doctrine but miss the block every consumer installs. The gate — `check-doctrine-registration` — holds the block honest: it asserts the always-loaded file carries the markdown link *and* keeps its methodology-rule digest in per-rule lockstep with the doctrine (each rule digested or declared trimmed, no digest bullet orphaned), and that each rule carries its one well-formed per-rule trailer — `*Stages:*` routing on the craft register, `*Digest:*` on the methodology register — fail-closed when a scanned file or heading is missing.
 
-The emitter — the `--emit stage-rules <stage>` arm on the gate binary
-`GATE_SDK_NATIVE_BIN` names — reads those trailers and prints the
-craft-rule pointers that bear on a stage, so a session entering it is reminded of
-the rules to follow before the matching action. It is derived, load-triggered
-data: context-kit's session-context hook is its consumer.
-See [SPEC.md](SPEC.md#stage-rules).
+The emitter — the `--emit stage-rules <stage>` arm on the gate binary `GATE_SDK_NATIVE_BIN` names — reads those trailers and prints the craft-rule pointers that bear on a stage, so a session entering it is reminded of the rules to follow before the matching action. It is derived, load-triggered data: context-kit's session-context hook is its consumer. See [SPEC.md](SPEC.md#stage-rules).
 
-The doctrine ships the rule *statements* only. Each kit's SPEC owns its
-mechanism and knob rosters, cited from the doctrine and never restated — so no
-private rule content crosses the provenance seam.
+The doctrine ships the rule *statements* only. Each kit's SPEC owns its mechanism and knob rosters, cited from the doctrine and never restated — so no private rule content crosses the provenance seam.
 
 ## Install
 
 Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree/master/gate-sdk/) (required), then:
 
-1. Install the reference block — with your always-loaded agent file present,
-   run this arm on the gate binary `GATE_SDK_NATIVE_BIN` names:
+1. Install the reference block — with your always-loaded agent file present, run this arm on the gate binary `GATE_SDK_NATIVE_BIN` names:
 
    ```
    --install-doctrine
    ```
 
-   It writes (or updates) the `## Delivery doctrine` block in `CLAUDE.md`,
-   linking `doctrine-kit/DOCTRINE.md`. A harness-less consumer can paste the
-   marker block by hand instead — the installer is only its generator. Point
-   `DOCTRINE_KIT_AGENT_FILE` / `DOCTRINE_KIT_DOCTRINE_FILE` at your own paths if
-   they differ from the defaults.
+   It writes (or updates) the `## Delivery doctrine` block in `CLAUDE.md`, linking `doctrine-kit/DOCTRINE.md`. A harness-less consumer can paste the marker block by hand instead — the installer is only its generator. Point `DOCTRINE_KIT_AGENT_FILE` / `DOCTRINE_KIT_DOCTRINE_FILE` at your own paths if they differ from the defaults.
 
 2. Register the gate — add to your `gates.list`:
 
@@ -73,19 +38,9 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    ```
    <!-- gate-roster:end -->
 
-   Regenerate the hook + graph artifacts with `--emit git-hooks --write` on the
-   gate binary `GATE_SDK_NATIVE_BIN` names.
+   Regenerate the hook + graph artifacts with `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names.
 
-3. Edit the digest — to drop a rule your project does not keep resident, declare
-   the trim in place: `<!-- doctrine-digest-trim: <rule name> — <reason> -->`
-   inside the digest section. The gate holds the digest in per-rule lockstep with
-   the doctrine modulo declared trims, so a silent omission stays red; point
-   `DOCTRINE_KIT_DIGEST_SECTION` at your heading if it is not `## Delivery doctrine`.
-   The declaration survives the next run: the installer reads your block before it
-   rewrites it and carries each declared marker back into the trimmed rule's
-   position, so re-vendoring never restores a rule you removed. That is the only
-   customization it preserves — see
-   [SPEC.md](SPEC.md#install-doctrine) for the bound and the two findings it reports.
+3. Edit the digest — to drop a rule your project does not keep resident, declare the trim in place: `<!-- doctrine-digest-trim: <rule name> — <reason> -->` inside the digest section. The gate holds the digest in per-rule lockstep with the doctrine modulo declared trims, so a silent omission stays red; point `DOCTRINE_KIT_DIGEST_SECTION` at your heading if it is not `## Delivery doctrine`. The declaration survives the next run: the installer reads your block before it rewrites it and carries each declared marker back into the trimmed rule's position, so re-vendoring never restores a rule you removed. That is the only customization it preserves — see [SPEC.md](SPEC.md#install-doctrine) for the bound and the two findings it reports.
 
 ## Test
 

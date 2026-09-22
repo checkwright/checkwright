@@ -22,7 +22,7 @@ claude\.ai/
 
 # Account-identification class — cite the role, never the account. Bans a
 # handle-shaped backticked token near an account noun, singular or plural, in
-# either order. Not handle-shaped: a short all-lowercase token (a CLI name) and
+# either order, inside one clause. Not handle-shaped: a short all-lowercase token (a CLI name) and
 # a token of punctuation alone. Scope, calibration and honest limit:
 # gate-sdk/SPEC.md §check-commit-msg.
-(^|[^A-Za-z])(accounts?|logins?|usernames?|handles?)[^A-Za-z`-][^`]{0,6}`([a-z]*[0-9A-Z][A-Za-z0-9_.-]*|[a-z]+[_.-][A-Za-z0-9_.-]*|[_.-]+[A-Za-z0-9][A-Za-z0-9_.-]*|[a-z]{6,})`|`([a-z]*[0-9A-Z][A-Za-z0-9_.-]*|[a-z]+[_.-][A-Za-z0-9_.-]*|[_.-]+[A-Za-z0-9][A-Za-z0-9_.-]*|[a-z]{6,})`[^A-Za-z`][^`]{0,6}(accounts?|logins?|usernames?|handles?)([^A-Za-z-]|$)
+(^|[^A-Za-z])(accounts?|logins?|usernames?|handles?)[^A-Za-z`.;-][^`.;]{0,6}`([a-z]*[0-9A-Z][A-Za-z0-9_.-]*|[a-z]+[_.-][A-Za-z0-9_.-]*|[_.-]+[A-Za-z0-9][A-Za-z0-9_.-]*|[a-z]{6,})`|`([a-z]*[0-9A-Z][A-Za-z0-9_.-]*|[a-z]+[_.-][A-Za-z0-9_.-]*|[_.-]+[A-Za-z0-9][A-Za-z0-9_.-]*|[a-z]{6,})`[^A-Za-z`.;][^`.;]{0,6}(accounts?|logins?|usernames?|handles?)([^A-Za-z-]|$)

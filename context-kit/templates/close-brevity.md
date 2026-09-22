@@ -1,37 +1,11 @@
-**Always-loaded brevity pass** — the recurring close-stage step that reacts to
-the standing per-session context cost. Splice this into your close skill (the
-guard-kit `close-triage.md` pattern). It reacts to the meter's *delta*, not
-its level: a file is not expected to grow each iteration, so growth since the
-iteration baseline is the worklist.
+**Always-loaded brevity pass** — the recurring close-stage step that reacts to the standing per-session context cost. Splice this into your close skill (the guard-kit `close-triage.md` pattern). It reacts to the meter's *delta*, not its level: a file is not expected to grow each iteration, so growth since the iteration baseline is the worklist.
 
-1. **Measure the delta, then the growth.** Run `--emit always-loaded` on the
-   gate binary `GATE_SDK_NATIVE_BIN` names
-   — it prints the total, the per-part split, and the delta against the committed
-   baseline. Then run it with `--growth`: every governed prose file that grew net in code points
-   since the iteration started, largest first. Both lists are the worklist; a
-   `stale` baseline means the delta is cumulative, so read the growth list for
-   this iteration's share.
+1. **Measure the delta, then the growth.** Run `--emit always-loaded` on the gate binary `GATE_SDK_NATIVE_BIN` names — it prints the total, the per-part split, and the delta against the committed baseline. Then run it with `--growth`: every governed prose file that grew net in code points since the iteration started, largest first. Both lists are the worklist; a `stale` baseline means the delta is cumulative, so read the growth list for this iteration's share.
 2. **Walk the growth, asking two distinct questions per block:**
-   - **Staleness** — *is it still true?* Outdated context is a standing tax on
-     every session that reads it.
-   - **Brevity** — *is each block worth its recurring per-session token cost?*
-     Dense is fine; redundant or over-explained is not.
-3. **Resolve by rewording or deleting, never by annotating.** Outdated context
-   goes to git history, not to a `formerly…` note — a narration line is new
-   standing cost that documents the old cost. Two mechanical floors sit under
-   this step: `check-brevity` (over-budget bullets that already point to a
-   deeper doc) and `check-manifest-temporal` (the lexical share — a fixed set
-   of `formerly…`-class markers in the manifest set); this pass is the semantic
-   residue neither gate can decide.
-4. **No file is exempt.** An on-demand file pays its cost at every open, and a
-   SPEC a stage opens each iteration is always-loaded in effect; the always-loaded
-   surface is only the tier that pays most often. Walk every file the growth
-   list names with the same two questions, and state the growth figure in the
-   close commit beside the delta.
-5. **Re-baseline and commit.** Finish by running
-   `--emit always-loaded --update-baseline` on the gate binary `GATE_SDK_NATIVE_BIN`
-   names (it also lowers armed ratchet ceilings) and commit the baseline and
-   ceiling files, so next iteration measures from this close.
+   - **Staleness** — *is it still true?* Outdated context is a standing tax on every session that reads it.
+   - **Brevity** — *is each block worth its recurring per-session token cost?* Dense is fine; redundant or over-explained is not.
+3. **Resolve by rewording or deleting, never by annotating.** Outdated context goes to git history, not to a `formerly…` note — a narration line is new standing cost that documents the old cost. Two mechanical floors sit under this step: `check-brevity` (over-budget bullets that already point to a deeper doc) and `check-manifest-temporal` (the lexical share — a fixed set of `formerly…`-class markers in the manifest set); this pass is the semantic residue neither gate can decide.
+4. **No file is exempt.** An on-demand file pays its cost at every open, and a SPEC a stage opens each iteration is always-loaded in effect; the always-loaded surface is only the tier that pays most often. Walk every file the growth list names with the same two questions, and state the growth figure in the close commit beside the delta.
+5. **Re-baseline and commit.** Finish by running `--emit always-loaded --update-baseline` on the gate binary `GATE_SDK_NATIVE_BIN` names (it also lowers armed ratchet ceilings) and commit the baseline and ceiling files, so next iteration measures from this close.
 
-Goal: a governed prose file grows only where re-phrasing could not carry the
-change, and every session pays for context that is still true and still terse.
+Goal: a governed prose file grows only where re-phrasing could not carry the change, and every session pays for context that is still true and still terse.

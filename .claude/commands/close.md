@@ -2,136 +2,39 @@ Execute the template at lifecycle-kit/templates/stages/close.md, applying the bi
 
 ## Bindings
 
-**harvest-routing** — harvest routing (`QUEUE_KIT_LESSON_TAGS`,
-`scripts/queue-config.knobs`): stream each tagged entry's body through
-`--lesson-sink <tag>`, which resolves the sink from the local
-`QUEUE_KIT_LESSON_SINKS` overlay or falls open to the default
-`.workflow/<tag>-harvest.md` staging append.
-  - `[essay]` — no sink command is configured here, so the body stages to
-    `.workflow/essay-harvest.md` (gitignored operator material feeding the
-    `launch-comms` methodology essay; merged into the essay, then cleared). This
-    binding owns that sink, so its close-surface declaration lands here:
+**harvest-routing** — harvest routing (`QUEUE_KIT_LESSON_TAGS`, `scripts/queue-config.knobs`): stream each tagged entry's body through `--lesson-sink <tag>`, which resolves the sink from the local `QUEUE_KIT_LESSON_SINKS` overlay or falls open to the default `.workflow/<tag>-harvest.md` staging append.
+  - `[essay]` — no sink command is configured here, so the body stages to `.workflow/essay-harvest.md` (gitignored operator material feeding the `launch-comms` methodology essay; merged into the essay, then cleared). This binding owns that sink, so its close-surface declaration lands here:
 
     close-surface: .workflow/essay-harvest.md advisory reclaim=: > .workflow/essay-harvest.md
 
-**drain-inputs** — `.workflow/knowledge-friction.log`, read whole; its triage stays
-the roster row's (drift-kit/templates/close-knowledge.md).
+**drain-inputs** — `.workflow/knowledge-friction.log`, read whole; its triage stays the roster row's (drift-kit/templates/close-knowledge.md).
 
-**housekeeping** — measure, then triage. First meter this closing session with
-`--emit overhead-meter <session-id>`, passing this session's own `close` stamp id, whose invocation and byte-proxy contract
-drift-kit/SPEC.md §The overhead meter owns: it logs the governance-vs-task
-proportion, the per-session producer feeding `kpi-overhead`. Then feed the
-stage-economics log, the tier decisions' revert signal, per drift-kit/SPEC.md §The
-stage-economics meter, Feeding — run `--emit stage-economics` — and confirm
-`--emit drift-report --trend` reads `econ 0`. The drain's commit
-message states the health triad beside its `qnet` fragment — `qnet`, the
-always-loaded delta with the `--growth` figure, and `kpi-overhead`'s share — with the
-cause when one moves the wrong way. The template's brevity pass (step 11) is
-context-kit/templates/close-brevity.md, run whole — its re-baseline step included.
-**The three are read against a stated
-expectation, and it is the operator's:** `qnet` at or below zero, governed prose
-flat or shrinking, the share falling. A gate enforcing them stays refused on the
-grounds lifecycle-kit/SPEC.md §The committed gap inbox states for the net-growth
-gate — the exits are judgments — and the
-shape is reopened only where none of the three has moved over five closes.
-The roster step above already names which surfaces to read; what
-this binding adds is the procedure each row routes to — the prompt-friction row
-to guard-kit/templates/close-triage.md, the knowledge-friction row to
-drift-kit/templates/close-knowledge.md, the essay-harvest row to the essay merge
-named under `harvest-routing`. Any task a sweep files follows
-queue-kit/SPEC.md §The tag algebra.
-  - **The valve ledger is a roster row this binding declares.** It is *tracked*,
-    so the derivation's capture-tier arm never reaches it and no declaration
-    would exist otherwise; the kit names no path, the location being this
-    repo's config. `advisory` is the honest mode — nothing structurally refuses
-    on an undispositioned ledger, the boundary simply truncates it — so the
-    skip is a judgment someone may audit rather than a forcing function
-    claimed and absent. No `reclaim=`: that is a gitignored member's obligation.
+**housekeeping** — measure, then triage. First meter this closing session with `--emit overhead-meter <session-id>`, passing this session's own `close` stamp id, whose invocation and byte-proxy contract drift-kit/SPEC.md §The overhead meter owns: it logs the governance-vs-task proportion, the per-session producer feeding `kpi-overhead`. Then feed the stage-economics log, the tier decisions' revert signal, per drift-kit/SPEC.md §The stage-economics meter, Feeding — run `--emit stage-economics` — and confirm `--emit drift-report --trend` reads `econ 0`. The drain's commit message states the health triad beside its `qnet` fragment — `qnet`, the always-loaded delta with the `--growth` figure, and `kpi-overhead`'s share — with the cause when one moves the wrong way. The template's brevity pass (step 11) is context-kit/templates/close-brevity.md, run whole — its re-baseline step included. **The three are read against a stated expectation, and it is the operator's:** `qnet` at or below zero, governed prose flat or shrinking, the share falling. A gate enforcing them stays refused on the grounds lifecycle-kit/SPEC.md §The committed gap inbox states for the net-growth gate — the exits are judgments — and the shape is reopened only where none of the three has moved over five closes. The roster step above already names which surfaces to read; what this binding adds is the procedure each row routes to — the prompt-friction row to guard-kit/templates/close-triage.md, the knowledge-friction row to drift-kit/templates/close-knowledge.md, the essay-harvest row to the essay merge named under `harvest-routing`. Any task a sweep files follows queue-kit/SPEC.md §The tag algebra.
+  - **The valve ledger is a roster row this binding declares.** It is *tracked*, so the derivation's capture-tier arm never reaches it and no declaration would exist otherwise; the kit names no path, the location being this repo's config. `advisory` is the honest mode — nothing structurally refuses on an undispositioned ledger, the boundary simply truncates it — so the skip is a judgment someone may audit rather than a forcing function claimed and absent. No `reclaim=`: that is a gitignored member's obligation.
 
     close-surface: .workflow/preflight-valve.txt advisory
 
-  - **The audit roster is a roster row this binding declares.** It is tracked, and
-    its knob is this repo's config.
+  - **The audit roster is a roster row this binding declares.** It is tracked, and its knob is this repo's config.
 
     close-surface: .workflow/audit-roster.txt advisory
 
-  - **Backlog eviction** — the worklist is `--emit queue-index
-    --icebox-candidates`; disposition each row: evict (rewrite the lead line
-    as a self-contained sentence dropping its `[cost:]` and `[surface:]` tags,
-    delete the body, move it under `## Icebox`),
-    rule wontfix (the ruling lands as a one-line boundary note in the owning
-    SPEC and the slug is **rewritten to a bare `- <slug>` line** under
-    `## Done` — a relocated entry reds `check-task-conservation`), or keep it
-    in Deferred with the trigger that keeps it there or, where no trigger keeps
-    it, with the `not-icebox-eligible:` declaration recording why. Eligibility
-    and the grammar are queue-kit/SPEC.md §The icebox tier; the worklist bounds
-    how much to read, it does not decide.
-  - **Trajectory projection** — after the template's Clear-Done step lands the
-    `close` stamp in history, regenerate the projection
-    (`--emit trajectory > docs/evidence-data.md`) and commit it
-    with the Done clear; the gate is blind at the enter-close commit by construction
-    and the remote is not, so no push lands between (drift-kit/SPEC.md §The
-    published-evidence extractor).
+  - **Backlog eviction** — the worklist is `--emit queue-index --icebox-candidates`; disposition each row: evict (rewrite the lead line as a self-contained sentence dropping its `[cost:]` and `[surface:]` tags, delete the body, move it under `## Icebox`), rule wontfix (the ruling lands as a one-line boundary note in the owning SPEC and the slug is **rewritten to a bare `- <slug>` line** under `## Done` — a relocated entry reds `check-task-conservation`), or keep it in Deferred with the trigger that keeps it there or, where no trigger keeps it, with the `not-icebox-eligible:` declaration recording why. Eligibility and the grammar are queue-kit/SPEC.md §The icebox tier; the worklist bounds how much to read, it does not decide.
+  - **Trajectory projection** — after the template's Clear-Done step lands the `close` stamp in history, regenerate the projection (`--emit trajectory > docs/evidence-data.md`) and commit it with the Done clear; the gate is blind at the enter-close commit by construction and the remote is not, so no push lands between (drift-kit/SPEC.md §The published-evidence extractor).
 
-**release-policy** — the procedure is RELEASING.md's reordered per-iteration
-close-stage steps; the bump criteria and the note grammar are installer/SPEC.md
-§Versioning and §The upgrade contract (cited, never restated here). Derive the
-bump off the dated `docs/posts/` note's fixed sections, whose roster and grammar
-that pointer owns; an all-None iteration stamps `none`.
+**release-policy** — the procedure is RELEASING.md's reordered per-iteration close-stage steps; the bump criteria and the note grammar are installer/SPEC.md §Versioning and §The upgrade contract (cited, never restated here). Derive the bump off the dated `docs/posts/` note's fixed sections, whose roster and grammar that pointer owns; an all-None iteration stamps `none`.
 
-**A close defers by default and tags only when a release trigger fires.** The
-bump criterion says what a release would be worth; the cadence criterion says
-whether to cut it now. Without the second, every iteration earning a bump takes a
-tag and the tag history reads as churn to the pre-launch audience
-installer/SPEC.md §The release channel declares the channel for. A qualifying iteration
-runs RELEASING.md's tag / GitHub Release / badge steps (a major runs
-release-sweep first, its boundary-only sub-procedure) when any of:
+**A close defers by default and tags only when a release trigger fires.** The bump criterion says what a release would be worth; the cadence criterion says whether to cut it now. Without the second, every iteration earning a bump takes a tag and the tag history reads as churn to the pre-launch audience installer/SPEC.md §The release channel declares the channel for. A qualifying iteration runs RELEASING.md's tag / GitHub Release / badge steps (a major runs release-sweep first, its boundary-only sub-procedure) when any of:
 
-- **Elapsed time** — the newest tag's creator date is at least 7 days old
-  (`git for-each-ref --sort=-creatordate --count=1 refs/tags`). A floor, never a
-  schedule: it permits a release and never forces one — and **it is dormant
-  while the channel docs/install.md §Upgrading declares reads `preview`, ruled 2026-08-31
-  by the operator through the lead**, on fourteen consecutive deferrals at one
-  version as the measured evidence that a permit-only limb never converts.
-  installer/SPEC.md §The release channel declares tag rhythm an artifact of internal iteration rather than a
-  stability signal, so a tag cut on elapsed time alone reaches no audience, and
-  accumulating costs nothing: the `deferred:vX.Y.Z` stamp is already a
-  mechanical floor on the next note (§Versioning's second input, which
-  `check-release-bump` reads). **A close does not re-argue this limb.** The
-  others are events, and an event either fired or it did not — which is the
-  whole of what the ruling bought, a basis to apply in place of a fifteenth
-  re-derivation reaching the same answer.
-- **A major** — the accumulated notes since the newest tag derive a major bump
-  under §Versioning (a decommission). A decommission waiting behind the cadence
-  floor is a deprecation promise coming due late, so it releases immediately.
-- **A security or supply-chain fix** in the batch. Reaching users late is the
-  whole cost being avoided. It reads narrowly while the channel is `preview`: a
-  vulnerability or a compromised artifact fires it, an install-path data-loss
-  repair does not, however severe, because that channel declares an audience of
-  internal iteration and there is no user population to reach late. The channel
-  flip reopens the reading rather than inheriting it; the operator-direction
-  trigger below stays available for the urgent case this declines to automate.
+- **Elapsed time** — the newest tag's creator date is at least 7 days old (`git for-each-ref --sort=-creatordate --count=1 refs/tags`). A floor, never a schedule: it permits a release and never forces one — and **it is dormant while the channel docs/install.md §Upgrading declares reads `preview`, ruled 2026-08-31 by the operator through the lead**, on fourteen consecutive deferrals at one version as the measured evidence that a permit-only limb never converts. installer/SPEC.md §The release channel declares tag rhythm an artifact of internal iteration rather than a stability signal, so a tag cut on elapsed time alone reaches no audience, and accumulating costs nothing: the `deferred:vX.Y.Z` stamp is already a mechanical floor on the next note (§Versioning's second input, which `check-release-bump` reads). **A close does not re-argue this limb.** The others are events, and an event either fired or it did not — which is the whole of what the ruling bought, a basis to apply in place of a fifteenth re-derivation reaching the same answer.
+- **A major** — the accumulated notes since the newest tag derive a major bump under §Versioning (a decommission). A decommission waiting behind the cadence floor is a deprecation promise coming due late, so it releases immediately.
+- **A security or supply-chain fix** in the batch. Reaching users late is the whole cost being avoided. It reads narrowly while the channel is `preview`: a vulnerability or a compromised artifact fires it, an install-path data-loss repair does not, however severe, because that channel declares an audience of internal iteration and there is no user population to reach late. The channel flip reopens the reading rather than inheriting it; the operator-direction trigger below stays available for the urgent case this declines to automate.
 - **Explicit operator direction**, recorded in the disposition line's basis.
-- **The channel's audience arriving** — the launch the private brief's own
-  readiness rule gates. The accumulated `deferred:` floor ships as
-  one release there rather than as a backfilled run of tags nobody read.
+- **The channel's audience arriving** — the launch the private brief's own readiness rule gates. The accumulated `deferred:` floor ships as one release there rather than as a backfilled run of tags nobody read.
 
-Otherwise stamp the disposition line's deferral form (lifecycle-kit/SPEC.md
-§templates/stages/ — `deferred:vX.Y.Z`, the version the criteria would have
-shipped as) and let the accumulated declarations ride the next qualifying
-release. RELEASING.md step 1 already composes a batched note from every
-declaration accumulated since the last tag, so nothing about note composition
-changes — only how often a tag is cut.
+Otherwise stamp the disposition line's deferral form (lifecycle-kit/SPEC.md §templates/stages/ — `deferred:vX.Y.Z`, the version the criteria would have shipped as) and let the accumulated declarations ride the next qualifying release. RELEASING.md step 1 already composes a batched note from every declaration accumulated since the last tag, so nothing about note composition changes — only how often a tag is cut.
 
-*The honest limit.* No gate reds a release cut too soon. Each trigger above is a
-case where a fast release is correct, so a timing gate would need an override
-valve covering all of them and would end up policing the valve rather than the
-cadence. Timing is policy under a mandatory disposition stamp, and that stamp is
-not nothing: silence is not a disposition.
+*The honest limit.* No gate reds a release cut too soon. Each trigger above is a case where a fast release is correct, so a timing gate would need an override valve covering all of them and would end up policing the valve rather than the cadence. Timing is policy under a mandatory disposition stamp, and that stamp is not nothing: silence is not a disposition.
 
-Disposition evidence: `.workflow/release-disposition.txt` (committed,
-boundary-required and boundary-truncated per `scripts/lifecycle-config.knobs`).
+Disposition evidence: `.workflow/release-disposition.txt` (committed, boundary-required and boundary-truncated per `scripts/lifecycle-config.knobs`).
 
-**push-budget** — one to two pushes per iteration; up to two hotfix pushes for a
-red push, unasked, and a third is asked for. Each push is watched to green on the
-`gates` workflow (`gh run watch`).
+**push-budget** — one to two pushes per iteration; up to two hotfix pushes for a red push, unasked, and a third is asked for. Each push is watched to green on the `gates` workflow (`gh run watch`).

@@ -6,1644 +6,331 @@ generated: true
 <!-- door-contributor: a generated mirror of a kit's own contributor source; every door on the page is that source's, and the banner above is the regeneration recipe -->
 # lifecycle-kit — an evidence-stamped iteration lifecycle for stateless agent sessions
 
-An iteration is a self-contained work cycle driven through a configurable
-sequence of stages (default: `scope → [align] → build → validate → close`).
-The problem the kit solves: a stateless agent session cannot be trusted to
-remember, or even re-read, a process document — so the process state lives in
-two governed files a gate can read, and every stage transition leaves
-machine-checkable evidence.
+An iteration is a self-contained work cycle driven through a configurable sequence of stages (default: `scope → [align] → build → validate → close`). The problem the kit solves: a stateless agent session cannot be trusted to remember, or even re-read, a process document — so the process state lives in two governed files a gate can read, and every stage transition leaves machine-checkable evidence.
 
-The kit carries the generic state machine only; a consumer's stage names,
-exit conditions, and ritual content are config and skill-template fill-ins.
-Requires [gate-sdk](https://github.com/checkwright/checkwright/tree/master/gate-sdk/) (the gates follow its four contracts and
-resolve through its registry).
+The kit carries the generic state machine only; a consumer's stage names, exit conditions, and ritual content are config and skill-template fill-ins. Requires [gate-sdk](https://github.com/checkwright/checkwright/tree/master/gate-sdk/) (the gates follow its four contracts and resolve through its registry).
 
 ## The state machine
 
 Two governed surfaces, carrying **one axis each**:
 
-- **The header line**, at the top of the consumer's queue file (default
-  `TASK-QUEUE.md`), carrying the *slow* axis — the iteration name, and nothing
-  else:
+- **The header line**, at the top of the consumer's queue file (default `TASK-QUEUE.md`), carrying the *slow* axis — the iteration name, and nothing else:
 
   ```
   ## Iteration: <name>
   ```
 
-- **The evidence file** (default `.workflow/WORKFLOW-STATE.txt`): free prose,
-  then a `---` separator, then one data line per stage-skill invocation:
+- **The evidence file** (default `.workflow/WORKFLOW-STATE.txt`): free prose, then a `---` separator, then one data line per stage-skill invocation:
 
   ```
   <iteration> <stage> <session-id> <YYYY-MM-DD> <head>
   ```
 
-  It carries the *fast* axis too: **the last data line's `<stage>` token is the
-  cursor** — the single source for "which stage is this iteration in".
+  It carries the *fast* axis too: **the last data line's `<stage>` token is the cursor** — the single source for "which stage is this iteration in".
 
-  `<head>` is the abbreviated commit `--enter-stage` read at the instant
-  it wrote the stamp, or the literal `none` where it found no git work tree and
-  no commit to name. It is **required**, and `none` is a value rather than an
-  omission: a permanently optional field is a permanent disarm switch for the
-  provenance assertion it exists to serve (§check-stage-evidence), which would
-  be enforcement-first inverted — the fix shipped beside its bypass. The field
-  is **appended** rather than inserted, so every positional reader of fields one
-  to four is unmoved.
+  `<head>` is the abbreviated commit `--enter-stage` read at the instant it wrote the stamp, or the literal `none` where it found no git work tree and no commit to name. It is **required**, and `none` is a value rather than an omission: a permanently optional field is a permanent disarm switch for the provenance assertion it exists to serve (§check-stage-evidence), which would be enforcement-first inverted — the fix shipped beside its bypass. The field is **appended** rather than inserted, so every positional reader of fields one to four is unmoved.
 
-  **The iteration-start commit is the first data line's `<head>`.** The boundary
-  truncation leaves the boundary stamp as the file's first data line, and that
-  stamp's `<head>` is the commit the iteration opened on. Anything a reader wants
-  to measure "since the iteration started" is measured from it. It is unaffected
-  by the unnamed-iteration sentinel and by `--enter-stage --rename`, since both
-  touch column 1 only. It is held true at introduction by §check-stage-evidence's
-  stamp-provenance assertion. There is **no** iteration-start commit when the
-  file is absent, when it has no data line (the no-cursor window), when that
-  `<head>` is `none`, or when this clone cannot resolve it. Each reader states
-  what it does then.
+  **The iteration-start commit is the first data line's `<head>`.** The boundary truncation leaves the boundary stamp as the file's first data line, and that stamp's `<head>` is the commit the iteration opened on. Anything a reader wants to measure "since the iteration started" is measured from it. It is unaffected by the unnamed-iteration sentinel and by `--enter-stage --rename`, since both touch column 1 only. It is held true at introduction by §check-stage-evidence's stamp-provenance assertion. There is **no** iteration-start commit when the file is absent, when it has no data line (the no-cursor window), when that `<head>` is `none`, or when this clone cannot resolve it. Each reader states what it does then.
 
-  **The previous-close commit is the `<head>` of the last stamp naming the last
-  configured stage, in the state file as it stood at the iteration-start
-  commit.** Read it with `git show <iteration-start>:<state-file>`, the path
-  repo-relative, and take the `<head>` of its last data line whose `<stage>` is
-  `LIFECYCLE_KIT_STAGES`' last member. The boundary truncation has not yet run at
-  that commit, so the blob still holds the previous iteration's stamps. It exists
-  because the iteration-start range has a hole: everything the previous close
-  committed after its own audit review, and any interstitial commit, lies before
-  the iteration-start commit. A reader that must see those commits measures from
-  the previous-close commit instead. The price is overlap: the range re-covers the
-  previous close's commits from its entry up to its review, which that review
-  already read. A re-read costs reading time and a hole costs an unswept edit, so
-  the overlap is taken. There is **no** previous-close commit where there is no
-  iteration-start commit, where the blob at it carries no last-stage stamp (a
-  first iteration, or a tree adopting the kit mid-history), or where that
-  `<head>` is `none` or does not resolve. Each reader states what it does then.
-  It is a prose derivation rather than a stage-machine adapter
-  (§The stage-machine adapters): its one reader is a closing session deriving a
-  corpus, and an adapter earns its place only when two readers must agree.
+  **The previous-close commit is the `<head>` of the last stamp naming the last configured stage, in the state file as it stood at the iteration-start commit.** Read it with `git show <iteration-start>:<state-file>`, the path repo-relative, and take the `<head>` of its last data line whose `<stage>` is `LIFECYCLE_KIT_STAGES`' last member. The boundary truncation has not yet run at that commit, so the blob still holds the previous iteration's stamps. It exists because the iteration-start range has a hole: everything the previous close committed after its own audit review, and any interstitial commit, lies before the iteration-start commit. A reader that must see those commits measures from the previous-close commit instead. The price is overlap: the range re-covers the previous close's commits from its entry up to its review, which that review already read. A re-read costs reading time and a hole costs an unswept edit, so the overlap is taken. There is **no** previous-close commit where there is no iteration-start commit, where the blob at it carries no last-stage stamp (a first iteration, or a tree adopting the kit mid-history), or where that `<head>` is `none` or does not resolve. Each reader states what it does then. It is a prose derivation rather than a stage-machine adapter (§The stage-machine adapters): its one reader is a closing session deriving a corpus, and an adapter earns its place only when two readers must agree.
 
-  **The five-field grammar is a breaking change to a shipped file format**, and
-  a consumer vendoring it mid-iteration reds until they rewrite their own
-  stamps: for each, `<head>` is the first parent of the commit that introduced
-  that stamp line, recoverable from history, and `none` where it is not — a
-  stamp whose introducing commit cannot be identified takes `none` rather than
-  a guess, because a guessed provenance value is indistinguishable from a real
-  one afterward. That rewrite is a **rewrite and not an introduction**, which is
-  what the migration clause of the newly-introduced test (§check-stage-evidence)
-  exists to say. The honest mitigation is the boundary: the first stage's reset
-  truncates this file, so a consumer upgrading at an iteration boundary pays
-  nothing.
+  **The five-field grammar is a breaking change to a shipped file format**, and a consumer vendoring it mid-iteration reds until they rewrite their own stamps: for each, `<head>` is the first parent of the commit that introduced that stamp line, recoverable from history, and `none` where it is not — a stamp whose introducing commit cannot be identified takes `none` rather than a guess, because a guessed provenance value is indistinguishable from a real one afterward. That rewrite is a **rewrite and not an introduction**, which is what the migration clause of the newly-introduced test (§check-stage-evidence) exists to say. The honest mitigation is the boundary: the first stage's reset truncates this file, so a consumer upgrading at an iteration boundary pays nothing.
 
-The header once carried a `[stage:]` field as well. It was a second copy of a
-derivable fact — every stage entry already stamps its `<stage>` — bought at one
-queue write per stage entry, and kept in sync only by an assertion that existed
-for no other purpose. Deriving the cursor from the stamps retires the copy, the
-write, and the assertion together (derivation-first). A consumer upgrading
-mid-iteration needs no migration step: every header reader strips an optional
-trailing bracketed field, so a residual `[stage:]` is inert and the next
-iteration-boundary reset rewrites the header without it.
+The header once carried a `[stage:]` field as well. It was a second copy of a derivable fact — every stage entry already stamps its `<stage>` — bought at one queue write per stage entry, and kept in sync only by an assertion that existed for no other purpose. Deriving the cursor from the stamps retires the copy, the write, and the assertion together (derivation-first). A consumer upgrading mid-iteration needs no migration step: every header reader strips an optional trailing bracketed field, so a residual `[stage:]` is inert and the next iteration-boundary reset rewrites the header without it.
 
-Both surfaces are **single-writer and branch-scoped**: an iteration owns exactly
-one branch (its home branch) and every stamp lands there, so
-concurrency between operators is git branch topology, not a multi-writer state
-file. The integration branch is the degenerate single-operator home; a second
-concurrent operator cuts a branch at their scope entry. The merge semantics that
-make this safe — the iteration-scoped surfaces resolve to the arriving branch at
-a merge — are §Multi-operator semantics.
+Both surfaces are **single-writer and branch-scoped**: an iteration owns exactly one branch (its home branch) and every stamp lands there, so concurrency between operators is git branch topology, not a multi-writer state file. The integration branch is the degenerate single-operator home; a second concurrent operator cuts a branch at their scope entry. The merge semantics that make this safe — the iteration-scoped surfaces resolve to the arriving branch at a merge — are §Multi-operator semantics.
 
-The default motion is the linear stage walk; the gate-legal shapes for leaving
-it — abandon, split, reopen — are specified in §Deviation transitions, not
-improvised.
+The default motion is the linear stage walk; the gate-legal shapes for leaving it — abandon, split, reopen — are specified in §Deviation transitions, not improvised.
 
-**An iteration carrying an observation-predicate entry places its first push
-early.** Where a promoted entry carries `[observed-by: <producer>]`
-(queue-kit/SPEC.md §The tag algebra) its completion predicate is an *observation
-of a remote run* rather than a tree state, so landing the work does not complete
-the entry:
+**An iteration carrying an observation-predicate entry places its first push early.** Where a promoted entry carries `[observed-by: <producer>]` (queue-kit/SPEC.md §The tag algebra) its completion predicate is an *observation of a remote run* rather than a tree state, so landing the work does not complete the entry:
 
-> An iteration whose promoted set carries any `[observed-by:]` entry places its
-> **first** push at or before the stage that lands that entry's work — never at
-> the closing stage.
+> An iteration whose promoted set carries any `[observed-by:]` entry places its **first** push at or before the stage that lands that entry's work — never at the closing stage.
 
-The rule **re-places** a push rather than buying one, which is what makes it the
-cheap shape: a finished run is read for free, and the commits recording the
-reading accumulate locally and ride the closing push. So the observation arrives
-*between* the iteration's two pushes — early enough to be read, committed and
-drained before the drain gate is reached. Without it the entry meets a bind with
-no valve: §check-stage-entry assertion B refuses a drain-stage entry on a
-non-empty active queue, and `[drain-exempt:]` reaches the drain stage's own
-entry but never its successors', so an entry awaiting a run it cannot yet have
-observed simply cannot drain in the iteration that bought it.
+The rule **re-places** a push rather than buying one, which is what makes it the cheap shape: a finished run is read for free, and the commits recording the reading accumulate locally and ride the closing push. So the observation arrives *between* the iteration's two pushes — early enough to be read, committed and drained before the drain gate is reached. Without it the entry meets a bind with no valve: §check-stage-entry assertion B refuses a drain-stage entry on a non-empty active queue, and `[drain-exempt:]` reaches the drain stage's own entry but never its successors', so an entry awaiting a run it cannot yet have observed simply cannot drain in the iteration that bought it.
 
-**The seam is held deliberately.** *How many* pushes an iteration may spend is
-consumer content and this rule names no number; it constrains only **where** the
-first one falls, which is an ordering this machine already owns. The count's
-reader is a session, so it is close's `push-budget` slot and not a knob: no arm
-would read a knob, and a default would ship one consumer's policy as the kit's
-(§templates/stages/). **The actor is the stage session whose next act reads the
-run the push produces.** For an `[observed-by:]` entry that is the session landing
-the entry's work: it pushes after its landing commit, waits in-turn for the run,
-and reads it before the Done move. A stage using a remote run as its oracle pushes
-for itself. A fixed pushing stage would contradict the placement rule wherever a
-different stage lands the work. The lead never pushes, a push publishing the
-lifecycle state it never writes (the optional-lead paragraph below). Every push, at any stage, runs the per-push identity precondition close's
-push step names. **And the rule is not enforceable** — a push's timing and its
-actor are no tree state, so no arm in this kit observes that a push was or was not
-spent, or by whom. It is a session obligation carried by prompts, and calling it
-gated would be the false claim; what the machine contributes is a refusal that
-names it (§check-stage-entry).
+**The seam is held deliberately.** *How many* pushes an iteration may spend is consumer content and this rule names no number; it constrains only **where** the first one falls, which is an ordering this machine already owns. The count's reader is a session, so it is close's `push-budget` slot and not a knob: no arm would read a knob, and a default would ship one consumer's policy as the kit's (§templates/stages/). **The actor is the stage session whose next act reads the run the push produces.** For an `[observed-by:]` entry that is the session landing the entry's work: it pushes after its landing commit, waits in-turn for the run, and reads it before the Done move. A stage using a remote run as its oracle pushes for itself. A fixed pushing stage would contradict the placement rule wherever a different stage lands the work. The lead never pushes, a push publishing the lifecycle state it never writes (the optional-lead paragraph below). Every push, at any stage, runs the per-push identity precondition close's push step names. **And the rule is not enforceable** — a push's timing and its actor are no tree state, so no arm in this kit observes that a push was or was not spent, or by whom. It is a session obligation carried by prompts, and calling it gated would be the false claim; what the machine contributes is a refusal that names it (§check-stage-entry).
 
-Where `<producer>` is a **release run** — tag-triggered, so no mid-iteration
-push can fire it — the placement is unsatisfiable, and the branch belongs to the
-scope stage, which splits such an entry at promotion into a produce half and an
-observe half rather than promoting it whole. The clause lives in scope's own
-template (§templates/stages/), because scope is the one moment the unit set is
-bounded and the one session that may write the queue.
+Where `<producer>` is a **release run** — tag-triggered, so no mid-iteration push can fire it — the placement is unsatisfiable, and the branch belongs to the scope stage, which splits such an entry at promotion into a produce half and an observe half rather than promoting it whole. The clause lives in scope's own template (§templates/stages/), because scope is the one moment the unit set is bounded and the one session that may write the queue.
 
-**A stage owes a resume journal, and the obligation is the stage's rather than
-the dispatch's.** delegation-kit owns the journal *contract* — what a session
-writes into it, when, and who may delete it (delegation-kit/SPEC.md §Resume
-journal — agent writes, scratch reset sweeps). What lives here is the **path**,
-because only the stage machine knows the stage: `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN`
-carries a `<stage>` placeholder, and expanding it is the one derivation a
-dispatching supervisor, a stage session and a stage entry all read. Its fourth
-reader is a **writer**: the entry tool opens the journal at the stamp and reports
-the path it wrote (§bin/enter-stage.sh), so the derivation is computed once, by
-one tool, at one moment, and no surface gains a second spelling of it. Nothing
-about the contract is restated here and nothing about the path is stated there —
-the owner-and-pointer split, held across the seam rather than inside one surface.
+**A stage owes a resume journal, and the obligation is the stage's rather than the dispatch's.** delegation-kit owns the journal *contract* — what a session writes into it, when, and who may delete it (delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps). What lives here is the **path**, because only the stage machine knows the stage: `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN` carries a `<stage>` placeholder, and expanding it is the one derivation a dispatching supervisor, a stage session and a stage entry all read. Its fourth reader is a **writer**: the entry tool opens the journal at the stamp and reports the path it wrote (§bin/enter-stage.sh), so the derivation is computed once, by one tool, at one moment, and no surface gains a second spelling of it. Nothing about the contract is restated here and nothing about the path is stated there — the owner-and-pointer split, held across the seam rather than inside one surface.
 
-**The obligation is instructed where the owing session reads it, and not only
-asserted downstream.** Ruling it here made it true of the kit and false of its
-surfaces: it was asserted at the *next* stage's entry, by which time the session
-that owed the journal is typically gone, and no surface a stage session loads
-said anything about it. A supervisor's own agent definition is not that surface —
-it reaches a dispatched session only, and this kit sanctions running a stage as an
-ordinary skill invocation with no supervisor at all. The repair is the stage
-template's **last step**, mirroring the stamp's first step and naming the journal
-as the stage's own exit artifact (§templates/stages/): one instruction, on the one
-surface every stage session loads on every dispatch path. A second detector would
-have been the wrong shape — what was missing was the instruction, and the
-detector that existed was the only thing that ever noticed.
+**The obligation is instructed where the owing session reads it, and not only asserted downstream.** Ruling it here made it true of the kit and false of its surfaces: it was asserted at the *next* stage's entry, by which time the session that owed the journal is typically gone, and no surface a stage session loads said anything about it. A supervisor's own agent definition is not that surface — it reaches a dispatched session only, and this kit sanctions running a stage as an ordinary skill invocation with no supervisor at all. The repair is the stage template's **last step**, mirroring the stamp's first step and naming the journal as the stage's own exit artifact (§templates/stages/): one instruction, on the one surface every stage session loads on every dispatch path. A second detector would have been the wrong shape — what was missing was the instruction, and the detector that existed was the only thing that ever noticed.
 
-**Three other shapes were available and each is refused on a stated ground**, put
-here so a later reader finds the disposition beside the option rather than
-re-deriving it:
+**Three other shapes were available and each is refused on a stated ground**, put here so a later reader finds the disposition beside the option rather than re-deriving it:
 
-- **An assertion at the session's own turn end, wired to a harness stop event.**
-  The strongest-looking shape, because it fires while the owing session is still
-  live. It is **not mechanizable as stated**: the subagent stop event is *not* the
-  session-end event (delegation-kit/SPEC.md §The delegation model, which records
-  it firing repeatedly inside one dispatched session that had ended no turn at
-  all) — so an assertion wired there fires from the first assistant step, when no
-  journal legitimately exists yet, with no signal telling an intermediate step
-  from a return. Two further holes are structural: a stage run with no supervisor
-  is the top-level session, whose turn end that kit deliberately leaves
-  unregistered, and a worktree-isolated session's stop log resolves against its
-  own cwd and dies with the worktree.
-- **The returning report asserts the path it wrote.** Unenforceable by
-  construction, not by anyone's appetite: a return lives in the parent's context
-  and leaves no artifact
-  (delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps),
-  so tree state is byte-identical whether a return was held or invented, and no
-  scanner over a repository reaches a conversation. It also points the wrong actor
-  at the wrong evidence — §templates/lead.md forbids the supervisor
-  hand-deriving prior-stage completeness and directs it at the machinery instead.
-  This is also the shape that would have moved the unit into delegation-kit;
-  refusing it is what keeps it here.
-- **Accept the escape and trust the successor.** The status quo, and its price is
-  the record: what the escape buys is real and unchanged — an absence that is
-  deliberate and written — but it is bought after the reasoning is gone, by the one
-  session structurally unable to reconstruct it.
+- **An assertion at the session's own turn end, wired to a harness stop event.** The strongest-looking shape, because it fires while the owing session is still live. It is **not mechanizable as stated**: the subagent stop event is *not* the session-end event (delegation-kit/SPEC.md §The delegation model, which records it firing repeatedly inside one dispatched session that had ended no turn at all) — so an assertion wired there fires from the first assistant step, when no journal legitimately exists yet, with no signal telling an intermediate step from a return. Two further holes are structural: a stage run with no supervisor is the top-level session, whose turn end that kit deliberately leaves unregistered, and a worktree-isolated session's stop log resolves against its own cwd and dies with the worktree.
+- **The returning report asserts the path it wrote.** Unenforceable by construction, not by anyone's appetite: a return lives in the parent's context and leaves no artifact (delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps), so tree state is byte-identical whether a return was held or invented, and no scanner over a repository reaches a conversation. It also points the wrong actor at the wrong evidence — §templates/lead.md forbids the supervisor hand-deriving prior-stage completeness and directs it at the machinery instead. This is also the shape that would have moved the unit into delegation-kit; refusing it is what keeps it here.
+- **Accept the escape and trust the successor.** The status quo, and its price is the record: what the escape buys is real and unchanged — an absence that is deliberate and written — but it is bought after the reasoning is gone, by the one session structurally unable to reconstruct it.
 
-**The derivation is the enabling move, and it is why this was unoracled before.**
-A path invented per dispatch leaves no record on disk of what was granted, so no
-gate and no entry can name the file a stage owes; two dispatchers can also
-disagree about where one stage's journal lives. The one source a session reads
-is its own entry report (§bin/enter-stage.sh); the supervisor names no path in a
-dispatch prompt, because a restated path is a second source the dispatched
-session prefers, and measured batches wrote their journals under prompt-named
-paths the next entry could not find. Entering is therefore how any session of a
-stage learns its journal, which is what binds the per-session stamp the
-same-stage re-entry paragraph below rules: a session that skips its entry has no journal path to
-write to, and meets that at its first write. **The honest limit:** no oracle
-detects a session that did not enter, because no tracked artifact names a session
-but the stamp itself — commits carry no session id a kit may assume, and a
-journal is scratch any session can write a heading into.
+**The derivation is the enabling move, and it is why this was unoracled before.** A path invented per dispatch leaves no record on disk of what was granted, so no gate and no entry can name the file a stage owes; two dispatchers can also disagree about where one stage's journal lives. The one source a session reads is its own entry report (§bin/enter-stage.sh); the supervisor names no path in a dispatch prompt, because a restated path is a second source the dispatched session prefers, and measured batches wrote their journals under prompt-named paths the next entry could not find. Entering is therefore how any session of a stage learns its journal, which is what binds the per-session stamp the same-stage re-entry paragraph below rules: a session that skips its entry has no journal path to write to, and meets that at its first write. **The honest limit:** no oracle detects a session that did not enter, because no tracked artifact names a session but the stamp itself — commits carry no session id a kit may assume, and a journal is scratch any session can write a heading into.
 
-**One journal per stage, appended by every session of that stage.** A stage that
-runs several sessions — the implementation stage runs one per task by contract —
-does not get several journals: the path is a function of the stage, so each
-session appends to the file its predecessors wrote, under a heading naming
-itself. Two consequences are stated because each looks like a defect until it is
-read. The `DONE`-as-last-line rule survives unchanged and reads *better* at this
-granularity: an earlier session's marker sitting mid-file is not a lie about that
-session, and the file's last line still answers *did the session that wrote last
-finish*. And the entry assertion below is satisfied by **any** session of the
-predecessor stage having written, which is the correct question — the successor
-needs the predecessor's reasoning, not one particular session's.
+**One journal per stage, appended by every session of that stage.** A stage that runs several sessions — the implementation stage runs one per task by contract — does not get several journals: the path is a function of the stage, so each session appends to the file its predecessors wrote, under a heading naming itself. Two consequences are stated because each looks like a defect until it is read. The `DONE`-as-last-line rule survives unchanged and reads *better* at this granularity: an earlier session's marker sitting mid-file is not a lie about that session, and the file's last line still answers *did the session that wrote last finish*. And the entry assertion below is satisfied by **any** session of the predecessor stage having written, which is the correct question — the successor needs the predecessor's reasoning, not one particular session's.
 
-**Measured against this repo's own journals rather than asserted.** The default
-`<scratch dir>/<stage>-journal.md` is the shape sessions here converged on
-unaided, which is the argument for deriving it rather than inventing one — but
-the convergence is not total, and the exception is the case the rule above
-exists for: on an iteration whose implementation stage was split into batches,
-the two batch sessions each wrote a discriminated name of their own. The
-derivation overrides that: the discriminator belongs in a heading inside the
-stage's journal, never in its filename, or the successor's assertion has no file
-to name. **The honest limit**: two sessions of one stage running *concurrently*
-append to one file with no coordination beyond append atomicity, which is
-untested here and filed rather than claimed safe.
+**Measured against this repo's own journals rather than asserted.** The default `<scratch dir>/<stage>-journal.md` is the shape sessions here converged on unaided, which is the argument for deriving it rather than inventing one — but the convergence is not total, and the exception is the case the rule above exists for: on an iteration whose implementation stage was split into batches, the two batch sessions each wrote a discriminated name of their own. The derivation overrides that: the discriminator belongs in a heading inside the stage's journal, never in its filename, or the successor's assertion has no file to name. **The honest limit**: two sessions of one stage running *concurrently* append to one file with no coordination beyond append atomicity, which is untested here and filed rather than claimed safe.
 
 ### The stamp protocol
 
-The **arriving** stage's skill *stamps* the evidence file as its first step —
-and that stamp is the whole transition, because the last stamp is the cursor.
-Nothing flips. The departing session writes nothing, so no uncommitted stage
-line crosses the session boundary. The entry commit stages the evidence file,
-so every state-coupled gate re-fires on it: the prior stage's
-machine-expressible exit is re-verified *at the entry* (`check-stage-evidence`),
-and `check-stage-entry` extends that one hop back. A self-asserted "stage
-complete" marker would prove a claim, not completion — the kit deliberately
-has none.
+The **arriving** stage's skill *stamps* the evidence file as its first step — and that stamp is the whole transition, because the last stamp is the cursor. Nothing flips. The departing session writes nothing, so no uncommitted stage line crosses the session boundary. The entry commit stages the evidence file, so every state-coupled gate re-fires on it: the prior stage's machine-expressible exit is re-verified *at the entry* (`check-stage-evidence`), and `check-stage-entry` extends that one hop back. A self-asserted "stage complete" marker would prove a claim, not completion — the kit deliberately has none.
 
-**What the entry re-fires, and what it does not.** The entry commit stages the
-evidence file alone, so the gates coupled to it — `check-stage-entry`,
-`check-stage-evidence`, `check-evidence-manifest`, `check-trajectory-fresh`,
-and any gate globbing the workflow dir — re-fire at every entry exactly as
-before. Queue-only-coupled gates do not: the queue is not written at an entry,
-so their re-run would be a no-op on unchanged input, and each of
-them couples some *other* input that fires it on the change it actually gates.
-What is genuinely given up is the incidental *periodic sweep* — the guarantee
-that those gates ran at least once per stage regardless of what changed, which
-could catch drift introduced out of band (a `--no-verify` commit, an edit
-outside every coupled glob). The full battery at the validate stage is the
-surviving sweep and the stronger one: it runs every gate, not the
-queue-coupled subset. The per-entry queue re-fire was a side effect of the flip,
-never the designed sweep — an accepted, costed loss.
+**What the entry re-fires, and what it does not.** The entry commit stages the evidence file alone, so the gates coupled to it — `check-stage-entry`, `check-stage-evidence`, `check-evidence-manifest`, `check-trajectory-fresh`, and any gate globbing the workflow dir — re-fire at every entry exactly as before. Queue-only-coupled gates do not: the queue is not written at an entry, so their re-run would be a no-op on unchanged input, and each of them couples some *other* input that fires it on the change it actually gates. What is genuinely given up is the incidental *periodic sweep* — the guarantee that those gates ran at least once per stage regardless of what changed, which could catch drift introduced out of band (a `--no-verify` commit, an edit outside every coupled glob). The full battery at the validate stage is the surviving sweep and the stronger one: it runs every gate, not the queue-coupled subset. The per-entry queue re-fire was a side effect of the flip, never the designed sweep — an accepted, costed loss.
 
-Mid-iteration the queue file is written only for real **work-state**
-transitions: promotion and naming (the first stage), the Done move riding each
-amendment-merge commit, and the closing dispositions. Stage motion never
-touches it.
+Mid-iteration the queue file is written only for real **work-state** transitions: promotion and naming (the first stage), the Done move riding each amendment-merge commit, and the closing dispositions. Stage motion never touches it.
 
-**A stage session landing a direction writes its class and date in the same
-commit as its content.** The form is inline beside the content
-(queue-kit/SPEC.md §The tag algebra); the classes are §The steering vocabulary;
-this section owns *when* the session writes it, because the session is the
-party whose commit is the audit artifact. Not afterwards, and not in a later
-pass: the relay that carried it is transport, never a store, so content landed
-without its class has already lost the only party who could attest it, and the
-next session cannot tell a relayed direction from a lead's decision. Where the
-relaying party stated no class, the session **asks** rather than defaulting
-upward — reading a direction into a silence is the invention the class exists to
-prevent, and inflating a relaying party's own decision to the operator's freezes
-a call that should have stayed revisable. The obligation binds both parties and
-neither half discharges the other's: the relay states the class
-(`templates/lead.md`), the landing session records it here.
+**A stage session landing a direction writes its class and date in the same commit as its content.** The form is inline beside the content (queue-kit/SPEC.md §The tag algebra); the classes are §The steering vocabulary; this section owns *when* the session writes it, because the session is the party whose commit is the audit artifact. Not afterwards, and not in a later pass: the relay that carried it is transport, never a store, so content landed without its class has already lost the only party who could attest it, and the next session cannot tell a relayed direction from a lead's decision. Where the relaying party stated no class, the session **asks** rather than defaulting upward — reading a direction into a silence is the invention the class exists to prevent, and inflating a relaying party's own decision to the operator's freezes a call that should have stayed revisable. The obligation binds both parties and neither half discharges the other's: the relay states the class (`templates/lead.md`), the landing session records it here.
 
-The **deterministic half** of that first step — read the iteration from the
-header, read the id from the `--emit-session-id` arm, append the stamp — is
-mechanized by
-`bash gate-sdk/bin/run-gates.sh --enter-stage <stage>`, the same
-writer/asserter split as `--emit git-hooks` ↔ `check-graph`: the skill
-invokes it, **judgment stays in the skill** (what the stage means, its exit
-condition, when to enter it at all), and the stage gates stay the independent
-verifier. The tool takes no `--force` flag, so the compliant path is the easy
-one — an operator who intends to override writes the stamp by hand, exactly
-as before the tool existed. Committing the stamp remains the skill's
-business, and the commit that adds a stamp carries the stamped stage as its
-subject scope (`<type>(<stage>): …`): `--enter-stage` prints that subject and
-`check-stamp-subject` holds it. The stamp commit is bound because a recovery keyed
-on the stage name — `git log --grep`, a pickaxe — must find the entry; a stage
-session's other commits keep their component scope, because nothing in them
-identifies the stage that made them. The stamp commits on its own — with **one** exception, stated here rather than only
-where the valve is, because a session reads this rule at its entry step and the
-valve's contract several sections away: an entry the one-shot pre-flight valve
-admitted rewrites the valve ledger in the same motion as the stamp, so the two
-commit together and the purity assertion exempts exactly that path
-(§bin/enter-stage.sh, §check-stage-evidence). And **never with `--no-verify`**:
-`--enter-stage` refuses to write
-while `check-stage-entry` is red, so the hook a bypass skips is exactly the
-battery that would confirm the stamp just written. A stage entry is never the
-one-off-with-cause that a bypass is reserved for.
+The **deterministic half** of that first step — read the iteration from the header, read the id from the `--emit-session-id` arm, append the stamp — is mechanized by `bash gate-sdk/bin/run-gates.sh --enter-stage <stage>`, the same writer/asserter split as `--emit git-hooks` ↔ `check-graph`: the skill invokes it, **judgment stays in the skill** (what the stage means, its exit condition, when to enter it at all), and the stage gates stay the independent verifier. The tool takes no `--force` flag, so the compliant path is the easy one — an operator who intends to override writes the stamp by hand, exactly as before the tool existed. Committing the stamp remains the skill's business, and the commit that adds a stamp carries the stamped stage as its subject scope (`<type>(<stage>): …`): `--enter-stage` prints that subject and `check-stamp-subject` holds it. The stamp commit is bound because a recovery keyed on the stage name — `git log --grep`, a pickaxe — must find the entry; a stage session's other commits keep their component scope, because nothing in them identifies the stage that made them. The stamp commits on its own — with **one** exception, stated here rather than only where the valve is, because a session reads this rule at its entry step and the valve's contract several sections away: an entry the one-shot pre-flight valve admitted rewrites the valve ledger in the same motion as the stamp, so the two commit together and the purity assertion exempts exactly that path (§bin/enter-stage.sh, §check-stage-evidence). And **never with `--no-verify`**: `--enter-stage` refuses to write while `check-stage-entry` is red, so the hook a bypass skips is exactly the battery that would confirm the stamp just written. A stage entry is never the one-off-with-cause that a bypass is reserved for.
 
-The first stage is the iteration boundary: `--enter-stage` *truncates* the
-evidence file back to its header (git history is the permanent audit trail;
-the gates only read the current iteration) and stamps under the
-unnamed-iteration sentinel `—`, rewritten to the real name when the stage
-names the iteration. Later stages only append.
+The first stage is the iteration boundary: `--enter-stage` *truncates* the evidence file back to its header (git history is the permanent audit trail; the gates only read the current iteration) and stamps under the unnamed-iteration sentinel `—`, rewritten to the real name when the stage names the iteration. Later stages only append.
 
-**The no-cursor window.** Because the cursor is the last stamp, it has an empty
-state the header never had — and one of its two shapes is reachable in normal
-operation. The boundary truncation leaves the evidence file holding its prose
-preamble and `---` with **no data line**, and the cursor is empty until the
-boundary stamp lands milliseconds later; the second shape is an absent file
-entirely (an unvendored or pre-upgrade consumer). Every reader of the cursor —
-inside this kit and in every consuming kit that derives it — **states its own
-behavior for that window** rather than inheriting whatever its parser happens
-to emit. The shared derivation `stages::current_stage` reports it as empty
-with a *success* status, because "no cursor" is a legitimate state and not an
-error; what it means is the caller's ruling, and each caller's is recorded in
-its own section.
+**The no-cursor window.** Because the cursor is the last stamp, it has an empty state the header never had — and one of its two shapes is reachable in normal operation. The boundary truncation leaves the evidence file holding its prose preamble and `---` with **no data line**, and the cursor is empty until the boundary stamp lands milliseconds later; the second shape is an absent file entirely (an unvendored or pre-upgrade consumer). Every reader of the cursor — inside this kit and in every consuming kit that derives it — **states its own behavior for that window** rather than inheriting whatever its parser happens to emit. The shared derivation `stages::current_stage` reports it as empty with a *success* status, because "no cursor" is a legitimate state and not an error; what it means is the caller's ruling, and each caller's is recorded in its own section.
 
-**Honest limit:** a stamp proves the stage skill was *invoked*, not that its
-work was done faithfully — strictly better than skip-and-no-trace, but not
-proof of done. The `<session-id>` field is **read, not hand-picked**:
-the `--emit-session-id` arm prints the canonical id by a fixed derivation
-order (§bin/session-id.sh), which rotates per session (including across a context
-clear), and the stage skills stamp exactly what it prints, so each stage's
-provenance is observed, not guessed.
-`check-stage-evidence`'s invocation floor keys on `<iteration> <stage>`; it
-additionally reads the session id to enforce cross-stage distinctness under
-the default `stage` posture (a stage entry must carry a fresh session; the
-`iteration` posture of `LIFECYCLE_KIT_SESSION_BOUNDARY` relaxes exactly this —
-see §check-stage-evidence).
+**Honest limit:** a stamp proves the stage skill was *invoked*, not that its work was done faithfully — strictly better than skip-and-no-trace, but not proof of done. The `<session-id>` field is **read, not hand-picked**: the `--emit-session-id` arm prints the canonical id by a fixed derivation order (§bin/session-id.sh), which rotates per session (including across a context clear), and the stage skills stamp exactly what it prints, so each stage's provenance is observed, not guessed. `check-stage-evidence`'s invocation floor keys on `<iteration> <stage>`; it additionally reads the session id to enforce cross-stage distinctness under the default `stage` posture (a stage entry must carry a fresh session; the `iteration` posture of `LIFECYCLE_KIT_SESSION_BOUNDARY` relaxes exactly this — see §check-stage-evidence).
 
-**Same-stage re-entry (N sibling sessions per stage).** Entering the
-currently-stamped stage from a *new* session is legal and appends a fresh
-stamp: `--enter-stage`'s idempotence guard keys on the full
-`(iteration, stage, session-id, head)` tuple, so only the *same* session
-re-entering **at the same commit** is a no-op — a re-entry after `HEAD` moved
-appends a fresh stamp carrying the new head, which is what makes re-running the
-tool the stated remedy for a stale recorded head rather than a reported no-op
-that changes nothing (§check-stage-evidence). `check-stage-entry` assertion A
-keys on the *predecessor* stamp,
-which the stage's first entry satisfied for every sibling. So N sessions may
-enter one stage — a multi-session build, or a lead's intra-stage batch split
-(§templates/lead.md) — serialized by the shared index/HEAD like any concurrent
-sessions; each leaves its own stamp, so per-batch provenance rides the existing
-stamp grammar with no new field. A sibling's entry simply appends another stamp
-naming the same stage, which leaves the cursor where it already was — there is
-no once-per-stage write left to make idempotent.
+**Same-stage re-entry (N sibling sessions per stage).** Entering the currently-stamped stage from a *new* session is legal and appends a fresh stamp: `--enter-stage`'s idempotence guard keys on the full `(iteration, stage, session-id, head)` tuple, so only the *same* session re-entering **at the same commit** is a no-op — a re-entry after `HEAD` moved appends a fresh stamp carrying the new head, which is what makes re-running the tool the stated remedy for a stale recorded head rather than a reported no-op that changes nothing (§check-stage-evidence). `check-stage-entry` assertion A keys on the *predecessor* stamp, which the stage's first entry satisfied for every sibling. So N sessions may enter one stage — a multi-session build, or a lead's intra-stage batch split (§templates/lead.md) — serialized by the shared index/HEAD like any concurrent sessions; each leaves its own stamp, so per-batch provenance rides the existing stamp grammar with no new field. A sibling's entry simply appends another stamp naming the same stage, which leaves the cursor where it already was — there is no once-per-stage write left to make idempotent.
 
-**The optional lead never becomes a second state source.** An iteration may run
-with a live *lead* session (§templates/lead.md) that dispatches its stage
-sessions and answers their escalations so a blocked stage resumes in place
-rather than restarting. The lead writes no state: every stamp
-originates in a stage session through `--enter-stage`, exactly as above, so the
-stamp protocol stays the only iteration state and a lead crash costs
-nothing the tracked surfaces do not already hold. The lead is a boundary skill,
-not a stage — it stamps nothing and joins no stage set, so the coverage gate
-never reads it (the release-sweep precedent, §templates/lead.md).
+**The optional lead never becomes a second state source.** An iteration may run with a live *lead* session (§templates/lead.md) that dispatches its stage sessions and answers their escalations so a blocked stage resumes in place rather than restarting. The lead writes no state: every stamp originates in a stage session through `--enter-stage`, exactly as above, so the stamp protocol stays the only iteration state and a lead crash costs nothing the tracked surfaces do not already hold. The lead is a boundary skill, not a stage — it stamps nothing and joins no stage set, so the coverage gate never reads it (the release-sweep precedent, §templates/lead.md).
 
-**A lead stamp is ruled out rather than merely omitted, and the enforcement
-reading is what makes that difference.** It breaks the invariant above by
-construction, and under `LIFECYCLE_KIT_SESSION_BOUNDARY`'s `stage` posture it
-also trips the gate: a live lead holds one session id across every stage it
-touches, so a lead-written stamp is precisely the cross-stage duplicate
-§check-stage-evidence reads as a self-reported skip. The rule and the check
-therefore agree rather than merely coexist, which is why the template states the
-ban and not this reasoning.
+**A lead stamp is ruled out rather than merely omitted, and the enforcement reading is what makes that difference.** It breaks the invariant above by construction, and under `LIFECYCLE_KIT_SESSION_BOUNDARY`'s `stage` posture it also trips the gate: a live lead holds one session id across every stage it touches, so a lead-written stamp is precisely the cross-stage duplicate §check-stage-evidence reads as a self-reported skip. The rule and the check therefore agree rather than merely coexist, which is why the template states the ban and not this reasoning.
 
-**Honest limit on the lead's dispatch precondition.** A lead dispatches stage
-N+1 on stage N's **agent completion notification**, never on an artifact — not
-its commit, its stamp, a clean tree, a green battery, or a cleared `--simulate`
-(§templates/lead.md) — nor on its hand-back report, which the session sends
-before its turn ends and so can arrive ahead of the notification. That precondition is **prose-only and human-enforced**, and
-the cause is structural rather than budgetary. The signal's **producer is the
-harness**, emitting it when the dispatched session's turn ends — outside every
-governed tree, which is not a gap to close but the direct reason no gate can read
-it; its enabling configuration is the dispatch itself, since the lead dispatches
-in the background with notification (delegation-kit/SPEC.md §The delegation
-model), so the producer is reachable on the ordinary path. Its **consumer is the
-lead**, at the dispatch transition for stage N+1, by the lead's own in-turn wait
-rather than a read. Its **truthfulness** is not the harness's to guarantee: a
-dispatched session that ends its turn on still-running work emits a notification
-that lies, which is what delegation-kit/SPEC.md §Operative residency exists to
-prevent. The limit is recorded here rather than left to be inferred from the
-absence of a gate, because an unstated version reads as an oversight for a later
-session to fix by building the impossible gate.
+**Honest limit on the lead's dispatch precondition.** A lead dispatches stage N+1 on stage N's **agent completion notification**, never on an artifact — not its commit, its stamp, a clean tree, a green battery, or a cleared `--simulate` (§templates/lead.md) — nor on its hand-back report, which the session sends before its turn ends and so can arrive ahead of the notification. That precondition is **prose-only and human-enforced**, and the cause is structural rather than budgetary. The signal's **producer is the harness**, emitting it when the dispatched session's turn ends — outside every governed tree, which is not a gap to close but the direct reason no gate can read it; its enabling configuration is the dispatch itself, since the lead dispatches in the background with notification (delegation-kit/SPEC.md §The delegation model), so the producer is reachable on the ordinary path. Its **consumer is the lead**, at the dispatch transition for stage N+1, by the lead's own in-turn wait rather than a read. Its **truthfulness** is not the harness's to guarantee: a dispatched session that ends its turn on still-running work emits a notification that lies, which is what delegation-kit/SPEC.md §Operative residency exists to prevent. The limit is recorded here rather than left to be inferred from the absence of a gate, because an unstated version reads as an oversight for a later session to fix by building the impossible gate.
 
-**One misreading of that precondition is named in the template, and it is
-kit-tier for the same reason this limit is.** An approval prompt gates a command
-*starting*, so an operator's note about having just answered one timestamps a
-beginning and never a completion. The misreading is available to any lead on any
-harness that prompts — generality — and it arrives reading as good news at
-exactly the moment a lead wants good news — salience. Those two together are what
-make it a shipped rule rather than one tree's incident lore, which is the test any
-candidate trap has to pass before the template carries it.
+**One misreading of that precondition is named in the template, and it is kit-tier for the same reason this limit is.** An approval prompt gates a command *starting*, so an operator's note about having just answered one timestamps a beginning and never a completion. The misreading is available to any lead on any harness that prompts — generality — and it arrives reading as good news at exactly the moment a lead wants good news — salience. Those two together are what make it a shipped rule rather than one tree's incident lore, which is the test any candidate trap has to pass before the template carries it.
 
-Naming the limit is also what routes the
-enforcement duty to where it *can* be discharged: the **negative is** assertable
-from the artifact side. A producer-liveness gate wired into
-`LIFECYCLE_KIT_ENTRY_PREFLIGHT` (evidence-kit/SPEC.md §check-producer-liveness)
-answers *is the producer still running?* independently of the signal, which is
-what covers the case where the signal itself is wrong. Precedent for a
-prose-only rule in the same template: the no-sibling-dispatch clause, prose for
-the same reason.
+Naming the limit is also what routes the enforcement duty to where it *can* be discharged: the **negative is** assertable from the artifact side. A producer-liveness gate wired into `LIFECYCLE_KIT_ENTRY_PREFLIGHT` (evidence-kit/SPEC.md §check-producer-liveness) answers *is the producer still running?* independently of the signal, which is what covers the case where the signal itself is wrong. Precedent for a prose-only rule in the same template: the no-sibling-dispatch clause, prose for the same reason.
 
-**Honest limit on the lead's post-dispatch check routing.** The rule that the
-lead's verify of the evidence-producing stage is a **read** of the committed
-evidence rather than a re-run of the producer (§templates/lead.md, applying
-delegation-kit/SPEC.md §Verify after every agent commit) is likewise
-**prose-only and human-enforced**, and for the generic reason that section
-states: the subject is a lead's *choice of command*, which leaves no tracked
-artifact any check could read. The nearest artifact-side proxy is
-`check-producer-liveness` on the entry-preflight hook (evidence-kit/SPEC.md
-§check-producer-liveness), and its coverage boundary must be stated precisely or
-this limit reads as closed when it is not: that gate answers *is a producer
-running now*, so it covers the **concurrent** case — a producer still live when
-the next entry is stamped — and not a **sequential** re-run, where a lead
-re-runs the producer after it has cleanly exited, holds no lock, and reds
-nothing. The two limits in this section are the same shape from opposite sides
-of one dispatch: the one above is about waiting for stage N to be *over*, this
-one about which command is safe *once it is*.
+**Honest limit on the lead's post-dispatch check routing.** The rule that the lead's verify of the evidence-producing stage is a **read** of the committed evidence rather than a re-run of the producer (§templates/lead.md, applying delegation-kit/SPEC.md §Verify after every agent commit) is likewise **prose-only and human-enforced**, and for the generic reason that section states: the subject is a lead's *choice of command*, which leaves no tracked artifact any check could read. The nearest artifact-side proxy is `check-producer-liveness` on the entry-preflight hook (evidence-kit/SPEC.md §check-producer-liveness), and its coverage boundary must be stated precisely or this limit reads as closed when it is not: that gate answers *is a producer running now*, so it covers the **concurrent** case — a producer still live when the next entry is stamped — and not a **sequential** re-run, where a lead re-runs the producer after it has cleanly exited, holds no lock, and reds nothing. The two limits in this section are the same shape from opposite sides of one dispatch: the one above is about waiting for stage N to be *over*, this one about which command is safe *once it is*.
 
-**Honest limit on the lead's open authorization.** The rule that opening an
-iteration is the operator's decision, obtained explicitly through the channel the
-consumer binds; that the grant arriving on that channel carries a cardinality and
-is spent by the open it pays for; and that the lead therefore stops and reports
-rather than opening the next one at the boundary
-(§templates/lead.md, one rule seated on the grant and read at both ends) is
-**prose-only and human-enforced** like its two siblings above — and here the cause is that the
-fact is **not encodable**, not that encoding is expensive. An authorization is a
-fact about a conversation. Every encoding of it — a flag on `--enter-stage`, a
-committed line naming an authority, a ledger arming — is written by the same
-session it binds, so it raises the cost of proceeding unauthorized and does not
-make an unauthorized open detectable afterward. **The channel and the cardinality
-are unencodable for that identical reason, said here rather than left inferable,
-because a bound channel and a stated number both look more mechanical than the
-bare decision does.** A bound channel is still a fact about a conversation, and a
-session could write *my invocation carried a two-iteration grant* exactly as
-easily as it could proceed unauthorized today; a number recorded anywhere is
-recorded by the reader it constrains. Neither mechanism named below is re-weighed
-against them and no third is proposed. Recording the limit is what keeps
-the prose rule from reading as a weaker stand-in for a mechanism that was
-available. **Two mechanisms were weighed, and which is which is on record.** The
-one-shot entry valve (§bin/enter-stage.sh) is ruled out **by its own contract**
-rather than by preference: it reaches no iteration-boundary refusal at all, and
-its ledger matches the queue header's iteration name while the boundary entry
-stamps the unnamed placeholder — so at the moment an authorization would be
-checked there is no name an arming could have been written against.
-`LIFECYCLE_KIT_BOUNDARY_REQUIRE` is the shape that would actually fit, already
-firing only on the first stage, reading a committed file, and failing closed when
-the file is absent; two costs are named with it rather than discovered later — it
-is guarded on the closing iteration having a name, so a consumer's very first
-iteration skips it, and its refusal text is written for the disposition semantics
-it currently serves, so a second semantic needs either a second knob or a
-generalized message. **Naming the shape is not proposing it**; it is what a later
-reader needs so that *no floor was buildable* is not the conclusion drawn from
-this refusal.
+**Honest limit on the lead's open authorization.** The rule that opening an iteration is the operator's decision, obtained explicitly through the channel the consumer binds; that the grant arriving on that channel carries a cardinality and is spent by the open it pays for; and that the lead therefore stops and reports rather than opening the next one at the boundary (§templates/lead.md, one rule seated on the grant and read at both ends) is **prose-only and human-enforced** like its two siblings above — and here the cause is that the fact is **not encodable**, not that encoding is expensive. An authorization is a fact about a conversation. Every encoding of it — a flag on `--enter-stage`, a committed line naming an authority, a ledger arming — is written by the same session it binds, so it raises the cost of proceeding unauthorized and does not make an unauthorized open detectable afterward. **The channel and the cardinality are unencodable for that identical reason, said here rather than left inferable, because a bound channel and a stated number both look more mechanical than the bare decision does.** A bound channel is still a fact about a conversation, and a session could write *my invocation carried a two-iteration grant* exactly as easily as it could proceed unauthorized today; a number recorded anywhere is recorded by the reader it constrains. Neither mechanism named below is re-weighed against them and no third is proposed. Recording the limit is what keeps the prose rule from reading as a weaker stand-in for a mechanism that was available. **Two mechanisms were weighed, and which is which is on record.** The one-shot entry valve (§bin/enter-stage.sh) is ruled out **by its own contract** rather than by preference: it reaches no iteration-boundary refusal at all, and its ledger matches the queue header's iteration name while the boundary entry stamps the unnamed placeholder — so at the moment an authorization would be checked there is no name an arming could have been written against. `LIFECYCLE_KIT_BOUNDARY_REQUIRE` is the shape that would actually fit, already firing only on the first stage, reading a committed file, and failing closed when the file is absent; two costs are named with it rather than discovered later — it is guarded on the closing iteration having a name, so a consumer's very first iteration skips it, and its refusal text is written for the disposition semantics it currently serves, so a second semantic needs either a second knob or a generalized message. **Naming the shape is not proposing it**; it is what a later reader needs so that *no floor was buildable* is not the conclusion drawn from this refusal.
 
 ### Deviation transitions
 
-The stages walk `scope → align → build → validate → close` in order by
-default; the gate-legal shapes for leaving that walk are specified here, not
-improvised. Each composes mechanism the kit already owns — `--enter-stage`'s
-boundary reset, canon-kit's amendment pairing, queue-kit's tag algebra — so
-**no new tooling, state, stamp grammar, or tag is introduced**, and a
-harness-less consumer keeps every shape. `check-stage-entry` and the stamp
-protocol bar an ad-hoc abandon, which is why each hatch is spelled against the
-existing gates.
+The stages walk `scope → align → build → validate → close` in order by default; the gate-legal shapes for leaving that walk are specified here, not improvised. Each composes mechanism the kit already owns — `--enter-stage`'s boundary reset, canon-kit's amendment pairing, queue-kit's tag algebra — so **no new tooling, state, stamp grammar, or tag is introduced**, and a harness-less consumer keeps every shape. `check-stage-entry` and the stamp protocol bar an ad-hoc abandon, which is why each hatch is spelled against the existing gates.
 
-**The demote ritual** is the shared step the other shapes compose. To take a
-promoted entry out of a live iteration: move it back to the deferred queue
-section restoring its board tags, and delete its amendment file in the
-same commit. Git history preserves the design — a later scope re-promotes by
-resurrecting the file from history rather than re-deriving it. The enforcement
-is already on the books: canon-kit's `check-amendment-queue` reds the commit on
-a deferred entry that still carries a spec ref, or an orphaned amendment left on
-disk. If the validate baseline carries a scenario keyed to the demoted entry,
-that scenario is re-scoped or removed in the same commit — a coverage-honesty
-obligation, not a gate one (`check-evidence-baseline`'s slug-liveness passes
-regardless, since a demoted entry stays a live queue task). **For an
-`[observed-by:]` entry the ritual is the fallback and not the normal path**: it
-stays legal, but §The state machine's push placement makes the observation
-arrive in-iteration, so the ritual's price there — the grammar cannot mark a
-unit landed-but-unobservable, and a demoted entry reads as unstarted — is no
-longer paid on the normal path.
+**The demote ritual** is the shared step the other shapes compose. To take a promoted entry out of a live iteration: move it back to the deferred queue section restoring its board tags, and delete its amendment file in the same commit. Git history preserves the design — a later scope re-promotes by resurrecting the file from history rather than re-deriving it. The enforcement is already on the books: canon-kit's `check-amendment-queue` reds the commit on a deferred entry that still carries a spec ref, or an orphaned amendment left on disk. If the validate baseline carries a scenario keyed to the demoted entry, that scenario is re-scoped or removed in the same commit — a coverage-honesty obligation, not a gate one (`check-evidence-baseline`'s slug-liveness passes regardless, since a demoted entry stays a live queue task). **For an `[observed-by:]` entry the ritual is the fallback and not the normal path**: it stays legal, but §The state machine's push placement makes the observation arrive in-iteration, so the ritual's price there — the grammar cannot mark a unit landed-but-unobservable, and a demoted entry reads as unstarted — is not paid on the normal path.
 
-**Abandon** ends an iteration without a close. Disposition every active entry
-explicitly — demote it (ritual above) or carry it (it stays active with its
-amendment and the next iteration adopts it); sink or delete every Lessons entry
-under the existing disposition rules (the first-stage entry refuses a non-empty
-Lessons section, so this is already forced). Then the next `--enter-stage
-scope` *is* the abandon: scope has no mandatory predecessor, so the entry is
-gate-legal from any stage, and the boundary reset drops the dead iteration's
-stamps exactly as it drops a closed one's (git history is the permanent audit
-trail — the existing boundary doctrine, not a new rule). The abandon commit's
-subject names the abandoned iteration; no stamp grammar changes.
+**Abandon** ends an iteration without a close. Disposition every active entry explicitly — demote it (ritual above) or carry it (it stays active with its amendment and the next iteration adopts it); sink or delete every Lessons entry under the existing disposition rules (the first-stage entry refuses a non-empty Lessons section, so this is already forced). Then the next `--enter-stage scope` *is* the abandon: scope has no mandatory predecessor, so the entry is gate-legal from any stage, and the boundary reset drops the dead iteration's stamps exactly as it drops a closed one's (git history is the permanent audit trail — the existing boundary doctrine, not a new rule). The abandon commit's subject names the abandoned iteration; no stamp grammar changes.
 
-**Split mid-flight** narrows a live iteration. The iteration name never changes
-once set — every stamp already written carries it, and a rename-in-place is
-barred because it would orphan those stamps against `check-stage-evidence`'s
-name-axis agreement — its staleness assertion reds every stamp whose iteration
-is not the header's. So splitting is demotion: demote the split-out subset
-via the ritual and drive the remaining queue through the remaining stages; the
-subset re-promotes at a later scope under its own iteration.
+**Split mid-flight** narrows a live iteration. The iteration name never changes once set — every stamp already written carries it, and a rename-in-place is barred because it would orphan those stamps against `check-stage-evidence`'s name-axis agreement — its staleness assertion reds every stamp whose iteration is not the header's. So splitting is demotion: demote the split-out subset via the ritual and drive the remaining queue through the remaining stages; the subset re-promotes at a later scope under its own iteration.
 
-**Reopen after close** is barred as an in-place edit. Stamps are append-only
-within an iteration and scope is the only reset, so there is no gate-legal way
-to continue a closed iteration's evidence file — and no history rewrite is
-sanctioned to fake one (doctrine-kit's *Re-verify volatile state before a git
-history rewrite* territory — cited by name, since a rule number re-arms the
-drift every later insertion causes). The sanctioned shape
-is a successor iteration: a post-close defect files as a debt entry and the
-follow-up iteration proceeds normally; the closed iteration's record stays
-immutable.
+**Reopen after close** is barred as an in-place edit. Stamps are append-only within an iteration and scope is the only reset, so there is no gate-legal way to continue a closed iteration's evidence file — and no history rewrite is sanctioned to fake one (doctrine-kit's *Re-verify volatile state before a git history rewrite* territory — cited by name, since a rule number re-arms the drift every later insertion causes). The sanctioned shape is a successor iteration: a post-close defect files as a debt entry and the follow-up iteration proceeds normally; the closed iteration's record stays immutable.
 
-**The interstitial mitigation** is the shape that fits *between* a close and the
-next scope. A repo-local mitigation for a recurring incident may land directly in
-that window while the incident's queue entry stays open for the kit-shaped form.
-One cap makes it admissible: **it adds no governed name** — canon-kit's
-feature/debt litmus read the other way (canon-kit/SPEC.md §The amendment
-lifecycle, where a task adding any name to a governed surface is a feature and
-needs an amendment). So an interstitial landing is admissible exactly when it is
-debt-shaped; anything feature-shaped waits for scope. The entry stays open either
-way, because the mitigation is repo-local and the entry's deliverable is not. Like
-every shape here it introduces no tooling, state, stamp grammar or tag — the cap
-is an existing litmus and the landing is an ordinary commit. It **widens Reopen
-after close** rather than competing with it: routing a post-close defect to a debt
-entry and a normal follow-up iteration is the right answer for a first occurrence
-and the wrong one for the fourth, and the fourth is now countable
-(queue-kit/SPEC.md §The tag algebra, the `recurrence:` declaration). The commit
-accounting already holds and needs no change — an interstitial commit falls into
-the *next* iteration's range and surfaces when that iteration closes
-(drift-kit/SPEC.md §The published-evidence extractor).
+**The interstitial mitigation** is the shape that fits *between* a close and the next scope. A repo-local mitigation for a recurring incident may land directly in that window while the incident's queue entry stays open for the kit-shaped form. One cap makes it admissible: **it adds no governed name** — canon-kit's feature/debt litmus read the other way (canon-kit/SPEC.md §The amendment lifecycle, where a task adding any name to a governed surface is a feature and needs an amendment). So an interstitial landing is admissible exactly when it is debt-shaped; anything feature-shaped waits for scope. The entry stays open either way, because the mitigation is repo-local and the entry's deliverable is not. Like every shape here it introduces no tooling, state, stamp grammar or tag — the cap is an existing litmus and the landing is an ordinary commit. It **widens Reopen after close** rather than competing with it: routing a post-close defect to a debt entry and a normal follow-up iteration is the right answer for a first occurrence and the wrong one for the fourth, and the fourth is now countable (queue-kit/SPEC.md §The tag algebra, the `recurrence:` declaration). The commit accounting already holds and needs no change — an interstitial commit falls into the *next* iteration's range and surfaces when that iteration closes (drift-kit/SPEC.md §The published-evidence extractor).
 
-**A parallel hotfix track is refused**, recorded here so it is not re-proposed: it
-violates scope-gated intake, it contends on live stage surfaces, and most incident
-fixes are feature-shaped — so a "hotfix" of them is an unreviewed iteration. The
-lane this shape governs already half-existed; what was missing was the signal that
-says when to use it.
+**A parallel hotfix track is refused**, recorded here so it is not re-proposed: it violates scope-gated intake, it contends on live stage surfaces, and most incident fixes are feature-shaped — so a "hotfix" of them is an unreviewed iteration. The lane this shape governs already half-existed; what was missing was the signal that says when to use it.
 
-**The close-merge** is the concurrent-close shape, and like the others it
-composes existing mechanism (the merge-supersede rule of §Multi-operator
-semantics, not new tooling). Iteration boundaries serialize on the integration
-branch: the closing operator reconciles *on their iteration branch* — merges the
-integration branch in, where the `merge=iteration-scoped` driver resolves the
-iteration-scoped surfaces to their own (arriving) side and humans resolve the
-content conflicts — re-runs the full battery green, then lands
-fast-forward-only on the integration branch. The integration branch never hosts
-a conflict resolution, so "arriving iteration" is always well-defined (ours on
-the iteration branch) and every merged tree passed the battery post-reconcile.
+**The close-merge** is the concurrent-close shape, and like the others it composes existing mechanism (the merge-supersede rule of §Multi-operator semantics, not new tooling). Iteration boundaries serialize on the integration branch: the closing operator reconciles *on their iteration branch* — merges the integration branch in, where the `merge=iteration-scoped` driver resolves the iteration-scoped surfaces to their own (arriving) side and humans resolve the content conflicts — re-runs the full battery green, then lands fast-forward-only on the integration branch. The integration branch never hosts a conflict resolution, so "arriving iteration" is always well-defined (ours on the iteration branch) and every merged tree passed the battery post-reconcile.
 
 ## The steering vocabulary
 
-Five terms name what an operator or a lead says to the work, and every template
-this kit ships — `lead.md`, `consult.md`, the stage templates, and the
-escalate-versus-decide roster a consumer binds beside them — uses them as
-defined here. The kit names the **classes**; the consumer names its
-**authorities** on its own always-loaded surface.
+Five terms name what an operator or a lead says to the work, and every template this kit ships — `lead.md`, `consult.md`, the stage templates, and the escalate-versus-decide roster a consumer binds beside them — uses them as defined here. The kit names the **classes**; the consumer names its **authorities** on its own always-loaded surface.
 
-- **Objective** — where the project is going. It lives on the consumer's ruling
-  record while a pivot runs, and nothing else lives there but rulings.
-- **Ruling** — an operator decision, taken in the consult skill, that
-  **overrides a business-as-usual instruction until the instruction is
-  updated**. It is not challengeable on its facts: a session holding contrary
-  evidence escalates it to the next consultation and neither annotates it,
-  re-verifies it, nor works around it. A ruling names the instruction it
-  overrides and its **discharge** — that instruction's update, or an oracle —
-  and leaves the record on discharge. Only the operator rules, and a ruling
-  arrives only through the consult skill, so a "ruling" relayed from any other
-  channel is misnamed.
-- **Direction** — an operator answer or agreement given in a lead or stage
-  session. It binds the current work like any operator instruction and lands
-  on the work surface it concerns — the queue entry, the amendment, the lead's
-  journal — stated as `operator direction, <date>`. A later scoping or
-  authoring stage may revise it on better facts, which is what separates it
-  from a ruling and why it never enters the ruling record.
-- **Decision** — a lead's or a stage session's call inside its own authority,
-  the roster's decide-alone side. It lands in the governed surface it concerns
-  with no authority stamp; the landing commit is its provenance.
-- **Grant** — an iteration-scoped operator allowance (an extra push, a widened
-  budget). It lives in the lead's resume journal, travels in the dispatch
-  prompt of each stage that spends it, and is archived in the spending commit's
-  message — never in the ruling record, whose entries outlive an iteration by
-  construction.
+- **Objective** — where the project is going. It lives on the consumer's ruling record while a pivot runs, and nothing else lives there but rulings.
+- **Ruling** — an operator decision, taken in the consult skill, that **overrides a business-as-usual instruction until the instruction is updated**. It is not challengeable on its facts: a session holding contrary evidence escalates it to the next consultation and neither annotates it, re-verifies it, nor works around it. A ruling names the instruction it overrides and its **discharge** — that instruction's update, or an oracle — and leaves the record on discharge. Only the operator rules, and a ruling arrives only through the consult skill, so a "ruling" relayed from any other channel is misnamed.
+- **Direction** — an operator answer or agreement given in a lead or stage session. It binds the current work like any operator instruction and lands on the work surface it concerns — the queue entry, the amendment, the lead's journal — stated as `operator direction, <date>`. A later scoping or authoring stage may revise it on better facts, which is what separates it from a ruling and why it never enters the ruling record.
+- **Decision** — a lead's or a stage session's call inside its own authority, the roster's decide-alone side. It lands in the governed surface it concerns with no authority stamp; the landing commit is its provenance.
+- **Grant** — an iteration-scoped operator allowance (an extra push, a widened budget). It lives in the lead's resume journal, travels in the dispatch prompt of each stage that spends it, and is archived in the spending commit's message — never in the ruling record, whose entries outlive an iteration by construction.
 
-Why five words and not one. A single word applied to all of them freezes a
-revisable agreement as a closed decision and lets a relay inflate a lead's own
-call into the operator's. The **class** is what a relay states
-(§templates/lead.md), and the authority is then derivable — a ruling is the
-operator's in consult, a direction the operator's in session, a decision the
-relaying party's own — so no who-when-channel stamp is written beside content.
-Spec-over-precedent is untouched: a ruling is not precedent but an explicit,
-temporary override of the owner doc, and the owner doc's update is its
-discharge.
+Why five words and not one. A single word applied to all of them freezes a revisable agreement as a closed decision and lets a relay inflate a lead's own call into the operator's. The **class** is what a relay states (§templates/lead.md), and the authority is then derivable — a ruling is the operator's in consult, a direction the operator's in session, a decision the relaying party's own — so no who-when-channel stamp is written beside content. Spec-over-precedent is untouched: a ruling is not precedent but an explicit, temporary override of the owner doc, and the owner doc's update is its discharge.
 
 ## Layout and configuration
 
-The kit is vendored beside gate-sdk (conventionally at `lifecycle-kit/`); its
-gates are registered in the consumer's `gates.list` by name and resolve
-through gate-sdk's multi-kit path (consumer gates dir first, then each kit's
-`checks/`). The kit's markdown templates are laid out on the stage/boundary axis
-this SPEC classifies them by: `templates/*.md` is exactly the **boundary skills**
-(`lead.md`, `release-sweep.md`, `upgrade.md`, `consult.md`),
-`templates/stages/*.md` exactly
-the stage-class templates. Stage skills adopt `templates/stages/*.md` in one of
-two modes — copied into the consumer's agent-skill directory with each named slot
-overwritten, or a thin binding shim that references the template (the grammar
-and the contract both modes satisfy are §templates/stages/).
+The kit is vendored beside gate-sdk (conventionally at `lifecycle-kit/`); its gates are registered in the consumer's `gates.list` by name and resolve through gate-sdk's multi-kit path (consumer gates dir first, then each kit's `checks/`). The kit's markdown templates are laid out on the stage/boundary axis this SPEC classifies them by: `templates/*.md` is exactly the **boundary skills** (`lead.md`, `release-sweep.md`, `upgrade.md`, `consult.md`), `templates/stages/*.md` exactly the stage-class templates. Stage skills adopt `templates/stages/*.md` in one of two modes — copied into the consumer's agent-skill directory with each named slot overwritten, or a thin binding shim that references the template (the grammar and the contract both modes satisfy are §templates/stages/).
 
-The stage machine itself is config with this repo's lifecycle as the
-default. Config is a **knob file**: copy `templates/lifecycle-config.knobs` into
-the gates dir as `lifecycle-config.knobs` (or point `LIFECYCLE_KIT_KNOB_FILE`
-elsewhere) and set only what you override — this roster owns every knob and its
-default; the template carries no second copy. lifecycle-kit's knobs are
-**static**: the binary resolves them in process from its own defaults table and
-the consumer's knob file; `bash gate-sdk/bin/run-gates.sh --emit
-knob-roster` prints each one with its shape and rendered default. The grammar, the
-`.local` overlay, the environment-over-file precedence for a scalar, and the
-refusals — a set `LIFECYCLE_KIT_KNOB_FILE` that does not exist, a left-behind
-`lifecycle-config.sh`, a non-empty file named by the retired
-`LIFECYCLE_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob file's. The kit's
-table validator checks the machine (unknown stages in the map, a waiver token
-colliding with a stage name, a non-integer n-gram width, a malformed preflight
-entry) and exits 2 on a malformed config — a broken machine must not gate
-anything (§The stage-machine adapters). A derived default below names the knob it reads as `${NAME}`, or as `${NAME:-<default>}` so the roster's rendered literal reads as agreement.
+The stage machine itself is config with this repo's lifecycle as the default. Config is a **knob file**: copy `templates/lifecycle-config.knobs` into the gates dir as `lifecycle-config.knobs` (or point `LIFECYCLE_KIT_KNOB_FILE` elsewhere) and set only what you override — this roster owns every knob and its default; the template carries no second copy. lifecycle-kit's knobs are **static**: the binary resolves them in process from its own defaults table and the consumer's knob file; `bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one with its shape and rendered default. The grammar, the `.local` overlay, the environment-over-file precedence for a scalar, and the refusals — a set `LIFECYCLE_KIT_KNOB_FILE` that does not exist, a left-behind `lifecycle-config.sh`, a non-empty file named by the retired `LIFECYCLE_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob file's. The kit's table validator checks the machine (unknown stages in the map, a waiver token colliding with a stage name, a non-integer n-gram width, a malformed preflight entry) and exits 2 on a malformed config — a broken machine must not gate anything (§The stage-machine adapters). A derived default below names the knob it reads as `${NAME}`, or as `${NAME:-<default>}` so the roster's rendered literal reads as agreement.
 
-**No knob carries the ruling-authority vocabulary, and this is where a reader
-looking for one finds out why.** §The state machine obliges a stage session to
-record who ruled a ruling it lands, and the authorities a project recognises are
-its own governance roles — named on the consumer's always-loaded surface, not
-here. No kit mechanism reads those values: nothing in this kit branches on them,
-so a knob holding them would have `check-knob-citation` as its only reader, which
-is a knob that should not exist. The grammar itself is queue-kit's
-(§The tag algebra owns the slot); this kit owns only the timing.
+**No knob carries the ruling-authority vocabulary, and this is where a reader looking for one finds out why.** §The state machine obliges a stage session to record who ruled a ruling it lands, and the authorities a project recognises are its own governance roles — named on the consumer's always-loaded surface, not here. No kit mechanism reads those values: nothing in this kit branches on them, so a knob holding them would have `check-knob-citation` as its only reader, which is a knob that should not exist. The grammar itself is queue-kit's (§The tag algebra owns the slot); this kit owns only the timing.
 
-Knob-rename compat precedent. A rename carries two obligations of different
-natures, and each answers to its own threshold.
+Knob-rename compat precedent. A rename carries two obligations of different natures, and each answers to its own threshold.
 
-**Declaration — owed from the first release tag, unconditionally.** A tagged
-release is a distribution, and whoever vendored it reads the note to learn what
-moved. From the first tag onward a rename owes a Renamed knobs declaration on the
-release declaration surface, and so in the note.
+**Declaration — owed from the first release tag, unconditionally.** A tagged release is a distribution, and whoever vendored it reads the note to learn what moved. From the first tag onward a rename owes a Renamed knobs declaration on the release declaration surface, and so in the note.
 
-**Compat shim and deprecation window — owed from the project's declared
-general-availability posture onward, never from a tag.** While a project's own
-declared stability posture is pre-general-availability, a knob rename is
-compat-free: no read-the-old-name shim, no deprecation window, no queue-bound
-deprecation marker. The declaration is still owed, so a consumer who vendored
-early is never surprised. They are told; they are simply not carried.
+**Compat shim and deprecation window — owed from the project's declared general-availability posture onward, never from a tag.** While a project's own declared stability posture is pre-general-availability, a knob rename is compat-free: no read-the-old-name shim, no deprecation window, no queue-bound deprecation marker. The declaration is still owed, so a consumer who vendored early is never surprised. They are told; they are simply not carried.
 
-The observable is a declared posture rather than an adoption count, because the
-obligation is normative rather than empirical. You owe a migration path because
-you promised stability, not because you counted users. A project that has
-promised nothing owes nothing, and owes it the instant it promises, whether or
-not anyone has installed. "The first observed external install" reads the premise
-most literally and is rejected: it cannot be falsified from the tree, and it
-makes the obligation turn on a fact outside the project's control. A tag was a
-bad proxy for that same reason rather than one that merely aged — it measures
-distribution where the obligation tracks promise, so it would have drifted under
-any release history, fast or slow.
+The observable is a declared posture rather than an adoption count, because the obligation is normative rather than empirical. You owe a migration path because you promised stability, not because you counted users. A project that has promised nothing owes nothing, and owes it the instant it promises, whether or not anyone has installed. "The first observed external install" reads the premise most literally and is rejected: it cannot be falsified from the tree, and it makes the obligation turn on a fact outside the project's control. A tag was a bad proxy for that same reason rather than one that merely aged — it measures distribution where the obligation tracks promise, so it would have drifted under any release history, fast or slow.
 
-**Fail-safe direction.** A project declaring no stability posture at all is
-treated as **past** the threshold: the compat obligation applies. Silence must
-not read as still-pre-GA, because that is the reading under which a project that
-never got round to declaring anything grants itself a permanent exemption. The
-window is opened by an explicit pre-GA declaration and by nothing else.
+**Fail-safe direction.** A project declaring no stability posture at all is treated as **past** the threshold: the compat obligation applies. Silence must not read as still-pre-GA, because that is the reading under which a project that never got round to declaring anything grants itself a permanent exemption. The window is opened by an explicit pre-GA declaration and by nothing else.
 
 The clause is knob-scoped, and the scoping is substantive rather than accidental:
 
-1. **The mechanism it points at is knob-shaped.** The deprecation path it invokes
-   is the queue-bound deprecation markers and the release note's `Renamed knobs`
-   section, whose `old → new` / `old → ∅` grammar is specific to config names. A
-   rule reaching gate names or file conventions would point at a mechanism that
-   does not accept them.
-2. **No class is left without a home.** A non-knob rename — a gate name, a file
-   or directory convention — is structurally accommodated by the release note's
-   `Behavior changes` section, whose bullet lead is defined as the changed
-   surface's name (script, knob, template, or file), a definition that already
-   admits each of those classes. What the note grammar does not yet carry is a
-   sentence explicitly *routing* non-knob renames there, so this is a sound
-   structural inference rather than an established convention. The narrow scoping
-   leaves no rename without a section shaped for it, which is all this reason
-   claims.
-3. **Widening it would restate a neighbour.** A general "any governed name" rule
-   is doctrine-tier, and that placement call belongs to doctrine rather than to a
-   kit SPEC, which would otherwise settle a doctrine question from the inside and
-   duplicate whatever lands there.
+1. **The mechanism it points at is knob-shaped.** The deprecation path it invokes is the queue-bound deprecation markers and the release note's `Renamed knobs` section, whose `old → new` / `old → ∅` grammar is specific to config names. A rule reaching gate names or file conventions would point at a mechanism that does not accept them.
+2. **No class is left without a home.** A non-knob rename — a gate name, a file or directory convention — is structurally accommodated by the release note's `Behavior changes` section, whose bullet lead is defined as the changed surface's name (script, knob, template, or file), a definition that already admits each of those classes. What the note grammar does not yet carry is a sentence explicitly *routing* non-knob renames there, so this is a sound structural inference rather than an established convention. The narrow scoping leaves no rename without a section shaped for it, which is all this reason claims.
+3. **Widening it would restate a neighbour.** A general "any governed name" rule is doctrine-tier, and that placement call belongs to doctrine rather than to a kit SPEC, which would otherwise settle a doctrine question from the inside and duplicate whatever lands there.
 
-No gate reads this clause, and that is a ruling rather than an omission. The
-predicate a gate would need is *"this commit renames a knob"*, which is not
-decidable from a diff without a knob-identity model no kit has; an approximation
-would fire on additions and removals alike and be valved into silence. The
-clause's reader is the build-stage session performing the rename, which reads it
-to decide whether it owes a shim and a deprecation marker.
+No gate reads this clause, and that is a ruling rather than an omission. The predicate a gate would need is *"this commit renames a knob"*, which is not decidable from a diff without a knob-identity model no kit has; an approximation would fire on additions and removals alike and be valved into silence. The clause's reader is the build-stage session performing the rename, which reads it to decide whether it owes a shim and a deprecation marker.
 
-A consumer points the general-availability criterion at whatever stability
-declaration it maintains. The kit states the criterion and never the instance:
-naming one project's channel vocabulary here would ship that project's release
-posture as everyone's, and no knob is introduced to read the value either, since
-the clause's reader is a human or agent rather than a gate.
+A consumer points the general-availability criterion at whatever stability declaration it maintains. The kit states the criterion and never the instance: naming one project's channel vocabulary here would ship that project's release posture as everyone's, and no knob is introduced to read the value either, since the clause's reader is a human or agent rather than a gate.
 
-- `LIFECYCLE_KIT_STAGES` — the stage roster, in order; default
-  `(scope align build validate close)`.
-- `LIFECYCLE_KIT_PREDECESSOR` — associative map stage → the predecessor whose
-  stamp `check-stage-entry` requires; default `([align]=scope [build]=scope
-  [validate]=build [close]=validate)` (`build` keys to `scope` because the
-  audit stage is trigger-gated; §check-stage-entry).
-- `LIFECYCLE_KIT_FIRST_STAGE` — the stage whose entry is the iteration boundary
-  (§bin/enter-stage.sh truncation); default `scope`.
-- `LIFECYCLE_KIT_DRAIN_STAGE` — the stage whose entry requires the active queue
-  sections empty; default `validate`; empty disables the drain assertion. Must
-  not be terminal: at least one `LIFECYCLE_KIT_PREDECESSOR` entry names it, or
-  config load fails (the drain-exempt backstop; §check-stage-entry).
-- `LIFECYCLE_KIT_ACTIVE_SECTIONS` — the queue sections the drain assertion
-  reads; default `("New Features" "Technical Debt")`. Independent of
-  canon-kit's `CANON_KIT_ACTIVE_SECTIONS` (read by `check-amendment-queue`'s
-  misfiled-spec-ready clause) though their defaults coincide — a consumer
-  retargeting one alone splits the drain assertion's view from
-  `check-amendment-queue`'s, with no gate to notice. A known, accepted
-  coupling: kit independence outranks unifying the knob.
-- `LIFECYCLE_KIT_AUDIT_STAGE` — the trigger-gated audit stage assertion C looks
-  for; default `align`; empty disables the audit machinery entirely.
-- `LIFECYCLE_KIT_AUDIT_ENTRY_STAGE` — the stage whose entry assertion C blocks
-  on a cross-component signal with no audit stamp; default `build` when an
-  audit stage is set, else empty.
-- `LIFECYCLE_KIT_WAIVER_TOKEN` — the stamp token recording the user's explicit
-  audit waiver; default `align-waived` — the audit stage followed by `-waived`,
-  and empty when no audit stage is set; must not collide with a stage name.
-- `LIFECYCLE_KIT_AMENDMENT_GLOB` / `LIFECYCLE_KIT_ROSTER_BASENAME` — the amendment
-  filename shape and the canonical-spec basename assertion C scans
-  (template dirs pruned); defaults `SPEC-*.md` / `SPEC.md`.
-- `LIFECYCLE_KIT_CONTRACT_TOKENS` — the amendment-body substrings assertion C
-  reads as a cross-component contract signal; default `("SPEC.md" "proto/")`.
-- `LIFECYCLE_KIT_SKILLS_DIR` — the agent-skill directory
-  `check-stage-skill-coverage` scans; default `.claude/commands`.
-- `LIFECYCLE_KIT_AGENT_FILE` — the always-loaded agent file the
-  `--install-lifecycle` arm writes the registration block into and
-  `check-lifecycle-registration` reads it back from; default `CLAUDE.md`
-  (the `DOCTRINE_KIT_AGENT_FILE` sibling).
-- `LIFECYCLE_KIT_QUEUE_FILE` / `LIFECYCLE_KIT_STATE_FILE` — the governed header and
-  stamp files; defaults `${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}` /
-  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt`.
-- `LIFECYCLE_KIT_SESSION_ID` — the harness-neutral stamp-id override, source 1
-  of the derivation order (§bin/session-id.sh); default unset. Read from the
-  process environment and never a row of the kit's table, so no knob file can set
-  it (§bin/session-id.sh).
-- `LIFECYCLE_KIT_SESSION_BOUNDARY` — `stage` or `iteration`; default `stage`.
-  The knob lives on the session-span/evidence axis only (ruled; no role
-  values): manual-versus-lead is the driver/role axis and rides context-kit's
-  session-role signal, never this knob.
-  The consumer's session-boundary posture: at `stage`, distinct stages of
-  one iteration may not share a session id (§check-stage-evidence); at
-  `iteration`, that cross-stage distinctness check alone is skipped —
-  attribution still rides the stamps, and every other assertion holds. The
-  table validator checks the value alongside its machine checks and exits 2 on
-  anything else. `--enter-stage` does not read it — stamping is
-  posture-independent; `templates/lead.md` consumes it as the inline-run
-  posture prose.
-- `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE` — the kit-owned lesson-disposition stamp
-  file; default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/lesson-evidence.txt`,
-  read by `check-lesson-disposition` and the boundary-reset built-in.
-- `LIFECYCLE_KIT_GAP_INBOX_FILE` — the committed append-only gap inbox
-  (§The committed gap inbox); default
-  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/gap-inbox.md`, written by the `--emit-file-gap` arm,
-  its `merge=union` attribute verified by `check-merge-attrs`, drained by the
-  close skill and read for emptiness by `--enter-stage`'s boundary refusal.
-- `LIFECYCLE_KIT_SURVEY_RECORD_FILE` — the committed per-iteration survey record
-  (§The survey record); default
-  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/survey-record.md`, written by the
-  `--emit file-survey` arm, asserted by `check-survey-record`, its headings
-  printed and its body truncated by `--enter-stage` (a kit-owned boundary built-in,
-  so it does not ride `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`), and its
-  `merge=iteration-scoped` attribute verified by `check-merge-attrs`. One knob,
-  and no second one for the grammar, the witness commands, or an opt-out — each
-  of those is contract rather than layout.
-- `LIFECYCLE_KIT_RECURRENCE_THRESHOLD` — positive integer, default `2`; the
-  recorded re-filing count at which a **deferred** entry enters the scope stage's
-  proposed unit set regardless of the standing directive's theme (the pre-emption
-  rule, §templates/stages/). Two recorded re-filings is a third incidence of the
-  same finding. It is a stated policy with a stated purpose rather than a derived
-  number, and a knob for that reason — `QUEUE_KIT_ENTRY_CAP`'s posture. The
-  count it is read against is the date count of the entry's `recurrence:`
-  declaration (queue-kit/SPEC.md §The tag algebra owns that grammar). That rule is
-  its only reader: queue-kit owns the declaration and reads no threshold,
-  drift-kit reports the count and applies no verdict.
-- `LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS` — the consumer's `close-surface:`
-  declaration surfaces beyond the resolved kit roots (§The close-surface
-  roster); default `*/SPEC.md`. It deliberately does **not** default to
-  `CANON_KIT_MANIFEST_FILES`: reading another kit's knob would make lifecycle-kit
-  depend on canon-kit's configuration for a value the consumer already owns, and
-  the one cross-kit knob read in the tree today is precedent, not a ruling. The
-  declaration vocabulary is kit-owned and carries no consumer content; the roster
-  is derived, never a kit literal — a kit shipping the *names* of a consumer's
-  inbound surfaces would publish that consumer's private workflow.
-- `LIFECYCLE_KIT_RULING_RECORD` — the consumer's ruling-record path
-  (§The ruling-staleness probe); **default empty**, so the whole
-  ruling-staleness machinery is inert for a consumer that keeps no such record,
-  exactly as the pre-flight valve's ledger knob defaults empty and no valve
-  exists. A kit shipping a default filename would be asserting that every adopter
-  keeps this artifact, under this name.
-- `LIFECYCLE_KIT_RULING_CITERS` — array of path globs the citing-side report
-  sweeps for a declared ruling name (§The ruling-staleness probe); **default
-  empty**, on the same ground the other prose-surface glob rosters above are the
-  consumer's: which of a tree's surfaces argue about rulings is a fact about that
-  tree, and a kit literal naming them would publish that consumer's layout.
-- `LIFECYCLE_KIT_RULING_ORACLE_TIMEOUT` — positive integer seconds bounding a
-  declared discharge oracle's dispatch (§The ruling-staleness probe); default
-  `10`. It exists so a hung command cannot wedge the arm that dispatches it, and
-  a timeout reports as a **dispatch failure** rather than as a verdict.
-  **No knob carries a condition vocabulary or an authority vocabulary**, and the
-  refusal is the one this kit already records for ruling-authority names: nothing
-  in the machinery branches on such a value, so a knob holding one would have the
-  knob-citation gate as its only reader.
-- `LIFECYCLE_KIT_AUDIT_ROSTER_FILE` — the consumer's audit roster (§The audit
-  roster); **default empty**, on `LIFECYCLE_KIT_RULING_RECORD`'s ground: a kit
-  default filename would assert that every adopter keeps this artifact under this
-  name. Empty makes close's review step and `check-audit-roster` inert.
-- `LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP` — positive integer bytes bounding every
-  roster line (§check-audit-roster); default `1500`. A stated policy rather than a
-  derived number, `QUEUE_KIT_ENTRY_CAP`'s posture: no prior byte cap exists to
-  derive it from. It is sized so a `scope` line holds a class's standing readings
-  as a paragraph, while a dozen-class roster at the cap on every line still reads
-  whole in one pass. The table validator refuses a non-positive value at exit 2.
-- `LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS` — array of path globs for the surfaces
-  held to the no-retrieval-pointer rule (§check-scratch-citation); default the
-  queue file alone (`${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}`, through `LIFECYCLE_KIT_QUEUE_FILE`). That default is the one permanent
-  surface this kit owns and where both attested firings landed, so it is
-  non-vacuous in every consumer and over-reaches in none. The roster is consumer
-  config and the forbidden targets are derived from the consumer's own truncate
-  configuration, so no kit literal names any surface a consumer happens to have.
-- `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` — extra files reset to their header at the
-  iteration boundary; default empty. Adding a member also widens
-  `check-scratch-citation`'s forbidden-target set, because both read
-  `stages::supersede_set`.
-- `LIFECYCLE_KIT_BOUNDARY_PRESERVE` — keep-list of **scratch-root names**, each an
-  immediate child of the scratch dir, that the iteration-boundary wipe spares whole
-  (§bin/enter-stage.sh); an entry containing `/` spares nothing and the boundary
-  report names it. Default empty, so an
-  unset-knob consumer gets a clean wipe of an already-disposable surface.
-  Boundary-only, and paired with the scratch dir it reads (`GATE_SDK_TMP_DIR`)
-  rather than adding a directory knob of its own. **The tier split matters:** the
-  `.gitkeep` exemption and the lead journal below are kit invariants this knob
-  cannot unset, and this knob is the consumer keep-list layered on top — a reader
-  who takes the knob for the wipe's only keep rule would reintroduce the
-  tracked-file deletion.
-- `LIFECYCLE_KIT_LEAD_JOURNAL_FILE` — the lead's own resume journal; default
-  `lead-journal.md`, a **scratch-root name** resolved inside the scratch dir that
-  `GATE_SDK_TMP_DIR` names. The boundary
-  wipe spares it as a kit invariant beside `.gitkeep`, and the boundary entry
-  reads it for the disposition mark (§bin/enter-stage.sh). Same tier split as the
-  knob above, and a **scalar** for the reason stated there: an assignment
-  overrides one value and cannot silently drop a second it never mentioned,
-  where a defaulted array is replaced wholesale. The kit may name this basename
-  because `templates/lead.md` mints the artifact and is the only surface that
-  writes it — the `LIFECYCLE_KIT_GAP_INBOX_FILE` posture, as against
-  `LIFECYCLE_KIT_RULING_RECORD`, which defaults empty precisely because a ruling
-  record is a *consumer's* artifact the kit must not presume. Stated so a later
-  reader does not "correct" this default to empty by false analogy with that one.
-- `LIFECYCLE_KIT_BOUNDARY_REQUIRE` — array of repo-relative files each of which
-  must carry a data line naming the closing iteration before the iteration
-  boundary may be crossed (§bin/enter-stage.sh); a missing member is a
-  fail-closed refusal; default empty (an unconfigured consumer sees no change).
-- `LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK` — `0` or `1`; default `1`. At `1` the
-  iteration boundary refuses while any linked worktree stands
-  (§bin/enter-stage.sh). Defaulted on because a consumer that never dispatches an
-  isolated agent has an empty `git worktree list` and the check is vacuous rather
-  than absent; a consumer with a standing long-lived worktree turns it off here
-  rather than teaching the kit its paths.
-- `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` — a POSIX ERE with exactly one capture
-  group standing in the top-level concatenation (the admitted shape:
-  gate-sdk/SPEC.md §The POSIX ERE matcher), matched against a linked worktree's
-  git lock reason, the group being the holder's pid (§bin/enter-stage.sh); **default empty**. Empty because a
-  lock reason is one harness's vocabulary and a kit literal spelling it would
-  publish it, the same seam the residue-directory omission takes; empty also
-  means *no classification is configured*, so an unconfigured consumer sees
-  exactly the unclassified refusal it sees today. Setting it buys a dependency
-  on evidence-kit's liveness predicate; a pattern outside that shape is a
-  fail-closed config refusal (§The stage-machine adapters).
-- `LIFECYCLE_KIT_ENTRY_PREFLIGHT` — per-stage `<stage>=<command>` entries run
-  alongside the built-in pre-flight (§bin/enter-stage.sh); default empty.
-- `LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE` — the committed one-shot valve ledger
-  whose `armed` line admits a single entry past a refusing
-  `LIFECYCLE_KIT_ENTRY_PREFLIGHT` command (§bin/enter-stage.sh); **default
-  empty**, meaning no valve and a final refusal, which is the behaviour every
-  consumer has today. The default is off because a ledger path is one consumer's
-  workflow-directory layout, and a kit literal spelling it would ship that layout
-  to every adopter — the seam `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` already takes
-  one knob up. Which stages may be valved is likewise not a kit literal: it is
-  whatever an arming line names, bounded by the configured stage roster. A
-  consumer setting it owes the ledger two things: membership in
-  `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`, which bounds "how many times did we reach
-  for the valve" at the iteration and keeps the ledger from accreting into a log
-  nobody reads, and a `close-surface:` declaration (§The close-surface roster),
-  without which a tracked ledger reaches no derived roster at all.
-- `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN` — the resume journal's path as a function
-  of the stage, carrying a `<stage>` placeholder (§The state machine); default
-  `${GATE_SDK_TMP_DIR:-.tmp}/<stage>-journal.md`, so the scratch dir's literal is
-  deferred to rather than restated here. A pattern carrying no placeholder is a
-  fail-closed config refusal (§The stage-machine adapters).
-- `LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE` — `0` or `1`; default `0`. At `1` the entry
-  tool opens the entering stage's journal at that derived path and a stage entry
-  refuses when the cursor's stage left no written journal there
-  (§bin/enter-stage.sh). One knob gates both, so at the default the opener is inert
-  along with the assertion it serves. Defaulted **off** because the assertion reads
-  the *predecessor*: switching it on mid-iteration asserts against sessions
-  dispatched before the rule existed, so a consumer throws it at an iteration
-  boundary, where a refusal costs a re-entry rather than a wedge.
+- `LIFECYCLE_KIT_STAGES` — the stage roster, in order; default `(scope align build validate close)`.
+- `LIFECYCLE_KIT_PREDECESSOR` — associative map stage → the predecessor whose stamp `check-stage-entry` requires; default `([align]=scope [build]=scope [validate]=build [close]=validate)` (`build` keys to `scope` because the audit stage is trigger-gated; §check-stage-entry).
+- `LIFECYCLE_KIT_FIRST_STAGE` — the stage whose entry is the iteration boundary (§bin/enter-stage.sh truncation); default `scope`.
+- `LIFECYCLE_KIT_DRAIN_STAGE` — the stage whose entry requires the active queue sections empty; default `validate`; empty disables the drain assertion. Must not be terminal: at least one `LIFECYCLE_KIT_PREDECESSOR` entry names it, or config load fails (the drain-exempt backstop; §check-stage-entry).
+- `LIFECYCLE_KIT_ACTIVE_SECTIONS` — the queue sections the drain assertion reads; default `("New Features" "Technical Debt")`. Independent of canon-kit's `CANON_KIT_ACTIVE_SECTIONS` (read by `check-amendment-queue`'s misfiled-spec-ready clause) though their defaults coincide — a consumer retargeting one alone splits the drain assertion's view from `check-amendment-queue`'s, with no gate to notice. A known, accepted coupling: kit independence outranks unifying the knob.
+- `LIFECYCLE_KIT_AUDIT_STAGE` — the trigger-gated audit stage assertion C looks for; default `align`; empty disables the audit machinery entirely.
+- `LIFECYCLE_KIT_AUDIT_ENTRY_STAGE` — the stage whose entry assertion C blocks on a cross-component signal with no audit stamp; default `build` when an audit stage is set, else empty.
+- `LIFECYCLE_KIT_WAIVER_TOKEN` — the stamp token recording the user's explicit audit waiver; default `align-waived` — the audit stage followed by `-waived`, and empty when no audit stage is set; must not collide with a stage name.
+- `LIFECYCLE_KIT_AMENDMENT_GLOB` / `LIFECYCLE_KIT_ROSTER_BASENAME` — the amendment filename shape and the canonical-spec basename assertion C scans (template dirs pruned); defaults `SPEC-*.md` / `SPEC.md`.
+- `LIFECYCLE_KIT_CONTRACT_TOKENS` — the amendment-body substrings assertion C reads as a cross-component contract signal; default `("SPEC.md" "proto/")`.
+- `LIFECYCLE_KIT_SKILLS_DIR` — the agent-skill directory `check-stage-skill-coverage` scans; default `.claude/commands`.
+- `LIFECYCLE_KIT_AGENT_FILE` — the always-loaded agent file the `--install-lifecycle` arm writes the registration block into and `check-lifecycle-registration` reads it back from; default `CLAUDE.md` (the `DOCTRINE_KIT_AGENT_FILE` sibling).
+- `LIFECYCLE_KIT_QUEUE_FILE` / `LIFECYCLE_KIT_STATE_FILE` — the governed header and stamp files; defaults `${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}` / `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt`.
+- `LIFECYCLE_KIT_SESSION_ID` — the harness-neutral stamp-id override, source 1 of the derivation order (§bin/session-id.sh); default unset. Read from the process environment and never a row of the kit's table, so no knob file can set it (§bin/session-id.sh).
+- `LIFECYCLE_KIT_SESSION_BOUNDARY` — `stage` or `iteration`; default `stage`. The knob lives on the session-span/evidence axis only (ruled; no role values): manual-versus-lead is the driver/role axis and rides context-kit's session-role signal, never this knob. The consumer's session-boundary posture: at `stage`, distinct stages of one iteration may not share a session id (§check-stage-evidence); at `iteration`, that cross-stage distinctness check alone is skipped — attribution still rides the stamps, and every other assertion holds. The table validator checks the value alongside its machine checks and exits 2 on anything else. `--enter-stage` does not read it — stamping is posture-independent; `templates/lead.md` consumes it as the inline-run posture prose.
+- `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE` — the kit-owned lesson-disposition stamp file; default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/lesson-evidence.txt`, read by `check-lesson-disposition` and the boundary-reset built-in.
+- `LIFECYCLE_KIT_GAP_INBOX_FILE` — the committed append-only gap inbox (§The committed gap inbox); default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/gap-inbox.md`, written by the `--emit-file-gap` arm, its `merge=union` attribute verified by `check-merge-attrs`, drained by the close skill and read for emptiness by `--enter-stage`'s boundary refusal.
+- `LIFECYCLE_KIT_SURVEY_RECORD_FILE` — the committed per-iteration survey record (§The survey record); default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/survey-record.md`, written by the `--emit file-survey` arm, asserted by `check-survey-record`, its headings printed and its body truncated by `--enter-stage` (a kit-owned boundary built-in, so it does not ride `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`), and its `merge=iteration-scoped` attribute verified by `check-merge-attrs`. One knob, and no second one for the grammar, the witness commands, or an opt-out — each of those is contract rather than layout.
+- `LIFECYCLE_KIT_RECURRENCE_THRESHOLD` — positive integer, default `2`; the recorded re-filing count at which a **deferred** entry enters the scope stage's proposed unit set regardless of the standing directive's theme (the pre-emption rule, §templates/stages/). Two recorded re-filings is a third incidence of the same finding. It is a stated policy with a stated purpose rather than a derived number, and a knob for that reason — `QUEUE_KIT_ENTRY_CAP`'s posture. The count it is read against is the date count of the entry's `recurrence:` declaration (queue-kit/SPEC.md §The tag algebra owns that grammar). That rule is its only reader: queue-kit owns the declaration and reads no threshold, drift-kit reports the count and applies no verdict.
+- `LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS` — the consumer's `close-surface:` declaration surfaces beyond the resolved kit roots (§The close-surface roster); default `*/SPEC.md`. It deliberately does **not** default to `CANON_KIT_MANIFEST_FILES`: reading another kit's knob would make lifecycle-kit depend on canon-kit's configuration for a value the consumer already owns, and the one cross-kit knob read in the tree today is precedent, not a ruling. The declaration vocabulary is kit-owned and carries no consumer content; the roster is derived, never a kit literal — a kit shipping the *names* of a consumer's inbound surfaces would publish that consumer's private workflow.
+- `LIFECYCLE_KIT_RULING_RECORD` — the consumer's ruling-record path (§The ruling-staleness probe); **default empty**, so the whole ruling-staleness machinery is inert for a consumer that keeps no such record, exactly as the pre-flight valve's ledger knob defaults empty and no valve exists. A kit shipping a default filename would be asserting that every adopter keeps this artifact, under this name.
+- `LIFECYCLE_KIT_RULING_CITERS` — array of path globs the citing-side report sweeps for a declared ruling name (§The ruling-staleness probe); **default empty**, on the same ground the other prose-surface glob rosters above are the consumer's: which of a tree's surfaces argue about rulings is a fact about that tree, and a kit literal naming them would publish that consumer's layout.
+- `LIFECYCLE_KIT_RULING_ORACLE_TIMEOUT` — positive integer seconds bounding a declared discharge oracle's dispatch (§The ruling-staleness probe); default `10`. It exists so a hung command cannot wedge the arm that dispatches it, and a timeout reports as a **dispatch failure** rather than as a verdict. **No knob carries a condition vocabulary or an authority vocabulary**, and the refusal is the one this kit already records for ruling-authority names: nothing in the machinery branches on such a value, so a knob holding one would have the knob-citation gate as its only reader.
+- `LIFECYCLE_KIT_AUDIT_ROSTER_FILE` — the consumer's audit roster (§The audit roster); **default empty**, on `LIFECYCLE_KIT_RULING_RECORD`'s ground: a kit default filename would assert that every adopter keeps this artifact under this name. Empty makes close's review step and `check-audit-roster` inert.
+- `LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP` — positive integer bytes bounding every roster line (§check-audit-roster); default `1500`. A stated policy rather than a derived number, `QUEUE_KIT_ENTRY_CAP`'s posture: no prior byte cap exists to derive it from. It is sized so a `scope` line holds a class's standing readings as a paragraph, while a dozen-class roster at the cap on every line still reads whole in one pass. The table validator refuses a non-positive value at exit 2.
+- `LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS` — array of path globs for the surfaces held to the no-retrieval-pointer rule (§check-scratch-citation); default the queue file alone (`${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}`, through `LIFECYCLE_KIT_QUEUE_FILE`). That default is the one permanent surface this kit owns and where both attested firings landed, so it is non-vacuous in every consumer and over-reaches in none. The roster is consumer config and the forbidden targets are derived from the consumer's own truncate configuration, so no kit literal names any surface a consumer happens to have.
+- `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` — extra files reset to their header at the iteration boundary; default empty. Adding a member also widens `check-scratch-citation`'s forbidden-target set, because both read `stages::supersede_set`.
+- `LIFECYCLE_KIT_BOUNDARY_PRESERVE` — keep-list of **scratch-root names**, each an immediate child of the scratch dir, that the iteration-boundary wipe spares whole (§bin/enter-stage.sh); an entry containing `/` spares nothing and the boundary report names it. Default empty, so an unset-knob consumer gets a clean wipe of an already-disposable surface. Boundary-only, and paired with the scratch dir it reads (`GATE_SDK_TMP_DIR`) rather than adding a directory knob of its own. **The tier split matters:** the `.gitkeep` exemption and the lead journal below are kit invariants this knob cannot unset, and this knob is the consumer keep-list layered on top — a reader who takes the knob for the wipe's only keep rule would reintroduce the tracked-file deletion.
+- `LIFECYCLE_KIT_LEAD_JOURNAL_FILE` — the lead's own resume journal; default `lead-journal.md`, a **scratch-root name** resolved inside the scratch dir that `GATE_SDK_TMP_DIR` names. The boundary wipe spares it as a kit invariant beside `.gitkeep`, and the boundary entry reads it for the disposition mark (§bin/enter-stage.sh). Same tier split as the knob above, and a **scalar** for the reason stated there: an assignment overrides one value and cannot silently drop a second it never mentioned, where a defaulted array is replaced wholesale. The kit may name this basename because `templates/lead.md` mints the artifact and is the only surface that writes it — the `LIFECYCLE_KIT_GAP_INBOX_FILE` posture, as against `LIFECYCLE_KIT_RULING_RECORD`, which defaults empty precisely because a ruling record is a *consumer's* artifact the kit must not presume. Stated so a later reader does not "correct" this default to empty by false analogy with that one.
+- `LIFECYCLE_KIT_BOUNDARY_REQUIRE` — array of repo-relative files each of which must carry a data line naming the closing iteration before the iteration boundary may be crossed (§bin/enter-stage.sh); a missing member is a fail-closed refusal; default empty (an unconfigured consumer sees no change).
+- `LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK` — `0` or `1`; default `1`. At `1` the iteration boundary refuses while any linked worktree stands (§bin/enter-stage.sh). Defaulted on because a consumer that never dispatches an isolated agent has an empty `git worktree list` and the check is vacuous rather than absent; a consumer with a standing long-lived worktree turns it off here rather than teaching the kit its paths.
+- `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` — a POSIX ERE with exactly one capture group standing in the top-level concatenation (the admitted shape: gate-sdk/SPEC.md §The POSIX ERE matcher), matched against a linked worktree's git lock reason, the group being the holder's pid (§bin/enter-stage.sh); **default empty**. Empty because a lock reason is one harness's vocabulary and a kit literal spelling it would publish it, the same seam the residue-directory omission takes; empty also means *no classification is configured*, so an unconfigured consumer sees exactly the unclassified refusal it sees today. Setting it buys a dependency on evidence-kit's liveness predicate; a pattern outside that shape is a fail-closed config refusal (§The stage-machine adapters).
+- `LIFECYCLE_KIT_ENTRY_PREFLIGHT` — per-stage `<stage>=<command>` entries run alongside the built-in pre-flight (§bin/enter-stage.sh); default empty.
+- `LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE` — the committed one-shot valve ledger whose `armed` line admits a single entry past a refusing `LIFECYCLE_KIT_ENTRY_PREFLIGHT` command (§bin/enter-stage.sh); **default empty**, meaning no valve and a final refusal, which is the behaviour every consumer has today. The default is off because a ledger path is one consumer's workflow-directory layout, and a kit literal spelling it would ship that layout to every adopter — the seam `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` already takes one knob up. Which stages may be valved is likewise not a kit literal: it is whatever an arming line names, bounded by the configured stage roster. A consumer setting it owes the ledger two things: membership in `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`, which bounds "how many times did we reach for the valve" at the iteration and keeps the ledger from accreting into a log nobody reads, and a `close-surface:` declaration (§The close-surface roster), without which a tracked ledger reaches no derived roster at all.
+- `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN` — the resume journal's path as a function of the stage, carrying a `<stage>` placeholder (§The state machine); default `${GATE_SDK_TMP_DIR:-.tmp}/<stage>-journal.md`, so the scratch dir's literal is deferred to rather than restated here. A pattern carrying no placeholder is a fail-closed config refusal (§The stage-machine adapters).
+- `LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE` — `0` or `1`; default `0`. At `1` the entry tool opens the entering stage's journal at that derived path and a stage entry refuses when the cursor's stage left no written journal there (§bin/enter-stage.sh). One knob gates both, so at the default the opener is inert along with the assertion it serves. Defaulted **off** because the assertion reads the *predecessor*: switching it on mid-iteration asserts against sessions dispatched before the rule existed, so a consumer throws it at an iteration boundary, where a refusal costs a re-entry rather than a wedge.
 
-The journal opener and `check-stage-skill-coverage`'s third direction add **no
-knob and no tree entry**, and this roster says so because a change that adds a
-writer and a gate direction reads as one that should have added both. The
-opener's inputs are the pattern and the require flag, already resolved here for
-the assertion; the gate direction's input is the executed surface it derives from
-the skills dir it already reads (§check-stage-skill-coverage).
-- `LIFECYCLE_KIT_SHIM_NGRAM` — the shared-n-gram width `check-shim-restatement`
-  trips at (positive integer; §check-shim-restatement); default `9`.
-- `LIFECYCLE_KIT_SHIM_DEDUP_CORPUS` — that gate's corpus file list; default
-  empty for the computed `CLAUDE.md`-plus-kit-templates default.
+The journal opener and `check-stage-skill-coverage`'s third direction add **no knob and no tree entry**, and this roster says so because a change that adds a writer and a gate direction reads as one that should have added both. The opener's inputs are the pattern and the require flag, already resolved here for the assertion; the gate direction's input is the executed surface it derives from the skills dir it already reads (§check-stage-skill-coverage).
+- `LIFECYCLE_KIT_SHIM_NGRAM` — the shared-n-gram width `check-shim-restatement` trips at (positive integer; §check-shim-restatement); default `9`.
+- `LIFECYCLE_KIT_SHIM_DEDUP_CORPUS` — that gate's corpus file list; default empty for the computed `CLAUDE.md`-plus-kit-templates default.
 
-`.gitattributes` (repo root) is a consumer surface the kit writes but adds **no
-knob** for: the `merge=iteration-scoped` supersede set derives from the existing
-boundary-truncate knobs (`LIFECYCLE_KIT_STATE_FILE`,
-`LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, and each `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`
-member), so a reshaped truncate set flows into the attribute block by
-construction — §Multi-operator semantics, §bin/install-lifecycle.sh.
+`.gitattributes` (repo root) is a consumer surface the kit writes but adds **no knob** for: the `merge=iteration-scoped` supersede set derives from the existing boundary-truncate knobs (`LIFECYCLE_KIT_STATE_FILE`, `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, and each `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member), so a reshaped truncate set flows into the attribute block by construction — §Multi-operator semantics, §bin/install-lifecycle.sh.
 
 ## Multi-operator semantics
 
-The contributor altitude of the coordination map: a second operator running
-their own concurrent iteration on the same repo. The two narrower altitudes are
-ruled elsewhere and stay untouched — sub-agents within one session
-(delegation-kit's serialize-or-worktree rules) and sessions within one iteration
-(§templates/lead.md: one live iteration, stages serialized through the stamp
-protocol). Fork contributors are out of scope: an outside PR never stamps
-state — it only passes the battery in CI.
+The contributor altitude of the coordination map: a second operator running their own concurrent iteration on the same repo. The two narrower altitudes are ruled elsewhere and stay untouched — sub-agents within one session (delegation-kit's serialize-or-worktree rules) and sessions within one iteration (§templates/lead.md: one live iteration, stages serialized through the stamp protocol). Fork contributors are out of scope: an outside PR never stamps state — it only passes the battery in CI.
 
-**The topology ruling — state surfaces stay single-writer; concurrency is git
-topology.** The header line, the evidence file, and every boundary-truncated
-surface are *iteration-scoped*: an iteration owns exactly one branch (its home
-branch), and every stamp lands there. One live iteration per branch —
-the second concurrent operator cuts a branch at their scope entry; the
-integration branch is the degenerate single-operator home, which is why a
-single-operator repo's own dogfood changes nothing. Branch naming is prose
-guidance (name the branch after the iteration), not mechanism — no knob, no
-gate. Ruled out, each because it composes worse than git already does: per-operator
-state files or stamp-attribution fields (multi-writer surfaces and a new stamp
-grammar — operator attribution already rides the git author on every stamp
-commit); a lock or lease on the integration branch (state the kit refuses to
-own, where git already provides the isolation).
+**The topology ruling — state surfaces stay single-writer; concurrency is git topology.** The header line, the evidence file, and every boundary-truncated surface are *iteration-scoped*: an iteration owns exactly one branch (its home branch), and every stamp lands there. One live iteration per branch — the second concurrent operator cuts a branch at their scope entry; the integration branch is the degenerate single-operator home, which is why a single-operator repo's own dogfood changes nothing. Branch naming is prose guidance (name the branch after the iteration), not mechanism — no knob, no gate. Ruled out, each because it composes worse than git already does: per-operator state files or stamp-attribution fields (multi-writer surfaces and a new stamp grammar — operator attribution already rides the git author on every stamp commit); a lock or lease on the integration branch (state the kit refuses to own, where git already provides the isolation).
 
-**The merge-supersede rule.** At any branch merge, the iteration-scoped surfaces
-resolve wholesale to the *arriving* (checked-out) iteration's version — the other
-side's content is per-iteration scratch the boundary doctrine already declares
-dead (git history is the permanent audit trail). The supersede set is **derived,
-never maintained**: it is exactly what `--enter-stage` truncates at the
-iteration boundary — `LIFECYCLE_KIT_STATE_FILE`,
-`LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, `LIFECYCLE_KIT_SURVEY_RECORD_FILE`, and
-the `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`
-members — rendered by `stages::supersede_set` (§The stage-machine adapters). The survey
-record is in the set for a reason worth stating: a carried survey describes a
-tree state the arriving iteration never had, so taking the other side would
-hand a stale finding a fresh-looking home (§The survey record). The queue file
-is deliberately *not* in the set: its body (backlog sections, lessons) is shared
-content that merges like any prose, and only its header line is iteration-scoped
-— resolved by hand to the arriving iteration, with a wrong resolution going red
-at the next commit because `check-stage-evidence` requires the header's name to
-agree with every stamp's, and the state file already took the arriving side by
-driver. Contention on the queue is lower than it reads: since the cursor left
-the header, **stage motion writes no queue at all**, so the file changes only on
-real work-state transitions (promotion and naming, a Done move, the closing
-dispositions) rather than once per stage entry per operator.
-Held-constant baselines and append-across-iterations evidence keep normal merge
-semantics: their conflicts are real disagreements. The kit owns exactly one
-`union`-driver surface — the committed gap inbox (§The committed gap inbox),
-whose append-only bullets must survive a concurrent merge rather than supersede
-— rendered into the attribute block beside the supersede set and verified by the
-same gate; a consumer with its own *tracked* shared append log points it at git's
-built-in `union` driver the same way — sanctioned shape, git-native. (Gitignored
-per-checkout scratch — friction logs — never merges and needs no rule.)
+**The merge-supersede rule.** At any branch merge, the iteration-scoped surfaces resolve wholesale to the *arriving* (checked-out) iteration's version — the other side's content is per-iteration scratch the boundary doctrine already declares dead (git history is the permanent audit trail). The supersede set is **derived, never maintained**: it is exactly what `--enter-stage` truncates at the iteration boundary — `LIFECYCLE_KIT_STATE_FILE`, `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, `LIFECYCLE_KIT_SURVEY_RECORD_FILE`, and the `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` members — rendered by `stages::supersede_set` (§The stage-machine adapters). The survey record is in the set for a reason worth stating: a carried survey describes a tree state the arriving iteration never had, so taking the other side would hand a stale finding a fresh-looking home (§The survey record). The queue file is deliberately *not* in the set: its body (backlog sections, lessons) is shared content that merges like any prose, and only its header line is iteration-scoped — resolved by hand to the arriving iteration, with a wrong resolution going red at the next commit because `check-stage-evidence` requires the header's name to agree with every stamp's, and the state file already took the arriving side by driver. Contention on the queue is lower than it reads: since the cursor left the header, **stage motion writes no queue at all**, so the file changes only on real work-state transitions (promotion and naming, a Done move, the closing dispositions) rather than once per stage entry per operator. Held-constant baselines and append-across-iterations evidence keep normal merge semantics: their conflicts are real disagreements. The kit owns exactly one `union`-driver surface — the committed gap inbox (§The committed gap inbox), whose append-only bullets must survive a concurrent merge rather than supersede — rendered into the attribute block beside the supersede set and verified by the same gate; a consumer with its own *tracked* shared append log points it at git's built-in `union` driver the same way — sanctioned shape, git-native. (Gitignored per-checkout scratch — friction logs — never merges and needs no rule.)
 
-**`.gitattributes` — the rule mechanized.** Each supersede-set path carries
-`merge=iteration-scoped`; the driver definition (`git config
-merge.iteration-scoped.driver true` — keep ours) is per-clone config installed by
-the `--install-lifecycle` arm beside its registration block (the `--install-hooks`
-opt-in class). Honest limit: on a clone without the driver installed the
-attribute is inert and the file conflicts normally — the rule above then governs
-the hand resolution, so the uninstalled path degrades to judgment, never to
-silence. Writer/asserter split: the arm emits the attribute block
-(marker-bounded), `check-merge-attrs` verifies it — the
-`--emit git-hooks` ↔ `check-graph` precedent.
+**`.gitattributes` — the rule mechanized.** Each supersede-set path carries `merge=iteration-scoped`; the driver definition (`git config merge.iteration-scoped.driver true` — keep ours) is per-clone config installed by the `--install-lifecycle` arm beside its registration block (the `--install-hooks` opt-in class). Honest limit: on a clone without the driver installed the attribute is inert and the file conflicts normally — the rule above then governs the hand resolution, so the uninstalled path degrades to judgment, never to silence. Writer/asserter split: the arm emits the attribute block (marker-bounded), `check-merge-attrs` verifies it — the `--emit git-hooks` ↔ `check-graph` precedent.
 
-**Who may stamp, at this altitude.** Unchanged: the arriving stage session
-stamps,
-and only on its own iteration's home branch. A session never stamps a branch whose
-iteration it is not driving; cross-iteration discoveries (a lesson, a deferred
-filing) land on the discoverer's own branch and reconcile at merge.
+**Who may stamp, at this altitude.** Unchanged: the arriving stage session stamps, and only on its own iteration's home branch. A session never stamps a branch whose iteration it is not driving; cross-iteration discoveries (a lesson, a deferred filing) land on the discoverer's own branch and reconcile at merge.
 
-**Causal-completeness core: no new state surface.** The design adds no stamp
-grammar, no queue tag, no evidence file. Every existing producer/consumer pair
-(`--enter-stage`, the stage gates, the drift report) keeps working per-branch
-unmodified. The two added surfaces each have a named reader at a named
-transition: the `merge=iteration-scoped` lines are read by git's merge machinery
-at a merge and by `check-merge-attrs` at pre-commit; the `merge.iteration-scoped`
-driver config is read by git's merge machinery when an attributed path needs a
-three-way merge (not readable by a pre-commit gate — per-clone state, its absence
-the recorded honest limit above). The close-merge protocol (§Deviation
-transitions) is produced by the closing operator's close session and consumed by
-the integration branch's battery — the reconcile commit re-fires every
-queue/state-coupled gate, which is what makes the header hand-resolution
-enforceable.
+**Causal-completeness core: no new state surface.** The design adds no stamp grammar, no queue tag, no evidence file. Every existing producer/consumer pair (`--enter-stage`, the stage gates, the drift report) keeps working per-branch unmodified. The two added surfaces each have a named reader at a named transition: the `merge=iteration-scoped` lines are read by git's merge machinery at a merge and by `check-merge-attrs` at pre-commit; the `merge.iteration-scoped` driver config is read by git's merge machinery when an attributed path needs a three-way merge (not readable by a pre-commit gate — per-clone state, its absence the recorded honest limit above). The close-merge protocol (§Deviation transitions) is produced by the closing operator's close session and consumed by the integration branch's battery — the reconcile commit re-fires every queue/state-coupled gate, which is what makes the header hand-resolution enforceable.
 
 ## The committed gap inbox
 
-Mid-iteration work-state writes race the stage session holding the shared git
-index: a gap surfaced mid-stage has no committed place to land except the queue
-file that stage session is already contending on. So mid-iteration gap *filing*
-gets a committed, append-only channel of its own — distinct from the
-knowledge-friction log, which stays the narrow sensor for a fact re-derived
-because no doc owns it (drift-kit/SPEC.md §The knowledge-friction loop). A
-*work-shaped* finding (a gap, a task, a defect) is backlog, not knowledge
-friction, and routes here. The route costs one always-loaded line in the
-consumer's instructions file, because the mid-iteration session that finds a gap
-loads no trigger for this section. It earns that cost by the inbox actually
-filling: the bullets a close drain dispositions are gaps that would otherwise
-have been a queue edit racing a stage session, or nothing at all.
+Mid-iteration work-state writes race the stage session holding the shared git index: a gap surfaced mid-stage has no committed place to land except the queue file that stage session is already contending on. So mid-iteration gap *filing* gets a committed, append-only channel of its own — distinct from the knowledge-friction log, which stays the narrow sensor for a fact re-derived because no doc owns it (drift-kit/SPEC.md §The knowledge-friction loop). A *work-shaped* finding (a gap, a task, a defect) is backlog, not knowledge friction, and routes here. The route costs one always-loaded line in the consumer's instructions file, because the mid-iteration session that finds a gap loads no trigger for this section. It earns that cost by the inbox actually filling: the bullets a close drain dispositions are gaps that would otherwise have been a queue edit racing a stage session, or nothing at all.
 
-**The surface.** `.workflow/gap-inbox.md` (knob `LIFECYCLE_KIT_GAP_INBOX_FILE`,
-§Layout and configuration) is a committed, append-only capture buffer. Grammar:
-a `# contract:` prose header, then one `- <YYYY-MM-DD> — <gap prose>` bullet per
-gap — **one shape for every filing**, with no structured slot between the date
-and the prose. A slug named *inside* the prose takes queue-kit's existing
-in-body citation form (queue-kit/SPEC.md §The tag algebra), single-backticked,
-borrowed rather than re-spelled; it is a citation and never a field, which is
-the whole distinction §check-gap-inbox-neutrality holds. Committed, not gitignored — a
-per-clone buffer fragments the backlog across
-operators, the finding that rules the gitignored friction log out as the channel.
-What *append-only* means on this surface is a merge property, and
-§Multi-operator semantics owns it: this is the kit's one `union`-driver surface.
+**The surface.** `.workflow/gap-inbox.md` (knob `LIFECYCLE_KIT_GAP_INBOX_FILE`, §Layout and configuration) is a committed, append-only capture buffer. Grammar: a `# contract:` prose header, then one `- <YYYY-MM-DD> — <gap prose>` bullet per gap — **one shape for every filing**, with no structured slot between the date and the prose. A slug named *inside* the prose takes queue-kit's existing in-body citation form (queue-kit/SPEC.md §The tag algebra), single-backticked, borrowed rather than re-spelled; it is a citation and never a field, which is the whole distinction §check-gap-inbox-neutrality holds. Committed, not gitignored — a per-clone buffer fragments the backlog across operators, the finding that rules the gitignored friction log out as the channel. What *append-only* means on this surface is a merge property, and §Multi-operator semantics owns it: this is the kit's one `union`-driver surface.
 
-**The affordance.** `run-gates.sh --emit file-gap [--] "<gap prose>"` (the
-`--emit-kfric` pattern: repo-root anchor, config-via-env, exit 2 on an empty
-argument) appends one dated bullet, seeding the contract header — byte-identical
-to the line close's drain truncates back to — when the inbox does not yet exist.
-It is the `--emit-file-gap` arm (gate-sdk/SPEC.md §The non-gate arm),
-whose declared roster is five rows of the kit's static table:
-`LIFECYCLE_KIT_GAP_INBOX_FILE`, `LIFECYCLE_KIT_QUEUE_FILE`,
-`LIFECYCLE_KIT_STATE_FILE`, `LIFECYCLE_KIT_STAGES` and
-`LIFECYCLE_KIT_FIRST_STAGE`. The family is forced rather than chosen: the tool
-reads knobs, and a hardcoded top-level flag has no table row to declare them on.
-Its one positional is free text, so it validates that argument's **shape** to
-gate-sdk/SPEC.md §The bin/-tool contract — an unrecognized leading `-` refused
-at exit 2, `--` ending option processing — which is the rule this capture
-affordance's own three attested firings bought, and which **survives the port
-because the hazard belongs to the argument rather than to the substrate**. The
-`-h`/`--help` arm does **not** survive: usage for a non-gate arm lives in
-`run-gates.sh`'s own help and in [README.md](README.md), so `--emit file-gap
---help` is a refusal rather than a capture. That is the one observable this
-member's port moved. Stdout is the filed bullet and nothing else; the three
-advisories below all ride **stderr**, so a reader pasting the returned line
-never carries a question or a warning inside it. It is
-advisory tooling, not a gate — no fixture pair is owed; the raw append (a bullet
-line into the inbox) stays a legal fallback, the grammar being the surface's
-contract, not the writer.
+**The affordance.** `run-gates.sh --emit file-gap [--] "<gap prose>"` (the `--emit-kfric` pattern: repo-root anchor, config-via-env, exit 2 on an empty argument) appends one dated bullet, seeding the contract header — byte-identical to the line close's drain truncates back to — when the inbox does not yet exist. It is the `--emit-file-gap` arm (gate-sdk/SPEC.md §The non-gate arm), whose declared roster is five rows of the kit's static table: `LIFECYCLE_KIT_GAP_INBOX_FILE`, `LIFECYCLE_KIT_QUEUE_FILE`, `LIFECYCLE_KIT_STATE_FILE`, `LIFECYCLE_KIT_STAGES` and `LIFECYCLE_KIT_FIRST_STAGE`. The family is forced rather than chosen: the tool reads knobs, and a hardcoded top-level flag has no table row to declare them on. Its one positional is free text, so it validates that argument's **shape** to gate-sdk/SPEC.md §The bin/-tool contract — an unrecognized leading `-` refused at exit 2, `--` ending option processing — which is the rule this capture affordance's own three attested firings bought, and which **survives the port because the hazard belongs to the argument rather than to the substrate**. The `-h`/`--help` arm does **not** survive: usage for a non-gate arm lives in `run-gates.sh`'s own help and in [README.md](README.md), so `--emit file-gap --help` is a refusal rather than a capture. That is the one observable this member's port moved. Stdout is the filed bullet and nothing else; the three advisories below all ride **stderr**, so a reader pasting the returned line never carries a question or a warning inside it. It is advisory tooling, not a gate — no fixture pair is owed; the raw append (a bullet line into the inbox) stays a legal fallback, the grammar being the surface's contract, not the writer.
 
-**The filing session commits its own bullet**, at the first moment the git index
-is free of stage-session work. Committing is not *disposition* — the drain below
-gives a bullet exactly one (promoted, fixed inline, or discarded) and none of
-them is "committed" — it is what makes the surface's name true: a channel called
-the *committed* gap inbox whose filer never commits leaves a bullet reaching the
-next iteration uncommitted, carried by whichever session happens to stage next.
-Three shapes were weighed and the second is selected. Leaving the commit to the
-next session to stage is refused: that is the state above, and it fails silently
-whenever no dispatch instruction names it. The affordance committing its own
-bullet is **unruled** rather than refused, and the precondition argues against
-it — a capture arm cannot judge index freeness, so the timing test can only sit
-on the session. That precondition is also what answers the standing
-index-contention objection to committing at all: a *timing* test rather than a
-rejection, which is why the objection does not carry. Where the filing session is
-a supervising lead, the obligation is restated at the surface that session reads
-(§templates/lead.md), because the write-authority invariant there enumerates
-stamps, queue writes and evidence files, and a literal reader takes the omission
-of commits for a prohibition.
+**The filing session commits its own bullet**, at the first moment the git index is free of stage-session work. Committing is not *disposition* — the drain below gives a bullet exactly one (promoted, fixed inline, or discarded) and none of them is "committed" — it is what makes the surface's name true: a channel called the *committed* gap inbox whose filer never commits leaves a bullet reaching the next iteration uncommitted, carried by whichever session happens to stage next. Three shapes were weighed and the second is selected. Leaving the commit to the next session to stage is refused: that is the state above, and it fails silently whenever no dispatch instruction names it. The affordance committing its own bullet is **unruled** rather than refused, and the precondition argues against it — a capture arm cannot judge index freeness, so the timing test can only sit on the session. That precondition is also what answers the standing index-contention objection to committing at all: a *timing* test rather than a rejection, which is why the objection does not carry. Where the filing session is a supervising lead, the obligation is restated at the surface that session reads (§templates/lead.md), because the write-authority invariant there enumerates stamps, queue writes and evidence files, and a literal reader takes the omission of commits for a prohibition.
 
-**This section's contract is wholly in-crate.** Its three implementations are the
-capture affordance above, `--enter-stage`'s **iteration-boundary gap-inbox check**
-with its close-skipped/post-close discriminator (§bin/enter-stage.sh), and this
-surface's union-merge membership (§Multi-operator semantics), which
-`native/src/stages.rs` holds.
+**This section's contract is wholly in-crate.** Its three implementations are the capture affordance above, `--enter-stage`'s **iteration-boundary gap-inbox check** with its close-skipped/post-close discriminator (§bin/enter-stage.sh), and this surface's union-merge membership (§Multi-operator semantics), which `native/src/stages.rs` holds.
 
-It also **resolves the prose against the live slug set** at capture and, on a
-match, raises a stderr advisory that **asks** the filer: the prose names live
-entry `<slug>` — if this bullet *re-files* that finding, say so in the prose and
-say why; if it merely cites, corrects, or argues against that entry, say it is
-*distinct* and why, because the closing stage's drain judges the recurrence and
-reads what was written. The resolution buys a prompt and nothing else: it writes
-no marker, and the bullet it accompanies is the same one shape every filing gets.
-The
-live set is every column-0 `- **<slug>** —` entry bullet in the queue file
-*outside* the fixed-spelling `## Lessons Learned` section — that is exactly
-active, deferred, and a configured icebox — and it needs **no section knob of its
-own** because both exclusions fall out of grammar the kit already reads. The done
-section is excluded by construction: a done entry is a bare-slug line, outside the
-entry grammar queue-kit/SPEC.md §The queue format defines. Lessons is excluded by
-name, and must be: a lesson lead line is outside that grammar for every *gate*,
-but it may legitimately be *written* in the entry shape (`- **slug** [tag] —
-prose`), so a grammar-only scan would resolve a live lesson as a queue entry and
-ask the filer about something that is not one. The `## Lessons Learned`
-literal is fixed spelling rather than config (queue-kit/SPEC.md §The tag algebra),
-and this kit already carries it — `--enter-stage`'s boundary refusal and
-`check-lesson-disposition` both scan it.
-The done exclusion is the substantive half: a finding that recurs *after* its fix
-landed is a new defect, not a recurrence, and files as one. Resolution is
-lifecycle-kit's own scan over the
-queue — the shape `check-stage-entry` assertion B already takes — never
-queue-kit's `queue_live_slugs`, because reaching for it would close a cross-kit
-cycle. queue-kit/SPEC.md §The queue format states that as the general rule (a kit
-that cannot depend on queue-kit re-implements the predicate and both ends cite the
-owner section), and drift-kit's `kpi-deferred-age` records the same accepted
-residual. Two further behaviours belong to the predicate rather than to its
-grammar: **longest match wins**, so the advisory names the most specific live
-entry the prose reaches; and the match is **word-bounded** on `[a-z0-9-]` in both
-directions, so a slug embedded in a longer hyphenated token raises nothing.
+It also **resolves the prose against the live slug set** at capture and, on a match, raises a stderr advisory that **asks** the filer: the prose names live entry `<slug>` — if this bullet *re-files* that finding, say so in the prose and say why; if it merely cites, corrects, or argues against that entry, say it is *distinct* and why, because the closing stage's drain judges the recurrence and reads what was written. The resolution buys a prompt and nothing else: it writes no marker, and the bullet it accompanies is the same one shape every filing gets. The live set is every column-0 `- **<slug>** —` entry bullet in the queue file *outside* the fixed-spelling `## Lessons Learned` section — that is exactly active, deferred, and a configured icebox — and it needs **no section knob of its own** because both exclusions fall out of grammar the kit already reads. The done section is excluded by construction: a done entry is a bare-slug line, outside the entry grammar queue-kit/SPEC.md §The queue format defines. Lessons is excluded by name, and must be: a lesson lead line is outside that grammar for every *gate*, but it may legitimately be *written* in the entry shape (`- **slug** [tag] — prose`), so a grammar-only scan would resolve a live lesson as a queue entry and ask the filer about something that is not one. The `## Lessons Learned` literal is fixed spelling rather than config (queue-kit/SPEC.md §The tag algebra), and this kit already carries it — `--enter-stage`'s boundary refusal and `check-lesson-disposition` both scan it. The done exclusion is the substantive half: a finding that recurs *after* its fix landed is a new defect, not a recurrence, and files as one. Resolution is lifecycle-kit's own scan over the queue — the shape `check-stage-entry` assertion B already takes — never queue-kit's `queue_live_slugs`, because reaching for it would close a cross-kit cycle. queue-kit/SPEC.md §The queue format states that as the general rule (a kit that cannot depend on queue-kit re-implements the predicate and both ends cite the owner section), and drift-kit's `kpi-deferred-age` records the same accepted residual. Two further behaviours belong to the predicate rather than to its grammar: **longest match wins**, so the advisory names the most specific live entry the prose reaches; and the match is **word-bounded** on `[a-z0-9-]` in both directions, so a slug embedded in a longer hyphenated token raises nothing.
 
-**The port reproduced that predicate rather than collapsing it onto its compiled
-twin, and the reason is a corpus difference rather than a preference.** The crate
-already carries `queue::live_slugs`, the compiled form of queue-kit's own
-predicate, whose section scope is composed from `QUEUE_KIT_ACTIVE_SECTIONS` plus
-the deferred and icebox section knobs. This section's predicate is
-**grammar-scoped instead** — every column-0 entry bullet outside the
-fixed-spelling Lessons section, needing no section knob of its own. Those are not
-the same corpus: a consumer whose icebox is unconfigured, or whose active-section
-roster differs from its heading set, gets a different live set from each. The
-collapse would therefore be a verdict change on a real consumer, which is not a
-thing a port may take on its own authority.
+**The port reproduced that predicate rather than collapsing it onto its compiled twin, and the reason is a corpus difference rather than a preference.** The crate already carries `queue::live_slugs`, the compiled form of queue-kit's own predicate, whose section scope is composed from `QUEUE_KIT_ACTIVE_SECTIONS` plus the deferred and icebox section knobs. This section's predicate is **grammar-scoped instead** — every column-0 entry bullet outside the fixed-spelling Lessons section, needing no section knob of its own. Those are not the same corpus: a consumer whose icebox is unconfigured, or whose active-section roster differs from its heading set, gets a different live set from each. The collapse would therefore be a verdict change on a real consumer, which is not a thing a port may take on its own authority.
 
-**The stated ground weakens under that substrate, and the honest note is here
-rather than left for a later reader to re-derive.** "Would close a cross-kit
-cycle" is a claim about a *shell* source dependency — this kit's `bin/` sourcing
-queue-kit's `lib/`. Inside one binary both predicates are already compiled
-together and no vendoring decision separates them, so the anti-cycle premise no
-longer describes the arrangement it was written against. Whether the refusal
-survives on an independent ownership ground, or retires with its premise, is not
-settled by any surface here and is not settled by the port.
+**The stated ground weakens under that substrate, and the honest note is here rather than left for a later reader to re-derive.** "Would close a cross-kit cycle" is a claim about a *shell* source dependency — this kit's `bin/` sourcing queue-kit's `lib/`. Inside one binary both predicates are already compiled together and no vendoring decision separates them, so the anti-cycle premise does not describe the arrangement it was written against. Whether the refusal survives on an independent ownership ground, or retires with its premise, is not settled by any surface here and is not settled by the port.
 
-**Why the matcher prompts rather than decides, and why it survives at all.** A
-recurrence is a claim about *what a finding is*, not about *what a string
-contains*, and no syntactic tell separates "this recurred" from "this is about
-that": a bullet can spell the denial out in words and still match. So the
-predicate is not sharpened, it is **demoted** — its recall was never the defect,
-its authority was. Deleting it would delete the only thing that can produce the
-prompt, and the prompt is what reaches the one party who can answer cheaply: a
-mid-build filer routinely has not read the queue, which is why the matcher
-existed in the first place.
+**Why the matcher prompts rather than decides, and why it survives at all.** A recurrence is a claim about *what a finding is*, not about *what a string contains*, and no syntactic tell separates "this recurred" from "this is about that": a bullet can spell the denial out in words and still match. So the predicate is not sharpened, it is **demoted** — its recall was never the defect, its authority was. Deleting it would delete the only thing that can produce the prompt, and the prompt is what reaches the one party who can answer cheaply: a mid-build filer routinely has not read the queue, which is why the matcher existed in the first place.
 
-**The objection has a second application, and the same answer.** A citation of a
-ruling carries no tell either: a surface may name a retired ruling as **evidence
-about the past**, which is correct prose, or restate it as a **live rule**, which
-is the defect — and one measured cohort holds the instance that settles it, a
-site recording a *live* ruling under a retired run's name, where the repair was
-to re-name the run and leave the ruling standing. So the citing-side reader takes
-the same demotion this one takes: it reports the sites and quotes them, and never
-says a citation is wrong (§The ruling-staleness probe). Two applications of one
-objection, with one answer, is what makes it a rule rather than a local excuse.
+**The objection has a second application, and the same answer.** A citation of a ruling carries no tell either: a surface may name a retired ruling as **evidence about the past**, which is correct prose, or restate it as a **live rule**, which is the defect — and one measured cohort holds the instance that settles it, a site recording a *live* ruling under a retired run's name, where the repair was to re-name the run and leave the ruling standing. So the citing-side reader takes the same demotion this one takes: it reports the sites and quotes them, and never says a citation is wrong (§The ruling-staleness probe). Two applications of one objection, with one answer, is what makes it a rule rather than a local excuse.
 
-**Its honest limit.** A bullet describing a recurrence without spelling the slug
-raises no advisory at all. That leaves no hole in this channel, because the drain
-reads **every** bullet regardless of whether the matcher spoke — which is the
-difference between a prompt and a gate, and the reason the judgment had to move
-rather than the predicate get sharper.
+**Its honest limit.** A bullet describing a recurrence without spelling the slug raises no advisory at all. That leaves no hole in this channel, because the drain reads **every** bullet regardless of whether the matcher spoke — which is the difference between a prompt and a gate, and the reason the judgment had to move rather than the predicate get sharper.
 
-**Three alternatives are refused, recorded so they are not re-drafted.** A
-*required* recurrence-or-new argument on the affordance turns capture into an
-interrogation, and refusing capture does not dissolve a finding — it pushes it
-back into session context, the deferred-capture antipattern this inbox exists to
-prevent; it is also asked of a party who has not read the queue. An *optional*
-`--recurrence <slug>` flag invites the drain to trust a structured claim,
-reinstating the same defect one layer up with a better provenance story. And
-*narrowing the matcher* — anchoring the slug, exempting a bullet containing a
-negation — institutionalizes the evasion: an affordance that must be phrased
-around to stay accurate is miscalibrated, and the next filer does not know to
-phrase around it. What all three trade against is prose, which the channel
-already carries and a judge already reads.
+**Three alternatives are refused, recorded so they are not re-drafted.** A *required* recurrence-or-new argument on the affordance turns capture into an interrogation, and refusing capture does not dissolve a finding — it pushes it back into session context, the deferred-capture antipattern this inbox exists to prevent; it is also asked of a party who has not read the queue. An *optional* `--recurrence <slug>` flag invites the drain to trust a structured claim, reinstating the same defect one layer up with a better provenance story. And *narrowing the matcher* — anchoring the slug, exempting a bullet containing a negation — institutionalizes the evasion: an affordance that must be phrased around to stay accurate is miscalibrated, and the next filer does not know to phrase around it. What all three trade against is prose, which the channel already carries and a judge already reads.
 
-**A fourth shape is refused — deriving post-close-ness from git — recorded so it
-is not re-drafted.** The proposal: rather than reading the cursor, ask "has the
-inbox been truncated since the close stamp's commit?", which separates the cases
-with no marker field. It is refused on evidence, on four independent grounds.
+**A fourth shape is refused — deriving post-close-ness from git — recorded so it is not re-drafted.** The proposal: rather than reading the cursor, ask "has the inbox been truncated since the close stamp's commit?", which separates the cases with no marker field. It is refused on evidence, on four independent grounds.
 
-- **It is wrong on the case that matters.** The predicate assumes the drain and
-  the closing stamp are commensurable in commit order. Measured over this
-  project's four most recently closed iterations they are not: the truncation is
-  **never** in the stamp's commit and is **always** a later, separately authored
-  one. So "truncated since the close stamp" is true of every normally-closed
-  iteration, and the single case it does distinguish — a close that stamped and
-  then skipped its drain — it answers *close-skipped*, handing the entering
-  session a recovery naming a stage that is gone. The cursor read is right there,
-  because close did run.
-- **It cannot answer the other case at all.** Where close was genuinely skipped
-  there is no close-stamp commit to anchor on, so the git predicate degenerates
-  into "is there a close stamp?" — which is the cursor read, obtained from a file
-  the tool already holds open.
-- **It would be `--enter-stage`'s first `git` invocation.** That tool shells
-  out to git nowhere: every decision it takes is a read of the queue and the
-  state file. Adding history-dependence to the state machine's only writer makes
-  the entry decision non-hermetic, and the branch's fixture would have to
-  construct commit history rather than three files.
-- **Its stated virtue does not discriminate.** "Needs no marker field, so
-  §check-gap-inbox-neutrality's two-field bound stays intact" is equally true of
-  the cursor read, which writes nothing anywhere. The bound is untouched by both,
-  so it selects neither.
+- **It is wrong on the case that matters.** The predicate assumes the drain and the closing stamp are commensurable in commit order. Measured over this project's four most recently closed iterations they are not: the truncation is **never** in the stamp's commit and is **always** a later, separately authored one. So "truncated since the close stamp" is true of every normally-closed iteration, and the single case it does distinguish — a close that stamped and then skipped its drain — it answers *close-skipped*, handing the entering session a recovery naming a stage that is gone. The cursor read is right there, because close did run.
+- **It cannot answer the other case at all.** Where close was genuinely skipped there is no close-stamp commit to anchor on, so the git predicate degenerates into "is there a close stamp?" — which is the cursor read, obtained from a file the tool already holds open.
+- **It would be `--enter-stage`'s first `git` invocation.** That tool shells out to git nowhere: every decision it takes is a read of the queue and the state file. Adding history-dependence to the state machine's only writer makes the entry decision non-hermetic, and the branch's fixture would have to construct commit history rather than three files.
+- **Its stated virtue does not discriminate.** "Needs no marker field, so §check-gap-inbox-neutrality's two-field bound stays intact" is equally true of the cursor read, which writes nothing anywhere. The bound is untouched by both, so it selects neither.
 
-**The tool writes no queue file, and that is the load-bearing constraint on the
-whole channel.** This inbox exists precisely because a gap surfaced mid-stage has
-no committed place to land except the queue file a stage session is already
-contending on. A capture affordance that stamped a `recurrence:` declaration onto
-a queue entry would do the one thing the inbox was built to prevent. The queue write
-therefore belongs to the closing stage's drain, which writes the queue anyway.
+**The tool writes no queue file, and that is the load-bearing constraint on the whole channel.** This inbox exists precisely because a gap surfaced mid-stage has no committed place to land except the queue file a stage session is already contending on. A capture affordance that stamped a `recurrence:` declaration onto a queue entry would do the one thing the inbox was built to prevent. The queue write therefore belongs to the closing stage's drain, which writes the queue anyway.
 
-**A queue entry cites this inbox as provenance, never as a locator.** The inbox
-is drained every close, so a sentence
-naming it as a fact's *current home* — "it is in the gap inbox as of" a date, or
-a parenthetical "(gap inbox," plus a date) — is broken by the next drain, while a
-sentence stating that a finding *was filed there and drained from it on a date*
-is history and stays true. The test is whether the sentence still resolves after
-the next drain. A fact a bullet carries is restated on the entry or cited to the
-surface the drain moved it to; a queue entry that must point at the bullet itself
-is pointing at a surface that will not exist. The same rule binds citations of
-the survey record (§The survey record), which the iteration boundary truncates.
-Held by review rather than a gate: a present-tense scan over queue prose is a
-tree-facing heuristic whose over-refusal cost the tree already pays elsewhere, and
-the measured rate — two locators in the inbox's whole life, both caught by one
-read — does not buy one.
+**A queue entry cites this inbox as provenance, never as a locator.** The inbox is drained every close, so a sentence naming it as a fact's *current home* — "it is in the gap inbox as of" a date, or a parenthetical "(gap inbox," plus a date) — is broken by the next drain, while a sentence stating that a finding *was filed there and drained from it on a date* is history and stays true. The test is whether the sentence still resolves after the next drain. A fact a bullet carries is restated on the entry or cited to the surface the drain moved it to; a queue entry that must point at the bullet itself is pointing at a surface that will not exist. The same rule binds citations of the survey record (§The survey record), which the iteration boundary truncates. Held by review rather than a gate: a present-tense scan over queue prose is a tree-facing heuristic whose over-refusal cost the tree already pays elsewhere, and the measured rate — two locators in the inbox's whole life, both caught by one read — does not buy one.
 
-**A dated attestation freezes the claim, never the locator.** The test above
-generalises past these two surfaces to every dated claim in queue prose. A dated
-measurement or judgment — *verified 2026-08-30: the three sites are …* — is
-history: true on its date, immune to later drift, and never refreshed, which is
-the freeze the ruling record's dated-measurement idiom already states per
-instance (gate-sdk/SPEC.md §The decisions this substrate already closed). The
-date in that example is a **specimen** and not an attestation of anything: it
-denotes no event, and any other date would leave the surrounding rule equally
-true. A `path:line` beside it is a locator by construction —
-its only reader follows it now — so drift falsifies the literal, and a literal
-position in prose is the de-literalization defect whatever date sits beside it
-(doctrine-kit/DOCTRINE.md §Methodology-maintenance rules). A date is not a rev:
-two closes have fallen on one calendar day, so a date under-determines the tree,
-where a carried survey's witness is corpus, oracle and rev (§The survey record)
-and the one frozen line range this tree keeps carries its commit
-(gate-sdk/SPEC.md §port-blockers). So a locator worth keeping is de-literalized
-to the name it points at, or rev-pinned where the exact span is load-bearing; the
-rule reaches the bare `verified <date>` standing beside a `path:line` with no
-freezing sentence, a case no surface stated before this. The consequence for the
-pendency sweeps: an anchor whose sentence holds while its line moved is a finding
-of the de-literalization class, fix-shaped at a drain, not of the pendency class;
-an anchor resolving to different text is a false claim. Two readings were
-refused. *A historical record immune to drift* makes a date a licence to carry
-rotting locators, contradicts de-literalization and spec-over-precedent, and
-would un-find a citation resolving to different text. *A live pointer the drift
-falsifies whole* makes the dated-measurement idiom defective and invites the
-recount the freeze forbids. A scanner gate over anchors is refused on the
-grounds the paragraph above already gives.
+**A dated attestation freezes the claim, never the locator.** The test above generalises past these two surfaces to every dated claim in queue prose. A dated measurement or judgment — *verified 2026-08-30: the three sites are …* — is history: true on its date, immune to later drift, and never refreshed, which is the freeze the ruling record's dated-measurement idiom already states per instance (gate-sdk/SPEC.md §The decisions this substrate already closed). The date in that example is a **specimen** and not an attestation of anything: it denotes no event, and any other date would leave the surrounding rule equally true. A `path:line` beside it is a locator by construction — its only reader follows it now — so drift falsifies the literal, and a literal position in prose is the de-literalization defect whatever date sits beside it (doctrine-kit/DOCTRINE.md §Methodology-maintenance rules). A date is not a rev: two closes have fallen on one calendar day, so a date under-determines the tree, where a carried survey's witness is corpus, oracle and rev (§The survey record) and the one frozen line range this tree keeps carries its commit (gate-sdk/SPEC.md §port-blockers). So a locator worth keeping is de-literalized to the name it points at, or rev-pinned where the exact span is load-bearing; the rule reaches the bare `verified <date>` standing beside a `path:line` with no freezing sentence, a case no surface stated before this. The consequence for the pendency sweeps: an anchor whose sentence holds while its line moved is a finding of the de-literalization class, fix-shaped at a drain, not of the pendency class; an anchor resolving to different text is a false claim. Two readings were refused. *A historical record immune to drift* makes a date a licence to carry rotting locators, contradicts de-literalization and spec-over-precedent, and would un-find a citation resolving to different text. *A live pointer the drift falsifies whole* makes the dated-measurement idiom defective and invites the recount the freeze forbids. A scanner gate over anchors is refused on the grounds the paragraph above already gives.
 
-**The drain's dispositions are ordered, and promotion is last, on a measured
-drain rather than on a preference.** The disposition set is fix, promote,
-discard; the drain tries them in that order per bullet and a promotion states in
-the close commit message why the fix disposition failed.
-The measurement: with the set listed promotion-first, fifteen consecutive drained
-bullets over two closes were promoted and none fixed, on a pool whose
-intake had outrun its exits three to one for a fortnight — so the unordered set
-was read as a promotion default, and a three-line defect cost a thirty-line
-entry plus the iteration that would one day build it. **A bullet is fix-shaped
-when it is debt-shaped by the interstitial litmus above — it adds no governed
-name — and lands test-and-doc-complete in the drain's own commit**; that litmus
-is the one this section's interstitial mitigation already applies, so no new
-criterion is minted. Fixing in the drain is not the refused hotfix track: it
-contends on no live stage surface (the closing stage holds the index), and
-what it admits is exactly what that refusal said a hotfix is not — debt-shaped
-work. It is also not an intake violation: scope gates *initiatives*, and a
-defect the drain fixes in one commit adds nothing for scope to weigh. **The
-icebox is not a drain disposition**: the tier takes deferred entries that aged
-without recurring, and a bullet drained today has no such age (queue-kit/SPEC.md
-§The icebox tier); a bullet not worth carrying is a discard with cause. The
-alternative refused alongside the ordering: a gate reddening a
-close on net pool growth. Enforcement-first would prefer it, but the refusal ground is
-that the exits are judgments — a forced exit is a fake one — so the figure is
-surfaced instead: drift-kit's `kpi-queue-net-delta` already computes it, and
-the drain's commit message states its `qnet` fragment.
+**The drain's dispositions are ordered, and promotion is last, on a measured drain rather than on a preference.** The disposition set is fix, promote, discard; the drain tries them in that order per bullet and a promotion states in the close commit message why the fix disposition failed. The measurement: with the set listed promotion-first, fifteen consecutive drained bullets over two closes were promoted and none fixed, on a pool whose intake had outrun its exits three to one for a fortnight — so the unordered set was read as a promotion default, and a three-line defect cost a thirty-line entry plus the iteration that would one day build it. **A bullet is fix-shaped when it is debt-shaped by the interstitial litmus above — it adds no governed name — and lands test-and-doc-complete in the drain's own commit**; that litmus is the one this section's interstitial mitigation already applies, so no new criterion is minted. Fixing in the drain is not the refused hotfix track: it contends on no live stage surface (the closing stage holds the index), and what it admits is exactly what that refusal said a hotfix is not — debt-shaped work. It is also not an intake violation: scope gates *initiatives*, and a defect the drain fixes in one commit adds nothing for scope to weigh. **The icebox is not a drain disposition**: the tier takes deferred entries that aged without recurring, and a bullet drained today has no such age (queue-kit/SPEC.md §The icebox tier); a bullet not worth carrying is a discard with cause. The alternative refused alongside the ordering: a gate reddening a close on net pool growth. Enforcement-first would prefer it, but the refusal ground is that the exits are judgments — a forced exit is a fake one — so the figure is surfaced instead: drift-kit's `kpi-queue-net-delta` already computes it, and the drain's commit message states its `qnet` fragment.
 
-It also **warns at the point of capture**, reading the cursor
-(`stages::current_stage`) to say which consequence the filer is buying: an
-ordinary filing is told the bullet blocks the next first-stage entry until the
-drain, and a filing made while the cursor sits at the **last configured stage**
-is told that once that stage finishes, none is left to drain it. The warning
-goes to stderr so the stamped bullet stays the tool's stdout contract. It is a
-warning and not a refusal deliberately: refusing capture does not dissolve a
-real finding, it pushes it back into session context — the deferred-capture
-antipattern this inbox exists to prevent.
+It also **warns at the point of capture**, reading the cursor (`stages::current_stage`) to say which consequence the filer is buying: an ordinary filing is told the bullet blocks the next first-stage entry until the drain, and a filing made while the cursor sits at the **last configured stage** is told that once that stage finishes, none is left to drain it. The warning goes to stderr so the stamped bullet stays the tool's stdout contract. It is a warning and not a refusal deliberately: refusing capture does not dissolve a real finding, it pushes it back into session context — the deferred-capture antipattern this inbox exists to prevent.
 
-**The drain re-verifies; capture does not.** A bullet's prose is a claim made at
-capture speed, and this channel is built to keep capture cheap, so nothing
-upstream established it — a bullet can assert a mechanism its filer inferred
-rather than ran, and a false premise is paid by whoever drains it. The drain
-therefore names, per bullet, the claim its disposition turns on and the command
-that establishes it, runs that command, and records in the same commit which
-bullets were re-verified and what fell (§templates/stages/ carries the step). The
-grounds are attested rather than argued: of the bullets re-verified at one
-boundary, two were false at their central claim and each fell to a single
-command, and a later bullet carried two false premises at once — one caught by
-the filer re-reading the source before the drain, the other only by the draining
-session's own probes. The step that reliably ran was the drain.
+**The drain re-verifies; capture does not.** A bullet's prose is a claim made at capture speed, and this channel is built to keep capture cheap, so nothing upstream established it — a bullet can assert a mechanism its filer inferred rather than ran, and a false premise is paid by whoever drains it. The drain therefore names, per bullet, the claim its disposition turns on and the command that establishes it, runs that command, and records in the same commit which bullets were re-verified and what fell (§templates/stages/ carries the step). The grounds are attested rather than argued: of the bullets re-verified at one boundary, two were false at their central claim and each fell to a single command, and a later bullet carried two false premises at once — one caught by the filer re-reading the source before the drain, the other only by the draining session's own probes. The step that reliably ran was the drain.
 
-**Filing looks for an owner first.** Re-verification reaches past the drain to
-every write of a new deferred entry, in any stage — a drain's or an intake's
-→promote, each finding close files on its own account (a lesson →task, an
-eviction or triage finding, a dispatch's captured debt), and a finding validate
-files as a task. Before writing, the session searches the
-queue file, the icebox included, for an entry that already owns the finding,
-grepping its distinctive terms: the paths, gate and knob names, and slug-shaped
-words. A match is read, not counted:
-- an owner carrying the finding is a **recurrence** — it takes a `recurrence:`
-  stamp and folds any new axis into its body, and no second entry is filed;
-- an adjacent entry is cited in the new entry's prose as **distinct**, with the
-  reason;
-- a done slug is a finding that recurred after its fix, filed as a new defect
-  naming that slug.
+**Filing looks for an owner first.** Re-verification reaches past the drain to every write of a new deferred entry, in any stage — a drain's or an intake's →promote, each finding close files on its own account (a lesson →task, an eviction or triage finding, a dispatch's captured debt), and a finding validate files as a task. Before writing, the session searches the queue file, the icebox included, for an entry that already owns the finding, grepping its distinctive terms: the paths, gate and knob names, and slug-shaped words. A match is read, not counted:
+- an owner carrying the finding is a **recurrence** — it takes a `recurrence:` stamp and folds any new axis into its body, and no second entry is filed;
+- an adjacent entry is cited in the new entry's prose as **distinct**, with the reason;
+- a done slug is a finding that recurred after its fix, filed as a new defect naming that slug.
 
-The filing commit records the lookup per entry — the terms searched, and `none`
-or the matched slug with its reading — so a missed owner shows as a bad search
-rather than a silent omission. The step needs no similarity oracle: the re-filings
-it answers each had an owner a plain grep for the slug and subject would have
-found, and in each the filer never ran it, so what was missing was the step, not a
-scanner. It binds where the queue is written, never at capture (the refusal
-below stands). *Honest limit:* a filer whose terms miss the owner files a
-duplicate and nothing reds — `check-task-conservation` conserves a duplicate pair —
-so the commit-message record is the only residue a later reader can audit.
+The filing commit records the lookup per entry — the terms searched, and `none` or the matched slug with its reading — so a missed owner shows as a bad search rather than a silent omission. The step needs no similarity oracle: the re-filings it answers each had an owner a plain grep for the slug and subject would have found, and in each the filer never ran it, so what was missing was the step, not a scanner. It binds where the queue is written, never at capture (the refusal below stands). *Honest limit:* a filer whose terms miss the owner files a duplicate and nothing reds — `check-task-conservation` conserves a duplicate pair — so the commit-message record is the only residue a later reader can audit.
 
-**Filing marks what it did not run.** Each of those writes marks every claim its
-disposition turns on that the session did not run with the inferred marker
-(§templates/stages/), on a body line of its own — a drain's claim dispositioned
-*as a claim* is carried that way, as a marker a later stage runs rather than prose
-nobody consumes. The marker is written where the entry is written and never at
-capture: a gap-inbox bullet gains nothing, and the drain turning the bullet into an
-entry is where the marker first appears.
+**Filing marks what it did not run.** Each of those writes marks every claim its disposition turns on that the session did not run with the inferred marker (§templates/stages/), on a body line of its own — a drain's claim dispositioned *as a claim* is carried that way, as a marker a later stage runs rather than prose nobody consumes. The marker is written where the entry is written and never at capture: a gap-inbox bullet gains nothing, and the drain turning the bullet into an entry is where the marker first appears.
 
-**Two capture-time shapes are refused, recorded so they are not re-drafted.** A
-filing-time prompt for the establishing command, and a grammar separating
-observed fact from inferred mechanism, both add friction at the moment this inbox
-exists to keep cheap, and both bill it to the party least able to pay — the
-mid-stage filer whose finding otherwise stays in session context. That is the
-deferred-capture antipattern the channel was built against, and it is not traded
-away to fix a different failure mode. The affordance gains no prompt and no
-grammar; §check-gap-inbox-neutrality keeps the bullet's fields at two. The
-refusal is this channel's and reaches no surface where capture is not cheap or no
-drain re-verifies. The survey record is such a surface, and it takes the split
-(§The survey record); so is a queue entry, which takes the inferred marker.
+**Two capture-time shapes are refused, recorded so they are not re-drafted.** A filing-time prompt for the establishing command, and a grammar separating observed fact from inferred mechanism, both add friction at the moment this inbox exists to keep cheap, and both bill it to the party least able to pay — the mid-stage filer whose finding otherwise stays in session context. That is the deferred-capture antipattern the channel was built against, and it is not traded away to fix a different failure mode. The affordance gains no prompt and no grammar; §check-gap-inbox-neutrality keeps the bullet's fields at two. The refusal is this channel's and reaches no surface where capture is not cheap or no drain re-verifies. The survey record is such a surface, and it takes the split (§The survey record); so is a queue entry, which takes the inferred marker.
 
-**Merge semantics.** The inbox carries `merge=union` (git-native, so no per-clone
-driver registration), not the keep-ours `merge=iteration-scoped` the
-boundary-truncated surfaces carry: an iteration-scoped surface is per-iteration
-scratch superseded at the boundary, but a gap filed on either side of a
-concurrent merge must survive. The installer emits the line and
-`check-merge-attrs` verifies it (§bin/install-lifecycle.sh, §check-merge-attrs).
+**Merge semantics.** The inbox carries `merge=union` (git-native, so no per-clone driver registration), not the keep-ours `merge=iteration-scoped` the boundary-truncated surfaces carry: an iteration-scoped surface is per-iteration scratch superseded at the boundary, but a gap filed on either side of a concurrent merge must survive. The installer emits the line and `check-merge-attrs` verifies it (§bin/install-lifecycle.sh, §check-merge-attrs).
 
-**The boundary check: one detector, two dispositions.**
-`--enter-stage`'s first-stage (iteration-boundary) entry is unchanged in
-**detection** — it still fires on any `- ` bullet in the inbox — and
-**discriminates** on which of two dispositions it takes, because the drain and
-the filing window do not coincide.
+**The boundary check: one detector, two dispositions.** `--enter-stage`'s first-stage (iteration-boundary) entry is unchanged in **detection** — it still fires on any `- ` bullet in the inbox — and **discriminates** on which of two dispositions it takes, because the drain and the filing window do not coincide.
 
-- **Close-skipped** — the closing iteration's cursor never reached the last
-  configured stage. The entry **refuses** (exit 1, the untriaged bullets
-  printed, nothing written — the same refusal contract as the non-empty Lessons
-  section), with the one recovery that applies: run the closing stage's
-  gap-drain step, truncate the inbox, re-enter. A stage was skipped, so the
-  recovery is to run it, and no gap outlives its iteration untriaged (the
-  gap-disposition rule: costed and filed, never flagged-and-skipped).
-- **Post-close** — the cursor sits at the last configured stage, so the closing
-  stage has run and none is coming back. The entry is **admitted**: the bullets
-  print on stderr as an advisory naming them this iteration's first-stage
-  intake, and the stamp proceeds. Deleting a bullet without a disposition is
-  still not a drain.
+- **Close-skipped** — the closing iteration's cursor never reached the last configured stage. The entry **refuses** (exit 1, the untriaged bullets printed, nothing written — the same refusal contract as the non-empty Lessons section), with the one recovery that applies: run the closing stage's gap-drain step, truncate the inbox, re-enter. A stage was skipped, so the recovery is to run it, and no gap outlives its iteration untriaged (the gap-disposition rule: costed and filed, never flagged-and-skipped).
+- **Post-close** — the cursor sits at the last configured stage, so the closing stage has run and none is coming back. The entry is **admitted**: the bullets print on stderr as an advisory naming them this iteration's first-stage intake, and the stamp proceeds. Deleting a bullet without a disposition is still not a drain.
 
-The discriminator is the closing-stage predicate over the cursor
-(§The stage-machine adapters), the same predicate the `--emit-file-gap` arm warns from at
-capture, so a filer told "none is left to drain it" is told so by the same test
-that later admits the bullet. **Both sides are compiled, and the agreement is
-two compositions rather than one hoisted predicate**: each arm composes it from
-the crate's `stages::current_stage` read and the last configured stage. **Two edges take the post-close
-disposition**, both following precedents the script already carries: a closing
-iteration that was never named (the `—` placeholder) has no close to have
-skipped — the guard `LIFECYCLE_KIT_BOUNDARY_REQUIRE` applies one block down for
-the same reason — and an inbox holding bullets with no cursor at all, a fresh
-consumer's first boundary, is that case too.
+The discriminator is the closing-stage predicate over the cursor (§The stage-machine adapters), the same predicate the `--emit-file-gap` arm warns from at capture, so a filer told "none is left to drain it" is told so by the same test that later admits the bullet. **Both sides are compiled, and the agreement is two compositions rather than one hoisted predicate**: each arm composes it from the crate's `stages::current_stage` read and the last configured stage. **Two edges take the post-close disposition**, both following precedents the script already carries: a closing iteration that was never named (the `—` placeholder) has no close to have skipped — the guard `LIFECYCLE_KIT_BOUNDARY_REQUIRE` applies one block down for the same reason — and an inbox holding bullets with no cursor at all, a fresh consumer's first boundary, is that case too.
 
-**No second detector is added for the post-close window**: the existing refusal
-already detects it, and what was missing was the message's actionability. That
-ruling is **kept and re-read** rather than retired — the two-disposition shape
-satisfies it more exactly than the two-recovery message did, since one detector
-still fires and what the discriminator picks is only what to do about it.
+**No second detector is added for the post-close window**: the existing refusal already detects it, and what was missing was the message's actionability. That ruling is **kept and re-read** rather than retired — the two-disposition shape satisfies it more exactly than the two-recovery message did, since one detector still fires and what the discriminator picks is only what to do about it.
 
-**Why admission, and not merely a better-worded refusal.** A refusal that picks
-the right message still leaves the queue write where this project's own history
-puts it: made **before any stamp exists, by a session that has entered no
-stage**, and committed as though by a stage that has not started. Routing a
-post-close finding into the first stage's ordinary intake is satisfiable only
-*inside* that stage — the intake is its — so the entry has to succeed for the
-finding to reach it. What the change buys is that the disposition becomes an
-ordinary in-stage queue write in the stage that writes the queue anyway.
+**Why admission, and not merely a better-worded refusal.** A refusal that picks the right message still leaves the queue write where this project's own history puts it: made **before any stamp exists, by a session that has entered no stage**, and committed as though by a stage that has not started. Routing a post-close finding into the first stage's ordinary intake is satisfiable only *inside* that stage — the intake is its — so the entry has to succeed for the finding to reach it. What the change buys is that the disposition becomes an ordinary in-stage queue write in the stage that writes the queue anyway.
 
-**What the admission costs, and why the loss is smaller than it looks.** The
-invariant "no gap outlives its iteration untriaged" is not weakened, because a
-post-close bullet never had a drainer in the iteration it was filed in — that is
-the defect, and no message could have supplied one. On admission the bullet
-stops being post-close: it becomes an ordinary mid-iteration bullet of the
-**new** iteration, and it therefore acquires the drainer it never had, that
-iteration's mandatory close drain. The first stage is directed to take it
-earlier because it is writing the queue anyway; if it does not, close does. That
-forcing function is the existing one rather than a new one.
+**What the admission costs, and why the loss is smaller than it looks.** The invariant "no gap outlives its iteration untriaged" is not weakened, because a post-close bullet never had a drainer in the iteration it was filed in — that is the defect, and no message could have supplied one. On admission the bullet stops being post-close: it becomes an ordinary mid-iteration bullet of the **new** iteration, and it therefore acquires the drainer it never had, that iteration's mandatory close drain. The first stage is directed to take it earlier because it is writing the queue anyway; if it does not, close does. That forcing function is the existing one rather than a new one.
 
-**The honest limit, stated because it is real.** The finding's *disposition*
-then lands in the next iteration's ledger, which cannot be repaired: the finding
-postdates its own iteration's close, so no iteration-correct ledger position
-exists for it. What is repaired is legibility — a promoted entry's provenance
-sentence carries the bullet's own date and names the iteration whose close
-generated it, so a reader sees where the finding came from even though its
-disposition sits one iteration later. A record that is late and says so is
-strictly better than one that is late and silent.
+**The honest limit, stated because it is real.** The finding's *disposition* then lands in the next iteration's ledger, which cannot be repaired: the finding postdates its own iteration's close, so no iteration-correct ledger position exists for it. What is repaired is legibility — a promoted entry's provenance sentence carries the bullet's own date and names the iteration whose close generated it, so a reader sees where the finding came from even though its disposition sits one iteration later. A record that is late and says so is strictly better than one that is late and silent.
 
-That check is the inbox's
-forcing function — branch-conditional as of the two dispositions above, refusing
-on the close-skipped branch and obliging an in-stage disposition on the other —
-so the inbox declares itself on the close-surface roster
-(§The close-surface roster) here, where the forcing function is documented:
+That check is the inbox's forcing function — branch-conditional as of the two dispositions above, refusing on the close-skipped branch and obliging an in-stage disposition on the other — so the inbox declares itself on the close-surface roster (§The close-surface roster) here, where the forcing function is documented:
 
 close-surface: .workflow/gap-inbox.md forced=lifecycle-kit/SPEC.md §bin/enter-stage.sh
 
-**Producers and consumers.** Producer: any mid-iteration session (lead or stage)
-via `--emit file-gap` — the knob default makes the channel live everywhere the
-kit is vendored. Consumers, **two**, one per disposition of the boundary check.
-The close skill's drain step (§templates/stages/) dispositions every bullet —
-promoted to a deferred entry, fixed inline that session, or
-discarded with cause in the close commit message — then truncates the inbox to
-its header. The **first stage's intake step** (§templates/stages/) takes the
-bullets the boundary carried, with the same disposition set and the same
-truncate-in-the-same-commit rule, run after its stamp; it is reachable at every
-boundary with no enabling config, and it exists because a post-close bullet has
-no drainer in the iteration that filed it. The boundary check reads emptiness at
-the next first-stage entry as the backstop for both.
+**Producers and consumers.** Producer: any mid-iteration session (lead or stage) via `--emit file-gap` — the knob default makes the channel live everywhere the kit is vendored. Consumers, **two**, one per disposition of the boundary check. The close skill's drain step (§templates/stages/) dispositions every bullet — promoted to a deferred entry, fixed inline that session, or discarded with cause in the close commit message — then truncates the inbox to its header. The **first stage's intake step** (§templates/stages/) takes the bullets the boundary carried, with the same disposition set and the same truncate-in-the-same-commit rule, run after its stamp; it is reachable at every boundary with no enabling config, and it exists because a post-close bullet has no drainer in the iteration that filed it. The boundary check reads emptiness at the next first-stage entry as the backstop for both.
 
-**A `recurrence:` date records a session's judgment that a finding re-occurred,
-made by reading the bullet's prose. A slug appearing in a bullet is an input to
-that judgment and never a verdict; no mechanism produces the declaration.**
+**A `recurrence:` date records a session's judgment that a finding re-occurred, made by reading the bullet's prose. A slug appearing in a bullet is an input to that judgment and never a verdict; no mechanism produces the declaration.**
 
-That drain step is the declaration's only **mechanized** producer
-(queue-kit/SPEC.md §The tag algebra), and it is the stage that must not skip the
-judgment: on a bullet it judges a recurrence it stamps the date onto that entry's
-declaration — creating the line when absent, appending the date when present —
-**in addition to** its ordinary disposition, never instead of it. It is reachable
-at every close with no enabling config, since the drain is already mandatory and
-the boundary refusal already forces it.
+That drain step is the declaration's only **mechanized** producer (queue-kit/SPEC.md §The tag algebra), and it is the stage that must not skip the judgment: on a bullet it judges a recurrence it stamps the date onto that entry's declaration — creating the line when absent, appending the date when present — **in addition to** its ordinary disposition, never instead of it. It is reachable at every close with no enabling config, since the drain is already mandatory and the boundary refusal already forces it.
 
-The drain is *not* the only producer, and that path is **ruled: sanctioned, and
-obliged.** A session that observes a recurrence outside the capture channel
-stamps one directly, in the commit it is already making. The obligation attaches
-to the **judgment**, not to the channel the observation arrived through — the
-failure the counter exists to end is a recurrence *seen and not recorded*, and a
-merely permitted write is one a session under pressure correctly declines, which
-would answer the question in form and leave it open in substance.
+The drain is *not* the only producer, and that path is **ruled: sanctioned, and obliged.** A session that observes a recurrence outside the capture channel stamps one directly, in the commit it is already making. The obligation attaches to the **judgment**, not to the channel the observation arrived through — the failure the counter exists to end is a recurrence *seen and not recorded*, and a merely permitted write is one a session under pressure correctly declines, which would answer the question in form and leave it open in substance.
 
-**A lead cannot discharge that obligation as written, and the channel already
-supplies what it can.** §templates/lead.md forbids the lead every queue write, so
-a lead that judges a recurrence has exactly one channel — this inbox — and a
-lead's judgment is made at the boundary, which is precisely where the check above
-stands. The discharge is therefore *stated* rather than invented: **a lead
-discharges the obligation by filing the judgment and its grounds into the
-bullet's prose**, and the stamp is made by the session that may write the queue,
-judging from that prose. That is the shape the drain already has — the bullet's
-prose is the grounds the judge reads — so no new authority and no new producer is
-created. What the two dispositions above supply is the route's far end: a
-boundary-filed lead judgment reaches a judge rather than a refusal.
-**The reach half — stages that may write the queue but never load this rule — is
-closed at the consumer's resident tier, not here and not in the stage
-templates.** The obligation binds *any session*, and context-kit/SPEC.md §The
-consumer footprint rules that class carried resident once: no kit-side surface
-every session shape loads exists, so a clause in each unserved stage template
-would be four restatements reaching no reader the resident line misses. This
-section stays the owner and the templates stay silent, except where that ruling's
-corollary lets a reader whose *discharge differs* be told directly: the lead,
-immediately below. The resident line costs one always-loaded bullet. It earns
-that cost by direct stamps, meaning `recurrence:` dates that land in commits
-other than the close drain's. The drain loads this rule through its own
-template, so the line's only marginal reader is a session that is not the drain.
+**A lead cannot discharge that obligation as written, and the channel already supplies what it can.** §templates/lead.md forbids the lead every queue write, so a lead that judges a recurrence has exactly one channel — this inbox — and a lead's judgment is made at the boundary, which is precisely where the check above stands. The discharge is therefore *stated* rather than invented: **a lead discharges the obligation by filing the judgment and its grounds into the bullet's prose**, and the stamp is made by the session that may write the queue, judging from that prose. That is the shape the drain already has — the bullet's prose is the grounds the judge reads — so no new authority and no new producer is created. What the two dispositions above supply is the route's far end: a boundary-filed lead judgment reaches a judge rather than a refusal. **The reach half — stages that may write the queue but never load this rule — is closed at the consumer's resident tier, not here and not in the stage templates.** The obligation binds *any session*, and context-kit/SPEC.md §The consumer footprint rules that class carried resident once: no kit-side surface every session shape loads exists, so a clause in each unserved stage template would be four restatements reaching no reader the resident line misses. This section stays the owner and the templates stay silent, except where that ruling's corollary lets a reader whose *discharge differs* be told directly: the lead, immediately below. The resident line costs one always-loaded bullet. It earns that cost by direct stamps, meaning `recurrence:` dates that land in commits other than the close drain's. The drain loads this rule through its own template, so the line's only marginal reader is a session that is not the drain.
 
-*Not forbidden*, on three independent grounds. It would strand a class by
-construction: this drain runs once, early in close, while close's own later steps
-— audits, lesson disposition, staleness reads, release disposition — necessarily
-generate findings that postdate it, leaving the one stage downstream of every
-drain no legal channel at all. It is already being obeyed at a recorded cost, and
-a rule whose disciplined observance produces a known-wrong count is the wrong
-rule. And it would red roughly a third of its own precedent — the ground on which
-the provenance gate below is refused, a refusal made to keep this route open.
+*Not forbidden*, on three independent grounds. It would strand a class by construction: this drain runs once, early in close, while close's own later steps — audits, lesson disposition, staleness reads, release disposition — necessarily generate findings that postdate it, leaving the one stage downstream of every drain no legal channel at all. It is already being obeyed at a recorded cost, and a rule whose disciplined observance produces a known-wrong count is the wrong rule. And it would red roughly a third of its own precedent — the ground on which the provenance gate below is refused, a refusal made to keep this route open.
 
-*Not mechanized*, which is foreclosed rather than weighed: **no mechanism
-produces the declaration** is the ruling stated above, and mechanizing this path
-reverses it. Independently, the only available mechanism is the capture-time
-matcher, whose honest limit above runs in the **under-counting** direction, so
-mechanizing on it would dress a known-lossy predicate as a count.
+*Not mechanized*, which is foreclosed rather than weighed: **no mechanism produces the declaration** is the ruling stated above, and mechanizing this path reverses it. Independently, the only available mechanism is the capture-time matcher, whose honest limit above runs in the **under-counting** direction, so mechanizing on it would dress a known-lossy predicate as a count.
 
-*Prospective only, and that is the rule's own reach rather than a narrowing of
-it.* No session backfills a date onto a judgment an
-earlier session declined to stamp. The trade below is what forecloses it: this
-rule concedes re-derivability and pays with **auditability by inspection**, so a
-date is legible only because the prose it was judged from sits in the same diff —
-and for a past decline the judging session is gone and no contemporaneous prose
-can be put there. A backfilled date would carry neither property, which is
-precisely the artifact this section refuses to ship. The counter-argument is
-recorded rather than buried: refutation two above rests on the declines having
-produced a known-wrong count, and that count stays wrong. A rule change fixes the
-count forward by removing what produced the error; retro-scoring is a different
-act on a worse evidence base. Stated here so the reach is read rather than
-re-derived.
+*Prospective only, and that is the rule's own reach rather than a narrowing of it.* No session backfills a date onto a judgment an earlier session declined to stamp. The trade below is what forecloses it: this rule concedes re-derivability and pays with **auditability by inspection**, so a date is legible only because the prose it was judged from sits in the same diff — and for a past decline the judging session is gone and no contemporaneous prose can be put there. A backfilled date would carry neither property, which is precisely the artifact this section refuses to ship. The counter-argument is recorded rather than buried: refutation two above rests on the declines having produced a known-wrong count, and that count stays wrong. A rule change fixes the count forward by removing what produced the error; retro-scoring is a different act on a worse evidence base. Stated here so the reach is read rather than re-derived.
 
-Stamping is **idempotent per (slug, date)** — two filings of one slug on
-one day record one date, the day being the only resolution the bullet's own
-grammar has, and inventing a finer one would claim precision this channel does not
-carry.
+Stamping is **idempotent per (slug, date)** — two filings of one slug on one day record one date, the day being the only resolution the bullet's own grammar has, and inventing a finer one would claim precision this channel does not carry.
 
-**What the judgment rule costs, and what pays for it.** The property the rule
-declines to offer is **re-derivability**: a date is *not* reproducible by
-re-running any predicate over the queue, so a reader cannot audit the count
-without trusting the session that stamped it, and claiming otherwise would be the
-dishonest half of the trade. What
-pays for it is **auditability by inspection** — the drain stamps the declaration
-in the *same commit* that truncates the inbox, so the judgment and the prose it
-was made from sit in one diff and a reader auditing a date reads that commit and
-sees the bullet the judge read. That same-commit rule is therefore **load-bearing
-rather than incidental**: it is the audit artifact. The **invariant** is the
-judgment and its grounds landing in one commit; truncating the inbox is one way
-of satisfying it and not the thing itself. A direct stamp truncates nothing, so
-it discharges the same obligation the only way it can — **the observation is
-written into the entry, beside the declaration, in the stamping commit** — and a
-reader auditing a direct date finds the grounds there exactly as with a drained
-one. The same-commit rule is also what makes the
-stamp a **mandated write** in queue-kit's sense — the class
-queue-kit/SPEC.md §check-queue-entry-budget defines, and the section a stamping
-session reads for its relief when that gate's per-entry cap blocks the stamp;
-that grounds write is the same mandated write as the date it accompanies, its
-grounds half rather than a discretionary addition, so it claims the same relief.
-Neither the class nor the relief is restated here; this section is only the
-contract that mandates the write. Re-running a matcher is
-replaced by reading the grounds, which is the correct trade when the thing
-recorded is a judgment.
+**What the judgment rule costs, and what pays for it.** The property the rule declines to offer is **re-derivability**: a date is *not* reproducible by re-running any predicate over the queue, so a reader cannot audit the count without trusting the session that stamped it, and claiming otherwise would be the dishonest half of the trade. What pays for it is **auditability by inspection** — the drain stamps the declaration in the *same commit* that truncates the inbox, so the judgment and the prose it was made from sit in one diff and a reader auditing a date reads that commit and sees the bullet the judge read. That same-commit rule is therefore **load-bearing rather than incidental**: it is the audit artifact. The **invariant** is the judgment and its grounds landing in one commit; truncating the inbox is one way of satisfying it and not the thing itself. A direct stamp truncates nothing, so it discharges the same obligation the only way it can — **the observation is written into the entry, beside the declaration, in the stamping commit** — and a reader auditing a direct date finds the grounds there exactly as with a drained one. The same-commit rule is also what makes the stamp a **mandated write** in queue-kit's sense — the class queue-kit/SPEC.md §check-queue-entry-budget defines, and the section a stamping session reads for its relief when that gate's per-entry cap blocks the stamp; that grounds write is the same mandated write as the date it accompanies, its grounds half rather than a discretionary addition, so it claims the same relief. Neither the class nor the relief is restated here; this section is only the contract that mandates the write. Re-running a matcher is replaced by reading the grounds, which is the correct trade when the thing recorded is a judgment.
 
-**What the sanction adds is judges.** It adds no *new* class of unverifiability —
-re-derivability is conceded above for the drain's own stamps — but the population
-that may stamp widens from one stage to every session, and some of those sessions
-judge their own tool use, which is a session grading itself. No gate can hold
-that and none is proposed; the counterweight is the grounds obligation above,
-which makes a thin judgment visibly thin.
+**What the sanction adds is judges.** It adds no *new* class of unverifiability — re-derivability is conceded above for the drain's own stamps — but the population that may stamp widens from one stage to every session, and some of those sessions judge their own tool use, which is a session grading itself. No gate can hold that and none is proposed; the counterweight is the grounds obligation above, which makes a thin judgment visibly thin.
 
-**A provenance gate was drafted here and is refused, recorded so it is not
-re-drafted.** Requiring every commit that adds a `recurrence:` date to co-stage
-the inbox looks like the enforced replacement for re-derivability. It is not: a
-back-test over this project's own history redded roughly one in three of the
-commits that had ever stamped one, and it would foreclose the direct-stamp path
-above by gating exactly the route the ruling there opens — which makes this
-refusal retrospectively correct rather than speculative. A gate that
-reds a third of the precedent it was derived from is measuring the rule, not the
-tree.
+**A provenance gate was drafted here and is refused, recorded so it is not re-drafted.** Requiring every commit that adds a `recurrence:` date to co-stage the inbox looks like the enforced replacement for re-derivability. It is not: a back-test over this project's own history redded roughly one in three of the commits that had ever stamped one, and it would foreclose the direct-stamp path above by gating exactly the route the ruling there opens — which makes this refusal retrospectively correct rather than speculative. A gate that reds a third of the precedent it was derived from is measuring the rule, not the tree.
 
-Each bullet's two fields have named readers: the date feeds close's staleness
-judgment and becomes the stamped recurrence date, and the prose is the
-disposition body, the grounds the drain judges the recurrence from, the claim the
-drain re-verifies, and — via the capture-time advisory on stderr — the field the
-filer is asked to write the claim into. There is no third field, which is the point:
-§check-gap-inbox-neutrality keeps it that way.
+Each bullet's two fields have named readers: the date feeds close's staleness judgment and becomes the stamped recurrence date, and the prose is the disposition body, the grounds the drain judges the recurrence from, the claim the drain re-verifies, and — via the capture-time advisory on stderr — the field the filer is asked to write the claim into. There is no third field, which is the point: §check-gap-inbox-neutrality keeps it that way.
 
 ## The survey record
 
-A stage that dispatches a survey — a census, a cohort sweep, a roster built by
-applying a criterion set to a corpus — buys a finding that lives in the
-dispatching session's context and dies with it. The next stage needing the same
-roster has no artifact to read, so it dispatches the same survey again. Neither
-session is undisciplined: each is correct in isolation, and the cost is
-structural. This surface is where the expensive half of a survey is carried
-across the stage boundary. It is reached through one always-loaded line in the
-consumer's instructions file, because both halves of the obligation bind every
-stage session: reading the record before buying a survey, and filing one a later
-stage will want. It earns that cost by citation. A later stage runs a recorded
-block's witness and cites the finding instead of re-buying the survey.
+A stage that dispatches a survey — a census, a cohort sweep, a roster built by applying a criterion set to a corpus — buys a finding that lives in the dispatching session's context and dies with it. The next stage needing the same roster has no artifact to read, so it dispatches the same survey again. Neither session is undisciplined: each is correct in isolation, and the cost is structural. This surface is where the expensive half of a survey is carried across the stage boundary. It is reached through one always-loaded line in the consumer's instructions file, because both halves of the obligation bind every stage session: reading the record before buying a survey, and filing one a later stage will want. It earns that cost by citation. A later stage runs a recorded block's witness and cites the finding instead of re-buying the survey.
 
-**The decomposition that makes carrying safe.** A carried finding has a
-staleness problem a re-derivation does not: a census written at scope and read
-at build is correct only while the tree it censused holds still, and the stages
-between them are exactly when that tree moves. Sizing that window per *kind* of
-survey is not makeable — it depends on what the next stage does, which the
-author cannot know. So it is answered mechanically per record instead. A survey
-worth carrying ran an **oracle** (the oracle-first doctrine demands it), and
-that splits it in two: a **cheap, re-runnable half** — the oracle's verdict —
-and an **expensive, judgment half** — the reading laid over that verdict against
-a criterion set. The re-derivation re-buys both; this surface carries the
-expensive half and re-runs the cheap one.
+**The decomposition that makes carrying safe.** A carried finding has a staleness problem a re-derivation does not: a census written at scope and read at build is correct only while the tree it censused holds still, and the stages between them are exactly when that tree moves. Sizing that window per *kind* of survey is not makeable — it depends on what the next stage does, which the author cannot know. So it is answered mechanically per record instead. A survey worth carrying ran an **oracle** (the oracle-first doctrine demands it), and that splits it in two: a **cheap, re-runnable half** — the oracle's verdict — and an **expensive, judgment half** — the reading laid over that verdict against a criterion set. The re-derivation re-buys both; this surface carries the expensive half and re-runs the cheap one.
 
-> **A carried survey is a citation with a falsifiable staleness witness, never a
-> substitute for the oracle. The consuming stage re-runs the oracle and diffs the
-> surveyed corpus since the recorded revision; if both hold, the recorded
-> judgment stands and is cited rather than re-bought. If either moved, the stage
-> dispatches only the delta.**
+> **A carried survey is a citation with a falsifiable staleness witness, never a substitute for the oracle. The consuming stage re-runs the oracle and diffs the surveyed corpus since the recorded revision; if both hold, the recorded judgment stands and is cited rather than re-bought. If either moved, the stage dispatches only the delta.**
 
-A survey therefore stays true exactly as long as its witness holds, and the
-witness is checkable in two commands. A queue entry cites a block here as
-provenance and never as a locator, since the boundary truncates it — the rule
-and its test are §The committed gap inbox's.
+A survey therefore stays true exactly as long as its witness holds, and the witness is checkable in two commands. A queue entry cites a block here as provenance and never as a locator, since the boundary truncates it — the rule and its test are §The committed gap inbox's.
 
-**The surface.** `.workflow/survey-record.md` (knob
-`LIFECYCLE_KIT_SURVEY_RECORD_FILE`, §Layout and configuration) is a committed
-per-iteration record, append-only within the iteration. Grammar: a `# contract:`
-prose header, then one block per survey:
+**The surface.** `.workflow/survey-record.md` (knob `LIFECYCLE_KIT_SURVEY_RECORD_FILE`, §Layout and configuration) is a committed per-iteration record, append-only within the iteration. Grammar: a `# contract:` prose header, then one block per survey:
 
 ```
 ## <YYYY-MM-DD> <stage> — <the one-line question this survey answered>
@@ -1654,415 +341,112 @@ prose header, then one block per survey:
 - inferred: <each claim the survey reasoned to without running a command, or the literal `none`>
 ```
 
-Five fields, and each earns its place by being read at a named transition —
-`corpus` and `rev` by the diff, `oracle` by the re-run, `finding` by the
-consuming session under the witness, and `inferred` by the consuming session
-**before** its work turns on any claim listed there. The heading is the
-discovery key and it states the *question*, because a later stage searches by
-the question it is about to ask, not by the corpus it has not yet chosen.
+Five fields, and each earns its place by being read at a named transition — `corpus` and `rev` by the diff, `oracle` by the re-run, `finding` by the consuming session under the witness, and `inferred` by the consuming session **before** its work turns on any claim listed there. The heading is the discovery key and it states the *question*, because a later stage searches by the question it is about to ask, not by the corpus it has not yet chosen.
 
-**`inferred` is where a claim goes that nothing ran.** A claim belongs in
-`finding` only when a command the survey ran established it — the oracle or any
-other — and in `inferred` otherwise: a mechanism read off prose, a count
-reasoned to rather than printed, a premise judged from its description. A
-verdict on a premise whose owning surface names its own reproduction is
-established only by running that reproduction. Every block carries the field,
-with the literal `none` legal and an empty value refused, on the convention
-`oracle:` set. The obligation is what does the work. A block missing the field
-reds. An author who writes `none` has written a checkable statement. So what
-stays uncaught is an author who believed an unrun claim verified, and that class
-is strictly smaller than the one uncaught without the field. The same argument
-justifies the retired-spelling block (canon-kit/SPEC.md §The amendment
-lifecycle).
+**`inferred` is where a claim goes that nothing ran.** A claim belongs in `finding` only when a command the survey ran established it — the oracle or any other — and in `inferred` otherwise: a mechanism read off prose, a count reasoned to rather than printed, a premise judged from its description. A verdict on a premise whose owning surface names its own reproduction is established only by running that reproduction. Every block carries the field, with the literal `none` legal and an empty value refused, on the convention `oracle:` set. The obligation is what does the work. A block missing the field reds. An author who writes `none` has written a checkable statement. So what stays uncaught is an author who believed an unrun claim verified, and that class is strictly smaller than the one uncaught without the field. The same argument justifies the retired-spelling block (canon-kit/SPEC.md §The amendment lifecycle).
 
-**Why this record takes the split §The committed gap inbox refuses.** That
-refusal rests on capture being cheap for a mid-stage filer and on a drain
-re-verifying every bullet. Neither holds here. A survey is bought by a session
-holding the oracle's output, and nothing drains the record: its readers are
-licensed to cite instead of re-deriving. The refusal's grounds do not reach this
-surface, so its conclusion does not either.
+**Why this record takes the split §The committed gap inbox refuses.** That refusal rests on capture being cheap for a mid-stage filer and on a drain re-verifying every bullet. Neither holds here. A survey is bought by a session holding the oracle's output, and nothing drains the record: its readers are licensed to cite instead of re-deriving. The refusal's grounds do not reach this surface, so its conclusion does not either.
 
-**`corpus` is spliced verbatim into the composed witness, so it is a pathspec
-and nothing else.** Scoping prose belongs in `finding`. Prose in this field does
-not error: `git diff` accepts the words as pathspecs matching nothing and exits
-clean, so the witness certifies a corpus it never read.
+**`corpus` is spliced verbatim into the composed witness, so it is a pathspec and nothing else.** Scoping prose belongs in `finding`. Prose in this field does not error: `git diff` accepts the words as pathspecs matching nothing and exits clean, so the witness certifies a corpus it never read.
 
-**No field carries a ranking's inbound sums, and that is a derivation rule, not
-an omission.** The sum is an oracle's output (queue-kit/SPEC.md §The queue-edges
-arm), printed deterministically in about a second, so the Derivation-first rule
-says it is re-derived and never transcribed. A transcribed sum was also
-unreadable where it was meant to be read. Its reader was the next boundary's
-ranking, and that boundary's own truncation empties this record before the
-ranking runs. The queue moves at close's drain and at scope's intake anyway, so
-a carried sum would be stale at its only reader. A ranking survey therefore
-names the queue-edges command in `oracle:`, where the witness re-runs it, and its
-`finding` cites the figures it ranked on without the record promising them to a
-later boundary.
+**No field carries a ranking's inbound sums, and that is a derivation rule, not an omission.** The sum is an oracle's output (queue-kit/SPEC.md §The queue-edges arm), printed deterministically in about a second, so the Derivation-first rule says it is re-derived and never transcribed. A transcribed sum was also unreadable where it was meant to be read. Its reader was the next boundary's ranking, and that boundary's own truncation empties this record before the ranking runs. The queue moves at close's drain and at scope's intake anyway, so a carried sum would be stale at its only reader. A ranking survey therefore names the queue-edges command in `oracle:`, where the witness re-runs it, and its `finding` cites the figures it ranked on without the record promising them to a later boundary.
 
-**No field for "how long this stays true."** Deliberately absent: an author
-cannot know it, and a field carrying a guess would be read as a warrant.
-`corpus` + `rev` + `oracle` let the *reader* compute it, which is the whole
-ruling above.
+**No field for "how long this stays true."** Deliberately absent: an author cannot know it, and a field carrying a guess would be read as a warrant. `corpus` + `rev` + `oracle` let the *reader* compute it, which is the whole ruling above.
 
-**Every field's git-object-shaped tokens are real, not the `rev` field's alone.**
-`rev` is machine-stamped and probed, but the other four are free prose an author
-writes — and a fabricated short hash in `corpus`, put there to make a dated
-census read as precise, is an attested failure of exactly this surface. Its
-class — *an identifier you did not read is not a citation* — is owned by
-delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps.
-So a word-bounded run of 7-40 lowercase hex
-carrying at least one `a`-`f`, in **any** of `corpus`, `oracle`, `finding` or
-`inferred`, must name a real object in this repository. A block that carries such a token on
-purpose — an illustrative sha in an `oracle:` command, a fixture literal — takes
-a valve line inside the block:
+**Every field's git-object-shaped tokens are real, not the `rev` field's alone.** `rev` is machine-stamped and probed, but the other four are free prose an author writes — and a fabricated short hash in `corpus`, put there to make a dated census read as precise, is an attested failure of exactly this surface. Its class — *an identifier you did not read is not a citation* — is owned by delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps. So a word-bounded run of 7-40 lowercase hex carrying at least one `a`-`f`, in **any** of `corpus`, `oracle`, `finding` or `inferred`, must name a real object in this repository. A block that carries such a token on purpose — an illustrative sha in an `oracle:` command, a fixture literal — takes a valve line inside the block:
 
 ```
 <!-- survey-token-exempt: <why this token names no object> -->
 ```
 
-The **reason is mandatory**, and a valve without one is a finding that does
-**not** exempt: a malformed valve must not buy the skip it failed to justify.
-The valve is per **block**, not per token, because a block that legitimately
-carries one illustrative sha usually carries its siblings too, and a per-token
-valve would put more markup in the record than record.
+The **reason is mandatory**, and a valve without one is a finding that does **not** exempt: a malformed valve must not buy the skip it failed to justify. The valve is per **block**, not per token, because a block that legitimately carries one illustrative sha usually carries its siblings too, and a per-token valve would put more markup in the record than record.
 
-**Append-only within the iteration, never edited in place.** A survey that
-turned out wrong is superseded by a later block answering the same question, not
-by a correction to the old one — the record is evidence of what was believed
-when, and rewriting it destroys the only thing that makes a stale finding
-diagnosable after the fact.
+**Append-only within the iteration, never edited in place.** A survey that turned out wrong is superseded by a later block answering the same question, not by a correction to the old one — the record is evidence of what was believed when, and rewriting it destroys the only thing that makes a stale finding diagnosable after the fact.
 
-**The witness — the re-use protocol.** A session about to buy a survey reads the
-record first and, for any block whose heading answers its question, runs the
-witness:
+**The witness — the re-use protocol.** A session about to buy a survey reads the record first and, for any block whose heading answers its question, runs the witness:
 
-1. **Corpus still?** `git diff --quiet <rev>..HEAD -- <corpus>` — clean means no
-   commit since the survey touched anything it covered.
-2. **Oracle still?** Re-run `<oracle>` and compare its verdict to the one the
-   finding was written against.
+1. **Corpus still?** `git diff --quiet <rev>..HEAD -- <corpus>` — clean means no commit since the survey touched anything it covered.
+2. **Oracle still?** Re-run `<oracle>` and compare its verdict to the one the finding was written against.
 
-**The witness is five strings, and that is what makes a finding portable.** It is
-not a property of the record file: the protocol's whole input is `corpus`,
-`oracle`, `rev`, `finding` and `inferred`, each a short string, and both commands
-run from HEAD. Copied onto another surface the witness is *more* durable than it
-is here, because the copy is not truncated.
+**The witness is five strings, and that is what makes a finding portable.** It is not a property of the record file: the protocol's whole input is `corpus`, `oracle`, `rev`, `finding` and `inferred`, each a short string, and both commands run from HEAD. Copied onto another surface the witness is *more* durable than it is here, because the copy is not truncated.
 
-Both hold → **cite the record; do not re-buy the survey** — cite its `finding`.
-A claim in its `inferred` field is not carried by the witness: re-establish it
-before your work turns on it, or carry it onward as inferred — into an amendment
-passage or a queue entry, as its inferred marker (§templates/stages/). Either moved →
-**dispatch only the delta**, the dispatch prompt naming the record block and the
-diff, so the child re-surveys what changed rather than the corpus. The
-asymmetry is what makes this safe to ship: a false *stale* costs one
-re-derivation — exactly today's cost, so the mechanism's worst case is the
-status quo — while a false *fresh* would need a change touching neither the
-corpus nor the oracle's verdict, in which case the finding is in fact still
-true. The mechanism can only degrade *toward* the behavior it replaces.
+Both hold → **cite the record; do not re-buy the survey** — cite its `finding`. A claim in its `inferred` field is not carried by the witness: re-establish it before your work turns on it, or carry it onward as inferred — into an amendment passage or a queue entry, as its inferred marker (§templates/stages/). Either moved → **dispatch only the delta**, the dispatch prompt naming the record block and the diff, so the child re-surveys what changed rather than the corpus. The asymmetry is what makes this safe to ship: a false *stale* costs one re-derivation — exactly today's cost, so the mechanism's worst case is the status quo — while a false *fresh* would need a change touching neither the corpus nor the oracle's verdict, in which case the finding is in fact still true. The mechanism can only degrade *toward* the behavior it replaces.
 
-**The honest limit.** A survey whose grounds are *not* an oracle — a judgment
-over prose, a reading of history — records `oracle: none`, and that block is a
-**note, not a re-usable survey**: readable for orientation, re-derived before it
-is relied on. Stating that costs one line per record and is the difference
-between a mechanism and a false-assurance surface. An *empty* oracle is the
-silent form of the same thing and is refused (§check-survey-record).
+**The honest limit.** A survey whose grounds are *not* an oracle — a judgment over prose, a reading of history — records `oracle: none`, and that block is a **note, not a re-usable survey**: readable for orientation, re-derived before it is relied on. Stating that costs one line per record and is the difference between a mechanism and a false-assurance surface. An *empty* oracle is the silent form of the same thing and is refused (§check-survey-record).
 
-*Ruled out: a timestamp freshness window.* "Trust a survey under N hours old" is
-the per-kind taxonomy in disguise — wrong in both directions (a one-minute-old
-survey is stale if the tree moved; a week-old one is fine if it did not) and it
-buys nothing the two-command witness does not. *Ruled out: auto-invalidating
-every block on any commit* — too coarse to leave the mechanism any use; the
-`corpus` pathspec exists precisely to make invalidation proportionate.
+*Ruled out: a timestamp freshness window.* "Trust a survey under N hours old" is the per-kind taxonomy in disguise — wrong in both directions (a one-minute-old survey is stale if the tree moved; a week-old one is fine if it did not) and it buys nothing the two-command witness does not. *Ruled out: auto-invalidating every block on any commit* — too coarse to leave the mechanism any use; the `corpus` pathspec exists precisely to make invalidation proportionate.
 
-**The affordance.** `bash gate-sdk/bin/run-gates.sh --emit file-survey [--]
-"<question>" "<corpus>" "<oracle>" "<inferred>" "<finding>"` appends one block,
-seeding the contract header when the record does not yet exist. It is a
-non-gate arm (gate-sdk/SPEC.md §The non-gate arm) declaring two reads,
-`LIFECYCLE_KIT_SURVEY_RECORD_FILE` and `LIFECYCLE_KIT_STATE_FILE`; the family is
-forced rather than chosen, since the arm resolves consumer knobs and a hardcoded
-flag has no table row to declare them on. It
-keeps the repo-root anchor — a relative record path names the same file from any
-subdirectory, falling back to the working directory outside a repository — exit 2
-on a missing or empty argument, and the free-text argument-shape contract of
-gate-sdk/SPEC.md §The bin/-tool contract, whose refusal here scans **every**
-positional, since five slots make arity no protection at all. Advisory tooling,
-not a gate — the raw append stays a legal fallback, the grammar being the
-surface's contract rather than the writer.
+**The affordance.** `bash gate-sdk/bin/run-gates.sh --emit file-survey [--] "<question>" "<corpus>" "<oracle>" "<inferred>" "<finding>"` appends one block, seeding the contract header when the record does not yet exist. It is a non-gate arm (gate-sdk/SPEC.md §The non-gate arm) declaring two reads, `LIFECYCLE_KIT_SURVEY_RECORD_FILE` and `LIFECYCLE_KIT_STATE_FILE`; the family is forced rather than chosen, since the arm resolves consumer knobs and a hardcoded flag has no table row to declare them on. It keeps the repo-root anchor — a relative record path names the same file from any subdirectory, falling back to the working directory outside a repository — exit 2 on a missing or empty argument, and the free-text argument-shape contract of gate-sdk/SPEC.md §The bin/-tool contract, whose refusal here scans **every** positional, since five slots make arity no protection at all. Advisory tooling, not a gate — the raw append stays a legal fallback, the grammar being the surface's contract rather than the writer.
 
-**The shape refusal crossed the port and the help arm did not**, and the split is
-the hazard's rather than the substrate's. A flag captured into a committed surface
-at exit 0 is a property of free text reaching a *capture* tool, attested three
-times, so it does not retire when the tool stops being a `bin/` script:
-a positional beginning with `-` that is not preceded by `--` is a refusal at exit
-2, on every slot, and `--` still ends option processing. Usage, by contrast,
-belongs to the substrate and lives in the front-end's own help, so
-`--emit file-survey --help` is a **refusal**, never a capture.
+**The shape refusal crossed the port and the help arm did not**, and the split is the hazard's rather than the substrate's. A flag captured into a committed surface at exit 0 is a property of free text reaching a *capture* tool, attested three times, so it does not retire when the tool stops being a `bin/` script: a positional beginning with `-` that is not preceded by `--` is a refusal at exit 2, on every slot, and `--` still ends option processing. Usage, by contrast, belongs to the substrate and lives in the front-end's own help, so `--emit file-survey --help` is a **refusal**, never a capture.
 
-It **stamps `rev` and the date itself and derives `<stage>` from the cursor**
-(the crate's `stages::current_stage` read over `LIFECYCLE_KIT_STATE_FILE`, which
-is the only reason that knob sits on the arm's roster), which is the load-bearing
-decision in the tool:
-`rev` is the field the entire re-use protocol turns on and exactly the field an
-author would get wrong — a short sha, the rev they *started* at, or none.
-Machine-stamping it is how the mechanism avoids failing silently when someone
-forgets, which is the failure shape that rules out author-supplied conventions
-elsewhere in this kit. A tree with no `HEAD` commit cannot ground a witness, so
-that is a refusal (exit 2) rather than a blank field; a tree with no cursor yet
-stamps the never-named `—` the queue header already uses.
+It **stamps `rev` and the date itself and derives `<stage>` from the cursor** (the crate's `stages::current_stage` read over `LIFECYCLE_KIT_STATE_FILE`, which is the only reason that knob sits on the arm's roster), which is the load-bearing decision in the tool: `rev` is the field the entire re-use protocol turns on and exactly the field an author would get wrong — a short sha, the rev they *started* at, or none. Machine-stamping it is how the mechanism avoids failing silently when someone forgets, which is the failure shape that rules out author-supplied conventions elsewhere in this kit. A tree with no `HEAD` commit cannot ground a witness, so that is a refusal (exit 2) rather than a blank field; a tree with no cursor yet stamps the never-named `—` the queue header already uses.
 
-The arm **deliberately does not** inherit `--emit-file-gap`'s slug resolution. A
-survey's prose routinely names queue slugs as its subject, and that resolver scans whole
-prose, so it would stamp a recurrence declaration onto the survey's subject.
-Adding no resolver here is a decision, not an omission.
+The arm **deliberately does not** inherit `--emit-file-gap`'s slug resolution. A survey's prose routinely names queue slugs as its subject, and that resolver scans whole prose, so it would stamp a recurrence declaration onto the survey's subject. Adding no resolver here is a decision, not an omission.
 
-**A permanent surface carries the finding, never a pointer into here.** A surface
-outside the boundary-truncated set — a queue entry, a SPEC section — must not
-promise a reader retrievable content in this record: the boundary reset below
-empties it, so the pointer resolves to nothing one iteration after it is written,
-and the finding survives only in the evicting commit. It inlines the finding
-together with the block's five witness fields instead, which is what keeps the
-finding *re-usable* rather than merely readable. Naming this record as a
-**subject** is unaffected — "the survey record is per-iteration scratch" promises
-nobody a retrieval — and that distinction is exactly what
-§check-scratch-citation's red condition is calibrated against.
+**A permanent surface carries the finding, never a pointer into here.** A surface outside the boundary-truncated set — a queue entry, a SPEC section — must not promise a reader retrievable content in this record: the boundary reset below empties it, so the pointer resolves to nothing one iteration after it is written, and the finding survives only in the evicting commit. It inlines the finding together with the block's five witness fields instead, which is what keeps the finding *re-usable* rather than merely readable. Naming this record as a **subject** is unaffected — "the survey record is per-iteration scratch" promises nobody a retrieval — and that distinction is exactly what §check-scratch-citation's red condition is calibrated against.
 
-**Commit-pinning the citation is wrong by construction, not merely awkward**, and
-it is the close a reader reaches for first. The capture arm stamps `rev` as
-HEAD *at filing time*, which precedes the commit that lands the block — so
-`git show <rev>:<record>` reads a blob that does not contain the block being
-cited, and it fails silently by printing a record without it. The sha a pin would
-need is the *landing* commit, which no field carries and which is precisely the
-class of value this section already rules an author gets wrong.
+**Commit-pinning the citation is wrong by construction, not merely awkward**, and it is the close a reader reaches for first. The capture arm stamps `rev` as HEAD *at filing time*, which precedes the commit that lands the block — so `git show <rev>:<record>` reads a blob that does not contain the block being cited, and it fails silently by printing a record without it. The sha a pin would need is the *landing* commit, which no field carries and which is precisely the class of value this section already rules an author gets wrong.
 
-**The affordance that makes inlining one command.**
-`bash gate-sdk/bin/run-gates.sh --emit cite-survey [--] "<heading-substring>"`
-selects the one block whose `## ` heading contains the
-substring and writes it to stdout as an inline-ready snippet — the heading
-rendered `**Carried survey — <heading>**` and all
-five fields in record order, off the same field set the block grammar above
-defines. It refuses (exit 2) on no match, on an ambiguous match, and on an absent
-record, rather than guessing: the author asked for one finding, and
-a silently-chosen sibling would be pasted onto a permanent surface as if it were
-the one they read. The no-match refusal prints the record's headings and the
-ambiguous one prints every match, because narrowing is what the author needs
-back. It follows the capture arm exactly — the repo-root anchor, exit 2 on a
-missing or empty argument, and — per
-gate-sdk/SPEC.md §The bin/-tool contract — the shape contract for its one
-free-text positional, its help arm retired on the same ground. Its declared read
-is `LIFECYCLE_KIT_SURVEY_RECORD_FILE` **alone**: it derives no stage and stamps no
-rev, so its sibling's second knob is deliberately off its roster. It is advisory
-tooling, not a gate, the same disposition its sibling carries. Its coverage by the
-shape contract is a census find rather than a firing: it carries
-`--emit-file-gap`'s exact single-argument shape and had simply never been run with a
-flag, and while it writes nothing, its help behavior was the same misleading
-error — the half of that finding the port discharges outright.
+**The affordance that makes inlining one command.** `bash gate-sdk/bin/run-gates.sh --emit cite-survey [--] "<heading-substring>"` selects the one block whose `## ` heading contains the substring and writes it to stdout as an inline-ready snippet — the heading rendered `**Carried survey — <heading>**` and all five fields in record order, off the same field set the block grammar above defines. It refuses (exit 2) on no match, on an ambiguous match, and on an absent record, rather than guessing: the author asked for one finding, and a silently-chosen sibling would be pasted onto a permanent surface as if it were the one they read. The no-match refusal prints the record's headings and the ambiguous one prints every match, because narrowing is what the author needs back. It follows the capture arm exactly — the repo-root anchor, exit 2 on a missing or empty argument, and — per gate-sdk/SPEC.md §The bin/-tool contract — the shape contract for its one free-text positional, its help arm retired on the same ground. Its declared read is `LIFECYCLE_KIT_SURVEY_RECORD_FILE` **alone**: it derives no stage and stamps no rev, so its sibling's second knob is deliberately off its roster. It is advisory tooling, not a gate, the same disposition its sibling carries. Its coverage by the shape contract is a census find rather than a firing: it carries `--emit-file-gap`'s exact single-argument shape and had simply never been run with a flag, and while it writes nothing, its help behavior was the same misleading error — the half of that finding the port discharges outright.
 
-**Four shell files implemented this section and all four have left the shell**,
-so the section is discharged. The affordances above ported in a cut selecting on this section, each
-declaring it in its own `# spec:` header; `--enter-stage`, which carries this
-section's **read trigger** — the entry report that prints the record's headings
-and never its findings — together with the boundary truncation below, declares
-§bin/enter-stage.sh and ported in that section's own cut; and
-`LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS`, the surface list the no-retrieval-pointer
-rule above reads, is a row of the kit's static table since the kit's knobs moved
-in-crate (§Layout and configuration). The general shape outlives the cuts: a stated-contract cut
-ports the files that *declare* a section, not every file that *implements* it,
-and the two sets come apart wherever a shared entry point or a config library
-carries one clause of another section's contract.
+**Four shell files implemented this section and all four have left the shell**, so the section is discharged. The affordances above ported in a cut selecting on this section, each declaring it in its own `# spec:` header; `--enter-stage`, which carries this section's **read trigger** — the entry report that prints the record's headings and never its findings — together with the boundary truncation below, declares §bin/enter-stage.sh and ported in that section's own cut; and `LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS`, the surface list the no-retrieval-pointer rule above reads, is a row of the kit's static table since the kit's knobs moved in-crate (§Layout and configuration). The general shape outlives the cuts: a stated-contract cut ports the files that *declare* a section, not every file that *implements* it, and the two sets come apart wherever a shared entry point or a config library carries one clause of another section's contract.
 
-The citation arm deliberately does **not** rewrite the citing surface. The author
-chooses where
-the finding belongs and how much of the `finding` prose to carry; a tool that
-spliced would need a marker block, which would make a hand-written citation a
-second-class form of the very thing this rule is trying to make ordinary.
+The citation arm deliberately does **not** rewrite the citing surface. The author chooses where the finding belongs and how much of the `finding` prose to carry; a tool that spliced would need a marker block, which would make a hand-written citation a second-class form of the very thing this rule is trying to make ordinary.
 
-**How this differs from the gap inbox, which it sits beside.** The two are
-sibling committed per-iteration surfaces with deliberately *opposite* semantics
-on both axes, and a reader who meets them apart will assume symmetry and get
-both wrong:
+**How this differs from the gap inbox, which it sits beside.** The two are sibling committed per-iteration surfaces with deliberately *opposite* semantics on both axes, and a reader who meets them apart will assume symmetry and get both wrong:
 
-- **Merge.** The gap inbox is `merge=union` — a gap filed on either side of a
-  concurrent merge must survive. The survey record is `merge=iteration-scoped`
-  (keep-ours): a survey from the other side describes a tree state this clone
-  never had, so surviving the merge is the hazard, not the save.
-- **Boundary.** The gap inbox *refuses* the iteration boundary while it holds
-  bullets, because every gap owes a disposition. The survey record is
-  boundary-**truncated and never refuses**: a survey owes nobody a disposition,
-  being scratch whose whole lifetime was the iteration that just ended
-  (§bin/enter-stage.sh).
+- **Merge.** The gap inbox is `merge=union` — a gap filed on either side of a concurrent merge must survive. The survey record is `merge=iteration-scoped` (keep-ours): a survey from the other side describes a tree state this clone never had, so surviving the merge is the hazard, not the save.
+- **Boundary.** The gap inbox *refuses* the iteration boundary while it holds bullets, because every gap owes a disposition. The survey record is boundary-**truncated and never refuses**: a survey owes nobody a disposition, being scratch whose whole lifetime was the iteration that just ended (§bin/enter-stage.sh).
 
-That per-iteration lifetime is delivered by the boundary reset rather than by a
-judgment — which is precisely the window the design needed sized. The record
-resets as a **kit built-in member**, not through the consumer's
-`LIFECYCLE_KIT_BOUNDARY_TRUNCATE` array, by the same rule
-`LIFECYCLE_KIT_LESSON_EVIDENCE_FILE` follows: a defaulted bash array is
-*replaced* when a consumer assigns it, so shipping the record as a default
-member would silently lose the reset in every consumer that sets the knob for
-its own reasons.
+That per-iteration lifetime is delivered by the boundary reset rather than by a judgment — which is precisely the window the design needed sized. The record resets as a **kit built-in member**, not through the consumer's `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` array, by the same rule `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE` follows: a defaulted bash array is *replaced* when a consumer assigns it, so shipping the record as a default member would silently lose the reset in every consumer that sets the knob for its own reasons.
 
-Two homes were ruled out, each on grounds that decide it alone. **The resume
-journal** (delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset
-sweeps) is crash recovery for the
-*writing* session, discoverable by its per-session name — a hand-off surface
-must be discoverable by content, by a session that never knew the writer's name
-— and it lives in untracked scratch with a second reclaimer, context-kit's
-session-context hook, whose age guard is shorter than an iteration
-(context-kit/SPEC.md §The session-context hook); a scope-stage journal can be
-swept before the stage that would read it ever runs, silently and
-time-dependently. **The gap inbox** has the right tier and the wrong semantics
-on both axes above: routing surveys there would make the boundary refuse on
-residue nobody owes a disposition for.
+Two homes were ruled out, each on grounds that decide it alone. **The resume journal** (delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps) is crash recovery for the *writing* session, discoverable by its per-session name — a hand-off surface must be discoverable by content, by a session that never knew the writer's name — and it lives in untracked scratch with a second reclaimer, context-kit's session-context hook, whose age guard is shorter than an iteration (context-kit/SPEC.md §The session-context hook); a scope-stage journal can be swept before the stage that would read it ever runs, silently and time-dependently. **The gap inbox** has the right tier and the wrong semantics on both axes above: routing surveys there would make the boundary refuse on residue nobody owes a disposition for.
 
-**Producers and consumers.** Producer: any session that bought a survey, via
-`--emit file-survey` through the battery front-end (the raw append the sanctioned
-fallback); the knob default makes the channel live everywhere the kit is vendored, so the deployed
-configuration that must be set is none. Consumer: the next stage session, at its
-`--enter-stage` entry — which prints the record's headings, the questions
-and never the findings — and at the moment it is about to dispatch a survey,
-where the witness applies. Each field's reader at its transition: `corpus` and
-`rev` by the consuming session's `git diff` at the pre-dispatch check, `oracle`
-by the same session at the same transition to re-run, `finding` by that session
-only *after* the witness holds (which is why the entry report prints headings and
-not findings), the `## ` heading by `--enter-stage` at every stage entry and
-by `check-survey-record` at commit time as the block delimiter. Third reader, at
-the iteration boundary: the first-stage truncate, which reads the surface as a
-whole and discards it.
+**Producers and consumers.** Producer: any session that bought a survey, via `--emit file-survey` through the battery front-end (the raw append the sanctioned fallback); the knob default makes the channel live everywhere the kit is vendored, so the deployed configuration that must be set is none. Consumer: the next stage session, at its `--enter-stage` entry — which prints the record's headings, the questions and never the findings — and at the moment it is about to dispatch a survey, where the witness applies. Each field's reader at its transition: `corpus` and `rev` by the consuming session's `git diff` at the pre-dispatch check, `oracle` by the same session at the same transition to re-run, `finding` by that session only *after* the witness holds (which is why the entry report prints headings and not findings), the `## ` heading by `--enter-stage` at every stage entry and by `check-survey-record` at commit time as the block delimiter. Third reader, at the iteration boundary: the first-stage truncate, which reads the surface as a whole and discards it.
 
-**Nothing is produced on the delegation side.** No journal contract moves, no
-dispatch shape changes, no obligation lands on a dispatched child. The producer
-is the *parent*, which is where delegation-kit's durable-before-you-act rule
-already puts the write; this surface gives that existing obligation a home for
-one shape of finding rather than adding an obligation. It is also **not** the
-durable escalation artifact delegation-kit/SPEC.md §The delegation model
-prescribes as a child's upward route: that one is mid-run, dispatcher-minted,
-per-dispatch and written by the child, where this is a hand-off, single-path,
-per-iteration and written by the parent after the child returns. Different
-writer, reader, lifetime and discovery key — they must not be collapsed.
+**Nothing is produced on the delegation side.** No journal contract moves, no dispatch shape changes, no obligation lands on a dispatched child. The producer is the *parent*, which is where delegation-kit's durable-before-you-act rule already puts the write; this surface gives that existing obligation a home for one shape of finding rather than adding an obligation. It is also **not** the durable escalation artifact delegation-kit/SPEC.md §The delegation model prescribes as a child's upward route: that one is mid-run, dispatcher-minted, per-dispatch and written by the child, where this is a hand-off, single-path, per-iteration and written by the parent after the child returns. Different writer, reader, lifetime and discovery key — they must not be collapsed.
 
-**Open, and shared with the gap inbox:** who commits an append filed by a
-session that is not the stage session. This surface inherits that question and
-does not answer it; the exposure is smaller, since a survey lost to an
-uncommitted append costs a re-derivation, which is today's cost.
+**Open, and shared with the gap inbox:** who commits an append filed by a session that is not the stage session. This surface inherits that question and does not answer it; the exposure is smaller, since a survey lost to an uncommitted append costs a re-derivation, which is today's cost.
 
 ## The close-surface roster
 
-Close reads a set of **inbound triage surfaces** — capture logs, harvest sinks,
-the gap inbox, the queue's Lessons section. Enumerated only as prose, that set
-has no closure: a surface close never reads leaves no trace anywhere, and a
-sixth inbox added without being named costs nothing at the moment of the mistake
-and everything afterwards. The roster replaces the enumeration with a
-derivation, and gives each surface a mode so a skip is a *visible* judgment
-rather than an invisible omission.
+Close reads a set of **inbound triage surfaces** — capture logs, harvest sinks, the gap inbox, the queue's Lessons section. Enumerated only as prose, that set has no closure: a surface close never reads leaves no trace anywhere, and a sixth inbox added without being named costs nothing at the moment of the mistake and everything afterwards. The roster replaces the enumeration with a derivation, and gives each surface a mode so a skip is a *visible* judgment rather than an invisible omission.
 
-**The declaration.** A surface declares itself in the section that already owns
-it — one full-line directive, the same shape and altitude as canon-kit's `spec:`
-and `contract:` directives (the derivation skips fenced blocks, so the grammar
-is quotable where it is specified — `check-spec-pointer`'s carve-out, for the
-same reason):
+**The declaration.** A surface declares itself in the section that already owns it — one full-line directive, the same shape and altitude as canon-kit's `spec:` and `contract:` directives (the derivation skips fenced blocks, so the grammar is quotable where it is specified — `check-spec-pointer`'s carve-out, for the same reason):
 
 ```
 close-surface: <path> <mode> [reclaim=<command>]
 ```
 
-- `<path>` — repo-relative, or a `<file>#<section>` locator when the surface is
-  a section of a larger file; the fragment is the heading in anchor form (spaces
-  as `-`), since `<path>` is the line's first whitespace-delimited token.
+- `<path>` — repo-relative, or a `<file>#<section>` locator when the surface is a section of a larger file; the fragment is the heading in anchor form (spaces as `-`), since `<path>` is the line's first whitespace-delimited token.
 - `<mode>` — exactly one of:
-  - `forced=<owner-path> §<section>` — a structural forcing function exists and
-    the citation names it. The gap inbox's is the iteration-boundary entry
-    refusal; the Lessons section's is that refusal's sibling assertion.
-  - `advisory` — no forcing function. Close reads it by procedure, and a skip is
-    **sanctioned and visible** rather than undetected. An advisory surface is not
-    a lesser surface; it is one whose skip is a judgment someone may audit.
-- `reclaim=<command>` — required when `<path>` is a capture-tier (gitignored)
-  member, naming the drain that empties it. It runs to end of line, so it is
-  written last. The runtime-artifact lifecycle rule already demands a paired
-  reclaim path for every write path; this is where that pairing becomes
-  machine-readable.
+  - `forced=<owner-path> §<section>` — a structural forcing function exists and the citation names it. The gap inbox's is the iteration-boundary entry refusal; the Lessons section's is that refusal's sibling assertion.
+  - `advisory` — no forcing function. Close reads it by procedure, and a skip is **sanctioned and visible** rather than undetected. An advisory surface is not a lesser surface; it is one whose skip is a judgment someone may audit.
+- `reclaim=<command>` — required when `<path>` is a capture-tier (gitignored) member, naming the drain that empties it. It runs to end of line, so it is written last. The runtime-artifact lifecycle rule already demands a paired reclaim path for every write path; this is where that pairing becomes machine-readable.
 
-Declaration lives with the owner, never in a central list: a central list is a
-second source that drifts from the surface it names, and the one-owner rule puts
-the fact where the surface is defined.
+Declaration lives with the owner, never in a central list: a central list is a second source that drifts from the surface it names, and the one-owner rule puts the fact where the surface is defined.
 
-A `forced=` declaration belongs on a **manifest surface**, and that is
-load-bearing rather than incidental — it is what gives the citation its
-resolver. `check-spec-pointer`'s prose-citation pass sweeps the manifest set for
-a free-prose `<path>.md §<heading>` citation and resolves it in prefix mode; a
-`forced=` citation *is* that shape, so it resolves today with no new code. The
-restriction binds `forced=` only, not the directive as such: an `advisory`
-declaration carries no citation and so needs no resolver, which is what lets a
-consumer-owned capture surface declare itself in the binding that owns it
-(a stage-skill binding is not a manifest surface). The honest limit follows from
-the same seam — a `forced=` declaration authored outside the manifest set would
-carry an unresolved citation, and no gate here catches that, because the
-resolver is canon-kit's and lifecycle-kit does not depend on canon-kit.
+A `forced=` declaration belongs on a **manifest surface**, and that is load-bearing rather than incidental — it is what gives the citation its resolver. `check-spec-pointer`'s prose-citation pass sweeps the manifest set for a free-prose `<path>.md §<heading>` citation and resolves it in prefix mode; a `forced=` citation *is* that shape, so it resolves today with no new code. The restriction binds `forced=` only, not the directive as such: an `advisory` declaration carries no citation and so needs no resolver, which is what lets a consumer-owned capture surface declare itself in the binding that owns it (a stage-skill binding is not a manifest surface). The honest limit follows from the same seam — a `forced=` declaration authored outside the manifest set would carry an unresolved citation, and no gate here catches that, because the resolver is canon-kit's and lifecycle-kit does not depend on canon-kit.
 
-**The derivation** is the `close-surfaces` emit arm
-(§The close-surfaces emit arm), never a maintained registry. Two
-sources, unioned: every `close-surface:` declaration across the resolved kit
-roots and the consumer's configured declaration surfaces; and every **gitignored
-member of the workflow directory** — capture-tier by definition (gate-sdk/SPEC.md
-§The workflow directory), therefore close-inbound by definition. The second
-source is the closure that makes the roster fail loudly: a capture surface added
-with no declaration appears as `(undeclared)` rather than not appearing at all.
-The roster reports the hole instead of inheriting it, which is the whole
-difference between a derived roster and a maintained one.
+**The derivation** is the `close-surfaces` emit arm (§The close-surfaces emit arm), never a maintained registry. Two sources, unioned: every `close-surface:` declaration across the resolved kit roots and the consumer's configured declaration surfaces; and every **gitignored member of the workflow directory** — capture-tier by definition (gate-sdk/SPEC.md §The workflow directory), therefore close-inbound by definition. The second source is the closure that makes the roster fail loudly: a capture surface added with no declaration appears as `(undeclared)` rather than not appearing at all. The roster reports the hole instead of inheriting it, which is the whole difference between a derived roster and a maintained one.
 
-**A consumer's ruling record is a roster member, and that is what makes close's
-repair step derived rather than remembered.** Close reads the record for aged
-facts and fired discharge conditions (§templates/stages/), so the record is an
-inbound triage surface by the same test as any other — and declaring it puts the
-obligation on the roster the stage already walks instead of in a session's
-memory. It declares itself in its own header, `advisory`: no structural forcing
-function exists, since nothing can red on a record nobody read, and the mode is
-what makes a skipped repair a visible judgment. It is tracked rather than
-capture-tier, so no `reclaim=` is owed. **The empty-knob case is the point of
-declaring it this way**: a consumer that keeps no ruling record leaves
-`LIFECYCLE_KIT_RULING_RECORD` empty and writes no declaration, the roster
-therefore carries no such row, and close's step **skips rather than fails** —
-the same inertness the probe's knobs buy at the other end.
+**A consumer's ruling record is a roster member, and that is what makes close's repair step derived rather than remembered.** Close reads the record for aged facts and fired discharge conditions (§templates/stages/), so the record is an inbound triage surface by the same test as any other — and declaring it puts the obligation on the roster the stage already walks instead of in a session's memory. It declares itself in its own header, `advisory`: no structural forcing function exists, since nothing can red on a record nobody read, and the mode is what makes a skipped repair a visible judgment. It is tracked rather than capture-tier, so no `reclaim=` is owed. **The empty-knob case is the point of declaring it this way**: a consumer that keeps no ruling record leaves `LIFECYCLE_KIT_RULING_RECORD` empty and writes no declaration, the roster therefore carries no such row, and close's step **skips rather than fails** — the same inertness the probe's knobs buy at the other end.
 
-**Ruled out: shrinking the roster by merging the two capture logs.** The obvious
-way to make close's inbox count smaller is to merge the two friction capture logs
-behind one file with a type column. It is ruled out, on this roster's own
-evidence:
+**Ruled out: shrinking the roster by merging the two capture logs.** The obvious way to make close's inbox count smaller is to merge the two friction capture logs behind one file with a type column. It is ruled out, on this roster's own evidence:
 
-- The logs are owned by **different kits**, and the dependency runs one way only
-  — the drift-kit KPI already reaches into guard-kit through the shared kit-root
-  resolution, so guard-kit cannot depend back without a cycle. A merged log has
-  no legal owner short of the base gate framework, which is not a friction sink.
-- Their producers are not the same kind of act: one is a **harness hook
-  fallthrough** writing raw command text at the moment of a prompt, undated and
-  ungrammared; the other is a **deliberate structured capture**. A type column
-  would not unify them, it would document that they were never one stream.
-- Their consumers are disjoint — allowlist-filtering and pattern-ranking on one
-  side, doc-owner remediation on the other. Every consumer would filter by type
-  first, re-deriving the two logs at read time, which is the tell that the merge
-  moves the split rather than removing it.
-- Their reclaim moments are independent whole-file truncations. Sharing one file
-  makes each sweep's drain erase the other type's untriaged lines.
+- The logs are owned by **different kits**, and the dependency runs one way only — the drift-kit KPI already reaches into guard-kit through the shared kit-root resolution, so guard-kit cannot depend back without a cycle. A merged log has no legal owner short of the base gate framework, which is not a friction sink.
+- Their producers are not the same kind of act: one is a **harness hook fallthrough** writing raw command text at the moment of a prompt, undated and ungrammared; the other is a **deliberate structured capture**. A type column would not unify them, it would document that they were never one stream.
+- Their consumers are disjoint — allowlist-filtering and pattern-ranking on one side, doc-owner remediation on the other. Every consumer would filter by type first, re-deriving the two logs at read time, which is the tell that the merge moves the split rather than removing it.
+- Their reclaim moments are independent whole-file truncations. Sharing one file makes each sweep's drain erase the other type's untriaged lines.
 
-The complaint the merge reached for is real — the two frictions compete for one
-triage attention and were ranked against each other by nothing — and the roster
-answers it directly: both appear on one derived roster, with modes, which is what
-"ranked against each other" needs. Merging the files was the proxy, not the thing.
+The complaint the merge reached for is real — the two frictions compete for one triage attention and were ranked against each other by nothing — and the roster answers it directly: both appear on one derived roster, with modes, which is what "ranked against each other" needs. Merging the files was the proxy, not the thing.
 
 ## The audit roster
 
-**The audit roster** is the capture mechanism of doctrine-kit's Enforcement-first
-carve-out. A class that no check can decide cleanly stays a stated manual duty,
-and a duty with no named cadence is one no session performs. So the class joins
-a tracked roster that the close stage reviews, with event-keyed due-ness: a named
-observable event — a contract edit, a release prep, a template upgrade, a new
-member on a governed surface — beats an iteration counter no surface tracks. The
-roster is hand-curated, not derived. Which classes escape a clean check is a
-judgment no tool enumerates, so Derivation-first's ladder lands on
-state-once-at-the-owner. The roster and its review step replace a gate; they
-are not one. Which classes a tree runs is consumer content: the blocks live in the
-consumer's file, and the kit ships no class.
+**The audit roster** is the capture mechanism of doctrine-kit's Enforcement-first carve-out. A class that no check can decide cleanly stays a stated manual duty, and a duty with no named cadence is one no session performs. So the class joins a tracked roster that the close stage reviews, with event-keyed due-ness: a named observable event — a contract edit, a release prep, a template upgrade, a new member on a governed surface — beats an iteration counter no surface tracks. The roster is hand-curated, not derived. Which classes escape a clean check is a judgment no tool enumerates, so Derivation-first's ladder lands on state-once-at-the-owner. The roster and its review step replace a gate; they are not one. Which classes a tree runs is consumer content: the blocks live in the consumer's file, and the kit ships no class.
 
-**The surface.** `LIFECYCLE_KIT_AUDIT_ROSTER_FILE` names it, and the knob
-defaults empty. A tracked record file carries a `# contract:` pointer header,
-then one block per class, separated by blank lines:
+**The surface.** `LIFECYCLE_KIT_AUDIT_ROSTER_FILE` names it, and the knob defaults empty. A tracked record file carries a `# contract:` pointer header, then one block per class, separated by blank lines:
 
 ```
 class: <class-slug>
@@ -2074,709 +458,123 @@ hits: <candidates triaged>
 declined: <what the sweep left unread or ruled outside its trigger, and why> | none
 ```
 
-A never-swept class carries `last: never` and stops there. Every other block
-carries all seven keys, in this order, one per line, with no stray line. Each
-field has a named reader:
+A never-swept class carries `last: never` and stops there. Every other block carries all seven keys, in this order, one per line, with no stray line. Each field has a named reader:
 - `class` — the review, as the block's key.
 - `due` and `last` — the review, to judge due-ness.
 - `scope` — the sweeping session, to derive its corpus.
 - `corpus` — the next sweep, which re-runs it as a floor.
-- `hits` — the next sweep. A count that falls with no tree change to explain it
-  is a signal to read.
+- `hits` — the next sweep. A count that falls with no tree change to explain it is a signal to read.
 - `declined` — the next sweep, which takes up what its predecessor set aside.
 
-**Nothing appends.** A sweep *replaces* the `last`, `corpus`, `hits` and
-`declined` lines. A reading that changes how the next sweep runs is folded into
-`scope` by re-phrasing it, never by appending. The sweep's narration, its
-findings and its cleared candidates go into the commit message that re-stamps
-the block, so `git log -p` over the roster recovers every earlier reading, and
-the file carries only the standing ones. Every line is bounded by
-`LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP`, so a whole-file read stays affordable at
-the review.
+**Nothing appends.** A sweep *replaces* the `last`, `corpus`, `hits` and `declined` lines. A reading that changes how the next sweep runs is folded into `scope` by re-phrasing it, never by appending. The sweep's narration, its findings and its cleared candidates go into the commit message that re-stamps the block, so `git log -p` over the roster recovers every earlier reading, and the file carries only the standing ones. Every line is bounded by `LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP`, so a whole-file read stays affordable at the review.
 
-*Ruled out: one file per class.* It moves growth from one file to many and
-removes none of it, and a review still reads each accreted body whole. *Ruled
-out: capping an appending row and forcing the appending close to compress.* How
-much a sweep appends depends on the iteration's shape, such as a deletion or a
-ruling landing, so a per-close cap would truncate hardest in the iteration the
-roster exists for. The cap here bounds a standing line that is rewritten, never
-an append. *Compaction without a grammar is unsafe:* a pass that reads an accreted
-row as prose can drop a mandatory field. That is why the fields are separate lines
-and `check-audit-roster` grades them.
+*Ruled out: one file per class.* It moves growth from one file to many and removes none of it, and a review still reads each accreted body whole. *Ruled out: capping an appending row and forcing the appending close to compress.* How much a sweep appends depends on the iteration's shape, such as a deletion or a ruling landing, so a per-close cap would truncate hardest in the iteration the roster exists for. The cap here bounds a standing line that is rewritten, never an append. *Compaction without a grammar is unsafe:* a pass that reads an accreted row as prose can drop a mandatory field. That is why the fields are separate lines and `check-audit-roster` grades them.
 
-**`corpus` attests what was read, not what the next sweep must read.** A stored
-probe goes stale whenever a class's instances are event-derived, such as the path
-components a deletion touched. So `scope` states how to derive the corpus, each
-sweep derives its own, and the predecessor's `corpus` is a floor that the sweep
-widens. A class whose `scope` derives its corpus from a commit range bases that
-range on the iteration-start commit by default. A class that must also see the
-previous close's own later commits and interstitial commits names the
-previous-close commit instead (§The state machine). A differential sweep of an
-un-gateable class is such a roster block, never a new close step: the roster is
-already the event-keyed cadence close reviews, and a second cadence mechanism
-for one class would also sit on a surface the class may itself govern. A class with no single-command corpus stamps
-`corpus: surfaces:` and the list of surfaces it actually read. A capability claim's
-instances are an example: they are a tree set that no scanner infers. A sweep
-that read nothing has nothing to stamp there, so it cannot record a verdict.
-`declined` records any live-looking hit the sweep ruled outside its own trigger.
-A declined hit that is a live defect is still dispositioned, under the
-Gap-disposition rule.
+**`corpus` attests what was read, not what the next sweep must read.** A stored probe goes stale whenever a class's instances are event-derived, such as the path components a deletion touched. So `scope` states how to derive the corpus, each sweep derives its own, and the predecessor's `corpus` is a floor that the sweep widens. A class whose `scope` derives its corpus from a commit range bases that range on the iteration-start commit by default. A class that must also see the previous close's own later commits and interstitial commits names the previous-close commit instead (§The state machine). A differential sweep of an un-gateable class is such a roster block, never a new close step: the roster is already the event-keyed cadence close reviews, and a second cadence mechanism for one class would also sit on a surface the class may itself govern. A class with no single-command corpus stamps `corpus: surfaces:` and the list of surfaces it actually read. A capability claim's instances are an example: they are a tree set that no scanner infers. A sweep that read nothing has nothing to stamp there, so it cannot record a verdict. `declined` records any live-looking hit the sweep ruled outside its own trigger. A declined hit that is a live defect is still dispositioned, under the Gap-disposition rule.
 
-**`last` names its stage, and the stage is checked against the stamps.**
-`<stage>` is a member of `LIFECYCLE_KIT_STAGES`. The review belongs to the last
-configured stage, but any stage may stamp. A stage that just moved a class's
-population would otherwise leave the row stale. The review reads a `last` naming
-any other stage as a **pre-stamp**: the audit is still owed and has not run.
-Where `<iteration>` is the queue header's current iteration, the state file must
-carry an `<iteration> <stage>` stamp, so a row cannot claim a stage that never
-ran. *The honest limit:* the check proves the named stage was entered. It does
-not prove that session wrote the line, and it does not prove the audit was
-faithful.
+**`last` names its stage, and the stage is checked against the stamps.** `<stage>` is a member of `LIFECYCLE_KIT_STAGES`. The review belongs to the last configured stage, but any stage may stamp. A stage that just moved a class's population would otherwise leave the row stale. The review reads a `last` naming any other stage as a **pre-stamp**: the audit is still owed and has not run. Where `<iteration>` is the queue header's current iteration, the state file must carry an `<iteration> <stage>` stamp, so a row cannot claim a stage that never ran. *The honest limit:* the check proves the named stage was entered. It does not prove that session wrote the line, and it does not prove the audit was faithful.
 
-**A consumer that sets the knob owes the roster a `close-surface:` declaration,
-`advisory`** (§The close-surface roster). The roster is tracked, so without one it
-reaches no derived roster, which is the same position as the pre-flight valve's
-ledger. No forcing function exists, and the mode makes a skipped review visible.
-An empty knob leaves the review step skipped and `check-audit-roster` inert.
+**A consumer that sets the knob owes the roster a `close-surface:` declaration, `advisory`** (§The close-surface roster). The roster is tracked, so without one it reaches no derived roster, which is the same position as the pre-flight valve's ledger. No forcing function exists, and the mode makes a skipped review visible. An empty knob leaves the review step skipped and `check-audit-roster` inert.
 
 ## Testing
 
-Every gate ships the ordinary `good/`+`bad/` fixture pair, and the scenarios one
-pair cannot hold live in `gate-tests/*.test.sh` scenario runners. What departs
-from the plain fixture-pair default, and what no single gate's subsection below
-can own, is how those runners **reach** their gate.
+Every gate ships the ordinary `good/`+`bad/` fixture pair, and the scenarios one pair cannot hold live in `gate-tests/*.test.sh` scenario runners. What departs from the plain fixture-pair default, and what no single gate's subsection below can own, is how those runners **reach** their gate.
 
-A runner that drives a gate names that gate, never a substrate: it resolves through
-`gate_run <name> <checks-dir> <args>` (gate-sdk/SPEC.md §run-gate-tests), which
-dispatches through `gate_command` exactly as the fixture harness does. A member
-that ports to a compiled subcommand therefore leaves its scenario coverage
-running unchanged — the property a path-named runner does not have, since the
-`checks/<name>.sh` it holds stops existing in the motion that lands the
-descriptor. For a case that differs by a knob rather than by argv, `gate_env
-NAME=VALUE` sets that one case's environment in the caller's subshell;
-`check-stage-evidence`'s session-boundary posture cases are the worked instance.
+A runner that drives a gate names that gate, never a substrate: it resolves through `gate_run <name> <checks-dir> <args>` (gate-sdk/SPEC.md §run-gate-tests), which dispatches through `gate_command` exactly as the fixture harness does. A member that ports to a compiled subcommand therefore leaves its scenario coverage running unchanged — the property a path-named runner does not have, since the `checks/<name>.sh` it holds stops existing in the motion that lands the descriptor. For a case that differs by a knob rather than by argv, `gate_env NAME=VALUE` sets that one case's environment in the caller's subshell; `check-stage-evidence`'s session-boundary posture cases are the worked instance.
 
-Every gate-driving runner in this kit resolves through `gate_run` rather than a
-held `checks/<name>.sh` path, and the payoff has now been collected **twice**:
-`check-stage-entry`'s runner needed no edit when that gate ported, and
-`check-close-surfaces`' sandbox-repo runner needed none when this one did —
-each already named the gate. Two attestations rather than one exception, which
-is the stronger claim this rule was written to earn.
+Every gate-driving runner in this kit resolves through `gate_run` rather than a held `checks/<name>.sh` path, and the payoff has now been collected **twice**: `check-stage-entry`'s runner needed no edit when that gate ported, and `check-close-surfaces`' sandbox-repo runner needed none when this one did — each already named the gate. Two attestations rather than one exception, which is the stronger claim this rule was written to earn.
 
-The rest exercise advisory tooling with no gate to dispatch, and so have nothing
-to say about reach — but since the enter-stage cut they do have something to say
-about **caller**: the seven that drive `--enter-stage` reach the binary
-directly rather than through gate-sdk's front-end, because
-that front-end refuses outside a git repository and these harnesses run in a
-non-git `mktemp -d` by design. That is the arm's sanctioned second caller
-(§bin/enter-stage.sh), not a bypass, and it is spelled once in
-`gate_arm_run <arm> <argv>` rather than seven times.
+The rest exercise advisory tooling with no gate to dispatch, and so have nothing to say about reach — but since the enter-stage cut they do have something to say about **caller**: the seven that drive `--enter-stage` reach the binary directly rather than through gate-sdk's front-end, because that front-end refuses outside a git repository and these harnesses run in a non-git `mktemp -d` by design. That is the arm's sanctioned second caller (§bin/enter-stage.sh), not a bypass, and it is spelled once in `gate_arm_run <arm> <argv>` rather than seven times.
 
-**A ported non-gate member owes a both-substrates comparison, and this kit's was
-bought over those same seven harnesses.** With both implementations present, each
-harness ran against each, and a byte-level driver compared them per case over
-twin sandboxes: the exit status, stdout and stderr byte for byte including every
-`help:` line and every simulate prefix, every written file, every unwritten file
-on each refusal path, and the wiped set over a scratch tree seeded with a nested
-preserved basename, a case compared under the unanchored spare test the wipe then
-had. Two columns are compared by **shape** rather than by value and
-saying so is the honest half — `<head>` is read live and `<session-id>` is derived,
-so each case either pins them or accepts a short sha, eight hex characters or the
-literal `none`. Because this repo is itself a consumer with a real queue, a second
-comparison was available that the previous cut could not buy: a `--simulate` of
-**every configured stage** on the live tree under both implementations,
-`--simulate` writing nothing by contract. Two differences survived and are named
-rather than hidden: the usage text's program word, which is the one spelling a
-port re-teaches, and the wiped set's report *order*, which moves from `find`'s
-readdir order to a sorted walk — the set identical, the order now deterministic.
+**A ported non-gate member owes a both-substrates comparison, and this kit's was bought over those same seven harnesses.** With both implementations present, each harness ran against each, and a byte-level driver compared them per case over twin sandboxes: the exit status, stdout and stderr byte for byte including every `help:` line and every simulate prefix, every written file, every unwritten file on each refusal path, and the wiped set over a scratch tree seeded with a nested preserved basename, a case compared under the unanchored spare test the wipe then had. Two columns are compared by **shape** rather than by value and saying so is the honest half — `<head>` is read live and `<session-id>` is derived, so each case either pins them or accepts a short sha, eight hex characters or the literal `none`. Because this repo is itself a consumer with a real queue, a second comparison was available that the previous cut could not buy: a `--simulate` of **every configured stage** on the live tree under both implementations, `--simulate` writing nothing by contract. Two differences survived and are named rather than hidden: the usage text's program word, which is the one spelling a port re-teaches, and the wiped set's report *order*, which moves from `find`'s readdir order to a sorted walk — the set identical, the order now deterministic.
 
-`gate-tests/gap-inbox-route.test.sh` is one of those, and it is named because it
-closes a hole rather than adding coverage to a covered path: the
-iteration-boundary gap-inbox check had **no fixture at all**, so both its refusal
-and its recovery text were unpinned while being the thing an entering session
-acts on. It drives `--enter-stage` against a sandboxed queue, state file and
-inbox — the harness `gate-tests/boundary-scratch-wipe.test.sh` established — and
-pins the branch both ways: the close-skipped case refuses with the drain recovery
-and writes nothing, the post-close case stamps and carries the bullets with its
-advisory, the never-named and no-cursor edges take the post-close branch, and
-`--simulate` reports each branch with its recovery relayed and writes nothing. No
-fixture *pair* is owed: this is a `bin/` tool, not a gate.
+`gate-tests/gap-inbox-route.test.sh` is one of those, and it is named because it closes a hole rather than adding coverage to a covered path: the iteration-boundary gap-inbox check had **no fixture at all**, so both its refusal and its recovery text were unpinned while being the thing an entering session acts on. It drives `--enter-stage` against a sandboxed queue, state file and inbox — the harness `gate-tests/boundary-scratch-wipe.test.sh` established — and pins the branch both ways: the close-skipped case refuses with the drain recovery and writes nothing, the post-close case stamps and carries the bullets with its advisory, the never-named and no-cursor edges take the post-close branch, and `--simulate` reports each branch with its recovery relayed and writes nothing. No fixture *pair* is owed: this is a `bin/` tool, not a gate.
 
 ## Per-component contracts
 
 ### The stage-machine adapters
 
-`native/src/stages.rs` is the **sole holder** of the stage machine's shared state
-adapters — the header parse and its iteration extraction (`stages::header`,
-`stages::header_iter`), the cursor (`stages::current_stage`) and stage membership
-(`stages::stage_known`) — because every gate must read the two axes identically,
-and a shared adapter removes that drift axis. The knobs they read resolve from the
-kit's static table (§Layout and configuration). Values and adapters only, never
-gate structure (gate-sdk's `lib/gate.sh` rule).
+`native/src/stages.rs` is the **sole holder** of the stage machine's shared state adapters — the header parse and its iteration extraction (`stages::header`, `stages::header_iter`), the cursor (`stages::current_stage`) and stage membership (`stages::stage_known`) — because every gate must read the two axes identically, and a shared adapter removes that drift axis. The knobs they read resolve from the kit's static table (§Layout and configuration). Values and adapters only, never gate structure (gate-sdk's `lib/gate.sh` rule).
 
-`stages::current_stage` is the **cursor derivation**: the last data line's
-`<stage>` token, hoisted so every lifecycle reader shares one definition of
-"current stage". It answers empty for both no-cursor shapes (§The state machine) —
-an absent file and a file with no data line — because "no cursor" is a legitimate
-state rather than a parse failure; its callers each rule on what it means for them
-(§check-stage-entry, §check-stage-evidence). `stages::header_iter` keeps stripping
-an optional trailing bracketed field: that strip is **residual-field healing**,
-letting a pre-upgrade header still carrying `[stage:]` read as the bare iteration
-name. The cross-kit readers deliberately do *not* call this adapter — each derives
-the cursor itself from a path it already configures, so no consumer kit gains a
-lifecycle-kit dependency.
+`stages::current_stage` is the **cursor derivation**: the last data line's `<stage>` token, hoisted so every lifecycle reader shares one definition of "current stage". It answers empty for both no-cursor shapes (§The state machine) — an absent file and a file with no data line — because "no cursor" is a legitimate state rather than a parse failure; its callers each rule on what it means for them (§check-stage-entry, §check-stage-evidence). `stages::header_iter` keeps stripping an optional trailing bracketed field: that strip is **residual-field healing**, letting a pre-upgrade header still carrying `[stage:]` read as the bare iteration name. The cross-kit readers deliberately do *not* call this adapter — each derives the cursor itself from a path it already configures, so no consumer kit gains a lifecycle-kit dependency.
 
-The same module holds the **iteration-start read**. It takes a state-file path and
-returns the first data line's `<head>` exactly as recorded, or empty in every
-no-commit case §The state machine lists. It verifies the commit resolves in one
-`git rev-parse --verify <head>^{commit}` before returning. A cross-kit reader hands
-in the path its own knob resolved, so it calls the crate read without gaining a
-lifecycle-kit vendoring dependency (the shared-derivation shape of
-§bin/session-id.sh).
+The same module holds the **iteration-start read**. It takes a state-file path and returns the first data line's `<head>` exactly as recorded, or empty in every no-commit case §The state machine lists. It verifies the commit resolves in one `git rev-parse --verify <head>^{commit}` before returning. A cross-kit reader hands in the path its own knob resolved, so it calls the crate read without gaining a lifecycle-kit vendoring dependency (the shared-derivation shape of §bin/session-id.sh).
 
-The **closing-stage predicate** is built on that cursor: true when the cursor
-equals the last member of `LIFECYCLE_KIT_STAGES`, false otherwise — including for
-both no-cursor shapes, since a cursor that does not exist has not reached anything.
-Its **two callers must agree**: the `--emit-file-gap` arm reads it for the
-capture-time warning that tells a filer which consequence they are buying, and
-`--enter-stage` reads it at the iteration-boundary gap-inbox check to choose
-between refusing and admitting (§The committed gap inbox). Each composes it from
-`stages::current_stage` and the last `LIFECYCLE_KIT_STAGES` element, so a filer
-warned that "none is left to drain it" is warned by the same test that later admits
-the bullet. **No knob is minted and none is possible**: the last configured stage
-is already `LIFECYCLE_KIT_STAGES`'s last member, so the predicate is config-derived
-in every consumer with nothing left to configure. It is a predicate over the cursor
-and must not acquire a third caller silently — `stages::current_stage` remains the
-general reader.
+The **closing-stage predicate** is built on that cursor: true when the cursor equals the last member of `LIFECYCLE_KIT_STAGES`, false otherwise — including for both no-cursor shapes, since a cursor that does not exist has not reached anything. Its **two callers must agree**: the `--emit-file-gap` arm reads it for the capture-time warning that tells a filer which consequence they are buying, and `--enter-stage` reads it at the iteration-boundary gap-inbox check to choose between refusing and admitting (§The committed gap inbox). Each composes it from `stages::current_stage` and the last `LIFECYCLE_KIT_STAGES` element, so a filer warned that "none is left to drain it" is warned by the same test that later admits the bullet. **No knob is minted and none is possible**: the last configured stage is already `LIFECYCLE_KIT_STAGES`'s last member, so the predicate is config-derived in every consumer with nothing left to configure. It is a predicate over the cursor and must not acquire a third caller silently — `stages::current_stage` remains the general reader.
 
-The module renders the resident registration block, `stages::registration_block`
-(§bin/install-lifecycle.sh), from the live config, and three members follow the
-same writer/asserter shape for the merge-attribute surface: `stages::supersede_set`
-is the derived iteration-scoped supersede set (the state file, the two kit-owned
-built-ins — the lesson-evidence file and the survey record — and each
-`LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member: exactly what `--enter-stage` truncates at
-the boundary); `stages::union_set` is the derived union-merge set (the gap inbox —
-§The committed gap inbox); and `stages::merge_attrs_block` renders the supersede
-set as `<path> merge=iteration-scoped` lines and the union set as
-`<path> merge=union` lines (§Multi-operator semantics). The shape holds between the
-`--install-lifecycle` arm and the gates that assert what it writes
-(§check-merge-attrs, §check-lifecycle-registration). The derived supersede set **is
-read past the merge-attribute pair**: `check-scratch-citation`, which forbids a
-permanent surface pointing a retriever at any of its members, and
-`check-stage-evidence` read it too. So a consumer adding a
-`LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member gets citation enforcement over it with no
-second roster to keep in step.
+The module renders the resident registration block, `stages::registration_block` (§bin/install-lifecycle.sh), from the live config, and three members follow the same writer/asserter shape for the merge-attribute surface: `stages::supersede_set` is the derived iteration-scoped supersede set (the state file, the two kit-owned built-ins — the lesson-evidence file and the survey record — and each `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member: exactly what `--enter-stage` truncates at the boundary); `stages::union_set` is the derived union-merge set (the gap inbox — §The committed gap inbox); and `stages::merge_attrs_block` renders the supersede set as `<path> merge=iteration-scoped` lines and the union set as `<path> merge=union` lines (§Multi-operator semantics). The shape holds between the `--install-lifecycle` arm and the gates that assert what it writes (§check-merge-attrs, §check-lifecycle-registration). The derived supersede set **is read past the merge-attribute pair**: `check-scratch-citation`, which forbids a permanent surface pointing a retriever at any of its members, and `check-stage-evidence` read it too. So a consumer adding a `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member gets citation enforcement over it with no second roster to keep in step.
 
-The **journal-path derivation** is `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN` with
-`<stage>` expanded (`enter_stage::journal_path`), hoisted for the same reason the
-cursor is — three readers must name one file or the assertion checks a path nobody
-was asked to write. Its readers are `--enter-stage` at the entry assertion, a
-dispatching supervisor deriving the path it grants, and the dispatched stage
-session deriving where to write (§The state machine). Two members sit beside it on
-the same ground: the opener writes the journal's opening line and reports the path
-it wrote, and the written predicate is what the entry assertion reads. They share
-the derivation above **and** one spelling of the opening line's fixed lead, so the
-writer and the reader that must tell the tool's own bytes from a session's cannot
-drift apart — the failure a second literal would make silent, since a diverged
-reader passes on every skeleton rather than erroring (§bin/enter-stage.sh).
+The **journal-path derivation** is `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN` with `<stage>` expanded (`enter_stage::journal_path`), hoisted for the same reason the cursor is — three readers must name one file or the assertion checks a path nobody was asked to write. Its readers are `--enter-stage` at the entry assertion, a dispatching supervisor deriving the path it grants, and the dispatched stage session deriving where to write (§The state machine). Two members sit beside it on the same ground: the opener writes the journal's opening line and reports the path it wrote, and the written predicate is what the entry assertion reads. They share the derivation above **and** one spelling of the opening line's fixed lead, so the writer and the reader that must tell the tool's own bytes from a session's cannot drift apart — the failure a second literal would make silent, since a diverged reader passes on every skeleton rather than erroring (§bin/enter-stage.sh).
 
-**The table validator is fail-closed on shape, not merely on presence.** It runs at
-the kit's first knob read in a process, collects every finding, and refuses at exit
-2 under the kit's malformed-config lead line (gate-sdk/SPEC.md §The knob file).
-`LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` states the rule the others follow: a non-empty
-pattern is compiled by the engine that will match it — gate-sdk/SPEC.md §The POSIX
-ERE matcher's one-group capture — and refused for any shape outside that item's,
-the finding carrying the engine's own reason. The refusal exists because the
-failure it replaces is silent: an uncompilable pattern matches nothing and a
-group-less one captures nothing, and either would classify every worktree
-unclassified while looking configured. Exercised in `smoke/` with a pattern
-actually set, the empty default never reaching the branch.
-`LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN` takes the same treatment for the same reason:
-a pattern with no `<stage>` placeholder names one file for every stage, so the
-entry assertion would read some other session's journal and **pass** on it — a
-wrong answer, not a missing one, which is why it is refused rather than tolerated.
-`LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE` takes the `0|1` arm shape
-`LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK` already has.
-`LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE` deliberately gains **no** validator arm, which
-is the roster's rule applied rather than an omission from it: its value is a path
-that need not exist — header-only is the valve ledger's resting state
-(§bin/enter-stage.sh) — so there is no shape a load-time check could refuse. The
-two fail-closed refusals that surface *are* the ledger's, and they live in the
-writer, where the file is actually read: a validator that parsed the ledger would
-refuse every entry on a malformed one, including entries that never asked whether a
-valve was armed.
+**The table validator is fail-closed on shape, not merely on presence.** It runs at the kit's first knob read in a process, collects every finding, and refuses at exit 2 under the kit's malformed-config lead line (gate-sdk/SPEC.md §The knob file). `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` states the rule the others follow: a non-empty pattern is compiled by the engine that will match it — gate-sdk/SPEC.md §The POSIX ERE matcher's one-group capture — and refused for any shape outside that item's, the finding carrying the engine's own reason. The refusal exists because the failure it replaces is silent: an uncompilable pattern matches nothing and a group-less one captures nothing, and either would classify every worktree unclassified while looking configured. Exercised in `smoke/` with a pattern actually set, the empty default never reaching the branch. `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN` takes the same treatment for the same reason: a pattern with no `<stage>` placeholder names one file for every stage, so the entry assertion would read some other session's journal and **pass** on it — a wrong answer, not a missing one, which is why it is refused rather than tolerated. `LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE` takes the `0|1` arm shape `LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK` already has. `LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE` deliberately gains **no** validator arm, which is the roster's rule applied rather than an omission from it: its value is a path that need not exist — header-only is the valve ledger's resting state (§bin/enter-stage.sh) — so there is no shape a load-time check could refuse. The two fail-closed refusals that surface *are* the ledger's, and they live in the writer, where the file is actually read: a validator that parsed the ledger would refuse every entry on a malformed one, including entries that never asked whether a valve was armed.
 
 ### bin/session-id.sh
 
-Prints the canonical stamp id so a stage skill reads it rather than guessing.
-**The member is the gate binary's `--emit-session-id` arm**, reached through the
-generic composer as `bash gate-sdk/bin/run-gates.sh --emit session-id`. **The
-heading is a section name, not a file name** — no `.sh` driver stands behind it,
-and it keeps this spelling because the citations pointing here resolve against
-it. It is not a gate — no
-`gates.list` row, no `.gate` descriptor, no fixture pair — but an arm-table
-member (gate-sdk/SPEC.md §The non-gate arm), whose contract is a
-**document**: one normalized id on stdout and exit 0, or a diagnostic on stderr
-and exit 2.
+Prints the canonical stamp id so a stage skill reads it rather than guessing. **The member is the gate binary's `--emit-session-id` arm**, reached through the generic composer as `bash gate-sdk/bin/run-gates.sh --emit session-id`. **The heading is a section name, not a file name** — no `.sh` driver stands behind it, and it keeps this spelling because the citations pointing here resolve against it. It is not a gate — no `gates.list` row, no `.gate` descriptor, no fixture pair — but an arm-table member (gate-sdk/SPEC.md §The non-gate arm), whose contract is a **document**: one normalized id on stdout and exit 0, or a diagnostic on stderr and exit 2.
 
-**This section owns the derivation's contract; the derivation itself lives in one
-shared crate module** (`native/src/sessions.rs`), which drift-kit's two meters
-read as well as this arm — one copy in-crate rather than one per reader
-(drift-kit/SPEC.md §The overhead meter). Nothing about the rules below changes:
-the module reads no environment at all, every input arriving as a value, so each
-consuming arm resolves **its own kit's** sessions-dir knob and hands the answer
-in. What is stated here rather than there is the *rule*; what lives there is the
-one implementation of it. The child-flag verification in source 3 is exposed
-from that module as its own verdict (top-level, delegated, undetermined),
-because drift-kit's overhead meter decides whether it may resolve at all on
-that verdict (drift-kit/SPEC.md §The overhead meter). It is one verification
-with two readers, never a second copy.
+**This section owns the derivation's contract; the derivation itself lives in one shared crate module** (`native/src/sessions.rs`), which drift-kit's two meters read as well as this arm — one copy in-crate rather than one per reader (drift-kit/SPEC.md §The overhead meter). Nothing about the rules below changes: the module reads no environment at all, every input arriving as a value, so each consuming arm resolves **its own kit's** sessions-dir knob and hands the answer in. What is stated here rather than there is the *rule*; what lives there is the one implementation of it. The child-flag verification in source 3 is exposed from that module as its own verdict (top-level, delegated, undetermined), because drift-kit's overhead meter decides whether it may resolve at all on that verdict (drift-kit/SPEC.md §The overhead meter). It is one verification with two readers, never a second copy.
 
-The id derives by a fixed source order, first hit wins, every source ending in
-the same normalization — strip a leading `agent-` token if present, then take
-the first 8 characters:
+The id derives by a fixed source order, first hit wins, every source ending in the same normalization — strip a leading `agent-` token if present, then take the first 8 characters:
 
-1. `LIFECYCLE_KIT_SESSION_ID` — a harness-neutral consumer override: a consumer
-   whose harness exposes a session identity by any means wires it here.
-2. `CLAUDE_CODE_SESSION_ID` — the shipped default source, harness-specific by
-   nature: this harness exports the current session's transcript uuid into every
-   Bash environment, identifying the session directly rather than inferring it
-   from file mtimes. Taken directly here only when `CLAUDE_CODE_CHILD_SESSION`
-   is unset; when the flag is set a lead-dispatched stage session
-   (§templates/lead.md) may see the *lead's* uuid here, so source 3 verifies
-   the flag before trusting it and can route back to this uuid.
-3. The newest transcript under the sessions dir (default
-   `<config-home>/projects/<cwd-slug>` — `$CLAUDE_CONFIG_DIR` or `~/.claude`,
-   and the cwd with every non-alphanumeric char mapped to `-`; override
-   `LIFECYCLE_KIT_SESSIONS_DIR`), the top-level glob widened with
-   `<dir>/*/subagents/*.jsonl` so a dispatched session with neither env var
-   still resolves without a per-dispatch override. Newest-file selection is the
-   documented single-operator assumption (one live session per project tree) —
-   and the widened glob makes it bite *within* one session too: a top-level
-   session that reaches this source (its Bash environment lacking the source-2
-   uuid) right after one of its subagents finishes picks that subagent's
-   transcript when it out-mtimes the session's own, so a lead deriving its own
-   id here (the session-role marker, §templates/lead.md) can name the wrong
-   session and misfire the suppression — a lead in that position verifies the
-   printed id against its own transcript before writing the marker. A
-   dispatched child (source 2 skipped, `CLAUDE_CODE_SESSION_ID` carrying the
-   lead's uuid) narrows this scan to `<dir>/<lead-uuid>/subagents/*.jsonl`
-   alone, excluding the lead's own top-level transcript — concurrently written,
-   and able to out-mtime the dispatched session's — from the candidate set. The
-   flag is verified, not trusted, because this harness sets it in top-level
-   sessions too: a non-empty narrowed scan is a genuine child (newest subagent
-   transcript wins); an empty scan with `<dir>/<lead-uuid>.jsonl` present marks
-   the flag spurious — a genuine child's transcript lives under `subagents/`
-   while it runs, so an empty scan plus a top-level transcript for the env uuid
-   means the uuid names a live top-level session, and the derivation falls back
-   to `CLAUDE_CODE_SESSION_ID` (source 2's answer). An empty scan with no such
-   top-level transcript exits 2 — only a wrong sessions dir or a broken layout
-   still reaches it. Two races are accepted: a genuine child stamping before
-   its transcript's first write would fall back to the lead's uuid (theoretical
-   — a child's transcript has its first writes by the time it can run a tool
-   call), and a spurious-flagged session that dispatched subagents earlier in
-   the same session stamps the newest subagent's id (a provenance smudge, not a
-   correctness break, unchanged from the prior trusting behavior). An absent dir
-   or transcript exits 2.
+1. `LIFECYCLE_KIT_SESSION_ID` — a harness-neutral consumer override: a consumer whose harness exposes a session identity by any means wires it here.
+2. `CLAUDE_CODE_SESSION_ID` — the shipped default source, harness-specific by nature: this harness exports the current session's transcript uuid into every Bash environment, identifying the session directly rather than inferring it from file mtimes. Taken directly here only when `CLAUDE_CODE_CHILD_SESSION` is unset; when the flag is set a lead-dispatched stage session (§templates/lead.md) may see the *lead's* uuid here, so source 3 verifies the flag before trusting it and can route back to this uuid.
+3. The newest transcript under the sessions dir (default `<config-home>/projects/<cwd-slug>` — `$CLAUDE_CONFIG_DIR` or `~/.claude`, and the cwd with every non-alphanumeric char mapped to `-`; override `LIFECYCLE_KIT_SESSIONS_DIR`), the top-level glob widened with `<dir>/*/subagents/*.jsonl` so a dispatched session with neither env var still resolves without a per-dispatch override. Newest-file selection is the documented single-operator assumption (one live session per project tree) — and the widened glob makes it bite *within* one session too: a top-level session that reaches this source (its Bash environment lacking the source-2 uuid) right after one of its subagents finishes picks that subagent's transcript when it out-mtimes the session's own, so a lead deriving its own id here (the session-role marker, §templates/lead.md) can name the wrong session and misfire the suppression — a lead in that position verifies the printed id against its own transcript before writing the marker. A dispatched child (source 2 skipped, `CLAUDE_CODE_SESSION_ID` carrying the lead's uuid) narrows this scan to `<dir>/<lead-uuid>/subagents/*.jsonl` alone, excluding the lead's own top-level transcript — concurrently written, and able to out-mtime the dispatched session's — from the candidate set. The flag is verified, not trusted, because this harness sets it in top-level sessions too: a non-empty narrowed scan is a genuine child (newest subagent transcript wins); an empty scan with `<dir>/<lead-uuid>.jsonl` present marks the flag spurious — a genuine child's transcript lives under `subagents/` while it runs, so an empty scan plus a top-level transcript for the env uuid means the uuid names a live top-level session, and the derivation falls back to `CLAUDE_CODE_SESSION_ID` (source 2's answer). An empty scan with no such top-level transcript exits 2 — only a wrong sessions dir or a broken layout still reaches it. Two races are accepted: a genuine child stamping before its transcript's first write would fall back to the lead's uuid (theoretical — a child's transcript has its first writes by the time it can run a tool call), and a spurious-flagged session that dispatched subagents earlier in the same session stamps the newest subagent's id (a provenance smudge, not a correctness break, unchanged from the prior trusting behavior). An absent dir or transcript exits 2.
 
-Invoked internally by `--enter-stage` for the `<session-id>` field; the stage
-skills reach it through `--enter-stage` rather than calling it themselves. The
-one session that calls it directly is a lead writing its own session-role marker
-(§templates/lead.md), which the front-end route serves.
+Invoked internally by `--enter-stage` for the `<session-id>` field; the stage skills reach it through `--enter-stage` rather than calling it themselves. The one session that calls it directly is a lead writing its own session-role marker (§templates/lead.md), which the front-end route serves.
 
-**The declared knob roster is empty, and it must be.** Neither
-`LIFECYCLE_KIT_SESSION_ID` nor `LIFECYCLE_KIT_SESSIONS_DIR` is a row in the kit's
-static table, and declaring a name its owning kit does not declare is the
-undeclared-name refusal (gate-sdk/SPEC.md §The knob file) — the arm would
-fail-close on every invocation. `LIFECYCLE_KIT_SESSIONS_DIR` is, however, an
-`env_only` name (gate-sdk/SPEC.md §The knob file), so an adopter's docs may cite
-it though no table row backs it. Table membership is nonetheless what makes the arm
-*reachable*, so the row exists with an empty roster, the second such member after
-`--emit-md-section`. Adding the two as rows so the names could be declared is
-refused: a knob file must never be able to set a stamp-id override, because every
-session reading that file would then stamp one id. The arm keeps reading both off
-the process environment.
+**The declared knob roster is empty, and it must be.** Neither `LIFECYCLE_KIT_SESSION_ID` nor `LIFECYCLE_KIT_SESSIONS_DIR` is a row in the kit's static table, and declaring a name its owning kit does not declare is the undeclared-name refusal (gate-sdk/SPEC.md §The knob file) — the arm would fail-close on every invocation. `LIFECYCLE_KIT_SESSIONS_DIR` is, however, an `env_only` name (gate-sdk/SPEC.md §The knob file), so an adopter's docs may cite it though no table row backs it. Table membership is nonetheless what makes the arm *reachable*, so the row exists with an empty roster, the second such member after `--emit-md-section`. Adding the two as rows so the names could be declared is refused: a knob file must never be able to set a stamp-id override, because every session reading that file would then stamp one id. The arm keeps reading both off the process environment.
 
-**Both names reach the arm anyway, and so do the harness's, because the
-front-end hands the binary its environment unchanged.** `gate_command` composes
-`<binary> <arm>` and `exec_arm` `exec`s the binary (gate-sdk/SPEC.md
-§lib/gate.sh, §run-gates), never under an `env -i`, so `LIFECYCLE_KIT_SESSION_ID`,
-`LIFECYCLE_KIT_SESSIONS_DIR`, `CLAUDE_CODE_SESSION_ID`,
-`CLAUDE_CODE_CHILD_SESSION`, `CLAUDE_CONFIG_DIR` and `HOME` reach it exactly as
-they reached the driver. §The non-gate arm's rule that *a default the deleted
-shell driver held inline moves into the owning kit's library in the same cut*
-does not bind here: its ground is a **declared** knob, and this arm declares none.
+**Both names reach the arm anyway, and so do the harness's, because the front-end hands the binary its environment unchanged.** `gate_command` composes `<binary> <arm>` and `exec_arm` `exec`s the binary (gate-sdk/SPEC.md §lib/gate.sh, §run-gates), never under an `env -i`, so `LIFECYCLE_KIT_SESSION_ID`, `LIFECYCLE_KIT_SESSIONS_DIR`, `CLAUDE_CODE_SESSION_ID`, `CLAUDE_CODE_CHILD_SESSION`, `CLAUDE_CONFIG_DIR` and `HOME` reach it exactly as they reached the driver. §The non-gate arm's rule that *a default the deleted shell driver held inline moves into the owning kit's library in the same cut* does not bind here: its ground is a **declared** knob, and this arm declares none.
 
-**The process cwd is an input to source 3, so `--enter-stage` reaches the binary
-directly rather than through the front-end.** `bin/run-gates.sh` cds to the git
-toplevel before dispatch (gate-sdk/SPEC.md §run-gates), which would change the
-sessions-dir slug under any other cwd and turn a non-repository cwd from working
-into exit 2 — so the sole production caller invokes `gate_native_bin`'s
-`--emit-session-id` directly, which §The non-gate arm sanctions in as many words:
-what the class forbids is a second entry point into the emission path, not a
-caller. The front-end route stays available and is what `templates/lead.md` and
-the consumer smoke use, both standing at the repo root where the two agree.
-Pinning the sessions dir to the toplevel would be an *arguable repair* inside a
-port, and was refused as one. One spelling is load-bearing so a later rewrite
-does not silently change it: bash's `pwd` prints the **logical** path it carries
-in `PWD` where `std::env::current_dir()` returns the physical one, so the arm
-reads `PWD` where it is set and the crate's crosser answers otherwise.
+**The process cwd is an input to source 3, so `--enter-stage` reaches the binary directly rather than through the front-end.** `bin/run-gates.sh` cds to the git toplevel before dispatch (gate-sdk/SPEC.md §run-gates), which would change the sessions-dir slug under any other cwd and turn a non-repository cwd from working into exit 2 — so the sole production caller invokes `gate_native_bin`'s `--emit-session-id` directly, which §The non-gate arm sanctions in as many words: what the class forbids is a second entry point into the emission path, not a caller. The front-end route stays available and is what `templates/lead.md` and the consumer smoke use, both standing at the repo root where the two agree. Pinning the sessions dir to the toplevel would be an *arguable repair* inside a port, and was refused as one. One spelling is load-bearing so a later rewrite does not silently change it: bash's `pwd` prints the **logical** path it carries in `PWD` where `std::env::current_dir()` returns the physical one, so the arm reads `PWD` where it is set and the crate's crosser answers otherwise.
 
-**The caller's absent-binary refusal is the port's one added surface.**
-`--enter-stage` reads the id before it dispatches any gate, so nothing else in
-that run would have reported an unbuilt binary first; it checks `gate_native_bin`
-is executable and refuses with the build command, in the shape §lib/gate.sh's own
-two readers use. Neither the derivation nor either exit status moved otherwise —
-the port was held against the deleted driver over the derivation order's five
-axes, all three refusal texts, a cross-tier mtime tie, a broken symlink, a
-dotfile and four cwd axes, with no difference in output or status.
-**The refusal is in-envelope rather than a widening.** The cut *opens* this
-failure mode rather than inheriting it: the deleted driver was a vendored shell
-script, present wherever the kit was, where the arm needs a **built** binary — so
-the refusal covers a case that did not exist before the cut, and a faithful port
-owes the case it created. That reading is worth stating rather than assuming,
-because a port's envelope rule does not settle on its face whether a refusal
-covering a failure mode the port itself created is inside the envelope or outside
-it, and the two answers differ in what a port may add without asking.
+**The caller's absent-binary refusal is the port's one added surface.** `--enter-stage` reads the id before it dispatches any gate, so nothing else in that run would have reported an unbuilt binary first; it checks `gate_native_bin` is executable and refuses with the build command, in the shape §lib/gate.sh's own two readers use. Neither the derivation nor either exit status moved otherwise — the port was held against the deleted driver over the derivation order's five axes, all three refusal texts, a cross-tier mtime tie, a broken symlink, a dotfile and four cwd axes, with no difference in output or status. **The refusal is in-envelope rather than a widening.** The cut *opens* this failure mode rather than inheriting it: the deleted driver was a vendored shell script, present wherever the kit was, where the arm needs a **built** binary — so the refusal covers a case that did not exist before the cut, and a faithful port owes the case it created. That reading is worth stating rather than assuming, because a port's envelope rule does not settle on its face whether a refusal covering a failure mode the port itself created is inside the envelope or outside it, and the two answers differ in what a port may add without asking.
 
-A port taking this derivation adds no permission grant: the post-port invocation
-is covered by the committed run-gates entries a consumer's own permission surface
-already carries, and the count of entries naming a deleted path is **probed rather
-than assumed** at the cut. The cut created no twin — the derivation sources no kit
-library, and the shell caller set emptied — so no parity oracle is owed.
+A port taking this derivation adds no permission grant: the post-port invocation is covered by the committed run-gates entries a consumer's own permission surface already carries, and the count of entries naming a deleted path is **probed rather than assumed** at the cut. The cut created no twin — the derivation sources no kit library, and the shell caller set emptied — so no parity oracle is owed.
 
-One fact a session taking this cut should not re-derive: its sole production
-caller is `--enter-stage`, which resolves the id internally — but the kit's
-own stage templates and `templates/lead.md` name this helper as the id's source
-and one of them **invokes it directly**, so a port edits kit `templates/*.md` and
-stales whatever projection reads them.
+One fact a session taking this cut should not re-derive: its sole production caller is `--enter-stage`, which resolves the id internally — but the kit's own stage templates and `templates/lead.md` name this helper as the id's source and one of them **invokes it directly**, so a port edits kit `templates/*.md` and stales whatever projection reads them.
 
 ### bin/enter-stage.sh
 
-The deterministic writer for a stage transition: `bash gate-sdk/bin/run-gates.sh --enter-stage <stage>`
-appends the invocation stamp, deriving the session id in process by the
-`--emit-session-id` derivation — never an argument, so the no-hand-picking rule
-rides into the tool.
+The deterministic writer for a stage transition: `bash gate-sdk/bin/run-gates.sh --enter-stage <stage>` appends the invocation stamp, deriving the session id in process by the `--emit-session-id` derivation — never an argument, so the no-hand-picking rule rides into the tool.
 
-**It is an `Arm::Run` arm-table member, and the variant is the exit contract.** The
-grammar is `--enter-stage [--simulate] <stage>`,
-`--enter-stage [--simulate] --rename <name>` or
-`--enter-stage [--simulate] --open-lead-journal`: `--simulate`, `--rename` and
-`--open-lead-journal` ride as operands, so the argument grammar is the one this tool always had and only the
-program word changed. `Arm::Run` rather than `Arm::Emit` because the exit status
-is **three-state and every code is load-bearing** — 0 a stamp or a reported
-no-op, **1 a refusal** (the entry pre-flight, a `LIFECYCLE_KIT_ENTRY_PREFLIGHT`
-command, the predecessor-journal assertion, and each of the boundary refusals),
-2 a usage or configuration error. An emitting arm collapses to `{0, 2}` and would
-rewrite every refusal to the misuse code, which is precisely the distinction the
-stage templates' *on a refusal, do not force the entry* rests on: a session
-cannot follow that advice if a refusal is indistinguishable from a typo. The
-status survives the front-end because it `exec`s the binary, so the arm's status
-*becomes* the front-end's; an absent or unbuildable binary is exit 2, joining
-the arms whose verdict a session reads rather than the decline-with-0 posture of
-a harness-integration arm.
+**It is an `Arm::Run` arm-table member, and the variant is the exit contract.** The grammar is `--enter-stage [--simulate] <stage>`, `--enter-stage [--simulate] --rename <name>` or `--enter-stage [--simulate] --open-lead-journal`: `--simulate`, `--rename` and `--open-lead-journal` ride as operands, so the argument grammar is the one this tool always had and only the program word changed. `Arm::Run` rather than `Arm::Emit` because the exit status is **three-state and every code is load-bearing** — 0 a stamp or a reported no-op, **1 a refusal** (the entry pre-flight, a `LIFECYCLE_KIT_ENTRY_PREFLIGHT` command, the predecessor-journal assertion, and each of the boundary refusals), 2 a usage or configuration error. An emitting arm collapses to `{0, 2}` and would rewrite every refusal to the misuse code, which is precisely the distinction the stage templates' *on a refusal, do not force the entry* rests on: a session cannot follow that advice if a refusal is indistinguishable from a typo. The status survives the front-end because it `exec`s the binary, so the arm's status *becomes* the front-end's; an absent or unbuildable binary is exit 2, joining the arms whose verdict a session reads rather than the decline-with-0 posture of a harness-integration arm.
 
-**Every stamp write's report ends in the commit to make and its subject.** After
-the `next: commit` line, a `subject:` line names the subject the commit carries
-(§The stamp protocol): `chore(<stage>): stamp the <stage> stage entry` for an
-entry, a valve-admitted entry included, and the same followed by `at the iteration
-boundary` for the boundary reset. The subject is scoped to the stamp the write
-added, so the writer hands the session the spelling `check-stamp-subject` asserts,
-from the same derivation (the last added stamp). `--simulate` writes nothing and
-prints no `next:` or `subject:` line.
+**Every stamp write's report ends in the commit to make and its subject.** After the `next: commit` line, a `subject:` line names the subject the commit carries (§The stamp protocol): `chore(<stage>): stamp the <stage> stage entry` for an entry, a valve-admitted entry included, and the same followed by `at the iteration boundary` for the boundary reset. The subject is scoped to the stamp the write added, so the writer hands the session the spelling `check-stamp-subject` asserts, from the same derivation (the last added stamp). `--simulate` writes nothing and prints no `next:` or `subject:` line.
 
-**A surplus argument is refused, never dropped, and the ground is that this
-tool's only flag is position-sensitive.** `<stage>` takes exactly one operand,
-`--rename` exactly one `<name>` and `--open-lead-journal` none; anything after it exits 2 naming the
-surplus token, and a trailing `--simulate` is named specially with the
-flag-first spelling because that is the misuse the refusal exists to catch.
-Silently ignoring it fails open on precisely the input a caller got wrong: the
-dropped token is the only thing separating a read-only probe from a real stamp,
-and at the first stage of an iteration from a boundary reset that truncates the
-evidence file and every `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member. Permissiveness
-— reading the flag in any position — was refused as the weaker half: it repairs
-the one spelling anybody has typed and leaves every other unparsed argument
-being discarded in silence, where the refusal covers the class. Making the mode
-an environment knob was refused as well, on a different ground: it mints a
-config surface to express what an argument already expresses, and an exported
-knob is inherited by every child the arm spawns where an argument is not.
+**A surplus argument is refused, never dropped, and the ground is that this tool's only flag is position-sensitive.** `<stage>` takes exactly one operand, `--rename` exactly one `<name>` and `--open-lead-journal` none; anything after it exits 2 naming the surplus token, and a trailing `--simulate` is named specially with the flag-first spelling because that is the misuse the refusal exists to catch. Silently ignoring it fails open on precisely the input a caller got wrong: the dropped token is the only thing separating a read-only probe from a real stamp, and at the first stage of an iteration from a boundary reset that truncates the evidence file and every `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member. Permissiveness — reading the flag in any position — was refused as the weaker half: it repairs the one spelling anybody has typed and leaves every other unparsed argument being discarded in silence, where the refusal covers the class. Making the mode an environment knob was refused as well, on a different ground: it mints a config surface to express what an argument already expresses, and an exported knob is inherited by every child the arm spawns where an argument is not.
 
-**The declared roster is the prefix family `LIFECYCLE_KIT_*`, plus four names
-outside it.** The family is a derivation rather than a transcription: this arm
-and the pre-flight gates it dispatches read lifecycle-kit knobs, and a transcribed
-union of them drifts the first time one of those gates gains a knob. Each dispatched gate
-inherits the invoking environment unchanged and resolves its own knobs.
-`GATE_SDK_PRUNE_DIRS` and `GATE_SDK_PRUNE_EXTRA_DIRS` are `check-stage-entry`'s,
-`GATE_SDK_KIT_DIRS` steers the kit roots whose `checks/` directories the two
-pre-flight members resolve in, and `GATE_SDK_TMP_DIR` is the scratch dir that is
-the temp state file's home, the boundary wipe's subject and the resume journal's
-parent.
+**The declared roster is the prefix family `LIFECYCLE_KIT_*`, plus four names outside it.** The family is a derivation rather than a transcription: this arm and the pre-flight gates it dispatches read lifecycle-kit knobs, and a transcribed union of them drifts the first time one of those gates gains a knob. Each dispatched gate inherits the invoking environment unchanged and resolves its own knobs. `GATE_SDK_PRUNE_DIRS` and `GATE_SDK_PRUNE_EXTRA_DIRS` are `check-stage-entry`'s, `GATE_SDK_KIT_DIRS` steers the kit roots whose `checks/` directories the two pre-flight members resolve in, and `GATE_SDK_TMP_DIR` is the scratch dir that is the temp state file's home, the boundary wipe's subject and the resume journal's parent.
 
-**Two callers are sanctioned, and the second one is not a convenience.** A stage
-session reaches the arm through `bash gate-sdk/bin/run-gates.sh`; a hermetic test
-harness resolves the binary itself and invokes the arm directly. The front-end `cd`s to the git toplevel and **refuses outside a
-repository**, while the harnesses that drive this tool end to end run in a non-git
-`mktemp -d` — and one of them asserts, as a named case, that a non-git tree skips
-the linked-worktree check rather than failing on it. Routing every caller through
-the front-end would convert a supported non-git invocation into a configuration
-error, which is a behaviour change no gate in the battery would report. Widening
-the front-end's `cd` was refused on its blast radius: gate-sdk/SPEC.md rules that
-every entry point resolves repo-root-relative paths from the toplevel, and a
-conditional `cd` would weaken the precondition the whole battery rests on to suit
-one arm's harness. gate-sdk/SPEC.md §The non-gate arm sanctions a *caller*
-reaching the binary and forbids only a second entry point into the emission path.
+**Two callers are sanctioned, and the second one is not a convenience.** A stage session reaches the arm through `bash gate-sdk/bin/run-gates.sh`; a hermetic test harness resolves the binary itself and invokes the arm directly. The front-end `cd`s to the git toplevel and **refuses outside a repository**, while the harnesses that drive this tool end to end run in a non-git `mktemp -d` — and one of them asserts, as a named case, that a non-git tree skips the linked-worktree check rather than failing on it. Routing every caller through the front-end would convert a supported non-git invocation into a configuration error, which is a behaviour change no gate in the battery would report. Widening the front-end's `cd` was refused on its blast radius: gate-sdk/SPEC.md rules that every entry point resolves repo-root-relative paths from the toplevel, and a conditional `cd` would weaken the precondition the whole battery rests on to suit one arm's harness. gate-sdk/SPEC.md §The non-gate arm sanctions a *caller* reaching the binary and forbids only a second entry point into the emission path.
 
-**The process cwd is an input, and the port widened it in one direction.** At the
-repository root — every stage session's case — the cwd already equals the
-toplevel, so the session-id derivation is byte-identical and nothing moves. From a
-subdirectory it succeeds, deriving the id off the toplevel slug, which is the
-project directory transcripts are keyed on — a widening in the safe direction,
-and the sentence gate-sdk/SPEC.md rules about every entry point rather than a
-licence this arm invents. Through the second caller no `cd` happens at
-all, so a harness's sandbox cwd is untouched.
-It is the **sole production writer of `<head>`** (§The state machine), read as
-`git rev-parse --short HEAD` in the state file's own work tree at the instant of
-the append, and `none` where that yields nothing — so the field is produced by
-the live path every stage template's first step already invokes rather than only
-under test. It takes no enabling knob: the field is unconditional, which is what
-refusing an optional spelling buys.
-`<stage>` must be a configured stage; anything else is a usage error (exit 2).
-Its positionals are membership-validated rather than free text, so it owes no
-leading-`-` refusal (gate-sdk/SPEC.md §The bin/-tool contract) — but it owes the
-help half, and `-h`/`--help` as the first argument prints usage on stdout and
-exits 0. The measured cost of not owing it is in this tool's own history: a
-session hunting for the rename mode below ran `--help`, got
-`'--help' is not a lifecycle stage`, and worked around a contract for three
-sessions that the usage text would have settled in one command.
-An ordinary stage **writes the evidence file only** — the appended stamp *is*
-the transition, since the last stamp is the cursor, so the queue file is not
-touched and need not be committed. The first stage
-(`LIFECYCLE_KIT_FIRST_STAGE`)
-performs the iteration-boundary reset instead — truncating the state file and
-every file in `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` back to its contract header and
-restarting the header at the unnamed-iteration form. That header rewrite is
-also where a residual pre-upgrade `[stage:]` field is dropped, so a consumer
-that vendored the cursor extraction mid-iteration heals at its next boundary
-without a migration step. `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`
-is a generic per-iteration reset knob — no consumer surface is named in
-the kit; a downstream kit whose per-iteration file must start each cycle from
-its contract header adds itself here, as evidence-kit's manifest does. The two
-kit-owned surfaces — `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE` and
-`LIFECYCLE_KIT_SURVEY_RECORD_FILE` (§The survey record) — reset by the same rule
-as **built-in members**: the kit owns those surfaces, so they do not ride the
-consumer knob (git history keeps the retired stamps and the retired surveys).
+**The process cwd is an input, and the port widened it in one direction.** At the repository root — every stage session's case — the cwd already equals the toplevel, so the session-id derivation is byte-identical and nothing moves. From a subdirectory it succeeds, deriving the id off the toplevel slug, which is the project directory transcripts are keyed on — a widening in the safe direction, and the sentence gate-sdk/SPEC.md rules about every entry point rather than a licence this arm invents. Through the second caller no `cd` happens at all, so a harness's sandbox cwd is untouched. It is the **sole production writer of `<head>`** (§The state machine), read as `git rev-parse --short HEAD` in the state file's own work tree at the instant of the append, and `none` where that yields nothing — so the field is produced by the live path every stage template's first step already invokes rather than only under test. It takes no enabling knob: the field is unconditional, which is what refusing an optional spelling buys. `<stage>` must be a configured stage; anything else is a usage error (exit 2). Its positionals are membership-validated rather than free text, so it owes no leading-`-` refusal (gate-sdk/SPEC.md §The bin/-tool contract) — but it owes the help half, and `-h`/`--help` as the first argument prints usage on stdout and exits 0. The measured cost of not owing it is in this tool's own history: a session hunting for the rename mode below ran `--help`, got `'--help' is not a lifecycle stage`, and worked around a contract for three sessions that the usage text would have settled in one command. An ordinary stage **writes the evidence file only** — the appended stamp *is* the transition, since the last stamp is the cursor, so the queue file is not touched and need not be committed. The first stage (`LIFECYCLE_KIT_FIRST_STAGE`) performs the iteration-boundary reset instead — truncating the state file and every file in `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` back to its contract header and restarting the header at the unnamed-iteration form. That header rewrite is also where a residual pre-upgrade `[stage:]` field is dropped, so a consumer that vendored the cursor extraction mid-iteration heals at its next boundary without a migration step. `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` is a generic per-iteration reset knob — no consumer surface is named in the kit; a downstream kit whose per-iteration file must start each cycle from its contract header adds itself here, as evidence-kit's manifest does. The two kit-owned surfaces — `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE` and `LIFECYCLE_KIT_SURVEY_RECORD_FILE` (§The survey record) — reset by the same rule as **built-in members**: the kit owns those surfaces, so they do not ride the consumer knob (git history keeps the retired stamps and the retired surveys).
 
-That written-surface set is also the **source of the stamp-commit purity
-assertion's exemption** (§check-stage-evidence): the boundary reset is the one
-legitimate reason a stamp commit touches anything besides the state file, so the
-assertion reads the members this reset already resolves rather than a roster
-minted to describe it — which is why widening the reset cannot leave the
-assertion behind.
+That written-surface set is also the **source of the stamp-commit purity assertion's exemption** (§check-stage-evidence): the boundary reset is the one legitimate reason a stamp commit touches anything besides the state file, so the assertion reads the members this reset already resolves rather than a roster minted to describe it — which is why widening the reset cannot leave the assertion behind.
 
-**What counts as the header, for the truncate.** The retained run is the
-member's leading blank and `#` **comment** lines, stopping at the first data
-line *or* at a markdown `## ` section heading, whichever comes first. The second
-half of that predicate is load-bearing rather than defensive: on a markdown
-surface whose blocks *are* `## ` headings — the survey record — a bare
-"keep every leading `#` line" rule reads the first block's heading as part of
-the header and carries one stale survey across the boundary, with the record's
-own read trigger then advertising it. The failure is silent, survives a green
-battery, and is invisible to any fixture that does not run a real boundary
-entry, which is why the boundary behavior is exercised end-to-end in
-`gate-tests/` rather than reasoned about.
+**What counts as the header, for the truncate.** The retained run is the member's leading blank and `#` **comment** lines, stopping at the first data line *or* at a markdown `## ` section heading, whichever comes first. The second half of that predicate is load-bearing rather than defensive: on a markdown surface whose blocks *are* `## ` headings — the survey record — a bare "keep every leading `#` line" rule reads the first block's heading as part of the header and carries one stale survey across the boundary, with the record's own read trigger then advertising it. The failure is silent, survives a green battery, and is invisible to any fixture that does not run a real boundary entry, which is why the boundary behavior is exercised end-to-end in `gate-tests/` rather than reasoned about.
 
-The boundary reset additionally **wipes the scratch dir** (`GATE_SDK_TMP_DIR`):
-every immediate child named neither `.gitkeep`, nor
-`LIFECYCLE_KIT_LEAD_JOURNAL_FILE`, nor a `LIFECYCLE_KIT_BOUNDARY_PRESERVE` entry
-is deleted with everything below it, and a spared child is **not descended**, so
-a spared directory is kept whole. The spare test is **anchored at the scratch
-root**: below it nothing is spared, so a nested `.gitkeep` or a nested file whose
-basename happens to equal a keep-list entry goes like any other member. An
-unanchored test let one nested `.gitkeep` keep its parent, fail that parent's
-removal as non-empty and keep every ancestor up to the root; and filtering the
-delete but not the descent would, once anchored, empty the very directory a
-consumer named in order to keep it. The report names the removed set the way it
-names the truncated set, a second note names each member whose removal
-**failed** (`boundary-wipe could not remove from <scratch>: <paths>`) rather than
-counting it as wiped, and a third names each keep-list entry containing `/`,
-which is not a scratch-root name and spared nothing. All three are notes, never
-an abort or a refusal — a config typo must not block the iteration boundary —
-and since a non-empty directory is either spared whole or fully descended, a
-failed-removal line is a real residue (a permission error, a concurrent writer).
-Truncate and wipe share the boundary trigger and the report line and **nothing
-else**: truncate rewrites a *tracked* file down to its `# contract:` header, so
-the file survives with an empty body; the wipe *deletes* untracked scratch
-members outright. `LIFECYCLE_KIT_BOUNDARY_PRESERVE` is therefore a keep-list for
-the delete and never a
-truncate target. The wipe runs last — after the truncate loop and after
-enter-stage removes its own temp files — so those temporaries are never
-candidates, and it is **boundary-only**: an ordinary stage entry appends and
-touches no scratch. It is unconditional over the directory because scratch is
-disposable *by definition*; a consumer's persistent measurement trends live
-outside it by retention contract.
+The boundary reset additionally **wipes the scratch dir** (`GATE_SDK_TMP_DIR`): every immediate child named neither `.gitkeep`, nor `LIFECYCLE_KIT_LEAD_JOURNAL_FILE`, nor a `LIFECYCLE_KIT_BOUNDARY_PRESERVE` entry is deleted with everything below it, and a spared child is **not descended**, so a spared directory is kept whole. The spare test is **anchored at the scratch root**: below it nothing is spared, so a nested `.gitkeep` or a nested file whose basename happens to equal a keep-list entry goes like any other member. An unanchored test let one nested `.gitkeep` keep its parent, fail that parent's removal as non-empty and keep every ancestor up to the root; and filtering the delete but not the descent would, once anchored, empty the very directory a consumer named in order to keep it. The report names the removed set the way it names the truncated set, a second note names each member whose removal **failed** (`boundary-wipe could not remove from <scratch>: <paths>`) rather than counting it as wiped, and a third names each keep-list entry containing `/`, which is not a scratch-root name and spared nothing. All three are notes, never an abort or a refusal — a config typo must not block the iteration boundary — and since a non-empty directory is either spared whole or fully descended, a failed-removal line is a real residue (a permission error, a concurrent writer). Truncate and wipe share the boundary trigger and the report line and **nothing else**: truncate rewrites a *tracked* file down to its `# contract:` header, so the file survives with an empty body; the wipe *deletes* untracked scratch members outright. `LIFECYCLE_KIT_BOUNDARY_PRESERVE` is therefore a keep-list for the delete and never a truncate target. The wipe runs last — after the truncate loop and after enter-stage removes its own temp files — so those temporaries are never candidates, and it is **boundary-only**: an ordinary stage entry appends and touches no scratch. It is unconditional over the directory because scratch is disposable *by definition*; a consumer's persistent measurement trends live outside it by retention contract.
 
-**Keep-list entries are root-relative basenames, never paths.** A path grammar
-(anchoring, `..`, a trailing slash) answers a need no reader has: every attested
-keep-list member is a root child, and a consumer that keeps nested scaffolding
-names the root directory holding it, which the wipe keeps whole.
+**Keep-list entries are root-relative basenames, never paths.** A path grammar (anchoring, `..`, a trailing slash) answers a need no reader has: every attested keep-list member is a root child, and a consumer that keeps nested scaffolding names the root directory holding it, which the wipe keeps whole.
 
-**So scratch protects nothing, and a session holding verified-but-uncommitted
-work there holds one copy.** The wipe is the far end of it; the near end is that
-a three-way merge can drop a scratch artifact mid-iteration with no conflict to
-notice, because the file is outside git's view entirely. Between the two, a patch
-or an analyzer a session has *verified* and parked in scratch has no second copy
-unless the session makes one, and the only two that exist are a commit and a
-stash. Stated here rather than left to a session's judgment because the
-disposable-by-definition rule above is exactly what invites parking work there —
-the rule is sound and its corollary is not obvious from it.
+**So scratch protects nothing, and a session holding verified-but-uncommitted work there holds one copy.** The wipe is the far end of it; the near end is that a three-way merge can drop a scratch artifact mid-iteration with no conflict to notice, because the file is outside git's view entirely. Between the two, a patch or an analyzer a session has *verified* and parked in scratch has no second copy unless the session makes one, and the only two that exist are a commit and a stash. Stated here rather than left to a session's judgment because the disposable-by-definition rule above is exactly what invites parking work there — the rule is sound and its corollary is not obvious from it.
 
-`.gitkeep` is a **kit invariant, not configuration** — the consumer cannot unset
-it. The kit must not delete a file the consumer tracks: doing so removes a
-tracked file at the boundary and dirties the tree at the very moment the
-first-stage session commits the reset. The exemption is *not* about the directory
-surviving (the tool `mkdir -p`s the scratch dir, and the wipe removes members,
-not the dir); it is recorded with its real reason so a later reader does not
-retire it as redundant, and it is generic-consumer mechanism rather than a fact
-about any one checkout — a consumer that gitignores its scratch dir wholesale
-never exercises it. Shipping the exemption as `LIFECYCLE_KIT_BOUNDARY_PRESERVE`'s
-*default* is **ruled out**: a defaulted bash array is replaced, not merged, when a
-consumer assigns it, so protection would decrease as configuration increases and
-any consumer setting that knob for its own reasons would silently lose the
-exemption. A
-git-aware "spare any tracked file" rule is **ruled out** too — it makes
-filesystem behavior git-dependent for one case, and it would spare any tracked
-file parked in scratch, re-opening the accumulation the wipe exists to close.
-**The invariant's honest limit follows the anchoring:** a consumer tracking a
-`.gitkeep` *below* the scratch root loses it at the boundary unless it names that
-root child on the keep-list, which is the declared route.
+`.gitkeep` is a **kit invariant, not configuration** — the consumer cannot unset it. The kit must not delete a file the consumer tracks: doing so removes a tracked file at the boundary and dirties the tree at the very moment the first-stage session commits the reset. The exemption is *not* about the directory surviving (the tool `mkdir -p`s the scratch dir, and the wipe removes members, not the dir); it is recorded with its real reason so a later reader does not retire it as redundant, and it is generic-consumer mechanism rather than a fact about any one checkout — a consumer that gitignores its scratch dir wholesale never exercises it. Shipping the exemption as `LIFECYCLE_KIT_BOUNDARY_PRESERVE`'s *default* is **ruled out**: a defaulted bash array is replaced, not merged, when a consumer assigns it, so protection would decrease as configuration increases and any consumer setting that knob for its own reasons would silently lose the exemption. A git-aware "spare any tracked file" rule is **ruled out** too — it makes filesystem behavior git-dependent for one case, and it would spare any tracked file parked in scratch, re-opening the accumulation the wipe exists to close. **The invariant's honest limit follows the anchoring:** a consumer tracking a `.gitkeep` *below* the scratch root loses it at the boundary unless it names that root child on the keep-list, which is the declared route.
 
-**The lead journal is the second kit invariant, and it is a scalar knob for
-exactly the reason `.gitkeep` is not a default.** A lead session is live *at* the
-boundary — it files a boundary judgment there for the entering session's intake
-(§templates/lead.md) — so its journal has a live session's lifetime rather than
-the iteration's, and the kit that instructs a lead to store state in this
-directory must not be the thing that deletes it. The replaced-not-merged
-argument above applies unchanged and with an attested instance behind it: this
-project's array had to name the journal by hand, after a loss, and any adopter
-assigning the array for their own reasons would silently drop it again. A
-**scalar** default has no such failure mode — an assignment overrides one value
-and cannot drop a second it never mentioned — so the same reasoning that made
-`.gitkeep` an invariant makes this one, and `LIFECYCLE_KIT_LEAD_JOURNAL_FILE`
-exists only so a consumer who renames the file can say so.
+**The lead journal is the second kit invariant, and it is a scalar knob for exactly the reason `.gitkeep` is not a default.** A lead session is live *at* the boundary — it files a boundary judgment there for the entering session's intake (§templates/lead.md) — so its journal has a live session's lifetime rather than the iteration's, and the kit that instructs a lead to store state in this directory must not be the thing that deletes it. The replaced-not-merged argument above applies unchanged and with an attested instance behind it: this project's array had to name the journal by hand, after a loss, and any adopter assigning the array for their own reasons would silently drop it again. A **scalar** default has no such failure mode — an assignment overrides one value and cannot drop a second it never mentioned — so the same reasoning that made `.gitkeep` an invariant makes this one, and `LIFECYCLE_KIT_LEAD_JOURNAL_FILE` exists only so a consumer who renames the file can say so.
 
-**Preserving is not draining, so the boundary entry also reports an undisposed
-journal.** When the lead journal exists, the boundary entry splits it into segments at its
-`## lead-journal opened after <key>` headings (the `--open-lead-journal` paragraph below) and compares each key
-with the **boundary key**: fields 2 through the last of the state file's last stamp *before
-this entry wrote*, or `none`. The **last** segment is **live** when its heading's key equals
-the boundary key. That segment was opened after the stamp this boundary closes over, so it
-belongs to the lead dispatching this very entry. Every other segment is **prior**. Each prior
-segment whose last non-empty line is not the disposition mark `DISPOSED` is reported: the
-advisory prints that segment's `## ` headings, its own opening heading first, and **proceeds**.
-A journal with no opening heading is a single prior segment, which is exactly the whole-file
-test. The boundary key is read before the reset truncates the state file, because the truncate
-removes the stamp the key names. This is the survey record's read trigger reused
-rather than reinvented (§The survey record) — the same print over a different
-file, headings and never findings. The mark itself is a presence marker on the
-`DONE` marker's precedent, produced by the lead at its close
-(§templates/lead.md) and carrying no date and no author, because no reader would
-branch on either. **A refusal is declined, and the ground is the discriminator
-that separates this file from the gap inbox.** The gap inbox refuses at a
-close-skipped boundary because its bullets are *drainable by the entering
-session* — they are queue-shaped, and the entering first stage may write the
-queue. A lead journal holds another session's working prose, and the entering
-session cannot discharge a disposition it does not hold the context to judge; a
-refusal it could clear only by deleting the file would train deletion of the
-very artifact the invariant protects. So the boundary makes the state **loud**
-and never blocking. **Its honest limit:** the advisory can be read and ignored,
-and nothing here forces the lead's disposition step. What it buys is that the
-undisposed state stops being silent — the attested failure being three findings
-that survived only because the operator happened to ask. The live exemption trusts the heading.
-A lead that opens its journal by hand, or not at all, gets the whole-file test and the false
-advisory with it, and a hand-written heading with a wrong key reads as prior. That is the safe
-direction.
+**Preserving is not draining, so the boundary entry also reports an undisposed journal.** When the lead journal exists, the boundary entry splits it into segments at its `## lead-journal opened after <key>` headings (the `--open-lead-journal` paragraph below) and compares each key with the **boundary key**: fields 2 through the last of the state file's last stamp *before this entry wrote*, or `none`. The **last** segment is **live** when its heading's key equals the boundary key. That segment was opened after the stamp this boundary closes over, so it belongs to the lead dispatching this very entry. Every other segment is **prior**. Each prior segment whose last non-empty line is not the disposition mark `DISPOSED` is reported: the advisory prints that segment's `## ` headings, its own opening heading first, and **proceeds**. A journal with no opening heading is a single prior segment, which is exactly the whole-file test. The boundary key is read before the reset truncates the state file, because the truncate removes the stamp the key names. This is the survey record's read trigger reused rather than reinvented (§The survey record) — the same print over a different file, headings and never findings. The mark itself is a presence marker on the `DONE` marker's precedent, produced by the lead at its close (§templates/lead.md) and carrying no date and no author, because no reader would branch on either. **A refusal is declined, and the ground is the discriminator that separates this file from the gap inbox.** The gap inbox refuses at a close-skipped boundary because its bullets are *drainable by the entering session* — they are queue-shaped, and the entering first stage may write the queue. A lead journal holds another session's working prose, and the entering session cannot discharge a disposition it does not hold the context to judge; a refusal it could clear only by deleting the file would train deletion of the very artifact the invariant protects. So the boundary makes the state **loud** and never blocking. **Its honest limit:** the advisory can be read and ignored, and nothing here forces the lead's disposition step. What it buys is that the undisposed state stops being silent — the attested failure being three findings that survived only because the operator happened to ask. The live exemption trusts the heading. A lead that opens its journal by hand, or not at all, gets the whole-file test and the false advisory with it, and a hand-written heading with a wrong key reads as prior. That is the safe direction.
 
-The scratch dir has a **second reclaimer, and the two do not overlap.**
-context-kit's session-context hook sweeps the same directory at *every* session
-start, age-guarded precisely so a concurrent same-checkout session's in-flight
-scratch survives (context-kit/SPEC.md §The session-context hook). The boundary
-wipe is deliberately **not** age-guarded: it fires once, at the iteration
-transition, where the only scratch a consumer means to carry across is by
-definition named in `LIFECYCLE_KIT_BOUNDARY_PRESERVE` — an age guard there would
-leave the previous
-iteration's fresh residue behind, which is the whole thing being reclaimed. Two
-triggers, two postures, one directory; neither mechanism reads the other.
+The scratch dir has a **second reclaimer, and the two do not overlap.** context-kit's session-context hook sweeps the same directory at *every* session start, age-guarded precisely so a concurrent same-checkout session's in-flight scratch survives (context-kit/SPEC.md §The session-context hook). The boundary wipe is deliberately **not** age-guarded: it fires once, at the iteration transition, where the only scratch a consumer means to carry across is by definition named in `LIFECYCLE_KIT_BOUNDARY_PRESERVE` — an age guard there would leave the previous iteration's fresh residue behind, which is the whole thing being reclaimed. Two triggers, two postures, one directory; neither mechanism reads the other.
 
-The boundary entry also
-**refuses outright when `## Lessons Learned` is non-empty** (exit 1, the
-untriaged entries printed, nothing written — the same refusal contract as the
-built-in pre-flight): an untriaged lesson must not cross into the next
-iteration, so no `[attend]` injection (queue-kit §The queue-index arm) can
-outlive the iteration that filed it. Its **gap-inbox check
-(`LIFECYCLE_KIT_GAP_INBOX_FILE`) is one detector with two dispositions**
-(§The committed gap inbox owns the design): it fires on any bullet, then reads
-the closing-stage predicate to choose. A **close-skipped** boundary
-refuses on the same contract as the Lessons check, so a mid-iteration gap the
-close skill did not drain cannot cross untriaged; a **post-close** one admits
-the entry and prints the bullets as a stderr advisory naming them the entering
-stage's intake, because no stage of the closing iteration is coming back for
-them. An absent inbox has no bullets and passes either way.
-**The survey record, its neighbour in the boundary reset, deliberately does
-not refuse** (§The survey record): it is truncated like any built-in member, and
-a non-empty one is never a blocker, because a survey owes nobody a disposition —
-it is scratch whose whole lifetime was the iteration just ending. The two
-surfaces sit one line apart in this tool with opposite semantics, so the
-asymmetry is stated rather than left to be inferred. The entry additionally
-carries the record's **read trigger**: when the record is non-empty the report
-prints its `## ` headings — the questions the iteration's prior surveys answered,
-never their findings, since printing a possibly-stale judgment ahead of its
-witness is the failure the witness exists to prevent. It rides the tool every
-stage already invokes as its first step, so it adds no invocation point and no
-schedule, and it lands at the one moment a stage session is guaranteed to be
-looking.
+The boundary entry also **refuses outright when `## Lessons Learned` is non-empty** (exit 1, the untriaged entries printed, nothing written — the same refusal contract as the built-in pre-flight): an untriaged lesson must not cross into the next iteration, so no `[attend]` injection (queue-kit §The queue-index arm) can outlive the iteration that filed it. Its **gap-inbox check (`LIFECYCLE_KIT_GAP_INBOX_FILE`) is one detector with two dispositions** (§The committed gap inbox owns the design): it fires on any bullet, then reads the closing-stage predicate to choose. A **close-skipped** boundary refuses on the same contract as the Lessons check, so a mid-iteration gap the close skill did not drain cannot cross untriaged; a **post-close** one admits the entry and prints the bullets as a stderr advisory naming them the entering stage's intake, because no stage of the closing iteration is coming back for them. An absent inbox has no bullets and passes either way. **The survey record, its neighbour in the boundary reset, deliberately does not refuse** (§The survey record): it is truncated like any built-in member, and a non-empty one is never a blocker, because a survey owes nobody a disposition — it is scratch whose whole lifetime was the iteration just ending. The two surfaces sit one line apart in this tool with opposite semantics, so the asymmetry is stated rather than left to be inferred. The entry additionally carries the record's **read trigger**: when the record is non-empty the report prints its `## ` headings — the questions the iteration's prior surveys answered, never their findings, since printing a possibly-stale judgment ahead of its witness is the failure the witness exists to prevent. It rides the tool every stage already invokes as its first step, so it adds no invocation point and no schedule, and it lands at the one moment a stage session is guaranteed to be looking.
 
-The boundary entry also **refuses when any linked worktree still stands** (exit
-1, each path printed, nothing written — the same refusal contract as the two
-above), gated by `LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK`. The predicate is
-deliberately a property of the boundary rather than a path: **at an iteration
-boundary no linked worktree should be live**, an in-flight dispatch being
-something that must not straddle a boundary and everything else being residue.
-So it fires on every entry of `git worktree list` beyond the main checkout — a
-harness's isolated-agent tree, any future producer — and no knob names a
-residue directory, because a kit default spelling one
-harness's layout would publish it. It is read off `git worktree list` and
-**never off `git status`**: a gitignored worktree leaves the status clean while
-it still stands, so a status-derived check reports success on exactly the state
-it exists to catch. `--simulate` relays the would-be refusal the way it does for
-lessons, and a tree that is not a git checkout at all skips the check rather than
-failing on it.
+The boundary entry also **refuses when any linked worktree still stands** (exit 1, each path printed, nothing written — the same refusal contract as the two above), gated by `LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK`. The predicate is deliberately a property of the boundary rather than a path: **at an iteration boundary no linked worktree should be live**, an in-flight dispatch being something that must not straddle a boundary and everything else being residue. So it fires on every entry of `git worktree list` beyond the main checkout — a harness's isolated-agent tree, any future producer — and no knob names a residue directory, because a kit default spelling one harness's layout would publish it. It is read off `git worktree list` and **never off `git status`**: a gitignored worktree leaves the status clean while it still stands, so a status-derived check reports success on exactly the state it exists to catch. `--simulate` relays the would-be refusal the way it does for lessons, and a tree that is not a git checkout at all skips the check rather than failing on it.
 
-**Each linked worktree carries a liveness class, and the signal is git's own
-rather than one this kit invents.** A worktree held by a live process is
-`locked`, and `git worktree list --porcelain` prints that lock's **reason** —
-which, for at least one harness, is a liveness record naming a **pid** and that
-process's **start time**; the same string sits on disk at
-`.git/worktrees/<name>/locked`. Measured rather than assumed, and re-measured at
-each stage that rested on it: the start field equals that process's own
-`/proc/<pid>/stat` field 22, so the reason carries a PID-reuse guard rather than
-decoration — a record strictly richer than the `pid=<n> run=<key>` grammar
-evidence-kit reads for backgrounded shell producers
-(evidence-kit/SPEC.md §check-producer-liveness). The reap that had no designable
-mechanism now has one, and nothing about the signal is minted here.
+**Each linked worktree carries a liveness class, and the signal is git's own rather than one this kit invents.** A worktree held by a live process is `locked`, and `git worktree list --porcelain` prints that lock's **reason** — which, for at least one harness, is a liveness record naming a **pid** and that process's **start time**; the same string sits on disk at `.git/worktrees/<name>/locked`. Measured rather than assumed, and re-measured at each stage that rested on it: the start field equals that process's own `/proc/<pid>/stat` field 22, so the reason carries a PID-reuse guard rather than decoration — a record strictly richer than the `pid=<n> run=<key>` grammar evidence-kit reads for backgrounded shell producers (evidence-kit/SPEC.md §check-producer-liveness). The reap that had no designable mechanism now has one, and nothing about the signal is minted here.
 
-**The reason's format is consumer vocabulary, taking the same disposition the
-residue directory takes one paragraph up.**
-`LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` is a POSIX ERE with exactly one capture
-group in the admitted shape (§Layout and configuration), matched against a lock reason, the group being the pid that consumer's
-harness writes there — **which this kit does not take for the holder's**. A
-harness may lock with the pid of the process *supervising* its agents rather
-than an agent's own, and no property of the reason distinguishes the two, so the
-class is a statement about the captured pid and never about the holder. The
-kit's default is **empty**, so an unconfigured consumer classifies nothing and
-sees exactly the behaviour above. The kit ships the mechanism — read the
-porcelain, apply the pattern, probe the pid — and the consumer ships the
-pattern, the same split `check-graph` takes over its vocabulary
-(gate-sdk/SPEC.md §The provenance seam).
+**The reason's format is consumer vocabulary, taking the same disposition the residue directory takes one paragraph up.** `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` is a POSIX ERE with exactly one capture group in the admitted shape (§Layout and configuration), matched against a lock reason, the group being the pid that consumer's harness writes there — **which this kit does not take for the holder's**. A harness may lock with the pid of the process *supervising* its agents rather than an agent's own, and no property of the reason distinguishes the two, so the class is a statement about the captured pid and never about the holder. The kit's default is **empty**, so an unconfigured consumer classifies nothing and sees exactly the behaviour above. The kit ships the mechanism — read the porcelain, apply the pattern, probe the pid — and the consumer ships the pattern, the same split `check-graph` takes over its vocabulary (gate-sdk/SPEC.md §The provenance seam).
 
 | observation | class |
 | --- | --- |
@@ -2785,2741 +583,502 @@ pattern, the same split `check-graph` takes over its vocabulary
 | locked, reason does not match the pattern | **unclassified** |
 | not locked at all | **orphaned** |
 
-With the pattern unset every linked worktree is **unclassified**, an unlocked one
-included: an empty pattern reads as *no classification is configured* rather than
-as a pattern matching everything, which is what keeps the default additive.
+With the pattern unset every linked worktree is **unclassified**, an unlocked one included: an empty pattern reads as *no classification is configured* rather than as a pattern matching everything, which is what keeps the default additive.
 
-**Liveness is `ek_pid_alive` and never a second predicate** — the probe the
-`.run` path already uses, so how liveness is decided stays settled in one place
-(evidence-kit/SPEC.md §check-producer-liveness). The predicate is **linked rather
-than sourced**: the compiled twin carries the same pid grammar and the same
-fail-closed reading of an unanswerable probe, so the classification table crosses
-unchanged. What changed with the port is the *shape* of the dependency, and the
-change is a narrowing. The conditional source this arm used to perform — reaching
-for evidence-kit's library only when the lock pattern was non-empty, so an
-unconfigured consumer owed no second vendored kit — has no counterpart here, and
-neither does the exit-2 arm for a configured pattern with that library
-unreachable: that refusal has no cause it could fire on.
+**Liveness is `ek_pid_alive` and never a second predicate** — the probe the `.run` path already uses, so how liveness is decided stays settled in one place (evidence-kit/SPEC.md §check-producer-liveness). The predicate is **linked rather than sourced**: the compiled twin carries the same pid grammar and the same fail-closed reading of an unanswerable probe, so the classification table crosses unchanged. What changed with the port is the *shape* of the dependency, and the change is a narrowing. The conditional source this arm used to perform — reaching for evidence-kit's library only when the lock pattern was non-empty, so an unconfigured consumer owed no second vendored kit — has no counterpart here, and neither does the exit-2 arm for a configured pattern with that library unreachable: that refusal has no cause it could fire on.
 
-**The lock pattern is consumer configuration, captured by the engine's one-group
-item.** This classification turns on the *captured* pid, and the capture is
-gate-sdk/SPEC.md §The POSIX ERE matcher's one-group item, compiled once per run —
-one interpreter judges and matches the pattern, and its agreement with bash's
-`=~`, the matcher this tool used before the port, is held by that item's
-differential oracle rather than asserted at a cut. That the pattern has the
-admitted shape is the table validator's fail-closed config check (§The
-stage-machine adapters), so the classifier is never reached with a pattern whose
-capture cannot be read.
+**The lock pattern is consumer configuration, captured by the engine's one-group item.** This classification turns on the *captured* pid, and the capture is gate-sdk/SPEC.md §The POSIX ERE matcher's one-group item, compiled once per run — one interpreter judges and matches the pattern, and its agreement with bash's `=~`, the matcher this tool used before the port, is held by that item's differential oracle rather than asserted at a cut. That the pattern has the admitted shape is the table validator's fail-closed config check (§The stage-machine adapters), so the classifier is never reached with a pattern whose capture cannot be read.
 
-**One capture group and not two.** The start-time field is matched and
-deliberately not captured. Parity is the first ground — the `.run` record grammar
-carries no start-time guard either, so capturing one here would make the worktree
-path stricter than the record path for no stated reason — and the error direction
-is the decisive one: a stranded worktree whose pid has been reused classifies
-**live**, and a live classification refuses, authorising nothing by itself.
-Dropping the guard errs toward refusing, which is the direction a
-fail-closed boundary wants. That safety is a function of what **reads** the
-class, so the strengthening is filed rather than banked — the moment anything
-reaps on the classification instead of printing it, the argument inverts.
+**One capture group and not two.** The start-time field is matched and deliberately not captured. Parity is the first ground — the `.run` record grammar carries no start-time guard either, so capturing one here would make the worktree path stricter than the record path for no stated reason — and the error direction is the decisive one: a stranded worktree whose pid has been reused classifies **live**, and a live classification refuses, authorising nothing by itself. Dropping the guard errs toward refusing, which is the direction a fail-closed boundary wants. That safety is a function of what **reads** the class, so the strengthening is filed rather than banked — the moment anything reaps on the classification instead of printing it, the argument inverts.
 
-**That error-direction ground holds only while the captured pid is the
-holder's**, and it is stated with the condition because the condition is
-falsifiable and does fail: a pattern can match a reason whose pid names the
-process *supervising* a harness's agents, and then every locked path reads
-**live** for as long as the entering session runs, so *errs toward refusing*
-reads *refuses until the reader gives up*. The classification is untouched by
-this — pid reuse still errs live, still the wanted direction — and so is the
-capture-group decision, since a start-time guard would not tell a supervisor's
-pid from a holder's either. What it bounds is the **reading** of a live class,
-which is why that class's guidance above is a loss-gated remedy rather than a
-wait. A boundary can be fail-closed against losing work and wide open to
-deadlock at once, and only the first of those is bought by refusing.
+**That error-direction ground holds only while the captured pid is the holder's**, and it is stated with the condition because the condition is falsifiable and does fail: a pattern can match a reason whose pid names the process *supervising* a harness's agents, and then every locked path reads **live** for as long as the entering session runs, so *errs toward refusing* reads *refuses until the reader gives up*. The classification is untouched by this — pid reuse still errs live, still the wanted direction — and so is the capture-group decision, since a start-time guard would not tell a supervisor's pid from a holder's either. What it bounds is the **reading** of a live class, which is why that class's guidance above is a loss-gated remedy rather than a wait. A boundary can be fail-closed against losing work and wide open to deadlock at once, and only the first of those is bought by refusing.
 
-**The refusal set does not narrow; the class changes the remedy.** Both classes
-still refuse — a live worktree because an in-flight dispatch must not straddle
-the boundary, an orphaned one because residue must be cleared before it is
-crossed — and the refusal prints one line per path carrying its class:
+**The refusal set does not narrow; the class changes the remedy.** Both classes still refuse — a live worktree because an in-flight dispatch must not straddle the boundary, an orphaned one because residue must be cleared before it is crossed — and the refusal prints one line per path carrying its class:
 
-- **live** — the pid the lock reason names is printed beside the loss report,
-  and the guidance leads with what a live reading does **not** establish: that
-  an agent still holds the path. Where the configured pattern captures the pid
-  of a process supervising a harness's agents rather than an agent's own, that
-  pid outlives every child and stays alive for as long as the entering session,
-  so a bare *wait for the named pid* terminates only when the session that is
-  waiting exits — a deadlock wearing a conservative refusal's clothes, and the
-  reason this class's guidance is not that sentence. The holder is established
-  from the dispatch the session knows is in flight; where none is, the path is
-  residue and takes the same loss-gated reap the other classes take — **unlock,
-  then an unforced `remove`, then the branch ref**. A force-removal is still
-  actively wrong here and is still not offered, and the two halves of the guard
-  are stated apart because they are not the same guard: an unforced `remove`
-  refuses on its own on a modified or untracked file, which is git's and needs
-  no classification, while a *clean* worktree whose branch carries commits
-  removes silently and the branch delete then takes those commits — so the
-  commit half is carried by the loss report alone, which is why this class's
-  remedy is gated on that report saying **lossless** rather than on the absence
-  of a git complaint. Measured rather than reasoned: the unforced remove exits 0
-  on that clean-but-unmerged path.
-- **orphaned** — the holder is gone, so the lock states a fact that has become
-  false. This is the class force-removal exists for and it is named only here.
-  Git requires **`--force` twice** to remove a *locked* worktree; once suffices
-  only for an unlocked dirty one, and the single-force spelling this guidance
-  used to carry was wrong for exactly the class it was aimed at.
-- **unclassified** — today's reap guidance verbatim, which is also the whole
-  behaviour an unconfigured consumer sees.
+- **live** — the pid the lock reason names is printed beside the loss report, and the guidance leads with what a live reading does **not** establish: that an agent still holds the path. Where the configured pattern captures the pid of a process supervising a harness's agents rather than an agent's own, that pid outlives every child and stays alive for as long as the entering session, so a bare *wait for the named pid* terminates only when the session that is waiting exits — a deadlock wearing a conservative refusal's clothes, and the reason this class's guidance is not that sentence. The holder is established from the dispatch the session knows is in flight; where none is, the path is residue and takes the same loss-gated reap the other classes take — **unlock, then an unforced `remove`, then the branch ref**. A force-removal is still actively wrong here and is still not offered, and the two halves of the guard are stated apart because they are not the same guard: an unforced `remove` refuses on its own on a modified or untracked file, which is git's and needs no classification, while a *clean* worktree whose branch carries commits removes silently and the branch delete then takes those commits — so the commit half is carried by the loss report alone, which is why this class's remedy is gated on that report saying **lossless** rather than on the absence of a git complaint. Measured rather than reasoned: the unforced remove exits 0 on that clean-but-unmerged path.
+- **orphaned** — the holder is gone, so the lock states a fact that has become false. This is the class force-removal exists for and it is named only here. Git requires **`--force` twice** to remove a *locked* worktree; once suffices only for an unlocked dirty one, and the single-force spelling this guidance used to carry was wrong for exactly the class it was aimed at.
+- **unclassified** — today's reap guidance verbatim, which is also the whole behaviour an unconfigured consumer sees.
 
-**The reap stays a session act, on a ground the experiment did not discharge.**
-The earlier ground — that this kit does not remove a directory whose liveness it
-cannot establish — is **retired**, liveness now being establishable. What stands
-in its place is untouched by that discharge: a worktree can hold commits existing
-nowhere else, so a wipe is destructive rather than merely wasteful. Liveness
-answers *is anyone working here*; it does not answer *would removing this lose
-anything*. What was missing at every attested firing was in any case not a reap
-but anything that *told* a session there was residue.
+**The reap stays a session act, on a ground the experiment did not discharge.** The earlier ground — that this kit does not remove a directory whose liveness it cannot establish — is **retired**, liveness now being establishable. What stands in its place is untouched by that discharge: a worktree can hold commits existing nowhere else, so a wipe is destructive rather than merely wasteful. Liveness answers *is anyone working here*; it does not answer *would removing this lose anything*. What was missing at every attested firing was in any case not a reap but anything that *told* a session there was residue.
 
-**The loss question is answered mechanically rather than left to the session.**
-For every path — the live class included, since its guidance turns on the same
-two facts — the refusal reports two facts read at the moment of
-refusal — whether the worktree's tree is dirty, and how many commits its `HEAD`
-carries that are unreachable from the main checkout's `HEAD` — and says so
-plainly when a path is clean **and** commitless, the case where removal is
-lossless by construction. Two git reads, no vendor vocabulary, and exactly the
-two facts a session used to re-derive by hand per path. This **replaces** a
-generic help line rather than sitting beside it: the retired line said harness
-residue is expected rather than evidence the child wrote, and that a hand-run
-`git status --porcelain` inside the worktree tells a stray write from an unfired
-reclamation — the same question, answered by hand, over the same paths. Keeping
-both would leave two lines teaching two ways to learn one fact, which is the
-residue this classification exists to remove, applied to its own refusal text.
+**The loss question is answered mechanically rather than left to the session.** For every path — the live class included, since its guidance turns on the same two facts — the refusal reports two facts read at the moment of refusal — whether the worktree's tree is dirty, and how many commits its `HEAD` carries that are unreachable from the main checkout's `HEAD` — and says so plainly when a path is clean **and** commitless, the case where removal is lossless by construction. Two git reads, no vendor vocabulary, and exactly the two facts a session used to re-derive by hand per path. This **replaces** a generic help line rather than sitting beside it: the retired line said harness residue is expected rather than evidence the child wrote, and that a hand-run `git status --porcelain` inside the worktree tells a stray write from an unfired reclamation — the same question, answered by hand, over the same paths. Keeping both would leave two lines teaching two ways to learn one fact, which is the residue this classification exists to remove, applied to its own refusal text.
 
-**Away from the boundary the same scan runs as an advisory.** Every non-boundary
-stage entry reads the worktrees and reports **orphaned paths only**, with the
-same loss report and the same reap guidance, as a stderr advisory that never
-refuses and never suppresses the stamp. It is safe only because the class
-exists: an unclassified mid-iteration report would name every in-flight
-dispatch, which mid-iteration is the **normal** state whenever a supervisor has
-work out, so it would either cry wolf at every entry or push a session to refuse
-legitimate work. A live worktree is reported nowhere here, there being nothing
-for the entering session to do about it, and with the pattern unset nothing is
-classifiable and no advisory is emitted at all.
+**Away from the boundary the same scan runs as an advisory.** Every non-boundary stage entry reads the worktrees and reports **orphaned paths only**, with the same loss report and the same reap guidance, as a stderr advisory that never refuses and never suppresses the stamp. It is safe only because the class exists: an unclassified mid-iteration report would name every in-flight dispatch, which mid-iteration is the **normal** state whenever a supervisor has work out, so it would either cry wolf at every entry or push a session to refuse legitimate work. A live worktree is reported nowhere here, there being nothing for the entering session to do about it, and with the pattern unset nothing is classifiable and no advisory is emitted at all.
 
-Two bounds are stated rather than banked, and the advisory moved one of them. The
-ceiling was **per iteration**, not per dispatch, with residue accumulating
-unseen inside an iteration; that blind spot is closed — residue is now surfaced
-at every stage entry — but **surfacing is not sweeping**, so accumulation within
-an iteration is visible rather than prevented and the reap remains a session act.
-The second bound is unchanged and still open: the check **cannot see a dangling
-branch ref** whose worktree is already gone — `git worktree list` does not report
-one, and the branch-name pattern that would is one harness's vocabulary — so the
-refusal's guidance names the branch half explicitly and the reaping session
-removes the ref with the directory. No gate reads any of this:
-`check-stage-entry`'s three
-assertions are unchanged and the boundary-precondition family has deliberately
-never had a gate sibling (§check-stage-entry states the predecessor-map omission
-for the same class of reason), and a gate over tree state cannot see a worktree
-at all. The grounds for refusing the earlier, sweep-shaped
-alternative — a reap in the dispatch guard — are delegation-kit's
-(delegation-kit/SPEC.md §The delegation model).
+Two bounds are stated rather than banked, and the advisory moved one of them. The ceiling was **per iteration**, not per dispatch, with residue accumulating unseen inside an iteration; that blind spot is closed — residue is now surfaced at every stage entry — but **surfacing is not sweeping**, so accumulation within an iteration is visible rather than prevented and the reap remains a session act. The second bound is unchanged and still open: the check **cannot see a dangling branch ref** whose worktree is already gone — `git worktree list` does not report one, and the branch-name pattern that would is one harness's vocabulary — so the refusal's guidance names the branch half explicitly and the reaping session removes the ref with the directory. No gate reads any of this: `check-stage-entry`'s three assertions are unchanged and the boundary-precondition family has deliberately never had a gate sibling (§check-stage-entry states the predecessor-map omission for the same class of reason), and a gate over tree state cannot see a worktree at all. The grounds for refusing the earlier, sweep-shaped alternative — a reap in the dispatch guard — are delegation-kit's (delegation-kit/SPEC.md §The delegation model).
 
-The boundary entry additionally **refuses
-when a `LIFECYCLE_KIT_BOUNDARY_REQUIRE` member lacks a disposition line for the
-closing iteration** (exit 1, nothing written, the same refusal contract): each
-member must carry a data line whose first token is the closing iteration's name,
-so a consumer wiring its release-disposition evidence here makes the close-stage
-disposition a mechanical boundary precondition rather than a decorative stamp.
-The check is **value-agnostic by construction** — it tests the first token only
-and never parses the value field — so a disposition grammar gaining a value (as
-it did with `deferred:<version>`, §templates/stages/) needs no
-widening here; recorded so a future value addition does not re-derive it.
-Fail-closed: a member that does not exist on disk is a refusal naming the path. A
-never-named (`—`) closing iteration has nothing to disposition and skips the
-check. `--simulate` relays the would-be refusal the way it does for lessons. The
-require-check runs after the Lessons refusal and before the boundary truncation,
-so a member that is also a `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` file is verified by
-the same boundary that then consumes it. **Pre-flight,
-not enforcement:** before writing, it runs the built-in `check-stage-entry`
-for the entered stage plus each `LIFECYCLE_KIT_ENTRY_PREFLIGHT` command whose
-stage key matches, and refuses
-(exit 1, findings printed, no writes) when any is red.
-The `LIFECYCLE_KIT_ENTRY_PREFLIGHT` half of that refusal is **conditional, and
-that half alone**: the one-shot valve below admits a single entry past it. A
-valve is not the `--force` flag this tool still refuses — it is armed in a
-committed file, carries a mandatory written reason, and valves one arm rather
-than the tool. The hand-off keeps the
-same `<queue> <state>` argv it always had, but **the temp file swapped sides**:
-because the cursor is the last stamp, the candidate transition now lives in a
-temp *state* file under `${GATE_SDK_TMP_DIR:-.tmp}` carrying the not-yet-written
-stamp, while the live queue passes through untouched (the boundary reset, which
-does rewrite the header, passes a temp queue as well). The refusal is advisory
-in the same sense the gate is at commit time (no `--force`, so the easy path is
-the compliant one — and the valve does not reinstate one: it is reached by
-committing a file, not by typing a word).
-`LIFECYCLE_KIT_ENTRY_PREFLIGHT` is a generic per-stage hook
-— no consumer surface is named in the kit; a downstream kit whose gate is the
-real precondition for a stage wires itself here (as evidence-kit's manifest gate
-does for close entry), turning a would-be pre-commit deadlock into a loud
-refusal at the entry. **Each entry's `<command>` is split on whitespace and
-exec'd as argv with no interpreter word prepended**, so the configured path rides
-its own exec bit: a consumer wiring a gate here configures the gate's *invocation*
-and not its declaration file, and a configured path that stops being executable —
-a member ported to a binary substrate leaving a data-file descriptor behind — is
-a stage-entry breakage rather than a stale reference.
-**The `<queue> <state>` pair above is appended to the end of that argv**, on
-every matching entry and whether or not the entry carries an argument of its own,
-which is what a configured front end has to be wired against. A command whose own
-grammar consumes its tail — a selector reading a list of names, say — takes the
-appended pair as two more of its own arguments, so such a front end needs a
-separator its grammar honours and the wiring is unconditional rather than
-per-entry. The kit fixes only that the pair is appended; the separator and the
-wiring belong to whatever the consumer configured.
+The boundary entry additionally **refuses when a `LIFECYCLE_KIT_BOUNDARY_REQUIRE` member lacks a disposition line for the closing iteration** (exit 1, nothing written, the same refusal contract): each member must carry a data line whose first token is the closing iteration's name, so a consumer wiring its release-disposition evidence here makes the close-stage disposition a mechanical boundary precondition rather than a decorative stamp. The check is **value-agnostic by construction** — it tests the first token only and never parses the value field — so a disposition grammar gaining a value (as it did with `deferred:<version>`, §templates/stages/) needs no widening here; recorded so a future value addition does not re-derive it. Fail-closed: a member that does not exist on disk is a refusal naming the path. A never-named (`—`) closing iteration has nothing to disposition and skips the check. `--simulate` relays the would-be refusal the way it does for lessons. The require-check runs after the Lessons refusal and before the boundary truncation, so a member that is also a `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` file is verified by the same boundary that then consumes it. **Pre-flight, not enforcement:** before writing, it runs the built-in `check-stage-entry` for the entered stage plus each `LIFECYCLE_KIT_ENTRY_PREFLIGHT` command whose stage key matches, and refuses (exit 1, findings printed, no writes) when any is red. The `LIFECYCLE_KIT_ENTRY_PREFLIGHT` half of that refusal is **conditional, and that half alone**: the one-shot valve below admits a single entry past it. A valve is not the `--force` flag this tool still refuses — it is armed in a committed file, carries a mandatory written reason, and valves one arm rather than the tool. The hand-off keeps the same `<queue> <state>` argv it always had, but **the temp file swapped sides**: because the cursor is the last stamp, the candidate transition now lives in a temp *state* file under `${GATE_SDK_TMP_DIR:-.tmp}` carrying the not-yet-written stamp, while the live queue passes through untouched (the boundary reset, which does rewrite the header, passes a temp queue as well). The refusal is advisory in the same sense the gate is at commit time (no `--force`, so the easy path is the compliant one — and the valve does not reinstate one: it is reached by committing a file, not by typing a word). `LIFECYCLE_KIT_ENTRY_PREFLIGHT` is a generic per-stage hook — no consumer surface is named in the kit; a downstream kit whose gate is the real precondition for a stage wires itself here (as evidence-kit's manifest gate does for close entry), turning a would-be pre-commit deadlock into a loud refusal at the entry. **Each entry's `<command>` is split on whitespace and exec'd as argv with no interpreter word prepended**, so the configured path rides its own exec bit: a consumer wiring a gate here configures the gate's *invocation* and not its declaration file, and a configured path that stops being executable — a member ported to a binary substrate leaving a data-file descriptor behind — is a stage-entry breakage rather than a stale reference. **The `<queue> <state>` pair above is appended to the end of that argv**, on every matching entry and whether or not the entry carries an argument of its own, which is what a configured front end has to be wired against. A command whose own grammar consumes its tail — a selector reading a list of names, say — takes the appended pair as two more of its own arguments, so such a front end needs a separator its grammar honours and the wiring is unconditional rather than per-entry. The kit fixes only that the pair is appended; the separator and the wiring belong to whatever the consumer configured.
 
-**The one-shot pre-flight valve admits one entry past a refusing pre-flight
-command.** `LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE` names a committed **valve
-ledger**; its default is the empty string, so no valve exists, every pre-flight
-refusal is final, and an unconfigured consumer sees exactly the behaviour above.
-The ledger's grammar is the one this kit's evidence files already use — a
-`# contract:` pointer header, then one data line per arming:
+**The one-shot pre-flight valve admits one entry past a refusing pre-flight command.** `LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE` names a committed **valve ledger**; its default is the empty string, so no valve exists, every pre-flight refusal is final, and an unconfigured consumer sees exactly the behaviour above. The ledger's grammar is the one this kit's evidence files already use — a `# contract:` pointer header, then one data line per arming:
 
 ```
 <iteration> <stage> armed|used <reason...>
 ```
 
-`<reason>` runs to end of line and is **mandatory**. It is what makes the
-one-shot a documented one, so a line without one is not a weaker arming; it is
-not an arming. It is free text authored by a consumer's own session: the kit
-specifies that it must be non-empty and never what it may say. **There is no
-date field, and its absence is a decision** — the ledger is truncated at the
-boundary, so every line belongs to one iteration by construction and the state
-file already dates that iteration's stages; a date here would be a second,
-drift-capable copy of a fact another surface owns.
-The iteration matched is the **queue header's**, not the stamp's:
-the ledger is truncated at the iteration boundary, so its lines belong to the
-iteration currently open, while the first stage's stamp carries the unnamed
-placeholder rather than a name any arming could have been written against.
+`<reason>` runs to end of line and is **mandatory**. It is what makes the one-shot a documented one, so a line without one is not a weaker arming; it is not an arming. It is free text authored by a consumer's own session: the kit specifies that it must be non-empty and never what it may say. **There is no date field, and its absence is a decision** — the ledger is truncated at the boundary, so every line belongs to one iteration by construction and the state file already dates that iteration's stages; a date here would be a second, drift-capable copy of a fact another surface owns. The iteration matched is the **queue header's**, not the stamp's: the ledger is truncated at the iteration boundary, so its lines belong to the iteration currently open, while the first stage's stamp carries the unnamed placeholder rather than a name any arming could have been written against.
 
-When a `LIFECYCLE_KIT_ENTRY_PREFLIGHT` command refuses **and** the ledger carries
-an `armed` line for the entering iteration and stage, the entry is **admitted**
-instead of refused and that line's state token is rewritten `armed` → `used`.
-**The admission is loud**: the report relays the pre-flight command's own
-findings — the text the refusal would have printed — says the valve admitted
-them, prints the reason, and prints how many `used` lines this iteration already
-carried before this one. The entry then proceeds and stamps as normal.
+When a `LIFECYCLE_KIT_ENTRY_PREFLIGHT` command refuses **and** the ledger carries an `armed` line for the entering iteration and stage, the entry is **admitted** instead of refused and that line's state token is rewritten `armed` → `used`. **The admission is loud**: the report relays the pre-flight command's own findings — the text the refusal would have printed — says the valve admitted them, prints the reason, and prints how many `used` lines this iteration already carried before this one. The entry then proceeds and stamps as normal.
 
-**What the valve is for, stated in its own contract because the ruling makes the
-documentation part of the deliverable.** Exactly one deadlock: a stage whose
-entry pre-flight is refused by a precondition only a *later* stage can clear, so
-the stage chartered to clear it is the stage the pre-flight is refusing.
-**Reaching for it twice in one iteration is the failure rather than a supported
-mode** — a valve gets reached for whenever the refused stage is inconvenient, and
-that prediction is what this contract has to answer. What answers it is not a
-prohibition but a **count at the moment of the act**: the admission report prints
-this iteration's prior `used` count, so the second reach announces itself to the
-session taking it, in its own transcript, before it proceeds. That is the shape
-the predecessor-journal escape below already takes — an evadable assertion whose
-value is that the deviation becomes deliberate and written instead of silent, at
-the one moment someone is looking. The refusal's `help:` line therefore names the
-valve **and that single sanctioned cause together**, so it cannot read as a
-generic bypass.
+**What the valve is for, stated in its own contract because the ruling makes the documentation part of the deliverable.** Exactly one deadlock: a stage whose entry pre-flight is refused by a precondition only a *later* stage can clear, so the stage chartered to clear it is the stage the pre-flight is refusing. **Reaching for it twice in one iteration is the failure rather than a supported mode** — a valve gets reached for whenever the refused stage is inconvenient, and that prediction is what this contract has to answer. What answers it is not a prohibition but a **count at the moment of the act**: the admission report prints this iteration's prior `used` count, so the second reach announces itself to the session taking it, in its own transcript, before it proceeds. That is the shape the predecessor-journal escape below already takes — an evadable assertion whose value is that the deviation becomes deliberate and written instead of silent, at the one moment someone is looking. The refusal's `help:` line therefore names the valve **and that single sanctioned cause together**, so it cannot read as a generic bypass.
 
-**The honest limit is stated with it rather than left to be inferred from it.** A
-session can arm its own valve. The valve is bypassable in exactly the sense the
-journal escape is, and claiming otherwise would be a stronger claim than the
-evidence carries. What it buys is that a bypass leaves a committed artifact with
-a written reason, a named obligation on the closing stage (§templates/stages/),
-and a count that makes the second one visible.
+**The honest limit is stated with it rather than left to be inferred from it.** A session can arm its own valve. The valve is bypassable in exactly the sense the journal escape is, and claiming otherwise would be a stronger claim than the evidence carries. What it buys is that a bypass leaves a committed artifact with a written reason, a named obligation on the closing stage (§templates/stages/), and a count that makes the second one visible.
 
-**Four narrowings, each a consequence of an existing ruling rather than a
-carve-out.**
+**Four narrowings, each a consequence of an existing ruling rather than a carve-out.**
 
-- **This arm only.** The valve does not reach the built-in `check-stage-entry`
-  pre-flight (which asserts the state machine's own stamp-protocol invariants),
-  the predecessor-journal assertion (which has its own named escape below), or
-  any iteration-boundary refusal — the Lessons check, the gap-inbox check, the
-  linked-worktree check, `LIFECYCLE_KIT_BOUNDARY_REQUIRE` — each of which guards
-  against work leaking across an iteration boundary and each of which already
-  states a recovery. `LIFECYCLE_KIT_ENTRY_PREFLIGHT` is the **consumer-wired**
-  arm, and a consumer-wired precondition is the only one whose deadlock a
-  consumer can reach at all.
-- **One line per admission.** Only the **first** matching `armed` line is
-  consumed, and one entry consumes at most one however many of its stage's
-  pre-flight commands refused — the valve admits the *entry*, not a command. So
-  arming twice does not admit twice, and the second line is still there for the
-  closing stage to see.
-- **Iteration *and* stage must match.** An arming aimed at another stage or left
-  from another iteration never admits. Both halves are asserted even though the
-  boundary truncation should make the cross-iteration case unreachable, because
-  that truncation is a knob a consumer may decline to set, and an assertion
-  resting on another consumer's configuration is not an assertion.
-- **The idempotent no-op consumes nothing.** A re-entry whose stamp is already
-  the last line exits 0 before the pre-flight runs at all, so a crashed-and-
-  resumed session cannot spend a second valve line on the same transition.
+- **This arm only.** The valve does not reach the built-in `check-stage-entry` pre-flight (which asserts the state machine's own stamp-protocol invariants), the predecessor-journal assertion (which has its own named escape below), or any iteration-boundary refusal — the Lessons check, the gap-inbox check, the linked-worktree check, `LIFECYCLE_KIT_BOUNDARY_REQUIRE` — each of which guards against work leaking across an iteration boundary and each of which already states a recovery. `LIFECYCLE_KIT_ENTRY_PREFLIGHT` is the **consumer-wired** arm, and a consumer-wired precondition is the only one whose deadlock a consumer can reach at all.
+- **One line per admission.** Only the **first** matching `armed` line is consumed, and one entry consumes at most one however many of its stage's pre-flight commands refused — the valve admits the *entry*, not a command. So arming twice does not admit twice, and the second line is still there for the closing stage to see.
+- **Iteration *and* stage must match.** An arming aimed at another stage or left from another iteration never admits. Both halves are asserted even though the boundary truncation should make the cross-iteration case unreachable, because that truncation is a knob a consumer may decline to set, and an assertion resting on another consumer's configuration is not an assertion.
+- **The idempotent no-op consumes nothing.** A re-entry whose stamp is already the last line exits 0 before the pre-flight runs at all, so a crashed-and- resumed session cannot spend a second valve line on the same transition.
 
-**Two fail-closed refusals (exit 2, nothing written):** a data line with fewer
-than four whitespace-separated fields, and a state token that is neither `armed`
-nor `used`. A ledger that cannot be parsed makes *is it armed?* unanswerable, and
-**both** silent branches are wrong there — admitting hides a malformed arming,
-refusing hides a valid one. The ledger is read only where that question is
-actually asked, which is at a pre-flight refusal: parsing it at every entry would
-let a malformed ledger wedge entries that never needed a valve, a wider refusal
-than the fail-closed arm was ruled for.
+**Two fail-closed refusals (exit 2, nothing written):** a data line with fewer than four whitespace-separated fields, and a state token that is neither `armed` nor `used`. A ledger that cannot be parsed makes *is it armed?* unanswerable, and **both** silent branches are wrong there — admitting hides a malformed arming, refusing hides a valid one. The ledger is read only where that question is actually asked, which is at a pre-flight refusal: parsing it at every entry would let a malformed ledger wedge entries that never needed a valve, a wider refusal than the fail-closed arm was ruled for.
 
-**A configured path that does not exist is *not armed*, not an error**, because
-header-only is the ledger's resting state and requiring the file would oblige
-every consumer setting the knob to create one; the failure direction is then a
-refusal, which is the safe one. So that a typo'd path cannot masquerade as a
-never-armed valve, **the refusal message names the configured path** and says
-which of the two cases it is — absent, or present and carrying no matching
-arming.
+**A configured path that does not exist is *not armed*, not an error**, because header-only is the ledger's resting state and requiring the file would oblige every consumer setting the knob to create one; the failure direction is then a refusal, which is the safe one. So that a typo'd path cannot masquerade as a never-armed valve, **the refusal message names the configured path** and says which of the two cases it is — absent, or present and carrying no matching arming.
 
-**Two writers, and the split is contract.** The arming session writes every line
-(§templates/stages/); this tool writes **none** — it rewrites the state token of
-one line that already exists. So the ledger's line set is the arming session's
-alone and this tool can only ever narrow what is admissible, which is what makes
-a two-writer surface safe here. The rewrite rides the **write**, not the match:
-the boundary refusals run after the pre-flight loop, so an entry that matched an
-arming can still refuse, and a refused entry must neither report that it was
-admitted nor spend a line saying so.
+**Two writers, and the split is contract.** The arming session writes every line (§templates/stages/); this tool writes **none** — it rewrites the state token of one line that already exists. So the ledger's line set is the arming session's alone and this tool can only ever narrow what is admissible, which is what makes a two-writer surface safe here. The rewrite rides the **write**, not the match: the boundary refusals run after the pre-flight loop, so an entry that matched an arming can still refuse, and a refused entry must neither report that it was admitted nor spend a line saying so.
 
-**A consumer wiring the knob owes its ledger a `close-surface:` declaration**
-(§The close-surface roster). The ledger is *tracked*, so `check-close-surfaces`'s
-undeclared-surface arm — whose second source is the workflow directory's
-*gitignored* members — never reaches it, and undeclared it would simply not
-appear on the roster the closing stage's inbound-triage sweep recomputes. No
-`reclaim=` field is owed: that is a capture-tier member's obligation. The kit
-names no path here, the ledger's location being consumer configuration and a kit
-literal spelling one consumer's workflow-directory layout being the seam this
-knob's empty default already holds.
+**A consumer wiring the knob owes its ledger a `close-surface:` declaration** (§The close-surface roster). The ledger is *tracked*, so `check-close-surfaces`'s undeclared-surface arm — whose second source is the workflow directory's *gitignored* members — never reaches it, and undeclared it would simply not appear on the roster the closing stage's inbound-triage sweep recomputes. No `reclaim=` field is owed: that is a capture-tier member's obligation. The kit names no path here, the ledger's location being consumer configuration and a kit literal spelling one consumer's workflow-directory layout being the seam this knob's empty default already holds.
 
-**The tool opens the entering stage's journal and reports the path it wrote**,
-under the same `LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE` gate as the assertion below,
-so at the kit default a consumer who has not taken the feature gains no file. It
-writes the opening line — the stamp's own five fields, no new field anywhere —
-and prints the path in its report, which is the entering session's source for it
-and lets the stage template's last step name *the journal the entry tool named*
-rather than restate a knob-driven derivation on every stage surface
-(§templates/stages/). What this buys is that **the absence stops being an
-absence**: a session that writes nothing now leaves a file naming who owed it and
-when, so the escape below becomes an append under a header rather than a record
-invented from nothing. Three behaviours are pinned, each being a way to get it
-wrong:
+**The tool opens the entering stage's journal and reports the path it wrote**, under the same `LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE` gate as the assertion below, so at the kit default a consumer who has not taken the feature gains no file. It writes the opening line — the stamp's own five fields, no new field anywhere — and prints the path in its report, which is the entering session's source for it and lets the stage template's last step name *the journal the entry tool named* rather than restate a knob-driven derivation on every stage surface (§templates/stages/). What this buys is that **the absence stops being an absence**: a session that writes nothing now leaves a file naming who owed it and when, so the escape below becomes an append under a header rather than a record invented from nothing. Three behaviours are pinned, each being a way to get it wrong:
 
-- **It appends where a journal exists, and never overwrites.** A stage may run
-  several sessions and §The state machine rules they share one file, so a second
-  session's entry appends a heading naming itself — which mechanizes the
-  discriminator-belongs-in-a-heading rule that section states and a dispatcher
-  otherwise has to remember.
-- **It writes nothing under `--simulate`.** That mode's contract is that it runs
-  everything up to the write and writes nothing; a skeleton written there would
-  make a read-only probe perform a real state write.
-- **It writes after the boundary wipe, not before.** The first stage of an
-  iteration truncates the state file and then wipes the scratch dir; a skeleton
-  written ahead of that wipe is deleted by it, silently, and that entry would then
-  look like every firing of the absence the opener exists to remove.
+- **It appends where a journal exists, and never overwrites.** A stage may run several sessions and §The state machine rules they share one file, so a second session's entry appends a heading naming itself — which mechanizes the discriminator-belongs-in-a-heading rule that section states and a dispatcher otherwise has to remember.
+- **It writes nothing under `--simulate`.** That mode's contract is that it runs everything up to the write and writes nothing; a skeleton written there would make a read-only probe perform a real state write.
+- **It writes after the boundary wipe, not before.** The first stage of an iteration truncates the state file and then wipes the scratch dir; a skeleton written ahead of that wipe is deleted by it, silently, and that entry would then look like every firing of the absence the opener exists to remove.
 
-**The predecessor-journal assertion runs in that same pre-flight**, gated by
-`LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE` and defaulting off. At `1`, an entry
-refuses when the stage the cursor names left no journal at its derived path
-(§The state machine) — **exit 1, the expected path printed, nothing written**,
-the boundary-precondition family's contract, and `--simulate` relays the
-would-be refusal rather than taking it. Its inputs are both already read here:
-the cursor, and the pattern expanded against it. Three narrowings, each a
-consequence of an existing ruling rather than a carve-out:
+**The predecessor-journal assertion runs in that same pre-flight**, gated by `LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE` and defaulting off. At `1`, an entry refuses when the stage the cursor names left no journal at its derived path (§The state machine) — **exit 1, the expected path printed, nothing written**, the boundary-precondition family's contract, and `--simulate` relays the would-be refusal rather than taking it. Its inputs are both already read here: the cursor, and the pattern expanded against it. Three narrowings, each a consequence of an existing ruling rather than a carve-out:
 
-- **Existence and non-emptiness, never the `DONE` marker.** delegation-kit rules
-  the marker redundant wherever the supervisor consumed the agent's return, its
-  signal being reserved for a cold read. A stage entry is not a cold read — the
-  entering session exists *because* the previous stage returned — so asserting
-  the marker would mint an obligation its owning section already retires at
-  exactly this transition. Absent and empty are told apart in the message,
-  because they are different mistakes. **What non-emptiness means is restated on
-  a file the tool itself opens**: the predicate is that the journal carries a line
-  the opener did not write — neither blank nor an opening line, the two sharing
-  one spelling of that line's shape in the crate so writer and reader cannot
-  drift. This is the same assertion, not a wider one. Non-emptiness meant *the
-  owing session wrote something*; once the tool opens the file, a bare
-  non-emptiness test passes on every skeleton and asserts nothing at all. Read the
-  other way round it is the opener's own debt: a tool that opens a file owes the
-  assertion that reads it a way to tell its own bytes from a session's. The
-  message discriminates all three states it now earns — **absent** (this tool
-  never ran for that stage), **unwritten** (it ran and the session did not, whether
-  the file is empty or carries opening lines only), and **written**.
-- **The in-iteration predecessor only.** The boundary reset wipes the scratch dir
-  at the first stage's entry and `LIFECYCLE_KIT_BOUNDARY_PRESERVE` deliberately
-  does not keep **stage** journals, so the first stage of an iteration has no
-  predecessor journal by construction and is never asserted against. The
-  qualifier is load-bearing rather than pedantic: a *supervising* session's
-  journal is a legitimate keep-list member (§templates/lead.md) and is not a
-  stage journal, so keeping one leaves this assertion's construction untouched —
-  the bullet below is that same distinction reached from the other side.
-- **Stages only.** A supervising session's own journal is not a stage journal: it
-  has no stamp, so the cursor cannot name it, and a second roster to reach it is
-  a surface this assertion did not buy.
+- **Existence and non-emptiness, never the `DONE` marker.** delegation-kit rules the marker redundant wherever the supervisor consumed the agent's return, its signal being reserved for a cold read. A stage entry is not a cold read — the entering session exists *because* the previous stage returned — so asserting the marker would mint an obligation its owning section already retires at exactly this transition. Absent and empty are told apart in the message, because they are different mistakes. **What non-emptiness means is restated on a file the tool itself opens**: the predicate is that the journal carries a line the opener did not write — neither blank nor an opening line, the two sharing one spelling of that line's shape in the crate so writer and reader cannot drift. This is the same assertion, not a wider one. Non-emptiness meant *the owing session wrote something*; once the tool opens the file, a bare non-emptiness test passes on every skeleton and asserts nothing at all. Read the other way round it is the opener's own debt: a tool that opens a file owes the assertion that reads it a way to tell its own bytes from a session's. The message discriminates all three states it now earns — **absent** (this tool never ran for that stage), **unwritten** (it ran and the session did not, whether the file is empty or carries opening lines only), and **written**.
+- **The in-iteration predecessor only.** The boundary reset wipes the scratch dir at the first stage's entry and `LIFECYCLE_KIT_BOUNDARY_PRESERVE` deliberately does not keep **stage** journals, so the first stage of an iteration has no predecessor journal by construction and is never asserted against. The qualifier is load-bearing rather than pedantic: a *supervising* session's journal is a legitimate keep-list member (§templates/lead.md) and is not a stage journal, so keeping one leaves this assertion's construction untouched — the bullet below is that same distinction reached from the other side.
+- **Stages only.** A supervising session's own journal is not a stage journal: it has no stamp, so the cursor cannot name it, and a second roster to reach it is a surface this assertion did not buy.
 
-**The refusal is evadable, and saying so is the point rather than a caveat on
-it.** Its help text names one way forward — write the missing journal yourself,
-stating that the predecessor left none — and an oracle over an artifact the
-asserted-against session can itself create is bypassable by definition. What the
-mechanism buys is not that a journal exists; it is that its **absence becomes
-deliberate and written** instead of silent and unnoticed, which is the defect
-exactly: the finding this closes was not that a session refused to journal, it
-was that nobody knew one had not. A session that writes "the predecessor left
-none" has produced the recovery record the channel exists for, at the one moment
-someone is looking. The escape is also what keeps the refusal off the deadlock
-class: a refusal with no reachable exit would wedge the lifecycle behind a
-session that has already ended and cannot be asked to fix anything. The opener
-**strengthens** that ground rather than weakening it: where the file exists, its
-opening line already names the session that owed the journal and when, so the
-stand-in is an append under a header rather than a fabricated record — and the
-escape clears an unwritten journal exactly as it clears an absent one.
+**The refusal is evadable, and saying so is the point rather than a caveat on it.** Its help text names one way forward — write the missing journal yourself, stating that the predecessor left none — and an oracle over an artifact the asserted-against session can itself create is bypassable by definition. What the mechanism buys is not that a journal exists; it is that its **absence becomes deliberate and written** instead of silent and unnoticed, which is the defect exactly: the finding this closes was not that a session refused to journal, it was that nobody knew one had not. A session that writes "the predecessor left none" has produced the recovery record the channel exists for, at the one moment someone is looking. The escape is also what keeps the refusal off the deadlock class: a refusal with no reachable exit would wedge the lifecycle behind a session that has already ended and cannot be asked to fix anything. The opener **strengthens** that ground rather than weakening it: where the file exists, its opening line already names the session that owed the journal and when, so the stand-in is an append under a header rather than a fabricated record — and the escape clears an unwritten journal exactly as it clears an absent one.
 
-**Default `0`, and the switch is thrown at a boundary rather than mid-iteration.**
-`REQUIRE=1` asserts against the *predecessor*, so enabling it inside a running
-iteration lands it underneath stages already dispatched before the rule existed,
-and puts the first enforced firing inside an iteration rather than at its
-boundary — where a refusal costs one stage re-entry instead of a wedge. A rule
-whose first live firing needs its own escape has been scheduled badly rather than
-designed badly. **`--simulate <stage>` — the read-only preflight mode:**
-it runs everything a real entry runs up to the write — config load and stage
-validation, header parse, session-id derivation, the idempotence probe (a
-would-be no-op is reported as such and exits 0), the candidate-stamp temp
-state build, `check-stage-entry`, every matching `LIFECYCLE_KIT_ENTRY_PREFLIGHT`
-entry and — where one of those refuses — the valve lookup, which names the line
-a real entry would consume and the reason it carries, leaves the ledger
-byte-identical and holds the mode at exit 0 because the real entry would proceed;
-then the predecessor-journal assertion, and — at an iteration boundary — the
-Lessons check, the gap-inbox check, the linked-worktree check and every
-`LIFECYCLE_KIT_BOUNDARY_REQUIRE` member, in the order a real entry runs
-them; then it stops: no stamp, no boundary truncation, the temp files removed.
-That roster is stated in full because a roster that stops short of the refusals
-the code runs is read as a guarantee the mode does not give. Every output
-line is prefixed `enter-stage (simulate):` so a transcript can never read as
-a stamp. Exit 0 = the real entry would proceed (or no-op); exit 1 = it would
-refuse, with the refusing check's output relayed line-by-line; exit 2 =
-usage/config error, as a real entry.
+**Default `0`, and the switch is thrown at a boundary rather than mid-iteration.** `REQUIRE=1` asserts against the *predecessor*, so enabling it inside a running iteration lands it underneath stages already dispatched before the rule existed, and puts the first enforced firing inside an iteration rather than at its boundary — where a refusal costs one stage re-entry instead of a wedge. A rule whose first live firing needs its own escape has been scheduled badly rather than designed badly. **`--simulate <stage>` — the read-only preflight mode:** it runs everything a real entry runs up to the write — config load and stage validation, header parse, session-id derivation, the idempotence probe (a would-be no-op is reported as such and exits 0), the candidate-stamp temp state build, `check-stage-entry`, every matching `LIFECYCLE_KIT_ENTRY_PREFLIGHT` entry and — where one of those refuses — the valve lookup, which names the line a real entry would consume and the reason it carries, leaves the ledger byte-identical and holds the mode at exit 0 because the real entry would proceed; then the predecessor-journal assertion, and — at an iteration boundary — the Lessons check, the gap-inbox check, the linked-worktree check and every `LIFECYCLE_KIT_BOUNDARY_REQUIRE` member, in the order a real entry runs them; then it stops: no stamp, no boundary truncation, the temp files removed. That roster is stated in full because a roster that stops short of the refusals the code runs is read as a guarantee the mode does not give. Every output line is prefixed `enter-stage (simulate):` so a transcript can never read as a stamp. Exit 0 = the real entry would proceed (or no-op); exit 1 = it would refuse, with the refusing check's output relayed line-by-line; exit 2 = usage/config error, as a real entry.
 
-**Every refusal's recovery is relayed too, and that is the mode's contract
-rather than a courtesy.** A refusal's `help:` line is its actionable half — the
-real refusal's own design rests on that (§The committed gap inbox) — so each one
-prints under `--simulate` as well, prefixed like every other simulate line. The
-mode's designed consumer is the lead (§templates/lead.md), which runs it before
-every dispatch rather than hand-deriving prior-stage completeness — a **step**
-there rather than one of two options, on the ground that a would-be refusal
-naming a missing predecessor journal is relayed while the session that owed it is
-still at its most likely to be resumable. That step is *gating* and never
-*liveness*: it composes with the lead's dispatch precondition and never
-substitutes for it, which that template states where it states both;
-relaying a verdict while withholding the one line that resolves it hands that
-consumer the refusal and keeps the recovery, which is measured rather than
-supposed — a lead reading a simulated boundary refusal escalated a question the
-withheld line answers verbatim. The **gap-inbox check's post-close disposition
-reports the branch it would take**: that the entry would proceed, naming how
-many bullets it would carry into the entering stage's intake, since "would
-refuse" and "would proceed carrying work" are different answers to the question
-the lead is asking. Not a gate — exercised in `smoke/`
-beside the existing enter-stage coverage (would-pass, would-refuse,
-would-no-op, nothing written).
+**Every refusal's recovery is relayed too, and that is the mode's contract rather than a courtesy.** A refusal's `help:` line is its actionable half — the real refusal's own design rests on that (§The committed gap inbox) — so each one prints under `--simulate` as well, prefixed like every other simulate line. The mode's designed consumer is the lead (§templates/lead.md), which runs it before every dispatch rather than hand-deriving prior-stage completeness — a **step** there rather than one of two options, on the ground that a would-be refusal naming a missing predecessor journal is relayed while the session that owed it is still at its most likely to be resumable. That step is *gating* and never *liveness*: it composes with the lead's dispatch precondition and never substitutes for it, which that template states where it states both; relaying a verdict while withholding the one line that resolves it hands that consumer the refusal and keeps the recovery, which is measured rather than supposed — a lead reading a simulated boundary refusal escalated a question the withheld line answers verbatim. The **gap-inbox check's post-close disposition reports the branch it would take**: that the entry would proceed, naming how many bullets it would carry into the entering stage's intake, since "would refuse" and "would proceed carrying work" are different answers to the question the lead is asking. Not a gate — exercised in `smoke/` beside the existing enter-stage coverage (would-pass, would-refuse, would-no-op, nothing written).
 
-**`--rename <name>` — the mechanized iteration rename.** Naming an iteration is
-a **two-surface** write — the queue header's placeholder and column 1 of the
-first stage's stamp — which `check-stage-evidence` requires to agree, so it rides
-this writer rather than a second tool. `[--simulate] --rename <name>` sets the
-header to `## Iteration: <name>` and rewrites column 1 of **every** data line in
-the state file. Every line rather than only the last is correct by the boundary
-invariant, not by convenience: the first-stage entry truncates the state file, so
-every line below the separator belongs to the current iteration by construction —
-which is exactly what `check-stage-evidence` asserts — and the whole-file rewrite
-therefore also heals a half-landed hand-rename. **It is not stage motion**: no
-stamp is appended and no stage token is written, so the cursor is untouched and
-"stage motion never writes the queue" is unweakened. The precedent for this tool
-writing the queue header at all is the boundary reset, which already does.
+**`--rename <name>` — the mechanized iteration rename.** Naming an iteration is a **two-surface** write — the queue header's placeholder and column 1 of the first stage's stamp — which `check-stage-evidence` requires to agree, so it rides this writer rather than a second tool. `[--simulate] --rename <name>` sets the header to `## Iteration: <name>` and rewrites column 1 of **every** data line in the state file. Every line rather than only the last is correct by the boundary invariant, not by convenience: the first-stage entry truncates the state file, so every line below the separator belongs to the current iteration by construction — which is exactly what `check-stage-evidence` asserts — and the whole-file rewrite therefore also heals a half-landed hand-rename. **It is not stage motion**: no stamp is appended and no stage token is written, so the cursor is untouched and "stage motion never writes the queue" is unweakened. The precedent for this tool writing the queue header at all is the boundary reset, which already does.
 
-Before writing, the mode asserts its **columns-2-to-last witness** — fields 2
-through `NF` of every data line (stage, session id, date, head, and any field a
-later grammar appends) identical before and after. It reads to the end of the
-line rather than to a pinned column because a field riding *outside* the witness
-could be dropped or corrupted by the rename with neither the tool nor its test
-noticing, which is exactly what the four-field spelling did to `<head>` the
-moment that field landed; an explicit column-5 check was refused because it
-re-hardcodes the arity the gap came from. This
-is the content predicate applied by the **writer**, where it is cheap and exact,
-rather than by the `Write`/`Edit` guard: a `PreToolUse` hook sees only *proposed*
-content, so proving "no stage token moved" there means reconstructing the
-pre-edit file and diffing field-wise inside a hook — the same computation with
-less information and no way to refuse cleanly. **Pre-flight, the same contract as
-the stamp path:** the candidate header and candidate state file are built as
-temporaries, `check-stage-evidence` runs against them, and a non-zero exit
-refuses with the gate's output relayed and nothing written. That gate is
-resolved through gate-sdk's `gate_command` rather than named by script path, so
-the arm names a gate and never a substrate: the resolved argv is prefix-shaped,
-so the two positionals ride it unchanged, and a gate the resolver cannot find
-is exit 2 — the dispatcher's own verdict — never a rename pre-flighted by a check
-that did not run. The built-in `check-stage-entry` pre-flight above resolves the
-same way, so both arms of this tool name a gate and neither names a substrate.
-**Refusals** (exit 2,
-nothing written): `<name>` empty; `<name>` equal to the unnamed placeholder,
-which only the boundary reset may write — checked ahead of the grammar that would
-also reject it, so the message names the owning writer instead of reporting a
-malformed name; and `<name>` outside the queue slug grammar `[a-z0-9][a-z0-9-]*`,
-where whitespace is the corrupting case, since column 1 is whitespace-delimited
-and a two-word name silently shifts every field of every stamp.
-**Idempotent** in the stamp path's sense: a header and every column 1 already
-reading `<name>` reports and exits 0 without writing. `--simulate --rename`
-relays what would change, prefixed `enter-stage (simulate):`, and writes nothing.
-The report names both written files and says to commit them together, which makes
-the one-commit coupling a property of the writer instead of a line of prose in
-the calling stage template. Its `subject:` line is
-`chore(<stage>): name the iteration <name>`, where `<stage>` is the stage of the
-last stamp the rewrite changed — the stamp `check-stamp-subject` reads off the
-commit, and the first stage whenever the rename runs, as it does, before any later
-stamp exists.
+Before writing, the mode asserts its **columns-2-to-last witness** — fields 2 through `NF` of every data line (stage, session id, date, head, and any field a later grammar appends) identical before and after. It reads to the end of the line rather than to a pinned column because a field riding *outside* the witness could be dropped or corrupted by the rename with neither the tool nor its test noticing, which is exactly what the four-field spelling did to `<head>` the moment that field landed; an explicit column-5 check was refused because it re-hardcodes the arity the gap came from. This is the content predicate applied by the **writer**, where it is cheap and exact, rather than by the `Write`/`Edit` guard: a `PreToolUse` hook sees only *proposed* content, so proving "no stage token moved" there means reconstructing the pre-edit file and diffing field-wise inside a hook — the same computation with less information and no way to refuse cleanly. **Pre-flight, the same contract as the stamp path:** the candidate header and candidate state file are built as temporaries, `check-stage-evidence` runs against them, and a non-zero exit refuses with the gate's output relayed and nothing written. That gate is resolved through gate-sdk's `gate_command` rather than named by script path, so the arm names a gate and never a substrate: the resolved argv is prefix-shaped, so the two positionals ride it unchanged, and a gate the resolver cannot find is exit 2 — the dispatcher's own verdict — never a rename pre-flighted by a check that did not run. The built-in `check-stage-entry` pre-flight above resolves the same way, so both arms of this tool name a gate and neither names a substrate. **Refusals** (exit 2, nothing written): `<name>` empty; `<name>` equal to the unnamed placeholder, which only the boundary reset may write — checked ahead of the grammar that would also reject it, so the message names the owning writer instead of reporting a malformed name; and `<name>` outside the queue slug grammar `[a-z0-9][a-z0-9-]*`, where whitespace is the corrupting case, since column 1 is whitespace-delimited and a two-word name silently shifts every field of every stamp. **Idempotent** in the stamp path's sense: a header and every column 1 already reading `<name>` reports and exits 0 without writing. `--simulate --rename` relays what would change, prefixed `enter-stage (simulate):`, and writes nothing. The report names both written files and says to commit them together, which makes the one-commit coupling a property of the writer instead of a line of prose in the calling stage template. Its `subject:` line is `chore(<stage>): name the iteration <name>`, where `<stage>` is the stage of the last stamp the rewrite changed — the stamp `check-stamp-subject` reads off the commit, and the first stage whenever the rename runs, as it does, before any later stamp exists.
 
-One reader is **invalidated** by a rename rather than served by it, and it is the
-reason the placeholder refusal exists: `LIFECYCLE_KIT_BOUNDARY_REQUIRE`'s check
-matches the closing iteration's name against the first token of a disposition
-line and reds on finding *none*, so a rename landing after the close stage has
-stamped its disposition reds the next boundary. Renaming an iteration that has
-already been dispositioned is a rename to redo at the disposition surface too;
-un-naming one is refused outright.
+One reader is **invalidated** by a rename rather than served by it, and it is the reason the placeholder refusal exists: `LIFECYCLE_KIT_BOUNDARY_REQUIRE`'s check matches the closing iteration's name against the first token of a disposition line and reds on finding *none*, so a rename landing after the close stage has stamped its disposition reds the next boundary. Renaming an iteration that has already been dispositioned is a rename to redo at the disposition surface too; un-naming one is refused outright.
 
-**Ruled out: a separate `rename-iteration.sh` tool.** It would add a second
-sanctioned writer of the state file, and one-writer is the property the
-`Write`/`Edit` guard's own block message asserts and the whole reason that guard
-exists. Advisory tooling like `--simulate`, so no fixture pair is owed; the
-hermetic cases — both surfaces rewritten, fields 2-4 proved unchanged, the
-half-landed heal, each refusal, the idempotent no-op, and `--simulate --rename`
-writing nothing — live in `gate-tests/`, because a rename cannot be exercised
-against a live checkout's own queue the way `smoke/` exercises the stamp path.
+**Ruled out: a separate `rename-iteration.sh` tool.** It would add a second sanctioned writer of the state file, and one-writer is the property the `Write`/`Edit` guard's own block message asserts and the whole reason that guard exists. Advisory tooling like `--simulate`, so no fixture pair is owed; the hermetic cases — both surfaces rewritten, fields 2-4 proved unchanged, the half-landed heal, each refusal, the idempotent no-op, and `--simulate --rename` writing nothing — live in `gate-tests/`, because a rename cannot be exercised against a live checkout's own queue the way `smoke/` exercises the stamp path.
 
-**`--open-lead-journal` — the lead's journal opener.** `[--simulate] --open-lead-journal`
-appends one heading to the lead journal (`<scratch>/$LIFECYCLE_KIT_LEAD_JOURNAL_FILE`),
-creating the file and its directory when absent:
+**`--open-lead-journal` — the lead's journal opener.** `[--simulate] --open-lead-journal` appends one heading to the lead journal (`<scratch>/$LIFECYCLE_KIT_LEAD_JOURNAL_FILE`), creating the file and its directory when absent:
 
 `## lead-journal opened after <key>`
 
-`<key>` is fields 2 through the last of the state file's last stamp, or the literal `none` when
-the file carries no stamp. The heading opens a **segment**, which runs to the next such heading
-or to the end of the file. Content before the first heading is a segment as well, so a journal
-written before this opener existed reads as one segment with no key; a blank-only run is no
-segment.
+`<key>` is fields 2 through the last of the state file's last stamp, or the literal `none` when the file carries no stamp. The heading opens a **segment**, which runs to the next such heading or to the end of the file. Content before the first heading is a segment as well, so a journal written before this opener existed reads as one segment with no key; a blank-only run is no segment.
 
-- **Append, never overwrite**, on the stage-journal opener's precedent. An undisposed prior
-  segment is the thing the boundary advisory reports, and an overwrite would delete it before
-  any reader ran.
-- **Disposed segments are dropped.** Before appending, the opener removes every segment whose
-  last non-empty line is `DISPOSED`. It keeps every other segment, in order. A disposed segment
-  has been discharged by the lead that wrote it, so no reader remains for it. Dropping it keeps
-  the protected file from becoming the accumulator the invariant warns about. The file is
-  rewritten only when a segment is dropped; otherwise the heading is a plain append.
-- **Idempotent.** When the file's last segment already opens with the heading for the current
-  key **and is undisposed**, the opener reports and exits 0 without writing. That covers a
-  resumed lead re-running its first step. A disposed last segment under the same key is dropped
-  and reopened like any other disposed segment: the no-op exists for a lead that is still
-  writing, and a lead that disposed has stopped. **Honest limit:** a second lead opening at the
-  same cursor, after the first ended without disposing, continues the first lead's segment. The
-  opener cannot tell a resumed lead from a replacing one. Either way the segment belongs to the
-  iteration about to open, and that is the property the advisory reads.
-- **Not stage motion.** No stamp is appended, no pre-flight runs, the queue is untouched, and
-  the command writes nothing tracked. `--simulate --open-lead-journal` relays what it would
-  write and drop, prefixed `enter-stage (simulate):`, and writes nothing.
-- **Exit contract:** 0 opened, or a reported no-op; 2 a usage or configuration error, an absent
-  state file included, on the stamp path's precedent. Surplus arguments after the operand are
-  refused by this tool's existing surplus rule. It has no 1, because it refuses nothing a caller
-  could clear.
+- **Append, never overwrite**, on the stage-journal opener's precedent. An undisposed prior segment is the thing the boundary advisory reports, and an overwrite would delete it before any reader ran.
+- **Disposed segments are dropped.** Before appending, the opener removes every segment whose last non-empty line is `DISPOSED`. It keeps every other segment, in order. A disposed segment has been discharged by the lead that wrote it, so no reader remains for it. Dropping it keeps the protected file from becoming the accumulator the invariant warns about. The file is rewritten only when a segment is dropped; otherwise the heading is a plain append.
+- **Idempotent.** When the file's last segment already opens with the heading for the current key **and is undisposed**, the opener reports and exits 0 without writing. That covers a resumed lead re-running its first step. A disposed last segment under the same key is dropped and reopened like any other disposed segment: the no-op exists for a lead that is still writing, and a lead that disposed has stopped. **Honest limit:** a second lead opening at the same cursor, after the first ended without disposing, continues the first lead's segment. The opener cannot tell a resumed lead from a replacing one. Either way the segment belongs to the iteration about to open, and that is the property the advisory reads.
+- **Not stage motion.** No stamp is appended, no pre-flight runs, the queue is untouched, and the command writes nothing tracked. `--simulate --open-lead-journal` relays what it would write and drop, prefixed `enter-stage (simulate):`, and writes nothing.
+- **Exit contract:** 0 opened, or a reported no-op; 2 a usage or configuration error, an absent state file included, on the stamp path's precedent. Surplus arguments after the operand are refused by this tool's existing surplus rule. It has no 1, because it refuses nothing a caller could clear.
 
-The key derivation is one function the opener and the boundary advisory both call, and the
-heading lead is one constant beside `DISPOSED`, spelled once for the reason the stage journal's
-opening mark is: the writer and the reader of the key must agree byte for byte.
+The key derivation is one function the opener and the boundary advisory both call, and the heading lead is one constant beside `DISPOSED`, spelled once for the reason the stage journal's opening mark is: the writer and the reader of the key must agree byte for byte.
 
-**Why the opener keys on the stage cursor, and why the entry tool writes the heading.** The
-cursor is the last stamp (§The state machine): a journal opened after that stamp was opened for
-the iteration about to open, and the stamp is unique by construction, since it carries a session
-id and a head. The key is fields 2 through the last rather than the whole line because `--rename`
-rewrites column 1 of every stamp — the same witness `--rename` asserts. A hand-written key would
-mean the lead reading the state file and copying a line out of it, which §templates/lead.md
-forbids (the lead never hand-derives prior-stage completeness) and which drifts by a single
-space. The opener is an operand of this tool because the tool already owns the lead journal's
-knob, its disposition mark and the advisory, so the key derivation has one home.
+**Why the opener keys on the stage cursor, and why the entry tool writes the heading.** The cursor is the last stamp (§The state machine): a journal opened after that stamp was opened for the iteration about to open, and the stamp is unique by construction, since it carries a session id and a head. The key is fields 2 through the last rather than the whole line because `--rename` rewrites column 1 of every stamp — the same witness `--rename` asserts. A hand-written key would mean the lead reading the state file and copying a line out of it, which §templates/lead.md forbids (the lead never hand-derives prior-stage completeness) and which drifts by a single space. The opener is an operand of this tool because the tool already owns the lead journal's knob, its disposition mark and the advisory, so the key derivation has one home.
 
-Advisory tooling like `--simulate`, so no fixture pair is owed; the hermetic cases — creation,
-append after an undisposed segment, the disposed-segment drop, the idempotent no-op,
-`--simulate --open-lead-journal` writing nothing, the surplus refusal and the `none` key — live
-in `gate-tests/`, and the key's survival of a rename is a unit test beside the rename witness's.
+Advisory tooling like `--simulate`, so no fixture pair is owed; the hermetic cases — creation, append after an undisposed segment, the disposed-segment drop, the idempotent no-op, `--simulate --open-lead-journal` writing nothing, the surplus refusal and the `none` key — live in `gate-tests/`, and the key's survival of a rename is a unit test beside the rename witness's.
 
-**Idempotent:** if the
-state file already ends with a stamp for the same `<iteration> <stage> <id>`,
-it reports and exits 0 without appending, so a crashed-and-resumed session
-re-runs its entry step safely. It reads the kit's knobs
-(`LIFECYCLE_KIT_QUEUE_FILE`, `LIFECYCLE_KIT_STATE_FILE`, `LIFECYCLE_KIT_STAGES`,
-`LIFECYCLE_KIT_FIRST_STAGE`, `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`,
-`LIFECYCLE_KIT_BOUNDARY_PRESERVE`,
-`LIFECYCLE_KIT_BOUNDARY_REQUIRE`, `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`,
-`LIFECYCLE_KIT_SURVEY_RECORD_FILE`, `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE`,
-`LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN`, `LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE`,
-`LIFECYCLE_KIT_ENTRY_PREFLIGHT`, and `LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE`).
+**Idempotent:** if the state file already ends with a stamp for the same `<iteration> <stage> <id>`, it reports and exits 0 without appending, so a crashed-and-resumed session re-runs its entry step safely. It reads the kit's knobs (`LIFECYCLE_KIT_QUEUE_FILE`, `LIFECYCLE_KIT_STATE_FILE`, `LIFECYCLE_KIT_STAGES`, `LIFECYCLE_KIT_FIRST_STAGE`, `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`, `LIFECYCLE_KIT_BOUNDARY_PRESERVE`, `LIFECYCLE_KIT_BOUNDARY_REQUIRE`, `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, `LIFECYCLE_KIT_SURVEY_RECORD_FILE`, `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE`, `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN`, `LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE`, `LIFECYCLE_KIT_ENTRY_PREFLIGHT`, and `LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE`).
 
-**The pre-flight gates this arm names are dispatched as child processes, never called in
-process.** Both arms name a gate and never a substrate: the member is resolved
-across the kit `checks/` directories, a `.sh` before a `.gate` in each, and a
-`.gate` becomes the argv `<binary> <name>`, run under this arm's environment
-unchanged. A member that
-resolves nowhere is exit 2 with the dispatcher's own diagnostic, never an entry
-pre-flighted by a check that did not run. The in-process call is refused where the
-compiled dispatcher already refuses it — on fault isolation and the surviving
-`.sh` members — so the arm spawns even though both
-gates live inside the same binary and the direct call would be free. **The
-resolution set is the kit's own `checks/` directories and not the consumer's gates
-directory**, which is the incumbent behaviour restated rather than widened: these
-two members are declared by this kit alone, and a `.sh` beside a `.gate` in the
-same directory still shadows it.
+**The pre-flight gates this arm names are dispatched as child processes, never called in process.** Both arms name a gate and never a substrate: the member is resolved across the kit `checks/` directories, a `.sh` before a `.gate` in each, and a `.gate` becomes the argv `<binary> <name>`, run under this arm's environment unchanged. A member that resolves nowhere is exit 2 with the dispatcher's own diagnostic, never an entry pre-flighted by a check that did not run. The in-process call is refused where the compiled dispatcher already refuses it — on fault isolation and the surviving `.sh` members — so the arm spawns even though both gates live inside the same binary and the direct call would be free. **The resolution set is the kit's own `checks/` directories and not the consumer's gates directory**, which is the incumbent behaviour restated rather than widened: these two members are declared by this kit alone, and a `.sh` beside a `.gate` in the same directory still shadows it.
 
-**This arm depends on gate-sdk, and the dependency is stated rather than
-absorbed.** It is an arm of gate-sdk's binary: it is reached through gate-sdk's
-front-end, it reads gate-sdk's knobs beside its own, and it dispatches through
-gate-sdk's resolver. A tree that vendored lifecycle-kit without gate-sdk cannot
-run the stamp writer at all — and, since the port, cannot run stage motion by any
-other path either. **That is the honest cost of this cut and it is stated rather
-than discovered.** An absent binary was already fatal to this tool, which needed
-the session-id derivation and refused with a build instruction; what is new is
-that stage motion now has **no shell path at all**, so a consumer whose platform
-carries no artifact loses the ability to enter a stage, cross an iteration
-boundary or rename an iteration. The loss is total but it is also loud and
-immediate: the front-end's unavailable diagnostic names the build command, and the
-failure lands at the session's first step rather than midway through work. The
-alternative — a second dispatch resolver written in shell — is the duplicate the
-shared substrate exists to remove, so the dependency is taken.
+**This arm depends on gate-sdk, and the dependency is stated rather than absorbed.** It is an arm of gate-sdk's binary: it is reached through gate-sdk's front-end, it reads gate-sdk's knobs beside its own, and it dispatches through gate-sdk's resolver. A tree that vendored lifecycle-kit without gate-sdk cannot run the stamp writer at all — and, since the port, cannot run stage motion by any other path either. **That is the honest cost of this cut and it is stated rather than discovered.** An absent binary was already fatal to this tool, which needed the session-id derivation and refused with a build instruction; what is new is that stage motion now has **no shell path at all**, so a consumer whose platform carries no artifact loses the ability to enter a stage, cross an iteration boundary or rename an iteration. The loss is total but it is also loud and immediate: the front-end's unavailable diagnostic names the build command, and the failure lands at the session's first step rather than midway through work. The alternative — a second dispatch resolver written in shell — is the duplicate the shared substrate exists to remove, so the dependency is taken.
 
-**This section records the cut.** `bin/enter-stage.sh` was the one owed file <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
-declaring this section, and taking it discharges the section **with no shell
-residue left in the kit at all** — the kit's shell members are the two `smoke/`
-members, `no-port` by declared cause, so `lifecycle-kit/bin/` is gone rather than
-merely lighter. The heading
-stays `bin/enter-stage.sh` deliberately: roughly eighty pointers inside the <!-- manifest-temporal-exempt: names the section heading kept as a pointer target, not a live file -->
-governed manifest set are backstopped by `check-kit-ref-liveness`, and at least
-six citations outside it have no gate behind them at all, so a rename would take
-half the pointer corpus stale silently.
+**This section records the cut.** `bin/enter-stage.sh` was the one owed file <!-- manifest-temporal-exempt: retirement record, names a shell file since removed --> declaring this section, and taking it discharges the section **with no shell residue left in the kit at all** — the kit's shell members are the two `smoke/` members, `no-port` by declared cause, so `lifecycle-kit/bin/` is gone rather than merely lighter. The heading stays `bin/enter-stage.sh` deliberately: roughly eighty pointers inside the <!-- manifest-temporal-exempt: names the section heading kept as a pointer target, not a live file --> governed manifest set are backstopped by `check-kit-ref-liveness`, and at least six citations outside it have no gate behind them at all, so a rename would take half the pointer corpus stale silently.
 
-Advisory tooling, not a gate: no fixture pair is owed; it is exercised end-to-end
-in `smoke/install.sh` — including the boundary require-check scenarios (a member
-naming the closing iteration passes; a member missing the line, a member absent
-from disk, and a never-named closing iteration each take their branch) — and in
-`gate-tests/`, whose seven hermetic harnesses drive the arm through its second
-caller from a non-git sandbox.
+Advisory tooling, not a gate: no fixture pair is owed; it is exercised end-to-end in `smoke/install.sh` — including the boundary require-check scenarios (a member naming the closing iteration passes; a member missing the line, a member absent from disk, and a never-named closing iteration each take their branch) — and in `gate-tests/`, whose seven hermetic harnesses drive the arm through its second caller from a non-git sandbox.
 
 ### bin/install-lifecycle.sh
 
-`bash gate-sdk/bin/run-gates.sh --install-lifecycle [agent-file]` writes the
-resident registration block
-into the always-loaded agent file (`LIFECYCLE_KIT_AGENT_FILE`, default
-`CLAUDE.md`; the positional override points a smoke or fixture at a scratch
-tree without touching consumer config), idempotently. **The `###
-bin/install-lifecycle.sh` heading is the section name, not a file name** — the
-in-SPEC citations resolve against it, and the shell tool it was named after has
-since ported. The block is bounded by
-fixed marker lines (`<!-- lifecycle-kit:begin -->` … `<!-- lifecycle-kit:end -->`);
-a run replaces the content between the markers when present and appends the
-block when absent, so re-running never duplicates. A begin marker without its
-end is a malformed target (exit 2, rather than guess the bounds); the agent
-file must already exist — the arm edits an always-loaded file, it does
-not mint one — so a missing target is exit 2. The marker insert/replace itself
-is not this member's code: it rides `crate::marker`'s installer writer, the
-holder of gate-sdk's marker-bounded span mechanics (gate-sdk/SPEC.md
-§lib/inject.sh), so no second replace path exists to drift.
+`bash gate-sdk/bin/run-gates.sh --install-lifecycle [agent-file]` writes the resident registration block into the always-loaded agent file (`LIFECYCLE_KIT_AGENT_FILE`, default `CLAUDE.md`; the positional override points a smoke or fixture at a scratch tree without touching consumer config), idempotently. **This section's heading is a section name, not a file name** — the in-SPEC citations resolve against it, and the shell tool it was named after has since ported. The block is bounded by fixed marker lines (`<!-- lifecycle-kit:begin -->` … `<!-- lifecycle-kit:end -->`); a run replaces the content between the markers when present and appends the block when absent, so re-running never duplicates. A begin marker without its end is a malformed target (exit 2, rather than guess the bounds); the agent file must already exist — the arm edits an always-loaded file, it does not mint one — so a missing target is exit 2. The marker insert/replace itself is not this member's code: it rides `crate::marker`'s installer writer, the holder of gate-sdk's marker-bounded span mechanics (gate-sdk/SPEC.md §lib/inject.sh), so no second replace path exists to drift.
 
-**It is an `Arm::Run` arm-table member** (gate-sdk/SPEC.md §The non-gate arm),
-reached by its own `bin/run-gates.sh` front-end branch rather than through the
-`--emit <name>` composer, because its contract is an **action with an exit
-status** — it mutates two files and writes one git config key, printing narration
-on stdout — and `Arm::Emit` collapses every error to 2. **The obvious alternative
-is an op of the `--install <op>` family, and it is refused on that family's own
-stated terms**: installer/SPEC.md §The install boundary rules that arm reads no
-kit config and no knob, because its caller is the bootstrap and may not be
-assumed to be a POSIX shell. This member's whole job is to render blocks derived
-from **resolved kit config**, so a knob-free op would have to take all eight knobs
-on argv from a caller with no way to resolve them. Recorded as refused rather than unconsidered, because the name collision
-makes it the first place a reader looks. Its declared roster is the union of what
-the two renderers read, taken from the gates that already declare those knobs
-rather than re-derived: `LIFECYCLE_KIT_AGENT_FILE`, `LIFECYCLE_KIT_STAGES` and
-`LIFECYCLE_KIT_QUEUE_FILE` from `check-lifecycle-registration`, and
-`LIFECYCLE_KIT_STATE_FILE`, `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`,
-`LIFECYCLE_KIT_SURVEY_RECORD_FILE`, `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` and
-`LIFECYCLE_KIT_GAP_INBOX_FILE` from `check-merge-attrs` — **eight**. A hardcoded
-top-level flag would have no table row to declare them on, so none of the checks
-reading the declared rosters could see what it reads.
+**It is an `Arm::Run` arm-table member** (gate-sdk/SPEC.md §The non-gate arm), reached by its own `bin/run-gates.sh` front-end branch rather than through the `--emit <name>` composer, because its contract is an **action with an exit status** — it mutates two files and writes one git config key, printing narration on stdout — and `Arm::Emit` collapses every error to 2. **The obvious alternative is an op of the `--install <op>` family, and it is refused on that family's own stated terms**: installer/SPEC.md §The install boundary rules that arm reads no kit config and no knob, because its caller is the bootstrap and may not be assumed to be a POSIX shell. This member's whole job is to render blocks derived from **resolved kit config**, so a knob-free op would have to take all eight knobs on argv from a caller with no way to resolve them. Recorded as refused rather than unconsidered, because the name collision makes it the first place a reader looks. Its declared roster is the union of what the two renderers read, taken from the gates that already declare those knobs rather than re-derived: `LIFECYCLE_KIT_AGENT_FILE`, `LIFECYCLE_KIT_STAGES` and `LIFECYCLE_KIT_QUEUE_FILE` from `check-lifecycle-registration`, and `LIFECYCLE_KIT_STATE_FILE`, `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, `LIFECYCLE_KIT_SURVEY_RECORD_FILE`, `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` and `LIFECYCLE_KIT_GAP_INBOX_FILE` from `check-merge-attrs` — **eight**. A hardcoded top-level flag would have no table row to declare them on, so none of the checks reading the declared rosters could see what it reads.
 
-**The `[agent-file]` positional ports unchanged, and the test that decides it was
-run rather than assumed.** §The non-gate arm's distinguishing test makes an
-argument *unportable* when it is a selector for where configuration comes from,
-which the tree's own knob files already answer. This positional is the other
-kind: it **is the file the rule writes into**, read from the arm's own argv and
-overriding the resolved default.
-The near miss is one line away and is an env var rather than a positional:
-`smoke/install.sh` runs the arm under `LIFECYCLE_KIT_KNOB_FILE=lock-stages.knobs`,
-a genuine config-file selector — and it keeps working, because the arm resolves
-the kit's knobs in process from its own environment, so the redirection happens
-*inside* the resolution rather than arriving after it.
+**The `[agent-file]` positional ports unchanged, and the test that decides it was run rather than assumed.** §The non-gate arm's distinguishing test makes an argument *unportable* when it is a selector for where configuration comes from, which the tree's own knob files already answer. This positional is the other kind: it **is the file the rule writes into**, read from the arm's own argv and overriding the resolved default. The near miss is one line away and is an env var rather than a positional: `smoke/install.sh` runs the arm under `LIFECYCLE_KIT_KNOB_FILE=lock-stages.knobs`, a genuine config-file selector — and it keeps working, because the arm resolves the kit's knobs in process from its own environment, so the redirection happens *inside* the resolution rather than arriving after it.
 
-The block is pointer-only, its roster derived: `crate::stages::registration_block`
-renders the one line that the repo runs the
-state machine on `LIFECYCLE_KIT_QUEUE_FILE`, the stage roster as skill
-invocations (`/<stage>` for each `LIFECYCLE_KIT_STAGES` member), and the
-markdown link to the kit SPEC — never stage prose, and never a hand-listed
-roster, so a consumer's reshaped stage set flows into the block by
-construction. The arm and `check-lifecycle-registration` share that one
-renderer, so the emitted block and the block the gate certifies cannot
-diverge.
+The block is pointer-only, its roster derived: `crate::stages::registration_block` renders the one line that the repo runs the state machine on `LIFECYCLE_KIT_QUEUE_FILE`, the stage roster as skill invocations (`/<stage>` for each `LIFECYCLE_KIT_STAGES` member), and the markdown link to the kit SPEC — never stage prose, and never a hand-listed roster, so a consumer's reshaped stage set flows into the block by construction. The arm and `check-lifecycle-registration` share that one renderer, so the emitted block and the block the gate certifies cannot diverge.
 
-The same run performs two further steps for the multi-operator merge surface
-(§Multi-operator semantics). **The merge-attribute step** injects a
-marker-bounded block (`# lifecycle-kit:merge:begin` … `# lifecycle-kit:merge:end`,
-the same installer writer again) into `.gitattributes` (repo root) rendered from
-`crate::stages::merge_attrs_block` — one `merge=iteration-scoped` line per
-supersede
-member (keep-ours) and one `merge=union` line per union member (the gap inbox,
-git-native) — so a reshaped supersede or union set flows into the attribute lines
-by construction and `check-merge-attrs` certifies the same rendering. **The
-writer/asserter split survives the port and its two implementations collapse to
-one**: before the port the writer was shell and the asserter was crate, deriving
-the same lines through two implementations held together by nothing but
-`smoke/install.sh`; they now compose the same two set derivations in one
-substrate. Unlike the agent file, the arm legitimately **mints
-`.gitattributes` when absent** (it is not an always-loaded file the consumer
-authored) — two adjacent file writes with opposite absent-file dispositions, which
-is precisely the shape a port unifies by accident. **The driver-config step**
-registers the keep-ours driver — `git
-config merge.iteration-scoped.driver true` — per-clone (the `--install-hooks`
-opt-in class); a non-repo cwd degrades to a printed skip, never a hard failure,
-leaving the `.gitattributes` attribute inert until a clone installs the driver.
-The skip goes to **stderr** and the two action lines to **stdout**, and that split
-is load-bearing: the arm is machine-drivable and a finding on stdout is a finding
-in a caller's data stream.
-The union attribute needs no such step — `merge=union` is git-native, so its
-line is live the moment `.gitattributes` carries it.
+The same run performs two further steps for the multi-operator merge surface (§Multi-operator semantics). **The merge-attribute step** injects a marker-bounded block (`# lifecycle-kit:merge:begin` … `# lifecycle-kit:merge:end`, the same installer writer again) into `.gitattributes` (repo root) rendered from `crate::stages::merge_attrs_block` — one `merge=iteration-scoped` line per supersede member (keep-ours) and one `merge=union` line per union member (the gap inbox, git-native) — so a reshaped supersede or union set flows into the attribute lines by construction and `check-merge-attrs` certifies the same rendering. **The writer/asserter split survives the port and its two implementations collapse to one**: before the port the writer was shell and the asserter was crate, deriving the same lines through two implementations held together by nothing but `smoke/install.sh`; they now compose the same two set derivations in one substrate. Unlike the agent file, the arm legitimately **mints `.gitattributes` when absent** (it is not an always-loaded file the consumer authored) — two adjacent file writes with opposite absent-file dispositions, which is precisely the shape a port unifies by accident. **The driver-config step** registers the keep-ours driver — `git config merge.iteration-scoped.driver true` — per-clone (the `--install-hooks` opt-in class); a non-repo cwd degrades to a printed skip, never a hard failure, leaving the `.gitattributes` attribute inert until a clone installs the driver. The skip goes to **stderr** and the two action lines to **stdout**, and that split is load-bearing: the arm is machine-drivable and a finding on stdout is a finding in a caller's data stream. The union attribute needs no such step — `merge=union` is git-native, so its line is live the moment `.gitattributes` carries it.
 
-**The entry point requires a repository, and that removed a silent mis-write
-rather than narrowing a graceful degradation.** `bash gate-sdk/bin/run-gates.sh`
-cds to `git rev-parse --show-toplevel` and refuses outside a repository
-(gate-sdk/SPEC.md §run-gates: *every entry point cds to the toplevel before
-resolving paths*), so a non-repo cwd now exits 2 with nothing written. Read that
-as a repair, not a loss: both install targets are **repo-root-relative by this
-kit's own config**, so the shell tool run outside a repository did not degrade
-gracefully — it wrote two files into whatever directory it happened to be in and
-exited 0. The soft-skip property above is the **driver-config step's**, and it is
-intact: when the arm runs, a cwd whose repository has no driver registered still
-prints its skip to stderr at exit 0. Stated in these terms deliberately, because
-"a narrowing we accepted" invites a later session to try to restore a behaviour
-that was wrong.
+**The entry point requires a repository, and that removed a silent mis-write rather than narrowing a graceful degradation.** `bash gate-sdk/bin/run-gates.sh` cds to `git rev-parse --show-toplevel` and refuses outside a repository (gate-sdk/SPEC.md §run-gates: *every entry point cds to the toplevel before resolving paths*), so a non-repo cwd now exits 2 with nothing written. Read that as a repair, not a loss: both install targets are **repo-root-relative by this kit's own config**, so the shell tool run outside a repository did not degrade gracefully — it wrote two files into whatever directory it happened to be in and exited 0. The soft-skip property above is the **driver-config step's**, and it is intact: when the arm runs, a cwd whose repository has no driver registered still prints its skip to stderr at exit 0. Stated in these terms deliberately, because "a narrowing we accepted" invites a later session to try to restore a behaviour that was wrong.
 
-Advisory tooling, not a gate: no fixture pair is owed; every step is exercised
-end-to-end in `smoke/install.sh`, which is the member's only caller. **Criterion
-2's discharge was the `# no-fixture:` road** — the same cases, both substrates,
-while both implementations existed — bought once at port time over a fourteen-case
-scenario compared on exit status, both output streams and the **bytes of both
-written files**: a fresh agent file, a re-run, a staled block, a missing agent
-file, a begin marker without its end, a fresh scratch repo, a re-run of that, the
-`[agent-file]` positional, and the lock-pattern config case the smoke still runs.
-Three deltas came out of that run and each is recorded rather than smoothed
-away: the non-repo entry-point refusal above (two of the three, one case and one
-assertion); and the malformed-marker refusal's prefix, which reads
-`install-lifecycle: <file>: begin marker present but end marker missing` where the
-shell named a helper function that has no compiled counterpart to name — the exit
-status is 2 on both sides and only the diagnostic wording moved. The compiled writer's third
-divergence, its whole-line marker-presence test (gate-sdk/SPEC.md §lib/inject.sh),
-produced **no** delta here and is unreachable in all fourteen cases: it is
-recorded at the module that owns it rather than counted against this scenario. **Criterion 5's residual bites at
-adoption rather than during use**, which is unusual: a vendored consumer on a host
-the artifact roster does not cover cannot install or refresh its registration
-block and merge attributes, and that block is what a consumer writes on day one.
-It is accepted on the class's stated terms and on one narrowing fact —
-`check-lifecycle-registration` and `check-merge-attrs` are themselves compiled, so
-a host with no artifact does not run the gates that would demand the block either,
-losing the writer and the asserter together rather than being held to a standard
-it cannot meet.
+Advisory tooling, not a gate: no fixture pair is owed; every step is exercised end-to-end in `smoke/install.sh`, which is the member's only caller. **Criterion 2's discharge was the `# no-fixture:` road** — the same cases, both substrates, while both implementations existed — bought once at port time over a fourteen-case scenario compared on exit status, both output streams and the **bytes of both written files**: a fresh agent file, a re-run, a staled block, a missing agent file, a begin marker without its end, a fresh scratch repo, a re-run of that, the `[agent-file]` positional, and the lock-pattern config case the smoke still runs. Three deltas came out of that run and each is recorded rather than smoothed away: the non-repo entry-point refusal above (two of the three, one case and one assertion); and the malformed-marker refusal's prefix, which reads `install-lifecycle: <file>: begin marker present but end marker missing` where the shell named a helper function that has no compiled counterpart to name — the exit status is 2 on both sides and only the diagnostic wording moved. The compiled writer's third divergence, its whole-line marker-presence test (gate-sdk/SPEC.md §lib/inject.sh), produced **no** delta here and is unreachable in all fourteen cases: it is recorded at the module that owns it rather than counted against this scenario. **Criterion 5's residual bites at adoption rather than during use**, which is unusual: a vendored consumer on a host the artifact roster does not cover cannot install or refresh its registration block and merge attributes, and that block is what a consumer writes on day one. It is accepted on the class's stated terms and on one narrowing fact — `check-lifecycle-registration` and `check-merge-attrs` are themselves compiled, so a host with no artifact does not run the gates that would demand the block either, losing the writer and the asserter together rather than being held to a standard it cannot meet.
 
 ### The close-surfaces emit arm
 
-Prints the derived close-surface roster (§The close-surface roster), one row per
-surface, tab-separated `<path>	<mode>	<reclaim>	<owner>	<state>`, sorted by path. A
-field with nothing declared is `-`; an owner-less row is a capture surface source
-2 found with no declaration, whose mode reads `(undeclared)`. The mode is echoed
-verbatim — a malformed one is passed through for `check-close-surfaces` to rule
-on, so the derivation never silently repairs what the gate exists to catch. An
-empty roster prints nothing and succeeds: a resolved-empty derivation is an
-answer, never an error.
+Prints the derived close-surface roster (§The close-surface roster), one row per surface, tab-separated `<path>	<mode>	<reclaim>	<owner>	<state>`, sorted by path. A field with nothing declared is `-`; an owner-less row is a capture surface source 2 found with no declaration, whose mode reads `(undeclared)`. The mode is echoed verbatim — a malformed one is passed through for `check-close-surfaces` to rule on, so the derivation never silently repairs what the gate exists to catch. An empty roster prints nothing and succeeds: a resolved-empty derivation is an answer, never an error.
 
-`<state>` is the row's on-disk state under the computed base. A file row reads
-`absent` (no such file), `empty` (the file holds nothing past the header run
-§bin/enter-stage.sh's truncate keeps, so a surface truncated to its `# contract:`
-header reads as the drained surface it is — the arm and the truncate share one
-predicate in the stage module rather than two copies of one rule) or `non-empty`.
-A `<file>#<section>` row reads `absent` when its file is, else `-`: a section's
-emptiness is its owner's read (the Lessons row is forced by the boundary refusal,
-the Deferred row is never empty), and resolving an anchor-form heading would give
-this arm a heading resolver it needs nowhere else. The state is **three named
-states, not a byte size**, on drift-kit/SPEC.md §The knowledge-friction loop's
-precedent: a size is a number whose only consumer is this question, and a
-header-only file has a non-zero one. The column is appended rather than inserted,
-so the four positions every reader indexes stay put. Close reads it twice: the
-triage sweep states `empty` as a clean read and takes `absent` as a finding, and
-the gap drain's first read skips both.
+`<state>` is the row's on-disk state under the computed base. A file row reads `absent` (no such file), `empty` (the file holds nothing past the header run §bin/enter-stage.sh's truncate keeps, so a surface truncated to its `# contract:` header reads as the drained surface it is — the arm and the truncate share one predicate in the stage module rather than two copies of one rule) or `non-empty`. A `<file>#<section>` row reads `absent` when its file is, else `-`: a section's emptiness is its owner's read (the Lessons row is forced by the boundary refusal, the Deferred row is never empty), and resolving an anchor-form heading would give this arm a heading resolver it needs nowhere else. The state is **three named states, not a byte size**, on drift-kit/SPEC.md §The knowledge-friction loop's precedent: a size is a number whose only consumer is this question, and a header-only file has a non-zero one. The column is appended rather than inserted, so the four positions every reader indexes stay put. Close reads it twice: the triage sweep states `empty` as a clean read and takes `absent` as a finding, and the gap drain's first read skips both.
 
-A **non-gate arm** (gate-sdk/SPEC.md §The non-gate arm), invoked as
-`bash gate-sdk/bin/run-gates.sh --emit close-surfaces [scan-root]`. Its two callers
-are `check-close-surfaces`, which reaches the derivation **in process** rather
-than spawning anything, and close, at its gap drain's first read and its
-inbound-triage sweep. Nothing stores the
-roster and nothing must: its whole value is that it is recomputed at the moment
-close reads it, so a capture surface added yesterday appears today.
+A **non-gate arm** (gate-sdk/SPEC.md §The non-gate arm), invoked as `bash gate-sdk/bin/run-gates.sh --emit close-surfaces [scan-root]`. Its two callers are `check-close-surfaces`, which reaches the derivation **in process** rather than spawning anything, and close, at its gap drain's first read and its inbound-triage sweep. Nothing stores the roster and nothing must: its whole value is that it is recomputed at the moment close reads it, so a capture surface added yesterday appears today.
 
-The declaration surfaces are the resolved kit roots' `LIFECYCLE_KIT_ROSTER_BASENAME`
-files plus every `LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS` match (gate-sdk's kit-root
-resolution, consumer-first with kit shadowing — the order every kit registry
-already uses); duplicates collapse. Follows the affordance contract, with the
-`cd` a compiled arm cannot take becoming a **computed base**: the scan-root
-argument, else the repo toplevel, with every path globbed, ignored and printed
-relative to it. Config-via-env through the knob files; and the three exit-2 causes —
-a non-repo base, an unreadable declaration surface, a `git check-ignore` that
-could not decide — become the arm's error return, which the front-end and the
-in-process caller both surface. Advisory tooling, no fixture pair owed — the
-gate below is what blocks, and §The non-gate arm is the second, now-structural
-ground for the same verdict: an arm returning a document has no pass and no
-fail to fixture.
+The declaration surfaces are the resolved kit roots' `LIFECYCLE_KIT_ROSTER_BASENAME` files plus every `LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS` match (gate-sdk's kit-root resolution, consumer-first with kit shadowing — the order every kit registry already uses); duplicates collapse. Follows the affordance contract, with the `cd` a compiled arm cannot take becoming a **computed base**: the scan-root argument, else the repo toplevel, with every path globbed, ignored and printed relative to it. Config-via-env through the knob files; and the three exit-2 causes — a non-repo base, an unreadable declaration surface, a `git check-ignore` that could not decide — become the arm's error return, which the front-end and the in-process caller both surface. Advisory tooling, no fixture pair owed — the gate below is what blocks, and §The non-gate arm is the second, now-structural ground for the same verdict: an arm returning a document has no pass and no fail to fixture.
 
-The sort is by path, with the **whole row** as its tie-break, and that is
-observable rather than incidental: one path may be declared on two surfaces, a
-duplication the derivation deliberately does not collapse (it collapses
-duplicate *surfaces*, not duplicate declarations). A path-only sort would leave
-the tie order at the sorter's discretion and churn the gate's error order for no
-edit.
+The sort is by path, with the **whole row** as its tie-break, and that is observable rather than incidental: one path may be declared on two surfaces, a duplication the derivation deliberately does not collapse (it collapses duplicate *surfaces*, not duplicate declarations). A path-only sort would leave the tie order at the sorter's discretion and churn the gate's error order for no edit.
 
 ### The ruling-staleness probe
 
-A **reporting** arm (`--emit ruling-staleness`) over a consumer's ruling record.
-It renders a document and its exit carries no verdict a caller branches on — it
-escalates to a reader rather than gating an act — so, like the roster arm above,
-it owes no `good`/`bad` fixture pair (§The non-gate arm's ground: an arm
-returning a document has no pass and no fail to fixture). It resolves three
-knobs (§Layout and configuration) and reads nothing else; with
-`LIFECYCLE_KIT_RULING_RECORD` empty it reports that it is unconfigured and
-returns, which is what makes close's repair step skip rather than fail for a
-consumer keeping no such record.
+A **reporting** arm (`--emit ruling-staleness`) over a consumer's ruling record. It renders a document and its exit carries no verdict a caller branches on — it escalates to a reader rather than gating an act — so, like the roster arm above, it owes no `good`/`bad` fixture pair (§The non-gate arm's ground: an arm returning a document has no pass and no fail to fixture). It resolves three knobs (§Layout and configuration) and reads nothing else; with `LIFECYCLE_KIT_RULING_RECORD` empty it reports that it is unconfigured and returns, which is what makes close's repair step skip rather than fail for a consumer keeping no such record.
 
-**Two declarations are its whole ruling grammar**, both body lines in the record,
-both hand-written under judgment by the session recording or retiring a ruling.
-Neither is a **tag**: a tag marks a move across a pending/ready boundary and
-these mark none, which is the further-tag test's own words.
+**Two declarations are its whole ruling grammar**, both body lines in the record, both hand-written under judgment by the session recording or retiring a ruling. Neither is a **tag**: a tag marks a move across a pending/ready boundary and these mark none, which is the further-tag test's own words.
 
 ```
 ruling: <name>[  <name>…]
 discharge: <name>  <oracle>
 ```
 
-**The operand separator is a two-space run in both grammars, stated in words
-because the fence cannot show it.** A ruling's name carries single spaces by
-construction — it is the noun other surfaces use — so only a doubled space can end
-one, and a `ruling:` list written with single spaces parses as one long name
-rather than the list its author meant. `discharge:` falls back to a single space
-when no doubled one is present, a convenience for a one-word slug and *not* a
-second grammar: a multi-word name written that way takes the fallback and
-surrenders its own tail to the oracle. Neither mistake reports — both parse —
-which is why the run is spelled here and in the malformed band's messages rather
-than left to a rendering.
+**The operand separator is a two-space run in both grammars, stated in words because the fence cannot show it.** A ruling's name carries single spaces by construction — it is the noun other surfaces use — so only a doubled space can end one, and a `ruling:` list written with single spaces parses as one long name rather than the list its author meant. `discharge:` falls back to a single space when no doubled one is present, a convenience for a one-word slug and *not* a second grammar: a multi-word name written that way takes the fallback and surrenders its own tail to the oracle. Neither mistake reports — both parse — which is why the run is spelled here and in the malformed band's messages rather than left to a rendering.
 
-`ruling:` names the ruling in the words other surfaces use for it — **one or
-more names, appended and never rewritten** — and exists for the *citing* side.
-That is the finding the obvious design does not have. The inbound half of this
-class reads naturally as *a citation resolving to a surviving section while the
-ruling inside it is gone*, and measured against a real cohort that diagnosis is
-too narrow twice over: in the largest instance on record, eight of eleven stale
-citations named the file, seven named the section, and **every one still
-resolved**, because the heading survived and only the body under it was
-rewritten. A probe over citation *targets* therefore reaches zero of eleven. The
-single invariant across all eleven was the ruling's **proper noun** in a
-present-tense claim anchored to no file at all, and across a tree that shape is
-the large majority. A twelfth site in that same cohort survived its repair by
-writing the noun one word differently, which is why a single declared name is
-insufficient by construction and the field takes a list.
+`ruling:` names the ruling in the words other surfaces use for it — **one or more names, appended and never rewritten** — and exists for the *citing* side. That is the finding the obvious design does not have. The inbound half of this class reads naturally as *a citation resolving to a surviving section while the ruling inside it is gone*, and measured against a real cohort that diagnosis is too narrow twice over: in the largest instance on record, eight of eleven stale citations named the file, seven named the section, and **every one still resolved**, because the heading survived and only the body under it was rewritten. A probe over citation *targets* therefore reaches zero of eleven. The single invariant across all eleven was the ruling's **proper noun** in a present-tense claim anchored to no file at all, and across a tree that shape is the large majority. A twelfth site in that same cohort survived its repair by writing the noun one word differently, which is why a single declared name is insufficient by construction and the field takes a list.
 
-`discharge:` is for a ruling conditioned on a future event, and it declares an
-**oracle** — a command — never a predicate the kit interprets. **Inventing a
-condition language was the obvious design and is refused on a structural fact.**
-Every machine-parsed conditional in this kit's neighbourhood resolves its
-condition against one domain, a queue's live/done partition, and that is not an
-implementation accident: a queue entry has a slug and a pool with an exit, and a
-ruling has neither. A condition grammar for rulings would have to mint the first
-non-queue condition domain and be expressive enough for the conditions records
-actually carry — a CI leg producing an artifact, an oracle's owed count reaching
-zero, a metric read at or below zero across three closes, a release channel
-flipping — which is a vocabulary that would be wrong the day after it landed.
-The oracle form instead reuses a doctrine this kit already ships: §The survey
-record's rule that a carried finding is a citation with a falsifiable staleness
-witness and never a substitute for the oracle. A discharge condition is that
-shape read forward — the ruling names the command, and the session that would
-rely on the ruling runs it. The kit interprets nothing; it dispatches and
-reports.
+`discharge:` is for a ruling conditioned on a future event, and it declares an **oracle** — a command — never a predicate the kit interprets. **Inventing a condition language was the obvious design and is refused on a structural fact.** Every machine-parsed conditional in this kit's neighbourhood resolves its condition against one domain, a queue's live/done partition, and that is not an implementation accident: a queue entry has a slug and a pool with an exit, and a ruling has neither. A condition grammar for rulings would have to mint the first non-queue condition domain and be expressive enough for the conditions records actually carry — a CI leg producing an artifact, an oracle's owed count reaching zero, a metric read at or below zero across three closes, a release channel flipping — which is a vocabulary that would be wrong the day after it landed. The oracle form instead reuses a doctrine this kit already ships: §The survey record's rule that a carried finding is a citation with a falsifiable staleness witness and never a substitute for the oracle. A discharge condition is that shape read forward — the ruling names the command, and the session that would rely on the ruling runs it. The kit interprets nothing; it dispatches and reports.
 
-**The oracle's contract is the exit status and one line of output, in three
-bands**, and the third band is why a broken oracle can never read as a fired
-condition:
+**The oracle's contract is the exit status and one line of output, in three bands**, and the third band is why a broken oracle can never read as a fired condition:
 
-- **not fired** — a non-zero exit, or a clean run printing nothing. The ruling
-  stands.
-- **fired** — a clean run that prints. The ruling becomes a **retirement
-  candidate** a session must judge under the record's mood test, never a
-  retirement the arm performs.
-- **dispatch failure** — the command could not be run, or exceeded
-  `LIFECYCLE_KIT_RULING_ORACLE_TIMEOUT`. Reported as such and joined to neither
-  other band.
+- **not fired** — a non-zero exit, or a clean run printing nothing. The ruling stands.
+- **fired** — a clean run that prints. The ruling becomes a **retirement candidate** a session must judge under the record's mood test, never a retirement the arm performs.
+- **dispatch failure** — the command could not be run, or exceeded `LIFECYCLE_KIT_RULING_ORACLE_TIMEOUT`. Reported as such and joined to neither other band.
 
-**Two oracle shapes sit in the not-fired band while their condition holds, and
-neither reports.** An absence test spelled `grep -L <x> <file>` prints the file
-and exits non-zero under GNU grep when `<x>` is absent, so it reads as not fired
-exactly when it should fire; spell absence as `grep -q <x> <file> || echo <evidence>`,
-and check it through `bash -c`, the arm's own dispatch, because an interactive
-shell may resolve `grep` to an implementation whose `-L` exits zero. A substring
-test for a slug is satisfied by any live citation of that slug, so a discharge
-keyed on an entry leaving its section anchors the match to the line that move
-writes — a bare done line under `grep -x` — never to the slug anywhere in the file.
+**Two oracle shapes sit in the not-fired band while their condition holds, and neither reports.** An absence test spelled `grep -L <x> <file>` prints the file and exits non-zero under GNU grep when `<x>` is absent, so it reads as not fired exactly when it should fire; spell absence as `grep -q <x> <file> || echo <evidence>`, and check it through `bash -c`, the arm's own dispatch, because an interactive shell may resolve `grep` to an implementation whose `-L` exits zero. A substring test for a slug is satisfied by any live citation of that slug, so a discharge keyed on an entry leaving its section anchors the match to the line that move writes — a bare done line under `grep -x` — never to the slug anywhere in the file.
 
-**A condition no command can settle takes the literal operand `manual`**,
-followed by the prose condition, and this is the case that forced the operand
-rather than an escape hatch: a record may carry a ruling whose condition resolves
-only against an untracked local surface no tracked oracle can reach, and a probe
-scoped to tracked surfaces would silently skip it. Declaring it `manual` makes it
-report as **owed to judgment**, which is the difference between a probe that
-knows what it cannot answer and one that answers wrongly.
+**A condition no command can settle takes the literal operand `manual`**, followed by the prose condition, and this is the case that forced the operand rather than an escape hatch: a record may carry a ruling whose condition resolves only against an untracked local surface no tracked oracle can reach, and a probe scoped to tracked surfaces would silently skip it. Declaring it `manual` makes it report as **owed to judgment**, which is the difference between a probe that knows what it cannot answer and one that answers wrongly.
 
-**Two reports, one arm.** The **discharge report** is one row per declared
-condition: the ruling's name, the oracle's band, the declaration's own site, and,
-for a fired one, the oracle's own output line as the evidence; a `manual` row
-carries its prose. The **citing report** is, per subject ruling, the sites across
-`LIFECYCLE_KIT_RULING_CITERS` naming it, with the citing line **quoted verbatim**
-so a reader judges the claim rather than the match. A ruling's `ruling:` names are
-the search keys, all of them; a subject the record declares no names for is swept
-under its own spelling alone, which is the no-retrofit decision showing through
-rather than a fallback worth hiding.
+**Two reports, one arm.** The **discharge report** is one row per declared condition: the ruling's name, the oracle's band, the declaration's own site, and, for a fired one, the oracle's own output line as the evidence; a `manual` row carries its prose. The **citing report** is, per subject ruling, the sites across `LIFECYCLE_KIT_RULING_CITERS` naming it, with the citing line **quoted verbatim** so a reader judges the claim rather than the match. A ruling's `ruling:` names are the search keys, all of them; a subject the record declares no names for is swept under its own spelling alone, which is the no-retrofit decision showing through rather than a fallback worth hiding.
 
-**The subject set is the fired conditions plus the arm's argv tail**, and the
-tail is what makes the report reachable for a retirement the record does not yet
-carry: *whose retirement a session has recorded* has no artifact to read at the
-moment it matters, since the session asking what would go stale is asking
-**before** it writes. So it names the ruling, and the arm answers. With no
-operand the report covers exactly the fired conditions, which is the close-stage
-step's reading.
+**The subject set is the fired conditions plus the arm's argv tail**, and the tail is what makes the report reachable for a retirement the record does not yet carry: *whose retirement a session has recorded* has no artifact to read at the moment it matters, since the session asking what would go stale is asking **before** it writes. So it names the ruling, and the arm answers. With no operand the report covers exactly the fired conditions, which is the close-stage step's reading.
 
-**Run bare AFTER a retirement has landed, the citing-side report is vacuous and
-reads as clean.** A retired paragraph fires nothing, so the subject set is empty
-and the run says there is nothing to sweep — at the one moment a session most
-wants the citing sites, the retirement being what stranded them. The tail answers
-that after case as well as the before one, and what to pass is the ruling's
-**names**: the declared-name lookup reads the live record, so a discharge slug
-that has just left it resolves to nothing and each operand degrades to a literal
-search over the corpus.
+**Run bare AFTER a retirement has landed, the citing-side report is vacuous and reads as clean.** A retired paragraph fires nothing, so the subject set is empty and the run says there is nothing to sweep — at the one moment a session most wants the citing sites, the retirement being what stranded them. The tail answers that after case as well as the before one, and what to pass is the ruling's **names**: the declared-name lookup reads the live record, so a discharge slug that has just left it resolves to nothing and each operand degrades to a literal search over the corpus.
 
-**Escalation-only, and the refusal is the design.** The arm proposes no edit,
-retires nothing, and never says a citation is wrong. That boundary answers this
-kit's own standing objection to mechanizing this class (§The committed gap
-inbox): a claim about *what a finding is* has no syntactic tell separating
-"this recurred" from "this is about", and the same objection reaches a citation —
-a surface may name a retired ruling as **evidence about the past**, which is
-correct prose, or restate it as a **live rule**, which is the defect, and no
-scanner tells them apart. The instance that proves it sits inside the eleven-entry
-cohort itself: one of the eleven recorded a *live* ruling under the retired run's
-name, so the remedy there was to re-name the run and leave the ruling untouched.
-**A probe blind to that distinction proposes reversals**, which is the one act
-the record holds operator-class throughout.
+**Escalation-only, and the refusal is the design.** The arm proposes no edit, retires nothing, and never says a citation is wrong. That boundary answers this kit's own standing objection to mechanizing this class (§The committed gap inbox): a claim about *what a finding is* has no syntactic tell separating "this recurred" from "this is about", and the same objection reaches a citation — a surface may name a retired ruling as **evidence about the past**, which is correct prose, or restate it as a **live rule**, which is the defect, and no scanner tells them apart. The instance that proves it sits inside the eleven-entry cohort itself: one of the eleven recorded a *live* ruling under the retired run's name, so the remedy there was to re-name the run and leave the ruling untouched. **A probe blind to that distinction proposes reversals**, which is the one act the record holds operator-class throughout.
 
-**An undeclared condition is reported, not inherited.** A ruling whose prose names
-a future event and which carries no `discharge:` line is reported as
-**undeclared**, taking the same closure §The close-surface roster takes for a
-capture surface nobody declared: the roster reports the hole instead of inheriting
-it, which is the whole difference between a derived roster and a maintained one.
-Without it the no-retrofit decision would be a silent hole rather than an honest
-one — a record whose rulings already name discharge events in prose under its own
-authoring convention, none of them machine-readable, would report one condition
-and look complete the moment a single declaration landed. **The detection is
-deliberately weak and is stated as weak**: it is a prose match over
-forward-looking phrasing, FP-bearing by construction, on the same honest posture a
-forward-precondition scan takes about the same problem. It reports, it does not
-red, and a false positive costs a reader one line.
+**An undeclared condition is reported, not inherited.** A ruling whose prose names a future event and which carries no `discharge:` line is reported as **undeclared**, taking the same closure §The close-surface roster takes for a capture surface nobody declared: the roster reports the hole instead of inheriting it, which is the whole difference between a derived roster and a maintained one. Without it the no-retrofit decision would be a silent hole rather than an honest one — a record whose rulings already name discharge events in prose under its own authoring convention, none of them machine-readable, would report one condition and look complete the moment a single declaration landed. **The detection is deliberately weak and is stated as weak**: it is a prose match over forward-looking phrasing, FP-bearing by construction, on the same honest posture a forward-precondition scan takes about the same problem. It reports, it does not red, and a false positive costs a reader one line.
 
-**A paragraph that states the record's contract takes a valve, and the valve excuses it from
-this pass alone.** A record that opens by defining what a ruling is will match the detector,
-because the definition carries the forward phrasing a ruling carries. That paragraph takes one
-line, anywhere inside it:
+**A paragraph that states the record's contract takes a valve, and the valve excuses it from this pass alone.** A record that opens by defining what a ruling is will match the detector, because the definition carries the forward phrasing a ruling carries. That paragraph takes one line, anywhere inside it:
 
 ```
 <!-- undeclared-condition-exempt: <why this paragraph is no ruling> -->
 ```
 
-The **reason is mandatory**. A valve with no reason reports in the malformed band and does
-**not** excuse its paragraph, on the rule that band states below: a malformed declaration must
-not buy the skip it failed to justify. The valve reaches the undeclared pass only. It is no
-declaration of a ruling, so the discharge report, the citing report and the `ruling:` name
-lookup never read it. It is per **paragraph** because the paragraph is the pass's unit. The
-line is found by the same reading the two declarations get, the fence skip and a
-leading-whitespace trim, so a valve quoted inside a fenced block, like the one above, is
-quotation and excuses nothing. Structural answers are refused. The probe does not skip a
-record's preamble by heading position, which would couple it to the record's shape and
-silently drop a real ruling placed there. The detector's phrases are not narrowed either,
-which is the evasion §The committed gap inbox refuses. The valve puts the fact on the record,
-where the author who wrote the paragraph can state it.
+The **reason is mandatory**. A valve with no reason reports in the malformed band and does **not** excuse its paragraph, on the rule that band states below: a malformed declaration must not buy the skip it failed to justify. The valve reaches the undeclared pass only. It is no declaration of a ruling, so the discharge report, the citing report and the `ruling:` name lookup never read it. It is per **paragraph** because the paragraph is the pass's unit. The line is found by the same reading the two declarations get, the fence skip and a leading-whitespace trim, so a valve quoted inside a fenced block, like the one above, is quotation and excuses nothing. Structural answers are refused. The probe does not skip a record's preamble by heading position, which would couple it to the record's shape and silently drop a real ruling placed there. The detector's phrases are not narrowed either, which is the evasion §The committed gap inbox refuses. The valve puts the fact on the record, where the author who wrote the paragraph can state it.
 
-**A malformed declaration reports as malformed, and never as absent.** Both
-declarations and the contract valve are hand-written, and each has a likeliest
-slip — a `discharge:` naming a ruling and no oracle, a `ruling:` whose name list
-is empty, a valve with no reason — which a reader that only parses would drop,
-or for the valve honour, rather than report. Dropped alone that is a silent loss;
-**composed it is worse than writing nothing**, because the undeclared pass
-skipped a paragraph on the *presence* of a `discharge:` line, so a typo
-suppressed the report that would otherwise name the ruling. So the arm carries a
-fourth band, **malformed**, one row per unreadable declaration with its site and
-what the grammar wanted — and the undeclared pass reads **well-formed**
-declarations only, which is the half that costs. A paragraph whose declaration
-cannot be read reports under both bands, correctly rather than duplicatively:
-they answer *this line is unreadable* and *this ruling has no readable
-condition*, and repairing the first must leave the second true. This is a
-**validity** read over a declaration that was written, so it neither takes nor
-reopens the refusal of a **presence** gate demanding one.
+**A malformed declaration reports as malformed, and never as absent.** Both declarations and the contract valve are hand-written, and each has a likeliest slip — a `discharge:` naming a ruling and no oracle, a `ruling:` whose name list is empty, a valve with no reason — which a reader that only parses would drop, or for the valve honour, rather than report. Dropped alone that is a silent loss; **composed it is worse than writing nothing**, because the undeclared pass skipped a paragraph on the *presence* of a `discharge:` line, so a typo suppressed the report that would otherwise name the ruling. So the arm carries a fourth band, **malformed**, one row per unreadable declaration with its site and what the grammar wanted — and the undeclared pass reads **well-formed** declarations only, which is the half that costs. A paragraph whose declaration cannot be read reports under both bands, correctly rather than duplicatively: they answer *this line is unreadable* and *this ruling has no readable condition*, and repairing the first must leave the second true. This is a **validity** read over a declaration that was written, so it neither takes nor reopens the refusal of a **presence** gate demanding one.
 
-**The producer/checker split is the one the port track already runs on.** A
-declaration *reports* and a separate reader *escalates when the named thing
-changes state*; that pairing is why a stale hold cannot silently under-count owed
-work, and it is copied here rather than re-invented.
+**The producer/checker split is the one the port track already runs on.** A declaration *reports* and a separate reader *escalates when the named thing changes state*; that pairing is why a stale hold cannot silently under-count owed work, and it is copied here rather than re-invented.
 
 ### check-close-surfaces
 
-Three assertions, over the derived roster: (A) **no undeclared surface** — every
-capture-tier workflow-dir member carries a declaration; (B) **every declaration
-carries a mode**, and a `forced=` mode's citation is *well-formed* — a
-repo-relative `<path>.md` followed by `§<section>`; (C) **every capture-tier
-declaration names a reclaim command**.
+Three assertions, over the derived roster: (A) **no undeclared surface** — every capture-tier workflow-dir member carries a declaration; (B) **every declaration carries a mode**, and a `forced=` mode's citation is *well-formed* — a repo-relative `<path>.md` followed by `§<section>`; (C) **every capture-tier declaration names a reclaim command**.
 
-Assertion B is shape-only, and resolution is somebody else's job already:
-`check-spec-pointer`'s prose pass resolves a `forced=` citation on any manifest
-surface (§The close-surface roster). Taking the presence-and-shape half here is
-not a preference — canon-kit's heading resolver is defined *inside its own gate*
-rather than exported from a library, and the port to the binary substrate did not
-change that: it is a private function of the compiled member, so there is still
-no resolver a second gate could call. Reaching it would mean either copying
-the resolver, which canon-kit's own tiering rule bans, or making lifecycle-kit
-depend on canon-kit — the same ownership-cycle argument that rules out the log
-merge. The honest arrangement is a pair of gates independently reading one
-surface, each asserting what it owns.
+Assertion B is shape-only, and resolution is somebody else's job already: `check-spec-pointer`'s prose pass resolves a `forced=` citation on any manifest surface (§The close-surface roster). Taking the presence-and-shape half here is not a preference — canon-kit's heading resolver is defined *inside its own gate* rather than exported from a library, and the port to the binary substrate did not change that: it is a private function of the compiled member, so there is still no resolver a second gate could call. Reaching it would mean either copying the resolver, which canon-kit's own tiering rule bans, or making lifecycle-kit depend on canon-kit — the same ownership-cycle argument that rules out the log merge. The honest arrangement is a pair of gates independently reading one surface, each asserting what it owns.
 
-The gate reads the roster by **calling the derivation in process**
-(§The close-surfaces emit arm),
-so a roster it could not derive is fail-closed (exit
-2), as is an unreadable declaration surface. The in-process call is the point
-rather than an optimization: it makes "the derivation and the gate can never
-disagree" structural instead of conventional. The gate splits the row's fifth
-field, `<state>`, off and reads it as nothing — a four-way split would fold it
-into the owner of every error line — and **never reds on `absent`**: a
-capture-tier surface is gitignored and legitimately absent in CI and a fresh
-clone, so an absence is a closing session's finding, never a tree violation. It
-also means the descriptor
-acquires a **source coupling** — the gate module and the emit module it reaches
-transitively join `couples=` beside the surfaces already named, or the gate
-stays registered, green, and never triggered on the edit that broke it.
+The gate reads the roster by **calling the derivation in process** (§The close-surfaces emit arm), so a roster it could not derive is fail-closed (exit 2), as is an unreadable declaration surface. The in-process call is the point rather than an optimization: it makes "the derivation and the gate can never disagree" structural instead of conventional. The gate splits the row's fifth field, `<state>`, off and reads it as nothing — a four-way split would fold it into the owner of every error line — and **never reds on `absent`**: a capture-tier surface is gitignored and legitimately absent in CI and a fresh clone, so an absence is a closing session's finding, never a tree violation. It also means the descriptor acquires a **source coupling** — the gate module and the emit module it reaches transitively join `couples=` beside the surfaces already named, or the gate stays registered, green, and never triggered on the edit that broke it.
 
-An optional scan-root argument (passed through to the derivation as its base) is
-the fixture
-capability: `git check-ignore` never reports a *tracked* path, and a fixture file
-must be tracked to survive a clone, so a case dir cannot hold a capture-tier
-member. The `good/`+`bad/` pair therefore covers assertion B on a consumer-set
-`LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS`, and the bespoke
-`gate-tests/check-close-surfaces.test.sh` builds sandbox repos with a real
-`.gitignore` for assertions A and C — the `check-exec-bit` precedent. Both move
-with the member across a substrate change rather than being re-authored: the
-pair is keyed by gate *name*, and the scenario runner dispatches by name through
-`gate_run` (§Testing). Tier
-`precommit`; the `# graph:` manifest couples the workflow dir, the
-declaration surfaces and the two crate modules.
+An optional scan-root argument (passed through to the derivation as its base) is the fixture capability: `git check-ignore` never reports a *tracked* path, and a fixture file must be tracked to survive a clone, so a case dir cannot hold a capture-tier member. The `good/`+`bad/` pair therefore covers assertion B on a consumer-set `LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS`, and the bespoke `gate-tests/check-close-surfaces.test.sh` builds sandbox repos with a real `.gitignore` for assertions A and C — the `check-exec-bit` precedent. Both move with the member across a substrate change rather than being re-authored: the pair is keyed by gate *name*, and the scenario runner dispatches by name through `gate_run` (§Testing). Tier `precommit`; the `# graph:` manifest couples the workflow dir, the declaration surfaces and the two crate modules.
 
-The three assertions carry `assertion A:` / `assertion B:` / `assertion C:`
-markers in the implementing member's own source, in whatever comment leader its
-substrate spells. That is not decoration: `check-gate-assertions` set-matches
-the enumeration above against those markers and reds on an **empty** set, so a
-port that drops them leaves the gate looking unasserted.
+The three assertions carry `assertion A:` / `assertion B:` / `assertion C:` markers in the implementing member's own source, in whatever comment leader its substrate spells. That is not decoration: `check-gate-assertions` set-matches the enumeration above against those markers and reds on an **empty** set, so a port that drops them leaves the gate looking unasserted.
 
-Calibration and honest limit: the gate asserts the roster is **complete and
-moded**, never that close actually *read* a surface. Reading is a session act
-with no mechanical residue short of a per-surface disposition stamp, which is the
-heavier design this deliberately does not take: the marking converts an invisible
-omission into a sanctioned one, and a stamp would convert it into a gated one at
-the cost of a stamp-per-surface-per-iteration ritual. The lighter disposition
-comes first because an advisory surface's skip is often correct, and gating a
-correct action is the failure mode the gap-inbox refusal already demonstrated.
-The un-gateable half rides the Enforcement-first carve-out's cadence — a class on
-the consumer's close-stage audit roster (§The audit roster).
+Calibration and honest limit: the gate asserts the roster is **complete and moded**, never that close actually *read* a surface. Reading is a session act with no mechanical residue short of a per-surface disposition stamp, which is the heavier design this deliberately does not take: the marking converts an invisible omission into a sanctioned one, and a stamp would convert it into a gated one at the cost of a stamp-per-surface-per-iteration ritual. The lighter disposition comes first because an advisory surface's skip is often correct, and gating a correct action is the failure mode the gap-inbox refusal already demonstrated. The un-gateable half rides the Enforcement-first carve-out's cadence — a class on the consumer's close-stage audit roster (§The audit roster).
 
 ### check-lifecycle-registration
 
-Invariant: the configured agent file (`LIFECYCLE_KIT_AGENT_FILE`) carries a
-lifecycle-kit marker block whose inner content byte-matches the block
-regenerated from the live stage machine (`stages::registration_block`). The
-block is derived from the machine, and a reshaped machine — a renamed or
-reordered stage, a relocated queue file — or a hand-edit stales it *by
-construction*, on the exact path the kit advertises (reshape the config,
-re-run the installer): the drift-prone-generated-surface case where a gate is
-owed (the enforcement-first weighing). The freshness posture is
-`check-doctrine-registration`'s, byte-strict like `check-docs-mirror-fresh`.
+Invariant: the configured agent file (`LIFECYCLE_KIT_AGENT_FILE`) carries a lifecycle-kit marker block whose inner content byte-matches the block regenerated from the live stage machine (`stages::registration_block`). The block is derived from the machine, and a reshaped machine — a renamed or reordered stage, a relocated queue file — or a hand-edit stales it *by construction*, on the exact path the kit advertises (reshape the config, re-run the installer): the drift-prone-generated-surface case where a gate is owed (the enforcement-first weighing). The freshness posture is `check-doctrine-registration`'s, byte-strict like `check-docs-mirror-fresh`.
 
-A missing block is a finding with the install remedy; a block present but out
-of lockstep is a finding printing the diff and the regenerate remedy (both
-exit 1). The stale-block report prints **every** hunk: the format and the
-uncapped contract are the crate renderer's, whose home is
-gate-sdk/SPEC.md §The diff renderer since it stopped being this gate's private
-mechanism, and this gate is its one live consumer. Resolution fails closed: a missing agent file, a begin marker without
-its end, or an errored marker capture is exit 2 — a half-written or unreadable
-target must not pass as clean. The gate satisfies the four gate-sdk contracts
-(gate-sdk/SPEC.md §The gate model): the single `LIFECYCLE-REGISTRATION: clean`
-line and a `help:` remedy on each finding path (output); exit 2 on an
-unreadable target (fail-closed); a `good/`+`bad/` fixture pair under
-`gate-tests/` (byte-lockstep-clean and stale-block) plus a sibling `*.test.sh`
-for the block-absent, unpaired-marker, and agent-missing cases the one-pair
-harness cannot hold (fixture-pair); and registration in this repo's
-`gates.list` where its own always-loaded file is the scan target (self-lint).
-Positional form `check-lifecycle-registration.sh [agent-file]` points the
-fixtures at a synthetic agent file. Its `# graph:` manifest couples the agent
-file, the kit's table in `native/src/knobs/lifecycle_kit.rs` and this repo's
-`scripts/lifecycle-config.knobs` — the config that feeds the block — so an edit
-to any re-fires the gate.
+A missing block is a finding with the install remedy; a block present but out of lockstep is a finding printing the diff and the regenerate remedy (both exit 1). The stale-block report prints **every** hunk: the format and the uncapped contract are the crate renderer's, whose home is gate-sdk/SPEC.md §The diff renderer since it stopped being this gate's private mechanism, and this gate is its one live consumer. Resolution fails closed: a missing agent file, a begin marker without its end, or an errored marker capture is exit 2 — a half-written or unreadable target must not pass as clean. The gate satisfies the four gate-sdk contracts (gate-sdk/SPEC.md §The gate model): the single `LIFECYCLE-REGISTRATION: clean` line and a `help:` remedy on each finding path (output); exit 2 on an unreadable target (fail-closed); a `good/`+`bad/` fixture pair under `gate-tests/` (byte-lockstep-clean and stale-block) plus a sibling `*.test.sh` for the block-absent, unpaired-marker, and agent-missing cases the one-pair harness cannot hold (fixture-pair); and registration in this repo's `gates.list` where its own always-loaded file is the scan target (self-lint). Positional form `check-lifecycle-registration.sh [agent-file]` points the fixtures at a synthetic agent file. Its `# graph:` manifest couples the agent file, the kit's table in `native/src/knobs/lifecycle_kit.rs` and this repo's `scripts/lifecycle-config.knobs` — the config that feeds the block — so an edit to any re-fires the gate.
 
 ### check-stage-evidence
 
-Invariant: the evidence file's stamps are well-formed and every one of them
-belongs to the header's iteration. Each stage skill appends a stamp as its
-first step, and since the last stamp *is* the current stage, "the current
-stage has a matching stamp" holds by construction — so the gate does not
-assert it, because a tautology is not an invariant. What it asserts is the
-**name-axis agreement** between the two surfaces, carried by the staleness
-assertion: every data line's iteration must be the header's. That assertion is
-what forces the first stage to rewrite its `—` bootstrap stamp once it names
-the iteration, and it is the sole remaining enforcer of header↔stamp
-agreement, not a bystander to it.
+Invariant: the evidence file's stamps are well-formed and every one of them belongs to the header's iteration. Each stage skill appends a stamp as its first step, and since the last stamp *is* the current stage, "the current stage has a matching stamp" holds by construction — so the gate does not assert it, because a tautology is not an invariant. What it asserts is the **name-axis agreement** between the two surfaces, carried by the staleness assertion: every data line's iteration must be the header's. That assertion is what forces the first stage to rewrite its `—` bootstrap stamp once it names the iteration, and it is the sole remaining enforcer of header↔stamp agreement, not a bystander to it.
 
-The gate's one no-cursor ruling: a state file that exists but carries **no
-stamp** is a red, with the same shape as the missing-file message. The
-window is legitimate *inside* `--enter-stage`'s boundary reset, which stamps
-in the same motion; by commit time an unstamped file means no stage was ever
-invoked, which is precisely what this gate exists to reject — and with the
-stage axis off the header, nothing else would have caught it (an empty file
-gives the grammar and staleness passes nothing to reject).
+The gate's one no-cursor ruling: a state file that exists but carries **no stamp** is a red, with the same shape as the missing-file message. The window is legitimate *inside* `--enter-stage`'s boundary reset, which stamps in the same motion; by commit time an unstamped file means no stage was ever invoked, which is precisely what this gate exists to reject — and with the stage axis off the header, nothing else would have caught it (an empty file gives the grammar and staleness passes nothing to reject).
 
-The stamp file is additionally kept provably bounded: every data line
-must be grammatically well-formed — exactly five fields, stage ∈ the
-configured stage set plus the waiver token (a stamp token but never a header
-stage), date `YYYY-MM-DD`, and `<head>` either the literal `none` or a
-lowercase hex abbreviation of 7 to 40 characters (§The state machine owns the
-field); every data line's iteration must be the current
-one, stale lines from a prior iteration are rejected; and the `—`
-unnamed-iteration sentinel may appear only while the header itself is unnamed.
-It also reads the `<session-id>` field (which it once ignored) for one
-cross-stage invariant, active at the default `stage` posture of
-`LIFECYCLE_KIT_SESSION_BOUNDARY` (§Layout and configuration): within the
-current iteration, two *different* stages may not share one session id — a
-stage entry is a context boundary and demands a fresh session, so a duplicate
-(e.g. build == validate) is a self-reported skip and fails. The rule constrains
-*cross-stage* sharing only: **same-stage re-entries are in-contract** — a
-multi-session build, or a lead's N sibling batch sessions of one stage
-(§The state machine), may share or rotate ids freely, a sanctioned pattern
-rather than merely unpunished. This owner-doc statement is the home of the rule
-the gate's own distinctness message echoes. Waiver-token stamps are exempt
-(never a stage, so never in the map). At the
-`iteration` posture the gate skips only this distinctness map; stamp grammar,
-staleness, and sentinel scoping hold
-identically, and a reused session id remains on the audit trail — it just
-stops failing the gate.
+The stamp file is additionally kept provably bounded: every data line must be grammatically well-formed — exactly five fields, stage ∈ the configured stage set plus the waiver token (a stamp token but never a header stage), date `YYYY-MM-DD`, and `<head>` either the literal `none` or a lowercase hex abbreviation of 7 to 40 characters (§The state machine owns the field); every data line's iteration must be the current one, stale lines from a prior iteration are rejected; and the `—` unnamed-iteration sentinel may appear only while the header itself is unnamed. It also reads the `<session-id>` field (which it once ignored) for one cross-stage invariant, active at the default `stage` posture of `LIFECYCLE_KIT_SESSION_BOUNDARY` (§Layout and configuration): within the current iteration, two *different* stages may not share one session id — a stage entry is a context boundary and demands a fresh session, so a duplicate (e.g. build == validate) is a self-reported skip and fails. The rule constrains *cross-stage* sharing only: **same-stage re-entries are in-contract** — a multi-session build, or a lead's N sibling batch sessions of one stage (§The state machine), may share or rotate ids freely, a sanctioned pattern rather than merely unpunished. This owner-doc statement is the home of the rule the gate's own distinctness message echoes. Waiver-token stamps are exempt (never a stage, so never in the map). At the `iteration` posture the gate skips only this distinctness map; stamp grammar, staleness, and sentinel scoping hold identically, and a reused session id remains on the audit trail — it just stops failing the gate.
 
-Calibration: the `—` sentinel is the bootstrap name for a new iteration
-before the first stage names it. Any stage past the first carrying `—` in the
-header is rejected (the unnamed-iteration guard, which reads the name axis from
-the header and the stage axis from the cursor — it works only because the two
-axes stay independently sourced); admitting `—` at every stage — an
-attested bug — would let an unnamed iteration reach the final stage
-undetected, so the allowance is stage-scoped, not global. The data section
-begins after the first `---` separator; prose above it is not validated
-line-by-line. Argument mode `$1 $2` (queue, state) with configured defaults
-makes the gate fixture-capable; the sentinel-scoping interplay that exceeds
-one good/bad pair is covered by `gate-tests/check-stage-evidence.test.sh`, which
-is also where the two assertions below are exercised — each needs a real git
-history, which no static fixture pair can carry.
+Calibration: the `—` sentinel is the bootstrap name for a new iteration before the first stage names it. Any stage past the first carrying `—` in the header is rejected (the unnamed-iteration guard, which reads the name axis from the header and the stage axis from the cursor — it works only because the two axes stay independently sourced); admitting `—` at every stage — an attested bug — would let an unnamed iteration reach the final stage undetected, so the allowance is stage-scoped, not global. The data section begins after the first `---` separator; prose above it is not validated line-by-line. Argument mode `$1 $2` (queue, state) with configured defaults makes the gate fixture-capable; the sentinel-scoping interplay that exceeds one good/bad pair is covered by `gate-tests/check-stage-evidence.test.sh`, which is also where the two assertions below are exercised — each needs a real git history, which no static fixture pair can carry.
 
-**The stamp-provenance assertion.** A stamp proves the stage skill was invoked;
-this assertion is what makes it prove the invocation came **first**. For every
-**newly introduced** stamp, inside a git work tree: **`<head>` must name
-`HEAD`** — the recorded abbreviation, at least seven characters, must be a
-prefix of the full `HEAD` sha, so a consumer's `core.abbrev` never enters the
-contract.
+**The stamp-provenance assertion.** A stamp proves the stage skill was invoked; this assertion is what makes it prove the invocation came **first**. For every **newly introduced** stamp, inside a git work tree: **`<head>` must name `HEAD`** — the recorded abbreviation, at least seven characters, must be a prefix of the full `HEAD` sha, so a consumer's `core.abbrev` never enters the contract.
 
-A stamp is **newly introduced** when no data line in `HEAD`'s version of the
-state file carries the same `<session-id> <head>` pair. Identity is that pair
-rather than the whole line because `--enter-stage --rename` rewrites
-column 1 of every data line and must not read as re-introducing all of them.
-**The migration clause** applies that same reasoning to the one other bulk
-rewrite this format has: a `HEAD`-version data line carrying only **four**
-fields matches any working-tree line with the same `<session-id>`, so the
-one-time five-field migration (§The state machine) is a rewrite and not an
-introduction. Without it the migration commit — and every consumer's own
-rewrite, which that section names as the recovery — would red against an
-assertion no historical stamp can satisfy. The clause is self-retiring:
-four-field lines cease to exist once migrated, and the boundary reset truncates
-the file within one iteration.
+A stamp is **newly introduced** when no data line in `HEAD`'s version of the state file carries the same `<session-id> <head>` pair. Identity is that pair rather than the whole line because `--enter-stage --rename` rewrites column 1 of every data line and must not read as re-introducing all of them. **The migration clause** applies that same reasoning to the one other bulk rewrite this format has: a `HEAD`-version data line carrying only **four** fields matches any working-tree line with the same `<session-id>`, so the one-time five-field migration (§The state machine) is a rewrite and not an introduction. Without it the migration commit — and every consumer's own rewrite, which that section names as the recovery — would red against an assertion no historical stamp can satisfy. The clause is self-retiring: four-field lines cease to exist once migrated, and the boundary reset truncates the file within one iteration.
 
-What it catches, without a history walk and without a per-stage surface roster:
-a session that stamps first and commits the stamp *after* its work commits has
-moved `HEAD` between the write and the commit, so the recorded head is stale and
-the gate reds naming both commits. **Same-stage re-entry is in reach by shape
-rather than by exemption** — a second session's stamp records its own `HEAD` and
-is committed on it, and the assertion never compares two stamps to each other.
+What it catches, without a history walk and without a per-stage surface roster: a session that stamps first and commits the stamp *after* its work commits has moved `HEAD` between the write and the commit, so the recorded head is stale and the gate reds naming both commits. **Same-stage re-entry is in reach by shape rather than by exemption** — a second session's stamp records its own `HEAD` and is committed on it, and the assertion never compares two stamps to each other.
 
-**Four inertness conditions, all stated, because an unstated one reads as
-coverage.** The assertion does not run when
+**Four inertness conditions, all stated, because an unstated one reads as coverage.** The assertion does not run when
 
-- **(a)** the state file's directory lies in no git work tree, or in a different
-  one from the configured surfaces — a vendored tree under test, a sandbox;
-- **(b)** the file handed to the gate is not *this* work tree's own configured
-  state file — its repo-root-relative path is not `LIFECYCLE_KIT_STATE_FILE`.
-  "Inside a work tree" alone is not the discriminator the amendment behind this
-  section assumed it was: a `gate-tests/` fixture tree sits inside the repo like
-  everything else, and firing there would assert a recorded head against a repo
-  whose history the fixture's stamps were never taken in. That is also what
-  keeps this gate's argument mode fixture-capable at no cost to the assertion;
-- **(c)** the state file is not tracked in `HEAD`, because there is then no
-  prior version to diff against and "newly introduced" is unanswerable rather
-  than false — a consumer's first state-file commit;
-- **(d)** no stamp is newly introduced, which is every battery run that stamps
-  nothing.
+- **(a)** the state file's directory lies in no git work tree, or in a different one from the configured surfaces — a vendored tree under test, a sandbox;
+- **(b)** the file handed to the gate is not *this* work tree's own configured state file — its repo-root-relative path is not `LIFECYCLE_KIT_STATE_FILE`. "Inside a work tree" alone is not the discriminator the amendment behind this section assumed it was: a `gate-tests/` fixture tree sits inside the repo like everything else, and firing there would assert a recorded head against a repo whose history the fixture's stamps were never taken in. That is also what keeps this gate's argument mode fixture-capable at no cost to the assertion;
+- **(c)** the state file is not tracked in `HEAD`, because there is then no prior version to diff against and "newly introduced" is unanswerable rather than false — a consumer's first state-file commit;
+- **(d)** no stamp is newly introduced, which is every battery run that stamps nothing.
 
-On the live file, `none` on a newly introduced stamp is a **red**, and that is
-what keeps the inertness from being a disarm. The residual is `git rm --cached`
-of the state file, which would restore condition (c): the same class as
-`--no-verify`, and closed by neither.
+On the live file, `none` on a newly introduced stamp is a **red**, and that is what keeps the inertness from being a disarm. The residual is `git rm --cached` of the state file, which would restore condition (c): the same class as `--no-verify`, and closed by neither.
 
-**The recovery names the delete, and the reason is the newly-introduced
-definition rather than a case split.** Every stamp this assertion reports is
-uncommitted — a line already in `HEAD`'s version of the state file carries a
-matching pair and is skipped — so re-running `--enter-stage` alone can never
-clear the red: the arm *appends*, so the fresh line lands beside the stale one
-and the assertion, which scans every data line rather than the last, reddens on
-the stale one again with a byte-identical message. The recovery is therefore
-**delete the stale line, then re-enter and commit the fresh stamp on its own**,
-and the delete loses nothing precisely because the line was never committed. A
-help text prescribing only the re-run sends an already-off-script session round
-a loop with no exit, which is measured rather than predicted — it was followed
-twice in a row and resolved only by a hand delete the text never mentioned.
-**The purity assertion's recovery is its own** and is stated with it, because
-one help text serving both classes is wrong for whichever it was not written
-for: a surplus staged path is unstaged and committed separately, the stamp
-itself being sound.
+**The recovery names the delete, and the reason is the newly-introduced definition rather than a case split.** Every stamp this assertion reports is uncommitted — a line already in `HEAD`'s version of the state file carries a matching pair and is skipped — so re-running `--enter-stage` alone can never clear the red: the arm *appends*, so the fresh line lands beside the stale one and the assertion, which scans every data line rather than the last, reddens on the stale one again with a byte-identical message. The recovery is therefore **delete the stale line, then re-enter and commit the fresh stamp on its own**, and the delete loses nothing precisely because the line was never committed. A help text prescribing only the re-run sends an already-off-script session round a loop with no exit, which is measured rather than predicted — it was followed twice in a row and resolved only by a hand delete the text never mentioned. **The purity assertion's recovery is its own** and is stated with it, because one help text serving both classes is wrong for whichever it was not written for: a surplus staged path is unstaged and committed separately, the stamp itself being sound.
 
-**The stamp-commit purity assertion.** The provenance assertion alone is
-defeated by a session that writes the stamp and its work into **one** commit:
-`HEAD` has not moved, so the recorded head is current. The complement closes it.
-Where the state file is among the staged paths *and* introduces a stamp, the
-staged path set must contain **only**:
+**The stamp-commit purity assertion.** The provenance assertion alone is defeated by a session that writes the stamp and its work into **one** commit: `HEAD` has not moved, so the recorded head is current. The complement closes it. Where the state file is among the staged paths *and* introduces a stamp, the staged path set must contain **only**:
 
 - the state file — for any stage's stamp; and additionally
-- `LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE` — for **any** stage's stamp, because an
-  admitting entry rewrites the valve ledger's state token in the same motion as
-  the stamp (§bin/enter-stage.sh); and additionally
-- the queue file, `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`,
-  `LIFECYCLE_KIT_SURVEY_RECORD_FILE`, the members of
-  `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`, and `LIFECYCLE_KIT_GAP_INBOX_FILE` — for
-  the **first stage**'s stamp only, because the iteration-boundary reset
-  legitimately writes all of them in one motion (§bin/enter-stage.sh).
+- `LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE` — for **any** stage's stamp, because an admitting entry rewrites the valve ledger's state token in the same motion as the stamp (§bin/enter-stage.sh); and additionally
+- the queue file, `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, `LIFECYCLE_KIT_SURVEY_RECORD_FILE`, the members of `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`, and `LIFECYCLE_KIT_GAP_INBOX_FILE` — for the **first stage**'s stamp only, because the iteration-boundary reset legitimately writes all of them in one motion (§bin/enter-stage.sh).
 
-**The set is one predicate, stated as itself: the paths `--enter-stage`
-writes at *this* entry.** Every member above derives from that and none is
-minted. The boundary-reset members are scoped to the first stage because the
-boundary reset is the only entry that writes them; the valve ledger is scoped to
-none because an admitting entry is not the first stage's and, more to the point,
-because the scoping it needs rides **membership** rather than a stage name — a
-non-admitting entry leaves the ledger untouched and therefore unstaged, so the
-exemption is unreachable except at the one branch that earns it. Widening the
-set can only remove violations and narrowing it can only add them, so a config
-change here is safe to reason about by inspection in both directions. Gating on
-the *staged* set rather than on the working tree is what keeps a sibling
-session's staged file out of this verdict: a stamp nothing is committing is not
-a stamp this commit introduces. It mechanizes a sentence every stage template
-already carries — *commit the stamp on its own* — which is enforcement-first
-applied to prose that had no gate behind it, and the one exception that sentence
-now carries (an admitted entry commits the valve ledger with the stamp) is this
-set's second bullet rather than a weakening of the rule.
+**The set is one predicate, stated as itself: the paths `--enter-stage` writes at *this* entry.** Every member above derives from that and none is minted. The boundary-reset members are scoped to the first stage because the boundary reset is the only entry that writes them; the valve ledger is scoped to none because an admitting entry is not the first stage's and, more to the point, because the scoping it needs rides **membership** rather than a stage name — a non-admitting entry leaves the ledger untouched and therefore unstaged, so the exemption is unreachable except at the one branch that earns it. Widening the set can only remove violations and narrowing it can only add them, so a config change here is safe to reason about by inspection in both directions. Gating on the *staged* set rather than on the working tree is what keeps a sibling session's staged file out of this verdict: a stamp nothing is committing is not a stamp this commit introduces. It mechanizes a sentence every stage template already carries — *commit the stamp on its own* — which is enforcement-first applied to prose that had no gate behind it, and the one exception that sentence now carries (an admitted entry commits the valve ledger with the stamp) is this set's second bullet rather than a weakening of the rule.
 
-**The concurrent-session false fire is real and its remedy is cheap.** Where a
-repo shares its git index between sessions, a sibling committing between a
-stamp's write and its commit moves `HEAD` and reds the stamp. The remedy is to
-re-run `--enter-stage`, which appends a fresh stamp at the current `HEAD` —
-a same-stage re-entry, in-contract, and cheaper than any weakening that would
-admit the case the assertion exists to catch. The tool's idempotence guard reads
-the head for exactly this reason (§The state machine).
+**The concurrent-session false fire is real and its remedy is cheap.** Where a repo shares its git index between sessions, a sibling committing between a stamp's write and its commit moves `HEAD` and reds the stamp. The remedy is to re-run `--enter-stage`, which appends a fresh stamp at the current `HEAD` — a same-stage re-entry, in-contract, and cheaper than any weakening that would admit the case the assertion exists to catch. The tool's idempotence guard reads the head for exactly this reason (§The state machine).
 
-Honest limit: the stamp proves the stage skill was *invoked*, never that it
-produced its green result — a validate stamp says validate ran, not that the
-suites passed. That gap is closed by evidence-kit, which commits a per-run
-evidence manifest (a suite verdict per line) and, via the optional
-`LIFECYCLE_KIT_BOUNDARY_TRUNCATE` integration, couples a close entry to
-the full green block.
+Honest limit: the stamp proves the stage skill was *invoked*, never that it produced its green result — a validate stamp says validate ran, not that the suites passed. That gap is closed by evidence-kit, which commits a per-run evidence manifest (a suite verdict per line) and, via the optional `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` integration, couples a close entry to the full green block.
 
-**The one ordering case neither assertion above reaches**, and it is structural
-rather than a gap in their design: a session that does its work, commits it, and
-only *then* runs `--enter-stage`. The stamp legitimately records the
-post-work `HEAD`, the stamp commit is pure, both assertions pass — and the work
-still preceded the mark. The interval between stage X-1's stamp and stage X's
-holds X-1's legitimate work and X's illegitimate pre-stamp work, and nothing in
-the tree separates them. Only a *declared* boundary can, and there are two
-candidates: a per-stage output-surface roster, refused because "a stage's own
-output surfaces" is not derivable from the tree — a build stage's are
-approximately everything — and a configured one false-fires when coarse and
-misses when narrow; or an **exit mark**, which this kit does not have and which
-no reading of an entry stamp can supply. Closing the remaining case is therefore
-a **composition** with a deliverable that mints an exit mark, not more work
-inside these assertions. Recording that is what stops the next reader
-re-deriving the refused roster.
+**The one ordering case neither assertion above reaches**, and it is structural rather than a gap in their design: a session that does its work, commits it, and only *then* runs `--enter-stage`. The stamp legitimately records the post-work `HEAD`, the stamp commit is pure, both assertions pass — and the work still preceded the mark. The interval between stage X-1's stamp and stage X's holds X-1's legitimate work and X's illegitimate pre-stamp work, and nothing in the tree separates them. Only a *declared* boundary can, and there are two candidates: a per-stage output-surface roster, refused because "a stage's own output surfaces" is not derivable from the tree — a build stage's are approximately everything — and a configured one false-fires when coarse and misses when narrow; or an **exit mark**, which this kit does not have and which no reading of an entry stamp can supply. Closing the remaining case is therefore a **composition** with a deliverable that mints an exit mark, not more work inside these assertions. Recording that is what stops the next reader re-deriving the refused roster.
 
-What the assertions do close is the generalization that *every entry-time
-assertion is satisfiable retroactively*, which fails for this one: the recorded
-head is bound to a commit that already existed when the stamp was written, and a
-stamp introduced later is checked against the `HEAD` of its own introduction, so
-re-satisfying it means re-stamping — which is a fresh, honest stamp rather than
-a forged one.
+What the assertions do close is the generalization that *every entry-time assertion is satisfiable retroactively*, which fails for this one: the recorded head is bound to a commit that already existed when the stamp was written, and a stamp introduced later is checked against the `HEAD` of its own introduction, so re-satisfying it means re-stamping — which is a fresh, honest stamp rather than a forged one.
 
-**The uncommitted window, and what closes it.** This gate — and every other one
-that would catch a hand-written stamp — fires at *commit*. The cursor, though, is
-the working tree's last stamp, and every reader reads the working tree. So a
-session that hand-edits the state file and simply never commits moves the stage
-cursor for its entire life and is caught by nothing. Content-based detection
-narrows this and does not close it: the `<head>` field makes a hand-written stamp
-name the `HEAD` it claims to have been taken at, so it is not byte-identical to
-`--enter-stage`'s for free — but a hand that reads `git rev-parse --short
-HEAD` writes an identical line, and a stamp that is never committed is never
-checked at all.
+**The uncommitted window, and what closes it.** This gate — and every other one that would catch a hand-written stamp — fires at *commit*. The cursor, though, is the working tree's last stamp, and every reader reads the working tree. So a session that hand-edits the state file and simply never commits moves the stage cursor for its entire life and is caught by nothing. Content-based detection narrows this and does not close it: the `<head>` field makes a hand-written stamp name the `HEAD` it claims to have been taken at, so it is not byte-identical to `--enter-stage`'s for free — but a hand that reads `git rev-parse --short HEAD` writes an identical line, and a stamp that is never committed is never checked at all.
 
-The `workflow-state-guard` harness-integration arm
-(`bash gate-sdk/bin/run-gates.sh --hook workflow-state-guard`) closes the part of
-that window an agent tooling actually passes through. It is a
-`PreToolUse(Write|Edit)` hook (register it on the alternation matcher; guard-kit's
-wiring template carries the block) that refuses a write whose target **resolves**
-to the state file, naming `--enter-stage` as the sanctioned writer. Resolved,
-not textual: an absolute path, a `./` prefix and a route through a symlinked
-directory are one file, and a textual comparison catches only the spelling it was
-written against. It resolves the path and advises or blocks through the same
-channels every harness-integration arm uses (gate-sdk/SPEC.md §The non-gate arm),
-sourcing no kit library of its own. The `GATE_SDK_WORKFLOW_DIR` indirection is
-honored, so a consumer who relocated the workflow directory gets a guard that
-follows it. No knob is added: there is no value to configure.
+The `workflow-state-guard` harness-integration arm (`bash gate-sdk/bin/run-gates.sh --hook workflow-state-guard`) closes the part of that window an agent tooling actually passes through. It is a `PreToolUse(Write|Edit)` hook (register it on the alternation matcher; guard-kit's wiring template carries the block) that refuses a write whose target **resolves** to the state file, naming `--enter-stage` as the sanctioned writer. Resolved, not textual: an absolute path, a `./` prefix and a route through a symlinked directory are one file, and a textual comparison catches only the spelling it was written against. It resolves the path and advises or blocks through the same channels every harness-integration arm uses (gate-sdk/SPEC.md §The non-gate arm), sourcing no kit library of its own. The `GATE_SDK_WORKFLOW_DIR` indirection is honored, so a consumer who relocated the workflow directory gets a guard that follows it. No knob is added: there is no value to configure.
 
-The residual is stated because an unstated residual reads as a closed hole. One
-Bash writer is closed by construction rather than by the hook: guard-kit's `--rewrite` arm
-refuses an operand resolving to the state file through this hook's own predicate
-(guard-kit/SPEC.md §rewrite), since rule 8 steers in-place rewrites to that arm as well as to the
-file tools this hook reads. Otherwise the
-guard reaches agent `Write`/`Edit` tool calls and nothing else — not a `Bash`
-redirect, not `--no-verify` at the commit that would have caught the result, not a
-human editing the file outside the agent tooling, and not any future writer that
-is not one of those tool calls. It narrows the window to the writers the harness
-routes through a hook; it does not close it. And it is inert until wired: a
-consumer who omits the settings-json block from guard-kit's wiring template gets a
-hook that enforces nothing while looking like it does, because the arm only ever
-runs when the harness's `PreToolUse(Write|Edit)` hook invokes it.
+The residual is stated because an unstated residual reads as a closed hole. One Bash writer is closed by construction rather than by the hook: guard-kit's `--rewrite` arm refuses an operand resolving to the state file through this hook's own predicate (guard-kit/SPEC.md §rewrite), since rule 8 steers in-place rewrites to that arm as well as to the file tools this hook reads. Otherwise the guard reaches agent `Write`/`Edit` tool calls and nothing else — not a `Bash` redirect, not `--no-verify` at the commit that would have caught the result, not a human editing the file outside the agent tooling, and not any future writer that is not one of those tool calls. It narrows the window to the writers the harness routes through a hook; it does not close it. And it is inert until wired: a consumer who omits the settings-json block from guard-kit's wiring template gets a hook that enforces nothing while looking like it does, because the arm only ever runs when the harness's `PreToolUse(Write|Edit)` hook invokes it.
 
 ### check-stage-entry
 
-Invariant: the stage being *entered* re-verifies its prior stage's static
-exit, extending the invocation-stamp floor `check-stage-evidence` provides
-for the current stage one hop back (a shared surface, a distinct invariant:
-*stamp grammar + name-axis agreement* there, *prior-stage invoked +
-entered-stage static exit* here). It reads the entered stage from the **cursor**
-— the state file's last stamp — and the iteration from the header, both through
-the shared `stages::current_stage`/`header_iter` derivations, which take
-positional fields one to three. That is why the `<head>` field appended in
-§The state machine moved nothing here, and it is recorded rather than left
-unstated so the next grammar change knows this reader was checked and cleared
-rather than overlooked. An empty
-cursor is unreachable by construction here and stays a hard parse error rather
-than a disarm: `--enter-stage` hands the gate a temp state file that always
-carries the candidate stamp, and at commit time the entry commit stages that
-same stamp. It owns four assertions, (A)
-prerequisite-stamp ordering — for an entered stage X the file carries a
-stamp for X's configured mandatory predecessor, which closes the "jumped
-straight to the last stage with no prior stamp" hole its sibling — which no
-longer asserts any stage coverage at all — cannot see; (B) drain-entry
-queue-empty —
-a drain-stage entry requires the configured active queue sections to carry
-no top-level `- ` entry, catching entry-on-incomplete-build, with one modeled
-residue class: an entry whose **lead line** carries `[drain-exempt: <reason>]`
-(syntax: queue-kit/SPEC.md §The tag algebra) is skipped at drain-stage entry —
-a drain-spanning feature whose remaining half *is* drain-stage work. The
-reason must be non-empty (empty is malformed, red); it is echoed in the
-refusal/clean detail, the audit trail its semantic reader. The **backstop**:
-at entry to every drain *successor* — each stage whose
-`LIFECYCLE_KIT_PREDECESSOR` value is the drain stage; the map is many-to-one,
-so every match backstops and a tagged entry drains by whichever successor is
-entered first — assertion B runs with **no** exemption: nothing may remain
-active, tagged or not. So untagged entries drain by drain-stage entry, tagged
-entries by successor entry. A roster whose drain stage is terminal (zero
-successors) is refused fail-closed at config load (the table validator,
-§The stage-machine adapters): an exemption with no reachable backstop would be permanent.
-Ruled-but-unpromoted work is never exempt residue — it files as a Deferred
-entry for a later scope's promotion (deferred-filing is the model
-for designed-but-unscheduled work). The blockers this assertion lists are
-**partitioned**: any carrying `[observed-by:]` (queue-kit/SPEC.md §The tag
-algebra) are named in a message of their own, because their remedy is not the
-one the ordinary message implies. An untagged blocker says *finish the work*; an
-observation-predicate blocker can have its work finished and still be
-undrainable, so its message cites §The state machine's push placement and the
-scope-stage split for a release-run producer. `[drain-exempt:]` still wins at
-drain-stage entry — an entry carrying both is exempt residue there and is
-partitioned into the observation message only at a successor's entry, where no
-exemption holds. **The honest limit, stated rather than left to be found:** this
-branch enforces nothing. A push's timing is not a tree state, so no arm here can
-observe that the placement rule was kept; what the branch buys is that the
-failure, when it happens, names its own remedy at the moment it fires instead of
-costing a fresh derivation. The enforceable half of this class is the tag's
-lead-line hygiene (queue-kit/SPEC.md §check-tag-lead-line); (C)
-audit-trigger — an audit-entry-stage header carrying a cross-component
-amendment signal but no `<iter> <audit-stage>` stamp demands either that
-stamp or an explicit recorded waiver line, mechanizing the audit stage's
-self-reported cross-component trigger so a missed trigger cannot silently
-skip the audit. The signal reads the on-disk amendment tree (cwd-relative,
-gate-sdk prune set applied, and `templates/` paths excluded — a shipped
-`SPEC-amendment.md` skeleton is a copyable stub, not a live amendment, the
-same exclusion canon-kit's finders apply): it fires when amendment files span
-≥2 component dirs, OR when a single amendment's component set — its own dir ∪
-the contract-surface tokens in its body that resolve to a roster dir — is ≥2.
-A **roster dir** is a directory holding `LIFECYCLE_KIT_ROSTER_BASENAME`, and
-the roster test screens the *body tokens* alone: an amendment file's own
-directory is a component wherever it sits, so a second component arrives
-either from a second amendment file anywhere, or from a body token that
-resolves to a roster dir. A **generated mirror** of a roster basename is a roster
-dir like any other, so a single-component amendment obliged to name the mirror as
-an update target — which a consumer's generated-projection rule may require —
-reaches ≥2 on that token alone.
-The
-waiver rides the same file the stamps do (auditable) and is written only on
-an explicit user ruling — never self-issued by the entering session; it
-satisfies only assertion C (assertion A's predecessor scan matches the audit
-stage exactly, so a waiver is never read as an audit *stamp*); and (D)
-inferred-claim residue — at audit-entry-stage entry, any on-disk amendment line or
-active queue-entry line carrying an `**Inferred, not run:**` marker, or a cannot-run
-marker whose reason is empty, is a refusal (the marker grammar: §templates/stages/).
+Invariant: the stage being *entered* re-verifies its prior stage's static exit, extending the invocation-stamp floor `check-stage-evidence` provides for the current stage one hop back (a shared surface, a distinct invariant: *stamp grammar + name-axis agreement* there, *prior-stage invoked + entered-stage static exit* here). It reads the entered stage from the **cursor** — the state file's last stamp — and the iteration from the header, both through the shared `stages::current_stage`/`header_iter` derivations, which take positional fields one to three. That is why the `<head>` field appended in §The state machine moved nothing here, and it is recorded rather than left unstated so the next grammar change knows this reader was checked and cleared rather than overlooked. An empty cursor is unreachable by construction here and stays a hard parse error rather than a disarm: `--enter-stage` hands the gate a temp state file that always carries the candidate stamp, and at commit time the entry commit stages that same stamp. It owns four assertions, (A) prerequisite-stamp ordering — for an entered stage X the file carries a stamp for X's configured mandatory predecessor, which closes the "jumped straight to the last stage with no prior stamp" hole its sibling — which asserts no stage coverage at all — cannot see; (B) drain-entry queue-empty — a drain-stage entry requires the configured active queue sections to carry no top-level `- ` entry, catching entry-on-incomplete-build, with one modeled residue class: an entry whose **lead line** carries `[drain-exempt: <reason>]` (syntax: queue-kit/SPEC.md §The tag algebra) is skipped at drain-stage entry — a drain-spanning feature whose remaining half *is* drain-stage work. The reason must be non-empty (empty is malformed, red); it is echoed in the refusal/clean detail, the audit trail its semantic reader. The **backstop**: at entry to every drain *successor* — each stage whose `LIFECYCLE_KIT_PREDECESSOR` value is the drain stage; the map is many-to-one, so every match backstops and a tagged entry drains by whichever successor is entered first — assertion B runs with **no** exemption: nothing may remain active, tagged or not. So untagged entries drain by drain-stage entry, tagged entries by successor entry. A roster whose drain stage is terminal (zero successors) is refused fail-closed at config load (the table validator, §The stage-machine adapters): an exemption with no reachable backstop would be permanent. Ruled-but-unpromoted work is never exempt residue — it files as a Deferred entry for a later scope's promotion (deferred-filing is the model for designed-but-unscheduled work). The blockers this assertion lists are **partitioned**: any carrying `[observed-by:]` (queue-kit/SPEC.md §The tag algebra) are named in a message of their own, because their remedy is not the one the ordinary message implies. An untagged blocker says *finish the work*; an observation-predicate blocker can have its work finished and still be undrainable, so its message cites §The state machine's push placement and the scope-stage split for a release-run producer. `[drain-exempt:]` still wins at drain-stage entry — an entry carrying both is exempt residue there and is partitioned into the observation message only at a successor's entry, where no exemption holds. **The honest limit, stated rather than left to be found:** this branch enforces nothing. A push's timing is not a tree state, so no arm here can observe that the placement rule was kept; what the branch buys is that the failure, when it happens, names its own remedy at the moment it fires instead of costing a fresh derivation. The enforceable half of this class is the tag's lead-line hygiene (queue-kit/SPEC.md §check-tag-lead-line); (C) audit-trigger — an audit-entry-stage header carrying a cross-component amendment signal but no `<iter> <audit-stage>` stamp demands either that stamp or an explicit recorded waiver line, mechanizing the audit stage's self-reported cross-component trigger so a missed trigger cannot silently skip the audit. The signal reads the on-disk amendment tree (cwd-relative, gate-sdk prune set applied, and `templates/` paths excluded — a shipped `SPEC-amendment.md` skeleton is a copyable stub, not a live amendment, the same exclusion canon-kit's finders apply): it fires when amendment files span ≥2 component dirs, OR when a single amendment's component set — its own dir ∪ the contract-surface tokens in its body that resolve to a roster dir — is ≥2. A **roster dir** is a directory holding `LIFECYCLE_KIT_ROSTER_BASENAME`, and the roster test screens the *body tokens* alone: an amendment file's own directory is a component wherever it sits, so a second component arrives either from a second amendment file anywhere, or from a body token that resolves to a roster dir. A **generated mirror** of a roster basename is a roster dir like any other, so a single-component amendment obliged to name the mirror as an update target — which a consumer's generated-projection rule may require — reaches ≥2 on that token alone. The waiver rides the same file the stamps do (auditable) and is written only on an explicit user ruling — never self-issued by the entering session; it satisfies only assertion C (assertion A's predecessor scan matches the audit stage exactly, so a waiver is never read as an audit *stamp*); and (D) inferred-claim residue — at audit-entry-stage entry, any on-disk amendment line or active queue-entry line carrying an `**Inferred, not run:**` marker, or a cannot-run marker whose reason is empty, is a refusal (the marker grammar: §templates/stages/).
 
-**Assertion D reads C's amendment walk and B's queue read, and nothing else.** The
-walk is C's — prune set, `templates/` exclusion and `LIFECYCLE_KIT_AMENDMENT_GLOB`
-basenames. The queue read is every line inside a top-level entry of a
-`LIFECYCLE_KIT_ACTIVE_SECTIONS` section of `LIFECYCLE_KIT_QUEUE_FILE`: an entry's
-extent runs from its top-level `- ` line to the line before the next top-level
-bullet, heading or `---` rule, so a section's preamble is in no entry. Both are
-already this gate's reads, so D needs no knob and no `--reads` root of its own; the
-queue read is a named file, outside the walk class gate-sdk/SPEC.md
-§check-reads-couples rules on, and `couples=` already carries it. The deferred
-section, the icebox and the done section are not read. It runs **whether or not an
-audit stamp exists**, because the audit stamp proves the audit ran, not that the
-markers were consumed. A line is read as a marker only where the marker opens it,
-after optional indentation and one optional `- ` or `> ` lead, and never inside a
-fence (a line opening a backtick or tilde fence toggles one, over the whole file); a
-cannot-run marker's reason is the text after its last spaced em dash, empty when
-that separator is absent or nothing follows it. **Red** prints one
-`<file>:<line>: <marker line>` per marker, amendment or queue alike, and the help
-line names the remedy: run the command, correct the passage or entry and delete the
-marker, or rewrite it to the cannot-run form with a reason — made at the stage the
-refused entry leaves the cursor at, since a refused `--enter-stage` writes nothing.
-**Clean** detail adds `N cannot-run claim(s) carried` when N > 0, summed over both
-corpora, the count build's run-the-system paragraph consumes. **Inert** where
-`LIFECYCLE_KIT_AUDIT_ENTRY_STAGE` is empty. **The honest limits:** a roster with no
-audit stage gets the template obligations without this backstop; a dedicated knob
-for the implementing stage would mint a name for one assertion, which the knob
-roster refuses without an attested consumer. A queue file whose active-section names
-are misconfigured reads no entries for D, exactly as for B, and nothing more is
-asserted about it.
+**Assertion D reads C's amendment walk and B's queue read, and nothing else.** The walk is C's — prune set, `templates/` exclusion and `LIFECYCLE_KIT_AMENDMENT_GLOB` basenames. The queue read is every line inside a top-level entry of a `LIFECYCLE_KIT_ACTIVE_SECTIONS` section of `LIFECYCLE_KIT_QUEUE_FILE`: an entry's extent runs from its top-level `- ` line to the line before the next top-level bullet, heading or `---` rule, so a section's preamble is in no entry. Both are already this gate's reads, so D needs no knob and no `--reads` root of its own; the queue read is a named file, outside the walk class gate-sdk/SPEC.md §check-reads-couples rules on, and `couples=` already carries it. The deferred section, the icebox and the done section are not read. It runs **whether or not an audit stamp exists**, because the audit stamp proves the audit ran, not that the markers were consumed. A line is read as a marker only where the marker opens it, after optional indentation and one optional `- ` or `> ` lead, and never inside a fence (a line opening a backtick or tilde fence toggles one, over the whole file); a cannot-run marker's reason is the text after its last spaced em dash, empty when that separator is absent or nothing follows it. **Red** prints one `<file>:<line>: <marker line>` per marker, amendment or queue alike, and the help line names the remedy: run the command, correct the passage or entry and delete the marker, or rewrite it to the cannot-run form with a reason — made at the stage the refused entry leaves the cursor at, since a refused `--enter-stage` writes nothing. **Clean** detail adds `N cannot-run claim(s) carried` when N > 0, summed over both corpora, the count build's run-the-system paragraph consumes. **Inert** where `LIFECYCLE_KIT_AUDIT_ENTRY_STAGE` is empty. **The honest limits:** a roster with no audit stage gets the template obligations without this backstop; a dedicated knob for the implementing stage would mint a name for one assertion, which the knob roster refuses without an attested consumer. A queue file whose active-section names are misconfigured reads no entries for D, exactly as for B, and nothing more is asserted about it.
 
-**Why a block and not an annotation.** An annotation already existed — the survey
-record's `inferred` field — and the failure D closes is that nothing consumed it; a
-marker that blocks nothing reproduces that failure one surface later. D is **not**
-the assertion-C sibling for the authoring stage refused below: that refusal rests on
-an authoring stage's *output* being verified by the pairing rule, and D asserts a
-property of the amendment's content the pairing rule never reads. **Not gated, and
-stated so:** whether the authoring-exit pass ran, which leaves no tracked residue,
-and whether an unmarked claim is true — the premise its author believed verified,
-the class the pass concedes (§templates/stages/).
+**Why a block and not an annotation.** An annotation already existed — the survey record's `inferred` field — and the failure D closes is that nothing consumed it; a marker that blocks nothing reproduces that failure one surface later. D is **not** the assertion-C sibling for the authoring stage refused below: that refusal rests on an authoring stage's *output* being verified by the pairing rule, and D asserts a property of the amendment's content the pairing rule never reads. **Not gated, and stated so:** whether the authoring-exit pass ran, which leaves no tracked residue, and whether an unmarked claim is true — the premise its author believed verified, the class the pass concedes (§templates/stages/).
 
-Calibration: the predecessor map deliberately omits a **trigger-gated stage**
-as anyone's mandatory predecessor — the audit stage, and equally a trigger-gated
-*authoring* stage where a roster splits one out (§templates/stages/) — because
-demanding its stamp before a successor would false-fire on an iteration that
-legitimately skipped it (an amendment-free iteration runs no audit; a debt-only
-one runs no authoring stage); the build→align re-check when align *did* run is
-the build skill's step-0 procedural precondition, not this gate. A trigger-gated
-authoring stage takes **no assertion-C sibling**, a mechanized trigger considered
-and deferred: its trigger is procedural (the prior stage's next-stage
-recommendation) and already backstopped by canon-kit's bidirectional
-amendment-pairing rule — a feature entry carries a `[spec:]` ref only when the
-amendment exists on disk, so a skipped authoring stage cannot ship a feature
-without its amendment. The disanalogy with assertion C is decisive: C mechanizes
-because the *audit* it gates is otherwise-unverifiable judgment, whereas an
-authoring stage's *output* — the amendment — is otherwise-verified by that
-bidirectional rule, so a process assertion there would only duplicate the
-on-disk-amendment signal or smear canon-kit's feature-section grammar into this
-gate. Assertion C's honest limit: it
-approximates "changes ≥2 components' *contracts*" with "touches or names ≥2
-component surfaces" — it can over-demand (the cheap waiver valve absorbs
-that) and can under-detect a purely semantic cross-component impact; it
-converts a silent skip into a stamp, a recorded waiver, or a narrow
-false-negative, strictly better than self-report.
+Calibration: the predecessor map deliberately omits a **trigger-gated stage** as anyone's mandatory predecessor — the audit stage, and equally a trigger-gated *authoring* stage where a roster splits one out (§templates/stages/) — because demanding its stamp before a successor would false-fire on an iteration that legitimately skipped it (an amendment-free iteration runs no audit; a debt-only one runs no authoring stage); the build→align re-check when align *did* run is the build skill's step-0 procedural precondition, not this gate. A trigger-gated authoring stage takes **no assertion-C sibling**, a mechanized trigger considered and deferred: its trigger is procedural (the prior stage's next-stage recommendation) and already backstopped by canon-kit's bidirectional amendment-pairing rule — a feature entry carries a `[spec:]` ref only when the amendment exists on disk, so a skipped authoring stage cannot ship a feature without its amendment. The disanalogy with assertion C is decisive: C mechanizes because the *audit* it gates is otherwise-unverifiable judgment, whereas an authoring stage's *output* — the amendment — is otherwise-verified by that bidirectional rule, so a process assertion there would only duplicate the on-disk-amendment signal or smear canon-kit's feature-section grammar into this gate. Assertion C's honest limit: it approximates "changes ≥2 components' *contracts*" with "touches or names ≥2 component surfaces" — it can over-demand (the cheap waiver valve absorbs that) and can under-detect a purely semantic cross-component impact; it converts a silent skip into a stamp, a recorded waiver, or a narrow false-negative, strictly better than self-report.
 
-**The gate dispatches to the binary substrate** — `checks/check-stage-entry.gate`
-to `native/src/gates/stage_entry.rs`, the shell script deleted — and the port
-asserts nothing new: assertions A to C, their calibration and assertion C's
-honest limit are exactly as stated above. The predecessor map is a keyed knob
-and is read **by key** (gate-sdk/SPEC.md §The knob file). Two
-consequences are worth stating where a reader of this gate will look for them.
-Its `couples=` **widens** to reach the amendment and roster corpora assertion C
-scans, which is correct coupling rather than a concession: an amendment landing
-anywhere genuinely changes what C sees, and the shell form's
-`# reads-couples-exempt:` markers were excusing that rather than expressing it.
-And its two whole-tree scans are declared to `--reads` as one root under two
-**filter-knob** names, `LIFECYCLE_KIT_ROSTER_BASENAME` and
-`LIFECYCLE_KIT_AMENDMENT_GLOB` — the channel gate-sdk/SPEC.md §check-reads-couples
-grew for it, so the port **answers** that assertion where the shell member was
-exempt from it. **Honest limit on the crate-side declaration:** neither fixture
-case reaches assertion C, so the crate's declared-roots unit test holds over an
-empty observation for this member and the scans' coverage rests on the
-behavioral test below and on the live battery.
+**The gate dispatches to the binary substrate** — `checks/check-stage-entry.gate` to `native/src/gates/stage_entry.rs`, the shell script deleted — and the port asserts nothing new: assertions A to C, their calibration and assertion C's honest limit are exactly as stated above. The predecessor map is a keyed knob and is read **by key** (gate-sdk/SPEC.md §The knob file). Two consequences are worth stating where a reader of this gate will look for them. Its `couples=` **widens** to reach the amendment and roster corpora assertion C scans, which is correct coupling rather than a concession: an amendment landing anywhere genuinely changes what C sees, and the shell form's `# reads-couples-exempt:` markers were excusing that rather than expressing it. And its two whole-tree scans are declared to `--reads` as one root under two **filter-knob** names, `LIFECYCLE_KIT_ROSTER_BASENAME` and `LIFECYCLE_KIT_AMENDMENT_GLOB` — the channel gate-sdk/SPEC.md §check-reads-couples grew for it, so the port **answers** that assertion where the shell member was exempt from it. **Honest limit on the crate-side declaration:** neither fixture case reaches assertion C, so the crate's declared-roots unit test holds over an empty observation for this member and the scans' coverage rests on the behavioral test below and on the live battery.
 
-The good/bad pair covers
-assertion A; `gate-tests/check-stage-entry.test.sh` covers B, C and D in
-sandbox scenarios. Suite *runs* and other
-non-static exits are not re-runnable as pre-commit gates and stay
-human-judged at the stage approval; the prerequisite-stamp floor is their
-mechanical residual.
+The good/bad pair covers assertion A; `gate-tests/check-stage-entry.test.sh` covers B, C and D in sandbox scenarios. Suite *runs* and other non-static exits are not re-runnable as pre-commit gates and stay human-judged at the stage approval; the prerequisite-stamp floor is their mechanical residual.
 
 ### check-stage-skill-coverage
 
-Invariant: the configured stage set and the skills dir (`LIFECYCLE_KIT_SKILLS_DIR`,
-default `.claude/commands`; override with the first argument) cover each other,
-**three directions**. Forward: every `LIFECYCLE_KIT_STAGES` member has a `<stage>.md`
-skill file — a stage with no skill cannot be entered. Reverse: every skill file
-that invokes `--enter-stage` names a live stage in the token it passes. The
-`--enter-stage` invocation is the mechanical marker separating a stage skill
-from an ordinary one, so a retired stage's orphan skill (its `.md` still
-invoking a now-unknown stage) reddens without false-flagging a non-stage skill
-like `/agent-execution`, which never invokes `--enter-stage`. A skills dir that
-does not exist is fail-closed (exit 2).
+Invariant: the configured stage set and the skills dir (`LIFECYCLE_KIT_SKILLS_DIR`, default `.claude/commands`; override with the first argument) cover each other, **three directions**. Forward: every `LIFECYCLE_KIT_STAGES` member has a `<stage>.md` skill file — a stage with no skill cannot be entered. Reverse: every skill file that invokes `--enter-stage` names a live stage in the token it passes. The `--enter-stage` invocation is the mechanical marker separating a stage skill from an ordinary one, so a retired stage's orphan skill (its `.md` still invoking a now-unknown stage) reddens without false-flagging a non-stage skill like `/agent-execution`, which never invokes `--enter-stage`. A skills dir that does not exist is fail-closed (exit 2).
 
-Third: every configured stage's **executed surface** carries the resume-journal
-step (§templates/stages/, §The state machine). Without it that step is a sentence
-a later template edit drops with nothing noticing — which is the very failure
-class the step exists to close, reproduced one level up, so the fix and its gate
-land as one unit. The direction rides this member rather than a new one because
-it is a direction on this member's own invariant: it already resolves
-`LIFECYCLE_KIT_STAGES` and already uses a mechanical marker in a file to tell a
-stage surface from an ordinary one.
+Third: every configured stage's **executed surface** carries the resume-journal step (§templates/stages/, §The state machine). Without it that step is a sentence a later template edit drops with nothing noticing — which is the very failure class the step exists to close, reproduced one level up, so the fix and its gate land as one unit. The direction rides this member rather than a new one because it is a direction on this member's own invariant: it already resolves `LIFECYCLE_KIT_STAGES` and already uses a mechanical marker in a file to tell a stage surface from an ordinary one.
 
-**The executed surface is derived, never configured.** For a stage whose skill
-carries a binding directive it is the template that directive names — the
-resolver `check-skill-binding` already owns — and for a copy-and-specialize skill
-carrying none it is the skill file itself, since that is then the surface the
-stage session executes. So the fork mode is covered rather than exempted, and no
-knob and no second positional is added to reach the template directory. A
-directive naming a file that does not exist is skipped here: that finding is
-`check-skill-binding`'s, and one defect owes one reporting gate rather than a
-second that says the same thing.
+**The executed surface is derived, never configured.** For a stage whose skill carries a binding directive it is the template that directive names — the resolver `check-skill-binding` already owns — and for a copy-and-specialize skill carrying none it is the skill file itself, since that is then the surface the stage session executes. So the fork mode is covered rather than exempted, and no knob and no second positional is added to reach the template directory. A directive naming a file that does not exist is skipped here: that finding is `check-skill-binding`'s, and one defect owes one reporting gate rather than a second that says the same thing.
 
-**The marker is a citation, never a sentence.** What the gate asserts is the
-step's `lifecycle-kit/SPEC.md §The state machine` citation — a token
-`check-spec-pointer` resolves in the same battery — so no prose is duplicated for
-a gate to match and no gate becomes a second author of wording it does not own. A
-gate matching a sentence acquires editorial control over that sentence. Whitespace
-is collapsed before the search, so a citation an author wrapped across two lines
-still resolves.
+**The marker is a citation, never a sentence.** What the gate asserts is the step's `lifecycle-kit/SPEC.md §The state machine` citation — a token `check-spec-pointer` resolves in the same battery — so no prose is duplicated for a gate to match and no gate becomes a second author of wording it does not own. A gate matching a sentence acquires editorial control over that sentence. Whitespace is collapsed before the search, so a citation an author wrapped across two lines still resolves.
 
-The `# graph:` couples the skills dir **and the stage-template dir** at
-`tier=precommit`, the coupling `check-skill-binding` already carries one section
-down, so an edit to either surface fires the gate; the whole-tree `run-gates.sh`
-battery backstops a stage-set edit (`lifecycle-config.knobs`), which is not itself in
-the coupled surface. The `good/`+`bad/` pair drives the citation direction — a
-fixture stage set whose surfaces all carry it, and one where a single stage's does
-not; `gate-tests/check-stage-skill-coverage.test.sh` covers the forward and
-reverse directions and the bound-template resolution the one pair cannot hold.
+The `# graph:` couples the skills dir **and the stage-template dir** at `tier=precommit`, the coupling `check-skill-binding` already carries one section down, so an edit to either surface fires the gate; the whole-tree `run-gates.sh` battery backstops a stage-set edit (`lifecycle-config.knobs`), which is not itself in the coupled surface. The `good/`+`bad/` pair drives the citation direction — a fixture stage set whose surfaces all carry it, and one where a single stage's does not; `gate-tests/check-stage-skill-coverage.test.sh` covers the forward and reverse directions and the bound-template resolution the one pair cannot hold.
 
 ### check-stamp-subject
 
-Invariant: when the staged state file (`LIFECYCLE_KIT_STATE_FILE`) adds data lines
-whose stage field is a `LIFECYCLE_KIT_STAGES` member, the subject line of the
-message file parses with a `<scope>` equal to the **last** such line's stage —
-the cursor the commit leaves. Parsing is `check-commit-subject`'s grammar
-(gate-sdk/SPEC.md §check-commit-subject); roster membership of the type stays that
-gate's to judge. The rule and its ground are §The stamp protocol's.
+Invariant: when the staged state file (`LIFECYCLE_KIT_STATE_FILE`) adds data lines whose stage field is a `LIFECYCLE_KIT_STAGES` member, the subject line of the message file parses with a `<scope>` equal to the **last** such line's stage — the cursor the commit leaves. Parsing is `check-commit-subject`'s grammar (gate-sdk/SPEC.md §check-commit-subject); roster membership of the type stays that gate's to judge. The rule and its ground are §The stamp protocol's.
 
-**What the gate reads.** A `tier=commit-msg` gate has the message file and the
-index, so the added stamps are the data lines of the staged state file absent from
-`HEAD`'s. That one read covers the ordinary entry, the boundary reset (which
-truncates, then stamps), the valve-admitted entry and `--rename` (whose rewritten
-lines are the added ones). A waiver line is not a stamp — its token cannot collide
-with a stage name (§Layout and configuration) — so the roster filter skips it. The
-derivation is the one `--enter-stage` names its printed subject from, so writer and
-asserter read the same stamp.
+**What the gate reads.** A `tier=commit-msg` gate has the message file and the index, so the added stamps are the data lines of the staged state file absent from `HEAD`'s. That one read covers the ordinary entry, the boundary reset (which truncates, then stamps), the valve-admitted entry and `--rename` (whose rewritten lines are the added ones). A waiver line is not a stamp — its token cannot collide with a stage name (§Layout and configuration) — so the roster filter skips it. The derivation is the one `--enter-stage` names its printed subject from, so writer and asserter read the same stamp.
 
-- **Skips, clean.** A commit adding no stamp line; a no-argument run (the
-  whole-tree battery), on `check-commit-subject`'s ground that the message is not
-  a tracked surface; no staged state file. With no `HEAD` state file, every staged
-  data line is an addition.
-- **Fail-closed.** A message-file argument naming a missing file exits 2, as does
-  an argument count other than one or three.
-- **Red message.** It names the subject, the stamp line it read the stage from,
-  the expected scope, and the tool's printed subject as the fix.
+- **Skips, clean.** A commit adding no stamp line; a no-argument run (the whole-tree battery), on `check-commit-subject`'s ground that the message is not a tracked surface; no staged state file. With no `HEAD` state file, every staged data line is an addition.
+- **Fail-closed.** A message-file argument naming a missing file exits 2, as does an argument count other than one or three.
+- **Red message.** It names the subject, the stamp line it read the stage from, the expected scope, and the tool's printed subject as the fix.
 
-**The honest limits.** An amend of a stamp commit compares against the commit being
-amended, which already carries the stamp, so a mis-scoped stamp commit fixed by
-`--amend` is not re-checked. A git-generated subject (`Merge …`) on a commit adding
-stamps reds: it has no scope to parse.
+**The honest limits.** An amend of a stamp commit compares against the commit being amended, which already carries the stamp, so a mis-scoped stamp commit fixed by `--amend` is not re-checked. A git-generated subject (`Merge …`) on a commit adding stamps reds: it has no scope to parse.
 
-The fixture form takes the staged and `HEAD` state-file blobs as two further
-arguments, so the pair runs hermetically without a git index — the synthetic
-second argument `check-trajectory-fresh` takes (drift-kit/SPEC.md §The
-published-evidence extractor). The `bad/` case is an align stamp committed under
-`chore(workflow)`; the `good/` case an align entry followed by a waiver line.
-`gate-tests/check-stamp-subject.test.sh` covers the boundary reset, the rename
-subject, a commit adding no stamp, an unscoped subject and the argument edges.
+The fixture form takes the staged and `HEAD` state-file blobs as two further arguments, so the pair runs hermetically without a git index — the synthetic second argument `check-trajectory-fresh` takes (drift-kit/SPEC.md §The published-evidence extractor). The `bad/` case is an align stamp committed under `chore(workflow)`; the `good/` case an align entry followed by a waiver line. `gate-tests/check-stamp-subject.test.sh` covers the boundary reset, the rename subject, a commit adding no stamp, an unscoped subject and the argument edges.
 
 ### check-skill-binding
 
-Invariant: every skill under `LIFECYCLE_KIT_SKILLS_DIR` (default `.claude/commands`;
-override with the first argument) that carries a binding directive — `Execute
-the template at <path>, applying the bindings below.` — (a) names a template
-file that exists and (b) binds exactly that template's slot set: an unbound slot
-is red, an orphan binding naming no slot is red. A skill with no directive is
-not read, so a copy-and-specialize skill carrying no such line is untouched —
-the same directive-as-selector mechanism `check-stage-skill-coverage` uses on
-`--enter-stage`. A bound skill need not be a stage skill: `/agent-execution`
-binds a delegation-kit template, which the gate accepts unchanged (the resolved
-template path may point at any kit). Template slots are the `*<slot-name: …>*` opening
-tokens; a shim's bindings are the `**slot-name** —` lead lines under
-`## Bindings`; the directive's template path resolves relative to the current
-directory (the tree root at pre-commit). A skills dir that does not exist is
-fail-closed (exit 2). The `# graph:` couples the skills dir, the stage-template
-dir, each boundary skill (`lead.md`, `release-sweep.md`, `upgrade.md`,
-`consult.md`), and each out-of-tree bound template (e.g. `delegation-kit/templates/agent-execution.md`)
-at `tier=precommit`, so a slot added to a template or a binding changed in a shim
-fires the gate. The boundary skills are coupled **by name** because this couple
-carries no kit-wide `templates/*.md` glob: a bindable template left off it is one
-whose edits fire nothing, and the gate stays green while the coupling is gone.
-`upgrade.md` is listed even where no consumer binds it — the entry is about the
-template's edits re-triggering the gate, and a consumer that does bind it
-inherits the manifest. The good/bad pair drives the unbound-slot case;
-`gate-tests/check-skill-binding.test.sh` covers the orphan-binding,
-missing-template, and skip (no-directive / no-slots) cases the one pair cannot.
+Invariant: every skill under `LIFECYCLE_KIT_SKILLS_DIR` (default `.claude/commands`; override with the first argument) that carries a binding directive — `Execute the template at <path>, applying the bindings below.` — (a) names a template file that exists and (b) binds exactly that template's slot set: an unbound slot is red, an orphan binding naming no slot is red. A skill with no directive is not read, so a copy-and-specialize skill carrying no such line is untouched — the same directive-as-selector mechanism `check-stage-skill-coverage` uses on `--enter-stage`. A bound skill need not be a stage skill: `/agent-execution` binds a delegation-kit template, which the gate accepts unchanged (the resolved template path may point at any kit). Template slots are the `*<slot-name: …>*` opening tokens; a shim's bindings are the `**slot-name** —` lead lines under `## Bindings`; the directive's template path resolves relative to the current directory (the tree root at pre-commit). A skills dir that does not exist is fail-closed (exit 2). The `# graph:` couples the skills dir, the stage-template dir, each boundary skill (`lead.md`, `release-sweep.md`, `upgrade.md`, `consult.md`), and each out-of-tree bound template (e.g. `delegation-kit/templates/agent-execution.md`) at `tier=precommit`, so a slot added to a template or a binding changed in a shim fires the gate. The boundary skills are coupled **by name** because this couple carries no kit-wide `templates/*.md` glob: a bindable template left off it is one whose edits fire nothing, and the gate stays green while the coupling is gone. `upgrade.md` is listed even where no consumer binds it — the entry is about the template's edits re-triggering the gate, and a consumer that does bind it inherits the manifest. The good/bad pair drives the unbound-slot case; `gate-tests/check-skill-binding.test.sh` covers the orphan-binding, missing-template, and skip (no-directive / no-slots) cases the one pair cannot.
 
 ### check-shim-restatement
 
-Invariant: no binding shim under `LIFECYCLE_KIT_SKILLS_DIR` shares a normalized word
-n-gram of length ≥ `LIFECYCLE_KIT_SHIM_NGRAM` with any surface in the dedup corpus
-`LIFECYCLE_KIT_SHIM_DEDUP_CORPUS` — the duplication tripwire under the same
-directive-as-selector rule `check-skill-binding` uses (a file with no `Execute
-the template …` directive is not a shim and is not read). The corpus defaults to
-the consumer's always-loaded agent file (`LIFECYCLE_KIT_AGENT_FILE`, default
-`CLAUDE.md`) plus every kit's `templates/**/*.md`
-(kit set from `gate_kit_roots`); an explicit `LIFECYCLE_KIT_SHIM_DEDUP_CORPUS` or
-positional corpus arguments override it — the latter is the hermetic-fixture
-affordance. Comparison normalizes first — lowercase, punctuation stripped to a
-word boundary, whitespace collapsed — so cosmetic rewording does not evade the
-tripwire; a resolved corpus that yields no n-grams is fail-closed (exit 2), never
-a false clean.
+Invariant: no binding shim under `LIFECYCLE_KIT_SKILLS_DIR` shares a normalized word n-gram of length ≥ `LIFECYCLE_KIT_SHIM_NGRAM` with any surface in the dedup corpus `LIFECYCLE_KIT_SHIM_DEDUP_CORPUS` — the duplication tripwire under the same directive-as-selector rule `check-skill-binding` uses (a file with no `Execute the template …` directive is not a shim and is not read). The corpus defaults to the consumer's always-loaded agent file (`LIFECYCLE_KIT_AGENT_FILE`, default `CLAUDE.md`) plus every kit's `templates/**/*.md` (kit set from `gate_kit_roots`); an explicit `LIFECYCLE_KIT_SHIM_DEDUP_CORPUS` or positional corpus arguments override it — the latter is the hermetic-fixture affordance. Comparison normalizes first — lowercase, punctuation stripped to a word boundary, whitespace collapsed — so cosmetic rewording does not evade the tripwire; a resolved corpus that yields no n-grams is fail-closed (exit 2), never a false clean.
 
-`LIFECYCLE_KIT_SHIM_NGRAM` is calibrated to the smallest window with zero false
-positives on the post-rewrite corpus, with a floor of 8 words so a citation line
-(a path plus a `§<heading>`) never fires — the default is 9, the width at which a
-citation of an 8-word heading stops tripping. Honest limit: the n-gram holds the *copy shape* only. Which tier a
-fact belongs to stays semantic judgment — a paraphrase below N words passes the
-gate and is still a defect to fix on sight (the same doctrine as
-check-comment-tier's floor). The `# graph:` couples the skills dir, `CLAUDE.md`,
-and the kit template dirs at `tier=precommit`, so editing a shim or a corpus
-surface fires the gate. Because the corpus find recurses but the `kit:templates/*.md`
-couple does not, the one kit template *sub*directory it misses —
-`lifecycle-kit/templates/stages/*.md`, the stage-skill templates each stage shim
-binds — is coupled explicitly beside it; a shim's own template is its likeliest
-collision surface, so it must re-trigger the gate. The boundary skills need no
-such entry: they sit at `templates/` root, already inside the plain couple. A red run names the
-shim, the corpus surface, and the shared n-gram, so the fix (delete the
-restatement, keep a citation) is mechanical. The good/bad pair drives the plain restatement/clean split;
-`gate-tests/check-shim-restatement.test.sh` covers the no-directive skip, the
-short-corpus fail-closed, and the below-N paraphrase the one pair cannot.
+`LIFECYCLE_KIT_SHIM_NGRAM` is calibrated to the smallest window with zero false positives on the post-rewrite corpus, with a floor of 8 words so a citation line (a path plus a `§<heading>`) never fires — the default is 9, the width at which a citation of an 8-word heading stops tripping. Honest limit: the n-gram holds the *copy shape* only. Which tier a fact belongs to stays semantic judgment — a paraphrase below N words passes the gate and is still a defect to fix on sight (the same doctrine as check-comment-tier's floor). The `# graph:` couples the skills dir, `CLAUDE.md`, and the kit template dirs at `tier=precommit`, so editing a shim or a corpus surface fires the gate. Because the corpus find recurses but the `kit:templates/*.md` couple does not, the one kit template *sub*directory it misses — `lifecycle-kit/templates/stages/*.md`, the stage-skill templates each stage shim binds — is coupled explicitly beside it; a shim's own template is its likeliest collision surface, so it must re-trigger the gate. The boundary skills need no such entry: they sit at `templates/` root, already inside the plain couple. A red run names the shim, the corpus surface, and the shared n-gram, so the fix (delete the restatement, keep a citation) is mechanical. The good/bad pair drives the plain restatement/clean split; `gate-tests/check-shim-restatement.test.sh` covers the no-directive skip, the short-corpus fail-closed, and the below-N paraphrase the one pair cannot.
 
 ### check-lesson-disposition
 
-Invariant: every `## Lessons Learned` entry present at HEAD and absent from the
-worktree leaves a well-formed disposition stamp in
-`LIFECYCLE_KIT_LESSON_EVIDENCE_FILE` — a lesson cannot be cleared without a
-recorded rule/task/harvest/discard call. The evidence home is a stamped file,
-not the commit body, because the battery runs at pre-commit when no commit
-message exists yet, so only a file is mechanically decidable (the
-`check-stage-evidence` fail-closed precedent). Each data line is
-``<iteration> lesson <rule <file> | task <slug> | harvest <tag> | discard <reason>> — <lead-line prefix>``;
-the `` — `` separates the disposition from the
-lead-line prefix that joins it to the removed entry (a stored prefix matches a
-removed entry when it is a leading substring of that entry's normalized lead
-line). Both grammar (each line well-formed, a known disposition kind) and
-per-entry matching (every removal has a stamp) hold; an unreadable evidence
-surface is fail-closed (exit 2). Shape validation only: `harvest <tag>` is not
-checked against `QUEUE_KIT_LESSON_TAGS` — that would cross-couple the kits'
-configs; the close skill and `check-tag-lead-line` hold the vocabulary.
+Invariant: every `## Lessons Learned` entry present at HEAD and absent from the worktree leaves a well-formed disposition stamp in `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE` — a lesson cannot be cleared without a recorded rule/task/harvest/discard call. The evidence home is a stamped file, not the commit body, because the battery runs at pre-commit when no commit message exists yet, so only a file is mechanically decidable (the `check-stage-evidence` fail-closed precedent). Each data line is ``<iteration> lesson <rule <file> | task <slug> | harvest <tag> | discard <reason>> — <lead-line prefix>``; the `` — `` separates the disposition from the lead-line prefix that joins it to the removed entry (a stored prefix matches a removed entry when it is a leading substring of that entry's normalized lead line). Both grammar (each line well-formed, a known disposition kind) and per-entry matching (every removal has a stamp) hold; an unreadable evidence surface is fail-closed (exit 2). Shape validation only: `harvest <tag>` is not checked against `QUEUE_KIT_LESSON_TAGS` — that would cross-couple the kits' configs; the close skill and `check-tag-lead-line` hold the vocabulary.
 
-Calibration: diffing HEAD against the worktree is fixture-hostile (a committed
-fixture has HEAD == worktree, so the removal case has no static representation —
-the `check-task-conservation` precedent), so the gate takes optional
-`[queue-head] [queue-worktree] [evidence-file]` override args and its good/bad
-pair drives all three hermetically (the `check-trajectory-fresh` synthetic-args
-precedent); `gate-tests/check-lesson-disposition.test.sh` covers the malformed
-grammar, still-present-not-removed, and prefix-join cases the one pair cannot.
-The `# graph:` couples the queue file and the evidence file at
-`tier=precommit`.
+Calibration: diffing HEAD against the worktree is fixture-hostile (a committed fixture has HEAD == worktree, so the removal case has no static representation — the `check-task-conservation` precedent), so the gate takes optional `[queue-head] [queue-worktree] [evidence-file]` override args and its good/bad pair drives all three hermetically (the `check-trajectory-fresh` synthetic-args precedent); `gate-tests/check-lesson-disposition.test.sh` covers the malformed grammar, still-present-not-removed, and prefix-join cases the one pair cannot. The `# graph:` couples the queue file and the evidence file at `tier=precommit`.
 
 ### check-merge-attrs
 
-Invariant, over two derived sets: bidirectional set-parity between the derived
-iteration-scoped supersede set (`stages::supersede_set`, §The stage-machine adapters) and
-the paths carrying `merge=iteration-scoped` in the consumer's `.gitattributes`
-(default `.gitattributes`; override with the first argument), plus **forward-only**
-parity between the derived union set (`stages::union_set` — the gap inbox) and
-the paths carrying `merge=union`. The iteration-scoped forward direction — a
-supersede-set path with no `merge=iteration-scoped` line — catches an
-unmechanized rule (a merge would silently take the wrong side on that surface).
-Its reverse direction is the safety edge: a `merge=iteration-scoped` attribute on
-a path *outside* the derived set silently discards merge content on a real
-surface, so a smuggled line is red, not config. The gate scans every
-`merge=iteration-scoped` line in the file — inside the installer's marker block
-or not — so the reverse edge holds against a hand-added line anywhere. The union
-set is **forward-only by design** — a union member with no `merge=union` line is
-red (a filed gap would be silently dropped at a concurrent merge), but a
-`merge=union` line *outside* the derived set is **not** flagged: `merge=union` is
-a git-native driver a consumer's own tracked append log legitimately carries
-(§Multi-operator semantics), so there is no smuggling to catch. A missing
-`.gitattributes` reports every derived surface as unmechanized (exit 1, the
-install remedy); an unreadable one, an empty supersede set (a lifecycle always
-owns at least its state file and its two kit-owned built-ins, the
-lesson-evidence file and the survey record), or an empty union set (it
-always owns at least its gap inbox), is fail-closed (exit 2).
+Invariant, over two derived sets: bidirectional set-parity between the derived iteration-scoped supersede set (`stages::supersede_set`, §The stage-machine adapters) and the paths carrying `merge=iteration-scoped` in the consumer's `.gitattributes` (default `.gitattributes`; override with the first argument), plus **forward-only** parity between the derived union set (`stages::union_set` — the gap inbox) and the paths carrying `merge=union`. The iteration-scoped forward direction — a supersede-set path with no `merge=iteration-scoped` line — catches an unmechanized rule (a merge would silently take the wrong side on that surface). Its reverse direction is the safety edge: a `merge=iteration-scoped` attribute on a path *outside* the derived set silently discards merge content on a real surface, so a smuggled line is red, not config. The gate scans every `merge=iteration-scoped` line in the file — inside the installer's marker block or not — so the reverse edge holds against a hand-added line anywhere. The union set is **forward-only by design** — a union member with no `merge=union` line is red (a filed gap would be silently dropped at a concurrent merge), but a `merge=union` line *outside* the derived set is **not** flagged: `merge=union` is a git-native driver a consumer's own tracked append log legitimately carries (§Multi-operator semantics), so there is no smuggling to catch. A missing `.gitattributes` reports every derived surface as unmechanized (exit 1, the install remedy); an unreadable one, an empty supersede set (a lifecycle always owns at least its state file and its two kit-owned built-ins, the lesson-evidence file and the survey record), or an empty union set (it always owns at least its gap inbox), is fail-closed (exit 2).
 
-The gate satisfies the four gate-sdk contracts (gate-sdk/SPEC.md §The gate model):
-the single `MERGE-ATTRS: clean` line and a `help:` remedy on the finding path
-(output); exit 2 on an unreadable target or an empty derived set (fail-closed); a
-`good/`+`bad/` fixture pair under `gate-tests/` — the good case the default
-state+lesson attribution plus the gap-inbox union line, the bad case a smuggled
-reverse-edge line — plus `gate-tests/check-merge-attrs.test.sh` for the
-iteration-scoped forward-missing and missing-file findings, the union
-forward-missing finding, the union no-reverse-edge case (a `merge=union` line
-outside the derived set stays clean), and a real two-branch merge in a sandbox
-repo that asserts the keep-ours driver resolves an attributed surface to the
-arriving side (fixture-pair); and
-registration in this repo's `gates.list` where its own `.gitattributes` is the
-scan target (self-lint). Its `# graph:` couples `.gitattributes`, the kit's table
-and this repo's `scripts/lifecycle-config.knobs` (the config the supersede set
-derives from) at `tier=precommit`;
-a reshaped `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` in the consumer config is backstopped
-by the whole-tree `run-gates.sh` battery (the `check-stage-skill-coverage`
-precedent).
+The gate satisfies the four gate-sdk contracts (gate-sdk/SPEC.md §The gate model): the single `MERGE-ATTRS: clean` line and a `help:` remedy on the finding path (output); exit 2 on an unreadable target or an empty derived set (fail-closed); a `good/`+`bad/` fixture pair under `gate-tests/` — the good case the default state+lesson attribution plus the gap-inbox union line, the bad case a smuggled reverse-edge line — plus `gate-tests/check-merge-attrs.test.sh` for the iteration-scoped forward-missing and missing-file findings, the union forward-missing finding, the union no-reverse-edge case (a `merge=union` line outside the derived set stays clean), and a real two-branch merge in a sandbox repo that asserts the keep-ours driver resolves an attributed surface to the arriving side (fixture-pair); and registration in this repo's `gates.list` where its own `.gitattributes` is the scan target (self-lint). Its `# graph:` couples `.gitattributes`, the kit's table and this repo's `scripts/lifecycle-config.knobs` (the config the supersede set derives from) at `tier=precommit`; a reshaped `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` in the consumer config is backstopped by the whole-tree `run-gates.sh` battery (the `check-stage-skill-coverage` precedent).
 
 ### check-survey-record
 
-Invariant: every block in the survey record (§The survey record) carries a whole
-witness. Over each `## ` block: all five keys present, in order, one per line
-(and no sixth key, no stray line); `corpus` non-empty; `oracle` and `inferred`
-non-empty, where the literal `none` is legal and is the honest form and an
-*empty* value is the silent form and is refused; and `rev` a full 40-hex sha
-naming a commit that
-exists — the assertion that catches the short-sha and wrong-rev cases, and the
-reason the field is machine-stamped rather than author-supplied. **And every
-git-object-shaped token in the other four non-`rev` fields names an object that
-exists** (§The survey record), unless the block carries the valve.
+Invariant: every block in the survey record (§The survey record) carries a whole witness. Over each `## ` block: all five keys present, in order, one per line (and no sixth key, no stray line); `corpus` non-empty; `oracle` and `inferred` non-empty, where the literal `none` is legal and is the honest form and an *empty* value is the silent form and is refused; and `rev` a full 40-hex sha naming a commit that exists — the assertion that catches the short-sha and wrong-rev cases, and the reason the field is machine-stamped rather than author-supplied. **And every git-object-shaped token in the other four non-`rev` fields names an object that exists** (§The survey record), unless the block carries the valve.
 
-`inferred` is asserted on the same two footings as `oracle` — present, and
-non-empty with `none` legal — because it answers the same question in its own
-dimension: an absent key and an empty value are both the silent form of "no
-claim was sorted", and the field exists precisely so a citing session can tell
-that apart from a survey that inferred nothing.
+`inferred` is asserted on the same two footings as `oracle` — present, and non-empty with `none` legal — because it answers the same question in its own dimension: an absent key and an empty value are both the silent form of "no claim was sorted", and the field exists precisely so a citing session can tell that apart from a survey that inferred nothing.
 
-**The widened arm reuses the `rev` arm's probe over a wider input, and its two
-asymmetries with that arm are deliberate.** The mechanism was already here and
-already trusted — `git cat-file -e` — pointed at the one field the attested
-fabrication did not use. Its input is every field but `rev`, `inferred` included:
-an inferred claim that pastes a sha is a citation like any other, so the arm covers
-it by construction rather than by a second arm. First asymmetry: the widened arm
-accepts **any object type**, where `rev` demands `^{commit}`. A sha naming a blob
-or a tree is a real citation, and demanding a commit outside `rev` would red a
-legitimate one. Second: the token shape requires at least one `a`-`f`, where
-`rev` takes any 40-hex string. That is false-positive control rather than rigour — a 7-plus
-run of bare digits in prose is a count, a compact date or a byte figure far more
-often than a sha — and its honest limit is that an all-digit short sha is not
-probed at all. `rev` itself is **excluded** from the widened scan: it has the
-stricter arm above, and reporting it twice would say one thing in two voices.
-The heading is not scanned either; it is a question, not a field.
+**The widened arm reuses the `rev` arm's probe over a wider input, and its two asymmetries with that arm are deliberate.** The mechanism was already here and already trusted — `git cat-file -e` — pointed at the one field the attested fabrication did not use. Its input is every field but `rev`, `inferred` included: an inferred claim that pastes a sha is a citation like any other, so the arm covers it by construction rather than by a second arm. First asymmetry: the widened arm accepts **any object type**, where `rev` demands `^{commit}`. A sha naming a blob or a tree is a real citation, and demanding a commit outside `rev` would red a legitimate one. Second: the token shape requires at least one `a`-`f`, where `rev` takes any 40-hex string. That is false-positive control rather than rigour — a 7-plus run of bare digits in prose is a count, a compact date or a byte figure far more often than a sha — and its honest limit is that an all-digit short sha is not probed at all. `rev` itself is **excluded** from the widened scan: it has the stricter arm above, and reporting it twice would say one thing in two voices. The heading is not scanned either; it is a question, not a field.
 
-**The corpus stops at this record, and the stopping point is argued rather than
-convenient.** A survey block's fields are short and structured, so a
-word-bounded hex run in one is a citation far more often than an accident. The
-same arm over the queue, or over every governed prose surface, would meet
-ordinary hex-looking English and fixture data — and a gate that cries wolf
-trains its readers to bypass it (gate-sdk/SPEC.md §When a gate earns its place).
-The wider sweep is filed and costed rather than built here.
+**The corpus stops at this record, and the stopping point is argued rather than convenient.** A survey block's fields are short and structured, so a word-bounded hex run in one is a citation far more often than an accident. The same arm over the queue, or over every governed prose surface, would meet ordinary hex-looking English and fixture data — and a gate that cries wolf trains its readers to bypass it (gate-sdk/SPEC.md §When a gate earns its place). The wider sweep is filed and costed rather than built here.
 
-**The valve is a markdown comment on a surface `check-comment-tier` does not
-scan, and that was probed rather than assumed.** A `survey-token-exempt` line
-added to this repo's live record produced no comment-tier violation, so the
-spelling is **not** registered on canon-kit's directive roster: a registration
-would be dead configuration, and it would couple one kit's gate to another kit's
-block grammar. A consumer that widens the comment-tier corpus to include the
-record has the universal `comment-tier-exempt:` escape already. What *does* have
-to know the spelling is this gate's own parser, which would otherwise read the
-valve as the stray line its block grammar forbids — the half the hermetic
-fixture pair can assert, since it needs no probe.
+**The valve is a markdown comment on a surface `check-comment-tier` does not scan, and that was probed rather than assumed.** A `survey-token-exempt` line added to this repo's live record produced no comment-tier violation, so the spelling is **not** registered on canon-kit's directive roster: a registration would be dead configuration, and it would couple one kit's gate to another kit's block grammar. A consumer that widens the comment-tier corpus to include the record has the universal `comment-tier-exempt:` escape already. What *does* have to know the spelling is this gate's own parser, which would otherwise read the valve as the stray line its block grammar forbids — the half the hermetic fixture pair can assert, since it needs no probe.
 
-An absent record, and a record truncated to its header, are **clean and counted
-inert**: the surface is optional, and a consumer that never files a survey must
-not carry a red gate.
+An absent record, and a record truncated to its header, are **clean and counted inert**: the surface is optional, and a consumer that never files a survey must not carry a red gate.
 
-Enforcement-first is why the gate ships in the same unit as the surface rather
-than as follow-up debt: a block missing its witness is *silently unusable*,
-which is the exact failure class the surface exists to close.
+Enforcement-first is why the gate ships in the same unit as the surface rather than as follow-up debt: a block missing its witness is *silently unusable*, which is the exact failure class the surface exists to close.
 
-**Bare drives the configured record with the full assertion set; an explicit
-file argument drives it hermetically — grammar only, with no rev-existence
-probe.** That split is forced by portability rather than convenience: a fixture's
-`rev` names no commit in the tree the fixture is copied into, so a pair asserting
-existence would go red in every consumer that vendored the kit. Bare also
-degrades to grammar-only outside a git repository, where there is nothing to
-resolve a sha against. The clean line names which mode ran, so a grammar-only
-pass can never be read as a verified one.
+**Bare drives the configured record with the full assertion set; an explicit file argument drives it hermetically — grammar only, with no rev-existence probe.** That split is forced by portability rather than convenience: a fixture's `rev` names no commit in the tree the fixture is copied into, so a pair asserting existence would go red in every consumer that vendored the kit. Bare also degrades to grammar-only outside a git repository, where there is nothing to resolve a sha against. The clean line names which mode ran, so a grammar-only pass can never be read as a verified one.
 
-The gate satisfies the four gate-sdk contracts (gate-sdk/SPEC.md §The gate
-model): the single `SURVEY-RECORD: clean` line and a `help:` remedy naming the
-grammar and the `--emit file-survey` arm on the finding path (output); exit 2 on
-an unreadable or explicitly-named-but-missing record and on a failed parse
-(fail-closed); a `good/`+`bad/` fixture pair under `gate-tests/` driven through
-the hermetic argument — the good case a three-block record including an
-`oracle: none` note, a valved block, and every block carrying `inferred: none`,
-the bad case a short sha, an empty oracle, a block with its `oracle` line
-missing, an **empty** `inferred` and a block whose `inferred` line is
-**missing** — which are different findings with different remedies, one "write
-`none`" and one "the grammar grew a field" — and a
-reasonless valve — plus
-`gate-tests/check-survey-record.test.sh` for the half the pair cannot hold,
-which is everything the probe decides: both arms of the rev-existence probe in a
-sandbox repo (a rev naming a real commit, and a well-formed 40-hex rev naming
-nothing), both arms of the widened token probe, the valve exempting its block,
-a reasonless valve that reds *and still probes*, and the two inert shapes
-(fixture-pair); and registration in this repo's
-`gates.list`, where its scan target is this repo's own record (self-lint). Its
-`# graph:` couples the record at `tier=precommit`.
+The gate satisfies the four gate-sdk contracts (gate-sdk/SPEC.md §The gate model): the single `SURVEY-RECORD: clean` line and a `help:` remedy naming the grammar and the `--emit file-survey` arm on the finding path (output); exit 2 on an unreadable or explicitly-named-but-missing record and on a failed parse (fail-closed); a `good/`+`bad/` fixture pair under `gate-tests/` driven through the hermetic argument — the good case a three-block record including an `oracle: none` note, a valved block, and every block carrying `inferred: none`, the bad case a short sha, an empty oracle, a block with its `oracle` line missing, an **empty** `inferred` and a block whose `inferred` line is **missing** — which are different findings with different remedies, one "write `none`" and one "the grammar grew a field" — and a reasonless valve — plus `gate-tests/check-survey-record.test.sh` for the half the pair cannot hold, which is everything the probe decides: both arms of the rev-existence probe in a sandbox repo (a rev naming a real commit, and a well-formed 40-hex rev naming nothing), both arms of the widened token probe, the valve exempting its block, a reasonless valve that reds *and still probes*, and the two inert shapes (fixture-pair); and registration in this repo's `gates.list`, where its scan target is this repo's own record (self-lint). Its `# graph:` couples the record at `tier=precommit`.
 
-*Not gated, and stated so the gate is not mistaken for more than it is:* whether
-a `finding` is **true**, and whether a session holding a fresh record actually
-read it. The first is unmechanizable; the second leaves no tracked artifact —
-the class delegation-kit/SPEC.md §Operative residency rules no gate is owed for.
-The entry report's read trigger (§bin/enter-stage.sh) is the affordance in place
-of an oracle there, and it is weaker than one by construction.
+*Not gated, and stated so the gate is not mistaken for more than it is:* whether a `finding` is **true**, and whether a session holding a fresh record actually read it. The first is unmechanizable; the second leaves no tracked artifact — the class delegation-kit/SPEC.md §Operative residency rules no gate is owed for. The entry report's read trigger (§bin/enter-stage.sh) is the affordance in place of an oracle there, and it is weaker than one by construction.
 
 ### check-audit-roster
 
-Four assertions, over each block of the configured roster (§The audit roster):
-(A) the keys are present, in order, one per line, with no stray line — `last: never`
-closes a block after four keys and every other `last:` closes it after seven; every
-value is non-empty, `declined` taking the literal `none`, `hits` is a decimal
-integer, and `last` is `never` or `<iteration> <stage>` with `<stage>` a member of
-`LIFECYCLE_KIT_STAGES`; (B) no line exceeds `LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP`
-bytes; (C) `class` slugs are unique; (D) a `last` whose `<iteration>` equals the
-queue header's iteration names a stage the state file stamped for that iteration.
+Four assertions, over each block of the configured roster (§The audit roster): (A) the keys are present, in order, one per line, with no stray line — `last: never` closes a block after four keys and every other `last:` closes it after seven; every value is non-empty, `declined` taking the literal `none`, `hits` is a decimal integer, and `last` is `never` or `<iteration> <stage>` with `<stage>` a member of `LIFECYCLE_KIT_STAGES`; (B) no line exceeds `LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP` bytes; (C) `class` slugs are unique; (D) a `last` whose `<iteration>` equals the queue header's iteration names a stage the state file stamped for that iteration.
 
-A key found later in the block than expected reports every key dropped before it
-and keeps its own line, so a lost `due:` reads as the missing field it is rather
-than as a cascade of misplaced ones. A `corpus` value opening `surfaces:` must name
-at least one surface.
+A key found later in the block than expected reports every key dropped before it and keeps its own line, so a lost `due:` reads as the missing field it is rather than as a cascade of misplaced ones. A `corpus` value opening `surfaces:` must name at least one surface.
 
-An empty knob, an absent file, or a file holding its header alone is **clean and
-counted inert**. Bare mode drives the configured roster with all four assertions;
-an explicit file argument drives it hermetically with A, B and C, because a
-fixture's iteration names nothing in the host's state file. The clean line names
-which mode ran, on §check-survey-record's precedent. D reads nothing for a past
-iteration's `last`, because the boundary truncates the state file.
+An empty knob, an absent file, or a file holding its header alone is **clean and counted inert**. Bare mode drives the configured roster with all four assertions; an explicit file argument drives it hermetically with A, B and C, because a fixture's iteration names nothing in the host's state file. The clean line names which mode ran, on §check-survey-record's precedent. D reads nothing for a past iteration's `last`, because the boundary truncates the state file.
 
-The gate satisfies the four gate-sdk contracts (gate-sdk/SPEC.md §The gate model):
-the single `AUDIT-ROSTER: clean` line and a `help:` naming the grammar section on
-the finding path (output); exit 2 on an unreadable roster, queue or state file, an
-explicitly-named-but-missing roster, an unresolvable knob or a non-positive cap
-(fail-closed); a `good/`+`bad/` pair under `gate-tests/` driven through the
-hermetic argument — the bad case a dropped `due:` line (the attested compaction
-loss), an over-cap line, a duplicate class, a `last:` naming an unconfigured stage
-and an empty `declined:`, the good case a `never` block, a `surfaces:` block and a
-command block — plus `gate-tests/check-audit-roster.test.sh` for assertion D and
-the inert shapes (fixture-pair); and registration in this repo's `gates.list`
-(self-lint). Its `# graph:` couples the knob-named roster, the queue file and the
-state file at `tier=precommit`.
+The gate satisfies the four gate-sdk contracts (gate-sdk/SPEC.md §The gate model): the single `AUDIT-ROSTER: clean` line and a `help:` naming the grammar section on the finding path (output); exit 2 on an unreadable roster, queue or state file, an explicitly-named-but-missing roster, an unresolvable knob or a non-positive cap (fail-closed); a `good/`+`bad/` pair under `gate-tests/` driven through the hermetic argument — the bad case a dropped `due:` line (the attested compaction loss), an over-cap line, a duplicate class, a `last:` naming an unconfigured stage and an empty `declined:`, the good case a `never` block, a `surfaces:` block and a command block — plus `gate-tests/check-audit-roster.test.sh` for assertion D and the inert shapes (fixture-pair); and registration in this repo's `gates.list` (self-lint). Its `# graph:` couples the knob-named roster, the queue file and the state file at `tier=precommit`.
 
-*Not gated:* whether a sweep read its corpus faithfully, and whether a `hits` count
-is true. Both are session acts with no tracked residue.
+*Not gated:* whether a sweep read its corpus faithfully, and whether a `hits` count is true. Both are session acts with no tracked residue.
 
 ### check-scratch-citation
 
-Invariant: no surface in `LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS` carries a
-**retrieval pointer** to a path in the derived boundary-truncated set. The rule
-and why inlining is the right close are §The survey record's; this section owns
-the red condition.
+Invariant: no surface in `LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS` carries a **retrieval pointer** to a path in the derived boundary-truncated set. The rule and why inlining is the right close are §The survey record's; this section owns the red condition.
 
-**The forbidden-target set is derived, never maintained** — it is
-`crate::stages::supersede_set` (§The stage-machine adapters states the
-derivation), already the single derivation behind the `.gitattributes` block
-the `--install-lifecycle` arm writes and `check-merge-attrs`'s parity check.
-This gate reads it too, which is why a consumer widening its truncate
-configuration gets citation enforcement for free.
+**The forbidden-target set is derived, never maintained** — it is `crate::stages::supersede_set` (§The stage-machine adapters states the derivation), already the single derivation behind the `.gitattributes` block the `--install-lifecycle` arm writes and `check-merge-attrs`'s parity check. This gate reads it too, which is why a consumer widening its truncate configuration gets citation enforcement for free.
 
-**Retrieval-pointer position, stated as the red condition.** A supersede-set path
-that is either **(a)** in markdown link-target position — the parenthesized half
-of a `[text]`-plus-parentheses pair — or **(b)** preceded
-by a colon and whitespace and followed by nothing but a closing quote, comma,
-period, bracket or end of paragraph — the attested form, *"Full finding and its
-two-command witness"* followed by the path. A bare path elsewhere in prose is a
-**mention** and is clean; that is the whole calibration, and it is why this is
-specified as a position rather than as a pattern.
+**Retrieval-pointer position, stated as the red condition.** A supersede-set path that is either **(a)** in markdown link-target position — the parenthesized half of a `[text]`-plus-parentheses pair — or **(b)** preceded by a colon and whitespace and followed by nothing but a closing quote, comma, period, bracket or end of paragraph — the attested form, *"Full finding and its two-command witness"* followed by the path. A bare path elsewhere in prose is a **mention** and is clean; that is the whole calibration, and it is why this is specified as a position rather than as a pattern.
 
-**The scan joins a paragraph's wrapped continuation lines before testing (b), or
-it is blind on its own worked example.** A queue file wraps prose to a budget, so
-a colon and the path it introduces routinely land on different physical lines —
-which is exactly what the attested instance did. The join is
-`check-spec-pointer`'s prose-extraction shape (canon-kit/SPEC.md
-§check-spec-pointer), adopted rather
-than re-decided: concatenate a blank-line-delimited paragraph, match over the
-join, and map a hit back to its physical line through per-line start offsets. A
-scanner that is right on an unwrapped fixture and silently blind on the wrapped
-case it was written for is the failure this forecloses, which is why the `bad/`
-case carries a wrapped instance beside the single-line and markdown-link forms.
+**The scan joins a paragraph's wrapped continuation lines before testing (b), or it is blind on its own worked example.** A queue file wraps prose to a budget, so a colon and the path it introduces routinely land on different physical lines — which is exactly what the attested instance did. The join is `check-spec-pointer`'s prose-extraction shape (canon-kit/SPEC.md §check-spec-pointer), adopted rather than re-decided: concatenate a blank-line-delimited paragraph, match over the join, and map a hit back to its physical line through per-line start offsets. A scanner that is right on an unwrapped fixture and silently blind on the wrapped case it was written for is the failure this forecloses, which is why the `bad/` case carries a wrapped instance beside the single-line and markdown-link forms.
 
-**Per-line escape hatch:** a `scratch-citation-exempt:` tag on the line above the
-hit, this repo's established opt-out shape, for a surface that must quote a dead
-citation verbatim in order to describe it. Its reader is this gate's scanner, at
-the transition where it has matched a pointer and is deciding whether to record a
-finding. *Stated so it is not mistaken for more than it is:* the class is real and
-permanent — any entry documenting a citation defect must quote one — but the tree
-carries no live user today, because the entry that motivated the tag completed and
-its prose left the queue with it. The `bad/`+`good/` fixture pair is where the
-hatch is exercised.
+**Per-line escape hatch:** a `scratch-citation-exempt:` tag on the line above the hit, this repo's established opt-out shape, for a surface that must quote a dead citation verbatim in order to describe it. Its reader is this gate's scanner, at the transition where it has matched a pointer and is deciding whether to record a finding. *Stated so it is not mistaken for more than it is:* the class is real and permanent — any entry documenting a citation defect must quote one — but the tree carries no live user today, because the entry that motivated the tag completed and its prose left the queue with it. The `bad/`+`good/` fixture pair is where the hatch is exercised.
 
-The gate satisfies the four gate-sdk contracts: the single
-`SCRATCH-CITATION: clean` line naming how many surfaces were scanned, and a
-`help:` remedy naming the `--emit cite-survey` arm and the exempt tag on the
-finding path (output); exit 2 on an empty derived target set and on a failed parse
-(fail-closed); a `good/`+`bad/` pair whose good case copies the mention forms live
-entries actually use — a path opening a wrapped line after a full stop, a
-prepositional mention, a colon-introduced pointer at a **non**-member path, and a
-tagged dead citation — because a rule that reds any of those is wrong and the
-fixture is what says so (fixture-pair); and registration in this repo's
-`gates.list`, where its surfaces are this repo's own queue and spec set
-(self-lint).
+The gate satisfies the four gate-sdk contracts: the single `SCRATCH-CITATION: clean` line naming how many surfaces were scanned, and a `help:` remedy naming the `--emit cite-survey` arm and the exempt tag on the finding path (output); exit 2 on an empty derived target set and on a failed parse (fail-closed); a `good/`+`bad/` pair whose good case copies the mention forms live entries actually use — a path opening a wrapped line after a full stop, a prepositional mention, a colon-introduced pointer at a **non**-member path, and a tagged dead citation — because a rule that reds any of those is wrong and the fixture is what says so (fixture-pair); and registration in this repo's `gates.list`, where its surfaces are this repo's own queue and spec set (self-lint).
 
-*Not gated:* whether an inlined finding is faithful to the block it came from.
-Nothing tracked relates the two once the record is truncated, and inventing a
-provenance field would re-open the per-iteration lifetime the record's design
-turns on.
+*Not gated:* whether an inlined finding is faithful to the block it came from. Nothing tracked relates the two once the record is truncated, and inventing a provenance field would re-open the per-iteration lifetime the record's design turns on.
 
 ### check-gap-inbox-neutrality
 
-Invariant: the gap inbox (§The committed gap inbox) records observations, not
-conclusions. Two assertions over every non-blank line below the `# contract:`
-header:
+Invariant: the gap inbox (§The committed gap inbox) records observations, not conclusions. Two assertions over every non-blank line below the `# contract:` header:
 
-- **A — grammar.** Every line is `- <YYYY-MM-DD> — <prose>` with non-empty
-  prose. Nothing gated this before, even though the raw append is an explicitly
-  legal fallback, so a malformed bullet was found by the drain reading it an
-  iteration later.
-- **B — no interposed verdict.** No bullet's prose opens with the retired
-  ``recurrence of `<slug>`:`` form. This is the class assertion, and its value is
-  that it catches a conclusion reaching the capture surface **by any producer** —
-  a stale vendored affordance, a hand append copying an older bullet's shape —
-  rather than only the affordance this kit ships. The `help:` line teaches the
-  rule rather than the regex: say *why* you believe the bullet re-files an entry,
-  in the prose, and let the drain judge.
+- **A — grammar.** Every line is `- <YYYY-MM-DD> — <prose>` with non-empty prose. Nothing gated this before, even though the raw append is an explicitly legal fallback, so a malformed bullet was found by the drain reading it an iteration later.
+- **B — no interposed verdict.** No bullet's prose opens with the retired ``recurrence of `<slug>`:`` form. This is the class assertion, and its value is that it catches a conclusion reaching the capture surface **by any producer** — a stale vendored affordance, a hand append copying an older bullet's shape — rather than only the affordance this kit ships. The `help:` line teaches the rule rather than the regex: say *why* you believe the bullet re-files an entry, in the prose, and let the drain judge.
 
-An absent inbox is **clean, not fail-closed** — never having filed a gap is a
-legal state for a fresh consumer, unlike §check-lifecycle-registration's missing
-agent file, which is an install that did not finish. Fail-closed applies to the
-scanner's own exit status, per gate-sdk's contract.
+An absent inbox is **clean, not fail-closed** — never having filed a gap is a legal state for a fresh consumer, unlike §check-lifecycle-registration's missing agent file, which is an install that did not finish. Fail-closed applies to the scanner's own exit status, per gate-sdk's contract.
 
-**Bare drives the configured inbox; an explicit file argument drives it
-hermetically**, the §check-survey-record precedent, which is what lets the
-fixture pair run against a copied inbox.
+**Bare drives the configured inbox; an explicit file argument drives it hermetically**, the §check-survey-record precedent, which is what lets the fixture pair run against a copied inbox.
 
-**Why the tool-side contract is pinned separately.** This gate reads the surface
-and cannot see which producer wrote a line, so it cannot hold the affordance to
-its own contract. `gate-tests/file-gap-recurrence.test.sh` is what does that. The
-two together are the enforcement: the fixture-runner catches the producer
-regressing, the gate catches a verdict arriving by any other route.
+**Why the tool-side contract is pinned separately.** This gate reads the surface and cannot see which producer wrote a line, so it cannot hold the affordance to its own contract. `gate-tests/file-gap-recurrence.test.sh` is what does that. The two together are the enforcement: the fixture-runner catches the producer regressing, the gate catches a verdict arriving by any other route.
 
-The gate satisfies the four gate-sdk contracts (gate-sdk/SPEC.md §The gate
-model): the single `GAP-INBOX-NEUTRALITY: clean` line and a `help:` remedy on the
-finding path (output); exit 2 on an unreadable or explicitly-named-but-missing
-inbox and on a failed parse (fail-closed); a `good/`+`bad/` fixture pair under
-`gate-tests/` driven through the hermetic argument — the good case a record whose
-prose both re-files and disclaims an entry in words, the bad case a retired
-marker beside two broken bullets (fixture-pair); and registration in this repo's
-`gates.list`, where its scan target is this repo's own inbox (self-lint). Its
-`# graph:` couples the inbox at `tier=precommit`.
+The gate satisfies the four gate-sdk contracts (gate-sdk/SPEC.md §The gate model): the single `GAP-INBOX-NEUTRALITY: clean` line and a `help:` remedy on the finding path (output); exit 2 on an unreadable or explicitly-named-but-missing inbox and on a failed parse (fail-closed); a `good/`+`bad/` fixture pair under `gate-tests/` driven through the hermetic argument — the good case a record whose prose both re-files and disclaims an entry in words, the bad case a retired marker beside two broken bullets (fixture-pair); and registration in this repo's `gates.list`, where its scan target is this repo's own inbox (self-lint). Its `# graph:` couples the inbox at `tier=precommit`.
 
-*Not gated, and stated so the gate is not mistaken for more than it is:* whether
-a bullet's prose states the recurrence claim **at all**, and whether the claim is
-**right**. Assertion B removes the one shape that pre-empts the judge; it cannot
-compel a filer to answer the advisory, and the judgment itself is the drain's
-(§templates/stages/), which is where the amendment deliberately put it.
+*Not gated, and stated so the gate is not mistaken for more than it is:* whether a bullet's prose states the recurrence claim **at all**, and whether the claim is **right**. Assertion B removes the one shape that pre-empts the judge; it cannot compel a filer to answer the advisory, and the judgment itself is the drain's (§templates/stages/), which is where the amendment deliberately put it.
 
 ### templates/stages/
 
-The stage-skill templates (`scope`/`align`/`build`/`validate`/`close`) carry
-the generic stage spine — the stamp first step (performed by invoking
-`bash gate-sdk/bin/run-gates.sh --enter-stage <stage>` and stating in one line what it does), each stage's
-trigger/ordering rules, its stage-local doctrine, the instruction-surface read in
-`build` (the one stage every template edit passes), and the **resume-journal last
-step** — with **named slots** where the consumer's rule content goes. The
-templates are the owned surface: this section states the contract a consumer
-skill must satisfy and never restates what a template carries.
+The stage-skill templates (`scope`/`align`/`build`/`validate`/`close`) carry the generic stage spine — the stamp first step (performed by invoking `bash gate-sdk/bin/run-gates.sh --enter-stage <stage>` and stating in one line what it does), each stage's trigger/ordering rules, its stage-local doctrine, the instruction-surface read in `build` (the one stage every template edit passes), and the **resume-journal last step** — with **named slots** where the consumer's rule content goes. The templates are the owned surface: this section states the contract a consumer skill must satisfy and never restates what a template carries.
 
-**The last step mirrors the first, and its placement is the residency doctrine
-applied rather than a preference.** delegation-kit/SPEC.md §Operative residency
-puts a rule on the surface its bound actor loads, and for a stage session that
-surface is the stage template — the one thing every stage session reads, under a
-supervisor and without one alike. The step **points and does not restate**: the
-journal's contract is delegation-kit's and its path is §The state machine's, so a
-step restating either would put a second carrier on a rule one pointer away. It
-therefore names the **act** — append `DONE` as the file's last line before
-reporting — and cites the two owners, which is also what keeps it short enough
-that `LIFECYCLE_KIT_SHIM_NGRAM`'s bar is nowhere near approached. Naming that one
-act discharges the whole obligation: the marker is meaningful only as the last
-line, so appending it entails that the file exists and that the session wrote into
-it. A consumer's binding **does not** restate the step — a binding that did would
-be `check-shim-restatement`'s subject, the kit templates being its corpus — and
-`check-stage-skill-coverage`'s third direction holds every configured stage's
-executed surface to carrying it.
+**The last step mirrors the first, and its placement is the residency doctrine applied rather than a preference.** delegation-kit/SPEC.md §Operative residency puts a rule on the surface its bound actor loads, and for a stage session that surface is the stage template — the one thing every stage session reads, under a supervisor and without one alike. The step **points and does not restate**: the journal's contract is delegation-kit's and its path is §The state machine's, so a step restating either would put a second carrier on a rule one pointer away. It therefore names the **act** — append `DONE` as the file's last line before reporting — and cites the two owners, which is also what keeps it short enough that `LIFECYCLE_KIT_SHIM_NGRAM`'s bar is nowhere near approached. Naming that one act discharges the whole obligation: the marker is meaningful only as the last line, so appending it entails that the file exists and that the session wrote into it. A consumer's binding **does not** restate the step — a binding that did would be `check-shim-restatement`'s subject, the kit templates being its corpus — and `check-stage-skill-coverage`'s third direction holds every configured stage's executed surface to carrying it.
 
-**The step instructs a marker the entry does not assert, and the two look like one
-change.** §bin/enter-stage.sh's first narrowing — *existence and non-emptiness,
-never the `DONE` marker* — stands untouched, on its own ground that a stage entry
-is not a cold read. Nor is the step the self-asserted completion marker §The stamp
-protocol refuses: that refusal is scoped to the **cursor**, a marker a state
-surface would read as proof of completion, and no surface reads this one — not the
-entry assertion, which reads existence and content, and not any state-machine
-surface, none of which consumes it at all. `DONE` is delegation-kit's own contract
-clause, already spelled and already read there; the step instructs a session to
-discharge it and mints nothing.
+**The step instructs a marker the entry does not assert, and the two look like one change.** §bin/enter-stage.sh's first narrowing — *existence and non-emptiness, never the `DONE` marker* — stands untouched, on its own ground that a stage entry is not a cold read. Nor is the step the self-asserted completion marker §The stamp protocol refuses: that refusal is scoped to the **cursor**, a marker a state surface would read as proof of completion, and no surface reads this one — not the entry assertion, which reads existence and content, and not any state-machine surface, none of which consumes it at all. `DONE` is delegation-kit's own contract clause, already spelled and already read there; the step instructs a session to discharge it and mints nothing.
 
-Alongside the default-roster templates the kit ships **`spec.md`**, an optional
-**amendment-authoring** stage template — the generative half of design, split
-out from `scope` on a roster that carries a dedicated authoring stage (the
-ontology: scope bounds the units, the authoring stage authors the amendments,
-the audit stage independently verifies them). It is a full stage (it invokes
-`--enter-stage` and stamps), **trigger-gated exactly like the audit stage**: it
-runs only when an iteration promotes a feature to author, it **appends** rather
-than resets (only the first stage resets the evidence file), and it takes `scope`
-as its predecessor without being named any stage's mandatory predecessor
-(§check-stage-entry's trigger-gated-stage calibration). The kit **default roster
-does not bind it** — the split is demand-gated and non-breaking; a consumer
-activates it through `LIFECYCLE_KIT_STAGES` / `LIFECYCLE_KIT_PREDECESSOR`
-(§Layout and configuration). This is the supported roster shape for a
-trigger-gated authoring stage, the same class as the trigger-gated audit stage.
-The generic authoring how-to `spec.md` single-sources — causal completeness and
-canon-kit's bidirectional queue pairing — is the content `scope`'s conditional
-authoring step points at, so a default-roster `scope` that still authors reads it
-there. Its per-delta **work-class** label is written **inline** rather than
-rostered, a roster being a second copy that drifts the moment a delta is split or
-reordered while its one reader — the lead, at batch-cut — is scanning the deltas
-themselves; the label records the delta's *demand* and never a model name,
-a baked name being drift against a churning roster and a spec-time
-recommendation attaching to a batch not yet cut. The judgment is the authoring
-stage's because it knows what each delta demands where the lead knows only what
-the queue entry says.
+Alongside the default-roster templates the kit ships **`spec.md`**, an optional **amendment-authoring** stage template — the generative half of design, split out from `scope` on a roster that carries a dedicated authoring stage (the ontology: scope bounds the units, the authoring stage authors the amendments, the audit stage independently verifies them). It is a full stage (it invokes `--enter-stage` and stamps), **trigger-gated exactly like the audit stage**: it runs only when an iteration promotes a feature to author, it **appends** rather than resets (only the first stage resets the evidence file), and it takes `scope` as its predecessor without being named any stage's mandatory predecessor (§check-stage-entry's trigger-gated-stage calibration). The kit **default roster does not bind it** — the split is demand-gated and non-breaking; a consumer activates it through `LIFECYCLE_KIT_STAGES` / `LIFECYCLE_KIT_PREDECESSOR` (§Layout and configuration). This is the supported roster shape for a trigger-gated authoring stage, the same class as the trigger-gated audit stage. The generic authoring how-to `spec.md` single-sources — causal completeness and canon-kit's bidirectional queue pairing — is the content `scope`'s conditional authoring step points at, so a default-roster `scope` that still authors reads it there. Its per-delta **work-class** label is written **inline** rather than rostered, a roster being a second copy that drifts the moment a delta is split or reordered while its one reader — the lead, at batch-cut — is scanning the deltas themselves; the label records the delta's *demand* and never a model name, a baked name being drift against a churning roster and a spec-time recommendation attaching to a batch not yet cut. The judgment is the authoring stage's because it knows what each delta demands where the lead knows only what the queue entry says.
 
-`spec.md`'s **Definition-of-Done placement clause is derived, not a new rule.**
-§check-stage-entry assertion B refuses any untagged active entry at the drain
-stage's entry and any active entry at every successor's, so an entry's Done move or
-demotion can be performed only before the drain stage — where canon-kit's merge
-step 4 already puts it — or at it for a `[drain-exempt:]` entry; a DoD naming the
-drain stage for an untagged entry is as unexecutable as one naming a successor.
-**A clause and not an assertion:** an assertion over the amendment glob would need
-a DoD item to spell its stage in a grammar, and canon-kit's amendment template has
-none — a DoD item is prose, and a stage word in it may name a stage for any reason
-— so the assertion would either guess from prose, false-positive on every such
-mention, or mint a stage field in a second kit's grammar to catch one authoring
-slip. The mechanical backstop already exists: the lead's pre-completion
-`--enter-stage --simulate <next stage>` read (§templates/lead.md) refuses exactly
-this case, provided it runs before the push.
+`spec.md`'s **Definition-of-Done placement clause is derived, not a new rule.** §check-stage-entry assertion B refuses any untagged active entry at the drain stage's entry and any active entry at every successor's, so an entry's Done move or demotion can be performed only before the drain stage — where canon-kit's merge step 4 already puts it — or at it for a `[drain-exempt:]` entry; a DoD naming the drain stage for an untagged entry is as unexecutable as one naming a successor. **A clause and not an assertion:** an assertion over the amendment glob would need a DoD item to spell its stage in a grammar, and canon-kit's amendment template has none — a DoD item is prose, and a stage word in it may name a stage for any reason — so the assertion would either guess from prose, false-positive on every such mention, or mint a stage field in a second kit's grammar to catch one authoring slip. The mechanical backstop already exists: the lead's pre-completion `--enter-stage --simulate <next stage>` read (§templates/lead.md) refuses exactly this case, provided it runs before the push.
 
-`spec.md`'s **authoring-exit pass** runs each delta's own claims before the
-amendment is committed, because the stage that wrote a claim is the cheapest place
-to run it: otherwise an amendment reaches build carrying claims nobody ran, and a
-survey's `inferred` claim restated in an amendment loses its flag at the
-restatement. The pass sorts what a delta asserts into **three classes**, whose
-costs differ by an order of magnitude:
+`spec.md`'s **authoring-exit pass** runs each delta's own claims before the amendment is committed, because the stage that wrote a claim is the cheapest place to run it: otherwise an amendment reaches build carrying claims nobody ran, and a survey's `inferred` claim restated in an amendment loses its flag at the restatement. The pass sorts what a delta asserts into **three classes**, whose costs differ by an order of magnitude:
 
-- **A spent delta** is an instruction whose predicate the authoring commit already
-  satisfied. The pass catches it outright — the one class fully visible from the
-  commit that wrote it. Its hazard is inverted: a build session trusting it hunts a
-  discrepancy that does not exist, or "corrects" a correct figure.
-- **A premise** is load-bearing: a ruling's ground, or a contract sentence cited to
-  a section. The pass reaches every premise its author recognizes as one, by running
-  it or by marking it. What stays uncaught is a premise the author believed
-  verified — a class strictly smaller than the one uncaught without the pass, the
-  survey record's `inferred` argument applied to amendments.
-- **An illustration** moves no oracle row, and its delta's ruling stands on its own
-  derivation; it is exempt, because probing it buys nothing a reader acts on.
+- **A spent delta** is an instruction whose predicate the authoring commit already satisfied. The pass catches it outright — the one class fully visible from the commit that wrote it. Its hazard is inverted: a build session trusting it hunts a discrepancy that does not exist, or "corrects" a correct figure.
+- **A premise** is load-bearing: a ruling's ground, or a contract sentence cited to a section. The pass reaches every premise its author recognizes as one, by running it or by marking it. What stays uncaught is a premise the author believed verified — a class strictly smaller than the one uncaught without the pass, the survey record's `inferred` argument applied to amendments.
+- **An illustration** moves no oracle row, and its delta's ruling stands on its own derivation; it is exempt, because probing it buys nothing a reader acts on.
 
-**Refused: probing every tree fact the amendment asserts.** That is open-ended and
-most asserted facts are illustrations, so the pass is bounded by the deltas'
-predicates and the premises their rulings name.
+**Refused: probing every tree fact the amendment asserts.** That is open-ended and most asserted facts are illustrations, so the pass is bounded by the deltas' predicates and the premises their rulings name.
 
-**The inferred marker** carries a premise the pass could not run, in one of two
-forms, each opening its own line:
+**The inferred marker** carries a premise the pass could not run, in one of two forms, each opening its own line:
 
-- `**Inferred, not run:** <claim> — <command>` — the command is mandatory, since
-  the marker exists to hand a later stage something to run.
-- `**Inferred, cannot run before build:** <claim> — <reason>` — for a claim whose
-  subject does not exist until build lands something; the reason is mandatory.
+- `**Inferred, not run:** <claim> — <command>` — the command is mandatory, since the marker exists to hand a later stage something to run.
+- `**Inferred, cannot run before build:** <claim> — <reason>` — for a claim whose subject does not exist until build lands something; the reason is mandatory.
 
-A marker is recognized only at the start of a line, after optional indentation and
-one optional `- ` or `> ` lead, and never inside a fence, so a mention of the
-spelling in running prose or in backticks is not a marker. The spellings are **kit
-constants, not config**: they belong to this kit's authoring template, on
-canon-kit's precedent that a kit-shipped template's own headings are constants.
-**The marker sits on the passage and not only in the survey record** because the
-record is boundary-truncated and holds a claim per block, not per passage, and a
-restatement drops the record's flag; the marker sits where the next reader reads,
-the rule the **Not yet applied** marker already follows.
+A marker is recognized only at the start of a line, after optional indentation and one optional `- ` or `> ` lead, and never inside a fence, so a mention of the spelling in running prose or in backticks is not a marker. The spellings are **kit constants, not config**: they belong to this kit's authoring template, on canon-kit's precedent that a kit-shipped template's own headings are constants. **The marker sits on the passage and not only in the survey record** because the record is boundary-truncated and holds a claim per block, not per passage, and a restatement drops the record's flag; the marker sits where the next reader reads, the rule the **Not yet applied** marker already follows.
 
-**A queue entry carries the marker too**, written by every session that writes a
-new deferred entry (§The committed gap inbox), on a continuation line of its own
-with **no `- ` lead**: with the lead the line parses as a sub-task whose bold
-lead-in is not a slug, which `check-task-names` reds. In the deferred pool and the
-icebox no gate reads it; the marker is the carried signal, dropped with the body at
-an eviction and recovered with it (queue-kit/SPEC.md §The icebox tier). It counts
-toward the entry cap like any body line (queue-kit/SPEC.md
-§check-queue-entry-budget).
+**A queue entry carries the marker too**, written by every session that writes a new deferred entry (§The committed gap inbox), on a continuation line of its own with **no `- ` lead**: with the lead the line parses as a sub-task whose bold lead-in is not a slug, which `check-task-names` reds. In the deferred pool and the icebox no gate reads it; the marker is the carried signal, dropped with the body at an eviction and recovered with it (queue-kit/SPEC.md §The icebox tier). It counts toward the entry cap like any body line (queue-kit/SPEC.md §check-queue-entry-budget).
 
-**The promoting stage runs an entry's not-run markers before it promotes the
-entry** — scope for debt, the authoring stage that pairs the entry for a feature —
-correcting the entry and deleting the marker, or rewriting it to the cannot-run
-form. **Scope owes debt this and not only assertion D** because a debt entry
-promoted straight into an active section meets no stage between scope and the
-audit-entry stage, so without the scope sentence the first reader of its marker is
-the refusal — the failure the align/D pairing below already closes for amendments.
+**The promoting stage runs an entry's not-run markers before it promotes the entry** — scope for debt, the authoring stage that pairs the entry for a feature — correcting the entry and deleting the marker, or rewriting it to the cannot-run form. **Scope owes debt this and not only assertion D** because a debt entry promoted straight into an active section meets no stage between scope and the audit-entry stage, so without the scope sentence the first reader of its marker is the refusal — the failure the align/D pairing below already closes for amendments.
 
-**Align runs every not-run marker and build runs the cannot-run ones first** — in an
-amendment or an active queue entry — although §check-stage-entry assertion D
-already refuses the build entry on an unrun marker: align is trigger-gated, so D
-holds the obligation when align is skipped, and align's sentence keeps the refusal
-from being the first notice when it runs.
+**Align runs every not-run marker and build runs the cannot-run ones first** — in an amendment or an active queue entry — although §check-stage-entry assertion D already refuses the build entry on an unrun marker: align is trigger-gated, so D holds the obligation when align is skipped, and align's sentence keeps the refusal from being the first notice when it runs.
 
-The directory holds the **stage-class** template set, not any one consumer's
-roster: it ships six templates while `LIFECYCLE_KIT_STAGES` defaults to five,
-because `spec.md` serves the split-authoring roster alone. Nothing derives a
-roster from this listing — the glob buys a legible layout, not a derivation.
+The directory holds the **stage-class** template set, not any one consumer's roster: it ships six templates while `LIFECYCLE_KIT_STAGES` defaults to five, because `spec.md` serves the split-authoring roster alone. Nothing derives a roster from this listing — the glob buys a legible layout, not a derivation.
 
-A consumer skill adopts a template in one of two modes; either way the executed
-skill states in one line what the stamp step does and supplies every
-slot's content:
+A consumer skill adopts a template in one of two modes; either way the executed skill states in one line what the stamp step does and supplies every slot's content:
 
-- **Consume-by-reference (the default)** — the consumer skill is a thin
-  **binding shim** whose body is a single directive line, `Execute the template
-  at <repo-relative path>, applying the bindings below.`, followed by a
-  `## Bindings` section with exactly one entry per template slot. The template
-  stays the executed surface; the shim carries only consumer content, so generic
-  doctrine has one owner and never drifts across a copy. This is the documented
-  default because it tracks the kit: a re-vendor reaches the template, and
-  `check-skill-binding` + `check-shim-restatement` hold the shim to a thin
-  reference.
-- **Copy-and-specialize (the sanctioned fork)** — the template is copied into
-  the consumer's skills dir and each slot overwritten in place; self-contained
-  and legible, structure copied not imported, so the skill stands alone
-  (gate-sdk's check-skeleton shape). It is a fork with its consequence owned:
-  you own the ritual prose, an upgrade's re-vendor does not reach it, and the
-  shim gates do not cover it. It is kept deliberately — the blessed escape hatch
-  that keeps legitimate structural divergence (different stages, a reshaped
-  machine) visible and contained, and the harness-agnostic floor the
-  upgrade smoke assumes; removing it would drive forks into edits of the
-  vendored template, which break Phase-A upgrade determinism with no gate to
-  catch them.
+- **Consume-by-reference (the default)** — the consumer skill is a thin **binding shim** whose body is a single directive line, `Execute the template at <repo-relative path>, applying the bindings below.`, followed by a `## Bindings` section with exactly one entry per template slot. The template stays the executed surface; the shim carries only consumer content, so generic doctrine has one owner and never drifts across a copy. This is the documented default because it tracks the kit: a re-vendor reaches the template, and `check-skill-binding` + `check-shim-restatement` hold the shim to a thin reference.
+- **Copy-and-specialize (the sanctioned fork)** — the template is copied into the consumer's skills dir and each slot overwritten in place; self-contained and legible, structure copied not imported, so the skill stands alone (gate-sdk's check-skeleton shape). It is a fork with its consequence owned: you own the ritual prose, an upgrade's re-vendor does not reach it, and the shim gates do not cover it. It is kept deliberately — the blessed escape hatch that keeps legitimate structural divergence (different stages, a reshaped machine) visible and contained, and the harness-agnostic floor the upgrade smoke assumes; removing it would drive forks into edits of the vendored template, which break Phase-A upgrade determinism with no gate to catch them.
 
-A consumer reaching for the fork to express *prose* divergence rather than
-structural divergence signals the slot vocabulary is too thin; the fix is
-richer slots pulling those cases back under shim protection, not more copying.
-No gate or telemetry watches for it — which mode a consumer picks is their tree,
-not this one.
+A consumer reaching for the fork to express *prose* divergence rather than structural divergence signals the slot vocabulary is too thin; the fix is richer slots pulling those cases back under shim protection, not more copying. No gate or telemetry watches for it — which mode a consumer picks is their tree, not this one.
 
-**Named slots (template grammar).** Each consumer placeholder is a named slot
-`*<slot-name: guidance>*` — `slot-name` matches `[a-z][a-z0-9-]*`, is unique
-within its template, and precedes the `:` and the guidance a copy-editor or
-shim author replaces. A copy-and-specialize consumer overwrites the whole
-`*<…>*` span; a shim binds the slot by name in a `## Bindings` entry
-`**slot-name** — <consumer content>` (multi-line content indents under its lead
-line), and carries nothing else — doctrine restated from the template in a shim
-is the defect the reference mode removes. `check-skill-binding` holds the
-shim↔template slot parity.
+**Named slots (template grammar).** Each consumer placeholder is a named slot `*<slot-name: guidance>*` — `slot-name` matches `[a-z][a-z0-9-]*`, is unique within its template, and precedes the `:` and the guidance a copy-editor or shim author replaces. A copy-and-specialize consumer overwrites the whole `*<…>*` span; a shim binds the slot by name in a `## Bindings` entry `**slot-name** — <consumer content>` (multi-line content indents under its lead line), and carries nothing else — doctrine restated from the template in a shim is the defect the reference mode removes. `check-skill-binding` holds the shim↔template slot parity.
 
-**Authoring rule (a binding shim binds residue, cites procedure, restates
-nothing).** A binding a slot supplies carries only what is local to this
-consumer — the residue: which surfaces to sweep, which config knobs, which log
-sinks. Procedure and always-loaded fact that a kit template or the consumer's
-`CLAUDE.md` already owns are named by a citation (a path plus a `§<heading>`), never
-copied into the shim: a shim is loaded on every stage invocation, so a
-restatement there is a per-session token tax on a fact with an owner, and it
-drifts the moment the owner changes. `check-shim-restatement` is the tripwire
-for the copy shape; the tier judgment (residue vs owned fact) stays the author's.
+**Authoring rule (a binding shim binds residue, cites procedure, restates nothing).** A binding a slot supplies carries only what is local to this consumer — the residue: which surfaces to sweep, which config knobs, which log sinks. Procedure and always-loaded fact that a kit template or the consumer's `CLAUDE.md` already owns are named by a citation (a path plus a `§<heading>`), never copied into the shim: a shim is loaded on every stage invocation, so a restatement there is a per-session token tax on a fact with an owner, and it drifts the moment the owner changes. `check-shim-restatement` is the tripwire for the copy shape; the tier judgment (residue vs owned fact) stays the author's.
 
-**The `validate` template carries the valve's arming step, and the `close`
-template carries its disposition step** (§bin/enter-stage.sh owns the valve's
-contract; both templates point at it rather than restating it). A validate that
-ends on a **deliberately accepted** red — a suite whose failure is understood and
-reproduces at the iteration-start commit — arms the valve for the closing
-stage and commits the ledger, rather than stopping for an operator round-trip.
+**The `validate` template carries the valve's arming step, and the `close` template carries its disposition step** (§bin/enter-stage.sh owns the valve's contract; both templates point at it rather than restating it). A validate that ends on a **deliberately accepted** red — a suite whose failure is understood and reproduces at the iteration-start commit — arms the valve for the closing stage and commits the ledger, rather than stopping for an operator round-trip.
 
-**Arming is not a queue write, and that distinction is what makes it validate's
-move to take.** A validate may not pre-empt the closing stage by writing the
-queue: a mid-iteration queue edit is what the gap inbox exists to prevent. Arming
-the valve is an evidence-adjacent record on a surface validate already writes at
-this exact point in its ritual, beside the evidence manifest and the baseline
-diff. The move the machine lacked was never a queue edit; it was a **hand-off**,
-and the ledger is the artifact that carries it. **The reason field is that
-hand-off's payload**, so validate writes what close needs — which suite, what the
-red is, why it is accepted rather than fixed, and the commit it reproduces at,
-which the row close lands must record — and close reads it as the
-input to the task it is about to file.
+**Arming is not a queue write, and that distinction is what makes it validate's move to take.** A validate may not pre-empt the closing stage by writing the queue: a mid-iteration queue edit is what the gap inbox exists to prevent. Arming the valve is an evidence-adjacent record on a surface validate already writes at this exact point in its ritual, beside the evidence manifest and the baseline diff. The move the machine lacked was never a queue edit; it was a **hand-off**, and the ledger is the artifact that carries it. **The reason field is that hand-off's payload**, so validate writes what close needs — which suite, what the red is, why it is accepted rather than fixed, and the commit it reproduces at, which the row close lands must record — and close reads it as the input to the task it is about to file.
 
-**A `used` line is a close-stage obligation, not a free pass.** For every `used`
-line in the closing iteration, close **files the blocking task and lands the
-baseline row that names it, in that session**. That is the deadlock's actual
-resolution rather than a courtesy: what makes the valve one-shot in substance and
-not merely in mechanism is that the entry it bought is spent making the next
-iteration's pre-flight pass without one. A close that enters through the valve
-and files nothing has moved the deadlock forward by one iteration at the cost of
-a record. The filed task **inlines** the finding rather than pointing at the
-ledger, the ledger being truncated at the next boundary — the same close the
-retrieval-pointer rule requires on independent grounds (§check-scratch-citation).
-**A residual `armed` line is dispositioned in the same step and with the same
-weight**: it means a session expected a refusal that never came, or armed the
-wrong stage, and either is a fact about the iteration worth one line rather than
-a file the boundary quietly truncates. The horizon is the iteration, because the
-ledger is truncated at the boundary — so "how many times did we reach for the
-valve" has a bounded, committed answer for exactly as long as anyone can act on
-it.
+**A `used` line is a close-stage obligation, not a free pass.** For every `used` line in the closing iteration, close **files the blocking task and lands the baseline row that names it, in that session**. That is the deadlock's actual resolution rather than a courtesy: what makes the valve one-shot in substance and not merely in mechanism is that the entry it bought is spent making the next iteration's pre-flight pass without one. A close that enters through the valve and files nothing has moved the deadlock forward by one iteration at the cost of a record. The filed task **inlines** the finding rather than pointing at the ledger, the ledger being truncated at the next boundary — the same close the retrieval-pointer rule requires on independent grounds (§check-scratch-citation). **A residual `armed` line is dispositioned in the same step and with the same weight**: it means a session expected a refusal that never came, or armed the wrong stage, and either is a fact about the iteration worth one line rather than a file the boundary quietly truncates. The horizon is the iteration, because the ledger is truncated at the boundary — so "how many times did we reach for the valve" has a bounded, committed answer for exactly as long as anyone can act on it.
 
-The `close` template carries a **ruling-record repair step**, placed with the
-staleness read and never with the brevity pass: close reads the record for aged
-facts and fired discharge conditions and repairs what the record's own contract
-puts in a session's hands. The step names the record **generically** and states
-the boundary by *pointing at* the record's contract rather than restating it —
-write authority on a ruling record is not a kit template's to grant
-(§templates/consult.md), so the kit adds obligation and the record grants
-authority. The placement is forced by the predicate: a repair asks *is it still
-true?*, which is the staleness step exactly, where the later pass's licence is
-compression and a correction made under it would be a deletion wearing a
-compression's clothes. **A repair is fix-shaped by the drain's existing litmus
-and needs no new criterion** — it adds no governed name and lands
-test-and-doc-complete in the closing session's own commit, which that litmus
-already admits; stating it is what stops a later session routing a two-word
-correction through a deferred entry. The record is a declared roster row
-(§The close-surface roster), so the obligation is derived rather than remembered
-and an unconfigured consumer sees the step skip. One act inside the step is a
-**recording** rather than a repair: an operator directive discharged by
-**falsification** — its premise measured false rather than the work being done —
-is recorded on the record as a closed-ruling line, because such a discharge leaves
-no landed unit and no queue trace, so a later session reading only the directive
-re-derives the whole investigation that falsified it.
+The `close` template carries a **ruling-record repair step**, placed with the staleness read and never with the brevity pass: close reads the record for aged facts and fired discharge conditions and repairs what the record's own contract puts in a session's hands. The step names the record **generically** and states the boundary by *pointing at* the record's contract rather than restating it — write authority on a ruling record is not a kit template's to grant (§templates/consult.md), so the kit adds obligation and the record grants authority. The placement is forced by the predicate: a repair asks *is it still true?*, which is the staleness step exactly, where the later pass's licence is compression and a correction made under it would be a deletion wearing a compression's clothes. **A repair is fix-shaped by the drain's existing litmus and needs no new criterion** — it adds no governed name and lands test-and-doc-complete in the closing session's own commit, which that litmus already admits; stating it is what stops a later session routing a two-word correction through a deferred entry. The record is a declared roster row (§The close-surface roster), so the obligation is derived rather than remembered and an unconfigured consumer sees the step skip. One act inside the step is a **recording** rather than a repair: an operator directive discharged by **falsification** — its premise measured false rather than the work being done — is recorded on the record as a closed-ruling line, because such a discharge leaves no landed unit and no queue trace, so a later session reading only the directive re-derives the whole investigation that falsified it.
 
-The `close` template carries a **moot sweep** ahead of its Clear-Done step: it
-asks which live entries the iteration's landings mooted and moves them to the
-done section, the exit queue-kit/SPEC.md §The icebox tier sanctions for an entry
-a landed unit has mooted. Without it nothing asks, and an obsolete entry lingers
-until a whole-pool triage reads it. **The sweep sits at close and not at build,
-on four grounds.** Close holds the iteration's whole exit set and whole commit
-range at once, where a build batch sees only its own landing, so a moot two
-batches produce jointly is visible to neither. The done section still holds the
-exits in one place until close clears it, so the sweep reads them where they
-sit. Close already writes the deferred pool through its gap drain and its
-eviction, while build's queue authority is the Done move for its own units, which
-a build step moving *other* entries would widen. And a build step repeats per
-batch, sweeping the same pool again each time, where close sweeps it once.
+The `close` template carries a **moot sweep** ahead of its Clear-Done step: it asks which live entries the iteration's landings mooted and moves them to the done section, the exit queue-kit/SPEC.md §The icebox tier sanctions for an entry a landed unit has mooted. Without it nothing asks, and an obsolete entry lingers until a whole-pool triage reads it. **The sweep sits at close and not at build, on four grounds.** Close holds the iteration's whole exit set and whole commit range at once, where a build batch sees only its own landing, so a moot two batches produce jointly is visible to neither. The done section still holds the exits in one place until close clears it, so the sweep reads them where they sit. Close already writes the deferred pool through its gap drain and its eviction, while build's queue authority is the Done move for its own units, which a build step moving *other* entries would widen. And a build step repeats per batch, sweeping the same pool again each time, where close sweeps it once.
 
-**The candidates are derived, and each source is chosen for what it reaches.**
-Entries citing a done slug cost no second run: the drain step's retired-citation
-read already invokes queue-kit's inbound-citation arm, whose retired block lists
-each cited done slug above its citing entries, and the two steps read those rows
-to different ends — the drain asks whether a citing line is a stale pointer, the
-sweep whether the citing *entry* is still open. A path the range deleted is taken
-without exclusion. A removed heading is read only from files the range
-*modified*, because a deleted file's headings are template scaffolding, an
-amendment's, that no entry cites. **The honest limit:** the set reaches a
-referent removed at path or heading granularity, and an entry citing landed work
-by slug. A referent edited away below a heading — a clause, a paragraph — falls
-outside it, and so does a supersession landed outside the range, such as a
-consult between iterations; the pool-wide triage stays the backstop for both.
-Whether an entry is mooted is semantic, so no gate judges the sweep; the battery
-judges only that a move stranded no pointer. The gates reading a slug reference
-red on one that *left* the live set, so a move adds their violations rather than
-clearing any, which is why the sweep runs the battery before its commit.
+**The candidates are derived, and each source is chosen for what it reaches.** Entries citing a done slug cost no second run: the drain step's retired-citation read already invokes queue-kit's inbound-citation arm, whose retired block lists each cited done slug above its citing entries, and the two steps read those rows to different ends — the drain asks whether a citing line is a stale pointer, the sweep whether the citing *entry* is still open. A path the range deleted is taken without exclusion. A removed heading is read only from files the range *modified*, because a deleted file's headings are template scaffolding, an amendment's, that no entry cites. **The honest limit:** the set reaches a referent removed at path or heading granularity, and an entry citing landed work by slug. A referent edited away below a heading — a clause, a paragraph — falls outside it, and so does a supersession landed outside the range, such as a consult between iterations; the pool-wide triage stays the backstop for both. Whether an entry is mooted is semantic, so no gate judges the sweep; the battery judges only that a move stranded no pointer. The gates reading a slug reference red on one that *left* the live set, so a move adds their violations rather than clearing any, which is why the sweep runs the battery before its commit.
 
-The `close` template carries a **release-disposition step**: every close
-dispositions the iteration at the release boundary — reading the consumer's
-`release-policy` slot and either executing its release procedure or stamping an
-explicit no-release line into the consumer-named disposition-evidence file
-(`<iteration> release <version|none|deferred:<version>> — <basis>`, the
-`check-lesson-disposition` contract shape at the release boundary).
+The `close` template carries a **release-disposition step**: every close dispositions the iteration at the release boundary — reading the consumer's `release-policy` slot and either executing its release procedure or stamping an explicit no-release line into the consumer-named disposition-evidence file (`<iteration> release <version|none|deferred:<version>> — <basis>`, the `check-lesson-disposition` contract shape at the release boundary).
 
-The third value carries a release the criteria **earn** but an operator ruling
-holds back, which `none` ("nothing to release") cannot express — a reader forced
-to tell the two apart by parsing basis prose has no mechanical signal at all. It
-is `deferred:<version>` and not a bare `deferred` because the thing that must
-survive is the *earned bump level*; a bare token drops it and the next release
-re-derives which floor it inherits. The producer derives `<version>` as the
-version the criteria *would have shipped as* had the release not been held: the
-bump the note's upgrade-contract sections floor, applied over the newest
-already-released note — never the next version the project happens to reach.
-Stating that rule is what keeps the field mechanically derivable rather than an
-operator's guess, since without a defined scale the discharge comparison has
-none. The criteria are not fields on the line. Until a release ships they
-accumulate on the release declaration surface (gate-sdk/SPEC.md §upgrade-smoke),
-and the note composed from it owns them after. The line carries the *level*.
+The third value carries a release the criteria **earn** but an operator ruling holds back, which `none` ("nothing to release") cannot express — a reader forced to tell the two apart by parsing basis prose has no mechanical signal at all. It is `deferred:<version>` and not a bare `deferred` because the thing that must survive is the *earned bump level*; a bare token drops it and the next release re-derives which floor it inherits. The producer derives `<version>` as the version the criteria *would have shipped as* had the release not been held: the bump the note's upgrade-contract sections floor, applied over the newest already-released note — never the next version the project happens to reach. Stating that rule is what keeps the field mechanically derivable rather than an operator's guess, since without a defined scale the discharge comparison has none. The criteria are not fields on the line. Until a release ships they accumulate on the release declaration surface (gate-sdk/SPEC.md §upgrade-smoke), and the note composed from it owns them after. The line carries the *level*.
 
-**Outstanding-deferral is derived, never tracked.** A `deferred:<version>` line
-is **outstanding** until a later line dispositions a release at or above
-`<version>`; that later line **discharges** it. Nothing records discharge
-separately — the release actually happening *is* the discharge, so there is no
-second state to drift. This is what keeps a consumer's gate over the value
-low-false-positive: a deferral cannot linger past the release that consumes it,
-and one that genuinely has not been consumed *should* keep firing.
+**Outstanding-deferral is derived, never tracked.** A `deferred:<version>` line is **outstanding** until a later line dispositions a release at or above `<version>`; that later line **discharges** it. Nothing records discharge separately — the release actually happening *is* the discharge, so there is no second state to drift. This is what keeps a consumer's gate over the value low-false-positive: a deferral cannot linger past the release that consumes it, and one that genuinely has not been consumed *should* keep firing.
 
-A consumer deriving that outstanding set reads the disposition file as
-**history ∪ live** — not replacement, not fallback — the same reader
-drift-kit/SPEC.md §The stage-economics meter applies to the stage stamps and
-drift-kit's `trajectory` emit arm already ships. The file is typically a `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member,
-so a carrying line survives only in committed history and a live-only reader sees
-nothing; conversely a history-only reader is blind at exactly the moment that
-matters most for a precommit gate — the pre-commit of the very close commit
-writing the `deferred:` line, when that line is live and not yet committed.
-The live arm covers the uncommitted tail, the history arm covers everything
-truncation has taken, and the union costs nothing because a line in both arms is
-the same line. Truncation-immunity is a property of the *reader*, and every
-reader of a truncated evidence file needs it.
+A consumer deriving that outstanding set reads the disposition file as **history ∪ live** — not replacement, not fallback — the same reader drift-kit/SPEC.md §The stage-economics meter applies to the stage stamps and drift-kit's `trajectory` emit arm already ships. The file is typically a `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member, so a carrying line survives only in committed history and a live-only reader sees nothing; conversely a history-only reader is blind at exactly the moment that matters most for a precommit gate — the pre-commit of the very close commit writing the `deferred:` line, when that line is live and not yet committed. The live arm covers the uncommitted tail, the history arm covers everything truncation has taken, and the union costs nothing because a line in both arms is the same line. Truncation-immunity is a property of the *reader*, and every reader of a truncated evidence file needs it.
 
-**The kit wires no gate over the value**, consistent with the release-sweep stamp
-file: the disposition file is operator evidence riding the release commit, the
-kit defines the value and the outstanding/discharged derivation, and a consumer
-may gate it. That split is the provenance seam — the *grammar* is generic
-lifecycle mechanism, the *bump criteria* being carried are consumer release
-policy, so the kit ships no list of criteria. The step runs after the surface-mutating
-close steps and before the brevity pass, since the note is itself such a write;
-silence is not a disposition. The `release-policy` slot carries the consumer's
-procedure and criteria by citation, the disposition-evidence path, and any
-boundary-only sub-procedure such as a major-only deprecation sweep; a consumer
-with no release process binds a plain `none`-every-iteration line. The
-disposition line's mechanical reader is `--enter-stage`'s boundary require-check
-(§bin/enter-stage.sh, `LIFECYCLE_KIT_BOUNDARY_REQUIRE`) when a consumer wires the
-file into that knob.
+**The kit wires no gate over the value**, consistent with the release-sweep stamp file: the disposition file is operator evidence riding the release commit, the kit defines the value and the outstanding/discharged derivation, and a consumer may gate it. That split is the provenance seam — the *grammar* is generic lifecycle mechanism, the *bump criteria* being carried are consumer release policy, so the kit ships no list of criteria. The step runs after the surface-mutating close steps and before the brevity pass, since the note is itself such a write; silence is not a disposition. The `release-policy` slot carries the consumer's procedure and criteria by citation, the disposition-evidence path, and any boundary-only sub-procedure such as a major-only deprecation sweep; a consumer with no release process binds a plain `none`-every-iteration line. The disposition line's mechanical reader is `--enter-stage`'s boundary require-check (§bin/enter-stage.sh, `LIFECYCLE_KIT_BOUNDARY_REQUIRE`) when a consumer wires the file into that knob.
 
-The `close` template's gap drain opens with a **first read of its inputs**: the
-surfaces the consumer's `drain-inputs` slot names, skipping an `empty` or `absent`
-row (§The close-surfaces emit arm), before any bullet is dispositioned, the read
-recorded in the drain's commit message. The kit owns the read's placement and its
-record; which surfaces it covers is consumer content, because not every capture
-surface bears on a bullet's claim (a raw machine log does not), because
-lifecycle-kit depends on no other kit and so cannot name another kit's log, and
-because the reader is a session rather than a gate, which makes the value a slot
-and not a knob. **A first read and not a reorder:** moving the roster sweep ahead
-of the drain would reorder one kit's step against another kit's triage template,
-renumber steps a binding cites by number, and sweep the drain's own `forced=` row
-ahead of that drain. **The honest limit:** nothing gates that the read ran; the
-commit-message line makes a skip visible, not impossible, the posture the drain's
-re-verification record already takes.
+The `close` template's gap drain opens with a **first read of its inputs**: the surfaces the consumer's `drain-inputs` slot names, skipping an `empty` or `absent` row (§The close-surfaces emit arm), before any bullet is dispositioned, the read recorded in the drain's commit message. The kit owns the read's placement and its record; which surfaces it covers is consumer content, because not every capture surface bears on a bullet's claim (a raw machine log does not), because lifecycle-kit depends on no other kit and so cannot name another kit's log, and because the reader is a session rather than a gate, which makes the value a slot and not a knob. **A first read and not a reorder:** moving the roster sweep ahead of the drain would reorder one kit's step against another kit's triage template, renumber steps a binding cites by number, and sweep the drain's own `forced=` row ahead of that drain. **The honest limit:** nothing gates that the read ran; the commit-message line makes a skip visible, not impossible, the posture the drain's re-verification record already takes.
 
-The `close` template's **push-identity precondition** is per-push and not
-per-session, an identity selected at a session's start being no evidence about
-the moment a later push happens; no gate substitutes for it, since an identity
-check grades that a login exists and never which one is selected. It binds a
-mid-iteration pusher too (§The state machine). The same step carries the
-`push-budget` slot, on the ground the `drain-inputs` paragraph states: the count's
-reader is the pushing session, so the value is a slot and not a knob.
+The `close` template's **push-identity precondition** is per-push and not per-session, an identity selected at a session's start being no evidence about the moment a later push happens; no gate substitutes for it, since an identity check grades that a login exists and never which one is selected. It binds a mid-iteration pusher too (§The state machine). The same step carries the `push-budget` slot, on the ground the `drain-inputs` paragraph states: the count's reader is the pushing session, so the value is a slot and not a knob.
 
-The `align` template's surviving-surface rule and its read-site verification each
-carry a ground: an amendment is deleted at merge, so a correction written into one
-and removed by the commit that lands it leaves no trace a later reader can
-recover; and authoring a producer silently asserts a consumer read side that
-rarely already matches.
+The `align` template's surviving-surface rule and its read-site verification each carry a ground: an amendment is deleted at merge, so a correction written into one and removed by the commit that lands it leaves no trace a later reader can recover; and authoring a producer silently asserts a consumer read side that rarely already matches.
 
-**`align`'s claim checks: scoped by subject, ungated.** A behaviour claim about a
-program is neither a modelled grammar nor a seam-crossing literal, so align checks
-it against the program, invocation first — claim verification, not the verdict
-prediction Oracle-first forbids. First earned by a pin-path grammar that the gate
-and the modelled tool each read differently, caught only by build's first
-differential run. A keeps list is the author's claim, read as negative claims,
-never as scope. No scanner decides whether prose describes a program, so the
-cadence is align itself (§check-stage-entry, assertion C).
+**`align`'s claim checks: scoped by subject, ungated.** A behaviour claim about a program is neither a modelled grammar nor a seam-crossing literal, so align checks it against the program, invocation first — claim verification, not the verdict prediction Oracle-first forbids. First earned by a pin-path grammar that the gate and the modelled tool each read differently, caught only by build's first differential run. A keeps list is the author's claim, read as negative claims, never as scope. No scanner decides whether prose describes a program, so the cadence is align itself (§check-stage-entry, assertion C).
 
-The `build` template runs one fresh session per task because a fresh session
-rehydrates the governing docs and queue state at full fidelity from disk, where an
-in-session summary erodes the approved plan and the re-derived premises.
+The `build` template runs one fresh session per task because a fresh session rehydrates the governing docs and queue state at full fidelity from disk, where an in-session summary erodes the approved plan and the re-derived premises.
 
-The `build` template treats an amendment's roster as a floor it re-derives because
-a roster measured at authoring undercounts in a way reading cannot see. Two hit
-shapes produce the misses. A hit **built by interpolation** (a date or a name held
-in a shell variable) returns nothing to a literal, field-count or length sweep. A
-**semantic** reader (prose restating what a component does, a script reading a
-value it never names) spells no moved name at all. Both kinds of miss are
-consequential, so "the tests still pass" reads true until the battery reaches the
-site. The recorded misses were caught by the battery and by the landing session's
-own reading, never by the authoring stage's roster or by the audit reading it. So
-the obligation sits with the stage that runs the battery against the changed tree.
-Two alternatives were weighed and refused. Dropping the roster would delete the
-discriminator canon-kit/SPEC.md §check-amendment-retired-spelling arm B reconciles
-survivors against. An oracle grepping an assertion idiom instead of a literal
-still spells a name, and a semantic reader spells none. **The honest limit:** no
-gate observes that the re-derivation ran. The battery reds on what it reaches, and
-a site no gate reaches is found only by the landing session's reading, which is
-what the paragraph obliges and does not verify. **The same re-derivation meets the
-over-count, and it is judged by the delta's need, never by an edit site.** A
-rostered target with nothing to update tempts a fabricated edit or a silent drop,
-so the empty result is a stated finding. The finding's terms are the citing
-delta's need and the passage that meets it, because the other terms can be true
-while the target's purpose goes unmet. A roster of queue-reading arms that lacked
-one arm's line was declined on "no line to widen", confirmed on those terms, and
-later repaired by adding the line. Any later reader who confirms a declination now
-confirms it against the author's need. **The honest limit:** no gate reads a
-commit message's declination, on the same ground as the re-derivation itself, so a
-declination stated on edit-site terms is caught only by the reader who re-reads
-it. Two heavier fixes were weighed and refused on one measured instance: narrowing
-rosters at authoring, when the roster was right, and a coverage assertion on every
-roster-shaped surface, a new oracle per surface.
+The `build` template treats an amendment's roster as a floor it re-derives because a roster measured at authoring undercounts in a way reading cannot see. Two hit shapes produce the misses. A hit **built by interpolation** (a date or a name held in a shell variable) returns nothing to a literal, field-count or length sweep. A **semantic** reader (prose restating what a component does, a script reading a value it never names) spells no moved name at all. Both kinds of miss are consequential, so "the tests still pass" reads true until the battery reaches the site. The recorded misses were caught by the battery and by the landing session's own reading, never by the authoring stage's roster or by the audit reading it. So the obligation sits with the stage that runs the battery against the changed tree. Two alternatives were weighed and refused. Dropping the roster would delete the discriminator canon-kit/SPEC.md §check-amendment-retired-spelling arm B reconciles survivors against. An oracle grepping an assertion idiom instead of a literal still spells a name, and a semantic reader spells none. **The honest limit:** no gate observes that the re-derivation ran. The battery reds on what it reaches, and a site no gate reaches is found only by the landing session's reading, which is what the paragraph obliges and does not verify. **The same re-derivation meets the over-count, and it is judged by the delta's need, never by an edit site.** A rostered target with nothing to update tempts a fabricated edit or a silent drop, so the empty result is a stated finding. The finding's terms are the citing delta's need and the passage that meets it, because the other terms can be true while the target's purpose goes unmet. A roster of queue-reading arms that lacked one arm's line was declined on "no line to widen", confirmed on those terms, and later repaired by adding the line. Any later reader who confirms a declination now confirms it against the author's need. **The honest limit:** no gate reads a commit message's declination, on the same ground as the re-derivation itself, so a declination stated on edit-site terms is caught only by the reader who re-reads it. Two heavier fixes were weighed and refused on one measured instance: narrowing rosters at authoring, when the roster was right, and a coverage assertion on every roster-shaped surface, a new oracle per surface.
 
-The `scope` template's recurrence override **decides** the collision rather than
-resolving it in the theme's favour: an automatic promotion would be a second
-intake path around scope-gated intake, and the failure it answers was never a
-ruling that went the wrong way but a collision that reached nobody. Its split rule
-is safe only against the pool total, a split scattering an entry's weight across
-siblings that only the sum puts back together.
+The `scope` template's recurrence override **decides** the collision rather than resolving it in the theme's favour: an automatic promotion would be a second intake path around scope-gated intake, and the failure it answers was never a ruling that went the wrong way but a collision that reached nobody. Its split rule is safe only against the pool total, a split scattering an entry's weight across siblings that only the sum puts back together.
 
-The `scope` template weighs a unit set against the pool's refill rate, because a
-set draining no more than inflow leaves the pool unchanged however well it ranks.
-The inflow figure is derived by drift-kit's `queue-flow` arm from the pool's slug
-sets at iteration-start commits (drift-kit/SPEC.md §The queue-flow arm), not from
-filing dates, which miss an entry filed and drained inside the window. Like the
-rest of the Composition line, the figure travels on the message channel, read by
-the party ruling on the set and by no gate. The widened third-tier fill is gated
-on that figure, and its cost basis is the lead's surface batching: a further
-surface costs one more dispatch batch, where a further iteration costs another
-stage walk (templates/lead.md §Economics). The arm is a cross-kit citation, not a
-dependency: a consumer without drift-kit gets no figure, and the line says so.
+The `scope` template weighs a unit set against the pool's refill rate, because a set draining no more than inflow leaves the pool unchanged however well it ranks. The inflow figure is derived by drift-kit's `queue-flow` arm from the pool's slug sets at iteration-start commits (drift-kit/SPEC.md §The queue-flow arm), not from filing dates, which miss an entry filed and drained inside the window. Like the rest of the Composition line, the figure travels on the message channel, read by the party ruling on the set and by no gate. The widened third-tier fill is gated on that figure, and its cost basis is the lead's surface batching: a further surface costs one more dispatch batch, where a further iteration costs another stage walk (templates/lead.md §Economics). The arm is a cross-kit citation, not a dependency: a consumer without drift-kit gets no figure, and the line says so.
 
-The recurrence override counts two different things for two different decisions.
-The dates on `recurrence:` decide when an entry is proposed; the declines of that
-proposal decide who may refuse it. Lead discretion is bounded at two declines so a
-counted recurrence cannot be deferred forever by the party it was escalated to: a
-third routes to the operator. Declines are prose on the entry, with date and
-ruling party, rather than a declaration with a grammar, because the scope session
-composing the next escalation is their only reader and it already reads the
-entry's grounds. **The honest limit:** the operator-routed mark travels on the
-message channel, so no gate observes that a lead relayed it rather than ruled it.
+The recurrence override counts two different things for two different decisions. The dates on `recurrence:` decide when an entry is proposed; the declines of that proposal decide who may refuse it. Lead discretion is bounded at two declines so a counted recurrence cannot be deferred forever by the party it was escalated to: a third routes to the operator. Declines are prose on the entry, with date and ruling party, rather than a declaration with a grammar, because the scope session composing the next escalation is their only reader and it already reads the entry's grounds. **The honest limit:** the operator-routed mark travels on the message channel, so no gate observes that a lead relayed it rather than ruled it.
 
-The `validate` template commits a repair before the suite roster starts or
-resumes: a suite asserting a clean worktree against the real checkout reads an
-uncommitted repair as the failure of the leg it guards, whose failure text names
-that leg and so reads as a regression from the iteration's diff.
+The `validate` template commits a repair before the suite roster starts or resumes: a suite asserting a clean worktree against the real checkout reads an uncommitted repair as the failure of the leg it guards, whose failure text names that leg and so reads as a regression from the iteration's diff.
 
 ### templates/release-sweep.md
 
-A **boundary skill**, not a stage — which is why it sits at `templates/` root
-beside `lead.md` rather than among the stage templates: it invokes no
-`--enter-stage` and stamps no state, so `check-stage-skill-coverage` never reads
-it (it governs only the configured stage set). It is the deprecation disposition
-walk at a major — invoked from
-close's release-disposition step when the derived bump is a major — forcing every
-marker on the `CANON_KIT_DEPRECATION_MARKERS` roster to a stamped disposition —
-decommission, carry-forward, or un-deprecate — the `check-lesson-disposition`
-contract shape at a release boundary. canon-kit's `check-deprecation-task` holds
-each marker bound to a live task between majors; this sweep forces the standing
-inventory to a decision at the boundary the deprecations were promised against.
-It carries **named slots** (`inventory-command`, `evidence-gate`), so like the
-stage skills it adopts the binding-shim grammar (§templates/stages/) and
-`check-skill-binding` holds the slot pairing; the stamp file is operator
-evidence riding the release commit — the kit wires no gate over it (a consumer
-may, through `evidence-gate`).
+A **boundary skill**, not a stage — which is why it sits at `templates/` root beside `lead.md` rather than among the stage templates: it invokes no `--enter-stage` and stamps no state, so `check-stage-skill-coverage` never reads it (it governs only the configured stage set). It is the deprecation disposition walk at a major — invoked from close's release-disposition step when the derived bump is a major — forcing every marker on the `CANON_KIT_DEPRECATION_MARKERS` roster to a stamped disposition — decommission, carry-forward, or un-deprecate — the `check-lesson-disposition` contract shape at a release boundary. canon-kit's `check-deprecation-task` holds each marker bound to a live task between majors; this sweep forces the standing inventory to a decision at the boundary the deprecations were promised against. It carries **named slots** (`inventory-command`, `evidence-gate`), so like the stage skills it adopts the binding-shim grammar (§templates/stages/) and `check-skill-binding` holds the slot pairing; the stamp file is operator evidence riding the release commit — the kit wires no gate over it (a consumer may, through `evidence-gate`).
 
 ### templates/upgrade.md
 
-`upgrade.md` is a **boundary skill** too, at `templates/` root rather than among
-the stage templates: it invokes no `--enter-stage` and stamps no state, so
-`check-stage-skill-coverage` never reads it. It is the phase-B disposition walk a consumer runs when moving
-their vendored kits from one release to the next — the judgment half of the
-two-phase upgrade contract whose deterministic half (the wholesale kit-sync) and
-whose executable proof both live in gate-sdk (gate-sdk/SPEC.md §upgrade-smoke),
-against the release-note grammar installer/SPEC.md §The upgrade contract owns. Its
-ritual registers the target note's newly-declared gates (a new gate's only
-delivery channel to an upgrading consumer — the phase-A sync never re-runs the
-installer), dispositions each red gate (fix-the-tree or exempt-with-cause, never
-a weakened gate), and closes on the semantic-residual audit: the upgrade is the
-cadence at which a consumer judges the ungateable third of a template-slot change
-— the shim fill that clears both `check-skill-binding` (slot-set drift) and
-`check-shim-restatement` (verbatim copy) yet duplicates what the new slot now
-means to own. It carries named slots (`gates-list`, `disposition-evidence`), so
-like the stage skills it adopts the binding-shim grammar (§templates/stages/) and
-`check-skill-binding` holds the slot pairing when a consumer binds it. This repo
-binds no command for it — the repo is the kit source, never a vendored consumer,
-so it never upgrades itself; the template ships for consumers and the upgrade
-smoke exercises the mechanics it narrates.
+`upgrade.md` is a **boundary skill** too, at `templates/` root rather than among the stage templates: it invokes no `--enter-stage` and stamps no state, so `check-stage-skill-coverage` never reads it. It is the phase-B disposition walk a consumer runs when moving their vendored kits from one release to the next — the judgment half of the two-phase upgrade contract whose deterministic half (the wholesale kit-sync) and whose executable proof both live in gate-sdk (gate-sdk/SPEC.md §upgrade-smoke), against the release-note grammar installer/SPEC.md §The upgrade contract owns. Its ritual registers the target note's newly-declared gates (a new gate's only delivery channel to an upgrading consumer — the phase-A sync never re-runs the installer), dispositions each red gate (fix-the-tree or exempt-with-cause, never a weakened gate), and closes on the semantic-residual audit: the upgrade is the cadence at which a consumer judges the ungateable third of a template-slot change — the shim fill that clears both `check-skill-binding` (slot-set drift) and `check-shim-restatement` (verbatim copy) yet duplicates what the new slot now means to own. It carries named slots (`gates-list`, `disposition-evidence`), so like the stage skills it adopts the binding-shim grammar (§templates/stages/) and `check-skill-binding` holds the slot pairing when a consumer binds it. This repo binds no command for it — the repo is the kit source, never a vendored consumer, so it never upgrades itself; the template ships for consumers and the upgrade smoke exercises the mechanics it narrates.
 
 ### templates/lead.md
 
-The **iteration lead** template — an optional live session that dispatches an
-iteration's stage sessions and answers their escalations, closing the
-restart-cost of a stage that would otherwise stop and surface to the user cold
-(§The state machine). Like `release-sweep.md` it is a **boundary skill, not a
-stage**: it stamps nothing through `--enter-stage` — it runs only the
-non-stamping `--simulate` and `--open-lead-journal` forms — and joins no stage set, so
-`check-stage-skill-coverage` never reads it. Like release-sweep it carries
-named slots, so it adopts the binding-shim grammar (§templates/stages/) — a
-consumer copies-and-specializes it or binds it through a thin shim, and
-`check-skill-binding` holds the slot pairing either way (this repo's
-`.claude/commands/lead.md` shim).
+The **iteration lead** template — an optional live session that dispatches an iteration's stage sessions and answers their escalations, closing the restart-cost of a stage that would otherwise stop and surface to the user cold (§The state machine). Like `release-sweep.md` it is a **boundary skill, not a stage**: it stamps nothing through `--enter-stage` — it runs only the non-stamping `--simulate` and `--open-lead-journal` forms — and joins no stage set, so `check-stage-skill-coverage` never reads it. Like release-sweep it carries named slots, so it adopts the binding-shim grammar (§templates/stages/) — a consumer copies-and-specializes it or binds it through a thin shim, and `check-skill-binding` holds the slot pairing either way (this repo's `.claude/commands/lead.md` shim).
 
-The template owns the orchestration protocol whole: the two lead postures
-(**unified** — the scope session stays live as the lead, one session holding
-judgment and dispatch on one model tier; **split** — a routing-tier lead
-dispatches scope as a stage session on the judgment tier and keeps it
-resumable as the iteration's *intent oracle*, ruling machinery questions
-itself, forwarding intent questions to the oracle with the working-state
-excerpt each turns on, and falling back to the governed surfaces — then the
-operator — when the oracle is gone; posture and tier assignment are standing
-dispatch policy in the ruling-config slot), the lead model (dispatch a
-stage session as a background agent whose prompt is that stage's ordinary skill
-invocation, with the inline-run posture sentence reading
-`LIFECYCLE_KIT_SESSION_BOUNDARY` — inline stage runs banned under `stage`,
-the sanctioned blocked-dispatch fallback under `iteration`; and the
-completion-notification dispatch precondition, with the prompt-answered-signal
-trap and the gating-versus-liveness boundary that keeps it from reading as a
-reversal of the hand-derivation corollary below — its honest limit is recorded
-in §The state machine and it is standing lead policy under the
-policy-is-config rule), the
-opening-an-iteration contract (the lead never selects the unit set — it relays
-the operator's standing directive, a theme bounding scope's survey and never a
-slug list, verbatim in the scope dispatch, and routes scope's proposed set back
-as an ordinary escalation once the set carries scope's composition verdict — a
-presence check rather than a grading, since scoring the verdict's argument would
-be selection by another route, and one no gate reads; selection is scope's
-contract, and a lead-authored
-menu pre-empts the premise re-verification; and — the limb the other three
-presuppose — **whether an iteration opens at all is the operator's decision**,
-obtained explicitly rather than inferred, arriving through **one channel the
-consumer's own binding names** (explicit and *separate* being distinct
-requirements, of which only the first is general) and carrying a **cardinality**
-that defaults to one open and is spent rather than renewed, on the ground that an
-open commits a
-*scale* of spend the operator chooses even where the work's content plainly
-routes through the lifecycle, which is why an instruction to fix filed work is
-named as no authorization and why the template's whole-authority sentence
-excludes opening; the undirected path is scoped to an authorized iteration
-carrying no theme rather than deleted, and a lead-relayed directive is stated as
-no evidence of authorization, so the surveying stage is asked for no check it
-holds less information to make), the closing-an-iteration contract as that same
-rule's **consequence** rather than a second rule standing at a second end — the
-lead stops at the final stage's completion and
-reports what it believes is owed instead of opening the next iteration, because
-the grant that paid for this iteration is spent; one rule seated on the grant and
-met at the boundary, which is also what
-covers both postures given the unified posture's lead *is* the previous scope
-session sitting on preserved notes at exactly that moment, the four-header
-escalation block (Question / Options / Recommendation / Evidence) together with
-the one class the lead never rules under either posture — reversing, demoting or
-re-scoping a recorded operator ruling or a stated objective is operator-class and
-is relayed, carved out of the derivable-from-the-governed-surfaces routing rule
-because a session holding contrary evidence reads the surface carrying the ruling
-as stale rather than as closed, the split-channel design (routine narration to the
-resume journal, escalations to the message channel — the journal path being
-derived per *stage*, a per-batch filename empties that derivation and the refusal
-lands cold on the **next** same-stage session, and the lead names no path in a
-dispatch, the entry report being the path's one source), the compact economics —
-the split-where-the-tail-dominates rule in **two limbs**, its cost limb and a
-character limb naming what the enumeration of judgment-bearing turns omits (the
-escalations a lead rules alone off a governed surface, which the routing rule
-converts into relays) so that the posture reads as a trade rather than a pure
-saving, carrying the generic **method** by which a consumer decides which limb
-its own posture is under while the threshold and every count taken stay the
-consumer's, the unified posture's handoff compact,
-and operator-suggested compacts at the acceptance
-boundaries that pay under the cold-wakes-times-compressible-residue rule —
-with the dispatch-granularity rule (the roster derived from every unit the
-iteration promoted rather than from the amendment set, which a debt unit carries
-no `[spec:]` ref to join, then batch units
-sharing a kit or SPEC surface, split on a model-tier change or a
-delegation-kit split trigger — a shared surface groups a batch without ordering
-one, so a cut across a producer/consumer edge between deltas dispatches the
-consumer against an input that does not exist yet), the per-batch work-class
-tiering (judgment being what the tier buys, downgrading a design-bearing batch
-trades a large correctness risk for a small window saving, while a stage-uniform
-class is a collapsed default and not a bound roster; a downgraded dispatch
-carries an escalate-on-discovery transition to a same-stage re-dispatch on the
-judgment tier, because a resume cannot change a session's model) and
-the lead-owns-batching clause (an intra-stage batch split is N sibling stage
-sessions the lead dispatches and verifies — each a same-stage re-entry,
-§The state machine — and a stage session never dispatches a sibling stage
-session, which is a ban rather than a preference because a stage that
-sub-dispatches its own batches nests a second supervisor at the lead's tier,
-hidden from the lead's budget and context accounting: the redundancy the split
-posture exists to remove, reintroduced where nothing is watching for it), and
-the stamps-authoritative invariant carried from §The state machine as the
-design's load-bearing rule — a batch directed not to stamp spends the
-per-session audit trail unrepairably, backdating falsifying the trail rather than
-restoring it — with its two corollaries: the lead never
-hand-derives prior-stage completeness from WORKFLOW-STATE or the git log (it
-dispatches and trusts `--enter-stage`'s fail-closed refusal, or gates an
-expensive dispatch with `--simulate`, and reads that same drain-entry verdict
-**before** declaring a stage's batches complete rather than after,
-§bin/enter-stage.sh), and a ruling
-whose acting session is not imminent is filed to a durable governed surface
-in the moment it is made.
-**The escalate-on-discovery transition sits on the tiering rule, not on any one
-stage.** The premise a downgrade rests on — this dispatch's work is mechanical —
-is behind every cheaper-tier dispatch, a stage-uniform cheaper default being one
-case among them, and an all-mechanical build batch can equally turn out to need
-a repair designed. Its trigger is a fix the session would have to author (code,
-a contract, a fixture, or a diagnosis that crosses components); running an
-oracle, editing a grammar-governed record and filing a finding are not triggers.
-The session commits whatever is complete and unrelated, and its escalation's
-Evidence names the journal heading the re-dispatched session reads at entry, so
-the diagnosis is not bought twice. The lead rules it alone because a batch's tier
-is already its assignment, and it re-dispatches rather than answering because a
-resume keeps the paused session's tier: one lead turn and one session start
-against a grind on the wrong tier nobody sees. A consumer that bound a
-stage-uniform cheaper tier keeps it — one re-dispatch fits inside the binding.
-**Honest limit:** nothing detects a session that does not recognize its
-discovery; the transition makes the right move cheap and named, and a grinding
-session stays unseen.
-**Relay-never-assert and the checked-figure rule rest on one asymmetry.** A stage
-session writes lifecycle state under oracle-first, fixture pairs and a validate
-battery; the lead writes none and carries no verification discipline, yet its
-rulings steer what stage sessions land — so relaying an unverified duration or
-count into a dispatch converts one session's guess into standing instruction for
-every session after it, and nothing reds. The relay rule names four ways authority
-is added in transit: a claim sent above its tier, a grant sent as unspent after it
-was spent, a mechanism sent where only the constraint was the lead's to set, and a
-rule sent to a role its owning surface does not bind. None of the attested
-instances was caught by the lead before the relay; most were caught by the
-receiving session declining to trust the prompt, which is why the consumer's
-agent definition carries the receiving half. A grant takes a spent state rather
-than a tier because the attested one was a fact gone stale between act and relay:
-a tier would have marked it correctly and still carried it. **The honest limit:**
-no gate reads a dispatch, and a tier or spent marker is written by the party it
-constrains, so the rule is prose on both ends; a role-scope scanner would first
-have to resolve a relayed sentence to its owning surface, which is semantic.
-An earlier second assertion over the drain
-assertion's own population is **ruled out** on record: a batching roster has
-dropped a promoted unit in practice and `check-stage-entry` named
-it at the refused entry, so the defect is detected late — at the price of one
-wasted dispatch — rather than undetected, and a duplicate reading of one fact
-would buy only the timing the simulate read already buys for free.
-The template also carries the lead's first step —
-writing the session-role marker context-kit's hook reads
-(context-kit/SPEC.md §The session-context hook), then opening its resume journal
-through `--enter-stage --open-lead-journal` (§bin/enter-stage.sh), whose keyed
-heading is what exempts the live lead's segment from the boundary's undisposed
-advisory.
-**Both of the lead's scratch artifacts outlive the iteration the boundary wipe
-reclaims, and that is one fact rather than two exceptions.** A lead session is
-live *at* the boundary — it files a boundary judgment there for the entering
-session's intake — so its session-role marker and its own resume journal alike
-have a live session's lifetime rather than the iteration's. **Their protection
-sits at different tiers, and the split is deliberate.** The journal's is a kit
-invariant (`LIFECYCLE_KIT_LEAD_JOURNAL_FILE`, §bin/enter-stage.sh): the kit
-mints the artifact, instructs the lead to store state in it, and therefore owes
-the protection rather than shipping the obligation and leaving the mechanism in
-one consumer's config file. The marker's lifetime is context-kit's, so a
-consumer that wants it kept names it on `LIFECYCLE_KIT_BOUNDARY_PRESERVE`
-(§bin/enter-stage.sh) — genuinely that consumer's declaration to make. The
-journal's protected lifetime is **not permanence**: the lead's disposition step
-and the boundary's undisposed advisory are what keep the file from becoming an
-accumulator nobody reads.
-The contrast with §templates/consult.md is deliberate and reached from the
-opposite direction: a consult session may span the boundary too and still takes
-**no** preserve entry, because its rulings are discharged into a commit as each
-closes, so a preserved journal would outlive the session that can interpret it. A
-*stage* session's journal takes none either, being spent by the boundary it is
-reclaimed at. So the question a keep-list candidate answers is **where its
-content is discharged**, not which session class wrote it — and a lead's journal
-is the case where the answer is *nowhere yet*, the channel still being read. Dispatch safety is not re-owned — it inherits
-delegation-kit's protocol by citation (delegation-kit/SPEC.md §The delegation
-model: background dispatch, the per-dispatch budget guard, verify after any
-agent commit) — with one lifecycle **instance** the generic rule cannot state
-because it would have to name a stage: when the dispatched stage is the
-evidence-producing one, the lead's verify is a read of the committed evidence
-manifest rather than a re-run of its producer, the harm splitting between an
-inert battery re-run and a destructive producer re-run (delegation-kit/SPEC.md
-§Verify after every agent commit owns the generic rule and the split; its honest
-limit here is recorded in §The state machine). Consumer residue stays in named slots — the tracked
-agent-definition carrying the standing dispatch policy the dispatch names (the
-ruling-class roster and everything else true of every dispatch, not improvised
-per prompt), and whether the consumer wires the optional escalation-shape guard
-(guard-kit/SPEC.md §wakeup-guard) or leaves it inert.
+The template owns the orchestration protocol whole: the two lead postures (**unified** — the scope session stays live as the lead, one session holding judgment and dispatch on one model tier; **split** — a routing-tier lead dispatches scope as a stage session on the judgment tier and keeps it resumable as the iteration's *intent oracle*, ruling machinery questions itself, forwarding intent questions to the oracle with the working-state excerpt each turns on, and falling back to the governed surfaces — then the operator — when the oracle is gone; posture and tier assignment are standing dispatch policy in the ruling-config slot), the lead model (dispatch a stage session as a background agent whose prompt is that stage's ordinary skill invocation, with the inline-run posture sentence reading `LIFECYCLE_KIT_SESSION_BOUNDARY` — inline stage runs banned under `stage`, the sanctioned blocked-dispatch fallback under `iteration`; and the completion-notification dispatch precondition, with the prompt-answered-signal trap and the gating-versus-liveness boundary that keeps it from reading as a reversal of the hand-derivation corollary below — its honest limit is recorded in §The state machine and it is standing lead policy under the policy-is-config rule), the opening-an-iteration contract (the lead never selects the unit set — it relays the operator's standing directive, a theme bounding scope's survey and never a slug list, verbatim in the scope dispatch, and routes scope's proposed set back as an ordinary escalation once the set carries scope's composition verdict — a presence check rather than a grading, since scoring the verdict's argument would be selection by another route, and one no gate reads; selection is scope's contract, and a lead-authored menu pre-empts the premise re-verification; and — the limb the other three presuppose — **whether an iteration opens at all is the operator's decision**, obtained explicitly rather than inferred, arriving through **one channel the consumer's own binding names** (explicit and *separate* being distinct requirements, of which only the first is general) and carrying a **cardinality** that defaults to one open and is spent rather than renewed, on the ground that an open commits a *scale* of spend the operator chooses even where the work's content plainly routes through the lifecycle, which is why an instruction to fix filed work is named as no authorization and why the template's whole-authority sentence excludes opening; the undirected path is scoped to an authorized iteration carrying no theme rather than deleted, and a lead-relayed directive is stated as no evidence of authorization, so the surveying stage is asked for no check it holds less information to make), the closing-an-iteration contract as that same rule's **consequence** rather than a second rule standing at a second end — the lead stops at the final stage's completion and reports what it believes is owed instead of opening the next iteration, because the grant that paid for this iteration is spent; one rule seated on the grant and met at the boundary, which is also what covers both postures given the unified posture's lead *is* the previous scope session sitting on preserved notes at exactly that moment, the four-header escalation block (Question / Options / Recommendation / Evidence) together with the one class the lead never rules under either posture — reversing, demoting or re-scoping a recorded operator ruling or a stated objective is operator-class and is relayed, carved out of the derivable-from-the-governed-surfaces routing rule because a session holding contrary evidence reads the surface carrying the ruling as stale rather than as closed, the split-channel design (routine narration to the resume journal, escalations to the message channel — the journal path being derived per *stage*, a per-batch filename empties that derivation and the refusal lands cold on the **next** same-stage session, and the lead names no path in a dispatch, the entry report being the path's one source), the compact economics — the split-where-the-tail-dominates rule in **two limbs**, its cost limb and a character limb naming what the enumeration of judgment-bearing turns omits (the escalations a lead rules alone off a governed surface, which the routing rule converts into relays) so that the posture reads as a trade rather than a pure saving, carrying the generic **method** by which a consumer decides which limb its own posture is under while the threshold and every count taken stay the consumer's, the unified posture's handoff compact, and operator-suggested compacts at the acceptance boundaries that pay under the cold-wakes-times-compressible-residue rule — with the dispatch-granularity rule (the roster derived from every unit the iteration promoted rather than from the amendment set, which a debt unit carries no `[spec:]` ref to join, then batch units sharing a kit or SPEC surface, split on a model-tier change or a delegation-kit split trigger — a shared surface groups a batch without ordering one, so a cut across a producer/consumer edge between deltas dispatches the consumer against an input that does not exist yet), the per-batch work-class tiering (judgment being what the tier buys, downgrading a design-bearing batch trades a large correctness risk for a small window saving, while a stage-uniform class is a collapsed default and not a bound roster; a downgraded dispatch carries an escalate-on-discovery transition to a same-stage re-dispatch on the judgment tier, because a resume cannot change a session's model) and the lead-owns-batching clause (an intra-stage batch split is N sibling stage sessions the lead dispatches and verifies — each a same-stage re-entry, §The state machine — and a stage session never dispatches a sibling stage session, which is a ban rather than a preference because a stage that sub-dispatches its own batches nests a second supervisor at the lead's tier, hidden from the lead's budget and context accounting: the redundancy the split posture exists to remove, reintroduced where nothing is watching for it), and the stamps-authoritative invariant carried from §The state machine as the design's load-bearing rule — a batch directed not to stamp spends the per-session audit trail unrepairably, backdating falsifying the trail rather than restoring it — with its two corollaries: the lead never hand-derives prior-stage completeness from WORKFLOW-STATE or the git log (it dispatches and trusts `--enter-stage`'s fail-closed refusal, or gates an expensive dispatch with `--simulate`, and reads that same drain-entry verdict **before** declaring a stage's batches complete rather than after, §bin/enter-stage.sh), and a ruling whose acting session is not imminent is filed to a durable governed surface in the moment it is made. **The escalate-on-discovery transition sits on the tiering rule, not on any one stage.** The premise a downgrade rests on — this dispatch's work is mechanical — is behind every cheaper-tier dispatch, a stage-uniform cheaper default being one case among them, and an all-mechanical build batch can equally turn out to need a repair designed. Its trigger is a fix the session would have to author (code, a contract, a fixture, or a diagnosis that crosses components); running an oracle, editing a grammar-governed record and filing a finding are not triggers. The session commits whatever is complete and unrelated, and its escalation's Evidence names the journal heading the re-dispatched session reads at entry, so the diagnosis is not bought twice. The lead rules it alone because a batch's tier is already its assignment, and it re-dispatches rather than answering because a resume keeps the paused session's tier: one lead turn and one session start against a grind on the wrong tier nobody sees. A consumer that bound a stage-uniform cheaper tier keeps it — one re-dispatch fits inside the binding. **Honest limit:** nothing detects a session that does not recognize its discovery; the transition makes the right move cheap and named, and a grinding session stays unseen. **Relay-never-assert and the checked-figure rule rest on one asymmetry.** A stage session writes lifecycle state under oracle-first, fixture pairs and a validate battery; the lead writes none and carries no verification discipline, yet its rulings steer what stage sessions land — so relaying an unverified duration or count into a dispatch converts one session's guess into standing instruction for every session after it, and nothing reds. The relay rule names four ways authority is added in transit: a claim sent above its tier, a grant sent as unspent after it was spent, a mechanism sent where only the constraint was the lead's to set, and a rule sent to a role its owning surface does not bind. None of the attested instances was caught by the lead before the relay; most were caught by the receiving session declining to trust the prompt, which is why the consumer's agent definition carries the receiving half. A grant takes a spent state rather than a tier because the attested one was a fact gone stale between act and relay: a tier would have marked it correctly and still carried it. **The honest limit:** no gate reads a dispatch, and a tier or spent marker is written by the party it constrains, so the rule is prose on both ends; a role-scope scanner would first have to resolve a relayed sentence to its owning surface, which is semantic. An earlier second assertion over the drain assertion's own population is **ruled out** on record: a batching roster has dropped a promoted unit in practice and `check-stage-entry` named it at the refused entry, so the defect is detected late — at the price of one wasted dispatch — rather than undetected, and a duplicate reading of one fact would buy only the timing the simulate read already buys for free. The template also carries the lead's first step — writing the session-role marker context-kit's hook reads (context-kit/SPEC.md §The session-context hook), then opening its resume journal through `--enter-stage --open-lead-journal` (§bin/enter-stage.sh), whose keyed heading is what exempts the live lead's segment from the boundary's undisposed advisory. **Both of the lead's scratch artifacts outlive the iteration the boundary wipe reclaims, and that is one fact rather than two exceptions.** A lead session is live *at* the boundary — it files a boundary judgment there for the entering session's intake — so its session-role marker and its own resume journal alike have a live session's lifetime rather than the iteration's. **Their protection sits at different tiers, and the split is deliberate.** The journal's is a kit invariant (`LIFECYCLE_KIT_LEAD_JOURNAL_FILE`, §bin/enter-stage.sh): the kit mints the artifact, instructs the lead to store state in it, and therefore owes the protection rather than shipping the obligation and leaving the mechanism in one consumer's config file. The marker's lifetime is context-kit's, so a consumer that wants it kept names it on `LIFECYCLE_KIT_BOUNDARY_PRESERVE` (§bin/enter-stage.sh) — genuinely that consumer's declaration to make. The journal's protected lifetime is **not permanence**: the lead's disposition step and the boundary's undisposed advisory are what keep the file from becoming an accumulator nobody reads. The contrast with §templates/consult.md is deliberate and reached from the opposite direction: a consult session may span the boundary too and still takes **no** preserve entry, because its rulings are discharged into a commit as each closes, so a preserved journal would outlive the session that can interpret it. A *stage* session's journal takes none either, being spent by the boundary it is reclaimed at. So the question a keep-list candidate answers is **where its content is discharged**, not which session class wrote it — and a lead's journal is the case where the answer is *nowhere yet*, the channel still being read. Dispatch safety is not re-owned — it inherits delegation-kit's protocol by citation (delegation-kit/SPEC.md §The delegation model: background dispatch, the per-dispatch budget guard, verify after any agent commit) — with one lifecycle **instance** the generic rule cannot state because it would have to name a stage: when the dispatched stage is the evidence-producing one, the lead's verify is a read of the committed evidence manifest rather than a re-run of its producer, the harm splitting between an inert battery re-run and a destructive producer re-run (delegation-kit/SPEC.md §Verify after every agent commit owns the generic rule and the split; its honest limit here is recorded in §The state machine). Consumer residue stays in named slots — the tracked agent-definition carrying the standing dispatch policy the dispatch names (the ruling-class roster and everything else true of every dispatch, not improvised per prompt), and whether the consumer wires the optional escalation-shape guard (guard-kit/SPEC.md §wakeup-guard) or leaves it inert.
 
 ### templates/consult.md
 
-The **operator strategy session** template, and a **boundary skill** of the class
-§Layout and configuration enumerates: like `lead.md` it invokes no
-`--enter-stage`, stamps nothing, and joins no stage set, so
-`check-stage-skill-coverage` never reads it. The classification is what makes it
-cost no new mechanism. A consultation may run before an iteration opens, between
-stages, or across an iteration boundary, and a template with no cursor is at odds
-with none of those. It carries named slots, so it adopts the
-binding-shim grammar (§templates/stages/) and `check-skill-binding` holds the
-slot pairing.
+The **operator strategy session** template, and a **boundary skill** of the class §Layout and configuration enumerates: like `lead.md` it invokes no `--enter-stage`, stamps nothing, and joins no stage set, so `check-stage-skill-coverage` never reads it. The classification is what makes it cost no new mechanism. A consultation may run before an iteration opens, between stages, or across an iteration boundary, and a template with no cursor is at odds with none of those. It carries named slots, so it adopts the binding-shim grammar (§templates/stages/) and `check-skill-binding` holds the slot pairing.
 
-*A seventh stage was ruled out.* It would need a predecessor entry in
-`LIFECYCLE_KIT_STAGES`, a fixed position in the walk, and a stamp — none of which
-a session that may precede or span an iteration has — and it would make
-`check-stage-entry` assertion A demand a consult stamp on every iteration that
-legitimately holds no consultation.
+*A seventh stage was ruled out.* It would need a predecessor entry in `LIFECYCLE_KIT_STAGES`, a fixed position in the walk, and a stamp — none of which a session that may precede or span an iteration has — and it would make `check-stage-entry` assertion A demand a consult stamp on every iteration that legitimately holds no consultation.
 
-**What the template owns** is a landing contract: the session's exit condition is
-that every ruling the operator closed has reached a governed surface, every
-refused alternative is recorded with its grounds, and every always-loaded surface
-those rulings stale is corrected, flagged, or filed — the failure it prevents
-being a strategy session whose conclusions the next session re-derives from
-memory or never recovers at all. Two mechanisms are what make
-that reachable rather than aspirational, and both are stated in the ritual. A
-ruling lands **at the moment it closes**, not at exit, so an interrupted session
-loses at most the ruling in flight rather than the session's whole output. And
-the session journals while it cannot commit, on the durability rule at its owning
-tier (delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset
-sweeps), which is what converts a shared index held by a live stage session from
-data loss into latency. The journal's reclaim is the existing boundary wipe of
-the scratch dir (§bin/enter-stage.sh) and no `LIFECYCLE_KIT_BOUNDARY_PRESERVE`
-entry is added — a preserved journal would outlive the session that can interpret
-it, its content having been discharged into a commit at exit.
+**What the template owns** is a landing contract: the session's exit condition is that every ruling the operator closed has reached a governed surface, every refused alternative is recorded with its grounds, and every always-loaded surface those rulings stale is corrected, flagged, or filed — the failure it prevents being a strategy session whose conclusions the next session re-derives from memory or never recovers at all. Two mechanisms are what make that reachable rather than aspirational, and both are stated in the ritual. A ruling lands **at the moment it closes**, not at exit, so an interrupted session loses at most the ruling in flight rather than the session's whole output. And the session journals while it cannot commit, on the durability rule at its owning tier (delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps), which is what converts a shared index held by a live stage session from data loss into latency. The journal's reclaim is the existing boundary wipe of the scratch dir (§bin/enter-stage.sh) and no `LIFECYCLE_KIT_BOUNDARY_PRESERVE` entry is added — a preserved journal would outlive the session that can interpret it, its content having been discharged into a commit at exit.
 
-**Write authority is not this template's to grant.** Who may record a ruling on a
-consumer's ruling record is stated by that record, at the widest tier true for
-every reader of it — every session that closes a ruling with the operator faces
-the question, not only a consult session. What the skill adds on top is
-obligation: elsewhere recording a closed ruling is permitted, here a consultation
-that did not record one has not exited.
+**Write authority is not this template's to grant.** Who may record a ruling on a consumer's ruling record is stated by that record, at the widest tier true for every reader of it — every session that closes a ruling with the operator faces the question, not only a consult session. What the skill adds on top is obligation: elsewhere recording a closed ruling is permitted, here a consultation that did not record one has not exited.
 
-Dispatch safety is inherited by citation rather than re-owned
-(delegation-kit/templates/agent-execution.md), on the same rule
-§templates/lead.md follows — a copied protocol is a second content tier that
-drifts. The template does state **tier selection** in its own right, because the
-hazard is sharper here than for a stage session: an unselected dispatch inherits
-the dispatcher's tier, and a consultation runs at the judgment tier while most of
-what it dispatches is read-only research, so an unselected fan-out buys the most
-expensive tier for the cheapest work.
+Dispatch safety is inherited by citation rather than re-owned (delegation-kit/templates/agent-execution.md), on the same rule §templates/lead.md follows — a copied protocol is a second content tier that drifts. The template does state **tier selection** in its own right, because the hazard is sharper here than for a stage session: an unselected dispatch inherits the dispatcher's tier, and a consultation runs at the judgment tier while most of what it dispatches is read-only research, so an unselected fan-out buys the most expensive tier for the cheapest work.
 
-Consumer residue stays in exactly **two named slots**, and the split is the
-provenance seam rather than a convenience — `entry-reading` (the surfaces a
-consultation reads on entry) and `landing-surfaces` (the surfaces a closed ruling
-may land on, by ruling class). A consumer's entry set reaches its private
-context, and a kit literal naming it would publish a private surface; its landing
-set names that consumer's own governance layout, and a kit shipping those names
-would ship one project's layout as everyone's. What stays kit mechanism is the
-shape: a consultation has an entry read-set and an exit landing-set, and every
-closed ruling reaches the landing set before the session ends. Each slot has a
-named reader — the entry step and the exit check respectively — and
-`check-skill-binding` requires the shim to bind exactly that set, so an unbound
-slot or an orphan binding is caught mechanically rather than by review.
+Consumer residue stays in exactly **two named slots**, and the split is the provenance seam rather than a convenience — `entry-reading` (the surfaces a consultation reads on entry) and `landing-surfaces` (the surfaces a closed ruling may land on, by ruling class). A consumer's entry set reaches its private context, and a kit literal naming it would publish a private surface; its landing set names that consumer's own governance layout, and a kit shipping those names would ship one project's layout as everyone's. What stays kit mechanism is the shape: a consultation has an entry read-set and an exit landing-set, and every closed ruling reaches the landing set before the session ends. Each slot has a named reader — the entry step and the exit check respectively — and `check-skill-binding` requires the shim to bind exactly that set, so an unbound slot or an orphan binding is caught mechanically rather than by review.

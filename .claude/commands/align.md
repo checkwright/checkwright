@@ -2,11 +2,6 @@ Execute the template at lifecycle-kit/templates/stages/align.md, applying the bi
 
 ## Bindings
 
-**consistency-gate** — the full gate battery, the bare gate binary at
-`GATE_SDK_NATIVE_BIN`.
+**consistency-gate** — the full gate battery, the bare gate binary at `GATE_SDK_NATIVE_BIN`.
 
-**audit-fanout** — audit the drifted surfaces against each other: each kit's
-SPEC.md vs its code, README.md kit table vs reality, CLAUDE.md conventions vs
-the kits' actual shape. A finding resolves in the affected spec or amendment
-(canon-kit/SPEC.md §The amendment lifecycle); a backfill task follows the
-grammar of queue-kit/SPEC.md §The tag algebra.
+**audit-fanout** — audit the drifted surfaces against each other: each kit's SPEC.md vs its code, README.md kit table vs reality, CLAUDE.md conventions vs the kits' actual shape. A finding resolves in the affected spec or amendment (canon-kit/SPEC.md §The amendment lifecycle); a backfill task follows the grammar of queue-kit/SPEC.md §The tag algebra.

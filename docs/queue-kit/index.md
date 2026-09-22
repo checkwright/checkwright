@@ -6,24 +6,13 @@ nav_child_order: 3
 
 # queue-kit
 
-A git-native, agent-readable task tracker. The queue is a single Markdown file
-under version control, not an external service — so an agent session reads its
-work and its history from the same tree it commits to, with no credential and
-no network round-trip.
+A git-native, agent-readable task tracker. The queue is a single Markdown file under version control, not an external service — so an agent session reads its work and its history from the same tree it commits to, with no credential and no network round-trip.
 
-queue-kit formalizes that file: one slug namespace, a small tag algebra
-(blocked-by, spec, drain-exempt, roadmap, observed-by, cost,
-surface, cap-credit) that
-encodes
-preconditions an agent can resolve
-mechanically, an index tool, a roadmap projector that renders the curated
-entries as a generated public page, and gates that hold the grammar a session
-selects work by.
+queue-kit formalizes that file: one slug namespace, a small tag algebra (blocked-by, spec, drain-exempt, roadmap, observed-by, cost, surface, cap-credit) that encodes preconditions an agent can resolve mechanically, an index tool, a roadmap projector that renders the curated entries as a generated public page, and gates that hold the grammar a session selects work by.
 
 ## Install
 
-The steps are the kit README's [Install](README.md#install) section.
-`checkwright init` does them for you — see the [install page](../install.md).
+The steps are the kit README's [Install](README.md#install) section. `checkwright init` does them for you — see the [install page](../install.md).
 
 ## Quick start
 
@@ -38,7 +27,4 @@ Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ## Contracts
 
-The queue format and the tag algebra are defined in the kit's
-[`SPEC.md`](SPEC.md#the-queue-format);
-its [`README.md`](README.md#queue-kit)
-lists the mechanism. Back to the [kit map](../index.md#the-kits).
+The queue format and the tag algebra are defined in the kit's [`SPEC.md`](SPEC.md#the-queue-format); its [`README.md`](README.md#queue-kit) lists the mechanism. Back to the [kit map](../index.md#the-kits).

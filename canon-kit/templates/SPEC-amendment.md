@@ -90,20 +90,9 @@
 
 ## Definition of Done
 
-- [ ] **Causal completeness** — every point of SPEC §The causal-completeness
-      check holds for each new state, event, interface and obligation.
-- [ ] **Instruction surfaces: instruction only** — replacement text for a
-      template, agent definition or shim carries no grounds; a delta places them
-      (the Content-tiering / SSOT rule).
-- [ ] **Merged with no information lost** — each addition re-phrases the
-      canonical-spec text it refines rather than appending to it; the merged spec
-      reads as one document a reader who never saw the amendment can use alone.
-- [ ] **Amendment deleted** — this file removed on merge; none remain for the
-      component (`ls <component>/SPEC-*.md`).
-- [ ] **Removals propagated** — every name this change retired is declared in
-      `## Retired spellings` above, and `check-amendment-retired-spelling` runs
-      each declaration against the whole tracked tree, not against the specs
-      alone.
-- [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
-      debt tasks (a build-time causal gap is resolved that session, not
-      deferred).
+- [ ] **Causal completeness** — every point of SPEC §The causal-completeness check holds for each new state, event, interface and obligation.
+- [ ] **Instruction surfaces: instruction only** — replacement text for a template, agent definition or shim carries no grounds; a delta places them (the Content-tiering / SSOT rule).
+- [ ] **Merged with no information lost** — each addition re-phrases the canonical-spec text it refines rather than appending to it; the merged spec reads as one document a reader who never saw the amendment can use alone.
+- [ ] **Amendment deleted** — this file removed on merge; none remain for the component (`ls <component>/SPEC-*.md`).
+- [ ] **Removals propagated** — every name this change retired is declared in `## Retired spellings` above, and `check-amendment-retired-spelling` runs each declaration against the whole tracked tree, not against the specs alone.
+- [ ] **Gaps filed** — cross-component gaps discovered during the work filed as debt tasks (a build-time causal gap is resolved that session, not deferred).

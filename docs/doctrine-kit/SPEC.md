@@ -6,534 +6,108 @@ generated: true
 <!-- door-contributor: a generated mirror of a kit's own contributor source; every door on the page is that source's, and the banner above is the regeneration recipe -->
 # doctrine-kit — the experience-packaging rung
 
-The delivery doctrine the other kits enforce piecemeal — the cross-kit practice
-rules a session must hold to work this methodology — becomes one kit-shipped,
-customer-deliverable rules file, installed by reference into a consumer's
-always-loaded agent file and held there by a gate. The other kits own the
-*mechanisms*; doctrine-kit owns the *statements* that name why those mechanisms
-exist, at one tier, in one place.
+The delivery doctrine the other kits enforce piecemeal — the cross-kit practice rules a session must hold to work this methodology — becomes one kit-shipped, customer-deliverable rules file, installed by reference into a consumer's always-loaded agent file and held there by a gate. The other kits own the *mechanisms*; doctrine-kit owns the *statements* that name why those mechanisms exist, at one tier, in one place.
 
-The kit is a new remit rather than a fold into canon-kit: the doctrine spans kit
-charges — enforcement-first is gate-sdk-flavoured, load-trigger residency is
-context-kit-flavoured, content-tiering is canon-kit-flavoured — and canon-kit's
-own out-of-scope boundary holds that a consumer's tier contract is not
-canon-kit's to own.
+The kit is a new remit rather than a fold into canon-kit: the doctrine spans kit charges — enforcement-first is gate-sdk-flavoured, load-trigger residency is context-kit-flavoured, content-tiering is canon-kit-flavoured — and canon-kit's own out-of-scope boundary holds that a consumer's tier contract is not canon-kit's to own.
 
 ## The doctrine deliverable
 
-`DOCTRINE.md` is the deliverable. It carries each cross-kit rule as its
-statement, why it holds under coding-agent work, and a pointer to the kit
-mechanism that enforces it; the mechanism and its knob rosters live in the cited
-kit SPEC, never restated in the doctrine. The rule *statements* are the
-doctrine's to own — a governed surface elsewhere cites a rule by name and links
-the doctrine rather than restating it.
+`DOCTRINE.md` is the deliverable. It carries each cross-kit rule as its statement, why it holds under coding-agent work, and a pointer to the kit mechanism that enforces it; the mechanism and its knob rosters live in the cited kit SPEC, never restated in the doctrine. The rule *statements* are the doctrine's to own — a governed surface elsewhere cites a rule by name and links the doctrine rather than restating it.
 
-The roster carries two registers: methodology-maintenance rules, which govern
-how the methodology's own surfaces stay honest and bear on every surface edit,
-and engineering-craft rules, which govern how the work built under the
-methodology is written and are triggered by test, rename, git-rewrite,
-config-edit, and dispatch work. The
-maintenance register forms the installed digest; the craft register lives behind
-the link, load-triggered — the doctrine applying its own load-trigger residency
-rule to itself.
+The roster carries two registers: methodology-maintenance rules, which govern how the methodology's own surfaces stay honest and bear on every surface edit, and engineering-craft rules, which govern how the work built under the methodology is written and are triggered by test, rename, git-rewrite, config-edit, and dispatch work. The maintenance register forms the installed digest; the craft register lives behind the link, load-triggered — the doctrine applying its own load-trigger residency rule to itself.
 
-**What a rule body owes beyond its digest.** A rule's body carries its
-*statement* — the convention, its scope, and every valve with each of its
-bounds; the *grounds* of a statement clause where no other surface owns them;
-*why it holds under agent work*; and *where it is enforced*, with that
-enforcement's honest limit — and length grades none of them. What is never owed,
-a compression pass removes on sight: a clause a sibling clause of the same body
-already states; a mechanism's operation or defence that a kit SPEC owns, which
-the *Enforced by* pointer already reaches (the Content-tiering rule applied to
-the doctrine itself); and narration of the sessions that attested the rule,
-whose home is version control. A long body whose every clause is owed is correct
-at its length. The split is the existing doctrine read at the body's grain
-rather than a new obligation — the file header keeps mechanism in the cited kit
-SPEC, and the Content-tiering rule forbids a parallel copy; what it settles is
-the residue a brevity pass meets, a clause in none of the never-owed classes
-that is merely *long*, and length is not a class. A length target is refused on
-the same ground: a digest is one line by construction, so *a body several times
-its digest* is true of every rule and discriminates nothing.
+**What a rule body owes beyond its digest.** A rule's body carries its *statement* — the convention, its scope, and every valve with each of its bounds; the *grounds* of a statement clause where no other surface owns them; *why it holds under agent work*; and *where it is enforced*, with that enforcement's honest limit — and length grades none of them. What is never owed, a compression pass removes on sight: a clause a sibling clause of the same body already states; a mechanism's operation or defence that a kit SPEC owns, which the *Enforced by* pointer already reaches (the Content-tiering rule applied to the doctrine itself); and narration of the sessions that attested the rule, whose home is version control. A long body whose every clause is owed is correct at its length. The split is the existing doctrine read at the body's grain rather than a new obligation — the file header keeps mechanism in the cited kit SPEC, and the Content-tiering rule forbids a parallel copy; what it settles is the residue a brevity pass meets, a clause in none of the never-owed classes that is merely *long*, and length is not a class. A length target is refused on the same ground: a digest is one line by construction, so *a body several times its digest* is true of every rule and discriminates nothing.
 
-A valve is where that consequence has to be said rather than inferred. A clause
-bounding what a session may start or do is statement, and a compression pass
-does not reword it even where shorter wording looks equivalent: a valve's
-wording is what a session reads to decide whether it is permitted, so changing
-it re-rules the valve, which enters as a scoped unit — the Scope-gated intake
-rule's own self-exemption clause. A repetition inside a valve is not a sibling
-restatement where removing it changes a count the valve enumerates. No gate
-grades any of this; whether a clause is owed is a judgment about its class, the
-false-positive carve-out's case, and its cadence is the close-stage brevity
-pass's walk of the doctrine file whenever it grows
-(context-kit/SPEC.md §The close-stage brevity pass). Its reader is whoever is
-about to shorten a rule body, who opens `DOCTRINE.md` rather than this SPEC, so
-the doctrine header carries a one-line pointer here.
+A valve is where that consequence has to be said rather than inferred. A clause bounding what a session may start or do is statement, and a compression pass does not reword it even where shorter wording looks equivalent: a valve's wording is what a session reads to decide whether it is permitted, so changing it re-rules the valve, which enters as a scoped unit — the Scope-gated intake rule's own self-exemption clause. A repetition inside a valve is not a sibling restatement where removing it changes a count the valve enumerates. No gate grades any of this; whether a clause is owed is a judgment about its class, the false-positive carve-out's case, and its cadence is the close-stage brevity pass's walk of the doctrine file whenever it grows (context-kit/SPEC.md §The close-stage brevity pass). Its reader is whoever is about to shorten a rule body, who opens `DOCTRINE.md` rather than this SPEC, so the doctrine header carries a one-line pointer here.
 
-The file is referenced in place, never copy-installed. A consumer vendors the
-kit and links the vendored path; re-vendoring the kit *is* the doctrine upgrade.
-A copied doctrine drifts the moment the source moves and the copy does not; a
-linked one cannot. This is point-never-restate applied to the doctrine mechanism
-itself.
+The file is referenced in place, never copy-installed. A consumer vendors the kit and links the vendored path; re-vendoring the kit *is* the doctrine upgrade. A copied doctrine drifts the moment the source moves and the copy does not; a linked one cannot. This is point-never-restate applied to the doctrine mechanism itself.
 
-`DOCTRINE.md` joins the consumer's spec manifest (through
-`CANON_KIT_MANIFEST_FILES`), so its links and commands resolve under the
-canon-kit doc gates like any governed page.
+`DOCTRINE.md` joins the consumer's spec manifest (through `CANON_KIT_MANIFEST_FILES`), so its links and commands resolve under the canon-kit doc gates like any governed page.
 
 ## install-doctrine
 
-The gate binary's `--install-doctrine` arm writes the reference block into the
-always-loaded agent file, idempotently. The block is bounded by fixed marker lines
-(`<!-- doctrine-kit:begin -->` … `<!-- doctrine-kit:end -->`); a run replaces
-the content between the markers when they are present and appends the block when
-they are not, so re-running never duplicates and a marker set left in place is
-updated where it sits. A begin marker without its end is a malformed target: the
-installer refuses (exit 2) rather than guess the block bounds. The agent file
-must already exist — the installer edits an always-loaded file, it does not mint
-one — so a missing target is exit 2. The marker insert/replace itself is not
-this installer's code: it rides gate-sdk's shared marker module
-(`install_block` to write, `read_block` to read the block as it
-stands), the single copy `lifecycle-kit`'s injector also uses
-(gate-sdk/SPEC.md §lib/inject.sh); this arm supplies the block content (the
-digest) and owns every rule about what survives from one run to the next.
+The gate binary's `--install-doctrine` arm writes the reference block into the always-loaded agent file, idempotently. The block is bounded by fixed marker lines (`<!-- doctrine-kit:begin -->` … `<!-- doctrine-kit:end -->`); a run replaces the content between the markers when they are present and appends the block when they are not, so re-running never duplicates and a marker set left in place is updated where it sits. A begin marker without its end is a malformed target: the installer refuses (exit 2) rather than guess the block bounds. The agent file must already exist — the installer edits an always-loaded file, it does not mint one — so a missing target is exit 2. The marker insert/replace itself is not this installer's code: it rides gate-sdk's shared marker module (`install_block` to write, `read_block` to read the block as it stands), the single copy `lifecycle-kit`'s injector also uses (gate-sdk/SPEC.md §lib/inject.sh); this arm supplies the block content (the digest) and owns every rule about what survives from one run to the next.
 
-The block is the always-loaded shape applied to the doctrine itself: a one-line
-digest of the methodology-maintenance rules plus a markdown link to the doctrine
-file. The engineering-craft register is not digested — it is load-triggered and
-reached through the link, so the always-loaded surface carries only what bears
-on every edit. The installer is the single source of the block *text* — the
-heading, the link paragraph, the bullet shape — so a manual insertion for a
-harness-less consumer copies what the tool would emit; the README documents that
-manual path. It is not the source of the block's *content*: the rule bullets are
-derived from `DOCTRINE.md` (below), so the installed digest names every
-methodology rule by construction rather than by an author remembering to, and a
-fresh consumer is in per-rule lockstep out of the box (installer and gate agree
-on the `## Delivery doctrine` heading — that agreement is part of
-check-doctrine-registration's contract). Trimming a rule the consumer does not
-keep resident stays legal, but rides a declared-trim marker rather than a silent
-deletion: the gate asserts name-lockstep modulo declared trims (§check-doctrine-registration
-assertion B).
+The block is the always-loaded shape applied to the doctrine itself: a one-line digest of the methodology-maintenance rules plus a markdown link to the doctrine file. The engineering-craft register is not digested — it is load-triggered and reached through the link, so the always-loaded surface carries only what bears on every edit. The installer is the single source of the block *text* — the heading, the link paragraph, the bullet shape — so a manual insertion for a harness-less consumer copies what the tool would emit; the README documents that manual path. It is not the source of the block's *content*: the rule bullets are derived from `DOCTRINE.md` (below), so the installed digest names every methodology rule by construction rather than by an author remembering to, and a fresh consumer is in per-rule lockstep out of the box (installer and gate agree on the `## Delivery doctrine` heading — that agreement is part of check-doctrine-registration's contract). Trimming a rule the consumer does not keep resident stays legal, but rides a declared-trim marker rather than a silent deletion: the gate asserts name-lockstep modulo declared trims (§check-doctrine-registration assertion B).
 
-**The two paths are the block's spelling as well as its operands.** The link the
-digest renders is the doctrine path *exactly as the caller handed it over*, and
-§check-doctrine-registration reads that link against a consumer-relative default.
-So a caller installing into a tree it is not standing in — `init`, vendoring into
-a consumer — hands over the consumer root as a separate **base** and the two paths
-as consumer-relative spellings, rather than resolving them first. Resolving them
-is the failure this rule exists to name: it writes an absolute path off the
-installing machine into the adopter's always-loaded agent file, where it fails the
-registration gate and outlives the machine that produced it. A caller standing in
-the tree passes no base and is unaffected, which is what the `--install-doctrine`
-arm's own adopter-facing argv does.
+**The two paths are the block's spelling as well as its operands.** The link the digest renders is the doctrine path *exactly as the caller handed it over*, and §check-doctrine-registration reads that link against a consumer-relative default. So a caller installing into a tree it is not standing in — `init`, vendoring into a consumer — hands over the consumer root as a separate **base** and the two paths as consumer-relative spellings, rather than resolving them first. Resolving them is the failure this rule exists to name: it writes an absolute path off the installing machine into the adopter's always-loaded agent file, where it fails the registration gate and outlives the machine that produced it. A caller standing in the tree passes no base and is unaffected, which is what the `--install-doctrine` arm's own adopter-facing argv does.
 
-**The digest is derived from the doctrine, one bullet per rule.** Each
-methodology rule carries a `*Digest:* <one-line summary>` trailer, and the
-installer emits that rule's bullet as `- **<name>** — <summary>`: the name read
-exactly as §check-doctrine-registration assertion C reads it, the summary taken
-from the trailer verbatim. The bullet roster is therefore the rule roster, and
-the two cannot come to differ in count — the drift axis is removed rather than
-watched, which is what Derivation-first asks for before Enforcement-first is
-even consulted. A hand-maintained bullet list is what this replaces, and its
-failure mode was not hypothetical: a rule that landed in `DOCTRINE.md` and in
-this repo's own agent file never reached the installer's list, so every fresh
-install vendored a digest one rule short while the consumer-side gate stayed
-green — the skew is invisible from the tree that has both copies right.
+**The digest is derived from the doctrine, one bullet per rule.** Each methodology rule carries a `*Digest:* <one-line summary>` trailer, and the installer emits that rule's bullet as `- **<name>** — <summary>`: the name read exactly as §check-doctrine-registration assertion C reads it, the summary taken from the trailer verbatim. The bullet roster is therefore the rule roster, and the two cannot come to differ in count — the drift axis is removed rather than watched, which is what Derivation-first asks for before Enforcement-first is even consulted. A hand-maintained bullet list is what this replaces, and its failure mode was not hypothetical: a rule that landed in `DOCTRINE.md` and in this repo's own agent file never reached the installer's list, so every fresh install vendored a digest one rule short while the consumer-side gate stayed green — the skew is invisible from the tree that has both copies right.
 
-*Why a trailer and not the rule's own prose.* The obvious cheaper design is to
-extract the summary from the rule body's opening sentence and add no format at
-all. It was measured rather than assumed, and it does not hold: of the twelve
-bullets the digest shipped, **none** occurs as contiguous text anywhere in
-`DOCTRINE.md`. The digest register is deliberately terser and more imperative
-than the doctrine's statement register — the rule states the convention and its
-scope, the bullet is what survives in a file read in full at every session start
-— so extraction would either degrade the doctrine's own prose into digest
-shorthand or invent a summary the author never wrote. The trailer is the
-authoring surface that makes derivation honest: the summary is authored once,
-beside the rule it summarizes, and read from there by everything that needs it.
+*Why a trailer and not the rule's own prose.* The obvious cheaper design is to extract the summary from the rule body's opening sentence and add no format at all. It was measured rather than assumed, and it does not hold: of the twelve bullets the digest shipped, **none** occurs as contiguous text anywhere in `DOCTRINE.md`. The digest register is deliberately terser and more imperative than the doctrine's statement register — the rule states the convention and its scope, the bullet is what survives in a file read in full at every session start — so extraction would either degrade the doctrine's own prose into digest shorthand or invent a summary the author never wrote. The trailer is the authoring surface that makes derivation honest: the summary is authored once, beside the rule it summarizes, and read from there by everything that needs it.
 
-**The derivation's refusals.** A rule carrying no `*Digest:*` trailer, or two,
-leaves its bullet undecidable, and the installer exits 2 naming the rule rather
-than emitting a digest silently short — the exact defect the derivation
-replaced, so failing closed is the point rather than a courtesy. A missing
-doctrine file and a methodology section that resolves to nothing are exit 2 on
-the same ground: the digest cannot be certified against an unreadable rule set.
-The derivation runs **once, at top level**, before the block is composed —
-`digest()` is read through process substitution, where an exit would end only
-the subshell and let the malformed doctrine through as a short digest, which is
-the failure mode being guarded. §check-doctrine-registration assertion E is the
-tree-side half of the same guard, so an untrailered rule reds at commit time
-instead of waiting for a consumer install to discover it.
+**The derivation's refusals.** A rule carrying no `*Digest:*` trailer, or two, leaves its bullet undecidable, and the installer exits 2 naming the rule rather than emitting a digest silently short — the exact defect the derivation replaced, so failing closed is the point rather than a courtesy. A missing doctrine file and a methodology section that resolves to nothing are exit 2 on the same ground: the digest cannot be certified against an unreadable rule set. The derivation runs **once, at top level**, before the block is composed — `digest()` is read through process substitution, where an exit would end only the subshell and let the malformed doctrine through as a short digest, which is the failure mode being guarded. §check-doctrine-registration assertion E is the tree-side half of the same guard, so an untrailered rule reds at commit time instead of waiting for a consumer install to discover it.
 
-**What this asks of a consumer.** Nothing, for a consumer who re-vendors
-`DOCTRINE.md` unchanged — the kit ships it, and its rules ship trailered. A
-consumer who *appends a local rule* to their vendored copy now owes that rule a
-`*Digest:*` trailer. That is a real obligation and worth stating rather than
-claiming zero impact, but it replaces a larger one: assertion B already required
-such a rule to be reflected in the digest, and the trailer is what makes its
-bullet generate rather than have to be hand-written and kept in step.
+**What this asks of a consumer.** Nothing, for a consumer who re-vendors `DOCTRINE.md` unchanged — the kit ships it, and its rules ship trailered. A consumer who *appends a local rule* to their vendored copy now owes that rule a `*Digest:*` trailer. That is a real obligation and worth stating rather than claiming zero impact, but it replaces a larger one: assertion B already required such a rule to be reflected in the digest, and the trailer is what makes its bullet generate rather than have to be hand-written and kept in step.
 
-**The declared-trim round-trip.** A generated block that is unconditionally
-rewritten would revoke that right on the next run — and revoke it *silently*,
-because a trim the installer restores to a bullet leaves an agent file whose
-hash matches what the installer last recorded. So the run is read-compute-emit
-rather than emit: the marker module's reader returns the block as it stands, the
-installer harvests every
-`<!-- doctrine-digest-trim: <rule name> — <reason> -->` line out of it, and each
-digest rule is emitted as **either** its bullet **or** — when that rule's name is
-trimmed — the harvested marker line verbatim, **in the bullet's position**.
-Substitution, not addition: a block carrying the trim *and* its bullet would
-satisfy assertions B and C while handing the consumer back the rule they
-removed, which is the customization defeated while appearing honored. In-place
-rather than appended so the consumer's reason stays where the rule it answers
-would have been; the gate accepts the marker anywhere in the digest section, so
-readability decides. The rule names the substitution keys on are the digest's
-own bullet names, read exactly as assertion C reads them — installer and gate
-never disagree about which rule a marker names.
+**The declared-trim round-trip.** A generated block that is unconditionally rewritten would revoke that right on the next run — and revoke it *silently*, because a trim the installer restores to a bullet leaves an agent file whose hash matches what the installer last recorded. So the run is read-compute-emit rather than emit: the marker module's reader returns the block as it stands, the installer harvests every `<!-- doctrine-digest-trim: <rule name> — <reason> -->` line out of it, and each digest rule is emitted as **either** its bullet **or** — when that rule's name is trimmed — the harvested marker line verbatim, **in the bullet's position**. Substitution, not addition: a block carrying the trim *and* its bullet would satisfy assertions B and C while handing the consumer back the rule they removed, which is the customization defeated while appearing honored. In-place rather than appended so the consumer's reason stays where the rule it answers would have been; the gate accepts the marker anywhere in the digest section, so readability decides. The rule names the substitution keys on are the digest's own bullet names, read exactly as assertion C reads them — installer and gate never disagree about which rule a marker names.
 
 Four behaviors the round-trip fixes:
 
-- **No trims declared → byte-identical output.** Load-bearing rather than
-  incidental: without it every consumer's agent file churns on every upgrade,
-  and the installer's caller starts reporting a file nobody edited.
-- **A trim naming no rule in the current digest** — a rule renamed or dropped
-  upstream — is carried forward *and* reported. It has no bullet position to
-  take, so it is carried at the digest's end. Surfacing it at the re-vendor
-  moment is the declared-not-silent design working: that is the moment the
-  consumer's decision gets reconciled.
-- **Duplicate trims for one rule** — the first is carried, the duplicate
-  dropped and reported. Silently collapsing them would be the same class of
-  quiet edit-loss one layer up.
-- **The report has two channels, and the split is deliberate.** The standing
-  rule it instances: an installer a machine may drive puts **findings on
-  stderr** and narration on stdout, and stays silent on a clean run — stderr
-  chatter on success is how a channel gets ignored. So each finding above goes
-  to stderr, and the action line on stdout gains the count of trims carried and
-  a tally of those findings. What makes the rule binding here rather than merely
-  tidy is the caller class this script has: a vendoring installer whose own
-  stdout is a machine-read channel of seeded paths must discard this script's,
-  so stdout is exactly where a reconciliation the consumer owes would be lost.
-  The honest consequence is that under such a caller the count has no reader —
-  the carried trims are read from the commit that install makes — while every
-  finding still reaches whoever ran it.
+- **No trims declared → byte-identical output.** Load-bearing rather than incidental: without it every consumer's agent file churns on every upgrade, and the installer's caller starts reporting a file nobody edited.
+- **A trim naming no rule in the current digest** — a rule renamed or dropped upstream — is carried forward *and* reported. It has no bullet position to take, so it is carried at the digest's end. Surfacing it at the re-vendor moment is the declared-not-silent design working: that is the moment the consumer's decision gets reconciled.
+- **Duplicate trims for one rule** — the first is carried, the duplicate dropped and reported. Silently collapsing them would be the same class of quiet edit-loss one layer up.
+- **The report has two channels, and the split is deliberate.** The standing rule it instances: an installer a machine may drive puts **findings on stderr** and narration on stdout, and stays silent on a clean run — stderr chatter on success is how a channel gets ignored. So each finding above goes to stderr, and the action line on stdout gains the count of trims carried and a tally of those findings. What makes the rule binding here rather than merely tidy is the caller class this script has: a vendoring installer whose own stdout is a machine-read channel of seeded paths must discard this script's, so stdout is exactly where a reconciliation the consumer owes would be lost. The honest consequence is that under such a caller the count has no reader — the carried trims are read from the commit that install makes — while every finding still reaches whoever ran it.
 
-**The honest bound.** The block is generated, and the declared trim is the only
-customization preserved across a run. An unsanctioned edit *inside* the span is
-reverted by design, and reds §check-doctrine-registration independently: an added
-or renamed bullet on assertions B and C, a **reworded** one on assertion F.
-Naming F here rather than C is a correction rather than a refinement — C reads
-bullet *names*, so before F existed the commonest edit of all, extending a
-bullet's summary in place under its own name, left every assertion green while
-the next run silently discarded the wording. Everything *outside* the markers is
-the adopter's and is never read or written, which is where a consumer's own
-elaboration of a rule belongs. Stating the bound is what makes the preserved case
-a contract rather than an accident.
+**The honest bound.** The block is generated, and the declared trim is the only customization preserved across a run. An unsanctioned edit *inside* the span is reverted by design, and reds §check-doctrine-registration independently: an added or renamed bullet on assertions B and C, a **reworded** one on assertion F. Naming F here rather than C is a correction rather than a refinement — C reads bullet *names*, so before F existed the commonest edit of all, extending a bullet's summary in place under its own name, left every assertion green while the next run silently discarded the wording. Everything *outside* the markers is the adopter's and is never read or written, which is where a consumer's own elaboration of a rule belongs. Stating the bound is what makes the preserved case a contract rather than an accident.
 
-**The removal mode.** `--install-doctrine --remove [agent-file]` is the insert
-path reversed over the same marker pair, riding the marker module's `remove_block`
-exactly as the insert path rides its sibling — so the marker strings keep their
-one writer and a caller reversing an installation needs no copy of them. It
-harvests no trims and emits no digest: a removal has nothing to carry forward,
-which is what makes it the reverse of the round-trip above rather than a second,
-emptier pass through it — and, for the same reason, it reads no doctrine file
-and so none of the derivation's refusals can arise on this path. An agent file
-carrying **no block is not an error** —
-the run says there was nothing to remove and exits 0, so a second `--remove` is
-as quiet as the first and a caller that cannot know whether the block was ever
-written there needs no way to ask. Its refusals are the two the insert path
-holds before it reads any doctrine, unchanged and the only two on this path: a
-missing agent file is exit 2, and a begin marker without its end is exit 2
-rather than a guess at the block bounds. What it removes is the
-reference block and nothing else — everything outside the markers is the
-adopter's, on the same terms the honest bound above states for a rewrite.
+**The removal mode.** `--install-doctrine --remove [agent-file]` is the insert path reversed over the same marker pair, riding the marker module's `remove_block` exactly as the insert path rides its sibling — so the marker strings keep their one writer and a caller reversing an installation needs no copy of them. It harvests no trims and emits no digest: a removal has nothing to carry forward, which is what makes it the reverse of the round-trip above rather than a second, emptier pass through it — and, for the same reason, it reads no doctrine file and so none of the derivation's refusals can arise on this path. An agent file carrying **no block is not an error** — the run says there was nothing to remove and exits 0, so a second `--remove` is as quiet as the first and a caller that cannot know whether the block was ever written there needs no way to ask. Its refusals are the two the insert path holds before it reads any doctrine, unchanged and the only two on this path: a missing agent file is exit 2, and a begin marker without its end is exit 2 rather than a guess at the block bounds. What it removes is the reference block and nothing else — everything outside the markers is the adopter's, on the same terms the honest bound above states for a rewrite.
 
-The round-trip's acceptor is `smoke/install.sh`, per the coverage tier
-gate-sdk/SPEC.md §lib/inject.sh sets for a module with no gate surface of its own:
-it declares a trim in the block the installer just emitted, re-runs the
-installer, and holds that the marker survived in the trimmed bullet's position,
-that the bullet is gone, and that the gate is green across the re-run. The same
-acceptor covers the removal mode on that tier and for that reason: it strips the
-block, holds that a second `--remove` is an idempotent no-op, and reinstalls to
-restore the baseline. It also drives the derivation's refusals, on the same tier
-and for a further reason: a refusal is the installer's behavior rather than the
-gate's, so no gate fixture can reach it. Pointed by the positional overrides at
-a scratch doctrine whose second rule carries no `*Digest:*` trailer — and again
-at one whose second rule carries two — it holds that the run exits 2, that the
-message names the offending rule, and that the agent file is byte-unchanged.
-That last assertion is the one worth having: an installer that refuses after
-writing has failed closed in its exit status only.
+The round-trip's acceptor is `smoke/install.sh`, per the coverage tier gate-sdk/SPEC.md §lib/inject.sh sets for a module with no gate surface of its own: it declares a trim in the block the installer just emitted, re-runs the installer, and holds that the marker survived in the trimmed bullet's position, that the bullet is gone, and that the gate is green across the re-run. The same acceptor covers the removal mode on that tier and for that reason: it strips the block, holds that a second `--remove` is an idempotent no-op, and reinstalls to restore the baseline. It also drives the derivation's refusals, on the same tier and for a further reason: a refusal is the installer's behavior rather than the gate's, so no gate fixture can reach it. Pointed by the positional overrides at a scratch doctrine whose second rule carries no `*Digest:*` trailer — and again at one whose second rule carries two — it holds that the run exits 2, that the message names the offending rule, and that the agent file is byte-unchanged. That last assertion is the one worth having: an installer that refuses after writing has failed closed in its exit status only.
 
-Positional overrides `--install-doctrine [agent-file [doctrine-file]]` let a
-smoke or a fixture point both paths at a scratch tree without touching consumer
-config; unset, they fall to the knob defaults.
+Positional overrides `--install-doctrine [agent-file [doctrine-file]]` let a smoke or a fixture point both paths at a scratch tree without touching consumer config; unset, they fall to the knob defaults.
 
-**The port disposition: discharged, with the installer's behind-invoke
-relocation.** The member was once sequenced behind that relocation rather than
-ported — a stated-contract cut dropped from an iteration's unit set, because the
-relocation's own precondition forbade it. `installer/SPEC.md` §The install
-boundary stated the selecting rule as *a step is takeable now iff it already runs
-only when an artifact was selected*, and named what broke otherwise: two of
-`installer/SPEC.md` §The gate binary's three selection outcomes left `init` with
-no artifact and both **proceeded**, so a step that became artifact-dependent
-turned a smaller battery into **no install**.
+**The port disposition: discharged, with the installer's behind-invoke relocation.** The member was once sequenced behind that relocation rather than ported — a stated-contract cut dropped from an iteration's unit set, because the relocation's own precondition forbade it. `installer/SPEC.md` §The install boundary stated the selecting rule as *a step is takeable now iff it already runs only when an artifact was selected*, and named what broke otherwise: two of `installer/SPEC.md` §The gate binary's three selection outcomes left `init` with no artifact and both **proceeded**, so a step that became artifact-dependent turned a smaller battery into **no install**.
 
-**The relocation retired that precondition rather than satisfying it**: both
-outcomes became bootstrap refusals, so an install that happens at all happens with
-a verified binary in hand, and every step is artifact-dependent by construction.
-The two adopter-path call sites moved with it — `init` seeds the reference block
-and `uninstall` trims it, both now arms of the binary reaching this module
-in-process — so the marker strings keep their one writer and neither call site
-needs a payload copy of a shell script any more.
+**The relocation retired that precondition rather than satisfying it**: both outcomes became bootstrap refusals, so an install that happens at all happens with a verified binary in hand, and every step is artifact-dependent by construction. The two adopter-path call sites moved with it — `init` seeds the reference block and `uninstall` trims it, both now arms of the binary reaching this module in-process — so the marker strings keep their one writer and neither call site needs a payload copy of a shell script any more.
 
-What the installer became is an `Arm::Run` on `--install-lifecycle`'s precedent
-(gate-sdk/SPEC.md §The non-gate arm): it mutates one file, emits no document, and
-its arm-table row declares the two knobs it resolves. Its named callers are the
-adopter's own install step, this kit's consumer smoke, and the `--init` arm.
-**One coupling a later reader will meet**: the crate's `--upgrade-smoke` arm ran
-this installer by path inside the vendored consumer tree, and now guards on the
-*kit* being vendored and drives the arm — a guard still naming the script would
-have gone quietly false and dropped the step out of that phase altogether.
+What the installer became is an `Arm::Run` on `--install-lifecycle`'s precedent (gate-sdk/SPEC.md §The non-gate arm): it mutates one file, emits no document, and its arm-table row declares the two knobs it resolves. Its named callers are the adopter's own install step, this kit's consumer smoke, and the `--init` arm. **One coupling a later reader will meet**: the crate's `--upgrade-smoke` arm ran this installer by path inside the vendored consumer tree, and now guards on the *kit* being vendored and drives the arm — a guard still naming the script would have gone quietly false and dropped the step out of that phase altogether.
 
 ## check-doctrine-registration
 
-Invariant, in six assertions: the configured agent file (A) carries a markdown
-link to the configured doctrine file and (B, C, F) holds its methodology-rule
-digest in per-rule lockstep with the doctrine by name and by text, and the
-doctrine's two registers tag every rule with exactly one per-rule trailer — the
-craft register with a stage-routing trailer (D), the methodology register with the
-digest trailer its bullet is generated from (E). The digest is the surface the
-always-loaded-shape rule requires, and a re-vendored `DOCTRINE.md` that adds or
-renames a methodology-maintenance rule staling every consumer's digest *by
-construction* — on the exact path the kit advertises as its upgrade story — is
-the drift-prone-surface-that-must-exist case where a gate is owed (the
-enforcement-first weighing). Extending the existing gate rather than adding one
-keeps the gate count flat; the coupling is unchanged (the `# graph:` manifest
-already couples the agent file and the doctrine file).
+Invariant, in six assertions: the configured agent file (A) carries a markdown link to the configured doctrine file and (B, C, F) holds its methodology-rule digest in per-rule lockstep with the doctrine by name and by text, and the doctrine's two registers tag every rule with exactly one per-rule trailer — the craft register with a stage-routing trailer (D), the methodology register with the digest trailer its bullet is generated from (E). The digest is the surface the always-loaded-shape rule requires, and a re-vendored `DOCTRINE.md` that adds or renames a methodology-maintenance rule staling every consumer's digest *by construction* — on the exact path the kit advertises as its upgrade story — is the drift-prone-surface-that-must-exist case where a gate is owed (the enforcement-first weighing). Extending the existing gate rather than adding one keeps the gate count flat; the coupling is unchanged (the `# graph:` manifest already couples the agent file and the doctrine file).
 
-- **Assertion A (link).** The gate greps the agent file for a
-  `](<doctrine-file>` link token; absent, it is a finding with the install
-  remedy. It asserts link *presence* only — that a session loading the agent
-  file is pointed at the doctrine, not that the link was followed or the
-  doctrine read (the honest limit: a link is not a read) — and leaves
-  link-target resolution to the consumer's doc gates (canon-kit's
-  `check-md-refs` over the manifest).
-- **Assertion B (doctrine → digest).** Every rule name under the doctrine's
-  `## Methodology-maintenance rules` section — the bold text of each numbered
-  rule, trailing period dropped (e.g. `Content-tiering / SSOT`) — appears as a
-  bold digest lead-in (`- **<name>**`) in the agent file's digest section.
-  Engineering-craft rules are exempt: they live behind the link by the
-  doctrine's own two-register design, so the gate scans only the
-  methodology section for the required set. The consumer's right to reject a
-  rule survives as a *declared* trim: a
-  `<!-- doctrine-digest-trim: <rule name> — <reason> -->` line inside the
-  digest section satisfies assertion B for that rule; a silent omission stays
-  red. Declared-not-silent is the reconciliation — the re-vendor moment
-  surfaces every added or renamed rule, and the consumer's decision (adopt the
-  bullet or trim it with cause) is recorded beside the digest it governs.
-- **Assertion C (digest → doctrine).** Every bold bullet lead-in in the digest
-  section matches a methodology-maintenance rule name — a digest line with no
-  owning rule is a rule stated nowhere the doctrine governs.
-- **Assertion D (craft-trailer coverage).** Every numbered rule under the
-  doctrine's `## Engineering-craft rules` section carries exactly one `*Stages:*`
-  trailer matching the tag grammar (§stage-rules). A craft rule with no trailer,
-  or two, or a malformed value is a finding: a re-vendored `DOCTRINE.md` that adds
-  an untagged craft rule reddens here instead of silently dropping out of the
-  stage routing the emitter derives. Stage-name *validity* is deliberately
-  unasserted — doctrine-kit does not depend on lifecycle-kit's stage config, and
-  the emitter's empty-output posture already covers an unknown stage; the gate
-  holds only that the trailer is present and well-formed.
-- **Assertion E (digest-trailer coverage).** Every numbered rule under the
-  doctrine's `## Methodology-maintenance rules` section carries exactly one
-  `*Digest:*` trailer with a non-empty value. This is D's sibling one register
-  over, and the sentence D is argued from transposes exactly: a re-vendored
-  `DOCTRINE.md` that adds an untrailered methodology rule reddens here instead of
-  silently dropping out of the digest the installer derives (§install-doctrine).
-  Zero trailers and two are both findings, for the reason they are on D — a rule
-  with two has no decidable bullet, and picking one silently is exactly the guess
-  a gate exists to refuse. The value is graded only for emptiness: what makes a
-  one-line summary *good* is not machine-decidable, and a check that pretended
-  otherwise would be the noisy gate the Enforcement-first carve-out warns
-  against. D and E run one walk over a register's numbered rules, parameterized
-  by the trailer name and by how its value is graded, so the two registers cannot
-  drift apart in how a rule is read.
-- **Assertion F (bullet text → trailer).** Every digest bullet whose name owns a
-  methodology rule carries that rule's `*Digest:*` value **verbatim** as its
-  summary — the text past the bold name and the em dash, read off the same walk E
-  grades so a rule's summary has one reader. It is B and C's missing axis: those
-  two hold the bullet *set* in lockstep and say nothing about a bullet's body, so
-  the edit that actually happens — a consumer extending a bullet in place, under
-  its own name, with local elaboration — passed every assertion while
-  §install-doctrine's next run discarded it. That is the drift-prone surface with
-  a *silent* failure the enforcement-first weighing asks for: the loss is invisible
-  from the tree, and the remedy is a rule about where the elaboration belongs
-  (outside the markers) rather than a judgment call. A rule whose trailer is
-  unreadable — absent, doubled, or empty — is assertion E's finding and is skipped
-  here, so one defect is never reported twice; and the trim marker is untouched,
-  a trimmed rule having no bullet to compare. The honest limit it inherits from C:
-  the assertion is scoped to the *digest section*, which the heading bounds and
-  the markers do not, so an adopter's prose under that heading is graded exactly
-  when it is written as a bullet naming a rule.
+- **Assertion A (link).** The gate greps the agent file for a link token whose target opens with `<doctrine-file>` (the closing bracket, then the opening parenthesis, then the path); absent, it is a finding with the install remedy. It asserts link *presence* only — that a session loading the agent file is pointed at the doctrine, not that the link was followed or the doctrine read (the honest limit: a link is not a read) — and leaves link-target resolution to the consumer's doc gates (canon-kit's `check-md-refs` over the manifest).
+- **Assertion B (doctrine → digest).** Every rule name under the doctrine's `## Methodology-maintenance rules` section — the bold text of each numbered rule, trailing period dropped (e.g. `Content-tiering / SSOT`) — appears as a bold digest lead-in (`- **<name>**`) in the agent file's digest section. Engineering-craft rules are exempt: they live behind the link by the doctrine's own two-register design, so the gate scans only the methodology section for the required set. The consumer's right to reject a rule survives as a *declared* trim: a `<!-- doctrine-digest-trim: <rule name> — <reason> -->` line inside the digest section satisfies assertion B for that rule; a silent omission stays red. Declared-not-silent is the reconciliation — the re-vendor moment surfaces every added or renamed rule, and the consumer's decision (adopt the bullet or trim it with cause) is recorded beside the digest it governs.
+- **Assertion C (digest → doctrine).** Every bold bullet lead-in in the digest section matches a methodology-maintenance rule name — a digest line with no owning rule is a rule stated nowhere the doctrine governs.
+- **Assertion D (craft-trailer coverage).** Every numbered rule under the doctrine's `## Engineering-craft rules` section carries exactly one `*Stages:*` trailer matching the tag grammar (§stage-rules). A craft rule with no trailer, or two, or a malformed value is a finding: a re-vendored `DOCTRINE.md` that adds an untagged craft rule reddens here instead of silently dropping out of the stage routing the emitter derives. Stage-name *validity* is deliberately unasserted — doctrine-kit does not depend on lifecycle-kit's stage config, and the emitter's empty-output posture already covers an unknown stage; the gate holds only that the trailer is present and well-formed.
+- **Assertion E (digest-trailer coverage).** Every numbered rule under the doctrine's `## Methodology-maintenance rules` section carries exactly one `*Digest:*` trailer with a non-empty value. This is D's sibling one register over, and the sentence D is argued from transposes exactly: a re-vendored `DOCTRINE.md` that adds an untrailered methodology rule reddens here instead of silently dropping out of the digest the installer derives (§install-doctrine). Zero trailers and two are both findings, for the reason they are on D — a rule with two has no decidable bullet, and picking one silently is exactly the guess a gate exists to refuse. The value is graded only for emptiness: what makes a one-line summary *good* is not machine-decidable, and a check that pretended otherwise would be the noisy gate the Enforcement-first carve-out warns against. D and E run one walk over a register's numbered rules, parameterized by the trailer name and by how its value is graded, so the two registers cannot drift apart in how a rule is read.
+- **Assertion F (bullet text → trailer).** Every digest bullet whose name owns a methodology rule carries that rule's `*Digest:*` value **verbatim** as its summary — the text past the bold name and the em dash, read off the same walk E grades so a rule's summary has one reader. It is B and C's missing axis: those two hold the bullet *set* in lockstep and say nothing about a bullet's body, so the edit that actually happens — a consumer extending a bullet in place, under its own name, with local elaboration — passed every assertion while §install-doctrine's next run discarded it. That is the drift-prone surface with a *silent* failure the enforcement-first weighing asks for: the loss is invisible from the tree, and the remedy is a rule about where the elaboration belongs (outside the markers) rather than a judgment call. A rule whose trailer is unreadable — absent, doubled, or empty — is assertion E's finding and is skipped here, so one defect is never reported twice; and the trim marker is untouched, a trimmed rule having no bullet to compare. The honest limit it inherits from C: the assertion is scoped to the *digest section*, which the heading bounds and the markers do not, so an adopter's prose under that heading is graded exactly when it is written as a bullet naming a rule.
 
-Section resolution fails closed. The digest section is the agent-file heading
-named by `DOCTRINE_KIT_DIGEST_SECTION` (Layout and configuration); a configured
-heading matching nothing exits 2 — a renamed digest section must not disarm the
-gate into passing an empty set. The doctrine-side headings
-(`Methodology-maintenance rules` and `Engineering-craft rules`) are kit
-mechanism, not config: the kit ships `DOCTRINE.md`, so it owns those names, and
-either one's absence is likewise exit 2 (the gate cannot certify the digest or
-the craft trailers against an unreadable rule set). A missing agent
-or doctrine file is fail-closed for the same reason, as is a grep or awk that
-errors rather than simply not-matching.
+Section resolution fails closed. The digest section is the agent-file heading named by `DOCTRINE_KIT_DIGEST_SECTION` (Layout and configuration); a configured heading matching nothing exits 2 — a renamed digest section must not disarm the gate into passing an empty set. The doctrine-side headings (`Methodology-maintenance rules` and `Engineering-craft rules`) are kit mechanism, not config: the kit ships `DOCTRINE.md`, so it owns those names, and either one's absence is likewise exit 2 (the gate cannot certify the digest or the craft trailers against an unreadable rule set). A missing agent or doctrine file is fail-closed for the same reason, as is a grep or awk that errors rather than simply not-matching.
 
-The gate satisfies the four gate-sdk contracts (gate-sdk/SPEC.md §The gate
-model): the single `DOCTRINE-REGISTRATION: clean` success line and a `help:`
-remedy on each finding path (output); exit 2 on an unreadable file, an
-unresolved section, or an errored capture (fail-closed); a `good/`+`bad/`
-fixture pair under `gate-tests/` — the pair carries the lockstep-clean and the
-digest-missing-a-rule cases (both craft-tagged so assertion D passes there), and
-a sibling `*.test.sh` drives the extra-line, declared-trim, link-absent,
-craft-untagged, craft-malformed, digest-trailer, divergent-bullet-text, and four
-fail-closed cases the one-pair harness cannot hold (fixture-pair); and
-registration in this repo's `gates.list` where
-its own always-loaded file is the scan target (self-lint). Positional form
-`check-doctrine-registration [agent-file [doctrine-file]]` lets the fixtures
-point at a synthetic agent and doctrine file.
+The gate satisfies the four gate-sdk contracts (gate-sdk/SPEC.md §The gate model): the single `DOCTRINE-REGISTRATION: clean` success line and a `help:` remedy on each finding path (output); exit 2 on an unreadable file, an unresolved section, or an errored capture (fail-closed); a `good/`+`bad/` fixture pair under `gate-tests/` — the pair carries the lockstep-clean and the digest-missing-a-rule cases (both craft-tagged so assertion D passes there), and a sibling `*.test.sh` drives the extra-line, declared-trim, link-absent, craft-untagged, craft-malformed, digest-trailer, divergent-bullet-text, and four fail-closed cases the one-pair harness cannot hold (fixture-pair); and registration in this repo's `gates.list` where its own always-loaded file is the scan target (self-lint). Positional form `check-doctrine-registration [agent-file [doctrine-file]]` lets the fixtures point at a synthetic agent and doctrine file.
 
 ## stage-rules
 
-The engineering-craft rules are load-triggered — behind the doctrine link, not
-digested (§The doctrine deliverable) — and a *stage* is itself a load trigger.
-The `--emit-stage-rules` arm closes that gap: it derives, for a given stage, the
-craft rules that bear on it and emits one pointer line per hit, so a session
-entering a stage is reminded of the craft rules to follow *before* the matching
-action, without the always-loaded surface carrying the prose. **The `## stage-rules`
-heading is the section name, not a file name** — the shell emitter it was named
-after is ported, and the citations in `context-kit/SPEC.md` and
-`doctrine-kit/README.md` resolve against this heading.
+The engineering-craft rules are load-triggered — behind the doctrine link, not digested (§The doctrine deliverable) — and a *stage* is itself a load trigger. The `--emit-stage-rules` arm closes that gap: it derives, for a given stage, the craft rules that bear on it and emits one pointer line per hit, so a session entering a stage is reminded of the craft rules to follow *before* the matching action, without the always-loaded surface carrying the prose. **The `## stage-rules` heading is the section name, not a file name** — the shell emitter it was named after is ported, and the citations in `context-kit/SPEC.md` and `doctrine-kit/README.md` resolve against this heading.
 
-**The tag grammar (single source: the rule owns its stage).** Each rule under
-`## Engineering-craft rules` in `DOCTRINE.md` carries a machine-parsable trailer
-line, `*Stages:* <stage>[, <stage>…]` — a comma list of lowercase stage tokens
-naming the kit's default stage vocabulary — or `*Stages:* —` for a rule that
-routes to no stage. The mapping lives on the rule, so a re-vendored `DOCTRINE.md`
-carries its own routing and no consumer-side stage↔rule table exists to drift;
-`check-doctrine-registration` assertion D holds every craft rule to exactly one
-well-formed trailer.
+**The tag grammar (single source: the rule owns its stage).** Each rule under `## Engineering-craft rules` in `DOCTRINE.md` carries a machine-parsable trailer line, `*Stages:* <stage>[, <stage>…]`, standing as its own paragraph inside the rule's list item so a tree that keeps its markdown unwrapped still reads it as a line — a comma list of lowercase stage tokens naming the kit's default stage vocabulary — or `*Stages:* —` for a rule that routes to no stage. The mapping lives on the rule, so a re-vendored `DOCTRINE.md` carries its own routing and no consumer-side stage↔rule table exists to drift; `check-doctrine-registration` assertion D holds every craft rule to exactly one well-formed trailer.
 
-**The emitter.** `run-gates.sh --emit stage-rules <stage> [doctrine-file]` scans
-the craft
-section for rules whose `*Stages:*` line names the given stage and prints one
-pointer line each — rule number, name, and the doctrine path — so the reader
-follows the link to the rule body. An unknown stage name yields empty output:
-the tags name the kit-default stages, so a consumer with a renamed stage set
-gets no routing rather than wrong routing (the stated honest limit — a stage
-remap knob is deferred until such a consumer exists). A missing doctrine file is
-exit 2, an absent craft section or a no-match stage is empty output.
+**The emitter.** `run-gates.sh --emit stage-rules <stage> [doctrine-file]` scans the craft section for rules whose `*Stages:*` line names the given stage and prints one pointer line each — rule number, name, and the doctrine path — so the reader follows the link to the rule body. An unknown stage name yields empty output: the tags name the kit-default stages, so a consumer with a renamed stage set gets no routing rather than wrong routing (the stated honest limit — a stage remap knob is deferred until such a consumer exists). A missing doctrine file is exit 2, an absent craft section or a no-match stage is empty output.
 
-**It is an `Arm::Emit` arm-table member** (gate-sdk/SPEC.md §The non-gate arm),
-reached through the generic `--emit <name>` composer rather than a front-end
-branch of its own, because its contract is a **document** and both of its
-failures — a missing `<stage>` and an unreadable doctrine file — are already the
-exit 2 that variant collapses every error to. Its declared roster is the one knob
-it reads, `DOCTRINE_KIT_DOCTRINE_FILE`, which it resolves from doctrine-kit's
-static knob table and the consumer's knob file (§Knob defaults), so a consumer
-override reaches it as it reaches the gate. The
-`[doctrine-file]` positional is **kept** rather than dropped as a config
-redirection, because the sibling surfaces it exists to match — `--install-doctrine
-[agent-file [doctrine-file]]` and the gate — still take theirs, and dropping it
-here alone would break the symmetry this section states in one sentence with
-them; the arm reads the knob when it is absent and the positional when present,
-the shell precedence unchanged.
+**It is an `Arm::Emit` arm-table member** (gate-sdk/SPEC.md §The non-gate arm), reached through the generic `--emit <name>` composer rather than a front-end branch of its own, because its contract is a **document** and both of its failures — a missing `<stage>` and an unreadable doctrine file — are already the exit 2 that variant collapses every error to. Its declared roster is the one knob it reads, `DOCTRINE_KIT_DOCTRINE_FILE`, which it resolves from doctrine-kit's static knob table and the consumer's knob file (§Knob defaults), so a consumer override reaches it as it reaches the gate. The `[doctrine-file]` positional is **kept** rather than dropped as a config redirection, because the sibling surfaces it exists to match — `--install-doctrine [agent-file [doctrine-file]]` and the gate — still take theirs, and dropping it here alone would break the symmetry this section states in one sentence with them; the arm reads the knob when it is absent and the positional when present, the shell precedence unchanged.
 
-**Both graceful limits are preserved verbatim, and that is an instruction rather
-than an omission.** The idiomatic compiled write of a stage lookup that matches
-nothing is an error or a diagnostic, and either would close a stated honest limit
-inside a port. An unknown stage and an absent craft section are each **exit 0
-with empty output**, the same disposition §upgrade-smoke's worktree predicate
-took. The craft-section heading `## Engineering-craft rules` moves into the crate
-module as a literal and stays **kit mechanism** (the kit ships `DOCTRINE.md`),
-never config: what crosses to a consumer is the rule content — numbers, names and
-`*Stages:*` routings — all of which stays in the doctrine file and is read at run
-time. The arm bakes **no stage vocabulary**: each parsed token is compared against
-the `<stage>` its caller supplies, so no kit literal spells any project's stages.
+**Both graceful limits are preserved verbatim, and that is an instruction rather than an omission.** The idiomatic compiled write of a stage lookup that matches nothing is an error or a diagnostic, and either would close a stated honest limit inside a port. An unknown stage and an absent craft section are each **exit 0 with empty output**, the same disposition §upgrade-smoke's worktree predicate took. The craft-section heading `## Engineering-craft rules` moves into the crate module as a literal and stays **kit mechanism** (the kit ships `DOCTRINE.md`), never config: what crosses to a consumer is the rule content — numbers, names and `*Stages:*` routings — all of which stays in the doctrine file and is read at run time. The arm bakes **no stage vocabulary**: each parsed token is compared against the `<stage>` its caller supplies, so no kit literal spells any project's stages.
 
-**Criterion 6 is discharged by the duplication being absent rather than
-machine-held.** This member's one knob has one producer, doctrine-kit's static
-knob table (§Knob defaults), so the value is computed in exactly one place and no
-second default exists to drift. **Criterion 5's
-residual is narrow, real and invisible**: a vendored consumer on a host the
-artifact roster does not cover loses the craft-rule pointer block outright, where
-a shell script used to give it to them. It is advisory output in a session brief
-rather than a gate, so the loss is a smaller brief and never a broken battery —
-and because the hook swallows every failure (below), it is silent, which is why
-it is stated here rather than filed under the class's usual terms.
+**Criterion 6 is discharged by the duplication being absent rather than machine-held.** This member's one knob has one producer, doctrine-kit's static knob table (§Knob defaults), so the value is computed in exactly one place and no second default exists to drift. **Criterion 5's residual is narrow, real and invisible**: a vendored consumer on a host the artifact roster does not cover loses the craft-rule pointer block outright, where a shell script used to give it to them. It is advisory output in a session brief rather than a gate, so the loss is a smaller brief and never a broken battery — and because the hook swallows every failure (below), it is silent, which is why it is stated here rather than filed under the class's usual terms.
 
-**The surfacing seam.** The emitter is derived data with no standing tier of its
-own; context-kit's session-context hook is its named consumer, emitting the
-current stage's pointer block when the knob resolves
-(context-kit/SPEC.md §The session-context hook, the drift-line seam precedent).
-**The seam's contract widened from a path to a command with this port**, which is
-that section's to state — a compiled arm has no path to `-f` and is not a script
-`bash` can run. What did **not** move is the seam itself: `CONTEXT_KIT_STAGE_RULES`
-still resolves whatever a consumer sets, still defaults to empty in the kit
-template, and the block is still silently absent when unset, exactly as
-`DRIFT_KIT_KPI_DIRS` still resolves a consumer plugin after the bundled KPIs went
-in-crate. **The hook's swallow is preserved verbatim** (`2>/dev/null … || true`):
-it is the documented behavior of an advisory step, and repairing it inside a port
-would be fixing the rules the port carries. The cost is that a port leaving the
-knob stale renders no block and reds nowhere — no gate reads whether the block
-still renders — which is why the porting session proved it by an observed hook
-run rather than off the diff.
+**The surfacing seam.** The emitter is derived data with no standing tier of its own; context-kit's session-context hook is its named consumer, emitting the current stage's pointer block when the knob resolves (context-kit/SPEC.md §The session-context hook, the drift-line seam precedent). **The seam's contract widened from a path to a command with this port**, which is that section's to state — a compiled arm has no path to `-f` and is not a script `bash` can run. What did **not** move is the seam itself: `CONTEXT_KIT_STAGE_RULES` still resolves whatever a consumer sets, still defaults to empty in the kit template, and the block is still silently absent when unset, exactly as `DRIFT_KIT_KPI_DIRS` still resolves a consumer plugin after the bundled KPIs went in-crate. **The hook's swallow is preserved verbatim** (`2>/dev/null … || true`): it is the documented behavior of an advisory step, and repairing it inside a port would be fixing the rules the port carries. The cost is that a port leaving the knob stale renders no block and reds nowhere — no gate reads whether the block still renders — which is why the porting session proved it by an observed hook run rather than off the diff.
 
 ## Knob defaults
 
-doctrine-kit's knobs are **static**: the binary resolves them in process from its
-own defaults table and the consumer's knob file, so the installer arm, the gate
-and the stage-rules emitter read one resolved configuration (gate-sdk/SPEC.md §The
-knob file). `bash gate-sdk/bin/run-gates.sh
---emit knob-roster` prints each one with its shape and rendered default. All three
-are scalars:
+doctrine-kit's knobs are **static**: the binary resolves them in process from its own defaults table and the consumer's knob file, so the installer arm, the gate and the stage-rules emitter read one resolved configuration (gate-sdk/SPEC.md §The knob file). `bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one with its shape and rendered default. All three are scalars:
 
-- `DOCTRINE_KIT_AGENT_FILE` — the always-loaded file the installer edits and the
-  gate scans, default `CLAUDE.md`.
-- `DOCTRINE_KIT_DOCTRINE_FILE` — the link target the installer writes and the
-  gate asserts, default `doctrine-kit/DOCTRINE.md`.
-- `DOCTRINE_KIT_DIGEST_SECTION` — the agent-file heading whose bullet list the
-  gate reads as the methodology-rule digest (assertions B and C), default
-  `## Delivery doctrine`. The default is the installer arm's installed block
-  heading, so a zero-config consumer that installed via the tool is green out of
-  the box; a consumer that renamed the heading repoints this knob (a rename that
-  leaves it stale exits 2 rather than passing an empty set).
+- `DOCTRINE_KIT_AGENT_FILE` — the always-loaded file the installer edits and the gate scans, default `CLAUDE.md`.
+- `DOCTRINE_KIT_DOCTRINE_FILE` — the link target the installer writes and the gate asserts, default `doctrine-kit/DOCTRINE.md`.
+- `DOCTRINE_KIT_DIGEST_SECTION` — the agent-file heading whose bullet list the gate reads as the methodology-rule digest (assertions B and C), default `## Delivery doctrine`. The default is the installer arm's installed block heading, so a zero-config consumer that installed via the tool is green out of the box; a consumer that renamed the heading repoints this knob (a rename that leaves it stale exits 2 rather than passing an empty set).
 
-The defaults are this repo's own layout, so this repo runs the kit on itself
-with no knob file: `CLAUDE.md` is the always-loaded agent file, and its
-`## Delivery doctrine` reference block links `doctrine-kit/DOCTRINE.md`.
+The defaults are this repo's own layout, so this repo runs the kit on itself with no knob file: `CLAUDE.md` is the always-loaded agent file, and its `## Delivery doctrine` reference block links `doctrine-kit/DOCTRINE.md`.
 
 ## Layout and configuration
 
-The kit is vendored beside gate-sdk (conventionally at `doctrine-kit/`); its
-gate is registered in the consumer's `gates.list` by name and resolves through
-gate-sdk's multi-kit path. Config is a **knob file**: an optional
-`doctrine-config.knobs` in the gates dir (or a `DOCTRINE_KIT_KNOB_FILE` elsewhere)
-sets any knob §Knob defaults lists, and a gitignored `doctrine-config.local.knobs`
-beside it carries private overlay values; defaults fill what both leave unset.
-The grammar, the environment-over-file precedence for a scalar, and the refusals —
-a set `DOCTRINE_KIT_KNOB_FILE` that does not exist, a left-behind
-`doctrine-config.sh`, a non-empty file named by the retired
-`DOCTRINE_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob file's.
+The kit is vendored beside gate-sdk (conventionally at `doctrine-kit/`); its gate is registered in the consumer's `gates.list` by name and resolves through gate-sdk's multi-kit path. Config is a **knob file**: an optional `doctrine-config.knobs` in the gates dir (or a `DOCTRINE_KIT_KNOB_FILE` elsewhere) sets any knob §Knob defaults lists, and a gitignored `doctrine-config.local.knobs` beside it carries private overlay values; defaults fill what both leave unset. The grammar, the environment-over-file precedence for a scalar, and the refusals — a set `DOCTRINE_KIT_KNOB_FILE` that does not exist, a left-behind `doctrine-config.sh`, a non-empty file named by the retired `DOCTRINE_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob file's.
 
 ## Out of scope
 
-Folding the doctrine into canon-kit — ruled out above. Copy-install of the
-doctrine file — a copied doctrine drifts; the reference is the mechanism.
-Per-rule enable/disable knobs — the doctrine is one document, and a consumer
-that rejects a rule declares a trim marker beside its digest rather than toggling
-a knob. A standing consultation step in place of packaging — the always-loaded
-anti-pattern this load-triggered kit exists to replace. A point-of-use guard
-pushing a craft rule at the triggering action (a Write-seam `guard_advise`) —
-demand-gated and out of scope: guard-kit's seam is Bash-only, the craft-rule
-triggers ride the harness Write/Edit tools the guard never sees, and the
-stage-routed surfacing (§stage-rules) already reaches every stage session, so a
-new Write-seam mechanism carries one tentative consumer and no live demand. The kit holds no opinion
-on *which* methodology rules a consumer keeps resident versus trims with cause;
-it ships the statements and the wiring, and the consumer's always-loaded budget
-rules the digest — but a trim is declared, not silent, so the gate holds the
-resident set and the doctrine in name-lockstep modulo those declarations.
+Folding the doctrine into canon-kit — ruled out above. Copy-install of the doctrine file — a copied doctrine drifts; the reference is the mechanism. Per-rule enable/disable knobs — the doctrine is one document, and a consumer that rejects a rule declares a trim marker beside its digest rather than toggling a knob. A standing consultation step in place of packaging — the always-loaded anti-pattern this load-triggered kit exists to replace. A point-of-use guard pushing a craft rule at the triggering action (a Write-seam `guard_advise`) — demand-gated and out of scope: guard-kit's seam is Bash-only, the craft-rule triggers ride the harness Write/Edit tools the guard never sees, and the stage-routed surfacing (§stage-rules) already reaches every stage session, so a new Write-seam mechanism carries one tentative consumer and no live demand. The kit holds no opinion on *which* methodology rules a consumer keeps resident versus trims with cause; it ships the statements and the wiring, and the consumer's always-loaded budget rules the digest — but a trim is declared, not silent, so the gate holds the resident set and the doctrine in name-lockstep modulo those declarations.

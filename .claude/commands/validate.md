@@ -2,20 +2,6 @@ Execute the template at lifecycle-kit/templates/stages/validate.md, applying the
 
 ## Bindings
 
-**exit-condition** — the full gate battery and every kit's fixture suite green,
-whole-tree.
+**exit-condition** — the full gate battery and every kit's fixture suite green, whole-tree.
 
-**suites** — run the full gate battery and every kit's fixture suite as
-CLAUDE.md §This repo is governed by its own kits lists them. Record the
-evidence with the codified spine: the `--run-validate` arm runs
-each configured suite — including the end-to-end consumer smoke exercised as a
-downstream consumer would (gate-sdk/SPEC.md §Consumer smoke) — diffs the
-baseline slice, and appends one `verdict=clean` line per suite to
-`.workflow/validate-evidence.txt`; commit that file (evidence-kit/SPEC.md
-§check-evidence-manifest). Gate on the positive success tokens, not the absence
-of failure text; a non-zero exit is a real new failure — fix or file it, never
-edit the baseline to pass. A legitimate baseline edit (a new held-constant red
-with its blocking slug, and its `reproduces-at=` commit where the row passed at
-the iteration start; a recovered row promoted to pass) is written per
-evidence-kit/SPEC.md §Baseline manifest; a finding filed into the queue
-follows queue-kit/SPEC.md §The tag algebra.
+**suites** — run the full gate battery and every kit's fixture suite as CLAUDE.md §This repo is governed by its own kits lists them. Record the evidence with the codified spine: the `--run-validate` arm runs each configured suite — including the end-to-end consumer smoke exercised as a downstream consumer would (gate-sdk/SPEC.md §Consumer smoke) — diffs the baseline slice, and appends one `verdict=clean` line per suite to `.workflow/validate-evidence.txt`; commit that file (evidence-kit/SPEC.md §check-evidence-manifest). Gate on the positive success tokens, not the absence of failure text; a non-zero exit is a real new failure — fix or file it, never edit the baseline to pass. A legitimate baseline edit (a new held-constant red with its blocking slug, and its `reproduces-at=` commit where the row passed at the iteration start; a recovered row promoted to pass) is written per evidence-kit/SPEC.md §Baseline manifest; a finding filed into the queue follows queue-kit/SPEC.md §The tag algebra.

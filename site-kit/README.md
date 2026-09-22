@@ -1,42 +1,16 @@
 # site-kit
 
-Deployment-truth governance for a docs site served from the repo (GitHub Pages
-and the like): gates that hold the tree honest — about the site's host, and
-about whether each page renders faithfully — and a template that watches the
-live deployment the tree cannot see.
+Deployment-truth governance for a docs site served from the repo (GitHub Pages and the like): gates that hold the tree honest — about the site's host, and about whether each page renders faithfully — and a template that watches the live deployment the tree cannot see.
 
-`check-docs-cname-parity` makes the CNAME file the single gated source of truth
-for the docs host: no tracked file may cite a *configured host alias* other than
-that host in a `://` URL, so a domain rename is a one-line edit to the CNAME
-that the gate then propagates. The alias set is consumer config
-(`SITE_KIT_ALIASES`), never a kit literal — a kit that shipped a project's host
-names would publish them.
+`check-docs-cname-parity` makes the CNAME file the single gated source of truth for the docs host: no tracked file may cite a *configured host alias* other than that host in a `://` URL, so a domain rename is a one-line edit to the CNAME that the gate then propagates. The alias set is consumer config (`SITE_KIT_ALIASES`), never a kit literal — a kit that shipped a project's host names would publish them.
 
-`check-docs-render-fidelity` renders every tracked docs page through the pinned
-Pages parser (kramdown-GFM) and asserts no fence or heading leakage — the
-divergence class where a source-green tree ships a garbled site because
-GitHub Pages' parser is not github.com's. It fails closed when the renderer is
-absent; the dependency joins a consumer's toolchain only when the gate is
-registered.
+`check-docs-render-fidelity` renders every tracked docs page through the pinned Pages parser (kramdown-GFM) and asserts no fence or heading leakage — the divergence class where a source-green tree ships a garbled site because GitHub Pages' parser is not github.com's. It fails closed when the renderer is absent; the dependency joins a consumer's toolchain only when the gate is registered.
 
-`check-docs-highlight-coverage` holds a layout that restyles code highlighting
-to the theme it restyles: every token class a tracked snapshot says the theme
-colours must have an override rule, or it keeps the theme's colour — black on a
-dark code background, for one. It is disarmed until `SITE_KIT_HIGHLIGHT_TOKENS`
-names the snapshot.
+`check-docs-highlight-coverage` holds a layout that restyles code highlighting to the theme it restyles: every token class a tracked snapshot says the theme colours must have an override rule, or it keeps the theme's colour — black on a dark code background, for one. It is disarmed until `SITE_KIT_HIGHLIGHT_TOKENS` names the snapshot.
 
-The template — `templates/site-health.yml` — is a scheduled probe of the live
-site (apex/www/http HTTPS, redirects, certificate expiry, release-body note
-pointers, and theme highlight-class drift against that snapshot). It verifies a *deployment*, not a tree, so it ships as a workflow a
-consumer copies, never a gate: the line is where the asserted object lives, and
-none of what it asserts is in any checkout. See [SPEC.md](SPEC.md#the-monitor-boundary)
-for why that boundary is load-bearing.
+The template — `templates/site-health.yml` — is a scheduled probe of the live site (apex/www/http HTTPS, redirects, certificate expiry, release-body note pointers, and theme highlight-class drift against that snapshot). It verifies a *deployment*, not a tree, so it ships as a workflow a consumer copies, never a gate: the line is where the asserted object lives, and none of what it asserts is in any checkout. See [SPEC.md](SPEC.md#the-monitor-boundary) for why that boundary is load-bearing.
 
-An installer-vendored tree does not carry this file. The payload withholds each
-kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is
-repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is
-packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer
-payload).
+An installer-vendored tree does not carry this file. The payload withholds each kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
 
 ## Install
 
@@ -52,35 +26,15 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    ```
    <!-- gate-roster:end -->
 
-   Regenerate the hook + graph artifacts: `--emit git-hooks --write` on the
-   gate binary `GATE_SDK_NATIVE_BIN` names.
-   `check-docs-render-fidelity` needs ruby plus the kramdown-parser-gfm gem (the
-   Pages parser); a consumer without a published docs site simply omits it.
+   Regenerate the hook + graph artifacts: `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names. `check-docs-render-fidelity` needs ruby plus the kramdown-parser-gfm gem (the Pages parser); a consumer without a published docs site simply omits it.
 
-2. Establish the host source of truth — a CNAME file holding exactly one host
-   line, at the path `SITE_KIT_CNAME` names (site-kit/SPEC.md owns its fallback).
+2. Establish the host source of truth — a CNAME file holding exactly one host line, at the path `SITE_KIT_CNAME` names (site-kit/SPEC.md owns its fallback).
 
-3. Declare your aliases — write a `site-config.knobs` in your gates dir with one
-   `SITE_KIT_ALIASES[] = <host>` line per reachable host that is *not* the cited
-   docs host (www subdomains, redirect domains, the pre-CNAME Pages host). With
-   no such line the gate holds on defaults and finds nothing.
+3. Declare your aliases — write a `site-config.knobs` in your gates dir with one `SITE_KIT_ALIASES[] = <host>` line per reachable host that is *not* the cited docs host (www subdomains, redirect domains, the pre-CNAME Pages host). With no such line the gate holds on defaults and finds nothing.
 
-4. Optional highlight coverage — if your layout restyles code highlighting, track
-   a snapshot of the classes your theme's stylesheet colours (one `.<class>` per
-   line under a `# contract:` header) and set `SITE_KIT_HIGHLIGHT_TOKENS` to it
-   in `site-config.knobs`. The monitor's theme-drift arm prints the list to paste.
+4. Optional highlight coverage — if your layout restyles code highlighting, track a snapshot of the classes your theme's stylesheet colours (one `.<class>` per line under a `# contract:` header) and set `SITE_KIT_HIGHLIGHT_TOKENS` to it in `site-config.knobs`. The monitor's theme-drift arm prints the list to paste.
 
-5. Optional live monitor — copy `templates/site-health.yml` verbatim into
-   `.github/workflows/`, then set three groups of step env or delete the arm each
-   belongs to: `ALT_DOMAIN` (drop the alternate-host probe if you serve no
-   redirect alias), `RELEASE_NOTE_GLOB` / `RELEASE_NOTE_TAG_KEY` /
-   `RELEASE_NOTE_URL_PATH` (drop the release-body arm if you publish no release
-   notes), and `HIGHLIGHT_CSS_PATH` / `HIGHLIGHT_TOKENS_FILE` (the theme-drift
-   arm, skipped while both are empty). It opens/updates/closes a `site-health`
-   issue on its own schedule.
-   The release-body arm needs the template's `contents: read` permission — it is
-   an allowlist, not an addition — and `RELEASE_NOTE_URL_PATH` is the value worth
-   checking twice: site-kit/SPEC.md §templates/site-health.yml names the trap.
+5. Optional live monitor — copy `templates/site-health.yml` verbatim into `.github/workflows/`, then set three groups of step env or delete the arm each belongs to: `ALT_DOMAIN` (drop the alternate-host probe if you serve no redirect alias), `RELEASE_NOTE_GLOB` / `RELEASE_NOTE_TAG_KEY` / `RELEASE_NOTE_URL_PATH` (drop the release-body arm if you publish no release notes), and `HIGHLIGHT_CSS_PATH` / `HIGHLIGHT_TOKENS_FILE` (the theme-drift arm, skipped while both are empty). It opens/updates/closes a `site-health` issue on its own schedule. The release-body arm needs the template's `contents: read` permission — it is an allowlist, not an addition — and `RELEASE_NOTE_URL_PATH` is the value worth checking twice: site-kit/SPEC.md §templates/site-health.yml names the trap.
 
 ## Test
 

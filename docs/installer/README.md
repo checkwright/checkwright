@@ -6,48 +6,23 @@ generated: true
 <!-- door-contributor: a generated mirror of a kit's own contributor source; every door on the page is that source's, and the banner above is the regeneration recipe -->
 # Checkwright
 
-The activation path for **Checkwright** — a coding-agent-assisted delivery
-methodology shipped as installable kits: a self-testing gate SDK for
-prose/spec/config surfaces, an evidence-stamped iteration lifecycle designed
-for stateless agent sessions, and token-economics-aware context management.
+The activation path for **Checkwright** — a coding-agent-assisted delivery methodology shipped as installable kits: a self-testing gate SDK for prose/spec/config surfaces, an evidence-stamped iteration lifecycle designed for stateless agent sessions, and token-economics-aware context management.
 
 ## What this package is
 
-A one-shot vendoring installer. It copies pinned kit source out of its own
-payload into your repository and commits it, then prints the commands that
-finish the setup. What governs your tree afterwards is committed and auditable:
-every gate arrives with its declaration and the one-line invariant that
-declaration carries, its `# spec:` pointer, and its `good/`+`bad/` fixture pair,
-and a gate whose implementation is compiled arrives as a digest-verified binary
-rather than as source. The specification section behind each pointer is published
-rather than packed (gate-sdk/SPEC.md §Consumer payload, which rules that and
-bounds it).
+A one-shot vendoring installer. It copies pinned kit source out of its own payload into your repository and commits it, then prints the commands that finish the setup. What governs your tree afterwards is committed and auditable: every gate arrives with its declaration and the one-line invariant that declaration carries, its `# spec:` pointer, and its `good/`+`bad/` fixture pair, and a gate whose implementation is compiled arrives as a digest-verified binary rather than as source. The specification section behind each pointer is published rather than packed (gate-sdk/SPEC.md §Consumer payload, which rules that and bounds it).
 
-What it is not: a dependency channel. Nothing resolves at your build time and
-the installer writes no dependency reference, no registry lockfile entry and no
-install-time lifecycle script — the contract and what it costs are
-`installer/SPEC.md` §The dependency boundary.
+What it is not: a dependency channel. Nothing resolves at your build time and the installer writes no dependency reference, no registry lockfile entry and no install-time lifecycle script — the contract and what it costs are `installer/SPEC.md` §The dependency boundary.
 
 ## Before you run it
 
-Each transport carries its own requirement, and each belongs to the delivery
-path alone. The Release tarball needs `curl`, `tar` and either hasher
-(`sha256sum`, or the `shasum` stock macOS ships instead); npm needs
-Node, for `npx`. The gate battery this vendors uses none of them, and no
-delivery-path tool joins the toolchain roster.
+Each transport carries its own requirement, and each belongs to the delivery path alone. The Release tarball needs `curl`, `tar` and either hasher (`sha256sum`, or the `shasum` stock macOS ships instead); npm needs Node, for `npx`. The gate battery this vendors uses none of them, and no delivery-path tool joins the toolchain roster.
 
-The toolchain the battery *does* assert, with its version floors, is on the
-install page. `checkwright doctor` renders it as an exit status and `init` gates
-on that before any file is written, so a machine below the floor is refused
-rather than half-installed.
+The toolchain the battery *does* assert, with its version floors, is on the install page. `checkwright doctor` renders it as an exit status and `init` gates on that before any file is written, so a machine below the floor is refused rather than half-installed.
 
 ## Quick start
 
-From a clean git repository, at its root. Pick a version off the
-[releases](https://github.com/checkwright/checkwright/releases) page and
-substitute it for `X.Y.Z`. Unpack outside the repository: `init` refuses a
-worktree that is not clean, and an extracted `package/` in your root is exactly
-what makes it unclean.
+From a clean git repository, at its root. Pick a version off the [releases](https://github.com/checkwright/checkwright/releases) page and substitute it for `X.Y.Z`. Unpack outside the repository: `init` refuses a worktree that is not clean, and an extracted `package/` in your root is exactly what makes it unclean.
 
 ```bash
 cw="$(mktemp -d)"
@@ -63,30 +38,15 @@ curl -fsSL -o "$cw/checkwright-X.Y.Z.tgz.sha256" \
 sh "$cw/package/bin/checkwright.sh" init
 ```
 
-With Node already present the same install is one command, `npx checkwright
-init` — same payload, same `init`, same `checkwright.lock`; only the fetch
-differs.
+With Node already present the same install is one command, `npx checkwright init` — same payload, same `init`, same `checkwright.lock`; only the fetch differs.
 
-`init` vendors the selected profile's kit directories, writes a `gates.list`
-seeded with each kit's starting gates alongside the config seam those kits need,
-and makes **one commit** naming the profile and the version. It ends by printing
-the commands that finish the setup, each with its reason — deliberately not
-copied here, because what `init` prints is `init`'s to say
-(`installer/SPEC.md` §init).
+`init` vendors the selected profile's kit directories, writes a `gates.list` seeded with each kit's starting gates alongside the config seam those kits need, and makes **one commit** naming the profile and the version. It ends by printing the commands that finish the setup, each with its reason — deliberately not copied here, because what `init` prints is `init`'s to say (`installer/SPEC.md` §init).
 
-Re-running is idempotent and non-destructive. `init` reads the per-file hash
-`checkwright.lock` recorded: a file still at its recorded hash is rewritten, and
-one you have changed since is **reported rather than overwritten** unless you
-pass `--force`. `--dry-run` prints the file plan and the manifest and writes
-nothing.
+Re-running is idempotent and non-destructive. `init` reads the per-file hash `checkwright.lock` recorded: a file still at its recorded hash is rewritten, and one you have changed since is **reported rather than overwritten** unless you pass `--force`. `--dry-run` prints the file plan and the manifest and writes nothing.
 
 ## What you can run
 
-`init` makes an install; the rest manage one after it exists. Each is an arm of
-the gate binary the payload carries, reached through the bootstrap, and the
-roster's owner is the binary — `checkwright --help` reads it off the artifact
-rather than off a list beside it, so it cannot promise a verb this build does
-not implement.
+`init` makes an install; the rest manage one after it exists. Each is an arm of the gate binary the payload carries, reached through the bootstrap, and the roster's owner is the binary — `checkwright --help` reads it off the artifact rather than off a list beside it, so it cannot promise a verb this build does not implement.
 
 | verb | asks |
 | --- | --- |
@@ -97,33 +57,20 @@ not implement.
 | `uninstall` | reverse the install, keeping anything I have edited |
 | `demo` | show me the adoption arc without touching my repository |
 
-`doctor` and `diff` write nothing, so neither takes a `--dry-run`, and nor does
-`demo`, whose only writes are to a scratch repository it removes. Every verb
-that does write takes one, and it means the same thing in each: print the plan,
-write nothing, exit 0.
+`doctor` and `diff` write nothing, so neither takes a `--dry-run`, and nor does `demo`, whose only writes are to a scratch repository it removes. Every verb that does write takes one, and it means the same thing in each: print the plan, write nothing, exit 0.
 
-`uninstall` reverses an install against the roster `init` recorded, keeping and
-reporting any file you edited rather than removing it — which is what lets an
-evaluation you decide against leave nothing of its own behind.
+`uninstall` reverses an install against the roster `init` recorded, keeping and reporting any file you edited rather than removing it — which is what lets an evaluation you decide against leave nothing of its own behind.
 
 ## Choosing a profile
 
-`starter`, `delegation`, `prose`, `full`. Not four rungs on one ladder: the
-profiles are ordered by kit-set containment, so moving to one that contains
-yours only ever adds, and two that contain neither the other — `delegation` and
-`prose` — are alternatives rather than steps.
+`starter`, `delegation`, `prose`, `full`. Not four rungs on one ladder: the profiles are ordered by kit-set containment, so moving to one that contains yours only ever adds, and two that contain neither the other — `delegation` and `prose` — are alternatives rather than steps.
 
-- **`starter`** — the gate SDK on its own: a battery, a generated pre-commit
-  hook, and gates that red on real defects in your tree with no configuration
-  outside your gates directory.
+- **`starter`** — the gate SDK on its own: a battery, a generated pre-commit hook, and gates that red on real defects in your tree with no configuration outside your gates directory.
 - **`delegation`** — adds every kit whose subject is the agent session itself.
-- **`prose`** — adds canon-kit instead, for a repository whose artifacts are
-  documents rather than code.
+- **`prose`** — adds canon-kit instead, for a repository whose artifacts are documents rather than code.
 - **`full`** — everything in the payload.
 
-`starter`, `delegation` and `prose` are rosters in `profiles.list`, each
-membership recorded beside the criterion behind it; `full` is derived from the
-payload at run time rather than listed.
+`starter`, `delegation` and `prose` are rosters in `profiles.list`, each membership recorded beside the criterion behind it; `full` is derived from the payload at run time rather than listed.
 
 ## Where the design lives
 

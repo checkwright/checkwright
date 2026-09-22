@@ -12,11 +12,13 @@ awk -v sec="$section" '
     { print }
     !ins && substr($0, 1, length(sec)) == sec {
         print ""
-        print "- **Bloated:** this bullet runs on for well past the four-line"
+        print "- **Bloated:** this bullet runs on for well past the code-point"
         print "  budget across several continuation lines, and it openly cites"
         print "  a deeper doc at HANDBOOK §Somewhere, so the brevity gate must"
         print "  flag it as over budget while admitting that its detail already"
-        print "  lives in that referenced section rather than here."
+        print "  lives in that referenced section rather than here, which is"
+        print "  exactly the restatement a resident surface pays for at every"
+        print "  session that loads it."
         ins = 1
     }
 ' CLAUDE.md > CLAUDE.md.tmp && mv CLAUDE.md.tmp CLAUDE.md

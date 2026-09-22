@@ -1,567 +1,113 @@
 # DOCTRINE.md — the Checkwright delivery doctrine
 
-The cross-kit delivery rules the kits enforce piecemeal, stated once. This file
-is the deliverable of [doctrine-kit](README.md): referenced in place from a
-consumer's always-loaded agent file, never copy-installed — re-vendoring the kit
-*is* the doctrine upgrade. Each rule lands as its statement, why it holds under
-coding-agent work, and a pointer to the mechanism that enforces it; the
-mechanism and its knob rosters live in the cited kit SPEC, never restated here.
-Length is not graded: a clause stays for its class, never goes for its size
-([SPEC.md](SPEC.md) §The doctrine deliverable).
+The cross-kit delivery rules the kits enforce piecemeal, stated once. This file is the deliverable of [doctrine-kit](README.md): referenced in place from a consumer's always-loaded agent file, never copy-installed — re-vendoring the kit *is* the doctrine upgrade. Each rule lands as its statement, why it holds under coding-agent work, and a pointer to the mechanism that enforces it; the mechanism and its knob rosters live in the cited kit SPEC, never restated here. Length is not graded: a clause stays for its class, never goes for its size ([SPEC.md](SPEC.md) §The doctrine deliverable).
 
-The roster is in two registers. **Methodology-maintenance** rules govern how the
-methodology's own surfaces stay honest; they bear on every surface edit and form
-the always-loaded digest a consumer installs. **Engineering-craft** rules govern
-how the work built under the methodology is written; they are load-triggered by
-test, rename, git-rewrite, config-edit, and dispatch work and live behind the
-link — an application of the load-trigger residency rule to the doctrine itself.
+The roster is in two registers. **Methodology-maintenance** rules govern how the methodology's own surfaces stay honest; they bear on every surface edit and form the always-loaded digest a consumer installs. **Engineering-craft** rules govern how the work built under the methodology is written; they are load-triggered by test, rename, git-rewrite, config-edit, and dispatch work and live behind the link — an application of the load-trigger residency rule to the doctrine itself.
 
 ## Methodology-maintenance rules
 
-1. **Content-tiering / SSOT.** Every governed surface owns exactly one content
-   tier and *points to* — never restates — a fact another surface owns. An
-   instruction surface — template, agent definition, binding shim — owns the
-   instruction tier: its grounds go to the section owning the mechanism (a
-   failure it prevents included, undated), its history to version control. A
-   parallel copy is the defect; the fix is one shape: replace the slab with a
-   pointer to the owner, then a gate forbids it growing back.
-   *Under agent work:* a restated fact drifts the moment one copy is edited and
-   the other is not, and an agent reading the stale copy inherits the drift as
-   ground truth. One owner means one thing to keep true.
-   *Enforced by:* the anti-restatement gate family — the comment-tier and
-   manifest/prose gates in [canon-kit/SPEC.md](../canon-kit/SPEC.md); the
-   instruction-surface sentence is read at authoring — build's ritual, the
-   amendment Definition of Done — and is not gateable.
-   *Digest:* one content tier per surface; point, never restate.
+1. **Content-tiering / SSOT.** Every governed surface owns exactly one content tier and *points to* — never restates — a fact another surface owns. An instruction surface — template, agent definition, binding shim — owns the instruction tier: its grounds go to the section owning the mechanism (a failure it prevents included, undated), its history to version control. A parallel copy is the defect; the fix is one shape: replace the slab with a pointer to the owner, then a gate forbids it growing back. *Under agent work:* a restated fact drifts the moment one copy is edited and the other is not, and an agent reading the stale copy inherits the drift as ground truth. One owner means one thing to keep true. *Enforced by:* the anti-restatement gate family — the comment-tier and manifest/prose gates in [canon-kit/SPEC.md](../canon-kit/SPEC.md); the instruction-surface sentence is read at authoring — build's ritual, the amendment Definition of Done — and is not gateable.
 
-2. **Enforcement-first.** On any fix or redundancy finding, name the defect
-   class *and* the mechanism that catches it, and land both in one unit; a green
-   instance fix is the stop signal to ask what check should have caught it. When
-   the gate cannot land in the same unit, the instance fix rides the gate's unit
-   rather than landing bare. The mechanism is bought against a budget — gate
-   count, runtime, maintenance — so the strongest form is structural: remove the
-   duplication or collapse the surface so the defect class cannot recur, and no
-   gate is owed. No duplication with no gate outranks duplication with a gate;
-   tolerated duplication is the exception and carries its defence (the amendment
-   template's sanctioned-copy rule is the model). But for a drift-prone surface
-   that must exist, the gate is cheap insurance and is owed. The defence that
-   excuses a *missing* gate on such a surface is a high false-positive rate: a
-   noisy check breeds exemptions and erodes the battery's authority, so the
-   class a check cannot decide cleanly stays a stated manual duty rather than a
-   noisy gate. A stated manual duty carries a *named cadence*, or it is a duty
-   no session performs: the un-gateable class joins a tracked audit roster
-   reviewed on a lifecycle hook, with event-keyed due-ness — a named observable
-   event beats an iteration counter no surface tracks
-   ([lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) §The audit roster owns the
-   mechanism).
-   *Under agent work:* an unenforced rule is a rule the next session cannot see;
-   a gate is the only carrier of intent that survives a fresh context window.
-   *Enforced by:* the meta-gate contracts every gate must satisfy —
-   [gate-sdk/SPEC.md](../gate-sdk/SPEC.md).
-   *Digest:* the fix and the gate that catches it land in one unit; removing the duplication outranks gating it.
+    *Digest:* one content tier per surface; point, never restate.
 
-3. **De-literalization.** Prose cites names; code or the owning SPEC owns values.
-   Knob defaults, shared constants, and derivable rosters are stated once at
-   their owner, and prose names the knob or the roster rather than its value.
-   The duty widens past values to *source identifiers*: prose names the public
-   contract — the knob, the command, the entry point another surface calls —
-   never a source's internal identifiers or its step-by-step algorithm.
-   **Reach, judged at the file and not the kit, decides whether a name may
-   appear.** A shipped vendored library is a public contract by construction,
-   so its owning kit's SPEC may name any function it defines. Beyond that kit
-   only its exports may be named: an underscore-prefixed helper is private to
-   its kit, and another kit's prose naming one is a finding. The native crate
-   reads the same way, with the module in place of the file. An item visible
-   past its module (`pub`, `pub(crate)`, `pub(super)`) may be named. A private
-   item belongs to the component its nearest `spec:` pointer names (the item's
-   own pointer, else its module's first line), and any other component naming
-   it is a finding. **Reach is checked first.** Only a name it admits goes on
-   to the citation test, so a private name out of reach stays a finding even
-   when it is a decision's subject. Among admitted names, naming one as the
-   subject of a contract or decision is a citation. Inventorying a source's
-   helpers or narrating its branch conditions is the same defect as a copied
-   knob value: a second source of a fact the code owns, stale at the next
-   refactor. The WHY, the invariant and the public contract stay SPEC prose;
-   the WHAT and the how live in the source behind a pointer.
-   *Under agent work:* a literal copied into prose is a second source of a
-   number, and an agent that trusts the nearer copy ships the stale one; an
-   internal-helper inventory rots the same way, read as ground truth after the
-   refactor that renamed it.
-   *Enforced by:* for values, the bare-cardinal gate in
-   [canon-kit/SPEC.md](../canon-kit/SPEC.md) §check-manifest-count; the
-   source-identifier class cannot be gated cleanly — a SPEC legitimately names
-   an admitted identifier as a contract, and whether it cites one or inventories
-   them is a judgment — so the Enforcement-first false-positive
-   carve-out applies — and it rides that carve-out's cadence as the
-   `internal-identifier-restatement` seed member of the close-stage audit
-   roster (lifecycle-kit/SPEC.md §The audit roster), a stated authoring duty due on
-   heavy-SPEC contract edits and at release prep.
-   *Digest:* prose cites names; code or the owning SPEC owns values.
+2. **Enforcement-first.** On any fix or redundancy finding, name the defect class *and* the mechanism that catches it, and land both in one unit; a green instance fix is the stop signal to ask what check should have caught it. When the gate cannot land in the same unit, the instance fix rides the gate's unit rather than landing bare. The mechanism is bought against a budget — gate count, runtime, maintenance — so the strongest form is structural: remove the duplication or collapse the surface so the defect class cannot recur, and no gate is owed. No duplication with no gate outranks duplication with a gate; tolerated duplication is the exception and carries its defence (the amendment template's sanctioned-copy rule is the model). But for a drift-prone surface that must exist, the gate is cheap insurance and is owed. The defence that excuses a *missing* gate on such a surface is a high false-positive rate: a noisy check breeds exemptions and erodes the battery's authority, so the class a check cannot decide cleanly stays a stated manual duty rather than a noisy gate. A stated manual duty carries a *named cadence*, or it is a duty no session performs: the un-gateable class joins a tracked audit roster reviewed on a lifecycle hook, with event-keyed due-ness — a named observable event beats an iteration counter no surface tracks ([lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) §The audit roster owns the mechanism). *Under agent work:* an unenforced rule is a rule the next session cannot see; a gate is the only carrier of intent that survives a fresh context window. *Enforced by:* the meta-gate contracts every gate must satisfy — [gate-sdk/SPEC.md](../gate-sdk/SPEC.md).
 
-4. **Derivation-first.** A fact a tool can derive from the tree is derived at
-   use time, never maintained as its own surface. The ladder: derive; else
-   state once at the owner and point (the Content-tiering / SSOT rule); and a
-   second copy a reader genuinely needs is a generated projection with a
-   freshness gate, never a hand-maintained restatement. Whether what remains
-   earns a gate is the Enforcement-first weighing. A count of a collection is
-   the archetypal derivable fact: the collection is its own counting surface,
-   and a stated total anywhere else is a duplicate counting surface, off by
-   one at the next member.
-   *Under agent work:* a hand-maintained enumeration of a derivable set is a
-   copy of the tree that is stale at the next edit, and an agent trusts the
-   nearer roster over the tree it summarizes; derivation deletes the drift
-   axis rather than gating it.
-   *Enforced by:* the derivation seams and their residual meta-checks — the
-   `kit:` couple expansion with its hand-list gate in
-   [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §check-kit-enum, the generated
-   projections' byte-compare freshness assertions in
-   [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §check-graph, and the
-   bare-cardinal gate in [canon-kit/SPEC.md](../canon-kit/SPEC.md)
-   §check-manifest-count.
-   *Digest:* derive the derivable (a roster, a count), never maintain it; a needed copy is generated and freshness-gated.
+    *Digest:* the fix and the gate that catches it land in one unit; removing the duplication outranks gating it.
 
-5. **Always-loaded shape.** A rule in the always-loaded agent file is one line —
-   the convention plus a pointer; its mechanism, rosters, and defaults live
-   behind the pointer in the owning doc.
-   *Under agent work:* the always-loaded file is read in full at every session
-   start, so every line spent restating a mechanism is context tax on every
-   task; a one-line pointer pays once and loads the detail only when needed.
-   No tier is free: an on-demand doc pays at every open, and one a stage opens
-   each iteration is always-loaded in effect, so brevity binds every governed
-   file and the close pass walks each one that grew.
-   *Enforced by:* the brevity budget and the per-file growth ratchet in
-   [context-kit/SPEC.md](../context-kit/SPEC.md) §The brevity gate and
-   §The surface ratchet.
-   *Digest:* one line per rule here; the mechanism behind the pointer.
+3. **De-literalization.** Prose cites names; code or the owning SPEC owns values. Knob defaults, shared constants, and derivable rosters are stated once at their owner, and prose names the knob or the roster rather than its value. The duty widens past values to *source identifiers*: prose names the public contract — the knob, the command, the entry point another surface calls — never a source's internal identifiers or its step-by-step algorithm. **Reach, judged at the file and not the kit, decides whether a name may appear.** A shipped vendored library is a public contract by construction, so its owning kit's SPEC may name any function it defines. Beyond that kit only its exports may be named: an underscore-prefixed helper is private to its kit, and another kit's prose naming one is a finding. The native crate reads the same way, with the module in place of the file. An item visible past its module (`pub`, `pub(crate)`, `pub(super)`) may be named. A private item belongs to the component its nearest `spec:` pointer names (the item's own pointer, else its module's first line), and any other component naming it is a finding. **Reach is checked first.** Only a name it admits goes on to the citation test, so a private name out of reach stays a finding even when it is a decision's subject. Among admitted names, naming one as the subject of a contract or decision is a citation. Inventorying a source's helpers or narrating its branch conditions is the same defect as a copied knob value: a second source of a fact the code owns, stale at the next refactor. The WHY, the invariant and the public contract stay SPEC prose; the WHAT and the how live in the source behind a pointer. *Under agent work:* a literal copied into prose is a second source of a number, and an agent that trusts the nearer copy ships the stale one; an internal-helper inventory rots the same way, read as ground truth after the refactor that renamed it. *Enforced by:* for values, the bare-cardinal gate in [canon-kit/SPEC.md](../canon-kit/SPEC.md) §check-manifest-count; the source-identifier class cannot be gated cleanly — a SPEC legitimately names an admitted identifier as a contract, and whether it cites one or inventories them is a judgment — so the Enforcement-first false-positive carve-out applies — and it rides that carve-out's cadence as the `internal-identifier-restatement` seed member of the close-stage audit roster (lifecycle-kit/SPEC.md §The audit roster), a stated authoring duty due on heavy-SPEC contract edits and at release prep.
 
-6. **Load-trigger residency.** The always-loaded file earns a rule only when no
-   stage, skill, or tool-call trigger exists to load it; anything a trigger can
-   pull lives in its owned doc behind that trigger.
-   *Under agent work:* always-loaded context is the scarcest budget; a rule that
-   a stage or a tool call would load anyway costs nothing to defer and everything
-   to keep resident.
-   *Enforced by:* the stage/skill load-triggers in
-   [lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) and the tool-call hook seam in
-   [guard-kit/SPEC.md](../guard-kit/SPEC.md), which give every triggered rule a home
-   that loads on demand.
-   *Digest:* resident only when no stage, skill, or tool loads it.
+    *Digest:* prose cites names; code or the owning SPEC owns values.
 
-7. **Widest-true-tier placement.** A fact lands at the widest tier where it holds
-   for every reader of that tier: kit-shipped surface when true for every
-   consumer, a consumer-tracked binding or config when it names this repo's own
-   choices, the local-only private brief when it cannot be published. A
-   template's binding-slot grammar is the seam marker between the first two.
-   *Under agent work:* a fact placed too narrow is re-derived by every reader who
-   needed it wider; placed too wide, it publishes a choice or a secret that was
-   never the reader's to see.
-   *Enforced by:* the binding-slot grammar in
-   [lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) §check-skill-binding, the seam
-   marker between kit-shipped and consumer-tracked tiers.
-   *Digest:* the widest tier true for every reader of it.
+4. **Derivation-first.** A fact a tool can derive from the tree is derived at use time, never maintained as its own surface. The ladder: derive; else state once at the owner and point (the Content-tiering / SSOT rule); and a second copy a reader genuinely needs is a generated projection with a freshness gate, never a hand-maintained restatement. Whether what remains earns a gate is the Enforcement-first weighing. A count of a collection is the archetypal derivable fact: the collection is its own counting surface, and a stated total anywhere else is a duplicate counting surface, off by one at the next member. *Under agent work:* a hand-maintained enumeration of a derivable set is a copy of the tree that is stale at the next edit, and an agent trusts the nearer roster over the tree it summarizes; derivation deletes the drift axis rather than gating it. *Enforced by:* the derivation seams and their residual meta-checks — the `kit:` couple expansion with its hand-list gate in [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §check-kit-enum, the generated projections' byte-compare freshness assertions in [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §check-graph, and the bare-cardinal gate in [canon-kit/SPEC.md](../canon-kit/SPEC.md) §check-manifest-count.
 
-8. **Oracle-first.** A check's output is its interface: run the gate instead of
-   emulating it, and treat a red run — including a red commit attempt, where the
-   generated hook runs exactly the coupled subset — as the designed feedback
-   channel, not an incident. Gate source is opened to fix the gate or write its
-   fixtures, never to predict its verdict. Nor is a diagnostic the session did
-   not run an oracle: an editor or language-server report the harness surfaces
-   unasked answers to no pinned toolchain and no snapshot the session controls,
-   so one contradicting the oracle is settled by re-running the oracle, never by
-   editing code the oracle passed. The battery is an oracle but not the
-   only one: a change whose real output is a deployed or generated artifact — a
-   rendered site, a compiled binary, a published package — is *tree-correct*
-   when the battery is green but not yet *artifact-correct*, so it names the
-   artifact surface it carries and exercises that artifact before the task is
-   done, never inferring artifact behaviour from a clean battery. Reachable
-   includes cheap-to-stand-up: an absent-but-installable runtime is one install
-   command away, not unreachable, so it is exercised too.
-   *Under agent work:* a deterministic check costs seconds and zero context;
-   reading its source to anticipate the verdict costs more than running the whole
-   battery and can still be wrong. The replica that exercises an artifact is
-   honest only when deployment-faithful — toolchain version- and plugin-matched
-   to the pinned deployment; a newer local toolchain invents failures the
-   deployment never shows and masks real ones it would, making it a second wrong
-   oracle rather than a check. An ambient report is the cheapest wrong oracle to
-   trust, because it arrives in context unrequested and in a compiler's voice.
-   *Enforced by:* the gate output contract in
-   [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) — the `clean` and `help:` lines are
-   written to be that interface — and the targeted-run resolver reachable through
-   the generated hook. Whether a session acted on an ambient report leaves no
-   residue in the tree, so that clause is judgment.
-   *Digest:* run the gate, never emulate it; a red run is the feedback channel.
+    *Digest:* derive the derivable (a roster, a count), never maintain it; a needed copy is generated and freshness-gated.
 
-9. **Spec-over-precedent.** A gate-enforced doc is ground truth: read the
-   owner, never mine git history or a prior session's artifacts for how to do
-   what an owned surface already specifies. History answers *what happened*,
-   never *what is correct*; precedent is consulted only where no owner exists,
-   and that consultation is a doc gap to capture, not a habit to keep.
-   *Under agent work:* models train on repos whose docs lag practice, so
-   "imitate the last instance" is a reflex prior — and here it is inverted:
-   the gates hold docs and practice convergent, so mimicking a prior session
-   re-imports as house style exactly the deviation that session was gated on.
-   *Enforced by:* the battery itself, which is what makes the owner doc
-   trustworthy, plus the knowledge-friction loop
-   ([drift-kit/SPEC.md](../drift-kit/SPEC.md) §The knowledge-friction loop) —
-   a fact with no owner gets one, shrinking the space where history is the
-   only oracle. No scanner sees *how* a session derived a choice; this rule
-   is judgment with a capture mechanism, not a gate.
-   *Digest:* the owner doc is ground truth; history answers what happened, never what is correct.
+5. **Always-loaded shape.** A rule in the always-loaded agent file is one line — the convention plus a pointer; its mechanism, rosters, and defaults live behind the pointer in the owning doc. *Under agent work:* the always-loaded file is read in full at every session start, so every line spent restating a mechanism is context tax on every task; a one-line pointer pays once and loads the detail only when needed. No tier is free: an on-demand doc pays at every open, and one a stage opens each iteration is always-loaded in effect, so brevity binds every governed file and the close pass walks each one that grew. *Enforced by:* the brevity budget and the per-file growth ratchet in [context-kit/SPEC.md](../context-kit/SPEC.md) §The brevity gate and §The surface ratchet.
 
-10. **Gap disposition.** A gap a session surfaces but will not close this
-   session — a coverage hole, a design defect, an escaping class — is *costed*,
-   not merely flagged: the session works out how the gap could be closed and
-   lands that analysis where the next session finds it, as a new queue entry or
-   an enrichment of the standing deferred entry that owns it. A bare
-   flag-and-skip is the defect. This is the knowledge-friction loop one altitude
-   up — that loop captures re-derived *facts* with no owner; this rule captures
-   the *design and coverage gaps* a session leaves behind. It fills the space
-   between two neighbours: Spec-over-precedent captures a doc gap met during
-   precedent consultation, Enforcement-first governs a fix being *landed*, and
-   neither governs a gap being *deferred*.
-   *Under agent work:* a fresh context window cannot see a gap the prior session
-   only reasoned about; an unwritten deferral is one the next session
-   re-discovers from scratch, and the costed remedy is the only carrier of the
-   analysis across the reset.
-   *Enforced by:* judgment with a capture mechanism, not a gate — whether a
-   session costed the remedy is not machine-decidable (the Enforcement-first
-   false-positive carve-out, on Spec-over-precedent's model). It rides the
-   queue's Deferred section for design gaps and the knowledge-friction log
-   ([drift-kit/SPEC.md](../drift-kit/SPEC.md) §The knowledge-friction loop) for
-   fact gaps.
-   *Digest:* a gap you defer is costed and filed, never flagged-and-skipped.
+    *Digest:* one line per rule here; the mechanism behind the pointer.
 
-11. **Scope-gated intake.** Delivery work enters only through the scope gate. A
-   new initiative raised mid-session — an operator or lead feature request, a
-   design idea, a "while we're here" — is *filed* as a costed Deferred entry by
-   default, never *started*: it becomes active work only by passing through scope
-   as an iteration's chosen unit. The default is file, not act, because starting
-   unscoped work skips the survey, the economic composition test, and the
-   feature/debt triage scope exists to run. This is Gap disposition's
-   intake-side sibling, guarding the *opposite* failure: that rule catches a gap
-   flagged and skipped (under-action on something found), this one catches a want
-   acted on before it is scoped (over-action on something raised). The rule
-   licenses no self-exemption — editing a governance surface is itself delivery
-   work, so codifying or amending this doctrine is done as a scoped unit, not the
-   very out-of-band edit it forbids.
-   **The one valve is the operator's hotfix ruling, and it is a ruling rather
-   than a judgment call.** An *impacting failure* — a defect that is paying a
-   measured, recurring cost on the lifecycle's own default path right now, such
-   that routing it through a whole iteration costs more than the fix — may be
-   landed in-session when the operator rules it a hotfix. The valve is bounded
-   three ways: the operator rules, never the session; the fix is minimal and
-   ships with its test and its owner-doc correction in the same commit, so the
-   hotfix is not a second content tier waiting for the iteration to catch up —
-   and *minimal* is measured against the failure modes the change itself
-   creates, never against the smallest diff, so a fix reaching one site further
-   to avoid introducing a failure mode its own diff would create is inside the
-   valve rather than outside it;
-   and the queue entry is **deleted in that commit, never moved to the done
-   section** — the ruling and the entry's slug go in the commit message, which
-   is the disposition. The done section is the closing iteration's ledger, and
-   a hotfix belongs to no iteration: a row left there is claimed by the next
-   close as its own delivery and can red the next boundary entry. A session
-   that sees an impacting failure
-   *proposes* the hotfix with its cost against the iteration's, and files it
-   if the operator does not rule — the default is still file.
-   *Under agent work:* an eager context reads a raised want as an instruction to
-   act *now* and will start building it in-session, bypassing scope entirely; the
-   default-to-file reflex is the one a fresh window least reliably supplies, so it
-   is stated rather than assumed.
-   *Enforced by:* judgment with a capture mechanism, not a gate — whether a raised
-   want should have been filed rather than started is not machine-decidable (the
-   Enforcement-first false-positive carve-out, on Gap disposition's model). The
-   intake it names is scope's — the survey that bounds an iteration's units
-   ([lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) §The state machine) — and the
-   filed form rides the queue's Deferred section.
-   *Digest:* a mid-session initiative is filed as a costed Deferred entry by default, never started; work enters only through scope — or through an operator-ruled hotfix of an impacting failure, minimal and test-and-doc-complete in one commit.
+6. **Load-trigger residency.** The always-loaded file earns a rule only when no stage, skill, or tool-call trigger exists to load it; anything a trigger can pull lives in its owned doc behind that trigger. *Under agent work:* always-loaded context is the scarcest budget; a rule that a stage or a tool call would load anyway costs nothing to defer and everything to keep resident. *Enforced by:* the stage/skill load-triggers in [lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) and the tool-call hook seam in [guard-kit/SPEC.md](../guard-kit/SPEC.md), which give every triggered rule a home that loads on demand.
 
-12. **Probe-before-assertion.** A claim about the tree, the harness, or a tool's
-    behavior that one cheap command would settle is probed before it is
-    asserted, and what the probe returned travels with the claim. The bar is
-    *availability, not confidence*: a claim is unprobed if a command that would
-    have settled it was there to run and was not, however well-reasoned the
-    assertion. This is Oracle-first's design-time sibling and the two divide
-    cleanly — that rule governs the claim a gate already decides and says run the
-    gate; this one governs the claim made at scope, at spec, in a survey, or in a
-    dispatch, where no oracle is running and standing one up costs a grep. It
-    binds a *relayed* claim as hard as an authored one: forwarding an unverified
-    premise is asserting it, and the forwarder owns the probe the originator
-    skipped. It binds **outbound** claims too, and that reach does not follow
-    from the inward examples: proposing that the operator file a report, open an
-    issue, or escalate to a vendor asserts the thing is *unreported* — a claim
-    about the world the proposal presumes, and one search from settled. The
-    outbound reach is stated rather than left to be derived, because holding the
-    general rule demonstrably does not produce it: the inward habit and the
-    outward one are learned separately.
-    **A probe that ran can still fail to settle the claim, and its silence reads
-    exactly like an answer.** A keyword sweep cannot find prose that describes a
-    thing without naming it, and a bounded window (`grep -A`, a line range) says
-    nothing about the lines past its edge — neither reports its own coverage. So a
-    probe's *coverage* is checked before its silence is read as a negative — a
-    second sweep on a paraphrase, or the section's real extent against the window.
-    *Under agent work:* an agent's prose reads identically whether it was
-    measured or inferred, so an unprobed premise enters the record
-    indistinguishable from a verified one and is inherited downstream as settled
-    fact. Each hand-off raises its apparent authority without adding evidence,
-    and the correction cost lands on whichever later session finally runs the
-    command — by which point the claim has shaped the work built on it.
-    *Enforced by:* judgment with a capture mechanism, not a gate — whether a
-    claim was probed is not machine-decidable (the Enforcement-first
-    false-positive carve-out, on Gap disposition's model). Its capture surfaces
-    are the survey record's witness discipline and the queue's practice of
-    dating premise corrections into entry bodies
-    ([lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) §The survey record).
-    Whether any slice of the class is mechanizable is open.
+    *Digest:* resident only when no stage, skill, or tool loads it.
+
+7. **Widest-true-tier placement.** A fact lands at the widest tier where it holds for every reader of that tier: kit-shipped surface when true for every consumer, a consumer-tracked binding or config when it names this repo's own choices, the local-only private brief when it cannot be published. A template's binding-slot grammar is the seam marker between the first two. *Under agent work:* a fact placed too narrow is re-derived by every reader who needed it wider; placed too wide, it publishes a choice or a secret that was never the reader's to see. *Enforced by:* the binding-slot grammar in [lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) §check-skill-binding, the seam marker between kit-shipped and consumer-tracked tiers.
+
+    *Digest:* the widest tier true for every reader of it.
+
+8. **Oracle-first.** A check's output is its interface: run the gate instead of emulating it, and treat a red run — including a red commit attempt, where the generated hook runs exactly the coupled subset — as the designed feedback channel, not an incident. Gate source is opened to fix the gate or write its fixtures, never to predict its verdict. Nor is a diagnostic the session did not run an oracle: an editor or language-server report the harness surfaces unasked answers to no pinned toolchain and no snapshot the session controls, so one contradicting the oracle is settled by re-running the oracle, never by editing code the oracle passed. The battery is an oracle but not the only one: a change whose real output is a deployed or generated artifact — a rendered site, a compiled binary, a published package — is *tree-correct* when the battery is green but not yet *artifact-correct*, so it names the artifact surface it carries and exercises that artifact before the task is done, never inferring artifact behaviour from a clean battery. Reachable includes cheap-to-stand-up: an absent-but-installable runtime is one install command away, not unreachable, so it is exercised too. *Under agent work:* a deterministic check costs seconds and zero context; reading its source to anticipate the verdict costs more than running the whole battery and can still be wrong. The replica that exercises an artifact is honest only when deployment-faithful — toolchain version- and plugin-matched to the pinned deployment; a newer local toolchain invents failures the deployment never shows and masks real ones it would, making it a second wrong oracle rather than a check. An ambient report is the cheapest wrong oracle to trust, because it arrives in context unrequested and in a compiler's voice. *Enforced by:* the gate output contract in [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) — the `clean` and `help:` lines are written to be that interface — and the targeted-run resolver reachable through the generated hook. Whether a session acted on an ambient report leaves no residue in the tree, so that clause is judgment.
+
+    *Digest:* run the gate, never emulate it; a red run is the feedback channel.
+
+9. **Spec-over-precedent.** A gate-enforced doc is ground truth: read the owner, never mine git history or a prior session's artifacts for how to do what an owned surface already specifies. History answers *what happened*, never *what is correct*; precedent is consulted only where no owner exists, and that consultation is a doc gap to capture, not a habit to keep. *Under agent work:* models train on repos whose docs lag practice, so "imitate the last instance" is a reflex prior — and here it is inverted: the gates hold docs and practice convergent, so mimicking a prior session re-imports as house style exactly the deviation that session was gated on. *Enforced by:* the battery itself, which is what makes the owner doc trustworthy, plus the knowledge-friction loop ([drift-kit/SPEC.md](../drift-kit/SPEC.md) §The knowledge-friction loop) — a fact with no owner gets one, shrinking the space where history is the only oracle. No scanner sees *how* a session derived a choice; this rule is judgment with a capture mechanism, not a gate.
+
+    *Digest:* the owner doc is ground truth; history answers what happened, never what is correct.
+
+10. **Gap disposition.** A gap a session surfaces but will not close this session — a coverage hole, a design defect, an escaping class — is *costed*, not merely flagged: the session works out how the gap could be closed and lands that analysis where the next session finds it, as a new queue entry or an enrichment of the standing deferred entry that owns it. A bare flag-and-skip is the defect. This is the knowledge-friction loop one altitude up — that loop captures re-derived *facts* with no owner; this rule captures the *design and coverage gaps* a session leaves behind. It fills the space between two neighbours: Spec-over-precedent captures a doc gap met during precedent consultation, Enforcement-first governs a fix being *landed*, and neither governs a gap being *deferred*. *Under agent work:* a fresh context window cannot see a gap the prior session only reasoned about; an unwritten deferral is one the next session re-discovers from scratch, and the costed remedy is the only carrier of the analysis across the reset. *Enforced by:* judgment with a capture mechanism, not a gate — whether a session costed the remedy is not machine-decidable (the Enforcement-first false-positive carve-out, on Spec-over-precedent's model). It rides the queue's Deferred section for design gaps and the knowledge-friction log ([drift-kit/SPEC.md](../drift-kit/SPEC.md) §The knowledge-friction loop) for fact gaps.
+
+    *Digest:* a gap you defer is costed and filed, never flagged-and-skipped.
+
+11. **Scope-gated intake.** Delivery work enters only through the scope gate. A new initiative raised mid-session — an operator or lead feature request, a design idea, a "while we're here" — is *filed* as a costed Deferred entry by default, never *started*: it becomes active work only by passing through scope as an iteration's chosen unit. The default is file, not act, because starting unscoped work skips the survey, the economic composition test, and the feature/debt triage scope exists to run. This is Gap disposition's intake-side sibling, guarding the *opposite* failure: that rule catches a gap flagged and skipped (under-action on something found), this one catches a want acted on before it is scoped (over-action on something raised). The rule licenses no self-exemption — editing a governance surface is itself delivery work, so codifying or amending this doctrine is done as a scoped unit, not the very out-of-band edit it forbids. **The one valve is the operator's hotfix ruling, and it is a ruling rather than a judgment call.** An *impacting failure* — a defect that is paying a measured, recurring cost on the lifecycle's own default path right now, such that routing it through a whole iteration costs more than the fix — may be landed in-session when the operator rules it a hotfix. The valve is bounded three ways: the operator rules, never the session; the fix is minimal and ships with its test and its owner-doc correction in the same commit, so the hotfix is not a second content tier waiting for the iteration to catch up — and *minimal* is measured against the failure modes the change itself creates, never against the smallest diff, so a fix reaching one site further to avoid introducing a failure mode its own diff would create is inside the valve rather than outside it; and the queue entry is **deleted in that commit, never moved to the done section** — the ruling and the entry's slug go in the commit message, which is the disposition. The done section is the closing iteration's ledger, and a hotfix belongs to no iteration: a row left there is claimed by the next close as its own delivery and can red the next boundary entry. A session that sees an impacting failure *proposes* the hotfix with its cost against the iteration's, and files it if the operator does not rule — the default is still file. *Under agent work:* an eager context reads a raised want as an instruction to act *now* and will start building it in-session, bypassing scope entirely; the default-to-file reflex is the one a fresh window least reliably supplies, so it is stated rather than assumed. *Enforced by:* judgment with a capture mechanism, not a gate — whether a raised want should have been filed rather than started is not machine-decidable (the Enforcement-first false-positive carve-out, on Gap disposition's model). The intake it names is scope's — the survey that bounds an iteration's units ([lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) §The state machine) — and the filed form rides the queue's Deferred section.
+
+    *Digest:* a mid-session initiative is filed as a costed Deferred entry by default, never started; work enters only through scope — or through an operator-ruled hotfix of an impacting failure, minimal and test-and-doc-complete in one commit.
+
+12. **Probe-before-assertion.** A claim about the tree, the harness, or a tool's behavior that one cheap command would settle is probed before it is asserted, and what the probe returned travels with the claim. The bar is *availability, not confidence*: a claim is unprobed if a command that would have settled it was there to run and was not, however well-reasoned the assertion. This is Oracle-first's design-time sibling and the two divide cleanly — that rule governs the claim a gate already decides and says run the gate; this one governs the claim made at scope, at spec, in a survey, or in a dispatch, where no oracle is running and standing one up costs a grep. It binds a *relayed* claim as hard as an authored one: forwarding an unverified premise is asserting it, and the forwarder owns the probe the originator skipped. It binds **outbound** claims too, and that reach does not follow from the inward examples: proposing that the operator file a report, open an issue, or escalate to a vendor asserts the thing is *unreported* — a claim about the world the proposal presumes, and one search from settled. The outbound reach is stated rather than left to be derived, because holding the general rule demonstrably does not produce it: the inward habit and the outward one are learned separately. **A probe that ran can still fail to settle the claim, and its silence reads exactly like an answer.** A keyword sweep cannot find prose that describes a thing without naming it, and a bounded window (`grep -A`, a line range) says nothing about the lines past its edge — neither reports its own coverage. So a probe's *coverage* is checked before its silence is read as a negative — a second sweep on a paraphrase, or the section's real extent against the window. *Under agent work:* an agent's prose reads identically whether it was measured or inferred, so an unprobed premise enters the record indistinguishable from a verified one and is inherited downstream as settled fact. Each hand-off raises its apparent authority without adding evidence, and the correction cost lands on whichever later session finally runs the command — by which point the claim has shaped the work built on it. *Enforced by:* judgment with a capture mechanism, not a gate — whether a claim was probed is not machine-decidable (the Enforcement-first false-positive carve-out, on Gap disposition's model). Its capture surfaces are the survey record's witness discipline and the queue's practice of dating premise corrections into entry bodies ([lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) §The survey record). Whether any slice of the class is mechanizable is open.
+
     *Digest:* a claim one cheap command would settle is probed before it is asserted; relaying an unverified premise is asserting it.
 
 ## Engineering-craft rules
 
-13. **Spec-invariant test naming.** A test of a spec-mandated invariant encodes
-   that invariant in its *name*; the SPEC's test-requirement section owns which
-   invariants a test must cover. A spec-clause *comment* on the test is not a
-   substitute — it duplicates what the name should carry and rots silently when
-   the clause is renamed.
-   *Under agent work:* a test name is the line read at every failure and kept
-   across refactors; an agent scanning a failing suite reads names, not comment
-   pointers, so the invariant must live where the failure surfaces it.
-   *Enforced by:* the test-naming convention, and canon-kit's `check-comment-tier`
-   ([canon-kit/SPEC.md](../canon-kit/SPEC.md)) — which sweeps the comment
-   substitute out rather than blessing it, leaving the name as the only place to
-   carry the invariant.
-   *Stages:* build, validate
+13. **Spec-invariant test naming.** A test of a spec-mandated invariant encodes that invariant in its *name*; the SPEC's test-requirement section owns which invariants a test must cover. A spec-clause *comment* on the test is not a substitute — it duplicates what the name should carry and rots silently when the clause is renamed. *Under agent work:* a test name is the line read at every failure and kept across refactors; an agent scanning a failing suite reads names, not comment pointers, so the invariant must live where the failure surfaces it. *Enforced by:* the test-naming convention, and canon-kit's `check-comment-tier` ([canon-kit/SPEC.md](../canon-kit/SPEC.md)) — which sweeps the comment substitute out rather than blessing it, leaving the name as the only place to carry the invariant.
 
-14. **Test from the real consumer's runtime.** Verify a contract from the runtime
-   of its real consumer, never a more lenient stand-in; a failure at a higher
-   test layer with no failing test at the layer below is a coverage gap in the
-   lower layer, closed there first.
-   *Under agent work:* an agent scripts the contract from whatever client is
-   easiest to drive, and a lenient stand-in passes what the real consumer's
-   stricter stack would reject — a green the production caller does not share.
-   *Enforced by:* a test-layer convention, not yet a checkwright gate: a consumer
-   registers its real-consumer suites in the validate battery
-   ([evidence-kit/SPEC.md](../evidence-kit/SPEC.md)), where a held-constant
-   baseline turns a dropped layer into a red validate.
-   *Stages:* build, validate
-
-15. **Inspectable-run discipline.** A component a test or an automation spawns
-    must emit a readable log to an inspectable path — never a muted sink; on a
-    failure, read that evidence before theorizing. A run you cannot inspect
-    barely beats a guess.
-    *Under agent work:* an agent theorizes confidently from nothing; forcing every
-    spawned component to leave an inspectable artifact converts a guess into a
-    read, and recorded evidence beats a reconstructed hypothesis.
-    *Enforced by:* the convention, kin to delegation-kit's resume-journal
-    discipline ([delegation-kit/SPEC.md](../delegation-kit/SPEC.md)) — the same
-    move of making a background actor write an inspectable record rather than
-    trusting its self-report.
     *Stages:* build, validate
 
-16. **Rename is a full-surface sweep.** A rename sweeps every surface in
-    lockstep — prose, fixtures, and docs, not only the compiler-checked
-    identifiers; the done-gate is a text-level completeness check, not the
-    type-checker, and an in-progress rename is verified by a completeness scan
-    before it is called finished.
-    *Under agent work:* an agent reads a green type-check as "rename done" and
-    leaves the retired term alive in every surface the compiler never sees; only
-    a text-level sweep closes it.
-    *Enforced by:* a text-level completeness check whose term list is *consumer
-    config*, never a kit literal — the same seam that keeps product vocabulary
-    out of shipped mechanism ([gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §The
-    provenance seam), so the check ships and the vocabulary stays with the
-    consumer.
+14. **Test from the real consumer's runtime.** Verify a contract from the runtime of its real consumer, never a more lenient stand-in; a failure at a higher test layer with no failing test at the layer below is a coverage gap in the lower layer, closed there first. *Under agent work:* an agent scripts the contract from whatever client is easiest to drive, and a lenient stand-in passes what the real consumer's stricter stack would reject — a green the production caller does not share. *Enforced by:* a test-layer convention, not yet a checkwright gate: a consumer registers its real-consumer suites in the validate battery ([evidence-kit/SPEC.md](../evidence-kit/SPEC.md)), where a held-constant baseline turns a dropped layer into a red validate.
+
+    *Stages:* build, validate
+
+15. **Inspectable-run discipline.** A component a test or an automation spawns must emit a readable log to an inspectable path — never a muted sink; on a failure, read that evidence before theorizing. A run you cannot inspect barely beats a guess. *Under agent work:* an agent theorizes confidently from nothing; forcing every spawned component to leave an inspectable artifact converts a guess into a read, and recorded evidence beats a reconstructed hypothesis. *Enforced by:* the convention, kin to delegation-kit's resume-journal discipline ([delegation-kit/SPEC.md](../delegation-kit/SPEC.md)) — the same move of making a background actor write an inspectable record rather than trusting its self-report.
+
+    *Stages:* build, validate
+
+16. **Rename is a full-surface sweep.** A rename sweeps every surface in lockstep — prose, fixtures, and docs, not only the compiler-checked identifiers; the done-gate is a text-level completeness check, not the type-checker, and an in-progress rename is verified by a completeness scan before it is called finished. *Under agent work:* an agent reads a green type-check as "rename done" and leaves the retired term alive in every surface the compiler never sees; only a text-level sweep closes it. *Enforced by:* a text-level completeness check whose term list is *consumer config*, never a kit literal — the same seam that keeps product vocabulary out of shipped mechanism ([gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §The provenance seam), so the check ships and the vocabulary stays with the consumer.
+
     *Stages:* build
 
-17. **Config edits are merges, not rewrites.** Edit a config or settings file
-    with targeted, string-scoped edits, never a full-file write reconstructed
-    from a partial read — a whole-file write built from part of the file
-    silently drops everything the write did not carry. And validate an
-    apparently broken file with the format's own parser before calling it
-    corrupt: an apparent corruption is usually a parse by the wrong tool, not
-    damaged content.
-    *Under agent work:* an agent reads the top of a settings file, writes the
-    whole file back from that fragment, and the keys it never read vanish with
-    no diff to flag them; or it declares a file corrupt off a wrong-tool parse
-    and "repairs" a file that was already valid.
-    *Enforced by:* a convention, not yet a checkwright gate — the harness's Edit
-    tool is the mechanism (an exact-string replace that fails loudly on a
-    missing or ambiguous match, keeping the write scoped to what was read); no
-    gate asserts a given edit was a merge rather than a rewrite.
+17. **Config edits are merges, not rewrites.** Edit a config or settings file with targeted, string-scoped edits, never a full-file write reconstructed from a partial read — a whole-file write built from part of the file silently drops everything the write did not carry. And validate an apparently broken file with the format's own parser before calling it corrupt: an apparent corruption is usually a parse by the wrong tool, not damaged content. *Under agent work:* an agent reads the top of a settings file, writes the whole file back from that fragment, and the keys it never read vanish with no diff to flag them; or it declares a file corrupt off a wrong-tool parse and "repairs" a file that was already valid. *Enforced by:* a convention, not yet a checkwright gate — the harness's Edit tool is the mechanism (an exact-string replace that fails loudly on a missing or ambiguous match, keeping the write scoped to what was read); no gate asserts a given edit was a merge rather than a rewrite.
+
     *Stages:* build
 
-18. **Re-verify volatile state before a git history rewrite.** Verify HEAD
-    (`git log --oneline -3`) before an amend or squash; after a `git reset
-    --soft`, re-stage and verify the staged content (`git show :<path>`) before
-    committing — the soft reset keeps the old index snapshot; carry the commit
-    message in the command — `-m`, or `-F -` fed by a quoted heredoc — rather
-    than in a message file, because scratch outlives the session that wrote it
-    and a sibling session committing from the same name lands the wrong message
-    with exit 0; where a file is unavoidable, write it in the same command as the
-    commit and read the landed message back (`git log -1 --format=%B`); and
-    rewrite the message when amending so it states the combined change.
-    *Under agent work:* the git index and HEAD are mutable state an agent
-    reasons about from a stale in-context snapshot, and a rewrite acts on what
-    the working tree *now* holds, not what the transcript last recorded, and a
-    message file under scratch is state another session may have written last —
-    so the verification must be a fresh read, never a remembered one.
-    *Enforced by:* guard-kit's advisory guard rule on `git commit --amend`, `git
-    reset --soft`, and `git commit -F`
-    ([guard-kit/SPEC.md](../guard-kit/SPEC.md) §The generic ruleset), which
-    surfaces this checklist at the moment the rewrite is dispatched — advisory
-    because each command is legitimate.
+18. **Re-verify volatile state before a git history rewrite.** Verify HEAD (`git log --oneline -3`) before an amend or squash; after a `git reset --soft`, re-stage and verify the staged content (`git show :<path>`) before committing — the soft reset keeps the old index snapshot; carry the commit message in the command — `-m`, or `-F -` fed by a quoted heredoc — rather than in a message file, because scratch outlives the session that wrote it and a sibling session committing from the same name lands the wrong message with exit 0; where a file is unavoidable, write it in the same command as the commit and read the landed message back (`git log -1 --format=%B`); and rewrite the message when amending so it states the combined change. *Under agent work:* the git index and HEAD are mutable state an agent reasons about from a stale in-context snapshot, and a rewrite acts on what the working tree *now* holds, not what the transcript last recorded, and a message file under scratch is state another session may have written last — so the verification must be a fresh read, never a remembered one. *Enforced by:* guard-kit's advisory guard rule on `git commit --amend`, `git reset --soft`, and `git commit -F` ([guard-kit/SPEC.md](../guard-kit/SPEC.md) §The generic ruleset), which surfaces this checklist at the moment the rewrite is dispatched — advisory because each command is legitimate.
+
     *Stages:* build, close
 
-19. **Entering another repo's tree, read its governance first.** A cross-repo
-    edit re-reads that repo's agent file and README and checks its branch
-    freshness every time — a second repo's model drifts independently of this
-    one's, so a remembered version of its rules is a stale premise.
-    *Under agent work:* an agent carries the governing rules of the repo it was
-    last in into the next one, importing the wrong house style; only a fresh
-    read of the entered tree's own governance corrects the prior.
-    *Enforced by:* a convention, not yet a checkwright gate — another repo's
-    tree is outside this tree's gate horizon, so no local check can assert its
-    governance was reread.
+19. **Entering another repo's tree, read its governance first.** A cross-repo edit re-reads that repo's agent file and README and checks its branch freshness every time — a second repo's model drifts independently of this one's, so a remembered version of its rules is a stale premise. *Under agent work:* an agent carries the governing rules of the repo it was last in into the next one, importing the wrong house style; only a fresh read of the entered tree's own governance corrects the prior. *Enforced by:* a convention, not yet a checkwright gate — another repo's tree is outside this tree's gate horizon, so no local check can assert its governance was reread.
+
     *Stages:* build
 
-20. **Naming: drop the qualifier the context supplies — only when every consumer
-    has that context.** A name that travels into a flat namespace keeps its
-    qualifier; default to the shorter form and reject the vacuous one, but a
-    name that loses the context which disambiguated it must carry the qualifier
-    with it.
-    *Under agent work:* an agent copies a short name out of the scope that gave
-    it meaning into a flat namespace where the qualifier is load-bearing, and
-    the collision surfaces far from the rename; "does every reader still have
-    the context" is the discriminator, not shortness.
-    *Enforced by:* a convention, not yet a checkwright gate — whether a
-    qualifier is redundant *for every consumer* is a judgment a scanner cannot
-    decide; the de-literalization instinct, a name sized to its widest reader,
-    is its written form.
+20. **Naming: drop the qualifier the context supplies — only when every consumer has that context.** A name that travels into a flat namespace keeps its qualifier; default to the shorter form and reject the vacuous one, but a name that loses the context which disambiguated it must carry the qualifier with it. *Under agent work:* an agent copies a short name out of the scope that gave it meaning into a flat namespace where the qualifier is load-bearing, and the collision surfaces far from the rename; "does every reader still have the context" is the discriminator, not shortness. *Enforced by:* a convention, not yet a checkwright gate — whether a qualifier is redundant *for every consumer* is a judgment a scanner cannot decide; the de-literalization instinct, a name sized to its widest reader, is its written form.
+
     *Stages:* scope, build
 
-21. **Reuse a co-located consumer's data before designing a new path.** For an
-    embedded or co-located actor, first ask whether it can read a co-located
-    consumer's already-fetched data before minting a new stream, grant, or
-    fetch — a "which path" framing can hide a "no path needed" answer.
-    *Under agent work:* an agent asked "how should X get this data" designs a
-    new channel because the question presupposes one, and never asks whether the
-    data is already in reach; the cheaper reuse stays invisible unless the
-    framing is challenged.
-    *Enforced by:* a convention, not yet a checkwright gate — a data-path choice
-    leaves no artifact a scanner reads; it is design-review judgment, kin to
-    reaching for an existing owner before minting a second source.
+21. **Reuse a co-located consumer's data before designing a new path.** For an embedded or co-located actor, first ask whether it can read a co-located consumer's already-fetched data before minting a new stream, grant, or fetch — a "which path" framing can hide a "no path needed" answer. *Under agent work:* an agent asked "how should X get this data" designs a new channel because the question presupposes one, and never asks whether the data is already in reach; the cheaper reuse stays invisible unless the framing is challenged. *Enforced by:* a convention, not yet a checkwright gate — a data-path choice leaves no artifact a scanner reads; it is design-review judgment, kin to reaching for an existing owner before minting a second source.
+
     *Stages:* scope, build
 
-22. **A resolver gate's flagged key is a fork, not a verdict.** A name-resolution
-    gate that finds a silent drop has found either dead config to remove *or*
-    promised-but-unwired config to build — one signature, opposite fixes; only
-    the owning SPEC distinguishes them, so verify intent against the SPEC before
-    sweeping the key away.
-    *Under agent work:* an agent reads a gate finding as an instruction ("remove
-    the flagged key") and deletes config the SPEC promised but the wiring never
-    delivered — turning a build-it signal into a delete-it action; the gate saw
-    the drop, not the intent.
-    *Enforced by:* the name-resolution gates that surface the drop — the
-    couples/reads walkers and reference-liveness sweeps in
-    [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) — but the fork itself is resolved
-    against the owning SPEC by judgment; the gate reports the dangling key,
-    never which way it should be closed.
+22. **A resolver gate's flagged key is a fork, not a verdict.** A name-resolution gate that finds a silent drop has found either dead config to remove *or* promised-but-unwired config to build — one signature, opposite fixes; only the owning SPEC distinguishes them, so verify intent against the SPEC before sweeping the key away. *Under agent work:* an agent reads a gate finding as an instruction ("remove the flagged key") and deletes config the SPEC promised but the wiring never delivered — turning a build-it signal into a delete-it action; the gate saw the drop, not the intent. *Enforced by:* the name-resolution gates that surface the drop — the couples/reads walkers and reference-liveness sweeps in [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) — but the fork itself is resolved against the owning SPEC by judgment; the gate reports the dangling key, never which way it should be closed.
+
     *Stages:* build
 
-23. **Quiet green, loud red.** A batch runner's success is one summary line
-    carrying its scope counts (the count doubling as the roster-collapse
-    tripwire); failure output is verbatim and never quiets. Per-item success
-    banners are an opt-in reading, not the default — the red path is the
-    feedback channel, the green path is a receipt.
-    *Under agent work:* every green re-run accretes the full banner roll in the
-    session's context, and a supervising session re-reads it on each cold wake —
-    success residue crowds out the signal the run exists to carry.
-    *Enforced by:* judgment at review — "prints too much on success" is not
-    mechanically decidable; the leaf mechanisms are gate-sdk's per-gate output
-    contract and the quiet-default run surfaces
-    ([gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §run-gates).
+23. **Quiet green, loud red.** A batch runner's success is one summary line carrying its scope counts (the count doubling as the roster-collapse tripwire); failure output is verbatim and never quiets. Per-item success banners are an opt-in reading, not the default — the red path is the feedback channel, the green path is a receipt. *Under agent work:* every green re-run accretes the full banner roll in the session's context, and a supervising session re-reads it on each cold wake — success residue crowds out the signal the run exists to carry. *Enforced by:* judgment at review — "prints too much on success" is not mechanically decidable; the leaf mechanisms are gate-sdk's per-gate output contract and the quiet-default run surfaces ([gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §run-gates).
+
     *Stages:* build
 
-24. **An assertion reports the size of the set it ranged over.** A verification a
-    session writes — a scan, a probe, a predicate under edit — whose subject is a
-    set prints that set's size beside its verdict, because an exit code cannot
-    distinguish *asserted and held* from *asserted nothing*: both are zero
-    failures. The corollary governs the probe that proves an assertion bites — a
-    mutation is valid only against a target the assertion actually ranges over,
-    or it reports an empty red set and reads as a pass. *Quiet green, loud red*
-    puts that count on a batch runner's summary line; this is the same tripwire
-    one altitude down, for the one-off verification a session writes and reads
-    inside the session.
-    *Under agent work:* an agent writes the check and reads its verdict in one
-    motion, so the exit code is the only evidence it holds that the check bit —
-    and a predicate just rewritten (a regex carried between dialects, a path list
-    narrowed) fails by matching nothing, which is indistinguishable from success.
-    A printed count is the one signal that survives the rewrite.
-    *Enforced by:* judgment, over a class only partly mechanizable — stated
-    honestly rather than promised to a scanner. Shipped: the vacuous-pass
-    tripwire in [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §run-gates, and the
-    `good/`+`bad/` fixture pair every gate already owes
-    ([gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §The gate model), which exercises a
-    predicate rather than trusting it. Buildable but unbuilt: a branch-coverage
-    assertion over a check's fixture corpus, for the arm that ships with no
-    fixture to run it. Unreachable: whether a session's mutation probe targeted
-    something its assertion ranges over is a property of a session act that
-    leaves no residue in the tree, so that third stays judgment.
+24. **An assertion reports the size of the set it ranged over.** A verification a session writes — a scan, a probe, a predicate under edit — whose subject is a set prints that set's size beside its verdict, because an exit code cannot distinguish *asserted and held* from *asserted nothing*: both are zero failures. The corollary governs the probe that proves an assertion bites — a mutation is valid only against a target the assertion actually ranges over, or it reports an empty red set and reads as a pass. *Quiet green, loud red* puts that count on a batch runner's summary line; this is the same tripwire one altitude down, for the one-off verification a session writes and reads inside the session. *Under agent work:* an agent writes the check and reads its verdict in one motion, so the exit code is the only evidence it holds that the check bit — and a predicate just rewritten (a regex carried between dialects, a path list narrowed) fails by matching nothing, which is indistinguishable from success. A printed count is the one signal that survives the rewrite. *Enforced by:* judgment, over a class only partly mechanizable — stated honestly rather than promised to a scanner. Shipped: the vacuous-pass tripwire in [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §run-gates, and the `good/`+`bad/` fixture pair every gate already owes ([gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §The gate model), which exercises a predicate rather than trusting it. Buildable but unbuilt: a branch-coverage assertion over a check's fixture corpus, for the arm that ships with no fixture to run it. Unreachable: whether a session's mutation probe targeted something its assertion ranges over is a property of a session act that leaves no residue in the tree, so that third stays judgment.
+
     *Stages:* build, validate
 
-25. **A third-party tool's behavior is a configuration question first.** Before
-    designing any mitigation around a tool you do not control, probe its
-    configuration surface and its issue tracker; a design question is what is
-    left after both come back empty. Repeated confirmation of a *behavior* is
-    evidence about the behavior and none at all about its *mutability*, so an
-    attestation count pushes confidence the wrong way — each re-confirmation
-    makes the mechanism feel settled and suppresses the config probe that would
-    retire it. The corollary reads the mitigation rather than the tool: a
-    workaround that keeps *growing* — more candidates, more unenforceable prose,
-    a hand payment per use — is itself evidence of solving the wrong problem,
-    because a correct fix converges and this shape accretes. When the workaround
-    outgrows the thing it works around, stop and re-probe the premise.
-    *Under agent work:* an agent inherits a prior session's symptom evidence as a
-    settled mechanism and designs against it, and symptom evidence accumulates
-    across sessions without any hand-off ever bearing on whether the symptom is
-    configurable — so the premise hardens exactly as the sessions that could
-    cheaply falsify it multiply.
-    *Enforced by:* judgment, not a gate, and for the reason Probe-before-assertion
-    states — whether a session probed a vendor's settings schema leaves no residue
-    in the tree. The two divide by *target*: that rule governs a claim about the
-    tree or the harness that a local command settles; this one governs a claim
-    about an external tool, where the probe leaves the tree entirely. Its capture
-    surface is the queue's design-pending tier, where a mitigation's growing
-    candidate list is the readable signal the corollary names.
+25. **A third-party tool's behavior is a configuration question first.** Before designing any mitigation around a tool you do not control, probe its configuration surface and its issue tracker; a design question is what is left after both come back empty. Repeated confirmation of a *behavior* is evidence about the behavior and none at all about its *mutability*, so an attestation count pushes confidence the wrong way — each re-confirmation makes the mechanism feel settled and suppresses the config probe that would retire it. The corollary reads the mitigation rather than the tool: a workaround that keeps *growing* — more candidates, more unenforceable prose, a hand payment per use — is itself evidence of solving the wrong problem, because a correct fix converges and this shape accretes. When the workaround outgrows the thing it works around, stop and re-probe the premise. *Under agent work:* an agent inherits a prior session's symptom evidence as a settled mechanism and designs against it, and symptom evidence accumulates across sessions without any hand-off ever bearing on whether the symptom is configurable — so the premise hardens exactly as the sessions that could cheaply falsify it multiply. *Enforced by:* judgment, not a gate, and for the reason Probe-before-assertion states — whether a session probed a vendor's settings schema leaves no residue in the tree. The two divide by *target*: that rule governs a claim about the tree or the harness that a local command settles; this one governs a claim about an external tool, where the probe leaves the tree entirely. Its capture surface is the queue's design-pending tier, where a mitigation's growing candidate list is the readable signal the corollary names.
+
     *Stages:* scope, spec, build
 
-26. **Read the subject, never a stand-in for it — a wrong stand-in is biased, not
-    noisy.** A measurement taken off a proxy for the thing that matters — a
-    module's knob list in place of the walk's filter argument, a declaration set
-    in place of the walks it declares, a hand sweep in place of a census an
-    oracle could run — errs in one consistent *direction*, because the
-    divergence is a property of the proxy rather than of the reading. So
-    independent readings converge on the **same** wrong answer, and agreement
-    between readers is not evidence: the fourth reader reproduces the first
-    reader's error for the first reader's reason. Name the subject, then name the
-    command that reads it; where an assertion's subject is a proxy, the assertion
-    is about the proxy. The corollary is the same substitution one level up, in
-    the option space rather than the measurement: when a session reports that
-    **no legal form exists**, the enumeration may have run over a stand-in axis,
-    so check the frame before accepting the impossibility — a reported dead end
-    is usually true inside a frame that is wrong.
-    *Under agent work:* an agent reaches for whatever is readable, and a proxy
-    gets chosen *because* it reads cleanly — which is also why review passes it:
-    a reviewer re-reads the same readable surface and inherits the bias instead
-    of catching it, so re-reading is the one remedy that cannot work. And an
-    agent reporting a dead end reports it from the option set it enumerated,
-    never from the one it did not see, so a confident "no legal repair" is the
-    shape most in need of a reframe rather than a ruling.
-    *Enforced by:* judgment, and honestly so — which surface a session read a
-    number off leaves no residue in the tree. What ships is the substitute for
-    the read rather than a check on it: an oracle per question (the `--emit`
-    arms and the `good/`+`bad/` fixture pair,
-    [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §The gate model) and rule 24's
-    printed set size, which catches a proxy that ranged over nothing but not one
-    that ranged over the wrong thing. Buildable and unbuilt: a census arm for
-    any population a session is asked to size, so the hand sweep has a cheaper
-    alternative at the moment it is tempting.
+26. **Read the subject, never a stand-in for it — a wrong stand-in is biased, not noisy.** A measurement taken off a proxy for the thing that matters — a module's knob list in place of the walk's filter argument, a declaration set in place of the walks it declares, a hand sweep in place of a census an oracle could run — errs in one consistent *direction*, because the divergence is a property of the proxy rather than of the reading. So independent readings converge on the **same** wrong answer, and agreement between readers is not evidence: the fourth reader reproduces the first reader's error for the first reader's reason. Name the subject, then name the command that reads it; where an assertion's subject is a proxy, the assertion is about the proxy. The corollary is the same substitution one level up, in the option space rather than the measurement: when a session reports that **no legal form exists**, the enumeration may have run over a stand-in axis, so check the frame before accepting the impossibility — a reported dead end is usually true inside a frame that is wrong. *Under agent work:* an agent reaches for whatever is readable, and a proxy gets chosen *because* it reads cleanly — which is also why review passes it: a reviewer re-reads the same readable surface and inherits the bias instead of catching it, so re-reading is the one remedy that cannot work. And an agent reporting a dead end reports it from the option set it enumerated, never from the one it did not see, so a confident "no legal repair" is the shape most in need of a reframe rather than a ruling. *Enforced by:* judgment, and honestly so — which surface a session read a number off leaves no residue in the tree. What ships is the substitute for the read rather than a check on it: an oracle per question (the `--emit` arms and the `good/`+`bad/` fixture pair, [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §The gate model) and rule 24's printed set size, which catches a proxy that ranged over nothing but not one that ranged over the wrong thing. Buildable and unbuilt: a census arm for any population a session is asked to size, so the hand sweep has a cheaper alternative at the moment it is tempting.
+
     *Stages:* spec, build, validate

@@ -1,29 +1,16 @@
 # Checkwright
 
-[![gates](https://github.com/checkwright/checkwright/actions/workflows/gates.yml/badge.svg)](https://github.com/checkwright/checkwright/actions/workflows/gates.yml)
-[![release](https://img.shields.io/github/v/tag/checkwright/checkwright?label=release)](https://github.com/checkwright/checkwright/releases)
+[![gates](https://github.com/checkwright/checkwright/actions/workflows/gates.yml/badge.svg)](https://github.com/checkwright/checkwright/actions/workflows/gates.yml) [![release](https://img.shields.io/github/v/tag/checkwright/checkwright?label=release)](https://github.com/checkwright/checkwright/releases)
 
-**Verification for coding-agent delivery.** Checkwright is the verification
-layer under agent orchestration: spec drift, skipped stages, and unsupported
-*done* claims become failing checks before a merge, instead of review findings
-after one. It ships as installable kits — harness-independent gates plus an
-evidence-stamped iteration lifecycle designed for stateless agent sessions.
+**Verification for coding-agent delivery.** Checkwright is the verification layer under agent orchestration: spec drift, skipped stages, and unsupported *done* claims become failing checks before a merge, instead of review findings after one. It ships as installable kits — harness-independent gates plus an evidence-stamped iteration lifecycle designed for stateless agent sessions.
 
-**For the maintainer of a repository coding agents write most of**, who has to
-answer at merge time whether the work is actually done, and cannot answer it by
-reading every diff.
+**For the maintainer of a repository coding agents write most of**, who has to answer at merge time whether the work is actually done, and cannot answer it by reading every diff.
 
-**It complements the workflow you already run.** Keep your spec process, your
-prompts, your harness. Add Checkwright where a claim has to be mechanically
-proven rather than asserted: the instructions shape, the gates enforce. Why that
-split is the whole design: [Where Checkwright sits](docs/positioning.md).
+**It complements the workflow you already run.** Keep your spec process, your prompts, your harness. Add Checkwright where a claim has to be mechanically proven rather than asserted: the instructions shape, the gates enforce. Why that split is the whole design: [Where Checkwright sits](docs/positioning.md).
 
 ## What that buys you
 
-**Before.** A session finishes a task and marks it done; the evidence is the
-session's own say-so. A page keeps citing a spec section that a rename moved out
-from under it. Both commits go in green, and the next stateless session reads
-both as ground truth.
+**Before.** A session finishes a task and marks it done; the evidence is the session's own say-so. A page keeps citing a spec section that a rename moved out from under it. Both commits go in green, and the next stateless session reads both as ground truth.
 
 **After.** Neither commit lands:
 
@@ -37,39 +24,17 @@ check-stage-evidence: a task reached Done with no validate stamp this iteration
 FAIL: check-stage-evidence
 ```
 
-Nothing there is a review opinion: each finding is cheap, mechanically decidable,
-and low-false-positive by construction, which is what lets it block a commit
-rather than open a thread. The semantic residue — is this design right, does the
-evidence earn the claim — stays with the human or the agent, undiluted.
+Nothing there is a review opinion: each finding is cheap, mechanically decidable, and low-false-positive by construction, which is what lets it block a commit rather than open a thread. The semantic residue — is this design right, does the evidence earn the claim — stays with the human or the agent, undiluted.
 
-Where the project is heading, and what moves an item: [`ROADMAP.md`](ROADMAP.md),
-generated from the queue entries a maintainer marked for the page and
-freshness-gated on every commit. What is already *ruled* — the operator's
-standing overrides of business as usual — is
-[`TRAJECTORY.md`](TRAJECTORY.md), hand-authored rather than generated. Docs live
-at <https://checkwright.dev> — the same pages served in-repo under
-[`docs/`](docs/index.md).
+Where the project is heading, and what moves an item: [`ROADMAP.md`](ROADMAP.md), generated from the queue entries a maintainer marked for the page and freshness-gated on every commit. What is already *ruled* — the operator's standing overrides of business as usual — is [`TRAJECTORY.md`](TRAJECTORY.md), hand-authored rather than generated. Docs live at <https://checkwright.dev> — the same pages served in-repo under [`docs/`](docs/index.md).
 
 ## Quick start
 
-Vendors a kit profile into a clean git repo and commits it. The primary path is
-the **release tarball** — download it and its `.sha256` off the
-[releases](https://github.com/checkwright/checkwright/releases) page, verify,
-extract, run `init` — which needs nothing beyond a GNU userland; `npx
-checkwright init` is the same vendoring over npm, for a consumer who already has
-Node. Both recipes, with profiles and requirements:
-[docs/install.md](docs/install.md) §Quick start.
+Vendors a kit profile into a clean git repo and commits it. The primary path is the **release tarball** — download it and its `.sha256` off the [releases](https://github.com/checkwright/checkwright/releases) page, verify, extract, run `init` — which needs nothing beyond a GNU userland; `npx checkwright init` is the same vendoring over npm, for a consumer who already has Node. Both recipes, with profiles and requirements: [docs/install.md](docs/install.md) §Quick start.
 
 ## The premise
 
-When coding agents do the writing, discipline does not hold: conventions live in
-prose no stateless session reliably re-reads, and drift is silent. The remedy is
-mechanization — every cheap, low-false-positive, mechanically-decidable
-consistency axis is enforced by a gate that blocks the commit, and the human (or
-agent) residue is held to the irreducibly semantic judgment alone. Checkwright
-packages that machinery, and this repository governs itself with its own kits,
-day one. A *wright* is a craftsman — shipwright, playwright; this is the craft
-of checks.
+When coding agents do the writing, discipline does not hold: conventions live in prose no stateless session reliably re-reads, and drift is silent. The remedy is mechanization — every cheap, low-false-positive, mechanically-decidable consistency axis is enforced by a gate that blocks the commit, and the human (or agent) residue is held to the irreducibly semantic judgment alone. Checkwright packages that machinery, and this repository governs itself with its own kits, day one. A *wright* is a craftsman — shipwright, playwright; this is the craft of checks.
 
 ## Kits
 
@@ -87,22 +52,13 @@ of checks.
 | [site-kit/](site-kit/) | Deployment-truth governance for a repo-served docs site: `check-docs-cname-parity` makes the CNAME file the single gated source of truth for the docs host (no tracked file cites a configured alias in a URL; the alias set is consumer config), `check-docs-render-fidelity` re-renders every tracked docs page through the Pages parser and reds on the observed leakage classes, and a `site-health.yml` template scheduled-probes the live deployment (HTTPS, redirects, cert expiry, and release-body note pointers) as a monitor, never a gate. |
 | [doctrine-kit/](doctrine-kit/) | The experience-packaging rung: the cross-kit delivery doctrine the other kits enforce piecemeal, stated once in a customer-deliverable `DOCTRINE.md` — referenced by link into a consumer's always-loaded agent file (re-vendor to upgrade, never copy-installed), installed by the gate binary's `--install-doctrine` arm, and held present by `check-doctrine-registration`. Ships the rule statements only; each kit's SPEC owns its mechanism, so no private rule content crosses the seam. |
 
-Every kit ships its own fixtures, README, and SPEC. The repo is a monorepo — a
-kit is split out only if it earns independent adoption.
+Every kit ships its own fixtures, README, and SPEC. The repo is a monorepo — a kit is split out only if it earns independent adoption.
 
 ## This repo, governed
 
-The gates registered in [`scripts/gates.list`](scripts/gates.list) run on this
-tree. What a *commit* owes is the full battery plus a selection of the fixture
-suites below — that selection rule is [`CLAUDE.md`](CLAUDE.md)'s, stated there
-and not restated here.
+The gates registered in [`scripts/gates.list`](scripts/gates.list) run on this tree. What a *commit* owes is the full battery plus a selection of the fixture suites below — that selection rule is [`CLAUDE.md`](CLAUDE.md)'s, stated there and not restated here.
 
-The block below is a different thing: the **register of this repo's runnable
-verification suites**, the set the validate stage runs in full. It is held in
-name-set parity with the configured `EVIDENCE_KIT_SUITES` by
-`check-battery-roster`, so the register is complete by enforcement — a suite
-validate runs and this block omits is red, and so is a line whose command runs
-no configured suite.
+The block below is a different thing: the **register of this repo's runnable verification suites**, the set the validate stage runs in full. It is held in name-set parity with the configured `EVIDENCE_KIT_SUITES` by `check-battery-roster`, so the register is complete by enforcement — a suite validate runs and this block omits is red, and so is a line whose command runs no configured suite.
 
 <!-- battery-roster:begin -->
 <!-- door-contributor: the contributor battery register — every line is a suite the validate stage runs in full, typed in a clone whose binary is built by construction -->
@@ -131,22 +87,11 @@ bash gate-sdk/bin/run-gates.sh --projection-witness                             
 ```
 <!-- battery-roster:end -->
 
-The last line, `--run-demo`, is the adoption walkthrough, and it runs from a
-checkout because it copies the kits out of this tree: against a throwaway
-consumer repo, touching no tree but its own, it vendors the kits, passes the
-battery clean, introduces a defect and shows the gate that blocks it, then drops
-the defect and goes green again. A checkout tracks no binary, so
-`bash gate-sdk/bin/build-native.sh` builds one first. The arm is specified in
-[gate-sdk/SPEC.md](gate-sdk/SPEC.md) §Consumer smoke.
+The last line, `--run-demo`, is the adoption walkthrough, and it runs from a checkout because it copies the kits out of this tree: against a throwaway consumer repo, touching no tree but its own, it vendors the kits, passes the battery clean, introduces a defect and shows the gate that blocks it, then drops the defect and goes green again. A checkout tracks no binary, so `bash gate-sdk/bin/build-native.sh` builds one first. The arm is specified in [gate-sdk/SPEC.md](gate-sdk/SPEC.md) §Consumer smoke.
 
-The gate binary's `--install-hooks` arm opts this clone into the generated
-pre-commit and commit-msg hooks. The repo also runs lifecycle-kit's own iteration state
-machine — [`TASK-QUEUE.md`](TASK-QUEUE.md) carries the iteration header, one
-iteration per hardening or roadmap unit.
+The gate binary's `--install-hooks` arm opts this clone into the generated pre-commit and commit-msg hooks. The repo also runs lifecycle-kit's own iteration state machine — [`TASK-QUEUE.md`](TASK-QUEUE.md) carries the iteration header, one iteration per hardening or roadmap unit.
 
-Contributing: the fixture is the unit of contribution — see
-[`CONTRIBUTING.md`](CONTRIBUTING.md) and [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md).
-Reporting a vulnerability: [`SECURITY.md`](SECURITY.md), never a public issue.
+Contributing: the fixture is the unit of contribution — see [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md). Reporting a vulnerability: [`SECURITY.md`](SECURITY.md), never a public issue.
 
 ## License
 

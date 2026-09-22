@@ -6,681 +6,114 @@ generated: true
 <!-- door-contributor: a generated mirror of a kit's own contributor source; every door on the page is that source's, and the banner above is the regeneration recipe -->
 # delegation-kit — safe delegated-agent execution for budget-bounded sessions
 
-Delegated agents are cheap to dispatch and expensive to trust. Three failure
-surfaces dominate: **shared mutable state** (two committing agents race the
-git index and one sweeps the other's staged files under the wrong message),
-**interrupted long units** (a usage-window wall fires mid-flight and the
-uncommitted investigation dies with the session), and **untrustworthy
-self-reports** (a sub-agent's "passed" claim, or a gate quietly weakened to
-make its commit pass). The kit packages the supervisor-side protocol that
-closes all three, plus the two pieces that are mechanizable: a trustworthy
-budget verdict (`usage-verdict`) and a commit-shape gate over gate tampering
-(`check-gate-tamper`).
+Delegated agents are cheap to dispatch and expensive to trust. Three failure surfaces dominate: **shared mutable state** (two committing agents race the git index and one sweeps the other's staged files under the wrong message), **interrupted long units** (a usage-window wall fires mid-flight and the uncommitted investigation dies with the session), and **untrustworthy self-reports** (a sub-agent's "passed" claim, or a gate quietly weakened to make its commit pass). The kit packages the supervisor-side protocol that closes all three, plus the two pieces that are mechanizable: a trustworthy budget verdict (`usage-verdict`) and a commit-shape gate over gate tampering (`check-gate-tamper`).
 
-The kit carries the protocol templates, the budget-verdict tool, and the
-tamper gate; the consumer supplies its own validate battery, shared-file
-roster, and toolchain checks — those are project rule content and never
-ship.
+The kit carries the protocol templates, the budget-verdict tool, and the tamper gate; the consumer supplies its own validate battery, shared-file roster, and toolchain checks — those are project rule content and never ship.
 
 ## The delegation model
 
-One **supervisor** session dispatches `Agent` tasks and owns every ruling;
-agents execute briefs and surface anything the brief does not cover.
-`templates/agent-execution.md` owns the load-bearing rules — it is the
-procedure a session loads, and each bullet's bold lead-in is the rule's stable
-name (§One template, a resident pointer). This section keeps the mechanism
-contracts and only the rationale that earns spec residency (a failure surface,
-a calibration history, a bound that is correctness rather than preference),
-each paragraph citing its rule by name rather than restating it.
+One **supervisor** session dispatches `Agent` tasks and owns every ruling; agents execute briefs and surface anything the brief does not cover. `templates/agent-execution.md` owns the load-bearing rules — it is the procedure a session loads, and each bullet's bold lead-in is the rule's stable name (§One template, a resident pointer). This section keeps the mechanism contracts and only the rationale that earns spec residency (a failure surface, a calibration history, a bound that is correctness rather than preference), each paragraph citing its rule by name rather than restating it.
 
-**Boundary — this protocol stays fire-and-forget.** An agent here executes a
-bounded brief and its result returns to the supervisor; a paused session that
-holds its working state and *resumes in place* when a question is answered is a
-different interaction model — *resume-in-place orchestration*, lifecycle-kit's
-lead template (lifecycle-kit/SPEC.md §templates/lead.md), which reuses this
-protocol's dispatch safety unchanged rather than replacing it.
+**Boundary — this protocol stays fire-and-forget.** An agent here executes a bounded brief and its result returns to the supervisor; a paused session that holds its working state and *resumes in place* when a question is answered is a different interaction model — *resume-in-place orchestration*, lifecycle-kit's lead template (lifecycle-kit/SPEC.md §templates/lead.md), which reuses this protocol's dispatch safety unchanged rather than replacing it.
 
-The template's **Serialize on shared files; ≤`DELEGATION_KIT_FAN_WIDTH`-wide
-otherwise** rule caps an *unlocked* fan-out at read-only work because the git
-index and HEAD are shared for every committing agent regardless of source-file
-disjointness — so the cap is a correctness bound, never a preference a consumer
-may configure up for committing agents (the knob's derivation: §Layout and
-configuration).
+The template's **Serialize on shared files; ≤`DELEGATION_KIT_FAN_WIDTH`-wide otherwise** rule caps an *unlocked* fan-out at read-only work because the git index and HEAD are shared for every committing agent regardless of source-file disjointness — so the cap is a correctness bound, never a preference a consumer may configure up for committing agents (the knob's derivation: §Layout and configuration).
 
-The template's **Background + notification, never poll** rule reads as
-universal but is not, and the sentence that scopes it is a fact rather than a
-role list: backgrounding survives a turn, and a dispatched agent's turn end is
-its session end. Attested failure surface — a stage session read the rule,
-backgrounded its whole validate suite, ended its turn to report progress, and
-its child died with it: an entry stamp, no results, the suite re-run from
-scratch. Nothing reddened, because missing evidence is indistinguishable from
-pending evidence. Two phrasings were drafted and rejected on the way to the
-current one, and both failures are instructive: a role-neutral "never end your
-turn with detached work" forbids the supervisor pattern the same rule
-prescribes, and "await it in the **foreground**" names a lever the agent may
-not have — dispatches made *without* requesting backgrounding have been
-observed detached anyway, so a rule stated on foreground is unfollowable
-exactly where it is needed. That a subagent's return terminates its background
-children was **attested here and inferred from the harness docs, not stated by
-them**, and a counter-observation has since narrowed it: a validate session
-backgrounded a *shell* producer, ended its turn, and the process kept running
-and kept writing its output file for minutes. Reaping holds for an `Agent`
-child and not for a shell one, so the rule's mechanism is the unconditional
-loss of the **observer**, not the conditional loss of the work — and the
-surviving-producer case is the worse of the two, since it is the
-unobservable-producer hazard — an unread producer mutating
-shared files while the next actor moves — arriving through the backgrounding
-door. The rule is anchored on the invariant either way — an agent's contract
-with its caller is its return value, so work whose result is not in the return
-did not happen as far as the caller is concerned — which is why the
-counter-observation cost the rule a sentence and not its content, exactly as
-this paragraph predicted a reaping change would.
+The template's **Background + notification, never poll** rule reads as universal but is not, and the sentence that scopes it is a fact rather than a role list: backgrounding survives a turn, and a dispatched agent's turn end is its session end. Attested failure surface — a stage session read the rule, backgrounded its whole validate suite, ended its turn to report progress, and its child died with it: an entry stamp, no results, the suite re-run from scratch. Nothing reddened, because missing evidence is indistinguishable from pending evidence. Two phrasings were drafted and rejected on the way to the current one, and both failures are instructive: a role-neutral "never end your turn with detached work" forbids the supervisor pattern the same rule prescribes, and "await it in the **foreground**" names a lever the agent may not have — dispatches made *without* requesting backgrounding have been observed detached anyway, so a rule stated on foreground is unfollowable exactly where it is needed. That a subagent's return terminates its background children was **attested here and inferred from the harness docs, not stated by them**, and a counter-observation has since narrowed it: a validate session backgrounded a *shell* producer, ended its turn, and the process kept running and kept writing its output file for minutes. Reaping holds for an `Agent` child and not for a shell one, so the rule's mechanism is the unconditional loss of the **observer**, not the conditional loss of the work — and the surviving-producer case is the worse of the two, since it is the unobservable-producer hazard — an unread producer mutating shared files while the next actor moves — arriving through the backgrounding door. The rule is anchored on the invariant either way — an agent's contract with its caller is its return value, so work whose result is not in the return did not happen as far as the caller is concerned — which is why the counter-observation cost the rule a sentence and not its content, exactly as this paragraph predicted a reaping change would.
 
-**Why that correction needed an affordance, not just a better reason.** The
-session that produced the counter-observation reasoned *correctly* into the
-failure: it read the producer-liveness hazard, concluded it must not let the
-next actor proceed until the producer finished, and ended its turn to wait for
-the completion notification — the one act that destroys that channel for a
-dispatched role. A rule whose correct application requires a channel the reader
-does not have is defeated by careful readers and not only careless ones, so the
-template names the channel a dispatched role *does* have: an in-turn wait on the
-work's own artifact. This is the case where the backgrounding rule and the
-liveness hazard meet and neither, alone, covered it.
+**Why that correction needed an affordance, not just a better reason.** The session that produced the counter-observation reasoned *correctly* into the failure: it read the producer-liveness hazard, concluded it must not let the next actor proceed until the producer finished, and ended its turn to wait for the completion notification — the one act that destroys that channel for a dispatched role. A rule whose correct application requires a channel the reader does not have is defeated by careful readers and not only careless ones, so the template names the channel a dispatched role *does* have: an in-turn wait on the work's own artifact. This is the case where the backgrounding rule and the liveness hazard meet and neither, alone, covered it.
 
-The template's **Background + notification, never poll** rule now carries a
-*which primitive* clause, and that clause's residency here is a calibration
-history. The template first named the harness's waiting primitive in the
-singular while the harness offers two forms with opposite reactivity, so a
-session picking one unaided picked by shape. Naming a form teaches a spelling;
-naming the property a wait must have and sorting the forms under it teaches the
-discriminator — a bound that is correctness rather than preference, because it
-is what survives a harness adding a third form.
+The template's **Background + notification, never poll** rule now carries a *which primitive* clause, and that clause's residency here is a calibration history. The template first named the harness's waiting primitive in the singular while the harness offers two forms with opposite reactivity, so a session picking one unaided picked by shape. Naming a form teaches a spelling; naming the property a wait must have and sorting the forms under it teaches the discriminator — a bound that is correctness rather than preference, because it is what survives a harness adding a third form.
 
-**Two waitable things, and only one of them has a path.** The template splits
-what a session waits *on* and carries that mechanism itself. What is added here
-is that the split is *complete* rather than merely convenient, because the
-attested failure had no third case — and that the artifact's home is the resume
-journal's own scoping widened rather than a second rule, so the survivability
-grounds are stated once and cited twice.
+**Two waitable things, and only one of them has a path.** The template splits what a session waits *on* and carries that mechanism itself. What is added here is that the split is *complete* rather than merely convenient, because the attested failure had no third case — and that the artifact's home is the resume journal's own scoping widened rather than a second rule, so the survivability grounds are stated once and cited twice.
 
-**The shell branch names its artifact, and the naming is the substance.** The
-split above left that branch pointing at *an artifact the session placed* without
-saying which, so a session that wanted to comply had nothing to write, and of the
-long-running shell producers a session might background, most publish no record of
-any kind. The artifact is a **launch-time liveness record**: the child's PID,
-captured by the launcher at the moment it backgrounds the child. The obvious
-repair — have the child touch a file when it finishes and wait on that — is
-refused, and the attested failure is exactly why: a completion marker answers *is
-it done* **to a live observer**, and the failure case is the one where the
-observer is gone. A liveness record answers *is it still running* **to whoever
-arrives next**, which is a question a dead session's successor can still ask.
+**The shell branch names its artifact, and the naming is the substance.** The split above left that branch pointing at *an artifact the session placed* without saying which, so a session that wanted to comply had nothing to write, and of the long-running shell producers a session might background, most publish no record of any kind. The artifact is a **launch-time liveness record**: the child's PID, captured by the launcher at the moment it backgrounds the child. The obvious repair — have the child touch a file when it finishes and wait on that — is refused, and the attested failure is exactly why: a completion marker answers *is it done* **to a live observer**, and the failure case is the one where the observer is gone. A liveness record answers *is it still running* **to whoever arrives next**, which is a question a dead session's successor can still ask.
 
-**The record's producer is the launcher, and the alternative is recorded as
-refused rather than merely not chosen.** The alternative is per-producer
-self-claiming — the producer-liveness lock's shape generalized so every
-long-running producer claims its own record — and it fails on three counts. It
-reaches only producers the consumer's own tree owns, where most backgrounded work
-is an ad-hoc command composed at the call site. It puts the record's production in
-the one process whose death is the event being detected, so a producer that dies
-before claiming is invisible in exactly the window that matters. And it bills a
-program for a property that belongs to the *launch* rather than to the program:
-the same script backgrounded is in this class and run in the foreground is not.
-The launcher, by contrast, knows the PID of anything it started, is the party that
-needs to read it back, and is the only one present at the moment the class is
-entered.
+**The record's producer is the launcher, and the alternative is recorded as refused rather than merely not chosen.** The alternative is per-producer self-claiming — the producer-liveness lock's shape generalized so every long-running producer claims its own record — and it fails on three counts. It reaches only producers the consumer's own tree owns, where most backgrounded work is an ad-hoc command composed at the call site. It puts the record's production in the one process whose death is the event being detected, so a producer that dies before claiming is invisible in exactly the window that matters. And it bills a program for a property that belongs to the *launch* rather than to the program: the same script backgrounded is in this class and run in the foreground is not. The launcher, by contrast, knows the PID of anything it started, is the party that needs to read it back, and is the only one present at the moment the class is entered.
 
-**The liveness clause widened rather than acquiring an exception, and its own
-premise is what falsified it.** The clause sanctioned a recorded-PID match *where
-liveness genuinely is the condition — a producer this session did not start*, and
-that exclusion rested on an assumption: a session that started the producer was
-taken to have a better instrument, namely its own artifact. The better instrument
-requires a live reader, and the failure being fixed is the loss of the reader. So
-the subject widens to cover a producer the session started **and backgrounded**,
-and the widening is on the subject alone, never on the predicate — pattern-matched
-liveness stays refused, and the bracket trick stays refused as the sanctioned
-form on the grounds below.
+**The liveness clause widened rather than acquiring an exception, and its own premise is what falsified it.** The clause sanctioned a recorded-PID match *where liveness genuinely is the condition — a producer this session did not start*, and that exclusion rested on an assumption: a session that started the producer was taken to have a better instrument, namely its own artifact. The better instrument requires a live reader, and the failure being fixed is the loss of the reader. So the subject widens to cover a producer the session started **and backgrounded**, and the widening is on the subject alone, never on the predicate — pattern-matched liveness stays refused, and the bracket trick stays refused as the sanctioned form on the grounds below.
 
-**The record's grammar is evidence-kit's, and that is what makes the second reader
-free.** There are two readers, and they are different parties at different
-transitions: the **launching session**, in-turn, as its wait condition; and
-**whoever arrives next**, which is the case the attested failure is actually
-about, where the launcher is gone and something else must be able to tell that a
-producer is still mutating shared files. Written in the one-line `pid=<n>
-run=<key>` grammar the producer-liveness lock already carries, the record is a
-legal subject for `check-producer-liveness` **unchanged** — that gate already
-takes a record path and already reports exactly *is the producer named here still
-running*, on a ruled exit contract. No new gate, no new tool, no new grammar, and
-a reader already specified, already fixture-covered and already wired. An inverted
-grammar would have bought a second implementation of a decided thing, which is the
-only argument this needs; it is recorded because *a launch record is not a lock,
-so it should have its own shape* is the reading a later session will reach for,
-and the answer is that the two records carry the same field, answer the same
-question, and differ only in who wrote them. How a PID's liveness is *decided*
-stays evidence-kit's — the predicate, the PID-reuse residual and the refused TTL
-are ruled in evidence-kit/SPEC.md §The producer-liveness lock and are not
-seconded here. delegation-kit owns *when a session waits and on what*.
+**The record's grammar is evidence-kit's, and that is what makes the second reader free.** There are two readers, and they are different parties at different transitions: the **launching session**, in-turn, as its wait condition; and **whoever arrives next**, which is the case the attested failure is actually about, where the launcher is gone and something else must be able to tell that a producer is still mutating shared files. Written in the one-line `pid=<n> run=<key>` grammar the producer-liveness lock already carries, the record is a legal subject for `check-producer-liveness` **unchanged** — that gate already takes a record path and already reports exactly *is the producer named here still running*, on a ruled exit contract. No new gate, no new tool, no new grammar, and a reader already specified, already fixture-covered and already wired. An inverted grammar would have bought a second implementation of a decided thing, which is the only argument this needs; it is recorded because *a launch record is not a lock, so it should have its own shape* is the reading a later session will reach for, and the answer is that the two records carry the same field, answer the same question, and differ only in who wrote them. How a PID's liveness is *decided* stays evidence-kit's — the predicate, the PID-reuse residual and the refused TTL are ruled in evidence-kit/SPEC.md §The producer-liveness lock and are not seconded here. delegation-kit owns *when a session waits and on what*.
 
-**Which children owe a record is the second half of that ownership statement,
-and the template draws the line rather than pointing at it.** A record states
-that something is mutating shared files, so a child that writes nothing owes
-none: a wait loop and a read-only pipeline are **observers**, and only a
-**producer** — a child writing anything a later reader must not race — takes the
-launch record. guard-kit already draws the same line mechanically, exempting an
-inline wait loop and a read-only pipeline from its launch refusal
-(guard-kit/SPEC.md §The generic ruleset). The template was nonetheless the
-surface out of step, and it was out of step because it delegated the question
-**by pointer** — handing the guard "the shapes that owe no record" without
-saying what they are, so a reader of the template alone could not derive the
-exemption the guard would grant it. Read literally, an obligation over *every*
-shell child obliges a record of the mandated wait primitive, which is itself a
-shell child; where that waiter's condition is one the record set can falsify,
-the record makes the condition unsatisfiable and the only thing still blocking
-the loop is the loop. Attested against three consumers of one record set at once
-— the stage-entry preflight, rule 14's tracked-tree block, and the turn-end
-liveness hook — which is also what refuses the reader-side repair: teaching one
-reader to ignore a record whose run key names the stage being entered fixes one
-consumer of three and leaves the other two holding the same record. Refusing the
-self-naming record at **write** time is guard-kit's surface and has already
-shipped there as that exemption, so restating it here would be a second
-implementation of a decided thing.
+**Which children owe a record is the second half of that ownership statement, and the template draws the line rather than pointing at it.** A record states that something is mutating shared files, so a child that writes nothing owes none: a wait loop and a read-only pipeline are **observers**, and only a **producer** — a child writing anything a later reader must not race — takes the launch record. guard-kit already draws the same line mechanically, exempting an inline wait loop and a read-only pipeline from its launch refusal (guard-kit/SPEC.md §The generic ruleset). The template was nonetheless the surface out of step, and it was out of step because it delegated the question **by pointer** — handing the guard "the shapes that owe no record" without saying what they are, so a reader of the template alone could not derive the exemption the guard would grant it. Read literally, an obligation over *every* shell child obliges a record of the mandated wait primitive, which is itself a shell child; where that waiter's condition is one the record set can falsify, the record makes the condition unsatisfiable and the only thing still blocking the loop is the loop. Attested against three consumers of one record set at once — the stage-entry preflight, rule 14's tracked-tree block, and the turn-end liveness hook — which is also what refuses the reader-side repair: teaching one reader to ignore a record whose run key names the stage being entered fixes one consumer of three and leaves the other two holding the same record. Refusing the self-naming record at **write** time is guard-kit's surface and has already shipped there as that exemption, so restating it here would be a second implementation of a decided thing.
 
-**The residual that exemption cannot reach gets an authoring check, and its want
-of an oracle is stated rather than hidden.** The exemption sees a wait loop only
-when it is spelled **inline**; guard-kit states that limit and accepts it, on the
-ground that the record costs a waiter nothing it does not already carry — rule 14
-holds tracked-tree mutations for the waiter's lifetime, which the producer it
-waits on already holds. That ground is sound for a waiter waiting on a
-**producer** and unsound for a waiter waiting on anything else: the attested
-instance waited on a **stage-entry precondition**, where no producer held
-anything and the waiter's own record was the only thing blocking the condition.
-So the template asks a recorded wait one question — can my own record falsify my
-condition — and nothing stands behind it as an oracle. The guard cannot read a
-wait's condition at `PreToolUse`, and the wedge's signature, a loop that never
-exits, is indistinguishable from a producer that is genuinely slow.
+**The residual that exemption cannot reach gets an authoring check, and its want of an oracle is stated rather than hidden.** The exemption sees a wait loop only when it is spelled **inline**; guard-kit states that limit and accepts it, on the ground that the record costs a waiter nothing it does not already carry — rule 14 holds tracked-tree mutations for the waiter's lifetime, which the producer it waits on already holds. That ground is sound for a waiter waiting on a **producer** and unsound for a waiter waiting on anything else: the attested instance waited on a **stage-entry precondition**, where no producer held anything and the waiter's own record was the only thing blocking the condition. So the template asks a recorded wait one question — can my own record falsify my condition — and nothing stands behind it as an oracle. The guard cannot read a wait's condition at `PreToolUse`, and the wedge's signature, a loop that never exits, is indistinguishable from a producer that is genuinely slow.
 
-**The record's name is a convention, and what the convention buys is a derivable
-set.** It is written as `<scratch-dir>/<key>.run`, carrying the same `pid=<n>
-run=<key>` line — the filename's `<key>` is that record's own `run=` value, not
-a third field. The grammar is untouched; what was missing is not the record's
-shape but its **discoverability**. Without a convention the record's path is
-known only to the session that wrote it and to whoever it happens to tell, so
-the second reader named above — *whoever arrives next*, where the launcher is
-gone — can read a record only by guessing its name. A suffix makes the set a
-glob, and every reader that must ask *is anything still running here* reads the
-set rather than a path: `check-producer-liveness`'s set mode
-(evidence-kit/SPEC.md §check-producer-liveness), the stage-entry preflight
-behind it, and guard-kit rule 14.
+**The record's name is a convention, and what the convention buys is a derivable set.** It is written as `<scratch-dir>/<key>.run`, carrying the same `pid=<n> run=<key>` line — the filename's `<key>` is that record's own `run=` value, not a third field. The grammar is untouched; what was missing is not the record's shape but its **discoverability**. Without a convention the record's path is known only to the session that wrote it and to whoever it happens to tell, so the second reader named above — *whoever arrives next*, where the launcher is gone — can read a record only by guessing its name. A suffix makes the set a glob, and every reader that must ask *is anything still running here* reads the set rather than a path: `check-producer-liveness`'s set mode (evidence-kit/SPEC.md §check-producer-liveness), the stage-entry preflight behind it, and guard-kit rule 14.
 
-**`.run` rather than `.lock`, and the distinction is load-bearing.** A lock is
-claimed and released by one owner and its absence means *free*;
-`EVIDENCE_KIT_LOCK_FILE` is one and keeps its name. A launch record is a
-**statement of fact left behind** — it answers *is it still running* to whoever
-arrives next, a question a dead session's successor can still ask — and its
-absence means *nothing was recorded*, never *nothing is running*. Two meanings,
-two suffixes; and a consumer's scratch reset carries no `*.run` on its keep-list,
-because a record surviving a work-unit boundary names a producer from the
-previous one, which is precisely the stale statement the sweep exists to remove.
+**`.run` rather than `.lock`, and the distinction is load-bearing.** A lock is claimed and released by one owner and its absence means *free*; `EVIDENCE_KIT_LOCK_FILE` is one and keeps its name. A launch record is a **statement of fact left behind** — it answers *is it still running* to whoever arrives next, a question a dead session's successor can still ask — and its absence means *nothing was recorded*, never *nothing is running*. Two meanings, two suffixes; and a consumer's scratch reset carries no `*.run` on its keep-list, because a record surviving a work-unit boundary names a producer from the previous one, which is precisely the stale statement the sweep exists to remove.
 
-**Both affordances are refused, and the refusal's cost is bounded rather than
-denied.** A tool to write the record and a second one to read it are declined: the
-write is a PID captured at launch and the read is a single liveness match, each a
-shell builtin away and both already spelled in the template, and a script whose
-body is one builtin is the clearest case of the script-interpreter surface this
-methodology shrinks. The generic reading affordance that would genuinely earn its
-place already exists and is `check-producer-liveness`, which the grammar reuse
-reaches without adding anything. What the refusal costs is stated rather than
-hidden: an affordance would make the record's grammar impossible to get wrong, and
-a hand-written one can be malformed. That failure is bounded by the consumer,
-which exits **2** on a record it cannot parse, so a malformed record reads as
-*could not be established* and never as *nothing running*.
+**Both affordances are refused, and the refusal's cost is bounded rather than denied.** A tool to write the record and a second one to read it are declined: the write is a PID captured at launch and the read is a single liveness match, each a shell builtin away and both already spelled in the template, and a script whose body is one builtin is the clearest case of the script-interpreter surface this methodology shrinks. The generic reading affordance that would genuinely earn its place already exists and is `check-producer-liveness`, which the grammar reuse reaches without adding anything. What the refusal costs is stated rather than hidden: an affordance would make the record's grammar impossible to get wrong, and a hand-written one can be malformed. That failure is bounded by the consumer, which exits **2** on a record it cannot parse, so a malformed record reads as *could not be established* and never as *nothing running*.
 
-**What the naming does not claim.** No gate enforces it, and the reason is
-structural rather than budgetary: the subject is *did a session record a PID
-before backgrounding*, and a session that skips the rule writes nothing, so there
-is no absence a check could have been told to expect. The artifact-side backstop
-stays the one §Operative residency already names — `check-producer-liveness` at a
-stage entry, covering the **concurrent** case, a producer still live when the next
-entry is stamped. Widening what that backstop may be pointed at does not make the
-rule itself checkable. What the naming removes is a different failure: a session
-that **wanted** to comply had no named artifact and was carved out of the only
-clause that fit.
+**What the naming does not claim.** No gate enforces it, and the reason is structural rather than budgetary: the subject is *did a session record a PID before backgrounding*, and a session that skips the rule writes nothing, so there is no absence a check could have been told to expect. The artifact-side backstop stays the one §Operative residency already names — `check-producer-liveness` at a stage entry, covering the **concurrent** case, a producer still live when the next entry is stamped. Widening what that backstop may be pointed at does not make the rule itself checkable. What the naming removes is a different failure: a session that **wanted** to comply had no named artifact and was carved out of the only clause that fit.
 
-**The enforcement-design question is now answered, and the answer is a
-relocation rather than a reversal.** *Given that prose alone does not hold, what
-does* stood open here while the ruling above — the write is structurally
-uncheckable — stayed true. It still is. What changed is the subject: the
-**harm** a missed wait causes is not the turn-end but a tracked-tree mutation
-under a live producer, and that arrives as an ordinary tool call at a
-`PreToolUse` chokepoint, which is precisely the class §Operative residency says
-the interception axis admits. It is enforced there, as guard-kit rule 14
-(guard-kit/SPEC.md §The generic ruleset). The chokepoint ruling is confirmed by
-this, not weakened.
+**The enforcement-design question is now answered, and the answer is a relocation rather than a reversal.** *Given that prose alone does not hold, what does* stood open here while the ruling above — the write is structurally uncheckable — stayed true. It still is. What changed is the subject: the **harm** a missed wait causes is not the turn-end but a tracked-tree mutation under a live producer, and that arrives as an ordinary tool call at a `PreToolUse` chokepoint, which is precisely the class §Operative residency says the interception axis admits. It is enforced there, as guard-kit rule 14 (guard-kit/SPEC.md §The generic ruleset). The chokepoint ruling is confirmed by this, not weakened.
 
-**The claim ships with its bound, because a claim without one is the failure
-this rule keeps re-earning.** The enforcement holds only for **a session that
-recorded**. The paragraph above rules that the record's write is structurally
-uncheckable — a session that skips the rule writes nothing, so there is no
-absence a check could have been told to expect — so a session that backgrounds
-without recording is invisible to rule 14 and to the entry preflight alike. It is
-now **refused at the launch**: guard-kit rule 15 blocks a backgrounding call that
-writes no record, and rule 19 grants the one canonical recorded launch of an
-allowlisted command, so the compliant spelling costs no permission decision. The
-write stays uncheckable after the fact; what the launch chokepoint reads is
-whether the call is going to write one. The residue left is a command the
-harness moves to the background on its timeout: it was a foreground call when
-the guard saw it, it writes no record, and no `PreToolUse` payload carries task
-state. The template covers the recoverable half. It sizes a foreground call's
-timeout so the move does not happen, has a record written from a pid the moved
-producer names, and holds the turn and the tracked tree until the harness's
-completion notification, which the move itself promises. A moved producer that
-names no pid stays unrecorded, but the turn-end hook refuses a dispatched
-session's turn end while the harness's own task view shows it running (§The
-turn-end liveness hook). Guard rule 14 still cannot see it, so a tracked-tree
-write beside it is held only by the template. That leaves a dispatched session
-holding a moved producer with no pid without an in-turn primitive that ends on
-the notification: there is no pid for a `kill -0` loop, and a pattern match is
-refused, so it can keep working until the notification arrives but cannot wait
-for it idle.
+**The claim ships with its bound, because a claim without one is the failure this rule keeps re-earning.** The enforcement holds only for **a session that recorded**. The paragraph above rules that the record's write is structurally uncheckable — a session that skips the rule writes nothing, so there is no absence a check could have been told to expect — so a session that backgrounds without recording is invisible to rule 14 and to the entry preflight alike. It is now **refused at the launch**: guard-kit rule 15 blocks a backgrounding call that writes no record, and rule 19 grants the one canonical recorded launch of an allowlisted command, so the compliant spelling costs no permission decision. The write stays uncheckable after the fact; what the launch chokepoint reads is whether the call is going to write one. The residue left is a command the harness moves to the background on its timeout: it was a foreground call when the guard saw it, it writes no record, and no `PreToolUse` payload carries task state. The template covers the recoverable half. It sizes a foreground call's timeout so the move does not happen, has a record written from a pid the moved producer names, and holds the turn and the tracked tree until the harness's completion notification, which the move itself promises. A moved producer that names no pid stays unrecorded, but the turn-end hook refuses a dispatched session's turn end while the harness's own task view shows it running (§The turn-end liveness hook). Guard rule 14 still cannot see it, so a tracked-tree write beside it is held only by the template. That leaves a dispatched session holding a moved producer with no pid without an in-turn primitive that ends on the notification: there is no pid for a `kill -0` loop, and a pattern match is refused, so it can keep working until the notification arrives but cannot wait for it idle.
 
-**The record's *write* is now reached at the launch chokepoint, and the refusal
-that stood here is discharged.** The candidate was a rule firing on the
-backgrounding call itself, held back on one empirical unknown: a shell `&` is in
-the command text every rule already reads, but a harness's background-this
-parameter is **tool input, not command text**, and whether it reaches the
-`PreToolUse` payload was a question about one field. It does:
-`.tool_input.run_in_background` is a JSON boolean `true` on a backgrounded Bash
-call and absent on a foreground one (guard-kit/SPEC.md §The guard framework
-records the payload's shape, so no session re-buys the probe). Both forms are
-therefore reachable and **guard-kit rule 15 builds both arms in one rule**. The
-judgment that held it back is kept rather than retired, because it is what made
-the two-arm rule the right build rather than a bigger one: **building only the
-`&` arm would have been worse than not building it** — every attested firing used
-the harness form, so a rule covering only the shell spelling would have blocked
-the form nobody uses and passed the one that fires, coverage in appearance and an
-assertion about nothing in fact. What ships is a **refusal** at the launch beside
-the grant that makes compliance cost nothing; guard-kit/SPEC.md §The generic
-ruleset states both, with rules 15 and 19, and states why the refusal is taken.
+**The record's *write* is now reached at the launch chokepoint, and the refusal that stood here is discharged.** The candidate was a rule firing on the backgrounding call itself, held back on one empirical unknown: a shell `&` is in the command text every rule already reads, but a harness's background-this parameter is **tool input, not command text**, and whether it reaches the `PreToolUse` payload was a question about one field. It does: `.tool_input.run_in_background` is a JSON boolean `true` on a backgrounded Bash call and absent on a foreground one (guard-kit/SPEC.md §The guard framework records the payload's shape, so no session re-buys the probe). Both forms are therefore reachable and **guard-kit rule 15 builds both arms in one rule**. The judgment that held it back is kept rather than retired, because it is what made the two-arm rule the right build rather than a bigger one: **building only the `&` arm would have been worse than not building it** — every attested firing used the harness form, so a rule covering only the shell spelling would have blocked the form nobody uses and passed the one that fires, coverage in appearance and an assertion about nothing in fact. What ships is a **refusal** at the launch beside the grant that makes compliance cost nothing; guard-kit/SPEC.md §The generic ruleset states both, with rules 15 and 19, and states why the refusal is taken.
 
-**The guard interaction that produced it resolves without touching the guard.**
-The attested sequence: a session reached for the correct artifact wait, spelled
-it against the harness's own scratchpad path, and the consumer's bash guard
-refused it and steered to repo-local scratch. The guard was **right** and needed
-no change. What was missing is that the doctrine never said where an awaited
-artifact belongs, so the refusal read as a refusal of artifact-waiting itself and
-pushed the session onto the process-liveness form that then broke. With the split
-above, a session waiting on an `Agent` never reaches for a path at all, and a
-session waiting on a shell child has a path the guard already sanctions.
+**The guard interaction that produced it resolves without touching the guard.** The attested sequence: a session reached for the correct artifact wait, spelled it against the harness's own scratchpad path, and the consumer's bash guard refused it and steered to repo-local scratch. The guard was **right** and needed no change. What was missing is that the doctrine never said where an awaited artifact belongs, so the refusal read as a refusal of artifact-waiting itself and pushed the session onto the process-liveness form that then broke. With the split above, a session waiting on an `Agent` never reaches for a path at all, and a session waiting on a shell child has a path the guard already sanctions.
 
-**The bracket trick is refused as the sanctioned form, and the grounds are here
-because the template defers them here.** The template carries the mechanism —
-why a process-liveness predicate can never go false, and the two sanctioned
-repairs — and sends here the one question it does not answer: why the third,
-`pgrep -f '[r]un-smoke.sh'`, is refused rather than passed over. It is the first
-thing a reader reaches for and it *works*, so what disqualifies it is not correctness
-but its failure mode: a spelling that must be remembered, whose omission is
-invisible at the call site and whose cost when omitted is silent and expensive.
-A rule whose correct form differs from its incorrect form by one character is a
-rule that will be got wrong, which is why the enforcement half is a guard rule
-over the shape (guard-kit/SPEC.md §The generic ruleset) rather than more prose.
+**The bracket trick is refused as the sanctioned form, and the grounds are here because the template defers them here.** The template carries the mechanism — why a process-liveness predicate can never go false, and the two sanctioned repairs — and sends here the one question it does not answer: why the third, `pgrep -f '[r]un-smoke.sh'`, is refused rather than passed over. It is the first thing a reader reaches for and it *works*, so what disqualifies it is not correctness but its failure mode: a spelling that must be remembered, whose omission is invisible at the call site and whose cost when omitted is silent and expensive. A rule whose correct form differs from its incorrect form by one character is a rule that will be got wrong, which is why the enforcement half is a guard rule over the shape (guard-kit/SPEC.md §The generic ruleset) rather than more prose.
 
-The template's **Findings you will act on are durable before you act on them**
-rule rests on a near-loss rather than a loss: a close stage dispatched two
-audit sweeps and then hit the session wall. Both had already returned, which
-was luck; had the wall landed mid-sweep the audit work would have been gone
-with no record it ran. The gap is that the journal mechanics are written for a
-dispatched *mutating* agent, so a read-only child journals nothing and its
-findings exist only as a return value in the parent's context. The fix
-deliberately does **not** overturn the read-only-fan-out caveat in §Resume
-journal — that caveat was re-examined against this evidence and kept, with its
-duty relocated to the receiving end, because overturning it would put the write
-back exactly where the observed failures are. Recorded here because the rule
-and the caveat otherwise read as each other's contradiction and the next
-reader re-litigates them.
+The template's **Findings you will act on are durable before you act on them** rule rests on a near-loss rather than a loss: a close stage dispatched two audit sweeps and then hit the session wall. Both had already returned, which was luck; had the wall landed mid-sweep the audit work would have been gone with no record it ran. The gap is that the journal mechanics are written for a dispatched *mutating* agent, so a read-only child journals nothing and its findings exist only as a return value in the parent's context. The fix deliberately does **not** overturn the read-only-fan-out caveat in §Resume journal — that caveat was re-examined against this evidence and kept, with its duty relocated to the receiving end, because overturning it would put the write back exactly where the observed failures are. Recorded here because the rule and the caveat otherwise read as each other's contradiction and the next reader re-litigates them.
 
-agent-budget-guard closes the gap the template's
-**Budget-check before *each* dispatch in a fan-out** rule leaves when it relies
-on the agent *choosing* to run the tool: a memory-quoted percentage acts in its
-place (a session quoted ~5% while the live verdict read 29%). It is a `PreToolUse` hook (matcher `Agent`) the
-harness fires on every dispatch once the consumer registers it in settings —
-per-dispatch freshness, not a start-of-session reading a mid-session window
-outlives. It runs `usage-verdict` at the decision point and routes on the exit
-code:
+agent-budget-guard closes the gap the template's **Budget-check before *each* dispatch in a fan-out** rule leaves when it relies on the agent *choosing* to run the tool: a memory-quoted percentage acts in its place (a session quoted ~5% while the live verdict read 29%). It is a `PreToolUse` hook (matcher `Agent`) the harness fires on every dispatch once the consumer registers it in settings — per-dispatch freshness, not a start-of-session reading a mid-session window outlives. It runs `usage-verdict` at the decision point and routes on the exit code:
 
-- **PAUSE (1)** → block, exit 2, with the verdict line plus its corrective (wait
-  for the window reset, or re-run with `DELEGATION_KIT_PAUSE_PCT` deliberately
-  raised). This is guard-kit's one sanctioned fail-closed deny — the hook
-  matcher proves the tool identity and PAUSE is reachable only through a fresh,
-  readable, over-threshold snapshot, so blocking cannot wedge a consumer with
-  no producer.
-- **STALE / unreadable (2)** and **OK / RESET-OK (0)** → advise, exit 0,
-  feeding the verdict line back as `additionalContext` so the live reading
-  rides in context at every dispatch and a memory-quoted percentage can never
-  be the acting source. The advise arm relays that line and adds nothing: the
-  verdict string carries its own decision consequence (§usage-verdict), so
-  restating it on the arm would be one fact in two places. Routing STALE to
-  advice rather than out of delegation is what keeps a consumer with no
-  snapshot producer working — budget-unknown is decision-relevant, never
-  disqualifying.
+- **PAUSE (1)** → block, exit 2, with the verdict line plus its corrective (wait for the window reset, or re-run with `DELEGATION_KIT_PAUSE_PCT` deliberately raised). This is guard-kit's one sanctioned fail-closed deny — the hook matcher proves the tool identity and PAUSE is reachable only through a fresh, readable, over-threshold snapshot, so blocking cannot wedge a consumer with no producer.
+- **STALE / unreadable (2)** and **OK / RESET-OK (0)** → advise, exit 0, feeding the verdict line back as `additionalContext` so the live reading rides in context at every dispatch and a memory-quoted percentage can never be the acting source. The advise arm relays that line and adds nothing: the verdict string carries its own decision consequence (§usage-verdict), so restating it on the arm would be one fact in two places. Routing STALE to advice rather than out of delegation is what keeps a consumer with no snapshot producer working — budget-unknown is decision-relevant, never disqualifying.
 
-The harness is the producer (it fires the hook once the settings registration
-is set); the consumers are the dispatching agent, which reads the verdict line
-off `additionalContext` at the dispatch-decision transition, and the
-supervising user, who consumes a block by ruling — raise the knob or wait; the
-agent never overrides. delegation-kit owns the verdict, its thresholds, and the
-routing; guard-kit supplies only the framework primitives (its second
-consumer). Registration is the opt-in valve: a consumer wanting pure advice
-does not wire the hook. No new persistent state and no new key on the
-`usage.txt` contract — the verdict line is the only interface.
+The harness is the producer (it fires the hook once the settings registration is set); the consumers are the dispatching agent, which reads the verdict line off `additionalContext` at the dispatch-decision transition, and the supervising user, who consumes a block by ruling — raise the knob or wait; the agent never overrides. delegation-kit owns the verdict, its thresholds, and the routing; guard-kit supplies only the framework primitives (its second consumer). Registration is the opt-in valve: a consumer wanting pure advice does not wire the hook. No new persistent state and no new key on the `usage.txt` contract — the verdict line is the only interface.
 
-**Covered at every depth, aggregated at none.** The hook's registration is
-session-wide, so it fires inside dispatched sessions too: a dispatched
-session's own dispatches re-arm it, carrying that session's identity, and the
-coverage reaches every depth rather than stopping at the root. What it cannot
-do is **aggregate** — each fire is independent and holds no state about the
-tree, so a verdict prices the one call it gates and never the subtree that call
-opens. That pairing is what the subtree clause of the template's
-**Budget-check before *each* dispatch in a fan-out** rule exists to compensate,
-and stating both halves here is what stops the next reader re-filing either.
-Calibration history, because the silence invited the wrong turn: the hook
-script is stateless and carries no depth counter, and a scope survey read that
-as *the guard does not reach below the root* and filed against it. The reading
-of the script was exact; the inference from it was false. A guard whose output
-is only ever seen by the session it fires in looks absent from every other
-vantage point — so a supervisor counting its own hook fires is watching a
-strict undercount of its own tree, which is the observation the residual
-projection gap is stated against rather than a coverage gap to be re-armed.
+**Covered at every depth, aggregated at none.** The hook's registration is session-wide, so it fires inside dispatched sessions too: a dispatched session's own dispatches re-arm it, carrying that session's identity, and the coverage reaches every depth rather than stopping at the root. What it cannot do is **aggregate** — each fire is independent and holds no state about the tree, so a verdict prices the one call it gates and never the subtree that call opens. That pairing is what the subtree clause of the template's **Budget-check before *each* dispatch in a fan-out** rule exists to compensate, and stating both halves here is what stops the next reader re-filing either. Calibration history, because the silence invited the wrong turn: the hook script is stateless and carries no depth counter, and a scope survey read that as *the guard does not reach below the root* and filed against it. The reading of the script was exact; the inference from it was false. A guard whose output is only ever seen by the session it fires in looks absent from every other vantage point — so a supervisor counting its own hook fires is watching a strict undercount of its own tree, which is the observation the residual projection gap is stated against rather than a coverage gap to be re-armed.
 
-A knob-raise ruling has one working transport in this harness: the settings
-env block (`.claude/settings.local.json`), which hooks re-read per fire — the
-raised `DELEGATION_KIT_PAUSE_PCT` reaches the guard on the next dispatch with
-no restart, and deleting the entry afterwards restores the default just as
-immediately. A Bash-tool inline `export` never reaches the hook (the hook
-process does not inherit the tool's shell), so it is not an override path.
-Propagation is asymmetric within a live session: the hook re-reads the file
-per fire, but the Bash tool environment retains an injected value after the
-entry is deleted until the session restarts — an in-session `usage-verdict`
-run and a hook fire can judge against different thresholds in that window, so
-the hook's verdict line, not an in-session re-run, is the acting reading. That
-this transport *works* is not a permission to use it for everything a harness
-env var reaches: the subagent-model override below rides the same block and is
-refused there, so the two must not read as one sanction.
+A knob-raise ruling has one working transport in this harness: the settings env block (`.claude/settings.local.json`), which hooks re-read per fire — the raised `DELEGATION_KIT_PAUSE_PCT` reaches the guard on the next dispatch with no restart, and deleting the entry afterwards restores the default just as immediately. A Bash-tool inline `export` never reaches the hook (the hook process does not inherit the tool's shell), so it is not an override path. Propagation is asymmetric within a live session: the hook re-reads the file per fire, but the Bash tool environment retains an injected value after the entry is deleted until the session restarts — an in-session `usage-verdict` run and a hook fire can judge against different thresholds in that window, so the hook's verdict line, not an in-session re-run, is the acting reading. That this transport *works* is not a permission to use it for everything a harness env var reaches: the subagent-model override below rides the same block and is refused there, so the two must not read as one sanction.
 
-**The subagent-model environment override is refused, and the reason is
-precedence.** Model resolution runs in a fixed order — the subagent-model
-environment override, then a dispatch's own `model` parameter, then the agent
-definition's `model:` frontmatter, then the dispatching conversation's model —
-and the environment rung sits *above* the per-dispatch parameter. Setting it
-would pin every subagent to a cheap tier in one line, and would thereby
-silently defeat a supervisor's deliberate per-batch tier pin, the mechanism
-`lifecycle-kit/templates/lead.md` §Economics — batch, and compact where it pays
-depends on to tier a batch by its work classes. A lever that overrides the
-deliberate choice is not a default; it is a ceiling, so it is recorded as
-rejected rather than left to be rediscovered as an improvement. The correct
-rung is the **frontmatter**, third in the chain: it supplies the standing
-default the template's **Match the dispatched model and effort to the unit's
-shape** rule asks for while the per-dispatch parameter still overrides it. The
-same rule's affirmative-selection clause is why the field is *stated* rather
-than left out — an omitted `model:` resolves to the literal `inherit`, so
-omission spells the dispatcher's tier rather than a neutral absence, and
-`check-agent-tier-explicit` is that clause's oracle over the tracked surface.
+**The subagent-model environment override is refused, and the reason is precedence.** Model resolution runs in a fixed order — the subagent-model environment override, then a dispatch's own `model` parameter, then the agent definition's `model:` frontmatter, then the dispatching conversation's model — and the environment rung sits *above* the per-dispatch parameter. Setting it would pin every subagent to a cheap tier in one line, and would thereby silently defeat a supervisor's deliberate per-batch tier pin, the mechanism `lifecycle-kit/templates/lead.md` §Economics — batch, and compact where it pays depends on to tier a batch by its work classes. A lever that overrides the deliberate choice is not a default; it is a ceiling, so it is recorded as rejected rather than left to be rediscovered as an improvement. The correct rung is the **frontmatter**, third in the chain: it supplies the standing default the template's **Match the dispatched model and effort to the unit's shape** rule asks for while the per-dispatch parameter still overrides it. The same rule's affirmative-selection clause is why the field is *stated* rather than left out — an omitted `model:` resolves to the literal `inherit`, so omission spells the dispatcher's tier rather than a neutral absence, and `check-agent-tier-explicit` is that clause's oracle over the tracked surface.
 
-**Isolation's second purpose, and why the cost objection does not land.** The
-template's **A read-only claim is made by isolation, not by sentence** rule
-states the disposition and carries none of its grounds, which are these. "It has
-no Edit tool" is not the safety property it reads as: every agent type available
-for audit-shaped work carries write tools, or at least a shell that reaches
-`git`, so a toolset is never narrowed by the brief describing it.
+**Isolation's second purpose, and why the cost objection does not land.** The template's **A read-only claim is made by isolation, not by sentence** rule states the disposition and carries none of its grounds, which are these. "It has no Edit tool" is not the safety property it reads as: every agent type available for audit-shaped work carries write tools, or at least a shell that reaches `git`, so a toolset is never narrowed by the brief describing it.
 
-**Confinement is the whole of it, and the "its own detector" claim is retired.**
-The isolation was once credited with a second purpose: the harness auto-cleans a
-worktree left unchanged, so a surviving worktree was read as proof the agent had
-written, making one mechanism both the confinement and its own detector. That
-biconditional is false in the direction that matters. Auto-clean is
-**best-effort**: every attested surviving worktree in this repo's record was
-locked at a stale stamp with an *empty* `git status --porcelain` inside, so
-survival does not imply a write. A detector whose positive is unsound is worse
-than no detector, because it trains its reader to investigate nothing — the
-reader who finds a surviving worktree and infers a stray write hunts a change
-that is not there, and stops hunting the third time. What replaces it is a weaker
-true statement and no new mechanism: a surviving worktree means *either* the
-child wrote *or* the reclamation did not fire, and telling the two apart is one
-`git status --porcelain` inside it — a read the reaping boundary now performs
-and reports per path, so the disjunction is resolved where it is met rather than
-by hand (lifecycle-kit/SPEC.md §bin/enter-stage.sh). Isolation's case is untouched and never
-needed the detector — the template's **A read-only claim is made by isolation,
-not by sentence** rule rests on write confinement, which is a property of the
-mechanism rather than an observation about its cleanup. Gitignoring the worktree
-path trades the free `git status` signal away, which is why the rule's second
-cost sends the parent to an explicit `git worktree list` at the reaping boundary
-instead — a reap now *enforced* there, since the iteration boundary refuses
-outright on any linked worktree (lifecycle-kit/SPEC.md §bin/enter-stage.sh).
+**Confinement is the whole of it, and the "its own detector" claim is retired.** The isolation was once credited with a second purpose: the harness auto-cleans a worktree left unchanged, so a surviving worktree was read as proof the agent had written, making one mechanism both the confinement and its own detector. That biconditional is false in the direction that matters. Auto-clean is **best-effort**: every attested surviving worktree in this repo's record was locked at a stale stamp with an *empty* `git status --porcelain` inside, so survival does not imply a write. A detector whose positive is unsound is worse than no detector, because it trains its reader to investigate nothing — the reader who finds a surviving worktree and infers a stray write hunts a change that is not there, and stops hunting the third time. What replaces it is a weaker true statement and no new mechanism: a surviving worktree means *either* the child wrote *or* the reclamation did not fire, and telling the two apart is one `git status --porcelain` inside it — a read the reaping boundary now performs and reports per path, so the disjunction is resolved where it is met rather than by hand (lifecycle-kit/SPEC.md §bin/enter-stage.sh). Isolation's case is untouched and never needed the detector — the template's **A read-only claim is made by isolation, not by sentence** rule rests on write confinement, which is a property of the mechanism rather than an observation about its cleanup. Gitignoring the worktree path trades the free `git status` signal away, which is why the rule's second cost sends the parent to an explicit `git worktree list` at the reaping boundary instead — a reap now *enforced* there, since the iteration boundary refuses outright on any linked worktree (lifecycle-kit/SPEC.md §bin/enter-stage.sh).
 
-**And this is the same failure as the `worktree.baseRef` one below, met from the
-other side.** That paragraph rules that repeated confirmation of a behavior is
-not evidence about its mutability, after a false universal reached shipped
-doctrine on attestations taken under one default. Here it was repeated
-*successful* auto-cleans that confirmed the detector until they did not, each
-success making the mechanism feel more settled and so suppressing the probe that
-would have falsified it. The two corrections are filed one paragraph apart so a
-reader meets the general lesson once with two instances, rather than twice as two
-unrelated repairs.
+**And this is the same failure as the `worktree.baseRef` one below, met from the other side.** That paragraph rules that repeated confirmation of a behavior is not evidence about its mutability, after a false universal reached shipped doctrine on attestations taken under one default. Here it was repeated *successful* auto-cleans that confirmed the detector until they did not, each success making the mechanism feel more settled and so suppressing the probe that would have falsified it. The two corrections are filed one paragraph apart so a reader meets the general lesson once with two instances, rather than twice as two unrelated repairs.
 
-**A dispatch-time sweep in the guard is refused, and recorded here so the
-earlier-is-better instinct meets the ruling rather than the silence.** The
-obvious earlier fix for accumulating residue is to have the dispatch guard reap
-it on the way past. It is ruled out on two grounds. *A verdict surface may not
-own lifecycle*: the guard's contract is to **decide** — allow or block a dispatch
-— and a guard that removes directories and deletes refs en route to a verdict has
-become a lifecycle owner whose failures are invisible at the only place anyone
-looks, which is the verdict. *And the timing is wrong in the one direction that
-cannot be recovered*: a dispatch-time sweep runs while sibling dispatches are in
-flight, so its predicate would have to establish that a worktree belongs to no
-live child, and a sweep that guesses wrong destroys a running sibling's checkout.
-The iteration-boundary refusal has the
-opposite property on both counts: it takes no destructive action at all, and it
-runs at the one moment whose whole definition is that the previous iteration's
-work is finished. The guard's contract, its assertions and its source are
-therefore unchanged by this ruling.
+**A dispatch-time sweep in the guard is refused, and recorded here so the earlier-is-better instinct meets the ruling rather than the silence.** The obvious earlier fix for accumulating residue is to have the dispatch guard reap it on the way past. It is ruled out on two grounds. *A verdict surface may not own lifecycle*: the guard's contract is to **decide** — allow or block a dispatch — and a guard that removes directories and deletes refs en route to a verdict has become a lifecycle owner whose failures are invisible at the only place anyone looks, which is the verdict. *And the timing is wrong in the one direction that cannot be recovered*: a dispatch-time sweep runs while sibling dispatches are in flight, so its predicate would have to establish that a worktree belongs to no live child, and a sweep that guesses wrong destroys a running sibling's checkout. The iteration-boundary refusal has the opposite property on both counts: it takes no destructive action at all, and it runs at the one moment whose whole definition is that the previous iteration's work is finished. The guard's contract, its assertions and its source are therefore unchanged by this ruling.
 
-**The second ground rested on a premise an experiment has since falsified, and
-the correction is recorded rather than left to be re-derived.** That ground read
-"lock is not a liveness signal here": the attested residue was locked,
-stale-stamped and clean, taken to be indistinguishable from a live child's
-worktree. It is distinguishable. The lock **reason** names the holding process's
-pid and its start time, so *does this worktree belong to a live child* is
-answerable from outside the child — the classification lifecycle-kit's boundary
-check now performs. The same experiment supplied the residue's **cause**, which
-nothing had established: a locked worktree is refused by `git worktree prune` and
-by an unforced `git worktree remove`, so a harness dying before its cleanup step
-strands one that is clean, commitless **and** unreclaimable — the exact signature
-the attested survivors carried and which the auto-clean-is-best-effort reading
-above described without explaining. Reclamation is tied to the **child's own
-return**, not to the dispatching session's lifetime.
+**The second ground rested on a premise an experiment has since falsified, and the correction is recorded rather than left to be re-derived.** That ground read "lock is not a liveness signal here": the attested residue was locked, stale-stamped and clean, taken to be indistinguishable from a live child's worktree. It is distinguishable. The lock **reason** names the holding process's pid and its start time, so *does this worktree belong to a live child* is answerable from outside the child — the classification lifecycle-kit's boundary check now performs. The same experiment supplied the residue's **cause**, which nothing had established: a locked worktree is refused by `git worktree prune` and by an unforced `git worktree remove`, so a harness dying before its cleanup step strands one that is clean, commitless **and** unreclaimable — the exact signature the attested survivors carried and which the auto-clean-is-best-effort reading above described without explaining. Reclamation is tied to the **child's own return**, not to the dispatching session's lifetime.
 
-**Whose pid the lock reason names is the harness's to decide, and that is why the
-trap is stated beside the reap step.** A harness writing its own supervising
-process's pid rather than the child's makes this the one record the protocol's
-standing instinct — distrust a pattern match, trust a recorded pid's liveness —
-reads as meaning something it does not, so the template states the limit where
-the reap is performed rather than leaving it to be re-derived.
+**Whose pid the lock reason names is the harness's to decide, and that is why the trap is stated beside the reap step.** A harness writing its own supervising process's pid rather than the child's makes this the one record the protocol's standing instinct — distrust a pattern match, trust a recorded pid's liveness — reads as meaning something it does not, so the template states the limit where the reap is performed rather than leaving it to be re-derived.
 
-**The ruling stands, and stands on the ground that survived.** *A verdict surface
-may not own lifecycle* is untouched by any of this, and it alone refuses the
-dispatch-time sweep. What the falsified premise changes is what is now
-**designable elsewhere**: a reaper at a boundary can be built against a published
-mechanism rather than against a guess, which is why the classification landed
-there and not here. The predicate also degrades to the old blind state wherever
-the consumer configures no lock-reason pattern, so a guard-side sweep would be
-resting on optional consumer config to avoid destroying a sibling's checkout —
-an argument against moving it here even now that the signal exists.
+**The ruling stands, and stands on the ground that survived.** *A verdict surface may not own lifecycle* is untouched by any of this, and it alone refuses the dispatch-time sweep. What the falsified premise changes is what is now **designable elsewhere**: a reaper at a boundary can be built against a published mechanism rather than against a guess, which is why the classification landed there and not here. The predicate also degrades to the old blind state wherever the consumer configures no lock-reason pattern, so a guard-side sweep would be resting on optional consumer config to avoid destroying a sibling's checkout — an argument against moving it here even now that the signal exists.
 
-**The reap is owed at the dispatching session's own turn end, and that
-obligation is not a reversal of the refusal above.** What is refused is a sweep
-**in the dispatch guard**, on the two grounds just stated, and neither reaches a
-session reaping what it minted. The first is silent, because the subject is a
-**session** and not a verdict surface. The second inverts: a dispatch-time sweep
-runs while sibling dispatches are in flight, so its predicate would have to
-establish that a worktree belongs to no live child and a wrong guess destroys a
-running sibling's checkout — while a dispatcher at its own turn end is past every
-child it started this turn and is scoped to trees it minted, so it needs no
-predicate about a sibling's liveness and takes no action outside its own set. The
-property the iteration boundary was credited with, running at a moment whose
-definition is that the work is finished, is what moves earlier rather than what
-weakens. The boundary refusal stays the **backstop**, and what the obligation
-buys is **latency** rather than a newly caught class: the refusal already catches
-the harm, and the obligation shortens an orphan's carry from every session left
-in the iteration to one turn.
+**The reap is owed at the dispatching session's own turn end, and that obligation is not a reversal of the refusal above.** What is refused is a sweep **in the dispatch guard**, on the two grounds just stated, and neither reaches a session reaping what it minted. The first is silent, because the subject is a **session** and not a verdict surface. The second inverts: a dispatch-time sweep runs while sibling dispatches are in flight, so its predicate would have to establish that a worktree belongs to no live child and a wrong guess destroys a running sibling's checkout — while a dispatcher at its own turn end is past every child it started this turn and is scoped to trees it minted, so it needs no predicate about a sibling's liveness and takes no action outside its own set. The property the iteration boundary was credited with, running at a moment whose definition is that the work is finished, is what moves earlier rather than what weakens. The boundary refusal stays the **backstop**, and what the obligation buys is **latency** rather than a newly caught class: the refusal already catches the harm, and the obligation shortens an orphan's carry from every session left in the iteration to one turn.
 
-**No new oracle is owed over that turn end, and the reason is the predicate
-rather than the budget.** `SubagentStop` does see a dispatched session's turn end
-and the turn-end liveness hook already refuses there, so the event is reachable —
-but a worktree carries no attribution to the ending session without the
-consumer's optional lock-reason configuration, so a refusal keyed on `git
-worktree list` would refuse a dispatcher for a concurrent session's live tree, at
-the most expensive moment to be wrong. **Registering the worktree for a later
-sweep is ruled out** on the launch record's own reasoning: `git worktree list` is
-already the registry, so what is missing is attribution and judgment rather than
-discoverability, and a record written by the dispatcher would share the reap's
-structural uncheckability — a session that skips the reap writes no record
-either, so there is no absence a check could have been told to expect.
+**No new oracle is owed over that turn end, and the reason is the predicate rather than the budget.** `SubagentStop` does see a dispatched session's turn end and the turn-end liveness hook already refuses there, so the event is reachable — but a worktree carries no attribution to the ending session without the consumer's optional lock-reason configuration, so a refusal keyed on `git worktree list` would refuse a dispatcher for a concurrent session's live tree, at the most expensive moment to be wrong. **Registering the worktree for a later sweep is ruled out** on the launch record's own reasoning: `git worktree list` is already the registry, so what is missing is attribution and judgment rather than discoverability, and a record written by the dispatcher would share the reap's structural uncheckability — a session that skips the reap writes no record either, so there is no absence a check could have been told to expect.
 
-**`worktree.baseRef` is vendor configuration, and choosing it is the consumer's
-job.** The template's **Isolation charges four harness costs, and paying them
-is the parent's job** rule names the knob and both of its values rather than a
-choice, because a vendoring consumer inherits the template and never a settings
-file. A consumer that dispatches isolated agents therefore sets the knob
-deliberately instead of inheriting the default, and — where its harness config is
-gated — pins it, through the general settings-pin mechanism (context-kit/SPEC.md
-§check-settings-pins) rather than anything this kit ships. What is ruled is that
-the value be *chosen*, never which value: a consumer wanting a clean tree per
-dispatch is right to stay on the default. No knob joins delegation-kit's own
-roster for it (§Layout and configuration) — this is harness configuration, not
-kit configuration, and a kit knob shadowing a vendor setting would be a second
-source for one value. Recorded so a later reader does not read the omission as an
-oversight and close it.
+**`worktree.baseRef` is vendor configuration, and choosing it is the consumer's job.** The template's **Isolation charges four harness costs, and paying them is the parent's job** rule names the knob and both of its values rather than a choice, because a vendoring consumer inherits the template and never a settings file. A consumer that dispatches isolated agents therefore sets the knob deliberately instead of inheriting the default, and — where its harness config is gated — pins it, through the general settings-pin mechanism (context-kit/SPEC.md §check-settings-pins) rather than anything this kit ships. What is ruled is that the value be *chosen*, never which value: a consumer wanting a clean tree per dispatch is right to stay on the default. No knob joins delegation-kit's own roster for it (§Layout and configuration) — this is harness configuration, not kit configuration, and a kit knob shadowing a vendor setting would be a second source for one value. Recorded so a later reader does not read the omission as an oversight and close it.
 
-**Why that cost names a knob and not a measurement.** "The worktree is cut at
-the remote tracking ref, so staleness equals the unpushed backlog" describes the
-`fresh` value alone; stated as universal it is false, and it reached shipped,
-consumer-facing doctrine on seven attestations — every one taken under that
-default, not one of them bearing on whether the behavior was configurable.
-Repeated confirmation of a behavior is not evidence about its mutability, and
-each re-confirmation made the mechanism feel more settled and so suppressed the
-configuration probe that would have settled it. Hence the rule's shape: name the
-knob and both values, and leave any measurement attributed to the configuration
-it was taken under. It follows that no parent "owes the doubt back" for a
-structural defect here — there is none, and the discipline below costs one line
-in a prompt.
+**Why that cost names a knob and not a measurement.** "The worktree is cut at the remote tracking ref, so staleness equals the unpushed backlog" describes the `fresh` value alone; stated as universal it is false, and it reached shipped, consumer-facing doctrine on seven attestations — every one taken under that default, not one of them bearing on whether the behavior was configurable. Repeated confirmation of a behavior is not evidence about its mutability, and each re-confirmation made the mechanism feel more settled and so suppressed the configuration probe that would have settled it. Hence the rule's shape: name the knob and both values, and leave any measurement attributed to the configuration it was taken under. It follows that no parent "owes the doubt back" for a structural defect here — there is none, and the discipline below costs one line in a prompt.
 
-**The child-side rev discipline is kept as defence in depth, and the first
-ground alone is sufficient.** The parent cannot read the child's *effective*
-setting — `baseRef` resolves on the dispatching machine's merged settings,
-nothing in the dispatch payload carries it and nothing returns it — so a parent
-assuming either value is asserting an unverified premise about a third-party
-tool, which is the move that produced the false doctrine above. Second, a
-vendoring consumer inherits the template and not a settings file, so for every
-consumer that has not set the knob the discipline is the whole protection. Third,
-even a repo that pins the knob is not covered end to end: a managed tier and a
-command-line override outrank a project settings file and lie outside any repo's
-reach. It is also nearly free and self-verifying — one command whose output *is*
-the evidence — so under a holding pin it degrades from load-bearing to a cheap
-assertion rather than becoming dead weight.
+**The child-side rev discipline is kept as defence in depth, and the first ground alone is sufficient.** The parent cannot read the child's *effective* setting — `baseRef` resolves on the dispatching machine's merged settings, nothing in the dispatch payload carries it and nothing returns it — so a parent assuming either value is asserting an unverified premise about a third-party tool, which is the move that produced the false doctrine above. Second, a vendoring consumer inherits the template and not a settings file, so for every consumer that has not set the knob the discipline is the whole protection. Third, even a repo that pins the knob is not covered end to end: a managed tier and a command-line override outrank a project settings file and lie outside any repo's reach. It is also nearly free and self-verifying — one command whose output *is* the evidence — so under a holding pin it degrades from load-bearing to a cheap assertion rather than becoming dead weight.
 
-**The untracked half reaches no configuration at all, and its disposition is
-refusal.** An isolated child sees only committed state, so the third cost is a
-ruling rather than a mitigation: no value of the knob helps and naming a rev does
-not either. Attested twice — a sweep sent to triage an untracked capture log read
-an empty file and reported its corpus absent, and a settings-overlay comparison
-saw no overlay because the local settings file is uncommitted. Both returned a
-confident "nothing there", indistinguishable in shape from a clean result, which
-makes it the worse of the two failure modes. It binds *against* the read-only
-rule rather than beside it: a read-only claim is made by isolation, and isolation
-is what blinds the read, so a claimed-read-only sweep over an untracked corpus
-has no correct form at all.
+**The untracked half reaches no configuration at all, and its disposition is refusal.** An isolated child sees only committed state, so the third cost is a ruling rather than a mitigation: no value of the knob helps and naming a rev does not either. Attested twice — a sweep sent to triage an untracked capture log read an empty file and reported its corpus absent, and a settings-overlay comparison saw no overlay because the local settings file is uncommitted. Both returned a confident "nothing there", indistinguishable in shape from a clean result, which makes it the worse of the two failure modes. It binds *against* the read-only rule rather than beside it: a read-only claim is made by isolation, and isolation is what blinds the read, so a claimed-read-only sweep over an untracked corpus has no correct form at all.
 
-**The dispatch-shape rules are one mechanism, seen from several sides.** The template's **Never dispatch
-a fork to narrow a child**, **A read-only claim is made by isolation, not by
-sentence**, and **A child's only upward route is a durable artifact** rules are
-one defect seen from three sides: each governs the *shape of a dispatch call*,
-and each failed the same way — the prose did not reach the reader it binds.
-One attested surface per rule: a fork dispatched as a read-only audit completed
-a whole stage, commits included; four forks dispatched with prose-only
-"read-only, no edits" briefs, one of which committed unreviewed on the shared
-branch; and repeated fan-outs, across stages and across iterations, messaged the top-level
-session instead of their dispatcher, which no prompt wording could have fixed.
+**The dispatch-shape rules are one mechanism, seen from several sides.** The template's **Never dispatch a fork to narrow a child**, **A read-only claim is made by isolation, not by sentence**, and **A child's only upward route is a durable artifact** rules are one defect seen from three sides: each governs the *shape of a dispatch call*, and each failed the same way — the prose did not reach the reader it binds. One attested surface per rule: a fork dispatched as a read-only audit completed a whole stage, commits included; four forks dispatched with prose-only "read-only, no edits" briefs, one of which committed unreviewed on the shared branch; and repeated fan-outs, across stages and across iterations, messaged the top-level session instead of their dispatcher, which no prompt wording could have fixed.
 
-**Why an oracle is owed here and not for the turn-ending rule.** §Operative
-residency closes on the finding that a restated rule is reachable, not obeyed,
-and owes no gate because no check can read a session's choice to end a turn —
-the act leaves no tracked artifact. A dispatch leaves no tracked artifact
-either, so the distinguishing axis is not durability but interception:
+**Why an oracle is owed here and not for the turn-ending rule.** §Operative residency closes on the finding that a restated rule is reachable, not obeyed, and owes no gate because no check can read a session's choice to end a turn — the act leaves no tracked artifact. A dispatch leaves no tracked artifact either, so the distinguishing axis is not durability but interception:
 
-> Where a rule binds an act that leaves no tracked artifact, the enforcement
-> question is whether the act passes a **chokepoint** — not whether it reaches
-> the tree. A dispatch does. A turn-end does not.
+> Where a rule binds an act that leaves no tracked artifact, the enforcement question is whether the act passes a **chokepoint** — not whether it reaches the tree. A dispatch does. A turn-end does not.
 
-**That second sentence was a claim about the harness, and it has now been
-measured.** A `SubagentStop` hook *is* a chokepoint at the turn-end, so it is the
-one candidate that could falsify the axis — and the decisive question was whether
-the harness already defers a subagent's stop while a background child is live,
-since a harness that deferred would dissolve the class this rule exists for. The
-probe at §The turn-end liveness hook put a live producer
-under a deliberate turn-end and read `live=yes`: **the stop is not deferred**. So
-the sentence stands as written for the `PreToolUse` axis it was said on, the
-relocation to guard-kit rule 14 stands, and the turn-end's own event is reachable.
+**That second sentence was a claim about the harness, and it has now been measured.** A `SubagentStop` hook *is* a chokepoint at the turn-end, so it is the one candidate that could falsify the axis — and the decisive question was whether the harness already defers a subagent's stop while a background child is live, since a harness that deferred would dissolve the class this rule exists for. The probe at §The turn-end liveness hook put a live producer under a deliberate turn-end and read `live=yes`: **the stop is not deferred**. So the sentence stands as written for the `PreToolUse` axis it was said on, the relocation to guard-kit rule 14 stands, and the turn-end's own event is reachable.
 
-**The second sentence of that block holds only on the axis it was said on, and
-the qualification is stated rather than left to be read past.** *A turn-end does
-not* pass a chokepoint on the **tool-call** axis, which is the axis the block is
-about. On the harness's own event axis it does, and the hook there **refuses**,
-by exit 2, on an operator authorization since spent (§The turn-end liveness
-hook owns the mechanism and the authorization's content). So the turn-end
-rule carries enforcement on both axes — rule 14 over the harm, this hook over the
-act — and neither is the other's substitute, since rule 14 reaches acts this
-hook's event never sees and this hook reaches a session that mutates nothing.
+**The second sentence of that block holds only on the axis it was said on, and the qualification is stated rather than left to be read past.** *A turn-end does not* pass a chokepoint on the **tool-call** axis, which is the axis the block is about. On the harness's own event axis it does, and the hook there **refuses**, by exit 2, on an operator authorization since spent (§The turn-end liveness hook owns the mechanism and the authorization's content). So the turn-end rule carries enforcement on both axes — rule 14 over the harm, this hook over the act — and neither is the other's substitute, since rule 14 reaches acts this hook's event never sees and this hook reaches a session that mutates nothing.
 
-**The chokepoint — what a `PreToolUse` hook can actually read.** The payload
-carries `session_id`, `prompt_id`, `transcript_path`, `cwd`, `permission_mode`,
-`hook_event_name`, `tool_name`, `tool_input`, and `tool_use_id`; and, **only
-when the hook fires inside a subagent**, `agent_id` and `agent_type`. For the
-dispatch tool, `tool_input` carries the dispatch's own parameters —
-`subagent_type`, `isolation`, `model`, `description`, `prompt`. Three
-consequences carry the guard below: the fork ban has an exact trigger
-(`tool_input.subagent_type`), the read-only claim has an exact trigger
-(`tool_input.isolation`), and depth has an exact, *documented* discriminator —
-`agent_id` is present iff the dispatching session is itself a subagent, so its
-presence means the call about to be made creates a grandchild. **That is a
-discriminator on the field's *presence*, never on its value**, and the
-distinction is worth one clause because §The turn-end liveness hook
-records a live doubt about the value: an observation of five firings in one
-session saw five distinct `agent_id` values. Nothing in that doubt touches this
-trigger — presence is still presence whether the value is per-agent or per-firing
-— so the two readings are compatible rather than in tension, and neither is the
-other's drift.
+**The chokepoint — what a `PreToolUse` hook can actually read.** The payload carries `session_id`, `prompt_id`, `transcript_path`, `cwd`, `permission_mode`, `hook_event_name`, `tool_name`, `tool_input`, and `tool_use_id`; and, **only when the hook fires inside a subagent**, `agent_id` and `agent_type`. For the dispatch tool, `tool_input` carries the dispatch's own parameters — `subagent_type`, `isolation`, `model`, `description`, `prompt`. Three consequences carry the guard below: the fork ban has an exact trigger (`tool_input.subagent_type`), the read-only claim has an exact trigger (`tool_input.isolation`), and depth has an exact, *documented* discriminator — `agent_id` is present iff the dispatching session is itself a subagent, so its presence means the call about to be made creates a grandchild. **That is a discriminator on the field's *presence*, never on its value**, and the distinction is worth one clause because §The turn-end liveness hook records a live doubt about the value: an observation of five firings in one session saw five distinct `agent_id` values. Nothing in that doubt touches this trigger — presence is still presence whether the value is per-agent or per-firing — so the two readings are compatible rather than in tension, and neither is the other's drift.
 
-**Honest limit on that roster.** It is sourced from the harness's own published
-hook contract, fetched rather than recalled, and from nothing in this tree —
-the same footing as `CLAUDE_CODE_CHILD_SESSION`'s "verified, not trusted"
-treatment (lifecycle-kit/SPEC.md §bin/session-id.sh). A future harness revision
-reshaping the payload is drift this SPEC cannot self-detect; only re-reading the
-hook contract catches it.
+**Honest limit on that roster.** It is sourced from the harness's own published hook contract, fetched rather than recalled, and from nothing in this tree — the same footing as `CLAUDE_CODE_CHILD_SESSION`'s "verified, not trusted" treatment (lifecycle-kit/SPEC.md §bin/session-id.sh). A future harness revision reshaping the payload is drift this SPEC cannot self-detect; only re-reading the hook contract catches it.
 
-**Two depth routes ruled out**, both being the obvious move.
-`CLAUDE_CODE_CHILD_SESSION` is set in top-level sessions too, and
-`CLAUDE_CODE_SESSION_ID` carries the *root* id for a child, so a depth-1 and a
-depth-2 dispatcher are indistinguishable by environment alone — that route
-ships a rule silently mis-firing at the top level. The meta record beside a
-transcript does carry an exact spawn depth, and that route works and is
-deliberately not taken: it couples a hook to an *uncontracted* harness artifact
-to answer a question one *contracted* boolean already answers. The
-stage-economics meter accepts that same coupling (drift-kit/SPEC.md §The
-stage-economics meter, the fan-out row) because it needs the whole spawn forest
-and no contracted field supplies it; a hook needs one bit and gets it under
-contract. The axis is what the contract supplies, not appetite for risk.
+**Two depth routes ruled out**, both being the obvious move. `CLAUDE_CODE_CHILD_SESSION` is set in top-level sessions too, and `CLAUDE_CODE_SESSION_ID` carries the *root* id for a child, so a depth-1 and a depth-2 dispatcher are indistinguishable by environment alone — that route ships a rule silently mis-firing at the top level. The meta record beside a transcript does carry an exact spawn depth, and that route works and is deliberately not taken: it couples a hook to an *uncontracted* harness artifact to answer a question one *contracted* boolean already answers. The stage-economics meter accepts that same coupling (drift-kit/SPEC.md §The stage-economics meter, the fan-out row) because it needs the whole spawn forest and no contracted field supplies it; a hook needs one bit and gets it under contract. The axis is what the contract supplies, not appetite for risk.
 
-agent-dispatch-guard is that oracle — a second `PreToolUse` hook
-on matcher `Agent`, beside the budget guard. It reads the payload once and runs
-the rules below, in order:
+agent-dispatch-guard is that oracle — a second `PreToolUse` hook on matcher `Agent`, beside the budget guard. It reads the payload once and runs the rules below, in order:
 
 | # | rule | trigger | decision |
 | --- | --- | --- | --- |
@@ -688,130 +121,25 @@ the rules below, in order:
 | D2 | isolation claim | `tool_input.subagent_type` ∈ `DELEGATION_KIT_READONLY_TYPES` and `tool_input.isolation` is not `worktree` | block |
 | D3 | depth advisory | payload carries `agent_id` | advise |
 
-Order is load-bearing only between D1/D2 and D3 — a blocked dispatch needs no
-advisory, so D3 runs last. D1 precedes D2 because the fork ban is unconditional
-and its message is the more specific one for a dispatch violating both.
+Order is load-bearing only between D1/D2 and D3 — a blocked dispatch needs no advisory, so D3 runs last. D1 precedes D2 because the fork ban is unconditional and its message is the more specific one for a dispatch violating both.
 
-**Why a second guard rather than more rules in the budget guard.** Four
-reasons, each independently sufficient: the budget guard blocks on a
-**transient** condition and is deliberately knob-overridable, while these block
-on a **permanent** doctrine violation that must not be per-dispatch
-overridable; the budget guard reads no stdin at all; a consumer may want either
-enforcement without the other, and hook registration is the only opt-in valve
-there is; and their test lanes take different payload grammars. The harness
-fires every hook registered on a matcher and any exit 2 blocks, so the two
-compose with no dispatcher between them.
+**Why a second guard rather than more rules in the budget guard.** Four reasons, each independently sufficient: the budget guard blocks on a **transient** condition and is deliberately knob-overridable, while these block on a **permanent** doctrine violation that must not be per-dispatch overridable; the budget guard reads no stdin at all; a consumer may want either enforcement without the other, and hook registration is the only opt-in valve there is; and their test lanes take different payload grammars. The harness fires every hook registered on a matcher and any exit 2 blocks, so the two compose with no dispatcher between them.
 
-**D1 blocks unconditionally**, which the template's own boundary does not — a
-fork stays correct where the child does the same job at the same authority, and
-a hook cannot read intent. The block is ruled unconditional on the ground that
-no sanctioned fork use exists in this doctrine, and the valve is **unwiring the
-hook**, never a knob: a per-dispatch override is exactly the honour system
-these rules exist to end, and a knob would restore it under a better
-name. The block message names the two lawful alternatives, as guard-kit
-requires of every block message.
+**D1 blocks unconditionally**, which the template's own boundary does not — a fork stays correct where the child does the same job at the same authority, and a hook cannot read intent. The block is ruled unconditional on the ground that no sanctioned fork use exists in this doctrine, and the valve is **unwiring the hook**, never a knob: a per-dispatch override is exactly the honour system these rules exist to end, and a knob would restore it under a better name. The block message names the two lawful alternatives, as guard-kit requires of every block message.
 
-**D2 is inert until configured**, by construction — the default roster is empty
-and the kit ships no agent-type names. An inert D2 reports nothing; it is a
-hook, not a gate, so there is no clean line to print. Stated here so a consumer
-does not infer coverage it has not configured.
+**D2 is inert until configured**, by construction — the default roster is empty and the kit ships no agent-type names. An inert D2 reports nothing; it is a hook, not a gate, so there is no clean line to print. Stated here so a consumer does not infer coverage it has not configured.
 
-**D2 composes with isolation's untracked-blindness cost, and the composition is
-stated in the protocol template because that is where a dispatcher reads it.**
-Isolation's third cost rules a sweep whose corpus includes an untracked or
-gitignored surface undelegable to an isolated agent, and its remedy reads as
-*dispatch it unisolated instead* — which, for a type in
-`DELEGATION_KIT_READONLY_TYPES`, is exactly the shape D2 blocks. Both rules are
-this kit's, their composition was stated on neither surface, and the consequence
-is that such a sweep is not delegable **at all** to a read-only type while the
-protocol never says so. Attested: a roster read delegated under that mandate
-reported "absent" for four surfaces that carried content, and a session trusting
-the numbers would have cleared nothing and reported clean. The **child's** half
-was missing with it — the sibling fourth cost tells a child that an unreadable
-gate verdict is the expected reading rather than a defect to repair, and the
-third cost carried no such clause, so an isolated child asked to read a
-gitignored path reports **absence** as a finding, which is the exact shape a
-parent cannot tell from a true empty. With an empty roster the *not delegable at
-all* clause is simply never reached, which is the correct inert behavior and
-needs no second knob to express. Cost (4) carries the matching dispatcher half:
-an oracle-running sweep is classified before dispatch, and the arm's output is
-handed over as a file named absolute into the main checkout, which an isolated
-child reads as it writes its journal. That is not the gitignored surface cost
-(3) rules out: cost (3) is about a path the child resolves inside its worktree,
-which carries no gitignored file, while a path named absolute into the main
-checkout reaches the main checkout's file, the resume-journal rule's route for a
-child's writes. Measured: an isolated sweep sent to run a binary-dispatched arm
-spent a full round trip returning blindness on a fact decidable before dispatch,
-and finished once re-dispatched with the arm's stdout materialized that way. A
-guard assertion is declined on cost (3)'s ground — the payload carries the
-prompt and never the oracles a sweep will run — and always-loaded residency by
-§Operative residency's condition (a), since the dispatcher fires the trigger
-that loads the template. A shared classify-before-dispatch step across (3) and
-(4) was weighed and not taken: it would re-phrase (3)'s *not delegable at all*
-ruling for a D2-held type.
+**D2 composes with isolation's untracked-blindness cost, and the composition is stated in the protocol template because that is where a dispatcher reads it.** Isolation's third cost rules a sweep whose corpus includes an untracked or gitignored surface undelegable to an isolated agent, and its remedy reads as *dispatch it unisolated instead* — which, for a type in `DELEGATION_KIT_READONLY_TYPES`, is exactly the shape D2 blocks. Both rules are this kit's, their composition was stated on neither surface, and the consequence is that such a sweep is not delegable **at all** to a read-only type while the protocol never says so. Attested: a roster read delegated under that mandate reported "absent" for four surfaces that carried content, and a session trusting the numbers would have cleared nothing and reported clean. The **child's** half was missing with it — the sibling fourth cost tells a child that an unreadable gate verdict is the expected reading rather than a defect to repair, and the third cost carried no such clause, so an isolated child asked to read a gitignored path reports **absence** as a finding, which is the exact shape a parent cannot tell from a true empty. With an empty roster the *not delegable at all* clause is simply never reached, which is the correct inert behavior and needs no second knob to express. Cost (4) carries the matching dispatcher half: an oracle-running sweep is classified before dispatch, and the arm's output is handed over as a file named absolute into the main checkout, which an isolated child reads as it writes its journal. That is not the gitignored surface cost (3) rules out: cost (3) is about a path the child resolves inside its worktree, which carries no gitignored file, while a path named absolute into the main checkout reaches the main checkout's file, the resume-journal rule's route for a child's writes. Measured: an isolated sweep sent to run a binary-dispatched arm spent a full round trip returning blindness on a fact decidable before dispatch, and finished once re-dispatched with the arm's stdout materialized that way. A guard assertion is declined on cost (3)'s ground — the payload carries the prompt and never the oracles a sweep will run — and always-loaded residency by §Operative residency's condition (a), since the dispatcher fires the trigger that loads the template. A shared classify-before-dispatch step across (3) and (4) was weighed and not taken: it would re-phrase (3)'s *not delegable at all* ruling for a D2-held type.
 
-**Two candidate owners were weighed and both refused.** *At this guard*: the
-payload carries `subagent_type`, `isolation` and prompt text and never the
-sweep's corpus, so a rule here would have to key on whether the prompt "names a
-path" — which D3's own design already rules out as firing on the word and
-teaching dispatchers to game the wording, buying a green hook and no channel.
-*At a consumer's own roster emitter*, where such a derivation already takes a
-per-path ignore verdict and drops it before printing: it would work, and it
-would repair one instance of a general class while leaving the class open, since
-a delegable sweep's corpus is frequently not that roster. The constraint
-therefore belongs where the dispatcher reads its protocol, and the narrower
-emitter-side repair stays available rather than being absorbed here.
+**Two candidate owners were weighed and both refused.** *At this guard*: the payload carries `subagent_type`, `isolation` and prompt text and never the sweep's corpus, so a rule here would have to key on whether the prompt "names a path" — which D3's own design already rules out as firing on the word and teaching dispatchers to game the wording, buying a green hook and no channel. *At a consumer's own roster emitter*, where such a derivation already takes a per-path ignore verdict and drops it before printing: it would work, and it would repair one instance of a general class while leaving the class open, since a delegable sweep's corpus is frequently not that roster. The constraint therefore belongs where the dispatcher reads its protocol, and the narrower emitter-side repair stays available rather than being absorbed here.
 
-**D2 is evaluated once, at dispatch, and a resume does not re-enter it.** D2
-holds a read-only claim to isolation because isolation makes the claim. A
-`SendMessage` resume of an isolated read-only child runs in the main checkout,
-its worktree gone, with the write reach D2 would have refused at dispatch —
-measured: a child that reported its own linked worktree at dispatch, resumed
-after it handed back, printed the main checkout as `pwd` and toplevel, with the
-main checkout alone in `git worktree list`. Nothing in the resume's `PreToolUse`
-payload names the recipient's type or isolation, and the dispatch payload
-carries a `tool_use_id` but not the agent id a resume addresses, so the guard
-cannot see the resume. A join would need a second, post-dispatch hook writing a
-map from agent id to dispatch shape, and a state file, for one class; that is
-declined as the heavier shape, whatever the post-dispatch payload carries. The
-template therefore treats a resumed isolated dispatch as a new dispatch for any
-work over the tree. It restricts the resume to re-emitting what the child holds,
-and has the child confirm its own linked worktree at every start. The child's
-check is a request, delivered where the child reads it (§Operative residency).
-What it removes is a resume running the work unconfined; nothing refuses a child
-that skips it.
+**D2 is evaluated once, at dispatch, and a resume does not re-enter it.** D2 holds a read-only claim to isolation because isolation makes the claim. A `SendMessage` resume of an isolated read-only child runs in the main checkout, its worktree gone, with the write reach D2 would have refused at dispatch — measured: a child that reported its own linked worktree at dispatch, resumed after it handed back, printed the main checkout as `pwd` and toplevel, with the main checkout alone in `git worktree list`. Nothing in the resume's `PreToolUse` payload names the recipient's type or isolation, and the dispatch payload carries a `tool_use_id` but not the agent id a resume addresses, so the guard cannot see the resume. A join would need a second, post-dispatch hook writing a map from agent id to dispatch shape, and a state file, for one class; that is declined as the heavier shape, whatever the post-dispatch payload carries. The template therefore treats a resumed isolated dispatch as a new dispatch for any work over the tree. It restricts the resume to re-emitting what the child holds, and has the child confirm its own linked worktree at every start. The child's check is a request, delivered where the child reads it (§Operative residency). What it removes is a resume running the work unconfined; nothing refuses a child that skips it.
 
-**D3 advises rather than blocks**, and both halves are deliberate. It cannot
-block: a nested dispatch is legitimate and common — a stage session's own
-read-only fan-out *is* a grandchild dispatch — so blocking would remove a
-capability rather than confine one. It must not be silent: this is the one rule
-whose bound reader provably never loads the protocol template (§One template, a
-resident pointer), so the advisory is the *only* delivery of it, which is
-§Operative residency's (a)–(c) shape applied at a hook instead of a doc. Ruled
-out for D3: keying on whether the prompt text "names a path" — that fires on
-the word and teaches dispatchers to game the wording, buying a green hook and
-no channel. The `agent_id` trigger is exact and unforgeable; the message
-carries the judgment the trigger cannot.
+**D3 advises rather than blocks**, and both halves are deliberate. It cannot block: a nested dispatch is legitimate and common — a stage session's own read-only fan-out *is* a grandchild dispatch — so blocking would remove a capability rather than confine one. It must not be silent: this is the one rule whose bound reader provably never loads the protocol template (§One template, a resident pointer), so the advisory is the *only* delivery of it, which is §Operative residency's (a)–(c) shape applied at a hook instead of a doc. Ruled out for D3: keying on whether the prompt text "names a path" — that fires on the word and teaches dispatchers to game the wording, buying a green hook and no channel. The `agent_id` trigger is exact and unforgeable; the message carries the judgment the trigger cannot.
 
-**The return-value obligation of an isolated read-only child is carried by the
-dispatcher's prompt, not by this guard and not by the kit.** Nothing carries
-D3's warning into the child: an isolated read-only child whose report went to a
-peer name it could not resolve returned a bare `.`, which reads as a sweep that
-found nothing. The template's disposition (2) has the dispatcher say so in the
-prompt. Two other carriers were weighed. **The guard rewriting the prompt** was
-declined: it would make this guard an author of dispatch text rather than a
-judge of dispatch shape, for a class that has not reproduced since the harness
-began stating the hand-back duty in the child's own prompt.
-**The agent-type definition** is the consumer's surface, since the kit ships no
-agent-type names (§Layout and configuration, `DELEGATION_KIT_READONLY_TYPES`); a
-consumer may carry the line there as well, in the type's own return contract.
+**The return-value obligation of an isolated read-only child is carried by the dispatcher's prompt, not by this guard and not by the kit.** Nothing carries D3's warning into the child: an isolated read-only child whose report went to a peer name it could not resolve returned a bare `.`, which reads as a sweep that found nothing. The template's disposition (2) has the dispatcher say so in the prompt. Two other carriers were weighed. **The guard rewriting the prompt** was declined: it would make this guard an author of dispatch text rather than a judge of dispatch shape, for a class that has not reproduced since the harness began stating the hand-back duty in the child's own prompt. **The agent-type definition** is the consumer's surface, since the kit ships no agent-type names (§Layout and configuration, `DELEGATION_KIT_READONLY_TYPES`); a consumer may carry the line there as well, in the type's own return contract.
 
-**Degradation — fail-open, but loud**, the posture guard-kit/SPEC.md §The guard
-framework names for a deny-guard whose matcher proves the tool but whose rule
-turns on a payload field. The binary being absent takes the general fail-open
-path (gate-sdk/SPEC.md §The non-gate arm) before this member ever runs — silently,
-with no advisory of this guard's own. What follows is the degradation surface
-once the arm does run:
+**Degradation — fail-open, but loud**, the posture guard-kit/SPEC.md §The guard framework names for a deny-guard whose matcher proves the tool but whose rule turns on a payload field. The binary being absent takes the general fail-open path (gate-sdk/SPEC.md §The non-gate arm) before this member ever runs — silently, with no advisory of this guard's own. What follows is the degradation surface once the arm does run:
 
 | what is missing | behavior |
 | --- | --- |
@@ -820,385 +148,86 @@ once the arm does run:
 | `DELEGATION_KIT_READONLY_TYPES` resolves empty | D2 inert, and silently so; D1 and D3 unaffected |
 | `DELEGATION_KIT_READONLY_TYPES` declared but its own read fails | allow; advisory naming D2 unenforced, D1 and D3 unaffected |
 
-Two implementation facts those rows force, recorded because the obvious build
-gets each of them wrong:
+Two implementation facts those rows force, recorded because the obvious build gets each of them wrong:
 
-- **There is no `jq`-absent arm to protect.** The compiled member emits its own
-  advisory envelope, serializing every interpolated value rather than quoting it
-  by hand (the braces and key order stay literal, to hold `guard_advise`'s wire
-  shape), so the shell original's escape-by-convention fragility and its jq-backed
-  delivery primitive both retire with it rather than needing a compiled
-  equivalent.
-- **The guard reads its roster through delegation-kit's validated table, not
-  around it, and an unrelated config fault still cannot wedge a dispatch.** The
-  kit's knobs are static (§Layout and configuration), so
-  `DELEGATION_KIT_READONLY_TYPES` resolves in process, and the table validator
-  runs at the kit's first resolution: a malformed *unrelated* delegation knob
-  fails this roster's read. That failure is the table's last row — D2 unenforced
-  with an advisory naming the fault, D1 and D3 unaffected — so the typo costs one
-  rule's enforcement, loudly, and never the dispatch. The distinction the
-  table's last two rows draw is this kit's standing one: a roster **resolved to
-  nothing** is silent, a roster whose own read fails is loud.
+- **There is no `jq`-absent arm to protect.** The compiled member emits its own advisory envelope, serializing every interpolated value rather than quoting it by hand (the braces and key order stay literal, to hold `guard_advise`'s wire shape), so the shell original's escape-by-convention fragility and its jq-backed delivery primitive both retire with it rather than needing a compiled equivalent.
+- **The guard reads its roster through delegation-kit's validated table, not around it, and an unrelated config fault still cannot wedge a dispatch.** The kit's knobs are static (§Layout and configuration), so `DELEGATION_KIT_READONLY_TYPES` resolves in process, and the table validator runs at the kit's first resolution: a malformed *unrelated* delegation knob fails this roster's read. That failure is the table's last row — D2 unenforced with an advisory naming the fault, D1 and D3 unaffected — so the typo costs one rule's enforcement, loudly, and never the dispatch. The distinction the table's last two rows draw is this kit's standing one: a roster **resolved to nothing** is silent, a roster whose own read fails is loud.
 
 ### One template, a resident pointer
 
-`templates/agent-execution.md` is the single source for the protocol — a
-binding-shim *template* in lifecycle-kit's grammar (lifecycle-kit/SPEC.md
-§check-skill-binding). The consumer creates `.claude/commands/agent-execution.md`
-as a shim that names the template and binds its two slots — the shared-file
-roster and the validate battery — the consumer-specialization discipline of
-guard-kit's consumer-rules block, now carried by the slot/binding mechanism the
-lifecycle skills already use. `check-skill-binding` enforces the slot pairing on
-the consumer side.
+`templates/agent-execution.md` is the single source for the protocol — a binding-shim *template* in lifecycle-kit's grammar (lifecycle-kit/SPEC.md §check-skill-binding). The consumer creates `.claude/commands/agent-execution.md` as a shim that names the template and binds its two slots — the shared-file roster and the validate battery — the consumer-specialization discipline of guard-kit's consumer-rules block, now carried by the slot/binding mechanism the lifecycle skills already use. `check-skill-binding` enforces the slot pairing on the consumer side.
 
-A spec reference to one of those rules uses the citation grammar
-`the template's **<name>** rule`, where `<name>` is a bullet's bold lead-in
-verbatim minus its trailing period; `check-rule-citation` resolves every such
-citation in §The delegation model forward into the template, so a lead-in
-rename cannot silently dangle a reference.
+A spec reference to one of those rules uses the citation grammar `the template's **<name>** rule`, where `<name>` is a bullet's bold lead-in verbatim minus its trailing period; `check-rule-citation` resolves every such citation in §The delegation model forward into the template, so a lead-in rename cannot silently dangle a reference.
 
-`templates/dispatch-checklists.md` is a second, load-triggered template the
-protocol template reaches by a single pointer line: `agent-execution.md` names
-it for a deletion, rename, or heavy cross-spec audit dispatch, and it loads only
-then — never resident, and not a binding shim (it binds no slots, so
-`check-skill-binding` does not scan it). It carries the mechanical pre-flight for
-those dispatch shapes — the importer/collision/sweep-verification checks — while
-the protocol proper stays whole in `agent-execution.md`; the pointer-line
-contract is that the protocol template stays complete alone and the checklists
-are a reach-through, so the width, journal, and validate rules live once in the
-protocol template and are cited from the checklists, never restated. This is the
-load-trigger-residency rule applied a rung deeper: even inside a load-triggered
-template, a subset that only a narrower trigger (a deletion or rename dispatch)
-needs sits behind its own pointer.
+`templates/dispatch-checklists.md` is a second, load-triggered template the protocol template reaches by a single pointer line: `agent-execution.md` names it for a deletion, rename, or heavy cross-spec audit dispatch, and it loads only then — never resident, and not a binding shim (it binds no slots, so `check-skill-binding` does not scan it). It carries the mechanical pre-flight for those dispatch shapes — the importer/collision/sweep-verification checks — while the protocol proper stays whole in `agent-execution.md`; the pointer-line contract is that the protocol template stays complete alone and the checklists are a reach-through, so the width, journal, and validate rules live once in the protocol template and are cited from the checklists, never restated. This is the load-trigger-residency rule applied a rung deeper: even inside a load-triggered template, a subset that only a narrower trigger (a deletion or rename dispatch) needs sits behind its own pointer.
 
-The consumer's CLAUDE.md carries no digest of the bullets, only a resident
-pointer: the pre-authorization sentence (consumer judgment on what delegation
-needs no ask) and `/agent-execution`. Rationale: a rule is resident only when it
-has no load trigger (the load-trigger-residency doctrine), and every protocol
-bullet triggers at `Agent` dispatch **for the role that dispatches** — which
-already has a mechanical seam, the
-per-dispatch budget guard, whose block message names `/agent-execution`. The
-doctrine lives behind the trigger, not in the always-loaded file. Honest limit,
-tightened now that a second hook rides the same matcher: the guards enforce
-mechanically exactly the rules that pass a chokepoint — the budget check, and
-the dispatch-shape rules (§The delegation model) — and protocol literacy
-beyond those stays unenforced. A session that dispatches without invoking the
-skill still carries only the resident pointer for everything else.
+The consumer's CLAUDE.md carries no digest of the bullets, only a resident pointer: the pre-authorization sentence (consumer judgment on what delegation needs no ask) and `/agent-execution`. Rationale: a rule is resident only when it has no load trigger (the load-trigger-residency doctrine), and every protocol bullet triggers at `Agent` dispatch **for the role that dispatches** — which already has a mechanical seam, the per-dispatch budget guard, whose block message names `/agent-execution`. The doctrine lives behind the trigger, not in the always-loaded file. Honest limit, tightened now that a second hook rides the same matcher: the guards enforce mechanically exactly the rules that pass a chokepoint — the budget check, and the dispatch-shape rules (§The delegation model) — and protocol literacy beyond those stays unenforced. A session that dispatches without invoking the skill still carries only the resident pointer for everything else.
 
-**That role qualifier is load-bearing rather than hedging.** Stated without it,
-the rationale is role-blind: a *dispatched* role fires no such trigger — it is
-not dispatching at all, it is executing a stage, and no stage skill or stage
-template loads this protocol — so for that reader the pointer posture leaves the
-rule unreached, which is how a posture nobody disputes produced three incidents.
-§Operative residency governs that case, and the bounded imperative it sanctions
-in a consumer's always-loaded agent definition is this same doctrine applied at a
-different reader, not an exception carved out of this paragraph.
+**That role qualifier is load-bearing rather than hedging.** Stated without it, the rationale is role-blind: a *dispatched* role fires no such trigger — it is not dispatching at all, it is executing a stage, and no stage skill or stage template loads this protocol — so for that reader the pointer posture leaves the rule unreached, which is how a posture nobody disputes produced three incidents. §Operative residency governs that case, and the bounded imperative it sanctions in a consumer's always-loaded agent definition is this same doctrine applied at a different reader, not an exception carved out of this paragraph.
 
 ### Operative residency
 
-A rule may be **restated as an imperative in a surface that does not own it**
-when all three of these hold:
+A rule may be **restated as an imperative in a surface that does not own it** when all three of these hold:
 
-- **(a) Unreachable trigger.** The actor the rule binds never fires a trigger
-  that loads the rule's owning doc. This is a property of the *reader*, settled
-  by asking which triggers that reader actually fires.
-- **(b) Imperative only.** What is restated is the instruction. The reasoning,
-  the failure analysis, and the mechanism stay with the owner.
-- **(c) Adjacent citation.** The restatement names the owning surface beside
-  itself, so the owner stays the single place the rule is explained and changed.
+- **(a) Unreachable trigger.** The actor the rule binds never fires a trigger that loads the rule's owning doc. This is a property of the *reader*, settled by asking which triggers that reader actually fires.
+- **(b) Imperative only.** What is restated is the instruction. The reasoning, the failure analysis, and the mechanism stay with the owner.
+- **(c) Adjacent citation.** The restatement names the owning surface beside itself, so the owner stays the single place the rule is explained and changed.
 
-Grounds a surface authors for its own instruction are no restatement and take no
-sanction; Content-tiering / SSOT places them (doctrine-kit/DOCTRINE.md).
+Grounds a surface authors for its own instruction are no restatement and take no sanction; Content-tiering / SSOT places them (doctrine-kit/DOCTRINE.md).
 
-Each condition has a reader at a transition rather than being self-evident: (a)
-and (b) are read by whoever authors a restatement, at authoring — build's
-ritual, the amendment Definition of Done — and again by a reviewer or an
-authoring stage assessing an existing one; (c) is the pointer any later reader
-— and any content-tiering check — follows back to the owner. The
-reader the sanction exists for is the third and never inspects a condition at
-all: the bound actor, which receives the imperative at the tier it always loads,
-which is the whole point.
+Each condition has a reader at a transition rather than being self-evident: (a) and (b) are read by whoever authors a restatement, at authoring — build's ritual, the amendment Definition of Done — and again by a reviewer or an authoring stage assessing an existing one; (c) is the pointer any later reader — and any content-tiering check — follows back to the owner. The reader the sanction exists for is the third and never inspects a condition at all: the bound actor, which receives the imperative at the tier it always loads, which is the whole point.
 
-**The anti-licence clause is part of the rule, not commentary.** The sanction is
-keyed on (a): a rule that the bound actor's own skill or template already loads
-fails (a) and stays a pointer. Without that clause this reads as "duplicate when
-it feels important", which is the failure content-tiering exists to prevent and
-would cost more than the gap it closes. **(a) licenses one restatement and not
-one per reader**, so where the bound actor is *any session* the carrier is the
-consumer's always-loaded tier and the templates those sessions load carry
-nothing; context-kit/SPEC.md §The consumer footprint rules that case and states
-the one thing a template may still say.
+**The anti-licence clause is part of the rule, not commentary.** The sanction is keyed on (a): a rule that the bound actor's own skill or template already loads fails (a) and stays a pointer. Without that clause this reads as "duplicate when it feels important", which is the failure content-tiering exists to prevent and would cost more than the gap it closes. **(a) licenses one restatement and not one per reader**, so where the bound actor is *any session* the carrier is the consumer's always-loaded tier and the templates those sessions load carry nothing; context-kit/SPEC.md §The consumer footprint rules that case and states the one thing a template may still say.
 
-**A worked case the clause decided, recorded because it decided *against*
-residency.** The provenance floor (§Resume journal) binds a session that **has
-dispatched**, and such a session loads `templates/agent-execution.md` through its
-own trigger — so condition (a) fails and the rule stays template-tier rather than
-joining an always-loaded manifest. A resident copy would be a second source paid
-for by every session that never dispatches at all. It is recorded here precisely
-because the rule reads as important enough to promote, and reading as important
-is the licence (a) withholds.
+**A worked case the clause decided, recorded because it decided *against* residency.** The provenance floor (§Resume journal) binds a session that **has dispatched**, and such a session loads `templates/agent-execution.md` through its own trigger — so condition (a) fails and the rule stays template-tier rather than joining an always-loaded manifest. A resident copy would be a second source paid for by every session that never dispatches at all. It is recorded here precisely because the rule reads as important enough to promote, and reading as important is the licence (a) withholds.
 
-**This is load-trigger residency's own logic, not an exception to it.** That
-doctrine earns a rule a place in an always-loaded file only when no stage, skill,
-or tool-call trigger exists to load it, and the decisive question is *exists for
-whom*. A trigger that exists but that the bound actor never fires is, for that
-actor, no trigger. The doctrine's stated justification — a rule a stage or a tool
-call would load anyway costs nothing to defer and everything to keep resident —
-does not merely fail for such an actor, it inverts: nothing loads it anyway, so
-deferring costs everything.
+**This is load-trigger residency's own logic, not an exception to it.** That doctrine earns a rule a place in an always-loaded file only when no stage, skill, or tool-call trigger exists to load it, and the decisive question is *exists for whom*. A trigger that exists but that the bound actor never fires is, for that actor, no trigger. The doctrine's stated justification — a rule a stage or a tool call would load anyway costs nothing to defer and everything to keep resident — does not merely fail for such an actor, it inverts: nothing loads it anyway, so deferring costs everything.
 
-**Content-tiering is satisfied by bounding what is copied, which is what (b) is
-for.** The restatement is still a restatement, which is why it needs this
-sanction rather than an argument; but its drift surface is one instruction rather
-than a slab, and the place the rule is explained and changed stays single.
+**Content-tiering is satisfied by bounding what is copied, which is what (b) is for.** The restatement is still a restatement, which is why it needs this sanction rather than an argument; but its drift surface is one instruction rather than a slab, and the place the rule is explained and changed stays single.
 
-The attested subjects are the template's **Background + notification, never
-poll** rule and its **Findings you will act on are durable before you act on
-them** rule, both of which bind a dispatched session. Three such sessions read a
-*descriptive* pointer to them at the always-loaded tier and derived no constraint
-from it. The derivations were easy, which is what makes the failure instructive:
-under load a descriptive sentence reads as background about one's situation
-rather than as a constraint on the next action. The defect this rule names is
-therefore pointer-versus-operative-statement, never absence.
+The attested subjects are the template's **Background + notification, never poll** rule and its **Findings you will act on are durable before you act on them** rule, both of which bind a dispatched session. Three such sessions read a *descriptive* pointer to them at the always-loaded tier and derived no constraint from it. The derivations were easy, which is what makes the failure instructive: under load a descriptive sentence reads as background about one's situation rather than as a constraint on the next action. The defect this rule names is therefore pointer-versus-operative-statement, never absence.
 
-**Operative is not obeyed, and a fourth firing is the attestation.** A dispatched
-session ended its turn on work still running while the waiting rule sat in that
-session's own agent definition as a bare imperative, restated under (a)–(c) —
-the compliant form this sanction licenses. So the diagnosis above names a cause
-*removed*, not the defect *closed*: residency makes a rule reachable at the point
-of use, and reachable is not obeyed. Every restatement this sanction licenses is
-a request delivered where it is read. Weigh it as one — worth its small drift
-surface for the failure mode it does remove, and never a substitute for an
-oracle where one is buildable. In the attested instance what caught the
-consequence was the artifact-side oracle below, with the prose already in its
-strengthened form.
+**Operative is not obeyed, and a fourth firing is the attestation.** A dispatched session ended its turn on work still running while the waiting rule sat in that session's own agent definition as a bare imperative, restated under (a)–(c) — the compliant form this sanction licenses. So the diagnosis above names a cause *removed*, not the defect *closed*: residency makes a rule reachable at the point of use, and reachable is not obeyed. Every restatement this sanction licenses is a request delivered where it is read. Weigh it as one — worth its small drift surface for the failure mode it does remove, and never a substitute for an oracle where one is buildable. In the attested instance what caught the consequence was the artifact-side oracle below, with the prose already in its strengthened form.
 
-**The propagate obligation has fired, and the record names what it cost.** The
-waiting rule changed — the primitive named by its reactivity property, the
-awaited artifact given a home — and the template's *when either rule changes
-here, propagate* header sent that change to both of its restatements in this
-consumer's `.claude/agents/` definitions: one a stage-session type, one a
-read-only sweep type. They did not carry the rule alike. One cited the bullet by
-name and restated its wait mechanics at length; the other carried a single
-turn-end line with no citation, no primitive and no home. **The target is
-symmetric even where the starting text is not**, so propagation into the second
-was a genuine addition sized to that file's own voice rather than a paste of the
-first's paragraph — and neither absorbed the rejected-alternative reasoning,
-which is (b)'s line and stays with this section's owner. Recorded because the
-sanction's cost is exactly this: every rule it licenses acquires N carriers that
-a later change must find, and a restatement that drifted *unevenly* is harder to
-spot than one that drifted at all.
+**The propagate obligation has fired, and the record names what it cost.** The waiting rule changed — the primitive named by its reactivity property, the awaited artifact given a home — and the template's *when either rule changes here, propagate* header sent that change to both of its restatements in this consumer's `.claude/agents/` definitions: one a stage-session type, one a read-only sweep type. They did not carry the rule alike. One cited the bullet by name and restated its wait mechanics at length; the other carried a single turn-end line with no citation, no primitive and no home. **The target is symmetric even where the starting text is not**, so propagation into the second was a genuine addition sized to that file's own voice rather than a paste of the first's paragraph — and neither absorbed the rejected-alternative reasoning, which is (b)'s line and stays with this section's owner. Recorded because the sanction's cost is exactly this: every rule it licenses acquires N carriers that a later change must find, and a restatement that drifted *unevenly* is harder to spot than one that drifted at all.
 
-**The obligation fired again, and the second firing found a carrier the roster
-did not hold.** The waiting rule changed once more — the shell-child branch named
-its artifact, and the liveness clause widened past *a producer this session did
-not start* — and propagation reached both `.claude/agents/` definitions as before.
-It also reached a **third** carrier sitting outside this section's roster
-entirely: guard-kit's self-matching-`pgrep` rule states the same clause verbatim
-in the corrective help text it prints when it blocks, mirrored in prose in that
-kit's own SPEC. Left alone, a guard-blocked session would read advice that
-undersells what it may now do with its own backgrounded child — a restatement
-whose reader arrives at the worst possible moment, already stopped and looking for
-the sanctioned form. Recorded because of what found it: the clause's own wording,
-grepped across the tree, and not this section's list of known carriers. The
-sanction's cost is N carriers a later change must find, and N is discovered by
-grepping the rule's phrasing rather than by consulting the roster — a roster is a
-record of the carriers someone noticed, never a proof of the set.
+**The obligation fired again, and the second firing found a carrier the roster did not hold.** The waiting rule changed once more — the shell-child branch named its artifact, and the liveness clause widened past *a producer this session did not start* — and propagation reached both `.claude/agents/` definitions as before. It also reached a **third** carrier sitting outside this section's roster entirely: guard-kit's self-matching-`pgrep` rule states the same clause verbatim in the corrective help text it prints when it blocks, mirrored in prose in that kit's own SPEC. Left alone, a guard-blocked session would read advice that undersells what it may now do with its own backgrounded child — a restatement whose reader arrives at the worst possible moment, already stopped and looking for the sanctioned form. Recorded because of what found it: the clause's own wording, grepped across the tree, and not this section's list of known carriers. The sanction's cost is N carriers a later change must find, and N is discovered by grepping the rule's phrasing rather than by consulting the roster — a roster is a record of the carriers someone noticed, never a proof of the set.
 
-**The rule's own attested counter-examples are now explained, and the explanation
-indicted the wording rather than the primitive.** Four of one session's
-backgrounded waiters had died before their conditions went true with their
-producers verifiably alive, against an event-stream call that succeeded first try
-— a standing case that the mandated primitive was the wrong one on this machine.
-It was measured rather than argued (§bin/wait-probe): every trial on a
-*completion-marker* predicate outlived its condition, on both harness forms and on
-a detached shell child, at producer durations up to and including the longest
-swept — so no form carries a wall-clock ceiling in that range. Every early exit
-instead shared one property, and it was not the form: the loop tested the
-producer's **liveness**, and it reproduced on the harness-uninvolved control in
-milliseconds, which exonerates the harness and the primitive together.
+**The rule's own attested counter-examples are now explained, and the explanation indicted the wording rather than the primitive.** Four of one session's backgrounded waiters had died before their conditions went true with their producers verifiably alive, against an event-stream call that succeeded first try — a standing case that the mandated primitive was the wrong one on this machine. It was measured rather than argued (§bin/wait-probe): every trial on a *completion-marker* predicate outlived its condition, on both harness forms and on a detached shell child, at producer durations up to and including the longest swept — so no form carries a wall-clock ceiling in that range. Every early exit instead shared one property, and it was not the form: the loop tested the producer's **liveness**, and it reproduced on the harness-uninvolved control in milliseconds, which exonerates the harness and the primitive together.
 
-**The cause is that the rule's two clauses compose into an inverted loop.** The
-protocol mandates wrapping `until <cond>; do sleep N; done` *and* looping on the
-recorded PID's liveness. `until` ends when its condition becomes **true** and
-`kill -0` is true while the producer is **alive**, so the literal composition of
-the two clauses exits at once, cleanly, with the producer running — which is
-exactly the reported signature, down to the clean exit status. The wait's
-condition must be its **continuation** condition: `until` takes a *done* predicate
-and `while` takes a *still-running* one, and liveness is a still-running
-predicate. So the ordering the template states stands **unchanged** and what
-changed is the spelling every carrier shipped, propagated to all four. That the
-correction is free at the guard was probed rather than assumed: rules 13 and 15
-walk `do … done` spans without reading the loop keyword, so the `while` form is
-exempt exactly as the `until` form is (guard-kit/SPEC.md §The generic ruleset).
+**The cause is that the rule's two clauses compose into an inverted loop.** The protocol mandates wrapping `until <cond>; do sleep N; done` *and* looping on the recorded PID's liveness. `until` ends when its condition becomes **true** and `kill -0` is true while the producer is **alive**, so the literal composition of the two clauses exits at once, cleanly, with the producer running — which is exactly the reported signature, down to the clean exit status. The wait's condition must be its **continuation** condition: `until` takes a *done* predicate and `while` takes a *still-running* one, and liveness is a still-running predicate. So the ordering the template states stands **unchanged** and what changed is the spelling every carrier shipped, propagated to all four. That the correction is free at the guard was probed rather than assumed: rules 13 and 15 walk `do … done` spans without reading the loop keyword, so the `while` form is exempt exactly as the `until` form is (guard-kit/SPEC.md §The generic ruleset).
 
-**Recorded here because of what the near-miss was.** A rule whose attested
-counter-examples stay unexplained is a rule its readers discount, and the
-discounting was already under way — the counter-examples had been read as evidence
-*against the primitive*, which would have inverted a correct ordering and left the
-actual defect, one keyword, shipped in all four carriers. The fifth firing's own
-lesson generalizes past this rule: an operative restatement propagates a rule's
-**wording**, so a defect in the wording is propagated with it, and N carriers make
-N copies of the bug rather than N chances to catch it.
+**Recorded here because of what the near-miss was.** A rule whose attested counter-examples stay unexplained is a rule its readers discount, and the discounting was already under way — the counter-examples had been read as evidence *against the primitive*, which would have inverted a correct ordering and left the actual defect, one keyword, shipped in all four carriers. The fifth firing's own lesson generalizes past this rule: an operative restatement propagates a rule's **wording**, so a defect in the wording is propagated with it, and N carriers make N copies of the bug rather than N chances to catch it.
 
-**The obligation fired a sixth time, and this firing is the one the fifth
-predicted.** The waiting rule changed again — the record obligation split into
-producer and observer, and a recorded wait acquired a self-deadlock check — and
-both `.claude/agents/` carriers held the rule in its *unconditional* form, which
-is to say both held the same defect the change repairs. That is the fifth
-firing's lesson observed rather than inferred. Two mechanics of the propagation
-are worth recording because they are what kept it honest: the carrier set was
-re-derived by grepping the rule's phrasing at the merge rather than read off this
-section's record of it, and each carrier again took an addition sized to its own
-voice rather than a paste, with none of the refused alternatives above riding
-along — (b)'s line.
+**The obligation fired a sixth time, and this firing is the one the fifth predicted.** The waiting rule changed again — the record obligation split into producer and observer, and a recorded wait acquired a self-deadlock check — and both `.claude/agents/` carriers held the rule in its *unconditional* form, which is to say both held the same defect the change repairs. That is the fifth firing's lesson observed rather than inferred. Two mechanics of the propagation are worth recording because they are what kept it honest: the carrier set was re-derived by grepping the rule's phrasing at the merge rather than read off this section's record of it, and each carrier again took an addition sized to its own voice rather than a paste, with none of the refused alternatives above riding along — (b)'s line.
 
-**A second rule of the same change was ruled *out* of residency, and the ruling
-is recorded beside the propagation so the two are not read as one sweep.** The
-turn-end worktree reap binds a session that **has dispatched**, and such a
-session loads `templates/agent-execution.md` through its own trigger, so
-condition (a) fails and the rule stays template-tier — the same reading this
-section records for the provenance floor. The isolated child's blindness clause
-goes the other way and qualifies on its own (a)–(c) reading: it binds a
-dispatched read-only agent, which fires no trigger that loads the template, and
-the carrier already stating the sibling gate-unavailability clause takes the new
-one beside it. The child's linked-worktree check at start and at resume
-qualifies on the same reading and rides the same carrier: it binds the same
-child, and neither its start nor a resume loads the template.
+**A second rule of the same change was ruled *out* of residency, and the ruling is recorded beside the propagation so the two are not read as one sweep.** The turn-end worktree reap binds a session that **has dispatched**, and such a session loads `templates/agent-execution.md` through its own trigger, so condition (a) fails and the rule stays template-tier — the same reading this section records for the provenance floor. The isolated child's blindness clause goes the other way and qualifies on its own (a)–(c) reading: it binds a dispatched read-only agent, which fires no trigger that loads the template, and the carrier already stating the sibling gate-unavailability clause takes the new one beside it. The child's linked-worktree check at start and at resume qualifies on the same reading and rides the same carrier: it binds the same child, and neither its start nor a resume loads the template.
 
-**No gate is owed *over the act*, and not for budget — but one is now owed over
-its harm, and it exists.** No check can read a session's choice to end a turn:
-the act leaves no tracked artifact, and no `PreToolUse` chokepoint sees it. The
-harness's own turn-end event does see it — measured, not assumed (§The
-turn-end liveness hook) — and that hook **refuses** there as well as seeing, on
-an authorization since given and spent. So the relocation below is not the only
-enforcement, and it is not the enforcement for want of an alternative: it is that
-on the merits, because the harm it blocks reaches a chokepoint the turn-end event
-never sees. What the ruling never licensed was stopping there. The harm
-the turn-end causes does pass a chokepoint — a tracked-tree mutation while a
-recorded producer is still writing arrives as an ordinary tool call — and it is
-blocked there by guard-kit rule 14 (guard-kit/SPEC.md §The generic ruleset,
-whose design §The delegation model owns). So the enforcement question this
-section left open is answered **by relocating the subject from the act to its
-consequence**, and the honest bound travels with the answer: it reaches only a
-session that recorded, since the record's write is itself structurally
-uncheckable.
+**No gate is owed *over the act*, and not for budget — but one is now owed over its harm, and it exists.** No check can read a session's choice to end a turn: the act leaves no tracked artifact, and no `PreToolUse` chokepoint sees it. The harness's own turn-end event does see it — measured, not assumed (§The turn-end liveness hook) — and that hook **refuses** there as well as seeing, on an authorization since given and spent. So the relocation below is not the only enforcement, and it is not the enforcement for want of an alternative: it is that on the merits, because the harm it blocks reaches a chokepoint the turn-end event never sees. What the ruling never licensed was stopping there. The harm the turn-end causes does pass a chokepoint — a tracked-tree mutation while a recorded producer is still writing arrives as an ordinary tool call — and it is blocked there by guard-kit rule 14 (guard-kit/SPEC.md §The generic ruleset, whose design §The delegation model owns). So the enforcement question this section left open is answered **by relocating the subject from the act to its consequence**, and the honest bound travels with the answer: it reaches only a session that recorded, since the record's write is itself structurally uncheckable.
 
-**The anti-restatement gates were**
-checked against a sanctioned restatement rather than assumed inert, since a
-sanction that required weakening a gate would be the wrong sanction:
-`check-shim-restatement` scans binding shims under the skills directory against a
-corpus of the consumer's always-loaded file plus kit templates, so a consumer's
-agent definition is neither its scanned surface nor its corpus, and
-`check-surface-duplication`'s predicate is a glossary term's definition on a
-canonical SPEC surface, which reaches no agent definition either. The sanction
-therefore ships with **no gate exemption** — and the honest converse ships with
-it: nothing in the battery would catch a *non*-compliant restatement, so (a)–(c)
-are review-enforced. Both buildable oracles detect a *consequence* rather than
-the act, and they sit at different distances from it: guard-kit rule 14
-**prevents** the consequence at the tool call that would cause it, and
-`check-producer-liveness` **detects** a producer still running at the next
-stage's entry (evidence-kit/SPEC.md §check-producer-liveness). The second
-detects late by construction — the turns between the firing and that entry are
-already spent, and a firing at the last stage of an iteration has no entry after
-it — which is what makes it the backstop behind the first rather than a
-substitute for it.
+**The anti-restatement gates were** checked against a sanctioned restatement rather than assumed inert, since a sanction that required weakening a gate would be the wrong sanction: `check-shim-restatement` scans binding shims under the skills directory against a corpus of the consumer's always-loaded file plus kit templates, so a consumer's agent definition is neither its scanned surface nor its corpus, and `check-surface-duplication`'s predicate is a glossary term's definition on a canonical SPEC surface, which reaches no agent definition either. The sanction therefore ships with **no gate exemption** — and the honest converse ships with it: nothing in the battery would catch a *non*-compliant restatement, so (a)–(c) are review-enforced. Both buildable oracles detect a *consequence* rather than the act, and they sit at different distances from it: guard-kit rule 14 **prevents** the consequence at the tool call that would cause it, and `check-producer-liveness` **detects** a producer still running at the next stage's entry (evidence-kit/SPEC.md §check-producer-liveness). The second detects late by construction — the turns between the firing and that entry are already spent, and a firing at the last stage of an iteration has no entry after it — which is what makes it the backstop behind the first rather than a substitute for it.
 
-**A case where an oracle *was* buildable now sits beside this one, and the two
-are not each other's contradiction.** The dispatch-shape rules bind acts
-that leave no tracked artifact either, yet they are gated. The axis that
-separates them is **interception, not durability**: a dispatch passes a
-chokepoint the harness fires a hook on, and a turn-end passes none the
-dispatch-shape rules could have used (§The delegation model, which owns the
-generalization, and §The turn-end liveness hook, which measured the
-harness's own turn-end event and found it reachable). So "no tracked artifact" is
-why neither rule gets a *gate* over the tree, and it is not by itself a reason
-to stop looking for an oracle. Recorded here for the same reason §The
-delegation model records the durability rule beside the read-only-fan-out
-caveat: otherwise the next reader re-litigates one of the two paragraphs.
+**A case where an oracle *was* buildable now sits beside this one, and the two are not each other's contradiction.** The dispatch-shape rules bind acts that leave no tracked artifact either, yet they are gated. The axis that separates them is **interception, not durability**: a dispatch passes a chokepoint the harness fires a hook on, and a turn-end passes none the dispatch-shape rules could have used (§The delegation model, which owns the generalization, and §The turn-end liveness hook, which measured the harness's own turn-end event and found it reachable). So "no tracked artifact" is why neither rule gets a *gate* over the tree, and it is not by itself a reason to stop looking for an oracle. Recorded here for the same reason §The delegation model records the durability rule beside the read-only-fan-out caveat: otherwise the next reader re-litigates one of the two paragraphs.
 
-**That last sentence was cashed rather than left standing.** The search it
-licensed found one: the turn-end is unreachable from the tool-call axis, but the
-mutation it enables is a `PreToolUse` call, and rule 14 fires there. It then
-found a second candidate on a different axis — the harness's own `SubagentStop`
-event, which the hook above measured and found live. It began as an oracle that
-*observed* rather than refused; turning it into the second kind took a separate
-authorization, that authorization was given, and it now refuses. Recorded because a
-sentence saying *keep looking* is cheap to write and easy to leave un-acted, and
-the next reader should find the outcome beside the licence rather than have to
-reconstruct whether anyone ever looked.
+**That last sentence was cashed rather than left standing.** The search it licensed found one: the turn-end is unreachable from the tool-call axis, but the mutation it enables is a `PreToolUse` call, and rule 14 fires there. It then found a second candidate on a different axis — the harness's own `SubagentStop` event, which the hook above measured and found live. It began as an oracle that *observed* rather than refused; turning it into the second kind took a separate authorization, that authorization was given, and it now refuses. Recorded because a sentence saying *keep looking* is cheap to write and easy to leave un-acted, and the next reader should find the outcome beside the licence rather than have to reconstruct whether anyone ever looked.
 
 ## The turn-end liveness hook
 
-The `subagent-stop-liveness` hook is an opt-in `SubagentStop` hook, inert
-until a consumer registers it, that **refuses a dispatched session's turn end
-while the launch records under the scratch dir say a producer is live, or while
-the harness's own task view shows a shell task of it still running**. It
-shipped as a probe first, and the probe's own result is what made it this: the
-question it was built to answer — **does the harness already defer a subagent's
-stop while a background child is live?** — came back *no* (§The probe is
-asymmetric), so the axis §The delegation model's waiting rule exists for holds at
-the turn-end too and a blocking hook was the only lever left.
+The `subagent-stop-liveness` hook is an opt-in `SubagentStop` hook, inert until a consumer registers it, that **refuses a dispatched session's turn end while the launch records under the scratch dir say a producer is live, or while the harness's own task view shows a shell task of it still running**. It shipped as a probe first, and the probe's own result is what made it this: the question it was built to answer — **does the harness already defer a subagent's stop while a background child is live?** — came back *no* (§The probe is asymmetric), so the axis §The delegation model's waiting rule exists for holds at the turn-end too and a blocking hook was the only lever left.
 
-**The refuser is unconditional, and two decisions behind that bind any later
-change to it.** They are stated here rather than left to be re-derived. First, a
-**capped** variant
-was offered as an explicit option and **refused**: refuse only on a
-`verdict=red live=yes` reading carrying at least one record, stay advisory
-otherwise. So every narrowing below is argued on its own stated grounds, never
-inherited as a safety margin, and where a boundary here coincides with the
-refused option's the coincidence is disclosed rather than left to be read back
-in through the resemblance. Second, what was at stake was the **class** —
-an observer turned refuser at a turn end — and never the size of the edit that
-delivered it. A tree whose harness already registers the hook gets a script edit
-rather than a permission-surface write; that is a true finding about **cost**, and
-a decision resting on it would come out the same way with the registration absent.
+**The refuser is unconditional, and two decisions behind that bind any later change to it.** They are stated here rather than left to be re-derived. First, a **capped** variant was offered as an explicit option and **refused**: refuse only on a `verdict=red live=yes` reading carrying at least one record, stay advisory otherwise. So every narrowing below is argued on its own stated grounds, never inherited as a safety margin, and where a boundary here coincides with the refused option's the coincidence is disclosed rather than left to be read back in through the resemblance. Second, what was at stake was the **class** — an observer turned refuser at a turn end — and never the size of the edit that delivered it. A tree whose harness already registers the hook gets a script edit rather than a permission-surface write; that is a true finding about **cost**, and a decision resting on it would come out the same way with the registration absent.
 
-**The event is `SubagentStop`, never `Stop`.** A dispatched session is a
-subagent, so its turn end fires `SubagentStop`, and every attested firing of the
-waiting rule was a dispatched session. `Stop` is deliberately not registered:
-the main-session turn end has no attested firing, so registering it would widen
-the subject past what the evidence carries. Enforcement inherits that boundary
-unchanged — the main session's turn end is still unreached.
+**The event is `SubagentStop`, never `Stop`.** A dispatched session is a subagent, so its turn end fires `SubagentStop`, and every attested firing of the waiting rule was a dispatched session. `Stop` is deliberately not registered: the main-session turn end has no attested firing, so registering it would widen the subject past what the evidence carries. Enforcement inherits that boundary unchanged — the main session's turn end is still unreached.
 
-**The contract: exit 2 on `red`, `corrupt` or `unresolved`, or while the payload's
-`background_tasks` shows a running `shell` task, exit 0 on every other path, and
-no hook JSON on either.** The hook reads its payload from stdin, asks
-the liveness reader whether any launch record under `${GATE_SDK_TMP_DIR:-.tmp}`
-names a live producer, appends one line to `DELEGATION_KIT_STOP_LOG`, and then
-either exits 0 or exits 2 with its refusal written to **stderr**.
+**The contract: exit 2 on `red`, `corrupt` or `unresolved`, or while the payload's `background_tasks` shows a running `shell` task, exit 0 on every other path, and no hook JSON on either.** The hook reads its payload from stdin, asks the liveness reader whether any launch record under `${GATE_SDK_TMP_DIR:-.tmp}` names a live producer, appends one line to `DELEGATION_KIT_STOP_LOG`, and then either exits 0 or exits 2 with its refusal written to **stderr**.
 
-**The refusal needs no emitter, and that is a repair to this section rather than
-a new claim.** This section used to argue that a hook which had to *speak* at
-`SubagentStop` would need a primitive guard-kit does not have — all three of
-guard-kit's emitters hardcode `hookEventName:"PreToolUse"` — and concluded that
-the blocking variant's emitter cost was stacked on its own authorization. The
-harness's published hook contract, fetched rather than recalled, settles it the
-other way for the exit-code route: `SubagentStop` is listed as an event a hook
-**can** block, exit 2 is the blocking route, and the hook's **stderr is shown to
-Claude and is itself the blocking reason when the hook emits no JSON decision**.
-So the refusal speaks through stderr, mints no guard-kit primitive, and leaves
-this hook's standing property intact — it **does not source guard-kit's lib**,
-which is what keeps delegation-kit from acquiring a dependency on guard-kit being
-vendored. Reading the payload costs the compiled member one stdin read and one
-parse, not a program apiece.
+**The refusal needs no emitter, and that is a repair to this section rather than a new claim.** This section used to argue that a hook which had to *speak* at `SubagentStop` would need a primitive guard-kit does not have — all three of guard-kit's emitters hardcode `hookEventName:"PreToolUse"` — and concluded that the blocking variant's emitter cost was stacked on its own authorization. The harness's published hook contract, fetched rather than recalled, settles it the other way for the exit-code route: `SubagentStop` is listed as an event a hook **can** block, exit 2 is the blocking route, and the hook's **stderr is shown to Claude and is itself the blocking reason when the hook emits no JSON decision**. So the refusal speaks through stderr, mints no guard-kit primitive, and leaves this hook's standing property intact — it **does not source guard-kit's lib**, which is what keeps delegation-kit from acquiring a dependency on guard-kit being vendored. Reading the payload costs the compiled member one stdin read and one parse, not a program apiece.
 
-**There is no advisory tier at this event, so the choice was deliver or do not.**
-At exit 0 a hook's stderr goes to the debug log only and Claude never sees it. A
-"log it more loudly" alternative therefore does not exist to be weighed: exit 2
-is the only delivery, which is why the refusal is not offered in a softer form.
+**There is no advisory tier at this event, so the choice was deliver or do not.** At exit 0 a hook's stderr goes to the debug log only and Claude never sees it. A "log it more loudly" alternative therefore does not exist to be weighed: exit 2 is the only delivery, which is why the refusal is not offered in a softer form.
 
-**Honest limit on both of those, inherited deliberately.** That contract is the
-harness's published one and nothing in this tree. It sits on the same footing
-§The delegation model already declares for the `PreToolUse` payload roster: a
-future harness revision reshaping the event is drift no gate here can
-self-detect, and only re-reading the contract catches it. Recorded so the next
-reader does not mistake a fetched fact for a measured one.
+**Honest limit on both of those, inherited deliberately.** That contract is the harness's published one and nothing in this tree. It sits on the same footing §The delegation model already declares for the `PreToolUse` payload roster: a future harness revision reshaping the event is drift no gate here can self-detect, and only re-reading the contract catches it. Recorded so the next reader does not mistake a fetched fact for a measured one.
 
-**The predicate is the reader's exit class, and it refuses on three of seven arms.**
-Reader **exit 2 is read through two names**, chosen by the hook's own `*.run`
-count: `corrupt` over a non-empty record set, `unresolved` over an empty one.
-The count picks the **name**, never the decision — both refuse.
+**The predicate is the reader's exit class, and it refuses on three of seven arms.** Reader **exit 2 is read through two names**, chosen by the hook's own `*.run` count: `corrupt` over a non-empty record set, `unresolved` over an empty one. The count picks the **name**, never the decision — both refuse.
 
 | reading | the hook holds | decision |
 | --- | --- | --- |
@@ -1210,1587 +239,296 @@ The count picks the **name**, never the decision — both refuse.
 | `unstarted` | a resolved reader the operating system would not start | log, exit 0 |
 | `error` | a configured reader that ran and did not answer | log, exit 0 |
 
-**`unstarted` is a reader whose argv resolved and whose spawn the operating system
-refused** — the default always resolves, and an override passed the
-resolution predicate — so `ETXTBSY`, `ENOENT` from an absent shebang
-interpreter, `EACCES`, `ENOEXEC`, `ENOMEM` or `EAGAIN`. **`unavailable` narrows to
-its name beside it.** The two are two cases with two fixes, a knob to correct
-and a reader or host that refused to start, and one name over both was a fail-open
-with no signature: a reader that cannot start was indistinguishable from one
-never configured. A distinct name rather than a wider `unavailable` row rests on
-the ground the exit-2 split already stands on — the fix is a different one.
+**`unstarted` is a reader whose argv resolved and whose spawn the operating system refused** — the default always resolves, and an override passed the resolution predicate — so `ETXTBSY`, `ENOENT` from an absent shebang interpreter, `EACCES`, `ENOEXEC`, `ENOMEM` or `EAGAIN`. **`unavailable` narrows to its name beside it.** The two are two cases with two fixes, a knob to correct and a reader or host that refused to start, and one name over both was a fail-open with no signature: a reader that cannot start was indistinguishable from one never configured. A distinct name rather than a wider `unavailable` row rests on the ground the exit-2 split already stands on — the fix is a different one.
 
-**`corrupt` refuses, and it diverges from guard-kit rule 14 on purpose.** Rule 14
-— tracked-tree mutation under a live producer — rules that a record which does not
-parse **declines** rather than blocks, because a guard is not the place a
-corruption verdict is taken and `check-producer-liveness` already exits 2 on one.
-That reasoning does not transfer, and the reason is structural rather than a
-matter of appetite. Rule 14 reads the records **one at a time**, so a malformed
-record declines *for itself* while a sibling record naming a live PID still
-blocks. This hook reads the whole set through **one exit code**, and the reader's
-own resolution is *exit 2 wins over red wins over green* (evidence-kit/SPEC.md
-§check-producer-liveness). Allowing on `corrupt` would therefore mean that **one
-malformed record anywhere under the scratch dir suppresses every refusal in the
-tree** — a bypass rule 14 does not have and cannot have, minted by copying rule
-14's disposition into a reader that lost the per-record view. The divergence is
-recorded from both sides, here and at guard-kit/SPEC.md §The generic ruleset rule
-14, so neither surface reads as the other's drift.
+**`corrupt` refuses, and it diverges from guard-kit rule 14 on purpose.** Rule 14 — tracked-tree mutation under a live producer — rules that a record which does not parse **declines** rather than blocks, because a guard is not the place a corruption verdict is taken and `check-producer-liveness` already exits 2 on one. That reasoning does not transfer, and the reason is structural rather than a matter of appetite. Rule 14 reads the records **one at a time**, so a malformed record declines *for itself* while a sibling record naming a live PID still blocks. This hook reads the whole set through **one exit code**, and the reader's own resolution is *exit 2 wins over red wins over green* (evidence-kit/SPEC.md §check-producer-liveness). Allowing on `corrupt` would therefore mean that **one malformed record anywhere under the scratch dir suppresses every refusal in the tree** — a bypass rule 14 does not have and cannot have, minted by copying rule 14's disposition into a reader that lost the per-record view. The divergence is recorded from both sides, here and at guard-kit/SPEC.md §The generic ruleset rule 14, so neither surface reads as the other's drift.
 
-**The corrupt arm is cheap to be wrong about and expensive to skip.** A corrupt
-record cannot be carried far: `check-producer-liveness` is a battery member, so
-the next commit reds on it. The false-refusal window is one malformed record's
-lifetime; the bypass window, had the arm been dropped, is however long a session
-cares to leave one in place.
+**The corrupt arm is cheap to be wrong about and expensive to skip.** A corrupt record cannot be carried far: `check-producer-liveness` is a battery member, so the next commit reds on it. The false-refusal window is one malformed record's lifetime; the bypass window, had the arm been dropped, is however long a session cares to leave one in place.
 
-**`unresolved` is the same refusal under a different diagnosis, and the ground is
-a proof from the reader's own contract rather than a judgment about appetite.**
-`check-producer-liveness` in set mode derives corruption **per record** and
-aggregates *exit 2 wins over red wins over green* (evidence-kit/SPEC.md
-§check-producer-liveness). Over an empty glob there is no per-record verdict to
-aggregate, so the gate **cannot** return corrupt on an empty set. A reading of
-exit 2 at `records=0` is therefore provably *not* record corruption; it is the
-reader failing for a reason that has nothing to do with any record. The shape
-that produces it in practice is a **worktree-isolated dispatch**: a fresh
-`git worktree add` checkout carries no build output, so the binary a `.gate`
-member dispatches to is absent and the reader fails closed before it reads a
-record. The hook already computes `records` by its own glob over the same
-directory, so the discriminator costs no new field, no new knob and no second
-reader. **The arm stays reachable once a consumer's reader takes the
-worktree-resolvability requirement below, and the row is not retired**: a reader
-whose own binary is genuinely missing in a main checkout still lands here, and so
-does every consumer whose adapter has not taken that requirement. What it removes
-is the isolated dispatch as this arm's *routine* producer, never the arm.
+**`unresolved` is the same refusal under a different diagnosis, and the ground is a proof from the reader's own contract rather than a judgment about appetite.** `check-producer-liveness` in set mode derives corruption **per record** and aggregates *exit 2 wins over red wins over green* (evidence-kit/SPEC.md §check-producer-liveness). Over an empty glob there is no per-record verdict to aggregate, so the gate **cannot** return corrupt on an empty set. A reading of exit 2 at `records=0` is therefore provably *not* record corruption; it is the reader failing for a reason that has nothing to do with any record. The shape that produces it in practice is a **worktree-isolated dispatch**: a fresh `git worktree add` checkout carries no build output, so the binary a `.gate` member dispatches to is absent and the reader fails closed before it reads a record. The hook already computes `records` by its own glob over the same directory, so the discriminator costs no new field, no new knob and no second reader. **The arm stays reachable once a consumer's reader takes the worktree-resolvability requirement below, and the row is not retired**: a reader whose own binary is genuinely missing in a main checkout still lands here, and so does every consumer whose adapter has not taken that requirement. What it removes is the isolated dispatch as this arm's *routine* producer, never the arm.
 
-**The count labels the diagnosis and decides nothing, and that is a ruling rather
-than a first draft.** The split was first drafted with `unresolved` **allowing**,
-on the sound ground just given that the case cannot be record corruption. Checked
-against the shipped hook, that would have flipped a `records=0` reading from
-`refuse` to `allow` — a real, mechanical edge of the unconditional refusal the
-section above secures. **The split is kept for its diagnostic value and
-`unresolved` maps to `decision=refuse`, so no edge of
-the secured refusal set narrows.** That is not a reversal of the unconditional
-refusal; it is that refusal holding intact against a delta that would
-have narrowed it. The technical ground was not found wrong — the unconditional
-refusal was simply worth more than the one provably-empty reading it costs. The
-finding is recorded here and not only the disposition, because a later reader who
-re-derives the *cannot be corruption* proof will reach the drafted conclusion
-again and needs to find the decision rather than the argument alone.
+**The count labels the diagnosis and decides nothing, and that is a ruling rather than a first draft.** The split was first drafted with `unresolved` **allowing**, on the sound ground just given that the case cannot be record corruption. Checked against the shipped hook, that would have flipped a `records=0` reading from `refuse` to `allow` — a real, mechanical edge of the unconditional refusal the section above secures. **The split is kept for its diagnostic value and `unresolved` maps to `decision=refuse`, so no edge of the secured refusal set narrows.** That is not a reversal of the unconditional refusal; it is that refusal holding intact against a delta that would have narrowed it. The technical ground was not found wrong — the unconditional refusal was simply worth more than the one provably-empty reading it costs. The finding is recorded here and not only the disposition, because a later reader who re-derives the *cannot be corruption* proof will reach the drafted conclusion again and needs to find the decision rather than the argument alone.
 
-**The cost that decision keeps is stated rather than left to be discovered — and it
-was measured, then bounded, without narrowing the refusal.** A worktree-isolated
-dispatch is still refused at turn end on a binary-absent reading, because
-`unresolved` refuses. Priced as one wasted exit when first decided, it was
-measured on 2026-08-25 as a **loop**: a refused turn end is retried, the
-condition — a reader that cannot run — is invariant under anything the child
-does, so one read-only audit spent 142 tool uses and ~179k tokens refusing and
-its report was lost with them. **The bound that answers it: `unresolved`
-refuses once.** The hook reads the payload's `stop_hook_active` — true when the
-harness is already continuing because of a stop hook — and on that firing the
-`unresolved` arm allows, logging `verdict=unresolved decision=allow`, which is
-how a triage reader tells a bounded refusal from a first one without a new
-field. `red` and `corrupt` read nothing from the field and stay unconditional:
-their conditions resolve (the producer ends; the record is deleted), so the
-loop they hold is the rule's own bound, and the field is read for the one arm
-whose condition never resolves. No edge of the secured refusal set narrows —
-the first refusal on every arm stands — and the refused alternative, allowing
-`unresolved` inside a linked worktree, is refused for exactly that reason. The
-root fix, a reader resolvable inside a worktree, belongs to separately queued
-work and dissolves the
-arm's firing rather than bounding it. **Measured live the same day, after the
-fix:** a worktree-isolated read-only dispatch was refused once and allowed on
-its next stop — two tool uses, ~18k child tokens, report delivered — against
-the 142 / ~179k / report-lost reading the hotfix answered.
+**The cost that decision keeps is stated rather than left to be discovered — and it was measured, then bounded, without narrowing the refusal.** A worktree-isolated dispatch is still refused at turn end on a binary-absent reading, because `unresolved` refuses. Priced as one wasted exit when first decided, it was measured on 2026-08-25 as a **loop**: a refused turn end is retried, the condition — a reader that cannot run — is invariant under anything the child does, so one read-only audit spent 142 tool uses and ~179k tokens refusing and its report was lost with them. **The bound that answers it: `unresolved` refuses once.** The hook reads the payload's `stop_hook_active` — true when the harness is already continuing because of a stop hook — and on that firing the `unresolved` arm allows, logging `verdict=unresolved decision=allow`, which is how a triage reader tells a bounded refusal from a first one without a new field. `red` and `corrupt` read nothing from the field and stay unconditional: their conditions resolve (the producer ends; the record is deleted), so the loop they hold is the rule's own bound, and the field is read for the one arm whose condition never resolves. No edge of the secured refusal set narrows — the first refusal on every arm stands — and the refused alternative, allowing `unresolved` inside a linked worktree, is refused for exactly that reason. The root fix, a reader resolvable inside a worktree, belongs to separately queued work and dissolves the arm's firing rather than bounding it. **Measured live the same day, after the fix:** a worktree-isolated read-only dispatch was refused once and allowed on its next stop — two tool uses, ~18k child tokens, report delivered — against the 142 / ~179k / report-lost reading the hotfix answered.
 
-**`records=0` is not a clause, and the resemblance to the refused option is
-disclosed at both places it arises.** The refused capped variant read
-"`verdict=red live=yes` carrying at least one record". The record count is not a
-condition here and is not imported as one: `check-producer-liveness` cannot return
-red over an empty set, so `red` already implies at least one record by the
-reader's own contract. That half of the refused option was vacuous, and nothing
-here adopts or needs it. The `corrupt`/`unresolved` split is the **second**
-coincidence, and it is disclosed on the same terms: there the count is not
-vacuous — exit 2 genuinely occurs at zero records — but it still decides no
-refusal, only which of two refusing names the reading gets. Record count decides
-no refusal anywhere in this hook, on either arm.
+**`records=0` is not a clause, and the resemblance to the refused option is disclosed at both places it arises.** The refused capped variant read "`verdict=red live=yes` carrying at least one record". The record count is not a condition here and is not imported as one: `check-producer-liveness` cannot return red over an empty set, so `red` already implies at least one record by the reader's own contract. That half of the refused option was vacuous, and nothing here adopts or needs it. The `corrupt`/`unresolved` split is the **second** coincidence, and it is disclosed on the same terms: there the count is not vacuous — exit 2 genuinely occurs at zero records — but it still decides no refusal, only which of two refusing names the reading gets. Record count decides no refusal anywhere in this hook, on either arm.
 
-**`unavailable`, `unstarted` and `error` allow on the degradation posture, not on
-leniency.** All three mean the hook obtained no reading — an **override** failed
-the resolution predicate, a resolved reader the operating system would not start,
-or a reader that ran failed to answer. Refusing there would refuse every turn end
-behind a mis-set knob, a refusing host or a broken reader, in a kit that ships
-this hook opt-in and inert. **This is
-where `unresolved` parts from them and the boundary is the reader's own contract,
-not a preference:** `unavailable` and `unstarted` are a reader that never ran and
-`error` is one whose answer this hook does not map, while `unresolved` is a
-configured, readable reader that **ran and returned its own fail-closed verdict**.
-Taking that verdict is not refusing on an absent reading; second-guessing it would
-be the fail-open the reader's exit 2 exists against. It is
-guard-kit/SPEC.md §The guard framework's fail-open-but-loud posture for a
-deny-guard whose rule turns on an external reader, the same posture §The
-delegation model's dispatch guard already takes, and the `verdict=error`,
-`verdict=unstarted` and `spawn` values in the grammar below are what supply the
-"loud".
+**`unavailable`, `unstarted` and `error` allow on the degradation posture, not on leniency.** All three mean the hook obtained no reading — an **override** failed the resolution predicate, a resolved reader the operating system would not start, or a reader that ran failed to answer. Refusing there would refuse every turn end behind a mis-set knob, a refusing host or a broken reader, in a kit that ships this hook opt-in and inert. **This is where `unresolved` parts from them and the boundary is the reader's own contract, not a preference:** `unavailable` and `unstarted` are a reader that never ran and `error` is one whose answer this hook does not map, while `unresolved` is a configured, readable reader that **ran and returned its own fail-closed verdict**. Taking that verdict is not refusing on an absent reading; second-guessing it would be the fail-open the reader's exit 2 exists against. It is guard-kit/SPEC.md §The guard framework's fail-open-but-loud posture for a deny-guard whose rule turns on an external reader, the same posture §The delegation model's dispatch guard already takes, and the `verdict=error`, `verdict=unstarted` and `spawn` values in the grammar below are what supply the "loud".
 
-**`unstarted` keeps the fail-open and makes it countable; it does not refuse, not
-even once.** Refusing once under the `stop_hook_active` bound `unresolved` takes
-would close the fail-open, but only by widening a refusal set this section holds
-as separately authorized, and a spawn the host refused is no reading at all — the
-class of `unavailable` and `error`, not of the reader's own fail-closed verdict.
-What the arm buys is a degradation that is not silent: `unstarted` and its `spawn`
-value are a distinct line the close-stage triage counts.
+**`unstarted` keeps the fail-open and makes it countable; it does not refuse, not even once.** Refusing once under the `stop_hook_active` bound `unresolved` takes would close the fail-open, but only by widening a refusal set this section holds as separately authorized, and a spawn the host refused is no reading at all — the class of `unavailable` and `error`, not of the reader's own fail-closed verdict. What the arm buys is a degradation that is not silent: `unstarted` and its `spawn` value are a distinct line the close-stage triage counts.
 
-**The harness's task view is a second refusing condition, beside the reading
-rather than in it.** An element of `background_tasks` with `type` `shell` and
-`status` `running` refuses whatever the reader said. It covers the producer no
-launch record names — a call the harness moved to the background on its
-timeout — which §What `background_tasks` carries measured the view as
-enumerating, since the harness launched it. It supplements the record set and
-substitutes for nothing: a detached producer the view does not enumerate is
-still the record set's. It logs nothing of the view. The condition is
-unconditional, like `red`: it reads nothing from `stop_hook_active`, because it
-resolves when the task ends. An element of `type` `subagent`, an element with
-any other `status`, an absent key, a non-array value and an element that is not
-an object all contribute nothing, so a malformed view degrades to the record-set
-decision alone — the quiet half of the fail-open-but-loud posture, since the
-view is a supplement and its absence must not refuse. The hook reads `type` and
-`status` to decide and logs neither, nor a count, nor any new field, so the
-grammar below and §What `background_tasks` carries' key-names-only ruling are
-untouched. A task-held refusal is still legible: the `verdict` stays what the
-reader said, so it shows as `decision=refuse` beside a non-refusing verdict
-(`green`, `unavailable`, `unstarted`, `error`), a pairing no other arm produces.
-Its stderr names the arm and tells the session to await the task's completion
-notification.
+**The harness's task view is a second refusing condition, beside the reading rather than in it.** An element of `background_tasks` with `type` `shell` and `status` `running` refuses whatever the reader said. It covers the producer no launch record names — a call the harness moved to the background on its timeout — which §What `background_tasks` carries measured the view as enumerating, since the harness launched it. It supplements the record set and substitutes for nothing: a detached producer the view does not enumerate is still the record set's. It logs nothing of the view. The condition is unconditional, like `red`: it reads nothing from `stop_hook_active`, because it resolves when the task ends. An element of `type` `subagent`, an element with any other `status`, an absent key, a non-array value and an element that is not an object all contribute nothing, so a malformed view degrades to the record-set decision alone — the quiet half of the fail-open-but-loud posture, since the view is a supplement and its absence must not refuse. The hook reads `type` and `status` to decide and logs neither, nor a count, nor any new field, so the grammar below and §What `background_tasks` carries' key-names-only ruling are untouched. A task-held refusal is still legible: the `verdict` stays what the reader said, so it shows as `decision=refuse` beside a non-refusing verdict (`green`, `unavailable`, `unstarted`, `error`), a pairing no other arm produces. Its stderr names the arm and tells the session to await the task's completion notification.
 
-**Whether a finished task leaves the array is not a premise of that condition.**
-It keys on `status` being `running`, so a finished task either leaves the array
-or carries another status, and both allow. The residual is a finished task still
-reporting `running`, which would hold the refusal across the session's retries.
-The log exposes that without logging a value: a run of `decision=refuse` beside
-a non-refusing verdict that outlasts the task's completion notification, and the
-first live firing measures it that way. **Honest limit:** until then the residual
-is unmeasured, and a session caught in it has no in-band way out; an
-operator-visible `decision=refuse` run in the log is the signature. How often a
-running task refuses at an intermediate firing costs nothing, since an
-intermediate exit 2 delivers nothing (below). A session's own backgrounded wait
-loop is itself a running `shell` task, so a turn end during it refuses — which is
-the waiting rule itself, and needs no exemption.
+**Whether a finished task leaves the array is not a premise of that condition.** It keys on `status` being `running`, so a finished task either leaves the array or carries another status, and both allow. The residual is a finished task still reporting `running`, which would hold the refusal across the session's retries. The log exposes that without logging a value: a run of `decision=refuse` beside a non-refusing verdict that outlasts the task's completion notification, and the first live firing measures it that way. **Honest limit:** until then the residual is unmeasured, and a session caught in it has no in-band way out; an operator-visible `decision=refuse` run in the log is the signature. How often a running task refuses at an intermediate firing costs nothing, since an intermediate exit 2 delivers nothing (below). A session's own backgrounded wait loop is itself a running `shell` task, so a turn end during it refuses — which is the waiting rule itself, and needs no exemption.
 
-**An unreadable payload does not disable enforcement, and this is the one place
-this hook is strictly better off than its `PreToolUse` siblings.** The verdict
-comes from the liveness reader over the run directory, so a payload that will not
-parse costs the log line its `event`, `session` and `keys` columns and leaves the
-verdict exact. It does not leave the *decision* exact in every arm, and the
-exception is stated rather than rounded away: `stop_hook_active` is a payload
-field, and on the `unresolved` arm alone it flips a refusal into an allow (the
-already-continuing bound below), and the task-view condition above is read from
-the payload, so an unreadable one drops it and leaves the record-set decision.
-Every other arm decides on the verdict alone.
-The advisory-envelope problem the dispatch guard had to solve by hand does not
-arise here either way, and no separate JSON program is on this path at all.
+**An unreadable payload does not disable enforcement, and this is the one place this hook is strictly better off than its `PreToolUse` siblings.** The verdict comes from the liveness reader over the run directory, so a payload that will not parse costs the log line its `event`, `session` and `keys` columns and leaves the verdict exact. It does not leave the *decision* exact in every arm, and the exception is stated rather than rounded away: `stop_hook_active` is a payload field, and on the `unresolved` arm alone it flips a refusal into an allow (the already-continuing bound below), and the task-view condition above is read from the payload, so an unreadable one drops it and leaves the record-set decision. Every other arm decides on the verdict alone. The advisory-envelope problem the dispatch guard had to solve by hand does not arise here either way, and no separate JSON program is on this path at all.
 
-**The bounded call stays, and its meaning inverts.** The reader is invoked under
-a wait bound the member applies unconditionally, which is one optional program
-fewer than the shell form's conditional `timeout`. While this hook only logged, the bound was
-there because a reader that hung would have refused the turn end by accident —
-the blocking variant arrived at sideways. Now that the hook *is* the blocking
-variant, the bound is what keeps a hung **reader** from being read as a live
-**producer**: a timeout is an unmapped exit code, so it is `error` and it allows,
-and a refusal is only ever the reader's own verdict. **The bounded call's error is
-typed, so a child that never started and one that did are two cases, never one
-string.** A **spawn** failure — the spawn funnel refusing, or the operating system
-refusing the spawn — carries the operating system's own error and reads
-`unstarted`. A **wait** failure on a child that did start reads `error`: a reader
-that ran and did not answer, which is `error`'s definition word for word.
+**The bounded call stays, and its meaning inverts.** The reader is invoked under a wait bound the member applies unconditionally, which is one optional program fewer than the shell form's conditional `timeout`. While this hook only logged, the bound was there because a reader that hung would have refused the turn end by accident — the blocking variant arrived at sideways. Now that the hook *is* the blocking variant, the bound is what keeps a hung **reader** from being read as a live **producer**: a timeout is an unmapped exit code, so it is `error` and it allows, and a refusal is only ever the reader's own verdict. **The bounded call's error is typed, so a child that never started and one that did are two cases, never one string.** A **spawn** failure — the spawn funnel refusing, or the operating system refusing the spawn — carries the operating system's own error and reads `unstarted`. A **wait** failure on a child that did start reads `error`: a reader that ran and did not answer, which is `error`'s definition word for word.
 
-**The liveness reading reuses `check-producer-liveness` and copies no grammar.**
-§The delegation model rules that the reading affordance which would genuinely
-earn its place already exists and is that gate; a hook re-implementing the
-`pid=<n> run=<key>` parse and the PID predicate would be a third copy of a
-grammar evidence-kit owns. So the hook invokes the reader in **set mode** over
-the scratch dir — which already quantifies the per-record verdict and already
-resolves *exit 2 wins over red wins over green* (evidence-kit/SPEC.md
-§check-producer-liveness) — and maps its exit class onto `verdict`, `live` and
-now the exit code. Nothing about how a PID's liveness is decided is seconded
-here.
+**The liveness reading reuses `check-producer-liveness` and copies no grammar.** §The delegation model rules that the reading affordance which would genuinely earn its place already exists and is that gate; a hook re-implementing the `pid=<n> run=<key>` parse and the PID predicate would be a third copy of a grammar evidence-kit owns. So the hook invokes the reader in **set mode** over the scratch dir — which already quantifies the per-record verdict and already resolves *exit 2 wins over red wins over green* (evidence-kit/SPEC.md §check-producer-liveness) — and maps its exit class onto `verdict`, `live` and now the exit code. Nothing about how a PID's liveness is decided is seconded here.
 
-**The prerequisite is discharged by construction, and what remains of it is
-stated rather than assumed.** The reading is the binary's own compiled
-`check-producer-liveness`, so a tree that can fire this hook at all can take a
-reading: the prerequisite is the binary, which *is* the hook. What survives is the
-**override**'s prerequisite — a consumer that sets
-`DELEGATION_KIT_LIVENESS_CMD` to an argv whose first element resolves to no
-executable program (an absent path, a path without the execute bit, a bare name
-not on `PATH`) gets `verdict=unavailable decision=allow` on every line: a hook that answers
-nothing and refuses nothing. That is honest degradation and it is preferable to a
-silent third parse that would work everywhere and drift from its owner.
+**The prerequisite is discharged by construction, and what remains of it is stated rather than assumed.** The reading is the binary's own compiled `check-producer-liveness`, so a tree that can fire this hook at all can take a reading: the prerequisite is the binary, which *is* the hook. What survives is the **override**'s prerequisite — a consumer that sets `DELEGATION_KIT_LIVENESS_CMD` to an argv whose first element resolves to no executable program (an absent path, a path without the execute bit, a bare name not on `PATH`) gets `verdict=unavailable decision=allow` on every line: a hook that answers nothing and refuses nothing. That is honest degradation and it is preferable to a silent third parse that would work everywhere and drift from its owner.
 
-**The kit shipped no default reader for as long as it could not ship a real one,
-and enforcement made that rule stronger rather than negotiable.** It defaulted to
-`evidence-kit/checks/check-producer-liveness.sh` while that gate was <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
-shell-declared. Porting the gate to a descriptor dispatched to
-the binary left that path existing in **no** tree — the readability test the reader
-sits behind fails everywhere, and the hook logged `unavailable` on every firing
-in a tree whose battery was green over it. A default naming a path nothing
-resolves is a fake default: it reads as a shipped capability and is none, which is
-worse than declaring the prerequisite. So the knob took no default and the reader
-was the consumer's to name; a kit-side default would decide whether a tree
-*refuses*. **The alternative was to teach this knob to resolve a gate *name*, and
-it was refused on a recorded precedent rather than on taste**:
-evidence-kit/SPEC.md §check-evidence-manifest met the identical break one caller
-over, when the same port turned a pre-flight entry's named path into a descriptor,
-and discharged it with a **consumer-side front end** resolving the name —
-"deliberately not teaching lifecycle-kit to resolve a name in that knob, which
-would be a kit-contract change". The same reasoning bound here, and it is the
-reason that repair changed no contract: the value is still a path this hook runs
-with the scratch dir as its only argument. **The record is kept in the past tense
-rather than struck out**, because the paragraph below is the lapse of exactly this
-refusal's premise and reads as a non-sequitur without it.
+**The kit shipped no default reader for as long as it could not ship a real one, and enforcement made that rule stronger rather than negotiable.** It defaulted to `evidence-kit/checks/check-producer-liveness.sh` while that gate was <!-- manifest-temporal-exempt: retirement record, names a shell file since removed --> shell-declared. Porting the gate to a descriptor dispatched to the binary left that path existing in **no** tree — the readability test the reader sits behind fails everywhere, and the hook logged `unavailable` on every firing in a tree whose battery was green over it. A default naming a path nothing resolves is a fake default: it reads as a shipped capability and is none, which is worse than declaring the prerequisite. So the knob took no default and the reader was the consumer's to name; a kit-side default would decide whether a tree *refuses*. **The alternative was to teach this knob to resolve a gate *name*, and it was refused on a recorded precedent rather than on taste**: evidence-kit/SPEC.md §check-evidence-manifest met the identical break one caller over, when the same port turned a pre-flight entry's named path into a descriptor, and discharged it with a **consumer-side front end** resolving the name — "deliberately not teaching lifecycle-kit to resolve a name in that knob, which would be a kit-contract change". The same reasoning bound here, and it is the reason that repair changed no contract: the value is still a path this hook runs with the scratch dir as its only argument. **The record is kept in the past tense rather than struck out**, because the paragraph below is the lapse of exactly this refusal's premise and reads as a non-sequitur without it.
 
-**That ruling's premise lapsed, and the kit now ships the default it could not
-ship before.** The refusal above was written while the gate was a descriptor a
-bash front end dispatched, so "only a consumer knows its front end" was true. The
-hook and `check-producer-liveness` are members of one binary, and a binary knows
-its own path: the hook reaches the gate through its **own executable** rather than
-through any front end, so **an empty knob, the default, resolves to
-`current_exe()`, spawned with the gate name and the scratch dir as its argv**.
-That is a real default rather than a fake one — the executable that is running is,
-by definition, present — and it is what retires the fake-default objection above
-rather than reversing it. `DELEGATION_KIT_LIVENESS_CMD` survives as the consumer
-**override**, for a consumer whose reader is not this gate: an indexed argv, one
-line per element, spawned directly with no shell and the scratch dir appended
-after its last element, so the consumer names an interpreter as an element when
-its reader needs one, and a one-element override naming an executable path runs
-that path with the scratch dir as its only argument. **Executability rather than
-mere file-ness is the override's resolution predicate**: its first element must
-resolve to an executable program — a path carrying a separator must carry the
-execute bit, a bare name must resolve on `PATH` — and one that does not cannot be
-spawned, so it resolves to no reader and reads `unavailable` rather than being run
-under an interpreter the kit chose for it.
+**That ruling's premise lapsed, and the kit now ships the default it could not ship before.** The refusal above was written while the gate was a descriptor a bash front end dispatched, so "only a consumer knows its front end" was true. The hook and `check-producer-liveness` are members of one binary, and a binary knows its own path: the hook reaches the gate through its **own executable** rather than through any front end, so **an empty knob, the default, resolves to `current_exe()`, spawned with the gate name and the scratch dir as its argv**. That is a real default rather than a fake one — the executable that is running is, by definition, present — and it is what retires the fake-default objection above rather than reversing it. `DELEGATION_KIT_LIVENESS_CMD` survives as the consumer **override**, for a consumer whose reader is not this gate: an indexed argv, one line per element, spawned directly with no shell and the scratch dir appended after its last element, so the consumer names an interpreter as an element when its reader needs one, and a one-element override naming an executable path runs that path with the scratch dir as its only argument. **Executability rather than mere file-ness is the override's resolution predicate**: its first element must resolve to an executable program — a path carrying a separator must carry the execute bit, a bare name must resolve on `PATH` — and one that does not cannot be spawned, so it resolves to no reader and reads `unavailable` rather than being run under an interpreter the kit chose for it.
 
-**The default is spawned rather than called in process, and the ground is the seam
-rather than caution.** `check-producer-liveness` is compiled into this binary and
-the gate table would hand back the function, so an in-process call is available and
-looks free. It is refused because this hook's whole predicate is *the reader's exit
-class* — the seven-arm table above — and that table is written over a **child
-process's** status, with "no reading at all" as an arm no return value can
-express. An in-process call yields an integer and can never yield that arm, so the
-default and an override would travel two code paths with two arm sets, and
-`unavailable` would become unreachable for the default while staying reachable for
-an override. One code path with two values of one argv keeps every row of the
-table true of both, which is the property the table's readers — the close-stage
-triage below and this hook's own refusal text — depend on. For the same reason a
-spawn that never started reads `unstarted` and not `error`: `error` names a
-reader that **ran** and returned an unmapped code, so reporting it over a failed
-spawn would name a reading that was never taken.
+**The default is spawned rather than called in process, and the ground is the seam rather than caution.** `check-producer-liveness` is compiled into this binary and the gate table would hand back the function, so an in-process call is available and looks free. It is refused because this hook's whole predicate is *the reader's exit class* — the seven-arm table above — and that table is written over a **child process's** status, with "no reading at all" as an arm no return value can express. An in-process call yields an integer and can never yield that arm, so the default and an override would travel two code paths with two arm sets, and `unavailable` would become unreachable for the default while staying reachable for an override. One code path with two values of one argv keeps every row of the table true of both, which is the property the table's readers — the close-stage triage below and this hook's own refusal text — depend on. For the same reason a spawn that never started reads `unstarted` and not `error`: `error` names a reader that **ran** and returned an unmapped code, so reporting it over a failed spawn would name a reading that was never taken.
 
-**`unavailable` is not retired by the default, and where it survives is stated**,
-because the obvious reading of a working default is that no firing can lack a
-reading again. An override whose first element resolves to no executable program
-still resolves to no reader, so the arm keeps its producer; one that resolves
-and then cannot be spawned reads `unstarted` instead. What
-it loses is the *empty knob* as a routine producer — precisely the fake-default
-degradation this section records as the reason the knob had no default at all.
+**`unavailable` is not retired by the default, and where it survives is stated**, because the obvious reading of a working default is that no firing can lack a reading again. An override whose first element resolves to no executable program still resolves to no reader, so the arm keeps its producer; one that resolves and then cannot be spawned reads `unstarted` instead. What it loses is the *empty knob* as a routine producer — precisely the fake-default degradation this section records as the reason the knob had no default at all.
 
-**A consumer's *override* must resolve from a worktree-isolated dispatch, and this
-is a requirement on the override rather than advice to it.** The default is
-discharged by construction — the executable that is running is present wherever it
-is running, so there is no absent path to resolve and no git query to make — which
-leaves this a requirement on the consumer who replaces it. The consequence of one
-that does not is severe and indirect, so it is named here: a fresh
-`git worktree add` checkout carries no build output, a reader that dispatches to
-a compiled binary therefore fails closed inside it, the hook reads `unresolved`
-over an empty record set and refuses — and because the harness returns only a
-dispatched session's **last** assistant message, that refusal **displaces the
-child's report** on the only channel the dispatcher reads. The child did the
-work; the parent receives a liveness complaint, and the failure is silent in the
-worse direction, since the returned text reads as a liveness complaint rather
-than as a dropped report. The bind can be structural rather than a rate: where a
-consumer's dispatch rules *require* isolation for read-only agents, isolation is
-also what arms this, and no dispatch shape avoids it while staying in contract.
+**A consumer's *override* must resolve from a worktree-isolated dispatch, and this is a requirement on the override rather than advice to it.** The default is discharged by construction — the executable that is running is present wherever it is running, so there is no absent path to resolve and no git query to make — which leaves this a requirement on the consumer who replaces it. The consequence of one that does not is severe and indirect, so it is named here: a fresh `git worktree add` checkout carries no build output, a reader that dispatches to a compiled binary therefore fails closed inside it, the hook reads `unresolved` over an empty record set and refuses — and because the harness returns only a dispatched session's **last** assistant message, that refusal **displaces the child's report** on the only channel the dispatcher reads. The child did the work; the parent receives a liveness complaint, and the failure is silent in the worse direction, since the returned text reads as a liveness complaint rather than as a dropped report. The bind can be structural rather than a rate: where a consumer's dispatch rules *require* isolation for read-only agents, isolation is also what arms this, and no dispatch shape avoids it while staying in contract.
 
-**The kit states the bar for the override and clears it for the default, and the
-worked example is the default's own discharge.** The reader that runs when the
-knob is unset is the binary that is *already executing the hook*, so inside a
-linked worktree carrying no build output it is still present and still answers:
-there is nothing to resolve, which is a stronger discharge than any resolution
-and is why no git query survives this section. An override takes the bar instead,
-in the same shape as the reader's exit-code contract above: something the
-consumer's own path must satisfy, because only that consumer knows where its
-reader lives.
+**The kit states the bar for the override and clears it for the default, and the worked example is the default's own discharge.** The reader that runs when the knob is unset is the binary that is *already executing the hook*, so inside a linked worktree carrying no build output it is still present and still answers: there is nothing to resolve, which is a stronger discharge than any resolution and is why no git query survives this section. An override takes the bar instead, in the same shape as the reader's exit-code contract above: something the consumer's own path must satisfy, because only that consumer knows where its reader lives.
 
-**Not re-implementing a resolution for the override is a narrowing, and it is
-deliberate rather than an omission.** A consumer whose override names a
-compiled-binary path gets no repair inside a worktree — the `unresolved` and
-`unavailable` arms stay reachable for exactly that consumer, which is why neither
-row is retired. The kit that once carried a resolving adapter is the kit that no
-longer needs one, and a consumer who reintroduces the shape owns it: resolving a
-configured binary against the **main checkout** when the configured path is absent
-and the cwd is a linked worktree, deriving the main checkout vendor-neutrally from
-`git rev-parse --git-common-dir`. **That narrow resolution is safe where a general
-one would not be:** `check-producer-liveness` reads `*.run` records and nothing
-else, so its verdict does not depend on the binary matching the worktree's source
-and a main-checkout binary answers the same question a locally-built one would.
-That is emphatically not true of gates in general — `check-gate-binary-fresh`
-exists precisely to compare a binary against the source in its own tree — which is
-why it belonged in one consumer front end for one gate and never in how the binary
-knob resolves.
+**Not re-implementing a resolution for the override is a narrowing, and it is deliberate rather than an omission.** A consumer whose override names a compiled-binary path gets no repair inside a worktree — the `unresolved` and `unavailable` arms stay reachable for exactly that consumer, which is why neither row is retired. The kit that carried a resolving adapter is the kit that needs none, and a consumer who reintroduces the shape owns it: resolving a configured binary against the **main checkout** when the configured path is absent and the cwd is a linked worktree, deriving the main checkout vendor-neutrally from `git rev-parse --git-common-dir`. **That narrow resolution is safe where a general one would not be:** `check-producer-liveness` reads `*.run` records and nothing else, so its verdict does not depend on the binary matching the worktree's source and a main-checkout binary answers the same question a locally-built one would. That is emphatically not true of gates in general — `check-gate-binary-fresh` exists precisely to compare a binary against the source in its own tree — which is why it belonged in one consumer front end for one gate and never in how the binary knob resolves.
 
-**Such a resolution resolves an artifact; it does not build one.** The recorded
-refusal it might look like reversing is untouched: an isolated agent still may not
-build the crate, and there is still no hook that can reach a worktree which does
-not exist yet at dispatch time. It resolves a binary that already exists in a tree
-that already exists, at the moment the reader runs.
+**Such a resolution resolves an artifact; it does not build one.** The recorded refusal it might look like reversing is untouched: an isolated agent still may not build the crate, and there is still no hook that can reach a worktree which does not exist yet at dispatch time. It resolves a binary that already exists in a tree that already exists, at the moment the reader runs.
 
-**The cost is stated beside the requirement, because it is what makes the bar
-worth stating rather than leaving to be discovered.** The ordinary case is one
-wasted round-trip paid while the dispatcher waits. The worst attested tail put no
-ceiling on it: an isolated dispatch wedged in a stop-hook loop across three
-resumptions, spent a full context budget and returned nothing at all, recovered
-only by re-dispatching fresh.
+**The cost is stated beside the requirement, because it is what makes the bar worth stating rather than leaving to be discovered.** The ordinary case is one wasted round-trip paid while the dispatcher waits. The worst attested tail put no ceiling on it: an isolated dispatch wedged in a stop-hook loop across three resumptions, spent a full context budget and returned nothing at all, recovered only by re-dispatching fresh.
 
-**One line per firing**, appended, space-delimited `key=value` after a leading
-timestamp:
+**One line per firing**, appended, space-delimited `key=value` after a leading timestamp:
 
 ```
 <UTC ISO-8601>  event=<hook_event_name|->  session=<session_id|->  live=<yes|no>  verdict=<green|red|corrupt|unresolved|error|unavailable|unstarted>  spawn=<the spawn error, one token|->  records=<n>  runs=<comma-separated run keys|->  decision=<refuse|allow>  keys=<comma-separated top-level payload keys>
 ```
 
-Every field has a reader at a named transition, and no field is carried that this
-list does not name one for:
+Every field has a reader at a named transition, and no field is carried that this list does not name one for:
 
-- **timestamp** — read by the close-stage reader to order firings and to tell a
-  fresh line from a stale one.
-- **`event`** — the payload's own `hook_event_name`. Read at the **first** firing,
-  to confirm the event fires at all for a dispatched session and that it is
-  spelled `SubagentStop`. The entry's whole correction turned on the event's
-  identity, which is what earns it a field.
-- **`session`** — the payload's `session_id`, `-` otherwise. Read to separate the
-  firings of one top-level session from another's in a shared log. **It is not the
-  subagent's own id**, and the first firings settled that against the field's
-  original reader: a dispatched agent and its dispatcher log the *same*
-  `session_id`, and neither matches the identifier a stage stamp carries, so
-  attributing a firing to a stage session is not a reading this field supports.
-  **Measured, and re-corroborated first-hand rather than carried forward**: a
-  worktree-isolated child's own log and its dispatcher's log carried the
-  identical `session=` token, read out of two different files in two different
-  checkouts. Re-derive by reading both logs, not by citing this.
-  **What *would* attribute a firing is not established, and the claim this bullet
-  used to make is withdrawn.** It named the payload's `agent_id` as the
-  discriminator that would, with a grammar delta as the only thing in the way.
-  That is a forward promise the evidence does not carry. **Observed, not
-  measured**: one read of five firings in a single session saw five **distinct**
-  top-level `agent_id` values, none of them matching the stable identifier the
-  same payloads' `background_tasks` array reported for the one live dispatched
-  agent. If that holds, the field is per-*firing* rather than per-*agent*, and
-  would attribute nothing. The observation is carried at that tier — a single
-  unreplicated read — and neither promoted nor dismissed.
-  **Why the doubt cannot be settled from this tree**, which is a consequence of a
-  ruling rather than of effort: the tracked record is
-  `.workflow/subagent-stop-liveness.log`, and by the no-values ruling (§What
-  `background_tasks` carries) it records the payload's top-level **key set and no
-  values** — so every line of it carries `agent_id` as a key and not one as a
-  value. Settling the question means reading raw payloads, which that ruling
-  holds operator-class. So nothing here says attribution is one grammar delta
-  away: what is established is that `session_id` does not attribute, and what is
-  open is whether anything in the payload does. A consumer proposing to log
-  `agent_id` for attribution is proposing to settle that question, not to
-  consume a settled answer.
-- **`live`** — `yes` exactly when the reader reported a live producer. It stays
-  two-valued and stays paired with `verdict`; the honest limit below is what
-  bounds how it may be read.
-- **`verdict`**, **`records`** — the reader's exit class and the number of `*.run`
-  records under the scratch dir. Read together: `records=0` makes a `live=no`
-  uninformative, while `records=2 live=no` says records existed and their
-  producers had exited. `verdict=corrupt` carries `live=no` because the field is
-  two-valued — the pair is the reading, never `live` alone. The pair is also what
-  **names** the exit-2 arm: the same reader exit reads `corrupt` at `records>0`
-  and `unresolved` at `records=0`, so a log line's `records` column is the only
-  place a later reader can see which of the two it was, and the two want
-  different fixes.
-- **`spawn`** — the operating system's own rendering of a spawn error, sanitized
-  to one token by the record's whitespace rule (for example
-  `Text_file_busy_(os_error_26)`), populated on `verdict=unstarted` alone and `-`
-  on every other firing, so it is never filled at a transition with no reader for
-  it. No errno table is kept: the value is derived and never transcribed. Its
-  named readers are the **close-stage triage** at the close-surface drain, asking
-  whether a firing's failure was **transient** (`ETXTBSY`, `EAGAIN`, `ENOMEM`: the
-  host, and a re-run clears it) or **persistent** (`ENOENT`, `EACCES`, `ENOEXEC`:
-  the override needs fixing), and this member's own case assertions, which print
-  the firing's line at a red so it names its cause.
-- **`runs`** — the **record set the decision was taken over**: the run dir's
-  `*.run` basenames with the suffix stripped, sorted and comma-joined, `-` over an
-  empty set. It is the same listing `records` is the length of, kept rather than
-  counted away, so the count and the names can never disagree. Its named reader is
-  the **close-stage triage** at the close-surface drain, at the same transition
-  `decision` and the three diagnostic `verdict` values are read at, and it is read
-  for the question that made the field worth having: **is the guard working or is
-  it wedged?** A `decision=refuse` row whose run key names a *sibling* producer is
-  the guard doing its job; one whose run key names the refused session's **own**
-  work is a session waiting on itself, which is a wedge no other field in this
-  record can show. Every attested refusal across five recorded measurements read
-  `live=yes records=1 decision=refuse`, so at `records=1` this field names the
-  matched record **exactly**.
-  **The wedge is a worked case rather than an argument, which is what establishes
-  that this is the right field.** A session backgrounded a wait, wrote a record
-  naming **its own** pid, and that single record refused its turn end **21 times
-  in ten minutes**, every row reading `live=yes verdict=red records=1
-  decision=refuse` — rows identical to a correct refusal in every column the
-  record then carried. Under this field each of those 21 rows would have carried
-  the run key naming that session's own work, and the wedge would have been
-  legible at a glance in the first of them. That is the whole discrimination the
-  field buys, and it is measured rather than projected.
-  **Its honest limit, declared rather than left to be discovered: above
-  `records=1` it names the candidate set and not the match.** The hook holds no
-  reading that distinguishes them — `check-producer-liveness` does print the
-  matched record on stdout, and the bounded call discards that stream (§The
-  turn-end liveness hook, *The bounded call stays*) — so claiming the set were the match would be a claim the
-  discarded output cannot support. A superset is strictly more than the nothing
-  the record carried before it, which is what makes the field worth its column
-  anyway.
-  **It carries no identity and is not an attribution field.** A run key is a name
-  the writing session chose for a piece of work, written into a record that same
-  session wrote; it is not an identifier the harness assigns. See the field-set
-  paragraph below, which this field answers in part, and §Attribution was weighed
-  and is not available, which it leaves standing.
-- **`verdict=error`** — a **configured** reader that ran and did not answer: an
-  unmapped exit code, the `timeout` bound firing, or a wait that failed on a child
-  that did start. Its named reader is the
-  close-stage triage below, at the same transition, distinguishing *this tree's
-  override resolves to nothing* (`unavailable`) from *this tree's enforcement is
-  broken* (`error`). Before enforcement both meant "no reading" and the
-  distinction cost more than it bought.
-- **`verdict=unresolved`** — the **third** state that triage tells apart, and the
-  second actionable one: a configured, readable reader that ran, exited 2, and
-  held no record to be about. It is what earns a third name rather than a fold
-  onto `unavailable`, because the fix is a different one — the reader could not
-  run at all, where `error` is a reader that ran and answered off-contract and
-  `unavailable` is an override that resolved to nothing. Its named reader is the same
-  close-stage triage at the same transition. Unlike the other two it also
-  **refuses**, so the triage reads it for a second question the others never
-  raise: whether a refusal was diagnostic rather than about a real producer.
-- **`verdict=unstarted`** — the **fourth** state that triage tells apart: a
-  reader that resolved and that the operating system would not start. Its named
-  reader is the same close-stage triage at the same transition, asking whether
-  the reader is mis-configured (`unavailable`) or refused to start (`unstarted`),
-  with `spawn` beside it for whether the refusal was transient or persistent.
-  Without it a failed spawn would log `unavailable`, and a reader that could not
-  start would read as one never configured.
-- **`decision`** — `refuse` exactly when the hook exits 2, `allow` otherwise, on
-  every firing including the allowing ones. Its named reader is the **close-stage
-  triage** at the close-surface drain, where the log is read and cleared, and it
-  is read for a question no other field answers: whether a firing was **acted
-  on**. `verdict` alone cannot answer it across the landing commit, because the
-  same `verdict=red` line means *observed* before enforcement and *refused* after
-  it, in one append-only file that spans both. `decision` is also what makes a
-  refusal countable, so the forcing function's own effectiveness is measurable —
-  which is the defect §The probe is asymmetric spent a whole iteration recording
-  about `live=no`. It cannot be derived from `live`: a `corrupt` refusal carries
-  `live=no decision=refuse`. Nor from `verdict`: a task-view refusal carries a
-  non-refusing verdict beside it.
-  **The honest limit on that countability, and it is a break in this contract
-  rather than a caveat on it: the named reader cannot see a worktree-isolated
-  agent's firings at all.** `DELEGATION_KIT_STOP_LOG` defaults under
-  `${GATE_SDK_WORKFLOW_DIR:-.workflow}`, resolved against the *writing session's*
-  cwd. An isolated agent's cwd is its own worktree, so its lines land in that
-  worktree's `.workflow/` and are destroyed with the worktree at reclamation —
-  and that is precisely the class `unresolved` names, so the field's claim that a
-  refusal is countable is true of **main-checkout firings only**. Not repaired
-  here, and the reason is a seam rather than appetite: pointing the knob at an
-  absolute main-checkout path would bake a machine path into a consumer surface,
-  and the vendor-neutral derivation (`git rev-parse --git-common-dir`) now exists
-  in this repo's *reader* without reaching this *writer* — a read-side bridge for
-  one gate is not a write-side one. It is filed rather than flagged and skipped.
-  **What the reader's resolution changes is which class goes unseen.** Where a
-  consumer's adapter resolves inside a worktree, an isolated child's firings read
-  `verdict=green records=0 decision=allow` rather than `unresolved … refuse`, so
-  the triage still cannot see them and what it cannot see is an allow. That is a
-  smaller loss and not a closed one. The log line's grammar, field list and order are untouched,
-  so the space-delimited parse the triage uses does not move.
-- **`keys`** — the payload's top-level key set, nothing more. Read **once**, at
-  the first firing, to settle what a `SubagentStop` payload carries without
-  asserting anything about it in advance. **It returned against the advance
-  claim**, which is the whole reason the field logs the set rather than assuming
-  it: the payload carries a top-level `background_tasks`, so the pre-wiring premise
-  that it names no background task was wrong, and only the key read caught it.
-  Values stay unlogged on the ground that survives that correction — logging them
-  would put transcript paths and prompt ids into a file for no reader. What
-  `background_tasks` carries was then settled **off this field**, by a one-off
-  read that widened nothing here: §What `background_tasks` carries.
+- **timestamp** — read by the close-stage reader to order firings and to tell a fresh line from a stale one.
+- **`event`** — the payload's own `hook_event_name`. Read at the **first** firing, to confirm the event fires at all for a dispatched session and that it is spelled `SubagentStop`. The entry's whole correction turned on the event's identity, which is what earns it a field.
+- **`session`** — the payload's `session_id`, `-` otherwise. Read to separate the firings of one top-level session from another's in a shared log. **It is not the subagent's own id**, and the first firings settled that against the field's original reader: a dispatched agent and its dispatcher log the *same* `session_id`, and neither matches the identifier a stage stamp carries, so attributing a firing to a stage session is not a reading this field supports. **Measured, and re-corroborated first-hand rather than carried forward**: a worktree-isolated child's own log and its dispatcher's log carried the identical `session=` token, read out of two different files in two different checkouts. Re-derive by reading both logs, not by citing this. **What *would* attribute a firing is not established, and the claim this bullet used to make is withdrawn.** It named the payload's `agent_id` as the discriminator that would, with a grammar delta as the only thing in the way. That is a forward promise the evidence does not carry. **Observed, not measured**: one read of five firings in a single session saw five **distinct** top-level `agent_id` values, none of them matching the stable identifier the same payloads' `background_tasks` array reported for the one live dispatched agent. If that holds, the field is per-*firing* rather than per-*agent*, and would attribute nothing. The observation is carried at that tier — a single unreplicated read — and neither promoted nor dismissed. **Why the doubt cannot be settled from this tree**, which is a consequence of a ruling rather than of effort: the tracked record is `.workflow/subagent-stop-liveness.log`, and by the no-values ruling (§What `background_tasks` carries) it records the payload's top-level **key set and no values** — so every line of it carries `agent_id` as a key and not one as a value. Settling the question means reading raw payloads, which that ruling holds operator-class. So nothing here says attribution is one grammar delta away: what is established is that `session_id` does not attribute, and what is open is whether anything in the payload does. A consumer proposing to log `agent_id` for attribution is proposing to settle that question, not to consume a settled answer.
+- **`live`** — `yes` exactly when the reader reported a live producer. It stays two-valued and stays paired with `verdict`; the honest limit below is what bounds how it may be read.
+- **`verdict`**, **`records`** — the reader's exit class and the number of `*.run` records under the scratch dir. Read together: `records=0` makes a `live=no` uninformative, while `records=2 live=no` says records existed and their producers had exited. `verdict=corrupt` carries `live=no` because the field is two-valued — the pair is the reading, never `live` alone. The pair is also what **names** the exit-2 arm: the same reader exit reads `corrupt` at `records>0` and `unresolved` at `records=0`, so a log line's `records` column is the only place a later reader can see which of the two it was, and the two want different fixes.
+- **`spawn`** — the operating system's own rendering of a spawn error, sanitized to one token by the record's whitespace rule (for example `Text_file_busy_(os_error_26)`), populated on `verdict=unstarted` alone and `-` on every other firing, so it is never filled at a transition with no reader for it. No errno table is kept: the value is derived and never transcribed. Its named readers are the **close-stage triage** at the close-surface drain, asking whether a firing's failure was **transient** (`ETXTBSY`, `EAGAIN`, `ENOMEM`: the host, and a re-run clears it) or **persistent** (`ENOENT`, `EACCES`, `ENOEXEC`: the override needs fixing), and this member's own case assertions, which print the firing's line at a red so it names its cause.
+- **`runs`** — the **record set the decision was taken over**: the run dir's `*.run` basenames with the suffix stripped, sorted and comma-joined, `-` over an empty set. It is the same listing `records` is the length of, kept rather than counted away, so the count and the names can never disagree. Its named reader is the **close-stage triage** at the close-surface drain, at the same transition `decision` and the three diagnostic `verdict` values are read at, and it is read for the question that made the field worth having: **is the guard working or is it wedged?** A `decision=refuse` row whose run key names a *sibling* producer is the guard doing its job; one whose run key names the refused session's **own** work is a session waiting on itself, which is a wedge no other field in this record can show. Every attested refusal across five recorded measurements read `live=yes records=1 decision=refuse`, so at `records=1` this field names the matched record **exactly**. **The wedge is a worked case rather than an argument, which is what establishes that this is the right field.** A session backgrounded a wait, wrote a record naming **its own** pid, and that single record refused its turn end **21 times in ten minutes**, every row reading `live=yes verdict=red records=1 decision=refuse` — rows identical to a correct refusal in every column the record then carried. Under this field each of those 21 rows would have carried the run key naming that session's own work, and the wedge would have been legible at a glance in the first of them. That is the whole discrimination the field buys, and it is measured rather than projected. **Its honest limit, declared rather than left to be discovered: above `records=1` it names the candidate set and not the match.** The hook holds no reading that distinguishes them — `check-producer-liveness` does print the matched record on stdout, and the bounded call discards that stream (§The turn-end liveness hook, *The bounded call stays*) — so claiming the set were the match would be a claim the discarded output cannot support. A superset is strictly more than the nothing the record carried before it, which is what makes the field worth its column anyway. **It carries no identity and is not an attribution field.** A run key is a name the writing session chose for a piece of work, written into a record that same session wrote; it is not an identifier the harness assigns. See the field-set paragraph below, which this field answers in part, and §Attribution was weighed and is not available, which it leaves standing.
+- **`verdict=error`** — a **configured** reader that ran and did not answer: an unmapped exit code, the `timeout` bound firing, or a wait that failed on a child that did start. Its named reader is the close-stage triage below, at the same transition, distinguishing *this tree's override resolves to nothing* (`unavailable`) from *this tree's enforcement is broken* (`error`). Before enforcement both meant "no reading" and the distinction cost more than it bought.
+- **`verdict=unresolved`** — the **third** state that triage tells apart, and the second actionable one: a configured, readable reader that ran, exited 2, and held no record to be about. It is what earns a third name rather than a fold onto `unavailable`, because the fix is a different one — the reader could not run at all, where `error` is a reader that ran and answered off-contract and `unavailable` is an override that resolved to nothing. Its named reader is the same close-stage triage at the same transition. Unlike the other two it also **refuses**, so the triage reads it for a second question the others never raise: whether a refusal was diagnostic rather than about a real producer.
+- **`verdict=unstarted`** — the **fourth** state that triage tells apart: a reader that resolved and that the operating system would not start. Its named reader is the same close-stage triage at the same transition, asking whether the reader is mis-configured (`unavailable`) or refused to start (`unstarted`), with `spawn` beside it for whether the refusal was transient or persistent. Without it a failed spawn would log `unavailable`, and a reader that could not start would read as one never configured.
+- **`decision`** — `refuse` exactly when the hook exits 2, `allow` otherwise, on every firing including the allowing ones. Its named reader is the **close-stage triage** at the close-surface drain, where the log is read and cleared, and it is read for a question no other field answers: whether a firing was **acted on**. `verdict` alone cannot answer it across the landing commit, because the same `verdict=red` line means *observed* before enforcement and *refused* after it, in one append-only file that spans both. `decision` is also what makes a refusal countable, so the forcing function's own effectiveness is measurable — which is the defect §The probe is asymmetric spent a whole iteration recording about `live=no`. It cannot be derived from `live`: a `corrupt` refusal carries `live=no decision=refuse`. Nor from `verdict`: a task-view refusal carries a non-refusing verdict beside it. **The honest limit on that countability, and it is a break in this contract rather than a caveat on it: the named reader cannot see a worktree-isolated agent's firings at all.** `DELEGATION_KIT_STOP_LOG` defaults under `${GATE_SDK_WORKFLOW_DIR:-.workflow}`, resolved against the *writing session's* cwd. An isolated agent's cwd is its own worktree, so its lines land in that worktree's `.workflow/` and are destroyed with the worktree at reclamation — and that is precisely the class `unresolved` names, so the field's claim that a refusal is countable is true of **main-checkout firings only**. Not repaired here, and the reason is a seam rather than appetite: pointing the knob at an absolute main-checkout path would bake a machine path into a consumer surface, and the vendor-neutral derivation (`git rev-parse --git-common-dir`) now exists in this repo's *reader* without reaching this *writer* — a read-side bridge for one gate is not a write-side one. It is filed rather than flagged and skipped. **What the reader's resolution changes is which class goes unseen.** Where a consumer's adapter resolves inside a worktree, an isolated child's firings read `verdict=green records=0 decision=allow` rather than `unresolved … refuse`, so the triage still cannot see them and what it cannot see is an allow. That is a smaller loss and not a closed one. The log line's grammar, field list and order are untouched, so the space-delimited parse the triage uses does not move.
+- **`keys`** — the payload's top-level key set, nothing more. Read **once**, at the first firing, to settle what a `SubagentStop` payload carries without asserting anything about it in advance. **It returned against the advance claim**, which is the whole reason the field logs the set rather than assuming it: the payload carries a top-level `background_tasks`, so the pre-wiring premise that it names no background task was wrong, and only the key read caught it. Values stay unlogged on the ground that survives that correction — logging them would put transcript paths and prompt ids into a file for no reader. What `background_tasks` carries was then settled **off this field**, by a one-off read that widened nothing here: §What `background_tasks` carries.
 
-`decision` sits before `keys` deliberately: `keys` is the one free-ish field and
-stays last, so the space-delimited parse never has to step over it. **`runs` is
-that rule's second worked instance**, and it is worked here rather than asserted:
-it lands **before** `keys` for the same reason and **beside `records`** for a
-second one — the two are the count and the names of one set, and the field list
-already reads `live`/`verdict`/`records` as a group. It is a **new field rather
-than a widened `records`**: the count has a named reader at a named transition
-today, and replacing it would move that reader for no gain.
+`decision` sits before `keys` deliberately: `keys` is the one free-ish field and stays last, so the space-delimited parse never has to step over it. **`runs` is that rule's second worked instance**, and it is worked here rather than asserted: it lands **before** `keys` for the same reason and **beside `records`** for a second one — the two are the count and the names of one set, and the field list already reads `live`/`verdict`/`records` as a group. It is a **new field rather than a widened `records`**: the count has a named reader at a named transition today, and replacing it would move that reader for no gain.
 
-**The record's field set is OPEN, and that is a contract rather than a
-description of today's list.** A reader parses this record **by key** and never
-by position or arity; the writer's field set is one table in the member's own
-module, so a field added to it appears in the line without any existing reader
-changing. Nothing here settles *what* is logged — the list above is still the
-whole of it and the two omissions above are still refused — only that the
-**shape does not lock**. The constraint this discharges was a live one: the
-question of per-session attribution (the agent id, the agent type, the matched
-run key) was open and belonged to a later unit, and it had to find a record it
-could extend in one table edit rather than a positional format it would have to
-break. `keys` staying last is what keeps that true in practice, because a field
-added before it lands between two keyed fields and a field added after it would
-sit past the one free-ish value. **The openness was then spent as designed —
-`runs` landed as one table edit and moved no reader** — which is the contract
-working rather than a claim about it. `spawn` landed the same way, immediately
-after `verdict`, the one value it qualifies.
+**The record's field set is OPEN, and that is a contract rather than a description of today's list.** A reader parses this record **by key** and never by position or arity; the writer's field set is one table in the member's own module, so a field added to it appears in the line without any existing reader changing. Nothing here settles *what* is logged — the list above is still the whole of it and the two omissions above are still refused — only that the **shape does not lock**. The constraint this discharges was a live one: the question of per-session attribution (the agent id, the agent type, the matched run key) was open and belonged to a later unit, and it had to find a record it could extend in one table edit rather than a positional format it would have to break. `keys` staying last is what keeps that true in practice, because a field added before it lands between two keyed fields and a field added after it would sit past the one free-ish value. **The openness was then spent as designed — `runs` landed as one table edit and moved no reader** — which is the contract working rather than a claim about it. `spawn` landed the same way, immediately after `verdict`, the one value it qualifies.
 
-**That open question is now answered in part, and the part that is closed is
-closed by a finding rather than by a choice.** Of its three candidates:
+**That open question is now answered in part, and the part that is closed is closed by a finding rather than by a choice.** Of its three candidates:
 
-- **The matched run key is *unavailable to the hook*, and the cause is
-  structural.** The hook invokes the reader under a bound that discards both its
-  streams, so what it holds is an **exit code and nothing else**.
-  `check-producer-liveness` in set mode does print the matched record, its run key
-  and its pid — on a stdout that goes nowhere. Recovering it would need either a
-  bounded **and capturing** call, where the bound is itself load-bearing (§The
-  turn-end liveness hook, *The bounded call stays*), or the hook parsing records
-  for itself, which *The liveness reading reuses `check-producer-liveness`* (same
-  section) forbids outright as a third copy of a
-  grammar evidence-kit owns. So this candidate is not one table edit and never
-  was, and that is recorded here so the next reader finds it costed.
-- **The record set stands in for it**, which is what `runs` above is: the same
-  discrimination the matched key was wanted for, derived from a listing the hook
-  already performs, exact at `records=1` and a declared superset above it.
-- **The agent id and the agent type stay refused**, on the grounds in the
-  omissions paragraph below rather than on availability.
+- **The matched run key is *unavailable to the hook*, and the cause is structural.** The hook invokes the reader under a bound that discards both its streams, so what it holds is an **exit code and nothing else**. `check-producer-liveness` in set mode does print the matched record, its run key and its pid — on a stdout that goes nowhere. Recovering it would need either a bounded **and capturing** call, where the bound is itself load-bearing (§The turn-end liveness hook, *The bounded call stays*), or the hook parsing records for itself, which *The liveness reading reuses `check-producer-liveness`* (same section) forbids outright as a third copy of a grammar evidence-kit owns. So this candidate is not one table edit and never was, and that is recorded here so the next reader finds it costed.
+- **The record set stands in for it**, which is what `runs` above is: the same discrimination the matched key was wanted for, derived from a listing the hook already performs, exact at `records=1` and a declared superset above it.
+- **The agent id and the agent type stay refused**, on the grounds in the omissions paragraph below rather than on availability.
 
-What remains open is narrower than it was: not *can this record be extended*, and
-not *what stands in for the matched key*, but only whether any **payload** field
-attributes a firing — which the `session` field's bullet above holds is
-unsettleable from this tree.
+What remains open is narrower than it was: not *can this record be extended*, and not *what stands in for the matched key*, but only whether any **payload** field attributes a firing — which the `session` field's bullet above holds is unsettleable from this tree.
 
-**One value's spelling moved with the substrate and is recorded rather than left
-to be noticed.** `keys` is the payload's top-level key set **sorted**, where the
-shell form's `jq keys_unsorted` gave it in document order. The compiled member's
-JSON object is ordered, and the alternative — preserving document order — costs a
-dependency this cut refuses to add. Nothing reads the order: the field exists to
-answer *which keys a payload carries*, which is a set question, and the record is
-parsed by key. The grammar, the field list and the field order are untouched, so
-the space-delimited parse the triage uses does not move.
+**One value's spelling moved with the substrate and is recorded rather than left to be noticed.** `keys` is the payload's top-level key set **sorted**, where the shell form's `jq keys_unsorted` gave it in document order. The compiled member's JSON object is ordered, and the alternative — preserving document order — costs a dependency this cut refuses to add. Nothing reads the order: the field exists to answer *which keys a payload carries*, which is a set question, and the record is parsed by key. The grammar, the field list and the field order are untouched, so the space-delimited parse the triage uses does not move.
 
-**No field is carried that this list does not name a reader for**, and the two the
-authorization might have invited and that are **not** carried are recorded so the
-omission does not read as an oversight: no session-attribution field (no payload
-value is **established** to attribute — `session_id` is established not to, and
-`agent_id`'s ability to is in doubt and unsettleable here; see `session` above
-and the shared-scratch-dir paragraph below) and no refusal counter (the bound on
-repeated refusals is the producer's own life, not a count). The
-session-attribution omission rests on those two facts and not on a negative over
-the whole payload: asserting that nothing in it attributes would be a claim
-nothing here has checked, and one that would be quietly falsified — on a surface
-nobody re-reads — if `agent_id` turned out to be per-agent after all. The
-omission's *conclusion* is unchanged either way, because the two reasons for not
-wanting such a field are the ones just given rather than the payload's contents.
+**No field is carried that this list does not name a reader for**, and the two the authorization might have invited and that are **not** carried are recorded so the omission does not read as an oversight: no session-attribution field (no payload value is **established** to attribute — `session_id` is established not to, and `agent_id`'s ability to is in doubt and unsettleable here; see `session` above and the shared-scratch-dir paragraph below) and no refusal counter (the bound on repeated refusals is the producer's own life, not a count). The session-attribution omission rests on those two facts and not on a negative over the whole payload: asserting that nothing in it attributes would be a claim nothing here has checked, and one that would be quietly falsified — on a surface nobody re-reads — if `agent_id` turned out to be per-agent after all. The omission's *conclusion* is unchanged either way, because the two reasons for not wanting such a field are the ones just given rather than the payload's contents.
 
-**`agent_id` and `agent_type` were proposed for exactly this purpose and are
-refused, and the refusal is written here rather than left as an absence** — so
-the next reader meeting the idea finds it costed instead of re-deriving it.
-`agent_id` is **observed per-firing rather than per-agent** (five firings in one
-session carried five distinct values, none matching the stable identifier the
-same payloads' `background_tasks` array reported for the one live agent; see
-`session` above), so logging it would settle that question rather than consume a
-settled answer — and settling it means reading raw payloads, which the no-values
-ruling holds operator-class. `agent_type`'s stability is measured by **nothing at
-all**, so it has no better standing. Both are *payload values*, where `keys`
-carries key names and never values; the privacy ruling and the identity doubt
-point the same way here, and that is said plainly so a later reader does not read
-the privacy rule as spent by this refusal.
+**`agent_id` and `agent_type` were proposed for exactly this purpose and are refused, and the refusal is written here rather than left as an absence** — so the next reader meeting the idea finds it costed instead of re-deriving it. `agent_id` is **observed per-firing rather than per-agent** (five firings in one session carried five distinct values, none matching the stable identifier the same payloads' `background_tasks` array reported for the one live agent; see `session` above), so logging it would settle that question rather than consume a settled answer — and settling it means reading raw payloads, which the no-values ruling holds operator-class. `agent_type`'s stability is measured by **nothing at all**, so it has no better standing. Both are *payload values*, where `keys` carries key names and never values; the privacy ruling and the identity doubt point the same way here, and that is said plainly so a later reader does not read the privacy rule as spent by this refusal.
 
-**Dropping `session=` was the third shape proposed and it is refused too.** The
-argument for dropping it was that it "serves neither reader but stops a field
-reading as attribution while carrying none". That mistakes this list's governing
-rule: it is that **no field is carried without a named reader**, never that every
-field must discriminate every question. `session` has a named reader at a named
-transition — separating one top-level session's firings from another's in a
-shared log — so dropping it would delete a live reader in order to fix a
-*misreading*. The misreading is fixed instead by `runs` carrying the
-discrimination `session` never claimed.
+**Dropping `session=` was the third shape proposed and it is refused too.** The argument for dropping it was that it "serves neither reader but stops a field reading as attribution while carrying none". That mistakes this list's governing rule: it is that **no field is carried without a named reader**, never that every field must discriminate every question. `session` has a named reader at a named transition — separating one top-level session's firings from another's in a shared log — so dropping it would delete a live reader in order to fix a *misreading*. The misreading is fixed instead by `runs` carrying the discrimination `session` never claimed.
 
-**What landed is a *record* field and not an *identity* field, and the
-distinction is drawn here rather than left to be inferred.** The
-session-attribution omission just above is about **identity** and is untouched by
-`runs`; this paragraph's refusals are about identity too. `runs` names the
-consumer's own launch records. A reader arriving from either refusal should find
-that `runs` answers the open question **without minting the field they refuse**,
-which strengthens them rather than narrowing them.
+**What landed is a *record* field and not an *identity* field, and the distinction is drawn here rather than left to be inferred.** The session-attribution omission just above is about **identity** and is untouched by `runs`; this paragraph's refusals are about identity too. `runs` names the consumer's own launch records. A reader arriving from either refusal should find that `runs` answers the open question **without minting the field they refuse**, which strengthens them rather than narrowing them.
 
-**`records` is counted by the hook's own `*.run` glob, not parsed back out of the
-reader**, and the reason is the reader's output contract rather than convenience:
-`check-producer-liveness` publishes a count only on its green line, printing one
-finding per blocking record on red and no total. Same directory, same glob, same
-number — and the field stays meaningful when the reader is unavailable, which is
-the case the prerequisite above makes reachable. For the same reason the reader's
-first output line is **not** carried verbatim: over `verdict`, `records` and
-`live` it adds only the blocking record paths, and a free-text field would break
-the space-delimited parse the grammar above is for. **`runs` is that same
-listing's membership rather than a second reading**, so this reasoning covers
-both fields at once and neither can drift from the other.
+**`records` is counted by the hook's own `*.run` glob, not parsed back out of the reader**, and the reason is the reader's output contract rather than convenience: `check-producer-liveness` publishes a count only on its green line, printing one finding per blocking record on red and no total. Same directory, same glob, same number — and the field stays meaningful when the reader is unavailable, which is the case the prerequisite above makes reachable. For the same reason the reader's first output line is **not** carried verbatim: over `verdict`, `records` and `live` it adds only the blocking record paths, and a free-text field would break the space-delimited parse the grammar above is for. **`runs` is that same listing's membership rather than a second reading**, so this reasoning covers both fields at once and neither can drift from the other.
 
-**The glob is taken *after* the reader has run, and the order is load-bearing
-now that the count names an arm.** A record created between the two would, in the
-other order, produce `records=0` beside a reading that legitimately saw that
-record — the one window in which the discriminator could name a genuine corruption
-`unresolved`. Globbing after does not close the window (nothing but a lock could)
-but it inverts which way an in-flight record errs: a record appearing during the
-reader's run is *counted*, so the reading is named `corrupt` and the message
-points at a record that exists. The residual window is one malformed record's
-lifetime against a battery member that reds on the next commit, which is the bound
-the corrupt arm is already priced at above.
+**The glob is taken *after* the reader has run, and the order is load-bearing now that the count names an arm.** A record created between the two would, in the other order, produce `records=0` beside a reading that legitimately saw that record — the one window in which the discriminator could name a genuine corruption `unresolved`. Globbing after does not close the window (nothing but a lock could) but it inverts which way an in-flight record errs: a record appearing during the reader's run is *counted*, so the reading is named `corrupt` and the message points at a record that exists. The residual window is one malformed record's lifetime against a battery member that reds on the next commit, which is the bound the corrupt arm is already priced at above.
 
-**The refusal message names the finding and the lawful exits**, as guard-kit
-requires of every block message, and its branch is **three-way — one arm per
-refusing verdict, never two**. On `red` it states that a launch record under the
-scratch dir names a live producer; on `corrupt`, that a record does not parse so
-no reading says whether one is live; on `unresolved`, that the reader produced no
-reading at all and held no record to have been about. Each arm names the turn may
-not end on it, and each carries its own way forward. `red` and `corrupt` share
-the two rule 14 already names — **wait for the producer on its own artifact, in a
-loop that ends when the condition goes true, or delete the record once the
-producer has exited** — and `unresolved` takes neither, because there is no
-producer to wait for and no record to delete: what it names instead is the
-**reader** as the thing to fix, plus the isolated-dispatch limit
-(`templates/agent-execution.md`) and the lawful response to it, reporting the
-gate unavailable and returning. Every arm names the reader command with the run
-directory: on `red` to see the record set, on `corrupt` to find which record is
-malformed, on `unresolved` to read the reader's own reason for failing.
+**The refusal message names the finding and the lawful exits**, as guard-kit requires of every block message, and its branch is **three-way — one arm per refusing verdict, never two**. On `red` it states that a launch record under the scratch dir names a live producer; on `corrupt`, that a record does not parse so no reading says whether one is live; on `unresolved`, that the reader produced no reading at all and held no record to have been about. Each arm names the turn may not end on it, and each carries its own way forward. `red` and `corrupt` share the two rule 14 already names — **wait for the producer on its own artifact, in a loop that ends when the condition goes true, or delete the record once the producer has exited** — and `unresolved` takes neither, because there is no producer to wait for and no record to delete: what it names instead is the **reader** as the thing to fix, plus the isolated-dispatch limit (`templates/agent-execution.md`) and the lawful response to it, reporting the gate unavailable and returning. Every arm names the reader command with the run directory: on `red` to see the record set, on `corrupt` to find which record is malformed, on `unresolved` to read the reader's own reason for failing.
 
-**The `red` and `corrupt` arms also name the record set the decision was taken
-over** — the same `runs` derivation the log line carries, rendered for the
-*refused session* rather than for the later reader. That is what makes the
-message a **steer** rather than a notification: it moves from *run this to see
-the record set for yourself* to *this is the record set, and run this to see it
-for yourself*, and at `records=1` it hands the refused session the one fact that
-tells it whether to wait or to retract its own record. **`unresolved` takes no
-such field**, and the omission is structural rather than an oversight: its record
-set is empty by construction — the reader exited 2 over an empty set — so the
-field would print the absent token inside a sentence about a reader that could
-not run, naming nothing. Both arms keep every existing sentence: the two lawful
-exits guard-kit requires of a block message, and the reader command with the run
-directory.
+**The `red` and `corrupt` arms also name the record set the decision was taken over** — the same `runs` derivation the log line carries, rendered for the *refused session* rather than for the later reader. That is what makes the message a **steer** rather than a notification: it moves from *run this to see the record set for yourself* to *this is the record set, and run this to see it for yourself*, and at `records=1` it hands the refused session the one fact that tells it whether to wait or to retract its own record. **`unresolved` takes no such field**, and the omission is structural rather than an oversight: its record set is empty by construction — the reader exited 2 over an empty set — so the field would print the absent token inside a sentence about a reader that could not run, naming nothing. Both arms keep every existing sentence: the two lawful exits guard-kit requires of a block message, and the reader command with the run directory.
 
-**It carries no session identity, because the hook has none to carry — and a run
-key is not one.** A run key is the name a session chose for a piece of work at
-launch, written into a record that same session wrote; it is not an identifier
-the harness assigns and it attributes nothing about who is running. The rule is
-unamended by the paragraph above, and it is restated here as *still true* rather
-than left for a reader to check.
+**It carries no session identity, because the hook has none to carry — and a run key is not one.** A run key is the name a session chose for a piece of work at launch, written into a record that same session wrote; it is not an identifier the harness assigns and it attributes nothing about who is running. The rule is unamended by the paragraph above, and it is restated here as *still true* rather than left for a reader to check.
 
-**Folding `unresolved` onto the `corrupt` arm is the specific mistake this branch
-exists against.** A two-way branch would print "a launch record does not parse"
-over a case that holds **no record to parse** — a false diagnosis pointing at a
-remedy (find the malformed record) that cannot be carried out. That is the same
-message-axis conflation `scripts/gate-exec.sh` was repaired for one caller down <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
-(gate-sdk/SPEC.md §lib/gate.sh), and a refusal whose message names no reachable
-remedy is exactly what invites a read-only agent to invent a mutating one.
+**Folding `unresolved` onto the `corrupt` arm is the specific mistake this branch exists against.** A two-way branch would print "a launch record does not parse" over a case that holds **no record to parse** — a false diagnosis pointing at a remedy (find the malformed record) that cannot be carried out. That is the same message-axis conflation `scripts/gate-exec.sh` was repaired for one caller down <!-- manifest-temporal-exempt: retirement record, names a shell file since removed --> (gate-sdk/SPEC.md §lib/gate.sh), and a refusal whose message names no reachable remedy is exactly what invites a read-only agent to invent a mutating one.
 
-**There is no knob, and unwiring the hook is the valve.** §The delegation model
-rules exactly this for the dispatch guard's D1 unconditional block: "the valve is
-**unwiring the hook**, never a knob: a per-dispatch override is exactly the honour
-system these rules exist to end, and a knob would restore it under a better name."
-The same reasoning binds here and for the same reason, so this hook adds no knob.
+**There is no knob, and unwiring the hook is the valve.** §The delegation model rules exactly this for the dispatch guard's D1 unconditional block: "the valve is **unwiring the hook**, never a knob: a per-dispatch override is exactly the honour system these rules exist to end, and a knob would restore it under a better name." The same reasoning binds here and for the same reason, so this hook adds no knob.
 
-**The ordinary escape is not the operator's, and that matters under the permission
-wall.** Unwiring means editing the consumer's settings, which is operator-class
-work no stage session may do. If
-unwiring were the *only* escape, this hook would be a mechanism whose every
-recovery path needed the operator. It is not: the record set is the session's own
-artifact, `check-producer-liveness` names the blocking record, and deleting a
-record whose producer has exited is — in rule 14's own words — "not a workaround,
-it is the statement of fact becoming false and being retracted". The
-operator-class valve is the last resort, not the first.
+**The ordinary escape is not the operator's, and that matters under the permission wall.** Unwiring means editing the consumer's settings, which is operator-class work no stage session may do. If unwiring were the *only* escape, this hook would be a mechanism whose every recovery path needed the operator. It is not: the record set is the session's own artifact, `check-producer-liveness` names the blocking record, and deleting a record whose producer has exited is — in rule 14's own words — "not a workaround, it is the statement of fact becoming false and being retracted". The operator-class valve is the last resort, not the first.
 
-**Loop protection reads the producer on the arms whose condition resolves, and
-the contracted `stop_hook_active` on the one whose condition does not.** An
-earlier revision of this paragraph refused the field as an *uncontracted*
-harness artifact; probed 2026-08-25 against the published hooks reference, that
-premise was false — the field is listed in the `SubagentStop` input schema,
-defined as true when the harness is already continuing because of a stop hook,
-with the reference's own guidance to check it "to avoid blocking on a condition
-that will never resolve", and an 8-consecutive-block harness cap behind it. The
-correction is recorded rather than silently made because the refusal's *other*
-ground still holds and still decides the shape: for `red` and `corrupt` the
-refusal's trigger is a real-world condition that ends when the producer ends or
-the record is retracted, so the loop is bounded by the thing the rule is about
-and the field is not read. For `unresolved` no such bound exists — see the
-measured-cost paragraph above — so the field is read there and nowhere else. The
-harness cap did not bound the measured loop, presumably because a child's tool
-calls between refusals break the consecutive count; recorded as observed, not
-explained, so a reader does not mistake the cap for a guard this tree relies on.
+**Loop protection reads the producer on the arms whose condition resolves, and the contracted `stop_hook_active` on the one whose condition does not.** An earlier revision of this paragraph refused the field as an *uncontracted* harness artifact; probed 2026-08-25 against the published hooks reference, that premise was false — the field is listed in the `SubagentStop` input schema, defined as true when the harness is already continuing because of a stop hook, with the reference's own guidance to check it "to avoid blocking on a condition that will never resolve", and an 8-consecutive-block harness cap behind it. The correction is recorded rather than silently made because the refusal's *other* ground still holds and still decides the shape: for `red` and `corrupt` the refusal's trigger is a real-world condition that ends when the producer ends or the record is retracted, so the loop is bounded by the thing the rule is about and the field is not read. For `unresolved` no such bound exists — see the measured-cost paragraph above — so the field is read there and nowhere else. The harness cap did not bound the measured loop, presumably because a child's tool calls between refusals break the consecutive count; recorded as observed, not explained, so a reader does not mistake the cap for a guard this tree relies on.
 
-**The shared scratch dir is the subject, stated rather than discovered.** The
-reading is over `${GATE_SDK_TMP_DIR:-.tmp}`, which concurrent sessions in one
-checkout share, so a record written by one session can refuse another's turn end.
-That is the mechanism's subject and not a defect filed against it. **The project
-already binds every session to that shared set**: guard-kit rule 14 blocks
-index-writing `git` in **any** session while any `*.run` record under a scratch
-dir names a live PID — it is not narrowed to the record's writer and never was.
-Extending the same binding from "you may not commit under a live producer" to
-"you may not end your turn under one" widens the *act set*, not the subject. A
-design that narrowed the turn-end rule to the writer would leave rule 14 and this
-hook disagreeing about whose producers bind whom, on one record set, with no
-surface owning the difference.
+**The shared scratch dir is the subject, stated rather than discovered.** The reading is over `${GATE_SDK_TMP_DIR:-.tmp}`, which concurrent sessions in one checkout share, so a record written by one session can refuse another's turn end. That is the mechanism's subject and not a defect filed against it. **The project already binds every session to that shared set**: guard-kit rule 14 blocks index-writing `git` in **any** session while any `*.run` record under a scratch dir names a live PID — it is not narrowed to the record's writer and never was. Extending the same binding from "you may not commit under a live producer" to "you may not end your turn under one" widens the *act set*, not the subject. A design that narrowed the turn-end rule to the writer would leave rule 14 and this hook disagreeing about whose producers bind whom, on one record set, with no surface owning the difference.
 
 ### Attribution was weighed and is not available
 
-The payload's `session_id` is
-shared by a dispatched agent and its dispatcher, and the `pid=<n> run=<key>`
-grammar carries no writer identity. Adding one is a grammar change across
-evidence-kit and guard-kit for a narrowing the paragraph above argues against
-wanting.
+The payload's `session_id` is shared by a dispatched agent and its dispatcher, and the `pid=<n> run=<key>` grammar carries no writer identity. Adding one is a grammar change across evidence-kit and guard-kit for a narrowing the paragraph above argues against wanting.
 
-**That ruling is unchanged by the `runs` field, and the distinction is drawn here
-because a reader arriving from this paragraph would otherwise infer it.** This
-ruling is about **identity** — who wrote a record, whose turn end is being
-refused. `runs` is about **shape**: it names *which records* the reading ranged
-over, which is a fact about the record set and not about any session. The two are
-reconcilable and are now reconciled in the text rather than left as two paragraphs
-a reader must square. Read only this one, and the whole `runs` field would look
-like something already refused; it is not, and what makes it admissible is
-precisely that it mints no identity.
+**That ruling is unchanged by the `runs` field, and the distinction is drawn here because a reader arriving from this paragraph would otherwise infer it.** This ruling is about **identity** — who wrote a record, whose turn end is being refused. `runs` is about **shape**: it names *which records* the reading ranged over, which is a fact about the record set and not about any session. The two are reconcilable and are now reconciled in the text rather than left as two paragraphs a reader must square. Read only this one, and the whole `runs` field would look like something already refused; it is not, and what makes it admissible is precisely that it mints no identity.
 
-**The residue is not closed here.** Two firings this hook cannot reach: a launch
-the harness **moves to the background on its timeout**, which writes no record
-(guard-kit rule 15's stated residue, since that rule refuses every unrecorded
-launch a `PreToolUse` call can see), and the
-harness's own `background_tasks` view, which §What `background_tasks` carries
-established enumerates what was *launched* rather than what is *running* and so
-cannot substitute for the record set.
+**The residue is not closed here.** Two firings this hook cannot reach: a launch the harness **moves to the background on its timeout**, which writes no record (guard-kit rule 15's stated residue, since that rule refuses every unrecorded launch a `PreToolUse` call can see), and the harness's own `background_tasks` view, which §What `background_tasks` carries established enumerates what was *launched* rather than what is *running* and so cannot substitute for the record set.
 
-**A refusal fires at intermediate steps too, and that cost is accepted rather
-than narrowed.** `SubagentStop` is not the session-end event: it fired seventeen
-times inside one dispatched session that had ended no turn at all, spaced by
-assistant steps (§The probe is asymmetric). There is no contracted discriminator
-for a real turn end in the payload, and both uncontracted candidates are refused
-on the precedent the loop-protection paragraph cites. What is left is a judgment
-about the cost and it comes out in favour: at an intermediate step the refusal
-reaches the agent with the obligation it is about to breach *before* it breaches
-it, which is earlier and cheaper than at the end, and it is the only channel that
-reaches the agent at all. The frequency is bounded by the producer's own life,
-and a session that is correctly waiting in-turn is making few assistant steps by
-construction.
+**A refusal fires at intermediate steps too, and that cost is accepted rather than narrowed.** `SubagentStop` is not the session-end event: it fired seventeen times inside one dispatched session that had ended no turn at all, spaced by assistant steps (§The probe is asymmetric). There is no contracted discriminator for a real turn end in the payload, and both uncontracted candidates are refused on the precedent the loop-protection paragraph cites. What is left is a judgment about the cost and it comes out in favour: at an intermediate step the refusal reaches the agent with the obligation it is about to breach *before* it breaches it, which is earlier and cheaper than at the end, and it is the only channel that reaches the agent at all. The frequency is bounded by the producer's own life, and a session that is correctly waiting in-turn is making few assistant steps by construction.
 
-**What exit 2 does at a firing that is not a stop was observed, not assumed.**
-The harness contract says exit 2 "prevents the subagent from stopping"; it does
-not say what that means at a firing where the subagent was not stopping, and both
-readings — the reason is injected and the session continues, or nothing happens
-and the line is still logged — were survivable, so the design branches on
-neither. The build bought the firing rather than reasoning about it: a dispatched
-session backgrounded a bounded producer, wrote its `<key>.run` record, and read
-its own log against its own transcript. **The second reading holds.** Two firings
-took `live=yes verdict=red records=1 decision=refuse` and exited 2, and *nothing
-was delivered*: no blocking reason reached the session, no tool call was
-interrupted or re-run, and the session continued normally. Both lines were still
-logged. When the producer exited the next firing read `verdict=green
-decision=allow`, so the refusal window closed with the producer's life — the
-bound the loop-protection paragraph above relies on, observed rather than
-assumed.
+**What exit 2 does at a firing that is not a stop was observed, not assumed.** The harness contract says exit 2 "prevents the subagent from stopping"; it does not say what that means at a firing where the subagent was not stopping, and both readings — the reason is injected and the session continues, or nothing happens and the line is still logged — were survivable, so the design branches on neither. The build bought the firing rather than reasoning about it: a dispatched session backgrounded a bounded producer, wrote its `<key>.run` record, and read its own log against its own transcript. **The second reading holds.** Two firings took `live=yes verdict=red records=1 decision=refuse` and exited 2, and *nothing was delivered*: no blocking reason reached the session, no tool call was interrupted or re-run, and the session continued normally. Both lines were still logged. When the producer exited the next firing read `verdict=green decision=allow`, so the refusal window closed with the producer's life — the bound the loop-protection paragraph above relies on, observed rather than assumed.
 
-**One half of the cost argument above is measured down by that, and is corrected
-rather than restated.** The claim that a refusal at an intermediate step reaches
-the agent with the obligation *before* it breaches it does **not** hold in this
-harness revision: at an intermediate firing the reach is nil. The judgment still
-comes out the same way, because the cost it was weighed against is nil for the
-same reason — an intermediate firing costs the session nothing at all, and what
-survives is a logged `decision=refuse` line that the close-stage triage can
-count. **The real turn end was bought later, and it delivers.** A dispatched
-session ended its turn while its own `.run` record named a live producer; the
-firing logged `decision=refuse`, the reason reached the session as stop-hook
-feedback, and the session resumed work on the producer. Both readings are now
-observed, not just contracted. They sit under the contract's own limit: only a
-fresh firing catches a harness revision.
+**One half of the cost argument above is measured down by that, and is corrected rather than restated.** The claim that a refusal at an intermediate step reaches the agent with the obligation *before* it breaches it does **not** hold in this harness revision: at an intermediate firing the reach is nil. The judgment still comes out the same way, because the cost it was weighed against is nil for the same reason — an intermediate firing costs the session nothing at all, and what survives is a logged `decision=refuse` line that the close-stage triage can count. **The real turn end was bought later, and it delivers.** A dispatched session ended its turn while its own `.run` record named a live producer; the firing logged `decision=refuse`, the reason reached the session as stop-hook feedback, and the session resumed work on the producer. Both readings are now observed, not just contracted. They sit under the contract's own limit: only a fresh firing catches a harness revision.
 
-**The log is capture-tier** — gitignored, advisory, drained by a named reclaim
-path (gate-sdk/SPEC.md §The workflow directory), which is what keeps
-`check-workflow-tiering` green on a member that is neither tracked nor ignored,
-and it declares itself on the close-surface roster (lifecycle-kit/SPEC.md §The
-close-surface roster) naming its own clear as the reclaim path:
+**The log is capture-tier** — gitignored, advisory, drained by a named reclaim path (gate-sdk/SPEC.md §The workflow directory), which is what keeps `check-workflow-tiering` green on a member that is neither tracked nor ignored, and it declares itself on the close-surface roster (lifecycle-kit/SPEC.md §The close-surface roster) naming its own clear as the reclaim path:
 
 close-surface: .workflow/subagent-stop-liveness.log advisory reclaim=: > .workflow/subagent-stop-liveness.log
 
-`advisory` rather than `forced`, on the reasoning guard-kit's friction log takes:
-nothing refuses a close that skips it, and a visible skip is the honest mode for a
-log whose enforcement lives in the exit code rather than in the file.
+`advisory` rather than `forced`, on the reasoning guard-kit's friction log takes: nothing refuses a close that skips it, and a visible skip is the honest mode for a log whose enforcement lives in the exit code rather than in the file.
 
-**No gate observes the wiring, and that is recorded rather than assumed.**
-`check-settings-pins` asserts only the pinned paths in the consumer's pins file
-(none under `hooks`), `check-settings-paths`'s subject is `permissions.allow[]`
-alone and never `hooks[].hooks[].command`, and `check-memory-off` scans the memory
-surface. So the registration reds nothing — and neither would a registration
-naming a script that does not exist. A session decides this wiring by reading this
-section, never by predicting a verdict. Under enforcement the consequence sharpens:
-an unwired hook is a tree where the turn-end rule has no enforcement at all, and
-nothing in the battery says so.
+**No gate observes the wiring, and that is recorded rather than assumed.** `check-settings-pins` asserts only the pinned paths in the consumer's pins file (none under `hooks`), `check-settings-paths`'s subject is `permissions.allow[]` alone and never `hooks[].hooks[].command`, and `check-memory-off` scans the memory surface. So the registration reds nothing — and neither would a registration naming a script that does not exist. A session decides this wiring by reading this section, never by predicting a verdict. Under enforcement the consequence sharpens: an unwired hook is a tree where the turn-end rule has no enforcement at all, and nothing in the battery says so.
 
-**One half of that is now observed, and the half that is not is the same half.**
-The *registration* is still unwatched, for the reasons above. What is watched is
-the **resolved reader**, on `scripts/gate-tests/subagent-stop-reader.test.sh`,
-which fires this repo's wired `--hook subagent-stop-liveness` arm over a scratch
-run dir it constructs, asserting `green` and an allowed exit on an empty dir,
-`red`, `decision=refuse` and exit 2 with a reason on a record naming a PID that is
-always alive — the reason naming the argv the hook actually spawned, which is how
-that lane sees the *default* resolving rather than merely a verdict arriving — and
-`unresolved decision=refuse` when an override is real and spawnable but produces
-no reading over an empty run dir. That last is the isolated-dispatch shape, and
-the one arm that must **not** come back `unavailable`, which would misreport a
-working override as one that resolved to nothing. `unavailable` fails that lane by
-name. **Both record-bearing
-arms also assert `runs`** — the empty-dir arm that it renders the absent token,
-the live-record arm that the row *and the refusal message* carry that record's
-key — so the field's two consumers are proved on the one lane that exercises the
-real wiring end to end.
+**One half of that is now observed, and the half that is not is the same half.** The *registration* is still unwatched, for the reasons above. What is watched is the **resolved reader**, on `scripts/gate-tests/subagent-stop-reader.test.sh`, which fires this repo's wired `--hook subagent-stop-liveness` arm over a scratch run dir it constructs, asserting `green` and an allowed exit on an empty dir, `red`, `decision=refuse` and exit 2 with a reason on a record naming a PID that is always alive — the reason naming the argv the hook actually spawned, which is how that lane sees the *default* resolving rather than merely a verdict arriving — and `unresolved decision=refuse` when an override is real and spawnable but produces no reading over an empty run dir. That last is the isolated-dispatch shape, and the one arm that must **not** come back `unavailable`, which would misreport a working override as one that resolved to nothing. `unavailable` fails that lane by name. **Both record-bearing arms also assert `runs`** — the empty-dir arm that it renders the absent token, the live-record arm that the row *and the refusal message* carry that record's key — so the field's two consumers are proved on the one lane that exercises the real wiring end to end.
 
-**`runs` carries a firing and a non-firing case in both lanes, which is this
-kit's fixture-pair discipline transplanted to a non-gate arm.** The hook owes no
-`good/`+`bad/` pair — it is a hook member and not a gate — so the discipline is
-met by the cases instead: a firing over a run dir holding records asserts the row
-names those records' keys, sorted and comma-joined, and a firing over an empty
-dir asserts the absent token. Without the second half a reader could not tell an
-absent set from a field that silently renders nothing.
+**`runs` carries a firing and a non-firing case in both lanes, which is this kit's fixture-pair discipline transplanted to a non-gate arm.** The hook owes no `good/`+`bad/` pair — it is a hook member and not a gate — so the discipline is met by the cases instead: a firing over a run dir holding records asserts the row names those records' keys, sorted and comma-joined, and a firing over an empty dir asserts the absent token. Without the second half a reader could not tell an absent set from a field that silently renders nothing.
 
-**The arity is itself under test, because the record's line is composed by
-*zipping* the field table against a values array and a length mismatch truncates
-silently rather than panicking.** Two cases pin it — one asserting the two arrays
-agree, one asserting the whole line's field count — so a field added to the table
-without its value fails loudly at the two places the truncation would otherwise
-be invisible. A third case lists every field in its expectation rather than a
-subset, on the same reasoning: a case that silently under-covers a field is
-exactly what the arity guard exists against.
+**The arity is itself under test, because the record's line is composed by *zipping* the field table against a values array and a length mismatch truncates silently rather than panicking.** Two cases pin it — one asserting the two arrays agree, one asserting the whole line's field count — so a field added to the table without its value fails loudly at the two places the truncation would otherwise be invisible. A third case lists every field in its expectation rather than a subset, on the same reasoning: a case that silently under-covers a field is exactly what the arity guard exists against.
 
-**A consumer whose crate-arms trigger did not reach this member would have no
-guard here at all, and that is worth stating because the reach is easy to
-misread.** The arity cases only bind if something runs them at commit time. In
-this repo `check-crate-arms` does reach a hook member — its couples list carries
-a `native/src/*.rs`-shaped glob, and a `couples=` pattern is matched with bash's
-**unquoted-pattern `[[ str == pat ]]`**, which is *string* matching rather than
-pathname expansion, so `*` matches `/` and the glob spans the module directories
-beneath it. **Read as a filesystem glob it would not**, and that misreading is
-the trap: it makes a trigger look blind that is not, and it would make a real
-blindness elsewhere look like the same false alarm. Verify the predicate, never
-the manifest line alone.
+**A consumer whose crate-arms trigger did not reach this member would have no guard here at all, and that is worth stating because the reach is easy to misread.** The arity cases only bind if something runs them at commit time. In this repo `check-crate-arms` does reach a hook member — its couples list carries a `native/src/*.rs`-shaped glob, and a `couples=` pattern is matched with bash's **unquoted-pattern `[[ str == pat ]]`**, which is *string* matching rather than pathname expansion, so `*` matches `/` and the glob spans the module directories beneath it. **Read as a filesystem glob it would not**, and that misreading is the trap: it makes a trigger look blind that is not, and it would make a real blindness elsewhere look like the same false alarm. Verify the predicate, never the manifest line alone.
 
-**Those semantics are gate-sdk's and not this hook's, which is why they are cited
-rather than restated.** The matcher has one owner — `gate_staged_matches` in
-gate-sdk's lib — whose body the pre-commit generator emits **verbatim**, so the
-rule governs every gate's `couples=` in every kit rather than one generated file.
-It is deliberate rather than incidental: the body carries a standing
-`shellcheck disable=SC2053`, and SC2053 is precisely *quote the right-hand side
-of `==` to prevent glob matching*, so the unquoting is a declared intent. Anyone
-meeting that line as a latent bug and quoting it would break every trigger in the
-tree at once.
+**Those semantics are gate-sdk's and not this hook's, which is why they are cited rather than restated.** The matcher has one owner — `gate_staged_matches` in gate-sdk's lib — whose body the pre-commit generator emits **verbatim**, so the rule governs every gate's `couples=` in every kit rather than one generated file. It is deliberate rather than incidental: the body carries a standing `shellcheck disable=SC2053`, and SC2053 is precisely *quote the right-hand side of `==` to prevent glob matching*, so the unquoting is a declared intent. Anyone meeting that line as a latent bug and quoting it would break every trigger in the tree at once.
 
-**Where a consumer's trigger genuinely does not reach, the compensating move is
-to run the gate explicitly** —
-`bash gate-sdk/bin/run-gates.sh --only check-crate-arms` in the landing commit —
-because the truncation is silent in both directions: a trigger that does not fire
-is indistinguishable from a clean battery. Building the binary does **not**
-discharge it either way: that builds, and runs neither arm.
+**Where a consumer's trigger genuinely does not reach, the compensating move is to run the gate explicitly** — `bash gate-sdk/bin/run-gates.sh --only check-crate-arms` in the landing commit — because the truncation is silent in both directions: a trigger that does not fire is indistinguishable from a clean battery. Building the binary does **not** discharge it either way: that builds, and runs neither arm.
 
-**The hermetic stub-driven lane that used to hold every verdict arm moved into
-the member's own module with the port, and the move is stated rather than left to
-be inferred from this section's silence.** The retired
-`gate-tests/subagent-stop-liveness.test.sh` drove a <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
-**stub** reader through all six arms (`green`, `red`, `corrupt`, `unresolved`,
-`unavailable`, `error`) hermetically, `corrupt` and `unresolved` twice each — once
-over a run dir holding a record and once over an empty one, since they are one
-reader exit read through two record counts — asserting the exit code, the
-`decision` column and the refusing arms' stderr wording apart from the verdict.
-That whole case set is the compiled member's, carried across expectation by
-expectation rather than re-derived from the code it tests, with one deliberate
-divergence: `keys` is asserted sorted, this section's own rule, where the table
-recorded document order. The real-reader lane above still reaches neither
-`corrupt` nor `error`, and does not need to — the stub lane is where a reader's
-exit class is chosen, and the real lane exists to prove the *resolved* reader runs
-at all. **Since the default landed, that stub lane also carries the resolution
-itself**: the empty knob resolving to the running executable and the gate name, an
-override resolving to itself with the run dir appended after its last element, an
-interpreter-led override resolving on `PATH`, and an override whose first element
-lacks the executable bit or names no program on `PATH` resolving to no reader —
-the readings a lane driving pre-resolved argv could not otherwise reach.
+**The hermetic stub-driven lane that used to hold every verdict arm moved into the member's own module with the port, and the move is stated rather than left to be inferred from this section's silence.** The retired `gate-tests/subagent-stop-liveness.test.sh` drove a <!-- manifest-temporal-exempt: retirement record, names a shell file since removed --> **stub** reader through all six arms (`green`, `red`, `corrupt`, `unresolved`, `unavailable`, `error`) hermetically, `corrupt` and `unresolved` twice each — once over a run dir holding a record and once over an empty one, since they are one reader exit read through two record counts — asserting the exit code, the `decision` column and the refusing arms' stderr wording apart from the verdict. That whole case set is the compiled member's, carried across expectation by expectation rather than re-derived from the code it tests, with one deliberate divergence: `keys` is asserted sorted, this section's own rule, where the table recorded document order. The real-reader lane above still reaches neither `corrupt` nor `error`, and does not need to — the stub lane is where a reader's exit class is chosen, and the real lane exists to prove the *resolved* reader runs at all. **Since the default landed, that stub lane also carries the resolution itself**: the empty knob resolving to the running executable and the gate name, an override resolving to itself with the run dir appended after its last element, an interpreter-led override resolving on `PATH`, and an override whose first element lacks the executable bit or names no program on `PATH` resolving to no reader — the readings a lane driving pre-resolved argv could not otherwise reach.
 
-**The compiled lane holds seven arms, and `unstarted` is pinned rather than left to
-a race.** Its case is an executable stub whose shebang names an interpreter that
-does not exist, so the spawn fails with `ENOENT` every time; it asserts
-`verdict=unstarted`, a `spawn` value that is not `-`, `decision=allow` and exit 0.
-Every assertion on a firing's exit code prints that firing's log line, so a red
-names its `verdict` and its `spawn` value rather than reporting `left: 0`.
+**The compiled lane holds seven arms, and `unstarted` is pinned rather than left to a race.** Its case is an executable stub whose shebang names an interpreter that does not exist, so the spawn fails with `ENOENT` every time; it asserts `verdict=unstarted`, a `spawn` value that is not `-`, `decision=allow` and exit 0. Every assertion on a firing's exit code prints that firing's log line, so a red names its `verdict` and its `spawn` value rather than reporting `left: 0`.
 
-**A reader stub is written by a child process, and never by the test process
-that spawns it.** The module's cases run as threads of one process whose sibling
-tests fork children of their own. A sibling that forks while a stub's write
-descriptor is open hands its child a copy of that descriptor, and the copy lives
-until the child's `exec` — `O_CLOEXEC` closes it at the `exec`, not at the `fork` —
-so a stub spawned inside that window fails with `ETXTBSY`. A test process that
-never opens the stub for writing has no descriptor to hand on. **The cause is
-inferred from measurement, never traced:** the reds were too fast for the reader
-bound and fell only on freshly written stubs, but the errno was never read, and
-`spawn` is what names it at the first residual red. Two alternatives are refused:
-a retry on `ETXTBSY`, which in a test weakens the assertion the test exists to
-make and in the hook changes a refusing hook's behavior; and a lock, which cannot
-reach the forks of other modules' tests.
+**A reader stub is written by a child process, and never by the test process that spawns it.** The module's cases run as threads of one process whose sibling tests fork children of their own. A sibling that forks while a stub's write descriptor is open hands its child a copy of that descriptor, and the copy lives until the child's `exec` — `O_CLOEXEC` closes it at the `exec`, not at the `fork` — so a stub spawned inside that window fails with `ETXTBSY`. A test process that never opens the stub for writing has no descriptor to hand on. **The cause is inferred from measurement, never traced:** the reds were too fast for the reader bound and fell only on freshly written stubs, but the errno was never read, and `spawn` is what names it at the first residual red. Two alternatives are refused: a retry on `ETXTBSY`, which in a test weakens the assertion the test exists to make and in the hook changes a refusing hook's behavior; and a lock, which cannot reach the forks of other modules' tests.
 
 ### What `background_tasks` carries
 
-The `keys` field settled that the payload has this top-level key and left what is
-in it open. A deliberate one-off read then took it, **out of band and without
-touching this hook**: the consumer's hook copy dumped each firing's raw
-payload to gitignored scratch across five firings and was restored byte-for-byte,
-so the grammar above still logs keys and never values.
+The `keys` field settled that the payload has this top-level key and left what is in it open. A deliberate one-off read then took it, **out of band and without touching this hook**: the consumer's hook copy dumped each firing's raw payload to gitignored scratch across five firings and was restored byte-for-byte, so the grammar above still logs keys and never values.
 
-**The decision the read was bought to inform: the probe keeps logging key names
-only.** No field is added and the grammar takes no delta. **What decided it is
-the read's own result, and the direction is the
-unusual part: the read STRENGTHENED the restriction rather than merely failing to
-overturn it.** The only named reader a value log would ever have had was the
-harness-view substitution below, and the read falsified that reader outright. A
-restriction with nothing on the other side of it has stopped being one.
-A derived non-value — a count, a type tally — was weighed and refused on the same
-ground: it serves no reader either, and a grammar delta plus a member edit are
-not spent on a field nothing reads.
-Should a reader appear, it reopens as a new question and not as this one.
+**The decision the read was bought to inform: the probe keeps logging key names only.** No field is added and the grammar takes no delta. **What decided it is the read's own result, and the direction is the unusual part: the read STRENGTHENED the restriction rather than merely failing to overturn it.** The only named reader a value log would ever have had was the harness-view substitution below, and the read falsified that reader outright. A restriction with nothing on the other side of it has stopped being one. A derived non-value — a count, a type tally — was weighed and refused on the same ground: it serves no reader either, and a grammar delta plus a member edit are not spent on a field nothing reads. Should a reader appear, it reopens as a new question and not as this one.
 
-**It is a live-children enumeration, and it is populated.** An array of objects in
-two shapes, both carrying `id`, `type`, `status` and `description`: a `type` of
-`subagent` adds `agent_type`, a `type` of `shell` adds `command`. It spans the
-emitting agent's own tree rather than its direct children only — the emitting
-session, its backgrounded shell task and its dispatched grandchild all appeared
-with `status` `running`, the count rising as the grandchild started. Alongside it
-the payload carries `transcript_path`, `cwd`, `prompt_id`, `permission_mode`,
-`agent_id`, `agent_type`, `stop_hook_active`, `agent_transcript_path`,
-`last_assistant_message` and `session_crons`, beside the three fields the grammar
-above reads. **`agent_id` appears in that list as a key and nothing more.** The
-same five firings that enumerated these keys carried five *distinct* top-level
-`agent_id` values, none matching the stable `id` this array reported for the one
-live dispatched agent — so listing it here asserts nothing about its being able
-to tell one agent from another. §The turn-end liveness hook's
-`session` bullet owns that doubt and the reason this tree cannot settle it.
+**It is a live-children enumeration, and it is populated.** An array of objects in two shapes, both carrying `id`, `type`, `status` and `description`: a `type` of `subagent` adds `agent_type`, a `type` of `shell` adds `command`. It spans the emitting agent's own tree rather than its direct children only — the emitting session, its backgrounded shell task and its dispatched grandchild all appeared with `status` `running`, the count rising as the grandchild started. Alongside it the payload carries `transcript_path`, `cwd`, `prompt_id`, `permission_mode`, `agent_id`, `agent_type`, `stop_hook_active`, `agent_transcript_path`, `last_assistant_message` and `session_crons`, beside the three fields the grammar above reads. **`agent_id` appears in that list as a key and nothing more.** The same five firings that enumerated these keys carried five *distinct* top-level `agent_id` values, none matching the stable `id` this array reported for the one live dispatched agent — so listing it here asserts nothing about its being able to tell one agent from another. §The turn-end liveness hook's `session` bullet owns that doubt and the reason this tree cannot settle it.
 
-**It enumerates what the harness launched, not what is running — and that is the
-decisive finding.** A producer detached from a foreground tool call, live
-throughout and carrying a `*.run` record the reader was concurrently reporting
-red, appeared in no firing. That is precisely the residue §The probe is
-asymmetric names as one of `live=no`'s three readings, unrecorded, and the class
-guard-kit rule 15 refuses at the launch. So the blocking hook **cannot substitute** the
-harness's view for the `*.run` record set: the two disagree exactly on the class
-the waiting rule exists for. Supplementing is the most it could do, and the hook
-now does: it refuses on a running `shell` element (§The turn-end liveness hook)
-and logs none of the view's values.
+**It enumerates what the harness launched, not what is running — and that is the decisive finding.** A producer detached from a foreground tool call, live throughout and carrying a `*.run` record the reader was concurrently reporting red, appeared in no firing. That is precisely the residue §The probe is asymmetric names as one of `live=no`'s three readings, unrecorded, and the class guard-kit rule 15 refuses at the launch. So the blocking hook **cannot substitute** the harness's view for the `*.run` record set: the two disagree exactly on the class the waiting rule exists for. Supplementing is the most it could do, and the hook now does: it refuses on a running `shell` element (§The turn-end liveness hook) and logs none of the view's values.
 
-**No entry carries a pid.** Those six field names are the whole schema, and a
-`shell` entry's `id` is the harness's own opaque task id. Joining this view to a
-record's `pid=<n>` therefore means parsing the `command` string — the value the
-ruling withholds — even over the children the view does see.
+**No entry carries a pid.** Those six field names are the whole schema, and a `shell` entry's `id` is the harness's own opaque task id. Joining this view to a record's `pid=<n>` therefore means parsing the `command` string — the value the ruling withholds — even over the children the view does see.
 
-**The privacy ground came back confirmed and wider, not weakened.** The value is
-not benign: `command` is a verbatim shell command line and `description` is
-free-text prose. Logging it would put command lines and task prose into a
-capture-tier file, which is more exposure than the transcript paths and prompt ids
-the ruling was originally written against, and it would do so in whatever tree
-vendors this kit.
+**The privacy ground came back confirmed and wider, not weakened.** The value is not benign: `command` is a verbatim shell command line and `description` is free-text prose. Logging it would put command lines and task prose into a capture-tier file, which is more exposure than the transcript paths and prompt ids the ruling was originally written against, and it would do so in whatever tree vendors this kit.
 
 ### The probe is asymmetric, and no reading may treat it otherwise
 
-**A `live=yes` line proves the harness does not defer the stop.** One firing with
-a live producer settles the unknown in that direction and the class stands.
+**A `live=yes` line proves the harness does not defer the stop.** One firing with a live producer settles the unknown in that direction and the class stands.
 
-**No accumulation of `live=no` lines proves that it does.** `live=no` is equally
-consistent with *the harness deferred the stop*, *the session waited correctly*,
-and *the session recorded nothing* — the last refused at an explicit launch by
-guard-kit rule 15 and still reachable through a call the harness moves to the
-background on its timeout. Passive accumulation therefore cannot return
-the finding that would dissolve the class, and anyone waiting for it waits forever
-and then reports the wrong thing.
+**No accumulation of `live=no` lines proves that it does.** `live=no` is equally consistent with *the harness deferred the stop*, *the session waited correctly*, and *the session recorded nothing* — the last refused at an explicit launch by guard-kit rule 15 and still reachable through a call the harness moves to the background on its timeout. Passive accumulation therefore cannot return the finding that would dissolve the class, and anyone waiting for it waits forever and then reports the wrong thing.
 
-**So the reading is bought by a deliberate firing, never by a wait.** A dispatched
-session backgrounds a producer that runs long, writes its `<key>.run` record, and
-then ends its turn. Both outcomes are results: the hook fires immediately with
-`live=yes`, so the harness does not defer and §Operative residency's axis holds at
-the turn-end too; or the hook does not fire until the child exits, so the harness
-does defer, the class dissolves, and this hook's remaining value is the
-evidence for retiring it. The log is what makes that firing, and every later
-accidental one, legible.
+**So the reading is bought by a deliberate firing, never by a wait.** A dispatched session backgrounds a producer that runs long, writes its `<key>.run` record, and then ends its turn. Both outcomes are results: the hook fires immediately with `live=yes`, so the harness does not defer and §Operative residency's axis holds at the turn-end too; or the hook does not fire until the child exits, so the harness does defer, the class dissolves, and this hook's remaining value is the evidence for retiring it. The log is what makes that firing, and every later accidental one, legible.
 
-**The firing was bought, and it returned the first branch.** A dispatched agent
-backgrounded a producer with a recorded PID and ended its turn without waiting;
-the log took `live=yes verdict=red records=1` four seconds later, and again at
-that agent's own stop, while the producer went on writing for another two and a
-half minutes. **The harness does not defer the stop**, so the class the waiting
-rule exists for does not dissolve, the relocation to guard-kit rule 14 stands, and
-a blocking hook was the only lever left. That was a second authorization this
-result did not grant; it was asked for and given, and the hook blocks (§The
-turn-end liveness hook). This subsection is kept as the evidence the
-authorization was argued from, not as a standing limit on it.
+**The firing was bought, and it returned the first branch.** A dispatched agent backgrounded a producer with a recorded PID and ended its turn without waiting; the log took `live=yes verdict=red records=1` four seconds later, and again at that agent's own stop, while the producer went on writing for another two and a half minutes. **The harness does not defer the stop**, so the class the waiting rule exists for does not dissolve, the relocation to guard-kit rule 14 stands, and a blocking hook was the only lever left. That was a second authorization this result did not grant; it was asked for and given, and the hook blocks (§The turn-end liveness hook). This subsection is kept as the evidence the authorization was argued from, not as a standing limit on it.
 
-**The same firings settled a second thing nothing could have settled before
-wiring: `SubagentStop` is not the session-end event.** It fired seventeen times
-inside one dispatched session that had ended no turn at all, spaced by assistant
-steps rather than by the clock — a stretch spanning three long tool calls and no
-assistant step produced no firing at all. The blocking variant therefore fires at
-*every* intermediate step of a session rather than once at its return, which is
-what a bounded run of blocks is actually spent on. Recorded here because it was a
-cost the authorization was weighed against, and because it is exactly the class of
-fact a probe exists to buy. **The cost came in smaller than the estimate, and the
-measurement is at §The turn-end liveness hook**: an intermediate firing
-that exits 2 delivers nothing to the session, so the per-step frequency costs the
-session nothing and buys a countable `decision=refuse` line.
+**The same firings settled a second thing nothing could have settled before wiring: `SubagentStop` is not the session-end event.** It fired seventeen times inside one dispatched session that had ended no turn at all, spaced by assistant steps rather than by the clock — a stretch spanning three long tool calls and no assistant step produced no firing at all. The blocking variant therefore fires at *every* intermediate step of a session rather than once at its return, which is what a bounded run of blocks is actually spent on. Recorded here because it was a cost the authorization was weighed against, and because it is exactly the class of fact a probe exists to buy. **The cost came in smaller than the estimate, and the measurement is at §The turn-end liveness hook**: an intermediate firing that exits 2 delivers nothing to the session, so the per-step frequency costs the session nothing and buys a countable `decision=refuse` line.
 
 ## Resume journal — agent writes, scratch reset sweeps
 
-**The contract, in four clauses.** A mutating agent journals to a repo-local
-gitignored scratch directory in the main checkout; the supervisor grants that
-path **absolute** in the dispatch prompt; each finding lands inline as it is
-confirmed; a `DONE` marker is appended on success. The operative text — what
-each clause requires of an agent, and why a temporary worktree and a system
-temp dir both fail the survivability test — is
-`templates/agent-execution.md`'s **Resume journal — agent writes, scratch reset
-sweeps** bullet, which is the surface an agent loads. This section owns what
-that bullet cannot carry: the lifetime rule's reasoning, the attestation it was
-priced against, and the two readings the marker carries.
+**The contract, in four clauses.** A mutating agent journals to a repo-local gitignored scratch directory in the main checkout; the supervisor grants that path **absolute** in the dispatch prompt; each finding lands inline as it is confirmed; a `DONE` marker is appended on success. The operative text — what each clause requires of an agent, and why a temporary worktree and a system temp dir both fail the survivability test — is `templates/agent-execution.md`'s **Resume journal — agent writes, scratch reset sweeps** bullet, which is the surface an agent loads. This section owns what that bullet cannot carry: the lifetime rule's reasoning, the attestation it was priced against, and the two readings the marker carries.
 
-**The grant clause stands, with one standing exception: a stage session.** Where
-the consumer runs a stage machine, the journal's path is a **derivation from the
-stage** that the machine owns and computes, and its entry tool opens the journal
-and reports the path to the entering session (lifecycle-kit/SPEC.md §The state
-machine). That report is the path's one source, so the supervisor grants no path
-in a stage session's prompt: a restated grant is a second source the dispatched
-session prefers, which is how journals landed under names the next entry could
-not find. The derivation's **artifact on disk** is what replaces the grant as the
-record of what the session owes. Every other mutating child is still granted its
-path. This kit owns the journal contract and states no path convention; that kit
-owns the path and states no contract.
+**The grant clause stands, with one standing exception: a stage session.** Where the consumer runs a stage machine, the journal's path is a **derivation from the stage** that the machine owns and computes, and its entry tool opens the journal and reports the path to the entering session (lifecycle-kit/SPEC.md §The state machine). That report is the path's one source, so the supervisor grants no path in a stage session's prompt: a restated grant is a second source the dispatched session prefers, which is how journals landed under names the next entry could not find. The derivation's **artifact on disk** is what replaces the grant as the record of what the session owes. Every other mutating child is still granted its path. This kit owns the journal contract and states no path convention; that kit owns the path and states no contract.
 
-**"Agent writes" acquires a case: the file may pre-exist the agent.** Under such a
-machine the shape is *the machine opens, the agent writes, the reset sweeps* — a
-journal found at its derived path may carry nothing but an opening line the
-machine wrote, naming the session that owes it. Nothing in the four clauses
-changes: the agent still lands each finding inline as it is confirmed and still
-appends `DONE` as the file's last line, and it appends under whatever the machine
-left rather than starting from an empty file. The retention rule below observes
-that a journal's *presence* signals nothing by itself; a machine that opens every
-journal makes that observation sharper rather than contradicting it, and the
-consumer's own repair is the predicate that reads past the opening line
-(lifecycle-kit/SPEC.md §bin/enter-stage.sh).
+**"Agent writes" acquires a case: the file may pre-exist the agent.** Under such a machine the shape is *the machine opens, the agent writes, the reset sweeps* — a journal found at its derived path may carry nothing but an opening line the machine wrote, naming the session that owes it. Nothing in the four clauses changes: the agent still lands each finding inline as it is confirmed and still appends `DONE` as the file's last line, and it appends under whatever the machine left rather than starting from an empty file. The retention rule below observes that a journal's *presence* signals nothing by itself; a machine that opens every journal makes that observation sharper rather than contradicting it, and the consumer's own repair is the predicate that reads past the opening line (lifecycle-kit/SPEC.md §bin/enter-stage.sh).
 
-**Lifetime — why retention rather than an eager deletion chore.** Cleanup is
-the consumer's own scratch reset at its next work-unit boundary, a mechanism
-the consumer already owns (here, `--enter-stage`'s boundary wipe of `.tmp/` at
-the next scope entry — lifecycle-kit/SPEC.md §bin/enter-stage.sh). Two things
-break when the supervisor deletes on its own schedule instead, and both appear
-only once a dispatched agent is **resumable** rather than one-shot: a resumed
-agent is still writing to the file, and a supervisor treating the journal as
-its **pull channel** (lifecycle-kit/templates/lead.md §Channel design)
-destroys at the first verified commit the channel it is supposed to keep
-reading. A one-shot sweep hides both, which is why an eager deletion chore
-read as correct for as long as it did.
+**Lifetime — why retention rather than an eager deletion chore.** Cleanup is the consumer's own scratch reset at its next work-unit boundary, a mechanism the consumer already owns (here, `--enter-stage`'s boundary wipe of `.tmp/` at the next scope entry — lifecycle-kit/SPEC.md §bin/enter-stage.sh). Two things break when the supervisor deletes on its own schedule instead, and both appear only once a dispatched agent is **resumable** rather than one-shot: a resumed agent is still writing to the file, and a supervisor treating the journal as its **pull channel** (lifecycle-kit/templates/lead.md §Channel design) destroys at the first verified commit the channel it is supposed to keep reading. A one-shot sweep hides both, which is why an eager deletion chore read as correct for as long as it did.
 
-**Attested.** A supervisor deleted a resumable session's journal after
-validating that session's first commits; the session resumed minutes later,
-found the file gone mid-write, rebuilt it from context, and reported the
-disappearance as a suspected scratch-directory reliability defect. The lost
-working state was the cheaper half — the false defect signal, raised against
-the scratch dir and against an unrelated sibling unit, is what retention is
-priced against. The same supervisor then retained two later sessions'
-journals against the then-governed text; that deviation is what this section
-now states.
+**Attested.** A supervisor deleted a resumable session's journal after validating that session's first commits; the session resumed minutes later, found the file gone mid-write, rebuilt it from context, and reported the disappearance as a suspected scratch-directory reliability defect. The lost working state was the cheaper half — the false defect signal, raised against the scratch dir and against an unrelated sibling unit, is what retention is priced against. The same supervisor then retained two later sessions' journals against the then-governed text; that deviation is what this section now states.
 
-**Reading `DONE` under retention.** Retention costs the *presence* of a
-journal its meaning: every journal now survives its session, so finding one
-signals nothing by itself. The marker still carries the completion claim, with
-one sharpening a resumable session forces — `DONE` is meaningful **only as the
-file's last line**, since a session resumed past its own marker appends after
-it, and a mid-file `DONE` claims a completion the later content contradicts.
-Whether a *missing* marker signals interruption still turns on whether the
-supervisor consumed the agent's return. On the ordinary completion path it
-did, and that return plus its post-commit verification (§Verify after every
-agent commit) *is* the recovery contract, so the marker is redundant there.
-Only in a **cold read** — a journal found with no return ever consumed, the
-agent's session having died before returning (a background sandbox died, a
-crash, a timeout) — is the marker the sole signal, and there the original
-reading holds: no `DONE` = interrupted, resume from it. A live journal is told
-from a spent one by the consumer's own work
-cursor and by `git log`, which together say more than presence ever did, and the
-boundary sweep bounds the ambiguity to the current work unit. **Per-session
-journal naming discriminates only where the path is the dispatcher's to choose**
-— under a stage machine the journal is named for the stage, so several
-sessions of one stage share the file and append to it. Nothing is lost at the
-granularity a reader actually asks about: the marker rule already says `DONE`
-counts only as the **last** line, so a shared file answers *did the session that
-wrote last finish*, which is the question, and an earlier session's mid-file
-marker is not a claim the later content contradicts. The
-inline-findings rule above is that cold arm's insurance — with no surviving
-return, a pointer-only journal would make a would-be `DONE` lie about
-recoverability.
+**Reading `DONE` under retention.** Retention costs the *presence* of a journal its meaning: every journal now survives its session, so finding one signals nothing by itself. The marker still carries the completion claim, with one sharpening a resumable session forces — `DONE` is meaningful **only as the file's last line**, since a session resumed past its own marker appends after it, and a mid-file `DONE` claims a completion the later content contradicts. Whether a *missing* marker signals interruption still turns on whether the supervisor consumed the agent's return. On the ordinary completion path it did, and that return plus its post-commit verification (§Verify after every agent commit) *is* the recovery contract, so the marker is redundant there. Only in a **cold read** — a journal found with no return ever consumed, the agent's session having died before returning (a background sandbox died, a crash, a timeout) — is the marker the sole signal, and there the original reading holds: no `DONE` = interrupted, resume from it. A live journal is told from a spent one by the consumer's own work cursor and by `git log`, which together say more than presence ever did, and the boundary sweep bounds the ambiguity to the current work unit. **Per-session journal naming discriminates only where the path is the dispatcher's to choose** — under a stage machine the journal is named for the stage, so several sessions of one stage share the file and append to it. Nothing is lost at the granularity a reader actually asks about: the marker rule already says `DONE` counts only as the **last** line, so a shared file answers *did the session that wrote last finish*, which is the question, and an earlier session's mid-file marker is not a claim the later content contradicts. The inline-findings rule above is that cold arm's insurance — with no surviving return, a pointer-only journal would make a would-be `DONE` lie about recoverability.
 
-**Caveat — a journal write has been observed to fail, and the cause is
-unexplained.** A background agent was once unable to `Write` to the granted
-path, silently falling back to returning findings in the final message — which
-defeats the journal exactly when it matters (a long, interruptible run). The
-template's read-only-fan-out carve-out and its grant-the-path-explicitly clause
-both follow from this observation.
+**Caveat — a journal write has been observed to fail, and the cause is unexplained.** A background agent was once unable to `Write` to the granted path, silently falling back to returning findings in the final message — which defeats the journal exactly when it matters (a long, interruptible run). The template's read-only-fan-out carve-out and its grant-the-path-explicitly clause both follow from this observation.
 
-**Narrowed from a property of isolation to a single unexplained observation,
-because the isolation reading was probed and did not hold.** A
-worktree-isolated agent dispatched with an absolute path in the **main
-checkout** wrote it successfully, from inside its own worktree — so isolation
-does not block the write, and the caveat's own prescribed remedy works under the
-strongest isolation this tree dispatches. That matters rather than being trivia:
-it is what makes an entry-time assertion on a journal's existence *fair*, since
-a missing journal is a session that did **not** write rather than one that
-**could not**. The caveat is narrowed and not deleted — one observation of
-capability does not falsify an observation of failure, and the failure that
-prompted this text remains unexplained, so the remedy stands and only the
-generalisation goes. That contract has two ends. The caveat's
-evidence is about **the child's** write failing silently, and its true
-content is *do not make recoverability depend on a backgrounded child's
-write* — which is why it is kept rather than overturned by the template's
-**Findings you will act on are durable before you act on them** rule. That
-rule's duty falls on **the parent**, which has already demonstrated it can
-write, being the session that granted the path. The two are disjoint
-readings of one contract, not each other's contradiction.
+**Narrowed from a property of isolation to a single unexplained observation, because the isolation reading was probed and did not hold.** A worktree-isolated agent dispatched with an absolute path in the **main checkout** wrote it successfully, from inside its own worktree — so isolation does not block the write, and the caveat's own prescribed remedy works under the strongest isolation this tree dispatches. That matters rather than being trivia: it is what makes an entry-time assertion on a journal's existence *fair*, since a missing journal is a session that did **not** write rather than one that **could not**. The caveat is narrowed and not deleted — one observation of capability does not falsify an observation of failure, and the failure that prompted this text remains unexplained, so the remedy stands and only the generalisation goes. That contract has two ends. The caveat's evidence is about **the child's** write failing silently, and its true content is *do not make recoverability depend on a backgrounded child's write* — which is why it is kept rather than overturned by the template's **Findings you will act on are durable before you act on them** rule. That rule's duty falls on **the parent**, which has already demonstrated it can write, being the session that granted the path. The two are disjoint readings of one contract, not each other's contradiction.
 
-**Journalling is a discharge path, not a dispatched session's privilege.** The
-template's durability rule turns on **capability, never role** — a session
-journals when it cannot commit and commits when it can — and this section owns
-why the earlier role-keyed reading failed. That reading granted the journal to a
-dispatched session and denied it to a top-level one, on the premise that a
-top-level session is by construction able to commit. The premise is false
-whenever another session holds the shared index, which is the *normal* condition
-while a work unit is in flight rather than an edge case: the supervising role
-improvised scratch notes on three separate occasions in one iteration, each time
-because a live dispatched session held the index. Improvised scratch is the
-journal mechanism with none of its contract — no granted path inside the sweep's
-reach, no inline landing, no marker — so the failure was silent and the
-reconstruction cost was paid per occurrence. Widening by capability rather than
-carving out a second surface per role is what keeps the reclaim story unchanged:
-every discharge path still lands in the same scratch directory the consumer's
-own work-unit boundary already sweeps, so no new lifetime, keep-list entry, or
-inbound-triage surface is created by the widening.
+**Journalling is a discharge path, not a dispatched session's privilege.** The template's durability rule turns on **capability, never role** — a session journals when it cannot commit and commits when it can — and this section owns why the earlier role-keyed reading failed. That reading granted the journal to a dispatched session and denied it to a top-level one, on the premise that a top-level session is by construction able to commit. The premise is false whenever another session holds the shared index, which is the *normal* condition while a work unit is in flight rather than an edge case: the supervising role improvised scratch notes on three separate occasions in one iteration, each time because a live dispatched session held the index. Improvised scratch is the journal mechanism with none of its contract — no granted path inside the sweep's reach, no inline landing, no marker — so the failure was silent and the reconstruction cost was paid per occurrence. Widening by capability rather than carving out a second surface per role is what keeps the reclaim story unchanged: every discharge path still lands in the same scratch directory the consumer's own work-unit boundary already sweeps, so no new lifetime, keep-list entry, or inbound-triage surface is created by the widening.
 
-**The provenance floor sits here because this section already owns the
-receiving side.** A dispatching session can narrate a finding from a subagent
-whose output it never received, and nothing reds — **five attested instances,
-every one self-caught**, four of them failures in two distinct shapes and the
-fifth a save. The operative text is the template's **A return you did not
-receive is not a finding, and an identifier you did not read is not a citation**
-bullet; what belongs here is the argument for why one of its two halves gets a
-rule instead of a gate.
+**The provenance floor sits here because this section already owns the receiving side.** A dispatching session can narrate a finding from a subagent whose output it never received, and nothing reds — **five attested instances, every one self-caught**, four of them failures in two distinct shapes and the fifth a save. The operative text is the template's **A return you did not receive is not a finding, and an identifier you did not read is not a citation** bullet; what belongs here is the argument for why one of its two halves gets a rule instead of a gate.
 
-**No gate reaches the relayed-return half, and that is a proof rather than an
-appetite.** The tree cannot observe what a session did or did not **receive**. A
-return lives in the parent's context and leaves no artifact, so tree state is
-byte-identical whether the return was held or invented — the prose reads the
-same either way, which is what makes this a gap rather than a lapse. Arrival is
-also unobservable to the parent *by construction* in at least one attested mode:
-a child that could not reach its dispatcher by name delivered its synthesis to
-the top-level session instead, so not even the parent's own self-inquiry
-discharges it. A gate would therefore have to assert a fact about a
-conversation, and no scanner over a repository reaches one. Recorded so the next
-session weighing an oracle for this half reads the argument rather than
-re-deriving it. **The minted-identifier half is a different matter and is not
-conceded**: it leaves a token behind, so it is gated one record at a time at
-lifecycle-kit/SPEC.md §check-survey-record.
+**No gate reaches the relayed-return half, and that is a proof rather than an appetite.** The tree cannot observe what a session did or did not **receive**. A return lives in the parent's context and leaves no artifact, so tree state is byte-identical whether the return was held or invented — the prose reads the same either way, which is what makes this a gap rather than a lapse. Arrival is also unobservable to the parent *by construction* in at least one attested mode: a child that could not reach its dispatcher by name delivered its synthesis to the top-level session instead, so not even the parent's own self-inquiry discharges it. A gate would therefore have to assert a fact about a conversation, and no scanner over a repository reaches one. Recorded so the next session weighing an oracle for this half reads the argument rather than re-deriving it. **The minted-identifier half is a different matter and is not conceded**: it leaves a token behind, so it is gated one record at a time at lifecycle-kit/SPEC.md §check-survey-record.
 
-**What stands in for the missing oracle is a mitigation, and it is this
-section's own mechanism.** The resume journal makes a child's output land on
-**disk** rather than only in a message, so a parent's claim becomes checkable
-against an artifact wherever the child wrote one. That is a reduction of the
-class's reach and not a closure of it, because the journal is the *child's*
-write and the sandbox caveat above says that write can fail silently. Stated as
-a bound, never banked as a fix.
+**What stands in for the missing oracle is a mitigation, and it is this section's own mechanism.** The resume journal makes a child's output land on **disk** rather than only in a message, so a parent's claim becomes checkable against an artifact wherever the child wrote one. That is a reduction of the class's reach and not a closure of it, because the journal is the *child's* write and the sandbox caveat above says that write can fail silently. Stated as a bound, never banked as a fix.
 
-**Attested first-person, and this instance is recorded because it is one where
-the floor HELD.** An isolated agent dispatched from the authoring session
-returned a message citing an audit roster "from my earlier turns". That roster
-was not in the return the dispatcher received — the return carried one paragraph
-about an environment defect and nothing else. It was not narrated, not relayed
-onward and not used; every update target in that iteration's amendments was
-derived first-hand instead. The same return also carried a claim the dispatcher
-could not verify, that the child had built the native binary to escape a refusal
-loop, and it is carried at that tier wherever it appears rather than promoted to
-a finding — what *was* verified is that the main checkout's binary mtime was
-unchanged and `git status` stayed clean. Two instances from two **consecutive**
-stage sessions of one iteration, a mint and a relay, is what makes the class
-structural rather than anecdotal.
+**Attested first-person, and this instance is recorded because it is one where the floor HELD.** An isolated agent dispatched from the authoring session returned a message citing an audit roster "from my earlier turns". That roster was not in the return the dispatcher received — the return carried one paragraph about an environment defect and nothing else. It was not narrated, not relayed onward and not used; every update target in that iteration's amendments was derived first-hand instead. The same return also carried a claim the dispatcher could not verify, that the child had built the native binary to escape a refusal loop, and it is carried at that tier wherever it appears rather than promoted to a finding — what *was* verified is that the main checkout's binary mtime was unchanged and `git status` stayed clean. Two instances from two **consecutive** stage sessions of one iteration, a mint and a relay, is what makes the class structural rather than anecdotal.
 
 ## Verify after every agent commit
 
-Re-run the relevant gates plus the consumer's validate battery (for this
-repo and any gate-sdk consumer: `bash gate-sdk/bin/run-gates.sh` and the
-kit fixture runners; a toolchain consumer adds its compile/lint/test set in
-the template's marked section, including a zero-byte-file sweep after
-renames — silent edit corruption is real). **Diff every gate change in an
-agent commit before accepting**: an agent blocked by a gate will weaken it
-(a false exemption) rather than fix the code — "the gate is in my way"
-almost always means the code doesn't fit the convention.
+Re-run the relevant gates plus the consumer's validate battery (for this repo and any gate-sdk consumer: `bash gate-sdk/bin/run-gates.sh` and the kit fixture runners; a toolchain consumer adds its compile/lint/test set in the template's marked section, including a zero-byte-file sweep after renames — silent edit corruption is real). **Diff every gate change in an agent commit before accepting**: an agent blocked by a gate will weaken it (a false exemption) rather than fix the code — "the gate is in my way" almost always means the code doesn't fit the convention.
 
-**The act is `verify`; the artifact stays the `validate battery`.** The
-discipline is an act a supervisor performs; the battery is the command set
-that act runs. One word for both made *completing the act* read as completing
-whatever else the consumer names with that word — attested where a consumer's
-stage roster carries it, and the near-miss was a skipped stage. Renaming the
-act rather than the artifact is the cheap side: the battery is a binding-slot
-name every consumer's shim carries (§One template, a resident pointer, read by
-`check-skill-binding`), while the act is named only in prose. The result reads
-coherently — *you verify an agent's commit by re-running the relevant gates and
-the consumer's validate battery* — and the act and the artifact having
-different names is the distinction that was missing.
+**The act is `verify`; the artifact stays the `validate battery`.** The discipline is an act a supervisor performs; the battery is the command set that act runs. One word for both made *completing the act* read as completing whatever else the consumer names with that word — attested where a consumer's stage roster carries it, and the near-miss was a skipped stage. Renaming the act rather than the artifact is the cheap side: the battery is a binding-slot name every consumer's shim carries (§One template, a resident pointer, read by `check-skill-binding`), while the act is named only in prose. The result reads coherently — *you verify an agent's commit by re-running the relevant gates and the consumer's validate battery* — and the act and the artifact having different names is the distinction that was missing.
 
-**A verify step never runs the producer of what it is verifying.** Re-running
-is safe and idempotent exactly when the dispatched unit's output is *work* and
-the check's output is *a verdict about that work*; it stops being safe the
-moment those coincide. Where a unit's deliverable **is** an evidence artifact,
-the verify is a **read of the committed artifact**, never a re-execution of
-what wrote it: re-running the producer mutates or duplicates the very record
-the check exists to confirm.
+**A verify step never runs the producer of what it is verifying.** Re-running is safe and idempotent exactly when the dispatched unit's output is *work* and the check's output is *a verdict about that work*; it stops being safe the moment those coincide. Where a unit's deliverable **is** an evidence artifact, the verify is a **read of the committed artifact**, never a re-execution of what wrote it: re-running the producer mutates or duplicates the very record the check exists to confirm.
 
-**The two wrong re-runs are not equally harmful, and a supervisor needs the
-split.** A check that writes nothing the artifact depends on is *inert* on it —
-misrouted and wasted work, with nothing lost. Re-running the artifact's **sole
-writer** is *destructive*. The routing defect is the same in both; only the
-second leaves evidence to restore, and the supervisor that has already run the
-wrong one reads this split to learn which one it is holding. Collapsing them
-would either overstate the harm of a wasteful re-run or understate the harm of
-the destructive one.
+**The two wrong re-runs are not equally harmful, and a supervisor needs the split.** A check that writes nothing the artifact depends on is *inert* on it — misrouted and wasted work, with nothing lost. Re-running the artifact's **sole writer** is *destructive*. The routing defect is the same in both; only the second leaves evidence to restore, and the supervisor that has already run the wrong one reads this split to learn which one it is holding. Collapsing them would either overstate the harm of a wasteful re-run or understate the harm of the destructive one.
 
-**Honest limit — this rule installs no oracle**, and recurrence is what
-establishes it matters rather than a projection: the misrouting fired in two
-consecutive iterations and an operator caught it both times. The check class
-that would catch it is a gate over a *supervisor's choice of command*, and no
-scanner is buildable — the choice leaves no tracked artifact to read, the same
-structural reason §Operative residency owes no gate. A consumer whose evidence
-producer claims a liveness lock has a partial artifact-side proxy; its coverage
-boundary is that consumer's own mechanism to state, not this section's. So
-detection stays human, and it is stated here rather than left implicit because
-an unstated limit reads as an oversight for a later session to close with a
-gate that cannot exist.
+**Honest limit — this rule installs no oracle**, and recurrence is what establishes it matters rather than a projection: the misrouting fired in two consecutive iterations and an operator caught it both times. The check class that would catch it is a gate over a *supervisor's choice of command*, and no scanner is buildable — the choice leaves no tracked artifact to read, the same structural reason §Operative residency owes no gate. A consumer whose evidence producer claims a liveness lock has a partial artifact-side proxy; its coverage boundary is that consumer's own mechanism to state, not this section's. So detection stays human, and it is stated here rather than left implicit because an unstated limit reads as an oversight for a later session to close with a gate that cannot exist.
 
-`check-gate-tamper` is the mechanical floor under the diff-every-gate-change
-duty. Two assertions, blocking the two attested tamper shapes:
+`check-gate-tamper` is the mechanical floor under the diff-every-gate-change duty. Two assertions, blocking the two attested tamper shapes:
 
-- **A — gate-edit isolation.** A commit that touches a gate file may touch
-  only meta-layer paths (`DELEGATION_KIT_META_PATHS` prefixes + root `*.md`);
-  co-staging product code with a gate edit is blocked. Split the gate change
-  into its own commit. A gate file is a path a `DELEGATION_KIT_GATE_FILES` glob
-  matches, **or** a registered member's resolved declaration, **or** the
-  gate-sdk library. The reader unions the last two in, each spelled against the
-  toplevel, so no consumer value can leave a registered gate or the library
-  uncovered.
-- **B — no self-serving exemption.** A newly added path/glob entry in any
-  gate's `# exception-list:` array must not match a file staged in the same
-  commit — an exemption never excuses the very change it lands with.
+- **A — gate-edit isolation.** A commit that touches a gate file may touch only meta-layer paths (`DELEGATION_KIT_META_PATHS` prefixes + root `*.md`); co-staging product code with a gate edit is blocked. Split the gate change into its own commit. A gate file is a path a `DELEGATION_KIT_GATE_FILES` glob matches, **or** a registered member's resolved declaration, **or** the gate-sdk library. The reader unions the last two in, each spelled against the toplevel, so no consumer value can leave a registered gate or the library uncovered.
+- **B — no self-serving exemption.** A newly added path/glob entry in any gate's `# exception-list:` array must not match a file staged in the same commit — an exemption never excuses the very change it lands with.
 
-**Honest limit:** the gate blocks by commit *shape*; it does not catch
-semantic weakening inside a legitimate scripts-only commit — the by-eye
-diff review of agent gate edits remains a supervisor duty. `--fixture <dir>`
-injects `staged-files` / `added-exemptions` lists (fixture-pair test
-capability); live mode reads `git diff --cached`.
+**Honest limit:** the gate blocks by commit *shape*; it does not catch semantic weakening inside a legitimate scripts-only commit — the by-eye diff review of agent gate edits remains a supervisor duty. `--fixture <dir>` injects `staged-files` / `added-exemptions` lists (fixture-pair test capability); live mode reads `git diff --cached`.
 
-`checks/check-gate-tamper.gate` (`precommit`, binary-dispatched). `--fixture`
-**survives the port**: it selects the rule's own input corpus, which no knob
-resolves, so it is not the arrives-too-late shape gate-sdk/SPEC.md §The non-gate
-arm deletes — the invocation delegation-kit/README.md documents stays true.
+`checks/check-gate-tamper.gate` (`precommit`, binary-dispatched). `--fixture` **survives the port**: it selects the rule's own input corpus, which no knob resolves, so it is not the arrives-too-late shape gate-sdk/SPEC.md §The non-gate arm deletes — the invocation delegation-kit/README.md documents stays true.
 
-The union is built in both modes (live and `--fixture`). A registered member
-resolves through the battery's own order — the gates dir first, then each kit
-root's `checks/`, `.sh` before `.gate` inside a dir; a member resolving nowhere
-adds nothing (resolving it is another gate's job), an absent `gates.list` adds
-nothing, and one that exists but cannot be read is exit 2. The library is
-`<GATE_SDK_ROOT>/lib/gate.sh`, dropped when the root lies outside the toplevel,
-where no staged path can name it. Each element is a literal, so matching it is
-equality; the union is additive and never filters a declared glob. The clean
-line reports the union's size (`<m> registered gate file(s) covered`), and
-assertion A's finding names the declared globs "plus every registered gate and
-the gate library".
+The union is built in both modes (live and `--fixture`). A registered member resolves through the battery's own order — the gates dir first, then each kit root's `checks/`, `.sh` before `.gate` inside a dir; a member resolving nowhere adds nothing (resolving it is another gate's job), an absent `gates.list` adds nothing, and one that exists but cannot be read is exit 2. The library is `<GATE_SDK_ROOT>/lib/gate.sh`, dropped when the root lies outside the toplevel, where no staged path can name it. Each element is a literal, so matching it is equality; the union is additive and never filters a declared glob. The clean line reports the union's size (`<m> registered gate file(s) covered`), and assertion A's finding names the declared globs "plus every registered gate and the gate library".
 
-**Criterion 4 binds on this gate on every tree.** The union puts every
-registered kit declaration among the gate files, `check-gate-tamper.gate`
-among them, so staging the gate's own declaration makes it read its own bytes
-whatever the consumer's globs say, and no configuration clears it;
-gate-sdk/SPEC.md §The port-candidate criteria carries the class.
+**Criterion 4 binds on this gate on every tree.** The union puts every registered kit declaration among the gate files, `check-gate-tamper.gate` among them, so staging the gate's own declaration makes it read its own bytes whatever the consumer's globs say, and no configuration clears it; gate-sdk/SPEC.md §The port-candidate criteria carries the class.
 
-**Two behaviours changed with the port, and both are decisions rather than
-drift.** Assertion B's report lines came out of the shell form in no
-reproducible order once a commit added two matching exemptions; the
-compiled form emits the same **set** byte-sorted, on the standing rule that a
-compiled form implements set semantics rather than a shell's
-incidental ordering. And a trailing `--fixture` with no directory after it
-**hung** the shell form in its argument-parsing loop; the compiled form reads the
-missing value as the empty directory name and refuses. A hang is not a verdict, so ending it costs no assertion.
+**Two behaviours changed with the port, and both are decisions rather than drift.** Assertion B's report lines came out of the shell form in no reproducible order once a commit added two matching exemptions; the compiled form emits the same **set** byte-sorted, on the standing rule that a compiled form implements set semantics rather than a shell's incidental ordering. And a trailing `--fixture` with no directory after it **hung** the shell form in its argument-parsing loop; the compiled form reads the missing value as the empty directory name and refuses. A hang is not a verdict, so ending it costs no assertion.
 
 ## check-agent-tier-explicit
 
-Every agent definition under `DELEGATION_KIT_AGENT_DIR` declares a `model:`
-field in its frontmatter. This is the oracle over the tracked half of the
-template's **Match the dispatched model and effort to the unit's shape** rule:
-the per-dispatch habit leaves no artifact, but a standing choice does, and the
-gate reads it.
+Every agent definition under `DELEGATION_KIT_AGENT_DIR` declares a `model:` field in its frontmatter. This is the oracle over the tracked half of the template's **Match the dispatched model and effort to the unit's shape** rule: the per-dispatch habit leaves no artifact, but a standing choice does, and the gate reads it.
 
-**It polices silence, not the choice.** An explicit `inherit`-valued `model:`
-**passes** — a dispatched session that should ride its dispatcher's tier is a
-legitimate answer and the gate has no business overruling it. What reds is
-*omission*, the one state indistinguishable from not having thought about it,
-and the one state that is not the neutral absence it looks like — the refused
-environment override and the precedence chain behind that reading are in
-§The delegation model. A reader arriving at this gate expecting it to enforce
-cheapness has the wrong model of it.
+**It polices silence, not the choice.** An explicit `inherit`-valued `model:` **passes** — a dispatched session that should ride its dispatcher's tier is a legitimate answer and the gate has no business overruling it. What reds is *omission*, the one state indistinguishable from not having thought about it, and the one state that is not the neutral absence it looks like — the refused environment override and the precedence chain behind that reading are in §The delegation model. A reader arriving at this gate expecting it to enforce cheapness has the wrong model of it.
 
-**Counted inertness.** A consumer with no such directory — or one holding no
-definitions — scans zero and reports a clean counted line, the derived-scan-set
-shape the kit's other gates use. There is no roster and no registration list to
-maintain: the scan set is the directory's contents.
+**Counted inertness.** A consumer with no such directory — or one holding no definitions — scans zero and reports a clean counted line, the derived-scan-set shape the kit's other gates use. There is no roster and no registration list to maintain: the scan set is the directory's contents.
 
-**Honest limit.** It holds the tracked surface only. A dispatch naming no agent
-type and no `model` parameter inherits and leaves no artifact for any gate to
-read, so the gate converts the standing-choice class from unenforceable to
-enforced and leaves the per-dispatch class to the rule's prose. That is
-strictly better than nothing and not a claim to have closed the tier question
-mechanically.
+**Honest limit.** It holds the tracked surface only. A dispatch naming no agent type and no `model` parameter inherits and leaves no artifact for any gate to read, so the gate converts the standing-choice class from unenforceable to enforced and leaves the per-dispatch class to the rule's prose. That is strictly better than nothing and not a claim to have closed the tier question mechanically.
 
 ## usage-verdict
 
-Emits a trustworthy budget verdict from a usage snapshot file, closing the
-three failure modes a raw percentage reading leaves open:
+Emits a trustworthy budget verdict from a usage snapshot file, closing the three failure modes a raw percentage reading leaves open:
 
-1. **Stale reading** — `now - updated_at` beyond `DELEGATION_KIT_STALE_AGE` → STALE
-   (exit 2): budget-unknown, never blocking delegation — re-read or refresh
-   before trusting the number.
-2. **Dead window** — `resets_at <= now` → RESET-OK (exit 0): the percentage
-   is from the dead window and must not be read as a pause signal. The
-   weekly axis carries the same rule per-axis (`seven_day_resets_at <= now`
-   disarms the weekly pause without forcing the whole verdict to RESET-OK —
-   the axes are judged independently).
-3. **Post-login lag** — a fresh login starts a new window but the
-   server-fed percentage lags it, and the file-write age check cannot see
-   that. The gate reads the auth event from the credentials file's mtime
-   (`DELEGATION_KIT_LOGIN_WINDOW`) and, within that window, routes a
-   would-be OK to STALE (re-read). Letting the lag print OK would emit a
-   fresh-looking chimera, since the producer stamps the new account id while
-   the percentage and `resets_at` still carry the dead login's window.
-   Self-limiting: once the mtime ages out, the reroute stops firing.
+1. **Stale reading** — `now - updated_at` beyond `DELEGATION_KIT_STALE_AGE` → STALE (exit 2): budget-unknown, never blocking delegation — re-read or refresh before trusting the number.
+2. **Dead window** — `resets_at <= now` → RESET-OK (exit 0): the percentage is from the dead window and must not be read as a pause signal. The weekly axis carries the same rule per-axis (`seven_day_resets_at <= now` disarms the weekly pause without forcing the whole verdict to RESET-OK — the axes are judged independently).
+3. **Post-login lag** — a fresh login starts a new window but the server-fed percentage lags it, and the file-write age check cannot see that. The gate reads the auth event from the credentials file's mtime (`DELEGATION_KIT_LOGIN_WINDOW`) and, within that window, routes a would-be OK to STALE (re-read). Letting the lag print OK would emit a fresh-looking chimera, since the producer stamps the new account id while the percentage and `resets_at` still carry the dead login's window. Self-limiting: once the mtime ages out, the reroute stops firing.
 
-   **The reroute is asymmetric — it may suppress an OK, never a PAUSE.** It
-   therefore follows the axis compares rather than preceding them. The two
-   directions of a lagging reading have opposite costs: a lagging *low*
-   percentage printing OK invites a dispatch the budget may not afford, which
-   is what the reroute exists to prevent; a lagging *high* percentage
-   suppressed into STALE waves that dispatch through, because STALE is
-   advisory and never blocks (§usage-verdict). An unconditional
-   reroute closes the first and opens the second, so it must fire on the
-   non-blocking outcome only: inside the window an at-or-over reading still
-   exits 1 on whichever axis fired, and an under-threshold one still exits 2.
-   An account switch swaps both windows, so neither axis escapes the
-   suppression when the outcome is a would-be OK.
+   **The reroute is asymmetric — it may suppress an OK, never a PAUSE.** It therefore follows the axis compares rather than preceding them. The two directions of a lagging reading have opposite costs: a lagging *low* percentage printing OK invites a dispatch the budget may not afford, which is what the reroute exists to prevent; a lagging *high* percentage suppressed into STALE waves that dispatch through, because STALE is advisory and never blocks (§usage-verdict). An unconditional reroute closes the first and opens the second, so it must fire on the non-blocking outcome only: inside the window an at-or-over reading still exits 1 on whichever axis fired, and an under-threshold one still exits 2. An account switch swaps both windows, so neither axis escapes the suppression when the outcome is a would-be OK.
 
-   **The mtime is a proxy, and the roll witnesses refute it.** A credentials
-   file's mtime cannot distinguish an actual login from a routine OAuth token
-   rotation, which rewrites the same file — so every rotation mints a fake
-   auth event and blinds the verdict for the window's duration, and rotations
-   cluster around long-session resume, exactly when a verdict is being asked
-   for. The reroute's *premise* is that a low percentage inside the window is
-   a **lagging** reading; when the five-hour window has demonstrably rolled,
-   a low percentage is the **expected** reading and the premise is false. Two
-   witnesses of a roll are already in hand at that point, and the verdict
-   consults both — conjunctively, since either alone is ambiguous:
+   **The mtime is a proxy, and the roll witnesses refute it.** A credentials file's mtime cannot distinguish an actual login from a routine OAuth token rotation, which rewrites the same file — so every rotation mints a fake auth event and blinds the verdict for the window's duration, and rotations cluster around long-session resume, exactly when a verdict is being asked for. The reroute's *premise* is that a low percentage inside the window is a **lagging** reading; when the five-hour window has demonstrably rolled, a low percentage is the **expected** reading and the premise is false. Two witnesses of a roll are already in hand at that point, and the verdict consults both — conjunctively, since either alone is ambiguous:
 
-   - the snapshot's `five_hour_resets_at` differs from the newest
-     `DELEGATION_KIT_USAGE_HISTORY` sample's `resets_at` (the boundary moved);
-   - the snapshot's `updated_at` is past that **previous** boundary (time
-     actually crossed it, rather than the boundary being restamped by an
-     account switch).
+   - the snapshot's `five_hour_resets_at` differs from the newest `DELEGATION_KIT_USAGE_HISTORY` sample's `resets_at` (the boundary moved);
+   - the snapshot's `updated_at` is past that **previous** boundary (time actually crossed it, rather than the boundary being restamped by an account switch).
 
-   Both firing disarms the reroute and the reading verdicts on its own merits.
-   This makes the verdict path a **reader** of the trend log it already
-   appends to; the read is taken before this run's own append, so the witness
-   is the previous reading and never this one. It falls open to the
-   unrefuted reroute whenever the log cannot answer — knob unset, file absent
-   or unreadable, or a tail carrying no numeric `resets_at` — which is the
-   pre-existing behavior, so an unconfigured consumer is unchanged. The
-   residual limit is honest and named: a rotation with **no** roll still
-   blinds the window, because no witness in hand contradicts it; closing that
-   needs an account-keyed check against the credential's own identity, not a
-   sharper time window.
+   Both firing disarms the reroute and the reading verdicts on its own merits. This makes the verdict path a **reader** of the trend log it already appends to; the read is taken before this run's own append, so the witness is the previous reading and never this one. It falls open to the unrefuted reroute whenever the log cannot answer — knob unset, file absent or unreadable, or a tail carrying no numeric `resets_at` — which is the pre-existing behavior, so an unconfigured consumer is unchanged. The residual limit is honest and named: a rotation with **no** roll still blinds the window, because no witness in hand contradicts it; closing that needs an account-keyed check against the credential's own identity, not a sharper time window.
 
-**The rule is a compiled arm, `bash gate-sdk/bin/run-gates.sh --usage-verdict`,
-and this is the first section in this kit whose whole contract is in-crate.**
-Both reference producers — the `--statusline` push producer and the
-`--usage-poll` poll producer — were already compiled, and the verdict was this
-section's last shell holder. §Trend reporter's own reader has since crossed as
-`--emit-usage-trend`, taking the kit's `bin/` column to **zero**. §bin/wait-probe was the
-kit's other owed section and is discharged, on a narrower reading of *discharged*
-that section states.
+**The rule is a compiled arm, `bash gate-sdk/bin/run-gates.sh --usage-verdict`, and this is the first section in this kit whose whole contract is in-crate.** Both reference producers — the `--statusline` push producer and the `--usage-poll` poll producer — were already compiled, and the verdict was this section's last shell holder. §Trend reporter's own reader has since crossed as `--emit-usage-trend`, taking the kit's `bin/` column to **zero**. §bin/wait-probe was the kit's other owed section and is discharged, on a narrower reading of *discharged* that section states.
 
-**It is an `Arm::Run` arm-table row and cannot be an `--emit-` member**, which the exit
-contract forces rather than taste choosing: the emitting family maps every
-success to 0 and every failure to 2, and this rule's **1** is the whole blocking
-signal the budget guard grades. So it takes its own flag spelling and its own
-front-end case arm, as `--upgrade-smoke` does (gate-sdk/SPEC.md §The non-gate
-arm). It is **not** a harness-integration arm either — its callers are a session
-brief, a kit smoke and a gate reaching it in process, the caller set that
-subsection's own definition excludes. Unavailable, for want of a binary on the
-host, is exit **2** at the front-end: already this rule's budget-unknown code, so an artifact-less host
-reads as STALE rather than as a verdict it never took.
+**It is an `Arm::Run` arm-table row and cannot be an `--emit-` member**, which the exit contract forces rather than taste choosing: the emitting family maps every success to 0 and every failure to 2, and this rule's **1** is the whole blocking signal the budget guard grades. So it takes its own flag spelling and its own front-end case arm, as `--upgrade-smoke` does (gate-sdk/SPEC.md §The non-gate arm). It is **not** a harness-integration arm either — its callers are a session brief, a kit smoke and a gate reaching it in process, the caller set that subsection's own definition excludes. Unavailable, for want of a binary on the host, is exit **2** at the front-end: already this rule's budget-unknown code, so an artifact-less host reads as STALE rather than as a verdict it never took.
 
-**Eleven declared knobs, each a row of delegation-kit's static table**:
-`DELEGATION_KIT_USAGE_FILE`, `_CRED_FILE`, `_ACCOUNT_CONFIG`, `_PAUSE_PCT`,
-`_PAUSE_PCT_7D`, `_STALE_AGE`, `_LOGIN_WINDOW`, `_REFRESH_CMD`,
-`_REFRESH_MIN_AGE`, `_USAGE_HISTORY` and `_FAN_WIDTH` (§Layout and
-configuration). The three paths are read through the reader's one
-empty-means-derive fill, which reads all three together, so `_ACCOUNT_CONFIG` is
-declared although the verdict never opens that file. A read of a name the table
-does not carry is an error rather than an empty value, so the roster and the
-table are one change and never two.
+**Eleven declared knobs, each a row of delegation-kit's static table**: `DELEGATION_KIT_USAGE_FILE`, `_CRED_FILE`, `_ACCOUNT_CONFIG`, `_PAUSE_PCT`, `_PAUSE_PCT_7D`, `_STALE_AGE`, `_LOGIN_WINDOW`, `_REFRESH_CMD`, `_REFRESH_MIN_AGE`, `_USAGE_HISTORY` and `_FAN_WIDTH` (§Layout and configuration). The three paths are read through the reader's one empty-means-derive fill, which reads all three together, so `_ACCOUNT_CONFIG` is declared although the verdict never opens that file. A read of a name the table does not carry is an error rather than an empty value, so the roster and the table are one change and never two.
 
-**Two positionals and one refusal.** `[usage-file [credentials-file]]` arrive as
-the arm's own argv and override `DELEGATION_KIT_USAGE_FILE` and
-`DELEGATION_KIT_CRED_FILE` — arguments the *rule* consumes rather than
-redirections of already-resolved config, so they cross the port unchanged
-(gate-sdk/SPEC.md §The non-gate arm's distinguishing test). A positional
-beginning with `-` that names no option is a **refusal**, usage on stderr and
-exit 2; `--` ends option processing; `-h`/`--help` belongs to the front-end
-(gate-sdk/SPEC.md §The bin/-tool contract). The refusal is not decoration —
-absorbing the flag made a mistyped invocation report
-`cannot read --help … -> STALE` at exit 2, which the budget guard routes to
-**advise**: a non-reading dressed as a reading at the decision point the rule
-exists to hold.
+**Two positionals and one refusal.** `[usage-file [credentials-file]]` arrive as the arm's own argv and override `DELEGATION_KIT_USAGE_FILE` and `DELEGATION_KIT_CRED_FILE` — arguments the *rule* consumes rather than redirections of already-resolved config, so they cross the port unchanged (gate-sdk/SPEC.md §The non-gate arm's distinguishing test). A positional beginning with `-` that names no option is a **refusal**, usage on stderr and exit 2; `--` ends option processing; `-h`/`--help` belongs to the front-end (gate-sdk/SPEC.md §The bin/-tool contract). The refusal is not decoration — absorbing the flag made a mistyped invocation report `cannot read --help … -> STALE` at exit 2, which the budget guard routes to **advise**: a non-reading dressed as a reading at the decision point the rule exists to hold.
 
-**One rule, two callers.** `verdict(args) -> (String, i32)` returns the line and
-the status; the arm prints the line and returns the status, and
-`agent-budget-guard` calls that same function in process, grading `code == 1` as
-its block and relaying the `String` verbatim (§The delegation model). A shape
-refusal returns an **empty** line with its usage already on stderr, so the arm
-prints nothing on stdout and the status carries the whole signal. The one
-program the compiled rule spawns is `DELEGATION_KIT_REFRESH_CMD`'s argv, spawned
-directly with no shell, and only when that knob is non-empty: it *is* a command
-seam, so its spawn survives the port.
+**One rule, two callers.** `verdict(args) -> (String, i32)` returns the line and the status; the arm prints the line and returns the status, and `agent-budget-guard` calls that same function in process, grading `code == 1` as its block and relaying the `String` verbatim (§The delegation model). A shape refusal returns an **empty** line with its usage already on stderr, so the arm prints nothing on stdout and the status carries the whole signal. The one program the compiled rule spawns is `DELEGATION_KIT_REFRESH_CMD`'s argv, spawned directly with no shell, and only when that knob is non-empty: it *is* a command seam, so its spawn survives the port.
 
-Check order: parse → RESET-OK → age-STALE → pause axes → login-STALE → OK. The
-RESET-OK branch is the same decision one step earlier and is ordering
-precedent for the witnesses: the file already accepts that a demonstrated roll
-outranks the reroute. It covers only a snapshot from an already-dead window;
-the witnesses cover a window that rolled *between* samples, where the
-re-polled snapshot carries a live `resets_at`.
+Check order: parse → RESET-OK → age-STALE → pause axes → login-STALE → OK. The RESET-OK branch is the same decision one step earlier and is ordering precedent for the witnesses: the file already accepts that a demonstrated roll outranks the reroute. It covers only a snapshot from an already-dead window; the witnesses cover a window that rolled *between* samples, where the re-polled snapshot carries a live `resets_at`.
 
-Exit codes: **0** OK / RESET-OK, **1** PAUSE, **2** STALE or unreadable. Exit
-2 is fail-closed on *trusting the number* and deliberately fail-open on
-*refusing work* — budget-unknown never blocks delegation — so it is never the
-code a reading that should refuse an expensive dispatch may land on. **The
-mapping stands and its machine reader is gone.** It was declared in the deleted
-tool's `# exit:` header, from which `check-assertion-strength` derived its whole
-live verdict vocabulary; with the header gone that gate's reach is zero, and
-gate-sdk/SPEC.md §check-assertion-strength records the loss, the two candidate
-widenings and their costs. What the mapping still governs is every caller above,
-each of which reads the status rather than a header.
-Fail-closed throughout: missing keys and a non-numeric percentage route to
-STALE; each threshold compare uses `awk`, not integer-only bash
-arithmetic, so a fractional percentage cannot silently skip PAUSE; and both
-pause compares are **at-or-over** (`>=`), so a reading exactly at
-`DELEGATION_KIT_PAUSE_PCT` / `DELEGATION_KIT_PAUSE_PCT_7D` pauses — the
-boundary reading is judged at the
-limit, not under it.
+Exit codes: **0** OK / RESET-OK, **1** PAUSE, **2** STALE or unreadable. Exit 2 is fail-closed on *trusting the number* and deliberately fail-open on *refusing work* — budget-unknown never blocks delegation — so it is never the code a reading that should refuse an expensive dispatch may land on. **The mapping stands and its machine reader is gone.** It was declared in the deleted tool's `# exit:` header, from which `check-assertion-strength` derived its whole live verdict vocabulary; with the header gone that gate's reach is zero, and gate-sdk/SPEC.md §check-assertion-strength records the loss, the two candidate widenings and their costs. What the mapping still governs is every caller above, each of which reads the status rather than a header. Fail-closed throughout: missing keys and a non-numeric percentage route to STALE; each threshold compare uses `awk`, not integer-only bash arithmetic, so a fractional percentage cannot silently skip PAUSE; and both pause compares are **at-or-over** (`>=`), so a reading exactly at `DELEGATION_KIT_PAUSE_PCT` / `DELEGATION_KIT_PAUSE_PCT_7D` pauses — the boundary reading is judged at the limit, not under it.
 
-**Demand-driven refresh.** The decision point triggers the poll: when
-`DELEGATION_KIT_REFRESH_CMD` is non-empty, `usage-verdict` spawns its argv
-before reading the snapshot, so the budget guard and any verdict caller read live
-data instead of whatever the last statusline render left behind. This closes
-the push producer's blind spot at the point of use — a lead that delegates
-stops rendering exactly when it goes static, and the first live poll proved
-the gap: the snapshot said 2-5% while the endpoint said 28%. Empty (the
-default) keeps the read-only behavior, so an unconfigured consumer's push and
-timer producers are unchanged.
+**Demand-driven refresh.** The decision point triggers the poll: when `DELEGATION_KIT_REFRESH_CMD` is non-empty, `usage-verdict` spawns its argv before reading the snapshot, so the budget guard and any verdict caller read live data instead of whatever the last statusline render left behind. This closes the push producer's blind spot at the point of use — a lead that delegates stops rendering exactly when it goes static, and the first live poll proved the gap: the snapshot said 2-5% while the endpoint said 28%. Empty (the default) keeps the read-only behavior, so an unconfigured consumer's push and timer producers are unchanged.
 
-The refresh is **short-circuited** by `DELEGATION_KIT_REFRESH_MIN_AGE`: the
-command runs only when the snapshot is missing, unreadable, or its
-`updated_at` age is at least that value. The floor exists because the verdict's
-callers fire in bursts rather than on a schedule — the dispatch guard runs it
-once per `Agent` call and the session-start brief once per session — so without
-it a configured refresh would hammer the source across a fan-out. At
-dispatch-decision time a stale-enough snapshot still polls.
+The refresh is **short-circuited** by `DELEGATION_KIT_REFRESH_MIN_AGE`: the command runs only when the snapshot is missing, unreadable, or its `updated_at` age is at least that value. The floor exists because the verdict's callers fire in bursts rather than on a schedule — the dispatch guard runs it once per `Agent` call and the session-start brief once per session — so without it a configured refresh would hammer the source across a fan-out. At dispatch-decision time a stale-enough snapshot still polls.
 
-It is **fail-soft**: a non-zero refresh exit leaves the snapshot untouched and
-the verdict proceeds on the cached file — the staleness machinery above judges
-its trust, turning a dead producer into a STALE verdict rather than a silent
-green. Refresh diagnostics are suppressed rather than mixed into the verdict
-output, which callers relay verbatim; the snapshot's age is the signal.
-`usage.txt` survives as last-known-good cache, source-agnostic seam, and test
-seam. A refresh inside the `DELEGATION_KIT_LOGIN_WINDOW` rewrites `updated_at` while the
-server-fed percentage may still lag the login by about a minute — the reroute
-correctly keeps those readings STALE for the window's duration, save the
-at-or-over ones it is forbidden to suppress.
+It is **fail-soft**: a non-zero refresh exit leaves the snapshot untouched and the verdict proceeds on the cached file — the staleness machinery above judges its trust, turning a dead producer into a STALE verdict rather than a silent green. Refresh diagnostics are suppressed rather than mixed into the verdict output, which callers relay verbatim; the snapshot's age is the signal. `usage.txt` survives as last-known-good cache, source-agnostic seam, and test seam. A refresh inside the `DELEGATION_KIT_LOGIN_WINDOW` rewrites `updated_at` while the server-fed percentage may still lag the login by about a minute — the reroute correctly keeps those readings STALE for the window's duration, save the at-or-over ones it is forbidden to suppress.
 
-**The verdict-string contract.** Every line `usage-verdict` emits carries three
-parts: the **reading** (the measured fields), the **epistemic status** of that
-reading (how far to trust the number), and its **decision consequence** for
-delegation (what the reading gates). A verdict string stating a status without
-its consequence is incomplete by contract — the reader completes it by
-inference, and the inference is unconstrained: a session reading a bare STALE
-infers "do not trust the number" into "do not dispatch". That read is wrong
-(STALE never blocks) and is structurally uncorrectable downstream, because the
-budget guard fires *on* dispatch, the act a hesitating session has not yet
-performed. STALE's status half is site-specific — each emission site names why
-it is stale — while its consequence half is uniform, because the consequence is
-uniform: STALE is budget-unknown at every site and never blocks delegation. The
-consequence clause appends *after* the `` -> <verdict> `` arrow, leaving it
-disjoint from the `width=<n>` invariant below.
+**The verdict-string contract.** Every line `usage-verdict` emits carries three parts: the **reading** (the measured fields), the **epistemic status** of that reading (how far to trust the number), and its **decision consequence** for delegation (what the reading gates). A verdict string stating a status without its consequence is incomplete by contract — the reader completes it by inference, and the inference is unconstrained: a session reading a bare STALE infers "do not trust the number" into "do not dispatch". That read is wrong (STALE never blocks) and is structurally uncorrectable downstream, because the budget guard fires *on* dispatch, the act a hesitating session has not yet performed. STALE's status half is site-specific — each emission site names why it is stale — while its consequence half is uniform, because the consequence is uniform: STALE is budget-unknown at every site and never blocks delegation. The consequence clause appends *after* the `` -> <verdict> `` arrow, leaving it disjoint from the `width=<n>` invariant below.
 
-**The `width=<n>` field.** Every emitted verdict line — OK, PAUSE, STALE (the
-fail-closed diagnostics included), RESET-OK — carries a `width=<n>` field
-immediately before the `` -> <verdict> `` arrow, read from
-`DELEGATION_KIT_FAN_WIDTH` (§Layout and configuration). It is the knob's
-mechanical reader: the budget check already runs before every dispatch, so the
-read-only fan-out bound surfaces at exactly the wave-sizing decision point, and
-`agent-budget-guard` relays the verdict line verbatim (block on PAUSE, advise
-otherwise) so the width rides into context with the budget verdict. *Verbatim*
-governs the verdict line's own text, not the surrounding frame: the guard
-prefixes the relayed line and the PAUSE arm appends its corrective, but no arm
-restates the payload's content — there is exactly one advise arm and it adds
-nothing. The field is
-a config constant, not derived from the snapshot, so it is present even on an
-unreadable-snapshot STALE. No exit-code or other-field change: existing callers
-that key off the exit code or the `-> <verdict>` arrow are unaffected.
+**The `width=<n>` field.** Every emitted verdict line — OK, PAUSE, STALE (the fail-closed diagnostics included), RESET-OK — carries a `width=<n>` field immediately before the `` -> <verdict> `` arrow, read from `DELEGATION_KIT_FAN_WIDTH` (§Layout and configuration). It is the knob's mechanical reader: the budget check already runs before every dispatch, so the read-only fan-out bound surfaces at exactly the wave-sizing decision point, and `agent-budget-guard` relays the verdict line verbatim (block on PAUSE, advise otherwise) so the width rides into context with the budget verdict. *Verbatim* governs the verdict line's own text, not the surrounding frame: the guard prefixes the relayed line and the PAUSE arm appends its corrective, but no arm restates the payload's content — there is exactly one advise arm and it adds nothing. The field is a config constant, not derived from the snapshot, so it is present even on an unreadable-snapshot STALE. No exit-code or other-field change: existing callers that key off the exit code or the `-> <verdict>` arrow are unaffected.
 
-**Two pause axes.** The five-hour window is the always-on axis; the weekly
-(7-day) window is a second axis, armed only when both `seven_day_used_pct`
-and `seven_day_resets_at` are present (a three-line snapshot keeps today's
-behavior — no retroactive contract break). The weekly limit can deplete
-while the 5h window sits comfortable, and a weekly PAUSE costs days, not
-hours, so it must gate delegation planning, not merely appear in a log —
-delegation is the discretionary spend, the first thing to stop near the
-weekly ceiling so the remaining week stays with the supervisor. The axes
-are judged independently against `DELEGATION_KIT_PAUSE_PCT` and
-`DELEGATION_KIT_PAUSE_PCT_7D`; either
-firing is a PAUSE (exit 1), and the message names the axis that fired
-(`PAUSE (7-day window)` vs `PAUSE (5h window)`, the weekly named when both
-fire) because the operator's remediation differs by days. No caller
-changes: the session-context hook and the per-dispatch Agent budget guard
-already consume the exit code, so the weekly axis flows into every dispatch
-decision the moment a producer supplies the keys.
+**Two pause axes.** The five-hour window is the always-on axis; the weekly (7-day) window is a second axis, armed only when both `seven_day_used_pct` and `seven_day_resets_at` are present (a three-line snapshot keeps today's behavior — no retroactive contract break). The weekly limit can deplete while the 5h window sits comfortable, and a weekly PAUSE costs days, not hours, so it must gate delegation planning, not merely appear in a log — delegation is the discretionary spend, the first thing to stop near the weekly ceiling so the remaining week stays with the supervisor. The axes are judged independently against `DELEGATION_KIT_PAUSE_PCT` and `DELEGATION_KIT_PAUSE_PCT_7D`; either firing is a PAUSE (exit 1), and the message names the axis that fired (`PAUSE (7-day window)` vs `PAUSE (5h window)`, the weekly named when both fire) because the operator's remediation differs by days. No caller changes: the session-context hook and the per-dispatch Agent budget guard already consume the exit code, so the weekly axis flows into every dispatch decision the moment a producer supplies the keys.
 
-**Usage-history sampling.** When `DELEGATION_KIT_USAGE_HISTORY` is non-empty,
-`usage-verdict` appends one sample line (§The usage.txt contract) to that log
-after every successfully parsed snapshot, whatever the verdict — the raw
-harness-reported values verbatim; write-time smoothing or correction is
-forbidden (a later corrective push is evidence about the earlier sample, and
-only the reader has both). A STALE exit from an unreadable or unparseable
-snapshot appends nothing — a sample the gate would not trust is not history.
-`--emit-usage-trend` (§Trend reporter) reads the log, and so does `usage-verdict`
-itself: the newest sample's `resets_at` is one of the two roll witnesses
-(§usage-verdict). That read is the log's only in-verdict consumer and is
-strictly fall-open, so the log stays an advisory trend surface rather than
-becoming a correctness dependency — a consumer with sampling off gets the
-same verdicts it always did.
+**Usage-history sampling.** When `DELEGATION_KIT_USAGE_HISTORY` is non-empty, `usage-verdict` appends one sample line (§The usage.txt contract) to that log after every successfully parsed snapshot, whatever the verdict — the raw harness-reported values verbatim; write-time smoothing or correction is forbidden (a later corrective push is evidence about the earlier sample, and only the reader has both). A STALE exit from an unreadable or unparseable snapshot appends nothing — a sample the gate would not trust is not history. `--emit-usage-trend` (§Trend reporter) reads the log, and so does `usage-verdict` itself: the newest sample's `resets_at` is one of the two roll witnesses (§usage-verdict). That read is the log's only in-verdict consumer and is strictly fall-open, so the log stays an advisory trend surface rather than becoming a correctness dependency — a consumer with sampling off gets the same verdicts it always did.
 
 ### The usage.txt contract
 
-The snapshot is the wire contract between any producer and the gate — three
-`key=value` lines:
+The snapshot is the wire contract between any producer and the gate — three `key=value` lines:
 
 ```
 five_hour_used_pct=<float>
@@ -2798,525 +536,130 @@ five_hour_resets_at=<epoch-seconds>
 updated_at=<epoch-seconds>
 ```
 
-Beyond the three mandatory lines a producer may write optional keys when its
-source exposes them; `usage-verdict` reads the ones it interprets and passes
-the rest through: `seven_day_used_pct` / `seven_day_resets_at` (the weekly
-window — read at the verdict transition to arm the second pause axis),
-`account` (the logged-in account identity — `login_at` detects a switch,
-`account` says to whom, which lets the trend reporter group a multi-account
-operator's segments per account), `tier` (subscription tier — the
-denominator behind the percentages), and `tokens_in` / `tokens_out`
-(cumulative token counts, the axis that binds API-billed consumers for whom
-no subscription percentage applies). Optional keys are omitted when their
-source has no value, never written empty; keys the verdict does not read
-pass through unchanged.
+Beyond the three mandatory lines a producer may write optional keys when its source exposes them; `usage-verdict` reads the ones it interprets and passes the rest through: `seven_day_used_pct` / `seven_day_resets_at` (the weekly window — read at the verdict transition to arm the second pause axis), `account` (the logged-in account identity — `login_at` detects a switch, `account` says to whom, which lets the trend reporter group a multi-account operator's segments per account), `tier` (subscription tier — the denominator behind the percentages), and `tokens_in` / `tokens_out` (cumulative token counts, the axis that binds API-billed consumers for whom no subscription percentage applies). Optional keys are omitted when their source has no value, never written empty; keys the verdict does not read pass through unchanged.
 
-**Omit-don't-empty binds the reader as much as the producer**, and it is stated
-here because the two now sit in different substrates and a later producer change
-must meet it: a reader of these lines tests a key's **presence**, defaults an
-absent one rather than failing on it, and never treats an omitted optional as a
-malformed line (§Trend reporter enumerates the defaults its own reader applies).
-A reader that demanded every key would red on a line this contract explicitly
-permits.
+**Omit-don't-empty binds the reader as much as the producer**, and it is stated here because the two now sit in different substrates and a later producer change must meet it: a reader of these lines tests a key's **presence**, defaults an absent one rather than failing on it, and never treats an omitted optional as a malformed line (§Trend reporter enumerates the defaults its own reader applies). A reader that demanded every key would red on a line this contract explicitly permits.
 
-The kit ships two reference producers — one push, one poll — and any producer
-honoring the contract works beside them. The `--statusline` arm is
-the push producer: a statusline hook
-that parses the harness's rate-limit JSON and atomically writes the
-snapshot (`tmp` + `mv`) to `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/usage.txt`.
-It also produces the weekly pair from the payload and `account` / `tier`
-from the local account config (`.credentials.json` / `~/.claude.json`,
-overridable via `DELEGATION_KIT_CRED_FILE` / `DELEGATION_KIT_ACCOUNT_CONFIG`).
-It ships no `tokens_in` / `tokens_out` producer: this harness's payload
-carries no cumulative token count, so under the dead-producer rule the keys
-stay defined here for third-party producers but no dead producer is shipped.
-Beyond the snapshot write it renders a status bar (§The statusline arm).
-The snapshot write is the contract; the bar is reference UX a consumer may
-restyle or discard. The source is pluggable
-(`DELEGATION_KIT_USAGE_FILE`), so no
-single-operator `CLAUDE_CONFIG_DIR` assumption is baked in.
+The kit ships two reference producers — one push, one poll — and any producer honoring the contract works beside them. The `--statusline` arm is the push producer: a statusline hook that parses the harness's rate-limit JSON and atomically writes the snapshot (`tmp` + `mv`) to `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/usage.txt`. It also produces the weekly pair from the payload and `account` / `tier` from the local account config (`.credentials.json` / `~/.claude.json`, overridable via `DELEGATION_KIT_CRED_FILE` / `DELEGATION_KIT_ACCOUNT_CONFIG`). It ships no `tokens_in` / `tokens_out` producer: this harness's payload carries no cumulative token count, so under the dead-producer rule the keys stay defined here for third-party producers but no dead producer is shipped. Beyond the snapshot write it renders a status bar (§The statusline arm). The snapshot write is the contract; the bar is reference UX a consumer may restyle or discard. The source is pluggable (`DELEGATION_KIT_USAGE_FILE`), so no single-operator `CLAUDE_CONFIG_DIR` assumption is baked in.
 
-The `--usage-poll` arm is the poll producer, closing the push producer's
-blind spot: the statusline fires on the supervising session's own message
-flow, so a lead that delegates stops producing exactly when it goes static —
-a delegated build can run for hours with every per-dispatch budget verdict
-reading a stale file. The poller is one poll cycle per invocation: read the
-harness OAuth token from the credentials file the kit already knows
-(`DELEGATION_KIT_CRED_FILE`; the token goes into the request header and
-nowhere else — never logged, never echoed, never written to the snapshot),
-query the account usage source, map the payload onto the contract (the three
-mandatory lines plus whichever optional keys the source exposes; **no new
-key**), and atomically rewrite the snapshot (`tmp` + `mv`, the same
-discipline). No daemon, no loop: scheduling belongs to the consumer, and two
-modes are sanctioned. **Demand-driven** (§usage-verdict): point
-`DELEGATION_KIT_REFRESH_CMD` at the poller and the same one-cycle producer runs
-at verdict time, which puts the freshest reading exactly at the decision point.
-**Timer-driven**: a cron line such as
-`*/5 * * * * bash gate-sdk/bin/run-gates.sh --usage-poll` or a
-systemd timer, for consumers wanting continuous trend density independent of
-verdict calls. Either entry is the enabling config; with neither, the producer
-is dead. The usage endpoint is harness-account plumbing, not a
-published contract, so the poller is **fail-soft**: a missing/unreadable
-credentials file, a fetch failure, or an unparseable payload exits non-zero
-with a `help:` line *without touching the snapshot* — a stale snapshot is
-already the detected condition downstream (`usage-verdict`'s `updated_at`
-staleness check turns it into a STALE verdict, never a silent green), and the
-non-zero exit lands in the invoking timer's logging, deliberately nowhere
-else. The endpoint URL is the `DELEGATION_KIT_USAGE_ENDPOINT` knob — both the
-test seam (the smoke points it at a local `file://` stub) and the valve when
-the source moves.
+The `--usage-poll` arm is the poll producer, closing the push producer's blind spot: the statusline fires on the supervising session's own message flow, so a lead that delegates stops producing exactly when it goes static — a delegated build can run for hours with every per-dispatch budget verdict reading a stale file. The poller is one poll cycle per invocation: read the harness OAuth token from the credentials file the kit already knows (`DELEGATION_KIT_CRED_FILE`; the token goes into the request header and nowhere else — never logged, never echoed, never written to the snapshot), query the account usage source, map the payload onto the contract (the three mandatory lines plus whichever optional keys the source exposes; **no new key**), and atomically rewrite the snapshot (`tmp` + `mv`, the same discipline). No daemon, no loop: scheduling belongs to the consumer, and two modes are sanctioned. **Demand-driven** (§usage-verdict): point `DELEGATION_KIT_REFRESH_CMD` at the poller and the same one-cycle producer runs at verdict time, which puts the freshest reading exactly at the decision point. **Timer-driven**: a cron line such as `*/5 * * * * bash gate-sdk/bin/run-gates.sh --usage-poll` or a systemd timer, for consumers wanting continuous trend density independent of verdict calls. Either entry is the enabling config; with neither, the producer is dead. The usage endpoint is harness-account plumbing, not a published contract, so the poller is **fail-soft**: a missing/unreadable credentials file, a fetch failure, or an unparseable payload exits non-zero with a `help:` line *without touching the snapshot* — a stale snapshot is already the detected condition downstream (`usage-verdict`'s `updated_at` staleness check turns it into a STALE verdict, never a silent green), and the non-zero exit lands in the invoking timer's logging, deliberately nowhere else. The endpoint URL is the `DELEGATION_KIT_USAGE_ENDPOINT` knob — both the test seam (the smoke points it at a local `file://` stub) and the valve when the source moves.
 
-Both producers write the whole snapshot atomically from the same account
-source; last-writer-wins is correct because the freshest write is the truest
-and `updated_at` arbitrates downstream. Nothing serializes them and nothing
-needs to. The trend log is unaffected: `usage-verdict` stays the single
-append author (§usage-verdict); the poller writes the snapshot only.
+Both producers write the whole snapshot atomically from the same account source; last-writer-wins is correct because the freshest write is the truest and `updated_at` arbitrates downstream. Nothing serializes them and nothing needs to. The trend log is unaffected: `usage-verdict` stays the single append author (§usage-verdict); the poller writes the snapshot only.
 
-Because the
-statusline fires far more often than the per-session /
-per-dispatch verdict calls, the render path is where a denser trend history
-would come from — but **the shipped statusline arm calls `usage-verdict`
-nowhere**, and its declared reads omit `DELEGATION_KIT_USAGE_HISTORY` for
-exactly that reason (§The statusline arm), so the sampling a consumer actually
-gets from setting that knob is whatever `usage-verdict`'s own per-session /
-per-dispatch callers produce. A consumer wanting the denser history drives the
-call from its own render path; `usage-verdict` stays the single append author
-(§usage-verdict), so such a consumer calls it rather than appending the log
-itself. The kit ships the knob and the append author, not the render-path
-call.
+Because the statusline fires far more often than the per-session / per-dispatch verdict calls, the render path is where a denser trend history would come from — but **the shipped statusline arm calls `usage-verdict` nowhere**, and its declared reads omit `DELEGATION_KIT_USAGE_HISTORY` for exactly that reason (§The statusline arm), so the sampling a consumer actually gets from setting that knob is whatever `usage-verdict`'s own per-session / per-dispatch callers produce. A consumer wanting the denser history drives the call from its own render path; `usage-verdict` stays the single append author (§usage-verdict), so such a consumer calls it rather than appending the log itself. The kit ships the knob and the append author, not the render-path call.
 
-**The sample line.** With sampling enabled (§usage-verdict), `usage-verdict`
-appends one line per parsed snapshot — the trend log's wire contract between
-it and `--emit-usage-trend`:
+**The sample line.** With sampling enabled (§usage-verdict), `usage-verdict` appends one line per parsed snapshot — the trend log's wire contract between it and `--emit-usage-trend`:
 
 ```
 updated_at=<epoch> pct=<float> resets_at=<epoch> verdict=<word> login_at=<epoch>[ account=<word>][ tier=<word>][ pct_7d=<float> resets_7d=<epoch>][ tokens_in=<n> tokens_out=<n>]
 ```
 
-Space-separated `key=value`, order-insensitive; optional groups are omitted
-(never written empty) when the snapshot lacks them. `login_at` is the
-credentials-file mtime the post-login-lag check already reads, stamped per
-sample so an account switch becomes data; `pct` / `resets_at` are the 5h
-values verbatim and `pct_7d` / `resets_7d` the weekly ones. The log is
-append-only (the tmp-prune / boundary-truncate conventions own cleanup), and
-carries operator-local account identifiers, so it lives under the gitignored
-measurement dir and never reaches a tracked file.
+Space-separated `key=value`, order-insensitive; optional groups are omitted (never written empty) when the snapshot lacks them. `login_at` is the credentials-file mtime the post-login-lag check already reads, stamped per sample so an account switch becomes data; `pct` / `resets_at` are the 5h values verbatim and `pct_7d` / `resets_7d` the weekly ones. The log is append-only (the tmp-prune / boundary-truncate conventions own cleanup), and carries operator-local account identifiers, so it lives under the gitignored measurement dir and never reaches a tracked file.
 
 ### The statusline arm
 
-The `--statusline` arm renders model/effort, a context gauge, the 5h
-and 7d windows with reset countdowns, an `iteration@stage` readout, and a queue
-counter group. Self-contained ANSI, no external asset (§Out of scope).
+The `--statusline` arm renders model/effort, a context gauge, the 5h and 7d windows with reset countdowns, an `iteration@stage` readout, and a queue counter group. Self-contained ANSI, no external asset (§Out of scope).
 
-The `iteration@stage` readout's two halves come from two surfaces: the iteration
-from the queue header, the stage from the lifecycle evidence file's **last data
-line**. Both are repo-root-relative reads in the arm's existing hardcode
-style — the arm adds no knob. With no cursor to read (no
-evidence file, or one truncated to its preamble at an iteration boundary) the
-readout degrades to the iteration alone rather than printing a dangling
-separator or a partial parse.
+The `iteration@stage` readout's two halves come from two surfaces: the iteration from the queue header, the stage from the lifecycle evidence file's **last data line**. Both are repo-root-relative reads in the arm's existing hardcode style — the arm adds no knob. With no cursor to read (no evidence file, or one truncated to its preamble at an iteration boundary) the readout degrades to the iteration alone rather than printing a dangling separator or a partial parse.
 
-**The counter group** is a compact `N12 T3 D48 I7` tally of the queue's task
-sections, appended last. The arm does not know how many sections exist,
-what they are called, or which tiers the set contains: it calls queue-kit's
-counter rendering and renders whatever
-`<section-name><TAB><count>` lines come back, labelling each with the initial of
-the name it was handed (queue-kit/SPEC.md §The queue-counts arm). The section
-vocabulary therefore stays entirely inside the kit that owns it — there is
-nothing here for a later editor to hardcode. As soon as two returned names share
-an initial, **every** label widens to two characters, so a colliding pair stays
-distinguishable and the group stays aligned rather than only the collision
-changing width.
+**The counter group** is a compact `N12 T3 D48 I7` tally of the queue's task sections, appended last. The arm does not know how many sections exist, what they are called, or which tiers the set contains: it calls queue-kit's counter rendering and renders whatever `<section-name><TAB><count>` lines come back, labelling each with the initial of the name it was handed (queue-kit/SPEC.md §The queue-counts arm). The section vocabulary therefore stays entirely inside the kit that owns it — there is nothing here for a later editor to hardcode. As soon as two returned names share an initial, **every** label widens to two characters, so a colliding pair stays distinguishable and the group stays aligned rather than only the collision changing width.
 
-**The call is in process, and the paragraph that ruled a subprocess call *the
-contract* retires with its ground — uniformly across this section and
-queue-kit/SPEC.md §The queue-counts
-arm, whose own subprocess paragraph stated the same ground and retires with it.**
-That ground was that the counter's shell
-library exits 2 at source time on a malformed queue config, so an in-process call
-would take the whole status bar down — model, context gauge, both rate-limit
-gauges — over a component worth four characters. The hazard is a **sourced shell
-library** calling `exit` in its caller's process, and the ported rendering has no
-spelling for it: it resolves its knobs through the crate's knob reads, which
-return `Result` and cannot exit, so a malformed queue config becomes an `Err`
-this arm maps to an empty counter group. The isolation argument's remaining force
-was already spent in any case — this module imports `crate::emit::kpi` and
-renders it in process, so the bar has never been isolated from crate code. It was
-isolated from *shell*, and that is what the port removed.
+**The call is in process, and the paragraph that ruled a subprocess call *the contract* retires with its ground — uniformly across this section and queue-kit/SPEC.md §The queue-counts arm, whose own subprocess paragraph stated the same ground and retires with it.** That ground was that the counter's shell library exits 2 at source time on a malformed queue config, so an in-process call would take the whole status bar down — model, context gauge, both rate-limit gauges — over a component worth four characters. The hazard is a **sourced shell library** calling `exit` in its caller's process, and the ported rendering has no spelling for it: it resolves its knobs through the crate's knob reads, which return `Result` and cannot exit, so a malformed queue config becomes an `Err` this arm maps to an empty counter group. The isolation argument's remaining force was already spent in any case — this module imports `crate::emit::kpi` and renders it in process, so the bar has never been isolated from crate code. It was isolated from *shell*, and that is what the port removed.
 
-**Everything the sentence protected is preserved.** An unresolvable queue file, a
-malformed config and empty output all still drop the group and change nothing
-else about the bar, matching the two degradations the arm already performs (an
-absent queue file drops the iteration; an absent evidence file drops the `@stage`
-suffix). There is no existence guard: the rendering ships in the same binary, so
-a profile that vendored this kit without queue-kit has no missing script to guard
-against.
+**Everything the sentence protected is preserved.** An unresolvable queue file, a malformed config and empty output all still drop the group and change nothing else about the bar, matching the two degradations the arm already performs (an absent queue file drops the iteration; an absent evidence file drops the `@stage` suffix). There is no existence guard: the rendering ships in the same binary, so a profile that vendored this kit without queue-kit has no missing script to guard against.
 
-**The arm's declared reads gain the counter rendering's four**
-(`QUEUE_KIT_QUEUE_FILE` and the three section knobs), because the subprocess used
-to resolve its own and an in-process reader resolves them itself. That
-*improves* on the state it replaces — knob resolution stops happening twice by
-two mechanisms. **Where those four resolve is stated here rather than inherited,
-because queue-kit/SPEC.md §The queue-index arm's configured-arm paragraph settles
-the caller that reaches an arm *as* an arm and an in-process call from a hook module
-is neither the front end nor a direct binary invoke:**
+**The arm's declared reads gain the counter rendering's four** (`QUEUE_KIT_QUEUE_FILE` and the three section knobs), because the subprocess used to resolve its own and an in-process reader resolves them itself. That *improves* on the state it replaces — knob resolution stops happening twice by two mechanisms. **Where those four resolve is stated here rather than inherited, because queue-kit/SPEC.md §The queue-index arm's configured-arm paragraph settles the caller that reaches an arm *as* an arm and an in-process call from a hook module is neither the front end nor a direct binary invoke:**
 
-- **They resolve in process from queue-kit's static table.** The four are static
-  knobs, so the binary reads them from the kit's defaults and the consumer's
-  `queue-config.knobs` wherever it runs (gate-sdk/SPEC.md §The knob file), and the
-  gate-sdk queue file `QUEUE_KIT_QUEUE_FILE`'s default derives from resolves from
-  gate-sdk's own table the same way. A consumer override reaches this reader
-  through the crate's own resolution. Adding the four names to the roster is
-  therefore not bookkeeping — it is what lets the knob-file derivation,
-  `check-reads-couples` and `check-gate-substrate-parity` see those reads.
-- **The silent-override-ignored failure is structurally unavailable.** No path
-  resolves the four but the kit table and the knob files, so no invocation can
-  substitute a platform default for a consumer's value.
-- **So the residual failure is total and visible, never partial and wrong.** A
-  malformed queue config, which the table validator refuses, drops the **whole**
-  counter group and changes nothing else about the bar — one of the degradations
-  above. A consumer's configured tier silently missing from a rendered tally has
-  no spelling on this path.
+- **They resolve in process from queue-kit's static table.** The four are static knobs, so the binary reads them from the kit's defaults and the consumer's `queue-config.knobs` wherever it runs (gate-sdk/SPEC.md §The knob file), and the gate-sdk queue file `QUEUE_KIT_QUEUE_FILE`'s default derives from resolves from gate-sdk's own table the same way. A consumer override reaches this reader through the crate's own resolution. Adding the four names to the roster is therefore not bookkeeping — it is what lets the knob-file derivation, `check-reads-couples` and `check-gate-substrate-parity` see those reads.
+- **The silent-override-ignored failure is structurally unavailable.** No path resolves the four but the kit table and the knob files, so no invocation can substitute a platform default for a consumer's value.
+- **So the residual failure is total and visible, never partial and wrong.** A malformed queue config, which the table validator refuses, drops the **whole** counter group and changes nothing else about the bar — one of the degradations above. A consumer's configured tier silently missing from a rendered tally has no spelling on this path.
 
-The render cost is one in-process scan per statusline fire, which is the kit's
-most frequent trigger by a wide margin (§The usage.txt contract). A full scan of a
-~3,600-line queue measures in single-digit milliseconds, so the group needs no
-cache — recorded so a later session does not add one on suspicion.
+The render cost is one in-process scan per statusline fire, which is the kit's most frequent trigger by a wide margin (§The usage.txt contract). A full scan of a ~3,600-line queue measures in single-digit milliseconds, so the group needs no cache — recorded so a later session does not add one on suspicion.
 
 ## Trend reporter
 
-`bash gate-sdk/bin/run-gates.sh --emit usage-trend [--] [history-file]` reads
-the history log and reports how the footprint
-evolves — advisory tooling, never a gate: exit **0** report emitted, **2**
-knob unset or history missing/unreadable (fail-closed, mirroring the
-verdict's STALE discipline), never **1** (it renders no verdict; the verdict
-stays the sole pause authority). The source signal is known-noisy — a
-rolling-window reading spikes and reverts-down when a harness over-report is
-corrected by the next push — so the design separates signal from noise by
-the window's one physical constraint: within a segment, true usage never
-decreases.
+`bash gate-sdk/bin/run-gates.sh --emit usage-trend [--] [history-file]` reads the history log and reports how the footprint evolves — advisory tooling, never a gate: exit **0** report emitted, **2** knob unset or history missing/unreadable (fail-closed, mirroring the verdict's STALE discipline), never **1** (it renders no verdict; the verdict stays the sole pause authority). The source signal is known-noisy — a rolling-window reading spikes and reverts-down when a harness over-report is corrected by the next push — so the design separates signal from noise by the window's one physical constraint: within a segment, true usage never decreases.
 
-1. **Segment** samples per axis by that axis's reset epoch, `login_at`,
-   `account`, and `tier`: the 5h axis keys on `resets_at`, the weekly axis
-   on `resets_7d` (the windows roll independently — a weekly segment spans
-   many 5h segments). A timer reset, a `/login`, or an account or tier
-   change each starts a segment; only within-segment comparisons are
-   meaningful, so an account switch is a boundary, not a flagged anomaly.
-2. **Flag** any sample whose pct is below an earlier one in the same segment
-   as a monotonicity violation: the downward correction indicts the elevated
-   sample(s) before it as reader noise, and both sides are excluded from rate
-   math, never averaged in. Median-of-3 smoothing resolves single-sample
-   spikes; segment endpoints keep their own value (no 2-window averaging).
-3. **Report** per segment and axis — first/last smoothed pct, pct-per-hour
-   rate, token deltas when token keys ride, tier, sample count, and
-   suspect-sample count (a high suspect ratio means the producer is
-   unreliable and no number from that segment is trusted). The weekly axis
-   additionally reports headroom against `DELEGATION_KIT_PAUSE_PCT_7D` at the current rate —
-   the planning number for how much delegation the week still affords — and,
-   when `account` is present, segments group under an account heading so a
-   rotating operator reads one weekly trajectory per account rather than an
-   interleaved stream.
+1. **Segment** samples per axis by that axis's reset epoch, `login_at`, `account`, and `tier`: the 5h axis keys on `resets_at`, the weekly axis on `resets_7d` (the windows roll independently — a weekly segment spans many 5h segments). A timer reset, a `/login`, or an account or tier change each starts a segment; only within-segment comparisons are meaningful, so an account switch is a boundary, not a flagged anomaly.
+2. **Flag** any sample whose pct is below an earlier one in the same segment as a monotonicity violation: the downward correction indicts the elevated sample(s) before it as reader noise, and both sides are excluded from rate math, never averaged in. Median-of-3 smoothing resolves single-sample spikes; segment endpoints keep their own value (no 2-window averaging).
+3. **Report** per segment and axis — first/last smoothed pct, pct-per-hour rate, token deltas when token keys ride, tier, sample count, and suspect-sample count (a high suspect ratio means the producer is unreliable and no number from that segment is trusted). The weekly axis additionally reports headroom against `DELEGATION_KIT_PAUSE_PCT_7D` at the current rate — the planning number for how much delegation the week still affords — and, when `account` is present, segments group under an account heading so a rotating operator reads one weekly trajectory per account rather than an interleaved stream.
 
-**The family is `Arm::Emit`, and the *absence* of a 1 is what settles it —
-the exact inverse of the ruling one table row away.** The emitting family maps
-success onto 0 and failure onto 2 and can never return 1
-(gate-sdk/SPEC.md §The non-gate arm); §usage-verdict is an `Arm::Run`
-**because** its 1 is the blocking signal a hook grades, so an emitting arm
-would collapse it. Here the contract *declares* no 1, so the collapse costs
-nothing and the arm is also a document producer on both halves of the family's
-shape. Spelling and grammar are one decision: the front-end composes
-`--emit-usage-trend` from its own `--emit <name>` operand, so **no new
-front-end `case` arm is added** and a member spelled anything else would be
-reachable by no shipped front-end. Two members, one test, opposite answers —
-which is the clearest statement of what that test asks.
+**The family is `Arm::Emit`, and the *absence* of a 1 is what settles it — the exact inverse of the ruling one table row away.** The emitting family maps success onto 0 and failure onto 2 and can never return 1 (gate-sdk/SPEC.md §The non-gate arm); §usage-verdict is an `Arm::Run` **because** its 1 is the blocking signal a hook grades, so an emitting arm would collapse it. Here the contract *declares* no 1, so the collapse costs nothing and the arm is also a document producer on both halves of the family's shape. Spelling and grammar are one decision: the front-end composes `--emit-usage-trend` from its own `--emit <name>` operand, so **no new front-end `case` arm is added** and a member spelled anything else would be reachable by no shipped front-end. Two members, one test, opposite answers — which is the clearest statement of what that test asks.
 
-**One consequence of taking the `--emit` family is where usage now lives, and
-it is not where a reader would guess.** The front-end's `--help` gives every
-non-gate arm holding its own `case` arm a named line and a paragraph, but the
-`--emit-` family gets one generic line and enumerates no member — so this arm's
-usage is **not** in the front-end's help text and is not owed there. It lives at
-the member's own **shape refusal**: `--emit usage-trend --help` prints the usage
-block at exit 2, where the shell form assigned the flag straight into the
-history path and answered `cannot read --help`. That is the discoverability half
-of the `bin/`-tool contract closed (gate-sdk/SPEC.md §The bin/-tool contract) —
-by the refusal rather than by the front-end.
+**One consequence of taking the `--emit` family is where usage now lives, and it is not where a reader would guess.** The front-end's `--help` gives every non-gate arm holding its own `case` arm a named line and a paragraph, but the `--emit-` family gets one generic line and enumerates no member — so this arm's usage is **not** in the front-end's help text and is not owed there. It lives at the member's own **shape refusal**: `--emit usage-trend --help` prints the usage block at exit 2, where the shell form assigned the flag straight into the history path and answered `cannot read --help`. That is the discoverability half of the `bin/`-tool contract closed (gate-sdk/SPEC.md §The bin/-tool contract) — by the refusal rather than by the front-end.
 
-**The `[history-file]` positional survives; the argv shape gains three
-behaviours the shell form never had.** The positional is an argument the rule
-itself consumes rather than a selector for where configuration comes from, so it
-ports unchanged and still overrides the configured path for test injection —
-resolved *lazily*, the knob read only when no positional rides, which is
-`${1:-…}`'s own semantics. Added with the port: a positional beginning with `-`
-that is not a recognized option is a refusal (usage on stderr, exit 2), `--`
-ends option processing so a dash-led path stays reachable, and the `-h`/`--help`
-arm is that refusal's named instance. **No arity refusal is added** — a second
-and later positional is ignored exactly as the shell ignored it, because
-tightening it would turn an accepted invocation into a refusal.
+**The `[history-file]` positional survives; the argv shape gains three behaviours the shell form never had.** The positional is an argument the rule itself consumes rather than a selector for where configuration comes from, so it ports unchanged and still overrides the configured path for test injection — resolved *lazily*, the knob read only when no positional rides, which is `${1:-…}`'s own semantics. Added with the port: a positional beginning with `-` that is not a recognized option is a refusal (usage on stderr, exit 2), `--` ends option processing so a dash-led path stays reachable, and the `-h`/`--help` arm is that refusal's named instance. **No arity refusal is added** — a second and later positional is ignored exactly as the shell ignored it, because tightening it would turn an accepted invocation into a refusal.
 
-**The declared knob roster is `DELEGATION_KIT_USAGE_HISTORY` and
-`DELEGATION_KIT_PAUSE_PCT_7D`, and neither is minted.** Both are rows of
-delegation-kit's static table (§Layout and configuration), so a default hardcoded
-in the reader would work in this repo and break silently for a consumer that
-overrides either — this tree overrides the history path and does *not* override
-the ceiling, so the headroom line here runs on the kit default. The two differ in
-how absence reads: the history knob's own default **is** the empty string, so an
-unset knob and a configured-empty one are one reading and take this tool's own
-"unset — no history to report" diagnostic; the ceiling's default is a real value,
-so a failed read of it is a resolution failure and surfaces as one.
+**The declared knob roster is `DELEGATION_KIT_USAGE_HISTORY` and `DELEGATION_KIT_PAUSE_PCT_7D`, and neither is minted.** Both are rows of delegation-kit's static table (§Layout and configuration), so a default hardcoded in the reader would work in this repo and break silently for a consumer that overrides either — this tree overrides the history path and does *not* override the ceiling, so the headroom line here runs on the kit default. The two differ in how absence reads: the history knob's own default **is** the empty string, so an unset knob and a configured-empty one are one reading and take this tool's own "unset — no history to report" diagnostic; the ceiling's default is a real value, so a failed read of it is a resolution failure and surfaces as one.
 
-**The wire shape is a contract, not an implementation detail, because the
-producer is already compiled and untouched by this port.** `--usage-verdict`
-appends the sample line (§The usage.txt contract) with optional keys **omitted
-rather than emitted empty**, so the reader defaults a missing `account` or
-`tier` to `-`, a missing `login_at` to `0`, and a missing `verdict`,
-`tokens_in` or `tokens_out` to `-`. Each default is the reader's half of that
-rule, and dropping one would turn an absent optional key into a parse failure on
-a line the producer is entitled to write. The two-axis emission is the same
-contract: a 5h record per sample, and a weekly one only when **both** weekly
-keys ride — presence of the key, not a non-empty value — so a log without them
-yields 5h segments alone rather than an error.
+**The wire shape is a contract, not an implementation detail, because the producer is already compiled and untouched by this port.** `--usage-verdict` appends the sample line (§The usage.txt contract) with optional keys **omitted rather than emitted empty**, so the reader defaults a missing `account` or `tier` to `-`, a missing `login_at` to `0`, and a missing `verdict`, `tokens_in` or `tokens_out` to `-`. Each default is the reader's half of that rule, and dropping one would turn an absent optional key into a parse failure on a line the producer is entitled to write. The two-axis emission is the same contract: a 5h record per sample, and a weekly one only when **both** weekly keys ride — presence of the key, not a non-empty value — so a log without them yields 5h segments alone rather than an error.
 
-**The segment order is a contract the reader reproduces, and its tie rule is a
-byte comparison of the whole record rather than input order.** Records sort by
-account, axis and tier bytewise — `LC_ALL=C`'s effect, which a byte-ordered
-`str` comparison already has, so a locale-aware comparator would be a silent
-divergence on a non-ASCII account name — then by `login_at`, the axis reset and
-`updated_at` numerically, a value carrying no numeric prefix reading as zero.
-The segmenter keys on that tuple **as text** and flushes on change, so a
-different order silently yields different segments rather than a differently
-ordered report, and reading a number out of the tuple would merge a boundary two
-spellings of one epoch keep apart. The last resort is the seventh comparison and
-it is load-bearing: GNU `sort` absent `-s` falls back to comparing the **whole
-line**, which is not what a merely stable sort does — a stable sort keeps input
-order, and on a full-key tie the two choose different segment endpoints and
-therefore print different token deltas. That difference was measured at the
-port, not reasoned about.
+**The segment order is a contract the reader reproduces, and its tie rule is a byte comparison of the whole record rather than input order.** Records sort by account, axis and tier bytewise — `LC_ALL=C`'s effect, which a byte-ordered `str` comparison already has, so a locale-aware comparator would be a silent divergence on a non-ASCII account name — then by `login_at`, the axis reset and `updated_at` numerically, a value carrying no numeric prefix reading as zero. The segmenter keys on that tuple **as text** and flushes on change, so a different order silently yields different segments rather than a differently ordered report, and reading a number out of the tuple would merge a boundary two spellings of one epoch keep apart. The last resort is the seventh comparison and it is load-bearing: GNU `sort` absent `-s` falls back to comparing the **whole line**, which is not what a merely stable sort does — a stable sort keeps input order, and on a full-key tie the two choose different segment endpoints and therefore print different token deltas. That difference was measured at the port, not reasoned about.
 
-**One option of a live deferred question leaves the design space with the shell
-file.** That question's option (c) is *give this tool
-an uppercase-token `# exit:` header*, one line against a still-owed shell file
-restoring a nonzero map for a gate whose live reach is already zero. The file is
-gone, so (c) is foreclosed; the gate is not broken by that, because it resolves
-a callee only through the own-kit-`bin/` convention and its scan roots are
-`smoke/` and `gate-tests/` rather than `bin/`, so deleting a `bin/` member
-changes what it can *resolve* and not what it *scans*
-(gate-sdk/SPEC.md §check-assertion-strength).
+**One option of a live deferred question leaves the design space with the shell file.** That question's option (c) is *give this tool an uppercase-token `# exit:` header*, one line against a still-owed shell file restoring a nonzero map for a gate whose live reach is already zero. The file is gone, so (c) is foreclosed; the gate is not broken by that, because it resolves a callee only through the own-kit-`bin/` convention and its scan roots are `smoke/` and `gate-tests/` rather than `bin/`, so deleting a `bin/` member changes what it can *resolve* and not what it *scans* (gate-sdk/SPEC.md §check-assertion-strength).
 
 ## bin/wait-probe
 
-`bash gate-sdk/bin/run-gates.sh --wait-probe <subcommand> [args]` is the
-instrument behind §Operative residency's wait-primitive
-measurement: it stands a **known-duration producer** up and exercises candidate
-wait forms against it, recording one line per trial. Hand-invoked, no trigger,
-wired into **no** tier — it launches processes and sleeps for its declared
-durations, so a gate tier would put a multi-second sleep on every commit for a
-measurement bought once. Its precedent for existing at all is the adoption
-walkthrough (`--run-demo`, gate-sdk/SPEC.md §Consumer smoke), a runnable artifact
-a session invokes by hand — and the precedent reads stronger since that
-walkthrough ported: it is now an arm, which is what this member is. It writes
-nothing tracked:
-producers, markers and launch records go to
-`GATE_SDK_TMP_DIR`, trials to the capture-tier evidence file below, and it mints
-no knob of its own for either (§Layout and configuration owns why).
+`bash gate-sdk/bin/run-gates.sh --wait-probe <subcommand> [args]` is the instrument behind §Operative residency's wait-primitive measurement: it stands a **known-duration producer** up and exercises candidate wait forms against it, recording one line per trial. Hand-invoked, no trigger, wired into **no** tier — it launches processes and sleeps for its declared durations, so a gate tier would put a multi-second sleep on every commit for a measurement bought once. Its precedent for existing at all is the adoption walkthrough (`--run-demo`, gate-sdk/SPEC.md §Consumer smoke), a runnable artifact a session invokes by hand — and the precedent reads stronger since that walkthrough ported: it is now an arm, which is what this member is. It writes nothing tracked: producers, markers and launch records go to `GATE_SDK_TMP_DIR`, trials to the capture-tier evidence file below, and it mints no knob of its own for either (§Layout and configuration owns why).
 
-**Six subcommands, and the subcommand word is an operand rather than part of the
-flag**: `produce`, `waiter`, `arm-local`, `record`, `report`, `sweep`. That is
-`--hook`'s shape, which also settles the arity question — the front-end hands the
-binary an arm's own argv unchanged, so a subcommand-bearing arm is a solved
-registration rather than a new one (gate-sdk/SPEC.md §The non-gate arm).
+**Six subcommands, and the subcommand word is an operand rather than part of the flag**: `produce`, `waiter`, `arm-local`, `record`, `report`, `sweep`. That is `--hook`'s shape, which also settles the arity question — the front-end hands the binary an arm's own argv unchanged, so a subcommand-bearing arm is a solved registration rather than a new one (gate-sdk/SPEC.md §The non-gate arm).
 
-**It is an `Arm::Run` arm-table row with its own front-end case arm, and it cannot be an
-`--emit-` member**, for two independent reasons. The exit contract is the first:
-the emitting family maps success to 0 and failure to 2, so it can never return the
-**1** below. The second stands without it — four of the six subcommands emit no
-document at all, standing processes up, writing launch records and appending a
-trial line, so the `--emit-` spelling would be a stretch this member has no claim
-to. It joins the arms that take their own spelling for their own contract.
+**It is an `Arm::Run` arm-table row with its own front-end case arm, and it cannot be an `--emit-` member**, for two independent reasons. The exit contract is the first: the emitting family maps success to 0 and failure to 2, so it can never return the **1** below. The second stands without it — four of the six subcommands emit no document at all, standing processes up, writing launch records and appending a trial line, so the `--emit-` spelling would be a stretch this member has no claim to. It joins the arms that take their own spelling for their own contract.
 
-**Two declared knobs and the port minted none**: `GATE_SDK_TMP_DIR` and
-`GATE_SDK_WORKFLOW_DIR`, the two the instrument already read. Both resolve in
-process from gate-sdk's table, and the arm's status survives the front-end's exec
-verbatim because `exec` replaces the shell's process image — so a dispatch failure is the
-only path on which the front-end's own unavailable status is reachable.
+**Two declared knobs and the port minted none**: `GATE_SDK_TMP_DIR` and `GATE_SDK_WORKFLOW_DIR`, the two the instrument already read. Both resolve in process from gate-sdk's table, and the arm's status survives the front-end's exec verbatim because `exec` replaces the shell's process image — so a dispatch failure is the only path on which the front-end's own unavailable status is reachable.
 
-**The exit contract is three-state**: **0** on a completed subcommand, **1** for
-`report` with no trials recorded, **2** on misuse. The `1` is contract rather than
-a latent defect, and the tempting collapse is refused on the instrument's own
-subject: *no trials recorded* is not misuse. The invocation is well formed and the
-tool ran; 1 is its substantive finding that there is nothing to classify, and
-folding it into the misuse code would make an honest empty reading
-indistinguishable from a typo — on the one tool whose entire value is telling **a
-reading from a non-reading**, which is the harm gate-sdk/SPEC.md §The bin/-tool
-contract records against the crossing clause. That contract's split binds here:
-the argv-shape refusal and the `--` escape cross to the arm, while the
-`-h`/`--help` arm retires to the front-end. What a front-end's one-line summary
-cannot carry is a six-entry subcommand roster, so the arm keeps its roster print on
-the **misuse** path — stderr, exit 2 — which is not the help arm.
+**The exit contract is three-state**: **0** on a completed subcommand, **1** for `report` with no trials recorded, **2** on misuse. The `1` is contract rather than a latent defect, and the tempting collapse is refused on the instrument's own subject: *no trials recorded* is not misuse. The invocation is well formed and the tool ran; 1 is its substantive finding that there is nothing to classify, and folding it into the misuse code would make an honest empty reading indistinguishable from a typo — on the one tool whose entire value is telling **a reading from a non-reading**, which is the harm gate-sdk/SPEC.md §The bin/-tool contract records against the crossing clause. That contract's split binds here: the argv-shape refusal and the `--` escape cross to the arm, while the `-h`/`--help` arm retires to the front-end. What a front-end's one-line summary cannot carry is a six-entry subcommand roster, so the arm keeps its roster print on the **misuse** path — stderr, exit 2 — which is not the help arm.
 
-**Three parts of the instrument stay shell, and each has its own ground**, because
-a reader who accepts one may not accept the others. This is gate-sdk/SPEC.md §The
-port-candidate criteria's *the program is the rule* clause applied where the
-program decides a **measurement** rather than an assertion:
+**Three parts of the instrument stay shell, and each has its own ground**, because a reader who accepts one may not accept the others. This is gate-sdk/SPEC.md §The port-candidate criteria's *the program is the rule* clause applied where the program decides a **measurement** rather than an assertion:
 
-- **The wait body.** The `until [ -f <marker> ]` / `until kill -0 <pid>` loop is
-  not an implementation of the instrument — it **is the artifact under
-  measurement**, the exact form `templates/agent-execution.md` prescribes and the
-  exact form guard-kit's loop-polarity rules are shaped to. A compiled loop would
-  measure a form no session ever runs, a silent change of subject on an instrument
-  whose whole output is evidence for a protocol clause. The loop and its four exit
-  traps are one constant the arm **execs** into, so *every form arms the same wait
-  body* is now one constant and one exec path rather than a claim about a script.
-- **The arming of the `local` form.** `arm-local` is defined as arming the waiter
-  as a **detached shell child**, the harness-uninvolved control; a crate-armed
-  child would make that form's name false, and the *form* axis is a measured axis.
-  The arming stays `nohup … &` inside a shell literal, with the launched PID read
-  back and written to the `<key>.run` record.
-- **The producer's launch, and this one is a hazard rather than a definition.** A
-  shell's backgrounded child is **reaped**, so `kill -0` on its recorded PID
-  correctly fails once it exits. A compiled child whose parent outlives it leaves a
-  **zombie**, and `kill -0` on a zombie **succeeds** — which would invert
-  `producer_alive_at_exit` on every trial while the instrument reported clean, and
-  that field is read to establish the *producer verifiably alive* condition that is
-  cause (i)'s whole tell. Keeping the launch in a shell keeps the reaping, and
-  keeping the reaping keeps the field true.
+- **The wait body.** The `until [ -f <marker> ]` / `until kill -0 <pid>` loop is not an implementation of the instrument — it **is the artifact under measurement**, the exact form `templates/agent-execution.md` prescribes and the exact form guard-kit's loop-polarity rules are shaped to. A compiled loop would measure a form no session ever runs, a silent change of subject on an instrument whose whole output is evidence for a protocol clause. The loop and its four exit traps are one constant the arm **execs** into, so *every form arms the same wait body* is now one constant and one exec path rather than a claim about a script.
+- **The arming of the `local` form.** `arm-local` is defined as arming the waiter as a **detached shell child**, the harness-uninvolved control; a crate-armed child would make that form's name false, and the *form* axis is a measured axis. The arming stays `nohup … &` inside a shell literal, with the launched PID read back and written to the `<key>.run` record.
+- **The producer's launch, and this one is a hazard rather than a definition.** A shell's backgrounded child is **reaped**, so `kill -0` on its recorded PID correctly fails once it exits. A compiled child whose parent outlives it leaves a **zombie**, and `kill -0` on a zombie **succeeds** — which would invert `producer_alive_at_exit` on every trial while the instrument reported clean, and that field is read to establish the *producer verifiably alive* condition that is cause (i)'s whole tell. Keeping the launch in a shell keeps the reaping, and keeping the reaping keeps the field true.
 
-**The arm `exec`s into the wait body rather than spawning and waiting on it, and
-the ground is measurement validity.** Backgrounding the wait puts **one** process
-between the harness and the loop. An arm that spawned the loop would put two, and
-the reaping cause the instrument exists to detect is a property of the process the
-harness signals; `exec` preserves the depth and the signal disposition, so the
-measured configuration is the one a session runs.
+**The arm `exec`s into the wait body rather than spawning and waiting on it, and the ground is measurement validity.** Backgrounding the wait puts **one** process between the harness and the loop. An arm that spawned the loop would put two, and the reaping cause the instrument exists to detect is a property of the process the harness signals; `exec` preserves the depth and the signal disposition, so the measured configuration is the one a session runs.
 
-**The retained shell dependencies are declared rather than hidden**: the arm spawns
-`bash`, and through it `nohup`, `sleep` and `date`. The first is on
-`GATE_SDK_PROGRAM_FLOOR` and the middle two are not, and that is stated as a cost
-rather than a dividend the port could claim: under the criterion's own ruling they
-are the rule's semantic content — a known-duration producer *is* a `sleep`, and a
-detached shell child *is* what `nohup … &` produces — so they are declared
-dependencies and not port work. The floor does not move, a consumer lacking either
-getting the failure it already got; what changes is only that the dependency is
-visible in a declared prose set instead of sitting in an unregistered script. What
-**left** the set is the instrument's text processing — `awk`, `sed`, `cut`, `cat`,
-`tail`, `mkdir`, `rm` and `dirname` — which is what the port compiled.
+**The retained shell dependencies are declared rather than hidden**: the arm spawns `bash`, and through it `nohup`, `sleep` and `date`. The first is on `GATE_SDK_PROGRAM_FLOOR` and the middle two are not, and that is stated as a cost rather than a dividend the port could claim: under the criterion's own ruling they are the rule's semantic content — a known-duration producer *is* a `sleep`, and a detached shell child *is* what `nohup … &` produces — so they are declared dependencies and not port work. The floor does not move, a consumer lacking either getting the failure it already got; what changes is only that the dependency is visible in a declared prose set instead of sitting in an unregistered script. What **left** the set is the instrument's text processing — `awk`, `sed`, `cut`, `cat`, `tail`, `mkdir`, `rm` and `dirname` — which is what the port compiled.
 
-**One trial** is: launch a producer that sleeps a declared duration and then writes
-a completion marker; record its PID at launch in a `<key>.run` file exactly as
-`templates/agent-execution.md` mandates — the rule applies to the instrument that
-measures it, so the probe's own producers are visible to `check-producer-liveness`
-and to guard rule 14 like any other; arm the wait form under test; and record
-whether the waiter exited **before** the marker appeared. That before/after
-relation is the whole measurement: a waiter that outlives its condition is
-working, and one that exits early is the observed failure.
+**One trial** is: launch a producer that sleeps a declared duration and then writes a completion marker; record its PID at launch in a `<key>.run` file exactly as `templates/agent-execution.md` mandates — the rule applies to the instrument that measures it, so the probe's own producers are visible to `check-producer-liveness` and to guard rule 14 like any other; arm the wait form under test; and record whether the waiter exited **before** the marker appeared. That before/after relation is the whole measurement: a waiter that outlives its condition is working, and one that exits early is the observed failure.
 
-**The `<key>.run` record's shape is a contract and its coupling is at run time
-rather than in any scan.** `check-producer-liveness` does not read this
-instrument's source; it reads the two-field `pid=<n> run=<key>` line the
-instrument leaves in the scratch directory, exactly as guard rule 14 does. Stated
-because it is the failure a re-implementation is likeliest to ship and no gate
-would report it: a form writing a differently-shaped record would leave its own
-producers **invisible** to the align-entry refusal and to the tracked-tree
-mutation guard, and every battery would stay green.
+**The `<key>.run` record's shape is a contract and its coupling is at run time rather than in any scan.** `check-producer-liveness` does not read this instrument's source; it reads the two-field `pid=<n> run=<key>` line the instrument leaves in the scratch directory, exactly as guard rule 14 does. Stated because it is the failure a re-implementation is likeliest to ship and no gate would report it: a form writing a differently-shaped record would leave its own producers **invisible** to the align-entry refusal and to the tracked-tree mutation guard, and every battery would stay green.
 
-**The producer's duration is swept, not fixed**, because a single duration cannot
-distinguish the candidate causes. The probe reads no harness internals and asserts
-no ceiling; it varies the input and reports where the behavior changes.
+**The producer's duration is swept, not fixed**, because a single duration cannot distinguish the candidate causes. The probe reads no harness internals and asserts no ceiling; it varies the input and reports where the behavior changes.
 
-**Two axes, and the second is what the instrument earns its keep on.** The *form*
-axis varies how the wait is armed. The *predicate* axis varies what the loop tests
-— a completion marker, or the producer's liveness. A form-only instrument can
-report that a form failed and can never report **why**, and the attested failures
-turned out to sit on the predicate axis, which a form-only sweep would have
-recorded as unexplained. Both axes are swept in the same run on identical
-producers, so no cell's result rests on a comparison with a differently-shaped
-trial, and every form arms the **same** wait body.
+**Two axes, and the second is what the instrument earns its keep on.** The *form* axis varies how the wait is armed. The *predicate* axis varies what the loop tests — a completion marker, or the producer's liveness. A form-only instrument can report that a form failed and can never report **why**, and the attested failures turned out to sit on the predicate axis, which a form-only sweep would have recorded as unexplained. Both axes are swept in the same run on identical producers, so no cell's result rests on a comparison with a differently-shaped trial, and every form arms the **same** wait body.
 
-**The per-trial line.** Every field has a named reader and the field set is closed
-at these:
+**The per-trial line.** Every field has a named reader and the field set is closed at these:
 
-- **`form`** — which wait form the trial armed. Read at the comparison; the only
-  field that distinguishes the candidates.
-- **`predicate`** — what the loop tested. Read at the classification, and it is
-  what separates a failing *form* from a failing *condition*.
-- **`producer_ms`** — the producer's declared duration. Read at the sweep analysis:
-  a ceiling shows as a threshold in this field.
-- **`waiter_exit`** — the waiter's exit status. Read at the classification, to
-  separate a signal status from a clean zero with the marker absent.
-- **`marker_at_ms`**, **`waiter_at_ms`** — elapsed wall-clock at the marker's
-  appearance and at the waiter's exit. Read **together and only together**: their
-  *order* is the measurement and neither alone says anything.
-- **`producer_alive_at_exit`** — whether the recorded PID still answered `kill -0`
-  when the waiter exited, establishing the *producer verifiably alive* condition —
-  on the recorded PID and never a process-table pattern, which is the protocol's
-  own rule.
-- **`class`** — `ok` on a clean trial; otherwise the cause, from the closed list
-  below.
+- **`form`** — which wait form the trial armed. Read at the comparison; the only field that distinguishes the candidates.
+- **`predicate`** — what the loop tested. Read at the classification, and it is what separates a failing *form* from a failing *condition*.
+- **`producer_ms`** — the producer's declared duration. Read at the sweep analysis: a ceiling shows as a threshold in this field.
+- **`waiter_exit`** — the waiter's exit status. Read at the classification, to separate a signal status from a clean zero with the marker absent.
+- **`marker_at_ms`**, **`waiter_at_ms`** — elapsed wall-clock at the marker's appearance and at the waiter's exit. Read **together and only together**: their *order* is the measurement and neither alone says anything.
+- **`producer_alive_at_exit`** — whether the recorded PID still answered `kill -0` when the waiter exited, establishing the *producer verifiably alive* condition — on the recorded PID and never a process-table pattern, which is the protocol's own rule.
+- **`class`** — `ok` on a clean trial; otherwise the cause, from the closed list below.
 
-The producer's own PID is **not** logged: the `<key>.run` record already holds it
-for the lifetime the wait needs, and a second copy in an advisory log would be a
-PID with no reader once the trial ends.
+The producer's own PID is **not** logged: the `<key>.run` record already holds it for the lifetime the wait needs, and a second copy in an advisory log would be a PID with no reader once the trial ends.
 
-**The candidate causes are enumerated before the run, not after it**, so a run
-returns a cause rather than an anecdote:
+**The candidate causes are enumerated before the run, not after it**, so a run returns a cause rather than an anecdote:
 
-- **(i) `reaped`** — the harness or the session boundary killed the backgrounded
-  shell. Tell: a signal exit status with the producer still alive.
-- **(ii) `ceiling`** — a wall-clock deadline the form carries. Tell: early exits
-  cluster above one duration and short trials never fail.
-- **(iii) `predicate`** — the condition went true, or could not go false, for a
-  reason unrelated to the producer. Tell: a clean **zero** exit with the marker
-  absent, reproducing on a form the harness never touched.
-- **(iv) `unexplained`** — recorded as such and reported as such. A closed list
-  that cannot say *I do not know* would force a wrong attribution, which is the
-  failure the enumeration exists to avoid.
+- **(i) `reaped`** — the harness or the session boundary killed the backgrounded shell. Tell: a signal exit status with the producer still alive.
+- **(ii) `ceiling`** — a wall-clock deadline the form carries. Tell: early exits cluster above one duration and short trials never fail.
+- **(iii) `predicate`** — the condition went true, or could not go false, for a reason unrelated to the producer. Tell: a clean **zero** exit with the marker absent, reproducing on a form the harness never touched.
+- **(iv) `unexplained`** — recorded as such and reported as such. A closed list that cannot say *I do not know* would force a wrong attribution, which is the failure the enumeration exists to avoid.
 
-**The honest limit, and it is a division of labour rather than a defect.** Cause
-(ii)'s tell is a **threshold across the sweep**, so no single line can carry it:
-`record` classifies from the tells a trial can see on its own and the `report` arm
-is the only reader that sees the sweep whole and can name (ii). A reader taking a
-line's `class` for the run's verdict has read the wrong surface. The second limit
-is scope: the probe arms the forms a shell can arm and the *session* arms the
-harness's own, calling `record` for each — the tool cannot invoke a harness tool
-parameter, so a run that measures the harness forms is a session's run and `sweep`
-is the harness-uninvolved reproducer a second machine executes.
+**The honest limit, and it is a division of labour rather than a defect.** Cause (ii)'s tell is a **threshold across the sweep**, so no single line can carry it: `record` classifies from the tells a trial can see on its own and the `report` arm is the only reader that sees the sweep whole and can name (ii). A reader taking a line's `class` for the run's verdict has read the wrong surface. The second limit is scope: the probe arms the forms a shell can arm and the *session* arms the harness's own, calling `record` for each — the tool cannot invoke a harness tool parameter, so a run that measures the harness forms is a session's run and `sweep` is the harness-uninvolved reproducer a second machine executes.
 
-**What is compiled is the instrument *around* the subject**, which is the whole of
-the seam above read from the other side. `record`'s trial-line assembly and its
-four-arm cause attribution are text and arithmetic over files the subject wrote, so
-they move without a seam question. `report`'s verdict block moves with them — the
-per-cell tallies, the **ceiling tell**, and the predicate-shaped conclusion — which
-is where the honest limit above is actually enforced, and it is the one verdict no
-trial line can carry, so it is the one a re-expression can silently drop. `sweep`'s
-orchestration moves too, and it keeps the recorded-PID liveness predicate **and its
-`while` polarity**: a `sweep` written `until` would reproduce, inside the
-instrument, the defect the instrument found. `produce`, `waiter` and `arm-local`
-move their bookkeeping only — the `t0` stamp, the marker and heartbeat paths, the
-`<key>.run` write, the PID read-back — and keep their shell literals.
+**What is compiled is the instrument *around* the subject**, which is the whole of the seam above read from the other side. `record`'s trial-line assembly and its four-arm cause attribution are text and arithmetic over files the subject wrote, so they move without a seam question. `report`'s verdict block moves with them — the per-cell tallies, the **ceiling tell**, and the predicate-shaped conclusion — which is where the honest limit above is actually enforced, and it is the one verdict no trial line can carry, so it is the one a re-expression can silently drop. `sweep`'s orchestration moves too, and it keeps the recorded-PID liveness predicate **and its `while` polarity**: a `sweep` written `until` would reproduce, inside the instrument, the defect the instrument found. `produce`, `waiter` and `arm-local` move their bookkeeping only — the `t0` stamp, the marker and heartbeat paths, the `<key>.run` write, the PID read-back — and keep their shell literals.
 
-**The duration sweep is a constant and deliberately not a knob**, on the same
-reading as the rest: the durations are the instrument's calibration, and a consumer
-varying them would be varying the experiment rather than configuring the tool.
+**The duration sweep is a constant and deliberately not a knob**, on the same reading as the rest: the durations are the instrument's calibration, and a consumer varying them would be varying the experiment rather than configuring the tool.
 
-**The trials land in `.workflow/wait-primitive-evidence.txt`** — capture-tier,
-gitignored, advisory (gate-sdk/SPEC.md §The workflow directory), declared on the
-close-surface roster (lifecycle-kit/SPEC.md §The close-surface roster) naming its
-own clear as the reclaim path:
+**The trials land in `.workflow/wait-primitive-evidence.txt`** — capture-tier, gitignored, advisory (gate-sdk/SPEC.md §The workflow directory), declared on the close-surface roster (lifecycle-kit/SPEC.md §The close-surface roster) naming its own clear as the reclaim path:
 
 close-surface: .workflow/wait-primitive-evidence.txt advisory reclaim=: > .workflow/wait-primitive-evidence.txt
 
-`advisory` rather than `forced`, on the reasoning §The turn-end liveness hook's
-log already takes: nothing refuses a close that skips it, and a visible skip is
-the honest mode for a probe. The **finding** — the branch the trials select and
-its grounds — lands in this SPEC, never in the log; the log is evidence, and
-evidence is not the record.
+`advisory` rather than `forced`, on the reasoning §The turn-end liveness hook's log already takes: nothing refuses a close that skips it, and a visible skip is the honest mode for a probe. The **finding** — the branch the trials select and its grounds — lands in this SPEC, never in the log; the log is evidence, and evidence is not the record.
 
-**This section is discharged, and the discharge is narrower than the kit's other
-one — narrow enough that stating the difference is this section's contribution to
-the port record.** There, a section's entire contract went in-crate. Here the
-*instrument* goes in-crate and its **subject** does not, so the section records
-itself discharged **with a named shell residue that is not residue**: the wait
-body, the local arming and the producer's launch are the artifact under test, not
-work left undone. A later reader counting a kit's owed sections needs both halves,
-because the second half is the one that looks like an unfinished port and is not.
+**This section is discharged, and the discharge is narrower than the kit's other one — narrow enough that stating the difference is this section's contribution to the port record.** There, a section's entire contract went in-crate. Here the *instrument* goes in-crate and its **subject** does not, so the section records itself discharged **with a named shell residue that is not residue**: the wait body, the local arming and the producer's launch are the artifact under test, not work left undone. A later reader counting a kit's owed sections needs both halves, because the second half is the one that looks like an unfinished port and is not.
 
 ## Layout and configuration
 
@@ -3339,576 +682,75 @@ delegation-kit/
   smoke/violation.sh
 ```
 
-**The wait-primitive probe's port retired no knob, and the roster says so rather
-than leaving a reader to infer the pattern from the cut before it.** That cut took
-this kit's last holder of a default site and the knob left with it; this one
-cannot, because the probe's two reads are `GATE_SDK_TMP_DIR` and
-`GATE_SDK_WORKFLOW_DIR` — gate-sdk knobs with many other holders each, declared on
-the arm's own roster (§bin/wait-probe) and defaulted by gate-sdk rather than
-here. Nothing in this kit's configuration moved for it, which is the fact a
-reader tracking the pattern needs.
+**The wait-primitive probe's port retired no knob, and the roster says so rather than leaving a reader to infer the pattern from the cut before it.** That cut took this kit's last holder of a default site and the knob left with it; this one cannot, because the probe's two reads are `GATE_SDK_TMP_DIR` and `GATE_SDK_WORKFLOW_DIR` — gate-sdk knobs with many other holders each, declared on the arm's own roster (§bin/wait-probe) and defaulted by gate-sdk rather than here. Nothing in this kit's configuration moved for it, which is the fact a reader tracking the pattern needs.
 
-Config is a **knob file**: copy `templates/delegation-config.knobs` into the gates
-dir as `delegation-config.knobs` (or point `DELEGATION_KIT_KNOB_FILE` elsewhere) and
-set any knob below; defaults fill what the file leaves unset. delegation-kit's
-knobs are **static**: the binary resolves them in process from its own defaults
-table and the consumer's knob file; `bash gate-sdk/bin/run-gates.sh --emit knob-roster`
-prints each one with its shape and rendered default. A gitignored
-`delegation-config.local.knobs` in the gates dir is the home for a private value a
-tracked file cannot carry. The grammar, that `.local` overlay, the
-environment-over-file precedence for a scalar, and the refusals — a set
-`DELEGATION_KIT_KNOB_FILE` that does not exist, a left-behind `delegation-config.sh`
-or `delegation-config.local.sh`, a non-empty file named by the retired
-`DELEGATION_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob file's. A file value
-for an indexed knob replaces its default whole. The kit's table validator refuses a
-malformed config at exit 2 with every finding — a broken machine gates nothing. A
-derived default below names the knob it reads as `${NAME}`, or as `${NAME:-<default>}` so the roster's rendered literal reads as agreement. Knobs (this repo's layout as defaults):
+Config is a **knob file**: copy `templates/delegation-config.knobs` into the gates dir as `delegation-config.knobs` (or point `DELEGATION_KIT_KNOB_FILE` elsewhere) and set any knob below; defaults fill what the file leaves unset. delegation-kit's knobs are **static**: the binary resolves them in process from its own defaults table and the consumer's knob file; `bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one with its shape and rendered default. A gitignored `delegation-config.local.knobs` in the gates dir is the home for a private value a tracked file cannot carry. The grammar, that `.local` overlay, the environment-over-file precedence for a scalar, and the refusals — a set `DELEGATION_KIT_KNOB_FILE` that does not exist, a left-behind `delegation-config.sh` or `delegation-config.local.sh`, a non-empty file named by the retired `DELEGATION_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob file's. A file value for an indexed knob replaces its default whole. The kit's table validator refuses a malformed config at exit 2 with every finding — a broken machine gates nothing. A derived default below names the knob it reads as `${NAME}`, or as `${NAME:-<default>}` so the roster's rendered literal reads as agreement. Knobs (this repo's layout as defaults):
 
-- `DELEGATION_KIT_USAGE_FILE` — default empty, and empty means *derive it*: the
-  reader fills `<config-home>/usage.txt`, the config home being
-  `CLAUDE_CONFIG_DIR` when set non-empty and `$HOME/.claude` otherwise — the
-  crate's one config-home derivation (lifecycle-kit/SPEC.md §bin/session-id.sh),
-  which `DRIFT_KIT_SESSIONS_DIR` shares. The derivation sits at the reader rather
-  than in the table because the harness home is read from the environment and is
-  no knob a derived row could declare as its input. The statusline, the poller
-  and `--usage-verdict` read this knob, `DELEGATION_KIT_CRED_FILE` and
-  `DELEGATION_KIT_ACCOUNT_CONFIG` through that one fill and never directly.
-  Positional `$1` overrides (test injection).
-- `DELEGATION_KIT_CRED_FILE` — derived from `${DELEGATION_KIT_USAGE_FILE}`:
-  `.credentials.json` in that file's directory when the usage file is set
-  non-empty, and empty otherwise, which the reader fills as `.credentials.json`
-  beside the derived usage file. Positional `$2` overrides.
-- `DELEGATION_KIT_ACCOUNT_CONFIG` — the harness config the account uuid is read
-  out of, for the snapshot's optional `account` field; default empty, and empty
-  means *derive it*: the reader fills `$HOME/.claude.json`. Both usage producers
-  read it and neither requires it: an unreadable file leaves the field unwritten
-  rather than failing the cycle.
-- `DELEGATION_KIT_USAGE_ENDPOINT` — the poll producer's usage source; default
-  `https://api.anthropic.com/api/oauth/usage`. The test seam (a `file://` stub)
-  and the stability valve when the unpublished source moves (§The usage.txt
-  contract).
+- `DELEGATION_KIT_USAGE_FILE` — default empty, and empty means *derive it*: the reader fills `<config-home>/usage.txt`, the config home being `CLAUDE_CONFIG_DIR` when set non-empty and `$HOME/.claude` otherwise — the crate's one config-home derivation (lifecycle-kit/SPEC.md §bin/session-id.sh), which `DRIFT_KIT_SESSIONS_DIR` shares. The derivation sits at the reader rather than in the table because the harness home is read from the environment and is no knob a derived row could declare as its input. The statusline, the poller and `--usage-verdict` read this knob, `DELEGATION_KIT_CRED_FILE` and `DELEGATION_KIT_ACCOUNT_CONFIG` through that one fill and never directly. Positional `$1` overrides (test injection).
+- `DELEGATION_KIT_CRED_FILE` — derived from `${DELEGATION_KIT_USAGE_FILE}`: `.credentials.json` in that file's directory when the usage file is set non-empty, and empty otherwise, which the reader fills as `.credentials.json` beside the derived usage file. Positional `$2` overrides.
+- `DELEGATION_KIT_ACCOUNT_CONFIG` — the harness config the account uuid is read out of, for the snapshot's optional `account` field; default empty, and empty means *derive it*: the reader fills `$HOME/.claude.json`. Both usage producers read it and neither requires it: an unreadable file leaves the field unwritten rather than failing the cycle.
+- `DELEGATION_KIT_USAGE_ENDPOINT` — the poll producer's usage source; default `https://api.anthropic.com/api/oauth/usage`. The test seam (a `file://` stub) and the stability valve when the unpublished source moves (§The usage.txt contract).
 - `DELEGATION_KIT_PAUSE_PCT` — default `80`.
-- `DELEGATION_KIT_PAUSE_PCT_7D` — weekly-axis pause threshold; default `95`,
-  deliberately looser than the 5h axis: a weekly PAUSE is remediated in days,
-  not hours, so pausing at the 5h conservatism would strand a fifth of the
-  week's budget — only the true red zone stops delegation on this axis. Read by
-  `--usage-verdict` and declared by `--emit-usage-trend`, which prints it back
-  verbatim as the headroom line's ceiling (§Trend reporter).
+- `DELEGATION_KIT_PAUSE_PCT_7D` — weekly-axis pause threshold; default `95`, deliberately looser than the 5h axis: a weekly PAUSE is remediated in days, not hours, so pausing at the 5h conservatism would strand a fifth of the week's budget — only the true red zone stops delegation on this axis. Read by `--usage-verdict` and declared by `--emit-usage-trend`, which prints it back verbatim as the headroom line's ceiling (§Trend reporter).
 - `DELEGATION_KIT_STALE_AGE` — default `600` (seconds).
 - `DELEGATION_KIT_LOGIN_WINDOW` — default `600` (seconds).
-- `DELEGATION_KIT_REFRESH_CMD` — the command `usage-verdict` runs before
-  reading the snapshot (§usage-verdict); default empty, which keeps the
-  read-only behavior. It is a **command knob**: an indexed argv, one
-  `DELEGATION_KIT_REFRESH_CMD[] = <element>` line per word, spawned directly with
-  no shell, so it takes no environment override and a command relying on shell
-  syntax names `bash`, `-c` and its command string as three elements. This repo
-  points it at the poll producer through the front-end.
-- `DELEGATION_KIT_REFRESH_MIN_AGE` — the refresh short-circuit (§usage-verdict);
-  default `60` (seconds), validated a non-negative integer by the table validator. The
-  floor is set by the render path, not the dispatch path: the statusline calls
-  the verdict on every render, so the default bounds source traffic to roughly
-  one poll a minute while leaving any dispatch-time reading fresh enough to act
-  on.
-- `DELEGATION_KIT_USAGE_HISTORY` — sample-log path; default empty (sampling
-  off). A consumer points it into its metric directory, a gitignored persistent
-  measurement trend (drift-kit/SPEC.md §Layout and configuration owns the
-  metric-dir retention contract). Written by `--usage-verdict` and declared by
-  `--emit-usage-trend`, whose `[history-file]` positional overrides it; because
-  the default is empty, an unset knob and a configured-empty one are one reading
-  (§Trend reporter).
-- `DELEGATION_KIT_FAN_WIDTH` — read-only-fan-out width bound; default `2`,
-  validated a positive integer by the table validator. It bounds read-only fan-outs
-  only: a committing fan-out serializes or takes its own worktree regardless
-  (the template's **Serialize on shared files; ≤`DELEGATION_KIT_FAN_WIDTH`-wide
-  otherwise** rule), so this knob is never a licence to widen concurrent
-  committers.
-  The default is the loss-bounding invariant — bound the in-flight loss to
-  what the window can absorb when the wall fires mid-flight — at a Pro-class
-  subscription window; a Max-class window absorbs more, and an API-billed
-  operator has no mid-flight window wall at all, so there spend rate and the
-  provider's rate limits replace the rationale. A consumer retunes from the
-  invariant, not the number. **Supervision ceiling:** operator attention over
-  N concurrent reports does not scale with the budget window — a bigger
-  window raises the affordable width, not the reviewable one, so budget is
-  never the sole input to widening. `usage-verdict` surfaces the live value
-  as the `width=` field (§usage-verdict), the knob's mechanical reader.
-- `DELEGATION_KIT_AGENT_DIR` — the directory `check-agent-tier-explicit` walks
-  for agent definitions; default `.claude/agents`, this harness's conventional
-  agent-definition location, validated non-empty by the table validator. Positional `$1`
-  overrides (fixture injection). A consumer whose harness keeps definitions
-  elsewhere repoints it; one with no such directory leaves it and the gate
-  reports its counted-inert clean line (§check-agent-tier-explicit).
-- `DELEGATION_KIT_GATE_FILES` — globs naming gate files for tamper
-  assertion A; default
-  `("${GATE_SDK_GATES_DIR}/check-*.sh" "${GATE_SDK_GATES_DIR}/check-*.gate")`.
-  **Both declaration spellings are on the default**, because a gate's
-  declaration path is `<name>.sh` *or* `<name>.gate`
-  (gate-sdk/SPEC.md §The `# graph:` manifest) — the widening the
-  `check-gate-tamper` row of
-  gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate
-  mandates. The knob names the gate files
-  **beyond** what the reader derives: `check-gate-tamper` unions every
-  registered member's resolved declaration and the gate-sdk library into the
-  resolved value (§Verify after every agent commit), for the reason it unions
-  kit roots into `DELEGATION_KIT_META_PATHS`: a file value replaces the default
-  whole, and a registered gate must stay covered under a consumer's own value.
-  A glob still covers a gate file not yet registered, such as a declaration
-  staged in the same commit that adds it to `gates.list`. The two knobs behave
-  alike: both are replaced whole by a file value, and both are widened by the
-  reader.
-- `DELEGATION_KIT_META_PATHS` — prefixes counted as meta-layer for
-  assertion A; default `("${GATE_SDK_GATES_DIR}/"
-  "${GATE_SDK_WORKFLOW_DIR:-.workflow}/" ".claude/")`; root-level `*.md` is
-  always meta. The reader, `check-gate-tamper`, unions every kit root the binary
-  derives from `GATE_SDK_ROOT` and `GATE_SDK_KIT_DIRS` into the resolved value as a
-  root-relative `<root>/` prefix the value does not already hold, and declares
-  `GATE_SDK_KIT_DIRS` for it — a vendored
-  kit's edits are meta-layer by definition, so the consumer's config need not
-  name kit dirs at all (this repo's keeps only the non-kit prefixes). The union
-  sits at the reader rather than in the default because a file value replaces the
-  default whole, and a kit root must stay meta under a consumer's own value. It is
-  additive, never a filter: a prefix the consumer declared cannot be lost.
-- `DELEGATION_KIT_STOP_LOG` — the turn-end hook's log (§The turn-end liveness
-  hook); default
-  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/subagent-stop-liveness.log`, the same
-  deferral guard-kit's two logs already take. No scratch-dir knob sits beside it:
-  the launch record's home is `${GATE_SDK_TMP_DIR:-.tmp}`, the cross-kit deferral
-  every kit reaching that directory already resolves it through, and a second
-  name for it would be the duplication rather than the config. **The rule has
-  since governed a second artifact and held**: the wait-primitive probe
-  (§bin/wait-probe) writes producers, markers and `<key>.run` records into that
-  same directory and mints no knob of its own for it either — a reading the
-  probe's port did not disturb, `GATE_SDK_TMP_DIR` crossing as one of its two
-  declared knobs rather than being replaced by a kit-local name. It mints none for
-  its evidence log
-  either, and there the reasoning is the narrower one this bullet's own knob does
-  not meet: a knob needs a reader, and `DELEGATION_KIT_STOP_LOG` has one — a
-  *second process*, the consumer-side hook, which must be told where to write.
-  The probe both writes and reads its own log in one arm, so a knob there would
-  be a name nothing reads, and the close stage reaches the file through the
-  roster's literal rather than through a knob.
-- `DELEGATION_KIT_LIVENESS_CMD` — the liveness reader the probe invokes in set
-  mode. It is a **command knob**: an indexed argv, one
-  `DELEGATION_KIT_LIVENESS_CMD[] = <element>` line per word, spawned **directly**
-  with no shell and the scratch dir appended after its last element, so it takes
-  no environment override and may name its own interpreter. Its first element must
-  resolve to an executable program — a path carrying a separator must carry the
-  execute bit, a bare name must resolve on `PATH` — or the override resolves to no
-  reader. It is an **override over a working default**: the default is empty,
-  and empty means the binary's own compiled `check-producer-liveness`, spawned
-  with the gate name and the scratch dir (§The turn-end liveness hook owns why the
-  default is spawned rather than called in process, and why the earlier
-  no-default ruling lapsed). A knob rather than a literal because a consumer's
-  reader may not be this gate at all; the honest-degradation case the section
-  states — every firing logging `verdict=unavailable decision=allow` and refusing
-  nothing — is now reached by an override that resolves to nothing, never by
-  leaving the knob alone.
-- `DELEGATION_KIT_READONLY_TYPES` — agent-type names the consumer dispatches for
-  read-only work; D2's only trigger (§The delegation model). Default empty, in
-  which case D2 is inert by construction. Every entry is the consumer's own
-  agent roster, never the kit's (gate-sdk/SPEC.md §The provenance seam) — the same
-  reasoning that ships `GUARD_KIT_BREADTH_PROBES` with no default probes.
-  Deliberately not knobbed alongside it, each ruled out for a stated reason: a
-  fork-type-name knob and an accepted-isolation-values knob — `fork` and
-  `worktree` are the **harness's** dispatch vocabulary, and a guard carries its
-  harness's tool vocabulary as literals the same way the wakeup-guard member
-  matches `ScheduleWakeup`/`CronCreate` literally, so
-  knobbing them would imply a portability the mechanism does not have; a
-  warn-only or per-rule opt-out — a doctrine downgradable per session is the
-  honour system these rules exist to end, so the valve stays the whole guard's
-  registration, never a finer one; and accepting `isolation: remote` as
-  satisfying D2 — plausibly correct (a remote agent cannot touch the local
-  index) but unverified from here, and remote availability is gated, so it is
-  excluded with its reason recorded rather than admitted on plausibility.
+- `DELEGATION_KIT_REFRESH_CMD` — the command `usage-verdict` runs before reading the snapshot (§usage-verdict); default empty, which keeps the read-only behavior. It is a **command knob**: an indexed argv, one `DELEGATION_KIT_REFRESH_CMD[] = <element>` line per word, spawned directly with no shell, so it takes no environment override and a command relying on shell syntax names `bash`, `-c` and its command string as three elements. This repo points it at the poll producer through the front-end.
+- `DELEGATION_KIT_REFRESH_MIN_AGE` — the refresh short-circuit (§usage-verdict); default `60` (seconds), validated a non-negative integer by the table validator. The floor is set by the render path, not the dispatch path: the statusline calls the verdict on every render, so the default bounds source traffic to roughly one poll a minute while leaving any dispatch-time reading fresh enough to act on.
+- `DELEGATION_KIT_USAGE_HISTORY` — sample-log path; default empty (sampling off). A consumer points it into its metric directory, a gitignored persistent measurement trend (drift-kit/SPEC.md §Layout and configuration owns the metric-dir retention contract). Written by `--usage-verdict` and declared by `--emit-usage-trend`, whose `[history-file]` positional overrides it; because the default is empty, an unset knob and a configured-empty one are one reading (§Trend reporter).
+- `DELEGATION_KIT_FAN_WIDTH` — read-only-fan-out width bound; default `2`, validated a positive integer by the table validator. It bounds read-only fan-outs only: a committing fan-out serializes or takes its own worktree regardless (the template's **Serialize on shared files; ≤`DELEGATION_KIT_FAN_WIDTH`-wide otherwise** rule), so this knob is never a licence to widen concurrent committers. The default is the loss-bounding invariant — bound the in-flight loss to what the window can absorb when the wall fires mid-flight — at a Pro-class subscription window; a Max-class window absorbs more, and an API-billed operator has no mid-flight window wall at all, so there spend rate and the provider's rate limits replace the rationale. A consumer retunes from the invariant, not the number. **Supervision ceiling:** operator attention over N concurrent reports does not scale with the budget window — a bigger window raises the affordable width, not the reviewable one, so budget is never the sole input to widening. `usage-verdict` surfaces the live value as the `width=` field (§usage-verdict), the knob's mechanical reader.
+- `DELEGATION_KIT_AGENT_DIR` — the directory `check-agent-tier-explicit` walks for agent definitions; default `.claude/agents`, this harness's conventional agent-definition location, validated non-empty by the table validator. Positional `$1` overrides (fixture injection). A consumer whose harness keeps definitions elsewhere repoints it; one with no such directory leaves it and the gate reports its counted-inert clean line (§check-agent-tier-explicit).
+- `DELEGATION_KIT_GATE_FILES` — globs naming gate files for tamper assertion A; default `("${GATE_SDK_GATES_DIR}/check-*.sh" "${GATE_SDK_GATES_DIR}/check-*.gate")`. **Both declaration spellings are on the default**, because a gate's declaration path is `<name>.sh` *or* `<name>.gate` (gate-sdk/SPEC.md §The `# graph:` manifest) — the widening the `check-gate-tamper` row of gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate mandates. The knob names the gate files **beyond** what the reader derives: `check-gate-tamper` unions every registered member's resolved declaration and the gate-sdk library into the resolved value (§Verify after every agent commit), for the reason it unions kit roots into `DELEGATION_KIT_META_PATHS`: a file value replaces the default whole, and a registered gate must stay covered under a consumer's own value. A glob still covers a gate file not yet registered, such as a declaration staged in the same commit that adds it to `gates.list`. The two knobs behave alike: both are replaced whole by a file value, and both are widened by the reader.
+- `DELEGATION_KIT_META_PATHS` — prefixes counted as meta-layer for assertion A; default `("${GATE_SDK_GATES_DIR}/" "${GATE_SDK_WORKFLOW_DIR:-.workflow}/" ".claude/")`; root-level `*.md` is always meta. The reader, `check-gate-tamper`, unions every kit root the binary derives from `GATE_SDK_ROOT` and `GATE_SDK_KIT_DIRS` into the resolved value as a root-relative `<root>/` prefix the value does not already hold, and declares `GATE_SDK_KIT_DIRS` for it — a vendored kit's edits are meta-layer by definition, so the consumer's config need not name kit dirs at all (this repo's keeps only the non-kit prefixes). The union sits at the reader rather than in the default because a file value replaces the default whole, and a kit root must stay meta under a consumer's own value. It is additive, never a filter: a prefix the consumer declared cannot be lost.
+- `DELEGATION_KIT_STOP_LOG` — the turn-end hook's log (§The turn-end liveness hook); default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/subagent-stop-liveness.log`, the same deferral guard-kit's two logs already take. No scratch-dir knob sits beside it: the launch record's home is `${GATE_SDK_TMP_DIR:-.tmp}`, the cross-kit deferral every kit reaching that directory already resolves it through, and a second name for it would be the duplication rather than the config. **The rule has since governed a second artifact and held**: the wait-primitive probe (§bin/wait-probe) writes producers, markers and `<key>.run` records into that same directory and mints no knob of its own for it either — a reading the probe's port did not disturb, `GATE_SDK_TMP_DIR` crossing as one of its two declared knobs rather than being replaced by a kit-local name. It mints none for its evidence log either, and there the reasoning is the narrower one this bullet's own knob does not meet: a knob needs a reader, and `DELEGATION_KIT_STOP_LOG` has one — a *second process*, the consumer-side hook, which must be told where to write. The probe both writes and reads its own log in one arm, so a knob there would be a name nothing reads, and the close stage reaches the file through the roster's literal rather than through a knob.
+- `DELEGATION_KIT_LIVENESS_CMD` — the liveness reader the probe invokes in set mode. It is a **command knob**: an indexed argv, one `DELEGATION_KIT_LIVENESS_CMD[] = <element>` line per word, spawned **directly** with no shell and the scratch dir appended after its last element, so it takes no environment override and may name its own interpreter. Its first element must resolve to an executable program — a path carrying a separator must carry the execute bit, a bare name must resolve on `PATH` — or the override resolves to no reader. It is an **override over a working default**: the default is empty, and empty means the binary's own compiled `check-producer-liveness`, spawned with the gate name and the scratch dir (§The turn-end liveness hook owns why the default is spawned rather than called in process, and why the earlier no-default ruling lapsed). A knob rather than a literal because a consumer's reader may not be this gate at all; the honest-degradation case the section states — every firing logging `verdict=unavailable decision=allow` and refusing nothing — is now reached by an override that resolves to nothing, never by leaving the knob alone.
+- `DELEGATION_KIT_READONLY_TYPES` — agent-type names the consumer dispatches for read-only work; D2's only trigger (§The delegation model). Default empty, in which case D2 is inert by construction. Every entry is the consumer's own agent roster, never the kit's (gate-sdk/SPEC.md §The provenance seam) — the same reasoning that ships `GUARD_KIT_BREADTH_PROBES` with no default probes. Deliberately not knobbed alongside it, each ruled out for a stated reason: a fork-type-name knob and an accepted-isolation-values knob — `fork` and `worktree` are the **harness's** dispatch vocabulary, and a guard carries its harness's tool vocabulary as literals the same way the wakeup-guard member matches `ScheduleWakeup`/`CronCreate` literally, so knobbing them would imply a portability the mechanism does not have; a warn-only or per-rule opt-out — a doctrine downgradable per session is the honour system these rules exist to end, so the valve stays the whole guard's registration, never a finer one; and accepting `isolation: remote` as satisfying D2 — plausibly correct (a remote agent cannot touch the local index) but unverified from here, and remote availability is gated, so it is excluded with its reason recorded rather than admitted on plausibility.
 
-`check-gate-tamper` registers in the consumer's `gates.list`
-(tier: precommit) — in this repo's too; dogfooding is day-one, and agents
-commit here.
+`check-gate-tamper` registers in the consumer's `gates.list` (tier: precommit) — in this repo's too; dogfooding is day-one, and agents commit here.
 
-`agent-budget-guard` is not a gate — it is a hook, so it registers not in
-`gates.list` but under `PreToolUse` matcher `Agent` in the consumer's
-`.claude/settings.json` (beside the guard-kit Bash guard). Wire
-`bash gate-sdk/bin/run-gates.sh --hook agent-budget-guard`; the verdict rule is
-compiled into the same binary, so the guard calls it **in process** and resolves
-no path at all — the guard's declared knob slice is `--usage-verdict`'s eleven
-(§usage-verdict). Registration
-is the whole opt-in: unwired, the guard is inert. This repo registers it, and
-its consumer session brief (`scripts/session-context.sh`) additionally prints
-the verdict line at SessionStart for planning-time visibility — a consumer-side
-edit; the context-kit template stays uncoupled from delegation-kit.
+`agent-budget-guard` is not a gate — it is a hook, so it registers not in `gates.list` but under `PreToolUse` matcher `Agent` in the consumer's `.claude/settings.json` (beside the guard-kit Bash guard). Wire `bash gate-sdk/bin/run-gates.sh --hook agent-budget-guard`; the verdict rule is compiled into the same binary, so the guard calls it **in process** and resolves no path at all — the guard's declared knob slice is `--usage-verdict`'s eleven (§usage-verdict). Registration is the whole opt-in: unwired, the guard is inert. This repo registers it, and its consumer session brief (`scripts/session-context.sh`) additionally prints the verdict line at SessionStart for planning-time visibility — a consumer-side edit; the context-kit template stays uncoupled from delegation-kit.
 
-`subagent-stop-liveness` is a third hook, and the only one on a non-`PreToolUse`
-event. It registers under `SubagentStop` in the consumer's `.claude/settings.json`
-— an event that takes **no matcher**, so the entry carries a `hooks` array alone
-and is not tool-scoped, the shape a `SessionStart` entry already has. Wire
-`bash gate-sdk/bin/run-gates.sh --hook subagent-stop-liveness`; it
-sources no kit lib at all (§The turn-end liveness hook owns why) and reads its own
-compiled `check-producer-liveness` unless `DELEGATION_KIT_LIVENESS_CMD` overrides
-it, so wiring alone is enough and no reader path is owed. Registration is again
-the whole opt-in, and here the opt-in is also the consent: the wiring is a
-permission-surface write, so it is the consumer's own act and never an agent
-session's.
+`subagent-stop-liveness` is a third hook, and the only one on a non-`PreToolUse` event. It registers under `SubagentStop` in the consumer's `.claude/settings.json` — an event that takes **no matcher**, so the entry carries a `hooks` array alone and is not tool-scoped, the shape a `SessionStart` entry already has. Wire `bash gate-sdk/bin/run-gates.sh --hook subagent-stop-liveness`; it sources no kit lib at all (§The turn-end liveness hook owns why) and reads its own compiled `check-producer-liveness` unless `DELEGATION_KIT_LIVENESS_CMD` overrides it, so wiring alone is enough and no reader path is owed. Registration is again the whole opt-in, and here the opt-in is also the consent: the wiring is a permission-surface write, so it is the consumer's own act and never an agent session's.
 
-`agent-dispatch-guard` is a second hook on that same matcher, registered the
-same way and **independently**: the harness fires every hook a matcher carries
-and any exit 2 blocks, so neither guard knows about the other and a consumer
-may wire either one alone (§The delegation model owns why they are two hook
-members rather than one). It reads the consumer's delegation config for D2's
-roster and nothing else. Registration is again the whole opt-in: unwired,
-it is inert — and an unwired dispatch guard is the exact failure shape it
-exists to catch, so wiring it is not optional dogfooding for a consumer that
-delegates.
+`agent-dispatch-guard` is a second hook on that same matcher, registered the same way and **independently**: the harness fires every hook a matcher carries and any exit 2 blocks, so neither guard knows about the other and a consumer may wire either one alone (§The delegation model owns why they are two hook members rather than one). It reads the consumer's delegation config for D2's roster and nothing else. Registration is again the whole opt-in: unwired, it is inert — and an unwired dispatch guard is the exact failure shape it exists to catch, so wiring it is not optional dogfooding for a consumer that delegates.
 
-**An `OK` verdict is a floor, not a recommendation.** The guard answers one
-question — is there headroom in the window *right now* — and blocks only on
-`PAUSE`. Everything else a dispatch decision turns on sits outside its reach:
-how long the dispatched work runs, what a fan-out beneath the checkpoint will
-cost in total (the guard re-arms on those children but prices each of them
-alone: covered at every depth, aggregated at none — §The delegation model),
-and whether anything forces the dispatch now rather than after the window
-resets. `OK` is therefore one input to that decision and never the decision
-itself; a dispatcher reading `OK` as "go" has substituted the guard's question
-for its own. The asymmetry is deliberate: a wrong `PAUSE` costs a delayed
-dispatch, while an `OK` that is right about headroom and silent about duration
-costs the work in flight.
+**An `OK` verdict is a floor, not a recommendation.** The guard answers one question — is there headroom in the window *right now* — and blocks only on `PAUSE`. Everything else a dispatch decision turns on sits outside its reach: how long the dispatched work runs, what a fan-out beneath the checkpoint will cost in total (the guard re-arms on those children but prices each of them alone: covered at every depth, aggregated at none — §The delegation model), and whether anything forces the dispatch now rather than after the window resets. `OK` is therefore one input to that decision and never the decision itself; a dispatcher reading `OK` as "go" has substituted the guard's question for its own. The asymmetry is deliberate: a wrong `PAUSE` costs a delayed dispatch, while an `OK` that is right about headroom and silent about duration costs the work in flight.
 
 ## Testing
 
-`check-gate-tamper` speaks the full gate contract (`GATE-TAMPER: clean
-(…)` / findings + `help:` lines / exit 0-1-2) and ships the standard
-`good/`+`bad/` fixture pair driven through `--fixture` by gate-sdk's
-`--run-gate-tests` arm. The pair reaches both assertions — the bad case carries a
-co-staged non-meta path *and* a newly added path exemption matching one of its
-own staged files, beside a bare token assertion B must pass over.
+`check-gate-tamper` speaks the full gate contract (`GATE-TAMPER: clean (…)` / findings + `help:` lines / exit 0-1-2) and ships the standard `good/`+`bad/` fixture pair driven through `--fixture` by gate-sdk's `--run-gate-tests` arm. The pair reaches both assertions — the bad case carries a co-staged non-meta path *and* a newly added path exemption matching one of its own staged files, beside a bare token assertion B must pass over.
 
-**The pair cannot reach the live arm, and that is a property of the injection
-rather than of the cases.** `--fixture` supplies both lists directly, so the
-function that derives them — reading each staged gate file's bytes out of the
-object store and diffing its exemption set against `HEAD`'s — runs in no fixture
-case. `gate-tests/check-gate-tamper.test.sh` is where it is exercised: each case
-builds a throwaway git repo, stages a commit shape into a real index, and runs
-the gate inside it. It holds the four verdicts the pair cannot — a HEAD-resident
-exemption is not "added" even when a co-staged file matches it, a newly appended
-one is, an added one matching nothing staged stays silent, and a staged
-*deletion* of a gate file reads as an empty exemption set rather than a failure
-to read.
+**The pair cannot reach the live arm, and that is a property of the injection rather than of the cases.** `--fixture` supplies both lists directly, so the function that derives them — reading each staged gate file's bytes out of the object store and diffing its exemption set against `HEAD`'s — runs in no fixture case. `gate-tests/check-gate-tamper.test.sh` is where it is exercised: each case builds a throwaway git repo, stages a commit shape into a real index, and runs the gate inside it. It holds the four verdicts the pair cannot — a HEAD-resident exemption is not "added" even when a co-staged file matches it, a newly appended one is, an added one matching nothing staged stays silent, and a staged *deletion* of a gate file reads as an empty exemption set rather than a failure to read.
 
-`check-rule-citation` speaks the same gate contract and ships the standard
-`good/`+`bad/` fixture pair (a citation resolving to a template lead-in vs one
-naming an absent lead-in), driven by the `--run-gate-tests` arm over fixture-local
-spec + template files passed as its two positional arguments.
+`check-rule-citation` speaks the same gate contract and ships the standard `good/`+`bad/` fixture pair (a citation resolving to a template lead-in vs one naming an absent lead-in), driven by the `--run-gate-tests` arm over fixture-local spec + template files passed as its two positional arguments.
 
-`check-agent-tier-explicit` speaks the same gate contract and ships the standard
-`good/`+`bad/` fixture pair over a fixture-local agent directory passed as its
-one positional argument. The `good/` side carries both passing shapes — a
-definition naming a cheaper class outright and one declaring `inherit` — so the
-pair proves the gate discriminates omission from choice rather than merely
-finding a `model:` string; the `bad/` side omits the field.
+`check-agent-tier-explicit` speaks the same gate contract and ships the standard `good/`+`bad/` fixture pair over a fixture-local agent directory passed as its one positional argument. The `good/` side carries both passing shapes — a definition naming a cheaper class outright and one declaring `inherit` — so the pair proves the gate discriminates omission from choice rather than merely finding a `model:` string; the `bad/` side omits the field.
 
-`usage-verdict` does not fit the gate contract (a three-state verdict, not a
-clean/violation pair), so — like guard-kit's guard-tests — the kit ships
-its own decision-table runner: `usage-tests/cases.tsv` pairs an expected
-verdict token (`OK`/`PAUSE`/`STALE`/`RESET-OK`) and exit code with scenario
-knobs (percentage, snapshot age offset, reset offset, credential age); the
-crate test module `native/src/usage_tests.rs` reads that table off disk,
-materializes each case as a generated snapshot
-file (timestamps must be computed relative to *now* — static fixtures
-would age into permanent STALE) and asserts verdict and exit code. The subject
-is reached **in process**, one call to the same `verdict(args) -> (String, i32)`
-the budget guard makes (§usage-verdict). **The clock
-is read once for the whole run**, and every case's timestamps are computed
-against that one reading: a per-case read introduces cross-case skew that flakes
-exactly the at-or-over boundary rows the table exists to pin. Each
-case runs in a throwaway sandbox that is also the gates directory, so the only
-knob file on the lookup path is the one the case writes, **and** with the
-ambient `DELEGATION_KIT_*` environment stripped before each invocation, so the
-rule exercises the kit defaults hermetic to the host repo — the decision table
-encodes those defaults, and a host override (a raised pause threshold, say) must
-not reshape it. Three properties carry that contract, and each is a place a
-reimplementation would quietly differ:
+`usage-verdict` does not fit the gate contract (a three-state verdict, not a clean/violation pair), so — like guard-kit's guard-tests — the kit ships its own decision-table runner: `usage-tests/cases.tsv` pairs an expected verdict token (`OK`/`PAUSE`/`STALE`/`RESET-OK`) and exit code with scenario knobs (percentage, snapshot age offset, reset offset, credential age); the crate test module `native/src/usage_tests.rs` reads that table off disk, materializes each case as a generated snapshot file (timestamps must be computed relative to *now* — static fixtures would age into permanent STALE) and asserts verdict and exit code. The subject is reached **in process**, one call to the same `verdict(args) -> (String, i32)` the budget guard makes (§usage-verdict). **The clock is read once for the whole run**, and every case's timestamps are computed against that one reading: a per-case read introduces cross-case skew that flakes exactly the at-or-over boundary rows the table exists to pin. Each case runs in a throwaway sandbox that is also the gates directory, so the only knob file on the lookup path is the one the case writes, **and** with the ambient `DELEGATION_KIT_*` environment stripped before each invocation, so the rule exercises the kit defaults hermetic to the host repo — the decision table encodes those defaults, and a host override (a raised pause threshold, say) must not reshape it. Three properties carry that contract, and each is a place a reimplementation would quietly differ:
 
-- **The strip is the whole `DELEGATION_KIT_*` namespace, derived at run time**
-  from the running process's own variables — never a hardcoded list of knob
-  names, which re-creates precisely the failure the poison exists to catch. That
-  prefix because a static scalar knob's environment override is its own name
-  (gate-sdk/SPEC.md §The knob file), which is the spelling the subject reads. The
-  stripped pairs are **held and restored** at the end, which is the in-process
-  face of the child-environment boundary a spawn had for free. An indexed knob
-  takes no environment override, so a case's `DELEGATION_KIT_REFRESH_CMD` argv
-  is written into the sandbox's knob file, one element per line, rather than
-  exported.
-- **The poison stays a real value in the running process** —
-  `DELEGATION_KIT_PAUSE_PCT` at a threshold that PAUSEs every under-threshold
-  row — and it is **re-armed before every case**, so the strip is proved at each
-  one rather than once for the run. What makes it load-bearing is the seeding
-  *order*: the case's scalar overrides are applied first and each kit default is
-  then seeded into the environment **only where the name is unset**, so a poison
-  the strip failed to remove is not overwritten and the table reddens. A seed
-  that wrote unconditionally would pass every assertion while proving nothing,
-  which is the one way this coverage can be lost; a negative control beside the
-  table skips the strip once and asserts the surviving poison PAUSEs. The write
-  goes through `knobenv`'s serializing guard, the crate's sole writer of the
-  process-global environment (gate-sdk/SPEC.md §lib/gate.sh) — load-bearing
-  because the subject shares that environment with the test.
-- **The per-case expectations stay literal expectations of the kit defaults.**
-  The seeded defaults are the test's own literals rather than reads of the
-  table, so the table does not prove that the defaults it encodes are the ones
-  delegation-kit's defaults table actually ships. Two existing holders carry that
-  link and neither is minted here: `check-knob-default-coupling` holds every
-  literal default against the owning SPEC, and `smoke/install.sh` drives a real
-  front-end invocation under its hermetic prelude. Spawning the front-end from the
-  crate test is refused: it re-introduces the `bash` spawn this port deleted, one
-  process further out, for what those two already cover. The trend runner below
-  reaches its subject in process on the same terms, so no runner in this module
-  spawns a kit script any more.
-  `touch -d "@<epoch>"` also stays, setting the credentials mtime that is the
-  whole login-window input: `File::set_modified` and `FileTimes` stabilised in
-  Rust 1.75 and `native/Cargo.toml` pins `rust-version = "1.71"`, so **the MSRV
-  against a 1.75 API is what holds this open**, not this member's shell subject —
-  `native/src/emit/session_id.rs` already spawns the identical `touch` in an
-  already-ported member's tests with no shell subject anywhere in it.
+- **The strip is the whole `DELEGATION_KIT_*` namespace, derived at run time** from the running process's own variables — never a hardcoded list of knob names, which re-creates precisely the failure the poison exists to catch. That prefix because a static scalar knob's environment override is its own name (gate-sdk/SPEC.md §The knob file), which is the spelling the subject reads. The stripped pairs are **held and restored** at the end, which is the in-process face of the child-environment boundary a spawn had for free. An indexed knob takes no environment override, so a case's `DELEGATION_KIT_REFRESH_CMD` argv is written into the sandbox's knob file, one element per line, rather than exported.
+- **The poison stays a real value in the running process** — `DELEGATION_KIT_PAUSE_PCT` at a threshold that PAUSEs every under-threshold row — and it is **re-armed before every case**, so the strip is proved at each one rather than once for the run. What makes it load-bearing is the seeding *order*: the case's scalar overrides are applied first and each kit default is then seeded into the environment **only where the name is unset**, so a poison the strip failed to remove is not overwritten and the table reddens. A seed that wrote unconditionally would pass every assertion while proving nothing, which is the one way this coverage can be lost; a negative control beside the table skips the strip once and asserts the surviving poison PAUSEs. The write goes through `knobenv`'s serializing guard, the crate's sole writer of the process-global environment (gate-sdk/SPEC.md §lib/gate.sh) — load-bearing because the subject shares that environment with the test.
+- **The per-case expectations stay literal expectations of the kit defaults.** The seeded defaults are the test's own literals rather than reads of the table, so the table does not prove that the defaults it encodes are the ones delegation-kit's defaults table actually ships. Two existing holders carry that link and neither is minted here: `check-knob-default-coupling` holds every literal default against the owning SPEC, and `smoke/install.sh` drives a real front-end invocation under its hermetic prelude. Spawning the front-end from the crate test is refused: it re-introduces the `bash` spawn this port deleted, one process further out, for what those two already cover. The trend runner below reaches its subject in process on the same terms, so no runner in this module spawns a kit script any more. `touch -d "@<epoch>"` also stays, setting the credentials mtime that is the whole login-window input: `File::set_modified` and `FileTimes` stabilised in Rust 1.75 and `native/Cargo.toml` pins `rust-version = "1.71"`, so **the MSRV against a 1.75 API is what holds this open**, not this member's shell subject — `native/src/emit/session_id.rs` already spawns the identical `touch` in an already-ported member's tests with no shell subject anywhere in it.
 
-`cases.tsv` columns are `verdict exit pct age_off reset_off cred_age pct_7d
-reset7d_off append axis desc` (the offsets seconds from *now*; `pct_7d` `-`
-omits the weekly keys, `append` is the expected sample-line count — counted as
-`grep -c ''` counts, a final unterminated line included, a line iterator's count
-being silently one short of it — and `axis`
-asserts which window a PAUSE names). Every verdict branch and both pause axes
-carry a firing and a non-firing case — the fixture-pair discipline,
-transplanted — covering a weekly PAUSE while 5h is comfortable, the axis
-named in the output, absent keys disarming the weekly axis, a dead weekly
-window not pausing, each axis's at-or-over boundary (a reading exactly at the
-threshold pauses; just under does not), both directions of the login reroute
-(an under-threshold percentage with a fresh login is STALE, not OK; an
-at-or-over one on either axis is still PAUSE, not STALE — the asymmetry is
-what keeps the reroute from waving an unaffordable dispatch through), and the
-sample-append discipline (a parsed snapshot
-appends one line whatever the verdict; a non-numeric snapshot appends none;
-`pct_7d` present-vs-omitted in the passed-through line). Every case also asserts
-the fan-width field on the verdict line, matched **with its trailing space** —
-without it `width=20` matches `width=2` and the assertion stops discriminating —
-and one case beside the table proves the field tracks `DELEGATION_KIT_FAN_WIDTH`
-rather than a literal. The default width the per-case match pins, and the
-refresh floor a diagnostic below names, stay **literal expectations of the kit
-defaults**: reading either from the library instead would make the table agree
-with whatever the library says rather than assert what it should say.
+`cases.tsv` columns are `verdict exit pct age_off reset_off cred_age pct_7d reset7d_off append axis desc` (the offsets seconds from *now*; `pct_7d` `-` omits the weekly keys, `append` is the expected sample-line count — counted as `grep -c ''` counts, a final unterminated line included, a line iterator's count being silently one short of it — and `axis` asserts which window a PAUSE names). Every verdict branch and both pause axes carry a firing and a non-firing case — the fixture-pair discipline, transplanted — covering a weekly PAUSE while 5h is comfortable, the axis named in the output, absent keys disarming the weekly axis, a dead weekly window not pausing, each axis's at-or-over boundary (a reading exactly at the threshold pauses; just under does not), both directions of the login reroute (an under-threshold percentage with a fresh login is STALE, not OK; an at-or-over one on either axis is still PAUSE, not STALE — the asymmetry is what keeps the reroute from waving an unaffordable dispatch through), and the sample-append discipline (a parsed snapshot appends one line whatever the verdict; a non-numeric snapshot appends none; `pct_7d` present-vs-omitted in the passed-through line). Every case also asserts the fan-width field on the verdict line, matched **with its trailing space** — without it `width=20` matches `width=2` and the assertion stops discriminating — and one case beside the table proves the field tracks `DELEGATION_KIT_FAN_WIDTH` rather than a literal. The default width the per-case match pins, and the refresh floor a diagnostic below names, stay **literal expectations of the kit defaults**: reading either from the library instead would make the table agree with whatever the library says rather than assert what it should say.
 
-The demand-driven refresh needs a command seam the table's columns do not
-carry, so it is asserted beside the table through a stub
-`DELEGATION_KIT_REFRESH_CMD` (a real
-poll would need the network): **armed** — a stale snapshot invokes the command
-and the verdict reads the values the refresh wrote, not the cached ones;
-**fail-soft** — a non-zero stub leaves the snapshot byte-identical, the verdict
-proceeds and the cached reading is judged STALE by the existing staleness
-machinery, and no refresh diagnostic leaks into the relayed verdict line — a
-**negative** conjunct over the merged stream, because callers relay that line
-verbatim and a stdout captured apart from stderr passes it vacuously;
-**short-circuit** — a snapshot under `DELEGATION_KIT_REFRESH_MIN_AGE` never invokes the
-command. Armed and short-circuit are the firing/non-firing pair over the same
-stub, so the absence proves the floor rather than a broken stub.
+The demand-driven refresh needs a command seam the table's columns do not carry, so it is asserted beside the table through a stub `DELEGATION_KIT_REFRESH_CMD` (a real poll would need the network): **armed** — a stale snapshot invokes the command and the verdict reads the values the refresh wrote, not the cached ones; **fail-soft** — a non-zero stub leaves the snapshot byte-identical, the verdict proceeds and the cached reading is judged STALE by the existing staleness machinery, and no refresh diagnostic leaks into the relayed verdict line — a **negative** conjunct over the merged stream, because callers relay that line verbatim and a stdout captured apart from stderr passes it vacuously; **short-circuit** — a snapshot under `DELEGATION_KIT_REFRESH_MIN_AGE` never invokes the command. Armed and short-circuit are the firing/non-firing pair over the same stub, so the absence proves the floor rather than a broken stub.
 
-The **roll witnesses** need a pre-seeded history tail the table's columns do
-not carry, so they are asserted beside it too, over one fixed shape — a low
-percentage with a credentials mtime inside the login window, which without a
-witness is STALE. Both witnesses present verdicts OK; each of the four ways
-the log can fail to answer holds the STALE — the boundary unmoved, the
-previous boundary uncrossed, a tail with a non-numeric `resets_at`, and no
-history at all. The two single-witness cases are the discriminating pair: they
-prove the conjunction is load-bearing rather than either witness carrying it
-alone. A sixth case asserts the read is not self-witnessing — a run with an
-empty log still STALEs and leaves exactly its own sample behind, so the
-witness can only ever be a previous reading.
+The **roll witnesses** need a pre-seeded history tail the table's columns do not carry, so they are asserted beside it too, over one fixed shape — a low percentage with a credentials mtime inside the login window, which without a witness is STALE. Both witnesses present verdicts OK; each of the four ways the log can fail to answer holds the STALE — the boundary unmoved, the previous boundary uncrossed, a tail with a non-numeric `resets_at`, and no history at all. The two single-witness cases are the discriminating pair: they prove the conjunction is load-bearing rather than either witness carrying it alone. A sixth case asserts the read is not self-witnessing — a run with an empty log still STALEs and leaves exactly its own sample behind, so the witness can only ever be a previous reading.
 
-`--emit-usage-trend` is likewise not a gate (it renders no clean/violation
-verdict), so it ships an assertion set over a
-static fixture history `usage-tests/trend-history.log` (static epochs are
-safe — the reporter measures within-segment deltas, never against *now*),
-carried by the same crate module under the same sandbox and strip discipline:
-the ambient `DELEGATION_KIT_*` namespace held aside and reseeded from the kit
-defaults, so the arm reads the empty history knob and the unset arm fires.
-**The trend runner carries no poison of its own**, because the one it carried
-discriminated two spellings of one knob — a kit variable read directly against
-the same value read through a separate wire — and a static knob has one
-spelling, so no wrong reader is left for a poison to catch. It
-asserts per-axis segmentation at a reset boundary, a `login_at` change, and
-an account change; per-account grouping reuniting a weekly trajectory across
-a switch-back; a spike-then-correction flagged and excluded rather than
-averaged; token deltas and weekly headroom on the report; the
-fail-closed refusals (knob unset / history missing), each read off the arm's own
-`Err` rather than off a child's status; the zero-segment **reading**, which
-stays a document at exit 0 rather than collapsing into the misuse code; and the
-three argv-shape behaviours the port added, which exist in one substrate only
-and are therefore asserted here rather than compared.
-**Its needles are exact golden strings and its segment counts
-are anchored on the reporter's own two-space indentation**: loosening a needle
-into a pattern weakens the assertion, and that indentation is load-bearing
-rather than cosmetic. No fixture pair owed —
-neither runner is a gate, and criterion 2's discharge for a non-gate member is
-the both-substrates comparison bought once at port time (gate-sdk/SPEC.md §The
-port-candidate criteria): the table's rows, the beside-the-table assertions and
-the trend fixture were driven through the shell runners and the crate module
-together and their verdicts and exit codes compared, *before* either shell file
-was deleted. Nothing machine-held keeps the two agreeing afterwards, which is
-why the originals are deleted rather than left running beside the crate tests.
+`--emit-usage-trend` is likewise not a gate (it renders no clean/violation verdict), so it ships an assertion set over a static fixture history `usage-tests/trend-history.log` (static epochs are safe — the reporter measures within-segment deltas, never against *now*), carried by the same crate module under the same sandbox and strip discipline: the ambient `DELEGATION_KIT_*` namespace held aside and reseeded from the kit defaults, so the arm reads the empty history knob and the unset arm fires. **The trend runner carries no poison of its own**, because the one it carried discriminated two spellings of one knob — a kit variable read directly against the same value read through a separate wire — and a static knob has one spelling, so no wrong reader is left for a poison to catch. It asserts per-axis segmentation at a reset boundary, a `login_at` change, and an account change; per-account grouping reuniting a weekly trajectory across a switch-back; a spike-then-correction flagged and excluded rather than averaged; token deltas and weekly headroom on the report; the fail-closed refusals (knob unset / history missing), each read off the arm's own `Err` rather than off a child's status; the zero-segment **reading**, which stays a document at exit 0 rather than collapsing into the misuse code; and the three argv-shape behaviours the port added, which exist in one substrate only and are therefore asserted here rather than compared. **Its needles are exact golden strings and its segment counts are anchored on the reporter's own two-space indentation**: loosening a needle into a pattern weakens the assertion, and that indentation is load-bearing rather than cosmetic. No fixture pair owed — neither runner is a gate, and criterion 2's discharge for a non-gate member is the both-substrates comparison bought once at port time (gate-sdk/SPEC.md §The port-candidate criteria): the table's rows, the beside-the-table assertions and the trend fixture were driven through the shell runners and the crate module together and their verdicts and exit codes compared, *before* either shell file was deleted. Nothing machine-held keeps the two agreeing afterwards, which is why the originals are deleted rather than left running beside the crate tests.
 
-**§Trend reporter's own port bought that comparison a second time, on the
-reporter rather than on its runner.** Both implementations ran in one session
-against the same config, and the **whole report was compared byte for byte** —
-the shipped fixture plus four crafted inputs the fixture does not exercise: a
-**full-key tie**, a log carrying one weekly key without the other in both
-directions, a comments-and-blanks-only log, and an account-less log whose every
-sample is suspect. The four exit outcomes were compared with them (report 0,
-zero-segment reading 0, unreadable history 2, unset knob 2), the last emptied at
-the **shared config both substrates read** rather than by an environment
-variable either would have overridden. Nothing in the report is wall-clock
-dependent, so every field was compared for equality and none for relation —
-unlike §bin/wait-probe's sweep below. Two things the comparison bought that
-reasoning would not have: the **tie rule** is a whole-line byte comparison
-rather than input order, which a stable sort would have got wrong and which the
-tie input caught by printing a different token delta; and the **ceiling knob**
-was proved to cross, a scratch config setting a non-default weekly threshold
-reaching the headroom line verbatim in both substrates, which is the exact
-silent breakage a baked-in default would have caused for a consumer and never
-here. The one variance is the diagnostic **prefix** — the front-end names the
-arm where the shell named the script — the message body after it being identical.
-`usage-verdict`'s own port bought that comparison again on the rule itself:
-every `cases.tsv` row, both beside-the-table sets and the fan-width case run
-against the shell tool and the compiled arm in one session, with the **verdict
-line, the exit code and the appended sample line** compared per case, and each
-row additionally checked against the table's own expected token so two empty
-outputs could not pass as agreement. This member has no live tree corpus — its
-input is a crafted snapshot — so the case set *is* the corpus and the comparison
-over it is complete rather than demoted. The only tolerated variance is the
-clock: two invocations cannot share an instant, so the four clock-derived
-integers on a verdict line are compared numerically within a small band while
-everything else is compared byte for byte.
+**§Trend reporter's own port bought that comparison a second time, on the reporter rather than on its runner.** Both implementations ran in one session against the same config, and the **whole report was compared byte for byte** — the shipped fixture plus four crafted inputs the fixture does not exercise: a **full-key tie**, a log carrying one weekly key without the other in both directions, a comments-and-blanks-only log, and an account-less log whose every sample is suspect. The four exit outcomes were compared with them (report 0, zero-segment reading 0, unreadable history 2, unset knob 2), the last emptied at the **shared config both substrates read** rather than by an environment variable either would have overridden. Nothing in the report is wall-clock dependent, so every field was compared for equality and none for relation — unlike §bin/wait-probe's sweep below. Two things the comparison bought that reasoning would not have: the **tie rule** is a whole-line byte comparison rather than input order, which a stable sort would have got wrong and which the tie input caught by printing a different token delta; and the **ceiling knob** was proved to cross, a scratch config setting a non-default weekly threshold reaching the headroom line verbatim in both substrates, which is the exact silent breakage a baked-in default would have caused for a consumer and never here. The one variance is the diagnostic **prefix** — the front-end names the arm where the shell named the script — the message body after it being identical. `usage-verdict`'s own port bought that comparison again on the rule itself: every `cases.tsv` row, both beside-the-table sets and the fan-width case run against the shell tool and the compiled arm in one session, with the **verdict line, the exit code and the appended sample line** compared per case, and each row additionally checked against the table's own expected token so two empty outputs could not pass as agreement. This member has no live tree corpus — its input is a crafted snapshot — so the case set *is* the corpus and the comparison over it is complete rather than demoted. The only tolerated variance is the clock: two invocations cannot share an instant, so the four clock-derived integers on a verdict line are compared numerically within a small band while everything else is compared byte for byte.
 
-**§bin/wait-probe's port bought the same comparison, and its shape is the one to
-copy where a member's output is a *measurement***. A full `sweep` ran under each
-implementation in one session and four things were compared: the **trial line**
-field by field, the **`<key>.run` record** — a first-class subject of the
-comparison rather than a side effect, since nothing static couples a gate to its
-shape — the **verdict block** byte for byte including the ceiling-tell line, and
-the **exit status per subcommand**, with `report` run against an empty evidence
-file in both substrates so the three-state contract's `1` was compared and not
-assumed. Two fields are deliberately **not** compared for equality, and saying so
-is the honest half: `marker_at_ms` and `waiter_at_ms` are wall-clock elapsed times
-that differ run to run, so what is compared for them is the **relation** —
-`waiter_at >= marker_at`, which is the whole measurement — and the `class` that
-relation produces. A comparison demanding byte equality there would fail on a
-correct port and pass on nothing. This member likewise has no live tree corpus, its
-input being processes it stands up itself, so the sweep *is* the corpus.
+**§bin/wait-probe's port bought the same comparison, and its shape is the one to copy where a member's output is a *measurement***. A full `sweep` ran under each implementation in one session and four things were compared: the **trial line** field by field, the **`<key>.run` record** — a first-class subject of the comparison rather than a side effect, since nothing static couples a gate to its shape — the **verdict block** byte for byte including the ceiling-tell line, and the **exit status per subcommand**, with `report` run against an empty evidence file in both substrates so the three-state contract's `1` was compared and not assumed. Two fields are deliberately **not** compared for equality, and saying so is the honest half: `marker_at_ms` and `waiter_at_ms` are wall-clock elapsed times that differ run to run, so what is compared for them is the **relation** — `waiter_at >= marker_at`, which is the whole measurement — and the `class` that relation produces. A comparison demanding byte equality there would fail on a correct port and pass on nothing. This member likewise has no live tree corpus, its input being processes it stands up itself, so the sweep *is* the corpus.
 
-`agent-budget-guard` and `agent-dispatch-guard` are hooks rather than gates, so
-each speaks exit-2 + hook JSON rather than the gate output contract — and each
-shipped a decision-table runner beside the verdict tests until the port moved
-both members into the binary. **A runner retires into the crate when its *cases*
-can be driven from there — the subject reached in process *or* spawned.** The
-guards' subjects moved in-crate, so a `#[test]` reached them directly; the
-verdict's did too, at its own cut, and the trend runner above followed at
-§Trend reporter's, its subject reached in process as the arm's own function.
-The narrower "the runners
-retired with their subjects" was true of its own instance and is not the general
-rule. **That last move retired the crate's only literal `kit(…)`-resolved
-shell-script invocation** — the two remaining `kit(…)` resolutions name *data*
-fixtures — and the spawn helper that read the merged child stream retired with
-its one caller. **What that does not claim, because it would be false, is that
-no crate code spawns `bash` on an owned kit script**: crate tests still source
-`gate-sdk/lib/gate.sh` to read the shell library's *own* answer — a pre-binary
-accessor, the gates-directory default or the source stamp — which is deliberate:
-a literal on the Rust side would restore the second source of truth those tests
-exist to hold, and that library stays shell on its own declared grounds
-(gate-sdk/SPEC.md §lib/gate.sh). The retired kind is a kit **`bin/` tool spawned as a test
-subject**, which is the kind a port can eliminate; sourcing a no-port library
-for parity is not that kind and does not retire with it. **What retirement buys is coverage at a second transition**: the
-assertions ran only in a validate suite, and now run under `check-crate-arms` at
-every commit *and* under the `native_crate` validate suite — a widening rather
-than a move, and affordable because the whole case set is under a second of wall
-clock against an arm that already runs at every commit. **One
-table stayed and one did not**, and that split is the rule rather than an
-accident. `usage-tests/dispatch-guard-cases.tsv` stays on disk and is now read
-by the crate test that replaced `bin/run-dispatch-guard-tests.sh`: it pairs an <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
-expected outcome (`block`/`advise`/`fallthrough`) with
-`subagent_type isolation nested desc`, fixes one roster for its whole run
-(`DELEGATION_KIT_READONLY_TYPES=(ro-type)`), and carries two sentinels in the
-type column — a `noroster:` prefix runs that row against an empty roster, the
-row that proves D2 is inert on the roster's *absence* rather than on a type
-missing from a populated one, and `UNPARSEABLE` is the degraded row that makes
-the fail-open-but-loud posture testable rather than merely stated. It is kit
-test data rather than consumer config, so moving it into Rust literals would
-trade a reviewable table for a recompile. `usage-tests/budget-guard-cases.tsv` <!-- manifest-temporal-exempt: port record of the retired table and runner -->
-went with `bin/run-budget-guard-tests.sh` instead: its columns
-(`action pct age_off reset_off cred_age desc`) are `usage-verdict`'s inputs
-rather than the guard's, and the guard-side assertion they drove is a two-branch
-routing — exit 1 blocks, every other status advises — which the member's own
-crate test covers directly. A six-row table of another tool's inputs, kept to
-exercise two branches, is data whose reader left.
+`agent-budget-guard` and `agent-dispatch-guard` are hooks rather than gates, so each speaks exit-2 + hook JSON rather than the gate output contract — and each shipped a decision-table runner beside the verdict tests until the port moved both members into the binary. **A runner retires into the crate when its *cases* can be driven from there — the subject reached in process *or* spawned.** The guards' subjects moved in-crate, so a `#[test]` reached them directly; the verdict's did too, at its own cut, and the trend runner above followed at §Trend reporter's, its subject reached in process as the arm's own function. The narrower "the runners retired with their subjects" was true of its own instance and is not the general rule. **That last move retired the crate's only literal `kit(…)`-resolved shell-script invocation** — the two remaining `kit(…)` resolutions name *data* fixtures — and the spawn helper that read the merged child stream retired with its one caller. **What that does not claim, because it would be false, is that no crate code spawns `bash` on an owned kit script**: crate tests still source `gate-sdk/lib/gate.sh` to read the shell library's *own* answer — a pre-binary accessor, the gates-directory default or the source stamp — which is deliberate: a literal on the Rust side would restore the second source of truth those tests exist to hold, and that library stays shell on its own declared grounds (gate-sdk/SPEC.md §lib/gate.sh). The retired kind is a kit **`bin/` tool spawned as a test subject**, which is the kind a port can eliminate; sourcing a no-port library for parity is not that kind and does not retire with it. **What retirement buys is coverage at a second transition**: the assertions ran only in a validate suite, and now run under `check-crate-arms` at every commit *and* under the `native_crate` validate suite — a widening rather than a move, and affordable because the whole case set is under a second of wall clock against an arm that already runs at every commit. **One table stayed and one did not**, and that split is the rule rather than an accident. `usage-tests/dispatch-guard-cases.tsv` stays on disk and is now read by the crate test that replaced `bin/run-dispatch-guard-tests.sh`: it pairs an <!-- manifest-temporal-exempt: retirement record, names a shell file since removed --> expected outcome (`block`/`advise`/`fallthrough`) with `subagent_type isolation nested desc`, fixes one roster for its whole run (`DELEGATION_KIT_READONLY_TYPES=(ro-type)`), and carries two sentinels in the type column — a `noroster:` prefix runs that row against an empty roster, the row that proves D2 is inert on the roster's *absence* rather than on a type missing from a populated one, and `UNPARSEABLE` is the degraded row that makes the fail-open-but-loud posture testable rather than merely stated. It is kit test data rather than consumer config, so moving it into Rust literals would trade a reviewable table for a recompile. `usage-tests/budget-guard-cases.tsv` <!-- manifest-temporal-exempt: port record of the retired table and runner --> went with `bin/run-budget-guard-tests.sh` instead: its columns (`action pct age_off reset_off cred_age desc`) are `usage-verdict`'s inputs rather than the guard's, and the guard-side assertion they drove is a two-branch routing — exit 1 blocks, every other status advises — which the member's own crate test covers directly. A six-row table of another tool's inputs, kept to exercise two branches, is data whose reader left.
 
-**Every rule still carries a firing and a non-firing case** (the fixture-pair
-discipline, transplanted): D1 — a fork blocks, a typed dispatch under an empty
-roster does not; D2 — a rostered type without isolation blocks, the same type
-with `isolation: worktree` does not, an unrostered type under a populated roster
-does not, and the empty-roster case does not; D3 — a payload carrying `agent_id`
-advises, one without it falls through.
+**Every rule still carries a firing and a non-firing case** (the fixture-pair discipline, transplanted): D1 — a fork blocks, a typed dispatch under an empty roster does not; D2 — a rostered type without isolation blocks, the same type with `isolation: worktree` does not, an unrostered type under a populated roster does not, and the empty-roster case does not; D3 — a payload carrying `agent_id` advises, one without it falls through.
 
-`smoke/install.sh` copies the templates and `bin/` tools into the scratch
-consumer, registers the tamper gate, and drives one crafted snapshot
-through the `--usage-verdict` arm asserting a verdict — self-verifying install,
-and the holder that keeps a real front-end run and a real knob resolution in this
-kit's coverage now that the crate table reaches the rule in process. It opens
-with **one hermetic env prelude covering the whole file**: it strips the whole
-`DELEGATION_KIT_*` namespace and then sets the knobs with no per-call home —
-sampling off, and both pause thresholds at the defaults the 95% reading is
-judged against. A prelude rather than per-instance pins because
-instance-pinning has already missed
-once by construction: a pass that pinned the two knobs then biting left the
-third, and the survivor was the one whose failure is **silent** — an
-unpinned history path makes every smoke verdict append a synthetic sample
-into whatever trend log the ambient config names, indistinguishable in shape
-from a real operator reading. That this repo's runs happened not to pollute
-was accidental, not designed: the harness runs the file with cwd = the
-scratch consumer root and the configured history path is *relative*, so the
-appends died with the scratch tree — hermeticity that evaporates the moment a
-consumer configures an absolute path or the file is invoked from a real tree.
-Stripping the whole namespace is the shape that cannot miss a third knob.
-The credentials pin stays **at each invocation** rather than moving into the
-prelude, because gate-sdk/SPEC.md §check-test-hermetic reads it there — a
-line-local pin is evidence a reader and a gate can both see without tracing
-file-level state — and the poller's own snapshot, credentials and endpoint
-paths stay inline too, being genuine per-call arguments the prelude has no
-business pre-empting. That
-assertion is **code-specific**: the 95% guard captures the exit status and
-compares it to the PAUSE code, reporting the status it observed rather than
-claiming an outcome it did not establish, so a STALE regression cannot pass
-under a "did not PAUSE" message (gate-sdk/SPEC.md
-§check-assertion-strength, the gate for the class). It also
-drives the poll producer through its `file://` stub seam: the happy path
-writes a contract-valid snapshot (asserted by driving it through
-`usage-verdict`), and a fetch failure exits non-zero leaving a pre-seeded
-snapshot byte-identical — the fail-soft contract, exercised end to end.
-`smoke/violation.sh` stages a gate edit co-staged with a product file in
-the scratch consumer and asserts the battery reds (assertion A) — the
-violation is craftable, so the file is mandatory
-(gate-sdk/SPEC.md §Consumer smoke).
+`smoke/install.sh` copies the templates and `bin/` tools into the scratch consumer, registers the tamper gate, and drives one crafted snapshot through the `--usage-verdict` arm asserting a verdict — self-verifying install, and the holder that keeps a real front-end run and a real knob resolution in this kit's coverage now that the crate table reaches the rule in process. It opens with **one hermetic env prelude covering the whole file**: it strips the whole `DELEGATION_KIT_*` namespace and then sets the knobs with no per-call home — sampling off, and both pause thresholds at the defaults the 95% reading is judged against. A prelude rather than per-instance pins because instance-pinning has already missed once by construction: a pass that pinned the two knobs then biting left the third, and the survivor was the one whose failure is **silent** — an unpinned history path makes every smoke verdict append a synthetic sample into whatever trend log the ambient config names, indistinguishable in shape from a real operator reading. That this repo's runs happened not to pollute was accidental, not designed: the harness runs the file with cwd = the scratch consumer root and the configured history path is *relative*, so the appends died with the scratch tree — hermeticity that evaporates the moment a consumer configures an absolute path or the file is invoked from a real tree. Stripping the whole namespace is the shape that cannot miss a third knob. The credentials pin stays **at each invocation** rather than moving into the prelude, because gate-sdk/SPEC.md §check-test-hermetic reads it there — a line-local pin is evidence a reader and a gate can both see without tracing file-level state — and the poller's own snapshot, credentials and endpoint paths stay inline too, being genuine per-call arguments the prelude has no business pre-empting. That assertion is **code-specific**: the 95% guard captures the exit status and compares it to the PAUSE code, reporting the status it observed rather than claiming an outcome it did not establish, so a STALE regression cannot pass under a "did not PAUSE" message (gate-sdk/SPEC.md §check-assertion-strength, the gate for the class). It also drives the poll producer through its `file://` stub seam: the happy path writes a contract-valid snapshot (asserted by driving it through `usage-verdict`), and a fetch failure exits non-zero leaving a pre-seeded snapshot byte-identical — the fail-soft contract, exercised end to end. `smoke/violation.sh` stages a gate edit co-staged with a product file in the scratch consumer and asserts the battery reds (assertion A) — the violation is craftable, so the file is mandatory (gate-sdk/SPEC.md §Consumer smoke).
 
-Both scripts stay on the shell substrate permanently and carry `# no-port:`
-saying so. The disposition is not this section's to argue: it is the class ruling
-at gate-sdk/SPEC.md §Consumer smoke, *The port disposition*, which reaches them by
-its **ground** rather than by its scope — that ruling's stated-contract cut covers
-the recipes answering to §Consumer smoke, and these two answer here, but its legs
-2 and 3 hold of them identically.
+Both scripts stay on the shell substrate permanently and carry `# no-port:` saying so. The disposition is not this section's to argue: it is the class ruling at gate-sdk/SPEC.md §Consumer smoke, *The port disposition*, which reaches them by its **ground** rather than by its scope — that ruling's stated-contract cut covers the recipes answering to §Consumer smoke, and these two answer here, but its legs 2 and 3 hold of them identically.
 
 ## Out of scope
 
-A consumer's validate battery (its compile/lint/test command set and rename
-corruption sweeps), its shared-file roster, and its width/burn anecdotes tied
-to specific sweeps are rule content, referenced only as marked-section
-examples. A task-output tailer is not shipped: such a tool hardcodes local
-harness paths and exists to violate the template's **Background + notification,
-never poll** rule for debugging. The
-`usage.txt` write contract and a reference producer rendering the gauge bars
-and `iteration@stage` readout do ship (the producer's ANSI is self-contained,
-pulling no external asset); a consumer's *particular* statusline styling and
-any asset its own gauges pull are not the rendering mechanism and stay with
-it. The split is protocol and mechanisms here, a consumer's rosters,
-batteries, and bespoke UX in its own copies.
+A consumer's validate battery (its compile/lint/test command set and rename corruption sweeps), its shared-file roster, and its width/burn anecdotes tied to specific sweeps are rule content, referenced only as marked-section examples. A task-output tailer is not shipped: such a tool hardcodes local harness paths and exists to violate the template's **Background + notification, never poll** rule for debugging. The `usage.txt` write contract and a reference producer rendering the gauge bars and `iteration@stage` readout do ship (the producer's ANSI is self-contained, pulling no external asset); a consumer's *particular* statusline styling and any asset its own gauges pull are not the rendering mechanism and stay with it. The split is protocol and mechanisms here, a consumer's rosters, batteries, and bespoke UX in its own copies.

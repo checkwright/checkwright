@@ -1458,37 +1458,23 @@ impl DefaultGrammar<'_> {
         String::new()
     }
 
-    // spec: canon-kit/SPEC.md §The shared spec adapters — `sk_default_literal`: the literal the first
-    // word-bounded "default" binds within a forward window, or the empty string
-    pub fn default_literal(&self, line: &str, win: usize) -> String {
-        let lb = line.to_ascii_lowercase();
-        let low = lb.as_bytes();
+    // spec: canon-kit/SPEC.md §check-knob-citation — the byte offset of every word-bounded "default"
+    // that binds a value literal within the same 24-character window, so a reader can bind a token
+    // to the marker it sits beside rather than to any marker on its line
+    pub fn default_bound_at(&self, line: &str) -> Vec<usize> {
+        let low = line.to_ascii_lowercase();
+        let low = low.as_bytes();
         let b = line.as_bytes();
-        let mut off = 0usize;
-        while off < low.len() {
-            let hit = (off..low.len()).find(|&i| {
+        (0..low.len())
+            .filter(|&i| {
                 low[i..].starts_with(b"default")
                     && (i == 0 || !(low[i - 1].is_ascii_alphanumeric() || low[i - 1] == b'_'))
-            });
-            let ms = match hit {
-                Some(i) => i,
-                None => return String::new(),
-            };
-            let after_start = ms + b"default".len();
-            let after_end = std::cmp::min(after_start + win, b.len());
-            let lit = self.literal_at(&b[after_start..after_end]);
-            if !lit.is_empty() {
-                return lit;
-            }
-            off = ms + 1;
-        }
-        String::new()
-    }
-
-    // spec: canon-kit/SPEC.md §The shared spec adapters — `sk_default_bound`: the word "default" binding a
-    // value literal within a 24-character forward window
-    pub fn default_bound(&self, line: &str) -> bool {
-        !self.default_literal(line, 24).is_empty()
+            })
+            .filter(|&i| {
+                let after = i + b"default".len();
+                !self.literal_at(&b[after..std::cmp::min(after + 24, b.len())]).is_empty()
+            })
+            .collect()
     }
 }
 

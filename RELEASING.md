@@ -1,93 +1,25 @@
 # Releasing Checkwright
 
-The repeatable release procedure — the **close stage's release-disposition
-step** invoked at *every* iteration close (lifecycle-kit/templates/stages/close.md;
-this repo binds it in `.claude/commands/close.md`), not a separately
-operator-invoked ritual. Checkwright carries one semver line applied as git tags,
-the kits moving in lockstep — the versioning model is
-[installer/SPEC.md](installer/SPEC.md) §Versioning, and the two-phase contract a
-release serves is that file's §The upgrade contract. The release-note post is the
-note's single home and the GitHub Release points at it.
+The repeatable release procedure — the **close stage's release-disposition step** invoked at *every* iteration close (lifecycle-kit/templates/stages/close.md; this repo binds it in `.claude/commands/close.md`), not a separately operator-invoked ritual. Checkwright carries one semver line applied as git tags, the kits moving in lockstep — the versioning model is [installer/SPEC.md](installer/SPEC.md) §Versioning, and the two-phase contract a release serves is that file's §The upgrade contract. The release-note post is the note's single home and the GitHub Release points at it.
 
-Like [CONTRIBUTING.md](CONTRIBUTING.md), this runbook is governed repo-meta:
-tracked, pinned in `scripts/core-files.list`, and in the spec manifest so its
-links and commands resolve under the doc gates.
+Like [CONTRIBUTING.md](CONTRIBUTING.md), this runbook is governed repo-meta: tracked, pinned in `scripts/core-files.list`, and in the spec manifest so its links and commands resolve under the doc gates.
 
 ## The procedure
 
-Every iteration close dispositions the release boundary and records the outcome
-as one line in `.workflow/release-disposition.txt` (the boundary-required
-disposition evidence read by the next iteration's scope entry,
-lifecycle-kit/SPEC.md §bin/enter-stage.sh). The line's grammar — every legal form
-of the version field, including the deferral form step 2 below writes — is owned
-by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
+Every iteration close dispositions the release boundary and records the outcome as one line in `.workflow/release-disposition.txt` (the boundary-required disposition evidence read by the next iteration's scope entry, lifecycle-kit/SPEC.md §bin/enter-stage.sh). The line's grammar — every legal form of the version field, including the deferral form step 2 below writes — is owned by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
 
-1. **Author the release-note post — in-iteration.** Add a dated `docs/posts/`
-   entry carrying a `release: vX.Y.Z` front-matter key and every fixed section
-   the upgrade contract's roster names; the skeleton below walks them in order.
-   The parseable grammar (front-matter key, section names, bullet lead tokens) is
-   owned by [installer/SPEC.md](installer/SPEC.md) §The upgrade contract; "none" is a
-   valid section body and is stated, never omitted. The note joins the nav by its
-   `release:` key with no further step — the [Releases page](docs/releases.md)
-   names that key in `nav_children_key`, so the note renders as a derived nav
-   child (and the render-time releases index lists it likewise); no
-   `scripts/docs-offnav.list` entry, no allowlist growth per release.
+1. **Author the release-note post — in-iteration.** Add a dated `docs/posts/` entry carrying a `release: vX.Y.Z` front-matter key and every fixed section the upgrade contract's roster names; the skeleton below walks them in order. The parseable grammar (front-matter key, section names, bullet lead tokens) is owned by [installer/SPEC.md](installer/SPEC.md) §The upgrade contract; "none" is a valid section body and is stated, never omitted. The note joins the nav by its `release:` key with no further step — the [Releases page](docs/releases.md) names that key in `nav_children_key`, so the note renders as a derived nav child (and the render-time releases index lists it likewise); no `scripts/docs-offnav.list` entry, no allowlist growth per release.
 
-   **Author the note's fixed chrome from this skeleton, never by copying a prior
-   post** — this runbook is the chrome's single source (the verbatim text below
-   was lifted once from the current posts to seed it, not copied per release):
+   **Author the note's fixed chrome from this skeleton, never by copying a prior post** — this runbook is the chrome's single source (the verbatim text below was lifted once from the current posts to seed it, not copied per release):
 
-   - **Opener (fixed, verbatim)** — the reserved framing, then a per-release
-     summary slot: *"Checkwright is the verification layer under agent
-     orchestration, and this release {one- or two-sentence summary}."*
-   - **In brief (fixed, no `None` form)** — placed immediately after the
-     Opener, ahead of the three variable sections below. Grammar owned by
-     [installer/SPEC.md](installer/SPEC.md) §The upgrade contract; cite it, never
-     restate it.
-   - **The three variable sections** — Tightened gates, Renamed knobs, and
-     Behavior changes, authored to [installer/SPEC.md](installer/SPEC.md) §The
-     upgrade contract's grammar (a knob *removal* is expressed `old → ∅` under
-     Renamed knobs); that pointer owns their grammar, this skeleton does not
-     restate it. **All three are composed, not recalled** — their bullets come
-     from `.workflow/release-declarations.md`, the release declaration surface
-     each landing session appended to in the commit that shipped the change
-     (gate-sdk/SPEC.md §upgrade-smoke). One note bullet per surface bullet, in
-     the same section, each section's lead tokens carried unchanged; the prose
-     may be edited for the reader. An empty section means a stated "None." A
-     change the composing session finds undeclared is appended to the surface
-     first, then transcribed — the discovering session is the producer
-     (gate-sdk/SPEC.md §upgrade-smoke). Because the surface accumulates across every
-     iteration since the last tag, a release batching several iterations inherits
-     all of their declarations here.
-     **Held by a gate, not by review:** `check-release-declaration-parity`
-     asserts each of the three composed sections' token sets equals the same
-     section of the surface it was composed from while the note is under
-     composition (its declared version carries no tag yet), so the transcription
-     this step performs is checked at commit time rather than trusted to a manual
-     read-across.
-   - **Upgrading — sync/regen slot** — {the wholesale kit sync at `vX.Y.Z`, the
-     generated artifacts to regenerate, then the full battery}.
-   - **Upgrading — allowed-red slot (two-way)** — state either "**No allowed
-     reds.**" when Tightened gates is empty, or "**The allowed red[s].**" naming
-     each red and the regen or step that clears it. The set itself — the
-     Tightened-gates lead tokens — is owned by [installer/SPEC.md](installer/SPEC.md)
-     §The upgrade contract's allowed-red-set grammar; cite it, never restate it.
-   - **Closing tail (fixed, verbatim)** — "The behavior changes above are
-     declared for reading, not a mechanical scan. If a gate reds that this note
-     does not name, the upgrade smoke was supposed to catch it first —
-     [open an issue](https://github.com/checkwright/checkwright/issues), because
-     that is a defect in the release rather than work for you."
+   - **Opener (fixed, verbatim)** — the reserved framing, then a per-release summary slot: *"Checkwright is the verification layer under agent orchestration, and this release {one- or two-sentence summary}."*
+   - **In brief (fixed, no `None` form)** — placed immediately after the Opener, ahead of the three variable sections below. Grammar owned by [installer/SPEC.md](installer/SPEC.md) §The upgrade contract; cite it, never restate it.
+   - **The three variable sections** — Tightened gates, Renamed knobs, and Behavior changes, authored to [installer/SPEC.md](installer/SPEC.md) §The upgrade contract's grammar (a knob *removal* is expressed `old → ∅` under Renamed knobs); that pointer owns their grammar, this skeleton does not restate it. **All three are composed, not recalled** — their bullets come from `.workflow/release-declarations.md`, the release declaration surface each landing session appended to in the commit that shipped the change (gate-sdk/SPEC.md §upgrade-smoke). One note bullet per surface bullet, in the same section, each section's lead tokens carried unchanged; the prose may be edited for the reader. An empty section means a stated "None." A change the composing session finds undeclared is appended to the surface first, then transcribed — the discovering session is the producer (gate-sdk/SPEC.md §upgrade-smoke). Because the surface accumulates across every iteration since the last tag, a release batching several iterations inherits all of their declarations here. **Held by a gate, not by review:** `check-release-declaration-parity` asserts each of the three composed sections' token sets equals the same section of the surface it was composed from while the note is under composition (its declared version carries no tag yet), so the transcription this step performs is checked at commit time rather than trusted to a manual read-across.
+   - **Upgrading — sync/regen slot** — {the wholesale kit sync at `vX.Y.Z`, the generated artifacts to regenerate, then the full battery}.
+   - **Upgrading — allowed-red slot (two-way)** — state either "**No allowed reds.**" when Tightened gates is empty, or "**The allowed red[s].**" naming each red and the regen or step that clears it. The set itself — the Tightened-gates lead tokens — is owned by [installer/SPEC.md](installer/SPEC.md) §The upgrade contract's allowed-red-set grammar; cite it, never restate it.
+   - **Closing tail (fixed, verbatim)** — "The behavior changes above are declared for reading, not a mechanical scan. If a gate reds that this note does not name, the upgrade smoke was supposed to catch it first — [open an issue](https://github.com/checkwright/checkwright/issues), because that is a defect in the release rather than work for you."
 
-2. **Derive the bump off the note.** Choose the bump by
-   [installer/SPEC.md](installer/SPEC.md) §Versioning's criteria (the derivable floor
-   is gated by `check-release-bump`), read off the note's three variable
-   sections — `## In brief` feeds no bump criterion, so do not look for one
-   there. An
-   iteration meeting no bump criterion earns **none**: stamp `<iteration> release
-   none — <basis>` into the disposition evidence and stop — no tag, no GitHub
-   Release. A patch stays available on operator judgment for an urgent fix.
-   An iteration that **meets** a bump criterion but whose release the operator
-   holds back is neither of those: stamp `<iteration> release deferred:vX.Y.Z —
+2. **Derive the bump off the note.** Choose the bump by [installer/SPEC.md](installer/SPEC.md) §Versioning's criteria (the derivable floor is gated by `check-release-bump`), read off the note's three variable sections — `## In brief` feeds no bump criterion, so do not look for one there. An iteration meeting no bump criterion earns **none**: stamp `<iteration> release none — <basis>` into the disposition evidence and stop — no tag, no GitHub Release. A patch stays available on operator judgment for an urgent fix. An iteration that **meets** a bump criterion but whose release the operator holds back is neither of those: stamp `<iteration> release deferred:vX.Y.Z —
    <basis>` — the version the criteria would have shipped as, derived over the
    newest already-released note — and stop, again with no tag and no Release. The
    deferral stays outstanding until a later line releases at or above it, and the
@@ -98,225 +30,49 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
    `none` for this — `none` means nothing was earned.
    Otherwise continue with the derived `vX.Y.Z`.
 
-3. **Major only: sweep the deprecation markers.** When the bump is a major, run
-   the release-sweep skill *before* the tag — the deprecation disposition walk at
-   the release boundary, its contract lifecycle-kit/SPEC.md §templates/release-sweep.md.
-   Every marker on the roster earns a stamped disposition in
-   `.workflow/release-sweep-evidence.txt` before the tag; an empty roster is a
-   stated "none". No marker rides into the next major undispositioned. That file
-   is a tracked checked projection of the workflow directory
-   (gate-sdk/SPEC.md §The workflow directory), so its first line is the
-   `# contract: RELEASING.md §The procedure — …` header carrying the block
-   grammar; a disposition block opens with a bare `<release> — <date>` line
-   below it, never a `#` one.
+3. **Major only: sweep the deprecation markers.** When the bump is a major, run the release-sweep skill *before* the tag — the deprecation disposition walk at the release boundary, its contract lifecycle-kit/SPEC.md §templates/release-sweep.md. Every marker on the roster earns a stamped disposition in `.workflow/release-sweep-evidence.txt` before the tag; an empty roster is a stated "none". No marker rides into the next major undispositioned. That file is a tracked checked projection of the workflow directory (gate-sdk/SPEC.md §The workflow directory), so its first line is the `# contract: RELEASING.md §The procedure — …` header carrying the block grammar; a disposition block opens with a bare `<release> — <date>` line below it, never a `#` one.
 
-4. **Tag the iteration's final commit, and drain the release declaration
-   surface.** The
-   drain and the disposition stamp are both tree writes, so the iteration's final
-   commit is the one this step creates — which fixes the ordering, and **the
-   ordering is not optional**. It binds in two places. First, **the note-authoring
-   commit of step 1 precedes this drain-and-stamp commit, and the two are not to
-   be squashed into one**: in the window between them the note and the surface are
-   both non-empty and comparable, which is the only window in which
-   `check-release-declaration-parity` can hold them equal. Compose and drain in a
-   single commit and the gate never sees a comparable state — it does not red, it
-   simply has nothing to say, so the parity claim is silently forfeited.
-   Enforcement of the split is this runbook's, not that gate's: a pre-commit gate
-   cannot tell "note and drain in one commit" from "note authored while the
-   surface was already empty". Second: write the **stamp** commit, push master,
-   watch the `gates` run *for that SHA* go green, and only then tag that commit
-   and push the tag. `CLAUDE.md` makes the remote oracle the authority over a
-   master push, and a tag's whole purpose is to name an immutable tree other
-   people fetch; tagging before the watch puts the tag on a tree only the local
-   battery ever saw, inverting that authority invisibly — every gate is green
-   either way, and the only tell is which SHA the `gates` run carries.
+4. **Tag the iteration's final commit, and drain the release declaration surface.** The drain and the disposition stamp are both tree writes, so the iteration's final commit is the one this step creates — which fixes the ordering, and **the ordering is not optional**. It binds in two places. First, **the note-authoring commit of step 1 precedes this drain-and-stamp commit, and the two are not to be squashed into one**: in the window between them the note and the surface are both non-empty and comparable, which is the only window in which `check-release-declaration-parity` can hold them equal. Compose and drain in a single commit and the gate never sees a comparable state — it does not red, it simply has nothing to say, so the parity claim is silently forfeited. Enforcement of the split is this runbook's, not that gate's: a pre-commit gate cannot tell "note and drain in one commit" from "note authored while the surface was already empty". Second: write the **stamp** commit, push master, watch the `gates` run *for that SHA* go green, and only then tag that commit and push the tag. `CLAUDE.md` makes the remote oracle the authority over a master push, and a tag's whole purpose is to name an immutable tree other people fetch; tagging before the watch puts the tag on a tree only the local battery ever saw, inverting that authority invisibly — every gate is green either way, and the only tell is which SHA the `gates` run carries.
 
-   **The drain lands after the tag, and the parity gate is what forces it.** That
-   gate arms on a note whose declared version carries **no tag yet**, so while the
-   note is untagged it holds the note's three declaration-bearing sections equal
-   to the surface — which means draining before the tag reds it, with the whole
-   composed set reported as never declared. Push and watch the stamp commit, tag
-   it, push the tag; the note is then tagged, the gate goes dormant, and the drain
-   commits cleanly. Sequenced this way the release is one `gates` watch and one
-   `publish` watch, and the drain commit rides the next push rather than buying a
-   third run.
+   **The drain lands after the tag, and the parity gate is what forces it.** That gate arms on a note whose declared version carries **no tag yet**, so while the note is untagged it holds the note's three declaration-bearing sections equal to the surface — which means draining before the tag reds it, with the whole composed set reported as never declared. Push and watch the stamp commit, tag it, push the tag; the note is then tagged, the gate goes dormant, and the drain commits cleanly. Sequenced this way the release is one `gates` watch and one `publish` watch, and the drain commit rides the next push rather than buying a third run.
 
-   Tag with `git tag -a vX.Y.Z` on the stamp commit, then push the tag to the
-   origin. The tag is also what discharges `.workflow/release-declarations.md`:
-   step 1 composed the note from it, so drain it at the tag and only there — an
-   iteration closing on `release none` or a deferral carries every section
-   forward, which is exactly what the next release's note must inherit. Drain by
-   **truncating to the header line**, never by clearing the file: it is a tracked
-   checked projection whose header is required, and a whole-file clear reds
-   `check-workflow-tiering` on the drain commit itself. Stamp
-   `<iteration> release vX.Y.Z — <basis>` into the disposition evidence, in the
-   commit the tag names.
+   Tag with `git tag -a vX.Y.Z` on the stamp commit, then push the tag to the origin. The tag is also what discharges `.workflow/release-declarations.md`: step 1 composed the note from it, so drain it at the tag and only there — an iteration closing on `release none` or a deferral carries every section forward, which is exactly what the next release's note must inherit. Drain by **truncating to the header line**, never by clearing the file: it is a tracked checked projection whose header is required, and a whole-file clear reds `check-workflow-tiering` on the drain commit itself. Stamp `<iteration> release vX.Y.Z — <basis>` into the disposition evidence, in the commit the tag names.
 
-   **The credential precondition — test the permission, and test it for the
-   right account.** The closing session runs steps 4-7 itself when it holds the
-   credentials (the default); only a genuinely keyless sandbox defers these to
-   the operator.
+   **The credential precondition — test the permission, and test it for the right account.** The closing session runs steps 4-7 itself when it holds the credentials (the default); only a genuinely keyless sandbox defers these to the operator.
 
-   **Read the local ops runbook first, in either branch.** It is outside the tree
-   and it owns the two mechanics this file deliberately does not carry: which
-   account is designated to release, and the exact push transport for the master
-   push and the tag push. That pointer is **not** scoped to the keyless-operator
-   case — a credentialed closing session performing its own push is its primary
-   reader, because the transport that works here is environmental and can change
-   without any tracked surface moving.
+   **Read the local ops runbook first, in either branch.** It is outside the tree and it owns the two mechanics this file deliberately does not carry: which account is designated to release, and the exact push transport for the master push and the tag push. That pointer is **not** scoped to the keyless-operator case — a credentialed closing session performing its own push is its primary reader, because the transport that works here is environmental and can change without any tracked surface moving.
 
-   The property that decides the precondition is the repository's own
-   **`permissions.push`**, read with `gh api repos/<owner>/<repo> --jq
-   .permissions`. **It answers for whichever account is currently active, and a
-   machine may carry more than one login.** So a `false` is not yet a finding:
-   first check *which* account is active against the release account the ops
-   runbook designates, select that account if it is not the active one, and only
-   then read the result as a fact about permission. A session that skips this
-   step reads an unselected login as a permission defect and stops a release
-   that was never blocked.
+   The property that decides the precondition is the repository's own **`permissions.push`**, read with `gh api repos/<owner>/<repo> --jq .permissions`. **It answers for whichever account is currently active, and a machine may carry more than one login.** So a `false` is not yet a finding: first check *which* account is active against the release account the ops runbook designates, select that account if it is not the active one, and only then read the result as a fact about permission. A session that skips this step reads an unselected login as a permission defect and stops a release that was never blocked.
 
-   The two things a session reaches for instead each prove nothing: `gh auth
-   status` reports a token's **scopes**, and a scope is a *ceiling* on what a
-   token may attempt rather than a grant of what the account may do on this
-   repository; and a git push transport that works elsewhere says nothing about
-   API writes, nor about whether that transport still works here — the ops
-   runbook owns the one that does. Two clauses ride with it, placed
-   here because a session will need them mid-release with a tag already public:
-   - **A 404 on a write is a permission signature, not a missing object.** GitHub
-     masks an unauthorized write as an absent resource, so a `gh release edit`
-     returning 404 against a Release that plainly exists means *not permitted*.
-   - **Identity before status code — establish who is writing before you read
-     what the write returned.** On any refused write, the first question is not
-     *what does this code mean* but **which account is active, and is it the
-     release account the ops runbook designates**. Answer that first, every time.
-     A refusal from an account that was never the intended writer carries no
-     information about permission at all, and interpreting it as one is how a
-     correct permission model gets read as a defect.
+   The two things a session reaches for instead each prove nothing: `gh auth status` reports a token's **scopes**, and a scope is a *ceiling* on what a token may attempt rather than a grant of what the account may do on this repository; and a git push transport that works elsewhere says nothing about API writes, nor about whether that transport still works here — the ops runbook owns the one that does. Two clauses ride with it, placed here because a session will need them mid-release with a tag already public:
+   - **A 404 on a write is a permission signature, not a missing object.** GitHub masks an unauthorized write as an absent resource, so a `gh release edit` returning 404 against a Release that plainly exists means *not permitted*.
+   - **Identity before status code — establish who is writing before you read what the write returned.** On any refused write, the first question is not *what does this code mean* but **which account is active, and is it the release account the ops runbook designates**. Answer that first, every time. A refusal from an account that was never the intended writer carries no information about permission at all, and interpreting it as one is how a correct permission model gets read as a defect.
 
-     **Selecting the designated release account is the expected resolution, not
-     an evasion.** Where the active account is not the release account, "fix the
-     permission" resolves to granting write to an account that must not hold it —
-     the one action the identity boundary forbids. Select the designated account
-     and proceed.
+     **Selecting the designated release account is the expected resolution, not an evasion.** Where the active account is not the release account, "fix the permission" resolves to granting write to an account that must not hold it — the one action the identity boundary forbids. Select the designated account and proceed.
 
-     **What survives is the recording obligation, which was the clause's real
-     content.** Do not leave a discrepancy between the account this runbook
-     expects to write and the account that actually did, unrecorded — that is the
-     thing a silent identity switch would have buried, and it is worth a line in
-     the ops runbook whenever it happens. Recording is the duty; the prohibition
-     never was.
+     **What survives is the recording obligation, which was the clause's real content.** Do not leave a discrepancy between the account this runbook expects to write and the account that actually did, unrecorded — that is the thing a silent identity switch would have buried, and it is worth a line in the ops runbook whenever it happens. Recording is the duty; the prohibition never was.
 
-     **The discriminator is named here; its value is not.** Which account is the
-     release account is private-ops content and does not belong on a tracked
-     surface, so this file names *what to check* and the local ops runbook owns
-     *what the answer must be*.
+     **The discriminator is named here; its value is not.** Which account is the release account is private-ops content and does not belong on a tracked surface, so this file names *what to check* and the local ops runbook owns *what the answer must be*.
 
-5. **Watch the publish workflow — both channels.** Pushing the tag is what
-   publishes the installer package: `.github/workflows/publish.yml` fires on the
-   tag alone. It first **builds** one gate binary and one
-   digest sidecar per target in the roster the build matrix is derived from
-   (gate-sdk/SPEC.md §Consumer payload — no platform is spelled in the workflow).
-   It then **builds** the gate binary that job's assemble step dispatches to, and
-   **assembles** the package once with the binary's `--pack-installer` arm, which
-   verifies each artifact against its sidecar before placing it. Two sibling jobs
-   then consume that one artifact — `release` attaches the tarball, its `.sha256`
-   and one versioned archive per target (binary and sidecar) to the GitHub Release
-   and writes the Release body step 6 verifies (the primary channel), and
-   `npm` runs `npm publish --provenance` from the runner (the secondary one,
-   held behind its approval environment). That hold is a **confirmation step
-   that produces an approval record**, and claiming more would be an overclaim:
-   the project is single-maintainer by standing ruling, so the reviewer and the
-   tag pusher are one account and independent review is unavailable by
-   construction. Expect the run to pause and to need your approval before the
-   `npm` job starts. Nothing is published by hand, and
-   **there is no version to edit** — the pack arm stamps the version from the
-   tag being packed and the job refuses a tarball whose stamp disagrees with it
-   (installer/SPEC.md §Versioning owns the one-semver-line rule this derives from).
-   Watch **both** jobs to green (`gh run watch`) before continuing; a red publish
-   is fixed and the tag re-pushed, never worked around by publishing locally. The
-   job's credential and approval are repository configuration rather than tree
-   state, so a first run on an unconfigured repository fails loudly on the
-   missing token rather than publishing unattested. What the job may pass npm as
-   a package spec is §The publish spec below, held by `check-npm-publish-spec`.
+5. **Watch the publish workflow — both channels.** Pushing the tag is what publishes the installer package: `.github/workflows/publish.yml` fires on the tag alone. It first **builds** one gate binary and one digest sidecar per target in the roster the build matrix is derived from (gate-sdk/SPEC.md §Consumer payload — no platform is spelled in the workflow). It then **builds** the gate binary that job's assemble step dispatches to, and **assembles** the package once with the binary's `--pack-installer` arm, which verifies each artifact against its sidecar before placing it. Two sibling jobs then consume that one artifact — `release` attaches the tarball, its `.sha256` and one versioned archive per target (binary and sidecar) to the GitHub Release and writes the Release body step 6 verifies (the primary channel), and `npm` runs `npm publish --provenance` from the runner (the secondary one, held behind its approval environment). That hold is a **confirmation step that produces an approval record**, and claiming more would be an overclaim: the project is single-maintainer by standing ruling, so the reviewer and the tag pusher are one account and independent review is unavailable by construction. Expect the run to pause and to need your approval before the `npm` job starts. Nothing is published by hand, and **there is no version to edit** — the pack arm stamps the version from the tag being packed and the job refuses a tarball whose stamp disagrees with it (installer/SPEC.md §Versioning owns the one-semver-line rule this derives from). Watch **both** jobs to green (`gh run watch`) before continuing; a red publish is fixed and the tag re-pushed, never worked around by publishing locally. The job's credential and approval are repository configuration rather than tree state, so a first run on an unconfigured repository fails loudly on the missing token rather than publishing unattested. What the job may pass npm as a package spec is §The publish spec below, held by `check-npm-publish-spec`.
 
-6. **Verify the GitHub Release body.** Step 5's `release` job created the
-   Release with its body already written: one pointer sentence and the post's
-   `https://checkwright.dev/` URL, derived from the note whose `release:` key
-   names the tag. The post is the note's single home, and the Release is a
-   pointer to it. A tag with no note, or with two, fails that job before the
-   Release exists, so step 5's watch is where a missing note surfaces. Open the
-   Release and follow the link. The body lives on the host, out of the
-   battery's reach, so its backstop is a monitor rather than a gate:
-   `site-health.yml`'s release-body arm asserts daily that each note's Release
-   body carries that URL, and separately that every apex URL the body carries
-   resolves (site-kit/SPEC.md §templates/site-health.yml). It is what catches a
-   body edited after the cut.
+6. **Verify the GitHub Release body.** Step 5's `release` job created the Release with its body already written: one pointer sentence and the post's `https://checkwright.dev/` URL, derived from the note whose `release:` key names the tag. The post is the note's single home, and the Release is a pointer to it. A tag with no note, or with two, fails that job before the Release exists, so step 5's watch is where a missing note surfaces. Open the Release and follow the link. The body lives on the host, out of the battery's reach, so its backstop is a monitor rather than a gate: `site-health.yml`'s release-body arm asserts daily that each note's Release body carries that URL, and separately that every apex URL the body carries resolves (site-kit/SPEC.md §templates/site-health.yml). It is what catches a body edited after the cut.
 
-7. **Verify the version badge.** Confirm the README release-version badge
-   resolves the new tag. It is sourced from the GitHub tag list, so each release
-   updates it with no edit — this step is a verification, not a write.
+7. **Verify the version badge.** Confirm the README release-version badge resolves the new tag. It is sourced from the GitHub tag list, so each release updates it with no edit — this step is a verification, not a write.
 
-   **The repo shows no Latest badge, and that is the declared outcome — do not
-   "fix" it.** While the version line is `0.x` the channel is `preview`, so
-   every published Release carries the prerelease flag and none is Latest
-   (invariant C, installer/SPEC.md §The release channel, which owns the rule).
-   Flipping the newest Release to non-prerelease from the web UI would look like
-   a one-click improvement and would silently revert that decision — no gate
-   sees the host, and nothing would attribute the change. It is also not all-or-
-   nothing in your favour: flipping one Release makes it Latest, and flipping it
-   back walks Latest to whichever Release is unflagged next. The badge returns on
-   its own at `v1.0.0`, when the newest tag stops being `0.x`. A flag that drifts
-   anyway is reported by `site-health.yml`'s release-channel arm, so this step
-   adds no hand check — creation already carries the flag and the monitor is the
-   backstop, and a third owner would only disagree with them.
+   **The repo shows no Latest badge, and that is the declared outcome — do not "fix" it.** While the version line is `0.x` the channel is `preview`, so every published Release carries the prerelease flag and none is Latest (invariant C, installer/SPEC.md §The release channel, which owns the rule). Flipping the newest Release to non-prerelease from the web UI would look like a one-click improvement and would silently revert that decision — no gate sees the host, and nothing would attribute the change. It is also not all-or- nothing in your favour: flipping one Release makes it Latest, and flipping it back walks Latest to whichever Release is unflagged next. The badge returns on its own at `v1.0.0`, when the newest tag stops being `0.x`. A flag that drifts anyway is reported by `site-health.yml`'s release-channel arm, so this step adds no hand check — creation already carries the flag and the monitor is the backstop, and a third owner would only disagree with them.
 
 ## The publish spec
 
-The positional argument of an `npm publish` in a workflow must be unambiguously
-a path **by its own literal text**. `check-npm-publish-spec` holds this over
-`.github/workflows/`; the rule is npm's, and it is stated here because a spec
-that reads correctly to a human is the shape that already reached a released
-tag.
+The positional argument of an `npm publish` in a workflow must be unambiguously a path **by its own literal text**. `check-npm-publish-spec` holds this over `.github/workflows/`; the rule is npm's, and it is stated here because a spec that reads correctly to a human is the shape that already reached a released tag.
 
-npm resolves a positional package spec as a **path** when it begins with `.` or
-`/`, and as the GitHub shorthand **`owner/repo`** otherwise. The trigger is the
-leading character, **not the slash** — `dist/x.tgz` sends npm to
-`git ls-remote`, while `./dist/x.tgz`, an absolute path, and
-`.tmp/pubrepro/dist/x.tgz` (three slashes, leading dot) are all read as paths.
-So neither "contains no slash" nor "starts with `./`" is the rule, and a gate
-narrowed to either would red a spec that works — including the `$PWD`-prefixed
-form the workflow now carries.
+npm resolves a positional package spec as a **path** when it begins with `.` or `/`, and as the GitHub shorthand **`owner/repo`** otherwise. The trigger is the leading character, **not the slash** — `dist/x.tgz` sends npm to `git ls-remote`, while `./dist/x.tgz`, an absolute path, and `.tmp/pubrepro/dist/x.tgz` (three slashes, leading dot) are all read as paths. So neither "contains no slash" nor "starts with `./`" is the rule, and a gate narrowed to either would red a spec that works — including the `$PWD`-prefixed form the workflow now carries.
 
-A spec is unambiguous when, with **one layer of surrounding shell quoting
-removed** (every real spec on this surface is quoted, so the strip comes first
-or the gate reads `"` as the leading character):
+A spec is unambiguous when, with **one layer of surrounding shell quoting removed** (every real spec on this surface is quoted, so the strip comes first or the gate reads `"` as the leading character):
 
 - its first character is `.` or `/`; or
-- it begins with a bare (`$PWD/`) or braced (`${PWD}/`) expansion of a
-  proven-absolute root, immediately followed by `/`. The roster is exactly
-  `PWD`, `GITHUB_WORKSPACE`, and `RUNNER_TEMP`, each absolute by a written
-  contract — POSIX gives `PWD` as *an absolute pathname of the current working
-  directory*, and the Actions default-environment-variable table documents the
-  other two as runner-absolute. `HOME` is deliberately **not** on it: POSIX
-  gives it as *a pathname* of the user's home directory with no absoluteness
-  guarantee, and the Actions contract does not carry it at all. Re-proposing a
-  root takes a contract citation, never a runner observation.
+- it begins with a bare (`$PWD/`) or braced (`${PWD}/`) expansion of a proven-absolute root, immediately followed by `/`. The roster is exactly `PWD`, `GITHUB_WORKSPACE`, and `RUNNER_TEMP`, each absolute by a written contract — POSIX gives `PWD` as *an absolute pathname of the current working directory*, and the Actions default-environment-variable table documents the other two as runner-absolute. `HOME` is deliberately **not** on it: POSIX gives it as *a pathname* of the user's home directory with no absoluteness guarantee, and the Actions contract does not carry it at all. Re-proposing a root takes a contract citation, never a runner observation.
 
-Everything else is refused, and two refusals look safe enough to name. A **bare
-filename** publishes today only because a file of that name happens to sit in
-the runner's cwd — a runtime property the literal does not express, which is why
-the gate's message states the ambiguity and never predicts a failure. A
-**command substitution** cannot be evaluated by any reader of the text, and is
-the exact shape that shipped in `v0.16.0`; assign it to a variable and publish
-through a prefixed expansion, which is what the `npm` job does.
+Everything else is refused, and two refusals look safe enough to name. A **bare filename** publishes today only because a file of that name happens to sit in the runner's cwd — a runtime property the literal does not express, which is why the gate's message states the ambiguity and never predicts a failure. A **command substitution** cannot be evaluated by any reader of the text, and is the exact shape that shipped in `v0.16.0`; assign it to a variable and publish through a prefixed expansion, which is what the `npm` job does.
 
-The rule reaches `npm publish` alone. Its positional argument is by definition a
-local package, so every one of them is path-intended; every other npm verb takes
-registry specs as its ordinary case (`npm install lodash` is a correct bare
-token), and applying this rule to them would red correct lines. Two reach limits
-are deliberate: the check is line-local, so an `npm publish` continued across a
-backslash is **refused loudly** rather than judged from a fragment; and shell
-scripts under the tree are out of reach, because a `.sh` file's spec is
-typically a variable whose absoluteness the text cannot prove — the workflow
-surface is where the spec is written as a literal, which is what makes it
-gateable there and nowhere else.
+The rule reaches `npm publish` alone. Its positional argument is by definition a local package, so every one of them is path-intended; every other npm verb takes registry specs as its ordinary case (`npm install lodash` is a correct bare token), and applying this rule to them would red correct lines. Two reach limits are deliberate: the check is line-local, so an `npm publish` continued across a backslash is **refused loudly** rather than judged from a fragment; and shell scripts under the tree are out of reach, because a `.sh` file's spec is typically a variable whose absoluteness the text cannot prove — the workflow surface is where the spec is written as a literal, which is what makes it gateable there and nowhere else.

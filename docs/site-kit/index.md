@@ -6,36 +6,17 @@ nav_child_order: 10
 
 # site-kit
 
-Deployment-truth governance for a docs site served from the repository itself
-(GitHub Pages and equivalents). It keeps three truths apart: what the tree says
-about the site's host, whether the committed pages render faithfully through
-the parser that will serve them, and whether the live deployment is actually
-up.
+Deployment-truth governance for a docs site served from the repository itself (GitHub Pages and equivalents). It keeps three truths apart: what the tree says about the site's host, whether the committed pages render faithfully through the parser that will serve them, and whether the live deployment is actually up.
 
-The host gate — `check-docs-cname-parity` — makes the CNAME file the single
-gated source of truth for the docs host. No tracked file may cite a configured
-host alias other than that host in a URL, so a domain rename is a one-line edit
-to the CNAME that the gate then propagates. The alias set is consumer config,
-never a kit literal: a kit that shipped a project's host names would publish
-them.
+The host gate — `check-docs-cname-parity` — makes the CNAME file the single gated source of truth for the docs host. No tracked file may cite a configured host alias other than that host in a URL, so a domain rename is a one-line edit to the CNAME that the gate then propagates. The alias set is consumer config, never a kit literal: a kit that shipped a project's host names would publish them.
 
-The render gate — `check-docs-render-fidelity` — re-renders every tracked docs
-page through the Pages parser and asserts the observed leakage classes
-never reach the published artifact: it verifies the real rendered output
-rather than trusting that a page reading green on github.com ships intact.
-The class list and the gate's honest limit live in the kit's
-[`SPEC.md`](SPEC.md#check-docs-render-fidelity).
+The render gate — `check-docs-render-fidelity` — re-renders every tracked docs page through the Pages parser and asserts the observed leakage classes never reach the published artifact: it verifies the real rendered output rather than trusting that a page reading green on github.com ships intact. The class list and the gate's honest limit live in the kit's [`SPEC.md`](SPEC.md#check-docs-render-fidelity).
 
-The template — `site-health.yml` — is a scheduled probe of the live site
-(HTTPS, redirects, certificate expiry, and release-body note pointers). It
-verifies a deployment, not a tree, so it ships as a workflow a consumer copies
-rather than a gate: the line is where the asserted object lives, and none of what
-it asserts is in any checkout.
+The template — `site-health.yml` — is a scheduled probe of the live site (HTTPS, redirects, certificate expiry, and release-body note pointers). It verifies a deployment, not a tree, so it ships as a workflow a consumer copies rather than a gate: the line is where the asserted object lives, and none of what it asserts is in any checkout.
 
 ## Install
 
-The steps are the kit README's [Install](README.md#install) section.
-`checkwright init` does them for you — see the [install page](../install.md).
+The steps are the kit README's [Install](README.md#install) section. `checkwright init` does them for you — see the [install page](../install.md).
 
 ## Quick start
 
@@ -48,9 +29,4 @@ Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ## Contracts
 
-The gate invariants, the monitor boundary, and every knob are defined in the
-kit's
-[`SPEC.md`](SPEC.md#check-docs-cname-parity);
-its [`README.md`](README.md#site-kit)
-lists the mechanism. Back to the
-[kit map](../index.md#the-kits).
+The gate invariants, the monitor boundary, and every knob are defined in the kit's [`SPEC.md`](SPEC.md#check-docs-cname-parity); its [`README.md`](README.md#site-kit) lists the mechanism. Back to the [kit map](../index.md#the-kits).

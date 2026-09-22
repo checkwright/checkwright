@@ -1,26 +1,10 @@
 # evidence-kit
 
-A held-constant test baseline and a committed per-run evidence manifest for the
-validate stage: a stage stamp proves a stage was *invoked*, evidence-kit proves
-it produced its green result. The manifest is a versioned, hashable wire
-contract (`# contract: evidence-manifest v1`) an external verifier can consume,
-so the kit is adoptable with or without an iteration lifecycle.
+A held-constant test baseline and a committed per-run evidence manifest for the validate stage: a stage stamp proves a stage was *invoked*, evidence-kit proves it produced its green result. The manifest is a versioned, hashable wire contract (`# contract: evidence-manifest v1`) an external verifier can consume, so the kit is adoptable with or without an iteration lifecycle.
 
-The gates: `check-evidence-baseline` (baseline grammar, blocking-slug liveness,
-scenario coverage, flip causation), `check-evidence-manifest` (manifest grammar and, where
-lifecycle drives the tree, close-entry green block + validate-stamp coupling),
-`check-battery-roster` (the runner doc's battery block against the suite roster)
-and `check-producer-liveness` (no stage entry while the producer is still
-running). The tools that drive it are both non-gate arms of the gate binary,
-reached through gate-sdk's front end: `--run-validate` (the codified spine that
-runs the suites and records evidence) and `--diff-baseline` (the situational
-runtime diff). See [SPEC.md](SPEC.md) for the full contracts.
+The gates: `check-evidence-baseline` (baseline grammar, blocking-slug liveness, scenario coverage, flip causation), `check-evidence-manifest` (manifest grammar and, where lifecycle drives the tree, close-entry green block + validate-stamp coupling), `check-battery-roster` (the runner doc's battery block against the suite roster) and `check-producer-liveness` (no stage entry while the producer is still running). The tools that drive it are both non-gate arms of the gate binary, reached through gate-sdk's front end: `--run-validate` (the codified spine that runs the suites and records evidence) and `--diff-baseline` (the situational runtime diff). See [SPEC.md](SPEC.md) for the full contracts.
 
-An installer-vendored tree does not carry this file. The payload withholds each
-kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is
-repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is
-packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer
-payload).
+An installer-vendored tree does not carry this file. The payload withholds each kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
 
 ## Install
 
@@ -37,8 +21,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    ```
    <!-- gate-roster:end -->
 
-   Regenerate the hook + graph artifacts by running `--emit git-hooks --write`
-   on the gate binary `GATE_SDK_NATIVE_BIN` names.
+   Regenerate the hook + graph artifacts by running `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names.
 
 2. Seed the two surfaces — `.workflow/validate-baseline.txt`:
 
@@ -48,37 +31,15 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
        # contract: evidence-manifest v1
 
-   (override the paths with `EVIDENCE_KIT_BASELINE_FILE` /
-   `EVIDENCE_KIT_MANIFEST_FILE`).
+   (override the paths with `EVIDENCE_KIT_BASELINE_FILE` / `EVIDENCE_KIT_MANIFEST_FILE`).
 
-3. Configure the suites — copy `templates/evidence-config.knobs` into your gates
-   dir as `evidence-config.knobs`, naming `EVIDENCE_KIT_SUITES` (one
-   `EVIDENCE_KIT_SUITES[] = <suite>` line each, or
-   `EVIDENCE_KIT_SUITES[] <- EVIDENCE_KIT_FIXTURE_SUITES` for the derived fixture
-   suites, whose run commands are derived too), an `EVIDENCE_KIT_RUN_<suite>`
-   command per other suite,
-   and the `EVIDENCE_KIT_PARSER` adapter (`exit-code` for a whole-suite pass/fail,
-   `libtest` for per-test result logs, or your own log-parsing command).
+3. Configure the suites — copy `templates/evidence-config.knobs` into your gates dir as `evidence-config.knobs`, naming `EVIDENCE_KIT_SUITES` (one `EVIDENCE_KIT_SUITES[] = <suite>` line each, or `EVIDENCE_KIT_SUITES[] <- EVIDENCE_KIT_FIXTURE_SUITES` for the derived fixture suites, whose run commands are derived too), an `EVIDENCE_KIT_RUN_<suite>` command per other suite, and the `EVIDENCE_KIT_PARSER` adapter (`exit-code` for a whole-suite pass/fail, `libtest` for per-test result logs, or your own log-parsing command).
 
-4. Record evidence at validate — run `--run-validate` on the gate binary
-   `GATE_SDK_NATIVE_BIN` names; it runs each suite, diffs the baseline, and
-   records one evidence line per suite —
-   written to the manifest in a single fold once the whole roster has run, so a
-   suite needing a clean worktree may sit anywhere in it.
+4. Record evidence at validate — run `--run-validate` on the gate binary `GATE_SDK_NATIVE_BIN` names; it runs each suite, diffs the baseline, and records one evidence line per suite — written to the manifest in a single fold once the whole roster has run, so a suite needing a clean worktree may sit anywhere in it.
 
-5. Optional lifecycle integration — set `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` to the
-   evidence manifest so a new iteration starts from the contract header, and the
-   manifest gate's close-entry and stamp-coupling assertions arm automatically.
+5. Optional lifecycle integration — set `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` to the evidence manifest so a new iteration starts from the contract header, and the manifest gate's close-entry and stamp-coupling assertions arm automatically.
 
-6. Wire `check-producer-liveness` on `LIFECYCLE_KIT_ENTRY_PREFLIGHT` rather than
-   in `gates.list`, its command naming the lock file
-   through a name-resolving front end rather than a path
-   (`<stage>=<front end> check-producer-liveness <lock-file>`; SPEC.md
-   §check-evidence-manifest owns why a preflight entry names the gate),
-   at whichever stage entries must not begin while `--run-validate`
-   is still running. It asks whether a producer is in flight, not whether the
-   tree is consistent, so a battery that `--run-validate` itself invokes would red
-   every run against that run's own lock. See SPEC.md §check-producer-liveness.
+6. Wire `check-producer-liveness` on `LIFECYCLE_KIT_ENTRY_PREFLIGHT` rather than in `gates.list`, its command naming the lock file through a name-resolving front end rather than a path (`<stage>=<front end> check-producer-liveness <lock-file>`; SPEC.md §check-evidence-manifest owns why a preflight entry names the gate), at whichever stage entries must not begin while `--run-validate` is still running. It asks whether a producer is in flight, not whether the tree is consistent, so a battery that `--run-validate` itself invokes would red every run against that run's own lock. See SPEC.md §check-producer-liveness.
 
 ## Test
 

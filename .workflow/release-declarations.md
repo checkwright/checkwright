@@ -147,6 +147,7 @@
 - `check-tag-lead-line` — `[cap-credit:]` joins the governed set, so a credit written on a continuation line now reds. Move it onto the entry's lead line.
 - `check-surface-ratchet` — sizes are now code points, and a ceiling row without the `cp` suffix exits 2 as a line-unit row. Re-stamp with `bash gate-sdk/bin/run-gates.sh --emit always-loaded --ceiling` and commit the file.
 - `check-brevity` — the per-bullet budget is now `CONTEXT_KIT_BREVITY_CAP` in code points (default `330`), so a bullet joined onto one line no longer passes on its line count. A bullet near the old four-line budget may land either side; the finding names its size.
+- `check-lifecycle-registration` — the block `--install-lifecycle` writes is now one line per paragraph, so an installed block reds as stale after upgrading. Re-run `--install-lifecycle` on the gate binary and commit the agent file.
 
 ## Renamed knobs
 
@@ -191,6 +192,9 @@
 - **`--emit footprint`** — each cell reads `<n>cp · ~<t>t` in place of `<n>l · ~<t>t`, and the page's prose paragraphs are emitted one line each. Regenerate your footprint page.
 - **`--emit queue-index --icebox-candidates` and `--emit entry-history`** — an entry's size prints in the cap's unit with its suffix (`4211cp`, `48lines`), code points under `off`, where it printed a bare line count. If you parse either, match the suffix.
 - **`context-kit/templates/close-brevity.md`** — step 1's growth list is net code points. If you copied the template out, re-take the step's wording.
+- **Every kit's markdown** — each kit's SPEC, README and shipped templates, and `doctrine-kit/DOCTRINE.md`, now carry one line per paragraph, and `DOCTRINE.md`'s `*Stages:*` and `*Digest:*` trailers each stand as their own paragraph inside the rule. Nothing reds; a template you copied out differs from the shipped one in line breaks only, so re-take it or leave it.
+- **`check-knob-citation`** — the "default" marker binds only a knob token it follows within 100 code points, so a knob no longer reds for an unrelated default elsewhere on its line; it fires less, never more.
+- **`gate-sdk/templates/msg-patterns.list`** — the account-identification pattern needs the account noun and the handle-shaped token inside one clause (no `.` or `;` between them). If you copied the template, re-take that line.
 - **`--emit md-unwrap [--write] <file>…`** — new canon-kit arm joining every paragraph broken across lines, the remedy `check-md-unwrapped` prints.
 - **guard-kit rule 17** — now auto-allows a create-redirect or quoted-delimiter heredoc body to a gitignored target, where it prompted. (seeded from iteration enter-stage-cut-and-file-authoring-act's deferral basis)
 - **`drift-kit/bin/drift-report.sh`** — deleted with `drift-kit/kpis/*`; reachable via `run-gates.sh --emit-drift-report`. (seeded from iteration drift-kpi-contract-port's deferral basis)

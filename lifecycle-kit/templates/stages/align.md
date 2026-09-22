@@ -1,105 +1,25 @@
-The `align` (spec-alignment) stage of an iteration. Cross-spec audit, then
-*<consistency-gate: your aggregate consistency gate — e.g. the full gate
-battery>* as one gate. Exit condition: no unresolved conflicts or terminology
-drift.
+The `align` (spec-alignment) stage of an iteration. Cross-spec audit, then *<consistency-gate: your aggregate consistency gate — e.g. the full gate battery>* as one gate. Exit condition: no unresolved conflicts or terminology drift.
 
-**First step — stamp evidence.** Run the lifecycle arm
-`--enter-stage align` on the gate binary `GATE_SDK_NATIVE_BIN` names: it appends `<iteration> align <session-id> <date> <head>` to
-`.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp
-proves invocation, not faithful execution), reading `<session-id>` from
-the `--emit-session-id` arm
-(the newest transcript — never hand-picked), using `date +%F`, and refusing
-(writing nothing) if `check-stage-entry` is red. On a refusal, **do not force
-the entry** — escalate to the lead (where one exists and this is not a standalone
-session) and stop; a refused entry is a gate verdict to resolve at its source,
-never to override. That stamp *is* the
-transition — the last stamp is the stage cursor, so nothing flips and no queue
-write is involved. Commit the stamp on its own — unless the
-pre-flight valve admitted this entry, which rewrites the valve ledger in the
-same motion, so the two commit together (lifecycle-kit/SPEC.md
-§bin/enter-stage.sh).
+**First step — stamp evidence.** Run the lifecycle arm `--enter-stage align` on the gate binary `GATE_SDK_NATIVE_BIN` names: it appends `<iteration> align <session-id> <date> <head>` to `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp proves invocation, not faithful execution), reading `<session-id>` from the `--emit-session-id` arm (the newest transcript — never hand-picked), using `date +%F`, and refusing (writing nothing) if `check-stage-entry` is red. On a refusal, **do not force the entry** — escalate to the lead (where one exists and this is not a standalone session) and stop; a refused entry is a gate verdict to resolve at its source, never to override. That stamp *is* the transition — the last stamp is the stage cursor, so nothing flips and no queue write is involved. Commit the stamp on its own — unless the pre-flight valve admitted this entry, which rewrites the valve ledger in the same motion, so the two commit together (lifecycle-kit/SPEC.md §bin/enter-stage.sh).
 
 ## Trigger (align is trigger-gated)
 
-Run `align` only when one fires: (1) phase start, before the first
-implementation task; (2) a multi-component spec ambiguity surfaces during
-build; (3) this iteration's **authoring stage** (scope by default, or the
-dedicated authoring stage where the roster splits one out) authored an amendment
-changing ≥2 components' contracts. None firing → the prior stage advances
-directly to `build`
-(align skipped; the advance still needs user approval per the stage-line
-rule). The arriving stage stamps its own entry as its first step
-(above).
+Run `align` only when one fires: (1) phase start, before the first implementation task; (2) a multi-component spec ambiguity surfaces during build; (3) this iteration's **authoring stage** (scope by default, or the dedicated authoring stage where the roster splits one out) authored an amendment changing ≥2 components' contracts. None firing → the prior stage advances directly to `build` (align skipped; the advance still needs user approval per the stage-line rule). The arriving stage stamps its own entry as its first step (above).
 
-Trigger 3 is mechanized at build entry: `check-stage-entry` assertion C blocks
-the build entry when the on-disk amendments carry a cross-component signal and
-no `<iter> align` stamp exists. To skip the audit anyway, the user must
-explicitly rule it unwarranted and a `<iter> align-waived <session> <date> <head>`
-line is recorded in `.workflow/WORKFLOW-STATE.txt` — never self-issued by the
-entering build session (lifecycle-kit/SPEC.md §check-stage-entry).
+Trigger 3 is mechanized at build entry: `check-stage-entry` assertion C blocks the build entry when the on-disk amendments carry a cross-component signal and no `<iter> align` stamp exists. To skip the audit anyway, the user must explicitly rule it unwarranted and a `<iter> align-waived <session> <date> <head>` line is recorded in `.workflow/WORKFLOW-STATE.txt` — never self-issued by the entering build session (lifecycle-kit/SPEC.md §check-stage-entry).
 
 ## Session ritual
 
-*<audit-fanout: your audit fan-out: sweep the spec corpus for missing fields,
-naming inconsistencies, undocumented contracts, contradictions; name the
-entry grammar any backfill task filed from a finding is written against.>* Resolve every
-finding in the affected spec or amendment — never ad-hoc, never deferred.
-When both could hold it, **the surviving surface wins**: land it in the
-canonical spec the amendment merges into, and let the amendment cite it.
-Commit all spec changes in a single `chore:` commit.
+*<audit-fanout: your audit fan-out: sweep the spec corpus for missing fields, naming inconsistencies, undocumented contracts, contradictions; name the entry grammar any backfill task filed from a finding is written against.>* Resolve every finding in the affected spec or amendment — never ad-hoc, never deferred. When both could hold it, **the surviving surface wins**: land it in the canonical spec the amendment merges into, and let the amendment cite it. Commit all spec changes in a single `chore:` commit.
 
-**A sweep is a survey — check the record before you buy one, and file the one
-you buy.** The audit fan-out above is the most expensive survey any stage
-dispatches. Before dispatching it, read the survey record and run the witness on
-any block whose heading already answers your question; afterwards, file the
-finding a later stage will want. Both halves, and what a passing witness
-licenses you to cite, are lifecycle-kit/SPEC.md §The survey record.
+**A sweep is a survey — check the record before you buy one, and file the one you buy.** The audit fan-out above is the most expensive survey any stage dispatches. Before dispatching it, read the survey record and run the witness on any block whose heading already answers your question; afterwards, file the finding a later stage will want. Both halves, and what a passing witness licenses you to cite, are lifecycle-kit/SPEC.md §The survey record.
 
-**Audit the amendment against itself before auditing it against the tree.** Two
-defects are visible on the amendment alone and both survive a green battery. An
-author-stated count ("three things and no fourth") is an assertion about the
-deliverable, so check it against what the deltas actually mandate rather than
-against the sentence it heads. And every `## Existing sections updated` entry
-must name the delta that owns it (canon-kit/templates/SPEC-amendment.md).
+**Audit the amendment against itself before auditing it against the tree.** Two defects are visible on the amendment alone and both survive a green battery. An author-stated count ("three things and no fourth") is an assertion about the deliverable, so check it against what the deltas actually mandate rather than against the sentence it heads. And every `## Existing sections updated` entry must name the delta that owns it (canon-kit/templates/SPEC-amendment.md).
 
-**A claim about an existing program is checked against that program** — a
-modelled grammar, a check a gate applies, a refusal an arm makes: one invocation,
-or the implementing line where none is cheap. If the named program lacks the
-behaviour, find the one that holds it. Run every `**Inferred, not run:**`
-marker's command, in an amendment or an active queue entry, correct the passage
-to what it returned and delete the marker, or rewrite it to the cannot-run form.
+**A claim about an existing program is checked against that program** — a modelled grammar, a check a gate applies, a refusal an arm makes: one invocation, or the implementing line where none is cheap. If the named program lacks the behaviour, find the one that holds it. Run every `**Inferred, not run:**` marker's command, in an amendment or an active queue entry, correct the passage to what it returned and delete the marker, or rewrite it to the cannot-run form.
 
-**The `## Existing sections updated` roster is checked from the tree, and the
-half that stays yours is the larger one.** A roster entry with no delta is
-visible on the document; a *surface with no entry* is not, because the evidence
-is in the tree. The **literal-substitution** half of that is mechanized: an
-amendment declares what it retires in its `## Retired spellings` block and the
-battery re-runs each declaration against the tracked tree, reconciling every
-survivor against the roster — so do not hand-grep a replaced literal, run the
-gate. What is left is the residue no scanner reaches: a stale prose sentence, a
-semantic over-claim, a cross-reference dangled by a deletion rather than a
-substitution, and the **renumber** case, where the retired and the replacing
-spellings are byte-identical and telling a stale citation from a correct one is
-a reading of the site's subject matter. That case is routed rather than gated —
-a cross-corpus citation naming its referent instead of its number has no numeric
-relation left to decay.
+**The `## Existing sections updated` roster is checked from the tree, and the half that stays yours is the larger one.** A roster entry with no delta is visible on the document; a *surface with no entry* is not, because the evidence is in the tree. The **literal-substitution** half of that is mechanized: an amendment declares what it retires in its `## Retired spellings` block and the battery re-runs each declaration against the tracked tree, reconciling every survivor against the roster — so do not hand-grep a replaced literal, run the gate. What is left is the residue no scanner reaches: a stale prose sentence, a semantic over-claim, a cross-reference dangled by a deletion rather than a substitution, and the **renumber** case, where the retired and the replacing spellings are byte-identical and telling a stale citation from a correct one is a reading of the site's subject matter. That case is routed rather than gated — a cross-corpus citation naming its referent instead of its number has no numeric relation left to decay.
 
-**Every amendment's "wires cleanly against the current tree" is a hypothesis,
-and the align audit is its first test.** Verify every
-cross-component literal *at the read site*: grep the consumer's actual match
-arms, don't trust the amendment's prose. A **negative** claim — "no such
-harness/helper/gate exists yet", or an amendment's list of what it keeps or
-leaves untouched, which bounds nothing — is the audit's weakest evidence shape: a
-literal-string grep proves only that the spellings you guessed are absent, and
-the thing you are about to build often already exists under a spelling you did
-not anticipate. Before asserting absence, search the *concept* two ways — the
-symbol under its plausible spellings **and** the directory that would own it —
-or write the claim bounded ("no match for X") rather than absolute. When scope authored a new gate, the
-audit is that gate's first real run — the drift it surfaces is a backfill
-worklist to land before build, not a reason the gate is wrong.
+**Every amendment's "wires cleanly against the current tree" is a hypothesis, and the align audit is its first test.** Verify every cross-component literal *at the read site*: grep the consumer's actual match arms, don't trust the amendment's prose. A **negative** claim — "no such harness/helper/gate exists yet", or an amendment's list of what it keeps or leaves untouched, which bounds nothing — is the audit's weakest evidence shape: a literal-string grep proves only that the spellings you guessed are absent, and the thing you are about to build often already exists under a spelling you did not anticipate. Before asserting absence, search the *concept* two ways — the symbol under its plausible spellings **and** the directory that would own it — or write the claim bounded ("no match for X") rather than absolute. When scope authored a new gate, the audit is that gate's first real run — the drift it surfaces is a backfill worklist to land before build, not a reason the gate is wrong.
 
-**Last step — the resume journal.** This stage's exit artifact is the resume
-journal the `--enter-stage` arm named at the stamp; its path is a derivation
-(lifecycle-kit/SPEC.md §The state machine) and its contract is
-delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps.
-Append `DONE` as the file's last line before you report.
+**Last step — the resume journal.** This stage's exit artifact is the resume journal the `--enter-stage` arm named at the stamp; its path is a derivation (lifecycle-kit/SPEC.md §The state machine) and its contract is delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps. Append `DONE` as the file's last line before you report.

@@ -6,20 +6,13 @@ nav_child_order: 9
 
 # evidence-kit
 
-A held-constant test baseline and a committed per-run evidence manifest for the
-validate stage. A stage stamp proves a stage was invoked; this proves it
-produced a green result. Together they let a reviewer — or an external
-verifier — trust that the checks actually ran, not just that someone said so.
+A held-constant test baseline and a committed per-run evidence manifest for the validate stage. A stage stamp proves a stage was invoked; this proves it produced a green result. Together they let a reviewer — or an external verifier — trust that the checks actually ran, not just that someone said so.
 
-The manifest is a versioned wire contract an outside party can consume, which
-is why the kit exists as a distinct surface: it is the seam a hosted attestation
-service would verify. It ships the validate runner and baseline-diff tool, and
-gates over baseline grammar, slug liveness, and manifest grammar.
+The manifest is a versioned wire contract an outside party can consume, which is why the kit exists as a distinct surface: it is the seam a hosted attestation service would verify. It ships the validate runner and baseline-diff tool, and gates over baseline grammar, slug liveness, and manifest grammar.
 
 ## Install
 
-The steps are the kit README's [Install](README.md#install) section.
-`checkwright init` does them for you — see the [install page](../install.md).
+The steps are the kit README's [Install](README.md#install) section. `checkwright init` does them for you — see the [install page](../install.md).
 
 ## Quick start
 
@@ -33,9 +26,4 @@ Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ## Contracts
 
-The baseline grammar and the versioned manifest contract are defined in the
-kit's
-[`SPEC.md`](SPEC.md#per-component-contracts);
-its [`README.md`](README.md#evidence-kit)
-lists the mechanism. Back to the
-[kit map](../index.md#the-kits).
+The baseline grammar and the versioned manifest contract are defined in the kit's [`SPEC.md`](SPEC.md#per-component-contracts); its [`README.md`](README.md#evidence-kit) lists the mechanism. Back to the [kit map](../index.md#the-kits).

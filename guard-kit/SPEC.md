@@ -1,3227 +1,535 @@
 # guard-kit — permission-friction reduction for agent sessions
 
-A command no allowlist entry matches is not refused — it is decided **out of
-band**, by whatever a harness does when nothing matches: interrupt a human, or
-run a model to judge the call. Either way that decision is invisible to the
-agent — nothing about it lands in the transcript, so the agent cannot notice,
-count, or fix the friction it causes — and either way it is paid per call, out
-of the operator's attention or out of latency and tokens, compounding as the
-command surface grows. The kit closes the
-loop: a `PreToolUse` guard decides at call time (block with a corrective
-message, steer to a better form, auto-allow the provably safe, log every
-fall-through), a scanner ranks the logged prompt sources, a curation pass
-keeps the committed allowlist durable and the per-user overlay small, and a
-recurring close-stage triage step makes the whole loop a habit instead of a
-one-off cleanup.
+A command no allowlist entry matches is not refused — it is decided **out of band**, by whatever a harness does when nothing matches: interrupt a human, or run a model to judge the call. Either way that decision is invisible to the agent — nothing about it lands in the transcript, so the agent cannot notice, count, or fix the friction it causes — and either way it is paid per call, out of the operator's attention or out of latency and tokens, compounding as the command surface grows. The kit closes the loop: a `PreToolUse` guard decides at call time (block with a corrective message, steer to a better form, auto-allow the provably safe, log every fall-through), a scanner ranks the logged prompt sources, a curation pass keeps the committed allowlist durable and the per-user overlay small, and a recurring close-stage triage step makes the whole loop a habit instead of a one-off cleanup.
 
-The kit carries the guard framework, the harness-generic ruleset, and the
-triage tooling; every project-specific guard rule (build-tool hygiene,
-container concurrency, test-suite serialization) is consumer rule content
-and never ships. guard-kit registers **no
-gates**: its runtime surfaces are hooks and advisory `bin/` tools, so
-nothing joins `gates.list`; it follows gate-sdk's layout and smoke
-conventions without depending on its registry.
+The kit carries the guard framework, the harness-generic ruleset, and the triage tooling; every project-specific guard rule (build-tool hygiene, container concurrency, test-suite serialization) is consumer rule content and never ships. guard-kit registers **no gates**: its runtime surfaces are hooks and advisory `bin/` tools, so nothing joins `gates.list`; it follows gate-sdk's layout and smoke conventions without depending on its registry.
 
 ## The friction loop
 
-1. **Call time** — the consumer's `bash-guard.sh` (copied from
-   `templates/`, wired as the `PreToolUse(Bash)` hook) inspects each
-   command: block, steer, rewrite, auto-allow, or fall through. Every
-   fall-through — exactly the set of commands whose decision was made out of
-   band — is appended to the friction log. That decision is invisible to the
-   agent whichever way it went, so this log is the only record.
-2. **Close time** — `run-gates.sh --emit scan-prompts` filters the log against
-   the committed allowlist and ranks what survives (§scan-prompts states the
-   local-overlay upper bound), grouped by command
-   pattern. Each recurring pattern is resolved by the **triage criterion**
-   (below); `--emit-compare-settings-allow` (§compare-settings-allow) lists the
-   local-overlay entries a committed glob already grants and those naming a
-   script that does not exist (the prune sets), and those a declared probe
-   proves too broad (the narrowing set). Then the
-   log is cleared — its named reclaim path.
-3. **Steady state** — friction low and justified: the committed
-   `settings.json` carries every durable pattern (reviewable, shared), the
-   local `settings.local.json` stays near-empty, and the guard encodes the
-   steering rules no static glob can express.
+1. **Call time** — the consumer's `bash-guard.sh` (copied from `templates/`, wired as the `PreToolUse(Bash)` hook) inspects each command: block, steer, rewrite, auto-allow, or fall through. Every fall-through — exactly the set of commands whose decision was made out of band — is appended to the friction log. That decision is invisible to the agent whichever way it went, so this log is the only record.
+2. **Close time** — `run-gates.sh --emit scan-prompts` filters the log against the committed allowlist and ranks what survives (§scan-prompts states the local-overlay upper bound), grouped by command pattern. Each recurring pattern is resolved by the **triage criterion** (below); `--emit-compare-settings-allow` (§compare-settings-allow) lists the local-overlay entries a committed glob already grants and those naming a script that does not exist (the prune sets), and those a declared probe proves too broad (the narrowing set). Then the log is cleared — its named reclaim path.
+3. **Steady state** — friction low and justified: the committed `settings.json` carries every durable pattern (reviewable, shared), the local `settings.local.json` stays near-empty, and the guard encodes the steering rules no static glob can express.
 
 ### What the steering is buying
 
-The guard's blocks **serialize**: a compound the agent wanted as one call becomes
-several, and a convenient spelling becomes a written-out one. That cost is real
-and paid every session, so the rationale is stated here rather than assumed — and
-it is not "the agent would otherwise be interrupted". Steering does not stop a
-decision from being *made*; it moves the call onto the path where the decision is
-already made, the static match, and off the path where something else must decide.
-Three things pay for the serialization, and none of them turns on *which* thing
-decides:
+The guard's blocks **serialize**: a compound the agent wanted as one call becomes several, and a convenient spelling becomes a written-out one. That cost is real and paid every session, so the rationale is stated here rather than assumed — and it is not "the agent would otherwise be interrupted". Steering does not stop a decision from being *made*; it moves the call onto the path where the decision is already made, the static match, and off the path where something else must decide. Three things pay for the serialization, and none of them turns on *which* thing decides:
 
-- **The match short-circuits everything downstream.** An allow/ask/deny match
-  resolves the call there. Whatever a harness does with an unmatched command, the
-  matched form skips it — so the bare spelling is the cheaper one on every axis a
-  harness charges, without knowing which axis that is.
-- **The match verdict is deterministic; the out-of-band one is not.** A steered
-  command's outcome is a property of a reviewed settings file, stable across
-  sessions and auditable without running anything. An unmatched command's outcome
-  is a judgment made per call. This is the half of the win that survives a harness
-  getting cheap at deciding.
-- **The tool-hygiene rules are untouched by any of it.** Read over `cat`, Glob
-  over `find`, Grep over a working-tree `git grep`, `git rm` over `rm`, a scratch
-  dir over the repo root — each steers to a better tool or a safer form, and would
-  earn the guard's keep with no permission mechanism in the picture at all.
+- **The match short-circuits everything downstream.** An allow/ask/deny match resolves the call there. Whatever a harness does with an unmatched command, the matched form skips it — so the bare spelling is the cheaper one on every axis a harness charges, without knowing which axis that is.
+- **The match verdict is deterministic; the out-of-band one is not.** A steered command's outcome is a property of a reviewed settings file, stable across sessions and auditable without running anything. An unmatched command's outcome is a judgment made per call. This is the half of the win that survives a harness getting cheap at deciding.
+- **The tool-hygiene rules are untouched by any of it.** Read over `cat`, Glob over `find`, Grep over a working-tree `git grep`, `git rm` over `rm`, a scratch dir over the repo root — each steers to a better tool or a safer form, and would earn the guard's keep with no permission mechanism in the picture at all.
 
-**The honest limit.** None of this is measured. Whether N matched calls beat one
-unmatched call in wall-clock is an empirical question the kit does not answer, and
-a harness whose unmatched path is cheap narrows the first bullet toward nothing.
-The ruling therefore rests on the second and third, which do not turn on cost: the
-guard is worth its serialization because it makes the outcome deterministic and
-the tool choice better — not because it dodges an interrupt. A message that names
-one harness's consequence is wrong in the same way whichever consequence it names,
-which is why none of them do.
+**The honest limit.** None of this is measured. Whether N matched calls beat one unmatched call in wall-clock is an empirical question the kit does not answer, and a harness whose unmatched path is cheap narrows the first bullet toward nothing. The ruling therefore rests on the second and third, which do not turn on cost: the guard is worth its serialization because it makes the outcome deterministic and the tool choice better — not because it dodges an interrupt. A message that names one harness's consequence is wrong in the same way whichever consequence it names, which is why none of them do.
 
 ### The triage criterion
 
-Allowlist and guard are two tools with distinct jobs — resolve each
-recurring pattern by the criterion, never by defaulting to the allowlist:
+Allowlist and guard are two tools with distinct jobs — resolve each recurring pattern by the criterion, never by defaulting to the allowlist:
 
-- **Allowlist** (`Bash(...)` in the committed settings) when the command is
-  safe *and already in the form to reinforce* — static, glob-matched,
-  declarative.
-- **Guard rule** when a *better form exists* and the agent should be steered
-  to it, or when the allow/deny needs logic a static glob cannot express.
+- **Allowlist** (`Bash(...)` in the committed settings) when the command is safe *and already in the form to reinforce* — static, glob-matched, declarative.
+- **Guard rule** when a *better form exists* and the agent should be steered to it, or when the allow/deny needs logic a static glob cannot express.
 - **Habit change** (a noted convention) for true one-offs.
 
-Caution: an allowlist entry can *mask* a steering opportunity — before
-blessing a form, confirm it is the one to reinforce; if a better form
-exists, steer to it in the guard rather than permitting the worse one.
+Caution: an allowlist entry can *mask* a steering opportunity — before blessing a form, confirm it is the one to reinforce; if a better form exists, steer to it in the guard rather than permitting the worse one.
 
-Note: the harness matches the allowlist **per segment** of a compound
-command, so a glob on the core command does not cover the `echo` banners,
-`wc`, redirects, or `;`-chained diagnostics wrapped around it — one
-unmatched segment takes the whole line off the match path. The read-only banner
-and diagnostic tools an agent habitually chains are therefore themselves
-legitimate allowlist entries (§The recommended allowlist names them); allowlist
-them, or run the core command bare.
+Note: the harness matches the allowlist **per segment** of a compound command, so a glob on the core command does not cover the `echo` banners, `wc`, redirects, or `;`-chained diagnostics wrapped around it — one unmatched segment takes the whole line off the match path. The read-only banner and diagnostic tools an agent habitually chains are therefore themselves legitimate allowlist entries (§The recommended allowlist names them); allowlist them, or run the core command bare.
 
-A row the ranking marks **allowlist-unreachable** (§scan-prompts) admits two
-dispositions, not three: an allowlist entry is *unavailable* for it rather than
-unattractive, so resolve it by a guard rule or a habit change, or leave it
-standing as measured friction — a standing row is an honest outcome, not an
-unfinished triage.
+A row the ranking marks **allowlist-unreachable** (§scan-prompts) admits two dispositions, not three: an allowlist entry is *unavailable* for it rather than unattractive, so resolve it by a guard rule or a habit change, or leave it standing as measured friction — a standing row is an honest outcome, not an unfinished triage.
 
 ### The recommended allowlist
 
-`templates/settings-allow.json` is a recommendation to merge by hand, entry by
-entry, into the committed settings file's `permissions.allow`, as a **union**: an
-object merge that replaces the array drops every grant the consumer already had.
-Nothing in the kit writes it, since a grant is the consumer's security decision
-(§compare-settings-allow's impact criterion rates a committed widening
-high-impact). Each entry is there for a stated reason and reaches a stated set:
+`templates/settings-allow.json` is a recommendation to merge by hand, entry by entry, into the committed settings file's `permissions.allow`, as a **union**: an object merge that replaces the array drops every grant the consumer already had. Nothing in the kit writes it, since a grant is the consumer's security decision (§compare-settings-allow's impact criterion rates a committed widening high-impact). Each entry is there for a stated reason and reaches a stated set:
 
-- **The gate binary, bare and with arguments, spelled as the placeholder
-  `@GATE_SDK_NATIVE_BIN@`.** This is what a session runs: every gate, every arm
-  and the ruleset's own steer targets are reached through it — rule 8's section
-  extractor, the `--rewrite` arm, and the `--scratch-run` runner rules 23 and 26
-  name, each of which now prints the binary rather than the front end
-  (§The generic ruleset). **It ships as a placeholder rather than a path, and
-  both halves of that are load-bearing.** `GATE_SDK_NATIVE_BIN` is per-consumer,
-  so a kit file carrying its resolved value would publish an adopter's install
-  location as if it were kit mechanism — the provenance seam, held by
-  `check-door-binding`'s seam assertion (§check-door-binding). And an entry the
-  adopter has not resolved must match **nothing**: a permission pattern is
-  compared against a literal command, `@GATE_SDK_NATIVE_BIN@` is no command, so
-  the failure mode of forgetting the step is a permission prompt rather than a
-  silent grant. Resolve it to the value your `gate-sdk-config.knobs` gives the
-  knob, spelled as a command — the binary prints it with
-  `--emit knob-values GATE_SDK_NATIVE_BIN`, and gate-sdk's
-  `gate_native_bin_spelled` is the one owner of that spelling
-  (gate-sdk/SPEC.md §lib/gate.sh).
-- **The front-end, bare and with arguments — kept, not replaced.** After the
-  door sweep two different programs get spawned, and granting one is not
-  granting the other. `templates/settings-hooks.json` wires its hooks to
-  `--hook` arms, which are the fail-open set and therefore keep naming the front
-  end by construction (gate-sdk/SPEC.md §run-gates), and a clone reaches the
-  front end before its first build, when there is no binary to name. Dropping
-  this pair would leave the kit's own hook wiring ungranted. Its reach is the
-  whole front-end. That includes:
+- **The gate binary, bare and with arguments, spelled as the placeholder `@GATE_SDK_NATIVE_BIN@`.** This is what a session runs: every gate, every arm and the ruleset's own steer targets are reached through it — rule 8's section extractor, the `--rewrite` arm, and the `--scratch-run` runner rules 23 and 26 name, each of which now prints the binary rather than the front end (§The generic ruleset). **It ships as a placeholder rather than a path, and both halves of that are load-bearing.** `GATE_SDK_NATIVE_BIN` is per-consumer, so a kit file carrying its resolved value would publish an adopter's install location as if it were kit mechanism — the provenance seam, held by `check-door-binding`'s seam assertion (§check-door-binding). And an entry the adopter has not resolved must match **nothing**: a permission pattern is compared against a literal command, `@GATE_SDK_NATIVE_BIN@` is no command, so the failure mode of forgetting the step is a permission prompt rather than a silent grant. Resolve it to the value your `gate-sdk-config.knobs` gives the knob, spelled as a command — the binary prints it with `--emit knob-values GATE_SDK_NATIVE_BIN`, and gate-sdk's `gate_native_bin_spelled` is the one owner of that spelling (gate-sdk/SPEC.md §lib/gate.sh).
+- **The front-end, bare and with arguments — kept, not replaced.** After the door sweep two different programs get spawned, and granting one is not granting the other. `templates/settings-hooks.json` wires its hooks to `--hook` arms, which are the fail-open set and therefore keep naming the front end by construction (gate-sdk/SPEC.md §run-gates), and a clone reaches the front end before its first build, when there is no binary to name. Dropping this pair would leave the kit's own hook wiring ungranted. Its reach is the whole front-end. That includes:
   - `--scratch-run`, which runs a scratch script under that arm's echo control;
-  - `--rewrite`, which rewrites files inside the repository under its own bounds
-    (§rewrite);
+  - `--rewrite`, which rewrites files inside the repository under its own bounds (§rewrite);
   - `--install-hooks`, which opts the clone into the generated git hooks;
   - every `--emit … --write` mode that regenerates a tracked projection.
-- **`git rm -q`**, rule 22's steer target, spelled as the steer prints it. Its
-  reach is deleting and staging tracked paths, which is recoverable from the last
-  commit. Rule 22 blocks its force flag whether or not a grant matches.
-- **The banner and diagnostic tools** an agent chains around a core command:
-  `echo`, `wc`, `grep`, `ls` and `command -v`. The harness matches each segment of
-  a compound on its own, so these are what keep a chained core command on the
-  match path. They read or print. A redirect on them is a file write the harness
-  checks against the target, not against these entries. **The criterion for this
-  set is that a utility has no write or execute form of its own**, meaning nothing
-  it can do beyond what the harness separately checks. So `find` (`-exec`,
-  `-delete`), `awk` (`system()`, `print >`), `xargs`, `sed` and every interpreter
-  stay out however habitually they are chained, and the steer for a rewrite is
-  `--rewrite`, not a grant. The front-end and `git rm -q` above are the kit's own
-  steer targets, each granted for its stated reach, not members of this set.
-  **The honest limit** is that a Bash read grant reaches paths a harness file-read
-  rule may deny, so a consumer holding such rules drops `grep` and `wc` here
-  rather than widening around them.
+- **`git rm -q`**, rule 22's steer target, spelled as the steer prints it. Its reach is deleting and staging tracked paths, which is recoverable from the last commit. Rule 22 blocks its force flag whether or not a grant matches.
+- **The banner and diagnostic tools** an agent chains around a core command: `echo`, `wc`, `grep`, `ls` and `command -v`. The harness matches each segment of a compound on its own, so these are what keep a chained core command on the match path. They read or print. A redirect on them is a file write the harness checks against the target, not against these entries. **The criterion for this set is that a utility has no write or execute form of its own**, meaning nothing it can do beyond what the harness separately checks. So `find` (`-exec`, `-delete`), `awk` (`system()`, `print >`), `xargs`, `sed` and every interpreter stay out however habitually they are chained, and the steer for a rewrite is `--rewrite`, not a grant. The front-end and `git rm -q` above are the kit's own steer targets, each granted for its stated reach, not members of this set. **The honest limit** is that a Bash read grant reaches paths a harness file-read rule may deny, so a consumer holding such rules drops `grep` and `wc` here rather than widening around them.
 
-**Deliberately absent, so a reader does not re-derive it.** The harness's built-in
-read-only `git` subcommands need no entry. A write to a gitignored target, a
-truncation of one and a sanctioned wait are granted by rules 16, 17 and 19 from
-the hook, where no settings entry can reach them. The harness's file tools, the
-steer targets of rules 8 to 11 and 25, are governed by its own permission mode,
-and an `Edit` or `Write` grant is a write widening this recommendation will not
-make on a consumer's behalf. Rule 2's bare-`git` steer target is one subcommand
-per consumer, and a blanket `git` grant reaches a force push. **The template
-assumes the kits are vendored at the repository root**, as `settings-hooks.json`
-does, and where `check-settings-paths` is registered it holds the front-end
-literal once merged. The set is hand-authored in the template, and the one
-invariant a hand-authored set can break — a rule blocking a form the template
-grants — is held by the consumer smoke (§Testing), which resolves the
-placeholder the way an adopter does and then **executes** the door it granted:
-a grant that parses is not a grant that spawns, and the union assertion beside
-it proves only the former.
+**Deliberately absent, so a reader does not re-derive it.** The harness's built-in read-only `git` subcommands need no entry. A write to a gitignored target, a truncation of one and a sanctioned wait are granted by rules 16, 17 and 19 from the hook, where no settings entry can reach them. The harness's file tools, the steer targets of rules 8 to 11 and 25, are governed by its own permission mode, and an `Edit` or `Write` grant is a write widening this recommendation will not make on a consumer's behalf. Rule 2's bare-`git` steer target is one subcommand per consumer, and a blanket `git` grant reaches a force push. **The template assumes the kits are vendored at the repository root**, as `settings-hooks.json` does, and where `check-settings-paths` is registered it holds the front-end literal once merged. The set is hand-authored in the template, and the one invariant a hand-authored set can break — a rule blocking a form the template grants — is held by the consumer smoke (§Testing), which resolves the placeholder the way an adopter does and then **executes** the door it granted: a grant that parses is not a grant that spawns, and the union assertion beside it proves only the former.
 
 ## The guard framework (`lib/guard.sh`)
 
-Primitives a consumer guard composes; each emits the harness's
-`PreToolUse` hook protocol, whose exit-status contract grounds every rule below:
-**exit 2** blocks the call and feeds stderr back to the agent, **exit 0** is no
-decision, and **every other non-zero status, 127 included, is a non-blocking
-error after which the call proceeds** — with a `hook error` notice on the first
-run alone, and a `statusLine` command's non-zero status only blanking the line.
-An absent hook command therefore *silently disables* a policy hook rather than
-refusing it, which is why a guard binary may not be allowed to fail open on its
-own absence.
+Primitives a consumer guard composes; each emits the harness's `PreToolUse` hook protocol, whose exit-status contract grounds every rule below: **exit 2** blocks the call and feeds stderr back to the agent, **exit 0** is no decision, and **every other non-zero status, 127 included, is a non-blocking error after which the call proceeds** — with a `hook error` notice on the first run alone, and a `statusLine` command's non-zero status only blanking the line. An absent hook command therefore *silently disables* a policy hook rather than refusing it, which is why a guard binary may not be allowed to fail open on its own absence.
 
-- `guard_read_input` — read stdin **once** into the global `GUARD_INPUT`,
-  returning non-zero when stdin yielded nothing. Called **directly**, never in a
-  command substitution, and before the first field accessor. It exists because
-  the payload was otherwise unreadable past its first field: `guard_read_command`
-  is invoked as `cmd="$(guard_read_command)"`, so any cache it set died with the
-  substitution's subshell and stdin was already consumed — a rule needing a
-  second field could not get one.
-- `guard_input_field <path>` — the value at `<path>` in `GUARD_INPUT`, or
-  nothing when `GUARD_INPUT` is unset or empty or the path is absent. The
-  accessor a rule reaching past the headline fields uses. `<path>` is jq's
-  path-expression subset — `.name`, `[N]` and `["key"]` steps — and anything
-  outside it, a jq filter included, reads as an absent field.
-- `guard_read_command` — parse the hook JSON, emit the command;
-  **fail-open** on any parse problem (exit 0) so a guard can never wedge
-  the agent.
-- `guard_read_path` — the same accessor for `.tool_input.file_path`, the field a
-  path-bearing tool call carries where a Bash call carries a command. It returns
-  **non-zero, emitting nothing**, when the field is absent, empty, or the payload
-  will not parse — so a matcher covering a call without one falls through instead
-  of blocking. That return contract is the whole design: an accessor returning
-  success on a missing field passes every happy path and wedges every other call
-  its matcher covers. Generic over any path-bearing tool; it names no path and no
-  rule, which is what keeps the rule in the kit that owns the file.
-- `guard_block <msg>` — exit 2 with the message on stderr. Every block
-  message is self-describing: it names the offending pattern *and* the
-  corrective form, so the why of a rule rides to the agent in the rejection
-  itself, not in a code comment.
-- `guard_advise <msg>` — allow, but feed the message back as
-  `additionalContext` (steering without blocking).
+- `guard_read_input` — read stdin **once** into the global `GUARD_INPUT`, returning non-zero when stdin yielded nothing. Called **directly**, never in a command substitution, and before the first field accessor. It exists because the payload was otherwise unreadable past its first field: `guard_read_command` is invoked as `cmd="$(guard_read_command)"`, so any cache it set died with the substitution's subshell and stdin was already consumed — a rule needing a second field could not get one.
+- `guard_input_field <path>` — the value at `<path>` in `GUARD_INPUT`, or nothing when `GUARD_INPUT` is unset or empty or the path is absent. The accessor a rule reaching past the headline fields uses. `<path>` is jq's path-expression subset — `.name`, `[N]` and `["key"]` steps — and anything outside it, a jq filter included, reads as an absent field.
+- `guard_read_command` — parse the hook JSON, emit the command; **fail-open** on any parse problem (exit 0) so a guard can never wedge the agent.
+- `guard_read_path` — the same accessor for `.tool_input.file_path`, the field a path-bearing tool call carries where a Bash call carries a command. It returns **non-zero, emitting nothing**, when the field is absent, empty, or the payload will not parse — so a matcher covering a call without one falls through instead of blocking. That return contract is the whole design: an accessor returning success on a missing field passes every happy path and wedges every other call its matcher covers. Generic over any path-bearing tool; it names no path and no rule, which is what keeps the rule in the kit that owns the file.
+- `guard_block <msg>` — exit 2 with the message on stderr. Every block message is self-describing: it names the offending pattern *and* the corrective form, so the why of a rule rides to the agent in the rejection itself, not in a code comment.
+- `guard_advise <msg>` — allow, but feed the message back as `additionalContext` (steering without blocking).
 - `guard_allow <reason>` — silent grant via `permissionDecision: allow`.
-- `guard_rewrite <cmd> <reason>` — behavior-preserving rewrite via
-  `updatedInput` (grant the better spelling of the same command).
-- `guard_log_fallthrough` — append the command to the friction log, one line per call: `\`, newline
-  and tab encoded as `\\`, `\n` and `\t`, cut to the harness's analysis bound plus one character
-  (§scan-prompts reads both); best-effort, never affects the decision.
-- `guard_allow_match <string> <pattern>` — the shell-glob match core: true when
-  the string matches a committed allow pattern, with the harness `:*` prefix
-  idiom modelled as the harness grants it: **word-bounded**, so `Bash(printf:*)`
-  matches `printf` alone or `printf` then a space then anything, and never
-  `printfx`, `printf-x` or `printf.x` — the closing `:*`, bare or before the
-  rule's own `)`, is read as the head alone or the head and a space-led `*`, and any other `:*`
-  is a plain `*`. **A closing space-led `*` that is the rule's only `*` reads the
-  same way**, so `Bash(git status *)` matches `git status` alone as well; beside
-  another `*` it does not, so `Bash(git -C * status *)` never matches a command
-  ending at `status`. **Measured, not read off documentation:** `claude -p
-  --safe-mode --setting-sources '' --permission-mode dontAsk --settings <file>`,
-  the rule as the file's one grant, told to run one command verbatim, read off
-  the JSON result's `permission_denials`. `Bash(touch f:*)` granted `touch f`
-  and `touch f g` and refused `touch fg`, `touch f-g` and `touch f.g`;
-  `Bash(python3 -:*)` refused `python3 -c …`; `Bash(touch f *)` granted
-  `touch f` and refused `touch fg`; `Bash(git status *)` granted `git status`;
-  `Bash(git -C * status *)` granted `git -C . status --short`, refused
-  `git -C . status`, and granted `git -C . log --oneline -1 -- status x` — an
-  interior `*` spans words, which is why a grant mirrored with a wildcard `-C`
-  target is not narrow. A model wider than the harness is
-  the failure that matters here — it would let compare-settings-allow call a
-  narrower grant redundant and rule 20 read an ungranted spelling as silently
-  granted. Not a
-  hook primitive — a shared helper, one implementation behind
-  compare-settings-allow's redundancy detection and rule 20's silent-grant
-  guard so the two never drift. It carries a **compiled twin**, `guard::allow_match`
-  in `native/src/guard.rs`, which is the crate's single holder: both compiled members
-  that compute this predicate — the `scan-prompts` ranker's grant test and the
-  `compare-settings-allow` arm — call it and neither spells it inline, so an edit
-  cannot change one member's verdicts while the other's stay right.
-- `guard_skeleton <cmd> <inert-class>…` — the context-aware normalizer, and the
-  only place a rule learns what part of a command is live. It returns the command
-  with every region of the named inert classes replaced by a placeholder token,
-  leaving everything else byte-identical. Four classes: **`sq`** (single-quoted
-  spans), **`dq`** (double-quoted spans), **`hd`** (heredoc bodies, from the line
-  after an opener to its terminator line), and **`hdq`** — the subset of `hd`
-  whose **delimiter is quoted** (`<<'EOF'`), where the shell itself guarantees
-  the body does not expand. `hdq` exists because that guarantee is what lets the
-  one rule that must keep heredoc bodies live keep only the bodies that can
-  actually expand. Each rule names the classes inert **for it**, in one argument, at one
-  call site — the classes were never the disagreement, since every rule agrees
-  that *some* regions are inert; the disagreement was that each decided privately
-  and none recorded why. Not a hook primitive, and a pure function of its
-  arguments: no config read, no subprocess, no global. Its compiled twin carries
-  the whole machinery, the heredoc arm included, because a friction-log line
-  decodes to the multi-line command it recorded (§scan-prompts). One argument is
-  not a class: **`body=<k>`** prints the body of the command's `<k>`th heredoc
-  opener instead of the view, empty when that opener has none, so
-  `_guard_heredoc_body` reads a body with the arm's own extent rather than a
-  second copy of it. It has one shell caller and no compiled reader, so the
-  twin does not carry it.
-- `guard_split_compound <skeleton>` — the compound splitter: emits one segment
-  per line, splitting on the harness's statement separators (`;`, `&&`, `||`,
-  `|&`, `|`), the two-character ones taken whole so `|&` never leaves an `&`
-  heading the next segment. **The class is the harness's, measured:** a
-  `claude -p` run under `dontAsk` granted `touch a |& touch b` on the two exact
-  grants `Bash(touch a)` and `Bash(touch b)` and refused it with `touch c` on the
-  right. A lone `&` is **not** in the class, because the harness does not split
-  on it: the same run refused `touch a & touch b` on those two grants, and
-  refused `touch a &` even under `Bash(touch a *)`, so a backgrounding `&` is a
-  call no allowlist entry grants rather than a segment boundary. So every grant
-  test reads a segment carrying one as ungranted, on rule 15's
-  statement-ending-`&` predicate: rule 20 counts it as the unmatched segment,
-  rules 4 and 7's rewrite grant withholds its allow, and §scan-prompts marks the
-  call allowlist-unreachable. **What a rule loses by the unsplit `&` was measured
-  rather than assumed:** ten rule targets each placed after `sleep 1 &` and after
-  `true &` were every one blocked, by their own rule or by rule 13's or 15's
-  before it. The one backgrounding shape no rule blocks is rule 19's recorded
-  launch, and a target after its `;` is a segment of its own that its rule reads. Also not a hook primitive — the single implementation every **shell**
-  consumer that reasons *per segment* shares (rules
-  2/4/7/8/12/14/15/17/18/19/20/22/24/25/26 and the read-compound carve-out of rules
-  9/10), so the harness's
-  per-segment matching surface is modelled in exactly one place **on this
-  substrate**. Across both substrates it is modelled in **two** places — the
-  `scan-prompts` ranker's grant test reasons per segment through the compiled
-  twin rather than through this function — and what
-  prevents the drift between them is the comparator below rather than
-  uniqueness. Fed a `guard_skeleton` view, so a separator inside a quoted
-  argument is never mistaken for a statement break. **What it models is the
-  harness's matching surface, not shell dataflow**, and that distinction is what
-  rule 23 rests its own two-level splitter on: the emitted segments carry no
-  record of *which* separator produced them, so a rule asking whose stdout feeds
-  whose stdin cannot be a caller — a different question, not a second dialect of
-  this one. Its separator class carries
-  **no newline**, and it does not need one: it *emits* segments as lines and
-  every consumer reads lines, so a newline already present in the input is
-  already a boundary before the substitution runs, and its compiled twin, which
-  returns segments rather than lines, ends one at a newline for the same reason.
-- `_guard_harness_view <segment>` — the segment as the harness's permission
-  matcher reads it: the leading wrappers the matcher strips before it matches a
-  `Bash` rule, removed from the head **repeatedly**. An `_`-prefixed internal
-  helper rather than surface a consumer composes from, rostered here because it
-  models harness behavior every reader of it must share. The stripped set is the
-  matcher's documented one, and each wrapper's arguments are walked by its own
-  grammar:
+- `guard_rewrite <cmd> <reason>` — behavior-preserving rewrite via `updatedInput` (grant the better spelling of the same command).
+- `guard_log_fallthrough` — append the command to the friction log, one line per call: `\`, newline and tab encoded as `\\`, `\n` and `\t`, cut to the harness's analysis bound plus one character (§scan-prompts reads both); best-effort, never affects the decision.
+- `guard_allow_match <string> <pattern>` — the shell-glob match core: true when the string matches a committed allow pattern, with the harness `:*` prefix idiom modelled as the harness grants it: **word-bounded**, so `Bash(printf:*)` matches `printf` alone or `printf` then a space then anything, and never `printfx`, `printf-x` or `printf.x` — the closing `:*`, bare or before the rule's own `)`, is read as the head alone or the head and a space-led `*`, and any other `:*` is a plain `*`. **A closing space-led `*` that is the rule's only `*` reads the same way**, so `Bash(git status *)` matches `git status` alone as well; beside another `*` it does not, so `Bash(git -C * status *)` never matches a command ending at `status`. **Measured, not read off documentation:** `claude -p --safe-mode --setting-sources '' --permission-mode dontAsk --settings <file>`, the rule as the file's one grant, told to run one command verbatim, read off the JSON result's `permission_denials`. `Bash(touch f:*)` granted `touch f` and `touch f g` and refused `touch fg`, `touch f-g` and `touch f.g`; `Bash(python3 -:*)` refused `python3 -c …`; `Bash(touch f *)` granted `touch f` and refused `touch fg`; `Bash(git status *)` granted `git status`; `Bash(git -C * status *)` granted `git -C . status --short`, refused `git -C . status`, and granted `git -C . log --oneline -1 -- status x` — an interior `*` spans words, which is why a grant mirrored with a wildcard `-C` target is not narrow. A model wider than the harness is the failure that matters here — it would let compare-settings-allow call a narrower grant redundant and rule 20 read an ungranted spelling as silently granted. Not a hook primitive — a shared helper, one implementation behind compare-settings-allow's redundancy detection and rule 20's silent-grant guard so the two never drift. It carries a **compiled twin**, `guard::allow_match` in `native/src/guard.rs`, which is the crate's single holder: both compiled members that compute this predicate — the `scan-prompts` ranker's grant test and the `compare-settings-allow` arm — call it and neither spells it inline, so an edit cannot change one member's verdicts while the other's stay right.
+- `guard_skeleton <cmd> <inert-class>…` — the context-aware normalizer, and the only place a rule learns what part of a command is live. It returns the command with every region of the named inert classes replaced by a placeholder token, leaving everything else byte-identical. Four classes: **`sq`** (single-quoted spans), **`dq`** (double-quoted spans), **`hd`** (heredoc bodies, from the line after an opener to its terminator line), and **`hdq`** — the subset of `hd` whose **delimiter is quoted** (`<<'EOF'`), where the shell itself guarantees the body does not expand. `hdq` exists because that guarantee is what lets the one rule that must keep heredoc bodies live keep only the bodies that can actually expand. Each rule names the classes inert **for it**, in one argument, at one call site — the classes were never the disagreement, since every rule agrees that *some* regions are inert; the disagreement was that each decided privately and none recorded why. Not a hook primitive, and a pure function of its arguments: no config read, no subprocess, no global. Its compiled twin carries the whole machinery, the heredoc arm included, because a friction-log line decodes to the multi-line command it recorded (§scan-prompts). One argument is not a class: **`body=<k>`** prints the body of the command's `<k>`th heredoc opener instead of the view, empty when that opener has none, so `_guard_heredoc_body` reads a body with the arm's own extent rather than a second copy of it. It has one shell caller and no compiled reader, so the twin does not carry it.
+- `guard_split_compound <skeleton>` — the compound splitter: emits one segment per line, splitting on the harness's statement separators (`;`, `&&`, `||`, `|&`, `|`), the two-character ones taken whole so `|&` never leaves an `&` heading the next segment. **The class is the harness's, measured:** a `claude -p` run under `dontAsk` granted `touch a |& touch b` on the two exact grants `Bash(touch a)` and `Bash(touch b)` and refused it with `touch c` on the right. A lone `&` is **not** in the class, because the harness does not split on it: the same run refused `touch a & touch b` on those two grants, and refused `touch a &` even under `Bash(touch a *)`, so a backgrounding `&` is a call no allowlist entry grants rather than a segment boundary. So every grant test reads a segment carrying one as ungranted, on rule 15's statement-ending-`&` predicate: rule 20 counts it as the unmatched segment, rules 4 and 7's rewrite grant withholds its allow, and §scan-prompts marks the call allowlist-unreachable. **What a rule loses by the unsplit `&` was measured rather than assumed:** ten rule targets each placed after `sleep 1 &` and after `true &` were every one blocked, by their own rule or by rule 13's or 15's before it. The one backgrounding shape no rule blocks is rule 19's recorded launch, and a target after its `;` is a segment of its own that its rule reads. Also not a hook primitive — the single implementation every **shell** consumer that reasons *per segment* shares (rules 2/4/7/8/12/14/15/17/18/19/20/22/24/25/26 and the read-compound carve-out of rules 9/10), so the harness's per-segment matching surface is modelled in exactly one place **on this substrate**. Across both substrates it is modelled in **two** places — the `scan-prompts` ranker's grant test reasons per segment through the compiled twin rather than through this function — and what prevents the drift between them is the comparator below rather than uniqueness. Fed a `guard_skeleton` view, so a separator inside a quoted argument is never mistaken for a statement break. **What it models is the harness's matching surface, not shell dataflow**, and that distinction is what rule 23 rests its own two-level splitter on: the emitted segments carry no record of *which* separator produced them, so a rule asking whose stdout feeds whose stdin cannot be a caller — a different question, not a second dialect of this one. Its separator class carries **no newline**, and it does not need one: it *emits* segments as lines and every consumer reads lines, so a newline already present in the input is already a boundary before the substitution runs, and its compiled twin, which returns segments rather than lines, ends one at a newline for the same reason.
+- `_guard_harness_view <segment>` — the segment as the harness's permission matcher reads it: the leading wrappers the matcher strips before it matches a `Bash` rule, removed from the head **repeatedly**. An `_`-prefixed internal helper rather than surface a consumer composes from, rostered here because it models harness behavior every reader of it must share. The stripped set is the matcher's documented one, and each wrapper's arguments are walked by its own grammar:
   - `time`, with an optional `-p`;
-  - `timeout`: `--preserve-status`, `--foreground`, `-v`, `--verbose`,
-    `-s`/`--signal`/`-k`/`--kill-after` in their separate and glued spellings,
-    then exactly one duration word — digits with an optional fraction, or a bare
-    fraction, with an optional `s`/`m`/`h`/`d` unit;
-  - `nice`: `-n N`, `-nN`, `--adjustment=N` and `-N`, `N` an optionally signed
-    integer;
+  - `timeout`: `--preserve-status`, `--foreground`, `-v`, `--verbose`, `-s`/`--signal`/`-k`/`--kill-after` in their separate and glued spellings, then exactly one duration word — digits with an optional fraction, or a bare fraction, with an optional `s`/`m`/`h`/`d` unit;
+  - `nice`: `-n N`, `-nN`, `--adjustment=N` and `-N`, `N` an optionally signed integer;
   - `nohup`, `builtin` and `noglob`;
-  - `stdbuf`: any run of `-i`/`-o`/`-e` in separate or glued spelling, and
-    `--input=`/`--output=`/`--error=`;
-  - `command`, except when the next word is `-v` or `-V`: that is a query, not a
-    wrapper;
+  - `stdbuf`: any run of `-i`/`-o`/`-e` in separate or glued spelling, and `--input=`/`--output=`/`--error=`;
+  - `command`, except when the next word is `-v` or `-V`: that is a query, not a wrapper;
   - a leading run of `NAME=value` words;
   - `xargs`, only when the next word is not option-shaped.
 
-  **The strip stops at the wrapper whose walk fails, and the view then begins at
-  that wrapper word.** An option the walk does not recognize, an argument it
-  cannot read (a duration or an adjustment that is not one), a wrapper followed by
-  an option-shaped word or by nothing at all, and an assignment whose value
-  carries a quote each stop it. That is the ruleset's bias toward passing: a view
-  that strips less matches fewer grants. `sudo`, `env`, `git -c` and an absolute
-  wrapper spelling are not in the set, because the matcher does not strip them
-  (rule 2 steers the last two).
-  **It is a classification view and never a grant view.** No rule grants through
-  it: a wrapper-prefixed command the matcher would grant is granted by the matcher
-  itself, so the guard has nothing to add, which is why a *strip, then re-test
-  through `guard_allow_match`* grant is refused. For the spellings the matcher
-  does not strip, a grant would bless a program reach.
-  **The assignment arm strips every assignment rather than the undocumented
-  known-safe subset the matcher strips**, because any narrower list would be a
-  guess presented as a model. Its readers bear that differently: a reader bounding
-  a grant only gains scrutiny from it, while the `scan-prompts` ranker can
-  under-count prompts on an assignment-prefixed command, which is stated rather
-  than hidden.
-  **The honest limit.** The wrapper set is the matcher's documented one, so a
-  harness revision that widens or narrows it is drift no gate here can
-  self-detect — the footing the payload roster below already declares.
+  **The strip stops at the wrapper whose walk fails, and the view then begins at that wrapper word.** An option the walk does not recognize, an argument it cannot read (a duration or an adjustment that is not one), a wrapper followed by an option-shaped word or by nothing at all, and an assignment whose value carries a quote each stop it. That is the ruleset's bias toward passing: a view that strips less matches fewer grants. `sudo`, `env`, `git -c` and an absolute wrapper spelling are not in the set, because the matcher does not strip them (rule 2 steers the last two). **It is a classification view and never a grant view.** No rule grants through it: a wrapper-prefixed command the matcher would grant is granted by the matcher itself, so the guard has nothing to add, which is why a *strip, then re-test through `guard_allow_match`* grant is refused. For the spellings the matcher does not strip, a grant would bless a program reach. **The assignment arm strips every assignment rather than the undocumented known-safe subset the matcher strips**, because any narrower list would be a guess presented as a model. Its readers bear that differently: a reader bounding a grant only gains scrutiny from it, while the `scan-prompts` ranker can under-count prompts on an assignment-prefixed command, which is stated rather than hidden. **The honest limit.** The wrapper set is the matcher's documented one, so a harness revision that widens or narrows it is drift no gate here can self-detect — the footing the payload roster below already declares.
 
-**The library reads its knobs from the binary, once per sourcing.** Its tail calls
-`gate_knob_values` (gate-sdk/SPEC.md §lib/gate.sh), sourcing `gate-sdk/lib/gate.sh`
-beside the vendor root `GUARD_KIT_LIB` names, for every row of guard-kit's table,
-and assigns each value to the shell variable of the same name: a scalar as a string,
-an indexed knob as an array, a keyed knob as an associative array. The rules, and a
-consumer's own rules in its hook copy, read those variables exactly as they read the
-sourced config, so a test that reassigns one after sourcing still steers the rule.
-The crate's table is the knobs' one producer, and the library holds no default. The
-load sits at the tail rather than the head because both of its failure answers are
-primitives the file defines above it.
+**The library reads its knobs from the binary, once per sourcing.** Its tail calls `gate_knob_values` (gate-sdk/SPEC.md §lib/gate.sh), sourcing `gate-sdk/lib/gate.sh` beside the vendor root `GUARD_KIT_LIB` names, for every row of guard-kit's table, and assigns each value to the shell variable of the same name: a scalar as a string, an indexed knob as an array, a keyed knob as an associative array. The rules, and a consumer's own rules in its hook copy, read those variables exactly as they read the sourced config, so a test that reassigns one after sourcing still steers the rule. The crate's table is the knobs' one producer, and the library holds no default. The load sits at the tail rather than the head because both of its failure answers are primitives the file defines above it.
 
-**The load fails in one of two ways, and the hook answers each differently.** When
-the binary cannot be reached — no `gate-sdk/lib/gate.sh` beside the vendor root, or
-no executable at `GATE_SDK_NATIVE_BIN` — the knob read cannot run at all, and the
-hook prints an advisory envelope naming the build command and exits 0. That
-envelope is a fixed literal rather than a `guard_advise`, because `guard_advise`
-renders through the binary this branch has just found missing; it interpolates
-nothing, so it carries no character JSON must escape, and
-`gate-tests/guard-read-path.test.sh` parses it. An advise carries
-no permission decision, so every command still takes the harness's own permission
-path. Only the steering is lost, and every call says so. A block there would refuse
-the very command that builds the binary. When the binary runs and refuses the
-config, with a malformed knob file or a set-but-missing `GUARD_KIT_KNOB_FILE`, the
-hook blocks with the refusal's own text, the loud posture a set-but-missing config
-file always had. The file is repaired with the Edit tool, which the guard does not
-intercept.
+**The load fails in one of two ways, and the hook answers each differently.** When the binary cannot be reached — no `gate-sdk/lib/gate.sh` beside the vendor root, or no executable at `GATE_SDK_NATIVE_BIN` — the knob read cannot run at all, and the hook prints an advisory envelope naming the build command and exits 0. That envelope is a fixed literal rather than a `guard_advise`, because `guard_advise` renders through the binary this branch has just found missing; it interpolates nothing, so it carries no character JSON must escape, and `gate-tests/guard-read-path.test.sh` parses it. An advise carries no permission decision, so every command still takes the harness's own permission path. Only the steering is lost, and every call says so. A block there would refuse the very command that builds the binary. When the binary runs and refuses the config, with a malformed knob file or a set-but-missing `GUARD_KIT_KNOB_FILE`, the hook blocks with the refusal's own text, the loud posture a set-but-missing config file always had. The file is repaired with the Edit tool, which the guard does not intercept.
 
-**Every JSON read and render goes through the binary, one spawn per call.** The
-library spawns no JSON program of its own. The sourcing tail reads the binary's
-path once, where the knob load already needs it, and the seven sites that read the
-payload or print an envelope call `--guard-json <mode> [<arg>…]`, a top-level flag
-of the gate binary beside `--guard-lib-parity` that resolves no knob, since every
-value it needs arrives as argv or stdin:
+**Every JSON read and render goes through the binary, one spawn per call.** The library spawns no JSON program of its own. The sourcing tail reads the binary's path once, where the knob load already needs it, and the seven sites that read the payload or print an envelope call `--guard-json <mode> [<arg>…]`, a top-level flag of the gate binary beside `--guard-lib-parity` that resolves no knob, since every value it needs arrives as argv or stdin:
 
-- **`field <path>`** reads a payload on stdin and prints the value at `<path>`: a
-  string bare, a number or boolean as JSON spells it, and nothing for null, an
-  absent path, an object, an array, or a path outside the grammar
-  `guard_input_field` names. The path is the crate's pin-path grammar
-  (context-kit/SPEC.md §check-settings-pins), and a step jq's own type rules
-  refuse reads as absent. `guard_input_field` calls it.
-- **`field-or-empty <path>`** is the same except that `false` also prints nothing —
-  `jq -r '<path> // empty'`. `guard_read_command` and `guard_read_path` call it.
-- **`allow-entries <settings-file>`** prints each string member of the file's
-  `permissions.allow`, one per line, and nothing when the file is absent,
-  unreadable or does not parse — §compare-settings-allow's in-crate read.
-  `_guard_allow_inners` filters its `Bash(...)` entries, and the list is read once
-  per hook process and settings path: `_guard_allow_load` fills a global that every
-  reader's call site loads first, directly, because each reader runs inside a
-  process substitution whose own assignments die with it.
-- **`advise <msg>`**, **`allow <reason>`** and **`rewrite <cmd> <reason>`** print
-  the envelope `guard_advise`, `guard_allow` and `guard_rewrite` always printed,
-  keys in the same order, every interpolated value serialized by the crate's
-  hook-JSON serializer (gate-sdk/SPEC.md §The non-gate arm) and never quoted by hand.
+- **`field <path>`** reads a payload on stdin and prints the value at `<path>`: a string bare, a number or boolean as JSON spells it, and nothing for null, an absent path, an object, an array, or a path outside the grammar `guard_input_field` names. The path is the crate's pin-path grammar (context-kit/SPEC.md §check-settings-pins), and a step jq's own type rules refuse reads as absent. `guard_input_field` calls it.
+- **`field-or-empty <path>`** is the same except that `false` also prints nothing — `jq -r '<path> // empty'`. `guard_read_command` and `guard_read_path` call it.
+- **`allow-entries <settings-file>`** prints each string member of the file's `permissions.allow`, one per line, and nothing when the file is absent, unreadable or does not parse — §compare-settings-allow's in-crate read. `_guard_allow_inners` filters its `Bash(...)` entries, and the list is read once per hook process and settings path: `_guard_allow_load` fills a global that every reader's call site loads first, directly, because each reader runs inside a process substitution whose own assignments die with it.
+- **`advise <msg>`**, **`allow <reason>`** and **`rewrite <cmd> <reason>`** print the envelope `guard_advise`, `guard_allow` and `guard_rewrite` always printed, keys in the same order, every interpolated value serialized by the crate's hook-JSON serializer (gate-sdk/SPEC.md §The non-gate arm) and never quoted by hand.
 
-Every mode exits 0 but a usage error, which exits 2, and writes LF on every host.
-**The library's fail-open posture carries over unchanged.** A read whose spawn
-fails or prints nothing is the absent field it always was, so its caller declines;
-a render whose spawn fails leaves stdout empty at exit 0, which is the harness's own
-permission path. A spawn costs well under a millisecond, less than the external
-parser it replaced, and the hook's latency is set by its sourcing and knob load.
-**One spawn per payload was refused**: `guard_input_field` takes whatever path a
-consumer's rule passes at call time, so batching would need the paths in advance or
-a second JSON encoding flattened into shell, either costing more than the spawns
-saved.
+Every mode exits 0 but a usage error, which exits 2, and writes LF on every host. **The library's fail-open posture carries over unchanged.** A read whose spawn fails or prints nothing is the absent field it always was, so its caller declines; a render whose spawn fails leaves stdout empty at exit 0, which is the harness's own permission path. A spawn costs well under a millisecond, less than the external parser it replaced, and the hook's latency is set by its sourcing and knob load. **One spawn per payload was refused**: `guard_input_field` takes whatever path a consumer's rule passes at call time, so batching would need the paths in advance or a second JSON encoding flattened into shell, either costing more than the spawns saved.
 
-**The honest limit: a consumer rule that passed `guard_input_field` a jq filter
-reads nothing.** The argument was once forwarded to `jq` whole, so a consumer copy
-could pass a pipe, `//` or a function. Such an argument is now outside the grammar
-and reads as an absent field, which fails open. No rule in this kit does it.
+**The honest limit: a consumer rule that passed `guard_input_field` a jq filter reads nothing.** The argument was once forwarded to `jq` whole, so a consumer copy could pass a pipe, `//` or a function. Such an argument is now outside the grammar and reads as an absent field, which fails open. No rule in this kit does it.
 
-**Five of these primitives are held twice, and a machine holds them equal.**
-`guard_split_compound`, `guard_skeleton` and `_guard_redirect_pairs` — the set
-`bin/`'s prompt ranker is composed from — `guard_allow_match`, the settings-allow
-match core, and `_guard_harness_view`, the wrapper strip that ranker's grant test
-and ranking key read, each carry a compiled twin in the gate
-binary, while this library itself stays shell. That is admissible only because
-the duplication is machine-held, which is the *unless* clause of gate-sdk's
-port-candidate criterion 6, and the machine is
-`gate-tests/guard-lib-parity.test.sh`: it feeds one canned corpus to both
-holders and compares their **classification**, A against B directly with no
-committed expected file, since a maintained golden would be a third copy to
-drift and the failure it exists to catch is one side edited without the other.
-The compiled side answers through `--guard-lib-parity <mode> <arg>...`, one mode
-per twinned predicate. The `split`, `skeleton` and `redirect` modes print each
-command and view in `guard_log_fallthrough`'s encoding, so a heredoc-bearing
-record stays one line. The library's `no-port` ground does not reach the
-five: each is a pure function of its arguments, resolving no knob,
-and `_guard_redirect_pairs` and `_guard_harness_view` are `_`-prefixed internal
-helpers rather than the documented
-`guard_*` surface a consumer composes rules from. `_guard_redirect_pairs` is
-therefore specified with the ranker that calls it (§scan-prompts) rather than in
-the roster above; the harness view is rostered there all the same, because what
-it models is harness behavior rather than one member's need.
+**Five of these primitives are held twice, and a machine holds them equal.** `guard_split_compound`, `guard_skeleton` and `_guard_redirect_pairs` — the set `bin/`'s prompt ranker is composed from — `guard_allow_match`, the settings-allow match core, and `_guard_harness_view`, the wrapper strip that ranker's grant test and ranking key read, each carry a compiled twin in the gate binary, while this library itself stays shell. That is admissible only because the duplication is machine-held, which is the *unless* clause of gate-sdk's port-candidate criterion 6, and the machine is `gate-tests/guard-lib-parity.test.sh`: it feeds one canned corpus to both holders and compares their **classification**, A against B directly with no committed expected file, since a maintained golden would be a third copy to drift and the failure it exists to catch is one side edited without the other. The compiled side answers through `--guard-lib-parity <mode> <arg>...`, one mode per twinned predicate. The `split`, `skeleton` and `redirect` modes print each command and view in `guard_log_fallthrough`'s encoding, so a heredoc-bearing record stays one line. The library's `no-port` ground does not reach the five: each is a pure function of its arguments, resolving no knob, and `_guard_redirect_pairs` and `_guard_harness_view` are `_`-prefixed internal helpers rather than the documented `guard_*` surface a consumer composes rules from. `_guard_redirect_pairs` is therefore specified with the ranker that calls it (§scan-prompts) rather than in the roster above; the harness view is rostered there all the same, because what it models is harness behavior rather than one member's need.
 
-**`harness-view`'s corpus covers every stripped wrapper in its separate and glued
-argument spellings**, nesting, an unrecognized option or an unreadable argument
-stopping the strip at its wrapper, a wrapper left with nothing to wrap,
-`command -v`/`-V` as a query, `xargs` with and without a flag, an assignment run
-with and without a quoted value, and the spellings the matcher does not strip.
-Its mode prints one line per command — mode, command, view — and the line
-comparison is its one reader.
+**`harness-view`'s corpus covers every stripped wrapper in its separate and glued argument spellings**, nesting, an unrecognized option or an unreadable argument stopping the strip at its wrapper, a wrapper left with nothing to wrap, `command -v`/`-V` as a query, `xargs` with and without a flag, an assignment run with and without a quoted value, and the spellings the matcher does not strip. Its mode prints one line per command — mode, command, view — and the line comparison is its one reader.
 
-**`allow-match`'s corpus is scoped to the shapes a permission rule can carry**,
-rather than to arbitrary globs, and it is a cross product of strings against globs
-rather than paired cases: the harness `:*` idiom in both positions — read
-word-bounded in the glob, against a glued and a punctuated continuation, left
-literal in the string — a bare trailing `*`, an interior `*`, a `?`,
-bracket classes plain, negated and ranged, and literals with no metacharacter at
-all, the last because a rule string is compared as a pattern and a consumer's
-literal must not acquire one.
+**`allow-match`'s corpus is scoped to the shapes a permission rule can carry**, rather than to arbitrary globs, and it is a cross product of strings against globs rather than paired cases: the harness `:*` idiom in both positions — read word-bounded in the glob, against a glued and a punctuated continuation, left literal in the string — a bare trailing `*`, an interior `*`, a `?`, bracket classes plain, negated and ranged, and literals with no metacharacter at all, the last because a rule string is compared as a pattern and a consumer's literal must not acquire one.
 
-**The duplication is permanent rather than transitional**, which is what makes
-the machine-held disposition the right one instead of a concession: the shell
-caller set for the five cannot empty. For the first three the live callers are
-rules 2/4/7/8/12/14/15/17/18/19/20/22/24/25/26 and the read-compound carve-out of rules
-9/10; for `guard_allow_match` they are rule 20's silent-grant guard, rules 4 and
-7's rewrite grant test, rule 19's recorded-launch grant and rule 24's slot parse; for `_guard_harness_view` it is
-rule 24's view — and all of them are functions in this same permanently-shell
-file. So the comparator
-does not retire either, and the arm it answers on is durable by construction.
-This is what distinguishes these modes from `--declaration-parity`, retired
-when its second holder went.
+**The duplication is permanent rather than transitional**, which is what makes the machine-held disposition the right one instead of a concession: the shell caller set for the five cannot empty. For the first three the live callers are rules 2/4/7/8/12/14/15/17/18/19/20/22/24/25/26 and the read-compound carve-out of rules 9/10; for `guard_allow_match` they are rule 20's silent-grant guard, rules 4 and 7's rewrite grant test, rule 19's recorded-launch grant and rule 24's slot parse; for `_guard_harness_view` it is rule 24's view — and all of them are functions in this same permanently-shell file. So the comparator does not retire either, and the arm it answers on is durable by construction. This is what distinguishes these modes from `--declaration-parity`, retired when its second holder went.
 
-**Placeholder, never deletion, and this is a correctness point rather than
-taste.** Deleting an inert span **fuses adjacent tokens**: a pattern glued to its
-flag loses the boundary between them and the residue reads as one word that was
-never in the command. The normalizer substitutes, so the skeleton has the same
-token count and the same statement structure as the command it models.
+**Placeholder, never deletion, and this is a correctness point rather than taste.** Deleting an inert span **fuses adjacent tokens**: a pattern glued to its flag loses the boundary between them and the residue reads as one word that was never in the command. The normalizer substitutes, so the skeleton has the same token count and the same statement structure as the command it models.
 
-**The heredoc class marks the body extent only.** The opener line and everything
-after the terminator stay fully live, so a heredoc-bearing call is still matched
-on its executable text — neither blanking everything after a `<<` (which blinds
-the guard to real commands in the same call) nor stripping quotes alone (which
-still refuses a double-quoted mention). The extent is decidable without a shell
-parser because the terminator is a literal token alone on its line, which is the
-property the class rests on.
+**The heredoc class marks the body extent only.** The opener line and everything after the terminator stay fully live, so a heredoc-bearing call is still matched on its executable text — neither blanking everything after a `<<` (which blinds the guard to real commands in the same call) nor stripping quotes alone (which still refuses a double-quoted mention). The extent is decidable without a shell parser because the terminator is a literal token alone on its line, which is the property the class rests on.
 
-**Two bounds, stated rather than discovered later.** A heredoc with an
-**unquoted** delimiter does expand, so `hd` is not inert for the expansion rule
-even though it is inert for every glyph rule — which is why classes are declared
-per rule and not fixed per region, and why the rule that cannot take `hd` takes
-`hdq` instead rather than going without. Only the delimiter's quoting decides
-this, never the body's content, so the test is decidable at the opener; a
-delimiter escaped rather than quoted (`<<\EOF`) is not recognized and its body
-stays live, which is the conservative direction. And the normalizer models **quoting, not
-shell semantics**: a construct that survives its scan and is not one of the three
-classes is treated as live, the fail-toward-matching direction and the one a
-guard should err in. That bound is why the command/process-substitution and
-backtick tests in rules 9, 10, 11, 12, 13, 14, 15, 18, 19, 22 and 24 read the
-**raw** command rather than
-a skeleton and must keep doing so — a `"$(…)"` inside double quotes still
-executes, so a rule that declared `dq` inert for *that* test would hand an
-auto-allow to a command substitution it could not see. Those tests are
-conservative declines, not verdict matching. **That roster is derived from the
-rule bodies, not from memory**: it named rules that carry no raw test and
-omitted rules that do until it was re-read against them, which is the same
-drift the number-bearing cross-references below take and the reason each is
-re-derived rather than carried.
+**Two bounds, stated rather than discovered later.** A heredoc with an **unquoted** delimiter does expand, so `hd` is not inert for the expansion rule even though it is inert for every glyph rule — which is why classes are declared per rule and not fixed per region, and why the rule that cannot take `hd` takes `hdq` instead rather than going without. Only the delimiter's quoting decides this, never the body's content, so the test is decidable at the opener; a delimiter escaped rather than quoted (`<<\EOF`) is not recognized and its body stays live, which is the conservative direction. And the normalizer models **quoting, not shell semantics**: a construct that survives its scan and is not one of the three classes is treated as live, the fail-toward-matching direction and the one a guard should err in. That bound is why the command/process-substitution and backtick tests in rules 9, 10, 11, 12, 13, 14, 15, 18, 19, 22 and 24 read the **raw** command rather than a skeleton and must keep doing so — a `"$(…)"` inside double quotes still executes, so a rule that declared `dq` inert for *that* test would hand an auto-allow to a command substitution it could not see. Those tests are conservative declines, not verdict matching. **That roster is derived from the rule bodies, not from memory**: it named rules that carry no raw test and omitted rules that do until it was re-read against them, which is the same drift the number-bearing cross-references below take and the reason each is re-derived rather than carried.
 
-**Rule 17 is the one member that left the roster, and the exception is the bound
-above rather than a hole in it.** Its decline reads the `hdq` view: every region
-that can substitute stays live, and the only region blanked is a
-quoted-delimiter heredoc body, which the shell guarantees cannot. So the rule
-still sees every substitution the roster's members see, and stops declining on
-the one region where the spelling is inert — the same asymmetry rule 6 already
-draws for `hdq` against `dq`, applied to a backtick instead of a `$`. A rule
-declining on `hd` here *would* be a hole, which is why the mode is `hdq`.
+**Rule 17 is the one member that left the roster, and the exception is the bound above rather than a hole in it.** Its decline reads the `hdq` view: every region that can substitute stays live, and the only region blanked is a quoted-delimiter heredoc body, which the shell guarantees cannot. So the rule still sees every substitution the roster's members see, and stops declining on the one region where the spelling is inert — the same asymmetry rule 6 already draws for `hdq` against `dq`, applied to a backtick instead of a `$`. A rule declining on `hd` here *would* be a hole, which is why the mode is `hdq`.
 
-**Rule 24 splits the two tests, and the split is safe in both of its uses.** Its
-backtick test reads the raw command, as the roster does. Its expansion and
-process-substitution test reads the `sq hdq` view, because a single-quoted span
-cannot expand any more than a quoted-delimiter heredoc body can, while `dq` stays
-live. As a block the rule loses nothing by declining; where rules 4 and 7 take its
-test as a grant predicate, every decline fails the grant.
+**Rule 24 splits the two tests, and the split is safe in both of its uses.** Its backtick test reads the raw command, as the roster does. Its expansion and process-substitution test reads the `sq hdq` view, because a single-quoted span cannot expand any more than a quoted-delimiter heredoc body can, while `dq` stays live. As a block the rule loses nothing by declining; where rules 4 and 7 take its test as a grant predicate, every decline fails the grant.
 
-**Rule 12 is the one rule that reaches its verdict off the raw command, and the
-exception is forced rather than chosen.** Its predicate is *the pattern literal
-`-f` will scan argv for*, and a skeleton replaces exactly that literal with a
-placeholder — the quoted operand is the normal spelling — so a skeleton view
-would blind the rule to the only thing it tests. It pays for the exception in the
-same conservative direction every other clause takes: it declines outright on any
-expansion, substitution or backtick (rule 6 blocks the expansion and substitution
-shapes; the backtick decline is this rule's own arm, per the raw-command reading
-above), and a
-pattern operand carrying a stray quote — the evidence that the compound split
-landed *inside* a quoted span — declines rather than guesses at the operand.
+**Rule 12 is the one rule that reaches its verdict off the raw command, and the exception is forced rather than chosen.** Its predicate is *the pattern literal `-f` will scan argv for*, and a skeleton replaces exactly that literal with a placeholder — the quoted operand is the normal spelling — so a skeleton view would blind the rule to the only thing it tests. It pays for the exception in the same conservative direction every other clause takes: it declines outright on any expansion, substitution or backtick (rule 6 blocks the expansion and substitution shapes; the backtick decline is this rule's own arm, per the raw-command reading above), and a pattern operand carrying a stray quote — the evidence that the compound split landed *inside* a quoted span — declines rather than guesses at the operand.
 
-**`GUARD_INPUT` first, stdin otherwise, and the fallback is the whole point of
-the shape.** `guard_read_command` and `guard_read_path` parse `GUARD_INPUT` when
-it is set and non-empty and read stdin exactly as they always did otherwise, so
-every consumer copy that never opted in keeps working byte-identically without an
-edit — it never sets `GUARD_INPUT`, so both readers take the stdin path. A guard
-that wants a second field opts in by adding one line, `guard_read_input || exit 0`
-ahead of the first accessor, which is what the shipped template carries. Making
-`guard_read_input` mandatory was refused: it would break every consumer copy on
-upgrade for a field only one rule needs.
+**`GUARD_INPUT` first, stdin otherwise, and the fallback is the whole point of the shape.** `guard_read_command` and `guard_read_path` parse `GUARD_INPUT` when it is set and non-empty and read stdin exactly as they always did otherwise, so every consumer copy that never opted in keeps working byte-identically without an edit — it never sets `GUARD_INPUT`, so both readers take the stdin path. A guard that wants a second field opts in by adding one line, `guard_read_input || exit 0` ahead of the first accessor, which is what the shipped template carries. Making `guard_read_input` mandatory was refused: it would break every consumer copy on upgrade for a field only one rule needs.
 
-**What a `PreToolUse` payload actually carries, recorded so no session re-buys
-the probe.** Top-level keys: `agent_id`, `agent_type`, `cwd`, `effort`,
-`hook_event_name`, `permission_mode`, `prompt_id`, `session_id`, `tool_input`,
-`tool_name`, `tool_use_id`, `transcript_path`. On a Bash call `tool_input` carries
-`command`, `description`, and `run_in_background` — a JSON boolean `true` on a
-backgrounded call, and **absent** on a foreground one. It is a fact about this
-framework's own inputs, so without it each session re-establishes it from the
-vendor hook reference.
+**What a `PreToolUse` payload actually carries, recorded so no session re-buys the probe.** Top-level keys: `agent_id`, `agent_type`, `cwd`, `effort`, `hook_event_name`, `permission_mode`, `prompt_id`, `session_id`, `tool_input`, `tool_name`, `tool_use_id`, `transcript_path`. On a Bash call `tool_input` carries `command`, `description`, and `run_in_background` — a JSON boolean `true` on a backgrounded call, and **absent** on a foreground one. It is a fact about this framework's own inputs, so without it each session re-establishes it from the vendor hook reference.
 
-**The live permission mode is in that payload and no rule reads it.**
-`permission_mode` sits alongside the fields the accessors pick off, so a rule
-whose rationale is mode-*conditional* — "no allowlist entry can suppress this
-prompt" is false under an auto-approving mode and true under the others —
-asserts a mode rather than reading one. Whether a guard *should* read the mode is
-a consumer decision and is not settled here; the same holds for `agent_id`,
-`agent_type` and `effort`, each of which belongs to a question of its own.
+**The live permission mode is in that payload and no rule reads it.** `permission_mode` sits alongside the fields the accessors pick off, so a rule whose rationale is mode-*conditional* — "no allowlist entry can suppress this prompt" is false under an auto-approving mode and true under the others — asserts a mode rather than reading one. Whether a guard *should* read the mode is a consumer decision and is not settled here; the same holds for `agent_id`, `agent_type` and `effort`, each of which belongs to a question of its own.
 
-**The payload is the only reliable reader of the mode, because the configured mode
-is not the live one.** The harness reads `permissions.defaultMode` at process
-launch only, and a conversation reset (`/clear`) resets the conversation but not
-the process: a mode switched in-session carries across the reset, and a
-`defaultMode` written from inside a running session takes effect only at the next
-launch. So a session can run for hours in a narrower mode than the settings file
-names, and the settings file is never evidence of the mode a call ran under. The
-live mode reaches a hook only on the per-tool-call payload above; the
-session-start hook's payload does not carry it, so no session-start check can
-report the mode the session will run in.
+**The payload is the only reliable reader of the mode, because the configured mode is not the live one.** The harness reads `permissions.defaultMode` at process launch only, and a conversation reset (`/clear`) resets the conversation but not the process: a mode switched in-session carries across the reset, and a `defaultMode` written from inside a running session takes effect only at the next launch. So a session can run for hours in a narrower mode than the settings file names, and the settings file is never evidence of the mode a call ran under. The live mode reaches a hook only on the per-tool-call payload above; the session-start hook's payload does not carry it, so no session-start check can report the mode the session will run in.
 
-Fail-open is the default posture. The one sanctioned fail-closed shape is a
-deny-guard whose hook *matcher* already proves the tool identity (see
-wakeup-guard): there, a logging or parse failure still denies.
+Fail-open is the default posture. The one sanctioned fail-closed shape is a deny-guard whose hook *matcher* already proves the tool identity (see wakeup-guard): there, a logging or parse failure still denies.
 
-**A third posture, fail-open-but-loud**, covers a deny-guard whose matcher
-proves the tool but whose rule turns on a **payload field**. The gap is real
-rather than a technicality: wakeup-guard's rule *is* the tool, so a parse
-failure that denies costs nothing, while a rule needing a field cannot say
-that — denying on a parse failure would wedge every call its matcher covers.
-Passing silently is the opposite failure and the worse one, since it ships an
-unenforceable claim that reports success. So the guard **allows the call and
-emits an advisory naming the rule it could not enforce**: a degraded
-enforcement is visible, never silently folded. One delivery constraint comes
-with the posture and is easy to miss — `guard_advise` renders through the gate
-binary, so a guard degrading *because* the binary is unreachable cannot reach for
-it and must emit the advisory envelope directly, or the loud half is lost in
-exactly the case it was written for. The library's own unreachable-binary branch
-is that case (§The guard framework (`lib/guard.sh`)).
+**A third posture, fail-open-but-loud**, covers a deny-guard whose matcher proves the tool but whose rule turns on a **payload field**. The gap is real rather than a technicality: wakeup-guard's rule *is* the tool, so a parse failure that denies costs nothing, while a rule needing a field cannot say that — denying on a parse failure would wedge every call its matcher covers. Passing silently is the opposite failure and the worse one, since it ships an unenforceable claim that reports success. So the guard **allows the call and emits an advisory naming the rule it could not enforce**: a degraded enforcement is visible, never silently folded. One delivery constraint comes with the posture and is easy to miss — `guard_advise` renders through the gate binary, so a guard degrading *because* the binary is unreachable cannot reach for it and must emit the advisory envelope directly, or the loud half is lost in exactly the case it was written for. The library's own unreachable-binary branch is that case (§The guard framework (`lib/guard.sh`)).
 
-delegation-kit's agent-budget-guard and agent-dispatch-guard were this
-framework's second and third consumers, and did not cost the kit alike, before
-both ported to compiled harness-integration arms: agent-budget-guard composed
-these primitives into a `PreToolUse(Agent)` hook that blocks on a PAUSE budget
-verdict and advises otherwise — cite-only, no guard-kit mechanism moved for it;
-agent-dispatch-guard shared that matcher and enforces delegation-kit's
-dispatch-shape rules, and guard-kit mechanism **did** move for that one, by
-exactly one clause — the fail-open-but-loud posture above, which it was the
-shipped instance of (delegation-kit/SPEC.md §The delegation model).
+delegation-kit's agent-budget-guard and agent-dispatch-guard were this framework's second and third consumers, and did not cost the kit alike, before both ported to compiled harness-integration arms: agent-budget-guard composed these primitives into a `PreToolUse(Agent)` hook that blocks on a PAUSE budget verdict and advises otherwise — cite-only, no guard-kit mechanism moved for it; agent-dispatch-guard shared that matcher and enforces delegation-kit's dispatch-shape rules, and guard-kit mechanism **did** move for that one, by exactly one clause — the fail-open-but-loud posture above, which it was the shipped instance of (delegation-kit/SPEC.md §The delegation model).
 
-lifecycle-kit's workflow-state-guard was the fourth consumer, on the same axis:
-a `PreToolUse(Write|Edit)` hook refusing a direct write to the lifecycle state
-file, and guard-kit mechanism **did** move for it, again by exactly one clause —
-`guard_read_path` above; nothing else was missing, since `guard_block` and
-`guard_advise` never read a command and were already tool-agnostic. That was the
-rule the three consumers made explicit while all three were shell — **the kit
-owning the rule ships the guard**, riding `lib/guard.sh` through the
-`GUARD_KIT_LIB` indirection where the lib holds a primitive the rule needs.
-**All three are now harness-integration arms** (gate-sdk/SPEC.md §The non-gate
-arm) reproducing the same postures in their own compiled module, so none rides
-this library or the `GUARD_KIT_LIB` indirection any longer — ownership of the
-rule stayed with the kit that had it; only the mechanism moved off this shell
-framework, onto the crate's own hook-JSON serializer. This library renders its
-envelopes through that same serializer (`--guard-json`, above), so the envelope
-shape has one producer on both substrates. The state file's path still lives with lifecycle-kit, never here, so
-guard-kit gains no dependency on a kit it does not otherwise know about
-(lifecycle-kit/SPEC.md §check-stage-evidence).
+lifecycle-kit's workflow-state-guard was the fourth consumer, on the same axis: a `PreToolUse(Write|Edit)` hook refusing a direct write to the lifecycle state file, and guard-kit mechanism **did** move for it, again by exactly one clause — `guard_read_path` above; nothing else was missing, since `guard_block` and `guard_advise` never read a command and were already tool-agnostic. That was the rule the three consumers made explicit while all three were shell — **the kit owning the rule ships the guard**, riding `lib/guard.sh` through the `GUARD_KIT_LIB` indirection where the lib holds a primitive the rule needs. **All three are now harness-integration arms** (gate-sdk/SPEC.md §The non-gate arm) reproducing the same postures in their own compiled module, so none rides this library or the `GUARD_KIT_LIB` indirection any longer — ownership of the rule stayed with the kit that had it; only the mechanism moved off this shell framework, onto the crate's own hook-JSON serializer. This library renders its envelopes through that same serializer (`--guard-json`, above), so the envelope shape has one producer on both substrates. The state file's path still lives with lifecycle-kit, never here, so guard-kit gains no dependency on a kit it does not otherwise know about (lifecycle-kit/SPEC.md §check-stage-evidence).
 
-**This library is permanently shell, on one ground.** The declaration sits in its
-own header and §port-blockers' `--tree` arm reads it there.
+**This library is permanently shell, on one ground.** The declaration sits in its own header and §port-blockers' `--tree` arm reads it there.
 
-- **It is the API a consumer's own shell rules are composed from.** §Consumer
-  rules rules that a consumer's project block/steer/allow rules live in its copy
-  of `templates/bash-guard.sh`, composed from the primitives above; the `kit
-  owning the rule ships the guard` pattern just stated is every other consumer
-  doing the same through the `GUARD_KIT_LIB` indirection. Porting this library
-  would delete that extension point, which the general rule that *a cut narrows
-  the port, never an extension point* refuses, on a seam whose interface is a set
-  of shell functions.
+- **It is the API a consumer's own shell rules are composed from.** §Consumer rules rules that a consumer's project block/steer/allow rules live in its copy of `templates/bash-guard.sh`, composed from the primitives above; the `kit owning the rule ships the guard` pattern just stated is every other consumer doing the same through the `GUARD_KIT_LIB` indirection. Porting this library would delete that extension point, which the general rule that *a cut narrows the port, never an extension point* refuses, on a seam whose interface is a set of shell functions.
 
-It resolves no knob: the load above reads every `GUARD_KIT_*` value from the
-binary, so the ground above is its only one.
+It resolves no knob: the load above reads every `GUARD_KIT_*` value from the binary, so the ground above is its only one.
 
-**What reopens it:** the ground dissolves if §Consumer rules stops composing a
-consumer's rules from these primitives.
+**What reopens it:** the ground dissolves if §Consumer rules stops composing a consumer's rules from these primitives.
 
-**The ground did not move when the decision table's runner ported**, and the
-sentence is here because a reader meeting a ported runner beside an unported
-library will ask. §Testing's `--run-guard-tests` arm spawns
-`templates/bash-guard.sh`, which sources this library exactly as it always did,
-so the extension point is still a set of shell functions a consumer's copy
-composes from. What the port moved is the harness around the subject; the subject
-and this library are what the ground is about.
+**The ground did not move when the decision table's runner ported**, and the sentence is here because a reader meeting a ported runner beside an unported library will ask. §Testing's `--run-guard-tests` arm spawns `templates/bash-guard.sh`, which sources this library exactly as it always did, so the extension point is still a set of shell functions a consumer's copy composes from. What the port moved is the harness around the subject; the subject and this library are what the ground is about.
 
 ## Consumer rules
 
-A consumer's project-specific block/steer/allow rules live in its copy of
-`templates/bash-guard.sh`, composed from the `lib/guard.sh` primitives above and
-placed **before** the generic ruleset — the template marks the position. The
-template's head reads the payload once (`guard_read_input || exit 0`) before the
-first field accessor, which is what makes a rule reading a tool-input field
-beyond the command reachable in a shipped guard rather than only in the tests; a
-copy without that line still runs every rule, on the fallback above. Order
-is the whole reason the seam sits here: a project rule that fires must fire
-ahead of the generic rule it refines, or the generic verdict wins and the
-project rule is dead code.
+A consumer's project-specific block/steer/allow rules live in its copy of `templates/bash-guard.sh`, composed from the `lib/guard.sh` primitives above and placed **before** the generic ruleset — the template marks the position. The template's head reads the payload once (`guard_read_input || exit 0`) before the first field accessor, which is what makes a rule reading a tool-input field beyond the command reachable in a shipped guard rather than only in the tests; a copy without that line still runs every rule, on the fallback above. Order is the whole reason the seam sits here: a project rule that fires must fire ahead of the generic rule it refines, or the generic verdict wins and the project rule is dead code.
 
-This is a placement contract, not a mechanism: guard-kit ships no consumer rule
-and names none. What a project blocks or steers is its own toolchain knowledge
-and stays in its copy, which is why the copy legitimately diverges from the
-template here and why no rule content crosses into the kit.
+This is a placement contract, not a mechanism: guard-kit ships no consumer rule and names none. What a project blocks or steers is its own toolchain knowledge and stays in its copy, which is why the copy legitimately diverges from the template here and why no rule content crosses into the kit.
 
-**Both sides of this seam are permanently shell, and each declares on its own
-half of the contract above.** `templates/bash-guard.sh` declares `# no-port:`
-because the position this section says the template marks is the *whole* of the
-template — a resolve-source-read preamble around one `[EDIT ME]` gap — so a
-compiled form would carry the mechanism and delete the seam. The consumer copy
-declares on the other half: what it holds beyond the template is project rule
-content, which the paragraph above rules the kit's to never name. That is why
-this repo's `<gates-dir>/bash-guard.sh` is the one copy in its corpus carrying
-`# copy-divergence:` declarations. The class ruling both cite is gate-sdk/SPEC.md §The harness-template port disposition.
+**Both sides of this seam are permanently shell, and each declares on its own half of the contract above.** `templates/bash-guard.sh` declares `# no-port:` because the position this section says the template marks is the *whole* of the template — a resolve-source-read preamble around one `[EDIT ME]` gap — so a compiled form would carry the mechanism and delete the seam. The consumer copy declares on the other half: what it holds beyond the template is project rule content, which the paragraph above rules the kit's to never name. That is why this repo's `<gates-dir>/bash-guard.sh` is the one copy in its corpus carrying `# copy-divergence:` declarations. The class ruling both cite is gate-sdk/SPEC.md §The harness-template port disposition.
 
-**The primitives a consumer composes from are permanently shell, which is what
-makes this contract durable rather than provisional.** A consumer writes its
-rules against `lib/guard.sh`'s functions; if that library moved in-crate the
-composition seam would move with it and every consumer copy would be written
-against an interface the tree does not carry. §The guard framework
-(`lib/guard.sh`) states the disposition and the ground it rests on.
+**The primitives a consumer composes from are permanently shell, which is what makes this contract durable rather than provisional.** A consumer writes its rules against `lib/guard.sh`'s functions; if that library moved in-crate the composition seam would move with it and every consumer copy would be written against an interface the tree does not carry. §The guard framework (`lib/guard.sh`) states the disposition and the ground it rests on.
 
-**Placement is a verification decision before it is a seam one, and this is the
-sentence that makes the contract usable.** The generic lane carries §Testing's
-decision-table obligation — every rule there owes a firing and a non-firing case,
-and the table is the only instrument that reads a *block* at all. The consumer
-lane carries none: a rule in a consumer's copy is reachable by no table in this
-kit, so it ships hand-verified and its narrowing cannot be measured. A rule that
-qualifies for either lane therefore belongs in the generic one. That a consumer's
-own rules have no verification lane at all is a real gap and a separate one; it
-is named here rather than solved, since solving it designs a testing lane for
-consumer copies.
+**Placement is a verification decision before it is a seam one, and this is the sentence that makes the contract usable.** The generic lane carries §Testing's decision-table obligation — every rule there owes a firing and a non-firing case, and the table is the only instrument that reads a *block* at all. The consumer lane carries none: a rule in a consumer's copy is reachable by no table in this kit, so it ships hand-verified and its narrowing cannot be measured. A rule that qualifies for either lane therefore belongs in the generic one. That a consumer's own rules have no verification lane at all is a real gap and a separate one; it is named here rather than solved, since solving it designs a testing lane for consumer copies.
 
 ## The hook on native Windows
 
-On native Windows the hook runs under Git for Windows' bundled bash, and the kit
-ships no second implementation. The ground is what the hook guards. It inspects
-calls to the harness's `Bash` tool, and the harness runs that tool only through
-Git Bash, so any session that has a call to guard already has the shell the
-guard needs. The harness also runs a command hook under Git Bash when it is
-installed. So the committed wiring (`templates/settings-hooks.json`) is the same
-on every host, which is what a settings file shared across a team's machines
-requires. The ruleset
-models bash quoting, heredocs and the harness's per-segment matching of bash
-commands (§The generic ruleset). A PowerShell twin would re-implement a bash
-reader in PowerShell to guard bash commands, and it would double every consumer
-rule on a seam whose interface is shell functions (§Consumer rules). A native
-hook front would port the ruleset and delete that extension point, which the
-library's permanent-shell ground refuses (§The guard framework (`lib/guard.sh`)).
-Both are refused.
+On native Windows the hook runs under Git for Windows' bundled bash, and the kit ships no second implementation. The ground is what the hook guards. It inspects calls to the harness's `Bash` tool, and the harness runs that tool only through Git Bash, so any session that has a call to guard already has the shell the guard needs. The harness also runs a command hook under Git Bash when it is installed. So the committed wiring (`templates/settings-hooks.json`) is the same on every host, which is what a settings file shared across a team's machines requires. The ruleset models bash quoting, heredocs and the harness's per-segment matching of bash commands (§The generic ruleset). A PowerShell twin would re-implement a bash reader in PowerShell to guard bash commands, and it would double every consumer rule on a seam whose interface is shell functions (§Consumer rules). A native hook front would port the ruleset and delete that extension point, which the library's permanent-shell ground refuses (§The guard framework (`lib/guard.sh`)). Both are refused.
 
-The hook's floor on that host is the install page's: Git for Windows' bash and the
-gate binary, which reads the payload and renders every envelope. A host carrying MinGit or no Git Bash
-is not claimed. On such a host the harness runs hook commands under PowerShell,
-where a bare `bash` reaches the system directory's WSL launcher.
-`checkwright doctor` refuses that host before any hook is wired.
+The hook's floor on that host is the install page's: Git for Windows' bash and the gate binary, which reads the payload and renders every envelope. A host carrying MinGit or no Git Bash is not claimed. On such a host the harness runs hook commands under PowerShell, where a bare `bash` reaches the system directory's WSL launcher. `checkwright doctor` refuses that host before any hook is wired.
 
-The library has no substrate difference to absorb in what it reads: the binary
-writes LF on every host, so each reader hands the ruleset a payload's own bytes,
-and a command whose own text carries a CR LF is read verbatim everywhere.
+The library has no substrate difference to absorb in what it reads: the binary writes LF on every host, so each reader hands the ruleset a payload's own bytes, and a command whose own text carries a CR LF is read verbatim everywhere.
 
-**The honest limit: the harness's `PowerShell` tool is not guarded.** On Windows
-the harness carries a second shell tool, named `PowerShell`, which is on by
-default beside `Bash`. A `Bash`-matched hook never sees its calls, so on a
-Windows host, a command the agent sends through that tool
-reaches the harness's own permission path unguarded and unlogged, and the
-friction loop does not measure it. Widening the matcher to `Bash|PowerShell` is
-refused, because it would run bash-grammar rules over PowerShell commands. A
-guard over PowerShell-grammar commands is separate work, not this kit's today. A
-consumer who wants every shell call guarded turns the tool off with the
-harness's own switch (`CLAUDE_CODE_USE_POWERSHELL_TOOL=0`). That is the
-consumer's call, and the kit does not recommend it.
+**The honest limit: the harness's `PowerShell` tool is not guarded.** On Windows the harness carries a second shell tool, named `PowerShell`, which is on by default beside `Bash`. A `Bash`-matched hook never sees its calls, so on a Windows host, a command the agent sends through that tool reaches the harness's own permission path unguarded and unlogged, and the friction loop does not measure it. Widening the matcher to `Bash|PowerShell` is refused, because it would run bash-grammar rules over PowerShell commands. A guard over PowerShell-grammar commands is separate work, not this kit's today. A consumer who wants every shell call guarded turns the tool off with the harness's own switch (`CLAUDE_CODE_USE_POWERSHELL_TOOL=0`). That is the consumer's call, and the kit does not recommend it.
 
-**The oracle** is the decision table (§Testing) run under Git Bash on the
-binding native-Windows install-smoke leg. Every generic rule's firing and
-non-firing case then executes on the substrate this section claims.
+**The oracle** is the decision table (§Testing) run under Git Bash on the binding native-Windows install-smoke leg. Every generic rule's firing and non-firing case then executes on the substrate this section claims.
 
 ## The generic ruleset
 
-Rules that encode **harness behavior, shell-substrate behavior, or behavior over
-an artifact whose grammar a kit owns**, never any project's toolchain. Each rule
-is one `lib/guard.sh` function named `guard_rule_<name>`. Its roster item below
-names that function, and the template guard runs the ruleset through
-`guard_generic_rules`, one call per item in roster order. Order is load-bearing
-where noted. An item's number, its function and its dispatch position therefore
-say one thing three times, and `check-guard-registration` (§Testing) holds
-them equal.
+Rules that encode **harness behavior, shell-substrate behavior, or behavior over an artifact whose grammar a kit owns**, never any project's toolchain. Each rule is one `lib/guard.sh` function named `guard_rule_<name>`. Its roster item below names that function, and the template guard runs the ruleset through `guard_generic_rules`, one call per item in roster order. Order is load-bearing where noted. An item's number, its function and its dispatch position therefore say one thing three times, and `check-guard-registration` (§Testing) holds them equal.
 
-**The clause has taken two widenings, and each is recorded with the rule that
-forced it, because a rule slipped in unremarked is what would rot it.**
+**The clause has taken two widenings, and each is recorded with the rule that forced it, because a rule slipped in unremarked is what would rot it.**
 
-- **The shell-substrate half was added for rule 12, and it admits nothing a
-  project owns.** A `-f` pattern match seeing the matcher's own argv is a
-  property of the shell substrate every consumer of this kit runs on — neither
-  harness behavior nor any project's toolchain — so the narrower sentence left
-  it in a gap it had no reason to leave.
-- **The kit-artifact half was added for rule 14, and it takes the same form and
-  passes the same test.** Rule 14 is neither of the two earlier classes as they
-  were written: what it reads is evidence-kit's `pid=<n> run=<key>` record and
-  the OS's process table. It interprets **no project vocabulary at all** — it
-  reads a PID and asks whether it is alive — so the test rule 12's widening had
-  to pass is the test this one passes: **it admits nothing a project owns**. A
-  kit's own artifact grammar is shipped mechanism, which is exactly what
-  gate-sdk/SPEC.md §The provenance seam distinguishes from private rule content.
+- **The shell-substrate half was added for rule 12, and it admits nothing a project owns.** A `-f` pattern match seeing the matcher's own argv is a property of the shell substrate every consumer of this kit runs on — neither harness behavior nor any project's toolchain — so the narrower sentence left it in a gap it had no reason to leave.
+- **The kit-artifact half was added for rule 14, and it takes the same form and passes the same test.** Rule 14 is neither of the two earlier classes as they were written: what it reads is evidence-kit's `pid=<n> run=<key>` record and the OS's process table. It interprets **no project vocabulary at all** — it reads a PID and asks whether it is alive — so the test rule 12's widening had to pass is the test this one passes: **it admits nothing a project owns**. A kit's own artifact grammar is shipped mechanism, which is exactly what gate-sdk/SPEC.md §The provenance seam distinguishes from private rule content.
 
 A project's toolchain stays out on the same words as before, under both.
 
-**Naming one harness's forms in a corrective costs portability, not privacy, and
-the cost is recorded rather than pre-paid.** Rule 13's block message names a
-backgrounded condition wait and the harness's event-stream form, because a
-corrective that named neither would be unfollowable. A harness tool name is
-public, documented, and shared by every consumer of that harness, so it is not
-private rule content and the provenance seam — a privacy boundary over private
-vocabularies (gate-sdk/SPEC.md §The provenance seam) — does not reach it. What such a
-literal does cost is portability: a second harness with different form names is
-what would force these into a configurable slot, and building that slot before
-that harness exists would be designing against no case.
+**Naming one harness's forms in a corrective costs portability, not privacy, and the cost is recorded rather than pre-paid.** Rule 13's block message names a backgrounded condition wait and the harness's event-stream form, because a corrective that named neither would be unfollowable. A harness tool name is public, documented, and shared by every consumer of that harness, so it is not private rule content and the provenance seam — a privacy boundary over private vocabularies (gate-sdk/SPEC.md §The provenance seam) — does not reach it. What such a literal does cost is portability: a second harness with different form names is what would force these into a configurable slot, and building that slot before that harness exists would be designing against no case.
 
-**The item grammar the gate reads.** Each top-level numbered item carries exactly
-one backticked `guard_rule_<name>` token, placed right after its bold title. An
-item never names another rule's function: a cross-reference between rules stays
-by number ("rule 14's walk").
+**The item grammar the gate reads.** Each top-level numbered item carries exactly one backticked `guard_rule_<name>` token, placed right after its bold title. An item never names another rule's function: a cross-reference between rules stays by number ("rule 14's walk").
 
-1. **`cd` in a compound command** (`guard_rule_cd_compound`) — blocked: cwd
-   drift, plus a compound the
-   allowlist cannot match, so the call is decided out of band. Corrective form:
-   absolute paths, or `git -C <dir>` for git.
-2. **A prefix spelling that falls off the match path, steered to the spelling
-   that stays on it** (`guard_rule_git_c_root`) — three arms, each blocked with
-   the spelling the matcher
-   resolves. Declares `sq dq hd`, so a quoted mention is not the command.
-   - **(a) `git -C <repo-root>` when cwd is the root**: the absolute `-C` target
-     matches no allowlist entry and falls off the match path, while the bare
-     `git` form is allowlisted and resolves on it. Pinned with a trailing space
-     to the exact root, so `git -C <root>/subdir` and a foreign-repo `-C` are
-     untouched.
-   - **(b) `git -c <key>=<value>`** among a git segment's global options, found
-     by rule 14's `_guard_git_subcommand` walk, so a global option that walk
-     does not recognize declines. The corrective has three parts. Drop the
-     `-c`: a pager or color override has no effect without a terminal, and the
-     bare subcommand is the allowlisted spelling. A `-c` form is never granted,
-     because a `-c` key can name a program the subcommand runs — `core.pager`,
-     `core.fsmonitor`, `core.sshCommand`, `alias.*` — and the same reach is why
-     the matcher does not strip it. A genuine config override runs through
-     `!<command>`.
-   - **(c) An absolute spelling of a stripped wrapper** — a segment's command
-     word, read past a leading shell keyword as rule 12 reads it, whose basename
-     is `time`, `timeout`, `nice`, `nohup` or `stdbuf` and which carries a `/` —
-     steered to the bare wrapper name the matcher strips (§The guard framework,
-     `_guard_harness_view`). The corrective states the one loss: a format option
-     only the binary takes (`/usr/bin/time -f`) has no stripped spelling, and
-     runs through `!<command>`.
+1. **`cd` in a compound command** (`guard_rule_cd_compound`) — blocked: cwd drift, plus a compound the allowlist cannot match, so the call is decided out of band. Corrective form: absolute paths, or `git -C <dir>` for git.
+2. **A prefix spelling that falls off the match path, steered to the spelling that stays on it** (`guard_rule_git_c_root`) — three arms, each blocked with the spelling the matcher resolves. Declares `sq dq hd`, so a quoted mention is not the command.
+   - **(a) `git -C <repo-root>` when cwd is the root**: the absolute `-C` target matches no allowlist entry and falls off the match path, while the bare `git` form is allowlisted and resolves on it. Pinned with a trailing space to the exact root, so `git -C <root>/subdir` and a foreign-repo `-C` are untouched.
+   - **(b) `git -c <key>=<value>`** among a git segment's global options, found by rule 14's `_guard_git_subcommand` walk, so a global option that walk does not recognize declines. The corrective has three parts. Drop the `-c`: a pager or color override has no effect without a terminal, and the bare subcommand is the allowlisted spelling. A `-c` form is never granted, because a `-c` key can name a program the subcommand runs — `core.pager`, `core.fsmonitor`, `core.sshCommand`, `alias.*` — and the same reach is why the matcher does not strip it. A genuine config override runs through `!<command>`.
+   - **(c) An absolute spelling of a stripped wrapper** — a segment's command word, read past a leading shell keyword as rule 12 reads it, whose basename is `time`, `timeout`, `nice`, `nohup` or `stdbuf` and which carries a `/` — steered to the bare wrapper name the matcher strips (§The guard framework, `_guard_harness_view`). The corrective states the one loss: a format option only the binary takes (`/usr/bin/time -f`) has no stripped spelling, and runs through `!<command>`.
 
-   **Why a steer and not a grant**, on rule 20's reasoning: arms (b) and (c)
-   fire on commands decided out of band anyway, so blocking converts that
-   decision into a durable steer at no extra cost, and a grant of (b) would bless
-   the program reach above.
-3. **Bare-name scratch redirect** (`guard_rule_scratch_redirect`) — a `>`/`>>`
-   to a slash-free
-   `*.err`/`*.out`/`*.log` target is blocked (it lands in the tracked tree
-   and risks a `git add -A`); the no-slash class lets path-bearing targets,
-   `/dev/null`, and fd-dups through. The corrective message points at the
-   consumer's gitignored scratch dirs (`GUARD_KIT_SCRATCH_DIRS`).
-4. **Absolute-path execution of a known read-only repo script**
-   (`guard_rule_abs_script`) — silently
-   rewritten to the repo-relative form via `guard_rewrite` (the relative
-   spelling is what allowlist globs match). The roster is the
-   `GUARD_KIT_RO_SCRIPTS` globs (default `check-*.sh`). Any other
-   absolute repo-script spelling gets a corrective block.
-   **The rewrite is a grant, so it attaches only when the rewritten command is
-   granted and bounded.** `guard_rewrite`'s envelope carries
-   `permissionDecision: allow`, so the rewrite attaches only when every segment
-   of the relative command, split as §The guard framework's splitter splits it
-   over the dequoted view, matches a committed `Bash(…)` pattern through
-   `guard_allow_match` with no backgrounding `&` ending it (the harness grants
-   no backgrounded call), and the command passes rule 24's test taken as a
-   predicate. A failed binary read, a missing settings file or a parse error fails the
-   first test, so a grant resting on a settings read never turns a missing file
-   into an allow, which is rule 18's contract for its own read. Otherwise the
-   corrective block fires, and the re-issued relative command meets every later
-   rule, rule 23's scratch-body refusal included: `bash <root>/.tmp/check-evil.sh`
-   now blocks rather than being granted ahead of rule 23. The shared test is
-   `_guard_rewrite_granted`, which rule 7 calls too. **Placed before**
-   rule 5, which would otherwise steer the same command less precisely.
-5. **Repo-root absolute prefix (non-script)** (`guard_rule_abs_prefix`) — any
-   other command carrying
-   the literal repo-root prefix is steered to the repo-relative spelling.
-   `git` is excluded — rule 2 already owns its `-C` handling.
-6. **Shell expansion / assignment** (`guard_rule_expansion`) — a residual
-   `${…}`/`$(…)`/`<(…)`/
-   `$NAME` in the skeleton is blocked (the harness's matcher refuses every
-   expansion before allowlist matching). **Declares `sq hdq`** for the expansion
-   check and **`sq dq hdq`** for the assignment check, and every part of that is
-   deliberate rather than inherited. `dq` stays live for the expansion check:
-   inside single quotes `$` is literal (`awk '$1'`), but a double-quoted `"$x"`
-   still expands and must stay visible. `hd` is **not** declared, since an
-   unquoted-delimiter heredoc body expands too — but `hdq` is, because a
-   **quoted** delimiter makes the shell itself the guarantee that the body
-   cannot expand. That is what stops the rule refusing prose that merely
-   *names* a substitution: a journal entry, a queue entry being appended, or a
-   commit message written through `git commit -F - <<'MSG'`. The assignment
-   check adds `dq` because a `NAME="value"` assigns whatever the quotes hold. A
-   standalone `NAME=value` assignment is
-   caught separately, since the expansion check only sees a *used* `$VAR`.
-7. **Unquoted brace glyph** (`guard_rule_brace_glyph`) — the harness's matcher
-   refuses the bare `{` glyph
-   before allowlist matching, the same behavior class rule 6 pre-empts for
-   `$`-expansions, so a `{` surviving in the skeleton is handled by shape.
-   **Declares `sq dq hd`, and the difference from rule 6 is the point rather
-   than an accident of two adjacent lines.** Rule 6's reason to keep
-   double-quoted spans live does not carry here: `{` is a **matcher glyph, not a
-   shell expansion**, so a double-quoted brace is exactly as inert as a
-   single-quoted one, and a heredoc-body brace is inert whatever the delimiter.
-   This is what stops a working POSIX quantifier (`grep -rnE "^[a-z]{2,}"`)
-   being refused, and it is equally what stops the **wrong corrective**: a block
-   message owes the offending pattern *and* the corrective form, and *write out
-   the brace expansion, spell the members* is inapplicable to a quantifier that
-   has no members and to a heredoc body that has nothing to respell. A block
-   whose corrective cannot be followed fails that contract however right its
-   verdict. A **bare `{}` placeholder** (`find … -exec cmd {} +`,
-   `xargs -I{}`), when every residual brace is exactly `{}`, is rewritten
-   via `guard_rewrite` — each `{}` single-quoted to `'{}'`,
-   behavior-preserving (the shell passes a literal `{}` either way) and
-   invisible to the matcher on the same premise as rule 6's strip. **That
-   rewrite is a grant too, so it attaches on rule 4's test** — the rewritten
-   command allowlisted segment by segment and bounded by rule 24, through
-   `_guard_rewrite_granted` — and otherwise **blocks**, with a corrective naming
-   the quoted `'{}'` spelling for the session to write itself, so the call
-   reaches the harness's own decision. `find . -type f -exec rm -rf {} \;` and
-   `ls | xargs -I{} rm {}` block wherever that command is not allowlisted.
-   **A block and not a fall-through**, because an unrewritten `{}` meets the
-   matcher's brace refusal and the harness documents no `updatedInput` carried
-   without a decision, so a fall-through cannot deliver the rewrite; the
-   corrective hands the session the same behavior-preserving respelling without
-   the grant. The cost is stated: a placeholder call whose command is not
-   allowlisted now takes a block and a re-issue where it was granted silently,
-   the price of the grant having been unconditional. Every
-   expanding form is **blocked** with the written-out corrective:
-   git-ref shorthand (`@{u}`, `@{-n}`, `<ref>@{n}`) names the explicit
-   spelling (`origin/<branch>..HEAD`, or the resolved ref/hash);
-   list/range (`{a,b}`, `{a..b}`) names the spelled-out members or a loop;
-   any other residual `{` gets the generic corrective (quote it if literal —
-   an unquoted awk/sed program — write it out if it expands). There is no
-   legitimate brace-glob convenience to preserve:
-   since every bare `{` already costs an out-of-band decision no allowlist entry
-   can suppress, block-and-steer strictly dominates; a brace in any inert region
-   passes untouched. **Placed before both auto-allow rules**
-   so their literal-target premise holds for braces as well.
-8. **`sed` or `awk` reading a file, or `sed`, `perl` or an inline `python` body
-   rewriting one** (`guard_rule_sed_file`) — blocked with the
-   steer to a better tool: `sed -i` or `perl -i` (any short bundle carrying
-   `i`, on any file operand) to the `--rewrite` arm (§rewrite), with the Edit
-   tool named for an edit a fixed replacement cannot express, and a `sed`
-   **file operand** to the Read tool's offset/limit. A `sed` fed by a pipe is a text filter with no tool equivalent
-   and is untouched, so the discriminator is the operand, not the binary — logic
-   no allowlist glob can express, which is why this is a rule and not a deny
-   entry. Segments are analyzed only when they *lead* with the tool, so a `-i`
-   flag on any other command (`grep -i`) is invisible to it.
-   **One walker, not a parser per tool.**
-   `_guard_program_operands <tool> <segment>` separates the program word from
-   the file operands through a per-tool option table:
-   - `sed`: `-e`/`-f` consume an argument and supply the script, and
-     `--expression=`/`--file=` do the same; `-i` in any spelling marks the
-     in-place rewrite; every other short and long option takes no argument.
-   - `awk`: `-F` and `-v` consume an argument, separate or glued; `-f` consumes
-     one and supplies the program; `--` ends options. Any other option word
-     declines.
-   - `perl`: `-e` or `-E` as a whole word consumes the next word, which supplies
-     the program; in a bundle (`-ne`, `-pe`) `e`/`E` takes the rest of the word,
-     or the next word when the rest is empty, and the bundle ends there. `i`
-     anywhere in a bundle marks the in-place rewrite and the rest of that word is
-     its backup extension (`-i`, `-i.bak`, `-pi`, `-0pi`, `-0777pi`), ending the
-     bundle. `a c n p s t T u U w W X` take no argument and the bundle continues;
-     `0` and `l` take the digits that follow them. `--` ends options. Any other
-     option word or bundle letter (`-I`, `-M`, `-m`, `-F`, `-x`, `-d`, `-D`,
-     `-C`, `-V`, `-S`, `-f`, a bare `-`, a long option) declines — conservative
-     in the direction the `awk` row takes.
+   **Why a steer and not a grant**, on rule 20's reasoning: arms (b) and (c) fire on commands decided out of band anyway, so blocking converts that decision into a durable steer at no extra cost, and a grant of (b) would bless the program reach above.
+3. **Bare-name scratch redirect** (`guard_rule_scratch_redirect`) — a `>`/`>>` to a slash-free `*.err`/`*.out`/`*.log` target is blocked (it lands in the tracked tree and risks a `git add -A`); the no-slash class lets path-bearing targets, `/dev/null`, and fd-dups through. The corrective message points at the consumer's gitignored scratch dirs (`GUARD_KIT_SCRATCH_DIRS`).
+4. **Absolute-path execution of a known read-only repo script** (`guard_rule_abs_script`) — silently rewritten to the repo-relative form via `guard_rewrite` (the relative spelling is what allowlist globs match). The roster is the `GUARD_KIT_RO_SCRIPTS` globs (default `check-*.sh`). Any other absolute repo-script spelling gets a corrective block. **The rewrite is a grant, so it attaches only when the rewritten command is granted and bounded.** `guard_rewrite`'s envelope carries `permissionDecision: allow`, so the rewrite attaches only when every segment of the relative command, split as §The guard framework's splitter splits it over the dequoted view, matches a committed `Bash(…)` pattern through `guard_allow_match` with no backgrounding `&` ending it (the harness grants no backgrounded call), and the command passes rule 24's test taken as a predicate. A failed binary read, a missing settings file or a parse error fails the first test, so a grant resting on a settings read never turns a missing file into an allow, which is rule 18's contract for its own read. Otherwise the corrective block fires, and the re-issued relative command meets every later rule, rule 23's scratch-body refusal included: `bash <root>/.tmp/check-evil.sh` now blocks rather than being granted ahead of rule 23. The shared test is `_guard_rewrite_granted`, which rule 7 calls too. **Placed before** rule 5, which would otherwise steer the same command less precisely.
+5. **Repo-root absolute prefix (non-script)** (`guard_rule_abs_prefix`) — any other command carrying the literal repo-root prefix is steered to the repo-relative spelling. `git` is excluded — rule 2 already owns its `-C` handling.
+6. **Shell expansion / assignment** (`guard_rule_expansion`) — a residual `${…}`/`$(…)`/`<(…)`/ `$NAME` in the skeleton is blocked (the harness's matcher refuses every expansion before allowlist matching). **Declares `sq hdq`** for the expansion check and **`sq dq hdq`** for the assignment check, and every part of that is deliberate rather than inherited. `dq` stays live for the expansion check: inside single quotes `$` is literal (`awk '$1'`), but a double-quoted `"$x"` still expands and must stay visible. `hd` is **not** declared, since an unquoted-delimiter heredoc body expands too — but `hdq` is, because a **quoted** delimiter makes the shell itself the guarantee that the body cannot expand. That is what stops the rule refusing prose that merely *names* a substitution: a journal entry, a queue entry being appended, or a commit message written through `git commit -F - <<'MSG'`. The assignment check adds `dq` because a `NAME="value"` assigns whatever the quotes hold. A standalone `NAME=value` assignment is caught separately, since the expansion check only sees a *used* `$VAR`.
+7. **Unquoted brace glyph** (`guard_rule_brace_glyph`) — the harness's matcher refuses the bare `{` glyph before allowlist matching, the same behavior class rule 6 pre-empts for `$`-expansions, so a `{` surviving in the skeleton is handled by shape. **Declares `sq dq hd`, and the difference from rule 6 is the point rather than an accident of two adjacent lines.** Rule 6's reason to keep double-quoted spans live does not carry here: `{` is a **matcher glyph, not a shell expansion**, so a double-quoted brace is exactly as inert as a single-quoted one, and a heredoc-body brace is inert whatever the delimiter. This is what stops a working POSIX quantifier (`grep -rnE "^[a-z]{2,}"`) being refused, and it is equally what stops the **wrong corrective**: a block message owes the offending pattern *and* the corrective form, and *write out the brace expansion, spell the members* is inapplicable to a quantifier that has no members and to a heredoc body that has nothing to respell. A block whose corrective cannot be followed fails that contract however right its verdict. A **bare `{}` placeholder** (`find … -exec cmd {} +`, `xargs -I{}`), when every residual brace is exactly `{}`, is rewritten via `guard_rewrite` — each `{}` single-quoted to `'{}'`, behavior-preserving (the shell passes a literal `{}` either way) and invisible to the matcher on the same premise as rule 6's strip. **That rewrite is a grant too, so it attaches on rule 4's test** — the rewritten command allowlisted segment by segment and bounded by rule 24, through `_guard_rewrite_granted` — and otherwise **blocks**, with a corrective naming the quoted `'{}'` spelling for the session to write itself, so the call reaches the harness's own decision. `find . -type f -exec rm -rf {} \;` and `ls | xargs -I{} rm {}` block wherever that command is not allowlisted. **A block and not a fall-through**, because an unrewritten `{}` meets the matcher's brace refusal and the harness documents no `updatedInput` carried without a decision, so a fall-through cannot deliver the rewrite; the corrective hands the session the same behavior-preserving respelling without the grant. The cost is stated: a placeholder call whose command is not allowlisted now takes a block and a re-issue where it was granted silently, the price of the grant having been unconditional. Every expanding form is **blocked** with the written-out corrective: git-ref shorthand (`@{u}`, `@{-n}`, `<ref>@{n}`) names the explicit spelling (`origin/<branch>..HEAD`, or the resolved ref/hash); list/range (`{a,b}`, `{a..b}`) names the spelled-out members or a loop; any other residual `{` gets the generic corrective (quote it if literal — an unquoted awk/sed program — write it out if it expands). There is no legitimate brace-glob convenience to preserve: since every bare `{` already costs an out-of-band decision no allowlist entry can suppress, block-and-steer strictly dominates; a brace in any inert region passes untouched. **Placed before both auto-allow rules** so their literal-target premise holds for braces as well.
+8. **`sed` or `awk` reading a file, or `sed`, `perl` or an inline `python` body rewriting one** (`guard_rule_sed_file`) — blocked with the steer to a better tool: `sed -i` or `perl -i` (any short bundle carrying `i`, on any file operand) to the `--rewrite` arm (§rewrite), with the Edit tool named for an edit a fixed replacement cannot express, and a `sed` **file operand** to the Read tool's offset/limit. A `sed` fed by a pipe is a text filter with no tool equivalent and is untouched, so the discriminator is the operand, not the binary — logic no allowlist glob can express, which is why this is a rule and not a deny entry. Segments are analyzed only when they *lead* with the tool, so a `-i` flag on any other command (`grep -i`) is invisible to it. **One walker, not a parser per tool.** `_guard_program_operands <tool> <segment>` separates the program word from the file operands through a per-tool option table:
+   - `sed`: `-e`/`-f` consume an argument and supply the script, and `--expression=`/`--file=` do the same; `-i` in any spelling marks the in-place rewrite; every other short and long option takes no argument.
+   - `awk`: `-F` and `-v` consume an argument, separate or glued; `-f` consumes one and supplies the program; `--` ends options. Any other option word declines.
+   - `perl`: `-e` or `-E` as a whole word consumes the next word, which supplies the program; in a bundle (`-ne`, `-pe`) `e`/`E` takes the rest of the word, or the next word when the rest is empty, and the bundle ends there. `i` anywhere in a bundle marks the in-place rewrite and the rest of that word is its backup extension (`-i`, `-i.bak`, `-pi`, `-0pi`, `-0777pi`), ending the bundle. `a c n p s t T u U w W X` take no argument and the bundle continues; `0` and `l` take the digits that follow them. `--` ends options. Any other option word or bundle letter (`-I`, `-M`, `-m`, `-F`, `-x`, `-d`, `-D`, `-C`, `-V`, `-S`, `-f`, a bare `-`, a long option) declines — conservative in the direction the `awk` row takes.
 
-   Absent a supplying option, the first bare word is the program and every later
-   one is an operand. `cat` keeps `_guard_is_cat_read` (rule 10), because it has
-   no program word.
-   **The `awk` arm fires on two read shapes and nothing else.** Both require
-   exactly one file operand and no pipe into the segment, meaning the `awk` heads
-   its pipeline. That test splits statements and then pipes, as rule 23 does and
-   for rule 23's reason: which segment is piped into is dataflow, and
-   `guard_split_compound` erases the separator that answers it.
-   - **(i) A line-range read.** The program's pattern is built only from `NR`
-     comparisons — `==`, `>=`, `<=` and the strict `>`/`<` — joined by `&&` or a
-     `,` range (`NR>=a && NR<=b`, `NR==a,NR==b`), with no action or the
-     print-all action (`{print}`, `{print $0}`). The steer names the Read tool's
-     offset/limit.
-   - **(ii) A heading-range read.** The program is a `/re1/,/re2/` range on a
-     `.md` operand, with no action or print-all. The steer names the section
-     extractor, its printed command derived from `GUARD_KIT_LIB` exactly as rule
-     23 derives the runner —
-     `bash <root>gate-sdk/bin/run-gates.sh --emit md-section <file> "<heading>"`
-     — which is the same cross-kit coupling rule 23 already admits, on the same
-     ground.
+   Absent a supplying option, the first bare word is the program and every later one is an operand. `cat` keeps `_guard_is_cat_read` (rule 10), because it has no program word. **The `awk` arm fires on two read shapes and nothing else.** Both require exactly one file operand and no pipe into the segment, meaning the `awk` heads its pipeline. That test splits statements and then pipes, as rule 23 does and for rule 23's reason: which segment is piped into is dataflow, and `guard_split_compound` erases the separator that answers it.
+   - **(i) A line-range read.** The program's pattern is built only from `NR` comparisons — `==`, `>=`, `<=` and the strict `>`/`<` — joined by `&&` or a `,` range (`NR>=a && NR<=b`, `NR==a,NR==b`), with no action or the print-all action (`{print}`, `{print $0}`). The steer names the Read tool's offset/limit.
+   - **(ii) A heading-range read.** The program is a `/re1/,/re2/` range on a `.md` operand, with no action or print-all. The steer names the section extractor, its printed command derived from `GUARD_KIT_LIB` exactly as rule 23 derives the runner — `bash <root>gate-sdk/bin/run-gates.sh --emit md-section <file> "<heading>"` — which is the same cross-kit coupling rule 23 already admits, on the same ground.
 
-   An action, a program file, a non-`.md` range, a second operand, a `-` stdin
-   operand, or a stream all pass. **Which steer to emit is decided by the
-   program's shape, never by a measured frequency**: the measured mix of range
-   reads flips with what an iteration reads, so no single target is right for the
-   class. Three shapes are refused as steer inputs — a transform, a single-regex
-   filter, and a range on a non-markdown file.
-   **The program text comes from a dequoted view, because the skeleton blanks
-   it.** `_guard_dequoted_view` walks the raw command in lockstep with its
-   `sq dq hd` skeleton and takes every region decision from the skeleton. It
-   removes the quote characters and holds each quoted span's blanks and statement
-   separators as sentinels, so a statement split or a word split cuts exactly
-   where it cuts the skeleton. Where the two cannot be aligned — a heredoc body,
-   an unterminated span, a newline inside quotes — the arm declines.
-   **A committed `awk` grant is not argued with.** A `PreToolUse` block is not
-   overridden by an allow, so the steer fires on the two read shapes ahead of any
-   grant; such a grant stays load-bearing for `awk` as a stream filter and for
-   every program shape the arm declines.
-   **The `perl` arm blocks an in-place rewrite with at least one file operand.**
-   **Both in-place arms steer to a tool whose effect is its command line.** An
-   in-place `sed` or `perl` program can read, write elsewhere, or execute, and the
-   guard cannot tell which from outside the program. `--rewrite` replaces fixed
-   text in named files and does nothing else, so the steer trades a program for a
-   statement of intent; its printed command is derived from `GUARD_KIT_LIB` as
-   rule 23 derives the runner. The Edit tool stays named for a single edit needing
-   more than a fixed replacement. A sweep over many files is one `--rewrite` call,
-   so neither arm bounds its operand count. **What passes:** `perl -pi` with no
-   file operand, which reads stdin and rewrites no file; an in-place call behind another command word (`xargs perl -pi`),
-   which is its lead's rule's subject; and a `perl` option the walker does not
-   model.
-   **The `python` arm blocks an inline body that is a literal rewrite**: it writes a file through `open(`
-   with a `w` or `a` mode or through `.write_text(`, it calls `.replace(`, and it carries no
-   computed-text construct (an f-string, `.format(`, `%` formatting, `re.`, an `import`, `.index(`,
-   `.find(`, `.join(`, `.split(`, a slice, `input(`, `sys.`, or a `$` in an unquoted-delimiter body). The
-   body is the `-c` argument (`_guard_program_operands`' `python` row: `-c` supplies the program, `-W`
-   and `-X` consume one word, `-u -B -E -I -s -S -O -q` none, a redirect token and its target are
-   skipped, anything else declines) or the heredoc feeding the segment's stdin (`_guard_heredoc_body`).
-   The `-c` argument is read off the dequoted view, so it declines where that view does. It steers to
-   `--rewrite` (`--expect` for a count assertion) or the Edit tool, and names `!<command>`. **Why this
-   shape and no wider one:** the inline bodies that recur across sessions are a literal read, replace
-   and write-back, which `--rewrite` performs with an effect its command line states. Computed
-   replacements, tallies and probes have no such tool, so they pass and stay measured friction. The arm
-   reads spelling, not semantics, and leans toward passing: a literal rewrite spelled through a
-   construct on that list passes, a computed one hiding behind none of them is blocked, and its steer
-   names `!<command>` for that case. The spellings it reads are python's, a language literal that
-   mints no knob, and a python revision that adds a write or formatting spelling is drift it does not
-   detect. **What passes besides:** a read-only body, a body writing through `shutil`, `os` or
-   `pathlib` without `.write_text(`, a `python` behind another command word, and any other
-   interpreter, since none was found inline. A committed `Bash(python3 -*)` grant is not argued with,
-   on the `awk` arm's ground: the grant stays load-bearing for every body the arm declines.
-   **Placed before both auto-allow rules:** a consumer that widens
-   `GUARD_KIT_RO_BINS` with `sed` would otherwise have rule 18 silently grant an
-   in-place rewrite. `awk` has no honest place on that roster, since a program
-   can print to a file or call `system()`, and the placement guards a consumer
-   who adds it anyway.
-9. **Listing-only `find`** (`guard_rule_find_glob`) — a bare `find` that only
-   lists is blocked with
-   the steer to the harness's Glob tool (the same shape as rule 8's `sed`
-   read-steer: a better tool exists, and Glob returns paths registered for a
-   later Read). Fires on the conjunction no allowlist glob can express: every
-   segment leads with `find` and carries **none of `find`'s declared write and
-   execute forms** — rule 18's declaration for `find`, so the action roster has
-   one literal — with **no composition** — no
-   pipe, `&&`/`||` chain, background, or redirect. A lone listing fires, and so
-   does a **`;`-sequence of listings**: a `;`-compound is not composition but a
-   batch of independent listings, exactly what the Glob steer collapses into one
-   call. A literal `echo`/`printf` banner segment between them is the natural
-   separator of such a batch and is tolerated; at least one segment must be a
-   listing. A piped `find` is a legitimate producer (rule 18 may still
-   auto-allow it), an action-predicate `find` is an executor, a redirected
-   `find` has a downstream reader, and a **mixed** compound (a segment that is
-   neither a listing nor a banner) all pass untouched. **Placed before both
-   auto-allow rules** (same reasoning as rule 8): a bare listing meets the steer
-   rather than a silent read-only-pipeline grant, since `find` is in the default
-   `GUARD_KIT_RO_BINS` roster. A consumer needing different behavior shadows
-   the rule in its consumer-rules section.
-   **Fires only when `Glob` is a member of `GUARD_KIT_SEARCH_TOOLS`**, and is
-   inert otherwise: a steer naming a tool the harness build does not carry is
-   unfollowable, and the guard cannot see the toolset (§Layout and configuration
-   states why the knob is the input). Inert, a bare listing reaches rule 18,
-   which grants it as a read-only segment — the working form the steer would
-   otherwise have displaced. The firing corrective adds the bare
-   fallback beside the tool — keep `find` and pipe the listing into a read-only
-   consumer, which rule 18 grants.
-10. **Bare single-file `cat`** (`guard_rule_cat_file`) — a `cat` read is blocked
-    with the steer to the
-    harness's Read tool (rule 8's read-steer shape: Read returns numbered lines
-    registered for a later Edit). Fires on the conjunction no allowlist glob
-    expresses: every segment leads with `cat` and carries **exactly one**
-    non-flag operand (flags are allowed, `cat -n <file>`), with **no
-    composition** — no pipe, heredoc, redirect, substitution, `&&`/`||` chain,
-    or background. A lone `cat <file>` fires, and so does a **`;`-batch of
-    reads** (`cat a; cat b`): a `;`-compound of single-file reads is a batch,
-    not composition, and collapses into successive Read calls — the ergonomic
-    case the steer exists for. A literal `echo`/`printf` banner segment between
-    reads is the natural separator of such a batch and is tolerated: it is
-    redundant once the batch moves to the Read tool, which shows each filename
-    itself. At least one segment must be a read. Multi-file concatenation, a
-    piped or heredoc'd `cat`, a redirected `cat`, an `&&`-chain, and a **mixed**
-    or banner-only compound are composition (or carry no read the Read tool
-    replaces) and pass untouched. **Placed before both auto-allow rules** (same
-    reasoning as rule 8): a bare `cat <file>` meets the steer rather than a
-    silent read-only-pipeline grant, since `cat` is in the default
-    `GUARD_KIT_RO_BINS` roster.
-11. **Working-tree `git grep`** (`guard_rule_git_grep`) — a `git grep` that
-    searches the working tree
-    is blocked with the steer to the harness's Grep tool (rule 8's read-steer
-    shape: Grep returns matching lines with files registered for a later Read).
-    Fires on the discriminator no allowlist glob expresses: the command leads
-    with `git grep`, names no revision, and does not scope elsewhere — the
-    index (`--cached`/`--staged`), a non-repo search (`--no-index`), or an
-    untracked-file search (`--untracked`). "Names a revision" is read off the
-    positional grammar: the pattern is one positional (or supplied by
-    `-e`/`-f`), so a *further* bare positional before any `--` is a tree-ish
-    the Grep tool cannot reach — `git grep foo` steers while `git grep foo
-    HEAD` passes, and a `-- <path>` limiter keeps the search in the working
-    tree and still steers. A piped `git grep` is a producer and never reaches
-    this rule (the consumer disqualifies it). Conservative by construction: an
-    unrecognized option-with-argument or a glued pattern flag biases toward
-    passing, never a false steer of a history search.
-    **Fires only when `Grep` is a member of `GUARD_KIT_SEARCH_TOOLS`**, on rule
-    9's reasoning, and is inert otherwise. The firing corrective adds the bare
-    fallback beside the tool: `grep -rn <pattern> <path>` searches the same
-    working tree.
-12. **Self-matching process-liveness predicate** (`guard_rule_pgrep_self_match`)
-    — a `pgrep`/`pkill -f` whose pattern matches the command's own text is
-    **blocked**. `-f` matches against full argv, and the harness runs a command
-    through a wrapper whose argv carries the whole command text — the command is
-    not the last word of the wrapper's `-c` string, so no `exec` replaces it — so
-    such a pattern always finds at least the wrapper: `until ! pgrep -f
-    '<script>'; do …; done` has a permanently-true condition and never exits, a
-    one-shot query always answers *running*, and a `pkill -f` signals its own
-    wrapper. It reds nothing: the work completes correctly and the only symptom
-    is the foreground cap absorbing an unbounded loop, which reads from outside
-    as a fixed cap-length wait. Fires on the conjunction no allowlist glob
-    expresses: a segment whose **command word** is `pgrep` or `pkill` — read past
-    a leading `until`/`while`/`if`/`!`, which do not change which binary runs —
-    carrying `-f` (bare or bundled in a short cluster), whose pattern operand (a
-    quoted operand read whole across its blanks), read as the ERE `pgrep`
-    compiles, matches the raw command text (case-insensitively under `-i`, as
-    `pgrep`'s own match is). A pattern that does not match its own text cannot
-    self-match and passes; the bracket trick (`'[r]un-smoke.sh'`, whose regex
-    needs text the command does not hold) is that case, and it passes this rule
-    while staying refused as the sanctioned form (below). The
-    corrective names both sanctioned forms: wait on the work's own artifact, or
-    `kill -0` against a **recorded PID** where liveness genuinely is the condition
-    — whoever started that producer, a child the session backgrounded itself
-    included, whose PID it recorded at launch as a `<key>.run` record under its
-    scratch directory. That clause is owned by
-    delegation-kit/SPEC.md §The delegation model and this text carries it, the
-    record's naming convention included — rule 14 reads that same set, so a
-    corrective that named the PID but not where it lives would send a blocked
-    session to write the one artifact shape neither reader can find.
-    A PID is an identity; a pattern is a
-    guess about a process table that includes the guesser. The refusal of the
-    bracket-trick repair as the *sanctioned* form is delegation-kit's ruling and
-    its grounds live there (delegation-kit/SPEC.md §The delegation model); this
-    rule exists because a correct form one character from an incorrect one will be
-    got wrong. Conservative by construction, in this ruleset's established
-    directions: an expansion or substitution anywhere in the command declines
-    outright (rule 6 already blocks those shapes); a `pgrep` without `-f` matches
-    process **names** rather than argv and is untouched; an unrecognized option, an
-    option whose argument cannot be walked, a second bare operand, `-x`/`--exact`
-    (the pattern must then match the whole argv line, which the wrapper's always
-    exceeds), `-v`/`--inverse` (the predicate is inverted, so the self-match
-    argument does not apply), and a pattern that is no valid ERE all decline.
-    Each biases toward passing rather than toward a false block. **Placed with the
-    read-steer rules and before both auto-allow rules**, on rule 8's stated
-    reasoning: `pgrep` is a plausible member of a widened `GUARD_KIT_RO_BINS` — it
-    is, after all, a read-only query — and a consumer who added it would otherwise
-    have rule 18 silently bless a waiter that can never exit.
-13. **Bare foreground `sleep`** (`guard_rule_bare_sleep`) — a `sleep` standing
-    in for a wait is
-    **blocked**, and the discriminator is the whole rule: a blanket `sleep` block
-    is wrong and is refused. The sanctioned wait *is* a condition loop, and such
-    a loop is expressly legitimate **in either spelling** —
-    `until <cond>; do sleep N; done` and `while <cond>; do sleep N; done` alike,
-    because the span walk below reads `do … done` and never the loop keyword, so
-    correcting a wait loop's polarity is free at the guard. So the rule fires on
-    exactly one shape — a bare foreground `sleep` in command position, outside
-    every loop wrapper — and never on a `sleep` inside a loop body. *The
-    discriminator is new territory:* this ruleset carries exactly one shell-keyword
-    parse and this rule is where it came from — rule 15's wait-loop exemption now
-    shares it rather than copying it, so the ruleset keeps one keyword-parsing
-    dialect. This one takes the skeleton view (so a `sleep` merely *named* in a
-    quoted span or a heredoc body is already inert), then walks it for `do … done`
-    spans and treats a `sleep` inside one as **inert** — structurally the carve-out
-    `_guard_is_banner` already performs for `echo`/`printf` segments in the batched-read
-    rules, applied to a keyword span instead of a segment. A `sleep` outside every
-    such span fires. Where the wrapper cannot be resolved — an unbalanced `do`/`done`,
-    or a span the rule cannot attribute — it **declines**, the direction every
-    other conservative clause here takes; a `sleep` that is an *argument* rather
-    than a command word never fires at all. **Blocks** rather than advises, on
-    rule 20's reasoning: no consumer allowlist is presumed to grant a bare
-    `sleep`, so the rule fires on a command that would be decided out of band
-    anyway and converts that decision into a durable steer at no extra cost. *The
-    corrective names the property and both forms* rather than one spelling: a wait
-    must end when its condition goes true, not when a duration expires; a
-    backgrounded command that *exits* on the condition fires one notification the
-    moment the condition holds, while the harness's event-stream form stays armed
-    to its deadline after its event fires when the command it was armed with is
-    unbounded, which makes it the second choice for a single completion. *It also
-    names the loop's polarity*, because that is the next mistake and it is the one
-    with an attested cost: `until` takes a done predicate, `while` takes a
-    still-running one such as a PID's liveness, and inverting them yields a loop
-    that exits at once with the producer still running
-    (delegation-kit/SPEC.md §bin/wait-probe measured it).
-    **The polarity example spells the PID as a literal, and that is a correction
-    rather than a preference.** It read `while kill -0 "$pid" …`, which **rule 6
-    blocks** — rule 6 dispatches ahead of this one and keeps `dq`
-    live so a double-quoted expansion stays visible, so a session obeying this
-    corrective met a block from a rule it had never reached, and the ruleset
-    argued with itself. The corrective keeps its reasoning and its polarity clause
-    and moves to the form that is actually reachable: the literal PID the session
-    read out of the `.run` record in the first place — which rule 19 then grants,
-    so the steer now ends in a form that costs no decision at all. A corrective
-    naming an unreachable form is the defect; the spelling is the fix. Naming one form teaches a spelling; naming the property
-    and sorting both under it teaches the rule — the discriminator is owned by
-    delegation-kit/SPEC.md §The delegation model. **Placed with rule 12, before both
-    auto-allow rules,** for the same reason: `sleep` is not on the default
-    read-only roster, but the placement argument is about what a consumer may add
-    and the whole family of steer rules already sits there.
-14. **Tracked-tree mutation under a live producer**
-    (`guard_rule_git_mutation_under_producer`) — a `git` command that
-    writes the index, the worktree or a ref is **blocked** while a `*.run`
-    record under a `GUARD_KIT_SCRATCH_DIRS` member names a live PID. The record
-    is the launch-time liveness record a session writes when it backgrounds a
-    shell child (delegation-kit/SPEC.md §The delegation model owns that rule;
-    evidence-kit/SPEC.md §The producer-liveness lock owns the `pid=<n>
-    run=<key>` grammar and the PID predicate, and neither is re-decided here).
-    **The act set is bounded and named rather than gestured at**: `add`,
-    `commit`, `rm`, `mv`, `restore`, `checkout`, `switch`, `reset`, `stash`,
-    `merge`, `rebase`, `cherry-pick`, `revert`, `apply`, `am`, `clean`.
-    Read-only git — `status`, `log`, `diff`, `show`, `rev-parse`, `ls-files` —
-    passes, and so does every non-`git` command. **`Write`/`Edit` are
-    deliberately outside the rule**: a mutating session's mandated journal write
-    lands through them and the scratch directory is gitignored, so a rule
-    reaching them would refuse the very mechanic the resume-journal contract
-    requires *while a wait is in progress*.
-    **This is the `PreToolUse` half of the waiting rule's enforcement, and it
-    works by relocation.** The turn-end passes no `PreToolUse` chokepoint, so it
-    is unreachable from this ruleset (delegation-kit/SPEC.md §Operative residency);
-    the **harm** it causes arrives as an ordinary tool call at a chokepoint
-    already wired, which is what this rule fires on. The harness's own turn-end
-    event reaches the act itself on a different axis, measured rather than
-    assumed, and the hook there **refuses** as well as observes
-    (delegation-kit/SPEC.md §The turn-end liveness hook). This rule's own
-    behavior is untouched by that and it stays the enforcement on its own axis: it
-    reaches mutations the turn-end event never sees, and that hook reaches a
-    session that mutates nothing.
-    **Why the block is right even though it over-reaches, stated rather than
-    softened.** A read-only producer takes no harm from a commit, and the record
-    cannot say which kind it is. This ruleset's established direction is to bias
-    toward passing; that direction is **not** taken here, and the ground is that
-    the biased-toward-passing reading is what has failed every time this rule
-    fired. The corrective is cheap and names both exits: **wait for the producer
-    on its own artifact, or delete the record if the producer is done** — and
-    deleting a record whose producer has exited is not a workaround, it is the
-    statement of fact becoming false and being retracted.
-    **Conservative in this ruleset's other established directions**, which are
-    kept: an expansion or substitution anywhere in the command declines outright
-    (rule 6 already blocks those shapes); a record that does not parse declines
-    rather than blocks, because a guard is not the place a corruption verdict is
-    taken and `check-producer-liveness` already exits 2 on one; git's global
-    options are walked so `git -C <dir> commit` is reached, but an option the
-    walk does not recognize declines rather than guess which token is the
-    subcommand; and an unrecognized `git` subcommand declines. Each biases
-    toward passing rather than toward a false block, which is the calibration
-    the previous paragraph departs from **only** on the read-only producer.
-    **The corrupt disposition diverges from the turn-end hook's, deliberately,
-    and is recorded from both sides.** This rule declines on a record that does
-    not parse; the `SubagentStop` hook **refuses** on one. The ground is
-    structural rather than a difference of appetite: this rule reads the records
-    **one at a time**, so a malformed record declines for itself while a sibling
-    naming a live PID still blocks, whereas the hook reads the whole set through
-    a single exit code. Allowing there would let one malformed record anywhere
-    under a scratch dir suppress every turn-end refusal in the tree — a bypass
-    this rule does not have and cannot have. The same divergence is stated from
-    the other side at
-    delegation-kit/SPEC.md §The turn-end liveness hook, so neither
-    surface reads as the other's drift.
-    **The hook has since named a `records=0` sub-case this rule has no analogue
-    for, and neither side's decision moves.** Reading a whole set through one
-    exit code lets the hook meet an exit 2 raised over **no record at all** — a
-    reader that could not run rather than a record that does not parse — which it
-    names `unresolved` and still refuses. A per-record read cannot reach that
-    case: with no record there is no call for this rule to be about. So the
-    divergence above is unchanged in substance and gains one clause — the hook's
-    exit-2 arm now carries two names, and this rule's decline still answers only
-    the one of them a record exists for.
-    **Placed with rules 12 and 13, before every auto-allow rule.** It is the
-    third member of the wait-discipline family and inherits their placement
-    argument (`git` is not on the default `GUARD_KIT_RO_BINS` roster, but a
-    consumer that widened it would otherwise have the read-only-pipeline rule
-    silently grant the mutation). **Two collisions make the placement necessary
-    rather than tidy**, and both are with rules that sit *after* the
-    auto-allows: rule 20 would block a chained `git commit` first and hand back
-    *run it bare* — a corrective that is wrong under a live producer and that
-    the session can follow; and rule 21 **advises** on `git commit --amend`, so
-    a rewrite under a live producer would proceed with a re-verification steer
-    instead of stopping.
-    **The bound this rule ships with is closed at the launch chokepoint for every
-    launch a `PreToolUse` call can see.** A session that backgrounded without
-    recording would be invisible here, and rule 15 refuses that launch itself, so
-    the record this rule reads is owed at every explicit launch. What stays
-    invisible is a command the harness moves to the background on its timeout,
-    which is rule 15's stated residue.
-15. **Backgrounded launch that records no producer**
-    (`guard_rule_background_no_record`) — a backgrounding Bash call
-    that neither writes a liveness record nor meets an exemption below is
-    **blocked**. The message names the record, its grammar, its home, and the two
-    things it buys — rule 14's reach, and the next arrival's ability to tell
-    whether the producer is still writing — and it names one canonical spelling
-    that writes the record:
+   An action, a program file, a non-`.md` range, a second operand, a `-` stdin operand, or a stream all pass. **Which steer to emit is decided by the program's shape, never by a measured frequency**: the measured mix of range reads flips with what an iteration reads, so no single target is right for the class. Three shapes are refused as steer inputs — a transform, a single-regex filter, and a range on a non-markdown file. **The program text comes from a dequoted view, because the skeleton blanks it.** `_guard_dequoted_view` walks the raw command in lockstep with its `sq dq hd` skeleton and takes every region decision from the skeleton. It removes the quote characters and holds each quoted span's blanks and statement separators as sentinels, so a statement split or a word split cuts exactly where it cuts the skeleton. Where the two cannot be aligned — a heredoc body, an unterminated span, a newline inside quotes — the arm declines. **A committed `awk` grant is not argued with.** A `PreToolUse` block is not overridden by an allow, so the steer fires on the two read shapes ahead of any grant; such a grant stays load-bearing for `awk` as a stream filter and for every program shape the arm declines. **The `perl` arm blocks an in-place rewrite with at least one file operand.** **Both in-place arms steer to a tool whose effect is its command line.** An in-place `sed` or `perl` program can read, write elsewhere, or execute, and the guard cannot tell which from outside the program. `--rewrite` replaces fixed text in named files and does nothing else, so the steer trades a program for a statement of intent; its printed command is derived from `GUARD_KIT_LIB` as rule 23 derives the runner. The Edit tool stays named for a single edit needing more than a fixed replacement. A sweep over many files is one `--rewrite` call, so neither arm bounds its operand count. **What passes:** `perl -pi` with no file operand, which reads stdin and rewrites no file; an in-place call behind another command word (`xargs perl -pi`), which is its lead's rule's subject; and a `perl` option the walker does not model. **The `python` arm blocks an inline body that is a literal rewrite**: it writes a file through `open(` with a `w` or `a` mode or through `.write_text(`, it calls `.replace(`, and it carries no computed-text construct (an f-string, `.format(`, `%` formatting, `re.`, an `import`, `.index(`, `.find(`, `.join(`, `.split(`, a slice, `input(`, `sys.`, or a `$` in an unquoted-delimiter body). The body is the `-c` argument (`_guard_program_operands`' `python` row: `-c` supplies the program, `-W` and `-X` consume one word, `-u -B -E -I -s -S -O -q` none, a redirect token and its target are skipped, anything else declines) or the heredoc feeding the segment's stdin (`_guard_heredoc_body`). The `-c` argument is read off the dequoted view, so it declines where that view does. It steers to `--rewrite` (`--expect` for a count assertion) or the Edit tool, and names `!<command>`. **Why this shape and no wider one:** the inline bodies that recur across sessions are a literal read, replace and write-back, which `--rewrite` performs with an effect its command line states. Computed replacements, tallies and probes have no such tool, so they pass and stay measured friction. The arm reads spelling, not semantics, and leans toward passing: a literal rewrite spelled through a construct on that list passes, a computed one hiding behind none of them is blocked, and its steer names `!<command>` for that case. The spellings it reads are python's, a language literal that mints no knob, and a python revision that adds a write or formatting spelling is drift it does not detect. **What passes besides:** a read-only body, a body writing through `shutil`, `os` or `pathlib` without `.write_text(`, a `python` behind another command word, and any other interpreter, since none was found inline. A committed `Bash(python3 -*)` grant is not argued with, on the `awk` arm's ground: the grant stays load-bearing for every body the arm declines. **Placed before both auto-allow rules:** a consumer that widens `GUARD_KIT_RO_BINS` with `sed` would otherwise have rule 18 silently grant an in-place rewrite. `awk` has no honest place on that roster, since a program can print to a file or call `system()`, and the placement guards a consumer who adds it anyway.
+9. **Listing-only `find`** (`guard_rule_find_glob`) — a bare `find` that only lists is blocked with the steer to the harness's Glob tool (the same shape as rule 8's `sed` read-steer: a better tool exists, and Glob returns paths registered for a later Read). Fires on the conjunction no allowlist glob can express: every segment leads with `find` and carries **none of `find`'s declared write and execute forms** — rule 18's declaration for `find`, so the action roster has one literal — with **no composition** — no pipe, `&&`/`||` chain, background, or redirect. A lone listing fires, and so does a **`;`-sequence of listings**: a `;`-compound is not composition but a batch of independent listings, exactly what the Glob steer collapses into one call. A literal `echo`/`printf` banner segment between them is the natural separator of such a batch and is tolerated; at least one segment must be a listing. A piped `find` is a legitimate producer (rule 18 may still auto-allow it), an action-predicate `find` is an executor, a redirected `find` has a downstream reader, and a **mixed** compound (a segment that is neither a listing nor a banner) all pass untouched. **Placed before both auto-allow rules** (same reasoning as rule 8): a bare listing meets the steer rather than a silent read-only-pipeline grant, since `find` is in the default `GUARD_KIT_RO_BINS` roster. A consumer needing different behavior shadows the rule in its consumer-rules section. **Fires only when `Glob` is a member of `GUARD_KIT_SEARCH_TOOLS`**, and is inert otherwise: a steer naming a tool the harness build does not carry is unfollowable, and the guard cannot see the toolset (§Layout and configuration states why the knob is the input). Inert, a bare listing reaches rule 18, which grants it as a read-only segment — the working form the steer would otherwise have displaced. The firing corrective adds the bare fallback beside the tool — keep `find` and pipe the listing into a read-only consumer, which rule 18 grants.
+10. **Bare single-file `cat`** (`guard_rule_cat_file`) — a `cat` read is blocked with the steer to the harness's Read tool (rule 8's read-steer shape: Read returns numbered lines registered for a later Edit). Fires on the conjunction no allowlist glob expresses: every segment leads with `cat` and carries **exactly one** non-flag operand (flags are allowed, `cat -n <file>`), with **no composition** — no pipe, heredoc, redirect, substitution, `&&`/`||` chain, or background. A lone `cat <file>` fires, and so does a **`;`-batch of reads** (`cat a; cat b`): a `;`-compound of single-file reads is a batch, not composition, and collapses into successive Read calls — the ergonomic case the steer exists for. A literal `echo`/`printf` banner segment between reads is the natural separator of such a batch and is tolerated: it is redundant once the batch moves to the Read tool, which shows each filename itself. At least one segment must be a read. Multi-file concatenation, a piped or heredoc'd `cat`, a redirected `cat`, an `&&`-chain, and a **mixed** or banner-only compound are composition (or carry no read the Read tool replaces) and pass untouched. **Placed before both auto-allow rules** (same reasoning as rule 8): a bare `cat <file>` meets the steer rather than a silent read-only-pipeline grant, since `cat` is in the default `GUARD_KIT_RO_BINS` roster.
+11. **Working-tree `git grep`** (`guard_rule_git_grep`) — a `git grep` that searches the working tree is blocked with the steer to the harness's Grep tool (rule 8's read-steer shape: Grep returns matching lines with files registered for a later Read). Fires on the discriminator no allowlist glob expresses: the command leads with `git grep`, names no revision, and does not scope elsewhere — the index (`--cached`/`--staged`), a non-repo search (`--no-index`), or an untracked-file search (`--untracked`). "Names a revision" is read off the positional grammar: the pattern is one positional (or supplied by `-e`/`-f`), so a *further* bare positional before any `--` is a tree-ish the Grep tool cannot reach — `git grep foo` steers while `git grep foo HEAD` passes, and a `-- <path>` limiter keeps the search in the working tree and still steers. A piped `git grep` is a producer and never reaches this rule (the consumer disqualifies it). Conservative by construction: an unrecognized option-with-argument or a glued pattern flag biases toward passing, never a false steer of a history search. **Fires only when `Grep` is a member of `GUARD_KIT_SEARCH_TOOLS`**, on rule 9's reasoning, and is inert otherwise. The firing corrective adds the bare fallback beside the tool: `grep -rn <pattern> <path>` searches the same working tree.
+12. **Self-matching process-liveness predicate** (`guard_rule_pgrep_self_match`) — a `pgrep`/`pkill -f` whose pattern matches the command's own text is **blocked**. `-f` matches against full argv, and the harness runs a command through a wrapper whose argv carries the whole command text — the command is not the last word of the wrapper's `-c` string, so no `exec` replaces it — so such a pattern always finds at least the wrapper: `until ! pgrep -f '<script>'; do …; done` has a permanently-true condition and never exits, a one-shot query always answers *running*, and a `pkill -f` signals its own wrapper. It reds nothing: the work completes correctly and the only symptom is the foreground cap absorbing an unbounded loop, which reads from outside as a fixed cap-length wait. Fires on the conjunction no allowlist glob expresses: a segment whose **command word** is `pgrep` or `pkill` — read past a leading `until`/`while`/`if`/`!`, which do not change which binary runs — carrying `-f` (bare or bundled in a short cluster), whose pattern operand (a quoted operand read whole across its blanks), read as the ERE `pgrep` compiles, matches the raw command text (case-insensitively under `-i`, as `pgrep`'s own match is). A pattern that does not match its own text cannot self-match and passes; the bracket trick (`'[r]un-smoke.sh'`, whose regex needs text the command does not hold) is that case, and it passes this rule while staying refused as the sanctioned form (below). The corrective names both sanctioned forms: wait on the work's own artifact, or `kill -0` against a **recorded PID** where liveness genuinely is the condition — whoever started that producer, a child the session backgrounded itself included, whose PID it recorded at launch as a `<key>.run` record under its scratch directory. That clause is owned by delegation-kit/SPEC.md §The delegation model and this text carries it, the record's naming convention included — rule 14 reads that same set, so a corrective that named the PID but not where it lives would send a blocked session to write the one artifact shape neither reader can find. A PID is an identity; a pattern is a guess about a process table that includes the guesser. The refusal of the bracket-trick repair as the *sanctioned* form is delegation-kit's ruling and its grounds live there (delegation-kit/SPEC.md §The delegation model); this rule exists because a correct form one character from an incorrect one will be got wrong. Conservative by construction, in this ruleset's established directions: an expansion or substitution anywhere in the command declines outright (rule 6 already blocks those shapes); a `pgrep` without `-f` matches process **names** rather than argv and is untouched; an unrecognized option, an option whose argument cannot be walked, a second bare operand, `-x`/`--exact` (the pattern must then match the whole argv line, which the wrapper's always exceeds), `-v`/`--inverse` (the predicate is inverted, so the self-match argument does not apply), and a pattern that is no valid ERE all decline. Each biases toward passing rather than toward a false block. **Placed with the read-steer rules and before both auto-allow rules**, on rule 8's stated reasoning: `pgrep` is a plausible member of a widened `GUARD_KIT_RO_BINS` — it is, after all, a read-only query — and a consumer who added it would otherwise have rule 18 silently bless a waiter that can never exit.
+13. **Bare foreground `sleep`** (`guard_rule_bare_sleep`) — a `sleep` standing in for a wait is **blocked**, and the discriminator is the whole rule: a blanket `sleep` block is wrong and is refused. The sanctioned wait *is* a condition loop, and such a loop is expressly legitimate **in either spelling** — `until <cond>; do sleep N; done` and `while <cond>; do sleep N; done` alike, because the span walk below reads `do … done` and never the loop keyword, so correcting a wait loop's polarity is free at the guard. So the rule fires on exactly one shape — a bare foreground `sleep` in command position, outside every loop wrapper — and never on a `sleep` inside a loop body. *The discriminator is new territory:* this ruleset carries exactly one shell-keyword parse and this rule is where it came from — rule 15's wait-loop exemption now shares it rather than copying it, so the ruleset keeps one keyword-parsing dialect. This one takes the skeleton view (so a `sleep` merely *named* in a quoted span or a heredoc body is already inert), then walks it for `do … done` spans and treats a `sleep` inside one as **inert** — structurally the carve-out `_guard_is_banner` already performs for `echo`/`printf` segments in the batched-read rules, applied to a keyword span instead of a segment. A `sleep` outside every such span fires. Where the wrapper cannot be resolved — an unbalanced `do`/`done`, or a span the rule cannot attribute — it **declines**, the direction every other conservative clause here takes; a `sleep` that is an *argument* rather than a command word never fires at all. **Blocks** rather than advises, on rule 20's reasoning: no consumer allowlist is presumed to grant a bare `sleep`, so the rule fires on a command that would be decided out of band anyway and converts that decision into a durable steer at no extra cost. *The corrective names the property and both forms* rather than one spelling: a wait must end when its condition goes true, not when a duration expires; a backgrounded command that *exits* on the condition fires one notification the moment the condition holds, while the harness's event-stream form stays armed to its deadline after its event fires when the command it was armed with is unbounded, which makes it the second choice for a single completion. *It also names the loop's polarity*, because that is the next mistake and it is the one with an attested cost: `until` takes a done predicate, `while` takes a still-running one such as a PID's liveness, and inverting them yields a loop that exits at once with the producer still running (delegation-kit/SPEC.md §bin/wait-probe measured it). **The polarity example spells the PID as a literal, and that is a correction rather than a preference.** It read `while kill -0 "$pid" …`, which **rule 6 blocks** — rule 6 dispatches ahead of this one and keeps `dq` live so a double-quoted expansion stays visible, so a session obeying this corrective met a block from a rule it had never reached, and the ruleset argued with itself. The corrective keeps its reasoning and its polarity clause and moves to the form that is actually reachable: the literal PID the session read out of the `.run` record in the first place — which rule 19 then grants, so the steer now ends in a form that costs no decision at all. A corrective naming an unreachable form is the defect; the spelling is the fix. Naming one form teaches a spelling; naming the property and sorting both under it teaches the rule — the discriminator is owned by delegation-kit/SPEC.md §The delegation model. **Placed with rule 12, before both auto-allow rules,** for the same reason: `sleep` is not on the default read-only roster, but the placement argument is about what a consumer may add and the whole family of steer rules already sits there.
+14. **Tracked-tree mutation under a live producer** (`guard_rule_git_mutation_under_producer`) — a `git` command that writes the index, the worktree or a ref is **blocked** while a `*.run` record under a `GUARD_KIT_SCRATCH_DIRS` member names a live PID. The record is the launch-time liveness record a session writes when it backgrounds a shell child (delegation-kit/SPEC.md §The delegation model owns that rule; evidence-kit/SPEC.md §The producer-liveness lock owns the `pid=<n> run=<key>` grammar and the PID predicate, and neither is re-decided here). **The act set is bounded and named rather than gestured at**: `add`, `commit`, `rm`, `mv`, `restore`, `checkout`, `switch`, `reset`, `stash`, `merge`, `rebase`, `cherry-pick`, `revert`, `apply`, `am`, `clean`. Read-only git — `status`, `log`, `diff`, `show`, `rev-parse`, `ls-files` — passes, and so does every non-`git` command. **`Write`/`Edit` are deliberately outside the rule**: a mutating session's mandated journal write lands through them and the scratch directory is gitignored, so a rule reaching them would refuse the very mechanic the resume-journal contract requires *while a wait is in progress*. **This is the `PreToolUse` half of the waiting rule's enforcement, and it works by relocation.** The turn-end passes no `PreToolUse` chokepoint, so it is unreachable from this ruleset (delegation-kit/SPEC.md §Operative residency); the **harm** it causes arrives as an ordinary tool call at a chokepoint already wired, which is what this rule fires on. The harness's own turn-end event reaches the act itself on a different axis, measured rather than assumed, and the hook there **refuses** as well as observes (delegation-kit/SPEC.md §The turn-end liveness hook). This rule's own behavior is untouched by that and it stays the enforcement on its own axis: it reaches mutations the turn-end event never sees, and that hook reaches a session that mutates nothing. **Why the block is right even though it over-reaches, stated rather than softened.** A read-only producer takes no harm from a commit, and the record cannot say which kind it is. This ruleset's established direction is to bias toward passing; that direction is **not** taken here, and the ground is that the biased-toward-passing reading is what has failed every time this rule fired. The corrective is cheap and names both exits: **wait for the producer on its own artifact, or delete the record if the producer is done** — and deleting a record whose producer has exited is not a workaround, it is the statement of fact becoming false and being retracted. **Conservative in this ruleset's other established directions**, which are kept: an expansion or substitution anywhere in the command declines outright (rule 6 already blocks those shapes); a record that does not parse declines rather than blocks, because a guard is not the place a corruption verdict is taken and `check-producer-liveness` already exits 2 on one; git's global options are walked so `git -C <dir> commit` is reached, but an option the walk does not recognize declines rather than guess which token is the subcommand; and an unrecognized `git` subcommand declines. Each biases toward passing rather than toward a false block, which is the calibration the previous paragraph departs from **only** on the read-only producer. **The corrupt disposition diverges from the turn-end hook's, deliberately, and is recorded from both sides.** This rule declines on a record that does not parse; the `SubagentStop` hook **refuses** on one. The ground is structural rather than a difference of appetite: this rule reads the records **one at a time**, so a malformed record declines for itself while a sibling naming a live PID still blocks, whereas the hook reads the whole set through a single exit code. Allowing there would let one malformed record anywhere under a scratch dir suppress every turn-end refusal in the tree — a bypass this rule does not have and cannot have. The same divergence is stated from the other side at delegation-kit/SPEC.md §The turn-end liveness hook, so neither surface reads as the other's drift. **The hook has since named a `records=0` sub-case this rule has no analogue for, and neither side's decision moves.** Reading a whole set through one exit code lets the hook meet an exit 2 raised over **no record at all** — a reader that could not run rather than a record that does not parse — which it names `unresolved` and still refuses. A per-record read cannot reach that case: with no record there is no call for this rule to be about. So the divergence above is unchanged in substance and gains one clause — the hook's exit-2 arm now carries two names, and this rule's decline still answers only the one of them a record exists for. **Placed with rules 12 and 13, before every auto-allow rule.** It is the third member of the wait-discipline family and inherits their placement argument (`git` is not on the default `GUARD_KIT_RO_BINS` roster, but a consumer that widened it would otherwise have the read-only-pipeline rule silently grant the mutation). **Two collisions make the placement necessary rather than tidy**, and both are with rules that sit *after* the auto-allows: rule 20 would block a chained `git commit` first and hand back *run it bare* — a corrective that is wrong under a live producer and that the session can follow; and rule 21 **advises** on `git commit --amend`, so a rewrite under a live producer would proceed with a re-verification steer instead of stopping. **The bound this rule ships with is closed at the launch chokepoint for every launch a `PreToolUse` call can see.** A session that backgrounded without recording would be invisible here, and rule 15 refuses that launch itself, so the record this rule reads is owed at every explicit launch. What stays invisible is a command the harness moves to the background on its timeout, which is rule 15's stated residue.
+15. **Backgrounded launch that records no producer** (`guard_rule_background_no_record`) — a backgrounding Bash call that neither writes a liveness record nor meets an exemption below is **blocked**. The message names the record, its grammar, its home, and the two things it buys — rule 14's reach, and the next arrival's ability to tell whether the producer is still writing — and it names one canonical spelling that writes the record:
 
     `<command> [<redirects>] & echo "pid=$! run=<key>" > <scratch-dir>/<key>.run; wait; rm -f <scratch-dir>/<key>.run`
 
-    The `wait` keeps a harness-backgrounded call alive until the child exits, so
-    the completion notification means the producer finished — never that it
-    passed: a bare `wait` and `rm -f` both exit 0, so the call's status is 0
-    whatever the producer returned, and its verdict is read off its own output —
-    by its tail, never whole: a producer that redraws a terminal frame per refresh
-    (`gh run watch`) appends a full frame per tick to a redirected log.
-    The trailing
-    `rm -f` retracts the record at exactly that moment, delegation-kit's *delete
-    once exited, and not before* rule taken mechanically rather than remembered.
-    The corrective states that rule 19's arm (B) grants the spelling for an
-    allowlisted command, and closes on the two shapes that owe no record: an
-    inline wait loop and a read-only pipeline.
-    **Two backgrounding forms, and both arms ship in one rule.** *Harness form* —
-    `.tool_input.run_in_background` is `true`, read through `guard_input_field`
-    (§The guard framework records the field and its shape). *Shell form* — the
-    skeleton (`sq dq hd`) ends a statement with a bare `&` that is neither the
-    `&&` operator, the `|&` separator (which pipes stderr too and backgrounds
-    nothing) nor a redirect's fd-dup. Building only the shell arm was
-    refused as worse than not building it: every attested firing used the harness
-    form, so a shell-only rule would cover the spelling nobody uses and pass the
-    one that fires — coverage in appearance
-    (delegation-kit/SPEC.md §The delegation model).
-    **The record-writing test reads the command text, and that is forced rather
-    than chosen.** At `PreToolUse` the child has not started and no record can
-    exist yet, so the only thing observable at this chokepoint is whether the
-    launch is *going to* write one: the call writes a record when its skeleton
-    carries a redirect whose target is a path under a `GUARD_KIT_SCRATCH_DIRS`
-    member ending in `.run`. That is the honest predicate, and the canonical
-    spelling's record write is shaped to meet it.
-    **Three exemptions, each reusing machinery already in the lib.** (1) *The call
-    writes a record* — the obligation is discharged inline. (2) *The call is a
-    wait loop* — a backgrounded `until <cond>; do sleep N; done` is the sanctioned
-    primitive rule 13 steers **toward**, a waiter rather than a producer, and
-    refusing there would make the ruleset refuse the form its own corrective
-    recommends; detected by the `do … done` span walk rule 13 already performs.
-    With rule 19 in place this exemption is also what *lets* the grant be reached:
-    the two draw the same waiter/producer partition, this one to withhold a
-    refusal and rule 19 to withhold a grant, and a wait exempted here goes on to
-    meet rule 19's own clauses rather than falling through unexamined.
-    (3) *The call is a read-only pipeline* — every segment leads with a
-    `GUARD_KIT_RO_BINS` member invoked in none of its declared write and execute
-    forms and every redirect target is `/dev/null` or an fd-dup, rule 18's own
-    test with its declared-forms reader, since a child that writes nothing has
-    nothing for a later commit to corrupt.
-    **Exemption (2) sees a wait loop only when it is spelled inline.** A wait
-    behind a script or binary name is invisible to the span walk, since at
-    `PreToolUse` the body is not readable, so it takes the record like any
-    launch. The record costs a waiter nothing it does not already carry: its only
-    effect is that rule 14 holds tracked-tree mutations for the waiter's
-    lifetime, which the producer it waits on already holds. A consumer-declared
-    roster of waiter names would lift the limit, and is refused on the seam
-    ground this rule's closing paragraph gives for a producer roster.
-    **Blocks, because the attested record a block required exists.** The guard
-    cannot tell a producer from a trivial child — a backgrounded `printf` and a
-    backgrounded gate battery are the same shape at this chokepoint — and this
-    ruleset's established direction is to bias toward passing, so the rule first
-    shipped as an advisory and named its own re-opening condition: a firing of
-    the recording omission after the advisory shipped, the attested record rule
-    14's own departure from that direction required. That firing is on record,
-    so the block is taken. The false-fire objection the advisory rested on is
-    answered by cost rather than denied. A launch of an allowlisted command
-    complies at no decision cost, through rule 19's arm (B). What remains is a
-    launch behind a name the exemptions cannot read and a launch of an ungranted
-    command, and each is one re-issue with the record, the second then meeting
-    the out-of-band decision it would have met anyway. The harm itself already
-    has a block, rule 14's refusal of the mutation, and this rule is what gives
-    that block its reach: rule 14 reads records, and an unrecorded launch leaves
-    it none.
-    **The honest limit.** The block closes the silent case at every launch a
-    `PreToolUse` call can see. It does not reach **a command the harness moves
-    to the background on its timeout**: that call was a foreground call at
-    `PreToolUse`, it writes no record, and no `PreToolUse` payload carries task
-    state. The one wired chokepoint holding any view of it is the turn end, whose
-    `SubagentStop` payload lists harness-launched shell tasks with a status.
-    delegation-kit rules that view a supplement to the record set and never a
-    substitute, because it misses a child detached with a shell `&`
-    (delegation-kit/SPEC.md §What `background_tasks` carries), and refusing a
-    turn end on a running harness task would widen that hook's refusal set,
-    which is not this rule's to take. The moved-on-timeout launch is therefore
-    this rule's stated residue.
-    Conservative in this ruleset's established directions: an expansion or
-    substitution anywhere in the command declines outright (rule 6 blocks those
-    shapes already), an unbalanced `do`/`done` declines, and an absent
-    `GUARD_INPUT` on a call carrying no shell `&` simply leaves the harness arm
-    unavailable and the rule inert — the graceful degradation §The guard
-    framework's `GUARD_INPUT`-then-stdin fallback buys. **Placed with rules 12, 13
-    and 14 as the fourth member of the wait-discipline family, before both
-    auto-allow rules**, and the placement is required rather than tidy: a
-    backgrounded read-only pipeline is granted outright by rule 18, so a rule
-    sitting after the auto-allows would never run on the shapes it exists for.
-    Rule 19's arm (B) grants only what this rule's exemption (1) has already let
-    through, so a recorded launch meets this rule first and passes it.
-    **No knob is minted, and that is a seam decision rather than an economy**: a
-    producer roster — *which backgrounded commands are worth a record* — is
-    exactly the consumer vocabulary the provenance seam keeps out of a kit, so the
-    rule recognizes shapes and blocks, and a consumer wanting a narrower
-    population narrows the two knobs that already exist.
-16. **Auto-allow `: > file` truncation** (`guard_rule_truncate_scratch`) — a
-    leading `:` plus redirect
-    defeats the permission matcher, so it is always decided out of band. Granted
-    silently when the command is *only* `:` followed by redirects and every target is
-    gitignored (`git check-ignore`): truncating scratch is safe; a tracked
-    file must still take that decision. The `git` subprocess is gated behind the rare
-    `:`-redirect match; expansions (rule 6) and brace forms (rule 7) are
-    already blocked, so a surviving target is a literal path.
-    **This ruling is what rule 17's create case rests on**, and the pointer is
-    here so the two are not read as independent grants of the same thing: once
-    truncating a gitignored target is granted here and appending to one is
-    granted there, creating one is the composition of the two and not a third
-    decision. A reader narrowing *this* rule narrows that one with it.
-17. **Auto-allow a write to a gitignored target** (`guard_rule_append_scratch`)
-    — the mandated resume-journal append that
-    delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps
-    obliges is a redirect, and the harness checks a redirect
-    **target** as a file write, so no `Bash(…)` allow entry can grant it: such a
-    rule grants the command and never the target. Granted silently when **every
-    clause below** holds, falling through untouched otherwise:
-    - **(0) Not a backgrounded launch.** A statement-ending `&` refuses before
-      any other clause is read: a backgrounded append is rule 15's subject, and
-      granting it here would bless a launch the liveness-record rule is about.
-    - **(a) Either write operator, `>>` or `>`** (an fd prefix allowed: `2>>`,
-      `2>`). Neither refuses; what bounds the grant is (b)'s target test and
-      (c)'s emitter bound, never the operator. **The create half rests on rule 16
-      as a composition, not as an analogy to it**: `: > <gitignored>` is granted
-      there and `<roster emitter> >> <gitignored>` is granted here, so
-      `<roster emitter> > <gitignored>` is what two standing grants already reach
-      in two calls, and admitting it adds one permission decision rather than one
-      capability. Stated as a composition because an analogy — *truncating scratch
-      is cheap, so creating it is too* — is what a later reader reopens a widening
-      on. **The honest cost**: no clause now protects a scratch file's prior
-      content from a mistyped redirect, so a live resume journal or a `.run`
-      liveness record is clobberable in one call. That door is already open —
-      rule 16 grants `: > <that same path>` unchanged — so this widens
-      convenience and not reach, and is admitted as a convenience widening.
-    - **(b) Every target gitignored**, on rule 16's exact `git check-ignore
-      --quiet --` predicate and its exact subprocess, gated behind the same
-      rarity: `git` is reached only once (a) and (c) have already matched.
-    - **(c) The leading command emits to stdout and nothing else**, and the
-      command is one statement. The roster is `GUARD_KIT_APPEND_BINS`.
-    - **(d) Conservative decline on anything unmodelled** — a command or process
-      substitution or a backtick anywhere in the **`hdq` view**, or a redirect
-      target that survives normalization carrying a quote. Declares `sq dq hd`
-      for its structural tests and `hdq` for this one.
+    The `wait` keeps a harness-backgrounded call alive until the child exits, so the completion notification means the producer finished — never that it passed: a bare `wait` and `rm -f` both exit 0, so the call's status is 0 whatever the producer returned, and its verdict is read off its own output — by its tail, never whole: a producer that redraws a terminal frame per refresh (`gh run watch`) appends a full frame per tick to a redirected log. The trailing `rm -f` retracts the record at exactly that moment, delegation-kit's *delete once exited, and not before* rule taken mechanically rather than remembered. The corrective states that rule 19's arm (B) grants the spelling for an allowlisted command, and closes on the two shapes that owe no record: an inline wait loop and a read-only pipeline. **Two backgrounding forms, and both arms ship in one rule.** *Harness form* — `.tool_input.run_in_background` is `true`, read through `guard_input_field` (§The guard framework records the field and its shape). *Shell form* — the skeleton (`sq dq hd`) ends a statement with a bare `&` that is neither the `&&` operator, the `|&` separator (which pipes stderr too and backgrounds nothing) nor a redirect's fd-dup. Building only the shell arm was refused as worse than not building it: every attested firing used the harness form, so a shell-only rule would cover the spelling nobody uses and pass the one that fires — coverage in appearance (delegation-kit/SPEC.md §The delegation model). **The record-writing test reads the command text, and that is forced rather than chosen.** At `PreToolUse` the child has not started and no record can exist yet, so the only thing observable at this chokepoint is whether the launch is *going to* write one: the call writes a record when its skeleton carries a redirect whose target is a path under a `GUARD_KIT_SCRATCH_DIRS` member ending in `.run`. That is the honest predicate, and the canonical spelling's record write is shaped to meet it. **Three exemptions, each reusing machinery already in the lib.** (1) *The call writes a record* — the obligation is discharged inline. (2) *The call is a wait loop* — a backgrounded `until <cond>; do sleep N; done` is the sanctioned primitive rule 13 steers **toward**, a waiter rather than a producer, and refusing there would make the ruleset refuse the form its own corrective recommends; detected by the `do … done` span walk rule 13 already performs. With rule 19 in place this exemption is also what *lets* the grant be reached: the two draw the same waiter/producer partition, this one to withhold a refusal and rule 19 to withhold a grant, and a wait exempted here goes on to meet rule 19's own clauses rather than falling through unexamined. (3) *The call is a read-only pipeline* — every segment leads with a `GUARD_KIT_RO_BINS` member invoked in none of its declared write and execute forms and every redirect target is `/dev/null` or an fd-dup, rule 18's own test with its declared-forms reader, since a child that writes nothing has nothing for a later commit to corrupt. **Exemption (2) sees a wait loop only when it is spelled inline.** A wait behind a script or binary name is invisible to the span walk, since at `PreToolUse` the body is not readable, so it takes the record like any launch. The record costs a waiter nothing it does not already carry: its only effect is that rule 14 holds tracked-tree mutations for the waiter's lifetime, which the producer it waits on already holds. A consumer-declared roster of waiter names would lift the limit, and is refused on the seam ground this rule's closing paragraph gives for a producer roster. **Blocks, because the attested record a block required exists.** The guard cannot tell a producer from a trivial child — a backgrounded `printf` and a backgrounded gate battery are the same shape at this chokepoint — and this ruleset's established direction is to bias toward passing, so the rule first shipped as an advisory and named its own re-opening condition: a firing of the recording omission after the advisory shipped, the attested record rule 14's own departure from that direction required. That firing is on record, so the block is taken. The false-fire objection the advisory rested on is answered by cost rather than denied. A launch of an allowlisted command complies at no decision cost, through rule 19's arm (B). What remains is a launch behind a name the exemptions cannot read and a launch of an ungranted command, and each is one re-issue with the record, the second then meeting the out-of-band decision it would have met anyway. The harm itself already has a block, rule 14's refusal of the mutation, and this rule is what gives that block its reach: rule 14 reads records, and an unrecorded launch leaves it none. **The honest limit.** The block closes the silent case at every launch a `PreToolUse` call can see. It does not reach **a command the harness moves to the background on its timeout**: that call was a foreground call at `PreToolUse`, it writes no record, and no `PreToolUse` payload carries task state. The one wired chokepoint holding any view of it is the turn end, whose `SubagentStop` payload lists harness-launched shell tasks with a status. delegation-kit rules that view a supplement to the record set and never a substitute, because it misses a child detached with a shell `&` (delegation-kit/SPEC.md §What `background_tasks` carries), and refusing a turn end on a running harness task would widen that hook's refusal set, which is not this rule's to take. The moved-on-timeout launch is therefore this rule's stated residue. Conservative in this ruleset's established directions: an expansion or substitution anywhere in the command declines outright (rule 6 blocks those shapes already), an unbalanced `do`/`done` declines, and an absent `GUARD_INPUT` on a call carrying no shell `&` simply leaves the harness arm unavailable and the rule inert — the graceful degradation §The guard framework's `GUARD_INPUT`-then-stdin fallback buys. **Placed with rules 12, 13 and 14 as the fourth member of the wait-discipline family, before both auto-allow rules**, and the placement is required rather than tidy: a backgrounded read-only pipeline is granted outright by rule 18, so a rule sitting after the auto-allows would never run on the shapes it exists for. Rule 19's arm (B) grants only what this rule's exemption (1) has already let through, so a recorded launch meets this rule first and passes it. **No knob is minted, and that is a seam decision rather than an economy**: a producer roster — *which backgrounded commands are worth a record* — is exactly the consumer vocabulary the provenance seam keeps out of a kit, so the rule recognizes shapes and blocks, and a consumer wanting a narrower population narrows the two knobs that already exist.
+16. **Auto-allow `: > file` truncation** (`guard_rule_truncate_scratch`) — a leading `:` plus redirect defeats the permission matcher, so it is always decided out of band. Granted silently when the command is *only* `:` followed by redirects and every target is gitignored (`git check-ignore`): truncating scratch is safe; a tracked file must still take that decision. The `git` subprocess is gated behind the rare `:`-redirect match; expansions (rule 6) and brace forms (rule 7) are already blocked, so a surviving target is a literal path. **This ruling is what rule 17's create case rests on**, and the pointer is here so the two are not read as independent grants of the same thing: once truncating a gitignored target is granted here and appending to one is granted there, creating one is the composition of the two and not a third decision. A reader narrowing *this* rule narrows that one with it.
+17. **Auto-allow a write to a gitignored target** (`guard_rule_append_scratch`) — the mandated resume-journal append that delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps obliges is a redirect, and the harness checks a redirect **target** as a file write, so no `Bash(…)` allow entry can grant it: such a rule grants the command and never the target. Granted silently when **every clause below** holds, falling through untouched otherwise:
+    - **(0) Not a backgrounded launch.** A statement-ending `&` refuses before any other clause is read: a backgrounded append is rule 15's subject, and granting it here would bless a launch the liveness-record rule is about.
+    - **(a) Either write operator, `>>` or `>`** (an fd prefix allowed: `2>>`, `2>`). Neither refuses; what bounds the grant is (b)'s target test and (c)'s emitter bound, never the operator. **The create half rests on rule 16 as a composition, not as an analogy to it**: `: > <gitignored>` is granted there and `<roster emitter> >> <gitignored>` is granted here, so `<roster emitter> > <gitignored>` is what two standing grants already reach in two calls, and admitting it adds one permission decision rather than one capability. Stated as a composition because an analogy — *truncating scratch is cheap, so creating it is too* — is what a later reader reopens a widening on. **The honest cost**: no clause now protects a scratch file's prior content from a mistyped redirect, so a live resume journal or a `.run` liveness record is clobberable in one call. That door is already open — rule 16 grants `: > <that same path>` unchanged — so this widens convenience and not reach, and is admitted as a convenience widening.
+    - **(b) Every target gitignored**, on rule 16's exact `git check-ignore --quiet --` predicate and its exact subprocess, gated behind the same rarity: `git` is reached only once (a) and (c) have already matched.
+    - **(c) The leading command emits to stdout and nothing else**, and the command is one statement. The roster is `GUARD_KIT_APPEND_BINS`.
+    - **(d) Conservative decline on anything unmodelled** — a command or process substitution or a backtick anywhere in the **`hdq` view**, or a redirect target that survives normalization carrying a quote. Declares `sq dq hd` for its structural tests and `hdq` for this one.
 
-    **Why (c) is the clause the safety argument rests on.** A
-    `permissionDecision: allow` blesses the whole call, so a rule keyed on the
-    redirect alone would grant `rm -rf .tmp/../.git >> .tmp/j.md` — the target is
-    gitignored, the operator is `>>`, and the command destroys the repository.
-    Bounding the *emitter* is what makes the grant safe, and bounding it to
-    **stdout-only** emitters is what makes the bound checkable: `cat`, `printf`
-    and `echo` write nowhere the redirect does not send them, so the redirect
-    target is the whole of what the call can touch. `tee` is deliberately **off**
-    the roster despite being the obvious fourth member — it takes a path
-    **argument**, so `tee -a <tracked file>` writes a tracked file with no
-    redirect at all and (b) never sees it. The honest limit is the mirror
-    of the one rule 18 carries for `GUARD_KIT_RO_BINS`, reached from the writing
-    side rather than the reading side: the grant is exactly as safe as the
-    roster's stdout-only property, which the rule asserts of the roster and
-    cannot verify of a member.
-    **(c) is also the clause no settings rule can express, and it is the whole of
-    why this grant is a hook.** Clauses (a) and (b) both turn on the redirect
-    target, and an anchored file-write rule over the ignored paths reaches a
-    target correctly. What such a rule cannot do is bound the **emitter**, so a
-    settings-only spelling grants `rm -rf .tmp/../.git > .tmp/j.md` on the target
-    alone. Recorded plainly because the target clauses read like the hard part
-    and are not: drop (c) and the grant is expressible in settings and unsafe.
-    **One statement is one segment plus its own heredoc residue, never one
-    segment.** `guard_split_compound` emits per **line** and `guard_skeleton`'s
-    `hd` class leaves a heredoc's body placeholder and terminator on lines of
-    their own, so the mandated `cat >> … <<'EOF'` form splits into *three*
-    segments and a one-segment test would refuse the exact command this rule
-    exists to grant. The test is therefore that every segment past the first is
-    exactly the residue the first segment's own openers produce — which still
-    refuses a second statement on a line of its own (`printf x >> .tmp/j.md`,
-    newline, `rm -rf …`), the hazard the one-statement bound is for.
-    **Two inert targets are exempt from (b)**, and the carve-out is
-    precedented rather than invented: `/dev/null` and an fd-dup (`&1`, `&2`) are
-    what rule 18 already treats as targets that are not files. Neither is a path
-    `git check-ignore` can answer about. Every **other** target takes that test,
-    and at least one such target must exist — a call redirecting only to inert
-    targets has no write to grant. Seeing an fd-dup at all takes this rule's own
-    operator-and-target
-    scan, because `_guard_redirect_targets`' target class excludes `&` and drops
-    an fd-dup target entirely.
-    **(d)'s substitution arm is not redundant with rule 6**, and that was measured
-    rather than assumed: rule 6 blocks `${…}`, `$(…)`, `<(…)` and `$NAME` and
-    exits 2 first, but **not** `>(…)`, which does run its command. An auto-allow
-    may not rest on a coverage claim that is only mostly true, so the decline
-    stays, and only its *subject* is narrowed from the raw command to the `hdq`
-    view.
-    **The `hdq` narrowing is rule 6's own ruling applied one rule over, not a new
-    one.** Rule 6 already declares that a double-quoted `"$x"` still expands so
-    `dq` stays live, while a **quoted-delimiter** heredoc body cannot — which is
-    what `hdq` names. A backtick inside `<<'EOF'` is inert by the identical
-    argument that makes `$x` inert there, so testing it against the raw command
-    declines on a region that cannot expand. The reasoning at the head of this
-    clause survives untouched; what does not survive is applying it where the
-    spelling has no way to substitute. **The asymmetry is deliberate and `hdq` is
-    not `hd`**: an **unquoted** delimiter (`<<EOF`) leaves the body live, so a
-    backtick there is a real substitution and the decline still fires. Stated
-    because `hd` is the mode most of the neighbouring rules take and reaching for
-    it here would silently grant a body that can run a command. Nothing else
-    distinguishes the two spellings at the grant boundary, so the two fixture rows
-    that assert it (§Testing) are the whole holder of the narrowing's bound.
-    **Placed immediately after rule 16 and before rule 18**, and the position is
-    load-bearing rather than tidy: placing it after the decorated-allowlist rule
-    would be wrong because that rule blocks a bare allow entry decorated by a
-    trailing redirect, which is one plausible spelling of the very command this
-    rule grants.
-    **The mandated in-turn wait was a stated non-target and is now rule 19's
-    subject**, and the sequencing that held it here is what the record is for: its
-    loop is ungrantable by a settings rule for a structural reason — the mandated
-    form *is* a loop condition, so it is decorated by construction — but a grant
-    minted around the then-sanctioned loop form would have been shaped to a
-    primitive the measurement might correct, and a guard on the wrong primitive
-    inherits its failure. Measure first, then grant — and the measurement, when it
-    came, corrected the shape twice over. It corrected the loop's *polarity*, so a
-    grant is shaped to `while <cond> …` as well as `until <cond> …`
-    (delegation-kit/SPEC.md §bin/wait-probe holds the trials; §Operative residency
-    holds the finding); and it corrected the *primitive*, because the measured
-    class is not `kill -0`-shaped at all but *a wait loop whose condition is an
-    arbitrary command*, strictly wider than any grant keyed on one spelling would
-    have covered. Every measured call is also a **compound**, which is what rule
-    19's clause (d) exists for. The waiter/producer partition this rule's own
-    clause (0) draws is the one rule 19 draws beside it.
-18. **Auto-allow read-only pipeline** (`guard_rule_ro_pipeline`) — granted
-    silently when every pipe
-    segment leads with a roster binary (`GUARD_KIT_RO_BINS`, default the
-    grep/head/cat/find/jq family) invoked in none of its declared write and
-    execute forms, and every redirect target is `/dev/null` or an fd-dup.
-    Declares `sq dq hd`. Conservative by construction:
-    command/process substitution, a leftover quote after normalization, any
-    statement separator, or a non-`/dev/null` redirect all refuse and fall
-    through. **`xargs` is on the roster but is not
-    a text filter — it executes a command** — so it carries a discriminator
-    rather than riding the leads-with test: an `xargs` segment counts read-only
-    only when the command it runs is itself a roster binary (or absent, since
-    bare `xargs` defaults to `echo`). Without it, roster membership alone would
-    silently grant `find . -type f | xargs rm -rf` and
-    `grep -rln foo src | xargs sed -i s/a/b/`. Unrecognized `xargs` options and
-    a nested `xargs` decline rather than guess. The discriminator makes an
-    `xargs` segment exactly as safe as the segment it runs and no safer.
-    **Leading with a roster binary does not make an invocation read-only**
-    (`sort -o <file>` overwrites the file), **so every member declares its write
-    and execute forms**, and a segment is read-only only when its words carry
-    none of them. A declaration is space-separated tokens, each decidable from
-    its own shape:
+    **Why (c) is the clause the safety argument rests on.** A `permissionDecision: allow` blesses the whole call, so a rule keyed on the redirect alone would grant `rm -rf .tmp/../.git >> .tmp/j.md` — the target is gitignored, the operator is `>>`, and the command destroys the repository. Bounding the *emitter* is what makes the grant safe, and bounding it to **stdout-only** emitters is what makes the bound checkable: `cat`, `printf` and `echo` write nowhere the redirect does not send them, so the redirect target is the whole of what the call can touch. `tee` is deliberately **off** the roster despite being the obvious fourth member — it takes a path **argument**, so `tee -a <tracked file>` writes a tracked file with no redirect at all and (b) never sees it. The honest limit is the mirror of the one rule 18 carries for `GUARD_KIT_RO_BINS`, reached from the writing side rather than the reading side: the grant is exactly as safe as the roster's stdout-only property, which the rule asserts of the roster and cannot verify of a member. **(c) is also the clause no settings rule can express, and it is the whole of why this grant is a hook.** Clauses (a) and (b) both turn on the redirect target, and an anchored file-write rule over the ignored paths reaches a target correctly. What such a rule cannot do is bound the **emitter**, so a settings-only spelling grants `rm -rf .tmp/../.git > .tmp/j.md` on the target alone. Recorded plainly because the target clauses read like the hard part and are not: drop (c) and the grant is expressible in settings and unsafe. **One statement is one segment plus its own heredoc residue, never one segment.** `guard_split_compound` emits per **line** and `guard_skeleton`'s `hd` class leaves a heredoc's body placeholder and terminator on lines of their own, so the mandated `cat >> … <<'EOF'` form splits into *three* segments and a one-segment test would refuse the exact command this rule exists to grant. The test is therefore that every segment past the first is exactly the residue the first segment's own openers produce — which still refuses a second statement on a line of its own (`printf x >> .tmp/j.md`, newline, `rm -rf …`), the hazard the one-statement bound is for. **Two inert targets are exempt from (b)**, and the carve-out is precedented rather than invented: `/dev/null` and an fd-dup (`&1`, `&2`) are what rule 18 already treats as targets that are not files. Neither is a path `git check-ignore` can answer about. Every **other** target takes that test, and at least one such target must exist — a call redirecting only to inert targets has no write to grant. Seeing an fd-dup at all takes this rule's own operator-and-target scan, because `_guard_redirect_targets`' target class excludes `&` and drops an fd-dup target entirely. **(d)'s substitution arm is not redundant with rule 6**, and that was measured rather than assumed: rule 6 blocks `${…}`, `$(…)`, `<(…)` and `$NAME` and exits 2 first, but **not** `>(…)`, which does run its command. An auto-allow may not rest on a coverage claim that is only mostly true, so the decline stays, and only its *subject* is narrowed from the raw command to the `hdq` view. **The `hdq` narrowing is rule 6's own ruling applied one rule over, not a new one.** Rule 6 already declares that a double-quoted `"$x"` still expands so `dq` stays live, while a **quoted-delimiter** heredoc body cannot — which is what `hdq` names. A backtick inside `<<'EOF'` is inert by the identical argument that makes `$x` inert there, so testing it against the raw command declines on a region that cannot expand. The reasoning at the head of this clause survives untouched; what does not survive is applying it where the spelling has no way to substitute. **The asymmetry is deliberate and `hdq` is not `hd`**: an **unquoted** delimiter (`<<EOF`) leaves the body live, so a backtick there is a real substitution and the decline still fires. Stated because `hd` is the mode most of the neighbouring rules take and reaching for it here would silently grant a body that can run a command. Nothing else distinguishes the two spellings at the grant boundary, so the two fixture rows that assert it (§Testing) are the whole holder of the narrowing's bound. **Placed immediately after rule 16 and before rule 18**, and the position is load-bearing rather than tidy: placing it after the decorated-allowlist rule would be wrong because that rule blocks a bare allow entry decorated by a trailing redirect, which is one plausible spelling of the very command this rule grants. **The mandated in-turn wait was a stated non-target and is now rule 19's subject**, and the sequencing that held it here is what the record is for: its loop is ungrantable by a settings rule for a structural reason — the mandated form *is* a loop condition, so it is decorated by construction — but a grant minted around the then-sanctioned loop form would have been shaped to a primitive the measurement might correct, and a guard on the wrong primitive inherits its failure. Measure first, then grant — and the measurement, when it came, corrected the shape twice over. It corrected the loop's *polarity*, so a grant is shaped to `while <cond> …` as well as `until <cond> …` (delegation-kit/SPEC.md §bin/wait-probe holds the trials; §Operative residency holds the finding); and it corrected the *primitive*, because the measured class is not `kill -0`-shaped at all but *a wait loop whose condition is an arbitrary command*, strictly wider than any grant keyed on one spelling would have covered. Every measured call is also a **compound**, which is what rule 19's clause (d) exists for. The waiter/producer partition this rule's own clause (0) draws is the one rule 19 draws beside it.
+18. **Auto-allow read-only pipeline** (`guard_rule_ro_pipeline`) — granted silently when every pipe segment leads with a roster binary (`GUARD_KIT_RO_BINS`, default the grep/head/cat/find/jq family) invoked in none of its declared write and execute forms, and every redirect target is `/dev/null` or an fd-dup. Declares `sq dq hd`. Conservative by construction: command/process substitution, a leftover quote after normalization, any statement separator, or a non-`/dev/null` redirect all refuse and fall through. **`xargs` is on the roster but is not a text filter — it executes a command** — so it carries a discriminator rather than riding the leads-with test: an `xargs` segment counts read-only only when the command it runs is itself a roster binary (or absent, since bare `xargs` defaults to `echo`). Without it, roster membership alone would silently grant `find . -type f | xargs rm -rf` and `grep -rln foo src | xargs sed -i s/a/b/`. Unrecognized `xargs` options and a nested `xargs` decline rather than guess. The discriminator makes an `xargs` segment exactly as safe as the segment it runs and no safer. **Leading with a roster binary does not make an invocation read-only** (`sort -o <file>` overwrites the file), **so every member declares its write and execute forms**, and a segment is read-only only when its words carry none of them. A declaration is space-separated tokens, each decidable from its own shape:
     - `none` — nothing: the member has no write or execute form.
-    - `--long` — `--long` and `--long=…`, and any abbreviation of it (`--lo`,
-      `--lo=…`), because a getopt-style parser accepts an unambiguous prefix of
-      a long option: `sort --outp=<file>` writes the file.
-    - `-x`, one letter — `-x` standalone and any short cluster carrying `x`
-      (`-uo`).
-    - `-word`, a dash and two or more letters — that exact word (`find`'s
-      predicates).
+    - `--long` — `--long` and `--long=…`, and any abbreviation of it (`--lo`, `--lo=…`), because a getopt-style parser accepts an unambiguous prefix of a long option: `sort --outp=<file>` writes the file.
+    - `-x`, one letter — `-x` standalone and any short cluster carrying `x` (`-uo`).
+    - `-word`, a dash and two or more letters — that exact word (`find`'s predicates).
     - `pos:N` — the segment carries `N` or more non-option words.
 
-    Option tokens are matched against the words as the shell passes them, read
-    from rule 8's dequoted view with backslashes removed, so a quoted `'-o'` is
-    the option it is. `pos:N` counts the skeleton's words with the segment's
-    redirects removed, so a quoted word counts as positional whatever it holds.
-    An option's argument or a quoted option can therefore over-count, which
-    withholds and never grants. Where the dequoted view cannot be aligned with
-    the skeleton, the segment is withheld.
-    **The lookup reads three tiers:** the consumer's `GUARD_KIT_RO_FORMS` entry
-    for the binary when one is set; else the kit's table below; else
-    **undeclared**, and an undeclared member is withheld: its segment is not
-    read-only, and the call falls through to the harness's own decision. An
-    empty declaration is undeclared, not `none`. A missed form therefore costs
-    a prompt and never a hole. A gate refusing a member added undeclared is not
-    built, on that ground: this kit registers no gates, and withholding at call
-    time delivers the property without minting the kit's first registered
-    surface over a consumer config file.
-    **The kit's table for the default roster** is a `lib/guard.sh` literal,
-    tool mechanism of the same class as rule 9's steer targets, so it crosses
-    no seam:
+    Option tokens are matched against the words as the shell passes them, read from rule 8's dequoted view with backslashes removed, so a quoted `'-o'` is the option it is. `pos:N` counts the skeleton's words with the segment's redirects removed, so a quoted word counts as positional whatever it holds. An option's argument or a quoted option can therefore over-count, which withholds and never grants. Where the dequoted view cannot be aligned with the skeleton, the segment is withheld. **The lookup reads three tiers:** the consumer's `GUARD_KIT_RO_FORMS` entry for the binary when one is set; else the kit's table below; else **undeclared**, and an undeclared member is withheld: its segment is not read-only, and the call falls through to the harness's own decision. An empty declaration is undeclared, not `none`. A missed form therefore costs a prompt and never a hole. A gate refusing a member added undeclared is not built, on that ground: this kit registers no gates, and withholding at call time delivers the property without minting the kit's first registered surface over a consumer config file. **The kit's table for the default roster** is a `lib/guard.sh` literal, tool mechanism of the same class as rule 9's steer targets, so it crosses no seam:
     - `sort`: `-o --output --compress-program`.
     - `uniq`: `pos:2`, since its second positional is its output file.
-    - `find`: `-delete -exec -execdir -ok -okdir -fprint -fprint0 -fprintf
-      -fls`.
+    - `find`: `-delete -exec -execdir -ok -okdir -fprint -fprint0 -fprintf -fls`.
     - `rg`: `--pre`, which runs a program.
     - `xargs`: `none` for its own options.
-    - Every other default member — `grep egrep fgrep head tail cat wc cut tr nl
-      rev tac paste comm column diff jq ls` — `none`.
+    - Every other default member — `grep egrep fgrep head tail cat wc cut tr nl rev tac paste comm column diff jq ls` — `none`.
 
-    Two stated non-forms: `sort -T` writes transient temporary files, and
-    `rg -z` runs fixed decompressors. Neither writes a named file or runs a
-    named program.
-    **One reader, four sites.** `_guard_ro_forms_clear` applies the declaration
-    over the whole command, to every segment whose command word is a roster
-    member. This rule, rule 15's exemption (3) and rule 19's clauses (c) and (d)
-    each call it once their own segment tests pass, so the four narrow together.
-    For an `xargs` segment it also applies the declaration of the command
-    `xargs` runs to that command's words, and there a `pos:N` token withholds
-    outright, since `xargs` appends operands the segment does not show;
-    `echo`/`printf` under `xargs` take no declaration, being the stdout-only
-    emitters the discriminator already admits. Rule 9's listing test reads
-    `find`'s declaration as well, so `find`'s action roster has one literal.
-    **The honest limit.** The grant is exactly as safe as the member's option
-    surface as declared. A binary that gains a write option in a later release
-    is a hole until its declaration is widened, and a platform whose spelling
-    differs is a hole until it is declared too.
-    Two carve-outs widen the grant, and
-    neither widens it past what the segment-by-segment safety argument already
-    covers:
-    - **A literal `echo`/`printf` banner segment is skipped**, the tolerance
-      rules 9 and 10 already carry on the stated ground that a banner is the
-      natural separator of a batched read; `_guard_is_banner` is shared and this
-      is its third caller. The asymmetry was the accident, not the tolerance. At
-      least one non-banner roster segment must remain, so a banner-only pipeline
-      is not granted.
-    - **The lead segment may instead be a bare committed allow entry** — an
-      exact `Bash(<cmd>)` with no glob, on rule 20's own reasoning that a
-      glob-headed family coexists with allowlisted decorators and would admit
-      far more than the reviewed command. The shape this repairs is an
-      allowlisted script piped into `head`: the lead is statically allowlisted,
-      so it was reviewed; every tail segment leads with a roster binary, so it
-      is read-only. The widened lead applies **only where something decorates
-      it** (more than one segment): an undecorated allowlisted command already
-      resolves on the static match, and intercepting it here would take it off
-      the friction log for no gain. Reads `GUARD_KIT_SETTINGS`, and the
-      **fail-open contract travels with the read**: a failed binary read, no settings file,
-      or a parse error and the lead-widening silently declines, leaving the rule
-      exactly as it behaves without it. A grant that depends on a settings read
-      must never turn a missing settings file into a grant, and declining is the
-      only direction that cannot.
-19. **Auto-allow a sanctioned wait** (`guard_rule_bounded_wait`) — two arms,
-    each granted silently when
-    **every** one of its clauses holds, the call falling through untouched
-    otherwise. Every clause is a safety argument, because
-    `permissionDecision: allow` blesses the *whole call* — so the rule bounds the
-    command rather than merely recognizing the shape it keys on, which is rule
-    17's stated discipline and this rule inherits it.
-    **Arm (A), the bounded in-turn wait.** The mandated in-turn wait
-    (delegation-kit/SPEC.md §Operative residency) is a condition loop, so it is
-    decorated by construction and no `Bash(…)` allow entry can match it: a glob
-    matches a command word, and this form's distinguishing text is a loop
-    *condition*.
-    - **(0) No statement-ending `&` anywhere in the command.** A backgrounding
-      launch is rule 15's subject, and a compound that *launches* something beside
-      its wait is a producer, not a waiter. This clause refuses the attested
-      launch-plus-poll form on its own terms rather than by relying on an earlier
-      rule's ordering — belt and braces, and the safety argument is better for
-      not being an ordering accident. It is **indifferent to the harness's
-      background flag**, which backgrounds the whole call without changing its
-      text: a backgrounded wait is the mandated form, and rule 15 already exempts
-      it from the record requirement on the ground that a waiter is not a producer.
-      The asymmetry is deliberate and is the honest reading of what each signal
-      says — the flag says *this call runs detached*, while a shell `&` says
-      *this command text starts something and then does something else*, and only
-      the second is a launch this arm must not bless; arm (B) grants one only in
-      its recorded spelling.
-    - **(a) The first statement is a `while`/`until` loop with exactly one
-      balanced `do … done` span**, detected with `_guard_loop_span` — the
-      ruleset's single shell-keyword walk, already shared by rules 13 and 15. A
-      second dialect is refused; one walk, three readers. More than one span
-      declines rather than being modelled: a nested wait is not the measured
-      class and resolving which span is the body is a guess.
-    - **(b) The loop body contains nothing but `sleep`.** This is the rule's
-      safety core. A loop body that runs anything else is unbounded work
-      executing an unbounded number of times under a grant, and no clause
-      elsewhere would bound it. Each body statement is `sleep` plus exactly one
-      numeric operand; anything else — a second command, a pipe, a redirect —
-      declines.
-    - **(c) The loop condition is read-only.** The condition runs once per
-      iteration, unboundedly often, so it is held to the same test rule 18
-      applies to a pipeline: every segment leads with a `GUARD_KIT_RO_BINS`
-      member invoked in none of its declared write and execute forms, and every
-      redirect target is inert (`/dev/null` or an fd-dup). Two
-      condition forms are admitted in their own right rather than by roster
-      membership, because each is read-only without being a filter: the shell
-      tests (`[ … ]`, `[[ … ]]`, `test`), and `kill -0 <pid>`, which asks a PID a
-      question and sends no signal. A leading `!` is read past on
-      `_guard_command_word`'s existing test, so the negated spelling rules 13 and
-      14 both steer toward is granted rather than left arguing with its own
-      correctives.
-    - **(d) Every statement after the loop passes rule 18's read-only-pipeline
-      test**, with rules 9, 10 and 18's literal `echo`/`printf` banner tolerance
-      (`_guard_is_banner`, this its fourth caller). This is the clause the
-      measurement bought: the mandated wait is *"report only results you hold"*,
-      so every measured call is a compound — the loop, then the thing the session
-      does once the wait ends — and a grant admitting only a lone loop statement
-      would cover **none** of them. Unlike rule 18 the tail is not required to
-      carry a read: the loop is the call's work, and a tail of pure banners
-      writes only to stdout. Rule 18's declared-forms reader runs once over the
-      whole call, so the condition and the tail are held to it alike.
-    - **(e) Conservative decline on anything unmodelled** — a command or process
-      substitution or a backtick anywhere in the **raw** command, and a quote
-      surviving normalization. The auto-allow band's carve-out, adopted
-      unchanged rather than reasoned about afresh; the quote half is taken in
-      rule 18's blanket spelling rather than rule 17's per-target one, which is
-      the stricter of the two and therefore the safe direction for a grant. The
-      band is **not** unanimous on the *subject*: rule 17 takes the same tests
-      against the `hdq` view, and this rule keeps the raw command because its own
-      grant has no heredoc in it to narrow onto.
+    Two stated non-forms: `sort -T` writes transient temporary files, and `rg -z` runs fixed decompressors. Neither writes a named file or runs a named program. **One reader, four sites.** `_guard_ro_forms_clear` applies the declaration over the whole command, to every segment whose command word is a roster member. This rule, rule 15's exemption (3) and rule 19's clauses (c) and (d) each call it once their own segment tests pass, so the four narrow together. For an `xargs` segment it also applies the declaration of the command `xargs` runs to that command's words, and there a `pos:N` token withholds outright, since `xargs` appends operands the segment does not show; `echo`/`printf` under `xargs` take no declaration, being the stdout-only emitters the discriminator already admits. Rule 9's listing test reads `find`'s declaration as well, so `find`'s action roster has one literal. **The honest limit.** The grant is exactly as safe as the member's option surface as declared. A binary that gains a write option in a later release is a hole until its declaration is widened, and a platform whose spelling differs is a hole until it is declared too. Two carve-outs widen the grant, and neither widens it past what the segment-by-segment safety argument already covers:
+    - **A literal `echo`/`printf` banner segment is skipped**, the tolerance rules 9 and 10 already carry on the stated ground that a banner is the natural separator of a batched read; `_guard_is_banner` is shared and this is its third caller. The asymmetry was the accident, not the tolerance. At least one non-banner roster segment must remain, so a banner-only pipeline is not granted.
+    - **The lead segment may instead be a bare committed allow entry** — an exact `Bash(<cmd>)` with no glob, on rule 20's own reasoning that a glob-headed family coexists with allowlisted decorators and would admit far more than the reviewed command. The shape this repairs is an allowlisted script piped into `head`: the lead is statically allowlisted, so it was reviewed; every tail segment leads with a roster binary, so it is read-only. The widened lead applies **only where something decorates it** (more than one segment): an undecorated allowlisted command already resolves on the static match, and intercepting it here would take it off the friction log for no gain. Reads `GUARD_KIT_SETTINGS`, and the **fail-open contract travels with the read**: a failed binary read, no settings file, or a parse error and the lead-widening silently declines, leaving the rule exactly as it behaves without it. A grant that depends on a settings read must never turn a missing settings file into a grant, and declining is the only direction that cannot.
+19. **Auto-allow a sanctioned wait** (`guard_rule_bounded_wait`) — two arms, each granted silently when **every** one of its clauses holds, the call falling through untouched otherwise. Every clause is a safety argument, because `permissionDecision: allow` blesses the *whole call* — so the rule bounds the command rather than merely recognizing the shape it keys on, which is rule 17's stated discipline and this rule inherits it. **Arm (A), the bounded in-turn wait.** The mandated in-turn wait (delegation-kit/SPEC.md §Operative residency) is a condition loop, so it is decorated by construction and no `Bash(…)` allow entry can match it: a glob matches a command word, and this form's distinguishing text is a loop *condition*.
+    - **(0) No statement-ending `&` anywhere in the command.** A backgrounding launch is rule 15's subject, and a compound that *launches* something beside its wait is a producer, not a waiter. This clause refuses the attested launch-plus-poll form on its own terms rather than by relying on an earlier rule's ordering — belt and braces, and the safety argument is better for not being an ordering accident. It is **indifferent to the harness's background flag**, which backgrounds the whole call without changing its text: a backgrounded wait is the mandated form, and rule 15 already exempts it from the record requirement on the ground that a waiter is not a producer. The asymmetry is deliberate and is the honest reading of what each signal says — the flag says *this call runs detached*, while a shell `&` says *this command text starts something and then does something else*, and only the second is a launch this arm must not bless; arm (B) grants one only in its recorded spelling.
+    - **(a) The first statement is a `while`/`until` loop with exactly one balanced `do … done` span**, detected with `_guard_loop_span` — the ruleset's single shell-keyword walk, already shared by rules 13 and 15. A second dialect is refused; one walk, three readers. More than one span declines rather than being modelled: a nested wait is not the measured class and resolving which span is the body is a guess.
+    - **(b) The loop body contains nothing but `sleep`.** This is the rule's safety core. A loop body that runs anything else is unbounded work executing an unbounded number of times under a grant, and no clause elsewhere would bound it. Each body statement is `sleep` plus exactly one numeric operand; anything else — a second command, a pipe, a redirect — declines.
+    - **(c) The loop condition is read-only.** The condition runs once per iteration, unboundedly often, so it is held to the same test rule 18 applies to a pipeline: every segment leads with a `GUARD_KIT_RO_BINS` member invoked in none of its declared write and execute forms, and every redirect target is inert (`/dev/null` or an fd-dup). Two condition forms are admitted in their own right rather than by roster membership, because each is read-only without being a filter: the shell tests (`[ … ]`, `[[ … ]]`, `test`), and `kill -0 <pid>`, which asks a PID a question and sends no signal. A leading `!` is read past on `_guard_command_word`'s existing test, so the negated spelling rules 13 and 14 both steer toward is granted rather than left arguing with its own correctives.
+    - **(d) Every statement after the loop passes rule 18's read-only-pipeline test**, with rules 9, 10 and 18's literal `echo`/`printf` banner tolerance (`_guard_is_banner`, this its fourth caller). This is the clause the measurement bought: the mandated wait is *"report only results you hold"*, so every measured call is a compound — the loop, then the thing the session does once the wait ends — and a grant admitting only a lone loop statement would cover **none** of them. Unlike rule 18 the tail is not required to carry a read: the loop is the call's work, and a tail of pure banners writes only to stdout. Rule 18's declared-forms reader runs once over the whole call, so the condition and the tail are held to it alike.
+    - **(e) Conservative decline on anything unmodelled** — a command or process substitution or a backtick anywhere in the **raw** command, and a quote surviving normalization. The auto-allow band's carve-out, adopted unchanged rather than reasoned about afresh; the quote half is taken in rule 18's blanket spelling rather than rule 17's per-target one, which is the stricter of the two and therefore the safe direction for a grant. The band is **not** unanimous on the *subject*: rule 17 takes the same tests against the `hdq` view, and this rule keeps the raw command because its own grant has no heredoc in it to narrow onto.
 
-    **Two forms this rule deliberately does not grant, stated so the silence is
-    not read as an oversight.** Coverage of the measured class is not the target;
-    coverage of the *sanctioned* class is, so each of these keeps prompting and
-    that is the rule working rather than a gap in it.
-    - **`pgrep -f <pattern>` as a condition.** It is a *pattern match*, and the
-      methodology forbids matching a pattern where a recorded PID is available
-      (delegation-kit/SPEC.md §The delegation model — the same ruling rule 12
-      blocks the self-matching case on). Granting it would bless a form the
-      methodology refuses.
-    - **`gh` as a condition.** Waiting on a CI run has a sanctioned blocking
-      primitive (`gh run watch`); admitting `gh` here would both widen a
-      read-only roster into a network tool and grant a workaround for a
-      primitive that already exists.
+    **Two forms this rule deliberately does not grant, stated so the silence is not read as an oversight.** Coverage of the measured class is not the target; coverage of the *sanctioned* class is, so each of these keeps prompting and that is the rule working rather than a gap in it.
+    - **`pgrep -f <pattern>` as a condition.** It is a *pattern match*, and the methodology forbids matching a pattern where a recorded PID is available (delegation-kit/SPEC.md §The delegation model — the same ruling rule 12 blocks the self-matching case on). Granting it would bless a form the methodology refuses.
+    - **`gh` as a condition.** Waiting on a CI run has a sanctioned blocking primitive (`gh run watch`); admitting `gh` here would both widen a read-only roster into a network tool and grant a workaround for a primitive that already exists.
 
-    **The honest limit is inherited rather than new.** Clause (a)'s predicate is
-    `_guard_loop_span`, which is command-text-shaped, so a wait loop inside a
-    script body is invisible to it exactly as it is to rule 15 — which makes that
-    blindness a property of the shared walk rather than a rule-15 defect, and the
-    two are siblings on it. Such a waiter's launch meets rule 15's block, and
-    spelled with its record it meets arm (B)'s grant.
+    **The honest limit is inherited rather than new.** Clause (a)'s predicate is `_guard_loop_span`, which is command-text-shaped, so a wait loop inside a script body is invisible to it exactly as it is to rule 15 — which makes that blindness a property of the shared walk rather than a rule-15 defect, and the two are siblings on it. Such a waiter's launch meets rule 15's block, and spelled with its record it meets arm (B)'s grant.
 
-    **Arm (B), the recorded launch.** Rule 15's corrective names one canonical
-    spelling, and this arm grants it when **every** clause below holds:
-    - **(B0) The shape.** The call is exactly three or four statements: a launch
-      ending in a statement-ending `&`; `echo "pid=$! run=<key>" > <dir>/<key>.run`,
-      with `<dir>` a `GUARD_KIT_SCRATCH_DIRS` member, `<key>` matching
-      `[A-Za-z0-9._-]+`, and the filename key equal to the `run=` key; `wait`;
-      and optionally `rm -f` of that same record path. The statements after the
-      launch are separated by `;` or a newline. The shape is read on the raw
-      command and again on the `sq dq hd` skeleton, so the `&` is live and the
-      record's argument is a real double-quoted span, and the launch's own
-      skeleton must equal the skeleton's launch, so no quote is open across the
-      `&`.
-    - **(B1) The launched command is granted and bounded.** The launch carries
-      no pipe, statement separator, heredoc or second backgrounding `&`, and no
-      fd-dup onto a named file (`>&<file>`), which is a write the redirect scan
-      does not read. Its words, read as rule 24 reads them — the skeleton saying
-      which words are redirects and the dequoted words carrying the content —
-      match a committed allow pattern through `guard_allow_match` on
-      `_guard_allow_inners`' fail-open read, so a failed read grants nothing.
-      The launch passes rule 24's test as a predicate, and the whole call passes
-      rule 22's and rule 23's tests as predicates: each rule's finder answers
-      without blocking, so arm (B) grants nothing a later rule would refuse.
-    - **(B2) The call writes only gitignored or inert targets**, on rule 17's
-      exact `git check-ignore --quiet --` predicate and its inert-target
-      carve-out. The record path takes the test too, so the grant never rests on
-      a scratch dir being ignored.
-    - **(B3) Conservative decline** on a command or process substitution or a
-      backtick anywhere, or on any expansion other than the single `$!` inside
-      statement 2's double-quoted argument, counted on the view where only a
-      single-quoted `$` is inert.
+    **Arm (B), the recorded launch.** Rule 15's corrective names one canonical spelling, and this arm grants it when **every** clause below holds:
+    - **(B0) The shape.** The call is exactly three or four statements: a launch ending in a statement-ending `&`; `echo "pid=$! run=<key>" > <dir>/<key>.run`, with `<dir>` a `GUARD_KIT_SCRATCH_DIRS` member, `<key>` matching `[A-Za-z0-9._-]+`, and the filename key equal to the `run=` key; `wait`; and optionally `rm -f` of that same record path. The statements after the launch are separated by `;` or a newline. The shape is read on the raw command and again on the `sq dq hd` skeleton, so the `&` is live and the record's argument is a real double-quoted span, and the launch's own skeleton must equal the skeleton's launch, so no quote is open across the `&`.
+    - **(B1) The launched command is granted and bounded.** The launch carries no pipe, statement separator, heredoc or second backgrounding `&`, and no fd-dup onto a named file (`>&<file>`), which is a write the redirect scan does not read. Its words, read as rule 24 reads them — the skeleton saying which words are redirects and the dequoted words carrying the content — match a committed allow pattern through `guard_allow_match` on `_guard_allow_inners`' fail-open read, so a failed read grants nothing. The launch passes rule 24's test as a predicate, and the whole call passes rule 22's and rule 23's tests as predicates: each rule's finder answers without blocking, so arm (B) grants nothing a later rule would refuse.
+    - **(B2) The call writes only gitignored or inert targets**, on rule 17's exact `git check-ignore --quiet --` predicate and its inert-target carve-out. The record path takes the test too, so the grant never rests on a scratch dir being ignored.
+    - **(B3) Conservative decline** on a command or process substitution or a backtick anywhere, or on any expansion other than the single `$!` inside statement 2's double-quoted argument, counted on the view where only a single-quoted `$` is inert.
 
-    **Why the grant is owed.** The record's builtin spelling carries `$!`. Rule
-    6's expansion match does not reach that special parameter, so the call
-    passes the guard, but the matcher refuses expansions: without this arm, rule
-    15's block would convert every compliant launch into an out-of-band
-    decision, and a floor whose corrective always costs a decision is the one
-    sessions learn to skip.
-    **The grant adds no capability.** The launched command is one the allowlist
-    already grants. The record write is the gitignored-target write rule 17
-    grants with an emitter it already rosters. `wait` is a builtin, and the
-    `rm -f` retracts the one file the same call created.
-    **delegation-kit's refusal of a tool to write the record stands**
-    (delegation-kit/SPEC.md §The delegation model). The write stays a shell
-    builtin, as that refusal requires. What changes is that the builtin's one
-    spelling is named in rule 15's corrective and costs no decision, which
-    narrows the refusal's stated cost — a hand-written record can be malformed —
-    without reversing it.
-    **The harness flag changes nothing.** A harness-backgrounded canonical
-    launch carries the same text, and its `wait` is what keeps the call alive
-    until the child exits.
+    **Why the grant is owed.** The record's builtin spelling carries `$!`. Rule 6's expansion match does not reach that special parameter, so the call passes the guard, but the matcher refuses expansions: without this arm, rule 15's block would convert every compliant launch into an out-of-band decision, and a floor whose corrective always costs a decision is the one sessions learn to skip. **The grant adds no capability.** The launched command is one the allowlist already grants. The record write is the gitignored-target write rule 17 grants with an emitter it already rosters. `wait` is a builtin, and the `rm -f` retracts the one file the same call created. **delegation-kit's refusal of a tool to write the record stands** (delegation-kit/SPEC.md §The delegation model). The write stays a shell builtin, as that refusal requires. What changes is that the builtin's one spelling is named in rule 15's corrective and costs no decision, which narrows the refusal's stated cost — a hand-written record can be malformed — without reversing it. **The harness flag changes nothing.** A harness-backgrounded canonical launch carries the same text, and its `wait` is what keeps the call alive until the child exits.
 
-    **Placed at the tail of the auto-allow band — after rule 18 and before rule
-    20 — and each constraint was checked against the decision table rather than
-    assumed.** It must sit **after rule 12** (the `pgrep`/`pkill` self-match
-    block), or the attested launch-plus-poll row flips from `block` to `allow`
-    and a never-exiting waiter is blessed; arm (A)'s clause (0) refuses that row
-    independently, and both holding is the intent. **After rules 8, 9, 10 and
-    13**, each of which states in its own section that it is placed before every
-    auto-allow rule. **After rule 15**, so a launch that owes a liveness record
-    meets the block before anything grants it — the same partition rule 17's
-    clause (0) draws — and arm (B) grants only what rule 15's exemption (1) has
-    already let through. **Before rule 20**, which would otherwise block a
-    decorated loop first; rule 20 does not block the canonical recorded launch,
-    whose lead carries the launch's `&` and its record, but arm (B) sits ahead of
-    it regardless. Placement at the tail of the band rather than at its
-    head is also the cheap choice: it renumbers the rules below it rather than
-    every rule in the band and every rule after it.
-20. **Decorated allowlisted command** (`guard_rule_allowlist_chain`) — the
-    leading command exactly matches a
-    committed **bare** allow entry (a `Bash(<cmd>)` with no `:*`/`*` glob) but
-    the command decorates it — `&&`/`;`/`|` chaining, a trailing redirect, or
-    `2>&1` — which leaves a segment nothing grants, so the whole call falls off
-    the match path and is decided out of band, and no allowlist entry pre-empts that.
-    **Blocked** with the steer *run it bare — the bare form is statically
-    allowed; the decoration is what costs the decision.* Block, not advise: the rule fires
-    only on commands that were going to be decided out of band anyway, so blocking
-    converts that decision into a durable steer at no extra cost, and an advise would *grant* the
-    decorated command (its extra segments the allowlist never reviewed).
-    **Bare leads only:** a glob-headed family (`Bash(git log:*)`) coexists with
-    allowlisted decorators, so only an exact bare entry qualifies as the lead;
-    widening to glob leads is possible later without a new name. **Never
-    intercepts a silent grant:** the harness matches per segment, so a compound
-    whose every segment matches the committed allowlist resolves on the match
-    and blocking it would regress — the rule therefore fires only when a
-    non-leading segment (or a redirect on the lead) fails to match any committed
-    allow entry, reusing `guard_allow_match`'s shell-glob semantics — and a
-    segment a backgrounding `&` ends fails to match whatever glob covers its
-    words, since the harness grants no backgrounded call (§The guard framework,
-    `guard_split_compound`). Reads
-    `GUARD_KIT_SETTINGS`; **fail-open** — a failed binary read, no settings file, or a
-    parse error and the rule silently declines and falls through. Placed after
-    the auto-allow rules (16, 17, 18, 19) so a silently granted read-only pipeline never
-    reaches it — which is also **why the allowlisted-lead grant lives in rule 18
-    and not here**. Grant, not fall-through, is what removes the friction of an
-    allowlisted command decorated only by a read-only reduction of its own
-    output, and this rule's own text refuses to grant, correctly: granting here
-    would bless segments the allowlist never reviewed. Rule 18 is already the
-    sanctioned place for a grant of exactly that shape and is already ordered
-    ahead of this rule, so a granted pipeline never arrives and nothing
-    ungranted becomes granted that either half would not have granted alone.
-    Declares `sq dq hd`.
-21. **Git history-rewrite advisory** (`guard_rule_git_rewrite`) — a `git commit`
-    carrying `--amend`, `-F`,
-    or `--file`, or a `git reset --soft`, gets a `guard_advise` steer carrying
-    the checklist from DOCTRINE.md's *Re-verify volatile state before a git
-    history rewrite* rule (verify HEAD before amend/squash; re-stage and verify
-    staged content after a soft reset; carry the message in the command (`-m`,
-    or `-F -` from a heredoc), and read a file-borne message back after the
-    commit). Advisory, not a block: each is a legitimate command, so the rule
-    injects the re-verification context and lets the command proceed. The
-    DOCTRINE.md rule is cited by **name**, not number — the doctrine's craft
-    rules renumber as it grows, and this ruleset renumbers on its own account
-    too — this rule's own number moved when rules 12 and 13 were inserted ahead
-    of it, again when rule 14 was, again when rule 15 was, again when the
-    append grant landed as rule 17, and again when the bounded-wait grant landed
-    as rule 19 — so a
-    doc-qualified number would rot on either renumber and read ambiguously
-    against the local numbering. Placed
-    after the auto-allow rules (16, 17, 18, 19) and the decorated-allowlist rule (20),
-    so it fires only on a bare rewrite command none of those claimed; a
-    decorated form meets rule 20's block first and the advisory fires on the
-    re-issued bare command.
-22. **Bare `rm` of a tracked path** (`guard_rule_rm_tracked`) — an `rm`
-    statement naming a git-tracked
-    file (`git ls-files --error-unmatch`) is **blocked** with the steer to
-    `git rm -q <path>`, which deletes and stages that one deletion in a single
-    motion. The deletion is the point: a bare `rm` leaves it unstaged, so it
-    lands only via a later `git add -A` — the form the shared-index discipline
-    warns against, since it sweeps a concurrent session's foreign path into the
-    commit. Block, not advise, on rule 20's reasoning: no consumer allowlist is
-    presumed to grant `rm`, so the rule fires on a command that would be decided
-    out of band anyway and converts that decision into a durable steer. Fires per statement
-    (`;`/`&&`/`||`/`|` split), so a decorated form steers on the same premise as
-    the bare one. Conservative by construction: expansions and backticks decline
-    outright (rule 6 already blocks the expansions; the backtick arm is this
-    rule's own), option words are skipped, and a
-    tracked *directory* under `rm -r` does not match `--error-unmatch` — each
-    biases toward passing rather than a false steer. An untracked or gitignored
-    target never matches, so scratch deletion is untouched.
-    **The steer's safety half: a `git rm` carrying its force flag is blocked
-    too.** A `git rm` segment whose options carry `-f` or `--force` is blocked,
-    its subcommand found by rule 14's `_guard_git_subcommand` walk read in that
-    walk's `args` mode. Every spelling git's option parser accepts fires:
-    standalone, in a short cluster (`-qf`, `-rf`), and as an abbreviation of
-    the long form (`--forc`, down to `--f`), since that parser takes any
-    unambiguous prefix of a long option. A word after `--` is a path and ends
-    the walk. The words are read from rule 8's dequoted view, so a quoted
-    `'-f'` is the flag the shell passes, and where that view cannot be aligned
-    the skeleton is read instead. The corrective names three exits: drop the
-    flag, since `git rm` refuses a file with local modifications and says so;
-    `git rm --cached` to untrack the file and keep it; and `!<command>` where
-    the loss is intended.
-    **Why this rule owns the arm.** This rule steers every tracked-path deletion
-    into `git rm -q`, and the force flag is the one spelling of that mandated
-    form that destroys uncommitted work. The arm fires whether or not a grant
-    matches, on rule 20's reasoning: ungranted, the call is decided out of band
-    anyway, and granted by a committed `git rm` glob it is silent data loss.
-23. **Script execution off a body the command string does not carry**
-    (`guard_rule_script_interpreter`) — a
-    command that invokes a script interpreter on a program body it takes from
-    **outside** the command string is **blocked** when that body's source is a
-    path under a `GUARD_KIT_SCRATCH_DIRS` member. Two arms, one predicate:
-    arm **(a)**, the interpreter is `bash` or `sh`, steers to the
-    `--scratch-run` arm — the allowlistable command that echoes the body as it
-    executes; arm **(b)**, the interpreter is a
-    `GUARD_KIT_SCRIPT_INTERPRETERS` member, states the bash-only rule
-    (§scratch-run) and names the same runner. Declares `sq dq hd`. The steer's
-    printed command is **derived**, not hardcoded: `lib/guard.sh` resolves
-    `_guard_door` once at load through gate-sdk's `gate_native_bin_spelled`
-    (gate-sdk/SPEC.md §lib/gate.sh), so a steer names the binary
-    `GATE_SDK_NATIVE_BIN` resolves and a consumer whose binary sits anywhere is
-    told a command that runs. That is a cross-kit coupling — a guard-kit library
-    reading a gate-sdk accessor — and it is admissible on a ground already in
-    the tree: guard-kit already sources `lib/gate.sh` for the knob read every
-    rule depends on, and `lib/guard.sh` is `# no-port:` permanently, so the
-    coupling has one holder and no parity obligation. Resolving it at load
-    rather than per message also means the steers cannot disagree with each
-    other within one call.
-    **The predicate is body visibility, and the discriminator is the same one
-    that bought the runner its grant.** §scratch-run's whole argument is that a
-    scratch path is rewritable by any session, so the body the operator approved
-    is not necessarily the body that runs, and the runner's echo-at-execution is
-    what restores the correspondence. A body carried **in** the command string —
-    `python3 -c 'print(1)'`, a heredoc, a herestring, a literal piped in — *is*
-    the command string: the permission prompt shows it to the approver verbatim
-    and the friction log records it. There is nothing for a compensating control
-    to compensate for, so a rule firing there would refuse a reviewable act in
-    the name of reviewability.
-    **What that argument may not claim, recorded because the obvious phrasing is
-    the wrong way round.** The guard's own matcher does **not** read those
-    bodies: the skeleton this rule declares strips single- and double-quoted
-    spans and heredoc bodies before the rule sees the command. The visibility
-    carrying the ruling is the **approver's**, not the guard's.
-    **Body source, not operand position.** "Names a path operand under a scratch
-    dir" is a *proxy* for "body invisible" and leaks in one direction: a path
-    operand always implies an invisible body, but an invisible body does not need
-    a path operand. So the rule resolves the body source the way the
-    interpreters themselves do — a `-c`/`-e`/`-m` argument (in the command
-    string), else the first bare operand, else stdin — and fires wherever the
-    scratch path turns out to sit: operand, `<` redirect source, the pipe
-    producer's operand, or a substitution operand.
-    **That resolution is also what keeps the rule off legitimate tooling**, and
-    it is exact rather than a carve-out: `python3 tools/gen.py` and
-    `bash <root>/gate-sdk/bin/run-gates.sh --scratch-run .tmp/x.sh` both name a body that is **not**
-    under a scratch dir — a tracked tool in the first, the runner itself in the
-    second, with the scratch path an argument *to* it — so neither fires. The
-    scratch-directory scope is not the proxy the previous paragraph drops: the
-    proxy was operand *position*, and position is what this rule stops caring
-    about.
-    **The substitution shape is covered in both spellings, and rule 6 is why it
-    had to be.** Rule 6's match carries no backtick alternative, so it blocks
-    ``python3 -c "$(cat .tmp/x.py)"`` and passes the identical command spelled
-    with backticks. A guard that blocks one spelling of a shape and passes the
-    other teaches the spelling rather than the rule, so this rule reads both
-    substitution spans; rule 6 merely pre-empts one of them by dispatch order,
-    which is ordering rather than duplication.
-    **It splits statements and then pipes, rather than calling
-    `guard_split_compound`**, and the divergence is forced: what this rule needs
-    is dataflow — whose stdout is the interpreter's stdin — and the shared
-    splitter erases the separator that tells a pipe from a `;`. It is not
-    modelling the harness's per-segment matching surface, which is what that
-    splitter is the single implementation of.
-    **Two honest limits, neither closed here.** A body drawn from outside the
-    scratch dir (`python3 - < /elsewhere/x.py`) is out of scope by the paragraph
-    above, and a body with no path at all (`curl … | python3`) is a wider hazard
-    with nothing to do with scratch execution. Both fall through, and a later
-    reader should meet that recorded rather than infer the rule is complete.
-    **Conservative in this ruleset's established directions**, with one named
-    exception: a `${…}`/`$NAME`/`<(…)`/`>(…)` anywhere in the command declines
-    outright (rule 6 blocks those shapes already), and an interpreter option the
-    walk cannot size declines rather than guess which token is the body — but a
-    **backtick** is deliberately *not* declined on, since it is the one
-    body-source spelling rule 6 does not reach and declining there would ship the
-    hole the rule exists to close.
-    **Placed at the tail, immediately before rule 24.** It grants nothing, so it
-    inherits no auto-allow ordering argument; and a command reaching it has
-    already been declined by every steer and every grant above, which is exactly
-    the population whose body source is worth resolving. Rule 24 grants nothing
-    either, so the order of the two decides only which block a command meeting
-    both receives.
-24. **A committed grant matched only by reaching past its path slot**
-    (`guard_rule_grant_path_slot`) — a
-    segment a committed `Bash(…)` allow pattern matches is **blocked** when that
-    pattern's **path slot** absorbs text reaching outside the path the pattern
-    names. A `*` in a committed pattern is a path slot when the
-    whitespace-delimited token of the pattern carrying it also carries a `/`: in
-    `rm -rf .tmp/*` and `bash */checks/check-*.sh` every `*` is one, and in
-    `git add *` and `bash gate-sdk/bin/run-gates.sh *` none is. The slot is what
-    the pattern's author wrote, so no knob and no vocabulary are needed, and a
-    consumer's `Bash(rm -rf build/*)` is bounded exactly as a scratch-dir grant
-    is. The test, per segment:
-    - **(1) Read the harness view.** The segment's dequoted text — rule 8's
-      dequoted view, quote characters removed and content kept, split on the
-      `sq dq hd` skeleton — with its redirects dropped and its backslashes
-      removed, through `_guard_harness_view`. The skeleton's words say which
-      words are redirects and the dequoted words carry the content, aligned one
-      for one, so a quoted `>` is an operand and a quoted blank stays inside its
-      word.
-    - **(2) Parse the matching pattern.** Each committed pattern that
-      `guard_allow_match` finds matching the view is translated into an anchored
-      regular expression, each `*` a capture group, and the leftmost-greedy parse
-      is taken.
-    - **(3) Test each path slot's capture.** Its first word must be clean, read
-      in the full shell word carrying it; every later non-option word must
-      re-match the slot's own token and be clean itself. A clean word carries no
-      `..` component and does not begin with `/` or `~`. At a slot opening its
-      token, an empty capture opens the path with the literal after the `*`, so
-      `bash /checks/check-x.sh` reads as absolute.
-    - **(4) Decide.** Any unclean word blocks, and the message names the
-      pattern, the word, and what it reaches past — a `..` component, an absolute
-      or home-relative path, or a second operand outside the slot. The corrective
-      is to spell the path inside the pattern's reach or to run the command
-      through `!<command>`. A match with every slot clean declines, and the
-      harness grants correctly.
+    **Placed at the tail of the auto-allow band — after rule 18 and before rule 20 — and each constraint was checked against the decision table rather than assumed.** It must sit **after rule 12** (the `pgrep`/`pkill` self-match block), or the attested launch-plus-poll row flips from `block` to `allow` and a never-exiting waiter is blessed; arm (A)'s clause (0) refuses that row independently, and both holding is the intent. **After rules 8, 9, 10 and 13**, each of which states in its own section that it is placed before every auto-allow rule. **After rule 15**, so a launch that owes a liveness record meets the block before anything grants it — the same partition rule 17's clause (0) draws — and arm (B) grants only what rule 15's exemption (1) has already let through. **Before rule 20**, which would otherwise block a decorated loop first; rule 20 does not block the canonical recorded launch, whose lead carries the launch's `&` and its record, but arm (B) sits ahead of it regardless. Placement at the tail of the band rather than at its head is also the cheap choice: it renumbers the rules below it rather than every rule in the band and every rule after it.
+20. **Decorated allowlisted command** (`guard_rule_allowlist_chain`) — the leading command exactly matches a committed **bare** allow entry (a `Bash(<cmd>)` with no `:*`/`*` glob) but the command decorates it — `&&`/`;`/`|` chaining, a trailing redirect, or `2>&1` — which leaves a segment nothing grants, so the whole call falls off the match path and is decided out of band, and no allowlist entry pre-empts that. **Blocked** with the steer *run it bare — the bare form is statically allowed; the decoration is what costs the decision.* Block, not advise: the rule fires only on commands that were going to be decided out of band anyway, so blocking converts that decision into a durable steer at no extra cost, and an advise would *grant* the decorated command (its extra segments the allowlist never reviewed). **Bare leads only:** a glob-headed family (`Bash(git log:*)`) coexists with allowlisted decorators, so only an exact bare entry qualifies as the lead; widening to glob leads is possible later without a new name. **Never intercepts a silent grant:** the harness matches per segment, so a compound whose every segment matches the committed allowlist resolves on the match and blocking it would regress — the rule therefore fires only when a non-leading segment (or a redirect on the lead) fails to match any committed allow entry, reusing `guard_allow_match`'s shell-glob semantics — and a segment a backgrounding `&` ends fails to match whatever glob covers its words, since the harness grants no backgrounded call (§The guard framework, `guard_split_compound`). Reads `GUARD_KIT_SETTINGS`; **fail-open** — a failed binary read, no settings file, or a parse error and the rule silently declines and falls through. Placed after the auto-allow rules (16, 17, 18, 19) so a silently granted read-only pipeline never reaches it — which is also **why the allowlisted-lead grant lives in rule 18 and not here**. Grant, not fall-through, is what removes the friction of an allowlisted command decorated only by a read-only reduction of its own output, and this rule's own text refuses to grant, correctly: granting here would bless segments the allowlist never reviewed. Rule 18 is already the sanctioned place for a grant of exactly that shape and is already ordered ahead of this rule, so a granted pipeline never arrives and nothing ungranted becomes granted that either half would not have granted alone. Declares `sq dq hd`.
+21. **Git history-rewrite advisory** (`guard_rule_git_rewrite`) — a `git commit` carrying `--amend`, `-F`, or `--file`, or a `git reset --soft`, gets a `guard_advise` steer carrying the checklist from DOCTRINE.md's *Re-verify volatile state before a git history rewrite* rule (verify HEAD before amend/squash; re-stage and verify staged content after a soft reset; carry the message in the command (`-m`, or `-F -` from a heredoc), and read a file-borne message back after the commit). Advisory, not a block: each is a legitimate command, so the rule injects the re-verification context and lets the command proceed. The DOCTRINE.md rule is cited by **name**, not number — the doctrine's craft rules renumber as it grows, and this ruleset renumbers on its own account too — this rule's own number moved when rules 12 and 13 were inserted ahead of it, again when rule 14 was, again when rule 15 was, again when the append grant landed as rule 17, and again when the bounded-wait grant landed as rule 19 — so a doc-qualified number would rot on either renumber and read ambiguously against the local numbering. Placed after the auto-allow rules (16, 17, 18, 19) and the decorated-allowlist rule (20), so it fires only on a bare rewrite command none of those claimed; a decorated form meets rule 20's block first and the advisory fires on the re-issued bare command.
+22. **Bare `rm` of a tracked path** (`guard_rule_rm_tracked`) — an `rm` statement naming a git-tracked file (`git ls-files --error-unmatch`) is **blocked** with the steer to `git rm -q <path>`, which deletes and stages that one deletion in a single motion. The deletion is the point: a bare `rm` leaves it unstaged, so it lands only via a later `git add -A` — the form the shared-index discipline warns against, since it sweeps a concurrent session's foreign path into the commit. Block, not advise, on rule 20's reasoning: no consumer allowlist is presumed to grant `rm`, so the rule fires on a command that would be decided out of band anyway and converts that decision into a durable steer. Fires per statement (`;`/`&&`/`||`/`|` split), so a decorated form steers on the same premise as the bare one. Conservative by construction: expansions and backticks decline outright (rule 6 already blocks the expansions; the backtick arm is this rule's own), option words are skipped, and a tracked *directory* under `rm -r` does not match `--error-unmatch` — each biases toward passing rather than a false steer. An untracked or gitignored target never matches, so scratch deletion is untouched. **The steer's safety half: a `git rm` carrying its force flag is blocked too.** A `git rm` segment whose options carry `-f` or `--force` is blocked, its subcommand found by rule 14's `_guard_git_subcommand` walk read in that walk's `args` mode. Every spelling git's option parser accepts fires: standalone, in a short cluster (`-qf`, `-rf`), and as an abbreviation of the long form (`--forc`, down to `--f`), since that parser takes any unambiguous prefix of a long option. A word after `--` is a path and ends the walk. The words are read from rule 8's dequoted view, so a quoted `'-f'` is the flag the shell passes, and where that view cannot be aligned the skeleton is read instead. The corrective names three exits: drop the flag, since `git rm` refuses a file with local modifications and says so; `git rm --cached` to untrack the file and keep it; and `!<command>` where the loss is intended. **Why this rule owns the arm.** This rule steers every tracked-path deletion into `git rm -q`, and the force flag is the one spelling of that mandated form that destroys uncommitted work. The arm fires whether or not a grant matches, on rule 20's reasoning: ungranted, the call is decided out of band anyway, and granted by a committed `git rm` glob it is silent data loss.
+23. **Script execution off a body the command string does not carry** (`guard_rule_script_interpreter`) — a command that invokes a script interpreter on a program body it takes from **outside** the command string is **blocked** when that body's source is a path under a `GUARD_KIT_SCRATCH_DIRS` member. Two arms, one predicate: arm **(a)**, the interpreter is `bash` or `sh`, steers to the `--scratch-run` arm — the allowlistable command that echoes the body as it executes; arm **(b)**, the interpreter is a `GUARD_KIT_SCRIPT_INTERPRETERS` member, states the bash-only rule (§scratch-run) and names the same runner. Declares `sq dq hd`. The steer's printed command is **derived**, not hardcoded: `lib/guard.sh` resolves `_guard_door` once at load through gate-sdk's `gate_native_bin_spelled` (gate-sdk/SPEC.md §lib/gate.sh), so a steer names the binary `GATE_SDK_NATIVE_BIN` resolves and a consumer whose binary sits anywhere is told a command that runs. That is a cross-kit coupling — a guard-kit library reading a gate-sdk accessor — and it is admissible on a ground already in the tree: guard-kit already sources `lib/gate.sh` for the knob read every rule depends on, and `lib/guard.sh` is `# no-port:` permanently, so the coupling has one holder and no parity obligation. Resolving it at load rather than per message also means the steers cannot disagree with each other within one call. **The predicate is body visibility, and the discriminator is the same one that bought the runner its grant.** §scratch-run's whole argument is that a scratch path is rewritable by any session, so the body the operator approved is not necessarily the body that runs, and the runner's echo-at-execution is what restores the correspondence. A body carried **in** the command string — `python3 -c 'print(1)'`, a heredoc, a herestring, a literal piped in — *is* the command string: the permission prompt shows it to the approver verbatim and the friction log records it. There is nothing for a compensating control to compensate for, so a rule firing there would refuse a reviewable act in the name of reviewability. **What that argument may not claim, recorded because the obvious phrasing is the wrong way round.** The guard's own matcher does **not** read those bodies: the skeleton this rule declares strips single- and double-quoted spans and heredoc bodies before the rule sees the command. The visibility carrying the ruling is the **approver's**, not the guard's. **Body source, not operand position.** "Names a path operand under a scratch dir" is a *proxy* for "body invisible" and leaks in one direction: a path operand always implies an invisible body, but an invisible body does not need a path operand. So the rule resolves the body source the way the interpreters themselves do — a `-c`/`-e`/`-m` argument (in the command string), else the first bare operand, else stdin — and fires wherever the scratch path turns out to sit: operand, `<` redirect source, the pipe producer's operand, or a substitution operand. **That resolution is also what keeps the rule off legitimate tooling**, and it is exact rather than a carve-out: `python3 tools/gen.py` and `bash <root>/gate-sdk/bin/run-gates.sh --scratch-run .tmp/x.sh` both name a body that is **not** under a scratch dir — a tracked tool in the first, the runner itself in the second, with the scratch path an argument *to* it — so neither fires. The scratch-directory scope is not the proxy the previous paragraph drops: the proxy was operand *position*, and position is what this rule stops caring about. **The substitution shape is covered in both spellings, and rule 6 is why it had to be.** Rule 6's match carries no backtick alternative, so it blocks ``python3 -c "$(cat .tmp/x.py)"`` and passes the identical command spelled with backticks. A guard that blocks one spelling of a shape and passes the other teaches the spelling rather than the rule, so this rule reads both substitution spans; rule 6 merely pre-empts one of them by dispatch order, which is ordering rather than duplication. **It splits statements and then pipes, rather than calling `guard_split_compound`**, and the divergence is forced: what this rule needs is dataflow — whose stdout is the interpreter's stdin — and the shared splitter erases the separator that tells a pipe from a `;`. It is not modelling the harness's per-segment matching surface, which is what that splitter is the single implementation of. **Two honest limits, neither closed here.** A body drawn from outside the scratch dir (`python3 - < /elsewhere/x.py`) is out of scope by the paragraph above, and a body with no path at all (`curl … | python3`) is a wider hazard with nothing to do with scratch execution. Both fall through, and a later reader should meet that recorded rather than infer the rule is complete. **Conservative in this ruleset's established directions**, with one named exception: a `${…}`/`$NAME`/`<(…)`/`>(…)` anywhere in the command declines outright (rule 6 blocks those shapes already), and an interpreter option the walk cannot size declines rather than guess which token is the body — but a **backtick** is deliberately *not* declined on, since it is the one body-source spelling rule 6 does not reach and declining there would ship the hole the rule exists to close. **Placed at the tail, immediately before rule 24.** It grants nothing, so it inherits no auto-allow ordering argument; and a command reaching it has already been declined by every steer and every grant above, which is exactly the population whose body source is worth resolving. Rule 24 grants nothing either, so the order of the two decides only which block a command meeting both receives.
+24. **A committed grant matched only by reaching past its path slot** (`guard_rule_grant_path_slot`) — a segment a committed `Bash(…)` allow pattern matches is **blocked** when that pattern's **path slot** absorbs text reaching outside the path the pattern names. A `*` in a committed pattern is a path slot when the whitespace-delimited token of the pattern carrying it also carries a `/`: in `rm -rf .tmp/*` and `bash */checks/check-*.sh` every `*` is one, and in `git add *` and `bash gate-sdk/bin/run-gates.sh *` none is. The slot is what the pattern's author wrote, so no knob and no vocabulary are needed, and a consumer's `Bash(rm -rf build/*)` is bounded exactly as a scratch-dir grant is. The test, per segment:
+    - **(1) Read the harness view.** The segment's dequoted text — rule 8's dequoted view, quote characters removed and content kept, split on the `sq dq hd` skeleton — with its redirects dropped and its backslashes removed, through `_guard_harness_view`. The skeleton's words say which words are redirects and the dequoted words carry the content, aligned one for one, so a quoted `>` is an operand and a quoted blank stays inside its word.
+    - **(2) Parse the matching pattern.** Each committed pattern that `guard_allow_match` finds matching the view is translated into an anchored regular expression, each `*` a capture group, and the leftmost-greedy parse is taken.
+    - **(3) Test each path slot's capture.** Its first word must be clean, read in the full shell word carrying it; every later non-option word must re-match the slot's own token and be clean itself. A clean word carries no `..` component and does not begin with `/` or `~`. At a slot opening its token, an empty capture opens the path with the literal after the `*`, so `bash /checks/check-x.sh` reads as absolute.
+    - **(4) Decide.** Any unclean word blocks, and the message names the pattern, the word, and what it reaches past — a `..` component, an absolute or home-relative path, or a second operand outside the slot. The corrective is to spell the path inside the pattern's reach or to run the command through `!<command>`. A match with every slot clean declines, and the harness grants correctly.
 
-    **Declines**, in this ruleset's established directions: an expansion,
-    substitution or backtick anywhere in the command, any live `$` included,
-    since the matcher refuses every expansion; a pattern carrying `?` or a
-    bracket class, which is skipped; a segment whose dequoted text carries a
-    quoted statement separator, which is skipped; a heredoc-bearing command,
-    whose dequoted view cannot be aligned; and a failed binary read, no settings file, or a
-    parse error, on `_guard_allow_inners`' fail-open read.
-    **It closes two reaches without re-spelling a grant.** `rm -rf .tmp/../<file>`
-    and `rm -rf .tmp/x <file>` block against a scratch-dir `rm` grant, and
-    `bash ../../evil/checks/check-x.sh` and `bash /elsewhere/checks/check-x.sh`
-    block against a script-runner glob, while the committed globs stay exactly
-    as they are.
-    **Why a guard rule and not a committed deny list.** A deny list matches per
-    subcommand and outranks a hook's allow, which makes it the one
-    harness-enforced layer. It has three disqualifying properties: a deny glob
-    cannot express *a second operand outside the directory*; it inherits the
-    fragility the harness's permission reference names for patterns that
-    constrain arguments; and it is a permission-settings edit, which a consumer
-    may reserve to its operator, so choosing it can decide that no session lands
-    the fix. The rule is derived from the settings it bounds, is testable in the
-    decision table, and lands with the kit. A deny list stays available as a
-    harness-enforced backstop an operator may add independently.
-    **Placed immediately before rule 25.** No auto-allow above it
-    grants a rule-24 subject: rule 16 truncates only, rule 17's emitter bound
-    refuses `rm` and `bash`, rule 18's roster carries neither, rule 19's arm (A)
-    body is `sleep` only, and its arm (B) applies this rule's test as a predicate. Rules 4 and 7 run ahead of it and each emit a rewrite
-    whose envelope carries an allow, so both apply this rule's test as a
-    predicate before that allow attaches, and no rewrite grants a rule-24 subject
-    either. **Taken as a predicate the test fails closed**: it reads a segment
-    carrying a quoted statement separator whole rather than skipping it, and
-    every other decline fails the grant.
-    **Honest limits.** The test is lexical, so a symlink under the slot reaches
-    past it undetected. The leftmost-greedy parse is one parse of a pattern that
-    may admit several. A wrapper option the harness view declines to strip hides
-    a reach the matcher would grant. And a command the rule declines — a
-    heredoc-bearing one among them — is left to the harness's own decision,
-    grant included.
-25. **An emitter write the harness cannot grant** (`guard_rule_emitter_write`) —
-    blocked, with a steer per arm.
-    Every arm reads a statement whose leading command is a `GUARD_KIT_APPEND_BINS`
-    member writing through `>>` or `>`, the shape rule 17 grants, and declare rule
-    17's classes. A statement is what `;`, `&&`, `||` and a newline separate,
-    carrying its own heredoc residue on rule 17's reading.
-    - **(a) Compounded.** The command holds more than one statement, and one of
-      them, issued alone, satisfies every clause of rule 17. The steer is to issue
-      that write as its own call, which rule 17 grants with no permission decision,
-      and the rest as a separate call.
-    - **(b) A target git does not ignore.** The statement is the whole command, and
-      a target fails rule 17's `git check-ignore` test. The steer is the harness's
-      Write or Edit tool for a file, or the capture arm that owns the surface when
-      the target is one: the tool is reviewable where a redirect is not, and the arm
-      keeps the surface's grammar.
-    - **(c) Compounded, to a target git does not ignore.** The command holds more
-      than one statement, and one of them is a write both arms above leave: not
-      every target is gitignored, so arm (a) does not fire, and it is not the whole
-      command, so arm (b) does not. The steer is to write that file with the Write
-      or Edit tool as its own call and issue the rest separately. It is the
-      composition of (a) and (b), and with it every emitter write statement meets
-      rule 17's grant, one of these three arms, or one of the declines below. A
-      statement whose targets are mixed, one gitignored and one not, is arm (c)'s,
-      since arm (a)'s premise that the write alone would be granted is false for it.
-      Statements are read in order, and the first that qualifies blocks.
+    **Declines**, in this ruleset's established directions: an expansion, substitution or backtick anywhere in the command, any live `$` included, since the matcher refuses every expansion; a pattern carrying `?` or a bracket class, which is skipped; a segment whose dequoted text carries a quoted statement separator, which is skipped; a heredoc-bearing command, whose dequoted view cannot be aligned; and a failed binary read, no settings file, or a parse error, on `_guard_allow_inners`' fail-open read. **It closes two reaches without re-spelling a grant.** `rm -rf .tmp/../<file>` and `rm -rf .tmp/x <file>` block against a scratch-dir `rm` grant, and `bash ../../evil/checks/check-x.sh` and `bash /elsewhere/checks/check-x.sh` block against a script-runner glob, while the committed globs stay exactly as they are. **Why a guard rule and not a committed deny list.** A deny list matches per subcommand and outranks a hook's allow, which makes it the one harness-enforced layer. It has three disqualifying properties: a deny glob cannot express *a second operand outside the directory*; it inherits the fragility the harness's permission reference names for patterns that constrain arguments; and it is a permission-settings edit, which a consumer may reserve to its operator, so choosing it can decide that no session lands the fix. The rule is derived from the settings it bounds, is testable in the decision table, and lands with the kit. A deny list stays available as a harness-enforced backstop an operator may add independently. **Placed immediately before rule 25.** No auto-allow above it grants a rule-24 subject: rule 16 truncates only, rule 17's emitter bound refuses `rm` and `bash`, rule 18's roster carries neither, rule 19's arm (A) body is `sleep` only, and its arm (B) applies this rule's test as a predicate. Rules 4 and 7 run ahead of it and each emit a rewrite whose envelope carries an allow, so both apply this rule's test as a predicate before that allow attaches, and no rewrite grants a rule-24 subject either. **Taken as a predicate the test fails closed**: it reads a segment carrying a quoted statement separator whole rather than skipping it, and every other decline fails the grant. **Honest limits.** The test is lexical, so a symlink under the slot reaches past it undetected. The leftmost-greedy parse is one parse of a pattern that may admit several. A wrapper option the harness view declines to strip hides a reach the matcher would grant. And a command the rule declines — a heredoc-bearing one among them — is left to the harness's own decision, grant included.
+25. **An emitter write the harness cannot grant** (`guard_rule_emitter_write`) — blocked, with a steer per arm. Every arm reads a statement whose leading command is a `GUARD_KIT_APPEND_BINS` member writing through `>>` or `>`, the shape rule 17 grants, and declare rule 17's classes. A statement is what `;`, `&&`, `||` and a newline separate, carrying its own heredoc residue on rule 17's reading.
+    - **(a) Compounded.** The command holds more than one statement, and one of them, issued alone, satisfies every clause of rule 17. The steer is to issue that write as its own call, which rule 17 grants with no permission decision, and the rest as a separate call.
+    - **(b) A target git does not ignore.** The statement is the whole command, and a target fails rule 17's `git check-ignore` test. The steer is the harness's Write or Edit tool for a file, or the capture arm that owns the surface when the target is one: the tool is reviewable where a redirect is not, and the arm keeps the surface's grammar.
+    - **(c) Compounded, to a target git does not ignore.** The command holds more than one statement, and one of them is a write both arms above leave: not every target is gitignored, so arm (a) does not fire, and it is not the whole command, so arm (b) does not. The steer is to write that file with the Write or Edit tool as its own call and issue the rest separately. It is the composition of (a) and (b), and with it every emitter write statement meets rule 17's grant, one of these three arms, or one of the declines below. A statement whose targets are mixed, one gitignored and one not, is arm (c)'s, since arm (a)'s premise that the write alone would be granted is false for it. Statements are read in order, and the first that qualifies blocks.
 
-    **Declines**, in this ruleset's established directions: rule 17's clause (d),
-    read over the whole command; a backgrounded command, which is rule 15's subject
-    and whose canonical recorded launch writes its record through an emitter to a
-    gitignored target, so arm (a) would otherwise refuse the spelling rule 15
-    mandates; a statement on a line whose heredoc openers sit in more than one
-    statement, whose residue cannot be attributed; and, for arms (b) and (c), a
-    target under `/dev/`, which is no file a Write or Edit tool can take.
-    Arm (a) is the measured class: every prompting gitignored-target append in the
-    friction log it was cut from was compounded or ran past the log's truncation.
-    Arm (b) fired on lone writes to tracked targets once it shipped, and arm (c) was
-    cut from the compounded shape that still fell through beside it: writes led by
-    `cat`, `printf` or `echo` to a repo-relative target outside the scratch set,
-    chained to another statement.
-    The destination test every arm needs is rule 17's, so no consumer roster is owed,
-    and no steer names a capture arm or its surface: that would put another
-    kit's surfaces inside guard-kit, a destination roster a consumer would then keep
-    in step, where the generic steer lets the agent's own instructions name the arm.
-26. **A `bash -c` or `sh -c` wrapper** (`guard_rule_shell_wrapper`) — blocked,
-    with the steer to run the payload
-    as the command itself, or, for a body that needs a shell of its own, to write it
-    to a scratch script and run it through the `--scratch-run` arm. Fires when a
-    segment's first word is `bash` or `sh` and its next word is `-c`. The wrapper
-    puts the whole payload inside one quoted argument, which the skeleton strips, so
-    no allowlist entry and no rule above can see the command inside it. That makes
-    the wrapper a steering target on its own terms, whatever it wraps. Declares
-    `sq dq hd`.
-    **What it does not reach.** A wrapper behind another command word,
-    `xargs bash -c` or `timeout 5 bash -c`, is out of scope: the leading word decides
-    which rule reads the call, and each of those leads is its own rule's subject. A
-    `bash <script>` naming a scratch path is rule 23's.
+    **Declines**, in this ruleset's established directions: rule 17's clause (d), read over the whole command; a backgrounded command, which is rule 15's subject and whose canonical recorded launch writes its record through an emitter to a gitignored target, so arm (a) would otherwise refuse the spelling rule 15 mandates; a statement on a line whose heredoc openers sit in more than one statement, whose residue cannot be attributed; and, for arms (b) and (c), a target under `/dev/`, which is no file a Write or Edit tool can take. Arm (a) is the measured class: every prompting gitignored-target append in the friction log it was cut from was compounded or ran past the log's truncation. Arm (b) fired on lone writes to tracked targets once it shipped, and arm (c) was cut from the compounded shape that still fell through beside it: writes led by `cat`, `printf` or `echo` to a repo-relative target outside the scratch set, chained to another statement. The destination test every arm needs is rule 17's, so no consumer roster is owed, and no steer names a capture arm or its surface: that would put another kit's surfaces inside guard-kit, a destination roster a consumer would then keep in step, where the generic steer lets the agent's own instructions name the arm.
+26. **A `bash -c` or `sh -c` wrapper** (`guard_rule_shell_wrapper`) — blocked, with the steer to run the payload as the command itself, or, for a body that needs a shell of its own, to write it to a scratch script and run it through the `--scratch-run` arm. Fires when a segment's first word is `bash` or `sh` and its next word is `-c`. The wrapper puts the whole payload inside one quoted argument, which the skeleton strips, so no allowlist entry and no rule above can see the command inside it. That makes the wrapper a steering target on its own terms, whatever it wraps. Declares `sq dq hd`. **What it does not reach.** A wrapper behind another command word, `xargs bash -c` or `timeout 5 bash -c`, is out of scope: the leading word decides which rule reads the call, and each of those leads is its own rule's subject. A `bash <script>` naming a scratch path is rule 23's.
 
-    Both rules block rather than advise, on rule 20's reasoning: the call would take
-    a permission decision anyway, and a block turns that decision into a durable
-    steer at no extra cost, where an advise would fall through to the same prompt
-    and teach nothing durable. Both sit at the tail, after rule 24, because neither
-    grants anything and a command reaching them has been declined by every grant
-    above.
+    Both rules block rather than advise, on rule 20's reasoning: the call would take a permission decision anyway, and a block turns that decision into a durable steer at no extra cost, where an advise would fall through to the same prompt and teach nothing durable. Both sit at the tail, after rule 24, because neither grants anything and a command reaching them has been declined by every grant above.
 
-**Fall-through logging closes every call and is no rule:** after
-`guard_generic_rules` returns, the template guard's `guard_log_fallthrough`
-appends anything neither blocked nor auto-allowed to the friction log. It runs
-last and never affects the decision.
+**Fall-through logging closes every call and is no rule:** after `guard_generic_rules` returns, the template guard's `guard_log_fallthrough` appends anything neither blocked nor auto-allowed to the friction log. It runs last and never affects the decision.
 
-**Nothing above claims the sleep half was already enforced.** Before rule 13, no
-rule in this ruleset enforced the never-poll rule's `sleep` half and rule 13 is
-the first; whether a mechanism *outside* a consumer's tree blocks a foreground
-`sleep` is an open question, unprobed as to cause, and no clause here rests a
-coverage claim on one. The rule is built as though nothing outside the tree
-enforced it — the only construction that is correct whichever way that resolves.
+**Nothing above claims the sleep half was already enforced.** Before rule 13, no rule in this ruleset enforced the never-poll rule's `sleep` half and rule 13 is the first; whether a mechanism *outside* a consumer's tree blocks a foreground `sleep` is an open question, unprobed as to cause, and no clause here rests a coverage claim on one. The rule is built as though nothing outside the tree enforced it — the only construction that is correct whichever way that resolves.
 
 ### Writing a consumer rule
 
-Project rules — build-cache hygiene, container-build concurrency,
-test-suite serialization, disk reclaim, tool-specific steering — live in a
-marked section of the consumer's copied `bash-guard.sh`, before the generic
-ruleset. Two ordering disciplines, attested in production use and kept as
-guidance: a command about to be *blocked* must never first trigger a
-side-effecting rule (place blocks before any reclaim/cleanup rule), and a
-steering rule must precede the broader rule that would catch the same
-command less precisely. A third, on the match surface: a substring rule
-sees the entire tool input, heredoc bodies included, so prose that merely
-*names* a guarded command — a `git commit -F -` message describing one —
-false-blocks. Match against a `guard_skeleton` view naming the classes inert
-for the rule (`sq dq hd` for any rule that does not itself test for an
-expansion), which neutralizes quoted spans and heredoc bodies alike, and keep
-longer prose out of the match surface via a quoted `-m` span or a `-F <file>`
-the hook never reads.
+Project rules — build-cache hygiene, container-build concurrency, test-suite serialization, disk reclaim, tool-specific steering — live in a marked section of the consumer's copied `bash-guard.sh`, before the generic ruleset. Two ordering disciplines, attested in production use and kept as guidance: a command about to be *blocked* must never first trigger a side-effecting rule (place blocks before any reclaim/cleanup rule), and a steering rule must precede the broader rule that would catch the same command less precisely. A third, on the match surface: a substring rule sees the entire tool input, heredoc bodies included, so prose that merely *names* a guarded command — a `git commit -F -` message describing one — false-blocks. Match against a `guard_skeleton` view naming the classes inert for the rule (`sq dq hd` for any rule that does not itself test for an expansion), which neutralizes quoted spans and heredoc bodies alike, and keep longer prose out of the match surface via a quoted `-m` span or a `-F <file>` the hook never reads.
 
 ## scratch-run
 
-`--scratch-run <script> [args…]` closes a loop the steering rules
-themselves open. **The member is the gate binary's arm**, reached through the
-front end as `bash gate-sdk/bin/run-gates.sh --scratch-run <script> [args…]`;
-the heading is a section name, not a file name, and it keeps this spelling
-because the citations pointing here resolve against it. The `--emit-` prefix is
-load-bearing (gate-sdk/SPEC.md §The non-gate arm) and this member is a runner,
-so it is spelled bare, the shape `--wait-probe` and `--upgrade-smoke` take. The generic ruleset pushes probes and multi-line sweeps
-into the consumer's gitignored scratch dir (`GATE_SDK_TMP_DIR`) and refuses
-the harness scratchpad by name — yet nothing allowlists *executing* what
-lands there, so every run of a steered-to script is decided out of band, forever. The
-runner is the fixed, allowlistable path that ends it: given a target inside
-the scratch dir it **echoes the script's contents to stdout** (a header
-naming the path, then the body), then **executes it**, passing stdout,
-stderr and the child's exit code through and forwarding `[args…]` verbatim
-without interpreting them.
+`--scratch-run <script> [args…]` closes a loop the steering rules themselves open. **The member is the gate binary's arm**, reached through the front end as `bash gate-sdk/bin/run-gates.sh --scratch-run <script> [args…]`; the heading is a section name, not a file name, and it keeps this spelling because the citations pointing here resolve against it. The `--emit-` prefix is load-bearing (gate-sdk/SPEC.md §The non-gate arm) and this member is a runner, so it is spelled bare, the shape `--wait-probe` and `--upgrade-smoke` take. The generic ruleset pushes probes and multi-line sweeps into the consumer's gitignored scratch dir (`GATE_SDK_TMP_DIR`) and refuses the harness scratchpad by name — yet nothing allowlists *executing* what lands there, so every run of a steered-to script is decided out of band, forever. The runner is the fixed, allowlistable path that ends it: given a target inside the scratch dir it **echoes the script's contents to stdout** (a header naming the path, then the body), then **executes it**, passing stdout, stderr and the child's exit code through and forwarding `[args…]` verbatim without interpreting them.
 
-The echo is the point, not a convenience. A bare scratch-glob allowlist
-would auto-approve executing any script at that path with its contents
-visible only in an earlier write call — turning a visible command into a
-silent *and* opaque one, the opposite of what the permission decision was buying.
-Echo-at-execution makes the silent run **self-documenting**: the executed
-lines land in the transcript at the moment they run, which is the evidence
-surface a supervisor's post-commit review reads. Steering the agent to
-inline the script instead is known-insufficient — it serves a short probe
-and not the genuine multi-line sweeps (loops, arrays, command
-substitution) that are exactly the recurring case.
+The echo is the point, not a convenience. A bare scratch-glob allowlist would auto-approve executing any script at that path with its contents visible only in an earlier write call — turning a visible command into a silent *and* opaque one, the opposite of what the permission decision was buying. Echo-at-execution makes the silent run **self-documenting**: the executed lines land in the transcript at the moment they run, which is the evidence surface a supervisor's post-commit review reads. Steering the agent to inline the script instead is known-insufficient — it serves a short probe and not the genuine multi-line sweeps (loops, arrays, command substitution) that are exactly the recurring case.
 
-**What the allowlist entry buys, and what it costs.** The consumer's entry
-names this fixed path with a wildcard tail, and a guard only ever inspects
-the **outer command string** — so an allowlisted invocation of the runner
-carries no expansion and no decoration, passes, and the script's
-*contents* are never guard-inspected at all. State that plainly rather than
-as a convenience: the generic rules that would refuse an expansion-bearing
-one-liner do not reach the same code once it sits inside a scratch file.
-The echoed body is the **compensating control**, and it relocates review
-rather than removing it — from *before* execution, where the permission
-decision put it, to *after*, in the transcript a supervisor reads. That is
-the actual posture of the entry.
+**What the allowlist entry buys, and what it costs.** The consumer's entry names this fixed path with a wildcard tail, and a guard only ever inspects the **outer command string** — so an allowlisted invocation of the runner carries no expansion and no decoration, passes, and the script's *contents* are never guard-inspected at all. State that plainly rather than as a convenience: the generic rules that would refuse an expansion-bearing one-liner do not reach the same code once it sits inside a scratch file. The echoed body is the **compensating control**, and it relocates review rather than removing it — from *before* execution, where the permission decision put it, to *after*, in the transcript a supervisor reads. That is the actual posture of the entry.
 
-**The consumer's opt-out is retired, knowingly, and the sentence that sold it is
-replaced rather than deleted.** This section used to tell a consumer unwilling to
-move review downstream to simply not add the grant — the tool still ran without
-it. Post-port that is false: the runner is an arm-table member, so it is reachable
-wherever the battery front end is, and a consumer cannot decline scratch
-execution without declining the battery. What a consumer loses is the ability to
-**separate** the two decisions; what is unchanged is the compensating control
-itself, which lives in the code and never lived in the grant. This is a **taken
-cost, not a discovery**: the removal-only shape was taken with this retirement
-named in the question. It does **not** establish that a port may retire a
-consumer guarantee whenever a family rule forces its hand — retiring one is an
-escalation rather than a decision inside the cut, and a later cut proposing
-another owes its own.
+**The consumer's opt-out is retired, knowingly, and the sentence that sold it is replaced rather than deleted.** This section used to tell a consumer unwilling to move review downstream to simply not add the grant — the tool still ran without it. Post-port that is false: the runner is an arm-table member, so it is reachable wherever the battery front end is, and a consumer cannot decline scratch execution without declining the battery. What a consumer loses is the ability to **separate** the two decisions; what is unchanged is the compensating control itself, which lives in the code and never lived in the grant. This is a **taken cost, not a discovery**: the removal-only shape was taken with this retirement named in the question. It does **not** establish that a port may retire a consumer guarantee whenever a family rule forces its hand — retiring one is an escalation rather than a decision inside the cut, and a later cut proposing another owes its own.
 
-**Scratch execution is bash-only, and the runner's hardcoded interpreter is the
-statement of that rule rather than an unexamined default.** Executing a program
-body that lives under a scratch directory is bash-only; rule 23 is the
-command-line half of the enforcement and the shebang refusal below is the
-runner's own half.
+**Scratch execution is bash-only, and the runner's hardcoded interpreter is the statement of that rule rather than an unexamined default.** Executing a program body that lives under a scratch directory is bash-only; rule 23 is the command-line half of the enforcement and the shebang refusal below is the runner's own half.
 
-**Why widening the runner is refused outright rather than costed.** Teaching it
-a second interpreter is not merely more expensive, it is wrong: the runner is
-reached through a committed allowlist grant naming this fixed path, and that
-grant was bought by one specific compensating control — the runner echoes the
-body it is about to execute, and it only ever hands that body to `bash`. A
-second interpreter converts a grant for *"run bash on a reviewed body"* into one
-for *"run anything on a reviewed body"* **with no settings edit**, widening a
-permission behind the boundary the consumer's operator owns, through a code
-change no permission gate reads. That is a security argument rather than a cost
-one, and it stands on its own.
+**Why widening the runner is refused outright rather than costed.** Teaching it a second interpreter is not merely more expensive, it is wrong: the runner is reached through a committed allowlist grant naming this fixed path, and that grant was bought by one specific compensating control — the runner echoes the body it is about to execute, and it only ever hands that body to `bash`. A second interpreter converts a grant for *"run bash on a reviewed body"* into one for *"run anything on a reviewed body"* **with no settings edit**, widening a permission behind the boundary the consumer's operator owns, through a code change no permission gate reads. That is a security argument rather than a cost one, and it stands on its own.
 
-**A grant naming a fixed path cannot be edited into its successor, and that
-structural fact stands; what it prices does not.** A permission set is matched,
-not versioned, so a *relocated* arm is a different command string and the old
-entry cannot become the new one without a window where neither runs. What this
-section used to conclude from that — *and that is what prices the work* — the
-port to an arm-table member falsified. Under gate-sdk/SPEC.md §The non-gate arm's
-forced-family test the runner is an **arm-table member**, so its new command string is
-the battery **front end's**, which a consumer's front-end grant already buys
-whole: any addition owed is that grant, bought once for every non-gate arm, and
-not a decision about scratch execution at all. A consumer running lifecycle
-stages already holds it; one running only the generated pre-commit hook may not,
-and owes the front-end grant rather than this tool's. So this port forced a
-**removal** and no addition — and the opposite case was always outside the bar:
-dropping a grant whose target a change deletes is a pure narrowing, forced by the
-change and landing in the same commit as it.
+**A grant naming a fixed path cannot be edited into its successor, and that structural fact stands; what it prices does not.** A permission set is matched, not versioned, so a *relocated* arm is a different command string and the old entry cannot become the new one without a window where neither runs. What this section used to conclude from that — *and that is what prices the work* — the port to an arm-table member falsified. Under gate-sdk/SPEC.md §The non-gate arm's forced-family test the runner is an **arm-table member**, so its new command string is the battery **front end's**, which a consumer's front-end grant already buys whole: any addition owed is that grant, bought once for every non-gate arm, and not a decision about scratch execution at all. A consumer running lifecycle stages already holds it; one running only the generated pre-commit hook may not, and owes the front-end grant rather than this tool's. So this port forced a **removal** and no addition — and the opposite case was always outside the bar: dropping a grant whose target a change deletes is a pure narrowing, forced by the change and landing in the same commit as it.
 
-**What bash-only costs, stated rather than glossed.** It removes a capability: a
-session wanting a Python scratch script must write a `.sh` that invokes Python
-with the body inline, or do the work in a language the control covers. The
-narrowing is taken deliberately — the population of non-bash scratch runs is
-small while the control's silent hole applied to every one of them.
+**What bash-only costs, stated rather than glossed.** It removes a capability: a session wanting a Python scratch script must write a `.sh` that invokes Python with the body inline, or do the work in a language the control covers. The narrowing is taken deliberately — the population of non-bash scratch runs is small while the control's silent hole applied to every one of them.
 
-**The runner refuses a non-bash shebang, and it reads the file rather than a
-roster.** It already `cat`s the target before executing, so it holds the body:
-when line one is a `#!` naming an interpreter that is neither `bash` nor `sh`
-(resolving the `/usr/bin/env <interp>` spelling to the same answer) it exits 2
-naming the bash-only rule, before the echo — so a refusal still prints no body
-and stays distinguishable from a child that exited 2. A target with **no**
-shebang is unaffected, which keeps every `.sh` the runner handles today working.
-That is **exact** where a roster is approximate, and it is derivation-first: the
-file states its own interpreter. Two mechanisms, each exact for the input it
-actually has — the guard has a command string and no file, the runner has a
-file, and this is why the arm deliberately does not read
-`GUARD_KIT_SCRIPT_INTERPRETERS` and does not declare it. A port that declared the
-knob because it sits in the kit's namespace would retire that reasoning by
-accident.
+**The runner refuses a non-bash shebang, and it reads the file rather than a roster.** It already `cat`s the target before executing, so it holds the body: when line one is a `#!` naming an interpreter that is neither `bash` nor `sh` (resolving the `/usr/bin/env <interp>` spelling to the same answer) it exits 2 naming the bash-only rule, before the echo — so a refusal still prints no body and stays distinguishable from a child that exited 2. A target with **no** shebang is unaffected, which keeps every `.sh` the runner handles today working. That is **exact** where a roster is approximate, and it is derivation-first: the file states its own interpreter. Two mechanisms, each exact for the input it actually has — the guard has a command string and no file, the runner has a file, and this is why the arm deliberately does not read `GUARD_KIT_SCRIPT_INTERPRETERS` and does not declare it. A port that declared the knob because it sits in the kit's namespace would retire that reasoning by accident.
 
-**What deliberately does not become config: the policy.** Bash-only is a rule,
-not a setting, and a knob that turned it off would restore the honour system the
-rule replaces. The valve is not vendoring the rule.
+**What deliberately does not become config: the policy.** Bash-only is a rule, not a setting, and a knob that turned it off would restore the honour system the rule replaces. The valve is not vendoring the rule.
 
-**Fail-closed on reach.** A target resolving outside the scratch dir is
-refused before any echo or execution, so the tool cannot become a general
-"run this arbitrary path unreviewed" bypass: its reach is exactly the
-scratch surface the guard already steers into. The test reads the
-*resolved* path, never the spelling, so a traversal out of the dir refuses
-like any other outsider. Refusal, an absent target, and a missing argument
-are each exit 2 — which the passthrough makes ambiguous by construction,
-since a child exiting 2 is indistinguishable by code alone; the echo is the
-discriminator, as a refusal prints no body.
+**Fail-closed on reach.** A target resolving outside the scratch dir is refused before any echo or execution, so the tool cannot become a general "run this arbitrary path unreviewed" bypass: its reach is exactly the scratch surface the guard already steers into. The test reads the *resolved* path, never the spelling, so a traversal out of the dir refuses like any other outsider. Refusal, an absent target, and a missing argument are each exit 2 — which the passthrough makes ambiguous by construction, since a child exiting 2 is indistinguishable by code alone; the echo is the discriminator, as a refusal prints no body.
 
-**The resolution is what forces the mechanism, and the cheaper alternative is
-refused on security rather than on cost.** *Resolved, never the spelling* means
-the arm resolves through `walk::canonicalize` — the crate's only
-`std::fs::canonicalize` (gate-sdk/SPEC.md §The crate's crosser), whose dialect
-obligation this caller inherits: the comparison runs on two answers from that one
-producer, never on one canonicalized path against one composed string. The
-crate's ordinary shape — an absolutise, a lexical normalize and a prefix
-compare — handles a `..` traversal but does **not** follow a **symlink** out of
-the scratch dir, so a symlink planted inside would pass a test the shell form
-fails. That is a narrowing of a fail-closed control, which this paragraph's own
-rule forbids, and the seam test asserts the symlink case rather than assuming it.
+**The resolution is what forces the mechanism, and the cheaper alternative is refused on security rather than on cost.** *Resolved, never the spelling* means the arm resolves through `walk::canonicalize` — the crate's only `std::fs::canonicalize` (gate-sdk/SPEC.md §The crate's crosser), whose dialect obligation this caller inherits: the comparison runs on two answers from that one producer, never on one canonicalized path against one composed string. The crate's ordinary shape — an absolutise, a lexical normalize and a prefix compare — handles a `..` traversal but does **not** follow a **symlink** out of the scratch dir, so a symlink planted inside would pass a test the shell form fails. That is a narrowing of a fail-closed control, which this paragraph's own rule forbids, and the seam test asserts the symlink case rather than assuming it.
 
-Content-agnostic generic mechanism: the scratch dir comes from gate-sdk's
-existing `GATE_SDK_TMP_DIR` and no kit knob is added — and that knob is now
-actually **resolved** from gate-sdk's table and the consumer's knob file, where
-the standalone script sourced no config and read it straight from the process
-environment, so a consumer setting it in their gates-dir config got a runner that
-ignored it. The port is a fix there rather than a translation, and it does not
-disturb how the knob is driven under test: an environment-set value still wins,
-because a scalar's environment value outranks every file (gate-sdk/SPEC.md §The
-knob file). The consumer's allowlist entry is that consumer's
-settings, never a kit literal.
+Content-agnostic generic mechanism: the scratch dir comes from gate-sdk's existing `GATE_SDK_TMP_DIR` and no kit knob is added — and that knob is now actually **resolved** from gate-sdk's table and the consumer's knob file, where the standalone script sourced no config and read it straight from the process environment, so a consumer setting it in their gates-dir config got a runner that ignored it. The port is a fix there rather than a translation, and it does not disturb how the knob is driven under test: an environment-set value still wins, because a scalar's environment value outranks every file (gate-sdk/SPEC.md §The knob file). The consumer's allowlist entry is that consumer's settings, never a kit literal.
 
-**This section's port-owed set is empty.** Every surface declaring it is now
-either in-crate — `native/src/emit/scratch_run.rs` and its `ARMS` row —
-or declared `# no-port:` (`lib/guard.sh`, which composes rule 23's steer). The
-seam cases stay in `gate-tests/scratch-run.test.sh`, on the shell substrate by
-their own nature. `bin/scratch-run.sh` was the one owed surface and its port took <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
-it, so **no later port cut is sequenced against this section**.
+**This section's port-owed set is empty.** Every surface declaring it is now either in-crate — `native/src/emit/scratch_run.rs` and its `ARMS` row — or declared `# no-port:` (`lib/guard.sh`, which composes rule 23's steer). The seam cases stay in `gate-tests/scratch-run.test.sh`, on the shell substrate by their own nature. `bin/scratch-run.sh` was the one owed surface and its port took <!-- manifest-temporal-exempt: retirement record, names a shell file since removed --> it, so **no later port cut is sequenced against this section**.
 
 ## rewrite
 
-`--rewrite [--regex] [--expect <n>] [--] <find> <replace> <file>…` replaces text in the named files
-and does nothing else. It is reached through the front-end as
-`bash gate-sdk/bin/run-gates.sh --rewrite …`, and it is the steer target of rule 8's in-place arms.
-The `--emit-` prefix is load-bearing (gate-sdk/SPEC.md §The non-gate arm) and this member writes
-files, so it is spelled bare, as `--scratch-run` is. Its module is `native/src/emit/rewrite.rs`; it
-spawns no program.
+`--rewrite [--regex] [--expect <n>] [--] <find> <replace> <file>…` replaces text in the named files and does nothing else. It is reached through the front-end as `bash gate-sdk/bin/run-gates.sh --rewrite …`, and it is the steer target of rule 8's in-place arms. The `--emit-` prefix is load-bearing (gate-sdk/SPEC.md §The non-gate arm) and this member writes files, so it is spelled bare, as `--scratch-run` is. Its module is `native/src/emit/rewrite.rs`; it spawns no program.
 
 Two richer forms are refused, and both fall to the Edit tool or to `!<command>`:
 
-- **Capture-group replacement** would need a substitution engine inside the matcher, which
-  gate-sdk/SPEC.md §The POSIX ERE matcher sizes out, and a backreference makes the output depend on
-  the matched text — the unpredictability the arm exists to remove.
-- **A pattern read from a file** would make the program invisible on the command line, the hazard
-  rule 23 blocks for scripts.
+- **Capture-group replacement** would need a substitution engine inside the matcher, which gate-sdk/SPEC.md §The POSIX ERE matcher sizes out, and a backreference makes the output depend on the matched text — the unpredictability the arm exists to remove.
+- **A pattern read from a file** would make the program invisible on the command line, the hazard rule 23 blocks for scripts.
 
 **What a match is.**
 
-- **Without `--regex`**, `<find>` is a literal matched over each file's whole content, so a match
-  may span lines. Three escapes are read, left to right, in both `<find>` and `<replace>`: `\n`
-  (newline), `\t` (tab) and `\\` (backslash). Any other backslash is literal. A multi-line edit can
-  therefore stay on one command line. An empty `<find>` is a refusal, since it matches everywhere.
-- **With `--regex`**, `<find>` is a POSIX extended regular expression (gate-sdk/SPEC.md §The POSIX
-  ERE matcher), applied line by line. A match never spans a newline, and `^` and `$` anchor at the
-  line's ends. A trailing newline ends the last line and opens none, so an empty file holds no line.
-  Matches are leftmost-longest and non-overlapping, scanning on from each match's end. An empty
-  match advances one byte.
-- `<replace>` is always literal text after the three escapes. There are no backreferences and
-  nothing is evaluated.
+- **Without `--regex`**, `<find>` is a literal matched over each file's whole content, so a match may span lines. Three escapes are read, left to right, in both `<find>` and `<replace>`: `\n` (newline), `\t` (tab) and `\\` (backslash). Any other backslash is literal. A multi-line edit can therefore stay on one command line. An empty `<find>` is a refusal, since it matches everywhere.
+- **With `--regex`**, `<find>` is a POSIX extended regular expression (gate-sdk/SPEC.md §The POSIX ERE matcher), applied line by line. A match never spans a newline, and `^` and `$` anchor at the line's ends. A trailing newline ends the last line and opens none, so an empty file holds no line. Matches are leftmost-longest and non-overlapping, scanning on from each match's end. An empty match advances one byte.
+- `<replace>` is always literal text after the three escapes. There are no backreferences and nothing is evaluated.
 
-**What it reports.** For every replaced span the arm prints `<file>:<line>:`, the original lines the
-span touched, each prefixed `-`, and those lines as the file now reads, each prefixed `+`. A span
-that deleted whole lines prints no `+` line, and two spans on one line each print that line's final
-form. A file with no match is named on a line of its own (`<file>: no match`) and left untouched.
-The arm then prints one summary line: `rewrite: <n> replacement(s) in <k> of <m> file(s)`.
+**What it reports.** For every replaced span the arm prints `<file>:<line>:`, the original lines the span touched, each prefixed `-`, and those lines as the file now reads, each prefixed `+`. A span that deleted whole lines prints no `+` line, and two spans on one line each print that line's final form. A file with no match is named on a line of its own (`<file>: no match`) and left untouched. The arm then prints one summary line: `rewrite: <n> replacement(s) in <k> of <m> file(s)`.
 
 **Exit status.**
 
 - **0** — at least one replacement was written.
-- **1** — nothing was written, for one of two reasons: no operand matched, or `--expect <n>` was
-  given and the total differs from `<n>`, which prints the matched counts beside `<n>` and no span.
-  `--expect` is the Edit tool's missing-or-ambiguous check carried to a sweep.
-- **2** — a refusal. The usage (on stderr), an unparseable pattern, or an operand refused below.
-  Every refusal happens before the first write.
+- **1** — nothing was written, for one of two reasons: no operand matched, or `--expect <n>` was given and the total differs from `<n>`, which prints the matched counts beside `<n>` and no span. `--expect` is the Edit tool's missing-or-ambiguous check carried to a sweep.
+- **2** — a refusal. The usage (on stderr), an unparseable pattern, or an operand refused below. Every refusal happens before the first write.
 
-An unrecognized `-`-prefixed argument before `--` is a refusal, wherever it sits among the operands,
-and `--` ends option processing, so a `<find>` or `<replace>` beginning with `-` stays reachable
-(gate-sdk/SPEC.md §The bin/-tool contract's shape half). Help lives at the refusal and in
-guard-kit/README.md, as for §compare-settings-allow.
+An unrecognized `-`-prefixed argument before `--` is a refusal, wherever it sits among the operands, and `--` ends option processing, so a `<find>` or `<replace>` beginning with `-` stays reachable (gate-sdk/SPEC.md §The bin/-tool contract's shape half). Help lives at the refusal and in guard-kit/README.md, as for §compare-settings-allow.
 
 **An operand is refused, and nothing is written, when any of these holds:**
 
 - it is not an existing regular file, or it is a symlink — both read off the operand as given;
-- its canonical path is not inside the canonical working directory, which the front-end sets to the
-  repository root (both sides resolved through `walk::canonicalize`, gate-sdk/SPEC.md §The crate's
-  crosser, and compared with §scratch-run's boundary test);
-- a component of its path is `.git`, tested on the operand as given and again on its canonical path
-  below the root, so a symlinked directory into `.git` is refused too;
-- it resolves to the lifecycle state file (lifecycle-kit/SPEC.md §check-stage-evidence, the
-  `workflow-state-guard` paragraph), tested with that hook's own predicate, `is_state_file`, and a
-  predicate that cannot resolve `GATE_SDK_WORKFLOW_DIR` is a refusal where the hook advises: a writer
-  that cannot tell whether it is about to write the state file must not write;
-- its content, or the content the rewrite would produce, is not UTF-8 or carries a NUL byte — the
-  matcher is byte-wise, so a match can split a multi-byte character;
+- its canonical path is not inside the canonical working directory, which the front-end sets to the repository root (both sides resolved through `walk::canonicalize`, gate-sdk/SPEC.md §The crate's crosser, and compared with §scratch-run's boundary test);
+- a component of its path is `.git`, tested on the operand as given and again on its canonical path below the root, so a symlinked directory into `.git` is refused too;
+- it resolves to the lifecycle state file (lifecycle-kit/SPEC.md §check-stage-evidence, the `workflow-state-guard` paragraph), tested with that hook's own predicate, `is_state_file`, and a predicate that cannot resolve `GATE_SDK_WORKFLOW_DIR` is a refusal where the hook advises: a writer that cannot tell whether it is about to write the state file must not write;
+- its content, or the content the rewrite would produce, is not UTF-8 or carries a NUL byte — the matcher is byte-wise, so a match can split a multi-byte character;
 - it names the same canonical file as an earlier operand.
 
-**The write.** Every operand is read, checked and rewritten in memory before the first byte is
-written. Each changed file is then written to a temporary file in its own directory and renamed over
-the original, with the original's permission bits, and its spans print once it is replaced. An I/O
-error part-way through is exit 2, and the message names the files already replaced, since a rename
-already done is not undone.
+**The write.** Every operand is read, checked and rewritten in memory before the first byte is written. Each changed file is then written to a temporary file in its own directory and renamed over the original, with the original's permission bits, and its spans print once it is replaced. An I/O error part-way through is exit 2, and the message names the files already replaced, since a rename already done is not undone.
 
 ### The rewrite arm's security posture
 
-**Its reach is narrower than what it replaces, and the grant it rides is not widened.** The arm is
-reached through the front-end grant a consumer already holds, so it needs no settings edit. That is
-the shape §scratch-run refuses for a second interpreter, and the difference is what the two widenings
-would add. Teaching the runner a second interpreter turns *run bash on a reviewed body* into *run
-anything*. But the front-end grant already reaches `--scratch-run`, and a bash body run there reaches
-`sed -i` and `perl -pi` on any path the process can write. So this arm adds **no capability** that
-grant lacks. What it adds is a **narrower form** of one capability the grant already has: bounded to
-the repository tree, refusing `.git` and the state file, executing nothing, and deterministic in its
-effect.
+**Its reach is narrower than what it replaces, and the grant it rides is not widened.** The arm is reached through the front-end grant a consumer already holds, so it needs no settings edit. That is the shape §scratch-run refuses for a second interpreter, and the difference is what the two widenings would add. Teaching the runner a second interpreter turns *run bash on a reviewed body* into *run anything*. But the front-end grant already reaches `--scratch-run`, and a bash body run there reaches `sed -i` and `perl -pi` on any path the process can write. So this arm adds **no capability** that grant lacks. What it adds is a **narrower form** of one capability the grant already has: bounded to the repository tree, refusing `.git` and the state file, executing nothing, and deterministic in its effect.
 
-**The compensating control is the printed span, and it relocates review rather than removing it.**
-A rewrite granted through the front-end is not decided before it runs. Its before-and-after lines
-land in the transcript as it runs, and the working tree's diff stands until commit. That is
-§scratch-run's echo posture, applied to an edit rather than a body.
+**The compensating control is the printed span, and it relocates review rather than removing it.** A rewrite granted through the front-end is not decided before it runs. Its before-and-after lines land in the transcript as it runs, and the working tree's diff stands until commit. That is §scratch-run's echo posture, applied to an edit rather than a body.
 
-**A path guard on the harness's file tools does not see this arm.** A `PreToolUse(Write|Edit)` hook
-reads a file-tool call and never a Bash command. That is why the arm refuses the state file itself,
-through the predicate the kit's one shipped path guard uses: rule 8 steers an in-place rewrite here
-first, and the steer must not open the file that guard exists for. **The honest limit:** a
-consumer's own `Write|Edit` path guard is not consulted, and a file it protects is rewritable here as
-it already is by `--scratch-run`. Such a consumer's protection is only as wide as its Bash rules.
+**A path guard on the harness's file tools does not see this arm.** A `PreToolUse(Write|Edit)` hook reads a file-tool call and never a Bash command. That is why the arm refuses the state file itself, through the predicate the kit's one shipped path guard uses: rule 8 steers an in-place rewrite here first, and the steer must not open the file that guard exists for. **The honest limit:** a consumer's own `Write|Edit` path guard is not consulted, and a file it protects is rewritable here as it already is by `--scratch-run`. Such a consumer's protection is only as wide as its Bash rules.
 
-**What the grant now reads as.** A front-end grant read as "run the gates" also grants silent,
-bounded rewrites of tracked files, so declining them means declining the battery: §scratch-run's
-taken cost, for this member.
+**What the grant now reads as.** A front-end grant read as "run the gates" also grants silent, bounded rewrites of tracked files, so declining them means declining the battery: §scratch-run's taken cost, for this member.
 
-**The matcher cannot be made to run away.** It is a Thompson-construction matcher with a bounded
-program (gate-sdk/SPEC.md §The POSIX ERE matcher), so a pattern costs at most linear memory and
-polynomial time per line, and a construct outside the grammar is a refusal.
+**The matcher cannot be made to run away.** It is a Thompson-construction matcher with a bounded program (gate-sdk/SPEC.md §The POSIX ERE matcher), so a pattern costs at most linear memory and polynomial time per line, and a construct outside the grammar is a refusal.
 
 ## scan-prompts
 
-Advisory: surfaces recurring permission-friction sources from the friction
-log, filtering against **both** settings files (`GUARD_KIT_SETTINGS` and
-`GUARD_KIT_SETTINGS_LOCAL`) and the harness's built-in read-only git/docker
-auto-allows. Matching is **per compound segment**, the same surface the
-harness matches on (§The guard framework, `guard_split_compound`): a logged
-command is granted only when *every* segment is, so a whole-string glob that
-spans a compound the harness would split and refuse — `Bash(git status:*)`
-against `git status && rm -rf x` — does not read as allowed and is counted as
-prompting.
+Advisory: surfaces recurring permission-friction sources from the friction log, filtering against **both** settings files (`GUARD_KIT_SETTINGS` and `GUARD_KIT_SETTINGS_LOCAL`) and the harness's built-in read-only git/docker auto-allows. Matching is **per compound segment**, the same surface the harness matches on (§The guard framework, `guard_split_compound`): a logged command is granted only when *every* segment is, so a whole-string glob that spans a compound the harness would split and refuse — `Bash(git status:*)` against `git status && rm -rf x` — does not read as allowed and is counted as prompting.
 
-**The invocation, and why the arm is a table member rather than a top-level
-flag.** The ranker is a non-gate arm, reached through the shipped front-end as
-`run-gates.sh --emit scan-prompts [--count] [--] [<log>]` with no front-end
-change, since the `--emit <name>` operand composes `--emit-<name>`. Its declared
-roster is three names — `GUARD_KIT_LOG`, `GUARD_KIT_SETTINGS` and
-`GUARD_KIT_SETTINGS_LOCAL` — every one a row of guard-kit's table (§Layout and
-configuration). Membership of the arm table is **forced by that roster**
-rather than chosen by family resemblance: the row declares the three reads, which
-the knob-file derivation, `check-reads-couples` and `check-gate-substrate-parity` read in
-process, while a hardcoded top-level flag has no row for any of them to read
-(gate-sdk/SPEC.md §The non-gate arm).
+**The invocation, and why the arm is a table member rather than a top-level flag.** The ranker is a non-gate arm, reached through the shipped front-end as `run-gates.sh --emit scan-prompts [--count] [--] [<log>]` with no front-end change, since the `--emit <name>` operand composes `--emit-<name>`. Its declared roster is three names — `GUARD_KIT_LOG`, `GUARD_KIT_SETTINGS` and `GUARD_KIT_SETTINGS_LOCAL` — every one a row of guard-kit's table (§Layout and configuration). Membership of the arm table is **forced by that roster** rather than chosen by family resemblance: the row declares the three reads, which the knob-file derivation, `check-reads-couples` and `check-gate-substrate-parity` read in process, while a hardcoded top-level flag has no row for any of them to read (gate-sdk/SPEC.md §The non-gate arm).
 
-**The residue this section keeps, stated because the arm is not the whole of
-it.** The behaviour below is composed from three `lib/guard.sh` primitives —
-`guard_split_compound`, `guard_skeleton` and `_guard_redirect_pairs` — and that
-library is permanently shell on the ground §The guard framework
-states. So this section's contract is **not wholly in-crate**, and will not be
-while that disposition stands: the binary holds the ranker, and what holds the
-primitives it is composed from is a compiled twin of each, kept equal to the
-shell original by `--guard-lib-parity`.
+**The residue this section keeps, stated because the arm is not the whole of it.** The behaviour below is composed from three `lib/guard.sh` primitives — `guard_split_compound`, `guard_skeleton` and `_guard_redirect_pairs` — and that library is permanently shell on the ground §The guard framework states. So this section's contract is **not wholly in-crate**, and will not be while that disposition stands: the binary holds the ranker, and what holds the primitives it is composed from is a compiled twin of each, kept equal to the shell original by `--guard-lib-parity`.
 
-**What a consumer on an artifact-less host loses, which is narrow and is not
-nothing.** This section carries **no gate** — the kit registers none — so no
-`gates.list` row is omitted and the omitted-member roster an artifact-free
-install declares does not move at all (gate-sdk/SPEC.md §The port-candidate
-criteria, criterion 5). What such a consumer loses is one advisory ranking:
-step 1 of the five in `templates/close-triage.md`. **The friction loop itself
-does not move** — the guard still blocks, steers and logs, the log still
-accrues, the triage criterion is still this section's, `compare-settings-allow`
-still runs, and the step's other four items are untouched. So the honest
-statement is that such a consumer triages an **unranked** log by reading it,
-which is worse than ranking it and is not the same as losing the loop.
+**What a consumer on an artifact-less host loses, which is narrow and is not nothing.** This section carries **no gate** — the kit registers none — so no `gates.list` row is omitted and the omitted-member roster an artifact-free install declares does not move at all (gate-sdk/SPEC.md §The port-candidate criteria, criterion 5). What such a consumer loses is one advisory ranking: step 1 of the five in `templates/close-triage.md`. **The friction loop itself does not move** — the guard still blocks, steers and logs, the log still accrues, the triage criterion is still this section's, `compare-settings-allow` still runs, and the step's other four items are untouched. So the honest statement is that such a consumer triages an **unranked** log by reading it, which is worse than ranking it and is not the same as losing the loop.
 
-**The two settings documents are parsed by the arm itself**, so the ranking
-carries no external-program dependency an absent parser could take. That closes
-a silent inflation and not merely a dependency: a settings read delegated to an
-external program fails *open* when the program is absent — the allowlist reads
-empty, every logged command reads as prompting, and the ranking reports a large,
-plausible, entirely wrong number at exit 0 for a KPI to record as a trend.
-**The claim is bounded to this reader and says nothing wider**: `smoke/install.sh`
-still shells to `jq` for the settings-merge in the install recipe, a contributor
-floor rather than an adopter one, and this member never joined the battery, so the
-battery's own program floor moves by nothing at all. **The arm's spawned-program
-set is empty**, which is stated here because nothing mechanical records it: a
-an arm-table row carries no requirement element and `--needs` answers for
-registry members only (gate-sdk/SPEC.md §The non-gate arm). The ranking needs no
-`jq`, `sed`, `grep`, `sort`, `wc` or `tr`, so no absent program can change what
-it reports.
+**The two settings documents are parsed by the arm itself**, so the ranking carries no external-program dependency an absent parser could take. That closes a silent inflation and not merely a dependency: a settings read delegated to an external program fails *open* when the program is absent — the allowlist reads empty, every logged command reads as prompting, and the ranking reports a large, plausible, entirely wrong number at exit 0 for a KPI to record as a trend. **The claim is bounded to this reader and says nothing wider**: `smoke/install.sh` still shells to `jq` for the settings-merge in the install recipe, a contributor floor rather than an adopter one, and this member never joined the battery, so the battery's own program floor moves by nothing at all. **The arm's spawned-program set is empty**, which is stated here because nothing mechanical records it: a an arm-table row carries no requirement element and `--needs` answers for registry members only (gate-sdk/SPEC.md §The non-gate arm). The ranking needs no `jq`, `sed`, `grep`, `sort`, `wc` or `tr`, so no absent program can change what it reports.
 
-**What crosses into the binary and what stays the consumer's**, stated because
-a compiled arm holds its literals inside the shipped artifact rather than in a
-file the consumer vendors and reads.
-Three command vocabularies travel with the ranker: the harness's built-in
-read-only `git` and `docker` auto-allows, and the common multi-command binaries
-the key sub-keys on. The first is harness behaviour and the second is
-shell-substrate knowledge, so both pass §The generic ruleset's own test — they
-admit nothing a project owns — and stay **kit literals that mint no knob**. What
-they cost is portability rather than privacy, and the cost does not turn on the
-substrate: a second harness with a different built-in set would force a
-configurable slot whether the set sat in shell or in the binary, so the port
-neither pays it nor pre-pays it. **The allowlist itself never crosses.** The arm
-reads a consumer's own `permissions.allow[]` through `GUARD_KIT_SETTINGS` and
-`GUARD_KIT_SETTINGS_LOCAL` and ships no default allow entry of any kind —
-`templates/settings-allow.json` is a recommendation the consumer merges, and this
-arm never reads it — so the
-mechanism is the kit's and the vocabulary stays the consumer's file — the shape
-§compare-settings-allow's empty-by-default probe roster already holds.
+**What crosses into the binary and what stays the consumer's**, stated because a compiled arm holds its literals inside the shipped artifact rather than in a file the consumer vendors and reads. Three command vocabularies travel with the ranker: the harness's built-in read-only `git` and `docker` auto-allows, and the common multi-command binaries the key sub-keys on. The first is harness behaviour and the second is shell-substrate knowledge, so both pass §The generic ruleset's own test — they admit nothing a project owns — and stay **kit literals that mint no knob**. What they cost is portability rather than privacy, and the cost does not turn on the substrate: a second harness with a different built-in set would force a configurable slot whether the set sat in shell or in the binary, so the port neither pays it nor pre-pays it. **The allowlist itself never crosses.** The arm reads a consumer's own `permissions.allow[]` through `GUARD_KIT_SETTINGS` and `GUARD_KIT_SETTINGS_LOCAL` and ships no default allow entry of any kind — `templates/settings-allow.json` is a recommendation the consumer merges, and this arm never reads it — so the mechanism is the kit's and the vocabulary stays the consumer's file — the shape §compare-settings-allow's empty-by-default probe roster already holds.
 
-**What "prompting" names in this tool's output.** The word is the tool's shipped
-vocabulary and stays as it is; what it counts is the set of calls **nothing in the
-allowlist grants**, whose decision the harness therefore made out of band. On a
-harness that interrupts, that set is literally the prompts; on one that decides
-another way, it is the same set under an inherited name. The count is the same
-number either way, and it is the number the triage criterion reads.
+**What "prompting" names in this tool's output.** The word is the tool's shipped vocabulary and stays as it is; what it counts is the set of calls **nothing in the allowlist grants**, whose decision the harness therefore made out of band. On a harness that interrupts, that set is literally the prompts; on one that decides another way, it is the same set under an inherited name. The count is the same number either way, and it is the number the triage criterion reads.
 
 The friction log's fall-throughs split three ways:
-- **Committed-covered** — every segment matches the committed allowlist or a
-  harness built-in, and the call is not allowlist-unreachable (below). Silently
-  granted, reinforced; off every list.
-- **Prompting** — some segment nothing grants. The headline `<n> prompting
-  call(s)`, grouped and ranked by pattern (leading binary, plus subcommand for
-  the common multi-command binaries, plus the **write-shape suffix** below),
-  triaged at close by the criterion above. Its rows are printed in **two
-  labelled sections** — *actionable*, then *allowlist-unreachable* (the
-  reachability verdict below) — and the headline gains one derived clause,
-  `<u> of them allowlist-unreachable`, the calls in the second section. The
-  partition is over **rows, never over the count**: `<n>`, `<m>` and
-  `kpi-prompt-friction`'s two integers are exactly what they were without it.
-- **Overlay-covered** — granted, and the call is not allowlist-unreachable
-  (below), but at least one segment relies on the
-  uncommitted `GUARD_KIT_SETTINGS_LOCAL` overlay. It *did not prompt*, so it is
-  excluded from the headline (the count is a true prompt count, not an upper
-  bound), yet it is exactly the promote-or-prune candidate the close step must
-  see — so it is ranked in a **separate, visibly-advisory section** below the
-  headline, never mixed into it. **An allowlist-unreachable row is sectioned
-  the same way and kept on the headline, and the difference is the reason for
-  each exclusion**: an overlay row is off the count because it did not prompt,
-  while an unreachable row *did* prompt and will on every future call of its
-  shape — moving it off would make the count stop measuring what the KPI reads
-  it for.
+- **Committed-covered** — every segment matches the committed allowlist or a harness built-in, and the call is not allowlist-unreachable (below). Silently granted, reinforced; off every list.
+- **Prompting** — some segment nothing grants. The headline `<n> prompting call(s)`, grouped and ranked by pattern (leading binary, plus subcommand for the common multi-command binaries, plus the **write-shape suffix** below), triaged at close by the criterion above. Its rows are printed in **two labelled sections** — *actionable*, then *allowlist-unreachable* (the reachability verdict below) — and the headline gains one derived clause, `<u> of them allowlist-unreachable`, the calls in the second section. The partition is over **rows, never over the count**: `<n>`, `<m>` and `kpi-prompt-friction`'s two integers are exactly what they were without it.
+- **Overlay-covered** — granted, and the call is not allowlist-unreachable (below), but at least one segment relies on the uncommitted `GUARD_KIT_SETTINGS_LOCAL` overlay. It *did not prompt*, so it is excluded from the headline (the count is a true prompt count, not an upper bound), yet it is exactly the promote-or-prune candidate the close step must see — so it is ranked in a **separate, visibly-advisory section** below the headline, never mixed into it. **An allowlist-unreachable row is sectioned the same way and kept on the headline, and the difference is the reason for each exclusion**: an overlay row is off the count because it did not prompt, while an unreachable row *did* prompt and will on every future call of its shape — moving it off would make the count stop measuring what the KPI reads it for.
 
-**The allowlist-reachability verdict, and why it is narrower than "anything the
-allowlist cannot fix".** A logged call is **allowlist-unreachable** when it
-carries a shape the permission matcher refuses outright, and four shapes qualify,
-each on a ground a rule already states in its own refusal text: an
-**expansion, substitution or backtick** — rule 6's "the harness's matcher refuses
-every expansion", with the output process substitution and the backtick it does
-not block — and a **write redirect**, which rule 16 says "defeats the permission
-matcher" and rule 17 says no `Bash(…)` entry can grant. **Grading each row
-against the allowlist's own matching rule is refused** though it is more exact:
-it re-implements that rule in the ranker, where reading the grounds the ruleset
-already states adds no second copy — and a note in this section alone, the
-cheapest shape, changes nothing a close reads. The redirect test is the
-write-shape suffix's own scan over `_guard_redirect_pairs`' twin with **rule 17's
-own target test**, so a `/dev/null` target and an fd-dup, which rule 17 exempts as
-targets that are not files, do not qualify — the suffix still keys them, since the
-key's axis is the operator and the verdict's is the target. **Chaining is
-excluded**: §The triage criterion's per-segment rule makes the segments of a
-compound themselves legitimate allowlist entries, and `granted()` already models a
-compound as reachable when every segment is, so a chaining arm would contradict
-the function computing the partition and retire rows an allowlist can fix. The
-verdict reads **every segment** of the line, not the key's first one — one
-unmatched segment takes the whole line off the match path — on a view where a
-single-quoted span and a backslash-escaped byte are inert and a double-quoted span
-is live for expansion. **A heredoc body is read the way the harness reads it**, which
-was probed rather than assumed: the body is data, the text after its terminator line
-is shell, and an unquoted-delimiter body still expands. So the expansion test blanks
-only a quoted-delimiter body, the redirect test blanks every body, and the log line
-is decoded first (§The guard framework, `guard_log_fallthrough`). The third shape is
-a call longer than the harness's analysis bound, which the harness asks about
-whatever the allowlist says. A decoded line longer than that bound is one. The
-fourth is a **backgrounding `&`** — rule 15's statement-ending bare `&` on the
-structural view, with `|&` excluded as the separator it is — because the harness
-grants no backgrounded call whatever its grants cover (§The guard framework,
-`guard_split_compound`, which records the probe). **A key is reported unreachable
-only when every call under it is**, and both limits lean the same way on purpose:
-under-retiring leaves an unactionable row on the actionable list, which is visible,
-while over-retiring hides friction a reader could have fixed, which is silent. The
-expansion test is the ranker's own reading of the log rather than a twinned
-primitive — it decides a report section, not a call — so it adds no member for
-`--guard-lib-parity` to hold.
+**The allowlist-reachability verdict, and why it is narrower than "anything the allowlist cannot fix".** A logged call is **allowlist-unreachable** when it carries a shape the permission matcher refuses outright, and four shapes qualify, each on a ground a rule already states in its own refusal text: an **expansion, substitution or backtick** — rule 6's "the harness's matcher refuses every expansion", with the output process substitution and the backtick it does not block — and a **write redirect**, which rule 16 says "defeats the permission matcher" and rule 17 says no `Bash(…)` entry can grant. **Grading each row against the allowlist's own matching rule is refused** though it is more exact: it re-implements that rule in the ranker, where reading the grounds the ruleset already states adds no second copy — and a note in this section alone, the cheapest shape, changes nothing a close reads. The redirect test is the write-shape suffix's own scan over `_guard_redirect_pairs`' twin with **rule 17's own target test**, so a `/dev/null` target and an fd-dup, which rule 17 exempts as targets that are not files, do not qualify — the suffix still keys them, since the key's axis is the operator and the verdict's is the target. **Chaining is excluded**: §The triage criterion's per-segment rule makes the segments of a compound themselves legitimate allowlist entries, and `granted()` already models a compound as reachable when every segment is, so a chaining arm would contradict the function computing the partition and retire rows an allowlist can fix. The verdict reads **every segment** of the line, not the key's first one — one unmatched segment takes the whole line off the match path — on a view where a single-quoted span and a backslash-escaped byte are inert and a double-quoted span is live for expansion. **A heredoc body is read the way the harness reads it**, which was probed rather than assumed: the body is data, the text after its terminator line is shell, and an unquoted-delimiter body still expands. So the expansion test blanks only a quoted-delimiter body, the redirect test blanks every body, and the log line is decoded first (§The guard framework, `guard_log_fallthrough`). The third shape is a call longer than the harness's analysis bound, which the harness asks about whatever the allowlist says. A decoded line longer than that bound is one. The fourth is a **backgrounding `&`** — rule 15's statement-ending bare `&` on the structural view, with `|&` excluded as the separator it is — because the harness grants no backgrounded call whatever its grants cover (§The guard framework, `guard_split_compound`, which records the probe). **A key is reported unreachable only when every call under it is**, and both limits lean the same way on purpose: under-retiring leaves an unactionable row on the actionable list, which is visible, while over-retiring hides friction a reader could have fixed, which is silent. The expansion test is the ranker's own reading of the log rather than a twinned primitive — it decides a report section, not a call — so it adds no member for `--guard-lib-parity` to hold.
 
-**What the section claims is disposition (a) only.** It reports the rows an
-allowlist entry cannot reach, and makes no claim about a guard rule or a habit
-change: both stay available for every row, and a guard rule reaching shapes no glob
-can express is that disposition's stated reason for existing. The section is
-**advisory on the log's own terms** (§The close-stage triage step) and reds nothing.
-Because the partition moves no call between prompting and granted and re-keys no
-row, it is **not** a definitional step of the kind recorded below.
+**What the section claims is disposition (a) only.** It reports the rows an allowlist entry cannot reach, and makes no claim about a guard rule or a habit change: both stay available for every row, and a guard rule reaching shapes no glob can express is that disposition's stated reason for existing. The section is **advisory on the log's own terms** (§The close-stage triage step) and reds nothing. Because the partition moves no call between prompting and granted and re-keys no row, it is **not** a definitional step of the kind recorded below.
 
-**The grant test reads the verdict, so the two cannot disagree.** A glob match on a
-raw segment has no model of a redirect or an expansion. A trailing `*` absorbs both,
-so `Bash(echo *)` would otherwise read `echo x > notes.md` and ``echo `date` `` as
-granted, while the verdict above marks both allowlist-unreachable. A call the
-verdict marks is therefore never granted, by the committed file or the overlay, and
-it always lands on the headline and in the unreachable section. There is one
-predicate and the grant test does not restate it. **The honest limit leans the
-verdict's way:** a harness may grant a redirect target through a file-write
-permission rule, which this arm does not read. Such a call reads prompting although
-it was granted. That over-count is visible on the ranking, where an under-count
-would be silent. A write rule 17 grants never reaches the log, so the common
-gitignored case is untouched.
+**The grant test reads the verdict, so the two cannot disagree.** A glob match on a raw segment has no model of a redirect or an expansion. A trailing `*` absorbs both, so `Bash(echo *)` would otherwise read `echo x > notes.md` and ``echo `date` `` as granted, while the verdict above marks both allowlist-unreachable. A call the verdict marks is therefore never granted, by the committed file or the overlay, and it always lands on the headline and in the unreachable section. There is one predicate and the grant test does not restate it. **The honest limit leans the verdict's way:** a harness may grant a redirect target through a file-write permission rule, which this arm does not read. Such a call reads prompting although it was granted. That over-count is visible on the ranking, where an under-count would be silent. A write rule 17 grants never reaches the log, so the common gitignored case is untouched.
 
-**The grant test drops each heredoc body and its terminator line from the segments it matches.** A
-body is not a command, and a split inside it would read `;` and `|` in a python body as separators.
-The honest limit is that the analysis bound is the harness's literal, so a revision that moves it is
-drift this arm cannot detect. Two more limits ride on the log line itself: the cut counts characters
-the way the hook's shell locale counts them, so under a byte locale a multi-byte command near the
-bound may read under it; and a line logged flattened before a consumer upgraded decodes wrongly where
-it carries a backslash, which lasts until the next close clears the log.
+**The grant test drops each heredoc body and its terminator line from the segments it matches.** A body is not a command, and a split inside it would read `;` and `|` in a python body as separators. The honest limit is that the analysis bound is the harness's literal, so a revision that moves it is drift this arm cannot detect. Two more limits ride on the log line itself: the cut counts characters the way the hook's shell locale counts them, so under a byte locale a multi-byte command near the bound may read under it; and a line logged flattened before a consumer upgraded decodes wrongly where it carries a backslash, which lasts until the next close clears the log.
 
-**Every segment is read through the harness view before it is matched or
-keyed.** The grant test and the ranking key both take the segment through
-`_guard_harness_view`'s compiled twin (§The guard framework), so a wrapper the
-permission matcher strips — `timeout 30 git log` — matches and keys as the
-command it wraps, while one the matcher does not strip keys as itself:
-`sudo timeout 30 git log` keys as `sudo`. The ranker and the matcher therefore
-agree about what a wrapper covers. A ranker holding its own shorter wrapper list
-disagrees in both directions, counting a `sudo`-prefixed call as granted and a
-`time`-prefixed one as prompting.
+**Every segment is read through the harness view before it is matched or keyed.** The grant test and the ranking key both take the segment through `_guard_harness_view`'s compiled twin (§The guard framework), so a wrapper the permission matcher strips — `timeout 30 git log` — matches and keys as the command it wraps, while one the matcher does not strip keys as itself: `sudo timeout 30 git log` keys as `sudo`. The ranker and the matcher therefore agree about what a wrapper covers. A ranker holding its own shorter wrapper list disagrees in both directions, counting a `sudo`-prefixed call as granted and a `time`-prefixed one as prompting.
 
-**The write-shape suffix, and why a bare command word was reporting the wrong
-thing.** The key appends the segment's **write-redirect operator** when it
-carries one, so `cat > <file> <<'EOF'` ranks as `cat >` and `cat >> <file>
-<<'EOF'` ranks as `cat >>`, while a redirect-free segment keys exactly as it did
-before. The operator is normalized to two values, `>` and `>>`: which descriptor
-is redirected is dropped (`2> f` keys the same as `> f`), because the axis the
-row has to carry is *this segment writes a file*, and create-versus-append is the
-finest distinction any reader of the ranking has wanted. A descriptor-dup
-(`2>&1`) is not a redirect to a file and does not qualify. The resulting shape is
-one the ranking already had — `git status` and `python3 -` are two-token keys
-today — so the suffix introduces no new output shape, only a new source for the
-second token. A write redirect standing where a subcommand would is re-homed into
-the suffix rather than doubled into both tokens; a **read** redirect is not this
-axis's subject and keys where it always did.
+**The write-shape suffix, and why a bare command word was reporting the wrong thing.** The key appends the segment's **write-redirect operator** when it carries one, so `cat > <file> <<'EOF'` ranks as `cat >` and `cat >> <file> <<'EOF'` ranks as `cat >>`, while a redirect-free segment keys exactly as it did before. The operator is normalized to two values, `>` and `>>`: which descriptor is redirected is dropped (`2> f` keys the same as `> f`), because the axis the row has to carry is *this segment writes a file*, and create-versus-append is the finest distinction any reader of the ranking has wanted. A descriptor-dup (`2>&1`) is not a redirect to a file and does not qualify. The resulting shape is one the ranking already had — `git status` and `python3 -` are two-token keys today — so the suffix introduces no new output shape, only a new source for the second token. A write redirect standing where a subcommand would is re-homed into the suffix rather than doubled into both tokens; a **read** redirect is not this axis's subject and keys where it always did.
 
-**The word and the suffix come from the same segment, and without that the
-change would be worse than the defect.** Both are read off the **first segment**
-of the logged line, split with `guard_split_compound` from a `guard_skeleton`
-view. The word alone would be unchanged by this — the first token of the whole
-line is the first token of its first segment — but pulling a redirect from
-*anywhere* in the line would key `mkdir -p .tmp && cat > x` as `mkdir >` and
-attribute a write to a command that performs none. Reading both from one segment
-makes the key internally consistent by construction. *Which* segment should be
-keyed when the friction-bearing one is not the first is a separate axis — which
-segment, not which shape — and is not settled here.
-**That limit has now bitten twice, and the second instance is recorded rather
-than left as a stated risk.** A later sweep of the same log found **two genuine
-writes hidden under a leading `mkdir`** — real, ungranted, write-shaped calls
-that no write-suffixed key could see, because the key reads the first segment
-only. So the first-segment choice is right about *consistency* and wrong about
-*coverage*, and the ranking under-counts the write class by however many such
-calls a corpus holds. The disposition is unchanged and is not re-decided here:
-the segment-selection axis is the one that owns it.
+**The word and the suffix come from the same segment, and without that the change would be worse than the defect.** Both are read off the **first segment** of the logged line, split with `guard_split_compound` from a `guard_skeleton` view. The word alone would be unchanged by this — the first token of the whole line is the first token of its first segment — but pulling a redirect from *anywhere* in the line would key `mkdir -p .tmp && cat > x` as `mkdir >` and attribute a write to a command that performs none. Reading both from one segment makes the key internally consistent by construction. *Which* segment should be keyed when the friction-bearing one is not the first is a separate axis — which segment, not which shape — and is not settled here. **That limit has now bitten twice, and the second instance is recorded rather than left as a stated risk.** A later sweep of the same log found **two genuine writes hidden under a leading `mkdir`** — real, ungranted, write-shaped calls that no write-suffixed key could see, because the key reads the first segment only. So the first-segment choice is right about *consistency* and wrong about *coverage*, and the ranking under-counts the write class by however many such calls a corpus holds. The disposition is unchanged and is not re-decided here: the segment-selection axis is the one that owns it.
 
-**No parser is minted for the redirect**, and the composition is stated because
-the obvious spelling is the wrong one. The detection reuses
-`_guard_redirect_pairs`, the operator-and-target scan rule 17 already performs,
-and excludes an fd-dup by rule 17's own target test. It deliberately does **not**
-reach for `_guard_redirect_targets` to do that exclusion: that helper drops an
-fd-dup target only as an accident of its target class, which is the very reason
-`_guard_redirect_pairs` exists, so resting the fd-dup rule on it would rest it on
-an accident. These are `_`-prefixed internal helpers rather than the documented
-`guard_*` surface, called from a `bin/` tool inside the same kit — a kit-internal
-call that widens no consumer contract. That is also what clears
-`_guard_redirect_pairs` for a compiled twin while the library it lives in stays
-shell: the `no-port` ground is about the consumer surface, and this helper
-is not on it (§The guard framework). Its twin is held equal by the same
-comparator as the other two.
+**No parser is minted for the redirect**, and the composition is stated because the obvious spelling is the wrong one. The detection reuses `_guard_redirect_pairs`, the operator-and-target scan rule 17 already performs, and excludes an fd-dup by rule 17's own target test. It deliberately does **not** reach for `_guard_redirect_targets` to do that exclusion: that helper drops an fd-dup target only as an accident of its target class, which is the very reason `_guard_redirect_pairs` exists, so resting the fd-dup rule on it would rest it on an accident. These are `_`-prefixed internal helpers rather than the documented `guard_*` surface, called from a `bin/` tool inside the same kit — a kit-internal call that widens no consumer contract. That is also what clears `_guard_redirect_pairs` for a compiled twin while the library it lives in stays shell: the `no-port` ground is about the consumer surface, and this helper is not on it (§The guard framework). Its twin is held equal by the same comparator as the other two.
 
-**Where `--guard-lib-parity` is dispatched from, and why that was measured
-rather than assumed.** The arm is a **hardcoded top-level flag**, resolved before
-the registry lookup beside the other parity arms, and **not** an `ARMS`
-row. Table membership turns on one property and not on the family an arm belongs
-to: a member's declared knob roster is what the knob-file derivation, `check-reads-couples`
-and `check-gate-substrate-parity` read, so an arm resolving a consumer knob must be
-a member and an arm resolving none has nothing for any of them to read. All three modes
-are pure functions of their arguments — read statically, the three bodies name no
-`GUARD_KIT_*` knob and call nothing that could reach one; read dynamically, their
-classification of a corpus is byte-identical with every knob in this kit's roster
-perturbed. So the roster is empty and the flag is top-level. The empty-roster
-escape that admits an `--emit-`-spelled arm to the table anyway does not reach
-here: its ground is reachability through the front-end's `--emit <name>` operand,
-which composes `--emit-<name>`, and this arm carries no such spelling.
+**Where `--guard-lib-parity` is dispatched from, and why that was measured rather than assumed.** The arm is a **hardcoded top-level flag**, resolved before the registry lookup beside the other parity arms, and **not** an `ARMS` row. Table membership turns on one property and not on the family an arm belongs to: a member's declared knob roster is what the knob-file derivation, `check-reads-couples` and `check-gate-substrate-parity` read, so an arm resolving a consumer knob must be a member and an arm resolving none has nothing for any of them to read. All three modes are pure functions of their arguments — read statically, the three bodies name no `GUARD_KIT_*` knob and call nothing that could reach one; read dynamically, their classification of a corpus is byte-identical with every knob in this kit's roster perturbed. So the roster is empty and the flag is top-level. The empty-roster escape that admits an `--emit-`-spelled arm to the table anyway does not reach here: its ground is reachability through the front-end's `--emit <name>` operand, which composes `--emit-<name>`, and this arm carries no such spelling.
 
-**What the top row actually is, recorded because the entry that bought this
-change predicted otherwise.** A read-shaped `cat <file>` cannot appear in the log
-at all: rule 10 blocks it and `guard_block` exits 2 before `guard_log_fallthrough`
-runs. Measured on the live log at the landing: of 43 `cat`-led lines, 33 were
-`cat >>`, 5 `cat >`, and the 5 remaining bare rows were **all** pipe-reads
-(`cat <file> | <consumer>`, one of them fd-dup-decorated) — composition, which is
-exactly what rule 10 deliberately does not block. So the row was never an
-answered steer and an unowned write sharing a key: it was the unowned write
-alone, wearing the word that names the answered steer. That is also the change's
-checkable post-condition — after it, a bare `cat` row is a **real finding**
-(a pipe-read or a multi-file read), not noise.
+**What the top row actually is, recorded because the entry that bought this change predicted otherwise.** A read-shaped `cat <file>` cannot appear in the log at all: rule 10 blocks it and `guard_block` exits 2 before `guard_log_fallthrough` runs. Measured on the live log at the landing: of 43 `cat`-led lines, 33 were `cat >>`, 5 `cat >`, and the 5 remaining bare rows were **all** pipe-reads (`cat <file> | <consumer>`, one of them fd-dup-decorated) — composition, which is exactly what rule 10 deliberately does not block. So the row was never an answered steer and an unowned write sharing a key: it was the unowned write alone, wearing the word that names the answered steer. That is also the change's checkable post-condition — after it, a bare `cat` row is a **real finding** (a pipe-read or a multi-file read), not noise.
 
-**`cat` is the only word this bites today, and the measurement that bounds it is
-recorded with it.** Decomposed across the same live ranking: `awk` and `grep`
-were reads throughout, `python3 -` was inline heredoc execution and already
-two-token, `git` is already subcommand-keyed so its reads and writes already
-occupied separate rows, and `sed` was absent because rule 8 blocks its read and
-in-place forms upstream of the log. `echo`/`printf`'s near-absence is
-structural for a reason worth naming precisely: on a rule 17 match `guard_allow`
-exits the hook directly, so a granted write through a roster emitter can never
-reach the log under any key. A write to a **gitignored** target — create or
-append alike, since rule 17 grants both — is therefore invisible here by
-construction. What still keys as `echo >` or `cat >` is a write both rule 17 and
-rule 25 decline: a shape rule 17's clause (d) leaves unmodelled, a backgrounded
-launch, a line whose heredoc residue cannot be attributed, or a device target.
-The honest reading is that the axis is **general and currently
-near-single-instance**, and a later reader deciding whether to extend or retire
-it needs to know the bite was measured rather than assumed.
+**`cat` is the only word this bites today, and the measurement that bounds it is recorded with it.** Decomposed across the same live ranking: `awk` and `grep` were reads throughout, `python3 -` was inline heredoc execution and already two-token, `git` is already subcommand-keyed so its reads and writes already occupied separate rows, and `sed` was absent because rule 8 blocks its read and in-place forms upstream of the log. `echo`/`printf`'s near-absence is structural for a reason worth naming precisely: on a rule 17 match `guard_allow` exits the hook directly, so a granted write through a roster emitter can never reach the log under any key. A write to a **gitignored** target — create or append alike, since rule 17 grants both — is therefore invisible here by construction. What still keys as `echo >` or `cat >` is a write both rule 17 and rule 25 decline: a shape rule 17's clause (d) leaves unmodelled, a backgrounded launch, a line whose heredoc residue cannot be attributed, or a device target. The honest reading is that the axis is **general and currently near-single-instance**, and a later reader deciding whether to extend or retire it needs to know the bite was measured rather than assumed.
 
-**This instrument cannot size the population its neighbouring rules already
-admit, and that is a property of the grant boundary rather than a gap in the
-sweep.** `guard_log_fallthrough` runs only after every rule has declined
-(§The generic ruleset, fall-through logging), so a granted call is never a log
-line. Two consequences a reader of
-this ranking has to carry. First, a question of the form *how often does the
-shape rule 17 grants actually occur* has **no answer in this log** — a zero here
-is zero by design, not zero by finding, and any sizing of that population needs a
-different instrument. Second, **a reading that drops after a grant widens has not
-measured fewer writes**: widening `guard_allow`'s admitted set shrinks this log's
-own corpus, so the class's next reading falls for a reason other than the
-behaviour changing. A close attributing such a drop to fewer writes would be
-reading the instrument's own boundary as a result.
+**This instrument cannot size the population its neighbouring rules already admit, and that is a property of the grant boundary rather than a gap in the sweep.** `guard_log_fallthrough` runs only after every rule has declined (§The generic ruleset, fall-through logging), so a granted call is never a log line. Two consequences a reader of this ranking has to carry. First, a question of the form *how often does the shape rule 17 grants actually occur* has **no answer in this log** — a zero here is zero by design, not zero by finding, and any sizing of that population needs a different instrument. Second, **a reading that drops after a grant widens has not measured fewer writes**: widening `guard_allow`'s admitted set shrinks this log's own corpus, so the class's next reading falls for a reason other than the behaviour changing. A close attributing such a drop to fewer writes would be reading the instrument's own boundary as a result.
 
-`--count` emits the compact `<patterns>/<occurrences>` prompting token
-(overlay-covered excluded, so a counting reader reads true); an explicit file
-argument overrides the log path. The two
-**compose, in either order** — the argument parse is a loop over argv, not a
-read of `$1` — and that is pinned rather than left implicit because a
-single-argument parse makes `--count <path>` return a real-looking
-number for the *default* log, which is the worst failure mode an instrument has:
-silent, plausible, and reached for first by exactly the measurement session that
-cannot afford it. The positional survives the port on §The non-gate arm's own
-distinguishing test (gate-sdk/SPEC.md): it selects the rule's **input corpus**
-rather than selecting where configuration comes from, so it arrives as argv
-into the arm and the arm consumes it.
+`--count` emits the compact `<patterns>/<occurrences>` prompting token (overlay-covered excluded, so a counting reader reads true); an explicit file argument overrides the log path. The two **compose, in either order** — the argument parse is a loop over argv, not a read of `$1` — and that is pinned rather than left implicit because a single-argument parse makes `--count <path>` return a real-looking number for the *default* log, which is the worst failure mode an instrument has: silent, plausible, and reached for first by exactly the measurement session that cannot afford it. The positional survives the port on §The non-gate arm's own distinguishing test (gate-sdk/SPEC.md): it selects the rule's **input corpus** rather than selecting where configuration comes from, so it arrives as argv into the arm and the arm consumes it.
 
-**That silent-plausible failure has a second door, and the arm closes it too.**
-A free-text positional absorbs whatever it is handed, so an unrecognized
-`-`-prefixed argument — a one-character typo of the tool's own flag — reads as a
-log path and reports a clean tree at exit 0, which is the same defect one door
-over from the ordering bug above. The arm **refuses an unrecognized `-`-prefixed
-argument with usage on stderr at exit 2**, and `--` ends option processing so a
-log path spelled with a leading dash stays reachable; without that escape the
-refusal would be a capability loss rather than a fix. This is gate-sdk/SPEC.md
-§The bin/-tool contract's shape half, which binds on every free-text argument
-and does not turn on whether the tool captures. Its `-h`/`--help` half does
-**not** cross: usage for a non-gate arm lives in the front-end's own help and in
-`guard-kit/README.md`, so `--emit scan-prompts --help` is a refusal rather than
-a help request.
+**That silent-plausible failure has a second door, and the arm closes it too.** A free-text positional absorbs whatever it is handed, so an unrecognized `-`-prefixed argument — a one-character typo of the tool's own flag — reads as a log path and reports a clean tree at exit 0, which is the same defect one door over from the ordering bug above. The arm **refuses an unrecognized `-`-prefixed argument with usage on stderr at exit 2**, and `--` ends option processing so a log path spelled with a leading dash stays reachable; without that escape the refusal would be a capability loss rather than a fix. This is gate-sdk/SPEC.md §The bin/-tool contract's shape half, which binds on every free-text argument and does not turn on whether the tool captures. Its `-h`/`--help` half does **not** cross: usage for a non-gate arm lives in the front-end's own help and in `guard-kit/README.md`, so `--emit scan-prompts --help` is a refusal rather than a help request.
 
-**`--count` keeps a named caller after its machine reader stops going through
-it.** Its callers are a **session** reaching it through the front-end and
-`gate-tests/scan-prompts.test.sh`; a session front-end invocation counts exactly
-as a stage step does (gate-sdk/SPEC.md §The non-gate arm), so the mode is not
-dead weight once `kpi-prompt-friction` calls the counter in-crate instead.
+**`--count` keeps a named caller after its machine reader stops going through it.** Its callers are a **session** reaching it through the front-end and `gate-tests/scan-prompts.test.sh`; a session front-end invocation counts exactly as a stage step does (gate-sdk/SPEC.md §The non-gate arm), so the mode is not dead weight once `kpi-prompt-friction` calls the counter in-crate instead.
 
-Its behavior
-— the three-way split, the per-segment matching, the true count, the
-argument-override in both orders, the
-write-shape suffix's create/append/fd-dup/first-segment cases, the reachability
-partition's sections and headline clause, the grant test's refusal of a call the
-verdict marks, the heredoc reading and the over-bound shape on an encoded log, and the
-argv-shape refusal with its `--` escape — is pinned by
-`gate-tests/scan-prompts.test.sh`, which reaches the arm through the front-end
-so the end-to-end path keeps a holder; the key derivation, the reachability
-verdict's shapes and exclusions, the grant test's reading of it on both passes,
-the log line's decode, the grant test's body drop and the mixed-key rule are additionally pinned
-in-crate, where `check-crate-arms` runs it. What that test pins is the split,
-the count semantics and those cases; the key's granularity beyond them is not a
-contract, which is why an additive suffix leaves its substring assertions true.
+Its behavior — the three-way split, the per-segment matching, the true count, the argument-override in both orders, the write-shape suffix's create/append/fd-dup/first-segment cases, the reachability partition's sections and headline clause, the grant test's refusal of a call the verdict marks, the heredoc reading and the over-bound shape on an encoded log, and the argv-shape refusal with its `--` escape — is pinned by `gate-tests/scan-prompts.test.sh`, which reaches the arm through the front-end so the end-to-end path keeps a holder; the key derivation, the reachability verdict's shapes and exclusions, the grant test's reading of it on both passes, the log line's decode, the grant test's body drop and the mixed-key rule are additionally pinned in-crate, where `check-crate-arms` runs it. What that test pins is the split, the count semantics and those cases; the key's granularity beyond them is not a contract, which is why an additive suffix leaves its substring assertions true.
 
-**The KPI's numerator steps at the landing commit, for a definitional reason.**
-Splitting one key into two raises `<patterns>` while leaving `<occurrences>`
-unchanged, so drift-kit's `kpi-prompt-friction` member reads a discontinuity that
-is not behavioral. The `^[0-9]+/[0-9]+$` contract it asserts is unbroken, so
-nothing reds — which is exactly what makes the step silent and worth stating. The
-pre-change reading, so a later trend read can attribute the step rather than
-re-derive it: **38 patterns across 173 prompting calls**, which the same log read
-as **44 patterns across the same 173 calls** immediately after. The KPI is **not**
-changed to compensate: a key change that makes the metric finer is the metric
-getting better, and rebasing it to hide the step would trade a legible one-time
-discontinuity for a permanent lie about granularity. drift-kit reads *trend, not
-level* and carries no annotation affordance, so this sentence is the annotation.
+**The KPI's numerator steps at the landing commit, for a definitional reason.** Splitting one key into two raises `<patterns>` while leaving `<occurrences>` unchanged, so drift-kit's `kpi-prompt-friction` member reads a discontinuity that is not behavioral. The `^[0-9]+/[0-9]+$` contract it asserts is unbroken, so nothing reds — which is exactly what makes the step silent and worth stating. The pre-change reading, so a later trend read can attribute the step rather than re-derive it: **38 patterns across 173 prompting calls**, which the same log read as **44 patterns across the same 173 calls** immediately after. The KPI is **not** changed to compensate: a key change that makes the metric finer is the metric getting better, and rebasing it to hide the step would trade a legible one-time discontinuity for a permanent lie about granularity. drift-kit reads *trend, not level* and carries no annotation affordance, so this sentence is the annotation.
 
-**Changing the wrapper strip is a step of the same definitional kind**, since it
-moves calls between granted and prompting and re-keys every row whose lead it
-changes. The move from a two-wrapper list (`sudo`, `timeout`) to the harness view
-read **14 patterns across 68 prompting calls** immediately before and **14 across
-68** immediately after, on one log. No logged line led with a wrapper either strip
-removes, so that corpus shows no discontinuity and a later trend read has none to
-attribute. The KPI is left as it is, on the same ground as above.
+**Changing the wrapper strip is a step of the same definitional kind**, since it moves calls between granted and prompting and re-keys every row whose lead it changes. The move from a two-wrapper list (`sudo`, `timeout`) to the harness view read **14 patterns across 68 prompting calls** immediately before and **14 across 68** immediately after, on one log. No logged line led with a wrapper either strip removes, so that corpus shows no discontinuity and a later trend read has none to attribute. The KPI is left as it is, on the same ground as above.
 
-**The grant test's reading of the verdict is a step of the same kind.** It moves
-every logged call carrying a write redirect or an expansion that a committed or
-overlay glob matched from granted to prompting, and re-keys nothing. On one log,
-**20 patterns across 69 prompting calls** immediately before and **23 across 77**
-immediately after. The KPI is left as it is, on the ground above.
+**The grant test's reading of the verdict is a step of the same kind.** It moves every logged call carrying a write redirect or an expansion that a committed or overlay glob matched from granted to prompting, and re-keys nothing. On one log, **20 patterns across 69 prompting calls** immediately before and **23 across 77** immediately after. The KPI is left as it is, on the ground above.
 
-**Reading a heredoc as the harness does is a step of the same kind.** The grant test moves
-heredoc-bearing calls from prompting to granted, and the third unreachable shape can move an
-over-bound call the other way. On one log, **27 patterns across 43 prompting calls** immediately
-before and **27 across 43** immediately after: that log was written flattened, so no line carried a
-body to drop and none passed the bound. The KPI is left as it is, on the ground above.
+**Reading a heredoc as the harness does is a step of the same kind.** The grant test moves heredoc-bearing calls from prompting to granted, and the third unreachable shape can move an over-bound call the other way. On one log, **27 patterns across 43 prompting calls** immediately before and **27 across 43** immediately after: that log was written flattened, so no line carried a body to drop and none passed the bound. The KPI is left as it is, on the ground above.
 
-**Reading allow rules and separators as the harness does is a step of the same kind.** The
-word-bounded `:*`, the bare match of a sole closing space-led `*`, `|&` as one separator and the
-backgrounding `&` as a fourth unreachable shape each move calls between granted and prompting.
-On one log snapshot, both binaries reading the same committed settings, **27 patterns across 63
-prompting calls** before the four and **26 across 62** after; the backgrounding shape alone moved
-nothing on that log. The KPI is left as it is, on the ground above.
+**Reading allow rules and separators as the harness does is a step of the same kind.** The word-bounded `:*`, the bare match of a sole closing space-led `*`, `|&` as one separator and the backgrounding `&` as a fourth unreachable shape each move calls between granted and prompting. On one log snapshot, both binaries reading the same committed settings, **27 patterns across 63 prompting calls** before the four and **26 across 62** after; the backgrounding shape alone moved nothing on that log. The KPI is left as it is, on the ground above.
 
-**A substrate change is not such a step, and that is recorded rather than
-assumed.** Moving the measurement off a spawn-and-parse and onto an in-crate
-call leaves the keying untouched, so both `<patterns>` and `<occurrences>` read
-exactly what they read before. The obligation above — record each step with its
-pre-change reading — is therefore discharged for that move by recording that
-there is **no** step, which is a reading a later trend reader can rely on only
-if it was taken while both holders were present.
+**A substrate change is not such a step, and that is recorded rather than assumed.** Moving the measurement off a spawn-and-parse and onto an in-crate call leaves the keying untouched, so both `<patterns>` and `<occurrences>` read exactly what they read before. The obligation above — record each step with its pre-change reading — is therefore discharged for that move by recording that there is **no** step, which is a reading a later trend reader can rely on only if it was taken while both holders were present.
 
 ## check-door-binding
 
-Invariant, three assertions over the tracked tree: **no kit-shipped surface
-outside the fail-open set names a front-end stub as a command to run**, **no
-kit template names a path to the gate binary**, and — over a consumer-configured
-surface set beyond the kit roots — **no door sits on a site that has not
-declared itself contributor-facing**. The first holds the door sweep that
-re-pointed every adopter-facing surface at the binary; the second holds the
-provenance seam the first one's placeholder depends on; the third reaches the
-surfaces the first cannot see, a consumer's own `README.md` and documentation
-tree among them.
+Invariant, three assertions over the tracked tree: **no kit-shipped surface outside the fail-open set names a front-end stub as a command to run**, **no kit template names a path to the gate binary**, and — over a consumer-configured surface set beyond the kit roots — **no door sits on a site that has not declared itself contributor-facing**. The first holds the door sweep that re-pointed every adopter-facing surface at the binary; the second holds the provenance seam the first one's placeholder depends on; the third reaches the surfaces the first cannot see, a consumer's own `README.md` and documentation tree among them.
 
-The corpus of assertions A and B is every kit root's `README.md` and its
-`templates/`, `lib/` and `bin/` trees, minus `gate-tests/` and `smoke/` —
-fixture and harness corpora a sweep of adopter surfaces does not reach. The seam
-assertion is scoped to `templates/` alone, because a template is the only kit
-surface an adopter copies and fills. Assertion C's corpus is
-`GUARD_KIT_DOOR_ROOTS` (§Layout and configuration), each entry a tracked file or
-a directory yielding its **tracked** members under A's own prune, and it is
-**empty by default**, in which case C is inert and this gate's verdict is what it
-was before C shipped. Tracked rather than walked, and the distinction is not
-cosmetic: a filesystem walk of a consumer's documentation tree reaches the local
-build cache a site generator leaves there, which is no governed surface and whose
-copy of a page would red twice over.
+The corpus of assertions A and B is every kit root's `README.md` and its `templates/`, `lib/` and `bin/` trees, minus `gate-tests/` and `smoke/` — fixture and harness corpora a sweep of adopter surfaces does not reach. The seam assertion is scoped to `templates/` alone, because a template is the only kit surface an adopter copies and fills. Assertion C's corpus is `GUARD_KIT_DOOR_ROOTS` (§Layout and configuration), each entry a tracked file or a directory yielding its **tracked** members under A's own prune, and it is **empty by default**, in which case C is inert and this gate's verdict is what it was before C shipped. Tracked rather than walked, and the distinction is not cosmetic: a filesystem walk of a consumer's documentation tree reaches the local build cache a site generator leaves there, which is no governed surface and whose copy of a page would red twice over.
 
-**Assertion C is a third assertion rather than a widened A, and the reason is
-that the two corpora differ in kind.** A's corpus is *kit-shipped* surfaces,
-whose audience the door sweep already settled — adopter-facing by construction,
-needing no per-site declaration, which is why A reds on a bare door. A
-consumer's own surfaces are **mixed-audience by nature**, so the same predicate
-cannot apply: a landing page's headline try-it command and a contributor battery
-register live inside one file. Folding two predicates into one assertion would
-make its red line ambiguous about which rule was breached, and would move every
-existing consumer's A verdict on upgrade. C is additive instead: with its corpus
-knob unset, no consumer's verdict changes at all.
+**Assertion C is a third assertion rather than a widened A, and the reason is that the two corpora differ in kind.** A's corpus is *kit-shipped* surfaces, whose audience the door sweep already settled — adopter-facing by construction, needing no per-site declaration, which is why A reds on a bare door. A consumer's own surfaces are **mixed-audience by nature**, so the same predicate cannot apply: a landing page's headline try-it command and a contributor battery register live inside one file. Folding two predicates into one assertion would make its red line ambiguous about which rule was breached, and would move every existing consumer's A verdict on upgrade. C is additive instead: with its corpus knob unset, no consumer's verdict changes at all.
 
-**C's discriminator is default-deny plus a site declaration.** The token is
-`<!-- door-contributor: <reason> -->`, the reason mandatory on the
-`comment-tier-exempt:` convention (canon-kit/SPEC.md §The shared spec adapters);
-an empty reason is malformed and reds rather than exempting, and the reason is
-echoed into the red-line detail so an audit trail exists — `[drain-exempt:]`'s
-ground (lifecycle-kit/SPEC.md §check-stage-entry). **There is no
-`door-adopter:` twin, and the omission is the design**: the unmarked case is
-adopter-facing, because declaring the complement on every other door would be a
-roster maintained against itself, which context-kit/SPEC.md §bin/env-probe's
-audience axis already rules for its own empty value. Default-deny is what closes
-the failure this assertion exists for — a future adopter-facing page
-reintroducing a repaired defect while nothing reds. Under it a new page's door
-reds the day it lands, with no roster to remember to update.
+**C's discriminator is default-deny plus a site declaration.** The token is `<!-- door-contributor: <reason> -->`, the reason mandatory on the `comment-tier-exempt:` convention (canon-kit/SPEC.md §The shared spec adapters); an empty reason is malformed and reds rather than exempting, and the reason is echoed into the red-line detail so an audit trail exists — `[drain-exempt:]`'s ground (lifecycle-kit/SPEC.md §check-stage-entry). **There is no `door-adopter:` twin, and the omission is the design**: the unmarked case is adopter-facing, because declaring the complement on every other door would be a roster maintained against itself, which context-kit/SPEC.md §bin/env-probe's audience axis already rules for its own empty value. Default-deny is what closes the failure this assertion exists for — a future adopter-facing page reintroducing a repaired defect while nothing reds. Under it a new page's door reds the day it lands, with no roster to remember to update.
 
-**Default-deny admits no pre-build exemption, and the two satisfying forms are
-the only ones.** A door standing on a configured corpus reds even where the site
-states its own precondition — that the binary is not built yet, say — because a
-stated precondition is prose and the discriminator is the declaration token. The
-repairs are therefore exactly two: name the arm on the binary the
-`GATE_SDK_NATIVE_BIN` knob resolves, or declare the site contributor-facing.
-Stated here because the reading is not derivable from the assertion's own
-wording, and a session meeting a pre-build door will otherwise look for a third
-form that does not exist.
+**Default-deny admits no pre-build exemption, and the two satisfying forms are the only ones.** A door standing on a configured corpus reds even where the site states its own precondition — that the binary is not built yet, say — because a stated precondition is prose and the discriminator is the declaration token. The repairs are therefore exactly two: name the arm on the binary the `GATE_SDK_NATIVE_BIN` knob resolves, or declare the site contributor-facing. Stated here because the reading is not derivable from the assertion's own wording, and a session meeting a pre-build door will otherwise look for a third form that does not exist.
 
-**Two scopes, because a one-site-one-declaration grammar is unaffordable and an
-unaffordable gate does not land.** *Site scope* is the declaration on the door's
-own line or the line above, the shared exempt window this repo's other valves
-already ride. *Span scope* is a declaration standing alone on its line, covering
-every door to the end of its enclosing unit, resolved two ways: the **fenced
-block** it immediately precedes, or the **whole file** when it stands before the
-file's first `#` heading. The fence resolution is what covers a multi-line
-command register without putting HTML comments inside a `bash` fence; the file
-resolution is what lets one emitter edit cover a whole generated page. **A door
-inside a generated region takes its declaration from the emitter, never from the
-page**, because a declaration written into emitted output is erased by the next
-regeneration.
+**Two scopes, because a one-site-one-declaration grammar is unaffordable and an unaffordable gate does not land.** *Site scope* is the declaration on the door's own line or the line above, the shared exempt window this repo's other valves already ride. *Span scope* is a declaration standing alone on its line, covering every door to the end of its enclosing unit, resolved two ways: the **fenced block** it immediately precedes, or the **whole file** when it stands before the file's first `#` heading. The fence resolution is what covers a multi-line command register without putting HTML comments inside a `bash` fence; the file resolution is what lets one emitter edit cover a whole generated page. **A door inside a generated region takes its declaration from the emitter, never from the page**, because a declaration written into emitted output is erased by the next regeneration.
 
-**Two alternatives are refused.** *A configured roster of adopter-facing sites*
-is the trivially-true proxy gate-sdk/SPEC.md §When a gate earns its place bars:
-a page added tomorrow is absent from the roster and reds nowhere, so the gate
-would manufacture confidence at exactly the point where the defect recurs. *A
-gate-side path heuristic* — a root surface adopter-facing, a docs tree
-contributor-facing — measures false on the file that matters, both audiences
-living inside one `README.md`, and a per-site heuristic has no signal to read.
+**Two alternatives are refused.** *A configured roster of adopter-facing sites* is the trivially-true proxy gate-sdk/SPEC.md §When a gate earns its place bars: a page added tomorrow is absent from the roster and reds nowhere, so the gate would manufacture confidence at exactly the point where the defect recurs. *A gate-side path heuristic* — a root surface adopter-facing, a docs tree contributor-facing — measures false on the file that matters, both audiences living inside one `README.md`, and a per-site heuristic has no signal to read.
 
-**C reuses A's predicate rather than copying it.** `is_door`, `token_span` and
-`names_fail_open_arm` are one implementation, because two spellings of one
-predicate would let A and C disagree about whether a line is a door. The
-fail-open arm exemption in particular is corpus-wide and keys on the arm alone.
+**C reuses A's predicate rather than copying it.** `is_door`, `token_span` and `names_fail_open_arm` are one implementation, because two spellings of one predicate would let A and C disagree about whether a line is a door. The fail-open arm exemption in particular is corpus-wide and keys on the arm alone.
 
-**The door/file discriminator is this gate's own, and it is the whole of what
-makes the first assertion decidable.** A mention of `run-gates.sh` or
-`run-gates.ps1` is a **door** when it is *spawned* — carried by an interpreter
-word (`bash`, `sh`, or PowerShell's `-File`) — or when an **arm** follows it.
-Every other mention names the program as its subject rather than invoking it:
-`` `run-gates.sh` runs gates, not tests `` is a sentence about a file, and a
-`GATE_SDK_PORTABILITY_PATHS` entry is a file whose shell dialect is checked.
-Those stay, and the amendment that landed this gate recorded one such site
-deliberately so the next reader sees a judgment rather than a gap. **A stub
-names itself**, so a file whose own basename is a door spelling is not swept:
-the spelling is retired as an *adopter-facing* door, not as the file's name.
+**The door/file discriminator is this gate's own, and it is the whole of what makes the first assertion decidable.** A mention of `run-gates.sh` or `run-gates.ps1` is a **door** when it is *spawned* — carried by an interpreter word (`bash`, `sh`, or PowerShell's `-File`) — or when an **arm** follows it. Every other mention names the program as its subject rather than invoking it: `` `run-gates.sh` runs gates, not tests `` is a sentence about a file, and a `GATE_SDK_PORTABILITY_PATHS` entry is a file whose shell dialect is checked. Those stay, and the amendment that landed this gate recorded one such site deliberately so the next reader sees a judgment rather than a gap. **A stub names itself**, so a file whose own basename is a door spelling is not swept: the spelling is retired as an *adopter-facing* door, not as the file's name.
 
-**A permission pattern is not an invocation.** A door inside a `Bash(…)` grant
-wrapper tells a harness what to *allow*, not what to run, and the recommended
-allowlist must name every door that actually gets spawned — which after the
-sweep is two, the binary and the front end the fail-open hook wiring still
-spawns (§The recommended allowlist). So an allowlist naming the front end is
-required rather than a violation. The wrapper shelters only what it encloses: a
-`Bash(…)` that has already closed earlier on the line does not exempt an
-invocation after it.
+**A permission pattern is not an invocation.** A door inside a `Bash(…)` grant wrapper tells a harness what to *allow*, not what to run, and the recommended allowlist must name every door that actually gets spawned — which after the sweep is two, the binary and the front end the fail-open hook wiring still spawns (§The recommended allowlist). So an allowlist naming the front end is required rather than a violation. The wrapper shelters only what it encloses: a `Bash(…)` that has already closed earlier on the line does not exempt an invocation after it.
 
-**The exemption keys on the arm, never on the file.** The fail-open arms —
-today `--hook` and `--statusline` — keep naming the front end by construction,
-because they are read exactly when the binary that would answer is absent
-(gate-sdk/SPEC.md §run-gates). So a door carrying one of them is exempt
-*wherever it sits*, a JSON `command` value included, and the set is read from
-the crate's `FAIL_OPEN_ARMS` declaration rather than re-listed here — the same
-declaration `check-front-end-fail-open` holds both stubs to, so neither gate can
-disagree with the other about which arms those are.
+**The exemption keys on the arm, never on the file.** The fail-open arms — today `--hook` and `--statusline` — keep naming the front end by construction, because they are read exactly when the binary that would answer is absent (gate-sdk/SPEC.md §run-gates). So a door carrying one of them is exempt *wherever it sits*, a JSON `command` value included, and the set is read from the crate's `FAIL_OPEN_ARMS` declaration rather than re-listed here — the same declaration `check-front-end-fail-open` holds both stubs to, so neither gate can disagree with the other about which arms those are.
 
-**The seam assertion replaced a stricter-looking one that could never pass.**
-The first authoring asserted that every substitution marker in a kit template is
-reached by an install arm that resolves it. No arm writes an adopter's settings
-and none is to be built (§The recommended allowlist), so that assertion would
-have redded on every marker it ever saw, for a reason no build could fix. An
-assertion that cannot pass is not a strict gate but a false one. What replaced
-it can fail for a real reason — an author pasting their own
-`scripts/checkwright-gates` into a shipped template — and no other gate covers
-it. It reads a path to the artifact, not the artifact's bare name, which is the
-kit's own vocabulary; the basename comes from the crate's package name, so the
-assertion and the binary it is about cannot drift apart.
+**The seam assertion replaced a stricter-looking one that could never pass.** The first authoring asserted that every substitution marker in a kit template is reached by an install arm that resolves it. No arm writes an adopter's settings and none is to be built (§The recommended allowlist), so that assertion would have redded on every marker it ever saw, for a reason no build could fix. An assertion that cannot pass is not a strict gate but a false one. What replaced it can fail for a real reason — an author pasting their own `scripts/checkwright-gates` into a shipped template — and no other gate covers it. It reads a path to the artifact, not the artifact's bare name, which is the kit's own vocabulary; the basename comes from the crate's package name, so the assertion and the binary it is about cannot drift apart.
 
-**Red** names the file and the violating line for the first assertion, the
-template and the path literal for the second, and the file, line and undeclared
-door for the third, with a malformed declaration reported as its own finding so
-the red line says which rule was breached. It **exits 2** on a corpus it cannot
-read and on a configured entry resolving to neither a tracked file nor a
-directory — the misconfiguration answer, never a false clean. **The clean line
-prints all three counts** — surfaces swept, templates among them, and configured
-surfaces swept — so a corpus that silently shrank to nothing is visible on green
-rather than passing vacuously. The third is a **report, not an assertion**:
-there is no floor and no exact-count arm on it, so a pruned corpus prints a
-smaller number and stays green.
+**Red** names the file and the violating line for the first assertion, the template and the path literal for the second, and the file, line and undeclared door for the third, with a malformed declaration reported as its own finding so the red line says which rule was breached. It **exits 2** on a corpus it cannot read and on a configured entry resolving to neither a tracked file nor a directory — the misconfiguration answer, never a false clean. **The clean line prints all three counts** — surfaces swept, templates among them, and configured surfaces swept — so a corpus that silently shrank to nothing is visible on green rather than passing vacuously. The third is a **report, not an assertion**: there is no floor and no exact-count arm on it, so a pruned corpus prints a smaller number and stays green.
 
 ## compare-settings-allow
 
-Advisory: lists local-overlay allow entries already granted by a glob in
-the committed settings, and those naming a script absent from the tree — the deterministic prune-candidate set for the
-close-stage audit. A committed pattern subsumes a local entry when the
-local string matches it under shell-glob semantics, with the harness `:*` prefix
-idiom and a sole closing space-led `*` read word-bounded (§The guard framework)
-so one test covers every form —
-the match core is `guard_allow_match`
-in `lib/guard.sh`, shared with rule 20. Read-only — reports candidates, never
-mutates (the operator prunes). It is the detector, not the policy: a
-non-redundant local entry can still be one-off junk worth pruning by
-judgment.
+Advisory: lists local-overlay allow entries already granted by a glob in the committed settings, and those naming a script absent from the tree — the deterministic prune-candidate set for the close-stage audit. A committed pattern subsumes a local entry when the local string matches it under shell-glob semantics, with the harness `:*` prefix idiom and a sole closing space-led `*` read word-bounded (§The guard framework) so one test covers every form — the match core is `guard_allow_match` in `lib/guard.sh`, shared with rule 20. Read-only — reports candidates, never mutates (the operator prunes). It is the detector, not the policy: a non-redundant local entry can still be one-off junk worth pruning by judgment.
 
-**The advisory is the `--emit-compare-settings-allow` arm-table member, and both
-halves of that are forced rather than chosen.** It is a **table member** on the
-forced-family test, the shape `--emit-scan-prompts` already holds: all four
-declared knobs — `GUARD_KIT_SETTINGS`, `GUARD_KIT_SETTINGS_LOCAL`,
-`GUARD_KIT_BREADTH_PROBES` and `GUARD_KIT_BREADTH_DECLARED` — are consumer
-configuration, rows of guard-kit's table (§Layout and configuration), and a
-member's declared roster is what the knob-file derivation and the roster checks read for it. It is an **`Arm::Emit`** because every report
-path already returns 0 — the no-overlay path, the empty-probe-set path and every
-path that finds candidates, this being an advisory that never renders a verdict —
-and the one non-zero path is the operand refusal at exit 2, so the `{0, 2}`
-collapse discards nothing the member carried. **`--count` does not make it an
-`Arm::Run`**: that mode answers two integers on stdout, which is
-`--emit-queue-index extent`'s reading of the family — a member may be a *query*
-tool rather than a generator — and its status carries no distinction the collapse
-would lose.
+**The advisory is the `--emit-compare-settings-allow` arm-table member, and both halves of that are forced rather than chosen.** It is a **table member** on the forced-family test, the shape `--emit-scan-prompts` already holds: all four declared knobs — `GUARD_KIT_SETTINGS`, `GUARD_KIT_SETTINGS_LOCAL`, `GUARD_KIT_BREADTH_PROBES` and `GUARD_KIT_BREADTH_DECLARED` — are consumer configuration, rows of guard-kit's table (§Layout and configuration), and a member's declared roster is what the knob-file derivation and the roster checks read for it. It is an **`Arm::Emit`** because every report path already returns 0 — the no-overlay path, the empty-probe-set path and every path that finds candidates, this being an advisory that never renders a verdict — and the one non-zero path is the operand refusal at exit 2, so the `{0, 2}` collapse discards nothing the member carried. **`--count` does not make it an `Arm::Run`**: that mode answers two integers on stdout, which is `--emit-queue-index extent`'s reading of the family — a member may be a *query* tool rather than a generator — and its status carries no distinction the collapse would lose.
 
-**Two of the four knobs are collections and neither needs new mechanism.**
-`GUARD_KIT_BREADTH_PROBES` is an indexed knob and `GUARD_KIT_BREADTH_DECLARED` a
-keyed one, and the crate reads them as a list and a map respectively. The keyed
-knob is the one worth naming: this member's whole declaration contract is the
-**key**, so a value-only read would silence nothing and report nothing while
-passing every element-shape check.
+**Two of the four knobs are collections and neither needs new mechanism.** `GUARD_KIT_BREADTH_PROBES` is an indexed knob and `GUARD_KIT_BREADTH_DECLARED` a keyed one, and the crate reads them as a list and a map respectively. The keyed knob is the one worth naming: this member's whole declaration contract is the **key**, so a value-only read would silence nothing and report nothing while passing every element-shape check.
 
-**The member spawns no external program at all — an empty set, the first in its
-class.** Both allow lists are read in-crate rather than through `jq`, which is
-what keeps an unreadable allowlist from reading as an empty one on a machine that
-merely lacks a tool. Rule 20's allowlist read takes the same in-crate reader through
-`--guard-json allow-entries` (§The guard framework (`lib/guard.sh`)), so no
-guard-kit reach an adopter runs needs `jq`.
+**The member spawns no external program at all — an empty set, the first in its class.** Both allow lists are read in-crate rather than through `jq`, which is what keeps an unreadable allowlist from reading as an empty one on a machine that merely lacks a tool. Rule 20's allowlist read takes the same in-crate reader through `--guard-json allow-entries` (§The guard framework (`lib/guard.sh`)), so no guard-kit reach an adopter runs needs `jq`.
 
-**The read distinguishes unreadable from absent, and that is a deliberate
-behaviour change.** An **absent** file is honestly zero entries, as before. An
-unparseable or unreadable **local overlay** takes the existing no-overlay path —
-the header and `no <path> — nothing to compare`, or `0 0` under `--count` — because
-an unreadable overlay is not an overlay that grants nothing. An unparseable
-**committed** file is a **refusal** with the path named, exit 2: reading it as
-empty would print *no redundant local entries*, a clean line the document does not
-support, over every local entry a committed glob may already grant.
+**The read distinguishes unreadable from absent, and that is a deliberate behaviour change.** An **absent** file is honestly zero entries, as before. An unparseable or unreadable **local overlay** takes the existing no-overlay path — the header and `no <path> — nothing to compare`, or `0 0` under `--count` — because an unreadable overlay is not an overlay that grants nothing. An unparseable **committed** file is a **refusal** with the path named, exit 2: reading it as empty would print *no redundant local entries*, a clean line the document does not support, over every local entry a committed glob may already grant.
 
-**An operand outside the closed set is refused, and its usage lives here.** The
-one operand is `--count`; anything else prints
-`usage: --emit compare-settings-allow [--count]` on stderr at exit 2, `--help`
-included. An `--emit-` member gets no front-end `case` arm — `--emit <name>`
-composes its flag, which is also why the spelling is forced — so it has no named
-help line to retire to, and the usage lives at the member's own shape refusal
-(gate-sdk/SPEC.md §The bin/-tool contract). The member is not a *reader instance*
-of that contract and does not claim to be: its one operand is drawn from a closed
-set, so validating membership already validates shape and the free-text trigger
-never fires.
+**An operand outside the closed set is refused, and its usage lives here.** The one operand is `--count`; anything else prints `usage: --emit compare-settings-allow [--count]` on stderr at exit 2, `--help` included. An `--emit-` member gets no front-end `case` arm — `--emit <name>` composes its flag, which is also why the spelling is forced — so it has no named help line to retire to, and the usage lives at the member's own shape refusal (gate-sdk/SPEC.md §The bin/-tool contract). The member is not a *reader instance* of that contract and does not claim to be: its one operand is drawn from a closed set, so validating membership already validates shape and the free-text trigger never fires.
 
-The advisory asks a **second question over the same two files**: which local entries
-are *too broad*. Redundancy asks whether a committed glob already grants a local
-entry; breadth asks whether a local glob would auto-allow a command the consumer
-called bad. Both are one call to `guard_allow_match` — the breadth question
-simply swaps its arguments, `guard_allow_match <probe> <local-glob>`, so there is
-no second matching implementation and the word-bounded `:*` reading is shared. The two
-findings are reported as distinct sets, and breadth is advisory in the same sense
-as redundancy: the report names the local glob and the one probe that witnesses
-its breadth, and the operator disposes — narrow the glob, or record that the
-breadth is intended.
+The advisory asks a **second question over the same two files**: which local entries are *too broad*. Redundancy asks whether a committed glob already grants a local entry; breadth asks whether a local glob would auto-allow a command the consumer called bad. Both are one call to `guard_allow_match` — the breadth question simply swaps its arguments, `guard_allow_match <probe> <local-glob>`, so there is no second matching implementation and the word-bounded `:*` reading is shared. The two findings are reported as distinct sets, and breadth is advisory in the same sense as redundancy: the report names the local glob and the one probe that witnesses its breadth, and the operator disposes — narrow the glob, or record that the breadth is intended.
 
-**Which way that disposition goes has a criterion, and the criterion is security
-rather than tidiness.** Breadth is kept wherever it is safe, because an allow
-match short-circuits the permission classifier outright — a broad rule actively
-*saves* model calls rather than merely avoiding a prompt, so narrowing one costs
-something on every call it stops matching. Narrowing is warranted only where a
-**destructive form sits inside a blanket grant**: a hard reset, a working-tree
-clean, a force push, a bare `checkout --` discarding local changes. A glob broad
-only in a harmless direction is declared intended, never trimmed.
+**Which way that disposition goes has a criterion, and the criterion is security rather than tidiness.** Breadth is kept wherever it is safe, because an allow match short-circuits the permission classifier outright — a broad rule actively *saves* model calls rather than merely avoiding a prompt, so narrowing one costs something on every call it stops matching. Narrowing is warranted only where a **destructive form sits inside a blanket grant**: a hard reset, a working-tree clean, a force push, a bare `checkout --` discarding local changes. A glob broad only in a harmless direction is declared intended, never trimmed.
 
-**Applying the disposition is the operator's authority, exercised by the session
-the operator is present in, on the operator's behalf — never by the operator's
-hand, and never by a delegated session.** A finding here is neither queue work
-nor build work, and it is not left standing either: the allowlist is how the
-friction the close stage measures is paid down (§The close-stage triage step), so
-a prepared diff nobody applies is that loop left open. What gates the application
-is impact: a **high-impact** edit waits for the operator's explicit confirmation,
-and a **low-impact** edit is applied and then reported, never asked. The file sets
-the bar, because the two differ in reach:
+**Applying the disposition is the operator's authority, exercised by the session the operator is present in, on the operator's behalf — never by the operator's hand, and never by a delegated session.** A finding here is neither queue work nor build work, and it is not left standing either: the allowlist is how the friction the close stage measures is paid down (§The close-stage triage step), so a prepared diff nobody applies is that loop left open. What gates the application is impact: a **high-impact** edit waits for the operator's explicit confirmation, and a **low-impact** edit is applied and then reported, never asked. The file sets the bar, because the two differ in reach:
 
-- **low-impact in either file** — an edit that only narrows: pruning a redundant or
-  one-off entry, narrowing a glob, adding a deny or ask entry;
-- **high-impact in either file** — an edit that relaxes a guard: a removed deny or
-  ask entry, a removed or weakened hook, an env override such as a raised pause
-  threshold;
-- **a widening** — a new or broader allow entry — is high-impact in **the committed
-  settings file**, which every clone reads, and in **the local overlay** is
-  high-impact only when it reaches a write, execute, network or destructive form;
-  a local widening to a read-only command or a fixed literal is low-impact.
+- **low-impact in either file** — an edit that only narrows: pruning a redundant or one-off entry, narrowing a glob, adding a deny or ask entry;
+- **high-impact in either file** — an edit that relaxes a guard: a removed deny or ask entry, a removed or weakened hook, an env override such as a raised pause threshold;
+- **a widening** — a new or broader allow entry — is high-impact in **the committed settings file**, which every clone reads, and in **the local overlay** is high-impact only when it reaches a write, execute, network or destructive form; a local widening to a read-only command or a fixed literal is low-impact.
 
-A **delegated** session may only *prepare* the edit — derive the diff, state its
-security grounds, record both — and hand it up; there its remit ends. The ground
-is not a preference about who should do it but that the work is not executable
-where a delegated session runs: a permission classifier denies the edit, and no
-operator is present to give the confirmation the edit's impact may owe. The
-refusal that remains is permission laundering: a supervising session applying a
-delegated session's diff **without the confirmation its impact owes**, which
-converts the permission boundary into a formality. Confirmation is the operator's
-act, never the supervisor's, and it does not bind the harness: a permission
-classifier may still deny a confirmed edit in the operator's own session, and the
-session then stops, names the denied edit, and lets the operator grant it —
-never retrying a narrower spelling of the same edit to slip past the denial. A delegated session that meets the refusal and stops
-has behaved correctly.
+A **delegated** session may only *prepare* the edit — derive the diff, state its security grounds, record both — and hand it up; there its remit ends. The ground is not a preference about who should do it but that the work is not executable where a delegated session runs: a permission classifier denies the edit, and no operator is present to give the confirmation the edit's impact may owe. The refusal that remains is permission laundering: a supervising session applying a delegated session's diff **without the confirmation its impact owes**, which converts the permission boundary into a formality. Confirmation is the operator's act, never the supervisor's, and it does not bind the harness: a permission classifier may still deny a confirmed edit in the operator's own session, and the session then stops, names the denied edit, and lets the operator grant it — never retrying a narrower spelling of the same edit to slip past the denial. A delegated session that meets the refusal and stops has behaved correctly.
 
-The probe set is consumer config (`GUARD_KIT_BREADTH_PROBES`, §Layout and
-configuration), and it is **probes rather than a roster**: each entry is a single
-witness whose auto-allowance would be bad, not a member of a set claimed
-complete. A missing probe costs one witness and can never produce a false green,
-because no completeness is claimed — and nothing here may come to claim it, since
-a report worded as coverage would be the false-confidence proxy gate-sdk/SPEC.md
-§When a gate earns its place refuses. With no probes declared the breadth section
-is omitted entirely rather than printed clean, so a consumer that declared no
-vocabulary cannot read silence as coverage.
+The probe set is consumer config (`GUARD_KIT_BREADTH_PROBES`, §Layout and configuration), and it is **probes rather than a roster**: each entry is a single witness whose auto-allowance would be bad, not a member of a set claimed complete. A missing probe costs one witness and can never produce a false green, because no completeness is claimed — and nothing here may come to claim it, since a report worded as coverage would be the false-confidence proxy gate-sdk/SPEC.md §When a gate earns its place refuses. With no probes declared the breadth section is omitted entirely rather than printed clean, so a consumer that declared no vocabulary cannot read silence as coverage.
 
-**The second disposition has a mechanism, and where the ruling lives is what makes
-it durable.** `GUARD_KIT_BREADTH_DECLARED` (§Layout and configuration) maps a
-permission-rule string to the reason that breadth was ruled intended — a pair,
-never a bare list, since a bare list re-loses the reason it exists to keep. It
-lives in the **committed** config the consumer tracks, so the ruling survives in a
-reviewable surface rather than in a session's memory or a commit message, which
-spec-over-precedent says is not ground truth. That fixes where a declaration
-*lives*; it does not widen what the breadth question *reads*, which stays the
-local overlay named above. An over-broad local glob keeps re-reporting until a
-**committed** declaration rules it, and a per-clone declaration cannot silence
-one.
+**The second disposition has a mechanism, and where the ruling lives is what makes it durable.** `GUARD_KIT_BREADTH_DECLARED` (§Layout and configuration) maps a permission-rule string to the reason that breadth was ruled intended — a pair, never a bare list, since a bare list re-loses the reason it exists to keep. It lives in the **committed** config the consumer tracks, so the ruling survives in a reviewable surface rather than in a session's memory or a commit message, which spec-over-precedent says is not ground truth. That fixes where a declaration *lives*; it does not widen what the breadth question *reads*, which stays the local overlay named above. An over-broad local glob keeps re-reporting until a **committed** declaration rules it, and a per-clone declaration cannot silence one.
 
-**The declaration match is exact-string, never glob.** An entry is declared when
-the exact local allow-rule string is a key of the map — a key test and nothing
-else. Routing it through `guard_allow_match` is refused: the kit's one matcher
-would let a single declaration silence globs the operator's ruling never named,
-which is a declaration widening itself, and a durable ruling about intended
-breadth is a ruling about **one** glob. The consequence is stated rather than left
-to be discovered — narrowing a declared glob, or re-spelling it, drops its
-declaration and the entry re-reports. That is correct, since the ruling was taken
-on the old string, and it is what keeps a declaration from outliving the glob it
-ruled.
+**The declaration match is exact-string, never glob.** An entry is declared when the exact local allow-rule string is a key of the map — a key test and nothing else. Routing it through `guard_allow_match` is refused: the kit's one matcher would let a single declaration silence globs the operator's ruling never named, which is a declaration widening itself, and a durable ruling about intended breadth is a ruling about **one** glob. The consequence is stated rather than left to be discovered — narrowing a declared glob, or re-spelling it, drops its declaration and the entry re-reports. That is correct, since the ruling was taken on the old string, and it is what keeps a declaration from outliving the glob it ruled.
 
-**A declared glob is not dropped from the report.** The over-broad set partitions
-in two and both halves print:
+**A declared glob is not dropped from the report.** The over-broad set partitions in two and both halves print:
 
-- **narrowing candidates** — over-broad and undeclared, printed with the
-  two-disposition help text above.
-- **declared intended** — over-broad and declared, printed as
-  `<glob>  ⊇  <probe>  — <reason>` under its own heading, with help text naming
-  the committed config as where the ruling lives.
+- **narrowing candidates** — over-broad and undeclared, printed with the two-disposition help text above.
+- **declared intended** — over-broad and declared, printed as `<glob>  ⊇  <probe>  — <reason>` under its own heading, with help text naming the committed config as where the ruling lives.
 
-Dropping a declared glob would make the knob a silencer whose contents nobody ever
-reads, and a field with no named reader is removed rather than shipped
-(canon-kit/SPEC.md §The causal-completeness check, point 4). An over-broad set
-that is **entirely** declared therefore prints the declared section and **no**
-narrowing section: *no over-broad local entries* would be false there. With no
-over-broad entries at all the report is unchanged, and with the map empty — the
-default, and the shipped state for a consumer who declares nothing — the partition
-is trivial, the declared subsection is omitted, and the breadth report matches,
-byte for byte, the tool as it behaved before the declaration shipped. The asymmetry with
-`GUARD_KIT_BREADTH_PROBES` is deliberate: an empty probe set omits the whole
-breadth section because silence there could be misread as coverage, while an empty
-declaration set omits only the declared subsection, where no coverage claim is
-available to misread and an absent section says exactly that nothing was declared.
+Dropping a declared glob would make the knob a silencer whose contents nobody ever reads, and a field with no named reader is removed rather than shipped (canon-kit/SPEC.md §The causal-completeness check, point 4). An over-broad set that is **entirely** declared therefore prints the declared section and **no** narrowing section: *no over-broad local entries* would be false there. With no over-broad entries at all the report is unchanged, and with the map empty — the default, and the shipped state for a consumer who declares nothing — the partition is trivial, the declared subsection is omitted, and the breadth report matches, byte for byte, the tool as it behaved before the declaration shipped. The asymmetry with `GUARD_KIT_BREADTH_PROBES` is deliberate: an empty probe set omits the whole breadth section because silence there could be misread as coverage, while an empty declaration set omits only the declared subsection, where no coverage claim is available to misread and an absent section says exactly that nothing was declared.
 
-**The honest limit: a declaration can outlive its subject and nothing notices.**
-The knob records a ruling; it does not verify that the glob it names is still in
-`GUARD_KIT_SETTINGS_LOCAL`, still over-broad, or still real. A stale declaration
-is silent. A stale-declaration report was weighed and refused, because it would
-print every declaration naming a **committed** glob as stale — and a committed
-glob was never in this report to begin with, so a declaration naming one is a
-durable record that the report itself does not read. That is exactly the shape a
-re-derivation of the committed allowlist produces when it rules a glob safe and
-keeps it broad, and it is stated rather than covered; the gap is filed rather than
-flagged-and-skipped. Nothing here makes a gate of the tool either: the placement
-ruling below is unchanged and unweakened by a knob that records exactly the
-operator intent that ruling turns on.
+**The honest limit: a declaration can outlive its subject and nothing notices.** The knob records a ruling; it does not verify that the glob it names is still in `GUARD_KIT_SETTINGS_LOCAL`, still over-broad, or still real. A stale declaration is silent. A stale-declaration report was weighed and refused, because it would print every declaration naming a **committed** glob as stale — and a committed glob was never in this report to begin with, so a declaration naming one is a durable record that the report itself does not read. That is exactly the shape a re-derivation of the committed allowlist produces when it rules a glob safe and keeps it broad, and it is stated rather than covered; the gap is filed rather than flagged-and-skipped. Nothing here makes a gate of the tool either: the placement ruling below is unchanged and unweakened by a knob that records exactly the operator intent that ruling turns on.
 
-This is the criterion's home rather than a gate, and the placement is ruled
-rather than defaulted: the subject is a gitignored per-machine file CI cannot
-see, and the verdict is operator-intent-dependent (a blanket grant is fine in a
-throwaway sandbox), which is the high-false-positive shape §When a gate earns its
-place holds back for an attested miss. What replaces the gate is a scheduled
-reader — §The close-stage triage step — the same mechanism the redundancy
-criterion has relied on since it shipped.
+This is the criterion's home rather than a gate, and the placement is ruled rather than defaulted: the subject is a gitignored per-machine file CI cannot see, and the verdict is operator-intent-dependent (a blanket grant is fine in a throwaway sandbox), which is the high-false-positive shape §When a gate earns its place holds back for an attested miss. What replaces the gate is a scheduled reader — §The close-stage triage step — the same mechanism the redundancy criterion has relied on since it shipped.
 
-**That ruling is about this subject, not about allow-list checking generally**,
-and the boundary is stated because the section otherwise reads as covering the
-whole surface and the next reader re-derives it. Both clauses are load-bearing
-and both fail on the *committed* file: it is tracked, so CI sees it, and "does
-this path exist" is a binary filesystem fact no operator intent can move. A
-committed-allow-list predicate of that shape is therefore gated, and gated
-elsewhere — context-kit/SPEC.md §check-settings-paths, with the kit that already
-owns the committed settings file as a gate subject. This kit holds the three
-`.permissions.allow[]` readers in the tree and still ships no gates; co-location
-by parsing technique does not outrank placement by governed surface.
+**That ruling is about this subject, not about allow-list checking generally**, and the boundary is stated because the section otherwise reads as covering the whole surface and the next reader re-derives it. Both clauses are load-bearing and both fail on the *committed* file: it is tracked, so CI sees it, and "does this path exist" is a binary filesystem fact no operator intent can move. A committed-allow-list predicate of that shape is therefore gated, and gated elsewhere — context-kit/SPEC.md §check-settings-paths, with the kit that already owns the committed settings file as a gate subject. This kit holds the three `.permissions.allow[]` readers in the tree and still ships no gates; co-location by parsing technique does not outrank placement by governed surface.
 
-**A third question over the overlay: which entries grant a script that is gone.**
-A grant naming a deleted script breaks nothing, since no command reaches it, but
-every reader of the overlay must re-verify which lines still mean anything, and a
-dead grant beside a renamed tool reads as coverage. The report lists each local
-entry whose command token is a literal `.sh` path that does not resolve, as
-`<entry> — no such file: <path>` in a dead-path section between the redundancy and
-breadth sections, with the checked count on its clean line — the count is what
-tells a predicate that scoped to the array from one that matched nothing. The
-token is taken by context-kit/SPEC.md §check-settings-paths' extraction predicate,
-**called rather than copied**: the scoping is ruled there, and a second extraction
-would drift from it the first time either was edited. The one difference is
-resolution. An absolute token resolves as written, because a per-machine grant is
-routinely absolute where a committed one is not; any other resolves against the
-repository root, where the front-end runs. This is the same subject that section
-gates for the committed file, answered here as an advisory, because the placement
-ruling above is about the overlay and does not move. The question needs no
-vocabulary — existence is a filesystem fact — so it has no probe knob and no
-opt-in, and the no-overlay path prints no dead-path section. It reads the
-filesystem and spawns nothing, so the member's empty spawned-program set above
-stands. `--count` does not carry the set, on the declared count's ground below.
+**A third question over the overlay: which entries grant a script that is gone.** A grant naming a deleted script breaks nothing, since no command reaches it, but every reader of the overlay must re-verify which lines still mean anything, and a dead grant beside a renamed tool reads as coverage. The report lists each local entry whose command token is a literal `.sh` path that does not resolve, as `<entry> — no such file: <path>` in a dead-path section between the redundancy and breadth sections, with the checked count on its clean line — the count is what tells a predicate that scoped to the array from one that matched nothing. The token is taken by context-kit/SPEC.md §check-settings-paths' extraction predicate, **called rather than copied**: the scoping is ruled there, and a second extraction would drift from it the first time either was edited. The one difference is resolution. An absolute token resolves as written, because a per-machine grant is routinely absolute where a committed one is not; any other resolves against the repository root, where the front-end runs. This is the same subject that section gates for the committed file, answered here as an advisory, because the placement ruling above is about the overlay and does not move. The question needs no vocabulary — existence is a filesystem fact — so it has no probe knob and no opt-in, and the no-overlay path prints no dead-path section. It reads the filesystem and spawns nothing, so the member's empty spawned-program set above stands. `--count` does not carry the set, on the declared count's ground below.
 
-`--count` emits both bare counts on one line, redundancy first and breadth
-second, and the breadth number counts the **narrowing candidates** rather than
-every over-broad entry: the count's one purpose is *how much is outstanding*, and
-a declared entry is not outstanding. A third number for the declared count is
-refused — no reader needs it, and the two-number line is a shape a consumer may
-already parse.
+`--count` emits both bare counts on one line, redundancy first and breadth second, and the breadth number counts the **narrowing candidates** rather than every over-broad entry: the count's one purpose is *how much is outstanding*, and a declared entry is not outstanding. A third number for the declared count is refused — no reader needs it, and the two-number line is a shape a consumer may already parse.
 
 ## wakeup-guard
 
-Optional second guard, same `--hook` dispatch, opposite posture: blocks
-self-scheduled wakeups (`ScheduleWakeup`/`CronCreate`) unconditionally and
-logs each attempt — a stored prompt re-fires in a later session as if the
-user typed it, long after its premises are stale, and the scheduling call
-is invisible at the moment it matters. Fail-closed (the matcher proves the
-tool identity, so a logging failure still denies). The attempt log is
-reviewed and deleted in the same close-stage triage pass as the friction
-log. Deliberate scheduling stays possible by disabling the hook for a
-session — the block is the default, not a capability removal.
+Optional second guard, same `--hook` dispatch, opposite posture: blocks self-scheduled wakeups (`ScheduleWakeup`/`CronCreate`) unconditionally and logs each attempt — a stored prompt re-fires in a later session as if the user typed it, long after its premises are stale, and the scheduling call is invisible at the moment it matters. Fail-closed (the matcher proves the tool identity, so a logging failure still denies). The attempt log is reviewed and deleted in the same close-stage triage pass as the friction log. Deliberate scheduling stays possible by disabling the hook for a session — the block is the default, not a capability removal.
 
-Each attempt line is a local-zone stamp in GNU `date -Is`'s shape,
-`YYYY-MM-DDTHH:MM:SS±HH:MM`, then the payload's `session_id`, `tool_name` and
-`tool_input` as one JSON object in that key order, `null` for a field the payload
-lacks. The binary builds the stamp in-process on unix from the offset the C
-library reports for the instant, and spawns `date -Is` only off unix, where
-`date` rides the userland `bash` requires (gate-sdk/SPEC.md §The program roster).
+Each attempt line is a local-zone stamp in GNU `date -Is`'s shape, `YYYY-MM-DDTHH:MM:SS±HH:MM`, then the payload's `session_id`, `tool_name` and `tool_input` as one JSON object in that key order, `null` for a field the payload lacks. The binary builds the stamp in-process on unix from the offset the C library reports for the instant, and spawns `date -Is` only off unix, where `date` rides the userland `bash` requires (gate-sdk/SPEC.md §The program roster).
 
-The attempt log is a capture-tier surface on the same terms as the friction log
-— gitignored, advisory, reclaimed by the triage pass named above — and it
-declares itself so whether or not the consumer wires the hook, because the tier
-has to hold the file the *first* time the guard fires rather than after a
-workflow-tiering red says it does not:
+The attempt log is a capture-tier surface on the same terms as the friction log — gitignored, advisory, reclaimed by the triage pass named above — and it declares itself so whether or not the consumer wires the hook, because the tier has to hold the file the *first* time the guard fires rather than after a workflow-tiering red says it does not:
 
 close-surface: .workflow/wakeup-attempts.log advisory reclaim=: > .workflow/wakeup-attempts.log
 
 ### escalation-guard
 
-escalation-guard is the wakeup-guard's sibling — same `--hook` dispatch,
-a tool-targeted matcher, a separate opt-in hook — but **advisory, not
-fail-closed**, and the opposite failure posture: an advisory never blocks a
-message, so any inability to inspect the payload passes silently. Registered as
-a `PreToolUse(SendMessage)` hook, it fires only on a message addressed to the
-lead (a background stage session reaches the live lead as `main`) and advises,
-feeding `additionalContext`, when that message lacks any of the decision-shape
-headers **Question / Options / Recommendation / Evidence**. A downward or
-peer-directed message, or one already carrying those headers, passes untouched.
+escalation-guard is the wakeup-guard's sibling — same `--hook` dispatch, a tool-targeted matcher, a separate opt-in hook — but **advisory, not fail-closed**, and the opposite failure posture: an advisory never blocks a message, so any inability to inspect the payload passes silently. Registered as a `PreToolUse(SendMessage)` hook, it fires only on a message addressed to the lead (a background stage session reaches the live lead as `main`) and advises, feeding `additionalContext`, when that message lacks any of the decision-shape headers **Question / Options / Recommendation / Evidence**. A downward or peer-directed message, or one already carrying those headers, passes untouched.
 
-It is the mechanical floor under lifecycle-kit's lead protocol
-(lifecycle-kit/SPEC.md §templates/lead.md): prompts request the escalation
-shape, this guard enforces it. The header grammar is the kit's mechanism; the
-ruling-class roster — what a stage session must escalate at all — stays consumer
-config in the dispatched agent-definition, never here. Opt-in is the consumer's
-settings registration, the same valve as the wakeup-guard; absent it the
-arm goes undispatched, the intended default. That stated default is the *only* enforcement of the
-wiring: no gate observes it — `check-settings-pins` and `check-memory-off` stay
-green whether the hook is wired or not — so a session decides whether to wire an
-optional guard by reading this section, never by predicting a gate's verdict or
-reading the guard's own source to infer one. It sources no config and writes no
-log — the advisory is transient, so nothing accrues for the close-stage triage.
+It is the mechanical floor under lifecycle-kit's lead protocol (lifecycle-kit/SPEC.md §templates/lead.md): prompts request the escalation shape, this guard enforces it. The header grammar is the kit's mechanism; the ruling-class roster — what a stage session must escalate at all — stays consumer config in the dispatched agent-definition, never here. Opt-in is the consumer's settings registration, the same valve as the wakeup-guard; absent it the arm goes undispatched, the intended default. That stated default is the *only* enforcement of the wiring: no gate observes it — `check-settings-pins` and `check-memory-off` stay green whether the hook is wired or not — so a session decides whether to wire an optional guard by reading this section, never by predicting a gate's verdict or reading the guard's own source to infer one. It sources no config and writes no log — the advisory is transient, so nothing accrues for the close-stage triage.
 
 ## The close-stage triage step
 
-`templates/close-triage.md` is the recurring step a consumer splices into
-its close-stage skill — it fills the `housekeeping` slot (step 4) in
-lifecycle-kit's close template. The step: run `scan-prompts`, resolve each
-recurring pattern by the triage criterion; review and delete the wakeup
-log if present; run `compare-settings-allow` and take its **three**
-dispositions — prune the listed redundant local entries, prune the listed
-dead-path local entries, and for each entry the
-breadth report names as a narrowing candidate, either narrow the glob or record
-that its breadth is intended as a `GUARD_KIT_BREADTH_DECLARED` entry in the
-committed config, which is what moves it into the report's declared section and
-stops it re-reporting — then by judgment prune the remaining one-off exact-string local
-entries and promote recurring safe patterns to the committed settings as
-globs; clear the friction log. Two judgments the reports cannot make sit in
-that last step. An entry naming a **script path** rather than a fixed command is
-not content-pinned — it grants whatever the file says at run time — and its
-sanctioned form is the `--scratch-run` arm (§scratch-run), whose echo is the
-compensating control; and widening the committed set is the consumer's call,
-since a session does not widen its own auto-allow set on its own say-so. Goal: the local set stays small, every
-durable pattern lives in the committed, reviewable allowlist, and no local glob
-auto-allows a command the consumer declared bad. One step, two reports, one
-reader — no new invocation point and no new schedule.
+`templates/close-triage.md` is the recurring step a consumer splices into its close-stage skill — it fills the `housekeeping` slot (step 4) in lifecycle-kit's close template. The step: run `scan-prompts`, resolve each recurring pattern by the triage criterion; review and delete the wakeup log if present; run `compare-settings-allow` and take its **three** dispositions — prune the listed redundant local entries, prune the listed dead-path local entries, and for each entry the breadth report names as a narrowing candidate, either narrow the glob or record that its breadth is intended as a `GUARD_KIT_BREADTH_DECLARED` entry in the committed config, which is what moves it into the report's declared section and stops it re-reporting — then by judgment prune the remaining one-off exact-string local entries and promote recurring safe patterns to the committed settings as globs; clear the friction log. Two judgments the reports cannot make sit in that last step. An entry naming a **script path** rather than a fixed command is not content-pinned — it grants whatever the file says at run time — and its sanctioned form is the `--scratch-run` arm (§scratch-run), whose echo is the compensating control; and widening the committed set is the consumer's call, since a session does not widen its own auto-allow set on its own say-so. Goal: the local set stays small, every durable pattern lives in the committed, reviewable allowlist, and no local glob auto-allows a command the consumer declared bad. One step, two reports, one reader — no new invocation point and no new schedule.
 
-The friction log is a capture-tier surface with no forcing function — nothing
-refuses a close that skips it — so it declares itself advisory on the
-close-surface roster (lifecycle-kit/SPEC.md §The close-surface roster), naming
-the clear above as its reclaim path. The ranking's allowlist-unreachable section
-is advisory on those same terms and adds no obligation: it reds nothing, gates
-nothing, and leaves the roster line unchanged:
+The friction log is a capture-tier surface with no forcing function — nothing refuses a close that skips it — so it declares itself advisory on the close-surface roster (lifecycle-kit/SPEC.md §The close-surface roster), naming the clear above as its reclaim path. The ranking's allowlist-unreachable section is advisory on those same terms and adds no obligation: it reds nothing, gates nothing, and leaves the roster line unchanged:
 
 close-surface: .workflow/prompt-friction.log advisory reclaim=: > .workflow/prompt-friction.log
 
@@ -3251,574 +559,99 @@ guard-kit/
   smoke/install.sh
 ```
 
-Config is a **knob file**: copy `templates/guard-config.knobs` into the gates dir
-as `guard-config.knobs` (or point `GUARD_KIT_KNOB_FILE` elsewhere) and set any knob
-below; defaults fill what the file leaves unset. guard-kit's knobs are **static**:
-the binary resolves them in process from its own defaults table and the consumer's
-knob file; `bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one with
-its shape and rendered default. A gitignored `guard-config.local.knobs` in the gates dir is
-the home for a private value a tracked file cannot carry. The grammar, that `.local`
-overlay, the environment-over-file precedence for a scalar, and the refusals — a set
-`GUARD_KIT_KNOB_FILE` that does not exist, a left-behind `guard-config.sh` or
-`guard-config.local.sh`, a non-empty file named by the retired
-`GUARD_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob file's. `lib/guard.sh`
-reads the values through the binary, and a refusal reaches the hook as a block
-carrying its text (§The guard framework). A derived default below names the knob it reads as `${NAME}`, or as `${NAME:-<default>}` so the roster's rendered literal reads as agreement.
-Knobs (this repo's layout as defaults):
+Config is a **knob file**: copy `templates/guard-config.knobs` into the gates dir as `guard-config.knobs` (or point `GUARD_KIT_KNOB_FILE` elsewhere) and set any knob below; defaults fill what the file leaves unset. guard-kit's knobs are **static**: the binary resolves them in process from its own defaults table and the consumer's knob file; `bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one with its shape and rendered default. A gitignored `guard-config.local.knobs` in the gates dir is the home for a private value a tracked file cannot carry. The grammar, that `.local` overlay, the environment-over-file precedence for a scalar, and the refusals — a set `GUARD_KIT_KNOB_FILE` that does not exist, a left-behind `guard-config.sh` or `guard-config.local.sh`, a non-empty file named by the retired `GUARD_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob file's. `lib/guard.sh` reads the values through the binary, and a refusal reaches the hook as a block carrying its text (§The guard framework). A derived default below names the knob it reads as `${NAME}`, or as `${NAME:-<default>}` so the roster's rendered literal reads as agreement. Knobs (this repo's layout as defaults):
 
-- `GUARD_KIT_LIB` — the vendored `lib/guard.sh` path the copied guards
-  source (the test runner points it at the tree under test); default
-  `guard-kit/lib/guard.sh`. Not a knob and no table row: env or the copied
-  guard's head only, because it names the library before the library exists,
-  so `guard-config.knobs` cannot set it.
-- `GUARD_KIT_LOG` — derived default
-  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/prompt-friction.log`.
-- `GUARD_KIT_WAKEUP_LOG` — derived default
-  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/wakeup-attempts.log`.
+- `GUARD_KIT_LIB` — the vendored `lib/guard.sh` path the copied guards source (the test runner points it at the tree under test); default `guard-kit/lib/guard.sh`. Not a knob and no table row: env or the copied guard's head only, because it names the library before the library exists, so `guard-config.knobs` cannot set it.
+- `GUARD_KIT_LOG` — derived default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/prompt-friction.log`.
+- `GUARD_KIT_WAKEUP_LOG` — derived default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/wakeup-attempts.log`.
 - `GUARD_KIT_SETTINGS` — default `.claude/settings.json`.
 - `GUARD_KIT_SETTINGS_LOCAL` — default `.claude/settings.local.json`.
-- `GUARD_KIT_BREADTH_PROBES` — array of permission-rule strings, each a witness
-  that a local glob is too broad (§compare-settings-allow); default empty, in
-  which case the breadth report is absent and the tool behaves exactly as it did
-  before the criterion shipped. Entries are full permission-rule strings rather
-  than bare commands, matching the settings vocabulary the tool already reads on
-  both sides, so a consumer can probe non-`Bash` rules with the same mechanism.
-  The kit ships **no** default probes: a probe names a command the consumer
-  calls bad, which is the consumer's vocabulary, never the kit's (gate-sdk/SPEC.md §The
-  provenance seam).
-- `GUARD_KIT_DOOR_ROOTS` — array of repo-relative paths, each a tracked file or
-  a directory, naming the surfaces beyond the kit roots that
-  `check-door-binding`'s assertion C sweeps; default **empty**, in which case C
-  is inert and the gate's verdict is what it was before C shipped. A directory
-  entry yields its **tracked** members under the prune set assertion A already
-  applies, so a consumer adds a governed tree once and every tracked page later
-  added under it is swept with no further edit — the derivation-first half of C's
-  default-deny — while a local build artifact under that tree is not a governed
-  surface and is never swept. The kit ships
-  **no** default entry: which of a consumer's surfaces it governs is the
-  consumer's fact, never the kit's (gate-sdk/SPEC.md §The provenance seam), on
-  `GUARD_KIT_BREADTH_PROBES`' precedent above. An entry resolving to neither a
-  tracked file nor a directory is exit 2, the posture every sibling here takes.
-- `GUARD_KIT_BREADTH_DECLARED` — keyed knob recording the breadths ruled
-  intended (§compare-settings-allow), one
-  `GUARD_KIT_BREADTH_DECLARED[<rule>] = <reason>` line each: the key is a permission-rule string, the value the reason
-  that breadth was ruled intended; default empty, in which case
-  the declared subsection is absent and the tool behaves exactly as it did before
-  the declaration shipped. **Keyed rather than a delimited indexed knob, and the
-  choice is not cosmetic:** a permission rule may contain any character a
-  command may, so every single-character separator an indexed knob would need
-  (`|`, `::`, a tab) is a character a legitimate rule can carry, and the knob
-  would ship a grammar that cannot express part of its own subject. A key holds
-  the rule verbatim, bounded only by the line grammar's own key rule (no `]`,
-  `=` or tab, which a live permission rule does not carry), and a key is unique by construction, so
-  the *which reason wins* question the delimited shape would raise cannot arise.
-  Report order never depends on the map's iteration order: the tool walks the
-  settings file's own allow list and looks each entry up, so the map is never
-  iterated and the unordered iteration never reaches output. The kit ships **no**
-  default declarations, on the same seam reasoning as the probes above.
-- `GUARD_KIT_RO_SCRIPTS` — array of globs eligible for the
-  absolute→relative rewrite (rule 4); default `("check-*.sh")`.
-- `GUARD_KIT_RO_BINS` — read-only pipeline roster (rule 18); default the
-  grep/head/cat/find/jq family, plus `xargs`, whose membership is qualified by
-  rule 18's discriminator rather than granting on the leads-with test alone.
-  Every member also takes a declaration of its write and execute forms, from
-  `GUARD_KIT_RO_FORMS` or the kit's table, and an undeclared member is withheld.
-- `GUARD_KIT_RO_FORMS` — keyed knob mapping a roster binary to its
-  declaration of write and execute forms, in rule 18's grammar, one
-  `GUARD_KIT_RO_FORMS[<binary>] = <declaration>` line each; default empty,
-  in which case the kit's table declares the default roster and nothing else.
-  Its reader is `_guard_ro_forms_clear`, at rule 15's exemption (3), rule 18 and
-  rule 19's clauses (c) and (d), plus rule 9's listing test for `find`, one
-  lookup per roster-led segment. A consumer adding a member to
-  `GUARD_KIT_RO_BINS` declares it here or the member is withheld; an entry for a
-  default member replaces the kit's declaration rather than adding to it.
-  **Keyed on `GUARD_KIT_BREADTH_DECLARED`'s ground**: the key is a binary
-  name held verbatim and unique by construction.
-- `GUARD_KIT_APPEND_BINS` — the emitter roster of rule 17's write grant, which
-  covers the create case as well as the append the name was minted for;
-  default `(cat printf echo)`. A knob rather than a kit literal on
-  `GUARD_KIT_RO_BINS`'s reasoning: a consumer whose mandated write rides a
-  different emitter shadows the array instead of forking the rule, and three
-  POSIX utility names are shipped mechanism rather than a vocabulary, so
-  defaulting them crosses no provenance seam. The roster's contract is **writes
-  only to its stdout**, and a consumer adding a command that writes anywhere
-  else widens the grant past rule 17(c)'s safety argument — the same widening
-  hazard `GUARD_KIT_RO_BINS` carries, stated here because this roster's members
-  are what bound a *write* rather than a read.
-- `GUARD_KIT_SEARCH_TOOLS` — the dedicated search tools the consumer's harness
-  build carries; default `(Glob Grep)`. Its readers are rule 9's firing test,
-  which reads `Glob`, and rule 11's, which reads `Grep`, one read each per call;
-  with a member absent its rule is inert. **A knob, because the guard cannot see
-  the toolset**: the `PreToolUse` payload's field set carries no toolset and
-  `agent_type` does not determine one, while a build lacking those tools is a
-  property of the harness installation, so a consumer config value is the tier it
-  belongs to. **The default names the tools, and the seam permits it**: a harness
-  tool name is public and shared by every consumer of that harness, which §The
-  generic ruleset's portability paragraph already rules a cost to portability
-  rather than privacy, and the default keeps every consumer that never sets the
-  knob byte-identical. A build that carries the tools in one session class and not
-  another makes any single value wrong in one of them, so the toolset is probed in
-  each session class the guard runs under before the value is set.
-- `GUARD_KIT_SCRATCH_DIRS` — gitignored scratch dirs named in the
-  rule-3 corrective message, and the scope of rules 14, 15 and 23;
-  default `(".tmp")`.
-- `GUARD_KIT_SCRIPT_INTERPRETERS` — the non-bash interpreters rule 23's arm (b)
-  covers; default `(python python3 node deno ruby perl php zsh)`. A roster is the
-  shape the three knobs above already use for a set of this kind, and making it a
-  knob is what answers the *a roster rots* objection: the kit ships a default and
-  the consumer owns the value, so a missing member is a config edit rather than a
-  kit release. Its members are universal interpreter binaries — none of the
-  classes gate-sdk/SPEC.md §The provenance seam names — so unlike
-  `GUARD_KIT_BREADTH_PROBES` it is kit-shippable *with* defaults; that roster is
-  consumer config because its members are private, so the test is the content and
-  never the shape. It has **exactly one** reader by design: arm (b)'s trigger.
-  the `--scratch-run` arm deliberately does not read it and does not declare it
-  (§scratch-run), so the knob never becomes a second copy of a fact the target
-  file itself states.
+- `GUARD_KIT_BREADTH_PROBES` — array of permission-rule strings, each a witness that a local glob is too broad (§compare-settings-allow); default empty, in which case the breadth report is absent and the tool behaves exactly as it did before the criterion shipped. Entries are full permission-rule strings rather than bare commands, matching the settings vocabulary the tool already reads on both sides, so a consumer can probe non-`Bash` rules with the same mechanism. The kit ships **no** default probes: a probe names a command the consumer calls bad, which is the consumer's vocabulary, never the kit's (gate-sdk/SPEC.md §The provenance seam).
+- `GUARD_KIT_DOOR_ROOTS` — array of repo-relative paths, each a tracked file or a directory, naming the surfaces beyond the kit roots that `check-door-binding`'s assertion C sweeps; default **empty**, in which case C is inert and the gate's verdict is what it was before C shipped. A directory entry yields its **tracked** members under the prune set assertion A already applies, so a consumer adds a governed tree once and every tracked page later added under it is swept with no further edit — the derivation-first half of C's default-deny — while a local build artifact under that tree is not a governed surface and is never swept. The kit ships **no** default entry: which of a consumer's surfaces it governs is the consumer's fact, never the kit's (gate-sdk/SPEC.md §The provenance seam), on `GUARD_KIT_BREADTH_PROBES`' precedent above. An entry resolving to neither a tracked file nor a directory is exit 2, the posture every sibling here takes.
+- `GUARD_KIT_BREADTH_DECLARED` — keyed knob recording the breadths ruled intended (§compare-settings-allow), one `GUARD_KIT_BREADTH_DECLARED[<rule>] = <reason>` line each: the key is a permission-rule string, the value the reason that breadth was ruled intended; default empty, in which case the declared subsection is absent and the tool behaves exactly as it did before the declaration shipped. **Keyed rather than a delimited indexed knob, and the choice is not cosmetic:** a permission rule may contain any character a command may, so every single-character separator an indexed knob would need (`|`, `::`, a tab) is a character a legitimate rule can carry, and the knob would ship a grammar that cannot express part of its own subject. A key holds the rule verbatim, bounded only by the line grammar's own key rule (no `]`, `=` or tab, which a live permission rule does not carry), and a key is unique by construction, so the *which reason wins* question the delimited shape would raise cannot arise. Report order never depends on the map's iteration order: the tool walks the settings file's own allow list and looks each entry up, so the map is never iterated and the unordered iteration never reaches output. The kit ships **no** default declarations, on the same seam reasoning as the probes above.
+- `GUARD_KIT_RO_SCRIPTS` — array of globs eligible for the absolute→relative rewrite (rule 4); default `("check-*.sh")`.
+- `GUARD_KIT_RO_BINS` — read-only pipeline roster (rule 18); default the grep/head/cat/find/jq family, plus `xargs`, whose membership is qualified by rule 18's discriminator rather than granting on the leads-with test alone. Every member also takes a declaration of its write and execute forms, from `GUARD_KIT_RO_FORMS` or the kit's table, and an undeclared member is withheld.
+- `GUARD_KIT_RO_FORMS` — keyed knob mapping a roster binary to its declaration of write and execute forms, in rule 18's grammar, one `GUARD_KIT_RO_FORMS[<binary>] = <declaration>` line each; default empty, in which case the kit's table declares the default roster and nothing else. Its reader is `_guard_ro_forms_clear`, at rule 15's exemption (3), rule 18 and rule 19's clauses (c) and (d), plus rule 9's listing test for `find`, one lookup per roster-led segment. A consumer adding a member to `GUARD_KIT_RO_BINS` declares it here or the member is withheld; an entry for a default member replaces the kit's declaration rather than adding to it. **Keyed on `GUARD_KIT_BREADTH_DECLARED`'s ground**: the key is a binary name held verbatim and unique by construction.
+- `GUARD_KIT_APPEND_BINS` — the emitter roster of rule 17's write grant, which covers the create case as well as the append the name was minted for; default `(cat printf echo)`. A knob rather than a kit literal on `GUARD_KIT_RO_BINS`'s reasoning: a consumer whose mandated write rides a different emitter shadows the array instead of forking the rule, and three POSIX utility names are shipped mechanism rather than a vocabulary, so defaulting them crosses no provenance seam. The roster's contract is **writes only to its stdout**, and a consumer adding a command that writes anywhere else widens the grant past rule 17(c)'s safety argument — the same widening hazard `GUARD_KIT_RO_BINS` carries, stated here because this roster's members are what bound a *write* rather than a read.
+- `GUARD_KIT_SEARCH_TOOLS` — the dedicated search tools the consumer's harness build carries; default `(Glob Grep)`. Its readers are rule 9's firing test, which reads `Glob`, and rule 11's, which reads `Grep`, one read each per call; with a member absent its rule is inert. **A knob, because the guard cannot see the toolset**: the `PreToolUse` payload's field set carries no toolset and `agent_type` does not determine one, while a build lacking those tools is a property of the harness installation, so a consumer config value is the tier it belongs to. **The default names the tools, and the seam permits it**: a harness tool name is public and shared by every consumer of that harness, which §The generic ruleset's portability paragraph already rules a cost to portability rather than privacy, and the default keeps every consumer that never sets the knob byte-identical. A build that carries the tools in one session class and not another makes any single value wrong in one of them, so the toolset is probed in each session class the guard runs under before the value is set.
+- `GUARD_KIT_SCRATCH_DIRS` — gitignored scratch dirs named in the rule-3 corrective message, and the scope of rules 14, 15 and 23; default `(".tmp")`.
+- `GUARD_KIT_SCRIPT_INTERPRETERS` — the non-bash interpreters rule 23's arm (b) covers; default `(python python3 node deno ruby perl php zsh)`. A roster is the shape the three knobs above already use for a set of this kind, and making it a knob is what answers the *a roster rots* objection: the kit ships a default and the consumer owns the value, so a missing member is a config edit rather than a kit release. Its members are universal interpreter binaries — none of the classes gate-sdk/SPEC.md §The provenance seam names — so unlike `GUARD_KIT_BREADTH_PROBES` it is kit-shippable *with* defaults; that roster is consumer config because its members are private, so the test is the content and never the shape. It has **exactly one** reader by design: arm (b)'s trigger. the `--scratch-run` arm deliberately does not read it and does not declare it (§scratch-run), so the knob never becomes a second copy of a fact the target file itself states.
 
-Both logs are per-iteration scratch: a consumer gitignores them even where
-its workflow dir is otherwise committed.
+Both logs are per-iteration scratch: a consumer gitignores them even where its workflow dir is otherwise committed.
 
 ## Testing
 
-The gate contracts do not fit hooks (a guard speaks exit-2 + hook JSON, not
-`OK:`/`FAIL:` lines), so the kit ships its own decision-table runner
-instead of `gate-tests/`: `guard-tests/cases.tsv` pairs an expected
-decision (`block`/`advise`/`allow`/`rewrite`/`fallthrough`) with a command;
-the `--run-guard-tests` arm feeds each through the template guard as
-hook JSON
-on stdin and asserts the exit code and output class, failing on any
-mismatch. Every generic rule carries at least one firing and one
-non-firing case (the fixture-pair discipline, transplanted). Two substitutions
-make a command expressible in one tab-separated cell: `@ROOT@` becomes the git
-sandbox root, and `@NL@` becomes a newline — without the second a heredoc case
-cannot be written at all, and the heredoc class would ship untested.
+The gate contracts do not fit hooks (a guard speaks exit-2 + hook JSON, not `OK:`/`FAIL:` lines), so the kit ships its own decision-table runner instead of `gate-tests/`: `guard-tests/cases.tsv` pairs an expected decision (`block`/`advise`/`allow`/`rewrite`/`fallthrough`) with a command; the `--run-guard-tests` arm feeds each through the template guard as hook JSON on stdin and asserts the exit code and output class, failing on any mismatch. Every generic rule carries at least one firing and one non-firing case (the fixture-pair discipline, transplanted). Two substitutions make a command expressible in one tab-separated cell: `@ROOT@` becomes the git sandbox root, and `@NL@` becomes a newline — without the second a heredoc case cannot be written at all, and the heredoc class would ship untested.
 
-**The member is an `Arm::Run` and an arm-table row, and both are forced
-rather than chosen.** The contract is a three-valued exit — 0 clean, 1 one or
-more verdict mismatches, 2 a harness precondition it could not meet — and the
-verdict, not the report, is what the evidence-kit suite reads; an `Arm::Emit`
-collapses that to 0-or-2. It is a table member rather than a hardcoded top-level
-flag because it is **configured**: the arm needs to know where guard-kit is
-vendored, which is gate-sdk's `GATE_SDK_KIT_DIRS` on its declared roster
-(gate-sdk/SPEC.md §The non-gate arm, *the family choice is forced for any tool
-that needs configuration at all*). The front-end needs no edit —
-`bin/run-gates.sh` hands every unrecognised leading `--<token>` to `exec_arm`.
-**The arm is unresolvable in a tree that does not vendor guard-kit**, which it
-shares with `--emit-scan-prompts` and which is a refusal with a message at
-exit 2, not a defect.
+**The member is an `Arm::Run` and an arm-table row, and both are forced rather than chosen.** The contract is a three-valued exit — 0 clean, 1 one or more verdict mismatches, 2 a harness precondition it could not meet — and the verdict, not the report, is what the evidence-kit suite reads; an `Arm::Emit` collapses that to 0-or-2. It is a table member rather than a hardcoded top-level flag because it is **configured**: the arm needs to know where guard-kit is vendored, which is gate-sdk's `GATE_SDK_KIT_DIRS` on its declared roster (gate-sdk/SPEC.md §The non-gate arm, *the family choice is forced for any tool that needs configuration at all*). The front-end needs no edit — `bin/run-gates.sh` hands every unrecognised leading `--<token>` to `exec_arm`. **The arm is unresolvable in a tree that does not vendor guard-kit**, which it shares with `--emit-scan-prompts` and which is a refusal with a message at exit 2, not a defect.
 
-**The declared roster is `GATE_SDK_KIT_DIRS` and nothing else, and the two
-omissions are design content rather than an oversight.** `GUARD_KIT_LOG` is not
-declared because the arm **overrides** it: the paragraph below rules that any
-ad-hoc invocation must point it at a scratch path, and declaring the knob would
-resolve a consumer's *live* friction log into a synthetic run and invite exactly
-the pollution that rule exists to prevent — so the arm sets the child's value to
-a path inside its own sandbox. The guard's own `GUARD_KIT_*` knobs are not
-declared because the spawned child reads them: `bash-guard.sh` sources
-`lib/guard.sh` through `GUARD_KIT_LIB`, and that library's load reads every one
-from the binary (§The guard framework), so declaring them here would resolve them
-for a child that reads them anyway. The arm exports the running binary's absolute
-path as `GATE_SDK_NATIVE_BIN` into each case instead, because a case runs in a
-sandbox where the repo-relative default names nothing and the load would answer
-every row with its unreachable-binary advise.
+**The declared roster is `GATE_SDK_KIT_DIRS` and nothing else, and the two omissions are design content rather than an oversight.** `GUARD_KIT_LOG` is not declared because the arm **overrides** it: the paragraph below rules that any ad-hoc invocation must point it at a scratch path, and declaring the knob would resolve a consumer's *live* friction log into a synthetic run and invite exactly the pollution that rule exists to prevent — so the arm sets the child's value to a path inside its own sandbox. The guard's own `GUARD_KIT_*` knobs are not declared because the spawned child reads them: `bash-guard.sh` sources `lib/guard.sh` through `GUARD_KIT_LIB`, and that library's load reads every one from the binary (§The guard framework), so declaring them here would resolve them for a child that reads them anyway. The arm exports the running binary's absolute path as `GATE_SDK_NATIVE_BIN` into each case instead, because a case runs in a sandbox where the repo-relative default names nothing and the load would answer every row with its unreachable-binary advise.
 
-**What is under test does not move; only the harness does.** Each case is still
-fed through the **unchanged** `templates/bash-guard.sh`, spawned as
-`bash <guard-kit>/templates/bash-guard.sh` with `GUARD_KIT_LIB`, `GUARD_KIT_LOG`
-and `GATE_SDK_NATIVE_BIN` in its environment, its working directory set to the
-sandbox and the hook payload on its stdin — the four inputs the shell harness
-supplied, and the binary the library's load reads its knobs from.
-Nothing about the guard's decision path is re-expressed in Rust, so the port
-creates no duplication at all: criterion 6's *unless* clause is satisfied in the
-absent form rather than argued around. What moved is the payload construction,
-the sandbox, the table parse, the classification and the accounting, each
-keeping its specified behavior:
+**What is under test does not move; only the harness does.** Each case is still fed through the **unchanged** `templates/bash-guard.sh`, spawned as `bash <guard-kit>/templates/bash-guard.sh` with `GUARD_KIT_LIB`, `GUARD_KIT_LOG` and `GATE_SDK_NATIVE_BIN` in its environment, its working directory set to the sandbox and the hook payload on its stdin — the four inputs the shell harness supplied, and the binary the library's load reads its knobs from. Nothing about the guard's decision path is re-expressed in Rust, so the port creates no duplication at all: criterion 6's *unless* clause is satisfied in the absent form rather than argued around. What moved is the payload construction, the sandbox, the table parse, the classification and the accounting, each keeping its specified behavior:
 
-- **The payload** is built in-crate with `serde_json` rather than by a `jq -nc`
-  per case. Its two fields keep their named readers — `tool_input.command` read
-  by every generic rule through `lib/guard.sh`'s command splitter, and
-  `tool_input.run_in_background` read by rule 15's harness arm — and no field is
-  added.
-- **The two substitutions** apply to the command cell before the payload is
-  built, in the fixed order above: `@ROOT@` then `@NL@`.
-- **The table grammar** is tab-separated, a row whose first field is
-  empty-or-whitespace skipped and one whose first field opens `#` skipped, with
-  the last field taking the line's remainder as `IFS=$'\t' read -r` left it. The
-  tables stay **on disk** and are not transcribed into Rust literals, on the same
-  ground the escalation table's does below.
-- **The classification** is a five-way ladder in exit-code-then-substring order —
-  exit 2 → `block`; any other non-zero → `exit<rc>`; `"updatedInput"` present →
-  `rewrite`; `"additionalContext"` present → `advise`;
-  `"permissionDecision":"allow"` present → `allow`; empty output →
-  `fallthrough`; else `unknown`. The order is load-bearing and is transcribed
-  rather than re-derived: a rewrite payload may also carry an
-  `additionalContext`, and the ladder is what makes the first match win.
-- **The sandbox** is a fresh directory under the host's temporary directory,
-  made in-crate and held in **two spellings**: the crate's own for the
-  filesystem and `git`, and the guard's shell's for the case's working
-  directory, its `GUARD_KIT_LOG` and every `@ROOT@`, read back once through
-  the `pwd -P` crossing (gate-sdk/SPEC.md §The path-dialect contract). On
-  Linux and macOS the two are one string. Under Git Bash on native Windows a
-  `mktemp -d` path is MSYS-spelled, which a native `git` cannot resolve, and a
-  drive-lettered `@ROOT@` never meets the `$PWD` the guard compares against,
-  so rules 2, 4 and 5 would read as the wrong verdict on that host. The tree carries five preconditions, each a
-  case's precondition rather than scenery, so a harness that builds four of them
-  turns real rows green for the wrong reason: `git init`, the three-line
-  `.gitignore`, a tracked `tracked.md` beside an untracked `scratch.txt` (rule 22
-  splits on tracked versus not), a `.tmp/dead-producer.run` carrying a dead PID
-  beside a `.tmp/notes.txt` that is not a record (so every mutating-git row
-  asserts rule 14's decline arm rather than the vacuous absence of any record),
-  and a `.claude/settings.json` carrying the nine-entry allowlist — three bare
-  or `:*` entries for rules 18 and 20, rule 4's two script globs so its rewrite
-  rows keep asserting the grant, a scratch `rm -rf .tmp/*` slot grant and a
-  `*/checks/check-*.sh` runner glob for rule 24's rows to bound, a
-  `find .tmp/* -exec cat {} +` pattern for rule 7's granted and unbounded
-  placeholder rows, and a `git rm -q *` grant, so rule 19's arm (B) has a
-  granted forced `git rm` for its rule-22 predicate row to refuse. Rule 18's allowlisted-lead widening and rule 20 read the
-  same file, so their rows are re-derived whenever it grows. A sandbox the
-  arm could not build is exit 2, the harness-precondition code — the shell form
-  would have cascaded it into verdict mismatches, a red naming the wrong cause.
+- **The payload** is built in-crate with `serde_json` rather than by a `jq -nc` per case. Its two fields keep their named readers — `tool_input.command` read by every generic rule through `lib/guard.sh`'s command splitter, and `tool_input.run_in_background` read by rule 15's harness arm — and no field is added.
+- **The two substitutions** apply to the command cell before the payload is built, in the fixed order above: `@ROOT@` then `@NL@`.
+- **The table grammar** is tab-separated, a row whose first field is empty-or-whitespace skipped and one whose first field opens `#` skipped, with the last field taking the line's remainder as `IFS=$'\t' read -r` left it. The tables stay **on disk** and are not transcribed into Rust literals, on the same ground the escalation table's does below.
+- **The classification** is a five-way ladder in exit-code-then-substring order — exit 2 → `block`; any other non-zero → `exit<rc>`; `"updatedInput"` present → `rewrite`; `"additionalContext"` present → `advise`; `"permissionDecision":"allow"` present → `allow`; empty output → `fallthrough`; else `unknown`. The order is load-bearing and is transcribed rather than re-derived: a rewrite payload may also carry an `additionalContext`, and the ladder is what makes the first match win.
+- **The sandbox** is a fresh directory under the host's temporary directory, made in-crate and held in **two spellings**: the crate's own for the filesystem and `git`, and the guard's shell's for the case's working directory, its `GUARD_KIT_LOG` and every `@ROOT@`, read back once through the `pwd -P` crossing (gate-sdk/SPEC.md §The path-dialect contract). On Linux and macOS the two are one string. Under Git Bash on native Windows a `mktemp -d` path is MSYS-spelled, which a native `git` cannot resolve, and a drive-lettered `@ROOT@` never meets the `$PWD` the guard compares against, so rules 2, 4 and 5 would read as the wrong verdict on that host. The tree carries five preconditions, each a case's precondition rather than scenery, so a harness that builds four of them turns real rows green for the wrong reason: `git init`, the three-line `.gitignore`, a tracked `tracked.md` beside an untracked `scratch.txt` (rule 22 splits on tracked versus not), a `.tmp/dead-producer.run` carrying a dead PID beside a `.tmp/notes.txt` that is not a record (so every mutating-git row asserts rule 14's decline arm rather than the vacuous absence of any record), and a `.claude/settings.json` carrying the nine-entry allowlist — three bare or `:*` entries for rules 18 and 20, rule 4's two script globs so its rewrite rows keep asserting the grant, a scratch `rm -rf .tmp/*` slot grant and a `*/checks/check-*.sh` runner glob for rule 24's rows to bound, a `find .tmp/* -exec cat {} +` pattern for rule 7's granted and unbounded placeholder rows, and a `git rm -q *` grant, so rule 19's arm (B) has a granted forced `git rm` for its rule-22 predicate row to refuse. Rule 18's allowlisted-lead widening and rule 20 read the same file, so their rows are re-derived whenever it grows. A sandbox the arm could not build is exit 2, the harness-precondition code — the shell form would have cascaded it into verdict mismatches, a red naming the wrong cause.
 
-**The runner drives each case from inside the sandbox**, which decides how a
-target is spelled and is stated because getting it wrong reads as a rule defect
-rather than as a spelling one: a path is written **relative** unless the case is
-*about* an absolute one, since rule 5 blocks any command carrying the repo-root
-prefix and an `@ROOT@`-absolute target therefore never reaches the rule under
-test. `@ROOT@` is for the cases whose subject is the absolute form — rules 2, 4
-and 5 — and for a foreign-repo contrast.
+**The runner drives each case from inside the sandbox**, which decides how a target is spelled and is stated because getting it wrong reads as a rule defect rather than as a spelling one: a path is written **relative** unless the case is *about* an absolute one, since rule 5 blocks any command carrying the repo-root prefix and an `@ROOT@`-absolute target therefore never reaches the rule under test. `@ROOT@` is for the cases whose subject is the absolute form — rules 2, 4 and 5 — and for a foreign-repo contrast.
 
-**Any ad-hoc invocation of a consumer's guard script must set `GUARD_KIT_LOG` to
-a scratch path**, because the logger's default is the *live* friction log and a
-throwaway probe otherwise files its synthetic commands as real friction. The
-kit's own runners all set it — the decision table into its sandbox, the
-`scan-prompts` fixture into its own — so the convention is invisible until a
-hand-written latency or behaviour probe drives `bash-guard.sh` in a loop and
-poisons the next close's ranking with its payload. Measured rather than
-hypothetical: one such probe contributed 30 of 237 ranked prompting calls at a
-single close, ranking second. **No scanner is proposed:** the polluting caller is
-a one-off script in the gitignored scratch dir, so there is no committed corpus
-to scan and the convention is carried by this sentence and by the
-`--scratch-run` arm's echo-at-execution.
+**Any ad-hoc invocation of a consumer's guard script must set `GUARD_KIT_LOG` to a scratch path**, because the logger's default is the *live* friction log and a throwaway probe otherwise files its synthetic commands as real friction. The kit's own runners all set it — the decision table into its sandbox, the `scan-prompts` fixture into its own — so the convention is invisible until a hand-written latency or behaviour probe drives `bash-guard.sh` in a loop and poisons the next close's ranking with its payload. Measured rather than hypothetical: one such probe contributed 30 of 237 ranked prompting calls at a single close, ranking second. **No scanner is proposed:** the polluting caller is a one-off script in the gitignored scratch dir, so there is no committed corpus to scan and the convention is carried by this sentence and by the `--scratch-run` arm's echo-at-execution.
 
-**The decision table is the instrument for any change to what the guard
-refuses, and its red condition is not monotone.** A change that *narrows*
-refusal cannot be cleared by inspection, because the table fails on a verdict
-mismatch **in either direction** rather than on a violation count: every
-existing case whose command carries a double-quoted brace, a heredoc, a banner
-segment, an append redirect to a gitignored target, or an allowlisted lead with
-a read-only tail must have its expected
-column **re-derived**, never assumed still correct. Rule 17's landing is the
-worked instance and the cheap one: it narrowed refusal and flipped exactly one
-pre-existing row, which the table reported and inspection had not.
-The `scan-prompts` arm cannot
-substitute for it, and the reason is structural rather than a matter of
-precision: `guard_block` exits 2 before `guard_log_fallthrough` runs, so a
-blocked command never reaches `GUARD_KIT_LOG` and that report is blind to every
-block the guard makes. A change converting a block into a grant therefore reads
-as a pure improvement on the scan and as nothing at all — which is why the
-table, not the scan, is what a narrowing change is measured on.
+**The decision table is the instrument for any change to what the guard refuses, and its red condition is not monotone.** A change that *narrows* refusal cannot be cleared by inspection, because the table fails on a verdict mismatch **in either direction** rather than on a violation count: every existing case whose command carries a double-quoted brace, a heredoc, a banner segment, an append redirect to a gitignored target, or an allowlisted lead with a read-only tail must have its expected column **re-derived**, never assumed still correct. Rule 17's landing is the worked instance and the cheap one: it narrowed refusal and flipped exactly one pre-existing row, which the table reported and inspection had not. The `scan-prompts` arm cannot substitute for it, and the reason is structural rather than a matter of precision: `guard_block` exits 2 before `guard_log_fallthrough` runs, so a blocked command never reaches `GUARD_KIT_LOG` and that report is blind to every block the guard makes. A change converting a block into a grant therefore reads as a pure improvement on the scan and as nothing at all — which is why the table, not the scan, is what a narrowing change is measured on.
 
-A second table, `guard-tests/escalation-cases.tsv`
-(`<decision> <TAB> <to> <TAB> <message>`), holds the same fixture-pair
-discipline for the escalation advisory: a firing case (a headerless message to
-`main` → advise) and its non-firing pair (a fully shaped block, and a non-`main`
-recipient → fallthrough). **Its driver is the crate test, not this runner.**
-The escalation-guard is a binary arm, so its cases are read by the crate test
-under that member's own module, and the `--run-guard-tests` arm covers
-`bash-guard.sh` alone — the one member of this kit that stays shell, because it
-is the extension point a consumer's own rules are written in.
-The table stayed on disk rather than becoming Rust literals: it is kit test data
-a reviewer reads, and a literal would trade that review for a recompile.
+A second table, `guard-tests/escalation-cases.tsv` (`<decision> <TAB> <to> <TAB> <message>`), holds the same fixture-pair discipline for the escalation advisory: a firing case (a headerless message to `main` → advise) and its non-firing pair (a fully shaped block, and a non-`main` recipient → fallthrough). **Its driver is the crate test, not this runner.** The escalation-guard is a binary arm, so its cases are read by the crate test under that member's own module, and the `--run-guard-tests` arm covers `bash-guard.sh` alone — the one member of this kit that stays shell, because it is the extension point a consumer's own rules are written in. The table stayed on disk rather than becoming Rust literals: it is kit test data a reviewer reads, and a literal would trade that review for a recompile.
 
-**That precedent is a road as well as a member, and taking it for this table was
-refused on a ground that has nothing to do with taste.** A session sizing the
-decision table will reach for the escalation lane first — replace the driver
-with a `#[cfg(test)]` test reading `cases.tsv` off disk. But a crate test runs
-only under `cargo test`, which needs a Rust toolchain, while the shipped
-**binary** needs none: gate-sdk/SPEC.md §Consumer payload ships a prebuilt
-artifact per declared target precisely so an adopter with no toolchain has a
-working battery. Moving this runner into a crate test would narrow the set of
-adopters who can run guard-kit's decision table from *everyone with the binary*
-to *everyone with cargo* — a reach narrowing taken inside a port, which the rule
-that a cut narrows the port refuses in its own domain and which nothing here
-licenses. **The discriminator, so the two roads stay
-distinguishable:** a crate test is the right home when the member's **subject**
-is in-crate, which the escalation guard's is; an arm is the right home when the
-subject is a spawned shell surface the payload ships, which `bash-guard.sh` is.
+**That precedent is a road as well as a member, and taking it for this table was refused on a ground that has nothing to do with taste.** A session sizing the decision table will reach for the escalation lane first — replace the driver with a `#[cfg(test)]` test reading `cases.tsv` off disk. But a crate test runs only under `cargo test`, which needs a Rust toolchain, while the shipped **binary** needs none: gate-sdk/SPEC.md §Consumer payload ships a prebuilt artifact per declared target precisely so an adopter with no toolchain has a working battery. Moving this runner into a crate test would narrow the set of adopters who can run guard-kit's decision table from *everyone with the binary* to *everyone with cargo* — a reach narrowing taken inside a port, which the rule that a cut narrows the port refuses in its own domain and which nothing here licenses. **The discriminator, so the two roads stay distinguishable:** a crate test is the right home when the member's **subject** is in-crate, which the escalation guard's is; an arm is the right home when the subject is a spawned shell surface the payload ships, which `bash-guard.sh` is.
 
-**The `compare-settings-allow` cut empties guard-kit's owed column outright**, and
-it is the second cut to reach this section: the `run-guard-tests` cut took
-§Testing's one owed file, leaving `bin/compare-settings-allow.sh` <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
-(§compare-settings-allow) as the kit's last member — a different section,
-correctly homed, and takeable as a singleton — and this cut ports that to the
-`--emit-compare-settings-allow` arm above. `lib/guard.sh` and
-`templates/bash-guard.sh` carry `# no-port:` on the extension-point ground §The
-guard framework and §Consumer rules state, reopened by neither cut. Guard-kit has no owed file at
-all.
+**The `compare-settings-allow` cut empties guard-kit's owed column outright**, and it is the second cut to reach this section: the `run-guard-tests` cut took §Testing's one owed file, leaving `bin/compare-settings-allow.sh` <!-- manifest-temporal-exempt: retirement record, names a shell file since removed --> (§compare-settings-allow) as the kit's last member — a different section, correctly homed, and takeable as a singleton — and this cut ports that to the `--emit-compare-settings-allow` arm above. `lib/guard.sh` and `templates/bash-guard.sh` carry `# no-port:` on the extension-point ground §The guard framework and §Consumer rules state, reopened by neither cut. Guard-kit has no owed file at all.
 
-A **third** table, `guard-tests/background-cases.tsv`
-(`<decision> <TAB> <run_in_background> <TAB> <command>`), extends that same
-precedent to rule 15's harness arm, and it is forced rather than tidy: the
-`cases.tsv` grammar pairs a decision with a *command*, and the harness arm's
-input is a **tool parameter**, so that arm cannot be written there at all and
-would otherwise ship untested — the coverage-in-appearance this rule's own design
-refuses. The runner feeds a Bash-shaped payload carrying the flag. Rows, each a
-firing/non-firing pair: harness-form background with no record → block;
-harness-form background writing a `.run` record → fallthrough; harness-form
-background of a wait loop → the grant rule 19's arm (A) earns it; harness-form
-background of a read-only pipeline → the auto-allow it already earns; a
-harness-form canonical recorded launch of an allowlisted command → rule 19's arm
-(B) grant, the flag changing nothing in its text; and a foreground call carrying
-neither → fallthrough, which is what proves the rule inert off the backgrounding
-path. The shell-`&` arm *is* a command, so its firing and non-firing rows stay in
-`cases.tsv`, beside arm (B)'s grant rows and its refusing rows. Rule 15 emits a
-**block**, so it converts a `fallthrough` row into a `block` row wherever it
-fires: every existing row whose command carries a trailing `&` has its expected
-column re-derived under the non-monotone rule above, never assumed still
-correct.
+A **third** table, `guard-tests/background-cases.tsv` (`<decision> <TAB> <run_in_background> <TAB> <command>`), extends that same precedent to rule 15's harness arm, and it is forced rather than tidy: the `cases.tsv` grammar pairs a decision with a *command*, and the harness arm's input is a **tool parameter**, so that arm cannot be written there at all and would otherwise ship untested — the coverage-in-appearance this rule's own design refuses. The runner feeds a Bash-shaped payload carrying the flag. Rows, each a firing/non-firing pair: harness-form background with no record → block; harness-form background writing a `.run` record → fallthrough; harness-form background of a wait loop → the grant rule 19's arm (A) earns it; harness-form background of a read-only pipeline → the auto-allow it already earns; a harness-form canonical recorded launch of an allowlisted command → rule 19's arm (B) grant, the flag changing nothing in its text; and a foreground call carrying neither → fallthrough, which is what proves the rule inert off the backgrounding path. The shell-`&` arm *is* a command, so its firing and non-firing rows stay in `cases.tsv`, beside arm (B)'s grant rows and its refusing rows. Rule 15 emits a **block**, so it converts a `fallthrough` row into a `block` row wherever it fires: every existing row whose command carries a trailing `&` has its expected column re-derived under the non-monotone rule above, never assumed still correct.
 
-**Rules 25 and 26 are measured on rows of their own, and they took that
-re-derivation.** A journal append followed by a `git` line, and the same append
-joined by `&&`, block; the same append alone allows; `cat >> tracked.md` alone
-blocks; a lead off the emitter roster, a device target and a backgrounded launch
-writing its record do not fire. Arm (c) flipped the row pinning the compounded
-write to a tracked target from `fallthrough` to `block`, and its rows add a heredoc
-create under a new directory and a target outside the repository, which block, and a
-compounded device target, which does not fire. Those two added compounds lead with
-`make build` rather than `git status`: the sandbox allowlists `git status`, so a
-compound led by it meets rule 20's block first, and the block row
-would pass for the wrong reason while the device row read `block`. `bash -c` and `sh -c` block, alone and behind another statement, while
-`xargs bash -c`, `timeout 5 bash -c` and the scratch runner taking a script path do
-not fire, the first two pinning the stated boundary. Rule 25 turns a `fallthrough`
-row into a `block` row wherever it fires, so three existing rows flipped — two
-writes to a tracked target and a granted write followed by a second statement — and
-rule 10's redirect-composition row now writes a gitignored target, so it still
-proves rule 10 inert rather than reading rule 25's block. A row a new rule shares
-with an older block is re-pointed where the older rule answers first, which only a
-probe of the message tells apart.
+**Rules 25 and 26 are measured on rows of their own, and they took that re-derivation.** A journal append followed by a `git` line, and the same append joined by `&&`, block; the same append alone allows; `cat >> tracked.md` alone blocks; a lead off the emitter roster, a device target and a backgrounded launch writing its record do not fire. Arm (c) flipped the row pinning the compounded write to a tracked target from `fallthrough` to `block`, and its rows add a heredoc create under a new directory and a target outside the repository, which block, and a compounded device target, which does not fire. Those two added compounds lead with `make build` rather than `git status`: the sandbox allowlists `git status`, so a compound led by it meets rule 20's block first, and the block row would pass for the wrong reason while the device row read `block`. `bash -c` and `sh -c` block, alone and behind another statement, while `xargs bash -c`, `timeout 5 bash -c` and the scratch runner taking a script path do not fire, the first two pinning the stated boundary. Rule 25 turns a `fallthrough` row into a `block` row wherever it fires, so three existing rows flipped — two writes to a tracked target and a granted write followed by a second statement — and rule 10's redirect-composition row now writes a gitignored target, so it still proves rule 10 inert rather than reading rule 25's block. A row a new rule shares with an older block is re-pointed where the older rule answers first, which only a probe of the message tells apart.
 
-**The knob load's price is measured, on a `git status` payload over ten calls
-each:** 65 to 68 ms per call, against 57 to 61 ms for the library that sourced its
-shell config. The load costs sourcing `lib/gate.sh` and one binary read, the binary
-resolving `GATE_SDK_WORKFLOW_DIR` for the two log paths in process beside the
-guard's own knobs.
+**The knob load's price is measured, on a `git status` payload over ten calls each:** 65 to 68 ms per call, against 57 to 61 ms for the library that sourced its shell config. The load costs sourcing `lib/gate.sh` and one binary read, the binary resolving `GATE_SDK_WORKFLOW_DIR` for the two log paths in process beside the guard's own knobs.
 
-`smoke/install.sh` copies the templates into the scratch consumer (guard
-and config into the gates dir, hook wiring merged into `.claude/settings.json`,
-log paths gitignored) and then drives one crafted payload directly through
-the installed guard, asserting a block carrying rule 1's steer, since a knob load
-the binary refuses blocks too — the install is self-verifying. The
-wiring is merged rather than written, and the merge asserts every hook event a
-co-vendored kit wired before it survives: an overwrite silently drops that kit's
-wiring from the composed consumer, and nothing downstream reads the final file.
-It then unions `templates/settings-allow.json`'s entries into the same file beside
-a sentinel entry written first, asserting the sentinel survives, and feeds each
-template entry's literal form — `Bash(` and `)` stripped, each `*` replaced by the
-word `x` — through the installed guard, failing on any block: a rule later blocking
-a form the recommendation grants would ship that steer/grant contradiction to
-every adopter (§The recommended allowlist).
-There is no `smoke/violation.sh`: the kit registers no gates, so no
-battery-reddening violation is craftable (gate-sdk/SPEC.md §Consumer smoke
-makes that file conditional on exactly this).
+`smoke/install.sh` copies the templates into the scratch consumer (guard and config into the gates dir, hook wiring merged into `.claude/settings.json`, log paths gitignored) and then drives one crafted payload directly through the installed guard, asserting a block carrying rule 1's steer, since a knob load the binary refuses blocks too — the install is self-verifying. The wiring is merged rather than written, and the merge asserts every hook event a co-vendored kit wired before it survives: an overwrite silently drops that kit's wiring from the composed consumer, and nothing downstream reads the final file. It then unions `templates/settings-allow.json`'s entries into the same file beside a sentinel entry written first, asserting the sentinel survives, and feeds each template entry's literal form — `Bash(` and `)` stripped, each `*` replaced by the word `x` — through the installed guard, failing on any block: a rule later blocking a form the recommendation grants would ship that steer/grant contradiction to every adopter (§The recommended allowlist). There is no `smoke/violation.sh`: the kit registers no gates, so no battery-reddening violation is craftable (gate-sdk/SPEC.md §Consumer smoke makes that file conditional on exactly this).
 
-`compare-settings-allow`'s breadth criterion takes the same bespoke lane for the
-same reason, at `gate-tests/compare-settings-allow.test.sh`: a firing probe
-(a blanket local glob reported with its witness), a non-firing one (a narrow
-entry reporting clean), and the empty-knob silence that proves the section is
-omitted rather than printed clean — which, with `GUARD_KIT_BREADTH_DECLARED`
-empty, also proves the declared subsection absent. The declaration's own cases sit
-beside them: a declared over-broad entry printing in the declared section with its
-reason and **not** in the narrowing set; an all-declared over-broad set printing
-the declared section, no narrowing section and no false clean line; `--count`'s
-breadth number excluding the declared entry; and an exactness case — a declaration
-differing from the local entry by one character leaves that entry in the narrowing
-set, which is the assertion that the lookup never became a glob match. A dead-path
-case sits with them: an overlay granting the front-end and a script that does not
-exist lists the second and not the first, while the unchanged `--count` assertions
-pin that the dead-path set never entered the two-integer line; the in-crate test
-pins the set's exact membership and checked count across a live, a dead relative
-and a dead absolute literal beside a `*` pattern and a bare command. It drives the arm
-through the battery runner's `--emit` front-end, with `GUARD_KIT_KNOB_FILE` pointed
-at a sandbox knob file and `GUARD_KIT_SETTINGS`/`GUARD_KIT_SETTINGS_LOCAL` set in the
-environment beside it, so the consumer's own probe array cannot leak into the fixture.
+`compare-settings-allow`'s breadth criterion takes the same bespoke lane for the same reason, at `gate-tests/compare-settings-allow.test.sh`: a firing probe (a blanket local glob reported with its witness), a non-firing one (a narrow entry reporting clean), and the empty-knob silence that proves the section is omitted rather than printed clean — which, with `GUARD_KIT_BREADTH_DECLARED` empty, also proves the declared subsection absent. The declaration's own cases sit beside them: a declared over-broad entry printing in the declared section with its reason and **not** in the narrowing set; an all-declared over-broad set printing the declared section, no narrowing section and no false clean line; `--count`'s breadth number excluding the declared entry; and an exactness case — a declaration differing from the local entry by one character leaves that entry in the narrowing set, which is the assertion that the lookup never became a glob match. A dead-path case sits with them: an overlay granting the front-end and a script that does not exist lists the second and not the first, while the unchanged `--count` assertions pin that the dead-path set never entered the two-integer line; the in-crate test pins the set's exact membership and checked count across a live, a dead relative and a dead absolute literal beside a `*` pattern and a bare command. It drives the arm through the battery runner's `--emit` front-end, with `GUARD_KIT_KNOB_FILE` pointed at a sandbox knob file and `GUARD_KIT_SETTINGS`/`GUARD_KIT_SETTINGS_LOCAL` set in the environment beside it, so the consumer's own probe array cannot leak into the fixture.
 
-**It carries no `jq` precondition, and neither does `--run-guard-tests`.** A
-precondition is owed only where the subject spawns the tool. This subject spawns
-none — the arm reads both allow lists in-crate and the sandbox JSON is written with
-`printf` — and neither does the guard `--run-guard-tests` drives, which reads its
-payload and allowlist through the binary, so a precondition in either would refuse a
-runnable suite on a machine that needs the tool for nothing the suite does.
+**It carries no `jq` precondition, and neither does `--run-guard-tests`.** A precondition is owed only where the subject spawns the tool. This subject spawns none — the arm reads both allow lists in-crate and the sandbox JSON is written with `printf` — and neither does the guard `--run-guard-tests` drives, which reads its payload and allowlist through the binary, so a precondition in either would refuse a runnable suite on a machine that needs the tool for nothing the suite does.
 
-**The unit/seam split `--scratch-run` and the kfric port took is refused here, on the
-split's own discriminator.** That split moved pure functions over inputs into
-`#[cfg(test)]` tests and kept at the seam the cases that need the front end, the
-knob files and a real child process. Every case in this suite is the second kind: each
-asserts the *report* rendered from four knobs a sandbox config supplies, and the two
-that look like unit cases are not — the exactness case asserts that the declaration
-lookup never became a glob match, which is only observable as an entry staying in the
-narrowing section, and `--count`'s breadth number excluding a declared entry is a
-property of the partition as rendered. Nothing is left over to move, so the split
-would produce an empty half. The one predicate that *is* a pure function is
-`guard_allow_match`, and it moves instead to the parity harness below, where its
-second holder is what makes it worth pinning.
+**The unit/seam split `--scratch-run` and the kfric port took is refused here, on the split's own discriminator.** That split moved pure functions over inputs into `#[cfg(test)]` tests and kept at the seam the cases that need the front end, the knob files and a real child process. Every case in this suite is the second kind: each asserts the *report* rendered from four knobs a sandbox config supplies, and the two that look like unit cases are not — the exactness case asserts that the declaration lookup never became a glob match, which is only observable as an entry staying in the narrowing section, and `--count`'s breadth number excluding a declared entry is a property of the partition as rendered. Nothing is left over to move, so the split would produce an empty half. The one predicate that *is* a pure function is `guard_allow_match`, and it moves instead to the parity harness below, where its second holder is what makes it worth pinning.
 
-A shipped tool that is not a hook takes neither lane, and the `--scratch-run`
-arm (§scratch-run) **splits** on the kfric port's precedent. Its **seam** cases
-stay at `gate-tests/scratch-run.test.sh` — echo-then-exec ordering, pass-through
-of args and exit code, the out-of-scratch, traversal and symlink-escape
-refusals, the absent-target and missing-argument exits, and the
-refusal-prints-no-body discriminator — because each is a property of the front
-end resolving the arm, the binary resolving the knob, and a real child process,
-which a crate unit test cannot see. Its **unit** cases — the shebang classifier
-across its spellings and the containment predicate — are pinned in the ported
-module's own `#[cfg(test)]` tests, where `check-crate-arms` runs them: they are
-pure functions over inputs and want no process. No assertion was dropped in the
-split. It is **not** a `guard-tests/` row: that table's grammar is a
-decision paired with a command, which cannot express any of the three. It is not
-a gate either, so no `good/`+`bad/` fixture pair is owed — but shipped mechanism
-owes a test, and the bespoke-unit-test lane is gate-sdk's
-`<tests-dir>/*.test.sh` (gate-sdk/SPEC.md §run-gate-tests), which admits a tests
-dir carrying unit tests and no fixture pair. Homing it there is what puts it
-under `check-test-hermetic`, whose assertion A enumerates
-`<kit-root>/gate-tests/*.test.sh` — the enforcement a kit-local runner would
-forfeit. A kit's first `gate-tests/` directory also obliges a fixture-runner
-line in the consumer's battery, which `check-kit-registration` reads from
-`git ls-files`: the line belongs in the same commit as the test, never a
-follow-up.
+A shipped tool that is not a hook takes neither lane, and the `--scratch-run` arm (§scratch-run) **splits** on the kfric port's precedent. Its **seam** cases stay at `gate-tests/scratch-run.test.sh` — echo-then-exec ordering, pass-through of args and exit code, the out-of-scratch, traversal and symlink-escape refusals, the absent-target and missing-argument exits, and the refusal-prints-no-body discriminator — because each is a property of the front end resolving the arm, the binary resolving the knob, and a real child process, which a crate unit test cannot see. Its **unit** cases — the shebang classifier across its spellings and the containment predicate — are pinned in the ported module's own `#[cfg(test)]` tests, where `check-crate-arms` runs them: they are pure functions over inputs and want no process. No assertion was dropped in the split. It is **not** a `guard-tests/` row: that table's grammar is a decision paired with a command, which cannot express any of the three. It is not a gate either, so no `good/`+`bad/` fixture pair is owed — but shipped mechanism owes a test, and the bespoke-unit-test lane is gate-sdk's `<tests-dir>/*.test.sh` (gate-sdk/SPEC.md §run-gate-tests), which admits a tests dir carrying unit tests and no fixture pair. Homing it there is what puts it under `check-test-hermetic`, whose assertion A enumerates `<kit-root>/gate-tests/*.test.sh` — the enforcement a kit-local runner would forfeit. A kit's first `gate-tests/` directory also obliges a fixture-runner line in the consumer's battery, which `check-kit-registration` reads from `git ls-files`: the line belongs in the same commit as the test, never a follow-up.
 
-The `--rewrite` arm (§rewrite) splits the same way. Its **seam** cases are
-`gate-tests/rewrite.test.sh`, in a git sandbox holding a relocated workflow dir:
-a two-file sweep through the front end, and the outside, symlink, `.git` and
-state-file refusals, each listed after a matching valid operand so exit 2 is
-seen to write nothing, since each needs the front end's root and the binary's
-knob resolution. Its **unit** cases, the matcher, report, `--expect`, UTF-8,
-duplicate and predicate-error cases, are the module's own `#[cfg(test)]` tests.
+The `--rewrite` arm (§rewrite) splits the same way. Its **seam** cases are `gate-tests/rewrite.test.sh`, in a git sandbox holding a relocated workflow dir: a two-file sweep through the front end, and the outside, symlink, `.git` and state-file refusals, each listed after a matching valid operand so exit 2 is seen to write nothing, since each needs the front end's root and the binary's knob resolution. Its **unit** cases, the matcher, report, `--expect`, UTF-8, duplicate and predicate-error cases, are the module's own `#[cfg(test)]` tests.
 
-Two `lib/guard.sh` primitives take the same bespoke-unit-test lane for the same
-structural reason — a `decision <TAB> command` row cannot express what they
-need. `gate-tests/git-mutation-under-producer.test.sh` asserts rule 14's firing
-arm (a tracked-tree mutation blocked while a recorded producer is still alive):
-the arm's second conjunct is a *live* PID, and a fixture carrying one would turn
-every other `git` row in `guard-tests/cases.tsv` into a block, so the table
-keeps only the decline arm (a dead record present) and the test owns the
-process the firing arm needs. `gate-tests/guard-read-path.test.sh` asserts
-`guard_read_path`, the file-path counterpart of `guard_read_command`, whose
-discriminating case — an absent `file_path` — is an accessor return value, not
-a command a `cases.tsv` row can carry. The same file holds the four binary readers
-to reading bytes verbatim (§The hook on native Windows): a JSON `\r\n` reads back
-as itself, and a payload or allowlist carrying no CR reads back with none. A table
-row's payload is built in-crate and could only carry that CR as a command whose
-own text holds it, and the sandbox's `settings.json` is the table's fixed
-nine-entry allowlist, which a CR-ended entry would change for every allowlist row.
-It also parses the unreachable-binary advisory literal as JSON (§The guard
-framework (`lib/guard.sh`)).
+Two `lib/guard.sh` primitives take the same bespoke-unit-test lane for the same structural reason — a `decision <TAB> command` row cannot express what they need. `gate-tests/git-mutation-under-producer.test.sh` asserts rule 14's firing arm (a tracked-tree mutation blocked while a recorded producer is still alive): the arm's second conjunct is a *live* PID, and a fixture carrying one would turn every other `git` row in `guard-tests/cases.tsv` into a block, so the table keeps only the decline arm (a dead record present) and the test owns the process the firing arm needs. `gate-tests/guard-read-path.test.sh` asserts `guard_read_path`, the file-path counterpart of `guard_read_command`, whose discriminating case — an absent `file_path` — is an accessor return value, not a command a `cases.tsv` row can carry. The same file holds the four binary readers to reading bytes verbatim (§The hook on native Windows): a JSON `\r\n` reads back as itself, and a payload or allowlist carrying no CR reads back with none. A table row's payload is built in-crate and could only carry that CR as a command whose own text holds it, and the sandbox's `settings.json` is the table's fixed nine-entry allowlist, which a CR-ended entry would change for every allowlist row. It also parses the unreachable-binary advisory literal as JSON (§The guard framework (`lib/guard.sh`)).
 
-`gate-tests/guard-lib-parity.test.sh` takes the same lane on a third structural
-ground: it asserts nothing about *one* implementation's decision, so no
-`decision <TAB> command` row could express it. It compares **two**
-implementations of the five twinned primitives over one canned corpus each (§The
-guard framework), which is why it is a separate file from `scan-prompts.test.sh`
-rather than cases added to it — that suite asserts one implementation's *output
-shape*, and the two questions do not share an oracle. It does not retire, because
-the shell holder cannot: unlike a parity harness whose second holder is waiting to
-be deleted, this one's is permanently shell.
+`gate-tests/guard-lib-parity.test.sh` takes the same lane on a third structural ground: it asserts nothing about *one* implementation's decision, so no `decision <TAB> command` row could express it. It compares **two** implementations of the five twinned primitives over one canned corpus each (§The guard framework), which is why it is a separate file from `scan-prompts.test.sh` rather than cases added to it — that suite asserts one implementation's *output shape*, and the two questions do not share an oracle. It does not retire, because the shell holder cannot: unlike a parity harness whose second holder is waiting to be deleted, this one's is permanently shell.
 
-`gate-tests/guard-config-knobs.test.sh` takes the lane on a fourth structural
-ground: a knob's **non-default value**. The decision table's runner feeds every
-row through one sandbox whose config it never varies, so no
-`decision <TAB> command` row can express a consumer who set a knob. Each case sources
-`lib/guard.sh` under a sandbox knob file selected through
-`GUARD_KIT_KNOB_FILE` — the consumer's own selector — and asks one rule for its
-verdict in a subshell, as the rule-14 test does. For `GUARD_KIT_SEARCH_TOOLS` the
-cases are: rules 9 and 11 firing under the default, each firing on its own member
-alone, both inert when the knob is empty, and each firing corrective naming its
-bare fallback. For `GUARD_KIT_RO_FORMS` they are: a consumer roster addition
-carrying a declaration granted by rule 18, the same addition undeclared withheld,
-an empty declaration withheld, and a consumer entry for a default member replacing
-the kit's declaration rather than adding to it. The decision table keeps the
-default-valued rows, the kit's own declaration table among them, which is why the
-two lanes do not overlap. The same lane holds the knob load's two failure answers,
-which no row can reach because the runner always supplies a binary: an unreachable
-binary advises, exits 0 and runs no rule, and a missing or malformed knob file
-blocks with the refusal's own text.
+`gate-tests/guard-config-knobs.test.sh` takes the lane on a fourth structural ground: a knob's **non-default value**. The decision table's runner feeds every row through one sandbox whose config it never varies, so no `decision <TAB> command` row can express a consumer who set a knob. Each case sources `lib/guard.sh` under a sandbox knob file selected through `GUARD_KIT_KNOB_FILE` — the consumer's own selector — and asks one rule for its verdict in a subshell, as the rule-14 test does. For `GUARD_KIT_SEARCH_TOOLS` the cases are: rules 9 and 11 firing under the default, each firing on its own member alone, both inert when the knob is empty, and each firing corrective naming its bare fallback. For `GUARD_KIT_RO_FORMS` they are: a consumer roster addition carrying a declaration granted by rule 18, the same addition undeclared withheld, an empty declaration withheld, and a consumer entry for a default member replacing the kit's declaration rather than adding to it. The decision table keeps the default-valued rows, the kit's own declaration table among them, which is why the two lanes do not overlap. The same lane holds the knob load's two failure answers, which no row can reach because the runner always supplies a binary: an unreachable binary advises, exits 0 and runs no rule, and a missing or malformed knob file blocks with the refusal's own text.
 
-`gate-tests/door-binding-corpus.test.sh` takes the lane on a fifth structural
-ground, and this one is the **fixture pair's** shape rather than the decision
-table's: a `good/`+`bad/` pair asserts exit 0 against exit 1, so neither half can
-spell an **exit 2**. §check-door-binding's assertion C has two — a configured
-`GUARD_KIT_DOOR_ROOTS` entry resolving to neither a tracked file nor a directory,
-and a configured surface the gate cannot read — and both are the fail-closed
-posture rather than a finding, so a pair that could express them would have to
-call a misconfiguration clean. The suite drives the gate through `gate_run` in a
-sandbox repository of its own, one tracked kit root so assertions A and B pass on
-a corpus rather than vacuously, and carries the **tracked-file control** beside
-the two refusals — without it a refusal proves only that the entry form was
-rejected, not that the entry was. The unreadable case is skipped, saying so,
-for a caller that can read a mode-`000` file.
+`gate-tests/door-binding-corpus.test.sh` takes the lane on a fifth structural ground, and this one is the **fixture pair's** shape rather than the decision table's: a `good/`+`bad/` pair asserts exit 0 against exit 1, so neither half can spell an **exit 2**. §check-door-binding's assertion C has two — a configured `GUARD_KIT_DOOR_ROOTS` entry resolving to neither a tracked file nor a directory, and a configured surface the gate cannot read — and both are the fail-closed posture rather than a finding, so a pair that could express them would have to call a misconfiguration clean. The suite drives the gate through `gate_run` in a sandbox repository of its own, one tracked kit root so assertions A and B pass on a corpus rather than vacuously, and carries the **tracked-file control** beside the two refusals — without it a refusal proves only that the entry form was rejected, not that the entry was. The unreadable case is skipped, saying so, for a caller that can read a mode-`000` file.
 
-A gateless kit shapes gate-sdk's discovery rule: `gate_kit_roots` recognizes a
-sibling kit by its `checks/` *or* `smoke/` directory. Keying on `checks/`
-alone would leave this kit undiscovered — its `smoke/install.sh` would never
-run under `--run-consumer-smoke`, and its `lib/` and `bin/` would escape
-`check-shellcheck`'s self-lint sweep.
+A gateless kit shapes gate-sdk's discovery rule: `gate_kit_roots` recognizes a sibling kit by its `checks/` *or* `smoke/` directory. Keying on `checks/` alone would leave this kit undiscovered — its `smoke/install.sh` would never run under `--run-consumer-smoke`, and its `lib/` and `bin/` would escape `check-shellcheck`'s self-lint sweep.
 
 ### check-guard-registration
 
-Invariant: §The generic ruleset's top-level numbered items, the `guard_rule_*`
-functions `lib/guard.sh` defines and the calls `guard_generic_rules` makes are
-one roster. It holds four assertions, each a finding at exit 1:
+Invariant: §The generic ruleset's top-level numbered items, the `guard_rule_*` functions `lib/guard.sh` defines and the calls `guard_generic_rules` makes are one roster. It holds four assertions, each a finding at exit 1:
 
-- **A**, the items are numbered from 1 with no gap or repeat, because prose
-  cites rules by number;
+- **A**, the items are numbered from 1 with no gap or repeat, because prose cites rules by number;
 - **B**, every item carries exactly one distinct `guard_rule_<name>` token;
-- **C**, the items' tokens in roster order equal the dispatcher's calls in
-  order, and a finding prints the diff (`<` roster, `>` dispatch);
-- **D**, the set of defined `guard_rule_*` functions equals the set dispatched,
-  and each side's extra member is named.
+- **C**, the items' tokens in roster order equal the dispatcher's calls in order, and a finding prints the diff (`<` roster, `>` dispatch);
+- **D**, the set of defined `guard_rule_*` functions equals the set dispatched, and each side's extra member is named.
 
-The section is its own body, from its heading to the next heading of any level.
-An item runs from its numbered lead line through every following blank or
-indented line, and ends at the first unindented non-blank line. A token is
-`guard_rule_` followed by at least one name character, so the prose glob
-`guard_rule_*` is none. A definition is a column-0 `guard_rule_<name>() {` line.
-A dispatcher line is a call `guard_rule_<name> "$cmd"`, the `local cmd="$1"`
-binding, or blank, and the body ends at a column-0 `}`. **Resolution fails
-closed, at exit 2:** an unreadable SPEC or library, an absent section, a section
-with no numbered item, an absent or unterminated `guard_generic_rules`, or a
-dispatcher line of any other shape. The gate refuses to guess at a body it cannot
-read, because a guessed body passes a skipped rule. The clean line is
-`GUARD-REGISTRATION: clean (<n> rule(s): roster, definitions and dispatch order in
-lockstep)`.
+The section is its own body, from its heading to the next heading of any level. An item runs from its numbered lead line through every following blank or indented line, and ends at the first unindented non-blank line. A token is `guard_rule_` followed by at least one name character, so the prose glob `guard_rule_*` is none. A definition is a column-0 `guard_rule_<name>() {` line. A dispatcher line is a call `guard_rule_<name> "$cmd"`, the `local cmd="$1"` binding, or blank, and the body ends at a column-0 `}`. **Resolution fails closed, at exit 2:** an unreadable SPEC or library, an absent section, a section with no numbered item, an absent or unterminated `guard_generic_rules`, or a dispatcher line of any other shape. The gate refuses to guess at a body it cannot read, because a guessed body passes a skipped rule. The clean line is `GUARD-REGISTRATION: clean (<n> rule(s): roster, definitions and dispatch order in lockstep)`.
 
-The gate takes no knob: a vendored guard-kit is never edited, so no deployed
-configuration would set one. It finds guard-kit the way `--run-guard-tests`
-does, as the kit root whose basename is `guard-kit` among the derived kit roots,
-so a relocated `GATE_SDK_KIT_DIRS` moves it too. The positional form
-`check-guard-registration [spec-file [lib-file]]` points it at a synthetic pair.
+The gate takes no knob: a vendored guard-kit is never edited, so no deployed configuration would set one. It finds guard-kit the way `--run-guard-tests` does, as the kit root whose basename is `guard-kit` among the derived kit roots, so a relocated `GATE_SDK_KIT_DIRS` moves it too. The positional form `check-guard-registration [spec-file [lib-file]]` points it at a synthetic pair.
 
-The gate is registered from this repo's gates dir rather than shipped in a kit
-`checks/`, because its subject exists only where guard-kit is authored: a
-consumer rule lives in the consumer's copied `bash-guard.sh`, never under
-`guard_generic_rules`, so no consumer tree holds an instance to red on.
-guard-kit still registers no gates. Its fixture pair holds one roster in
-lockstep and one tree firing all four assertions; the exit-2 cases a one-pair
-harness cannot hold (section absent, dispatcher absent, dispatcher unterminated,
-a foreign dispatcher line) are the sibling `check-guard-registration.test.sh`.
+The gate is registered from this repo's gates dir rather than shipped in a kit `checks/`, because its subject exists only where guard-kit is authored: a consumer rule lives in the consumer's copied `bash-guard.sh`, never under `guard_generic_rules`, so no consumer tree holds an instance to red on. guard-kit still registers no gates. Its fixture pair holds one roster in lockstep and one tree firing all four assertions; the exit-2 cases a one-pair harness cannot hold (section absent, dispatcher absent, dispatcher unterminated, a foreign dispatcher line) are the sibling `check-guard-registration.test.sh`.
 
-**Out of its reach, by construction: the inert classes a rule declares.** An
-item's `Declares sq dq hd` is transcribed from the rule's `guard_skeleton`
-call. It is not one value per rule: rule 6 builds two skeletons with different
-class sets, rule 18 four, and some rules skeletonize inside a helper. Only
-some items carry a declaration at all. An equality check would have no single
-satisfying value per member.
+**Out of its reach, by construction: the inert classes a rule declares.** An item's `Declares sq dq hd` is transcribed from the rule's `guard_skeleton` call. It is not one value per rule: rule 6 builds two skeletons with different class sets, rule 18 four, and some rules skeletonize inside a helper. Only some items carry a declaration at all. An equality check would have no single satisfying value per member.
 
 ## Out of scope
 
-Every toolchain- and product-coupled guard rule is consumer rule content:
-build-cache hygiene, container-build concurrency and restart discipline,
-test-suite serialization rosters, proactive disk reclaim, tool-preference
-steering, and any read-only script roster beyond `check-*.sh`. So are
-allowlist contents beyond the read-only core, and a memory-policy write
-guard (a product ruling, not friction mechanism). The split is framework
-and generic rules here, a consumer's rules in its own copied guard.
+Every toolchain- and product-coupled guard rule is consumer rule content: build-cache hygiene, container-build concurrency and restart discipline, test-suite serialization rosters, proactive disk reclaim, tool-preference steering, and any read-only script roster beyond `check-*.sh`. So are allowlist contents beyond the read-only core, and a memory-policy write guard (a product ruling, not friction mechanism). The split is framework and generic rules here, a consumer's rules in its own copied guard.

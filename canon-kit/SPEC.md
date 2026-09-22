@@ -1,2661 +1,513 @@
 # canon-kit — spec discipline for agent-authored components
 
-One canonical spec per component, deltas as short-lived amendment files, and
-a star topology across the prose surfaces: every fact has exactly one owning
-surface, and every other surface cites it — never restates it. The problem
-the kit solves: when coding agents author the specs, design rationale gets
-re-derived under build pressure unless it is captured up front, and a
-parallel copy of any gated fact is an un-gateable second source that drifts
-silently. The remedy is a lifecycle (amendments authored up front,
-merged and deleted at build) and gates over the copy-shaped failure modes.
+One canonical spec per component, deltas as short-lived amendment files, and a star topology across the prose surfaces: every fact has exactly one owning surface, and every other surface cites it — never restates it. The problem the kit solves: when coding agents author the specs, design rationale gets re-derived under build pressure unless it is captured up front, and a parallel copy of any gated fact is an un-gateable second source that drifts silently. The remedy is a lifecycle (amendments authored up front, merged and deleted at build) and gates over the copy-shaped failure modes.
 
-The kit carries the lifecycle, the checklists, and its gates; a consumer's
-surface names, banned headings, and scan languages are config, with this
-repo's layout as the defaults. Requires [gate-sdk](../gate-sdk/) (the gates
-follow its four contracts and resolve through its registry); the queue
-lifecycle gate reads the tag syntax [queue-kit](../queue-kit/) defines.
+The kit carries the lifecycle, the checklists, and its gates; a consumer's surface names, banned headings, and scan languages are config, with this repo's layout as the defaults. Requires [gate-sdk](../gate-sdk/) (the gates follow its four contracts and resolve through its registry); the queue lifecycle gate reads the tag syntax [queue-kit](../queue-kit/) defines.
 
 ## The spec model
 
-Every component has exactly one canonical spec file (default `SPEC.md`) —
-complete, current, the single source of truth. A spec has three jobs, and
-"copying the code into prose" is not one of them:
+Every component has exactly one canonical spec file (default `SPEC.md`) — complete, current, the single source of truth. A spec has three jobs, and "copying the code into prose" is not one of them:
 
-1. **Owns semantics** — invariants, ordering, error behavior; the prose no
-   other artifact carries.
-2. **Names contracts** — every interface is named, and each name is tied to
-   the implementation by a gate; a named-but-ungated contract is the rot
-   vector.
-3. **Never copies a structural definition** — reference the code, do not
-   copy it. Anything readable from the code (exact types, field layouts,
-   config values) is implementation, not spec content; an ungated verbatim
-   copy drifts silently the moment the code changes
-   (`check-spec-embedded-source`).
+1. **Owns semantics** — invariants, ordering, error behavior; the prose no other artifact carries.
+2. **Names contracts** — every interface is named, and each name is tied to the implementation by a gate; a named-but-ungated contract is the rot vector.
+3. **Never copies a structural definition** — reference the code, do not copy it. Anything readable from the code (exact types, field layouts, config values) is implementation, not spec content; an ungated verbatim copy drifts silently the moment the code changes (`check-spec-embedded-source`).
 
-A **SPEC amendment** (default glob `SPEC-*.md`, in the owning component's
-directory) is the delta artifact for a designed-but-unimplemented change:
-it describes only what is added or changed, is named after the feature
-(`SPEC-sqlite.md`, never `SPEC-PHASE3-SQLITE.md`), and is a transition
-artifact — merged into the canonical spec and deleted when the work
-completes; an amendment never outlives its implementation. **Whether a kit
-directory is in the amendment corpus at all is consumer config, not a kit
-guarantee**: both substrates prune a vendored kit root under the scan root
-unless `CANON_KIT_SCAN_KIT_ROOTS=1` (§Layout and configuration), so an
-amendment placed in one falls out of the amendment set at the default —
-silently, with no pairing gate and no verdict, rather than as a red. The one
-sanctioned copy exemption: an amendment may embed a wire-contract delta
-(e.g. a fenced proto block) until merge, because it is the design home for
-a contract that does not exist yet; the canonical spec cites the contract
-file, never re-embeds it. A ruling with no owning component (governance,
-workflow, gates) is a **root-level amendment**: same lifecycle, lives at
-the repo root, merges into the consumer's rulebook instead of a component
-spec. A component is any top-level directory owning a body of work, kit or
-not — said out rather than left to precedent, because the repo-root fallback
-otherwise reads as the default for anything not plainly a kit, and once two
-units answer the case differently neither precedent decides the third.
+A **SPEC amendment** (default glob `SPEC-*.md`, in the owning component's directory) is the delta artifact for a designed-but-unimplemented change: it describes only what is added or changed, is named after the feature (`SPEC-sqlite.md`, never `SPEC-PHASE3-SQLITE.md`), and is a transition artifact — merged into the canonical spec and deleted when the work completes; an amendment never outlives its implementation. **Whether a kit directory is in the amendment corpus at all is consumer config, not a kit guarantee**: both substrates prune a vendored kit root under the scan root unless `CANON_KIT_SCAN_KIT_ROOTS=1` (§Layout and configuration), so an amendment placed in one falls out of the amendment set at the default — silently, with no pairing gate and no verdict, rather than as a red. The one sanctioned copy exemption: an amendment may embed a wire-contract delta (e.g. a fenced proto block) until merge, because it is the design home for a contract that does not exist yet; the canonical spec cites the contract file, never re-embeds it. A ruling with no owning component (governance, workflow, gates) is a **root-level amendment**: same lifecycle, lives at the repo root, merges into the consumer's rulebook instead of a component spec. A component is any top-level directory owning a body of work, kit or not — said out rather than left to precedent, because the repo-root fallback otherwise reads as the default for anything not plainly a kit, and once two units answer the case differently neither precedent decides the third.
 
 ## The amendment lifecycle
 
-Spec-writing is an **authoring-stage** activity, not a build activity — build
-sessions never author specs. The feature/debt litmus runs at filing in the
-scoping stage's triage; the amendment is *authored* in whichever stage the
-roster designates for it (scope by default, or a dedicated authoring stage where
-the roster splits one out).
-A feature task is therefore in exactly one of two states, marked by its
-section and the queue tag whose syntax queue-kit defines:
+Spec-writing is an **authoring-stage** activity, not a build activity — build sessions never author specs. The feature/debt litmus runs at filing in the scoping stage's triage; the amendment is *authored* in whichever stage the roster designates for it (scope by default, or a dedicated authoring stage where the roster splits one out). A feature task is therefore in exactly one of two states, marked by its section and the queue tag whose syntax queue-kit defines:
 
-- **Design-pending** — no amendment yet; the entry sits in a **design-pending
-  section**, excluded from selection. That set is the deferred section plus,
-  where the consumer configures one, queue-kit's optional icebox tier
-  (`CANON_KIT_ICEBOX_SECTION`; the tier is queue-kit/SPEC.md §The icebox tier).
-  A dormant entry is unbuilt design, so the state reaches it unchanged. A
-  promotion drops queue-kit's two deferred board tags (queue-kit/SPEC.md §The
-  tag algebra): both are read off the deferred pool alone, and where
-  `check-deferred-board-tags` is registered its assertion B is the checksum on
-  the drop.
-- **Spec-ready** — the amendment exists; the entry sits in the feature
-  section tagged `[spec: <ref>]`, eligible for selection.
+- **Design-pending** — no amendment yet; the entry sits in a **design-pending section**, excluded from selection. That set is the deferred section plus, where the consumer configures one, queue-kit's optional icebox tier (`CANON_KIT_ICEBOX_SECTION`; the tier is queue-kit/SPEC.md §The icebox tier). A dormant entry is unbuilt design, so the state reaches it unchanged. A promotion drops queue-kit's two deferred board tags (queue-kit/SPEC.md §The tag algebra): both are read off the deferred pool alone, and where `check-deferred-board-tags` is registered its assertion B is the checksum on the drop.
+- **Spec-ready** — the amendment exists; the entry sits in the feature section tagged `[spec: <ref>]`, eligible for selection.
 
-The **bidirectional rule**: every feature entry in the active queue carries
-a `[spec:]` ref that resolves to a file on disk, and every amendment on
-disk has at least one queue entry pointing at it — several entries may pair
-one amendment. Writing the amendment *is* promoting
-the deferred entry — without the pairing, design rationale and ruled-out
-alternatives get re-derived under build pressure. Technical debt needs no
-amendment (it fixes behavior to an existing spec); a debt task that needs a
-design *ruling* is design work — it goes to the deferred section until
-scope rules on it. Enforced by
-`check-amendment-queue`.
+The **bidirectional rule**: every feature entry in the active queue carries a `[spec:]` ref that resolves to a file on disk, and every amendment on disk has at least one queue entry pointing at it — several entries may pair one amendment. Writing the amendment *is* promoting the deferred entry — without the pairing, design rationale and ruled-out alternatives get re-derived under build pressure. Technical debt needs no amendment (it fixes behavior to an existing spec); a debt task that needs a design *ruling* is design work — it goes to the deferred section until scope rules on it. Enforced by `check-amendment-queue`.
 
-**The delta-ID grammar.** An amendment's `## What changes` is a sequence of
-**deltas**, and both a delta and a citation to one have a pinned form. Pinned
-because the next section requires each update target to name the delta that
-owns it, and a name no surface specifies is unmechanizable: a gate cannot match
-a grammar the template never states.
+**The delta-ID grammar.** An amendment's `## What changes` is a sequence of **deltas**, and both a delta and a citation to one have a pinned form. Pinned because the next section requires each update target to name the delta that owns it, and a name no surface specifies is unmechanizable: a gate cannot match a grammar the template never states.
 
-A **delta** is a `###` heading under `## What changes` of the form
-`### (<N>) <title>`, where `<N>` is a positive decimal integer written without a
-leading zero and `<title>` is non-empty. Delta numbers begin at one and are
-**sequential and unique** within the amendment — a gap or a repeat means a delta
-was split or dropped without its citations moving, which is the drift this
-grammar exists to make visible.
+A **delta** is a `###` heading under `## What changes` of the form `### (<N>) <title>`, where `<N>` is a positive decimal integer written without a leading zero and `<title>` is non-empty. Delta numbers begin at one and are **sequential and unique** within the amendment — a gap or a repeat means a delta was split or dropped without its citations moving, which is the drift this grammar exists to make visible.
 
-A **citation** is the token `delta <N>` or `deltas <N>` (case-insensitive),
-optionally continuing into further integers separated by commas and/or the word
-`and`; a trailing possessive (`delta 3's`) is the same citation. The literal
-`all deltas` cites **every** delta the amendment defines — the form a
-whole-amendment update target already uses in practice (a generated mirror is
-stale the moment any delta lands), admitted rather than forced into an
-enumeration that would itself drift as deltas are added.
+A **citation** is the token `delta <N>` or `deltas <N>` (case-insensitive), optionally continuing into further integers separated by commas and/or the word `and`; a trailing possessive (`delta 3's`) is the same citation. The literal `all deltas` cites **every** delta the amendment defines — the form a whole-amendment update target already uses in practice (a generated mirror is stale the moment any delta lands), admitted rather than forced into an enumeration that would itself drift as deltas are added.
 
-A heading rather than a bold lead-in token, because a heading gives a delta an
-anchor a reader can link to and a scanner can find in one pass, and it survives
-reordering under a diff more legibly than a token buried in a paragraph. The
-**work-class tag** an amendment may carry (`{mechanical}` / `{design-bearing}`)
-is deliberately **outside** this grammar: its owner is the roster's
-authoring-stage template and its reader is the iteration lead at batch-cut, so
-carrying it inside the delta token would tie two independent conventions to one
-string and stop either changing without the other. Stated as a non-target so a
-later reader does not read the silence as an omission. Enforced by
-`check-amendment-update-target`.
+A heading rather than a bold lead-in token, because a heading gives a delta an anchor a reader can link to and a scanner can find in one pass, and it survives reordering under a diff more legibly than a token buried in a paragraph. The **work-class tag** an amendment may carry (`{mechanical}` / `{design-bearing}`) is deliberately **outside** this grammar: its owner is the roster's authoring-stage template and its reader is the iteration lead at batch-cut, so carrying it inside the delta token would tie two independent conventions to one string and stop either changing without the other. Stated as a non-target so a later reader does not read the silence as an omission. Enforced by `check-amendment-update-target`.
 
-**The `## Retired spellings` block.** Every amendment carries a
-`## Retired spellings` section, and its body is one of two forms:
+**The `## Retired spellings` block.** Every amendment carries a `## Retired spellings` section, and its body is one of two forms:
 
-- **The negative form** — a single bullet whose first word is `None`
-  (case-insensitive), an em dash, and a non-empty reason:
-  `- None — no delta of this amendment retires a spelling.`
-- **The positive form** — one or more bullets, each opening with a **backticked
-  spelling** and carrying a **delta citation** in the citation grammar above.
-  That grammar is reused rather than restated, so the two blocks cannot drift
-  into two dialects of one token, and a bullet's subject is its **leading
-  backticked token** on the same convention the update-target roster names a
-  path by.
+- **The negative form** — a single bullet whose first word is `None` (case-insensitive), an em dash, and a non-empty reason: `- None — no delta of this amendment retires a spelling.`
+- **The positive form** — one or more bullets, each opening with a **backticked spelling** and carrying a **delta citation** in the citation grammar above. That grammar is reused rather than restated, so the two blocks cannot drift into two dialects of one token, and a bullet's subject is its **leading backticked token** on the same convention the update-target roster names a path by.
 
-A bullet's entry is the bullet line plus its indented continuation — the same
-wrap-straddling boundary `check-amendment-update-target` crosses, for the same
-reason: a citation that wrapped across a newline is still one subject. The valve
-is `<!-- retired-spelling-exempt: <reason> -->` on the bullet's first line or the
-one above, riding the shared exempt window (§The shared spec adapters) with a mandatory
-reason; an exempt bullet leaves the declared-spelling count as well as the
-finding, so a reader of the clean line is never looking at a count that silently
-shrank. The **work-class tag** is outside this grammar for the reason it is
-outside the delta-ID grammar above.
+A bullet's entry is the bullet line plus its indented continuation — the same wrap-straddling boundary `check-amendment-update-target` crosses, for the same reason: a citation that wrapped across a newline is still one subject. The valve is `<!-- retired-spelling-exempt: <reason> -->` on the bullet's first line or the one above, riding the shared exempt window (§The shared spec adapters) with a mandatory reason; an exempt bullet leaves the declared-spelling count as well as the finding, so a reader of the clean line is never looking at a count that silently shrank. The **work-class tag** is outside this grammar for the reason it is outside the delta-ID grammar above.
 
-**Why a declaration, when the roster's own omission is what failed.** The
-objection to answer first is that a declaration has the same hole as the roster
-it repairs — an author who forgot a surface will equally forget a spelling — and
-the block's shape is the answer to it. **The roster has no negative form**: a
-short roster and a complete one are the same document, so there is no line an
-author fails to write and nothing for a gate to miss. A retired-spelling block
-does have one, and it is mandatory, so an author who skips the section is
-writing an amendment that reds — a caught error class where the short roster was
-not. What stays uncaught is an author who declares the section, retires a
-spelling and does not name it: real, and strictly smaller than what is uncaught
-without the block. And the obligation is not new — the shipped template's
-Definition of Done already owes the grep on every amendment; nothing has ever
-recorded the run or checked its result, so the block writes down an existing
-duty in a form a gate can re-execute. Enforced by
-`check-amendment-retired-spelling`.
+**Why a declaration, when the roster's own omission is what failed.** The objection to answer first is that a declaration has the same hole as the roster it repairs — an author who forgot a surface will equally forget a spelling — and the block's shape is the answer to it. **The roster has no negative form**: a short roster and a complete one are the same document, so there is no line an author fails to write and nothing for a gate to miss. A retired-spelling block does have one, and it is mandatory, so an author who skips the section is writing an amendment that reds — a caught error class where the short roster was not. What stays uncaught is an author who declares the section, retires a spelling and does not name it: real, and strictly smaller than what is uncaught without the block. And the obligation is not new — the shipped template's Definition of Done already owes the grep on every amendment; nothing has ever recorded the run or checked its result, so the block writes down an existing duty in a form a gate can re-execute. Enforced by `check-amendment-retired-spelling`.
 
-An amendment file is **outside the governed manifest**: `CANON_KIT_MANIFEST_FILES`
-globs `*/SPEC.md`, which `SPEC-<name>.md` does not match, so the prose and knob
-gates never scan one. Their obligations attach at the merge rather than at the
-amendment — an amendment may carry a citation or a knob mention that would red
-once integrated, and §Merging an amendment step 2 is where that debt comes due.
+An amendment file is **outside the governed manifest**: `CANON_KIT_MANIFEST_FILES` globs `*/SPEC.md`, which `SPEC-<name>.md` does not match, so the prose and knob gates never scan one. Their obligations attach at the merge rather than at the amendment — an amendment may carry a citation or a knob mention that would red once integrated, and §Merging an amendment step 2 is where that debt comes due.
 
-The `[spec:]` tag is a **checksum on the promotion move**, not a second source
-of the state its section already carries. Its redundancy is the mechanism: a
-promotion crosses a section boundary *and* adds the ref, so a feature entry
-without the ref catches a move that dropped the ref and `[spec:]` in a
-design-pending section catches a ref that dropped the move. A debt entry's
-deferred ↔ active move is held by the board tags instead: an active entry
-carrying them and a deferred entry lacking them each red — **honest limit:**
-only where `check-deferred-board-tags` is registered, and an icebox one-liner
-moved into an active section by accident reds nowhere, because the icebox
-carries no board tags. That is also the test a further tag has to pass: **a
-state tag is admitted only when it carries information its section does not.**
-A tag restating the section that holds it is the two-sources defect and is
-refused, as an icebox tag was and as the retired design-pending tag is
-(§check-amendment-queue arm (d) reds a leftover).
+The `[spec:]` tag is a **checksum on the promotion move**, not a second source of the state its section already carries. Its redundancy is the mechanism: a promotion crosses a section boundary *and* adds the ref, so a feature entry without the ref catches a move that dropped the ref and `[spec:]` in a design-pending section catches a ref that dropped the move. A debt entry's deferred ↔ active move is held by the board tags instead: an active entry carrying them and a deferred entry lacking them each red — **honest limit:** only where `check-deferred-board-tags` is registered, and an icebox one-liner moved into an active section by accident reds nowhere, because the icebox carries no board tags. That is also the test a further tag has to pass: **a state tag is admitted only when it carries information its section does not.** A tag restating the section that holds it is the two-sources defect and is refused, as an icebox tag was and as the retired design-pending tag is (§check-amendment-queue arm (d) reds a leftover).
 
-That test admits **state** tags and is the wrong test for an **attribute**. An
-attribute a lead-line reader consumes — the session board, a ranking or
-eviction arm, anything that scans the `- ` line alone — is a field tag on the
-lead line, because a body declaration is invisible to that reader and the
-lead-line gate (queue-kit/SPEC.md §check-tag-lead-line) is what holds the
-value where the reader looks; the error class it adds is the reflow that
-strands the value on a continuation line. What no lead-line reader consumes
-stays a body declaration, which is why `recurrence:` is one: its readers scan
-a line of its own. The attribute's *value set* is a separate decision the
-minting amendment states — closed and consumer-configured on the roadmap
-tag's precedent, or a date — and a new field tag is a feature by the litmus
-below regardless of which test admitted it.
+That test admits **state** tags and is the wrong test for an **attribute**. An attribute a lead-line reader consumes — the session board, a ranking or eviction arm, anything that scans the `- ` line alone — is a field tag on the lead line, because a body declaration is invisible to that reader and the lead-line gate (queue-kit/SPEC.md §check-tag-lead-line) is what holds the value where the reader looks; the error class it adds is the reflow that strands the value on a continuation line. What no lead-line reader consumes stays a body declaration, which is why `recurrence:` is one: its readers scan a line of its own. The attribute's *value set* is a separate decision the minting amendment states — closed and consumer-configured on the roadmap tag's precedent, or a date — and a new field tag is a feature by the litmus below regardless of which test admitted it.
 
-The feature/debt litmus is **new names**: a task that adds any name to a
-governed surface — a script, a config knob, a file or directory convention,
-a tag, a contract another component must honor — is a feature and needs the
-amendment, however small the diff; debt converges behavior on names the
-spec already carries. The tell for misfiling: a queue entry whose body
-carries more than a few lines of design ruling is an amendment inlined
-where this gate cannot see it — the entry format has no home for causal
-completeness, and the rationale evaporates when the done section is
-cleared. The gate cannot decide which section a task belongs in (that is
-the semantic residue); it enforces the pairing once the section is chosen,
-so the litmus runs at filing time, in the scope skill's triage.
+The feature/debt litmus is **new names**: a task that adds any name to a governed surface — a script, a config knob, a file or directory convention, a tag, a contract another component must honor — is a feature and needs the amendment, however small the diff; debt converges behavior on names the spec already carries. The tell for misfiling: a queue entry whose body carries more than a few lines of design ruling is an amendment inlined where this gate cannot see it — the entry format has no home for causal completeness, and the rationale evaporates when the done section is cleared. The gate cannot decide which section a task belongs in (that is the semantic residue); it enforces the pairing once the section is chosen, so the litmus runs at filing time, in the scope skill's triage.
 
 ### The causal-completeness check
 
-Before an amendment is ready, every new state, event, interface and obligation
-it introduces passes these points:
+Before an amendment is ready, every new state, event, interface and obligation it introduces passes these points:
 
-1. **Producer named and reachable** — what code path, call, or timer triggers
-   it; a producer whose enabling config no deployed configuration sets is dead
-   everywhere but unit tests.
-2. **Consumer named** — what receives it, by what mechanism (stream, call,
-   poll), and every roster-holding reader of the surface it lands on: such a
-   reader reds on a name its roster lacks, so a minted name lists that roster
-   as an update target (a comment directive meets `check-comment-tier`'s).
-3. **Existing integration sections updated** — any spec section describing the
-   prior flow is updated in the amendment itself.
-4. **Every field has a named reader** — the consumer and transition reading each
-   field of a new message; a field with no reader is removed, and one read at
-   one transition is not populated at others.
-5. **Each reader's red condition named, not merely its subject** — binding on a
-   delta that *narrows* a corpus (a prune, a tighter glob, a dropped file). Only
-   a verdict monotone in the violation set clears by inspection, and three
-   ordinary shapes are not: a reader that reds on *finding none*, one asserting
-   an exact count, one holding a minimum or coverage floor. "A narrower corpus
-   can only remove violations" is false: pruning the file holding a
-   declaration's sole instance flips `check-install-claim` red on a zero count.
-6. **Every member's satisfying value named** — binding on a delta obliging each
-   member of a corpus enumerable at authoring time: enumerate the members by a
-   named probe and name each one's value; a member with none narrows the
-   assertion here, because build can neither satisfy nor narrow it.
+1. **Producer named and reachable** — what code path, call, or timer triggers it; a producer whose enabling config no deployed configuration sets is dead everywhere but unit tests.
+2. **Consumer named** — what receives it, by what mechanism (stream, call, poll), and every roster-holding reader of the surface it lands on: such a reader reds on a name its roster lacks, so a minted name lists that roster as an update target (a comment directive meets `check-comment-tier`'s).
+3. **Existing integration sections updated** — any spec section describing the prior flow is updated in the amendment itself.
+4. **Every field has a named reader** — the consumer and transition reading each field of a new message; a field with no reader is removed, and one read at one transition is not populated at others.
+5. **Each reader's red condition named, not merely its subject** — binding on a delta that *narrows* a corpus (a prune, a tighter glob, a dropped file). Only a verdict monotone in the violation set clears by inspection, and three ordinary shapes are not: a reader that reds on *finding none*, one asserting an exact count, one holding a minimum or coverage floor. "A narrower corpus can only remove violations" is false: pruning the file holding a declaration's sole instance flips `check-install-claim` red on a zero count.
+6. **Every member's satisfying value named** — binding on a delta obliging each member of a corpus enumerable at authoring time: enumerate the members by a named probe and name each one's value; a member with none narrows the assertion here, because build can neither satisfy nor narrow it.
 
-A cross-component causal gap surfacing at build is not a deferred TODO: stop,
-resolve it that session, update the spec before resuming. lifecycle-kit's stage
-templates carry these hooks; canon-kit owns the checklist and the promotion gate.
+A cross-component causal gap surfacing at build is not a deferred TODO: stop, resolve it that session, update the spec before resuming. lifecycle-kit's stage templates carry these hooks; canon-kit owns the checklist and the promotion gate.
 
 ### Merging an amendment (on task completion)
 
 1. Read the canonical spec fully, then the amendment.
-2. Integrate by re-phrasing, never by appending: a spec is not expected to grow
-   each merge, so an addition rewrites the instruction it refines — clearer,
-   briefer, phrase-shaped — and adds text only where no rewrite carries it. The
-   merged spec reads as one document to a reader who never saw the amendment.
-   Design rationale relocates into the spec's prose; an embedded wire-delta
-   becomes a citation to the contract file — the exemption is file-scoped, so
-   once step 3 deletes it `check-spec-embedded-source` re-arms on a kept embed.
-3. Delete the amendment file, and in the same commit repoint every sibling
-   amendment's filename citation of it to the canonical section it merged into
-   (arm (e) of `check-amendment-queue` reds the commit otherwise); verify none
-   remain for the component. **The
-   none-remain half is discharged at the iteration, not at the commit** — with
-   sibling amendments in flight for one component, only the batch merging the
-   last of them can satisfy it, and the earlier batches' identical assertions are
-   unsatisfiable at their own commits. The horizon is the iteration because the
-   build stage stays resident until the queue empties and close refuses entry on
-   a non-empty active queue.
-4. Move the queue entry to `## Done`, dropping its `[spec:]` tag — the
-   amendment it referenced is gone, and `check-amendment-queue` requires
-   every `[spec:]` ref to resolve to a file on disk.
-   **Unless the entry outlives the amendment.** Where an entry's deliverable is a
-   *corpus* and the amendment delivered one **increment** of it, the terminal move
-   is a **demotion** rather than a Done move: drop the `[spec:]` tag and return the
-   entry into its design-pending section, so the next
-   increment re-promotes with a fresh amendment. A Done move there asserts a
-   finished deliverable that is not finished. It also costs a second thing that is
-   easy to miss: a done entry is a bare slug, so **every** tag the entry carried
-   goes with it — including any tag a generated public projection reads, which
-   silently drops the item from that projection while the work remains outstanding.
-   This is the branch to state explicitly because it is the uncatchable one — the
-   Done-move contract has no gate behind either half, so the wrong terminal move
-   reds nothing and is found only by a later reader.
-   **A demotion also lands the entry back inside a size cap, where a Done move
-   would not.** A done entry is a bare slug and nothing measures it; a deferred
-   entry is measured per-entry against queue-kit's size cap in its configured
-   unit, unless the consumer set it `off` (queue-kit/SPEC.md §check-queue-entry-budget), so
-   any roster or table this amendment instructs the build to transcribe onto the
-   entry is priced against that cap, and an entry already near it is compressed in
-   the same commit that demotes it. Neither owner states this alone — the cap is
-   queue-kit's and the demotion is this section's — and they meet only here.
-   **Return it to the position it was promoted from**, recovered from the
-   promoting commit's own diff. No surface owns a demoted entry's position, so
-   without this each demotion lands wherever the writer put it — and two batches
-   demoting into one section in sequence reverse their prior relative order.
-   **Restore its `[cost:]` and `[surface:]` tags from the same diff**, where the
-   promotion dropped them: a deferred entry carries both (queue-kit/SPEC.md
-   §check-deferred-board-tags), and the diff that yields the position yields
-   their values too.
-5. Propagate removals (grep every spec for names the change retired), file
-   discovered gaps as debt tasks, and commit the merge with the work.
+2. Integrate by re-phrasing, never by appending: a spec is not expected to grow each merge, so an addition rewrites the instruction it refines — clearer, briefer, phrase-shaped — and adds text only where no rewrite carries it. The merged spec reads as one document to a reader who never saw the amendment. Design rationale relocates into the spec's prose; an embedded wire-delta becomes a citation to the contract file — the exemption is file-scoped, so once step 3 deletes it `check-spec-embedded-source` re-arms on a kept embed.
+3. Delete the amendment file, and in the same commit repoint every sibling amendment's filename citation of it to the canonical section it merged into (arm (e) of `check-amendment-queue` reds the commit otherwise); verify none remain for the component. **The none-remain half is discharged at the iteration, not at the commit** — with sibling amendments in flight for one component, only the batch merging the last of them can satisfy it, and the earlier batches' identical assertions are unsatisfiable at their own commits. The horizon is the iteration because the build stage stays resident until the queue empties and close refuses entry on a non-empty active queue.
+4. Move the queue entry to `## Done`, dropping its `[spec:]` tag — the amendment it referenced is gone, and `check-amendment-queue` requires every `[spec:]` ref to resolve to a file on disk. **Unless the entry outlives the amendment.** Where an entry's deliverable is a *corpus* and the amendment delivered one **increment** of it, the terminal move is a **demotion** rather than a Done move: drop the `[spec:]` tag and return the entry into its design-pending section, so the next increment re-promotes with a fresh amendment. A Done move there asserts a finished deliverable that is not finished. It also costs a second thing that is easy to miss: a done entry is a bare slug, so **every** tag the entry carried goes with it — including any tag a generated public projection reads, which silently drops the item from that projection while the work remains outstanding. This is the branch to state explicitly because it is the uncatchable one — the Done-move contract has no gate behind either half, so the wrong terminal move reds nothing and is found only by a later reader. **A demotion also lands the entry back inside a size cap, where a Done move would not.** A done entry is a bare slug and nothing measures it; a deferred entry is measured per-entry against queue-kit's size cap in its configured unit, unless the consumer set it `off` (queue-kit/SPEC.md §check-queue-entry-budget), so any roster or table this amendment instructs the build to transcribe onto the entry is priced against that cap, and an entry already near it is compressed in the same commit that demotes it. Neither owner states this alone — the cap is queue-kit's and the demotion is this section's — and they meet only here. **Return it to the position it was promoted from**, recovered from the promoting commit's own diff. No surface owns a demoted entry's position, so without this each demotion lands wherever the writer put it — and two batches demoting into one section in sequence reverse their prior relative order. **Restore its `[cost:]` and `[surface:]` tags from the same diff**, where the promotion dropped them: a deferred entry carries both (queue-kit/SPEC.md §check-deferred-board-tags), and the diff that yields the position yields their values too.
+5. Propagate removals (grep every spec for names the change retired), file discovered gaps as debt tasks, and commit the merge with the work.
 
-The shipped amendment template ends in a Definition-of-Done checklist that
-includes causal completeness, instruction-only replacement text (the doctrine
-rule named, not linked: the prose profile vendors no doctrine-kit),
-merged-with-no-information-lost, the file-deleted assertions, and gap filing.
+The shipped amendment template ends in a Definition-of-Done checklist that includes causal completeness, instruction-only replacement text (the doctrine rule named, not linked: the prose profile vendors no doctrine-kit), merged-with-no-information-lost, the file-deleted assertions, and gap filing.
 
 ## Content tiering — the star topology
 
-Every governed prose surface owns exactly one content tier and *points to*
-— never restates — a fact owned by another surface. Which surfaces exist
-and what each owns is the consumer's tier contract (each consumer's is its
-own instance); the kit's rules are the topology itself:
+Every governed prose surface owns exactly one content tier and *points to* — never restates — a fact owned by another surface. Which surfaces exist and what each owns is the consumer's tier contract (each consumer's is its own instance); the kit's rules are the topology itself:
 
-- **One owner per fact.** A parallel copy of a gated fact is the defect —
-  a second source no gate reads, drifting silently. The fix keeps each
-  surface's tier and replaces the foreign-tier slab with a pointer.
-- **Definitions have one home.** A canonical bold-lead-in definition of a
-  glossary term belongs only to the glossary; another surface may *use*
-  the term, explain *why* it exists, or carry its local mechanism — never
-  the definition (`check-surface-duplication`, with per-site valves for a
-  surface that legitimately introduces a concept).
-- **Quantitative literals are code-owned.** A count or enumerated set
-  transcribed into prose is a parallel copy; cite the owning source
-  instead (`check-manifest-count` bans a bare cardinal quantifying a
-  governed collection in a manifest — the collection is the count's owner).
-  A literal stays verbatim only when load-bearing, and then only
-  gate-coupled — and `check-measured-claim` is the mechanism that clause names:
-  a `measured:` marker binds the literal to an oracle the gate re-runs, which
-  turns a transcribed number into a generated, freshness-gated copy and is the
-  second remedy this bullet offers beside citing the owner. Prefer citing the
-  owner where the number need not be stated; mark it where a reader is served by
-  reading it. **What makes marking happen at all is a third mechanism**, because
-  the two above both wait for an author to act: `check-unmarked-claim` lets a
-  consumer declare a *class* of claim that may not go unoracled, so the sentences
-  most worth binding are pressured into a marker rather than left to authorial
-  memory — and the class reaches a claim carrying no number, which is where this
-  bullet's own rules stop.
-  A **user-facing** claim takes the same treatment when a reader
-  acts on it: `check-install-claim` gives the primary-install-path claim one
-  declared owner and holds every governed install section to it, so the topology
-  reaches beyond the internal facts the rules above are stated over.
-  A path's **version-control tracking status** is code-owned in
-  the same sense a count is — git owns it — so prose states the rule and
-  `check-tracking-claim` verifies it, rather than prose transcribing membership.
-- **Comments cite, never restate.** The code surface is a tier too: a
-  full-line comment on a governed source is a machine or reason directive,
-  rides the contiguous run a directive opens, or is exempt — design
-  rationale lives in the owning SPEC section, not re-derived in a comment
-  block; the pointer names where the why lives and couples the code to it —
-  never relocating the why into the comment (`check-comment-tier`; the
-  FP-prone trailing-comment judgment stays a review tripwire).
-- **Honest mechanizability.** Only the structural sub-rules gate (banned
-  headings, fence density, duplicate definitions, verbatim copies,
-  temporal-narration markers, restated collection totals); the core
-  judgment — is this sentence a definition or a narration, a why or a
-  mechanism — is FP-prone and stays a review tripwire, explicitly not a
-  blocking gate.
+- **One owner per fact.** A parallel copy of a gated fact is the defect — a second source no gate reads, drifting silently. The fix keeps each surface's tier and replaces the foreign-tier slab with a pointer.
+- **Definitions have one home.** A canonical bold-lead-in definition of a glossary term belongs only to the glossary; another surface may *use* the term, explain *why* it exists, or carry its local mechanism — never the definition (`check-surface-duplication`, with per-site valves for a surface that legitimately introduces a concept).
+- **Quantitative literals are code-owned.** A count or enumerated set transcribed into prose is a parallel copy; cite the owning source instead (`check-manifest-count` bans a bare cardinal quantifying a governed collection in a manifest — the collection is the count's owner). A literal stays verbatim only when load-bearing, and then only gate-coupled — and `check-measured-claim` is the mechanism that clause names: a `measured:` marker binds the literal to an oracle the gate re-runs, which turns a transcribed number into a generated, freshness-gated copy and is the second remedy this bullet offers beside citing the owner. Prefer citing the owner where the number need not be stated; mark it where a reader is served by reading it. **What makes marking happen at all is a third mechanism**, because the two above both wait for an author to act: `check-unmarked-claim` lets a consumer declare a *class* of claim that may not go unoracled, so the sentences most worth binding are pressured into a marker rather than left to authorial memory — and the class reaches a claim carrying no number, which is where this bullet's own rules stop. A **user-facing** claim takes the same treatment when a reader acts on it: `check-install-claim` gives the primary-install-path claim one declared owner and holds every governed install section to it, so the topology reaches beyond the internal facts the rules above are stated over. A path's **version-control tracking status** is code-owned in the same sense a count is — git owns it — so prose states the rule and `check-tracking-claim` verifies it, rather than prose transcribing membership.
+- **Comments cite, never restate.** The code surface is a tier too: a full-line comment on a governed source is a machine or reason directive, rides the contiguous run a directive opens, or is exempt — design rationale lives in the owning SPEC section, not re-derived in a comment block; the pointer names where the why lives and couples the code to it — never relocating the why into the comment (`check-comment-tier`; the FP-prone trailing-comment judgment stays a review tripwire).
+- **Honest mechanizability.** Only the structural sub-rules gate (banned headings, fence density, duplicate definitions, verbatim copies, temporal-narration markers, restated collection totals); the core judgment — is this sentence a definition or a narration, a why or a mechanism — is FP-prone and stays a review tripwire, explicitly not a blocking gate.
 
 ## Layout and configuration
 
-The kit is vendored beside gate-sdk (conventionally at `canon-kit/`); its
-gates are registered in the consumer's `gates.list` by name — each
-where its surface exists (a consumer with no glossary does not register
-`check-surface-duplication`) — and resolve through gate-sdk's multi-kit
-path.
+The kit is vendored beside gate-sdk (conventionally at `canon-kit/`); its gates are registered in the consumer's `gates.list` by name — each where its surface exists (a consumer with no glossary does not register `check-surface-duplication`) — and resolve through gate-sdk's multi-kit path.
 
-Brand tokens and generic vocabulary sit on opposite sides of a seam. Brand
-tokens carry the kit's identity and move with the kit name: the kit dir
-(`canon-kit/`), the `CANON_KIT_` env-knob prefix, the discovered knob
-filename (`canon-config.knobs`, the `<kit>-config.knobs` convention), and the
-docs-site page dir (`docs/canon-kit/`). Generic vocabulary names the spec
-*artifact* discipline rather than the brand and is fixed regardless of the
-kit's name: the `SPEC.md` canonical-spec filename, the `SPEC-*.md` amendment
-glob, the `spec:` and `contract:` source directives, the `[spec:]` queue
-tag, the `check-spec-*` gate names, and the shared
-`native/src/spec.rs` adapters (where "spec" names the discipline). The consumer gate
-`check-kit-ref-liveness` (declared by a `.gate` descriptor in `scripts/` and
-dispatched to the binary substrate — the dangling-reference hazard is a kit
-author's, so it is not templated into gate-sdk) holds the brand-token side
-honest tree-wide: every slash- or
-line-anchored `<name>-kit` / `gate-sdk` path segment must name a
-`gate_kit_roots` dir, and every live-prefix kit knob must resolve to a tracked
-kit knob (check-docs-cmd's resolver, reused so the non-uniform knob-prefix map
-has one home). **A knob resolves through a family stem in either direction, and
-the second direction is bounded by a declaration.** A scanned `<FAMILY>_` stem
-resolves when kit source defines any member under it. A scanned member
-resolves through a stem only when that stem is a **declared family**. For a
-static kit, that means a family its knob table declares, as evidence-kit's
-table declares `EVIDENCE_KIT_RUN_` for the suite it is running
-(evidence-kit/SPEC.md §Layout and configuration). For a prefix no static table
-owns, it means a stem its kit source spells. The member direction exists for a
-**dispatch-composed** name, whose full spelling is built at runtime and appears
-in no kit literal. Spelling the members out to satisfy an exact match would be
-a hardcoded roster of consumer knob names in a kit literal, which is the one
-shape that crosses the provenance seam here. A static kit's table is the
-complete answer for its prefix, though. A stem its source spells only as a
-wildcard in a help line or a comment is not a family, and resolving members
-through one would pass any misspelling under it. It valves the surfaces that legitimately
-name design-ahead or frozen brands — `gate-tests/` fixture bodies, `docs/posts/*`, the
-release declaration surface those notes are composed from (whose Renamed knobs
-section names a removed knob by construction), the generated trajectory data,
-`SPEC-*.md` amendments, and the two design-ahead records: the queue and the gap
-inbox (`LIFECYCLE_KIT_GAP_INBOX_FILE`), each read by its knob. Both name knobs
-and paths not yet minted, and the inbox cannot hold one past the close that
-truncates it. So a rename cannot leave a dangle without turning a gate red.
+Brand tokens and generic vocabulary sit on opposite sides of a seam. Brand tokens carry the kit's identity and move with the kit name: the kit dir (`canon-kit/`), the `CANON_KIT_` env-knob prefix, the discovered knob filename (`canon-config.knobs`, the `<kit>-config.knobs` convention), and the docs-site page dir (`docs/canon-kit/`). Generic vocabulary names the spec *artifact* discipline rather than the brand and is fixed regardless of the kit's name: the `SPEC.md` canonical-spec filename, the `SPEC-*.md` amendment glob, the `spec:` and `contract:` source directives, the `[spec:]` queue tag, the `check-spec-*` gate names, and the shared `native/src/spec.rs` adapters (where "spec" names the discipline). The consumer gate `check-kit-ref-liveness` (declared by a `.gate` descriptor in `scripts/` and dispatched to the binary substrate — the dangling-reference hazard is a kit author's, so it is not templated into gate-sdk) holds the brand-token side honest tree-wide: every slash- or line-anchored `<name>-kit` / `gate-sdk` path segment must name a `gate_kit_roots` dir, and every live-prefix kit knob must resolve to a tracked kit knob (check-docs-cmd's resolver, reused so the non-uniform knob-prefix map has one home). **A knob resolves through a family stem in either direction, and the second direction is bounded by a declaration.** A scanned `<FAMILY>_` stem resolves when kit source defines any member under it. A scanned member resolves through a stem only when that stem is a **declared family**. For a static kit, that means a family its knob table declares, as evidence-kit's table declares `EVIDENCE_KIT_RUN_` for the suite it is running (evidence-kit/SPEC.md §Layout and configuration). For a prefix no static table owns, it means a stem its kit source spells. The member direction exists for a **dispatch-composed** name, whose full spelling is built at runtime and appears in no kit literal. Spelling the members out to satisfy an exact match would be a hardcoded roster of consumer knob names in a kit literal, which is the one shape that crosses the provenance seam here. A static kit's table is the complete answer for its prefix, though. A stem its source spells only as a wildcard in a help line or a comment is not a family, and resolving members through one would pass any misspelling under it. It valves the surfaces that legitimately name design-ahead or frozen brands — `gate-tests/` fixture bodies, `docs/posts/*`, the release declaration surface those notes are composed from (whose Renamed knobs section names a removed knob by construction), the generated trajectory data, `SPEC-*.md` amendments, and the two design-ahead records: the queue and the gap inbox (`LIFECYCLE_KIT_GAP_INBOX_FILE`), each read by its knob. Both name knobs and paths not yet minted, and the inbox cannot hold one past the close that truncates it. So a rename cannot leave a dangle without turning a gate red.
 
-Config is a **knob file**: copy `templates/canon-config.knobs` into the gates dir
-as `canon-config.knobs` (or point `CANON_KIT_KNOB_FILE` elsewhere) and set any knob
-below; defaults fill what the file leaves unset. canon-kit's knobs are **static**:
-the binary resolves them in process from its own defaults table and the consumer's
-knob file; `bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one
-with its shape and rendered default. A gitignored `canon-config.local.knobs` in the gates dir is the
-home for a private value a tracked file cannot carry. The grammar, that `.local`
-overlay, the environment-over-file precedence for a scalar, the knob reference and
-the refusals — a set `CANON_KIT_KNOB_FILE` that does not exist, a left-behind
-`canon-config.sh` or `canon-config.local.sh`, a non-empty file named by the retired
-`CANON_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob file's. The kit's table
-validator refuses a malformed config at exit 2 with every finding. A derived default
-below names the knob it reads as `${NAME}`, or as `${NAME:-<default>}` so the roster's rendered literal reads as agreement.
-**The five `CANON_KIT_*_CMD` knobs are command knobs**: each is an argv, one
-`NAME[] = element` line per word, spawned directly with no shell, and an empty knob
-is no command, which its reader takes as the clean skip (gate-sdk/SPEC.md §The knob
-file; the spawn and its output validation are §The shared spec adapters').
+Config is a **knob file**: copy `templates/canon-config.knobs` into the gates dir as `canon-config.knobs` (or point `CANON_KIT_KNOB_FILE` elsewhere) and set any knob below; defaults fill what the file leaves unset. canon-kit's knobs are **static**: the binary resolves them in process from its own defaults table and the consumer's knob file; `bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one with its shape and rendered default. A gitignored `canon-config.local.knobs` in the gates dir is the home for a private value a tracked file cannot carry. The grammar, that `.local` overlay, the environment-over-file precedence for a scalar, the knob reference and the refusals — a set `CANON_KIT_KNOB_FILE` that does not exist, a left-behind `canon-config.sh` or `canon-config.local.sh`, a non-empty file named by the retired `CANON_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob file's. The kit's table validator refuses a malformed config at exit 2 with every finding. A derived default below names the knob it reads as `${NAME}`, or as `${NAME:-<default>}` so the roster's rendered literal reads as agreement. **The five `CANON_KIT_*_CMD` knobs are command knobs**: each is an argv, one `NAME[] = element` line per word, spawned directly with no shell, and an empty knob is no command, which its reader takes as the clean skip (gate-sdk/SPEC.md §The knob file; the spawn and its output validation are §The shared spec adapters').
 
-**A corpus knob below widens the declaring gates' *triggers* as well as their
-scanned corpus**, which before the `knob:<NAME>` couples token it did not: a gate
-whose walk a knob bounds carries `knob:<NAME>` in its `# graph: couples=`, so
-widening the knob widens what fires the gate (gate-sdk/SPEC.md §The `# graph:`
-manifest). The clause is stated once here rather than on each bullet it reaches —
-`CANON_KIT_SPEC_NAME`, `CANON_KIT_AMENDMENT_GLOB`, `CANON_KIT_MANIFEST_FILES`,
-`CANON_KIT_PROSE_SURFACE_GLOBS`, `CANON_KIT_MEASURED_SURFACE_GLOBS`,
-`CANON_KIT_COMMENT_SURFACE`, `CANON_KIT_PROSE_TELL_GLOBS`,
-`CANON_KIT_SEAM_SURFACE_GLOBS`, `CANON_KIT_UNWRAP_GLOBS` and
-`CANON_KIT_UNWRAP_EXCLUDE` — because it is one fact about the mechanism and
-not ten facts about ten knobs. Which knobs it
-reaches is derived from the walks rather than listed as policy, so a knob added
-later is reached with no edit here; **`CANON_KIT_DUP_SURFACES` is deliberately not
-among them**, and that is a verdict rather than an omission — its members are read
-as named files, which §check-reads-couples rules outside the walk class, so
-coupling it would trigger a gate on paths no walk of its reaches.
+**A corpus knob below widens the declaring gates' *triggers* as well as their scanned corpus**, which before the `knob:<NAME>` couples token it did not: a gate whose walk a knob bounds carries `knob:<NAME>` in its `# graph: couples=`, so widening the knob widens what fires the gate (gate-sdk/SPEC.md §The `# graph:` manifest). The clause is stated once here rather than on each bullet it reaches — `CANON_KIT_SPEC_NAME`, `CANON_KIT_AMENDMENT_GLOB`, `CANON_KIT_MANIFEST_FILES`, `CANON_KIT_PROSE_SURFACE_GLOBS`, `CANON_KIT_MEASURED_SURFACE_GLOBS`, `CANON_KIT_COMMENT_SURFACE`, `CANON_KIT_PROSE_TELL_GLOBS`, `CANON_KIT_SEAM_SURFACE_GLOBS`, `CANON_KIT_UNWRAP_GLOBS` and `CANON_KIT_UNWRAP_EXCLUDE` — because it is one fact about the mechanism and not ten facts about ten knobs. Which knobs it reaches is derived from the walks rather than listed as policy, so a knob added later is reached with no edit here; **`CANON_KIT_DUP_SURFACES` is deliberately not among them**, and that is a verdict rather than an omission — its members are read as named files, which §check-reads-couples rules outside the walk class, so coupling it would trigger a gate on paths no walk of its reaches.
 
-**A glob-array corpus knob spells "any depth" as `**`, never as one glob per
-depth.** Its value is a `walk::glob_files` pattern, whose `**` spans any number of
-directories and skips hidden ones as `*` does, and its `knob:` couples token
-expands a `**` member to a pattern covering every path it selects (gate-sdk/SPEC.md
-§The `# graph:` manifest). A value that enumerates depths to mean every depth is a
-maintained copy that drops a file one level below its last rung with no
-diagnostic. A depth bound that excludes a subtree on purpose is a selection, and
-stays the consumer's to spell.
+**A glob-array corpus knob spells "any depth" as `**`, never as one glob per depth.** Its value is a `walk::glob_files` pattern, whose `**` spans any number of directories and skips hidden ones as `*` does, and its `knob:` couples token expands a `**` member to a pattern covering every path it selects (gate-sdk/SPEC.md §The `# graph:` manifest). A value that enumerates depths to mean every depth is a maintained copy that drops a file one level below its last rung with no diagnostic. A depth bound that excludes a subtree on purpose is a selection, and stays the consumer's to spell.
 
 Knobs:
 
 - `CANON_KIT_SPEC_NAME` — canonical spec filename, default `SPEC.md`.
 - `CANON_KIT_AMENDMENT_GLOB` — default `SPEC-*.md`.
 - `CANON_KIT_QUEUE_FILE` — default `${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}`.
-- `CANON_KIT_FEATURE_SECTIONS` — array, default `("New Features")`: active
-  sections whose entries require `[spec:]`.
-- `CANON_KIT_ACTIVE_SECTIONS` — array, default
-  `("New Features" "Technical Debt")`: sections where a `[spec:]`-tagged entry
-  is misfiled unless the section is also a feature section.
-- `CANON_KIT_DEFERRED_SECTION` — default `Deferred`: the deferred section, the
-  first member of the design-pending section set.
-- `CANON_KIT_ICEBOX_SECTION` — scalar, default **empty**: the second
-  design-pending section, queue-kit's optional icebox tier. Empty means the
-  set is the deferred section alone. Naming the deferred section is malformed
-  config. What generalizes here is the section **set**, not the tag set — no
-  icebox-specific tag exists or is wanted.
-- `CANON_KIT_DOD_HEADING` — default `Definition of Done`;
-  `CANON_KIT_DOD_MODE` — `exactly-one` (the default) or `at-most-one`
-  (a reference-spec corpus carries no DoD).
-- `CANON_KIT_SCAN_KIT_ROOTS` — `0` (default) or `1`. At `0` the shared finders
-  skip vendored kit roots (`gate_kit_roots`): a kit's `SPEC.md`/`SPEC-*.md` and
-  its `README.md` alike are a dependency's documentation, not governed content,
-  so the `exactly-one` default holds out of the box on a tree that merely
-  vendored the kits beside gate-sdk and no consumer is asked to answer for a
-  dependency's own internal links. Set `1` when the kit docs are the consumer's
-  own first-party content.
-- `CANON_KIT_BANNED_HEADINGS` — array, default
-  `("Directory Structure" "Public API" "Cargo.toml Dependencies")`;
-  `CANON_KIT_DERIVABLE_DENSITY` — default `60` (percent fenced);
-  `CANON_KIT_DERIVABLE_POINTER_REGEX` — the index-pointer marker that exempts
-  a shed section, default `pub-index|proto-index` (consumer index tooling).
-- `CANON_KIT_EMBED_THRESHOLD` / `CANON_KIT_EMBED_MINLINES` — defaults `0.70`
-  / `8`; `CANON_KIT_EMBED_LANGS` — the scanned fence-language → source
-  mapping, one `kind|fence-langs|file-globs` entry per language family, the two
-  list fields `,`-separated — field names the row declares, so a descriptor
-  couples the candidate globs as `knob:CANON_KIT_EMBED_LANGS.file-globs`
-  (gate-sdk/SPEC.md §The `# graph:` manifest) — default = the bundled list; `CANON_KIT_EMBED_ILLUSTRATIVE` — fences
-  illustrative-by-default, default `(json)`; `CANON_KIT_EMBED_WIRE_KIND` — the
-  one fence an amendment may embed as a not-yet-merged contract delta,
-  default `proto`.
-- `CANON_KIT_GLOSSARY_FILE` — default `GLOSSARY.md`;
-  `CANON_KIT_DUP_SURFACES` — array of surfaces scanned for foreign
-  definitions, default `(VISION.md)` plus every component spec.
-- `CANON_KIT_MANIFEST_FILES` — array of globs, default empty ⇒ derive the
-  manifest set (canonical specs, `README.md` at any depth, `CLAUDE.md`);
-  `CANON_KIT_PROSE_SURFACE_GLOBS` — array of candidate globs, default empty:
-  each matched file joins the manifest set **iff it is slot-free** (no
-  lifecycle-kit binding slot `*<name: …>*`, no `CONSUMER BINDING` header), so
-  slot-free kit-template markdown and agent definitions come under the manifest
-  doc gates while slot-bearing surfaces self-exclude — which surfaces a consumer
-  governs is their config, the discriminator is kit mechanism (§The shared spec adapters).
-  `CANON_KIT_TEMPORAL_MARKERS` — the temporal-narration marker set scanned by
-  `check-manifest-temporal`, default a generic-English list (`previously`,
-  `formerly`, `renamed from`, …), matched case-insensitively and extended
-  through `CANON_KIT_TEMPORAL_MARKERS_EXTRA` under the `_EXTRA` semantics below;
-  `CANON_KIT_TEMPORAL_EXEMPT_SECTIONS` — array of heading names whose whole
-  section is exempt, default empty.
-- `CANON_KIT_SEAM_AUTHORITY_MARKERS` — the authority-marker ERE array
-  `check-provenance-seam` matches against a case-folded sentence, default a bundled
-  attribution-shaped set: `operator( |-)(ruled|ruling|direction|directed|decided|ratified|approved|chose)`,
-  `lead, `, `own-authority`, `ruled`, `ratified` and `consult`; extended through
-  `CANON_KIT_SEAM_AUTHORITY_MARKERS_EXTRA` under the `_EXTRA` semantics below. The
-  set is attribution-shaped rather than role-shaped: a bare `operator`, `lead`,
-  `ruling` or `direction` is this kit family's role vocabulary, and adding one reds
-  a dated measurement and a specimen that are not provenance.
-  `CANON_KIT_SEAM_AGENT_FILES` — array of always-loaded agent-file names, default
-  `("CLAUDE.md")`, the harness's public file name; a consumer on another harness
-  adds its own. `CANON_KIT_SEAM_PRIVATE_SURFACES` — array of the publisher's
-  private paths (a ruling record, a local-only brief), default **empty**: those
-  names are one publisher's vocabulary, so no spelling ships as a literal, and the
-  empty default switches the private-surface arm off. `CANON_KIT_SEAM_SLUG_MIN_LEN` — positive
-  integer, default `12`: the shortest queue slug the slug arm matches, so a short
-  slug cannot match ordinary hyphenated prose. `CANON_KIT_SEAM_SURFACE_GLOBS` —
-  array of repo-root-relative globs, default empty: the consumer's own published
-  documents that `check-provenance-seam` holds to the provenance class. Which of a
-  tree's documents are public is its own content, so no glob ships as a literal.
-- `CANON_KIT_MDREF_EXCLUDE` — array of globs, default empty: manifest-set docs
-  `check-md-refs` skips (a consumer's generated documentation whose links a
-  build tool owns).
+- `CANON_KIT_FEATURE_SECTIONS` — array, default `("New Features")`: active sections whose entries require `[spec:]`.
+- `CANON_KIT_ACTIVE_SECTIONS` — array, default `("New Features" "Technical Debt")`: sections where a `[spec:]`-tagged entry is misfiled unless the section is also a feature section.
+- `CANON_KIT_DEFERRED_SECTION` — default `Deferred`: the deferred section, the first member of the design-pending section set.
+- `CANON_KIT_ICEBOX_SECTION` — scalar, default **empty**: the second design-pending section, queue-kit's optional icebox tier. Empty means the set is the deferred section alone. Naming the deferred section is malformed config. What generalizes here is the section **set**, not the tag set — no icebox-specific tag exists or is wanted.
+- `CANON_KIT_DOD_HEADING` — default `Definition of Done`; `CANON_KIT_DOD_MODE` — `exactly-one` (the default) or `at-most-one` (a reference-spec corpus carries no DoD).
+- `CANON_KIT_SCAN_KIT_ROOTS` — `0` (default) or `1`. At `0` the shared finders skip vendored kit roots (`gate_kit_roots`): a kit's `SPEC.md`/`SPEC-*.md` and its `README.md` alike are a dependency's documentation, not governed content, so the `exactly-one` default holds out of the box on a tree that merely vendored the kits beside gate-sdk and no consumer is asked to answer for a dependency's own internal links. Set `1` when the kit docs are the consumer's own first-party content.
+- `CANON_KIT_BANNED_HEADINGS` — array, default `("Directory Structure" "Public API" "Cargo.toml Dependencies")`; `CANON_KIT_DERIVABLE_DENSITY` — default `60` (percent fenced); `CANON_KIT_DERIVABLE_POINTER_REGEX` — the index-pointer marker that exempts a shed section, default `pub-index|proto-index` (consumer index tooling).
+- `CANON_KIT_EMBED_THRESHOLD` / `CANON_KIT_EMBED_MINLINES` — defaults `0.70` / `8`; `CANON_KIT_EMBED_LANGS` — the scanned fence-language → source mapping, one `kind|fence-langs|file-globs` entry per language family, the two list fields `,`-separated — field names the row declares, so a descriptor couples the candidate globs as `knob:CANON_KIT_EMBED_LANGS.file-globs` (gate-sdk/SPEC.md §The `# graph:` manifest) — default = the bundled list; `CANON_KIT_EMBED_ILLUSTRATIVE` — fences illustrative-by-default, default `(json)`; `CANON_KIT_EMBED_WIRE_KIND` — the one fence an amendment may embed as a not-yet-merged contract delta, default `proto`.
+- `CANON_KIT_GLOSSARY_FILE` — default `GLOSSARY.md`; `CANON_KIT_DUP_SURFACES` — array of surfaces scanned for foreign definitions, default `(VISION.md)` plus every component spec.
+- `CANON_KIT_MANIFEST_FILES` — array of globs, default empty ⇒ derive the manifest set (canonical specs, `README.md` at any depth, `CLAUDE.md`); `CANON_KIT_PROSE_SURFACE_GLOBS` — array of candidate globs, default empty: each matched file joins the manifest set **iff it is slot-free** (no lifecycle-kit binding slot `*<name: …>*`, no `CONSUMER BINDING` header), so slot-free kit-template markdown and agent definitions come under the manifest doc gates while slot-bearing surfaces self-exclude — which surfaces a consumer governs is their config, the discriminator is kit mechanism (§The shared spec adapters). `CANON_KIT_TEMPORAL_MARKERS` — the temporal-narration marker set scanned by `check-manifest-temporal`, default a generic-English list (`previously`, `formerly`, `renamed from`, …), matched case-insensitively and extended through `CANON_KIT_TEMPORAL_MARKERS_EXTRA` under the `_EXTRA` semantics below; `CANON_KIT_TEMPORAL_EXEMPT_SECTIONS` — array of heading names whose whole section is exempt, default empty.
+- `CANON_KIT_SEAM_AUTHORITY_MARKERS` — the authority-marker ERE array `check-provenance-seam` matches against a case-folded sentence, default a bundled attribution-shaped set: `operator( |-)(ruled|ruling|direction|directed|decided|ratified|approved|chose)`, `lead, `, `own-authority`, `ruled`, `ratified` and `consult`; extended through `CANON_KIT_SEAM_AUTHORITY_MARKERS_EXTRA` under the `_EXTRA` semantics below. The set is attribution-shaped rather than role-shaped: a bare `operator`, `lead`, `ruling` or `direction` is this kit family's role vocabulary, and adding one reds a dated measurement and a specimen that are not provenance. `CANON_KIT_SEAM_AGENT_FILES` — array of always-loaded agent-file names, default `("CLAUDE.md")`, the harness's public file name; a consumer on another harness adds its own. `CANON_KIT_SEAM_PRIVATE_SURFACES` — array of the publisher's private paths (a ruling record, a local-only brief), default **empty**: those names are one publisher's vocabulary, so no spelling ships as a literal, and the empty default switches the private-surface arm off. `CANON_KIT_SEAM_SLUG_MIN_LEN` — positive integer, default `12`: the shortest queue slug the slug arm matches, so a short slug cannot match ordinary hyphenated prose. `CANON_KIT_SEAM_SURFACE_GLOBS` — array of repo-root-relative globs, default empty: the consumer's own published documents that `check-provenance-seam` holds to the provenance class. Which of a tree's documents are public is its own content, so no glob ships as a literal.
+- `CANON_KIT_MDREF_EXCLUDE` — array of globs, default empty: manifest-set docs `check-md-refs` skips (a consumer's generated documentation whose links a build tool owns).
 - `CANON_KIT_UNWRAP_GLOBS` / `CANON_KIT_UNWRAP_EXCLUDE` — arrays of git pathspecs, default empty: the tracked markdown `check-md-unwrapped` holds to one line per paragraph, less the excluded paths. An empty include set is the clean skip, since which files a tree keeps unwrapped is its own editorial choice (§check-md-unwrapped).
-- `CANON_KIT_RESTATEMENT_PAGES` — array of globs, default empty: the pages
-  `check-docs-restatement-parity` holds to the `README.md` beside each. Which
-  pages restate a source is one site's layout, so no spelling ships as a kit
-  literal.
-- `CANON_KIT_FENCE_PROGRAMS` — array of program names a shell fence may start a
-  command with, default a bundled generic utility set (`cat`, `grep`, `git`, …;
-  `--emit knob-roster` prints it whole); extended through
-  `CANON_KIT_FENCE_PROGRAMS_EXTRA` under the `_EXTRA` semantics below. Read by
-  `check-fence-command-head`. The toolchain a tree's recipes name — a compiler, a
-  fetch tool, a package manager — is that tree's own vocabulary, so it rides the
-  extra rather than a kit literal (the provenance seam).
-- `CANON_KIT_FENCE_RUN_PROGRAMS` — array of program names a fence
-  `check-fence-run` executes may start a command with, default `("git")`. It is
-  the whole set, not an extra over `CANON_KIT_FENCE_PROGRAMS`: every name in it
-  is a program that runs with the scratch's network reach, so the default admits
-  only the one program the fixed environment confines to local protocols. A
-  vocabulary rather than a walk filter, so it takes no `knob:` couples token, on
-  the fence-program pair's own ground.
-- `CANON_KIT_RETIRED_SPELLING_EXCLUDE` — array of globs, default empty: tracked
-  paths held out of `check-amendment-retired-spelling`'s reconciliation corpus.
-  Which surfaces are **history-bearing** is a consumer fact, not a kit one — a
-  work queue, a ruling record and a scratch directory are named by that
-  consumer's own configuration, and a retired spelling survives in all three
-  legitimately, because that is what a history surface is for. A kit default
-  naming them would be a kit literal carrying one project's layout, which the
-  provenance seam refuses. **The empty default is the conservative one, not a
-  fail-open**: the exclusion can only ever remove findings, so a consumer that
-  configures nothing gets a noisier gate rather than a blinder one — worth
-  stating because the reflex on reading "defaults to empty" is to look for the
-  hole.
-- `CANON_KIT_COUNT_COLLECTIONS` — array of collection-noun plurals
-  `check-manifest-count` treats as growing governed sets, default
-  `("gates" "meta-gates" "checks" "kits" "stages" "rules" "KPIs")` (a consumer
-  appends its own governed plurals); `CANON_KIT_COUNT_WEDGE_WORDS` — how many
-  words may sit between the cardinal and the noun, default `2`;
-  `CANON_KIT_COUNT_ALLOWED_PHRASES` — exact-phrase allowlist for fixed named
-  sets a doc may cite inline, default empty (a consumer names its own fixed
-  sets, and only a phrase whose noun it governs needs the valve).
-- `CANON_KIT_ENUM_SETS_CMD` — a consumer command emitting the governed sets
-  `check-prose-enum` holds, one `<set-name>`⇥`<member>` line per member,
-  default empty ⇒ clean skip (no declared sets). The bundled emitter,
-  `bash gate-sdk/bin/run-gates.sh --emit enum-sets`, derives the queue tag sets
-  from queue-kit's own parser rather than restating them. The knob's own contract
-  is unchanged by a value naming a bundled arm: it takes any consumer command, so
-  an adopter still points it anywhere — what the payload offers is an emitter an
-  adopter can name without authoring a script, not a claim on where a consumer's
-  sets come from.
-- `CANON_KIT_INSTALL_TRANSPORTS_CMD` — a consumer command emitting the install
-  transports `check-install-claim` holds, one `<transport-id>`⇥`<ERE>` line per
-  transport, default empty ⇒ clean skip. `CANON_KIT_INSTALL_SECTION_RE` — an ERE
-  matched against `##`-or-deeper heading text to select the sections that gate
-  scans, default empty ⇒ clean skip; either knob left empty skips the whole gate,
-  since neither assertion has a vocabulary to judge against without the other.
-  `CANON_KIT_INSTALL_CLAIM_EXCLUDE` — array of globs dropped from that gate's
-  scanned set on top of `CANON_KIT_MDREF_EXCLUDE`, default empty. A transport
-  vocabulary is one project's distribution model, so no spelling of it ships as a
-  kit literal (the provenance seam).
-- `CANON_KIT_PAYLOAD_CLAIMS_CMD` — a consumer command emitting the payload
-  disclosure classes `check-payload-claim` holds, one `<claim-id>`⇥`<ERE>` line
-  per class, default empty ⇒ clean skip (the correct posture for a tree whose
-  payload discloses one thing only). `CANON_KIT_PAYLOAD_CLAIM_EXCLUDE` — array
-  of globs dropped from that gate's scanned set on top of
-  `CANON_KIT_MDREF_EXCLUDE`, default empty. A spelling of what a payload
-  discloses is one project's distribution model, so it is consumer config for
-  the same provenance-seam reason the transport vocabulary above is.
-- `CANON_KIT_MEASURED_CLAIMS_CMD` — a consumer command emitting the oracle
-  `check-measured-claim` re-runs, one `<key>`⇥`<value>` line per measurable fact,
-  default empty ⇒ clean skip (no oracle, so no marker has anything to disagree
-  with). `CANON_KIT_MEASURED_SURFACE_GLOBS` — array of globs naming the scanned
-  surface, default empty ⇒ empty corpus and a clean gate; the two are set
-  together or not at all. What a project measures is that project's vocabulary,
-  so no key ships as a kit literal (the provenance seam). A consumer commonly
-  derives the surface by reference,
-  `CANON_KIT_MEASURED_SURFACE_GLOBS[] <- CANON_KIT_MANIFEST_FILES`, and widens it
-  with what the manifest set omits: binding shims, which the prose surface
-  excludes on a copy-shape ownership this rule is not covered by, and a work
-  queue, which takes the marker without taking the manifest tier's bare-cardinal
-  ban (§check-manifest-count).
-  **Deriving this knob from the manifest array is the common shape, and it makes a
-  manifest widening wider than it looks:** the readers of *both* knobs move at
-  once, so a consumer widening `CANON_KIT_MANIFEST_FILES` widens this knob's pair
-  as well as the manifest pair it named. A manifest widening also owes a `# graph:`
-  coupling edit that a widening of this knob does not — the measured pair couples
-  markdown broadly and reaches any `.md` surface, while the manifest pair couples a
-  narrower manifest-shaped set, so widening the manifest array without widening
-  those gates' coupling manifests ships a knob whose gate never triggers on the
-  file it was widened for, and the miss surfaces only in a full-battery run.
-  The surface knob
-  has a **second reader**, `check-unmarked-claim`, which shares it rather than
-  forking a knob of its own: the pair composes over one corpus
-  (§check-unmarked-claim), and the recorded cost is that a consumer cannot scan
-  claim classes over a different surface than its measured claims.
-- `CANON_KIT_CLAIM_CLASSES_CMD` — a consumer command emitting the claim classes
-  `check-unmarked-claim` holds, one `<class-id>`⇥`<ERE>` line per class, default
-  empty ⇒ clean skip (no declared class, so no sentence falls in one). A class is
-  a spelling of what one project claims about itself, so it is consumer config for
-  the same provenance-seam reason the vocabularies above are, and for one more:
-  this kit's own SPEC is governed prose, so a kit literal here would match its own
-  class while describing it.
-  The gate reads `CANON_KIT_MEASURED_SURFACE_GLOBS` above for its corpus and adds no
-  surface knob.
-- `CANON_KIT_COMMENT_MACHINE` / `CANON_KIT_COMMENT_REASON` — arrays, default
-  empty: extra directive prefixes appended to the built-in kit-mechanism
-  roster (a consumer's product vocabulary). `CANON_KIT_COMMENT_SURFACE` —
-  array of globs, default empty ⇒ derive: `.sh`, `.gate` and `.rs` sources under
-  the root (kit roots per `CANON_KIT_SCAN_KIT_ROOTS`, `templates/` pruned) plus the
-  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/*.txt` state files.
-  `CANON_KIT_COMMENT_POSITIONAL` — the language construct roster for
-  positional rescue, default empty (the kit is language-agnostic; a Rust
-  consumer sets `.unwrap( .expect( unsafe #[allow(`).
-  `CANON_KIT_COMMENT_WHITELIST` — array of globs, default empty: the
-  consumer's not-yet-swept sources, its array tagged `# exception-list:`
-  with a per-entry `# until: <drain-task>`. `CANON_KIT_COMMENT_RUN_CAP` —
-  positive integer, default 3: total physical comment lines a directive
-  blesses (its own line plus continuations, blank `#` lines counted).
-- `CANON_KIT_PROSE_TELL_GLOBS` — array of repo-root-relative globs, default
-  empty ⇒ nothing scanned, a clean pass: the reader-facing prose surfaces
-  `check-prose-tells` reads. Which surfaces carry authored prose is the
-  consumer's editorial posture, and per the provenance seam it never lands as a
-  kit literal. The threshold knobs, each read by `check-prose-tells` alone and
-  validated by this table (a malformed value refuses at exit 2 with every
-  finding, the table's standing rule above):
-  `CANON_KIT_PROSE_TELL_EMDASH_MAX` — em-dashes a paragraph may carry, a
-  non-negative integer, default `2`; `CANON_KIT_PROSE_TELL_CONTRAST_MAX` —
-  "not X, it's Y" contrast turns a section may carry, a non-negative integer,
-  default `1`; `CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES` — sentences a
-  paragraph needs before its rhythm is judged, an integer of at least `2` (a
-  coefficient of variation over one sentence is zero by construction, so a
-  floor of one would red every one-sentence paragraph), default `4`;
-  `CANON_KIT_PROSE_TELL_RHYTHM_CV_MIN` — the word-count coefficient-of-variation
-  floor beneath which a paragraph reads as metronomic, a non-negative decimal
-  (unbounded above one, unlike the embed threshold's unit fraction), default
-  `0.25`; `CANON_KIT_PROSE_TELL_TRICOLON_MAX` — "A, B, and C" triples a section
-  may carry, a non-negative integer, default `2`.
-  `CANON_KIT_PROSE_TELL_PHRASES` — array of throat-clearing
-  phrases matched case-insensitively, default a bundled generic-English set
-  (`It's worth noting`, `That said`, …); `CANON_KIT_PROSE_TELL_ABBR_ALLOW` —
-  array of abbreviations exempt from the undefined-abbreviation tell, default a
-  bundled universal set (`API`, `CLI`, `URL`, …). A consumer extends any
-  bundled vocabulary — these two, `CANON_KIT_TEMPORAL_MARKERS`,
-  `CANON_KIT_SEAM_AUTHORITY_MARKERS` and `CANON_KIT_FENCE_PROGRAMS` above — with
-  its own through the matching `_EXTRA` knob:
-  `CANON_KIT_PROSE_TELL_PHRASES_EXTRA`,
-  `CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA`,
-  `CANON_KIT_TEMPORAL_MARKERS_EXTRA`,
-  `CANON_KIT_SEAM_AUTHORITY_MARKERS_EXTRA` and
-  `CANON_KIT_FENCE_PROGRAMS_EXTRA`, all default empty, which each reader
-  unions onto the resolved base (`spec::vocabulary`): the effective set is the
-  base followed by the extra. The union is the reader's rather than a derived
-  default's, because a file value replaces a knob whole and a derived default fires
-  only at the default, so a consumer who set the base keeps the extra. Extension
-  therefore costs one token, never a restatement of the bundled default that would
-  silently diverge from it. Setting a base array keeps its replace semantics, and
-  that is the narrowing valve: a consumer wanting a bundled member *gone* replaces
-  the base array. A temporal or authority marker set whose base and extra are both
-  empty is malformed config. Generic English is
-  kit-shippable; a consumer's own vocabulary never becomes a kit literal (the
-  provenance seam).
+- `CANON_KIT_RESTATEMENT_PAGES` — array of globs, default empty: the pages `check-docs-restatement-parity` holds to the `README.md` beside each. Which pages restate a source is one site's layout, so no spelling ships as a kit literal.
+- `CANON_KIT_FENCE_PROGRAMS` — array of program names a shell fence may start a command with, default a bundled generic utility set (`cat`, `grep`, `git`, …; `--emit knob-roster` prints it whole); extended through `CANON_KIT_FENCE_PROGRAMS_EXTRA` under the `_EXTRA` semantics below. Read by `check-fence-command-head`. The toolchain a tree's recipes name — a compiler, a fetch tool, a package manager — is that tree's own vocabulary, so it rides the extra rather than a kit literal (the provenance seam).
+- `CANON_KIT_FENCE_RUN_PROGRAMS` — array of program names a fence `check-fence-run` executes may start a command with, default `("git")`. It is the whole set, not an extra over `CANON_KIT_FENCE_PROGRAMS`: every name in it is a program that runs with the scratch's network reach, so the default admits only the one program the fixed environment confines to local protocols. A vocabulary rather than a walk filter, so it takes no `knob:` couples token, on the fence-program pair's own ground.
+- `CANON_KIT_RETIRED_SPELLING_EXCLUDE` — array of globs, default empty: tracked paths held out of `check-amendment-retired-spelling`'s reconciliation corpus. Which surfaces are **history-bearing** is a consumer fact, not a kit one — a work queue, a ruling record and a scratch directory are named by that consumer's own configuration, and a retired spelling survives in all three legitimately, because that is what a history surface is for. A kit default naming them would be a kit literal carrying one project's layout, which the provenance seam refuses. **The empty default is the conservative one, not a fail-open**: the exclusion can only ever remove findings, so a consumer that configures nothing gets a noisier gate rather than a blinder one — worth stating because the reflex on reading "defaults to empty" is to look for the hole.
+- `CANON_KIT_COUNT_COLLECTIONS` — array of collection-noun plurals `check-manifest-count` treats as growing governed sets, default `("gates" "meta-gates" "checks" "kits" "stages" "rules" "KPIs")` (a consumer appends its own governed plurals); `CANON_KIT_COUNT_WEDGE_WORDS` — how many words may sit between the cardinal and the noun, default `2`; `CANON_KIT_COUNT_ALLOWED_PHRASES` — exact-phrase allowlist for fixed named sets a doc may cite inline, default empty (a consumer names its own fixed sets, and only a phrase whose noun it governs needs the valve).
+- `CANON_KIT_ENUM_SETS_CMD` — a consumer command emitting the governed sets `check-prose-enum` holds, one `<set-name>`⇥`<member>` line per member, default empty ⇒ clean skip (no declared sets). The bundled emitter, `bash gate-sdk/bin/run-gates.sh --emit enum-sets`, derives the queue tag sets from queue-kit's own parser rather than restating them. The knob's own contract is unchanged by a value naming a bundled arm: it takes any consumer command, so an adopter still points it anywhere — what the payload offers is an emitter an adopter can name without authoring a script, not a claim on where a consumer's sets come from.
+- `CANON_KIT_INSTALL_TRANSPORTS_CMD` — a consumer command emitting the install transports `check-install-claim` holds, one `<transport-id>`⇥`<ERE>` line per transport, default empty ⇒ clean skip. `CANON_KIT_INSTALL_SECTION_RE` — an ERE matched against `##`-or-deeper heading text to select the sections that gate scans, default empty ⇒ clean skip; either knob left empty skips the whole gate, since neither assertion has a vocabulary to judge against without the other. `CANON_KIT_INSTALL_CLAIM_EXCLUDE` — array of globs dropped from that gate's scanned set on top of `CANON_KIT_MDREF_EXCLUDE`, default empty. A transport vocabulary is one project's distribution model, so no spelling of it ships as a kit literal (the provenance seam).
+- `CANON_KIT_PAYLOAD_CLAIMS_CMD` — a consumer command emitting the payload disclosure classes `check-payload-claim` holds, one `<claim-id>`⇥`<ERE>` line per class, default empty ⇒ clean skip (the correct posture for a tree whose payload discloses one thing only). `CANON_KIT_PAYLOAD_CLAIM_EXCLUDE` — array of globs dropped from that gate's scanned set on top of `CANON_KIT_MDREF_EXCLUDE`, default empty. A spelling of what a payload discloses is one project's distribution model, so it is consumer config for the same provenance-seam reason the transport vocabulary above is.
+- `CANON_KIT_MEASURED_CLAIMS_CMD` — a consumer command emitting the oracle `check-measured-claim` re-runs, one `<key>`⇥`<value>` line per measurable fact, default empty ⇒ clean skip (no oracle, so no marker has anything to disagree with). `CANON_KIT_MEASURED_SURFACE_GLOBS` — array of globs naming the scanned surface, default empty ⇒ empty corpus and a clean gate; the two are set together or not at all. What a project measures is that project's vocabulary, so no key ships as a kit literal (the provenance seam). A consumer commonly derives the surface by reference, `CANON_KIT_MEASURED_SURFACE_GLOBS[] <- CANON_KIT_MANIFEST_FILES`, and widens it with what the manifest set omits: binding shims, which the prose surface excludes on a copy-shape ownership this rule is not covered by, and a work queue, which takes the marker without taking the manifest tier's bare-cardinal ban (§check-manifest-count). **Deriving this knob from the manifest array is the common shape, and it makes a manifest widening wider than it looks:** the readers of *both* knobs move at once, so a consumer widening `CANON_KIT_MANIFEST_FILES` widens this knob's pair as well as the manifest pair it named. A manifest widening also owes a `# graph:` coupling edit that a widening of this knob does not — the measured pair couples markdown broadly and reaches any `.md` surface, while the manifest pair couples a narrower manifest-shaped set, so widening the manifest array without widening those gates' coupling manifests ships a knob whose gate never triggers on the file it was widened for, and the miss surfaces only in a full-battery run. The surface knob has a **second reader**, `check-unmarked-claim`, which shares it rather than forking a knob of its own: the pair composes over one corpus (§check-unmarked-claim), and the recorded cost is that a consumer cannot scan claim classes over a different surface than its measured claims.
+- `CANON_KIT_CLAIM_CLASSES_CMD` — a consumer command emitting the claim classes `check-unmarked-claim` holds, one `<class-id>`⇥`<ERE>` line per class, default empty ⇒ clean skip (no declared class, so no sentence falls in one). A class is a spelling of what one project claims about itself, so it is consumer config for the same provenance-seam reason the vocabularies above are, and for one more: this kit's own SPEC is governed prose, so a kit literal here would match its own class while describing it. The gate reads `CANON_KIT_MEASURED_SURFACE_GLOBS` above for its corpus and adds no surface knob.
+- `CANON_KIT_COMMENT_MACHINE` / `CANON_KIT_COMMENT_REASON` — arrays, default empty: extra directive prefixes appended to the built-in kit-mechanism roster (a consumer's product vocabulary). `CANON_KIT_COMMENT_SURFACE` — array of globs, default empty ⇒ derive: `.sh`, `.gate` and `.rs` sources under the root (kit roots per `CANON_KIT_SCAN_KIT_ROOTS`, `templates/` pruned) plus the `${GATE_SDK_WORKFLOW_DIR:-.workflow}/*.txt` state files. `CANON_KIT_COMMENT_POSITIONAL` — the language construct roster for positional rescue, default empty (the kit is language-agnostic; a Rust consumer sets `.unwrap( .expect( unsafe #[allow(`). `CANON_KIT_COMMENT_WHITELIST` — array of globs, default empty: the consumer's not-yet-swept sources, its array tagged `# exception-list:` with a per-entry `# until: <drain-task>`. `CANON_KIT_COMMENT_RUN_CAP` — positive integer, default 3: total physical comment lines a directive blesses (its own line plus continuations, blank `#` lines counted).
+- `CANON_KIT_PROSE_TELL_GLOBS` — array of repo-root-relative globs, default empty ⇒ nothing scanned, a clean pass: the reader-facing prose surfaces `check-prose-tells` reads. Which surfaces carry authored prose is the consumer's editorial posture, and per the provenance seam it never lands as a kit literal. The threshold knobs, each read by `check-prose-tells` alone and validated by this table (a malformed value refuses at exit 2 with every finding, the table's standing rule above): `CANON_KIT_PROSE_TELL_EMDASH_MAX` — em-dashes a paragraph may carry, a non-negative integer, default `2`; `CANON_KIT_PROSE_TELL_CONTRAST_MAX` — "not X, it's Y" contrast turns a section may carry, a non-negative integer, default `1`; `CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES` — sentences a paragraph needs before its rhythm is judged, an integer of at least `2` (a coefficient of variation over one sentence is zero by construction, so a floor of one would red every one-sentence paragraph), default `4`; `CANON_KIT_PROSE_TELL_RHYTHM_CV_MIN` — the word-count coefficient-of-variation floor beneath which a paragraph reads as metronomic, a non-negative decimal (unbounded above one, unlike the embed threshold's unit fraction), default `0.25`; `CANON_KIT_PROSE_TELL_TRICOLON_MAX` — "A, B, and C" triples a section may carry, a non-negative integer, default `2`. `CANON_KIT_PROSE_TELL_PHRASES` — array of throat-clearing phrases matched case-insensitively, default a bundled generic-English set (`It's worth noting`, `That said`, …); `CANON_KIT_PROSE_TELL_ABBR_ALLOW` — array of abbreviations exempt from the undefined-abbreviation tell, default a bundled universal set (`API`, `CLI`, `URL`, …). A consumer extends any bundled vocabulary — these two, `CANON_KIT_TEMPORAL_MARKERS`, `CANON_KIT_SEAM_AUTHORITY_MARKERS` and `CANON_KIT_FENCE_PROGRAMS` above — with its own through the matching `_EXTRA` knob: `CANON_KIT_PROSE_TELL_PHRASES_EXTRA`, `CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA`, `CANON_KIT_TEMPORAL_MARKERS_EXTRA`, `CANON_KIT_SEAM_AUTHORITY_MARKERS_EXTRA` and `CANON_KIT_FENCE_PROGRAMS_EXTRA`, all default empty, which each reader unions onto the resolved base (`spec::vocabulary`): the effective set is the base followed by the extra. The union is the reader's rather than a derived default's, because a file value replaces a knob whole and a derived default fires only at the default, so a consumer who set the base keeps the extra. Extension therefore costs one token, never a restatement of the bundled default that would silently diverge from it. Setting a base array keeps its replace semantics, and that is the narrowing valve: a consumer wanting a bundled member *gone* replaces the base array. A temporal or authority marker set whose base and extra are both empty is malformed config. Generic English is kit-shippable; a consumer's own vocabulary never becomes a kit literal (the provenance seam).
 
-Cross-kit note: the section knobs carry the same defaults as queue-kit's;
-the knobs are independent (either kit runs without the other), so a
-consumer renaming its sections sets both — and the icebox section name spans
-every kit that reads the tier on that same shape (queue-kit's
-`QUEUE_KIT_ICEBOX_SECTION`, this knob, drift-kit's `DRIFT_KIT_ICEBOX_SECTION`),
-each degrading to "no icebox" rather than to a wrong section when left unset. Valve and marker spellings <!-- prose-enum-exempt: names the one amendment-lifecycle tag specifically; the other task tags sit outside that lifecycle, not dropped members -->
-(`[spec:]`, `vision-introduces` / `spec-introduces`,
-`spec-embedded-source-exempt: <reason>`) are mechanism, not config.
+Cross-kit note: the section knobs carry the same defaults as queue-kit's; the knobs are independent (either kit runs without the other), so a consumer renaming its sections sets both — and the icebox section name spans every kit that reads the tier on that same shape (queue-kit's `QUEUE_KIT_ICEBOX_SECTION`, this knob, drift-kit's `DRIFT_KIT_ICEBOX_SECTION`), each degrading to "no icebox" rather than to a wrong section when left unset. Valve and marker spellings <!-- prose-enum-exempt: names the one amendment-lifecycle tag specifically; the other task tags sit outside that lifecycle, not dropped members --> (`[spec:]`, `vision-introduces` / `spec-introduces`, `spec-embedded-source-exempt: <reason>`) are mechanism, not config.
 
 ## Per-component contracts
 
-Each gate below owns its own section — the assertion, its fixture pair, and the
-reason for any bespoke unit test beside it. The bespoke unit tests are named
-together here, because a roster spread across per-gate sections is one no reader
-and no oracle sees whole: `check-amendment-update-target.test.sh`,
-`check-comment-tier.test.sh`,
-`check-deprecation-task.test.sh`, `check-docs-cmd.test.sh`, `check-docs-link-convention.test.sh`,
-`check-knob-citation.test.sh`, `check-knob-default-coupling.test.sh`,
-`check-manifest-count.test.sh`, `check-md-refs.test.sh`,
-`check-measured-claim.test.sh`, `check-prose-enum.test.sh`,
-`check-provenance-seam.test.sh`, `check-spec-dod-singleton.test.sh`, `check-tracking-claim.test.sh` and
-`check-unmarked-claim.test.sh`.
+Each gate below owns its own section — the assertion, its fixture pair, and the reason for any bespoke unit test beside it. The bespoke unit tests are named together here, because a roster spread across per-gate sections is one no reader and no oracle sees whole: `check-amendment-update-target.test.sh`, `check-comment-tier.test.sh`, `check-deprecation-task.test.sh`, `check-docs-cmd.test.sh`, `check-docs-link-convention.test.sh`, `check-knob-citation.test.sh`, `check-knob-default-coupling.test.sh`, `check-manifest-count.test.sh`, `check-md-refs.test.sh`, `check-measured-claim.test.sh`, `check-prose-enum.test.sh`, `check-provenance-seam.test.sh`, `check-spec-dod-singleton.test.sh`, `check-tracking-claim.test.sh` and `check-unmarked-claim.test.sh`.
 
 ### The shared spec adapters
 
-`native/src/spec.rs` is the sole holder of the adapters the spec-scanning gates
-share — values and adapters only, never gate structure. It centralizes the surfaces
-and vocabularies those gates read, so a rule enters once and every sibling matches
-the same shapes:
+`native/src/spec.rs` is the sole holder of the adapters the spec-scanning gates share — values and adapters only, never gate structure. It centralizes the surfaces and vocabularies those gates read, so a rule enters once and every sibling matches the same shapes:
 
-- **Section grammar and queue resolution:** the one queue walk that emits a live
-  slug for a bold lead-in bullet in an active or **design-pending** section —
-  deferred plus a configured icebox, one section set so the pairing arms and the walk
-  can never disagree on it — and a done slug for a bare-slug bullet outside them;
-  the single grammar `check-todo-task-liveness` and `check-deprecation-task`
-  resolve a `task: <slug>` binding through. **The walk is `queue_slugs`**, and its
-  classifier matches a section name against the configured sets directly (queue-kit's
-  rule — both sides of a section boundary must parse identically). That walk's
-  bullet lead-line predicate is written again in the
-  crate rather than pointed at `native/src/queue.rs`'s adapters, which keeps
-  canon-kit one of the format's independent holders under the
-  re-implement-and-cite-from-both-ends rule
-  (queue-kit/SPEC.md §The queue format) — two modules in one crate are still two
-  holders where one shared function is not; the holder census and the residue it
-  leaves live at gate-sdk/SPEC.md §check-gate-exemption-tasks.
-- **The governed comment surface:** `comment_surface` in `native/src/spec.rs` —
-  the one corpus primitive `check-spec-pointer`, `check-comment-tier`,
-  `check-todo-task-liveness` and `check-deprecation-task` all call, its single
-  parameter deciding whether `templates/` sources are pruned. Its file set spans
-  **both gate declaration spellings, the ported implementation, and the workflow
-  directory's tracked tier**: `*.sh`, the `*.gate` descriptor, `*.rs`, and every
-  tracked member of `GATE_SDK_WORKFLOW_DIR` whatever its extension. Stated once
-  here rather than at each of the four callers, since a gate whose rule became a
-  compiled subcommand must not have its `# spec:` pointer, its comment tier, or a
-  `TODO(task:)` marker silently drop out of coverage — the widening is made at the
-  shared primitive so no caller can inherit a narrower corpus than its siblings
-  (gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate). The shell
-  forms are **deleted rather than duplicated**: all four callers compiled in one
-  cohort, so criterion 6 is satisfied in the form it calls strongest — the
-  duplication is absent rather than machine-held. A consumer whose own gate called
-  `spec_comment_surface`, `spec_comment_surface_with_templates` or
-  `spec_comment_whitelisted` shadows the gate, which is the answer this section
-  already gives for the finder-choice question below.
-- **Finders:** the canonical-spec / amendment finders the spec-scanning gates
-  share, and the manifest-set finder the narration-gate family shares —
-  canonical specs plus `README.md`/`CLAUDE.md`, amendments excluded — so its
-  members read one identical set. The finder then folds in each
-  `CANON_KIT_PROSE_SURFACE_GLOBS` candidate that is **slot-free**: it bears no
-  lifecycle-kit binding slot (`*<name: …>*`, slot-name `[a-z][a-z0-9-]*` — the
-  grammar lifecycle-kit/SPEC.md §templates/stages/ owns) and no
-  `CONSUMER BINDING` header. A slot-bearing candidate is silently excluded — a template still
-  awaiting binding is a placeholder, not finished prose, and its coverage stays
-  the shim/binding gates (§Layout and configuration states the knob). All three
-  markdown finders — canonical specs, amendments, and the manifest set's
-  `README.md` half — skip a `templates/` skeleton (a copyable stub, not governed
-  content, the same rationale as the gate-tests prune) and, unless
-  `CANON_KIT_SCAN_KIT_ROOTS=1`, any vendored kit root under the scan root. The
-  kit-root prune reaches the README because the knob's rationale turns on whose
-  documentation a file is, not on which filename carries it: a vendored kit's
-  `README.md` is a dependency's docs exactly as its `SPEC.md` is, and pruning
-  one while governing the other reds a consumer on a dependency's own internal
-  links — measured, on a profile that vendors canon-kit without queue-kit, where
-  `canon-kit/README.md`'s `../queue-kit/` link dangles on a bare install tree.
-  An ancestor kit root — the case when a kit's own fixture dir is the scan
-  root — never prunes.
+- **Section grammar and queue resolution:** the one queue walk that emits a live slug for a bold lead-in bullet in an active or **design-pending** section — deferred plus a configured icebox, one section set so the pairing arms and the walk can never disagree on it — and a done slug for a bare-slug bullet outside them; the single grammar `check-todo-task-liveness` and `check-deprecation-task` resolve a `task: <slug>` binding through. **The walk is `queue_slugs`**, and its classifier matches a section name against the configured sets directly (queue-kit's rule — both sides of a section boundary must parse identically). That walk's bullet lead-line predicate is written again in the crate rather than pointed at `native/src/queue.rs`'s adapters, which keeps canon-kit one of the format's independent holders under the re-implement-and-cite-from-both-ends rule (queue-kit/SPEC.md §The queue format) — two modules in one crate are still two holders where one shared function is not; the holder census and the residue it leaves live at gate-sdk/SPEC.md §check-gate-exemption-tasks.
+- **The governed comment surface:** `comment_surface` in `native/src/spec.rs` — the one corpus primitive `check-spec-pointer`, `check-comment-tier`, `check-todo-task-liveness` and `check-deprecation-task` all call, its single parameter deciding whether `templates/` sources are pruned. Its file set spans **both gate declaration spellings, the ported implementation, and the workflow directory's tracked tier**: `*.sh`, the `*.gate` descriptor, `*.rs`, and every tracked member of `GATE_SDK_WORKFLOW_DIR` whatever its extension. Stated once here rather than at each of the four callers, since a gate whose rule became a compiled subcommand must not have its `# spec:` pointer, its comment tier, or a `TODO(task:)` marker silently drop out of coverage — the widening is made at the shared primitive so no caller can inherit a narrower corpus than its siblings (gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate). The shell forms are **deleted rather than duplicated**: all four callers compiled in one cohort, so criterion 6 is satisfied in the form it calls strongest — the duplication is absent rather than machine-held. A consumer whose own gate called `spec_comment_surface`, `spec_comment_surface_with_templates` or `spec_comment_whitelisted` shadows the gate, which is the answer this section already gives for the finder-choice question below.
+- **Finders:** the canonical-spec / amendment finders the spec-scanning gates share, and the manifest-set finder the narration-gate family shares — canonical specs plus `README.md`/`CLAUDE.md`, amendments excluded — so its members read one identical set. The finder then folds in each `CANON_KIT_PROSE_SURFACE_GLOBS` candidate that is **slot-free**: it bears no lifecycle-kit binding slot (`*<name: …>*`, slot-name `[a-z][a-z0-9-]*` — the grammar lifecycle-kit/SPEC.md §templates/stages/ owns) and no `CONSUMER BINDING` header. A slot-bearing candidate is silently excluded — a template still awaiting binding is a placeholder, not finished prose, and its coverage stays the shim/binding gates (§Layout and configuration states the knob). All three markdown finders — canonical specs, amendments, and the manifest set's `README.md` half — skip a `templates/` skeleton (a copyable stub, not governed content, the same rationale as the gate-tests prune) and, unless `CANON_KIT_SCAN_KIT_ROOTS=1`, any vendored kit root under the scan root. The kit-root prune reaches the README because the knob's rationale turns on whose documentation a file is, not on which filename carries it: a vendored kit's `README.md` is a dependency's docs exactly as its `SPEC.md` is, and pruning one while governing the other reds a consumer on a dependency's own internal links — measured, on a profile that vendors canon-kit without queue-kit, where `canon-kit/README.md`'s `../queue-kit/` link dangles on a bare install tree. An ancestor kit root — the case when a kit's own fixture dir is the scan root — never prunes.
 
-  **One asymmetry inside the manifest set, written down because a port that
-  tidies it changes the corpus.** The canonical-spec half and the `README.md`
-  half are both `templates/`-filtered and kit-root pruned; the **`CLAUDE.md`
-  half is neither**. A consumer's agent manifest is governed content wherever it
-  sits, including inside a vendored kit root and inside a `templates/`
-  skeleton — so regularizing the three finders into one loop silently drops two
-  files that belong in the set. The rule is the asymmetry, not the tidy form.
+  **One asymmetry inside the manifest set, written down because a port that tidies it changes the corpus.** The canonical-spec half and the `README.md` half are both `templates/`-filtered and kit-root pruned; the **`CLAUDE.md` half is neither**. A consumer's agent manifest is governed content wherever it sits, including inside a vendored kit root and inside a `templates/` skeleton — so regularizing the three finders into one loop silently drops two files that belong in the set. The rule is the asymmetry, not the tidy form.
 
-  **Every primitive here is compiled only.** The manifest finder carries all three
-  branches — explicit globs, the default walk, and the prose-surface fold — plus the
-  kit-root path prune; beside it sit the claim-gate primitives: the declaration
-  grammar, the declaration roster, the governed-doc set behind its two exclude
-  valves, and the command adapters below. `comment_surface` and `queue_slugs` are
-  in the same module, so each primitive has one holder, ported once and proved by
-  each member that calls it.
-- **The emitter-backed vocabularies** — the enum sets, the install transports,
-  the payload-disclosure classes, the measured claims and the claim classes a
-  consumer supplies as a *command knob*. Each member reads its command's output
-  through an adapter that spawns the argv **once per process** and caches the
-  parsed `<first>`⇥`<second>` lines, so no spelling of a consumer's vocabulary
-  becomes a kit literal and a member that never asks spawns nothing. The empty argv
-  is checked before any spawn, which is what tells *none configured* from
-  *configured, and it declared nothing* — the two clean skips a claim gate reports
-  apart. **Two validation contracts, both exit 2:** for the enum sets a command that
-  fails or exits non-zero, a line with no tab, an empty field or an extra tab; for
-  the three `<id>`⇥`<ERE>` vocabularies and the measured claims the same, plus a
-  first field that is not slug-shaped or repeats, with the command knob named as the
-  label in every message. A tab a POSIX ERE may legitimately carry is refused as an
-  extra tab before a pattern is compiled.
-  **A configured command may itself be a front-end arm, which nests one front-end
-  invocation inside another — and the termination is a constraint on the arm's
-  roster rather than a property inherited.** A command that is a front-end arm must
-  not declare the knob that names it, or the resolution recurses:
-  `--emit-enum-sets` declares `GATE_SDK_KIT_DIRS` and `QUEUE_KIT_LESSON_TAGS` and
-  may never gain `CANON_KIT_ENUM_SETS_CMD`. **Nothing reds if it does** — the
-  failure is a hang or an unbounded recursion, not a verdict — which is why the
-  condition is written here, beside the adapter. The residue stays: the spawned
-  front-end still sources `lib/gate.sh` to locate the binary before exec'ing it,
-  one extra `bash`, one `lib/gate.sh` source and one
-  binary exec per read of that vocabulary. It is a **residue to file, never a
-  licence** to take the in-process shortcut §check-prose-enum refuses.
-- **The count adapter** the restated-total gates share, so a consumer's
-  `CANON_KIT_COUNT_COLLECTIONS` vocabulary enters once and every such gate
-  matches the same total shapes — including a total whose cardinal and noun
-  straddle a prose wrap, reported at the cardinal's physical line. **That
-  wrap-straddling normalization now has a second reader**: `check-unmarked-claim`
-  matches a class ERE against the same normalized paragraph and maps the match's
-  span back to the physical line it starts on (`FlatPara`,
-  `native/src/spec.rs`), so both cross a prose wrap by one rule rather than by a
-  copy each. What the count adapter owns is the *total* grammar; what the flatten
-  adapter owns is the *subject* a pattern is matched against, and separating them
-  is why a second reader cost a call rather than a fork. The boundary
-  rule and the mechanical exemptions live in one shared fragment, so no sibling
-  drifts from another in what it counts as a total (§check-manifest-count). That
-  boundary guards a prose **noun** against gluing to a following word ("gate"
-  inside "gatekeepers") — a different rule from the enum matcher's **identifier**
-  boundary (§check-prose-enum), which the two once spelled alike and only
-  half-alike at that. English nouns do not compound across underscores, so the
-  noun rule stays as it is; the shared spelling was never a shared rule.
-- **The enum sets** arrive through `enum_sets`, over `CANON_KIT_ENUM_SETS_CMD`
-  (§check-prose-enum).
-- **The claim vocabularies** arrive through `claim_vocabulary(<command knob>)` —
-  one loader for every `<id>`⇥`<ERE>` vocabulary a claim gate reads, taking the
-  command knob as an argument rather than reading one named knob, so a second claim
-  axis costs a caller and not a second copy. **That argument is attested rather
-  than anticipated:** `check-unmarked-claim` arrived as a caller and nothing else —
-  no fork of the loader, no second copy of the shape checks. It compiles every
-  pattern before the first corpus line is read. The duplicate check is what a bare
-  emit grammar cannot express and both gates need: two lines claiming one id would
-  give a class two patterns and make its match order arbitrary. Its callers are
-  `check-install-claim` over `CANON_KIT_INSTALL_TRANSPORTS_CMD`
-  (§check-install-claim), `check-payload-claim` over `CANON_KIT_PAYLOAD_CLAIMS_CMD`
-  (§check-payload-claim) and `check-unmarked-claim` over
-  `CANON_KIT_CLAIM_CLASSES_CMD` (§check-unmarked-claim); `measured_claims` reads
-  `CANON_KIT_MEASURED_CLAIMS_CMD` under the same keyed contract without compiling
-  (§check-measured-claim), since its second field is a measured value rather than
-  an ERE. The two-field shape is what makes the unmarked-claim caller
-  coverage-only: a class cannot carry a required key beside its ERE without a
-  third field the adapter refuses, and the refusal is kept rather than relaxed.
-- **The comment-surface adapters:** the comment gates read *different* surfaces,
-  which is the one thing the primitive's parameter decides.
-  `check-spec-pointer` scans the template-pruned surface — a template's `spec:`
-  line is an unresolvable-by-design placeholder (§check-spec-pointer);
-  `check-comment-tier` scans the with-templates surface — a copied-out
-  template's `spec:` pointer resolves against the vendored kit path (kit SPECs
-  travel with the vendor-whole install), so its comments are governed like any
-  source (§check-comment-tier). Which finder a gate uses is kit contract, not
-  consumer config — a consumer wanting the old blanket exemption shadows the
-  gate.
-  **The configured branch narrows exactly as the default branch does, and did not.**
-  When `CANON_KIT_COMMENT_SURFACE` is set the surface is drawn from that knob's globs
-  instead of the extension walk — but the knob selects which *files* the corpus is drawn
-  from and nothing else, so every narrowing past that point belongs to the corpus rather
-  than to one branch. Returning early from the configured branch skipped five of them:
-  the `templates/` rule and its parameter above, the kit-root prune, the byte sort, the
-  **workflow tier** — which §check-spec-pointer requires, so a consumer who set the knob
-  silently lost the whole `.workflow/` tracked tier — and **the walker's own prune set**,
-  because the glob walk is bash-faithful and prunes nothing where the extension walk
-  prunes `GATE_SDK_PRUNE_DIRS` and `GATE_SDK_PRUNE_EXTRA_DIRS`. **That last one is the cause of the directory-shape explosion**
-  a configured value otherwise has to enumerate around — named explicitly because the
-  kit-root prune is the arm that reads like the culprit and cannot be it, being a no-op
-  wherever `CANON_KIT_SCAN_KIT_ROOTS=1`. The knob is a corpus
-  *selector*, never a corpus *replacement* with its own semantics.
-  **The prune set bounds the walk, not only its result.** The configured branch expands
-  through `walk::glob_files_pruned`, whose `**` never descends into a pruned directory, and
-  then drops any hit a glob reached by naming a pruned directory outright. Filtering the
-  result alone reads the same corpus but still stats every entry under `target/`, and a
-  build running beside the battery creates and deletes temporary directories there, so an
-  entry listed and then gone is a fail-closed exit 2 on a tree with nothing wrong in it.
-- **The canonical-spec finder prunes the generated on-site mirror**, as a directory
-  prune beside the `templates/` one it already applies. A prose gate grading a generated
-  page is unfixable at the file — the repair is to the source and the regeneration — so
-  the finding can only be absorbed or ignored, which is the reasoning this tree already
-  states for a sibling knob at `scripts/canon-config.knobs`. Applied inside the kit
-  mechanism the ground is stronger than editorial scope: the mirror is excluded because
-  it is **generated**, and the generator is the kit's own. The two narrowings are one
-  prune list, read by the walk and by the member's registry declaration from one place,
-  because a declared prune narrows a coverage demand and two spellings could disagree
-  about it (gate-sdk/SPEC.md §check-reads-couples).
-- **The amendment finder** `amendments`, the amendment-glob counterpart of the
-  canonical-spec finder above. Its consumers are `check-amendment-queue` and
-  `check-amendment-update-target`, and they **differ in fail-closed posture on
-  purpose** — so the crate holds two spellings of one walk, `amendments` and
-  `amendments_strict`, rather than one that reads as drift. The best-effort form
-  swallows an unwalkable scan root and yields no amendments, which the queue gate
-  can afford because an empty amendment set cannot hide a violation there (every
-  `[spec:]` ref then dangles and the run reds). The update-target gate has no
-  second surface to contradict an empty set, so for it an empty set hides every
-  violation silently and the walk refuses instead. Each section states its own
-  half; the difference is a reasoned divergence, never an inconsistency to
-  reconcile.
-- **The default-statement grammar** both knob gates share, `DefaultGrammar`, so the
-  rule for what reads as a stated default has one home. It recognizes the value
-  literal opening a window (a backticked non-knob string, a quoted string, or a
-  number) and returns the literal the word "default" binds; a caller-supplied
-  knob-name predicate keeps a bare knob name from reading as a value.
-  `check-knob-citation` reads it to reject a restated value in prose;
-  `check-knob-default-coupling` reads it to confirm the SPEC states the source's
-  literal (§check-knob-default-coupling).
+  **Every primitive here is compiled only.** The manifest finder carries all three branches — explicit globs, the default walk, and the prose-surface fold — plus the kit-root path prune; beside it sit the claim-gate primitives: the declaration grammar, the declaration roster, the governed-doc set behind its two exclude valves, and the command adapters below. `comment_surface` and `queue_slugs` are in the same module, so each primitive has one holder, ported once and proved by each member that calls it.
+- **The emitter-backed vocabularies** — the enum sets, the install transports, the payload-disclosure classes, the measured claims and the claim classes a consumer supplies as a *command knob*. Each member reads its command's output through an adapter that spawns the argv **once per process** and caches the parsed `<first>`⇥`<second>` lines, so no spelling of a consumer's vocabulary becomes a kit literal and a member that never asks spawns nothing. The empty argv is checked before any spawn, which is what tells *none configured* from *configured, and it declared nothing* — the two clean skips a claim gate reports apart. **Two validation contracts, both exit 2:** for the enum sets a command that fails or exits non-zero, a line with no tab, an empty field or an extra tab; for the three `<id>`⇥`<ERE>` vocabularies and the measured claims the same, plus a first field that is not slug-shaped or repeats, with the command knob named as the label in every message. A tab a POSIX ERE may legitimately carry is refused as an extra tab before a pattern is compiled. **A configured command may itself be a front-end arm, which nests one front-end invocation inside another — and the termination is a constraint on the arm's roster rather than a property inherited.** A command that is a front-end arm must not declare the knob that names it, or the resolution recurses: `--emit-enum-sets` declares `GATE_SDK_KIT_DIRS` and `QUEUE_KIT_LESSON_TAGS` and may never gain `CANON_KIT_ENUM_SETS_CMD`. **Nothing reds if it does** — the failure is a hang or an unbounded recursion, not a verdict — which is why the condition is written here, beside the adapter. The residue stays: the spawned front-end still sources `lib/gate.sh` to locate the binary before exec'ing it, one extra `bash`, one `lib/gate.sh` source and one binary exec per read of that vocabulary. It is a **residue to file, never a licence** to take the in-process shortcut §check-prose-enum refuses.
+- **The count adapter** the restated-total gates share, so a consumer's `CANON_KIT_COUNT_COLLECTIONS` vocabulary enters once and every such gate matches the same total shapes — including a total whose cardinal and noun straddle a prose wrap, reported at the cardinal's physical line. **That wrap-straddling normalization now has a second reader**: `check-unmarked-claim` matches a class ERE against the same normalized paragraph and maps the match's span back to the physical line it starts on (`FlatPara`, `native/src/spec.rs`), so both cross a prose wrap by one rule rather than by a copy each. What the count adapter owns is the *total* grammar; what the flatten adapter owns is the *subject* a pattern is matched against, and separating them is why a second reader cost a call rather than a fork. The boundary rule and the mechanical exemptions live in one shared fragment, so no sibling drifts from another in what it counts as a total (§check-manifest-count). That boundary guards a prose **noun** against gluing to a following word ("gate" inside "gatekeepers") — a different rule from the enum matcher's **identifier** boundary (§check-prose-enum), which the two once spelled alike and only half-alike at that. English nouns do not compound across underscores, so the noun rule stays as it is; the shared spelling was never a shared rule.
+- **The enum sets** arrive through `enum_sets`, over `CANON_KIT_ENUM_SETS_CMD` (§check-prose-enum).
+- **The claim vocabularies** arrive through `claim_vocabulary(<command knob>)` — one loader for every `<id>`⇥`<ERE>` vocabulary a claim gate reads, taking the command knob as an argument rather than reading one named knob, so a second claim axis costs a caller and not a second copy. **That argument is attested rather than anticipated:** `check-unmarked-claim` arrived as a caller and nothing else — no fork of the loader, no second copy of the shape checks. It compiles every pattern before the first corpus line is read. The duplicate check is what a bare emit grammar cannot express and both gates need: two lines claiming one id would give a class two patterns and make its match order arbitrary. Its callers are `check-install-claim` over `CANON_KIT_INSTALL_TRANSPORTS_CMD` (§check-install-claim), `check-payload-claim` over `CANON_KIT_PAYLOAD_CLAIMS_CMD` (§check-payload-claim) and `check-unmarked-claim` over `CANON_KIT_CLAIM_CLASSES_CMD` (§check-unmarked-claim); `measured_claims` reads `CANON_KIT_MEASURED_CLAIMS_CMD` under the same keyed contract without compiling (§check-measured-claim), since its second field is a measured value rather than an ERE. The two-field shape is what makes the unmarked-claim caller coverage-only: a class cannot carry a required key beside its ERE without a third field the adapter refuses, and the refusal is kept rather than relaxed.
+- **The comment-surface adapters:** the comment gates read *different* surfaces, which is the one thing the primitive's parameter decides. `check-spec-pointer` scans the template-pruned surface — a template's `spec:` line is an unresolvable-by-design placeholder (§check-spec-pointer); `check-comment-tier` scans the with-templates surface — a copied-out template's `spec:` pointer resolves against the vendored kit path (kit SPECs travel with the vendor-whole install), so its comments are governed like any source (§check-comment-tier). Which finder a gate uses is kit contract, not consumer config — a consumer wanting the old blanket exemption shadows the gate. **The configured branch narrows exactly as the default branch does, and did not.** When `CANON_KIT_COMMENT_SURFACE` is set the surface is drawn from that knob's globs instead of the extension walk — but the knob selects which *files* the corpus is drawn from and nothing else, so every narrowing past that point belongs to the corpus rather than to one branch. Returning early from the configured branch skipped five of them: the `templates/` rule and its parameter above, the kit-root prune, the byte sort, the **workflow tier** — which §check-spec-pointer requires, so a consumer who set the knob silently lost the whole `.workflow/` tracked tier — and **the walker's own prune set**, because the glob walk is bash-faithful and prunes nothing where the extension walk prunes `GATE_SDK_PRUNE_DIRS` and `GATE_SDK_PRUNE_EXTRA_DIRS`. **That last one is the cause of the directory-shape explosion** a configured value otherwise has to enumerate around — named explicitly because the kit-root prune is the arm that reads like the culprit and cannot be it, being a no-op wherever `CANON_KIT_SCAN_KIT_ROOTS=1`. The knob is a corpus *selector*, never a corpus *replacement* with its own semantics. **The prune set bounds the walk, not only its result.** The configured branch expands through `walk::glob_files_pruned`, whose `**` never descends into a pruned directory, and then drops any hit a glob reached by naming a pruned directory outright. Filtering the result alone reads the same corpus but still stats every entry under `target/`, and a build running beside the battery creates and deletes temporary directories there, so an entry listed and then gone is a fail-closed exit 2 on a tree with nothing wrong in it.
+- **The canonical-spec finder prunes the generated on-site mirror**, as a directory prune beside the `templates/` one it already applies. A prose gate grading a generated page is unfixable at the file — the repair is to the source and the regeneration — so the finding can only be absorbed or ignored, which is the reasoning this tree already states for a sibling knob at `scripts/canon-config.knobs`. Applied inside the kit mechanism the ground is stronger than editorial scope: the mirror is excluded because it is **generated**, and the generator is the kit's own. The two narrowings are one prune list, read by the walk and by the member's registry declaration from one place, because a declared prune narrows a coverage demand and two spellings could disagree about it (gate-sdk/SPEC.md §check-reads-couples).
+- **The amendment finder** `amendments`, the amendment-glob counterpart of the canonical-spec finder above. Its consumers are `check-amendment-queue` and `check-amendment-update-target`, and they **differ in fail-closed posture on purpose** — so the crate holds two spellings of one walk, `amendments` and `amendments_strict`, rather than one that reads as drift. The best-effort form swallows an unwalkable scan root and yields no amendments, which the queue gate can afford because an empty amendment set cannot hide a violation there (every `[spec:]` ref then dangles and the run reds). The update-target gate has no second surface to contradict an empty set, so for it an empty set hides every violation silently and the walk refuses instead. Each section states its own half; the difference is a reasoned divergence, never an inconsistency to reconcile.
+- **The default-statement grammar** both knob gates share, `DefaultGrammar`, so the rule for what reads as a stated default has one home. It recognizes the value literal opening a window (a backticked non-knob string, a quoted string, or a number) and returns the literal the word "default" binds; a caller-supplied knob-name predicate keeps a bare knob name from reading as a value. `check-knob-citation` reads it to reject a restated value in prose; `check-knob-default-coupling` reads it to confirm the SPEC states the source's literal (§check-knob-default-coupling).
 
 ### check-amendment-queue
 
-Invariant: the bidirectional rule holds — (a) no feature-section entry
-without `[spec:]`, and no `[spec:]`-tagged entry in an active non-feature
-section (a spec-ready entry is misfiled there — it belongs in a feature
-section); (b) an entry in a **design-pending section** already carrying
-`[spec:]` must be promoted; (c) every amendment on disk pairs with a `[spec:]`
-queue entry and every `[spec:]` ref resolves to a file; (d) the retired
-design-pending tag appears on no line of a feature, active or design-pending
-section, lead line or body alike — section membership is the state
-(§The amendment lifecycle), and prose about the state spells it without
-brackets (queue-kit/SPEC.md §check-tag-lead-line). Arm (d) reds rather than
-leaving the token inert because an inert leftover keeps the two sources alive
-in every adopter queue with nothing to say so, and habit re-mints a spelling
-the record still shows — the ground queue-kit/SPEC.md
-§check-queue-entry-budget assertion (D) gives for its retired token; the
-migration is mechanical and the finding names it. (e) Every amendment-glob
-filename cited in the body of an amendment on disk resolves to a file — an
-amendment is deleted on merge, so a filename citation of a sibling dangles from
-that moment, and inside an amendment it is always read as governing input
-because the file is a transition artifact; its durable form is the canonical
-section the cited amendment merged into.
+Invariant: the bidirectional rule holds — (a) no feature-section entry without `[spec:]`, and no `[spec:]`-tagged entry in an active non-feature section (a spec-ready entry is misfiled there — it belongs in a feature section); (b) an entry in a **design-pending section** already carrying `[spec:]` must be promoted; (c) every amendment on disk pairs with a `[spec:]` queue entry and every `[spec:]` ref resolves to a file; (d) the retired design-pending tag appears on no line of a feature, active or design-pending section, lead line or body alike — section membership is the state (§The amendment lifecycle), and prose about the state spells it without brackets (queue-kit/SPEC.md §check-tag-lead-line). Arm (d) reds rather than leaving the token inert because an inert leftover keeps the two sources alive in every adopter queue with nothing to say so, and habit re-mints a spelling the record still shows — the ground queue-kit/SPEC.md §check-queue-entry-budget assertion (D) gives for its retired token; the migration is mechanical and the finding names it. (e) Every amendment-glob filename cited in the body of an amendment on disk resolves to a file — an amendment is deleted on merge, so a filename citation of a sibling dangles from that moment, and inside an amendment it is always read as governing input because the file is a transition artifact; its durable form is the canonical section the cited amendment merged into.
 
-Calibration: a ref is a bare amendment basename (searched tree-wide) or a
-repo-relative path (resolved directly — the generalization that lets a
-consumer point a task at any design artifact, e.g. this repo's kit-SPEC
-drafts). Sub-bullets and prose notes are outside the entry grammar;
-`precommit` tier.
+Calibration: a ref is a bare amendment basename (searched tree-wide) or a repo-relative path (resolved directly — the generalization that lets a consumer point a task at any design artifact, e.g. this repo's kit-SPEC drafts). Sub-bullets and prose notes are outside the entry grammar; `precommit` tier.
 
-Arm (e)'s calibration. **The token** is the basename pattern of
-`CANON_KIT_AMENDMENT_GLOB` with its `*` matching one or more of
-`[A-Za-z0-9._-]`, behind an optional repo-relative directory prefix of the same
-characters plus `/`, standing between characters outside that class or a line
-edge; backticks do not change the match, a placeholder (`SPEC-<feature>.md`) or
-the glob itself carries a character outside the class and is no token, and a
-sentence-final period after a token is punctuation rather than part of it.
-**Resolution** is the one a `[spec:]` ref gets, so the two cannot diverge: a
-token containing `/` resolves when that path is a file, a bare basename when an
-amendment on disk carries it, so a self-citation resolves. **Skipped:** fenced
-blocks, because a quoted example is grammar being shown, and HTML comments,
-because they carry template guidance — nothing else. **No valve:** every
-filename citation of an amendment inside an amendment is read as input and every
-history use has a durable form, so a per-site exemption would only ever license
-the defect; an illustration that must show a filename goes in a fence. An
-unreadable amendment is exit 2 as for (a)–(c), while the finder stays
-best-effort: an empty amendment set makes (e) vacuous and hides nothing, since
-with no amendments there is nothing to cite from.
+Arm (e)'s calibration. **The token** is the basename pattern of `CANON_KIT_AMENDMENT_GLOB` with its `*` matching one or more of `[A-Za-z0-9._-]`, behind an optional repo-relative directory prefix of the same characters plus `/`, standing between characters outside that class or a line edge; backticks do not change the match, a placeholder (`SPEC-<feature>.md`) or the glob itself carries a character outside the class and is no token, and a sentence-final period after a token is punctuation rather than part of it. **Resolution** is the one a `[spec:]` ref gets, so the two cannot diverge: a token containing `/` resolves when that path is a file, a bare basename when an amendment on disk carries it, so a self-citation resolves. **Skipped:** fenced blocks, because a quoted example is grammar being shown, and HTML comments, because they carry template guidance — nothing else. **No valve:** every filename citation of an amendment inside an amendment is read as input and every history use has a durable form, so a per-site exemption would only ever license the defect; an illustration that must show a filename goes in a fence. An unreadable amendment is exit 2 as for (a)–(c), while the finder stays best-effort: an empty amendment set makes (e) vacuous and hides nothing, since with no amendments there is nothing to cite from.
 
-Coverage limit, stated because the arms' section-wide reach invites the
-stronger claim: any heading that is not a feature, active, or deferred
-section classifies as `other` and skips every arm, so the **done section is
-an exempt population** for the `[spec:]` arms and arm (d) — an entry carried
-into done still carrying its `[spec:]` tag reds only through arm (c)'s ref
-resolution, and queue-kit's lead-line gate misses it too (its scanned surface
-is the task sections alone). In practice the done grammar is a bare slug line,
-so the tag is dropped by that grammar rather than by a gate. The `[spec:]`
-guard is total over the *promotion* moves it exists to catch — design-pending
-→ a feature section — and silent on the disposition move. This is a limit on *this* gate's axis only: the amendment artifact is
-held on a second axis by `check-amendment-update-target`
-(§check-amendment-update-target), whose corpus is the same amendment set and
-whose subject is what the file says about itself rather than how it pairs with
-the queue.
+Coverage limit, stated because the arms' section-wide reach invites the stronger claim: any heading that is not a feature, active, or deferred section classifies as `other` and skips every arm, so the **done section is an exempt population** for the `[spec:]` arms and arm (d) — an entry carried into done still carrying its `[spec:]` tag reds only through arm (c)'s ref resolution, and queue-kit's lead-line gate misses it too (its scanned surface is the task sections alone). In practice the done grammar is a bare slug line, so the tag is dropped by that grammar rather than by a gate. The `[spec:]` guard is total over the *promotion* moves it exists to catch — design-pending → a feature section — and silent on the disposition move. This is a limit on *this* gate's axis only: the amendment artifact is held on a second axis by `check-amendment-update-target` (§check-amendment-update-target), whose corpus is the same amendment set and whose subject is what the file says about itself rather than how it pairs with the queue.
 
-**Arm (c) has an authoring consequence worth stating, because it is discovered
-otherwise only by losing something.** The pairing is bidirectional, so deleting a
-merged amendment and moving its task out of the live sections have to land in one
-commit — neither half is legal alone. Everything the entry's body carried goes
-with it in that commit: a ruling's grounds, an authority stamp, a measurement the
-entry was the only holder of. So prose that is worth more than the entry's own
-lifetime belongs in a governed surface *before* the landing commit, never on the
-entry as its permanent home. This is a consequence of (c) rather than a further
-rule, and no gate can catch it — the loss is indistinguishable from an ordinary
-disposition.
+**Arm (c) has an authoring consequence worth stating, because it is discovered otherwise only by losing something.** The pairing is bidirectional, so deleting a merged amendment and moving its task out of the live sections have to land in one commit — neither half is legal alone. Everything the entry's body carried goes with it in that commit: a ruling's grounds, an authority stamp, a measurement the entry was the only holder of. So prose that is worth more than the entry's own lifetime belongs in a governed surface *before* the landing commit, never on the entry as its permanent home. This is a consequence of (c) rather than a further rule, and no gate can catch it — the loss is indistinguishable from an ordinary disposition.
 
-**Arm (e) holds the decidable slice of the owner-position question, and reads the
-amendment corpus alone.** Prose may cite a merged amendment as settled history,
-never as a live owner; tense separates the two and is not decidable, but spelling
-is. Measured when the arm landed, every attested owner citation between sibling
-amendments was the bare path form in running prose, never a `§` form, so a
-`§`-only proxy would have caught none. The queue half is an honest limit, not a
-deferred assertion: queue bodies' filename citations of amendments were
-overwhelmingly lawful history (six of seven named a merged amendment as where a
-past claim was made), so a filename assertion there would punish valuable prose to
-catch the rare owner citation, and a slug-form owner citation is not decidable
-either. Both stay review's.
+**Arm (e) holds the decidable slice of the owner-position question, and reads the amendment corpus alone.** Prose may cite a merged amendment as settled history, never as a live owner; tense separates the two and is not decidable, but spelling is. Measured when the arm landed, every attested owner citation between sibling amendments was the bare path form in running prose, never a `§` form, so a `§`-only proxy would have caught none. The queue half is an honest limit, not a deferred assertion: queue bodies' filename citations of amendments were overwhelmingly lawful history (six of seven named a merged amendment as where a past claim was made), so a filename assertion there would punish valuable prose to catch the rare owner citation, and a slug-form owner citation is not decidable either. Both stay review's.
 
-**The amendment finder is best-effort, and the port had to reproduce that
-rather than harden it.** `spec_amendments` ends `2>/dev/null … || true`, so an
-unwalkable scan root yields *no amendments* instead of a refusal. Read against
-gate-sdk/SPEC.md §Fail-closed contract the compiled form would refuse there —
-and that would be a verdict change across the seam, which is exactly what the
-port's parity run holds invariant. It is also not the vacuity that contract
-guards: an empty amendment set cannot hide a violation in either direction,
-because every `[spec:]` ref then dangles and the run reds. Recorded here
-because the natural port instinct is to add the refusal, and the sibling
-`check-todo-task-liveness` — which *does* refuse on a bad scan root — makes the
-instinct look precedented. That member's shell form carried the `-d` guard;
-this one never has.
+**The amendment finder is best-effort, and the port had to reproduce that rather than harden it.** `spec_amendments` ends `2>/dev/null … || true`, so an unwalkable scan root yields *no amendments* instead of a refusal. Read against gate-sdk/SPEC.md §Fail-closed contract the compiled form would refuse there — and that would be a verdict change across the seam, which is exactly what the port's parity run holds invariant. It is also not the vacuity that contract guards: an empty amendment set cannot hide a violation in either direction, because every `[spec:]` ref then dangles and the run reds. Recorded here because the natural port instinct is to add the refusal, and the sibling `check-todo-task-liveness` — which *does* refuse on a bad scan root — makes the instinct look precedented. That member's shell form carried the `-d` guard; this one never has.
 
 ### check-amendment-update-target
 
-Invariant: in every amendment on disk, each entry under
-`## Existing sections updated` cites at least one delta, and every cited delta is
-defined under `## What changes` in the same amendment. The grammar it reads —
-what a delta is, what a citation looks like — is contract, stated at
-§The amendment lifecycle and shown to the author in
-`templates/SPEC-amendment.md`.
+Invariant: in every amendment on disk, each entry under `## Existing sections updated` cites at least one delta, and every cited delta is defined under `## What changes` in the same amendment. The grammar it reads — what a delta is, what a citation looks like — is contract, stated at §The amendment lifecycle and shown to the author in `templates/SPEC-amendment.md`.
 
-The failure it closes is attested: an update target no delta claims **reaches
-build as an orphan a batch adopts on its own authority**, which is the
-template's own words for it. That is not hypothetical — one iteration dropped a
-tightened-gates declaration across all three of its build batches, and a fourth
-batch repaired it at validate.
+The failure it closes is attested: an update target no delta claims **reaches build as an orphan a batch adopts on its own authority**, which is the template's own words for it. That is not hypothetical — one iteration dropped a tightened-gates declaration across all three of its build batches, and a fourth batch repaired it at validate.
 
 **Three arms and a valve.**
 
-- **A — the grammar.** Red (exit 1) when a `###` heading under `## What changes`
-  does not match `### (<N>) <title>`, or when the delta numbers, read in
-  document order, are not `1..n` unique and ascending. This is the arm that makes
-  B and C possible at all. Only the **first** ordering breach in a file is
-  reported: inserting one delta shifts every number after it, so reporting each
-  would bury the single edit that caused them.
-- **B — the uncited target.** Red when a top-level `-` bullet under
-  `## Existing sections updated` carries no citation. The bullet's entry is the
-  bullet line plus its indented continuation, so a citation that wrapped across a
-  newline is still one subject — the same wrap-straddling boundary
-  §check-unmarked-claim crosses, for the same reason.
-- **C — the dangling citation.** Red when a citation names an `<N>` no
-  `### (<N>)` heading defines, `all deltas` in an amendment that defines none
-  included. Without C, arms A and B both pass on an amendment whose targets cite
-  deltas that were renumbered out from under them.
-- **Valve** — `<!-- update-target-exempt: <reason> -->` on the bullet's first
-  line or the one above, riding the shared exempt-window (§The shared spec adapters — the line
-  or the one above), and the reason is mandatory (the `comment-tier-exempt:`
-  convention). An exempt bullet leaves the target count as well as the finding.
+- **A — the grammar.** Red (exit 1) when a `###` heading under `## What changes` does not match `### (<N>) <title>`, or when the delta numbers, read in document order, are not `1..n` unique and ascending. This is the arm that makes B and C possible at all. Only the **first** ordering breach in a file is reported: inserting one delta shifts every number after it, so reporting each would bury the single edit that caused them.
+- **B — the uncited target.** Red when a top-level `-` bullet under `## Existing sections updated` carries no citation. The bullet's entry is the bullet line plus its indented continuation, so a citation that wrapped across a newline is still one subject — the same wrap-straddling boundary §check-unmarked-claim crosses, for the same reason.
+- **C — the dangling citation.** Red when a citation names an `<N>` no `### (<N>)` heading defines, `all deltas` in an amendment that defines none included. Without C, arms A and B both pass on an amendment whose targets cite deltas that were renumbered out from under them.
+- **Valve** — `<!-- update-target-exempt: <reason> -->` on the bullet's first line or the one above, riding the shared exempt-window (§The shared spec adapters — the line or the one above), and the reason is mandatory (the `comment-tier-exempt:` convention). An exempt bullet leaves the target count as well as the finding.
 
-A fenced block is skipped whole, on the ground §The amendment lifecycle already
-gives the fence its exemption for: an amendment may embed a wire-contract delta
-until merge, and a heading or a bullet inside one is grammar being shown rather
-than a delta being defined.
+A fenced block is skipped whole, on the ground §The amendment lifecycle already gives the fence its exemption for: an amendment may embed a wire-contract delta until merge, and a heading or a bullet inside one is grammar being shown rather than a delta being defined.
 
-**Fail-closed (exit 2):** a scan root that is not a directory; an amendment
-carrying `## Existing sections updated` but no `## What changes`, where no entry
-*can* be owned and no arm could say which to blame; a file the finder returns and
-the reader cannot read; and **an unwalkable scan root**, where
-§check-amendment-queue's best-effort finder returns empty instead. That last
-divergence is deliberate and is the one to read carefully: the queue gate can
-afford an empty amendment set because its other direction contradicts it, while
-here an empty set hides every violation silently. The two spellings of the walk
-live at §The shared spec adapters, which owns the asymmetry.
+**Fail-closed (exit 2):** a scan root that is not a directory; an amendment carrying `## Existing sections updated` but no `## What changes`, where no entry *can* be owned and no arm could say which to blame; a file the finder returns and the reader cannot read; and **an unwalkable scan root**, where §check-amendment-queue's best-effort finder returns empty instead. That last divergence is deliberate and is the one to read carefully: the queue gate can afford an empty amendment set because its other direction contradicts it, while here an empty set hides every violation silently. The two spellings of the walk live at §The shared spec adapters, which owns the asymmetry.
 
-**No new knob, and the reason is not laziness.** The corpus is `spec_amendments`
-(§The shared spec adapters) — the same finder §check-amendment-queue uses, already applying
-the `templates/` exclusion that keeps a shipped `SPEC-amendment.md` skeleton from
-being read as a live amendment, so the skeleton's illustrative headings cannot
-red the gate that governs its copies. The two heading names are **kit constants,
-not config**: they are canon-kit's own template's headings, and a consumer
-editing them has edited canon-kit's artifact rather than configured it. The
-contrast with §check-spec-dod-singleton's configurable Definition-of-Done heading
-is real, and the line is where the surface is authored — that heading appears in
-**consumer-authored canonical specs**, these appear in **copies of a kit-shipped
-skeleton**. A knob is available later behind an attested consumer rename; adding
-one now would be a knob whose only reader is §check-knob-citation.
+**No new knob, and the reason is not laziness.** The corpus is `spec_amendments` (§The shared spec adapters) — the same finder §check-amendment-queue uses, already applying the `templates/` exclusion that keeps a shipped `SPEC-amendment.md` skeleton from being read as a live amendment, so the skeleton's illustrative headings cannot red the gate that governs its copies. The two heading names are **kit constants, not config**: they are canon-kit's own template's headings, and a consumer editing them has edited canon-kit's artifact rather than configured it. The contrast with §check-spec-dod-singleton's configurable Definition-of-Done heading is real, and the line is where the surface is authored — that heading appears in **consumer-authored canonical specs**, these appear in **copies of a kit-shipped skeleton**. A knob is available later behind an attested consumer rename; adding one now would be a knob whose only reader is §check-knob-citation.
 
-**Deliberately not asserted: roster completeness.** Whether the roster names
-every surface the change obliges a write to is a claim about the world, not the
-file, and no scanner reaches it; arm B catches a target *listed and unowned*,
-never one never listed. **One narrow slice of that half is mechanized**, by
-§check-amendment-retired-spelling rather than a fourth arm here: retiring a
-*literal* leaves the retired and replacing spellings in disjoint token spaces,
-so a survivor scan reconciles against this roster. The residue is carried by
-the align stage, which reads it against the tree, and by the build stage, which
-re-derives the roster before the merge counts as complete
-(lifecycle-kit/SPEC.md §templates/stages/) — which is why a roster names the
-probe that produced it rather than claiming completeness
-(`templates/SPEC-amendment.md`), a claim that invites the merge to skip that
-re-derivation. The residue is a stale prose sentence, a semantic over-claim, a
-cross-reference dangled by a deletion, and the renumber case, whose two
-spellings share one token space. Three stronger arms were refused. **Every
-delta cited by some target** is false — a delta adding a new section touches no
-existing one. **Every path or `§` reference in a delta body rostered** cries
-wolf, since a delta names many surfaces for context (gate-sdk/SPEC.md §When a
-gate earns its place). **Every comment directive a delta mints rostered** cries
-wolf too: a name obliges `check-comment-tier`'s roster only where it lands as a
-full-line comment on the governed surface, which the amendment does not say,
-and names minted for fixtures, workflow files, descriptors or a trailing
-position owe no row. `check-comment-tier` reds at an obliged site regardless,
-and §The causal-completeness check point 2 prompts the row at authoring.
+**Deliberately not asserted: roster completeness.** Whether the roster names every surface the change obliges a write to is a claim about the world, not the file, and no scanner reaches it; arm B catches a target *listed and unowned*, never one never listed. **One narrow slice of that half is mechanized**, by §check-amendment-retired-spelling rather than a fourth arm here: retiring a *literal* leaves the retired and replacing spellings in disjoint token spaces, so a survivor scan reconciles against this roster. The residue is carried by the align stage, which reads it against the tree, and by the build stage, which re-derives the roster before the merge counts as complete (lifecycle-kit/SPEC.md §templates/stages/) — which is why a roster names the probe that produced it rather than claiming completeness (`templates/SPEC-amendment.md`), a claim that invites the merge to skip that re-derivation. The residue is a stale prose sentence, a semantic over-claim, a cross-reference dangled by a deletion, and the renumber case, whose two spellings share one token space. Three stronger arms were refused. **Every delta cited by some target** is false — a delta adding a new section touches no existing one. **Every path or `§` reference in a delta body rostered** cries wolf, since a delta names many surfaces for context (gate-sdk/SPEC.md §When a gate earns its place). **Every comment directive a delta mints rostered** cries wolf too: a name obliges `check-comment-tier`'s roster only where it lands as a full-line comment on the governed surface, which the amendment does not say, and names minted for fixtures, workflow files, descriptors or a trailing position owe no row. `check-comment-tier` reds at an obliged site regardless, and §The causal-completeness check point 2 prompts the row at authoring.
 
-**Deliberately not asserted either: a rostered target's non-vacuity.** Two arms
-were weighed for the over-count direction, where a bullet names a target with
-nothing to update. The first requires that a rostered path exist. It is refused
-because a target the change creates legitimately does not exist before the merge,
-and because the attested over-count names a file that exists and simply does not
-hold the text attributed to it. The second requires that the amendment's cited
-string be present in the named file. It is refused because an update target's text
-is what the merge will write, so at authoring time it has no subject to find. What
-remains is a claim the merging session checks: the build stage re-derives the
-roster and declines a target only by naming the passage that already meets its
-delta's need (lifecycle-kit/SPEC.md §templates/stages/). That separates a met
-target from a skipped one.
+**Deliberately not asserted either: a rostered target's non-vacuity.** Two arms were weighed for the over-count direction, where a bullet names a target with nothing to update. The first requires that a rostered path exist. It is refused because a target the change creates legitimately does not exist before the merge, and because the attested over-count names a file that exists and simply does not hold the text attributed to it. The second requires that the amendment's cited string be present in the named file. It is refused because an update target's text is what the merge will write, so at authoring time it has no subject to find. What remains is a claim the merging session checks: the build stage re-derives the roster and declines a target only by naming the passage that already meets its delta's need (lifecycle-kit/SPEC.md §templates/stages/). That separates a met target from a skipped one.
 
-**Criterion 4** (gate-sdk/SPEC.md §The port-candidate criteria) **clears**: the
-corpus is `spec_amendments`, which reaches no gate declaration path. **Born
-native**, no shell form authored — a crate-carrying tree births a gate native by
-default and none of the three exception classes applies. Its `good/`+`bad/` pair
-is its oracle: the `bad/` case carries a malformed heading, a non-sequential
-delta number, an uncited target and a dangling citation together, so each arm has
-an executable statement, while the `good/` case exercises the wrapped citation,
-the list and possessive forms, `all deltas`, the fenced decoy and the valve.
-`check-amendment-update-target.test.sh` holds the fail-closed exits and the
-empty-corpus clean, which a one-pair harness cannot spell.
+**Criterion 4** (gate-sdk/SPEC.md §The port-candidate criteria) **clears**: the corpus is `spec_amendments`, which reaches no gate declaration path. **Born native**, no shell form authored — a crate-carrying tree births a gate native by default and none of the three exception classes applies. Its `good/`+`bad/` pair is its oracle: the `bad/` case carries a malformed heading, a non-sequential delta number, an uncited target and a dangling citation together, so each arm has an executable statement, while the `good/` case exercises the wrapped citation, the list and possessive forms, `all deltas`, the fenced decoy and the valve. `check-amendment-update-target.test.sh` holds the fail-closed exits and the empty-corpus clean, which a one-pair harness cannot spell.
 
-Producer of nothing but a verdict; its consumer is the committing session through
-the output contract, on the generated pre-commit hook, `run-gates.sh` and CI, and
-the `--run-gate-tests` arm through the fixture pair. Its input is `spec_amendments`'
-output — an existing producer with an existing enabling path, so nothing new must
-be configured for the gate to see a live corpus. `precommit` tier.
+Producer of nothing but a verdict; its consumer is the committing session through the output contract, on the generated pre-commit hook, `run-gates.sh` and CI, and the `--run-gate-tests` arm through the fixture pair. Its input is `spec_amendments`' output — an existing producer with an existing enabling path, so nothing new must be configured for the gate to see a live corpus. `precommit` tier.
 
 ### check-amendment-retired-spelling
 
-Invariant: every amendment on disk carries a `## Retired spellings` block in one
-of the two forms §The amendment lifecycle pins, and every spelling that block
-declares survives in the tree only at a path the same amendment's
-`## Existing sections updated` roster names.
+Invariant: every amendment on disk carries a `## Retired spellings` block in one of the two forms §The amendment lifecycle pins, and every spelling that block declares survives in the tree only at a path the same amendment's `## Existing sections updated` roster names.
 
-The failure it closes is the roster's own omission, whose evidence is in the tree
-rather than in the document: an amendment's roster can be short by a surface, and
-only a grep finds the missing one — a grep the template's Definition of Done
-already owes, that nothing obliges and nothing records having run.
+The failure it closes is the roster's own omission, whose evidence is in the tree rather than in the document: an amendment's roster can be short by a surface, and only a grep finds the missing one — a grep the template's Definition of Done already owes, that nothing obliges and nothing records having run.
 
-**Why only this slice.** Deciding which surfaces an amendment *should* have
-listed is the semantics of the change, and §check-amendment-update-target already
-refuses it. What is decidable is the **literal-substitution** slice: after a
-delta replaces literal `X` with literal `Y`, every remaining occurrence of `X` is
-either a site the change should have reached or one deliberately left standing,
-and the roster is the existing discriminator between them. The **renumber** slice
-is not decidable and is a stated non-target — inserting a rule and shifting the
-numbers after it leaves the retired and the replacing spellings in the *same*
-token space, so a site reading `rule 19` is either a stale citation to the old
-19 or a correct one to the new, the two are byte-identical, and the correct
-post-change sites are dense in the renumbered range rather than rare in it. A
-survivor scan there returns a hit set dominated by non-violations, which is the
-cry-wolf shape §check-amendment-update-target already refused a stronger arm for
-(gate-sdk/SPEC.md §When a gate earns its place). Its durable fix is not a gate at
-all: a cross-corpus citation that names its referent rather than its number has
-no numeric relation left to decay, which dissolves the slice instead of detecting
-it. Recorded here because "declare a pattern instead of a literal" is the obvious
-repair a later reader reaches for, and it reaches only some of the renumber's
-site classes — markdown ordinals, parenthesized placement citations and a
-comma-list roster are three different spellings of one shifted number.
+**Why only this slice.** Deciding which surfaces an amendment *should* have listed is the semantics of the change, and §check-amendment-update-target already refuses it. What is decidable is the **literal-substitution** slice: after a delta replaces literal `X` with literal `Y`, every remaining occurrence of `X` is either a site the change should have reached or one deliberately left standing, and the roster is the existing discriminator between them. The **renumber** slice is not decidable and is a stated non-target — inserting a rule and shifting the numbers after it leaves the retired and the replacing spellings in the *same* token space, so a site reading `rule 19` is either a stale citation to the old 19 or a correct one to the new, the two are byte-identical, and the correct post-change sites are dense in the renumbered range rather than rare in it. A survivor scan there returns a hit set dominated by non-violations, which is the cry-wolf shape §check-amendment-update-target already refused a stronger arm for (gate-sdk/SPEC.md §When a gate earns its place). Its durable fix is not a gate at all: a cross-corpus citation that names its referent rather than its number has no numeric relation left to decay, which dissolves the slice instead of detecting it. Recorded here because "declare a pattern instead of a literal" is the obvious repair a later reader reaches for, and it reaches only some of the renumber's site classes — markdown ordinals, parenthesized placement citations and a comma-list roster are three different spellings of one shifted number.
 
 **Three arms and a valve.**
 
-- **A — the grammar.** Red (exit 1) when an amendment carrying `## What changes`
-  has no `## Retired spellings` section, when that section carries no bullet,
-  when its body is neither the negative form nor bullets each carrying a
-  backticked spelling and a citation, and when the negative form carries an empty
-  reason. This is the arm that closes the omission hole the roster has no shape
-  for, and the arm B and C depend on.
-- **B — the survivor reconciliation.** For each declared spelling, scan the
-  reconciliation corpus and red on every **surface** carrying an occurrence at a
-  path no `## Existing sections updated` bullet of that same amendment names. A
-  roster bullet names a path by its **leading backticked token**, which is where
-  that convention becomes contract rather than habit; the finding's subject is
-  the surface rather than the occurrence, so one line per surface is reported and
-  not one per hit — a second hit in a file the author must open anyway adds no
-  worklist item and buries the ones that do. The amendment set is out of the
-  corpus, so an amendment is never its own violation.
-- **C — the dangling citation.** Red when a bullet cites an `<N>` no
-  `### (<N>)` heading defines, `all deltas` in an amendment defining none
-  included. Without C, A and B both pass on a block whose bullets cite deltas
-  renumbered out from under them — the same failure arm C of
-  §check-amendment-update-target closes, reached through the second block.
-- **Valve** — `<!-- retired-spelling-exempt: <reason> -->` on the bullet's first
-  line or the one above, riding the shared exempt window (§The shared spec adapters), reason
-  mandatory per the `comment-tier-exempt:` convention. An exempt bullet leaves
-  the declared-spelling count as well as the finding.
+- **A — the grammar.** Red (exit 1) when an amendment carrying `## What changes` has no `## Retired spellings` section, when that section carries no bullet, when its body is neither the negative form nor bullets each carrying a backticked spelling and a citation, and when the negative form carries an empty reason. This is the arm that closes the omission hole the roster has no shape for, and the arm B and C depend on.
+- **B — the survivor reconciliation.** For each declared spelling, scan the reconciliation corpus and red on every **surface** carrying an occurrence at a path no `## Existing sections updated` bullet of that same amendment names. A roster bullet names a path by its **leading backticked token**, which is where that convention becomes contract rather than habit; the finding's subject is the surface rather than the occurrence, so one line per surface is reported and not one per hit — a second hit in a file the author must open anyway adds no worklist item and buries the ones that do. The amendment set is out of the corpus, so an amendment is never its own violation.
+- **C — the dangling citation.** Red when a bullet cites an `<N>` no `### (<N>)` heading defines, `all deltas` in an amendment defining none included. Without C, A and B both pass on a block whose bullets cite deltas renumbered out from under them — the same failure arm C of §check-amendment-update-target closes, reached through the second block.
+- **Valve** — `<!-- retired-spelling-exempt: <reason> -->` on the bullet's first line or the one above, riding the shared exempt window (§The shared spec adapters), reason mandatory per the `comment-tier-exempt:` convention. An exempt bullet leaves the declared-spelling count as well as the finding.
 
-A fenced block is skipped whole, on the ground §The amendment lifecycle gives the
-fence: an embedded wire-contract delta is grammar being shown rather than a
-bullet being declared.
+A fenced block is skipped whole, on the ground §The amendment lifecycle gives the fence: an embedded wire-contract delta is grammar being shown rather than a bullet being declared.
 
-**The reconciliation corpus is `git ls-files` minus the amendment set, minus
-`CANON_KIT_RETIRED_SPELLING_EXCLUDE`.** Tracked files only, so an untracked
-scratch file is not a violation and a green run before staging is vacuous for
-exactly the file it most needs to see — the property gate-sdk/SPEC.md
-§Enforcement tiers states of the whole battery and this gate inherits. The
-`git ls-files` corpus is precedented for a canon-kit member rather than a novelty
-(§check-tree-terms in gate-sdk resolves its corpus the same way) and it carries
-the `git` **tool dependency** the crate's registry declares. **It carries no walk
-root, and the member still declares one**: gate-sdk/SPEC.md §check-reads-couples
-rules a `git ls-files` corpus outside the walk class, so the corpus adds no root
-— but this member *also* resolves the amendment set through the shared finder,
-which is a walk, so the registry declares the `?` its cohort declares for a scan
-root that is the member's own first argument. The distinction is worth stating
-because reading the corpus rule as the member's whole read-set would declare an
-empty root set that the crate's observed-roots-⊆-declared assertion reds on.
+**The reconciliation corpus is `git ls-files` minus the amendment set, minus `CANON_KIT_RETIRED_SPELLING_EXCLUDE`.** Tracked files only, so an untracked scratch file is not a violation and a green run before staging is vacuous for exactly the file it most needs to see — the property gate-sdk/SPEC.md §Enforcement tiers states of the whole battery and this gate inherits. The `git ls-files` corpus is precedented for a canon-kit member rather than a novelty (§check-tree-terms in gate-sdk resolves its corpus the same way) and it carries the `git` **tool dependency** the crate's registry declares. **It carries no walk root, and the member still declares one**: gate-sdk/SPEC.md §check-reads-couples rules a `git ls-files` corpus outside the walk class, so the corpus adds no root — but this member *also* resolves the amendment set through the shared finder, which is a walk, so the registry declares the `?` its cohort declares for a scan root that is the member's own first argument. The distinction is worth stating because reading the corpus rule as the member's whole read-set would declare an empty root set that the crate's observed-roots-⊆-declared assertion reds on.
 
-**Fail-closed (exit 2):** a scan root that is not a directory; an **unwalkable**
-scan root; an amendment carrying `## Retired spellings` but no `## What changes`,
-where no bullet *can* cite a delta and no arm could say which to blame; a file
-the reader cannot read; and a failure to enumerate the reconciliation corpus
-(a non-repository cwd included). The unwalkable-root posture follows
-§check-amendment-update-target and **not** §check-amendment-queue: an empty
-amendment set here hides every violation silently, where the queue gate can
-afford one because its other direction contradicts it. That asymmetry is owned at
-§The shared spec adapters.
+**Fail-closed (exit 2):** a scan root that is not a directory; an **unwalkable** scan root; an amendment carrying `## Retired spellings` but no `## What changes`, where no bullet *can* cite a delta and no arm could say which to blame; a file the reader cannot read; and a failure to enumerate the reconciliation corpus (a non-repository cwd included). The unwalkable-root posture follows §check-amendment-update-target and **not** §check-amendment-queue: an empty amendment set here hides every violation silently, where the queue gate can afford one because its other direction contradicts it. That asymmetry is owned at §The shared spec adapters.
 
-**Output.** On clean, the amendments scanned, the spellings declared, and how
-many took the negative form — a count on the clean line and not only on the red
-one, so the block's uptake is readable without a failure. On red, each finding as
-`<amendment>:<line>: <spelling> survives at <path>:<line>, named by no roster
-bullet`.
+**Output.** On clean, the amendments scanned, the spellings declared, and how many took the negative form — a count on the clean line and not only on the red one, so the block's uptake is readable without a failure. On red, each finding as `<amendment>:<line>: <spelling> survives at <path>:<line>, named by no roster bullet`.
 
-**Criterion 4** (gate-sdk/SPEC.md §The port-candidate criteria) **clears** for
-the reason it clears for its sibling: the corpus is `spec_amendments` plus the
-tracked tree, neither of which reaches a gate declaration path. **Born native**,
-no shell form authored. Its `good/`+`bad/` pair is its oracle — `bad/` carries a
-missing section, a positive bullet with no citation, an unreconciled survivor and
-a dangling citation, so each arm has an executable statement, while `good/`
-exercises the negative form, a wrapped citation, the valve, and a survivor at a
-path the roster does name.
+**Criterion 4** (gate-sdk/SPEC.md §The port-candidate criteria) **clears** for the reason it clears for its sibling: the corpus is `spec_amendments` plus the tracked tree, neither of which reaches a gate declaration path. **Born native**, no shell form authored. Its `good/`+`bad/` pair is its oracle — `bad/` carries a missing section, a positive bullet with no citation, an unreconciled survivor and a dangling citation, so each arm has an executable statement, while `good/` exercises the negative form, a wrapped citation, the valve, and a survivor at a path the roster does name.
 
-Producer of nothing but a verdict; its consumers are the committing session
-through the output contract on the generated pre-commit hook, `run-gates.sh` and
-CI, the `--run-gate-tests` arm through the fixture pair, and the **align stage**,
-whose roster duty is now defined as the complement of what arm B covers — a duty
-the build stage's roster re-derivation shares (lifecycle-kit/SPEC.md
-§templates/stages/).
-`precommit` tier, `trigger=*` — a survivor can appear in any tracked file, so any
-tree edit is a trigger.
+Producer of nothing but a verdict; its consumers are the committing session through the output contract on the generated pre-commit hook, `run-gates.sh` and CI, the `--run-gate-tests` arm through the fixture pair, and the **align stage**, whose roster duty is now defined as the complement of what arm B covers — a duty the build stage's roster re-derivation shares (lifecycle-kit/SPEC.md §templates/stages/). `precommit` tier, `trigger=*` — a survivor can appear in any tracked file, so any tree edit is a trigger.
 
 ### check-spec-dod-singleton
 
-Invariant: no canonical spec carries the configured Definition-of-Done
-heading more than once (a duplicate checklist is the two-sources defect on
-the completion contract); under `exactly-one` mode a spec with none is
-also flagged.
+Invariant: no canonical spec carries the configured Definition-of-Done heading more than once (a duplicate checklist is the two-sources defect on the completion contract); under `exactly-one` mode a spec with none is also flagged.
 
-Calibration: heading match is level-insensitive within `##`–`####`;
-`at-most-one` exists because a reference-spec corpus legitimately has no
-DoD. The good/bad pair covers the DoD count; `check-spec-dod-singleton.test.sh`
-covers the finder's kit-root scoping — a DoD-less vendored kit `SPEC.md` is
-pruned by default (so `exactly-one` holds on a vendored tree) and re-included
-by `CANON_KIT_SCAN_KIT_ROOTS=1`. `align-only` tier.
+Calibration: heading match is level-insensitive within `##`–`####`; `at-most-one` exists because a reference-spec corpus legitimately has no DoD. The good/bad pair covers the DoD count; `check-spec-dod-singleton.test.sh` covers the finder's kit-root scoping — a DoD-less vendored kit `SPEC.md` is pruned by default (so `exactly-one` holds on a vendored tree) and re-included by `CANON_KIT_SCAN_KIT_ROOTS=1`. `align-only` tier.
 
 ### check-spec-derivable-section
 
-Invariant: no canonical-spec section under a banned heading (the
-configured code-derivable set) whose body exceeds the density budget in
-fenced lines — such a section is a code dump that drifts; it sheds to a
-one-line index pointer (which is exempt).
+Invariant: no canonical-spec section under a banned heading (the configured code-derivable set) whose body exceeds the density budget in fenced lines — such a section is a code dump that drifts; it sheds to a one-line index pointer (which is exempt).
 
-Calibration: density counts non-blank lines; the heading set and budget
-are config because what is derivable depends on the consumer's index
-tooling. `align-only` tier.
+Calibration: density counts non-blank lines; the heading set and budget are config because what is derivable depends on the consumer's index tooling. `align-only` tier.
 
 ### check-spec-embedded-source
 
-Invariant: no fenced block in a canonical spec verbatim-copies a tracked
-source file above the overlap threshold — cite the path instead. Overlap
-detection needs no author opt-in; the two valves are the amendment
-wire-delta exemption — an amendment is a short-lived design-to-code bridge,
-so a not-yet-cite-able wire contract legitimately embeds there until merge
-promotes it to a file the canonical spec cites — and the per-site
-`spec-embedded-source-exempt: <reason>` marker.
+Invariant: no fenced block in a canonical spec verbatim-copies a tracked source file above the overlap threshold — cite the path instead. Overlap detection needs no author opt-in; the two valves are the amendment wire-delta exemption — an amendment is a short-lived design-to-code bridge, so a not-yet-cite-able wire contract legitimately embeds there until merge promotes it to a file the canonical spec cites — and the per-site `spec-embedded-source-exempt: <reason>` marker.
 
-Calibration: blocks shorter than `CANON_KIT_EMBED_MINLINES` are ignored;
-languages in `CANON_KIT_EMBED_ILLUSTRATIVE` are skipped by default; the
-threshold is calibrated against real specs, not synthetic fixtures.
-`precommit` tier.
+Calibration: blocks shorter than `CANON_KIT_EMBED_MINLINES` are ignored; languages in `CANON_KIT_EMBED_ILLUSTRATIVE` are skipped by default; the threshold is calibrated against real specs, not synthetic fixtures. `precommit` tier.
 
-**The wire-delta exemption is scoped to the configured wire kind, not to
-amendments.** An amendment quoting enough distinct non-trivial lines of a tracked
-file in a fence of any *other* language fires exactly as a canonical spec would,
-which is what keeps the valve a bridge for a wire contract rather than a blanket
-licence for amendment prose. The per-site marker is the general escape, and it is
-a **path-identity** test against the amendment set rather than a name pattern —
-which is what re-arms the exemption the moment the amendment is deleted, instead
-of leaving a spelling that outlives its subject.
+**The wire-delta exemption is scoped to the configured wire kind, not to amendments.** An amendment quoting enough distinct non-trivial lines of a tracked file in a fence of any *other* language fires exactly as a canonical spec would, which is what keeps the valve a bridge for a wire contract rather than a blanket licence for amendment prose. The per-site marker is the general escape, and it is a **path-identity** test against the amendment set rather than a name pattern — which is what re-arms the exemption the moment the amendment is deleted, instead of leaving a spelling that outlives its subject.
 
-**Ported to the binary substrate at §The sixth budget batch** (gate-sdk/SPEC.md).
-Criterion 4's verdict on it was taken **conservatively without ruling the class**:
-its walk opens and content-compares every source file the language roster names,
-its own declaration and every sibling's included, but as a *diff reference* rather
-than as its assertion target, and whether that satisfies the criterion is a question
-about the class that this member's port does not answer. The port took the binding
-verdict for this member because that costs a fixture widening and cannot be wrong in
-the harmful direction, while clearing wrongly ships the hole the criterion exists to
-point at; a later reader must not read the disposition as the class's answer. The widening the verdict bought is the one delta the pair was
-missing: its cases derive a real corpus and do reach the finder, but neither valve
-was exercised by any committed case, and both now are.
+**Ported to the binary substrate at §The sixth budget batch** (gate-sdk/SPEC.md). Criterion 4's verdict on it was taken **conservatively without ruling the class**: its walk opens and content-compares every source file the language roster names, its own declaration and every sibling's included, but as a *diff reference* rather than as its assertion target, and whether that satisfies the criterion is a question about the class that this member's port does not answer. The port took the binding verdict for this member because that costs a fixture widening and cannot be wrong in the harmful direction, while clearing wrongly ships the hole the criterion exists to point at; a later reader must not read the disposition as the class's answer. The widening the verdict bought is the one delta the pair was missing: its cases derive a real corpus and do reach the finder, but neither valve was exercised by any committed case, and both now are.
 
-**One second-order fact the port prices whichever way that class falls**: every
-port removes a shell declaration from this gate's candidate index and adds a Rust
-module to it, so its verdicts move under *every* sibling's port — the narrowing is
-a swap rather than a removal, and a port can therefore create a violation here by
-moving a derivation's text from a file the specs do not quote into one they do.
+**One second-order fact the port prices whichever way that class falls**: every port removes a shell declaration from this gate's candidate index and adds a Rust module to it, so its verdicts move under *every* sibling's port — the narrowing is a swap rather than a removal, and a port can therefore create a violation here by moving a derivation's text from a file the specs do not quote into one they do.
 
 ### check-manifest-temporal
 
-Invariant: no temporal-narration marker in governed manifest prose outside an
-exempt site. A manifest states current behavior only — history is derivable
-from git, and a `formerly…` line is standing context cost documenting the old
-cost, taxing every session that reads it. This gate mechanizes the lexical
-share of that judgment; context-kit's close-stage brevity pass keeps the
-semantic residue (*is this sentence about the past?*); a by-eye
-narration-marker KPI is superseded by this gate (drift-kit/SPEC.md
-§Out of scope).
+Invariant: no temporal-narration marker in governed manifest prose outside an exempt site. A manifest states current behavior only — history is derivable from git, and a `formerly…` line is standing context cost documenting the old cost, taxing every session that reads it. This gate mechanizes the lexical share of that judgment; context-kit's close-stage brevity pass keeps the semantic residue (*is this sentence about the past?*); a by-eye narration-marker KPI is superseded by this gate (drift-kit/SPEC.md §Out of scope).
 
-The scanned set is the shared `spec_manifest_files` finder (§The shared spec adapters):
-canonical specs, `README.md` at any depth, and `CLAUDE.md`; amendments are
-excluded by construction (a transition artifact describes change — that is its
-nature). Markers are `CANON_KIT_TEMPORAL_MARKERS`, the base array merged with
-`CANON_KIT_TEMPORAL_MARKERS_EXTRA` (§Layout and configuration), matched
-case-insensitively;
-fenced code blocks are skipped and a marker inside an inline-code span is a
-meta-reference, not narration — so a gate-output example or this section's own
-vocabulary may name one. Three valves suppress a legitimately past line: a
-per-site `manifest-temporal-exempt: <reason>` comment on the line or the one
-above; `CANON_KIT_TEMPORAL_EXEMPT_SECTIONS` — heading names whose whole
-section (subsections included) is exempt (a deliberate-absence section may
-narrate what the kit excludes); and `CANON_KIT_TEMPORAL_EXEMPT_PATHS` — path
-globs whose whole file is exempt, for an immutable dated-narrative surface a
-heading name cannot address (dated announcement posts, which take link and
-command resolution but not narration governance). These three valves also admit a retired-path citation
-under §check-docs-cmd assertion C, so a site's marker or path exemption clears
-both gates at once and their reach is stated once, by the section that owns the
-valves. Producer: the generated pre-commit hook /
-`run-gates.sh`; consumer: the committing operator via the output contract; each
-marker hit is read at the single scan transition (file, line, marker in the
-message), no persistent state. Fail-closed on an unreadable manifest.
+The scanned set is the shared `spec_manifest_files` finder (§The shared spec adapters): canonical specs, `README.md` at any depth, and `CLAUDE.md`; amendments are excluded by construction (a transition artifact describes change — that is its nature). Markers are `CANON_KIT_TEMPORAL_MARKERS`, the base array merged with `CANON_KIT_TEMPORAL_MARKERS_EXTRA` (§Layout and configuration), matched case-insensitively; fenced code blocks are skipped and a marker inside an inline-code span is a meta-reference, not narration — so a gate-output example or this section's own vocabulary may name one. Three valves suppress a legitimately past line: a per-site `manifest-temporal-exempt: <reason>` comment on the line or the one above; `CANON_KIT_TEMPORAL_EXEMPT_SECTIONS` — heading names whose whole section (subsections included) is exempt (a deliberate-absence section may narrate what the kit excludes); and `CANON_KIT_TEMPORAL_EXEMPT_PATHS` — path globs whose whole file is exempt, for an immutable dated-narrative surface a heading name cannot address (dated announcement posts, which take link and command resolution but not narration governance). These three valves also admit a retired-path citation under §check-docs-cmd assertion C, so a site's marker or path exemption clears both gates at once and their reach is stated once, by the section that owns the valves. Producer: the generated pre-commit hook / `run-gates.sh`; consumer: the committing operator via the output contract; each marker hit is read at the single scan transition (file, line, marker in the message), no persistent state. Fail-closed on an unreadable manifest.
 
-The rule is a **compiled subcommand** (gate-sdk/SPEC.md §The POSIX ERE matcher):
-each marker is a consumer-supplied ERE, compiled through the crate's matcher
-before the first corpus line is read, so a pattern outside the POSIX grammar
-exits 2 naming the pattern and the knob rather than scanning past what it meant.
-Two fidelity points a transliteration loses, recorded because both are invisible
-in a green run: the marker test runs against a **case-folded subject** and the
-pattern is not folded, so a marker written with an upper-case letter matches
-nothing; and `CANON_KIT_TEMPORAL_MARKERS_EXTRA` unions onto the resolved base at
-this member, which declares both knobs and reads them through `spec::vocabulary`
-once, so no second union can double an added marker.
+The rule is a **compiled subcommand** (gate-sdk/SPEC.md §The POSIX ERE matcher): each marker is a consumer-supplied ERE, compiled through the crate's matcher before the first corpus line is read, so a pattern outside the POSIX grammar exits 2 naming the pattern and the knob rather than scanning past what it meant. Two fidelity points a transliteration loses, recorded because both are invisible in a green run: the marker test runs against a **case-folded subject** and the pattern is not folded, so a marker written with an upper-case letter matches nothing; and `CANON_KIT_TEMPORAL_MARKERS_EXTRA` unions onto the resolved base at this member, which declares both knobs and reads them through `spec::vocabulary` once, so no second union can double an added marker.
 
-Calibration: the marker set is tuned against this repo as the FP corpus — bare
-`used to` is excluded (it collides with instrumental "used to build/filter").
-At build every hit is dispositioned: reword (preferred — narration is standing
-cost), section-exempt (provenance), or site-exempt with reason. `precommit`
-tier.
+Calibration: the marker set is tuned against this repo as the FP corpus — bare `used to` is excluded (it collides with instrumental "used to build/filter"). At build every hit is dispositioned: reword (preferred — narration is standing cost), section-exempt (provenance), or site-exempt with reason. `precommit` tier.
 
 ### check-manifest-count
 
-Invariant: no bare cardinal quantifying a governed collection noun
-in manifest prose outside an exempt site. A pinned total for a *growing*
-collection — `six gates`, `seven meta-gates` — is a second source no gate reads:
-the count's owner is the collection itself (`gates.list`, a `checks/` dir, the
-stages config), and a restated total drifts the moment the collection grows.
-Ban, don't validate — a validating gate carries
-the standing token cost context-kit's brevity machinery rejects plus FP-prone
-entity mapping; a lexical tripwire eliminates the copy. The motivating find: this
-repo landed one gate and left the same total in four disagreeing copies (across
-two READMEs and a SPEC), caught only by close-stage review.
+Invariant: no bare cardinal quantifying a governed collection noun in manifest prose outside an exempt site. A pinned total for a *growing* collection — `six gates`, `seven meta-gates` — is a second source no gate reads: the count's owner is the collection itself (`gates.list`, a `checks/` dir, the stages config), and a restated total drifts the moment the collection grows. Ban, don't validate — a validating gate carries the standing token cost context-kit's brevity machinery rejects plus FP-prone entity mapping; a lexical tripwire eliminates the copy. The motivating find: this repo landed one gate and left the same total in four disagreeing copies (across two READMEs and a SPEC), caught only by close-stage review.
 
-The scanned set is the shared manifest-set finder (§The shared spec adapters) —
-canonical specs, `README.md`, `CLAUDE.md`; amendments excluded, fenced blocks
-skipped, an inline-code cardinal a meta-reference (so this section may name its
-own examples). The grammar and the matcher have **one holder**, the compiled
-count adapter, and the prose walk is the shared manifest-prose driver
-(§The shared spec adapters), so this gate, its `check-prose-enum` sibling, and its
-comment-tier cousin
-read one vocabulary and one exemption behavior, and a total wrapped across a
-prose break is caught and reported at its first physical line; a blank line, a
-fence, and a `manifest-count-exempt:` site each end the paragraph — an exempted
-line cannot join its neighbours into a total.
+The scanned set is the shared manifest-set finder (§The shared spec adapters) — canonical specs, `README.md`, `CLAUDE.md`; amendments excluded, fenced blocks skipped, an inline-code cardinal a meta-reference (so this section may name its own examples). The grammar and the matcher have **one holder**, the compiled count adapter, and the prose walk is the shared manifest-prose driver (§The shared spec adapters), so this gate, its `check-prose-enum` sibling, and its comment-tier cousin read one vocabulary and one exemption behavior, and a total wrapped across a prose break is caught and reported at its first physical line; a blank line, a fence, and a `manifest-count-exempt:` site each end the paragraph — an exempted line cannot join its neighbours into a total.
 
-**The cardinal grammar is stated as a rule, and the list is the matcher's.**
-Digit sequences, unbounded, plus every cardinal English spells as a **single
-token**, case-insensitive — the words themselves owned by `native/src/spec.rs`
-and cited here rather than transcribed, a transcription being a second copy that
-drifts the next time the boundary moves. Both ends of the range are rules a
-reader can apply to a spelling the table does not contain. `one` is deliberately
-outside it — singleton and cardinality-rule idioms ("one owner per fact", "one
-iteration per kit") are invariants, not totals. The upper end is the
-**notation's** rather than a place a list happened to stop: the matcher reads a
-word between word boundaries, and every cardinal past the single-token range is a
-hyphenated or multi-word construction no single-token pattern can reach.
-**That residue is a stated limit, not a closed one** — a hyphenated compound
-stays unreachable where its digit spelling does not, so the discontinuity is
-narrowed rather than removed. A compound grammar is **refused**: it would have to
-tell a quantifying compound from the far commoner partitive and ordinal prose the
-same tokens appear in, and that distinction's false-positive surface is worse
-than the hole it closes.
+**The cardinal grammar is stated as a rule, and the list is the matcher's.** Digit sequences, unbounded, plus every cardinal English spells as a **single token**, case-insensitive — the words themselves owned by `native/src/spec.rs` and cited here rather than transcribed, a transcription being a second copy that drifts the next time the boundary moves. Both ends of the range are rules a reader can apply to a spelling the table does not contain. `one` is deliberately outside it — singleton and cardinality-rule idioms ("one owner per fact", "one iteration per kit") are invariants, not totals. The upper end is the **notation's** rather than a place a list happened to stop: the matcher reads a word between word boundaries, and every cardinal past the single-token range is a hyphenated or multi-word construction no single-token pattern can reach. **That residue is a stated limit, not a closed one** — a hyphenated compound stays unreachable where its digit spelling does not, so the discontinuity is narrowed rather than removed. A compound grammar is **refused**: it would have to tell a quantifying compound from the far commoner partitive and ordinal prose the same tokens appear in, and that distinction's false-positive surface is worse than the hole it closes.
 
-Collection nouns are `CANON_KIT_COUNT_COLLECTIONS`
-(default the plurals the kits themselves grow: `gates`, `meta-gates`, `checks`,
-`kits`, `stages`, `rules`, `KPIs`) — the one place consumer vocabulary enters,
-and it enters as config.
+Collection nouns are `CANON_KIT_COUNT_COLLECTIONS` (default the plurals the kits themselves grow: `gates`, `meta-gates`, `checks`, `kits`, `stages`, `rules`, `KPIs`) — the one place consumer vocabulary enters, and it enters as config.
 
-Two match shapes carry the cardinal to the noun: the *quantifier* shape, which
-allows up to `CANON_KIT_COUNT_WEDGE_WORDS` (default `2`) modifiers wedged between
-cardinal and noun (so `nine generic rules` pins a total as surely as the
-adjacent `six gates`, adjacency being the zero-wedge case), and the
-*noun-then-range* shape (`rules 1-8`), which pins both endpoints of an ordered
-collection and rots on every append. The exempt contexts an author writes into:
-a threshold or comparator on the same line (a bound is a rule, not a total); the
-`all but <cardinal>` partition idiom; a partitive marker (`of`, `out of`) on
-either side of the match (in `three of the twelve gates` neither cardinal is a
-restated total), read across one line break of the paragraph so a wrap between
-marker and cardinal is no red — one line and not the whole paragraph, which would
-exempt a total beside any partitive anywhere in it; `CANON_KIT_COUNT_ALLOWED_PHRASES`, an exact-phrase allowlist for
-fixed named sets a doc legitimately enumerates (default empty — fixed-set naming
-is consumer judgment, config not mechanism, biting only on a phrase whose noun
-the consumer governs); and the per-site `manifest-count-exempt: <reason>` marker
-on the line or the one above. The exact operator and phrase tokens each context
-recognizes are the check's own regex, generic-English mechanism rather than
-config.
+Two match shapes carry the cardinal to the noun: the *quantifier* shape, which allows up to `CANON_KIT_COUNT_WEDGE_WORDS` (default `2`) modifiers wedged between cardinal and noun (so `nine generic rules` pins a total as surely as the adjacent `six gates`, adjacency being the zero-wedge case), and the *noun-then-range* shape (`rules 1-8`), which pins both endpoints of an ordered collection and rots on every append. The exempt contexts an author writes into: a threshold or comparator on the same line (a bound is a rule, not a total); the `all but <cardinal>` partition idiom; a partitive marker (`of`, `out of`) on either side of the match (in `three of the twelve gates` neither cardinal is a restated total), read across one line break of the paragraph so a wrap between marker and cardinal is no red — one line and not the whole paragraph, which would exempt a total beside any partitive anywhere in it; `CANON_KIT_COUNT_ALLOWED_PHRASES`, an exact-phrase allowlist for fixed named sets a doc legitimately enumerates (default empty — fixed-set naming is consumer judgment, config not mechanism, biting only on a phrase whose noun the consumer governs); and the per-site `manifest-count-exempt: <reason>` marker on the line or the one above. The exact operator and phrase tokens each context recognizes are the check's own regex, generic-English mechanism rather than config.
 
-**The sanctioned discharge is the `measured:` marker** (§check-measured-claim),
-and it is the only one of the four that *answers* the ban rather than stepping
-around it: the objection this invariant encodes is a transcribed total with no
-owner, and a marker binds the total to an oracle a gate re-runs. So a cardinal
-under a `<!-- measured: <key>=<value> -->` line satisfies the ban the way a
-generated copy satisfies derivation-first, which strictly shrinks this gate's
-violation set. It rides the same per-site window the exempt marker does: the
-marker's line and the line below it, for a full-line and an inline marker alike,
-so the two discharges are one behavior with two spellings rather than a second
-walk. Rewording to cite the owning collection
-stays preferred where the total is not worth stating at all; the exempt tag drops
-to a genuine last resort, because "deliberately unchecked" is now the one thing
-it means.
-Producer: the generated pre-commit hook / `run-gates.sh`; consumer: the
-committing operator via the output contract; each hit read at the single scan
-transition (file, line, matched span in the message), no persistent state.
-Fail-closed on an unreadable manifest.
+**The sanctioned discharge is the `measured:` marker** (§check-measured-claim), and it is the only one of the four that *answers* the ban rather than stepping around it: the objection this invariant encodes is a transcribed total with no owner, and a marker binds the total to an oracle a gate re-runs. So a cardinal under a `<!-- measured: <key>=<value> -->` line satisfies the ban the way a generated copy satisfies derivation-first, which strictly shrinks this gate's violation set. It rides the same per-site window the exempt marker does: the marker's line and the line below it, for a full-line and an inline marker alike, so the two discharges are one behavior with two spellings rather than a second walk. Rewording to cite the owning collection stays preferred where the total is not worth stating at all; the exempt tag drops to a genuine last resort, because "deliberately unchecked" is now the one thing it means. Producer: the generated pre-commit hook / `run-gates.sh`; consumer: the committing operator via the output contract; each hit read at the single scan transition (file, line, matched span in the message), no persistent state. Fail-closed on an unreadable manifest.
 
-Calibration shares the sibling's FP corpus and procedure
-(§check-manifest-temporal): the default noun list is tuned against this tree,
-every hit dispositioned — reword to cite the owning collection (preferred),
-extend `CANON_KIT_COUNT_ALLOWED_PHRASES` (a genuinely fixed set), or site-exempt
-with reason. The good/bad pair covers every match shape and the mechanical
-exemptions;
-`check-manifest-count.test.sh` covers the config-driven paths (a consumer-governed
-noun and the allowlist containment) the stock defaults cannot reach, and the
-measured-marker discharge's *window* — that the marked claim is exempt and the
-next paragraph is not, which a pair cannot spell because a fixture file either
-trips or does not. `precommit` tier.
+Calibration shares the sibling's FP corpus and procedure (§check-manifest-temporal): the default noun list is tuned against this tree, every hit dispositioned — reword to cite the owning collection (preferred), extend `CANON_KIT_COUNT_ALLOWED_PHRASES` (a genuinely fixed set), or site-exempt with reason. The good/bad pair covers every match shape and the mechanical exemptions; `check-manifest-count.test.sh` covers the config-driven paths (a consumer-governed noun and the allowlist containment) the stock defaults cannot reach, and the measured-marker discharge's *window* — that the marked claim is exempt and the next paragraph is not, which a pair cannot spell because a fixture file either trips or does not. `precommit` tier.
 
 ### check-provenance-seam
 
-`checks/check-provenance-seam.gate` (`precommit`, binary-dispatched).
-Invariant: no kit SPEC carries a publisher-provenance marker or quotes a roster
-one consumer configured — the two classes gate-sdk/SPEC.md §The provenance seam
-bars from a kit file — and no seam surface a consumer declares carries the first. A kit SPEC is vendored and rendered wherever the kit goes,
-so an attribution publishes who decided what and when, a pointer into the
-publisher's tree is dead in every copy, and a configured roster reads to a
-second consumer as the shape of its own. The gate holds the lexical shapes of the
-provenance class and the one roster shape of the content class that an oracle
-can hold without flooding; the voice-not-content judgement and the
-whose-truth discriminator behind them stay a review concern.
+`checks/check-provenance-seam.gate` (`precommit`, binary-dispatched). Invariant: no kit SPEC carries a publisher-provenance marker or quotes a roster one consumer configured — the two classes gate-sdk/SPEC.md §The provenance seam bars from a kit file — and no seam surface a consumer declares carries the first. A kit SPEC is vendored and rendered wherever the kit goes, so an attribution publishes who decided what and when, a pointer into the publisher's tree is dead in every copy, and a configured roster reads to a second consumer as the shape of its own. The gate holds the lexical shapes of the provenance class and the one roster shape of the content class that an oracle can hold without flooding; the voice-not-content judgement and the whose-truth discriminator behind them stay a review concern.
 
-**Corpus.** Two sets. The canonical spec (`CANON_KIT_SPEC_NAME`) at the root of
-every kit root (gate-sdk/SPEC.md §Layout and configuration), derived rather than
-listed, is scanned **only when `CANON_KIT_SCAN_KIT_ROOTS` is `1`**, that knob's
-existing meaning: the kit docs are the consumer's own first-party content. At the
-default `0` they are a dependency's, since an adopter vendoring a SPEC-bearing tree
-would otherwise have its own queue slugs and private names red someone else's
-document. The files `CANON_KIT_SEAM_SURFACE_GLOBS` matches are the consumer's own
-by declaration, so they are scanned whatever the kit-roots knob says. They take
-the **provenance arms** (dated-attribution, agent-file-pointer, private-surface,
-queue-slug and hex-reference) and **not** the consumer-roster arm: that arm bars a
-kit from quoting a consumer's configuration, and a consumer's own record
-describing its own configuration is that consumer's content. A file both sets
-reach is scanned once, as a kit SPEC. With both sets empty the gate passes, and
-its clean line names which set was off. The gate ships in a kit rather than as a
-consumer gate because the seam is a rule for every kit publisher.
+**Corpus.** Two sets. The canonical spec (`CANON_KIT_SPEC_NAME`) at the root of every kit root (gate-sdk/SPEC.md §Layout and configuration), derived rather than listed, is scanned **only when `CANON_KIT_SCAN_KIT_ROOTS` is `1`**, that knob's existing meaning: the kit docs are the consumer's own first-party content. At the default `0` they are a dependency's, since an adopter vendoring a SPEC-bearing tree would otherwise have its own queue slugs and private names red someone else's document. The files `CANON_KIT_SEAM_SURFACE_GLOBS` matches are the consumer's own by declaration, so they are scanned whatever the kit-roots knob says. They take the **provenance arms** (dated-attribution, agent-file-pointer, private-surface, queue-slug and hex-reference) and **not** the consumer-roster arm: that arm bars a kit from quoting a consumer's configuration, and a consumer's own record describing its own configuration is that consumer's content. A file both sets reach is scanned once, as a kit SPEC. With both sets empty the gate passes, and its clean line names which set was off. The gate ships in a kit rather than as a consumer gate because the seam is a rule for every kit publisher.
 
-**Fenced blocks are skipped; nothing else is.** There is no per-site valve, no
-section carve-out and no path exemption. A fence holds grammar being shown, and a
-shown instance is a specimen, not a stamp. An inline-code span *is* scanned: a
-pointer written in backticks is exactly as dead in a vendored copy. Each paragraph
-is rejoined across its line wraps, so a marker split by a wrap still matches, and
-a finding reports its first physical line.
+**Fenced blocks are skipped; nothing else is.** There is no per-site valve, no section carve-out and no path exemption. A fence holds grammar being shown, and a shown instance is a specimen, not a stamp. An inline-code span *is* scanned: a pointer written in backticks is exactly as dead in a vendored copy. Each paragraph is rejoined across its line wraps, so a marker split by a wrap still matches, and a finding reports its first physical line.
 
 **Arms.** Each finding names file, line, arm and matched span.
 
-- **dated-attribution** — an ISO `YYYY-MM-DD` date (no digit abutting it) and an
-  authority marker from `CANON_KIT_SEAM_AUTHORITY_MARKERS` in one sentence. A
-  sentence ends at `.`, `?`, `!` or `;` followed by whitespace. A date with no
-  marker passes, which is the dated-measurement exclusion made mechanical; a
-  marker with no date passes, because an unattributed rule about the kit family's
-  roles is mechanism.
-- **agent-file-pointer** — a name from `CANON_KIT_SEAM_AGENT_FILES` followed by a
-  section citation (`§`, with or without a joining comma or space) or by a
-  possessive `'s`. A closing backtick may sit between the name and either. A bare
-  mention passes, because a knob default naming a consumer's agent file is
-  mechanism; a name preceded by a word character or `.` is a different file.
-- **private-surface** — any mention of a path in `CANON_KIT_SEAM_PRIVATE_SURFACES`
-  as a whole path token: no word character, `/` or `.` before it, and no word
-  character, `/` or `.`-plus-alphanumeric after it, so a longer name containing
-  the path does not match.
-- **queue-slug** — a lead-line slug of the queue file (`CANON_KIT_QUEUE_FILE`) at
-  least `CANON_KIT_SEAM_SLUG_MIN_LEN` characters long, matched with
-  `[A-Za-z0-9_-]` as word characters on both sides. A lead line is an unindented
-  bullet whose lead is a bold slug or a bare slug, in any section. **A slug equal
-  to a mechanism name the tree defines is not a finding**: a kit root's directory
-  name, a gate declared in the gates directory or a kit's `checks/`, or a
-  `gates.list` member. That exclusion is structural, not a valve: a unit named
-  after the gate or kit it mints would otherwise red that gate's own section while
-  the unit's entry is live.
-- **hex-reference** — a run of 7 to 40 lowercase hex characters with no letter,
-  digit or `_` on either side, carrying at least one digit and at least one
-  letter `a`–`f`. That is the shape of an abbreviated or full git object name
-  and of a digest prefix; either points into one publisher's history, so it is
-  dead in every vendored copy. Requiring both classes keeps a decimal literal
-  and an all-letter word such as `defaced` out, and the arm matches bare prose as
-  well as inline code, since the reference is as dead either way.
-- **consumer-roster** — two or more distinct candidates of one knob in one
-  paragraph, each as a whole inline-code span, reported at the paragraph's first
-  line with the knob and the matched spans. A candidate is an element of a static
-  indexed or keyed knob whose layered value the consumer set, absent from that
-  row's default, spelled `<key>=<value>` for a keyed pair, and carrying a `/` or
-  `=`. The shape is the attested leak's: a kit SPEC illustrating a keyed wire by
-  enumerating one tree's configured pairs. Matching any single configured value
-  floods, because most have a lawful reading — a kit default, a generic noun, a
-  kit's own path — and so does co-occurrence of bare values, on word-valued
-  elements; a whole-span quote of two slash- or pair-shaped consumer-only elements
-  measured zero hits over the kit SPECs while firing on the attested instance.
+- **dated-attribution** — an ISO `YYYY-MM-DD` date (no digit abutting it) and an authority marker from `CANON_KIT_SEAM_AUTHORITY_MARKERS` in one sentence. A sentence ends at `.`, `?`, `!` or `;` followed by whitespace. A date with no marker passes, which is the dated-measurement exclusion made mechanical; a marker with no date passes, because an unattributed rule about the kit family's roles is mechanism.
+- **agent-file-pointer** — a name from `CANON_KIT_SEAM_AGENT_FILES` followed by a section citation (`§`, with or without a joining comma or space) or by a possessive `'s`. A closing backtick may sit between the name and either. A bare mention passes, because a knob default naming a consumer's agent file is mechanism; a name preceded by a word character or `.` is a different file.
+- **private-surface** — any mention of a path in `CANON_KIT_SEAM_PRIVATE_SURFACES` as a whole path token: no word character, `/` or `.` before it, and no word character, `/` or `.`-plus-alphanumeric after it, so a longer name containing the path does not match.
+- **queue-slug** — a lead-line slug of the queue file (`CANON_KIT_QUEUE_FILE`) at least `CANON_KIT_SEAM_SLUG_MIN_LEN` characters long, matched with `[A-Za-z0-9_-]` as word characters on both sides. A lead line is an unindented bullet whose lead is a bold slug or a bare slug, in any section. **A slug equal to a mechanism name the tree defines is not a finding**: a kit root's directory name, a gate declared in the gates directory or a kit's `checks/`, or a `gates.list` member. That exclusion is structural, not a valve: a unit named after the gate or kit it mints would otherwise red that gate's own section while the unit's entry is live.
+- **hex-reference** — a run of 7 to 40 lowercase hex characters with no letter, digit or `_` on either side, carrying at least one digit and at least one letter `a`–`f`. That is the shape of an abbreviated or full git object name and of a digest prefix; either points into one publisher's history, so it is dead in every vendored copy. Requiring both classes keeps a decimal literal and an all-letter word such as `defaced` out, and the arm matches bare prose as well as inline code, since the reference is as dead either way.
+- **consumer-roster** — two or more distinct candidates of one knob in one paragraph, each as a whole inline-code span, reported at the paragraph's first line with the knob and the matched spans. A candidate is an element of a static indexed or keyed knob whose layered value the consumer set, absent from that row's default, spelled `<key>=<value>` for a keyed pair, and carrying a `/` or `=`. The shape is the attested leak's: a kit SPEC illustrating a keyed wire by enumerating one tree's configured pairs. Matching any single configured value floods, because most have a lawful reading — a kit default, a generic noun, a kit's own path — and so does co-occurrence of bare values, on word-valued elements; a whole-span quote of two slash- or pair-shaped consumer-only elements measured zero hits over the kit SPECs while firing on the attested instance.
 
-The possessive shape is one class with the section citation — both point into the
-publisher's always-loaded file — so leaving it out would carve an exemption by
-omission into a gate that ships exemption-free.
+The possessive shape is one class with the section citation — both point into the publisher's always-loaded file — so leaving it out would carve an exemption by omission into a gate that ships exemption-free.
 
 **Honest limits**, stated so a green run is not read as a clean seam:
-- undated attribution passes, since a marker-only arm would red the role
-  vocabulary;
-- a dated landing or incident label with no attribution passes, since a date-only
-  arm cannot tell it from a frozen measurement;
+- undated attribution passes, since a marker-only arm would red the role vocabulary;
+- a dated landing or incident label with no attribution passes, since a date-only arm cannot tell it from a frozen measurement;
 - a stamp dated in words rather than ISO passes;
-- a retired slug or a cut ordinal passes, because deriving retired slugs reads
-  queue history, which a fixture cannot pin and a shallow clone does not have;
+- a retired slug or a cut ordinal passes, because deriving retired slugs reads queue history, which a fixture cannot pin and a shallow clone does not have;
 - a slug below the length floor passes;
-- an all-digit abbreviated object name passes, which is about one in thirty at
-  seven characters and rarer beyond; so does an uppercase one, and a decimal CI
-  run or job id, which no shape tells from a measured number;
-- a UUID segment or an eight-digit hex colour in prose reds as a hex reference;
-  fence the specimen, since fences are the gate's one escape;
-- an attributive agent-file pointer (*the agent file's ban*) passes, because
-  telling it from a consumer-side mention (*the consumer's agent file carries …*)
-  is judgement;
+- an all-digit abbreviated object name passes, which is about one in thirty at seven characters and rarer beyond; so does an uppercase one, and a decimal CI run or job id, which no shape tells from a measured number;
+- a UUID segment or an eight-digit hex colour in prose reds as a hex reference; fence the specimen, since fences are the gate's one escape;
+- an attributive agent-file pointer (*the agent file's ban*) passes, because telling it from a consumer-side mention (*the consumer's agent file carries …*) is judgement;
 - kit templates, kit READMEs and a kit's doctrine file are outside the corpus;
-- a singleton roster quote passes, as do a word-valued element, an unbackticked
-  mention and a scalar knob's value — the content class beyond the roster shape
-  is judged by gate-sdk/SPEC.md §The provenance seam's discriminator at review.
+- a singleton roster quote passes, as do a word-valued element, an unbackticked mention and a scalar knob's value — the content class beyond the roster shape is judged by gate-sdk/SPEC.md §The provenance seam's discriminator at review.
 
 Those shapes are held by the close-stage review, not by this gate.
 
-**A queue edit can red a kit SPEC.** Filing an entry whose slug appears as text in
-a kit SPEC reds the commit that files it, naming the SPEC line; renaming a fresh
-slug costs nothing. The descriptor therefore couples `knob:CANON_KIT_QUEUE_FILE`
-beside `kit:SPEC.md`, so the hook fires on the commit that introduces the finding.
-**A consumer knob edit can too**, which is why the member declares every static
-indexed and keyed row: the declaration reaches every static kit, so each kit's
-knob file joins its `couples=` as a derived couple (gate-sdk/SPEC.md §The
-`# graph:` manifest) and the hook fires on the knob edit with no path literal in
-the descriptor.
+**A queue edit can red a kit SPEC.** Filing an entry whose slug appears as text in a kit SPEC reds the commit that files it, naming the SPEC line; renaming a fresh slug costs nothing. The descriptor therefore couples `knob:CANON_KIT_QUEUE_FILE` beside `kit:SPEC.md`, so the hook fires on the commit that introduces the finding. **A consumer knob edit can too**, which is why the member declares every static indexed and keyed row: the declaration reaches every static kit, so each kit's knob file joins its `couples=` as a derived couple (gate-sdk/SPEC.md §The `# graph:` manifest) and the hook fires on the knob edit with no path literal in the descriptor.
 
-**Fail-closed (exit 2):** a kit SPEC or the queue file that exists but cannot be
-read; an authority marker that does not compile (every pattern compiles before the
-first line is read, as §check-manifest-temporal's do); an authority marker set
-empty in both base and extra; a non-positive or non-integer slug floor. **An absent
-queue file** switches the queue-slug arm off and says so in the clean line, as an
-empty private-surface list does for its arm: a kit publisher with no work queue is
-an ordinary configuration, and the other arms still judge it.
+**Fail-closed (exit 2):** a kit SPEC or the queue file that exists but cannot be read; an authority marker that does not compile (every pattern compiles before the first line is read, as §check-manifest-temporal's do); an authority marker set empty in both base and extra; a non-positive or non-integer slug floor. **An absent queue file** switches the queue-slug arm off and says so in the clean line, as an empty private-surface list does for its arm: a kit publisher with no work queue is an ordinary configuration, and the other arms still judge it.
 
-Producer: the generated pre-commit hook and `run-gates.sh`, on a commit touching a
-kit SPEC, a seam surface or the queue file; consumer: the committing session via the output
-contract, each finding read once at the scan transition (file, line, arm, span),
-no persistent state. The arm names the remedy: delete an attribution, restate what
-a pointer stood for, rename a fresh slug, or name the knob rather than quote its
-configured roster. The fixture pair trips each arm and carries a fenced copy of
-every trip that must add no finding; its consumer knob file sets a keyed knob,
-and `good/` quotes one configured pair and two pairs equal to the default, and
-carries a decimal `2147483646`, an all-letter hex word and a fenced object name;
-`check-provenance-seam.test.sh` holds the paths a pair cannot spell — the
-kit-roots-off default, an absent queue file, the `_EXTRA` union, a seam surface
-redding at kit-roots `0`, and a seam surface quoting two configured roster
-elements with no consumer-roster finding.
+Producer: the generated pre-commit hook and `run-gates.sh`, on a commit touching a kit SPEC, a seam surface or the queue file; consumer: the committing session via the output contract, each finding read once at the scan transition (file, line, arm, span), no persistent state. The arm names the remedy: delete an attribution, restate what a pointer stood for, rename a fresh slug, or name the knob rather than quote its configured roster. The fixture pair trips each arm and carries a fenced copy of every trip that must add no finding; its consumer knob file sets a keyed knob, and `good/` quotes one configured pair and two pairs equal to the default, and carries a decimal `2147483646`, an all-letter hex word and a fenced object name; `check-provenance-seam.test.sh` holds the paths a pair cannot spell — the kit-roots-off default, an absent queue file, the `_EXTRA` union, a seam surface redding at kit-roots `0`, and a seam surface quoting two configured roster elements with no consumer-roster finding.
 
 ### check-measured-claim
 
-Invariant: a measured count or extent claim that names an oracle agrees with it.
-The class this closes is a claim authored into governed prose with **no** oracle
-at all — a total, a corpus size, a swept set — which goes stale the moment the
-thing it measured moves, and whose detection is a human re-measuring by hand at
-review time if at all. The sibling ban (§check-manifest-count) reaches the
-tractable slice of that class by refusing a bare cardinal over a governed
-collection; it cannot reach a claim carrying no cardinal, and an *extent* claim
-("the kit SPECs came back clean") is exactly that shape. Both halves need the
-author to say what was measured, so this is a **marker** an author applies rather
-than a scanner inferring intent: a scanner triggers on a numeral, and the claims
-that cost the most carry none.
+Invariant: a measured count or extent claim that names an oracle agrees with it. The class this closes is a claim authored into governed prose with **no** oracle at all — a total, a corpus size, a swept set — which goes stale the moment the thing it measured moves, and whose detection is a human re-measuring by hand at review time if at all. The sibling ban (§check-manifest-count) reaches the tractable slice of that class by refusing a bare cardinal over a governed collection; it cannot reach a claim carrying no cardinal, and an *extent* claim ("the kit SPECs came back clean") is exactly that shape. Both halves need the author to say what was measured, so this is a **marker** an author applies rather than a scanner inferring intent: a scanner triggers on a numeral, and the claims that cost the most carry none.
 
-**The marker binds a claim to an oracle key and its measured value**, as an
-HTML comment in one of two positions:
+**The marker binds a claim to an oracle key and its measured value**, as an HTML comment in one of two positions:
 
 ```
 <!-- measured: <key>=<value> -->
 ```
 
-**Full-line**, alone on the line immediately above the claim, binding the
-paragraph below. **Inline**, anywhere else in a line of prose, binding the one
-sentence the marker follows. A mid-paragraph claim takes the inline form,
-because a full-line comment there would split the rendered paragraph. An
-occurrence inside an inline code span is the grammar being shown, not a marker,
-just as an occurrence in a fence is.
+**Full-line**, alone on the line immediately above the claim, binding the paragraph below. **Inline**, anywhere else in a line of prose, binding the one sentence the marker follows. A mid-paragraph claim takes the inline form, because a full-line comment there would split the rendered paragraph. An occurrence inside an inline code span is the grammar being shown, not a marker, just as an occurrence in a fence is.
 
-It joins the family `install-primary:` (§check-install-claim) and
-`payload-discloses:` (§check-payload-claim) rather than inventing a form — a
-full-line comment pairing a prose claim with a machine-readable id drawn from a
-consumer-owned vocabulary behind a `*_CMD` knob. It is deliberately **not** the
-`-exempt:` family: those are suppression valves that make a gate look away, and
-this is an attachment that gives a gate something to check. The reader-facing
-form of the claim stays prose; the marker is the tier beside it.
+It joins the family `install-primary:` (§check-install-claim) and `payload-discloses:` (§check-payload-claim) rather than inventing a form — a full-line comment pairing a prose claim with a machine-readable id drawn from a consumer-owned vocabulary behind a `*_CMD` knob. It is deliberately **not** the `-exempt:` family: those are suppression valves that make a gate look away, and this is an attachment that gives a gate something to check. The reader-facing form of the claim stays prose; the marker is the tier beside it.
 
-**The oracle is consumer-owned.** `CANON_KIT_MEASURED_CLAIMS_CMD` names a command
-emitting one `<key>`⇥`<value>` line per measurable fact, read through the
-`measured_claims` adapter (§The shared spec adapters) and so carrying its keyed
-fail-closed contract. The marker grammar and the comparison are kit mechanism; every key,
-every oracle command and every measured fact is consumer config, because a kit
-literal enumerating what a project measures would publish that project's
-vocabulary. An unset knob means the gate has no oracle and reports clean — the
-inactive-by-default posture its `*_CMD` siblings take.
+**The oracle is consumer-owned.** `CANON_KIT_MEASURED_CLAIMS_CMD` names a command emitting one `<key>`⇥`<value>` line per measurable fact, read through the `measured_claims` adapter (§The shared spec adapters) and so carrying its keyed fail-closed contract. The marker grammar and the comparison are kit mechanism; every key, every oracle command and every measured fact is consumer config, because a kit literal enumerating what a project measures would publish that project's vocabulary. An unset knob means the gate has no oracle and reports clean — the inactive-by-default posture its `*_CMD` siblings take.
 
-**A key's *meaning* is consumer-owned too, and that is the one failure none of the
-three arms can catch.** Redefining an existing key's oracle to answer a wider or
-narrower question leaves every arm satisfied while the referent moves: arm A
-compares the marker to the emitter and arm C compares the marker to the prose, and
-both stay green because neither knows what the key is *about*. The public sentence
-above the marker then asserts something nobody wrote and no gate can see. So a
-measurement whose question differs from an existing key's takes **its own key**,
-however close the two numbers happen to be at the moment — the closeness is what
-makes the substitution tempting and the drift invisible. What holds a key's meaning
-honest is review at the diff, which is the same answer §check-comment-tier gives
-for a free-text cause and for the same reason: nothing here parses meaning.
+**A key's *meaning* is consumer-owned too, and that is the one failure none of the three arms can catch.** Redefining an existing key's oracle to answer a wider or narrower question leaves every arm satisfied while the referent moves: arm A compares the marker to the emitter and arm C compares the marker to the prose, and both stay green because neither knows what the key is *about*. The public sentence above the marker then asserts something nobody wrote and no gate can see. So a measurement whose question differs from an existing key's takes **its own key**, however close the two numbers happen to be at the moment — the closeness is what makes the substitution tempting and the drift invisible. What holds a key's meaning honest is review at the diff, which is the same answer §check-comment-tier gives for a free-text cause and for the same reason: nothing here parses meaning.
 
-**A key joins the roster before a marker names it, and a key no marker names is the
-ordinary state rather than a reservation.** Arm B runs marker-to-roster — it fires
-on a *marker* whose key nobody emits — and there is deliberately no converse
-assertion, because an emitter is a consumer's own program and a kit is in no
-position to rule which of its facts a document must cite. The ordering matters when
-a key is minted: the emitter gains the line first, and prose binds it whenever a
-sentence is written that needs it. Reading it the other way — treating arm B as
-something that exercises every emitted key — would be a false comfort, since a key
-no marker names is touched by no arm at all.
+**A key joins the roster before a marker names it, and a key no marker names is the ordinary state rather than a reservation.** Arm B runs marker-to-roster — it fires on a *marker* whose key nobody emits — and there is deliberately no converse assertion, because an emitter is a consumer's own program and a kit is in no position to rule which of its facts a document must cite. The ordering matters when a key is minted: the emitter gains the line first, and prose binds it whenever a sentence is written that needs it. Reading it the other way — treating arm B as something that exercises every emitted key — would be a false comfort, since a key no marker names is touched by no arm at all.
 
 **Three arms.**
 
-- **A — the oracle disagrees.** Red when the emitter's current value for `<key>`
-  differs from the marker's `<value>`. This is the point: the number in the
-  document is now checked against the tree.
-- **B — the key is unknown.** Fail closed (exit 2) when `<key>` is absent from
-  the emitter's roster. A marker naming a key nobody emits is a claim with no
-  oracle wearing the costume of one, which is worse than an unmarked claim. A
-  marker that does not parse fails closed for the same reason.
-- **C — the marker drifted off its own sentence.** When `<value>` is a bare
-  cardinal, red unless that cardinal appears as a token in the claim the marker
-  binds. Without arm C the marker and the prose can disagree while the marker and
-  the oracle agree, and the gate would go green over a false sentence — the exact
-  failure being closed.
+- **A — the oracle disagrees.** Red when the emitter's current value for `<key>` differs from the marker's `<value>`. This is the point: the number in the document is now checked against the tree.
+- **B — the key is unknown.** Fail closed (exit 2) when `<key>` is absent from the emitter's roster. A marker naming a key nobody emits is a claim with no oracle wearing the costume of one, which is worse than an unmarked claim. A marker that does not parse fails closed for the same reason.
+- **C — the marker drifted off its own sentence.** When `<value>` is a bare cardinal, red unless that cardinal appears as a token in the claim the marker binds. Without arm C the marker and the prose can disagree while the marker and the oracle agree, and the gate would go green over a false sentence — the exact failure being closed.
 
-Arm C's cardinal grammar is §check-manifest-count's, read as a value: a digit run
-or a single-token spelled cardinal normalized to digits, so a marker's `12` and a
-sentence's "twelve" are one cardinal rather than two. Widening that grammar
-strictly **shrinks** arm C's violation set, because its red condition is a marker
-cardinal *absent from* its bound claim and a spelling the matcher cannot reach
-reads as absent. The claim a full-line marker binds is the paragraph below it,
-ending at a blank line, a fence, a second full-line marker or the end of file,
-less any sentence an inline marker in it binds. An inline marker binds the
-sentence ending at the marker. Paragraph text is rejoined across its wraps, and a
-sentence ends at `.`, `?`, `!` or `;` followed by whitespace, which is
-§check-provenance-seam's sentence. A terminator separated from the marker only by
-whitespace closes the bound sentence rather than opening it. Marker text is never
-part of any claim. **The authoring contract arm C prices:** a bound claim carrying
-more than one distinct cardinal is ambiguous, and the gate fails closed rather
-than guessing which one the marker holds — the remedy in the help line is to
-split the sentence, or mark the sentence carrying the measurement inline. That
-cost is bounded: it applies only to sentences an author chose to mark.
+Arm C's cardinal grammar is §check-manifest-count's, read as a value: a digit run or a single-token spelled cardinal normalized to digits, so a marker's `12` and a sentence's "twelve" are one cardinal rather than two. Widening that grammar strictly **shrinks** arm C's violation set, because its red condition is a marker cardinal *absent from* its bound claim and a spelling the matcher cannot reach reads as absent. The claim a full-line marker binds is the paragraph below it, ending at a blank line, a fence, a second full-line marker or the end of file, less any sentence an inline marker in it binds. An inline marker binds the sentence ending at the marker. Paragraph text is rejoined across its wraps, and a sentence ends at `.`, `?`, `!` or `;` followed by whitespace, which is §check-provenance-seam's sentence. A terminator separated from the marker only by whitespace closes the bound sentence rather than opening it. Marker text is never part of any claim. **The authoring contract arm C prices:** a bound claim carrying more than one distinct cardinal is ambiguous, and the gate fails closed rather than guessing which one the marker holds — the remedy in the help line is to split the sentence, or mark the sentence carrying the measurement inline. That cost is bounded: it applies only to sentences an author chose to mark.
 
-**Extent claims are covered by arms A and B alone, and that is the design rather
-than a gap.** An extent claim carries no cardinal, so arm C does not apply and arm
-A does the work, with `<value>` whatever the author declares the extent to be and
-the emitter recomputes: a corpus size, a sorted membership list, a digest over
-the swept set. This is the axis no scanner reaches and it costs nothing extra —
-the same arms, with a set-valued rather than integer-valued oracle. Because tab is
-this protocol's own field separator and the adapter refuses an extra one, a
-set-valued oracle joins its members with something else. This
-repo's first such inhabitant is `gate-substrates`, the live substrate set the
-enforcement core runs on, its members joined with `+`; it is the shape that makes
-a **definitional or qualitative** sentence self-correcting, since such a sentence
-carries no cardinal for arm C to check and would otherwise be marked with nothing
-an emitter could recompute.
+**Extent claims are covered by arms A and B alone, and that is the design rather than a gap.** An extent claim carries no cardinal, so arm C does not apply and arm A does the work, with `<value>` whatever the author declares the extent to be and the emitter recomputes: a corpus size, a sorted membership list, a digest over the swept set. This is the axis no scanner reaches and it costs nothing extra — the same arms, with a set-valued rather than integer-valued oracle. Because tab is this protocol's own field separator and the adapter refuses an extra one, a set-valued oracle joins its members with something else. This repo's first such inhabitant is `gate-substrates`, the live substrate set the enforcement core runs on, its members joined with `+`; it is the shape that makes a **definitional or qualitative** sentence self-correcting, since such a sentence carries no cardinal for arm C to check and would otherwise be marked with nothing an emitter could recompute.
 
-**The known limit, stated rather than hidden: a claim nobody marks is uncaught
-here.** It is narrowed from both sides, along different axes.
-§check-manifest-count's discharge makes marking pressured rather than voluntary
-wherever the ban already bites — a narrowing by **shape**, reaching whatever
-carries a bare cardinal over a governed collection. §check-unmarked-claim narrows
-by **subject**, reaching a claim a consumer has declared must not go unoracled
-whether or not it carries a number. Neither closes the limit; between them the
-uncaught remainder is a claim that is both unnumbered and undeclared, which is a
-smaller set than either alone leaves.
+**The known limit, stated rather than hidden: a claim nobody marks is uncaught here.** It is narrowed from both sides, along different axes. §check-manifest-count's discharge makes marking pressured rather than voluntary wherever the ban already bites — a narrowing by **shape**, reaching whatever carries a bare cardinal over a governed collection. §check-unmarked-claim narrows by **subject**, reaching a claim a consumer has declared must not go unoracled whether or not it carries a number. Neither closes the limit; between them the uncaught remainder is a claim that is both unnumbered and undeclared, which is a smaller set than either alone leaves.
 
-The scanned surface is its own glob knob, `CANON_KIT_MEASURED_SURFACE_GLOBS`,
-**not** the manifest set. The motivating class ranges over SPEC sections and
-binding shims alike, and neither existing surface reaches a shim: the manifest set
-excludes them by omission, with no documented rationale (a reader should not infer
-a ruling from a silent absence), and the prose surface (§The shared spec adapters) excludes them
-by a documented decision about which gate *owns* a shim — `check-shim-restatement`,
-which holds copy shape. That ownership is not this rule's: a restatement that is
-**wrong** has diverged from its owner's wording and is therefore not a copy. So
-reusing either surface would under-scan by exactly the instance that motivated the
-class. Fenced blocks are skipped (a fence is grammar being shown, not a claim being
-made), and a per-site `measured-claim-exempt: <reason>` marker on the line or the
-one above suppresses a marker a document is exhibiting rather than asserting.
+The scanned surface is its own glob knob, `CANON_KIT_MEASURED_SURFACE_GLOBS`, **not** the manifest set. The motivating class ranges over SPEC sections and binding shims alike, and neither existing surface reaches a shim: the manifest set excludes them by omission, with no documented rationale (a reader should not infer a ruling from a silent absence), and the prose surface (§The shared spec adapters) excludes them by a documented decision about which gate *owns* a shim — `check-shim-restatement`, which holds copy shape. That ownership is not this rule's: a restatement that is **wrong** has diverged from its owner's wording and is therefore not a copy. So reusing either surface would under-scan by exactly the instance that motivated the class. Fenced blocks are skipped (a fence is grammar being shown, not a claim being made), and a per-site `measured-claim-exempt: <reason>` marker on the line or the one above suppresses a marker a document is exhibiting rather than asserting.
 
-**The valve stays, and its zero live uses are not evidence against it.** The use count was taken over *this* tree, which is the wrong corpus: canon-kit is a
-kit, so the valve's readers are adopters whose prose this repo cannot see. It is a
-fail-safe for an author who must exhibit a full-line marker outside a fence, and a
-fail-safe carrying live uses would mean the fence-and-inline escapes had already
-failed. It stands beside the family boundary drawn above rather than against it —
-that boundary rules what the `measured:` marker *is*, not whether a suppression
-valve may accompany it.
+**The valve stays, and its zero live uses are not evidence against it.** The use count was taken over *this* tree, which is the wrong corpus: canon-kit is a kit, so the valve's readers are adopters whose prose this repo cannot see. It is a fail-safe for an author who must exhibit a full-line marker outside a fence, and a fail-safe carrying live uses would mean the fence-and-inline escapes had already failed. It stands beside the family boundary drawn above rather than against it — that boundary rules what the `measured:` marker *is*, not whether a suppression valve may accompany it.
 
-Producer: the generated pre-commit hook / `run-gates.sh`; consumer: the committing
-operator via the output contract; each marker read at the single scan transition
-(file, line, key, value), no persistent state. `precommit` tier.
+Producer: the generated pre-commit hook / `run-gates.sh`; consumer: the committing operator via the output contract; each marker read at the single scan transition (file, line, key, value), no persistent state. `precommit` tier.
 
-**Born native, and this is the first gate with no shell original.** Shrinking
-the interpreter surface to the unavoidable makes a new shell gate debt created
-knowingly; landing it as a Rust module plus a `.gate` descriptor avoids
-that, and it needs no unbuilt substrate (its glob corpus is served by the walker
-already in production, which is why the corpus was designed as its own surface
-rather than a union with the manifest set). The port criteria govern *ports*, so a
-gate with one implementation has no second substrate to prove parity against: its
-oracle is its `good/`+`bad/` pair, exactly like any new shell gate's, with
-`check-measured-claim.test.sh` holding the fail-closed arms a pair cannot spell.
-**The accepted cost:** a `.gate`-declared member is omitted from the `gates.list` of
-a consumer whose host the release publishes no artifact for, so on an uncovered
-platform this gate does not run where a shell gate would have. That is the port's
-standing cost, already accepted for the members whose shell forms were deleted, and
-it is why the omit-and-declare path exists — a paid price, not an open risk. This
-section settles *this* gate only and is no precedent for a second: new gates in a
-crate-carrying tree are born native by default, with shell an exception under one
-of three stated classes (gate-sdk/SPEC.md §The port-candidate criteria), and what
-settles a second gate is that rule, never this section.
+**Born native, and this is the first gate with no shell original.** Shrinking the interpreter surface to the unavoidable makes a new shell gate debt created knowingly; landing it as a Rust module plus a `.gate` descriptor avoids that, and it needs no unbuilt substrate (its glob corpus is served by the walker already in production, which is why the corpus was designed as its own surface rather than a union with the manifest set). The port criteria govern *ports*, so a gate with one implementation has no second substrate to prove parity against: its oracle is its `good/`+`bad/` pair, exactly like any new shell gate's, with `check-measured-claim.test.sh` holding the fail-closed arms a pair cannot spell. **The accepted cost:** a `.gate`-declared member is omitted from the `gates.list` of a consumer whose host the release publishes no artifact for, so on an uncovered platform this gate does not run where a shell gate would have. That is the port's standing cost, already accepted for the members whose shell forms were deleted, and it is why the omit-and-declare path exists — a paid price, not an open risk. This section settles *this* gate only and is no precedent for a second: new gates in a crate-carrying tree are born native by default, with shell an exception under one of three stated classes (gate-sdk/SPEC.md §The port-candidate criteria), and what settles a second gate is that rule, never this section.
 
 ### check-unmarked-claim
 
-Invariant: on the scanned prose surface, a paragraph matching a
-consumer-declared **claim-class** pattern carries a `measured:` marker. The class
-this closes is the axis §check-measured-claim names as its own known limit: the
-marker is voluntary, so the claims that most need an oracle are exactly the ones
-an author never thought to mark. This gate makes marking **pressured inside a
-declared class**, the same narrowing §check-manifest-count already performs for
-the bare-cardinal shape — there by *shape*, here by *subject*.
+Invariant: on the scanned prose surface, a paragraph matching a consumer-declared **claim-class** pattern carries a `measured:` marker. The class this closes is the axis §check-measured-claim names as its own known limit: the marker is voluntary, so the claims that most need an oracle are exactly the ones an author never thought to mark. This gate makes marking **pressured inside a declared class**, the same narrowing §check-manifest-count already performs for the bare-cardinal shape — there by *shape*, here by *subject*.
 
-**It declares a class; it does not ban a phrase, and the difference is the whole
-design.** A ban is discharged forever the moment the banned phrase is deleted, and
-it can only ever face one direction. A class assertion fires again on the next
-author who states the same thing in new words, and it covers a claim that
-overstates in *either* direction, because what puts a sentence in the class is
-what it asserts rather than which words it reaches for. The two properties are
-one property: the class is written over the claim, never over a canonical
-phrasing.
+**It declares a class; it does not ban a phrase, and the difference is the whole design.** A ban is discharged forever the moment the banned phrase is deleted, and it can only ever face one direction. A class assertion fires again on the next author who states the same thing in new words, and it covers a claim that overstates in *either* direction, because what puts a sentence in the class is what it asserts rather than which words it reaches for. The two properties are one property: the class is written over the claim, never over a canonical phrasing.
 
 **Two arms and a valve.**
 
-- **A — an unmarked claim.** Red (exit 1) when a paragraph matches a declared
-  class ERE and no `measured:` marker binds it. The finding names the class id,
-  the file, and the physical line where the match starts, and its `help:` line
-  states the three remedies below. A paragraph yields at most one finding, at the
-  first class in roster order that matches it.
-- **B — the vocabulary fails to load.** Exit 2 on a command error, an unparsable
-  line, a non-slug id, or a repeated id — inherited unchanged from
-  `claim_vocabulary` (§The shared spec adapters), which already names the failing
-  vocabulary by its command knob in every message — and on a declared ERE that does
-  not compile, which is the same unreadable-roster failure one step later.
-- **Valve** — `<!-- unmarked-claim-exempt: <reason> -->` on the flagged line or
-  directly above it, riding the shared exempt-window (§The shared spec adapters — the line or
-  the one above), and the reason is mandatory (the `comment-tier-exempt:`
-  convention — a deliberate keep carries its cause in-line, a reasonless valve is
-  red).
+- **A — an unmarked claim.** Red (exit 1) when a paragraph matches a declared class ERE and no `measured:` marker binds it. The finding names the class id, the file, and the physical line where the match starts, and its `help:` line states the three remedies below. A paragraph yields at most one finding, at the first class in roster order that matches it.
+- **B — the vocabulary fails to load.** Exit 2 on a command error, an unparsable line, a non-slug id, or a repeated id — inherited unchanged from `claim_vocabulary` (§The shared spec adapters), which already names the failing vocabulary by its command knob in every message — and on a declared ERE that does not compile, which is the same unreadable-roster failure one step later.
+- **Valve** — `<!-- unmarked-claim-exempt: <reason> -->` on the flagged line or directly above it, riding the shared exempt-window (§The shared spec adapters — the line or the one above), and the reason is mandatory (the `comment-tier-exempt:` convention — a deliberate keep carries its cause in-line, a reasonless valve is red).
 
-**The three remedies, and the gate is indifferent between them.** Rewrite the
-sentence out of the class (the doctrine's preference — a claim not made cannot go
-stale); attach a `measured:` marker binding it to an oracle; or land a reasoned
-valve. Naming all three on the finding is what keeps the gate from reading as a
-ban, which it deliberately is not.
+**The three remedies, and the gate is indifferent between them.** Rewrite the sentence out of the class (the doctrine's preference — a claim not made cannot go stale); attach a `measured:` marker binding it to an oracle; or land a reasoned valve. Naming all three on the finding is what keeps the gate from reading as a ban, which it deliberately is not.
 
-**Matching is whitespace-normalized across lines, and this is load-bearing rather
-than a nicety.** A claim spans a prose wrap as readily as it fits on one line, so
-a line-keyed predicate is blind by construction on whatever fraction of its corpus
-happens to wrap — a fraction no author controls and no reviewer can see. The ERE
-is matched against the paragraph with every run of whitespace, the newline at a
-wrap included, collapsed to one space; the finding is reported at the physical
-line the match starts on. This is not a new mechanism: it is the boundary
-§check-manifest-count already crosses for a total whose cardinal and noun straddle
-a wrap, reported at the cardinal's physical line, and the shared adapter
-(§The shared spec adapters) is where that normalization already lives. The subject is
-**ASCII-lowercased** before matching and a class pattern is authored in lower
-case, so a sentence's opening capital is not a way past the class.
+**Matching is whitespace-normalized across lines, and this is load-bearing rather than a nicety.** A claim spans a prose wrap as readily as it fits on one line, so a line-keyed predicate is blind by construction on whatever fraction of its corpus happens to wrap — a fraction no author controls and no reviewer can see. The ERE is matched against the paragraph with every run of whitespace, the newline at a wrap included, collapsed to one space; the finding is reported at the physical line the match starts on. This is not a new mechanism: it is the boundary §check-manifest-count already crosses for a total whose cardinal and noun straddle a wrap, reported at the cardinal's physical line, and the shared adapter (§The shared spec adapters) is where that normalization already lives. The subject is **ASCII-lowercased** before matching and a class pattern is authored in lower case, so a sentence's opening capital is not a way past the class.
 
-**A paragraph is the unit, and it is §check-measured-claim's paragraph**, so
-both gates agree on what a marker binds. A full-line marker heading the block
-discharges the whole paragraph. An inline marker discharges a class match that
-starts inside the sentence it binds, and no other, so a marked figure does not
-vouch for an unmarked claim beside it.
-Fenced blocks are skipped for the reason that section gives: a fence is grammar
-being shown, not a claim being made.
+**A paragraph is the unit, and it is §check-measured-claim's paragraph**, so both gates agree on what a marker binds. A full-line marker heading the block discharges the whole paragraph. An inline marker discharges a class match that starts inside the sentence it binds, and no other, so a marked figure does not vouch for an unmarked claim beside it. Fenced blocks are skipped for the reason that section gives: a fence is grammar being shown, not a claim being made.
 
-**Coverage-only, and the reason is a constraint rather than a preference.** The
-gate asserts that a matched claim carries *a* marker; it does not assert *which*
-key. `claim_vocabulary` is a two-field loader that **rejects a line carrying
-an extra tab**, so a class cannot declare a required key beside its ERE without a
-third field the loader refuses. Adding one would fork the loader every claim gate
-shares — the cost §The shared spec adapters explicitly took the shared-loader shape to avoid.
-The key is checked by `check-measured-claim` on the very next arm (its arm B fails
-closed on a key nobody emits, its arm A on a value the oracle now contradicts),
-so the composition covers it and neither gate duplicates the other.
+**Coverage-only, and the reason is a constraint rather than a preference.** The gate asserts that a matched claim carries *a* marker; it does not assert *which* key. `claim_vocabulary` is a two-field loader that **rejects a line carrying an extra tab**, so a class cannot declare a required key beside its ERE without a third field the loader refuses. Adding one would fork the loader every claim gate shares — the cost §The shared spec adapters explicitly took the shared-loader shape to avoid. The key is checked by `check-measured-claim` on the very next arm (its arm B fails closed on a key nobody emits, its arm A on a value the oracle now contradicts), so the composition covers it and neither gate duplicates the other.
 
-The scanned surface is `CANON_KIT_MEASURED_SURFACE_GLOBS` — **shared with
-`check-measured-claim`, not forked**, because they compose: a claim this
-one pressures into a marker is a claim that one then re-measures, and holding them
-over one corpus is what makes that handoff total. The cost of sharing is stated
-rather than hidden: a consumer wanting claim classes over a *different* surface
-than its measured claims cannot express that, and the split is available later
-behind an attested need. Sharing also means this gate's corpus widens whenever
-that knob does, without a decision of its own — so a widening is **re-run** here
-rather than reasoned about, a declared class being free to match a surface nobody
-widened it for.
+The scanned surface is `CANON_KIT_MEASURED_SURFACE_GLOBS` — **shared with `check-measured-claim`, not forked**, because they compose: a claim this one pressures into a marker is a claim that one then re-measures, and holding them over one corpus is what makes that handoff total. The cost of sharing is stated rather than hidden: a consumer wanting claim classes over a *different* surface than its measured claims cannot express that, and the split is available later behind an attested need. Sharing also means this gate's corpus widens whenever that knob does, without a decision of its own — so a widening is **re-run** here rather than reasoned about, a declared class being free to match a surface nobody widened it for.
 
-**The roster is consumer config and the seam here is sharper than its siblings'.**
-Every class id and every pattern arrives through `CANON_KIT_CLAIM_CLASSES_CMD`
-(§Layout and configuration); the scan, the normalization, the marker lookup and
-the verdict are kit mechanism. Beyond the provenance seam every claim gate
-observes, this one has a reason of its own: **this SPEC is itself governed prose**,
-so a kit that enumerated a consumer's claim phrasings would match its own class
-while describing it and need a valve to say what it does. Holding the roster in
-consumer config means the kit's prose never spells a member. An unset command
-means no class is declared and the gate reports clean — the inactive-by-default
-posture its `*_CMD` siblings take, and the correct posture rather than a gap: only
-a consumer's own vocabulary can turn this gate on.
+**The roster is consumer config and the seam here is sharper than its siblings'.** Every class id and every pattern arrives through `CANON_KIT_CLAIM_CLASSES_CMD` (§Layout and configuration); the scan, the normalization, the marker lookup and the verdict are kit mechanism. Beyond the provenance seam every claim gate observes, this one has a reason of its own: **this SPEC is itself governed prose**, so a kit that enumerated a consumer's claim phrasings would match its own class while describing it and need a valve to say what it does. Holding the roster in consumer config means the kit's prose never spells a member. An unset command means no class is declared and the gate reports clean — the inactive-by-default posture its `*_CMD` siblings take, and the correct posture rather than a gap: only a consumer's own vocabulary can turn this gate on.
 
-**The honest limit, and it is a property of what a roster can hold.** A claim
-stated in a **single implementation-tool token** with no predicate around it is out
-of reach: rostering the bare token would fire on every passing mention of the tool,
-and a gate that cries wolf is a gate its readers learn to bypass — the failure §When
-a gate earns its place (gate-sdk/SPEC.md) names as a defect in the gate rather than
-in the corpus. The general move for a noisy member is to roster **the predicate the
-noisy subject attaches to** rather than the subject, which recovers the site with
-none of the noise; a bare token offers no predicate to move to, and that is the
-residue. Two further bounds are deliberate: the gate cannot tell a **true** class
-member from a false one — it asserts the claim is *bound* to an oracle and
-`check-measured-claim` then asserts the oracle agrees — and neither reaches a
-sentence whose prose is true today and whose stated *reason* is wrong, which stays
-a human judgment.
+**The honest limit, and it is a property of what a roster can hold.** A claim stated in a **single implementation-tool token** with no predicate around it is out of reach: rostering the bare token would fire on every passing mention of the tool, and a gate that cries wolf is a gate its readers learn to bypass — the failure §When a gate earns its place (gate-sdk/SPEC.md) names as a defect in the gate rather than in the corpus. The general move for a noisy member is to roster **the predicate the noisy subject attaches to** rather than the subject, which recovers the site with none of the noise; a bare token offers no predicate to move to, and that is the residue. Two further bounds are deliberate: the gate cannot tell a **true** class member from a false one — it asserts the claim is *bound* to an oracle and `check-measured-claim` then asserts the oracle agrees — and neither reaches a sentence whose prose is true today and whose stated *reason* is wrong, which stays a human judgment.
 
-**Criterion 4** (gate-sdk/SPEC.md §The port-candidate criteria) **clears**: the
-corpus is a pure glob expansion of the configured surface set, reaching no gate
-declaration path in this tree — the same verdict and the same reasoning as
-§check-prose-tells, and flippable by the same consumer config. **Born native**, with
-no shell form authored: a crate-carrying tree births a gate native by default and
-none of the three exception classes applies here (gate-sdk/SPEC.md §The
-port-candidate criteria). Its `good/`+`bad/` pair is its oracle — the `bad/` case
-carries a claim wrapped across a newline, so the line-keyed blindness above is
-executable rather than asserted — with `check-unmarked-claim.test.sh` holding the
-fail-closed vocabulary arms and the two distinct clean skips a pair cannot spell.
+**Criterion 4** (gate-sdk/SPEC.md §The port-candidate criteria) **clears**: the corpus is a pure glob expansion of the configured surface set, reaching no gate declaration path in this tree — the same verdict and the same reasoning as §check-prose-tells, and flippable by the same consumer config. **Born native**, with no shell form authored: a crate-carrying tree births a gate native by default and none of the three exception classes applies here (gate-sdk/SPEC.md §The port-candidate criteria). Its `good/`+`bad/` pair is its oracle — the `bad/` case carries a claim wrapped across a newline, so the line-keyed blindness above is executable rather than asserted — with `check-unmarked-claim.test.sh` holding the fail-closed vocabulary arms and the two distinct clean skips a pair cannot spell.
 
-Producer of nothing but a verdict; its consumer is the committing session through
-the output contract, on the generated pre-commit hook, `run-gates.sh` and CI. Each
-paragraph is read at the single scan transition, no persistent state. `precommit`
-tier.
+Producer of nothing but a verdict; its consumer is the committing session through the output contract, on the generated pre-commit hook, `run-gates.sh` and CI. Each paragraph is read at the single scan transition, no persistent state. `precommit` tier.
 
 ### check-prose-enum
 
-Invariant: within one manifest-prose paragraph, a delimited hand list naming two
-or more members of one declared governed set must name every member of that set,
-unless an exempt site holds; a member absent from the paragraph is reported as
-omitted. This is the enumeration sibling of check-manifest-count's restated
-totals and the prose analog of check-kit-enum's hand-list doctrine: the count
-gate catches a bare cardinal over a growing collection, but a row that
-*enumerates instead of counting* drifts just as silently when the set grows.
+Invariant: within one manifest-prose paragraph, a delimited hand list naming two or more members of one declared governed set must name every member of that set, unless an exempt site holds; a member absent from the paragraph is reported as omitted. This is the enumeration sibling of check-manifest-count's restated totals and the prose analog of check-kit-enum's hand-list doctrine: the count gate catches a bare cardinal over a growing collection, but a row that *enumerates instead of counting* drifts just as silently when the set grows.
 <!-- prose-enum-exempt: historical attested-drift citation — names the set as it stood when the drift occurred, deliberately not tracking growth -->
-The attested drift: a README row's `blocked-by/needs-spec/spec` tag algebra went
-incomplete when a sibling tag landed — same restatement, different surface form,
-no scanner. Engagement mirrors check-kit-enum — two members are a list, a lone
-member (or two scattered across a paragraph, not adjacent) is a mention, not a
-list.
+The attested drift: a README row's `blocked-by/needs-spec/spec` tag algebra went incomplete when a sibling tag landed — same restatement, different surface form, no scanner. Engagement mirrors check-kit-enum — two members are a list, a lone member (or two scattered across a paragraph, not adjacent) is a mention, not a list.
 
-Set declarations are consumer config, never gate literals (the provenance seam):
-`CANON_KIT_ENUM_SETS_CMD` (default empty — clean skip) names a consumer command
-emitting one `<set-name>`⇥`<member>` line per member, read through
-`enum_sets` (§The shared spec adapters); a command that fails or a line that does not
-parse is fail-closed (exit 2). A member matches word-bounded — bracketed
-(`[spec:]`) or bare (`spec`), neither an alphanumeric, a hyphen, nor an
-underscore abutting, so a stem never matches inside a longer tag, and an
-**underscore-separated identifier never reads as present inside a longer
-sibling**: `guard_allow` is named by "the `guard_allow` helper" and not by "the
-`guard_allow_match` pair", which is what a reader means by both sentences. A
-member that falsely reads as present is one the gate stops asking about, so the
-paragraph omitting it reports clean — the silent direction, and the reason the
-class holds the whole identifier rather than most of it. `.` and `/` stay
-*outside* the class deliberately, and that is what makes the identifier reading
-exactly one character wide: a basename member matches prose spelling the file
-kit-relative, repo-relative or bare (below), which admitting either would break.
-The attested drift used bare stems.
-The grammar stays two fields. A third, scoping a set to a whole file rather than
-a paragraph, was weighed against a **cross-document** absence — members spread
-over per-section prose, which a paragraph-scoped judge structurally cannot see —
-and refused: it changes a wire grammar whose fail-closed rule rejects a third
-field, and a document-scoped completeness test has a far worse false-positive
-profile, since any mention anywhere satisfies it. Reshaping such prose into a
-roster the paragraph judge can read closes the same case with no grammar change.
+Set declarations are consumer config, never gate literals (the provenance seam): `CANON_KIT_ENUM_SETS_CMD` (default empty — clean skip) names a consumer command emitting one `<set-name>`⇥`<member>` line per member, read through `enum_sets` (§The shared spec adapters); a command that fails or a line that does not parse is fail-closed (exit 2). A member matches word-bounded — bracketed (`[spec:]`) or bare (`spec`), neither an alphanumeric, a hyphen, nor an underscore abutting, so a stem never matches inside a longer tag, and an **underscore-separated identifier never reads as present inside a longer sibling**: `guard_allow` is named by "the `guard_allow` helper" and not by "the `guard_allow_match` pair", which is what a reader means by both sentences. A member that falsely reads as present is one the gate stops asking about, so the paragraph omitting it reports clean — the silent direction, and the reason the class holds the whole identifier rather than most of it. `.` and `/` stay *outside* the class deliberately, and that is what makes the identifier reading exactly one character wide: a basename member matches prose spelling the file kit-relative, repo-relative or bare (below), which admitting either would break. The attested drift used bare stems. The grammar stays two fields. A third, scoping a set to a whole file rather than a paragraph, was weighed against a **cross-document** absence — members spread over per-section prose, which a paragraph-scoped judge structurally cannot see — and refused: it changes a wire grammar whose fail-closed rule rejects a third field, and a document-scoped completeness test has a far worse false-positive profile, since any mention anywhere satisfies it. Reshaping such prose into a roster the paragraph judge can read closes the same case with no grammar change.
 
-The scanned set and the paragraph walk are the shared `spec_manifest_files`
-finder and `spec_manifest_walk_awk` driver (§The shared spec adapters); this gate's
-`sk_on_pflush` hook judges each flushed paragraph. Two or more members present
-count as a *hand list* only when a run of them is chained by a separator
-carrying a delimiter (a comma, slash, bracket, parenthesis, colon, period,
-backtick or pipe) or the word `and`/`or`. Whitespace alone never chains, because
-two set members side by side in running prose are ordinary words ("a cost
-surface"), and a list always spells its separator. Members merely co-occurring
-in one paragraph with prose between them stay mentions. Omitted members are set
-members absent from the whole paragraph — the sibling that landed but never
-joined the list. Exempt contexts follow the count gate's family shape,
-mechanical markers first, per-site tag last: a subset marker in the window
-(`e.g.`, `such as`, `among them` — the list declares itself partial), a
-partitive marker on the match (`some of`, `one of`, `of the set` — a selection,
-not an enumeration), and the per-site `prose-enum-exempt: <reason>` on the line
-or the one above. The corrective names both legitimate fixes: cite the owning
-set by name, or complete the enumeration — never trim to a silent subset.
+The scanned set and the paragraph walk are the shared `spec_manifest_files` finder and `spec_manifest_walk_awk` driver (§The shared spec adapters); this gate's `sk_on_pflush` hook judges each flushed paragraph. Two or more members present count as a *hand list* only when a run of them is chained by a separator carrying a delimiter (a comma, slash, bracket, parenthesis, colon, period, backtick or pipe) or the word `and`/`or`. Whitespace alone never chains, because two set members side by side in running prose are ordinary words ("a cost surface"), and a list always spells its separator. Members merely co-occurring in one paragraph with prose between them stay mentions. Omitted members are set members absent from the whole paragraph — the sibling that landed but never joined the list. Exempt contexts follow the count gate's family shape, mechanical markers first, per-site tag last: a subset marker in the window (`e.g.`, `such as`, `among them` — the list declares itself partial), a partitive marker on the match (`some of`, `one of`, `of the set` — a selection, not an enumeration), and the per-site `prose-enum-exempt: <reason>` on the line or the one above. The corrective names both legitimate fixes: cite the owning set by name, or complete the enumeration — never trim to a silent subset.
 
-Producer: the generated pre-commit hook / `run-gates.sh`, coupled to the
-manifest set plus the consumer's config and kit sources (a set change re-fires
-the gate over the docs). Consumer: the committing operator via the output
-contract — file, line, set name, count, and the omitted members all read once at
-the scan transition. `CANON_KIT_ENUM_SETS_CMD` is read at startup; both fields of
-each emitted line are read at match time (set name in the report, member in the
-matcher). The bundled `--emit-enum-sets` arm, one value the knob takes, derives
-the queue task-tag set and the Lessons-channel set from queue-kit's own
-lead-line tag vocabulary plus `QUEUE_KIT_LESSON_TAGS` — derived, not restated; the
-two roles are separate sets because a paragraph naming one role's tags is not
-enumerating the other. A set a consumer can only hand-list is that consumer's
-own drift to own; the kit contract asks only for the emit grammar.
+Producer: the generated pre-commit hook / `run-gates.sh`, coupled to the manifest set plus the consumer's config and kit sources (a set change re-fires the gate over the docs). Consumer: the committing operator via the output contract — file, line, set name, count, and the omitted members all read once at the scan transition. `CANON_KIT_ENUM_SETS_CMD` is read at startup; both fields of each emitted line are read at match time (set name in the report, member in the matcher). The bundled `--emit-enum-sets` arm, one value the knob takes, derives the queue task-tag set and the Lessons-channel set from queue-kit's own lead-line tag vocabulary plus `QUEUE_KIT_LESSON_TAGS` — derived, not restated; the two roles are separate sets because a paragraph naming one role's tags is not enumerating the other. A set a consumer can only hand-list is that consumer's own drift to own; the kit contract asks only for the emit grammar.
 
-**The sets arrive as the configured command's output, and the gate must not call
-the emitter in process — which is a live refusal now that both sit in one binary.**
-The adapter spawns the *configured* argv and reads its lines (§The shared spec
-adapters). With the bundled emitter compiled into the same binary as the gate, an
-in-process call
-looks free; it is not, because it would resolve the **bundled** producer for a
-consumer who configured a different one — precisely the extension point the knob
-exists to protect. The property that makes the shortcut tempting is the reason to
-write the refusal down rather than leave it to be re-derived.
+**The sets arrive as the configured command's output, and the gate must not call the emitter in process — which is a live refusal now that both sit in one binary.** The adapter spawns the *configured* argv and reads its lines (§The shared spec adapters). With the bundled emitter compiled into the same binary as the gate, an in-process call looks free; it is not, because it would resolve the **bundled** producer for a consumer who configured a different one — precisely the extension point the knob exists to protect. The property that makes the shortcut tempting is the reason to write the refusal down rather than leave it to be re-derived.
 
-**The tag vocabulary is referenced from the gate that owns it, not parsed out of
-it.** `check-tag-lead-line`'s class table is the single holder of both the match
-literal and the tag name, and the emitter reads that table directly, terminator
-strip and all, so a rename cannot leave two spellings disagreeing. That direct
-reference is also why the shell form's parse anchors **retire rather than being
-weakened**: a check refusing to run unless the file held exactly one class table
-existed to anchor a text read on the table rather than on position, and a compiled
-reference cannot be ambiguous about which table it names. Recorded with its ground,
-because deleting a fail-closed check inside a port is otherwise exactly the move
-this project refuses.
+**The tag vocabulary is referenced from the gate that owns it, not parsed out of it.** `check-tag-lead-line`'s class table is the single holder of both the match literal and the tag name, and the emitter reads that table directly, terminator strip and all, so a rename cannot leave two spellings disagreeing. That direct reference is also why the shell form's parse anchors **retire rather than being weakened**: a check refusing to run unless the file held exactly one class table existed to anchor a text read on the table rather than on position, and a compiled reference cannot be ambiguous about which table it names. Recorded with its ground, because deleting a fail-closed check inside a port is otherwise exactly the move this project refuses.
 
-The same emitter adds two roster families over the kit tree, one set per kit
-root: a `<kit>-lib` set of the tracked top-level `lib/*.sh` basenames and a
-`<kit>-gate-test` set of the tracked top-level `gate-tests/*.test.sh` basenames,
-with the roots the binary derives from `GATE_SDK_ROOT` and `GATE_SDK_KIT_DIRS`
-(gate-sdk/SPEC.md §Layout and configuration) so the sets cannot enumerate a tree
-the battery does not. **Tracked is contract, not
-an implementation accident**: the listing comes from `git`, so an *untracked* new
-sibling does not enrol, and a walk of the filesystem would silently widen a set
-another surface reasons about. A battery run before `git add` of a new sibling
-therefore reads the old set and can turn red at the commit that stages it, so it
-is run after staging. A new kit, lib or unit
-test enrols with no edit, which is the property a hand correction per stale
-roster would not have. Members are basenames rather than paths because a
-basename matches prose spelling the file kit-relative, repo-relative or bare —
-the boundary rule above accepts the leading slash. The families fail closed
-where an empty result contradicts the shape they read (no kit roots at all, or a
-`lib/` tracking no top-level `*.sh`) and stay silent where emptiness is real: a
-`gate-tests/` holding only `good/`+`bad/` fixture directories ships no bespoke
-unit test, and that is a normal kit. One set is not kit-rooted: `kpi-builtin`,
-the ids of the binary's bundled KPI table (drift-kit/SPEC.md §Bundled KPIs),
-referenced from that table the way the tag vocabulary is referenced from
-`check-tag-lead-line`'s.
+The same emitter adds two roster families over the kit tree, one set per kit root: a `<kit>-lib` set of the tracked top-level `lib/*.sh` basenames and a `<kit>-gate-test` set of the tracked top-level `gate-tests/*.test.sh` basenames, with the roots the binary derives from `GATE_SDK_ROOT` and `GATE_SDK_KIT_DIRS` (gate-sdk/SPEC.md §Layout and configuration) so the sets cannot enumerate a tree the battery does not. **Tracked is contract, not an implementation accident**: the listing comes from `git`, so an *untracked* new sibling does not enrol, and a walk of the filesystem would silently widen a set another surface reasons about. A battery run before `git add` of a new sibling therefore reads the old set and can turn red at the commit that stages it, so it is run after staging. A new kit, lib or unit test enrols with no edit, which is the property a hand correction per stale roster would not have. Members are basenames rather than paths because a basename matches prose spelling the file kit-relative, repo-relative or bare — the boundary rule above accepts the leading slash. The families fail closed where an empty result contradicts the shape they read (no kit roots at all, or a `lib/` tracking no top-level `*.sh`) and stay silent where emptiness is real: a `gate-tests/` holding only `good/`+`bad/` fixture directories ships no bespoke unit test, and that is a normal kit. One set is not kit-rooted: `kpi-builtin`, the ids of the binary's bundled KPI table (drift-kit/SPEC.md §Bundled KPIs), referenced from that table the way the tag vocabulary is referenced from `check-tag-lead-line`'s.
 
-Two further families — a per-lib set of its function names, and a per-lib set of
-the files sourcing it — were derived, measured against this tree and refused;
-the reason is recorded so neither is re-minted. Both fail on one property: a
-lib's functions and its sourcers are a vocabulary prose *discusses*, not a set
-prose *rosters*, so the set-difference is real while the finding is false. The
-function family reported an omission at every passage explaining how two helpers
-interact, none of them a roster — the measurement that is dispositive on its own,
-and the one that produced the rule this paragraph ends on. The refusal rests on
-that ground alone. It rests **not at all** on the matcher, which bounds an
-identifier on the underscore too (above), so `guard_allow` is absent from a
-paragraph naming only `guard_allow_match`: a refusal resting partly on a broken
-matcher would invite exactly the wrong inference — fix the matcher, re-mint the
-family. That matcher defect was sighted while measuring this very family, which
-is where the identifier boundary rule came from and why the family is named here
-as its origin rather than as a second reason to refuse.
-The caller family's one intended site is a caller roster written as narrative, which
-the hand-list adjacency rule correctly declines to judge, so it was inert there
-while still firing falsely on a README row naming two of a kit's tools. The rule
-the pair teaches: declare a derived set when the tree shape it reads is one the
-prose rosters — a layout is such a shape, an incidental relation is not.
+Two further families — a per-lib set of its function names, and a per-lib set of the files sourcing it — were derived, measured against this tree and refused; the reason is recorded so neither is re-minted. Both fail on one property: a lib's functions and its sourcers are a vocabulary prose *discusses*, not a set prose *rosters*, so the set-difference is real while the finding is false. The function family reported an omission at every passage explaining how two helpers interact, none of them a roster — the measurement that is dispositive on its own, and the one that produced the rule this paragraph ends on. The refusal rests on that ground alone. It rests **not at all** on the matcher, which bounds an identifier on the underscore too (above), so `guard_allow` is absent from a paragraph naming only `guard_allow_match`: a refusal resting partly on a broken matcher would invite exactly the wrong inference — fix the matcher, re-mint the family. That matcher defect was sighted while measuring this very family, which is where the identifier boundary rule came from and why the family is named here as its origin rather than as a second reason to refuse. The caller family's one intended site is a caller roster written as narrative, which the hand-list adjacency rule correctly declines to judge, so it was inert there while still firing falsely on a README row naming two of a kit's tools. The rule the pair teaches: declare a derived set when the tree shape it reads is one the prose rosters — a layout is such a shape, an incidental relation is not.
 
-**A set is what a registry holds, and a contract is cited, not enumerated.** A
-derived set reads a tracked listing, a registry file or a compiled table. A value
-set that exists only as a conditional's arms or an argument parser's modes is
-behaviour. An extractor for it would be a per-site oracle that a refactor breaks.
-Prose names the behaviour and cites its owning section, so nothing restates the
-members. An invocation block rostering an arm's modes is the residue, held by
-review.
+**A set is what a registry holds, and a contract is cited, not enumerated.** A derived set reads a tracked listing, a registry file or a compiled table. A value set that exists only as a conditional's arms or an argument parser's modes is behaviour. An extractor for it would be a per-site oracle that a refactor breaks. Prose names the behaviour and cites its owning section, so nothing restates the members. An invocation block rostering an arm's modes is the residue, held by review.
 
-Calibration follows the count gate's procedure: tuned against this tree, every
-hit dispositioned — cite the set, complete the list, or site-exempt with reason.
-The good/bad pair covers a bare comma hand list dropping a member and the
-marked-subset cases; `check-prose-enum.test.sh` covers the config-driven paths
-(the empty-default skip, the fail-closed escapes, bracketed matching, multi-set
-independence, the exempt escapes, the whitespace-only gap that never chains, and
-the identifier boundary's prefix-sibling
-pair) the pair cannot reach — the boundary case needs a declared set holding
-underscore members, which is a config no pair running on the consumer's own
-hyphenated sets can supply. `precommit` tier.
+Calibration follows the count gate's procedure: tuned against this tree, every hit dispositioned — cite the set, complete the list, or site-exempt with reason. The good/bad pair covers a bare comma hand list dropping a member and the marked-subset cases; `check-prose-enum.test.sh` covers the config-driven paths (the empty-default skip, the fail-closed escapes, bracketed matching, multi-set independence, the exempt escapes, the whitespace-only gap that never chains, and the identifier boundary's prefix-sibling pair) the pair cannot reach — the boundary case needs a declared set holding underscore members, which is a config no pair running on the consumer's own hyphenated sets can supply. `precommit` tier.
 
 ### check-knob-citation
 
-Invariant: no kit knob stated *with its value* in governed manifest prose
-outside the owning kit's SPEC. This is the enforcement half of the
-de-literalization rule (doctrine-kit/DOCTRINE.md §Methodology-maintenance
-rules): a knob default copied into a README or a sibling SPEC is a second source
-no gate reads, and it drifts the moment the owner changes. Where the count and
-enum siblings ban a restated *total* and a restated *enumeration*, this bans a
-restated *knob value*.
+Invariant: no kit knob stated *with its value* in governed manifest prose outside the owning kit's SPEC. This is the enforcement half of the de-literalization rule (doctrine-kit/DOCTRINE.md §Methodology-maintenance rules): a knob default copied into a README or a sibling SPEC is a second source no gate reads, and it drifts the moment the owner changes. Where the count and enum siblings ban a restated *total* and a restated *enumeration*, this bans a restated *knob value*.
 
-The knob-token vocabulary is derived, never listed — the provenance seam holds
-(a kit literal carrying a private vocabulary would publish it). Each
-`gate_kit_roots` member yields two SCREAMING_SNAKE prefix forms: the dir name
-uppercased with hyphens mapped to underscores (`gate-sdk` → `GATE_SDK_`,
-`delegation-kit` → `DELEGATION_KIT_`), and for a `-kit`-suffixed dir the
-suffix-dropped short form too (`lifecycle-kit` → `LIFECYCLE_`), so a knob on
-either the long or the short form is governed. Both forms derive mechanically,
-so adding a kit widens the vocabulary with no edit here and the gate ships no
-term list. A SCREAMING_SNAKE token is a candidate
-only when it starts with a derived prefix; the short form widens the token
-space, and the value-marker leg below is what holds the false-positive rate.
+The knob-token vocabulary is derived, never listed — the provenance seam holds (a kit literal carrying a private vocabulary would publish it). Each `gate_kit_roots` member yields two SCREAMING_SNAKE prefix forms: the dir name uppercased with hyphens mapped to underscores (`gate-sdk` → `GATE_SDK_`, `delegation-kit` → `DELEGATION_KIT_`), and for a `-kit`-suffixed dir the suffix-dropped short form too (`lifecycle-kit` → `LIFECYCLE_`), so a knob on either the long or the short form is governed. Both forms derive mechanically, so adding a kit widens the vocabulary with no edit here and the gate ships no term list. A SCREAMING_SNAKE token is a candidate only when it starts with a derived prefix; the short form widens the token space, and the value-marker leg below is what holds the false-positive rate.
 
-A candidate fires on the value-marker triad, every leg required: a
-derived-prefix token; a same-line value marker; and a surface that is not the
-token's owning SPEC (`<owning-kit>/` joined to `CANON_KIT_SPEC_NAME`). The
-marker is one of two shapes — `=` appended directly to the token
-(`<KIT>_<KNOB>=<value>`), or the word "default" bound within a short window to a
-value literal (a backticked value, a quoted string, or a number). Bare knob
-names stay legal everywhere: prose cites the name and points at the owning
-roster, the fixed instance the gate must never flag; a bare number with no knob
-token in reach never fires — a tripwire left to human judgment, not a gate rule.
-Code and config are out of scope: code owns values, and only the prose manifest
-is scanned.
+A candidate fires on the value-marker triad, every leg required: a derived-prefix token; a value marker bound to it on its line; and a surface that is not the token's owning SPEC (`<owning-kit>/` joined to `CANON_KIT_SPEC_NAME`). The marker is one of two shapes — `=` appended directly to the token (`<KIT>_<KNOB>=<value>`), or the word "default" following the token within 100 code points and bound within a short window to a value literal (a backticked value, a quoted string, or a number). The reach is what a width-bounded line gave the same-line leg, stated as a distance so an unwrapped paragraph does not bind a knob to another knob's default; a marker before the token binds nothing, since a stated default reads knob first, then value. Bare knob names stay legal everywhere: prose cites the name and points at the owning roster, the fixed instance the gate must never flag; a bare number with no knob token in reach never fires — a tripwire left to human judgment, not a gate rule. Code and config are out of scope: code owns values, and only the prose manifest is scanned.
 
-Two calibrations hold the false-positive rate against this tree, the corpus the
-leg is tuned on. A token named inside a `${…}` shell parameter expansion is a
-name citation — another knob's default *expression*, a fallback source — never a
-value statement of itself, so expansions are blanked before the token scan. And
-the "default" leg binds: the word must be followed within a short window by a
-literal that is not itself a backticked knob name, so a stated default like
-``default `docs/CNAME` `` fires while a knob cited bare after the verb ("these
-paths default through `<KIT>_<KNOB>`") does not.
+Two calibrations hold the false-positive rate against this tree, the corpus the leg is tuned on. A token named inside a `${…}` shell parameter expansion is a name citation — another knob's default *expression*, a fallback source — never a value statement of itself, so expansions are blanked before the token scan. And the "default" leg binds: the word must be followed within a short window by a literal that is not itself a backticked knob name, so a stated default like ``default `docs/CNAME` `` fires while a knob cited bare after the verb ("these paths default through `<KIT>_<KNOB>`") does not.
 
-The scanned set is the shared `spec_manifest_files` finder and the prose walk is
-the shared `spec_manifest_walk_awk` driver (§The shared spec adapters); this gate supplies the
-`sk_on_line` hook (the per-line triad) and leaves `sk_on_pflush` unused — the
-marker is same-line, so no paragraph join is needed. Fences are skipped, and a
-`knob-citation-exempt: <reason>` on the line or the one above is the per-site
-valve for a genuine local restatement (a wiring example whose value is the
-citing kit's own path). Producer: the generated pre-commit hook / `run-gates.sh`,
-coupled to the manifest set and the kit SPECs; consumer: the committing operator
-via the output contract — file, line, the knob token, and the owning SPEC the
-value belongs in, each read once at the scan transition, no persistent state.
-Fail-closed on the awk status.
+The scanned set is the shared `spec_manifest_files` finder and the prose walk is the shared `spec_manifest_walk_awk` driver (§The shared spec adapters); this gate supplies the `sk_on_line` hook (the per-line triad) and leaves `sk_on_pflush` unused — the marker is same-line, so no paragraph join is needed. Fences are skipped, and a `knob-citation-exempt: <reason>` on the line or the one above is the per-site valve for a genuine local restatement (a wiring example whose value is the citing kit's own path). Producer: the generated pre-commit hook / `run-gates.sh`, coupled to the manifest set and the kit SPECs; consumer: the committing operator via the output contract — file, line, the knob token, and the owning SPEC the value belongs in, each read once at the scan transition, no persistent state. Fail-closed on the awk status.
 
-Calibration follows the family procedure (§check-manifest-temporal): every hit
-dispositioned — cite the knob by name and point at its SPEC roster (preferred),
-or exempt a genuine local restatement with reason. The good/bad pair covers both
-marker shapes, the short-derived prefix, the `${…}` name citation, the
-default-as-verb non-hit, and the per-site valve; `check-knob-citation.test.sh`
-covers the owning-SPEC exemption (a kit may state its own knob's value in its own
-SPEC but not in its README) the fixture pair cannot reach. `precommit` tier.
+Calibration follows the family procedure (§check-manifest-temporal): every hit dispositioned — cite the knob by name and point at its SPEC roster (preferred), or exempt a genuine local restatement with reason. The good/bad pair covers both marker shapes, the short-derived prefix, the `${…}` name citation, the default-as-verb non-hit, and the per-site valve; `check-knob-citation.test.sh` covers the owning-SPEC exemption (a kit may state its own knob's value in its own SPEC but not in its README) the fixture pair cannot reach. `precommit` tier.
 
-This gate polices where a value is *placed* (prose may not restate it); its
-sibling `check-knob-default-coupling` polices whether the value *agrees* between
-the source fallback and the SPEC that owns it. The two share the
-default-statement grammar (§The shared spec adapters) — one reads it to reject a value in
-prose, the other to confirm the SPEC states the source's literal.
+This gate polices where a value is *placed* (prose may not restate it); its sibling `check-knob-default-coupling` polices whether the value *agrees* between the source fallback and the SPEC that owns it. The two share the default-statement grammar (§The shared spec adapters) — one reads it to reject a value in prose, the other to confirm the SPEC states the source's literal.
 
 ### check-knob-default-coupling
 
-Invariant, for every literal kit-knob default in kit executable source: the
-literal (1) agrees across every site that supplies it and (2) equals the default
-the owning kit's SPEC states. Where `check-knob-citation` bars a knob value
-copied into prose *outside* the owning SPEC, this closes the channel that gate
-leaves open — the `:-` fallback (or guarded assignment) in the source that
-actually supplies the default is coupled to the SPEC statement, so the two
-cannot drift silently.
+Invariant, for every literal kit-knob default in kit executable source: the literal (1) agrees across every site that supplies it and (2) equals the default the owning kit's SPEC states. Where `check-knob-citation` bars a knob value copied into prose *outside* the owning SPEC, this closes the channel that gate leaves open — the `:-` fallback (or guarded assignment) in the source that actually supplies the default is coupled to the SPEC statement, so the two cannot drift silently.
 
-Two default idioms are scanned: a `${PREFIX_KNOB:-value}` fallback expansion, and
-the guarded assignment that is the dominant form in the kits' `lib/*.sh` — a
-`[[ -v PREFIX_KNOB ]] || PREFIX_KNOB=value` scalar or a
-`declare -p PREFIX_KNOB &>/dev/null || PREFIX_KNOB=(…)` array. The knob prefix is
-derived, never listed — one SCREAMING_SNAKE form per `gate_kit_roots` member
-(the dir uppercased, hyphens to underscores), so the gate ships no term list and
-the provenance seam holds; a token is a candidate only when it opens with a
-derived prefix. The scanned surface is the kit source under those roots (the
-roster the meta-gates walk, `templates/` and fixtures pruned); a knob's owning
-SPEC is resolved by its prefix, not the citing file's kit, so a `canon-kit`
-source citing a `GATE_SDK_` knob couples to gate-sdk's SPEC. A **third idiom** is
-the static knob roster (gate-sdk/SPEC.md §The non-gate arm, `--emit
-knob-roster`): a static kit's defaults live in the binary's knob table rather than
-in kit source, and each scalar default rendered there is a record coupled exactly
-as a guarded assignment is, read from the table in process and reported at its
-roster line. A row the table **derives** renders with the host's executable suffix
-where the row appends one (gate-sdk/SPEC.md §Layout and configuration), so its
-SPEC comparison removes that same standard-library suffix first: a Windows host
-couples `…checkwright-gates.exe` to the SPEC's suffix-less literal, a suffix-less
-host compares unchanged, and a spelled row is never trimmed. An indexed or keyed roster default is an array default, skipped as
-below.
+Two default idioms are scanned: a `${PREFIX_KNOB:-value}` fallback expansion, and the guarded assignment that is the dominant form in the kits' `lib/*.sh` — a `[[ -v PREFIX_KNOB ]] || PREFIX_KNOB=value` scalar or a `declare -p PREFIX_KNOB &>/dev/null || PREFIX_KNOB=(…)` array. The knob prefix is derived, never listed — one SCREAMING_SNAKE form per `gate_kit_roots` member (the dir uppercased, hyphens to underscores), so the gate ships no term list and the provenance seam holds; a token is a candidate only when it opens with a derived prefix. The scanned surface is the kit source under those roots (the roster the meta-gates walk, `templates/` and fixtures pruned); a knob's owning SPEC is resolved by its prefix, not the citing file's kit, so a `canon-kit` source citing a `GATE_SDK_` knob couples to gate-sdk's SPEC. A **third idiom** is the static knob roster (gate-sdk/SPEC.md §The non-gate arm, `--emit knob-roster`): a static kit's defaults live in the binary's knob table rather than in kit source, and each scalar default rendered there is a record coupled exactly as a guarded assignment is, read from the table in process and reported at its roster line. A row the table **derives** renders with the host's executable suffix where the row appends one (gate-sdk/SPEC.md §Layout and configuration), so its SPEC comparison removes that same standard-library suffix first: a Windows host couples `…checkwright-gates.exe` to the SPEC's suffix-less literal, a suffix-less host compares unchanged, and a spelled row is never trimmed. An indexed or keyed roster default is an array default, skipped as below.
 
-Assertion 1 (source self-agreement): every literal site for one knob carries the
-same literal; two disagreeing is drift inside the source before any SPEC is
-read, and it suppresses the knob's assertion-2 check (fix the source first).
-Assertion 2 (SPEC agreement): the owning SPEC states that same literal as the
-knob's default, read through the default-statement grammar `check-knob-citation`
-shares (§The shared spec adapters). A default stated as the same `${…:-tail}` deferral the
-source uses is reduced tail-to-tail before the compare, so a knob inheriting
-another kit's default reads as agreement. A knob whose SPEC carries no default
-statement at all reds — the SPEC owns knob defaults.
+Assertion 1 (source self-agreement): every literal site for one knob carries the same literal; two disagreeing is drift inside the source before any SPEC is read, and it suppresses the knob's assertion-2 check (fix the source first). Assertion 2 (SPEC agreement): the owning SPEC states that same literal as the knob's default, read through the default-statement grammar `check-knob-citation` shares (§The shared spec adapters). A default stated as the same `${…:-tail}` deferral the source uses is reduced tail-to-tail before the compare, so a knob inheriting another kit's default reads as agreement. A knob whose SPEC carries no default statement at all reds — the SPEC owns knob defaults.
 
-**An *absent* owning SPEC is a skip, where a *silent* one reds, and the
-distinction is the assertion's own.** The sentence above rules a file that exists
-and fails to state a default. A kit whose SPEC file is not there at all has no
-owning statement to drift *from*, and assertion 2 is a comparison between two
-sites rather than a requirement that a second site exist — so every knob of such
-a kit is skipped and counted on the clean line beside the other skip classes.
-Reading the two cases as one turns a missing file into a finding per knob, which
-says nothing about drift and everything about which files a tree happens to
-carry. The live case is a consumer whose kits arrived through a payload that
-withholds their SPECs (gate-sdk/SPEC.md §Consumer payload); in a tree that
-authors its kits every SPEC is present, the skip count is zero, and the assertion
-is unchanged.
+**An *absent* owning SPEC is a skip, where a *silent* one reds, and the distinction is the assertion's own.** The sentence above rules a file that exists and fails to state a default. A kit whose SPEC file is not there at all has no owning statement to drift *from*, and assertion 2 is a comparison between two sites rather than a requirement that a second site exist — so every knob of such a kit is skipped and counted on the clean line beside the other skip classes. Reading the two cases as one turns a missing file into a finding per knob, which says nothing about drift and everything about which files a tree happens to carry. The live case is a consumer whose kits arrived through a payload that withholds their SPECs (gate-sdk/SPEC.md §Consumer payload); in a tree that authors its kits every SPEC is present, the skip count is zero, and the assertion is unchanged.
 
-The coupling is literal-to-literal, and the calibration draws the boundary of
-what carries a single literal to couple. Skipped-and-counted, never coupled: a
-computed default (any expansion, substitution, or arithmetic in the value), an
-array default (no single literal), an empty fallback (`${X:-}` is the `set -u`
-presence-guard idiom, not a value — the real default lives at the else-branch or
-guarded-assignment site the gate reaches there), and a default the SPEC states
-*descriptively* rather than as a literal (a regex, a phrase set, a bundled list —
-code owns the complex value and the SPEC describes it, the widest-true tier). The
-honest limit: agreement is confirmed by the source literal appearing as the
-SPEC's stated default, so a value the SPEC never pins to a literal cannot be
-coupled — only a literal disagreement or a wholly undocumented default reds.
+The coupling is literal-to-literal, and the calibration draws the boundary of what carries a single literal to couple. Skipped-and-counted, never coupled: a computed default (any expansion, substitution, or arithmetic in the value), an array default (no single literal), an empty fallback (`${X:-}` is the `set -u` presence-guard idiom, not a value — the real default lives at the else-branch or guarded-assignment site the gate reaches there), and a default the SPEC states *descriptively* rather than as a literal (a regex, a phrase set, a bundled list — code owns the complex value and the SPEC describes it, the widest-true tier). The honest limit: agreement is confirmed by the source literal appearing as the SPEC's stated default, so a value the SPEC never pins to a literal cannot be coupled — only a literal disagreement or a wholly undocumented default reds.
 
-**Ported to the binary substrate at §The sixth budget batch** (gate-sdk/SPEC.md),
-where it took criterion 4 in its sharpest form: its `couples=` field is one level
-deep and so does not cover its own declaration path, while the recursive kit-root
-walk beneath it — which prunes `templates/` and nothing else — reads that path as
-content on every run. Couple clears, walk binds. Its assertion target is the
-grammar of a default, never a gate's dispatch relation, so the criterion is paid
-by the good/bad pair rather than answered by staying shell (§Meta-gate
-conservation for the binary substrate).
+**Ported to the binary substrate at §The sixth budget batch** (gate-sdk/SPEC.md), where it took criterion 4 in its sharpest form: its `couples=` field is one level deep and so does not cover its own declaration path, while the recursive kit-root walk beneath it — which prunes `templates/` and nothing else — reads that path as content on every run. Couple clears, walk binds. Its assertion target is the grammar of a default, never a gate's dispatch relation, so the criterion is paid by the good/bad pair rather than answered by staying shell (§Meta-gate conservation for the binary substrate).
 
-Producer: the generated pre-commit hook / `run-gates.sh`, coupled to kit source
-and the kit SPECs; consumer: the committing operator via the output contract —
-file, the knob, the source literal, and the owning SPEC, each read once at the
-scan transition, no persistent state. Fail-closed on an unreadable kit root or an
-unresolved knob. The good/bad
-pair covers self-agreement, the SPEC disagreement, and both idioms;
-`check-knob-default-coupling.test.sh` covers the cross-kit owning SPEC, the
-absent-default red, and the descriptive/array/empty/deferral skips the pair
-cannot reach. `precommit` tier.
+Producer: the generated pre-commit hook / `run-gates.sh`, coupled to kit source and the kit SPECs; consumer: the committing operator via the output contract — file, the knob, the source literal, and the owning SPEC, each read once at the scan transition, no persistent state. Fail-closed on an unreadable kit root or an unresolved knob. The good/bad pair covers self-agreement, the SPEC disagreement, and both idioms; `check-knob-default-coupling.test.sh` covers the cross-kit owning SPEC, the absent-default red, and the descriptive/array/empty/deferral skips the pair cannot reach. `precommit` tier.
 
 ### check-surface-duplication
 
-Invariant: no unvalved bold-lead-in definition of a glossary term on a
-configured non-glossary surface — the canonical definition form belongs
-only to the glossary; elsewhere it is a second definition that drifts.
-Valves `vision-introduces:` / `spec-introduces:` (same line or the line
-above) make a legitimate narrative or local introduction a reviewable
-decision in the diff.
+Invariant: no unvalved bold-lead-in definition of a glossary term on a configured non-glossary surface — the canonical definition form belongs only to the glossary; elsewhere it is a second definition that drifts. Valves `vision-introduces:` / `spec-introduces:` (same line or the line above) make a legitimate narrative or local introduction a reviewable decision in the diff.
 
-Calibration: a bold lead-in naming a component (a directory owning a
-canonical spec) is never flagged — a component's definition lives in its
-own spec, so there is nothing to restate; gate-test fixtures are excluded;
-exits 2 when the glossary file is absent (register the gate only where the
-topology exists). `align-only` tier.
+Calibration: a bold lead-in naming a component (a directory owning a canonical spec) is never flagged — a component's definition lives in its own spec, so there is nothing to restate; gate-test fixtures are excluded; exits 2 when the glossary file is absent (register the gate only where the topology exists). `align-only` tier.
 
-**`.gate`-dispatched**, declared at
-`canon-kit/checks/check-surface-duplication.gate` with its rule in
-`native/src/gates/surface_duplication.rs`. It is one of the two members that
-ported without the registry oracle selecting them: this tree
-registers it in no `gates.list`, so the port arm's two registry arms never
-counted it and the port moved no number of theirs
-(gate-sdk/SPEC.md §The port-candidate criteria, criterion 7). Criteria 1
-and 3 therefore both fail on their own terms rather than by a proxy, and what
-replaces the dispatch proof they would have bought is **the fixture pair plus
-canon-kit's own smoke** — named as the only oracle available, not offered as an
-equivalent one.
+**`.gate`-dispatched**, declared at `canon-kit/checks/check-surface-duplication.gate` with its rule in `native/src/gates/surface_duplication.rs`. It is one of the two members that ported without the registry oracle selecting them: this tree registers it in no `gates.list`, so the port arm's two registry arms never counted it and the port moved no number of theirs (gate-sdk/SPEC.md §The port-candidate criteria, criterion 7). Criteria 1 and 3 therefore both fail on their own terms rather than by a proxy, and what replaces the dispatch proof they would have bought is **the fixture pair plus canon-kit's own smoke** — named as the only oracle available, not offered as an equivalent one.
 
-**It is not a wrapper, and that is a measured verdict rather than a reading of
-its text.** Every program the pre-port form reached for was on
-`GATE_SDK_PROGRAM_FLOOR`, so none of them was ever a requirement to declare, and
-none survives the port either: the text scans run in process and the
-canonical-spec walk is `spec::canonical_specs`, already compiled for the
-`spec_manifest_files` cohort. The compiled form spawns **nothing**, so its
-declared requirement set is empty rather than floor-filtered to empty.
+**It is not a wrapper, and that is a measured verdict rather than a reading of its text.** Every program the pre-port form reached for was on `GATE_SDK_PROGRAM_FLOOR`, so none of them was ever a requirement to declare, and none survives the port either: the text scans run in process and the canonical-spec walk is `spec::canonical_specs`, already compiled for the `spec_manifest_files` cohort. The compiled form spawns **nothing**, so its declared requirement set is empty rather than floor-filtered to empty.
 
-**Two awk semantics are reproduced rather than tidied, and both are narrower
-than a reader expects.** The comment stripper is `<!--[^>]*-->`, so a comment
-carrying a `>` is *not* a comment to this rule and the lead-in behind it is not
-seen — widening it to a shortest-span match would silence a valve tag the shell
-form still reads. The valve reads the **last** keyword occurrence on its line and
-stops at the first `-->` with the whitespace behind it, so a line naming the tag
-twice tags the term it ends with. Both are pure functions of a page's bytes and
-both are held by crate unit tests, which is where the negative half of every arm
-lives: a fixture pair asserts a finding's presence and never its absence.
+**Two awk semantics are reproduced rather than tidied, and both are narrower than a reader expects.** The comment stripper is `<!--[^>]*-->`, so a comment carrying a `>` is *not* a comment to this rule and the lead-in behind it is not seen — widening it to a shortest-span match would silence a valve tag the shell form still reads. The valve reads the **last** keyword occurrence on its line and stops at the first `-->` with the whitespace behind it, so a line naming the tag twice tags the term it ends with. Both are pure functions of a page's bytes and both are held by crate unit tests, which is where the negative half of every arm lives: a fixture pair asserts a finding's presence and never its absence.
 
-**Criterion 4 binds and the live-tree arm was not demoted.** The pre-port rule
-was restored at `canon-kit/checks/zz-parity-probe.sh` — inside the resolve dir,
-outside the `check-*` glob, so no member resolves to it — and both forms were
-driven from the same cwd with the same argv over the post-descriptor corpus.
-Eight comparisons, all byte-identical including exit codes: this tree's own root
-(where the member refuses, because no glossary exists here), both fixture cases,
-a constructed corpus exercising the table's alternates, its parenthesised and
-backticked cells, both valve arms, the wrong-tag arm, the component exemption,
-the block-opening rule and both comment shapes, plus the absent-root, the
-absent-glossary and the no-configured-surface refusals. **The arm carries no
-bound**: this member's corpus is markdown, so the restored `.sh` probe sits
-outside the corpus it probes.
+**Criterion 4 binds and the live-tree arm was not demoted.** The pre-port rule was restored at `canon-kit/checks/zz-parity-probe.sh` — inside the resolve dir, outside the `check-*` glob, so no member resolves to it — and both forms were driven from the same cwd with the same argv over the post-descriptor corpus. Eight comparisons, all byte-identical including exit codes: this tree's own root (where the member refuses, because no glossary exists here), both fixture cases, a constructed corpus exercising the table's alternates, its parenthesised and backticked cells, both valve arms, the wrong-tag arm, the component exemption, the block-opening rule and both comment shapes, plus the absent-root, the absent-glossary and the no-configured-surface refusals. **The arm carries no bound**: this member's corpus is markdown, so the restored `.sh` probe sits outside the corpus it probes.
 
-**One narrowing is asserted rather than normalised away.** An unreadable surface
-still refuses at exit 2, and the *text* of that refusal is the gate's own rather
-than a child's, because the compiled form has no child to quote. No third-party
-diagnostic is reproduced, and none was reproducible on either substrate.
+**One narrowing is asserted rather than normalised away.** An unreadable surface still refuses at exit 2, and the *text* of that refusal is the gate's own rather than a child's, because the compiled form has no child to quote. No third-party diagnostic is reproduced, and none was reproducible on either substrate.
 
 ### check-comment-tier
 
-Invariant: every full-line comment on a governed source is one of — a
-machine directive (a comment a tool parses: `graph:`, `shellcheck`,
-`contract:`, `install:`, `armed-by:`, `projection:`, `smoke-unregistered:`,
-`portability-declared:` — the middle four read off a kit's
-vendored source, `install:` by the installer's recipe module and
-`check-install-disposition`, `armed-by:` by `doctor` and
-`check-install-disposition`, `projection:` by `check-projection-roster`,
-`smoke-unregistered:` by `--run-consumer-smoke`
-off `smoke/install.sh`, gate-sdk/SPEC.md §The install disposition and
-§Consumer smoke; `portability-declared: <reason>` is read at its own site by
-`check-portability-floor`, and it joins the built-in roster rather than a
-consumer's extras for the reason the others do — the directive is kit mechanism,
-minted by the gate-sdk section that owns the gate, gate-sdk/SPEC.md
-§check-portability-floor; `path-dialect-exempt: <reason>` is read at its own site
-by `check-path-dialect` and joins the built-in roster on that same ground,
-gate-sdk/SPEC.md §check-path-dialect — it answers *this value is not a filesystem
-location*, which is why it is not `comment-tier-exempt:`, whose question is
-whether a comment earns its place; `door-contributor: <reason>` is read at its
-own site by `check-door-binding`'s assertion C and joins the built-in roster on
-the same ground, guard-kit/SPEC.md §check-door-binding — it answers *this door's
-reader is a contributor*, and an emitter writing it into generated output
-carries it in a source string the roster must bless where the emitter also
-comments it), a reason directive (a spec pointer, usage synopsis, or
-positional justification: `spec:`, `usage:`, `exception-list:`,
-`no-fixture:`, `no-port:`, `port-until:`, `assertion`, `permanent:`, `TODO(task:`,
-`TODO(spec-ambiguity)`, which blesses a bounded window — its own line plus
-continuation lines up to `CANON_KIT_COMMENT_RUN_CAP` total physical comment
-lines, blank `#` lines counted; a directive mid-run opens a fresh window
-from its own line, and every comment line beyond a window classifies on its
-own), `comment-tier-exempt: <reason>`, or the
-comment immediately above a positional construct from the language roster.
-Anything else is flagged. Code is the WHAT, its SPEC the WHY — the seam the
-align stage checks each side against; a comment that restates the code, or
-paraphrases the SPEC section it cites, is deleted, not blessed. A `spec:`
-directive earns its place by the coupling it makes — a bare pointer binding
-this code site to the requirement that governs it, as `contract:` / `assertion`
-/ `graph:` bind a site to a manifest contract, an enumerated assertion, or the
-gate graph. The binding is the value: either side's drift breaks it visibly
-(gate-checked both sides for `graph:` and `assertion`; for `spec:` /
-`contract:` `check-spec-pointer` gate-checks the forward side — the target
-resolves — leaving only the reverse, an uncovered requirement, a review
-concern), which is why it blesses only its own one-line binding, never a
-relocated block — restatement couples nothing, it just forks the why into a
-second copy no gate reads. `comment-tier-exempt: <reason>` is the honest
-directive for a genuinely-local fact below SPEC altitude that neither tier
-owns.
+Invariant: every full-line comment on a governed source is one of — a machine directive (a comment a tool parses: `graph:`, `shellcheck`, `contract:`, `install:`, `armed-by:`, `projection:`, `smoke-unregistered:`, `portability-declared:` — the middle four read off a kit's vendored source, `install:` by the installer's recipe module and `check-install-disposition`, `armed-by:` by `doctor` and `check-install-disposition`, `projection:` by `check-projection-roster`, `smoke-unregistered:` by `--run-consumer-smoke` off `smoke/install.sh`, gate-sdk/SPEC.md §The install disposition and §Consumer smoke; `portability-declared: <reason>` is read at its own site by `check-portability-floor`, and it joins the built-in roster rather than a consumer's extras for the reason the others do — the directive is kit mechanism, minted by the gate-sdk section that owns the gate, gate-sdk/SPEC.md §check-portability-floor; `path-dialect-exempt: <reason>` is read at its own site by `check-path-dialect` and joins the built-in roster on that same ground, gate-sdk/SPEC.md §check-path-dialect — it answers *this value is not a filesystem location*, which is why it is not `comment-tier-exempt:`, whose question is whether a comment earns its place; `door-contributor: <reason>` is read at its own site by `check-door-binding`'s assertion C and joins the built-in roster on the same ground, guard-kit/SPEC.md §check-door-binding — it answers *this door's reader is a contributor*, and an emitter writing it into generated output carries it in a source string the roster must bless where the emitter also comments it), a reason directive (a spec pointer, usage synopsis, or positional justification: `spec:`, `usage:`, `exception-list:`, `no-fixture:`, `no-port:`, `port-until:`, `assertion`, `permanent:`, `TODO(task:`, `TODO(spec-ambiguity)`, which blesses a bounded window — its own line plus continuation lines up to `CANON_KIT_COMMENT_RUN_CAP` total physical comment lines, blank `#` lines counted; a directive mid-run opens a fresh window from its own line, and every comment line beyond a window classifies on its own), `comment-tier-exempt: <reason>`, or the comment immediately above a positional construct from the language roster. Anything else is flagged. Code is the WHAT, its SPEC the WHY — the seam the align stage checks each side against; a comment that restates the code, or paraphrases the SPEC section it cites, is deleted, not blessed. A `spec:` directive earns its place by the coupling it makes — a bare pointer binding this code site to the requirement that governs it, as `contract:` / `assertion` / `graph:` bind a site to a manifest contract, an enumerated assertion, or the gate graph. The binding is the value: either side's drift breaks it visibly (gate-checked both sides for `graph:` and `assertion`; for `spec:` / `contract:` `check-spec-pointer` gate-checks the forward side — the target resolves — leaving only the reverse, an uncovered requirement, a review concern), which is why it blesses only its own one-line binding, never a relocated block — restatement couples nothing, it just forks the why into a second copy no gate reads. `comment-tier-exempt: <reason>` is the honest directive for a genuinely-local fact below SPEC altitude that neither tier owns.
 
-The governed-source corpus reaches the **implementation of a ported gate**, not
-just shell — `comment_surface` with templates kept (§The shared spec adapters), which owns
-the file set. This is the load-bearing half of the reader
-partition gate-sdk/SPEC.md §The `# graph:` manifest states — locality-class
-directives bind to a line of implementation and therefore stay there, so the
-tier rule has to follow them across the substrate or go dark exactly where it
-still applies. A descriptor's own lines are directives by construction. Marker
-matching is on the **token**, independent of the comment leader, so `//` and `#`
-carry the same directives and no language earns a quieter standard.
+The governed-source corpus reaches the **implementation of a ported gate**, not just shell — `comment_surface` with templates kept (§The shared spec adapters), which owns the file set. This is the load-bearing half of the reader partition gate-sdk/SPEC.md §The `# graph:` manifest states — locality-class directives bind to a line of implementation and therefore stay there, so the tier rule has to follow them across the substrate or go dark exactly where it still applies. A descriptor's own lines are directives by construction. Marker matching is on the **token**, independent of the comment leader, so `//` and `#` carry the same directives and no language earns a quieter standard.
 
-**The colon side's sharp edge is a naming rule, not a matcher one.** A colon
-directive matches as a substring (the joining rule under Calibration below), so a
-short token nests inside ordinary vocabulary: a directive named `port:` would
-silently bless `support:`, `transport:`, `export:` and `report:`. Roster names on
-that side are chosen not to nest; a bare word is bounded and carries no such
-hazard. Unenforced by construction — the hazard is in a name that does not exist
-yet, and a scanner over a roster of literals would be checking the roster against
-itself.
+**The colon side's sharp edge is a naming rule, not a matcher one.** A colon directive matches as a substring (the joining rule under Calibration below), so a short token nests inside ordinary vocabulary: a directive named `port:` would silently bless `support:`, `transport:`, `export:` and `report:`. Roster names on that side are chosen not to nest; a bare word is bounded and carries no such hazard. Unenforced by construction — the hazard is in a name that does not exist yet, and a scanner over a roster of literals would be checking the roster against itself.
 
-One shape overrides the window: a full-line comment carrying a **restated
-collection total** — the count grammar of §check-manifest-count, over the same
-`CANON_KIT_COUNT_COLLECTIONS` vocabulary — is flagged even where a directive
-blesses it, and positional rescue does not reach it either. A count is never
-directive wording. A directive's blessing covers its own wording physically
-wrapped, never a total pinned beside it, and such a total is exactly the second
-source the manifest gate bans: `# rules 1-8` sat stale in this repo's own guard
-while its ruleset grew past eight, invisible because no gate read comments for
-counts. The fix is deleting the count or citing the owning collection; the sole
-valve is `comment-tier-exempt: <reason>`, whose window suppresses the override
-as it suppresses the tier rule. The override still catches a total hidden in a
-directive's own wrapped wording — the wrap is exactly where one would escape a
-line-at-a-time scan — and an exempt line cannot launder its neighbours into one.
-The weighed alternative — a source-coupled
-numeral scan with an allowlist — is rejected: legitimate numerals abound in
-source (exit codes, indices, field positions) and the false-positive rate would
-exceed the catch. Counts in *code* stay a review concern; counts in *prose*,
-wherever the prose lives, are gated.
+One shape overrides the window: a full-line comment carrying a **restated collection total** — the count grammar of §check-manifest-count, over the same `CANON_KIT_COUNT_COLLECTIONS` vocabulary — is flagged even where a directive blesses it, and positional rescue does not reach it either. A count is never directive wording. A directive's blessing covers its own wording physically wrapped, never a total pinned beside it, and such a total is exactly the second source the manifest gate bans: `# rules 1-8` sat stale in this repo's own guard while its ruleset grew past eight, invisible because no gate read comments for counts. The fix is deleting the count or citing the owning collection; the sole valve is `comment-tier-exempt: <reason>`, whose window suppresses the override as it suppresses the tier rule. The override still catches a total hidden in a directive's own wrapped wording — the wrap is exactly where one would escape a line-at-a-time scan — and an exempt line cannot launder its neighbours into one. The weighed alternative — a source-coupled numeral scan with an allowlist — is rejected: legitimate numerals abound in source (exit codes, indices, field positions) and the false-positive rate would exceed the catch. Counts in *code* stay a review concern; counts in *prose*, wherever the prose lives, are gated.
 
-Calibration: the built-in roster is Checkwright's own kit-mechanism
-directive names; `CANON_KIT_COMMENT_MACHINE` / `_REASON` append a consumer's
-product vocabulary (the same split as `check-graph`'s vocab — the mechanism
-ships, the rule content is config). The window cap is
-`CANON_KIT_COMMENT_RUN_CAP` (default 3 — one wrapped sentence): a
-within-window continuation is the directive's own wording physically
-wrapped, blessed as such, while prose beyond the window is presumed
-relocated restatement and deleted. `comment-tier-exempt:` is reserved for a
-genuinely-local fact neither tier owns, and exempting a restatement rather
-than deleting it is itself the defect — a long roster (a `usage:` option
-list, a header) restructures into directive-anchored short paragraphs or
-trims, never launders prose past the cap. The count-shape override reads the
-shared count adapter (§check-manifest-count) rather than a second grammar, so it
-inherits that gate's carve-outs unchanged: a comparator bound or a `per`-phrase
-in a directive is a rule and not a total, a partitive proportion exempts both
-its cardinals, and a cardinal in inline code is a meta-reference — which is why
-a directive may still say `at most three checks per run` or name a
-`` `six gates` `` example. No knob is added: the noun vocabulary enters through
-`CANON_KIT_COUNT_COLLECTIONS` and the wedge window through
-`CANON_KIT_COUNT_WEDGE_WORDS`. The default surface is shell
-(`#`) — `templates/` stubs included: a copied-out template's `spec:` line
-resolves against the vendored kit path (kit SPECs travel with the
-vendor-whole install), so its comments are directives like any source and
-this gate governs them, where
-`check-spec-pointer` exempts them as placeholders-by-design — with the
-workflow directory's **tracked** members blessing only `contract:`/`see`,
-whatever their extension (the capture tier is gitignored and headerless, so
-tracking is the filter, not the suffix — gate-sdk/SPEC.md §The workflow
-directory). On a **markdown** member of that directory a `##`-or-deeper line is
-the surface's own block grammar rather than a comment, and is read as an
-ordinary content line: a workflow surface whose records *are* `## ` blocks
-(lifecycle-kit/SPEC.md §The survey record) would otherwise have every record
-heading flagged as untagged prose, and no tagging is available that would not
-put a directive inside the data. The narrowing costs no coverage — the member's
-`# contract:` header is still classified here, and its tier and header payload
-are `check-workflow-tiering`'s (gate-sdk/SPEC.md §The workflow directory) — and
-it is deliberately extension-scoped rather than content-sniffed, so a `.txt`
-data member's `#` lines stay comments;
-slash-comment parsing (`//`, `/* */`, doc-comments, heredoc skipping) ships
-as mechanism and activates when a consumer widens `CANON_KIT_COMMENT_SURFACE`
-to a language that needs it. Positional rescue is language-agnostic — its
-construct roster (`CANON_KIT_COMMENT_POSITIONAL`) is consumer config, empty
-by default so inert on the shell surface (a Rust consumer supplies the
-`unwrap`/`allow`-class tokens; a consumer's language is not a kit
-literal). Trailing inline comments are out of scope by construction — the
-FP-prone half of the judgment stays a review tripwire. Not-yet-swept
-sources ride `CANON_KIT_COMMENT_WHITELIST` (its array tagged
-`# exception-list:`, each `# until:` a live drain task per
-`check-gate-exemption-tasks`), draining kit by kit. `precommit` tier.
+Calibration: the built-in roster is Checkwright's own kit-mechanism directive names; `CANON_KIT_COMMENT_MACHINE` / `_REASON` append a consumer's product vocabulary (the same split as `check-graph`'s vocab — the mechanism ships, the rule content is config). The window cap is `CANON_KIT_COMMENT_RUN_CAP` (default 3 — one wrapped sentence): a within-window continuation is the directive's own wording physically wrapped, blessed as such, while prose beyond the window is presumed relocated restatement and deleted. `comment-tier-exempt:` is reserved for a genuinely-local fact neither tier owns, and exempting a restatement rather than deleting it is itself the defect — a long roster (a `usage:` option list, a header) restructures into directive-anchored short paragraphs or trims, never launders prose past the cap. The count-shape override reads the shared count adapter (§check-manifest-count) rather than a second grammar, so it inherits that gate's carve-outs unchanged: a comparator bound or a `per`-phrase in a directive is a rule and not a total, a partitive proportion exempts both its cardinals, and a cardinal in inline code is a meta-reference — which is why a directive may still say `at most three checks per run` or name a `` `six gates` `` example. No knob is added: the noun vocabulary enters through `CANON_KIT_COUNT_COLLECTIONS` and the wedge window through `CANON_KIT_COUNT_WEDGE_WORDS`. The default surface is shell (`#`) — `templates/` stubs included: a copied-out template's `spec:` line resolves against the vendored kit path (kit SPECs travel with the vendor-whole install), so its comments are directives like any source and this gate governs them, where `check-spec-pointer` exempts them as placeholders-by-design — with the workflow directory's **tracked** members blessing only `contract:`/`see`, whatever their extension (the capture tier is gitignored and headerless, so tracking is the filter, not the suffix — gate-sdk/SPEC.md §The workflow directory). On a **markdown** member of that directory a `##`-or-deeper line is the surface's own block grammar rather than a comment, and is read as an ordinary content line: a workflow surface whose records *are* `## ` blocks (lifecycle-kit/SPEC.md §The survey record) would otherwise have every record heading flagged as untagged prose, and no tagging is available that would not put a directive inside the data. The narrowing costs no coverage — the member's `# contract:` header is still classified here, and its tier and header payload are `check-workflow-tiering`'s (gate-sdk/SPEC.md §The workflow directory) — and it is deliberately extension-scoped rather than content-sniffed, so a `.txt` data member's `#` lines stay comments; slash-comment parsing (`//`, `/* */`, doc-comments, heredoc skipping) ships as mechanism and activates when a consumer widens `CANON_KIT_COMMENT_SURFACE` to a language that needs it. Positional rescue is language-agnostic — its construct roster (`CANON_KIT_COMMENT_POSITIONAL`) is consumer config, empty by default so inert on the shell surface (a Rust consumer supplies the `unwrap`/`allow`-class tokens; a consumer's language is not a kit literal). Trailing inline comments are out of scope by construction — the FP-prone half of the judgment stays a review tripwire. Not-yet-swept sources ride `CANON_KIT_COMMENT_WHITELIST` (its array tagged `# exception-list:`, each `# until:` a live drain task per `check-gate-exemption-tasks`), draining kit by kit. `precommit` tier.
 
-**Declared by `check-comment-tier.gate`, dispatching to the binary**, with the
-four members of this family ported as one cohort
-(gate-sdk/SPEC.md §The first cohort, and the rule that selects the next). Its
-`couples=` carries `*.gate` and `*.rs` as **bare globs** beside the shell and
-workflow spellings: the corpus scans both declaration forms and the ported
-implementation, and a token naming this repo's crate directory would publish one
-consumer's layout into a kit file (gate-sdk/SPEC.md §The provenance seam) and be false
-for every other. The gate reads no regex engine — its blessing roster is a set of
-literal directive tokens, matched as a substring for a `keyword:` and
-non-alphanumeric-bounded for a bare word, which is joining rather than
-interpreting (gate-sdk/SPEC.md §The POSIX ERE matcher).
+**Declared by `check-comment-tier.gate`, dispatching to the binary**, with the four members of this family ported as one cohort (gate-sdk/SPEC.md §The first cohort, and the rule that selects the next). Its `couples=` carries `*.gate` and `*.rs` as **bare globs** beside the shell and workflow spellings: the corpus scans both declaration forms and the ported implementation, and a token naming this repo's crate directory would publish one consumer's layout into a kit file (gate-sdk/SPEC.md §The provenance seam) and be false for every other. The gate reads no regex engine — its blessing roster is a set of literal directive tokens, matched as a substring for a `keyword:` and non-alphanumeric-bounded for a bare word, which is joining rather than interpreting (gate-sdk/SPEC.md §The POSIX ERE matcher).
 
 ### check-spec-pointer
 
-Invariant, two passes, forward direction only: every `spec:` / `contract:`
-pointer **directive** on a governed source resolves, and every free-prose
-`§<heading>` **citation** on a governed manifest resolves. The
-directive set is exactly what `check-comment-tier` blesses by shape: full-line
-`spec:` / `contract:` comments on the governed sources, plus the `# contract:`
-headers on the workflow directory's **tracked** members (gate-sdk/SPEC.md §The
-workflow directory owns that tier). That section rules two `contract:` payloads,
-and this gate honours both: a **version-marker** payload (`<format-name> v<N>`,
-matched on that section's own anchored shape, and only after `contract:` — a
-`spec:` directive wearing the shape still resolves as a path) is a wire-format
-version its owning gate parses, so it names no path, resolves as none, and is
-counted on the clean line rather than skipped silently. Discriminating it here is
-what keeps the form usable without a per-consumer whitelist entry. A directive's
-target grammar is
-`<path> [§<heading>]`: `<path>` (repo-relative) must be a tracked file, and when
-a `§<heading>` fragment is present the file must carry a matching markdown
-heading; a pointer without `§` resolves file-only. Reddens on a missing or
-untracked target file, on a named heading the target lacks, and — fail-closed —
-on a directive that matched the pointer shape but carries no target path.
+Invariant, two passes, forward direction only: every `spec:` / `contract:` pointer **directive** on a governed source resolves, and every free-prose `§<heading>` **citation** on a governed manifest resolves. The directive set is exactly what `check-comment-tier` blesses by shape: full-line `spec:` / `contract:` comments on the governed sources, plus the `# contract:` headers on the workflow directory's **tracked** members (gate-sdk/SPEC.md §The workflow directory owns that tier). That section rules two `contract:` payloads, and this gate honours both: a **version-marker** payload (`<format-name> v<N>`, matched on that section's own anchored shape, and only after `contract:` — a `spec:` directive wearing the shape still resolves as a path) is a wire-format version its owning gate parses, so it names no path, resolves as none, and is counted on the clean line rather than skipped silently. Discriminating it here is what keeps the form usable without a per-consumer whitelist entry. A directive's target grammar is `<path> [§<heading>]`: `<path>` (repo-relative) must be a tracked file, and when a `§<heading>` fragment is present the file must carry a matching markdown heading; a pointer without `§` resolves file-only. Reddens on a missing or untracked target file, on a named heading the target lacks, and — fail-closed — on a directive that matched the pointer shape but carries no target path.
 
-The prose-citation pass closes the gap where a citation woven into a sentence
-(`context-kit/SPEC.md §The memory-off doctrine`) resolved neither file nor
-heading while the structured directive and the markdown-link anchor were both
-verdict-checked. It scans the manifest set (`spec_manifest_files`, the same
-surface the manifest-narration gate family reads) over a blank-line-delimited
-paragraph join so a heading that wraps a line reassembles, and resolves the
-heading through one shared resolution path — the directive pass and the
-citation pass call the same helper, so they cannot diverge. Free prose runs on past the heading with no delimiter, so
-the citation pass matches a heading as a boundary-anchored **prefix** of the
-fragment where the directive pass matches it whole.
+The prose-citation pass closes the gap where a citation woven into a sentence (`context-kit/SPEC.md §The memory-off doctrine`) resolved neither file nor heading while the structured directive and the markdown-link anchor were both verdict-checked. It scans the manifest set (`spec_manifest_files`, the same surface the manifest-narration gate family reads) over a blank-line-delimited paragraph join so a heading that wraps a line reassembles, and resolves the heading through one shared resolution path — the directive pass and the citation pass call the same helper, so they cannot diverge. Free prose runs on past the heading with no delimiter, so the citation pass matches a heading as a boundary-anchored **prefix** of the fragment where the directive pass matches it whole.
 
-The pass reads three citation forms. A `<path>.md §` citation (the path bare or
-as a whole code span), and a markdown link followed by `§` (the link target is the
-path, resolved from the citing file's directory with its `#anchor` stripped),
-resolve against that file. An adjacent path that is not a tracked file is out of
-scope, since path liveness stays with the gates that own it (`check-md-refs`,
-`check-kit-ref-liveness`), and a link target that is not a tracked file (a URL, an
-untracked path) drops to the third form. A `§` with no path resolves against the
-headings of the whole manifest set, the citing file included. Its intended file is
-not syntactic, because prose puts the owning path before the heading, after it or
-nowhere. So this form asserts liveness and not provenance: the heading exists
-somewhere in the governed set, and a citation aimed at the wrong file that carries
-a live title passes. A fragment that does not open with a letter, a digit or a
-backtick is a placeholder (`§<heading>`) or the mark itself, and never fires; nor
-does a `§` quoted inside a code span. The finding says "in no governed file".
-Honest limit: a short heading is a prefix of many fragments, so the union
-under-reds around short titles and never over-reds.
+The pass reads three citation forms. A `<path>.md §` citation (the path bare or as a whole code span), and a markdown link followed by `§` (the link target is the path, resolved from the citing file's directory with its `#anchor` stripped), resolve against that file. An adjacent path that is not a tracked file is out of scope, since path liveness stays with the gates that own it (`check-md-refs`, `check-kit-ref-liveness`), and a link target that is not a tracked file (a URL, an untracked path) drops to the third form. A `§` with no path resolves against the headings of the whole manifest set, the citing file included. Its intended file is not syntactic, because prose puts the owning path before the heading, after it or nowhere. So this form asserts liveness and not provenance: the heading exists somewhere in the governed set, and a citation aimed at the wrong file that carries a live title passes. A fragment that does not open with a letter, a digit or a backtick is a placeholder (`§<heading>`) or the mark itself, and never fires; nor does a `§` quoted inside a code span. The finding says "in no governed file". Honest limit: a short heading is a prefix of many fragments, so the union under-reds around short titles and never over-reds.
 
-**A title names one section per file.** Two headings in one manifest file whose
-qualifier-stripped text is equal are red, at any levels. A resolver takes the first
-match, so a pointer meaning the second binds to the first from the day it is
-written, and no reading of the pointer can tell them apart. The finding names the
-file, both line numbers and the title.
+**A title names one section per file.** Two headings in one manifest file whose qualifier-stripped text is equal are red, at any levels. A resolver takes the first match, so a pointer meaning the second binds to the first from the day it is written, and no reading of the pointer can tell them apart. The finding names the file, both line numbers and the title.
 
-**A *withheld* target is not a dangling one, and the two are told apart by the
-kit root.** A target `<dir>/`*spec name* whose `<dir>` resolves to a directory
-while only the SPEC file is absent is reported as **withheld** and counted on the
-clean line, not as a finding. The live case is a tree that received its kits from
-a payload publishing that file rather than packing it (gate-sdk/SPEC.md §Consumer
-payload): the pointer is correct and its document is reachable, which is already
-what a shipped gate's `# spec:` pointer means there. The discrimination is narrow
-on purpose — a path naming a kit root that does not exist is still a dangling
-pointer, a target present but missing the named heading still reds, and no other
-absent file is excused. Rewriting such a pointer instead would treat a correct
-binding as the defect, and resolving it to a published URL is not available: a
-directive's target is a repo-relative path and the grammar admits no URL form.
+**A *withheld* target is not a dangling one, and the two are told apart by the kit root.** A target `<dir>/`*spec name* whose `<dir>` resolves to a directory while only the SPEC file is absent is reported as **withheld** and counted on the clean line, not as a finding. The live case is a tree that received its kits from a payload publishing that file rather than packing it (gate-sdk/SPEC.md §Consumer payload): the pointer is correct and its document is reachable, which is already what a shipped gate's `# spec:` pointer means there. The discrimination is narrow on purpose — a path naming a kit root that does not exist is still a dangling pointer, a target present but missing the named heading still reds, and no other absent file is excused. Rewriting such a pointer instead would treat a correct binding as the defect, and resolving it to a published URL is not available: a directive's target is a repo-relative path and the grammar admits no URL form.
 
-**The vendored-root prune and this case cover different halves, and reading the
-prune as covering both is what a consumer's seeded files disprove.** At the
-default a vendored kit root is pruned from this gate's corpus, so a pointer
-**inside** a kit root is never scanned. That says nothing about a pointer
-**into** one from a file outside — the `# contract:` headers on the workflow
-directory's tracked members (gate-sdk/SPEC.md §The workflow directory) are
-exactly such a tier, and an installer seeds them. The withheld case above is what
-covers that half. A consumer who sets `CANON_KIT_SCAN_KIT_ROOTS=1` opts the prune
-off and brings the pointers inside those roots into the corpus; the withheld case
-does not silence a heading fragment they carry, its subject being the target file
-rather than the source. Stated so the opt-out's cost is read as a boundary rather
-than discovered as a defect.
+**The vendored-root prune and this case cover different halves, and reading the prune as covering both is what a consumer's seeded files disprove.** At the default a vendored kit root is pruned from this gate's corpus, so a pointer **inside** a kit root is never scanned. That says nothing about a pointer **into** one from a file outside — the `# contract:` headers on the workflow directory's tracked members (gate-sdk/SPEC.md §The workflow directory) are exactly such a tier, and an installer seeds them. The withheld case above is what covers that half. A consumer who sets `CANON_KIT_SCAN_KIT_ROOTS=1` opts the prune off and brings the pointers inside those roots into the corpus; the withheld case does not silence a heading fragment they carry, its subject being the target file rather than the source. Stated so the opt-out's cost is read as a boundary rather than discovered as a defect.
 
-`check-comment-tier` owns the directive's *shape*; this gate adds *resolution*
-on top, the binding a `spec:` pointer makes being only as good as its liveness
-— a renamed or deleted heading leaves every inbound pointer or citation
-dangling, otherwise caught only on review. Heading match tolerates a trailing
-`(qualifier)` on either side: a pointer narrowing a section to a labelled point
-(`§check-graph (assertion G)` → the `check-graph` heading) or a heading carrying
-a locator the pointer omits (`§The guard framework` → `## The guard framework
-(lib/guard.sh)`), and a prose citation may name a heading by its lead clause,
-the text before its first comma, em dash or colon, since a sentence-shaped heading
-is cited by that clause and the fragment runs on into prose. The directive pass
-stays exact. Two `§` carve-outs keep the false-positive floor and must not
-be conflated: a directive's em-dash *prose tail* (`spec: <path> §<h> — <gloss>`)
-strips at the `` — `` so a `§` in the gloss is not read as a heading, while a
-free-prose citation *is* a heading marker, read in the three forms above. Fenced
-code blocks are skipped in both passes — a quoted example is not a citation — and
-a fenced line of a markdown file is never a heading.
+`check-comment-tier` owns the directive's *shape*; this gate adds *resolution* on top, the binding a `spec:` pointer makes being only as good as its liveness — a renamed or deleted heading leaves every inbound pointer or citation dangling, otherwise caught only on review. Heading match tolerates a trailing `(qualifier)` on either side: a pointer narrowing a section to a labelled point (`§check-graph (assertion G)` → the `check-graph` heading) or a heading carrying a locator the pointer omits (`§The guard framework` → `## The guard framework (lib/guard.sh)`), and a prose citation may name a heading by its lead clause, the text before its first comma, em dash or colon, since a sentence-shaped heading is cited by that clause and the fragment runs on into prose. The directive pass stays exact. Two `§` carve-outs keep the false-positive floor and must not be conflated: a directive's em-dash *prose tail* (`spec: <path> §<h> — <gloss>`) strips at the `` — `` so a `§` in the gloss is not read as a heading, while a free-prose citation *is* a heading marker, read in the three forms above. Fenced code blocks are skipped in both passes — a quoted example is not a citation — and a fenced line of a markdown file is never a heading.
 
-Calibration: forward direction only. The reverse — flagging a requirement with
-no inbound pointer as uncovered code — needs a "what counts as a requirement"
-notion that risks false positives against the cheap-and-FP-free bar, so it is
-ruled out (a separate task with its own ruling if ever wanted; this gate
-reserves no syntax for it). Nor does it judge ownership, meaning whether a
-resolving section is the one carrying the cited claim. That is comprehension. The
-one mechanical proxy measured (a backticked token in the citing paragraph that
-occurs in exactly one other section of the target) flagged 15 of 50 citations, and
-none was a wrong-section citation. A red there would train readers to skip the
-gate. Green means the section exists, and review owns the rest. Configuration is
-shared with `check-comment-tier` —
-the whitelist predicate and the same
-`CANON_KIT_COMMENT_*` knobs, so no new config knob — but this gate scans
-the **pruned** comment surface, which drops `templates/` sources where
-`check-comment-tier` keeps them. The split is by design, not a "SPECs don't
-travel" claim: a template's `spec: <your SPEC> §check-<area>` line is a
-placeholder the consumer fills in, unresolvable *by design* in the kit's own
-tree — resolving it there would check the consumer's homework against a stub.
-The tier gate still governs those template comments by *shape* (they must be
-directives), so each gate draws the `templates/` line where its own semantics
-put it. `precommit` tier.
+Calibration: forward direction only. The reverse — flagging a requirement with no inbound pointer as uncovered code — needs a "what counts as a requirement" notion that risks false positives against the cheap-and-FP-free bar, so it is ruled out (a separate task with its own ruling if ever wanted; this gate reserves no syntax for it). Nor does it judge ownership, meaning whether a resolving section is the one carrying the cited claim. That is comprehension. The one mechanical proxy measured (a backticked token in the citing paragraph that occurs in exactly one other section of the target) flagged 15 of 50 citations, and none was a wrong-section citation. A red there would train readers to skip the gate. Green means the section exists, and review owns the rest. Configuration is shared with `check-comment-tier` — the whitelist predicate and the same `CANON_KIT_COMMENT_*` knobs, so no new config knob — but this gate scans the **pruned** comment surface, which drops `templates/` sources where `check-comment-tier` keeps them. The split is by design, not a "SPECs don't travel" claim: a template's `spec: <your SPEC> §check-<area>` line is a placeholder the consumer fills in, unresolvable *by design* in the kit's own tree — resolving it there would check the consumer's homework against a stub. The tier gate still governs those template comments by *shape* (they must be directives), so each gate draws the `templates/` line where its own semantics put it. `precommit` tier.
 
-Retention ruling: the standing doubt — forward-only checking plus the
-basename↔`§<heading>` convention make the pointer largely redundant, its gloss a
-restatement risk — is answered and the roster slot kept. The convention
-derives a section's *name*, never its liveness: absent an inbound pointer,
-renaming or deleting a SPEC heading reddens nothing, and the pointer is the
-only mechanized code→prose coupling (the reverse direction stays a review
-concern per the paragraph above). Sites away from a file's header bind
-sections no naming convention can derive. Narrowing the directive to a bare
-pointer buys nothing: the gloss is already capped at the one-line binding
-(§check-comment-tier), and a gloss restating the cited section is deleted
-under that doctrine, not re-gated here. Dropping the slot would also orphan
-the citation coverage the convention carries — the reason a dedicated
-script↔doc citation gate stays unbuilt.
+Retention ruling: the standing doubt — forward-only checking plus the basename↔`§<heading>` convention make the pointer largely redundant, its gloss a restatement risk — is answered and the roster slot kept. The convention derives a section's *name*, never its liveness: absent an inbound pointer, renaming or deleting a SPEC heading reddens nothing, and the pointer is the only mechanized code→prose coupling (the reverse direction stays a review concern per the paragraph above). Sites away from a file's header bind sections no naming convention can derive. Narrowing the directive to a bare pointer buys nothing: the gloss is already capped at the one-line binding (§check-comment-tier), and a gloss restating the cited section is deleted under that doctrine, not re-gated here. Dropping the slot would also orphan the citation coverage the convention carries — the reason a dedicated script↔doc citation gate stays unbuilt.
 
-**Declared by `check-spec-pointer.gate`, dispatching to the binary**, with its
-`couples=` widened to `*.gate`, `*.rs` and every tracked workflow member on the
-same terms `check-comment-tier`'s is. The gate that reads a `# spec:` directive
-is now itself declared by one, so a member of this family reads its own cohort's
-descriptors — which is why the fixture pair carries a descriptor arm rather than
-resting on the live tree to exercise it.
+**Declared by `check-spec-pointer.gate`, dispatching to the binary**, with its `couples=` widened to `*.gate`, `*.rs` and every tracked workflow member on the same terms `check-comment-tier`'s is. The gate that reads a `# spec:` directive is now itself declared by one, so a member of this family reads its own cohort's descriptors — which is why the fixture pair carries a descriptor arm rather than resting on the live tree to exercise it.
 
 ### check-todo-task-liveness
 
-Invariant: every `TODO(task: <slug>)` marker on a governed source resolves to a
-live queue task. A `<slug>` naming an active or deferred task resolves; a slug
-sitting in `Done` is **stale** (the entry left the live pool, the marker did
-not); a slug absent from the queue is **unresolved** (a typo or an unfiled
-task). Stale and unresolved both redden — a marker referencing nothing is a
-dangling forward reference, the source-side twin of a `blocked-by` tag left
-pointing at a slug that has exited. The verdict does not turn on whether the
-work *shipped*: a Done line records an exit from the live pool and not a
-delivery (queue-kit/SPEC.md §The queue format), and a marker waiting on an
-entry that was mooted is as dangling as one waiting on an entry that landed.
+Invariant: every `TODO(task: <slug>)` marker on a governed source resolves to a live queue task. A `<slug>` naming an active or deferred task resolves; a slug sitting in `Done` is **stale** (the entry left the live pool, the marker did not); a slug absent from the queue is **unresolved** (a typo or an unfiled task). Stale and unresolved both redden — a marker referencing nothing is a dangling forward reference, the source-side twin of a `blocked-by` tag left pointing at a slug that has exited. The verdict does not turn on whether the work *shipped*: a Done line records an exit from the live pool and not a delivery (queue-kit/SPEC.md §The queue format), and a marker waiting on an entry that was mooted is as dangling as one waiting on an entry that landed.
 
-`check-comment-tier` owns the marker's *shape* — it blesses `TODO(task:` as a
-reason directive — and this gate adds *resolution* on top, exactly as
-`check-spec-pointer` adds resolution to the `spec:` shape the same tier gate
-blesses. It closes the liveness gap those siblings already guard elsewhere:
-`check-task-names` flags a `blocked-by` gone stale on a done slug and
-`check-gate-exemption-tasks` resolves an exemption's `# until:` slug against the
-live set, but a `TODO(task:)` bound to a cleared task passed forever because
-nothing read the source side. The marker requires a resolvable slug after the
-colon, so a tool carrying the bare roster literal (`check-comment-tier`'s own
-directive name) never self-matches, and full-line versus trailing placement is
-immaterial: resolution governs the referent, not the comment tier. Bare
-`TODO`/`FIXME`/`HACK` markers are out of scope — trailing-comment scanning is a
-separate ruling if the need attests.
+`check-comment-tier` owns the marker's *shape* — it blesses `TODO(task:` as a reason directive — and this gate adds *resolution* on top, exactly as `check-spec-pointer` adds resolution to the `spec:` shape the same tier gate blesses. It closes the liveness gap those siblings already guard elsewhere: `check-task-names` flags a `blocked-by` gone stale on a done slug and `check-gate-exemption-tasks` resolves an exemption's `# until:` slug against the live set, but a `TODO(task:)` bound to a cleared task passed forever because nothing read the source side. The marker requires a resolvable slug after the colon, so a tool carrying the bare roster literal (`check-comment-tier`'s own directive name) never self-matches, and full-line versus trailing placement is immaterial: resolution governs the referent, not the comment tier. Bare `TODO`/`FIXME`/`HACK` markers are out of scope — trailing-comment scanning is a separate ruling if the need attests.
 
-Placement: the marker is a comment directive on the governed comment surface, so
-it is canon-kit's, not queue-kit's (which disclaims source-file conventions in
-its Out of scope). The gate scans the pruned comment surface, dropping `templates/`
-as placeholders-by-design like `check-spec-pointer`, and reads the queue through
-`CANON_KIT_QUEUE_FILE` with no new knob — the live/done split is the shared
-`queue_slugs` adapter (§The shared spec adapters), one queue walk reading a bare-slug
-bullet outside the active and deferred sections as the queue's done shape. That
-`task: <slug>` binding grammar — a `task:` key naming a slug that must resolve
-to a live queue entry — is one grammar both liveness gates share:
-`check-deprecation-task` is the twin, resolving the same binding on a
-deprecation marker through the same adapter (§check-deprecation-task). Latent at landing: no such marker exists in
-the tree yet — the gate ships before the first one, so a future `TODO(task:)`
-cannot outlive its task silently. A queue-read failure is fail-closed (exit 2).
-`precommit` tier. **Declared by `check-todo-task-liveness.gate`, dispatching to
-the binary**, its `couples=` widened to `*.gate` and `*.rs` and its
-`.workflow/*.txt` spelling corrected to `.workflow/*`, which is the tier the
-corpus actually takes.
+Placement: the marker is a comment directive on the governed comment surface, so it is canon-kit's, not queue-kit's (which disclaims source-file conventions in its Out of scope). The gate scans the pruned comment surface, dropping `templates/` as placeholders-by-design like `check-spec-pointer`, and reads the queue through `CANON_KIT_QUEUE_FILE` with no new knob — the live/done split is the shared `queue_slugs` adapter (§The shared spec adapters), one queue walk reading a bare-slug bullet outside the active and deferred sections as the queue's done shape. That `task: <slug>` binding grammar — a `task:` key naming a slug that must resolve to a live queue entry — is one grammar both liveness gates share: `check-deprecation-task` is the twin, resolving the same binding on a deprecation marker through the same adapter (§check-deprecation-task). Latent at landing: no such marker exists in the tree yet — the gate ships before the first one, so a future `TODO(task:)` cannot outlive its task silently. A queue-read failure is fail-closed (exit 2). `precommit` tier. **Declared by `check-todo-task-liveness.gate`, dispatching to the binary**, its `couples=` widened to `*.gate` and `*.rs` and its `.workflow/*.txt` spelling corrected to `.workflow/*`, which is the tier the corpus actually takes.
 
 ### check-deprecation-task
 
-Invariant: every deprecation marker on a governed source binds a `task: <slug>`
-that resolves to a live queue task. The marker vocabulary is consumer config —
-`CANON_KIT_DEPRECATION_MARKERS`, a roster of regexes (one per element) matched
-against the governed comment surface. A language's marker spelling is never a
-kit literal: the roster ships empty, so a repo that sets none is clean-skipped
-(the `check-graph`/`graph-vocab` seam — the kit ships the resolution mechanism,
-the consumer names its own `#[deprecated]`, `@deprecated`, or `@Deprecated`).
-The descriptor declares `# armed-by:` on the roster, so `doctor` names a
-registered member still skipping (gate-sdk/SPEC.md §The install disposition).
-The scan itself stays consumer toolchain — a clippy/ESLint-class linter already
-inventories deprecation markers; this gate adds the governance coupling no
-linter ships: a deprecated surface that names no decommission task, or names a
-done or absent one, has nothing tracking its removal.
+Invariant: every deprecation marker on a governed source binds a `task: <slug>` that resolves to a live queue task. The marker vocabulary is consumer config — `CANON_KIT_DEPRECATION_MARKERS`, a roster of regexes (one per element) matched against the governed comment surface. A language's marker spelling is never a kit literal: the roster ships empty, so a repo that sets none is clean-skipped (the `check-graph`/`graph-vocab` seam — the kit ships the resolution mechanism, the consumer names its own `#[deprecated]`, `@deprecated`, or `@Deprecated`). The descriptor declares `# armed-by:` on the roster, so `doctor` names a registered member still skipping (gate-sdk/SPEC.md §The install disposition). The scan itself stays consumer toolchain — a clippy/ESLint-class linter already inventories deprecation markers; this gate adds the governance coupling no linter ships: a deprecated surface that names no decommission task, or names a done or absent one, has nothing tracking its removal.
 
-A marker line carrying no `task: <slug>` is **unbound**; a bound slug sitting in
-`Done` is **stale** (the decommission finished, the marker did not); a bound
-slug absent from the queue is **unresolved**. All three redden — each finding
-names the file, the line, the matched marker, and the offending slug. The
-binding grammar and the queue-resolution pass are `check-todo-task-liveness`'s:
-the same `task: <slug>` key over the same `queue_slugs` adapter
-(§check-todo-task-liveness, §The shared spec adapters), one grammar both liveness gates
-share. The gate scans the pruned comment surface (templates dropped as
-placeholders-by-design) and reads the queue through `CANON_KIT_QUEUE_FILE`, no
-new knob beyond the roster. An unreadable queue or source is fail-closed
-(exit 2); an empty roster is the clean skip, not an error.
+A marker line carrying no `task: <slug>` is **unbound**; a bound slug sitting in `Done` is **stale** (the decommission finished, the marker did not); a bound slug absent from the queue is **unresolved**. All three redden — each finding names the file, the line, the matched marker, and the offending slug. The binding grammar and the queue-resolution pass are `check-todo-task-liveness`'s: the same `task: <slug>` key over the same `queue_slugs` adapter (§check-todo-task-liveness, §The shared spec adapters), one grammar both liveness gates share. The gate scans the pruned comment surface (templates dropped as placeholders-by-design) and reads the queue through `CANON_KIT_QUEUE_FILE`, no new knob beyond the roster. An unreadable queue or source is fail-closed (exit 2); an empty roster is the clean skip, not an error.
 
-**Declared by `check-deprecation-task.gate`, dispatching to the binary**, with
-the same widened `couples=` its twin carries. The roster is where this member
-parts from its three siblings: it is a consumer array joined into one alternation
-and **interpreted**, so the compiled form compiles it through the crate's POSIX
-ERE matcher (gate-sdk/SPEC.md §The POSIX ERE matcher) and reports the offending
-knob by name on a pattern the engine refuses. One shell defect went with the
-port, found by widening the fixture pair rather than by review: the unbound
-finding named the marker as `''`, because the record carried an empty slug field
-*between* two populated ones and `IFS=$'\t' read` collapses a tab run. It was
-repaired in the shell before the port, so the parity run proves the repaired
-message on both substrates rather than freezing the defect into the compiled
-form.
+**Declared by `check-deprecation-task.gate`, dispatching to the binary**, with the same widened `couples=` its twin carries. The roster is where this member parts from its three siblings: it is a consumer array joined into one alternation and **interpreted**, so the compiled form compiles it through the crate's POSIX ERE matcher (gate-sdk/SPEC.md §The POSIX ERE matcher) and reports the offending knob by name on a pattern the engine refuses. One shell defect went with the port, found by widening the fixture pair rather than by review: the unbound finding named the marker as `''`, because the record carried an empty slug field *between* two populated ones and `IFS=$'\t' read` collapses a tab run. It was repaired in the shell before the port, so the parity run proves the repaired message on both substrates rather than freezing the defect into the compiled form.
 
-A tree that sets no roster gets the clean skip, so the good/bad fixture
-pair and `check-deprecation-task.test.sh` carry the resolved and reddened paths
-under a fixture-local roster (the `check-manifest-count` config-path precedent).
-The release-boundary disposition walk over the standing marker inventory
-(decommission now, re-justify and carry the task forward, or un-deprecate) is
-lifecycle-kit's `release-sweep` skill template, and the between-major backlog
-trend over the same roster is drift-kit's `kpi-deprecated-surface` example
-(lifecycle-kit/SPEC.md §templates/release-sweep.md, drift-kit/SPEC.md §Out of
-scope). `precommit` tier.
+A tree that sets no roster gets the clean skip, so the good/bad fixture pair and `check-deprecation-task.test.sh` carry the resolved and reddened paths under a fixture-local roster (the `check-manifest-count` config-path precedent). The release-boundary disposition walk over the standing marker inventory (decommission now, re-justify and carry the task forward, or un-deprecate) is lifecycle-kit's `release-sweep` skill template, and the between-major backlog trend over the same roster is drift-kit's `kpi-deprecated-surface` example (lifecycle-kit/SPEC.md §templates/release-sweep.md, drift-kit/SPEC.md §Out of scope). `precommit` tier.
 
 ### check-tracking-claim
 
-Invariant: every **tracking claim** on a governed manifest surface agrees with
-git. A tracking claim is a fixed-vocabulary predicate bound to the backticked
-repo-relative path token it follows:
+Invariant: every **tracking claim** on a governed manifest surface agrees with git. A tracking claim is a fixed-vocabulary predicate bound to the backticked repo-relative path token it follows:
 
 | Predicate | Holds when |
 | --- | --- |
@@ -2663,136 +515,27 @@ repo-relative path token it follows:
 | `is gitignored`, `is local-only` | the path has ignored members and no tracked ones |
 | `is two-tier` | both classes are non-empty — the path holds tracked and ignored members |
 
-It exists because the defect class it catches — an always-loaded surface
-asserting a directory is committed while part of it is gitignored — is invisible
-to every other gate the kit ships: `check-md-refs` resolves paths,
-`check-spec-pointer` resolves headings, and neither reads what the sentence
-*claims* about the path. Resolution: a path naming a directory expands to its
-members (`git ls-files` for the tracked side, `git check-ignore --no-index` on
-the path for the ignored side); a path naming a file is its own single member.
-The ignored side is read from the rules, not the working tree, so a gitignored
-runtime path with no file in a fresh checkout still resolves — a presence read
-(`ls-files --others --ignored`, which lists only files that exist) made the same
-claim verify locally and red in CI. `--no-index` is load-bearing for the mixed
-predicate: plain `check-ignore` refuses to report a directory that has a tracked
-member as ignored, and a two-tier directory always has one. The mixed predicate
-is what lets an honestly-mixed directory have a true sentence at all — without
-it, the always-loaded tier could only be given a false one. Its rule-based proof
-reaches only a directory the rules match whole (a `dir/` pattern) that also
-carries a tracked member; a directory whose ignored members are matched by file
-patterns, the directory itself matching no rule, has no rule-based two-tier proof
-and stays a prose description.
+It exists because the defect class it catches — an always-loaded surface asserting a directory is committed while part of it is gitignored — is invisible to every other gate the kit ships: `check-md-refs` resolves paths, `check-spec-pointer` resolves headings, and neither reads what the sentence *claims* about the path. Resolution: a path naming a directory expands to its members (`git ls-files` for the tracked side, `git check-ignore --no-index` on the path for the ignored side); a path naming a file is its own single member. The ignored side is read from the rules, not the working tree, so a gitignored runtime path with no file in a fresh checkout still resolves — a presence read (`ls-files --others --ignored`, which lists only files that exist) made the same claim verify locally and red in CI. `--no-index` is load-bearing for the mixed predicate: plain `check-ignore` refuses to report a directory that has a tracked member as ignored, and a two-tier directory always has one. The mixed predicate is what lets an honestly-mixed directory have a true sentence at all — without it, the always-loaded tier could only be given a false one. Its rule-based proof reaches only a directory the rules match whole (a `dir/` pattern) that also carries a tracked member; a directory whose ignored members are matched by file patterns, the directory itself matching no rule, has no rule-based two-tier proof and stays a prose description.
 
-Reddens on a predicate whose verification fails, and — fail-closed — on a bound
-path that exists in neither the index, the ignore rules, nor the working tree,
-since an unresolvable path makes the claim unverifiable rather than true.
+Reddens on a predicate whose verification fails, and — fail-closed — on a bound path that exists in neither the index, the ignore rules, nor the working tree, since an unresolvable path makes the claim unverifiable rather than true.
 
-Surface: the manifest set (`spec_manifest_files`, the same surface the
-manifest-narration gate family reads). **No new knob**: the predicate vocabulary
-is kit-owned generic English, and which surfaces are governed is a knob that
-already exists. Fenced code blocks are skipped, matching `check-spec-pointer` —
-a quoted example is not a claim — and a predicate inside an inline code span is
-a meta-reference, not an assertion (`check-manifest-count`'s carve-out, same
-reason), which is what lets this section name its own vocabulary.
+Surface: the manifest set (`spec_manifest_files`, the same surface the manifest-narration gate family reads). **No new knob**: the predicate vocabulary is kit-owned generic English, and which surfaces are governed is a knob that already exists. Fenced code blocks are skipped, matching `check-spec-pointer` — a quoted example is not a claim — and a predicate inside an inline code span is a meta-reference, not an assertion (`check-manifest-count`'s carve-out, same reason), which is what lets this section name its own vocabulary.
 
-Calibration, stated as the gate's honest limit: **forward direction only, fixed
-vocabulary only, adjacency only.** The gate fires on the listed predicates and
-rules on nothing else; a claim phrased any other way ("the workflow directory
-ships in the repo") is out of scope and stays a review concern — the same
-forward-only bar `check-spec-pointer` holds, and for the same reason: widening to
-"any sentence asserting tracking" needs a notion of assertion that cannot hold
-the false-positive floor. **Adjacency is the binding**: only whitespace may sit
-between the path's closing backtick and the predicate, so a clause in between
-unbinds it (`` `core-files.list` `` *manifest exists in the worktree and* is
-tracked is correctly not a claim). That is deliberate under-detection, and it is
-what buys the false-positive floor: the fixture pair covers both directions.
+Calibration, stated as the gate's honest limit: **forward direction only, fixed vocabulary only, adjacency only.** The gate fires on the listed predicates and rules on nothing else; a claim phrased any other way ("the workflow directory ships in the repo") is out of scope and stays a review concern — the same forward-only bar `check-spec-pointer` holds, and for the same reason: widening to "any sentence asserting tracking" needs a notion of assertion that cannot hold the false-positive floor. **Adjacency is the binding**: only whitespace may sit between the path's closing backtick and the predicate, so a clause in between unbinds it (`` `core-files.list` `` *manifest exists in the worktree and* is tracked is correctly not a claim). That is deliberate under-detection, and it is what buys the false-positive floor: the fixture pair covers both directions.
 
-The gate landed green over this repo — two claims (`.tmp/` and `.metric/`, both
-gitignored), each verified rule-based against the ignore rules; a third
-directory, `.workflow/`, is described in prose citing gate-sdk/SPEC.md §The
-workflow directory rather than as a bound claim, because its ignored members are
-file-pattern-matched and the directory itself matches no rule, so no rule-based
-two-tier proof exists for it. No
-backfill. That is the expected shape: it is a regression gate for a defect that already shipped on the
-always-loaded tier, not a discovery tool, and §When a gate earns its place in
-gate-sdk/SPEC.md governs that class. No per-site valve is taken: a claim that
-cannot be made true is a claim that must be reworded, and a valve would restore
-exactly the unverified-prose state the gate exists to end. Tier `precommit`; the
-`# graph:` manifest couples the manifest set and `.gitignore`.
+The gate landed green over this repo — two claims (`.tmp/` and `.metric/`, both gitignored), each verified rule-based against the ignore rules; a third directory, `.workflow/`, is described in prose citing gate-sdk/SPEC.md §The workflow directory rather than as a bound claim, because its ignored members are file-pattern-matched and the directory itself matches no rule, so no rule-based two-tier proof exists for it. No backfill. That is the expected shape: it is a regression gate for a defect that already shipped on the always-loaded tier, not a discovery tool, and §When a gate earns its place in gate-sdk/SPEC.md governs that class. No per-site valve is taken: a claim that cannot be made true is a claim that must be reworded, and a valve would restore exactly the unverified-prose state the gate exists to end. Tier `precommit`; the `# graph:` manifest couples the manifest set and `.gitignore`.
 
 ### check-spec-fence-balance
 
-Invariant: every governed markdown file carries an even count of code-fence
-delimiters (lines opening with ```` ``` ````). The fence-skipping parsers across
-the kits — `check-spec-embedded-source`, `check-tag-lead-line`, the queue
-scanners — all toggle a fence flag line by line; an odd count leaves the flag
-stuck and the rest of the file is read *inside* a phantom fence, so every later
-finding silently fails open. This gate turns that silent hole into a red. The
-surface is the manifest set (`spec_manifest_files`) plus the configured queue
-file (`CANON_KIT_QUEUE_FILE`) — two motivating parsers (`check-tag-lead-line`,
-`check-queue-wrap`) scan the queue, which the manifest set excludes — with no
-new knob. A grep error (not a no-match) is fail-closed (exit 2).
+Invariant: every governed markdown file carries an even count of code-fence delimiters (lines opening with ```` ``` ````). The fence-skipping parsers across the kits — `check-spec-embedded-source`, `check-tag-lead-line`, the queue scanners — all toggle a fence flag line by line; an odd count leaves the flag stuck and the rest of the file is read *inside* a phantom fence, so every later finding silently fails open. This gate turns that silent hole into a red. The surface is the manifest set (`spec_manifest_files`) plus the configured queue file (`CANON_KIT_QUEUE_FILE`) — two motivating parsers (`check-tag-lead-line`, `check-queue-wrap`) scan the queue, which the manifest set excludes — with no new knob. A grep error (not a no-match) is fail-closed (exit 2).
 
 ### check-md-refs
 
-Invariant: every internal markdown link in the governed doc set resolves. A
-relative-path target (with the source file's directory as the base) must be a
-tracked file, or a directory holding tracked files; a `#anchor` — alone
-(same-file) or trailing a path — must match the GitHub heading slug of a
-heading in the target file. External URLs (`scheme://`, `mailto:`) are out of
-scope: the network is not a gate dependency. The doc set is the manifest set
-(`CLAUDE.md` included; a vendored kit's own `README.md` only where
-`CANON_KIT_SCAN_KIT_ROOTS` re-includes it) minus the `CANON_KIT_MDREF_EXCLUDE` globs
-(default empty, for a consumer's generated docs); the scan runs over tracked
-sources only, so an untracked local-only file (a `*.local.md`) is a legitimate
-link *source* that is never scanned and, being git-ignored-and-present, a
-legitimate *target* that resolves without being tracked. A grep error is
-fail-closed (exit 2). The link extractor is purely syntactic — it matches the
-bracket-then-paren link shape (a `]` immediately followed by a parenthesized
-target) without stripping code spans, so a literal markdown link written in
-governed prose is scanned as a real link even inside inline backticks; to name
-such a link in prose without tripping the gate, separate the `]` and the `(`
-(a space). The amendment `SPEC-*.md`
-files escape only by lying outside the scanned doc set, not by any code-span
-exemption. Links are this gate's charge; the sibling `check-docs-cmd` takes the
-invoked commands and env knobs written inside fences and backticks, over the
-same governed doc set (one shared set, no second knob).
+Invariant: every internal markdown link in the governed doc set resolves. A relative-path target (with the source file's directory as the base) must be a tracked file, or a directory holding tracked files; a `#anchor` — alone (same-file) or trailing a path — must match the GitHub heading slug of a heading in the target file. External URLs (`scheme://`, `mailto:`) are out of scope: the network is not a gate dependency. The doc set is the manifest set (`CLAUDE.md` included; a vendored kit's own `README.md` only where `CANON_KIT_SCAN_KIT_ROOTS` re-includes it) minus the `CANON_KIT_MDREF_EXCLUDE` globs (default empty, for a consumer's generated docs); the scan runs over tracked sources only, so an untracked local-only file (a `*.local.md`) is a legitimate link *source* that is never scanned and, being git-ignored-and-present, a legitimate *target* that resolves without being tracked. A grep error is fail-closed (exit 2). The link extractor is purely syntactic — it matches the bracket-then-paren link shape (a `]` immediately followed by a parenthesized target) without stripping code spans, so a literal markdown link written in governed prose is scanned as a real link even inside inline backticks; to name such a link in prose without tripping the gate, separate the `]` and the `(` (a space). The amendment `SPEC-*.md` files escape only by lying outside the scanned doc set, not by any code-span exemption. Links are this gate's charge; the sibling `check-docs-cmd` takes the invoked commands and env knobs written inside fences and backticks, over the same governed doc set (one shared set, no second knob).
 
-**The self-repo blob-link pass.** An absolute link is normally out of scope —
-the network is not a gate dependency — with one exception: a link into this
-same repository's GitHub tree, which resolves against the working tree exactly
-as a relative link does. The repo identity is derived at gate runtime from
-`git remote get-url origin` through the shared `gate_self_repo_prefix` adapter
-(gate-sdk/SPEC.md §lib/gate.sh), so the resolver here and any reference-link
-*producer* draw one identity; the `git@host:owner/repo` and
-`https://host/owner/repo[.git]` remote forms normalize to one
-`https://host/owner/repo` identity, so the kit ships no repo name (the
-provenance seam holds) and CI's checkout and a local clone alike supply it. A
-link whose prefix is `<identity>/blob/<CANON_KIT_DOCS_BLOB_REF>/` (the ref
-default `master`) is a self-repo reference link: its `<path>` must be a
-git-tracked file, and a trailing `#anchor` must slug — under the same GitHub
-heading-slug rules the same-file anchors use — to a heading in that file. A
-repo with no `origin` skips the pass: a self-repo link cannot be identified, so
-it falls through to the external-URL skip. The ref is a knob rather than a
-literal because it is a policy choice, not a derived fact — the site is living
-documentation of the current tree, so a reference link pins to the default
-branch, and a tag-pinned reference copy would buy
-staleness, not stability.
+**The self-repo blob-link pass.** An absolute link is normally out of scope — the network is not a gate dependency — with one exception: a link into this same repository's GitHub tree, which resolves against the working tree exactly as a relative link does. The repo identity is derived at gate runtime from `git remote get-url origin` through the shared `gate_self_repo_prefix` adapter (gate-sdk/SPEC.md §lib/gate.sh), so the resolver here and any reference-link *producer* draw one identity; the `git@host:owner/repo` and `https://host/owner/repo[.git]` remote forms normalize to one `https://host/owner/repo` identity, so the kit ships no repo name (the provenance seam holds) and CI's checkout and a local clone alike supply it. A link whose prefix is `<identity>/blob/<CANON_KIT_DOCS_BLOB_REF>/` (the ref default `master`) is a self-repo reference link: its `<path>` must be a git-tracked file, and a trailing `#anchor` must slug — under the same GitHub heading-slug rules the same-file anchors use — to a heading in that file. A repo with no `origin` skips the pass: a self-repo link cannot be identified, so it falls through to the external-URL skip. The ref is a knob rather than a literal because it is a policy choice, not a derived fact — the site is living documentation of the current tree, so a reference link pins to the default branch, and a tag-pinned reference copy would buy staleness, not stability.
 
-**Coverage the good/bad pair cannot hold**, and where it lives:
-`gate-tests/check-md-refs.test.sh`. The harness resolves exactly one `good/` and
-one `bad/` case dir per gate, and this gate's pair is spent on the core
-link-resolution logic, so two behaviors ride a bespoke test instead. The
-self-repo pass is the first: each case builds a throwaway repo with a controlled
-`origin`, which a case dir run inside this repo cannot do. The kit-root prune on
-the manifest set's README half is the second, and the two cases differ only in
-`CANON_KIT_SCAN_KIT_ROOTS` over one tree — a shape the pair's
-one-tree-per-verdict form cannot express even with a slot free. That second half
-is the **only** executable oracle the prune has: a kit-authoring tree sets the
-knob, so its battery is a no-op on it, and a vendoring consumer's knob is `0`
-either way, so no consumer-smoke run distinguishes a knob-gated prune from an unconditional one.
-The sibling `gate-tests/check-spec-dod-singleton.test.sh` carries the same
-prune's canonical-spec half for the same reason.
+**Coverage the good/bad pair cannot hold**, and where it lives: `gate-tests/check-md-refs.test.sh`. The harness resolves exactly one `good/` and one `bad/` case dir per gate, and this gate's pair is spent on the core link-resolution logic, so two behaviors ride a bespoke test instead. The self-repo pass is the first: each case builds a throwaway repo with a controlled `origin`, which a case dir run inside this repo cannot do. The kit-root prune on the manifest set's README half is the second, and the two cases differ only in `CANON_KIT_SCAN_KIT_ROOTS` over one tree — a shape the pair's one-tree-per-verdict form cannot express even with a slot free. That second half is the **only** executable oracle the prune has: a kit-authoring tree sets the knob, so its battery is a no-op on it, and a vendoring consumer's knob is `0` either way, so no consumer-smoke run distinguishes a knob-gated prune from an unconditional one. The sibling `gate-tests/check-spec-dod-singleton.test.sh` carries the same prune's canonical-spec half for the same reason.
 
 ### check-md-unwrapped
 
@@ -2812,734 +555,184 @@ Invariant: in the governed markdown set, no paragraph is broken across physical 
 
 ### The reference-link grammar
 
-A docs-site page cites two kinds of in-repo target, and the grammar splits on
-which. A *rendered-document* reference — a `SPEC.md`, its sibling `README.md`,
-or the doctrine deliverable — cites the on-site mirror of that document
-*relatively* when the site publishes one: a generated, freshness-gated
-projection under `docs/<dir>/` that keeps reference reading on the served site.
-**The mirror's corpus is every top-level directory holding a `SPEC.md`, not
-every kit root.** A directory joins it by acquiring one, so a rendered document
-belonging to no kit is mirrored on the same terms as a kit's, and the freshness
-gate's coupling declares that corpus rather than a per-kit expansion of it — a
-coupling narrower than what the emitter reads would leave the wider half
-ungated. The mirror preserves the
-documents' cross-citation topology one-to-one, so the relative shape a page
-uses is the same shape the source tree uses. A *source* reference — a script, a
-gate body, config, a directory: files the site does not render — cites the tree
-with an absolute GitHub blob link
-`https://<host>/<owner>/<repo>/blob/<ref>/<path>[#anchor]`, anchored when it
-names a section, because a relative link into the unrendered surrounding tree
-would 404 on a site that serves `docs/` alone. **That prescription is held by
-`check-docs-link-convention`'s off-root rule** (§check-docs-link-convention
-below): a relative link whose target resolves outside the site root is a
-violation, so the requirement above is enforced rather than merely stated.
-Both are the downward-citation shape of the tiering topology, one on-site and
-one off. Resolution of the blob form belongs to `check-md-refs`' self-repo pass
-(identity derivation and the ref knob live there); `check-docs-link-convention`
-owns the shape of the relative links that stay inside `docs/`. The mirror is
-what a site opts into, not a precondition of the grammar: absent a published
-mirror, rendered-document references fall back to the same off-site blob form
-as source references.
+A docs-site page cites two kinds of in-repo target, and the grammar splits on which. A *rendered-document* reference — a `SPEC.md`, its sibling `README.md`, or the doctrine deliverable — cites the on-site mirror of that document *relatively* when the site publishes one: a generated, freshness-gated projection under `docs/<dir>/` that keeps reference reading on the served site. **The mirror's corpus is every top-level directory holding a `SPEC.md`, not every kit root.** A directory joins it by acquiring one, so a rendered document belonging to no kit is mirrored on the same terms as a kit's, and the freshness gate's coupling declares that corpus rather than a per-kit expansion of it — a coupling narrower than what the emitter reads would leave the wider half ungated. The mirror preserves the documents' cross-citation topology one-to-one, so the relative shape a page uses is the same shape the source tree uses. A *source* reference — a script, a gate body, config, a directory: files the site does not render — cites the tree with an absolute GitHub blob link `https://<host>/<owner>/<repo>/blob/<ref>/<path>[#anchor]`, anchored when it names a section, because a relative link into the unrendered surrounding tree would 404 on a site that serves `docs/` alone. **That prescription is held by `check-docs-link-convention`'s off-root rule** (§check-docs-link-convention below): a relative link whose target resolves outside the site root is a violation, so the requirement above is enforced rather than merely stated. Both are the downward-citation shape of the tiering topology, one on-site and one off. Resolution of the blob form belongs to `check-md-refs`' self-repo pass (identity derivation and the ref knob live there); `check-docs-link-convention` owns the shape of the relative links that stay inside `docs/`. The mirror is what a site opts into, not a precondition of the grammar: absent a published mirror, rendered-document references fall back to the same off-site blob form as source references.
 
 ### check-docs-link-convention
 
-`checks/check-docs-link-convention.gate` (`precommit`, binary-dispatched).
-Invariant: every relative markdown link on a docs-site page obeys the
-downward-citation *shape* — the resolution of those links is `check-md-refs`'
-charge, and this gate owns shape alone. Absolute reference links (the off-site
-blob grammar above) are out of this gate's scope entirely: their resolution is
-`check-md-refs`' self-repo pass, and this gate turns only on the relative links
-that stay inside the tree. Each rule is scoped to the docs tree
-because the "kit page" it turns on (a `<root>/<kit>/index.md`) exists only
-there:
+`checks/check-docs-link-convention.gate` (`precommit`, binary-dispatched). Invariant: every relative markdown link on a docs-site page obeys the downward-citation *shape* — the resolution of those links is `check-md-refs`' charge, and this gate owns shape alone. Absolute reference links (the off-site blob grammar above) are out of this gate's scope entirely: their resolution is `check-md-refs`' self-repo pass, and this gate turns only on the relative links that stay inside the tree. Each rule is scoped to the docs tree because the "kit page" it turns on (a `<root>/<kit>/index.md`) exists only there:
 
-- **No directory-target link.** A relative link whose target names a directory
-  (a trailing `/`, or a path that resolves to a tracked directory) must instead
-  name the file — `kit/index.md`, never `kit/`. A bare directory link is
-  ambiguous about what the page is citing and defeats anchor-level citation.
-- **Anchored kit back-links.** On a kit page (`<root>/<kit>/index.md`), a link
-  back to that same kit's own `README.md` or `SPEC.md` must carry a `#section`
-  anchor. A page cites downward into a *named* section, never at the whole spec —
-  the anti-restatement doctrine expressed as a link shape.
-- **No off-root relative link.** A relative link whose target *resolves* to an
-  existing path outside `CANON_KIT_LINK_ROOT` must instead cite the absolute
-  self-repo blob form (§The reference-link grammar). The rule turns on the
-  resolved path, not the link text, so a `../`-prefixed link that resolves back
-  under the root is silent. Only resolving targets are classified — a relative
-  target that resolves to nothing is `check-md-refs`' finding alone, and this
-  rule does not double-report it; a directory target outside the root still
-  satisfies the first rule's predicate first and is reported there, once.
-  Anchors and absolute URLs never fire, by the gate's existing scope. Generated
-  mirror pages (`generated: true` front matter) are in scope, deliberately: their
-  off-root conformance is a property of the generator that emits them, which is a
-  thing that can regress, and exempting them would blind the corpus's larger half.
-  The existing `docs-link-exempt: <reason>` valve suppresses this rule as it does
-  the other two — no second valve.
+- **No directory-target link.** A relative link whose target names a directory (a trailing `/`, or a path that resolves to a tracked directory) must instead name the file — `kit/index.md`, never `kit/`. A bare directory link is ambiguous about what the page is citing and defeats anchor-level citation.
+- **Anchored kit back-links.** On a kit page (`<root>/<kit>/index.md`), a link back to that same kit's own `README.md` or `SPEC.md` must carry a `#section` anchor. A page cites downward into a *named* section, never at the whole spec — the anti-restatement doctrine expressed as a link shape.
+- **No off-root relative link.** A relative link whose target *resolves* to an existing path outside `CANON_KIT_LINK_ROOT` must instead cite the absolute self-repo blob form (§The reference-link grammar). The rule turns on the resolved path, not the link text, so a `../`-prefixed link that resolves back under the root is silent. Only resolving targets are classified — a relative target that resolves to nothing is `check-md-refs`' finding alone, and this rule does not double-report it; a directory target outside the root still satisfies the first rule's predicate first and is reported there, once. Anchors and absolute URLs never fire, by the gate's existing scope. Generated mirror pages (`generated: true` front matter) are in scope, deliberately: their off-root conformance is a property of the generator that emits them, which is a thing that can regress, and exempting them would blind the corpus's larger half. The existing `docs-link-exempt: <reason>` valve suppresses this rule as it does the other two — no second valve.
 
-The scanned tree is `CANON_KIT_LINK_ROOT` (default `docs`; the fixture pair
-overrides it with a positional arg pointing at a synthetic tree), walked for
-every `*.md`. The link extractor is the same syntactic bracket-then-paren match
-`check-md-refs` uses; `scheme://` and `mailto:` targets are out of scope, and a
-pure `#anchor` (no path) satisfies neither rule. Per-site valve: a
-`docs-link-exempt: <reason>` HTML comment on the link line or the one directly
-above suppresses that one finding — for the rare legitimate directory link a
-consumer's layout demands. A missing scan root is fail-closed (exit 2).
+The scanned tree is `CANON_KIT_LINK_ROOT` (default `docs`; the fixture pair overrides it with a positional arg pointing at a synthetic tree), walked for every `*.md`. The link extractor is the same syntactic bracket-then-paren match `check-md-refs` uses; `scheme://` and `mailto:` targets are out of scope, and a pure `#anchor` (no path) satisfies neither rule. Per-site valve: a `docs-link-exempt: <reason>` HTML comment on the link line or the one directly above suppresses that one finding — for the rare legitimate directory link a consumer's layout demands. A missing scan root is fail-closed (exit 2).
 
-**The walk is unpruned, deliberately, and the port carries that rather than the
-kit's shared prune set** (gate-sdk/SPEC.md §The fourth budget batch): the shell
-form reached for a bare `find` rather than `gate_find`, so a docs tree with a
-directory named like a prune entry is still scanned whole. The compiled form
-takes the prune-free traversal for the same reason, and orders its pages by
-bytes where the shell's `| sort` ordered them by the invoking locale's
-collation — a report-order narrowing, never a change to which pages are read.
-Target resolution is likewise lexical where the shell called
-`realpath -m --relative-to=.`: the two agree on a tree with no symlinked docs
-directory, which every case compared at the port confirmed, including an
-absolute scan root and a scan root of `.`. The bespoke
-`gate-tests/check-docs-link-convention.test.sh` holds the off-root rule's edges
-and dispatches through `gate_run`.
+**The walk is unpruned, deliberately, and the port carries that rather than the kit's shared prune set** (gate-sdk/SPEC.md §The fourth budget batch): the shell form reached for a bare `find` rather than `gate_find`, so a docs tree with a directory named like a prune entry is still scanned whole. The compiled form takes the prune-free traversal for the same reason, and orders its pages by bytes where the shell's `| sort` ordered them by the invoking locale's collation — a report-order narrowing, never a change to which pages are read. Target resolution is likewise lexical where the shell called `realpath -m --relative-to=.`: the two agree on a tree with no symlinked docs directory, which every case compared at the port confirmed, including an absolute scan root and a scan root of `.`. The bespoke `gate-tests/check-docs-link-convention.test.sh` holds the off-root rule's edges and dispatches through `gate_run`.
 
 ### check-docs-cmd
 
-Invariant: every invoked repo-relative `.sh` path in a fence, every backticked or
-fenced kit-prefixed env knob, and every inline-span path citation in the governed
-doc set resolves against the tree, or names no path the tree has retired — the
-command/knob/citation analog of `check-md-refs`, since a broken `bash <path>`
-line, a retired knob name or a citation of a deleted file drifts silently where a
-broken link would be caught. Three assertions:
+Invariant: every invoked repo-relative `.sh` path in a fence, every backticked or fenced kit-prefixed env knob, and every inline-span path citation in the governed doc set resolves against the tree, or names no path the tree has retired — the command/knob/citation analog of `check-md-refs`, since a broken `bash <path>` line, a retired knob name or a citation of a deleted file drifts silently where a broken link would be caught. Three assertions:
 
-- **(A) invoked command paths.** Inside a fenced block, a `.sh` path in
-  *invocation* position — the first word of a `;`/`|`/`&&`-separated segment, or
-  the first non-flag argument when that word is `bash`/`sh`/`source`/`.` — must
-  resolve to a tracked file, tried doc-directory-relative first (a kit SPEC's
-  own `bin/x.sh`) then repo-root-relative (a cross-kit `gate-sdk/bin/x.sh`).
-  Only invocations are checked, so a path in argument position — a `cp
-  templates/x.sh scripts/x.sh` install *destination*, which the consumer
-  creates and this repo need not track — is never a finding. That is the
-  deliberate calibration: the invariant's failure mode is a broken invocation,
-  and scoping to the two named forms (a bare `<dir>/…/<name>.sh` and the
-  `bash <path>` form) drops the hypothetical-install-target class by
-  construction, with no whole-file exemption.
-- **(B) env knobs.** Any backticked or fenced ALL-CAPS name carrying a kit
-  prefix (the roster is each `gate_kit_roots` member's basename uppercased,
-  hyphens to underscores, trailing `_`: `gate-sdk` → `GATE_SDK_`) must occur in
-  the kits' tracked *code* — their shell sources and config templates, never
-  their own prose, so a knob name-dropped only in markdown cannot self-satisfy.
-  The corpus is the union across all kits, not the prefix owner alone: a
-  namespaced knob may be read by a dependent kit (`GATE_SDK_NATIVE_BIN` is
-  gate-sdk's, read by other kits' smokes), and the prefix marks scope, not
-  location. A family stem — a caps run ending `_` because a placeholder or glob
-  follows it (`EVIDENCE_KIT_RUN_<suite>`, `CANON_KIT_COMMENT_*`) — resolves when
-  any code name extends it. Names with no kit prefix are out of scope, so
-  generic shell vars never false-positive. A **static** kit's knob names leave
-  kit-root code with its library, so the set is that grep unioned with the static
-  knob roster's names (gate-sdk/SPEC.md §The non-gate arm, `--emit knob-roster`),
-  each static kit's `<KIT>_KNOB_FILE` locator and the retired `<KIT>_CONFIG_FILE`
-  its legacy refusal still reads, all from the binary's table in process.
-  `check-kit-ref-liveness` takes the same union.
-- **(C) retired cited paths.** Outside a fence, a path-shaped token inside an
-  inline code span reds when it names a path the repository has **retired** and
-  still tracks under none of its resolutions. A token is path-shaped when it has
-  two or more `/`-separated segments of `[A-Za-z0-9._-]`, a final segment
-  carrying an extension, and no `..`, after the same quote and punctuation trims
-  as (A) and a leading `./` stripped. A single-segment token matching
-  `CANON_KIT_AMENDMENT_GLOB` is path-shaped too, and it resolves by basename
-  against the whole tracked tree, since an amendment is cited by bare name
-  wherever its component sits: it reds when no tracked path carries that
-  basename and a retired one did. Every other token's **resolutions** are the doc's
-  directory, the repo root, and each `gate_kit_roots` member: a kit-relative
-  citation such as `lib/gate.sh`, written in one kit's SPEC about another kit's
-  file, resolves the way its reader resolves it. A token **resolves** when any
-  resolution is a tracked file or a directory holding one. The **retired set** is
-  every path deleted in the history this clone holds (`git log --no-renames
-  --diff-filter=D`, so a rename counts as a deletion of its old name), plus every
-  path the index deletes against `HEAD`; the second half makes the deleting
-  commit red at pre-commit, before its deletion is in history, and an unborn
-  `HEAD` has retired nothing. A token that resolves nowhere and names no retired
-  path is admitted: a hypothetical, a consumer-side file or a gitignored capture
-  stream is not a stale identifier.
+- **(A) invoked command paths.** Inside a fenced block, a `.sh` path in *invocation* position — the first word of a `;`/`|`/`&&`-separated segment, or the first non-flag argument when that word is `bash`/`sh`/`source`/`.` — must resolve to a tracked file, tried doc-directory-relative first (a kit SPEC's own `bin/x.sh`) then repo-root-relative (a cross-kit `gate-sdk/bin/x.sh`). Only invocations are checked, so a path in argument position — a `cp templates/x.sh scripts/x.sh` install *destination*, which the consumer creates and this repo need not track — is never a finding. That is the deliberate calibration: the invariant's failure mode is a broken invocation, and scoping to the two named forms (a bare `<dir>/…/<name>.sh` and the `bash <path>` form) drops the hypothetical-install-target class by construction, with no whole-file exemption.
+- **(B) env knobs.** Any backticked or fenced ALL-CAPS name carrying a kit prefix (the roster is each `gate_kit_roots` member's basename uppercased, hyphens to underscores, trailing `_`: `gate-sdk` → `GATE_SDK_`) must occur in the kits' tracked *code* — their shell sources and config templates, never their own prose, so a knob name-dropped only in markdown cannot self-satisfy. The corpus is the union across all kits, not the prefix owner alone: a namespaced knob may be read by a dependent kit (`GATE_SDK_NATIVE_BIN` is gate-sdk's, read by other kits' smokes), and the prefix marks scope, not location. A family stem — a caps run ending `_` because a placeholder or glob follows it (`EVIDENCE_KIT_RUN_<suite>`, `CANON_KIT_COMMENT_*`) — resolves when any code name extends it. Names with no kit prefix are out of scope, so generic shell vars never false-positive. A **static** kit's knob names leave kit-root code with its library, so the set is that grep unioned with the static knob roster's names (gate-sdk/SPEC.md §The non-gate arm, `--emit knob-roster`), each static kit's `<KIT>_KNOB_FILE` locator and the retired `<KIT>_CONFIG_FILE` its legacy refusal still reads, all from the binary's table in process. `check-kit-ref-liveness` takes the same union.
+- **(C) retired cited paths.** Outside a fence, a path-shaped token inside an inline code span reds when it names a path the repository has **retired** and still tracks under none of its resolutions. A token is path-shaped when it has two or more `/`-separated segments of `[A-Za-z0-9._-]`, a final segment carrying an extension, and no `..`, after the same quote and punctuation trims as (A) and a leading `./` stripped. A single-segment token matching `CANON_KIT_AMENDMENT_GLOB` is path-shaped too, and it resolves by basename against the whole tracked tree, since an amendment is cited by bare name wherever its component sits: it reds when no tracked path carries that basename and a retired one did. Every other token's **resolutions** are the doc's directory, the repo root, and each `gate_kit_roots` member: a kit-relative citation such as `lib/gate.sh`, written in one kit's SPEC about another kit's file, resolves the way its reader resolves it. A token **resolves** when any resolution is a tracked file or a directory holding one. The **retired set** is every path deleted in the history this clone holds (`git log --no-renames --diff-filter=D`, so a rename counts as a deletion of its old name), plus every path the index deletes against `HEAD`; the second half makes the deleting commit red at pre-commit, before its deletion is in history, and an unborn `HEAD` has retired nothing. A token that resolves nowhere and names no retired path is admitted: a hypothetical, a consumer-side file or a gitignored capture stream is not a stale identifier.
 
-  **History is admitted where `check-manifest-temporal` admits it, through its
-  three valves and no fourth:** a `manifest-temporal-exempt: <reason>` marker on
-  the line or the one above, a section named in
-  `CANON_KIT_TEMPORAL_EXEMPT_SECTIONS`, or a file matching
-  `CANON_KIT_TEMPORAL_EXEMPT_PATHS`. Naming a retired path is narration about the
-  past, and that gate already rules where narration may stand; the compiled
-  member reads the valves through that member's own line classifier, so neither
-  gate can disagree with the other about which line is history. The exemption goes no
-  further than that: a valved line's fenced invocations and knobs are still
-  scanned. In a flowing paragraph the marker rides the end of a line as inline
-  HTML, since a line-leading `<!--` opens an HTML block that ends the paragraph;
-  one marker covers its own line and the next.
+  **History is admitted where `check-manifest-temporal` admits it, through its three valves and no fourth:** a `manifest-temporal-exempt: <reason>` marker on the line or the one above, a section named in `CANON_KIT_TEMPORAL_EXEMPT_SECTIONS`, or a file matching `CANON_KIT_TEMPORAL_EXEMPT_PATHS`. Naming a retired path is narration about the past, and that gate already rules where narration may stand; the compiled member reads the valves through that member's own line classifier, so neither gate can disagree with the other about which line is history. The exemption goes no further than that: a valved line's fenced invocations and knobs are still scanned. In a flowing paragraph the marker rides the end of a line as inline HTML, since a line-leading `<!--` opens an HTML block that ends the paragraph; one marker covers its own line and the next.
 
-  **(C) reds on retirement and (A) on absence, and the difference is
-  deliberate.** An invocation of a path that was never tracked is a broken
-  command; a citation of one is usually a hypothetical, a consumer-side file or a
-  gitignored capture stream, and a valve on it would record nothing true.
-  Admission never turns on a line's age against the deleting commit: a port
-  commit is exactly the one that rewrites the paragraphs citing what it deleted,
-  so an age test would admit the stale citations at the one moment they matter.
-  A historical mention names the path, not the commit, because a kit SPEC states
-  its rules undated and provenance stays in git history. **A shallow clone
-  under-reds and never invents:** its retired set is whatever history the clone
-  holds, so the arm reports fewer findings and no false ones; gate-sdk's workflow template
-  fetches full depth for history-reading gates, and the clean line names the
-  shallow case rather than passing silently. The same dependence bars (C) from
-the `good/`+`bad/` pair, which runs inside whatever repository vendored it: a
-retirement case builds its own history in the bespoke test instead.
+  **(C) reds on retirement and (A) on absence, and the difference is deliberate.** An invocation of a path that was never tracked is a broken command; a citation of one is usually a hypothetical, a consumer-side file or a gitignored capture stream, and a valve on it would record nothing true. Admission never turns on a line's age against the deleting commit: a port commit is exactly the one that rewrites the paragraphs citing what it deleted, so an age test would admit the stale citations at the one moment they matter. A historical mention names the path, not the commit, because a kit SPEC states its rules undated and provenance stays in git history. **A shallow clone under-reds and never invents:** its retired set is whatever history the clone holds, so the arm reports fewer findings and no false ones; gate-sdk's workflow template fetches full depth for history-reading gates, and the clean line names the shallow case rather than passing silently. The same dependence bars (C) from the `good/`+`bad/` pair, which runs inside whatever repository vendored it: a retirement case builds its own history in the bespoke test instead.
 
-The governed doc set is exactly `check-md-refs`' — the manifest set minus
-`CANON_KIT_MDREF_EXCLUDE` — shared, with no gate-specific knob. Prose outside
-fences and code spans is never scanned for paths. A hypothetical *invocation* is
-written outside a fence, or its whole doc joins the per-file
-`CANON_KIT_MDREF_EXCLUDE` valve; a hypothetical *citation* needs nothing, because
-a path never tracked is not retired. A path written outside every code span stays
-unscanned, and that residue is the close-stage audit roster's. The knob set, the
-tracked set and the retired set are built by repo-root-anchored `git` reads, so
-they hold when the fixture runner invokes from a case directory. Not a git
-repository, or a `git` read that errors, is fail-closed (exit 2). The `# graph:`
-manifest couples the doc set to `scripts/*.sh` and every kit's shell sources
-(`kit:*.sh`), so a script rename, a knob retirement or a valve edit in the
-consumer config re-fires the gate over the docs. The two valve knobs take no
-`knob:` token: the path valve narrows the corpus and the section valve names
-headings rather than paths, and neither is a walk filter's pattern set
-(gate-sdk/SPEC.md §gen-pre-commit).
+The governed doc set is exactly `check-md-refs`' — the manifest set minus `CANON_KIT_MDREF_EXCLUDE` — shared, with no gate-specific knob. Prose outside fences and code spans is never scanned for paths. A hypothetical *invocation* is written outside a fence, or its whole doc joins the per-file `CANON_KIT_MDREF_EXCLUDE` valve; a hypothetical *citation* needs nothing, because a path never tracked is not retired. A path written outside every code span stays unscanned, and that residue is the close-stage audit roster's. The knob set, the tracked set and the retired set are built by repo-root-anchored `git` reads, so they hold when the fixture runner invokes from a case directory. Not a git repository, or a `git` read that errors, is fail-closed (exit 2). The `# graph:` manifest couples the doc set to `scripts/*.sh` and every kit's shell sources (`kit:*.sh`), so a script rename, a knob retirement or a valve edit in the consumer config re-fires the gate over the docs. The two valve knobs take no `knob:` token: the path valve narrows the corpus and the section valve names headings rather than paths, and neither is a walk filter's pattern set (gate-sdk/SPEC.md §gen-pre-commit).
 
 ### check-docs-restatement-parity
 
-Invariant: every arm token and kit-knob token a declared restating page carries
-in its code still occurs in the page's source. A restating page — a site's
-per-component landing page that repeats the component README's runnable line —
-is generated by nothing, so a README edit leaves it silently behind.
+Invariant: every arm token and kit-knob token a declared restating page carries in its code still occurs in the page's source. A restating page — a site's per-component landing page that repeats the component README's runnable line — is generated by nothing, so a README edit leaves it silently behind.
 
-**Remove first, then gate what remains.** A restated *step* told in prose is
-not gated: it is removed, and the page points at the source's own section
-instead. What a page cannot drop without losing its purpose — its one runnable
-line — is what this gate holds. Generation is the wrong remedy here, because it
-copies the restatement rather than removing it and would need a per-page map of
-which source section and which subset a page restates.
+**Remove first, then gate what remains.** A restated *step* told in prose is not gated: it is removed, and the page points at the source's own section instead. What a page cannot drop without losing its purpose — its one runnable line — is what this gate holds. Generation is the wrong remedy here, because it copies the restatement rather than removing it and would need a per-page map of which source section and which subset a page restates.
 
-- **Corpus:** files matching `CANON_KIT_RESTATEMENT_PAGES`, an array of globs
-  expanded like every canon-kit glob knob, default empty. An empty knob, or
-  globs matching nothing, is a clean `0 page(s)`: the pages are the consumer's
-  list, and an empty expansion under a set knob shows on that line.
-- **Source:** the `README.md` in the page's own directory. The pairing needs no
-  layout knowledge beyond the page glob. Under the reference-link mirror
-  topology (§The reference-link grammar) that sibling is the generated mirror of
-  the kit-root README. **A declared page with no source beside it is exit 2**,
-  naming the page, since a declared restating page with no source is a
-  configuration error rather than a pass. A `bad/` fixture is held to exit 1, so
-  the module's unit test asserts this arm.
-- **Tokens:** read only from the page's code: inline code spans and fenced
-  lines. Prose outside code is not scanned, because a narrative mention of a
-  flag is not a restated command. There are two classes. An **arm token** is
-  `--`, then a lowercase letter, then `[a-z0-9-]`, not glued to a preceding word
-  character. A **kit-knob token** is matched by §check-docs-cmd (B)'s matcher,
-  reused rather than copied: a caps run carrying a prefix derived from the kit
-  roots.
-- **Assertion:** each page token occurs in its source as a whole token of the
-  same class. The source is read whole, prose included. Whole-token matching is
-  what stops `--run` from being found inside `--run-gate-tests`. A page may carry
-  a subset of its source's tokens; the gate asserts only that what the page
-  names is still named there.
+- **Corpus:** files matching `CANON_KIT_RESTATEMENT_PAGES`, an array of globs expanded like every canon-kit glob knob, default empty. An empty knob, or globs matching nothing, is a clean `0 page(s)`: the pages are the consumer's list, and an empty expansion under a set knob shows on that line.
+- **Source:** the `README.md` in the page's own directory. The pairing needs no layout knowledge beyond the page glob. Under the reference-link mirror topology (§The reference-link grammar) that sibling is the generated mirror of the kit-root README. **A declared page with no source beside it is exit 2**, naming the page, since a declared restating page with no source is a configuration error rather than a pass. A `bad/` fixture is held to exit 1, so the module's unit test asserts this arm.
+- **Tokens:** read only from the page's code: inline code spans and fenced lines. Prose outside code is not scanned, because a narrative mention of a flag is not a restated command. There are two classes. An **arm token** is `--`, then a lowercase letter, then `[a-z0-9-]`, not glued to a preceding word character. A **kit-knob token** is matched by §check-docs-cmd (B)'s matcher, reused rather than copied: a caps run carrying a prefix derived from the kit roots.
+- **Assertion:** each page token occurs in its source as a whole token of the same class. The source is read whole, prose included. Whole-token matching is what stops `--run` from being found inside `--run-gate-tests`. A page may carry a subset of its source's tokens; the gate asserts only that what the page names is still named there.
 
-**Red** is one finding per missing token, naming the page, the line, the token
-and its source. The clean line counts pages and tokens, so an armed corpus
-whose pages carry no code tokens reads `0 token(s)` rather than passing unseen.
-`tier=precommit`: a drift is restorable in the commit that causes it, by editing
-the page. The descriptor couples `knob:CANON_KIT_RESTATEMENT_PAGES` and
-`*/README.md`, the sources. `install: zero-config`: the empty default scans
-nothing.
+**Red** is one finding per missing token, naming the page, the line, the token and its source. The clean line counts pages and tokens, so an armed corpus whose pages carry no code tokens reads `0 token(s)` rather than passing unseen. `tier=precommit`: a drift is restorable in the commit that causes it, by editing the page. The descriptor couples `knob:CANON_KIT_RESTATEMENT_PAGES` and `*/README.md`, the sources. `install: zero-config`: the empty default scans nothing.
 
-**The honest limit.** The gate catches a renamed or removed arm or knob. It
-cannot catch a changed install *step* told in prose, which is why such prose is
-removed rather than left for a gate that cannot read it.
+**The honest limit.** The gate catches a renamed or removed arm or knob. It cannot catch a changed install *step* told in prose, which is why such prose is removed rather than left for a gate that cannot read it.
 
 ### check-fence-command-head
 
-Invariant: every command in a `bash`, `sh` or `shell` fence of the governed doc
-set starts with a word that can run when the fence is pasted, as written, into a
-shell at the repository root. A reader copies a shell fence whole, so a line
-that opens on an arm's flag — the binary's name left to the prose above it —
-fails at the reader's prompt with no gate having seen it. `check-docs-cmd` (A)
-resolves an invoked script path and says nothing of a head that is no path at
-all; this gate is the other half.
+Invariant: every command in a `bash`, `sh` or `shell` fence of the governed doc set starts with a word that can run when the fence is pasted, as written, into a shell at the repository root. A reader copies a shell fence whole, so a line that opens on an arm's flag — the binary's name left to the prose above it — fails at the reader's prompt with no gate having seen it. `check-docs-cmd` (A) resolves an invoked script path and says nothing of a head that is no path at all; this gate is the other half.
 
-**Command position is gate-sdk's scanner's**, the one the port report reads
-(gate-sdk/SPEC.md §port-blockers): the first word of each command after `;`,
-`&`, `|`, `&&`, `||`, a newline or a subshell or group opener, and after a
-resuming reserved word (`if`, `then`, `do`, `!`, …) or an assignment prefix. A
-heredoc body, a `case` pattern, a continuation line and a quoted word are never
-a head; a command inside `$(…)` is, and is judged like any other. **A head runs
-when it is** one of these, in order:
+**Command position is gate-sdk's scanner's**, the one the port report reads (gate-sdk/SPEC.md §port-blockers): the first word of each command after `;`, `&`, `|`, `&&`, `||`, a newline or a subshell or group opener, and after a resuming reserved word (`if`, `then`, `do`, `!`, …) or an assignment prefix. A heredoc body, a `case` pattern, a continuation line and a quoted word are never a head; a command inside `$(…)` is, and is judged like any other. **A head runs when it is** one of these, in order:
 
-- a word beginning with `-` **never** runs: a flag names no command, and no
-  valve below admits it;
-- an **expansion** — a `$`-led or backquoted word, quoted or bare — whose value
-  the fence's reader holds, so `"$gates"` and `"$(tool)"` both run;
+- a word beginning with `-` **never** runs: a flag names no command, and no valve below admits it;
+- an **expansion** — a `$`-led or backquoted word, quoted or bare — whose value the fence's reader holds, so `"$gates"` and `"$(tool)"` both run;
 - an **elision** (`...`, `…`) or a **placeholder** (`<name>`);
-- a **shell builtin or reserved word**, the bash set, a literal of the shell's
-  grammar rather than config;
-- a **function** the fence defines (`name()` or `function name`) or a file it
-  sources defines. A `.` or `source` operand resolves like a path below, its
-  `${NAME:-default}` read as the default, the value a tree that sets no locator
-  runs with; an operand still an expansion after that contributes nothing;
-- a **configured program**: `CANON_KIT_FENCE_PROGRAMS` followed by
-  `CANON_KIT_FENCE_PROGRAMS_EXTRA` (§Layout and configuration). A rooted or
-  `~/` path is judged by its basename against the same set, since its location
-  is one machine's;
-- a **tracked path**: a relative word carrying a `/` that names a file the index
-  tracks, tried against the doc's directory first and the working directory
-  second, the (A) order. Tracked rather than present, so an untracked build
-  output that happens to exist in one clone reds in every clone alike.
+- a **shell builtin or reserved word**, the bash set, a literal of the shell's grammar rather than config;
+- a **function** the fence defines (`name()` or `function name`) or a file it sources defines. A `.` or `source` operand resolves like a path below, its `${NAME:-default}` read as the default, the value a tree that sets no locator runs with; an operand still an expansion after that contributes nothing;
+- a **configured program**: `CANON_KIT_FENCE_PROGRAMS` followed by `CANON_KIT_FENCE_PROGRAMS_EXTRA` (§Layout and configuration). A rooted or `~/` path is judged by its basename against the same set, since its location is one machine's;
+- a **tracked path**: a relative word carrying a `/` that names a file the index tracks, tried against the doc's directory first and the working directory second, the (A) order. Tracked rather than present, so an untracked build output that happens to exist in one clone reds in every clone alike.
 
-Anything else reds, a bare program name the configured set lacks included, which
-is what catches a binary named by its basename with nothing putting it on
-`PATH`. A copied prompt (`$ cmd`) reds by the same rule, because the `$` is the
-head.
+Anything else reds, a bare program name the configured set lacks included, which is what catches a binary named by its basename with nothing putting it on `PATH`. A copied prompt (`$ cmd`) reds by the same rule, because the `$` is the head.
 
-**The valve is the info string.** A fence written to be read rather than pasted —
-output, a transcript, a grammar sketch — takes another language (`text`,
-`console`), which is also what renders it truthfully; there is no line marker
-and no path knob. The corpus is `check-md-refs`' governed doc set, the same one
-(A) reads, and the one knob pair is a vocabulary rather than a walk filter, so it
-takes no `knob:` couples token (gate-sdk/SPEC.md §gen-pre-commit).
+**The valve is the info string.** A fence written to be read rather than pasted — output, a transcript, a grammar sketch — takes another language (`text`, `console`), which is also what renders it truthfully; there is no line marker and no path knob. The corpus is `check-md-refs`' governed doc set, the same one (A) reads, and the one knob pair is a vocabulary rather than a walk filter, so it takes no `knob:` couples token (gate-sdk/SPEC.md §gen-pre-commit).
 
-**What it does not attempt.** A head that runs is not a command that succeeds:
-the gate never executes a fence, so a wrong operand, a missing environment and a
-variable the fence reads but never assigned all pass. A command led by a
-redirection (`>out cmd`) is not judged, because the scanner leaves command
-position at the operator. Executing a fence is `check-fence-run`'s, for the
-fences a doc marks runnable.
+**What it does not attempt.** A head that runs is not a command that succeeds: the gate never executes a fence, so a wrong operand, a missing environment and a variable the fence reads but never assigned all pass. A command led by a redirection (`>out cmd`) is not judged, because the scanner leaves command position at the operator. Executing a fence is `check-fence-run`'s, for the fences a doc marks runnable.
 
-**Red** names each doc, line and head with the rule it failed; the clean line
-counts docs, shell fences and heads, so an empty corpus shows as zero rather
-than passing silently. The tracked set is one repository-root-anchored
-`git ls-files`, and a failed read, or no repository, exits 2.
+**Red** names each doc, line and head with the rule it failed; the clean line counts docs, shell fences and heads, so an empty corpus shows as zero rather than passing silently. The tracked set is one repository-root-anchored `git ls-files`, and a failed read, or no repository, exits 2.
 
 ### check-fence-run
 
-Invariant: every shell fence a governed doc marks runnable passes a narrowed
-static pass, then runs, and exits with the status it declares.
-`check-fence-command-head` shows that a fence's command head can run and nothing
-else, so a wrong operand or an unassigned variable passes it. This gate executes
-the fences a doc opts in, and it is `tier=align-only`: it runs in the full battery
-and stays out of the generated pre-commit hook, the class gate-sdk/SPEC.md
-§check-graph reserves for gates pre-commit cannot afford.
+Invariant: every shell fence a governed doc marks runnable passes a narrowed static pass, then runs, and exits with the status it declares. `check-fence-command-head` shows that a fence's command head can run and nothing else, so a wrong operand or an unassigned variable passes it. This gate executes the fences a doc opts in, and it is `tier=align-only`: it runs in the full battery and stays out of the generated pre-commit hook, the class gate-sdk/SPEC.md §check-graph reserves for gates pre-commit cannot afford.
 
-**The marker.** A doc marks a `bash`, `sh` or `shell` fence runnable with a
-`<!-- fence-runnable -->` line **immediately above** the fence's opening line, or
-declares a non-zero status with `<!-- fence-runnable: exit=<n> -->` for a fence
-that shows a failure (`n` a decimal from 0 to 255; the default is 0). With no
-marker a fence is not runnable, so a tree that marks nothing executes nothing. A
-misspelled marker that silently disarms is the failure a marker exists to
-prevent, so the marker is judged strictly, and each of these reds:
+**The marker.** A doc marks a `bash`, `sh` or `shell` fence runnable with a `<!-- fence-runnable -->` line **immediately above** the fence's opening line, or declares a non-zero status with `<!-- fence-runnable: exit=<n> -->` for a fence that shows a failure (`n` a decimal from 0 to 255; the default is 0). With no marker a fence is not runnable, so a tree that marks nothing executes nothing. A misspelled marker that silently disarms is the failure a marker exists to prevent, so the marker is judged strictly, and each of these reds:
 
 - a marker whose next line is not a `bash`, `sh` or `shell` fence opener;
 - a marker operand other than `exit=<decimal>`;
-- a line that looks like the marker and misses the grammar — one whose text,
-  after indentation, opens `<!--`, optional space, then `fence-run`.
+- a line that looks like the marker and misses the grammar — one whose text, after indentation, opens `<!--`, optional space, then `fence-run`.
 
-A marker-shaped line inside a fence is fence content and is not read, and prose
-naming the marker mid-line marks nothing. `check-fence-command-head` treats a
-marked fence exactly as any other, since the comment sits outside the fence body.
-The corpus is `check-md-refs`' governed doc set, the one both fence gates read, and
-at the default `CANON_KIT_SCAN_KIT_ROOTS` it prunes the kit roots, so what runs in a
-consumer is its own first-party docs.
+A marker-shaped line inside a fence is fence content and is not read, and prose naming the marker mid-line marks nothing. `check-fence-command-head` treats a marked fence exactly as any other, since the comment sits outside the fence body. The corpus is `check-md-refs`' governed doc set, the one both fence gates read, and at the default `CANON_KIT_SCAN_KIT_ROOTS` it prunes the kit roots, so what runs in a consumer is its own first-party docs.
 
-**The static pass, before anything runs.** Every command in a marked fence must
-have a head `check-fence-command-head` admits, narrowed:
+**The static pass, before anything runs.** Every command in a marked fence must have a head `check-fence-command-head` admits, narrowed:
 
-- a **configured program** must be in `CANON_KIT_FENCE_RUN_PROGRAMS` (§Layout
-  and configuration), never `CANON_KIT_FENCE_PROGRAMS`;
-- an **expansion** head (`"$gates"`), or a path naming the gate binary
-  `GATE_SDK_NATIVE_BIN` resolves to, has its first operand checked against the
-  fence-safe arm set (gate-sdk/SPEC.md §The non-gate arm): a `-`-led operand is a
-  member, `--emit <name>` names a member of that family, and a bare word is a
-  registered gate;
+- a **configured program** must be in `CANON_KIT_FENCE_RUN_PROGRAMS` (§Layout and configuration), never `CANON_KIT_FENCE_PROGRAMS`;
+- an **expansion** head (`"$gates"`), or a path naming the gate binary `GATE_SDK_NATIVE_BIN` resolves to, has its first operand checked against the fence-safe arm set (gate-sdk/SPEC.md §The non-gate arm): a `-`-led operand is a member, `--emit <name>` names a member of that family, and a bare word is a registered gate;
 - any **other tracked path** reds, because a script's body is outside the pass;
-- a builtin that **runs its operand as a command** — `exec`, `eval`, `trap`, and
-  `command` other than its `-v`/`-V` probe — reds, because the head scan never
-  sees the command it runs.
+- a builtin that **runs its operand as a command** — `exec`, `eval`, `trap`, and `command` other than its `-v`/`-V` probe — reds, because the head scan never sees the command it runs.
 
-A red head is reported and its fence is not executed. The pass is what makes *no
-network* hold for the shipped defaults: no admitted head dials out, and the
-crate's only network-spawning arms are outside the fence-safe set. **Honest
-limit:** a function the fence sources is admitted as a function, so the pass
-trusts what a sourced library runs.
+A red head is reported and its fence is not executed. The pass is what makes *no network* hold for the shipped defaults: no admitted head dials out, and the crate's only network-spawning arms are outside the fence-safe set. **Honest limit:** a function the fence sources is admitted as a function, so the pass trusts what a sourced library runs.
 
-**The run.** No portable process sandbox exists on the three adopter operating
-systems (gate-sdk/SPEC.md §The adopter constraints), so *no network* is held by
-the construction above rather than by a kernel facility.
+**The run.** No portable process sandbox exists on the three adopter operating systems (gate-sdk/SPEC.md §The adopter constraints), so *no network* is held by the construction above rather than by a kernel facility.
 
-1. **One scratch per doc**, under `DEMO_TMP_DIR`, else the platform temp
-   directory — the base §Consumer smoke's builder takes. The copy is gate-sdk's
-   tracked-tree scratch (gate-sdk/SPEC.md §Consumer smoke) over the gate's working
-   directory, seeded under a fixed identity so a fence that reads git sees a
-   repository. At the repository root that is the whole tracked
-   tree; in a fixture case dir it is the case dir alone.
-2. **The binary is placed.** `GATE_SDK_NATIVE_BIN` is resolved against the
-   scratch root, and where that lands inside the scratch the running binary is
-   copied there through the builder's own placement, which a source clone's
-   untracked build output needs. A value pointing outside the scratch is used as
-   it stands.
-3. **Marked fences run in document order**, each as its own `bash -euo pipefail`
-   process with the scratch root as its working directory. Files carry over from
-   one fence to the next and shell state does not: a reader pasting a later fence
-   into a fresh shell has no variable an earlier one set either, and `-u` turns
-   that unassigned variable into a red.
-4. **The environment is fixed and not inherited.** It carries the host's `PATH`
-   value, `LC_ALL=C`, `HOME` at a directory inside the scratch's `.git`,
-   `GIT_CONFIG_NOSYSTEM=1`, `GIT_CONFIG_GLOBAL` at an empty file there,
-   `GIT_ALLOW_PROTOCOL=file`, the proxy variables `http_proxy`, `https_proxy`
-   and `all_proxy` in both cases at an unroutable loopback port,
-   `GATE_SDK_NATIVE_BIN` at the placed binary, a nesting marker, and on Windows the
-   system root a process cannot start without. **Honest limit:** this is defense
-   in depth for a consumer-added program that honors proxies, not a sandbox; a
-   program named in `CANON_KIT_FENCE_RUN_PROGRAMS` that ignores proxy variables can
-   reach the network, and naming it is the consumer's act.
+1. **One scratch per doc**, under `DEMO_TMP_DIR`, else the platform temp directory — the base §Consumer smoke's builder takes. The copy is gate-sdk's tracked-tree scratch (gate-sdk/SPEC.md §Consumer smoke) over the gate's working directory, seeded under a fixed identity so a fence that reads git sees a repository. At the repository root that is the whole tracked tree; in a fixture case dir it is the case dir alone.
+2. **The binary is placed.** `GATE_SDK_NATIVE_BIN` is resolved against the scratch root, and where that lands inside the scratch the running binary is copied there through the builder's own placement, which a source clone's untracked build output needs. A value pointing outside the scratch is used as it stands.
+3. **Marked fences run in document order**, each as its own `bash -euo pipefail` process with the scratch root as its working directory. Files carry over from one fence to the next and shell state does not: a reader pasting a later fence into a fresh shell has no variable an earlier one set either, and `-u` turns that unassigned variable into a red.
+4. **The environment is fixed and not inherited.** It carries the host's `PATH` value, `LC_ALL=C`, `HOME` at a directory inside the scratch's `.git`, `GIT_CONFIG_NOSYSTEM=1`, `GIT_CONFIG_GLOBAL` at an empty file there, `GIT_ALLOW_PROTOCOL=file`, the proxy variables `http_proxy`, `https_proxy` and `all_proxy` in both cases at an unroutable loopback port, `GATE_SDK_NATIVE_BIN` at the placed binary, a nesting marker, and on Windows the system root a process cannot start without. **Honest limit:** this is defense in depth for a consumer-added program that honors proxies, not a sandbox; a program named in `CANON_KIT_FENCE_RUN_PROGRAMS` that ignores proxy variables can reach the network, and naming it is the consumer's act.
 5. **The scratch is removed on every exit path.**
 
-**The nesting marker.** A fence may run the battery, whose `check-fence-run`
-would re-enter the same fences in a scratch of the scratch without end. The marker
-carries how many fence scratches deep a run sits: a corpus walk at any depth
-executes nothing and says so on its clean line, while a run over named docs — this
-gate's own fixture suite, run by a fence — still executes, until a backstop depth of
-three ends a doc that names itself.
+**The nesting marker.** A fence may run the battery, whose `check-fence-run` would re-enter the same fences in a scratch of the scratch without end. The marker carries how many fence scratches deep a run sits: a corpus walk at any depth executes nothing and says so on its clean line, while a run over named docs — this gate's own fixture suite, run by a fence — still executes, until a backstop depth of three ends a doc that names itself.
 
-**Red** is a fence whose exit status differs from the declared one, naming the
-doc, the fence's opening line, both statuses and the last twenty lines of the
-fence's merged output; a static-pass red names the doc, the line, the head and
-the rule it failed, and a marker red the doc, the line and the defect. The clean
-line counts docs, marked fences, executed commands and scratches, so a tree with
-no marked fence prints `0 marked fence(s)` — nothing executed, not a quiet pass. A
-failed copy, a missing `bash` or a failed `git init` exits 2.
+**Red** is a fence whose exit status differs from the declared one, naming the doc, the fence's opening line, both statuses and the last twenty lines of the fence's merged output; a static-pass red names the doc, the line, the head and the rule it failed, and a marker red the doc, the line and the defect. The clean line counts docs, marked fences, executed commands and scratches, so a tree with no marked fence prints `0 marked fence(s)` — nothing executed, not a quiet pass. A failed copy, a missing `bash` or a failed `git init` exits 2.
 
-**On a host with no `bash`, and on Windows.** The gate spawns `bash` only when a
-marked fence passes the static pass. With zero markers it spawns nothing and is
-clean on every host, so an adopter who never marks a fence takes on no
-interpreter; marking one is the act that takes the dependency, and the fence is a
-`bash` fence by its own info string. The bash audience's third `derived` arm
-records that spawn (context-kit/SPEC.md §bin/env-probe), calling this gate's
-corpus and marker functions rather than copies of them.
+**On a host with no `bash`, and on Windows.** The gate spawns `bash` only when a marked fence passes the static pass. With zero markers it spawns nothing and is clean on every host, so an adopter who never marks a fence takes on no interpreter; marking one is the act that takes the dependency, and the fence is a `bash` fence by its own info string. The bash audience's third `derived` arm records that spawn (context-kit/SPEC.md §bin/env-probe), calling this gate's corpus and marker functions rather than copies of them.
 
 ### check-install-claim
 
-Invariant: exactly one governed doc declares which install transport is primary,
-and no scanned install section leads with a different one. This is the star
-topology's first *user-facing* application — the same one-owner-per-fact rule the
-kit applies to internal facts, aimed at a claim a first-time reader acts on.
+Invariant: exactly one governed doc declares which install transport is primary, and no scanned install section leads with a different one. This is the star topology's first *user-facing* application — the same one-owner-per-fact rule the kit applies to internal facts, aimed at a claim a first-time reader acts on.
 
-**What it does not attempt.** Whether a documented install command resolves
-against a live registry needs network egress at gate time and is out of a
-hermetic battery's reach. It is not built, and this paragraph says so rather than
-leaving a reader to over-read a green run: the command that drove this gate's
-filing was syntactically fine, and only a registry could have contradicted it.
-What is decidable from the tree alone is the consistency half — two surfaces
-cannot name different primary transports — and that is the whole of what runs.
+**What it does not attempt.** Whether a documented install command resolves against a live registry needs network egress at gate time and is out of a hermetic battery's reach. It is not built, and this paragraph says so rather than leaving a reader to over-read a green run: the command that drove this gate's filing was syntactically fine, and only a registry could have contradicted it. What is decidable from the tree alone is the consistency half — two surfaces cannot name different primary transports — and that is the whole of what runs.
 
-**The corpus is the governed-doc set, and a package manifest is not in it.** The
-walk is `governed_docs` and the declarations are read out of what that returns,
-so `files[]` arrays, `bin` maps and lockfiles are outside the scan however
-plainly they name a transport. The gate's name reads as though it graded the
-package manifest, which is why the negative is stated here rather than left to be
-re-derived off the module.
+**The corpus is the governed-doc set, and a package manifest is not in it.** The walk is `governed_docs` and the declarations are read out of what that returns, so `files[]` arrays, `bin` maps and lockfiles are outside the scan however plainly they name a transport. The gate's name reads as though it graded the package manifest, which is why the negative is stated here rather than left to be re-derived off the module.
 
-The claim's machine-readable owner is a full-line
-`<!-- install-primary: <transport-id> -->` HTML comment. A marker rather than a
-visible sentence, because the reader-facing form of this claim already exists as
-prose and must stay prose; the marker is the tier beside it, not a replacement.
-The transport vocabulary is consumer config — one `<transport-id>`⇥`<ERE>` line
-per transport through `CANON_KIT_INSTALL_TRANSPORTS_CMD`, loaded by
-`claim_vocabulary` (§The shared spec adapters) — because a kit literal spelling a
-transport publishes one project's distribution model as a kit fact.
+The claim's machine-readable owner is a full-line `<!-- install-primary: <transport-id> -->` HTML comment. A marker rather than a visible sentence, because the reader-facing form of this claim already exists as prose and must stay prose; the marker is the tier beside it, not a replacement. The transport vocabulary is consumer config — one `<transport-id>`⇥`<ERE>` line per transport through `CANON_KIT_INSTALL_TRANSPORTS_CMD`, loaded by `claim_vocabulary` (§The shared spec adapters) — because a kit literal spelling a transport publishes one project's distribution model as a kit fact.
 
-**Where this gate ends and §check-payload-claim begins.** The two answer
-different questions and share only the vocabulary loader. This one is
-**positional and install-section-scoped**: naming a secondary transport is
-correct prose, so what it judges is which transport a selected section *leads*
-with. Its sibling is **membership over the whole governed document**, because a
-disclosure class other than the declared one has no correct-but-secondary form —
-it is wrong wherever it appears. The scopes do not coincide either, so neither
-gate is the other's second assertion pair: an install section under this repo's
-section regex is not where the disclosure claim is ruled, and folding a
-whole-document membership rule into a section-scoped positional gate would make
-this gate's name false and give one gate two unrelated calibrations to reason
-about on a red.
+**Where this gate ends and §check-payload-claim begins.** The two answer different questions and share only the vocabulary loader. This one is **positional and install-section-scoped**: naming a secondary transport is correct prose, so what it judges is which transport a selected section *leads* with. Its sibling is **membership over the whole governed document**, because a disclosure class other than the declared one has no correct-but-secondary form — it is wrong wherever it appears. The scopes do not coincide either, so neither gate is the other's second assertion pair: an install section under this repo's section regex is not where the disclosure claim is ruled, and folding a whole-document membership rule into a section-scoped positional gate would make this gate's name false and give one gate two unrelated calibrations to reason about on a red.
 
-The scanned set is `check-md-refs`' governed doc set (the manifest set minus
-`CANON_KIT_MDREF_EXCLUDE`) minus `CANON_KIT_INSTALL_CLAIM_EXCLUDE`. Two
-assertions:
+The scanned set is `check-md-refs`' governed doc set (the manifest set minus `CANON_KIT_MDREF_EXCLUDE`) minus `CANON_KIT_INSTALL_CLAIM_EXCLUDE`. Two assertions:
 
-- **(A) Singleton owner.** Exactly one declaration exists across the scanned set.
-  Zero is the defect the gate was built for — nothing owns the claim, so two
-  pages can drift apart with nothing watching — and two owners is that same
-  defect wearing a different shape. An id outside the configured vocabulary is
-  fail-closed (exit 2) rather than a violation: the gate then holds no primary to
-  compare a section against, so it must not run rather than pass.
-- **(B) Leading transport.** Within each scanned document, for every
-  `##`-or-deeper section whose heading text matches
-  `CANON_KIT_INSTALL_SECTION_RE`, the **earliest** line matching any transport
-  pattern must match the declared primary. Later matches are never flagged, and a
-  section matching no transport pattern is silent. One line matching two patterns
-  passes when either id is the primary — a sentence naming both transports is not
-  leading with the secondary one. Fenced content is scanned, because a recipe is
-  exactly where a transport shows, but a fenced line is never read as a heading;
-  the declaration line is skipped, since a claim is not evidence for itself.
+- **(A) Singleton owner.** Exactly one declaration exists across the scanned set. Zero is the defect the gate was built for — nothing owns the claim, so two pages can drift apart with nothing watching — and two owners is that same defect wearing a different shape. An id outside the configured vocabulary is fail-closed (exit 2) rather than a violation: the gate then holds no primary to compare a section against, so it must not run rather than pass.
+- **(B) Leading transport.** Within each scanned document, for every `##`-or-deeper section whose heading text matches `CANON_KIT_INSTALL_SECTION_RE`, the **earliest** line matching any transport pattern must match the declared primary. Later matches are never flagged, and a section matching no transport pattern is silent. One line matching two patterns passes when either id is the primary — a sentence naming both transports is not leading with the secondary one. Fenced content is scanned, because a recipe is exactly where a transport shows, but a fenced line is never read as a heading; the declaration line is skipped, since a claim is not evidence for itself.
 
-**The rule is a compiled subcommand, and one piece of it is load-bearing beyond
-this gate.** The section regex and every transport pattern are consumer EREs
-compiled through the crate's matcher (gate-sdk/SPEC.md §The POSIX ERE matcher);
-the `install-primary:` declaration grammar and the `^#{2,6}[[:space:]]+` heading
-grammar are kit literals. The heading one goes through the matcher anyway, and
-deliberately: taking a heading's text is a **span** read, so routing it through
-`find` gives the matcher's leftmost-longest span API a production reader on every
-invocation of a precommit-tier gate, rather than one alive only in unit tests.
+**The rule is a compiled subcommand, and one piece of it is load-bearing beyond this gate.** The section regex and every transport pattern are consumer EREs compiled through the crate's matcher (gate-sdk/SPEC.md §The POSIX ERE matcher); the `install-primary:` declaration grammar and the `^#{2,6}[[:space:]]+` heading grammar are kit literals. The heading one goes through the matcher anyway, and deliberately: taking a heading's text is a **span** read, so routing it through `find` gives the matcher's leftmost-longest span API a production reader on every invocation of a precommit-tier gate, rather than one alive only in unit tests.
 
-**One declaration grammar, where two spellings once disagreed.** The declaration
-is detected and its id extracted by the same grammar, so the terminator is part
-of it: an id run and the `-->` that closes the comment share the hyphen, and the
-run gives hyphens back until the terminator matches. A space-less
-`<!--install-primary:tarball-->` therefore declares `tarball`, and the rule runs.
-The compiled form is the single spelling; a detecting pattern that required the
-terminator beside an extracting one that did not made that same line read as a
-declaration of `tarball--` and fail-closed on a vocabulary it was never checked
-against.
+**One declaration grammar, where two spellings once disagreed.** The declaration is detected and its id extracted by the same grammar, so the terminator is part of it: an id run and the `-->` that closes the comment share the hyphen, and the run gives hyphens back until the terminator matches. A space-less `<!--install-primary:tarball-->` therefore declares `tarball`, and the rule runs. The compiled form is the single spelling; a detecting pattern that required the terminator beside an extracting one that did not made that same line read as a declaration of `tarball--` and fail-closed on a vocabulary it was never checked against.
 
-Assertion B is the answer to the leading-versus-mentioning question: naming a
-secondary transport is correct prose and must stay green, so the rule is
-positional. **The scope in which "leading" is well-defined is the install
-section, not the file**, and that calibration was verified rather than assumed —
-this repo's own install page names its npm path in the H1 preamble about 120
-lines above the tarball recipe, so a whole-file first-match rule would red the
-owner page on correct prose.
+Assertion B is the answer to the leading-versus-mentioning question: naming a secondary transport is correct prose and must stay green, so the rule is positional. **The scope in which "leading" is well-defined is the install section, not the file**, and that calibration was verified rather than assumed — this repo's own install page names its npm path in the H1 preamble about 120 lines above the tarball recipe, so a whole-file first-match rule would red the owner page on correct prose.
 
-Three honest limits, each stated because a reader would otherwise over-trust a
-green run. Registry reachability is the first, above. **Pattern quality is the
-second, and it is the consumer's own drift to own:** the gate is only as sharp as
-the emitted EREs, and a loosely-written pattern wins matches by accident — the
-kit contract asks for the emit grammar, exactly as `check-prose-enum` says of a
-hand-listed set. **The third is bought by the section scope:** the prose tier of
-the declared claim may itself sit outside any scanned section, as this repo's
-does, in which case rewriting that prose to name a different transport while
-leaving the declaration alone stays green. That binding is documentary — held by
-this section and by a reader, not by the gate. It is the price of the scoping
-rather than an argument against it, since the alternative whole-file rule reds
-the owner page today, and the recurrence path that actually fired is unaffected:
-the drift was a `## Quick start` section leading with the wrong transport, which
-is in scope.
+Three honest limits, each stated because a reader would otherwise over-trust a green run. Registry reachability is the first, above. **Pattern quality is the second, and it is the consumer's own drift to own:** the gate is only as sharp as the emitted EREs, and a loosely-written pattern wins matches by accident — the kit contract asks for the emit grammar, exactly as `check-prose-enum` says of a hand-listed set. **The third is bought by the section scope:** the prose tier of the declared claim may itself sit outside any scanned section, as this repo's does, in which case rewriting that prose to name a different transport while leaving the declaration alone stays green. That binding is documentary — held by this section and by a reader, not by the gate. It is the price of the scoping rather than an argument against it, since the alternative whole-file rule reds the owner page today, and the recurrence path that actually fired is unaffected: the drift was a `## Quick start` section leading with the wrong transport, which is in scope.
 
-Producer: the maintainer editing the section that owns the claim, plus the
-consumer's transport command; both are live tracked configuration in this repo,
-not fixture-only. Consumer: the committing operator via the output contract —
-assertion B's report names the section, the offending line, and *which* transport
-it led with, because "wrong transport" alone would leave the reader grepping. The
-declaration carries exactly one field and both assertions read it; each emitted
-line's id is read at the membership check and in the report, its ERE at the
-per-line match.
+Producer: the maintainer editing the section that owns the claim, plus the consumer's transport command; both are live tracked configuration in this repo, not fixture-only. Consumer: the committing operator via the output contract — assertion B's report names the section, the offending line, and *which* transport it led with, because "wrong transport" alone would leave the reader grepping. The declaration carries exactly one field and both assertions read it; each emitted line's id is read at the membership check and in the report, its ERE at the per-line match.
 
-The gate lands greenfield: the drift that filed it was fixed inline at the close
-that filed it, so this pins a currently-consistent claim and its value is
-recurrence. That claim drifted at two consecutive releases with nothing watching
-it, on the surface a first-time reader runs first. The good/bad pair covers the
-recurrence path itself — a quick-start section leading with the secondary
-transport — beside a silent no-transport section, a heading the regex does not
-select, and a published note the path valve keeps out of the scanned set. The
-`# graph:` manifest couples the gate to the doc set and `scripts/*.sh`, so a
-transport rename re-fires it over the docs. `precommit` tier.
+The gate lands greenfield: the drift that filed it was fixed inline at the close that filed it, so this pins a currently-consistent claim and its value is recurrence. That claim drifted at two consecutive releases with nothing watching it, on the surface a first-time reader runs first. The good/bad pair covers the recurrence path itself — a quick-start section leading with the secondary transport — beside a silent no-transport section, a heading the regex does not select, and a published note the path valve keeps out of the scanned set. The `# graph:` manifest couples the gate to the doc set and `scripts/*.sh`, so a transport rename re-fires it over the docs. `precommit` tier.
 
 ### check-payload-claim
 
-Invariant: exactly one governed doc declares what a gate on the vendored payload
-discloses, and no scanned governed doc asserts a different disclosure class. Two
-assertions: (A) **singleton owner** — exactly one declaration exists across the
-scanned set; (B) **no contradicting assertion** — no scanned line matches the
-pattern of a class other than the declared one.
+Invariant: exactly one governed doc declares what a gate on the vendored payload discloses, and no scanned governed doc asserts a different disclosure class. Two assertions: (A) **singleton owner** — exactly one declaration exists across the scanned set; (B) **no contradicting assertion** — no scanned line matches the pattern of a class other than the declared one.
 
-The claim's machine-readable owner is a full-line
-`<!-- payload-discloses: <claim-id> -->` HTML comment, the same
-tier-beside-the-prose shape §check-install-claim uses and for the same reason:
-the reader-facing form of this claim already exists as prose and must stay prose.
-It belongs in the section that rules the fact, which in this repo is
-gate-sdk/SPEC.md §Consumer payload. The disclosure vocabulary is consumer config
-— one `<claim-id>`⇥`<ERE>` line per class through
-`CANON_KIT_PAYLOAD_CLAIMS_CMD`, loaded by `claim_vocabulary` (§The shared spec adapters)
-— because a spelling of what a payload discloses is one project's distribution
-model, and a kit literal carrying one would publish it. The scanned set is
-`check-md-refs`' governed doc set (the manifest set minus
-`CANON_KIT_MDREF_EXCLUDE`) minus `CANON_KIT_PAYLOAD_CLAIM_EXCLUDE` — the same
-composition its sibling uses, so a consumer configures one scanned-set idiom
-rather than two.
+The claim's machine-readable owner is a full-line `<!-- payload-discloses: <claim-id> -->` HTML comment, the same tier-beside-the-prose shape §check-install-claim uses and for the same reason: the reader-facing form of this claim already exists as prose and must stay prose. It belongs in the section that rules the fact, which in this repo is gate-sdk/SPEC.md §Consumer payload. The disclosure vocabulary is consumer config — one `<claim-id>`⇥`<ERE>` line per class through `CANON_KIT_PAYLOAD_CLAIMS_CMD`, loaded by `claim_vocabulary` (§The shared spec adapters) — because a spelling of what a payload discloses is one project's distribution model, and a kit literal carrying one would publish it. The scanned set is `check-md-refs`' governed doc set (the manifest set minus `CANON_KIT_MDREF_EXCLUDE`) minus `CANON_KIT_PAYLOAD_CLAIM_EXCLUDE` — the same composition its sibling uses, so a consumer configures one scanned-set idiom rather than two.
 
-**Assertion A.** Zero declarations is the defect the gate exists for: nothing
-owns the claim, so an unbounded number of surfaces drift with nothing watching,
-and no reader can tell which surface is the one to believe. Two owners is that
-same defect wearing a different shape. A `<claim-id>` outside the configured
-vocabulary is **fail-closed (exit 2)** rather than a violation — with no
-resolvable declared class the gate holds nothing to compare a line against, so
-it must not run rather than pass.
+**Assertion A.** Zero declarations is the defect the gate exists for: nothing owns the claim, so an unbounded number of surfaces drift with nothing watching, and no reader can tell which surface is the one to believe. Two owners is that same defect wearing a different shape. A `<claim-id>` outside the configured vocabulary is **fail-closed (exit 2)** rather than a violation — with no resolvable declared class the gate holds nothing to compare a line against, so it must not run rather than pass.
 
-**Assertion B.** Across each scanned document, any line matching the pattern of a
-class other than the declared one is a violation, wherever in the document it
-sits. Membership rather than position, because a non-declared disclosure class
-has no correct secondary form. The declaration line itself is skipped, since a
-claim is not evidence for itself. Fenced content is scanned, because a quoted
-recipe is exactly where a disclosure claim shows up in passing. The report names
-the offending class, because "wrong disclosure class" alone would leave the
-reader grepping.
+**Assertion B.** Across each scanned document, any line matching the pattern of a class other than the declared one is a violation, wherever in the document it sits. Membership rather than position, because a non-declared disclosure class has no correct secondary form. The declaration line itself is skipped, since a claim is not evidence for itself. Fenced content is scanned, because a quoted recipe is exactly where a disclosure claim shows up in passing. The report names the offending class, because "wrong disclosure class" alone would leave the reader grepping.
 
-The rule is a **compiled subcommand** — structurally the simplest consumer of the
-crate's matcher, membership over the whole document rather than position inside a
-section, so the engine and the vocabulary bridge were both proved by its two
-cohort siblings before it landed. It shares the declaration grammar
-§check-install-claim states, including that section's single-spelling rule.
+The rule is a **compiled subcommand** — structurally the simplest consumer of the crate's matcher, membership over the whole document rather than position inside a section, so the engine and the vocabulary bridge were both proved by its two cohort siblings before it landed. It shares the declaration grammar §check-install-claim states, including that section's single-spelling rule.
 
-**The declared class's own pattern is latent rather than unread.** Assertion B
-matches only the classes that are *not* declared, so the declared one's pattern
-does no work while it holds the declaration — and starts doing it the moment the
-declaration moves to another class. The vocabulary is a set of classes, not a set
-of live matchers, so a class is emitted with its pattern whether or not it is
-currently the declared one.
+**The declared class's own pattern is latent rather than unread.** Assertion B matches only the classes that are *not* declared, so the declared one's pattern does no work while it holds the declaration — and starts doing it the moment the declaration moves to another class. The vocabulary is a set of classes, not a set of live matchers, so a class is emitted with its pattern whether or not it is currently the declared one.
 
-**One claim axis rather than a claim registry.** The shape behind this gate and
-its sibling — a declared owner, an id vocabulary, a scanned corpus — invites a
-registry keyed by claim name. Refused for now, with the reason recorded so it is
-not re-derived: one axis exists, this gate and its sibling already share the only
-piece worth sharing (the vocabulary loader), and a registry would mint an
-axis-name knob and an indirection to hold a single member. The refusal is cheap to reverse — a
-second axis is the trigger, and both gates would collapse into the registry with
-their vocabularies unchanged.
+**One claim axis rather than a claim registry.** The shape behind this gate and its sibling — a declared owner, an id vocabulary, a scanned corpus — invites a registry keyed by claim name. Refused for now, with the reason recorded so it is not re-derived: one axis exists, this gate and its sibling already share the only piece worth sharing (the vocabulary loader), and a registry would mint an axis-name knob and an indirection to hold a single member. The refusal is cheap to reverse — a second axis is the trigger, and both gates would collapse into the registry with their vocabularies unchanged.
 
-**Honest limits.** The gate is only as sharp as the emitted patterns, and a
-loosely-written one wins matches by accident — the same consumer-owned drift
-§check-install-claim states, since the kit contract asks for the emit grammar and
-never for the patterns. A claim phrased in a shape no emitted pattern recognizes
-is out of reach; what the gate converts is an unbounded prose corpus into a
-checkable one, not an English-language reader. And the scanned set is the
-manifest set, so a claim made on a surface the consumer has not brought into that
-set stays unheld.
+**Honest limits.** The gate is only as sharp as the emitted patterns, and a loosely-written one wins matches by accident — the same consumer-owned drift §check-install-claim states, since the kit contract asks for the emit grammar and never for the patterns. A claim phrased in a shape no emitted pattern recognizes is out of reach; what the gate converts is an unbounded prose corpus into a checkable one, not an English-language reader. And the scanned set is the manifest set, so a claim made on a surface the consumer has not brought into that set stays unheld.
 
-Producer: the maintainer editing the section that rules the fact, plus the
-consumer's disclosure command; both are live tracked configuration in this repo,
-not fixture-only. Consumer: the committing operator via the output contract, and
-both assertions read the declaration's one field — at the membership check, at
-the declared-versus-other comparison, and in the violation report.
+Producer: the maintainer editing the section that rules the fact, plus the consumer's disclosure command; both are live tracked configuration in this repo, not fixture-only. Consumer: the committing operator via the output contract, and both assertions read the declaration's one field — at the membership check, at the declared-versus-other comparison, and in the violation report.
 
-The good/bad pair covers the reintroduction path itself — one corrected sentence
-restored verbatim to its original overclaiming form — beside the near-miss
-sentences the pattern boundary must stay silent on and a published dated note the
-path valve keeps out of the scanned set. The `# graph:` manifest couples the gate
-to the governed doc set and `scripts/*.sh`, so an edit to a claim surface or to
-the vocabulary re-fires it. `precommit` tier.
+The good/bad pair covers the reintroduction path itself — one corrected sentence restored verbatim to its original overclaiming form — beside the near-miss sentences the pattern boundary must stay silent on and a published dated note the path valve keeps out of the scanned set. The `# graph:` manifest couples the gate to the governed doc set and `scripts/*.sh`, so an edit to a claim surface or to the vocabulary re-fires it. `precommit` tier.
 
 ### check-prose-tells
 
-The mechanical subset of the AI-prose tells — the machine-detectable patterns
-that mark agent-authored reader-facing prose — over the consumer-configured
-markdown surfaces (`CANON_KIT_PROSE_TELL_GLOBS`; empty ⇒ nothing scanned, the
-correct unconfigured-consumer no-op). Judgment-dependent tells (voice, argument
-shape, hedging) are out of scope permanently: the gate never grows heuristics
-that would make it probabilistic; that read stays human.
+The mechanical subset of the AI-prose tells — the machine-detectable patterns that mark agent-authored reader-facing prose — over the consumer-configured markdown surfaces (`CANON_KIT_PROSE_TELL_GLOBS`; empty ⇒ nothing scanned, the correct unconfigured-consumer no-op). Judgment-dependent tells (voice, argument shape, hedging) are out of scope permanently: the gate never grows heuristics that would make it probabilistic; that read stays human.
 
-It runs six mechanical assertions over each surface, every one threshold-gated:
-em-dash density (A), throat-clearing phrases (B), contrast cadence (C),
-undefined abbreviations (D), sentence-rhythm variance (E), and tricolon density
-(F). A paragraph is a blank-line-delimited block and a section is a `##`-headed
-span, except that each markdown list item (`-`/`*`/`+`/`N.`) is its own unit for
-every paragraph and section assertion — a definition list carrying one em-dash
-per item is well-formed markdown, not flowing prose, so its items are never
-lumped into one block (the same structural holdout the non-prose surfaces below
-earn). Because the tells measure authored prose, three non-prose surfaces are
-held out before any assertion runs: inline `` `code` `` spans, markdown table
-rows, and generated `<!-- name:begin -->`…`<!-- name:end -->` regions, a marker
-being a line whose whole trimmed content is the comment, so prose naming one
-opens nothing (each region is byte-gated elsewhere — a prose gate that forced edits to generated content
-would contradict its generation, the same reasoning that keeps an immutable
-dated-post archive out of the opt-in). Fenced code the shared walk driver already drops.
+It runs six mechanical assertions over each surface, every one threshold-gated: em-dash density (A), throat-clearing phrases (B), contrast cadence (C), undefined abbreviations (D), sentence-rhythm variance (E), and tricolon density (F). A paragraph is a blank-line-delimited block and a section is a `##`-headed span, except that each markdown list item (`-`/`*`/`+`/`N.`) is its own unit for every paragraph and section assertion — a definition list carrying one em-dash per item is well-formed markdown, not flowing prose, so its items are never lumped into one block (the same structural holdout the non-prose surfaces below earn). Because the tells measure authored prose, three non-prose surfaces are held out before any assertion runs: inline `` `code` `` spans, markdown table rows, and generated `<!-- name:begin -->`…`<!-- name:end -->` regions, a marker being a line whose whole trimmed content is the comment, so prose naming one opens nothing (each region is byte-gated elsewhere — a prose gate that forced edits to generated content would contradict its generation, the same reasoning that keeps an immutable dated-post archive out of the opt-in). Fenced code the shared walk driver already drops.
 
-- **A. Em-dash density** — a paragraph carrying more than
-  `CANON_KIT_PROSE_TELL_EMDASH_MAX` em-dashes.
-- **B. Throat-clearing phrases** — a case-insensitive match of any
-  `CANON_KIT_PROSE_TELL_PHRASES` member, the base array merged with
-  `CANON_KIT_PROSE_TELL_PHRASES_EXTRA` (§Layout and configuration).
-- **C. Contrast cadence** — the "not X — it's Y" shape (a `not …` clause
-  resolved across an em-dash or `, but` into `it's`/`it is`) more than
-  `CANON_KIT_PROSE_TELL_CONTRAST_MAX` times in a section.
-- **D. Undefined abbreviations** — an all-caps token of length ≥ 3 the file
-  never expands (no parenthesized expansion at any occurrence) and absent from
-  `CANON_KIT_PROSE_TELL_ABBR_ALLOW` merged with
-  `CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA` (§Layout and configuration).
-- **E. Sentence-rhythm variance** — a paragraph of at least
-  `CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES` sentences whose sentence
-  word-count coefficient of variation falls below
-  `CANON_KIT_PROSE_TELL_RHYTHM_CV_MIN` (metronomic cadence).
-- **F. Tricolon density** — more than `CANON_KIT_PROSE_TELL_TRICOLON_MAX`
-  `A, B, and C` constructions in a section.
+- **A. Em-dash density** — a paragraph carrying more than `CANON_KIT_PROSE_TELL_EMDASH_MAX` em-dashes.
+- **B. Throat-clearing phrases** — a case-insensitive match of any `CANON_KIT_PROSE_TELL_PHRASES` member, the base array merged with `CANON_KIT_PROSE_TELL_PHRASES_EXTRA` (§Layout and configuration).
+- **C. Contrast cadence** — the "not X — it's Y" shape (a `not …` clause resolved across an em-dash or `, but` into `it's`/`it is`) more than `CANON_KIT_PROSE_TELL_CONTRAST_MAX` times in a section.
+- **D. Undefined abbreviations** — an all-caps token of length ≥ 3 the file never expands (no parenthesized expansion at any occurrence) and absent from `CANON_KIT_PROSE_TELL_ABBR_ALLOW` merged with `CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA` (§Layout and configuration).
+- **E. Sentence-rhythm variance** — a paragraph of at least `CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES` sentences whose sentence word-count coefficient of variation falls below `CANON_KIT_PROSE_TELL_RHYTHM_CV_MIN` (metronomic cadence).
+- **F. Tricolon density** — more than `CANON_KIT_PROSE_TELL_TRICOLON_MAX` `A, B, and C` constructions in a section.
 
-Exact detection regexes are implementation, owned by the gate source; the
-`good/`+`bad/` fixture pair is the executable statement of each boundary
-(`bad/` trips every assertion, `good/` passes all and demonstrates the valve).
-Thresholds are the `CANON_KIT_PROSE_TELL_*` knobs (§Layout and configuration).
+Exact detection regexes are implementation, owned by the gate source; the `good/`+`bad/` fixture pair is the executable statement of each boundary (`bad/` trips every assertion, `good/` passes all and demonstrates the valve). Thresholds are the `CANON_KIT_PROSE_TELL_*` knobs (§Layout and configuration).
 
-**Ported to the binary substrate at §The sixth budget batch** (gate-sdk/SPEC.md).
-Two properties of the port are stated here because neither is visible from the
-assertion list. The corpus is walked **once per file**, not once per surface set:
-assertion D is an in-file assertion, so a shared walk would pool every surface's
-tokens into one buffer and an abbreviation expanded in any file would clear it in
-all of them. The thresholds are validated by the kit's knob table (§Layout and
-configuration), so a malformed one refuses every canon-kit gate at exit 2 with
-the knob named, never reads as zero.
+**Ported to the binary substrate at §The sixth budget batch** (gate-sdk/SPEC.md). Two properties of the port are stated here because neither is visible from the assertion list. The corpus is walked **once per file**, not once per surface set: assertion D is an in-file assertion, so a shared walk would pool every surface's tokens into one buffer and an abbreviation expanded in any file would clear it in all of them. The thresholds are validated by the kit's knob table (§Layout and configuration), so a malformed one refuses every canon-kit gate at exit 2 with the knob named, never reads as zero.
 
-Criterion 4 **clears** on this member and the verdict is a property of a
-consumer's config rather than of the gate: its corpus is a pure glob expansion of
-the configured prose-surface set, which reaches no gate declaration path in this
-tree. A consumer whose prose globs named descriptors would flip it.
+Criterion 4 **clears** on this member and the verdict is a property of a consumer's config rather than of the gate: its corpus is a pure glob expansion of the configured prose-surface set, which reaches no gate declaration path in this tree. A consumer whose prose globs named descriptors would flip it.
 
-**Valve** — an HTML comment `<!-- prose-tell-exempt: <reason> -->` on the
-flagged line or directly above it suppresses the tell at that site; it rides the
-shared exempt-window (§The shared spec adapters — the line or the one above), and the reason
-is mandatory (the `comment-tier-exempt:` convention — a deliberate stylistic
-keep carries its cause in-line, a reasonless valve is red). The gate is a
-producer of nothing but a verdict: the committing session reads the red and
-either fixes the prose or lands a reasoned valve (oracle-first), the fixture
-pair feeds the `--run-gate-tests` arm, and every `CANON_KIT_PROSE_TELL_*` field is read
-by `check-prose-tells` at scan time and no other component.
+**Valve** — an HTML comment `<!-- prose-tell-exempt: <reason> -->` on the flagged line or directly above it suppresses the tell at that site; it rides the shared exempt-window (§The shared spec adapters — the line or the one above), and the reason is mandatory (the `comment-tier-exempt:` convention — a deliberate stylistic keep carries its cause in-line, a reasonless valve is red). The gate is a producer of nothing but a verdict: the committing session reads the red and either fixes the prose or lands a reasoned valve (oracle-first), the fixture pair feeds the `--run-gate-tests` arm, and every `CANON_KIT_PROSE_TELL_*` field is read by `check-prose-tells` at scan time and no other component.
 
 ### templates/
 
-`canon-config.knobs` — the consumer knob-file template: a one-line `#` pointer
-to the §Layout and configuration knob table, so the table stays the one owner
-of the knob roster rather than a parallel copy in the template drifting
-against it.
-`SPEC-amendment.md` — the amendment skeleton: delta sections plus the
-Definition-of-Done checklist (causal completeness, no information lost on
-merge, amendment deleted, none remaining, gaps filed as debt).
+`canon-config.knobs` — the consumer knob-file template: a one-line `#` pointer to the §Layout and configuration knob table, so the table stays the one owner of the knob roster rather than a parallel copy in the template drifting against it. `SPEC-amendment.md` — the amendment skeleton: delta sections plus the Definition-of-Done checklist (causal completeness, no information lost on merge, amendment deleted, none remaining, gaps filed as debt).
 
 ## Out of scope
 
-A consumer's tier contract — which surfaces exist and what each owns — is its
-own instance; canon-kit ships the topology rules, not the table. Glossary and
-vision structural gates (`check-glossary-tiering`,
-`check-glossary-entry-types`, `check-vision-tiering`,
-`check-retired-term-coupling`) encode one instance's surface roles, entry
-taxonomy, and ubiquitous-language couplings — rule content; their generic
-cross-surface axis ships here as `check-surface-duplication`.
-`check-comment-tier` splits: a consumer's *product* directive vocabulary
-(`glossary:`, `diagram:`, `domain-enum`, …) is rule content, supplied as
-`CANON_KIT_COMMENT_*` config, while the classifier, the kit-mechanism directive
-roster, and the surface/positional parsing machinery ship here — the comment
-surface is one of the enforced tiering surfaces. A `check-root-tiering` is a
-pure consumer-filename allowlist with no mechanism residue. Global-constant
-literal gates (the pagination-literal pattern) are per-constant rule content.
-Diagram/spec annotation couplings are unclaimed, a later kit's scope.
+A consumer's tier contract — which surfaces exist and what each owns — is its own instance; canon-kit ships the topology rules, not the table. Glossary and vision structural gates (`check-glossary-tiering`, `check-glossary-entry-types`, `check-vision-tiering`, `check-retired-term-coupling`) encode one instance's surface roles, entry taxonomy, and ubiquitous-language couplings — rule content; their generic cross-surface axis ships here as `check-surface-duplication`. `check-comment-tier` splits: a consumer's *product* directive vocabulary (`glossary:`, `diagram:`, `domain-enum`, …) is rule content, supplied as `CANON_KIT_COMMENT_*` config, while the classifier, the kit-mechanism directive roster, and the surface/positional parsing machinery ship here — the comment surface is one of the enforced tiering surfaces. A `check-root-tiering` is a pure consumer-filename allowlist with no mechanism residue. Global-constant literal gates (the pagination-literal pattern) are per-constant rule content. Diagram/spec annotation couplings are unclaimed, a later kit's scope.
 
-**A numeral-notation convention for a work queue is refused, on two grounds
-worth recording so it is not re-proposed as an easy win.** Its motivation is that
-notation decides reach — but the single-token grammar (§check-manifest-count)
-settles the notation half inside the manifest corpus, and a work queue takes the
-`measured:` marker without taking the bare-cardinal ban, so a spelling choice
-there decides nothing a gate reads. What is left is compaction, which is a style
-preference and not an invariant. The second ground is ownership: a queue's
-notation is the queue kit's to rule, and landing one here would put a queue
-convention in the manifest kit — the shape the topology rules above exist to
-prevent.
+**A numeral-notation convention for a work queue is refused, on two grounds worth recording so it is not re-proposed as an easy win.** Its motivation is that notation decides reach — but the single-token grammar (§check-manifest-count) settles the notation half inside the manifest corpus, and a work queue takes the `measured:` marker without taking the bare-cardinal ban, so a spelling choice there decides nothing a gate reads. What is left is compaction, which is a style preference and not an invariant. The second ground is ownership: a queue's notation is the queue kit's to rule, and landing one here would put a queue convention in the manifest kit — the shape the topology rules above exist to prevent.

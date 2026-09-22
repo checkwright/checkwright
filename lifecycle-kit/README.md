@@ -1,36 +1,12 @@
 # lifecycle-kit
 
-The iteration stage state machine for coding-agent-assisted delivery: a
-`## Iteration: <name>` header line in the task queue naming the iteration, an
-evidence file of `<iteration> <stage> <session-id> <date> <head>` stamps whose
-**last stamp is the current stage** and whose `<head>` binds each stamp to the
-commit it was taken at, stage
-skills (scope/align/build/validate/close by default — stages are config), and
-gates that make skipping a stage, or claiming one without running
-its skill, fail the commit.
+The iteration stage state machine for coding-agent-assisted delivery: a `## Iteration: <name>` header line in the task queue naming the iteration, an evidence file of `<iteration> <stage> <session-id> <date> <head>` stamps whose **last stamp is the current stage** and whose `<head>` binds each stamp to the commit it was taken at, stage skills (scope/align/build/validate/close by default — stages are config), and gates that make skipping a stage, or claiming one without running its skill, fail the commit.
 
-Why: a stateless agent session doesn't reliably re-read process prose. So the
-process state lives in two files a gate can read, and every stage skill stamps
-its invocation as its first step (mechanized by the `--enter-stage <stage>` arm
-on the gate binary `GATE_SDK_NATIVE_BIN` names, so the misformat-prone hand
-ritual is one command). That stamp *is* the stage transition — there is no
-second copy of the cursor to keep in sync, and stage motion writes no queue at
-all.
-`check-stage-evidence` verifies the stamp file's grammar and that every stamp
-belongs to the header's iteration; `check-stage-entry` verifies the
-predecessor stamp, the drained queue at validate entry, and, at build entry,
-the cross-component audit trigger and no unrun inferred-claim marker. See [SPEC.md](SPEC.md) for the
-full contracts.
+Why: a stateless agent session doesn't reliably re-read process prose. So the process state lives in two files a gate can read, and every stage skill stamps its invocation as its first step (mechanized by the `--enter-stage <stage>` arm on the gate binary `GATE_SDK_NATIVE_BIN` names, so the misformat-prone hand ritual is one command). That stamp *is* the stage transition — there is no second copy of the cursor to keep in sync, and stage motion writes no queue at all. `check-stage-evidence` verifies the stamp file's grammar and that every stamp belongs to the header's iteration; `check-stage-entry` verifies the predecessor stamp, the drained queue at validate entry, and, at build entry, the cross-component audit trigger and no unrun inferred-claim marker. See [SPEC.md](SPEC.md) for the full contracts.
 
-An installer-vendored tree does not carry this file. The payload withholds each
-kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is
-repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is
-packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer
-payload).
+An installer-vendored tree does not carry this file. The payload withholds each kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
 
-The linear stage walk is the default; the gate-legal ways to leave it —
-abandon, split, reopen — compose existing mechanism with no new tooling
-([SPEC.md](SPEC.md) §Deviation transitions).
+The linear stage walk is the default; the gate-legal ways to leave it — abandon, split, reopen — compose existing mechanism with no new tooling ([SPEC.md](SPEC.md) §Deviation transitions).
 
 ## Install
 
@@ -57,16 +33,9 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    ```
    <!-- gate-roster:end -->
 
-   They resolve through gate-sdk's registry path (your gates dir first, then
-   each kit's `checks/`), and their `# graph:` manifests put them in the
-   generated pre-commit hook (`check-stamp-subject` in the commit-msg hook),
-   written by `--emit git-hooks --write` on the gate binary
-   `GATE_SDK_NATIVE_BIN` names.
+   They resolve through gate-sdk's registry path (your gates dir first, then each kit's `checks/`), and their `# graph:` manifests put them in the generated pre-commit hook (`check-stamp-subject` in the commit-msg hook), written by `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names.
 
-2. Give the queue file its header and each evidence file its skeleton — the
-   stage-stamp file and the lesson-disposition file
-   (`LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, both boundary-reset to their header).
-   The queue header line:
+2. Give the queue file its header and each evidence file its skeleton — the stage-stamp file and the lesson-disposition file (`LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, both boundary-reset to their header). The queue header line:
 
        ## Iteration: —
 
@@ -80,50 +49,15 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
        # contract: lifecycle-kit/SPEC.md §check-lesson-disposition
 
-3. Adopt `templates/stages/*.md` in your agent-skill directory (e.g.
-   `.claude/commands/`): by default make each skill a binding shim that
-   references the template (SPEC.md §templates/stages/) — it tracks the kit, so
-   a re-vendor reaches it and the shim gates hold it thin. Or, as the sanctioned
-   fork, copy each in and fill its named slots (`*<slot-name: …>*`) with your
-   project's ritual — you then own the ritual prose, upgrades don't reach it,
-   and the shim gates don't cover it (kept for legitimate structural
-   divergence).
+3. Adopt `templates/stages/*.md` in your agent-skill directory (e.g. `.claude/commands/`): by default make each skill a binding shim that references the template (SPEC.md §templates/stages/) — it tracks the kit, so a re-vendor reaches it and the shim gates hold it thin. Or, as the sanctioned fork, copy each in and fill its named slots (`*<slot-name: …>*`) with your project's ritual — you then own the ritual prose, upgrades don't reach it, and the shim gates don't cover it (kept for legitimate structural divergence).
 
-4. Point your always-loaded agent file at the machine — run
-   `--install-lifecycle` on the gate binary `GATE_SDK_NATIVE_BIN` names. It
-   writes a marker-bounded registration block (the state machine, the stage
-   roster as skill invocations, the SPEC link) into
-   `LIFECYCLE_KIT_AGENT_FILE` (default
-   `CLAUDE.md`), the roster derived from your config so a reshape (step 5)
-   flows in on a re-run. `check-lifecycle-registration` (step 1) holds the
-   block in lockstep. The same run also writes the merge-attribute block into
-   `.gitattributes` — a `merge=iteration-scoped` line per per-iteration state
-   surface (these resolve to the arriving branch at a merge — SPEC.md
-   §Multi-operator semantics) and a `merge=union` line for the committed gap
-   inbox (its append-only bullets must survive a concurrent merge — SPEC.md §The
-   committed gap inbox) — and registers the keep-ours driver in your clone's git
-   config (per-clone, the `--install-hooks` opt-in class; the git-native union
-   driver needs no such step). `check-merge-attrs` (step 1) holds the block in
-   parity with the derived supersede and union sets.
+4. Point your always-loaded agent file at the machine — run `--install-lifecycle` on the gate binary `GATE_SDK_NATIVE_BIN` names. It writes a marker-bounded registration block (the state machine, the stage roster as skill invocations, the SPEC link) into the file `LIFECYCLE_KIT_AGENT_FILE` names, the roster derived from your config so a reshape (step 5) flows in on a re-run. `check-lifecycle-registration` (step 1) holds the block in lockstep. The same run also writes the merge-attribute block into `.gitattributes` — a `merge=iteration-scoped` line per per-iteration state surface (these resolve to the arriving branch at a merge — SPEC.md §Multi-operator semantics) and a `merge=union` line for the committed gap inbox (its append-only bullets must survive a concurrent merge — SPEC.md §The committed gap inbox) — and registers the keep-ours driver in your clone's git config (per-clone, the `--install-hooks` opt-in class; the git-native union driver needs no such step). `check-merge-attrs` (step 1) holds the block in parity with the derived supersede and union sets.
 
-5. Optional — narrow the hand-edit window: register
-   `bash gate-sdk/bin/run-gates.sh --hook workflow-state-guard` as a
-   `PreToolUse(Write|Edit)` hook (guard-kit's `templates/settings-hooks.json`
-   carries the block). It refuses an agent write to the stage-stamp file, whose
-   only sanctioned writer is the `--enter-stage` arm — the gates that would catch a
-   hand-stamp all fire at commit, and an uncommitted one moves the cursor for a
-   whole session (SPEC.md §check-stage-evidence). Requires guard-kit vendored.
+5. Optional — narrow the hand-edit window: register `bash gate-sdk/bin/run-gates.sh --hook workflow-state-guard` as a `PreToolUse(Write|Edit)` hook (guard-kit's `templates/settings-hooks.json` carries the block). It refuses an agent write to the stage-stamp file, whose only sanctioned writer is the `--enter-stage` arm — the gates that would catch a hand-stamp all fire at commit, and an uncommitted one moves the cursor for a whole session (SPEC.md §check-stage-evidence). Requires guard-kit vendored.
 
-6. Optional — reshape the machine: copy `templates/lifecycle-config.knobs` into
-   your gates dir and set stages, predecessors, drain/audit stages, section
-   names, or file paths, one `NAME = value` or `NAME[] = element` line each.
-   Defaults are this repo's own lifecycle; `--emit knob-roster` on the gate
-   binary `GATE_SDK_NATIVE_BIN` names prints them.
+6. Optional — reshape the machine: copy `templates/lifecycle-config.knobs` into your gates dir and set stages, predecessors, drain/audit stages, section names, or file paths, one `NAME = value` or `NAME[] = element` line each. Defaults are this repo's own lifecycle; `--emit knob-roster` on the gate binary `GATE_SDK_NATIVE_BIN` names prints them.
 
-After install the battery is red at `check-stage-evidence` until your first
-`/scope` session runs (it names the iteration and stamps the evidence file as
-its first step) — the bootstrap header is a stage like any other, fail-closed
-by design.
+After install the battery is red at `check-stage-evidence` until your first `/scope` session runs (it names the iteration and stamps the evidence file as its first step) — the bootstrap header is a stage like any other, fail-closed by design.
 
 ## Use
 
@@ -140,19 +74,9 @@ Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
 "$gates" --emit ruling-staleness ["<ruling name>"…]  # fired conditions, undeclared ones, citing sites
 ```
 
-`--emit session-id` is [SPEC.md](SPEC.md) §bin/session-id.sh's derivation order,
-which `--enter-stage` reads for you: reach for it directly only where a session
-writes an id itself, as `templates/lead.md`'s session-role marker step does. It
-takes no argument and resolves no knob. **The front-end route reads the cwd
-`bin/run-gates.sh` cds to** — the git toplevel — so a caller standing elsewhere
-whose sessions dir is the cwd-slugged default invokes the binary's
-`--emit-session-id` arm directly instead, which is what `--enter-stage` does.
+`--emit session-id` is [SPEC.md](SPEC.md) §bin/session-id.sh's derivation order, which `--enter-stage` reads for you: reach for it directly only where a session writes an id itself, as `templates/lead.md`'s session-role marker step does. It takes no argument and resolves no knob. **The front-end route reads the cwd `bin/run-gates.sh` cds to** — the git toplevel — so a caller standing elsewhere whose sessions dir is the cwd-slugged default invokes the binary's `--emit-session-id` arm directly instead, which is what `--enter-stage` does.
 
-The two survey arms are the capture and citation affordances of
-[SPEC.md](SPEC.md) §The survey record, reached through gate-sdk's battery
-front-end, which locates the gate binary for them. `--` ends option processing for either, and a
-positional beginning with `-` without it is a refusal — the shape half of
-gate-sdk/SPEC.md §The bin/-tool contract, which outlives the port.
+The two survey arms are the capture and citation affordances of [SPEC.md](SPEC.md) §The survey record, reached through gate-sdk's battery front-end, which locates the gate binary for them. `--` ends option processing for either, and a positional beginning with `-` without it is a refusal — the shape half of gate-sdk/SPEC.md §The bin/-tool contract, which outlives the port.
 
 ## Test
 

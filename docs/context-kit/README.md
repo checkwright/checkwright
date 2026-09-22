@@ -6,35 +6,15 @@ generated: true
 <!-- door-contributor: a generated mirror of a kit's own contributor source; every door on the page is that source's, and the banner above is the regeneration recipe -->
 # context-kit
 
-Token-economics-aware context management for stateless agent sessions: an
-index-first reading toolset, a session-start hook that assembles a compact
-brief, a meter that tracks the always-loaded surface against a committed
-baseline, one gate over its governed always-loaded sections, a freshness-gated
-per-kit token-footprint projection, a close-stage
-brevity pass that reacts to the meter's delta, and a memory-off gate pair
-(settings pins plus a local memory-dir scan) that keeps the harness's
-ungoverned auto-memory surface disabled.
+Token-economics-aware context management for stateless agent sessions: an index-first reading toolset, a session-start hook that assembles a compact brief, a meter that tracks the always-loaded surface against a committed baseline, one gate over its governed always-loaded sections, a freshness-gated per-kit token-footprint projection, a close-stage brevity pass that reacts to the meter's delta, and a memory-off gate pair (settings pins plus a local memory-dir scan) that keeps the harness's ungoverned auto-memory surface disabled.
 
-Why: a stateless session pays for context twice. The *on-demand* cost is
-opening a whole SPEC or source file when one section was needed — the index
-tools cut that ("index, then read the one you need"). The *standing* cost is the
-always-loaded surface (the instructions file, the session-start hook output)
-where every added line is a recurring per-session tax that grows silently,
-because no single session sees the trend — the meter, the gate, and the
-close-stage pass make that growth visible and actionable. See
-[SPEC.md](SPEC.md) for the full contracts.
+Why: a stateless session pays for context twice. The *on-demand* cost is opening a whole SPEC or source file when one section was needed — the index tools cut that ("index, then read the one you need"). The *standing* cost is the always-loaded surface (the instructions file, the session-start hook output) where every added line is a recurring per-session tax that grows silently, because no single session sees the trend — the meter, the gate, and the close-stage pass make that growth visible and actionable. See [SPEC.md](SPEC.md) for the full contracts.
 
-An installer-vendored tree does not carry this file. The payload withholds each
-kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is
-repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is
-packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer
-payload).
+An installer-vendored tree does not carry this file. The payload withholds each kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
 
 ## Install
 
-Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree/master/gate-sdk/) (required); the meter's default
-hook approximation and the session-context template also expect
-[queue-kit](https://github.com/checkwright/checkwright/tree/master/queue-kit/). Then:
+Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree/master/gate-sdk/) (required); the meter's default hook approximation and the session-context template also expect [queue-kit](https://github.com/checkwright/checkwright/tree/master/queue-kit/). Then:
 
 1. Register the gates — add to your `gates.list`:
 
@@ -49,43 +29,15 @@ hook approximation and the session-context template also expect
    ```
    <!-- gate-roster:end -->
 
-   They resolve through gate-sdk's registry path (your gates dir first, then
-   each kit's `checks/`), and their `# graph:` manifests put them in the
-   generated pre-commit hook, which `--emit git-hooks --write` on the gate
-   binary `GATE_SDK_NATIVE_BIN` names writes.
-   The memory-off gates are inert until you opt in — `check-settings-pins`
-   skips clean with no pins file, so create `settings-pins.conf` (one
-   `<path> = <expected JSON>` per line, the path a dot/bracket path expression
-   rather than an arbitrary `jq` filter — SPEC.md §check-settings-pins) naming
-   the keys to hold, e.g. the
-   auto-memory-disabling ones. `check-settings-paths` needs no manifest: it
-   reads the same settings file and holds every allow-list grant naming a
-   literal `.sh` path against the tree. `check-footprint-fresh` byte-gates a committed
-   `docs/footprint.md` against the footprint emitter it calls in-process;
-   register it when you publish that projection. `check-surface-ratchet` arms
-   once you stamp its ceilings —
-   `--emit always-loaded --ceiling` on the gate binary, committed —
-   and reds thereafter on a governed surface that grew past its row without a
-   deliberate re-stamp (SPEC.md §The surface ratchet).
+   They resolve through gate-sdk's registry path (your gates dir first, then each kit's `checks/`), and their `# graph:` manifests put them in the generated pre-commit hook, which `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names writes. The memory-off gates are inert until you opt in — `check-settings-pins` skips clean with no pins file, so create `settings-pins.conf` (one `<path> = <expected JSON>` per line, the path a dot/bracket path expression rather than an arbitrary `jq` filter — SPEC.md §check-settings-pins) naming the keys to hold, e.g. the auto-memory-disabling ones. `check-settings-paths` needs no manifest: it reads the same settings file and holds every allow-list grant naming a literal `.sh` path against the tree. `check-footprint-fresh` byte-gates a committed `docs/footprint.md` against the footprint emitter it calls in-process; register it when you publish that projection. `check-surface-ratchet` arms once you stamp its ceilings — `--emit always-loaded --ceiling` on the gate binary, committed — and reds thereafter on a governed surface that grew past its row without a deliberate re-stamp (SPEC.md §The surface ratchet).
 
-2. Wire the session-start hook — copy `templates/session-context.sh` into your
-   gates dir, edit its `[EDIT ME]` sections (layout judgment, not mechanism),
-   and merge `templates/settings-sessionstart.json` into `.claude/settings.json`.
+2. Wire the session-start hook — copy `templates/session-context.sh` into your gates dir, edit its `[EDIT ME]` sections (layout judgment, not mechanism), and merge `templates/settings-sessionstart.json` into `.claude/settings.json`.
 
-3. Set the baseline — run `--emit always-loaded --update-baseline` on the gate
-   binary `GATE_SDK_NATIVE_BIN` names and commit
-   `.workflow/always-loaded-baseline.txt`.
+3. Set the baseline — run `--emit always-loaded --update-baseline` on the gate binary `GATE_SDK_NATIVE_BIN` names and commit `.workflow/always-loaded-baseline.txt`.
 
-4. Seed your env profile — the gate binary's `--emit env-probe` arm
-   writes a marker-bounded machine profile (OS, package manager, toolchain versions,
-   absent tools) into `ENV.local.md` and seeds a hand-authored gotchas scaffold
-   above the markers. The file is local-only (gitignore it); re-run on demand
-   when the box changes. The session-context hook emits it when present.
+4. Seed your env profile — the gate binary's `--emit env-probe` arm writes a marker-bounded machine profile (OS, package manager, toolchain versions, absent tools) into `ENV.local.md` and seeds a hand-authored gotchas scaffold above the markers. The file is local-only (gitignore it); re-run on demand when the box changes. The session-context hook emits it when present.
 
-5. Optional — retune: copy `templates/context-config.knobs` into your gates dir and
-   override any knob (surfaces, hook-body command, brevity file/section set/
-   budget/pointer pattern, env-profile file). Defaults are this repo's layout. Splice
-   `templates/close-brevity.md` into your close skill.
+5. Optional — retune: copy `templates/context-config.knobs` into your gates dir and override any knob (surfaces, hook-body command, brevity file/section set/ budget/pointer pattern, env-profile file). Defaults are this repo's layout. Splice `templates/close-brevity.md` into your close skill.
 
 ## Use
 

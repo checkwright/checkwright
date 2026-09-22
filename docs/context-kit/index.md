@@ -6,23 +6,13 @@ nav_child_order: 7
 
 # context-kit
 
-Token-economics-aware context management. Everything a stateless session reads
-costs tokens, and a session that reads whole files to answer a narrow question
-burns its budget before it starts work. context-kit makes reading cheap and
-deliberate.
+Token-economics-aware context management. Everything a stateless session reads costs tokens, and a session that reads whole files to answer a narrow question burns its budget before it starts work. context-kit makes reading cheap and deliberate.
 
-It ships index-first reading tools that surface a file's shape before its body,
-a session-start hook that assembles a compact orienting brief, an always-loaded
-meter with a committed baseline, a gate over the density of the densest
-always-loaded section, and a memory-off gate pair that keeps the harness's
-ungoverned per-session memory surface disabled — the doctrine and both gates
-are defined in the kit's
-[`SPEC.md`](SPEC.md#the-memory-off-doctrine).
+It ships index-first reading tools that surface a file's shape before its body, a session-start hook that assembles a compact orienting brief, an always-loaded meter with a committed baseline, a gate over the density of the densest always-loaded section, and a memory-off gate pair that keeps the harness's ungoverned per-session memory surface disabled — the doctrine and both gates are defined in the kit's [`SPEC.md`](SPEC.md#the-memory-off-doctrine).
 
 ## Install
 
-The steps are the kit README's [Install](README.md#install) section.
-`checkwright init` does them for you — see the [install page](../install.md).
+The steps are the kit README's [Install](README.md#install) section. `checkwright init` does them for you — see the [install page](../install.md).
 
 ## Quick start
 
@@ -36,11 +26,4 @@ Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ## Contracts
 
-The reading-tool contracts and the always-loaded budget are defined in the
-kit's
-[`SPEC.md`](SPEC.md#the-consumer-footprint),
-including the consumer footprint it holds — what the kits ask
-your always-loaded surface to carry, worth reading before you vendor. Its
-[`README.md`](README.md#context-kit)
-lists the mechanism. Back to the
-[kit map](../index.md#the-kits).
+The reading-tool contracts and the always-loaded budget are defined in the kit's [`SPEC.md`](SPEC.md#the-consumer-footprint), including the consumer footprint it holds — what the kits ask your always-loaded surface to carry, worth reading before you vendor. Its [`README.md`](README.md#context-kit) lists the mechanism. Back to the [kit map](../index.md#the-kits).

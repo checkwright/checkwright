@@ -80,14 +80,25 @@ impl Sink {
     }
 }
 
+// spec: canon-kit/SPEC.md §check-knob-citation — the reach binding a knob token to a value marker
+const MARKER_REACH: usize = 100;
+
 impl spec::ProseSink for Sink {
     fn on_line(&mut self, file: &str, fnr: usize, raw: &str) {
         // spec: canon-kit/SPEC.md §check-knob-citation — a knob named inside a `${…}` shell
         // expansion is a name citation, never a value statement of itself; blank the
         // expansions before the token scan
         let tokline = blank_expansions(raw);
-        let bound = spec::DefaultGrammar { is_knobname: &|t: &str| self.has_prefix(t) }
-            .default_bound(raw);
+        let markers = spec::DefaultGrammar { is_knobname: &|t: &str| self.has_prefix(t) }
+            .default_bound_at(raw);
+        // spec: canon-kit/SPEC.md §check-knob-citation — a token binds a marker that follows it
+        // within MARKER_REACH code points, so an unwrapped paragraph does not bind a knob to
+        // another knob's default
+        let near = |at: usize| {
+            markers.iter().any(|&m| {
+                m > at && raw.get(at..m).is_some_and(|s| s.chars().count() <= MARKER_REACH)
+            })
+        };
         let mut first: Option<(String, String)> = None;
         let b = tokline.as_bytes();
         let mut pos = 0usize;
@@ -126,11 +137,11 @@ impl spec::ProseSink for Sink {
                 ));
                 return;
             }
-            if first.is_none() {
+            if first.is_none() && near(start) {
                 first = Some((tok, owner));
             }
         }
-        if bound {
+        {
             if let Some((tok, owner)) = first {
                 self.out.push(format!(
                     "  {}:{}  {} stated with a default value — the value belongs in {}/{}",
@@ -152,7 +163,7 @@ fn blank_expansions(line: &str) -> String {
     while i < b.len() {
         if b[i] == b'$' && i + 1 < b.len() && b[i + 1] == b'{' {
             if let Some(off) = b[i + 2..].iter().position(|&c| c == b'}') {
-                out.extend_from_slice(b"  ");
+                out.resize(out.len() + off + 3, b' ');
                 i = i + 2 + off + 1;
                 continue;
             }
@@ -192,4 +203,30 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
     println!("KNOB-CITATION: clean ({} manifest file(s); no kit knob stated with a value in prose outside the owning SPEC)", manifests.len());
     Ok(0)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::spec::ProseSink;
+
+    fn fired(line: &str) -> usize {
+        let mut s = Sink {
+            pairs: vec![("QUEUE_KIT_".to_string(), "queue-kit".to_string())],
+            spec_name: "SPEC.md".to_string(),
+            out: Vec::new(),
+        };
+        s.on_line("lifecycle-kit/SPEC.md", 1, line);
+        s.out.len()
+    }
+
+    // spec: canon-kit/SPEC.md §check-knob-citation — the default marker binds the knob it follows
+    // within reach, never a knob it precedes or one a paragraph away
+    #[test]
+    fn a_default_marker_binds_only_the_knob_it_follows_within_reach() {
+        assert_eq!(fired("`QUEUE_KIT_ENTRY_CAP` — default `4300cp`."), 1);
+        assert_eq!(fired("default `1500`. A policy, `QUEUE_KIT_ENTRY_CAP`'s posture."), 0);
+        let far = format!("`QUEUE_KIT_ENTRY_CAP` is cited. {} Another knob has default `7`.", "x".repeat(120));
+        assert_eq!(fired(&far), 0);
+    }
 }

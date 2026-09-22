@@ -1,797 +1,185 @@
 # site-kit — deployment-truth governance for a repo-served docs site
 
-A docs site served from the repository (GitHub Pages and equivalents) has two
-truths a gate battery must keep straight: what the *tree* says about the site's
-host, and whether the *live deployment* is actually up. site-kit gates the
-tree-side truths — the cited host, and whether each page renders faithfully
-through the platform's own parser — and ships a template for the deployment
-liveness, holding the boundary between gate and monitor so neither leaks into
-the other.
+A docs site served from the repository (GitHub Pages and equivalents) has two truths a gate battery must keep straight: what the *tree* says about the site's host, and whether the *live deployment* is actually up. site-kit gates the tree-side truths — the cited host, and whether each page renders faithfully through the platform's own parser — and ships a template for the deployment liveness, holding the boundary between gate and monitor so neither leaks into the other.
 
 ## The monitor boundary
 
-**The line is where the asserted object lives.** A gate asserts over the tree: a
-checkout plus bash is all it needs, which is what makes it deterministic,
-hermetic, and safe to block a merge with. Deployment truth is in no checkout —
-the live host's responses, its certificate, and the bodies of the Releases it
-publishes are state no commit contains — so no gate can assert it, and enforcing
-it through a pre-commit or CI gate would break both the low-false-positive
-contract and the CI backstop's checkout-plus-bash hermeticity
-(gate-sdk/SPEC.md §Enforcement tiers).
+**The line is where the asserted object lives.** A gate asserts over the tree: a checkout plus bash is all it needs, which is what makes it deterministic, hermetic, and safe to block a merge with. Deployment truth is in no checkout — the live host's responses, its certificate, and the bodies of the Releases it publishes are state no commit contains — so no gate can assert it, and enforcing it through a pre-commit or CI gate would break both the low-false-positive contract and the CI backstop's checkout-plus-bash hermeticity (gate-sdk/SPEC.md §Enforcement tiers).
 
-Object location governs rather than *whether a commit caused the failure*, and
-the difference is load-bearing. Some host-side failures are caused by nothing any
-commit did — DNS, a Pages incident, a stalled certificate renewal. Others are
-caused by a session skipping a step, which is commit-shaped in spirit and still
-ungateable, because the artifact it damaged sits on the host rather than in the
-tree. A criterion built on cause admits the first kind and stumbles on the
-second; a criterion built on where the object lives covers both, and stays true
-of every probe arm instead of only the arms whose causes it happens to list.
+Object location governs rather than *whether a commit caused the failure*, and the difference is load-bearing. Some host-side failures are caused by nothing any commit did — DNS, a Pages incident, a stalled certificate renewal. Others are caused by a session skipping a step, which is commit-shaped in spirit and still ungateable, because the artifact it damaged sits on the host rather than in the tree. A criterion built on cause admits the first kind and stumbles on the second; a criterion built on where the object lives covers both, and stays true of every probe arm instead of only the arms whose causes it happens to list.
 
-So the deployment probe is *monitoring*, not a gate: it ships as
-`templates/site-health.yml`, a scheduled workflow a consumer copies, and signals
-through an issue and a red run of its own, never a blocked merge. The
-tree-honesty half — that the repo never *cites* a stale host — is a real gate,
-because that is a property of the tree.
+So the deployment probe is *monitoring*, not a gate: it ships as `templates/site-health.yml`, a scheduled workflow a consumer copies, and signals through an issue and a red run of its own, never a blocked merge. The tree-honesty half — that the repo never *cites* a stale host — is a real gate, because that is a property of the tree.
 
 ## Layout and configuration
 
-The kit is vendored beside gate-sdk (conventionally at `site-kit/`); its gate
-is registered in the consumer's `gates.list` by name and resolves through
-gate-sdk's multi-kit path. `check-docs-cname-parity` registers where a docs
-site with a gated host exists; a consumer without one simply omits it.
-`check-docs-highlight-coverage` registers anywhere, because it is disarmed until
-`SITE_KIT_HIGHLIGHT_TOKENS` names a snapshot, and a site whose layout restyles
-code highlighting arms it.
+The kit is vendored beside gate-sdk (conventionally at `site-kit/`); its gate is registered in the consumer's `gates.list` by name and resolves through gate-sdk's multi-kit path. `check-docs-cname-parity` registers where a docs site with a gated host exists; a consumer without one simply omits it. `check-docs-highlight-coverage` registers anywhere, because it is disarmed until `SITE_KIT_HIGHLIGHT_TOKENS` names a snapshot, and a site whose layout restyles code highlighting arms it.
 
-Config is a **knob file**: write a `site-config.knobs` in the gates dir (or point
-`SITE_KIT_KNOB_FILE` elsewhere) setting any knob §Knob defaults lists; defaults
-fill what the file leaves unset. The grammar, the `.local` overlay, the
-environment-over-file precedence for a scalar, and the refusals — a set
-`SITE_KIT_KNOB_FILE` that does not exist, a left-behind `site-config.sh`, a
-non-empty file named by the retired `SITE_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md
-§The knob file's.
+Config is a **knob file**: write a `site-config.knobs` in the gates dir (or point `SITE_KIT_KNOB_FILE` elsewhere) setting any knob §Knob defaults lists; defaults fill what the file leaves unset. The grammar, the `.local` overlay, the environment-over-file precedence for a scalar, and the refusals — a set `SITE_KIT_KNOB_FILE` that does not exist, a left-behind `site-config.sh`, a non-empty file named by the retired `SITE_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob file's.
 
-`templates/site-health.yml` is governed by none of these. Its knobs — `ALT_DOMAIN`,
-the three `RELEASE_NOTE_*` and the two `HIGHLIGHT_*` below — are **step-level workflow env** set in the
-copied file itself, not `SITE_KIT_*` knobs, and no knob file names them.
-The template is copied and edited rather than read as config, so reaching into
-the gates dir would couple a monitor to it and hard-code a vendored kit path into
-a workflow whose whole distribution model is verbatim copy.
+`templates/site-health.yml` is governed by none of these. Its knobs — `ALT_DOMAIN`, the three `RELEASE_NOTE_*` and the two `HIGHLIGHT_*` below — are **step-level workflow env** set in the copied file itself, not `SITE_KIT_*` knobs, and no knob file names them. The template is copied and edited rather than read as config, so reaching into the gates dir would couple a monitor to it and hard-code a vendored kit path into a workflow whose whole distribution model is verbatim copy.
 
 ## Knob defaults
 
-site-kit's knobs are **static**: the binary resolves them in process from its own
-defaults table and the consumer's knob file (gate-sdk/SPEC.md §The knob file).
-`bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one with its
-shape and rendered default.
+site-kit's knobs are **static**: the binary resolves them in process from its own defaults table and the consumer's knob file (gate-sdk/SPEC.md §The knob file). `bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one with its shape and rendered default.
 
-- `SITE_KIT_CNAME` — the CNAME file holding the one authoritative host line,
-  default `docs/CNAME`.
-- `SITE_KIT_ALIASES` — array, default empty: every reachable host that is *not*
-  the cited docs host and must therefore never appear in a `://` URL in the
-  tree. Rule content by nature, so it is consumer config — a kit literal
-  carrying it would publish a project's host names across the provenance seam.
+- `SITE_KIT_CNAME` — the CNAME file holding the one authoritative host line, default `docs/CNAME`.
+- `SITE_KIT_ALIASES` — array, default empty: every reachable host that is *not* the cited docs host and must therefore never appear in a `://` URL in the tree. Rule content by nature, so it is consumer config — a kit literal carrying it would publish a project's host names across the provenance seam.
 - `SITE_KIT_SCAN_ROOT` — the `git ls-files` root the gate walks, default `.`.
-- `SITE_KIT_EXEMPT_PATHS` — array of path globs skipped during the scan,
-  default `("*/gate-tests/*" "*docs/posts/*")`: fixture trees deliberately cite
-  aliases, and dated posts are immutable published artifacts.
-- `SITE_KIT_DOCS_DIR` — the docs-site root `check-docs-render-fidelity` walks
-  for tracked markdown pages, default `docs`.
-- `SITE_KIT_HIGHLIGHT_TOKENS` — the tracked snapshot of the token classes the
-  site theme's highlight CSS colours, default empty, which disarms
-  `check-docs-highlight-coverage`. Which theme a site uses and which classes it
-  colours is one project's content, so the list is consumer config.
-- `SITE_KIT_HIGHLIGHT_OVERRIDES` — array of pathspecs listing the tracked files
-  whose CSS overrides the theme, default `("docs/_layouts/*.html")`.
-- `SITE_KIT_HIGHLIGHT_SCOPE` — the selector the theme scopes its highlight
-  classes under, default `.highlight`.
-- `SITE_KIT_RENDERER` — array, the stdin→stdout **single-document** GFM-to-HTML
-  command, default the kramdown CLI invocation with GFM input —
-  `ruby -e '…Kramdown::Document…input: "GFM"…'`, the parser GitHub Pages pins.
-  It is the contract `check-docs-render-fidelity` renders each page through when
-  `SITE_KIT_RENDERER_BATCH` is empty: one of the gate's two renderer contracts,
-  and the fallback of the pair. A consumer whose Pages stack differs points this
-  at its own renderer; an unresolvable one fails the gate closed.
-  **Its value is also a port blocker, and repointing it moves one.** The first
-  element of whatever this knob holds is an external program
-  `check-docs-render-fidelity` requires, which is what gate-sdk's criterion 7
-  screens for and what `bash gate-sdk/bin/run-gates.sh --emit port-blockers` derives
-  by resolving this knob (gate-sdk/SPEC.md §port-blockers). The dependency is
-  spelled nowhere in the
-  gate's own source, so it is recorded here, where the knob lives: a consumer who
-  points this at a renderer their payload already carries removes that blocker,
-  and one who points it at a heavier toolchain deepens it.
-- `SITE_KIT_RENDERER_BATCH` — array, **optional**: a command rendering N
-  documents over one stream, `NUL`-terminated in both directions and
-  count-preserving, the framing specified in §check-docs-render-fidelity. Setting
-  it collapses the gate's per-page interpreter restarts into a single process,
-  which is where substantially all of that gate's cost lives. Its default is the
-  batch form of the same kramdown-with-GFM-input invocation `SITE_KIT_RENDERER`
-  defaults to — a `ruby -e` loop splitting stdin on `NUL` and writing one
-  `NUL`-terminated HTML document per input — filled **only when
-  `SITE_KIT_RENDERER` is itself still at its kit default.** Filling it
-  unconditionally would defeat a deliberate pin: a consumer who points
-  `SITE_KIT_RENDERER` at the version-locked bundle below, not knowing a second
-  knob now exists, would have that pinned oracle replaced by this unpinned one
-  and the gate would report clean against a parser build they explicitly
-  rejected — a false clean produced by an upgrade. Under the rule they instead
-  keep the per-document path at its own cost and its own semantics, and opt in by
-  pointing this knob at the batch form of their own pinned renderer. "Pinned"
-  means set in a knob file, tracked or overlay: an indexed knob takes no
-  environment override, so a file is the only place `SITE_KIT_RENDERER` is set
-  from.
+- `SITE_KIT_EXEMPT_PATHS` — array of path globs skipped during the scan, default `("*/gate-tests/*" "*docs/posts/*")`: fixture trees deliberately cite aliases, and dated posts are immutable published artifacts.
+- `SITE_KIT_DOCS_DIR` — the docs-site root `check-docs-render-fidelity` walks for tracked markdown pages, default `docs`.
+- `SITE_KIT_HIGHLIGHT_TOKENS` — the tracked snapshot of the token classes the site theme's highlight CSS colours, default empty, which disarms `check-docs-highlight-coverage`. Which theme a site uses and which classes it colours is one project's content, so the list is consumer config.
+- `SITE_KIT_HIGHLIGHT_OVERRIDES` — array of pathspecs listing the tracked files whose CSS overrides the theme, default `("docs/_layouts/*.html")`.
+- `SITE_KIT_HIGHLIGHT_SCOPE` — the selector the theme scopes its highlight classes under, default `.highlight`.
+- `SITE_KIT_RENDERER` — array, the stdin→stdout **single-document** GFM-to-HTML command, default the kramdown CLI invocation with GFM input — `ruby -e '…Kramdown::Document…input: "GFM"…'`, the parser GitHub Pages pins. It is the contract `check-docs-render-fidelity` renders each page through when `SITE_KIT_RENDERER_BATCH` is empty: one of the gate's two renderer contracts, and the fallback of the pair. A consumer whose Pages stack differs points this at its own renderer; an unresolvable one fails the gate closed. **Its value is also a port blocker, and repointing it moves one.** The first element of whatever this knob holds is an external program `check-docs-render-fidelity` requires, which is what gate-sdk's criterion 7 screens for and what `bash gate-sdk/bin/run-gates.sh --emit port-blockers` derives by resolving this knob (gate-sdk/SPEC.md §port-blockers). The dependency is spelled nowhere in the gate's own source, so it is recorded here, where the knob lives: a consumer who points this at a renderer their payload already carries removes that blocker, and one who points it at a heavier toolchain deepens it.
+- `SITE_KIT_RENDERER_BATCH` — array, **optional**: a command rendering N documents over one stream, `NUL`-terminated in both directions and count-preserving, the framing specified in §check-docs-render-fidelity. Setting it collapses the gate's per-page interpreter restarts into a single process, which is where substantially all of that gate's cost lives. Its default is the batch form of the same kramdown-with-GFM-input invocation `SITE_KIT_RENDERER` defaults to — a `ruby -e` loop splitting stdin on `NUL` and writing one `NUL`-terminated HTML document per input — filled **only when `SITE_KIT_RENDERER` is itself still at its kit default.** Filling it unconditionally would defeat a deliberate pin: a consumer who points `SITE_KIT_RENDERER` at the version-locked bundle below, not knowing a second knob now exists, would have that pinned oracle replaced by this unpinned one and the gate would report clean against a parser build they explicitly rejected — a false clean produced by an upgrade. Under the rule they instead keep the per-document path at its own cost and its own semantics, and opt in by pointing this knob at the batch form of their own pinned renderer. "Pinned" means set in a knob file, tracked or overlay: an indexed knob takes no environment override, so a file is the only place `SITE_KIT_RENDERER` is set from.
 
 ## check-docs-cname-parity
 
-`checks/check-docs-cname-parity.gate` (`precommit`, binary-dispatched).
-Invariant: no tracked file cites a `SITE_KIT_ALIASES` host in a `://` URL,
-where the authoritative host `H` is read from `SITE_KIT_CNAME`. The CNAME file
-must hold exactly one non-blank host line (else exit 2); `H` itself is exempt
-even when listed among the aliases, so a canonical apex that doubles as a
-redirect target is cited freely. The scan enumerates tracked files under
-`SITE_KIT_SCAN_ROOT` via `git ls-files`, drops the gate-sdk prune set and every
-`SITE_KIT_EXEMPT_PATHS` glob, and greps the survivors for `://<host>`; a host
-that is a configured alias other than `H` is a finding. A rename is thus a
-one-line edit to the CNAME file that the gate re-propagates — the host lives in
-one gated place, and drift anywhere else is caught. The scan reads tracked
-content only, so an untracked local file is never a source; a `git ls-files`
-error is fail-closed (exit 2). The positional form
-`check-docs-cname-parity <scan-root> <cname-file>` lets a fixture point both at
-a synthetic tree without touching consumer config.
+`checks/check-docs-cname-parity.gate` (`precommit`, binary-dispatched). Invariant: no tracked file cites a `SITE_KIT_ALIASES` host in a `://` URL, where the authoritative host `H` is read from `SITE_KIT_CNAME`. The CNAME file must hold exactly one non-blank host line (else exit 2); `H` itself is exempt even when listed among the aliases, so a canonical apex that doubles as a redirect target is cited freely. The scan enumerates tracked files under `SITE_KIT_SCAN_ROOT` via `git ls-files`, drops the gate-sdk prune set and every `SITE_KIT_EXEMPT_PATHS` glob, and greps the survivors for `://<host>`; a host that is a configured alias other than `H` is a finding. A rename is thus a one-line edit to the CNAME file that the gate re-propagates — the host lives in one gated place, and drift anywhere else is caught. The scan reads tracked content only, so an untracked local file is never a source; a `git ls-files` error is fail-closed (exit 2). The positional form `check-docs-cname-parity <scan-root> <cname-file>` lets a fixture point both at a synthetic tree without touching consumer config.
 
-**Its default scan root makes the whole tracked tree its content corpus, and
-that is a port cost worth stating where the rule lives.** With `SITE_KIT_SCAN_ROOT`
-unset the walk is every tracked file, so every kit's `checks/*.sh` and `*.gate`
-is inside the corpus this gate reads *as content* — gate-sdk's criterion 4
-verbatim, reached through the walk rather than through the trigger field. The
-`# graph:` couple is the single literal CNAME file, so the derived
-substrate-sensitive set never selects it and gate-sdk's conservation assertion
-structurally cannot see the hold; it is the first worked instance in that
-direction (gate-sdk/SPEC.md §The fourth budget batch). The discharge is the
-general one: the fixture pair carries the arm, because `gate-tests` is pruned
-from every live-tree walk and no port can change what is inside it. The pair's
-good case therefore takes the default arm — no positional, scan root and CNAME
-both at their knob defaults, a fixture declaration path inside its own corpus —
-and the bad case keeps the explicit-root arm.
+**Its default scan root makes the whole tracked tree its content corpus, and that is a port cost worth stating where the rule lives.** With `SITE_KIT_SCAN_ROOT` unset the walk is every tracked file, so every kit's `checks/*.sh` and `*.gate` is inside the corpus this gate reads *as content* — gate-sdk's criterion 4 verbatim, reached through the walk rather than through the trigger field. The `# graph:` couple is the single literal CNAME file, so the derived substrate-sensitive set never selects it and gate-sdk's conservation assertion structurally cannot see the hold; it is the first worked instance in that direction (gate-sdk/SPEC.md §The fourth budget batch). The discharge is the general one: the fixture pair carries the arm, because `gate-tests` is pruned from every live-tree walk and no port can change what is inside it. The pair's good case therefore takes the default arm — no positional, scan root and CNAME both at their knob defaults, a fixture declaration path inside its own corpus — and the bad case keeps the explicit-root arm.
 
-**There is no third positional selecting a config file.** Which knob file the
-member reads is already selectable, by `SITE_KIT_KNOB_FILE`, so a positional would
-be a second spelling of that one knob. A fixture supplies its own alias set the way
-any consumer does — a `site-config.knobs` in the gates dir of its case — which
-costs the pair nothing.
+**There is no third positional selecting a config file.** Which knob file the member reads is already selectable, by `SITE_KIT_KNOB_FILE`, so a positional would be a second spelling of that one knob. A fixture supplies its own alias set the way any consumer does — a `site-config.knobs` in the gates dir of its case — which costs the pair nothing.
 
 ## check-docs-render-fidelity
 
-Invariant: every tracked markdown page under `SITE_KIT_DOCS_DIR`, rendered
-through the Pages parser, leaks no code-span corruption symptom into
-rendered text — neither a literal backtick nor a raw non-HTML-element tag
-surviving outside a code context — promotes no code-fenced line into a heading,
-and renders no fewer tables than its source GFM table starts. GitHub Pages
-renders through kramdown's GFM parser, which diverges from github.com's cmark:
-consecutive fenced blocks inside one list item corrupt the page — the second
-fence prints literally and a `#`-leading skeleton line becomes a heading — so a
-tree that reads green on github.com can ship a garbled Pages site with no gate in
-the path. This gate mechanizes deployment-faithful artifact verification for
-that artifact: it renders the real output and asserts the observed leakage class,
-rather than trusting the source.
+Invariant: every tracked markdown page under `SITE_KIT_DOCS_DIR`, rendered through the Pages parser, leaks no code-span corruption symptom into rendered text — neither a literal backtick nor a raw non-HTML-element tag surviving outside a code context — promotes no code-fenced line into a heading, and renders no fewer tables than its source GFM table starts. GitHub Pages renders through kramdown's GFM parser, which diverges from github.com's cmark: consecutive fenced blocks inside one list item corrupt the page — the second fence prints literally and a `#`-leading skeleton line becomes a heading — so a tree that reads green on github.com can ship a garbled Pages site with no gate in the path. This gate mechanizes deployment-faithful artifact verification for that artifact: it renders the real output and asserts the observed leakage class, rather than trusting the source.
 
-The leakage class has more than one root cause, and the assertion keys on the
-**shared symptom** rather than on any single cause — one low-false-positive
-assertion covering every shape that leaves the same signature. The causes
-observed on this tree: (1) a code span that wraps across a line break whose
-continuation begins with a block-level or generic XML tag; (2) a single-line code
-span whose embedded angle-bracket token (a placeholder such as `<verdict>` or
-`<n>`) is consumed as a raw HTML span before the span can close, no line break
-involved; (3) a code span nesting escaped backticks alongside such a token. Those
-three are the same kramdown behavior — parsing blocks before spans, it treats the
-angle-bracket token as the start of an HTML block, severing the span so it emits
-raw HTML that swallows the rest of the page (`gettalong/kramdown#843`, closed
-works-as-designed: a documented, permanent divergence, not a pending fix). Cause
-(4) is a **different mechanism with the same signature**, which is why keying on
-the symptom rather than on the parse pays: a single-backtick span whose content
-begins or ends with a space does not form a span at all under the GFM parser, so
-its opening backtick stays literal and pairs with the *next* backtick on the
-page, severing a span further down that is itself well-formed. The reported
-location is therefore downstream of the defect, and a session that reads only the
-reported line re-buys the diagnosis (measured 2026-08-30: two battery cycles). A
-severed span never forms the closing fence run, so it leaves not a multi-backtick
-marker but a **single** stray backtick and a **raw placeholder tag** in the
-rendered text — which is exactly the symptom the assertion keys on, so the gate is
-a standing defense against the whole class rather than a stopgap against one
-backtick-fence shape of it.
+The leakage class has more than one root cause, and the assertion keys on the **shared symptom** rather than on any single cause — one low-false-positive assertion covering every shape that leaves the same signature. The causes observed on this tree: (1) a code span that wraps across a line break whose continuation begins with a block-level or generic XML tag; (2) a single-line code span whose embedded angle-bracket token (a placeholder such as `<verdict>` or `<n>`) is consumed as a raw HTML span before the span can close, no line break involved; (3) a code span nesting escaped backticks alongside such a token. Those three are the same kramdown behavior — parsing blocks before spans, it treats the angle-bracket token as the start of an HTML block, severing the span so it emits raw HTML that swallows the rest of the page (`gettalong/kramdown#843`, closed works-as-designed: a documented, permanent divergence, not a pending fix). Cause (4) is a **different mechanism with the same signature**, which is why keying on the symptom rather than on the parse pays: a single-backtick span whose content begins or ends with a space does not form a span at all under the GFM parser, so its opening backtick stays literal and pairs with the *next* backtick on the page, severing a span further down that is itself well-formed. The reported location is therefore downstream of the defect, and a session that reads only the reported line re-buys the diagnosis (measured 2026-08-30: two battery cycles). A severed span never forms the closing fence run, so it leaves not a multi-backtick marker but a **single** stray backtick and a **raw placeholder tag** in the rendered text — which is exactly the symptom the assertion keys on, so the gate is a standing defense against the whole class rather than a stopgap against one backtick-fence shape of it.
 
-**Reach is `SITE_KIT_DOCS_DIR`, and stays there.** A repo-root page has no site
-URL and is served by the forge's own CommonMark view, so a kramdown-only
-divergence there is not reader-visible and this gate is right not to walk it.
-The renderer-to-surface map is a consumer's own documentation concern, not a
-widened scan.
+**Reach is `SITE_KIT_DOCS_DIR`, and stays there.** A repo-root page has no site URL and is served by the forge's own CommonMark view, so a kramdown-only divergence there is not reader-visible and this gate is right not to walk it. The renderer-to-surface map is a consumer's own documentation concern, not a widened scan.
 
-The scan enumerates tracked `*.md` files under `SITE_KIT_DOCS_DIR` via
-`git ls-files` (every underscore-prefixed directory segment excluded — those are
-Jekyll internals, not published pages), strips Jekyll front matter so it renders
-exactly the body kramdown sees, and asserts three properties per page:
+The scan enumerates tracked `*.md` files under `SITE_KIT_DOCS_DIR` via `git ls-files` (every underscore-prefixed directory segment excluded — those are Jekyll internals, not published pages), strips Jekyll front matter so it renders exactly the body kramdown sees, and asserts three properties per page:
 
-1. **No span-corruption leakage** — the rendered HTML's text content, taken
-   after the `<pre>` blocks and inline `<code>` spans are removed (a legitimate
-   backtick renders inside `<code>` and a legitimate embedded tag renders as
-   escaped entities inside it, so both are excluded before the check), carries
-   neither of two symptoms: (a) **any literal backtick** — a single stray one,
-   not only a `` `{3,} `` fence run — and (b) **any raw tag whose element name is
-   not a known HTML element**, matched by name so an attribute-bearing legitimate
-   tag (`<a href…>`) is excluded and a placeholder token (`<verdict>`, `<n>`,
-   `<KIT>`) is not. Content inside an `<svg>` or `<math>` subtree is exempt from
-   (b), tracked by open/close depth: those two roots open foreign content whose
-   vocabularies (`<circle>`, `<mi>`) are not HTML element names, so scanning them
-   by the HTML set would red a page for legitimate inline markup. The exemption is
-   scoped to the subtree rather than granted to the names, so a bare `<path>` or
-   `<use>` outside any `<svg>` still reds as the placeholder token it is. Keep
-   such a subtree on one source line: kramdown severs a foreign root split across
-   a line break, emitting its tail as escaped text, and that is a real render
-   divergence the gate is right to red.
-   Either symptom is the signature of a code span or fenced block
-   the parser failed to form, regardless of which construct confused it: a
-   backtick that never paired, or a placeholder tag kramdown passed through as a
-   raw HTML block. The two are complementary — a swallowed page region whose own
-   inline code re-leaks as literal backticks trips (a), while a swallowed
-   backtick-free region (pure prose or headings) trips only (b) — so neither
-   alone covers the class and the assertion keys on both.
-2. **No heading leakage** — the count of rendered heading elements never exceeds
-   the count of source heading lines the gate's own fence-aware scan (cmark
-   rules: ATX and setext, both skipped inside a fenced or `~`-fenced block)
-   places outside any code context. A surplus rendered heading is a `#` line
-   promoted out of a broken code block.
-3. **No table leakage** — the count of rendered `<table>` elements is never
-   *less than* the count of source GFM table starts the same fence-aware scan
-   places outside code. A table start is a pipe-carrying row immediately
-   followed by a delimiter row (dashes, colons, pipes — the `| --- |` shape).
-   The direction is one-sided: rendered may *exceed* source (a raw-HTML
-   `<table>` in source is legitimate and renders without a GFM start); only a
-   deficit reds. A deficit is a source table that shipped as literal-pipe
-   paragraph text — kramdown terminates a table only on a blank line, so a
-   table whose last row abuts a following non-blank line collapses into a
-   paragraph.
+1. **No span-corruption leakage** — the rendered HTML's text content, taken after the `<pre>` blocks and inline `<code>` spans are removed (a legitimate backtick renders inside `<code>` and a legitimate embedded tag renders as escaped entities inside it, so both are excluded before the check), carries neither of two symptoms: (a) **any literal backtick** — a single stray one, not only a `` `{3,} `` fence run — and (b) **any raw tag whose element name is not a known HTML element**, matched by name so an attribute-bearing legitimate tag (`<a href…>`) is excluded and a placeholder token (`<verdict>`, `<n>`, `<KIT>`) is not. Content inside an `<svg>` or `<math>` subtree is exempt from (b), tracked by open/close depth: those two roots open foreign content whose vocabularies (`<circle>`, `<mi>`) are not HTML element names, so scanning them by the HTML set would red a page for legitimate inline markup. The exemption is scoped to the subtree rather than granted to the names, so a bare `<path>` or `<use>` outside any `<svg>` still reds as the placeholder token it is. Keep such a subtree on one source line: kramdown severs a foreign root split across a line break, emitting its tail as escaped text, and that is a real render divergence the gate is right to red. Either symptom is the signature of a code span or fenced block the parser failed to form, regardless of which construct confused it: a backtick that never paired, or a placeholder tag kramdown passed through as a raw HTML block. The two are complementary — a swallowed page region whose own inline code re-leaks as literal backticks trips (a), while a swallowed backtick-free region (pure prose or headings) trips only (b) — so neither alone covers the class and the assertion keys on both.
+2. **No heading leakage** — the count of rendered heading elements never exceeds the count of source heading lines the gate's own fence-aware scan (cmark rules: ATX and setext, both skipped inside a fenced or `~`-fenced block) places outside any code context. A surplus rendered heading is a `#` line promoted out of a broken code block.
+3. **No table leakage** — the count of rendered `<table>` elements is never *less than* the count of source GFM table starts the same fence-aware scan places outside code. A table start is a pipe-carrying row immediately followed by a delimiter row (dashes, colons, pipes — the `| --- |` shape). The direction is one-sided: rendered may *exceed* source (a raw-HTML `<table>` in source is legitimate and renders without a GFM start); only a deficit reds. A deficit is a source table that shipped as literal-pipe paragraph text — kramdown terminates a table only on a blank line, so a table whose last row abuts a following non-blank line collapses into a paragraph.
 
-The renderer is the gate's oracle. Before scanning, the gate probes it on a
-one-line document; an unresolvable or non-producing renderer exits 2 with a help
-line naming the dependency (ruby plus the kramdown-parser-gfm gem, or a
-`SITE_KIT_RENDERER` override) — a gate that cannot run its oracle refuses, never
-a false clean. That dependency joins the *consumer's* toolchain only when the
-consumer registers this gate; it stays outside env-probe's probe-set floor, and
-`docs/install.md`'s Requirements prose states the tier. A consumer with no
-published docs site simply omits the gate by the registry-not-array convention
-and never installs the dependency.
+The renderer is the gate's oracle. Before scanning, the gate probes it on a one-line document; an unresolvable or non-producing renderer exits 2 with a help line naming the dependency (ruby plus the kramdown-parser-gfm gem, or a `SITE_KIT_RENDERER` override) — a gate that cannot run its oracle refuses, never a false clean. That dependency joins the *consumer's* toolchain only when the consumer registers this gate; it stays outside env-probe's probe-set floor, and `docs/install.md`'s Requirements prose states the tier. A consumer with no published docs site simply omits the gate by the registry-not-array convention and never installs the dependency.
 
-**`checks/check-docs-render-fidelity.gate` (`precommit`, binary-dispatched).**
-Ported into `native/src/gates/docs_render_fidelity.rs`. It is a criterion-7 **wrapper**: the
-program the rule requires is the first element of whichever renderer knob the run
-resolves to a command, so the compiled form spawns it and refuses at exit 2 when
-it cannot run, the dependency moving not at all (gate-sdk/SPEC.md §The
-port-candidate criteria, criterion 7). The dependency itself, and the fact that a
-consumer who repoints a knob moves it, are owned at §Knob defaults under those
-knobs and are not restated here.
+**`checks/check-docs-render-fidelity.gate` (`precommit`, binary-dispatched).** Ported into `native/src/gates/docs_render_fidelity.rs`. It is a criterion-7 **wrapper**: the program the rule requires is the first element of whichever renderer knob the run resolves to a command, so the compiled form spawns it and refuses at exit 2 when it cannot run, the dependency moving not at all (gate-sdk/SPEC.md §The port-candidate criteria, criterion 7). The dependency itself, and the fact that a consumer who repoints a knob moves it, are owned at §Knob defaults under those knobs and are not restated here.
 
-**Its requirement is knob-derived, and it is *two* knobs rather than one.**
-`--needs` declares `git` plus `?<TAB>SITE_KIT_RENDERER_BATCH` and
-`?<TAB>SITE_KIT_RENDERER`, and the port arm resolves the pair through the
-same knob resolver the member itself reads them through. Naming only `SITE_KIT_RENDERER` — as this section
-did before the port — is wrong for a reason no zero-config run exposes: with the
-batch knob non-empty the gate never invokes the per-document one, so a consumer
-who pins only the batch renderer requires *that* command. The two defaults both
-begin `ruby`, which is why the narrower claim read true here and would have
-under-declared anywhere else. `git` is declared for its two spawns (`rev-parse
---git-dir`, `ls-files`) and is on the program floor, so it costs no criterion-7
-residual; `mktemp` and `awk` do not survive the port at all, the scratch tree and
-the three scans having moved in process.
+**Its requirement is knob-derived, and it is *two* knobs rather than one.** `--needs` declares `git` plus `?<TAB>SITE_KIT_RENDERER_BATCH` and `?<TAB>SITE_KIT_RENDERER`, and the port arm resolves the pair through the same knob resolver the member itself reads them through. Naming only `SITE_KIT_RENDERER` — as this section did before the port — is wrong for a reason no zero-config run exposes: with the batch knob non-empty the gate never invokes the per-document one, so a consumer who pins only the batch renderer requires *that* command. The two defaults both begin `ruby`, which is why the narrower claim read true here and would have under-declared anywhere else. `git` is declared for its two spawns (`rev-parse --git-dir`, `ls-files`) and is on the program floor, so it costs no criterion-7 residual; `mktemp` and `awk` do not survive the port at all, the scratch tree and the three scans having moved in process.
 
-**The GNU-awk floor's last live holder left with it.** The three scans below were
-written in GNU awk (`BEGINFILE`/`ENDFILE`/`ARGIND`), and this was the only
-remaining registered shell member holding those extensions, which a measurement
-over the registered shell members established. The port retires the holder; it
-does **not** narrow docs/install.md §Requirements, which states an adopter-facing
-floor decided on its own terms, so narrowing it starts from a discharged
-precondition rather than a re-derivation.
+**The GNU-awk floor's last live holder left with it.** The three scans below were written in GNU awk (`BEGINFILE`/`ENDFILE`/`ARGIND`), and this was the only remaining registered shell member holding those extensions, which a measurement over the registered shell members established. The port retires the holder; it does **not** narrow docs/install.md §Requirements, which states an adopter-facing floor decided on its own terms, so narrowing it starts from a discharged precondition rather than a re-derivation.
 
-**The second positional is retired on port, and its function is not.**
-`[docs-dir] [config-file]` took a config path as argv[2]. What it did survives
-under the file knob: a harness pointing the renderer knobs at a synthetic setup
-exports `SITE_KIT_KNOB_FILE` naming a knob file, and the member reads its static
-knobs from that file (gate-sdk/SPEC.md §The knob file). The **first** positional is
-unchanged and still defaults to `SITE_KIT_DOCS_DIR`.
+**The second positional is retired on port, and its function is not.** `[docs-dir] [config-file]` took a config path as argv[2]. What it did survives under the file knob: a harness pointing the renderer knobs at a synthetic setup exports `SITE_KIT_KNOB_FILE` naming a knob file, and the member reads its static knobs from that file (gate-sdk/SPEC.md §The knob file). The **first** positional is unchanged and still defaults to `SITE_KIT_DOCS_DIR`.
 
-**`NUL`-stripping becomes deliberate, and it has to.** The framing's
-unforgeability rests on the gate's own reader having already dropped any `NUL` in
-the source before framing happens — a side effect, in the shell form, of bash not
-being able to hold one in a variable. A compiled reader *can* hold one, so it
-drops them at the same point on purpose. The property is load-bearing rather than
-incidental now, which is the one place this port turns an accident of the
-substrate into a stated rule.
+**`NUL`-stripping becomes deliberate, and it has to.** The framing's unforgeability rests on the gate's own reader having already dropped any `NUL` in the source before framing happens — a side effect, in the shell form, of bash not being able to hold one in a variable. A compiled reader *can* hold one, so it drops them at the same point on purpose. The property is load-bearing rather than incidental now, which is the one place this port turns an accident of the substrate into a stated rule.
 
-**Criterion 4 binds, and the live-tree arm was not demoted.** The member's own
-declaration path moves at this port, so the comparison could have been made only
-against the pre-descriptor tree. It was not: the pre-port rule was restored under
-a name no member resolves to (gate-sdk/SPEC.md §The port-candidate criteria,
-criterion 4), which put both implementations over the **post**-descriptor corpus.
-The arm carries **no bound** — unlike §check-shellcheck's, whose corpus is every
-`.sh` and so contains its own probe file; this member's corpus is `docs/**.md`,
-so the probe sat outside it and both forms read the committed tree byte for byte.
-Twenty-four comparisons over the same cwd, argv and config, all **byte-identical
-including exit codes**: both render paths over the live tree, the fixture pair and
-a front-matter/nested/`_layouts` corpus; the empty corpus; an absent docs dir; the
-batch count mismatch and both probe failures; and each of those again with the
-renderer removed from `PATH` (gate-sdk/SPEC.md §Fail-closed contract owns the
-scrub technique). Two arms were **probed rather than accepted**: a "no repository"
-case first built under `.tmp/` sat inside this checkout, so it proved an empty
-gitignored corpus instead, and re-running it from outside any repository is what
-established the ordering fact below.
+**Criterion 4 binds, and the live-tree arm was not demoted.** The member's own declaration path moves at this port, so the comparison could have been made only against the pre-descriptor tree. It was not: the pre-port rule was restored under a name no member resolves to (gate-sdk/SPEC.md §The port-candidate criteria, criterion 4), which put both implementations over the **post**-descriptor corpus. The arm carries **no bound** — unlike §check-shellcheck's, whose corpus is every `.sh` and so contains its own probe file; this member's corpus is `docs/**.md`, so the probe sat outside it and both forms read the committed tree byte for byte. Twenty-four comparisons over the same cwd, argv and config, all **byte-identical including exit codes**: both render paths over the live tree, the fixture pair and a front-matter/nested/`_layouts` corpus; the empty corpus; an absent docs dir; the batch count mismatch and both probe failures; and each of those again with the renderer removed from `PATH` (gate-sdk/SPEC.md §Fail-closed contract owns the scrub technique). Two arms were **probed rather than accepted**: a "no repository" case first built under `.tmp/` sat inside this checkout, so it proved an empty gitignored corpus instead, and re-running it from outside any repository is what established the ordering fact below.
 
-**The refusal order, read off the shell text rather than assumed.** Each check
-below precedes any finding and wins over the ones after it: **not a git
-repository**, then **docs dir not found**, then the renderer probe, then the
-corpus enumeration. So an
-absent docs dir reports the docs dir even with no renderer installed, and a tree
-outside a repository reports that even with both. This member's probe is also not
-the presence test the first wrapper established — it probes the oracle *by running
-it*, because for a renderer, on-`PATH` is not the property the gate needs, and an
-absent program therefore surfaces as the probe's own exit status inside the
-member's own sentence.
+**The refusal order, read off the shell text rather than assumed.** Each check below precedes any finding and wins over the ones after it: **not a git repository**, then **docs dir not found**, then the renderer probe, then the corpus enumeration. So an absent docs dir reports the docs dir even with no renderer installed, and a tree outside a repository reports that even with both. This member's probe is also not the presence test the first wrapper established — it probes the oracle *by running it*, because for a renderer, on-`PATH` is not the property the gate needs, and an absent program therefore surfaces as the probe's own exit status inside the member's own sentence.
 
-**The batch stream, and why the count is the fail-closed.** One renderer process
-per page is the gate's whole cost — the interpreter restarts, not the rendering —
-so where `SITE_KIT_RENDERER_BATCH` is non-empty the gate renders the corpus over
-one stream instead. The framing is `NUL`-terminated in both directions: the gate
-writes each front-matter-stripped body, `NUL`-terminated, to the command's stdin,
-and the command writes each rendered document to stdout in the **same order**,
-each `NUL`-terminated. `NUL` is a *terminator* rather than a separator, so N
-documents produce exactly N `NUL`s with no trailing-empty ambiguity, and it is
-unforgeable by page content for a stronger reason than rarity: bash cannot hold a
-`NUL` in a variable, so the gate's own reader has already dropped any `NUL` in
-the source before framing happens. A sentinel line would be forgeable — by a docs
-page describing this contract, first of all. Length-prefixed framing is equally
-sound and loses only on the obligation it puts on a consumer, who would have to
-implement exact-byte reads where splitting on a byte is a one-liner in every
-language a Pages stack might use.
+**The batch stream, and why the count is the fail-closed.** One renderer process per page is the gate's whole cost — the interpreter restarts, not the rendering — so where `SITE_KIT_RENDERER_BATCH` is non-empty the gate renders the corpus over one stream instead. The framing is `NUL`-terminated in both directions: the gate writes each front-matter-stripped body, `NUL`-terminated, to the command's stdin, and the command writes each rendered document to stdout in the **same order**, each `NUL`-terminated. `NUL` is a *terminator* rather than a separator, so N documents produce exactly N `NUL`s with no trailing-empty ambiguity, and it is unforgeable by page content for a stronger reason than rarity: bash cannot hold a `NUL` in a variable, so the gate's own reader has already dropped any `NUL` in the source before framing happens. A sentinel line would be forgeable — by a docs page describing this contract, first of all. Length-prefixed framing is equally sound and loses only on the obligation it puts on a consumer, who would have to implement exact-byte reads where splitting on a byte is a one-liner in every language a Pages stack might use.
 
-Two implementation constraints follow, and a natural reading of the contract
-breaks both. **Command substitution strips `NUL`**, so the batch output must
-never pass through `$(…)`; the gate reads it through a **process substitution**
-instead, which also keeps the loop body in the current shell so the findings it
-appends to survive. Writer and reader being separate processes
-is what makes the exchange deadlock-free. **Process substitution discards the
-renderer's exit status**, so the batch path cannot keep the per-page fail-closed
-the per-document loop has — and a renderer that dies mid-stream yields fewer
-documents than pages. The gate therefore compares documents-read against
-pages-enumerated after the loop, which detects renderer death, truncation and
-framing error alike, one check standing in for the status the shell threw away.
-It exits 2 — a refusal to run the oracle — never 1, which would report a finding
-about the docs. Per-document scanning is unchanged: each document read off the
-stream goes through the same assertions, and the source-side scans are untouched.
+Two implementation constraints follow, and a natural reading of the contract breaks both. **Command substitution strips `NUL`**, so the batch output must never pass through `$(…)`; the gate reads it through a **process substitution** instead, which also keeps the loop body in the current shell so the findings it appends to survive. Writer and reader being separate processes is what makes the exchange deadlock-free. **Process substitution discards the renderer's exit status**, so the batch path cannot keep the per-page fail-closed the per-document loop has — and a renderer that dies mid-stream yields fewer documents than pages. The gate therefore compares documents-read against pages-enumerated after the loop, which detects renderer death, truncation and framing error alike, one check standing in for the status the shell threw away. It exits 2 — a refusal to run the oracle — never 1, which would report a finding about the docs. Per-document scanning is unchanged: each document read off the stream goes through the same assertions, and the source-side scans are untouched.
 
-**Probe routing.** The gate probes the oracle it will actually run, and only that
-one. With the batch knob empty it probes `SITE_KIT_RENDERER` on a one-line
-document exactly as above. With the batch knob set it probes the batch command
-instead, on a probe that exercises the framing as well as the parser: two
-one-line documents in, exactly two non-empty documents back. Probing the
-per-document renderer too would refuse a batch-only consumer over a renderer this
-run never invokes. A **failing** batch probe exits 2 and does not fall back: a
-set knob is the consumer's deliberate statement about which parser is
-authoritative, so quietly rendering through a different one is the same
-false-clean class the fill condition in §Layout and configuration closes from the
-other direction. A gate that cannot run its configured oracle refuses.
+**Probe routing.** The gate probes the oracle it will actually run, and only that one. With the batch knob empty it probes `SITE_KIT_RENDERER` on a one-line document exactly as above. With the batch knob set it probes the batch command instead, on a probe that exercises the framing as well as the parser: two one-line documents in, exactly two non-empty documents back. Probing the per-document renderer too would refuse a batch-only consumer over a renderer this run never invokes. A **failing** batch probe exits 2 and does not fall back: a set knob is the consumer's deliberate statement about which parser is authoritative, so quietly rendering through a different one is the same false-clean class the fill condition in §Layout and configuration closes from the other direction. A gate that cannot run its configured oracle refuses.
 
-The false-positive floor is the assertion's hard boundary, deliberately set. The
-backtick symptom rests on a property of well-formed markdown: every backtick
-belongs to a code span, which renders inside `<code>` and is excluded from the
-scanned text, so a backtick surviving into paragraph, heading, or list text is a
-code span that failed to form — not legitimate prose. Its one residual
-legitimate case is documenting the backtick *character* itself; the faithful way
-to do that is a doubled-backtick code span, which renders the character inside
-`<code>` — excluded from the scan — so the honest form does not trip the gate and
-only the fragile bare-backtick form would. The raw-tag symptom rests on
-the HTML-element allowlist: kramdown passes an unrecognized `<name>` through
-verbatim as raw HTML, while a `<name>` whose element is in the HTML standard is
-legitimate markup — so a tag matched by element name against that set is
-excluded, and only a token outside it (a placeholder kramdown mistook for an HTML
-block) reds. Its residual legitimate case is a page that deliberately embeds a
-*non-standard* element (a custom element or web component); a placeholder meant
-as literal prose is instead written as a code span (`` `<verdict>` `` renders
-`<code>&lt;verdict&gt;</code>`) and never surfaces as a raw tag. Both floors hold
-empirically: across the tracked corpus each symptom fires on exactly the
-corrupted pages and no clean page. The element set is generic mechanism — the
-HTML standard's element list is universal render truth, not consumer rule
-content — so it is a kit built-in, not a config seam; a consumer that
-legitimately ships non-standard elements in a docs page is the narrow accepted
-false positive, and if that demand ever attests, an optional allowlist-extension
-knob is the config-via-env answer, deferred until then rather than built against
-a case no page presents.
+The false-positive floor is the assertion's hard boundary, deliberately set. The backtick symptom rests on a property of well-formed markdown: every backtick belongs to a code span, which renders inside `<code>` and is excluded from the scanned text, so a backtick surviving into paragraph, heading, or list text is a code span that failed to form — not legitimate prose. Its one residual legitimate case is documenting the backtick *character* itself; the faithful way to do that is a doubled-backtick code span, which renders the character inside `<code>` — excluded from the scan — so the honest form does not trip the gate and only the fragile bare-backtick form would. The raw-tag symptom rests on the HTML-element allowlist: kramdown passes an unrecognized `<name>` through verbatim as raw HTML, while a `<name>` whose element is in the HTML standard is legitimate markup — so a tag matched by element name against that set is excluded, and only a token outside it (a placeholder kramdown mistook for an HTML block) reds. Its residual legitimate case is a page that deliberately embeds a *non-standard* element (a custom element or web component); a placeholder meant as literal prose is instead written as a code span (`` `<verdict>` `` renders `<code>&lt;verdict&gt;</code>`) and never surfaces as a raw tag. Both floors hold empirically: across the tracked corpus each symptom fires on exactly the corrupted pages and no clean page. The element set is generic mechanism — the HTML standard's element list is universal render truth, not consumer rule content — so it is a kit built-in, not a config seam; a consumer that legitimately ships non-standard elements in a docs page is the narrow accepted false positive, and if that demand ever attests, an optional allowlist-extension knob is the config-via-env answer, deferred until then rather than built against a case no page presents.
 
-Honest limit: this is not a full render-diff between the two parsers. It
-mechanizes the observed leakage class — the code-span corruption symptom (a
-surviving backtick or raw placeholder tag), headings, and tables — and stays
-silent on divergences that corrupt none of the three. The first assertion keys
-on the shared symptom rather than a multi-backtick fence run, so it implements
-the severed-span defense (`gettalong/kramdown#843`) the section describes — prose
-and assertion cover the same class. The table count can be
-masked by an offsetting raw-HTML `<table>` on the same page: one collapsed GFM
-table plus one HTML table balances the counts. The table detector is
-deliberately conservative (delimiter-row anchored), so a table kramdown accepts
-but the scan does not count can only *under*-count source starts — which
-false-cleans, never false-reds. The observed table incident: a
-generated rollup table abutting its `:end` marker shipped as a literal-pipe
-paragraph with the gate silent; the emitter fix is a trailing blank line, and
-this assertion mechanizes the channel. The good/bad
-fixture pair exercises the span-corruption symptom (a bad page whose severed span
-leaks a stray backtick and a raw placeholder tag, a good page whose faithful code
-spans render clean) alongside the fence/heading case. Because that bad page would
-red on its fence run alone, every assertion the pair cannot isolate carries a
-hermetic unit test of its own, named here rather than described:
-`check-docs-render-fidelity-span.test.sh`,
-`check-docs-render-fidelity-table.test.sh`,
-`check-docs-render-fidelity-foreign.test.sh` and
-`check-docs-render-fidelity-batch.test.sh`.
+Honest limit: this is not a full render-diff between the two parsers. It mechanizes the observed leakage class — the code-span corruption symptom (a surviving backtick or raw placeholder tag), headings, and tables — and stays silent on divergences that corrupt none of the three. The first assertion keys on the shared symptom rather than a multi-backtick fence run, so it implements the severed-span defense (`gettalong/kramdown#843`) the section describes — prose and assertion cover the same class. The table count can be masked by an offsetting raw-HTML `<table>` on the same page: one collapsed GFM table plus one HTML table balances the counts. The table detector is deliberately conservative (delimiter-row anchored), so a table kramdown accepts but the scan does not count can only *under*-count source starts — which false-cleans, never false-reds. The observed table incident: a generated rollup table abutting its `:end` marker shipped as a literal-pipe paragraph with the gate silent; the emitter fix is a trailing blank line, and this assertion mechanizes the channel. The good/bad fixture pair exercises the span-corruption symptom (a bad page whose severed span leaks a stray backtick and a raw placeholder tag, a good page whose faithful code spans render clean) alongside the fence/heading case. Because that bad page would red on its fence run alone, every assertion the pair cannot isolate carries a hermetic unit test of its own, named here rather than described: `check-docs-render-fidelity-span.test.sh`, `check-docs-render-fidelity-table.test.sh`, `check-docs-render-fidelity-foreign.test.sh` and `check-docs-render-fidelity-batch.test.sh`.
 
-The span test runs a page with no fence, no surplus heading and no table, whose
-only defect is the severed span: it reds span-only and clears in the
-doubled-backtick form, so a widening that reds nothing new cannot pass. The table
-test is that same shape — a collapsed table reds table-only, a trailing blank
-clears. The foreign test holds the SVG/MathML exemption to its *scope*: a page
-carrying inline `<svg>` clears, because the exemption follows the subtree by
-open/close depth rather than a name list, while a bare `<path>` outside any
-`<svg>` still reds — and that second half is what keeps the first from passing
-under a blanket widening, which would clear the good page at the cost of the
-placeholder tokens the assertion exists for. The batch test exists because the
-good/bad pair sets no renderer knob, so it already runs the batch path and cannot
-by itself distinguish that path from the fallback; it asserts that the kit's two
-renderer defaults, read off `--emit knob-roster`, render a corpus
-byte-identically, that the batch path and the per-document fallback return the
-same verdict on the same pages, and that a wrong document count and an
-unresolvable batch command each exit 2. That a pinned `SITE_KIT_RENDERER`
-suppresses the batch default is a crate unit test on the site-kit knob table,
-because the fill rule is a property of the table and not of a tracked tree. The count case uses
-a stub that always emits two documents, so it passes the two-document probe and is
-caught only by the corpus count — a stub the probe already rejected would never
-reach the assertion under test.
-All four are invoked through `gate_run`, so each names a gate and never a
-substrate, and each supplies its renderer configuration as `SITE_KIT_KNOB_FILE`
-rather than as the retired second positional. The positional form
-`check-docs-render-fidelity [docs-dir]` lets a fixture point the docs dir at a
-synthetic tree without touching consumer config. `precommit` tier, coupling the
-docs tree.
+The span test runs a page with no fence, no surplus heading and no table, whose only defect is the severed span: it reds span-only and clears in the doubled-backtick form, so a widening that reds nothing new cannot pass. The table test is that same shape — a collapsed table reds table-only, a trailing blank clears. The foreign test holds the SVG/MathML exemption to its *scope*: a page carrying inline `<svg>` clears, because the exemption follows the subtree by open/close depth rather than a name list, while a bare `<path>` outside any `<svg>` still reds — and that second half is what keeps the first from passing under a blanket widening, which would clear the good page at the cost of the placeholder tokens the assertion exists for. The batch test exists because the good/bad pair sets no renderer knob, so it already runs the batch path and cannot by itself distinguish that path from the fallback; it asserts that the kit's two renderer defaults, read off `--emit knob-roster`, render a corpus byte-identically, that the batch path and the per-document fallback return the same verdict on the same pages, and that a wrong document count and an unresolvable batch command each exit 2. That a pinned `SITE_KIT_RENDERER` suppresses the batch default is a crate unit test on the site-kit knob table, because the fill rule is a property of the table and not of a tracked tree. The count case uses a stub that always emits two documents, so it passes the two-document probe and is caught only by the corpus count — a stub the probe already rejected would never reach the assertion under test. All four are invoked through `gate_run`, so each names a gate and never a substrate, and each supplies its renderer configuration as `SITE_KIT_KNOB_FILE` rather than as the retired second positional. The positional form `check-docs-render-fidelity [docs-dir]` lets a fixture point the docs dir at a synthetic tree without touching consumer config. `precommit` tier, coupling the docs tree.
 
-**The port adds a third oracle, and the split is the one the pair cannot carry.**
-The good/bad pair and the four bespoke tests both need a real tracked tree, so
-they stay where they are; what moved into **crate unit tests** is every assertion
-that is a pure function of a page's bytes — the foreign-content exemption in both
-directions, a backtick inside and outside a code span, the element counts, the
-fence-aware heading and table scans including the seventh-`#` bound, front-matter
-stripping, `NUL` framing as a terminator rather than a separator, and the
-Jekyll-internal segment test. Those are commit-time oracles through
-`check-crate-arms` exactly as the bespoke tests are through the fixture runner,
-and they are the arms a golden pair can only assert the *presence* of a line for
-(gate-sdk/SPEC.md §The port-candidate criteria, criterion 2). The pair contract is
-intact: both cases still exist and still exercise the batch path end to end.
+**The port adds a third oracle, and the split is the one the pair cannot carry.** The good/bad pair and the four bespoke tests both need a real tracked tree, so they stay where they are; what moved into **crate unit tests** is every assertion that is a pure function of a page's bytes — the foreign-content exemption in both directions, a backtick inside and outside a code span, the element counts, the fence-aware heading and table scans including the seventh-`#` bound, front-matter stripping, `NUL` framing as a terminator rather than a separator, and the Jekyll-internal segment test. Those are commit-time oracles through `check-crate-arms` exactly as the bespoke tests are through the fixture runner, and they are the arms a golden pair can only assert the *presence* of a line for (gate-sdk/SPEC.md §The port-candidate criteria, criterion 2). The pair contract is intact: both cases still exist and still exercise the batch path end to end.
 
-Parser-version fidelity (a second honest limit). The oracle is faithful to the
-*parser* GitHub Pages uses (kramdown with GFM input), not necessarily to the
-exact kramdown *version* Pages pins: a locally-installed kramdown that differs
-in patch or minor version from the Pages-locked one can render a construct
-differently, so a green local run is not a categorical proof for a divergence
-introduced between the two versions. The exact-pin recipe closes that gap for a
-consumer that needs it: point `SITE_KIT_RENDERER` at a version-locked bundle —
-a `bundle exec ruby …Kramdown…` invocation whose `Gemfile.lock` pins kramdown
-(and `kramdown-parser-gfm`) to the versions the `github-pages` gem resolves — so
-the oracle and the deploy render byte-for-byte the same parser build. Pin
-`SITE_KIT_RENDERER_BATCH` in the same motion, at the batch form of that same
-locked bundle, or leave it unset: those are the two states in which the gate runs
-the parser build the pin names. Overriding only the per-document knob already
-leaves the batch knob empty by its fill rule, so a half-applied pin costs speed
-rather than fidelity — but a consumer who set a batch renderer earlier and pins
-only the per-document one afterwards has pinned the knob the gate will not use.
-The kit does not auto-resolve the pin: fetching the Pages-locked gemset at gate
-time would break the hermetic no-network render contract the oracle depends on (a
-gate must run offline and deterministically), so it stays a consumer's deliberate
-override, not kit-run machinery.
+Parser-version fidelity (a second honest limit). The oracle is faithful to the *parser* GitHub Pages uses (kramdown with GFM input), not necessarily to the exact kramdown *version* Pages pins: a locally-installed kramdown that differs in patch or minor version from the Pages-locked one can render a construct differently, so a green local run is not a categorical proof for a divergence introduced between the two versions. The exact-pin recipe closes that gap for a consumer that needs it: point `SITE_KIT_RENDERER` at a version-locked bundle — a `bundle exec ruby …Kramdown…` invocation whose `Gemfile.lock` pins kramdown (and `kramdown-parser-gfm`) to the versions the `github-pages` gem resolves — so the oracle and the deploy render byte-for-byte the same parser build. Pin `SITE_KIT_RENDERER_BATCH` in the same motion, at the batch form of that same locked bundle, or leave it unset: those are the two states in which the gate runs the parser build the pin names. Overriding only the per-document knob already leaves the batch knob empty by its fill rule, so a half-applied pin costs speed rather than fidelity — but a consumer who set a batch renderer earlier and pins only the per-document one afterwards has pinned the knob the gate will not use. The kit does not auto-resolve the pin: fetching the Pages-locked gemset at gate time would break the hermetic no-network render contract the oracle depends on (a gate must run offline and deterministically), so it stays a consumer's deliberate override, not kit-run machinery.
 
-Renderer agreement (a third honest limit). Where a consumer sets both renderer
-knobs, the kit cannot verify that their batch renderer agrees document-for-
-document with their per-document one; a divergent pair yields a divergent oracle,
-and nothing in the framing contract can detect that. What the kit does hold is
-its own pair: the two defaults are asserted byte-identical over a corpus by
-fixture, so the zero-config path is covered by construction rather than by
-assumption.
+Renderer agreement (a third honest limit). Where a consumer sets both renderer knobs, the kit cannot verify that their batch renderer agrees document-for- document with their per-document one; a divergent pair yields a divergent oracle, and nothing in the framing contract can detect that. What the kit does hold is its own pair: the two defaults are asserted byte-identical over a corpus by fixture, so the zero-config path is covered by construction rather than by assumption.
 
 ## check-docs-highlight-coverage
 
-`checks/check-docs-highlight-coverage.gate` (`precommit`, binary-dispatched,
-`install: zero-config`, armed by `SITE_KIT_HIGHLIGHT_TOKENS`). A site that
-restyles code highlighting has to override every token class the theme's own
-highlight CSS colours. A class it misses keeps the theme's colour, and on a dark
-code background that can be an unreadable token: Rouge marks a shell `&&` with
-`.o`, and a light theme colours `.o` black.
+`checks/check-docs-highlight-coverage.gate` (`precommit`, binary-dispatched, `install: zero-config`, armed by `SITE_KIT_HIGHLIGHT_TOKENS`). A site that restyles code highlighting has to override every token class the theme's own highlight CSS colours. A class it misses keeps the theme's colour, and on a dark code background that can be an unreadable token: Rouge marks a shell `&&` with `.o`, and a light theme colours `.o` black.
 
-**The invariant splits along §The monitor boundary.** Two objects are involved,
-and they live in two places. The layout's overrides are in the tree, so that the
-layout covers a declared class list is a tree property, and this gate asserts
-it. The theme's coloured class set lives on the host: it is served from the
-deployment, at a theme version the platform chooses, and no commit contains it.
-That the declared list still matches the live theme is deployment truth, which
-the theme-drift arm of `templates/site-health.yml` asserts. The tracked
-**snapshot** is the seam between the two: this gate reads it as its oracle, and
-the monitor holds it to the live CSS.
+**The invariant splits along §The monitor boundary.** Two objects are involved, and they live in two places. The layout's overrides are in the tree, so that the layout covers a declared class list is a tree property, and this gate asserts it. The theme's coloured class set lives on the host: it is served from the deployment, at a theme version the platform chooses, and no commit contains it. That the declared list still matches the live theme is deployment truth, which the theme-drift arm of `templates/site-health.yml` asserts. The tracked **snapshot** is the seam between the two: this gate reads it as its oracle, and the monitor holds it to the live CSS.
 
-- **The snapshot** is the file `SITE_KIT_HIGHLIGHT_TOKENS` names. Its first line
-  is a `# contract:` header; below it, one class per line, written as `.o`. A `#`
-  line and a blank line are ignored, and any other line that is not one
-  `.<class>` token is a finding. Empty, the knob disarms the gate, which still
-  prints its clean line saying nothing was asserted.
-- **The overrides** are the tracked files `git ls-files` lists for each
-  `SITE_KIT_HIGHLIGHT_OVERRIDES` pathspec. A file carrying a `<style` element is
-  read for its `<style>` bodies only, so a template brace elsewhere in the page
-  opens no rule; any other file is CSS throughout. Comments are stripped, and a
-  rule's selector list is the text since the previous `{`, `}` or `;`, so the
-  inner rule of an at-rule is a rule.
-- **Covered.** A class is covered when some rule has a selector that, after the
-  selector list is **split on commas** and its whitespace collapsed, ends in
-  `<scope> .<class>`, where `<scope>` is `SITE_KIT_HIGHLIGHT_SCOPE`. Any ancestor
-  prefix before the scope is admitted, joined by a space or `>`, so
-  `.site-content .markdown-body .highlight .o` covers `.o`. The split is to the
-  comma because a grouped rule's later members are the ones a first-selector
-  reading misses: in `.highlight .k,.highlight .kv{…}` only the split reaches
-  `.kv`.
+- **The snapshot** is the file `SITE_KIT_HIGHLIGHT_TOKENS` names. Its first line is a `# contract:` header; below it, one class per line, written as `.o`. A `#` line and a blank line are ignored, and any other line that is not one `.<class>` token is a finding. Empty, the knob disarms the gate, which still prints its clean line saying nothing was asserted.
+- **The overrides** are the tracked files `git ls-files` lists for each `SITE_KIT_HIGHLIGHT_OVERRIDES` pathspec. A file carrying a `<style` element is read for its `<style>` bodies only, so a template brace elsewhere in the page opens no rule; any other file is CSS throughout. Comments are stripped, and a rule's selector list is the text since the previous `{`, `}` or `;`, so the inner rule of an at-rule is a rule.
+- **Covered.** A class is covered when some rule has a selector that, after the selector list is **split on commas** and its whitespace collapsed, ends in `<scope> .<class>`, where `<scope>` is `SITE_KIT_HIGHLIGHT_SCOPE`. Any ancestor prefix before the scope is admitted, joined by a space or `>`, so `.site-content .markdown-body .highlight .o` covers `.o`. The split is to the comma because a grouped rule's later members are the ones a first-selector reading misses: in `.highlight .k,.highlight .kv{…}` only the split reaches `.kv`.
 - **Assertion:** every snapshot class is covered.
 
 Findings, each on its own line:
 
 - each uncovered class, naming the class and its snapshot line;
-- an armed snapshot holding **zero** classes. A capture that extracted nothing
-  is the extraction's failure, not an empty theme, so this reader reds on finding
-  none;
+- an armed snapshot holding **zero** classes. A capture that extracted nothing is the extraction's failure, not an empty theme, so this reader reds on finding none;
 - an override pathspec listing no tracked file, since the covering file is gone;
 - a snapshot line that is not one class.
 
-The clean line counts snapshot classes, override files and covering rules. Exit
-2 when the snapshot is named but does not exist or cannot be read, and when
-`git ls-files` fails. The remedy for an uncovered class is an override taking its
-token family's colour, and for a stale snapshot the monitor's printed list. The
-window the split leaves open is stated with the monitor's arm
-(§templates/site-health.yml, the theme-drift arm).
+The clean line counts snapshot classes, override files and covering rules. Exit 2 when the snapshot is named but does not exist or cannot be read, and when `git ls-files` fails. The remedy for an uncovered class is an override taking its token family's colour, and for a stale snapshot the monitor's printed list. The window the split leaves open is stated with the monitor's arm (§templates/site-health.yml, the theme-drift arm).
 
 ## templates/site-health.yml
 
-The scheduled live-site probe, copied verbatim into a consumer's
-`.github/workflows/`. It reads the apex host from the CNAME file (the same
-source the gate trusts), then checks: the apex answers 200 over HTTPS, `www`
-and `http` redirect to the canonical origin, an optional `ALT_DOMAIN` redirect
-keeps its path, the certificate is at least a fortnight from expiry, every
-published release note is pointed at by a resolving URL in its Release body, and
-an optional theme-drift arm holds the highlight snapshot to the live theme. A
-failure opens or updates a single `site-health` issue and reds the run;
-recovery closes it. The `ALT_DOMAIN` value is a bare hostname, never a `://`
-literal, so it does not itself trip the parity gate. A `# enforce:` marker rides
-the template so that, once copied, an enforcement map projects it as a monitor.
+The scheduled live-site probe, copied verbatim into a consumer's `.github/workflows/`. It reads the apex host from the CNAME file (the same source the gate trusts), then checks: the apex answers 200 over HTTPS, `www` and `http` redirect to the canonical origin, an optional `ALT_DOMAIN` redirect keeps its path, the certificate is at least a fortnight from expiry, every published release note is pointed at by a resolving URL in its Release body, and an optional theme-drift arm holds the highlight snapshot to the live theme. A failure opens or updates a single `site-health` issue and reds the run; recovery closes it. The `ALT_DOMAIN` value is a bare hostname, never a `://` literal, so it does not itself trip the parity gate. A `# enforce:` marker rides the template so that, once copied, an enforcement map projects it as a monitor.
 
-**The arm roster is a floor, not a ceiling, and "copied verbatim" describes the
-distribution model rather than forbidding an edit.** The copy is the consumer's
-file: nothing syncs it back, and no gate couples the two, so a consumer may add
-arms of its own. Which side of the seam an arm belongs on follows from what it
-asserts. An arm implementing an invariant this kit ships belongs in the template,
-where every consumer inherits it. An arm implementing a **consumer-local**
-invariant belongs in that consumer's copy and must stay out of the template —
-copied into a tree that never declared the convention it derives from, it would
-assert something no kit ships and no consumer agreed to, which is dead config
-that reads as coverage. An arm cannot be truer than the declaration it composes,
-so it lives at the widest tier that declaration is true for. A consumer-local
-arm becomes template material only if its underlying declaration becomes kit
-mechanism — and then it arrives as an optional arm on the existing
-set-the-env-or-delete-the-arm pattern, the way the release-note knobs already do.
+**The arm roster is a floor, not a ceiling, and "copied verbatim" describes the distribution model rather than forbidding an edit.** The copy is the consumer's file: nothing syncs it back, and no gate couples the two, so a consumer may add arms of its own. Which side of the seam an arm belongs on follows from what it asserts. An arm implementing an invariant this kit ships belongs in the template, where every consumer inherits it. An arm implementing a **consumer-local** invariant belongs in that consumer's copy and must stay out of the template — copied into a tree that never declared the convention it derives from, it would assert something no kit ships and no consumer agreed to, which is dead config that reads as coverage. An arm cannot be truer than the declaration it composes, so it lives at the widest tier that declaration is true for. A consumer-local arm becomes template material only if its underlying declaration becomes kit mechanism — and then it arrives as an optional arm on the existing set-the-env-or-delete-the-arm pattern, the way the release-note knobs already do.
 
-The workflow's `permissions:` block is an **allowlist, not an addition** — every
-scope it omits is `none` — so reading the tag list and the Release bodies needs
-`contents: read` declared beside `issues: write`, and the probe step needs its own
-`GH_TOKEN`. On a public repository the declaration is redundant and the arm
-appears to work without it; at a private-repo consumer it is the difference
-between the arm working and the arm 404ing on every note, because GitHub masks an
-unauthorized read as an absent resource — the failure arrives looking like "no
-such Release" rather than "not permitted". This declaration is held by an oracle
-rather than by review: `check-action-permissions` (gate-sdk/SPEC.md
-§check-action-permissions) reds a job that consumes the GitHub token without
-declaring what it takes, and this template's `probe` job is armed by all three of
-its triggers. What stays a non-goal is the wider workflow-security category the
-gate deliberately does not enter — expression injection (gate-sdk/SPEC.md
-§check-action-run-shell) and over-declaration alike.
+The workflow's `permissions:` block is an **allowlist, not an addition** — every scope it omits is `none` — so reading the tag list and the Release bodies needs `contents: read` declared beside `issues: write`, and the probe step needs its own `GH_TOKEN`. On a public repository the declaration is redundant and the arm appears to work without it; at a private-repo consumer it is the difference between the arm working and the arm 404ing on every note, because GitHub masks an unauthorized read as an absent resource — the failure arrives looking like "no such Release" rather than "not permitted". This declaration is held by an oracle rather than by review: `check-action-permissions` (gate-sdk/SPEC.md §check-action-permissions) reds a job that consumes the GitHub token without declaring what it takes, and this template's `probe` job is armed by all three of its triggers. What stays a non-goal is the wider workflow-security category the gate deliberately does not enter — expression injection (gate-sdk/SPEC.md §check-action-run-shell) and over-declaration alike.
 
-**The release-body arm.** For every tracked release note whose front-matter tag
-key names a tag that exists on the remote, the arm asserts two properties over
-that tag's Release:
+**The release-body arm.** For every tracked release note whose front-matter tag key names a tag that exists on the remote, the arm asserts two properties over that tag's Release:
 
-- **Presence** — a Release exists for the tag, and its body *contains* the note's
-  canonical URL, derived **scheme-qualified** as `https://` plus the apex host
-  from the CNAME file plus the path from `RELEASE_NOTE_URL_PATH`. This is what
-  catches a body that was never filled in.
-- **Resolution** — every apex-hosted URL *as literally written in the body*
-  answers 200. This is what catches a body whose pointer is present but dead.
+- **Presence** — a Release exists for the tag, and its body *contains* the note's canonical URL, derived **scheme-qualified** as `https://` plus the apex host from the CNAME file plus the path from `RELEASE_NOTE_URL_PATH`. This is what catches a body that was never filled in.
+- **Resolution** — every apex-hosted URL *as literally written in the body* answers 200. This is what catches a body whose pointer is present but dead.
 
-**The two run over two different strings, and collapsing them re-opens the defect
-the other closes.** A body carrying a trailing-slash URL *contains* the
-slash-less form as a substring, so a presence-only check passes a pointer that
-404s; and a probe that derived the URL itself and then resolved *that* would
-confirm only its own arithmetic while the body stayed wrong. Presence runs over
-the URL the arm derives; resolution over the URLs the body actually carries.
+**The two run over two different strings, and collapsing them re-opens the defect the other closes.** A body carrying a trailing-slash URL *contains* the slash-less form as a substring, so a presence-only check passes a pointer that 404s; and a probe that derived the URL itself and then resolved *that* would confirm only its own arithmetic while the body stayed wrong. Presence runs over the URL the arm derives; resolution over the URLs the body actually carries.
 
-Presence is deliberately loose in one direction and strict in the other.
-*Containment, never equality*: a body may write a suffixed or otherwise decorated
-variant of the URL, so a token-equality test reds a corpus that is in fact
-correct — and the looseness that permits it is exactly what lets the
-trailing-slash form through, which is why resolution exists rather than a
-stricter presence. *Scheme-qualified*: a markdown link whose visible label
-repeats the URL scheme-less satisfies a scheme-less presence test while the link
-*target* goes unchecked, and a wrong-but-resolving target then passes both
-assertions with nothing red.
+Presence is deliberately loose in one direction and strict in the other. *Containment, never equality*: a body may write a suffixed or otherwise decorated variant of the URL, so a token-equality test reds a corpus that is in fact correct — and the looseness that permits it is exactly what lets the trailing-slash form through, which is why resolution exists rather than a stricter presence. *Scheme-qualified*: a markdown link whose visible label repeats the URL scheme-less satisfies a scheme-less presence test while the link *target* goes unchecked, and a wrong-but-resolving target then passes both assertions with nothing red.
 
-URL extraction is **scheme-anchored over the whole body text**, never
-markdown-link-aware — only the scheme reliably separates a link target from a
-visible label — and a trailing **run** of punctuation is stripped from an
-extracted URL before it is resolved. The punctuation that occurs in practice is
-markdown-structural rather than sentential: a `)` closing a link target, or `)**`
-closing one inside bold. A stripping set written for the period captures those
-closers into the URL and reds a healthy corpus, so the set carries the markdown
-closers alongside sentence punctuation (the template owns the set), and strips a
-run rather than a single character — or `)**` merely becomes `)*`.
-The extracted set is **not** narrowed to note URLs: the assertion is over
-apex-hosted URLs, so a body's other apex links are covered deliberately.
+URL extraction is **scheme-anchored over the whole body text**, never markdown-link-aware — only the scheme reliably separates a link target from a visible label — and a trailing **run** of punctuation is stripped from an extracted URL before it is resolved. The punctuation that occurs in practice is markdown-structural rather than sentential: a `)` closing a link target, or `)**` closing one inside bold. A stripping set written for the period captures those closers into the URL and reds a healthy corpus, so the set carries the markdown closers alongside sentence punctuation (the template owns the set), and strips a run rather than a single character — or `)**` merely becomes `)*`. The extracted set is **not** narrowed to note URLs: the assertion is over apex-hosted URLs, so a body's other apex links are covered deliberately.
 
-The tag list comes from the **API, paginated**, never from `git tag`.
-`actions/checkout` defaults to `fetch-depth: 1` and fetches no tags, so a
-`git tag`-driven arm finds zero released notes and reports green forever. Two
-properties of the call are load-bearing: `gh api --paginate` discharges the
-paging with no manual page loop, and because it *concatenates* the pages' arrays,
-`--jq 'length'` returns the last page's length rather than the total — so the
-count is taken by streaming the elements, and the pagination is forward-looking
-insurance no run will ever confirm until a consumer passes its first page. The
-tag list is not replaceable by a per-note Release-by-tag lookup: a 404 there
-cannot distinguish a tag that was never pushed (a legitimate skip for a note
-whose release is deferred) from a tag whose Release is missing (a real finding),
-and conflating them either reds every deferred note or hides a missing Release.
+The tag list comes from the **API, paginated**, never from `git tag`. `actions/checkout` defaults to `fetch-depth: 1` and fetches no tags, so a `git tag`-driven arm finds zero released notes and reports green forever. Two properties of the call are load-bearing: `gh api --paginate` discharges the paging with no manual page loop, and because it *concatenates* the pages' arrays, `--jq 'length'` returns the last page's length rather than the total — so the count is taken by streaming the elements, and the pagination is forward-looking insurance no run will ever confirm until a consumer passes its first page. The tag list is not replaceable by a per-note Release-by-tag lookup: a 404 there cannot distinguish a tag that was never pushed (a legitimate skip for a note whose release is deferred) from a tag whose Release is missing (a real finding), and conflating them either reds every deferred note or hides a missing Release.
 
-**The arm's three knobs** are step-level workflow env on the probe step, set in
-the copied file the way `ALT_DOMAIN` already is (§Layout and configuration):
+**The arm's three knobs** are step-level workflow env on the probe step, set in the copied file the way `ALT_DOMAIN` already is (§Layout and configuration):
 
 - `RELEASE_NOTE_GLOB` — the tracked path glob enumerating release-note files.
-- `RELEASE_NOTE_TAG_KEY` — the front-matter key whose value is the tag a note
-  belongs to. Load-bearing rather than decorative: a posts directory holds posts
-  that are not release notes, and this key is what separates them. It is read
-  **anchored inside the opening front-matter fence**, so the same key spelled in
-  a note's body is not mistaken for the note's own tag.
-- `RELEASE_NOTE_URL_PATH` — the site path a note is published at, written with a
-  `{slug}` token the arm substitutes with the note filename minus its extension.
-  It holds the **path only**; the host is never repeated here, because the CNAME
-  file stays the single source for it and a host rename must stay a one-file
-  edit. This is the knob with no cross-check anywhere — nothing outside the site
-  generator derives a note's served URL — so it is the one a consumer can set
-  wrongly and see nothing red. The concrete trap: a generator that emits
-  `/posts/<slug>.html` while the host *also* serves the extensionless form makes
-  the suffixed value look the more literally correct of the two, and it reds
-  every body written to the bare form.
+- `RELEASE_NOTE_TAG_KEY` — the front-matter key whose value is the tag a note belongs to. Load-bearing rather than decorative: a posts directory holds posts that are not release notes, and this key is what separates them. It is read **anchored inside the opening front-matter fence**, so the same key spelled in a note's body is not mistaken for the note's own tag.
+- `RELEASE_NOTE_URL_PATH` — the site path a note is published at, written with a `{slug}` token the arm substitutes with the note filename minus its extension. It holds the **path only**; the host is never repeated here, because the CNAME file stays the single source for it and a host rename must stay a one-file edit. This is the knob with no cross-check anywhere — nothing outside the site generator derives a note's served URL — so it is the one a consumer can set wrongly and see nothing red. The concrete trap: a generator that emits `/posts/<slug>.html` while the host *also* serves the extensionless form makes the suffixed value look the more literally correct of the two, and it reds every body written to the bare form.
 
-**The zero-cases, ruled exhaustively.** Every count the arm ranges over can be
-zero, and each zero is either a finding or a legitimate pass; an unruled one is
-how the arm becomes a green that means nothing.
+**The zero-cases, ruled exhaustively.** Every count the arm ranges over can be zero, and each zero is either a finding or a legitimate pass; an unruled one is how the arm becomes a green that means nothing.
 
-- **The glob matches no notes** — a **finding**. A misconfigured
-  `RELEASE_NOTE_GLOB` is itself the defect, which is what makes "set these knobs
-  or delete the arm" an instruction rather than advice.
-- **The tag-list call fails** — a **finding**, asserted on the call's own exit
-  status with the API's error text (which carries the HTTP code) in the message,
-  never inferred from the count that follows. The probe step runs under `set +e`,
-  so a failed invocation yields an empty tag list and a zero exit; every note then
-  reads "not yet released" and the arm reports a clean run forever. On the
-  per-Release lookup a failure reads like "no such Release"; on the tag-list call
-  the same failure reads like "green".
-- **The per-Release lookup fails for a tag that exists** — a **finding**. The tag
-  list has already established that the tag is real, so this is the
-  missing-Release case rather than the deferred-release one.
-- **The glob matches notes and none carries the tag key** — **not** a finding,
-  stated so it is not added by symmetry with the first case. A consumer whose
-  notes genuinely precede its first release is in this state legitimately. It is
-  nonetheless the likelier of the two knob misconfigurations, precisely because
-  the glob's failure is loud and the key's is silent.
+- **The glob matches no notes** — a **finding**. A misconfigured `RELEASE_NOTE_GLOB` is itself the defect, which is what makes "set these knobs or delete the arm" an instruction rather than advice.
+- **The tag-list call fails** — a **finding**, asserted on the call's own exit status with the API's error text (which carries the HTTP code) in the message, never inferred from the count that follows. The probe step runs under `set +e`, so a failed invocation yields an empty tag list and a zero exit; every note then reads "not yet released" and the arm reports a clean run forever. On the per-Release lookup a failure reads like "no such Release"; on the tag-list call the same failure reads like "green".
+- **The per-Release lookup fails for a tag that exists** — a **finding**. The tag list has already established that the tag is real, so this is the missing-Release case rather than the deferred-release one.
+- **The glob matches notes and none carries the tag key** — **not** a finding, stated so it is not added by symmetry with the first case. A consumer whose notes genuinely precede its first release is in this state legitimately. It is nonetheless the likelier of the two knob misconfigurations, precisely because the glob's failure is loud and the key's is silent.
 - **Zero *released* notes** — not a finding, for the same reason.
 
-**The census line makes those states readable; the rulings above are what make a
-vacuous pass impossible.** On every run the arm prints a census of what it ranged
-over — notes found, of those carrying the tag key, of those released against the
-remote tag count, and of those checked. No count in it is another by
-construction: the gap between *found* and *keyed* separates a typo'd
-`RELEASE_NOTE_TAG_KEY` from a corpus that simply mixes notes with ordinary posts,
-the gap between *keyed* and *released* is the legitimate pre-release state, and
-the gap between *released* and *checked* is a Release the arm could not read.
-Collapsing *found* into *keyed* would render the first two of those states
-identically, which is what reporting them apart buys. This is the same shape as
-gate-sdk's vacuous-pass
-tripwire (§run-gates): a *reading* available to whoever opens the run log, not an
-assertion, and on a green run nobody opens it. It earns its place as the
-diagnostic naming which state a reader is in; it is not itself what stands
-between this arm and a vacuous pass.
+**The census line makes those states readable; the rulings above are what make a vacuous pass impossible.** On every run the arm prints a census of what it ranged over — notes found, of those carrying the tag key, of those released against the remote tag count, and of those checked. No count in it is another by construction: the gap between *found* and *keyed* separates a typo'd `RELEASE_NOTE_TAG_KEY` from a corpus that simply mixes notes with ordinary posts, the gap between *keyed* and *released* is the legitimate pre-release state, and the gap between *released* and *checked* is a Release the arm could not read. Collapsing *found* into *keyed* would render the first two of those states identically, which is what reporting them apart buys. This is the same shape as gate-sdk's vacuous-pass tripwire (§run-gates): a *reading* available to whoever opens the run log, not an assertion, and on a green run nobody opens it. It earns its place as the diagnostic naming which state a reader is in; it is not itself what stands between this arm and a vacuous pass.
 
-**Stated coverage limit.** The arm is driven from the tree's notes, so it is total
-over note→Release and silent on the reverse: a Release carrying no note anywhere
-in the tree reds nowhere. The deliverable is the note's pointer, and the
-population that has ever gone wrong is the pointer's.
+**Stated coverage limit.** The arm is driven from the tree's notes, so it is total over note→Release and silent on the reverse: a Release carrying no note anywhere in the tree reds nowhere. The deliverable is the note's pointer, and the population that has ever gone wrong is the pointer's.
 
-**Cost per run.** The paginated tag list, one Release lookup per released note,
-and one resolution request per distinct apex URL in each body — linear in release
-count, on a daily schedule, well inside the authenticated rate limit.
-Deliberately uncapped and unknobbed: a "newest N only" bound would stop probing
-exactly the old releases where this class of defect has actually been found.
+**Cost per run.** The paginated tag list, one Release lookup per released note, and one resolution request per distinct apex URL in each body — linear in release count, on a daily schedule, well inside the authenticated rate limit. Deliberately uncapped and unknobbed: a "newest N only" bound would stop probing exactly the old releases where this class of defect has actually been found.
 
-**The theme-drift arm** is the monitor half of §check-docs-highlight-coverage.
-It is optional, on the set-the-env-or-delete-the-arm pattern, and takes two
-step-level env values:
+**The theme-drift arm** is the monitor half of §check-docs-highlight-coverage. It is optional, on the set-the-env-or-delete-the-arm pattern, and takes two step-level env values:
 
 - `HIGHLIGHT_CSS_PATH` — the site path of the theme stylesheet;
-- `HIGHLIGHT_TOKENS_FILE` — the tracked snapshot, the same file
-  `SITE_KIT_HIGHLIGHT_TOKENS` names.
+- `HIGHLIGHT_TOKENS_FILE` — the tracked snapshot, the same file `SITE_KIT_HIGHLIGHT_TOKENS` names.
 
-The arm fetches `https://<apex><HIGHLIGHT_CSS_PATH>`, the apex read from the
-CNAME file as the other arms read it, and extracts the class set by **the
-extraction rule**:
+The arm fetches `https://<apex><HIGHLIGHT_CSS_PATH>`, the apex read from the CNAME file as the other arms read it, and extracts the class set by **the extraction rule**:
 
 - **Rules.** Comments are stripped and the stylesheet is split into rules at `}`.
-- **Colour-bearing.** A rule is kept when its declaration block sets `color`,
-  `background` or `background-color`.
+- **Colour-bearing.** A rule is kept when its declaration block sets `color`, `background` or `background-color`.
 - **Selectors.** Its selector list is split on `,`.
-- **Classes.** Each selector that is exactly `.highlight .<class>`, one class
-  after the scope, is kept.
+- **Classes.** Each selector that is exactly `.highlight .<class>`, one class after the scope, is kept.
 - **Result.** Sorted and de-duplicated.
 
-It compares that set with the snapshot's classes (`#` and blank lines dropped)
-in **both directions**. A class the theme colours and the snapshot lacks is a
-finding, because the gate would never ask for its override. A class the snapshot
-lists and the theme does not colour is a finding, because the snapshot is a
-copy and a copy must match. On either, it prints the added and removed classes
-**and the full new list**, so the remedy is a paste into the snapshot, followed
-by whatever overrides the gate then reds on.
+It compares that set with the snapshot's classes (`#` and blank lines dropped) in **both directions**. A class the theme colours and the snapshot lacks is a finding, because the gate would never ask for its override. A class the snapshot lists and the theme does not colour is a finding, because the snapshot is a copy and a copy must match. On either, it prints the added and removed classes **and the full new list**, so the remedy is a paste into the snapshot, followed by whatever overrides the gate then reds on.
 
 The zero-cases:
 
-- a fetch failure is a finding, asserted on the call's own exit status with
-  `curl -f`, so an HTTP error is a failure rather than an error page parsed;
-- a fetched stylesheet yielding **zero** classes is a finding, since the
-  extraction or the theme's structure broke;
+- a fetch failure is a finding, asserted on the call's own exit status with `curl -f`, so an HTTP error is a failure rather than an error page parsed;
+- a fetched stylesheet yielding **zero** classes is a finding, since the extraction or the theme's structure broke;
 - an unreadable snapshot, or only one of the two values set, is a finding;
-- with both values empty the arm is skipped, with a census line saying so. The
-  template ships them empty.
+- with both values empty the arm is skipped, with a census line saying so. The template ships them empty.
 
-The census prints fetched bytes, colour-bearing rules, extracted classes and
-snapshot classes. The fetch is anonymous HTTPS, so the arm needs no new
-`permissions:` scope.
+The census prints fetched bytes, colour-bearing rules, extracted classes and snapshot classes. The fetch is anonymous HTTPS, so the arm needs no new `permissions:` scope.
 
-**The honest limit.** The gate cannot see a theme bump, and this arm sees it on
-its next scheduled run. Between a bump and that run the live site can show
-uncovered tokens. The daily schedule bounds how long that lasts, and the pre-bump
-tree cannot prevent it.
+**The honest limit.** The gate cannot see a theme bump, and this arm sees it on its next scheduled run. Between a bump and that run the live site can show uncovered tokens. The daily schedule bounds how long that lasts, and the pre-bump tree cannot prevent it.
 
-The kit's `smoke/install.sh` installs the template verbatim into the scratch tree
-as governed surface, and registers the gates that read it. The scratch battery is
-the union of what each kit's `smoke/install.sh` registers; this kit contributes
-`check-docs-cname-parity`, and its workflow is linted by the `check-action-*`
-gates gate-sdk's own leg registers beside the workflow template gate-sdk
-installs. `check-tree-terms` reads the installed file too, for tree terms. So a
-template regression in the workflow's bash, its action pins, or its `gh`
-repository context reds the smoke rather than surfacing at a consumer.
+The kit's `smoke/install.sh` installs the template verbatim into the scratch tree as governed surface, and registers the gates that read it. The scratch battery is the union of what each kit's `smoke/install.sh` registers; this kit contributes `check-docs-cname-parity`, and its workflow is linted by the `check-action-*` gates gate-sdk's own leg registers beside the workflow template gate-sdk installs. `check-tree-terms` reads the installed file too, for tree terms. So a template regression in the workflow's bash, its action pins, or its `gh` repository context reds the smoke rather than surfacing at a consumer.
 
-Those four qualify on gate-sdk's leg under the registration accounting's
-predicate — a gate earns a scratch-battery slot when it reads a surface the
-install writes (gate-sdk/SPEC.md §Consumer smoke). The predicate binds every kit,
-and the same section rules on the omissions: what this kit leaves unregistered is
-decided by the accounting's probe, not by a judgment recorded here.
+Those four qualify on gate-sdk's leg under the registration accounting's predicate — a gate earns a scratch-battery slot when it reads a surface the install writes (gate-sdk/SPEC.md §Consumer smoke). The predicate binds every kit, and the same section rules on the omissions: what this kit leaves unregistered is decided by the accounting's probe, not by a judgment recorded here.
 
 ## Out of scope
 
-The kit does not resolve DNS, provision certificates, or configure the host
-platform — those are the deployment's concerns, surfaced by the monitor, not
-governed by a gate. It does not gate the *content* of the docs site (links,
-commands, prose): that is canon-kit's charge over the governed doc set —
-`check-docs-render-fidelity` gates how a page *renders*, never what it says. And
-it holds no opinion on which host a project uses — only that the tree cites one,
-and that the CNAME file names it.
+The kit does not resolve DNS, provision certificates, or configure the host platform — those are the deployment's concerns, surfaced by the monitor, not governed by a gate. It does not gate the *content* of the docs site (links, commands, prose): that is canon-kit's charge over the governed doc set — `check-docs-render-fidelity` gates how a page *renders*, never what it says. And it holds no opinion on which host a project uses — only that the tree cites one, and that the CNAME file names it.

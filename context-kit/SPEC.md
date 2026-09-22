@@ -1,1145 +1,245 @@
 # context-kit — token-economics-aware context management
 
-A stateless agent session pays for context twice. On-demand cost: opening a
-large SPEC or source file whole when only one section was needed. Standing
-cost: the always-loaded surface — everything injected into *every* session
-(the instructions file, the session-start hook output) — where each added
-line is a recurring per-session tax that grows silently, because no single
-session ever sees the trend. The kit attacks both: an index-first reading
-toolset, a session-start hook template that assembles a compact brief, a
-meter that tracks the always-loaded surface against a per-iteration
-baseline, a brevity gate over its governed always-loaded sections, the
-close-stage brevity pass that reacts to the meter's delta, and a memory-off
-gate pair that keeps the ungoverned harness-memory surface disabled rather
-than left to accrete.
+A stateless agent session pays for context twice. On-demand cost: opening a large SPEC or source file whole when only one section was needed. Standing cost: the always-loaded surface — everything injected into *every* session (the instructions file, the session-start hook output) — where each added line is a recurring per-session tax that grows silently, because no single session ever sees the trend. The kit attacks both: an index-first reading toolset, a session-start hook template that assembles a compact brief, a meter that tracks the always-loaded surface against a per-iteration baseline, a brevity gate over its governed always-loaded sections, the close-stage brevity pass that reacts to the meter's delta, and a memory-off gate pair that keeps the ungoverned harness-memory surface disabled rather than left to accrete.
 
-The kit carries the index mechanism, the hook skeleton, the meter, the
-brevity machinery, and the memory-off enforcement; a consumer's product-shaped
-surfaces (proto and diagram indexes, its doc roster, its harvest pipeline)
-stay in the consumer repo (§Out of scope).
+The kit carries the index mechanism, the hook skeleton, the meter, the brevity machinery, and the memory-off enforcement; a consumer's product-shaped surfaces (proto and diagram indexes, its doc roster, its harvest pipeline) stay in the consumer repo (§Out of scope).
 
 ## Index-first reading
 
-"Index, then read the one you need" — the pattern every tool serves. All three
-are **advisory arms of the gate binary**, reached through the battery runner's
-`--emit` front-end (`bash gate-sdk/bin/run-gates.sh --emit <name> …`); none joins
-`gates.list` and none returns a verdict a battery reads, which is the non-gate
-class gate-sdk/SPEC.md §The non-gate arm rules. Each is an **arm-table member**
-rather than a hardcoded flag, and for the first and third that family is forced
-rather than chosen: a tool that resolves a consumer knob declares it on its table
-row, and a hardcoded flag has no row, so the knob-file derivation, `check-reads-couples` and
-`check-gate-substrate-parity` cannot see what it reads.
+"Index, then read the one you need" — the pattern every tool serves. All three are **advisory arms of the gate binary**, reached through the battery runner's `--emit` front-end (`bash gate-sdk/bin/run-gates.sh --emit <name> …`); none joins `gates.list` and none returns a verdict a battery reads, which is the non-gate class gate-sdk/SPEC.md §The non-gate arm rules. Each is an **arm-table member** rather than a hardcoded flag, and for the first and third that family is forced rather than chosen: a tool that resolves a consumer knob declares it on its table row, and a hardcoded flag has no row, so the knob-file derivation, `check-reads-couples` and `check-gate-substrate-parity` cannot see what it reads.
 
-- **`--emit md-index [paths…]`** — compact structural index for Markdown:
-  heading hierarchy with line numbers, each heading followed by its
-  section's first sentence, plus a per-file line count (the cost signal —
-  whether to read whole or by section). Defaults to the whole tree, minus
-  `CONTEXT_KIT_PRUNE_DIRS`, which is its one declared read.
+- **`--emit md-index [paths…]`** — compact structural index for Markdown: heading hierarchy with line numbers, each heading followed by its section's first sentence, plus a per-file line count (the cost signal — whether to read whole or by section). Defaults to the whole tree, minus `CONTEXT_KIT_PRUNE_DIRS`, which is its one declared read.
 
-  Four observable properties **are** the contract, because each is a place a
-  reimplementation would quietly differ. The first two are pinned by an
-  index-tests golden (§Testing); the last two, and the fence asymmetry stated
-  below them, are pinned by the arm's own crate tests, which `check-crate-arms`
-  runs — the golden corpus carries no heading inside a fence and every golden
-  invocation names one explicit file, so no golden reaches them:
+  Four observable properties **are** the contract, because each is a place a reimplementation would quietly differ. The first two are pinned by an index-tests golden (§Testing); the last two, and the fence asymmetry stated below them, are pinned by the arm's own crate tests, which `check-crate-arms` runs — the golden corpus carries no heading inside a fence and every golden invocation names one explicit file, so no golden reaches them:
 
-  - **Per-file block shape** — `<repo-relative path>  (<N>L)` where `N` is the
-    `wc -l` newline count, then one indented row per heading
-    `<indent><hashes> <heading>:<lineno>`, or
-    `<indent><hashes> <heading>:<lineno>  — <first sentence>` where a first
-    sentence was found, then a blank line — after the last block too.
-  - **The first-sentence rule** — the first non-blank line after the heading
-    that is not inside a fence and is not itself a heading or a `---` rule;
-    markdown link syntax reduced to its text, `*`, `_` and backticks stripped,
-    cut at the first `.`, `!` or `?`, else at 120 characters.
-  - **Traversal and order** — `*.md` under the given paths, `find`'s own entry
-    model (a symlinked file is an entry, matched by name and read through),
-    `CONTEXT_KIT_PRUNE_DIRS` matched on the leaf basename, results in byte order
-    of the walked path — absolute in the default form, the default target being
-    the repository toplevel. A file the walk reached but the reader cannot open
-    contributes nothing rather than failing the run.
-  - **The empty case** — `No Markdown files found in <targets>`, where the
-    targets are the ones given and default to the repository toplevel, so the
-    default form of the message carries an absolute path.
+  - **Per-file block shape** — `<repo-relative path>  (<N>L)` where `N` is the `wc -l` newline count, then one indented row per heading `<indent><hashes> <heading>:<lineno>`, or `<indent><hashes> <heading>:<lineno>  — <first sentence>` where a first sentence was found, then a blank line — after the last block too.
+  - **The first-sentence rule** — the first non-blank line after the heading that is not inside a fence and is not itself a heading or a `---` rule; markdown link syntax reduced to its text, `*`, `_` and backticks stripped, cut at the first `.`, `!` or `?`, else at 120 characters.
+  - **Traversal and order** — `*.md` under the given paths, `find`'s own entry model (a symlinked file is an entry, matched by name and read through), `CONTEXT_KIT_PRUNE_DIRS` matched on the leaf basename, results in byte order of the walked path — absolute in the default form, the default target being the repository toplevel. A file the walk reached but the reader cannot open contributes nothing rather than failing the run.
+  - **The empty case** — `No Markdown files found in <targets>`, where the targets are the ones given and default to the repository toplevel, so the default form of the message carries an absolute path.
 
-  The heading scan is deliberately **fence-blind** where the first-sentence
-  search above is not: a `##` inside a fenced block is a row. That asymmetry is
-  the shell form's and the arm's own tests record it, so it is contract rather
-  than oversight.
+  The heading scan is deliberately **fence-blind** where the first-sentence search above is not: a `##` inside a fenced block is a row. That asymmetry is the shell form's and the arm's own tests record it, so it is contract rather than oversight.
 
-- **`--emit md-section <file> <heading>`** — prints one section, from the
-  matched heading to the next heading of the same or higher level. Match is
-  **case-insensitive**, tolerates a **leading `§`** (so a spec citation pastes
-  directly), and compares the heading's **text** — hashes and surrounding
-  whitespace stripped — rather than a line prefix, so a query is a heading name
-  and never a raw heading line. Headings inside fenced code blocks are not
-  mistaken for structure **at either end**: one opens no section, and one does
-  not close the section around it. The companion: find the heading in the index,
-  extract just that body.
+- **`--emit md-section <file> <heading>`** — prints one section, from the matched heading to the next heading of the same or higher level. Match is **case-insensitive**, tolerates a **leading `§`** (so a spec citation pastes directly), and compares the heading's **text** — hashes and surrounding whitespace stripped — rather than a line prefix, so a query is a heading name and never a raw heading line. Headings inside fenced code blocks are not mistaken for structure **at either end**: one opens no section, and one does not close the section around it. The companion: find the heading in the index, extract just that body.
 
-  **The matcher is this arm's and the walk is the crate's.**
-  `section::sections` bounds a section by heading level exactly as this tool
-  does, and that half is reused: the arm masks fenced lines out and hands the
-  masked view to that walk, so the fence rule and the match rule stay the
-  matcher's while the bounding stays one implementation. Widening
-  `section::sections` itself would move its other callers across every call
-  site to save one function.
+  **The matcher is this arm's and the walk is the crate's.** `section::sections` bounds a section by heading level exactly as this tool does, and that half is reused: the arm masks fenced lines out and hands the masked view to that walk, so the fence rule and the match rule stay the matcher's while the bounding stays one implementation. Widening `section::sections` itself would move its other callers across every call site to save one function.
 
-  Matching is **exact on the heading's text**, and the near-miss behaviour that
-  follows from it — empty on a near miss, correct on an exact query — is a
-  stated limit rather than a defect the port fixed.
+  Matching is **exact on the heading's text**, and the near-miss behaviour that follows from it — empty on a near miss, correct on an exact query — is a stated limit rather than a defect the port fixed.
 
-  **Its declared knob roster is empty**, because the arm resolves no knob; it is
-  an arm-table row regardless, since table membership is what makes
-  `--emit md-section` reach it at all. Exit statuses: `0` with the section on
-  stdout; **`2`** with a diagnostic on stderr for a missing argument, a file
-  that is not there, and a query matching no heading. That last was exit 1 in
-  the deleted shell driver; no caller read the 1.
+  **Its declared knob roster is empty**, because the arm resolves no knob; it is an arm-table row regardless, since table membership is what makes `--emit md-section` reach it at all. Exit statuses: `0` with the section on stdout; **`2`** with a diagnostic on stderr for a missing argument, a file that is not there, and a query matching no heading. That last was exit 1 in the deleted shell driver; no caller read the 1.
 
-- **`--emit pub-index [paths…]`** — compact public API surface: every public
-  item with kind, name, and line, sorted by kind then name, in a per-file
-  block headed by a count. It is a **dispatcher over per-language
-  extractors**, and the port narrowed the tool without narrowing the extension
-  point. The dispatcher owns three jobs: traversal (the prune set is
-  `CONTEXT_KIT_PRUNE_DIRS`, the walk `md-index`'s above), the kind-then-name
-  sort (bytewise, then the whole row), and the row formatting under a
-  `<rel>  (<count>)` block header — the index-tests goldens assert the exact
-  shape.
+- **`--emit pub-index [paths…]`** — compact public API surface: every public item with kind, name, and line, sorted by kind then name, in a per-file block headed by a count. It is a **dispatcher over per-language extractors**, and the port narrowed the tool without narrowing the extension point. The dispatcher owns three jobs: traversal (the prune set is `CONTEXT_KIT_PRUNE_DIRS`, the walk `md-index`'s above), the kind-then-name sort (bytewise, then the whole row), and the row formatting under a `<rel>  (<count>)` block header — the index-tests goldens assert the exact shape.
 
-  **Resolution stays consumer-first** (the `gates.list` precedent). For each
-  enabled language, a file at `<CONTEXT_KIT_PUB_LANG_DIR>/<lang>.sh` is used if
-  it exists; otherwise the built-in extractor for that language; otherwise the
-  arm refuses at exit 2 naming the language, the path it looked for and what is
-  built in. The built-in roster replaces the deleted `lib/pub-lang/` leg rather
-  than removing it, so a consumer's `rust.sh` still shadows the shipped Rust
-  grammar.
+  **Resolution stays consumer-first** (the `gates.list` precedent). For each enabled language, a file at `<CONTEXT_KIT_PUB_LANG_DIR>/<lang>.sh` is used if it exists; otherwise the built-in extractor for that language; otherwise the arm refuses at exit 2 naming the language, the path it looked for and what is built in. The built-in roster replaces the deleted `lib/pub-lang/` leg rather than removing it, so a consumer's `rust.sh` still shadows the shipped Rust grammar.
 
-  **A consumer extractor is still a sourced bash file defining exactly two
-  names.** `PUB_LANG_GLOBS` (the find globs, e.g. `*.rs`) and
-  `pub_lang_extract <file>` (emitting unsorted `kind name lineno` rows) are
-  unchanged contract; two names, both read every run, and no other
-  extractor-file surface is contract. The arm runs one through **two `bash`
-  spawns per language** — one sources it and prints `PUB_LANG_GLOBS`, one
-  sources it and calls `pub_lang_extract` over the file list the arm walked.
-  Two rather than one because the globs are needed *before* the walk, and one
-  spawn per contract name rather than a private protocol so the seam a consumer
-  writes against does not change shape. The per-file framing inside the second
-  spawn is the dispatcher's own and reaches no consumer name.
+  **A consumer extractor is still a sourced bash file defining exactly two names.** `PUB_LANG_GLOBS` (the find globs, e.g. `*.rs`) and `pub_lang_extract <file>` (emitting unsorted `kind name lineno` rows) are unchanged contract; two names, both read every run, and no other extractor-file surface is contract. The arm runs one through **two `bash` spawns per language** — one sources it and prints `PUB_LANG_GLOBS`, one sources it and calls `pub_lang_extract` over the file list the arm walked. Two rather than one because the globs are needed *before* the walk, and one spawn per contract name rather than a private protocol so the seam a consumer writes against does not change shape. The per-file framing inside the second spawn is the dispatcher's own and reaches no consumer name.
 
-  **Two extractors are built in**, `rust` (every `pub`/`pub(crate)`/`pub(super)`
-  item of the eight declared kinds) and `ts` (TypeScript: `export`-declared
-  `function`/`class`/`interface`/`type`/`enum`/`const`/`let`/`var`, `const enum`
-  folded to `enum`, and `export default` named or falling back to the literal
-  `default`, over `*.ts` and `*.tsx` with `.d.ts` included as public surface by
-  construction). Both stay **grep-grade**, re-expressed against the crate's
-  POSIX ERE matcher: re-exports (`export { x } from`) and multi-line
-  declarations are stated honest limits, not parsed. They are **not arms of
-  their own** — their only caller is the dispatcher and their only output
-  contract is the rows it consumes, so a flag each would mint two spellings with
-  one caller between them and put a second entry point into the emission path.
-  The dispatcher shipped when demand named it — a second adopter's tree carries
-  a TypeScript surface its Rust-only copy could not index — not before: an
-  unrequested plugin framework would have been scaffolding, and AST/tree-sitter
-  parsing is above the tool's grep-grade portability altitude.
+  **Two extractors are built in**, `rust` (every `pub`/`pub(crate)`/`pub(super)` item of the eight declared kinds) and `ts` (TypeScript: `export`-declared `function`/`class`/`interface`/`type`/`enum`/`const`/`let`/`var`, `const enum` folded to `enum`, and `export default` named or falling back to the literal `default`, over `*.ts` and `*.tsx` with `.d.ts` included as public surface by construction). Both stay **grep-grade**, re-expressed against the crate's POSIX ERE matcher: re-exports (`export { x } from`) and multi-line declarations are stated honest limits, not parsed. They are **not arms of their own** — their only caller is the dispatcher and their only output contract is the rows it consumes, so a flag each would mint two spellings with one caller between them and put a second entry point into the emission path. The dispatcher shipped when demand named it — a second adopter's tree carries a TypeScript surface its Rust-only copy could not index — not before: an unrequested plugin framework would have been scaffolding, and AST/tree-sitter parsing is above the tool's grep-grade portability altitude.
 
-**One traversal-exclusion set, read by both walkers.** `CONTEXT_KIT_PRUNE_DIRS`
-is the kit's single exclusion array; the `md-index` and `pub-index` arms share
-one walk over it instead of each holding a private literal, and both read it as
-one of context-kit's static knobs, resolved from the kit's defaults table and the
-consumer's knob file (§Layout and configuration). Two private literals had
-drifted apart *and* from the tree: neither carried the harness's isolated-agent
-worktree leaf, so both walkers descended into a second full copy of the
-repository and indexed it as tree content, which for `md-index` is every
-governed markdown surface twice.
+**One traversal-exclusion set, read by both walkers.** `CONTEXT_KIT_PRUNE_DIRS` is the kit's single exclusion array; the `md-index` and `pub-index` arms share one walk over it instead of each holding a private literal, and both read it as one of context-kit's static knobs, resolved from the kit's defaults table and the consumer's knob file (§Layout and configuration). Two private literals had drifted apart *and* from the tree: neither carried the harness's isolated-agent worktree leaf, so both walkers descended into a second full copy of the repository and indexed it as tree content, which for `md-index` is every governed markdown surface twice.
 
-The match is on the **leaf basename**, the same rule and the same reasoning
-gate-sdk/SPEC.md §lib/gate.sh fixed for its own set: pruning a parent path also
-passes but loses coverage silently, because the governed markdown under it is
-reached by explicit globs no prune touches. gate-sdk's set additionally covers a
-scratch dir and a fixture-corpus dir, and both are **deliberately absent from
-this one** — this set's subject
-is the second copy of the repository, and adding either is a corpus narrowing
-with its own readers (the index-tests goldens; a session that legitimately wants
-a fixture corpus indexed). Whether the two sets should converge is an open
-question, filed rather than taken. They are **not one fact spelled twice**: one
-carries leaves gate-sdk's does not and omits two that it has,
-gate-sdk/SPEC.md §lib/gate.sh owning that set's membership and this knob's
-default owning this one,
-and deriving this one from the gate library would make context-kit's own
-exclusion rule a gate-sdk read, so a consumer assigns this knob in its own config
-instead.
+The match is on the **leaf basename**, the same rule and the same reasoning gate-sdk/SPEC.md §lib/gate.sh fixed for its own set: pruning a parent path also passes but loses coverage silently, because the governed markdown under it is reached by explicit globs no prune touches. gate-sdk's set additionally covers a scratch dir and a fixture-corpus dir, and both are **deliberately absent from this one** — this set's subject is the second copy of the repository, and adding either is a corpus narrowing with its own readers (the index-tests goldens; a session that legitimately wants a fixture corpus indexed). Whether the two sets should converge is an open question, filed rather than taken. They are **not one fact spelled twice**: one carries leaves gate-sdk's does not and omits two that it has, gate-sdk/SPEC.md §lib/gate.sh owning that set's membership and this knob's default owning this one, and deriving this one from the gate library would make context-kit's own exclusion rule a gate-sdk read, so a consumer assigns this knob in its own config instead.
 
 ## The session-context hook (template)
 
-`templates/session-context.sh` is a consumer copy (the `bash-guard.sh`
-pattern): wired as the harness's session-start hook via
-`templates/settings-sessionstart.json`, it assembles the session brief.
-Every step is guarded and degrades silently — the hook never fails a
-session.
+`templates/session-context.sh` is a consumer copy (the `bash-guard.sh` pattern): wired as the harness's session-start hook via `templates/settings-sessionstart.json`, it assembles the session brief. Every step is guarded and degrades silently — the hook never fails a session.
 
-**The template and its consumer copy are both permanently shell**, declared
-`# no-port:` under the class ruling at gate-sdk/SPEC.md §The harness-template port disposition.
-The template carries an `[EDIT ME]` gap at every layout-judgment step below —
-tool paths, the dirty-surface pre-run, the stage-conditioned nudges, the index
-footer, the probe path — and README.md tells an adopter to fill them as layout
-judgment rather than mechanism, so those gaps *are* the extension point and a
-compiled form would leave nothing to fill. The copy declares on the second
-ground: it is the filled instance, so everything it holds beyond the template is
-this repo's own layout content.
+**The template and its consumer copy are both permanently shell**, declared `# no-port:` under the class ruling at gate-sdk/SPEC.md §The harness-template port disposition. The template carries an `[EDIT ME]` gap at every layout-judgment step below — tool paths, the dirty-surface pre-run, the stage-conditioned nudges, the index footer, the probe path — and README.md tells an adopter to fill them as layout judgment rather than mechanism, so those gaps *are* the extension point and a compiled form would leave nothing to fill. The copy declares on the second ground: it is the filled instance, so everything it holds beyond the template is this repo's own layout content.
 
-**A `hooks[]` edit arms immediately, and this is the kit set's record of it** —
-true of every hook registration in the settings file, not just this template's:
-the running session and its already-dispatched subagents pick it up with no
-restart and no re-dispatch. Measured rather than assumed, by watching a newly
-registered hook's log fill inside the same session that wrote the registration.
-It bounds what a session-start hook can be relied on for: arming is not the
-same event as the session brief, so a hook wired mid-session runs without ever
-having assembled one.
+**A `hooks[]` edit arms immediately, and this is the kit set's record of it** — true of every hook registration in the settings file, not just this template's: the running session and its already-dispatched subagents pick it up with no restart and no re-dispatch. Measured rather than assumed, by watching a newly registered hook's log fill inside the same session that wrote the registration. It bounds what a session-start hook can be relied on for: arming is not the same event as the session brief, so a hook wired mid-session runs without ever having assembled one.
 
 Steps, in order:
 
-1. **Queue index** — via queue-kit's `queue-index` arm, reached through the
-   battery runner's `--emit` front-end (queue-kit/SPEC.md §The queue-index arm),
-   collapsing the
-   Deferred section to a tally except on the close and scope stages. The stage
-   it routes on comes from the cursor — `CONTEXT_KIT_STATE_FILE`'s last data
-   line — with an empty cursor (no such file, or one truncated to its preamble
-   at an iteration boundary) taking the collapsed branch every non-close,
-   non-scope stage already takes, so the no-cursor window needs no branch of
-   its own and can never fail the session.
-   Deferred is unpickable and only scope (promotion) acts on it; the full
-   board additionally serves close's backlog review, and — by the
-   cursor-lag rule below — firing on close is what hands the full board to
-   the first scope session, which reads `close` at session start. On any
-   other stage the full listing is pure recurring cost.
-   A configured icebox tier rides **both** branches as a one-line tally, so
-   this step needs no new stage routing: a dormant entry is already one line,
-   so there is no full listing of it to withhold, and the eviction work that
-   reads the tier reads `--emit queue-index --icebox-candidates` rather than this
-   index.
-2. **Dirty-surface pre-run** — for each component with uncommitted
-   changes, pre-run the matching surface index (default: `--emit pub-index`
-   over top-level dirs containing `src/`), so a resumed session's editing
-   surface is already in context. Component detection and the index
-   command live in a marked consumer section of the template — they are
-   layout assumptions, not mechanism.
-   **The step's availability guard reads the gate binary, and the ordering is
-   the contract rather than a detail.** The index is an arm now, so the guard is
-   that the binary is present and executable and it is taken **before** the block
-   prints its header: `exec_arm` exits 2 with a diagnostic that this call site
-   swallows on both channels, so a guard taken after the header would print
-   `Public API surface of those components…` followed by nothing on every host the
-   artifact roster does not cover. Read first, the block is **absent rather than
-   empty** — the way the deleted script-path guard degraded. The hook sources
-   `gate-sdk/lib/gate.sh` directly and spells the door with
-   `gate_native_bin_spelled` (gate-sdk/SPEC.md §lib/gate.sh): the library
-   defines functions and runs nothing at load, so no read of it can fail a
-   session, and the door has one spelling across every step below rather than a
-   script path per call site.
-3. **Drift line** — one `--emit <arm> --trend` summary line when the
-   consumer has a drift report; silently absent otherwise (drift-kit owns
-   the report; the seam is this optional line).
-4. **Stage-conditioned nudges** — short reminders keyed on a stage set
-   read from the header (this repo's delegation nudge is the exemplar).
-   Each keys on {predecessor, own stage} (the cursor-lag rule below) so a
-   first-of-stage session and a restarted one both receive it. Marked
-   consumer section: which stages get which nudge is consumer judgment.
-   Suppressed when the session-role signal (below) marks the session `lead`
-   — the nudges are executor-facing.
-5. **Memory-off backstop** — one warning line when the harness memory dir
-   (`CONTEXT_KIT_MEMORY_DIRS`) holds content, pointing the durable fact at its
-   tracked home (§The memory-off doctrine). `check-memory-off` fires only at
-   commit; this surfaces pollution at session start, between commits. Silent
-   when the dir is empty or absent.
-6. **Scratch sweep** — reclaim `${GATE_SDK_TMP_DIR:-.tmp}` entries older
-   than a day, depth-first (`-mindepth 1 -depth`) so stray directories are
-   reclaimed too, never touching `.gitkeep`. Age-guarded so a concurrent
-   same-checkout session's in-flight scratch survives.
-7. **Index-reminder footer** — the "index first" ritual with the
-   consumer's actual index commands listed (consumer-edited).
-8. **Stage-routed craft-rule pointers** — when `CONTEXT_KIT_STAGE_RULES`
-   names a **command** (doctrine-kit's `--emit stage-rules` arm), the current
-   stage's craft-rule pointer block, so a stage session is reminded of the
-   craft rules bearing on it before the matching action. The step runs the
-   resolved command with the stage appended and carries **no `-f` existence
-   guard**, the drift line's own shape: a path test on a command
-   passes for nothing. Silently absent
-   when the emitter is unset or the stage routes no rules (doctrine-kit owns
-   the emitter and its tag grammar; the seam is this optional step, the
-   drift-line precedent). Keyed on the derived stage directly, not a
-   {predecessor, own stage} set: the pointers are advisory reminders, so
-   over-firing to an adjacent stage costs only a few lines, and the
-   cursor-lag rule below is about *conditioning*, not about which stage's
-   rules to show. Suppressed when the session-role signal marks the
-   session `lead` — the craft rules are executor-facing.
-9. **Env profile** — when the consumer-local profile file
-   (`CONTEXT_KIT_ENV_PROFILE_FILE`, §bin/env-probe) exists, the step first runs
-   `run-gates.sh --emit env-probe` to re-probe it (output suppressed so no
-   status line reaches the brief), then emits its whole body verbatim so the
-   session adapts
-   its commands to the box as it is now. The re-probe sits inside the same
-   file-present guard, so producer and consumer co-locate here and the probe
-   never auto-seeds a profile the operator did not opt into. Silent when the
-   file is absent — the harness's own `Platform:` line is the fallback, no
-   re-probe fires, and no always-loaded cost is paid where no profile was
-   seeded. The consumer owns the file's brevity (they author the gotchas half),
-   the drift-line precedent.
+1. **Queue index** — via queue-kit's `queue-index` arm, reached through the battery runner's `--emit` front-end (queue-kit/SPEC.md §The queue-index arm), collapsing the Deferred section to a tally except on the close and scope stages. The stage it routes on comes from the cursor — `CONTEXT_KIT_STATE_FILE`'s last data line — with an empty cursor (no such file, or one truncated to its preamble at an iteration boundary) taking the collapsed branch every non-close, non-scope stage already takes, so the no-cursor window needs no branch of its own and can never fail the session. Deferred is unpickable and only scope (promotion) acts on it; the full board additionally serves close's backlog review, and — by the cursor-lag rule below — firing on close is what hands the full board to the first scope session, which reads `close` at session start. On any other stage the full listing is pure recurring cost. A configured icebox tier rides **both** branches as a one-line tally, so this step needs no new stage routing: a dormant entry is already one line, so there is no full listing of it to withhold, and the eviction work that reads the tier reads `--emit queue-index --icebox-candidates` rather than this index.
+2. **Dirty-surface pre-run** — for each component with uncommitted changes, pre-run the matching surface index (default: `--emit pub-index` over top-level dirs containing `src/`), so a resumed session's editing surface is already in context. Component detection and the index command live in a marked consumer section of the template — they are layout assumptions, not mechanism. **The step's availability guard reads the gate binary, and the ordering is the contract rather than a detail.** The index is an arm now, so the guard is that the binary is present and executable and it is taken **before** the block prints its header: `exec_arm` exits 2 with a diagnostic that this call site swallows on both channels, so a guard taken after the header would print `Public API surface of those components…` followed by nothing on every host the artifact roster does not cover. Read first, the block is **absent rather than empty** — the way the deleted script-path guard degraded. The hook sources `gate-sdk/lib/gate.sh` directly and spells the door with `gate_native_bin_spelled` (gate-sdk/SPEC.md §lib/gate.sh): the library defines functions and runs nothing at load, so no read of it can fail a session, and the door has one spelling across every step below rather than a script path per call site.
+3. **Drift line** — one `--emit <arm> --trend` summary line when the consumer has a drift report; silently absent otherwise (drift-kit owns the report; the seam is this optional line).
+4. **Stage-conditioned nudges** — short reminders keyed on a stage set read from the header (this repo's delegation nudge is the exemplar). Each keys on {predecessor, own stage} (the cursor-lag rule below) so a first-of-stage session and a restarted one both receive it. Marked consumer section: which stages get which nudge is consumer judgment. Suppressed when the session-role signal (below) marks the session `lead` — the nudges are executor-facing.
+5. **Memory-off backstop** — one warning line when the harness memory dir (`CONTEXT_KIT_MEMORY_DIRS`) holds content, pointing the durable fact at its tracked home (§The memory-off doctrine). `check-memory-off` fires only at commit; this surfaces pollution at session start, between commits. Silent when the dir is empty or absent.
+6. **Scratch sweep** — reclaim `${GATE_SDK_TMP_DIR:-.tmp}` entries older than a day, depth-first (`-mindepth 1 -depth`) so stray directories are reclaimed too, never touching `.gitkeep`. Age-guarded so a concurrent same-checkout session's in-flight scratch survives.
+7. **Index-reminder footer** — the "index first" ritual with the consumer's actual index commands listed (consumer-edited).
+8. **Stage-routed craft-rule pointers** — when `CONTEXT_KIT_STAGE_RULES` names a **command** (doctrine-kit's `--emit stage-rules` arm), the current stage's craft-rule pointer block, so a stage session is reminded of the craft rules bearing on it before the matching action. The step runs the resolved command with the stage appended and carries **no `-f` existence guard**, the drift line's own shape: a path test on a command passes for nothing. Silently absent when the emitter is unset or the stage routes no rules (doctrine-kit owns the emitter and its tag grammar; the seam is this optional step, the drift-line precedent). Keyed on the derived stage directly, not a {predecessor, own stage} set: the pointers are advisory reminders, so over-firing to an adjacent stage costs only a few lines, and the cursor-lag rule below is about *conditioning*, not about which stage's rules to show. Suppressed when the session-role signal marks the session `lead` — the craft rules are executor-facing.
+9. **Env profile** — when the consumer-local profile file (`CONTEXT_KIT_ENV_PROFILE_FILE`, §bin/env-probe) exists, the step first runs `run-gates.sh --emit env-probe` to re-probe it (output suppressed so no status line reaches the brief), then emits its whole body verbatim so the session adapts its commands to the box as it is now. The re-probe sits inside the same file-present guard, so producer and consumer co-locate here and the probe never auto-seeds a profile the operator did not opt into. Silent when the file is absent — the harness's own `Platform:` line is the fallback, no re-probe fires, and no always-loaded cost is paid where no profile was seeded. The consumer owns the file's brevity (they author the gotchas half), the drift-line precedent.
 
-**The cursor-lag rule.** The hook runs at session start, before the
-arriving skill stamps its entry (its first step) — and that stamp is what
-moves the cursor. So a first-of-stage session reads the *predecessor's* stage.
-The lag is structural and survives any change of cursor source: the hook reads
-a value written after it fires. Stage-conditioned
-output therefore keys on a stage *set* spanning {predecessor, own stage} —
-guaranteeing the first-of-stage session is served, at the accepted cost of
-over-firing to the other sessions that share a cursor value (a restarted
-session of a keyed stage, or the first session of the stage after it).
+**The cursor-lag rule.** The hook runs at session start, before the arriving skill stamps its entry (its first step) — and that stamp is what moves the cursor. So a first-of-stage session reads the *predecessor's* stage. The lag is structural and survives any change of cursor source: the hook reads a value written after it fires. Stage-conditioned output therefore keys on a stage *set* spanning {predecessor, own stage} — guaranteeing the first-of-stage session is served, at the accepted cost of over-firing to the other sessions that share a cursor value (a restarted session of a keyed stage, or the first session of the stage after it).
 
-**The session-role signal.** The hook keys every stage-conditioned injection
-off the lifecycle stage cursor, which says nothing about whether the
-*reading* session is a lead, a stage session, or a manual run — so without a
-role signal a lead draws executor-facing craft rules at every hook fire
-(startup, plus each compact/resume re-fire, the recurring cost). The signal
-is a marker file, **session-id-scoped**: `/lead`'s first step writes one line
-`lead <id>` — `<id>` being the `--emit-session-id` arm's value — to
-`CONTEXT_KIT_SESSION_ROLE_FILE` (gitignored scratch, default
-`${GATE_SDK_TMP_DIR:-.tmp}/session-role`). The hook treats the session as
-`lead` only when the marker's id equals the 8-char prefix of **its own
-payload's session id** — read from the hook payload, never from
-`CLAUDE_CODE_SESSION_ID`, because a subagent is handed its *parent's* id in
-that variable (the named assumption: were the harness ever to fire
-`SessionStart` in subagents, an env-var read would match every stage session
-to its lead's marker and invert the suppression onto exactly its intended
-audience; revisit if subagent hook-fire lands). So a concurrent or later
-top-level session never bleeds, and a stale marker self-invalidates when the
-id rotates. The payload arrives on the hook's stdin, consumable exactly once,
-so the single read here is its sole consumer — a later payload-derived signal
-(a stage derivation, say) must hoist that one read ahead of this guard, never
-add a second. Its guard is *stdin is not a TTY*, which a **manual** run of the
-hook satisfies whenever it inherits an open pipe, so the read blocks and the
-steps below it never emit: run the hook by hand with stdin redirected from
-`/dev/null`. Top-level scoping is sufficient because both producer and
-consumer are top-level by construction — `SessionStart` does not fire for
-Task-spawned subagents, so the only sessions the hook fires in are leads and
-manual runs, and the identity match discriminates exactly those. When the
-signal marks the session `lead`, steps 4 and 8 are suppressed; everything
-else emits unchanged. Signal absent ⇒ byte-identical to the signal-free
-hook; the read is guarded like every step — the hook never fails a session.
-Accepted limits (not defects): the initial startup fire precedes `/lead` by
-construction, a bounded one-per-lead-session cost against the
-per-compact/resume recurrence that is the actual waste; the marker ages out
-with the day-horizon scratch sweep (step 6), degrading to absent-signal
-behavior; the marker's lifetime is the **lead session's, not the iteration's**,
-so a consumer boundary ritual that wipes gitignored scratch (a scope
-evidence-reset, say) must spare the marker file — a lead outliving an iteration
-boundary otherwise reverts silently to absent-signal behavior until it rewrites
-it; and the producer inherits the `--emit-session-id` arm's
-`CLAUDE_CODE_SESSION_ID` dependency — unset, the newest-transcript fallback
-in a lead with live subagents returns an `agent-` prefix the payload can
-never match, and the signal silently no-ops to absent-signal behavior (the
-failure costs a suppression, never a correctness property). Rejected
-alternatives, recorded so they are not re-derived: a launch-env var (a
-perpetual operator ritual whose forgotten export degrades silently with no
-signal it happened) and both-producers-with-precedence (two producers plus a
-precedence rule to spec and gate, for a gap one hook fire wide).
+**The session-role signal.** The hook keys every stage-conditioned injection off the lifecycle stage cursor, which says nothing about whether the *reading* session is a lead, a stage session, or a manual run — so without a role signal a lead draws executor-facing craft rules at every hook fire (startup, plus each compact/resume re-fire, the recurring cost). The signal is a marker file, **session-id-scoped**: `/lead`'s first step writes one line `lead <id>` — `<id>` being the `--emit-session-id` arm's value — to `CONTEXT_KIT_SESSION_ROLE_FILE` (gitignored scratch, default `${GATE_SDK_TMP_DIR:-.tmp}/session-role`). The hook treats the session as `lead` only when the marker's id equals the 8-char prefix of **its own payload's session id** — read from the hook payload, never from `CLAUDE_CODE_SESSION_ID`, because a subagent is handed its *parent's* id in that variable (the named assumption: were the harness ever to fire `SessionStart` in subagents, an env-var read would match every stage session to its lead's marker and invert the suppression onto exactly its intended audience; revisit if subagent hook-fire lands). So a concurrent or later top-level session never bleeds, and a stale marker self-invalidates when the id rotates. The payload arrives on the hook's stdin, consumable exactly once, so the single read here is its sole consumer — a later payload-derived signal (a stage derivation, say) must hoist that one read ahead of this guard, never add a second. Its guard is *stdin is not a TTY*, which a **manual** run of the hook satisfies whenever it inherits an open pipe, so the read blocks and the steps below it never emit: run the hook by hand with stdin redirected from `/dev/null`. Top-level scoping is sufficient because both producer and consumer are top-level by construction — `SessionStart` does not fire for Task-spawned subagents, so the only sessions the hook fires in are leads and manual runs, and the identity match discriminates exactly those. When the signal marks the session `lead`, steps 4 and 8 are suppressed; everything else emits unchanged. Signal absent ⇒ byte-identical to the signal-free hook; the read is guarded like every step — the hook never fails a session. Accepted limits (not defects): the initial startup fire precedes `/lead` by construction, a bounded one-per-lead-session cost against the per-compact/resume recurrence that is the actual waste; the marker ages out with the day-horizon scratch sweep (step 6), degrading to absent-signal behavior; the marker's lifetime is the **lead session's, not the iteration's**, so a consumer boundary ritual that wipes gitignored scratch (a scope evidence-reset, say) must spare the marker file — a lead outliving an iteration boundary otherwise reverts silently to absent-signal behavior until it rewrites it; and the producer inherits the `--emit-session-id` arm's `CLAUDE_CODE_SESSION_ID` dependency — unset, the newest-transcript fallback in a lead with live subagents returns an `agent-` prefix the payload can never match, and the signal silently no-ops to absent-signal behavior (the failure costs a suppression, never a correctness property). Rejected alternatives, recorded so they are not re-derived: a launch-env var (a perpetual operator ritual whose forgotten export degrades silently with no signal it happened) and both-producers-with-precedence (two producers plus a precedence rule to spec and gate, for a gap one hook fire wide).
 
-**Ruled out — lifecycle stamp-id injection.** The hook payload carries the
-harness session id, and **in a top-level session** its 8-char prefix equals
-what lifecycle-kit's `--emit-session-id` arm computes, so the hook *could* inject the
-canonical stamp id with no shell-out. The parity is top-level-only and holds
-only while the harness sets `CLAUDE_CODE_SESSION_ID`: a subagent is handed its
-*parent's* id in that variable, while the arm deliberately derives the
-subagent's own transcript id instead (its `CLAUDE_CODE_CHILD_SESSION` branch),
-so the two quantities diverge there by design. The hook does not inject: lifecycle-kit owns its id derivation
-end-to-end (the stage-entry ritual derives it via `--emit-session-id`,
-whatever invokes that arm), and having the stage skills
-read a context-kit-injected value would wire an upstream kit's protocol to
-a downstream kit's hook for ergonomics only — the trust model gains
-nothing, since `check-stage-evidence` already enforces that the stamped id
-is current. A consumer may add a local informational echo; the template
-ships none.
+**Ruled out — lifecycle stamp-id injection.** The hook payload carries the harness session id, and **in a top-level session** its 8-char prefix equals what lifecycle-kit's `--emit-session-id` arm computes, so the hook *could* inject the canonical stamp id with no shell-out. The parity is top-level-only and holds only while the harness sets `CLAUDE_CODE_SESSION_ID`: a subagent is handed its *parent's* id in that variable, while the arm deliberately derives the subagent's own transcript id instead (its `CLAUDE_CODE_CHILD_SESSION` branch), so the two quantities diverge there by design. The hook does not inject: lifecycle-kit owns its id derivation end-to-end (the stage-entry ritual derives it via `--emit-session-id`, whatever invokes that arm), and having the stage skills read a context-kit-injected value would wire an upstream kit's protocol to a downstream kit's hook for ergonomics only — the trust model gains nothing, since `check-stage-evidence` already enforces that the stamped id is current. A consumer may add a local informational echo; the template ships none.
 
 ## bin/env-probe
 
-The env-probe member derives a local machine profile so a session adapts to the
-box it runs on — package manager, toolchain versions, absent tools — without
-those machine facts ever landing in the public tree. It writes a
-marker-bounded generated block (`<!-- context-kit:env:begin -->` /
-`:end`, via gate-sdk's shared marker-block writer) into the file named
-by `CONTEXT_KIT_ENV_PROFILE_FILE` (default `ENV.local.md`), replacing an
-existing block or appending a fresh one — but only when the probed content
-actually changed (Cadence, below), so the block's probe date marks the last
-real change, not the last run. The probed half is derivation-first — never
-hand-maintained.
+The env-probe member derives a local machine profile so a session adapts to the box it runs on — package manager, toolchain versions, absent tools — without those machine facts ever landing in the public tree. It writes a marker-bounded generated block (`<!-- context-kit:env:begin -->` / `:end`, via gate-sdk's shared marker-block writer) into the file named by `CONTEXT_KIT_ENV_PROFILE_FILE` (default `ENV.local.md`), replacing an existing block or appending a fresh one — but only when the probed content actually changed (Cadence, below), so the block's probe date marks the last real change, not the last run. The probed half is derivation-first — never hand-maintained.
 
-**How it is invoked, and its one knob.** It is a non-gate arm
-(gate-sdk/SPEC.md §The non-gate arm) rather than a script: `--emit-env-probe`,
-reached by every caller as `run-gates.sh --emit env-probe`, and the binary
-resolves its configuration in process. It is an *action that reports* —
-it rewrites the block and prints one line naming what it did — and both its
-failures exit 2. Its declared knob roster is **`CONTEXT_KIT_ENV_PROFILE_FILE`
-and nothing else**: that name is one of context-kit's static knobs, resolved from
-the kit's defaults table and the consumer's knob file (§Layout and configuration),
-so the value is computed in one place and no second default exists to drift. A hardcoded profile path would resolve
-`ENV.local.md` and silently ignore every consumer override, which is the failure
-gate-sdk/SPEC.md §The non-gate arm names as the difference between working and
-appearing to.
+**How it is invoked, and its one knob.** It is a non-gate arm (gate-sdk/SPEC.md §The non-gate arm) rather than a script: `--emit-env-probe`, reached by every caller as `run-gates.sh --emit env-probe`, and the binary resolves its configuration in process. It is an *action that reports* — it rewrites the block and prints one line naming what it did — and both its failures exit 2. Its declared knob roster is **`CONTEXT_KIT_ENV_PROFILE_FILE` and nothing else**: that name is one of context-kit's static knobs, resolved from the kit's defaults table and the consumer's knob file (§Layout and configuration), so the value is computed in one place and no second default exists to drift. A hardcoded profile path would resolve `ENV.local.md` and silently ignore every consumer override, which is the failure gate-sdk/SPEC.md §The non-gate arm names as the difference between working and appearing to.
 
-**The marker test is whole-line, on both halves.** The presence test guarding
-the change-detection read and the writer's own test agree, so a marker occurring
-inside prose opens no block: gate-sdk/SPEC.md §lib/inject.sh rules that
-resolution, and this member carries it rather than the shell form's substring
-guard over a whole-line extraction — which reported a replacement it had not
-made.
+**The marker test is whole-line, on both halves.** The presence test guarding the change-detection read and the writer's own test agree, so a marker occurring inside prose opens no block: gate-sdk/SPEC.md §lib/inject.sh rules that resolution, and this member carries it rather than the shell form's substring guard over a whole-line extraction — which reported a replacement it had not made.
 
-**What it probes.** OS/distro (`uname`, `/etc/os-release`); the package manager
-(first present of an ordered detection walk over the known managers); each
-roster member's version and its floor verdict (below); the absent-tools list
-(roster members `PATH` does not resolve); and the below-contract list. The
-roster itself is owned by `native/src/toolfloor.rs` and never restated here. Its
-spawned programs are `uname`, off unix `date`, and every roster member it probes.
-The roster is the kit's own and a consumer cannot shadow it, which is what keeps
-this set bounded by the paragraph below rather than by a consumer's file.
+**What it probes.** OS/distro (`uname`, `/etc/os-release`); the package manager (first present of an ordered detection walk over the known managers); each roster member's version and its floor verdict (below); the absent-tools list (roster members `PATH` does not resolve); and the below-contract list. The roster itself is owned by `native/src/toolfloor.rs` and never restated here. Its spawned programs are `uname`, off unix `date`, and every roster member it probes. The roster is the kit's own and a consumer cannot shadow it, which is what keeps this set bounded by the paragraph below rather than by a consumer's file.
 
-**The roster is what doctor verifies, not the set the binary spawns;
-gate-sdk/SPEC.md §The program roster is that set, and a unit test holds the
-two in relation.** A spawned program with any audience but `contributor` is on
-this roster, on `GATE_SDK_PROGRAM_FLOOR`'s default, or is the payload itself.
-The binary spawns `date` and `ps` off unix only, where they resolve from Git for
-Windows' `usr/bin`, the userland the `bash` member already requires there, so
-they share `bash`'s package rather than joining the roster; `mktemp` and `cp`
-are spawned by source-clone arms alone. The floor keeps all four for the shipped
-shell's sake (gate-sdk/SPEC.md §lib/gate.sh). A contributor-side program —
-`uname` (this arm), `tar` and `npm` (the installer packer), `rustc`, `mktemp`
-and `cp` — carries the `contributor` audience on the program roster and need not
-be on either. Every element of this roster is a program-roster member, so the walk
-never probes a program the binary cannot name.
+**The roster is what doctor verifies, not the set the binary spawns; gate-sdk/SPEC.md §The program roster is that set, and a unit test holds the two in relation.** A spawned program with any audience but `contributor` is on this roster, on `GATE_SDK_PROGRAM_FLOOR`'s default, or is the payload itself. The binary spawns `date` and `ps` off unix only, where they resolve from Git for Windows' `usr/bin`, the userland the `bash` member already requires there, so they share `bash`'s package rather than joining the roster; `mktemp` and `cp` are spawned by source-clone arms alone. The floor keeps all four for the shipped shell's sake (gate-sdk/SPEC.md §lib/gate.sh). A contributor-side program — `uname` (this arm), `tar` and `npm` (the installer packer), `rustc`, `mktemp` and `cp` — carries the `contributor` audience on the program roster and need not be on either. Every element of this roster is a program-roster member, so the walk never probes a program the binary cannot name.
 
-**The roster and its floor axis (`native/src/toolfloor.rs`).** The roster lives
-beside the predicate that reads it, in the module the whole crate resolves it
-through, so the probe arm, `check-install-toolchain` and the installer's `doctor`
-read one array rather than three copies of it. That module still carries the
-*parser* for an array read out of a file, because a gate fixture needs a roster it
-can author and a fixture path is untrusted input — a reader takes the array as
-text and never sources it. It
-defines `PROBE_SET` and the predicate below and nothing else. It
-carries no knob, deliberately: the roster is the kit's own dependency set, and a
-consumer who could override it could only make the contract lie.
+**The roster and its floor axis (`native/src/toolfloor.rs`).** The roster lives beside the predicate that reads it, in the module the whole crate resolves it through, so the probe arm, `check-install-toolchain` and the installer's `doctor` read one array rather than three copies of it. That module still carries the *parser* for an array read out of a file, because a gate fixture needs a roster it can author and a fixture path is untrusted input — a reader takes the array as text and never sources it. It defines `PROBE_SET` and the predicate below and nothing else. It carries no knob, deliberately: the roster is the kit's own dependency set, and a consumer who could override it could only make the contract lie.
 
-A roster element reads `<name>[:<min-version>[:<impl-token>[:<audience>]]]`. A
-bare name keeps
-the original meaning — must be present, no version constraint — so the floor axis
-is **per-member** rather than a number demanded of every member. The fields are
-positional, so a member constrained by implementation alone carries an empty
-min-version field (`<name>::<impl-token>`), and an empty field means what an omitted trailing
-field means: `jq`, `jq:`, `jq::` and `jq:::` are one unconstrained member. No live
-member carries an implementation token; the axis stays in the grammar for a member
-a construct forces onto one implementation. **A member
-gains a floor only where a construct the battery actually runs forces one**, and
-the forcing construct is recorded with it — a floor nobody's code forces is not
-pinned, which is what stops a version number from rotting into an aspiration
-(de-literalization applied to a version: the value is owned where the constraint
-is provable).
+A roster element reads `<name>[:<min-version>[:<impl-token>[:<audience>]]]`. A bare name keeps the original meaning — must be present, no version constraint — so the floor axis is **per-member** rather than a number demanded of every member. The fields are positional, so a member constrained by implementation alone carries an empty min-version field (`<name>::<impl-token>`), and an empty field means what an omitted trailing field means: `jq`, `jq:`, `jq::` and `jq:::` are one unconstrained member. No live member carries an implementation token; the axis stays in the grammar for a member a construct forces onto one implementation. **A member gains a floor only where a construct the battery actually runs forces one**, and the forcing construct is recorded with it — a floor nobody's code forces is not pinned, which is what stops a version number from rotting into an aspiration (de-literalization applied to a version: the value is owned where the constraint is provable).
 
-**The audience axis.** The fourth field names *whose* floor a member is, because
-the roster has two kinds of reader and one flat array gated both of them on all
-of it. Its value set is closed and kit-owned exactly as the floor predicate's
-verdict set is, and a unit test in `toolfloor.rs` holds it closed:
+**The audience axis.** The fourth field names *whose* floor a member is, because the roster has two kinds of reader and one flat array gated both of them on all of it. Its value set is closed and kit-owned exactly as the floor predicate's verdict set is, and a unit test in `toolfloor.rs` holds it closed:
 
-- **empty** — every adopter. The unmarked case is not spelled — declaring the
-  complement on every other member would be a roster maintained against itself —
-  so the emptiness rule above carries it.
+- **empty** — every adopter. The unmarked case is not spelled — declaring the complement on every other member would be a roster maintained against itself — so the emptiness rule above carries it.
 - **`contributor`** — a contributor-side floor with no install-time role.
-- **a kit name, or several joined by `+`** — owed where any named kit is
-  selected; each value is a kit's directory name, and the test holds each one
-  to a kit root the authoring tree carries, since a misspelled name is a
-  condition nothing satisfies and would silently drop the member from that
-  kit's floor. The joiner is `+` because the element must stay one shell word
-  and the install page's parenthetical already splits on `,`.
-- **`registered`** — owed where a registered gate's requirement element (the
-  data `--needs` prints, gate-sdk/SPEC.md §check-reads-couples) names the
-  member; derived from the registry, never listed. A registered name with no
-  crate `REGISTRY` row is a consumer-declared shell gate and contributes
-  nothing, a consumer command being the consumer's requirement
-  (gate-sdk/SPEC.md §The program roster).
-- **`derived`** — the kit list is not spelled at all: the reader evaluates the
-  member's own predicate over the kit roots — and, where the predicate has an arm
-  keyed on document content, over the reader's anchor — and takes the kit-list arm
-  above on what it returns. It exists for the same reason `registered` does — a set that
-  can be measured is a set nothing should maintain (Derivation-first) — and it
-  is a *sentinel*, never a kit name, exactly as the two values above are. A
-  written-back value computed once and gated for freshness was the alternative
-  and is a copy; the audience is read by a process that already has the kit
-  roots in hand, so there is nothing to cache. Its resolution is the reader's,
-  not the roster's: the predicate opens files, and only the caller knows which
-  tree holds the kits a given report is about — the payload before an install,
-  the vendored tree after one. **A `derived` audience that resolves to nothing
-  is undecided, never not-owed.** An empty answer means the derivation reached
-  no kit root to read, and rendering that as *you do not owe this member* is
-  precisely the fail-open a derivation is here to close; every reader therefore
-  publishes the resolved kit names rather than the sentinel, and reports an
-  unresolvable one as unprobed.
+- **a kit name, or several joined by `+`** — owed where any named kit is selected; each value is a kit's directory name, and the test holds each one to a kit root the authoring tree carries, since a misspelled name is a condition nothing satisfies and would silently drop the member from that kit's floor. The joiner is `+` because the element must stay one shell word and the install page's parenthetical already splits on `,`.
+- **`registered`** — owed where a registered gate's requirement element (the data `--needs` prints, gate-sdk/SPEC.md §check-reads-couples) names the member; derived from the registry, never listed. A registered name with no crate `REGISTRY` row is a consumer-declared shell gate and contributes nothing, a consumer command being the consumer's requirement (gate-sdk/SPEC.md §The program roster).
+- **`derived`** — the kit list is not spelled at all: the reader evaluates the member's own predicate over the kit roots — and, where the predicate has an arm keyed on document content, over the reader's anchor — and takes the kit-list arm above on what it returns. It exists for the same reason `registered` does — a set that can be measured is a set nothing should maintain (Derivation-first) — and it is a *sentinel*, never a kit name, exactly as the two values above are. A written-back value computed once and gated for freshness was the alternative and is a copy; the audience is read by a process that already has the kit roots in hand, so there is nothing to cache. Its resolution is the reader's, not the roster's: the predicate opens files, and only the caller knows which tree holds the kits a given report is about — the payload before an install, the vendored tree after one. **A `derived` audience that resolves to nothing is undecided, never not-owed.** An empty answer means the derivation reached no kit root to read, and rendering that as *you do not owe this member* is precisely the fail-open a derivation is here to close; every reader therefore publishes the resolved kit names rather than the sentinel, and reports an unresolvable one as unprobed.
 
-**The owed-predicate.** `toolfloor` answers *is this member owed under this
-selection*, where a **selection** is a kit set and a registered gate set, from a
-closed three-value set: **owed** (an empty audience, a kit list — the union of
-its names — sharing a name with the kit set, or `registered` where some gate-set
-member's `REGISTRY` row names the member), **not owed** (`contributor`, a kit
-list sharing no name with the kit set, or
-`registered` with no such row), and **undecided** (a conditional value with no
-selection to read, or a `derived` value the selection carries no resolution
-for). A `derived` value resolves to its kit list first and then takes the
-kit-list arm unchanged, so the predicate gained a spelling and no fourth
-answer. It exists so no consumer-side reader re-implements that rule
-against a value set it does not own. A consumer-side reader — the installer's
-`doctor`, whose exit status is `init`'s last precondition — probes and fails
-only on an owed member, skips a not-owed one outright, and renders an undecided
-one unprobed (installer/SPEC.md §doctor). A contributor-side
-reader — the env-probe arm — walks the roster whole and marks the audience
-instead, since a contributor-side floor is exactly what it is reporting on.
-The field is a grammar axis rather than a filter in the reader that needs it,
-because a hard-coded exception is a literal de-literalization forbids and one
-that re-fires the day a second contributor-only member lands.
+**The owed-predicate.** `toolfloor` answers *is this member owed under this selection*, where a **selection** is a kit set and a registered gate set, from a closed three-value set: **owed** (an empty audience, a kit list — the union of its names — sharing a name with the kit set, or `registered` where some gate-set member's `REGISTRY` row names the member), **not owed** (`contributor`, a kit list sharing no name with the kit set, or `registered` with no such row), and **undecided** (a conditional value with no selection to read, or a `derived` value the selection carries no resolution for). A `derived` value resolves to its kit list first and then takes the kit-list arm unchanged, so the predicate gained a spelling and no fourth answer. It exists so no consumer-side reader re-implements that rule against a value set it does not own. A consumer-side reader — the installer's `doctor`, whose exit status is `init`'s last precondition — probes and fails only on an owed member, skips a not-owed one outright, and renders an undecided one unprobed (installer/SPEC.md §doctor). A contributor-side reader — the env-probe arm — walks the roster whole and marks the audience instead, since a contributor-side floor is exactly what it is reporting on. The field is a grammar axis rather than a filter in the reader that needs it, because a hard-coded exception is a literal de-literalization forbids and one that re-fires the day a second contributor-only member lands.
 
 The constrained members and what forces each:
 
-- `bash:4.3::derived` — the
-  floor is set by the **highest** construct the shipped shell runs, not the most
-  numerous. Three bash-4.0 constructs are present — `declare -A`
-  (gate-sdk, guard-kit, evidence-kit, the installer's consumer smoke), `mapfile`
-  (across the kits), case-modification expansion (gate-sdk's gate library and the
-  installer's consumer smoke) — but the **nameref** (`local -n`, bash 4.3)
-  outranks them: `_gate_prebinary_file_value` in `gate-sdk/lib/gate.sh`, which the
-  front-end, guard-kit's library and context-kit's session template source. The
-  leaf gate that carried the second instance, `check-comment-tier`, has since
-  ported to the binary substrate and its script is gone — which changes nothing
-  about the floor, because the nameref in the shared gate library makes 4.3 the
-  floor of every shell surface that sources it. Recorded here because the
-  earlier `4.0` was a fail-open: `env-probe` reported `ok` on a 4.2 box the
-  battery would fail with an obscure syntax error.
-  **The audience is derived, not listed, and this is the predicate a kit is
-  measured against:** a kit root is in the bash audience when it **ships a file
-  the adopter's host runs with bash** — a file under that root, outside
-  `gate-tests/` and `smoke/`, that either carries a **bash shebang** or is a
-  shipped **settings template whose hook command is spawned with a `bash`
-  word**. The second arm keys on the template and not on the script it names,
-  because the kit shipping the wiring is what makes the adopter's harness run
-  bash whichever root the target lies under. Both arms read a *spawn*: an
-  interpreter is matched as a path component, so `#!/usr/bin/env pwsh` does not
-  qualify on the `sh` inside `pwsh`, and `#!/bin/sh` does not qualify at all.
-  Prose telling a reader to **type** a bash command is deliberately **not** the
-  predicate. That exclusion is what makes the derivation decidable rather than
-  contested: while both readings were live they disagreed about which kit roots
-  qualify, and since the door sweep (guard-kit/SPEC.md §check-door-binding) no
-  kit ships such prose, so admitting it would re-open that disagreement. The
-  exclusion of `gate-tests/` and `smoke/` is the contributor boundary the
-  `contributor` audience above already draws, reused rather than restated.
+- `bash:4.3::derived` — the floor is set by the **highest** construct the shipped shell runs, not the most numerous. Three bash-4.0 constructs are present — `declare -A` (gate-sdk, guard-kit, evidence-kit, the installer's consumer smoke), `mapfile` (across the kits), case-modification expansion (gate-sdk's gate library and the installer's consumer smoke) — but the **nameref** (`local -n`, bash 4.3) outranks them: `_gate_prebinary_file_value` in `gate-sdk/lib/gate.sh`, which the front-end, guard-kit's library and context-kit's session template source. The leaf gate that carried the second instance, `check-comment-tier`, has since ported to the binary substrate and its script is gone — which changes nothing about the floor, because the nameref in the shared gate library makes 4.3 the floor of every shell surface that sources it. Recorded here because the earlier `4.0` was a fail-open: `env-probe` reported `ok` on a 4.2 box the battery would fail with an obscure syntax error. **The audience is derived, not listed, and this is the predicate a kit is measured against:** a kit root is in the bash audience when it **ships a file the adopter's host runs with bash** — a file under that root, outside `gate-tests/` and `smoke/`, that either carries a **bash shebang** or is a shipped **settings template whose hook command is spawned with a `bash` word**. The second arm keys on the template and not on the script it names, because the kit shipping the wiring is what makes the adopter's harness run bash whichever root the target lies under. Both arms read a *spawn*: an interpreter is matched as a path component, so `#!/usr/bin/env pwsh` does not qualify on the `sh` inside `pwsh`, and `#!/bin/sh` does not qualify at all. Prose telling a reader to **type** a bash command is deliberately **not** the predicate. That exclusion is what makes the derivation decidable rather than contested: while both readings were live they disagreed about which kit roots qualify, and since the door sweep (guard-kit/SPEC.md §check-door-binding) no kit ships such prose, so admitting it would re-open that disagreement. The exclusion of `gate-tests/` and `smoke/` is the contributor boundary the `contributor` audience above already draws, reused rather than restated.
 
-  **The third arm is read over the anchor, not per kit root:** the kit that owns
-  the fence-executing gate (canon-kit/SPEC.md §check-fence-run) joins the audience
-  when the anchor's fence-run corpus carries a marked fence. A kit list, or
-  `registered`, would owe `bash` to every selection carrying that kit, the `prose`
-  profile included, marked fence or not; and the corpus the gate executes lies in
-  no kit root (that section's corpus). The owning kit is read off
-  the registry's owner column, never written as a literal, and joins only when it
-  is among the reader's kit roots; the corpus and the marker test are the gate's own
-  functions, so the arm and the gate cannot disagree about whether a spawn can
-  happen. A marked fence is not the *typed* prose excluded above: the gate executes
-  it, so it is a spawn, the thing the other two arms read. A **bash surface** is
-  whatever any of the three arms reads. **Honest limit:** a verdict holds for the
-  moment it is read. `init` resolves over the payload, which holds no adopter
-  content, so a marker the adopter writes later is owed from the next `doctor` or
-  env-probe read; until then the gate's fail-closed exit 2 on a missing `bash` keeps
-  the gap loud.
+  **The third arm is read over the anchor, not per kit root:** the kit that owns the fence-executing gate (canon-kit/SPEC.md §check-fence-run) joins the audience when the anchor's fence-run corpus carries a marked fence. A kit list, or `registered`, would owe `bash` to every selection carrying that kit, the `prose` profile included, marked fence or not; and the corpus the gate executes lies in no kit root (that section's corpus). The owning kit is read off the registry's owner column, never written as a literal, and joins only when it is among the reader's kit roots; the corpus and the marker test are the gate's own functions, so the arm and the gate cannot disagree about whether a spawn can happen. A marked fence is not the *typed* prose excluded above: the gate executes it, so it is a spawn, the thing the other two arms read. A **bash surface** is whatever any of the three arms reads. **Honest limit:** a verdict holds for the moment it is read. `init` resolves over the payload, which holds no adopter content, so a marker the adopter writes later is owed from the next `doctor` or env-probe read; until then the gate's fail-closed exit 2 on a missing `bash` keeps the gap loud.
 
-  **The floor-holding root is narrowed past**, named by the root the SDK
-  occupies rather than by a literal: `installer/profiles.list` puts it in every
-  profile by construction, so admitting it would make the member unconditional —
-  the floor the adopter constraints refuse (gate-sdk/SPEC.md §The adopter
-  constraints, *the floor is git*). Its own bash surfaces are the front-end stub
-  no starter path needs, the contributor-side build script and the adopter's
-  opt-in shell-gate skeleton, which the `contributor` audience and the door
-  surfaces already account for.
+  **The floor-holding root is narrowed past**, named by the root the SDK occupies rather than by a literal: `installer/profiles.list` puts it in every profile by construction, so admitting it would make the member unconditional — the floor the adopter constraints refuse (gate-sdk/SPEC.md §The adopter constraints, *the floor is git*). Its own bash surfaces are the front-end stub no starter path needs, the contributor-side build script and the adopter's opt-in shell-gate skeleton, which the `contributor` audience and the door surfaces already account for.
 
-  What the derivation replaces is a hand-held list whose honest limit had
-  already been realized: nothing re-derived it, so it had drifted in **both**
-  directions at once — over-declaring kits that ship no such file and
-  under-declaring kits that do. Neither direction can recur: the
-  derivation walks the kit roots, and a kit that later ships a bash surface
-  joins the audience with no edit anywhere. The generated git hooks stay POSIX
-  sh (gate-sdk/SPEC.md §gen-pre-commit) and `init` spawns the binary it placed
-  rather than the front-end (installer/SPEC.md §init), so neither puts a
-  selection on the bash floor. The derivation opens files, so it walks the
-  repository-path spelling of the kit roots and not the gate-sdk-parent one
-  (gate-sdk/SPEC.md §lib/gate.sh).
-- `cargo:1.71::contributor` — a **contributor-side** floor, never a runtime one,
-  and that reading is now declared on the element and read by name rather than
-  left as an aside: the audience field is what the consumer-side predicate
-  above resolves, so the sentence is enforced instead of merely written. It
-  carries
-  two tiers because two kinds of tree read it. Where a `.gate` descriptor is live
-  it is a **commit-time** floor — `gate_command` puts the binary on the pre-commit
-  path and is fail-closed on an absent one, so the battery will not run without a
-  built crate (gate-sdk/SPEC.md §What the dispatch seam does not settle); that is
-  this repo today, its first cohort having landed. Everywhere else it stays the weaker
-  **contributor/build** floor: a consumer tree receives a prebuilt binary and never
-  a crate, so nothing there compiles at commit time. Both tiers rest on the same
-  forcing fact — the **highest MSRV in the crate's resolved dependency graph**,
-  which since the settings cohort took the crate's first dependency
-  (gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency) is
-  above the `edition = "2021"` floor of 1.56 that governed while the graph was
-  empty. It is re-derived against the lock at any dependency change rather than
-  recalled, and a move carries every surface stating it — including **the
-  rendered verdict below (§bin/env-probe) and any consumer page quoting this
-  element as a *format example***, none of them machine-checked. They are called
-  out because a format example is the shape a floor move keeps
-  missing: it reads as illustration, so it survives the grep a reader runs for
-  the surface. It is also a `check-crate-arms` input: clippy
-  suppresses a lint whose suggested API postdates the declared floor, so raising
-  the floor un-suppresses lints against code no change touched.
-  `cargo` is the member rather than `rustc` because `cargo build` is what the
-  contributor routine and the `gates` workflow actually invoke, and the two ship as
-  one toolchain sharing a version banner — the representative-member rule: one
-  member stands for a whole package family, and it is the program the forcing
-  construct actually invokes. The floor tracks what the crate and its
-  graph actually require, not whatever rustc a given box happens to carry; pinning
-  the latter would be exactly the aspiration this section's rule forbids. Runtime is
-  unaffected: git remains the sole runtime dependency of a ported gate, shelled out
-  rather than embedded.
-Every other member is a bare name — no construct in the battery forces a version
-on it (the `jq` usage is 1.5-era throughout), so none is pinned. No construct the
-shipped code runs forces GNU coreutils, so no member stands for that family: the
-floor predicate compares versions in-process, the binary reads civil dates
-in-process on unix (drift-kit/SPEC.md §Bundled KPIs) and computes relative paths
-lexically, and `stat -c` has no live site. `awk` and `sort` are off the roster:
-no shipped program runs awk, and the POSIX `sort -u` the shipped shell keeps rests
-on `GATE_SDK_PROGRAM_FLOOR`'s assumption (gate-sdk/SPEC.md §lib/gate.sh).
+  What the derivation replaces is a hand-held list whose honest limit had already been realized: nothing re-derived it, so it had drifted in **both** directions at once — over-declaring kits that ship no such file and under-declaring kits that do. Neither direction can recur: the derivation walks the kit roots, and a kit that later ships a bash surface joins the audience with no edit anywhere. The generated git hooks stay POSIX sh (gate-sdk/SPEC.md §gen-pre-commit) and `init` spawns the binary it placed rather than the front-end (installer/SPEC.md §init), so neither puts a selection on the bash floor. The derivation opens files, so it walks the repository-path spelling of the kit roots and not the gate-sdk-parent one (gate-sdk/SPEC.md §lib/gate.sh).
+- `cargo:1.71::contributor` — a **contributor-side** floor, never a runtime one, and that reading is now declared on the element and read by name rather than left as an aside: the audience field is what the consumer-side predicate above resolves, so the sentence is enforced instead of merely written. It carries two tiers because two kinds of tree read it. Where a `.gate` descriptor is live it is a **commit-time** floor — `gate_command` puts the binary on the pre-commit path and is fail-closed on an absent one, so the battery will not run without a built crate (gate-sdk/SPEC.md §What the dispatch seam does not settle); that is this repo today, its first cohort having landed. Everywhere else it stays the weaker **contributor/build** floor: a consumer tree receives a prebuilt binary and never a crate, so nothing there compiles at commit time. Both tiers rest on the same forcing fact — the **highest MSRV in the crate's resolved dependency graph**, which since the settings cohort took the crate's first dependency (gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency) is above the `edition = "2021"` floor of 1.56 that governed while the graph was empty. It is re-derived against the lock at any dependency change rather than recalled, and a move carries every surface stating it — including **the rendered verdict below (§bin/env-probe) and any consumer page quoting this element as a *format example***, none of them machine-checked. They are called out because a format example is the shape a floor move keeps missing: it reads as illustration, so it survives the grep a reader runs for the surface. It is also a `check-crate-arms` input: clippy suppresses a lint whose suggested API postdates the declared floor, so raising the floor un-suppresses lints against code no change touched. `cargo` is the member rather than `rustc` because `cargo build` is what the contributor routine and the `gates` workflow actually invoke, and the two ship as one toolchain sharing a version banner — the representative-member rule: one member stands for a whole package family, and it is the program the forcing construct actually invokes. The floor tracks what the crate and its graph actually require, not whatever rustc a given box happens to carry; pinning the latter would be exactly the aspiration this section's rule forbids. Runtime is unaffected: git remains the sole runtime dependency of a ported gate, shelled out rather than embedded. Every other member is a bare name — no construct in the battery forces a version on it (the `jq` usage is 1.5-era throughout), so none is pinned. No construct the shipped code runs forces GNU coreutils, so no member stands for that family: the floor predicate compares versions in-process, the binary reads civil dates in-process on unix (drift-kit/SPEC.md §Bundled KPIs) and computes relative paths lexically, and `stat -c` has no live site. `awk` and `sort` are off the roster: no shipped program runs awk, and the POSIX `sort -u` the shipped shell keeps rests on `GATE_SDK_PROGRAM_FLOOR`'s assumption (gate-sdk/SPEC.md §lib/gate.sh).
 
-An implementation token is matched as a **substring of the tool's own version
-banner** — a GNU coreutils tool prints `(GNU coreutils)` in its own — so the
-constraint is checked against the binary actually on `PATH` rather than against a
-package name nothing can probe. Its honest limit is the same one: the roster
-asserts what `PATH` resolves at probe time, so an installed-but-not-`PATH`-ordered
-GNU userland probes as below contract, correctly, since that is what the gates
-will invoke.
+An implementation token is matched as a **substring of the tool's own version banner** — a GNU coreutils tool prints `(GNU coreutils)` in its own — so the constraint is checked against the binary actually on `PATH` rather than against a package name nothing can probe. Its honest limit is the same one: the roster asserts what `PATH` resolves at probe time, so an installed-but-not-`PATH`-ordered GNU userland probes as below contract, correctly, since that is what the gates will invoke.
 
-**The floor predicate.** `tool_floor_check <element> <banner>` returns one verdict
-from a closed set — `ok`, `absent` (an empty banner), `below <found> <floor>`,
-`wrong-impl <found>`, `uncomparable`. The comparison is in-process and spawns
-nothing: field-wise numeric over the dotted digit runs, the shorter token padded
-with zero fields so `4.3` meets `4.3.0`, and `4.10` above `4.9`.
-`<found>` is the banner's first dotted-version token for `below` and its
-first word — the implementation's own name — for `wrong-impl`. `uncomparable` is
-the fail-closed arm, with one cause: a banner or token the predicate cannot
-compare — no dotted-version token, a field that is not an ASCII digit run, or one
-that overflows a 64-bit integer — is reported unverified and never silently as
-`ok` — the posture
-gate-sdk/SPEC.md §The gate model requires of a gate, applied to a probe that is
-not one.
+**The floor predicate.** `tool_floor_check <element> <banner>` returns one verdict from a closed set — `ok`, `absent` (an empty banner), `below <found> <floor>`, `wrong-impl <found>`, `uncomparable`. The comparison is in-process and spawns nothing: field-wise numeric over the dotted digit runs, the shorter token padded with zero fields so `4.3` meets `4.3.0`, and `4.10` above `4.9`. `<found>` is the banner's first dotted-version token for `below` and its first word — the implementation's own name — for `wrong-impl`. `uncomparable` is the fail-closed arm, with one cause: a banner or token the predicate cannot compare — no dotted-version token, a field that is not an ASCII digit run, or one that overflows a 64-bit integer — is reported unverified and never silently as `ok` — the posture gate-sdk/SPEC.md §The gate model requires of a gate, applied to a probe that is not one.
 
-**The predicate has one holder, and the road there was the deletion road.** It
-had two while the installer's `doctor` was bash and sourced the shell library off
-its own payload copy; the behind-invoke relocation put `doctor` in the crate
-(installer/SPEC.md §The install boundary), which emptied that caller set and
-made the road gate-sdk/SPEC.md §The port-candidate criteria prefers available
-after all. The shell library, its golden and the cross-substrate parity harness
-that stood in for the deletion all retired together, on §The non-gate arm's own
-rule that a parity arm's caller is its second holder: one holder cannot be held
-equal to itself, and a harness that can only skip is the unreachable code that
-rule exists to refuse.
+**The predicate has one holder, and the road there was the deletion road.** It had two while the installer's `doctor` was bash and sourced the shell library off its own payload copy; the behind-invoke relocation put `doctor` in the crate (installer/SPEC.md §The install boundary), which emptied that caller set and made the road gate-sdk/SPEC.md §The port-candidate criteria prefers available after all. The shell library, its golden and the cross-substrate parity harness that stood in for the deletion all retired together, on §The non-gate arm's own rule that a parity arm's caller is its second holder: one holder cannot be held equal to itself, and a harness that can only skip is the unreachable code that rule exists to refuse.
 
-**Every floor probe resolves its member to a path before spawning it, and only
-where the platform has a system-directory homonym.** Windows searches that
-directory *before* `PATH`, so a bare program name reaches whatever the platform
-ships under it rather than the implementation `PATH` offers. The presence probe
-walks `PATH` and the spawn does not, so for a member the system directory ships a
-different program under, the two would disagree about a single tool and the
-verdict would describe the homonym. Both probes therefore resolve the member
-outside the system directory first, and the rejection covers every view the
-platform shows that directory through (gate-sdk/SPEC.md §check-graph). **A host
-offering the member nowhere else falls back to the bare name rather than
-refusing**, because the floor roster's own `absent` or `wrong-impl` is then the
-true reading. That fall-back is the floor probe's resolver's own and never reads
-gate-sdk's homonym roster, whose rows all refuse: a **reporting** resolver needs a
-reading of the host, not a refusal it cannot render. It keeps its own callers for
-the same reason — its value is rendered in the banner below and in doctor's, not
-only spawned. Elsewhere the name passes through unaltered: a POSIX spawn already
-searches `PATH` and nothing else, and resolving there would swap the spawned
-literal for an absolute path on every host the battery runs on, which is what a
-registry declaration is compared against.
+**Every floor probe resolves its member to a path before spawning it, and only where the platform has a system-directory homonym.** Windows searches that directory *before* `PATH`, so a bare program name reaches whatever the platform ships under it rather than the implementation `PATH` offers. The presence probe walks `PATH` and the spawn does not, so for a member the system directory ships a different program under, the two would disagree about a single tool and the verdict would describe the homonym. Both probes therefore resolve the member outside the system directory first, and the rejection covers every view the platform shows that directory through (gate-sdk/SPEC.md §check-graph). **A host offering the member nowhere else falls back to the bare name rather than refusing**, because the floor roster's own `absent` or `wrong-impl` is then the true reading. That fall-back is the floor probe's resolver's own and never reads gate-sdk's homonym roster, whose rows all refuse: a **reporting** resolver needs a reading of the host, not a refusal it cannot render. It keeps its own callers for the same reason — its value is rendered in the banner below and in doctor's, not only spawned. Elsewhere the name passes through unaltered: a POSIX spawn already searches `PATH` and nothing else, and resolving there would swap the spawned literal for an absolute path on every host the battery runs on, which is what a registry declaration is compared against.
 
-**The rendered verdict.** Each toolchain bullet carries the probed banner and,
-for a constrained member, the constraint and its verdict — `` (floor 4.3, ok) ``,
-`` (requires GNU — below contract) ``, `` (floor 4.3 — unverified) ``; an
-unconstrained member carries no parenthetical. A member carrying an audience
-carries it here too, as `<audience>-only` — `` (floor 1.71, contributor-only, ok) ``,
-`` (guard-kit-only, ok) ``, `` (registered-only, ok) `` — and every line
-that names such a member is marked the same way — the absent list and the
-below-contract list included, because those are the two lines on which *below a
-floor that is yours* and *below a floor you are not on the hook for* would
-otherwise read alike. A `**Below contract:**` line joins
-the existing `**Absent:**` line, reading `none` when clean and otherwise naming
-each failing member through the verdict's own fields: `below` and `wrong-impl`
-are distinguished because the remedies differ — upgrade versus install a
-different implementation — and `uncomparable` is listed as explicitly unverified
-rather than folded into the clean state. Both version probes read from
-`/dev/null`: `-V` prints a version banner for most tools but is an ordinary flag
-for some — GNU sort's version-*sort* — so a tool that rejects `--version` would
-otherwise fall through to a `-V` that reads inherited stdin and hangs the probe.
+**The rendered verdict.** Each toolchain bullet carries the probed banner and, for a constrained member, the constraint and its verdict — `` (floor 4.3, ok) ``, `` (requires GNU — below contract) ``, `` (floor 4.3 — unverified) ``; an unconstrained member carries no parenthetical. A member carrying an audience carries it here too, as `<audience>-only` — `` (floor 1.71, contributor-only, ok) ``, `` (guard-kit-only, ok) ``, `` (registered-only, ok) `` — and every line that names such a member is marked the same way — the absent list and the below-contract list included, because those are the two lines on which *below a floor that is yours* and *below a floor you are not on the hook for* would otherwise read alike. A `**Below contract:**` line joins the existing `**Absent:**` line, reading `none` when clean and otherwise naming each failing member through the verdict's own fields: `below` and `wrong-impl` are distinguished because the remedies differ — upgrade versus install a different implementation — and `uncomparable` is listed as explicitly unverified rather than folded into the clean state. Both version probes read from `/dev/null`: `-V` prints a version banner for most tools but is an ordinary flag for some — GNU sort's version-*sort* — so a tool that rejects `--version` would otherwise fall through to a `-V` that reads inherited stdin and hangs the probe.
 
-**The content seam (consumer-local, gitignored).** Hand-authored gotchas — the
-"no `dig`/`host`; use `getent`/DoH" class a probe cannot know — live *outside*
-the markers in the same file and survive every re-probe; when the file is
-absent the probe seeds that scaffold once, then only ever rewrites the block.
-The per-session re-probe (Cadence, below) does not trigger that seeding: it
-runs only against a file that already exists, so seeding stays a
-first-run/on-demand action.
-The file is `*.local.md`-class: local-only, gitignored (the consumer's
-`.gitignore` and its always-loaded housekeeping line carry it), so machine facts
-stay private.
+**The content seam (consumer-local, gitignored).** Hand-authored gotchas — the "no `dig`/`host`; use `getent`/DoH" class a probe cannot know — live *outside* the markers in the same file and survive every re-probe; when the file is absent the probe seeds that scaffold once, then only ever rewrites the block. The per-session re-probe (Cadence, below) does not trigger that seeding: it runs only against a file that already exists, so seeding stays a first-run/on-demand action. The file is `*.local.md`-class: local-only, gitignored (the consumer's `.gitignore` and its always-loaded housekeeping line carry it), so machine facts stay private.
 
-**Cadence — per-session auto-refresh.** The session-context hook re-probes
-once per session, at its step-9 profile emit (§The session-context hook), so a
-session always adapts to the box as it is now — the install step seeds the
-profile once, and every session thereafter refreshes it. Change-detection keeps
-this cheap and the date honest: the probe rewrites the block only when the
-probed content differs from what is on disk (the `Probed` date line excluded
-from the comparison), so an unchanged box writes nothing and the date marks the
-last real change, not the last run. Still no freshness gate — env truth is not
-cheaply machine-verifiable and the probe is already the derivation (the
-enforcement-first carve-out; the per-session re-probe is now the enforcement,
-replacing the install-step-only cadence). The hook re-probes only when the
-profile file already exists, so a never-seeded consumer pays no cost and seeds
-nothing unbidden.
+**Cadence — per-session auto-refresh.** The session-context hook re-probes once per session, at its step-9 profile emit (§The session-context hook), so a session always adapts to the box as it is now — the install step seeds the profile once, and every session thereafter refreshes it. Change-detection keeps this cheap and the date honest: the probe rewrites the block only when the probed content differs from what is on disk (the `Probed` date line excluded from the comparison), so an unchanged box writes nothing and the date marks the last real change, not the last run. Still no freshness gate — env truth is not cheaply machine-verifiable and the probe is already the derivation (the enforcement-first carve-out; the per-session re-probe is now the enforcement, replacing the install-step-only cadence). The hook re-probes only when the profile file already exists, so a never-seeded consumer pays no cost and seeds nothing unbidden.
 
 ## The always-loaded meter
 
-The meter measures the standing surface: the summed code-point count of the configured surface files — each non-blank line trimmed, plus one per break between two of them, the count queue-kit/SPEC.md §check-queue-entry-budget defines, so a reflow moves nothing — (default `CLAUDE.md`) plus the
-steady-state hook body, approximated by the configured hook-body command
-(default: queue-kit's `queue-index` arm through the battery runner's `--emit`
-front-end, `--collapse-deferred`, when resolvable). The approximation is deliberate: the meter must never run the
-session-context hook itself — the hook emits this meter's own output line,
-so self-measurement would recurse and inflate.
+The meter measures the standing surface: the summed code-point count of the configured surface files — each non-blank line trimmed, plus one per break between two of them, the count queue-kit/SPEC.md §check-queue-entry-budget defines, so a reflow moves nothing — (default `CLAUDE.md`) plus the steady-state hook body, approximated by the configured hook-body command (default: queue-kit's `queue-index` arm through the battery runner's `--emit` front-end, `--collapse-deferred`, when resolvable). The approximation is deliberate: the meter must never run the session-context hook itself — the hook emits this meter's own output line, so self-measurement would recurse and inflate.
 
-The meter lives here, not in drift-kit's collator, because the *metric* is
-context economics and the *report* is drift reporting — drift-kit's
-`kpi-always-loaded` consumes this measurement for its row instead of re-embedding
-it.
+The meter lives here, not in drift-kit's collator, because the *metric* is context economics and the *report* is drift reporting — drift-kit's `kpi-always-loaded` consumes this measurement for its row instead of re-embedding it.
 
-**It is the `--emit-always-loaded` arm-table member, and both halves of that are
-forced rather than chosen.** It is a **table member** because it resolves the consumer knobs
-`CONTEXT_KIT_SURFACES`, `CONTEXT_KIT_HOOK_CMD`, `CONTEXT_KIT_BASELINE_FILE`,
-`CONTEXT_KIT_GROWTH_PATHS`, `CONTEXT_KIT_CEILING_FILE`,
-`CONTEXT_KIT_RATCHET_PATHS` and `CONTEXT_KIT_STATE_FILE`, and a hardcoded
-top-level flag has no row to declare them on. `GATE_SDK_WORKFLOW_DIR` and
-`GATE_SDK_GATES_DIR` are deliberately **not** declared: the static rows whose
-defaults derive from them declare them as inputs (§Layout and configuration), and
-resolving those rows resolves them (gate-sdk/SPEC.md §The knob file), so declaring
-either would state one fact twice. It is an **`Arm::Emit`** because the
-whole failure grammar is already that variant's collapse — every mode returns 0 and
-the one non-zero path is exit 2 — so `{0, 2}` discards nothing the member carried;
-`--emit-usage-trend` is the sibling admitted on exactly that ground.
+**It is the `--emit-always-loaded` arm-table member, and both halves of that are forced rather than chosen.** It is a **table member** because it resolves the consumer knobs `CONTEXT_KIT_SURFACES`, `CONTEXT_KIT_HOOK_CMD`, `CONTEXT_KIT_BASELINE_FILE`, `CONTEXT_KIT_GROWTH_PATHS`, `CONTEXT_KIT_CEILING_FILE`, `CONTEXT_KIT_RATCHET_PATHS` and `CONTEXT_KIT_STATE_FILE`, and a hardcoded top-level flag has no row to declare them on. `GATE_SDK_WORKFLOW_DIR` and `GATE_SDK_GATES_DIR` are deliberately **not** declared: the static rows whose defaults derive from them declare them as inputs (§Layout and configuration), and resolving those rows resolves them (gate-sdk/SPEC.md §The knob file), so declaring either would state one fact twice. It is an **`Arm::Emit`** because the whole failure grammar is already that variant's collapse — every mode returns 0 and the one non-zero path is exit 2 — so `{0, 2}` discards nothing the member carried; `--emit-usage-trend` is the sibling admitted on exactly that ground.
 
-**The measurement is a library function the arm wraps, not the arm itself** —
-§bin/footprint's split, and this is its second instance in the kit. The function
-returns the figures (surface total, hook total, the combined total, the baseline
-row's total, surface count and commit where one resolves, and the iteration-start
-commit with the surfaces' size there where the caller hands one in); the arm renders the three modes over
-them, and `kpi-always-loaded` reads the same figures in process. That is what ended
-the undeclared cross-kit output contract the KPI used to keep, parsing the rendered
-line back apart for a leading total and a marked delta.
+**The measurement is a library function the arm wraps, not the arm itself** — §bin/footprint's split, and this is its second instance in the kit. The function returns the figures (surface total, hook total, the combined total, the baseline row's total, surface count and commit where one resolves, and the iteration-start commit with the surfaces' size there where the caller hands one in); the arm renders the three modes over them, and `kpi-always-loaded` reads the same figures in process. That is what ended the undeclared cross-kit output contract the KPI used to keep, parsing the rendered line back apart for a leading total and a marked delta.
 
-**The modes arrive as operands, never composed into the flag** —
-`--emit always-loaded`, then `--growth`, `--update-baseline` or `--ceiling` — the
-shape `--hook` and `--wait-probe` already carry for their own subcommand words.
-Composing a flag spelling per mode is
-refused for the reason that shape exists: each spelling would be another row
-publishing one knob roster, and the front-end's grammar would carry a second copy of
-a decision the arm table already holds.
+**The modes arrive as operands, never composed into the flag** — `--emit always-loaded`, then `--growth`, `--update-baseline` or `--ceiling` — the shape `--hook` and `--wait-probe` already carry for their own subcommand words. Composing a flag spelling per mode is refused for the reason that shape exists: each spelling would be another row publishing one knob roster, and the front-end's grammar would carry a second copy of a decision the arm table already holds.
 
-**An operand outside that closed set is a refusal**: usage on stderr, exit 2,
-`--help` included. The ground is the harm rather than an argument-shape rule —
-`--update-baseline` is a **close-stage act**, and a silent fall-through to the bare
-reading prints an ordinary-looking meter line at exit 0 while writing no baseline at
-all, after which the session commits a close whose baseline was never rewritten and
-the next iteration's brevity pass reacts to a delta measured from the wrong commit. A
-refusal is what makes that state unreachable, and there is no third disposition
-available to an operand dispatch.
+**An operand outside that closed set is a refusal**: usage on stderr, exit 2, `--help` included. The ground is the harm rather than an argument-shape rule — `--update-baseline` is a **close-stage act**, and a silent fall-through to the bare reading prints an ordinary-looking meter line at exit 0 while writing no baseline at all, after which the session commits a close whose baseline was never rewritten and the next iteration's brevity pass reacts to a delta measured from the wrong commit. A refusal is what makes that state unreachable, and there is no third disposition available to an operand dispatch.
 
-**The hook body stays spawned, as the knob's argv with no shell, and calling
-`queue-index` in-process is refused.** The knob is a **command seam**, not an
-implementation detail: its whole contract is that a consumer names *their* hook body,
-and the default merely happens to name this project's own arm. An in-process shortcut
-would measure the wrong thing for every consumer whose hook body is not queue-kit's,
-silently and at exit 0 — and the committed witness is exactly such a consumer, the
-index-test case driving this member with a `cat <file>` argv, which a port that
-special-cased the default would keep green while breaking the seam the golden exists
-to prove. A command that could not be spawned contributes `hook 0`, and a command's
-stdout is counted whatever its exit status.
+**The hook body stays spawned, as the knob's argv with no shell, and calling `queue-index` in-process is refused.** The knob is a **command seam**, not an implementation detail: its whole contract is that a consumer names *their* hook body, and the default merely happens to name this project's own arm. An in-process shortcut would measure the wrong thing for every consumer whose hook body is not queue-kit's, silently and at exit 0 — and the committed witness is exactly such a consumer, the index-test case driving this member with a `cat <file>` argv, which a port that special-cased the default would keep green while breaking the seam the golden exists to prove. A command that could not be spawned contributes `hook 0`, and a command's stdout is counted whatever its exit status.
 
-- **Default invocation** prints one line: total, per-part breakdown, the delta against the
-  baseline when one exists, and — where an iteration-start commit exists — the surfaces' delta
-  since it. The line marks the baseline **stale** when the row's surface count differs from the
-  surfaces' size at the iteration-start commit, which means a close skipped its re-stamp and the
-  baseline delta is cumulative. The mark covers the surface half only: the hook body's size at
-  a past commit is not recoverable, so a stale hook half is not detected.
-- **`--ceiling`** — rewrite the ceiling file (§The surface ratchet) to current
-  sizes, creating it if absent; the baseline row stays. Checked write; exit 2
-  names the path.
-- **`--update-baseline`** rewrites the baseline file, and the ceiling file where
-  one exists — a close-stage act,
-  because the brevity pass reacts to the *delta*, not the level (a file is not
-  expected to grow each iteration, so growth since the iteration started is
-  the worklist). The write is checked and a failure names the path at exit 2, the
-  refusal shape gate-sdk/SPEC.md §The non-gate arm rules for this class: a
-  confirmation line reporting a rewrite that did not happen is worse than none.
-- **`--growth`** prints the brevity pass's other worklist: a header with the
-  count of files that grew and their net code points, then one row per governed
-  prose file whose net code-point growth is positive, largest first, over the
-  pathspecs in `CONTEXT_KIT_GROWTH_PATHS`. It measures from lifecycle-kit's
-  **iteration-start commit** (lifecycle-kit/SPEC.md §The state machine), read
-  through that section's shared crate read on `CONTEXT_KIT_STATE_FILE`. So the
-  worklist is this iteration's growth whether or not the last close
-  re-stamped. Where there is no iteration-start commit it measures from the
-  commit the baseline row records, and a baseline commit git cannot resolve
-  then prints a one-line notice and exits clean. Neither path adds a second
-  baseline file. A stale baseline adds a second header line naming both
-  surface counts. Separate from the bare invocation because
-  `kpi-always-loaded` reads that as one line.
-- **Baseline file** (`${GATE_SDK_WORKFLOW_DIR:-.workflow}/`
-  `always-loaded-baseline.txt`, committed): a `# contract:` header
-  pointing here, then one data line
-  `<total>cp <surface>cp <baseline-commit>`. **A row whose figures carry no `cp` suffix is a line-unit row from before the re-unit**: the bare reading then prints `baseline in retired line unit — re-stamp with --update-baseline` in place of a delta and exits 0, so the discontinuity is recorded where the reader meets it, never as a phantom fall, and the stale mark stays silent until the re-stamp. Trailing extra
-  fields are tolerated and preserved-ignored — a consumer's file may carry
-  a fourth (a settings-local count, say, a guard-kit-adjacent KPI owned by
-  its drift report), and the kit reads such a file unchanged. The baseline is
-  the consumer-side floor-holder for the footprint contract
-  (§The consumer footprint): its delta is what the close-stage brevity pass
-  reacts to.
+- **Default invocation** prints one line: total, per-part breakdown, the delta against the baseline when one exists, and — where an iteration-start commit exists — the surfaces' delta since it. The line marks the baseline **stale** when the row's surface count differs from the surfaces' size at the iteration-start commit, which means a close skipped its re-stamp and the baseline delta is cumulative. The mark covers the surface half only: the hook body's size at a past commit is not recoverable, so a stale hook half is not detected.
+- **`--ceiling`** — rewrite the ceiling file (§The surface ratchet) to current sizes, creating it if absent; the baseline row stays. Checked write; exit 2 names the path.
+- **`--update-baseline`** rewrites the baseline file, and the ceiling file where one exists — a close-stage act, because the brevity pass reacts to the *delta*, not the level (a file is not expected to grow each iteration, so growth since the iteration started is the worklist). The write is checked and a failure names the path at exit 2, the refusal shape gate-sdk/SPEC.md §The non-gate arm rules for this class: a confirmation line reporting a rewrite that did not happen is worse than none.
+- **`--growth`** prints the brevity pass's other worklist: a header with the count of files that grew and their net code points, then one row per governed prose file whose net code-point growth is positive, largest first, over the pathspecs in `CONTEXT_KIT_GROWTH_PATHS`. It measures from lifecycle-kit's **iteration-start commit** (lifecycle-kit/SPEC.md §The state machine), read through that section's shared crate read on `CONTEXT_KIT_STATE_FILE`. So the worklist is this iteration's growth whether or not the last close re-stamped. Where there is no iteration-start commit it measures from the commit the baseline row records, and a baseline commit git cannot resolve then prints a one-line notice and exits clean. Neither path adds a second baseline file. A stale baseline adds a second header line naming both surface counts. Separate from the bare invocation because `kpi-always-loaded` reads that as one line.
+- **Baseline file** (`${GATE_SDK_WORKFLOW_DIR:-.workflow}/` `always-loaded-baseline.txt`, committed): a `# contract:` header pointing here, then one data line `<total>cp <surface>cp <baseline-commit>`. **A row whose figures carry no `cp` suffix is a line-unit row from before the re-unit**: the bare reading then prints `baseline in retired line unit — re-stamp with --update-baseline` in place of a delta and exits 0, so the discontinuity is recorded where the reader meets it, never as a phantom fall, and the stale mark stays silent until the re-stamp. Trailing extra fields are tolerated and preserved-ignored — a consumer's file may carry a fourth (a settings-local count, say, a guard-kit-adjacent KPI owned by its drift report), and the kit reads such a file unchanged. The baseline is the consumer-side floor-holder for the footprint contract (§The consumer footprint): its delta is what the close-stage brevity pass reacts to.
 
 ## bin/footprint
 
-The footprint emitter publishes the kits' measured context footprint — the
-adoption-cost evidence a consumer weighs before vendoring, the concrete form of
-the token-economics positioning. Where the meter reads one consumer's live
-always-loaded total, this reads the tracked kit surfaces and attributes the cost
-per kit, split by when it lands.
+The footprint emitter publishes the kits' measured context footprint — the adoption-cost evidence a consumer weighs before vendoring, the concrete form of the token-economics positioning. Where the meter reads one consumer's live always-loaded total, this reads the tracked kit surfaces and attributes the cost per kit, split by when it lands.
 
-The measured set is **derived, not maintained**: every top-level directory
-carrying a `SPEC.md`. No knob names it and nothing tests for kit-hood, so a
-directory joins the page by acquiring a `SPEC.md` — which makes a measured row a
-statement about that directory's context cost and never a claim that it is a
-kit. A directory that ships no always-loaded block and no `templates/` tree
-scores an empty tier in both columns and is reported at that, rather than
-filtered out: the derivation has one rule and a suppression would be a second.
+The measured set is **derived, not maintained**: every top-level directory carrying a `SPEC.md`. No knob names it and nothing tests for kit-hood, so a directory joins the page by acquiring a `SPEC.md` — which makes a measured row a statement about that directory's context cost and never a claim that it is a kit. A directory that ships no always-loaded block and no `templates/` tree scores an empty tier in both columns and is reported at that, rather than filtered out: the derivation has one rule and a suppression would be a second.
 
 Each kit is measured in the always-loaded and load-triggered tiers:
 
-- **Always-loaded** — the block a kit generates between its own
-  `begin`/`end` markers in the configured surface files
-  (`CONTEXT_KIT_SURFACES`), the agent-file text the kit injects into every
-  session's context. This reuses the always-loaded meter's surface set; most
-  kits inject nothing and score zero here.
-- **Load-triggered** — the skill and template markdown the kit ships under its
-  `templates/` tree, pulled into context only when its trigger fires. Gate-test
-  fixtures sit outside `templates/`, so they never enter the count.
+- **Always-loaded** — the block a kit generates between its own `begin`/`end` markers in the configured surface files (`CONTEXT_KIT_SURFACES`), the agent-file text the kit injects into every session's context. This reuses the always-loaded meter's surface set; most kits inject nothing and score zero here.
+- **Load-triggered** — the skill and template markdown the kit ships under its `templates/` tree, pulled into context only when its trigger fires. Gate-test fixtures sit outside `templates/`, so they never enter the count.
 
-**Numbers ruling.** Code-point counts are exact, each tier counted with the meter's measure, and the cell reads `<n>cp · ~<t>t`. The token column is a
-*labeled estimate* — a bytes/4 heuristic, carried with a leading `~` and stated
-inline as model-tokenizer-dependent, never a false-precision figure.
+**Numbers ruling.** Code-point counts are exact, each tier counted with the meter's measure, and the cell reads `<n>cp · ~<t>t`. The token column is a *labeled estimate* — a bytes/4 heuristic, carried with a leading `~` and stated inline as model-tokenizer-dependent, never a false-precision figure.
 
-**Attribution ruling: kit share only.** A kit's advertised cost is what the kit
-ships. Consumer bindings (the skill shims pointing at a vendored template),
-consumer config, the on-demand SPEC/README pages, this repo's own `CLAUDE.md`
-residue, and the session hook's dynamic body (consumer state, not fixed kit
-text) are all excluded, and the page states the exclusion so the number is
-honest. The exclusion is also a determinism requirement: the freshness gate
-byte-compares the emission, so every measured surface must be a static tracked
-file — a live hook run, being state-dependent, could never be byte-gated.
+**Attribution ruling: kit share only.** A kit's advertised cost is what the kit ships. Consumer bindings (the skill shims pointing at a vendored template), consumer config, the on-demand SPEC/README pages, this repo's own `CLAUDE.md` residue, and the session hook's dynamic body (consumer state, not fixed kit text) are all excluded, and the page states the exclusion so the number is honest. The exclusion is also a determinism requirement: the freshness gate byte-compares the emission, so every measured surface must be a static tracked file — a live hook run, being state-dependent, could never be byte-gated.
 
-**Emission, and the substrate it runs on.** The emitter is a **non-gate arm of
-the gate binary**, `--emit-footprint` (gate-sdk/SPEC.md §The non-gate arm), and
-it prints the committed `docs/footprint.md` page whole: front matter, method and
-exclusion prose, then the table with a totals row. It is reached as
-`bash gate-sdk/bin/run-gates.sh --emit footprint`, the front-end every `--emit` arm
-is reached through, and it reads `CONTEXT_KIT_SURFACES` as one of context-kit's
-static knobs, resolved from the kit's defaults table and the consumer's knob file
-(§Layout and configuration).
+**Emission, and the substrate it runs on.** The emitter is a **non-gate arm of the gate binary**, `--emit-footprint` (gate-sdk/SPEC.md §The non-gate arm), and it prints the committed `docs/footprint.md` page whole: front matter, method and exclusion prose, then the table with a totals row. It is reached as `bash gate-sdk/bin/run-gates.sh --emit footprint`, the front-end every `--emit` arm is reached through, and it reads `CONTEXT_KIT_SURFACES` as one of context-kit's static knobs, resolved from the kit's defaults table and the consumer's knob file (§Layout and configuration).
 
-The emission is a **library function** the arm wraps rather than the arm itself,
-which is what lets §check-footprint-fresh call it in-process and the value
-rollup consume its per-kit figures as data rather than re-parsing the rendered
-page. That split is the **kit's** shape rather than this member's: §The
-always-loaded meter takes it too, and for the same reason — a sibling reader that
-would otherwise parse a rendered line back apart.
+The emission is a **library function** the arm wraps rather than the arm itself, which is what lets §check-footprint-fresh call it in-process and the value rollup consume its per-kit figures as data rather than re-parsing the rendered page. That split is the **kit's** shape rather than this member's: §The always-loaded meter takes it too, and for the same reason — a sibling reader that would otherwise parse a rendered line back apart.
 
-**The advisory bare mode did not survive the port**, and its loss is the ported
-script's deletion rather than a separate decision: the shell emitter printed a
-human header plus the table on a bare invocation, and the replacement arm's
-contract is exactly what `--emit` printed. The table is still reachable — it is
-in the emitted page — so what went is the header, which had no reader that the
-page does not serve. Advisory by construction is unchanged: the arm never joins
-`gates.list`, and the freshness gate (§check-footprint-fresh) is what blocks a
-stale page.
+**The advisory bare mode did not survive the port**, and its loss is the ported script's deletion rather than a separate decision: the shell emitter printed a human header plus the table on a bare invocation, and the replacement arm's contract is exactly what `--emit` printed. The table is still reachable — it is in the emitted page — so what went is the header, which had no reader that the page does not serve. Advisory by construction is unchanged: the arm never joins `gates.list`, and the freshness gate (§check-footprint-fresh) is what blocks a stale page.
 
 ## The brevity gate
 
-`check-brevity` — a section-agnostic name: the governed sections
-are a knob, so no section name binds the gate (a consumer's
-`check-convention-brevity` would be its section-specific counterpart). It scans one designated
-always-loaded file for a **set** of bulleted sections (`CONTEXT_KIT_BREVITY_SECTIONS`) where
-every top-level `- ` list item carries a code-point budget, and flags a bullet that is **over budget
-and cites a deeper doc** (carries a `§` pointer) — over-long while admitting its
-detail already has a home elsewhere. Under-budget bullets and over-budget
-bullets with no pointer pass (the latter may genuinely own their content);
-`<!-- brevity-exempt: <reason> -->` on the bullet's first line or the line
-above blesses a bullet whose every line is load-bearing.
+`check-brevity` — a section-agnostic name: the governed sections are a knob, so no section name binds the gate (a consumer's `check-convention-brevity` would be its section-specific counterpart). It scans one designated always-loaded file for a **set** of bulleted sections (`CONTEXT_KIT_BREVITY_SECTIONS`) where every top-level `- ` list item carries a code-point budget, and flags a bullet that is **over budget and cites a deeper doc** (carries a `§` pointer) — over-long while admitting its detail already has a home elsewhere. Under-budget bullets and over-budget bullets with no pointer pass (the latter may genuinely own their content); `<!-- brevity-exempt: <reason> -->` on the bullet's first line or the line above blesses a bullet whose every line is load-bearing.
 
-**The item.** A bullet is a top-level `- ` item and its extent runs to the next
-one or the section's end, so an indented item belongs to its parent, and its size is the meter's code-point count over that extent. A bold name
-is not required: a restating bullet on the always-loaded tier is as costly whether
-or not it opens in bold, and a predicate reading only `- **` items left most of a
-consumer's housekeeping-shaped sections outside the gate. The span is measured to
-the bullet's last line carrying content, so a trailing blank adds nothing. The predicate is the member's own
-argument to the shared section-walking primitive, which
-`check-doctrine-registration` calls with its own, so widening it moves no other
-gate's walk.
+**The item.** A bullet is a top-level `- ` item and its extent runs to the next one or the section's end, so an indented item belongs to its parent, and its size is the meter's code-point count over that extent. A bold name is not required: a restating bullet on the always-loaded tier is as costly whether or not it opens in bold, and a predicate reading only `- **` items left most of a consumer's housekeeping-shaped sections outside the gate. The span is measured to the bullet's last line carrying content, so a trailing blank adds nothing. The predicate is the member's own argument to the shared section-walking primitive, which `check-doctrine-registration` calls with its own, so widening it moves no other gate's walk.
 
-**The finding line** reports the bullet's size in code points and names each over-budget bullet by its governed section, its
-line number in the file and its lead — the bold run where the bullet opens with
-one, else the opening characters of its lead line, cut on a character — because
-a bullet with no bold name has nothing else to print, and a finding naming only
-the bullet cannot locate it while several sections are governed. The clean
-line names each section with the count of bullets read in it.
+**The finding line** reports the bullet's size in code points and names each over-budget bullet by its governed section, its line number in the file and its lead — the bold run where the bullet opens with one, else the opening characters of its lead line, cut on a character — because a bullet with no bold name has nothing else to print, and a finding naming only the bullet cannot locate it while several sections are governed. The clean line names each section with the count of bullets read in it.
 
-**Section resolution fails closed.** Every element of the set must resolve: an
-element matching no heading in the governed file exits 2 and names that heading,
-never a clean 0, even while its siblings resolve. The knob and the heading
-are a coupling no other gate holds, so a renamed or deleted section would
-otherwise disarm the gate while it reported the rest as clean — a gate
-whose target vanished is a broken machine, not a clean tree. A section that
-resolves and holds no bullets is clean: resolution is what fails closed, not
-emptiness. An **empty set** also exits 2: a registered gate governing nothing is
-the vacuous pass the fail-closed contract refuses, and a consumer that wants no
-brevity check unregisters the gate — unlike `CONTEXT_KIT_RATCHET_PATHS`, whose
-empty default means *no load-triggered surface*, an empty brevity set has no
-reading. A **repeated element is scanned once**, so a duplicated heading in config
-cannot double a finding or the clean line's count.
+**Section resolution fails closed.** Every element of the set must resolve: an element matching no heading in the governed file exits 2 and names that heading, never a clean 0, even while its siblings resolve. The knob and the heading are a coupling no other gate holds, so a renamed or deleted section would otherwise disarm the gate while it reported the rest as clean — a gate whose target vanished is a broken machine, not a clean tree. A section that resolves and holds no bullets is clean: resolution is what fails closed, not emptiness. An **empty set** also exits 2: a registered gate governing nothing is the vacuous pass the fail-closed contract refuses, and a consumer that wants no brevity check unregisters the gate — unlike `CONTEXT_KIT_RATCHET_PATHS`, whose empty default means *no load-triggered surface*, an empty brevity set has no reading. A **repeated element is scanned once**, so a duplicated heading in config cannot double a finding or the clean line's count.
 
-**One budget for the set.** `CONTEXT_KIT_BREVITY_CAP` is a scalar. A
-per-section budget has no reader while no governed section wants a different
-value, so it is not a field; a consumer that attests one reopens it.
+**One budget for the set.** `CONTEXT_KIT_BREVITY_CAP` is a scalar. A per-section budget has no reader while no governed section wants a different value, so it is not a field; a consumer that attests one reopens it.
 
-The pointer default is any `§`, not a single doc name like `HANDBOOK §`:
-"cites a deeper doc" is the mechanism-level meaning and a consumer's handbook
-is one instance of it, so the superset matches every such pointer. Ships with
-a `good/`+`bad/` fixture pair and registers in the
-consumer's `gates.list` (this repo's included).
+The pointer default is any `§`, not a single doc name like `HANDBOOK §`: "cites a deeper doc" is the mechanism-level meaning and a consumer's handbook is one instance of it, so the superset matches every such pointer. Ships with a `good/`+`bad/` fixture pair and registers in the consumer's `gates.list` (this repo's included).
 
 **Two honest limits.**
 
 - **The unit is the code point.** A bullet is measured the way the meter measures a surface, so joining or wrapping its lines moves nothing, and the apparatus still measures one quantity.
-- **The pointer conjunct reads `§` by default**, so a bullet pointing at a
-  document by path alone passes on it. `CONTEXT_KIT_BREVITY_POINTER_RE` is the
-  consumer's lever; widening it to a path pattern also matches a bullet whose
-  *subject* is a file, which is most of a housekeeping section, so the default
-  is the conservative setting.
+- **The pointer conjunct reads `§` by default**, so a bullet pointing at a document by path alone passes on it. `CONTEXT_KIT_BREVITY_POINTER_RE` is the consumer's lever; widening it to a path pattern also matches a bullet whose *subject* is a file, which is most of a housekeeping section, so the default is the conservative setting.
 
-Prose outside any bullet — the paragraph sections of an agent file — is outside
-the gate's grammar.
+Prose outside any bullet — the paragraph sections of an agent file — is outside the gate's grammar.
 
 ## The surface ratchet
 
 `check-surface-ratchet` — no governed surface above its committed ceiling.
 
-- **Governed:** `CONTEXT_KIT_SURFACES`, plus tracked files matching
-  `CONTEXT_KIT_RATCHET_PATHS`; size = the meter's code-point count.
-- **Ceilings:** `CONTEXT_KIT_CEILING_FILE` — a `# contract:` header, then
-  `<n>cp <path>` per governed file, sorted by path.
-- **Red:** a file above its row, or a governed file with no row (a new surface
-  grows from nothing). The report names file, size and ceiling, and prints
-  `--emit always-loaded --ceiling`, committed with the growth.
-- **Clean:** otherwise. A row for a deleted or ungoverned file is ignored, so
-  narrowing never reds.
+- **Governed:** `CONTEXT_KIT_SURFACES`, plus tracked files matching `CONTEXT_KIT_RATCHET_PATHS`; size = the meter's code-point count.
+- **Ceilings:** `CONTEXT_KIT_CEILING_FILE` — a `# contract:` header, then `<n>cp <path>` per governed file, sorted by path.
+- **Red:** a file above its row, or a governed file with no row (a new surface grows from nothing). The report names file, size and ceiling, and prints `--emit always-loaded --ceiling`, committed with the growth.
+- **Clean:** otherwise. A row for a deleted or ungoverned file is ignored, so narrowing never reds.
 - **Exit 2:** ceiling file absent, a row unparsable, a row without the `cp` suffix (a line-unit row, the message naming `--emit always-loaded --ceiling` as the re-stamp), a knob unresolved.
-- **Writers:** never the gate — `--ceiling` in the growing commit,
-  `--update-baseline` at close where the file exists.
-- **Why a ratchet:** no budget to calibrate; growth shows in the commit that
-  causes it. A re-stamp makes it deliberate, not justified; close judges.
-- **Why these files, per file:** the kit's case is a trigger-loaded instruction
-  surface, which a trigger loads whole; a SPEC is read by section, and close's
-  growth walk reads it. A consumer may govern any authored surface whose growth
-  it wants shown in the growing commit — a public page whose reader tier must not
-  regrow is the second case. A generated copy is left out: its size is its
-  source's.
-- **Why its own file:** `--update-baseline` rewrites the baseline as one row, whose
-  surface count is the meter's staleness witness.
+- **Writers:** never the gate — `--ceiling` in the growing commit, `--update-baseline` at close where the file exists.
+- **Why a ratchet:** no budget to calibrate; growth shows in the commit that causes it. A re-stamp makes it deliberate, not justified; close judges.
+- **Why these files, per file:** the kit's case is a trigger-loaded instruction surface, which a trigger loads whole; a SPEC is read by section, and close's growth walk reads it. A consumer may govern any authored surface whose growth it wants shown in the growing commit — a public page whose reader tier must not regrow is the second case. A generated copy is left out: its size is its source's.
+- **Why its own file:** `--update-baseline` rewrites the baseline as one row, whose surface count is the meter's staleness witness.
 - **Why `on-surface`:** `init` writes no ceiling file; `--ceiling` arms the gate.
 - **Outside:** the hook body — consumer state, not authored text.
-- **Limit:** pathspecs outside the descriptor's static `couples=` are held by the
-  battery, not the hook.
+- **Limit:** pathspecs outside the descriptor's static `couples=` are held by the battery, not the hook.
 
 ## The close-stage brevity pass
 
-`templates/close-brevity.md` is the recurring close-stage step a consumer
-splices into its close skill (the guard-kit `close-triage.md` pattern).
-The procedure: run `--emit always-loaded`, then `--emit always-loaded --growth`;
-walk the always-loaded delta and every file the growth list names, asking two
-distinct questions — staleness (*is it still true?*) and brevity (*is each
-block worth its cost at every read?*); resolve by rewording or deleting, never
-by annotating (outdated context
+`templates/close-brevity.md` is the recurring close-stage step a consumer splices into its close skill (the guard-kit `close-triage.md` pattern). The procedure: run `--emit always-loaded`, then `--emit always-loaded --growth`; walk the always-loaded delta and every file the growth list names, asking two distinct questions — staleness (*is it still true?*) and brevity (*is each block worth its cost at every read?*); resolve by rewording or deleting, never by annotating (outdated context
 <!-- manifest-temporal-exempt: names the "formerly…" note as the anti-pattern this pass forbids, not written as narration -->
-goes to git history, not to a "formerly…" note); **no file is exempt** — an
-on-demand doc pays at every open, and a SPEC a stage opens each iteration is
-always-loaded in effect, the always-loaded tier being only the one that pays
-most often; finish with `--emit always-loaded --update-baseline` and commit the
-baseline and ceiling files (§The surface ratchet).
+goes to git history, not to a "formerly…" note); **no file is exempt** — an on-demand doc pays at every open, and a SPEC a stage opens each iteration is always-loaded in effect, the always-loaded tier being only the one that pays most often; finish with `--emit always-loaded --update-baseline` and commit the baseline and ceiling files (§The surface ratchet).
 
-The lexical share of this narration judgment — a fixed set of `formerly…`-class
-markers in the manifest set — is a blocking gate
-(canon-kit/SPEC.md §check-manifest-temporal); this pass keeps the semantic
-residue (*is this sentence about the past?*) that no marker set can decide.
+The lexical share of this narration judgment — a fixed set of `formerly…`-class markers in the manifest set — is a blocking gate (canon-kit/SPEC.md §check-manifest-temporal); this pass keeps the semantic residue (*is this sentence about the past?*) that no marker set can decide.
 
 ## The consumer footprint
 
-A consumer project pursues its own objectives; the tooling must stay
-near-invisible in its context budget. This section states and holds the kits'
-consumer-resident footprint — what checkwright asks a consumer's always-loaded
-surface to carry — owned in one place, with the always-loaded meter's baseline
-as the consumer-side floor-holder. It is prose contract only: no new state,
-event, knob, or gate. Its producer is the kit author at kit-landing time (the
-kit-landing checklist gains no step; the review seam is the roster row); its
-readers are a consumer evaluating adoption cost before vendoring and this
-repo's own close-stage brevity pass, which reads the roster when judging
-whether a new resident line is a kit ask or repo content.
+A consumer project pursues its own objectives; the tooling must stay near-invisible in its context budget. This section states and holds the kits' consumer-resident footprint — what checkwright asks a consumer's always-loaded surface to carry — owned in one place, with the always-loaded meter's baseline as the consumer-side floor-holder. It is prose contract only: no new state, event, knob, or gate. Its producer is the kit author at kit-landing time (the kit-landing checklist gains no step; the review seam is the roster row); its readers are a consumer evaluating adoption cost before vendoring and this repo's own close-stage brevity pass, which reads the roster when judging whether a new resident line is a kit ask or repo content.
 
-**The budget rule.** A kit's resident ask is at most one pointer line **per
-obligation it owns whose bound actor fires no trigger that loads it** — the
-load-trigger-residency and always-loaded-shape doctrine rules applied to kit
-shipping. The unit is the obligation, not the kit, and that is the rule rather
-than an allowance carved for a kit that outgrew it: a pair of such obligations
-merged onto one line states neither. What the rule forbids is unchanged — a
-second line for a rule some trigger already loads, and a line spent on mechanism
-the owning SPEC holds.
+**The budget rule.** A kit's resident ask is at most one pointer line **per obligation it owns whose bound actor fires no trigger that loads it** — the load-trigger-residency and always-loaded-shape doctrine rules applied to kit shipping. The unit is the obligation, not the kit, and that is the rule rather than an allowance carved for a kit that outgrew it: a pair of such obligations merged onto one line states neither. What the rule forbids is unchanged — a second line for a rule some trigger already loads, and a line spent on mechanism the owning SPEC holds.
 
-**A block-sized ask, and the property that sanctions one.** A resident ask may
-exceed a line when it is **generated and held in lockstep by a gate**: such a
-block costs the consumer no authoring and cannot drift out of step with the kit
-that emits it, so the authoring and drift costs the line budget exists to bound
-are both zero. Two asks qualify — doctrine-kit's digest, itself bounded by its
-one-line-per-rule shape (the always-loaded-shape rule) and held by
-doctrine-kit/SPEC.md §check-doctrine-registration, assertion F, because a
-re-vendor upgrade stales the digest by construction; and lifecycle-kit's
-registration block, held by lifecycle-kit/SPEC.md §check-lifecycle-registration.
-A hand-written block qualifies under neither, and is the case the line budget is
-for.
+**A block-sized ask, and the property that sanctions one.** A resident ask may exceed a line when it is **generated and held in lockstep by a gate**: such a block costs the consumer no authoring and cannot drift out of step with the kit that emits it, so the authoring and drift costs the line budget exists to bound are both zero. Two asks qualify — doctrine-kit's digest, itself bounded by its one-line-per-rule shape (the always-loaded-shape rule) and held by doctrine-kit/SPEC.md §check-doctrine-registration, assertion F, because a re-vendor upgrade stales the digest by construction; and lifecycle-kit's registration block, held by lifecycle-kit/SPEC.md §check-lifecycle-registration. A hand-written block qualifies under neither, and is the case the line budget is for.
 
-**Resident once, never once per template.** An obligation whose bound actor is
-*any session* is carried here and is **not** also restated in the kit templates
-those sessions load. delegation-kit/SPEC.md §Operative residency licenses a
-restatement where no bound actor's trigger reaches the owning doc; it licenses
-**one**, and a per-template copy multiplies the drift surface by the template
-count while reaching no reader this tier already reaches — there being no
-kit-side surface every session shape loads, since each stage skill is its own
-binding shim and a lead loads no stage template at all. drift-kit/SPEC.md §The
-knowledge-friction loop ruled this same call for its own channel, refusing a
-per-stage capture prompt because a standing session-start instruction converts
-one re-derivation into a permanent per-session tax; that ground is about the
-multiplication rather than about that channel, so it binds every obligation this
-roster carries. **The corollary is what a template may still say.** A template
-states such an obligation where its reader's *discharge differs* from the
-resident line's — instruction that surface authors for itself, which takes no
-sanction and is no restatement. What it must never do is carry the obligation's
-channel or disposal-time half alone: to a reader who meets no other statement of
-it, the deferred half reads as the discharge.
+**Resident once, never once per template.** An obligation whose bound actor is *any session* is carried here and is **not** also restated in the kit templates those sessions load. delegation-kit/SPEC.md §Operative residency licenses a restatement where no bound actor's trigger reaches the owning doc; it licenses **one**, and a per-template copy multiplies the drift surface by the template count while reaching no reader this tier already reaches — there being no kit-side surface every session shape loads, since each stage skill is its own binding shim and a lead loads no stage template at all. drift-kit/SPEC.md §The knowledge-friction loop ruled this same call for its own channel, refusing a per-stage capture prompt because a standing session-start instruction converts one re-derivation into a permanent per-session tax; that ground is about the multiplication rather than about that channel, so it binds every obligation this roster carries. **The corollary is what a template may still say.** A template states such an obligation where its reader's *discharge differs* from the resident line's — instruction that surface authors for itself, which takes no sanction and is no restatement. What it must never do is carry the obligation's channel or disposal-time half alone: to a reader who meets no other statement of it, the deferred half reads as the discharge.
 
-**The roster, by citation.** Each kit's resident ask is named by citing the kit
-SPEC section that owns it, never by restating it here — so the roster cannot
-drift out of lockstep with what the kit actually ships. A kit adding a resident
-ask adds its row below, which is the review seam:
+**The roster, by citation.** Each kit's resident ask is named by citing the kit SPEC section that owns it, never by restating it here — so the roster cannot drift out of lockstep with what the kit actually ships. A kit adding a resident ask adds its row below, which is the review seam:
 
-- **delegation-kit** — the pre-authorization sentence plus skill pointer:
-  delegation-kit/SPEC.md §One template, a resident pointer.
+- **delegation-kit** — the pre-authorization sentence plus skill pointer: delegation-kit/SPEC.md §One template, a resident pointer.
 - **doctrine-kit** — the doctrine link plus the digest block: doctrine-kit/SPEC.md.
-- **drift-kit** — the knowledge-friction capture bullet:
-  drift-kit/SPEC.md §The knowledge-friction loop, which already states the
-  one-bullet cost and its earn-back condition.
-- **lifecycle-kit** — the generated registration block
-  (lifecycle-kit/SPEC.md §check-lifecycle-registration), plus one line per
-  obligation whose bound actor is any session and whose owning section no such
-  session's trigger loads: gap capture and the recurrence stamp, both
-  lifecycle-kit/SPEC.md §The committed gap inbox, and survey capture
-  (§The survey record), each of which states its line's cost and earn-back
-  condition.
-- **every other kit** — none: their hooks, skills, gates, and SPECs are load-
-  or event-triggered, so they cost nothing until opened. The discriminator this
-  row turns on, and the one the brevity pass reads: a resident line that
-  *emphasizes* an already-enforced mechanism is the consumer's own content, not
-  a kit ask — only an obligation with no other carrier is.
+- **drift-kit** — the knowledge-friction capture bullet: drift-kit/SPEC.md §The knowledge-friction loop, which already states the one-bullet cost and its earn-back condition.
+- **lifecycle-kit** — the generated registration block (lifecycle-kit/SPEC.md §check-lifecycle-registration), plus one line per obligation whose bound actor is any session and whose owning section no such session's trigger loads: gap capture and the recurrence stamp, both lifecycle-kit/SPEC.md §The committed gap inbox, and survey capture (§The survey record), each of which states its line's cost and earn-back condition.
+- **every other kit** — none: their hooks, skills, gates, and SPECs are load- or event-triggered, so they cost nothing until opened. The discriminator this row turns on, and the one the brevity pass reads: a resident line that *emphasizes* an already-enforced mechanism is the consumer's own content, not a kit ask — only an obligation with no other carrier is.
 
-**The floor-holder ruling.** The meter plus its committed baseline
-(§The always-loaded meter) ship as the consumer's floor-holder: the consumer
-install (§Layout and configuration) seeds `always-loaded-baseline.txt`, so
-growth of the resident surface is a visible delta at every close-stage brevity
-pass. The hold is *advisory by design*. A hard total-size gate cannot attribute
-growth — the consumer's own content shares the file and is theirs to grow — so
-a level gate would be a noisy check breeding exemptions, the high-false-positive
-case the enforcement-first rule sanctions for keeping a class as stated manual
-duty rather than a gate. The mechanical holds that do exist stay: `check-brevity`
-bounds the bulleted sections its knob designates (§The brevity gate; a doctrine
-digest is no candidate for that knob — generated one
-line per rule and held byte-for-byte by `check-doctrine-registration`, so a
-brevity finding there is unreachable), and the meter delta feeds
-`kpi-always-loaded`.
+**The floor-holder ruling.** The meter plus its committed baseline (§The always-loaded meter) ship as the consumer's floor-holder: the consumer install (§Layout and configuration) seeds `always-loaded-baseline.txt`, so growth of the resident surface is a visible delta at every close-stage brevity pass. The hold is *advisory by design*. A hard total-size gate cannot attribute growth — the consumer's own content shares the file and is theirs to grow — so a level gate would be a noisy check breeding exemptions, the high-false-positive case the enforcement-first rule sanctions for keeping a class as stated manual duty rather than a gate. The mechanical holds that do exist stay: `check-brevity` bounds the bulleted sections its knob designates (§The brevity gate; a doctrine digest is no candidate for that knob — generated one line per rule and held byte-for-byte by `check-doctrine-registration`, so a brevity finding there is unreachable), and the meter delta feeds `kpi-always-loaded`.
 
-The measured counterpart to this budget doctrine is the published footprint page
-(§bin/footprint): this section owns the budget rule, the page owns the measured
-per-kit numbers, and the two never restate each other.
+The measured counterpart to this budget doctrine is the published footprint page (§bin/footprint): this section owns the budget rule, the page owns the measured per-kit numbers, and the two never restate each other.
 
 ## The memory-off doctrine
 
-Harness memory — the per-session store the harness offers to persist facts
-across sessions — is an always-loaded surface the meter cannot read and no
-gate scans: standing per-session context that accretes outside the tier
-contract, ungoverned by construction. The methodology already routes durable
-knowledge through a star topology, and those routes are the replacement —
-durable facts to their doc owner (the knowledge-friction loop), iteration-
-scoped attention to the lesson channels, private context to the operator's
-local brief. So the kit disables harness memory and enforces it off rather
-than governing its content.
+Harness memory — the per-session store the harness offers to persist facts across sessions — is an always-loaded surface the meter cannot read and no gate scans: standing per-session context that accretes outside the tier contract, ungoverned by construction. The methodology already routes durable knowledge through a star topology, and those routes are the replacement — durable facts to their doc owner (the knowledge-friction loop), iteration- scoped attention to the lesson channels, private context to the operator's local brief. So the kit disables harness memory and enforces it off rather than governing its content.
 
-The banned class is *harness-side silent accumulation*, not every local file: an
-explicit, derived, operator-curated local file is config, not memory.
-`ENV.local.md` (§bin/env-probe) sits with every `*.local.md` on the config side of
-that line — its probed half is a re-runnable derivation, its gotchas half is
-hand-curated, and both are gitignored operator surfaces the operator chose to
-keep, never a store the harness wrote to behind the tier contract.
+The banned class is *harness-side silent accumulation*, not every local file: an explicit, derived, operator-curated local file is config, not memory. `ENV.local.md` (§bin/env-probe) sits with every `*.local.md` on the config side of that line — its probed half is a re-runnable derivation, its gotchas half is hand-curated, and both are gitignored operator surfaces the operator chose to keep, never a store the harness wrote to behind the tier contract.
 
-Blast-radius honesty rides the doctrine: the gates hold the tree regardless of
-a polluted session, so a memory that quietly re-accumulated degrades one
-session's judgment, never the committed baselines. This is therefore a
-lightweight gate pair — a hermetic pin and a local-environment scan — not
-machinery. Enforcement splits on the tree-vs-environment seam: what a commit
-can carry (the tracked settings file) is hermetic and CI-real
-(§check-settings-pins); what only the operator's machine holds (the memory
-dir, the untracked local settings) is a local-environment scan, CI-neutral
-(§check-memory-off).
+Blast-radius honesty rides the doctrine: the gates hold the tree regardless of a polluted session, so a memory that quietly re-accumulated degrades one session's judgment, never the committed baselines. This is therefore a lightweight gate pair — a hermetic pin and a local-environment scan — not machinery. Enforcement splits on the tree-vs-environment seam: what a commit can carry (the tracked settings file) is hermetic and CI-real (§check-settings-pins); what only the operator's machine holds (the memory dir, the untracked local settings) is a local-environment scan, CI-neutral (§check-memory-off).
 
 ## check-settings-pins
 
-`checks/check-settings-pins.gate` (hermetic, `precommit`, dispatched to the gate
-binary — gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency)
-is the identity.conf pattern pointed at harness config. Every pin in
-`CONTEXT_KIT_SETTINGS_PINS`
-(default `${GATE_SDK_GATES_DIR}/settings-pins.conf`) holds against
-the tracked settings file `CONTEXT_KIT_SETTINGS_FILE` (default
-`.claude/settings.json`). Grammar: one `<path> = <expected JSON>` per line,
-`#` comments and blanks ignored. General-purpose by construction — any
-settings key is pinnable — this consumer's first pins hold the
-auto-memory-disabling keys.
+`checks/check-settings-pins.gate` (hermetic, `precommit`, dispatched to the gate binary — gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency) is the identity.conf pattern pointed at harness config. Every pin in `CONTEXT_KIT_SETTINGS_PINS` (default `${GATE_SDK_GATES_DIR}/settings-pins.conf`) holds against the tracked settings file `CONTEXT_KIT_SETTINGS_FILE` (default `.claude/settings.json`). Grammar: one `<path> = <expected JSON>` per line, `#` comments and blanks ignored. General-purpose by construction — any settings key is pinnable — this consumer's first pins hold the auto-memory-disabling keys.
 
-**The left-hand side is a path expression, not a `jq` filter**, and the grammar
-is complete:
+**The left-hand side is a path expression, not a `jq` filter**, and the grammar is complete:
 
 ```
 path   := '.' | step+
@@ -1148,239 +248,60 @@ ident  := [A-Za-z_][A-Za-z0-9_]*
 int    := '-'? [0-9]+
 ```
 
-A path **opens with `.`**; everything else — pipes, filters, `?` error
-suppression, slices, iteration, functions, arithmetic — is refused, and the gate
-turns that refusal into **exit 2 naming the offending pin, the knob it came from,
-and the construct**. The leading-`.` rule is load-bearing rather than tidy: `jq`
-reads a leading `["k"]` as an array *literal* and returns `["k"]`, so admitting
-one would answer a question `jq` was never asked. This is a narrowing of a
-consumer config surface, taken openly and refusing loudly outside the subset — not
-the silent mis-scan the ERE cohort's foreclosure forbids, which binds *sizing an
-implementation* to one consumer's usage while the documented grammar stays wider.
-The knob's whole documented job is naming a settings key, which a path expression
-expresses in full. A filter crate (`jaq`) was priced against the narrowing and
-declined; the observation that such a crate exists is not a ground to reopen it,
-being the observation the narrowing was decided against.
+A path **opens with `.`**; everything else — pipes, filters, `?` error suppression, slices, iteration, functions, arithmetic — is refused, and the gate turns that refusal into **exit 2 naming the offending pin, the knob it came from, and the construct**. The leading-`.` rule is load-bearing rather than tidy: `jq` reads a leading `["k"]` as an array *literal* and returns `["k"]`, so admitting one would answer a question `jq` was never asked. This is a narrowing of a consumer config surface, taken openly and refusing loudly outside the subset — not the silent mis-scan the ERE cohort's foreclosure forbids, which binds *sizing an implementation* to one consumer's usage while the documented grammar stays wider. The knob's whole documented job is naming a settings key, which a path expression expresses in full. A filter crate (`jaq`) was priced against the narrowing and declined; the observation that such a crate exists is not a ground to reopen it, being the observation the narrowing was decided against.
 
-**The right-hand side is a JSON value, and the comparison is structural** — the
-`jq -c` *rendering* is not the contract. A byte-rendering contract is unachievable
-across `jq` versions and therefore cannot be a parity target: `jq` 1.6 re-renders
-every number through a double where 1.7 preserves an unmutated literal, so
-`{"x":1e3}` renders `1000` under one and `1e3` under the other, and a crate
-holding byte parity with "`jq -c`" would be holding parity with whichever `jq` the
-comparison ran against. Structural comparison has no such dependency and diverges
-from the shell only in the forgiving direction — an expected side written with
-non-canonical spacing now matches. Part of what *structural* means is one explicit
-rule the object model does not give free: **numbers compare by their `f64` value
-wherever they occur, every other shape by the parsed value's own equality**. The
-parser's own equality separates `1` from `1.0` by variant where `jq` calls them
-one value, and `jq`'s equality is not shallow, so a pin nested one level deep
-would otherwise report a mismatch nobody would think to test for.
+**The right-hand side is a JSON value, and the comparison is structural** — the `jq -c` *rendering* is not the contract. A byte-rendering contract is unachievable across `jq` versions and therefore cannot be a parity target: `jq` 1.6 re-renders every number through a double where 1.7 preserves an unmutated literal, so `{"x":1e3}` renders `1000` under one and `1e3` under the other, and a crate holding byte parity with "`jq -c`" would be holding parity with whichever `jq` the comparison ran against. Structural comparison has no such dependency and diverges from the shell only in the forgiving direction — an expected side written with non-canonical spacing now matches. Part of what *structural* means is one explicit rule the object model does not give free: **numbers compare by their `f64` value wherever they occur, every other shape by the parsed value's own equality**. The parser's own equality separates `1` from `1.0` by variant where `jq` calls them one value, and `jq`'s equality is not shallow, so a pin nested one level deep would otherwise report a mismatch nobody would think to test for.
 
-Two semantics are **preserved deliberately rather than improved**, because a port
-proves parity and does not repair rules. A path evaluating to `null` is the
-**absent** branch, whether the key is absent or explicitly `null`: the shell
-cannot tell the two apart and the compiled form can, so reproducing the
-conflation is the faithful port, and a session wanting the distinction files an
-entry against this section. And **indexing follows `jq`'s own type rules** — a
-field step on `null` yields `null`; a field step on a string, number, boolean or
-array, and an index step on an object, are errors the gate classifies as a
-malformed pin.
+Two semantics are **preserved deliberately rather than improved**, because a port proves parity and does not repair rules. A path evaluating to `null` is the **absent** branch, whether the key is absent or explicitly `null`: the shell cannot tell the two apart and the compiled form can, so reproducing the conflation is the faithful port, and a session wanting the distinction files an entry against this section. And **indexing follows `jq`'s own type rules** — a field step on `null` yields `null`; a field step on a string, number, boolean or array, and an index step on an object, are errors the gate classifies as a malformed pin.
 
-Dispositions: a pin whose path resolves to the expected value passes; a path
-present with a different value is the legible violation (exit 1, each finding
-reading path, expected, and actual). Fail-closed (exit 2) on an unreadable or
-non-JSON settings file, a malformed pin line, a pin outside the path grammar, or
-a pin naming a key **absent** from the settings file — an absent key is a desynced
-manifest (the pins and the settings are one repo's tracked config, edited
-together), not the legible drift a red is for. Absent pins file: the opt-in-off
-state, a clean skip. Ships a `good/`+`bad/` fixture pair, registers in the
-consumer's `gates.list` (this repo's included), and is driven end to end against
-an installed settings file by the consumer smoke (§Testing).
+Dispositions: a pin whose path resolves to the expected value passes; a path present with a different value is the legible violation (exit 1, each finding reading path, expected, and actual). Fail-closed (exit 2) on an unreadable or non-JSON settings file, a malformed pin line, a pin outside the path grammar, or a pin naming a key **absent** from the settings file — an absent key is a desynced manifest (the pins and the settings are one repo's tracked config, edited together), not the legible drift a red is for. Absent pins file: the opt-in-off state, a clean skip. Ships a `good/`+`bad/` fixture pair, registers in the consumer's `gates.list` (this repo's included), and is driven end to end against an installed settings file by the consumer smoke (§Testing).
 
-**What a pin is worth depends on which tiers can outrank the file it pins**, and
-the gate reads exactly one tier. The harness resolves settings across five, in
-order: managed policy, then command-line, then the untracked local settings file,
-then the tracked settings file this gate reads, then the operator's user-level
-file. Objects deep-merge; the exceptions that merge rather than override are the
-permissions arrays, MCP servers, HTTP hook URLs and `fallbackModel` chains. Two
-consequences the gate's own verdict does not carry. A pin **does** beat the
-operator's user-level file, which is what makes a tracked pin meaningful at all
-rather than a suggestion the machine can quietly ignore. And a pin is **beaten**
-by three tiers above it, of which `check-memory-off` covers one — the local
-settings overlay — leaving managed policy and command-line flags outside any
-gate's reach. That residue is unclosable here rather than merely unbuilt: neither
-tier leaves an artifact in the tree, and the command line does not exist until
-the session starts.
+**What a pin is worth depends on which tiers can outrank the file it pins**, and the gate reads exactly one tier. The harness resolves settings across five, in order: managed policy, then command-line, then the untracked local settings file, then the tracked settings file this gate reads, then the operator's user-level file. Objects deep-merge; the exceptions that merge rather than override are the permissions arrays, MCP servers, HTTP hook URLs and `fallbackModel` chains. Two consequences the gate's own verdict does not carry. A pin **does** beat the operator's user-level file, which is what makes a tracked pin meaningful at all rather than a suggestion the machine can quietly ignore. And a pin is **beaten** by three tiers above it, of which `check-memory-off` covers one — the local settings overlay — leaving managed policy and command-line flags outside any gate's reach. That residue is unclosable here rather than merely unbuilt: neither tier leaves an artifact in the tree, and the command line does not exist until the session starts.
 
 ## check-settings-paths
 
-`checks/check-settings-paths.gate` (hermetic, `precommit`, dispatched to the gate
-binary alongside its sibling — gate-sdk/SPEC.md §The settings cohort, and the
-crate's first dependency) holds the second
-invariant over the same tracked file: every entry in
-`CONTEXT_KIT_SETTINGS_FILE`'s `permissions.allow[]` whose command token is a
-**literal** repo-relative `.sh` path resolves in the working tree. The knob is
-reused, not introduced — §check-settings-pins already owns it and its default.
+`checks/check-settings-paths.gate` (hermetic, `precommit`, dispatched to the gate binary alongside its sibling — gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency) holds the second invariant over the same tracked file: every entry in `CONTEXT_KIT_SETTINGS_FILE`'s `permissions.allow[]` whose command token is a **literal** repo-relative `.sh` path resolves in the working tree. The knob is reused, not introduced — §check-settings-pins already owns it and its default.
 
-The class it defends is a standing property of a gate port rather than a
-one-time count: replacing a kit's `checks/<gate>.sh` with a `<gate>.gate`
-descriptor strands every allow entry naming the old path, and this repo
-accumulated such entries one cohort apart before the gate existed. A dead grant
-breaks nothing — no command can reach it — so the cost is a permission roster
-whose every reader must re-verify which lines still mean anything.
+The class it defends is a standing property of a gate port rather than a one-time count: replacing a kit's `checks/<gate>.sh` with a `<gate>.gate` descriptor strands every allow entry naming the old path, and this repo accumulated such entries one cohort apart before the gate existed. A dead grant breaks nothing — no command can reach it — so the cost is a permission roster whose every reader must re-verify which lines still mean anything.
 
-**The extraction predicate**, scoped against the shapes a permission array
-actually carries. A candidate is taken only from an entry of the form
-`Bash(<command>)`; leading `env NAME=VALUE` assignments and a `bash`/`sh`
-interpreter word are skipped, and the first remaining token is the candidate. A
-candidate not ending in `.sh` is out of scope — a bare command names no path,
-and a non-`.sh` path entry (a log truncation, a scratch removal) names a
-runtime-created gitignored path whose absence is its ordinary state, so
-existence is the wrong predicate for it. A candidate **containing `*`** is a
-pattern, intentionally polymorphic over files that need not exist today, and is
-skipped. That rule is scoped to the *command token*, not the entry: this repo's
-standing shape for a grant taking arguments is a bare entry beside a
-`*`-suffixed twin, and the twin's path is as literal — and as strandable — as
-the bare form's, so it stays in scope.
+**The extraction predicate**, scoped against the shapes a permission array actually carries. A candidate is taken only from an entry of the form `Bash(<command>)`; leading `env NAME=VALUE` assignments and a `bash`/`sh` interpreter word are skipped, and the first remaining token is the candidate. A candidate not ending in `.sh` is out of scope — a bare command names no path, and a non-`.sh` path entry (a log truncation, a scratch removal) names a runtime-created gitignored path whose absence is its ordinary state, so existence is the wrong predicate for it. A candidate **containing `*`** is a pattern, intentionally polymorphic over files that need not exist today, and is skipped. That rule is scoped to the *command token*, not the entry: this repo's standing shape for a grant taking arguments is a bare entry beside a `*`-suffixed twin, and the twin's path is as literal — and as strandable — as the bare form's, so it stays in scope.
 
-The predicate has a second reader: guard-kit's `compare-settings-allow` applies it
-to the local overlay as an advisory (guard-kit/SPEC.md §compare-settings-allow). It
-calls this gate's holder rather than restating it, so a change to the scoping above
-changes that report too. The gate's subject stays the committed file alone.
+The predicate has a second reader: guard-kit's `compare-settings-allow` applies it to the local overlay as an advisory (guard-kit/SPEC.md §compare-settings-allow). It calls this gate's holder rather than restating it, so a change to the scoping above changes that report too. The gate's subject stays the committed file alone.
 
-Splitting the grant into tokens must not expand it. Globbing a pattern grant
-against the tree and then asserting an arbitrary first match would green the whole
-pattern class instead of skipping it, while leaving the checked count silently
-inflated. The shell form protected that with `read -ra`, which does not expand;
-the compiled form splits on ASCII whitespace, which has no expansion to suppress.
-The property is the same and it is the property, not the idiom, that the fixture
-pair's checked count pins.
+Splitting the grant into tokens must not expand it. Globbing a pattern grant against the tree and then asserting an arbitrary first match would green the whole pattern class instead of skipping it, while leaving the checked count silently inflated. The shell form protected that with `read -ra`, which does not expand; the compiled form splits on ASCII whitespace, which has no expansion to suppress. The property is the same and it is the property, not the idiom, that the fixture pair's checked count pins.
 
-Dispositions: exit 1 lists each violating entry verbatim beside the path that
-did not resolve, so the reader can repoint or drop the grant without re-deriving
-which token was read. The clean line reports the **checked count**, which is
-what distinguishes a predicate that scoped to the array from one that vacuously
-matched nothing. Fail-closed (exit 2) on a settings file that is
-unreadable or not JSON — the sibling gate reads the same file on the same terms,
-and the file is this gate's sole subject rather than an opt-in manifest, so
-there is no absent-surface skip to grant. A `--fixture <dir>` mode reads
-`<dir>/settings.json` and resolves candidates against `<dir>`, which is the
-hermetic mode the `good/`+`bad/` fixture pair drives.
+Dispositions: exit 1 lists each violating entry verbatim beside the path that did not resolve, so the reader can repoint or drop the grant without re-deriving which token was read. The clean line reports the **checked count**, which is what distinguishes a predicate that scoped to the array from one that vacuously matched nothing. Fail-closed (exit 2) on a settings file that is unreadable or not JSON — the sibling gate reads the same file on the same terms, and the file is this gate's sole subject rather than an opt-in manifest, so there is no absent-surface skip to grant. A `--fixture <dir>` mode reads `<dir>/settings.json` and resolves candidates against `<dir>`, which is the hermetic mode the `good/`+`bad/` fixture pair drives.
 
-The pair pins the scoping, not merely the verdict. `good/` carries every
-skipped shape — pattern tokens, bare non-path commands, non-`.sh` paths —
-alongside resolving literals in all three extraction shapes (bare,
-`env`-prefixed, trailing-flag), and its expectation pins the **checked count**:
-the pattern-expansion defect above passes an exit-code-only fixture, because an
-expanded pattern resolves by construction, and is visible only in the count.
-`bad/` carries a dead path in the bare, `*`-twin and `env`-prefixed shapes
-beside one resolving grant, so a broken extraction arm shows as a missing
-finding rather than a still-red exit.
+The pair pins the scoping, not merely the verdict. `good/` carries every skipped shape — pattern tokens, bare non-path commands, non-`.sh` paths — alongside resolving literals in all three extraction shapes (bare, `env`-prefixed, trailing-flag), and its expectation pins the **checked count**: the pattern-expansion defect above passes an exit-code-only fixture, because an expanded pattern resolves by construction, and is visible only in the count. `bad/` carries a dead path in the bare, `*`-twin and `env`-prefixed shapes beside one resolving grant, so a broken extraction arm shows as a missing finding rather than a still-red exit.
 
-Its `# graph:` manifest names the settings file as its subject and the check
-script globs as a **reverse trigger** — a cohort deleting a ported gate's `.sh`
-is exactly the edit that strands a grant, so it must re-run the gate. The
-distinction is recorded because gate-sdk/SPEC.md's port criterion 4 turns on it,
-and a later port reading that couple as content would misclassify the member.
-The trigger is a partial route by construction: the generated hook reads staged
-`ACMR` paths, so a *deleted* `.sh` never matches it. What the trigger catches is
-the ordinary edit that strands a grant; what catches the cohort is the full
-battery, which runs whole-tree with no trigger filter.
+Its `# graph:` manifest names the settings file as its subject and the check script globs as a **reverse trigger** — a cohort deleting a ported gate's `.sh` is exactly the edit that strands a grant, so it must re-run the gate. The distinction is recorded because gate-sdk/SPEC.md's port criterion 4 turns on it, and a later port reading that couple as content would misclassify the member. The trigger is a partial route by construction: the generated hook reads staged `ACMR` paths, so a *deleted* `.sh` never matches it. What the trigger catches is the ordinary edit that strands a grant; what catches the cohort is the full battery, which runs whole-tree with no trigger filter.
 
-**The criterion-7 debt this gate landed carrying is paid, and this paragraph is
-the record that it was.** `jq` is not on `GATE_SDK_PROGRAM_FLOOR`, so the gate
-failed port criterion 7 the day it landed and owed designed-away work at its port.
-That work is the settings cohort (gate-sdk/SPEC.md §The settings cohort, and the
-crate's first dependency), which retired the requirement for this member and its
-sibling by taking a JSON reader into the crate rather than by hand-rolling a
-parser to dodge a dependency — the outcome this paragraph predicted when it said
-one parsing story for the settings file is worth more than the criterion. `jq`
-remains required by `check-installer-no-deps` alone (excluded with cause) now that
-`check-memory-off` has taken the same reader, so it is retired from the battery
-but for that one member, and not from the shipped install path at all.
+**The criterion-7 debt this gate landed carrying is paid, and this paragraph is the record that it was.** `jq` is not on `GATE_SDK_PROGRAM_FLOOR`, so the gate failed port criterion 7 the day it landed and owed designed-away work at its port. That work is the settings cohort (gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency), which retired the requirement for this member and its sibling by taking a JSON reader into the crate rather than by hand-rolling a parser to dodge a dependency — the outcome this paragraph predicted when it said one parsing story for the settings file is worth more than the criterion. `jq` remains required by `check-installer-no-deps` alone (excluded with cause) now that `check-memory-off` has taken the same reader, so it is retired from the battery but for that one member, and not from the shipped install path at all.
 
-**The gate is not the prune.** It reads the settings file and writes nothing,
-but it reds the moment it registers on a tree carrying stranded entries, and the
-settings file is operator-owned configuration a session edits only on the
-operator's behalf (guard-kit/SPEC.md §compare-settings-allow). The landing order
-is therefore fixed: the prune lands, then the gate registers.
+**The gate is not the prune.** It reads the settings file and writes nothing, but it reds the moment it registers on a tree carrying stranded entries, and the settings file is operator-owned configuration a session edits only on the operator's behalf (guard-kit/SPEC.md §compare-settings-allow). The landing order is therefore fixed: the prune lands, then the gate registers.
 
 ## check-memory-off
 
-`checks/check-memory-off.gate` (local-environment class, binary-dispatched, the
-check-identity precedent) scans the operator's machine, not the tree — its
-`# graph:` manifest couples the pins file it reads and triggers on `*`, because
-the surfaces it guards (the memory dir and the untracked local settings) never
-stage. Two red conditions:
+`checks/check-memory-off.gate` (local-environment class, binary-dispatched, the check-identity precedent) scans the operator's machine, not the tree — its `# graph:` manifest couples the pins file it reads and triggers on `*`, because the surfaces it guards (the memory dir and the untracked local settings) never stage. Two red conditions:
 
-- the harness's per-project memory dir holds content — any regular file that
-  is not the dir-preserving `.gitkeep`;
-- the untracked local settings file (`settings.local.json` beside the settings
-  file) sets a pinned key to a value other than its pin — the override the
-  hermetic gate cannot see, since it reads only the tracked file.
+- the harness's per-project memory dir holds content — any regular file that is not the dir-preserving `.gitkeep`;
+- the untracked local settings file (`settings.local.json` beside the settings file) sets a pinned key to a value other than its pin — the override the hermetic gate cannot see, since it reads only the tracked file.
 
-`CONTEXT_KIT_MEMORY_DIRS` (a space-separated glob list) names the dirs to
-scan; its default derives the current project's dir from the harness layout
-(§Layout and configuration). CI-neutral: where the surface is absent the gate
-is clean, and the clean line states the fail-open caveat — an absent dir
-proves nothing about another clone.
+`CONTEXT_KIT_MEMORY_DIRS` (a space-separated glob list) names the dirs to scan; its default derives the current project's dir from the harness layout (§Layout and configuration). CI-neutral: where the surface is absent the gate is clean, and the clean line states the fail-open caveat — an absent dir proves nothing about another clone.
 
-**It has one arm, and the knobs are it.** The `--fixture <dir>` arm the shell
-form carried is deleted: every path it redirected — the scanned dirs, the pins
-manifest, the local settings file derived from `CONTEXT_KIT_SETTINGS_FILE` by
-swapping `.json` for `.local.json` — a knob already redirects, so the arm bought
-a shorter spelling and paid for it with a second code path that never drove the
-derivation being checked. The pair and `check-memory-off.test.sh` reach the gate
-through the three knobs instead, which is what makes them a parity oracle for the
-live arm rather than for a fixture-only one.
+**It has one arm, and the knobs are it.** The `--fixture <dir>` arm the shell form carried is deleted: every path it redirected — the scanned dirs, the pins manifest, the local settings file derived from `CONTEXT_KIT_SETTINGS_FILE` by swapping `.json` for `.local.json` — a knob already redirects, so the arm bought a shorter spelling and paid for it with a second code path that never drove the derivation being checked. The pair and `check-memory-off.test.sh` reach the gate through the three knobs instead, which is what makes them a parity oracle for the live arm rather than for a fixture-only one.
 
-**Comparison is structural and a null actual is a skip**, and the two are
-recorded because they part company with `check-settings-pins` over one manifest.
-The pins file declares *expected JSON*, not an expected byte form, so `1` and
-`1.0` are one value here as they already are there; a right-hand side that is not
-JSON cannot be compared structurally at all and is skipped on this member's one
-disposition for a pin it cannot read — that same line of that same manifest is
-what the sibling gate fail-closes on, so the condition is graded, not lost. A
-path evaluating to **null**, by contrast, is this gate's ordinary clean case: the
-local file simply sets no override for that key. `check-settings-pins` reads a
-null as an absent pin and refuses, which is right for the tracked file it reads
-and would be a correctness regression here, reddening every clone whose local
-settings merely omit a pinned key.
+**Comparison is structural and a null actual is a skip**, and the two are recorded because they part company with `check-settings-pins` over one manifest. The pins file declares *expected JSON*, not an expected byte form, so `1` and `1.0` are one value here as they already are there; a right-hand side that is not JSON cannot be compared structurally at all and is skipped on this member's one disposition for a pin it cannot read — that same line of that same manifest is what the sibling gate fail-closes on, so the condition is graded, not lost. A path evaluating to **null**, by contrast, is this gate's ordinary clean case: the local file simply sets no override for that key. `check-settings-pins` reads a null as an absent pin and refuses, which is right for the tracked file it reads and would be a correctness regression here, reddening every clone whose local settings merely omit a pinned key.
 
-Fail-closed (exit 2) when it cannot read what is present to check: a local
-settings file that is unreadable or not valid JSON, a memory dir it cannot walk,
-or a `HOME` it cannot read when the default derivation is the one in play.
+Fail-closed (exit 2) when it cannot read what is present to check: a local settings file that is unreadable or not valid JSON, a memory dir it cannot walk, or a `HOME` it cannot read when the default derivation is the one in play.
 
 ## check-footprint-fresh
 
-`checks/check-footprint-fresh.gate` (hermetic, `precommit`) byte-compares the
-committed `docs/footprint.md` against the footprint emitter, the
-`check-docs-mirror-fresh`/`check-trajectory-fresh` posture: a generated,
-freshness-gated projection is Derivation-first's sanctioned copy, so the
-maintainer re-runs the emitter after any change to a measured surface and a
-stale page reddens the battery. Its `# graph:` manifest couples the measured
-surfaces — the configured agent file and each kit's `templates/` tree — and the
-`*/SPEC.md` glob the kit roster derives from, so an edit to what the page counts,
-or a kit arriving or leaving, re-fires the gate.
+`checks/check-footprint-fresh.gate` (hermetic, `precommit`) byte-compares the committed `docs/footprint.md` against the footprint emitter, the `check-docs-mirror-fresh`/`check-trajectory-fresh` posture: a generated, freshness-gated projection is Derivation-first's sanctioned copy, so the maintainer re-runs the emitter after any change to a measured surface and a stale page reddens the battery. Its `# graph:` manifest couples the measured surfaces — the configured agent file and each kit's `templates/` tree — and the `*/SPEC.md` glob the kit roster derives from, so an edit to what the page counts, or a kit arriving or leaving, re-fires the gate.
 
-**It is a registry member of the gate binary, and its emitter is a function call
-rather than a spawn.** The comparator and the emitter ported in one unit, so
-where the shell form ran `bash <emitter> --emit` in a subprocess, the compiled
-member calls the emitter module's `emit()` **in-process** — which is what
-retires the family's `bash` hop for this member (gate-sdk/SPEC.md §The first
-cohort, and the rule that selects the next). The `CONTEXT_KIT_SURFACES` the
-emitter reads is one of context-kit's static knobs, declared by this member.
+**It is a registry member of the gate binary, and its emitter is a function call rather than a spawn.** The comparator and the emitter ported in one unit, so where the shell form ran `bash <emitter> --emit` in a subprocess, the compiled member calls the emitter module's `emit()` **in-process** — which is what retires the family's `bash` hop for this member (gate-sdk/SPEC.md §The first cohort, and the rule that selects the next). The `CONTEXT_KIT_SURFACES` the emitter reads is one of context-kit's static knobs, declared by this member.
 
-Bare, it runs the live emitter; a two-argument form
-(`check-footprint-fresh <projection> <emit>`) compares two pre-baked files,
-the hermetic mode the `bad/` fixture case drives; `good/` exercises the live
-emitter on its default branch over a staged one-kit corpus. Fail-closed (exit 2)
-on a missing projection or emit source; the stale byte-compare is the exit-1
-violation. The page's generated numbers ride the `docs/evidence-data.md`
-precedent past the prose gates on content, not a named valve — the figures live
-in table cells the count gate does not read as prose, and the method prose names
-no bare collection total.
+Bare, it runs the live emitter; a two-argument form (`check-footprint-fresh <projection> <emit>`) compares two pre-baked files, the hermetic mode the `bad/` fixture case drives; `good/` exercises the live emitter on its default branch over a staged one-kit corpus. Fail-closed (exit 2) on a missing projection or emit source; the stale byte-compare is the exit-1 violation. The page's generated numbers ride the `docs/evidence-data.md` precedent past the prose gates on content, not a named valve — the figures live in table cells the count gate does not read as prose, and the method prose names no bare collection total.
 
 ## Layout and configuration
 
@@ -1411,473 +332,71 @@ context-kit/
   smoke/violation.sh
 ```
 
-**The kit carries no `lib/` directory, and that is a discharge rather than a
-silence.** The kit's knob defaults and config refusals live in its static
-defaults table and validator (below). The sourceable
-owner of the probe roster and the floor predicate was read on the **installer**
-path and by `check-install-toolchain`; the installer's behind-invoke relocation
-put both readers in the crate, which emptied its caller set and let it be deleted
-rather than ported (§bin/env-probe). The `lib/pub-lang/` extractors are
-**discharged**: they were the bundled members of the registry `pub-index`
-resolves, and they moved in-crate behind the surviving seam in the cut that
-ported that resolver (§Index-first reading).
+**The kit carries no `lib/` directory, and that is a discharge rather than a silence.** The kit's knob defaults and config refusals live in its static defaults table and validator (below). The sourceable owner of the probe roster and the floor predicate was read on the **installer** path and by `check-install-toolchain`; the installer's behind-invoke relocation put both readers in the crate, which emptied its caller set and let it be deleted rather than ported (§bin/env-probe). The `lib/pub-lang/` extractors are **discharged**: they were the bundled members of the registry `pub-index` resolves, and they moved in-crate behind the surviving seam in the cut that ported that resolver (§Index-first reading).
 
-The install also seeds the committed baseline the footprint contract holds
-(§The consumer footprint): after wiring the hook it runs
-`run-gates.sh --emit always-loaded --update-baseline` once to write
-`always-loaded-baseline.txt`, and `smoke/install.sh` asserts that step by
-running the meter and checking the baseline lands. Install also seeds the local
-env profile — `run-gates.sh --emit env-probe` writes the first `ENV.local.md`
-block (§bin/env-probe); being an operator-local, gitignored surface, no smoke
-asserts it (the stated install step is its enforcement).
+The install also seeds the committed baseline the footprint contract holds (§The consumer footprint): after wiring the hook it runs `run-gates.sh --emit always-loaded --update-baseline` once to write `always-loaded-baseline.txt`, and `smoke/install.sh` asserts that step by running the meter and checking the baseline lands. Install also seeds the local env profile — `run-gates.sh --emit env-probe` writes the first `ENV.local.md` block (§bin/env-probe); being an operator-local, gitignored surface, no smoke asserts it (the stated install step is its enforcement).
 
-Config is a **knob file**: copy `templates/context-config.knobs` into the gates dir
-as `context-config.knobs` (or point `CONTEXT_KIT_KNOB_FILE` elsewhere) and set any
-knob below; defaults fill what the file leaves unset. context-kit's knobs are
-**static**: the binary resolves them in process from its own defaults table and the
-consumer's knob file; `bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one
-with its shape and rendered default. A gitignored `context-config.local.knobs` in the
-gates dir is the home for a private value a tracked file cannot carry. The grammar,
-that `.local` overlay, the environment-over-file precedence for a scalar, and the
-refusals — a set `CONTEXT_KIT_KNOB_FILE` that does not exist, a left-behind
-`context-config.sh` or `context-config.local.sh`, a non-empty file named by the
-retired `CONTEXT_KIT_CONFIG_FILE`, a retired knob name — are gate-sdk/SPEC.md §The
-knob file's. The kit's table validator refuses a malformed context config at exit 2
-with every finding — a broken config must not gate anything: an empty
-`CONTEXT_KIT_SETTINGS_FILE`, `CONTEXT_KIT_SETTINGS_PINS` or
-`CONTEXT_KIT_BREVITY_FILE`, a `CONTEXT_KIT_BREVITY_CAP` that is not a positive integer, and the
-set-but-missing settings file below. A derived default below names the knob it reads as `${NAME}`, or as `${NAME:-<default>}` so the roster's rendered literal reads as agreement. Knobs:
+Config is a **knob file**: copy `templates/context-config.knobs` into the gates dir as `context-config.knobs` (or point `CONTEXT_KIT_KNOB_FILE` elsewhere) and set any knob below; defaults fill what the file leaves unset. context-kit's knobs are **static**: the binary resolves them in process from its own defaults table and the consumer's knob file; `bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one with its shape and rendered default. A gitignored `context-config.local.knobs` in the gates dir is the home for a private value a tracked file cannot carry. The grammar, that `.local` overlay, the environment-over-file precedence for a scalar, and the refusals — a set `CONTEXT_KIT_KNOB_FILE` that does not exist, a left-behind `context-config.sh` or `context-config.local.sh`, a non-empty file named by the retired `CONTEXT_KIT_CONFIG_FILE`, a retired knob name — are gate-sdk/SPEC.md §The knob file's. The kit's table validator refuses a malformed context config at exit 2 with every finding — a broken config must not gate anything: an empty `CONTEXT_KIT_SETTINGS_FILE`, `CONTEXT_KIT_SETTINGS_PINS` or `CONTEXT_KIT_BREVITY_FILE`, a `CONTEXT_KIT_BREVITY_CAP` that is not a positive integer, and the set-but-missing settings file below. A derived default below names the knob it reads as `${NAME}`, or as `${NAME:-<default>}` so the roster's rendered literal reads as agreement. Knobs:
 
-- `CONTEXT_KIT_SURFACES` — array of always-loaded files; default
-  `("CLAUDE.md")`. The measured surface is agent-file-name-agnostic: a consumer
-  whose harness reads `AGENTS.md` (or any other always-loaded agent file) sets
-  this to that file and the meter, the footprint, and `check-brevity` all follow
-  — no kit mechanism resolves the agent file by literal. The
-  AGENTS.md adapter smoke (§Testing) exercises exactly that: an `AGENTS.md`
-  scratch consumer whose battery is green and whose meter and footprint measure
-  `AGENTS.md`.
-- `CONTEXT_KIT_PUB_LANGS` — array naming the `pub-index` extractors to enable;
-  default **empty**, and empty means *derive it* rather than *no languages*: the
-  one reader of the knob expands it to the arm's built-in extractor roster
-  (the `CONTEXT_KIT_MEMORY_DIRS` shape below). No literal default can express
-  that roster, which lives in the crate: transcribing it into the table would be
-  the maintained list derivation-first forbids and a second producer of one
-  roster, so the expansion belongs to the arm and the table states the empty
-  default and stops. Setting it to an
-  explicitly empty array is therefore the same input as leaving it unset, which
-  is the one behaviour the port collapsed — no shipped sentence promised that
-  spelling as a way to disable the tool, and a sentinel meaning "none" would mint
-  vocabulary for a use nobody has.
-- `CONTEXT_KIT_PRUNE_DIRS` — array of **leaf basenames** both index walkers
-  exclude from their `find` (§Index-first reading); default the union of what the
-  two tools carried privately plus the harness worktree leaf — `.git`,
-  `node_modules`, `target`, `dist`, `build`, `worktrees`. Deliberately not
-  gate-sdk's set and deliberately not derived from it.
-- `CONTEXT_KIT_PUB_LANG_DIR` — the consumer extractor dir searched before the
-  arm's built-in roster (a same-basename file shadows the shipped grammar);
-  default `${GATE_SDK_GATES_DIR}/pub-lang`.
-- `CONTEXT_KIT_HOOK_CMD` — the command whose output code-point count approximates the
-  steady-state hook body (§The always-loaded meter). A **command knob**: an
-  indexed argv, one `CONTEXT_KIT_HOOK_CMD[] = word` line per element, spawned
-  directly with no shell, and taking no environment override; a command that needs
-  shell syntax is written as a `bash`, `-c` and command-string argv. Its default is
-  a derived row: queue-kit's `queue-index` arm through the battery front-end,
-  `("bash" "<candidate>" "--emit" "queue-index" "--collapse-deferred")`, for the
-  first candidate that exists as a file among `${GATE_SDK_GATES_DIR}/run-gates.sh`
-  and `${GATE_SDK_ROOT}/bin/run-gates.sh`, the gate-sdk root locator spelled
-  relative to the working directory — consumer-first, then the sibling gate-sdk's
-  front-end — else **empty** (surfaces only). The empty answer is what
-  the meter's `hook 0` branch reads and what a consumer vendoring context-kit
-  without a battery front-end depends on; a file line `CONTEXT_KIT_HOOK_CMD =`
-  replaces the default whole with that empty value, a deliberate no-hook override.
-  `--emit knob-roster` renders the first candidate rather than probing a path built
-  from a placeholder (gate-sdk/SPEC.md §The knob file).
-- `CONTEXT_KIT_DRIFT_REPORT` — the **`--emit` arm name** of the consumer's
-  drift report, not a path: the hook runs
-  `run-gates.sh --emit <name> --trend` for the brief's drift line; default
-  empty (the line is omitted).
-  **It was a script path in an earlier revision of this kit**, and the change is
-  called out because the guard changed with it: a `-f` existence test on an arm name
-  passes for nothing, so a hook that kept testing the value as a path would
-  have dropped the drift line with no red anywhere. A consumer whose config
-  still holds the old path degrades to no drift line, which is the same
-  degrade an absent report always had.
-- `CONTEXT_KIT_STAGE_RULES` — the **command** that emits stage→craft-rule
-  pointers, not a path: the session-context hook runs it with the current stage
-  appended for the brief's craft-rule block, and carries no `-f` guard. Default
-  empty (the block is omitted); doctrine-kit's `--emit stage-rules` invocation
-  is one value it takes (doctrine-kit/SPEC.md §stage-rules).
-  **It was a path to a bash script in an earlier revision**, widened when that emitter
-  ported to a compiled arm — a command a consumer can still point anywhere,
-  which is what porting a knob's *value* leaves intact. The honest limit, stated
-  because the migration is not free for everyone: a consumer whose config holds a
-  bare **executable** script path keeps working, a command of one word; a
-  consumer whose config holds a path to a **non-executable** script — which is
-  what a script run under an explicit `bash` needs — stops working,
-  because the `bash` prefix the hook used to supply is gone. That is one line of
-  config to migrate, and it is what lets the knob name a compiled arm at all.
-  **The knob is not renamed to `…_CMD`**: a rename costs every consumer a config
-  edit for a contract that widens rather than changes subject, and strands its
-  citations in two SPECs and a template.
-- `CONTEXT_KIT_STATE_FILE` — the lifecycle evidence file whose **last data
-  line** carries the stage cursor the hook routes on (§The session-context
-  hook); default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt`. Read
-  as a named file, never through stdin — the session-role signal consumes stdin
-  exactly once, and a second reader there would starve it.
-- `CONTEXT_KIT_ENV_PROFILE_FILE` — the consumer-local env profile file the
-  env-probe arm writes and the session-context hook's step 9 emits
-  (§bin/env-probe); default `ENV.local.md`.
-- `CONTEXT_KIT_SESSION_ROLE_FILE` — the session-role marker `/lead` writes and
-  the session-context hook's identity match reads (§The session-context hook);
-  default `${GATE_SDK_TMP_DIR:-.tmp}/session-role` (gitignored scratch).
-- `CONTEXT_KIT_BASELINE_FILE` — default
-  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/always-loaded-baseline.txt`.
-- `CONTEXT_KIT_STATE_FILE` — the lifecycle state file whose first stamp names the
-  iteration-start commit the meter's `--growth` and staleness read (§The always-loaded meter);
-  default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt`. context-kit's own knob
-  rather than an import of lifecycle-kit's, so a consumer without lifecycle-kit resolves an
-  absent file and keeps the baseline-only reading.
-- `CONTEXT_KIT_GROWTH_PATHS` — array of git pathspecs the meter's `--growth`
-  arm measures; default `("*.md")`. A consumer excludes generated mirrors and
-  fixture copies here, since a copy's growth is its source's.
-- `CONTEXT_KIT_CEILING_FILE` — the ratchet's committed ceilings
-  (§The surface ratchet); default
-  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/surface-ceiling.txt`. Its own file rather
-  than a row in the baseline, because `--update-baseline` rewrites that file as
-  one row and would erase a ceiling at every close.
-- `CONTEXT_KIT_RATCHET_PATHS` — array of git pathspecs naming the
-  load-triggered surfaces the ratchet governs beside `CONTEXT_KIT_SURFACES`;
-  default **empty** (the always-loaded files alone). Empty here means *no
-  load-triggered surface*, not *derive it*: which files a harness loads whole is
-  the adopter's own layout, and a default spelling the kits' own template paths
-  would red an adopter's re-vendor commit for growth the kit shipped.
+- `CONTEXT_KIT_SURFACES` — array of always-loaded files; default `("CLAUDE.md")`. The measured surface is agent-file-name-agnostic: a consumer whose harness reads `AGENTS.md` (or any other always-loaded agent file) sets this to that file and the meter, the footprint, and `check-brevity` all follow — no kit mechanism resolves the agent file by literal. The AGENTS.md adapter smoke (§Testing) exercises exactly that: an `AGENTS.md` scratch consumer whose battery is green and whose meter and footprint measure `AGENTS.md`.
+- `CONTEXT_KIT_PUB_LANGS` — array naming the `pub-index` extractors to enable; default **empty**, and empty means *derive it* rather than *no languages*: the one reader of the knob expands it to the arm's built-in extractor roster (the `CONTEXT_KIT_MEMORY_DIRS` shape below). No literal default can express that roster, which lives in the crate: transcribing it into the table would be the maintained list derivation-first forbids and a second producer of one roster, so the expansion belongs to the arm and the table states the empty default and stops. Setting it to an explicitly empty array is therefore the same input as leaving it unset, which is the one behaviour the port collapsed — no shipped sentence promised that spelling as a way to disable the tool, and a sentinel meaning "none" would mint vocabulary for a use nobody has.
+- `CONTEXT_KIT_PRUNE_DIRS` — array of **leaf basenames** both index walkers exclude from their `find` (§Index-first reading); default the union of what the two tools carried privately plus the harness worktree leaf — `.git`, `node_modules`, `target`, `dist`, `build`, `worktrees`. Deliberately not gate-sdk's set and deliberately not derived from it.
+- `CONTEXT_KIT_PUB_LANG_DIR` — the consumer extractor dir searched before the arm's built-in roster (a same-basename file shadows the shipped grammar); default `${GATE_SDK_GATES_DIR}/pub-lang`.
+- `CONTEXT_KIT_HOOK_CMD` — the command whose output code-point count approximates the steady-state hook body (§The always-loaded meter). A **command knob**: an indexed argv, one `CONTEXT_KIT_HOOK_CMD[] = word` line per element, spawned directly with no shell, and taking no environment override; a command that needs shell syntax is written as a `bash`, `-c` and command-string argv. Its default is a derived row: queue-kit's `queue-index` arm through the battery front-end, `("bash" "<candidate>" "--emit" "queue-index" "--collapse-deferred")`, for the first candidate that exists as a file among `${GATE_SDK_GATES_DIR}/run-gates.sh` and `${GATE_SDK_ROOT}/bin/run-gates.sh`, the gate-sdk root locator spelled relative to the working directory — consumer-first, then the sibling gate-sdk's front-end — else **empty** (surfaces only). The empty answer is what the meter's `hook 0` branch reads and what a consumer vendoring context-kit without a battery front-end depends on; a file line `CONTEXT_KIT_HOOK_CMD =` replaces the default whole with that empty value, a deliberate no-hook override. `--emit knob-roster` renders the first candidate rather than probing a path built from a placeholder (gate-sdk/SPEC.md §The knob file).
+- `CONTEXT_KIT_DRIFT_REPORT` — the **`--emit` arm name** of the consumer's drift report, not a path: the hook runs `run-gates.sh --emit <name> --trend` for the brief's drift line; default empty (the line is omitted). **It was a script path in an earlier revision of this kit**, and the change is called out because the guard changed with it: a `-f` existence test on an arm name passes for nothing, so a hook that kept testing the value as a path would have dropped the drift line with no red anywhere. A consumer whose config still holds the old path degrades to no drift line, which is the same degrade an absent report always had.
+- `CONTEXT_KIT_STAGE_RULES` — the **command** that emits stage→craft-rule pointers, not a path: the session-context hook runs it with the current stage appended for the brief's craft-rule block, and carries no `-f` guard. Default empty (the block is omitted); doctrine-kit's `--emit stage-rules` invocation is one value it takes (doctrine-kit/SPEC.md §stage-rules). **It was a path to a bash script in an earlier revision**, widened when that emitter ported to a compiled arm — a command a consumer can still point anywhere, which is what porting a knob's *value* leaves intact. The honest limit, stated because the migration is not free for everyone: a consumer whose config holds a bare **executable** script path keeps working, a command of one word; a consumer whose config holds a path to a **non-executable** script — which is what a script run under an explicit `bash` needs — stops working, because the `bash` prefix the hook used to supply is gone. That is one line of config to migrate, and it is what lets the knob name a compiled arm at all. **The knob is not renamed to `…_CMD`**: a rename costs every consumer a config edit for a contract that widens rather than changes subject, and strands its citations in two SPECs and a template.
+- `CONTEXT_KIT_STATE_FILE` — the lifecycle evidence file whose **last data line** carries the stage cursor the hook routes on (§The session-context hook); default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt`. Read as a named file, never through stdin — the session-role signal consumes stdin exactly once, and a second reader there would starve it.
+- `CONTEXT_KIT_ENV_PROFILE_FILE` — the consumer-local env profile file the env-probe arm writes and the session-context hook's step 9 emits (§bin/env-probe); default `ENV.local.md`.
+- `CONTEXT_KIT_SESSION_ROLE_FILE` — the session-role marker `/lead` writes and the session-context hook's identity match reads (§The session-context hook); default `${GATE_SDK_TMP_DIR:-.tmp}/session-role` (gitignored scratch).
+- `CONTEXT_KIT_BASELINE_FILE` — default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/always-loaded-baseline.txt`.
+- `CONTEXT_KIT_STATE_FILE` — the lifecycle state file whose first stamp names the iteration-start commit the meter's `--growth` and staleness read (§The always-loaded meter); default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt`. context-kit's own knob rather than an import of lifecycle-kit's, so a consumer without lifecycle-kit resolves an absent file and keeps the baseline-only reading.
+- `CONTEXT_KIT_GROWTH_PATHS` — array of git pathspecs the meter's `--growth` arm measures; default `("*.md")`. A consumer excludes generated mirrors and fixture copies here, since a copy's growth is its source's.
+- `CONTEXT_KIT_CEILING_FILE` — the ratchet's committed ceilings (§The surface ratchet); default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/surface-ceiling.txt`. Its own file rather than a row in the baseline, because `--update-baseline` rewrites that file as one row and would erase a ceiling at every close.
+- `CONTEXT_KIT_RATCHET_PATHS` — array of git pathspecs naming the load-triggered surfaces the ratchet governs beside `CONTEXT_KIT_SURFACES`; default **empty** (the always-loaded files alone). Empty here means *no load-triggered surface*, not *derive it*: which files a harness loads whole is the adopter's own layout, and a default spelling the kits' own template paths would red an adopter's re-vendor commit for growth the kit shipped.
 - `CONTEXT_KIT_BREVITY_FILE` — default `CLAUDE.md`.
-- `CONTEXT_KIT_BREVITY_SECTIONS` — array of headings of the budgeted bullet
-  sections; default `("## Shared conventions")`, a one-element set. It replaces
-  the retired scalar `CONTEXT_KIT_BREVITY_SECTION`, a **retired name** in the
-  kit table: a knob-file line naming it, or the name exported in the environment,
-  is refused at exit 2 naming the replacement (gate-sdk/SPEC.md §The knob file).
-  Without the refusal a config still setting it would be silently ignored while a
-  file carrying `## Shared conventions` was governed on the wrong section at exit 0
-  (the retired `GATE_SDK_GRAPH_THEME` precedent, gate-sdk/SPEC.md §check-graph).
+- `CONTEXT_KIT_BREVITY_SECTIONS` — array of headings of the budgeted bullet sections; default `("## Shared conventions")`, a one-element set. It replaces the retired scalar `CONTEXT_KIT_BREVITY_SECTION`, a **retired name** in the kit table: a knob-file line naming it, or the name exported in the environment, is refused at exit 2 naming the replacement (gate-sdk/SPEC.md §The knob file). Without the refusal a config still setting it would be silently ignored while a file carrying `## Shared conventions` was governed on the wrong section at exit 0 (the retired `GATE_SDK_GRAPH_THEME` precedent, gate-sdk/SPEC.md §check-graph).
 - `CONTEXT_KIT_BREVITY_CAP` — code points per bullet, a positive integer; default `330`. Every governed bullet a four-line budget admitted with a pointer measured at most 327 code points on a real resident file, so the re-unit keeps the bound. The retired `CONTEXT_KIT_BREVITY_BUDGET` (lines per bullet) is refused at exit 2 naming this knob.
-- `CONTEXT_KIT_BREVITY_POINTER_RE` — the "cites a deeper doc" pattern;
-  default `§`.
-- `CONTEXT_KIT_SETTINGS_FILE` — the tracked harness settings file
-  check-settings-pins and check-settings-paths each verify, on a different
-  invariant, and whose `.local.json` sibling check-memory-off scans; default
-  `.claude/settings.json`. **Explicitly setting it to a path that is not a file
-  is refused (exit 2) by the kit's table validator**, which reads the value's
-  origin beside it: a value from the environment, the local overlay or the tracked
-  knob file is set, while the default with no file at its path is not-adopted and
-  degrades at each reader. A reader sees one path string and cannot tell the
-  misconfigured case from the unadopted one, so the refusal belongs where the
-  origin is visible. Emptiness is **not** the signal here — the validator rejects
-  an empty value as malformed — which is why this knob's not-adopted default is a
-  path that may be absent, where `DRIFT_KIT_KPIS_FILE` resolves empty at its
-  not-adopted default (drift-kit/SPEC.md §Layout and configuration).
-- `CONTEXT_KIT_SETTINGS_PINS` — the pins manifest; default
-  `${GATE_SDK_GATES_DIR}/settings-pins.conf`.
-- `CONTEXT_KIT_MEMORY_DIRS` — space-separated glob list of harness memory dirs
-  check-memory-off scans; default **empty**, and empty means *derive it* rather
-  than *no dir*: the current project's dir under the operator's home,
-  `$HOME/.claude/projects/<slug>/memory`, where `<slug>` is the project's
-  absolute path with every `/` and `.` folded to `-` (the harness's own
-  encoding). The derivation belongs to the one member that reads the knob
-  (`native/src/gates/memory_off.rs`): a table row cannot name `HOME` as an input,
-  and deriving lazily at that reader keeps a `git` subprocess off the path of every
-  unrelated knob resolution. A knob because the layout moves: design against the
-  live layout, keep it config.
+- `CONTEXT_KIT_BREVITY_POINTER_RE` — the "cites a deeper doc" pattern; default `§`.
+- `CONTEXT_KIT_SETTINGS_FILE` — the tracked harness settings file check-settings-pins and check-settings-paths each verify, on a different invariant, and whose `.local.json` sibling check-memory-off scans; default `.claude/settings.json`. **Explicitly setting it to a path that is not a file is refused (exit 2) by the kit's table validator**, which reads the value's origin beside it: a value from the environment, the local overlay or the tracked knob file is set, while the default with no file at its path is not-adopted and degrades at each reader. A reader sees one path string and cannot tell the misconfigured case from the unadopted one, so the refusal belongs where the origin is visible. Emptiness is **not** the signal here — the validator rejects an empty value as malformed — which is why this knob's not-adopted default is a path that may be absent, where `DRIFT_KIT_KPIS_FILE` resolves empty at its not-adopted default (drift-kit/SPEC.md §Layout and configuration).
+- `CONTEXT_KIT_SETTINGS_PINS` — the pins manifest; default `${GATE_SDK_GATES_DIR}/settings-pins.conf`.
+- `CONTEXT_KIT_MEMORY_DIRS` — space-separated glob list of harness memory dirs check-memory-off scans; default **empty**, and empty means *derive it* rather than *no dir*: the current project's dir under the operator's home, `$HOME/.claude/projects/<slug>/memory`, where `<slug>` is the project's absolute path with every `/` and `.` folded to `-` (the harness's own encoding). The derivation belongs to the one member that reads the knob (`native/src/gates/memory_off.rs`): a table row cannot name `HOME` as an input, and deriving lazily at that reader keeps a `git` subprocess off the path of every unrelated knob resolution. A knob because the layout moves: design against the live layout, keep it config.
 
-`CONTEXT_KIT_DRIFT_REPORT`, `CONTEXT_KIT_STAGE_RULES` and
-`CONTEXT_KIT_SESSION_ROLE_FILE` have **no table row** and are not knob-file knobs:
-the consumer's copy of `templates/session-context.sh` reads them from its own
-environment, falling back to the defaults stated above, and reads
-`CONTEXT_KIT_STATE_FILE`, `CONTEXT_KIT_MEMORY_DIRS` and
-`CONTEXT_KIT_ENV_PROFILE_FILE` the same way beside their rows.
+`CONTEXT_KIT_DRIFT_REPORT`, `CONTEXT_KIT_STAGE_RULES` and `CONTEXT_KIT_SESSION_ROLE_FILE` have **no table row** and are not knob-file knobs: the consumer's copy of `templates/session-context.sh` reads them from its own environment, falling back to the defaults stated above, and reads `CONTEXT_KIT_STATE_FILE`, `CONTEXT_KIT_MEMORY_DIRS` and `CONTEXT_KIT_ENV_PROFILE_FILE` the same way beside their rows.
 
-The hook template itself is consumer-edited rather than knob-driven (the
-guard-kit guard precedent): its variation points are layout judgment,
-and a template with a dozen knobs is harder to own than a marked section.
+The hook template itself is consumer-edited rather than knob-driven (the guard-kit guard precedent): its variation points are layout judgment, and a template with a dozen knobs is harder to own than a marked section.
 
 ## Testing
 
-The three index arms and the meter are advisory and speak plain text, so
-the gate contracts do not fit; the kit ships an expected-output runner
-instead: `index-tests/` holds a small fixture corpus (Markdown with nested
-headings, fences, and link-bearing first sentences; Rust with the pub-item
-kinds; TypeScript with every kind the `ts` grammar claims — including
-`const enum` and `export default` — beside re-export and non-export lines it
-must skip; a baseline file) beside expected outputs, and
-the `--run-index-tests` arm (gate-sdk/SPEC.md §The non-gate arm) drives
-each one through the `--emit` front-end over
-that corpus and asserts exact output, failing on any diff. The runner spawns the
-arms from the host checkout, so it pins every knob an arm reads at the corpus, the
-meter's iteration state file included: an unpinned knob resolves against the host's
-live state and leaks it into the golden. **The goldens are the
-port's parity oracle and they are unusually strong**: they were produced by the
-shell implementations the arms replaced, so holding them byte-for-byte is a
-cross-substrate comparison over a committed corpus rather than an assertion of
-parity. A consumer-shadowing case points `CONTEXT_KIT_PUB_LANG_DIR` at a scratch dir
-whose `rust.sh` emits a marker row: it is the extractor seam's **end-to-end
-proof**, the consumer-first resolution order and the `bash` spawn that executes a
-consumer extractor both exercised, with the shadow's output rather than the
-built-in grammar's recorded in the golden. **The installer's behind-invoke relocation reached
-`index-tests/toolfloor-cases.sh` and the shell library it sourced, and the <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
-mechanism is stated so a later reader can re-run the test rather than inherit the
-verdict**: the case table *sourced* that library, so it was a projection of that
-library's own verdict set and the two moved together — into deletion rather than
-into a port, once the relocation emptied the library's caller set
-(§bin/env-probe). The driver above was once bound into
-that pair too, on the strength of a shared section and a shared subject — a
-co-location claim wearing a coupling claim's words. It sourced neither the runner
-nor the library; its only contact with the sequenced library was a `bash`
-subprocess spawn whose stdout was diffed against a golden, a process boundary
-structurally identical to the spawns that already reached ported arms through the
-front-end. **That discriminator is this section's own**, worked here first for
-the AGENTS.md smoke below: a member that sources neither the runner nor the
-library is unblocked on its own ground, because a stated cause reaches only the
-members it names (gate-sdk/SPEC.md §Porting a gate to the binary substrate). The
-smoke declared the same section, sourced neither, and its own header called it a
-standalone validate suite, so it was unblocked and has since cut; the driver was
-released on the same test and has since cut too (below). **Releasing the driver
-released nothing else** at the time. `bin/always-loaded.sh` <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
-(§The always-loaded meter) was a different section's owed file, correctly homed and takeable as a
-singleton on its own, and it has since cut too — its golden is the arm's parity
-oracle, held byte-for-byte over an unedited expectation file (below). **Nothing
-is owed to context-kit now**: the last two members left by deletion rather than
-by a port, and a later session may not quietly add one this section does not
-name. The roster's oracle is
-`bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree` rather than a count
-maintained here.
-**The floor predicate's golden retired with the shell holder it was the oracle
-for**, and the reason is worth keeping: it printed one line per (element, banner)
-pair so the closed verdict set, the spellings of an unconstrained member and the
-`uncomparable` fail-closed arm were asserted rather than assumed — of the *shell*
-holder alone. With one holder left those assertions are the crate's own unit
-tests, where a golden would be a second copy to drift; the audience axis, whose
-present, empty and omitted forms are each a case, is asserted there for the same
-reason.
-The arm registers as its own evidence-kit validate suite
-(`index_tests`, the `demo` precedent, read by exit code): the golden the refactor
-leans on now
-has an automated validate-stage consumer. The footprint emitter is advisory the same way, but its
-projection is gated rather than runner-tested: `check-footprint-fresh` byte-holds
-`docs/footprint.md` against `--emit`. `check-brevity`, `check-surface-ratchet`, `check-settings-pins`,
-`check-memory-off`, and `check-footprint-fresh` are gates and carry the standard
-fixture pair; the footprint `bad/` case drives the hermetic two-argument mode
-(`<projection> <emit>`), the `check-trajectory-fresh` precedent. Both
-memory-off pairs reach their subject differently, and the difference is the
-point: the settings-pins pair takes a `--fixture <dir>` injection (the
-check-identity precedent) reading `<dir>/settings.json` against
-`<dir>/settings-pins.conf`, while the memory-off pair drives
-`CONTEXT_KIT_MEMORY_DIRS` from its own case-dir config, because that member's
-fixture arm was deleted for being a code path its live arm never took.
-The direct unit tests beside the pairs hold the axes those pairs fix and so
-cannot express: `check-brevity.test.sh` holds the section-set resolution (the
-pair fixes `CONTEXT_KIT_BREVITY_SECTIONS` at the stock one-element default and
-always supplies a file carrying it, so neither case can express an element that
-resolves to nothing — exit 2, a broken machine rather than a clean tree — nor an
-unmatched element beside a resolved one, the empty set, a repeated element, a
-second section's non-bold bullet, or the retired scalar knob's refusal). The pair
-itself carries a non-bold bullet on each side, over budget with a pointer in
-`bad/` and within budget in `good/`. The memory-off local-override axis — an untracked
-`settings.local.json` that re-enables a pinned key past an empty dir — cannot
-be a good/bad pair (the pair fixes the dir axis), so `check-memory-off.test.sh`
-holds it. `check-settings-pins.test.sh` holds the **refusal** axis: the pair
-fixes the holds-vs-mismatch axis (exit 0 vs exit 1) alone, so a pin outside
-the documented path grammar — a jq filter, an iteration, a slice, an array
-literal — needs its own case to prove the refusal is exit 2, loud and naming
-the pin, the knob and the construct, never a silent clean verdict.
-`check-surface-ratchet.test.sh` holds its member's refusal axis on the same
-reading — an absent ceiling file and an unparsable row are each exit 2, which
-the pair's own well-formed file cannot express — plus the ignored stale row. Its
-sandbox is outside any git repository, so every case leaves
-`CONTEXT_KIT_RATCHET_PATHS` empty and the tracked-pathspec arm stays the pair's,
-whose cases run inside the repo and drive it from their own case-dir config
-(the memory-off pair's shape, and here it is what makes `git ls-files` resolve).
+The three index arms and the meter are advisory and speak plain text, so the gate contracts do not fit; the kit ships an expected-output runner instead: `index-tests/` holds a small fixture corpus (Markdown with nested headings, fences, and link-bearing first sentences; Rust with the pub-item kinds; TypeScript with every kind the `ts` grammar claims — including `const enum` and `export default` — beside re-export and non-export lines it must skip; a baseline file) beside expected outputs, and the `--run-index-tests` arm (gate-sdk/SPEC.md §The non-gate arm) drives each one through the `--emit` front-end over that corpus and asserts exact output, failing on any diff. The runner spawns the arms from the host checkout, so it pins every knob an arm reads at the corpus, the meter's iteration state file included: an unpinned knob resolves against the host's live state and leaks it into the golden. **The goldens are the port's parity oracle and they are unusually strong**: they were produced by the shell implementations the arms replaced, so holding them byte-for-byte is a cross-substrate comparison over a committed corpus rather than an assertion of parity. A consumer-shadowing case points `CONTEXT_KIT_PUB_LANG_DIR` at a scratch dir whose `rust.sh` emits a marker row: it is the extractor seam's **end-to-end proof**, the consumer-first resolution order and the `bash` spawn that executes a consumer extractor both exercised, with the shadow's output rather than the built-in grammar's recorded in the golden. **The installer's behind-invoke relocation reached `index-tests/toolfloor-cases.sh` and the shell library it sourced, and the <!-- manifest-temporal-exempt: retirement record, names a shell file since removed --> mechanism is stated so a later reader can re-run the test rather than inherit the verdict**: the case table *sourced* that library, so it was a projection of that library's own verdict set and the two moved together — into deletion rather than into a port, once the relocation emptied the library's caller set (§bin/env-probe). The driver above was once bound into that pair too, on the strength of a shared section and a shared subject — a co-location claim wearing a coupling claim's words. It sourced neither the runner nor the library; its only contact with the sequenced library was a `bash` subprocess spawn whose stdout was diffed against a golden, a process boundary structurally identical to the spawns that already reached ported arms through the front-end. **That discriminator is this section's own**, worked here first for the AGENTS.md smoke below: a member that sources neither the runner nor the library is unblocked on its own ground, because a stated cause reaches only the members it names (gate-sdk/SPEC.md §Porting a gate to the binary substrate). The smoke declared the same section, sourced neither, and its own header called it a standalone validate suite, so it was unblocked and has since cut; the driver was released on the same test and has since cut too (below). **Releasing the driver released nothing else** at the time. `bin/always-loaded.sh` <!-- manifest-temporal-exempt: retirement record, names a shell file since removed --> (§The always-loaded meter) was a different section's owed file, correctly homed and takeable as a singleton on its own, and it has since cut too — its golden is the arm's parity oracle, held byte-for-byte over an unedited expectation file (below). **Nothing is owed to context-kit now**: the last two members left by deletion rather than by a port, and a later session may not quietly add one this section does not name. The roster's oracle is `bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree` rather than a count maintained here. **The floor predicate's golden retired with the shell holder it was the oracle for**, and the reason is worth keeping: it printed one line per (element, banner) pair so the closed verdict set, the spellings of an unconstrained member and the `uncomparable` fail-closed arm were asserted rather than assumed — of the *shell* holder alone. With one holder left those assertions are the crate's own unit tests, where a golden would be a second copy to drift; the audience axis, whose present, empty and omitted forms are each a case, is asserted there for the same reason. The arm registers as its own evidence-kit validate suite (`index_tests`, the `demo` precedent, read by exit code): the golden the refactor leans on now has an automated validate-stage consumer. The footprint emitter is advisory the same way, but its projection is gated rather than runner-tested: `check-footprint-fresh` byte-holds `docs/footprint.md` against `--emit`. `check-brevity`, `check-surface-ratchet`, `check-settings-pins`, `check-memory-off`, and `check-footprint-fresh` are gates and carry the standard fixture pair; the footprint `bad/` case drives the hermetic two-argument mode (`<projection> <emit>`), the `check-trajectory-fresh` precedent. Both memory-off pairs reach their subject differently, and the difference is the point: the settings-pins pair takes a `--fixture <dir>` injection (the check-identity precedent) reading `<dir>/settings.json` against `<dir>/settings-pins.conf`, while the memory-off pair drives `CONTEXT_KIT_MEMORY_DIRS` from its own case-dir config, because that member's fixture arm was deleted for being a code path its live arm never took. The direct unit tests beside the pairs hold the axes those pairs fix and so cannot express: `check-brevity.test.sh` holds the section-set resolution (the pair fixes `CONTEXT_KIT_BREVITY_SECTIONS` at the stock one-element default and always supplies a file carrying it, so neither case can express an element that resolves to nothing — exit 2, a broken machine rather than a clean tree — nor an unmatched element beside a resolved one, the empty set, a repeated element, a second section's non-bold bullet, or the retired scalar knob's refusal). The pair itself carries a non-bold bullet on each side, over budget with a pointer in `bad/` and within budget in `good/`. The memory-off local-override axis — an untracked `settings.local.json` that re-enables a pinned key past an empty dir — cannot be a good/bad pair (the pair fixes the dir axis), so `check-memory-off.test.sh` holds it. `check-settings-pins.test.sh` holds the **refusal** axis: the pair fixes the holds-vs-mismatch axis (exit 0 vs exit 1) alone, so a pin outside the documented path grammar — a jq filter, an iteration, a slice, an array literal — needs its own case to prove the refusal is exit 2, loud and naming the pin, the knob and the construct, never a silent clean verdict. `check-surface-ratchet.test.sh` holds its member's refusal axis on the same reading — an absent ceiling file and an unparsable row are each exit 2, which the pair's own well-formed file cannot express — plus the ignored stale row. Its sandbox is outside any git repository, so every case leaves `CONTEXT_KIT_RATCHET_PATHS` empty and the tracked-pathspec arm stays the pair's, whose cases run inside the repo and drive it from their own case-dir config (the memory-off pair's shape, and here it is what makes `git ls-files` resolve).
 
-`smoke/install.sh` copies the templates into the scratch consumer (config
-into the gates dir, hook wiring into the harness settings), runs the hook
-end-to-end asserting it exits zero (and, when queue-kit is co-vendored,
-emits the queue index — the installer assumes only gate-sdk, so the queue
-integration is exercised only alongside queue-kit), and runs
-`run-gates.sh --emit always-loaded --update-baseline` asserting the baseline
-file appears. It then exercises the ratchet's three states in order —
-`--ceiling` then clean, a grown surface then red, a second `--ceiling` then
-clean again (§The surface ratchet) — **unregistered, through `gate_command`, and
-disarmed again by deleting the ceiling file**. Registering it and leaving a
-ceiling standing would stamp a half-installed consumer: context-kit installs
-second, and every kit after it grows the agent file, so the stamp would be stale
-by construction before the green-battery assertion runs. Unregistered is the
-accounted state for it — the disposition is `on-surface`, so the registration
-accounting's own probe exempts it (gate-sdk/SPEC.md §Consumer smoke) and no
-`# smoke-unregistered:` reason is owed.
-It then drives `check-settings-pins` through its pass, violation and skip dispositions the same
-way — through `gate_command`, at the pins knob's default path — on a pin **derived** from the
-first `ident`-named, non-null key of the settings file the install just wrote, so the recipe
-asserts no particular key is pinnable. The pass is asserted on the clean line's pin count and
-not on exit 0, which the absent-pins skip shares. It restores the settings file and deletes the
-pins file before handing on, because a later co-vendored install merges into the settings file
-and would leave a standing pin on a value that install changed.
-`smoke/violation.sh` crafts an over-budget pointered bullet in the scratch
-consumer's brevity file and asserts the battery reddens via
-`check-brevity`. It inserts the bullet inside the first governed section rather than
-appending at end-of-file: a co-vendored kit may append a trailing section (the
-doctrine-kit installer adds one), and an EOF-appended bullet would land outside
-`check-brevity`'s scanned sections and silently disarm the smoke.
+`smoke/install.sh` copies the templates into the scratch consumer (config into the gates dir, hook wiring into the harness settings), runs the hook end-to-end asserting it exits zero (and, when queue-kit is co-vendored, emits the queue index — the installer assumes only gate-sdk, so the queue integration is exercised only alongside queue-kit), and runs `run-gates.sh --emit always-loaded --update-baseline` asserting the baseline file appears. It then exercises the ratchet's three states in order — `--ceiling` then clean, a grown surface then red, a second `--ceiling` then clean again (§The surface ratchet) — **unregistered, through `gate_command`, and disarmed again by deleting the ceiling file**. Registering it and leaving a ceiling standing would stamp a half-installed consumer: context-kit installs second, and every kit after it grows the agent file, so the stamp would be stale by construction before the green-battery assertion runs. Unregistered is the accounted state for it — the disposition is `on-surface`, so the registration accounting's own probe exempts it (gate-sdk/SPEC.md §Consumer smoke) and no `# smoke-unregistered:` reason is owed. It then drives `check-settings-pins` through its pass, violation and skip dispositions the same way — through `gate_command`, at the pins knob's default path — on a pin **derived** from the first `ident`-named, non-null key of the settings file the install just wrote, so the recipe asserts no particular key is pinnable. The pass is asserted on the clean line's pin count and not on exit 0, which the absent-pins skip shares. It restores the settings file and deletes the pins file before handing on, because a later co-vendored install merges into the settings file and would leave a standing pin on a value that install changed. `smoke/violation.sh` crafts an over-budget pointered bullet in the scratch consumer's brevity file and asserts the battery reddens via `check-brevity`. It inserts the bullet inside the first governed section rather than appending at end-of-file: a co-vendored kit may append a trailing section (the doctrine-kit installer adds one), and an EOF-appended bullet would land outside `check-brevity`'s scanned sections and silently disarm the smoke.
 
-Both of those scripts stay on the shell substrate permanently and carry
-`# no-port:` saying so. The disposition is not this section's to argue: it is the
-class ruling at gate-sdk/SPEC.md §Consumer smoke, *The port disposition*, which
-reaches them by its **ground** rather than by its scope — that ruling's
-stated-contract cut covers the recipes answering to §Consumer smoke, and these
-two answer here, but its legs 2 and 3 hold of them identically. The AGENTS.md
-smoke below was never a member of that class and is why the distinction is worth
-keeping: it is a standalone validate-suite driver, not an install or violation
-recipe, so neither leg reached it and it ported.
+Both of those scripts stay on the shell substrate permanently and carry `# no-port:` saying so. The disposition is not this section's to argue: it is the class ruling at gate-sdk/SPEC.md §Consumer smoke, *The port disposition*, which reaches them by its **ground** rather than by its scope — that ruling's stated-contract cut covers the recipes answering to §Consumer smoke, and these two answer here, but its legs 2 and 3 hold of them identically. The AGENTS.md smoke below was never a member of that class and is why the distinction is worth keeping: it is a standalone validate-suite driver, not an install or violation recipe, so neither leg reached it and it ported.
 
-The **AGENTS.md agent-file adapter smoke** is the exercise behind the
-Tier-two compatibility claim (docs/positioning.md §The tiered compatibility
-claim), and it is the `--agents-md-smoke` arm (gate-sdk/SPEC.md §The
-non-gate arm). It vendors a scratch consumer through the shared consumer-smoke
-mechanics (gate-sdk/SPEC.md §Consumer smoke), converts its agent file from
-`CLAUDE.md` to `AGENTS.md`, sets the agent-file knobs in the consumer's config
-seams (`GATE_SDK_AGENT_FILE`, `LIFECYCLE_KIT_AGENT_FILE`, `DOCTRINE_KIT_AGENT_FILE`,
-`CANON_KIT_MANIFEST_FILES`, `CONTEXT_KIT_SURFACES`, `CONTEXT_KIT_BREVITY_FILE`),
-then asserts the battery is green, `--emit always-loaded` and the footprint emitter
-measure the `AGENTS.md` surface, and `check-root-tiering`'s built-in allowlist accepts
-`AGENTS.md` at root while rejecting a stray second agent file. It is a standalone
-harness — not driven by `--run-consumer-smoke`, which asserts the kit defaults
-under zero config — and registers as its own evidence-kit validate suite
-(`agents_md_smoke`, the `demo` precedent).
+The **AGENTS.md agent-file adapter smoke** is the exercise behind the Tier-two compatibility claim (docs/positioning.md §The tiered compatibility claim), and it is the `--agents-md-smoke` arm (gate-sdk/SPEC.md §The non-gate arm). It vendors a scratch consumer through the shared consumer-smoke mechanics (gate-sdk/SPEC.md §Consumer smoke), converts its agent file from `CLAUDE.md` to `AGENTS.md`, sets the agent-file knobs in the consumer's config seams (`GATE_SDK_AGENT_FILE`, `LIFECYCLE_KIT_AGENT_FILE`, `DOCTRINE_KIT_AGENT_FILE`, `CANON_KIT_MANIFEST_FILES`, `CONTEXT_KIT_SURFACES`, `CONTEXT_KIT_BREVITY_FILE`), then asserts the battery is green, `--emit always-loaded` and the footprint emitter measure the `AGENTS.md` surface, and `check-root-tiering`'s built-in allowlist accepts `AGENTS.md` at root while rejecting a stray second agent file. It is a standalone harness — not driven by `--run-consumer-smoke`, which asserts the kit defaults under zero config — and registers as its own evidence-kit validate suite (`agents_md_smoke`, the `demo` precedent).
 
-**The member is an `Arm::Run` and an arm-table row.** The contract is a
-verdict — 0 with the clean line, 1 with a `FAIL — <reason>` line, 2 a
-precondition the harness could not meet — and an `Arm::Emit` could carry the
-report but not the verdict, which is what the validate suite reads through its
-`EVIDENCE_KIT_PARSER` setting (evidence-kit/SPEC.md §Layout and configuration
-owns the values). It is spelled `--agents-md-smoke` and not
-`--emit-agents-md-smoke` because the `--emit-` prefix is load-bearing for the
-emit family alone, `bin/run-gates.sh` composing it from an `--emit <name>`
-operand; a non-emitting `Arm::Run` is spelled directly, as `--upgrade-smoke`,
-`--run-validate` and `--scratch-run` already are. No front-end edit is owed
-either way.
+**The member is an `Arm::Run` and an arm-table row.** The contract is a verdict — 0 with the clean line, 1 with a `FAIL — <reason>` line, 2 a precondition the harness could not meet — and an `Arm::Emit` could carry the report but not the verdict, which is what the validate suite reads through its `EVIDENCE_KIT_PARSER` setting (evidence-kit/SPEC.md §Layout and configuration owns the values). It is spelled `--agents-md-smoke` and not `--emit-agents-md-smoke` because the `--emit-` prefix is load-bearing for the emit family alone, `bin/run-gates.sh` composing it from an `--emit <name>` operand; a non-emitting `Arm::Run` is spelled directly, as `--upgrade-smoke`, `--run-validate` and `--scratch-run` already are. No front-end edit is owed either way.
 
-**Its declared roster is `GATE_SDK_KIT_DIRS` and `GATE_SDK_NATIVE_BIN`, and it
-declares no `CONTEXT_KIT_` knob at all** — which is the point rather than an
-omission. The first is what tells the arm which kits to vendor and the second
-what the binary placement needs; every knob in the six-knob set above is
-**written into the scratch consumer's own config seams** and never resolved for
-the arm itself, because resolving one here would hand the arm this repo's posture
-in place of the one it is constructing.
+**Its declared roster is `GATE_SDK_KIT_DIRS` and `GATE_SDK_NATIVE_BIN`, and it declares no `CONTEXT_KIT_` knob at all** — which is the point rather than an omission. The first is what tells the arm which kits to vendor and the second what the binary placement needs; every knob in the six-knob set above is **written into the scratch consumer's own config seams** and never resolved for the arm itself, because resolving one here would hand the arm this repo's posture in place of the one it is constructing.
 
-**The vendoring calls gate-sdk's in-crate scratch-consumer builder**
-(gate-sdk/SPEC.md §Consumer smoke), in process, so the smoke holds no second copy
-of the build. One consequence is observable and is stated: the arm routes the
-installers' output to its stderr, keeping its stdout for the verdict lines.
+**The vendoring calls gate-sdk's in-crate scratch-consumer builder** (gate-sdk/SPEC.md §Consumer smoke), in process, so the smoke holds no second copy of the build. One consequence is observable and is stated: the arm routes the installers' output to its stderr, keeping its stdout for the verdict lines.
 
-**Everything after the vendoring is the arm's own, and the step a port most
-easily loses is the regeneration ordering.** Each kit's `install.sh` already
-wrote the hook and `CHECK-GRAPH.html`, but that write ran before
-`scripts/canon-config.knobs` existed, so the baked `# graph:` derivation used
-canon-kit's bare default rather than the `AGENTS.md`-widened manifest set. The
-arm regenerates both **under the same env the battery will run with** —
-`LIFECYCLE_KIT_AGENT_FILE` and `CANON_KIT_KNOB_FILE`, which ride the
-environment of every spawned battery run because the lifecycle knob is scalar
-with no default config file and canon resolves its manifest only through its
-knob file — or `check-graph` reds the AGENTS.md consumer on a hook stale by
-construction. A regeneration step the arm could not complete is exit 2, the
-harness-precondition code: it is the arm's own construction and not a finding
-about the consumer.
+**Everything after the vendoring is the arm's own, and the step a port most easily loses is the regeneration ordering.** Each kit's `install.sh` already wrote the hook and `CHECK-GRAPH.html`, but that write ran before `scripts/canon-config.knobs` existed, so the baked `# graph:` derivation used canon-kit's bare default rather than the `AGENTS.md`-widened manifest set. The arm regenerates both **under the same env the battery will run with** — `LIFECYCLE_KIT_AGENT_FILE` and `CANON_KIT_KNOB_FILE`, which ride the environment of every spawned battery run because the lifecycle knob is scalar with no default config file and canon resolves its manifest only through its knob file — or `check-graph` reds the AGENTS.md consumer on a hook stale by construction. A regeneration step the arm could not complete is exit 2, the harness-precondition code: it is the arm's own construction and not a finding about the consumer.
 
-**The one place the arm must not act for itself is the root-tiering dispatch.**
-`check-root-tiering`'s argv is resolved **once against the vendored tree**, whose
-knobs and binary are the consumer's, by a `bash -c` sourcing that tree's
-`lib/gate.sh` and calling `gate_command`; only then is it run from a separate
-orientation-clean repo. That resolution stays on the shell side for the same
-reason the vendoring does, and a literal `checks/<gate>.sh` path would name a
-substrate the port has moved. A dispatch that resolves to nothing is a `FAIL`
-rather than an argv the arm then tries to execute — the shell form's `mapfile`
-made that check vacuous, because an empty capture still yields one empty element.
+**The one place the arm must not act for itself is the root-tiering dispatch.** `check-root-tiering`'s argv is resolved **once against the vendored tree**, whose knobs and binary are the consumer's, by a `bash -c` sourcing that tree's `lib/gate.sh` and calling `gate_command`; only then is it run from a separate orientation-clean repo. That resolution stays on the shell side for the same reason the vendoring does, and a literal `checks/<gate>.sh` path would name a substrate the port has moved. A dispatch that resolves to nothing is a `FAIL` rather than an argv the arm then tries to execute — the shell form's `mapfile` made that check vacuous, because an empty capture still yields one empty element.
 
-**The scratch lifecycle is the arm's own control flow rather than a trap.** The
-shell form owned two scratch trees and one `trap … EXIT` that was **re-armed**
-partway through, so the second `trap` was what made the first tree's cleanup
-survive the second tree's creation — a shell idiom rather than a contract, and
-one a failure between the two arms could defeat. The arm cleans both trees on
-every exit path and `--keep` suppresses both, printing the scratch consumer's
-retained path as the shell form did; the orientation repo is retained beside it
-under `${TMPDIR}/agents-md-rt.*`, findable by name. `--keep` is an argument the
-rule itself consumes rather than a selector for where configuration comes from,
-so it survives the port as argv (gate-sdk/SPEC.md §The non-gate arm's
-distinguishing test), and the file's usage sentence moves to the arm's own
-refusal text.
+**The scratch lifecycle is the arm's own control flow rather than a trap.** The shell form owned two scratch trees and one `trap … EXIT` that was **re-armed** partway through, so the second `trap` was what made the first tree's cleanup survive the second tree's creation — a shell idiom rather than a contract, and one a failure between the two arms could defeat. The arm cleans both trees on every exit path and `--keep` suppresses both, printing the scratch consumer's retained path as the shell form did; the orientation repo is retained beside it under `${TMPDIR}/agents-md-rt.*`, findable by name. `--keep` is an argument the rule itself consumes rather than a selector for where configuration comes from, so it survives the port as argv (gate-sdk/SPEC.md §The non-gate arm's distinguishing test), and the file's usage sentence moves to the arm's own refusal text.
 
-The **expected-output runner** above is the section's other `Arm::Run`, spelled
-`--run-index-tests`, and the two dispositions sit together because the second was
-decided against the first. Its contract is a **verdict** — 0 with the clean
-summary line, 1 with the failing-check report, 2 on a harness error (no golden, a
-tool that exited non-zero) — which the `index_tests` validate suite reads by exit
-code, so an `Arm::Emit` could carry the report but not the verdict. The variant
-fixes the spelling: an `Arm::Run` is a bare flag, the `--emit-` prefix being
-load-bearing for the emit family alone (gate-sdk/SPEC.md §The non-gate arm's
-correlation rule). `--update` is an argument the rule itself consumes rather than
-a selector for where configuration comes from, so it survives as argv on
-`--keep`'s precedent, and the file's `usage:` line moves to the arm's own refusal
-text — where, unlike the shell form's `$1` read, an unrecognised word is a
-refusal rather than silently ignored.
+The **expected-output runner** above is the section's other `Arm::Run`, spelled `--run-index-tests`, and the two dispositions sit together because the second was decided against the first. Its contract is a **verdict** — 0 with the clean summary line, 1 with the failing-check report, 2 on a harness error (no golden, a tool that exited non-zero) — which the `index_tests` validate suite reads by exit code, so an `Arm::Emit` could carry the report but not the verdict. The variant fixes the spelling: an `Arm::Run` is a bare flag, the `--emit-` prefix being load-bearing for the emit family alone (gate-sdk/SPEC.md §The non-gate arm's correlation rule). `--update` is an argument the rule itself consumes rather than a selector for where configuration comes from, so it survives as argv on `--keep`'s precedent, and the file's `usage:` line moves to the arm's own refusal text — where, unlike the shell form's `$1` read, an unrecognised word is a refusal rather than silently ignored.
 
-**The arm keeps spawning the front-end, and that is the property the port must
-not lose.** Each check reaches its arm through `bash gate-sdk/bin/run-gates.sh
---emit <name>` rather than through the binary, for the reason stated above; the
-compiled arm therefore spawns `bash` per check and nothing else, and it resolves
-the front-end and the fixture corpus out of the transported kit roots because a
-compiled member has no `BASH_SOURCE` anchor. It places the child in the host
-checkout, the front-end refusing outside a git repository — a condition the shell
-form met only by being run from the root.
+**The arm keeps spawning the front-end, and that is the property the port must not lose.** Each check reaches its arm through `bash gate-sdk/bin/run-gates.sh --emit <name>` rather than through the binary, for the reason stated above; the compiled arm therefore spawns `bash` per check and nothing else, and it resolves the front-end and the fixture corpus out of the transported kit roots because a compiled member has no `BASH_SOURCE` anchor. It places the child in the host checkout, the front-end refusing outside a git repository — a condition the shell form met only by being run from the root.
 
-**The goldens were the port's acceptance oracle and no expectation file was
-edited by the cut.** The shell form's stdout and exit status were captured at the
-commit before its deletion, across the bare arm and `--update`, and both diffed
-byte-for-byte against the compiled arm's. An edited golden would have converted
-the parity oracle into an assertion about the new implementation, which is the
-one way this port could have passed while destroying the thing it ported.
+**The goldens were the port's acceptance oracle and no expectation file was edited by the cut.** The shell form's stdout and exit status were captured at the commit before its deletion, across the bare arm and `--update`, and both diffed byte-for-byte against the compiled arm's. An edited golden would have converted the parity oracle into an assertion about the new implementation, which is the one way this port could have passed while destroying the thing it ported.
 
-**Three sub-behaviours no golden holds each assert in the arm**, named because a
-port loses these first. The **consumer-shadowing case** writes its scratch
-`rust.sh` to disk and passes `CONTEXT_KIT_KNOB_FILE` into a *spawned* child —
-resolving that knob for the arm itself would hand it this repo's posture instead
-of the one it is constructing, the rule this section already states for the
-AGENTS.md smoke's six-knob set. The **refusal case** asserts exit 2, the usage
-block on **stderr**, and **nothing on stdout** for an unrecognised meter mode;
-the assertion is the exit status and the stream, so it lives in the arm rather
-than in an expectation file, and one spawn answers what the shell form needed two
-for. `norm()`'s **path rewrite** folds an absolute corpus path to the corpus-relative
-one; losing it makes every golden hold an absolute path and the suite passes only
-on the machine that last ran `--update`.
+**Three sub-behaviours no golden holds each assert in the arm**, named because a port loses these first. The **consumer-shadowing case** writes its scratch `rust.sh` to disk and passes `CONTEXT_KIT_KNOB_FILE` into a *spawned* child — resolving that knob for the arm itself would hand it this repo's posture instead of the one it is constructing, the rule this section already states for the AGENTS.md smoke's six-knob set. The **refusal case** asserts exit 2, the usage block on **stderr**, and **nothing on stdout** for an unrecognised meter mode; the assertion is the exit status and the stream, so it lives in the arm rather than in an expectation file, and one spawn answers what the shell form needed two for. `norm()`'s **path rewrite** folds an absolute corpus path to the corpus-relative one; losing it makes every golden hold an absolute path and the suite passes only on the machine that last ran `--update`.
 
-**Its scratch lifecycle is control flow rather than a trap**, and here the port
-repairs a window rather than transcribing one: the shell form armed its single
-`trap … EXIT` *after* the shadow dir and config were created and used, so a
-failure in between leaked them. The arm removes one scratch root on every exit
-path. Its declared roster is `GATE_SDK_KIT_DIRS` and no `CONTEXT_KIT_` knob at
-all, for the same reason the smoke above declares none.
+**Its scratch lifecycle is control flow rather than a trap**, and here the port repairs a window rather than transcribing one: the shell form armed its single `trap … EXIT` *after* the shadow dir and config were created and used, so a failure in between leaked them. The arm removes one scratch root on every exit path. Its declared roster is `GATE_SDK_KIT_DIRS` and no `CONTEXT_KIT_` knob at all, for the same reason the smoke above declares none.
 
 ## Out of scope
 
-Product-shaped indexes — a `proto-index` over a proto layout, a
-`diagram-index` over architecture HTML — are consumer surfaces; a consumer
-names its own extra indexes in the hook template's footer. `check-md-refs`
-(an orientation-doc roster is rule content; the link-resolution mechanism is
-unclaimed, not this kit's) and `check-md-sections` (a required-heading map is
-rule content, and the queue surface it guards is already gated by queue-kit).
-A close-stage harvest pipeline (`[pub]` lessons, publication paths) is
-product workflow, not context mechanism. The drift report itself is
-drift-kit's surface — only the always-loaded meter lives here. A consumer's
-session-context content — its delegation nudge wording, component roster,
-and extra index commands — stays in its own copied hook. Memory **content**
-is out of scope by construction: the memory-off gates govern presence (the
-dir stays empty) and pins (the disabling keys hold), never a live session's
-context, which is not a scannable surface — a session polluted mid-flight is
-caught by the tree the gates hold, not by reading the session.
+Product-shaped indexes — a `proto-index` over a proto layout, a `diagram-index` over architecture HTML — are consumer surfaces; a consumer names its own extra indexes in the hook template's footer. `check-md-refs` (an orientation-doc roster is rule content; the link-resolution mechanism is unclaimed, not this kit's) and `check-md-sections` (a required-heading map is rule content, and the queue surface it guards is already gated by queue-kit). A close-stage harvest pipeline (`[pub]` lessons, publication paths) is product workflow, not context mechanism. The drift report itself is drift-kit's surface — only the always-loaded meter lives here. A consumer's session-context content — its delegation nudge wording, component roster, and extra index commands — stays in its own copied hook. Memory **content** is out of scope by construction: the memory-off gates govern presence (the dir stays empty) and pins (the disabling keys hold), never a live session's context, which is not a scannable surface — a session polluted mid-flight is caught by the tree the gates hold, not by reading the session.

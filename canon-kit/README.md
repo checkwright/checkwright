@@ -1,33 +1,16 @@
 # canon-kit
 
-Spec discipline for agent-authored components: one canonical spec per component,
-deltas as short-lived amendment files, and a star topology across the prose
-surfaces — every fact has exactly one owning surface, and every other surface
-*cites* it rather than restating it. Gates hold the copy-shaped failure
-modes; the irreducibly semantic judgment stays a review tripwire, not a gate.
+Spec discipline for agent-authored components: one canonical spec per component, deltas as short-lived amendment files, and a star topology across the prose surfaces — every fact has exactly one owning surface, and every other surface *cites* it rather than restating it. Gates hold the copy-shaped failure modes; the irreducibly semantic judgment stays a review tripwire, not a gate.
 
-Why: when a coding agent authors the specs, design rationale gets re-derived
-under build pressure unless it is captured up front, and a parallel copy of any
-gated fact is an un-gateable second source that drifts silently. The remedy is a
-lifecycle (amendments authored up front, merged and deleted at build) plus gates
-over the mechanically-decidable copy failures — a doubled Definition-of-Done, a
-banned-heading code dump, a fenced block that verbatim-copies a source file, a
-glossary definition restated on another surface, a feature task with no
-amendment. See [SPEC.md](SPEC.md) for the full contracts.
+Why: when a coding agent authors the specs, design rationale gets re-derived under build pressure unless it is captured up front, and a parallel copy of any gated fact is an un-gateable second source that drifts silently. The remedy is a lifecycle (amendments authored up front, merged and deleted at build) plus gates over the mechanically-decidable copy failures — a doubled Definition-of-Done, a banned-heading code dump, a fenced block that verbatim-copies a source file, a glossary definition restated on another surface, a feature task with no amendment. See [SPEC.md](SPEC.md) for the full contracts.
 
-An installer-vendored tree does not carry this file. The payload withholds each
-kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is
-repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is
-packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer
-payload).
+An installer-vendored tree does not carry this file. The payload withholds each kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
 
 ## Install
 
-Vendor the kit beside [gate-sdk](../gate-sdk/) (required); the queue-facing gate
-reads the tag syntax [queue-kit](../queue-kit/) defines.
+Vendor the kit beside [gate-sdk](../gate-sdk/) (required); the queue-facing gate reads the tag syntax [queue-kit](../queue-kit/) defines.
 
-1. Register the gates — add to your `gates.list`, **each where its surface
-   exists**:
+1. Register the gates — add to your `gates.list`, **each where its surface exists**:
 
    <!-- gate-roster:begin -->
    ```
@@ -64,30 +47,15 @@ reads the tag syntax [queue-kit](../queue-kit/) defines.
    check-deprecation-task       # needs a deprecation-marker vocabulary
    ```
 
-   They resolve through gate-sdk's registry path (your gates dir first, then
-   each kit's `checks/`), and their `# graph:` manifests put the precommit-tier
-   ones in the generated hook, which `--emit git-hooks --write` on the gate
-   binary `GATE_SDK_NATIVE_BIN` names writes.
+   They resolve through gate-sdk's registry path (your gates dir first, then each kit's `checks/`), and their `# graph:` manifests put the precommit-tier ones in the generated hook, which `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names writes.
 
-2. Adopt the amendment lifecycle — copy `templates/SPEC-amendment.md` when a
-   designed-but-unimplemented change needs a home. Name it after the feature
-   (`SPEC-<feature>.md`), place it in the owning component's directory (a
-   governance ruling with no component lives at the repo root), and pair it with
-   a queue entry tagged `[spec: SPEC-<feature>.md]`. Merge it into the canonical
-   spec and delete it when the work completes.
+2. Adopt the amendment lifecycle — copy `templates/SPEC-amendment.md` when a designed-but-unimplemented change needs a home. Name it after the feature (`SPEC-<feature>.md`), place it in the owning component's directory (a governance ruling with no component lives at the repo root), and pair it with a queue entry tagged `[spec: SPEC-<feature>.md]`. Merge it into the canonical spec and delete it when the work completes.
 
-3. Optional — reshape the config: copy `templates/canon-config.knobs` into your
-   gates dir and override the manifest set, the spec/amendment names, section
-   set, the Definition-of-Done mode (`exactly-one` / `at-most-one`), the banned-heading
-   set and density budget, the embedded-source language map, or the glossary
-   surface list. Defaults are this repo's layout.
+3. Optional — reshape the config: copy `templates/canon-config.knobs` into your gates dir and override the manifest set, the spec/amendment names, section set, the Definition-of-Done mode (`exactly-one` / `at-most-one`), the banned-heading set and density budget, the embedded-source language map, or the glossary surface list. Defaults are this repo's layout.
 
 ## Use
 
-The lifecycle is prose discipline the gates enforce; there is no runtime tool.
-Author a spec so it (1) owns semantics, (2) names every contract and couples it
-to code by a gate, and (3) never copies a structural definition — reference the
-code instead. Author amendments up front; merge and delete them at build.
+The lifecycle is prose discipline the gates enforce; there is no runtime tool. Author a spec so it (1) owns semantics, (2) names every contract and couples it to code by a gate, and (3) never copies a structural definition — reference the code instead. Author amendments up front; merge and delete them at build.
 
 ## Test
 

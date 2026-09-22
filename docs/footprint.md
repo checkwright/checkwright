@@ -26,16 +26,16 @@ The figures are kit-share only — what a kit itself ships. A consumer's own bin
 
 | kit | always-loaded | load-triggered |
 | --- | --- | --- |
-| canon-kit | — | 5785cp · ~1548t |
-| context-kit | — | 2351cp · ~610t |
-| delegation-kit | — | 40057cp · ~10331t |
+| canon-kit | — | 5785cp · ~1531t |
+| context-kit | — | 2351cp · ~594t |
+| delegation-kit | — | 40057cp · ~10087t |
 | doctrine-kit | 1624cp · ~413t | — |
-| drift-kit | — | 6368cp · ~1646t |
+| drift-kit | — | 6368cp · ~1610t |
 | evidence-kit | — | — |
 | gate-sdk | — | — |
-| guard-kit | — | 4243cp · ~1120t |
+| guard-kit | — | 4243cp · ~1076t |
 | installer | — | — |
-| lifecycle-kit | 301cp · ~76t | 113335cp · ~28875t |
+| lifecycle-kit | 301cp · ~76t | 113335cp · ~28587t |
 | queue-kit | — | 1781cp · ~464t |
 | site-kit | — | — |
-| **total** | 1925cp · ~489t | 173920cp · ~44597t |
+| **total** | 1925cp · ~489t | 173920cp · ~43950t |

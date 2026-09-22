@@ -1,125 +1,29 @@
-The `build` (implementation) stage of an iteration. Implement the queued work
-in queue order. Exit condition: task queue empty for this iteration.
+The `build` (implementation) stage of an iteration. Implement the queued work in queue order. Exit condition: task queue empty for this iteration.
 
-Build is **mandatory every iteration** and processes **both feature and debt
-units**: it merges a promoted feature's amendment into the canonical spec and
-makes a debt unit's direct edits (a debt unit skips the authoring stage
-entirely), and it **owns the task-completion Done move** for either kind. The
-authoring stage authors amendments only — it makes no direct spec/code edit and
-moves nothing to Done.
+Build is **mandatory every iteration** and processes **both feature and debt units**: it merges a promoted feature's amendment into the canonical spec and makes a debt unit's direct edits (a debt unit skips the authoring stage entirely), and it **owns the task-completion Done move** for either kind. The authoring stage authors amendments only — it makes no direct spec/code edit and moves nothing to Done.
 
-**Step 0 — audit-readiness recheck (before the stamp).** The
-entry stamp re-fires the state-coupled gates but **not** your
-spec-consistency battery (it couples the spec corpus, not the evidence file), so a
-build session can enter on an unverified align corpus. Close that hop:
-**iff** an `align` stamp for the current iteration exists in
-`.workflow/WORKFLOW-STATE.txt`, run *<consistency-gate: your aggregate
-consistency gate>* and refuse to stamp if it is red — fix the drift first (or return to
-`align`). Absent an align stamp, align did not run this iteration; build's
-prior stage is scope, whose exit the entry already re-fires — **except** when
-`check-stage-entry` assertion C fires: a cross-component amendment signal with
-no align stamp blocks the entry until the iteration carries either an align
-stamp or an explicit `<iter> align-waived <session> <date> <head>` waiver line,
-written **only on the user's explicit ruling** — never self-issued by this
-entering session.
+**Step 0 — audit-readiness recheck (before the stamp).** The entry stamp re-fires the state-coupled gates but **not** your spec-consistency battery (it couples the spec corpus, not the evidence file), so a build session can enter on an unverified align corpus. Close that hop: **iff** an `align` stamp for the current iteration exists in `.workflow/WORKFLOW-STATE.txt`, run *<consistency-gate: your aggregate consistency gate>* and refuse to stamp if it is red — fix the drift first (or return to `align`). Absent an align stamp, align did not run this iteration; build's prior stage is scope, whose exit the entry already re-fires — **except** when `check-stage-entry` assertion C fires: a cross-component amendment signal with no align stamp blocks the entry until the iteration carries either an align stamp or an explicit `<iter> align-waived <session> <date> <head>` waiver line, written **only on the user's explicit ruling** — never self-issued by this entering session.
 
-**First step — stamp evidence.** Run the lifecycle arm
-`--enter-stage build` on the gate binary `GATE_SDK_NATIVE_BIN` names: it appends `<iteration> build <session-id> <date> <head>`
-to `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the
-stamp proves invocation, not faithful execution), reading `<session-id>` from
-the `--emit-session-id` arm
-(the newest transcript — never hand-picked), using `date +%F`, and refusing
-(writing nothing) if `check-stage-entry` is red. On a refusal, **do not force
-the entry** — escalate to the lead (where one exists and this is not a standalone
-session) and stop; a refused entry is a gate verdict to resolve at its source,
-never to override. That stamp *is* the
-transition — the last stamp is the stage cursor, so nothing flips and no queue
-write is involved. Commit the stamp on its own — unless the
-pre-flight valve admitted this entry, which rewrites the valve ledger in the
-same motion, so the two commit together (lifecycle-kit/SPEC.md
-§bin/enter-stage.sh).
+**First step — stamp evidence.** Run the lifecycle arm `--enter-stage build` on the gate binary `GATE_SDK_NATIVE_BIN` names: it appends `<iteration> build <session-id> <date> <head>` to `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp proves invocation, not faithful execution), reading `<session-id>` from the `--emit-session-id` arm (the newest transcript — never hand-picked), using `date +%F`, and refusing (writing nothing) if `check-stage-entry` is red. On a refusal, **do not force the entry** — escalate to the lead (where one exists and this is not a standalone session) and stop; a refused entry is a gate verdict to resolve at its source, never to override. That stamp *is* the transition — the last stamp is the stage cursor, so nothing flips and no queue write is involved. Commit the stamp on its own — unless the pre-flight valve admitted this entry, which rewrites the valve ledger in the same motion, so the two commit together (lifecycle-kit/SPEC.md §bin/enter-stage.sh).
 
-Build runs one fresh session per task. Prefer
-a session reset at a task boundary; reach for mid-task summarization only as
-a fallback before a commit, never as the routine per-task reset.
+Build runs one fresh session per task. Prefer a session reset at a task boundary; reach for mid-task summarization only as a fallback before a commit, never as the routine per-task reset.
 
-**Every session still stamps** — re-run `--enter-stage build` on the gate binary `GATE_SDK_NATIVE_BIN` names each
-session: it appends a fresh `<iter> build <session-id> <date> <head>` line with this
-session's id, so WORKFLOW-STATE keeps the per-session audit trail
-(`check-stage-evidence` tolerates multiple `build` stamps). The entry is also
-where this session's journal path comes from; there is no other source. A sibling stamp
-naming `build` leaves the cursor where it already is, so there is no
-once-per-stage write to coordinate — only a re-run within one session that
-already stamped is reported as an idempotent no-op. Prefer committing the new
-stamp standalone when the task will land as several commits, so the evidence
-is durable rather than sitting uncommitted across a long session.
+**Every session still stamps** — re-run `--enter-stage build` on the gate binary `GATE_SDK_NATIVE_BIN` names each session: it appends a fresh `<iter> build <session-id> <date> <head>` line with this session's id, so WORKFLOW-STATE keeps the per-session audit trail (`check-stage-evidence` tolerates multiple `build` stamps). The entry is also where this session's journal path comes from; there is no other source. A sibling stamp naming `build` leaves the cursor where it already is, so there is no once-per-stage write to coordinate — only a re-run within one session that already stamped is reported as an idempotent no-op. Prefer committing the new stamp standalone when the task will land as several commits, so the evidence is durable rather than sitting uncommitted across a long session.
 
 ## Session ritual
 
-*<ritual: your build ritual: pick the first unblocked task; read the spec for
-every component the task touches and merge its amendments into the canonical
-spec on completion; implement exactly what the spec describes — no features
-beyond it; write tests as you go; present a plan for approval before code where
-your process requires it; name your amendment-merge procedure owner and the
-queue-entry grammar the task-completion move writes against.>*
+*<ritual: your build ritual: pick the first unblocked task; read the spec for every component the task touches and merge its amendments into the canonical spec on completion; implement exactly what the spec describes — no features beyond it; write tests as you go; present a plan for approval before code where your process requires it; name your amendment-merge procedure owner and the queue-entry grammar the task-completion move writes against.>*
 
-Build-time question triage — who rules, and where the ruling lives: a
-question *within the amendment's envelope* (calibration, mechanics) is ruled
-in-session and written into the spec text being merged — a ruling that lives
-only in conversation evaporates. A *change to the envelope* (narrowing or
-widening asserted behavior, user-facing semantics) stops and surfaces to the
-user — never pick a "conservative alternative" silently. A *cross-component
-causal gap* is not a TODO: stop, resolve it this session, update the spec.
+Build-time question triage — who rules, and where the ruling lives: a question *within the amendment's envelope* (calibration, mechanics) is ruled in-session and written into the spec text being merged — a ruling that lives only in conversation evaporates. A *change to the envelope* (narrowing or widening asserted behavior, user-facing semantics) stops and surfaces to the user — never pick a "conservative alternative" silently. A *cross-component causal gap* is not a TODO: stop, resolve it this session, update the spec.
 
-**Instruction-surface edits carry the instruction only.** Grounds → the
-mechanism's owning section, same commit; history → the commit message
-(doctrine-kit/DOCTRINE.md, Content-tiering / SSOT).
+**Instruction-surface edits carry the instruction only.** Grounds → the mechanism's owning section, same commit; history → the commit message (doctrine-kit/DOCTRINE.md, Content-tiering / SSOT).
 
-**Don't re-buy the roster the stage before you already bought.** Where
-implementing a task sends you across a corpus — every call site of a helper,
-every spec citing a name — read the survey record first: a block whose heading
-answers your question, whose corpus is unmoved since its recorded rev and whose
-oracle still returns the same verdict, is cited rather than re-surveyed, and one
-whose witness fails narrows the dispatch to what moved. File the surveys you buy
-(lifecycle-kit/SPEC.md §The survey record).
+**Don't re-buy the roster the stage before you already bought.** Where implementing a task sends you across a corpus — every call site of a helper, every spec citing a name — read the survey record first: a block whose heading answers your question, whose corpus is unmoved since its recorded rev and whose oracle still returns the same verdict, is cited rather than re-surveyed, and one whose witness fails narrows the dispatch to what moved. File the surveys you buy (lifecycle-kit/SPEC.md §The survey record).
 
-**An amendment's roster is a floor, never the reach.** Before the merge counts as
-complete, re-derive every roster it carries (update targets, callers, readers)
-against the tree. Grep each name the change moves or retires over the tracked tree without
-silencing stderr. Ask what consumes the changed behaviour without spelling any of
-those names. Then run the battery and the touched kit's fixture suite. Land every
-site the roster missed in the same unit as in-envelope work, and name the missed
-sites in the commit message. Decline a rostered target only when the surface
-already says what its citing delta needs from it, naming in the commit message the
-target, that need and the passage that already meets it. A surface lacking what
-the delta needs, a missing passage included, is a missed site you land in this
-unit. Never write an edit a met need does not call for, nor drop a target silently.
+**An amendment's roster is a floor, never the reach.** Before the merge counts as complete, re-derive every roster it carries (update targets, callers, readers) against the tree. Grep each name the change moves or retires over the tracked tree without silencing stderr. Ask what consumes the changed behaviour without spelling any of those names. Then run the battery and the touched kit's fixture suite. Land every site the roster missed in the same unit as in-envelope work, and name the missed sites in the commit message. Decline a rostered target only when the surface already says what its citing delta needs from it, naming in the commit message the target, that need and the passage that already meets it. A surface lacking what the delta needs, a missing passage included, is a missed site you land in this unit. Never write an edit a met need does not call for, nor drop a target silently.
 
-**Declare what a vendoring consumer will meet, in the unit that lands it.** A unit
-that lands or tightens a gate, renames or removes a knob, or removes a kit tool
-or changes what a kit script, template or default does appends one bullet to the matching section of
-the release declaration surface, `<workflow-dir>/release-declarations.md`
-(gate-sdk/SPEC.md §upgrade-smoke), in the same commit, written as the release
-note's bullet: the lead token that section takes, then what moved and what the
-consumer must do. The surface accumulates across the iterations batched into one
-release; the release step composes the note from it and drains it at the tag, so
-nothing here loads the release runbook. Only what ships inside a kit is declared.
+**Declare what a vendoring consumer will meet, in the unit that lands it.** A unit that lands or tightens a gate, renames or removes a knob, or removes a kit tool or changes what a kit script, template or default does appends one bullet to the matching section of the release declaration surface, `<workflow-dir>/release-declarations.md` (gate-sdk/SPEC.md §upgrade-smoke), in the same commit, written as the release note's bullet: the lead token that section takes, then what moved and what the consumer must do. The surface accumulates across the iterations batched into one release; the release step composes the note from it and drains it at the tag, so nothing here loads the release runbook. Only what ships inside a kit is declared.
 
-**Run the system; don't reason about it** — when a running system is
-reachable, reproduce first, read second. Recorded evidence rots: a static
-trace in a task body is a dated hypothesis to re-verify, not a premise. An
-amendment passage or active queue entry marked `**Inferred, cannot run before build:**` is run as
-soon as its subject exists, before the delta resting on it lands, and the
-merge carries what it returned. A change carrying an artifact surface — a change whose real output is a deployed
-or generated artifact — names that surface and exercises the artifact
-deployment-faithfully before the stage exits; a green battery is tree-correct,
-not artifact-correct (Oracle-first). An entry carrying `[observed-by:]` is
-complete only when its run is read: after its landing commit, run close's push
-precondition, push, wait in-turn for the run, and read it before the Done move
-(lifecycle-kit/SPEC.md §The state machine).
+**Run the system; don't reason about it** — when a running system is reachable, reproduce first, read second. Recorded evidence rots: a static trace in a task body is a dated hypothesis to re-verify, not a premise. An amendment passage or active queue entry marked `**Inferred, cannot run before build:**` is run as soon as its subject exists, before the delta resting on it lands, and the merge carries what it returned. A change carrying an artifact surface — a change whose real output is a deployed or generated artifact — names that surface and exercises the artifact deployment-faithfully before the stage exits; a green battery is tree-correct, not artifact-correct (Oracle-first). An entry carrying `[observed-by:]` is complete only when its run is read: after its landing commit, run close's push precondition, push, wait in-turn for the run, and read it before the Done move (lifecycle-kit/SPEC.md §The state machine).
 
-**Last step — the resume journal.** This stage's exit artifact is the resume
-journal the `--enter-stage` arm named at the stamp; its path is a derivation
-(lifecycle-kit/SPEC.md §The state machine) and its contract is
-delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps.
-Append `DONE` as the file's last line before you report.
+**Last step — the resume journal.** This stage's exit artifact is the resume journal the `--enter-stage` arm named at the stamp; its path is a derivation (lifecycle-kit/SPEC.md §The state machine) and its contract is delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps. Append `DONE` as the file's last line before you report.

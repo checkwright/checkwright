@@ -37,10 +37,10 @@ pub fn registration_block() -> Result<String, String> {
     let queue = walk::knob_scalar("LIFECYCLE_KIT_QUEUE_FILE")?;
     let roster: Vec<String> = stages()?.iter().map(|s| format!("`/{}`", s)).collect();
     Ok(format!(
-        "The repo runs lifecycle-kit's iteration state machine on `{}` — one\n\
-         stage session per stage, each invoking its skill:\n\
-         {}.\n\
-         The state machine, its stamp protocol, and the per-stage contracts:\n\
+        "The repo runs lifecycle-kit's iteration state machine on `{}` — one \
+         stage session per stage, each invoking its skill: \
+         {}. \
+         The state machine, its stamp protocol, and the per-stage contracts: \
          [lifecycle-kit/SPEC.md](lifecycle-kit/SPEC.md).",
         queue,
         roster.join(" ")
