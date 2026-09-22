@@ -8,6 +8,108 @@
 
 ## New Features
 
+### scope-supersession-unchecked
+
+[spec: SPEC-supersession.md]
+
+scope aggregates explicit inbound citations (converge, subsume, block; lifecycle-kit/templates/stages/scope.md), but it has no semantic test for when one Deferred entry makes another obsolete even though neither cites the other. A tactical entry therefore gets ranked as work when a strategic sibling would moot it. Live instance: queue-kit-unwrap's scope recommended three line-cap fixes and left `markdown-hard-wrap-unowned-and-ungated`, which mooted them, to its own iteration. The operator reversed that choice.
+
+**Ruled at spec (2026-09-22):** a supersession pass over the ranking's shortlist, keyed on the names each candidate's deliverable edits rather than on citations, ruling each pairing mooted, reshaped or independent in a `Supersession:` line beside the `Composition:` line; the lead's presence check reads both. A pool-wide pass was refused on cost, with the close moot sweep and the pool triage as backstops.
+
+**Operator exception to the enhancement admission filter** (2026-09-22 scope, lead-relayed), because the operator already reversed a misranking this gap caused. Admitted to `stage-contract-drain`, for /spec to author and promote.
+
+**Cost while deferred:** every scope can rank tactical work that is already mooted. Filed 2026-09-22 to the gap inbox by the lead as an operator direction. Promoted at close because →fix would change the scope contract, which is a spec amendment. Owner lookup ran over `supersed`, `obsolete`, `subsume` and `strategic` in scope.md and found no owner.
+
+### build-work-before-entry-stamp
+
+[spec: SPEC-dispatch-entry.md] [recurrence: 2026-09-22]
+
+a stage session can land its work commits before running its own `--enter-stage`, and nothing reds it: `check-stage-evidence` catches a stamp committed after the work it preceded, never work preceding the stamp, and a same-stage re-entry finds the cursor already on its stage. Measured 2026-09-22 by `git log`: canon-gate-precision's second build session merged two amendments, then stamped at the second merge's head. The first instance, one iteration earlier and also on the cheaper tier, was discarded at scope because §check-stage-evidence states the limit; the recurrence shows that stating the limit did not stop it.
+
+**Operator exception to the enhancement admission filter** (2026-09-22 scope, lead-relayed), because the recurrence is judged. Admitted to `stage-contract-drain`, for /spec to author and promote.
+
+**Ruled at spec (2026-09-22):** the oracle, tied to the dispatch rather than the session. The lead declares each stage session with `--enter-stage --dispatch <stage>`, a scratch marker line the session's stamp removes, and a new commit-msg gate `check-dispatch-entry` reds a commit adding no stamp while a line stands. The stamp-first line was refused because every stage template already carries it and both recurrences ran with it in context. A commit-time session-id tie was refused: committing workers of a stage session and the boundary skills never stamp, so it false-fires on sanctioned work. Lifecycle-kit alone; no delegation-kit surface changes.
+
+**Cost while deferred:** the stamp's recorded head postdates the stage's work, so the stamp misplaces where that session's work began. Filed 2026-09-22 to the gap inbox by the canon-gate-precision lead as a recurrence judgment; promoted at its close because →fix needs a new oracle or a dispatch-path ruling. Owner lookup ran over `stamp` and `newly introduced` in lifecycle-kit/SPEC.md; §check-stage-evidence owns the assertion and its limit.
+
+### lead-no-change-decision-has-no-landing-site
+
+[spec: SPEC-no-change-landing.md]
+
+a lead decision whose content is "make no change" is invisible to every later stage, because the landing rule presupposes a ruling with something to write.
+
+**Attested once:** a scope escalated whether a recurrence date was owed; the lead declined it and told scope nothing further was owed, on the ground that scope's gap bullet carried the grounds. That bullet recorded the question as escalated and unresolved, so close re-derived the judgment from the owner doc three stages later. Same disposition, one re-derivation — but the opposite call would have tripped the recurrence threshold and forced an entry into a unit set, a queue change only the lead may rule. lifecycle-kit/templates/lead.md already calls the message thread transport and already requires a ruling whose acting session is not imminent to be filed durably; both clauses assume an act that writes something.
+
+**Ruled at spec (2026-09-22):** the landing rule. A no-change answer is landed like any other, on the surface that recorded the question, and a question held in the gap inbox takes a resolution bullet naming it, the inbox being append-only; the lead relays such an answer as one to be landed. The lead-assertion rule was refused as the fix: a lead that says nothing leaves the same open record.
+
+**Operator exception to the enhancement admission filter** (operator direction 2026-09-22, lead-relayed): the operator selected set B directly in the lead session, and it carries this lead-protocol rule; the filter's hold is lifted.
+
+**Cost while deferred:** the next no-change ruling on a threshold-bearing question is re-derived by a session that may not rule it.
+
+**DISTINCT from [record-stamp-encoding-compression](#record-stamp-encoding-compression) and `precondition-gate-direction-blindness`**, the entries the instance happened on; this is the lead protocol's landing rule. Filed 2026-09-20 to the gap inbox by the lead of `adopter-floor-door-remainder`; promoted at the 2026-09-21 scope intake, a late record that says so. Owner lookup ran over `no-change`, `landing site`, `lead decision` and `transport` and found no owner.
+
+### delta-instruction-batch-dependence-unmarked
+
+[spec: SPEC-batch-conditional-delta.md]
+
+a spec amendment can state a delta instruction in the unconditional voice when its satisfying act depends on which units share the build BATCH, and the grammar has no way to say so.
+
+**Attested twice in one iteration, both door amendments:** each carried "exactly two of the 59 door sites are adopter-facing and are deliberately left red, being the paired debt entry's deliverable" — true only of a batch EXCLUDING that debt unit. The lead batched the debt unit IN on a producer/consumer read, at which point the correct act was to REPAIR those two sites.
+
+**Measured, not projected:** the dispatched session reported it would have left them red on the amendment's letter, and only an explicit prompt-side inversion by the lead prevented it — which is prompt-side and dies with the lead. A later session reading the merged amendment alone reaches the wrong act and calls it correct.
+
+**Ruled at spec (2026-09-22):** the authoring rule. A delta whose act depends on a named sibling landing in the same batch states the act for each case; the spec-stage check was refused, since deciding batch dependence from prose is the author's judgment made a second time by a weaker judge.
+
+**DISTINCT from every live entry**, and the owner sweep over `delta`, `amendment`, `batch` and `unconditional` found none: [amendment-refusal-acceptance-parity](#amendment-refusal-acceptance-parity) concerns an amendment's REFUSAL rationale rather than its instruction voice, and [amendment-dod-sibling-dependence](#amendment-dod-sibling-dependence) concerns a DoD item depending on an unnamed sibling rather than a delta's voice.
+
+**Operator exception to the enhancement admission filter** (operator direction 2026-09-22, lead-relayed): set B, which the operator selected directly in the lead session, includes this authoring rule; the filter's hold is lifted.
+
+**Cost while deferred:** once/low to rule, plus whatever the rule costs to gate; until then every batch-dependent delta needs a lead present to invert it. Filed 2026-09-20 by the iteration lead to the gap inbox at the build batch-2 dispatch, where inverting the instruction was the act that surfaced it; drained and promoted 2026-09-20 at close.
+
+### inferred-marker-malformed-placement-passes-unseen
+
+[spec: SPEC-misplaced-marker.md]
+
+`check-stage-entry` assertion D reads an inferred marker only where the full spelling opens a physical line (`inferred_marker` in `native/src/gates/stage_entry.rs`), so a marker an author places mid-line, or whose spelling a hard wrap splits, is invisible and its unrun claim passes the build entry. Both attested instances were mid-line: two of three markers in a declined-target-audit amendment, found only because the third, well-formed one redded `--simulate build`. A line-start marker whose reason wraps to the next line already reds (empty reason), so that case fails closed.
+
+**Re-verified at the drain:** the unit test `a_marker_is_read_only_at_line_start` passes and asserts a mid-line `**Inferred, not run:**` reads as `None`; a line opening with a split spelling fails both `strip_prefix` arms.
+
+**Ruled at spec (2026-09-22):** the narrowing is taken. A bold marker spelling outside a code span that does not open its line, or that a line break splits, is a misplaced marker and assertion D refuses it; a mention is written in a code span. Measured: every tracked markdown mention already is, and the one flipping verdict is the scenario test's D4 specimen.
+
+**Admitted to `stage-contract-drain`** (2026-09-22 scope, operator direction, lead-relayed) as a fail-open repair of an existing gate, outside the enhancement admission filter; /spec authors and promotes it.
+
+**Cost while deferred:** a misplaced marker's claim reaches build unrun, and only the author's own line-start discipline holds. Filed 2026-09-18 to the gap inbox at declined-target-audit's align; promoted at its close drain. Owner lookup: `inferred marker`, `inferred_marker`, `scan_markers`, `malformed marker` — none.
+
+### stamp-subject-merge-carve-out-unruled
+
+[spec: SPEC-merge-stamps.md]
+
+`check-stamp-subject` reds a commit adding stamp lines under git's own `Merge …` subject, which has no scope to parse (lifecycle-kit/SPEC.md §check-stamp-subject, honest limits), while `check-commit-subject` admits `Merge `, `Revert ` and `fixup! ` / `squash! ` as carve-outs never to be reworded (gate-sdk/SPEC.md §check-commit-subject). A consumer merging branches that carry state-file stamps meets two gates whose remedies conflict.
+
+**Measured at spec (2026-09-22), in a scratch clone with this repo's commit-msg hook:** a `--no-ff` merge of a branch that added a build stamp refused under git's default subject, and passed all three commit-msg gates under `git merge -m "chore(build): merge side"`. `MERGE_HEAD` resolves inside the hook on a clean merge, a conflict-resolved commit and an octopus.
+
+**Ruled at spec (2026-09-22):** neither listed remedy. The gate counts a stamp as added only when no merge parent carries it, so an inherited stamp, checked at its own commit, is not re-checked, and a hand-written `Merge …` subject on a commit introducing a stamp still reds. A subject carve-out was refused for that hole; the scoped-merge remedy for making every such merge carry a stage scope it does not describe.
+
+**Admitted to `stage-contract-drain`** (2026-09-22 scope, operator direction, lead-relayed), outside the enhancement admission filter because it reconciles two landed gates and adds no capability; /spec authors and promotes it and runs the marker above.
+
+**Cost while deferred:** none here, where internal work commits direct to master; a multi-operator consumer's stamp-carrying merge is blocked until reworded. Filed 2026-09-19 to the gap inbox at `lifecycle-contract-drain`'s build, promoted at its close drain by lead decision. Owner lookup: `stamp-subject`, `merge subject`, `git-generated` — no entry matched.
+
+### close-surface-row-trackedness-undeclared
+
+[spec: SPEC-surface-tracking.md]
+
+a close-surface roster row does not say whether its path is tracked or gitignored, so a session deciding whether that row's read is delegable to an isolated agent re-derives the bit by hand. Isolation cost (3) makes that bit decide delegability outright: an untracked or gitignored corpus is not delegable at all to a type held to isolation.
+
+**The filing premise was corrected at the drain, and the correction changes the cost.** The bullet claimed the emitter already holds a `git check-ignore` verdict per path and drops it. It does not: `native/src/emit/close_surfaces.rs` calls `check-ignore` only inside the workflow-directory walk that mints `(undeclared)` rows, and its exit-1 arm `continue`s, so the verdict exists for gitignored workflow-dir members alone. Rows harvested from declaration surfaces get no call at all. A fifth tier field is therefore a widening that adds one `check-ignore` per declared row, not a free print of a fact already held.
+
+**Ruled at spec (2026-09-22):** a sixth column, `<tracking>`, reading `tracked`, `ignored` or `untracked`, computed once per row by two batched git calls. `check-close-surfaces` assertion C reads `ignored` from it rather than spawning its own `check-ignore`, and the close template names a row that is not `tracked` as undelegable to an isolated agent. Three values, because the gate asks "gitignored?" and the delegating session asks "in the index?".
+
+**DISTINCT from `delegated-read-blind-to-gitignored-capture`, Done 2026-09-16**, which ruled the general constraint onto the protocol template; this is one emitter withholding a fact its reader needs, and it stands whether or not any sweep is ever delegated.
+
+**Operator exception to the enhancement admission filter** (operator direction 2026-09-22, lead-relayed): the row-grammar field rides set B, the eight entries the operator selected directly in the lead session; the filter's hold is lifted.
+
+**Cost while deferred:** every delegating session re-derives the bit, and one that skips the derivation delegates a read returning absence for content. Filed 2026-09-16 to the gap inbox by the spec stage, weighed as that iteration's second candidate owner and refused there for repairing one instance of a general class; drained and promoted at close, which falsified half its premise.
+
 ## Technical Debt
 
 ### stage-evidence-prefix-doubles-a-separator
@@ -31,18 +133,6 @@ a kit feature that encodes a policy, such as record-size capping, ships this pro
 **Deliverable:** a DOCTRINE methodology rule plus its one-line digest in the always-loaded file, and an enforcement if one is feasible. Operator direction, with the work: first run a read-heavy audit (audit-sweep type) of existing gates and of decommissioned ones (deleted `.gate` descriptors and removed `native/src` modules in git history) for places where a gate hard-codes this project's policy instead of offering consumer-selectable alternatives. The audit's findings supply the rule's worked examples and the follow-up entries.
 
 **Cost while deferred:** every design session defaults to hard-coding this project's preference, and the operator pays for each correction. Filed 2026-09-22 to the gap inbox by the queue-kit-unwrap lead as an operator direction, with an addendum. Promoted at its close because →fix would author a new doctrine rule and an audit, which is more than a close drain may land. Recurrence stamped on the operator's statement that the direction had been corrected before. Owner lookup ran over `policy`, `consumer choice` and `consumer-select` in doctrine-kit/DOCTRINE.md and found no owner.
-
-### scope-supersession-unchecked
-
-[cost: iteration/low] [surface: lifecycle-kit]
-
-scope aggregates explicit inbound citations (converge, subsume, block; lifecycle-kit/templates/stages/scope.md), but it has no semantic test for when one Deferred entry makes another obsolete even though neither cites the other. A tactical entry therefore gets ranked as work when a strategic sibling would moot it. Live instance: queue-kit-unwrap's scope recommended three line-cap fixes and left `markdown-hard-wrap-unowned-and-ungated`, which mooted them, to its own iteration. The operator reversed that choice.
-
-**Deliverable:** a scope-template step and its SPEC contract that pair each candidate against the strategic entries that could make it obsolete, with a written verdict (mooted / reshaped / independent) in the unit-set escalation.
-
-**Operator exception to the enhancement admission filter** (2026-09-22 scope, lead-relayed), because the operator already reversed a misranking this gap caused. Admitted to `stage-contract-drain`, for /spec to author and promote.
-
-**Cost while deferred:** every scope can rank tactical work that is already mooted. Filed 2026-09-22 to the gap inbox by the lead as an operator direction. Promoted at close because →fix would change the scope contract, which is a spec amendment. Owner lookup ran over `supersed`, `obsolete`, `subsume` and `strategic` in scope.md and found no owner.
 
 ### line-window-gates-unaudited
 
@@ -104,16 +194,6 @@ tracked shell sites test a path for absoluteness by a leading `/` alone, so a ca
 
 **Cost while deferred:** an adopter who empties the pattern file gets a silent clean pass with no doctor warning, and a default provenance-seam install gets one too. Filed 2026-09-22 to the gap inbox by the census discharging `armed-by-census-unrun`; promoted at close because →fix needs a new declaration shape. Owner lookup ran over `armed-by` in gate-sdk/SPEC.md; §The install disposition owns the declaration.
 
-### build-work-before-entry-stamp
-
-[cost: event/low] [surface: lifecycle-kit] [recurrence: 2026-09-22]
-
-a stage session can land its work commits before running its own `--enter-stage`, and nothing reds it: `check-stage-evidence` catches a stamp committed after the work it preceded, never work preceding the stamp, and a same-stage re-entry finds the cursor already on its stage. Measured 2026-09-22 by `git log`: canon-gate-precision's second build session merged two amendments, then stamped at the second merge's head. The first instance, one iteration earlier and also on the cheaper tier, was discarded at scope because §check-stage-evidence states the limit; the recurrence shows that stating the limit did not stop it.
-
-**Operator exception to the enhancement admission filter** (2026-09-22 scope, lead-relayed), because the recurrence is judged. Admitted to `stage-contract-drain`, for /spec to author and promote.
-
-**Deliverable — rule one of two:** an oracle asserting that a session's work commits follow its own entry stamp (inferred: commits carry no session id, so how the oracle ties a commit to a session is the open question), or a stamp-first line carried in the dispatch path the cheaper tier reads. **Cost while deferred:** the stamp's recorded head postdates the stage's work, so the stamp misplaces where that session's work began. Filed 2026-09-22 to the gap inbox by the canon-gate-precision lead as a recurrence judgment; promoted at its close because →fix needs a new oracle or a dispatch-path ruling. Owner lookup ran over `stamp` and `newly introduced` in lifecycle-kit/SPEC.md; §check-stage-evidence owns the assertion and its limit.
-
 ### doc-path-hardcoded-reads
 
 [cost: event/low] [surface: gate-sdk]
@@ -158,40 +238,6 @@ a surface that disclaims carrying a rule ("stated there and not restated here") 
 
 **Cost while deferred:** each such disclaimer is a licence a later reader trusts, and the copy beside it rots silently. Filed 2026-09-20 to the gap inbox by the close of `adopter-floor-door-remainder`; promoted 2026-09-21 at the next scope's intake, so the record is late and says so. Owner lookup ran over `disclaim`, `not restated here`, `restatement` and the two gates above and found no owner.
 
-### lead-no-change-decision-has-no-landing-site
-
-[cost: once/low] [surface: lifecycle-kit]
-
-a lead decision whose content is "make no change" is invisible to every later stage, because the landing rule presupposes a ruling with something to write.
-
-**Attested once:** a scope escalated whether a recurrence date was owed; the lead declined it and told scope nothing further was owed, on the ground that scope's gap bullet carried the grounds. That bullet recorded the question as escalated and unresolved, so close re-derived the judgment from the owner doc three stages later. Same disposition, one re-derivation — but the opposite call would have tripped the recurrence threshold and forced an entry into a unit set, a queue change only the lead may rule. lifecycle-kit/templates/lead.md already calls the message thread transport and already requires a ruling whose acting session is not imminent to be filed durably; both clauses assume an act that writes something.
-
-**Deliverable — rule one of two, neither authored:** a no-change decision appends its resolution to the gap bullet that raised it, so the drain reads a closed question; or the lead template states that "nothing further is owed" is never the lead's to assert about a durable record it did not read. The lead journal is scratch and is not the answer.
-
-**Held Deferred by the enhancement admission filter** (2026-09-22 scope, operator reading, lead-relayed): both options are new lead-protocol rules, and neither meets any of the filter's three criteria.
-
-**Cost while deferred:** the next no-change ruling on a threshold-bearing question is re-derived by a session that may not rule it.
-
-**DISTINCT from [record-stamp-encoding-compression](#record-stamp-encoding-compression) and `precondition-gate-direction-blindness`**, the entries the instance happened on; this is the lead protocol's landing rule. Filed 2026-09-20 to the gap inbox by the lead of `adopter-floor-door-remainder`; promoted at the 2026-09-21 scope intake, a late record that says so. Owner lookup ran over `no-change`, `landing site`, `lead decision` and `transport` and found no owner.
-
-### delta-instruction-batch-dependence-unmarked
-
-[cost: once/low] [surface: lifecycle-kit]
-
-a spec amendment can state a delta instruction in the unconditional voice when its satisfying act depends on which units share the build BATCH, and the grammar has no way to say so.
-
-**Attested twice in one iteration, both door amendments:** each carried "exactly two of the 59 door sites are adopter-facing and are deliberately left red, being the paired debt entry's deliverable" — true only of a batch EXCLUDING that debt unit. The lead batched the debt unit IN on a producer/consumer read, at which point the correct act was to REPAIR those two sites.
-
-**Measured, not projected:** the dispatched session reported it would have left them red on the amendment's letter, and only an explicit prompt-side inversion by the lead prevented it — which is prompt-side and dies with the lead. A later session reading the merged amendment alone reaches the wrong act and calls it correct.
-
-**Deliverable — neither candidate authored:** a delta-authoring rule that a batch-dependent instruction names its condition; or a spec-stage check that a delta citing a sibling unit's deliverable states what happens when both land together.
-
-**DISTINCT from every live entry**, and the owner sweep over `delta`, `amendment`, `batch` and `unconditional` found none: [amendment-refusal-acceptance-parity](#amendment-refusal-acceptance-parity) concerns an amendment's REFUSAL rationale rather than its instruction voice, and [amendment-dod-sibling-dependence](#amendment-dod-sibling-dependence) concerns a DoD item depending on an unnamed sibling rather than a delta's voice.
-
-**Held Deferred by the enhancement admission filter** (2026-09-22 scope, operator reading, lead-relayed): both candidates are new, either an authoring rule or a spec-stage check, and neither meets any of the filter's three criteria.
-
-**Cost while deferred:** once/low to rule, plus whatever the rule costs to gate; until then every batch-dependent delta needs a lead present to invert it. Filed 2026-09-20 by the iteration lead to the gap inbox at the build batch-2 dispatch, where inverting the instruction was the act that surfaced it; drained and promoted 2026-09-20 at close.
-
 ### probe-before-assertion-doctrine
 
 [cost: event/low] [surface: doctrine-kit] [recurrence: 2026-09-20]
@@ -205,20 +251,6 @@ a spec amendment can state a delta instruction in the unconditional voice when i
 **Why design-pending:** whether this is a fourth always-loaded line, a re-wording of the existing one, or something mechanizable is the open call — and it is a governed-surface widening, which a close does not self-serve. The cheapest candidate worth beating is still the one the original filing named: widen an existing rule rather than mint another.
 
 **Cost while deferred:** measured at seven misses in one iteration, two of them reaching validate. Filed 2026-08-07 by close as that iteration's candidate lesson; iceboxed in the machinery-class triage slice; returned to the deferred section at `door-binding-sweep`'s close drain on the recurrence above. Owner lookup: `probe`, `premise`, `unverified`, `corpus narrower` — this entry, plus two **adjacent and distinct** icebox members: the cited-object token sweep's corpus (a *gate's* corpus) and [dispatched-child-asserts-an-unverified-base](#dispatched-child-asserts-an-unverified-base) (a child inheriting a base it never probed).
-
-### inferred-marker-malformed-placement-passes-unseen
-
-[cost: event/low] [surface: lifecycle-kit]
-
-`check-stage-entry` assertion D reads an inferred marker only where the full spelling opens a physical line (`inferred_marker` in `native/src/gates/stage_entry.rs`), so a marker an author places mid-line, or whose spelling a hard wrap splits, is invisible and its unrun claim passes the build entry. Both attested instances were mid-line: two of three markers in a declined-target-audit amendment, found only because the third, well-formed one redded `--simulate build`. A line-start marker whose reason wraps to the next line already reds (empty reason), so that case fails closed.
-
-**Re-verified at the drain:** the unit test `a_marker_is_read_only_at_line_start` passes and asserts a mid-line `**Inferred, not run:**` reads as `None`; a line opening with a split spelling fails both `strip_prefix` arms.
-
-**Why design-pending:** lifecycle-kit/SPEC.md §templates/stages/ rules a mid-line mention prose, not a marker, and the test pins it. Refusing a bold unbackticked mid-line spelling as a malformed marker narrows that rule, and prose mentions in an amendment would red.
-
-**Admitted to `stage-contract-drain`** (2026-09-22 scope, operator direction, lead-relayed) as a fail-open repair of an existing gate, outside the enhancement admission filter; /spec authors and promotes it.
-
-**Cost while deferred:** a misplaced marker's claim reaches build unrun, and only the author's own line-start discipline holds. Filed 2026-09-18 to the gap inbox at declined-target-audit's align; promoted at its close drain. Owner lookup: `inferred marker`, `inferred_marker`, `scan_markers`, `malformed marker` — none.
 
 ### guard-declares-class-correspondence-ungated
 
@@ -283,20 +315,6 @@ on native Windows the harness's `PowerShell` tool is on by default beside `Bash`
 **Why design-pending:** a PowerShell-grammar guard needs its own skeleton and splitter, rules that model PowerShell rather than bash, and a decision table on a Windows leg. None of that is designed, and whether a consumer-rule seam belongs on it is open.
 
 **Cost while deferred:** on a Windows host a command routed through the PowerShell tool bypasses every steer and block, and the close-stage triage never sees it. Filed 2026-09-18 at `windows-adopter-path`'s spec by operator direction (lead-relayed), when `guard-hook-windows-substrate` was designed. Owner lookup: `PowerShell tool`, `USE_POWERSHELL_TOOL`, `Bash|PowerShell` — none.
-
-### stamp-subject-merge-carve-out-unruled
-
-[cost: event/low] [surface: lifecycle-kit]
-
-`check-stamp-subject` reds a commit adding stamp lines under git's own `Merge …` subject, which has no scope to parse (lifecycle-kit/SPEC.md §check-stamp-subject, honest limits), while `check-commit-subject` admits `Merge `, `Revert ` and `fixup! ` / `squash! ` as carve-outs never to be reworded (gate-sdk/SPEC.md §check-commit-subject). A consumer merging branches that carry state-file stamps meets two gates whose remedies conflict.
-
-**Why design-pending:** the remedies are (a) exempt git-generated subjects in `check-stamp-subject` on `check-commit-subject`'s precedent, or (b) keep the red and name the merge-time remedy, a scoped subject supplied with `git merge -m`. Either narrows or holds the landed envelope, so an envelope ruling is owed at this entry's scope.
-
-**Inferred, not run:** that `git merge -m` with a scoped subject clears both gates on a stamp-carrying merge.
-
-**Admitted to `stage-contract-drain`** (2026-09-22 scope, operator direction, lead-relayed), outside the enhancement admission filter because it reconciles two landed gates and adds no capability; /spec authors and promotes it and runs the marker above.
-
-**Cost while deferred:** none here, where internal work commits direct to master; a multi-operator consumer's stamp-carrying merge is blocked until reworded. Filed 2026-09-19 to the gap inbox at `lifecycle-contract-drain`'s build, promoted at its close drain by lead decision. Owner lookup: `stamp-subject`, `merge subject`, `git-generated` — no entry matched.
 
 ### config-variant-battery-harness
 
@@ -817,22 +835,6 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 **Why design-pending:** the repair narrows a corpus shared by roughly ten readers (`check-md-refs`, `check-docs-cmd`, `check-manifest-count`, `check-prose-enum` and the claim gates among them), so canon-kit/SPEC.md §The causal-completeness check item 5 binds: each reader's red condition is enumerated, a zero-count reader such as `check-install-claim` being the attested inversion. Whether any consumer relies on the unpruned form is unprobed.
 
 **Cost while deferred:** a consumer widening the knob with a multi-level glob governs fixture prose as manifest content, or enumerates single-level globs around the gap; and both configured expansions (`CANON_KIT_MANIFEST_FILES`, `CANON_KIT_PROSE_SURFACE_GLOBS`) still call `walk::glob_files`, so a `**` there stats every entry under `target/` and a concurrent cargo build can exit-2 every manifest reader on a clean tree. Repair route: `walk::glob_corpus` (gate-sdk/SPEC.md §The port-candidate criteria). Verified 2026-09-19 at close: `native/src/spec.rs` lines 197 and 215. Filed 2026-09-15 by `couples-field-semantics`' spec into the gap inbox; drained and promoted 2026-09-15 at close.
-
-### close-surface-row-trackedness-undeclared
-
-[cost: event/low] [surface: lifecycle-kit]
-
-a close-surface roster row does not say whether its path is tracked or gitignored, so a session deciding whether that row's read is delegable to an isolated agent re-derives the bit by hand. Isolation cost (3) makes that bit decide delegability outright: an untracked or gitignored corpus is not delegable at all to a type held to isolation.
-
-**The filing premise was corrected at the drain, and the correction changes the cost.** The bullet claimed the emitter already holds a `git check-ignore` verdict per path and drops it. It does not: `native/src/emit/close_surfaces.rs` calls `check-ignore` only inside the workflow-directory walk that mints `(undeclared)` rows, and its exit-1 arm `continue`s, so the verdict exists for gitignored workflow-dir members alone. Rows harvested from declaration surfaces get no call at all. A fifth tier field is therefore a widening that adds one `check-ignore` per declared row, not a free print of a fact already held.
-
-**Why design-pending:** whether the field names the tier, the trackedness bit, or nothing at all — the constraint living in the protocol template instead — is a grammar call, and `check-close-surfaces` reads the same rows.
-
-**DISTINCT from `delegated-read-blind-to-gitignored-capture`, Done 2026-09-16**, which ruled the general constraint onto the protocol template; this is one emitter withholding a fact its reader needs, and it stands whether or not any sweep is ever delegated.
-
-**Held Deferred by the enhancement admission filter** (2026-09-22 scope, operator reading, lead-relayed): a new row-grammar field, which meets none of the filter's three criteria.
-
-**Cost while deferred:** every delegating session re-derives the bit, and one that skips the derivation delegates a read returning absence for content. Filed 2026-09-16 to the gap inbox by the spec stage, weighed as that iteration's second candidate owner and refused there for repairing one instance of a general class; drained and promoted at close, which falsified half its premise.
 
 ### local-only-files-write-back-untriggered
 
