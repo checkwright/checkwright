@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: queue-kit-unwrap
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,21 @@
 ## New Features
 
 ## Technical Debt
+
+- **queue-backlog-vocabulary-undeclared** — the tree uses "queue" for the governed file and its
+  drain mechanics (`--emit queue-counts`, the drain-entry assertion, `QUEUE_KIT_ENTRY_LINE_CAP`)
+  and "backlog" for the accumulating mass and its aging (`kpi-gate-backlog`, the backlog-aging
+  findings), and no doc states which word owns which half.
+  **Re-verified at this scope:** queue-kit/SPEC.md and lifecycle-kit/SPEC.md still carry usages
+  only, no definition. **Deliverable:** one section in queue-kit/SPEC.md declaring the split and
+  its ground. It salvages an operator-declined rename of the queue file (operator direction,
+  2026-09-18): collapsing the two words would cost the live distinction and leave
+  `kpi-gate-backlog` naming something other than the backlog, and the path was always consumer
+  config (`QUEUE_KIT_QUEUE_FILE`).
+  **Cost while deferred:** each reader infers the distinction, and a rename proposal can recur.
+  Filed 2026-09-18 to the gap inbox by the lead after `external-install-evidence`'s close;
+  promoted 2026-09-22 into `queue-kit-unwrap` by operator direction (lead-relayed). Debt: it
+  declares two names the tree already carries and mints none.
 
 ## Deferred
 
@@ -128,6 +143,9 @@
   this scope's intake on the real recurrence above (gap bullet dated 2026-09-21, filed after
   `scratch-hermeticity`'s close). Body before eviction: `git log -p -S'<slug>' -- TASK-QUEUE.md`.
   **DISTINCT from `docs-cmd-retired-path-blind-to-queue`**, where the whole cited path is retired.
+  Feature — a gate or a citation rule either way; `/spec` authors and promotes it. Operator
+  direction 2026-09-22 (lead-relayed): into `queue-kit-unwrap`; heading anchors cover queue
+  records only.
   recurrence: queue-citation-line-number-stales-within-its-own-session 2026-09-21
 
 - **recurrence-line-never-ages** [cost: event/low] [surface: queue-kit] — a dated `recurrence:`
@@ -144,6 +162,8 @@
   Filed 2026-09-21 to the gap inbox at `release-declaration-coupling`'s close eviction; promoted at
   the next scope's intake the same day. Owner lookup ran over `recurrence:`, `live trigger` and
   `age limb`; §The icebox tier owns the trigger list and states no age rule for it.
+  Feature — an age limb mints a knob and a refusal narrows the tier's contract; `/spec` authors and
+  promotes it. Operator direction 2026-09-22 (lead-relayed): into `queue-kit-unwrap`.
 
 - **disclaimer-beside-its-own-restatement** [cost: event/low] [surface: canon-kit] — a surface
   that disclaims carrying a rule ("stated there and not restated here") in the same sentence that
@@ -225,6 +245,9 @@
   bullet; owner lookup ran over `line cap`, `headroom`, `entry budget` and
   `squeeze` across the pool and returned the three entries distinguished above
   and no owner.
+  **Reshaped by operator direction 2026-09-22 (lead-relayed), into `queue-kit-unwrap`:** unwrapped
+  entries have no line axis, and the hard-wrap entry re-units the cap to code points; the residue is
+  whether compression at that cap is the intended trade. `/spec` discharges or authors it.
 
 - **stage-evidence-prefix-doubles-a-separator** [cost: event/low] [surface: lifecycle-kit]
   — `check-stage-evidence`'s path relativizer composes its not-under arm from
@@ -548,6 +571,9 @@
   Surfaced 2026-09-10 by the operator through the consult channel in a lead session, relayed by that
   lead into the gap inbox of `packer-port-terminal-cut`'s close and promoted at this scope. The full
   probed body is recoverable: `git log -p -S'bimodal, and load-bearing' -- .workflow/gap-inbox.md`.
+  **Operator direction 2026-09-22 (lead-relayed), into `queue-kit-unwrap`:** tracked markdown
+  carries no artificial line cap; a tool needing a line-capped form gets one generated from the
+  uncapped tracked file. Feature (a new gate); `/spec` authors and promotes it.
 
 - **queue-entry-shape-slugs-headings-links** [cost: once/low] [surface: queue-kit] — the operator's queue-shape sequence:
   ratchet slug length, make each task a third-level heading, then make every cross-task reference a
@@ -585,6 +611,9 @@
   roadmap walk.
   Surfaced 2026-09-10 as above; full body via
   `git log -p -S'TASKS BECOME THIRD-LEVEL HEADINGS' -- .workflow/gap-inbox.md`.
+  **Operator direction 2026-09-22 (lead-relayed), into `queue-kit-unwrap`:** records such as tasks
+  become link-referenceable headings. Re-verified at scope: 0 third-level headings in this file.
+  Feature (a slug ratchet and a heading grammar); `/spec` authors and promotes it.
 
 - **install-smoke-leg-names-mix-two-axes** [cost: event/low] [surface: .github] — the `install-smoke` legs in
   `.github/workflows/gates.yml` spend one suffix slot on two different axes, and two tracked
@@ -1369,8 +1398,9 @@
   **Three surfaces carry the wrong spelling**, which is why this is one unit rather than a typo
   (a fourth, `queue-entry-evidence-tier`'s body, left with that entry at its 2026-09-17 landing):
   this file's `## Icebox` preamble, queue-kit/SPEC.md §The
-  icebox tier, and `check-queue-entry-budget`'s own help text — that last one is a compiled
-  subcommand now, so the fix costs a crate edit and a rebuild rather than a string swap.
+  icebox tier, and `check-queue-entry-budget`'s own help text. **Re-verified 2026-09-22 at
+  scope:** the help text no longer carries `-S` (`git grep` over `native/src` is empty); the live
+  sites are the preamble, queue-kit/SPEC.md §The icebox tier and body recovery recipes here.
   **It does not re-open `queue-entry-evidence-tier`'s narrowing, and that is deliberate.** That
   entry ruled recovery solved and signalling the gap, on a 2026-08-02 measurement of the
   *compression* case — a shrinking body whose slug count does drop, where `-S` genuinely worked.
@@ -1390,6 +1420,8 @@
   Filed 2026-08-17 by close, from re-verifying a gap-inbox bullet; both probes were run before
   the claim was asserted and the compression-vs-eviction split checked against the entry it
   would otherwise have contradicted.
+  Operator direction 2026-09-22 (lead-relayed): into `queue-kit-unwrap`; `/spec` authors and
+  promotes it.
 
 - **settings-hook-command-path-gate** [cost: event/high] [surface: context-kit] — a hook registration in
   `.claude/settings.json` whose `command` names a renamed or deleted script reds nowhere and
@@ -1521,6 +1553,8 @@
   recurrence: precondition-gate-direction-blindness 2026-09-20
   Filed 2026-08-24 to the gap inbox by scope, which reproduced the red; drained and promoted
   2026-08-25 at close, which read the gate's four help lines first-hand and corrected the filing.
+  Feature — either horn changes the gate's asserted behavior or its SPEC contract; `/spec` authors
+  and promotes it. Operator direction 2026-09-22 (lead-relayed): into `queue-kit-unwrap`.
 
 - **icebox-eviction-line-budget-squeeze** [cost: event/low] [surface: queue-kit] — the icebox tier's one-line grammar
   and `check-queue-wrap`'s column cap are jointly unsatisfiable above a slug length nothing
@@ -1566,9 +1600,9 @@
   thin line; this one cost one round-trip and landed no line at all. Both branches are now
   attested, which retires the "predicted" half of the deliverable — the three candidate rulings
   stand unchanged and none of them is chosen here.
-  **Premise loosened 2026-09-17:** the icebox lead line no longer carries the design-pending tag,
-  so each attested slug gains 17 columns (31 → 48, 22 → 39). The squeeze stands, because slug
-  length is still unbounded, but its threshold moved; re-measure before ruling.
+  **Reshaped by operator direction 2026-09-22 (lead-relayed), into `queue-kit-unwrap`:** past the
+  2026-09-17 loosening (no design-pending tag, +17 columns), unwrapped markdown leaves the one-line
+  grammar no column cap; `/spec` confirms the hard-wrap and entry-shape amendments discharge it.
   recurrence: icebox-eviction-line-budget-squeeze 2026-09-03
 
 - **site-health-issue-venue-unwanted** [cost: event/low] [surface: site-kit] — the site-health probe files issues on
@@ -1790,6 +1824,9 @@
   recurrence: lead-line-blocked-by-spec-tag-width-collision 2026-09-20
   Filed 2026-09-15 to the gap inbox at that spec stage, measured by `check-queue-wrap`'s red at its
   promotion commit; drained and promoted the same day at close.
+  **Reshaped by operator direction 2026-09-22 (lead-relayed), into `queue-kit-unwrap`:** with tags
+  on a heading's body and no column cap, the collision has no budget left; `/spec` confirms it
+  discharges with the hard-wrap and entry-shape amendments or authors the residue.
 
 - **close-surface-row-trackedness-undeclared** [cost: event/low] [surface: lifecycle-kit]
   — a close-surface roster row does not say whether its path is tracked or gitignored, so a
@@ -1814,20 +1851,6 @@
   Filed 2026-09-16 to the gap inbox by the spec stage, weighed as that iteration's second
   candidate owner and refused there for repairing one instance of a general class; drained and
   promoted at close, which falsified half its premise.
-
-- **queue-backlog-vocabulary-undeclared** [cost: once/low] [surface: queue-kit] — the tree uses
-  "queue" for the governed file and its drain mechanics (`--emit queue-counts`, the drain-entry
-  assertion, `QUEUE_KIT_ENTRY_LINE_CAP`) and "backlog" for the accumulating mass and its aging
-  (`kpi-gate-backlog`, the backlog-aging findings), and no doc states which word owns which half.
-  **Probed at filing:** queue-kit/SPEC.md and lifecycle-kit/SPEC.md carry usages only, no
-  definition. **Deliverable:** one section in queue-kit/SPEC.md declaring the split and its
-  ground. It salvages an operator-declined rename of the queue file (operator direction,
-  2026-09-18): collapsing the two words would cost the live distinction and leave
-  `kpi-gate-backlog` naming something other than the backlog, and the path was always consumer
-  config (`QUEUE_KIT_QUEUE_FILE`).
-  **Cost while deferred:** each reader infers the distinction, and a rename proposal can recur.
-  Filed 2026-09-18 to the gap inbox by the lead after `external-install-evidence`'s close;
-  promoted at the following scope.
 
 - **local-only-files-write-back-untriggered** [cost: event/low] [surface: lifecycle-kit] — the
   consumer's local-only companion files have read triggers at three skills and no write-back
