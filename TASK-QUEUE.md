@@ -416,7 +416,7 @@ whether a kit may ship a knob whose only working configuration requires the cons
 
 **The capability loss that raised it is CLOSED, and this entry is deliberately the residue.** `shell-gate-tail-port` deleted the path `DELEGATION_KIT_LIVENESS_CMD` defaulted to, so the turn-end liveness probe logged `verdict=unavailable` on every firing. The repair landed at the same cut: the kit template dropped a default that pointed at nothing (a path present in no tree reads as a shipped capability and is none), the knob kept its contract exactly — a path run with the scratch dir as its only argument — and this repo named its own reader `scripts/producer-liveness-reader.sh`, reaching the gate through `scripts/gate-exec.sh`. BOTH scripts left the tree 2026-09-05, and the negative control at `scripts/gate-tests/subagent-stop-reader.test.sh` now asserts `unresolved`, never `unavailable`.
 
-**The capture log priced the loss and then verified the repair, read at close.** `.workflow/subagent-stop-liveness.log` carried **77** `verdict=unavailable` firings, every one inside a single 46-minute window between the port that deleted the path and the repair, and **zero** after it. So the degradation was real, bounded, silent except for that field, and is closed — which is what makes the surviving question a convention question rather than a defect.
+**The capture log priced the loss and verified the repair:** 77 `verdict=unavailable` firings inside one 46-minute window, zero after. So the surviving question is a convention question, not a defect. **Kept at queue-kit-unwrap's close** on a live trigger: [consumer-policy-rule-absent](#consumer-policy-rule-absent)'s gate audit reads the same config-surface question.
 
 **The precedent this stands on, which is what makes the question general.** evidence-kit met the identical break one caller over when the same port turned a pre-flight entry's named path into a descriptor, and discharged it with a CONSUMER-SIDE front end resolving the gate name, explicitly refusing to teach the kit's knob to resolve a name as "a kit-contract change". Two kits, two consumers, one shape, invented twice.
 
@@ -668,26 +668,6 @@ governed prose asserts what `.workflow/validate-baseline.txt` holds, and nothing
 
 **Cost while deferred:** low and slow, but it recurs on exactly the readers who most need the file — a cohort pricing criterion 5 reads the prose first. Filed 2026-08-14 by close, from its own gap-inbox drain and staleness review; kept in Deferred at the 2026-08-24 eviction review on the trigger above and on the live slug it names.
 
-### gap-capture-argv-prompt-friction
-
-[cost: event/low] [surface: gate-sdk] [recurrence: 2026-08-15]
-
-the mandated capture tools take their prose as an argv string, so every filing whose prose contains shell punctuation costs an out-of-band permission decision.
-
-**Re-measured 2026-08-15: three prompting calls** (`file-survey.sh` twice, `file-gap.sh` once, `kfric.sh` none), against six the iteration before. Halved, and the halving is not progress — fewer captures were filed, and the per-filing tax is unchanged.
-
-**Diagnosed rather than allowlisted, per the triage criterion.** `bash gate-sdk/bin/run-gates.sh *` is **already** in the committed allowlist and, since the 2026-09-01 and 2026-09-03 ports made survey, gap and knowledge-friction capture arms, is the one grant covering all three — the per-tool `kfric.sh *` grant went with its file — so this is not missing coverage. The harness matcher refuses a command whose text carries an expansion or a redirect, and gap prose routinely carries both: a backticked slug is command substitution, and a bullet describing `jq -r … 2>/dev/null` contains a redirect operator inside its quotes. The glob cannot help, because the match never gets that far.
-
-**Measured this iteration:** `file-gap.sh` prompted **4** times, `file-survey.sh` and `kfric.sh` once each — six out-of-band decisions on the three tools the repo *mandates* for in-the-moment capture, which is the exact path CLAUDE.md says deferred capture ruins.
-
-**Deliverable, and it is small:** a body-from-file arm — `--emit file-gap --from <path>` reading the prose from a scratch file written with the editor tool — is a fully static command the matcher can grant. The same shape serves `--emit file-survey` and `--emit kfric`, whose free-text fields are the same shape; the capture tool's port to a compiled arm moves where that shape is written and settles nothing here. What needs deciding is whether it is per-member or a shared helper, and whether the argv form stays (it should — a short gap is one call).
-
-**Why it is not a guard rule:** there is no better *form* to steer to today, which is what a guard rule requires. The form has to exist first.
-
-**Cost while deferred:** a friction tax that scales with how carefully a bullet is written, which taxes exactly the good filings. Filed 2026-08-14 by close, from the prompt-friction triage.
-
-**Held Deferred:** the `--from` arm, this entry's whole deliverable, is excluded by the enhancement admission filter (operator direction 2026-09-21, lead-relayed).
-
 ### settings-hook-command-path-gate
 
 [cost: event/high] [surface: context-kit]
@@ -796,7 +776,7 @@ the harness project-dir derivation `check-memory-off` and its two shell twins sh
 
 ### record-stamp-encoding-compression
 
-[cost: event/low] [surface: queue-kit] [recurrence: 2026-09-03]
+[cost: event/low] [surface: queue-kit] [recurrence: 2026-09-03] [not-icebox-eligible: 2026-09-22 operator-ruled direction of 2026-09-01; evicting it would demote that ruling]
 
 buy discrimination in the queue's record stamps by RE-ENCODING them rather than by adding text, the deferred pool's per-entry budget being what makes added text the wrong trade.
 
@@ -812,17 +792,7 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 **Why design-pending:** the ruling fixes the DIRECTION and not the grammar. Open: which components take the new encoding and in what order, whether the change is a migration or a read-both-write-new window, and what each date-reading gate asserts across it — a wrong answer reds every governed surface at once.
 
-**Cost while deferred:** low and bounded, and it is the cost of the thing it replaces — every entry that needs discrimination keeps buying it with text against a budget that already blocked one stage this iteration. Filed 2026-09-01 by close under CLAUDE.md §Housekeeping's operator-directed exception, staged and committed in one motion. FILED AND NOT BUILT: it rides no cut, no iteration since has shared its surface (scope's composition test, re-grounded 2026-09-11), and this is no hotfix.
-
-### docs-cmd-retired-path-blind-to-queue
-
-[cost: event/low] [surface: canon-kit]
-
-canon-kit/SPEC.md §check-docs-cmd assertion (C) cannot see a retired path cited from the queue, from two sides: its corpus is the manifest set, which excludes TASK-QUEUE.md, and a `<path>:<line>[,<line>]` token fails the path shape because `:` is outside the segment class.
-
-**Attested once:** two Deferred bodies cited deleted kit libraries in that form after `config-seam-second-cut` and stayed green; that close found them by grep and corrected them.
-
-**Why design-pending:** the candidate trims a trailing line suffix before the shape test and reads the queue's live sections, and the alternative is a stated reason the queue stays out. Which, and whether the queue's retired-work citations then need an exemption, is the call.
+**Cost while deferred:** low and bounded — every entry needing discrimination keeps buying it with text against the entry budget. Filed 2026-09-01 by close under CLAUDE.md §Housekeeping's operator-directed exception; it rides no cut and is no hotfix.
 
 **DISTINCT from `queue-citation-line-number-stales-within-its-own-session`** (Done), where the cited file lives and only its line number drifts; here the whole path is retired.
 
@@ -1227,10 +1197,6 @@ Prints only on a refusal; lead-ruled 2026-09-03.
 ### check-graph-trigger-consumer-path-reach
 
 couples= misses installer/.
-
-### precondition-gate-negation-false-positive
-
-Reds a true negated precondition.
 
 ### worktree-isolated-dispatch-cannot-reach-the-main-checkout
 
@@ -1868,6 +1834,14 @@ a gate here reopens a stated refusal.
 
 each claim still wants its own probe.
 
+### gap-capture-argv-prompt-friction
+
+Capture arms take their prose as argv, so a filing carrying shell punctuation costs a permission decision; a `--from <path>` body arm is the candidate fix.
+
+### docs-cmd-retired-path-blind-to-queue
+
+`check-docs-cmd` assertion (C) misses a retired path cited from the queue, which is outside its manifest corpus and whose `<path>:<line>` token fails the path shape.
+
 ## Done
 
 - queue-recovery-pickaxe-wrong-oracle
@@ -1880,5 +1854,6 @@ each claim still wants its own probe.
 - queue-entry-shape-slugs-headings-links
 - icebox-eviction-line-budget-squeeze
 - lead-line-blocked-by-spec-tag-width-collision
+- precondition-gate-negation-false-positive
 
 ## Lessons Learned
