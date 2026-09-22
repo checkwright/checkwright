@@ -12,6 +12,66 @@
 
 ## Deferred
 
+### consumer-policy-rule-absent
+
+[cost: event/high] [surface: doctrine-kit] [recurrence: 2026-09-22]
+
+a kit feature that encodes a policy, such as record-size capping, ships this project's one choice as the kit's behaviour instead of a consumer-selectable set of alternatives ('off' among them, plus a lead-grantable per-record exception where it fits). This repo should then bind exactly one choice as a consumer. doctrine-kit/DOCTRINE.md has the provenance seam (content to config) and widest-true-tier (placement), but no design rule that turns a policy into a consumer choice, and nothing checks it. Live instance: queue-kit-unwrap's build hard-coded a 100-code-point marker reach into `check-knob-citation` (`MARKER_REACH`, native/src/gates/knob_citation.rs).
+
+**Deliverable:** a DOCTRINE methodology rule plus its one-line digest in the always-loaded file, and an enforcement if one is feasible. Operator direction, with the work: first run a read-heavy audit (audit-sweep type) of existing gates and of decommissioned ones (deleted `.gate` descriptors and removed `native/src` modules in git history) for places where a gate hard-codes this project's policy instead of offering consumer-selectable alternatives. The audit's findings supply the rule's worked examples and the follow-up entries.
+
+**Cost while deferred:** every design session defaults to hard-coding this project's preference, and the operator pays for each correction. Filed 2026-09-22 to the gap inbox by the queue-kit-unwrap lead as an operator direction, with an addendum. Promoted at its close because →fix would author a new doctrine rule and an audit, which is more than a close drain may land. Recurrence stamped on the operator's statement that the direction had been corrected before. Owner lookup ran over `policy`, `consumer choice` and `consumer-select` in doctrine-kit/DOCTRINE.md and found no owner.
+
+### scope-supersession-unchecked
+
+[cost: iteration/low] [surface: lifecycle-kit]
+
+scope aggregates explicit inbound citations (converge, subsume, block; lifecycle-kit/templates/stages/scope.md), but it has no semantic test for when one Deferred entry makes another obsolete even though neither cites the other. A tactical entry therefore gets ranked as work when a strategic sibling would moot it. Live instance: queue-kit-unwrap's scope recommended three line-cap fixes and left `markdown-hard-wrap-unowned-and-ungated`, which mooted them, to its own iteration. The operator reversed that choice.
+
+**Deliverable:** a scope-template step and its SPEC contract that pair each candidate against the strategic entries that could make it obsolete, with a written verdict (mooted / reshaped / independent) in the unit-set escalation.
+
+**Cost while deferred:** every scope can rank tactical work that is already mooted. Filed 2026-09-22 to the gap inbox by the lead as an operator direction. Promoted at close because →fix would change the scope contract, which is a spec amendment. Owner lookup ran over `supersed`, `obsolete`, `subsume` and `strategic` in scope.md and found no owner.
+
+### line-window-gates-unaudited
+
+[cost: event/low] [surface: canon-kit]
+
+`check-knob-citation`'s same-line default leg bound unrelated knobs once paragraphs became one line, and queue-kit-unwrap recalibrated it to a 100-code-point forward reach. No one has audited the other gates whose precision rests on a same-line window (the `check-manifest-count` wedge, `check-prose-tells`, the msg-patterns account pattern) for the wider unit. None of them reds today.
+
+**Deliverable:** per gate, a measured over-firing read on the unwrapped tree, and a recalibration or a stated reason the line is still the right unit.
+
+**Cost while deferred:** silent over-firing on a future long paragraph. Filed 2026-09-22 to the gap inbox by queue-kit-unwrap's build batch 3. Promoted at close because →fix is an audit of three gates. Owner lookup ran over `same-line` and `co-occur` in canon-kit/SPEC.md, gate-sdk/SPEC.md and the audit roster and found no owner.
+
+### queue-migrate-bold-split
+
+[cost: event/low] [surface: queue-kit]
+
+queue-kit/SPEC.md §The queue-migrate arm starts a new paragraph at any continuation line that opens with a bold lead-in. A wrapped sentence whose next line happens to start with a bold span is therefore cut in two mid-sentence. This happened twelve times in this repo's own conversion, and re-running `--emit queue-migrate` on the pre-conversion queue (`4e205fc2^`) reproduces the splits. queue-kit-unwrap's close joined them by hand.
+
+**Deliverable:** a paragraph-start test that can tell a bold lead-in (for example, a bold span ending in `:` or `.`, or a preceding line that ends a sentence) from a wrapped bold span, with a fixture row for the mid-sentence case.
+
+**Cost while deferred:** an adopter migrating a wrapped queue gets broken paragraphs that no gate reports. Filed 2026-09-22 at queue-kit-unwrap's close drain. Promoted rather than fixed because the rule is the SPEC's own and changing it is a spec amendment. Owner: queue-kit/SPEC.md §The queue-migrate arm.
+
+### retired-citation-referent-rule
+
+[cost: event/low] [surface: queue-kit]
+
+live entries cite retired slugs in prose, and nothing marks them the same way ('(landed)', '(retired)', 'Done <date>'). After the queue-headings amendment, a retired citation is a backticked token that assertion R keeps apart from a live link (queue-kit/SPEC.md §The tag algebra), but it still has no anchor. The open question is the operator's: should a live entry cite the shipped mechanism by a stable anchor (a SPEC §, a gate name, a path) rather than the retired slug? And if so, should a `check-queue-hygiene` axis hold that, given that the queue-edges arm already computes the retired set? A provenance citation ("filed during X") names the slug correctly and must stay legal. This is inferred, not measured.
+
+**Deliverable:** that ruling, and either the axis or a stated reason the close-stage retired-block read is enough.
+
+**Cost while deferred:** a retired citation's referent can be reached only through history. Filed 2026-09-22 to the gap inbox by the lead on an operator question. The one-off sweep it asked for ran at queue-kit-unwrap's close: it found 28 retired rows plus one name-live row, most already marking retirement, and corrected three inline. Promoted for the rule half. Owner: queue-kit/SPEC.md §The tag algebra and §The queue-edges arm; neither rules on the referent.
+
+### install-path-developer-first
+
+[cost: event/high] [surface: installer]
+
+the adopter's first contact assumes a developer toolchain. docs/index.md's quick-try block leads with `npx checkwright` ("Try it with Node on the machine"), while docs/install.md calls the Release tarball the primary path because it adds no runtime dependency. The landing page therefore contradicts the install page and gate-sdk/SPEC.md §The adopter constraints (no toolchain assumed). docs/install.md opens with target triples and release-leg status, spreads its prerequisites across per-profile tags, and gives its quick start as a multi-line curl + checksum + tar sequence. There is no clear per-OS path, and the audience includes business users.
+
+**Deliverable:** a customer-first rework. Lead with a no-toolchain path (a one-line OS-native bootstrap per OS; the option set is weighed at spec). Give each OS a section with its prerequisites, install, verify and uninstall. Move contributor-only facts (triples, leg status, cargo/jq) off the adopter path, and demote npx to an alternative for Node users. Likely iteration-class: it spans docs/, installer/README.md and possibly installer/ mechanism.
+
+**Cost while deferred:** every first-contact adopter without Node meets a developer path. Filed 2026-09-22 to the gap inbox by the lead as an operator direction and suggested as a next-iteration theme. Promoted at close because it is iteration-class. Re-verified: docs/index.md line 14 and docs/install.md line 10 read as stated. Owner: docs/install.md and installer/SPEC.md.
+
 ### shell-textual-absoluteness-single-dialect
 
 [cost: event/low] [surface: gate-sdk]
@@ -48,9 +108,7 @@ eighteen kit-shipped `couples=` literals across thirteen members name a consumer
 
 **Deliverable:** per member, a knob the code reads and the registry declares (the literal then converts by gate-sdk/SPEC.md §The # graph: manifest's rule), or an undeclared read declared.
 
-**Cost while deferred:** those triggers stay pinned to this layout in every vendored tree. Filed 2026-09-22 to the gap inbox from the doc-path-tokens survey's class 4; promoted at close because each member's module needs reading. **DISTINCT from**
-
-**[check-graph-trigger-consumer-path-reach](#check-graph-trigger-consumer-path-reach)** (icebox), whose subject is a `couples=` missing `installer/`, not a frozen consumer literal.
+**Cost while deferred:** those triggers stay pinned to this layout in every vendored tree. Filed 2026-09-22 to the gap inbox from the doc-path-tokens survey's class 4; promoted at close because each member's module needs reading. **DISTINCT from** **[check-graph-trigger-consumer-path-reach](#check-graph-trigger-consumer-path-reach)** (icebox), whose subject is a `couples=` missing `installer/`, not a frozen consumer literal.
 
 ### pipe-membership-corpus-omits-test-suites
 
@@ -170,13 +228,9 @@ items in guard-kit/SPEC.md §The generic ruleset state the inert quoting classes
 
 [cost: event/low] [surface: context-kit]
 
-nothing asserts the roster↔template relation context-kit/SPEC.md §The consumer footprint rules: an obligation whose bound actor is any session is carried at the consumer's resident tier and is
+nothing asserts the roster↔template relation context-kit/SPEC.md §The consumer footprint rules: an obligation whose bound actor is any session is carried at the consumer's resident tier and is **not** also restated in the kit templates those sessions load, with one corollary permitting a template statement where the reader's discharge differs and never the channel or disposal-time half alone. The ruling landed this iteration and no oracle reads it, so the next template shipping an unsanctioned restatement — or an obligation losing its only carrier — reds nothing.
 
-**not** also restated in the kit templates those sessions load, with one corollary permitting a template statement where the reader's discharge differs and never the channel or disposal-time half alone. The ruling landed this iteration and no oracle reads it, so the next template shipping an unsanctioned restatement — or an obligation losing its only carrier — reds nothing.
-
-**Premise corrected at the drain that promoted this:** the filing bullet credited the no-gate claim to delegation-kit/SPEC.md §Operative residency. That section makes no such claim; it says the opposite ("never a substitute for an oracle where one is buildable"). The claim sits in §Verify after every agent commit, whose honest-limit paragraph asserts §Operative residency owes no gate "the same structural reason" — a supervisor's choice of command leaving no tracked artifact to read. That ground does not reach this defect, which is a grep over tracked files, so
-
-**that sentence is what narrows** if this lands.
+**Premise corrected at the drain that promoted this:** the filing bullet credited the no-gate claim to delegation-kit/SPEC.md §Operative residency. That section makes no such claim; it says the opposite ("never a substitute for an oracle where one is buildable"). The claim sits in §Verify after every agent commit, whose honest-limit paragraph asserts §Operative residency owes no gate "the same structural reason" — a supervisor's choice of command leaving no tracked artifact to read. That ground does not reach this defect, which is a grep over tracked files, so **that sentence is what narrows** if this lands.
 
 **Why design-pending:** the assertable direction is the open question. The ruling forbids the per-template copy, so the negative direction (no template restates a rostered resident obligation) is the one the ruling supports, while the bullet as filed named the positive one (each rostered obligation reaches the templates of the readers it binds). Which the corollary's exception can be expressed in, and whether a grep can tell a sanctioned discharge-differs statement from a restatement, are the two calls. **The worked hard case, found by this close's instruction-tier sweep:** `lifecycle-kit/templates/lead.md`'s journal-disposal block states the kfric obligation's *timing* half and names no channel, which the corollary permits here only because the lead also loads the resident line that does. Any oracle must rule that CLEAN; ruling it a violation is the false positive that would make the check unusable.
 
@@ -362,9 +416,7 @@ whether a kit may ship a knob whose only working configuration requires the cons
 
 **The capability loss that raised it is CLOSED, and this entry is deliberately the residue.** `shell-gate-tail-port` deleted the path `DELEGATION_KIT_LIVENESS_CMD` defaulted to, so the turn-end liveness probe logged `verdict=unavailable` on every firing. The repair landed at the same cut: the kit template dropped a default that pointed at nothing (a path present in no tree reads as a shipped capability and is none), the knob kept its contract exactly — a path run with the scratch dir as its only argument — and this repo named its own reader `scripts/producer-liveness-reader.sh`, reaching the gate through `scripts/gate-exec.sh`. BOTH scripts left the tree 2026-09-05, and the negative control at `scripts/gate-tests/subagent-stop-reader.test.sh` now asserts `unresolved`, never `unavailable`.
 
-**The capture log priced the loss and then verified the repair, read at close.** `.workflow/subagent-stop-liveness.log` carried **77** `verdict=unavailable` firings, every one inside a single 46-minute window between the port that deleted the path and the repair, and
-
-**zero** after it. So the degradation was real, bounded, silent except for that field, and is closed — which is what makes the surviving question a convention question rather than a defect.
+**The capture log priced the loss and then verified the repair, read at close.** `.workflow/subagent-stop-liveness.log` carried **77** `verdict=unavailable` firings, every one inside a single 46-minute window between the port that deleted the path and the repair, and **zero** after it. So the degradation was real, bounded, silent except for that field, and is closed — which is what makes the surviving question a convention question rather than a defect.
 
 **The precedent this stands on, which is what makes the question general.** evidence-kit met the identical break one caller over when the same port turned a pre-flight entry's named path into a descriptor, and discharged it with a CONSUMER-SIDE front end resolving the gate name, explicitly refusing to teach the kit's knob to resolve a name as "a kit-contract change". Two kits, two consumers, one shape, invented twice.
 
@@ -386,9 +438,7 @@ harness plugin packaging. Harness plugin/marketplace packaging of the stage skil
 
 **Negative result — the tarball channel's economics do not transfer here.** The retired `release-tarball-delivery-channel` was cheap for a structural reason that is absent from this rung: `.github/workflows/publish.yml`'s `pack` job already assembles and stamps one tarball and uploads it as the run's artifact, so a new channel is a sibling job that `needs: pack` and consumes that artifact. A marketplace package cannot consume it. Its unit of delivery is the harness's own plugin manifest format, not a packed npm assembly, and its subject is the stage skills and guards rather than the eleven-kit tree — so it shares neither the assembly nor the artifact. Recorded because the reflex at promotion will be to cost this by analogy from the tarball's sibling-job cheapness and arrive at the wrong number.
 
-**Open question a promoting scope answers first — deliberately undecided here.** Whether the marketplace package vendors kits at all, or merely registers the skills and delegates all vendoring to the installer's `init`. Under the second answer it stops being a distribution channel and becomes a
-
-**discovery surface**, and `checkwright.lock` ceases to be a contract it must *honour* and becomes one it must not *violate* — the materially cheaper answer, and the one that dissolves most of the sequencing risk above. It is not settled here because it is downstream of this entry's standing ruling that the plugin substrate moves fast and the design must be made against the live manifest format at promotion; deciding it now would be deciding it against a format that will have moved. Recorded 2026-07-26 by close (`activation-path`).
+**Open question a promoting scope answers first — deliberately undecided here.** Whether the marketplace package vendors kits at all, or merely registers the skills and delegates all vendoring to the installer's `init`. Under the second answer it stops being a distribution channel and becomes a **discovery surface**, and `checkwright.lock` ceases to be a contract it must *honour* and becomes one it must not *violate* — the materially cheaper answer, and the one that dissolves most of the sequencing risk above. It is not settled here because it is downstream of this entry's standing ruling that the plugin substrate moves fast and the design must be made against the live manifest format at promotion; deciding it now would be deciding it against a format that will have moved. Recorded 2026-07-26 by close (`activation-path`).
 
 **Cost while deferred:** zero mechanism rots — the install-ownership contract this must package against is already written and maintained by the installer's `init`; what is foregone is a discovery surface, and the plugin substrate's motion means a design taken early would be retaken at promotion anyway. Surfaced 2026-07-09 in adoption-track's split; evidence artifact retained: upstream Claude Code issue #75214 (project config can't lift the Task ask-first default), surfaced dogfooding the delegation nudge 2026-07-07.
 
@@ -414,7 +464,7 @@ hosted attestation. The team/paid rung: gates verified server-side by a party th
 
 foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent, extending the homogeneous multi-agent model to a heterogeneous fleet. It cashes the public no-lock-in claim and is the purest expression of the thesis — governance enforced at the git/gate boundary, not by trusting the author. *Already agent-neutral:* the verification substrate (git, the gate battery, the bash stamp state machine) does not care who authored the diff, and the coordination primitive is the shared git-index/HEAD serialization. *Homogeneous today — the real work, worst-first:* (1) the **escalation resume model** collapses into (2) as a property of the chosen transport, per the 2026-07-25 amendment below; (2) **dispatch transport** — today the harness `Agent`/`SendMessage`/task-notification; a foreign agent needs a transport-neutral handoff. The adapter contract is "open / prompt / permission-request / resume" spoken over each vendor's structured **machine plane, never its TUI**: a screen-scrape relay is the adapter of last resort for a vendor shipping no machine interface at all — it yields rendered frames not turn events, answers dialogs by heuristic, and bets on the vendor's least-stable surface. (3) **budget oracle** — the verdict tool is Anthropic-OAuth-specific; a heterogeneous fleet has N vendor-keyed oracles, the same seam as the credential-swap entries, and the vendors' JSONL event streams carry the token-usage events a TUI path would scrape from a status bar. (4) **stage-contract expression** — the lifecycle machinery is neutral bash but the stage-skill prose is not.
 
-**Seam ruling (on record):** generic mechanism only — transport, budget oracle, and escalation channel become consumer-config seams; a kit literal naming a vendor crosses the provenance seam and is ruled out, the `prose-profile` pattern. It extends the per-batch model-tiering lever across vendors, and interacts with [hosted-attestation-service](#hosted-attestation-service), [plugin-marketplace](#plugin-marketplace), and the credential-swap entries.
+**Seam ruling (on record):** generic mechanism only — transport, budget oracle, and escalation channel become consumer-config seams; a kit literal naming a vendor crosses the provenance seam and is ruled out, the pattern the retired `prose-profile` ruled. It extends the per-batch model-tiering lever across vendors, and interacts with [hosted-attestation-service](#hosted-attestation-service), [plugin-marketplace](#plugin-marketplace), and the credential-swap entries.
 
 **Demand-gated — demand attested (2026-07-23):** the operator holds working foreign-vendor subscriptions and wants read-heavy delegation routed to them for budget headroom, and with three vendors live the N-keyed oracle seam is no longer hypothetical. First slice at promotion: a foreign-CLI executor for the already-pre-authorized read-heavy audit / mechanical-sweep class over a spawned non-interactive CLI process, one adapter per vendor as consumer config — not full stage dispatch.
 
@@ -434,15 +484,11 @@ first-class support for swapping the Anthropic OAuth credential out from under i
 
 **(a) Detection.** usage-verdict's auth-change reroute fires only on CRED_FILE mtime, so an out-of-band / env-var / path token swap that does not rewrite that file bypasses it — the verdict trusts the prior account's snapshot and the poller re-fetches the stale file's token. Broaden the reroute to also fire when the live account identity (oauthAccount.accountUuid / subscriptionType) differs from the snapshot's `account=` / `tier=`, forcing a re-poll on any swap.
 
-**(b) Evidence.** the `.metric/` trend samples already carry `account=` / `tier=`, but the wave-over-wave burn projection reads the tail
-
-**unpartitioned**, so a swap reads as a spurious used% drop that corrupts the projection and masks aggregate load. Segment usage analysis by `account=` and mark the swap boundary in the trend log so the evidence is per-account-honest.
+**(b) Evidence.** the `.metric/` trend samples already carry `account=` / `tier=`, but the wave-over-wave burn projection reads the tail **unpartitioned**, so a swap reads as a spurious used% drop that corrupts the projection and masks aggregate load. Segment usage analysis by `account=` and mark the swap boundary in the trend log so the evidence is per-account-honest.
 
 **(c) Safety.** the budget guard's premise is one account = one rate window per wave; background rotation moves the wall in-flight agents bill against and lets rotation collectively exceed what any single account's 5h/7-day PAUSE would allow while each account stays individually under threshold. Add a cross-account aggregate view so supported swapping cannot silently blow past the true combined ceiling.
 
-**(d) Signal-quality refinement (advisory, not a bug).** the post-login reroute (`DELEGATION_KIT_LOGIN_WINDOW`) is correctly advisory-only — STALE never blocks (delegation-kit/SPEC.md §usage-verdict, which also states the server lag the next point turns on), so this is signal quality, not a dispatch-blocking defect. Two points: the window default is 600s while the SPEC's own stated server-lag is "about a minute", a ~10x margin worth tightening; and it is a
-
-**blanket** time-window where an **account-keyed** check is sharper — trust `usage.txt` when its `account=` matches the current credential's account AND `updated_at > login_at`, with a short (~90s) settling floor for the server lag. That restores the true reading in ~1 min instead of 10 and stops 10 min of STALE samples polluting the trend log (`.metric/usage-history.log`) — which directly sharpens (b).
+**(d) Signal-quality refinement (advisory, not a bug).** the post-login reroute (`DELEGATION_KIT_LOGIN_WINDOW`) is correctly advisory-only — STALE never blocks (delegation-kit/SPEC.md §usage-verdict, which also states the server lag the next point turns on), so this is signal quality, not a dispatch-blocking defect. Two points: the window default is 600s while the SPEC's own stated server-lag is "about a minute", a ~10x margin worth tightening; and it is a **blanket** time-window where an **account-keyed** check is sharper — trust `usage.txt` when its `account=` matches the current credential's account AND `updated_at > login_at`, with a short (~90s) settling floor for the server lag. That restores the true reading in ~1 min instead of 10 and stops 10 min of STALE samples polluting the trend log (`.metric/usage-history.log`) — which directly sharpens (b).
 
 **Cost while deferred:** any background swap today silently corrupts the burn projection and can breach the combined budget ceiling with every account reading individually safe; and the login window over-STALEs by ~10x.
 
@@ -456,9 +502,7 @@ the interop rung. Govern a tree whose specs an **external spec-authoring toolkit
 
 **The design is already decided and is not what this entry holds.** Two rulings on record settle it: `prose-profile` (retired) ruled a profile ships as an adapter delivered as optional consumer config and never as a kit literal, and [heterogeneous-agent-delegation](#heterogeneous-agent-delegation) rules a kit literal naming a vendor crosses the provenance seam outright. So the shape is a consumer-side profile over a declared artifact layout — the `check-graph` / `graph-vocab` pattern — with per-toolkit specifics in consumer config. What is open is the *substance*: which lifecycle assumptions break when the amendment set is authored elsewhere, and whether a tested two-toolkit consumer is buildable without a kit ever naming one.
 
-**Survey run 2026-08-02 at scope — three corrections, so a spec pass starts here.** (1) *Cheaper than filed:* the load-bearing knobs already exist as consumer config (`CANON_KIT_SPEC_NAME`, `_AMENDMENT_GLOB`, `_QUEUE_FILE`, `_DOD_MODE`; `LIFECYCLE_KIT_AMENDMENT_GLOB`, `_CONTRACT_TOKENS`). The work is *proving them sufficient*, not inventing a profile format. (2) *The sharpest break is a silent one:* `check-stage-entry` assertion C reads literal `SPEC.md`/`proto/` substrings inside amendment bodies as its cross-component signal, so a foreign layout makes it
-
-**never fire** — the align audit is skipped with no red. An interop consumer is not merely unsupported, it is silently under-gated. `check-spec-pointer` breaks the same way on non-markdown artifacts. (3) *The deepest coupling is process, not config:* `check-spec-derivable-section`/`check-spec-embedded-source` assume the canonical-spec-plus-short-lived-amendment model itself, which a toolkit keeping many living per-feature specs does not fit at any knob setting.
+**Survey run 2026-08-02 at scope — three corrections, so a spec pass starts here.** (1) *Cheaper than filed:* the load-bearing knobs already exist as consumer config (`CANON_KIT_SPEC_NAME`, `_AMENDMENT_GLOB`, `_QUEUE_FILE`, `_DOD_MODE`; `LIFECYCLE_KIT_AMENDMENT_GLOB`, `_CONTRACT_TOKENS`). The work is *proving them sufficient*, not inventing a profile format. (2) *The sharpest break is a silent one:* `check-stage-entry` assertion C reads literal `SPEC.md`/`proto/` substrings inside amendment bodies as its cross-component signal, so a foreign layout makes it **never fire** — the align audit is skipped with no red. An interop consumer is not merely unsupported, it is silently under-gated. `check-spec-pointer` breaks the same way on non-markdown artifacts. (3) *The deepest coupling is process, not config:* `check-spec-derivable-section`/`check-spec-embedded-source` assume the canonical-spec-plus-short-lived-amendment model itself, which a toolkit keeping many living per-feature specs does not fit at any knob setting.
 
 **The discharge pattern already exists in-tree.** docs/positioning.md §The tiered compatibility claim says "This is tested, not asserted" and cites context-kit's `--agents-md-smoke` arm. That is the shape the three claims below owe.
 
@@ -484,7 +528,7 @@ a narrow external preview before any broad announcement: a preview cohort whose 
 
 **Expected FIRST FINDING, not a precondition:** today's quick start is curl, sha256sum, tar and `bash … init` from a repository root; macOS needs GNU bash and coreutils by adopter action; native Windows needs Git for Windows. That is why the merged channel gives the installer no delta — those host-floor facts are an output of the observation, not an input.
 
-**Refused, grounds carried forward:** parking behind `native-windows-bash-floor` or the git-only-floor discharge (the trigger is what the preview measures); the icebox (the highest cost-while-deferred in the intake).
+**Refused, grounds carried forward:** parking behind `native-windows-bash-floor` (landed 2026-09-18) or the git-only-floor discharge (the trigger is what the preview measures); the icebox (the highest cost-while-deferred in the intake).
 
 **Cost while deferred — still the highest of its intake, and now the more exposed half.** Every claim that would be strongest with external evidence still rests on internal dogfooding, and the channel that would carry it is built and reading zero: the published page states an honest `0` on every pass while the volume of unattested governed surface keeps growing. Deferring also silently defers [benchmark-ab-experiment](#benchmark-ab-experiment), since running that first would fix the wrong metrics. Surfaced 2026-08-02 at close, in the same intake pass, as the review's fourth-ranked item.
 
@@ -524,7 +568,7 @@ a gate-authoring SDK. `.gate` as the substrate-neutral surface. **Operator-surfa
 
 [cost: event/low] [surface: gate-sdk]
 
-`check-gate-tamper`'s exemption reader has no implementation-side equivalent. Split 2026-08-09 at scope by operator ruling from `gate-tamper-roster-native-reach`, when that entry narrowed to its meta-path-roster half and promoted; this is the exemption half, unchanged in substance. That entry was itself split 2026-08-02 from `native-gate-meta-layer-reach`, so this is the second narrowing of one original gap. `extract_exemptions()` parses a shell `# exception-list:` array literal, so a ported gate's Rust module can carry no exemption the gate is able to read.
+`check-gate-tamper`'s exemption reader has no implementation-side equivalent. Split 2026-08-09 at scope by operator ruling from `gate-tamper-roster-native-reach` (since retired), when that entry narrowed to its meta-path-roster half and promoted; this is the exemption half, unchanged in substance. That entry was itself split 2026-08-02 from `native-gate-meta-layer-reach`, so this is the second narrowing of one original gap. `extract_exemptions()` parses a shell `# exception-list:` array literal, so a ported gate's Rust module can carry no exemption the gate is able to read.
 
 **Why design-pending:** it wants the ruling [gate-authoring-sdk-surface](#gate-authoring-sdk-surface) holds — whether a meta-gate reads a substrate-neutral descriptor or learns each substrate — and that entry is horizon-set to ecosystem work, so this one waits.
 
@@ -662,9 +706,7 @@ a hook registration in `.claude/settings.json` whose `command` names a renamed o
 
 [cost: event/low] [surface: guard-kit] [recurrence: 2026-08-29]
 
-a guard-kit rule number is a stable-looking identifier that is not stable: rules renumber on every insertion, and the renumbering sweep's roster covers SPEC prose, lib comments, the test tables and the runner —
-
-**cross-corpus prose has never been in it**.
+a guard-kit rule number is a stable-looking identifier that is not stable: rules renumber on every insertion, and the renumbering sweep's roster covers SPEC prose, lib comments, the test tables and the runner — **cross-corpus prose has never been in it**.
 
 **Measured, not assumed:** `ro-bins-write-option-bypass` cited the read-only-pipeline rule as "rule 15 ... rule 13 when this entry was filed" while it was in fact 17 — stale twice over, and already stale before the renumbering that moved rules 15-20 to 16-21. That one citation was corrected in place at close 2026-08-22 by naming the rule instead of numbering it; the durable rule is this entry's.
 
@@ -702,9 +744,7 @@ guard-kit cites its own rule numbers everywhere and nothing holds a single citat
 
 the site-health probe files issues on the public repo for failures the iteration lifecycle resolves anyway, and the operator does not want that venue.
 
-**Operator-ruled 2026-08-25: the issue-filing path is unwanted.** The objection is to the
-
-**venue**, not to the probe — and a later session must not read it as the probe being wrong. Both firings were true positives on arm #6, the Release body missing its note URL: 2026-08-08 on `v0.22.0` and 2026-08-24 on `v0.25.0`, each cleared by the probe's own recovery path.
+**Operator-ruled 2026-08-25: the issue-filing path is unwanted.** The objection is to the **venue**, not to the probe — and a later session must not read it as the probe being wrong. Both firings were true positives on arm #6, the Release body missing its note URL: 2026-08-08 on `v0.22.0` and 2026-08-24 on `v0.25.0`, each cleared by the probe's own recovery path.
 
 **Those dates sit in this prose deliberately.** The operator has since deleted both issues — probed here, `gh issue list --state all` returns nothing — so the tracker is empty, two dead run-log URLs are all that survives of the evidence, and the underlying defect's repair landed as `release-body-step-has-no-in-tree-witness` — the publish job now composes the Release body, unwitnessed until the first tagged publish run — rather than at any issue that resolves. The `site-health` label survives and is harmless: the workflow's label creation is idempotent and its open-issue lookup returns empty either way.
 
@@ -714,9 +754,7 @@ the site-health probe files issues on the public repo for failures the iteration
 
 **Option 2 is the recommendation and it is BLOCKED, operator-class.** The template header states the issue path as a standing design ruling — a failed probe opens or updates an issue and recovery self-clears — so making it opt-out reverses that ruling, which is the operator's to do and neither a stage's nor a lead's. Recorded rather than resolved.
 
-**The replacement signal is the whole cost, and one half is now probed.** Candidate A, red run only: GitHub's documented scheduled-failure notification targets the last modifier of the
-
-**cron syntax** — not the last committer — and here that is `016d522a`, 2026-07-10, the operator, so the channel resolves to the right person today. The limit that cannot be probed from the tree is whether their notification settings deliver it. Candidate B, write the failure report to the run's job summary: visible in the Actions tab and files nothing, but the workflow writes no step summary today, so this is net-new work rather than a redirect.
+**The replacement signal is the whole cost, and one half is now probed.** Candidate A, red run only: GitHub's documented scheduled-failure notification targets the last modifier of the **cron syntax** — not the last committer — and here that is `016d522a`, 2026-07-10, the operator, so the channel resolves to the right person today. The limit that cannot be probed from the tree is whether their notification settings deliver it. Candidate B, write the failure report to the run's job summary: visible in the Actions tab and files nothing, but the workflow writes no step summary today, so this is net-new work rather than a redirect.
 
 **Cost while deferred:** tracker noise on a public repo, and nothing worse — the probe is accurate and self-clearing, so no outage goes unseen while this waits. Filed 2026-08-25 by scope, operator-directed and relayed through the lead; the tree read behind it was re-run here rather than taken on the relay.
 
@@ -762,13 +800,11 @@ the harness project-dir derivation `check-memory-off` and its two shell twins sh
 
 buy discrimination in the queue's record stamps by RE-ENCODING them rather than by adding text, the deferred pool's per-entry budget being what makes added text the wrong trade.
 
-**Operator-ruled 2026-09-01, and the ruling picked a route none of the three escalated options offered.** The escalation asked how to disambiguate two same-day recurrences and proposed, among others, an iteration slug beside the date. That was REFUSED: adding a field spends the budget the format is trying to protect. The worked example given is `YYYY-MM-DD` → a dashless `YYMMDDHHMM` —
+**Operator-ruled 2026-09-01, and the ruling picked a route none of the three escalated options offered.** The escalation asked how to disambiguate two same-day recurrences and proposed, among others, an iteration slug beside the date. That was REFUSED: adding a field spends the budget the format is trying to protect. The worked example given is `YYYY-MM-DD` → a dashless `YYMMDDHHMM` — **the same ten columns, now carrying hour and minute** — which discriminates same-day instances outright and needs no slug. Array notation for multiple stamps is named as a further step, and the direction is stated to generalize to other task-record components rather than to `recurrence:` alone.
 
-**the same ten columns, now carrying hour and minute** — which discriminates same-day instances outright and needs no slug. Array notation for multiple stamps is named as a further step, and the direction is stated to generalize to other task-record components rather than to `recurrence:` alone.
+**The envelope is one knob now.** queue-kit-unwrap moved the entry cap to code points (`QUEUE_KIT_ENTRY_CAP`) and deregistered `check-queue-wrap` here, so a shorter stamp frees budget but no columns; same-day discrimination is untouched. Weighed at that close and kept: dropping it would re-scope an operator ruling.
 
-**The envelope is two knobs and compression pays on both axes**, which is why this is not a tidiness argument: `QUEUE_KIT_WRAP_BUDGET=100` and `QUEUE_KIT_ENTRY_LINE_CAP=50` (queue-kit's in-crate knob defaults) bound columns and lines separately, so a shorter stamp frees columns directly and freed columns let prose reflow into fewer lines.
-
-**The column axis is WITNESSED THREE TIMES, all measured, none projected.** 2026-09-01: `/spec` blocked outright — `native-gate-port-remaining-corpus`'s lead line could not hold two `spec:` refs under 100 columns, over by two at any legal naming, and the lead ruled around it. 2026-09-03: the same wall forced MINTING a second host, `drift-kit-bin-port-residue`, fissioning the port corpus into per-directory hosts for an encoding reason — a host that emptied and left the queue by 2026-09-05, so the wall outlasted the structure it forced. 2026-09-04: FOUR cuts want four refs against a 66-column base that holds ONE — two shortest legal refs measure 117. Two more hosts REFUSED; four per-cut Done-bound entries taken instead.
+**The column axis was witnessed three times before the wrap limit left.** 2026-09-01: `/spec` blocked — `native-gate-port-remaining-corpus`'s lead line could not hold two `spec:` refs under 100 columns. 2026-09-03: the wall forced minting a second host, `drift-kit-bin-port-residue`, for an encoding reason. 2026-09-04: four cuts wanted four refs against a base that held one; four per-cut entries taken instead.
 
 **The gain is the ENCODING, not the list, and the entry says so because the format already has the list.** queue-kit/SPEC.md §The tag algebra, the `recurrence:` declaration paragraph, defines `recurrence: <slug> <YYYY-MM-DD> [<YYYY-MM-DD>…]`, multiple dates on one line today. **A second interaction dissolves with it.** queue-kit/SPEC.md §The tag algebra, the self-naming-slug paragraph, grounds the field partly in `check-queue-hygiene` rejecting exact-duplicate lines, naming same-day recurrence on two entries as "exactly the case the declaration exists to record". Under a minute-bearing stamp those two lines stop colliding at all, so one of that field's two stated grounds is retired by the encoding rather than argued against.
 
