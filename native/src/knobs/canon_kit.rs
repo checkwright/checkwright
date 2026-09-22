@@ -173,6 +173,22 @@ fn fraction(v: &str) -> bool {
     }
 }
 
+// spec: canon-kit/SPEC.md §Layout and configuration — a non-negative decimal, `^[0-9]+$|^[0-9]*\.[0-9]+$`:
+// unlike `fraction`, unbounded above one, since a coefficient of variation may exceed it
+fn decimal(v: &str) -> bool {
+    match v.split_once('.') {
+        Some((int, frac)) => (int.is_empty() || digits(int)) && digits(frac),
+        None => digits(v),
+    }
+}
+
+// spec: canon-kit/SPEC.md §Layout and configuration — an integer of at least two: a coefficient of
+// variation over one sentence is zero by construction, so a floor of one would red every
+// one-sentence paragraph
+fn min_sentences(v: &str) -> bool {
+    digits(v) && v.parse::<u64>().is_ok_and(|n| n >= 2)
+}
+
 // spec: canon-kit/SPEC.md §Layout and configuration — a broken spec config gates nothing: emptiness,
 // the enumerated switches, the numeric ranges, and the icebox apart from the deferred section
 fn validate(v: &Values) -> Vec<String> {
@@ -238,6 +254,30 @@ fn validate(v: &Values) -> Vec<String> {
     if empty_list("CANON_KIT_COUNT_COLLECTIONS") {
         errs.push("CANON_KIT_COUNT_COLLECTIONS is empty".to_string());
     }
+    // spec: canon-kit/SPEC.md §check-prose-tells — the five thresholds are validated here, not
+    // coerced by the gate: a malformed one refuses every canon-kit gate at exit 2 with the knob
+    // named, never reads as zero
+    for n in [
+        "CANON_KIT_PROSE_TELL_EMDASH_MAX",
+        "CANON_KIT_PROSE_TELL_CONTRAST_MAX",
+        "CANON_KIT_PROSE_TELL_TRICOLON_MAX",
+    ] {
+        if let Some(s) = scalar(v, n).filter(|s| !digits(s)) {
+            errs.push(format!("{} must be a non-negative integer (got '{}')", n, s));
+        }
+    }
+    if let Some(s) = scalar(v, "CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES").filter(|s| !min_sentences(s)) {
+        errs.push(format!(
+            "CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES must be an integer >= 2 (got '{}')",
+            s
+        ));
+    }
+    if let Some(s) = scalar(v, "CANON_KIT_PROSE_TELL_RHYTHM_CV_MIN").filter(|s| !decimal(s)) {
+        errs.push(format!(
+            "CANON_KIT_PROSE_TELL_RHYTHM_CV_MIN must be a non-negative decimal (got '{}')",
+            s
+        ));
+    }
     errs
 }
 
@@ -252,6 +292,41 @@ mod tests {
         }
         for bad in ["", "0", "1.5", "2", "0.", "1.", "a.1", "00.1"] {
             assert!(!fraction(bad), "{}", bad);
+        }
+    }
+
+    // spec: canon-kit/SPEC.md §Layout and configuration — a non-negative decimal is unbounded
+    // above one, unlike the embed threshold's unit fraction
+    #[test]
+    fn a_decimal_is_non_negative_and_unbounded_above_one() {
+        for ok in ["0", "2", "0.25", ".5", "10.5", "007"] {
+            assert!(decimal(ok), "{}", ok);
+        }
+        for bad in ["", "-1", "1.", ".", "a.1", "1.a"] {
+            assert!(!decimal(bad), "{}", bad);
+        }
+    }
+
+    // spec: canon-kit/SPEC.md §check-prose-tells — the em-dash/contrast/tricolon maxes: zero is a
+    // legitimate ban, and a decimal or negative value is refused rather than coerced to it
+    #[test]
+    fn a_prose_tell_max_is_a_non_negative_integer() {
+        for ok in ["0", "2", "007"] {
+            assert!(digits(ok), "{}", ok);
+        }
+        for bad in ["", "-1", "1.5", "a", "2 "] {
+            assert!(!digits(bad), "{}", bad);
+        }
+    }
+
+    // spec: canon-kit/SPEC.md §check-prose-tells — the rhythm floor is an integer of at least two
+    #[test]
+    fn the_rhythm_floor_is_an_integer_of_at_least_two() {
+        for ok in ["2", "4", "10"] {
+            assert!(min_sentences(ok), "{}", ok);
+        }
+        for bad in ["", "0", "1", "-1", "2.0", "a"] {
+            assert!(!min_sentences(bad), "{}", bad);
         }
     }
 }

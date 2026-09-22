@@ -15,32 +15,12 @@ pub fn run(args: &[String]) -> i32 {
     }
 }
 
-// spec: canon-kit/SPEC.md §check-prose-tells — a threshold's value is *coerced*, never
-// validated: the shell form hands awk an unchecked string and awk reads its leading numeric
-// prefix, so a malformed value becomes zero on both substrates rather than diverging
-fn coerce(s: &str) -> f64 {
-    let b = s.trim_start().as_bytes();
-    let mut i = 0usize;
-    if i < b.len() && (b[i] == b'+' || b[i] == b'-') {
-        i += 1;
-    }
-    let start_digits = i;
-    while i < b.len() && b[i].is_ascii_digit() {
-        i += 1;
-    }
-    if i < b.len() && b[i] == b'.' {
-        i += 1;
-        while i < b.len() && b[i].is_ascii_digit() {
-            i += 1;
-        }
-    }
-    if i == start_digits {
-        return 0.0;
-    }
-    std::str::from_utf8(&b[..i])
-        .ok()
-        .and_then(|t| t.parse::<f64>().ok())
-        .unwrap_or(0.0)
+// spec: canon-kit/SPEC.md §check-prose-tells — every threshold is validated by the kit's knob
+// table (§Layout and configuration) before this gate ever reads it, so a numeric parse here
+// cannot fail — a failure is a bug in that validator, not a malformed consumer value
+fn numeric(s: &str) -> Result<f64, String> {
+    s.parse::<f64>()
+        .map_err(|e| format!("{} is not numeric despite table validation: {}", s, e))
 }
 
 struct Thresholds {
@@ -481,13 +461,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let contrast_max_raw = walk::knob_scalar("CANON_KIT_PROSE_TELL_CONTRAST_MAX")?;
     let tricolon_max_raw = walk::knob_scalar("CANON_KIT_PROSE_TELL_TRICOLON_MAX")?;
     let th = Thresholds {
-        emdash_max: coerce(&emdash_max_raw),
+        emdash_max: numeric(&emdash_max_raw)?,
         emdash_max_raw,
-        contrast_max: coerce(&contrast_max_raw),
+        contrast_max: numeric(&contrast_max_raw)?,
         contrast_max_raw,
-        rhythm_min: coerce(&walk::knob_scalar("CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES")?),
-        rhythm_cv_min: coerce(&walk::knob_scalar("CANON_KIT_PROSE_TELL_RHYTHM_CV_MIN")?),
-        tricolon_max: coerce(&tricolon_max_raw),
+        rhythm_min: numeric(&walk::knob_scalar("CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES")?)?,
+        rhythm_cv_min: numeric(&walk::knob_scalar("CANON_KIT_PROSE_TELL_RHYTHM_CV_MIN")?)?,
+        tricolon_max: numeric(&tricolon_max_raw)?,
         tricolon_max_raw,
     };
 

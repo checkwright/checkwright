@@ -637,15 +637,22 @@ Knobs:
   empty ⇒ nothing scanned, a clean pass: the reader-facing prose surfaces
   `check-prose-tells` reads. Which surfaces carry authored prose is the
   consumer's editorial posture, and per the provenance seam it never lands as a
-  kit literal. The threshold knobs, each read by `check-prose-tells` alone:
-  `CANON_KIT_PROSE_TELL_EMDASH_MAX` — em-dashes a paragraph may carry, default
-  `2`; `CANON_KIT_PROSE_TELL_CONTRAST_MAX` — "not X, it's Y" contrast turns a
-  section may carry, default `1`; `CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES` —
-  sentences a paragraph needs before its rhythm is judged, default `4`;
+  kit literal. The threshold knobs, each read by `check-prose-tells` alone and
+  validated by this table (a malformed value refuses at exit 2 with every
+  finding, the table's standing rule above):
+  `CANON_KIT_PROSE_TELL_EMDASH_MAX` — em-dashes a paragraph may carry, a
+  non-negative integer, default `2`; `CANON_KIT_PROSE_TELL_CONTRAST_MAX` —
+  "not X, it's Y" contrast turns a section may carry, a non-negative integer,
+  default `1`; `CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES` — sentences a
+  paragraph needs before its rhythm is judged, an integer of at least `2` (a
+  coefficient of variation over one sentence is zero by construction, so a
+  floor of one would red every one-sentence paragraph), default `4`;
   `CANON_KIT_PROSE_TELL_RHYTHM_CV_MIN` — the word-count coefficient-of-variation
-  floor beneath which a paragraph reads as metronomic, default `0.25`;
-  `CANON_KIT_PROSE_TELL_TRICOLON_MAX` — "A, B, and C" triples a section may
-  carry, default `2`. `CANON_KIT_PROSE_TELL_PHRASES` — array of throat-clearing
+  floor beneath which a paragraph reads as metronomic, a non-negative decimal
+  (unbounded above one, unlike the embed threshold's unit fraction), default
+  `0.25`; `CANON_KIT_PROSE_TELL_TRICOLON_MAX` — "A, B, and C" triples a section
+  may carry, a non-negative integer, default `2`.
+  `CANON_KIT_PROSE_TELL_PHRASES` — array of throat-clearing
   phrases matched case-insensitively, default a bundled generic-English set
   (`It's worth noting`, `That said`, …); `CANON_KIT_PROSE_TELL_ABBR_ALLOW` —
   array of abbreviations exempt from the undefined-abbreviation tell, default a
@@ -3460,12 +3467,9 @@ Two properties of the port are stated here because neither is visible from the
 assertion list. The corpus is walked **once per file**, not once per surface set:
 assertion D is an in-file assertion, so a shared walk would pool every surface's
 tokens into one buffer and an abbreviation expanded in any file would clear it in
-all of them. And the thresholds are **coerced, not validated** — the port
-reproduces that rather than hardening it, because a refusal the shell form never
-made is a verdict change across the seam. A malformed threshold therefore reads
-as zero on both substrates, which makes the gate fire on everything or never; the
-repair belongs in the library, where one computation would serve both, and is
-filed as its own unit rather than taken here.
+all of them. The thresholds are validated by the kit's knob table (§Layout and
+configuration), so a malformed one refuses every canon-kit gate at exit 2 with
+the knob named, never reads as zero.
 
 Criterion 4 **clears** on this member and the verdict is a property of a
 consumer's config rather than of the gate: its corpus is a pure glob expansion of

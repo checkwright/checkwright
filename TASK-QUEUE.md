@@ -12,20 +12,6 @@
 
 ## New Features
 
-- **prose-tell-threshold-validation** [spec: SPEC-threshold-shape.md] — `check-prose-tells`' five
-  numeric thresholds are read through a prefix coercion and never validated, so a typo turns a
-  calibrated gate into a silent no-op or a wall of noise, confidently and with no diagnostic.
-  **Re-measured at spec:** canon-kit's knob-table validator names none of the five, and no tree
-  config or fixture sets one, so every member takes its default.
-  **Ruled at spec (2026-09-22):** refuse at exit 2, the rule canon-kit/SPEC.md §Layout and
-  configuration already states for the table; the fallback was refused as the table's one
-  exception. Maxes are non-negative integers, the rhythm floor an integer of at least two, the
-  variation floor a non-negative decimal.
-  **Cost while deferred:** a consumer typo produces a confidently wrong verdict, and neither
-  failure mode names its cause.
-  Filed 2026-08-19 by close from the gap inbox, which carried it twice.
-  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its threshold unit.
-
 ## Technical Debt
 
 ## Deferred
@@ -2120,5 +2106,6 @@
 - kit-spec-singleton-consumer-config-quotes
 - gap-inbox-kit-ref-valve
 - kit-ref-liveness-stem-token-hole
+- prose-tell-threshold-validation
 
 ## Lessons Learned
