@@ -1,3 +1,4 @@
 # graph: couples=*.md,knob:GATE_SDK_GATES_DIR/*.sh,kit:*.sh,knob:CANON_KIT_MEASURED_SURFACE_GLOBS dir=one valve=none tier=precommit
 # install: on-surface
+# armed-by: CANON_KIT_CLAIM_CLASSES_CMD
 # spec: canon-kit/SPEC.md §check-unmarked-claim — a paragraph matching a consumer-declared claim class carries a `measured:` marker: the class is the trigger and the marker one of three remedies, so a claim that must not go stale is bound to an oracle rather than left to authorial memory

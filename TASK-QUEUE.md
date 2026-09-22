@@ -8,62 +8,6 @@
 
 ## New Features
 
-### consumer-policy-rule-absent
-
-[spec: SPEC-policy-choice.md] [recurrence: 2026-09-22]
-
-a kit feature that encodes a policy, such as record-size capping, ships this project's one choice as the kit's behaviour instead of a consumer-selectable set of alternatives ('off' among them, plus a lead-grantable per-record exception where it fits). This repo should then bind exactly one choice as a consumer. doctrine-kit/DOCTRINE.md has the provenance seam (content to config) and widest-true-tier (placement), but no design rule that turns a policy into a consumer choice, and nothing checks it. Live instance: queue-kit-unwrap's build hard-coded a 100-code-point marker reach into `check-knob-citation` (`MARKER_REACH`, native/src/gates/knob_citation.rs).
-
-**Deliverable:** a DOCTRINE methodology rule plus its one-line digest in the always-loaded file, and an enforcement if one is feasible. Operator direction, with the work: first run a read-heavy audit (audit-sweep type) of existing gates and of decommissioned ones (deleted `.gate` descriptors and removed `native/src` modules in git history) for places where a gate hard-codes this project's policy instead of offering consumer-selectable alternatives. The audit's findings supply the rule's worked examples and the follow-up entries.
-
-**Leads `consumer-policy-seam`; admitted on the filter's trust arm** — operator direction 2026-09-22, lead-relayed: a calibration a kit bakes in with no knob or off switch is one an adopter must trust as shipped, and a wrong red at it can only be bypassed. The five entries joining it are reshaped by its rule.
-
-**Specified 2026-09-22:** methodology rule 13, Policy-as-choice, with a discriminator (does another value keep the gate's stated contract true?) and three exclusions (kit-shipped grammar, contract invariant or external limit, verdict-neutral value); its digest; and a cadence, a `baked-calibration` audit-roster class, rather than a gate. The census ran at spec over 117 kit gate modules and 110 deleted gate files and found six verdict-affecting baked calibrations and no true decommission. The baked windows are named constants, inline literals, a paragraph walk and a pattern quantifier alike, so a constant scan would be a stand-in. No conversion is built here; the census's five follow-ups are in the gap inbox.
-
-**Cost while deferred:** every design session defaults to hard-coding this project's preference, and the operator pays for each correction. Filed 2026-09-22 to the gap inbox by the queue-kit-unwrap lead as an operator direction, with an addendum. Promoted at its close because →fix would author a new doctrine rule and an audit, which is more than a close drain may land. Recurrence stamped on the operator's statement that the direction had been corrected before. Owner lookup ran over `policy`, `consumer choice` and `consumer-select` in doctrine-kit/DOCTRINE.md and found no owner.
-
-### kit-knob-consumer-adapter-convention
-
-[spec: SPEC-policy-choice.md] [recurrence: 2026-09-03]
-
-whether a kit may ship a knob whose only working configuration requires the consumer to author an adapter, and whether the front-end shape that answer takes should be a named convention rather than each consumer's invention.
-
-**The capability loss that raised it is CLOSED, and this entry is deliberately the residue.** `shell-gate-tail-port` deleted the path `DELEGATION_KIT_LIVENESS_CMD` defaulted to, so the turn-end liveness probe logged `verdict=unavailable` on every firing. The repair landed at the same cut: the kit template dropped a default that pointed at nothing (a path present in no tree reads as a shipped capability and is none), the knob kept its contract exactly — a path run with the scratch dir as its only argument — and this repo named its own reader `scripts/producer-liveness-reader.sh`, reaching the gate through `scripts/gate-exec.sh`. BOTH scripts left the tree 2026-09-05, and the negative control at `scripts/gate-tests/subagent-stop-reader.test.sh` now asserts `unresolved`, never `unavailable`.
-
-**The capture log priced the loss and verified the repair:** 77 `verdict=unavailable` firings inside one 46-minute window, zero after. So the surviving question is a convention question, not a defect. **Kept at queue-kit-unwrap's close** on a live trigger: [consumer-policy-rule-absent](#consumer-policy-rule-absent)'s gate audit reads the same config-surface question. **Joins `consumer-policy-seam`, riding under that entry as reshaped** — operator direction 2026-09-22, lead-relayed; it goes after that entry's rule.
-
-**Specified 2026-09-22, in the rule's amendment:** a knob that selects behavior ships a working value (a bundled bare name, a kit `--emit` arm through the front-end, or `off`), and a consumer command extends the set but is never its only working member, stated in gate-sdk/SPEC.md §The knob file. A new kit adapter is an `--emit` arm, never a third bare name. The five canon-kit claim gates whose empty command knob disarms them declare it with `# armed-by:`, so `doctor` names the state.
-
-**The precedent this stands on, which is what makes the question general.** evidence-kit met the identical break one caller over when the same port turned a pre-flight entry's named path into a descriptor, and discharged it with a CONSUMER-SIDE front end resolving the gate name, explicitly refusing to teach the kit's knob to resolve a name as "a kit-contract change". Two kits, two consumers, one shape, invented twice.
-
-**Why this needed design:** naming the convention is a cross-kit envelope change. The seam INSTANCE it was argued on is spent — `scripts/gate-exec.sh` left the tree 2026-09-05 and its successor `run-gates.sh --only` is kit-shipped, so a template could name that one — while the question survives on the parser knobs, where any default is still a seam call first.
-
-**Cost while deferred:** low and adoption-shaped — every consumer configuring such a knob rediscovers the adapter shape from scratch, and a consumer that does not gets honest degradation rather than a break, which is why nothing forces the issue.
-
-**The 2026-09-03 parser cut narrowed the question to its naming and answered nothing else.** Both `EVIDENCE_KIT_PARSER_<suite>` values this repo configures now name bundled arms, so an adopter wanting per-gate or per-arm scenarios writes a knob value instead of authoring a script: the *mechanism* stopped being each consumer's invention. The *name* did not — a third built-in adapter beside `exit-code` and `libtest` was refused twice over, on the ground that absorbing an owed script into a permanently shell library discharges the port's count while defeating its objective, and on the ground that naming the convention is this entry's own deliverable, which a port cut may not rule (evidence-kit/SPEC.md §The evidence adapters). So the cut DEMOTES this entry rather than closing it, returning it to the position the 2026-08-24 promotion took it from.
-
-**The delegation instance LEAVES the class 2026-09-05 (operator, consult):** the liveness hook reaches its gate through its own executable, so the knob is an override over a working default (delegation-kit/SPEC.md §The turn-end liveness hook); the question survives on the parser knobs. Filed 2026-08-24 to the gap inbox by build in two bullets, the second correcting the first's repair premise as measured-false; promoted 2026-08-24 at `shell-gate-tail-port-and-completion-oracle`'s close, whose drain confirmed the reader, its oracle and the surviving question. The instance above was filed 2026-09-03 to the gap inbox by the consult and drained here into this entry rather than into a new one, the port-only run barring the drain's promote.
-
-### matching-window-roster-absent
-
-[spec: SPEC-policy-choice.md]
-
-no surface rosters which gates carry a same-line or same-paragraph matching window, so auditing the class means re-deriving the roster off `native/src/gates` and the pattern files each time. The residue is spread across four surfaces: canon-kit/SPEC.md and gate-sdk/SPEC.md carry the three audited windows' verdicts in three sections, and [msg-uuid-reach-unbounded](#msg-uuid-reach-unbounded) and [measured-claim-span-unbounded](#measured-claim-span-unbounded) carry a fourth and fifth candidate.
-
-**Deliverable — rule one of two:** a DERIVED roster (a `.gate` descriptor field the binary reads, or an `--emit` arm over the pattern files and the gate modules — never a hand-kept list, which derivation-first forbids), or a stated refusal naming why the class has no decidable oracle.
-
-**Probed at promotion:** three windows are named constants — `MARKER_REACH` (`knob_citation.rs`), `SPAN_CAP` (`queue_prose_precondition.rs`), `WINDOW` (`assertion_strength.rs`) — while the msg-uuid window is a regex `.*` in a pattern file and measured-claim's is a paragraph walk, so a constant-name scan alone reaches three of five.
-
-**Corrected at spec 2026-09-22, by the census:** `SPAN_CAP` is not a window. It caps the excerpt the finding message quotes (`fired_span`) and changes no verdict. The census also found an inline 400-character window in `knob_default_coupling.rs` that no constant name marks. So no shape is common, and the inferred claim that a descriptor field or an emit arm could decide membership is false.
-
-**Specified 2026-09-22, in the rule's amendment:** the stated refusal. A window is bounded by structure where the grammar has one and otherwise by a knob; `--emit knob-roster` lists the knob-backed ones; no window roster is kept, since no scan decides membership (gate-sdk/SPEC.md §Calibration lessons).
-
-**DISTINCT from** the two entries above, each owning one window's calibration and discharged by fixing it; this owns the missing surface that would have led an auditor to either.
-
-**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed; reshaped by [consumer-policy-rule-absent](#consumer-policy-rule-absent), whose audit of baked policy is the census this roster derives from.
-
-**Cost while deferred:** the next auditor re-derives the roster from source. Filed 2026-09-22 to the gap inbox by `install-first-contact`'s close, captured as knowledge friction during `line-window-gates-unaudited`'s audit, and promoted at the next scope's intake, so the record is late and says so. Owner lookup ran `matching window`, `same-line window` and `window roster` over the tracked docs — no owner.
-
 ### msg-uuid-reach-unbounded
 
 [spec: SPEC-uuid-reach.md]
@@ -74,7 +18,7 @@ no surface rosters which gates carry a same-line or same-paragraph matching wind
 
 **Probed at scope 2026-09-22:** the interval stays under the engine's bound — `DUP_MAX` is 255 in `native/src/ere.rs`, against the candidate's `{0,40}`.
 
-**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed; reshaped by [consumer-policy-rule-absent](#consumer-policy-rule-absent), whose rule answers the seam question above, so it goes after it.
+**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed; reshaped by `consumer-policy-rule-absent`, whose rule answers the seam question above, so it goes after it.
 
 **Corrected at spec 2026-09-22, by running the candidate through the engine:** there are six sites, not five, since a unit-test literal in `native/src/gates/commit_msg.rs` carries the shape too. The `{0,40}` candidate fails both ways: it still reds a `Note: …session id such as <uuid>` line, and it misses a URL-valued trailer, whose host carries a `.`. **Specified:** the value becomes one token, `[^ ]*`, which reds every trailer shape and no quoting prose, and carries no number to choose. The pattern file is already consumer config, so template and copy both take it and no knob is minted. The shipped-shapes unit test reads the template rather than a copy, since its account-pattern copy had drifted.
 
@@ -90,7 +34,7 @@ no surface rosters which gates carry a same-line or same-paragraph matching wind
 
 **Deliverable, repriced by the above:** a reach or a sentence boundary on the full-line marker's claim span, or a stated reason the paragraph is the right unit — canon-kit/SPEC.md §check-measured-claim owns the sentence. It stays filed rather than discarded because the gate ships to adopters whose trees this measurement cannot reach.
 
-**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed; reshaped by [consumer-policy-rule-absent](#consumer-policy-rule-absent), since a claim-span reach is a baked calibration, so it goes after it.
+**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed; reshaped by `consumer-policy-rule-absent`, since a claim-span reach is a baked calibration, so it goes after it.
 
 **Specified 2026-09-22:** the full-line span is the knob `CANON_KIT_MEASURED_SPAN`, `paragraph`, `sentence` or `off`, default `paragraph` so no adopter's verdict moves, and this repo binds `sentence`. A code-point reach is refused because it cuts a sentence arbitrarily. Re-measured: the six full-line markers outside fixtures are four `gate-substrates=native` and two copies (canon-kit/SPEC.md and its generated mirror) of one fenced specimen, so the binding moves no verdict here.
 
@@ -122,13 +66,13 @@ three kit gates bake a matching window with no knob: `MARKER_REACH` (100 code po
 
 **Deliverable, per Policy-as-choice:** each a knob in its kit's table, default the shipped value so no verdict moves, `off` where the gate's other assertions survive, the SPEC section stating the knob, a fixture case per value, and this repo binding its choice in its knob file.
 
-**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed at a spec re-entry after align: all three windows rather than `MARKER_REACH` alone, fixed in this iteration rather than left filed. It goes after [consumer-policy-rule-absent](#consumer-policy-rule-absent), whose rule it applies.
+**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed at a spec re-entry after align: all three windows rather than `MARKER_REACH` alone, fixed in this iteration rather than left filed. It goes after `consumer-policy-rule-absent`, whose rule it applies.
 
 **Specified 2026-09-22:** `CANON_KIT_KNOB_CITATION_REACH` (a count, `sentence` or `off`), `CANON_KIT_DEFAULT_COUPLING_WINDOW` (a count or `off`, which stops SPEC agreement and keeps source self-agreement) and `GATE_SDK_ASSERTION_STRENGTH_WINDOW` (a count; no `off`, since the window bounds the gate's only assertion). A paragraph bound for the coupling window and a guard-body bound for assertion strength are refused with grounds. This repo binds the shipped values, which move no verdict here.
 
 **Widened 2026-09-23 by a second operator direction, lead-relayed:** the gap filed at this spec, the 24-byte span in which `spec::DefaultGrammar::default_bound_at` binds "default" to a value literal, joins this unit. Probed at entry: `check-knob-citation` is its one caller (the filing said both knob gates, which is false; the coupling gate hands the grammar its own window's tail). **Specified:** `CANON_KIT_KNOB_CITATION_LITERAL_SPAN`, bytes, default `24`, with no `off` of its own, since the reach's `off` stops the same leg. Sentence and clause bounds are refused because both admit the adverbial "by default" the span exists to refuse.
 
-**Cost while deferred:** every adopter meets four distances it cannot set. Filed 2026-09-22 to the gap inbox from the consumer-policy-seam spec census (survey record block "which kit gates bake a policy…"), and entered directly under the direction above. **DISTINCT from** [matching-window-roster-absent](#matching-window-roster-absent), which owns the refused roster; this owns the three conversions.
+**Cost while deferred:** every adopter meets four distances it cannot set. Filed 2026-09-22 to the gap inbox from the consumer-policy-seam spec census (survey record block "which kit gates bake a policy…"), and entered directly under the direction above. **DISTINCT from** `matching-window-roster-absent`, which owns the refused roster; this owns the three conversions.
 
 ## Technical Debt
 
@@ -1737,5 +1681,9 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 `check-docs-cmd` assertion (C) misses a retired path cited from the queue, which is outside its manifest corpus and whose `<path>:<line>` token fails the path shape.
 
 ## Done
+
+- consumer-policy-rule-absent
+- kit-knob-consumer-adapter-convention
+- matching-window-roster-absent
 
 ## Lessons Learned
