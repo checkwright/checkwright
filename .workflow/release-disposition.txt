@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+install-first-contact release deferred:v0.26.0 — declarations since v0.25.0 still derive a minor with no decommission (this iteration adds check-action-job-ref, the manifest finder's prune narrowing with the two count-reading gates it can red, CANON_KIT_UNWRAP_DECLARATION_LEADS, check-docs-link-convention's per-rule help lines and lead.md's conflicting-answers relay rule); no trigger fired: elapsed-time limb dormant under preview, no security or supply-chain fix, no operator direction, no audience arrival
