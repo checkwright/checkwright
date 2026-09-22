@@ -1,2 +1,2 @@
 # contract: context-kit/SPEC.md §The always-loaded meter
-8 5 deadbeefcafebabe
+215cp 157cp deadbeefcafebabe
