@@ -400,7 +400,7 @@ The gate binary needs no special case. `init` records it as an ordinary `files` 
 
 **What it spawns.** The verb itself spawns `git` and its own executable, and nothing else: `git` is the adopter floor and the executable is the binary the bootstrap just verified, so the verb adds no member to the tool-floor roster. The battery it runs spawns whatever the `full` profile's registered gates spawn, which is that profile's own floor (context-kit/SPEC.md §bin/env-probe). A gate whose program is missing exits 2 under the fail-closed contract, so act 2 fails loudly rather than passing quietly.
 
-**Its oracles** are the consumer smoke's demo arm (§The consumer smoke) — the one place a packed payload meets a walkthrough at all — and the PowerShell install-smoke leg in the `gates` workflow, which runs the verb once on a host whose adopter path is PowerShell, where the POSIX runs cannot answer for the `full` battery.
+**Its oracles** are the consumer smoke's demo arm (§The consumer smoke) — the one place a packed payload meets a walkthrough at all — and the PowerShell install-smoke leg in the `gates` workflow, which runs the verb once on a host whose adopter path is PowerShell, where the POSIX runs cannot answer for the `full` battery. **That Windows oracle holds bash on `PATH`**, and it must: `full` carries kits that owe `bash` (docs/install.md §Requirements), so act 1's `init` refuses on a host without it, and a demo run after the leg strips bash would measure `doctor`'s refusal rather than the battery. The leg's no-bash step holds the starter install's hooks instead.
 
 The banner, the green-token matcher and the excerpt are one module both walkthroughs call; each keeps its own acts.
 

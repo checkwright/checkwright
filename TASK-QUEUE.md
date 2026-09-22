@@ -114,18 +114,6 @@ an amendment's refusal rationale can claim an acceptance criterion asserts somet
 
 **Cost while deferred:** paid once per docs adopter, at exactly the moment they are deciding whether the battery is worth keeping — the worst moment this project has to spend a false-feeling red. Filed 2026-08-09 by close, draining the bullet spec filed under scope-gated intake.
 
-### install-smoke-powershell-demo-runs-before-bash-strip
-
-the `install-smoke-pwsh-windows` leg runs `checkwright demo` (the `full` battery) in the step BEFORE the one that strips every bash from PATH, so the full profile on Windows is witnessed with bash present and never without; the no-bash step exercises only the starter init's hooks.
-
-**Re-verified at this scope:** in `.github/workflows/gates.yml` the demo block sits in the init step, ahead of the step named "commit through the generated hooks with no bash on PATH"; gates run 35632734000 (`58908d02`) showed both green in that order. installer/SPEC.md §demo claims only that the leg runs the verb on a PowerShell adopter's path, so no tracked sentence is false.
-
-**Deliverable — rule one of two:** run the demo after the strip (or a second demo there), or state in installer/SPEC.md §demo that the Windows oracle holds bash on PATH.
-
-**Why promoted, not fixed:** moving the demo is a Windows step whose verdict is unknown until a Windows run — a `full` member spawning bash would red it — and the other limb narrows a claim.
-
-**Cost while deferred:** a `full`-profile gate needing bash on Windows ships unseen. Filed 2026-09-21 to the gap inbox by `docs-first-contact`'s close, reading its push run; promoted at the next scope. Owner lookup: `install-smoke-pwsh-windows`, `demo`, `bash stripped` — the two entries naming that leg own its name and its exemption keying, not its step order.
-
 ## Deferred
 
 ### consumer-policy-rule-absent
@@ -1755,5 +1743,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 `check-docs-cmd` assertion (C) misses a retired path cited from the queue, which is outside its manifest corpus and whose `<path>:<line>` token fails the path shape.
 
 ## Done
+
+- install-smoke-powershell-demo-runs-before-bash-strip
 
 ## Lessons Learned
