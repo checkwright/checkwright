@@ -348,6 +348,12 @@ impl Kit {
         self.rows.iter().find(|r| r.name == name)
     }
 
+    // spec: canon-kit/SPEC.md §Layout and configuration — whether `stem` names one of this kit's
+    // declared families exactly, the table's complete answer for its own prefix
+    fn declares_family(&self, stem: &str) -> bool {
+        self.families.iter().any(|f| f.prefix == stem)
+    }
+
     // spec: gate-sdk/SPEC.md §The knob file — the declared family a name is a member of: under its
     // prefix with a valid suffix, and never a declared row the prefix also spells
     fn family_of(&self, name: &str) -> Option<&'static Family> {
@@ -426,6 +432,13 @@ pub fn owner(name: &str) -> Option<&'static Kit> {
         .iter()
         .copied()
         .find(|k| name.starts_with(&k.prefix()))
+}
+
+// spec: canon-kit/SPEC.md §Layout and configuration — a scanned member resolves through a stem
+// only when that stem is a declared family: a static kit's table names it exactly, and a stem no
+// static table owns falls back to what its kit source spells
+pub fn is_declared_family(stem: &str) -> bool {
+    owner(stem).is_some_and(|k| k.declares_family(stem))
 }
 
 // spec: gate-sdk/SPEC.md §The knob file — the gates directory is a locator, env-or-default, because

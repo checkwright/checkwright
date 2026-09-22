@@ -12,37 +12,6 @@
 
 ## New Features
 
-- **gap-inbox-kit-ref-valve** [spec: SPEC-kit-ref-resolution.md] — `check-kit-ref-liveness` valves
-  the queue file out because the queue is design-ahead and names future knobs and paths, but the
-  gap inbox is design-ahead in the same way and is not valved.
-  **Attested:** a bullet proposing an unminted lifecycle-kit knob by its full prefixed name redded
-  the battery at `config-seam-fourth-cut`'s close, and the filed prose had to describe the knobs
-  instead of naming them.
-  **Ruled at spec (2026-09-22):** the valve limb. The inbox is truncated every close, so a dangling
-  name cannot outlive the boundary; its path is read by `LIFECYCLE_KIT_GAP_INBOX_FILE`, a static
-  row the gate can resolve in process. A filer rule was refused: it keeps the red. The survey
-  record is not valved: it records measurements, and no red there is attested.
-  **Cost while deferred:** a gap filer who names a proposed knob reds the battery and rewords.
-  Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, from the red its own
-  filing hit; promoted at the next iteration's scope.
-  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its valve unit.
-
-- **kit-ref-liveness-stem-token-hole** [spec: SPEC-kit-ref-resolution.md] — a typo'd knob name under
-  a stem kit source spells resolves and passes unchecked, because any token under a defined stem
-  resolves through it.
-  **Premise moved, re-measured at spec:** the composed family the filing cited and the binary's
-  `--knobs` arm it proposed resolving against were both removed. The live hole is two
-  non-family stems, `CANON_KIT_PROSE_TELL_` and `CANON_KIT_COMMENT_`, spelled only as wildcards
-  in a help line and a comment; the real composed families are declared in evidence-kit's static
-  knob table.
-  **Ruled at spec (2026-09-22):** a member resolves through a stem only when a static table declares
-  that stem a family, or when no static table owns the prefix; the narrowing reds nothing on the
-  current tree. A typo'd consumer suffix under a declared family stays a stated limit.
-  **Cost while deferred:** a typo'd knob reference reads as governed and checked while binding
-  nothing — a knob silently never applied, surfacing as behavior, not as a red.
-  Filed 2026-08-10 by close, from the residual build batch 2 identified and did not file.
-  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its stem unit.
-
 - **prose-tell-threshold-validation** [spec: SPEC-threshold-shape.md] — `check-prose-tells`' five
   numeric thresholds are read through a prefix coercion and never validated, so a typo turns a
   calibrated gate into a silent no-op or a wall of noise, confidently and with no diagnostic.
@@ -2149,5 +2118,7 @@
 - measured-marker-cannot-sit-mid-paragraph
 - partitive-exemption-line-scope
 - kit-spec-singleton-consumer-config-quotes
+- gap-inbox-kit-ref-valve
+- kit-ref-liveness-stem-token-hole
 
 ## Lessons Learned

@@ -225,6 +225,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let queue_file = walk::knob_scalar("GATE_SDK_QUEUE_FILE")
         .map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
     let queue_base = queue_file.rsplit('/').next().unwrap_or(&queue_file).to_string();
+    // spec: canon-kit/SPEC.md §Layout and configuration — the gap inbox joins the queue in the
+    // valve, by its knob's resolved repo-relative path rather than by basename
+    let gap_inbox_file = walk::knob_scalar("LIFECYCLE_KIT_GAP_INBOX_FILE")
+        .map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
     let prune = walk::prune_dirs().map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
 
     let ls = proc::run(&programs::GIT, &["ls-files", "--", scanroot])
@@ -250,6 +254,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         if path.starts_with("docs/posts/")
             || path == "docs/evidence-data.md"
             || path == ".workflow/release-declarations.md"
+            || path == gap_inbox_file
         {
             continue;
         }
@@ -325,8 +330,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
 }
 
 // spec: canon-kit/SPEC.md §Layout and configuration — an exact occurrence, or either side of a
-// family-stem match: a stem naming defined members, or a member of a defined stem. A bare kit
-// prefix is not a stem, or every knob of that kit would resolve against the prefix alone.
+// family-stem match, the member direction bounded by a declared family. A bare kit prefix is not
+// a stem, or every knob of that kit would resolve against the prefix alone.
 fn knob_ok(t: &str, defined: &HashSet<String>, prefixes: &[String]) -> bool {
     if defined.contains(t) {
         return true;
@@ -335,7 +340,11 @@ fn knob_ok(t: &str, defined: &HashSet<String>, prefixes: &[String]) -> bool {
         if t.ends_with('_') && k.starts_with(t) {
             return true;
         }
-        if k.ends_with('_') && t.starts_with(k.as_str()) && !prefixes.iter().any(|p| p == k) {
+        if k.ends_with('_')
+            && t.starts_with(k.as_str())
+            && !prefixes.iter().any(|p| p == k)
+            && (crate::knobs::owner(k).is_none() || crate::knobs::is_declared_family(k))
+        {
             return true;
         }
     }
@@ -386,5 +395,19 @@ mod tests {
         assert!(!knob_ok(&unknown, &defined, &prefixes));
         let stem: HashSet<String> = [pfx.clone()].into_iter().collect();
         assert!(!knob_ok(&unknown, &stem, &prefixes));
+    }
+
+    // spec: canon-kit/SPEC.md §Layout and configuration — a member resolves through a stem only
+    // when that stem is a declared family: a wildcard-mention stem stays unresolved, a
+    // table-declared one still resolves
+    // comment-tier-exempt: the two full names are assembled from parts rather than spelled, so
+    // this gate scanning its own source finds no knob token that resolves to nothing
+    #[test]
+    fn a_member_resolves_through_a_stem_only_when_the_stem_is_a_declared_family() {
+        let (wildcard, family) = ("CANON_KIT_PROSE_TELL_".to_string(), "EVIDENCE_KIT_RUN_".to_string());
+        let prefixes = vec!["CANON_KIT_".to_string(), "EVIDENCE_KIT_".to_string()];
+        let defined: HashSet<String> = [wildcard.clone(), family.clone()].into_iter().collect();
+        assert!(!knob_ok(&format!("{}EMDASH_MAXX", wildcard), &defined, &prefixes));
+        assert!(knob_ok(&format!("{}SOME_SUITE", family), &defined, &prefixes));
     }
 }

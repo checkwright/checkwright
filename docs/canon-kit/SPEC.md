@@ -378,20 +378,28 @@ honest tree-wide: every slash- or
 line-anchored `<name>-kit` / `gate-sdk` path segment must name a
 `gate_kit_roots` dir, and every live-prefix kit knob must resolve to a tracked
 kit knob (check-docs-cmd's resolver, reused so the non-uniform knob-prefix map
-has one home). **A knob resolves through a family stem in either direction**: a
-scanned `<FAMILY>_` stem resolves when kit source defines any member under it,
-and a scanned member resolves when kit source defines the stem. The second
-direction is what a **dispatch-composed** knob name needs — evidence-kit's
-`EVIDENCE_KIT_RUN_<suite>` family builds the full name at runtime from the suite
-it is running (evidence-kit/SPEC.md §Layout and configuration), so kit source
-contains the stem and never the members. Spelling the members out to satisfy an exact match would be a
-hardcoded roster of consumer knob names in a kit literal, which is the one shape
-that crosses the provenance seam here. It valves the surfaces that legitimately
+has one home). **A knob resolves through a family stem in either direction, and
+the second direction is bounded by a declaration.** A scanned `<FAMILY>_` stem
+resolves when kit source defines any member under it. A scanned member
+resolves through a stem only when that stem is a **declared family**. For a
+static kit, that means a family its knob table declares, as evidence-kit's
+table declares `EVIDENCE_KIT_RUN_` for the suite it is running
+(evidence-kit/SPEC.md §Layout and configuration). For a prefix no static table
+owns, it means a stem its kit source spells. The member direction exists for a
+**dispatch-composed** name, whose full spelling is built at runtime and appears
+in no kit literal. Spelling the members out to satisfy an exact match would be
+a hardcoded roster of consumer knob names in a kit literal, which is the one
+shape that crosses the provenance seam here. A static kit's table is the
+complete answer for its prefix, though. A stem its source spells only as a
+wildcard in a help line or a comment is not a family, and resolving members
+through one would pass any misspelling under it. It valves the surfaces that legitimately
 name design-ahead or frozen brands — `gate-tests/` fixture bodies, `docs/posts/*`, the
 release declaration surface those notes are composed from (whose Renamed knobs
 section names a removed knob by construction), the generated trajectory data,
-`SPEC-*.md` amendments, and the queue — so a rename cannot leave a dangle without
-turning a gate red.
+`SPEC-*.md` amendments, and the two design-ahead records: the queue and the gap
+inbox (`LIFECYCLE_KIT_GAP_INBOX_FILE`), each read by its knob. Both name knobs
+and paths not yet minted, and the inbox cannot hold one past the close that
+truncates it. So a rename cannot leave a dangle without turning a gate red.
 
 Config is a **knob file**: copy `templates/canon-config.knobs` into the gates dir
 as `canon-config.knobs` (or point `CANON_KIT_KNOB_FILE` elsewhere) and set any knob

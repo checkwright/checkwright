@@ -9,3 +9,8 @@ CANON_KIT_BOGUS_KNOB
 The bare kit prefix is not a family stem, or one composed spelling of it would
 resolve every knob the kit could ever name:
 GATE_SDK_BOGUS_KNOB
+
+A member resolves through a stem only when the stem is a declared family — a
+wildcard mention of a stem in kit source is not one, so a typo under it stays
+unresolved:
+CANON_KIT_PROSE_TELL_EMDASH_MAXX
