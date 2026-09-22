@@ -1674,12 +1674,4 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 ## Done
 
-- consumer-policy-rule-absent
-- kit-knob-consumer-adapter-convention
-- matching-window-roster-absent
-- probe-before-assertion-doctrine
-- measured-claim-span-unbounded
-- baked-matching-windows
-- msg-uuid-reach-unbounded
-
 ## Lessons Learned
