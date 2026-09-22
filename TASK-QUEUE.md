@@ -26,9 +26,9 @@ the adopter's first contact assumes a developer toolchain. docs/index.md's quick
 
 [spec: SPEC-install-smoke-leg-names.md] [not-icebox-eligible: 2026-09-09 operator ruled it a defect] [observed-by: gates workflow]
 
-the `install-smoke` legs in `.github/workflows/gates.yml` spend one suffix slot on two different axes, and two tracked surfaces now carry prose whose only job is to undo the misreading that produces.
+the install-smoke legs in `.github/workflows/gates.yml` spend one suffix slot on two different axes, and two tracked surfaces now carry prose whose only job is to undo the misreading that produces.
 
-**The naming, read off the workflow.** Four legs take a PLATFORM suffix (`install-smoke-windows`, `install-smoke-macos`, `install-smoke-macos-intel`, `install-smoke-linux-arm64`), the baseline Linux leg takes none, and `install-smoke-powershell` takes a BOOTSTRAP suffix while running on `windows-latest`, so a reader counting platforms off the names counts wrong. Since the second Linux leg landed 2026-09-11, the unsuffixed baseline is ambiguous as well.
+**The naming, read off the workflow.** Four legs take a PLATFORM suffix (`install-smoke-sh-windows`, `install-smoke-sh-macos`, `install-smoke-sh-macos-intel`, `install-smoke-sh-linux-arm64`), the baseline Linux leg takes none, and `install-smoke-pwsh-windows` takes a BOOTSTRAP suffix while running on `windows-latest`, so a reader counting platforms off the names counts wrong. Since the second Linux leg landed 2026-09-11, the unsuffixed baseline is ambiguous as well.
 
 **The cost is attested rather than predicted:** `.github/workflows/gates.yml` and `installer/SPEC.md` each carry a paragraph whose whole job is to correct that miscount. A name needing a paragraph to be read correctly is the defect; the paragraph is the receipt.
 
@@ -116,7 +116,7 @@ an amendment's refusal rationale can claim an acceptance criterion asserts somet
 
 ### install-smoke-powershell-demo-runs-before-bash-strip
 
-the `install-smoke-powershell` leg runs `checkwright demo` (the `full` battery) in the step BEFORE the one that strips every bash from PATH, so the full profile on Windows is witnessed with bash present and never without; the no-bash step exercises only the starter init's hooks.
+the `install-smoke-pwsh-windows` leg runs `checkwright demo` (the `full` battery) in the step BEFORE the one that strips every bash from PATH, so the full profile on Windows is witnessed with bash present and never without; the no-bash step exercises only the starter init's hooks.
 
 **Re-verified at this scope:** in `.github/workflows/gates.yml` the demo block sits in the init step, ahead of the step named "commit through the generated hooks with no bash on PATH"; gates run 35632734000 (`58908d02`) showed both green in that order. installer/SPEC.md §demo claims only that the leg runs the verb on a PowerShell adopter's path, so no tracked sentence is false.
 
@@ -124,7 +124,7 @@ the `install-smoke-powershell` leg runs `checkwright demo` (the `full` battery) 
 
 **Why promoted, not fixed:** moving the demo is a Windows step whose verdict is unknown until a Windows run — a `full` member spawning bash would red it — and the other limb narrows a claim.
 
-**Cost while deferred:** a `full`-profile gate needing bash on Windows ships unseen. Filed 2026-09-21 to the gap inbox by `docs-first-contact`'s close, reading its push run; promoted at the next scope. Owner lookup: `install-smoke-powershell`, `demo`, `bash stripped` — the two entries naming that leg own its name and its exemption keying, not its step order.
+**Cost while deferred:** a `full`-profile gate needing bash on Windows ships unseen. Filed 2026-09-21 to the gap inbox by `docs-first-contact`'s close, reading its push run; promoted at the next scope. Owner lookup: `install-smoke-pwsh-windows`, `demo`, `bash stripped` — the two entries naming that leg own its name and its exemption keying, not its step order.
 
 ## Deferred
 
@@ -280,7 +280,7 @@ evidence-kit/SPEC.md §check-evidence-baseline says the suite-coverage arm close
 
 no `gates.yml` step runs guard-kit's `gate-tests/guard-read-path.test.sh` (its verbatim-bytes and no-added-CR assertions) on a Windows leg: fixture suites run only in the Linux `gates` job. `floor-jq-guard-lib` deleted the `_guard_lf` CR strip on the ground that those reads return bytes verbatim, so the Windows half of that claim is unproven.
 
-**Re-verified at the drain:** `--run-gate-tests` appears once in `.github/workflows/gates.yml`, in the `gates` job; gates run 35455364409's `install-smoke-windows` log has no hit for the test.
+**Re-verified at the drain:** `--run-gate-tests` appears once in `.github/workflows/gates.yml`, in the `gates` job; gates run 35455364409's `install-smoke-sh-windows` log has no hit for the test.
 
 **Why promoted, not fixed:** the fix is a Windows workflow step whose outcome is unknown until a Windows run. A red there reopens a landed unit, and the close's one remaining push cannot absorb it.
 
@@ -322,7 +322,7 @@ the shipped platform roster held four joined triples and two more the installed 
 
 **PRODUCT-class** by the 2026-08-30 witness discriminator — the install path is adopter-facing, so the machinery-class icebox default does not reach this and it stays ordinary scope intake.
 
-**DISCHARGED 2026-09-11 at `52b4b96a`, leg repaired at `644547a6`: `aarch64-unknown-linux-gnu` is DECLARED HELD**, with its probed runner mapping and an `install-smoke-linux-arm64` consumer leg. Its roster line is deliberately unwritten — the join is the roster header's own predicate and never a queue entry's — and every mechanic that unit probed now lives where it belongs rather than here: the declaration-before-mapping ordering in `native/targets.list`'s header, the pinned-label cost in `native/runners.list`'s, and the answered floor question in the leg's own job header.
+**DISCHARGED 2026-09-11 at `52b4b96a`, leg repaired at `644547a6`: `aarch64-unknown-linux-gnu` is DECLARED HELD**, with its probed runner mapping and an `install-smoke-sh-linux-arm64` consumer leg. Its roster line is deliberately unwritten — the join is the roster header's own predicate and never a queue entry's — and every mechanic that unit probed now lives where it belongs rather than here: the declaration-before-mapping ordering in `native/targets.list`'s header, the pinned-label cost in `native/runners.list`'s, and the answered floor question in the leg's own job header.
 
 **WHAT REMAINS IS `aarch64-pc-windows-msvc` ALONE**, and it is the operator's specific ask. Unpriced and unprejudged: its cost turns on whether GitHub's ARM Windows runners have reached general availability — re-probe actions/runner-images' table rather than trusting any paragraph — and on a runner decision that is the operator's rather than a session's.
 
@@ -340,13 +340,13 @@ the shipped platform roster held four joined triples and two more the installed 
 
 an instrument leg's `continue-on-error` is dropped by an argued expiry that fires on the leg running green ONCE, so widening the leg afterwards re-creates, silently, the never-run condition the exemption existed for.
 
-**ATTESTED, and the cost was the exact one the exemption was written to avoid.** `install-smoke-powershell` carried the expiry "drop this line on the run it is first observed green and not before". It fired on an EIGHT-check leg; a later delta rewrote the leg to THIRTEEN, so five brand-new assertions executed for the first time anywhere on a leg that was by then BINDING. Two defects in the thirteenth reddened master at `ab676c7b`. The exemption's own stated ground was that "its first run was that code's first run and a binding red would have spent a watched push on the very defect the leg exists to surface" — and it spent precisely that push, against a one-to-two-push iteration budget.
+**ATTESTED, and the cost was the exact one the exemption was written to avoid.** `install-smoke-pwsh-windows` carried the expiry "drop this line on the run it is first observed green and not before". It fired on an EIGHT-check leg; a later delta rewrote the leg to THIRTEEN, so five brand-new assertions executed for the first time anywhere on a leg that was by then BINDING. Two defects in the thirteenth reddened master at `ab676c7b`. The exemption's own stated ground was that "its first run was that code's first run and a binding red would have spent a watched push on the very defect the leg exists to surface" — and it spent precisely that push, against a one-to-two-push iteration budget.
 
-**BOTH DEFECTS ARE FIXED and this entry is deliberately the residue.** `74d94c94` provisioned the leg to the floor and cast the bare `-match` whose `System.Object[]` killed the step; `install-smoke-powershell` is SUCCESS at `273a9d76` in run `34346492761`, re-verified at this scope. Master is green and nothing needs reverting — what survives is the keying.
+**BOTH DEFECTS ARE FIXED and this entry is deliberately the residue.** `74d94c94` provisioned the leg to the floor and cast the bare `-match` whose `System.Object[]` killed the step; `install-smoke-pwsh-windows` is SUCCESS at `273a9d76` in run `34346492761`, re-verified at this scope. Master is green and nothing needs reverting — what survives is the keying.
 
 **Why design-pending, a real fork with no obviously right limb:** an expiry keyed to *the assertion set unchanged* needs a stable identity for that set, which the live leg spells as inline PowerShell rather than as anything a scanner can count; a re-arm obligation on the widening session is a prose rule no gate reads and the same class this tree keeps refusing; and the third reading — that widening a binding leg is simply owed a rehearsal round like any other new code — costs a push per widening, which the budget above is what bounds. The shape reaches every `continue-on-error` instrument leg in `.github/workflows/gates.yml`, not this one.
 
-**A FOURTH LIMB, ATTESTED RATHER THAN PROPOSED — `lead, own-authority` 2026-09-09 through the lead's message channel.** An exemption whose posture is DERIVED — `continue-on-error` read out of a per-target roster index rather than hand-carried — makes the binding transition happen on the run that licenses it with no edit, and is rehearsed by construction, the green run licensing the join being the same assertion set. Witness: `install-smoke-windows` carried verbatim the expiry this entry indicts; this iteration's build replaced it with the derived read, and run 34394922502 shows `native-artifacts (x86_64-pc-windows-msvc, windows-latest, false)` with both Windows legs binding and no hand edit. **Its BOUND, where the limb is weaker than it looks:** the derived posture needs a roster carrying a held/joined axis. Platform-target legs have one; an instrument leg with no target roster — the PowerShell bootstrap leg among them — does not, so the limb may resolve the platform subset and leave the shape stated above only partly answered. It is also the limb doctrine favours on its face, derivation-first. **Next step, filed and NOT started:** re-measure the remaining `continue-on-error` legs against this limb — which have a roster to derive from. That is a survey, so scope-gated intake puts pricing it in scope's hands.
+**A FOURTH LIMB, ATTESTED RATHER THAN PROPOSED — `lead, own-authority` 2026-09-09 through the lead's message channel.** An exemption whose posture is DERIVED — `continue-on-error` read out of a per-target roster index rather than hand-carried — makes the binding transition happen on the run that licenses it with no edit, and is rehearsed by construction, the green run licensing the join being the same assertion set. Witness: `install-smoke-sh-windows` carried verbatim the expiry this entry indicts; this iteration's build replaced it with the derived read, and run 34394922502 shows `native-artifacts (x86_64-pc-windows-msvc, windows-latest, false)` with both Windows legs binding and no hand edit. **Its BOUND, where the limb is weaker than it looks:** the derived posture needs a roster carrying a held/joined axis. Platform-target legs have one; an instrument leg with no target roster — the PowerShell bootstrap leg among them — does not, so the limb may resolve the platform subset and leave the shape stated above only partly answered. It is also the limb doctrine favours on its face, derivation-first. **Next step, filed and NOT started:** re-measure the remaining `continue-on-error` legs against this limb — which have a roster to derive from. That is a survey, so scope-gated intake puts pricing it in scope's hands.
 
 **DISTINCT from [binding-intel-leg-failed-one-run-in-two](#binding-intel-leg-failed-one-run-in-two)**, which owns a leg already binding failing non-deterministically with no cause a finished run can reach; this owns the transition INTO binding being keyed to the wrong predicate.
 
@@ -358,7 +358,7 @@ an instrument leg's `continue-on-error` is dropped by an argued expiry that fire
 
 a leg this project made binding failed one of its first two runs, non-deterministically, in a way no finished run can diagnose; master is green and nothing needs reverting.
 
-**Read the resolution first.** Master went red at `adb7379f` and GREEN again at `7329b319`, the very next commit, with `install-smoke-macos-intel` PASSING the second time on the same code path and the same three declared targets. What is left is the leg, not a fire.
+**Read the resolution first.** Master went red at `adb7379f` and GREEN again at `7329b319`, the very next commit, with `install-smoke-sh-macos-intel` PASSING the second time on the same code path and the same three declared targets. What is left is the leg, not a fire.
 
 **What failed.** In run 34267324532 (job 102200720560), the upgrade arm's pack step: the packer as it then was, `scripts/pack-installer.sh`, exited non-zero in 1.6 seconds having printed NOTHING — `run-smoke.sh`:877 echoes `PACK_OUT` to stderr and `PACK_OUT` was empty. Every other arm on that leg passed (main, toolchain-free, jq-less), and the SIBLING arm64 leg ran the same upgrade arm on the same commit with the same three declared targets and finished clean.
 
@@ -382,7 +382,7 @@ a leg this project made binding failed one of its first two runs, non-determinis
 
 a held producer leg's failure fails the workflow through a binding consumer leg, so held-ness is defeated for the pair, and the binding leg's measurement goes to zero rather than degrading.
 
-**Every premise verified at HEAD 2026-09-08 and measured on a live run.** `native-artifacts` carries `continue-on-error: ${{ matrix.held }}` over a derived matrix (`.github/workflows/gates.yml`:737, :739); `install-smoke-macos` at :858 needs it and is binding, stated twice (:838 "It is binding: its red fails this workflow", and again at :1064). The coupling is the normalize step at :1012-1016, which exits 1 when the host's artifact is absent — and it aborts BEFORE the smoke runs, so a down producer yields no measurement at all rather than a degraded one. Measured on run `34200226768`, where that step printed "the producer uploaded no complete aarch64-apple-darwin artifact" and those legs were the run's only failures.
+**Every premise verified at HEAD 2026-09-08 and measured on a live run.** `native-artifacts` carries `continue-on-error: ${{ matrix.held }}` over a derived matrix (`.github/workflows/gates.yml`:737, :739); `install-smoke-sh-macos` at :858 needs it and is binding, stated twice (:838 "It is binding: its red fails this workflow", and again at :1064). The coupling is the normalize step at :1012-1016, which exits 1 when the host's artifact is absent — and it aborts BEFORE the smoke runs, so a down producer yields no measurement at all rather than a degraded one. Measured on run `34200226768`, where that step printed "the producer uploaded no complete aarch64-apple-darwin artifact" and those legs were the run's only failures.
 
 **Second cost, in the same shape.** The leg used to buy an adopter-path measurement from a host build; after delta 5 it consumes the producer's upload and buys nothing when the producer is down.
 
@@ -392,7 +392,7 @@ a held producer leg's failure fails the workflow through a binding consumer leg,
 
 **Cost while deferred:** every future held platform inherits it, so widening the roster widens the coupling, and a red master traceable to a leg nobody declared binding costs a fresh diagnosis.
 
-**ITS OBSERVED TRIGGER CLEARED HOURS AFTER FILING, and the correction is recorded rather than left to rot.** Run `34209082851` at `d433fd4a` has BOTH darwin producer legs green, so the normalize step passes and the coupling is dormant at HEAD; `install-smoke-macos` is red on a different, downstream defect. What the run does NOT show is the coupling repaired — it shows the one trigger that had fired going away. The entry stays deferred on the structural ground its cost field states, that every future held platform inherits it, and NOT on a red master. Filed 2026-09-08 by close from the gap inbox. Promoted rather than fixed because it is an envelope question the operator has already declined once in its wider form; promoted rather than iceboxed because the coupling is structural and inherited, which no single green run retires.
+**ITS OBSERVED TRIGGER CLEARED HOURS AFTER FILING, and the correction is recorded rather than left to rot.** Run `34209082851` at `d433fd4a` has BOTH darwin producer legs green, so the normalize step passes and the coupling is dormant at HEAD; `install-smoke-sh-macos` is red on a different, downstream defect. What the run does NOT show is the coupling repaired — it shows the one trigger that had fired going away. The entry stays deferred on the structural ground its cost field states, that every future held platform inherits it, and NOT on a red master. Filed 2026-09-08 by close from the gap inbox. Promoted rather than fixed because it is an envelope question the operator has already declined once in its wider form; promoted rather than iceboxed because the coupling is structural and inherited, which no single green run retires.
 
 ### kit-knob-consumer-adapter-convention
 
@@ -714,7 +714,7 @@ the harness project-dir derivation `check-memory-off` and its two shell twins sh
 
 **Why it promotes rather than fixing or iceboxing.** →fix fails on evidence, not on effort: the missing fact is *which spelling the harness uses on Windows*, an observation of another program on a host this tree has none of, and no command on a Linux box produces it — writing a fold without it would be inventing a Windows fact, which is what spec declined to do. →icebox fails because a live trigger exists and is dated: the Windows leg `platform-support-ci-matrix` shipped before retiring 2026-09-06 still runs on every push to master and is the run that can observe it, and the migration that just landed made every *other* producer dialect-correct, so these three are now the tree's recorded exception rather than part of a uniform unfixed background.
 
-**Standing exclusion — `lead, own-authority` 2026-09-10 through the lead's message channel, at `host-resolution-fail-open-cut`'s scope:** the worklist reads the retired slug and not the live CI leg `install-smoke-windows`, so it scores this entry false-eligible; [icebox-trigger-blind-to-retired-carrier](#icebox-trigger-blind-to-retired-carrier) owns that predicate defect, DECLINED as a rider then with the exposure accepted in writing.
+**Standing exclusion — `lead, own-authority` 2026-09-10 through the lead's message channel, at `host-resolution-fail-open-cut`'s scope:** the worklist reads the retired slug and not the live CI leg `install-smoke-sh-windows`, so it scores this entry false-eligible; [icebox-trigger-blind-to-retired-carrier](#icebox-trigger-blind-to-retired-carrier) owns that predicate defect, DECLINED as a rider then with the exposure accepted in writing.
 
 **Owner is context-kit, not gate-sdk.** The rule's home is context-kit/SPEC.md §Layout and configuration; the dialect contract is gate-sdk's. It is that seam, not a migration defect.
 

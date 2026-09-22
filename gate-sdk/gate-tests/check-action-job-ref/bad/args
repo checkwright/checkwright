@@ -1,0 +1,2 @@
+# Reject case: the same workflow, and a doc citing leg-b, which no workflow defines.
+tree

@@ -96,6 +96,7 @@ check-action-pinning
 check-action-run-shell
 check-action-gh-repo
 check-action-permissions
+check-action-job-ref
 check-commit-msg
 check-commit-subject
 check-tree-terms

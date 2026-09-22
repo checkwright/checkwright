@@ -1,0 +1,3 @@
+# graph: couples=*.md,*.yml,*.yaml dir=one valve=none tier=precommit
+# install: on-surface
+# spec: gate-sdk/SPEC.md §check-action-job-ref — every backticked span matching a consumer-declared job pattern names a job key some walked workflow defines

@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §The `# graph:` manifest — one module per ported gate; the
 // subcommand name is the gate name, so no mapping table exists to drift
 pub mod action_gh_repo;
+pub mod action_job_ref;
 pub mod action_permissions;
 pub mod action_pinning;
 pub mod action_run_shell;
@@ -237,6 +238,14 @@ pub const REGISTRY: &[GateEntry] = &[
         action_permissions::run,
         &[(".", "ext:lit:yml,yaml", "", "")],
         &["GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS"],
+        "gate-sdk",
+        &[],
+    ),
+    (
+        "check-action-job-ref",
+        action_job_ref::run,
+        &[(".", "ext:lit:md,yml,yaml", "", "")],
+        &["GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS", "GATE_SDK_JOB_REF_PATTERNS"],
         "gate-sdk",
         &[],
     ),

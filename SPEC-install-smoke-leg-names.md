@@ -19,7 +19,7 @@ The `install-smoke` legs in `.github/workflows/gates.yml` use one suffix slot fo
 
 ### (1) Rename the six job keys and every mention of them {mechanical}
 
-**Not yet applied.** Rename each job key in `.github/workflows/gates.yml` per the table, and every tracked mention of a renamed leg, backticked or not, outside the history surfaces. The roster under §Existing sections updated names each surface.
+**Applied.** Rename each job key in `.github/workflows/gates.yml` per the table, and every tracked mention of a renamed leg, backticked or not, outside the history surfaces. The roster under §Existing sections updated names each surface.
 
 `docs/install.md` §Requirements' platform block names `install-smoke-linux-arm64` in the `aarch64-unknown-linux-gnu` line's held precondition. The act there depends on the sibling entry `install-path-developer-first`, whose own ruling ("Where the contributor facts go", SPEC-install-per-os.md) keeps that block on `docs/install.md` and only repositions it, to `## Requirements` moved to the page's end — it never carries the block off the file:
 
@@ -32,7 +32,7 @@ Rename the leg names in live queue entries too, active and deferred, in the same
 
 ### (2) Retire the two correcting paragraphs {mechanical}
 
-**Not yet applied.** Now that each name carries its bootstrap, the paragraphs that walk back a platform count shrink to the rule.
+**Applied.** Now that each name carries its bootstrap, the paragraphs that walk back a platform count shrink to the rule.
 
 In `installer/SPEC.md` §The install boundary, rewrite the paragraph beginning "**The two bootstraps are hand-kept, and parity is held by running, not by generation.**" as:
 
@@ -46,7 +46,7 @@ Then delete the paragraph above the arm64 leg beginning "**The name is minted un
 
 ### (3) `check-action-job-ref`: a backticked leg name names a job {design-bearing}
 
-**Not yet applied.** A new gate-sdk gate, born native, registered in `scripts/gates.list`. Add to gate-sdk/SPEC.md after §check-action-permissions:
+**Applied.** A new gate-sdk gate, born native, registered in `scripts/gates.list`. Add to gate-sdk/SPEC.md after §check-action-permissions:
 
 > ### check-action-job-ref
 >
@@ -68,7 +68,7 @@ Implementation: a module in `native/src/gates/`, a `gate-sdk/checks/check-action
 
 ### (4) This repo binds the leg family {mechanical}
 
-**Not yet applied.** In `scripts/gate-sdk-config.knobs`:
+**Applied with the Done move**, the commit deleting both install amendments, since each carries a backticked `install-smoke` the first pattern would red while it is on disk. In `scripts/gate-sdk-config.knobs`:
 
 ```
 GATE_SDK_JOB_REF_PATTERNS[] = install-smoke

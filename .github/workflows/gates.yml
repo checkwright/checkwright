@@ -97,7 +97,7 @@ jobs:
   # what has to run *before* that platform may join it (gate-sdk/SPEC.md
   # §Consumer payload). Deriving this matrix from the roster would close the
   # loop: no platform could ever earn the run that qualifies it.
-  install-smoke:
+  install-smoke-sh-linux:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -277,7 +277,7 @@ jobs:
   # §check-action-run-shell), so the habit this comment used to describe is the
   # mechanism: `shell: bash` selects Git-for-Windows bash and keeps the runner
   # and the gate agreeing on what this text is.
-  install-smoke-windows:
+  install-smoke-sh-windows:
     needs: [native-artifacts, native-artifacts-roster]
     runs-on: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['x86_64-pc-windows-msvc'].runner }}
     continue-on-error: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['x86_64-pc-windows-msvc'].held }}
@@ -554,14 +554,7 @@ jobs:
           echo "spent and a red here is a support commitment broken."
           exit "$rc"
 
-  # The second BOOTSTRAP's own install-smoke leg. Count these legs by bootstrap and
-  # never by platform (installer/SPEC.md §The install boundary): every leg above
-  # drives ONE bootstrap — the Windows one through Git-for-Windows bash — so a
-  # reader counting platforms has been reading a growing set of legs as covering a
-  # growing set of bootstraps, which they never did. The platform count is
-  # deliberately not written here: it moves whenever the platform declaration does,
-  # and a number written here goes stale silently, as this sentence's did.
-  # No other leg substitutes for this one.
+  # The pwsh bootstrap's leg (installer/SPEC.md §The install boundary). No other leg substitutes for it.
   #
   # **What it asserts.** Both halves of §The install boundary's two-part oracle.
   # BOOTSTRAP PARITY: the five steps that section specifies, each on its own
@@ -592,7 +585,7 @@ jobs:
   # Assembling a payload is the packer's job and the packer is bash (§The packer).
   # What must run on a host with no POSIX shell is the step that invokes
   # checkwright.ps1 — and that step is pwsh, reading only the packed tarball.
-  install-smoke-powershell:
+  install-smoke-pwsh-windows:
     runs-on: windows-latest
     timeout-minutes: 45
     permissions:
@@ -1312,7 +1305,7 @@ jobs:
   # native/targets.list's header states, rather than an adopter-path measurement
   # that licenses nothing: the bytes it installs are the release-shaped
   # producer's, moved and never re-derived.
-  install-smoke-macos:
+  install-smoke-sh-macos:
     needs: native-artifacts
     runs-on: macos-latest
     # Measured, not predicted: this leg took **20m12s** on run `34038127178`, over
@@ -1621,7 +1614,7 @@ jobs:
   # the workflow reds — loudly, which is the right direction for a support
   # retraction that forgot its leg.
   #
-  # It is no longer the only such read: `install-smoke-windows` takes its own
+  # It is no longer the only such read: `install-smoke-sh-windows` takes its own
   # posture from the same index at `x86_64-pc-windows-msvc`, on the same argument,
   # since that triple joined the declaration as `held`. The remaining bare
   # spellings of it — the `gates` job's cross-check and the PowerShell leg's host
@@ -1653,7 +1646,7 @@ jobs:
   # for a job whose runner is derived rather than matrixed. It is enforced:
   # check-action-run-shell refuses to lint a `run:` whose dialect it cannot
   # derive, so an unnamed shell here is a red rather than a silence.
-  install-smoke-macos-intel:
+  install-smoke-sh-macos-intel:
     needs: [native-artifacts, native-artifacts-roster]
     runs-on: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['x86_64-apple-darwin'].runner }}
     continue-on-error: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['x86_64-apple-darwin'].held }}
@@ -1892,21 +1885,11 @@ jobs:
   # class they do not costs its own floor first"); re-read the probe rather than
   # this paragraph if the image ever changes under the pinned label.
   #
-  # **The name is minted under the convention already in this file and that is a
-  # deliberate NON-decision.** `install-smoke-leg-names-mix-two-axes` records two
-  # live, unranked naming schemes and no name is stable under both, so no
-  # scheme-neutral name exists to reach for; whichever scheme wins, this leg is
-  # renamed with the others. What this leg OWES that entry is recorded rather than
-  # left to be discovered: a SECOND Linux leg makes the baseline's unsuffixed
-  # `install-smoke` actively ambiguous, where before the absence of a suffix meant
-  # "the baseline". That is the strongest new argument that entry has and it is
-  # this leg's own doing.
-  #
   # **Every step names `shell: bash`**, for the reason the Intel sibling states: a
   # `runs-on` that is an expression cannot be read by any tree-local reader, so
   # nothing can state this job's dialect from the file, and check-action-run-shell
   # refuses to lint a `run:` whose dialect it cannot derive.
-  install-smoke-linux-arm64:
+  install-smoke-sh-linux-arm64:
     needs: [native-artifacts, native-artifacts-roster]
     runs-on: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['aarch64-unknown-linux-gnu'].runner }}
     continue-on-error: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['aarch64-unknown-linux-gnu'].held }}

@@ -51,6 +51,7 @@ check-action-pinning
 check-action-run-shell
 check-action-gh-repo
 check-action-permissions
+check-action-job-ref
 check-core-files
 check-identity
 check-stage-evidence

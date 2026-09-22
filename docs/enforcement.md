@@ -68,6 +68,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | [gate-sdk](gate-sdk/index.md) | check-action-run-shell | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-action-gh-repo | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-action-permissions | precommit |
+| [gate-sdk](gate-sdk/index.md) | check-action-job-ref | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-core-files | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-identity | precommit |
 | [lifecycle-kit](lifecycle-kit/index.md) | check-stage-evidence | precommit |

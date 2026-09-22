@@ -160,6 +160,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("GATE_SDK_SPEC_BASE_URL", "").empty_takes_default(),
         Row::scalar("GATE_SDK_COMMIT_TYPES", "feat fix refactor perf docs test build ci chore style")
             .empty_takes_default().words(),
+        Row::indexed("GATE_SDK_JOB_REF_PATTERNS", &[]),
     ],
     validate: None,
     open_family: false,

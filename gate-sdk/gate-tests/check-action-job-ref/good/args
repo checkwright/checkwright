@@ -1,0 +1,3 @@
+# Accept case: a workflow defining job leg-a, a doc and a workflow comment citing
+# it, and a slug sharing its prefix outside every pattern.
+tree
