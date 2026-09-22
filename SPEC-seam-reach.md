@@ -31,8 +31,10 @@ consumer's content.
   and in `site-kit/templates/site-health.yml`. A supply-chain pin is kit content.
   Templates are outside the gate's corpus, so the audit class says so (delta 5).
 - **installer/SPEC.md is the only repo-root-governed SPEC.**
-  `git ls-files '*.md' | grep -v -E '^(docs/|[a-z-]+-kit/|gate-sdk/)'` lists no
-  other `SPEC.md`. It has seven letter-and-digit hex tokens (six commit heads and
+  `git ls-files '*.md' ':!scripts/gate-tests/' | grep -v -E '^(docs/|[a-z-]+-kit/|gate-sdk/)'` lists no
+  other `SPEC.md` — dropping the fixture exclusion also matches thirteen `SPEC.md`
+  specimens under `scripts/gate-tests/`, gate-test fixtures rather than governed
+  documents. It has seven letter-and-digit hex tokens (six commit heads and
   one digest prefix) and fourteen `` `<9-12 digits>` `` run or job id lines.
   The entry's attribution probe, `git grep -n -i -E 'ruled 20[0-9]{2}-|by the (operator|lead)' -- installer/SPEC.md`,
   plus a date beside the default `lead, ` marker, finds six dated-attribution
