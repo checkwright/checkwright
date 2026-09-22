@@ -117,6 +117,7 @@ pub const KIT: Kit = Kit {
         Row::indexed("CANON_KIT_PAYLOAD_CLAIM_EXCLUDE", &[]),
         Row::indexed("CANON_KIT_MEASURED_CLAIMS_CMD", &[]),
         Row::indexed("CANON_KIT_MEASURED_SURFACE_GLOBS", &[]),
+        Row::scalar("CANON_KIT_MEASURED_SPAN", "paragraph"),
         Row::indexed("CANON_KIT_CLAIM_CLASSES_CMD", &[]),
         Row::indexed("CANON_KIT_COMMENT_MACHINE", &[]),
         Row::indexed("CANON_KIT_COMMENT_REASON", &[]),
@@ -219,6 +220,9 @@ fn validate(v: &Values) -> Vec<String> {
     }
     if let Some(m) = scalar(v, "CANON_KIT_DOD_MODE").filter(|m| *m != "exactly-one" && *m != "at-most-one") {
         errs.push(format!("CANON_KIT_DOD_MODE must be exactly-one|at-most-one (got '{}')", m));
+    }
+    if let Some(s) = scalar(v, "CANON_KIT_MEASURED_SPAN").filter(|s| !matches!(*s, "paragraph" | "sentence" | "off")) {
+        errs.push(format!("CANON_KIT_MEASURED_SPAN must be paragraph|sentence|off (got '{}')", s));
     }
     if let Some(s) = scalar(v, "CANON_KIT_SCAN_KIT_ROOTS").filter(|s| *s != "0" && *s != "1") {
         errs.push(format!("CANON_KIT_SCAN_KIT_ROOTS must be 0|1 (got '{}')", s));

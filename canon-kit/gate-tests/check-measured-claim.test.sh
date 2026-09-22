@@ -26,6 +26,10 @@ cat >"$SANDBOX/off.knobs" <<'EOF'
 CANON_KIT_MEASURED_SURFACE_GLOBS[] = *.md
 EOF
 
+for span in sentence off bogus; do
+    { cat "$SANDBOX/cfg.knobs"; echo "CANON_KIT_MEASURED_SPAN = $span"; } >"$SANDBOX/span-$span.knobs"
+done
+
 check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4=config
     local label="$1" want="$2" sub="$3" cfg="$4"
     local out rc
@@ -83,9 +87,23 @@ The registry holds 7 gates today.
 EOF
 check_case "no-oracle-is-clean" 0 "MEASURED-CLAIM: clean" off.knobs
 
+# The full-line span: the marker's cardinal sits in the paragraph's second
+# sentence, which the default paragraph span reaches, the sentence span does
+# not, and the off span never reads.
+cat >"$SANDBOX/SPEC.md" <<'EOF'
+# consumer — SPEC
+
+<!-- measured: gate-total=7 -->
+The registry is sized by its table. It holds 7 gates today.
+EOF
+check_case "span-paragraph-reaches-the-second-sentence" 0 "MEASURED-CLAIM: clean" cfg.knobs
+check_case "span-sentence-binds-the-first-sentence" 1 "SPEC.md:3  the marker's cardinal '7' appears nowhere" span-sentence.knobs
+check_case "span-off-skips-arm-c" 0 "MEASURED-CLAIM: clean" span-off.knobs
+check_case "span-unknown-value-exits-2" 2 "CANON_KIT_MEASURED_SPAN must be paragraph|sentence|off" span-bogus.knobs
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-measured-claim.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-measured-claim.test.sh: clean (unknown key + ambiguous claim + malformed marker all fail closed; an unset oracle is inactive)"
+echo "check-measured-claim.test.sh: clean (unknown key + ambiguous claim + malformed marker all fail closed; an unset oracle is inactive; the full-line span binds the paragraph, the first sentence or nothing, and refuses any other value)"
 exit 0

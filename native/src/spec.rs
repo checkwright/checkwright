@@ -839,7 +839,7 @@ fn bound_sentence(b: &[u8], at: usize) -> (usize, usize) {
     let mut t = e.saturating_sub(1);
     while t > 0 {
         t -= 1;
-        if matches!(b[t], b'.' | b'?' | b'!' | b';') && is_space(b[t + 1]) {
+        if sentence_end(b, t) {
             s = t + 1;
             break;
         }
@@ -848,6 +848,24 @@ fn bound_sentence(b: &[u8], at: usize) -> (usize, usize) {
         s += 1;
     }
     (s, e)
+}
+
+// spec: canon-kit/SPEC.md §check-provenance-seam — a sentence ends at `.`, `?`, `!` or `;`
+// followed by whitespace
+pub(crate) fn sentence_end(b: &[u8], t: usize) -> bool {
+    matches!(b[t], b'.' | b'?' | b'!' | b';') && b.get(t + 1).is_some_and(|&c| is_space(c))
+}
+
+// spec: canon-kit/SPEC.md §check-measured-claim — the `sentence` span: the text's first
+// sentence, its leading whitespace skipped and its terminator kept
+pub fn first_sentence(text: &str) -> &str {
+    let b = text.as_bytes();
+    let mut s = 0usize;
+    while s < b.len() && is_space(b[s]) {
+        s += 1;
+    }
+    let e = (s..b.len()).find(|&t| sentence_end(b, t)).map_or(b.len(), |t| t + 1);
+    &text[s..e]
 }
 
 // spec: canon-kit/SPEC.md §check-measured-claim — marker text is never part of any claim, and
@@ -1514,6 +1532,14 @@ mod tests {
         assert_eq!(m.len(), 1);
         assert_eq!(&t[m[0].sentence.0..m[0].sentence.1], "Two has 3 rows.");
         assert_eq!(&t[m[0].at..m[0].end], "<!-- measured: k=3 -->");
+    }
+
+    #[test]
+    fn the_first_sentence_ends_at_a_terminator_followed_by_whitespace() {
+        assert_eq!(first_sentence("   One v1.2 row. Two has 3."), "One v1.2 row.");
+        assert_eq!(first_sentence("No terminator"), "No terminator");
+        assert_eq!(first_sentence("Ends here."), "Ends here.");
+        assert_eq!(first_sentence("  "), "");
     }
 
     // spec: canon-kit/SPEC.md §The amendment lifecycle — the delta-heading grammar, tested where

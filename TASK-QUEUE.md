@@ -24,22 +24,6 @@
 
 **Cost while deferred:** a false red waits on the first prose paragraph pairing a trailer-shaped lead-in with a quoted UUID. Filed 2026-09-22 by build batch 2 under scope-gated intake; the lead ruled it stays filed rather than landing mid-iteration, and it promotes at close because the seam question is an envelope call for spec, not a drain fix. **DISTINCT from `line-window-gates-unaudited`** (Done 2026-09-22), whose subject is a named roster of three windows, all three measured to need no recalibration; this is a fourth pattern that audit met on the way. Owner lookup ran `msg-patterns`, `matching window` and `same-line window` over the queue — no owner.
 
-### measured-claim-span-unbounded
-
-[spec: SPEC-claim-span.md]
-
-`check-measured-claim` binds a full-line `measured:` marker to the paragraph below it, and on an unwrapped tree that paragraph is one line running to thousands of code points. Arm C then tests only that the marker's cardinal appears somewhere in the span, so a marker whose own sentence has drifted can still read as agreeing.
-
-**The measurement the filing asked for was bought at this drain, and it corrects the filed premise twice.** (1) Arm C is *fail-closed* on a wide span rather than silently green: `native/src/gates/measured_claim.rs` reds the run when the bound claim carries more than one distinct cardinal ("which one the marker holds is ambiguous"), and a thousands-code-point paragraph almost always carries several. The false-green case survives only where a long span carries exactly one distinct cardinal equal to the marker's value. (2) Arm C is dormant on this tree: every live full-line marker is `gate-substrates=native` (`CONTRIBUTING.md`, `SECURITY.md`, `docs/positioning.md`, `docs/methodology.md`), a non-cardinal value `cardinal_value` returns `None` for, so the paragraph span is never read at all. Every other marker in the tree is a fixture or a grammar specimen.
-
-**Deliverable, repriced by the above:** a reach or a sentence boundary on the full-line marker's claim span, or a stated reason the paragraph is the right unit — canon-kit/SPEC.md §check-measured-claim owns the sentence. It stays filed rather than discarded because the gate ships to adopters whose trees this measurement cannot reach.
-
-**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed; reshaped by `consumer-policy-rule-absent`, since a claim-span reach is a baked calibration, so it goes after it.
-
-**Specified 2026-09-22:** the full-line span is the knob `CANON_KIT_MEASURED_SPAN`, `paragraph`, `sentence` or `off`, default `paragraph` so no adopter's verdict moves, and this repo binds `sentence`. A code-point reach is refused because it cuts a sentence arbitrarily. Re-measured: the six full-line markers outside fixtures are four `gate-substrates=native` and two copies (canon-kit/SPEC.md and its generated mirror) of one fenced specimen, so the binding moves no verdict here.
-
-**Cost while deferred:** an adopter writing a cardinal-valued full-line marker above an unwrapped paragraph gets a binding whose agreement is near-accidental. Filed 2026-09-22 by build batch 2 as inferred from source; measured at this close and narrowed. **DISTINCT from `line-window-gates-unaudited`** (Done 2026-09-22), whose closed roster of three windows that audit discharged; this is a fourth gate it flagged and did not audit. Owner lookup ran `measured-claim` and `paragraph` over the queue — no owner.
-
 ### baked-matching-windows
 
 [spec: SPEC-matching-windows.md]
@@ -1668,5 +1652,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - kit-knob-consumer-adapter-convention
 - matching-window-roster-absent
 - probe-before-assertion-doctrine
+- measured-claim-span-unbounded
 
 ## Lessons Learned

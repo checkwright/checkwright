@@ -22,7 +22,25 @@ struct Marker {
     line: usize,
     key: String,
     value: String,
-    claim: String,
+    claim: Option<String>,
+}
+
+// spec: canon-kit/SPEC.md §check-measured-claim — `CANON_KIT_MEASURED_SPAN`, the claim a
+// full-line marker binds; an inline marker's span is its own sentence whatever this holds
+#[derive(Clone, Copy)]
+enum Span {
+    Paragraph,
+    Sentence,
+    Off,
+}
+
+fn span() -> Result<Span, String> {
+    match spec::knob_pub("CANON_KIT_MEASURED_SPAN")?.as_str() {
+        "paragraph" => Ok(Span::Paragraph),
+        "sentence" => Ok(Span::Sentence),
+        "off" => Ok(Span::Off),
+        v => Err(format!("CANON_KIT_MEASURED_SPAN must be paragraph|sentence|off (got '{}')", v)),
+    }
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
@@ -40,6 +58,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Ok(0);
     }
     let roster = spec::measured_claims()?;
+    let span = span()?;
 
     let mut files: Vec<String> = walk::glob_corpus(Path::new(root), &globs)?
         .into_iter()
@@ -56,7 +75,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut markers: Vec<Marker> = Vec::new();
     let mut errs: Vec<String> = Vec::new();
     for f in &files {
-        collect(f, &spec::read_text(Path::new(f))?, &mut markers, &mut errs);
+        collect(f, &spec::read_text(Path::new(f))?, span, &mut markers, &mut errs);
     }
 
     let mut out: Vec<String> = Vec::new();
@@ -83,11 +102,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
         // spec: canon-kit/SPEC.md §check-measured-claim — arm C, which applies only to a
         // bare-cardinal value: an extent claim carries no cardinal and is covered by A and B
-        let want = match cardinal_value(&m.value) {
-            Some(w) => w,
-            None => continue,
+        let (want, claim) = match (cardinal_value(&m.value), &m.claim) {
+            (Some(w), Some(c)) => (w, c),
+            _ => continue,
         };
-        let found = distinct_cardinals(&m.claim);
+        let found = distinct_cardinals(claim);
         if found.len() > 1 {
             errs.push(format!(
                 "{}:{}  the bound claim carries {} distinct cardinals ({}) — which one the marker holds is ambiguous",
@@ -130,7 +149,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 // spec: canon-kit/SPEC.md §check-measured-claim — a full-line marker alone on the line above
 // its paragraph, or an inline marker inside a prose line; a fenced block is grammar being shown
 // rather than a claim being made, and the per-site exempt window is the line or the one above
-fn collect(file: &str, text: &str, markers: &mut Vec<Marker>, errs: &mut Vec<String>) {
+fn collect(file: &str, text: &str, span: Span, markers: &mut Vec<Marker>, errs: &mut Vec<String>) {
     let lines: Vec<&str> = text.lines().collect();
     let exempt = |i: usize| lines[i].contains(EXEMPT) || (i > 0 && lines[i - 1].contains(EXEMPT));
     let mut fence = false;
@@ -140,7 +159,7 @@ fn collect(file: &str, text: &str, markers: &mut Vec<Marker>, errs: &mut Vec<Str
         let fl = spec::is_fence_line(raw);
         let full = !fence && !fl && raw.trim().starts_with(spec::MEASURED_MARKER);
         if fl || fence || full || spec::is_blank(raw) {
-            block(file, &lines, head.take(), &std::mem::take(&mut body), &exempt, markers, errs);
+            block(file, &lines, head.take(), &std::mem::take(&mut body), span, &exempt, markers, errs);
             if fl {
                 fence = !fence;
             } else if full {
@@ -150,16 +169,19 @@ fn collect(file: &str, text: &str, markers: &mut Vec<Marker>, errs: &mut Vec<Str
         }
         body.push(i);
     }
-    block(file, &lines, head, &body, &exempt, markers, errs);
+    block(file, &lines, head, &body, span, &exempt, markers, errs);
 }
 
 // spec: canon-kit/SPEC.md §check-measured-claim — one paragraph: its inline markers each bind
-// the sentence ending at them, and its full-line marker binds the rest, less all marker text
+// the sentence ending at them, and its full-line marker binds the span of the rest, less all
+// marker text
+#[allow(clippy::too_many_arguments)]
 fn block(
     file: &str,
     lines: &[&str],
     head: Option<usize>,
     body: &[usize],
+    span: Span,
     exempt: &dyn Fn(usize) -> bool,
     markers: &mut Vec<Marker>,
     errs: &mut Vec<String>,
@@ -176,7 +198,7 @@ fn block(
     let line_of = |off: usize| starts.iter().rev().find(|(o, _)| *o <= off).map(|s| s.1).unwrap_or(0);
     let inline = spec::inline_markers(&joined);
     let marks: Vec<(usize, usize)> = inline.iter().map(|m| (m.at, m.end)).collect();
-    let mut push = |i: usize, t: &str, claim: String| {
+    let mut push = |i: usize, t: &str, claim: Option<String>| {
         if exempt(i) {
             return;
         }
@@ -193,12 +215,18 @@ fn block(
     for m in &inline {
         let (s, e) = m.sentence;
         let sentence = spec::text_without(&joined[..e], &marks)[s..].to_string();
-        push(line_of(m.at), joined[m.at..m.end].trim(), sentence);
+        push(line_of(m.at), joined[m.at..m.end].trim(), Some(sentence));
     }
     if let Some(h) = head {
         let mut cuts = marks.clone();
         cuts.extend(inline.iter().map(|m| m.sentence));
-        push(h, lines[h].trim(), spec::text_without(&joined, &cuts));
+        let rest = spec::text_without(&joined, &cuts);
+        let claim = match span {
+            Span::Paragraph => Some(rest),
+            Span::Sentence => Some(spec::first_sentence(&rest).to_string()),
+            Span::Off => None,
+        };
+        push(h, lines[h].trim(), claim);
     }
 }
 
@@ -303,11 +331,18 @@ mod tests {
         assert_eq!(parse("<!-- measured: no-separator -->"), None);
     }
 
-    fn claims(text: &str) -> Vec<(usize, String, Vec<String>)> {
+    fn claims_at(text: &str, span: Span) -> Vec<(usize, String, Option<Vec<String>>)> {
         let (mut m, mut e) = (Vec::new(), Vec::new());
-        collect("f.md", text, &mut m, &mut e);
+        collect("f.md", text, span, &mut m, &mut e);
         assert!(e.is_empty(), "{:?}", e);
-        m.into_iter().map(|x| (x.line, x.key, distinct_cardinals(&x.claim))).collect()
+        m.into_iter().map(|x| (x.line, x.key, x.claim.as_deref().map(distinct_cardinals))).collect()
+    }
+
+    fn claims(text: &str) -> Vec<(usize, String, Vec<String>)> {
+        claims_at(text, Span::Paragraph)
+            .into_iter()
+            .map(|(l, k, c)| (l, k, c.expect("a paragraph span always binds a claim")))
+            .collect()
     }
 
     // spec: canon-kit/SPEC.md §check-measured-claim — an inline marker binds the one sentence it
@@ -318,6 +353,21 @@ mod tests {
         let got = claims(t);
         assert_eq!(got[0], (3, "b".into(), vec!["12".to_string()]));
         assert_eq!(got[1], (1, "a".into(), vec!["3".to_string()]));
+    }
+
+    // spec: canon-kit/SPEC.md §check-measured-claim — the span reaches full-line markers only:
+    // `sentence` binds the first sentence of what the paragraph span would, `off` binds none,
+    // and an inline marker keeps its own sentence under either
+    #[test]
+    fn the_span_narrows_the_full_line_claim_and_leaves_inline_markers_alone() {
+        let t = "<!-- measured: a=7 -->\nThe table sizes it. It holds 7 rows. Then 12 files. <!-- measured: b=12 -->\n";
+        let at = |s: Span| claims_at(t, s);
+        assert_eq!(at(Span::Paragraph)[1], (1, "a".into(), Some(vec!["7".to_string()])));
+        assert_eq!(at(Span::Sentence)[1], (1, "a".into(), Some(vec![])));
+        assert_eq!(at(Span::Off)[1], (1, "a".into(), None));
+        for s in [Span::Paragraph, Span::Sentence, Span::Off] {
+            assert_eq!(at(s)[0], (2, "b".into(), Some(vec!["12".to_string()])));
+        }
     }
 
     #[test]

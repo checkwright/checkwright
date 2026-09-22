@@ -419,7 +419,7 @@ pub const REGISTRY: &[GateEntry] = &[
     ),
     // spec: canon-kit/SPEC.md §check-measured-claim — born native, so it derives its corpus
     // from its own glob surface rather than from `spec::manifest_files`: the knob set is its
-    // two knobs alone
+    // surface, its oracle and its span
     (
         "check-measured-claim",
         measured_claim::run,
@@ -429,6 +429,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "CANON_KIT_MEASURED_CLAIMS_CMD",
             "CANON_KIT_MEASURED_SURFACE_GLOBS",
+            "CANON_KIT_MEASURED_SPAN",
         ],
         "canon-kit",
         &[("git", ""), ("?", "CANON_KIT_MEASURED_CLAIMS_CMD")],

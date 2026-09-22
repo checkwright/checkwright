@@ -74,6 +74,8 @@ CANON_KIT_MEASURED_CLAIMS_CMD[] = scripts/measured-claims.sh
 CANON_KIT_MEASURED_SURFACE_GLOBS[] <- CANON_KIT_MANIFEST_FILES
 CANON_KIT_MEASURED_SURFACE_GLOBS[] = .claude/commands/*.md
 CANON_KIT_MEASURED_SURFACE_GLOBS[] = TASK-QUEUE.md
+# comment-tier-exempt: this repo keeps its markdown unwrapped (CANON_KIT_UNWRAP_GLOBS below), so a paragraph is one line of any length and a full-line marker binds its own first sentence rather than whatever cardinal the paragraph carries further on
+CANON_KIT_MEASURED_SPAN = sentence
 
 # comment-tier-exempt: this repo's claim-class roster — the classes are consumer config for the same provenance-seam reason the transport, payload and measured vocabularies above are, and more sharply: the roster spells this project's own positioning vocabulary, so a kit literal carrying it would publish it and canon-kit/SPEC.md would match its own class while describing it; the scanned surface is CANON_KIT_MEASURED_SURFACE_GLOBS above rather than a second knob, since every site the class reaches already falls inside it
 CANON_KIT_CLAIM_CLASSES_CMD[] = bash
