@@ -1756,13 +1756,4 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 ## Done
 
-- stamp-subject-merge-carve-out-unruled
-- build-work-before-entry-stamp
-- inferred-marker-malformed-placement-passes-unseen
-- close-surface-row-trackedness-undeclared
-- stage-evidence-prefix-doubles-a-separator
-- scope-supersession-unchecked
-- lead-no-change-decision-has-no-landing-site
-- delta-instruction-batch-dependence-unmarked
-
 ## Lessons Learned

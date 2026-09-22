@@ -210,3 +210,4 @@
 | gate-sdk-surface-drain | sc sp a b v c | 13f/0d | 12 · ≤1d | 21s clean | 129 |
 | canon-gate-precision | sc sp a b v c | 6f/0d | 4 · ≤0d | 21s clean | 129 |
 | queue-kit-unwrap | sc sp a b v c | 10f/2d | 5 · ≤0d | 21s clean | 129 |
+| stage-contract-drain | sc sp · b v c | 8f/1d | 7 · ≤0d | 21s clean | 130 |
