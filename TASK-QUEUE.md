@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: consumer-policy-seam
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [README.md](README.md) maps the kits.
 
@@ -19,6 +19,8 @@
 a kit feature that encodes a policy, such as record-size capping, ships this project's one choice as the kit's behaviour instead of a consumer-selectable set of alternatives ('off' among them, plus a lead-grantable per-record exception where it fits). This repo should then bind exactly one choice as a consumer. doctrine-kit/DOCTRINE.md has the provenance seam (content to config) and widest-true-tier (placement), but no design rule that turns a policy into a consumer choice, and nothing checks it. Live instance: queue-kit-unwrap's build hard-coded a 100-code-point marker reach into `check-knob-citation` (`MARKER_REACH`, native/src/gates/knob_citation.rs).
 
 **Deliverable:** a DOCTRINE methodology rule plus its one-line digest in the always-loaded file, and an enforcement if one is feasible. Operator direction, with the work: first run a read-heavy audit (audit-sweep type) of existing gates and of decommissioned ones (deleted `.gate` descriptors and removed `native/src` modules in git history) for places where a gate hard-codes this project's policy instead of offering consumer-selectable alternatives. The audit's findings supply the rule's worked examples and the follow-up entries.
+
+**Leads `consumer-policy-seam`; admitted on the filter's trust arm** — operator direction 2026-09-22, lead-relayed: a calibration a kit bakes in with no knob or off switch is one an adopter must trust as shipped, and a wrong red at it can only be bypassed. Stays Deferred for /spec to author and pair; the five entries joining it are reshaped by its rule and go after it.
 
 **Cost while deferred:** every design session defaults to hard-coding this project's preference, and the operator pays for each correction. Filed 2026-09-22 to the gap inbox by the queue-kit-unwrap lead as an operator direction, with an addendum. Promoted at its close because →fix would author a new doctrine rule and an audit, which is more than a close drain may land. Recurrence stamped on the operator's statement that the direction had been corrected before. Owner lookup ran over `policy`, `consumer choice` and `consumer-select` in doctrine-kit/DOCTRINE.md and found no owner.
 
@@ -110,7 +112,9 @@ installer/SPEC.md §The install boundary rules a shipped PowerShell file's code 
 
 **Inferred, not run:** the candidate preserves all three assertions in `native/src/gates/tree_terms.rs` — run `gate-sdk/bin/run-gates.sh --only check-tree-terms` plus the `check-commit-msg` and `check-tree-terms` fixture suites against each of the five rewritten copies.
 
-**Inferred, not run:** the interval stays under the engine's `RE_DUP_MAX` of 255 — `grep -rn RE_DUP_MAX native/src/`.
+**Probed at scope 2026-09-22:** the interval stays under the engine's bound — `DUP_MAX` is 255 in `native/src/ere.rs`, against the candidate's `{0,40}`.
+
+**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed; reshaped by [consumer-policy-rule-absent](#consumer-policy-rule-absent), whose rule answers the seam question above, so it goes after it.
 
 **Cost while deferred:** a false red waits on the first prose paragraph pairing a trailer-shaped lead-in with a quoted UUID. Filed 2026-09-22 by build batch 2 under scope-gated intake; the lead ruled it stays filed rather than landing mid-iteration, and it promotes at close because the seam question is an envelope call for spec, not a drain fix. **DISTINCT from `line-window-gates-unaudited`** (Done 2026-09-22), whose subject is a named roster of three windows, all three measured to need no recalibration; this is a fourth pattern that audit met on the way. Owner lookup ran `msg-patterns`, `matching window` and `same-line window` over the queue — no owner.
 
@@ -123,6 +127,8 @@ installer/SPEC.md §The install boundary rules a shipped PowerShell file's code 
 **The measurement the filing asked for was bought at this drain, and it corrects the filed premise twice.** (1) Arm C is *fail-closed* on a wide span rather than silently green: `native/src/gates/measured_claim.rs` reds the run when the bound claim carries more than one distinct cardinal ("which one the marker holds is ambiguous"), and a thousands-code-point paragraph almost always carries several. The false-green case survives only where a long span carries exactly one distinct cardinal equal to the marker's value. (2) Arm C is dormant on this tree: every live full-line marker is `gate-substrates=native` (`CONTRIBUTING.md`, `SECURITY.md`, `docs/positioning.md`, `docs/methodology.md`), a non-cardinal value `cardinal_value` returns `None` for, so the paragraph span is never read at all. Every other marker in the tree is a fixture or a grammar specimen.
 
 **Deliverable, repriced by the above:** a reach or a sentence boundary on the full-line marker's claim span, or a stated reason the paragraph is the right unit — canon-kit/SPEC.md §check-measured-claim owns the sentence. It stays filed rather than discarded because the gate ships to adopters whose trees this measurement cannot reach.
+
+**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed; reshaped by [consumer-policy-rule-absent](#consumer-policy-rule-absent), since a claim-span reach is a baked calibration, so it goes after it.
 
 **Cost while deferred:** an adopter writing a cardinal-valued full-line marker above an unwrapped paragraph gets a binding whose agreement is near-accidental. Filed 2026-09-22 by build batch 2 as inferred from source; measured at this close and narrowed. **DISTINCT from `line-window-gates-unaudited`** (Done 2026-09-22), whose closed roster of three windows that audit discharged; this is a fourth gate it flagged and did not audit. Owner lookup ran `measured-claim` and `paragraph` over the queue — no owner.
 
@@ -139,6 +145,8 @@ no surface rosters which gates carry a same-line or same-paragraph matching wind
 **Inferred, not run:** that a descriptor field or an emit arm can decide 'carries a matching window' for the other two shapes — establish it by reading the audited modules' window code for a common shape.
 
 **DISTINCT from** the two entries above, each owning one window's calibration and discharged by fixing it; this owns the missing surface that would have led an auditor to either.
+
+**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed; reshaped by [consumer-policy-rule-absent](#consumer-policy-rule-absent), whose audit of baked policy is the census this roster derives from.
 
 **Cost while deferred:** the next auditor re-derives the roster from source. Filed 2026-09-22 to the gap inbox by `install-first-contact`'s close, captured as knowledge friction during `line-window-gates-unaudited`'s audit, and promoted at the next scope's intake, so the record is late and says so. Owner lookup ran `matching window`, `same-line window` and `window roster` over the tracked docs — no owner.
 
@@ -181,6 +189,8 @@ a surface that disclaims carrying a rule ("stated there and not restated here") 
 **The sharpening is the finding, and it is new.** `Probe-before-assertion` asks whether a probe was *run*; in all seven a probe ran. What failed is that its **corpus was narrower than the corpus the claim ranged over**, which the rule as worded does not reach. The drain reproduced the shape on its own inputs: the `door-sweep-reach-stops-at-the-kit-boundary` bullet named nine `docs/site-architecture.md` sites where a fresh grep returns thirteen, and missed `docs/index.md` altogether.
 
 **Why design-pending:** whether this is a fourth always-loaded line, a re-wording of the existing one, or something mechanizable is the open call — and it is a governed-surface widening, which a close does not self-serve. The cheapest candidate worth beating is still the one the original filing named: widen an existing rule rather than mint another.
+
+**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed; it shares that unit's doctrine-kit surface, DOCTRINE.md and the always-loaded digest.
 
 **Cost while deferred:** measured at seven misses in one iteration, two of them reaching validate. Filed 2026-08-07 by close as that iteration's candidate lesson; iceboxed in the machinery-class triage slice; returned to the deferred section at `door-binding-sweep`'s close drain on the recurrence above. Owner lookup: `probe`, `premise`, `unverified`, `corpus narrower` — this entry, plus two **adjacent and distinct** icebox members: the cited-object token sweep's corpus (a *gate's* corpus) and [dispatched-child-asserts-an-unverified-base](#dispatched-child-asserts-an-unverified-base) (a child inheriting a base it never probed).
 
@@ -352,7 +362,7 @@ whether a kit may ship a knob whose only working configuration requires the cons
 
 **The capability loss that raised it is CLOSED, and this entry is deliberately the residue.** `shell-gate-tail-port` deleted the path `DELEGATION_KIT_LIVENESS_CMD` defaulted to, so the turn-end liveness probe logged `verdict=unavailable` on every firing. The repair landed at the same cut: the kit template dropped a default that pointed at nothing (a path present in no tree reads as a shipped capability and is none), the knob kept its contract exactly — a path run with the scratch dir as its only argument — and this repo named its own reader `scripts/producer-liveness-reader.sh`, reaching the gate through `scripts/gate-exec.sh`. BOTH scripts left the tree 2026-09-05, and the negative control at `scripts/gate-tests/subagent-stop-reader.test.sh` now asserts `unresolved`, never `unavailable`.
 
-**The capture log priced the loss and verified the repair:** 77 `verdict=unavailable` firings inside one 46-minute window, zero after. So the surviving question is a convention question, not a defect. **Kept at queue-kit-unwrap's close** on a live trigger: [consumer-policy-rule-absent](#consumer-policy-rule-absent)'s gate audit reads the same config-surface question.
+**The capture log priced the loss and verified the repair:** 77 `verdict=unavailable` firings inside one 46-minute window, zero after. So the surviving question is a convention question, not a defect. **Kept at queue-kit-unwrap's close** on a live trigger: [consumer-policy-rule-absent](#consumer-policy-rule-absent)'s gate audit reads the same config-surface question. **Joins `consumer-policy-seam`, riding under that entry as reshaped** — operator direction 2026-09-22, lead-relayed; it goes after that entry's rule.
 
 **The precedent this stands on, which is what makes the question general.** evidence-kit met the identical break one caller over when the same port turned a pre-flight entry's named path into a descriptor, and discharged it with a CONSUMER-SIDE front end resolving the gate name, explicitly refusing to teach the kit's knob to resolve a name as "a kit-contract change". Two kits, two consumers, one shape, invented twice.
 
