@@ -18,6 +18,10 @@ GATE_SDK_PORTABILITY_PATHS = installer/bin gate-sdk/lib/gate.sh gate-sdk/bin/run
 # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — this repo builds and hashes the release-shaped artifact in two workflows: the release path, and the CI producer whose artifacts the install-smoke legs install
 GATE_SDK_NATIVE_PUBLISH_WORKFLOW = .github/workflows/publish.yml .github/workflows/gates.yml
 
+# spec: gate-sdk/SPEC.md §check-action-job-ref — this repo's job-reference vocabulary: the install-smoke leg family. The first pattern catches a bare `install-smoke` left behind by the bootstrap-first rename, since no job carries that key any more, so a sentence naming the family as a whole is written unbackticked; the second keeps every queue slug in the family out of reach, because none of them opens with a bootstrap segment
+GATE_SDK_JOB_REF_PATTERNS[] = install-smoke
+GATE_SDK_JOB_REF_PATTERNS[] = install-smoke-(sh|pwsh)-[a-z0-9-]+
+
 # spec: gate-sdk/SPEC.md §check-projection-roster — this repo's generated-projections roster, the section of the load-triggered site-architecture page whose keyed rows the gate holds to the declaring gates
 GATE_SDK_PROJECTION_ROSTER = docs/site-architecture.md
 GATE_SDK_PROJECTION_ROSTER_SECTION = Generated projections and their freshness gates

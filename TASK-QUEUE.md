@@ -8,36 +8,6 @@
 
 ## New Features
 
-### install-path-developer-first
-
-[spec: SPEC-install-per-os.md] [observed-by: gates workflow]
-
-the adopter's first contact assumes a developer toolchain. docs/index.md's quick-try block leads with `npx checkwright` ("Try it with Node on the machine"), while docs/install.md calls the Release tarball the primary path because it adds no runtime dependency. The landing page therefore contradicts the install page and gate-sdk/SPEC.md §The adopter constraints (no toolchain assumed). docs/install.md opens with target triples and release-leg status, spreads its prerequisites across per-profile tags, and gives its quick start as a multi-line curl + checksum + tar sequence. There is no clear per-OS path, and the audience includes business users.
-
-**Deliverable:** a customer-first rework. Lead with a no-toolchain path (a one-line OS-native bootstrap per OS; the option set is weighed at spec). Give each OS a section with its prerequisites, install, verify and uninstall. Move contributor-only facts (triples, leg status, cargo/jq) off the adopter path, and demote npx to an alternative for Node users. Likely iteration-class: it spans docs/, installer/README.md and possibly installer/ mechanism.
-
-**Operator direction (2026-09-22, lead session, relayed by the lead):** option C of spec's escalation. This iteration writes native per-OS recipes with no piped script: npx is demoted to an alternative for Node users, and docs/index.md leads with the no-Node path. The hosted one-liner is filed as [install-hosted-one-liner](#install-hosted-one-liner). The one-line wording in the deliverable is therefore not built here, and installer/SPEC.md §The dependency boundary's refusal of a `curl … | sh` one-liner stays in force.
-
-**Ruled at spec (2026-09-22):** one four-step recipe for macOS and Linux in `sh` and one for Windows in PowerShell. Each is split at the network into a fetch fence and a marked install block, which the install-smoke legs run verbatim against a packed tarball. The platform and toolchain blocks stay on docs/install.md under a `## Requirements` moved to the page's end, because three readers parse them there by marker, and the remedy blocks move into their OS sections. Observed by the push, because the Windows block's run under Windows PowerShell 5.1 is measured only on a Windows runner.
-
-**Cost while deferred:** every first-contact adopter without Node meets a developer path. Filed 2026-09-22 to the gap inbox by the lead as an operator direction and suggested as a next-iteration theme. Promoted at close because it is iteration-class. Re-verified: docs/index.md line 14 and docs/install.md line 10 read as stated. Owner: docs/install.md and installer/SPEC.md.
-
-### install-smoke-leg-names-mix-two-axes
-
-[spec: SPEC-install-smoke-leg-names.md] [not-icebox-eligible: 2026-09-09 operator ruled it a defect] [observed-by: gates workflow]
-
-the install-smoke legs in `.github/workflows/gates.yml` spend one suffix slot on two different axes, and two tracked surfaces now carry prose whose only job is to undo the misreading that produces.
-
-**The naming, read off the workflow.** Four legs take a PLATFORM suffix (`install-smoke-sh-windows`, `install-smoke-sh-macos`, `install-smoke-sh-macos-intel`, `install-smoke-sh-linux-arm64`), the baseline Linux leg takes none, and `install-smoke-pwsh-windows` takes a BOOTSTRAP suffix while running on `windows-latest`, so a reader counting platforms off the names counts wrong. Since the second Linux leg landed 2026-09-11, the unsuffixed baseline is ambiguous as well.
-
-**The cost is attested rather than predicted:** `.github/workflows/gates.yml` and `installer/SPEC.md` each carry a paragraph whose whole job is to correct that miscount. A name needing a paragraph to be read correctly is the defect; the paragraph is the receipt.
-
-**WHETHER IS RULED.** The operator ruled 2026-09-09, in the lead session and through the lead channel, that intuitive design is the aim, so closing this as no-mechanism is not available to a later drain.
-
-**Ruled at spec (2026-09-22):** bootstrap first, then platform, on every leg: `install-smoke-<bootstrap>-<platform>`, with `sh` and `pwsh` as the bootstrap segment, so six job keys rename. The platform-preserving scheme was refused because it leaves the bootstrap implicit on four legs, and that is the axis installer/SPEC.md counts by. The two correcting paragraphs shrink to the rule. The check folded in 2026-09-11 from `host-resolution-fail-open-cut`'s close inbox lands as gate-sdk's `check-action-job-ref`, over consumer-configured job-name patterns. The radius stays in-tree, with no out-of-band step: no required status check names a leg, and the local ops runbook names none (measured 2026-09-11). Re-measured at spec, it is wider than the entry's earlier five files: it also takes `gate-sdk/SPEC.md` and `installer/consumer-smoke/run-smoke.sh`.
-
-**Cost while deferred:** two surfaces keep paying a correcting paragraph at every read, and every new reader of the CI matrix starts from a miscount the prose then walks back. Filed 2026-09-10 by close from the gap inbox; re-priced 2026-09-11 at close onto the scheme-ranking ground.
-
 ### fence-run-fixed-env-hides-user-gem-dir
 
 [spec: SPEC-fence-run-home.md]
@@ -1726,6 +1696,8 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 ## Done
 
+- install-path-developer-first
+- install-smoke-leg-names-mix-two-axes
 - amendment-refusal-acceptance-parity
 - install-smoke-powershell-demo-runs-before-bash-strip
 
