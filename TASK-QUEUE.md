@@ -8,6 +8,48 @@
 
 ## New Features
 
+### install-smoke-leg-names-mix-two-axes
+
+[spec: SPEC-install-smoke-leg-names.md] [not-icebox-eligible: 2026-09-09 operator ruled it a defect] [observed-by: gates workflow]
+
+the `install-smoke` legs in `.github/workflows/gates.yml` spend one suffix slot on two different axes, and two tracked surfaces now carry prose whose only job is to undo the misreading that produces.
+
+**The naming, read off the workflow.** Four legs take a PLATFORM suffix (`install-smoke-windows`, `install-smoke-macos`, `install-smoke-macos-intel`, `install-smoke-linux-arm64`), the baseline Linux leg takes none, and `install-smoke-powershell` takes a BOOTSTRAP suffix while running on `windows-latest`, so a reader counting platforms off the names counts wrong. Since the second Linux leg landed 2026-09-11, the unsuffixed baseline is ambiguous as well.
+
+**The cost is attested rather than predicted:** `.github/workflows/gates.yml` and `installer/SPEC.md` each carry a paragraph whose whole job is to correct that miscount. A name needing a paragraph to be read correctly is the defect; the paragraph is the receipt.
+
+**WHETHER IS RULED.** The operator ruled 2026-09-09, in the lead session and through the lead channel, that intuitive design is the aim, so closing this as no-mechanism is not available to a later drain.
+
+**Ruled at spec (2026-09-22):** bootstrap first, then platform, on every leg: `install-smoke-<bootstrap>-<platform>`, with `sh` and `pwsh` as the bootstrap segment, so six job keys rename. The platform-preserving scheme was refused because it leaves the bootstrap implicit on four legs, and that is the axis installer/SPEC.md counts by. The two correcting paragraphs shrink to the rule. The check folded in 2026-09-11 from `host-resolution-fail-open-cut`'s close inbox lands as gate-sdk's `check-action-job-ref`, over consumer-configured job-name patterns. The radius stays in-tree, with no out-of-band step: no required status check names a leg, and the local ops runbook names none (measured 2026-09-11). Re-measured at spec, it is wider than the entry's earlier five files: it also takes `gate-sdk/SPEC.md` and `installer/consumer-smoke/run-smoke.sh`.
+
+**Cost while deferred:** two surfaces keep paying a correcting paragraph at every read, and every new reader of the CI matrix starts from a miscount the prose then walks back. Filed 2026-09-10 by close from the gap inbox; re-priced 2026-09-11 at close onto the scheme-ranking ground.
+
+### fence-run-fixed-env-hides-user-gem-dir
+
+[spec: SPEC-fence-run-home.md]
+
+site-kit's fixture-suite fence stays unmarked for `check-fence-run`, so the command an adopter pastes from it runs unwitnessed. canon-kit/SPEC.md §check-fence-run pins `HOME` inside the scratch and inherits only `PATH`, and a Ruby user install keeps `kramdown-parser-gfm` under `HOME`'s user gem dir, so the suite finds no gems there. **Measured 2026-09-21:** `gem env gempath` lists the user gem dir first and the only kramdown gems sit there.
+
+**Deliverable — rule one of two:** a declared, consumer-named environment passthrough in the fixed environment (a `GEM_PATH`-shaped knob, stated beside the proxy honest limit), or a stated refusal naming why a toolchain resolving through `HOME` stays outside fence execution. Then mark the fence.
+
+**Ruled at spec (2026-09-22):** the refusal limb. Neither `GEM_PATH` nor `GEM_HOME` is set on the attested host, and Ruby derives the user gem dir from `HOME`, so a passthrough reaches nothing there. Passing `HOME` through would undo the pin. The fence stays unmarked, and §check-fence-run item 4 states the limit.
+
+**Cost while deferred:** one adopter-facing command unwitnessed; the render-fidelity gate itself still runs in the battery. Filed 2026-09-21 to the gap inbox by build batch 3 of `docs-first-contact`; promoted at its close because →fix needs an envelope change to the fixed environment. Owner lookup ran over `fixed environment`, `HOME` and `GEM_` in canon-kit/SPEC.md; §check-fence-run item 4 owns the variable list and names no passthrough.
+
+**DISTINCT from `fence-execution-gate` (landed)**, which built the gate this member cannot reach.
+
+### md-unwrap-folds-declarations
+
+[spec: SPEC-unwrap-declarations.md]
+
+`--emit md-unwrap` joins a line-start declaration (`ruling:`, `discharge:`, `close-surface:`) onto the paragraph above it, because canon-kit/SPEC.md §check-md-unwrapped's block scanner models only CommonMark block starts. The join changes no rendering, but it hides the declaration from every reader that keys on a line start. Attested once: the unwrap of TRAJECTORY.md folded its `discharge:` and `ruling:` lines into the ruling paragraph, so the ruling-staleness probe read the admission filter as an undeclared condition. Two-space hard breaks restored them; they are still in the file. The arm's postcondition checks only the gate's own verdict, and the probe is advisory, so nothing redded.
+
+**Deliverable:** a configured declaration-lead set that the scanner treats as a block start. The arm then never joins such a line and the gate never reds it. Add a fixture row for each. A new knob is a new name, so this needs an amendment.
+
+**Ruled at spec (2026-09-22):** `CANON_KIT_UNWRAP_DECLARATION_LEADS`, an array defaulting to empty. The attested leads are another kit's vocabulary, so none ships as a canon-kit literal. This repo binds `ruling:`, `discharge:` and `close-surface:`.
+
+**Cost while deferred:** the next unwrap of a declaring surface silently disarms that surface's reader. Filed 2026-09-22 to the gap inbox at `queue-kit-unwrap`'s close; promoted at the next iteration's scope intake, so the record is late and says so. Owner: canon-kit/SPEC.md §check-md-unwrapped, which names no declaration line.
+
 ## Technical Debt
 
 ### line-window-gates-unaudited
@@ -150,18 +192,6 @@ eighteen kit-shipped `couples=` literals across thirteen members name a consumer
 
 **Cost while deferred:** a new membership pipe written in a suite goes unflagged until it flips a verdict under load. Filed 2026-09-22 by build batch 4 of gate-sdk-surface-drain on a lead ruling; promoted at close because §check-pipe-membership states the suites outside its corpus, so the widening is an envelope change for spec, not a drain fix.
 
-### fence-run-fixed-env-hides-user-gem-dir
-
-[cost: event/low] [surface: canon-kit]
-
-site-kit's fixture-suite fence stays unmarked for `check-fence-run`, so the command an adopter pastes from it runs unwitnessed. canon-kit/SPEC.md §check-fence-run pins `HOME` inside the scratch and inherits only `PATH`, and a Ruby user install keeps `kramdown-parser-gfm` under `HOME`'s user gem dir, so the suite finds no gems there. **Measured 2026-09-21:** `gem env gempath` lists the user gem dir first and the only kramdown gems sit there.
-
-**Deliverable — rule one of two:** a declared, consumer-named environment passthrough in the fixed environment (a `GEM_PATH`-shaped knob, stated beside the proxy honest limit), or a stated refusal naming why a toolchain resolving through `HOME` stays outside fence execution. Then mark the fence.
-
-**Cost while deferred:** one adopter-facing command unwitnessed; the render-fidelity gate itself still runs in the battery. Filed 2026-09-21 to the gap inbox by build batch 3 of `docs-first-contact`; promoted at its close because →fix needs an envelope change to the fixed environment. Owner lookup ran over `fixed environment`, `HOME` and `GEM_` in canon-kit/SPEC.md; §check-fence-run item 4 owns the variable list and names no passthrough.
-
-**DISTINCT from `fence-execution-gate` (landed)**, which built the gate this member cannot reach.
-
 ### disclaimer-beside-its-own-restatement
 
 [cost: event/low] [surface: canon-kit]
@@ -289,30 +319,6 @@ the shipped platform roster held four joined triples and two more the installed 
 **DISTINCT from [binding-intel-leg-failed-one-run-in-two](#binding-intel-leg-failed-one-run-in-two)**, whose subject is a joined leg's RELIABILITY; this owns which hosts get a binary at all.
 
 **Cost while deferred: bounded, and one leg now rather than two** — one build leg and one smoke leg, plus a platform floor if the ARM Windows image does not carry the class the two bootstrap scripts already bootstrap. Runner availability is the open question here rather than the known non-blocker it was for arm64 Linux. Surfaced 2026-09-10 by the iteration lead at the operator's ask — rescued out of a gitignored journal into `packer-port-terminal-cut`'s gap inbox, promoted 2026-09-10 at scope on a fresh roster read, specified 2026-09-11 at spec with its scope narrowed to one leg, and demoted 2026-09-11 at build on canon-kit/SPEC.md §Merging an amendment (on task completion), step 4's corpus-versus-increment test — ruled `lead, own-authority` 2026-09-11 through the lead's message channel, that lead reversing its own Done instruction of the same date after verifying the grounds at source.
-
-### install-smoke-leg-names-mix-two-axes
-
-[cost: event/low] [surface: .github] [not-icebox-eligible: 2026-09-09 operator ruled it a defect]
-
-the `install-smoke` legs in `.github/workflows/gates.yml` spend one suffix slot on two different axes, and two tracked surfaces now carry prose whose only job is to undo the misreading that produces.
-
-**The naming, read off the workflow.** Three legs take a PLATFORM suffix (`install-smoke-windows`, `install-smoke-macos`, `install-smoke-macos-intel`), the baseline Linux leg takes none, and `install-smoke-powershell` takes a BOOTSTRAP suffix while running on `windows-latest` — so it reads as a second Windows platform leg, and a reader counting platforms off the leg names counts wrong.
-
-**THE STRONGEST ARGUMENT IS NEW AND THE LEG THAT MADE IT RECORDED SO.** `install-smoke-linux-arm64` landed 2026-09-11, and a SECOND Linux leg makes the baseline's unsuffixed `install-smoke` actively ambiguous where the absence of a suffix used to mean "the baseline" — the leg's own job header in `.github/workflows/gates.yml` states that it owes this entry the point. The leg count is deliberately unwritten here for the reason gates.yml's own correcting paragraph gives about platform counts: it moves, and a number written in prose goes stale silently.
-
-**The cost is attested rather than predicted:** `.github/workflows/gates.yml` and `installer/SPEC.md` each carry a paragraph whose whole job is to say that a reader counting platforms has been reading three legs as covering two halves, which they never did. A name needing a paragraph to be read correctly is the defect; the paragraph is the receipt.
-
-**WHETHER IS RULED, so only the scheme is open.** The operator ruled 2026-09-09, in the lead session and through the lead channel, that intuitive design is the aim — which retires the correct-but-underexplained disposition, a name a reader must be corrected about not being intuitive however well the correction is written. Closing this as no-mechanism is therefore not available to a later drain.
-
-**Why design-pending:** two schemes are live and unranked — bootstrap-first (`install-smoke-bash-<platform>` alongside `install-smoke-powershell`), or platform-suffix-preserving (rename only the odd leg so it names its bootstrap unambiguously) — and the blast radius has to be priced with the scheme rather than discovered after it.
-
-**THE BLAST RADIUS IS WHOLLY IN-TREE, and this entry asserted otherwise until 2026-09-11.** It claimed the rename also reaches the branch-protection required-check names in the local ops runbook's desired state, and that that surface breaks silently. Both halves are false and were measured false at the drain: the runbook names no `install-smoke` leg at all, and this repo's branch-protection desired state is deliberately none, so there are no required checks to break. The radius is five tracked files — `.github/workflows/gates.yml`, `installer/SPEC.md`, `TASK-QUEUE.md`, `docs/site-architecture.md`, `docs/install.md` — with no out-of-band step; other tracked files carry the literal descriptively or in historical logs and are not rename targets.
-
-**WHAT STILL MAKES IT SCOPE WORK, on the corrected radius.** Not reach: the unranked schemes. Five files renamed under a scheme nobody chose is a rename done twice, and the ranking is the deliverable a drain fix cannot supply.
-
-**Folded 2026-09-11 from `host-resolution-fail-open-cut`'s close inbox:** the rename lands with a check that every backticked `install-smoke-<suffix>` literal in tracked prose names a gates.yml job key; free-prose leg descriptions stay beyond its reach, its honest limit.
-
-**Cost while deferred:** two surfaces keep paying a correcting paragraph at every read, and every new reader of the CI matrix starts from a miscount the prose then walks back. Filed 2026-09-10 by close from the gap inbox, on a reach premise this drain falsified; re-priced 2026-09-11 at close onto the scheme-ranking ground, which survives.
 
 ### instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set
 
@@ -741,16 +747,6 @@ the consumer's local-only companion files have read triggers at three skills and
 **Held Deferred by the enhancement admission filter** (TRAJECTORY.md §The rulings): new template slots are an enhancement that cuts no time-to-first-value, closes no trust gap and produces no external proof.
 
 **Cost while deferred:** local-only surfaces drift until a consult happens to audit them. Filed 2026-09-18 to the gap inbox by the consult that audited the local-only files, after `external-install-evidence`'s close; promoted to Deferred at the next scope.
-
-### md-unwrap-folds-declarations
-
-[cost: event/low] [surface: canon-kit]
-
-`--emit md-unwrap` joins a line-start declaration (`ruling:`, `discharge:`, `close-surface:`) onto the paragraph above it, because canon-kit/SPEC.md §check-md-unwrapped's block scanner models only CommonMark block starts. The join changes no rendering, but it hides the declaration from every reader that keys on a line start. Attested once: the unwrap of TRAJECTORY.md folded its `discharge:` and `ruling:` lines into the ruling paragraph, so the ruling-staleness probe read the admission filter as an undeclared condition. Two-space hard breaks restored them; they are still in the file. The arm's postcondition checks only the gate's own verdict, and the probe is advisory, so nothing redded.
-
-**Deliverable:** a configured declaration-lead set that the scanner treats as a block start. The arm then never joins such a line and the gate never reds it. Add a fixture row for each. A new knob is a new name, so this needs an amendment.
-
-**Cost while deferred:** the next unwrap of a declaring surface silently disarms that surface's reader. Filed 2026-09-22 to the gap inbox at `queue-kit-unwrap`'s close; promoted at the next iteration's scope intake, so the record is late and says so. Owner: canon-kit/SPEC.md §check-md-unwrapped, which names no declaration line.
 
 ## Icebox
 
