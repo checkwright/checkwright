@@ -212,3 +212,4 @@
 | queue-kit-unwrap | sc sp a b v c | 10f/2d | 5 · ≤0d | 21s clean | 129 |
 | stage-contract-drain | sc sp · b v c | 8f/1d | 7 · ≤0d | 21s clean | 130 |
 | install-first-contact | sc sp a b v c | 5f/6d | 4 · ≤0d | 27s 3✗ | 131 |
+| consumer-policy-seam | sc sp a b v c | 8f/0d | 5 · ≤1d | 21s clean | 131 |

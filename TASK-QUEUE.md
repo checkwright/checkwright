@@ -622,6 +622,64 @@ the consumer's local-only companion files have read triggers at three skills and
 
 **Cost while deferred:** local-only surfaces drift until a consult happens to audit them. Filed 2026-09-18 to the gap inbox by the consult that audited the local-only files, after `external-install-evidence`'s close; promoted to Deferred at the next scope.
 
+### worktree-hook-guards-fail-open
+
+[cost: event/high] [surface: gate-sdk]
+
+every binary-backed harness hook is inert inside a worktree-isolated dispatch. `gate-sdk/bin/run-gates.sh` resolves `GATE_SDK_NATIVE_BIN` repo-relative from the worktree's own top level, a linked worktree carries no build output, and `--hook` is on the front end's fail-open set, so the arm exits 0 with its "absent or not executable" line. Measured 2026-09-22 at `consumer-policy-seam`'s spec: an audit-sweep dispatched under `isolation: worktree` spawned six fork children, and each `agent-dispatch-guard` record shows the fail-open allow. So the read-only-claim rule that sends a dispatch to a worktree herds it into the one place the fork ban and the budget guard cannot fire. delegation-kit/SPEC.md already repairs this for the turn-end liveness reader alone.
+
+**Deliverable:** the hook front end resolves the binary from the main checkout (`git rev-parse --git-common-dir`) when its cwd is a linked worktree, or a stated refusal to; plus a fixture proving the fork ban fires from inside a linked worktree. The choice is design work: a main-checkout binary can be built from a different tree than the worktree's.
+
+**Inferred, not run:** that the bash guard and the workflow-state guard are inert there too — run each from a scratch `git worktree add` with no `native/target`.
+
+**DISTINCT from** the icebox's [worktree-dispatch-rebuilds-the-gate-binary](#worktree-dispatch-rebuilds-the-gate-binary) (the cold-build cost of the same missing binary) and [worktree-isolated-dispatch-cannot-reach-the-main-checkout](#worktree-isolated-dispatch-cannot-reach-the-main-checkout) (the bridge question); this entry's subject is a guard failing open, which neither names.
+
+**Cost while deferred:** the fork ban and the budget guard are advisory for any worktree-isolated agent. Filed 2026-09-22 to the gap inbox by the lead; promoted 2026-09-23 at `consumer-policy-seam`'s close, because the fix picks between two resolution shapes.
+
+### canon-spec-prune-bakes-docs
+
+[cost: event/low] [surface: canon-kit]
+
+`native/src/spec.rs`'s `CANON_SPEC_PRUNE` bakes `**/templates` and `docs/*` into canonical-spec discovery for every consumer of `spec::canonical_specs`. `docs/*` is this repo's generated-mirror location, a consumer layout path in kit mechanism. An adopter whose site lives elsewhere double-counts its mirror as canonical specs, and one whose real specs sit under `docs/` loses them. Neither canon-kit/SPEC.md nor site-kit/SPEC.md states a ground for the literal.
+
+**Deliverable:** a knob carrying the two values as this repo's binding, a derivation from the knob that already names the site root (`SITE_KIT_SCAN_ROOT`, a cross-kit read to weigh), or a stated ground that `docs/` is kit convention.
+
+**DISTINCT from** [doc-path-hardcoded-reads](#doc-path-hardcoded-reads), whose members are `.gate` `couples=` literals; this is a crate constant on a different reader.
+
+**Cost while deferred:** no adopter exists pre-launch, so the wrong set is read only on this tree, where it is right. Filed 2026-09-22 to the gap inbox by `consumer-policy-seam`'s spec census; promoted 2026-09-23 at its close, because each deliverable either mints a governed name or rules a seam.
+
+### policy-choice-census-residue
+
+[cost: event/low] [surface: canon-kit]
+
+the `consumer-policy-seam` spec census left eleven members owing a ruling under doctrine-kit/DOCTRINE.md's Policy-as-choice discriminator.
+
+**Eight kit-fixed values**, each SPEC-grounded in terms other than the discriminator's: `check-shellcheck` and `check-action-run-shell`'s `-S warning` floor; `check-prose-tells`' all-caps run of 3 and its contrast and tricolon regexes; `check-provenance-seam`'s 7..40 hex run; `check-queue-prose-precondition`'s past-tense verb list; `check-prose-enum`'s 8- and 16-byte adjacency gaps; `check-fence-run`'s `DEPTH_BACKSTOP=3`; `check-gate-assertions`' cardinal words capped at nine; and the msg-patterns template's account-noun `{0,6}` reach. **Three knobs with no `off`**: `QUEUE_KIT_WRAP_BUDGET`, `LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP` and `LIFECYCLE_KIT_SHIM_NGRAM` validate a positive integer only, where `QUEUE_KIT_ENTRY_CAP` and `QUEUE_KIT_SLUG_MAX` admit `off`. Re-verified 2026-09-23: `DEPTH_BACKSTOP`, the `{0,6}` reach and all three validators read as filed.
+
+**Deliverable:** per fixed value, its SPEC ground restated in the discriminator's terms (grammar, contract, external limit, verdict-neutral) or a knob. Per knob, `off` admitted where the gate's other assertions survive it, or a stated ground that the calibration is the gate's whole predicate.
+
+**Cost while deferred:** the Policy-as-choice audit-roster class re-reads the same eleven on every due sweep, and the census sweeps already split on two of them. Filed 2026-09-22 to the gap inbox as two bullets by the spec census; merged and promoted 2026-09-23 at close, because every member is a per-member ruling.
+
+### repo-inherits-policy-defaults
+
+[cost: event/low] [surface: scripts]
+
+Policy-as-choice says a consumer holding a choice binds it in its own config and the kit's author is such a consumer, yet this repo inherits most policy knobs' kit defaults silently. **Premise corrected 2026-09-23:** the filing said *every*; this iteration bound its new knobs explicitly (`CANON_KIT_KNOB_CITATION_REACH`, `CANON_KIT_KNOB_CITATION_LITERAL_SPAN`, `CANON_KIT_DEFAULT_COUPLING_WINDOW`, `GATE_SDK_ASSERTION_STRENGTH_WINDOW`, `CANON_KIT_MEASURED_SPAN`), while older ones such as `QUEUE_KIT_WRAP_BUDGET`, `QUEUE_KIT_ENTRY_CAP` and `LIFECYCLE_KIT_SHIM_NGRAM` stay unbound in `scripts/*.knobs`.
+
+**Deliverable:** a census of kit policy knobs (not layout knobs) whose default this repo relies on, and an explicit binding line per knob, so a later move of a kit default moves no verdict here; or a ruling that inheriting a default is binding it.
+
+**Cost while deferred:** a kit default moved toward a more universal value silently moves this repo's verdicts. Filed 2026-09-22 to the gap inbox by `consumer-policy-seam`'s spec; promoted 2026-09-23 at its close, because the census is its own sweep and its alternative is a reading of the doctrine.
+
+### unmarked-discharge-vs-span
+
+[cost: event/low] [surface: canon-kit]
+
+`check-unmarked-claim` discharges a class match anywhere in a full-line marker's paragraph, while `CANON_KIT_MEASURED_SPAN` at `sentence` narrows `check-measured-claim` arm C to the paragraph's first sentence. So under `sentence` a claim in a later sentence reads as marked though arm C no longer reads it. canon-kit/SPEC.md §check-unmarked-claim states the divergence; whether the discharge should follow the span is unruled.
+
+**Deliverable:** a ruling, and the discharge walk made to follow the span or the divergence grounded as intended.
+
+**Cost while deferred:** nothing reds or passes differently on this tree, whose four full-line markers carry a non-cardinal value; an adopter binding `sentence` gets a discharge wider than the check. Filed 2026-09-23 to the gap inbox by `consumer-policy-seam`'s build; promoted at its close, because the answer is a semantic ruling.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
