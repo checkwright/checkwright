@@ -65,17 +65,16 @@ impl Sections {
         }
     }
 
-    pub fn is_deferred(&self, line: &str) -> bool {
-        heading_name(line).map(|n| n == self.deferred).unwrap_or(false)
+    // spec: queue-kit/SPEC.md §The shared queue adapters — these two take a section *name*, the
+    // `Entry::section` an entry walk carries, rather than a heading line
+    pub fn is_deferred(&self, name: &str) -> bool {
+        name == self.deferred
     }
 
     // spec: queue-kit/SPEC.md §The icebox tier — an unset knob leaves a matcher nothing can
     // match, so every icebox reader degrades to "no icebox" rather than to "every section"
-    pub fn is_icebox(&self, line: &str) -> bool {
-        if self.icebox.is_empty() {
-            return false;
-        }
-        heading_name(line).map(|n| n == self.icebox).unwrap_or(false)
+    pub fn is_icebox(&self, name: &str) -> bool {
+        !self.icebox.is_empty() && name == self.icebox
     }
 
     pub fn is_done(&self, line: &str) -> bool {
@@ -110,35 +109,184 @@ fn is_slug_head(b: u8) -> bool {
     b.is_ascii_lowercase() || b.is_ascii_digit()
 }
 
-// spec: queue-kit/SPEC.md §The shared queue adapters — awk's leftmost-longest `\*\*[a-z0-9][a-z0-9-]*\*\*`,
-// returning the slug between the delimiters
-pub fn first_bold_slug(line: &str) -> Option<&str> {
-    let b = line.as_bytes();
-    let mut i = 0usize;
-    while i + 4 < b.len() {
-        if b[i] != b'*' || b[i + 1] != b'*' {
-            i += 1;
-            continue;
-        }
-        let start = i + 2;
-        if start >= b.len() || !is_slug_head(b[start]) {
-            i += 1;
-            continue;
-        }
-        let mut j = start + 1;
-        while j < b.len() && is_slug_byte(b[j]) {
-            j += 1;
-        }
-        if j + 1 < b.len() && b[j] == b'*' && b[j + 1] == b'*' {
-            return Some(&line[start..j]);
-        }
-        i += 1;
-    }
-    None
+// spec: queue-kit/SPEC.md §The queue format — `[a-z0-9][a-z0-9-]*`, the whole string
+pub fn is_slug(s: &str) -> bool {
+    let b = s.as_bytes();
+    !b.is_empty() && is_slug_head(b[0]) && b.iter().all(|c| is_slug_byte(*c))
 }
 
-// spec: queue-kit/SPEC.md §The shared queue adapters — the anchored guard the extraction runs behind:
-// `^[[:space:]]*-[[:space:]]+\*\*[a-z0-9][a-z0-9-]*\*\*`
+// spec: queue-kit/SPEC.md §The queue format — an ATX heading's level: one to six `#` then a space
+pub fn heading_level(line: &str) -> Option<usize> {
+    let n = line.bytes().take_while(|b| *b == b'#').count();
+    if (1..=6).contains(&n) && matches!(line.as_bytes().get(n), Some(b' ') | Some(b'\t')) {
+        Some(n)
+    } else {
+        None
+    }
+}
+
+// spec: queue-kit/SPEC.md §The queue format — `### <slug>` opens an entry and `#### <slug>` a
+// sub-task; the heading's whole text is the slug, trailing whitespace the only slack
+pub fn entry_heading(line: &str) -> Option<(usize, &str)> {
+    let level = heading_level(line).filter(|l| *l == 3 || *l == 4)?;
+    let slug = line[level + 1..].trim_matches([' ', '\t']);
+    if is_slug(slug) {
+        Some((level, slug))
+    } else {
+        None
+    }
+}
+
+// spec: queue-kit/SPEC.md §The queue format — the tag line: one or more bracketed tags separated by
+// spaces and nothing else; a bracket followed by `(` is a link and never a tag
+pub fn is_tag_line(line: &str) -> bool {
+    let mut rest = line.trim_matches([' ', '\t']);
+    if rest.is_empty() {
+        return false;
+    }
+    while !rest.is_empty() {
+        let Some(body) = rest.strip_prefix('[') else { return false };
+        let Some(close) = body.find(']') else { return false };
+        if body[..close].contains('[') || close == 0 || !is_slug_head(body.as_bytes()[0]) {
+            return false;
+        }
+        let after = &body[close + 1..];
+        let next = after.trim_start_matches([' ', '\t']);
+        if !next.is_empty() && next.len() == after.len() {
+            return false;
+        }
+        rest = next;
+    }
+    true
+}
+
+fn is_rule(line: &str) -> bool {
+    line.trim_end_matches([' ', '\t']) == "---"
+}
+
+// spec: queue-kit/SPEC.md §The queue format — one entry as the heading grammar reads it: 0-based
+// line indices, `end` exclusive, the extent running to the next heading of the same or a shallower
+// level, a `---` rule, or the end of the file
+#[derive(Debug, Clone, PartialEq)]
+pub struct Entry {
+    pub level: usize,
+    pub slug: String,
+    pub section: String,
+    pub start: usize,
+    pub end: usize,
+    pub tag_line: Option<usize>,
+}
+
+impl Entry {
+    // spec: queue-kit/SPEC.md §The queue format — the tag line's text, empty for an untagged entry
+    pub fn tags<'a>(&self, lines: &[&'a str]) -> &'a str {
+        self.tag_line.map(|i| lines[i]).unwrap_or("")
+    }
+
+    // spec: queue-kit/SPEC.md §The queue format — the body: every line of the extent after the
+    // heading and the tag line, sub-task lines included
+    pub fn body_lines(&self) -> impl Iterator<Item = usize> + '_ {
+        (self.start + 1..self.end).filter(move |i| Some(*i) != self.tag_line)
+    }
+}
+
+// spec: queue-kit/SPEC.md §The shared queue adapters — the extent of the heading at `start`
+pub fn extent_end(lines: &[&str], start: usize, level: usize) -> usize {
+    (start + 1..lines.len())
+        .find(|&i| heading_level(lines[i]).is_some_and(|l| l <= level) || is_rule(lines[i]))
+        .unwrap_or(lines.len())
+}
+
+// spec: queue-kit/SPEC.md §The shared queue adapters — every entry and sub-task heading in the task
+// sections, in file order, each with its extent and tag line
+pub fn entries(lines: &[&str], sec: &Sections) -> Vec<Entry> {
+    let mut out = Vec::new();
+    let mut section: Option<String> = None;
+    for (i, line) in lines.iter().enumerate() {
+        if is_section_line(line) {
+            section = if sec.is_task(line) { heading_name(line).map(str::to_string) } else { None };
+            continue;
+        }
+        let Some(name) = section.as_ref() else { continue };
+        let Some((level, slug)) = entry_heading(line) else { continue };
+        let end = extent_end(lines, i, level);
+        let tag_line = (i + 1..end)
+            .find(|&j| !lines[j].trim().is_empty())
+            .filter(|&j| heading_level(lines[j]).is_none() && is_tag_line(lines[j]));
+        out.push(Entry {
+            level,
+            slug: slug.to_string(),
+            section: name.clone(),
+            start: i,
+            end,
+            tag_line,
+        });
+    }
+    out
+}
+
+// spec: queue-kit/SPEC.md §The tag algebra — the `[recurrence:]` array's dates, in order; its
+// count is the number of re-filings and its last element the newest
+pub fn recurrence_dates(tag_line: &str) -> Vec<&str> {
+    field_tags(tag_line, "recurrence")
+        .first()
+        .map(|t| t.raw.split(',').map(str::trim).filter(|d| is_iso_date(d)).collect())
+        .unwrap_or_default()
+}
+
+pub fn is_iso_date(tok: &str) -> bool {
+    let b = tok.as_bytes();
+    b.len() == 10
+        && b.iter().enumerate().all(|(i, c)| match i {
+            4 | 7 => *c == b'-',
+            _ => c.is_ascii_digit(),
+        })
+}
+
+// spec: queue-kit/SPEC.md §The shared queue adapters — one markdown link on a line: its target's
+// path half, its fragment half, and the byte offsets of the fragment and of the closing paren
+pub struct Link<'a> {
+    pub path: &'a str,
+    pub frag: &'a str,
+    pub frag_start: usize,
+    pub close: usize,
+}
+
+// spec: queue-kit/SPEC.md §The shared queue adapters — every `](<target>)` on a line, the target
+// split at its first `#`; a target holding whitespace is no link
+pub fn md_links(line: &str) -> Vec<Link<'_>> {
+    let mut out = Vec::new();
+    let mut from = 0usize;
+    while let Some(rel) = line[from..].find("](") {
+        let t = from + rel + 2;
+        let Some(len) = line[t..].find(')') else { break };
+        let target = &line[t..t + len];
+        from = t + len + 1;
+        if target.contains(char::is_whitespace) {
+            continue;
+        }
+        let (path, frag, frag_start) = match target.find('#') {
+            Some(h) => (&target[..h], &target[h + 1..], t + h + 1),
+            None => (target, "", t + len),
+        };
+        out.push(Link { path, frag, frag_start, close: t + len });
+    }
+    out
+}
+
+// spec: queue-kit/SPEC.md §The tag algebra — the same-file link to an entry, `](#<slug>)`: the byte
+// span of each slug-shaped fragment, beside `backtick_slugs`
+pub fn link_slugs(line: &str) -> Vec<(usize, usize)> {
+    md_links(line)
+        .into_iter()
+        .filter(|l| l.path.is_empty() && is_slug(l.frag))
+        .map(|l| (l.frag_start, l.frag_start + l.frag.len()))
+        .collect()
+}
+
+// spec: queue-kit/SPEC.md §The shared queue adapters — the retired bullet grammar's lead,
+// `^[[:space:]]*-[[:space:]]+\*\*[a-z0-9][a-z0-9-]*\*\*`, read by the history walk and the migration
+// arm alone
 pub fn bullet_slug(line: &str) -> Option<&str> {
     let rest = strip_bullet_lead(line)?;
     let b = rest.as_bytes();
@@ -178,10 +326,7 @@ pub fn strip_bullet_lead(line: &str) -> Option<&str> {
     Some(&line[i..])
 }
 
-// spec: queue-kit/SPEC.md §The queue format — awk's `/^-[[:space:]]/`, the column-0 bullet the
-// section scanners key on: an indented sub-task is deliberately outside it
-// spec: queue-kit/SPEC.md §The queue-counts arm — shared, because the index and the counters
-// report one queue's size and a second copy is what would let them disagree
+// spec: queue-kit/SPEC.md §The tag algebra — awk's `/^-[[:space:]]/`, the column-0 bullet a lesson is
 pub fn is_top_level_bullet(line: &str) -> bool {
     let b = line.as_bytes();
     matches!(b.first(), Some(&c) if c == b'-')
@@ -315,37 +460,11 @@ pub fn is_bullet(line: &str) -> bool {
     matches!(b.get(i + 1), Some(&c) if c == b' ' || c == b'\t')
 }
 
-// spec: queue-kit/SPEC.md §The shared queue adapters — awk's `match($0, /[^[:space:]]/) - 1`: the column
-// of the first non-space character, and 0 for a line that is entirely space
-pub fn indent(line: &str) -> usize {
-    line.bytes()
-        .position(|b| b != b' ' && b != b'\t')
-        .unwrap_or(0)
-}
-
-// spec: queue-kit/SPEC.md §The shared queue adapters — queue_live_slugs: every bold kebab slug leading a
-// bullet in a task section, in file order
+// spec: queue-kit/SPEC.md §The shared queue adapters — queue_live_slugs: every entry and sub-task
+// heading in a task section, in file order
 pub fn live_slugs(text: &str, sec: &Sections) -> Vec<String> {
-    let mut out = Vec::new();
-    let mut inq = false;
-    for line in text.lines() {
-        if sec.is_task(line) {
-            inq = true;
-            continue;
-        }
-        if is_section_line(line) {
-            inq = false;
-        }
-        if !inq {
-            continue;
-        }
-        if bullet_slug(line).is_some() {
-            if let Some(s) = first_bold_slug(line) {
-                out.push(s.to_string());
-            }
-        }
-    }
-    out
+    let lines: Vec<&str> = text.lines().collect();
+    entries(&lines, sec).into_iter().map(|e| e.slug).collect()
 }
 
 // spec: queue-kit/SPEC.md §The shared queue adapters — the retired set, derived from the queue
@@ -376,12 +495,12 @@ pub fn retired_set(file: &str, live: &[String]) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     for line in log.lines() {
         // spec: queue-kit/SPEC.md §The queue-edges arm — one strip takes the diff column off
-        // added, removed and context lines alike, so a lead line counts wherever the walk meets
-        // it; the diff headers survive the strip as text no lead-line grammar matches.
+        // added, removed and context lines alike, so an entry lead counts wherever the walk meets
+        // it; history holds both entry grammars, the heading and the retired bullet.
         let mut chars = line.chars();
         chars.next();
         let s = chars.as_str();
-        if let Some(g) = bullet_slug(s) {
+        if let Some(g) = entry_heading(s).map(|(_, g)| g).or_else(|| bullet_slug(s)) {
             if !live.iter().any(|l| l == g) && !out.iter().any(|r| r == g) {
                 out.push(g.to_string());
             }
@@ -501,19 +620,17 @@ pub fn done_slugs(text: &str, sec: &Sections) -> Vec<String> {
     out
 }
 
-// spec: queue-kit/SPEC.md §The shared queue adapters — the one [roadmap:] + roadmap-summary: parse, shared by
-// the roadmap arm and check-roadmap-fresh so the two never disagree on what an entry claims. The
-// typed record is that section's, TSV line and defensive `-` column included.
+// spec: queue-kit/SPEC.md §The shared queue adapters — the one [roadmap:] + [roadmap-summary:] parse, shared
+// by the roadmap arm and check-roadmap-fresh so the two never disagree on what an entry claims
 pub struct RoadmapEntry {
     pub tags: usize,
     pub field: String,
     pub slug: String,
-    pub declarations: usize,
+    pub summaries: usize,
     pub summary: String,
 }
 
 const TAG_OPEN: &str = "[roadmap:";
-const DECLARATION: &str = "roadmap-summary:";
 
 // spec: queue-kit/SPEC.md §The shared queue adapters — awk's non-overlapping `while (match(s, /\[roadmap:/))`
 fn tag_count(line: &str) -> usize {
@@ -538,88 +655,32 @@ fn tag_field(line: &str) -> String {
         .to_string()
 }
 
-// spec: queue-kit/SPEC.md §The tag algebra — the declaration is body-scoped by design, so it is
-// read off a *continuation* line: awk's `/^[[:space:]]+roadmap-summary:/` demands the indent, and
-// a column-0 spelling is not a declaration.
-fn is_declaration(line: &str) -> bool {
-    let body = line.trim_start_matches([' ', '\t']);
-    body.len() < line.len() && body.starts_with(DECLARATION)
+// spec: queue-kit/SPEC.md §The shared queue adapters — every whitespace run collapsed to one space and
+// the ends trimmed. The summary is a whitelist, so this is the only text that reaches the page.
+fn collapsed(t: &str) -> String {
+    t.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
-// spec: queue-kit/SPEC.md §The shared queue adapters — awk's `declared()`: the marking stripped, every
-// whitespace run collapsed to one space, and the leading and trailing space that collapse leaves
-// removed. The declaration is a whitelist, so this is the only text that reaches the page.
-fn declared(line: &str) -> String {
-    let t = line.trim_start_matches([' ', '\t']);
-    let t = t.strip_prefix(DECLARATION).unwrap_or(t);
-    let mut out = String::new();
-    let mut ws = false;
-    for c in t.chars() {
-        if c == ' ' || c == '\t' {
-            ws = true;
-            continue;
-        }
-        if ws && !out.is_empty() {
-            out.push(' ');
-        }
-        ws = false;
-        out.push(c);
-    }
-    out
-}
-
-// spec: queue-kit/SPEC.md §The shared queue adapters — one record per live entry carrying a tag or a
-// declaration, in queue order. An entry carrying neither is not a roadmap entry and is dropped
-// here rather than at each caller, which is what keeps the two callers' universe identical.
+// spec: queue-kit/SPEC.md §The shared queue adapters — one record per live entry carrying a
+// `[roadmap:]` or a `[roadmap-summary:]` tag, in queue order, both read off the tag line. An entry
+// carrying neither is dropped here rather than at each caller, keeping the callers' universe one.
 pub fn roadmap_entries(text: &str, sec: &Sections) -> Vec<RoadmapEntry> {
-    let mut out: Vec<RoadmapEntry> = Vec::new();
-    let mut cur: Option<RoadmapEntry> = None;
-    let mut inq = false;
-
-    fn flush(cur: &mut Option<RoadmapEntry>, out: &mut Vec<RoadmapEntry>) {
-        if let Some(e) = cur.take() {
-            if !e.slug.is_empty() && (e.tags > 0 || e.declarations > 0) {
-                out.push(e);
-            }
-        }
-    }
-
-    for line in text.lines() {
-        if sec.is_task(line) {
-            flush(&mut cur, &mut out);
-            inq = true;
-            continue;
-        }
-        if is_section_line(line) {
-            flush(&mut cur, &mut out);
-            inq = false;
-            continue;
-        }
-        if !inq {
-            continue;
-        }
-        if bullet_slug(line).is_some() {
-            flush(&mut cur, &mut out);
-            cur = Some(RoadmapEntry {
-                tags: tag_count(line),
-                field: tag_field(line),
-                slug: first_bold_slug(line).unwrap_or_default().to_string(),
-                declarations: 0,
-                summary: String::new(),
-            });
-            continue;
-        }
-        if let Some(e) = cur.as_mut() {
-            if !e.slug.is_empty() && is_declaration(line) {
-                e.declarations += 1;
-                if e.declarations == 1 {
-                    e.summary = declared(line);
-                }
-            }
-        }
-    }
-    flush(&mut cur, &mut out);
-    out
+    let lines: Vec<&str> = text.lines().collect();
+    entries(&lines, sec)
+        .into_iter()
+        .filter_map(|e| {
+            let t = e.tags(&lines);
+            let sums = field_tags(t, "roadmap-summary");
+            let r = RoadmapEntry {
+                tags: tag_count(t),
+                field: tag_field(t),
+                slug: e.slug,
+                summaries: sums.len(),
+                summary: sums.first().map(|s| collapsed(s.raw)).unwrap_or_default(),
+            };
+            (r.tags > 0 || r.summaries > 0).then_some(r)
+        })
+        .collect()
 }
 
 // spec: queue-kit/SPEC.md §The queue format — the first `<label><iso-day>` on a line; the label is
@@ -704,7 +765,6 @@ mod tests {
         assert_eq!(bullet_slug("- **Bad** — prose"), None);
         assert_eq!(bullet_slug("- plain"), None);
         assert_eq!(bullet_slug("-**no-space**"), None);
-        assert_eq!(first_bold_slug("x **one** y **two**"), Some("one"));
     }
 
     #[test]
@@ -715,10 +775,10 @@ mod tests {
             icebox: String::new(),
             done: "Done".into(),
         };
-        assert!(!s.is_icebox("## Icebox"));
+        assert!(!s.is_icebox("Icebox") && !s.is_icebox(""));
         assert_eq!(s.task_sections(), vec!["New Features", "Deferred"]);
         s.icebox = "Icebox".into();
-        assert!(s.is_icebox("## Icebox"));
+        assert!(s.is_icebox("Icebox"));
         assert_eq!(
             s.task_sections(),
             vec!["New Features", "Deferred", "Icebox"]
@@ -733,8 +793,71 @@ mod tests {
             icebox: String::new(),
             done: "Done".into(),
         };
-        let text = "## New Features\n- **a** x\n## Done\n- b\n## Deferred\n- **c** y\n";
-        assert_eq!(live_slugs(text, &sec), vec!["a".to_string(), "c".to_string()]);
+        let text = "## New Features\n### a\nx\n#### a-sub\n## Done\n- b\n### d\n## Deferred\n### c\n";
+        assert_eq!(live_slugs(text, &sec), vec!["a".to_string(), "a-sub".to_string(), "c".to_string()]);
+    }
+
+    // spec: queue-kit/SPEC.md §The queue format — the heading is the bare slug, three or four hashes
+    #[test]
+    fn an_entry_heading_is_a_bare_slug_at_level_three_or_four() {
+        assert_eq!(entry_heading("### the-slug"), Some((3, "the-slug")));
+        assert_eq!(entry_heading("#### sub-1  "), Some((4, "sub-1")));
+        assert_eq!(entry_heading("### Someday"), None);
+        assert_eq!(entry_heading("### a [tag]"), None);
+        assert_eq!(entry_heading("## a"), None);
+        assert_eq!(entry_heading("##### a"), None);
+        assert_eq!(heading_level("###x"), None);
+    }
+
+    // spec: queue-kit/SPEC.md §The queue format — a tag line holds bracketed tags and nothing else
+    #[test]
+    fn a_tag_line_is_only_bracketed_tags() {
+        assert!(is_tag_line("[cost: event/low] [surface: queue-kit]"));
+        assert!(is_tag_line("[attend]"));
+        assert!(is_tag_line("[roadmap-summary: One sentence, with commas.]"));
+        assert!(!is_tag_line("[link](#x) prose"));
+        assert!(!is_tag_line("[cost: event/low] and prose"));
+        assert!(!is_tag_line("[a][b]"));
+        assert!(!is_tag_line(""));
+        assert!(!is_tag_line("[Upper: x]"));
+    }
+
+    // spec: queue-kit/SPEC.md §The queue format — the extent runs to the next heading of the same or
+    // a shallower level, and the tag line is the first non-blank line under the heading
+    #[test]
+    fn an_entry_carries_its_extent_and_tag_line() {
+        let sec = Sections {
+            active: vec!["New Features".into()],
+            deferred: "Deferred".into(),
+            icebox: String::new(),
+            done: "Done".into(),
+        };
+        let text = "## New Features\n\n### a\n\n[spec: x.md]\n\nbody\n\n#### a-sub\n\nsub body\n\n### b\n\nno tags\n## Done\n";
+        let lines: Vec<&str> = text.lines().collect();
+        let es = entries(&lines, &sec);
+        assert_eq!(es.len(), 3);
+        assert_eq!((es[0].start, es[0].end, es[0].tag_line), (2, 12, Some(4)));
+        assert_eq!(es[0].tags(&lines), "[spec: x.md]");
+        assert_eq!((es[1].level, es[1].start, es[1].end, es[1].tag_line), (4, 8, 12, None));
+        assert_eq!((es[2].start, es[2].end, es[2].tag_line), (12, 15, None));
+    }
+
+    // spec: queue-kit/SPEC.md §The tag algebra — the recurrence array, count and last element
+    #[test]
+    fn the_recurrence_array_reads_every_date_in_order() {
+        assert_eq!(recurrence_dates("[cost: once/low] [recurrence: 2026-09-03, 2026-09-10]"), vec!["2026-09-03", "2026-09-10"]);
+        assert!(recurrence_dates("[recurrence: soon]").is_empty());
+        assert!(recurrence_dates("[cost: once/low]").is_empty());
+    }
+
+    // spec: queue-kit/SPEC.md §The tag algebra — a same-file link's slug-shaped fragment
+    #[test]
+    fn a_link_slug_is_a_same_file_slug_fragment() {
+        let l = "see [a-b](#a-b), [x](other.md#c), [y](#Not-Slug) and [z](#d)";
+        let got: Vec<&str> = link_slugs(l).into_iter().map(|(s, e)| &l[s..e]).collect();
+        assert_eq!(got, vec!["a-b", "d"]);
+        let m = md_links("[q](../TASK-QUEUE.md#e-f) (deferred)");
+        assert_eq!((m[0].path, m[0].frag), ("../TASK-QUEUE.md", "e-f"));
     }
 
     // spec: queue-kit/SPEC.md §check-task-conservation — the done grammar is bare-slug-only, so

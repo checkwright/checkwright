@@ -155,9 +155,23 @@ pub fn run(args: &[String]) -> i32 {
     let mut linecite: Vec<String> = Vec::new();
     let mut pickaxe: Vec<String> = Vec::new();
     let mut seen: HashMap<&str, usize> = HashMap::new();
+    // spec: queue-kit/SPEC.md §check-queue-hygiene — a line inside an entry's extent is body, and the
+    // first non-blank line under an entry heading may be its tag line
+    let mut in_extent = false;
+    let mut after_heading = false;
 
     for (i, line) in text.lines().enumerate() {
         let fnr = i + 1;
+        let level = queue::heading_level(line);
+        let tag_line = after_heading && queue::is_tag_line(line);
+        if !is_blank(line) {
+            after_heading = queue::entry_heading(line).is_some();
+        }
+        if level.is_some_and(|l| l <= 2) || is_rule(line) {
+            in_extent = false;
+        } else if level.is_some_and(|l| l >= 3) {
+            in_extent = true;
+        }
         if line.contains("<!--") || line.contains("-->") {
             html.push(format!("{}:{}: {}", file, fnr, line));
         }
@@ -170,12 +184,13 @@ pub fn run(args: &[String]) -> i32 {
         }
 
         // spec: queue-kit/SPEC.md §check-queue-hygiene — every column-0 line must be a
-        // heading, a '- ' bullet, '---', or a configured QUEUE_KIT_PROSE_LEADS lead
+        // heading, a '- ' bullet, '---', a configured QUEUE_KIT_PROSE_LEADS lead, or a line
+        // inside an entry's extent
         let col0 = match line.bytes().next() {
             Some(b) => b != b' ' && b != b'\t',
             None => false,
         };
-        if col0 {
+        if col0 && !in_extent {
             let ok = line.starts_with('#')
                 || matches!(line.as_bytes().get(1), Some(&c) if line.starts_with('-') && (c == b' ' || c == b'\t'))
                 || is_rule(line)
@@ -185,7 +200,9 @@ pub fn run(args: &[String]) -> i32 {
             }
         }
 
-        if !is_blank(line) && !is_rule(line) {
+        // spec: queue-kit/SPEC.md §check-queue-hygiene — two entries may carry identical tags, and the
+        // heading above each tag line already tells them apart
+        if !is_blank(line) && !is_rule(line) && !tag_line {
             match seen.get(line) {
                 Some(first) => dup.push(format!(
                     "{}:{}: {} (first seen at line {})",
@@ -225,13 +242,14 @@ pub fn run(args: &[String]) -> i32 {
             if !html.is_empty() || !dup.is_empty() {
                 println!();
             }
-            println!("check-queue-hygiene: column-0 prose (every column-0 line must be a heading,");
-            println!("a '- ' bullet, '---', or a configured QUEUE_KIT_PROSE_LEADS lead):");
+            println!("check-queue-hygiene: column-0 prose outside every entry (every column-0 line must");
+            println!("be a heading, a '- ' bullet, '---', a configured QUEUE_KIT_PROSE_LEADS lead, or a");
+            println!("line inside an entry):");
             for x in &prose {
                 println!("  {}", x);
             }
-            println!("  help: indent the prose to a continuation line under its bullet, or (for a");
-            println!("        recurring protocol lead) add its token to QUEUE_KIT_PROSE_LEADS.");
+            println!("  help: move the prose under its entry's heading, indent a section preamble, or");
+            println!("        (for a recurring protocol lead) add its token to QUEUE_KIT_PROSE_LEADS.");
         }
         if !linecite.is_empty() {
             if !html.is_empty() || !dup.is_empty() || !prose.is_empty() {

@@ -28,7 +28,9 @@ cat >"$SANDBOX/TASK-QUEUE.md" <<'EOF'
 
 ## New Features
 
-- **live-teardown** — a live decommission task.
+### live-teardown
+
+a live decommission task.
 
 ## Technical Debt
 

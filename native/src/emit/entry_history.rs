@@ -1,6 +1,7 @@
 // spec: queue-kit/SPEC.md §check-queue-entry-budget — the entry-history arm: the commits at which
 // one entry's counted extent fell, reported and never judged, with no exit-1 path at all
-use crate::gates::queue_entry_budget::{self, Sec};
+use crate::emit::queue_migrate;
+use crate::gates::queue_entry_budget;
 use crate::queue;
 
 const USAGE: &str = "\
@@ -73,7 +74,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
             None => continue,
         };
         let count = match blobs.at(commit, &file)? {
-            Some(text) => count_of(&text, &sec_cfg, &slug, unit),
+            Some(text) => count_of(&queue_migrate::heading_form(&text, &sec_cfg), &sec_cfg, &slug, unit),
             None => None,
         };
         // spec: queue-kit/SPEC.md §check-queue-entry-budget — the bound, and the departure commit:
@@ -109,7 +110,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         });
     }
     // spec: queue-kit/SPEC.md §check-queue-entry-budget — the retired set admits a slug on
-    // lead-line shape alone, so a bold bullet that never stood in a task section is addressable and
+    // entry shape alone, so a heading or bullet that never stood in a task section is addressable and
     // has no counted history; that is the one case the membership bound does not shorten
     if walked == 0 {
         return Err(format!(
@@ -163,7 +164,7 @@ fn count_of(text: &str, sec_cfg: &queue::Sections, slug: &str, unit: queue::Unit
     queue_entry_budget::walk(text, sec_cfg)
         .entries
         .into_iter()
-        .find(|e| e.slug == slug && e.sec != Sec::Other)
+        .find(|e| e.slug == slug)
         .map(|e| e.size(unit))
 }
 
@@ -193,28 +194,31 @@ mod tests {
     const Q: &str = "\
 ## New Features
 
-- **live-one** — a promoted entry
-  a second line
+### live-one
+
+a promoted entry
 
 ## Deferred
 
-- **def-one** [cost: event/low] — a deferred entry
-  a second line
-  a third line
-  recurrence: def-one 2026-01-01
+### def-one
+
+[cost: event/low] [recurrence: 2026-01-01]
+
+a deferred entry
+
+a second paragraph
 
 ## Done
 
 - def-gone
 ";
 
-    // spec: queue-kit/SPEC.md §check-queue-entry-budget — the arm reads the cap's own count, which
-    // is the extent less the declaration discount: five lines of extent, one `recurrence:` line
-    // discounted, four counted; in code points, the three content lines and their two breaks.
+    // spec: queue-kit/SPEC.md §check-queue-entry-budget — the arm reads the cap's own count: the
+    // whole extent in lines, and in code points the four content lines and their three breaks.
     #[test]
-    fn the_count_is_the_caps_count_and_not_the_extent() {
-        assert_eq!(count(Q, "def-one", Lines), Some(4));
-        let cp = "- **def-one** [cost: event/low] — a deferred entry".chars().count() + 1 + 13 + 1 + 12;
+    fn the_count_is_the_caps_count() {
+        assert_eq!(count(Q, "def-one", Lines), Some(8));
+        let cp = "### def-one".len() + 1 + "[cost: event/low] [recurrence: 2026-01-01]".len() + 1 + 16 + 1 + 18;
         assert_eq!(count(Q, "def-one", Cp), Some(cp));
     }
 
@@ -222,7 +226,7 @@ mod tests {
     // pool is still measured, so a reader following one entry's history crosses the promotion
     #[test]
     fn a_promoted_entry_is_measured_where_it_now_stands() {
-        assert_eq!(count(Q, "live-one", Lines), Some(3));
+        assert_eq!(count(Q, "live-one", Lines), Some(4));
     }
 
     // spec: queue-kit/SPEC.md §check-queue-entry-budget — a bare slug under Done is not an entry

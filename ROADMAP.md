@@ -27,14 +27,14 @@ _Nothing is queued under this horizon._
 
 ### next
 
-- **`companion-toolkit-profile`** *(ecosystem)* — Gate a tree whose specs another toolkit's workflow wrote.
-- **`gate-authoring-sdk-surface`** *(ecosystem)* — Author a gate in any language behind one substrate-neutral descriptor.
+- [companion-toolkit-profile](TASK-QUEUE.md#companion-toolkit-profile) *(ecosystem)* — Gate a tree whose specs another toolkit's workflow wrote.
+- [gate-authoring-sdk-surface](TASK-QUEUE.md#gate-authoring-sdk-surface) *(ecosystem)* — Author a gate in any language behind one substrate-neutral descriptor.
 
 ### later
 
-- **`plugin-marketplace`** *(ecosystem)* — The stage skills and guards installable as a harness plugin.
-- **`benchmark-ab-experiment`** *(adoption)* — A controlled experiment measuring drift with and without governance.
-- **`hosted-attestation-service`** *(commercial)* — Gate runs verified by a neutral party no committing agent can touch.
-- **`heterogeneous-agent-delegation`** *(ecosystem)* — Dispatch a stage to any vendor's coding agent, gated identically.
+- [plugin-marketplace](TASK-QUEUE.md#plugin-marketplace) *(ecosystem)* — The stage skills and guards installable as a harness plugin.
+- [benchmark-ab-experiment](TASK-QUEUE.md#benchmark-ab-experiment) *(adoption)* — A controlled experiment measuring drift with and without governance.
+- [hosted-attestation-service](TASK-QUEUE.md#hosted-attestation-service) *(commercial)* — Gate runs verified by a neutral party no committing agent can touch.
+- [heterogeneous-agent-delegation](TASK-QUEUE.md#heterogeneous-agent-delegation) *(ecosystem)* — Dispatch a stage to any vendor's coding agent, gated identically.
 
 <!-- roadmap:end -->

@@ -4,21 +4,35 @@
 
 ## New Features
 
-- **alpha-feature** — build the alpha surface. [blocked-by: beta-feature]
-- **beta-feature** — the prerequisite groundwork.
-  - **beta-subtask** — a nested unit of beta.
+### alpha-feature
+
+[blocked-by: beta-feature]
+
+build the alpha surface.
+
+### beta-feature
+
+the prerequisite groundwork.
+
+#### beta-subtask
+
+a nested unit of beta.
 
 ## Technical Debt
 
-- **tidy-logs** — collapse the duplicated log lines, stop appending closing notes, and keep the
-  banner delegated on each host.
-- **narrate-the-tag** — describe the design-pending state and the design-pending work it marks.
+### tidy-logs
+
+collapse the duplicated log lines, stop appending closing notes, and keep the banner delegated on each host.
+
+### narrate-the-tag
+
+describe the design-pending state and the design-pending work it marks.
 
 ## Deferred
 
-### Later
+### gamma-feature
 
-- **gamma-feature** — revisit when the alpha surface settles.
+revisit when the alpha surface settles.
 
 ## Done
 

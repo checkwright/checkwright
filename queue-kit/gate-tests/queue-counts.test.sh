@@ -28,18 +28,33 @@ cat >"$SANDBOX/TASK-QUEUE.md" <<'EOF'
 
 ## New Features
 
-- **feat-a** [cost: event/low] — do a thing.
-- **feat-b** [roadmap: now/x] — do another.
+### feat-a
+
+[cost: event/low]
+
+do a thing.
+
+### feat-b
+
+[roadmap: now/x]
+
+do another.
 
 ## Technical Debt
 
 ## Deferred
 
-- **defer-a** [cost: once/high] — later.
+### defer-a
+
+[cost: once/high]
+
+later.
 
 ## Chill
 
-- **chill-a** — much later.
+### chill-a
+
+much later.
 
 ## Done
 

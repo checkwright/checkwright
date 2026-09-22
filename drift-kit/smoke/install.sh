@@ -23,7 +23,9 @@ cat > "$work/TASK-QUEUE.md" <<'EOF'
 # TASK-QUEUE.md
 ## Iteration: smoke
 ## Deferred
-- **foo** — a thing. Surfaced 2025-01-01.
+### foo
+
+a thing. Surfaced 2025-01-01.
 ## Done
 EOF
 
@@ -203,14 +205,14 @@ qhead() { git -C "$qrepo" rev-parse --short HEAD; }
 qstamp() { printf '# hdr\n---\n\n%s scope %s 2025-01-01 %s\n' "$1" "$2" "$(qhead)" > "$qrepo/.workflow/WORKFLOW-STATE.txt"; qcommit "chore(scope): stamp $1"; }
 qflow() { ( cd "$qrepo" && GATE_SDK_NATIVE_BIN="$TRAJ_BIN" \
     bash "$SMOKE_KIT_ROOT/../gate-sdk/bin/run-gates.sh" --emit queue-flow "$@" ); }
-printf '# Q\n## Deferred\n- **a** — x\n- **b** — x\n## Done\n' > "$qrepo/TASK-QUEUE.md"; qcommit "queue"
+printf '# Q\n## Deferred\n### a\nx\n### b\nx\n## Done\n' > "$qrepo/TASK-QUEUE.md"; qcommit "queue"
 qstamp one s1
 [[ "$(qflow)" == 'n/a (fewer than two iteration-start commits in reach)' ]] \
     || fail "queue-flow over one iteration start did not degrade to its n/a line: $(qflow)"
-printf '# Q\n## Deferred\n- **b** — x\n- **c** — x\n## Done\n- a\n' > "$qrepo/TASK-QUEUE.md"; qcommit "drain a, file c"
+printf '# Q\n## Deferred\n### b\nx\n### c\nx\n## Done\n- a\n' > "$qrepo/TASK-QUEUE.md"; qcommit "drain a, file c"
 printf 'one build s1b 2025-01-01 %s\n' "$(qhead)" >> "$qrepo/.workflow/WORKFLOW-STATE.txt"; qcommit "chore(build): stamp one"
 qstamp two s2
-printf '# Q\n## Deferred\n- **c** — x\n- **d** — x\n- **e** — x\n## Done\n' > "$qrepo/TASK-QUEUE.md"; qcommit "drain b, file d e"
+printf '# Q\n## Deferred\n### c\nx\n### d\nx\n### e\nx\n## Done\n' > "$qrepo/TASK-QUEUE.md"; qcommit "drain b, file d e"
 qstamp three s3
 set +e
 qout="$(qflow)"; qrc=$?
@@ -347,7 +349,7 @@ ptmiss="$(ptkpi "$work/no-such-price-table.tsv")"
 grep -q 'n/a (no price table)' <<<"$ptmiss" || fail "absent price table must degrade fail-visibly: $ptmiss"
 
 # spec: drift-kit/SPEC.md §Testing — kpi-incident-recurrence over purpose-built queues:
-# the sum across declarations, the highest-count slug, the trend fragment, and the two
+# the sum across [recurrence:] arrays, the highest-count slug, the trend fragment, and the two
 # degradations. Fixture-stable, like kpi-price-table-age: it reads a file the fixture writes.
 irkpi() { DRIFT_KIT_QUEUE_FILE="$1" solo kpi-incident-recurrence; }
 irtrend_of() { DRIFT_KIT_QUEUE_FILE="$1" trend_frag kpi-incident-recurrence; }
@@ -357,10 +359,17 @@ cat > "$ir_q" <<'EOF'
 # TASK-QUEUE.md
 ## Iteration: smoke
 ## Deferred
-- **thrice** — a finding re-filed three times.
-  recurrence: thrice 2026-08-01 2026-08-02 2026-08-04
-- **once** — a finding re-filed once.
-  recurrence: once 2026-08-04
+### thrice
+
+[recurrence: 2026-08-01, 2026-08-02, 2026-08-04]
+
+a finding re-filed three times.
+
+### once
+
+[recurrence: 2026-08-04]
+
+a finding re-filed once.
 ## Done
 EOF
 set +e
@@ -368,14 +377,14 @@ irout="$(irkpi "$ir_q")"; irrc=$?
 set -e
 [[ "$irrc" -eq 0 ]] || fail "kpi-incident-recurrence exited $irrc (advisory plugins always exit 0)"
 [[ "$(row_count Lag <<<"$irout")" -eq 1 ]] || fail "kpi-incident-recurrence must emit exactly one lag row: $irout"
-grep -q '4 re-filing(s) recorded' <<<"$irout" || fail "the count must sum dates across every declaration, not count declarations: $irout"
+grep -q '4 re-filing(s) recorded' <<<"$irout" || fail "the count must sum dates across every array, not count tags: $irout"
 grep -q 'highest thrice at 3' <<<"$irout" || fail "the highest-count slug row is missing or wrong: $irout"
 [[ "$(irtrend_of "$ir_q")" == 'recur 4' ]] || fail "kpi-incident-recurrence --trend not 'recur 4': $(irtrend_of "$ir_q")"
 
 irnone="$(irkpi "$work/TASK-QUEUE.md")"
-grep -q 'n/a (no recurrence declaration in the queue)' <<<"$irnone" \
-    || fail "a queue with no declaration must degrade fail-visibly rather than reporting 0: $irnone"
-[[ -z "$(irtrend_of "$work/TASK-QUEUE.md")" ]] || fail "--trend must emit nothing when no declaration exists"
+grep -q 'n/a (no recurrence tag in the queue)' <<<"$irnone" \
+    || fail "a queue with no recurrence tag must degrade fail-visibly rather than reporting 0: $irnone"
+[[ -z "$(irtrend_of "$work/TASK-QUEUE.md")" ]] || fail "--trend must emit nothing when no recurrence tag exists"
 grep -q 'n/a (no queue file)' <<<"$(irkpi "$work/no-such-queue.md")" \
     || fail "an absent queue file must degrade fail-visibly"
 

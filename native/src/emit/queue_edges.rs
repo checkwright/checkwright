@@ -117,16 +117,21 @@ impl Agg<'_> {
         }
     }
 
+    // spec: queue-kit/SPEC.md §The queue-edges arm — a same-file link is the live citation and a
+    // backticked token the retired one; resolution, not the form, decides which set a target is in
     fn scan_body(&mut self, line: &str) {
-        for (start, end) in queue::backtick_slugs(line) {
+        let mut spans = queue::link_slugs(line);
+        spans.extend(queue::backtick_slugs(line));
+        spans.sort();
+        for (start, end) in spans {
             self.edge(&line[start..end], line);
         }
     }
 }
 
 // spec: queue-kit/SPEC.md §The queue-edges arm — a citation is attributed to the nearest
-// preceding slug bullet, so a sub-task cites in its own name; the lead line yields its
-// `[blocked-by:]` tag alone, never its prose.
+// preceding entry heading, so a sub-task cites in its own name; the tag line yields its
+// `[blocked-by:]` tags alone.
 fn aggregate(
     text: &str,
     sec: &Sections,
@@ -144,27 +149,23 @@ fn aggregate(
         rorder: Vec::new(),
         recs: Vec::new(),
     };
-    let mut in_task = false;
-    for line in text.lines() {
-        if sec.is_task(line) {
-            in_task = true;
-            agg.cur.clear();
+    let lines: Vec<&str> = text.lines().collect();
+    let entries = queue::entries(&lines, sec);
+    let mut owner: Vec<Option<(&str, bool)>> = vec![None; lines.len()];
+    for e in &entries {
+        for (i, slot) in owner.iter_mut().enumerate().take(e.end).skip(e.start + 1) {
+            *slot = Some((e.slug.as_str(), Some(i) == e.tag_line));
+        }
+    }
+    for (i, line) in lines.iter().enumerate() {
+        let Some((slug, is_tags)) = owner[i] else { continue };
+        if queue::heading_level(line).is_some() {
             continue;
         }
-        if queue::is_section_line(line) {
-            in_task = false;
-            agg.cur.clear();
-            continue;
-        }
-        if !in_task {
-            continue;
-        }
-        if let Some(slug) = queue::bullet_slug(line) {
-            agg.cur = slug.to_string();
+        agg.cur = slug.to_string();
+        if is_tags {
             agg.scan_blocked(line);
-            continue;
-        }
-        if !agg.cur.is_empty() {
+        } else {
             agg.scan_body(line);
         }
     }
@@ -209,27 +210,43 @@ mod tests {
 
 ## New Features
 
-- **feat-a** — a feature citing `feat-b` on its lead line.
-  **Relation to `feat-b`:** this one subsumes it entirely.
-  It also mentions `landed-thing`, which is not a live slug, and `feat-a`.
-  - **feat-a-sub** — a sub-task.
-    It cites `def-a` in its own name.
+### feat-a
 
-- **feat-b** [blocked-by: def-a] — blocked, so it cites its blocker.
+a feature whose summary names [feat-b](#feat-b).
+
+**Relation to [feat-b](#feat-b):** this one subsumes it entirely.
+
+It also mentions `landed-thing`, which is not a live slug, and `feat-a`.
+
+#### feat-a-sub
+
+a sub-task. It cites [def-a](#def-a) in its own name.
+
+### feat-b
+
+[blocked-by: def-a]
+
+blocked, so it cites its blocker.
 
 ## Technical Debt
 
-- **debt-a** — an entry nobody cites.
-  It mentions `feat-b` once more.
+### debt-a
+
+an entry nobody cites.
+
+It mentions [feat-b](#feat-b) once more.
 
 ## Deferred
 
-- **def-a** — a deferred entry is a live target.
+### def-a
+
+a deferred entry is a live target.
 
 ## Done
 
 - done-slug
-  It mentions `feat-b`, but Done is not a task section.
+
+It mentions [feat-b](#feat-b), but Done is not a task section.
 
 ## Lessons Learned
 ";
@@ -267,22 +284,22 @@ mod tests {
     #[test]
     fn the_citation_grammar_resolves_counts_and_stays_silent_on_a_non_slug() {
         let out = run("", &[]);
-        assert!(out.contains("feat-b (2 inbound)"), "{}", out);
+        assert!(out.contains("feat-b (3 inbound)"), "{}", out);
         assert!(out.contains("def-a (2 inbound)"), "{}", out);
         assert!(!out.contains("landed-thing ("), "{}", out);
         assert!(!out.contains("feat-a ("), "{}", out);
         assert!(!out.contains("done-slug ("), "{}", out);
         assert!(
-            out.contains("**Relation to `feat-b`:** this one subsumes it entirely."),
+            out.contains("**Relation to [feat-b](#feat-b):** this one subsumes it entirely."),
             "the citing line is not carried verbatim: {}",
             out
         );
     }
 
-    // spec: queue-kit/SPEC.md §The queue-edges arm — attribution is to the nearest preceding slug
-    // bullet, and a lead line yields its `[blocked-by:]` tag alone rather than its prose.
+    // spec: queue-kit/SPEC.md §The queue-edges arm — attribution is to the nearest preceding entry
+    // heading, and the tag line yields its `[blocked-by:]` tag alone.
     #[test]
-    fn a_sub_task_cites_in_its_own_name_and_a_lead_line_yields_only_its_tag() {
+    fn a_sub_task_cites_in_its_own_name_and_a_tag_line_yields_only_its_tag() {
         let out = run("def-a", &[]);
         assert!(out.contains("feat-a-sub"), "{}", out);
         assert!(out.contains("[blocked-by: def-a]"), "{}", out);
@@ -290,11 +307,7 @@ mod tests {
         let out = run("feat-b", &[]);
         assert!(out.contains("subsumes it entirely"), "{}", out);
         assert!(out.contains("debt-a"), "{}", out);
-        assert!(
-            !out.contains("a feature citing"),
-            "the lead line's prose became an edge: {}",
-            out
-        );
+        assert!(out.contains("a feature whose summary names"), "the summary is body: {}", out);
         assert_eq!(run("debt-a", &[]), "", "a live slug with no inbound edges");
     }
 
@@ -303,9 +316,9 @@ mod tests {
     #[test]
     fn retired_targets_trail_the_live_block_alphabetically() {
         let out = run("", &["landed-thing", "a-retired-one"]);
-        assert!(out.contains("feat-b (2 inbound)"), "{}", out);
+        assert!(out.contains("feat-b (3 inbound)"), "{}", out);
         assert!(out.contains("landed-thing (1 inbound, retired)"), "{}", out);
-        let live_at = out.find("feat-b (2 inbound)").expect("no live block");
+        let live_at = out.find("feat-b (3 inbound)").expect("no live block");
         let ret_at = out.find("landed-thing (1 inbound").expect("no retired block");
         assert!(ret_at > live_at, "the retired block does not trail: {}", out);
         // comment-tier-exempt: names this fixture's second retired slug, which is cited by

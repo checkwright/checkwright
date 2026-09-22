@@ -15,10 +15,11 @@ fn knob_or(args: &[String], at: usize, knob: &str) -> Result<String, String> {
 // spec: lifecycle-kit/SPEC.md §check-stage-entry — the awk section machine: an active-section
 // heading opens the window, any other `## ` heading closes it, and only a `- ` bullet inside it
 // is a queue entry. Returns each such bullet with its 1-based line number.
-fn active_bullets<'a>(text: &'a str, sections: &[String]) -> Vec<(usize, &'a str)> {
+fn active_bullets(text: &str, sections: &[String]) -> Vec<(usize, String)> {
     let mut out = Vec::new();
     let mut inq = false;
-    for (i, line) in text.lines().enumerate() {
+    let lines: Vec<&str> = text.lines().collect();
+    for (i, line) in lines.iter().enumerate() {
         if let Some(rest) = line.strip_prefix("## ") {
             if sections
                 .iter()
@@ -29,10 +30,18 @@ fn active_bullets<'a>(text: &'a str, sections: &[String]) -> Vec<(usize, &'a str
             }
             inq = false;
         }
-        if !inq || !line.starts_with("- ") {
+        if !inq || !line.starts_with("### ") {
             continue;
         }
-        out.push((i + 1, line));
+        // spec: queue-kit/SPEC.md §The queue format — an entry is its heading, and its tags ride
+        // the first non-blank line under it when that line opens with a bracket
+        let tags = lines[i + 1..]
+            .iter()
+            .find(|l| !l.trim().is_empty())
+            .filter(|l| l.starts_with('['))
+            .map(|l| format!(" {}", l))
+            .unwrap_or_default();
+        out.push((i + 1, format!("{}{}", line, tags)));
     }
     out
 }
@@ -152,20 +161,22 @@ fn inferred_marker(line: &str) -> Option<Marker> {
     })
 }
 
-// spec: lifecycle-kit/SPEC.md §check-stage-entry — D's queue read: a line is in scope only inside a
-// top-level entry of an active section, from its `- ` line to the line before the next top-level
-// bullet, heading or `---` rule. Indexed by 0-based line number.
+// spec: lifecycle-kit/SPEC.md §check-stage-entry — D's queue read: a line is in scope only inside an
+// entry of an active section, from its entry heading to the line before the next heading of the
+// same or a shallower level, or a `---` rule. Indexed by 0-based line number.
 fn active_entry_lines(text: &str, sections: &[String]) -> Vec<bool> {
     let (mut out, mut in_section, mut in_entry) = (Vec::new(), false, false);
     for line in text.lines() {
-        if line.starts_with('#') || line.trim_end_matches([' ', '\t']) == "---" {
+        let hashes = line.bytes().take_while(|b| *b == b'#').count();
+        let heading = hashes > 0 && line[hashes..].starts_with(' ');
+        if line.trim_end_matches([' ', '\t']) == "---" || (heading && hashes <= 2) {
             in_entry = false;
             if let Some(rest) = line.strip_prefix("## ") {
                 in_section = sections
                     .iter()
                     .any(|s| rest.trim_end_matches([' ', '\t']) == s);
             }
-        } else if line.starts_with("- ") {
+        } else if heading && hashes == 3 {
             in_entry = in_section;
         }
         out.push(in_entry);
@@ -374,7 +385,7 @@ pub fn run(args: &[String]) -> i32 {
         let (mut leftover, mut malformed) = (String::new(), String::new());
         let mut observed = String::new();
         for (ln, text) in active_bullets(&qtext, &k.active_sections) {
-            match drain_exempt_reason(text) {
+            match drain_exempt_reason(&text) {
                 Some("") => malformed.push_str(&format!("\n    {}: {}", ln, text)),
                 Some(reason) if b_drain => {
                     if !exempt_detail.is_empty() {
@@ -548,14 +559,14 @@ pub fn run(args: &[String]) -> i32 {
 mod tests {
     use super::*;
 
-    // spec: lifecycle-kit/SPEC.md §check-stage-entry — the section window is the awk machine's:
-    // an active heading opens it, any other `## ` closes it, and only a `- ` bullet counts
+    // spec: lifecycle-kit/SPEC.md §check-stage-entry — the section window: an active heading opens
+    // it, any other `## ` closes it, and only a `###` entry heading counts, read with its tag line
     #[test]
     fn the_active_window_opens_on_a_section_and_closes_on_any_other_heading() {
-        let text = "## New Features\n- a\n## Done\n- b\n## Technical Debt  \n- c\nnot a bullet\n";
+        let text = "## New Features\n### a\n\n[drain-exempt: why]\n## Done\n### b\n## Technical Debt  \n### c\n\nprose\n- not an entry\n";
         let secs = vec!["New Features".to_string(), "Technical Debt".to_string()];
-        let got: Vec<&str> = active_bullets(text, &secs).iter().map(|(_, l)| *l).collect();
-        assert_eq!(got, vec!["- a", "- c"]);
+        let got: Vec<String> = active_bullets(text, &secs).into_iter().map(|(_, l)| l).collect();
+        assert_eq!(got, vec!["### a [drain-exempt: why]", "### c"]);
     }
 
     // spec: lifecycle-kit/SPEC.md §check-stage-entry — an empty reason is malformed rather than
@@ -601,11 +612,17 @@ mod tests {
     // entry only: a deferred entry's marker, a section preamble's and a fenced one are unread
     #[test]
     fn a_queue_marker_is_read_only_inside_an_active_entry_and_outside_a_fence() {
-        let text = "## Technical Debt\n  **Inferred, not run:** preamble — `c`\n- **a** — x\n  **Inferred, not run:** active — `c`\n  ```\n  **Inferred, not run:** fenced — `c`\n  ```\n## Deferred\n- **b** — y\n  **Inferred, not run:** deferred — `c`\n";
+        let text = "## Technical Debt\n  **Inferred, not run:** preamble — `c`\n### a\n**Inferred, not run:** active — `c`\n#### a-sub\n**Inferred, not run:** sub — `c`\n```\n**Inferred, not run:** fenced — `c`\n```\n## Deferred\n### b\n**Inferred, not run:** deferred — `c`\n";
         let secs = vec!["New Features".to_string(), "Technical Debt".to_string()];
         let scope = active_entry_lines(text, &secs);
         let (hits, n) = scan_markers(text, &|i| scope.get(i).copied().unwrap_or(false));
-        assert_eq!(hits, vec!["4:   **Inferred, not run:** active — `c`".to_string()]);
+        assert_eq!(
+            hits,
+            vec![
+                "4: **Inferred, not run:** active — `c`".to_string(),
+                "6: **Inferred, not run:** sub — `c`".to_string()
+            ]
+        );
         assert_eq!(n, 0);
     }
 

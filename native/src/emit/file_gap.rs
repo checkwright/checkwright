@@ -18,11 +18,6 @@ const USAGE: &str = "usage: --emit file-gap [--] \"<gap prose>\"\n  appends one 
 // consumer's first filing, byte-identical to the line close's drain truncates back to.
 const CONTRACT_HEADER: &str = "# contract: lifecycle-kit/SPEC.md §The committed gap inbox — append-only mid-iteration gap capture, close-drained; one bullet per gap below.\n";
 
-// spec: lifecycle-kit/SPEC.md §The committed gap inbox — the fixed-spelling section the live-slug
-// scan excludes by name: a lesson may legitimately be written in the entry shape, so a grammar-only
-// scan would ask the filer about something that is not a queue entry.
-const LESSONS_HEADING: &str = "## Lessons Learned";
-
 // spec: lifecycle-kit/SPEC.md §The committed gap inbox — one bullet shape for every filing,
 // matching or not: the tool records the observation and never interposes a verdict.
 fn bullet(today: &str, prose: &str) -> String {
@@ -52,17 +47,11 @@ fn bounded(hay: &str, needle: &str) -> bool {
     false
 }
 
-// spec: lifecycle-kit/SPEC.md §The committed gap inbox — the live set is every column-0
-// `- **<slug>** —` entry bullet outside the Lessons section; the done section falls out by grammar
-// because a done entry is a bare-slug line, and an indented sub-task by the column-0 anchor.
+// spec: lifecycle-kit/SPEC.md §The committed gap inbox — the live set is every `### <slug>` entry
+// heading in the queue file (queue-kit/SPEC.md §The queue format); the done section and Lessons fall
+// out by grammar because each holds bullets, and a sub-task by its deeper heading.
 fn entry_slug(line: &str) -> Option<&str> {
-    let rest = line.strip_prefix('-')?;
-    if !rest.starts_with([' ', '\t']) {
-        return None;
-    }
-    let body = rest.trim_start_matches([' ', '\t']).strip_prefix("**")?;
-    let end = body.find("**")?;
-    let slug = &body[..end];
+    let slug = line.strip_prefix("### ")?.trim_end_matches([' ', '\t']);
     let mut chars = slug.chars();
     let first = chars.next()?;
     if !(first.is_ascii_lowercase() || first.is_ascii_digit()) {
@@ -71,10 +60,7 @@ fn entry_slug(line: &str) -> Option<&str> {
     if !chars.all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-') {
         return None;
     }
-    match body[end + 2..].chars().next() {
-        Some(' ') | Some('\t') => Some(slug),
-        _ => None,
-    }
+    Some(slug)
 }
 
 // spec: lifecycle-kit/SPEC.md §The committed gap inbox — lifecycle-kit's own predicate, reproduced
@@ -82,23 +68,7 @@ fn entry_slug(line: &str) -> Option<&str> {
 // corpus, so the collapse would be a verdict change on a real consumer.
 // spec: lifecycle-kit/SPEC.md §The committed gap inbox — longest match wins.
 pub fn live_slug(queue_text: &str, prose: &str) -> Option<String> {
-    let mut live: Vec<&str> = Vec::new();
-    let mut in_lessons = false;
-    for line in queue_text.lines() {
-        if line.trim_end_matches([' ', '\t']) == LESSONS_HEADING {
-            in_lessons = true;
-            continue;
-        }
-        if line.starts_with("## ") {
-            in_lessons = false;
-        }
-        if in_lessons {
-            continue;
-        }
-        if let Some(s) = entry_slug(line) {
-            live.push(s);
-        }
-    }
+    let live: Vec<&str> = queue_text.lines().filter_map(entry_slug).collect();
     let hay = prose.to_lowercase();
     let mut best: Option<&str> = None;
     for s in live {
@@ -198,19 +168,29 @@ mod tests {
 
 ## New Features
 
-- **fork-dispatch** — an active entry whose slug is a hyphen-prefix of a deferred one.
+### fork-dispatch
+
+an active entry whose slug is a hyphen-prefix of a deferred one.
 
 ## Technical Debt
 
 ## Deferred
 
-- **fork-dispatch-prohibition** — the deferred entry.
-  Cost while deferred: recovery is re-paid each time.
-  - **nested-subtask** — a sub-task, indented, deliberately out of the entry scan.
+### fork-dispatch-prohibition
+
+the deferred entry.
+
+Cost while deferred: recovery is re-paid each time.
+
+#### nested-subtask
+
+a sub-task, deliberately out of the entry scan.
 
 ## Icebox
 
-- **iced-entry** — one line, still live work.
+### iced-entry
+
+one line, still live work.
 
 ## Done
 
@@ -244,9 +224,9 @@ mod tests {
         );
     }
 
-    // spec: lifecycle-kit/SPEC.md §The committed gap inbox — the four exclusions: done by grammar,
-    // Lessons by name, a sub-task by the column-0 anchor, and a hyphen-embedded near-miss by the
-    // `[a-z0-9-]` word boundary.
+    // spec: lifecycle-kit/SPEC.md §The committed gap inbox — the four exclusions: done and Lessons by
+    // grammar, a sub-task by its deeper heading, and a hyphen-embedded near-miss by the `[a-z0-9-]`
+    // word boundary.
     #[test]
     fn done_lessons_subtask_and_a_hyphen_embedded_near_miss_all_stay_silent() {
         for prose in [

@@ -1,40 +1,15 @@
 // spec: queue-kit/SPEC.md §check-queue-entry-budget — a deferred entry is a costed filing:
 // bounded above so it is not an inlined amendment, bounded below so it is not a flag-and-skip,
-// bounded in what it may displace; an icebox entry is its lead line and nothing else
+// bounded in what it may displace; an icebox entry is its heading and one sentence
 use crate::queue::{self, Unit};
 
 const COST_MARK: &str = "**Cost while deferred";
-
-struct Open {
-    slug: String,
-    start: usize,
-    ind: usize,
-    sec: Sec,
-    costed: bool,
-    nb: usize,
-    decls: u32,
-    cp: usize,
-    cpn: usize,
-    credits: Vec<String>,
-    marks: queue::DeferMarks,
-}
-
-impl Open {
-    fn count_cp(&mut self, line: &str) {
-        let t = line.trim();
-        if !t.is_empty() {
-            self.cp += t.chars().count();
-            self.cpn += 1;
-        }
-    }
-}
 
 // spec: queue-kit/SPEC.md §check-queue-entry-budget — the active sections are uncapped, so no
 // assertion here reads `Active`; the walk still measures those entries because a reader of one
 // entry's history follows it across a promotion, and the alternative is a second walk
 #[derive(PartialEq, Clone, Copy)]
 pub enum Sec {
-    Other,
     Active,
     Deferred,
     Icebox,
@@ -46,13 +21,13 @@ pub enum Sec {
 pub struct Closed {
     pub slug: String,
     pub start: usize,
-    pub ind: usize,
+    pub level: usize,
     pub sec: Sec,
     pub costed: bool,
     pub nb: usize,
+    pub tagged: bool,
     pub count: usize,
     pub cp: usize,
-    pub decls: u32,
     pub dated: bool,
     pub credits: Vec<String>,
 }
@@ -86,210 +61,58 @@ pub struct Scan {
     pub retired: Vec<(usize, String, String)>,
 }
 
-fn is_iso_date(tok: &str) -> bool {
-    let b = tok.as_bytes();
-    b.len() == 10
-        && b[4] == b'-'
-        && b[7] == b'-'
-        && [0, 1, 2, 3, 5, 6, 8, 9]
-            .iter()
-            .all(|&i| b[i].is_ascii_digit())
-}
-
-// spec: queue-kit/SPEC.md §check-queue-entry-budget — at most one line of EACH declaration
-// grammar the queue format defines is discounted, each matched by its own grammar: lead token,
-// slug, then at least one ISO date past the slug, with no entry-boundary or self-slug condition
-const DECLARATIONS: [(&str, usize); 2] = [("recurrence:", 3), ("not-icebox-eligible:", 3)];
-
-// spec: queue-kit/SPEC.md §check-queue-entry-budget — assertion (D): a body line led by a
-// retired declaration token is refused, provenance being stated inline
-const RETIRED: [&str; 1] = ["ruled:"];
-
-fn declaration(line: &str) -> Option<usize> {
-    let f: Vec<&str> = line.split_whitespace().collect();
-    DECLARATIONS
-        .iter()
-        .position(|&(tok, min)| f.len() >= min && f[0] == tok && f[2..].iter().any(|t| is_iso_date(t)))
-}
-
-// spec: queue-kit/SPEC.md §check-queue-entry-budget — the finding names which grammars were
-// discounted, so a reader checks the arithmetic against the extent without re-deriving the set
-fn discounted(decls: u32) -> String {
-    let toks: Vec<&str> = DECLARATIONS
-        .iter()
-        .enumerate()
-        .filter(|(i, _)| decls & (1 << i) != 0)
-        .map(|(_, (tok, _))| *tok)
-        .collect();
-    if toks.is_empty() {
-        String::new()
-    } else {
-        format!(", after discounting one {} line", toks.join(" and one "))
-    }
-}
-
-fn is_rule(line: &str) -> bool {
-    match line.strip_prefix("---") {
-        Some(rest) => rest.bytes().all(|b| b == b' ' || b == b'\t'),
-        None => false,
-    }
-}
+// spec: queue-kit/SPEC.md §check-queue-entry-budget — assertion (D): a retired tag on the tag line
+// is refused, provenance being stated inline
+const RETIRED: [&str; 1] = ["ruled"];
 
 // spec: queue-kit/SPEC.md §check-queue-entry-budget — the scan, split from the verdict so a reader
 // of the same quantity measures with the assertion's own walk rather than a second spelling of it;
-// entries come back in close order, which is the order the verdict's findings are reported in
+// entries come back in file order, which is the order the verdict's findings are reported in. The
+// size is the whole extent, heading and tag line included: nothing is discounted.
 pub fn walk(text: &str, sec_cfg: &queue::Sections) -> Scan {
-    let mut out: Vec<Closed> = Vec::new();
+    let lines: Vec<&str> = text.lines().collect();
+    let mut entries: Vec<Closed> = Vec::new();
     let mut retired: Vec<(usize, String, String)> = Vec::new();
-    let mut open: Vec<Open> = Vec::new();
-    let mut sec = Sec::Other;
-    let mut bound;
-    // spec: queue-kit/SPEC.md §check-queue-entry-budget — closing to depth 0 closes every open
-    // entry, the shape a heading and end-of-file both need
-    let all = 0usize;
-
-    // spec: queue-kit/SPEC.md §check-queue-entry-budget — an extent runs from the lead line to
-    // the line before the next bullet at the same or shallower indent; a sub-task nests inside
-    // its parent and is measured as its own entry too
-    macro_rules! close_to {
-        ($ind:expr) => {{
-            while let Some(o) = open.last() {
-                if o.ind < $ind {
-                    break;
+    for e in queue::entries(&lines, sec_cfg) {
+        let sec = if sec_cfg.is_deferred(&e.section) {
+            Sec::Deferred
+        } else if sec_cfg.is_icebox(&e.section) {
+            Sec::Icebox
+        } else {
+            Sec::Active
+        };
+        let extent = &lines[e.start..e.end];
+        let content: Vec<&str> = extent.iter().map(|l| l.trim()).filter(|l| !l.is_empty()).collect();
+        let cp = content.iter().map(|l| l.chars().count()).sum::<usize>() + content.len().saturating_sub(1);
+        let tags = e.tags(&lines);
+        if sec != Sec::Active {
+            for name in RETIRED {
+                if !queue::field_tags(tags, name).is_empty() {
+                    retired.push((e.tag_line.unwrap_or(e.start) + 1, e.slug.clone(), format!("[{}:]", name)));
                 }
-                let o = open.pop().unwrap();
-                // spec: queue-kit/SPEC.md §check-queue-entry-budget — the count is the extent less
-                // at most one line of each declaration grammar per entry
-                let count = bound - o.start - o.decls.count_ones() as usize;
-                out.push(Closed {
-                    slug: o.slug,
-                    start: o.start,
-                    ind: o.ind,
-                    sec: o.sec,
-                    costed: o.costed,
-                    nb: o.nb,
-                    count,
-                    cp: o.cp + o.cpn.saturating_sub(1),
-                    decls: o.decls,
-                    dated: o.marks.defer_date().is_some(),
-                    credits: o.credits,
-                });
             }
-        }};
+        }
+        // spec: queue-kit/SPEC.md §check-queue-entry-budget — assertion (E) reads the entry's own
+        // body, up to its first sub-task, the scoping the icebox-candidates arm gives the same parse
+        let mut marks = queue::DeferMarks::default();
+        for i in e.body_lines().take_while(|i| queue::heading_level(lines[*i]).is_none()) {
+            marks.observe(lines[i]);
+        }
+        entries.push(Closed {
+            slug: e.slug.clone(),
+            start: e.start + 1,
+            level: e.level,
+            sec,
+            costed: extent.iter().any(|l| l.contains(COST_MARK)),
+            nb: content.len() - 1,
+            tagged: e.tag_line.is_some(),
+            count: e.end - e.start,
+            cp,
+            dated: marks.defer_date().is_some(),
+            credits: queue::field_tags(tags, "cap-credit").iter().map(|t| t.raw.to_string()).collect(),
+        });
     }
-
-    let mut last = 0usize;
-    for (i, line) in text.lines().enumerate() {
-        let fnr = i + 1;
-        last = fnr;
-
-        if line.starts_with('#') || is_rule(line) {
-            bound = fnr;
-            close_to!(all);
-        }
-        if queue::is_section_line(line) {
-            sec = if sec_cfg.is_deferred(line) {
-                Sec::Deferred
-            } else if sec_cfg.is_icebox(line) {
-                Sec::Icebox
-            } else if sec_cfg.is_task(line) {
-                Sec::Active
-            } else {
-                Sec::Other
-            };
-            continue;
-        }
-        if sec == Sec::Other {
-            continue;
-        }
-
-        if queue::is_bullet(line) {
-            let ind = queue::indent(line);
-            bound = fnr;
-            close_to!(ind);
-            match queue::bullet_slug(line) {
-                None => {
-                    // spec: queue-kit/SPEC.md §check-queue-entry-budget — a prose-note bullet
-                    // is a content line of every entry it sits inside
-                    for o in open.iter_mut() {
-                        o.nb += 1;
-                        o.count_cp(line);
-                    }
-                    if let Some(o) = open.last_mut() {
-                        o.marks.observe(line);
-                    }
-                }
-                Some(slug) => {
-                    let slug = slug.to_string();
-                    for o in open.iter_mut() {
-                        o.nb += 1;
-                        o.count_cp(line);
-                    }
-                    let costed = line.contains(COST_MARK);
-                    open.push(Open {
-                        slug,
-                        start: fnr,
-                        ind,
-                        sec,
-                        costed: false,
-                        nb: 1,
-                        decls: 0,
-                        cp: line.trim().chars().count(),
-                        cpn: 1,
-                        credits: queue::field_tags(line, "cap-credit").iter().map(|t| t.raw.to_string()).collect(),
-                        marks: queue::DeferMarks::default(),
-                    });
-                    if costed {
-                        for o in open.iter_mut() {
-                            o.costed = true;
-                        }
-                    }
-                }
-            }
-            continue;
-        }
-
-        if !open.is_empty() && !line.trim().is_empty() {
-            // spec: queue-kit/SPEC.md §check-queue-entry-budget — assertion (D) binds the deferred
-            // and icebox tiers, the corpus it has always scanned; the walk's reach into the active
-            // sections is for measurement alone and must not widen an assertion's corpus with it
-            if sec != Sec::Active {
-                if let Some(tok) = line.split_whitespace().next() {
-                    if RETIRED.contains(&tok) {
-                        let slug = open.last().map(|o| o.slug.clone()).unwrap_or_default();
-                        retired.push((fnr, slug, tok.to_string()));
-                    }
-                }
-            }
-            // spec: queue-kit/SPEC.md §check-queue-entry-budget — assertion (E) reads a mark into the
-            // innermost open entry alone, the scoping the icebox-candidates arm gives the same parse
-            if let Some(o) = open.last_mut() {
-                o.marks.observe(line);
-            }
-            let decl = declaration(line).map_or(0, |i| 1u32 << i);
-            // spec: queue-kit/SPEC.md §check-queue-entry-budget — the first line of each declaration
-            // grammar in an entry is the discounted one, in either unit
-            for o in open.iter_mut() {
-                o.nb += 1;
-                if o.decls & decl == 0 && decl != 0 {
-                    o.decls |= decl;
-                } else {
-                    o.count_cp(line);
-                }
-            }
-        }
-        if !open.is_empty() && line.contains(COST_MARK) {
-            for o in open.iter_mut() {
-                o.costed = true;
-            }
-        }
-    }
-    bound = last + 1;
-    close_to!(all);
-    Scan {
-        entries: out,
-        retired,
-    }
+    Scan { entries, retired }
 }
 
 pub fn run(args: &[String]) -> i32 {
@@ -344,7 +167,7 @@ pub fn run(args: &[String]) -> i32 {
     let retired: Vec<String> = scan
         .retired
         .iter()
-        .map(|(fnr, slug, tok)| format!("{}:{}: {} — retired declaration grammar {}", file, fnr, slug, tok))
+        .map(|(fnr, slug, tok)| format!("{}:{}: {} — retired tag {}", file, fnr, slug, tok))
         .collect();
     for o in &scan.entries {
         match o.sec {
@@ -362,7 +185,7 @@ pub fn run(args: &[String]) -> i32 {
                     if n > limit {
                         let credited = if granted > 0 { format!(" + credit {}{}", granted, unit.suffix()) } else { String::new() };
                         size.push(format!(
-                            "{}:{}: {} — {}{} (cap {}{}{}){}",
+                            "{}:{}: {} — {}{} (cap {}{}{})",
                             file,
                             o.start,
                             o.slug,
@@ -371,27 +194,30 @@ pub fn run(args: &[String]) -> i32 {
                             c,
                             unit.suffix(),
                             credited,
-                            discounted(o.decls)
                         ));
                     }
                     headroom.push((o.start, o.slug.clone(), limit.saturating_sub(n), granted));
                 }
-                if o.ind == 0 && !o.costed {
+                if o.level == 3 && !o.costed {
                     cost.push(format!("{}:{}: {}", file, o.start, o.slug));
                 }
-                if o.ind == 0 && !o.dated {
+                if o.level == 3 && !o.dated {
                     undated.push(format!("{}:{}: {}", file, o.start, o.slug));
                 }
             }
             Sec::Icebox => {
-                if o.nb > 1 {
+                if o.nb != 1 || o.tagged {
                     shape.push(format!(
-                        "{}:{}: {} — {} content lines; an icebox entry is exactly one",
-                        file, o.start, o.slug, o.nb
+                        "{}:{}: {} — {} content line(s){}; an icebox entry is its heading and exactly one sentence",
+                        file,
+                        o.start,
+                        o.slug,
+                        o.nb,
+                        if o.tagged { " and a tag line" } else { "" }
                     ));
                 }
             }
-            Sec::Active | Sec::Other => {}
+            Sec::Active => {}
         }
     }
 
@@ -434,19 +260,19 @@ pub fn run(args: &[String]) -> i32 {
             }
         }
         if !retired.is_empty() {
-            println!("retired declaration line (state who ruled, when and through what channel");
-            println!("inline beside the ruling's content, then delete the line):");
+            println!("retired tag (state who ruled, when and through what channel inline beside");
+            println!("the ruling's content, then delete the tag):");
             for x in &retired {
                 println!("  {}", x);
             }
         }
-        println!("  help: add the cost field, or evict the entry to the icebox as a one-line lead.");
+        println!("  help: add the cost field, or evict the entry to the icebox as its heading and one sentence.");
         println!("        Over the cap: compress by ANSWERING grounds, never by dropping them —");
         println!("        an unanswered ground is relocated to a linked entry. Relocating it into");
         println!("        an entry that ALREADY owns its subject is self-served only for a");
         println!("        mandated write; minting a NEW entry to hold it stays authorization-");
         println!("        gated (queue-kit/SPEC.md section check-queue-entry-budget, which");
-        println!("        defines the class and owns the declaration-line discount above). A");
+        println!("        defines the class). A");
         println!("        record whose compression would lose what its reader needs may be");
         println!("        granted a [cap-credit:] by the same authority; a session never takes one.");
         // spec: queue-kit/SPEC.md §check-queue-entry-budget — the arm's named reader is this
@@ -491,7 +317,7 @@ pub fn run(args: &[String]) -> i32 {
 fn credit_grant(raw: &str) -> Result<(usize, Unit), String> {
     let f: Vec<&str> = raw.split_whitespace().collect();
     let shape = "malformed [cap-credit:] (want +<n><unit> <YYYY-MM-DD> <grantor> <reason>)";
-    if f.len() < 4 || !is_iso_date(f[1]) {
+    if f.len() < 4 || !queue::is_iso_date(f[1]) {
         return Err(shape.to_string());
     }
     match f[0].strip_prefix('+').map(queue::parse_size) {
@@ -560,19 +386,38 @@ mod tests {
     }
 
     // spec: queue-kit/SPEC.md §check-queue-entry-budget — a reflow of the same text moves the
-    // code-point size by nothing, and one line of each declaration grammar is discounted
+    // code-point size by nothing, and the whole extent counts, heading and tag line included
     #[test]
-    fn the_code_point_size_is_reflow_invariant_and_discounts_one_declaration() {
-        let wrapped = entry("## Deferred\n\n- **e** — alpha beta\n  gamma delta\n  recurrence: e 2026-01-01\n");
-        let joined = entry("## Deferred\n\n- **e** — alpha beta gamma delta\n  recurrence: e 2026-01-01\n");
+    fn the_code_point_size_is_reflow_invariant_and_counts_the_whole_extent() {
+        let wrapped = entry("## Deferred\n\n### e\n\n[recurrence: 2026-01-01]\n\nalpha beta\ngamma delta\n");
+        let joined = entry("## Deferred\n\n### e\n\n[recurrence: 2026-01-01]\n\nalpha beta gamma delta\n");
         assert_eq!(wrapped.cp, joined.cp);
-        assert_eq!(joined.cp, "- **e** — alpha beta gamma delta".chars().count());
-        assert_eq!(wrapped.count, 2);
+        assert_eq!(joined.cp, "### e [recurrence: 2026-01-01] alpha beta gamma delta".chars().count());
+        assert_eq!(joined.count, 5);
+    }
+
+    // spec: queue-kit/SPEC.md §check-queue-entry-budget — assertion B's shape: the heading and one
+    // sentence, no tag line
+    #[test]
+    fn an_icebox_entry_is_its_heading_and_one_sentence() {
+        let sec = queue::Sections {
+            active: vec!["New Features".to_string()],
+            deferred: "Deferred".to_string(),
+            icebox: "Icebox".to_string(),
+            done: String::new(),
+        };
+        let shape = |t: &str| {
+            let e = walk(t, &sec).entries.remove(0);
+            (e.nb, e.tagged)
+        };
+        assert_eq!(shape("## Icebox\n\n### e\n\nOne sentence.\n"), (1, false));
+        assert_eq!(shape("## Icebox\n\n### e\n\n[cost: once/low]\n\nOne sentence.\n"), (2, true));
+        assert_eq!(shape("## Icebox\n\n### e\n\nOne.\n\nTwo.\n"), (2, false));
     }
 
     #[test]
     fn a_credit_stands_only_when_granted_bounded_in_unit_and_needed() {
-        let text = "## Deferred\n\n- **e** [cap-credit: +10cp 2026-09-22 lead keeps a ground] — xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n";
+        let text = "## Deferred\n\n### e\n\n[cap-credit: +10cp 2026-09-22 lead keeps a ground]\n\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n";
         let e = entry(text);
         let cap = Some((20, Unit::Cp));
         assert!(e.cp > 20);
@@ -582,7 +427,7 @@ mod tests {
         assert!(credit_verdict(&e, None, Some((50, Unit::Cp))).is_err());
         assert!(credit_verdict(&e, Some((20, Unit::Lines)), Some((50, Unit::Lines))).is_err());
         assert!(credit_verdict(&e, Some((10_000, Unit::Cp)), Some((50, Unit::Cp))).unwrap_err().starts_with("stale"));
-        let bare = entry("## Deferred\n\n- **e** [cap-credit: +10cp] — x\n");
+        let bare = entry("## Deferred\n\n### e\n\n[cap-credit: +10cp]\n\nx\n");
         assert!(credit_verdict(&bare, cap, Some((50, Unit::Cp))).unwrap_err().starts_with("malformed"));
     }
 }

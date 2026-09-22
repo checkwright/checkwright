@@ -32,6 +32,8 @@ cat >"$sb/TASK-QUEUE.md" <<'EOF'
 EOF
 git -C "$sb" add -A
 git -C "$sb" commit -qm seed
+# the seed above is written in the retired bullet grammar and this revision in headings: the
+# retired set reads both, since a history predates the heading grammar
 cat >"$sb/TASK-QUEUE.md" <<'EOF'
 ## New Features
 
@@ -41,7 +43,9 @@ cat >"$sb/TASK-QUEUE.md" <<'EOF'
 
 ## Icebox
 
-- **ice-task** — evicted.
+### ice-task
+
+evicted.
 
 ## Done
 

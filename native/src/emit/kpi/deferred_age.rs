@@ -17,9 +17,11 @@ fn marked_date(line: &str, mark: &str) -> Option<String> {
     None
 }
 
+// spec: queue-kit/SPEC.md §The queue format — the entry heading re-implemented: `### ` or `#### `
+// opening a slug
 fn is_entry_lead(line: &str) -> bool {
-    line.trim_start()
-        .strip_prefix("- **")
+    line.strip_prefix("#### ")
+        .or_else(|| line.strip_prefix("### "))
         .and_then(|r| r.bytes().next())
         .is_some_and(|c| c.is_ascii_lowercase() || c.is_ascii_digit())
 }
@@ -102,15 +104,16 @@ mod tests {
     fn each_entry_contributes_its_surfaced_else_filed_date() {
         let lines = vec![
             "  Preamble quoting Filed 2026-01-01.",
-            "- **resurfaced** [cost: event/low] — lead",
-            "  Filed 2026-07-07 by close.",
-            "  Surfaced 2026-08-01 at build.",
-            "- **filed-only** — lead",
-            "  Filed 2026-07-20 by scope.",
-            "  Filed 2026-06-01 quoted later.",
-            "  Filed not-a-date",
-            "- **undated** — lead",
-            "  no mark here",
+            "### resurfaced",
+            "[cost: event/low]",
+            "Filed 2026-07-07 by close.",
+            "Surfaced 2026-08-01 at build.",
+            "### filed-only",
+            "Filed 2026-07-20 by scope.",
+            "Filed 2026-06-01 quoted later.",
+            "Filed not-a-date",
+            "### undated",
+            "no mark here",
         ];
         assert_eq!(defer_dates(&lines), vec!["2026-07-20", "2026-08-01"]);
     }

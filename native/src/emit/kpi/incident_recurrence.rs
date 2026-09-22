@@ -1,4 +1,4 @@
-// spec: drift-kit/SPEC.md §Bundled KPIs — kpi-incident-recurrence: re-filings recorded by the queue's `recurrence:` declarations, and the highest-count slug (queue-kit/SPEC.md §The tag algebra owns the grammar; the second implementation is accepted residual — drift-kit cannot source queue-kit's lib without a cross-kit cycle)
+// spec: drift-kit/SPEC.md §Bundled KPIs — kpi-incident-recurrence: re-filings recorded by the queue's `[recurrence:]` tags, and the highest-count slug (queue-kit/SPEC.md §The tag algebra owns the grammar; the second implementation is accepted residual — drift-kit cannot source queue-kit's lib without a cross-kit cycle)
 use super::{is_iso_day, na, read, Ctx};
 
 const LABEL: &str = "incident recurrence";
@@ -9,24 +9,46 @@ pub struct Tally {
     pub top_count: usize,
 }
 
-// spec: drift-kit/SPEC.md §Bundled KPIs — the declaration is self-slug-bearing and lives on a line
-// of its own, so one anchored scan reads it with no entry-boundary parsing: `recurrence: <slug>`
-// then one date per re-filing, and a declaration carrying no date contributes nothing.
+// spec: queue-kit/SPEC.md §The tag algebra — the pairing re-implemented: an entry heading
+// (`### <slug>` or `#### <slug>`) names the entry, and its tag line is the first non-blank line
+// under it when that line opens with a bracket
+fn heading_slug(line: &str) -> Option<&str> {
+    let rest = line.strip_prefix("#### ").or_else(|| line.strip_prefix("### "))?;
+    Some(rest.trim_end())
+}
+
+// spec: drift-kit/SPEC.md §Bundled KPIs — the `[recurrence:]` array on an entry's tag line: one
+// comma-separated date per re-filing, and a tag carrying no date contributes nothing.
+fn array_dates(tag_line: &str) -> usize {
+    let Some(open) = tag_line.find("[recurrence:") else { return 0 };
+    let body = &tag_line[open + "[recurrence:".len()..];
+    let body = &body[..body.find(']').unwrap_or(body.len())];
+    body.split(',').filter(|t| is_iso_day(t.trim())).count()
+}
+
 pub fn tally(text: &str) -> Tally {
     let (mut total, mut top, mut slug) = (0usize, 0usize, String::new());
+    let mut owner: Option<&str> = None;
     for line in text.lines() {
-        let f: Vec<&str> = line.split_whitespace().collect();
-        if f.len() < 3 || f[0] != "recurrence:" {
+        if let Some(s) = heading_slug(line) {
+            owner = Some(s);
             continue;
         }
-        let n = f[2..].iter().filter(|t| is_iso_day(t)).count();
+        if line.trim().is_empty() {
+            continue;
+        }
+        let Some(s) = owner.take() else { continue };
+        if !line.starts_with('[') {
+            continue;
+        }
+        let n = array_dates(line);
         if n == 0 {
             continue;
         }
         total += n;
         if n > top {
             top = n;
-            slug = f[1].to_string();
+            slug = s.to_string();
         }
     }
     Tally {
@@ -43,7 +65,7 @@ pub fn run(ctx: &Ctx, trend: bool) -> Option<String> {
     };
     let t = tally(&text);
     if t.total == 0 {
-        return na("lag", LABEL, "no recurrence declaration in the queue", trend);
+        return na("lag", LABEL, "no recurrence tag in the queue", trend);
     }
     if trend {
         return Some(format!("recur {}\n", t.total));
@@ -58,14 +80,15 @@ pub fn run(ctx: &Ctx, trend: bool) -> Option<String> {
 mod tests {
     use super::*;
 
-    // spec: drift-kit/SPEC.md §Bundled KPIs — the count is the dates on the line, so a declaration
-    // whose fields are not dates contributes nothing and cannot become the top slug
+    // spec: drift-kit/SPEC.md §Bundled KPIs — the count is the dates in the array, so a tag whose
+    // elements are not dates contributes nothing and cannot become the top slug, and a body line
+    // is never a tag line
     #[test]
-    fn only_dated_declarations_count_and_the_top_is_the_widest_one() {
-        let t = "recurrence: alpha 2026-01-01 2026-02-02\n\
-                 recurrence: beta 2026-03-03\n\
-                 recurrence: gamma pending\n\
-                 prose mentioning recurrence: delta 2026-04-04\n";
+    fn only_dated_arrays_count_and_the_top_is_the_widest_one() {
+        let t = "### alpha\n\n[cost: once/low] [recurrence: 2026-01-01, 2026-02-02]\n\nbody\n\
+                 ### beta\n\n[recurrence: 2026-03-03]\n\
+                 ### gamma\n\n[recurrence: pending]\n\
+                 ### delta\n\nprose mentioning [recurrence: 2026-04-04]\n";
         let r = tally(t);
         assert_eq!(r.total, 3);
         assert_eq!(r.top_slug, "alpha");

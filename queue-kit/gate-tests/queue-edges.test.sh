@@ -31,16 +31,25 @@ cat >"$SANDBOX/TASK-QUEUE.md" <<'EOF'
 
 ## New Features
 
-- **feat-a** — a feature citing `feat-b` on its lead line.
-  **Relation to `feat-b`:** this one subsumes it entirely.
+### feat-a
 
-- **feat-b** [blocked-by: def-a] — blocked, so it cites its blocker.
+a feature.
+
+**Relation to [feat-b](#feat-b):** this one subsumes it entirely.
+
+### feat-b
+
+[blocked-by: def-a]
+
+blocked, so it cites its blocker.
 
 ## Technical Debt
 
 ## Deferred
 
-- **def-a** — a deferred entry is a live target.
+### def-a
+
+a deferred entry is a live target.
 
 ## Done
 
@@ -80,8 +89,9 @@ edges "$Q" >/dev/null 2>&1
 
 # ---------------------------------------------------------------------------
 # The retired half. A second sandbox, this one a git repository, whose queue file has two
-# revisions: `gone-a` held a lead line in revision 1 and holds none in revision 2, which is the
-# definition of retired. `landed-thing` never held one.
+# revisions: `gone-a` held an entry in revision 1 and holds none in revision 2, which is the
+# definition of retired. `landed-thing` never held one. Revision 1 is in the retired bullet
+# grammar and revision 2 in headings, so the history walk is held to reading both.
 GITBOX="$SANDBOX/repo"
 mkdir -p "$GITBOX"
 git -C "$GITBOX" init -q 2>/dev/null
@@ -121,15 +131,21 @@ cat >"$GITBOX/TASK-QUEUE.md" <<'EOF'
 
 ## New Features
 
-- **feat-a** — a live entry.
-  Its body cites `gone-a`, disposed of one revision ago, and also
-  `landed-thing`, a token that never held a lead line at all.
+### feat-a
+
+a live entry.
+
+Its body cites `gone-a`, disposed of one revision ago, and also `landed-thing`, a token that never held a lead line at all.
 
 ## Technical Debt
 
-- **debt-a** — a second citer, so the retired count is not always one.
-  Sequence against `gone-a` rather than duplicating it, and defer to `feat-a`.
-  It also cites `gone-b`, whose name ships nothing.
+### debt-a
+
+a second citer, so the retired count is not always one.
+
+Sequence against `gone-a` rather than duplicating it, and defer to [feat-a](#feat-a).
+
+It also cites `gone-b`, whose name ships nothing.
 
 ## Deferred
 

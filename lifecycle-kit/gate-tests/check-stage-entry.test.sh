@@ -36,7 +36,9 @@ cat >"$SANDBOX/TASK-QUEUE.md" <<'EOF'
 
 ## New Features
 
-- **unfinished-feature** `[spec: SPEC-demo.md]` — still in the build queue
+### unfinished-feature
+
+still in the build queue, its spec `SPEC-demo.md`
 
 ## Technical Debt
 
@@ -98,7 +100,11 @@ cat >"$b2/TASK-QUEUE.md" <<'EOF'
 
 ## New Features
 
-- **spanning-feature** [drain-exempt: validate-half is validate work] — build half shipped
+### spanning-feature
+
+[drain-exempt: validate-half is validate work]
+
+build half shipped
 
 ## Technical Debt
 
@@ -119,7 +125,11 @@ cat >"$b3/TASK-QUEUE.md" <<'EOF'
 
 ## New Features
 
-- **spanning-feature** [drain-exempt: ] — no reason recorded
+### spanning-feature
+
+[drain-exempt: ]
+
+no reason recorded
 
 ## Technical Debt
 
@@ -141,7 +151,11 @@ cat >"$b4/TASK-QUEUE.md" <<'EOF'
 
 ## New Features
 
-- **spanning-feature** [drain-exempt: validate-half is validate work] — never drained
+### spanning-feature
+
+[drain-exempt: validate-half is validate work]
+
+never drained
 
 ## Technical Debt
 
@@ -171,7 +185,11 @@ cat >"$b5/TASK-QUEUE.md" <<'EOF'
 
 ## New Features
 
-- **observed-feature** [observed-by: ci-run] — work landed; the run is unread
+### observed-feature
+
+[observed-by: ci-run]
+
+work landed; the run is unread
 
 ## Technical Debt
 
@@ -321,12 +339,12 @@ $3
 ## Done
 EOF
 }
-marked_entry=$'- **marked-entry** — a premise the filer did not run\n  **Inferred, not run:** the arm refuses — `run-gates.sh --only x`'
+marked_entry=$'### marked-entry\n\na premise the filer did not run\n\n**Inferred, not run:** the arm refuses — `run-gates.sh --only x`'
 
 # D5 (bad): a not-run marker on an active debt entry — refused, naming the queue line.
 d_sandbox "$SANDBOX/d5" 'no marker here'
 d_queue "$SANDBOX/d5" "$marked_entry" ""
-check_case "D5 active-queue-entry-marker" "$SANDBOX/d5" 1 "TASK-QUEUE.md:11:   **Inferred, not run:**"
+check_case "D5 active-queue-entry-marker" "$SANDBOX/d5" 1 "TASK-QUEUE.md:14: **Inferred, not run:**"
 
 # D6 (good): the same marker on a deferred entry — the pool is not read.
 d_sandbox "$SANDBOX/d6" 'no marker here'

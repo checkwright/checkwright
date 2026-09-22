@@ -6,15 +6,21 @@
 
 ## New Features
 
-- **wire-the-widget** — build the widget wiring.
+### wire-the-widget
+
+build the widget wiring.
 
 ## Technical Debt
 
-- **flaky-retry** — the retry path is flaky.
+### flaky-retry
+
+the retry path is flaky.
 
 ## Deferred
 
-- **later-thing** — a deferred design.
+### later-thing
+
+a deferred design.
 
 ## Done
 

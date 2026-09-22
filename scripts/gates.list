@@ -68,7 +68,6 @@ check-scratch-citation
 check-gap-inbox-neutrality
 check-queue-sections
 check-queue-hygiene
-check-queue-wrap
 check-tag-lead-line
 check-queue-entry-budget
 check-deferred-board-tags
@@ -137,5 +136,6 @@ check-door-binding
 # The binary carries members this battery deliberately does not register. Each
 # records its cause here, where the assertion that joins the two rosters reads it
 # (gate-sdk/SPEC.md §check-gate-substrate-parity, assertion I).
+# unregistered: check-queue-wrap — this tree keeps its queue unwrapped under check-md-unwrapped, and the wrap gate is the hard-wrapping consumer's alternative
 # unregistered: check-surface-duplication — this tree declares no glossary, for the provenance-seam reason, and the member exits 2 without one
 # unregistered: check-producer-liveness — this repo's gates suite is the battery --run-validate itself invokes, so a registered liveness gate would red every validate run against its own lock

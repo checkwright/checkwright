@@ -117,7 +117,6 @@ CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA[] = ROADMAP
 CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA[] = GNU
 CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA[] = BSD
 
-# comment-tier-exempt: this repo keeps its tracked markdown unwrapped, one line per paragraph; gate-test fixtures are held out because a fixture's line shape is the input under test, and the queue and its shipped template because their grammar is line-scoped and check-queue-wrap still holds a consumer's queue — consumer editorial scope, never a kit literal (the provenance seam)
+# comment-tier-exempt: this repo keeps its tracked markdown unwrapped, one line per paragraph, the queue and its shipped template included; gate-test fixtures are held out because a fixture's line shape is the input under test — consumer editorial scope, never a kit literal (the provenance seam)
 CANON_KIT_UNWRAP_GLOBS[] = *.md
 CANON_KIT_UNWRAP_EXCLUDE[] = */gate-tests/*
-CANON_KIT_UNWRAP_EXCLUDE[] = *TASK-QUEUE.md

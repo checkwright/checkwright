@@ -8,7 +8,9 @@
 
 ## Technical Debt
 
-- **flaky-retry** — the retry path is flaky.
+### flaky-retry
+
+the retry path is flaky.
 
 ## Deferred
 

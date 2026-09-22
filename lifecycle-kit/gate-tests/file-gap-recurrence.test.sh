@@ -19,14 +19,19 @@ cat >"$SANDBOX/TASK-QUEUE.md" <<'EOF'
 
 ## New Features
 
-- **fork-dispatch** — an active entry whose slug is a hyphen-prefix of a deferred one.
+### fork-dispatch
+
+an active entry whose slug is a hyphen-prefix of a deferred one.
 
 ## Technical Debt
 
 ## Deferred
 
-- **fork-dispatch-prohibition** — the deferred entry.
-  Cost while deferred: recovery is re-paid each time.
+### fork-dispatch-prohibition
+
+the deferred entry.
+
+Cost while deferred: recovery is re-paid each time.
 
 ## Icebox
 

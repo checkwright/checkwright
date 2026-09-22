@@ -1,5 +1,10 @@
-[drain-exempt] on a continuation line
-[roadmap] on a continuation line
-[observed-by] on a continuation line
-[cost] on a continuation line
-[surface] on a continuation line
+[blocked-by] in the body
+[drain-exempt] in the body
+[roadmap] in the body
+[observed-by] in the body
+[cost] in the body
+[surface] in the body
+[recurrence] in the body
+[roadmap-summary] in the body
+[not-icebox-eligible] in the body
+[attend] in the body

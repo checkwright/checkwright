@@ -49,14 +49,6 @@ fn replace_all(re: &Ere, subject: &str, replacement: &str) -> Result<String, Str
     Ok(out)
 }
 
-// spec: queue-kit/SPEC.md §check-queue-prose-precondition — awk's `/^-[[:space:]]/`: a new
-// top-level active entry, so the `-` is at column zero and an indented bullet is continuation
-fn is_top_level_entry(line: &str) -> bool {
-    let b = line.as_bytes();
-    b.first() == Some(&b'-')
-        && matches!(b.get(1), Some(&c) if c == b' ' || c == b'\t' || c == 0x0b || c == 0x0c || c == b'\r')
-}
-
 const SPAN_CAP: usize = 80;
 
 fn clause_end(c: &char) -> bool {
@@ -113,8 +105,6 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let text = std::fs::read_to_string(&file).map_err(|_| format!("file not found: {}", file))?;
 
     let mut findings: Vec<(usize, String, String)> = Vec::new();
-    let mut open: Option<Entry> = None;
-    let mut inq = false;
 
     // spec: gate-sdk/SPEC.md §The twelfth cohort — `to_ascii_lowercase` and not `to_lowercase`:
     // the shell form's `tolower` is C-locale, and a Unicode fold can change a string's byte length,
@@ -141,36 +131,19 @@ fn rule(args: &[String]) -> Result<i32, String> {
         Ok(())
     };
 
-    for (i, line) in text.lines().enumerate() {
-        let fnr = i + 1;
-        if queue::is_section_line(line) {
-            let name = queue::heading_name(line).unwrap_or("");
-            inq = sec.active.iter().any(|a| a == name);
-            flush(&mut open)?;
+    let lines: Vec<&str> = text.lines().collect();
+    for e in queue::entries(&lines, &sec) {
+        if e.level != 3 || !sec.active.contains(&e.section) {
             continue;
         }
-        if !inq {
-            continue;
-        }
-        if is_top_level_entry(line) {
-            flush(&mut open)?;
-            open = Some(Entry {
-                startln: fnr,
-                lead: line.to_string(),
-                body: line.to_string(),
-                hasblock: carries_block_tag(line),
-            });
-            continue;
-        }
-        if let Some(e) = open.as_mut() {
-            e.body.push(' ');
-            e.body.push_str(line);
-            if carries_block_tag(line) {
-                e.hasblock = true;
-            }
-        }
+        let extent = &lines[e.start..e.end];
+        flush(&mut Some(Entry {
+            startln: e.start + 1,
+            lead: lines[e.start].to_string(),
+            body: extent.join(" "),
+            hasblock: extent.iter().any(|l| carries_block_tag(l)),
+        }))?;
     }
-    flush(&mut open)?;
 
     if !findings.is_empty() {
         println!("check-queue-prose-precondition: active entry states a forward precondition in prose");
@@ -248,14 +221,5 @@ mod tests {
         let long = format!("{} gated on x", "w".repeat(200));
         let at = long.find("gated on").unwrap();
         assert_eq!(fired_span(&long, at, at + 8).chars().count(), SPAN_CAP + " gated on x".len() - 1);
-    }
-
-    // spec: queue-kit/SPEC.md §check-queue-prose-precondition — awk's `/^-[[:space:]]/`, which
-    // an indented continuation bullet does not match
-    #[test]
-    fn only_a_column_zero_bullet_opens_an_entry() {
-        assert!(is_top_level_entry("- **slug** — prose"));
-        assert!(!is_top_level_entry("  - a continuation bullet"));
-        assert!(!is_top_level_entry("-no-space"));
     }
 }

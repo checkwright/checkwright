@@ -39,29 +39,16 @@ fn slug_at(b: &[u8], at: usize) -> Option<usize> {
     Some(j)
 }
 
-// spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the live slug is the bold lead-in of a
-// bullet lead line, one per entry; reading every bold token on every line is the fail-open
+// spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the live slug is an entry heading's whole
+// text, `### <slug>` or `#### <slug>` for a sub-task; reading every slug-shaped token on every line
+// is the fail-open
 fn lead_line_slug(line: &str) -> Option<String> {
-    let t = lstrip(line).as_bytes();
-    if t.is_empty() || t[0] != b'-' {
-        return None;
+    let rest = line.strip_prefix("#### ").or_else(|| line.strip_prefix("### "))?;
+    let t = rest.trim_end_matches([' ', '\t']).as_bytes();
+    match slug_at(t, 0) {
+        Some(end) if end == t.len() => Some(String::from_utf8_lossy(t).into_owned()),
+        _ => None,
     }
-    let mut i = 1usize;
-    let start = i;
-    while i < t.len() && (t[i] == b' ' || t[i] == b'\t') {
-        i += 1;
-    }
-    if i == start {
-        return None;
-    }
-    if i + 2 >= t.len() || t[i] != b'*' || t[i + 1] != b'*' {
-        return None;
-    }
-    let end = slug_at(t, i + 2)?;
-    if end + 1 >= t.len() || t[end] != b'*' || t[end + 1] != b'*' {
-        return None;
-    }
-    Some(String::from_utf8_lossy(&t[i + 2..end]).into_owned())
 }
 
 fn live_slugs(queue: &Path) -> Vec<String> {

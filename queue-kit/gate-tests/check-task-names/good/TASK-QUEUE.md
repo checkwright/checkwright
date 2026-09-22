@@ -4,19 +4,33 @@
 
 ## New Features
 
-- **alpha-feature** — build the alpha surface. [blocked-by: beta-feature]
-- **beta-feature** — the prerequisite groundwork.
-  - **beta-subtask** — a nested unit of beta.
+### alpha-feature
+
+[blocked-by: beta-feature]
+
+build the alpha surface once [beta-feature](#beta-feature) lands, reusing what `old-finished-task` left and naming `alpha-feature` itself.
+
+### beta-feature
+
+the prerequisite groundwork.
+
+#### beta-subtask
+
+a nested unit of beta.
 
 ## Technical Debt
 
-- **tidy-logs** — collapse the duplicated log lines.
+### tidy-logs
+
+collapse the duplicated log lines.
 
 ## Deferred
 
-### Later
+  A section preamble may list its entries: [gamma-feature](#gamma-feature).
 
-- **gamma-feature** — revisit when the alpha surface settles.
+### gamma-feature
+
+revisit when the alpha surface settles.
 
 ## Done
 

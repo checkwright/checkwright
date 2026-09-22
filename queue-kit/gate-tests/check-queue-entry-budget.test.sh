@@ -50,13 +50,15 @@ run() {
 }
 
 BIG="$(printf 'ground %.0s' $(seq 1 700))"
-LARGE="- **big-idea** — an entry far past the shipped cap.
-  $BIG
-  **Cost while deferred:** low. Filed 2026-01-01 by scope."
-SMALL="- **small-idea** — an extent over a three-line cap.
-  a second line
-  a third line
-  **Cost while deferred:** low. Filed 2026-01-01 by scope."
+LARGE="### big-idea
+
+an entry far past the shipped cap. $BIG
+
+**Cost while deferred:** low. Filed 2026-01-01 by scope."
+SMALL="### small-idea
+
+an extent over a three-line cap.
+**Cost while deferred:** low. Filed 2026-01-01 by scope."
 
 # --- (1) the shipped default is a code-point cap, and an entry past it reds -----------
 checks=$((checks + 1))
@@ -66,7 +68,7 @@ out="$(run '')"; rc=$?
 grep -qE 'big-idea — [0-9]+cp \(cap 4300cp\)' <<<"$out" \
     || note default-unit "the default cap did not measure in code points: $out"
 
-# --- (2) `<n>lines` measures counted lines: the extent, its trailing blank line included --
+# --- (2) `<n>lines` measures counted lines: the extent, heading and trailing blank included --
 checks=$((checks + 1))
 queue "$SMALL"
 out="$(run 'QUEUE_KIT_ENTRY_CAP = 3lines')"; rc=$?
@@ -80,16 +82,20 @@ queue "$LARGE"
 out="$(run 'QUEUE_KIT_ENTRY_CAP = off')"; rc=$?
 [[ "$rc" -eq 0 ]] || note off-exit "an entry under an off cap exited $rc rather than 0: $out"
 grep -qF 'size cap off' <<<"$out" || note off-line "the clean line did not name the off cap: $out"
-queue "- **uncosted-idea** — no cost field. Filed 2026-01-01 by scope."
+queue "### uncosted-idea
+
+no cost field. Filed 2026-01-01 by scope."
 out="$(run 'QUEUE_KIT_ENTRY_CAP = off')"; rc=$?
 [[ "$rc" -eq 1 ]] || note off-others "assertion C stopped running under an off cap (exit $rc): $out"
 
 # --- (4) a credit reds when credits are off, and when its unit is not the cap's -----------
 checks=$((checks + 1))
-queue "- **credited-idea** [cap-credit: +2lines 2026-01-02 lead a measured ground] — over the cap.
-  a second line
-  a third line
-  **Cost while deferred:** low. Filed 2026-01-01 by scope."
+queue "### credited-idea
+
+[cap-credit: +4lines 2026-01-02 lead a measured ground]
+
+over the cap.
+**Cost while deferred:** low. Filed 2026-01-01 by scope."
 out="$(run $'QUEUE_KIT_ENTRY_CAP = 3lines\nQUEUE_KIT_ENTRY_CREDIT_MAX = off')"; rc=$?
 [[ "$rc" -eq 1 ]] || note credits-off-exit "a credit under credits off exited $rc: $out"
 grep -qF 'credits are off' <<<"$out" || note credits-off "the credit was not refused as off: $out"

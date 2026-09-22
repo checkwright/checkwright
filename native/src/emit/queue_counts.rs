@@ -58,23 +58,23 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     })
 }
 
-// spec: queue-kit/SPEC.md §The queue-counts arm — the counted unit is the top-level entry bullet,
-// and a heading outside the task set closes the section it ends, which is what keeps Done out
-// with no section name enumerated here
+// spec: queue-kit/SPEC.md §The queue-counts arm — the counted unit is the `###` entry, in its
+// configured task section, which is what keeps Done out with no section name enumerated here
+fn top_entries<'a>(lines: &[&'a str], sec: &Sections) -> Vec<(usize, &'a str)> {
+    let sections = sec.task_sections();
+    queue::entries(lines, sec)
+        .into_iter()
+        .filter(|e| e.level == 3)
+        .filter_map(|e| sections.iter().position(|s| *s == e.section).map(|i| (i, e.tags(lines))))
+        .collect()
+}
+
 fn render(text: &str, sec: &Sections) -> String {
     let sections = sec.task_sections();
     let mut counts = vec![0usize; sections.len()];
-    let mut cur: Option<usize> = None;
-    for line in text.lines() {
-        if queue::is_section_line(line) {
-            cur = queue::heading_name(line).and_then(|h| sections.iter().position(|s| *s == h));
-            continue;
-        }
-        if let Some(i) = cur {
-            if queue::is_top_level_bullet(line) && queue::first_bold_slug(line).is_some() {
-                counts[i] += 1;
-            }
-        }
+    let lines: Vec<&str> = text.lines().collect();
+    for (i, _) in top_entries(&lines, sec) {
+        counts[i] += 1;
     }
     let mut out = String::new();
     for (i, name) in sections.iter().enumerate() {
@@ -101,20 +101,12 @@ fn value_of(line: &str, tag: &str) -> String {
 fn render_by(text: &str, sec: &Sections, tag: &str) -> String {
     let sections = sec.task_sections();
     let mut buckets: Vec<Vec<(String, usize)>> = vec![Vec::new(); sections.len()];
-    let mut cur: Option<usize> = None;
-    for line in text.lines() {
-        if queue::is_section_line(line) {
-            cur = queue::heading_name(line).and_then(|h| sections.iter().position(|s| *s == h));
-            continue;
-        }
-        if let Some(i) = cur {
-            if queue::is_top_level_bullet(line) && queue::first_bold_slug(line).is_some() {
-                let value = value_of(line, tag);
-                match buckets[i].iter_mut().find(|(k, _)| *k == value) {
-                    Some((_, n)) => *n += 1,
-                    None => buckets[i].push((value, 1)),
-                }
-            }
+    let lines: Vec<&str> = text.lines().collect();
+    for (i, tags) in top_entries(&lines, sec) {
+        let value = value_of(tags, tag);
+        match buckets[i].iter_mut().find(|(k, _)| *k == value) {
+            Some((_, n)) => *n += 1,
+            None => buckets[i].push((value, 1)),
         }
     }
     let mut out = String::new();
@@ -137,24 +129,45 @@ mod tests {
 
 ## New Features
 
-- **feat-a** [cost: event/low] — do a thing.
-  - **not-an-entry** — an indented bullet is body, not a second entry.
-- **feat-b** [roadmap: now/x] — do another.
+### feat-a
+
+[cost: event/low]
+
+do a thing.
+
+#### not-an-entry
+
+a sub-task is counted with its parent, not as a second entry.
+
+### feat-b
+
+[roadmap: now/x]
+
+do another.
 
 ## Technical Debt
 
 ## Deferred
 
-- **defer-a** [cost: once/high] — later.
+### defer-a
+
+[cost: once/high]
+
+later.
 
 ## Chill
 
-- **chill-a** — much later.
+### chill-a
+
+much later.
 
 ## Done
 
 - done-a
-- **done-b** — a Done entry shaped like an active one, to prove Done is out.
+
+### done-b
+
+a Done entry shaped like an active one, to prove Done is out.
 
 ## Lessons Learned
 
@@ -194,7 +207,7 @@ mod tests {
             icebox: String::new(),
             done: String::new(),
         };
-        let q = "## Work\n\n- **w1** — one.\n\n## Someday\n\n- **s1** — two.\n- **s2** — three.\n\n## Done\n\n- **d1** — not counted.\n";
+        let q = "## Work\n\n### w1\n\none.\n\n## Someday\n\n### s1\n\ntwo.\n\n### s2\n\nthree.\n\n## Done\n\n### d1\n\nnot counted.\n";
         assert_eq!(render(q, &sec), "Work\t1\nSomeday\t2\n");
     }
 
@@ -229,7 +242,7 @@ mod tests {
             render_by(Q, &sections("Chill"), "roadmap"),
             "New Features/(none)\t1\nNew Features/now/x\t1\nDeferred/(none)\t1\nChill/(none)\t1\n"
         );
-        assert_eq!(value_of("- **a** [attend] — x", "attend"), "attend");
+        assert_eq!(value_of("[attend]", "attend"), "attend");
     }
 
     // spec: queue-kit/SPEC.md §The queue-counts arm — the arm enumerates no tag name, so an unknown

@@ -8,7 +8,7 @@ nav_child_order: 3
 
 A git-native, agent-readable task tracker. The queue is a single Markdown file under version control, not an external service — so an agent session reads its work and its history from the same tree it commits to, with no credential and no network round-trip.
 
-queue-kit formalizes that file: one slug namespace, a small tag algebra (blocked-by, spec, drain-exempt, roadmap, observed-by, cost, surface, cap-credit) that encodes preconditions an agent can resolve mechanically, an index tool, a roadmap projector that renders the curated entries as a generated public page, and gates that hold the grammar a session selects work by.
+queue-kit formalizes that file: one slug namespace, a small tag algebra (blocked-by, spec, drain-exempt, roadmap, observed-by, cost, surface, cap-credit, recurrence, roadmap-summary, not-icebox-eligible) that encodes preconditions an agent can resolve mechanically, an index tool, a roadmap projector that renders the curated entries as a generated public page, and gates that hold the grammar a session selects work by.
 
 ## Install
 

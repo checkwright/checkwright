@@ -1,17 +1,10 @@
 // spec: queue-kit/SPEC.md §check-deferred-board-tags — every top-level deferred entry carries one
-// cost tag and one surface tag on its lead line, and no active-section lead line carries either
+// cost tag and one surface tag on its tag line, and no active-section tag line carries either
 use crate::queue;
 use crate::walk;
 use std::path::Path;
 
-#[derive(PartialEq)]
-enum Sec {
-    Active,
-    Deferred,
-    Other,
-}
-
-// spec: queue-kit/SPEC.md §check-deferred-board-tags — assertion A over one deferred lead line
+// spec: queue-kit/SPEC.md §check-deferred-board-tags — assertion A over one deferred tag line
 fn deferred_findings(line: &str, root: &[String]) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     match queue::field_tags(line, "cost").as_slice() {
@@ -103,53 +96,33 @@ pub fn run(args: &[String]) -> i32 {
     };
 
     let mut findings: Vec<String> = Vec::new();
-    let mut cur = Sec::Other;
-    let mut fence = false;
     let mut seen = 0usize;
-    for (i, line) in text.lines().enumerate() {
-        if queue::is_section_line(line) {
-            let name = queue::heading_name(line);
-            cur = if sec.is_deferred(line) {
-                Sec::Deferred
-            } else if sec.active.iter().any(|a| Some(a.as_str()) == name) {
-                Sec::Active
-            } else {
-                Sec::Other
-            };
-            continue;
-        }
-        if line.trim_start_matches([' ', '\t']).starts_with("```") {
-            fence = !fence;
-            continue;
-        }
-        if fence || cur == Sec::Other {
-            continue;
-        }
-        let slug = match queue::bullet_slug(line) {
-            Some(s) => s,
-            None => continue,
-        };
-        let found = if cur == Sec::Deferred {
-            if !queue::is_top_level_bullet(line) {
+    let lines: Vec<&str> = text.lines().collect();
+    for e in queue::entries(&lines, &sec) {
+        let tags = e.tags(&lines);
+        let found = if sec.is_deferred(&e.section) {
+            if e.level != 3 {
                 continue;
             }
             seen += 1;
-            deferred_findings(line, &entries)
+            deferred_findings(tags, &entries)
+        } else if sec.active.contains(&e.section) {
+            active_findings(tags)
         } else {
-            active_findings(line)
+            continue;
         };
         for f in found {
-            findings.push(format!("{}:{}: {} — {}", file, i + 1, slug, f));
+            findings.push(format!("{}:{}: {} — {}", file, e.start + 1, e.slug, f));
         }
     }
 
     if !findings.is_empty() {
         println!("check-deferred-board-tags: deferred board tag violation(s) (an entry's cost class");
-        println!("and primary surface ride its lead line, the only line the board's readers scan):");
+        println!("and primary surface ride its tag line, the only line the board's readers scan):");
         for f in &findings {
             println!("  {}", f);
         }
-        println!("  help: give each deferred lead line exactly one [cost: <recurrence>/<magnitude>],");
+        println!("  help: give each deferred tag line exactly one [cost: <recurrence>/<magnitude>],");
         println!("        classed from the entry's own cost prose, and one [surface: <entry>] naming");
         println!("        the top-level root entry it mainly changes; a promotion drops both");
         println!("        (queue-kit/SPEC.md section check-deferred-board-tags).");
@@ -175,32 +148,32 @@ mod tests {
     }
 
     #[test]
-    fn a_lead_line_with_one_valid_tag_of_each_is_clean() {
-        let line = "- **a** [cost: iteration/high] [surface: widget-kit] — x";
+    fn a_tag_line_with_one_valid_tag_of_each_is_clean() {
+        let line = "[cost: iteration/high] [surface: widget-kit]";
         assert!(deferred_findings(line, &root()).is_empty());
     }
 
     #[test]
     fn an_absent_tag_is_named_per_tag() {
-        let got = deferred_findings("- **a** — x", &root());
+        let got = deferred_findings("", &root());
         assert_eq!(got, vec!["no [cost:] tag", "no [surface:] tag"]);
     }
 
     #[test]
     fn a_value_outside_the_closed_grammar_or_the_root_listing_reds() {
-        let bad_cost = "- **a** [cost: weekly/high] [surface: widget-kit] — x";
+        let bad_cost = "[cost: weekly/high] [surface: widget-kit]";
         assert_eq!(deferred_findings(bad_cost, &root()).len(), 1);
-        let spaced = "- **a** [cost:once/low] [surface: widget-kit] — x";
+        let spaced = "[cost:once/low] [surface: widget-kit]";
         assert_eq!(deferred_findings(spaced, &root()).len(), 1);
-        let missing = "- **a** [cost: once/low] [surface: no-such-kit] — x";
+        let missing = "[cost: once/low] [surface: no-such-kit]";
         assert_eq!(deferred_findings(missing, &root()).len(), 1);
-        let pathy = "- **a** [cost: once/low] [surface: widget-kit/README.md] — x";
+        let pathy = "[cost: once/low] [surface: widget-kit/README.md]";
         assert_eq!(deferred_findings(pathy, &root()).len(), 1);
     }
 
     #[test]
     fn a_repeated_tag_reds_even_when_each_instance_is_valid() {
-        let line = "- **a** [cost: once/low] [cost: event/low] [surface: widget-kit] — x";
+        let line = "[cost: once/low] [cost: event/low] [surface: widget-kit]";
         assert_eq!(
             deferred_findings(line, &root()),
             vec!["2 [cost:] tags; an entry carries exactly one"]
@@ -208,8 +181,8 @@ mod tests {
     }
 
     #[test]
-    fn an_active_lead_line_carrying_either_tag_reds() {
-        assert_eq!(active_findings("- **a** [surface: widget-kit] — x").len(), 1);
-        assert!(active_findings("- **a** — the cost: prose is not a tag").is_empty());
+    fn an_active_tag_line_carrying_either_tag_reds() {
+        assert_eq!(active_findings("[surface: widget-kit]").len(), 1);
+        assert!(active_findings("the cost: prose is not a tag").is_empty());
     }
 }

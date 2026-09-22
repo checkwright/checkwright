@@ -20,11 +20,13 @@ cat > "$sb/TASK-QUEUE.md" <<'EOF'
 
 ## New Features
 
-- **a-live-task** — the only slug this queue carries.
+### a-live-task
+
+the only slug this queue carries.
 
 ## Done
 
-- **retired-task** — completed.
+- retired-task
 EOF
 cat > "$sb/kitroot/checks/check-vendored.sh" <<'EOF'
 #!/usr/bin/env bash

@@ -51,6 +51,17 @@ fn classify(line: &str, s: &Sets) -> Option<Sec> {
     Some(Sec::Other)
 }
 
+// spec: queue-kit/SPEC.md §The queue format — the entry's tag line, re-implemented: the first
+// non-blank line under the heading at `at` when it opens with a bracket, else nothing
+fn tag_line<'a>(lines: &[&'a str], at: usize) -> &'a str {
+    lines[at + 1..]
+        .iter()
+        .find(|l| !l.trim().is_empty())
+        .filter(|l| l.starts_with('['))
+        .copied()
+        .unwrap_or("")
+}
+
 fn is_space(c: u8) -> bool {
     c == b' ' || c == b'\t' || c == b'\r' || c == 0x0b || c == 0x0c
 }
@@ -242,7 +253,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // spec: canon-kit/SPEC.md §check-amendment-queue — awk's `sec` is unset until the first
     // heading, so a line above every section is classified by no arm; `Other` is that state
     let mut sec = Sec::Other;
-    for (idx, line) in text.lines().enumerate() {
+    let lines: Vec<&str> = text.lines().collect();
+    for (idx, line) in lines.iter().enumerate() {
         if let Some(c) = classify(line, &sets) {
             sec = c;
             continue;
@@ -254,13 +266,14 @@ fn rule(args: &[String]) -> Result<i32, String> {
         if line.contains(RETIRED_TAG) {
             retired.push(at.clone());
         }
-        if !line.starts_with("- ") {
+        if !line.starts_with("### ") || spec::entry_heading_slug(line).is_none() {
             continue;
         }
+        let tagged = tag_line(&lines, idx).contains("[spec:");
         match sec {
-            Sec::Feature if !line.contains("[spec:") => missing.push(at),
-            Sec::Active if line.contains("[spec:") => mready.push(at),
-            Sec::Deferred if line.contains("[spec:") => dready.push(at),
+            Sec::Feature if !tagged => missing.push(at),
+            Sec::Active if tagged => mready.push(at),
+            Sec::Deferred if tagged => dready.push(at),
             _ => {}
         }
     }
@@ -431,7 +444,16 @@ mod tests {
         ));
         assert!(matches!(classify("## Deferred", &s), Some(Sec::Deferred)));
         assert!(matches!(classify("## Done", &s), Some(Sec::Other)));
-        assert!(classify("- **x** — y", &s).is_none());
+        assert!(classify("### x", &s).is_none());
+    }
+
+    // spec: queue-kit/SPEC.md §The queue format — the `[spec:]` tag is read off the tag line under
+    // the heading, and a body paragraph is never a tag line
+    #[test]
+    fn the_tag_line_is_the_first_non_blank_line_when_it_opens_with_a_bracket() {
+        let lines = ["### a", "", "[spec: SPEC-a.md]", "", "body", "### b", "", "prose [spec: x]"];
+        assert_eq!(tag_line(&lines, 0), "[spec: SPEC-a.md]");
+        assert_eq!(tag_line(&lines, 5), "");
     }
 
     // spec: canon-kit/SPEC.md §check-amendment-queue — an empty icebox knob omits the term

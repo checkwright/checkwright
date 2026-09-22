@@ -3,8 +3,8 @@
 8344cp .claude/agents/stage-session.md
 1446cp .claude/commands/agent-execution.md
 551cp .claude/commands/align.md
-1095cp .claude/commands/build.md
-8594cp .claude/commands/close.md
+1148cp .claude/commands/build.md
+8556cp .claude/commands/close.md
 1759cp .claude/commands/consult.md
 1590cp .claude/commands/economics.md
 4609cp .claude/commands/lead.md
@@ -12,7 +12,7 @@
 7191cp .claude/commands/scope.md
 1155cp .claude/commands/spec.md
 1204cp .claude/commands/validate.md
-12077cp CLAUDE.md
+12073cp CLAUDE.md
 5785cp canon-kit/templates/SPEC-amendment.md
 2351cp context-kit/templates/close-brevity.md
 36660cp delegation-kit/templates/agent-execution.md
@@ -59,7 +59,7 @@
 25092cp docs/posts/2026-08-14-checkwright-v0-23-0.md
 12217cp docs/posts/2026-08-21-checkwright-v0-24-0.md
 6598cp docs/posts/2026-08-23-checkwright-v0-25-0.md
-1394cp docs/queue-kit/index.md
+1444cp docs/queue-kit/index.md
 757cp docs/releases.md
 26068cp docs/site-architecture.md
 2168cp docs/site-kit/index.md
@@ -72,9 +72,9 @@
 2100cp lifecycle-kit/templates/release-sweep.md
 6584cp lifecycle-kit/templates/stages/align.md
 8155cp lifecycle-kit/templates/stages/build.md
-20577cp lifecycle-kit/templates/stages/close.md
-17198cp lifecycle-kit/templates/stages/scope.md
+20621cp lifecycle-kit/templates/stages/close.md
+17194cp lifecycle-kit/templates/stages/scope.md
 8308cp lifecycle-kit/templates/stages/spec.md
 5742cp lifecycle-kit/templates/stages/validate.md
 2765cp lifecycle-kit/templates/upgrade.md
-1781cp queue-kit/templates/TASK-QUEUE.md
+1392cp queue-kit/templates/TASK-QUEUE.md

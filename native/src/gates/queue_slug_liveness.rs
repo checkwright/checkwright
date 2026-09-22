@@ -1,4 +1,4 @@
-// spec: queue-kit/SPEC.md §check-queue-slug-liveness — every slug-shaped bold-code token in a
+// spec: queue-kit/SPEC.md §check-queue-slug-liveness — every link into the queue from a
 // configured prose surface resolves against the queue's live slug set, no configured citation
 // surface cites a retired slug, and every status parenthetical in the queue matches its slug
 use crate::queue;
@@ -7,36 +7,16 @@ use std::path::{Path, PathBuf};
 
 const VALVE: &str = "retired-citation-exempt:";
 
-// spec: queue-kit/SPEC.md §check-queue-slug-liveness — ``**`slug`**``: the bold-code form that
-// claims queue membership, scanned for every occurrence on the line
-fn bold_code_tokens(line: &str) -> Vec<&str> {
-    let b = line.as_bytes();
-    let mut out = Vec::new();
-    let mut i = 0usize;
-    while i + 6 < b.len() {
-        if !(b[i] == b'*' && b[i + 1] == b'*' && b[i + 2] == b'`') {
-            i += 1;
-            continue;
-        }
-        let start = i + 3;
-        if start >= b.len() || !(b[start].is_ascii_lowercase() || b[start].is_ascii_digit()) {
-            i += 1;
-            continue;
-        }
-        let mut j = start + 1;
-        while j < b.len()
-            && (b[j].is_ascii_lowercase() || b[j].is_ascii_digit() || b[j] == b'-')
-        {
-            j += 1;
-        }
-        if j + 2 < b.len() && b[j] == b'`' && b[j + 1] == b'*' && b[j + 2] == b'*' {
-            out.push(&line[start..j]);
-            i = j + 3;
-            continue;
-        }
-        i += 1;
-    }
-    out
+// spec: queue-kit/SPEC.md §check-queue-slug-liveness — the membership claim: a markdown link whose
+// target resolves, relative to the citing page, to the queue file and whose fragment is slug-shaped
+fn queue_claims<'a>(line: &'a str, page_dir: &str, queue: &str) -> Vec<&'a str> {
+    let want = walk::abs_against("/", queue);
+    queue::md_links(line)
+        .into_iter()
+        .filter(|l| !l.path.is_empty() && queue::is_slug(l.frag))
+        .filter(|l| walk::abs_against("/", &format!("{}/{}", page_dir, l.path)) == want)
+        .map(|l| l.frag)
+        .collect()
 }
 
 // spec: queue-kit/SPEC.md §check-queue-slug-liveness — assertion B's token is single-backtick: a
@@ -78,8 +58,8 @@ fn status_vocabulary(sec: &queue::Sections) -> Vec<(String, Option<String>)> {
     out
 }
 
-// spec: queue-kit/SPEC.md §check-queue-slug-liveness — `(<status>)` right after the closing
-// backtick, one space allowed between, exactly one vocabulary word inside
+// spec: queue-kit/SPEC.md §check-queue-slug-liveness — `(<status>)` right after the byte at `end`,
+// one space allowed between, exactly one vocabulary word inside
 fn status_after(line: &str, end: usize) -> Option<&str> {
     let rest = &line[end + 1..];
     let rest = rest.strip_prefix(' ').unwrap_or(rest);
@@ -92,8 +72,8 @@ fn status_after(line: &str, end: usize) -> Option<&str> {
     Some(word)
 }
 
-// spec: queue-kit/SPEC.md §check-queue-slug-liveness — the section each slug heads an entry in: a
-// lead-line bullet anywhere, or a bare bullet in the done section
+// spec: queue-kit/SPEC.md §check-queue-slug-liveness — the section each slug heads an entry in: an
+// entry heading anywhere, or a bare bullet in the done section
 fn slug_sections(text: &str, sec: &queue::Sections) -> Vec<(String, String)> {
     let mut out: Vec<(String, String)> = Vec::new();
     let mut cur: Option<&str> = None;
@@ -103,8 +83,8 @@ fn slug_sections(text: &str, sec: &queue::Sections) -> Vec<(String, String)> {
             continue;
         }
         let Some(name) = cur else { continue };
-        let slug = match queue::bullet_slug(line) {
-            Some(s) => Some(s),
+        let slug = match queue::entry_heading(line) {
+            Some((_, s)) => Some(s),
             None if !sec.done.is_empty() && name == sec.done => queue::bare_bullet_slug(line),
             None => None,
         };
@@ -124,10 +104,19 @@ fn status_findings(
     let vocab = status_vocabulary(sec);
     let mut cands: Vec<(usize, &str, &str)> = Vec::new();
     for (i, line) in text.lines().enumerate() {
-        for (s, e) in queue::backtick_slugs(line) {
-            if let Some(word) = status_after(line, e) {
+        // spec: queue-kit/SPEC.md §check-queue-slug-liveness — a status follows a backticked token's
+        // closing backtick or a same-file link's closing paren
+        let mut cited: Vec<(&str, usize)> = queue::backtick_slugs(line).into_iter().map(|(s, e)| (&line[s..e], e)).collect();
+        cited.extend(
+            queue::md_links(line)
+                .into_iter()
+                .filter(|l| l.path.is_empty() && queue::is_slug(l.frag))
+                .map(|l| (l.frag, l.close)),
+        );
+        for (slug, end) in cited {
+            if let Some(word) = status_after(line, end) {
                 if vocab.iter().any(|(w, _)| w == word) {
-                    cands.push((i + 1, &line[s..e], word));
+                    cands.push((i + 1, slug, word));
                 }
             }
         }
@@ -234,8 +223,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut dead: Vec<String> = Vec::new();
     for f in &prose {
         let text = read(f)?;
+        let dir = f.parent().map(|d| d.display().to_string()).unwrap_or_default();
         for (i, line) in text.lines().enumerate() {
-            for tok in bold_code_tokens(line) {
+            for tok in queue_claims(line, &dir, &qfile) {
                 if !live.iter().any(|s| s == tok) {
                     dead.push(format!("{}:{}:{}", f.display(), i + 1, tok));
                 }
@@ -268,13 +258,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let status = status_findings(&qtext, &sec, &retired, &qpath);
 
     if !dead.is_empty() {
-        println!("check-queue-slug-liveness: bold-code token claims queue membership but names no live task:");
+        println!("check-queue-slug-liveness: link into the queue claims membership but names no live task:");
         for x in &dead {
             println!("  {}", x);
         }
-        println!("  help: a **`slug`** token claims the slug is a live queue task. If the task");
-        println!("        landed, drop the bold-code form and cite its owning SPEC; otherwise fix");
-        println!("        the slug or restore the task to the queue.");
+        println!("  help: a link to <queue-file>#<slug> claims the slug is a live queue task. If the");
+        println!("        task landed, drop the link and cite its owning SPEC; otherwise fix the");
+        println!("        slug or restore the task to the queue.");
     }
     if !stale.is_empty() {
         println!("check-queue-slug-liveness: governed prose cites a retired queue slug as a live pointer:");
@@ -297,7 +287,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     println!(
-        "QUEUE-SLUG-LIVENESS: clean ({} prose surface(s), {} citation surface(s) scanned; every bold-code token resolves to a live task, no retired slug is cited and every status parenthetical agrees in {})",
+        "QUEUE-SLUG-LIVENESS: clean ({} prose surface(s), {} citation surface(s) scanned; every link into the queue resolves to a live task, no retired slug is cited and every status parenthetical agrees in {})",
         prose.len(),
         cites.len(),
         qpath.display()
@@ -318,13 +308,14 @@ mod tests {
         }
     }
 
+    // spec: queue-kit/SPEC.md §check-queue-slug-liveness — a claim is a link resolving to the queue
+    // file from the citing page's directory, with a slug-shaped fragment; bold code claims nothing
     #[test]
-    fn a_bold_code_token_is_lowercase_kebab_inside_backticks_and_bold() {
-        assert_eq!(bold_code_tokens("see **`a-b`** here"), vec!["a-b"]);
-        assert_eq!(bold_code_tokens("**`x`** and **`y`**"), vec!["x", "y"]);
-        assert!(bold_code_tokens("**bare-bold**").is_empty());
-        assert!(bold_code_tokens("`just-code`").is_empty());
-        assert!(bold_code_tokens("**`Upper`**").is_empty());
+    fn a_claim_is_a_link_into_the_queue_file_with_a_slug_fragment() {
+        let l = "see [a-b](../TASK-QUEUE.md#a-b), [c](other.md#c), [d](../TASK-QUEUE.md#Not) and **`e`**";
+        assert_eq!(queue_claims(l, "docs", "TASK-QUEUE.md"), vec!["a-b"]);
+        assert_eq!(queue_claims("[x](TASK-QUEUE.md#x)", "", "TASK-QUEUE.md"), vec!["x"]);
+        assert!(queue_claims("[x](TASK-QUEUE.md#x)", "docs", "TASK-QUEUE.md").is_empty());
     }
 
     #[test]
@@ -344,17 +335,17 @@ mod tests {
 
     #[test]
     fn a_status_parenthetical_agrees_with_the_slug_section() {
-        let q = "## New Features\n\n- **a-live** — x\n\n## Deferred\n\n- **b-def** — cites `c-ice` (icebox), `b-def` (deferred), `a-live` (deferred), `d-done` (retired), `gone` (retired), `x-none` (done), `d-done` (landed 2026)\n\n## Icebox\n\n- **c-ice** — y\n\n## Done\n\n- d-done\n";
+        let q = "## New Features\n\n### a-live\n\nx\n\n## Deferred\n\n### b-def\n\ncites [c-ice](#c-ice) (icebox), `b-def` (deferred), [a-live](#a-live) (deferred), `d-done` (retired), `gone` (retired), `x-none` (done), `d-done` (landed 2026)\n\n## Icebox\n\n### c-ice\n\ny\n\n## Done\n\n- d-done\n";
         let ret = || vec!["d-done".to_string(), "gone".to_string()];
         let out = status_findings(q, &sec(), &ret, Path::new("Q.md"));
-        assert_eq!(out, vec!["Q.md:7:a-live says (deferred) but is New Features".to_string()]);
-        let q2 = "## Deferred\n\n- **b-def** — `d-done` (icebox) and `gone` (done)\n\n## Done\n\n- d-done\n";
+        assert_eq!(out, vec!["Q.md:11:a-live says (deferred) but is New Features".to_string()]);
+        let q2 = "## Deferred\n\n### b-def\n\n`d-done` (icebox) and `gone` (done)\n\n## Done\n\n- d-done\n";
         let out = status_findings(q2, &sec(), &ret, Path::new("Q.md"));
         assert_eq!(
             out,
             vec![
-                "Q.md:3:d-done says (icebox) but is Done".to_string(),
-                "Q.md:3:gone says (done) but is retired".to_string(),
+                "Q.md:5:d-done says (icebox) but is Done".to_string(),
+                "Q.md:5:gone says (done) but is retired".to_string(),
             ]
         );
     }

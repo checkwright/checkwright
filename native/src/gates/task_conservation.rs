@@ -95,7 +95,10 @@ pub fn run(args: &[String]) -> i32 {
             eprintln!("check-task-conservation: {}", e);
             return 2;
         }
-        Ok(Some(b)) => String::from_utf8_lossy(&b).into_owned(),
+        // spec: queue-kit/SPEC.md §check-task-conservation — a HEAD written in the retired bullet
+        // grammar is read through the migration, so the converting commit is conserved against its
+        // own pre-image and a slug live before it stays grandfathered
+        Ok(Some(b)) => crate::emit::queue_migrate::heading_form(&String::from_utf8_lossy(&b), &sec).into_owned(),
         Ok(None) => {
             println!(
                 "TASK-CONSERVATION: clean ({} not at HEAD — no prior live slugs to conserve)",
@@ -166,15 +169,15 @@ mod tests {
 
     #[test]
     fn a_slug_still_live_or_moved_to_done_is_conserved() {
-        let head = "## New Features\n- **a** x\n- **b** y\n";
-        let work = "## New Features\n- **a** x\n## Done\n- b\n";
+        let head = "## New Features\n### a\nx\n### b\ny\n";
+        let work = "## New Features\n### a\nx\n## Done\n- b\n";
         assert_eq!(diff(head, work, &sections()), (2, vec![]));
     }
 
     #[test]
     fn a_slug_in_neither_set_is_lost_and_reported_in_head_order() {
-        let head = "## New Features\n- **a** x\n- **b** y\n- **c** z\n";
-        let work = "## New Features\n- **b** y\n";
+        let head = "## New Features\n### a\nx\n### b\ny\n### c\nz\n";
+        let work = "## New Features\n### b\ny\n";
         let (conserved, lost) = diff(head, work, &sections());
         assert_eq!(conserved, 1);
         assert_eq!(lost, vec!["a".to_string(), "c".to_string()]);
@@ -184,24 +187,34 @@ mod tests {
     // construction, and an entry carried into done with its live shape intact is not
     #[test]
     fn eviction_conserves_but_a_relocated_live_shape_does_not() {
-        let head = "## New Features\n- **a** x\n";
-        assert_eq!(diff(head, "## Icebox\n- **a** x\n", &sections()), (1, vec![]));
-        let (_, lost) = diff(head, "## Done\n- **a** — x\n", &sections());
+        let head = "## New Features\n### a\nx\n";
+        assert_eq!(diff(head, "## Icebox\n### a\nx\n", &sections()), (1, vec![]));
+        let (_, lost) = diff(head, "## Done\n### a\nx\n", &sections());
         assert_eq!(lost, vec!["a".to_string()]);
+    }
+
+    // spec: queue-kit/SPEC.md §check-task-conservation — the commit converting a bullet-grammar
+    // queue is conserved against its own pre-image, read through the migration
+    #[test]
+    fn a_bullet_grammar_head_is_read_through_the_migration() {
+        let head = "## New Features\n\n- **a** — x\n- **b** — y\n\n## Done\n";
+        let work = "## New Features\n\n### a\n\nx\n\n## Done\n\n- b\n";
+        let head = crate::emit::queue_migrate::heading_form(head, &sections());
+        assert_eq!(diff(&head, work, &sections()), (2, vec![]));
     }
 
     // spec: queue-kit/SPEC.md §check-task-conservation — assertion B binds a new slug and a rename,
     // and grandfathers a long slug already live (or done) at HEAD
     #[test]
     fn only_a_slug_new_to_head_is_held_to_the_ceiling() {
-        let head = "## New Features\n- **grandfathered-long-slug** x\n## Done\n- done-long-slug\n";
-        let work = "## New Features\n- **grandfathered-long-slug** x\n- **brand-new-long-slug** y\n\
-                    - **short** z\n- **done-long-slug** w\n## Done\n";
+        let head = "## New Features\n### grandfathered-long-slug\nx\n## Done\n- done-long-slug\n";
+        let work = "## New Features\n### grandfathered-long-slug\nx\n### brand-new-long-slug\ny\n\
+                    ### short\nz\n### done-long-slug\nw\n## Done\n";
         assert_eq!(
             over_ceiling(head, work, &sections(), 10),
             vec![("brand-new-long-slug".to_string(), 19)]
         );
         assert!(over_ceiling(head, work, &sections(), 19).is_empty());
-        assert!(over_ceiling("", "## New Features\n- **abc** x\n", &sections(), 3).is_empty());
+        assert!(over_ceiling("", "## New Features\n### abc\nx\n", &sections(), 3).is_empty());
     }
 }

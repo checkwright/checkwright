@@ -4,22 +4,39 @@
 
 ## New Features
 
-- **alpha-feature** — build the alpha surface.
-  it is really [blocked-by: beta-feature] until beta ships.
-- **beta-feature** — the prerequisite groundwork.
-- **gamma-feature** — a drain-spanning surface whose exemption reflowed
-  off the lead line: [drain-exempt: validate-half pending] no reader sees it.
-- **epsilon-feature** — a unit whose producer declaration reflowed off the
-  lead line: [observed-by: ci-run] so the promotion-time reader never sees it.
+### alpha-feature
+
+build the alpha surface. it is really [blocked-by: beta-feature] until beta ships.
+
+### beta-feature
+
+the prerequisite groundwork.
+
+### gamma-feature
+
+a drain-spanning surface whose exemption reflowed off the lead line: [drain-exempt: validate-half pending] no reader sees it.
+
+### epsilon-feature
+
+a unit whose producer declaration reflowed off the lead line: [observed-by: ci-run] so the promotion-time reader never sees it.
 
 ## Technical Debt
 
 ## Deferred
 
-- **delta-idea** — a parked idea whose roadmap placement reflowed off the lead
-  line: it is still [roadmap: later/delta] but no tag reader scans this far.
-- **eta-idea** — a parked idea whose board tags reflowed off the lead
-  line: [cost: once/low] [surface: queue-kit] so the board never ranks it.
+### delta-idea
+
+a parked idea whose roadmap placement reflowed off the lead line: it is still [roadmap: later/delta] but no tag reader scans this far.
+
+### eta-idea
+
+a parked idea whose board tags reflowed off the lead line: [cost: once/low] [surface: queue-kit] so the board never ranks it.
+
+### theta-idea
+
+[cost: once/low] [surface: queue-kit]
+
+a parked idea whose former declarations were written into the body: [recurrence: 2026-01-01] and [not-icebox-eligible: 2026-01-02 a standing fact] and [roadmap-summary: A public sentence.], so no reader sees any of them.
 
 ## Done
 

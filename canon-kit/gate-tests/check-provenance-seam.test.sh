@@ -20,7 +20,9 @@ cat >"$SANDBOX/TASK-QUEUE.md" <<'EOF'
 
 ## New Features
 
-- **sprocket-rework-unit** — rework the sprocket.
+### sprocket-rework-unit
+
+rework the sprocket.
 EOF
 cat >"$SANDBOX/widget-toolkit/SPEC.md" <<'EOF'
 # widget-toolkit — SPEC

@@ -1,4 +1,4 @@
 # graph: couples=knob:QUEUE_KIT_QUEUE_FILE,knob:QUEUE_KIT_ROADMAP_FILE dir=one valve=none tier=precommit trigger=knob:QUEUE_KIT_QUEUE_FILE,knob:QUEUE_KIT_ROADMAP_FILE
 # projection: ROADMAP.md
-# spec: queue-kit/SPEC.md §check-roadmap-fresh — every [roadmap:] tag names a configured horizon and track and pairs with exactly one roadmap-summary: declaration, and the projection page's marker block is the byte-fresh emission of the roadmap arm
+# spec: queue-kit/SPEC.md §check-roadmap-fresh — every [roadmap:] tag names a configured horizon and track and pairs with exactly one [roadmap-summary:] tag, and the projection page's marker block is the byte-fresh emission of the roadmap arm
 # install: on-surface

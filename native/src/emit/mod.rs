@@ -45,6 +45,7 @@ pub mod queue_counts;
 pub mod queue_edges;
 pub mod queue_flow;
 pub mod queue_index;
+pub mod queue_migrate;
 pub mod reads_census;
 pub mod rewrite;
 pub mod scan_prompts;
@@ -354,6 +355,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
             "QUEUE_KIT_DEFERRED_SECTION",
             "QUEUE_KIT_ICEBOX_SECTION",
         ],
+    ),
+    // spec: queue-kit/SPEC.md §The queue-migrate arm — the grammar migration a consumer upgrading
+    // queue-kit runs once, configured by the section vocabulary it rewrites within
+    (
+        "--emit-queue-migrate",
+        Arm::Emit(queue_migrate::emit),
+        queue_migrate::KNOBS,
     ),
     // spec: context-kit/SPEC.md §Index-first reading — the markdown structural index. A table
     // member rather than a hardcoded flag because it reads a consumer knob, which a hardcoded flag

@@ -188,22 +188,21 @@ impl Mechanism {
     }
 }
 
-// spec: canon-kit/SPEC.md §check-provenance-seam — every lead-line slug in every section: the
-// bold `- **slug**` lead of an open entry and the bare `- slug` line of a finished one
+// spec: canon-kit/SPEC.md §check-provenance-seam — every entry slug in every section: the
+// `### <slug>` heading of an open entry and the bare `- slug` line of a finished one
 fn lead_slugs(text: &str) -> Vec<String> {
     let mut out = Vec::new();
     for raw in text.lines() {
+        if let Some(s) = spec::entry_heading_slug(raw) {
+            out.push(s.to_string());
+            continue;
+        }
         let Some(rest) = raw.strip_prefix("- ") else {
             continue;
         };
-        let rest = rest.trim_start();
-        if let Some(b) = rest.strip_prefix("**") {
-            let end = b.find("**").unwrap_or(0);
-            if end > 0 && is_slug(&b[..end]) {
-                out.push(b[..end].to_string());
-            }
-        } else if is_slug(rest.trim_end()) {
-            out.push(rest.trim_end().to_string());
+        let rest = rest.trim();
+        if is_slug(rest) {
+            out.push(rest.to_string());
         }
     }
     out
@@ -483,7 +482,7 @@ mod tests {
 
     #[test]
     fn lead_slugs_read_both_the_open_and_the_finished_lead() {
-        let q = "## A\n\n- **widget-rework-unit** [x] — body\n  - **not-a-lead** nested\n\n## Done\n\n- finished-unit-slug\n- Prose line\n";
+        let q = "## A\n\n### widget-rework-unit\n\n[x]\n\n- **not-a-lead** a body list item\n\n## Done\n\n- finished-unit-slug\n- Prose line\n";
         let s = lead_slugs(q);
         assert!(s.contains(&"widget-rework-unit".to_string()));
         assert!(s.contains(&"finished-unit-slug".to_string()));

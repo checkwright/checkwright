@@ -1,1 +1,10 @@
 duplicate slug
+TASK-QUEUE.md:17: tidy-logs (first seen at line 13)
+task-section heading that is not a valid slug
+TASK-QUEUE.md:21: ### Not A Slug
+task-section bullet outside every entry
+TASK-QUEUE.md:25: - **stray-entry**
+same-file link naming no live entry
+TASK-QUEUE.md:15: (#gone-task)
+live entry cited in backticks rather than linked
+TASK-QUEUE.md:9: `tidy-logs`

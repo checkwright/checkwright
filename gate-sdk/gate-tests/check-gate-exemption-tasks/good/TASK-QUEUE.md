@@ -2,7 +2,9 @@
 
 ## New Features
 
-- **fix-sample-surface** — a live task the fixture's `# until:` resolves to.
+### fix-sample-surface
+
+a live task the fixture's `# until:` resolves to.
 
 ## Done
 

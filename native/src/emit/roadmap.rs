@@ -38,7 +38,7 @@ fn parse(args: &[String]) -> Result<(Mode, String), String> {
 // spec: queue-kit/SPEC.md §The roadmap arm — every configured horizon gets its heading whether or
 // not the queue fills it: an empty horizon is information, and a section that vanishes when it
 // empties reads as a page that forgot it. The order is the knob array's own, never a sort.
-fn body(entries: &[RoadmapEntry], horizons: &[String]) -> String {
+fn body(entries: &[RoadmapEntry], horizons: &[String], base: &str) -> String {
     let mut out = String::new();
     for (i, h) in horizons.iter().enumerate() {
         if i > 0 {
@@ -67,14 +67,14 @@ fn body(entries: &[RoadmapEntry], horizons: &[String]) -> String {
                 continue;
             }
             // spec: queue-kit/SPEC.md §The roadmap arm — the whitelist: an entry with no single
-            // declaration contributes no prose, so unmarked body text can never reach the page
+            // summary tag contributes no prose, so unmarked body text can never reach the page
             // even when the gate is bypassed
-            if e.declarations != 1 || e.summary.is_empty() {
+            if e.summaries != 1 || e.summary.is_empty() {
                 continue;
             }
             out.push_str(&format!(
-                "- **`{}`** *({})* — {}\n",
-                e.slug, track, e.summary
+                "- [{}]({}#{}) *({})* — {}\n",
+                e.slug, base, e.slug, track, e.summary
             ));
             n += 1;
         }
@@ -110,13 +110,13 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         );
     }
     let sec = Sections::active_and_deferred()?;
-    let text = body(&queue::roadmap_entries(&text, &sec), &horizons);
+    let page = queue::knob_scalar("QUEUE_KIT_ROADMAP_FILE")?;
+    let text = body(&queue::roadmap_entries(&text, &sec), &horizons, &link_base(&page, &file));
 
     if let Mode::Emit = mode {
         return Ok(text);
     }
 
-    let page = queue::knob_scalar("QUEUE_KIT_ROADMAP_FILE")?;
     if page.is_empty() {
         return Err(
             "--write needs QUEUE_KIT_ROADMAP_FILE; it is empty (no projection page configured)"
@@ -129,6 +129,17 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     let name = queue::knob_scalar("QUEUE_KIT_ROADMAP_MARKER")?;
     marker::write_block(&page, &begin(&name), &end(&name), &text)?;
     Ok(format!("roadmap: replaced the {} block in {}\n", name, page))
+}
+
+// spec: queue-kit/SPEC.md §The roadmap arm — the queue file's path relative to the page's directory,
+// both repo-root-relative; the lexical relative path from the page file itself is one level too
+// deep, so its first `..` is the page's own name. No page configured leaves the queue path as is.
+fn link_base(page: &str, queue: &str) -> String {
+    if page.is_empty() {
+        return queue.to_string();
+    }
+    let from_file = crate::walk::relative_to(&format!("/{}", page), &format!("/{}", queue));
+    from_file.strip_prefix("../").map(str::to_string).unwrap_or(from_file)
 }
 
 // spec: gate-sdk/SPEC.md §lib/inject.sh — the marker pair's spelling, derived from the configured
@@ -146,12 +157,12 @@ pub fn end(name: &str) -> String {
 mod tests {
     use super::*;
 
-    fn entry(tags: usize, field: &str, slug: &str, decls: usize, summary: &str) -> RoadmapEntry {
+    fn entry(tags: usize, field: &str, slug: &str, sums: usize, summary: &str) -> RoadmapEntry {
         RoadmapEntry {
             tags,
             field: field.to_string(),
             slug: slug.to_string(),
-            declarations: decls,
+            summaries: sums,
             summary: summary.to_string(),
         }
     }
@@ -166,10 +177,20 @@ mod tests {
     fn every_configured_horizon_gets_a_heading_in_the_knobs_own_order() {
         let e = vec![entry(1, "soon/alpha", "a-thing", 1, "A public sentence.")];
         assert_eq!(
-            body(&e, &horizons()),
-            "### soon\n\n- **`a-thing`** *(alpha)* — A public sentence.\n\n### someday\n\n\
+            body(&e, &horizons(), "TASK-QUEUE.md"),
+            "### soon\n\n- [a-thing](TASK-QUEUE.md#a-thing) *(alpha)* — A public sentence.\n\n### someday\n\n\
              _Nothing is queued under this horizon._\n\n"
         );
+    }
+
+    // spec: queue-kit/SPEC.md §The roadmap arm — the link target is the queue relative to the page's
+    // directory, and an unconfigured page leaves the queue path as the arm read it
+    #[test]
+    fn the_link_base_is_the_queue_relative_to_the_pages_directory() {
+        assert_eq!(link_base("ROADMAP.md", "TASK-QUEUE.md"), "TASK-QUEUE.md");
+        assert_eq!(link_base("docs/roadmap.md", "TASK-QUEUE.md"), "../TASK-QUEUE.md");
+        assert_eq!(link_base("docs/roadmap.md", "docs/q.md"), "q.md");
+        assert_eq!(link_base("", "TASK-QUEUE.md"), "TASK-QUEUE.md");
     }
 
     // spec: queue-kit/SPEC.md §The roadmap arm — the whitelist and the field grammar: a second
@@ -186,7 +207,7 @@ mod tests {
             entry(1, "soon/alpha", "two-decl", 2, "s"),
             entry(1, "elsewhere/alpha", "other-horizon", 1, "s"),
         ];
-        let out = body(&e, &horizons());
+        let out = body(&e, &horizons(), "TASK-QUEUE.md");
         assert!(out.contains("### soon\n\n_Nothing is queued"), "{}", out);
         for slug in [
             "two-tags",

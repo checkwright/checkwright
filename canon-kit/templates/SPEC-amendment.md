@@ -12,7 +12,7 @@
   components takes the repo root. The
   basename need not match that entry's slug: the ref resolves as a bare
   basename tree-wide, and swapping a long slug into the tag can push the
-  entry's lead line past the queue's wrap budget — so a shorter basename than
+  entry's tag line past a wrapped queue's budget — so a shorter basename than
   the slug is the fix, not a mismatch to avoid. It
   describes ONLY what is added or changed — do not restate the canonical spec.
   It is a transition artifact: merged into the canonical spec and deleted when

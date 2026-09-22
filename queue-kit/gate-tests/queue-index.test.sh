@@ -25,19 +25,33 @@ cat >"$SANDBOX/TASK-QUEUE.md" <<'EOF'
 
 ## New Features
 
-- **feat-a** — do a thing.
-- **feat-b** [attend-not-a-tag] — another.
+### feat-a
+
+do a thing.
+
+### feat-b
+
+[attend-not-a-tag]
+
+another.
 
 ## Technical Debt
 
 ## Deferred
 
-- **def-a** — a deferred entry.
+### def-a
+
+a deferred entry.
 
 ## Cold Storage
 
-- **ice-a** — an iceboxed entry.
-- **ice-b** — a second iceboxed entry.
+### ice-a
+
+an iceboxed entry.
+
+### ice-b
+
+a second iceboxed entry.
 
 ## Done
 

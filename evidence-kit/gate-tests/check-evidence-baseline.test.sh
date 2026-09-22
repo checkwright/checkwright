@@ -31,22 +31,22 @@ case_run() {
 
 # A — a fail slug that resolves to a live task is CLEAN.
 case_run "live-slug-clean" \
-    'u a fail live-one\n' '## New Features\n- **live-one** — x\n' \
+    'u a fail live-one\n' '## New Features\n### live-one\n' \
     0 "clean"
 
 # B — a fail slug that is a Done task is stale-red.
 case_run "done-slug-stale" \
-    'u a fail gone-task\n' '## Done\n- **gone-task** — x\n' \
+    'u a fail gone-task\n' '## Done\n- gone-task\n' \
     1 "is a Done task"
 
 # C — a fail slug that resolves nowhere is red.
 case_run "unknown-slug" \
-    'u a fail nowhere\n' '## New Features\n- **other** — x\n' \
+    'u a fail nowhere\n' '## New Features\n### other\n' \
     1 "resolves to no live task"
 
 # D — a 'pass' line carrying a slug is red (a pass takes no blocking slug).
 case_run "pass-with-slug" \
-    'u a pass stray\n' '## New Features\n- **stray** — x\n' \
+    'u a pass stray\n' '## New Features\n### stray\n' \
     1 "takes no blocking slug"
 
 # E — a permanent marker satisfies liveness without a queue task.
@@ -54,7 +54,7 @@ _perm_cfg() {
     local d="$tmp/perm"; mkdir -p "$d/scripts"
     printf 'EVIDENCE_KIT_PERMANENT_SLUGS[] = forever\n' >"$d/scripts/evidence-config.knobs"
     printf '# fixture\nu a ignore forever\n' >"$d/base.txt"
-    printf '## New Features\n- **unrelated** — x\n' >"$d/queue.md"
+    printf '## New Features\n### unrelated\n' >"$d/queue.md"
     ( cd "$d" && unset EVIDENCE_KIT_KNOB_FILE \
         && gate_env GATE_SDK_GATES_DIR=scripts \
         && gate_run check-evidence-baseline "$DIR/checks" base.txt queue.md 2>&1 )
@@ -121,7 +121,7 @@ start="$(_git rev-parse HEAD)"
 _git commit -qm inside --allow-empty
 inside="$(_git rev-parse HEAD)"
 printf '# state\n---\nit scope sid 2026-01-01 %s\n' "$start" >"$flip/state.txt"
-printf '## New Features\n- **live** — x\n' >"$flip/queue.md"
+printf '## New Features\n### live\n' >"$flip/queue.md"
 
 # flip_case <name> <baseline-file> <baseline-body> <state> <want-exit> <expect-substring>
 flip_case() {

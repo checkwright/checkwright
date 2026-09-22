@@ -2,9 +2,9 @@ feature-section entries without [spec:]
 design-pending-section entries already carrying [spec:]
 misfiled in an active non-feature section
 [design-pending] is retired — section membership is the state; delete the tag
-:12: - **still-tagged-debt** [design-pending]
-:17: - **later-thing** [design-pending]
-:18:   Why [design-pending]:
+:31: [design-pending]
+:45: [design-pending]
+:47: a deferred lead line carrying the retired tag. Why [design-pending]:
 queue references [spec: nested/SPEC-gone.md] but no such file exists at that path
 queue references [spec: SPEC-gone.md] but no amendment file named SPEC-gone.md exists on disk
 amendment on disk with no queue entry: ./SPEC-orphan.md

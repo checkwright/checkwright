@@ -23,30 +23,34 @@ fn is_slug_byte(c: u8) -> bool {
     c.is_ascii_lowercase() || c.is_ascii_digit() || c == b'-'
 }
 
-// spec: drift-kit/SPEC.md §Bundled KPIs — the active-entry grammar: an indented bullet whose
-// lead-in is a bold slug. A bare Done-style bullet is not an entry, which is what keeps the pool
-// the design-pending one.
-pub fn bold_lead_slug(line: &str) -> Option<&str> {
-    let rest = line.trim_start_matches([' ', '\t']);
-    let rest = rest.strip_prefix('-')?;
-    let after = rest.trim_start_matches([' ', '\t']);
-    if after.len() == rest.len() {
-        return None;
-    }
-    let inner = after.strip_prefix("**")?;
-    let b = inner.as_bytes();
-    if b.is_empty() || !(b[0].is_ascii_lowercase() || b[0].is_ascii_digit()) {
-        return None;
-    }
-    let end = inner
-        .find("**")
-        .filter(|e| *e > 0 && b[..*e].iter().all(|c| is_slug_byte(*c)))?;
-    Some(&inner[..end])
+fn slug_shaped(s: &str) -> bool {
+    let b = s.as_bytes();
+    !b.is_empty() && (b[0].is_ascii_lowercase() || b[0].is_ascii_digit()) && b.iter().all(|c| is_slug_byte(*c))
 }
 
-// spec: drift-kit/SPEC.md §Bundled KPIs — one walk emitting the section-tagged slug of every bold
-// lead-in bullet plus a trailing line count, so the entry axis and the weight axis are read off
-// the same parse. The unknown-heading reset is what scopes both to the pool's own sections.
+// spec: queue-kit/SPEC.md §The queue format — the entry grammar re-implemented: `### <slug>`, or
+// `#### <slug>` for a sub-task. A bare Done-style bullet is not an entry, which is what keeps the
+// pool the design-pending one.
+// spec: drift-kit/SPEC.md §Bundled KPIs — the baseline is a past revision, and a revision from before
+// the heading grammar spells an entry as a bold-slug bullet, so that retired lead is read too
+pub fn entry_slug(line: &str) -> Option<&str> {
+    if let Some(rest) = line.strip_prefix("#### ").or_else(|| line.strip_prefix("### ")) {
+        let slug = rest.trim_end_matches([' ', '\t']);
+        return slug_shaped(slug).then_some(slug);
+    }
+    let after = line.trim_start_matches([' ', '\t']).strip_prefix('-')?;
+    let inner = after.trim_start_matches([' ', '\t']);
+    if inner.len() == after.len() {
+        return None;
+    }
+    let inner = inner.strip_prefix("**")?;
+    let end = inner.find("**")?;
+    slug_shaped(&inner[..end]).then_some(&inner[..end])
+}
+
+// spec: drift-kit/SPEC.md §Bundled KPIs — one walk emitting the section-tagged slug of every entry
+// heading plus a trailing line count, so the entry axis and the weight axis are read off the same
+// parse. The unknown-heading reset is what scopes both to the pool's own sections.
 pub fn pool(text: &str, deferred: &str, icebox: &str) -> Pool {
     let (dh, ih) = (format!("## {}", deferred), format!("## {}", icebox));
     let mut sec = "";
@@ -68,7 +72,7 @@ pub fn pool(text: &str, deferred: &str, icebox: &str) -> Pool {
             continue;
         }
         lines += 1;
-        if let Some(slug) = bold_lead_slug(line) {
+        if let Some(slug) = entry_slug(line) {
             // spec: drift-kit/SPEC.md §Bundled KPIs — the pool is keyed by slug, the shape the
             // shell form's associative array had: a slug spelled twice is one entry and the last
             // spelling names its section.
@@ -146,11 +150,11 @@ pub fn run(ctx: &Ctx, trend: bool) -> Option<String> {
 mod tests {
     use super::*;
 
-    // spec: drift-kit/SPEC.md §Bundled KPIs — the pool is the bold-lead-in entries of the two
-    // configured sections, and the line count is every line under them whatever its shape
+    // spec: drift-kit/SPEC.md §Bundled KPIs — the pool is the entries of the two configured
+    // sections, and the line count is every line under them whatever its shape
     #[test]
     fn the_pool_reads_both_configured_sections_and_counts_all_their_lines() {
-        let t = "## Active\n- **live-one** — prose\n## Deferred\n- **alpha** — prose\n\n  cost line\n## Icebox\n- **beta** — prose\n";
+        let t = "## Active\n### live-one\n## Deferred\n### alpha\n\ncost line\n## Icebox\n### beta\n";
         let p = pool(t, "Deferred", "Icebox");
         assert_eq!(
             p.entries,
@@ -166,21 +170,22 @@ mod tests {
     // section alone, so an icebox heading is an unknown one and its lines drop out
     #[test]
     fn an_unset_icebox_knob_leaves_that_section_out_of_the_pool() {
-        let t = "## Deferred\n- **alpha** — prose\n## Icebox\n- **beta** — prose\n";
+        let t = "## Deferred\n### alpha\n## Icebox\n### beta\n";
         let p = pool(t, "Deferred", "");
         assert_eq!(p.entries, vec![("deferred".to_string(), "alpha".to_string())]);
         assert_eq!(p.lines, 1);
     }
 
-    // spec: drift-kit/SPEC.md §Bundled KPIs — only a bold slug lead-in is an entry; a Done-style
-    // bare bullet and a bold phrase that is not a slug are both prose to this member
+    // spec: drift-kit/SPEC.md §Bundled KPIs — an entry heading is an entry, and so is a past
+    // revision's bold-slug bullet; a Done-style bare bullet and a non-slug heading are prose
     #[test]
-    fn only_a_bold_slug_lead_in_is_an_entry() {
-        assert_eq!(bold_lead_slug("- **some-slug** — prose"), Some("some-slug"));
-        assert_eq!(bold_lead_slug("  - **s2** trailing"), Some("s2"));
-        assert_eq!(bold_lead_slug("- bare-slug"), None);
-        assert_eq!(bold_lead_slug("- **Two Words** — prose"), None);
-        assert_eq!(bold_lead_slug("- **-lead** — prose"), None);
-        assert_eq!(bold_lead_slug("-**no-space**"), None);
+    fn only_an_entry_heading_or_a_retired_bullet_lead_is_an_entry() {
+        assert_eq!(entry_slug("### some-slug"), Some("some-slug"));
+        assert_eq!(entry_slug("#### s2  "), Some("s2"));
+        assert_eq!(entry_slug("- **some-slug** — prose"), Some("some-slug"));
+        assert_eq!(entry_slug("- bare-slug"), None);
+        assert_eq!(entry_slug("### Two Words"), None);
+        assert_eq!(entry_slug("- **Two Words** — prose"), None);
+        assert_eq!(entry_slug("-**no-space**"), None);
     }
 }

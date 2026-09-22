@@ -40,12 +40,20 @@ queue() {  # $1 = the def-target body lines, $2 = the renamed entry's slug, $3 =
 
 ## Deferred
 
-- **def-other** [cost: event/low] [surface: none] — an unrelated entry.
-  **Cost while deferred** nothing at all. Filed 2026-01-01 by scope.
+### def-other
+
+[cost: event/low] [surface: none]
+
+an unrelated entry.
+**Cost while deferred** nothing at all. Filed 2026-01-01 by scope.
 $1
-- **$2** [cost: event/low] [surface: none] — the renamed entry.
-  **Cost while deferred** nothing at all. Filed 2026-01-01 by scope.
-  one body line
+### $2
+
+[cost: event/low] [surface: none]
+
+the renamed entry.
+**Cost while deferred** nothing at all. Filed 2026-01-01 by scope.
+one body line
 
 ## Done
 ${3:-}
@@ -56,30 +64,31 @@ EOF
 
 commit() { git -C "$SANDBOX" add TASK-QUEUE.md && git -C "$SANDBOX" commit -q -m "$1"; }
 
-TARGET_AT_FILING='
-- **def-target** [cost: event/low] [surface: none] — the measured entry.
-  **Cost while deferred** the grounds it carries. Filed 2026-01-01 by scope.
-  ground one
-  ground two
-  ground three
-  ground four'
+# The entries are line-per-ground, the shape a queue measured in lines keeps.
+TARGET_HEAD='### def-target
+
+[cost: event/low] [surface: none]
+
+the measured entry.
+**Cost while deferred** the grounds it carries. Filed 2026-01-01 by scope.'
+TARGET_AT_FILING="$TARGET_HEAD
+ground one
+ground two
+ground three
+ground four"
 TARGET_GROWN="$TARGET_AT_FILING
-  ground five
-  ground six"
-TARGET_NET_ZERO='
-- **def-target** [cost: event/low] [surface: none] — the measured entry.
-  **Cost while deferred** the grounds it carries. Filed 2026-01-01 by scope.
-  answer one, replacing two grounds
-  a second answer line
-  ground three
-  ground four
-  ground five
-  ground six'
-TARGET_COMPRESSED='
-- **def-target** [cost: event/low] [surface: none] — the measured entry.
-  **Cost while deferred** the grounds it carries. Filed 2026-01-01 by scope.
-  answered: all six grounds, relocated to `def-other`
-  ground six'
+ground five
+ground six"
+TARGET_NET_ZERO="$TARGET_HEAD
+answer one, replacing two grounds
+a second answer line
+ground three
+ground four
+ground five
+ground six"
+TARGET_COMPRESSED="$TARGET_HEAD
+answered: all six grounds, relocated to [def-other](#def-other)
+ground six"
 
 # --- the seeded history, oldest first ------------------------------------------------
 queue '' def-renamed-old;              commit "seed the queue with no target entry"
@@ -127,7 +136,7 @@ grep -qE "^  $DEPARTURE  " <<<"$out" \
 
 # --- the decrease is reported, with its before, its after and its subject -------------
 checks=$((checks + 1))
-grep -qE "^  $COMPRESS  8lines -> 4lines  compress def-target by answering\$" <<<"$out" \
+grep -qE "^  $COMPRESS  12lines -> 8lines  compress def-target by answering\$" <<<"$out" \
     || note row "the compressing commit's row is not the reported one: $out"
 
 # --- limit: a commit that grows and one that nets out do not appear -------------------

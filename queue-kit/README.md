@@ -1,8 +1,8 @@
 # queue-kit
 
-A git-native, agent-readable task tracker: one Markdown file where `##` sections are queues, bold kebab-case slugs are the task handles, and square-bracket tags (`[blocked-by:]`, `[spec:]`, `[drain-exempt:]`, `[roadmap:]`, `[observed-by:]`, `[cost:]`, `[surface:]`, `[cap-credit:]`, `[precondition-ok:]`, plus the Lessons Learned channel's `[attend]` and the consumer-named harvest tags) are the state machine. Gates hold the grammar a coding agent selects work by, and five more arms of the same binary read the file: `queue-index` renders the compact selection surface, `queue-counts` tallies each task section for a status readout, `queue-edges` sums the citations pointing *at* an entry, `entry-history` reports the commits at which one entry's counted extent fell, and `roadmap` projects the entries curated with `[roadmap:]` onto a generated public page. A sixth, `--lesson-sink`, routes a harvested lesson body to its configured sink.
+A git-native, agent-readable task tracker: one Markdown file where `##` sections are queues, `### <slug>` headings are the tasks — each kebab-case slug the task's handle and link anchor — and square-bracket tags on the line under each heading (`[blocked-by:]`, `[spec:]`, `[drain-exempt:]`, `[roadmap:]`, `[observed-by:]`, `[cost:]`, `[surface:]`, `[cap-credit:]`, `[recurrence:]`, `[roadmap-summary:]`, `[not-icebox-eligible:]`, `[precondition-ok:]`, plus the Lessons Learned channel's `[attend]` and the consumer-named harvest tags) are the state machine. Gates hold the grammar a coding agent selects work by, and five more arms of the same binary read the file: `queue-index` renders the compact selection surface, `queue-counts` tallies each task section for a status readout, `queue-edges` sums the citations pointing *at* an entry, `entry-history` reports the commits at which one entry's counted extent fell, and `roadmap` projects the entries curated with `[roadmap:]` onto a generated public page. A sixth, `--lesson-sink`, routes a harvested lesson body to its configured sink, and `queue-migrate` rewrites a queue written in the older bullet grammar into headings, once, on upgrade.
 
-Why: an agent picks work by *parsing*, not reading — so everything selection trusts (section position, slugs, tags) must be grammar a gate can enforce, and everything a human writes freely (task prose) must stay off the parse path. Drift between what the prose says and what the parser sees is the failure mode; all but three of the gates each close one instance of it — a tag reflowed off its lead line, a duplicate slug, a lost task, a forward precondition stated in prose but never tagged. The three exceptions hold a different axis: projection freshness, and the deferred pool's filing contract — its per-entry budget and its lead-line board tags. See [SPEC.md](SPEC.md) for the full contracts.
+Why: an agent picks work by *parsing*, not reading — so everything selection trusts (section position, slugs, tags) must be grammar a gate can enforce, and everything a human writes freely (task prose) must stay off the parse path. Drift between what the prose says and what the parser sees is the failure mode; all but three of the gates each close one instance of it — a tag written off its tag line, a duplicate slug, a live reference left unlinked, a lost task, a forward precondition stated in prose but never tagged. The three exceptions hold a different axis: projection freshness, and the deferred pool's filing contract — its per-entry budget and its tag-line board tags. See [SPEC.md](SPEC.md) for the full contracts.
 
 An installer-vendored tree does not carry this file. The payload withholds each kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
 
@@ -28,7 +28,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    ```
    <!-- gate-roster:end -->
 
-   They resolve through gate-sdk's registry path (your gates dir first, then each kit's `checks/`), and their `# graph:` manifests put them in the generated pre-commit hook, written by `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names.
+   `check-queue-wrap` is for a queue you hard-wrap; if you keep it unwrapped, one line per paragraph as the template ships, leave it out and register canon-kit's `check-md-unwrapped` instead. They resolve through gate-sdk's registry path (your gates dir first, then each kit's `checks/`), and their `# graph:` manifests put them in the generated pre-commit hook, written by `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names.
 
 2. Give your queue file the section skeleton — copy `templates/TASK-QUEUE.md` and fill it in (it shows one example entry per grammar shape). The default sections are `New Features` / `Technical Debt` (active), `Deferred`, `Done` — plus an optional `Icebox` tier between the last two for backlogs whose carry weight has become the problem, off by default (`QUEUE_KIT_ICEBOX_SECTION`).
 
@@ -41,7 +41,7 @@ Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
 ```bash
 . "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
 "$gates" --emit queue-index                       # header + active (• ready / ✗ blocked) + deferred + icebox tally
-"$gates" --emit queue-index --collapse-deferred   # deferred as a per-### tally
+"$gates" --emit queue-index --collapse-deferred   # deferred as a one-line tally
 "$gates" --emit queue-index --extent <slug>       # inclusive line range of one entry's subtree
 "$gates" --emit queue-index --icebox-candidates   # the closing stage's eviction worklist
 "$gates" --emit queue-counts                       # "<key><TAB><count>", one line per task section, in configured order
@@ -52,6 +52,7 @@ Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
 "$gates" --lesson-sink <tag>                      # route a lesson body on stdin to its configured sink
 "$gates" --emit roadmap          # the public roadmap block, to stdout
 "$gates" --emit roadmap --write   # splice it into the configured projection page
+"$gates" --emit queue-migrate --write TASK-QUEUE.md   # once, on upgrade: bullet entries become ### headings with a tag line
 ```
 
 The roadmap projection is opt-in: it emits nothing until you set the horizon and track vocabularies and a projection page in your config (step 3 above), so an unconfigured consumer gets a clean skip rather than a kit-shaped roadmap.

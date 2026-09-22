@@ -270,9 +270,8 @@ pub fn comment_whitelisted(rel: &str, whitelist: &[String]) -> bool {
     whitelist.iter().any(|g| walk::pattern_match(g, rel))
 }
 
-// spec: canon-kit/SPEC.md §The shared spec adapters — `spec_queue_slugs`: one walk emitting live for a
-// bold lead-in bullet in an active or deferred section and done for a bare-slug bullet
-// outside them
+// spec: canon-kit/SPEC.md §The shared spec adapters — `spec_queue_slugs`: one walk emitting live for an
+// entry heading in an active or deferred section and done for a bare-slug bullet outside them
 // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the format is written again here
 // rather than `crate::queue`'s adapters called: canon-kit is one of its independent holders,
 // and two modules in one crate are still two holders where one shared function is not
@@ -300,10 +299,8 @@ pub fn queue_slugs(path: &Path) -> Result<QueueSlugs, String> {
             continue;
         }
         if active {
-            if let Some(rest) = bullet_lead(raw) {
-                if let Some(s) = bold_slug_at_start(rest) {
-                    out.live.push(s);
-                }
+            if let Some(s) = entry_heading_slug(raw) {
+                out.live.push(s.to_string());
             }
             continue;
         }
@@ -350,24 +347,12 @@ fn is_slug(s: &str) -> bool {
         .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || *c == b'-')
 }
 
-// spec: canon-kit/SPEC.md §The shared spec adapters — `\*\*[a-z0-9][a-z0-9-]*\*\*` at the bullet's lead-in,
-// which is where the guard regex already required it, so awk's leftmost match is this one
-fn bold_slug_at_start(rest: &str) -> Option<String> {
-    let b = rest.as_bytes();
-    if b.len() < 5 || b[0] != b'*' || b[1] != b'*' {
-        return None;
-    }
-    if !(b[2].is_ascii_lowercase() || b[2].is_ascii_digit()) {
-        return None;
-    }
-    let mut j = 3usize;
-    while j < b.len() && (b[j].is_ascii_lowercase() || b[j].is_ascii_digit() || b[j] == b'-') {
-        j += 1;
-    }
-    if j + 1 < b.len() && b[j] == b'*' && b[j + 1] == b'*' {
-        return Some(String::from_utf8_lossy(&b[2..j]).into_owned());
-    }
-    None
+// spec: queue-kit/SPEC.md §The queue format — the entry predicate re-implemented: `### <slug>`, or
+// `#### <slug>` for a sub-task, the heading's whole text the slug
+pub fn entry_heading_slug(line: &str) -> Option<&str> {
+    let rest = line.strip_prefix("#### ").or_else(|| line.strip_prefix("### "))?;
+    let slug = trim_posix_end(rest);
+    is_slug(slug).then_some(slug)
 }
 
 // spec: canon-kit/SPEC.md §The shared spec adapters — the manifest set as the members that sort it read

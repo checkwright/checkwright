@@ -4,7 +4,9 @@
 
 ## New Features
 
-- **precondition-latent** — revisit when spec-kit lands before starting this.
+### precondition-latent
+
+revisit when spec-kit lands before starting this.
 
 ## Technical Debt
 

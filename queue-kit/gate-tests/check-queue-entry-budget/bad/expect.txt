@@ -1,13 +1,14 @@
-beta-idea — 408cp (cap 270cp)
-zeta-idea — 278cp (cap 270cp)
-eta-idea — 301cp (cap 270cp), after discounting one recurrence: line
-nu-idea — 359cp (cap 270cp)
-mu-idea — stale credit: the entry measures 142cp, within the 270cp cap without it — delete the tag
+beta-idea — 404cp (cap 270cp)
+zeta-idea — 283cp (cap 270cp)
+eta-idea — 306cp (cap 270cp)
+nu-idea — 355cp (cap 270cp)
+mu-idea — stale credit: the entry measures 138cp, within the 270cp cap without it — delete the tag
 nu-idea — credit +500cp exceeds QUEUE_KIT_ENTRY_CREDIT_MAX (100cp)
-theta-idea — retired declaration grammar ruled:
+theta-idea — retired tag [ruled:]
 no 'Cost while deferred' field
 gamma-idea
 no defer date
-TASK-QUEUE.md:47: iota-idea
-TASK-QUEUE.md:52: kappa-idea
-delta-idea — 3 content lines; an icebox entry is exactly one
+TASK-QUEUE.md:49: iota-idea
+TASK-QUEUE.md:55: kappa-idea
+delta-idea — 2 content line(s); an icebox entry is its heading and exactly one sentence
+omicron-idea — 2 content line(s) and a tag line; an icebox entry is its heading and exactly one sentence

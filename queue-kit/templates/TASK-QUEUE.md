@@ -2,43 +2,55 @@
 
 ## Iteration: —
 
-  The lifecycle iteration header (lifecycle-kit): the composed-tree shape a
-  Checkwright consumer ships. A queue-only adopter with no lifecycle-kit
-  deletes this line and the `---` below; both are inert to the queue gates.
+  The lifecycle iteration header (lifecycle-kit), the shape a Checkwright consumer ships.
+
+  A queue-only adopter deletes this line and the `---` below; both are inert to the queue gates.
 
 ---
 
 ## New Features
 
-  The feature section: every entry here is spec-ready, carrying a `[spec:]` tag
-  whose ref names the amendment file its design lives in (written at the scope
-  stage). No example entry sits here — a spec-ready one would dangle its ref; the
-  grammar shapes are shown under Technical Debt, an active section with identical
-  grammar.
+  The feature section: every entry here is spec-ready, its `[spec:]` tag naming its amendment.
+
+  No example sits here, since a spec-ready one would dangle its ref; see Technical Debt.
 
 ## Technical Debt
 
-- **example-feature** — a top-level active entry: a bold kebab-case slug, an
-  em-dash, then free prose. Selection picks the first entry with no blocked-by
-  tag, in section order (see downstream-feature).
-- **downstream-feature** — an entry blocked on another. [blocked-by: example-feature]
-  - **example-subtask** — an indented bold bullet is a sub-task (same grammar,
-    same slug namespace).
-  - a plain indented bullet (no bold lead-in) is a prose note, left alone.
-- **example-debt** — the second active section; same grammar as New Features.
+### example-feature
+
+A top-level active entry: its slug is the heading, and its tags ride the line under it.
+
+Selection picks the first entry with no blocked-by tag, in section order.
+
+### downstream-feature
+
+[blocked-by: example-feature]
+
+An entry blocked on another, its blocker named on the tag line.
+
+It cites a live entry with a link: [example-feature](#example-feature).
+
+#### example-subtask
+
+A sub-task is a deeper heading inside its parent, with the same grammar.
+
+### example-debt
+
+The second active section; the same grammar as New Features.
 
 ## Deferred
 
-  Parked work, excluded from selection. `###` subsections are presentation
-  only (indented, so this note stays off the column-0 grammar path).
+  Parked work, excluded from selection.
 
-### Someday
+### example-deferred
 
-- **example-deferred** [cost: once/low] [surface: TASK-QUEUE.md] — a design-pending entry.
-  **Cost while deferred:** what staying parked costs — a red gate, a stale
-  doc, a foregone lever — for a later scope to weigh; the lead line carries its
-  class (when paid, then how much) and the root entry the work mainly changes.
-  Filed 2026-01-01 by scope — the defer date, its mark and date on one line.
+[cost: once/low] [surface: TASK-QUEUE.md]
+
+A design-pending entry, its cost class and primary surface on the tag line.
+
+**Cost while deferred:** what staying parked costs, for a later scope to weigh.
+
+Filed 2026-01-01 by scope — the defer date, its mark and date on one line.
 
 ## Done
 

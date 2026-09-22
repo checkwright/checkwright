@@ -22,33 +22,39 @@ fn fields(line: &str) -> (String, String, String, String, String) {
 }
 
 // spec: evidence-kit/SPEC.md §check-evidence-baseline — the queue's `<slug> <section>` walk: a
-// `## ` heading names the section, and a bold-slug bullet under it claims membership of it
+// `## ` heading names the section, and an entry heading under it (queue-kit/SPEC.md §The queue
+// format: `### <slug>`, or `#### <slug>` for a sub-task) or a bare line outside every entry claims it
 fn queue_entries(text: &str) -> Vec<(String, String)> {
+    let shaped = |s: &str| {
+        let b = s.as_bytes();
+        !b.is_empty()
+            && (b[0].is_ascii_lowercase() || b[0].is_ascii_digit())
+            && b.iter().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || *c == b'-')
+    };
     let mut sec = String::new();
     let mut out = Vec::new();
+    let mut in_entry = false;
     for line in text.lines() {
         if let Some(rest) = line.strip_prefix("##") {
             if rest.starts_with([' ', '\t']) {
                 sec = rest.trim_start_matches([' ', '\t']).trim_end().to_string();
+                in_entry = false;
                 continue;
             }
         }
-        let Some(after_dash) = line.strip_prefix('-') else {
-            continue;
+        let slug = match line.strip_prefix("#### ").or_else(|| line.strip_prefix("### ")) {
+            Some(rest) => {
+                in_entry = true;
+                rest.trim_end()
+            }
+            None => match line.strip_prefix("- ").filter(|_| !in_entry) {
+                Some(rest) => rest.trim(),
+                None => continue,
+            },
         };
-        if !after_dash.starts_with([' ', '\t']) {
-            continue;
+        if shaped(slug) {
+            out.push((slug.to_string(), sec.clone()));
         }
-        let rest = after_dash.trim_start_matches([' ', '\t']);
-        let Some(rest) = rest.strip_prefix("**") else {
-            continue;
-        };
-        let Some(end) = rest.find("**") else { continue };
-        let slug = &rest[..end];
-        if slug.is_empty() || slug.contains('*') {
-            continue;
-        }
-        out.push((slug.to_string(), sec.clone()));
     }
     out
 }
@@ -382,11 +388,11 @@ mod tests {
         );
     }
 
-    // spec: evidence-kit/SPEC.md §check-evidence-baseline — a bold-slug bullet claims the
-    // section it sits under, and a `### ` heading is not a section line
+    // spec: evidence-kit/SPEC.md §check-evidence-baseline — an entry heading claims the section it
+    // sits under, a `### ` heading is not a section line, and a non-slug heading claims nothing
     #[test]
-    fn a_bullet_claims_the_section_heading_above_it() {
-        let q = "## New Features\n- **live-one** — x\n### Sub\n## Done\n- **gone** — y\nnot a bullet\n";
+    fn an_entry_heading_claims_the_section_heading_above_it() {
+        let q = "## New Features\n### live-one\nx\n- body-item\n### Sub\n## Done\n- gone\n- **bold** not an entry\n";
         assert_eq!(
             queue_entries(q),
             vec![

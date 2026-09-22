@@ -1,5 +1,5 @@
 // spec: queue-kit/SPEC.md §check-queue-wrap — no queue line exceeds the wrap budget (Unicode
-// code points), so a runaway never reflows to column 0
+// code points), so a runaway never reflows a tag off its tag line
 use crate::queue;
 
 // comment-tier-exempt: the shell side reaches code-point width by making awk bytewise under
@@ -18,7 +18,7 @@ fn is_table_row(line: &str) -> bool {
 
 // spec: queue-kit/SPEC.md §check-queue-wrap — the discount removes one well-formed cost tag and one
 // surface tag naming an existing root entry, each with one adjacent space, and nothing else, so a
-// discounted lead line stays inside the bound that section states
+// discounted tag line stays inside the bound that section states
 fn discount_board_tags(line: &str, root_has: &dyn Fn(&str) -> bool) -> String {
     let mut s = line.to_string();
     for name in ["cost", "surface"] {
@@ -58,6 +58,9 @@ fn scan(
     let mut over: Vec<(usize, usize, String)> = Vec::new();
     let mut fence = false;
     let mut in_deferred = false;
+    // spec: queue-kit/SPEC.md §check-queue-wrap — the discounted line is a deferred entry's tag
+    // line: the first non-blank line under its `###` heading, when it holds only tags
+    let mut after_heading = false;
     for (i, line) in text.lines().enumerate() {
         if queue::is_section_line(line) {
             in_deferred = queue::heading_name(line) == Some(deferred);
@@ -69,10 +72,11 @@ fn scan(
         if fence || is_table_row(line) {
             continue;
         }
-        let measured = if in_deferred
-            && queue::is_top_level_bullet(line)
-            && queue::bullet_slug(line).is_some()
-        {
+        let tag_line = after_heading && queue::is_tag_line(line);
+        if !line.trim().is_empty() {
+            after_heading = in_deferred && queue::entry_heading(line).is_some_and(|(l, _)| l == 3);
+        }
+        let measured = if tag_line {
             discount_board_tags(line, root_has)
         } else {
             line.to_string()
@@ -143,13 +147,13 @@ pub fn run(args: &[String]) -> i32 {
             "check-queue-wrap: line(s) over the {}-column budget (a runaway",
             budget
         );
-        println!("that reflows to column 0 corrupts the '- ' lead the tools key on):");
+        println!("that an editor reflows can push a tag off the tag line the tools key on):");
         for (ln, w, text) in &over {
             println!("  {}:{}: {} cols — {}", file, ln, w, text);
         }
         println!("  help: hard-wrap the line under the budget. Exempt already: table rows,");
         println!("        fenced code, and a line over budget solely from one unbreakable token;");
-        println!("        a deferred lead line's one [cost:] and one [surface:] tag go uncounted.");
+        println!("        a deferred tag line's one [cost:] and one [surface:] tag go uncounted.");
         return 1;
     }
 
@@ -170,7 +174,7 @@ mod tests {
 
     fn tagged_lead() -> String {
         format!(
-            "- **slug** [cost: iteration/high] [surface: queue-kit] — {}",
+            "[cost: iteration/high] [surface: queue-kit] [spec: {}]",
             "x".repeat(70)
         )
     }
@@ -192,25 +196,25 @@ mod tests {
     }
 
     #[test]
-    fn a_tagged_deferred_lead_line_is_measured_without_its_board_tags() {
+    fn a_tagged_deferred_tag_line_is_measured_without_its_board_tags() {
         let lead = tagged_lead();
         assert!(cplen(&lead) > 100);
-        let text = format!("## Deferred\n\n{}\n", lead);
+        let text = format!("## Deferred\n\n### slug\n\n{}\n", lead);
         assert!(scan(&text, 100, "Deferred", &root).is_empty());
     }
 
     #[test]
-    fn a_prose_continuation_line_over_budget_still_reds() {
+    fn a_body_line_over_budget_still_reds() {
         let text = format!(
-            "## Deferred\n\n- **slug** [cost: once/low] [surface: queue-kit] — x\n  {}\n",
+            "## Deferred\n\n### slug\n\n[cost: once/low] [surface: queue-kit]\n\n{}\n",
             "word ".repeat(21)
         );
         assert_eq!(scan(&text, 100, "Deferred", &root).len(), 1);
     }
 
     #[test]
-    fn an_active_lead_line_carrying_the_tags_is_not_discounted() {
-        let text = format!("## New Features\n\n{}\n", tagged_lead());
+    fn an_active_tag_line_carrying_the_tags_is_not_discounted() {
+        let text = format!("## New Features\n\n### slug\n\n{}\n", tagged_lead());
         assert_eq!(scan(&text, 100, "Deferred", &root).len(), 1);
     }
 

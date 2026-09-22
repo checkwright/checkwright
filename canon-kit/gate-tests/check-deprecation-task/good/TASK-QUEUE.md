@@ -6,13 +6,17 @@
 
 ## New Features
 
-- **retire-legacy-widget** — decommission the deprecated widget wiring.
+### retire-legacy-widget
+
+decommission the deprecated widget wiring.
 
 ## Technical Debt
 
 ## Deferred
 
-- **later-teardown** — a deferred teardown.
+### later-teardown
+
+a deferred teardown.
 
 ## Done
 

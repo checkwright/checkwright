@@ -16,7 +16,7 @@ const LOW_CLASS: [&str; 2] = ["event/low", "once/low"];
 const USAGE: &str = "\
 usage: --emit queue-index [--collapse-deferred] [--extent <slug>] [--icebox-candidates] [queue-file]
   default: header + active (• ready / ✗ blocked) + deferred titles and board tags + icebox tally;
-  --collapse-deferred: per-### tally; --extent <slug>: \"<start> <end>\";
+  --collapse-deferred: deferred tally; --extent <slug>: \"<start> <end>\";
   --icebox-candidates: eviction worklist (• eligible / ✗ excluded, cause in place of the class)
 ";
 
@@ -105,56 +105,40 @@ fn truncate_chars(s: &str, cap: usize) -> String {
     }
 }
 
-// spec: queue-kit/SPEC.md §The queue-index arm — awk's `gsub(/\[[^]]*\]/, "", t)`: every bracketed
-// tag comes off before the slug-and-dash strip, so the dash is adjacent when that strip runs.
-fn remove_bracketed(s: &str) -> String {
+// spec: queue-kit/SPEC.md §The queue-index arm — a markdown link renders as its text, so a summary
+// citing a live entry reads as prose rather than as link syntax
+fn plain(s: &str) -> String {
     let mut out = String::with_capacity(s.len());
     let mut rest = s;
     while let Some(open) = rest.find('[') {
-        match rest[open + 1..].find(']') {
-            Some(rel) => {
+        let after = &rest[open + 1..];
+        let link = after.find("](").and_then(|m| after[m + 2..].find(')').map(|c| (m, m + 2 + c)));
+        match link {
+            Some((m, c)) if !after[..m].contains(['[', ']']) => {
                 out.push_str(&rest[..open]);
-                rest = &rest[open + 1 + rel + 1..];
+                out.push_str(&after[..m]);
+                rest = &after[c + 1..];
             }
-            None => break,
+            _ => {
+                out.push_str(&rest[..open + 1]);
+                rest = after;
+            }
         }
     }
     out.push_str(rest);
     out
 }
 
-// spec: queue-kit/SPEC.md §The queue-index arm — awk's
-// `^\*\*[a-z0-9][a-z0-9-]*\*\*[[:space:]]*(—[[:space:]]*)?`: the em-dash separator goes with the
-// slug, so a lead line that is all tag renders as the bare slug and not an orphaned separator.
-fn strip_slug_and_dash(s: &str) -> String {
-    let b = s.as_bytes();
-    if b.len() < 5 || b[0] != b'*' || b[1] != b'*' {
-        return s.to_string();
-    }
-    let head = b[2];
-    if !(head.is_ascii_lowercase() || head.is_ascii_digit()) {
-        return s.to_string();
-    }
-    let mut j = 3usize;
-    while j < b.len() && (b[j].is_ascii_lowercase() || b[j].is_ascii_digit() || b[j] == b'-') {
-        j += 1;
-    }
-    if !(j + 1 < b.len() && b[j] == b'*' && b[j + 1] == b'*') {
-        return s.to_string();
-    }
-    let mut rest = &s[j + 2..];
-    rest = rest.trim_start_matches([' ', '\t']);
-    if let Some(r) = rest.strip_prefix('—') {
-        rest = r.trim_start_matches([' ', '\t']);
-    }
-    rest.to_string()
-}
-
-fn title(line: &str) -> String {
-    let t = queue::strip_bullet_lead(line).unwrap_or(line);
-    let t = remove_bracketed(t);
-    let t = strip_slug_and_dash(&t);
-    truncate_chars(t.trim_matches([' ', '\t']), TITLE_CAP)
+// spec: queue-kit/SPEC.md §The queue-index arm — the title is the entry's summary, its first body
+// paragraph before any sub-task, and an entry with none renders as the bare slug
+fn title(lines: &[&str], e: &queue::Entry) -> String {
+    let summary = e
+        .body_lines()
+        .map(|i| lines[i])
+        .take_while(|l| queue::heading_level(l).is_none())
+        .find(|l| !l.trim().is_empty())
+        .unwrap_or("");
+    truncate_chars(plain(summary).trim_matches([' ', '\t']), TITLE_CAP)
 }
 
 fn joined(slug: &str, t: &str) -> String {
@@ -184,16 +168,6 @@ fn blockers(line: &str) -> String {
     queue::blocked_by(line).join(", ")
 }
 
-#[derive(PartialEq)]
-enum Sec {
-    None,
-    Active,
-    Deferred,
-    Icebox,
-    Lessons,
-    Other,
-}
-
 fn index(text: &str, collapse: bool) -> Result<String, String> {
     let sec_cfg = Sections::active_and_deferred()?;
     let cap: usize = queue::knob_scalar("QUEUE_KIT_ATTEND_CAP")?
@@ -208,95 +182,49 @@ fn index(text: &str, collapse: bool) -> Result<String, String> {
         out.push('\n');
     }
 
-    let mut sec = Sec::None;
-    let mut cur_sub = String::new();
+    let lines: Vec<&str> = text.lines().collect();
     let mut active: Vec<(char, String)> = Vec::new();
     let mut deferred: Vec<String> = Vec::new();
-    let mut tally_order: Vec<String> = Vec::new();
-    let mut tally: Vec<(String, usize)> = Vec::new();
     let mut icebox_n = 0usize;
+    for e in queue::entries(&lines, &sec_cfg).iter().filter(|e| e.level == 3) {
+        let tags = e.tags(&lines);
+        if sec_cfg.active.contains(&e.section) {
+            let bl = blockers(tags);
+            let mark = if bl.is_empty() { '•' } else { '✗' };
+            let mut row = joined(&e.slug, &title(&lines, e));
+            if !bl.is_empty() {
+                row.push_str(&format!("   [blocked-by: {}]", bl));
+            }
+            if let Some(d) = drain_exempt(tags) {
+                row.push_str(&format!("   [drain-exempt: {}]", d));
+            }
+            active.push((mark, row));
+        } else if sec_cfg.is_deferred(&e.section) {
+            let mut row = joined(&e.slug, &title(&lines, e));
+            for name in BOARD_TAGS {
+                if let Some(t) = queue::field_tags(tags, name).first() {
+                    row.push_str(&format!("   [{}: {}]", name, t.raw.trim()));
+                }
+            }
+            deferred.push(row);
+        } else {
+            icebox_n += 1;
+        }
+    }
+
     let mut attend_n = 0usize;
     let mut attend: Vec<String> = Vec::new();
-
-    for line in text.lines() {
-        if sec_cfg.is_deferred(line) {
-            sec = Sec::Deferred;
-            continue;
-        }
-        if let Some(name) = queue::heading_name(line) {
-            if sec_cfg.active.iter().any(|a| a == name) {
-                sec = Sec::Active;
-                continue;
-            }
-        }
-        if sec_cfg.is_icebox(line) {
-            sec = Sec::Icebox;
-            continue;
-        }
-        if queue::is_lessons_line(line) {
-            sec = Sec::Lessons;
-            continue;
-        }
+    let mut in_lessons = false;
+    for line in &lines {
         if queue::is_section_line(line) {
-            sec = Sec::Other;
+            in_lessons = queue::is_lessons_line(line);
             continue;
         }
-
-        match sec {
-            Sec::Icebox => {
-                if is_top_level_bullet(line) && queue::first_bold_slug(line).is_some() {
-                    icebox_n += 1;
-                }
+        if in_lessons && is_top_level_bullet(line) && line.contains("[attend]") {
+            attend_n += 1;
+            if attend_n <= cap {
+                attend.push(line.trim_end_matches([' ', '\t']).to_string());
             }
-            Sec::Lessons => {
-                if is_top_level_bullet(line) && line.contains("[attend]") {
-                    attend_n += 1;
-                    if attend_n <= cap {
-                        attend.push(line.trim_end_matches([' ', '\t']).to_string());
-                    }
-                }
-            }
-            Sec::Active => {
-                if is_top_level_bullet(line) {
-                    if let Some(slug) = queue::first_bold_slug(line) {
-                        let bl = blockers(line);
-                        let de = drain_exempt(line);
-                        let mark = if bl.is_empty() { '•' } else { '✗' };
-                        let mut row = joined(slug, &title(line));
-                        if !bl.is_empty() {
-                            row.push_str(&format!("   [blocked-by: {}]", bl));
-                        }
-                        if let Some(d) = de {
-                            row.push_str(&format!("   [drain-exempt: {}]", d));
-                        }
-                        active.push((mark, row));
-                    }
-                }
-            }
-            Sec::Deferred => {
-                if let Some(rest) = line.strip_prefix("### ") {
-                    cur_sub = rest.trim_end_matches([' ', '\t']).to_string();
-                } else if is_top_level_bullet(line) {
-                    if let Some(slug) = queue::first_bold_slug(line) {
-                        let key = if cur_sub.is_empty() { "(top)".to_string() } else { cur_sub.clone() };
-                        match tally.iter_mut().find(|(k, _)| *k == key) {
-                            Some((_, n)) => *n += 1,
-                            None => {
-                                tally_order.push(key.clone());
-                                tally.push((key.clone(), 1));
-                            }
-                        }
-                        let mut row = joined(slug, &title(line));
-                        for name in BOARD_TAGS {
-                            if let Some(t) = queue::field_tags(line, name).first() {
-                                row.push_str(&format!("   [{}: {}]", name, t.raw.trim()));
-                            }
-                        }
-                        deferred.push(row);
-                    }
-                }
-            }
-            _ => {}
         }
     }
 
@@ -310,12 +238,10 @@ fn index(text: &str, collapse: bool) -> Result<String, String> {
     out.push('\n');
     if collapse {
         out.push_str("Deferred (tally):\n");
-        if tally_order.is_empty() {
+        if deferred.is_empty() {
             out.push_str("  (none)\n");
-        }
-        for key in &tally_order {
-            let n = tally.iter().find(|(k, _)| k == key).map(|(_, n)| *n).unwrap_or(0);
-            out.push_str(&format!("  {}: {}\n", key, n));
+        } else {
+            out.push_str(&format!("  (top): {}\n", deferred.len()));
         }
     } else {
         out.push_str("Deferred:\n");
@@ -346,31 +272,13 @@ fn extent(text: &str, slug: &str) -> Result<String, String> {
     if slug.is_empty() {
         return Err("--extent needs a <slug>".to_string());
     }
-    let mut start = 0usize;
-    let mut ind = 0usize;
-    let mut found = false;
-    let mut n = 0usize;
-    for (i, line) in text.lines().enumerate() {
-        n = i + 1;
-        if !found {
-            if let Some(s) = queue::bullet_slug(line) {
-                if s == slug {
-                    found = true;
-                    start = n;
-                    ind = queue::indent(line);
-                }
+    let lines: Vec<&str> = text.lines().collect();
+    for (i, line) in lines.iter().enumerate() {
+        if let Some((level, s)) = queue::entry_heading(line) {
+            if s == slug {
+                return Ok(format!("{} {}\n", i + 1, queue::extent_end(&lines, i, level)));
             }
-            continue;
         }
-        if line.starts_with('#') || line.trim_end_matches([' ', '\t']) == "---" {
-            return Ok(format!("{} {}\n", start, n - 1));
-        }
-        if queue::is_bullet(line) && queue::indent(line) <= ind {
-            return Ok(format!("{} {}\n", start, n - 1));
-        }
-    }
-    if found {
-        return Ok(format!("{} {}\n", start, n));
     }
     Err(format!("slug not found: {}", slug))
 }
@@ -447,20 +355,13 @@ fn ineligibility(e: &Pending, cutoff: &str, live: &[String]) -> Option<(String, 
         return Some(("[roadmap] tag — not icebox-eligible".to_string(), String::new()));
     }
     // spec: queue-kit/SPEC.md §The queue-index arm — a written standing cause outranks an inferred trigger
-    for line in e.body.lines() {
-        if let Some(rest) = line.trim_start().strip_prefix("not-icebox-eligible:") {
-            return Some(standing(rest));
-        }
+    if let Some(t) = queue::field_tags(&e.lead, "not-icebox-eligible").first() {
+        return Some(standing(t.raw));
     }
-    for line in e.body.lines() {
-        let t = line.trim_start();
-        if !t.starts_with("recurrence:") {
-            continue;
-        }
-        // spec: queue-kit/SPEC.md §The icebox tier — a recurrence ages on the entry's own window
-        if let Some(d) = last_date(t).filter(|d| *d >= cutoff) {
-            return Some((format!("[recurrence] re-filed {} — live trigger", d), String::new()));
-        }
+    // spec: queue-kit/SPEC.md §The icebox tier — a recurrence ages on the entry's own window, read
+    // off the array's last element
+    if let Some(d) = queue::recurrence_dates(&e.lead).last().filter(|d| **d >= cutoff) {
+        return Some((format!("[recurrence] re-filed {} — live trigger", d), String::new()));
     }
     for s in live {
         if *s == e.slug {
@@ -474,7 +375,7 @@ fn ineligibility(e: &Pending, cutoff: &str, live: &[String]) -> Option<(String, 
 }
 
 fn standing(rest: &str) -> (String, String) {
-    let fields: Vec<&str> = rest.split_whitespace().skip(1).collect();
+    let fields: Vec<&str> = rest.split_whitespace().collect();
     let (date, grounds) = match fields.split_first() {
         Some((d, g)) if d.len() == 10 && has_date(d) => (*d, g),
         _ => ("(undated)", &fields[..]),
@@ -549,36 +450,27 @@ fn candidates(text: &str) -> Result<String, String> {
             .collect(),
     };
     let mut out = String::new();
-    let mut in_deferred = false;
-    let mut pending: Option<Pending> = None;
-    for (i, line) in text.lines().enumerate() {
-        let n = i + 1;
-        if queue::is_section_line(line) {
-            flush(&mut pending, &sizes, &cutoff, &live, &mut out);
-            in_deferred = sec_cfg.is_deferred(line);
+    let lines: Vec<&str> = text.lines().collect();
+    for e in queue::entries(&lines, &sec_cfg) {
+        if e.level != 3 || !sec_cfg.is_deferred(&e.section) {
             continue;
         }
-        if !in_deferred {
-            continue;
+        let tags = e.tags(&lines);
+        let mut p = Pending {
+            slug: e.slug.clone(),
+            start: e.start + 1,
+            marks: queue::DeferMarks::default(),
+            cost: lead_class(tags),
+            lead: tags.to_string(),
+            body: String::new(),
+        };
+        for i in e.body_lines() {
+            p.body.push_str(lines[i]);
+            p.body.push('\n');
+            p.marks.observe(lines[i]);
         }
-        if let Some(slug) = queue::bullet_slug(line) {
-            flush(&mut pending, &sizes, &cutoff, &live, &mut out);
-            pending = Some(Pending {
-                slug: slug.to_string(),
-                start: n,
-                marks: queue::DeferMarks::default(),
-                cost: lead_class(line),
-                lead: line.to_string(),
-                body: String::new(),
-            });
-            continue;
-        }
-        let Some(e) = pending.as_mut() else { continue };
-        e.body.push_str(line);
-        e.body.push('\n');
-        e.marks.observe(line);
+        flush(&mut Some(p), &sizes, &cutoff, &live, &mut out);
     }
-    flush(&mut pending, &sizes, &cutoff, &live, &mut out);
     Ok(out)
 }
 
@@ -586,9 +478,9 @@ fn candidates(text: &str) -> Result<String, String> {
 mod tests {
     use super::*;
 
-    // spec: queue-kit/SPEC.md §The queue-index arm — the rendering cases the shell fixture used to
-    // pin, moved here with the tool: tag residue, the multi-tag lead line, the drain-exempt echo,
-    // the empty title, and the attend block's cap and overflow across both index renderings.
+    // spec: queue-kit/SPEC.md §The queue-index arm — the rendering cases: the title is the summary
+    // with a link rendered as its text, the multi-tag tag line, the drain-exempt echo, the empty
+    // title, and the attend block's cap and overflow across both index renderings.
     const Q: &str = "\
 # TASK-QUEUE.md
 
@@ -596,18 +488,47 @@ mod tests {
 
 ## New Features
 
-- **feat-tagged** [spec: SPEC-x.md] — a tagged active entry.
-- **feat-two-tags** [spec: SPEC-x.md] [roadmap: later/thing] — two tags here.
-- **feat-alltag** [spec: SPEC-x.md]
-- **feat-exempt** [drain-exempt: half pending] — exempt and titled.
-- **feat-blocked** [blocked-by: feat-tagged] — waiting on one.
+### feat-tagged
+
+[spec: SPEC-x.md]
+
+a tagged active entry.
+
+### feat-two-tags
+
+[spec: SPEC-x.md] [roadmap: later/thing]
+
+two tags here, citing [feat-tagged](#feat-tagged).
+
+### feat-alltag
+
+[spec: SPEC-x.md]
+
+### feat-exempt
+
+[drain-exempt: half pending]
+
+exempt and titled.
+
+### feat-blocked
+
+[blocked-by: feat-tagged]
+
+waiting on one.
 
 ## Technical Debt
 
 ## Deferred
 
-- **def-tagged** [cost: event/low] [surface: queue-kit] — a tagged deferred entry.
-- **def-alltag** [spec: some-kit/SPEC.md §A Long Pointer Section]
+### def-tagged
+
+[cost: event/low] [surface: queue-kit]
+
+a tagged deferred entry.
+
+### def-alltag
+
+[spec: some-kit/SPEC.md §A Long Pointer Section]
 
 ## Done
 
@@ -631,7 +552,7 @@ mod tests {
     fn a_tag_comes_off_without_leaving_the_separator_it_sat_next_to() {
         let out = render(false, 3);
         assert!(out.contains("• feat-tagged — a tagged active entry."), "{}", out);
-        assert!(out.contains("• feat-two-tags — two tags here."), "{}", out);
+        assert!(out.contains("• feat-two-tags — two tags here, citing feat-tagged."), "{}", out);
         assert!(out.contains("def-tagged — a tagged deferred entry."), "{}", out);
     }
 
@@ -715,13 +636,13 @@ mod tests {
     }
 
     // spec: queue-kit/SPEC.md §The queue-index arm — extent is the range an eviction deletes, so it
-    // ends at the line before the next same-or-shallower bullet, heading or separator.
+    // ends at the line before the next same-or-shallower heading or separator.
     #[test]
     fn extent_ends_at_the_line_before_the_next_entry() {
         let r = extent(Q, "feat-tagged").expect("extent failed");
-        assert_eq!(r, "7 7\n", "{}", r);
+        assert_eq!(r, "7 12\n", "{}", r);
         let r = extent(Q, "def-alltag").expect("extent failed");
-        assert_eq!(r, "18 19\n", "{}", r);
+        assert_eq!(r, "45 48\n", "{}", r);
         assert!(extent(Q, "no-such-slug").is_err());
     }
 
@@ -730,6 +651,7 @@ mod tests {
     #[test]
     fn a_slug_is_named_only_where_it_stands_as_a_whole_token() {
         assert!(names_slug("held by `some-slug` today", "some-slug"));
+        assert!(names_slug("held by [some-slug](#some-slug) today", "some-slug"));
         assert!(names_slug("[blocked-by: some-slug]", "some-slug"));
         assert!(!names_slug("names some-slug-extended instead", "some-slug"));
         assert!(!names_slug("names a-some-slug instead", "some-slug"));
@@ -738,19 +660,19 @@ mod tests {
 
     const CUT: &str = "2026-07-01";
 
-    // spec: queue-kit/SPEC.md §The icebox tier — a recurrence is live only while its newest date
-    // is inside the age window, and the cause prints that date.
+    // spec: queue-kit/SPEC.md §The icebox tier — a recurrence is live only while the array's last
+    // date is inside the age window, and the cause prints that date.
     #[test]
     fn a_recurrence_is_live_only_while_its_newest_date_is_inside_the_window() {
         let live: Vec<String> = vec![];
-        let r = ineligibility(&pend("- **subject** — t.", "  recurrence: subject 2026-07-01\n"), CUT, &live);
+        let r = ineligibility(&pend("[recurrence: 2026-07-01]", "t.\n"), CUT, &live);
         assert_eq!(full(r).unwrap(), "[recurrence] re-filed 2026-07-01 — live trigger");
-        let r = ineligibility(&pend("- **subject** — t.", "  recurrence: subject 2026-05-01 2026-06-30\n"), CUT, &live);
+        let r = ineligibility(&pend("[recurrence: 2026-05-01, 2026-06-30]", "t.\n"), CUT, &live);
         assert!(r.is_none(), "an aged recurrence is no live trigger: {:?}", r);
-        let r = ineligibility(&pend("- **subject** — t.", "  recurrence: subject 2026-05-01 2026-08-02\n"), CUT, &live);
+        let r = ineligibility(&pend("[recurrence: 2026-05-01, 2026-08-02]", "t.\n"), CUT, &live);
         assert_eq!(full(r).unwrap(), "[recurrence] re-filed 2026-08-02 — live trigger");
         let live = vec!["other".to_string()];
-        let r = ineligibility(&pend("- **subject** — t.", "  recurrence: subject 2026-05-01\n  waits on `other`.\n"), CUT, &live);
+        let r = ineligibility(&pend("[recurrence: 2026-05-01]", "waits on [other](#other).\n"), CUT, &live);
         assert_eq!(full(r).unwrap(), "[trigger] names live slug other");
     }
 
@@ -765,50 +687,49 @@ mod tests {
         }
     }
 
-    // spec: queue-kit/SPEC.md §The icebox tier — all three categorical triggers, plus the two
-    // near-misses the grammar creates: the self-naming `recurrence:` mandates, and an undated
-    // `recurrence:` line, neither of which is a live trigger.
     // spec: queue-kit/SPEC.md §The queue-index arm — a cause's fixed prefix and variable tail,
     // joined uncapped, is exactly the row a reader saw before the cap ever applies.
     fn full(r: Option<(String, String)>) -> Option<String> {
         r.map(|(prefix, tail)| format!("{}{}", prefix, tail))
     }
 
+    // spec: queue-kit/SPEC.md §The icebox tier — all three categorical triggers, plus the two
+    // near-misses: self-naming, and a recurrence tag carrying no date, neither a live trigger.
     #[test]
     fn every_categorical_trigger_is_decided_and_self_naming_is_not_one() {
         let live = vec!["other".to_string(), "subject".to_string()];
-        let r = ineligibility(&pend("- **subject** [roadmap: now/x] — t.", ""), CUT, &live);
+        let r = ineligibility(&pend("[roadmap: now/x]", ""), CUT, &live);
         assert!(full(r).unwrap().starts_with("[roadmap]"));
-        let r = ineligibility(&pend("- **subject** — t.", "  recurrence: subject 2026-08-01\n"), CUT, &live);
+        let r = ineligibility(&pend("[recurrence: 2026-08-01]", ""), CUT, &live);
         assert!(full(r).unwrap().starts_with("[recurrence]"));
-        let r = ineligibility(&pend("- **subject** — t.", "  waits on `other` landing.\n"), CUT, &live);
+        let r = ineligibility(&pend("", "waits on [other](#other) landing.\n"), CUT, &live);
         assert_eq!(full(r).unwrap(), "[trigger] names live slug other");
-        let r = ineligibility(&pend("- **subject** — t.", "  subject is the whole of it.\n"), CUT, &live);
+        let r = ineligibility(&pend("", "subject is the whole of it.\n"), CUT, &live);
         assert!(r.is_none(), "self-naming is narration, not a trigger: {:?}", r);
-        let r = ineligibility(&pend("- **subject** — t.", "  recurrence: subject soon\n"), CUT, &live);
-        assert!(r.is_none(), "an undated recurrence line is no re-filing: {:?}", r);
+        let r = ineligibility(&pend("[recurrence: soon]", ""), CUT, &live);
+        assert!(r.is_none(), "an undated recurrence tag is no re-filing: {:?}", r);
     }
 
     // spec: queue-kit/SPEC.md §The queue-index arm — the standing cause's place in the order and its
-    // printed form, an absent date or grounds appearing rather than vanishing, and the declaration's
-    // own lead token dropped from the printed prefix.
+    // printed form, an absent date or grounds appearing rather than vanishing, and the tag's own
+    // name dropped from the printed prefix.
     #[test]
-    fn a_standing_declaration_is_decided_after_the_tag_and_before_the_recurrence_line() {
+    fn a_standing_tag_is_decided_after_the_roadmap_tag_and_before_the_recurrence() {
         let live = vec!["other".to_string()];
-        let decl = "  not-icebox-eligible: subject 2026-08-17 eviction spends the clause\n";
-        let r = ineligibility(&pend("- **subject** — t.", decl), CUT, &live);
+        let decl = "[not-icebox-eligible: 2026-08-17 eviction spends the clause]";
+        let r = ineligibility(&pend(decl, ""), CUT, &live);
         assert_eq!(full(r).unwrap(), "[standing] 2026-08-17 — eviction spends the clause");
-        let r = ineligibility(&pend("- **subject** [roadmap: now/x] — t.", decl), CUT, &live);
+        let r = ineligibility(&pend(&format!("[roadmap: now/x] {}", decl), ""), CUT, &live);
         assert!(full(r).unwrap().starts_with("[roadmap]"));
-        let body = format!("  recurrence: subject 2026-08-01\n  waits on `other`.\n{}", decl);
-        let r = ineligibility(&pend("- **subject** — t.", &body), CUT, &live);
+        let lead = format!("[recurrence: 2026-08-01] {}", decl);
+        let r = ineligibility(&pend(&lead, "waits on [other](#other).\n"), CUT, &live);
         assert!(full(r).as_deref().unwrap_or("").starts_with("[standing]"));
-        let r = ineligibility(&pend("- **subject** — t.", "  not-icebox-eligible: subject grounds only\n"), CUT, &live);
+        let r = ineligibility(&pend("[not-icebox-eligible: grounds only]", ""), CUT, &live);
         assert_eq!(full(r).unwrap(), "[standing] (undated) — grounds only");
-        let r = ineligibility(&pend("- **subject** — t.", "  not-icebox-eligible: subject 2026-08-17\n"), CUT, &live);
+        let r = ineligibility(&pend("[not-icebox-eligible: 2026-08-17]", ""), CUT, &live);
         assert_eq!(full(r).unwrap(), "[standing] 2026-08-17 — (ungrounded)");
-        let r = ineligibility(&pend("- **subject** — t.", "  prose naming not-icebox-eligible: mid-line.\n"), CUT, &live);
-        assert!(r.is_none(), "only a line led by the token declares: {:?}", r);
+        let r = ineligibility(&pend("", "prose naming not-icebox-eligible: mid-line.\n"), CUT, &live);
+        assert!(r.is_none(), "only the tag declares: {:?}", r);
     }
 
     // spec: queue-kit/SPEC.md §The queue-index arm — the cap binds the variable tail and never the
@@ -817,8 +738,8 @@ mod tests {
     fn the_cap_binds_the_variable_tail_and_never_the_class_prefix() {
         let live: Vec<String> = vec![];
         let long = "a very long declared reason that runs well past the forty eight character mark on its own";
-        let decl = format!("  not-icebox-eligible: subject 2026-08-17 {}\n", long);
-        let (prefix, tail) = ineligibility(&pend("- **subject** — t.", &decl), CUT, &live).unwrap();
+        let decl = format!("[not-icebox-eligible: 2026-08-17 {}]", long);
+        let (prefix, tail) = ineligibility(&pend(&decl, ""), CUT, &live).unwrap();
         assert_eq!(prefix, "[standing] 2026-08-17 — ");
         assert!(!prefix.contains("not-icebox-eligible"), "{}", prefix);
         assert!(tail.chars().count() > CAUSE_CAP, "fixture must exceed the cap: {}", tail);
@@ -827,10 +748,19 @@ mod tests {
         assert!(capped.ends_with('…'), "{}", capped);
     }
 
-    fn worklist(q: &str) -> String {
+    // spec: queue-kit/SPEC.md §The queue-migrate arm — the worklist cases are written in the retired
+    // bullet grammar and read through the migration arm, which makes each one a case of that arm too
+    fn worklist(legacy: &str) -> String {
+        let sec = Sections {
+            active: vec!["New Features".into()],
+            deferred: "Deferred".into(),
+            icebox: String::new(),
+            done: "Done".into(),
+        };
+        let q = crate::emit::queue_migrate::convert(legacy, &sec).expect("migration failed");
         let knobs = crate::knobenv::lock();
         knobs.set("QUEUE_KIT_ICEBOX_AGE_DAYS", "7");
-        let out = candidates(q).expect("candidates failed");
+        let out = candidates(&q).expect("candidates failed");
         knobs.remove("QUEUE_KIT_ICEBOX_AGE_DAYS");
         out
     }

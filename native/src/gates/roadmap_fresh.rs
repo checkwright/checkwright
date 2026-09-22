@@ -1,5 +1,5 @@
 // spec: queue-kit/SPEC.md §check-roadmap-fresh — every [roadmap:] tag names a configured horizon
-// and track and pairs with exactly one roadmap-summary: declaration, and the projection page's
+// and track and pairs with exactly one [roadmap-summary:] tag, and the projection page's
 // marker block is the byte-fresh emission of the roadmap arm
 use crate::emit::roadmap;
 use crate::fresh;
@@ -54,25 +54,25 @@ fn rule(args: &[String]) -> Result<i32, String> {
             continue;
         }
         // spec: queue-kit/SPEC.md §check-roadmap-fresh — assertion C, both directions: the tag
-        // decides projection and the declaration is the only prose that may be projected, so
+        // decides projection and the summary is the only prose that may be projected, so
         // neither is meaningful without the other
         if e.tags == 0 {
             bad.push(format!(
-                "{}: carries a roadmap-summary: declaration but no [roadmap:] tag; a dead marking \
+                "{}: carries a [roadmap-summary:] tag but no [roadmap:] tag; a dead marking \
                  is what a dropped or reflowed tag looks like from the page's side",
                 e.slug
             ));
             continue;
         }
         tagged += 1;
-        // spec: queue-kit/SPEC.md §check-roadmap-fresh — the declaration count and the tag's
+        // spec: queue-kit/SPEC.md §check-roadmap-fresh — the summary count and the tag's
         // fields are independent, so both are reported in one run rather than costing the author
         // a second round trip
-        if e.declarations != 1 {
+        if e.summaries != 1 {
             bad.push(format!(
-                "{}: is [roadmap:]-tagged but carries {} roadmap-summary: declaration(s); exactly \
+                "{}: is [roadmap:]-tagged but carries {} [roadmap-summary:] tag(s); exactly \
                  one is required",
-                e.slug, e.declarations
+                e.slug, e.summaries
             ));
         }
         if e.tags != 1 {
@@ -110,10 +110,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
         for b in &bad {
             println!("  {}", b);
         }
-        println!("  help: an entry joins the page with a [roadmap: <horizon>/<track>] tag on its lead");
+        println!("  help: an entry joins the page with a [roadmap: <horizon>/<track>] tag on its tag");
         println!("        line, both values drawn from QUEUE_KIT_HORIZONS / QUEUE_KIT_TRACKS, plus");
-        println!("        exactly one indented 'roadmap-summary: <text>' declaration in its body —");
-        println!("        the only prose the public page prints (queue-kit/SPEC.md §The roadmap arm).");
+        println!("        exactly one [roadmap-summary: <sentence>] tag beside it — the only prose");
+        println!("        the public page prints (queue-kit/SPEC.md §The roadmap arm).");
         return Ok(1);
     }
 

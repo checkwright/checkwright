@@ -290,10 +290,6 @@ if staged_matches '*TASK-QUEUE.md' 'scripts/canon-config.knobs' 'scripts/gate-sd
     run_gate check-queue-hygiene native/target/release/checkwright-gates check-queue-hygiene
 fi
 
-if staged_matches '*TASK-QUEUE.md' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'scripts/queue-config.knobs' 'native/src/gates/queue_wrap.rs' 'native/src/queue.rs'; then
-    run_gate check-queue-wrap native/target/release/checkwright-gates check-queue-wrap
-fi
-
 if staged_matches '*TASK-QUEUE.md' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'scripts/queue-config.knobs' 'native/src/gates/tag_lead_line.rs' 'native/src/queue.rs'; then
     run_gate check-tag-lead-line native/target/release/checkwright-gates check-tag-lead-line
 fi
@@ -310,7 +306,7 @@ if staged_matches '*TASK-QUEUE.md' 'scripts/canon-config.knobs' 'scripts/gate-sd
     run_gate check-task-names native/target/release/checkwright-gates check-task-names
 fi
 
-if staged_matches '*TASK-QUEUE.md' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'scripts/queue-config.knobs' 'native/src/gates/task_conservation.rs' 'native/src/programs.rs' 'native/src/queue.rs'; then
+if staged_matches '*TASK-QUEUE.md' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'scripts/queue-config.knobs' 'native/src/gates/task_conservation.rs' 'native/src/programs.rs' 'native/src/queue.rs' 'native/src/emit/queue_migrate.rs'; then
     run_gate check-task-conservation native/target/release/checkwright-gates check-task-conservation
 fi
 
@@ -348,7 +344,7 @@ if staged_matches '*SPEC*.md' '*README.md' '*CLAUDE.md' '*CLAUDE.md' '*README.md
     run_gate check-md-refs native/target/release/checkwright-gates check-md-refs
 fi
 
-if staged_matches '*.md' '*.md' '*/gate-tests/*' '*TASK-QUEUE.md' 'scripts/canon-config.knobs' 'native/src/gates/md_unwrapped.rs' 'native/src/spec.rs' 'native/src/programs.rs'; then
+if staged_matches '*.md' '*.md' '*/gate-tests/*' 'scripts/canon-config.knobs' 'native/src/gates/md_unwrapped.rs' 'native/src/spec.rs' 'native/src/programs.rs'; then
     run_gate check-md-unwrapped native/target/release/checkwright-gates check-md-unwrapped
 fi
 

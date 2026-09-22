@@ -4,7 +4,9 @@
 
 ## New Features
 
-- **long-line** — this single physical line runs well past the hundred column budget on purpose so the wrap gate fires and reports it right here.
+### long-line
+
+this single physical line runs well past the hundred column budget on purpose so the wrap gate fires and reports it right here.
 
 ## Technical Debt
 

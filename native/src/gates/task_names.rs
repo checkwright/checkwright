@@ -1,33 +1,32 @@
-// spec: queue-kit/SPEC.md §check-task-names — task entries lead with a unique kebab slug, done
-// entries are bare slugs, every blocked-by resolves to a live task
+// spec: queue-kit/SPEC.md §check-task-names — task entries are headings with a unique kebab slug,
+// done entries are bare slugs, every blocked-by resolves to a live task, references are links
 use crate::queue;
 use std::collections::HashMap;
 
-// spec: queue-kit/SPEC.md §check-task-names — `\*\*[^*]*\*\*`: the bold lead-in as written,
-// so an invalid slug is reported with the text the author actually typed
-fn bold_run(line: &str) -> Option<&str> {
+// spec: queue-kit/SPEC.md §check-task-names — assertion R's single-backtick token: a double-backtick
+// span is a quoted literal, not a citation
+fn single_backtick_slugs(line: &str) -> Vec<&str> {
     let b = line.as_bytes();
-    let mut i = 0usize;
-    while i + 3 < b.len() {
-        if b[i] == b'*' && b[i + 1] == b'*' {
-            let start = i + 2;
-            let mut j = start;
-            while j < b.len() && b[j] != b'*' {
-                j += 1;
-            }
-            if j + 1 < b.len() && b[j] == b'*' && b[j + 1] == b'*' {
-                return Some(&line[start..j]);
-            }
-        }
-        i += 1;
-    }
-    None
+    queue::backtick_slugs(line)
+        .into_iter()
+        .filter(|&(s, e)| !(s >= 2 && b[s - 2] == b'`') && b.get(e + 1) != Some(&b'`'))
+        .map(|(s, e)| &line[s..e])
+        .collect()
 }
 
-fn is_bold_lead(line: &str) -> bool {
-    queue::strip_bullet_lead(line)
-        .map(|r| r.starts_with("**"))
-        .unwrap_or(false)
+// spec: queue-kit/SPEC.md §check-task-names — a fence line toggles the window no reference is read in
+fn fenced_lines(lines: &[&str]) -> Vec<bool> {
+    let mut inside = false;
+    lines
+        .iter()
+        .map(|l| {
+            if l.trim_start().starts_with("```") {
+                inside = !inside;
+                return true;
+            }
+            inside
+        })
+        .collect()
 }
 
 // spec: queue-kit/SPEC.md §check-task-names — every `[blocked-by: <slug>]` on the line, in
@@ -109,9 +108,35 @@ pub fn run(args: &[String]) -> i32 {
     let mut live: HashMap<String, usize> = HashMap::new();
     let mut done: Vec<String> = Vec::new();
     let mut brefs: Vec<(String, usize)> = Vec::new();
+    let lines: Vec<&str> = text.lines().collect();
+    let entries = queue::entries(&lines, &sec);
+    // spec: queue-kit/SPEC.md §check-task-names — each line's owning entry and whether it is that
+    // entry's tag line; a sub-task's lines are its own, not its parent's
+    let mut owner: Vec<Option<(&str, bool)>> = vec![None; lines.len()];
+    for e in &entries {
+        match live.get(&e.slug) {
+            Some(first) => dup.push(format!(
+                "{}:{}: {} (first seen at line {})",
+                file,
+                e.start + 1,
+                e.slug,
+                first
+            )),
+            None => {
+                live.insert(e.slug.clone(), e.start + 1);
+            }
+        }
+        for (i, slot) in owner.iter_mut().enumerate().take(e.end).skip(e.start) {
+            *slot = Some((e.slug.as_str(), Some(i) == e.tag_line));
+        }
+        if let Some(t) = e.tag_line {
+            for r in blocked_refs(lines[t]) {
+                brefs.push((r, t + 1));
+            }
+        }
+    }
     let mut cur = "";
-
-    for (i, line) in text.lines().enumerate() {
+    for (i, line) in lines.iter().enumerate() {
         let fnr = i + 1;
         if sec.is_task(line) {
             cur = "task";
@@ -125,38 +150,42 @@ pub fn run(args: &[String]) -> i32 {
             cur = "other";
             continue;
         }
-
-        if cur == "task" && queue::is_bullet(line) {
-            let ind = queue::indent(line);
-            let isbold = is_bold_lead(line);
-            if ind == 0 || isbold {
-                if let Some(slug) = queue::bullet_slug(line) {
-                    match live.get(slug) {
-                        Some(first) => dup.push(format!(
-                            "{}:{}: {} (first seen at line {})",
-                            file, fnr, slug, first
-                        )),
-                        None => {
-                            live.insert(slug.to_string(), fnr);
-                        }
-                    }
-                } else if isbold {
-                    let what = bold_run(line).unwrap_or("(unparsable bold lead-in)");
-                    invalid.push(format!("{}:{}: {}", file, fnr, what));
-                } else {
-                    missing.push(format!("{}:{}: {}", file, fnr, line));
-                }
-            }
-            for r in blocked_refs(line) {
-                brefs.push((r, fnr));
+        if cur == "task" {
+            if queue::heading_level(line).is_some_and(|l| l >= 3) && queue::entry_heading(line).is_none() {
+                invalid.push(format!("{}:{}: {}", file, fnr, line));
+            } else if owner[i].is_none() && queue::is_top_level_bullet(line) {
+                missing.push(format!("{}:{}: {}", file, fnr, line));
             }
             continue;
         }
-
         if cur == "done" && queue::is_bullet(line) {
             match bare_done_slug(line) {
                 Some(d) => done.push(d.to_string()),
                 None => baddone.push(format!("{}:{}: {}", file, fnr, line)),
+            }
+        }
+    }
+
+    // spec: queue-kit/SPEC.md §check-task-names — assertion R: a same-file link must name a live
+    // entry, and a single-backticked live slug in an entry body must be that link
+    let fenced = fenced_lines(&lines);
+    let (mut dangling, mut unlinked) = (Vec::new(), Vec::new());
+    for (i, line) in lines.iter().enumerate() {
+        if fenced[i] {
+            continue;
+        }
+        for (s, e) in queue::link_slugs(line) {
+            if !live.contains_key(&line[s..e]) {
+                dangling.push(format!("{}:{}: (#{})", file, i + 1, &line[s..e]));
+            }
+        }
+        let Some((own, is_tags)) = owner[i] else { continue };
+        if is_tags || queue::heading_level(line).is_some() {
+            continue;
+        }
+        for tok in single_backtick_slugs(line) {
+            if tok != own && live.contains_key(tok) {
+                unlinked.push(format!("{}:{}: `{}`", file, i + 1, tok));
             }
         }
     }
@@ -180,7 +209,9 @@ pub fn run(args: &[String]) -> i32 {
         + dup.len()
         + baddone.len()
         + unresolved.len()
-        + stale.len();
+        + stale.len()
+        + dangling.len()
+        + unlinked.len();
     if total > 0 {
         let mut sep = false;
         let mut block = |head: &[&str], items: &Vec<String>, help: &[&str]| {
@@ -202,16 +233,19 @@ pub fn run(args: &[String]) -> i32 {
             }
         };
         block(
-            &["check-task-names: task entry without a bold kebab-case slug:"],
+            &["check-task-names: task-section bullet outside every entry (an entry is a heading):"],
             &missing,
-            &["  help: lead the entry with a slug — '- **the-slug** — <prose>'."],
+            &[
+                "  help: open the entry with its slug as a heading — '### the-slug' — or run",
+                "        bash gate-sdk/bin/run-gates.sh --emit queue-migrate --write <queue-file>.",
+            ],
         );
         block(
-            &["check-task-names: task entry whose bold lead-in is not a valid slug:"],
+            &["check-task-names: task-section heading that is not a valid slug:"],
             &invalid,
             &[
-                "  help: a slug matches [a-z0-9][a-z0-9-]* (lowercase kebab-case); for a",
-                "        non-task note, use a plain or italic indented bullet instead.",
+                "  help: an entry heading is the bare slug, [a-z0-9][a-z0-9-]* (lowercase",
+                "        kebab-case), at '###' or '####' for a sub-task; tags go on the line below.",
             ],
         );
         block(
@@ -237,11 +271,21 @@ pub fn run(args: &[String]) -> i32 {
                 "        keeps the entry unpickable).",
             ],
         );
+        block(
+            &["check-task-names: same-file link naming no live entry (a dangling reference):"],
+            &dangling,
+            &["  help: a retired slug is cited in backticks — '`the-slug`', not a link."],
+        );
+        block(
+            &["check-task-names: live entry cited in backticks rather than linked:"],
+            &unlinked,
+            &["  help: a live reference is a link — '[the-slug](#the-slug)'."],
+        );
         return 1;
     }
 
     println!(
-        "TASK-NAMES: clean ({} live slug(s) unique, {} done, all blockers resolve to live tasks in {})",
+        "TASK-NAMES: clean ({} live slug(s) unique, {} done, all blockers resolve to live tasks and every reference is a live link or a retired citation in {})",
         live.len(),
         done.len(),
         file
@@ -272,11 +316,12 @@ mod tests {
         assert_eq!(bare_done_slug("- **bold**"), None);
     }
 
+    // spec: queue-kit/SPEC.md §check-task-names — assertion R's token is single-backtick, and a
+    // fence hides every reference inside it
     #[test]
-    fn an_invalid_bold_lead_in_reports_the_text_as_written() {
-        assert_eq!(bold_run("- **Not A Slug** — x"), Some("Not A Slug"));
-        assert_eq!(bold_run("- **"), None);
-        assert!(is_bold_lead("  - **x**"));
-        assert!(!is_bold_lead("  - x"));
+    fn a_citation_token_is_single_backtick_and_a_fence_hides_it() {
+        assert_eq!(single_backtick_slugs("see `a-b` and ``c-d``"), vec!["a-b"]);
+        let lines = ["x", "```", "`a`", "```", "y"];
+        assert_eq!(fenced_lines(&lines), vec![false, true, true, true, false]);
     }
 }
