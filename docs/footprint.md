@@ -35,7 +35,7 @@ The figures are kit-share only — what a kit itself ships. A consumer's own bin
 | gate-sdk | — | — |
 | guard-kit | — | 4243cp · ~1076t |
 | installer | — | — |
-| lifecycle-kit | 301cp · ~76t | 114827cp · ~28961t |
+| lifecycle-kit | 301cp · ~76t | 115133cp · ~29038t |
 | queue-kit | — | 1392cp · ~359t |
 | site-kit | — | — |
-| **total** | 1925cp · ~489t | 175023cp · ~44220t |
+| **total** | 1925cp · ~489t | 175329cp · ~44297t |

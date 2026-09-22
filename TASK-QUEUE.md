@@ -8,24 +8,6 @@
 
 ## New Features
 
-### delta-instruction-batch-dependence-unmarked
-
-[spec: SPEC-batch-conditional-delta.md]
-
-a spec amendment can state a delta instruction in the unconditional voice when its satisfying act depends on which units share the build BATCH, and the grammar has no way to say so.
-
-**Attested twice in one iteration, both door amendments:** each carried "exactly two of the 59 door sites are adopter-facing and are deliberately left red, being the paired debt entry's deliverable" — true only of a batch EXCLUDING that debt unit. The lead batched the debt unit IN on a producer/consumer read, at which point the correct act was to REPAIR those two sites.
-
-**Measured, not projected:** the dispatched session reported it would have left them red on the amendment's letter, and only an explicit prompt-side inversion by the lead prevented it — which is prompt-side and dies with the lead. A later session reading the merged amendment alone reaches the wrong act and calls it correct.
-
-**Ruled at spec (2026-09-22):** the authoring rule. A delta whose act depends on a named sibling landing in the same batch states the act for each case; the spec-stage check was refused, since deciding batch dependence from prose is the author's judgment made a second time by a weaker judge.
-
-**DISTINCT from every live entry**, and the owner sweep over `delta`, `amendment`, `batch` and `unconditional` found none: [amendment-refusal-acceptance-parity](#amendment-refusal-acceptance-parity) concerns an amendment's REFUSAL rationale rather than its instruction voice, and [amendment-dod-sibling-dependence](#amendment-dod-sibling-dependence) concerns a DoD item depending on an unnamed sibling rather than a delta's voice.
-
-**Operator exception to the enhancement admission filter** (operator direction 2026-09-22, lead-relayed): set B, which the operator selected directly in the lead session, includes this authoring rule; the filter's hold is lifted.
-
-**Cost while deferred:** once/low to rule, plus whatever the rule costs to gate; until then every batch-dependent delta needs a lead present to invert it. Filed 2026-09-20 by the iteration lead to the gap inbox at the build batch-2 dispatch, where inverting the instruction was the act that surfaced it; drained and promoted 2026-09-20 at close.
-
 ## Technical Debt
 
 ## Deferred
@@ -1781,5 +1763,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - stage-evidence-prefix-doubles-a-separator
 - scope-supersession-unchecked
 - lead-no-change-decision-has-no-landing-site
+- delta-instruction-batch-dependence-unmarked
 
 ## Lessons Learned

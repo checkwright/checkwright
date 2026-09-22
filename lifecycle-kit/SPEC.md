@@ -1012,6 +1012,8 @@ A marker opens its line, after optional indentation and one optional `- ` or `> 
 
 **Align runs every not-run marker and build runs the cannot-run ones first** — in an amendment or an active queue entry — although §check-stage-entry assertion D already refuses the build entry on an unrun marker: align is trigger-gated, so D holds the obligation when align is skipped, and align's sentence keeps the refusal from being the first notice when it runs.
 
+`spec.md` has a delta **state both acts** where its act depends on a sibling unit sharing the build batch, because the author writes the delta before the lead cuts the batches. A delta written for one case is wrong for the other. The session that builds it has only the amendment to read, and the merged text outlives any prompt that corrected it. So the author states both acts on the passage, and the batch cut picks the one that applies. No check reads it: whether an act depends on the batch is semantic, and the author is the party already judging it. A check deciding it from prose would be a second, weaker judge of the same question.
+
 The directory holds the **stage-class** template set, not any one consumer's roster: it ships six templates while `LIFECYCLE_KIT_STAGES` defaults to five, because `spec.md` serves the split-authoring roster alone. Nothing derives a roster from this listing — the glob buys a legible layout, not a derivation.
 
 A consumer skill adopts a template in one of two modes; either way the executed skill states in one line what the stamp step does and supplies every slot's content:
