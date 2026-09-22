@@ -44,7 +44,7 @@ The cross-kit delivery rules live in [doctrine-kit/DOCTRINE.md](doctrine-kit/DOC
 - **Spec-over-precedent** — the owner doc is ground truth; history answers what happened, never what is correct.
 - **Gap disposition** — a gap you defer is costed and filed, never flagged-and-skipped.
 - **Scope-gated intake** — a mid-session initiative is filed as a costed Deferred entry by default, never started; work enters only through scope — or through an operator-ruled hotfix of an impacting failure, minimal and test-and-doc-complete in one commit.
-- **Probe-before-assertion** — a claim one cheap command would settle is probed before it is asserted; relaying an unverified premise is asserting it.
+- **Probe-before-assertion** — a claim one cheap command would settle is probed over the corpus the claim ranges over before it is asserted; relaying an unverified premise is asserting it.
 - **Policy-as-choice** — a kit ships a calibration as a consumer-selectable set, off among them, never its author's one choice; each consumer binds its own.
 <!-- doctrine-kit:end -->
 

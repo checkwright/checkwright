@@ -40,24 +40,6 @@
 
 **Cost while deferred:** an adopter writing a cardinal-valued full-line marker above an unwrapped paragraph gets a binding whose agreement is near-accidental. Filed 2026-09-22 by build batch 2 as inferred from source; measured at this close and narrowed. **DISTINCT from `line-window-gates-unaudited`** (Done 2026-09-22), whose closed roster of three windows that audit discharged; this is a fourth gate it flagged and did not audit. Owner lookup ran `measured-claim` and `paragraph` over the queue — no owner.
 
-### probe-before-assertion-doctrine
-
-[spec: SPEC-probe-corpus.md] [recurrence: 2026-09-20]
-
-**returned from the icebox on a judged recurrence.** The rule it asked for shipped: CLAUDE.md §Delivery doctrine carries `Probe-before-assertion`, and the icebox line recorded the remainder as "Rule shipped; mechanizing it is open". What re-fires it is that the shipped rule did not hold, and did not hold seven times in one iteration.
-
-**The seven, all one shape — a probe narrower than the claim it supported.** Three path-scoped greps; two filters whose empty return was read as success; an amendment whose printed probe over-returned; and a nested-tree probe whose first confirming run used an inconsistent tree. Two of the seven produced regressions that reached validate, where they cost a re-tier.
-
-**The sharpening is the finding, and it is new.** `Probe-before-assertion` asks whether a probe was *run*; in all seven a probe ran. What failed is that its **corpus was narrower than the corpus the claim ranged over**, which the rule as worded does not reach. The drain reproduced the shape on its own inputs: the `door-sweep-reach-stops-at-the-kit-boundary` bullet named nine `docs/site-architecture.md` sites where a fresh grep returns thirteen, and missed `docs/index.md` altogether.
-
-**Why design-pending:** whether this is a fourth always-loaded line, a re-wording of the existing one, or something mechanizable is the open call — and it is a governed-surface widening, which a close does not self-serve. The cheapest candidate worth beating is still the one the original filing named: widen an existing rule rather than mint another.
-
-**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed; it shares that unit's doctrine-kit surface, DOCTRINE.md and the always-loaded digest.
-
-**Specified 2026-09-22:** the existing rule is widened and no line is minted. Its coverage clause is rewritten around the corpus, so a probe supports no claim wider than what it ranged over, and its digest gains "over the corpus the claim ranges over". Mechanizing is refused, because the only tool-readable records write the corpus and the probe side by side, so a check comparing them would hold the record to itself.
-
-**Cost while deferred:** measured at seven misses in one iteration, two of them reaching validate. Filed 2026-08-07 by close as that iteration's candidate lesson; iceboxed in the machinery-class triage slice; returned to the deferred section at `door-binding-sweep`'s close drain on the recurrence above. Owner lookup: `probe`, `premise`, `unverified`, `corpus narrower` — this entry, plus two **adjacent and distinct** icebox members: the cited-object token sweep's corpus (a *gate's* corpus) and [dispatched-child-asserts-an-unverified-base](#dispatched-child-asserts-an-unverified-base) (a child inheriting a base it never probed).
-
 ### baked-matching-windows
 
 [spec: SPEC-matching-windows.md]
@@ -1685,5 +1667,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - consumer-policy-rule-absent
 - kit-knob-consumer-adapter-convention
 - matching-window-roster-absent
+- probe-before-assertion-doctrine
 
 ## Lessons Learned
