@@ -8,18 +8,6 @@
 
 ## New Features
 
-### scope-supersession-unchecked
-
-[spec: SPEC-supersession.md]
-
-scope aggregates explicit inbound citations (converge, subsume, block; lifecycle-kit/templates/stages/scope.md), but it has no semantic test for when one Deferred entry makes another obsolete even though neither cites the other. A tactical entry therefore gets ranked as work when a strategic sibling would moot it. Live instance: queue-kit-unwrap's scope recommended three line-cap fixes and left `markdown-hard-wrap-unowned-and-ungated`, which mooted them, to its own iteration. The operator reversed that choice.
-
-**Ruled at spec (2026-09-22):** a supersession pass over the ranking's shortlist, keyed on the names each candidate's deliverable edits rather than on citations, ruling each pairing mooted, reshaped or independent in a `Supersession:` line beside the `Composition:` line; the lead's presence check reads both. A pool-wide pass was refused on cost, with the close moot sweep and the pool triage as backstops.
-
-**Operator exception to the enhancement admission filter** (2026-09-22 scope, lead-relayed), because the operator already reversed a misranking this gap caused. Admitted to `stage-contract-drain`, for /spec to author and promote.
-
-**Cost while deferred:** every scope can rank tactical work that is already mooted. Filed 2026-09-22 to the gap inbox by the lead as an operator direction. Promoted at close because →fix would change the scope contract, which is a spec amendment. Owner lookup ran over `supersed`, `obsolete`, `subsume` and `strategic` in scope.md and found no owner.
-
 ### lead-no-change-decision-has-no-landing-site
 
 [spec: SPEC-no-change-landing.md]
@@ -1807,5 +1795,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - inferred-marker-malformed-placement-passes-unseen
 - close-surface-row-trackedness-undeclared
 - stage-evidence-prefix-doubles-a-separator
+- scope-supersession-unchecked
 
 ## Lessons Learned
