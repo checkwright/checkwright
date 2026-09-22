@@ -38,10 +38,33 @@
   disposition), so `doctor` cannot name this disarmed state. **Deliverable — rule one of two:** an
   arming shape reading content emptiness, or a stated refusal naming why a content-emptied pattern
   file stays outside `doctor`. No design is proposed here.
+  **Second instance, same limit:** `check-provenance-seam` asserts nothing at the defaults
+  (`CANON_KIT_SCAN_KIT_ROOTS=0` with `CANON_KIT_SEAM_SURFACE_GLOBS` empty), a conjunction one
+  knob's emptiness cannot state; its dead `armed-by:` on the `0|1` switch came off at
+  canon-gate-precision's close. The ruling covers both shapes.
   **Cost while deferred:** an adopter who empties the pattern file gets a silent clean pass with no
-  doctor warning. Filed 2026-09-22 to the gap inbox by the census discharging
+  doctor warning, and a default provenance-seam install gets one too. Filed 2026-09-22 to the gap
+  inbox by the census discharging
   `armed-by-census-unrun`; promoted at close because →fix needs a new declaration shape. Owner
   lookup ran over `armed-by` in gate-sdk/SPEC.md; §The install disposition owns the declaration.
+
+- **build-work-before-entry-stamp** [cost: event/low] [surface: lifecycle-kit] — a stage session
+  can land its work commits before running its own `--enter-stage`, and nothing reds it:
+  `check-stage-evidence` catches a stamp committed after the work it preceded, never work preceding
+  the stamp, and a same-stage re-entry finds the cursor already on its stage. Measured 2026-09-22 by
+  `git log`: canon-gate-precision's second build session merged two amendments, then stamped at the
+  second merge's head. The first instance, one iteration earlier and also on the cheaper tier, was
+  discarded at scope because §check-stage-evidence states the limit; the recurrence shows that
+  stating the limit did not stop it.
+  **Deliverable — rule one of two:** an oracle asserting that a session's work commits follow its
+  own entry stamp (inferred: commits carry no session id, so how the oracle ties a commit to a
+  session is the open question), or a stamp-first line carried in the dispatch path the cheaper
+  tier reads. **Cost while deferred:** the stamp's recorded head postdates the stage's work, so
+  the stamp misplaces where that session's work began. Filed 2026-09-22 to the gap inbox by the
+  canon-gate-precision lead as a recurrence judgment; promoted at its close because →fix needs a new
+  oracle or a dispatch-path ruling. Owner lookup ran over `stamp` and `newly introduced` in
+  lifecycle-kit/SPEC.md; §check-stage-evidence owns the assertion and its limit.
+  recurrence: build-work-before-entry-stamp 2026-09-22
 
 - **doc-path-hardcoded-reads** [cost: event/low] [surface: gate-sdk] — eighteen kit-shipped
   `couples=` literals across thirteen members name a consumer path the member reads that no knob it

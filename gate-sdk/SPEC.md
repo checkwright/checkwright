@@ -12195,6 +12195,14 @@ manifest). The one knob-derived value the hook bakes is the resolved
 and the hook's currency is held by regeneration plus `check-graph`'s
 byte-freshness assertion.
 
+**The staged set picks the members; the working tree is what they judge.** A
+member reads its corpus from the working tree as a whole-tree run does — an
+index-reading member such as `check-gate-tamper` says so in its own section — so
+an unstaged edit is judged as though it were committed: a commit can be refused
+on content it does not carry, or pass over staged content the tree has since
+changed. **Honest limit:** bring the working tree to the staged state before
+committing (stage the rest, or stash it with `--keep-index`).
+
 **Regeneration follows staging, never merely the build — and the reason is that
 a derived roster reads `git ls-files` rather than the worktree.** A generator
 whose input set comes from the tracked list cannot see a file that exists and is

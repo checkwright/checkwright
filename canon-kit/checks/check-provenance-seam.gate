@@ -1,4 +1,3 @@
 # graph: couples=kit:SPEC.md,knob:CANON_KIT_QUEUE_FILE,knob:CANON_KIT_SPEC_NAME,knob:CANON_KIT_SCAN_KIT_ROOTS,knob:CANON_KIT_SEAM_SURFACE_GLOBS dir=one valve=none tier=precommit
 # install: zero-config
-# armed-by: CANON_KIT_SCAN_KIT_ROOTS
 # spec: canon-kit/SPEC.md §check-provenance-seam — no kit SPEC or declared seam surface carries a publisher-provenance marker — a dated attribution, an agent-file pointer, a private-surface mention, a live queue slug or a hex object reference — or, in a kit SPEC, quotes a roster one consumer configured
