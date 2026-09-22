@@ -21,12 +21,14 @@ The `install-smoke` legs in `.github/workflows/gates.yml` use one suffix slot fo
 
 **Not yet applied.** Rename each job key in `.github/workflows/gates.yml` per the table, and every tracked mention of a renamed leg, backticked or not, outside the history surfaces. The roster under §Existing sections updated names each surface.
 
-`docs/install.md` §Requirements' platform block names `install-smoke-linux-arm64` in the `aarch64-unknown-linux-gnu` line's held precondition. The act there depends on the sibling entry `install-path-developer-first`:
+`docs/install.md` §Requirements' platform block names `install-smoke-linux-arm64` in the `aarch64-unknown-linux-gnu` line's held precondition. The act there depends on the sibling entry `install-path-developer-first`, whose own ruling ("Where the contributor facts go", SPEC-install-per-os.md) keeps that block on `docs/install.md` and only repositions it, to `## Requirements` moved to the page's end — it never carries the block off the file:
 
-- **If `install-path-developer-first` lands in the same build batch, or earlier,** and has moved the platform block off `docs/install.md`, rename the leg at the block's new location and leave `docs/install.md` to that unit.
-- **If it lands in a later batch, or not at all this iteration,** rename the leg in place in `docs/install.md`.
+- **If `install-path-developer-first` lands in the same build batch, or earlier,** rename the leg at the block's repositioned location, under the page's `## Requirements`.
+- **If it lands in a later batch, or not at all this iteration,** rename the leg at the block's current location, mid-page.
 
-Rename the leg names in live queue entries too, active and deferred, in the same commit. The queue is excluded from the retired-spelling gate's corpus, so no gate catches a missed queue mention. That commit applies the rule in `install-smoke-powershell-demo-runs-before-bash-strip`'s body as it stands then, whether or not that debt entry has landed.
+Both branches edit `docs/install.md`; the difference is only where in the page the block sits when the rename runs.
+
+Rename the leg names in live queue entries too, active and deferred, in the same commit. The queue is excluded from the retired-spelling gate's corpus, so no gate catches a missed queue mention. **A queue sentence naming the leg family as a whole** — as `install-smoke-leg-names-mix-two-axes`'s own opening paragraph does, with "the `install-smoke` legs … spend one suffix slot on two different axes" — is unbackticked in place, per delta 4's convention, rather than rewritten to one leg's new name: the sentence describes all six legs' pre-rename shape, and substituting a single renamed leg's spelling would misstate it. A queue mention that names one leg specifically is renamed to that leg's new spelling as usual. That commit applies the rule in `install-smoke-powershell-demo-runs-before-bash-strip`'s body as it stands then, whether or not that debt entry has landed.
 
 ### (2) Retire the two correcting paragraphs {mechanical}
 
