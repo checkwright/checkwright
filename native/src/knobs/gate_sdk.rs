@@ -161,6 +161,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("GATE_SDK_COMMIT_TYPES", "feat fix refactor perf docs test build ci chore style")
             .empty_takes_default().words(),
         Row::indexed("GATE_SDK_JOB_REF_PATTERNS", &[]),
+        Row::scalar("GATE_SDK_ASSERTION_STRENGTH_WINDOW", "8"),
     ],
     validate: None,
     open_family: false,

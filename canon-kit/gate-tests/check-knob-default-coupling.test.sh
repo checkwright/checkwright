@@ -20,11 +20,13 @@ mkdir -p "$SANDBOX/gate-sdk" "$SANDBOX/widget-kit/lib"
 
 run_gate() {  # echoes gate output; roster is the two sandbox kits
     ( cd "$SANDBOX" && gate_env GATE_SDK_KIT_DIRS="gate-sdk widget-kit" GATE_SDK_ROOT="$DIR/../gate-sdk" \
+        CANON_KIT_KNOB_FILE="$SANDBOX/case.knobs" \
         && gate_run check-knob-default-coupling "$DIR/checks" 2>&1 )
 }
 
-check_case() {  # $1=label  $2=want-rc  $3=want-substring
+check_case() {  # $1=label  $2=want-rc  $3=want-substring  [$4=knob line]
     local label="$1" want="$2" sub="$3" out rc
+    printf '%s\n' "${4:-}" >"$SANDBOX/case.knobs"
     out="$(run_gate)"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL [$label]: want exit $want, got $rc -- $out"; fails=$((fails + 1)); return
@@ -67,9 +69,34 @@ cat >"$SANDBOX/widget-kit/lib/widget.sh" <<'EOF'
 EOF
 check_case "absent-default-fires" 1 "stated nowhere in the owning SPEC"
 
+# The window: the SPEC states the default 454 code points past the knob's name,
+# outside the default window and inside a wider one.
+{ printf '# widget-kit — SPEC\n\n- `WIDGET_KIT_FAR` — '
+  printf 'word %.0s' {1..90}
+  printf 'default `far.md`.\n'
+} >"$SANDBOX/widget-kit/SPEC.md"
+cat >"$SANDBOX/widget-kit/lib/widget.sh" <<'EOF'
+#!/usr/bin/env bash
+: "${WIDGET_KIT_FAR:-far.md}"
+EOF
+check_case "window-default-misses-454" 1 "WIDGET_KIT_FAR — source default \`far.md\` is stated nowhere"
+check_case "window-600-reaches-454" 0 "KNOB-DEFAULT-COUPLING: clean" "CANON_KIT_DEFAULT_COUPLING_WINDOW = 600"
+
+# off: the SPEC comparison is not run, so a SPEC stating another default is
+# clean, while two disagreeing source sites still red.
+printf '# widget-kit — SPEC\n\n- `WIDGET_KIT_FAR` — default `other.md`.\n' >"$SANDBOX/widget-kit/SPEC.md"
+check_case "window-off-skips-the-spec" 0 "the SPEC comparison was not run" "CANON_KIT_DEFAULT_COUPLING_WINDOW = off"
+cat >"$SANDBOX/widget-kit/lib/widget.sh" <<'EOF'
+#!/usr/bin/env bash
+: "${WIDGET_KIT_FAR:-far.md}"
+: "${WIDGET_KIT_FAR:-near.md}"
+EOF
+check_case "window-off-keeps-self-agreement" 1 "disagrees with" "CANON_KIT_DEFAULT_COUPLING_WINDOW = off"
+check_case "window-unknown-value-exits-2" 2 "CANON_KIT_DEFAULT_COUPLING_WINDOW" "CANON_KIT_DEFAULT_COUPLING_WINDOW = paragraph"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-knob-default-coupling.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-knob-default-coupling.test.sh: clean (cross-kit owning SPEC + descriptive/array/empty/deferral skips + absent-default fires)"
+echo "check-knob-default-coupling.test.sh: clean (cross-kit owning SPEC + descriptive/array/empty/deferral skips + absent-default fires + the window at a count and off)"
 exit 0

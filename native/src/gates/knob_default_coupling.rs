@@ -293,8 +293,9 @@ enum Verdict {
 }
 
 // spec: canon-kit/SPEC.md §check-knob-default-coupling — assertion 2 over one kit's SPEC, read as
-// one blob so a default statement wrapped across lines still binds its knob
-fn spec_verdict(pairs: &[(String, String)], blob: &[char], knob: &str, want: &str) -> Verdict {
+// one blob so a default statement wrapped across lines still binds its knob, within `window` code
+// points past the knob's name
+fn spec_verdict(pairs: &[(String, String)], blob: &[char], knob: &str, want: &str, window: usize) -> Verdict {
     let k: Vec<char> = knob.chars().collect();
     let grammar = spec::DefaultGrammar {
         is_knobname: &|t: &str| is_knobname(pairs, t),
@@ -312,7 +313,7 @@ fn spec_verdict(pairs: &[(String, String)], blob: &[char], knob: &str, want: &st
             start = hit + k.len();
             continue;
         }
-        let end = std::cmp::min(blob.len(), hit + k.len() + 400);
+        let end = std::cmp::min(blob.len(), hit + k.len() + window);
         let win = reduce_deferrals(&blob[hit..end].iter().collect::<String>());
         // spec: canon-kit/SPEC.md §check-knob-default-coupling — ASCII folding, because the
         // offset the hit yields indexes back into the unfolded window and a Unicode fold can
@@ -353,11 +354,28 @@ fn spec_literal(val: &str, derived: bool, host_suffix: &str) -> String {
     }
 }
 
+// spec: canon-kit/SPEC.md §check-knob-default-coupling — `CANON_KIT_DEFAULT_COUPLING_WINDOW`: a
+// positive count, or `None` for `off`, which skips assertion 2
+fn window() -> Result<Option<usize>, String> {
+    let raw = spec::knob_pub("CANON_KIT_DEFAULT_COUPLING_WINDOW")?;
+    if raw == "off" {
+        return Ok(None);
+    }
+    match raw.parse::<usize>() {
+        Ok(n) if n > 0 && raw.bytes().all(|b| b.is_ascii_digit()) => Ok(Some(n)),
+        _ => Err(format!(
+            "CANON_KIT_DEFAULT_COUPLING_WINDOW must be a positive integer or off (got '{}')",
+            raw
+        )),
+    }
+}
+
 fn rule(_args: &[String]) -> Result<i32, String> {
     let pairs = prefix_pairs()?;
     if pairs.is_empty() {
         return Err("no kit roots enumerated".to_string());
     }
+    let window = window()?;
 
     let mut sources: Vec<String> = Vec::new();
     // spec: gate-sdk/SPEC.md §Layout and configuration — the root is walked off disk, so it takes
@@ -442,7 +460,7 @@ fn rule(_args: &[String]) -> Result<i32, String> {
 
     let mut kit_subset: BTreeMap<String, Vec<(String, String, String)>> = BTreeMap::new();
     for (knob, (val, _, kit, spec_val)) in &first {
-        if conflict.contains_key(knob) {
+        if conflict.contains_key(knob) || window.is_none() {
             continue;
         }
         kit_subset
@@ -469,7 +487,7 @@ fn rule(_args: &[String]) -> Result<i32, String> {
             .chars()
             .collect();
         for (knob, val, spec_val) in subset {
-            match spec_verdict(&pairs, &blob, knob, spec_val) {
+            match spec_verdict(&pairs, &blob, knob, spec_val, window.unwrap_or_default()) {
                 Verdict::Found => {}
                 Verdict::Disagree => findings.push(format!(
                     "  {}  {} — source default `{}` but the SPEC states a different default",
@@ -495,6 +513,15 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         return Ok(1);
     }
 
+    if window.is_none() {
+        println!(
+            "KNOB-DEFAULT-COUPLING: clean ({} kit source file(s); {} literal default site(s) agree across sites; the SPEC comparison was not run, CANON_KIT_DEFAULT_COUPLING_WINDOW being off; {} computed/array/empty default(s) skipped-and-counted)",
+            sources.len(),
+            lit_count,
+            skipped
+        );
+        return Ok(0);
+    }
     println!(
         "KNOB-DEFAULT-COUPLING: clean ({} kit source file(s); {} literal default site(s) agree across sites and with the owning SPEC; {} computed/array/empty + {} descriptively-stated + {} whose kit ships no SPEC file default(s) skipped-and-counted)",
         sources.len(),
@@ -516,7 +543,21 @@ mod tests {
         let pairs = vec![("GATE_SDK_".to_string(), "gate-sdk".to_string())];
         let blob: Vec<char> = SPEC_PHRASE.chars().collect();
         let want = spec_literal(rendered, derived, host_suffix);
-        matches!(spec_verdict(&pairs, &blob, "GATE_SDK_NATIVE_BIN", &want), Verdict::Found)
+        matches!(spec_verdict(&pairs, &blob, "GATE_SDK_NATIVE_BIN", &want, 400), Verdict::Found)
+    }
+
+    // spec: canon-kit/SPEC.md §check-knob-default-coupling — the window is counted in code points
+    // past the knob's name, and a default whose value it does not reach whole is not found
+    #[test]
+    fn a_default_binds_only_inside_the_window() {
+        let pairs = vec![("WIDGET_KIT_".to_string(), "widget-kit".to_string())];
+        let text = format!("`WIDGET_KIT_X` {} default `abc`.", "é".repeat(50));
+        let blob: Vec<char> = text.chars().collect();
+        let value_end = text[..text.find("c`").expect("value")].chars().count() + 1;
+        let reach = value_end - "`WIDGET_KIT_X".chars().count();
+        let at = |w: usize| matches!(spec_verdict(&pairs, &blob, "WIDGET_KIT_X", "abc", w), Verdict::Found);
+        assert!(at(reach));
+        assert!(!at(reach - 1));
     }
 
     #[test]

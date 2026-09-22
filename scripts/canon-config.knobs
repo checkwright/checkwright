@@ -81,6 +81,13 @@ CANON_KIT_MEASURED_SPAN = sentence
 CANON_KIT_CLAIM_CLASSES_CMD[] = bash
 CANON_KIT_CLAIM_CLASSES_CMD[] = scripts/claim-classes.sh
 
+# spec: canon-kit/SPEC.md §check-knob-citation — this repo binds the shipped reach, the distance its prose was measured at when its markdown was unwrapped; sentence is unmeasured here, and switching to it would be a verdict change
+CANON_KIT_KNOB_CITATION_REACH = 100
+# spec: canon-kit/SPEC.md §check-knob-citation — this repo binds the shipped literal span, the one the citation gate is green at on this tree
+CANON_KIT_KNOB_CITATION_LITERAL_SPAN = 24
+# spec: canon-kit/SPEC.md §check-knob-default-coupling — this repo binds the shipped window, at which the coupling gate is green on this tree
+CANON_KIT_DEFAULT_COUPLING_WINDOW = 400
+
 # comment-tier-exempt: the enum-set emitter derives the queue-tag set from queue-kit's own tag parser plus this repo's lesson tags, so a prose enumeration of the tag vocabulary that drops a member is caught rather than trusted
 CANON_KIT_ENUM_SETS_CMD[] = bash
 CANON_KIT_ENUM_SETS_CMD[] = gate-sdk/bin/run-gates.sh

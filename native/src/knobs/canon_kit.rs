@@ -73,6 +73,9 @@ pub const KIT: Kit = Kit {
         Row::scalar("CANON_KIT_DOCS_BLOB_REF", "master"),
         Row::indexed("CANON_KIT_MANIFEST_FILES", &[]),
         Row::indexed("CANON_KIT_PROSE_SURFACE_GLOBS", &[]),
+        Row::scalar("CANON_KIT_KNOB_CITATION_REACH", "100"),
+        Row::scalar("CANON_KIT_KNOB_CITATION_LITERAL_SPAN", "24"),
+        Row::scalar("CANON_KIT_DEFAULT_COUPLING_WINDOW", "400"),
         Row::indexed(
             "CANON_KIT_TEMPORAL_MARKERS",
             &[
@@ -240,10 +243,17 @@ fn validate(v: &Values) -> Vec<String> {
         "CANON_KIT_COUNT_WEDGE_WORDS",
         "CANON_KIT_COMMENT_RUN_CAP",
         "CANON_KIT_SEAM_SLUG_MIN_LEN",
+        "CANON_KIT_KNOB_CITATION_LITERAL_SPAN",
     ] {
         if let Some(s) = scalar(v, n).filter(|s| !positive(s)) {
             errs.push(format!("{} must be a positive integer (got '{}')", n, s));
         }
+    }
+    if let Some(s) = scalar(v, "CANON_KIT_KNOB_CITATION_REACH").filter(|s| !positive(s) && !matches!(*s, "sentence" | "off")) {
+        errs.push(format!("CANON_KIT_KNOB_CITATION_REACH must be a positive integer, sentence or off (got '{}')", s));
+    }
+    if let Some(s) = scalar(v, "CANON_KIT_DEFAULT_COUPLING_WINDOW").filter(|s| !positive(s) && *s != "off") {
+        errs.push(format!("CANON_KIT_DEFAULT_COUPLING_WINDOW must be a positive integer or off (got '{}')", s));
     }
     for n in ["CANON_KIT_GLOSSARY_FILE", "CANON_KIT_DOCS_BLOB_REF"] {
         if empty(n) {

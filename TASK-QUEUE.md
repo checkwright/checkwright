@@ -24,22 +24,6 @@
 
 **Cost while deferred:** a false red waits on the first prose paragraph pairing a trailer-shaped lead-in with a quoted UUID. Filed 2026-09-22 by build batch 2 under scope-gated intake; the lead ruled it stays filed rather than landing mid-iteration, and it promotes at close because the seam question is an envelope call for spec, not a drain fix. **DISTINCT from `line-window-gates-unaudited`** (Done 2026-09-22), whose subject is a named roster of three windows, all three measured to need no recalibration; this is a fourth pattern that audit met on the way. Owner lookup ran `msg-patterns`, `matching window` and `same-line window` over the queue — no owner.
 
-### baked-matching-windows
-
-[spec: SPEC-matching-windows.md]
-
-three kit gates bake a matching window with no knob: `MARKER_REACH` (100 code points, `native/src/gates/knob_citation.rs`, `check-knob-citation`), an inline 400-code-point search window (`native/src/gates/knob_default_coupling.rs`, `check-knob-default-coupling`, no SPEC ground stated) and `WINDOW` (8 lines, `native/src/gates/assertion_strength.rs`, `check-assertion-strength`). Each is a calibration another adopter could set differently while the gate's contract stays true, so every adopter inherits three hand-picked distances as unbypassable reds.
-
-**Deliverable, per Policy-as-choice:** each a knob in its kit's table, default the shipped value so no verdict moves, `off` where the gate's other assertions survive, the SPEC section stating the knob, a fixture case per value, and this repo binding its choice in its knob file.
-
-**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed at a spec re-entry after align: all three windows rather than `MARKER_REACH` alone, fixed in this iteration rather than left filed. It goes after `consumer-policy-rule-absent`, whose rule it applies.
-
-**Specified 2026-09-22:** `CANON_KIT_KNOB_CITATION_REACH` (a count, `sentence` or `off`), `CANON_KIT_DEFAULT_COUPLING_WINDOW` (a count or `off`, which stops SPEC agreement and keeps source self-agreement) and `GATE_SDK_ASSERTION_STRENGTH_WINDOW` (a count; no `off`, since the window bounds the gate's only assertion). A paragraph bound for the coupling window and a guard-body bound for assertion strength are refused with grounds. This repo binds the shipped values, which move no verdict here.
-
-**Widened 2026-09-23 by a second operator direction, lead-relayed:** the gap filed at this spec, the 24-byte span in which `spec::DefaultGrammar::default_bound_at` binds "default" to a value literal, joins this unit. Probed at entry: `check-knob-citation` is its one caller (the filing said both knob gates, which is false; the coupling gate hands the grammar its own window's tail). **Specified:** `CANON_KIT_KNOB_CITATION_LITERAL_SPAN`, bytes, default `24`, with no `off` of its own, since the reach's `off` stops the same leg. Sentence and clause bounds are refused because both admit the adverbial "by default" the span exists to refuse.
-
-**Cost while deferred:** every adopter meets four distances it cannot set. Filed 2026-09-22 to the gap inbox from the consumer-policy-seam spec census (survey record block "which kit gates bake a policy…"), and entered directly under the direction above. **DISTINCT from** `matching-window-roster-absent`, which owns the refused roster; this owns the three conversions.
-
 ## Technical Debt
 
 ## Deferred
@@ -1653,5 +1637,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - matching-window-roster-absent
 - probe-before-assertion-doctrine
 - measured-claim-span-unbounded
+- baked-matching-windows
 
 ## Lessons Learned

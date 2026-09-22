@@ -1465,9 +1465,9 @@ impl DefaultGrammar<'_> {
     }
 
     // spec: canon-kit/SPEC.md §check-knob-citation — the byte offset of every word-bounded "default"
-    // that binds a value literal within the same 24-character window, so a reader can bind a token
-    // to the marker it sits beside rather than to any marker on its line
-    pub fn default_bound_at(&self, line: &str) -> Vec<usize> {
+    // that binds a value literal lying wholly within the `span` bytes after it, so a reader can bind
+    // a token to the marker it sits beside rather than to any marker on its line
+    pub fn default_bound_at(&self, line: &str, span: usize) -> Vec<usize> {
         let low = line.to_ascii_lowercase();
         let low = low.as_bytes();
         let b = line.as_bytes();
@@ -1478,7 +1478,7 @@ impl DefaultGrammar<'_> {
             })
             .filter(|&i| {
                 let after = i + b"default".len();
-                !self.literal_at(&b[after..std::cmp::min(after + 24, b.len())]).is_empty()
+                !self.literal_at(&b[after..std::cmp::min(after + span, b.len())]).is_empty()
             })
             .collect()
     }
@@ -1532,6 +1532,16 @@ mod tests {
         assert_eq!(m.len(), 1);
         assert_eq!(&t[m[0].sentence.0..m[0].sentence.1], "Two has 3 rows.");
         assert_eq!(&t[m[0].at..m[0].end], "<!-- measured: k=3 -->");
+    }
+
+    // spec: canon-kit/SPEC.md §check-knob-citation — the literal span is the caller's: a value
+    // literal closing past it binds no marker
+    #[test]
+    fn a_default_binds_only_a_literal_closing_inside_the_span() {
+        let g = DefaultGrammar { is_knobname: &|t: &str| t.starts_with("QUEUE_KIT_") };
+        let line = "`QUEUE_KIT_ENTRY_CAP` defaults, as the kit table has it, to `7`.";
+        assert!(g.default_bound_at(line, 24).is_empty());
+        assert_eq!(g.default_bound_at(line, 40), vec![22]);
     }
 
     #[test]

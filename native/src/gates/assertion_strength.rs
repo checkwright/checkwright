@@ -4,7 +4,19 @@
 use crate::walk;
 use std::path::Path;
 
-const WINDOW: usize = 8;
+// spec: gate-sdk/SPEC.md §check-assertion-strength — `GATE_SDK_ASSERTION_STRENGTH_WINDOW`, the
+// lines after a guarded call read for its failure text: a positive integer, validated here since
+// gate-sdk's table carries no validator
+fn window() -> Result<usize, String> {
+    let raw = walk::knob_scalar("GATE_SDK_ASSERTION_STRENGTH_WINDOW")?;
+    match raw.parse::<usize>() {
+        Ok(n) if n > 0 && raw.bytes().all(|b| b.is_ascii_digit()) => Ok(n),
+        _ => Err(format!(
+            "GATE_SDK_ASSERTION_STRENGTH_WINDOW must be a positive integer (got '{}') — treating as failure (not clean)",
+            raw
+        )),
+    }
+}
 
 fn is_word(b: u8) -> bool {
     b.is_ascii_alphanumeric() || b == b'_' || b == b'-'
@@ -205,6 +217,7 @@ fn is_comment_line(line: &str) -> bool {
 }
 
 struct Scan {
+    window: usize,
     declaring: usize,
     findings: Vec<String>,
 }
@@ -255,7 +268,7 @@ fn scan_file(path: &str, text: &str, kitroot: &str, scan: &mut Scan) -> Result<(
             continue;
         }
 
-        let mut stop = i + WINDOW;
+        let mut stop = i + scan.window;
         if stop > n - 1 {
             stop = n - 1;
         }
@@ -347,6 +360,13 @@ pub fn run(args: &[String]) -> i32 {
     };
 
     let mut scan = Scan {
+        window: match window() {
+            Ok(w) => w,
+            Err(e) => {
+                eprintln!("check-assertion-strength: {}", e);
+                return 2;
+            }
+        },
         declaring: 0,
         findings: Vec::new(),
     };
