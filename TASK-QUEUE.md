@@ -8,22 +8,6 @@
 
 ## New Features
 
-### msg-uuid-reach-unbounded
-
-[spec: SPEC-uuid-reach.md]
-
-`scripts/msg-patterns.list` line 21 and its kit twin `gate-sdk/templates/msg-patterns.list` line 21 spell `^[A-Za-z][A-Za-z-]*: .*<uuid>`, whose `.*` was bounded by the physical line and is now bounded by a paragraph. Re-verified at this drain: both live lines carry the unbounded form and so do all three fixture copies (`gate-sdk/gate-tests/check-commit-msg/{good,bad}/patterns.list`, `gate-sdk/gate-tests/check-tree-terms/good/patterns.list`) — five sites. Nothing reds today: exactly one tracked line wears both the trailer-key shape and a UUID, inside a pruned fixture. The ordinary edit that reds it is a markdown paragraph opening `Note: ` or `Session: ` that quotes an example session UUID later in the same paragraph, which this repo documents `--emit session-id` and so plausibly writes.
-
-**Deliverable:** a bounded reach. Candidate, run by the filer through `check-tree-terms` over the tracked tree and clean at exit 0: `^[A-Za-z][A-Za-z-]*: [^.;]{0,40}<uuid>`. **The seam question the fix must rule first:** a numeric reach inside a shipped generic pattern sits on the provenance boundary, so whether the calibration belongs in the kit template, the consumer copy, or both is undecided (gate-sdk/SPEC.md §The provenance seam).
-
-**Probed at scope 2026-09-22:** the interval stays under the engine's bound — `DUP_MAX` is 255 in `native/src/ere.rs`, against the candidate's `{0,40}`.
-
-**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed; reshaped by `consumer-policy-rule-absent`, whose rule answers the seam question above, so it goes after it.
-
-**Corrected at spec 2026-09-22, by running the candidate through the engine:** there are six sites, not five, since a unit-test literal in `native/src/gates/commit_msg.rs` carries the shape too. The `{0,40}` candidate fails both ways: it still reds a `Note: …session id such as <uuid>` line, and it misses a URL-valued trailer, whose host carries a `.`. **Specified:** the value becomes one token, `[^ ]*`, which reds every trailer shape and no quoting prose, and carries no number to choose. The pattern file is already consumer config, so template and copy both take it and no knob is minted. The shipped-shapes unit test reads the template rather than a copy, since its account-pattern copy had drifted.
-
-**Cost while deferred:** a false red waits on the first prose paragraph pairing a trailer-shaped lead-in with a quoted UUID. Filed 2026-09-22 by build batch 2 under scope-gated intake; the lead ruled it stays filed rather than landing mid-iteration, and it promotes at close because the seam question is an envelope call for spec, not a drain fix. **DISTINCT from `line-window-gates-unaudited`** (Done 2026-09-22), whose subject is a named roster of three windows, all three measured to need no recalibration; this is a fourth pattern that audit met on the way. Owner lookup ran `msg-patterns`, `matching window` and `same-line window` over the queue — no owner.
-
 ## Technical Debt
 
 ## Deferred
@@ -1638,5 +1622,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - probe-before-assertion-doctrine
 - measured-claim-span-unbounded
 - baked-matching-windows
+- msg-uuid-reach-unbounded
 
 ## Lessons Learned

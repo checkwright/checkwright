@@ -177,16 +177,17 @@ mod tests {
     }
 
     // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — the live pattern shapes this gate ships
-    // with, compiled and matched through the crate's own engine rather than through grep
+    // with, compiled and matched through the crate's own engine rather than through grep.
+    // spec: gate-sdk/SPEC.md §check-commit-msg — read the shipped template rather than compile a
+    // copy, so a template edit is what this test exercises and the two cannot drift apart
     #[test]
     fn the_shipped_pattern_shapes_compile_and_select_the_right_lines() {
-        let pats = [
-            "/(home|Users)/[A-Za-z0-9._-]+",
-            "^[A-Za-z][A-Za-z-]*: .*[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
-            "(^|[^A-Za-z])(accounts?|logins?|usernames?|handles?)[^A-Za-z`-][^`]{0,6}`([a-z]*[0-9A-Z][A-Za-z0-9_.-]*|[a-z]+[_.-][A-Za-z0-9_.-]*|[_.-]+[A-Za-z0-9][A-Za-z0-9_.-]*|[a-z]{6,})`|`([a-z]*[0-9A-Z][A-Za-z0-9_.-]*|[a-z]+[_.-][A-Za-z0-9_.-]*|[_.-]+[A-Za-z0-9][A-Za-z0-9_.-]*|[a-z]{6,})`[^A-Za-z`][^`]{0,6}(accounts?|logins?|usernames?|handles?)([^A-Za-z-]|$)",
-        ];
-        let res: Vec<Ere> = pats
-            .iter()
+        let tpl = Path::new(env!("CARGO_MANIFEST_DIR")).join("../gate-sdk/templates/msg-patterns.list");
+        let text = std::fs::read_to_string(&tpl)
+            .unwrap_or_else(|e| panic!("cannot read {}: {}", tpl.display(), e));
+        let res: Vec<Ere> = text
+            .lines()
+            .filter(|l| is_pattern(l))
             .map(|p| Ere::compile(p).expect("a shipped pattern failed to compile"))
             .collect();
         let hit = |s: &str| res.iter().any(|r| r.is_match(s));
@@ -194,6 +195,10 @@ mod tests {
         // spelled: this module is tracked, and the same pattern set scans the tracked tree
         assert!(hit(&format!("see /{}/someone/x for the log", "home")));
         assert!(hit("Session-Id: 3f2504e0-4f89-41d3-9a0c-0305e82c3301"));
+        // spec: gate-sdk/SPEC.md §check-commit-msg — the value is bounded by the token, not by a
+        // count: a URL-valued trailer hits and a prose lead-in quoting a UUID after a space does not
+        assert!(hit("Link: https://example.com/session/3f2504e0-4f89-41d3-9a0c-0305e82c3301"));
+        assert!(!hit("Note: the harness prints a session id such as 3f2504e0-4f89-41d3-9a0c-0305e82c3301"));
         // spec: gate-sdk/SPEC.md §check-commit-msg — the account-identification class matches a
         // handle-shaped token either side of a singular or plural noun, never a role, CLI name
         // or punctuation-only token
