@@ -8,6 +8,20 @@
 
 ## New Features
 
+### install-path-developer-first
+
+[spec: SPEC-install-per-os.md] [observed-by: gates workflow]
+
+the adopter's first contact assumes a developer toolchain. docs/index.md's quick-try block leads with `npx checkwright` ("Try it with Node on the machine"), while docs/install.md calls the Release tarball the primary path because it adds no runtime dependency. The landing page therefore contradicts the install page and gate-sdk/SPEC.md §The adopter constraints (no toolchain assumed). docs/install.md opens with target triples and release-leg status, spreads its prerequisites across per-profile tags, and gives its quick start as a multi-line curl + checksum + tar sequence. There is no clear per-OS path, and the audience includes business users.
+
+**Deliverable:** a customer-first rework. Lead with a no-toolchain path (a one-line OS-native bootstrap per OS; the option set is weighed at spec). Give each OS a section with its prerequisites, install, verify and uninstall. Move contributor-only facts (triples, leg status, cargo/jq) off the adopter path, and demote npx to an alternative for Node users. Likely iteration-class: it spans docs/, installer/README.md and possibly installer/ mechanism.
+
+**Operator direction (2026-09-22, lead session, relayed by the lead):** option C of spec's escalation. This iteration writes native per-OS recipes with no piped script: npx is demoted to an alternative for Node users, and docs/index.md leads with the no-Node path. The hosted one-liner is filed as [install-hosted-one-liner](#install-hosted-one-liner). The one-line wording in the deliverable is therefore not built here, and installer/SPEC.md §The dependency boundary's refusal of a `curl … | sh` one-liner stays in force.
+
+**Ruled at spec (2026-09-22):** one four-step recipe for macOS and Linux in `sh` and one for Windows in PowerShell. Each is split at the network into a fetch fence and a marked install block, which the install-smoke legs run verbatim against a packed tarball. The platform and toolchain blocks stay on docs/install.md under a `## Requirements` moved to the page's end, because three readers parse them there by marker, and the remedy blocks move into their OS sections. Observed by the push, because the Windows block's run under Windows PowerShell 5.1 is measured only on a Windows runner.
+
+**Cost while deferred:** every first-contact adopter without Node meets a developer path. Filed 2026-09-22 to the gap inbox by the lead as an operator direction and suggested as a next-iteration theme. Promoted at close because it is iteration-class. Re-verified: docs/index.md line 14 and docs/install.md line 10 read as stated. Owner: docs/install.md and installer/SPEC.md.
+
 ### install-smoke-leg-names-mix-two-axes
 
 [spec: SPEC-install-smoke-leg-names.md] [not-icebox-eligible: 2026-09-09 operator ruled it a defect] [observed-by: gates workflow]
@@ -144,15 +158,15 @@ live entries cite retired slugs in prose, and nothing marks them the same way ('
 
 **Cost while deferred:** a retired citation's referent can be reached only through history. Filed 2026-09-22 to the gap inbox by the lead on an operator question. The one-off sweep it asked for ran at queue-kit-unwrap's close: it found 28 retired rows plus one name-live row, most already marking retirement, and corrected three inline. Promoted for the rule half. Owner: queue-kit/SPEC.md §The tag algebra and §The queue-edges arm; neither rules on the referent.
 
-### install-path-developer-first
+### install-hosted-one-liner
 
 [cost: event/high] [surface: installer]
 
-the adopter's first contact assumes a developer toolchain. docs/index.md's quick-try block leads with `npx checkwright` ("Try it with Node on the machine"), while docs/install.md calls the Release tarball the primary path because it adds no runtime dependency. The landing page therefore contradicts the install page and gate-sdk/SPEC.md §The adopter constraints (no toolchain assumed). docs/install.md opens with target triples and release-leg status, spreads its prerequisites across per-profile tags, and gives its quick start as a multi-line curl + checksum + tar sequence. There is no clear per-OS path, and the audience includes business users.
+the install page's no-Node path is four steps per system, not one line. A hosted, tracked bootstrap pair — `curl -fsSL https://checkwright.dev/install.sh | sh` and `irm https://checkwright.dev/install.ps1 | iex` — would fetch a pinned release, verify it and run `init` in one command. installer/SPEC.md §The dependency boundary refuses a piped remote script, because an unreviewed script fed straight to a shell contradicts the page's opening claim, and that refusal stands until this entry rules otherwise.
 
-**Deliverable:** a customer-first rework. Lead with a no-toolchain path (a one-line OS-native bootstrap per OS; the option set is weighed at spec). Give each OS a section with its prerequisites, install, verify and uninstall. Move contributor-only facts (triples, leg status, cargo/jq) off the adopter path, and demote npx to an alternative for Node users. Likely iteration-class: it spans docs/, installer/README.md and possibly installer/ mechanism.
+**Deliverable:** a ruling on the refusal, then, if it is reversed, the two scripts as twins, a pinned-version line with a freshness gate against the newest tag, and a CI witness that runs each one-liner against a packed payload. `irm` cannot read `file://`, so the PowerShell witness needs a local server or a base-URL override.
 
-**Cost while deferred:** every first-contact adopter without Node meets a developer path. Filed 2026-09-22 to the gap inbox by the lead as an operator direction and suggested as a next-iteration theme. Promoted at close because it is iteration-class. Re-verified: docs/index.md line 14 and docs/install.md line 10 read as stated. Owner: docs/install.md and installer/SPEC.md.
+**Cost while deferred:** a first-contact adopter copies a four-step recipe where a one-liner would do. Filed 2026-09-22 at spec on the operator's direction (lead session), which chose per-OS recipes for install-path-developer-first this iteration and deferred the one-liner. Owner: installer/SPEC.md §The dependency boundary.
 
 ### shell-textual-absoluteness-single-dialect
 
