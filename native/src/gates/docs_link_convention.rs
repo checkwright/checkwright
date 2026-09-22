@@ -142,6 +142,9 @@ fn inner(args: &[String]) -> Result<i32, String> {
     }
 
     let mut bad: Vec<String> = Vec::new();
+    // spec: canon-kit/SPEC.md §check-docs-link-convention — which of the three rules fired, so the
+    // report carries each fired rule's own remedy and no other rule's
+    let (mut dir_fired, mut offroot_fired, mut anchor_fired) = (false, false, false);
     let mut links = 0usize;
     for f in &pages {
         let base = dir_of(f).to_string();
@@ -172,9 +175,10 @@ fn inner(args: &[String]) -> Result<i32, String> {
                 }
                 if path.ends_with('/') {
                     if !exempt(&lines, lno) {
+                        dir_fired = true;
                         bad.push(format!(
-                            "{}:{}: directory-target link '{}' — name the file (e.g. {}index.md), not the directory",
-                            f, lno, tgt, path
+                            "{}:{}: directory-target link '{}' — the target names a directory, which is not a page",
+                            f, lno, tgt
                         ));
                     }
                     continue;
@@ -185,17 +189,19 @@ fn inner(args: &[String]) -> Result<i32, String> {
                 }
                 if Path::new(&p).is_dir() {
                     if !exempt(&lines, lno) {
+                        dir_fired = true;
                         bad.push(format!(
-                            "{}:{}: directory-target link '{}' → {}/ — name the file (e.g. {}/index.md), not the directory",
-                            f, lno, tgt, p, tgt
+                            "{}:{}: directory-target link '{}' → {}/ — the target resolves to a directory, which is not a page",
+                            f, lno, tgt, p
                         ));
                     }
                     continue;
                 }
                 if Path::new(&p).exists() && !walk::under(&root, &p) {
                     if !exempt(&lines, lno) {
+                        offroot_fired = true;
                         bad.push(format!(
-                            "{}:{}: off-root relative link '{}' → {} — resolves outside {}/, so it 404s on a site served from {}/ alone; cite it in the absolute self-repo blob form",
+                            "{}:{}: off-root relative link '{}' → {} — resolves outside {}/, so it 404s on a site served from {}/ alone",
                             f, lno, tgt, p, root, root
                         ));
                     }
@@ -207,8 +213,9 @@ fn inner(args: &[String]) -> Result<i32, String> {
                         && base_of(dir_of(&p)) == kit
                         && !exempt(&lines, lno)
                     {
+                        anchor_fired = true;
                         bad.push(format!(
-                            "{}:{}: anchorless back-link '{}' to this kit's {} — a docs page cites downward, name the #section rather than the whole spec",
+                            "{}:{}: anchorless back-link '{}' to this kit's {} — a docs page cites downward, into a named section rather than a whole spec",
                             f, lno, tgt, b
                         ));
                     }
@@ -222,11 +229,18 @@ fn inner(args: &[String]) -> Result<i32, String> {
         for b in &bad {
             println!("  {}", b);
         }
-        println!("  help: name the file a directory link points at (kit/index.md, not kit/); give a kit page's");
-        println!("        back-link to its own README/SPEC a #section anchor; cite a target outside the docs");
-        println!("        root with the absolute self-repo blob form (canon-kit/SPEC.md §The reference-link");
-        println!("        grammar) rather than relatively. Per-site valve: a 'docs-link-exempt: <reason>'");
-        println!("        HTML comment on the link line or the one above.");
+        // spec: canon-kit/SPEC.md §check-docs-link-convention — one help line per rule that fired,
+        // so a first red carries its own remedy rather than the whole convention
+        if dir_fired {
+            println!("  help: name the file a directory link points at — 'kit/index.md', never 'kit/'.");
+        }
+        if offroot_fired {
+            println!("  help: cite a target outside {}/ in the absolute self-repo blob form, not relatively (canon-kit/SPEC.md §The reference-link grammar).", root);
+        }
+        if anchor_fired {
+            println!("  help: give a kit page's back-link to its own README/SPEC a #section anchor naming the section it cites.");
+        }
+        println!("  help: per-site valve — a 'docs-link-exempt: <reason>' HTML comment on the link line or the one above suppresses one finding.");
         return Ok(1);
     }
     println!(

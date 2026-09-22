@@ -26,20 +26,6 @@
 
 **Cost while deferred:** a consumer widening the knob with a multi-level glob governs fixture prose as manifest content, or enumerates single-level globs around the gap; and both configured expansions (`CANON_KIT_MANIFEST_FILES`, `CANON_KIT_PROSE_SURFACE_GLOBS`) still call `walk::glob_files`, so a `**` there stats every entry under `target/` and a concurrent cargo build can exit-2 every manifest reader on a clean tree. Repair route: `walk::glob_corpus` (gate-sdk/SPEC.md §The port-candidate criteria). Re-verified 2026-09-22 at scope: `native/src/spec.rs` lines 179 and 197. Filed 2026-09-15 by `couples-field-semantics`' spec into the gap inbox; drained and promoted 2026-09-15 at close.
 
-### docs-link-red-remedy-first
-
-`check-docs-link-convention` reds on the most ordinary thing a docs subpage author writes, and leads with the diagnosis.
-
-**Measured 2026-08-09 at spec on a real `init` consumer.** A `docs/` tree whose `index.md` carries a `[project README](../README.md)` link reds with "off-root relative link … resolves outside docs/".
-
-**The rule is correct, and changing it is not what this asks for.** For a site served from `docs/` alone such a link 404s, and the gate already offers a remedy — the absolute self-repo blob form, or a `docs-link-exempt:` comment. It stays on-surface deliberately (its descriptor's `install:` line keeps it there), so nothing is broken today.
-
-**The gap is first contact.** The gate's whole subject is a docs host, so the adopter most likely to register it is the adopter most likely to write that link — and they meet a red before they meet the remedy, having adopted the battery minutes earlier.
-
-**The buyable half is probably narrower than a rule change:** the failure text could lead with the remedy rather than the diagnosis. That is a message edit plus its fixture, not a predicate change, and it should be costed before any widening of the rule is.
-
-**Cost while deferred:** paid once per docs adopter, at exactly the moment they are deciding whether the battery is worth keeping — the worst moment this project has to spend a false-feeling red. Filed 2026-08-09 by close, draining the bullet spec filed under scope-gated intake.
-
 ## Deferred
 
 ### consumer-policy-rule-absent
@@ -1676,5 +1662,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - install-smoke-powershell-demo-runs-before-bash-strip
 - fence-run-fixed-env-hides-user-gem-dir
 - md-unwrap-folds-declarations
+- docs-link-red-remedy-first
 
 ## Lessons Learned

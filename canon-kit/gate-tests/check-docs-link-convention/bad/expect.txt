@@ -1,1 +1,4 @@
 directory-target link
+help: name the file a directory link points at
+help: give a kit page's back-link to its own README/SPEC a #section anchor
+help: per-site valve

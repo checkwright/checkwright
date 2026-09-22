@@ -42,6 +42,25 @@ check_case() {
 scaffold "$tmp/a" 'See [outside](../OUTSIDE.md).'
 check_case "off-root-file-reds" "$tmp/a" 1 "off-root relative link"
 
+# A2 — the remedy an adopter meets is their own rule's and no other's. This is a
+# docs adopter's likeliest first red, so the report must not spend four lines
+# teaching two conventions they did not break.
+out_a="$(cd "$tmp/a" && gate_run check-docs-link-convention "$CHECKS" docs 2>&1)"
+if ! grep -qF -- "help: cite a target outside" <<<"$out_a"; then
+    echo "  FAIL [help-is-per-rule]: the rule that fired printed no remedy: $out_a"
+    fails=$((fails + 1))
+fi
+for absent in "help: name the file a directory link points at" "help: give a kit page's back-link"; do
+    if grep -qF -- "$absent" <<<"$out_a"; then
+        echo "  FAIL [help-is-per-rule]: a rule that did not fire printed its remedy: $out_a"
+        fails=$((fails + 1))
+    fi
+done
+if ! grep -qF -- "help: per-site valve" <<<"$out_a"; then
+    echo "  FAIL [help-is-per-rule]: the valve remedy is owed on any red: $out_a"
+    fails=$((fails + 1))
+fi
+
 # B — resolving back under the root is silent. Keying on the '../' text instead of
 # the resolved path would red the majority of correct links in a real corpus.
 scaffold "$tmp/b" 'See [other](../docs/other.md).'
@@ -90,5 +109,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-docs-link-convention.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-docs-link-convention.test: ok (an off-root relative link to an existing target reds; a ../ link resolving back under the root, the blob form, a pure anchor, and a target that resolves to nothing are all silent; an off-root directory target stays the directory rule's single finding; the existing docs-link-exempt valve suppresses it; a generated mirror page is in scope)"
+echo "check-docs-link-convention.test: ok (an off-root relative link to an existing target reds and prints its own remedy and no other rule's, the valve remedy included; a ../ link resolving back under the root, the blob form, a pure anchor, and a target that resolves to nothing are all silent; an off-root directory target stays the directory rule's single finding; the existing docs-link-exempt valve suppresses it; a generated mirror page is in scope)"
 exit 0
