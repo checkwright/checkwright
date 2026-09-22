@@ -596,13 +596,11 @@ The constrained members and what forces each:
   above the `edition = "2021"` floor of 1.56 that governed while the graph was
   empty. It is re-derived against the lock at any dependency change rather than
   recalled, and a move carries every surface stating it — including **the
-  rendered verdict below (§bin/env-probe) and `docs/site-architecture.md`, both of which quote
-  this element as a *format example***, and both machine-checked by nothing. That
-  pair is named rather than described because a format example is the shape a
-  floor move keeps missing: it reads as illustration, so it survives the grep a
-  reader runs for the surface. The 1.56 → 1.71 move missed
-  `docs/site-architecture.md` at authoring and this section's own example at the
-  merge, the second caught only by a close-stage audit. It is also a `check-crate-arms` input: clippy
+  rendered verdict below (§bin/env-probe) and any consumer page quoting this
+  element as a *format example***, none of them machine-checked. They are called
+  out because a format example is the shape a floor move keeps
+  missing: it reads as illustration, so it survives the grep a reader runs for
+  the surface. It is also a `check-crate-arms` input: clippy
   suppresses a lint whose suggested API postdates the declared floor, so raising
   the floor un-suppresses lints against code no change touched.
   `cargo` is the member rather than `rustc` because `cargo build` is what the
@@ -956,8 +954,8 @@ consumer's `gates.list` (this repo's included).
 - **The pointer conjunct reads `§` by default**, so a bullet pointing at a
   document by path alone passes on it. `CONTEXT_KIT_BREVITY_POINTER_RE` is the
   consumer's lever; widening it to a path pattern also matches a bullet whose
-  *subject* is a file, which is most of a housekeeping section, so this repo
-  leaves it at the default.
+  *subject* is a file, which is most of a housekeeping section, so the default
+  is the conservative setting.
 
 Prose outside any bullet — the paragraph sections of an agent file — is outside
 the gate's grammar.
@@ -1100,8 +1098,8 @@ growth — the consumer's own content shares the file and is theirs to grow — 
 a level gate would be a noisy check breeding exemptions, the high-false-positive
 case the enforcement-first rule sanctions for keeping a class as stated manual
 duty rather than a gate. The mechanical holds that do exist stay: `check-brevity`
-bounds the bulleted sections its knob designates (§The brevity gate; this repo
-governs the conventions block and Housekeeping, not the digest — generated one
+bounds the bulleted sections its knob designates (§The brevity gate; a doctrine
+digest is no candidate for that knob — generated one
 line per rule and held byte-for-byte by `check-doctrine-registration`, so a
 brevity finding there is unreachable), and the meter delta feeds
 `kpi-always-loaded`.
@@ -1509,7 +1507,7 @@ set-but-missing settings file below. A derived default below names the knob it r
 - `CONTEXT_KIT_DRIFT_REPORT` — the **`--emit` arm name** of the consumer's
   drift report, not a path: the hook runs
   `run-gates.sh --emit <name> --trend` for the brief's drift line; default
-  empty (the line is omitted), and this repo's own copy sets `drift-report`.
+  empty (the line is omitted).
   **It was a script path in an earlier revision of this kit**, and the change is
   called out because the guard changed with it: a `-f` existence test on an arm name
   passes for nothing, so a hook that kept testing the value as a path would
@@ -1519,15 +1517,15 @@ set-but-missing settings file below. A derived default below names the knob it r
 - `CONTEXT_KIT_STAGE_RULES` — the **command** that emits stage→craft-rule
   pointers, not a path: the session-context hook runs it with the current stage
   appended for the brief's craft-rule block, and carries no `-f` guard. Default
-  empty (the block is omitted); this repo's own copy sets doctrine-kit's
-  `--emit stage-rules` invocation (doctrine-kit/SPEC.md §stage-rules).
+  empty (the block is omitted); doctrine-kit's `--emit stage-rules` invocation
+  is one value it takes (doctrine-kit/SPEC.md §stage-rules).
   **It was a path to a bash script in an earlier revision**, widened when that emitter
   ported to a compiled arm — a command a consumer can still point anywhere,
   which is what porting a knob's *value* leaves intact. The honest limit, stated
   because the migration is not free for everyone: a consumer whose config holds a
   bare **executable** script path keeps working, a command of one word; a
   consumer whose config holds a path to a **non-executable** script — which is
-  what this repo's own default was, run under an explicit `bash` — stops working,
+  what a script run under an explicit `bash` needs — stops working,
   because the `bash` prefix the hook used to supply is gone. That is one line of
   config to migrate, and it is what lets the knob name a compiled arm at all.
   **The knob is not renamed to `…_CMD`**: a rename costs every consumer a config
@@ -1564,9 +1562,7 @@ set-but-missing settings file below. A derived default below names the knob it r
   default **empty** (the always-loaded files alone). Empty here means *no
   load-triggered surface*, not *derive it*: which files a harness loads whole is
   the adopter's own layout, and a default spelling the kits' own template paths
-  would red an adopter's re-vendor commit for growth the kit shipped. This
-  repo's own copy names its kit templates, agent definitions and binding shims,
-  and excludes the gate-test fixture corpus.
+  would red an adopter's re-vendor commit for growth the kit shipped.
 - `CONTEXT_KIT_BREVITY_FILE` — default `CLAUDE.md`.
 - `CONTEXT_KIT_BREVITY_SECTIONS` — array of headings of the budgeted bullet
   sections; default `("## Shared conventions")`, a one-element set. It replaces
@@ -1576,7 +1572,6 @@ set-but-missing settings file below. A derived default below names the knob it r
   Without the refusal a config still setting it would be silently ignored while a
   file carrying `## Shared conventions` was governed on the wrong section at exit 0
   (the retired `GATE_SDK_GRAPH_THEME` precedent, gate-sdk/SPEC.md §check-graph).
-  This repo governs the conventions block and `## Housekeeping`.
 - `CONTEXT_KIT_BREVITY_BUDGET` — lines per bullet; default `4`.
 - `CONTEXT_KIT_BREVITY_POINTER_RE` — the "cites a deeper doc" pattern;
   default `§`.

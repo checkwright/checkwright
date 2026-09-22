@@ -4423,9 +4423,8 @@ a false clean.
 
 `LIFECYCLE_KIT_SHIM_NGRAM` is calibrated to the smallest window with zero false
 positives on the post-rewrite corpus, with a floor of 8 words so a citation line
-(a path plus a `§<heading>`) never fires — this repo's default is 9, the width at
-which the 8-word heading `This repo is governed by its own kits` stops
-tripping. Honest limit: the n-gram holds the *copy shape* only. Which tier a
+(a path plus a `§<heading>`) never fires — the default is 9, the width at which a
+citation of an 8-word heading stops tripping. Honest limit: the n-gram holds the *copy shape* only. Which tier a
 fact belongs to stays semantic judgment — a paraphrase below N words passes the
 gate and is still a defect to fix on sight (the same doctrine as
 check-comment-tier's floor). The `# graph:` couples the skills dir, `CLAUDE.md`,
@@ -4925,7 +4924,7 @@ slot's content:
   doctrine has one owner and never drifts across a copy. This is the documented
   default because it tracks the kit: a re-vendor reaches the template, and
   `check-skill-binding` + `check-shim-restatement` hold the shim to a thin
-  reference. This repo dogfoods it (`.claude/commands/*.md`).
+  reference.
 - **Copy-and-specialize (the sanctioned fork)** — the template is copied into
   the consumer's skills dir and each slot overwritten in place; self-contained
   and legible, structure copied not imported, so the skill stands alone

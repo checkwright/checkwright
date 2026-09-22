@@ -59,22 +59,6 @@
 
 ## Technical Debt
 
-- **kit-spec-singleton-consumer-config-quotes** — kit SPECs quote single values of this repo's
-  knob configuration, which gate-sdk/SPEC.md §The provenance seam rules consumer rule content, and
-  `check-provenance-seam`'s consumer-roster arm cannot see a singleton.
-  **Re-verified at this scope:** canon-kit/SPEC.md §Layout and configuration quotes the four
-  claim-command argv values (`scripts/install-transports.sh`, `scripts/payload-claims.sh`,
-  `scripts/measured-claims.sh`, `scripts/claim-classes.sh`); gate-sdk/SPEC.md names
-  `scripts/measured-claims.sh` on eight lines, not the seven sites filed, and names this repo's
-  plugin files as knob values.
-  **Deliverable:** sweep every kit SPEC under the voice-not-content discriminator, replacing each
-  value with its knob's name or moving it to the consumer config it quotes.
-  **Cost while deferred:** each quote publishes one tree's configuration in every vendored copy
-  and goes stale against it.
-  Filed 2026-09-21 to the gap inbox by gate-sdk-surface-drain's spec session; promoted 2026-09-22
-  into `canon-gate-precision` by operator direction (lead-relayed). Debt: it applies the seam rule
-  the spec already carries and mints no name.
-
 ## Deferred
 
 - **shell-textual-absoluteness-single-dialect** [cost: event/low] [surface: gate-sdk] — tracked
@@ -2164,5 +2148,6 @@
 - installer-spec-provenance-residue
 - measured-marker-cannot-sit-mid-paragraph
 - partitive-exemption-line-scope
+- kit-spec-singleton-consumer-config-quotes
 
 ## Lessons Learned

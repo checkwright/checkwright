@@ -3404,7 +3404,7 @@ derived default below names the knob it reads as `${NAME}`, or as `${NAME:-<defa
   one poll a minute while leaving any dispatch-time reading fresh enough to act
   on.
 - `DELEGATION_KIT_USAGE_HISTORY` — sample-log path; default empty (sampling
-  off). This repo sets `.metric/usage-history.log`, a gitignored persistent
+  off). A consumer points it into its metric directory, a gitignored persistent
   measurement trend (drift-kit/SPEC.md §Layout and configuration owns the
   metric-dir retention contract). Written by `--usage-verdict` and declared by
   `--emit-usage-trend`, whose `[history-file]` positional overrides it; because

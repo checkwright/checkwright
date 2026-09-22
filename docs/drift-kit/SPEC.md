@@ -141,7 +141,7 @@ declares the **prefix family** `DRIFT_KIT_*` and reads it through the family
 read: every declared scalar's resolved value, then every consumer scalar the
 local overlay or the tracked knob file sets (§Layout and configuration, the open
 family), the environment still outranking both. A knob a consumer's own knob file
-sets and nothing in this repo names therefore reaches the plugin; one exported in
+sets and nothing in the kit names therefore reaches the plugin; one exported in
 the invoking environment reaches it by inheritance. A transcribed `DRIFT_KIT_*`
 roster would lose exactly that knob and would land on the derivation-first rule;
 none is introduced anywhere.

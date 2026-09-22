@@ -3191,8 +3191,7 @@ shape, this guard enforces it. The header grammar is the kit's mechanism; the
 ruling-class roster — what a stage session must escalate at all — stays consumer
 config in the dispatched agent-definition, never here. Opt-in is the consumer's
 settings registration, the same valve as the wakeup-guard; absent it the
-arm goes undispatched, the intended default (this repo leaves it unwired, as
-it does the wakeup-guard). That stated default is the *only* enforcement of the
+arm goes undispatched, the intended default. That stated default is the *only* enforcement of the
 wiring: no gate observes it — `check-settings-pins` and `check-memory-off` stay
 green whether the hook is wired or not — so a session decides whether to wire an
 optional guard by reading this section, never by predicting a gate's verdict or

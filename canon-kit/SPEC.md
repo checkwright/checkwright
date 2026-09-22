@@ -449,14 +449,14 @@ Knobs:
   icebox-specific tag exists or is wanted.
 - `CANON_KIT_DOD_HEADING` — default `Definition of Done`;
   `CANON_KIT_DOD_MODE` — `exactly-one` (the default) or `at-most-one`
-  (a reference-spec corpus like this repo's kits carries no DoD).
+  (a reference-spec corpus carries no DoD).
 - `CANON_KIT_SCAN_KIT_ROOTS` — `0` (default) or `1`. At `0` the shared finders
   skip vendored kit roots (`gate_kit_roots`): a kit's `SPEC.md`/`SPEC-*.md` and
   its `README.md` alike are a dependency's documentation, not governed content,
   so the `exactly-one` default holds out of the box on a tree that merely
   vendored the kits beside gate-sdk and no consumer is asked to answer for a
   dependency's own internal links. Set `1` when the kit docs are the consumer's
-  own first-party content (this repo does, and keeps `at-most-one` for them).
+  own first-party content.
 - `CANON_KIT_BANNED_HEADINGS` — array, default
   `("Directory Structure" "Public API" "Cargo.toml Dependencies")`;
   `CANON_KIT_DERIVABLE_DENSITY` — default `60` (percent fenced);
@@ -482,13 +482,12 @@ Knobs:
   slot-free kit-template markdown and agent definitions come under the manifest
   doc gates while slot-bearing surfaces self-exclude — which surfaces a consumer
   governs is their config, the discriminator is kit mechanism (§The shared spec adapters).
-  This repo sets `("*/templates/*.md" ".claude/agents/*.md")`.
   `CANON_KIT_TEMPORAL_MARKERS` — the temporal-narration marker set scanned by
   `check-manifest-temporal`, default a generic-English list (`previously`,
   `formerly`, `renamed from`, …), matched case-insensitively and extended
   through `CANON_KIT_TEMPORAL_MARKERS_EXTRA` under the `_EXTRA` semantics below;
   `CANON_KIT_TEMPORAL_EXEMPT_SECTIONS` — array of heading names whose whole
-  section is exempt, default empty (this repo sets `Out of scope`).
+  section is exempt, default empty.
 - `CANON_KIT_SEAM_AUTHORITY_MARKERS` — the authority-marker ERE array
   `check-provenance-seam` matches against a case-folded sentence, default a bundled
   attribution-shaped set: `operator( |-)(ruled|ruling|direction|directed|decided|ratified|approved|chose)`,
@@ -514,23 +513,21 @@ Knobs:
 - `CANON_KIT_RESTATEMENT_PAGES` — array of globs, default empty: the pages
   `check-docs-restatement-parity` holds to the `README.md` beside each. Which
   pages restate a source is one site's layout, so no spelling ships as a kit
-  literal. This repo sets `("docs/*/index.md")`.
+  literal.
 - `CANON_KIT_FENCE_PROGRAMS` — array of program names a shell fence may start a
   command with, default a bundled generic utility set (`cat`, `grep`, `git`, …;
   `--emit knob-roster` prints it whole); extended through
   `CANON_KIT_FENCE_PROGRAMS_EXTRA` under the `_EXTRA` semantics below. Read by
   `check-fence-command-head`. The toolchain a tree's recipes name — a compiler, a
   fetch tool, a package manager — is that tree's own vocabulary, so it rides the
-  extra rather than a kit literal (the provenance seam). This repo adds its
-  crate toolchain, its fetch and checksum tools, one platform's package manager
-  and the npm runner.
+  extra rather than a kit literal (the provenance seam).
 - `CANON_KIT_FENCE_RUN_PROGRAMS` — array of program names a fence
   `check-fence-run` executes may start a command with, default `("git")`. It is
   the whole set, not an extra over `CANON_KIT_FENCE_PROGRAMS`: every name in it
   is a program that runs with the scratch's network reach, so the default admits
   only the one program the fixed environment confines to local protocols. A
   vocabulary rather than a walk filter, so it takes no `knob:` couples token, on
-  the fence-program pair's own ground. This repo sets nothing.
+  the fence-program pair's own ground.
 - `CANON_KIT_RETIRED_SPELLING_EXCLUDE` — array of globs, default empty: tracked
   paths held out of `check-amendment-retired-spelling`'s reconciliation corpus.
   Which surfaces are **history-bearing** is a consumer fact, not a kit one — a
@@ -542,8 +539,7 @@ Knobs:
   fail-open**: the exclusion can only ever remove findings, so a consumer that
   configures nothing gets a noisier gate rather than a blinder one — worth
   stating because the reflex on reading "defaults to empty" is to look for the
-  hole. This repo holds out its queue, its ruling record, its workflow directory
-  and every kit's `gate-tests/` tree.
+  hole.
 - `CANON_KIT_COUNT_COLLECTIONS` — array of collection-noun plurals
   `check-manifest-count` treats as growing governed sets, default
   `("gates" "meta-gates" "checks" "kits" "stages" "rules" "KPIs")` (a consumer
@@ -554,13 +550,13 @@ Knobs:
   sets, and only a phrase whose noun it governs needs the valve).
 - `CANON_KIT_ENUM_SETS_CMD` — a consumer command emitting the governed sets
   `check-prose-enum` holds, one `<set-name>`⇥`<member>` line per member,
-  default empty ⇒ clean skip (no declared sets). This repo sets the argv
-  `bash gate-sdk/bin/run-gates.sh --emit enum-sets`, the bundled emitter, which
-  derives the queue tag sets from queue-kit's own parser rather than restating
-  them. The knob's own contract is unchanged by that value naming a bundled arm:
-  it takes any consumer command, so an adopter still points it anywhere — what the
-  payload gained is an emitter an adopter can name without authoring a script, not
-  a claim on where a consumer's sets come from.
+  default empty ⇒ clean skip (no declared sets). The bundled emitter,
+  `bash gate-sdk/bin/run-gates.sh --emit enum-sets`, derives the queue tag sets
+  from queue-kit's own parser rather than restating them. The knob's own contract
+  is unchanged by a value naming a bundled arm: it takes any consumer command, so
+  an adopter still points it anywhere — what the payload offers is an emitter an
+  adopter can name without authoring a script, not a claim on where a consumer's
+  sets come from.
 - `CANON_KIT_INSTALL_TRANSPORTS_CMD` — a consumer command emitting the install
   transports `check-install-claim` holds, one `<transport-id>`⇥`<ERE>` line per
   transport, default empty ⇒ clean skip. `CANON_KIT_INSTALL_SECTION_RE` — an ERE
@@ -570,9 +566,7 @@ Knobs:
   `CANON_KIT_INSTALL_CLAIM_EXCLUDE` — array of globs dropped from that gate's
   scanned set on top of `CANON_KIT_MDREF_EXCLUDE`, default empty. A transport
   vocabulary is one project's distribution model, so no spelling of it ships as a
-  kit literal (the provenance seam). This repo sets the argv
-  `bash scripts/install-transports.sh`, `^(Quick start|Install)`, and
-  `("docs/posts/*")`.
+  kit literal (the provenance seam).
 - `CANON_KIT_PAYLOAD_CLAIMS_CMD` — a consumer command emitting the payload
   disclosure classes `check-payload-claim` holds, one `<claim-id>`⇥`<ERE>` line
   per class, default empty ⇒ clean skip (the correct posture for a tree whose
@@ -580,20 +574,18 @@ Knobs:
   of globs dropped from that gate's scanned set on top of
   `CANON_KIT_MDREF_EXCLUDE`, default empty. A spelling of what a payload
   discloses is one project's distribution model, so it is consumer config for
-  the same provenance-seam reason the transport vocabulary above is. This repo
-  sets the argv `bash scripts/payload-claims.sh` and `("docs/posts/*")`.
+  the same provenance-seam reason the transport vocabulary above is.
 - `CANON_KIT_MEASURED_CLAIMS_CMD` — a consumer command emitting the oracle
   `check-measured-claim` re-runs, one `<key>`⇥`<value>` line per measurable fact,
   default empty ⇒ clean skip (no oracle, so no marker has anything to disagree
   with). `CANON_KIT_MEASURED_SURFACE_GLOBS` — array of globs naming the scanned
   surface, default empty ⇒ empty corpus and a clean gate; the two are set
   together or not at all. What a project measures is that project's vocabulary,
-  so no key ships as a kit literal (the provenance seam). This repo sets the argv
-  `bash scripts/measured-claims.sh`, and the surface as the reference
-  `CANON_KIT_MEASURED_SURFACE_GLOBS[] <- CANON_KIT_MANIFEST_FILES` followed by
-  `.claude/commands/*.md` and `TASK-QUEUE.md` — the shims the manifest set omits and
-  the prose surface
-  excludes on a copy-shape ownership this rule is not covered by, and the work
+  so no key ships as a kit literal (the provenance seam). A consumer commonly
+  derives the surface by reference,
+  `CANON_KIT_MEASURED_SURFACE_GLOBS[] <- CANON_KIT_MANIFEST_FILES`, and widens it
+  with what the manifest set omits: binding shims, which the prose surface
+  excludes on a copy-shape ownership this rule is not covered by, and a work
   queue, which takes the marker without taking the manifest tier's bare-cardinal
   ban (§check-manifest-count).
   **Deriving this knob from the manifest array is the common shape, and it makes a
@@ -616,7 +608,7 @@ Knobs:
   a spelling of what one project claims about itself, so it is consumer config for
   the same provenance-seam reason the vocabularies above are, and for one more:
   this kit's own SPEC is governed prose, so a kit literal here would match its own
-  class while describing it. This repo sets the argv `bash scripts/claim-classes.sh`.
+  class while describing it.
   The gate reads `CANON_KIT_MEASURED_SURFACE_GLOBS` above for its corpus and adds no
   surface knob.
 - `CANON_KIT_COMMENT_MACHINE` / `CANON_KIT_COMMENT_REASON` — arrays, default
@@ -1318,13 +1310,11 @@ meta-reference, not narration — so a gate-output example or this section's own
 vocabulary may name one. Three valves suppress a legitimately past line: a
 per-site `manifest-temporal-exempt: <reason>` comment on the line or the one
 above; `CANON_KIT_TEMPORAL_EXEMPT_SECTIONS` — heading names whose whole
-section (subsections included) is exempt, this repo's config naming
-`Out of scope` (a deliberate-absence ruling may narrate what the kit
-excludes); and `CANON_KIT_TEMPORAL_EXEMPT_PATHS` — path
+section (subsections included) is exempt (a deliberate-absence section may
+narrate what the kit excludes); and `CANON_KIT_TEMPORAL_EXEMPT_PATHS` — path
 globs whose whole file is exempt, for an immutable dated-narrative surface a
-heading name cannot address (this repo's config naming `docs/posts/*`, the
-dated announcement posts, which take link and command resolution but not
-narration governance). These three valves also admit a retired-path citation
+heading name cannot address (dated announcement posts, which take link and
+command resolution but not narration governance). These three valves also admit a retired-path citation
 under §check-docs-cmd assertion C, so a site's marker or path exemption clears
 both gates at once and their reach is stated once, by the section that owns the
 valves. Producer: the generated pre-commit hook /
@@ -1947,8 +1937,7 @@ the gate over the docs). Consumer: the committing operator via the output
 contract — file, line, set name, count, and the omitted members all read once at
 the scan transition. `CANON_KIT_ENUM_SETS_CMD` is read at startup; both fields of
 each emitted line are read at match time (set name in the report, member in the
-matcher). This repo's configured value is the bundled `--emit-enum-sets` arm,
-which derives
+matcher). The bundled `--emit-enum-sets` arm, one value the knob takes, derives
 the queue task-tag set and the Lessons-channel set from queue-kit's own
 lead-line tag vocabulary plus `QUEUE_KIT_LESSON_TAGS` — derived, not restated; the
 two roles are separate sets because a paragraph naming one role's tags is not
@@ -2634,7 +2623,7 @@ repaired in the shell before the port, so the parity run proves the repaired
 message on both substrates rather than freezing the defect into the compiled
 form.
 
-This repo sets no roster, so the gate clean-skips here — the good/bad fixture
+A tree that sets no roster gets the clean skip, so the good/bad fixture
 pair and `check-deprecation-task.test.sh` carry the resolved and reddened paths
 under a fixture-local roster (the `check-manifest-count` config-path precedent).
 The release-boundary disposition walk over the standing marker inventory
@@ -2769,7 +2758,7 @@ repo with no `origin` skips the pass: a self-repo link cannot be identified, so
 it falls through to the external-URL skip. The ref is a knob rather than a
 literal because it is a policy choice, not a derived fact — the site is living
 documentation of the current tree, so a reference link pins to the default
-branch (this repo's `master`), and a tag-pinned reference copy would buy
+branch, and a tag-pinned reference copy would buy
 staleness, not stability.
 
 **Coverage the good/bad pair cannot hold**, and where it lives:
@@ -2781,9 +2770,9 @@ self-repo pass is the first: each case builds a throwaway repo with a controlled
 the manifest set's README half is the second, and the two cases differ only in
 `CANON_KIT_SCAN_KIT_ROOTS` over one tree — a shape the pair's
 one-tree-per-verdict form cannot express even with a slot free. That second half
-is the **only** executable oracle the prune has: this repo sets the knob, so its
-battery is a no-op on it, and a consumer's knob is `0` either way, so no
-consumer-smoke run distinguishes a knob-gated prune from an unconditional one.
+is the **only** executable oracle the prune has: a kit-authoring tree sets the
+knob, so its battery is a no-op on it, and a vendoring consumer's knob is `0`
+either way, so no consumer-smoke run distinguishes a knob-gated prune from an unconditional one.
 The sibling `gate-tests/check-spec-dod-singleton.test.sh` carries the same
 prune's canonical-spec half for the same reason.
 
@@ -3431,8 +3420,8 @@ held out before any assertion runs: inline `` `code` `` spans, markdown table
 rows, and generated `<!-- name:begin -->`…`<!-- name:end -->` regions, a marker
 being a line whose whole trimmed content is the comment, so prose naming one
 opens nothing (each region is byte-gated elsewhere — a prose gate that forced edits to generated content
-would contradict its generation, the same reasoning that keeps `docs/posts/`
-out of the opt-in). Fenced code the shared walk driver already drops.
+would contradict its generation, the same reasoning that keeps an immutable
+dated-post archive out of the opt-in). Fenced code the shared walk driver already drops.
 
 - **A. Em-dash density** — a paragraph carrying more than
   `CANON_KIT_PROSE_TELL_EMDASH_MAX` em-dashes.

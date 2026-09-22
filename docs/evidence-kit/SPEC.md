@@ -105,9 +105,8 @@ Knobs, this repo's surface names as defaults:
   another's (gate-sdk/SPEC.md §run-gates). Stated rather than left derivable,
   because it is the surface a reader would otherwise re-derive off the runner.
   **A second consumer suite exercises the knob, and it is the one that shows the
-  contract already covers more than a test runner.** This repo's
-  `installer_smoke` takes a parser emitting **one scenario per arm** of the
-  consumer smoke — arm names, not test names, which the per-suite override admits
+  contract already covers more than a test runner.** An installer-smoke suite
+  takes a parser emitting **one scenario per arm** of the consumer smoke — arm names, not test names, which the per-suite override admits
   without amendment because it names a command over a log and says nothing about
   what a scenario must be. The arm roster is **not listed in the parser**: it is
   derived from the smoke script's own top-level headers, so an arm added or
@@ -121,7 +120,7 @@ Knobs, this repo's surface names as defaults:
   entirely a format specifier.
   **The driver is the consumer's own file, so it is an operand rather than a
   constant.** `bash gate-sdk/bin/run-gates.sh --emit parse-smoke-log <driver>` is
-  the whole of this repo's configured value: the driver path arrives as the arm's
+  the whole of a consumer's configured value: the driver path arrives as the arm's
   leading positional, the arm holds no default for it, and an invocation missing it
   or naming a driver that does not resolve is exit 2 before any line of the log is
   judged. The log arrives **last**, after everything the knob value spells, which
@@ -1014,7 +1013,7 @@ bug.
 The overlap with `check-kit-registration` assertion B (gate-sdk/SPEC.md
 §check-kit-registration) is deliberate. That assertion requires every kit root
 with tracked `gate-tests/` files to have a runner-doc line naming
-`<kit>/gate-tests`; because this repo's config derives exactly those roots into
+`<kit>/gate-tests`; where a consumer's config derives exactly those roots into
 `EVIDENCE_KIT_SUITES` through `EVIDENCE_KIT_FIXTURE_SUITES`, assertion (A) here is a
 superset of that arm for a consumer running both kits. It is kept rather than
 retired on a dependency direction: a gate-sdk gate may not require this kit's

@@ -2100,7 +2100,7 @@ key, and the desync had one silent direction — a key renamed without its regex
 leaves every downstream reader agreeing while the matcher hunts a token no
 entry carries, and the lead-line guard for that class dies with nothing
 reddening. The table is also the **derivation surface** a consumer's enum
-emitter reads for the tag vocabulary (this repo's `--emit-enum-sets` arm →
+emitter reads for the tag vocabulary (the bundled `--emit-enum-sets` arm →
 `check-prose-enum`), so it is the single source for the spelling on both the
 enforcement and the prose side. The emitter references the table rather than
 parsing the module as text, and `QUEUE_KIT_LESSON_TAGS` stays the consumer's:

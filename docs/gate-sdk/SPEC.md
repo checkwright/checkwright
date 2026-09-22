@@ -518,7 +518,7 @@ manifest).
 
 **A command knob** (`<KIT>_…_CMD`) is an **indexed** knob holding an argv, one
 element per line: `CANON_KIT_MEASURED_CLAIMS_CMD[] = bash` then
-`CANON_KIT_MEASURED_CLAIMS_CMD[] = scripts/measured-claims.sh`. Its reader spawns the
+`CANON_KIT_MEASURED_CLAIMS_CMD[] = scripts/oracle.sh`. Its reader spawns the
 argv directly and no shell parses it, so a consumer on native Windows names its own
 interpreter. The program is resolved by the crate's one program resolver (§Fail-closed
 contract), the child inherits the reader's working directory and environment, and an
@@ -2662,8 +2662,8 @@ is substrate-sensitive when its expanded `couples=` covers the **declaration
 path of a registry member** — the derivation `check-gate-substrate-parity`
 performs at runtime, so no count or roster here can rot. (The test is against
 registry members' declaration paths specifically, not against every `*.sh`
-under a resolve dir: `scripts/measured-claims.sh` sits in the gates dir and is not
-a gate, and matching it would over-report.) **Where a declaration lives is not a
+under a resolve dir: a consumer's claim-oracle script can sit in the gates dir and is
+not a gate, and matching it would over-report.) **Where a declaration lives is not a
 term of that derivation**, on either side of it: a member the consumer's own
 gates directory declares earns a row on exactly the same terms as a kit-declared
 one, and a consumer-declared member's own declaration path counts as an object
@@ -4476,7 +4476,7 @@ that answers each is the one whose corpus matches its question.
 
    **The residual is the omitted roster and its count, and that is what a cohort
    records.** It is **measured, never reasoned**, and the instrument is
-   `installer_smoke`'s binary-less leg: it installs a profile from an
+   the installer smoke's binary-less leg: it installs a profile from an
    artifact-free payload, derives the set that payload dispatches to a binary from
    the consumer's own vendored tree, and asserts the consumer's `gates.list`
    declares exactly that set, at a **non-zero** count
@@ -4545,7 +4545,7 @@ that answers each is the one whose corpus matches its question.
    What a cohort may not do is land **unpriced**, and while an aggregate price
    stands unpaid a held `fail` row in `.workflow/validate-baseline.txt` is what
    keeps it visible — a machine-held record of an unpaid price. Read the file,
-   not this sentence, for whether any such row stands: the `installer_smoke`
+   not this sentence, for whether any such row stands: the installer smoke
    row this clause was first written against has since been earned out and
    reads `pass` today, so the mechanism is live and its founding instance is
    not.
@@ -4680,7 +4680,7 @@ that answers each is the one whose corpus matches its question.
    this criterion's own paragraph above, and it is the **validate stage's to
    write** — a row encoding a judgment is not a build-stage surface, and the
    governed record is here rather than in the file. The consequence a later
-   session must not misread: validate meets a **failing `installer_smoke` against
+   session must not misread: validate meets a **failing installer smoke against
    a `pass` baseline**, and that is the held row working rather than a red to
    repair. Repairing it would reverse this ruling **by mechanism** rather than by
    argument, which is exactly what a held row exists to prevent.
@@ -5626,7 +5626,7 @@ itself.
 took getting there is the part worth keeping.** Both members are
 `# install: zero-config` and both live in `gate-sdk`, which the measured profile
 carries, so the predicted growth is **two** with the profile intersection a no-op.
-`installer_smoke`'s binary-less leg, run from a clean checkout of each rev reached
+The installer smoke's binary-less leg, run from a clean checkout of each rev reached
 by path, reports **twenty-two** omitted members before the batch and
 **twenty-four** after — the prediction exactly, and both sides measured rather
 than one measured and one reasoned. The **judgment** is the standing one, **accept
@@ -5736,7 +5736,7 @@ budget batch adds a section to this SPEC only where it has a finding to record* 
 an adjudication a later selector would otherwise re-make, a primitive it landed,
 a criterion it discharged. Membership and progress are **derived** instead: a
 ported member leaves a `.gate` beside its deleted `.sh`, and the count is
-`scripts/measured-claims.sh`'s `ported-gate-members`, which §check-measured-claim
+the `ported-gate-members` key of the measured-claim oracle (`CANON_KIT_MEASURED_CLAIMS_CMD`), which §check-measured-claim
 already holds to the tree. Without the rule the section count scales with the
 tail — roughly one section per batch across the remaining singletons — and the
 fixed per-iteration ceremony the arm exists to amortize gets paid a second time,
@@ -6358,7 +6358,7 @@ advisory group is a finding the selecting session adjudicates*. The batch is not
 one unit of work and was never merged, recorded or argued as one. Under the arm's
 record-only-findings rule this section carries the two adjudications the cut
 produced and no member roster: membership is derivable from the tree and the
-count from `scripts/measured-claims.sh`.
+count from the measured-claim oracle (`CANON_KIT_MEASURED_CLAIMS_CMD`).
 
 **Criterion 3 does not bar a `tier=commit-msg` member, and the criterion's
 literal value is a proxy rather than a bar.** It reads `tier=precommit`, and its
@@ -6405,8 +6405,8 @@ increment is a hand-composed batch rather than a cohort. The batch is not one
 unit of work and was not merged, recorded or argued as one: each member took its
 own descriptor, its own registry entry, its own parity run and its own deletion.
 Under the arm's record-only-findings rule this section carries the cut's findings
-and no member roster — membership is derivable from the tree and the count from
-`scripts/measured-claims.sh`.
+and no member roster — membership is derivable from the tree and the count from the measured-claim
+oracle (`CANON_KIT_MEASURED_CLAIMS_CMD`).
 
 **A member was admitted on the wrong criterion, and correcting the record is the
 first finding.** The prior cut admitted `check-memory-off` on a criterion-7
@@ -6511,7 +6511,7 @@ was not merged, recorded or argued as one: each member took its own descriptor,
 its own registry entry, its own parity run and its own shell deletion, in its own
 commit. Under the arm's record-only-findings rule this section carries the cut's
 findings and no member roster — membership is derivable from the tree and the
-count from `scripts/measured-claims.sh`'s `ported-gate-members`.
+count from the `ported-gate-members` key of the measured-claim oracle (`CANON_KIT_MEASURED_CLAIMS_CMD`).
 
 **The size arm is permanently exhausted, and that is a change to the rule rather
 than a reading of one cut.** `bash gate-sdk/bin/run-gates.sh --emit port-blockers --group`
@@ -6639,7 +6639,7 @@ are ruled per cut and never inherited, and a later selector reading the two
 together as a standing envelope is reading a precedent that has now been refused
 twice. Under the arm's record-only-findings rule this section carries the cut's
 findings and no member roster — membership is derivable from the tree and the
-count from `scripts/measured-claims.sh`'s `ported-gate-members`.
+count from the `ported-gate-members` key of the measured-claim oracle (`CANON_KIT_MEASURED_CLAIMS_CMD`).
 
 **The width was re-examined *after* the amendment was authored, on cost evidence
 that had moved, and held.** The width was fixed against a survey ranking the
@@ -6814,7 +6814,7 @@ in hand and against it. Cut widths are ruled per cut and never inherited, and th
 five sections above are each their own ruling rather than a standing envelope. As
 with every batch section, this one records the cut's **findings and no member
 roster** — membership is derivable from the tree and the count from
-`scripts/measured-claims.sh`'s `ported-gate-members`. The fifth cut's
+the `ported-gate-members` key of the measured-claim oracle (`CANON_KIT_MEASURED_CLAIMS_CMD`). The fifth cut's
 drop-any-member relief rides in this envelope by the same ruling, available for
 cause and never as a budget lever.
 
@@ -7142,7 +7142,7 @@ green once fixed. The suite's only failure is the markdown-link class the held
 row already owns, so no class this cohort could have emptied changed hands. The
 falsifier was available and did not fire: a newly lost class would have shown as
 a value-arm class this consumer used to catch, or as a red battery, and neither
-appeared. The `installer_smoke fail` row that stood held in
+appeared. The installer smoke's `fail` row that stood held in
 `.workflow/validate-baseline.txt` at the time was **not** this cohort's price: it
 recorded a markdown-link hole in the aggregate-cost measurement, which this
 cohort neither widened nor repaired. That row has since been earned out to
@@ -7677,7 +7677,7 @@ this repo's floor while the two held members below keep `jq` in the battery.
 
 **Criterion 5, priced by measurement.** Both members are `install: on-surface`, so
 the lifecycle-kit cohort's precedent **predicted** a binary-less residual growth
-of zero. Measured with `installer_smoke`'s binary-less leg after this cohort's own
+of zero. Measured with the installer smoke's binary-less leg after this cohort's own
 commit: **12 members omitted and declared**, and the prose profile's descriptor
 set is untouched by the cohort, so growth is **zero** and the prediction holds.
 
@@ -7966,7 +7966,7 @@ than empirical.** All three members are consumer-declared, so they sit in no kit
 residual counts what a consumer *loses*, and this cohort takes nothing from any
 consumer. That is a stronger ground than the settings cohort's `on-surface`
 argument, and it still does not discharge the criterion: N members each
-individually runnable is not a measurement. Measured with `installer_smoke`'s
+individually runnable is not a measurement. Measured with the installer smoke's
 binary-less leg after this cohort's own commit, from a clean checkout reached by
 path: **12 members omitted and declared**, the same figure the settings cohort
 measured, so growth is **zero** and the cohort lands on that finding. The
@@ -8121,7 +8121,7 @@ All ten members are consumer-declared: they sit in no kit's `checks/`, `init` ca
 never seed them, and no adopter has ever had them, so the cohort takes nothing
 from any consumer and the prediction was **zero** growth. N members each
 individually runnable is not a measurement, which is why the ground does not
-discharge the criterion; measured with `installer_smoke`'s binary-less leg from a
+discharge the criterion; measured with the installer smoke's binary-less leg from a
 clean checkout reached by path, after this cohort's own commit: **12 members
 omitted and declared**, the same figure the settings and declaration cohorts
 measured, so
@@ -8206,8 +8206,7 @@ splitting one member across commits.
 
 **The price.** Three crate modules, two descriptors, three shell files deleted,
 one renamed SPEC heading with its citations moved, and the generated-projection
-fan-out `docs/site-architecture.md` §Generated projections and their freshness
-gates rosters. Parity was proved by running both
+fan-out the projection roster (`GATE_SDK_PROJECTION_ROSTER`) lists. Parity was proved by running both
 substrates over the live tree: the arm is byte-identical to the deleted script's
 roster, and the ported precondition gate is byte-identical to the deleted one
 over `TASK-QUEUE.md` and over a crafted corpus reaching the bracket-bridging,
@@ -8243,7 +8242,7 @@ dispatch, the toolchain floor pin, and the CI crate build/clippy/test legs. The
 crate carries **both** first-cohort rules — as **live dispatched** implementations
 since their descriptors landed, having been `reference-only` while those were held
 (§The first cohort, and the rule that selects the next) — so `cargo test` and the
-`native_crate` evidence suite assert against real gate rules rather than going
+crate's evidence suite assert against real gate rules rather than going
 green over an empty crate, and the read-declaration unit tests hold a `?` to its
 arity across two members rather than one. Those properties came from the modules
 existing, never from their disposition, so going live changed neither.
@@ -8579,12 +8578,11 @@ platforms **on the page that already states them** — one marker block per page
 each entry a target triple and a join state, `joined` for a triple the roster
 carries and `held` with a named precondition for one it does not — rather than
 minting a second file asserting platform support, which would put the commitment
-in two places to hold the two-place problem down. This repo's instance is
-`docs/install.md` §Requirements' `platforms:begin` block, whose grammar and
-holder are its own (`docs/site-architecture.md`); the *shape* is kit mechanism
-and *which* platforms are declared is the project's own support commitment, the
-same split the roster file itself takes. **A declared block is what makes the
-bound checkable, and this repo's is checked**: `check-install-platforms` reds on
+in two places to hold the two-place problem down. The block's grammar and holder
+are the consumer's own; the *shape* is kit mechanism and *which* platforms are
+declared is the project's own support commitment, the same split the roster file
+itself takes. **A declared block is what makes the bound checkable**: a
+consumer gate such as `check-install-platforms` reds on
 a roster line the block does not declare `joined` and on the converse, so the
 bound is discharged at the commit that would break it rather than by whoever
 remembers to open the page. A consumer without such a gate still holds the bound
@@ -9510,7 +9508,7 @@ CI entry point (wiring CI is out of scope here).
 
 The **accounting phase** is produced by `--run-consumer-smoke` on every
 invocation — no enabling knob, since the harness *is* a consumer's
-`consumer_smoke` validate suite, so the producer is reachable in the real
+validate suite, so the producer is reachable in the real
 configuration and not only under test. It reads the vendored kits' `checks/`
 directories, the scratch `scripts/gates.list`, and the vendored
 `smoke/install.sh` declarations, all present in the scratch tree once
@@ -11570,7 +11568,7 @@ through the emit front-end (§The non-gate arm), and the destination comes from 
 scratch consumer's own `GATE_SDK_GRAPH_ARTIFACT` — resolved in that tree — never
 from the host's, which is what this suite's own process reads. The
 distinction is load-bearing rather than pedantic: a host that republishes its
-artifact (this repo serves `docs/check-graph.html`) would otherwise write the
+artifact would otherwise write the
 scratch consumer's artifact to a path that consumer's own gate never looks at.
 This is what discharges the graph-artifact literal, and it takes neither of the
 two dispositions weighed against it: it neither duplicates the default
@@ -12498,7 +12496,7 @@ gate-sdk's scratch-consumer builder ignores the placed binary; the installer's
 build reaching it — the publish workflow's per-target build, CI's, and the
 consumer smoke's host build — goes through *this* script. So the property is held
 in two places that do not depend on each other: this script refuses to leave a
-leaking artifact behind, and `installer_smoke` runs a real `init` and a real
+leaking artifact behind, and the installer smoke runs a real `init` and a real
 consumer battery over the result, where §check-tree-terms reads the committed
 binary. A future second builder whose artifact reaches a tracked tree is caught by
 the second; one whose artifact does not is not a leak. What remains uncovered is a
@@ -13534,7 +13532,7 @@ consumer receives the descriptor and never the crate (assertion E holds the crat
 outside every kit root), so a marker set that is not in the tree is not one this
 gate can assert over, and reding on it would red every adopter. Crate presence is
 the **manifest**, never the directory, for the reason §check-gate-output states.
-The skip's executed oracle is `installer_smoke`, which runs the battery on a
+The skip's executed oracle is the installer smoke, which runs the battery on a
 freshly vendored consumer and is what found the red this branch answers.
 
 **Four port hazards are pinned here, each a place the natural port diverges
@@ -15784,7 +15782,7 @@ hook (when any gate is `tier=commit-msg`), and the coupling-graph projection at
 `GATE_SDK_GRAPH_ARTIFACT` (default `<gates-dir>/CHECK-GRAPH.html`) each equal
 the emission this member computes in process, down to every emitted asset href resolving
 under the artifact's own directory. The remedy lines print the resolved artifact
-path, so a consumer that republishes it (this repo serves `docs/check-graph.html`)
+path, so a consumer that republishes it
 is always offered its own regenerate command; how each guarantee is asserted
 lives in the check. A `# graph:` manifest embedded in a `SPEC-*.md` amendment
 body is held to the glob grammar but not to the vocabulary or hook-parity — the
@@ -16082,9 +16080,7 @@ via `--refs-only` (the fixture's `check-graph-refs.test.sh` drives it, as
 neither `href` nor `src` and are out of scope. Dark mode is the theme owner's disposition: the kit default keeps its
 light+dark scheme, and because the emitted mermaid init keys on
 `prefers-color-scheme`, a theme's chrome must honor that query too or it clashes
-with a dark-rendered graph on the same page. This repo's `scripts/graph-theme/`
-supplies the docs-host tokens, header, and footer (both schemes), so
-`docs/check-graph.html` reads as the same site.
+with a dark-rendered graph on the same page.
 
 Render cap (`GATE_SDK_GRAPH_MAX_EDGES`, default `100000`): Mermaid refuses to
 render a flowchart whose edge count *exceeds* `maxEdges` (its own default is
@@ -16696,14 +16692,14 @@ family, never enumerated, since a prefix is a resolution set and not a roster
 (§lib/gate.sh); and **monitors** — the
 one class with no parseable registry — from a line-start
 `# enforce: class=monitor <free-text>` marker a non-gate surface declares itself
-with, greped under `GATE_SDK_ENFORCE_SCAN_DIR` (this repo's first carrier is the
-site-health workflow — deployment truth, not tree truth). A marker is **dormant
+with, greped under `GATE_SDK_ENFORCE_SCAN_DIR` (a site-health workflow is the
+shape — deployment truth, not tree truth). A marker is **dormant
 in a template or fixture** — an inert copy-source — and **activates only where a
 consumer copies the file into a live path**: the walk therefore prunes
 `templates/` (a `grep -v`, the sibling-finder idiom) atop the `gate-tests`
 exclusion `GATE_GREP_EXCLUDES` already carries, so site-kit's shipped
-`templates/site-health.yml` marker projects no row while this repo's own copy of
-it under `.github/workflows/` does. The `# enforce:`
+`templates/site-health.yml` marker projects no row while a consumer's copy of it
+under a live workflow path does. The `# enforce:`
 grammar is the reusable name a future uncovered class adopts rather than growing
 a bespoke registry.
 
@@ -18360,7 +18356,7 @@ inherited.**
   `TREE-TERMS: clean` and exited 0. Dead on this tree, which tracks no binaries;
   live in a consumer's, which is exactly why it is ruled here rather than
   discovered there. **It is live on this tree**, which the ruling did not expect
-  and the measurement found: `installer_smoke`'s artifact legs commit the gate
+  and the measurement found: the installer smoke's artifact legs commit the gate
   binary into a scratch consumer's tree at `scripts/checkwright-gates`, so this
   arm reads a real consumer's real artifact on every run of that suite. What it
   caught there is **fixed at its source rather than exempted here**: the build
@@ -18677,8 +18673,7 @@ Producer of nothing but a verdict; its consumers are the committing session
 through the output contract, on the generated pre-commit hook, `run-gates.sh` and
 CI, and the `--run-gate-tests` arm through the fixture pair. Its `couples=`
 carries `knob:GATE_SDK_PROJECTION_ROSTER` beside the descriptor globs, so a roster
-edit re-runs it. This repo sets both knobs, so the gate is live here and not only
-in fixtures.
+edit re-runs it.
 
 ### check-template-copy-parity
 
