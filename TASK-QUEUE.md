@@ -54,22 +54,6 @@ a spec amendment can state a delta instruction in the unconditional voice when i
 
 **Cost while deferred:** once/low to rule, plus whatever the rule costs to gate; until then every batch-dependent delta needs a lead present to invert it. Filed 2026-09-20 by the iteration lead to the gap inbox at the build batch-2 dispatch, where inverting the instruction was the act that surfaced it; drained and promoted 2026-09-20 at close.
 
-### close-surface-row-trackedness-undeclared
-
-[spec: SPEC-surface-tracking.md]
-
-a close-surface roster row does not say whether its path is tracked or gitignored, so a session deciding whether that row's read is delegable to an isolated agent re-derives the bit by hand. Isolation cost (3) makes that bit decide delegability outright: an untracked or gitignored corpus is not delegable at all to a type held to isolation.
-
-**The filing premise was corrected at the drain, and the correction changes the cost.** The bullet claimed the emitter already holds a `git check-ignore` verdict per path and drops it. It does not: `native/src/emit/close_surfaces.rs` calls `check-ignore` only inside the workflow-directory walk that mints `(undeclared)` rows, and its exit-1 arm `continue`s, so the verdict exists for gitignored workflow-dir members alone. Rows harvested from declaration surfaces get no call at all. A fifth tier field is therefore a widening that adds one `check-ignore` per declared row, not a free print of a fact already held.
-
-**Ruled at spec (2026-09-22):** a sixth column, `<tracking>`, reading `tracked`, `ignored` or `untracked`, computed once per row by two batched git calls. `check-close-surfaces` assertion C reads `ignored` from it rather than spawning its own `check-ignore`, and the close template names a row that is not `tracked` as undelegable to an isolated agent. Three values, because the gate asks "gitignored?" and the delegating session asks "in the index?".
-
-**DISTINCT from `delegated-read-blind-to-gitignored-capture`, Done 2026-09-16**, which ruled the general constraint onto the protocol template; this is one emitter withholding a fact its reader needs, and it stands whether or not any sweep is ever delegated.
-
-**Operator exception to the enhancement admission filter** (operator direction 2026-09-22, lead-relayed): the row-grammar field rides set B, the eight entries the operator selected directly in the lead session; the filter's hold is lifted.
-
-**Cost while deferred:** every delegating session re-derives the bit, and one that skips the derivation delegates a read returning absence for content. Filed 2026-09-16 to the gap inbox by the spec stage, weighed as that iteration's second candidate owner and refused there for repairing one instance of a general class; drained and promoted at close, which falsified half its premise.
-
 ## Technical Debt
 
 ### stage-evidence-prefix-doubles-a-separator
@@ -1831,5 +1815,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - stamp-subject-merge-carve-out-unruled
 - build-work-before-entry-stamp
 - inferred-marker-malformed-placement-passes-unseen
+- close-surface-row-trackedness-undeclared
 
 ## Lessons Learned

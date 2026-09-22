@@ -1243,7 +1243,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-close-surfaces",
         close_surfaces::run,
-        &[("?", "", "", "dynamic@src/emit/close_surfaces.rs:158 via emit::close_surfaces::derive")],
+        &[("?", "", "", "dynamic@src/emit/close_surfaces.rs:209 via emit::close_surfaces::derive")],
         &[
             "GATE_SDK_KIT_DIRS",
             "GATE_SDK_PRUNE_DIRS",

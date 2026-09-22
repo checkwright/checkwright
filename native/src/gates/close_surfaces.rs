@@ -2,7 +2,6 @@
 // and moded: no undeclared capture surface, every declaration carries a mode with a well-formed
 // forced= citation, every capture-tier declaration names a reclaim command
 use crate::emit::close_surfaces;
-use crate::{proc, programs};
 
 fn is_space(b: u8) -> bool {
     matches!(b, b' ' | b'\t' | b'\n' | 0x0b | 0x0c | b'\r')
@@ -68,12 +67,14 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     for row in &roster.rows {
         // spec: lifecycle-kit/SPEC.md §check-close-surfaces — the fifth field, the row's state, is
-        // split off and never read: a four-way split would fold it into the owner
-        let mut f = row.splitn(5, '\t');
+        // split off and never read, and the sixth is `<tracking>`: a four-way split would fold both
+        // into the owner
+        let mut f = row.splitn(6, '\t');
         let path = f.next().unwrap_or("");
         let mode = f.next().unwrap_or("");
         let reclaim = f.next().unwrap_or("");
         let owner = f.next().unwrap_or("");
+        let tracking = f.nth(1).unwrap_or("");
         if path.is_empty() {
             continue;
         }
@@ -103,19 +104,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
 
         // assertion C: a capture-tier declaration names its reclaim command
-        if crate::walk::under(&roster.workflow_dir, path) {
-            let ci = proc::run(
-                &programs::GIT,
-                &["-C", &roster.base, "check-ignore", "-q", "--", path],
-            )?;
-            if ci.code() == Some(0) {
-                captures += 1;
-                if reclaim == "-" || reclaim.is_empty() {
-                    errors.push(format!(
-                        "{}: 'close-surface: {}' is capture-tier (gitignored) and names no reclaim= command",
-                        owner, path
-                    ));
-                }
+        if tracking == "ignored" {
+            captures += 1;
+            if reclaim == "-" || reclaim.is_empty() {
+                errors.push(format!(
+                    "{}: 'close-surface: {}' is capture-tier (gitignored) and names no reclaim= command",
+                    owner, path
+                ));
             }
         }
     }

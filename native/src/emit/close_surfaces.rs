@@ -132,9 +132,60 @@ fn row_state(base: &str, locator: &str) -> &'static str {
     }
 }
 
+fn row_file(locator: &str) -> &str {
+    locator.split('#').next().unwrap_or(locator)
+}
+
+fn nul_list(out: &[u8]) -> Vec<String> {
+    String::from_utf8_lossy(out)
+        .split('\0')
+        .filter(|p| !p.is_empty())
+        .map(str::to_string)
+        .collect()
+}
+
+// spec: lifecycle-kit/SPEC.md §The close-surfaces emit arm — the `<tracking>` value of each file,
+// from one `git ls-files` and one `git check-ignore --stdin` over them all
+fn tracking(base: &str, files: &[&str]) -> Result<Vec<&'static str>, String> {
+    if files.is_empty() {
+        return Ok(Vec::new());
+    }
+    let mut ls = vec!["--literal-pathspecs", "-C", base, "ls-files", "-z", "--"];
+    ls.extend(files.iter().copied());
+    let listed = proc::run(&programs::GIT, &ls)?;
+    let tracked = nul_list(
+        listed
+            .stdout()
+            .ok_or_else(|| format!("git ls-files failed under {}", base))?,
+    );
+    let input: Vec<u8> = files.iter().flat_map(|f| f.bytes().chain(std::iter::once(0))).collect();
+    let ci = proc::run_with_stdin(&programs::GIT, &["-C", base, "check-ignore", "--stdin", "-z"], &input)?;
+    let ignored = match ci.code() {
+        Some(0) => nul_list(ci.streams().0),
+        Some(1) => Vec::new(),
+        other => {
+            return Err(format!(
+                "git check-ignore exited {} under {}",
+                other.unwrap_or(-1),
+                base
+            ))
+        }
+    };
+    Ok(files
+        .iter()
+        .map(|f| {
+            if tracked.iter().any(|t| walk::at_or_under(f.trim_end_matches('/'), t)) {
+                "tracked"
+            } else if ignored.iter().any(|i| i.trim_end_matches('/') == f.trim_end_matches('/')) {
+                "ignored"
+            } else {
+                "untracked"
+            }
+        })
+        .collect())
+}
+
 pub struct Roster {
-    pub base: String,
-    pub workflow_dir: String,
     pub rows: Vec<String>,
 }
 
@@ -201,12 +252,18 @@ pub fn derive(args: &[String]) -> Result<Roster, String> {
         }
     }
 
+    let files: Vec<&str> = rows
+        .iter()
+        .map(|r| row_file(r.split('\t').next().unwrap_or("")))
+        .collect();
+    let values = tracking(&base, &files)?;
+    let mut rows: Vec<String> = rows
+        .iter()
+        .zip(values)
+        .map(|(r, t)| format!("{}\t{}", r, t))
+        .collect();
     sort_rows(&mut rows);
-    Ok(Roster {
-        base,
-        workflow_dir,
-        rows,
-    })
+    Ok(Roster { rows })
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — an empty roster prints nothing and the caller reads
@@ -279,6 +336,33 @@ mod tests {
         assert_eq!(row_state(&base, "data.md"), "non-empty");
         assert_eq!(row_state(&base, "data.md#Deferred"), "-");
         assert_eq!(row_state(&base, "missing.md#Deferred"), "absent");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The close-surfaces emit arm — tracked, ignored and untracked each
+    // read as such, and a section row reads its file's value
+    #[test]
+    fn a_row_reads_tracked_ignored_or_untracked_and_a_section_row_its_files() {
+        let dir = std::env::temp_dir().join(format!("close-surfaces-tracking-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("mk");
+        let base = dir.display().to_string();
+        let git = |a: &[&str]| {
+            let mut v = vec!["-C", base.as_str()];
+            v.extend_from_slice(a);
+            proc::run(&programs::GIT, &v).expect("git").stdout().is_some()
+        };
+        assert!(git(&["init", "-q"]));
+        std::fs::write(dir.join(".gitignore"), "cap.log\n").expect("w");
+        std::fs::write(dir.join("q.md"), "x\n").expect("w");
+        std::fs::write(dir.join("cap.log"), "x\n").expect("w");
+        std::fs::write(dir.join("loose.md"), "x\n").expect("w");
+        assert!(git(&["add", "q.md", ".gitignore"]));
+        let files = ["q.md", row_file("q.md#Deferred"), "cap.log", "loose.md", "missing.md"];
+        assert_eq!(
+            tracking(&base, &files).expect("tracking"),
+            vec!["tracked", "tracked", "ignored", "untracked", "untracked"]
+        );
         let _ = std::fs::remove_dir_all(&dir);
     }
 

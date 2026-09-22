@@ -4,7 +4,7 @@
 # a gitignored member: `git check-ignore` never reports a tracked path, and a
 # fixture file must be tracked to survive a clone. So the capture-tier half —
 # assertion A (an undeclared capture surface) and assertion C (a declared one
-# with no reclaim command) — is exercised in sandbox repos here, the
+# with no reclaim command, inside or outside the workflow dir) — is exercised in sandbox repos here, the
 # check-merge-attrs / check-exec-bit precedent. The pair covers assertion B.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
@@ -57,9 +57,16 @@ ok="$SANDBOX/ok"
 seed_repo "$ok" "close-surface: .workflow/capture.log advisory reclaim=: > .workflow/capture.log"
 check_case "capture-declared-and-reclaimed" "$ok" 0 "CLOSE-SURFACES: clean"
 
+# --- assertion C reads <tracking>: a gitignored declared path outside the workflow dir, no reclaim ---
+outside="$SANDBOX/outside"
+seed_repo "$outside" $'close-surface: .workflow/capture.log advisory reclaim=: > .workflow/capture.log\nclose-surface: notes/scratch.log advisory'
+printf 'notes/\n' >>"$outside/.gitignore"
+mkdir -p "$outside/notes"; printf 'x\n' >"$outside/notes/scratch.log"
+check_case "ignored-outside-workflow-without-reclaim" "$outside" 1 "'close-surface: notes/scratch.log' is capture-tier"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-close-surfaces.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-close-surfaces.test.sh: clean (undeclared capture, declared-without-reclaim, and the satisfied case, 3 cases)"
+echo "check-close-surfaces.test.sh: clean (undeclared capture, declared-without-reclaim, the satisfied case, and a gitignored declared path outside the workflow dir, 4 cases)"
 exit 0
