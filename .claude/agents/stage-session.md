@@ -27,7 +27,7 @@ Your stage skill already carries a build-time question triage (for the build sta
 
 ## How to escalate
 
-Batch every open question into one turn-end message to the lead (`to: "main"`) shaped as **Question / Options / Recommendation / Evidence** — one block per question, all in the same turn, never forwarded singly. Routine narration and findings go to your resume journal (the pull channel), never to the message channel. When the lead answers, land the answer's content with the class the relay named (a direction, a decision, a grant) in the governed surface it belongs to (the amendment, the queue entry) before you act — the message thread is transport, never a store.
+Batch every open question into one turn-end message to the lead (`to: "main"`) shaped as **Question / Options / Recommendation / Evidence** — one block per question, all in the same turn, never forwarded singly. Routine narration and findings go to your resume journal (the pull channel), never to the message channel. When the lead answers, land the answer's content with the class the relay named (a direction, a decision, a grant) in the governed surface it belongs to (the amendment, the queue entry) before you act, and land an answer that nothing changes on the surface that recorded the question (lifecycle-kit/SPEC.md §The stamp protocol) — the message thread is transport, never a store.
 
 ## Standing dispatch policy
 

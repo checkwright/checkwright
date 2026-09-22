@@ -8,22 +8,6 @@
 
 ## New Features
 
-### lead-no-change-decision-has-no-landing-site
-
-[spec: SPEC-no-change-landing.md]
-
-a lead decision whose content is "make no change" is invisible to every later stage, because the landing rule presupposes a ruling with something to write.
-
-**Attested once:** a scope escalated whether a recurrence date was owed; the lead declined it and told scope nothing further was owed, on the ground that scope's gap bullet carried the grounds. That bullet recorded the question as escalated and unresolved, so close re-derived the judgment from the owner doc three stages later. Same disposition, one re-derivation — but the opposite call would have tripped the recurrence threshold and forced an entry into a unit set, a queue change only the lead may rule. lifecycle-kit/templates/lead.md already calls the message thread transport and already requires a ruling whose acting session is not imminent to be filed durably; both clauses assume an act that writes something.
-
-**Ruled at spec (2026-09-22):** the landing rule. A no-change answer is landed like any other, on the surface that recorded the question, and a question held in the gap inbox takes a resolution bullet naming it, the inbox being append-only; the lead relays such an answer as one to be landed. The lead-assertion rule was refused as the fix: a lead that says nothing leaves the same open record.
-
-**Operator exception to the enhancement admission filter** (operator direction 2026-09-22, lead-relayed): the operator selected set B directly in the lead session, and it carries this lead-protocol rule; the filter's hold is lifted.
-
-**Cost while deferred:** the next no-change ruling on a threshold-bearing question is re-derived by a session that may not rule it.
-
-**DISTINCT from [record-stamp-encoding-compression](#record-stamp-encoding-compression) and `precondition-gate-direction-blindness`**, the entries the instance happened on; this is the lead protocol's landing rule. Filed 2026-09-20 to the gap inbox by the lead of `adopter-floor-door-remainder`; promoted at the 2026-09-21 scope intake, a late record that says so. Owner lookup ran over `no-change`, `landing site`, `lead decision` and `transport` and found no owner.
-
 ### delta-instruction-batch-dependence-unmarked
 
 [spec: SPEC-batch-conditional-delta.md]
@@ -1796,5 +1780,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - close-surface-row-trackedness-undeclared
 - stage-evidence-prefix-doubles-a-separator
 - scope-supersession-unchecked
+- lead-no-change-decision-has-no-landing-site
 
 ## Lessons Learned
