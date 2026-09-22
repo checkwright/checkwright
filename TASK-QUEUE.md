@@ -850,6 +850,16 @@ the `install-smoke-powershell` leg runs `checkwright demo` (the `full` battery) 
 
 **Cost while deferred:** a `full`-profile gate needing bash on Windows ships unseen. Filed 2026-09-21 to the gap inbox by `docs-first-contact`'s close, reading its push run; promoted at the next scope. Owner lookup: `install-smoke-powershell`, `demo`, `bash stripped` — the two entries naming that leg own its name and its exemption keying, not its step order.
 
+### md-unwrap-folds-declarations
+
+[cost: event/low] [surface: canon-kit]
+
+`--emit md-unwrap` joins a line-start declaration (`ruling:`, `discharge:`, `close-surface:`) onto the paragraph above it, because canon-kit/SPEC.md §check-md-unwrapped's block scanner models only CommonMark block starts. The join changes no rendering, but it hides the declaration from every reader that keys on a line start. Attested once: the unwrap of TRAJECTORY.md folded its `discharge:` and `ruling:` lines into the ruling paragraph, so the ruling-staleness probe read the admission filter as an undeclared condition. Two-space hard breaks restored them; they are still in the file. The arm's postcondition checks only the gate's own verdict, and the probe is advisory, so nothing redded.
+
+**Deliverable:** a configured declaration-lead set that the scanner treats as a block start. The arm then never joins such a line and the gate never reds it. Add a fixture row for each. A new knob is a new name, so this needs an amendment.
+
+**Cost while deferred:** the next unwrap of a declaring surface silently disarms that surface's reader. Filed 2026-09-22 to the gap inbox at `queue-kit-unwrap`'s close; promoted at the next iteration's scope intake, so the record is late and says so. Owner: canon-kit/SPEC.md §check-md-unwrapped, which names no declaration line.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
