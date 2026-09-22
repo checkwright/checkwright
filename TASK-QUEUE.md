@@ -12,37 +12,6 @@
 
 ## New Features
 
-- **provenance-seam-commit-sha-shape** [spec: SPEC-seam-reach.md] — neither
-  `check-provenance-seam`'s arms nor the provenance-seam-residue audit class name a commit or
-  digest shape, so a hex object name in a kit SPEC, template or README is caught only by a human
-  reviewer; gate-sdk/SPEC.md §Consumer smoke carried two until a brevity pass cut them.
-  **Re-measured at spec:** the kit SPECs and READMEs carry no lowercase 7-40 hex token with both a
-  letter and a digit, bare or backticked; the one bare-hex hit, evidence-kit/SPEC.md's
-  `2147483646`, is decimal, and the two template hits are pinned action digests (mechanism).
-  **Ruled at spec (2026-09-22):** a hex-reference arm requiring a letter and a digit, bare prose
-  and inline code alike, its all-digit, uppercase and decimal-id misses stated as honest limits;
-  the audit class names the shape over the payload surfaces the gate does not scan.
-  **Cost while deferred:** a commit reference in a kit SPEC ships in every vendored copy.
-  Filed 2026-09-22 to the gap inbox by gate-sdk-surface-drain's close; promoted at the next scope.
-  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its SHA-shape unit.
-
-- **installer-spec-provenance-residue** [spec: SPEC-seam-reach.md] — installer/SPEC.md carries
-  dated operator and lead rulings and CI run ids, job ids, head SHAs and a digest prefix as
-  measurement records, which CLAUDE.md's public-repo rule bars from every tracked file; installer/
-  is not a kit, so `check-provenance-seam`'s corpus and the provenance-seam-residue audit class
-  both skip it. It rides no payload but is public on the repository and on the docs mirror.
-  **Re-measured at spec:** six dated-attribution sentences (plus two later citations of one),
-  seven letter-and-digit hex tokens and fourteen run or job id lines; zero queue slugs,
-  private-surface or agent-file pointers; it is the only repo-root-governed SPEC.
-  **Ruled at spec (2026-09-22), the corpus reach:** the gate takes it, through a consumer glob knob
-  holding the tree's own published records to the provenance arms (never the consumer-roster arm),
-  scanned whatever `CANON_KIT_SCAN_KIT_ROOTS` says; review alone and a hardcoded path were refused.
-  This tree declares installer/SPEC.md in the sweep's commit or after it, never before.
-  **Cost while deferred:** publisher provenance on a public surface.
-  Filed 2026-09-22 to the gap inbox by gate-sdk-surface-drain's close sweep, which reported it out
-  of corpus; promoted at the next scope.
-  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its residue unit.
-
 - **gap-inbox-kit-ref-valve** [spec: SPEC-kit-ref-resolution.md] — `check-kit-ref-liveness` valves
   the queue file out because the queue is design-ahead and names future knobs and paths, but the
   gap inbox is design-ahead in the same way and is not valved.
@@ -2224,5 +2193,8 @@
 - **lead-agent-id-compaction-defense** — each claim still wants its own probe.
 
 ## Done
+
+- provenance-seam-commit-sha-shape
+- installer-spec-provenance-residue
 
 ## Lessons Learned

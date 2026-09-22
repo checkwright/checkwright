@@ -13,6 +13,9 @@ CANON_KIT_SCAN_KIT_ROOTS = 1
 CANON_KIT_SEAM_PRIVATE_SURFACES[] = TRAJECTORY.md
 CANON_KIT_SEAM_PRIVATE_SURFACES[] = BRIEF.local.md
 
+# comment-tier-exempt: installer/ is repo-root-governed rather than a kit, yet its SPEC is published on the repository and the docs mirror, so the provenance arms hold it as this tree's own seam surface
+CANON_KIT_SEAM_SURFACE_GLOBS[] = installer/SPEC.md
+
 # comment-tier-exempt: deliberate-absence rulings may narrate what the kit excludes — an "Out of scope" section states what a kit does not carry and why, so the whole section is exempt from the temporal-narration gate
 CANON_KIT_TEMPORAL_EXEMPT_SECTIONS[] = Out of scope
 

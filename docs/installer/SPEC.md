@@ -645,8 +645,8 @@ moment*:
   the worked case: nothing behind the invoke reads JSON with `jq`, because the
   crate reads it with `serde_json`.
 
-**How the port oracle reads those three values — ruled 2026-08-31 by the
-operator in consult, so a cut can cite this section as its stated contract.**
+**How the port oracle reads those three values — a stated contract a cut can
+cite.**
 The section is a two-sided port disposition. `bootstrap` is the port's
 irreducible, and it is irreducible in the strict sense: something must run
 before the binary exists on the machine, and fetching and executing the first
@@ -672,7 +672,7 @@ Rust", which is a port commitment, and a reading that voids the section's text
 is wrong.
 
 **The two bootstraps are hand-kept, and parity is held by running, not by
-generation — ruled 2026-08-26.** Each half is authored in its own language
+generation.** Each half is authored in its own language
 against the five steps above, and the oracle that holds them equal is a
 per-**bootstrap** install-smoke leg. **Count those legs by bootstrap and never by
 platform.** `.github/workflows/gates.yml` carries an install-smoke job for each
@@ -688,7 +688,7 @@ The PowerShell leg ships with the PowerShell half, and **no other leg
 substitutes for it**, because every other leg drives the other bootstrap.
 
 **That running oracle is structurally blind to one region, so a static binding
-over it is complementary to this ruling rather than a substitute for it.** The
+over it is complementary to this rule rather than a substitute for it.** The
 PowerShell leg runs on `windows-latest` and only there, so `Get-HostTarget`'s
 `linux/x64` and `linux/arm64` arms have never been executed by any run this
 repository has bought and no run it could buy today would execute them.
@@ -701,7 +701,7 @@ this record's own and is what makes a field-level assertion complementary rather
 than contested.
 
 **That oracle has two parts, and only one of them is in place — read this before
-reading the leg as short of its own ruling.** The ruling above asks for a leg
+reading the leg as short of its own rule.** The rule above asks for a leg
 *exercising the payload end to end*, and that phrase carries two distinct
 assertions:
 
@@ -715,7 +715,7 @@ assertions:
   and the leg asserts one.
 
 The two were conflated because both halves were assumed to land together. The
-drift the 2026-08-26 ruling guards is between the two **bootstraps**, and *end to
+drift the hand-kept-parity rule guards is between the two **bootstraps**, and *end to
 end* adds **payload** coverage rather than **parity** coverage — which is why the
 first part shipped alone and the second waited. Both are in place now, and the
 distinction is kept because a later reader sizing a new leg needs to know which
@@ -959,7 +959,7 @@ one that artifact was linked against*. Two questions, two places — and folding
 the second into the `case` arms would also destroy the extraction shape pinned
 above. pwsh runs on Linux, so this half's Linux arms are reachable and it
 carries the same discriminator against the same signals, hand-kept on the
-2026-08-26 ruling's terms.
+terms of §The install boundary's parity-by-running rule.
 
 **Selection keeps three outcomes, and collapsing any two is the defect. What
 changed with the relocation is that only one of them proceeds.** The
@@ -1797,8 +1797,8 @@ to `--no-filters` would therefore not be a spelling fix. A filtered hash and a
 raw hash disagree about exactly one population — an adopter whose edit is a
 line-ending change — so the switch decides that `init` now notices such an edit
 and refuses to overwrite it, which is a behavior change to the non-destructive
-re-run on **every** platform and belongs to a unit scoped to it. It was
-**refused 2026-09-05 by the lead** as a repair for the native Windows leg's
+re-run on **every** platform and belongs to a unit scoped to it. It is
+**refused** as a repair for the native Windows leg's
 manifest disagreement (§The consumer smoke), on that ground and on one more: a
 repair guessed at a mechanism no probe reproduces is a guess whatever else it
 is, and a cause read carries no authority to change what a `files` hash means.
@@ -2095,8 +2095,8 @@ is about the payload artifacts and does not reach a binary built there for
 tooling; a `cargo build` in `pack:` compiles bytes that job checked out at the
 tag, so the checkout-plus-bash tamper floor the workflow's own header states is
 intact; and build-then-pack in one job is rehearsed on every CI run rather than
-first exercised by a real publish. Ruled by the operator 2026-09-09 through the
-AskUserQuestion channel, reversing a `lead, own-authority` refusal of 2026-09-06.
+first exercised by a real publish. Refusing ROUTE 1 on those costs is refused
+too: each is bounded, while the alternative's unverified bytes are not.
 
 **The disposition is stated here rather than in a kit SPEC, and the ground is
 the provenance seam.** The cut splits three ways and the split is what keeps the
@@ -2107,14 +2107,14 @@ version and a commit — and gate-sdk/SPEC.md §Consumer payload already owns ev
 one of those, generic over any consumer that redistributes kits. Its *inputs*
 stay consumer config, unchanged in width. What is repo-private is the
 **disposition**: that this repository's release path is what invokes the arm,
-from which job, and under which ruling. A kit SPEC governing that would publish a
+from which job, and on which grounds. A kit SPEC governing that would publish a
 rule about one project's release path as kit mechanism, and gate-sdk/SPEC.md
 §Consumer payload bounds its own reach to what a gate ships in any case — a
 route disposition for a release assembler is not a disclosure rule. This surface
 is repo-root-governed with no owning kit, and it already hosts this shape for the
 harness §The consumer smoke governs — a repo-private tool that rides no payload,
-whose non-shipping status is established by citing the packed set. Ruled
-`lead, own-authority` 2026-09-06, the seam ground primary.
+whose non-shipping status is established by citing the packed set. The seam
+ground is the primary one.
 
 ## The consumer smoke
 
@@ -2122,8 +2122,7 @@ whose non-shipping status is established by citing the packed set. Ruled
 registered as a validate suite so a bit-rotted activation path is a red
 validate rather than a discovery at announcement.
 
-**The port disposition — `run-smoke.sh` is declared `no-port`, ruled 2026-08-31
-by the operator in consult.** It is this repo's acceptance harness and rides no
+**The port disposition — `run-smoke.sh` is declared `no-port`.** It is this repo's acceptance harness and rides no
 payload: the `--pack-installer` arm assembles both transports out of the kit
 roots and never out of `installer/consumer-smoke/`, so no adopter receives it
 and no adopter path executes it — the ground gate-sdk/SPEC.md §Consumer smoke,
@@ -2729,10 +2728,8 @@ shape, and the one host that needs this one is the host nobody is standing at.
 **What the native Windows leg has measured so far.** That leg is
 `continue-on-error` and reports rather than judges; these are its findings,
 recorded here because they are what the next rider of the leg would otherwise
-re-buy. Rounds 12 (run `33782234328`, head `32f73806`), 13 (run `33963571906`,
-head `c4850072`, the first round the report above ran on) and 14 (run
-`34002192468`, head `a5b6907b`) and 15 (run `34054512420`, head `bf1fc722`, the
-first round with **both** operands held) all fail the same arm on the same
+re-buy. Rounds 12, 13 (the first round the report above ran on), 14 and 15
+(the first round with **both** operands held) all fail the same arm on the same
 profile, 12 and 13 at `starter: 477 of 477 manifest entries disagree with the
 tree`, 14 and 15 at `476 of 476` — the count moved with the payload, not with
 the defect. *In rounds 12 to 14, the value labelled `got` in the log is the
@@ -2756,8 +2753,8 @@ existed.*
   `recorded` and `recomputed` equal, so the binary's bytes are exactly the bytes
   `init` published. Round 14 adds `want` **as the loop held it** to that set and
   round 15 adds `got`, so in round 15 all five values on both samples are one
-  string — `affdbceb…d982` on `gate-sdk/README.md`, `4159af89…f942e` on the
-  `.exe` — and `%q` renders every one of the ten unquoted. *Read that last clause
+  string, one per sampled path (`gate-sdk/README.md` and the `.exe`), and `%q`
+  renders every one of the ten unquoted. *Read that last clause
   under the bound the two-renderings paragraph above now states: it establishes
   what quoting alone can, and no round before 18 held an octet dump to establish
   more.*
@@ -2804,8 +2801,8 @@ verdict's row. Nothing else about rounds 12 to 15 moves — what they measured i
 what is recorded here.
 
 *Round 17 is the first round under that repair, and it REOPENS the series rather
-than confirming the pairing.* Run `34108112152`, job `101697744618`, read by
-close at the push it already watches. The repair delivered exactly what it was
+than confirming the pairing.* It was read by close at the push it already
+watches. The repair delivered exactly what it was
 built for: the verdict's own row is printed, the refusal names it, and the report
 says so in as many words — *the witness row `gate-sdk/README.md` is one of the
 samples already chosen, so the verdict row and that sample coincide*. What that
@@ -2855,17 +2852,16 @@ push to master, so the reading has an owner inside the ordinary stage set and
 costs no push of its own: **close**, at the push it already makes and watches.
 The reading is an explicit, **job-keyed** act — read that job's log, never the
 workflow's conclusion. The job is `continue-on-error: true`, so the two verdicts
-come apart, and that is measured rather than predicted: runs `34002192468` and
-`34054512420` both concluded `success` while `install-smoke-windows` concluded
+come apart, and that is measured rather than predicted: the runs of rounds 14
+and 15 both concluded `success` while `install-smoke-windows` concluded
 `failure`. A session that watched the run to green and inferred the leg from
 that verdict would read a passing workflow as a passing leg. What gets recorded
 here afterwards is what was observed, by whoever observed it — this section
 predicts no content for it.
 
 **Rounds 18 through 20 are compressed to what still binds — observed 2026-09-07
-and 2026-09-08, runs `34142337941`, `34212264301` and `34245261556`; the
-derivations are in git history and this block is the whole of what survives
-them.**
+and 2026-09-08; the derivations are in git history and this block is the whole
+of what survives them.**
 
 *The established fact.* The carriage return is on the manifest line as the loop
 reads it, **before any split**: `stream1` and `badline` — the first line of the
@@ -2903,7 +2899,7 @@ that is not the trimming this arm is closed to. Its coverage is **per-read and
 correctly narrow**, which round 21 then measured rather than assumed.
 
 **Round 21 read the first job to run under that repair, and the repair works —
-read 2026-09-08 off run `34267324532`, job `102199861062`, head `adb7379f`.**
+read 2026-09-08.**
 The strip fired on **492 of 493 lines carrying a carriage return**, and `mismatch`
 came back **0**: the manifest hash arm PASSES, having reddened at 493 and then 492
 *disagreeing entries* in the two prior rounds. That class is closed.
@@ -2947,9 +2943,8 @@ rather than fixed** — the behind-invoke relocation replaced their
 `jq`-into-multi-line-capture pipeline with a structural parse, which leaves no
 line-oriented reader for a terminator to survive in.
 
-*Reproduced, which is why the numbers above are not one run's accident.* Run
-`34270944900`, job `102212080750`, head `7329b319` — an independent job on the next
-commit — reports the same **492 of 493**, the same absent disagreement report, and
+*Reproduced, which is why the numbers above are not one run's accident.* An
+independent job on the next commit reports the same **492 of 493**, the same absent disagreement report, and
 the same kits-roster failure. Two runs agreeing is what licenses reading the count
 as a property of the host rather than of a round.
 
@@ -2965,15 +2960,12 @@ claims the leg passes.
 and what they did buy is a narrowing plus a correction to this harness.* Both
 blocked at the preflight self-test on the harness's own synthetic
 `a\r\nb\nc\r\n`, before the suite reached anything the arm exists to protect.
-Round 22 (run `34359998379`, job `102495340310`) returned three elements
-rendering as `a\r`, `b`, `c\r`. Round 23 (run `34362529057`, job
-`102504146632`), with a bare `mapfile -t` over the identical channel as a
-baseline, reported that **the baseline and the reader agreed on every element and
+Round 22 returned three elements rendering as `a\r`, `b`, `c\r`. Round 23,
+with a bare `mapfile -t` over the identical channel as a baseline, reported that **the baseline and the reader agreed on every element and
 neither carried a carriage return the strip could take**.
 
 *Round 24 printed the operands, and what they say is not what either earlier
-reading predicted.* Run `34365172990`, job `102512903319`, with the arm declaring
-rather than blocking: `element 0 arrived as $'a\r' and came back as $'a\r'`. **The channel
+reading predicted.* With the arm declaring rather than blocking: `element 0 arrived as $'a\r' and came back as $'a\r'`. **The channel
 carries the byte and the reader gave it back.** So the channel is not consuming
 anything, and round 23's "no carriage return anywhere" was the arm's own
 `${x%$'\r'}` failing to strip in the position that computes it. That same run
@@ -3015,8 +3007,8 @@ that upload, normalized it and handed it to the smoke through
 and MSYS's runtime accepts it — measured, and the reason no `cygpath` guard was
 added there on the way past.
 
-*Round 25 closed the terminator question on the only host that asks it.* Run
-`34368000890`, job `102522579646`: the leg ran **34 minutes** against two to four
+*Round 25 closed the terminator question on the only host that asks it.* The
+leg ran **34 minutes** against two to four
 on every round before it, and the kits read declared and PASSED at every profile
 and hop — `1 of 1`, `8 of 8`, `2 of 2`, and `12 of 12` three times. The count
 fires and the stored value is stripped, which is what no earlier round could get
@@ -3078,7 +3070,7 @@ because a value printed by the shell is the value the shell holds and not the on
 the program was handed — which is exactly the distinction that hid this.
 
 *THE PRODUCER, NAMED AT LAST — round 26. Twenty-one rounds asked whose byte it
-is, and one arm's own two declarations answer it.* Run `34374380337`, job `102544260473`. The seam arm reached its
+is, and one arm's own two declarations answer it.* The seam arm reached its
 byte-identity assertion and printed, immediately above the failure:
 
     the seam manifest's roster: the stream delivered 1210 of 1210 line(s) ending in a carriage return
