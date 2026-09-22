@@ -1406,7 +1406,9 @@ collection and rots on every append. The exempt contexts an author writes into:
 a threshold or comparator on the same line (a bound is a rule, not a total); the
 `all but <cardinal>` partition idiom; a partitive marker (`of`, `out of`) on
 either side of the match (in `three of the twelve gates` neither cardinal is a
-restated total); `CANON_KIT_COUNT_ALLOWED_PHRASES`, an exact-phrase allowlist for
+restated total), read across one line break of the paragraph so a wrap between
+marker and cardinal is no red — one line and not the whole paragraph, which would
+exempt a total beside any partitive anywhere in it; `CANON_KIT_COUNT_ALLOWED_PHRASES`, an exact-phrase allowlist for
 fixed named sets a doc legitimately enumerates (default empty — fixed-set naming
 is consumer judgment, config not mechanism, biting only on a phrase whose noun
 the consumer governs); and the per-site `manifest-count-exempt: <reason>` marker
@@ -1420,9 +1422,10 @@ around it: the objection this invariant encodes is a transcribed total with no
 owner, and a marker binds the total to an oracle a gate re-runs. So a cardinal
 under a `<!-- measured: <key>=<value> -->` line satisfies the ban the way a
 generated copy satisfies derivation-first, which strictly shrinks this gate's
-violation set. It rides the same per-site window the exempt marker does — the
-marker line and the claim below it — so the two discharges are one behavior with
-two spellings rather than a second walk. Rewording to cite the owning collection
+violation set. It rides the same per-site window the exempt marker does: the
+marker's line and the line below it, for a full-line and an inline marker alike,
+so the two discharges are one behavior with two spellings rather than a second
+walk. Rewording to cite the owning collection
 stays preferred where the total is not worth stating at all; the exempt tag drops
 to a genuine last resort, because "deliberately unchecked" is now the one thing
 it means.
@@ -1598,12 +1601,19 @@ author to say what was measured, so this is a **marker** an author applies rathe
 than a scanner inferring intent: a scanner triggers on a numeral, and the claims
 that cost the most carry none.
 
-**The marker binds a claim to an oracle key and its measured value**, as a
-full-line HTML comment on the line immediately above the claim:
+**The marker binds a claim to an oracle key and its measured value**, as an
+HTML comment in one of two positions:
 
 ```
 <!-- measured: <key>=<value> -->
 ```
+
+**Full-line**, alone on the line immediately above the claim, binding the
+paragraph below. **Inline**, anywhere else in a line of prose, binding the one
+sentence the marker follows. A mid-paragraph claim takes the inline form,
+because a full-line comment there would split the rendered paragraph. An
+occurrence inside an inline code span is the grammar being shown, not a marker,
+just as an occurrence in a fence is.
 
 It joins the family `install-primary:` (§check-install-claim) and
 `payload-discloses:` (§check-payload-claim) rather than inventing a form — a
@@ -1664,12 +1674,17 @@ or a single-token spelled cardinal normalized to digits, so a marker's `12` and 
 sentence's "twelve" are one cardinal rather than two. Widening that grammar
 strictly **shrinks** arm C's violation set, because its red condition is a marker
 cardinal *absent from* its bound claim and a spelling the matcher cannot reach
-reads as absent. The claim a marker binds is
-the paragraph below it, ending at a blank line, a fence, a second marker or the
-end of file. **The authoring contract arm C prices:** a bound claim carrying more
-than one distinct cardinal is ambiguous, and the gate fails closed rather than
-guessing which one the marker holds — the remedy in the help line is to split the
-sentence or move the marker onto the clause that carries the measurement. That
+reads as absent. The claim a full-line marker binds is the paragraph below it,
+ending at a blank line, a fence, a second full-line marker or the end of file,
+less any sentence an inline marker in it binds. An inline marker binds the
+sentence ending at the marker. Paragraph text is rejoined across its wraps, and a
+sentence ends at `.`, `?`, `!` or `;` followed by whitespace, which is
+§check-provenance-seam's sentence. A terminator separated from the marker only by
+whitespace closes the bound sentence rather than opening it. Marker text is never
+part of any claim. **The authoring contract arm C prices:** a bound claim carrying
+more than one distinct cardinal is ambiguous, and the gate fails closed rather
+than guessing which one the marker holds — the remedy in the help line is to
+split the sentence, or mark the sentence carrying the measurement inline. That
 cost is bounded: it applies only to sentences an author chose to mark.
 
 **Extent claims are covered by arms A and B alone, and that is the design rather
@@ -1796,10 +1811,11 @@ a wrap, reported at the cardinal's physical line, and the shared adapter
 **ASCII-lowercased** before matching and a class pattern is authored in lower
 case, so a sentence's opening capital is not a way past the class.
 
-**A paragraph is the unit, and it is §check-measured-claim's paragraph**, so the
-both gates agree on what a marker binds: the block ending at a blank line, a fence,
-or the end of file, with the marker line riding inside the block it heads — which
-is what makes carrying a marker a property of the paragraph rather than of a line.
+**A paragraph is the unit, and it is §check-measured-claim's paragraph**, so
+both gates agree on what a marker binds. A full-line marker heading the block
+discharges the whole paragraph. An inline marker discharges a class match that
+starts inside the sentence it binds, and no other, so a marked figure does not
+vouch for an unmarked claim beside it.
 Fenced blocks are skipped for the reason that section gives: a fence is grammar
 being shown, not a claim being made.
 

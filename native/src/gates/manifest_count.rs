@@ -29,16 +29,19 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // gates fences and per-site markers, these hooks judge the line and the wrapped paragraph
     struct Sink {
         grammar: spec::CountGrammar,
+        prev: String,
         out: Vec<String>,
     }
     impl spec::ProseSink for Sink {
         fn on_line(&mut self, file: &str, fnr: usize, raw: &str) {
-            if let Some(hit) = self.grammar.hit(raw) {
+            if let Some(hit) = self.grammar.hit_after(&self.prev, raw) {
                 self.out
                     .push(format!("  {}:{}  restated collection total: {}", file, fnr, hit));
             }
+            self.prev = raw.to_string();
         }
         fn on_pflush(&mut self, file: &str, para: &spec::Para) {
+            self.prev.clear();
             if let Some((fnr, hit)) = spec::para_wrapped(&self.grammar, para) {
                 self.out
                     .push(format!("  {}:{}  restated collection total: {}", file, fnr, hit));
@@ -47,6 +50,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
     let mut sink = Sink {
         grammar: spec::CountGrammar::resolve()?,
+        prev: String::new(),
         out: Vec::new(),
     };
     // spec: canon-kit/SPEC.md §check-manifest-count — the second sanctioned discharge, riding
@@ -64,7 +68,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         for l in &out {
             println!("{}", l);
         }
-        println!("  help: reword to cite the owning collection (e.g. 'the gates in gates.list') rather than pin a total; a total worth keeping takes a '<!-- measured: <key>=<value> -->' marker on the line above, which binds it to an oracle check-measured-claim re-runs; a genuinely fixed named set joins CANON_KIT_COUNT_ALLOWED_PHRASES; a threshold/rate/partition/proportion is already exempt; else add a 'manifest-count-exempt: <reason>' comment on the line or the one above");
+        println!("  help: reword to cite the owning collection (e.g. 'the gates in gates.list') rather than pin a total; a total worth keeping takes a '<!-- measured: <key>=<value> -->' marker on the line above, or inline after the sentence, which binds it to an oracle check-measured-claim re-runs; a genuinely fixed named set joins CANON_KIT_COUNT_ALLOWED_PHRASES; a threshold/rate/partition/proportion is already exempt; else add a 'manifest-count-exempt: <reason>' comment on the line or the one above");
         return Ok(1);
     }
     println!("MANIFEST-COUNT: clean ({} manifest file(s); no bare cardinal quantifying a governed collection in prose outside an exempt site)", manifests.len());

@@ -9,3 +9,6 @@ the same — what puts a sentence in the class is what it asserts.
 
 The Engine Is A Small Shell Script, capitalized where the sentence starts, which
 is no way past a class matched against a lowercased subject.
+
+It ships one binary. <!-- measured: engine-substrate=shell --> The engine is a
+shell script, and the inline marker above binds the sentence before it, not this one.

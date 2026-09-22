@@ -4,6 +4,9 @@
 The engine is a small shell script today, and the marker above binds that claim
 to an oracle the gate re-runs rather than to whoever last remembered it.
 
+It ships one binary. The engine is one shell program. <!-- measured: engine-substrate=shell -->
+The inline marker discharges the sentence it follows, mid-paragraph.
+
 The engine blocks a commit when two governed surfaces disagree. That sentence
 falls outside the declared class, so the gate leaves it alone — a class
 assertion, never a ban on a word.

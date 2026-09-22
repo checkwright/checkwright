@@ -804,6 +804,78 @@ pub fn cardinal_word_value(w: &str) -> Option<String> {
 // gate that reads it and by check-manifest-count, whose ban the marker discharges
 pub const MEASURED_MARKER: &str = "<!-- measured:";
 
+// spec: canon-kit/SPEC.md §check-measured-claim — an inline marker: the marker opener inside a
+// line of prose and outside any inline code span, spanning to its `-->` (or to the end of the
+// text when unclosed, which its reader refuses as unparsable), binding the sentence ending at it
+pub struct InlineMarker {
+    pub at: usize,
+    pub end: usize,
+    pub sentence: (usize, usize),
+}
+
+pub fn inline_markers(text: &str) -> Vec<InlineMarker> {
+    let b = text.as_bytes();
+    let mut spans: Vec<(usize, usize)> = Vec::new();
+    let mut i = 0usize;
+    while let Some(off) = b[i..].iter().position(|&c| c == b'`') {
+        let a = i + off;
+        match b[a + 1..].iter().position(|&c| c == b'`') {
+            Some(o2) => {
+                spans.push((a, a + 1 + o2));
+                i = a + o2 + 2;
+            }
+            None => break,
+        }
+    }
+    let mut out = Vec::new();
+    for (at, _) in text.match_indices(MEASURED_MARKER) {
+        if spans.iter().any(|(s, e)| at > *s && at < *e) {
+            continue;
+        }
+        let from = at + MEASURED_MARKER.len();
+        let end = text[from..].find("-->").map(|o| from + o + 3).unwrap_or(text.len());
+        out.push(InlineMarker { at, end, sentence: bound_sentence(b, at) });
+    }
+    out
+}
+
+// spec: canon-kit/SPEC.md §check-measured-claim — the sentence ending at the marker: back to the
+// previous `.`, `?`, `!` or `;` followed by whitespace, a terminator separated from the marker
+// only by whitespace closing the bound sentence rather than opening it
+fn bound_sentence(b: &[u8], at: usize) -> (usize, usize) {
+    let mut e = at;
+    while e > 0 && is_space(b[e - 1]) {
+        e -= 1;
+    }
+    let mut s = 0usize;
+    let mut t = e.saturating_sub(1);
+    while t > 0 {
+        t -= 1;
+        if matches!(b[t], b'.' | b'?' | b'!' | b';') && is_space(b[t + 1]) {
+            s = t + 1;
+            break;
+        }
+    }
+    while s < e && is_space(b[s]) {
+        s += 1;
+    }
+    (s, e)
+}
+
+// spec: canon-kit/SPEC.md §check-measured-claim — marker text is never part of any claim, and
+// a full-line marker's claim is its paragraph less every inline-bound sentence
+pub fn text_without(text: &str, cuts: &[(usize, usize)]) -> String {
+    let mut keep = vec![true; text.len()];
+    for (s, e) in cuts {
+        for k in keep.iter_mut().take(*e.min(&text.len())).skip(*s) {
+            *k = false;
+        }
+    }
+    let b = text.as_bytes();
+    let bytes: Vec<u8> = (0..b.len()).map(|k| if keep[k] { b[k] } else { b' ' }).collect();
+    String::from_utf8_lossy(&bytes).into_owned()
+}
+
 pub struct CountGrammar {
     nouns: Vec<String>,
     wedge: usize,
@@ -844,19 +916,30 @@ impl CountGrammar {
     // range shape; a cardinal inside inline code is a meta-reference and is blanked before
     // either runs.
     pub fn hit(&self, text: &str) -> Option<String> {
+        self.hit_after("", text)
+    }
+
+    // spec: canon-kit/SPEC.md §check-manifest-count — a partitive marker on either side of the
+    // match, read across one line break: the previous line of the paragraph leads the prefix
+    // the partitive test sees, and no other exemption reads it
+    pub fn hit_after(&self, lead: &str, text: &str) -> Option<String> {
         // spec: canon-kit/SPEC.md §check-manifest-count — byte-wise because awk's
         // substr/tolower are; a char-wise port shifts every offset on a multi-byte glyph
         let scan = strip_inline_code(text.as_bytes());
         let low: Vec<u8> = scan.iter().map(|c| c.to_ascii_lowercase()).collect();
-        if let Some(s) = self.span(&low, &scan, true) {
+        let mut lead: Vec<u8> = strip_inline_code(lead.as_bytes()).iter().map(|c| c.to_ascii_lowercase()).collect();
+        if !lead.is_empty() {
+            lead.push(b' ');
+        }
+        if let Some(s) = self.span(&low, &scan, &lead, true) {
             return Some(s);
         }
-        self.span(&low, &scan, false)
+        self.span(&low, &scan, &lead, false)
     }
 
     // spec: canon-kit/SPEC.md §check-manifest-count — leftmost-longest, then the boundary
     // rule, then the exemptions
-    fn span(&self, lb: &[u8], scan: &[u8], quantifier: bool) -> Option<String> {
+    fn span(&self, lb: &[u8], scan: &[u8], lead: &[u8], quantifier: bool) -> Option<String> {
         let mut start = 0usize;
         while start < lb.len() {
             let m = (start..lb.len()).find_map(|i| {
@@ -868,7 +951,7 @@ impl CountGrammar {
                 e.map(|end| (i, end))
             });
             let (ms, me) = m?;
-            if self.accept(lb, ms, me, quantifier) {
+            if self.accept(lb, lead, ms, me, quantifier) {
                 return Some(String::from_utf8_lossy(&scan[ms..me]).into_owned());
             }
             start = ms + 1;
@@ -876,7 +959,7 @@ impl CountGrammar {
         None
     }
 
-    fn accept(&self, lb: &[u8], ms: usize, me: usize, quantifier: bool) -> bool {
+    fn accept(&self, lb: &[u8], lead: &[u8], ms: usize, me: usize, quantifier: bool) -> bool {
         let bc = if ms > 0 { lb[ms - 1] } else { b' ' };
         let ac = if me < lb.len() { lb[me] } else { b' ' };
         if is_alnum(bc) {
@@ -900,7 +983,7 @@ impl CountGrammar {
         if trimmed_space_end_ends_with(prefix, b"all but") {
             return false;
         }
-        if prefix_of_partitive(prefix) {
+        if prefix_of_partitive(prefix) || (!lead.is_empty() && prefix_of_partitive(&[lead, prefix].concat())) {
             return false;
         }
         if contains_bare_of(m) {
@@ -1436,6 +1519,27 @@ mod tests {
         assert_eq!(cardinal_word_value("ninety").as_deref(), Some("90"));
         assert_eq!(cardinal_word_value("one"), None);
         assert_eq!(cardinal_word_value("hundred"), None);
+    }
+
+    // spec: canon-kit/SPEC.md §check-manifest-count — the partitive marker reads across one
+    // line break, and only where nothing but an article stands between it and the match
+    #[test]
+    fn a_wrapped_partitive_exempts_and_nothing_else_reads_the_lead() {
+        let g = CountGrammar { nouns: vec!["checks".into()], wedge: 2, phrases: vec![] };
+        assert!(g.hit("the 96 checks counted").is_some());
+        assert!(g.hit_after("appeared in 57 of", "the 96 checks counted").is_none());
+        assert!(g.hit_after("appeared in 57 of", "96 checks counted").is_none());
+        assert!(g.hit_after("appeared in 57 of", "and then 96 checks ran").is_some());
+        assert!(g.hit_after("at least", "96 checks ran").is_some());
+    }
+
+    #[test]
+    fn an_inline_marker_binds_the_sentence_ending_at_it_outside_code_spans() {
+        let t = "One. Two has 3 rows. <!-- measured: k=3 --> Next `<!-- measured: x=1 -->`.";
+        let m = inline_markers(t);
+        assert_eq!(m.len(), 1);
+        assert_eq!(&t[m[0].sentence.0..m[0].sentence.1], "Two has 3 rows.");
+        assert_eq!(&t[m[0].at..m[0].end], "<!-- measured: k=3 -->");
     }
 
     // spec: canon-kit/SPEC.md §The amendment lifecycle — the delta-heading grammar, tested where

@@ -18,6 +18,12 @@ Proportions restate no total on either side, numerator or denominator:
 - six of the gates are meta-gates
 - nine out of ten kits vendor the runner unchanged
 
+A partitive survives a prose wrap: the defect appeared in 57 of
+the 96 checks counted that day.
+
+Mid-paragraph, the registry holds 7 gates. <!-- measured: gate-total=7 --> The
+inline marker discharges the total where it stands.
+
 A modifier wedge wider than the window reads as prose: nine plainly generic scanning rules.
 
 A cardinal named in `six gates` inline code is a meta-reference, and a fenced

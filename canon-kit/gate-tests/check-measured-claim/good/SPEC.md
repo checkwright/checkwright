@@ -8,6 +8,14 @@ the emitter that recomputes it rather than leaving it transcribed.
 The published artifacts cover linux and macos — an extent claim carrying no
 cardinal at all, so arms A and B do the whole job and arm C never applies.
 
+<!-- measured: gate-total=7 -->
+The registry holds 7 gates today. The kits number
+12 in all. <!-- measured: kit-total=12 --> The full-line marker binds the first
+sentence and the inline one the second, so neither claim is ambiguous.
+
+The grammar is `<!-- measured: never-emitted-either=3 -->`, and a backticked
+marker is a specimen the gate never resolves.
+
 An unmarked sentence is not this gate's business: a claim nobody marks is
 uncaught here, which is the coverage limit stated rather than hidden.
 

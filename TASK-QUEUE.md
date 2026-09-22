@@ -43,21 +43,6 @@
   Filed 2026-08-10 by close, from the residual build batch 2 identified and did not file.
   Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its stem unit.
 
-- **measured-marker-cannot-sit-mid-paragraph** [spec: SPEC-inline-marker.md] —
-  `check-measured-claim` binds its marker as a full-line comment above a paragraph, so a claim
-  standing mid-paragraph can carry no marker and goes stale unwatched.
-  **Premise moved, re-measured at spec:** the attested instance, TRAJECTORY.md's port-figure
-  paragraph, was retired at a later close, and the file carries no figure now; the contract limit
-  still ships to every adopter, which is what the entry's not-icebox witness rested on.
-  **Ruled at spec (2026-09-22):** an inline marker, written inside a prose line, binds the one
-  sentence it follows; a code-span occurrence is a specimen, not a marker. Which figures to mark
-  stays consumer policy (frozen attestations are not marked), so no sweep rides this unit.
-  **Cost while deferred:** a mid-paragraph measured claim in governed prose goes stale where no
-  gate reaches it, and only a hand sweep finds it.
-  Filed 2026-09-04 by the close of `enter-stage-cut-and-file-authoring-act` into the gap inbox;
-  promoted at a later scope intake.
-  Operator direction 2026-09-22 (lead-relayed): into `canon-gate-precision`, its marker unit.
-
 - **prose-tell-threshold-validation** [spec: SPEC-threshold-shape.md] — `check-prose-tells`' five
   numeric thresholds are read through a prefix coercion and never validated, so a typo turns a
   calibrated gate into a silent no-op or a wall of noise, confidently and with no diagnostic.
@@ -89,25 +74,6 @@
   Filed 2026-09-21 to the gap inbox by gate-sdk-surface-drain's spec session; promoted 2026-09-22
   into `canon-gate-precision` by operator direction (lead-relayed). Debt: it applies the seam rule
   the spec already carries and mints no name.
-
-- **partitive-exemption-line-scope** — `check-manifest-count` is stricter than its own spec, and
-  the gap is one line break wide: prose reading "appeared in 57 of" / "the 96 checks counted that
-  day" reds as a restated collection total because the line broke between the partitive marker
-  and the cardinal, while the same sentence on one line passes.
-  **Re-verified at this scope:** the shared spec adapter (`native/src/spec.rs`) slices the
-  partitive prefix from the current line's bytes alone, while canon-kit/SPEC.md
-  §check-manifest-count states the exemption as a partitive marker "on either side of the match"
-  with no line qualifier — the comparator exemption beside it is the one scoped to the same line.
-  **Deliverable:** the partitive test sees a marker across a line break, in the shared adapter so
-  `check-prose-enum` (same adapter, same defect) is fixed with it, plus a `good/` fixture case
-  pinning a wrapped partitive. How far across is calibration inside the spec's wording: joining the
-  whole paragraph widens the exemption to any partitive anywhere in it, a false-negative surface a
-  one-line lookback does not open.
-  **Cost while deferred:** an author whose partitive wraps pays a red and is offered the exemption
-  tag as the remedy, which would bless a non-violation permanently.
-  Filed 2026-08-03 at close from the gap inbox (found by build batch 4); promoted 2026-09-22 into
-  `canon-gate-precision` by operator direction (lead-relayed). Debt: it converges the gate on the
-  exemption the spec already states.
 
 ## Deferred
 
@@ -2196,5 +2162,7 @@
 
 - provenance-seam-commit-sha-shape
 - installer-spec-provenance-residue
+- measured-marker-cannot-sit-mid-paragraph
+- partitive-exemption-line-scope
 
 ## Lessons Learned

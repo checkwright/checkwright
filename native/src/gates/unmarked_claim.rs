@@ -79,8 +79,26 @@ fn rule(args: &[String]) -> Result<i32, String> {
             // spec: canon-kit/SPEC.md §check-unmarked-claim — the subject is ASCII-lowercased
             // before matching; the fold is byte-length-preserving, so the span still maps home
             let hay = flat.text.to_ascii_lowercase();
+            // spec: canon-kit/SPEC.md §check-unmarked-claim — an inline marker discharges a class
+            // match starting inside the sentence it binds and no other; marker text is no claim
+            let inline = spec::inline_markers(&flat.text);
+            let discharged = |at: usize| {
+                inline
+                    .iter()
+                    .any(|m| (at >= m.sentence.0 && at < m.sentence.1) || (at >= m.at && at < m.end))
+            };
             for (id, re) in self.classes {
-                if let Some((start, _)) = re.find(&hay) {
+                let mut from = 0usize;
+                let mut hit = None;
+                while from <= hay.len() {
+                    let Some((start, _)) = re.find_from(&hay, from) else { break };
+                    if !discharged(start) {
+                        hit = Some(start);
+                        break;
+                    }
+                    from = start + 1;
+                }
+                if let Some(start) = hit {
                     self.out.push(format!(
                         "  {}:{}  falls in claim class '{}' and carries no 'measured:' marker",
                         file,
@@ -107,7 +125,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         for l in &out {
             println!("{}", l);
         }
-        println!("  help: three remedies and the gate is indifferent between them — rewrite the sentence out of the class (a claim not made cannot go stale); attach a '<!-- measured: <key>=<value> -->' marker on the line above, binding it to an oracle check-measured-claim re-runs; or, for a deliberate keep, tag '<!-- unmarked-claim-exempt: <reason> -->' on the flagged line or directly above it (a reason is mandatory). The classes are CANON_KIT_CLAIM_CLASSES_CMD's (canon-kit/SPEC.md §Layout and configuration); this is a class assertion, never a ban on a phrase.");
+        println!("  help: three remedies and the gate is indifferent between them — rewrite the sentence out of the class (a claim not made cannot go stale); attach a '<!-- measured: <key>=<value> -->' marker on the line above, or inline after the sentence, binding it to an oracle check-measured-claim re-runs; or, for a deliberate keep, tag '<!-- unmarked-claim-exempt: <reason> -->' on the flagged line or directly above it (a reason is mandatory). The classes are CANON_KIT_CLAIM_CLASSES_CMD's (canon-kit/SPEC.md §Layout and configuration); this is a class assertion, never a ban on a phrase.");
         return Ok(1);
     }
     println!(

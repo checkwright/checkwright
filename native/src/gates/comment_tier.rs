@@ -139,7 +139,8 @@ impl<'a> Walk<'a> {
         let cspan = if exempt {
             String::new()
         } else {
-            self.grammar.hit(body).unwrap_or_default()
+            let lead = self.block.last().map(|r| r.text.as_str()).unwrap_or("");
+            self.grammar.hit_after(lead, body).unwrap_or_default()
         };
         self.block.push(Rec {
             line: fnr,

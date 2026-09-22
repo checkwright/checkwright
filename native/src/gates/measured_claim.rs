@@ -106,7 +106,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     if !errs.is_empty() {
         return Err(format!(
-            "a marker could not be resolved against the oracle; treating as failure (not clean):\n{}\n  help: emit the key from CANON_KIT_MEASURED_CLAIMS_CMD, or drop the marker; for an ambiguous claim, split the sentence or move the marker onto the clause that carries the measurement",
+            "a marker could not be resolved against the oracle; treating as failure (not clean):\n{}\n  help: emit the key from CANON_KIT_MEASURED_CLAIMS_CMD, or drop the marker; for an ambiguous claim, split the sentence, or mark the sentence carrying the measurement inline",
             errs.iter().map(|e| format!("  {}", e)).collect::<Vec<_>>().join("\n")
         ));
     }
@@ -127,35 +127,61 @@ fn rule(args: &[String]) -> Result<i32, String> {
     Ok(0)
 }
 
-// spec: canon-kit/SPEC.md §check-measured-claim — the marker is a full-line HTML comment on
-// the line immediately above its claim; a fenced block is grammar being shown rather than a
-// claim being made, and the per-site exempt window is the line or the one above
+// spec: canon-kit/SPEC.md §check-measured-claim — a full-line marker alone on the line above
+// its paragraph, or an inline marker inside a prose line; a fenced block is grammar being shown
+// rather than a claim being made, and the per-site exempt window is the line or the one above
 fn collect(file: &str, text: &str, markers: &mut Vec<Marker>, errs: &mut Vec<String>) {
     let lines: Vec<&str> = text.lines().collect();
+    let exempt = |i: usize| lines[i].contains(EXEMPT) || (i > 0 && lines[i - 1].contains(EXEMPT));
     let mut fence = false;
+    let mut head: Option<usize> = None;
+    let mut body: Vec<usize> = Vec::new();
     for (i, raw) in lines.iter().enumerate() {
-        if spec::is_fence_line(raw) {
-            fence = !fence;
+        let fl = spec::is_fence_line(raw);
+        let full = !fence && !fl && raw.trim().starts_with(spec::MEASURED_MARKER);
+        if fl || fence || full || spec::is_blank(raw) {
+            block(file, &lines, head.take(), &std::mem::take(&mut body), &exempt, markers, errs);
+            if fl {
+                fence = !fence;
+            } else if full {
+                head = Some(i);
+            }
             continue;
         }
-        if fence {
-            continue;
+        body.push(i);
+    }
+    block(file, &lines, head, &body, &exempt, markers, errs);
+}
+
+// spec: canon-kit/SPEC.md §check-measured-claim — one paragraph: its inline markers each bind
+// the sentence ending at them, and its full-line marker binds the rest, less all marker text
+fn block(
+    file: &str,
+    lines: &[&str],
+    head: Option<usize>,
+    body: &[usize],
+    exempt: &dyn Fn(usize) -> bool,
+    markers: &mut Vec<Marker>,
+    errs: &mut Vec<String>,
+) {
+    let mut joined = String::new();
+    let mut starts: Vec<(usize, usize)> = Vec::new();
+    for (k, &i) in body.iter().enumerate() {
+        if k > 0 {
+            joined.push(' ');
         }
-        let t = raw.trim();
-        if !t.starts_with(spec::MEASURED_MARKER) {
-            continue;
-        }
-        if raw.contains(EXEMPT) || (i > 0 && lines[i - 1].contains(EXEMPT)) {
-            continue;
+        starts.push((joined.len(), i));
+        joined.push_str(lines[i]);
+    }
+    let line_of = |off: usize| starts.iter().rev().find(|(o, _)| *o <= off).map(|s| s.1).unwrap_or(0);
+    let inline = spec::inline_markers(&joined);
+    let marks: Vec<(usize, usize)> = inline.iter().map(|m| (m.at, m.end)).collect();
+    let mut push = |i: usize, t: &str, claim: String| {
+        if exempt(i) {
+            return;
         }
         match parse(t) {
-            Some((key, value)) => markers.push(Marker {
-                file: file.to_string(),
-                line: i + 1,
-                key,
-                value,
-                claim: bound_claim(&lines, i),
-            }),
+            Some((key, value)) => markers.push(Marker { file: file.to_string(), line: i + 1, key, value, claim }),
             None => errs.push(format!(
                 "{}:{}  marker does not parse: {} — the grammar is `<!-- measured: <key>=<value> -->`",
                 file,
@@ -163,6 +189,16 @@ fn collect(file: &str, text: &str, markers: &mut Vec<Marker>, errs: &mut Vec<Str
                 t
             )),
         }
+    };
+    for m in &inline {
+        let (s, e) = m.sentence;
+        let sentence = spec::text_without(&joined[..e], &marks)[s..].to_string();
+        push(line_of(m.at), joined[m.at..m.end].trim(), sentence);
+    }
+    if let Some(h) = head {
+        let mut cuts = marks.clone();
+        cuts.extend(inline.iter().map(|m| m.sentence));
+        push(h, lines[h].trim(), spec::text_without(&joined, &cuts));
     }
 }
 
@@ -177,21 +213,6 @@ fn parse(t: &str) -> Option<(String, String)> {
         return None;
     }
     Some((k.to_string(), v.to_string()))
-}
-
-// spec: canon-kit/SPEC.md §check-measured-claim — the bound claim is the paragraph the marker
-// sits above: the run of lines below it up to a blank line, a fence, a second marker or the
-// end of the file
-fn bound_claim(lines: &[&str], i: usize) -> String {
-    let mut out: Vec<&str> = Vec::new();
-    for l in lines.iter().skip(i + 1) {
-        if spec::is_blank(l) || spec::is_fence_line(l) || l.trim().starts_with(spec::MEASURED_MARKER)
-        {
-            break;
-        }
-        out.push(l);
-    }
-    out.join(" ")
 }
 
 // spec: canon-kit/SPEC.md §check-measured-claim — a bare cardinal is a digit run or one of the
@@ -280,6 +301,28 @@ mod tests {
         );
         assert_eq!(parse("<!-- measured: no-value= -->"), None);
         assert_eq!(parse("<!-- measured: no-separator -->"), None);
+    }
+
+    fn claims(text: &str) -> Vec<(usize, String, Vec<String>)> {
+        let (mut m, mut e) = (Vec::new(), Vec::new());
+        collect("f.md", text, &mut m, &mut e);
+        assert!(e.is_empty(), "{:?}", e);
+        m.into_iter().map(|x| (x.line, x.key, distinct_cardinals(&x.claim))).collect()
+    }
+
+    // spec: canon-kit/SPEC.md §check-measured-claim — an inline marker binds the one sentence it
+    // follows, and a full-line marker's paragraph is less that sentence and all marker text
+    #[test]
+    fn an_inline_marker_binds_its_sentence_and_leaves_the_rest_to_the_full_line_marker() {
+        let t = "<!-- measured: a=3 -->\nThere are three rows. The corpus has\n12 files. <!-- measured: b=12 --> Then more.\n";
+        let got = claims(t);
+        assert_eq!(got[0], (3, "b".into(), vec!["12".to_string()]));
+        assert_eq!(got[1], (1, "a".into(), vec!["3".to_string()]));
+    }
+
+    #[test]
+    fn a_backticked_marker_is_a_specimen_not_a_marker() {
+        assert!(claims("The grammar is `<!-- measured: nokey=1 -->` as shown.\n").is_empty());
     }
 
     // spec: canon-kit/SPEC.md §check-measured-claim — an extent value carries no cardinal, so
