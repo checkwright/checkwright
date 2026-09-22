@@ -1844,16 +1844,4 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 ## Done
 
-- queue-recovery-pickaxe-wrong-oracle
-- queue-citation-line-number-stales-within-its-own-session
-- recurrence-line-never-ages
-- precondition-gate-direction-blindness
-- queue-backlog-vocabulary-undeclared
-- markdown-hard-wrap-unowned-and-ungated
-- entry-line-cap-has-no-line-axis-relief
-- queue-entry-shape-slugs-headings-links
-- icebox-eviction-line-budget-squeeze
-- lead-line-blocked-by-spec-tag-width-collision
-- precondition-gate-negation-false-positive
-
 ## Lessons Learned
