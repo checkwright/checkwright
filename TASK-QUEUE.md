@@ -2122,13 +2122,4 @@
 
 ## Done
 
-- provenance-seam-commit-sha-shape
-- installer-spec-provenance-residue
-- measured-marker-cannot-sit-mid-paragraph
-- partitive-exemption-line-scope
-- kit-spec-singleton-consumer-config-quotes
-- gap-inbox-kit-ref-valve
-- kit-ref-liveness-stem-token-hole
-- prose-tell-threshold-validation
-
 ## Lessons Learned
