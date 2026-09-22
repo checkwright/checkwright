@@ -18,6 +18,37 @@ fn blob(spec: &str) -> Option<String> {
         .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))
 }
 
+// spec: lifecycle-kit/SPEC.md §check-stamp-subject — the commits a merge in progress joins, read
+// off `MERGE_HEAD`; none when no merge is in progress
+fn merge_parents() -> Vec<String> {
+    let present = proc::run(&programs::GIT, &["rev-parse", "-q", "--verify", "MERGE_HEAD"])
+        .map(|c| c.stdout().is_some())
+        .unwrap_or(false);
+    if !present {
+        return Vec::new();
+    }
+    let Some(path) = proc::run(&programs::GIT, &["rev-parse", "--git-path", "MERGE_HEAD"])
+        .ok()
+        .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string()))
+    else {
+        return Vec::new();
+    };
+    std::fs::read_to_string(&path)
+        .map(|t| t.split_whitespace().map(str::to_string).collect())
+        .unwrap_or_default()
+}
+
+// spec: lifecycle-kit/SPEC.md §check-stamp-subject — the live added-stamp read, shared with
+// check-dispatch-entry: the staged state file, and the `HEAD` and merge-parent versions before it
+pub fn live_state_sides(state: &str) -> Option<(String, Vec<String>)> {
+    let staged = blob(&format!(":{}", state))?;
+    let mut priors = vec![blob(&format!("HEAD:{}", state)).unwrap_or_default()];
+    for parent in merge_parents() {
+        priors.push(blob(&format!("{}:{}", parent, state)).unwrap_or_default());
+    }
+    Some((staged, priors))
+}
+
 pub fn run(args: &[String]) -> i32 {
     // spec: lifecycle-kit/SPEC.md §check-stamp-subject — no-arg is a clean skip, on
     // check-commit-subject's ground: the message is not a whole-tree surface
@@ -25,8 +56,8 @@ pub fn run(args: &[String]) -> i32 {
         println!("STAMP-SUBJECT: clean (no message file argument — the commit-msg hook surface is not a whole-tree target; skipped)");
         return 0;
     };
-    if args.len() != 1 && args.len() != 3 {
-        eprintln!("check-stamp-subject: usage: check-stamp-subject <message-file> [<staged-state> <head-state>]");
+    if args.len() == 2 {
+        eprintln!("check-stamp-subject: usage: check-stamp-subject <message-file> [<staged-state> <head-state> [<merge-parent-state>...]]");
         return 2;
     }
     if !Path::new(msg).is_file() {
@@ -47,16 +78,21 @@ pub fn run(args: &[String]) -> i32 {
             return 2;
         }
     };
-    // spec: lifecycle-kit/SPEC.md §check-stamp-subject — the fixture form hands both state-file
-    // sides in as files, so the pair runs hermetically without a git index
-    let (staged, head) = if args.len() == 3 {
-        match (read_file(&args[1]), read_file(&args[2])) {
-            (Ok(s), Ok(h)) => (s, h),
-            (Err(e), _) | (_, Err(e)) => {
-                eprintln!("check-stamp-subject: {}", e);
-                return 2;
+    // spec: lifecycle-kit/SPEC.md §check-stamp-subject — the fixture form hands every state-file
+    // side in as a file, so the pair runs hermetically without a git index
+    let (staged, priors) = if args.len() >= 3 {
+        let mut sides = Vec::new();
+        for a in &args[1..] {
+            match read_file(a) {
+                Ok(t) => sides.push(t),
+                Err(e) => {
+                    eprintln!("check-stamp-subject: {}", e);
+                    return 2;
+                }
             }
         }
+        let staged = sides.remove(0);
+        (staged, sides)
     } else {
         let state = match walk::knob_scalar("LIFECYCLE_KIT_STATE_FILE") {
             Ok(v) => v,
@@ -65,8 +101,8 @@ pub fn run(args: &[String]) -> i32 {
                 return 2;
             }
         };
-        match blob(&format!(":{}", state)) {
-            Some(s) => (s, blob(&format!("HEAD:{}", state)).unwrap_or_default()),
+        match live_state_sides(&state) {
+            Some(sides) => sides,
             None => {
                 println!("STAMP-SUBJECT: clean (no staged state file {} — no stamp to bind)", state);
                 return 0;
@@ -74,7 +110,8 @@ pub fn run(args: &[String]) -> i32 {
         }
     };
 
-    let Some(line) = stages::last_added_stamp(&staged, &head, &roster) else {
+    let prior: Vec<&str> = priors.iter().map(String::as_str).collect();
+    let Some(line) = stages::last_added_stamp_over(&staged, &prior, &roster) else {
         println!("STAMP-SUBJECT: clean (the commit adds no stamp line)");
         return 0;
     };
@@ -99,7 +136,7 @@ pub fn run(args: &[String]) -> i32 {
 #[cfg(test)]
 mod tests {
     use super::super::commit_subject::scope_token;
-    use crate::stages::last_added_stamp;
+    use crate::stages::{last_added_stamp, last_added_stamp_over};
 
     fn roster() -> Vec<String> {
         ["scope", "spec", "align", "build", "validate", "close"]
@@ -136,5 +173,24 @@ mod tests {
         assert_eq!(scope_token("chore: stamp"), None);
         assert_eq!(scope_token("chore(align) no colon"), None);
         assert_eq!(scope_token("Merge (align): x"), None);
+    }
+
+    // spec: lifecycle-kit/SPEC.md §check-stamp-subject — a line only a merge parent carries is
+    // inherited, not added; a line no parent carries is added; no parents is the `HEAD` read
+    #[test]
+    fn a_stamp_a_merge_parent_carries_is_not_an_addition() {
+        let hdr = "# h\n---\n\n";
+        let head = format!("{}it scope s1 2026-01-01 aaaaaaa\n", hdr);
+        let side = format!("{}it build s2 2026-01-01 bbbbbbb\n", head);
+        assert_eq!(last_added_stamp_over(&side, &[&head, &side], &roster()), None);
+        let resolved = format!("{}it build s3 2026-01-02 ccccccc\n", side);
+        assert_eq!(
+            last_added_stamp_over(&resolved, &[&head, &side], &roster()),
+            Some("it build s3 2026-01-02 ccccccc")
+        );
+        assert_eq!(
+            last_added_stamp_over(&side, &[&head], &roster()),
+            last_added_stamp(&side, &head, &roster())
+        );
     }
 }

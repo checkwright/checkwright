@@ -1691,7 +1691,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
     ),
     // spec: lifecycle-kit/SPEC.md §check-stamp-subject — the message file plus the state file's
-    // staged and `HEAD` blobs, read through git rather than walked: the empty-walk-root shape
+    // staged, `HEAD` and merge-parent blobs, read through git rather than walked: the empty-walk-root shape
     (
         "check-stamp-subject",
         stamp_subject::run,

@@ -125,7 +125,13 @@ pub fn first_head(text: &str) -> String {
 // `after` absent from `before` whose stage field is a roster member. The writer names its subject
 // from it and the gate asserts against it, so the two cannot disagree about which stage decides.
 pub fn last_added_stamp<'a>(after: &'a str, before: &str, stages: &[String]) -> Option<&'a str> {
-    let prior = data_lines(before);
+    last_added_stamp_over(after, &[before], stages)
+}
+
+// spec: lifecycle-kit/SPEC.md §check-stamp-subject — a merge inherits the stamps its parents carry,
+// so the prior set is the union of every prior version's data lines
+pub fn last_added_stamp_over<'a>(after: &'a str, befores: &[&str], stages: &[String]) -> Option<&'a str> {
+    let prior: Vec<&str> = befores.iter().flat_map(|b| data_lines(b)).collect();
     data_lines(after)
         .into_iter()
         .rfind(|l| !prior.contains(l) && stage_known(stages, stamp_stage(l)))

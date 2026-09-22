@@ -80,20 +80,6 @@ a spec amendment can state a delta instruction in the unconditional voice when i
 
 **Cost while deferred:** a misplaced marker's claim reaches build unrun, and only the author's own line-start discipline holds. Filed 2026-09-18 to the gap inbox at declined-target-audit's align; promoted at its close drain. Owner lookup: `inferred marker`, `inferred_marker`, `scan_markers`, `malformed marker` — none.
 
-### stamp-subject-merge-carve-out-unruled
-
-[spec: SPEC-merge-stamps.md]
-
-`check-stamp-subject` reds a commit adding stamp lines under git's own `Merge …` subject, which has no scope to parse (lifecycle-kit/SPEC.md §check-stamp-subject, honest limits), while `check-commit-subject` admits `Merge `, `Revert ` and `fixup! ` / `squash! ` as carve-outs never to be reworded (gate-sdk/SPEC.md §check-commit-subject). A consumer merging branches that carry state-file stamps meets two gates whose remedies conflict.
-
-**Measured at spec (2026-09-22), in a scratch clone with this repo's commit-msg hook:** a `--no-ff` merge of a branch that added a build stamp refused under git's default subject, and passed all three commit-msg gates under `git merge -m "chore(build): merge side"`. `MERGE_HEAD` resolves inside the hook on a clean merge, a conflict-resolved commit and an octopus.
-
-**Ruled at spec (2026-09-22):** neither listed remedy. The gate counts a stamp as added only when no merge parent carries it, so an inherited stamp, checked at its own commit, is not re-checked, and a hand-written `Merge …` subject on a commit introducing a stamp still reds. A subject carve-out was refused for that hole; the scoped-merge remedy for making every such merge carry a stage scope it does not describe.
-
-**Admitted to `stage-contract-drain`** (2026-09-22 scope, operator direction, lead-relayed), outside the enhancement admission filter because it reconciles two landed gates and adds no capability; /spec authors and promotes it and runs the marker above.
-
-**Cost while deferred:** none here, where internal work commits direct to master; a multi-operator consumer's stamp-carrying merge is blocked until reworded. Filed 2026-09-19 to the gap inbox at `lifecycle-contract-drain`'s build, promoted at its close drain by lead decision. Owner lookup: `stamp-subject`, `merge subject`, `git-generated` — no entry matched.
-
 ### close-surface-row-trackedness-undeclared
 
 [spec: SPEC-surface-tracking.md]
@@ -1867,5 +1853,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 `check-docs-cmd` assertion (C) misses a retired path cited from the queue, which is outside its manifest corpus and whose `<path>:<line>` token fails the path shape.
 
 ## Done
+
+- stamp-subject-merge-carve-out-unruled
 
 ## Lessons Learned
