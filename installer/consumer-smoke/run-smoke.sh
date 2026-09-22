@@ -1228,9 +1228,9 @@ case "$(uname -s)" in
     MINGW*|MSYS*|CYGWIN*) BASHLESS_HOST=skip ;;
     *) BASHLESS_HOST=run ;;
 esac
-# spec: installer/SPEC.md §The consumer smoke — a native Windows host runs every hook through Git for Windows' bundled shell whatever PATH carries, so no PATH there can be bash-less for git, and farming that bundle's usr/bin would relocate the runtime library its programs load; install-smoke-powershell holds the bash-less commit on that host
+# spec: installer/SPEC.md §The consumer smoke — a native Windows host runs every hook through Git for Windows' bundled shell whatever PATH carries, so no PATH there can be bash-less for git, and farming that bundle's usr/bin would relocate the runtime library its programs load; install-smoke-pwsh-windows holds the bash-less commit on that host
 if [[ "$BASHLESS_HOST" == skip ]]; then
-    say "skipped on a native Windows host: git runs its hooks through its bundled shell whatever PATH carries, and install-smoke-powershell commits with bash stripped there"
+    say "skipped on a native Windows host: git runs its hooks through its bundled shell whatever PATH carries, and install-smoke-pwsh-windows commits with bash stripped there"
 else
     BASH_PATH="$(path_without bash "$SCRATCH/bashfarm")" || fail "could not build the bash-less arm's PATH farm"
     [[ -z "$( PATH="$BASH_PATH" "$BASH" -c 'command -v bash' 2>/dev/null )" ]] \
