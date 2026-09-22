@@ -420,21 +420,28 @@ fn names_slug(hay: &str, slug: &str) -> bool {
     false
 }
 
-fn has_date(line: &str) -> bool {
-    let b = line.as_bytes();
-    (0..b.len().saturating_sub(9)).any(|i| {
-        (0..10).all(|k| match k {
-            4 | 7 => b[i + k] == b'-',
-            _ => b[i + k].is_ascii_digit(),
-        })
+fn date_at(b: &[u8], i: usize) -> bool {
+    (0..10).all(|k| match k {
+        4 | 7 => b[i + k] == b'-',
+        _ => b[i + k].is_ascii_digit(),
     })
+}
+
+fn has_date(line: &str) -> bool {
+    last_date(line).is_some()
+}
+
+// spec: queue-kit/SPEC.md §The queue-index arm — dates are appended in order, so the newest is the last
+fn last_date(line: &str) -> Option<&str> {
+    let b = line.as_bytes();
+    (0..b.len().saturating_sub(9)).rev().find(|&i| date_at(b, i)).map(|i| &line[i..i + 10])
 }
 
 // spec: queue-kit/SPEC.md §The icebox tier — the categorical half of the eligibility rule; §The
 // queue-index arm owns the 2026-08-24 reopening that moved it here.
 // spec: queue-kit/SPEC.md §The queue-index arm — a cause is its fixed class prefix, which prints
 // whole, and its variable tail, which is the only part a caller may cap.
-fn ineligibility(e: &Pending, live: &[String]) -> Option<(String, String)> {
+fn ineligibility(e: &Pending, cutoff: &str, live: &[String]) -> Option<(String, String)> {
     if e.lead.contains("[roadmap:") {
         return Some(("[roadmap] tag — not icebox-eligible".to_string(), String::new()));
     }
@@ -446,8 +453,12 @@ fn ineligibility(e: &Pending, live: &[String]) -> Option<(String, String)> {
     }
     for line in e.body.lines() {
         let t = line.trim_start();
-        if t.starts_with("recurrence:") && has_date(t) {
-            return Some(("[recurrence] dated re-filing — live trigger".to_string(), String::new()));
+        if !t.starts_with("recurrence:") {
+            continue;
+        }
+        // spec: queue-kit/SPEC.md §The icebox tier — a recurrence ages on the entry's own window
+        if let Some(d) = last_date(t).filter(|d| *d >= cutoff) {
+            return Some((format!("[recurrence] re-filed {} — live trigger", d), String::new()));
         }
     }
     for s in live {
@@ -490,7 +501,7 @@ fn flush(p: &mut Option<Pending>, at: usize, cutoff: &str, live: &[String], out:
         // spec: queue-kit/SPEC.md §The queue-index arm — an ineligible row keeps its line and
         // trades its class for the reason: the class is inclusion evidence, and it decides
         // nothing once a categorical exclusion has already settled the row.
-        let (mark, tail) = match ineligibility(&e, live) {
+        let (mark, tail) = match ineligibility(&e, cutoff, live) {
             Some((prefix, tail)) => ('✗', format!("{}{}", prefix, cap_chars(&tail))),
             None => {
                 let c = if e.cost.is_empty() { "(unclassed)" } else { e.cost.as_str() };
@@ -710,6 +721,24 @@ mod tests {
         assert!(names_slug("some-slug", "some-slug"));
     }
 
+    const CUT: &str = "2026-07-01";
+
+    // spec: queue-kit/SPEC.md §The icebox tier — a recurrence is live only while its newest date
+    // is inside the age window, and the cause prints that date.
+    #[test]
+    fn a_recurrence_is_live_only_while_its_newest_date_is_inside_the_window() {
+        let live: Vec<String> = vec![];
+        let r = ineligibility(&pend("- **subject** — t.", "  recurrence: subject 2026-07-01\n"), CUT, &live);
+        assert_eq!(full(r).unwrap(), "[recurrence] re-filed 2026-07-01 — live trigger");
+        let r = ineligibility(&pend("- **subject** — t.", "  recurrence: subject 2026-05-01 2026-06-30\n"), CUT, &live);
+        assert!(r.is_none(), "an aged recurrence is no live trigger: {:?}", r);
+        let r = ineligibility(&pend("- **subject** — t.", "  recurrence: subject 2026-05-01 2026-08-02\n"), CUT, &live);
+        assert_eq!(full(r).unwrap(), "[recurrence] re-filed 2026-08-02 — live trigger");
+        let live = vec!["other".to_string()];
+        let r = ineligibility(&pend("- **subject** — t.", "  recurrence: subject 2026-05-01\n  waits on `other`.\n"), CUT, &live);
+        assert_eq!(full(r).unwrap(), "[trigger] names live slug other");
+    }
+
     fn pend(lead: &str, body: &str) -> Pending {
         Pending {
             slug: "subject".to_string(),
@@ -733,15 +762,15 @@ mod tests {
     #[test]
     fn every_categorical_trigger_is_decided_and_self_naming_is_not_one() {
         let live = vec!["other".to_string(), "subject".to_string()];
-        let r = ineligibility(&pend("- **subject** [roadmap: now/x] — t.", ""), &live);
+        let r = ineligibility(&pend("- **subject** [roadmap: now/x] — t.", ""), CUT, &live);
         assert!(full(r).unwrap().starts_with("[roadmap]"));
-        let r = ineligibility(&pend("- **subject** — t.", "  recurrence: subject 2026-08-01\n"), &live);
+        let r = ineligibility(&pend("- **subject** — t.", "  recurrence: subject 2026-08-01\n"), CUT, &live);
         assert!(full(r).unwrap().starts_with("[recurrence]"));
-        let r = ineligibility(&pend("- **subject** — t.", "  waits on `other` landing.\n"), &live);
+        let r = ineligibility(&pend("- **subject** — t.", "  waits on `other` landing.\n"), CUT, &live);
         assert_eq!(full(r).unwrap(), "[trigger] names live slug other");
-        let r = ineligibility(&pend("- **subject** — t.", "  subject is the whole of it.\n"), &live);
+        let r = ineligibility(&pend("- **subject** — t.", "  subject is the whole of it.\n"), CUT, &live);
         assert!(r.is_none(), "self-naming is narration, not a trigger: {:?}", r);
-        let r = ineligibility(&pend("- **subject** — t.", "  recurrence: subject soon\n"), &live);
+        let r = ineligibility(&pend("- **subject** — t.", "  recurrence: subject soon\n"), CUT, &live);
         assert!(r.is_none(), "an undated recurrence line is no re-filing: {:?}", r);
     }
 
@@ -752,18 +781,18 @@ mod tests {
     fn a_standing_declaration_is_decided_after_the_tag_and_before_the_recurrence_line() {
         let live = vec!["other".to_string()];
         let decl = "  not-icebox-eligible: subject 2026-08-17 eviction spends the clause\n";
-        let r = ineligibility(&pend("- **subject** — t.", decl), &live);
+        let r = ineligibility(&pend("- **subject** — t.", decl), CUT, &live);
         assert_eq!(full(r).unwrap(), "[standing] 2026-08-17 — eviction spends the clause");
-        let r = ineligibility(&pend("- **subject** [roadmap: now/x] — t.", decl), &live);
+        let r = ineligibility(&pend("- **subject** [roadmap: now/x] — t.", decl), CUT, &live);
         assert!(full(r).unwrap().starts_with("[roadmap]"));
         let body = format!("  recurrence: subject 2026-08-01\n  waits on `other`.\n{}", decl);
-        let r = ineligibility(&pend("- **subject** — t.", &body), &live);
+        let r = ineligibility(&pend("- **subject** — t.", &body), CUT, &live);
         assert!(full(r).as_deref().unwrap_or("").starts_with("[standing]"));
-        let r = ineligibility(&pend("- **subject** — t.", "  not-icebox-eligible: subject grounds only\n"), &live);
+        let r = ineligibility(&pend("- **subject** — t.", "  not-icebox-eligible: subject grounds only\n"), CUT, &live);
         assert_eq!(full(r).unwrap(), "[standing] (undated) — grounds only");
-        let r = ineligibility(&pend("- **subject** — t.", "  not-icebox-eligible: subject 2026-08-17\n"), &live);
+        let r = ineligibility(&pend("- **subject** — t.", "  not-icebox-eligible: subject 2026-08-17\n"), CUT, &live);
         assert_eq!(full(r).unwrap(), "[standing] 2026-08-17 — (ungrounded)");
-        let r = ineligibility(&pend("- **subject** — t.", "  prose naming not-icebox-eligible: mid-line.\n"), &live);
+        let r = ineligibility(&pend("- **subject** — t.", "  prose naming not-icebox-eligible: mid-line.\n"), CUT, &live);
         assert!(r.is_none(), "only a line led by the token declares: {:?}", r);
     }
 
@@ -774,7 +803,7 @@ mod tests {
         let live: Vec<String> = vec![];
         let long = "a very long declared reason that runs well past the forty eight character mark on its own";
         let decl = format!("  not-icebox-eligible: subject 2026-08-17 {}\n", long);
-        let (prefix, tail) = ineligibility(&pend("- **subject** — t.", &decl), &live).unwrap();
+        let (prefix, tail) = ineligibility(&pend("- **subject** — t.", &decl), CUT, &live).unwrap();
         assert_eq!(prefix, "[standing] 2026-08-17 — ");
         assert!(!prefix.contains("not-icebox-eligible"), "{}", prefix);
         assert!(tail.chars().count() > CAUSE_CAP, "fixture must exceed the cap: {}", tail);

@@ -252,11 +252,19 @@ promotion trigger**. The age limb is what makes the tier a demotion on evidence
 rather than a filing preference: an entry younger than the knob has not had the
 chance to recur. **What counts as live is deliberately narrow**, and it was narrowed
 against a measured pool where the prior reading let almost nothing qualify: a live
-trigger is a **live, unbuilt queue slug** the entry names, a dated `recurrence:`
-line, or a `[roadmap:]` tag. A trigger that is itself gated on launch — a first
-external adopter, a preview cohort, an install count — is **dormant**: the entry
-waits in the icebox until the event occurs and returns on it, which is the round
-trip the tier already conserves. The `not-icebox-eligible:` limb stands beside the
+trigger is a **live, unbuilt queue slug** the entry names, a `recurrence:` line
+whose newest date is no older than `QUEUE_KIT_ICEBOX_AGE_DAYS`, or a `[roadmap:]`
+tag. A trigger that is itself gated on launch — a first external adopter, a
+preview cohort, an install count — is **dormant**: the entry waits in the icebox
+until the event occurs and returns on it, which is the round trip the tier
+already conserves. A recurrence ages on the same knob as the entry. It shows the
+finding was live on its date, and once the window has passed with no newer date
+the finding had its chance to recur and did not, which is the dormancy evidence
+the age limb reads; one knob serves both limbs because both answer whether the
+entry has had the window to recur, and a second number could only disagree with
+the first. A later recurrence returns the entry with a fresh date. Only
+eligibility ages the date. The scope pre-emption count and the recurrence KPI
+read every date as history. The `not-icebox-eligible:` limb stands beside the
 live-trigger limb rather than widening what counts as live, so that narrowing is
 untouched: the declaration records a fact no trigger carries.
 
@@ -271,7 +279,7 @@ more certainly none of it ever qualifies. The safety valve is the round trip the
 tier already conserves rather than a new mechanism — a member that genuinely
 re-fires returns on a real recurrence, which is a trigger arriving from outside
 the set and therefore untouched by this clause. Nothing here narrows a
-`[roadmap:]` tag or a dated `recurrence:` line, both of which stay live inside
+`[roadmap:]` tag or a `recurrence:` line inside the age window, both of which stay live inside
 such a set exactly as they are outside one.
 
 The class is the lead line's `[cost:]` tag and never the word the cost field
@@ -754,8 +762,9 @@ must not gate anything. A derived default below is written as
 - `QUEUE_KIT_ENTRY_LINE_CAP` — positive integer, default `50`; the per-entry
   line cap `check-queue-entry-budget` assertion A holds over the deferred
   section.
-- `QUEUE_KIT_ICEBOX_AGE_DAYS` — positive integer, default `30`; the defer-date
-  age filter for the `queue-index` arm's `--icebox-candidates`, and nothing else.
+- `QUEUE_KIT_ICEBOX_AGE_DAYS` — positive integer, default `30`; the age window
+  for the `queue-index` arm's `--icebox-candidates`: the defer-date filter and
+  the recurrence-trigger limb (§The icebox tier), and nothing else.
 - `QUEUE_KIT_WRAP_BUDGET` — default `100` (`check-queue-wrap` gate floor).
 - `QUEUE_KIT_PROSE_LEADS` — array of column-0 lead tokens exempt from the
   hygiene gate's no-prose axis, default `("Protocol:")`.
@@ -1043,8 +1052,11 @@ settled the row. The cause names the exclusion class, decided in this order — 
 printed as `[standing] <date> — <grounds>` — the declaration's own lead token
 is dropped because the `✗` mark and the `[standing]` class token both already
 say it, and the four class tokens read uniformly as a result; a line with no
-date renders `(undated)` and one with no grounds `(ungrounded)`; a dated
-`recurrence:` declaration; or the first live slug named in file order, which
+date renders `(undated)` and one with no grounds `(ungrounded)`; a
+`recurrence:` declaration whose newest date — the last one, since dates are
+appended in order — is inside the age window, printed as
+`[recurrence] re-filed <date> — live trigger` so the closing stage sees when the
+window closes; or the first live slug named in file order, which
 stands for the class rather than enumerating it. A cause someone wrote about the
 entry outranks a trigger the arm infers, which is why the declaration precedes
 the two inferred triggers. Every cause prints its **class prefix whole** and

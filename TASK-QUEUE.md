@@ -46,22 +46,6 @@
   2026-08-25 at close, which read the gate's four help lines first-hand and corrected the filing;
   promoted into `queue-kit-unwrap` 2026-09-22 by operator direction (lead-relayed).
 
-- **recurrence-line-never-ages** [spec: SPEC-recurrence-age.md] — a dated `recurrence:` line
-  counts as a live icebox trigger with no age limb, so one recurrence pins a low-cost entry out
-  of the icebox indefinitely, even after later re-measurements fail to reproduce it.
-  queue-kit/SPEC.md §The icebox tier lists a dated `recurrence:` line among live triggers and ages
-  only the entry itself (`QUEUE_KIT_ICEBOX_AGE_DAYS`), never the recurrence date.
-  **Attested once:** `worktree-isolated-agent-report-lost-to-a-failed-peer-send` recurred
-  2026-08-26, did not reproduce 2026-09-16 or 2026-09-21, was re-costed `event/low`, and stayed
-  Deferred on that one date until `delegation-seams` landed it. The instance, not a recurrence.
-  **Specified 2026-09-22:** the age limb, on the newest recurrence date against the tier's own
-  `QUEUE_KIT_ICEBOX_AGE_DAYS` (no knob minted); the worklist prints the date its window reads;
-  the scope pre-emption count and the recurrence KPI keep reading every date as history.
-  **Cost while deferred:** each close's eviction re-judges such entries by hand and keeps them.
-  Filed 2026-09-21 to the gap inbox at `release-declaration-coupling`'s close eviction; promoted at
-  the next scope's intake the same day, and into `queue-kit-unwrap` 2026-09-22 by operator
-  direction (lead-relayed).
-
 - **markdown-hard-wrap-unowned-and-ungated** [spec: SPEC-md-unwrap.md] — this repo's markdown
   hard-wrapping convention is unowned, bimodal and load-bearing for a gate whose manifest does not
   say so, and under enforcement-first the unwrap and its oracle land in one unit or neither does.
@@ -2123,5 +2107,6 @@
 
 - queue-recovery-pickaxe-wrong-oracle
 - queue-citation-line-number-stales-within-its-own-session
+- recurrence-line-never-ages
 
 ## Lessons Learned
