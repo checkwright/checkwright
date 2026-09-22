@@ -12,11 +12,11 @@ install-first-contact queue_kit sha256=5880c4840de8628f0c320fd728dd3e425a92b6d15
 install-first-contact site_kit sha256=48d3335dd0d627713fd607013b1cc6a0049e60b8f4a1905b441b7699d4c844c2 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
 install-first-contact scripts sha256=79ed7aac215203e28c16d151e43d18867b9d53aa24afc2c79947e252882e97b7 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
 install-first-contact guard_tests sha256=2e9a22131559a27d70c1ffe7f075649ff0a18e7ddacf4aaee09130cdf20bd345 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
-install-first-contact demo sha256=c0b621e758f3779b9484ff197e2b6147956e80b40a5195014bf8fccbc25ee96a pass=0 fail=1 ignore=0 verdict=new-failures 2026-09-22
-install-first-contact installer_smoke sha256=aa216a7abba30b78b1f7275b2a35173d51ebb45b7bef8185d7013cda8628f7cf pass=17 fail=0 ignore=0 verdict=clean 2026-09-22
-install-first-contact consumer_smoke sha256=9c0767ffa2dc4200539789a08fbf3c72da04a3e23c546749f09d2d2d6c1e8922 pass=0 fail=1 ignore=0 verdict=new-failures 2026-09-22
-install-first-contact upgrade sha256=4e7d67974cb084e17cbcfc064a87e970424dc5967f0a460cea36699ea2cec6a8 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
-install-first-contact agents_md_smoke sha256=56c198172779ac2587a79df81d0a18d71c7e429c3605a40e03727332a4b80817 pass=0 fail=1 ignore=0 verdict=new-failures 2026-09-22
+install-first-contact demo sha256=d85563845dd6fe76088b0eef114aca072fb2d08684a61cc4cdbd80acf73d9227 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+install-first-contact installer_smoke sha256=aedf4010065d965df4e60cd7a4da1a98a420468c6dfc06b790e208ab420d222c pass=17 fail=0 ignore=0 verdict=clean 2026-09-22
+install-first-contact consumer_smoke sha256=3031de9506c18af68e496dad352509491c4eb571f819ce629a306b96cd44fee7 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+install-first-contact upgrade sha256=29f8b1ec5daf496a90be62b43155ce445c14e651c4ef30f7b97576acd3bf6a79 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+install-first-contact agents_md_smoke sha256=71a7a434efa549d7dafc64460de4ae6b4e2d4fdd136ac793d901f651d361a284 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
 install-first-contact index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
-install-first-contact native_crate sha256=346d9a231a2bc863f5de3c34dd0755ca26b4eb76101984b7dab5a4e2195aed2e pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+install-first-contact native_crate sha256=33c3a6ce49649865783d9d2d6a68bcafe5b2b4ad2e0788f481adb6777f7a464b pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
 install-first-contact projection_witness sha256=9fff9e505d47d46ba8eb9894a468563fd9b75f55bffd8a0729f09ccd593f1006 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
