@@ -52,6 +52,7 @@ check-action-pinning
 check-action-run-shell
 check-action-gh-repo
 check-action-permissions
+check-action-job-ref
 # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion I's own declaration
 # grammar (a sibling of §The install disposition's `# smoke-unregistered:`, on a second
 # roster): gate-sdk-owned subcommands this leg's minimal registry deliberately omits,
