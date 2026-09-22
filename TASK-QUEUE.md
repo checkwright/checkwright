@@ -56,16 +56,6 @@ a spec amendment can state a delta instruction in the unconditional voice when i
 
 ## Technical Debt
 
-### stage-evidence-prefix-doubles-a-separator
-
-`check-stage-evidence`'s path relativizer composes its not-under arm from `git rev-parse --show-prefix`, which prints a TRAILING slash, onto a path with a separator already between them.
-
-**Latent rather than live:** the doubled separator is collapsed downstream by `walk::normalize_abs`, so no verdict is wrong today. Removing the second separator is a behaviour change to a COMPARED value, which wants its own measurement. **Re-verified at this scope:** the `--show-prefix` call is still at `native/src/gates/stage_evidence.rs` line 100.
-
-**Deliverable:** measure what the compared value is on each arm, then either trim the prefix at the site or state at the site that the collapse is relied on.
-
-**Cost while deferred:** none paid today; the exposure is a later edit to `normalize_abs`'s collapse turning a latent defect live with nothing asserting the coupling. Filed 2026-09-20 by close's drain; promoted 2026-09-22 into `stage-contract-drain` by operator direction (lead-relayed). Debt: it converges one site on behaviour the SPEC already states and mints no name.
-
 ## Deferred
 
 ### consumer-policy-rule-absent
@@ -1816,5 +1806,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - build-work-before-entry-stamp
 - inferred-marker-malformed-placement-passes-unseen
 - close-surface-row-trackedness-undeclared
+- stage-evidence-prefix-doubles-a-separator
 
 ## Lessons Learned

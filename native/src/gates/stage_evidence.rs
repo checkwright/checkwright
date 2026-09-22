@@ -40,6 +40,12 @@ fn norm(p: &str) -> String {
     walk::normalize_abs(p).trim_start_matches('/').to_string()
 }
 
+// spec: lifecycle-kit/SPEC.md §check-stage-evidence — `git rev-parse --show-prefix` prints its
+// own trailing separator, or nothing at the root, so a cwd-relative path is appended to it as is
+fn under_prefix(prefix: &str, p: &str) -> String {
+    norm(&format!("{}{}", prefix, p))
+}
+
 fn git_line(args: &[&str]) -> Option<String> {
     let c = proc::run(&programs::GIT, args).ok()?;
     let b = c.stdout()?;
@@ -106,7 +112,7 @@ fn provenance(
     // onto the repo root rather than compared in a frame nothing else uses
     let rel = |p: &str| match walk::rel_under(&root_c, p) {
         Some(inside) => norm(inside),
-        None => norm(&format!("{}/{}", prefix, p)),
+        None => under_prefix(&prefix, p),
     };
     let rel_state = rel(state);
     // spec: lifecycle-kit/SPEC.md §check-stage-evidence — inertness (b): the file handed to
@@ -386,6 +392,21 @@ pub fn run(args: &[String]) -> i32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: lifecycle-kit/SPEC.md §check-stage-evidence — both `--show-prefix` shapes, the root's
+    // empty one and a subdirectory's slash-terminated one, rebase to the value the doubled-separator
+    // spelling reached only through `normalize_abs`'s collapse
+    #[test]
+    fn a_show_prefix_path_is_composed_without_a_doubled_separator() {
+        for (prefix, p, want) in [
+            ("", ".workflow/WORKFLOW-STATE.txt", ".workflow/WORKFLOW-STATE.txt"),
+            ("native/", "../.workflow/WORKFLOW-STATE.txt", ".workflow/WORKFLOW-STATE.txt"),
+            ("native/src/", "x.txt", "native/src/x.txt"),
+        ] {
+            assert_eq!(under_prefix(prefix, p), want);
+            assert_eq!(under_prefix(prefix, p), norm(&format!("{}/{}", prefix, p)));
+        }
+    }
 
     // spec: lifecycle-kit/SPEC.md §check-stage-evidence — the recovery must name the delete: a help
     // prescribing only the re-run sends an already-off-script session round a loop with no exit,
