@@ -8,21 +8,115 @@
 
 ## New Features
 
-## Technical Debt
-
-## Deferred
-
 ### consumer-policy-rule-absent
 
-[cost: event/high] [surface: doctrine-kit] [recurrence: 2026-09-22]
+[spec: SPEC-policy-choice.md] [recurrence: 2026-09-22]
 
 a kit feature that encodes a policy, such as record-size capping, ships this project's one choice as the kit's behaviour instead of a consumer-selectable set of alternatives ('off' among them, plus a lead-grantable per-record exception where it fits). This repo should then bind exactly one choice as a consumer. doctrine-kit/DOCTRINE.md has the provenance seam (content to config) and widest-true-tier (placement), but no design rule that turns a policy into a consumer choice, and nothing checks it. Live instance: queue-kit-unwrap's build hard-coded a 100-code-point marker reach into `check-knob-citation` (`MARKER_REACH`, native/src/gates/knob_citation.rs).
 
 **Deliverable:** a DOCTRINE methodology rule plus its one-line digest in the always-loaded file, and an enforcement if one is feasible. Operator direction, with the work: first run a read-heavy audit (audit-sweep type) of existing gates and of decommissioned ones (deleted `.gate` descriptors and removed `native/src` modules in git history) for places where a gate hard-codes this project's policy instead of offering consumer-selectable alternatives. The audit's findings supply the rule's worked examples and the follow-up entries.
 
-**Leads `consumer-policy-seam`; admitted on the filter's trust arm** — operator direction 2026-09-22, lead-relayed: a calibration a kit bakes in with no knob or off switch is one an adopter must trust as shipped, and a wrong red at it can only be bypassed. Stays Deferred for /spec to author and pair; the five entries joining it are reshaped by its rule and go after it.
+**Leads `consumer-policy-seam`; admitted on the filter's trust arm** — operator direction 2026-09-22, lead-relayed: a calibration a kit bakes in with no knob or off switch is one an adopter must trust as shipped, and a wrong red at it can only be bypassed. The five entries joining it are reshaped by its rule.
+
+**Specified 2026-09-22:** methodology rule 13, Policy-as-choice, with a discriminator (does another value keep the gate's stated contract true?) and three exclusions (kit-shipped grammar, contract invariant or external limit, verdict-neutral value); its digest; and a cadence, a `baked-calibration` audit-roster class, rather than a gate. The census ran at spec over 117 kit gate modules and 110 deleted gate files and found six verdict-affecting baked calibrations and no true decommission. The baked windows are named constants, inline literals, a paragraph walk and a pattern quantifier alike, so a constant scan would be a stand-in. No conversion is built here; the census's five follow-ups are in the gap inbox.
 
 **Cost while deferred:** every design session defaults to hard-coding this project's preference, and the operator pays for each correction. Filed 2026-09-22 to the gap inbox by the queue-kit-unwrap lead as an operator direction, with an addendum. Promoted at its close because →fix would author a new doctrine rule and an audit, which is more than a close drain may land. Recurrence stamped on the operator's statement that the direction had been corrected before. Owner lookup ran over `policy`, `consumer choice` and `consumer-select` in doctrine-kit/DOCTRINE.md and found no owner.
+
+### kit-knob-consumer-adapter-convention
+
+[spec: SPEC-policy-choice.md] [recurrence: 2026-09-03]
+
+whether a kit may ship a knob whose only working configuration requires the consumer to author an adapter, and whether the front-end shape that answer takes should be a named convention rather than each consumer's invention.
+
+**The capability loss that raised it is CLOSED, and this entry is deliberately the residue.** `shell-gate-tail-port` deleted the path `DELEGATION_KIT_LIVENESS_CMD` defaulted to, so the turn-end liveness probe logged `verdict=unavailable` on every firing. The repair landed at the same cut: the kit template dropped a default that pointed at nothing (a path present in no tree reads as a shipped capability and is none), the knob kept its contract exactly — a path run with the scratch dir as its only argument — and this repo named its own reader `scripts/producer-liveness-reader.sh`, reaching the gate through `scripts/gate-exec.sh`. BOTH scripts left the tree 2026-09-05, and the negative control at `scripts/gate-tests/subagent-stop-reader.test.sh` now asserts `unresolved`, never `unavailable`.
+
+**The capture log priced the loss and verified the repair:** 77 `verdict=unavailable` firings inside one 46-minute window, zero after. So the surviving question is a convention question, not a defect. **Kept at queue-kit-unwrap's close** on a live trigger: [consumer-policy-rule-absent](#consumer-policy-rule-absent)'s gate audit reads the same config-surface question. **Joins `consumer-policy-seam`, riding under that entry as reshaped** — operator direction 2026-09-22, lead-relayed; it goes after that entry's rule.
+
+**Specified 2026-09-22, in the rule's amendment:** a knob that selects behavior ships a working value (a bundled bare name, a kit `--emit` arm through the front-end, or `off`), and a consumer command extends the set but is never its only working member, stated in gate-sdk/SPEC.md §The knob file. A new kit adapter is an `--emit` arm, never a third bare name. The five canon-kit claim gates whose empty command knob disarms them declare it with `# armed-by:`, so `doctor` names the state.
+
+**The precedent this stands on, which is what makes the question general.** evidence-kit met the identical break one caller over when the same port turned a pre-flight entry's named path into a descriptor, and discharged it with a CONSUMER-SIDE front end resolving the gate name, explicitly refusing to teach the kit's knob to resolve a name as "a kit-contract change". Two kits, two consumers, one shape, invented twice.
+
+**Why this needed design:** naming the convention is a cross-kit envelope change. The seam INSTANCE it was argued on is spent — `scripts/gate-exec.sh` left the tree 2026-09-05 and its successor `run-gates.sh --only` is kit-shipped, so a template could name that one — while the question survives on the parser knobs, where any default is still a seam call first.
+
+**Cost while deferred:** low and adoption-shaped — every consumer configuring such a knob rediscovers the adapter shape from scratch, and a consumer that does not gets honest degradation rather than a break, which is why nothing forces the issue.
+
+**The 2026-09-03 parser cut narrowed the question to its naming and answered nothing else.** Both `EVIDENCE_KIT_PARSER_<suite>` values this repo configures now name bundled arms, so an adopter wanting per-gate or per-arm scenarios writes a knob value instead of authoring a script: the *mechanism* stopped being each consumer's invention. The *name* did not — a third built-in adapter beside `exit-code` and `libtest` was refused twice over, on the ground that absorbing an owed script into a permanently shell library discharges the port's count while defeating its objective, and on the ground that naming the convention is this entry's own deliverable, which a port cut may not rule (evidence-kit/SPEC.md §The evidence adapters). So the cut DEMOTES this entry rather than closing it, returning it to the position the 2026-08-24 promotion took it from.
+
+**The delegation instance LEAVES the class 2026-09-05 (operator, consult):** the liveness hook reaches its gate through its own executable, so the knob is an override over a working default (delegation-kit/SPEC.md §The turn-end liveness hook); the question survives on the parser knobs. Filed 2026-08-24 to the gap inbox by build in two bullets, the second correcting the first's repair premise as measured-false; promoted 2026-08-24 at `shell-gate-tail-port-and-completion-oracle`'s close, whose drain confirmed the reader, its oracle and the surviving question. The instance above was filed 2026-09-03 to the gap inbox by the consult and drained here into this entry rather than into a new one, the port-only run barring the drain's promote.
+
+### matching-window-roster-absent
+
+[spec: SPEC-policy-choice.md]
+
+no surface rosters which gates carry a same-line or same-paragraph matching window, so auditing the class means re-deriving the roster off `native/src/gates` and the pattern files each time. The residue is spread across four surfaces: canon-kit/SPEC.md and gate-sdk/SPEC.md carry the three audited windows' verdicts in three sections, and [msg-uuid-reach-unbounded](#msg-uuid-reach-unbounded) and [measured-claim-span-unbounded](#measured-claim-span-unbounded) carry a fourth and fifth candidate.
+
+**Deliverable — rule one of two:** a DERIVED roster (a `.gate` descriptor field the binary reads, or an `--emit` arm over the pattern files and the gate modules — never a hand-kept list, which derivation-first forbids), or a stated refusal naming why the class has no decidable oracle.
+
+**Probed at promotion:** three windows are named constants — `MARKER_REACH` (`knob_citation.rs`), `SPAN_CAP` (`queue_prose_precondition.rs`), `WINDOW` (`assertion_strength.rs`) — while the msg-uuid window is a regex `.*` in a pattern file and measured-claim's is a paragraph walk, so a constant-name scan alone reaches three of five.
+
+**Corrected at spec 2026-09-22, by the census:** `SPAN_CAP` is not a window. It caps the excerpt the finding message quotes (`fired_span`) and changes no verdict. The census also found an inline 400-character window in `knob_default_coupling.rs` that no constant name marks. So no shape is common, and the inferred claim that a descriptor field or an emit arm could decide membership is false.
+
+**Specified 2026-09-22, in the rule's amendment:** the stated refusal. A window is bounded by structure where the grammar has one and otherwise by a knob; `--emit knob-roster` lists the knob-backed ones; no window roster is kept, since no scan decides membership (gate-sdk/SPEC.md §Calibration lessons).
+
+**DISTINCT from** the two entries above, each owning one window's calibration and discharged by fixing it; this owns the missing surface that would have led an auditor to either.
+
+**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed; reshaped by [consumer-policy-rule-absent](#consumer-policy-rule-absent), whose audit of baked policy is the census this roster derives from.
+
+**Cost while deferred:** the next auditor re-derives the roster from source. Filed 2026-09-22 to the gap inbox by `install-first-contact`'s close, captured as knowledge friction during `line-window-gates-unaudited`'s audit, and promoted at the next scope's intake, so the record is late and says so. Owner lookup ran `matching window`, `same-line window` and `window roster` over the tracked docs — no owner.
+
+### msg-uuid-reach-unbounded
+
+[spec: SPEC-uuid-reach.md]
+
+`scripts/msg-patterns.list` line 21 and its kit twin `gate-sdk/templates/msg-patterns.list` line 21 spell `^[A-Za-z][A-Za-z-]*: .*<uuid>`, whose `.*` was bounded by the physical line and is now bounded by a paragraph. Re-verified at this drain: both live lines carry the unbounded form and so do all three fixture copies (`gate-sdk/gate-tests/check-commit-msg/{good,bad}/patterns.list`, `gate-sdk/gate-tests/check-tree-terms/good/patterns.list`) — five sites. Nothing reds today: exactly one tracked line wears both the trailer-key shape and a UUID, inside a pruned fixture. The ordinary edit that reds it is a markdown paragraph opening `Note: ` or `Session: ` that quotes an example session UUID later in the same paragraph, which this repo documents `--emit session-id` and so plausibly writes.
+
+**Deliverable:** a bounded reach. Candidate, run by the filer through `check-tree-terms` over the tracked tree and clean at exit 0: `^[A-Za-z][A-Za-z-]*: [^.;]{0,40}<uuid>`. **The seam question the fix must rule first:** a numeric reach inside a shipped generic pattern sits on the provenance boundary, so whether the calibration belongs in the kit template, the consumer copy, or both is undecided (gate-sdk/SPEC.md §The provenance seam).
+
+**Probed at scope 2026-09-22:** the interval stays under the engine's bound — `DUP_MAX` is 255 in `native/src/ere.rs`, against the candidate's `{0,40}`.
+
+**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed; reshaped by [consumer-policy-rule-absent](#consumer-policy-rule-absent), whose rule answers the seam question above, so it goes after it.
+
+**Corrected at spec 2026-09-22, by running the candidate through the engine:** there are six sites, not five, since a unit-test literal in `native/src/gates/commit_msg.rs` carries the shape too. The `{0,40}` candidate fails both ways: it still reds a `Note: …session id such as <uuid>` line, and it misses a URL-valued trailer, whose host carries a `.`. **Specified:** the value becomes one token, `[^ ]*`, which reds every trailer shape and no quoting prose, and carries no number to choose. The pattern file is already consumer config, so template and copy both take it and no knob is minted. The shipped-shapes unit test reads the template rather than a copy, since its account-pattern copy had drifted.
+
+**Cost while deferred:** a false red waits on the first prose paragraph pairing a trailer-shaped lead-in with a quoted UUID. Filed 2026-09-22 by build batch 2 under scope-gated intake; the lead ruled it stays filed rather than landing mid-iteration, and it promotes at close because the seam question is an envelope call for spec, not a drain fix. **DISTINCT from `line-window-gates-unaudited`** (Done 2026-09-22), whose subject is a named roster of three windows, all three measured to need no recalibration; this is a fourth pattern that audit met on the way. Owner lookup ran `msg-patterns`, `matching window` and `same-line window` over the queue — no owner.
+
+### measured-claim-span-unbounded
+
+[spec: SPEC-claim-span.md]
+
+`check-measured-claim` binds a full-line `measured:` marker to the paragraph below it, and on an unwrapped tree that paragraph is one line running to thousands of code points. Arm C then tests only that the marker's cardinal appears somewhere in the span, so a marker whose own sentence has drifted can still read as agreeing.
+
+**The measurement the filing asked for was bought at this drain, and it corrects the filed premise twice.** (1) Arm C is *fail-closed* on a wide span rather than silently green: `native/src/gates/measured_claim.rs` reds the run when the bound claim carries more than one distinct cardinal ("which one the marker holds is ambiguous"), and a thousands-code-point paragraph almost always carries several. The false-green case survives only where a long span carries exactly one distinct cardinal equal to the marker's value. (2) Arm C is dormant on this tree: every live full-line marker is `gate-substrates=native` (`CONTRIBUTING.md`, `SECURITY.md`, `docs/positioning.md`, `docs/methodology.md`), a non-cardinal value `cardinal_value` returns `None` for, so the paragraph span is never read at all. Every other marker in the tree is a fixture or a grammar specimen.
+
+**Deliverable, repriced by the above:** a reach or a sentence boundary on the full-line marker's claim span, or a stated reason the paragraph is the right unit — canon-kit/SPEC.md §check-measured-claim owns the sentence. It stays filed rather than discarded because the gate ships to adopters whose trees this measurement cannot reach.
+
+**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed; reshaped by [consumer-policy-rule-absent](#consumer-policy-rule-absent), since a claim-span reach is a baked calibration, so it goes after it.
+
+**Specified 2026-09-22:** the full-line span is the knob `CANON_KIT_MEASURED_SPAN`, `paragraph`, `sentence` or `off`, default `paragraph` so no adopter's verdict moves, and this repo binds `sentence`. A code-point reach is refused because it cuts a sentence arbitrarily. Re-measured: the five full-line markers outside fixtures are four `gate-substrates=native` and one fenced specimen, so the binding moves no verdict here.
+
+**Cost while deferred:** an adopter writing a cardinal-valued full-line marker above an unwrapped paragraph gets a binding whose agreement is near-accidental. Filed 2026-09-22 by build batch 2 as inferred from source; measured at this close and narrowed. **DISTINCT from `line-window-gates-unaudited`** (Done 2026-09-22), whose closed roster of three windows that audit discharged; this is a fourth gate it flagged and did not audit. Owner lookup ran `measured-claim` and `paragraph` over the queue — no owner.
+
+### probe-before-assertion-doctrine
+
+[spec: SPEC-probe-corpus.md] [recurrence: 2026-09-20]
+
+**returned from the icebox on a judged recurrence.** The rule it asked for shipped: CLAUDE.md §Delivery doctrine carries `Probe-before-assertion`, and the icebox line recorded the remainder as "Rule shipped; mechanizing it is open". What re-fires it is that the shipped rule did not hold, and did not hold seven times in one iteration.
+
+**The seven, all one shape — a probe narrower than the claim it supported.** Three path-scoped greps; two filters whose empty return was read as success; an amendment whose printed probe over-returned; and a nested-tree probe whose first confirming run used an inconsistent tree. Two of the seven produced regressions that reached validate, where they cost a re-tier.
+
+**The sharpening is the finding, and it is new.** `Probe-before-assertion` asks whether a probe was *run*; in all seven a probe ran. What failed is that its **corpus was narrower than the corpus the claim ranged over**, which the rule as worded does not reach. The drain reproduced the shape on its own inputs: the `door-sweep-reach-stops-at-the-kit-boundary` bullet named nine `docs/site-architecture.md` sites where a fresh grep returns thirteen, and missed `docs/index.md` altogether.
+
+**Why design-pending:** whether this is a fourth always-loaded line, a re-wording of the existing one, or something mechanizable is the open call — and it is a governed-surface widening, which a close does not self-serve. The cheapest candidate worth beating is still the one the original filing named: widen an existing rule rather than mint another.
+
+**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed; it shares that unit's doctrine-kit surface, DOCTRINE.md and the always-loaded digest.
+
+**Specified 2026-09-22:** the existing rule is widened and no line is minted. Its coverage clause is rewritten around the corpus, so a probe supports no claim wider than what it ranged over, and its digest gains "over the corpus the claim ranges over". Mechanizing is refused, because the only tool-readable records write the corpus and the probe side by side, so a check comparing them would hold the record to itself.
+
+**Cost while deferred:** measured at seven misses in one iteration, two of them reaching validate. Filed 2026-08-07 by close as that iteration's candidate lesson; iceboxed in the machinery-class triage slice; returned to the deferred section at `door-binding-sweep`'s close drain on the recurrence above. Owner lookup: `probe`, `premise`, `unverified`, `corpus narrower` — this entry, plus two **adjacent and distinct** icebox members: the cited-object token sweep's corpus (a *gate's* corpus) and [dispatched-child-asserts-an-unverified-base](#dispatched-child-asserts-an-unverified-base) (a child inheriting a base it never probed).
+
+## Technical Debt
+
+## Deferred
 
 ### queue-migrate-bold-split
 
@@ -102,54 +196,6 @@ installer/SPEC.md §The install boundary rules a shipped PowerShell file's code 
 
 **Cost while deferred:** the class regresses only into a watched push, against a one-to-two-push iteration budget. Filed 2026-09-22 by build batch 1; promoted at close because →fix needs a new gate arm and a fixture pair, which is build-class work under scope-gated intake. Owner lookup ran `ascii`, `portability-floor` and `code page` over the queue — no owner.
 
-### msg-uuid-reach-unbounded
-
-[cost: event/low] [surface: gate-sdk]
-
-`scripts/msg-patterns.list` line 21 and its kit twin `gate-sdk/templates/msg-patterns.list` line 21 spell `^[A-Za-z][A-Za-z-]*: .*<uuid>`, whose `.*` was bounded by the physical line and is now bounded by a paragraph. Re-verified at this drain: both live lines carry the unbounded form and so do all three fixture copies (`gate-sdk/gate-tests/check-commit-msg/{good,bad}/patterns.list`, `gate-sdk/gate-tests/check-tree-terms/good/patterns.list`) — five sites. Nothing reds today: exactly one tracked line wears both the trailer-key shape and a UUID, inside a pruned fixture. The ordinary edit that reds it is a markdown paragraph opening `Note: ` or `Session: ` that quotes an example session UUID later in the same paragraph, which this repo documents `--emit session-id` and so plausibly writes.
-
-**Deliverable:** a bounded reach. Candidate, run by the filer through `check-tree-terms` over the tracked tree and clean at exit 0: `^[A-Za-z][A-Za-z-]*: [^.;]{0,40}<uuid>`. **The seam question the fix must rule first:** a numeric reach inside a shipped generic pattern sits on the provenance boundary, so whether the calibration belongs in the kit template, the consumer copy, or both is undecided (gate-sdk/SPEC.md §The provenance seam).
-
-**Inferred, not run:** the candidate preserves all three assertions in `native/src/gates/tree_terms.rs` — run `gate-sdk/bin/run-gates.sh --only check-tree-terms` plus the `check-commit-msg` and `check-tree-terms` fixture suites against each of the five rewritten copies.
-
-**Probed at scope 2026-09-22:** the interval stays under the engine's bound — `DUP_MAX` is 255 in `native/src/ere.rs`, against the candidate's `{0,40}`.
-
-**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed; reshaped by [consumer-policy-rule-absent](#consumer-policy-rule-absent), whose rule answers the seam question above, so it goes after it.
-
-**Cost while deferred:** a false red waits on the first prose paragraph pairing a trailer-shaped lead-in with a quoted UUID. Filed 2026-09-22 by build batch 2 under scope-gated intake; the lead ruled it stays filed rather than landing mid-iteration, and it promotes at close because the seam question is an envelope call for spec, not a drain fix. **DISTINCT from `line-window-gates-unaudited`** (Done 2026-09-22), whose subject is a named roster of three windows, all three measured to need no recalibration; this is a fourth pattern that audit met on the way. Owner lookup ran `msg-patterns`, `matching window` and `same-line window` over the queue — no owner.
-
-### measured-claim-span-unbounded
-
-[cost: event/low] [surface: canon-kit]
-
-`check-measured-claim` binds a full-line `measured:` marker to the paragraph below it, and on an unwrapped tree that paragraph is one line running to thousands of code points. Arm C then tests only that the marker's cardinal appears somewhere in the span, so a marker whose own sentence has drifted can still read as agreeing.
-
-**The measurement the filing asked for was bought at this drain, and it corrects the filed premise twice.** (1) Arm C is *fail-closed* on a wide span rather than silently green: `native/src/gates/measured_claim.rs` reds the run when the bound claim carries more than one distinct cardinal ("which one the marker holds is ambiguous"), and a thousands-code-point paragraph almost always carries several. The false-green case survives only where a long span carries exactly one distinct cardinal equal to the marker's value. (2) Arm C is dormant on this tree: every live full-line marker is `gate-substrates=native` (`CONTRIBUTING.md`, `SECURITY.md`, `docs/positioning.md`, `docs/methodology.md`), a non-cardinal value `cardinal_value` returns `None` for, so the paragraph span is never read at all. Every other marker in the tree is a fixture or a grammar specimen.
-
-**Deliverable, repriced by the above:** a reach or a sentence boundary on the full-line marker's claim span, or a stated reason the paragraph is the right unit — canon-kit/SPEC.md §check-measured-claim owns the sentence. It stays filed rather than discarded because the gate ships to adopters whose trees this measurement cannot reach.
-
-**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed; reshaped by [consumer-policy-rule-absent](#consumer-policy-rule-absent), since a claim-span reach is a baked calibration, so it goes after it.
-
-**Cost while deferred:** an adopter writing a cardinal-valued full-line marker above an unwrapped paragraph gets a binding whose agreement is near-accidental. Filed 2026-09-22 by build batch 2 as inferred from source; measured at this close and narrowed. **DISTINCT from `line-window-gates-unaudited`** (Done 2026-09-22), whose closed roster of three windows that audit discharged; this is a fourth gate it flagged and did not audit. Owner lookup ran `measured-claim` and `paragraph` over the queue — no owner.
-
-### matching-window-roster-absent
-
-[cost: event/low] [surface: gate-sdk]
-
-no surface rosters which gates carry a same-line or same-paragraph matching window, so auditing the class means re-deriving the roster off `native/src/gates` and the pattern files each time. The residue is spread across four surfaces: canon-kit/SPEC.md and gate-sdk/SPEC.md carry the three audited windows' verdicts in three sections, and [msg-uuid-reach-unbounded](#msg-uuid-reach-unbounded) and [measured-claim-span-unbounded](#measured-claim-span-unbounded) carry a fourth and fifth candidate.
-
-**Deliverable — rule one of two:** a DERIVED roster (a `.gate` descriptor field the binary reads, or an `--emit` arm over the pattern files and the gate modules — never a hand-kept list, which derivation-first forbids), or a stated refusal naming why the class has no decidable oracle.
-
-**Probed at promotion:** three windows are named constants — `MARKER_REACH` (`knob_citation.rs`), `SPAN_CAP` (`queue_prose_precondition.rs`), `WINDOW` (`assertion_strength.rs`) — while the msg-uuid window is a regex `.*` in a pattern file and measured-claim's is a paragraph walk, so a constant-name scan alone reaches three of five.
-
-**Inferred, not run:** that a descriptor field or an emit arm can decide 'carries a matching window' for the other two shapes — establish it by reading the audited modules' window code for a common shape.
-
-**DISTINCT from** the two entries above, each owning one window's calibration and discharged by fixing it; this owns the missing surface that would have led an auditor to either.
-
-**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed; reshaped by [consumer-policy-rule-absent](#consumer-policy-rule-absent), whose audit of baked policy is the census this roster derives from.
-
-**Cost while deferred:** the next auditor re-derives the roster from source. Filed 2026-09-22 to the gap inbox by `install-first-contact`'s close, captured as knowledge friction during `line-window-gates-unaudited`'s audit, and promoted at the next scope's intake, so the record is late and says so. Owner lookup ran `matching window`, `same-line window` and `window roster` over the tracked docs — no owner.
-
 ### smoke-registry-omission-blind
 
 [cost: event/low] [surface: gate-sdk]
@@ -177,22 +223,6 @@ a surface that disclaims carrying a rule ("stated there and not restated here") 
 **Deliverable:** a gate, or an assertion joining an existing restatement gate, over that shape. A feature by the new-names litmus, so it owes an amendment and passes the enhancement admission filter only on an arm its authoring session argues.
 
 **Cost while deferred:** each such disclaimer is a licence a later reader trusts, and the copy beside it rots silently. Filed 2026-09-20 to the gap inbox by the close of `adopter-floor-door-remainder`; promoted 2026-09-21 at the next scope's intake, so the record is late and says so. Owner lookup ran over `disclaim`, `not restated here`, `restatement` and the two gates above and found no owner.
-
-### probe-before-assertion-doctrine
-
-[cost: event/low] [surface: doctrine-kit] [recurrence: 2026-09-20]
-
-**returned from the icebox on a judged recurrence.** The rule it asked for shipped: CLAUDE.md §Delivery doctrine carries `Probe-before-assertion`, and the icebox line recorded the remainder as "Rule shipped; mechanizing it is open". What re-fires it is that the shipped rule did not hold, and did not hold seven times in one iteration.
-
-**The seven, all one shape — a probe narrower than the claim it supported.** Three path-scoped greps; two filters whose empty return was read as success; an amendment whose printed probe over-returned; and a nested-tree probe whose first confirming run used an inconsistent tree. Two of the seven produced regressions that reached validate, where they cost a re-tier.
-
-**The sharpening is the finding, and it is new.** `Probe-before-assertion` asks whether a probe was *run*; in all seven a probe ran. What failed is that its **corpus was narrower than the corpus the claim ranged over**, which the rule as worded does not reach. The drain reproduced the shape on its own inputs: the `door-sweep-reach-stops-at-the-kit-boundary` bullet named nine `docs/site-architecture.md` sites where a fresh grep returns thirteen, and missed `docs/index.md` altogether.
-
-**Why design-pending:** whether this is a fourth always-loaded line, a re-wording of the existing one, or something mechanizable is the open call — and it is a governed-surface widening, which a close does not self-serve. The cheapest candidate worth beating is still the one the original filing named: widen an existing rule rather than mint another.
-
-**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed; it shares that unit's doctrine-kit surface, DOCTRINE.md and the always-loaded digest.
-
-**Cost while deferred:** measured at seven misses in one iteration, two of them reaching validate. Filed 2026-08-07 by close as that iteration's candidate lesson; iceboxed in the machinery-class triage slice; returned to the deferred section at `door-binding-sweep`'s close drain on the recurrence above. Owner lookup: `probe`, `premise`, `unverified`, `corpus narrower` — this entry, plus two **adjacent and distinct** icebox members: the cited-object token sweep's corpus (a *gate's* corpus) and [dispatched-child-asserts-an-unverified-base](#dispatched-child-asserts-an-unverified-base) (a child inheriting a base it never probed).
 
 ### guard-declares-class-correspondence-ungated
 
@@ -353,26 +383,6 @@ a held producer leg's failure fails the workflow through a binding consumer leg,
 **Cost while deferred:** every future held platform inherits it, so widening the roster widens the coupling, and a red master traceable to a leg nobody declared binding costs a fresh diagnosis.
 
 **ITS OBSERVED TRIGGER CLEARED HOURS AFTER FILING, and the correction is recorded rather than left to rot.** Run `34209082851` at `d433fd4a` has BOTH darwin producer legs green, so the normalize step passes and the coupling is dormant at HEAD; `install-smoke-sh-macos` is red on a different, downstream defect. What the run does NOT show is the coupling repaired — it shows the one trigger that had fired going away. The entry stays deferred on the structural ground its cost field states, that every future held platform inherits it, and NOT on a red master. Filed 2026-09-08 by close from the gap inbox. Promoted rather than fixed because it is an envelope question the operator has already declined once in its wider form; promoted rather than iceboxed because the coupling is structural and inherited, which no single green run retires.
-
-### kit-knob-consumer-adapter-convention
-
-[cost: event/low] [surface: evidence-kit] [recurrence: 2026-09-03]
-
-whether a kit may ship a knob whose only working configuration requires the consumer to author an adapter, and whether the front-end shape that answer takes should be a named convention rather than each consumer's invention.
-
-**The capability loss that raised it is CLOSED, and this entry is deliberately the residue.** `shell-gate-tail-port` deleted the path `DELEGATION_KIT_LIVENESS_CMD` defaulted to, so the turn-end liveness probe logged `verdict=unavailable` on every firing. The repair landed at the same cut: the kit template dropped a default that pointed at nothing (a path present in no tree reads as a shipped capability and is none), the knob kept its contract exactly — a path run with the scratch dir as its only argument — and this repo named its own reader `scripts/producer-liveness-reader.sh`, reaching the gate through `scripts/gate-exec.sh`. BOTH scripts left the tree 2026-09-05, and the negative control at `scripts/gate-tests/subagent-stop-reader.test.sh` now asserts `unresolved`, never `unavailable`.
-
-**The capture log priced the loss and verified the repair:** 77 `verdict=unavailable` firings inside one 46-minute window, zero after. So the surviving question is a convention question, not a defect. **Kept at queue-kit-unwrap's close** on a live trigger: [consumer-policy-rule-absent](#consumer-policy-rule-absent)'s gate audit reads the same config-surface question. **Joins `consumer-policy-seam`, riding under that entry as reshaped** — operator direction 2026-09-22, lead-relayed; it goes after that entry's rule.
-
-**The precedent this stands on, which is what makes the question general.** evidence-kit met the identical break one caller over when the same port turned a pre-flight entry's named path into a descriptor, and discharged it with a CONSUMER-SIDE front end resolving the gate name, explicitly refusing to teach the kit's knob to resolve a name as "a kit-contract change". Two kits, two consumers, one shape, invented twice.
-
-**Why this needed design:** naming the convention is a cross-kit envelope change. The seam INSTANCE it was argued on is spent — `scripts/gate-exec.sh` left the tree 2026-09-05 and its successor `run-gates.sh --only` is kit-shipped, so a template could name that one — while the question survives on the parser knobs, where any default is still a seam call first.
-
-**Cost while deferred:** low and adoption-shaped — every consumer configuring such a knob rediscovers the adapter shape from scratch, and a consumer that does not gets honest degradation rather than a break, which is why nothing forces the issue.
-
-**The 2026-09-03 parser cut narrowed the question to its naming and answered nothing else.** Both `EVIDENCE_KIT_PARSER_<suite>` values this repo configures now name bundled arms, so an adopter wanting per-gate or per-arm scenarios writes a knob value instead of authoring a script: the *mechanism* stopped being each consumer's invention. The *name* did not — a third built-in adapter beside `exit-code` and `libtest` was refused twice over, on the ground that absorbing an owed script into a permanently shell library discharges the port's count while defeating its objective, and on the ground that naming the convention is this entry's own deliverable, which a port cut may not rule (evidence-kit/SPEC.md §The evidence adapters). So the cut DEMOTES this entry rather than closing it, returning it to the position the 2026-08-24 promotion took it from.
-
-**The delegation instance LEAVES the class 2026-09-05 (operator, consult):** the liveness hook reaches its gate through its own executable, so the knob is an override over a working default (delegation-kit/SPEC.md §The turn-end liveness hook); the question survives on the parser knobs. Filed 2026-08-24 to the gap inbox by build in two bullets, the second correcting the first's repair premise as measured-false; promoted 2026-08-24 at `shell-gate-tail-port-and-completion-oracle`'s close, whose drain confirmed the reader, its oracle and the surviving question. The instance above was filed 2026-09-03 to the gap inbox by the consult and drained here into this entry rather than into a new one, the port-only run barring the drain's promote.
 
 ### plugin-marketplace
 
