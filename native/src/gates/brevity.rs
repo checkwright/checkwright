@@ -30,26 +30,22 @@ fn bullet_lead(line: &str) -> String {
 
 struct Bullet {
     lead: String,
-    span: usize,
+    size: usize,
     pointer: bool,
     exempt: bool,
 }
 
-// spec: context-kit/SPEC.md §The brevity gate — the span is measured to the final line carrying
-// content, so a trailing blank before the next bullet never inflates the count
+// spec: context-kit/SPEC.md §The brevity gate — the size is the meter's code-point count over the
+// bullet's extent, so joining or wrapping its lines moves nothing
 fn measure(lines: &[&str], at: usize, end: usize, pointer_re: &Ere) -> Bullet {
-    let mut span = 1usize;
     let mut body = String::from(lines[at]);
-    for (offset, line) in lines[at + 1..end].iter().enumerate() {
+    for line in &lines[at + 1..end] {
         body.push(' ');
         body.push_str(line);
-        if !section::blank(line) {
-            span = offset + 2;
-        }
     }
     Bullet {
         lead: bullet_lead(lines[at]),
-        span,
+        size: section::cp_size(lines[at..end].iter().copied()),
         pointer: pointer_re.is_match(&body),
         exempt: lines[at].contains("brevity-exempt")
             || lines[at - 1].contains("brevity-exempt"),
@@ -92,11 +88,11 @@ pub fn run(args: &[String]) -> i32 {
         );
         return 2;
     }
-    let budget: usize = match knob("CONTEXT_KIT_BREVITY_BUDGET") {
+    let budget: usize = match knob("CONTEXT_KIT_BREVITY_CAP") {
         Ok(v) => match v.parse() {
             Ok(n) => n,
             Err(_) => {
-                eprintln!("check-brevity: CONTEXT_KIT_BREVITY_BUDGET is not an integer: {}", v);
+                eprintln!("check-brevity: CONTEXT_KIT_BREVITY_CAP is not an integer: {}", v);
                 return 2;
             }
         },
@@ -200,17 +196,17 @@ pub fn run(args: &[String]) -> i32 {
                 let b = measure(&lines, at, sec.start + item.end, &pointer_re);
                 total += 1;
                 in_section += 1;
-                if b.span <= budget {
+                if b.size <= budget {
                     within += 1;
                 }
-                if b.span > budget && b.pointer && !b.exempt {
+                if b.size > budget && b.pointer && !b.exempt {
                     findings.push(format!(
-                        "'{}' line {}: {} — {} lines AND cites a deeper doc (over the {}-line \
+                        "'{}' line {}: {} — {}cp AND cites a deeper doc (over the {}cp \
                          budget while admitting its detail lives elsewhere)",
                         name,
                         at + 1,
                         b.lead,
-                        b.span,
+                        b.size,
                         budget
                     ));
                 }
@@ -225,7 +221,7 @@ pub fn run(args: &[String]) -> i32 {
             println!("  {}", f);
         }
         println!(
-            "  help: cut each to ≤{} lines by pushing detail into the section it already points \
+            "  help: cut each to ≤{}cp by pushing detail into the section it already points \
              to, or add <!-- brevity-exempt: <reason> --> on the bullet's first line / the line \
              above if every line is load-bearing",
             budget
@@ -252,10 +248,12 @@ mod tests {
     // spec: context-kit/SPEC.md §The brevity gate — the three-way conjunction is the calibration:
     // dropping any conjunct turns the gate into a length police, so each is measured separately
     #[test]
-    fn the_span_stops_at_the_last_line_carrying_content() {
+    fn the_size_is_the_code_point_count_and_blank_lines_add_nothing() {
         let lines = section::split_lines("## S\n- **a** — x\ncont\n\n\n");
         let b = measure(&lines, 1, lines.len(), &re());
-        assert_eq!(b.span, 2);
+        assert_eq!(b.size, "- **a** — x".chars().count() + 1 + "cont".len());
+        let joined = section::split_lines("## S\n- **a** — x cont\n");
+        assert_eq!(measure(&joined, 1, joined.len(), &re()).size, b.size);
         assert_eq!(b.lead, "a");
         assert!(!b.pointer);
     }

@@ -54,7 +54,7 @@
   bound; the context-kit measures in code points, their baseline and ceiling rows carrying a unit
   suffix that records the discontinuity; the rewrite of every tracked markdown file but this one,
   which unwraps in `SPEC-queue-headings.md`'s conversion; and a lead-grantable per-record
-  `[cap-credit:]` bounded by `QUEUE_KIT_ENTRY_CREDIT_MAX` (`off` valid) and stale once unneeded
+  `cap-credit` tag bounded by `QUEUE_KIT_ENTRY_CREDIT_MAX` (`off` valid) and stale once unneeded
   (operator direction 2026-09-22, lead-relayed: the cap should not be rigid where exceeding it
   avoids information loss). That amendment keeps `check-tag-lead-line` and, per the operator's
   answer on the move above (direction 2026-09-22, lead-relayed), puts every tag — `recurrence:`

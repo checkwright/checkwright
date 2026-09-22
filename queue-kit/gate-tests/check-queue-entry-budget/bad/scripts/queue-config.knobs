@@ -1,3 +1,4 @@
-# spec: queue-kit/SPEC.md §Layout and configuration — the fixture's own icebox and cap, so the case reads no tree state outside this directory
+# spec: queue-kit/SPEC.md §Layout and configuration — the fixture's own icebox, cap and credit bound, so the case reads no tree state outside this directory
 QUEUE_KIT_ICEBOX_SECTION = Icebox
-QUEUE_KIT_ENTRY_LINE_CAP = 6
+QUEUE_KIT_ENTRY_CAP = 270cp
+QUEUE_KIT_ENTRY_CREDIT_MAX = 100cp

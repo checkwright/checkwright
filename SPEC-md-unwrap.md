@@ -52,7 +52,7 @@ In §Layout and configuration, add `CANON_KIT_UNWRAP_GLOBS` and `CANON_KIT_UNWRA
 
 ### (2) The unwrap-aware wording in kit SPECs that assumed this repo wraps {mechanical}
 
-**Not yet applied.** Kit mechanism that reads across a wrap stays, as delta 1 rules. What changes is text that states *this repo's* wrap as an authoring target or remedy:
+**Applied.** Kit mechanism that reads across a wrap stays, as delta 1 rules. What changes is text that states *this repo's* wrap as an authoring target or remedy:
 
 - queue-kit/SPEC.md §check-queue-wrap: "(default 100 columns; the authoring target is ~80)" becomes "(default 100 columns)", and the section opens by naming itself as the wrapping consumer's gate, with `check-md-unwrapped` as the alternative (canon-kit/SPEC.md §check-md-unwrapped).
 - queue-kit/SPEC.md §check-queue-hygiene's wrapped-fragment paragraph is prefixed "Under a wrapped queue," because an unwrapped paragraph cannot share a fragment line.
@@ -60,7 +60,7 @@ In §Layout and configuration, add `CANON_KIT_UNWRAP_GLOBS` and `CANON_KIT_UNWRA
 
 ### (3) queue-kit: a selectable per-entry cap, `QUEUE_KIT_ENTRY_CAP`, retiring `QUEUE_KIT_ENTRY_LINE_CAP` {design-bearing}
 
-**Not yet applied.** In §Layout and configuration, replace the `QUEUE_KIT_ENTRY_LINE_CAP` bullet with:
+**Applied.** In §Layout and configuration, replace the `QUEUE_KIT_ENTRY_LINE_CAP` bullet with:
 
 > - `QUEUE_KIT_ENTRY_CAP` — default `4300cp`: the per-entry size cap `check-queue-entry-budget` assertion A holds over the deferred section, as a count and a unit. `<n>cp` measures code points, `<n>lines` measures counted lines, and `off` disables assertion A while assertions B to E still run. A value outside that grammar is malformed config (exit 2). `lines` is a sound measure only where every line is width-bounded, so choose it beside `check-queue-wrap` and never beside `check-md-unwrapped`.
 
@@ -84,7 +84,7 @@ The fixture pair of `check-queue-entry-budget` moves to the new knob. `bad/` kee
 
 ### (4) context-kit: the meter, the ratchet, the brevity gate and the footprint measure code points {design-bearing}
 
-**Not yet applied.**
+**Applied.**
 
 - §The always-loaded meter: "the summed line count" becomes "the summed code-point count", measured with the same count delta 3 defines (trimmed non-blank lines plus one per break), over the surfaces and over the hook body's stdout. The baseline row becomes `<total>cp <surface>cp <baseline-commit>`. **A row whose figures carry no `cp` suffix is a line-unit row from before the re-unit.** The bare reading then prints `baseline in retired line unit — re-stamp with --update-baseline` in place of a delta, and exits 0. That discontinuity is recorded where the reader meets it, never as a phantom fall. `--growth` reports net code points. §Layout and configuration's `CONTEXT_KIT_HOOK_CMD` bullet, "the command whose output line count approximates the steady-state hook body", becomes "the command whose output code-point count approximates the steady-state hook body", the same re-unit its cited section now measures in.
 - §The surface ratchet: "size = newline count, the meter's measure" becomes "size = the meter's code-point count". The ceiling rows become `<n>cp <path>`, and a row without the suffix exits 2, naming `--emit always-loaded --ceiling` as the re-stamp.
@@ -105,7 +105,7 @@ Wiring: `native/src/emit/always_loaded.rs` (the measure, the row grammar and the
 
 ### (6) queue-kit: the lead-grantable cap credit, `[cap-credit:]` and `QUEUE_KIT_ENTRY_CREDIT_MAX` {design-bearing}
 
-**Not yet applied.** This lands with delta 3 or after it. The operator's direction (quoted above) asks for an additional credit on a record the cap would otherwise force into losing information. The decisions below are this amendment's, and each carries its ground.
+**Applied.** This lands with delta 3 or after it. The operator's direction (quoted above) asks for an additional credit on a record the cap would otherwise force into losing information. The decisions below are this amendment's, and each carries its ground.
 
 - **The grant is a tag on the credited entry**, not a line in a separate ledger. Its one machine reader, assertion A, measures that entry, so the grant sits where the measure is taken, travels with the entry through every move, and needs no second file kept in step with the queue. It is lead-line-scoped (§check-tag-lead-line joins it to the governed set). Under `SPEC-queue-headings.md` it rides the tag line.
 - **The amount is additive and bounded.** The credited entry's limit is the cap plus the credit. No single credit may exceed `QUEUE_KIT_ENTRY_CREDIT_MAX`, so a credit relieves an exceptional record without turning into a second, uncapped class.

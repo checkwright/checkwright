@@ -274,7 +274,8 @@ templates carry these hooks; canon-kit owns the checklist and the promotion gate
    reds nothing and is found only by a later reader.
    **A demotion also lands the entry back inside a size cap, where a Done move
    would not.** A done entry is a bare slug and nothing measures it; a deferred
-   entry is measured per-entry (queue-kit/SPEC.md §check-queue-entry-budget), so
+   entry is measured per-entry against queue-kit's size cap in its configured
+   unit, unless the consumer set it `off` (queue-kit/SPEC.md §check-queue-entry-budget), so
    any roster or table this amendment instructs the build to transcribe onto the
    entry is priced against that cap, and an entry already near it is compressed in
    the same commit that demotes it. Neither owner states this alone — the cap is

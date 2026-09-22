@@ -36,7 +36,7 @@ as `##` sections over column-0 bullets:
   is required** — the Gap-disposition rule's costing — and **every top-level
   deferred entry resolves a defer date** (below), both held by
   `check-queue-entry-budget` (§check-queue-entry-budget), which also caps the
-  entry's total length. Its class rides the lead line's
+  entry's total size in its configured unit. Its class rides the lead line's
   `[cost:]` tag (§The tag algebra), and the field carries the prose that class
   summarises. The field's bold lead-in is
   line-local like a tag: split across a reflow it is invisible to the scanner
@@ -119,7 +119,7 @@ mix the two kinds reorders it freely.
 The two words name two halves of one thing, and each owns its half. **Queue**
 is the governed file and its drain mechanics: the sections and entry grammar a
 parser selects work by, the counts the `queue-counts` arm reports, the
-drain-entry exemption, and the per-entry caps (`QUEUE_KIT_ENTRY_LINE_CAP`).
+drain-entry exemption, and the per-entry cap and its credits (`QUEUE_KIT_ENTRY_CAP`, `QUEUE_KIT_ENTRY_CREDIT_MAX`).
 **Backlog** is the accumulating mass of unlanded work read as a quantity over
 time: its growth and its aging, which drift-kit trends (drift-kit/SPEC.md
 `kpi-gate-backlog`, the backlog-aging findings) and the closing stage reviews
@@ -424,7 +424,7 @@ weighed and refused.** It is precise and it carries a kind — and it is wrong
 here on three counts. Every citation a corpus has already written would need
 hand-authoring, the maintained-roster anti-pattern derivation-first forbids;
 those lines would land inside entries measured against
-`check-queue-entry-budget`'s raw-line cap, where sub-tasks do not relieve a
+`check-queue-entry-budget`'s size cap, where sub-tasks do not relieve a
 parent's budget, so precision would be paid for in evictions; and a
 hand-declared edge can be forgotten in exactly the moment it matters, whereas a
 citation written in prose is written because the author was already thinking
@@ -540,6 +540,7 @@ adoption step between landing it and reading it.
   it cuts batches from promoted
   entries whose amendments name the files they edit, and a root entry is coarser
   than that. Carried where `[cost:]` is, by the same gate.
+- `[cap-credit: +<n><unit> <YYYY-MM-DD> <grantor> <reason>]` — a per-entry size credit on a deferred entry, raising that entry's limit under §check-queue-entry-budget assertion A to `QUEUE_KIT_ENTRY_CAP` plus `<n>`. `<unit>` is the cap's own (`cp` or `lines`). `<grantor>` names the granting role in the consumer's own authority vocabulary, and the kit enumerates none. `<reason>` is non-empty and states what the cap would otherwise have cost. At most one per entry, lead-line-scoped. Written only on a grant by the role §check-queue-entry-budget names. **Honest limit:** no gate can tell a granted credit from a self-issued one, the limit every inline provenance statement in this format carries (§check-queue-entry-budget assertion D states provenance inline for the same reason): the claim is read, never verified. The grant date and grantor put the claim where a later close reads it.
 - `[roadmap: <horizon>/<track>]` — public-projection marker: the entry is
   curated onto the generated roadmap page (§The roadmap arm), under `<horizon>`
   and labelled `<track>`. The tag's spelling is fixed mechanism; its two field
@@ -625,13 +626,12 @@ authorization-gated). That ground survives the discount §check-queue-entry-budg
 grants this declaration, **because the discount is one line per grammar**: the
 second and later lines of a per-recurrence variant match the grammar already
 discounted and are counted like any other, so the variant still grows an entry
-linearly against the cap. The single-line form costs **no**
-counted line at all, which strengthens the case for it rather than weakening it.
-Its own ceiling is
-`check-queue-wrap`'s budget, reached after a handful of dates on a long slug, and
-reaching it is the *correct* complaint: a slug recorded as recurring that many
-times without anyone promoting it is a governance failure, surfaced loudly rather
-than absorbed.
+linearly against the cap. The single-line form costs **nothing** against the
+cap at all, which strengthens the case for it rather than weakening it. What
+bounds it is the at-most-one-line rule, not a width: an unwrapped line has no
+width ceiling, and a slug recorded as recurring many times without anyone
+promoting it is a governance failure the scoping stage's pre-emption rule
+surfaces rather than one the line's length should.
 
 Unlike the `relates:` declaration refused above, no corpus needs migrating. The
 line is **session-written under judgment** — the closing stage's gap-inbox drain
@@ -768,9 +768,8 @@ must not gate anything. A derived default below is written as
   no carry problem, and shipping the section anyway would leak the same posture
   `QUEUE_KIT_HORIZONS` and `QUEUE_KIT_PROSE_SURFACE_GLOBS` already ship empty to
   avoid. Naming the deferred section is malformed config.
-- `QUEUE_KIT_ENTRY_LINE_CAP` — positive integer, default `50`; the per-entry
-  line cap `check-queue-entry-budget` assertion A holds over the deferred
-  section.
+- `QUEUE_KIT_ENTRY_CAP` — default `4300cp`: the per-entry size cap `check-queue-entry-budget` assertion A holds over the deferred section, as a count and a unit. `<n>cp` measures code points, `<n>lines` measures counted lines, and `off` disables assertion A while assertions B to E still run. A value outside that grammar is malformed config (exit 2). `lines` is a sound measure only where every line is width-bounded, so choose it beside `check-queue-wrap` and never beside `check-md-unwrapped`.
+- `QUEUE_KIT_ENTRY_CREDIT_MAX` — default `2150cp`, or `off`: the largest `[cap-credit:]` one entry may carry, in the cap's unit. `off` disables credits, and then any credit tag is red. The default is half the default cap, so a credited entry stays within one and a half caps. A maximum in another unit than the cap's admits no credit, so a consumer choosing `lines` sets this knob in lines too.
 - `QUEUE_KIT_ICEBOX_AGE_DAYS` — positive integer, default `30`; the age window
   for the `queue-index` arm's `--icebox-candidates`: the defer-date filter and
   the recurrence-trigger limb (§The icebox tier), and nothing else.
@@ -1045,8 +1044,9 @@ icebox emits no line at all.
 `--icebox-candidates` prints the closing stage's eviction worklist over the
 deferred section: one line per entry whose defer date (§The queue format) is
 older than `QUEUE_KIT_ICEBOX_AGE_DAYS` **and** whose lead line's `[cost:]`
-class is in the low class (§The icebox tier), carrying the entry's line count
-and that class. An entry with no defer date is listed as `(undated)`, and one
+class is in the low class (§The icebox tier), carrying the entry's size in the
+cap's unit, as `check-queue-entry-budget`'s own walk measures it (code points
+under `QUEUE_KIT_ENTRY_CAP=off`), and that class. An entry with no defer date is listed as `(undated)`, and one
 with no class (no tag, or a value outside the closed grammar) as `(unclassed)`,
 rather than filtered out — an absent input appears rather than vanishing. The
 class is read off the lead line alone, never off the `Cost while deferred`
@@ -1602,7 +1602,7 @@ configured name's basename, so a recipe written with the default path or with
 false positive is rephrased, since the axes read prose and every hit has a
 stable spelling available.
 
-The duplicate arm's commonest true positive is a **wrapped fragment**: promoting
+Under a wrapped queue, the duplicate arm's commonest true positive is a **wrapped fragment**: promoting
 several entries in one commit gives them a shared sentence whose wrapping lands
 one identical line in each. The prose is correct and the collision is an artifact
 of where it broke, so the fix is to **re-wrap**, not to reword as the red
@@ -1634,21 +1634,8 @@ becomes a bound on the record.** The first two sides are about the entry's
 *size*; the third is about what the cap *spends* to stay inside it. Five
 assertions:
 
-- **(A) Size.** No deferred entry exceeds `QUEUE_KIT_ENTRY_LINE_CAP` **counted**
-  lines. An entry's **extent** is the lead line through the line before the next
-  bullet at the same or shallower indent — the same extent
-  the `queue-index` arm's `--extent` yields, so the range the gate measures is the
-  range an eviction deletes. Its **count** is that extent less **at most one line
-  of each declaration grammar the queue format defines** (§The tag algebra) —
-  today `recurrence:` and `not-icebox-eligible:`, and any later grammar by construction rather
-  than by a further edit here. Extent and count differ by those discounted lines
-  and by nothing else, at most one per grammar, which is what
-  keeps the equality above a statement about the *range* while the cap binds the
-  *count*. A sub-task nests inside its parent's extent and is measured as its own
-  entry too — and claims its own at-most-one-per-grammar discount, so a parent
-  whose extent holds two `recurrence:` lines still discounts one of them. An
-  inferred-marker line is a counted body line — it is content rather than a declaration
-  grammar this format defines.
+- **(A) Size.** No deferred entry exceeds `QUEUE_KIT_ENTRY_CAP` in its unit. An entry's **extent** is the lead line through the line before the next bullet at the same or shallower indent — the range the `queue-index` arm's `--extent` yields, so the range the gate measures is the range an eviction deletes. Its **size** is measured over that extent less **at most one line of each declaration grammar the queue format defines** (§The tag algebra) — today `recurrence:` and `not-icebox-eligible:`, and any later grammar by construction rather than by a further edit here — and nothing else is discounted, which is what keeps the equality above a statement about the *range* while the cap binds the *size*. The first line of each grammar in an entry is the discounted one. In code points, each remaining non-blank line counts its code points with leading and trailing whitespace trimmed, plus one for each break between two of them, so a reflow of the same text moves the size by nothing. In lines, the size is the count of remaining lines. A sub-task nests inside its parent's extent and is measured as its own entry too — and claims its own at-most-one-per-grammar discount, so a parent whose extent holds two `recurrence:` lines still discounts one of them. An inferred-marker line is counted, being content rather than a declaration grammar this format defines.
+  A deferred entry carrying a `[cap-credit:]` (§The tag algebra) is held to the cap plus its credit. The credit is red when it is malformed, when its unit differs from the cap's, when it exceeds `QUEUE_KIT_ENTRY_CREDIT_MAX`, when credits are `off` or the cap is `off`, or when the entry fits the cap without it. That last is a **stale** credit, and the fix is to delete the tag. An active entry's credit is inert, since active entries are uncapped. It is checked again if the entry returns to the deferred section.
 - **(B) Icebox shape.** Every icebox entry is exactly one line; a continuation
   line under an icebox bullet is a violation. Skips clean when
   `QUEUE_KIT_ICEBOX_SECTION` is empty, the empty-knob behavior
@@ -1674,12 +1661,7 @@ assertions:
   cannot disagree about which entries are undated. Binds top-level entries only,
   as (C) does.
 
-Calibration: `QUEUE_KIT_ENTRY_LINE_CAP` defaults to `50`. The cap's job is to
-keep compression from regrowing rather than to force the initial cut, so it is
-calibrated at the tail rather than the body — above the 75th percentile of a
-real pool, with no natural break in the distribution to read a value off. It is
-a stated policy with a stated purpose rather than a derived one, and it is a
-knob for exactly that reason. The scan is line-local: the cost field's bold
+Calibration: `QUEUE_KIT_ENTRY_CAP` defaults to `4300cp`, which is fifty counted lines at a real deferred pool's median of 85 code points per counted line, rounded up so that it admits every entry a fifty-line cap admitted on that pool, whether the declaration discount applies (largest 4211) or every line is counted (largest 4268). The re-unit moved the unit and not the bound. The cap's job is to keep compression from regrowing rather than to force the initial cut, so it is calibrated at the tail rather than the body — above the 75th percentile of a real pool, with no natural break in the distribution to read a value off. It is a stated policy with a stated purpose rather than a derived one, and it is a knob for exactly that reason. **The unit is the consumer's choice and so is having a cap at all**, because which measure bounds a record is policy rather than mechanism: the kit ships the measures, and a consumer binds one or sets `off`. The scan is line-local: the cost field's bold
 lead-in must sit on one line, the same reason a tag must sit on its lead line
 (§check-tag-lead-line), and a lead-in split by a reflow reads as absent. (C)
 binds top-level entries only — a sub-task is covered by its parent's costing.
@@ -1690,8 +1672,8 @@ cap. The carry problem is the deferred pool's alone.
 
 **Clean-path headroom.** When every assertion holds, the clean line is
 followed by one line per Deferred entry — a sub-task included, since it is
-measured as its own entry under (A) — naming that entry's headroom to the cap:
-the same count assertion A already derives, one subtraction away, so exposing
+measured as its own entry under (A) — naming that entry's headroom to the cap in the configured unit, or to its credited limit, marked `credit +<n>`, for an entry carrying a standing credit:
+the same size assertion A already derives, one subtraction away, so exposing
 it costs no new computation and mints no new name. This is exposure, not a new
 capability: the enforcing member already computes each entry's count in order
 to enforce the cap, so a session sizing an edit reads the measurement instead
@@ -1731,9 +1713,8 @@ reversing it.
 
 *Why a declaration line is discounted, and why exactly one of each grammar.* Such
 a line is
-**fixed-shape and width-bounded** — §The tag algebra rules its ceiling to be
-`check-queue-wrap`'s budget and rules reaching that ceiling the *correct*
-complaint, so the discount cannot let an entry grow without bound. It is exactly
+**fixed-shape** — §The tag algebra bounds each grammar to one line per entry, its
+repeats appended, so the discount cannot let an entry grow without bound. It is exactly
 the **generated-shaped content** that argued content was otherwise spent to seat,
 so making the count blind to it removes that trade rather than arbitrating it.
 And it is **one line per grammar, not a grammar-wide exemption**: each
@@ -1750,10 +1731,10 @@ declaration's own grammar — its lead token, a slug, then at least
 one ISO date past the slug, the shape drift-kit's `kpi-incident-recurrence`
 already reads for `recurrence:` —
 with no entry-boundary or self-slug condition added, since the at-most-one bound
-is what does the scoping. The discount narrows the **count** only and removes
+is what does the scoping. The discount stays **one declaration line per grammar**, measured in the configured unit. It narrows the **size** only and removes
 nothing from the scan, so (B), which counts icebox continuation lines, and (C),
 which asserts a lead-in is *present*, cannot flip; (A) itself reds on
-*exceeding* the cap and is monotone in the count, so a smaller count reds
+*exceeding* the cap and is monotone in the size, so a smaller size reds
 strictly less.
 
 **A mandated write is the class the cap has no self-served answer for.** A
@@ -1823,7 +1804,10 @@ pointer's target exists *first*.
   issues the recipe with the ruling. A session blocked by the cap does not
   self-serve *that*, the same lineage as a `check-stage-entry` assertion C waiver
   (lifecycle-kit/SPEC.md §check-stage-entry), and the gate's failure text
-  therefore cites this section rather than inlining the recipe.
+  therefore cites this section rather than inlining the recipe. The authorizing
+  session may answer the ask with a split, a credit (§The tag algebra's
+  `[cap-credit:]`), or a denial, and the split criterion still decides whether a
+  split fits.
 
   **An entry is a split candidate when it carries two or more deliverables that
   can take different dispositions** — where *different dispositions* means one
@@ -1913,30 +1897,15 @@ session is back to compressing by answering, or to asking. That is the correct
 outcome rather than a hole — needing to mint an entry *is* the signal that a
 unit, not a ground, is what would not fit.
 
-*Why the cap is not widened for exceptional content.* Assertion A's bound is
-the amendment-inlining line above, not a length preference, so raising the
-number moves the number without moving the line — and the entries that would
-claim an exception are the likeliest ungoverned amendments. A conditional cap
-collapses back into authorization anyway, or it is the self-issued exemption
-the delegation doctrine already names as the standard failure mode. The
-declaration discount is **not** that widening and must not be read as one: it
-changes what the count includes, never the number, and it is unconditional —
-no entry claims it by being exceptional. Widening it to one line of each grammar
-keeps both properties, since a grammar either is one the format defines or is
-not, which is a property of the format rather than of the entry claiming it.
-**Monotonic ruling accretion is not a further exception, and it is the case that
-asks:** an entry whose rulings outgrow its budget takes compression by answering
-and the self-served relocation, never an allowance, because the three shapes it
-would want are already refused above — the discount widened to a whole block, a
-cap conditional on carrying rulings, and ruling-count as a split signal.
+*Why the cap is not widened by the session that needs the room.* Assertion A's bound is the amendment-inlining line above, not a length preference, so raising the number for everyone moves the number without moving the line — and the entries that would claim an exception are the likeliest ungoverned amendments. An exception is therefore **granted, never taken**. A conditional cap taken by the session that needs it is the self-issued exemption the delegation doctrine already names as the standard failure mode. A `[cap-credit:]` is the conditional cap in the one form that does not collapse into it: the authorization is recorded on the entry, bounded by a knob, and withdrawn automatically once the entry fits the cap without it. The declaration discount is **not** that widening either, and must not be read as one: it changes what the size includes, never the number, and it is unconditional — no entry claims it by being exceptional. Widening it to one line of each grammar keeps both properties, since a grammar either is one the format defines or is not, which is a property of the format rather than of the entry claiming it. **Monotonic ruling accretion** still takes compression by answering and the self-served relocation first, and never an automatic allowance, because the three shapes it would want are refused above — the discount widened to a whole block, a cap conditional on carrying rulings, and ruling-count as a split signal. A credit is for the record whose compression would lose information its reader needs, which is the case a blocked session states when it asks.
 
 **`--emit entry-history <slug>` — the commits at which one entry's counted
 extent fell.** The contract above is an authoring contract, so a break in it is
 silent; this arm is what makes a break **detectable after the fact** rather than
 enforced before it. It reports one row per commit in which the named entry's
-**counted** extent decreased — that commit, the count before it, the count after
-it, and that commit's subject — newest first. Every field has a reader at the
-moment the report is read: the commit is opened, the two counts size what left,
+**counted** extent decreased — that commit, the size before it, the size after
+it, each in the cap's configured unit (code points under `off`) and suffixed with it, and that commit's subject — newest first. Every field has a reader at the
+moment the report is read: the commit is opened, the two sizes measure what left,
 and the subject decides whether opening it is worth it. There is no fourth field
 because there is no fourth reader, and in particular there is **no verdict
 column**.
@@ -2059,16 +2028,14 @@ read.
 
 ### check-queue-wrap
 
+This is the gate of a consumer that hard-wraps its queue; a consumer that keeps its markdown unwrapped registers `check-md-unwrapped` instead (canon-kit/SPEC.md §check-md-unwrapped).
+
 Invariant: no line exceeds the `QUEUE_KIT_WRAP_BUDGET` gate floor (default
-100 columns; the authoring target is ~80). The tools key on the column-0
+100 columns). The tools key on the column-0
 `- ` lead, so an unwrapped runaway that reflows to column 0 corrupts the
 parse; the tripwire fires before that lands.
 
-**The coupling it underwrites is the stronger ground.** `check-queue-entry-budget`
-bounds an entry by counting its **lines**, and a line cap bounds an entry's size
-only while lines are width-bounded, so this gate is that cap's denominator. A
-reading that finds the runaway ground thin and deregisters the gate unbounds the
-cap with it.
+**The coupling it underwrites is conditional.** Where `QUEUE_KIT_ENTRY_CAP` is in `lines`, this gate is that cap's denominator, and deregistering it unbounds the cap. Under `cp` or `off` the entry cap is width-independent, and this gate is the wrapping convention's own tripwire and nothing more.
 
 Calibration: three exemptions mirror the wrapping convention — table rows,
 fenced-code blocks, and lines whose own longest token itself exceeds the budget
@@ -2100,7 +2067,7 @@ prose line still wraps at the budget. **Inheritance:** any later gate measuring
 the width or wrapping of queue lines inherits this discount for these two tags.
 
 Refused, with grounds: raising `QUEUE_KIT_WRAP_BUDGET` for the whole file — it
-loosens every line, prose included, and weakens the entry cap this gate
+loosens every line, prose included, and weakens a `lines` entry cap this gate
 underwrites; moving the surface tag into the body — it defeats the reason the
 tag rides the board; shorter spellings — once a slug and the tags an entry
 already carries sit on the line, no spelling of the two fits every entry.
@@ -2110,7 +2077,7 @@ already carries sit on the line, no spelling of the two fits every entry.
 Invariant: every **lead-line-scoped** tag sits on its bullet's lead line — the
 only line *its* readers scan; such a tag pushed to a continuation line by a
 reflow silently unblocks a task, voids a drain
-exemption, drops a deferred entry's class or surface off the board, or drops a
+exemption, drops a deferred entry's class, surface or cap credit off the board, or drops a
 lesson out of the attention block. Membership tracks reader semantics, not §The tag
 algebra: a tag is governed here when its readers scan lead lines alone, so the
 set is narrower than the algebra's and `[precondition-ok:]` is deliberately
@@ -2124,7 +2091,7 @@ that disarms itself exactly when the last user drains — the reverse of what a
 lead-line guard is for. The governed set and
 scanned surface both widen with the lesson channels: `[blocked-by:]` /
 `[spec:]` / `[drain-exempt:]` / `[roadmap:]` /
-`[observed-by:]` / `[cost:]` / `[surface:]` in the task
+`[observed-by:]` / `[cost:]` / `[surface:]` / `[cap-credit:]` in the task
 sections (active + deferred), plus
 `[attend]` and every `QUEUE_KIT_LESSON_TAGS` name in the `## Lessons Learned`
 section — the section the `queue-index` arm now reads, which retires the old "parsed

@@ -147,7 +147,7 @@ pub fn run(args: &[String]) -> i32 {
         for (ln, w, text) in &over {
             println!("  {}:{}: {} cols — {}", file, ln, w, text);
         }
-        println!("  help: hard-wrap the line at ~80 columns. Exempt already: table rows,");
+        println!("  help: hard-wrap the line under the budget. Exempt already: table rows,");
         println!("        fenced code, and a line over budget solely from one unbreakable token;");
         println!("        a deferred lead line's one [cost:] and one [surface:] tag go uncounted.");
         return 1;

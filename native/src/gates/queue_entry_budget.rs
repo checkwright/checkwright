@@ -1,7 +1,7 @@
 // spec: queue-kit/SPEC.md §check-queue-entry-budget — a deferred entry is a costed filing:
 // bounded above so it is not an inlined amendment, bounded below so it is not a flag-and-skip,
 // bounded in what it may displace; an icebox entry is its lead line and nothing else
-use crate::queue;
+use crate::queue::{self, Unit};
 
 const COST_MARK: &str = "**Cost while deferred";
 
@@ -13,7 +13,20 @@ struct Open {
     costed: bool,
     nb: usize,
     decls: u32,
+    cp: usize,
+    cpn: usize,
+    credits: Vec<String>,
     marks: queue::DeferMarks,
+}
+
+impl Open {
+    fn count_cp(&mut self, line: &str) {
+        let t = line.trim();
+        if !t.is_empty() {
+            self.cp += t.chars().count();
+            self.cpn += 1;
+        }
+    }
 }
 
 // spec: queue-kit/SPEC.md §check-queue-entry-budget — the active sections are uncapped, so no
@@ -28,8 +41,8 @@ pub enum Sec {
 }
 
 // spec: queue-kit/SPEC.md §check-queue-entry-budget — one closed entry as the walk measured it.
-// `count` is assertion A's own quantity, so the entry-history arm reads the cap's measure rather
-// than minting a second spelling of it.
+// `count` (lines) and `cp` (code points) are assertion A's own quantities, so the entry-history
+// and queue-index arms read the cap's measure rather than minting a second spelling of it.
 pub struct Closed {
     pub slug: String,
     pub start: usize,
@@ -38,8 +51,31 @@ pub struct Closed {
     pub costed: bool,
     pub nb: usize,
     pub count: usize,
+    pub cp: usize,
     pub decls: u32,
     pub dated: bool,
+    pub credits: Vec<String>,
+}
+
+impl Closed {
+    // spec: queue-kit/SPEC.md §check-queue-entry-budget — the size in the cap's unit
+    pub fn size(&self, unit: Unit) -> usize {
+        match unit {
+            Unit::Cp => self.cp,
+            Unit::Lines => self.count,
+        }
+    }
+}
+
+// spec: queue-kit/SPEC.md §check-queue-entry-budget — the cap's unit, and the unit a reader
+// prints in: under `off` a size still has a reading, and it is code points
+pub fn cap() -> Result<Option<(usize, Unit)>, String> {
+    let raw = queue::knob_scalar("QUEUE_KIT_ENTRY_CAP")?;
+    queue::parse_size(&raw).map_err(|e| format!("QUEUE_KIT_ENTRY_CAP: {}", e))
+}
+
+pub fn display_unit(cap: Option<(usize, Unit)>) -> Unit {
+    cap.map_or(Unit::Cp, |(_, u)| u)
 }
 
 // spec: queue-kit/SPEC.md §check-queue-entry-budget — one pass answers both shapes the gate reads:
@@ -133,8 +169,10 @@ pub fn walk(text: &str, sec_cfg: &queue::Sections) -> Scan {
                     costed: o.costed,
                     nb: o.nb,
                     count,
+                    cp: o.cp + o.cpn.saturating_sub(1),
                     decls: o.decls,
                     dated: o.marks.defer_date().is_some(),
+                    credits: o.credits,
                 });
             }
         }};
@@ -175,6 +213,7 @@ pub fn walk(text: &str, sec_cfg: &queue::Sections) -> Scan {
                     // is a content line of every entry it sits inside
                     for o in open.iter_mut() {
                         o.nb += 1;
+                        o.count_cp(line);
                     }
                     if let Some(o) = open.last_mut() {
                         o.marks.observe(line);
@@ -184,6 +223,7 @@ pub fn walk(text: &str, sec_cfg: &queue::Sections) -> Scan {
                     let slug = slug.to_string();
                     for o in open.iter_mut() {
                         o.nb += 1;
+                        o.count_cp(line);
                     }
                     let costed = line.contains(COST_MARK);
                     open.push(Open {
@@ -194,6 +234,9 @@ pub fn walk(text: &str, sec_cfg: &queue::Sections) -> Scan {
                         costed: false,
                         nb: 1,
                         decls: 0,
+                        cp: line.trim().chars().count(),
+                        cpn: 1,
+                        credits: queue::field_tags(line, "cap-credit").iter().map(|t| t.raw.to_string()).collect(),
                         marks: queue::DeferMarks::default(),
                     });
                     if costed {
@@ -224,9 +267,15 @@ pub fn walk(text: &str, sec_cfg: &queue::Sections) -> Scan {
                 o.marks.observe(line);
             }
             let decl = declaration(line).map_or(0, |i| 1u32 << i);
+            // spec: queue-kit/SPEC.md §check-queue-entry-budget — the first line of each declaration
+            // grammar in an entry is the discounted one, in either unit
             for o in open.iter_mut() {
                 o.nb += 1;
-                o.decls |= decl;
+                if o.decls & decl == 0 && decl != 0 {
+                    o.decls |= decl;
+                } else {
+                    o.count_cp(line);
+                }
             }
         }
         if !open.is_empty() && line.contains(COST_MARK) {
@@ -251,20 +300,19 @@ pub fn run(args: &[String]) -> i32 {
             return 2;
         }
     };
-    let cap_raw = match queue::knob_scalar("QUEUE_KIT_ENTRY_LINE_CAP") {
+    let cap = match cap() {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-queue-entry-budget: {}", e);
             return 2;
         }
     };
-    let cap: usize = match cap_raw.parse() {
-        Ok(n) => n,
-        Err(_) => {
-            eprintln!(
-                "check-queue-entry-budget: QUEUE_KIT_ENTRY_LINE_CAP is not a positive integer: {}",
-                cap_raw
-            );
+    let max = match queue::knob_scalar("QUEUE_KIT_ENTRY_CREDIT_MAX")
+        .and_then(|raw| queue::parse_size(&raw).map_err(|e| format!("QUEUE_KIT_ENTRY_CREDIT_MAX: {}", e)))
+    {
+        Ok(v) => v,
+        Err(e) => {
+            eprintln!("check-queue-entry-budget: {}", e);
             return 2;
         }
     };
@@ -291,7 +339,8 @@ pub fn run(args: &[String]) -> i32 {
     // spec: queue-kit/SPEC.md §check-queue-entry-budget — headroom is the size
     // assertion's own count one subtraction away, collected for every closed
     // Deferred entry regardless of cap outcome and surfaced only on the clean path
-    let mut headroom: Vec<(usize, String, usize)> = Vec::new();
+    let mut headroom: Vec<(usize, String, usize, usize)> = Vec::new();
+    let mut credit: Vec<String> = Vec::new();
     let retired: Vec<String> = scan
         .retired
         .iter()
@@ -300,17 +349,32 @@ pub fn run(args: &[String]) -> i32 {
     for o in &scan.entries {
         match o.sec {
             Sec::Deferred => {
-                let n = o.count;
-                if n > cap {
-                    size.push(format!(
-                        "{}:{}: {} — {} lines (cap {}){}",
-                        file,
-                        o.start,
-                        o.slug,
-                        n,
-                        cap,
-                        discounted(o.decls)
-                    ));
+                let granted = match credit_verdict(o, cap, max) {
+                    Ok(g) => g,
+                    Err(why) => {
+                        credit.push(format!("{}:{}: {} — {}", file, o.start, o.slug, why));
+                        0
+                    }
+                };
+                if let Some((c, unit)) = cap {
+                    let n = o.size(unit);
+                    let limit = c + granted;
+                    if n > limit {
+                        let credited = if granted > 0 { format!(" + credit {}{}", granted, unit.suffix()) } else { String::new() };
+                        size.push(format!(
+                            "{}:{}: {} — {}{} (cap {}{}{}){}",
+                            file,
+                            o.start,
+                            o.slug,
+                            n,
+                            unit.suffix(),
+                            c,
+                            unit.suffix(),
+                            credited,
+                            discounted(o.decls)
+                        ));
+                    }
+                    headroom.push((o.start, o.slug.clone(), limit.saturating_sub(n), granted));
                 }
                 if o.ind == 0 && !o.costed {
                     cost.push(format!("{}:{}: {}", file, o.start, o.slug));
@@ -318,7 +382,6 @@ pub fn run(args: &[String]) -> i32 {
                 if o.ind == 0 && !o.dated {
                     undated.push(format!("{}:{}: {}", file, o.start, o.slug));
                 }
-                headroom.push((o.start, o.slug.clone(), cap.saturating_sub(n)));
             }
             Sec::Icebox => {
                 if o.nb > 1 {
@@ -332,13 +395,20 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
 
-    if !size.is_empty() || !cost.is_empty() || !shape.is_empty() || !retired.is_empty() || !undated.is_empty() {
+    if !size.is_empty() || !credit.is_empty() || !cost.is_empty() || !shape.is_empty() || !retired.is_empty() || !undated.is_empty() {
         println!("check-queue-entry-budget: deferred-pool entry budget violation(s):");
         println!();
         if !size.is_empty() {
-            println!("over the per-entry line cap (a body that long is an amendment inlined where");
+            println!("over the per-entry size cap (a body that long is an amendment inlined where");
             println!("the amendment gates cannot see it):");
             for x in &size {
+                println!("  {}", x);
+            }
+        }
+        if !credit.is_empty() {
+            println!("a [cap-credit:] that does not stand (a credit is granted, bounded, and deleted");
+            println!("once the entry fits the cap without it):");
+            for x in &credit {
                 println!("  {}", x);
             }
         }
@@ -376,7 +446,9 @@ pub fn run(args: &[String]) -> i32 {
         println!("        an entry that ALREADY owns its subject is self-served only for a");
         println!("        mandated write; minting a NEW entry to hold it stays authorization-");
         println!("        gated (queue-kit/SPEC.md section check-queue-entry-budget, which");
-        println!("        defines the class and owns the declaration-line discount above).");
+        println!("        defines the class and owns the declaration-line discount above). A");
+        println!("        record whose compression would lose what its reader needs may be");
+        println!("        granted a [cap-credit:] by the same authority; a session never takes one.");
         // spec: queue-kit/SPEC.md §check-queue-entry-budget — the arm's named reader is this
         // failure's reader, who is by construction the session about to compress; it is routed
         // here because no other trigger reaches that session at that moment
@@ -387,17 +459,130 @@ pub fn run(args: &[String]) -> i32 {
         return 1;
     }
 
+    let Some((c, unit)) = cap else {
+        println!(
+            "QUEUE-ENTRY-BUDGET: clean (size cap off; every {} entry carrying a cost field and resolving a defer date in {})",
+            sec_cfg.deferred, file
+        );
+        return 0;
+    };
+    let u = unit.suffix();
     println!(
-        "QUEUE-ENTRY-BUDGET: clean (every {} entry within {} lines, carrying a cost field and resolving a defer date in {})",
-        sec_cfg.deferred, cap, file
+        "QUEUE-ENTRY-BUDGET: clean (every {} entry within {}{}, carrying a cost field and resolving a defer date in {})",
+        sec_cfg.deferred, c, u, file
     );
     if !headroom.is_empty() {
         println!();
-        println!("headroom under the {}-line cap, per entry:", cap);
-        headroom.sort_by_key(|(start, _, _)| *start);
-        for (_, slug, h) in &headroom {
-            println!("  {}: {} lines of headroom", slug, h);
+        println!("headroom under the {}{} cap, per entry:", c, u);
+        headroom.sort_by_key(|(start, _, _, _)| *start);
+        for (_, slug, h, granted) in &headroom {
+            if *granted > 0 {
+                println!("  {}: {}{} of headroom (credit +{}{})", slug, h, u, granted, u);
+            } else {
+                println!("  {}: {}{} of headroom", slug, h, u);
+            }
         }
     }
     0
+}
+
+// spec: queue-kit/SPEC.md §The tag algebra — `[cap-credit: +<n><unit> <YYYY-MM-DD> <grantor>
+// <reason>]`: the amount, a date, a one-token grantor and a non-empty reason
+fn credit_grant(raw: &str) -> Result<(usize, Unit), String> {
+    let f: Vec<&str> = raw.split_whitespace().collect();
+    let shape = "malformed [cap-credit:] (want +<n><unit> <YYYY-MM-DD> <grantor> <reason>)";
+    if f.len() < 4 || !is_iso_date(f[1]) {
+        return Err(shape.to_string());
+    }
+    match f[0].strip_prefix('+').map(queue::parse_size) {
+        Some(Ok(Some(g))) => Ok(g),
+        _ => Err(shape.to_string()),
+    }
+}
+
+// spec: queue-kit/SPEC.md §check-queue-entry-budget — a deferred entry's credit, in the cap's unit:
+// `Ok(0)` where it carries none, the amount where it stands, and the reason where it is red
+fn credit_verdict(o: &Closed, cap: Option<(usize, Unit)>, max: Option<(usize, Unit)>) -> Result<usize, String> {
+    let raw = match o.credits.as_slice() {
+        [] => return Ok(0),
+        [one] => one,
+        _ => return Err("more than one [cap-credit:] (at most one per entry)".to_string()),
+    };
+    let (n, unit) = credit_grant(raw)?;
+    let Some((c, cap_unit)) = cap else {
+        return Err("a credit under QUEUE_KIT_ENTRY_CAP=off (there is no cap to credit)".to_string());
+    };
+    if unit != cap_unit {
+        return Err(format!("credit in {} but the cap is in {}", unit.suffix(), cap_unit.suffix()));
+    }
+    match max {
+        None => return Err("credits are off (QUEUE_KIT_ENTRY_CREDIT_MAX=off)".to_string()),
+        Some((_, mu)) if mu != cap_unit => {
+            return Err(format!(
+                "QUEUE_KIT_ENTRY_CREDIT_MAX is in {} but the cap is in {}, so it admits no credit",
+                mu.suffix(),
+                cap_unit.suffix()
+            ))
+        }
+        Some((m, _)) if n > m => {
+            return Err(format!("credit +{}{} exceeds QUEUE_KIT_ENTRY_CREDIT_MAX ({}{})", n, unit.suffix(), m, unit.suffix()))
+        }
+        Some(_) => {}
+    }
+    let size = o.size(cap_unit);
+    if size <= c {
+        return Err(format!(
+            "stale credit: the entry measures {}{}, within the {}{} cap without it — delete the tag",
+            size,
+            unit.suffix(),
+            c,
+            unit.suffix()
+        ));
+    }
+    Ok(n)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn sections() -> queue::Sections {
+        queue::Sections {
+            active: vec!["New Features".to_string()],
+            deferred: "Deferred".to_string(),
+            icebox: String::new(),
+            done: String::new(),
+        }
+    }
+
+    fn entry(text: &str) -> Closed {
+        walk(text, &sections()).entries.into_iter().find(|e| e.slug == "e").expect("entry")
+    }
+
+    // spec: queue-kit/SPEC.md §check-queue-entry-budget — a reflow of the same text moves the
+    // code-point size by nothing, and one line of each declaration grammar is discounted
+    #[test]
+    fn the_code_point_size_is_reflow_invariant_and_discounts_one_declaration() {
+        let wrapped = entry("## Deferred\n\n- **e** — alpha beta\n  gamma delta\n  recurrence: e 2026-01-01\n");
+        let joined = entry("## Deferred\n\n- **e** — alpha beta gamma delta\n  recurrence: e 2026-01-01\n");
+        assert_eq!(wrapped.cp, joined.cp);
+        assert_eq!(joined.cp, "- **e** — alpha beta gamma delta".chars().count());
+        assert_eq!(wrapped.count, 2);
+    }
+
+    #[test]
+    fn a_credit_stands_only_when_granted_bounded_in_unit_and_needed() {
+        let text = "## Deferred\n\n- **e** [cap-credit: +10cp 2026-09-22 lead keeps a ground] — xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n";
+        let e = entry(text);
+        let cap = Some((20, Unit::Cp));
+        assert!(e.cp > 20);
+        assert_eq!(credit_verdict(&e, cap, Some((50, Unit::Cp))), Ok(10));
+        assert!(credit_verdict(&e, cap, Some((5, Unit::Cp))).is_err());
+        assert!(credit_verdict(&e, cap, None).is_err());
+        assert!(credit_verdict(&e, None, Some((50, Unit::Cp))).is_err());
+        assert!(credit_verdict(&e, Some((20, Unit::Lines)), Some((50, Unit::Lines))).is_err());
+        assert!(credit_verdict(&e, Some((10_000, Unit::Cp)), Some((50, Unit::Cp))).unwrap_err().starts_with("stale"));
+        let bare = entry("## Deferred\n\n- **e** [cap-credit: +10cp] — x\n");
+        assert!(credit_verdict(&bare, cap, Some((50, Unit::Cp))).unwrap_err().starts_with("malformed"));
+    }
 }

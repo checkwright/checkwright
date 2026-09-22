@@ -1,7 +1,8 @@
-headroom under the 6-line cap, per entry:
-beta-idea: 2 lines of headroom
-gamma-idea: 2 lines of headroom
-zeta-idea: 0 lines of headroom
-theta-idea: 0 lines of headroom
-iota-idea: 0 lines of headroom
-kappa-idea: 2 lines of headroom
+headroom under the 269cp cap, per entry:
+beta-idea: 119cp of headroom
+gamma-idea: 117cp of headroom
+zeta-idea: 43cp of headroom
+theta-idea: 0cp of headroom
+iota-idea: 41cp of headroom
+kappa-idea: 133cp of headroom
+lambda-idea: 32cp of headroom (credit +100cp)

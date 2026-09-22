@@ -24,8 +24,8 @@ struct Join {
 
 // spec: context-kit/SPEC.md §bin/footprint — the rollup's cost columns are the token figure alone,
 // the `~<n>t` the footprint cell carries; an absent tier stays an em dash
-fn token_cell(lines: usize, bytes: usize) -> String {
-    if lines == 0 && bytes == 0 {
+fn token_cell(cp: usize, bytes: usize) -> String {
+    if cp == 0 && bytes == 0 {
         return "\u{2014}".to_string();
     }
     format!("~{}t", bytes / 4)
@@ -47,12 +47,12 @@ fn build() -> Result<Join, String> {
     let always: Vec<(String, String)> = foot
         .rows
         .iter()
-        .map(|r| (r.kit.clone(), token_cell(r.always.lines, r.always.bytes)))
+        .map(|r| (r.kit.clone(), token_cell(r.always.cp, r.always.bytes)))
         .collect();
     let triggered: Vec<(String, String)> = foot
         .rows
         .iter()
-        .map(|r| (r.kit.clone(), token_cell(r.triggered.lines, r.triggered.bytes)))
+        .map(|r| (r.kit.clone(), token_cell(r.triggered.cp, r.triggered.bytes)))
         .collect();
 
     Ok(Join {
@@ -61,8 +61,8 @@ fn build() -> Result<Join, String> {
         kits,
         always,
         triggered,
-        total_always: token_cell(foot.always_total.lines, foot.always_total.bytes),
-        total_triggered: token_cell(foot.triggered_total.lines, foot.triggered_total.bytes),
+        total_always: token_cell(foot.always_total.cp, foot.always_total.bytes),
+        total_triggered: token_cell(foot.triggered_total.cp, foot.triggered_total.bytes),
     })
 }
 

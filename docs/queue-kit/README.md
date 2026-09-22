@@ -9,7 +9,7 @@ generated: true
 A git-native, agent-readable task tracker: one Markdown file where `##`
 sections are queues, bold kebab-case slugs are the task handles, and
 square-bracket tags (`[blocked-by:]`, `[spec:]`,
-`[drain-exempt:]`, `[roadmap:]`, `[observed-by:]`, `[cost:]`, `[surface:]`,
+`[drain-exempt:]`, `[roadmap:]`, `[observed-by:]`, `[cost:]`, `[surface:]`, `[cap-credit:]`,
 `[precondition-ok:]`, plus the
 Lessons Learned
 channel's `[attend]` and the consumer-named harvest tags) are the state machine.

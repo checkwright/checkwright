@@ -39,6 +39,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         return Err("entry-history needs a <slug>".to_string());
     }
     let sec_cfg = queue::Sections::active_and_deferred()?;
+    let unit = queue_entry_budget::display_unit(queue_entry_budget::cap()?);
     let file = if file.is_empty() {
         queue::knob_scalar("QUEUE_KIT_QUEUE_FILE")?
     } else {
@@ -72,7 +73,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
             None => continue,
         };
         let count = match blobs.at(commit, &file)? {
-            Some(text) => count_of(&text, &sec_cfg, &slug),
+            Some(text) => count_of(&text, &sec_cfg, &slug, unit),
             None => None,
         };
         // spec: queue-kit/SPEC.md §check-queue-entry-budget — the bound, and the departure commit:
@@ -144,10 +145,12 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     }
     for r in &rows {
         out.push_str(&format!(
-            "  {}  {} -> {}  {}\n",
+            "  {}  {}{} -> {}{}  {}\n",
             short(&r.commit),
             r.before,
+            unit.suffix(),
             r.after,
+            unit.suffix(),
             r.subject
         ));
     }
@@ -156,12 +159,12 @@ pub fn emit(args: &[String]) -> Result<String, String> {
 
 // spec: queue-kit/SPEC.md §check-queue-entry-budget — the count is assertion A's own, read off the
 // gate's walk: a change to what counts moves the cap and this report together
-fn count_of(text: &str, sec_cfg: &queue::Sections, slug: &str) -> Option<usize> {
+fn count_of(text: &str, sec_cfg: &queue::Sections, slug: &str, unit: queue::Unit) -> Option<usize> {
     queue_entry_budget::walk(text, sec_cfg)
         .entries
         .into_iter()
         .find(|e| e.slug == slug && e.sec != Sec::Other)
-        .map(|e| e.count)
+        .map(|e| e.size(unit))
 }
 
 fn short(sha: &str) -> String {
@@ -171,6 +174,11 @@ fn short(sha: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::{count_of, short};
+    use crate::queue::Unit::{self, Cp, Lines};
+
+    fn count(q: &str, slug: &str, unit: Unit) -> Option<usize> {
+        count_of(q, &sections(), slug, unit)
+    }
     use crate::queue::Sections;
 
     fn sections() -> Sections {
@@ -202,25 +210,27 @@ mod tests {
 
     // spec: queue-kit/SPEC.md §check-queue-entry-budget — the arm reads the cap's own count, which
     // is the extent less the declaration discount: five lines of extent, one `recurrence:` line
-    // discounted, four counted.
+    // discounted, four counted; in code points, the three content lines and their two breaks.
     #[test]
     fn the_count_is_the_caps_count_and_not_the_extent() {
-        assert_eq!(count_of(Q, &sections(), "def-one"), Some(4));
+        assert_eq!(count(Q, "def-one", Lines), Some(4));
+        let cp = "- **def-one** [cost: event/low] — a deferred entry".chars().count() + 1 + 13 + 1 + 12;
+        assert_eq!(count(Q, "def-one", Cp), Some(cp));
     }
 
     // spec: queue-kit/SPEC.md §check-queue-entry-budget — an entry promoted out of the deferred
     // pool is still measured, so a reader following one entry's history crosses the promotion
     #[test]
     fn a_promoted_entry_is_measured_where_it_now_stands() {
-        assert_eq!(count_of(Q, &sections(), "live-one"), Some(3));
+        assert_eq!(count(Q, "live-one", Lines), Some(3));
     }
 
     // spec: queue-kit/SPEC.md §check-queue-entry-budget — a bare slug under Done is not an entry
     // the cap measures, so it reads as absence and ends the walk
     #[test]
     fn a_done_slug_is_absence() {
-        assert_eq!(count_of(Q, &sections(), "def-gone"), None);
-        assert_eq!(count_of(Q, &sections(), "no-such-slug"), None);
+        assert_eq!(count(Q, "def-gone", Lines), None);
+        assert_eq!(count(Q, "no-such-slug", Cp), None);
     }
 
     #[test]

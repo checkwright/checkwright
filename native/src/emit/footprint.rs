@@ -8,7 +8,7 @@ use std::path::Path;
 const SURFACES_KNOB: &str = "CONTEXT_KIT_SURFACES";
 
 pub struct Tally {
-    pub lines: usize,
+    pub cp: usize,
     pub bytes: usize,
 }
 
@@ -47,7 +47,7 @@ fn kit_roster() -> Result<Vec<String>, String> {
 fn kit_always(kit: &str, surfaces: &[String]) -> Result<Tally, String> {
     let begin = format!("<!-- {}:begin -->", kit);
     let end = format!("<!-- {}:end -->", kit);
-    let mut lines = 0usize;
+    let mut cp = 0usize;
     let mut bytes = 0usize;
     for sf in surfaces {
         if !Path::new(sf).is_file() {
@@ -69,22 +69,22 @@ fn kit_always(kit: &str, surfaces: &[String]) -> Result<Tally, String> {
                 block.push(line);
             }
         }
-        // spec: context-kit/SPEC.md §bin/footprint — the shell form captures the block in `$(…)`,
-        // stripping every trailing newline, then re-terminates it with exactly one before
-        // counting; an empty block is skipped rather than counted as a line.
+        // spec: context-kit/SPEC.md §bin/footprint — the block's trailing newlines are stripped and
+        // exactly one re-terminates it for the byte count; an empty block is skipped. The size is
+        // the meter's code-point count, so a reflow of the block moves nothing.
         let joined = block.join("\n");
         let joined = joined.trim_end_matches('\n');
         if joined.is_empty() {
             continue;
         }
-        lines += joined.matches('\n').count() + 1;
+        cp += crate::section::cp_size(joined.lines());
         bytes += joined.len() + 1;
     }
-    Ok(Tally { lines, bytes })
+    Ok(Tally { cp, bytes })
 }
 
 // spec: context-kit/SPEC.md §bin/footprint — load-triggered tier: the kit's shipped markdown under
-// its templates tree, counted in `wc`'s own model — lines are newlines, bytes are bytes.
+// its templates tree, sized with the meter's code-point count; bytes are bytes.
 fn kit_triggered(kit: &str) -> Result<Tally, String> {
     let mut files: Vec<String> =
         walk::glob_files(Path::new(kit), &["templates/**/*.md".to_string()])?
@@ -93,27 +93,27 @@ fn kit_triggered(kit: &str) -> Result<Tally, String> {
             .collect();
     files.sort();
     files.dedup();
-    let mut lines = 0usize;
+    let mut cp = 0usize;
     let mut bytes = 0usize;
     for f in &files {
         let b = std::fs::read(f).map_err(|e| format!("cannot read {}: {}", f, e))?;
-        lines += b.iter().filter(|&&c| c == b'\n').count();
+        cp += crate::section::cp_size(String::from_utf8_lossy(&b).lines());
         bytes += b.len();
     }
-    Ok(Tally { lines, bytes })
+    Ok(Tally { cp, bytes })
 }
 
 pub fn measure() -> Result<Footprint, String> {
     let surfaces = walk::knob_array(SURFACES_KNOB)?;
     let mut rows: Vec<KitRow> = Vec::new();
-    let mut always_total = Tally { lines: 0, bytes: 0 };
-    let mut triggered_total = Tally { lines: 0, bytes: 0 };
+    let mut always_total = Tally { cp: 0, bytes: 0 };
+    let mut triggered_total = Tally { cp: 0, bytes: 0 };
     for kit in kit_roster()? {
         let always = kit_always(&kit, &surfaces)?;
         let triggered = kit_triggered(&kit)?;
-        always_total.lines += always.lines;
+        always_total.cp += always.cp;
         always_total.bytes += always.bytes;
-        triggered_total.lines += triggered.lines;
+        triggered_total.cp += triggered.cp;
         triggered_total.bytes += triggered.bytes;
         rows.push(KitRow {
             kit,
@@ -128,13 +128,13 @@ pub fn measure() -> Result<Footprint, String> {
     })
 }
 
-// spec: context-kit/SPEC.md §bin/footprint — lines exact, tokens a bytes/4 estimate computed at
-// render; an empty tier is an em dash rather than a zero.
+// spec: context-kit/SPEC.md §bin/footprint — code points exact, tokens a bytes/4 estimate computed
+// at render; an empty tier is an em dash rather than a zero.
 fn cell(t: &Tally) -> String {
-    if t.lines == 0 && t.bytes == 0 {
+    if t.cp == 0 && t.bytes == 0 {
         return "\u{2014}".to_string();
     }
-    format!("{}l \u{b7} ~{}t", t.lines, t.bytes / 4)
+    format!("{}cp \u{b7} ~{}t", t.cp, t.bytes / 4)
 }
 
 pub fn table(f: &Footprint) -> String {
@@ -166,37 +166,20 @@ nav_child_order: 2
 
 # Context footprint
 
-What vendoring Checkwright costs a consumer's context budget, measured per kit
-and split by when the cost is paid. Every number here is generated from the
-tracked kit surfaces by `bash gate-sdk/bin/run-gates.sh --emit footprint` and
-held current by a freshness gate, so the page cannot drift from what the kits
-actually ship.
+What vendoring Checkwright costs a consumer's context budget, measured per kit and split by when the cost is paid. Every number here is generated from the tracked kit surfaces by `bash gate-sdk/bin/run-gates.sh --emit footprint` and held current by a freshness gate, so the page cannot drift from what the kits actually ship.
 
 ## What is measured
 
 Each kit's footprint splits by when its cost lands in a session:
 
-- **Always-loaded** — the fixed block a kit injects into the consumer's
-  always-loaded agent file, so it rides every session's context. Measured as the
-  content a kit generates between its own `begin`/`end` markers in the configured
-  surface files.
-- **Load-triggered** — the kit's shipped skill and template markdown, pulled
-  into context only when its trigger fires. Measured over the markdown the kit
-  ships under its templates directory.
+- **Always-loaded** — the fixed block a kit injects into the consumer's always-loaded agent file, so it rides every session's context. Measured as the content a kit generates between its own `begin`/`end` markers in the configured surface files.
+- **Load-triggered** — the kit's shipped skill and template markdown, pulled into context only when its trigger fires. Measured over the markdown the kit ships under its templates directory.
 
-Line counts are exact. The token column is a labeled estimate — a
-bytes-over-four heuristic, marked with a leading `~` because the true count is
-model-tokenizer-dependent; read it as an order of magnitude, never a precise
-figure.
+Code-point counts (`cp`) are exact. The token column is a labeled estimate — a bytes-over-four heuristic, marked with a leading `~` because the true count is model-tokenizer-dependent; read it as an order of magnitude, never a precise figure.
 
 ## What is excluded
 
-The figures are kit-share only — what a kit itself ships. A consumer's own
-bindings (the skill shims that point at a vendored template), consumer
-configuration, the reference SPEC and README pages a reader opens on demand, and
-the session hook's dynamic body (which is consumer state, not fixed kit text) are
-all left out, so each number reflects the kit's advertised cost rather than a
-host repository's residue.
+The figures are kit-share only — what a kit itself ships. A consumer's own bindings (the skill shims that point at a vendored template), consumer configuration, the reference SPEC and README pages a reader opens on demand, and the session hook's dynamic body (which is consumer state, not fixed kit text) are all left out, so each number reflects the kit's advertised cost rather than a host repository's residue.
 
 ## Per-kit footprint
 
@@ -214,8 +197,8 @@ mod tests {
     // token figure is integer bytes/4, so a sub-4-byte tier reads ~0t rather than rounding up
     #[test]
     fn an_empty_tier_is_an_em_dash_and_tokens_are_integer_bytes_over_four() {
-        assert_eq!(cell(&Tally { lines: 0, bytes: 0 }), "\u{2014}");
-        assert_eq!(cell(&Tally { lines: 2, bytes: 9 }), "2l \u{b7} ~2t");
-        assert_eq!(cell(&Tally { lines: 1, bytes: 3 }), "1l \u{b7} ~0t");
+        assert_eq!(cell(&Tally { cp: 0, bytes: 0 }), "\u{2014}");
+        assert_eq!(cell(&Tally { cp: 2, bytes: 9 }), "2cp \u{b7} ~2t");
+        assert_eq!(cell(&Tally { cp: 1, bytes: 3 }), "1cp \u{b7} ~0t");
     }
 }

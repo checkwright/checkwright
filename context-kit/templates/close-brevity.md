@@ -7,7 +7,7 @@ iteration baseline is the worklist.
 1. **Measure the delta, then the growth.** Run `--emit always-loaded` on the
    gate binary `GATE_SDK_NATIVE_BIN` names
    — it prints the total, the per-part split, and the delta against the committed
-   baseline. Then run it with `--growth`: every governed prose file that grew net
+   baseline. Then run it with `--growth`: every governed prose file that grew net in code points
    since the iteration started, largest first. Both lists are the worklist; a
    `stale` baseline means the delta is cumulative, so read the growth list for
    this iteration's share.

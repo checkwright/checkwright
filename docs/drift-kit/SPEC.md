@@ -299,8 +299,8 @@ Lead:
   the meter's stale-baseline mark, from context-kit's meter, read **in process**
   as figures. It hands the meter the report's own `DRIFT_KIT_ITERATION_START`
   rather than letting it resolve `CONTEXT_KIT_STATE_FILE`, so the row and the
-  header can never name two different starts. `--trend` appends `stale` to its
-  `loaded` fragment when marked.
+  header can never name two different starts. Its `--trend` fragment reads
+  `loaded <n>cp`, the meter's code-point total, and appends `stale` when marked.
   The row spawned the meter and parsed its rendered line back apart until the
   meter became an arm; that parse was an undeclared cross-kit output contract, and
   the split into a measurement function the arm renders over is what ended it

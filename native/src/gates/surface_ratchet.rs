@@ -37,19 +37,19 @@ pub fn run(_args: &[String]) -> i32 {
     };
 
     let mut findings: Vec<String> = Vec::new();
-    for (file, lines) in &governed {
+    for (file, size) in &governed {
         // spec: context-kit/SPEC.md §The surface ratchet — a row whose file is gone or is no
         // longer governed is ignored, so narrowing the governed set never reds; the match is
         // therefore from the governed side, never from the row side.
         match rows.iter().find(|(_, p)| p == file) {
-            Some((ceiling, _)) if lines <= ceiling => {}
+            Some((ceiling, _)) if size <= ceiling => {}
             Some((ceiling, _)) => findings.push(format!(
-                "{} — {} lines, above its committed ceiling of {}",
-                file, lines, ceiling
+                "{} — {}cp, above its committed ceiling of {}cp",
+                file, size, ceiling
             )),
             None => findings.push(format!(
-                "{} — {} lines, no ceiling row (a newly governed surface grows from nothing)",
-                file, lines
+                "{} — {}cp, no ceiling row (a newly governed surface grows from nothing)",
+                file, size
             )),
         }
     }

@@ -312,6 +312,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
             "QUEUE_KIT_ICEBOX_SECTION",
             "QUEUE_KIT_ATTEND_CAP",
             "QUEUE_KIT_ICEBOX_AGE_DAYS",
+            "QUEUE_KIT_ENTRY_CAP",
         ],
     ),
     // spec: queue-kit/SPEC.md §check-queue-entry-budget — an `Arm::Emit` on the family's own test:
@@ -322,6 +323,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Emit(entry_history::emit),
         &[
             "QUEUE_KIT_QUEUE_FILE",
+            "QUEUE_KIT_ENTRY_CAP",
             "QUEUE_KIT_ACTIVE_SECTIONS",
             "QUEUE_KIT_DEFERRED_SECTION",
             "QUEUE_KIT_ICEBOX_SECTION",

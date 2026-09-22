@@ -265,6 +265,42 @@ pub fn field_tags<'a>(line: &'a str, name: &str) -> Vec<FieldTag<'a>> {
     out
 }
 
+// spec: queue-kit/SPEC.md §Layout and configuration — the unit a record size is measured in
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Unit {
+    Cp,
+    Lines,
+}
+
+impl Unit {
+    pub fn suffix(self) -> &'static str {
+        match self {
+            Unit::Cp => "cp",
+            Unit::Lines => "lines",
+        }
+    }
+}
+
+// spec: queue-kit/SPEC.md §Layout and configuration — `<n>cp`, `<n>lines`, or `off` (`None`), with
+// `<n>` a positive integer; anything else is malformed config. Shared by the knob validator and
+// every reader, so the grammar the table admits is the grammar the readers parse.
+pub fn parse_size(v: &str) -> Result<Option<(usize, Unit)>, String> {
+    if v == "off" {
+        return Ok(None);
+    }
+    let (digits, unit) = if let Some(d) = v.strip_suffix("cp") {
+        (d, Unit::Cp)
+    } else if let Some(d) = v.strip_suffix("lines") {
+        (d, Unit::Lines)
+    } else {
+        return Err(format!("'{}' is not <n>cp, <n>lines or off", v));
+    };
+    match digits.parse::<usize>() {
+        Ok(n) if n > 0 && digits.bytes().all(|b| b.is_ascii_digit()) => Ok(Some((n, unit))),
+        _ => Err(format!("'{}' is not <n>cp, <n>lines or off", v)),
+    }
+}
+
 // spec: queue-kit/SPEC.md §The queue format — `^[[:space:]]*-[[:space:]]` (one space, no
 // `+`), the looser bullet test the section scanners use
 pub fn is_bullet(line: &str) -> bool {

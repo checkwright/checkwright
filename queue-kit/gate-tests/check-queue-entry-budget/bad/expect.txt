@@ -1,6 +1,9 @@
-beta-idea — 9 lines (cap 6)
-zeta-idea — 7 lines (cap 6)
-eta-idea — 7 lines (cap 6), after discounting one recurrence: line
+beta-idea — 408cp (cap 270cp)
+zeta-idea — 278cp (cap 270cp)
+eta-idea — 301cp (cap 270cp), after discounting one recurrence: line
+nu-idea — 359cp (cap 270cp)
+mu-idea — stale credit: the entry measures 142cp, within the 270cp cap without it — delete the tag
+nu-idea — credit +500cp exceeds QUEUE_KIT_ENTRY_CREDIT_MAX (100cp)
 theta-idea — retired declaration grammar ruled:
 no 'Cost while deferred' field
 gamma-idea

@@ -103,9 +103,32 @@ pub fn blank(line: &str) -> bool {
     !line.bytes().any(|b| !is_posix_space(b))
 }
 
+// spec: queue-kit/SPEC.md §check-queue-entry-budget — the code-point size of a run of lines, the
+// one measure every record and surface size reads: each non-blank line trimmed, plus one per
+// break between two of them, so joining or wrapping the same text moves nothing
+pub fn cp_size<'a>(lines: impl IntoIterator<Item = &'a str>) -> usize {
+    let (mut sum, mut n) = (0usize, 0usize);
+    for l in lines {
+        let t = l.trim();
+        if !t.is_empty() {
+            sum += t.chars().count();
+            n += 1;
+        }
+    }
+    sum + n.saturating_sub(1)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_code_point_size_is_reflow_invariant() {
+        assert_eq!(cp_size(["abc def"]), 7);
+        assert_eq!(cp_size(["abc", "  def  ", "", "—"]), 3 + 1 + 3 + 1 + 1);
+        assert_eq!(cp_size(["abc def"]), cp_size(["abc", "def"]));
+        assert_eq!(cp_size(Vec::<&str>::new()), 0);
+    }
 
     #[test]
     fn a_deeper_heading_does_not_close_a_section_and_a_shallower_one_does() {

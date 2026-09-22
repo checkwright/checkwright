@@ -13,7 +13,7 @@ no network round-trip.
 
 queue-kit formalizes that file: one slug namespace, a small tag algebra
 (blocked-by, spec, drain-exempt, roadmap, observed-by, cost,
-surface) that
+surface, cap-credit) that
 encodes
 preconditions an agent can resolve
 mechanically, an index tool, a roadmap projector that renders the curated

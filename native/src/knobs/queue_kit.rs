@@ -23,7 +23,8 @@ pub const KIT: Kit = Kit {
         Row::scalar("QUEUE_KIT_ICEBOX_SECTION", ""),
         Row::scalar("QUEUE_KIT_DONE_SECTION", "Done"),
         Row::scalar("QUEUE_KIT_WRAP_BUDGET", "100"),
-        Row::scalar("QUEUE_KIT_ENTRY_LINE_CAP", "50"),
+        Row::scalar("QUEUE_KIT_ENTRY_CAP", "4300cp"),
+        Row::scalar("QUEUE_KIT_ENTRY_CREDIT_MAX", "2150cp"),
         Row::scalar("QUEUE_KIT_ICEBOX_AGE_DAYS", "30"),
         Row::indexed("QUEUE_KIT_REQUIRED_SECTIONS", REQUIRED_SECTIONS),
         Row::indexed("QUEUE_KIT_PROSE_LEADS", &["Protocol:"]),
@@ -44,7 +45,7 @@ pub const KIT: Kit = Kit {
     validate: Some(("queue config", validate)),
     open_family: false,
     families: &[],
-    retired: &[],
+    retired: &[("QUEUE_KIT_ENTRY_LINE_CAP", "QUEUE_KIT_ENTRY_CAP")],
     env_only: &[],
 };
 
@@ -69,13 +70,17 @@ fn validate(v: &Values) -> Vec<String> {
     for n in [
         "QUEUE_KIT_WRAP_BUDGET",
         "QUEUE_KIT_ATTEND_CAP",
-        "QUEUE_KIT_ENTRY_LINE_CAP",
         "QUEUE_KIT_ICEBOX_AGE_DAYS",
     ] {
         if let Some(s) = scalar(v, n) {
             if !positive(s) {
                 errs.push(format!("{} must be a positive integer (got '{}')", n, s));
             }
+        }
+    }
+    for n in ["QUEUE_KIT_ENTRY_CAP", "QUEUE_KIT_ENTRY_CREDIT_MAX"] {
+        if let Some(Err(e)) = scalar(v, n).map(crate::queue::parse_size) {
+            errs.push(format!("{} must be <n>cp, <n>lines or off: {}", n, e));
         }
     }
     if scalar(v, "QUEUE_KIT_ICEBOX_SECTION") == scalar(v, "QUEUE_KIT_DEFERRED_SECTION") {

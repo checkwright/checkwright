@@ -8,8 +8,8 @@
 
 ## Deferred
 
-- **beta-idea** — an inlined amendment: eight body lines past
-  a six-line cap, which is the shape the size assertion exists to refuse.
+- **beta-idea** — an inlined amendment: a body well past
+  the cap, which is the shape the size assertion exists to refuse.
   **Deliverable:** a thing.
   **Why design-pending:** the open call is which of two shapes to take.
   **Cost while deferred:** low and non-rotting.
@@ -22,15 +22,15 @@
   **Deliverable:** another thing.
   Filed 2026-01-02 by scope.
 
-- **zeta-idea** — one line over the cap with no declaration
+- **zeta-idea** — over the cap with no declaration
   anywhere in it, so nothing is discounted and the cap holds exactly where it
   held before. A discount that greened this case would have moved the cap
   rather than the count.
   **Cost while deferred:** low.
   Filed 2026-01-03 by scope.
 
-- **eta-idea** — a declaration and one further excess line: the
-  discount removes one line from the count and this entry is still over, which
+- **eta-idea** — a declaration and further excess: the
+  discount removes one line from the size and this entry is still over, which
   is the other half of the same demonstration — the discount is one line per
   grammar, not a grammar-wide exemption.
   recurrence: eta-idea 2026-01-04 2026-01-08
@@ -53,6 +53,15 @@
   spelled with a word between the mark and the date and a lowercase mark.
   **Cost while deferred:** low.
   filed at build 2026-01-07 by close.
+
+- **mu-idea** [cap-credit: +50cp 2026-01-08 lead a measured ground] — a stale credit.
+  **Cost while deferred:** low. Filed 2026-01-08 by close.
+
+- **nu-idea** [cap-credit: +500cp 2026-01-09 lead a measured ground] — a credit
+  over the bound: the entry is over the cap, and the credit that would cover it
+  exceeds the largest one a single entry may carry, so no grant can stand here
+  and the entry is measured against the cap alone, which it overruns.
+  **Cost while deferred:** low. Filed 2026-01-09 by close.
 
 ## Icebox
 

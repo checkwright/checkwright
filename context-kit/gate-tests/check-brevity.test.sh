@@ -3,7 +3,7 @@
 # the pair fixes CONTEXT_KIT_BREVITY_SECTIONS at the stock one-element default and
 # always supplies a file carrying it, so neither case can express an element that
 # resolves to nothing, an empty set, a repeated element, a multi-section set or the
-# retired scalar knob. Each refusal is exit 2 (a gate whose target vanished is a
+# retired scalar knob, or the retired line budget. Each refusal is exit 2 (a gate whose target vanished is a
 # broken machine, not a clean tree), which run-gate-tests reads as a harness error
 # from a bad/ tree — so they live here.
 #
@@ -22,7 +22,7 @@ cat >"$SANDBOX/renamed.md" <<'MD'
 
 ## Conventions we since renamed
 
-- **Over budget with pointer:** this bullet runs past the four-line budget
+- **Over budget with pointer:** this bullet runs past the code-point budget
   across several lines of prose while admitting its detail already lives
   in the HANDBOOK §Some section that it cites, so a gate that resolved this
   section would flag it — the fix being to trim the bullet and lean on the
@@ -49,7 +49,7 @@ cat >"$SANDBOX/two.md" <<'MD'
 ## Housekeeping
 
 - `scratch/` is a plain bullet with no bold name that runs past the
-  four-line budget across several lines of prose and cites the
+  code-point budget across several lines of prose and cites the
   HANDBOOK §Some section, so only a gate reading the second governed
   section and every top-level item, not only bold-named ones, sees
   it at all.
@@ -81,6 +81,19 @@ CFG
 cat >"$SANDBOX/retired-cfg.knobs" <<'CFG'
 CONTEXT_KIT_BREVITY_SECTION = ## Shared conventions
 CFG
+
+cat >"$SANDBOX/retired-budget-cfg.knobs" <<'CFG'
+CONTEXT_KIT_BREVITY_BUDGET = 4
+CFG
+
+# The same over-cap bullet, joined onto one line: the size is code points, so a join moves nothing.
+cat >"$SANDBOX/joined.md" <<'MD'
+# governed file
+
+## Shared conventions
+
+- **Joined:** this bullet sits on one physical line and still runs past the code-point cap while admitting its detail lives in the HANDBOOK §Some section, so joining its lines is no way under the cap.
+MD
 
 # The stock-default cases pin an existing empty config (the strict loader
 # exits 2 on a set-but-missing path, and /dev/null is not a regular file).
@@ -120,12 +133,12 @@ check_case "matched-but-bulletless-clean" 0 "BREVITY: clean (0 bullets" empty.md
 # The renamed file is clean once the knob is repointed at the live heading —
 # and the bullet it was hiding is now seen, so the knob really did resolve.
 check_case "repointed-knob-sees-bullets" 1 "Over budget with pointer" renamed.md \
-    CONTEXT_KIT_KNOB_FILE="$SANDBOX/cfg.knobs"
+    CONTEXT_KIT_KNOB_FILE="$SANDBOX/cfg.knobs" CONTEXT_KIT_BREVITY_CAP=100
 
 # A multi-section set reaches its second element, and the non-bold bullet there
 # is measured and named by section, line and opening text.
 check_case "second-section-non-bold-bullet" 1 "'## Housekeeping' line 9: \`scratch/\` is a plain bullet" two.md \
-    CONTEXT_KIT_KNOB_FILE="$SANDBOX/two-cfg.knobs"
+    CONTEXT_KIT_KNOB_FILE="$SANDBOX/two-cfg.knobs" CONTEXT_KIT_BREVITY_CAP=100
 
 # One unmatched element refuses the whole set, naming that element — the resolved
 # sibling must not report the rest clean.
@@ -144,9 +157,17 @@ check_case "empty-set-fails-closed" 2 "CONTEXT_KIT_BREVITY_SECTIONS is empty" tw
 check_case "retired-scalar-knob-refused" 2 "set CONTEXT_KIT_BREVITY_SECTIONS" two.md \
     CONTEXT_KIT_KNOB_FILE="$SANDBOX/retired-cfg.knobs"
 
+# The retired line budget refuses rather than being silently ignored, naming the code-point cap.
+check_case "retired-line-budget-refused" 2 "set CONTEXT_KIT_BREVITY_CAP" two.md \
+    CONTEXT_KIT_KNOB_FILE="$SANDBOX/retired-budget-cfg.knobs"
+
+# A one-line bullet over the cap reds exactly as its wrapped form would.
+check_case "joined-bullet-still-measured" 1 "Joined" joined.md \
+    CONTEXT_KIT_KNOB_FILE="$SANDBOX/noop-cfg.knobs" CONTEXT_KIT_BREVITY_CAP=100
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-brevity.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-brevity.test.sh: clean (unmatched default + unmatched config + one unmatched element + empty set + retired knob exit 2, bulletless match clean, repointed knob sees the hidden bullet, second section's non-bold bullet seen, repeated element scanned once, 9 cases)"
+echo "check-brevity.test.sh: clean (unmatched default + unmatched config + one unmatched element + empty set + retired knob exit 2, bulletless match clean, repointed knob sees the hidden bullet, second section's non-bold bullet seen, repeated element scanned once, retired line budget exit 2, joined bullet still measured, 11 cases)"
 exit 0

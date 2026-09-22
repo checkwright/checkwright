@@ -14,6 +14,7 @@ pub const CLASSES: &[&str] = &[
     "observed-by:",
     "cost:",
     "surface:",
+    "cap-credit:",
 ];
 
 // spec: queue-kit/SPEC.md §check-tag-lead-line — the terminator strip, held once in the module

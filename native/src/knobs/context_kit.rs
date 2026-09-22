@@ -66,7 +66,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("CONTEXT_KIT_MEMORY_DIRS", "").words(),
         Row::scalar("CONTEXT_KIT_BREVITY_FILE", "CLAUDE.md"),
         Row::indexed("CONTEXT_KIT_BREVITY_SECTIONS", &["## Shared conventions"]),
-        Row::scalar("CONTEXT_KIT_BREVITY_BUDGET", "4"),
+        Row::scalar("CONTEXT_KIT_BREVITY_CAP", "330"),
         Row::scalar("CONTEXT_KIT_BREVITY_POINTER_RE", "§"),
         Row::indexed("CONTEXT_KIT_SURFACES", &["CLAUDE.md"]),
         Row::indexed("CONTEXT_KIT_GROWTH_PATHS", &["*.md"]),
@@ -91,12 +91,15 @@ pub const KIT: Kit = Kit {
     validate: Some(("context config", validate)),
     open_family: false,
     families: &[],
-    retired: &[("CONTEXT_KIT_BREVITY_SECTION", "CONTEXT_KIT_BREVITY_SECTIONS")],
+    retired: &[
+        ("CONTEXT_KIT_BREVITY_SECTION", "CONTEXT_KIT_BREVITY_SECTIONS"),
+        ("CONTEXT_KIT_BREVITY_BUDGET", "CONTEXT_KIT_BREVITY_CAP"),
+    ],
     env_only: &[],
 };
 
 // spec: context-kit/SPEC.md §Layout and configuration — a broken context config gates nothing:
-// emptiness, the budget's integer shape, and a settings file a consumer set to a path that is absent
+// emptiness, the cap's positive-integer shape, and a settings file a consumer set to a path that is absent
 fn validate(v: &Values) -> Vec<String> {
     let mut errs: Vec<String> = Vec::new();
     for n in ["CONTEXT_KIT_SETTINGS_FILE", "CONTEXT_KIT_SETTINGS_PINS", "CONTEXT_KIT_BREVITY_FILE"] {
@@ -105,9 +108,9 @@ fn validate(v: &Values) -> Vec<String> {
         }
     }
     errs.extend(set_but_missing(v, "CONTEXT_KIT_SETTINGS_FILE"));
-    if let Some(b) = scalar(v, "CONTEXT_KIT_BREVITY_BUDGET") {
-        if b.is_empty() || !b.bytes().all(|c| c.is_ascii_digit()) {
-            errs.push(format!("CONTEXT_KIT_BREVITY_BUDGET must be an integer (got '{}')", b));
+    if let Some(b) = scalar(v, "CONTEXT_KIT_BREVITY_CAP") {
+        if b.is_empty() || !b.bytes().all(|c| c.is_ascii_digit()) || b.bytes().all(|c| c == b'0') {
+            errs.push(format!("CONTEXT_KIT_BREVITY_CAP must be a positive integer of code points (got '{}')", b));
         }
     }
     errs

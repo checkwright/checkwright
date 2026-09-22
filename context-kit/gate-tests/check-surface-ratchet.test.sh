@@ -29,8 +29,9 @@ EOF
 
 cfg absent            # no .txt written at all
 cfg unparsable && printf '# contract: x\nnot-a-number CLAUDE.md\n' >"$SANDBOX/unparsable.txt"
-cfg sized && printf '# contract: x\n2 %s\n' "$SANDBOX/CLAUDE.md" >"$SANDBOX/sized.txt"
-cfg narrowed && printf '# contract: x\n2 %s\n99 %s/gone.md\n' "$SANDBOX/CLAUDE.md" "$SANDBOX" >"$SANDBOX/narrowed.txt"
+cfg sized && printf '# contract: x\n7cp %s\n' "$SANDBOX/CLAUDE.md" >"$SANDBOX/sized.txt"
+cfg narrowed && printf '# contract: x\n7cp %s\n99cp %s/gone.md\n' "$SANDBOX/CLAUDE.md" "$SANDBOX" >"$SANDBOX/narrowed.txt"
+cfg legacy && printf '# contract: x\n2 %s\n' "$SANDBOX/CLAUDE.md" >"$SANDBOX/legacy.txt"
 
 check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4=config-name
     local label="$1" want="$2" sub="$3" name="$4"
@@ -55,7 +56,11 @@ check_case "absent-ceiling-file-fails-closed" 2 "cannot read the ceiling file" a
 # dropping it would leave exactly that surface silently ungoverned.
 check_case "unparsable-row-fails-closed" 2 "unparsable ceiling row" unparsable
 
-# The floor the two refusals sit on: a well-formed file over a surface at its
+# A row in the retired line unit carries no code-point figure, so it is refused with the re-stamp
+# named rather than compared as if its number were code points.
+check_case "line-unit-row-fails-closed" 2 "--emit always-loaded --ceiling" legacy
+
+# The floor the refusals sit on: a well-formed file over a surface at its
 # ceiling is clean, so the exit 2s above are the grammar failing and not the rule.
 check_case "well-formed-ceiling-is-clean" 0 "SURFACE-RATCHET: clean (1 governed file" sized
 
@@ -67,5 +72,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-surface-ratchet.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-surface-ratchet.test.sh: clean (absent file + unparsable row exit 2, well-formed file clean, stale row ignored, 4 cases)"
+echo "check-surface-ratchet.test.sh: clean (absent file, unparsable row and line-unit row exit 2, well-formed file clean, stale row ignored, 5 cases)"
 exit 0

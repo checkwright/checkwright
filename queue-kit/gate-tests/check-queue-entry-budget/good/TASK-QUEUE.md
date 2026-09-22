@@ -23,23 +23,21 @@
   **Cost while deferred — bounded:** one stale paragraph, no gate gap.
   Filed 2026-01-02 by scope.
 
-- **zeta-idea** — seven extent lines against a six-line cap,
-  and the sole excess is the machine-written declaration below, which the
-  count discounts one of per entry.
+- **zeta-idea** — over the cap only by the machine-written
+  declaration below, which the size discounts one of per entry.
   recurrence: zeta-idea 2026-01-03 2026-01-09
   **Cost while deferred:** low — the discount is what keeps this filing legible.
   Filed 2026-01-03 by scope.
 
-- **theta-idea** — seven extent lines against the same cap, with
-  its ruling's provenance stated inline — ruled 2026-01-05 (operator, relay) —
-  rather than as a declaration line, so only the recurrence line is discounted
-  and the entry lands exactly on the cap.
+- **theta-idea** — its ruling's provenance stated inline —
+  ruled 2026-01-05 (operator, relay) — rather than as a declaration line, so
+  only the recurrence line is discounted and the entry lands exactly on the cap.
   recurrence: theta-idea 2026-01-05
   **Cost while deferred:** low. Filed 2026-01-05 by close.
 
-- **iota-idea** — seven extent lines against the same cap, one
-  of them the standing-exclusion declaration below, which the count discounts
-  as it discounts a recurrence line, so the entry lands exactly on the cap.
+- **iota-idea** — one of its lines the standing-exclusion
+  declaration below, which the size discounts as it discounts a recurrence
+  line, so the entry stays within the cap.
   not-icebox-eligible: iota-idea 2026-01-07 a recorded decision keeps it deferred
   **Cost while deferred:** low.
   Filed 2026-01-07 by close.
@@ -47,6 +45,12 @@
 - **kappa-idea** — dated by its premise mark alone, with no provenance line.
   **Cost while deferred:** low.
   Surfaced 2026-01-08 at build.
+
+- **lambda-idea** [cap-credit: +100cp 2026-01-10 lead compressing it would drop a measured ground] — over the
+  cap and within its granted credit: the grant is recorded on the entry, bounded
+  by the credit knob, and would go red as stale the moment the entry fits the
+  cap without it.
+  **Cost while deferred:** low. Filed 2026-01-10 by close.
 
 ## Icebox
 

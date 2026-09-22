@@ -1,6 +1,7 @@
 // spec: queue-kit/SPEC.md §The queue-index arm — the compact queue surface for task selection.
 // Three modes on one arm, selected from the arm's own argv tail rather than from three arms:
 // the emitter type is defined over an argv slice precisely so a mode rides as a flag.
+use crate::gates::queue_entry_budget;
 use crate::queue::{self, is_top_level_bullet, Sections};
 
 const TITLE_CAP: usize = 64;
@@ -491,7 +492,14 @@ struct Pending {
     body: String,
 }
 
-fn flush(p: &mut Option<Pending>, at: usize, cutoff: &str, live: &[String], out: &mut String) {
+// spec: queue-kit/SPEC.md §The queue-index arm — each deferred entry's size in the cap's unit, as
+// the budget gate's own walk measures it, keyed by lead line
+struct Sizes {
+    unit: queue::Unit,
+    by_start: std::collections::HashMap<usize, usize>,
+}
+
+fn flush(p: &mut Option<Pending>, sizes: &Sizes, cutoff: &str, live: &[String], out: &mut String) {
     let Some(e) = p.take() else { return };
     let d = e.marks.defer_date().unwrap_or("");
     let dated_in = d.is_empty() || d < cutoff;
@@ -509,10 +517,10 @@ fn flush(p: &mut Option<Pending>, at: usize, cutoff: &str, live: &[String], out:
             }
         };
         out.push_str(&format!(
-            "{} {:<46} {:>4}l  {:<11} {}\n",
+            "{} {:<46} {:>9}  {:<11} {}\n",
             mark,
             e.slug,
-            at - e.start,
+            format!("{}{}", sizes.by_start.get(&e.start).copied().unwrap_or(0), sizes.unit.suffix()),
             shown_date,
             tail
         ));
@@ -531,15 +539,22 @@ fn candidates(text: &str) -> Result<String, String> {
     let sec_cfg = Sections::active_and_deferred()?;
     let cutoff = age_cutoff()?;
     let live = queue::live_slugs(text, &sec_cfg);
+    let unit = queue_entry_budget::display_unit(queue_entry_budget::cap()?);
+    let sizes = Sizes {
+        unit,
+        by_start: queue_entry_budget::walk(text, &sec_cfg)
+            .entries
+            .iter()
+            .map(|e| (e.start, e.size(unit)))
+            .collect(),
+    };
     let mut out = String::new();
     let mut in_deferred = false;
     let mut pending: Option<Pending> = None;
-    let mut n = 0usize;
-
     for (i, line) in text.lines().enumerate() {
-        n = i + 1;
+        let n = i + 1;
         if queue::is_section_line(line) {
-            flush(&mut pending, n, &cutoff, &live, &mut out);
+            flush(&mut pending, &sizes, &cutoff, &live, &mut out);
             in_deferred = sec_cfg.is_deferred(line);
             continue;
         }
@@ -547,7 +562,7 @@ fn candidates(text: &str) -> Result<String, String> {
             continue;
         }
         if let Some(slug) = queue::bullet_slug(line) {
-            flush(&mut pending, n, &cutoff, &live, &mut out);
+            flush(&mut pending, &sizes, &cutoff, &live, &mut out);
             pending = Some(Pending {
                 slug: slug.to_string(),
                 start: n,
@@ -563,7 +578,7 @@ fn candidates(text: &str) -> Result<String, String> {
         e.body.push('\n');
         e.marks.observe(line);
     }
-    flush(&mut pending, n + 1, &cutoff, &live, &mut out);
+    flush(&mut pending, &sizes, &cutoff, &live, &mut out);
     Ok(out)
 }
 

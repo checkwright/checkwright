@@ -23,12 +23,12 @@ pub fn run(ctx: &Ctx, trend: bool) -> Option<String> {
         let mark = if m.stale() { " stale" } else { "" };
         return Some(match m.base_total {
             Some(base) => format!(
-                "loaded {}l {:+}{}\n",
+                "loaded {}cp {:+}{}\n",
                 m.total,
                 m.total as i64 - base as i64,
                 mark
             ),
-            None => format!("loaded {}l{}\n", m.total, mark),
+            None => format!("loaded {}cp{}\n", m.total, mark),
         });
     }
     Some(format!(

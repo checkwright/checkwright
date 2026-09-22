@@ -720,8 +720,7 @@ nothing unbidden.
 
 ## The always-loaded meter
 
-The meter measures the standing surface: the summed line
-count of the configured surface files (default `CLAUDE.md`) plus the
+The meter measures the standing surface: the summed code-point count of the configured surface files — each non-blank line trimmed, plus one per break between two of them, the count queue-kit/SPEC.md §check-queue-entry-budget defines, so a reflow moves nothing — (default `CLAUDE.md`) plus the
 steady-state hook body, approximated by the configured hook-body command
 (default: queue-kit's `queue-index` arm through the battery runner's `--emit`
 front-end, `--collapse-deferred`, when resolvable). The approximation is deliberate: the meter must never run the
@@ -801,8 +800,8 @@ stdout is counted whatever its exit status.
   refusal shape gate-sdk/SPEC.md §The non-gate arm rules for this class: a
   confirmation line reporting a rewrite that did not happen is worse than none.
 - **`--growth`** prints the brevity pass's other worklist: a header with the
-  count of files that grew and their net lines, then one row per governed
-  prose file whose net line growth is positive, largest first, over the
+  count of files that grew and their net code points, then one row per governed
+  prose file whose net code-point growth is positive, largest first, over the
   pathspecs in `CONTEXT_KIT_GROWTH_PATHS`. It measures from lifecycle-kit's
   **iteration-start commit** (lifecycle-kit/SPEC.md §The state machine), read
   through that section's shared crate read on `CONTEXT_KIT_STATE_FILE`. So the
@@ -816,7 +815,7 @@ stdout is counted whatever its exit status.
 - **Baseline file** (`${GATE_SDK_WORKFLOW_DIR:-.workflow}/`
   `always-loaded-baseline.txt`, committed): a `# contract:` header
   pointing here, then one data line
-  `<total-lines> <surface-lines> <baseline-commit>`. Trailing extra
+  `<total>cp <surface>cp <baseline-commit>`. **A row whose figures carry no `cp` suffix is a line-unit row from before the re-unit**: the bare reading then prints `baseline in retired line unit — re-stamp with --update-baseline` in place of a delta and exits 0, so the discontinuity is recorded where the reader meets it, never as a phantom fall, and the stale mark stays silent until the re-stamp. Trailing extra
   fields are tolerated and preserved-ignored — a consumer's file may carry
   a fourth (a settings-local count, say, a guard-kit-adjacent KPI owned by
   its drift report), and the kit reads such a file unchanged. The baseline is
@@ -851,7 +850,7 @@ Each kit is measured in the always-loaded and load-triggered tiers:
   `templates/` tree, pulled into context only when its trigger fires. Gate-test
   fixtures sit outside `templates/`, so they never enter the count.
 
-**Numbers ruling.** Line counts are exact. The token column is a
+**Numbers ruling.** Code-point counts are exact, each tier counted with the meter's measure, and the cell reads `<n>cp · ~<t>t`. The token column is a
 *labeled estimate* — a bytes/4 heuristic, carried with a leading `~` and stated
 inline as model-tokenizer-dependent, never a false-precision figure.
 
@@ -895,7 +894,7 @@ stale page.
 are a knob, so no section name binds the gate (a consumer's
 `check-convention-brevity` would be its section-specific counterpart). It scans one designated
 always-loaded file for a **set** of bulleted sections (`CONTEXT_KIT_BREVITY_SECTIONS`) where
-every top-level `- ` list item carries a line budget, and flags a bullet that is **over budget
+every top-level `- ` list item carries a code-point budget, and flags a bullet that is **over budget
 and cites a deeper doc** (carries a `§` pointer) — over-long while admitting its
 detail already has a home elsewhere. Under-budget bullets and over-budget
 bullets with no pointer pass (the latter may genuinely own their content);
@@ -903,16 +902,16 @@ bullets with no pointer pass (the latter may genuinely own their content);
 above blesses a bullet whose every line is load-bearing.
 
 **The item.** A bullet is a top-level `- ` item and its extent runs to the next
-one or the section's end, so an indented item belongs to its parent. A bold name
+one or the section's end, so an indented item belongs to its parent, and its size is the meter's code-point count over that extent. A bold name
 is not required: a restating bullet on the always-loaded tier is as costly whether
 or not it opens in bold, and a predicate reading only `- **` items left most of a
 consumer's housekeeping-shaped sections outside the gate. The span is measured to
-the bullet's last line carrying content. The predicate is the member's own
+the bullet's last line carrying content, so a trailing blank adds nothing. The predicate is the member's own
 argument to the shared section-walking primitive, which
 `check-doctrine-registration` calls with its own, so widening it moves no other
 gate's walk.
 
-**The finding line** names each over-budget bullet by its governed section, its
+**The finding line** reports the bullet's size in code points and names each over-budget bullet by its governed section, its
 line number in the file and its lead — the bold run where the bullet opens with
 one, else the opening characters of its lead line, cut on a character — because
 a bullet with no bold name has nothing else to print, and a finding naming only
@@ -933,7 +932,7 @@ empty default means *no load-triggered surface*, an empty brevity set has no
 reading. A **repeated element is scanned once**, so a duplicated heading in config
 cannot double a finding or the clean line's count.
 
-**One budget for the set.** `CONTEXT_KIT_BREVITY_BUDGET` is a scalar. A
+**One budget for the set.** `CONTEXT_KIT_BREVITY_CAP` is a scalar. A
 per-section budget has no reader while no governed section wants a different
 value, so it is not a field; a consumer that attests one reopens it.
 
@@ -945,12 +944,7 @@ consumer's `gates.list` (this repo's included).
 
 **Two honest limits.**
 
-- **The unit is the physical line.** A bullet joined onto one long line passes
-  any budget. The always-loaded meter and the surface ratchet measure the same
-  unit, so the context apparatus measures one quantity and a joined line lowers
-  all three together; a width-aware span would diverge from both. A cut made to
-  satisfy this gate holds the bullet's own prevailing wrap — no line wider than
-  the widest it already had — rather than buying its budget by joining lines.
+- **The unit is the code point.** A bullet is measured the way the meter measures a surface, so joining or wrapping its lines moves nothing, and the apparatus still measures one quantity.
 - **The pointer conjunct reads `§` by default**, so a bullet pointing at a
   document by path alone passes on it. `CONTEXT_KIT_BREVITY_POINTER_RE` is the
   consumer's lever; widening it to a path pattern also matches a bullet whose
@@ -965,15 +959,15 @@ the gate's grammar.
 `check-surface-ratchet` — no governed surface above its committed ceiling.
 
 - **Governed:** `CONTEXT_KIT_SURFACES`, plus tracked files matching
-  `CONTEXT_KIT_RATCHET_PATHS`; size = newline count, the meter's measure.
+  `CONTEXT_KIT_RATCHET_PATHS`; size = the meter's code-point count.
 - **Ceilings:** `CONTEXT_KIT_CEILING_FILE` — a `# contract:` header, then
-  `<lines> <path>` per governed file, sorted by path.
+  `<n>cp <path>` per governed file, sorted by path.
 - **Red:** a file above its row, or a governed file with no row (a new surface
   grows from nothing). The report names file, size and ceiling, and prints
   `--emit always-loaded --ceiling`, committed with the growth.
 - **Clean:** otherwise. A row for a deleted or ungoverned file is ignored, so
   narrowing never reds.
-- **Exit 2:** ceiling file absent, a row unparsable, a knob unresolved.
+- **Exit 2:** ceiling file absent, a row unparsable, a row without the `cp` suffix (a line-unit row, the message naming `--emit always-loaded --ceiling` as the re-stamp), a knob unresolved.
 - **Writers:** never the gate — `--ceiling` in the growing commit,
   `--update-baseline` at close where the file exists.
 - **Why a ratchet:** no budget to calibrate; growth shows in the commit that
@@ -1093,7 +1087,7 @@ ask adds its row below, which is the review seam:
 (§The always-loaded meter) ship as the consumer's floor-holder: the consumer
 install (§Layout and configuration) seeds `always-loaded-baseline.txt`, so
 growth of the resident surface is a visible delta at every close-stage brevity
-pass. The hold is *advisory by design*. A hard total-line gate cannot attribute
+pass. The hold is *advisory by design*. A hard total-size gate cannot attribute
 growth — the consumer's own content shares the file and is theirs to grow — so
 a level gate would be a noisy check breeding exemptions, the high-false-positive
 case the enforcement-first rule sanctions for keeping a class as stated manual
@@ -1457,7 +1451,7 @@ retired `CONTEXT_KIT_CONFIG_FILE`, a retired knob name — are gate-sdk/SPEC.md 
 knob file's. The kit's table validator refuses a malformed context config at exit 2
 with every finding — a broken config must not gate anything: an empty
 `CONTEXT_KIT_SETTINGS_FILE`, `CONTEXT_KIT_SETTINGS_PINS` or
-`CONTEXT_KIT_BREVITY_FILE`, a non-integer `CONTEXT_KIT_BREVITY_BUDGET`, and the
+`CONTEXT_KIT_BREVITY_FILE`, a `CONTEXT_KIT_BREVITY_CAP` that is not a positive integer, and the
 set-but-missing settings file below. A derived default below names the knob it reads as `${NAME}`, or as `${NAME:-<default>}` so the roster's rendered literal reads as agreement. Knobs:
 
 - `CONTEXT_KIT_SURFACES` — array of always-loaded files; default
@@ -1488,7 +1482,7 @@ set-but-missing settings file below. A derived default below names the knob it r
 - `CONTEXT_KIT_PUB_LANG_DIR` — the consumer extractor dir searched before the
   arm's built-in roster (a same-basename file shadows the shipped grammar);
   default `${GATE_SDK_GATES_DIR}/pub-lang`.
-- `CONTEXT_KIT_HOOK_CMD` — the command whose output line count approximates the
+- `CONTEXT_KIT_HOOK_CMD` — the command whose output code-point count approximates the
   steady-state hook body (§The always-loaded meter). A **command knob**: an
   indexed argv, one `CONTEXT_KIT_HOOK_CMD[] = word` line per element, spawned
   directly with no shell, and taking no environment override; a command that needs
@@ -1572,7 +1566,7 @@ set-but-missing settings file below. A derived default below names the knob it r
   Without the refusal a config still setting it would be silently ignored while a
   file carrying `## Shared conventions` was governed on the wrong section at exit 0
   (the retired `GATE_SDK_GRAPH_THEME` precedent, gate-sdk/SPEC.md §check-graph).
-- `CONTEXT_KIT_BREVITY_BUDGET` — lines per bullet; default `4`.
+- `CONTEXT_KIT_BREVITY_CAP` — code points per bullet, a positive integer; default `330`. Every governed bullet a four-line budget admitted with a pointer measured at most 327 code points on a real resident file, so the re-unit keeps the bound. The retired `CONTEXT_KIT_BREVITY_BUDGET` (lines per bullet) is refused at exit 2 naming this knob.
 - `CONTEXT_KIT_BREVITY_POINTER_RE` — the "cites a deeper doc" pattern;
   default `§`.
 - `CONTEXT_KIT_SETTINGS_FILE` — the tracked harness settings file

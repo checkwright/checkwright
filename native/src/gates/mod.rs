@@ -324,7 +324,8 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &[
             "QUEUE_KIT_QUEUE_FILE",
-            "QUEUE_KIT_ENTRY_LINE_CAP",
+            "QUEUE_KIT_ENTRY_CAP",
+            "QUEUE_KIT_ENTRY_CREDIT_MAX",
             "QUEUE_KIT_ACTIVE_SECTIONS",
             "QUEUE_KIT_DEFERRED_SECTION",
             "QUEUE_KIT_ICEBOX_SECTION",
@@ -1602,7 +1603,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &[
             "CONTEXT_KIT_BREVITY_FILE",
-            "CONTEXT_KIT_BREVITY_BUDGET",
+            "CONTEXT_KIT_BREVITY_CAP",
             "CONTEXT_KIT_BREVITY_SECTIONS",
             "CONTEXT_KIT_BREVITY_POINTER_RE",
         ],

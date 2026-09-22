@@ -2,6 +2,7 @@
 // the committed baseline. Two levels: `measure` produces the figures and `emit` renders the three
 // modes over them, which is what lets `kpi-always-loaded` read them as data (§bin/footprint).
 use crate::{proc, programs};
+use crate::section;
 use crate::stages;
 use crate::walk;
 
@@ -37,6 +38,7 @@ pub struct Measurement {
     pub base_surface: Option<u64>,
     pub start_commit: String,
     pub start_surface: Option<u64>,
+    pub legacy: bool,
 }
 
 impl Measurement {
@@ -81,14 +83,27 @@ struct Row {
     extra: String,
 }
 
-// spec: context-kit/SPEC.md §The always-loaded meter — `^[0-9]+$`: a field that is not a bare
-// non-negative integer carries no figure, rather than one read off a partial parse.
+fn digits(field: &str) -> bool {
+    !field.is_empty() && field.bytes().all(|c| c.is_ascii_digit())
+}
+
+// spec: context-kit/SPEC.md §The always-loaded meter — `^[0-9]+cp$`: a field that is not a
+// non-negative code-point figure carries no figure, rather than one read off a partial parse.
 fn count(field: &str) -> Option<u64> {
-    if !field.is_empty() && field.bytes().all(|c| c.is_ascii_digit()) {
-        field.parse::<u64>().ok()
-    } else {
-        None
-    }
+    field.strip_suffix("cp").filter(|d| digits(d)).and_then(|d| d.parse::<u64>().ok())
+}
+
+// spec: context-kit/SPEC.md §The always-loaded meter — a figure with no `cp` suffix is a line-unit
+// row from before the re-unit: the discontinuity is read where the reader meets it
+fn legacy(field: &str) -> bool {
+    digits(field)
+}
+
+// spec: context-kit/SPEC.md §The always-loaded meter — the meter's measure, shared with the
+// ratchet: the code-point count of the text (section::cp_size), so a reflow moves nothing
+pub fn cp_of(b: &[u8]) -> u64 {
+    let text = String::from_utf8_lossy(b);
+    section::cp_size(text.lines()) as u64
 }
 
 // spec: context-kit/SPEC.md §The always-loaded meter — the baseline row is the file's first line
@@ -107,9 +122,9 @@ fn baseline_row(path: &str) -> Option<Row> {
 }
 
 // spec: context-kit/SPEC.md §The always-loaded meter — the hook body is measured by running
-// whatever command the knob names, through `bash -c`, and counting the lines it wrote: the knob is
-// a consumer command seam, so the spawn is the contract rather than an implementation detail.
-fn hook_lines(argv: &[String]) -> u64 {
+// whatever command the knob names and counting the code points it wrote: the knob is a consumer
+// command seam, so the spawn is the contract rather than an implementation detail.
+fn hook_cp(argv: &[String]) -> u64 {
     let Some((program, rest)) = argv.split_first() else {
         return 0;
     };
@@ -122,12 +137,7 @@ fn hook_lines(argv: &[String]) -> u64 {
         // a failing command that still printed is counted on what it printed.
         Err(_) => return 0,
     };
-    let text = String::from_utf8_lossy(out.stdout()).into_owned();
-    let body = text.trim_end_matches('\n');
-    if body.is_empty() {
-        return 0;
-    }
-    body.matches('\n').count() as u64 + 1
+    cp_of(out.stdout())
 }
 
 // spec: context-kit/SPEC.md §The surface ratchet — the governed set is the configured surfaces plus
@@ -150,24 +160,24 @@ pub fn governed() -> Result<Vec<(String, u64)>, String> {
     }
     paths.sort();
     paths.dedup();
-    // spec: context-kit/SPEC.md §The surface ratchet — size is the newline count, the meter's own
-    // measure; a governed name that is not a readable file contributes nothing, which is what
-    // `measure` above does with an absent surface.
+    // spec: context-kit/SPEC.md §The surface ratchet — size is the meter's code-point count; a
+    // governed name that is not a readable file contributes nothing, as `measure` does with an
+    // absent surface.
     let mut out: Vec<(String, u64)> = Vec::new();
     for p in paths {
         if p.is_empty() || !std::path::Path::new(&p).is_file() {
             continue;
         }
         if let Ok(b) = std::fs::read(&p) {
-            out.push((p, b.iter().filter(|&&c| c == b'\n').count() as u64));
+            out.push((p, cp_of(&b)));
         }
     }
     Ok(out)
 }
 
-// spec: context-kit/SPEC.md §The surface ratchet — the ceiling file: a `# contract:` header, then
-// `<lines> <path>` per governed file. An unparsable row is exit 2 for every reader, because a row
-// silently dropped is a surface silently ungoverned.
+// spec: context-kit/SPEC.md §The surface ratchet — the ceiling file: `<n>cp <path>` rows under a
+// `# contract:` header; an unparsable or line-unit row is exit 2, since a dropped row is a surface
+// silently ungoverned
 pub fn ceiling_rows(path: &str) -> Result<Vec<(u64, String)>, String> {
     let text = std::fs::read_to_string(path)
         .map_err(|e| format!("cannot read the ceiling file {}: {}", path, e))?;
@@ -180,7 +190,16 @@ pub fn ceiling_rows(path: &str) -> Result<Vec<(u64, String)>, String> {
         let bad = || format!("{}:{}: unparsable ceiling row: {}", path, n + 1, t);
         let (size, rest) = t.split_at(t.find([' ', '\t']).ok_or_else(bad)?);
         let file = trim_space(rest);
-        let size: u64 = size.parse().map_err(|_| bad())?;
+        if legacy(size) {
+            return Err(format!(
+                "{}:{}: ceiling row in the retired line unit: {} — re-stamp with \
+                 `bash gate-sdk/bin/run-gates.sh --emit always-loaded --ceiling`",
+                path,
+                n + 1,
+                t
+            ));
+        }
+        let size: u64 = count(size).ok_or_else(bad)?;
         if file.is_empty() {
             return Err(bad());
         }
@@ -196,8 +215,8 @@ pub fn write_ceiling(path: &str) -> Result<String, String> {
     let rows = governed()?;
     let mut body = String::from(CEILING_HEADER);
     body.push('\n');
-    for (file, lines) in &rows {
-        body.push_str(&format!("{} {}\n", lines, file));
+    for (file, size) in &rows {
+        body.push_str(&format!("{}cp {}\n", size, file));
     }
     std::fs::write(path, body).map_err(|e| format!("cannot write {}: {}", path, e))?;
     Ok(format!(
@@ -205,10 +224,6 @@ pub fn write_ceiling(path: &str) -> Result<String, String> {
         rows.len(),
         path
     ))
-}
-
-fn newlines(b: &[u8]) -> u64 {
-    b.iter().filter(|&&c| c == b'\n').count() as u64
 }
 
 // spec: context-kit/SPEC.md §The always-loaded meter — the surfaces' size at a past commit, one
@@ -219,7 +234,7 @@ fn surface_at(commit: &str, surfaces: &[String]) -> u64 {
         .filter_map(|p| {
             proc::run(&programs::GIT, &["show", &format!("{}:{}", commit, p)])
                 .ok()
-                .and_then(|c| c.stdout().map(newlines))
+                .and_then(|c| c.stdout().map(cp_of))
         })
         .sum()
 }
@@ -234,10 +249,10 @@ pub fn measure(start: &str) -> Result<Measurement, String> {
             continue;
         }
         if let Ok(b) = std::fs::read(f) {
-            surface += newlines(&b);
+            surface += cp_of(&b);
         }
     }
-    let hook = hook_lines(&walk::knob_array("CONTEXT_KIT_HOOK_CMD")?);
+    let hook = hook_cp(&walk::knob_array("CONTEXT_KIT_HOOK_CMD")?);
     let row = baseline_row(&walk::knob_scalar("CONTEXT_KIT_BASELINE_FILE")?);
     let start_surface = if start.is_empty() {
         None
@@ -253,6 +268,7 @@ pub fn measure(start: &str) -> Result<Measurement, String> {
         base_surface: row.as_ref().and_then(|r| count(&r.surface)),
         start_commit: start.to_string(),
         start_surface,
+        legacy: row.as_ref().is_some_and(|r| legacy(&r.total)),
     })
 }
 
@@ -266,7 +282,7 @@ fn short(commit: &str) -> String {
 // bare line and the update mode's confirmation so the two cannot render one figure two ways.
 fn parts(m: &Measurement) -> String {
     format!(
-        "{}l (surfaces {} \u{b7} hook {})",
+        "{}cp (surfaces {}cp \u{b7} hook {}cp)",
         m.total, m.surface, m.hook
     )
 }
@@ -275,6 +291,10 @@ fn parts(m: &Measurement) -> String {
 // commit the line must stay byte-identical to the baseline-only reading.
 pub fn line(m: &Measurement) -> String {
     let mut out = match m.base_total {
+        _ if m.legacy => format!(
+            "{}  baseline in retired line unit \u{2014} re-stamp with --update-baseline",
+            parts(m)
+        ),
         Some(base) => format!(
             "{}  {:+} since {}",
             parts(m),
@@ -310,41 +330,43 @@ fn growth(m: &Measurement, baseline_file: &str) -> Result<String, String> {
         (m.base_commit.as_str(), short(&m.base_commit))
     };
     let paths = walk::knob_array("CONTEXT_KIT_GROWTH_PATHS")?;
-    let mut args: Vec<&str> = vec!["diff", "--numstat", from, "--"];
+    let mut args: Vec<&str> = vec!["diff", "--name-only", "--no-renames", from, "--"];
     args.extend(paths.iter().map(String::as_str));
-    let numstat = proc::run(&programs::GIT, &args)
+    let changed = proc::run(&programs::GIT, &args)
         .ok()
         .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))
         .unwrap_or_default();
+    // spec: context-kit/SPEC.md §The always-loaded meter — net growth is the file's code-point size
+    // now less its size at the start commit, a path absent on either side counting zero
     let mut rows: Vec<(i64, String)> = Vec::new();
-    for l in numstat.lines() {
-        let f: Vec<&str> = l.split('\t').collect();
-        if f.len() < 3 || f[0] == "-" {
-            continue;
-        }
-        let net = f[0].parse::<i64>().unwrap_or(0) - f[1].parse::<i64>().unwrap_or(0);
-        if net > 0 {
-            rows.push((net, f[2].to_string()));
+    for f in changed.lines().filter(|l| !l.is_empty()) {
+        let now = std::fs::read(f).map_or(0, |b| cp_of(&b)) as i64;
+        let then = proc::run(&programs::GIT, &["show", &format!("{}:{}", from, f)])
+            .ok()
+            .and_then(|c| c.stdout().map(cp_of))
+            .unwrap_or(0) as i64;
+        if now > then {
+            rows.push((now - then, f.to_string()));
         }
     }
     rows.sort_by(|a, b| b.0.cmp(&a.0).then_with(|| b.1.cmp(&a.1)));
     let net: i64 = rows.iter().map(|(d, _)| d).sum();
     let mut out = format!(
-        "growth since {}: {} file(s) grew, +{} net line(s)\n",
+        "growth since {}: {} file(s) grew, +{}cp net\n",
         label,
         rows.len(),
         net
     );
     if let (true, Some(b), Some(s)) = (m.stale(), m.base_surface, m.start_surface) {
         out.push_str(&format!(
-            "baseline {} is stale: its surfaces count {}, the iteration opened at {} \u{2014} re-stamp with --update-baseline at close\n",
+            "baseline {} is stale: its surfaces count {}cp, the iteration opened at {}cp \u{2014} re-stamp with --update-baseline at close\n",
             short(&m.base_commit),
             b,
             s
         ));
     }
     for (d, f) in &rows {
-        out.push_str(&format!("  +{}\t{}\n", d, f));
+        out.push_str(&format!("  +{}cp\t{}\n", d, f));
     }
     Ok(out)
 }
@@ -367,7 +389,7 @@ fn update_baseline(m: &Measurement, baseline_file: &str) -> Result<String, Strin
         .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string()))
         .unwrap_or_else(|| "unknown".to_string());
     let extra = baseline_row(baseline_file).map_or(String::new(), |r| r.extra);
-    let mut row = format!("{} {} {}", m.total, m.surface, commit);
+    let mut row = format!("{}cp {}cp {}", m.total, m.surface, commit);
     if !extra.is_empty() {
         row.push(' ');
         row.push_str(&extra);
@@ -454,7 +476,7 @@ mod tests {
         let path = dir.join("surface-ceiling.txt");
         let p = path.to_string_lossy().to_string();
 
-        std::fs::write(&path, format!("{}\n\n194 CLAUDE.md\n 40\tkit/templates/a.md \n", CEILING_HEADER))
+        std::fs::write(&path, format!("{}\n\n194cp CLAUDE.md\n 40cp\tkit/templates/a.md \n", CEILING_HEADER))
             .expect("cannot write the scratch ceiling file");
         assert_eq!(
             ceiling_rows(&p).expect("a well-formed ceiling file was refused"),
@@ -464,13 +486,16 @@ mod tests {
             ]
         );
 
-        for bad in ["CLAUDE.md\n", "x CLAUDE.md\n", "194\n", "194 \n"] {
+        for bad in ["CLAUDE.md\n", "x CLAUDE.md\n", "194cp\n", "194cp \n", "12xcp CLAUDE.md\n"] {
             std::fs::write(&path, format!("{}\n{}", CEILING_HEADER, bad))
                 .expect("cannot write the scratch ceiling file");
             let err = ceiling_rows(&p)
                 .expect_err("an unparsable ceiling row was absorbed rather than refused");
             assert!(err.contains("unparsable"), "the refusal named no cause: {}", err);
         }
+        std::fs::write(&path, format!("{}\n194 CLAUDE.md\n", CEILING_HEADER)).expect("cannot write");
+        let err = ceiling_rows(&p).expect_err("a line-unit ceiling row was read as code points");
+        assert!(err.contains("retired line unit") && err.contains("--ceiling"), "{}", err);
 
         std::fs::remove_dir_all(&dir).ok();
     }
@@ -483,8 +508,8 @@ mod tests {
         let fields = |r: Row| (r.total, r.surface, r.commit, r.extra);
         let s = |v: &str| v.to_string();
         assert_eq!(
-            fields(split_row("213 203 de046195 41 extra")),
-            (s("213"), s("203"), s("de046195"), s("41 extra"))
+            fields(split_row("213cp 203cp de046195 41 extra")),
+            (s("213cp"), s("203cp"), s("de046195"), s("41 extra"))
         );
         assert_eq!(
             fields(split_row("  213   203   de046195  ")),
@@ -494,8 +519,10 @@ mod tests {
             fields(split_row("213 203")),
             (s("213"), s("203"), String::new(), String::new())
         );
-        assert_eq!(count("203"), Some(203));
-        assert_eq!(count("-3"), None);
+        assert_eq!(count("203cp"), Some(203));
+        assert_eq!(count("203"), None);
+        assert!(legacy("203") && !legacy("203cp"));
+        assert_eq!(count("-3cp"), None);
         assert_eq!(count(""), None);
     }
 
@@ -513,11 +540,12 @@ mod tests {
             base_surface: Some(201),
             start_commit: "d57c4fec11".to_string(),
             start_surface: Some(201),
+            legacy: false,
         };
         assert!(!m.stale());
         assert_eq!(
             line(&m),
-            "213l (surfaces 203 \u{b7} hook 10)  +2 since de046195 \u{b7} surfaces +2 since iteration start d57c4fec"
+            "213cp (surfaces 203cp \u{b7} hook 10cp)  +2 since de046195 \u{b7} surfaces +2 since iteration start d57c4fec"
         );
         let m = Measurement {
             base_surface: Some(190),
@@ -526,7 +554,7 @@ mod tests {
         assert!(m.stale());
         assert_eq!(
             line(&m),
-            "213l (surfaces 203 \u{b7} hook 10)  +2 since de046195 \u{b7} surfaces +2 since iteration start d57c4fec (baseline stale)"
+            "213cp (surfaces 203cp \u{b7} hook 10cp)  +2 since de046195 \u{b7} surfaces +2 since iteration start d57c4fec (baseline stale)"
         );
         let m = Measurement {
             base_surface: None,
@@ -548,17 +576,23 @@ mod tests {
             base_surface: Some(1),
             start_commit: String::new(),
             start_surface: None,
+            legacy: false,
         };
-        assert_eq!(line(&m), "213l (surfaces 203 \u{b7} hook 10)  +2 since de046195");
+        assert_eq!(line(&m), "213cp (surfaces 203cp \u{b7} hook 10cp)  +2 since de046195");
         let m = Measurement {
             base_total: None,
             ..m
         };
-        assert_eq!(line(&m), "213l (surfaces 203 \u{b7} hook 10)");
+        assert_eq!(line(&m), "213cp (surfaces 203cp \u{b7} hook 10cp)");
         let m = Measurement {
             base_total: Some(227),
             ..m
         };
-        assert_eq!(line(&m), "213l (surfaces 203 \u{b7} hook 10)  -14 since de046195");
+        assert_eq!(line(&m), "213cp (surfaces 203cp \u{b7} hook 10cp)  -14 since de046195");
+        let m = Measurement { legacy: true, ..m };
+        assert_eq!(
+            line(&m),
+            "213cp (surfaces 203cp \u{b7} hook 10cp)  baseline in retired line unit \u{2014} re-stamp with --update-baseline"
+        );
     }
 }

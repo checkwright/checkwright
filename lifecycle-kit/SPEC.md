@@ -800,7 +800,7 @@ the clause's reader is a human or agent rather than a gate.
   proposed unit set regardless of the standing directive's theme (the pre-emption
   rule, §templates/stages/). Two recorded re-filings is a third incidence of the
   same finding. It is a stated policy with a stated purpose rather than a derived
-  number, and a knob for that reason — `QUEUE_KIT_ENTRY_LINE_CAP`'s posture. The
+  number, and a knob for that reason — `QUEUE_KIT_ENTRY_CAP`'s posture. The
   count it is read against is the date count of the entry's `recurrence:`
   declaration (queue-kit/SPEC.md §The tag algebra owns that grammar). That rule is
   its only reader: queue-kit owns the declaration and reads no threshold,
@@ -839,7 +839,7 @@ the clause's reader is a human or agent rather than a gate.
   name. Empty makes close's review step and `check-audit-roster` inert.
 - `LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP` — positive integer bytes bounding every
   roster line (§check-audit-roster); default `1500`. A stated policy rather than a
-  derived number, `QUEUE_KIT_ENTRY_LINE_CAP`'s posture: no prior byte cap exists to
+  derived number, `QUEUE_KIT_ENTRY_CAP`'s posture: no prior byte cap exists to
   derive it from. It is sized so a `scope` line holds a class's standing readings
   as a paragraph, while a dozen-class roster at the cap on every line still reads
   whole in one pass. The table validator refuses a non-positive value at exit 2.

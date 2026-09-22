@@ -102,7 +102,9 @@ COMPRESS="$(sha HEAD)"
 queue '' def-renamed-new '- def-target'; commit "dispose of def-target: move it to Done"
 DEPARTURE="$(sha HEAD)"
 
-arm() { ( cd "$SANDBOX" && gate_arm_run --emit-entry-history "$@" 2>&1 ); }
+# The seeded history is sized in lines, so the arm reads the cap in that unit; the code-point unit's
+# reflow invariance is held by the crate's unit tests.
+arm() { ( cd "$SANDBOX" && gate_env QUEUE_KIT_ENTRY_CAP=50lines && gate_arm_run --emit-entry-history "$@" 2>&1 ); }
 
 # --- the walk's bound: it stops at the filing commit, not at the root -----------------
 checks=$((checks + 1))
@@ -125,7 +127,7 @@ grep -qE "^  $DEPARTURE  " <<<"$out" \
 
 # --- the decrease is reported, with its before, its after and its subject -------------
 checks=$((checks + 1))
-grep -qE "^  $COMPRESS  8 -> 4  compress def-target by answering\$" <<<"$out" \
+grep -qE "^  $COMPRESS  8lines -> 4lines  compress def-target by answering\$" <<<"$out" \
     || note row "the compressing commit's row is not the reported one: $out"
 
 # --- limit: a commit that grows and one that nets out do not appear -------------------
@@ -152,10 +154,12 @@ grep -qF "departed at" <<<"$ren" \
 # reads the blob at the compressing commit, since the entry has since departed the task sections.
 checks=$((checks + 1))
 after="$(grep -E "^  $COMPRESS  " <<<"$out" | awk '{print $4}')"
+after="${after%lines}"
 git -C "$SANDBOX" show "$COMPRESS:TASK-QUEUE.md" >"$SANDBOX/at-compress.md"
-head_out="$( cd "$SANDBOX" && gate_env QUEUE_KIT_ENTRY_LINE_CAP=50 \
+head_out="$( cd "$SANDBOX" && gate_env QUEUE_KIT_ENTRY_CAP=50lines \
     && gate_run check-queue-entry-budget "$CHECKS" "$SANDBOX/at-compress.md" 2>&1 )"
-headroom="$(grep -E '^  def-target: [0-9]+ lines of headroom' <<<"$head_out" | awk '{print $2}')"
+headroom="$(grep -E '^  def-target: [0-9]+lines of headroom' <<<"$head_out" | awk '{print $2}')"
+headroom="${headroom%lines}"
 if [[ -z "$after" || -z "$headroom" ]]; then
     note one-spelling-read "could not read both numbers (after='$after' headroom='$headroom'): $head_out"
 elif [[ "$after" -ne $((50 - headroom)) ]]; then
