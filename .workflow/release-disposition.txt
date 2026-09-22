@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+queue-kit-unwrap release deferred:v0.26.0 — declarations since v0.25.0 still derive a minor with no decommission (this iteration adds check-md-unwrapped, the heading-shape queue grammar, the code-point entry cap and the QUEUE_KIT_ENTRY_LINE_CAP → QUEUE_KIT_ENTRY_CAP rename, a pre-1.0 breaking change riding a minor); no trigger fired: elapsed-time limb dormant under preview, no security or supply-chain fix, no operator direction, no audience arrival
