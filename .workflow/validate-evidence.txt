@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+queue-kit-unwrap gates sha256=1d472564e813d39ba2a54b2f135a3a6dcd05aa73f887c767eef692d7ba5570a3 pass=129 fail=0 ignore=0 verdict=clean 2026-09-22
+queue-kit-unwrap gate_sdk sha256=4c72e5b4dd4d6322d2e1b461762c03cd42010e912100f2ff2dc2ffb984cc9ba6 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+queue-kit-unwrap canon_kit sha256=dc6a43104da09a45baf285d375331912d745214796a752b44d9b8ccdeb35ff52 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+queue-kit-unwrap context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+queue-kit-unwrap delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+queue-kit-unwrap doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+queue-kit-unwrap evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+queue-kit-unwrap guard_kit sha256=01d94b4120e133665e01946fe44d31a730d2c6cdfd1570e5ce6b96a7a1b30e1b pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+queue-kit-unwrap lifecycle_kit sha256=bac54b43ac9a49c420f8020fda337dac934779dfe6701db269ad8ac2a89ceb81 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+queue-kit-unwrap queue_kit sha256=5880c4840de8628f0c320fd728dd3e425a92b6d1554f5e56ce403a8d8b13f3c5 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+queue-kit-unwrap site_kit sha256=48d3335dd0d627713fd607013b1cc6a0049e60b8f4a1905b441b7699d4c844c2 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+queue-kit-unwrap scripts sha256=79ed7aac215203e28c16d151e43d18867b9d53aa24afc2c79947e252882e97b7 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+queue-kit-unwrap guard_tests sha256=2e9a22131559a27d70c1ffe7f075649ff0a18e7ddacf4aaee09130cdf20bd345 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+queue-kit-unwrap demo sha256=8b2072cd724b89fbd4e19f0d1881ec22104789d7bf2de11002d1655c685ae28c pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+queue-kit-unwrap installer_smoke sha256=62c4b9bfcd6f4cfcccaf4338f3c037fe285769d7ab73b338172f4e84f6aaed35 pass=17 fail=0 ignore=0 verdict=clean 2026-09-22
+queue-kit-unwrap consumer_smoke sha256=b420916b61f34666ef083c99498923ec6d07d434f6087fa34838d506666259c2 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+queue-kit-unwrap upgrade sha256=4a9c446d8df4e727f3dafee363645da598939f6a887d27cb80dfebec73912159 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+queue-kit-unwrap agents_md_smoke sha256=6eec75053d095fd21eaedad57df19f6bda8ac30cdbadf350388605789aaa0de1 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+queue-kit-unwrap index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+queue-kit-unwrap native_crate sha256=1a1ce19f70a2d76b4368e8d1eb94cfff4ad0f4c6dc6ff555df03fd2e0ce14112 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
+queue-kit-unwrap projection_witness sha256=f7d0a2fe356693b7965d351bc11c2abc64eda509228a58533a5df2ca7e0b1559 pass=1 fail=0 ignore=0 verdict=clean 2026-09-22
