@@ -12,3 +12,9 @@ A keyed pair such as `spec=scope` is one element. The wire's default pairs
 `build=scope` and `validate=build` are the kit's own.
 
 widget-toolkit ships one gate. The operator reads its report close-over-close.
+
+The counter saturates at 2147483646, and a defaced widget is rebuilt.
+
+```text
+The cap landed in 4f2a9c1e.
+```

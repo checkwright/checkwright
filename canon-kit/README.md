@@ -51,7 +51,7 @@ reads the tag syntax [queue-kit](../queue-kit/) defines.
    check-measured-claim         # needs a measured-claim oracle (marked claims re-measured)
    check-unmarked-claim         # needs a claim-class roster (a declared class carries a marker)
    check-manifest-temporal      # no temporal narration in manifest prose
-   check-provenance-seam        # no publisher provenance in a kit SPEC (kit authors only)
+   check-provenance-seam        # no publisher provenance in a kit SPEC or a declared seam surface
    check-tracking-claim         # a path's tracking status in prose agrees with git
    check-prose-enum             # partial enumeration of a governed set
    check-md-refs                # internal markdown links resolve

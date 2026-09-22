@@ -426,7 +426,7 @@ if staged_matches '*SPEC*.md' '*README.md' '*CLAUDE.md' '*CLAUDE.md' '*README.md
     run_gate check-manifest-count native/target/release/checkwright-gates check-manifest-count
 fi
 
-if staged_matches 'gate-sdk/SPEC.md' 'canon-kit/SPEC.md' 'context-kit/SPEC.md' 'delegation-kit/SPEC.md' 'doctrine-kit/SPEC.md' 'drift-kit/SPEC.md' 'evidence-kit/SPEC.md' 'guard-kit/SPEC.md' 'lifecycle-kit/SPEC.md' 'queue-kit/SPEC.md' 'site-kit/SPEC.md' '*TASK-QUEUE.md' '*SPEC.md' '*1' 'scripts/canon-config.knobs' 'scripts/context-config.knobs' 'scripts/delegation-config.knobs' 'scripts/drift-config.knobs' 'scripts/evidence-config.knobs' 'scripts/gate-sdk-config.knobs' 'scripts/guard-config.knobs' 'scripts/lifecycle-config.knobs' 'scripts/queue-config.knobs' 'scripts/site-config.knobs' 'native/src/gates/provenance_seam.rs' 'native/src/ere.rs' 'native/src/spec.rs'; then
+if staged_matches 'gate-sdk/SPEC.md' 'canon-kit/SPEC.md' 'context-kit/SPEC.md' 'delegation-kit/SPEC.md' 'doctrine-kit/SPEC.md' 'drift-kit/SPEC.md' 'evidence-kit/SPEC.md' 'guard-kit/SPEC.md' 'lifecycle-kit/SPEC.md' 'queue-kit/SPEC.md' 'site-kit/SPEC.md' '*TASK-QUEUE.md' '*SPEC.md' '*1' '*installer/SPEC.md' 'scripts/canon-config.knobs' 'scripts/context-config.knobs' 'scripts/delegation-config.knobs' 'scripts/drift-config.knobs' 'scripts/evidence-config.knobs' 'scripts/gate-sdk-config.knobs' 'scripts/guard-config.knobs' 'scripts/lifecycle-config.knobs' 'scripts/queue-config.knobs' 'scripts/site-config.knobs' 'native/src/gates/provenance_seam.rs' 'native/src/ere.rs' 'native/src/spec.rs'; then
     run_gate check-provenance-seam native/target/release/checkwright-gates check-provenance-seam
 fi
 

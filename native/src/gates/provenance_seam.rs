@@ -17,8 +17,13 @@ pub fn run(args: &[String]) -> i32 {
 }
 
 fn rule(_args: &[String]) -> Result<i32, String> {
-    if spec::knob_pub("CANON_KIT_SCAN_KIT_ROOTS")? != "1" {
-        println!("PROVENANCE-SEAM: clean (CANON_KIT_SCAN_KIT_ROOTS is 0: kit roots are a dependency's, so no kit SPEC is scanned)");
+    let kit_on = spec::knob_pub("CANON_KIT_SCAN_KIT_ROOTS")? == "1";
+    let surface_globs: Vec<String> = spec::knob_array_pub("CANON_KIT_SEAM_SURFACE_GLOBS")?
+        .into_iter()
+        .filter(|s| !s.is_empty())
+        .collect();
+    if !kit_on && surface_globs.is_empty() {
+        println!("PROVENANCE-SEAM: clean (CANON_KIT_SCAN_KIT_ROOTS is 0: kit roots are a dependency's, so no kit SPEC is scanned; CANON_KIT_SEAM_SURFACE_GLOBS is empty, so no seam surface is either)");
         return Ok(0);
     }
     let floor_raw = spec::knob_pub("CANON_KIT_SEAM_SLUG_MIN_LEN")?;
@@ -72,7 +77,7 @@ fn rule(_args: &[String]) -> Result<i32, String> {
 
     let spec_name = spec::spec_name()?;
     let mut files: Vec<String> = Vec::new();
-    for r in &roots {
+    for r in roots.iter().filter(|_| kit_on) {
         let r = r.trim_end_matches('/');
         if r.is_empty() {
             continue;
@@ -83,6 +88,20 @@ fn rule(_args: &[String]) -> Result<i32, String> {
             files.push(spec::strip_dot_slash(&f));
         }
     }
+    // spec: canon-kit/SPEC.md §check-provenance-seam — a file both sets reach is scanned once, as
+    // a kit SPEC
+    let mut surfaces: Vec<String> = walk::glob_corpus(Path::new("."), &surface_globs)?
+        .into_iter()
+        .map(|p| spec::strip_dot_slash(&p.display().to_string()))
+        .filter(|f| !files.contains(f))
+        .collect();
+    surfaces.sort();
+    surfaces.dedup();
+    for f in &surfaces {
+        spec::read_text(Path::new(f))?;
+    }
+    let kit_count = files.len();
+    files.extend(surfaces.iter().cloned());
 
     let rosters: Vec<(&str, Vec<String>)> = crate::knobs::consumer_elements()?
         .into_iter()
@@ -96,20 +115,27 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         private: &private,
         slugs: slugs.as_deref().unwrap_or(&[]),
         rosters: &rosters,
+        surfaces: &surfaces,
         out: Vec::new(),
     };
     spec::walk_prose_multi(&files, &[], &mut sink)?;
 
     if !sink.out.is_empty() {
-        println!("check-provenance-seam: provenance-seam finding(s) in a kit SPEC — a kit SPEC states its rule undated and impersonally, a pointer that resolves only in the publisher's tree is dead in every vendored copy, and a roster one consumer configured is that tree's content:");
+        println!("check-provenance-seam: provenance-seam finding(s) in a kit SPEC or seam surface — a published rule is stated undated and impersonally, a pointer that resolves only in the publisher's tree is dead in every vendored copy, and a roster one consumer configured is that tree's content:");
         println!();
         for l in &sink.out {
             println!("{}", l);
         }
-        println!("  help: dated-attribution — delete the attribution and keep the rule; agent-file-pointer or private-surface — state the rule the pointer stood for, or cite the kit SPEC section that owns it; queue-slug — name what the slug denoted, or rename a freshly filed slug; consumer-roster — name the knob rather than quote its configured roster (gate-sdk/SPEC.md §The provenance seam)");
+        println!("  help: dated-attribution — delete the attribution and keep the rule; agent-file-pointer or private-surface — state the rule the pointer stood for, or cite the kit SPEC section that owns it; queue-slug — name what the slug denoted, or rename a freshly filed slug; hex-reference — delete the object name and state the fact it labelled; consumer-roster — name the knob rather than quote its configured roster (gate-sdk/SPEC.md §The provenance seam)");
         return Ok(1);
     }
     let mut notes: Vec<&str> = Vec::new();
+    if !kit_on {
+        notes.push("kit SPECs off: CANON_KIT_SCAN_KIT_ROOTS is 0");
+    }
+    if surface_globs.is_empty() {
+        notes.push("seam surfaces off: CANON_KIT_SEAM_SURFACE_GLOBS is empty");
+    }
     if private.is_empty() {
         notes.push("private-surface arm off: CANON_KIT_SEAM_PRIVATE_SURFACES is empty");
     }
@@ -122,8 +148,9 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         format!("; {}", notes.join("; "))
     };
     println!(
-        "PROVENANCE-SEAM: clean ({} kit SPEC(s); no publisher-provenance marker or quoted consumer roster{})",
-        files.len(),
+        "PROVENANCE-SEAM: clean ({} kit SPEC(s), {} seam surface(s); no publisher-provenance marker or quoted consumer roster{})",
+        kit_count,
+        surfaces.len(),
         suffix
     );
     Ok(0)
@@ -199,6 +226,7 @@ struct Seam<'a> {
     private: &'a [String],
     slugs: &'a [String],
     rosters: &'a [(&'a str, Vec<String>)],
+    surfaces: &'a [String],
     out: Vec<String>,
 }
 
@@ -245,7 +273,12 @@ impl ProseSink for Seam<'_> {
         self.agent_file_pointer(&j, &mut hits);
         self.private_surface(&j, &mut hits);
         self.queue_slug(&j, &mut hits);
-        self.consumer_roster(&j, para.fnr[0], &mut hits);
+        hex_reference(&j, &mut hits);
+        // spec: canon-kit/SPEC.md §check-provenance-seam — a seam surface is the consumer's own
+        // record of its own configuration, so the consumer-roster arm does not judge it
+        if !self.surfaces.iter().any(|s| s == file) {
+            self.consumer_roster(&j, para.fnr[0], &mut hits);
+        }
         hits.sort_by_key(|h| h.0);
         for (ln, msg) in hits {
             self.out.push(format!("  {}:{}  {}", file, ln, msg));
@@ -357,6 +390,32 @@ impl Seam<'_> {
     }
 }
 
+// spec: canon-kit/SPEC.md §check-provenance-seam — hex-reference: a 7-40 run of lowercase hex with
+// no letter, digit or `_` on either side, carrying a digit and a letter `a`-`f`
+fn hex_reference(j: &Joined, hits: &mut Vec<(usize, String)>) {
+    let b = j.text.as_bytes();
+    let tok = |c: u8| c.is_ascii_alphanumeric() || c == b'_';
+    let mut i = 0usize;
+    while i < b.len() {
+        if !tok(b[i]) {
+            i += 1;
+            continue;
+        }
+        let s = i;
+        while i < b.len() && tok(b[i]) {
+            i += 1;
+        }
+        let run = &b[s..i];
+        if (7..=40).contains(&run.len())
+            && run.iter().all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(c))
+            && run.iter().any(u8::is_ascii_digit)
+            && run.iter().any(|c| c.is_ascii_lowercase())
+        {
+            hits.push((j.line_at(s), format!("hex-reference: {}", &j.text[s..i])));
+        }
+    }
+}
+
 // spec: canon-kit/SPEC.md §check-provenance-seam — each single-backtick inline-code span's content
 fn code_spans(t: &str) -> Vec<&str> {
     let mut out = Vec::new();
@@ -400,6 +459,21 @@ mod tests {
         assert_eq!(iso_date("on 2026-09-16, ruled"), Some("2026-09-16"));
         assert_eq!(iso_date("12026-09-16"), None);
         assert_eq!(iso_date("2026-9-16"), None);
+    }
+
+    fn hexes(t: &str) -> Vec<String> {
+        let j = Joined { text: t.to_string(), starts: vec![(0, 1)] };
+        let mut h = Vec::new();
+        hex_reference(&j, &mut h);
+        h.into_iter().map(|x| x.1).collect()
+    }
+
+    #[test]
+    fn a_hex_reference_needs_a_digit_a_letter_and_a_clean_boundary() {
+        assert_eq!(hexes("at `a1b2c3d4` and 0fedcba9."), vec!["hex-reference: a1b2c3d4", "hex-reference: 0fedcba9"]);
+        assert!(hexes("id 2147483646, word defaced, short ab12cd").is_empty());
+        assert!(hexes("Xa1b2c3d4 a1b2c3d4g _a1b2c3d4 A1B2C3D4").is_empty());
+        assert_eq!(hexes("uuid 1b4e28ba-2fa1").len(), 1);
     }
 
     #[test]

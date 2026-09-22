@@ -57,9 +57,11 @@ and quoting it is a restatement that de-literalization governs rather than the
 seam.
 
 canon-kit's `check-provenance-seam` holds the publisher-provenance class's
-lexical shapes and the content class's consumer-roster shape over the kit SPECs
-of a tree that authors its kits; its honest limits, the shapes it cannot see,
-are recorded in canon-kit/SPEC.md §check-provenance-seam.
+lexical shapes, a commit or digest reference among them, and the content class's
+consumer-roster shape over the kit SPECs of a tree that authors its kits, and the
+provenance shapes alone over the published documents a consumer declares its
+own; its honest limits, the shapes it cannot see, are recorded in
+canon-kit/SPEC.md §check-provenance-seam.
 
 ## Layout and configuration
 

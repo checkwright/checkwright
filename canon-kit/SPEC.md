@@ -412,8 +412,9 @@ widening the knob widens what fires the gate (gate-sdk/SPEC.md §The `# graph:`
 manifest). The clause is stated once here rather than on each bullet it reaches —
 `CANON_KIT_SPEC_NAME`, `CANON_KIT_AMENDMENT_GLOB`, `CANON_KIT_MANIFEST_FILES`,
 `CANON_KIT_PROSE_SURFACE_GLOBS`, `CANON_KIT_MEASURED_SURFACE_GLOBS`,
-`CANON_KIT_COMMENT_SURFACE` and `CANON_KIT_PROSE_TELL_GLOBS` — because it is one
-fact about the mechanism and not seven facts about seven knobs. Which knobs it
+`CANON_KIT_COMMENT_SURFACE`, `CANON_KIT_PROSE_TELL_GLOBS` and
+`CANON_KIT_SEAM_SURFACE_GLOBS` — because it is one fact about the mechanism and
+not eight facts about eight knobs. Which knobs it
 reaches is derived from the walks rather than listed as policy, so a knob added
 later is reached with no edit here; **`CANON_KIT_DUP_SURFACES` is deliberately not
 among them**, and that is a verdict rather than an omission — its members are read
@@ -503,7 +504,10 @@ Knobs:
   names are one publisher's vocabulary, so no spelling ships as a literal, and the
   empty default switches the private-surface arm off. `CANON_KIT_SEAM_SLUG_MIN_LEN` — positive
   integer, default `12`: the shortest queue slug the slug arm matches, so a short
-  slug cannot match ordinary hyphenated prose.
+  slug cannot match ordinary hyphenated prose. `CANON_KIT_SEAM_SURFACE_GLOBS` —
+  array of repo-root-relative globs, default empty: the consumer's own published
+  documents that `check-provenance-seam` holds to the provenance class. Which of a
+  tree's documents are public is its own content, so no glob ships as a literal.
 - `CANON_KIT_MDREF_EXCLUDE` — array of globs, default empty: manifest-set docs
   `check-md-refs` skips (a consumer's generated documentation whose links a
   build tool owns).
@@ -1444,7 +1448,7 @@ trips or does not. `precommit` tier.
 `checks/check-provenance-seam.gate` (`precommit`, binary-dispatched).
 Invariant: no kit SPEC carries a publisher-provenance marker or quotes a roster
 one consumer configured — the two classes gate-sdk/SPEC.md §The provenance seam
-bars from a kit file. A kit SPEC is vendored and rendered wherever the kit goes,
+bars from a kit file — and no seam surface a consumer declares carries the first. A kit SPEC is vendored and rendered wherever the kit goes,
 so an attribution publishes who decided what and when, a pointer into the
 publisher's tree is dead in every copy, and a configured roster reads to a
 second consumer as the shape of its own. The gate holds the lexical shapes of the
@@ -1452,15 +1456,21 @@ provenance class and the one roster shape of the content class that an oracle
 can hold without flooding; the voice-not-content judgement and the
 whose-truth discriminator behind them stay a review concern.
 
-**Corpus.** The canonical spec (`CANON_KIT_SPEC_NAME`) at the root of every kit
-root (gate-sdk/SPEC.md §Layout and configuration), derived rather than listed. It
-is scanned **only when `CANON_KIT_SCAN_KIT_ROOTS` is `1`**, that knob's existing
-meaning: the kit docs are the consumer's own first-party content. At the default
-`0` the gate passes with a clean line saying kit roots are a dependency's — right
-for an adopter vendoring a SPEC-bearing tree, whose own queue slugs and private
-names would otherwise red someone else's document. A consumer authoring kits sets
-the knob. The gate ships in a kit rather than as a consumer gate because the seam
-is a rule for every kit publisher.
+**Corpus.** Two sets. The canonical spec (`CANON_KIT_SPEC_NAME`) at the root of
+every kit root (gate-sdk/SPEC.md §Layout and configuration), derived rather than
+listed, is scanned **only when `CANON_KIT_SCAN_KIT_ROOTS` is `1`**, that knob's
+existing meaning: the kit docs are the consumer's own first-party content. At the
+default `0` they are a dependency's, since an adopter vendoring a SPEC-bearing tree
+would otherwise have its own queue slugs and private names red someone else's
+document. The files `CANON_KIT_SEAM_SURFACE_GLOBS` matches are the consumer's own
+by declaration, so they are scanned whatever the kit-roots knob says. They take
+the **provenance arms** (dated-attribution, agent-file-pointer, private-surface,
+queue-slug and hex-reference) and **not** the consumer-roster arm: that arm bars a
+kit from quoting a consumer's configuration, and a consumer's own record
+describing its own configuration is that consumer's content. A file both sets
+reach is scanned once, as a kit SPEC. With both sets empty the gate passes, and
+its clean line names which set was off. The gate ships in a kit rather than as a
+consumer gate because the seam is a rule for every kit publisher.
 
 **Fenced blocks are skipped; nothing else is.** There is no per-site valve, no
 section carve-out and no path exemption. A fence holds grammar being shown, and a
@@ -1495,6 +1505,13 @@ a finding reports its first physical line.
   `gates.list` member. That exclusion is structural, not a valve: a unit named
   after the gate or kit it mints would otherwise red that gate's own section while
   the unit's entry is live.
+- **hex-reference** — a run of 7 to 40 lowercase hex characters with no letter,
+  digit or `_` on either side, carrying at least one digit and at least one
+  letter `a`–`f`. That is the shape of an abbreviated or full git object name
+  and of a digest prefix; either points into one publisher's history, so it is
+  dead in every vendored copy. Requiring both classes keeps a decimal literal
+  and an all-letter word such as `defaced` out, and the arm matches bare prose as
+  well as inline code, since the reference is as dead either way.
 - **consumer-roster** — two or more distinct candidates of one knob in one
   paragraph, each as a whole inline-code span, reported at the paragraph's first
   line with the knob and the matched spans. A candidate is an element of a static
@@ -1520,6 +1537,11 @@ omission into a gate that ships exemption-free.
 - a retired slug or a cut ordinal passes, because deriving retired slugs reads
   queue history, which a fixture cannot pin and a shallow clone does not have;
 - a slug below the length floor passes;
+- an all-digit abbreviated object name passes, which is about one in thirty at
+  seven characters and rarer beyond; so does an uppercase one, and a decimal CI
+  run or job id, which no shape tells from a measured number;
+- a UUID segment or an eight-digit hex colour in prose reds as a hex reference;
+  fence the specimen, since fences are the gate's one escape;
 - an attributive agent-file pointer (*the agent file's ban*) passes, because
   telling it from a consumer-side mention (*the consumer's agent file carries …*)
   is judgement;
@@ -1549,15 +1571,18 @@ empty private-surface list does for its arm: a kit publisher with no work queue 
 an ordinary configuration, and the other arms still judge it.
 
 Producer: the generated pre-commit hook and `run-gates.sh`, on a commit touching a
-kit SPEC or the queue file; consumer: the committing session via the output
+kit SPEC, a seam surface or the queue file; consumer: the committing session via the output
 contract, each finding read once at the scan transition (file, line, arm, span),
 no persistent state. The arm names the remedy: delete an attribution, restate what
 a pointer stood for, rename a fresh slug, or name the knob rather than quote its
 configured roster. The fixture pair trips each arm and carries a fenced copy of
 every trip that must add no finding; its consumer knob file sets a keyed knob,
-and `good/` quotes one configured pair and two pairs equal to the default;
+and `good/` quotes one configured pair and two pairs equal to the default, and
+carries a decimal `2147483646`, an all-letter hex word and a fenced object name;
 `check-provenance-seam.test.sh` holds the paths a pair cannot spell — the
-kit-roots-off default, an absent queue file and the `_EXTRA` union.
+kit-roots-off default, an absent queue file, the `_EXTRA` union, a seam surface
+redding at kit-roots `0`, and a seam surface quoting two configured roster
+elements with no consumer-roster finding.
 
 ### check-measured-claim
 

@@ -1,1 +1,1 @@
-PROVENANCE-SEAM: clean (1 kit SPEC(s); no publisher-provenance marker or quoted consumer roster)
+PROVENANCE-SEAM: clean (1 kit SPEC(s), 0 seam surface(s); no publisher-provenance marker or quoted consumer roster; seam surfaces off: CANON_KIT_SEAM_SURFACE_GLOBS is empty)

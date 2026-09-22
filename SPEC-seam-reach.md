@@ -51,7 +51,7 @@ consumer's content.
 
 ### (1) §check-provenance-seam gains a hex-reference arm {mechanical}
 
-**Not yet applied.** Add to the **Arms** list, after **queue-slug**:
+**Applied.** Add to the **Arms** list, after **queue-slug**:
 
 > - **hex-reference** — a run of 7 to 40 lowercase hex characters with no letter,
 >   digit or `_` on either side, carrying at least one digit and at least one
@@ -79,7 +79,7 @@ stays green.
 
 ### (2) A consumer seam-surface corpus: `CANON_KIT_SEAM_SURFACE_GLOBS` {mechanical}
 
-**Not yet applied.** In §Layout and configuration, add to the
+**Applied.** In §Layout and configuration, add to the
 `CANON_KIT_SEAM_*` bullet:
 
 > `CANON_KIT_SEAM_SURFACE_GLOBS` — array of repo-root-relative globs, default
@@ -151,7 +151,7 @@ swept every shape a gate can see.
 
 ### (5) The provenance-seam-residue audit class names the new shape and surfaces {mechanical}
 
-**Not yet applied.** Re-phrase the `scope:` line of `.workflow/audit-roster.txt`'s
+**Applied.** Re-phrase the `scope:` line of `.workflow/audit-roster.txt`'s
 `provenance-seam-residue` block, keeping it under the line cap, so that:
 
 - its honest-limit list gains delta 1's two limits (all-digit, uppercase and

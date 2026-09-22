@@ -99,6 +99,7 @@ pub const KIT: Kit = Kit {
         Row::indexed("CANON_KIT_SEAM_AGENT_FILES", &["CLAUDE.md"]),
         Row::indexed("CANON_KIT_SEAM_PRIVATE_SURFACES", &[]),
         Row::scalar("CANON_KIT_SEAM_SLUG_MIN_LEN", "12"),
+        Row::indexed("CANON_KIT_SEAM_SURFACE_GLOBS", &[]),
         Row::indexed(
             "CANON_KIT_COUNT_COLLECTIONS",
             &["gates", "meta-gates", "checks", "kits", "stages", "rules", "KPIs"],

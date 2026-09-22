@@ -748,12 +748,12 @@ pub const REGISTRY: &[GateEntry] = &[
         "canon-kit",
         &[("git", "")],
     ),
-    // spec: canon-kit/SPEC.md §check-provenance-seam — the corpus is one named file per kit root,
-    // read rather than walked, so this member declares no walk root
+    // spec: canon-kit/SPEC.md §check-provenance-seam — the kit SPECs are one named file per kit
+    // root, read rather than walked; the seam surfaces are the one walked root
     (
         "check-provenance-seam",
         provenance_seam::run,
-        &[],
+        &[(".", "glob:knob:CANON_KIT_SEAM_SURFACE_GLOBS", "", "")],
         &[
             "GATE_SDK_KIT_DIRS",
             "GATE_SDK_GATES_DIR",
@@ -765,6 +765,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_SEAM_AGENT_FILES",
             "CANON_KIT_SEAM_PRIVATE_SURFACES",
             "CANON_KIT_SEAM_SLUG_MIN_LEN",
+            "CANON_KIT_SEAM_SURFACE_GLOBS",
             EVERY_COLLECTION_KNOB,
         ],
         "canon-kit",

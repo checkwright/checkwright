@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Behavioral test of the config-driven paths the one-pair good/bad harness cannot
 # hold: the kit-roots-off default, an absent queue file, the _EXTRA marker union,
-# the fence skip as an absence (expect.txt asserts presence only), and the
-# fail-closed config arms.
+# the fence skip as an absence (expect.txt asserts presence only), the fail-closed
+# config arms, and a seam surface's corpus and arm set.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -94,9 +94,30 @@ check_case "malformed-marker" 2 "does not compile" "$out" "$rc"
 out="$(run "$SANDBOX/on.knobs" CANON_KIT_SEAM_SLUG_MIN_LEN=0)"; rc=$?
 check_case "zero-floor" 2 "CANON_KIT_SEAM_SLUG_MIN_LEN" "$out" "$rc"
 
+# A seam surface is the consumer's own by declaration: it is scanned with kit roots
+# off, takes the provenance arms, and quoting its own configured roster is no finding.
+cat >"$SANDBOX/PUBLIC.md" <<'EOF'
+# Public record
+
+The operator ruled on 2026-08-12 that the packer stays.
+
+The generated pages are `gen/a.md` and `gen/b.md`.
+EOF
+cat >"$SANDBOX/surface.knobs" <<'EOF'
+CANON_KIT_SEAM_SURFACE_GLOBS[] = PUBLIC.md
+CANON_KIT_MDREF_EXCLUDE[] = gen/a.md
+CANON_KIT_MDREF_EXCLUDE[] = gen/b.md
+EOF
+out="$(run "$SANDBOX/surface.knobs")"; rc=$?
+check_case "surface-kit-roots-off" 1 "PUBLIC.md:3  dated-attribution: 2026-08-12" "$out" "$rc"
+if grep -qF "consumer-roster: " <<<"$out"; then
+    echo "  FAIL [surface-no-roster]: a seam surface quoting its own roster must add no consumer-roster finding:"
+    printf '    %s\n' "$out"; fails=$((fails + 1))
+fi
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-provenance-seam.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-provenance-seam.test.sh: clean (kit-roots-off default + fence skip + _EXTRA union + absent queue file + malformed marker + non-positive slug floor)"
+echo "check-provenance-seam.test.sh: clean (kit-roots-off default + fence skip + _EXTRA union + absent queue file + malformed marker + non-positive slug floor + seam surface at kit-roots off, roster arm off)"
 exit 0
