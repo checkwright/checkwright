@@ -54,20 +54,6 @@ a spec amendment can state a delta instruction in the unconditional voice when i
 
 **Cost while deferred:** once/low to rule, plus whatever the rule costs to gate; until then every batch-dependent delta needs a lead present to invert it. Filed 2026-09-20 by the iteration lead to the gap inbox at the build batch-2 dispatch, where inverting the instruction was the act that surfaced it; drained and promoted 2026-09-20 at close.
 
-### inferred-marker-malformed-placement-passes-unseen
-
-[spec: SPEC-misplaced-marker.md]
-
-`check-stage-entry` assertion D reads an inferred marker only where the full spelling opens a physical line (`inferred_marker` in `native/src/gates/stage_entry.rs`), so a marker an author places mid-line, or whose spelling a hard wrap splits, is invisible and its unrun claim passes the build entry. Both attested instances were mid-line: two of three markers in a declined-target-audit amendment, found only because the third, well-formed one redded `--simulate build`. A line-start marker whose reason wraps to the next line already reds (empty reason), so that case fails closed.
-
-**Re-verified at the drain:** the unit test `a_marker_is_read_only_at_line_start` passes and asserts a mid-line `**Inferred, not run:**` reads as `None`; a line opening with a split spelling fails both `strip_prefix` arms.
-
-**Ruled at spec (2026-09-22):** the narrowing is taken. A bold marker spelling outside a code span that does not open its line, or that a line break splits, is a misplaced marker and assertion D refuses it; a mention is written in a code span. Measured: every tracked markdown mention already is, and the one flipping verdict is the scenario test's D4 specimen.
-
-**Admitted to `stage-contract-drain`** (2026-09-22 scope, operator direction, lead-relayed) as a fail-open repair of an existing gate, outside the enhancement admission filter; /spec authors and promotes it.
-
-**Cost while deferred:** a misplaced marker's claim reaches build unrun, and only the author's own line-start discipline holds. Filed 2026-09-18 to the gap inbox at declined-target-audit's align; promoted at its close drain. Owner lookup: `inferred marker`, `inferred_marker`, `scan_markers`, `malformed marker` — none.
-
 ### close-surface-row-trackedness-undeclared
 
 [spec: SPEC-surface-tracking.md]
@@ -1844,5 +1830,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 - stamp-subject-merge-carve-out-unruled
 - build-work-before-entry-stamp
+- inferred-marker-malformed-placement-passes-unseen
 
 ## Lessons Learned

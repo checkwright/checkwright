@@ -184,14 +184,70 @@ fn active_entry_lines(text: &str, sections: &[String]) -> Vec<bool> {
     out
 }
 
+fn is_fence(line: &str) -> bool {
+    let t = line.trim_start_matches([' ', '\t']);
+    t.starts_with("```") || t.starts_with("~~~")
+}
+
+// spec: lifecycle-kit/SPEC.md §check-stage-entry — a code span is a backtick run and the next run
+// of the same length on that line; an unclosed run is literal
+fn code_spans(s: &str) -> Vec<(usize, usize)> {
+    let b = s.as_bytes();
+    let run_at = |i: usize| b[i..].iter().take_while(|c| **c == b'`').count();
+    let (mut spans, mut i) = (Vec::new(), 0usize);
+    while i < b.len() {
+        if b[i] != b'`' {
+            i += 1;
+            continue;
+        }
+        let n = run_at(i);
+        let mut j = i + n;
+        let mut close = None;
+        while j < b.len() {
+            if b[j] == b'`' {
+                let m = run_at(j);
+                if m == n {
+                    close = Some(j + m);
+                    break;
+                }
+                j += m;
+            } else {
+                j += 1;
+            }
+        }
+        match close {
+            Some(end) => {
+                spans.push((i, end));
+                i = end;
+            }
+            None => i += n,
+        }
+    }
+    spans
+}
+
+// spec: lifecycle-kit/SPEC.md §check-stage-entry — the start of each bold spelling outside a code span
+fn bare_spellings(s: &str) -> Vec<usize> {
+    let spans = code_spans(s);
+    let mut out = Vec::new();
+    for sp in [NOT_RUN, CANNOT_RUN] {
+        out.extend(
+            s.match_indices(sp)
+                .map(|(at, _)| at)
+                .filter(|at| !spans.iter().any(|(a, z)| a <= at && at < z)),
+        );
+    }
+    out
+}
+
 // spec: lifecycle-kit/SPEC.md §check-stage-entry — a fence line toggles the window no marker is
-// read inside, and `in_scope` narrows which lines are read. Returns the unrun markers as
-// `<line>: <text>` and the reasoned cannot-run count.
-fn scan_markers(text: &str, in_scope: &dyn Fn(usize) -> bool) -> (Vec<String>, usize) {
-    let (mut unrun, mut carried, mut fenced) = (Vec::new(), 0usize, false);
-    for (i, line) in text.lines().enumerate() {
-        let t = line.trim_start_matches([' ', '\t']);
-        if t.starts_with("```") || t.starts_with("~~~") {
+// read inside, and `in_scope` narrows which lines are read. Returns the unrun markers and the
+// misplaced ones as `<line>: <text>`, and the reasoned cannot-run count.
+fn scan_markers(text: &str, in_scope: &dyn Fn(usize) -> bool) -> (Vec<String>, Vec<String>, usize) {
+    let lines: Vec<&str> = text.lines().collect();
+    let (mut unrun, mut misplaced, mut carried, mut fenced) = (Vec::new(), Vec::new(), 0usize, false);
+    for (i, line) in lines.iter().enumerate() {
+        if is_fence(line) {
             fenced = !fenced;
             continue;
         }
@@ -203,10 +259,24 @@ fn scan_markers(text: &str, in_scope: &dyn Fn(usize) -> bool) -> (Vec<String>, u
                 reason_empty: false,
             }) => carried += 1,
             Some(_) => unrun.push(format!("{}: {}", i + 1, line)),
-            None => {}
+            None => {
+                let mut bad = !bare_spellings(line).is_empty();
+                // spec: lifecycle-kit/SPEC.md §check-stage-entry — a split spelling starts on this
+                // line and ends on the next, read joined by one space
+                if let Some(next) = lines.get(i + 1).filter(|n| !is_fence(n) && in_scope(i + 1)) {
+                    let joined = format!("{} {}", line, next);
+                    bad |= bare_spellings(&joined).iter().any(|at| {
+                        let len = if joined[*at..].starts_with(NOT_RUN) { NOT_RUN.len() } else { CANNOT_RUN.len() };
+                        *at < line.len() && at + len > line.len()
+                    });
+                }
+                if bad {
+                    misplaced.push(format!("{}: {}", i + 1, line));
+                }
+            }
         }
     }
-    (unrun, carried)
+    (unrun, misplaced, carried)
 }
 
 // spec: lifecycle-kit/SPEC.md §check-stage-entry — assertion C's signal, or None.
@@ -476,9 +546,11 @@ pub fn run(args: &[String]) -> i32 {
     // assertion D: audit-entry refuses an on-disk amendment or active queue entry still carrying an
     // unrun inferred-claim marker, audit stamp or not (lifecycle-kit/SPEC.md §check-stage-entry)
     let mut d_fired = false;
+    let mut d_misplaced = false;
     let mut carried = 0usize;
     if at_audit_entry {
         let mut unrun = String::new();
+        let mut misplaced = String::new();
         for af in tree
             .iter()
             .filter(|p| walk::pattern_match(&k.amendment_glob, basename(p)))
@@ -493,23 +565,36 @@ pub fn run(args: &[String]) -> i32 {
                     return 2;
                 }
             };
-            let (hits, n) = scan_markers(&text, &|_| true);
+            let (hits, bad, n) = scan_markers(&text, &|_| true);
             carried += n;
             for h in hits {
                 unrun.push_str(&format!("\n    {}:{}", af, h));
             }
+            for h in bad {
+                misplaced.push_str(&format!("\n    {}:{}", af, h.replacen(": ", ": misplaced marker: ", 1)));
+            }
         }
         let scope = active_entry_lines(&qtext, &k.active_sections);
-        let (hits, n) = scan_markers(&qtext, &|i| scope.get(i).copied().unwrap_or(false));
+        let (hits, bad, n) = scan_markers(&qtext, &|i| scope.get(i).copied().unwrap_or(false));
         carried += n;
         for h in hits {
             unrun.push_str(&format!("\n    {}:{}", k.queue, h));
+        }
+        for h in bad {
+            misplaced.push_str(&format!("\n    {}:{}", k.queue, h.replacen(": ", ": misplaced marker: ", 1)));
         }
         if !unrun.is_empty() {
             d_fired = true;
             errors.push(format!(
                 "entering '{}' but on-disk amendments or active queue entries carry inferred-claim marker(s) nobody ran (a not-run marker, or a cannot-run marker with no reason):{}",
                 stage, unrun
+            ));
+        }
+        if !misplaced.is_empty() {
+            d_misplaced = true;
+            errors.push(format!(
+                "entering '{}' but on-disk amendments or active queue entries carry a bold marker spelling that does not open its line or is split across a line break:{}",
+                stage, misplaced
             ));
         }
     }
@@ -531,6 +616,9 @@ pub fn run(args: &[String]) -> i32 {
         }
         if d_fired {
             println!("  help: at the stage the refused entry leaves the cursor at, run each marker's command, correct the passage or entry to what it returned and delete the marker — or rewrite it to '{} <claim> — <reason>' where the claim's subject does not exist until {}", CANNOT_RUN, k.audit_entry_stage);
+        }
+        if d_misplaced {
+            println!("  help: a misplaced marker is fixed at its site — move the marker to open its own line, or write a mention of the spelling in a code span (`{}`)", NOT_RUN);
         }
         return 1;
     }
@@ -604,8 +692,29 @@ mod tests {
         let text = "```\n**Inferred, not run:** a — `c`\n```\n**Inferred, cannot run before build:** b — why\n**Inferred, not run:** d — `c`\n";
         assert_eq!(
             scan_markers(text, &|_| true),
-            (vec!["5: **Inferred, not run:** d — `c`".to_string()], 1)
+            (vec!["5: **Inferred, not run:** d — `c`".to_string()], Vec::new(), 1)
         );
+    }
+
+    // spec: lifecycle-kit/SPEC.md §check-stage-entry — a bold spelling D does not read as a marker is
+    // misplaced: mid-line outside a code span, or split across a line break; a line-start marker is
+    // read as before and never also counted as misplaced
+    #[test]
+    fn a_bold_spelling_that_is_no_marker_is_misplaced() {
+        let (unrun, bad, _) = scan_markers("prose **Inferred, not run:** x\n", &|_| true);
+        assert!(unrun.is_empty());
+        assert_eq!(bad, vec!["1: prose **Inferred, not run:** x".to_string()]);
+        let (_, bad, _) = scan_markers("prose `**Inferred, not run:**` x\nand ``**Inferred, cannot run before build:**`` y\n", &|_| true);
+        assert!(bad.is_empty(), "{:?}", bad);
+        let (_, bad, _) = scan_markers("a claim **Inferred,\nnot run:** x — `c`\n", &|_| true);
+        assert_eq!(bad, vec!["1: a claim **Inferred,".to_string()]);
+        let (_, bad, _) = scan_markers("**Inferred, cannot\nrun before build:** x — why\n", &|_| true);
+        assert_eq!(bad, vec!["1: **Inferred, cannot".to_string()]);
+        let (unrun, bad, _) = scan_markers("**Inferred, not run:** x — `c`\nnext line\n", &|_| true);
+        assert_eq!((unrun.len(), bad.len()), (1, 0));
+        let (_, bad, _) = scan_markers("a claim **Inferred,\n```\nnot run:** x\n```\n", &|_| true);
+        assert!(bad.is_empty(), "a split across a fence line is not joined: {:?}", bad);
+        assert_eq!(code_spans("a `b` c ``d`e`` `unclosed"), vec![(2, 5), (8, 15)]);
     }
 
     // spec: lifecycle-kit/SPEC.md §check-stage-entry — D reads a queue marker inside an active
@@ -615,7 +724,7 @@ mod tests {
         let text = "## Technical Debt\n  **Inferred, not run:** preamble — `c`\n### a\n**Inferred, not run:** active — `c`\n#### a-sub\n**Inferred, not run:** sub — `c`\n```\n**Inferred, not run:** fenced — `c`\n```\n## Deferred\n### b\n**Inferred, not run:** deferred — `c`\n";
         let secs = vec!["New Features".to_string(), "Technical Debt".to_string()];
         let scope = active_entry_lines(text, &secs);
-        let (hits, n) = scan_markers(text, &|i| scope.get(i).copied().unwrap_or(false));
+        let (hits, _, n) = scan_markers(text, &|i| scope.get(i).copied().unwrap_or(false));
         assert_eq!(
             hits,
             vec![

@@ -11,10 +11,11 @@
 # assertion C drives four
 # cross-component build-entry scenarios (2-dir amendments ±waiver,
 # single-amendment cross-component body, single-component amendment);
-# assertion D drives six build-entry marker scenarios (not-run red,
+# assertion D drives seven build-entry marker scenarios (not-run red,
 # reasoned cannot-run clean with its count, empty-reason red, a fenced,
-# mid-line and templates/-stub mention all clean, a marker on an active
-# queue entry red, and the same marker on a deferred entry clean).
+# backticked mid-line and templates/-stub mention all clean, a marker on an
+# active queue entry red, the same marker on a deferred entry clean, and a
+# bare mid-line and a line-split spelling each red as misplaced).
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -316,11 +317,16 @@ check_case "D2 cannot-run-with-reason" "$SANDBOX/d2" 0 "1 cannot-run claim(s) ca
 d_sandbox "$SANDBOX/d3" '**Inferred, cannot run before build:** the gate reds'
 check_case "D3 cannot-run-empty-reason" "$SANDBOX/d3" 1 "SPEC-foo.md:1:"
 
-# D4 (good): a marker inside a fence, a mid-line mention in prose, and a templates/ stub — none a marker.
-d_sandbox "$SANDBOX/d4" $'```\n**Inferred, not run:** fenced — `x`\n```\nprose naming **Inferred, not run:** mid-line'
+# D4 (good): a marker inside a fence, a backticked mid-line mention in prose, and a templates/ stub — none a marker.
+d_sandbox "$SANDBOX/d4" $'```\n**Inferred, not run:** fenced — `x`\n```\nprose naming `**Inferred, not run:**` mid-line'
 mkdir -p "$SANDBOX/d4/some-kit/templates"
 printf '**Inferred, not run:** stub — `x`\n' >"$SANDBOX/d4/some-kit/templates/SPEC-amendment.md"
 check_case "D4 fence-prose-stub-not-markers" "$SANDBOX/d4" 0 "STAGE-ENTRY: clean"
+
+# D7 (bad): a bold spelling mid-line, and one a hard wrap splits — each refused as misplaced.
+d_sandbox "$SANDBOX/d7" $'prose naming **Inferred, not run:** mid-line\na claim **Inferred,\nnot run:** wrapped — `x`'
+check_case "D7 mid-line-misplaced" "$SANDBOX/d7" 1 "SPEC-foo.md:1: misplaced marker: prose naming"
+check_case "D7 split-misplaced" "$SANDBOX/d7" 1 "SPEC-foo.md:2: misplaced marker: a claim"
 
 d_queue() {  # $1=dir  $2=debt-section body  $3=deferred-section body — rewrites the queue D5/D6 share
     cat >"$1/TASK-QUEUE.md" <<EOF
@@ -355,5 +361,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-stage-entry.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-stage-entry.test.sh: clean (assertion B queue-empty + drain-exempt model + observed-by refusal branch + assertion C cross-component align/waiver + templates-stub exclusion + assertion D inferred-claim residue over amendments and active queue entries, 16 scenarios)"
+echo "check-stage-entry.test.sh: clean (assertion B queue-empty + drain-exempt model + observed-by refusal branch + assertion C cross-component align/waiver + templates-stub exclusion + assertion D inferred-claim residue over amendments and active queue entries + misplaced markers, 18 scenarios)"
 exit 0
