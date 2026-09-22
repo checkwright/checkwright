@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+stage-contract-drain release deferred:v0.26.0 — declarations since v0.25.0 still derive a minor with no decommission (this iteration adds check-stamp-subject, check-dispatch-entry, check-stage-entry assertion D, the close-surfaces <tracking> column and the --enter-stage --dispatch forms); no trigger fired: elapsed-time limb dormant under preview, no security or supply-chain fix, no operator direction, no audience arrival
