@@ -1690,14 +1690,4 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 ## Done
 
-- install-path-developer-first
-- install-smoke-leg-names-mix-two-axes
-- amendment-refusal-acceptance-parity
-- install-smoke-powershell-demo-runs-before-bash-strip
-- fence-run-fixed-env-hides-user-gem-dir
-- md-unwrap-folds-declarations
-- docs-link-red-remedy-first
-- line-window-gates-unaudited
-- manifest-files-configured-branch-unpruned
-
 ## Lessons Learned
