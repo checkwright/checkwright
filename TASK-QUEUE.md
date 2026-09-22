@@ -126,7 +126,9 @@ three kit gates bake a matching window with no knob: `MARKER_REACH` (100 code po
 
 **Specified 2026-09-22:** `CANON_KIT_KNOB_CITATION_REACH` (a count, `sentence` or `off`), `CANON_KIT_DEFAULT_COUPLING_WINDOW` (a count or `off`, which stops SPEC agreement and keeps source self-agreement) and `GATE_SDK_ASSERTION_STRENGTH_WINDOW` (a count; no `off`, since the window bounds the gate's only assertion). A paragraph bound for the coupling window and a guard-body bound for assertion strength are refused with grounds. This repo binds the shipped values, which move no verdict here.
 
-**Cost while deferred:** every adopter meets three distances it cannot set. Filed 2026-09-22 to the gap inbox from the consumer-policy-seam spec census (survey record block "which kit gates bake a policy…"), and entered directly under the direction above. **DISTINCT from** [matching-window-roster-absent](#matching-window-roster-absent), which owns the refused roster; this owns the three conversions.
+**Widened 2026-09-23 by a second operator direction, lead-relayed:** the gap filed at this spec, the 24-byte span in which `spec::DefaultGrammar::default_bound_at` binds "default" to a value literal, joins this unit. Probed at entry: `check-knob-citation` is its one caller (the filing said both knob gates, which is false; the coupling gate hands the grammar its own window's tail). **Specified:** `CANON_KIT_KNOB_CITATION_LITERAL_SPAN`, bytes, default `24`, with no `off` of its own, since the reach's `off` stops the same leg. Sentence and clause bounds are refused because both admit the adverbial "by default" the span exists to refuse.
+
+**Cost while deferred:** every adopter meets four distances it cannot set. Filed 2026-09-22 to the gap inbox from the consumer-policy-seam spec census (survey record block "which kit gates bake a policy…"), and entered directly under the direction above. **DISTINCT from** [matching-window-roster-absent](#matching-window-roster-absent), which owns the refused roster; this owns the three conversions.
 
 ## Technical Debt
 
