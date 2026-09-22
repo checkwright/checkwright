@@ -114,6 +114,20 @@ no surface rosters which gates carry a same-line or same-paragraph matching wind
 
 **Cost while deferred:** measured at seven misses in one iteration, two of them reaching validate. Filed 2026-08-07 by close as that iteration's candidate lesson; iceboxed in the machinery-class triage slice; returned to the deferred section at `door-binding-sweep`'s close drain on the recurrence above. Owner lookup: `probe`, `premise`, `unverified`, `corpus narrower` — this entry, plus two **adjacent and distinct** icebox members: the cited-object token sweep's corpus (a *gate's* corpus) and [dispatched-child-asserts-an-unverified-base](#dispatched-child-asserts-an-unverified-base) (a child inheriting a base it never probed).
 
+### baked-matching-windows
+
+[spec: SPEC-matching-windows.md]
+
+three kit gates bake a matching window with no knob: `MARKER_REACH` (100 code points, `native/src/gates/knob_citation.rs`, `check-knob-citation`), an inline 400-code-point search window (`native/src/gates/knob_default_coupling.rs`, `check-knob-default-coupling`, no SPEC ground stated) and `WINDOW` (8 lines, `native/src/gates/assertion_strength.rs`, `check-assertion-strength`). Each is a calibration another adopter could set differently while the gate's contract stays true, so every adopter inherits three hand-picked distances as unbypassable reds.
+
+**Deliverable, per Policy-as-choice:** each a knob in its kit's table, default the shipped value so no verdict moves, `off` where the gate's other assertions survive, the SPEC section stating the knob, a fixture case per value, and this repo binding its choice in its knob file.
+
+**Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed at a spec re-entry after align: all three windows rather than `MARKER_REACH` alone, fixed in this iteration rather than left filed. It goes after [consumer-policy-rule-absent](#consumer-policy-rule-absent), whose rule it applies.
+
+**Specified 2026-09-22:** `CANON_KIT_KNOB_CITATION_REACH` (a count, `sentence` or `off`), `CANON_KIT_DEFAULT_COUPLING_WINDOW` (a count or `off`, which stops SPEC agreement and keeps source self-agreement) and `GATE_SDK_ASSERTION_STRENGTH_WINDOW` (a count; no `off`, since the window bounds the gate's only assertion). A paragraph bound for the coupling window and a guard-body bound for assertion strength are refused with grounds. This repo binds the shipped values, which move no verdict here.
+
+**Cost while deferred:** every adopter meets three distances it cannot set. Filed 2026-09-22 to the gap inbox from the consumer-policy-seam spec census (survey record block "which kit gates bake a policy…"), and entered directly under the direction above. **DISTINCT from** [matching-window-roster-absent](#matching-window-roster-absent), which owns the refused roster; this owns the three conversions.
+
 ## Technical Debt
 
 ## Deferred
