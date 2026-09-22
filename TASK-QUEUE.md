@@ -90,6 +90,56 @@ eighteen kit-shipped `couples=` literals across thirteen members name a consumer
 
 **Cost while deferred:** a new membership pipe written in a suite goes unflagged until it flips a verdict under load. Filed 2026-09-22 by build batch 4 of gate-sdk-surface-drain on a lead ruling; promoted at close because §check-pipe-membership states the suites outside its corpus, so the widening is an envelope change for spec, not a drain fix.
 
+### ps1-ascii-unheld-at-commit
+
+[cost: event/low] [surface: gate-sdk]
+
+installer/SPEC.md §The install boundary rules a shipped PowerShell file's code ASCII, and nothing local holds it: Windows PowerShell 5.1 decodes a BOM-less script in the host ANSI code page, so a UTF-8 em-dash inside a string literal closes the string and the whole parse collapses (measured 2026-09-22, run `35753505608`, `installer/bin/checkwright.ps1`). Re-verified at this drain: no module under `native/src/gates/` asserts a file's content ASCII, and `scripts/portability-patterns.list` carries no such pattern — so the only enforcement is the `install-smoke-pwsh-windows` leg, and a regression costs a watched push to find.
+
+**Deliverable:** a precommit assertion over the configured install-path corpus's `*.ps1` — non-ASCII outside comments — with the fixture pair the born-native contract requires. `check-portability-floor` is the nearest home: its corpus `GATE_SDK_PORTABILITY_PATHS` already reaches `installer/bin`. **The design question the home raises:** that gate's roster is one POSIX ERE per line with neither comment-awareness nor a character-class vocabulary for *non-ASCII*, so the assertion is a module arm beside the roster rather than a roster line.
+
+**Cost while deferred:** the class regresses only into a watched push, against a one-to-two-push iteration budget. Filed 2026-09-22 by build batch 1; promoted at close because →fix needs a new gate arm and a fixture pair, which is build-class work under scope-gated intake. Owner lookup ran `ascii`, `portability-floor` and `code page` over the queue — no owner.
+
+### msg-uuid-reach-unbounded
+
+[cost: event/low] [surface: gate-sdk]
+
+`scripts/msg-patterns.list` line 21 and its kit twin `gate-sdk/templates/msg-patterns.list` line 21 spell `^[A-Za-z][A-Za-z-]*: .*<uuid>`, whose `.*` was bounded by the physical line and is now bounded by a paragraph. Re-verified at this drain: both live lines carry the unbounded form and so do all three fixture copies (`gate-sdk/gate-tests/check-commit-msg/{good,bad}/patterns.list`, `gate-sdk/gate-tests/check-tree-terms/good/patterns.list`) — five sites. Nothing reds today: exactly one tracked line wears both the trailer-key shape and a UUID, inside a pruned fixture. The ordinary edit that reds it is a markdown paragraph opening `Note: ` or `Session: ` that quotes an example session UUID later in the same paragraph, which this repo documents `--emit session-id` and so plausibly writes.
+
+**Deliverable:** a bounded reach. Candidate, run by the filer through `check-tree-terms` over the tracked tree and clean at exit 0: `^[A-Za-z][A-Za-z-]*: [^.;]{0,40}<uuid>`. **The seam question the fix must rule first:** a numeric reach inside a shipped generic pattern sits on the provenance boundary, so whether the calibration belongs in the kit template, the consumer copy, or both is undecided (gate-sdk/SPEC.md §The provenance seam).
+
+**Inferred, not run:** the candidate preserves all three assertions in `native/src/gates/tree_terms.rs` — run `gate-sdk/bin/run-gates.sh --only check-tree-terms` plus the `check-commit-msg` and `check-tree-terms` fixture suites against each of the five rewritten copies.
+
+**Inferred, not run:** the interval stays under the engine's `RE_DUP_MAX` of 255 — `grep -rn RE_DUP_MAX native/src/`.
+
+**Cost while deferred:** a false red waits on the first prose paragraph pairing a trailer-shaped lead-in with a quoted UUID. Filed 2026-09-22 by build batch 2 under scope-gated intake; the lead ruled it stays filed rather than landing mid-iteration, and it promotes at close because the seam question is an envelope call for spec, not a drain fix. **DISTINCT from `line-window-gates-unaudited`** (Done 2026-09-22), whose subject is a named roster of three windows, all three measured to need no recalibration; this is a fourth pattern that audit met on the way. Owner lookup ran `msg-patterns`, `matching window` and `same-line window` over the queue — no owner.
+
+### measured-claim-span-unbounded
+
+[cost: event/low] [surface: canon-kit]
+
+`check-measured-claim` binds a full-line `measured:` marker to the paragraph below it, and on an unwrapped tree that paragraph is one line running to thousands of code points. Arm C then tests only that the marker's cardinal appears somewhere in the span, so a marker whose own sentence has drifted can still read as agreeing.
+
+**The measurement the filing asked for was bought at this drain, and it corrects the filed premise twice.** (1) Arm C is *fail-closed* on a wide span rather than silently green: `native/src/gates/measured_claim.rs` reds the run when the bound claim carries more than one distinct cardinal ("which one the marker holds is ambiguous"), and a thousands-code-point paragraph almost always carries several. The false-green case survives only where a long span carries exactly one distinct cardinal equal to the marker's value. (2) Arm C is dormant on this tree: every live full-line marker is `gate-substrates=native` (`CONTRIBUTING.md`, `SECURITY.md`, `docs/positioning.md`, `docs/methodology.md`), a non-cardinal value `cardinal_value` returns `None` for, so the paragraph span is never read at all. Every other marker in the tree is a fixture or a grammar specimen.
+
+**Deliverable, repriced by the above:** a reach or a sentence boundary on the full-line marker's claim span, or a stated reason the paragraph is the right unit — canon-kit/SPEC.md §check-measured-claim owns the sentence. It stays filed rather than discarded because the gate ships to adopters whose trees this measurement cannot reach.
+
+**Cost while deferred:** an adopter writing a cardinal-valued full-line marker above an unwrapped paragraph gets a binding whose agreement is near-accidental. Filed 2026-09-22 by build batch 2 as inferred from source; measured at this close and narrowed. **DISTINCT from `line-window-gates-unaudited`** (Done 2026-09-22), whose closed roster of three windows that audit discharged; this is a fourth gate it flagged and did not audit. Owner lookup ran `measured-claim` and `paragraph` over the queue — no owner.
+
+### smoke-registry-omission-blind
+
+[cost: event/low] [surface: gate-sdk]
+
+`check-gate-substrate-parity` assertion I holds the *consumer's* `scripts/gates.list` against the binary's owned-subcommand roster, but it reads `gate-sdk/smoke/install.sh`'s embedded registry only when it runs inside the scratch consumer — so in the authoring repo nothing reads that heredoc at all. Measured this iteration: `check-action-job-ref` landed in `39e92816` touching every roster site except that one, and the miss surfaced three commits later as three red validate suites (`demo`, `consumer_smoke`, `agents_md_smoke`), each failing in that script's ACT 1 hook leg — an expensive, badly-localized signal for a one-line omission, repaired at `d683ada3`. docs/site-architecture.md already rosters the site as hand-maintained, so this is enforcement of a rule already written, not a new rule.
+
+**Deliverable:** a precommit-tier assertion that every kit's `smoke/install.sh` registry-plus-`# unregistered:` set covers that kit's owned subcommands in the binary registry. `check-gate-substrate-parity` is the nearest home — it already owns the roster read (`gates::names_with_owners`), the declaration grammar, and it already runs on the authoring tree.
+
+**One of the two filed inferred claims was run at this drain and holds:** no kit's `smoke/install.sh` currently omits a gate the binary attributes to it, checked across all eleven kits against `--list`'s owner column. Honest limit: the probe tested *mention anywhere in the file*, which is necessary but weaker than the registry-versus-`# unregistered:` split the real assertion would make.
+
+**Inferred, not run:** parsing the heredoc out of `smoke/install.sh` needs no new grammar beyond `registry::members` plus the `# unregistered:` reader — establish it by drafting the arm against `gate-sdk/smoke/install.sh` and its ten sibling scripts.
+
+**Cost while deferred:** each new kit-owned subcommand can miss the site, and the catcher stays three validate suites away from the cause. Filed 2026-09-22 by validate. Owner lookup ran `smoke registry`, `substrate-parity` and `roster site` over the queue — [substrate-parity-assertion-c-reach-unannounced](#substrate-parity-assertion-c-reach-unannounced) (icebox) owns assertion C's reach, not assertion I's blind spot, and [non-gate-arm-roster-hand-maintained](#non-gate-arm-roster-hand-maintained) (icebox) owns a different hand-maintained roster; no owner.
+
 ### disclaimer-beside-its-own-restatement
 
 [cost: event/low] [surface: canon-kit]
