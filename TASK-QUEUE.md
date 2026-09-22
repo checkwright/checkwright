@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: install-first-contact
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [README.md](README.md) maps the kits.
 
@@ -9,6 +9,66 @@
 ## New Features
 
 ## Technical Debt
+
+### line-window-gates-unaudited
+
+`check-knob-citation`'s same-line default leg bound unrelated knobs once paragraphs became one line, and queue-kit-unwrap recalibrated it to a 100-code-point forward reach. No one has audited the other gates whose precision rests on a same-line window (the `check-manifest-count` wedge, `check-prose-tells`, the msg-patterns account pattern) for the wider unit. None of them reds today.
+
+**Deliverable:** per gate, a measured over-firing read on the unwrapped tree, and a recalibration or a stated reason the line is still the right unit.
+
+**Cost while deferred:** silent over-firing on a future long paragraph. Filed 2026-09-22 to the gap inbox by queue-kit-unwrap's build batch 3. Promoted at close because →fix is an audit of three gates. Owner lookup ran over `same-line` and `co-occur` in canon-kit/SPEC.md, gate-sdk/SPEC.md and the audit roster and found no owner.
+
+### manifest-files-configured-branch-unpruned
+
+`spec::manifest_files`' configured branch (`CANON_KIT_MANIFEST_FILES` non-empty) applies no prune set, where the default branch's walks prune `GATE_SDK_PRUNE_DIRS` and canon-kit/SPEC.md §The shared spec adapters rules that `comment_surface`'s configured branch narrow exactly as its default does. So a configured value cannot say `**` without admitting `gate-tests/` fixtures; this repo's single-level globs in `scripts/canon-config.knobs` stand in for the prune. Verified 2026-09-15 at close: the configured branch is `glob_files` plus an `is_file` test, with no `path_pruned` filter.
+
+**Why design-pending:** the repair narrows a corpus shared by roughly ten readers (`check-md-refs`, `check-docs-cmd`, `check-manifest-count`, `check-prose-enum` and the claim gates among them), so canon-kit/SPEC.md §The causal-completeness check item 5 binds: each reader's red condition is enumerated, a zero-count reader such as `check-install-claim` being the attested inversion. Whether any consumer relies on the unpruned form is unprobed.
+
+**Cost while deferred:** a consumer widening the knob with a multi-level glob governs fixture prose as manifest content, or enumerates single-level globs around the gap; and both configured expansions (`CANON_KIT_MANIFEST_FILES`, `CANON_KIT_PROSE_SURFACE_GLOBS`) still call `walk::glob_files`, so a `**` there stats every entry under `target/` and a concurrent cargo build can exit-2 every manifest reader on a clean tree. Repair route: `walk::glob_corpus` (gate-sdk/SPEC.md §The port-candidate criteria). Re-verified 2026-09-22 at scope: `native/src/spec.rs` lines 179 and 197. Filed 2026-09-15 by `couples-field-semantics`' spec into the gap inbox; drained and promoted 2026-09-15 at close.
+
+### amendment-refusal-acceptance-parity
+
+an amendment's refusal rationale can claim an acceptance criterion asserts something that criterion does not say. The `--dry-run` amendment refused a gate on the stated ground that the behavioral property was asserted directly instead, in D8, as *each mutating verb's* `--dry-run` leaving the tree object unchanged. D8's own ordered specification listed one verb, not each. Two sections of one governing document said different things about what that document accepts.
+
+**The contradiction, not the coverage, is what earns the entry.** A build session reading either section in isolation would have been correct and would have shipped a different acceptor — the wide reading builds three assertions, the narrow one builds one. Build read D8's explicit list and built to it, which is the conservative call and the right one, since widening asserted behavior is envelope-shaped. But which acceptor shipped turned on which section the builder happened to open.
+
+**It passed spec and align.** Neither stage caught a self-falsifying document, which is what makes this a methodology gap rather than one amendment's typo: the acceptance section is the contract, the refusal section argues *from* it, and nothing compares the two.
+
+**Gap generalization — the class that should have caught it.** The nearest sibling is [intra-file-pendency-contradiction-scan](#intra-file-pendency-contradiction-scan), which scans one file for a slug whose tense disagrees between two sections. Same family — a governed file falsifying itself, decidable with no tree comparison — on a different axis: that one is about tense, this about the scope of an acceptance claim. Cited rather than folded, because collapsing them would hand one gate two unrelated vocabularies.
+
+**Why design-pending:** the decidable predicate is not obvious. "A refusal section citing an acceptance item must quote it" is checkable but is ceremony; comparing a paraphrase against the criterion it paraphrases is a judgment no scanner makes. The honest middle — a refusal may cite an acceptance item by identifier and may not restate its content — is a change to the amendment format, which is doctrine rather than a gate.
+
+**Cost while deferred:** any amendment can argue a refusal from a claim about its own acceptance that no stage verifies, and the failure is silent — both readings pass every gate, and the divergence surfaces only as a coverage gap found after the amendment is deleted.
+
+**Closing this takes both halves, and the ruling folds the fix in here rather than into a unit of its own.** Lead-ruled 2026-08-08: a separate entry for the one-assertion fix would let the cheap half close on its own and quietly leave the expensive one — that the document cleared both spec and align carrying the contradiction — as nobody's. Enforcement-first, applied to a finding rather than a gate: the fix and what explains it land together. Closure therefore requires **both** (1) the missing `--dry-run` assertion in the consumer smoke and (2) removal of the stated bound in `installer/SPEC.md` §The verbs. **Premise corrected 2026-09-22 at scope:** `init --dry-run` is already held there (installer/SPEC.md §The verbs, the classifier paragraph), and the bound now names `update --dry-run` as the unheld verb, so the claim that `update` execing `init` makes one arm cover both is false. What remains is an `update --dry-run` arm, then the bound's removal.
+
+**The tree is honest today, only narrower than the refusal argued.** The capability-liveness sweep at this close found zero governed surfaces still carrying the wide claim, so nothing published overclaims; what is missing is the assertion, not a correction. Filed 2026-08-08 by close, draining the gap inbox; found at build. The coverage half was escalated as an envelope call and folded in here on the lead's ruling the same day.
+
+### docs-link-red-remedy-first
+
+`check-docs-link-convention` reds on the most ordinary thing a docs subpage author writes, and leads with the diagnosis.
+
+**Measured 2026-08-09 at spec on a real `init` consumer.** A `docs/` tree whose `index.md` carries a `[project README](../README.md)` link reds with "off-root relative link … resolves outside docs/".
+
+**The rule is correct, and changing it is not what this asks for.** For a site served from `docs/` alone such a link 404s, and the gate already offers a remedy — the absolute self-repo blob form, or a `docs-link-exempt:` comment. It stays on-surface deliberately (its descriptor's `install:` line keeps it there), so nothing is broken today.
+
+**The gap is first contact.** The gate's whole subject is a docs host, so the adopter most likely to register it is the adopter most likely to write that link — and they meet a red before they meet the remedy, having adopted the battery minutes earlier.
+
+**The buyable half is probably narrower than a rule change:** the failure text could lead with the remedy rather than the diagnosis. That is a message edit plus its fixture, not a predicate change, and it should be costed before any widening of the rule is.
+
+**Cost while deferred:** paid once per docs adopter, at exactly the moment they are deciding whether the battery is worth keeping — the worst moment this project has to spend a false-feeling red. Filed 2026-08-09 by close, draining the bullet spec filed under scope-gated intake.
+
+### install-smoke-powershell-demo-runs-before-bash-strip
+
+the `install-smoke-powershell` leg runs `checkwright demo` (the `full` battery) in the step BEFORE the one that strips every bash from PATH, so the full profile on Windows is witnessed with bash present and never without; the no-bash step exercises only the starter init's hooks.
+
+**Re-verified at this scope:** in `.github/workflows/gates.yml` the demo block sits in the init step, ahead of the step named "commit through the generated hooks with no bash on PATH"; gates run 35632734000 (`58908d02`) showed both green in that order. installer/SPEC.md §demo claims only that the leg runs the verb on a PowerShell adopter's path, so no tracked sentence is false.
+
+**Deliverable — rule one of two:** run the demo after the strip (or a second demo there), or state in installer/SPEC.md §demo that the Windows oracle holds bash on PATH.
+
+**Why promoted, not fixed:** moving the demo is a Windows step whose verdict is unknown until a Windows run — a `full` member spawning bash would red it — and the other limb narrows a claim.
+
+**Cost while deferred:** a `full`-profile gate needing bash on Windows ships unseen. Filed 2026-09-21 to the gap inbox by `docs-first-contact`'s close, reading its push run; promoted at the next scope. Owner lookup: `install-smoke-powershell`, `demo`, `bash stripped` — the two entries naming that leg own its name and its exemption keying, not its step order.
 
 ## Deferred
 
@@ -21,16 +81,6 @@ a kit feature that encodes a policy, such as record-size capping, ships this pro
 **Deliverable:** a DOCTRINE methodology rule plus its one-line digest in the always-loaded file, and an enforcement if one is feasible. Operator direction, with the work: first run a read-heavy audit (audit-sweep type) of existing gates and of decommissioned ones (deleted `.gate` descriptors and removed `native/src` modules in git history) for places where a gate hard-codes this project's policy instead of offering consumer-selectable alternatives. The audit's findings supply the rule's worked examples and the follow-up entries.
 
 **Cost while deferred:** every design session defaults to hard-coding this project's preference, and the operator pays for each correction. Filed 2026-09-22 to the gap inbox by the queue-kit-unwrap lead as an operator direction, with an addendum. Promoted at its close because →fix would author a new doctrine rule and an audit, which is more than a close drain may land. Recurrence stamped on the operator's statement that the direction had been corrected before. Owner lookup ran over `policy`, `consumer choice` and `consumer-select` in doctrine-kit/DOCTRINE.md and found no owner.
-
-### line-window-gates-unaudited
-
-[cost: event/low] [surface: canon-kit]
-
-`check-knob-citation`'s same-line default leg bound unrelated knobs once paragraphs became one line, and queue-kit-unwrap recalibrated it to a 100-code-point forward reach. No one has audited the other gates whose precision rests on a same-line window (the `check-manifest-count` wedge, `check-prose-tells`, the msg-patterns account pattern) for the wider unit. None of them reds today.
-
-**Deliverable:** per gate, a measured over-firing read on the unwrapped tree, and a recalibration or a stated reason the line is still the right unit.
-
-**Cost while deferred:** silent over-firing on a future long paragraph. Filed 2026-09-22 to the gap inbox by queue-kit-unwrap's build batch 3. Promoted at close because →fix is an audit of three gates. Owner lookup ran over `same-line` and `co-occur` in canon-kit/SPEC.md, gate-sdk/SPEC.md and the audit roster and found no owner.
 
 ### queue-migrate-bold-split
 
@@ -530,42 +580,6 @@ one file can call the same slug landed in one section and pending in another, an
 
 **Cost while deferred:** the class stays a sweep whose reach is whoever runs it, and its one measured miss cost a full iteration of a governed SPEC contradicting itself in public — gate-sdk/SPEC.md is mirrored to the docs site, so the contradiction shipped. Filed 2026-08-04 at close; the instances it would have caught were fixed the same session.
 
-### amendment-refusal-acceptance-parity
-
-[cost: event/low] [surface: canon-kit]
-
-an amendment's refusal rationale can claim an acceptance criterion asserts something that criterion does not say. The `--dry-run` amendment refused a gate on the stated ground that the behavioral property was asserted directly instead, in D8, as *each mutating verb's* `--dry-run` leaving the tree object unchanged. D8's own ordered specification listed one verb, not each. Two sections of one governing document said different things about what that document accepts.
-
-**The contradiction, not the coverage, is what earns the entry.** A build session reading either section in isolation would have been correct and would have shipped a different acceptor — the wide reading builds three assertions, the narrow one builds one. Build read D8's explicit list and built to it, which is the conservative call and the right one, since widening asserted behavior is envelope-shaped. But which acceptor shipped turned on which section the builder happened to open.
-
-**It passed spec and align.** Neither stage caught a self-falsifying document, which is what makes this a methodology gap rather than one amendment's typo: the acceptance section is the contract, the refusal section argues *from* it, and nothing compares the two.
-
-**Gap generalization — the class that should have caught it.** The nearest sibling is [intra-file-pendency-contradiction-scan](#intra-file-pendency-contradiction-scan), which scans one file for a slug claimed landed in one section and pending in another. Same family — a governed file falsifying itself, decidable with no tree comparison — on a different axis: that one is about tense, this about the scope of an acceptance claim. Cited rather than folded, because collapsing them would hand one gate two unrelated vocabularies.
-
-**Why design-pending:** the decidable predicate is not obvious. "A refusal section citing an acceptance item must quote it" is checkable but is ceremony; comparing a paraphrase against the criterion it paraphrases is a judgment no scanner makes. The honest middle — a refusal may cite an acceptance item by identifier and may not restate its content — is a change to the amendment format, which is doctrine rather than a gate.
-
-**Cost while deferred:** any amendment can argue a refusal from a claim about its own acceptance that no stage verifies, and the failure is silent — both readings pass every gate, and the divergence surfaces only as a coverage gap found after the amendment is deleted.
-
-**Closing this takes both halves, and the ruling folds the fix in here rather than into a unit of its own.** Lead-ruled 2026-08-08: a separate entry for the one-assertion fix would let the cheap half close on its own and quietly leave the expensive one — that the document cleared both spec and align carrying the contradiction — as nobody's. Enforcement-first, applied to a finding rather than a gate: the fix and what explains it land together. Closure therefore requires **both** (1) the `init --dry-run` assertion in the consumer smoke — one arm, because `update` execs `init`, so it covers both mutating paths the reversal arm does not — and (2) removal of the stated bound now standing in `installer/SPEC.md` §The verbs and §The consumer smoke. Taking (1) without (2) leaves a published caveat naming a coverage limit that no longer holds.
-
-**The tree is honest today, only narrower than the refusal argued.** The capability-liveness sweep at this close found zero governed surfaces still carrying the wide claim, so nothing published overclaims; what is missing is the assertion, not a correction. Filed 2026-08-08 by close, draining the gap inbox; found at build. The coverage half was escalated as an envelope call and folded in here on the lead's ruling the same day.
-
-### docs-link-red-remedy-first
-
-[cost: event/high] [surface: site-kit]
-
-`check-docs-link-convention` reds on the most ordinary thing a docs subpage author writes, and leads with the diagnosis.
-
-**Measured 2026-08-09 at spec on a real `init` consumer.** A `docs/` tree whose `index.md` carries a `[project README](../README.md)` link reds with "off-root relative link … resolves outside docs/".
-
-**The rule is correct, and changing it is not what this asks for.** For a site served from `docs/` alone such a link 404s, and the gate already offers a remedy — the absolute self-repo blob form, or a `docs-link-exempt:` comment. It stays on-surface deliberately (its descriptor's `install:` line keeps it there), so nothing is broken today.
-
-**The gap is first contact.** The gate's whole subject is a docs host, so the adopter most likely to register it is the adopter most likely to write that link — and they meet a red before they meet the remedy, having adopted the battery minutes earlier.
-
-**The buyable half is probably narrower than a rule change:** the failure text could lead with the remedy rather than the diagnosis. That is a message edit plus its fixture, not a predicate change, and it should be costed before any widening of the rule is.
-
-**Cost while deferred:** paid once per docs adopter, at exactly the moment they are deciding whether the battery is worth keeping — the worst moment this project has to spend a false-feeling red. Filed 2026-08-09 by close, draining the bullet spec filed under scope-gated intake.
-
 ### baseline-row-prose-coupling-gate
 
 [cost: event/low] [surface: canon-kit]
@@ -714,16 +728,6 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 **Cost while deferred:** each kit-library retirement can strand a queue citation that reads live until a hand grep finds it. Filed 2026-09-14 by `config-seam-second-cut`'s close into the gap inbox, from its stale-identifier-after-retirement audit; promoted at this iteration's scope.
 
-### manifest-files-configured-branch-unpruned
-
-[cost: event/low] [surface: canon-kit]
-
-`spec::manifest_files`' configured branch (`CANON_KIT_MANIFEST_FILES` non-empty) applies no prune set, where the default branch's walks prune `GATE_SDK_PRUNE_DIRS` and canon-kit/SPEC.md §The shared spec adapters rules that `comment_surface`'s configured branch narrow exactly as its default does. So a configured value cannot say `**` without admitting `gate-tests/` fixtures; this repo's single-level globs in `scripts/canon-config.knobs` stand in for the prune. Verified 2026-09-15 at close: the configured branch is `glob_files` plus an `is_file` test, with no `path_pruned` filter.
-
-**Why design-pending:** the repair narrows a corpus shared by roughly ten readers (`check-md-refs`, `check-docs-cmd`, `check-manifest-count`, `check-prose-enum` and the claim gates among them), so canon-kit/SPEC.md §The causal-completeness check item 5 binds: each reader's red condition is enumerated, a zero-count reader such as `check-install-claim` being the attested inversion. Whether any consumer relies on the unpruned form is unprobed.
-
-**Cost while deferred:** a consumer widening the knob with a multi-level glob governs fixture prose as manifest content, or enumerates single-level globs around the gap; and both configured expansions (`CANON_KIT_MANIFEST_FILES`, `CANON_KIT_PROSE_SURFACE_GLOBS`) still call `walk::glob_files`, so a `**` there stats every entry under `target/` and a concurrent cargo build can exit-2 every manifest reader on a clean tree. Repair route: `walk::glob_corpus` (gate-sdk/SPEC.md §The port-candidate criteria). Verified 2026-09-19 at close: `native/src/spec.rs` lines 197 and 215. Filed 2026-09-15 by `couples-field-semantics`' spec into the gap inbox; drained and promoted 2026-09-15 at close.
-
 ### local-only-files-write-back-untriggered
 
 [cost: event/low] [surface: lifecycle-kit]
@@ -737,20 +741,6 @@ the consumer's local-only companion files have read triggers at three skills and
 **Held Deferred by the enhancement admission filter** (TRAJECTORY.md §The rulings): new template slots are an enhancement that cuts no time-to-first-value, closes no trust gap and produces no external proof.
 
 **Cost while deferred:** local-only surfaces drift until a consult happens to audit them. Filed 2026-09-18 to the gap inbox by the consult that audited the local-only files, after `external-install-evidence`'s close; promoted to Deferred at the next scope.
-
-### install-smoke-powershell-demo-runs-before-bash-strip
-
-[cost: event/low] [surface: .github]
-
-the `install-smoke-powershell` leg runs `checkwright demo` (the `full` battery) in the step BEFORE the one that strips every bash from PATH, so the full profile on Windows is witnessed with bash present and never without; the no-bash step exercises only the starter init's hooks.
-
-**Re-verified at this scope:** in `.github/workflows/gates.yml` the demo block sits in the init step, ahead of the step named "commit through the generated hooks with no bash on PATH"; gates run 35632734000 (`58908d02`) showed both green in that order. installer/SPEC.md §demo claims only that the leg runs the verb on a PowerShell adopter's path, so no tracked sentence is false.
-
-**Deliverable — rule one of two:** run the demo after the strip (or a second demo there), or state in installer/SPEC.md §demo that the Windows oracle holds bash on PATH.
-
-**Why promoted, not fixed:** moving the demo is a Windows step whose verdict is unknown until a Windows run — a `full` member spawning bash would red it — and the other limb narrows a claim.
-
-**Cost while deferred:** a `full`-profile gate needing bash on Windows ships unseen. Filed 2026-09-21 to the gap inbox by `docs-first-contact`'s close, reading its push run; promoted at the next scope. Owner lookup: `install-smoke-powershell`, `demo`, `bash stripped` — the two entries naming that leg own its name and its exemption keying, not its step order.
 
 ### md-unwrap-folds-declarations
 
