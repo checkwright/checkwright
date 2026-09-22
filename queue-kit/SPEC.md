@@ -2210,10 +2210,12 @@ off its implementation module rather than off its descriptor.
 Invariant: no active-section entry states a forward precondition in prose
 ("revisit when …", "once X lands", "gated on …") without a `[blocked-by:]`
 tag — such an entry is latently blocked yet mechanically pickable as "first
-unblocked", because selection trusts tags, not prose. Resolution: tag the
-real blocker, move the entry to the deferred section, rephrase past-tense if
-the precondition is met, or the `[precondition-ok: <reason>]` opt-out (a
-queue tag, not an HTML comment, so it survives the hygiene gate).
+unblocked", because selection trusts tags, not prose. Resolution depends on
+what the fired clause says, which the finding prints. A precondition the entry
+waits on takes the real blocker as a tag, a move to the deferred section, or a
+past-tense rephrase if it is met. The `[precondition-ok: <reason>]` opt-out (a
+queue tag, not an HTML comment, so it survives the hygiene gate) is for
+everything else.
 
 Calibration: the trigger set (`QUEUE_KIT_PRECONDITION_REGEX`) is deliberately
 narrow — forward-looking phrasing only, the default's phrases left-bounded on a
@@ -2231,9 +2233,23 @@ where a kit-generic defect does not belong. The gate is scoped to the active
 sections (the deferred section uses
 "revisit when" as normal vocabulary and is exempt, and the icebox inherits that
 exemption for the same reason: forward-looking phrasing is what a parked entry
-is *for*). FP-bearing by
-construction (parsing prose intent); the blocking grade is justified by a
-silent pick attested in production use and the bounded scope.
+is *for*).
+
+**Two shapes match the trigger set without stating a precondition, and the
+valve is their contract rather than a workaround.** A **negated** clause ("not
+gated on", "never waiting on") and an **inverted** one, naming this entry as
+what another waits on ("upstream of", "blocked on this"), both fire. The gate
+reads neither negation nor direction, deliberately. Telling who is blocked
+means parsing a sentence's subject, and any read the gate could run is a second
+phrase set of cues that misses the next spelling, the brittle-vocabulary
+refusal §The tag algebra makes for relational verbs. For those shapes the valve
+with a stated cause is the whole answer, and its reason names which shape it
+is. The finding quotes the fired clause from the lowercased, rewritten body —
+the match widened to its enclosing clause, up to the neighbouring `.`, `;` or
+line end and capped at 80 code points each side — so it is matched text, never
+the author's spelling. Blocking grade still stands. A silent pick was attested
+in production use, and a false positive costs one red and one valve that the
+finding's own help routes to.
 
 ### check-queue-slug-liveness
 

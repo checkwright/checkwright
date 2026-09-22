@@ -57,6 +57,22 @@ fn is_top_level_entry(line: &str) -> bool {
         && matches!(b.get(1), Some(&c) if c == b' ' || c == b'\t' || c == 0x0b || c == 0x0c || c == b'\r')
 }
 
+const SPAN_CAP: usize = 80;
+
+fn clause_end(c: &char) -> bool {
+    matches!(c, '.' | ';' | '\n')
+}
+
+// spec: queue-kit/SPEC.md §check-queue-prose-precondition — the match widened to its enclosing
+// clause, capped each side, quoted from the rewritten body rather than the author's spelling
+fn fired_span(b: &str, s: usize, e: usize) -> String {
+    let mut left: Vec<char> = b[..s].chars().rev().take_while(|c| !clause_end(c)).take(SPAN_CAP).collect();
+    left.reverse();
+    let right: String = b[e..].chars().take_while(|c| !clause_end(c)).take(SPAN_CAP).collect();
+    let whole = format!("{}{}{}", left.into_iter().collect::<String>(), &b[s..e], right);
+    whole.split_whitespace().collect::<Vec<_>>().join(" ")
+}
+
 fn carries_block_tag(line: &str) -> bool {
     line.contains("[blocked-by:") || line.contains("[precondition-ok:")
 }
@@ -96,7 +112,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     };
     let text = std::fs::read_to_string(&file).map_err(|_| format!("file not found: {}", file))?;
 
-    let mut findings: Vec<(usize, String)> = Vec::new();
+    let mut findings: Vec<(usize, String, String)> = Vec::new();
     let mut open: Option<Entry> = None;
     let mut inq = false;
 
@@ -109,8 +125,18 @@ fn rule(args: &[String]) -> Result<i32, String> {
         let b = replace_all(&bracket, &b, " ")?;
         let b = replace_all(&past_tense, &b, " ")?;
         let b = replace_all(&tag_word, &b, " ")?;
-        if trig.is_match(&b) && !e.hasblock {
-            findings.push((e.startln, e.lead));
+        if e.hasblock {
+            return Ok(());
+        }
+        if let Some((s, t)) = trig.find(&b) {
+            if !b.is_char_boundary(s) || !b.is_char_boundary(t) {
+                return Err(format!(
+                    "the trigger matched bytes {}..{} of a body those offsets do not divide — the \
+                     fired-on clause could not be built; treating as failure (not clean)",
+                    s, t
+                ));
+            }
+            findings.push((e.startln, e.lead, fired_span(&b, s, t)));
         }
         Ok(())
     };
@@ -150,12 +176,16 @@ fn rule(args: &[String]) -> Result<i32, String> {
         println!("check-queue-prose-precondition: active entry states a forward precondition in prose");
         println!("but carries no [blocked-by:] tag — selection trusts tags, so it is latently blocked");
         println!("yet mechanically pickable as 'first unblocked':");
-        for (ln, lead) in &findings {
+        for (ln, lead, span) in &findings {
             println!("  {}:{}: {}", file, ln, lead);
+            println!("      fired on: \"{}\"", span);
         }
-        println!("  help: tag the real blocker '[blocked-by: <slug>]', or move the entry to the");
-        println!("        Deferred section, or rephrase past-tense if the precondition is already");
-        println!("        met, or opt out with '[precondition-ok: <reason>]' anywhere in the entry.");
+        println!("  help: read the fired-on clause, then pick by its shape.");
+        println!("    It states a precondition THIS entry waits on: tag the real blocker '[blocked-by: <slug>]',");
+        println!("    move the entry to Deferred, or rephrase past-tense if the precondition is already met.");
+        println!("    It is negated, or it names this entry as what something else waits on: the gate cannot");
+        println!("    read either shape, and '[precondition-ok: <cause>]' anywhere in the entry is the answer");
+        println!("    (queue-kit/SPEC.md §check-queue-prose-precondition).");
         return Ok(1);
     }
 
@@ -204,6 +234,20 @@ mod tests {
             replace_all(&past, "c waitingonce foo landedon d", " ").unwrap(),
             "c waiting on d"
         );
+    }
+
+    // spec: queue-kit/SPEC.md §check-queue-prose-precondition — the fired-on clause
+    #[test]
+    fn the_fired_on_span_is_the_enclosing_clause() {
+        let b = "- **s** — first sentence. this one waits on other landing; then more.";
+        let at = b.find("waits on").unwrap();
+        assert_eq!(fired_span(b, at, at + "waits on".len()), "this one waits on other landing");
+        let b = "- **s** — lead. and it is   gated on the tail";
+        let at = b.find("gated on").unwrap();
+        assert_eq!(fired_span(b, at, at + "gated on".len()), "and it is gated on the tail");
+        let long = format!("{} gated on x", "w".repeat(200));
+        let at = long.find("gated on").unwrap();
+        assert_eq!(fired_span(&long, at, at + 8).chars().count(), SPAN_CAP + " gated on x".len() - 1);
     }
 
     // spec: queue-kit/SPEC.md §check-queue-prose-precondition — awk's `/^-[[:space:]]/`, which

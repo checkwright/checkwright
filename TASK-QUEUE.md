@@ -12,40 +12,6 @@
 
 ## New Features
 
-- **precondition-gate-direction-blindness** [spec: SPEC-precondition-direction.md] —
-  `check-queue-prose-precondition` reds an entry whose prose says the entry IS the blocker, and
-  three of the four remedies it prints are false for that shape.
-  **Reproduced at this iteration's scope rather than predicted.** Promoting
-  `worktree-reclamation-cause-falsification` to Technical Debt red the member on a paragraph
-  reading "UPSTREAM of <slug>" and "two sibling amendments are blocked on", where the entry held
-  no precondition of its own and was pickable first by construction.
-  **The remedy list is the sharper half, and it was read off the gate at this drain.** The four
-  lines it prints are: tag the real blocker, move the entry to Deferred, rephrase past-tense, or
-  take the `[precondition-ok:]` valve. For an entry naming ITSELF as the upstream, a blocker tag
-  asserts a blocker that does not exist, past-tense rephrasing falsifies an unrun experiment, and
-  a move to Deferred undoes an operator-ruled promotion. Only the valve is true, so the gate's
-  own help text steers a session toward writing something false unless it stops to reason.
-  **Direction, not negation — and the filing's "they do not share a fix" FELL at the drain.**
-  `precondition-gate-negation-false-positive` is the NEGATED shape ("not gated on", "no longer
-  waiting on") against a bare-substring alternation; this is the unnegated, affirmative sentence
-  whose subject is the blocker rather than the blocked, and no phrase-set calibration reaches it.
-  But that entry's third candidate deliverable — declare the valve the intended answer and widen
-  queue-kit/SPEC.md's calibration paragraph to say so — is this entry's second horn verbatim. The
-  two are distinct in TRIGGER and overlap in REMEDY, so whichever is taken first should take
-  both; the filing's claim was read against the sibling's trigger set, never its deliverable list.
-  **No `recurrence:` date joins that sibling:** its finding is the gate redding a NEGATED
-  sentence, and a negated sentence did not re-occur. A neighbouring shape in the same
-  false-positive family did, which is a new defect and files as one.
-  **Specified 2026-09-22:** the second horn — the gate reads neither direction nor negation, the
-  valve with a stated cause is the contract for both shapes, the finding prints the clause that
-  fired and the help text branches on it; the iceboxed sibling is left to close's moot sweep.
-  **Cost while deferred:** every entry that names itself as an upstream blocker pays one red and
-  one valve, and the surface teaching the repair teaches three wrong ones.
-  recurrence: precondition-gate-direction-blindness 2026-09-20
-  Filed 2026-08-24 to the gap inbox by scope, which reproduced the red; drained and promoted
-  2026-08-25 at close, which read the gate's four help lines first-hand and corrected the filing;
-  promoted into `queue-kit-unwrap` 2026-09-22 by operator direction (lead-relayed).
-
 - **markdown-hard-wrap-unowned-and-ungated** [spec: SPEC-md-unwrap.md] — this repo's markdown
   hard-wrapping convention is unowned, bimodal and load-bearing for a gate whose manifest does not
   say so, and under enforcement-first the unwrap and its oracle land in one unit or neither does.
@@ -2108,5 +2074,6 @@
 - queue-recovery-pickaxe-wrong-oracle
 - queue-citation-line-number-stales-within-its-own-session
 - recurrence-line-never-ages
+- precondition-gate-direction-blindness
 
 ## Lessons Learned
