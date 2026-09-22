@@ -1,1 +1,8 @@
 # contract: lifecycle-kit/SPEC.md §The survey record — carried surveys, one block per survey; boundary-truncated, cited only behind a passing witness.
+
+## 2026-09-22 scope — which deferred entries lead and fill this iteration's unit set under the admission filter
+- corpus: TASK-QUEUE.md
+- oracle: ./native/target/release/checkwright-gates --emit queue-edges
+- rev: 836b601f87035d7bdbc8ecf283d37857944d5d32
+- finding: No tier-1 row passes the filter: heterogeneous-agent-delegation, the only iteration-class row, was filter-excluded 2026-09-19. No tier-2 roadmap row passes: companion-toolkit-profile and gate-authoring-sdk-surface filter-excluded 2026-09-20; plugin-marketplace, benchmark-ab-experiment, hosted-attestation-service later and demand-gated. No deferred entry reaches the recurrence threshold of 2. Lead: consumer-policy-rule-absent (event/high, operator-directed, one recurrence); its live instance MARKER_REACH is a matching window, and the grep over the pool rules msg-uuid-reach-unbounded, measured-claim-span-unbounded, matching-window-roster-absent and kit-knob-consumer-adapter-convention reshaped by it; probe-before-assertion-doctrine shares its doctrine-kit surface. Window constants probed: MARKER_REACH, SPAN_CAP, WINDOW in native/src/gates. queue-flow mean-filed 3.8. Alternatives: gate-sdk debt drain (7 admissible rows), .github push-protection bundle.
+- inferred: that consumer-policy-rule-absent passes the admission filter on its trust arm (a baked calibration an adopter cannot tune is one they must trust) - a judgment for the lead, not a run; that the doctrine rule's audit will file follow-up entries, raising inflow
