@@ -39,7 +39,6 @@ gates check-lesson-disposition pass
 gates check-merge-attrs pass
 gates check-queue-sections pass
 gates check-queue-hygiene pass
-gates check-queue-wrap pass
 gates check-tag-lead-line pass
 gates check-task-names pass
 gates check-task-conservation pass
