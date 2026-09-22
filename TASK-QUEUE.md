@@ -12,6 +12,330 @@
 
 ## New Features
 
+- **precondition-gate-direction-blindness** [spec: SPEC-precondition-direction.md] —
+  `check-queue-prose-precondition` reds an entry whose prose says the entry IS the blocker, and
+  three of the four remedies it prints are false for that shape.
+  **Reproduced at this iteration's scope rather than predicted.** Promoting
+  `worktree-reclamation-cause-falsification` to Technical Debt red the member on a paragraph
+  reading "UPSTREAM of <slug>" and "two sibling amendments are blocked on", where the entry held
+  no precondition of its own and was pickable first by construction.
+  **The remedy list is the sharper half, and it was read off the gate at this drain.** The four
+  lines it prints are: tag the real blocker, move the entry to Deferred, rephrase past-tense, or
+  take the `[precondition-ok:]` valve. For an entry naming ITSELF as the upstream, a blocker tag
+  asserts a blocker that does not exist, past-tense rephrasing falsifies an unrun experiment, and
+  a move to Deferred undoes an operator-ruled promotion. Only the valve is true, so the gate's
+  own help text steers a session toward writing something false unless it stops to reason.
+  **Direction, not negation — and the filing's "they do not share a fix" FELL at the drain.**
+  `precondition-gate-negation-false-positive` is the NEGATED shape ("not gated on", "no longer
+  waiting on") against a bare-substring alternation; this is the unnegated, affirmative sentence
+  whose subject is the blocker rather than the blocked, and no phrase-set calibration reaches it.
+  But that entry's third candidate deliverable — declare the valve the intended answer and widen
+  queue-kit/SPEC.md's calibration paragraph to say so — is this entry's second horn verbatim. The
+  two are distinct in TRIGGER and overlap in REMEDY, so whichever is taken first should take
+  both; the filing's claim was read against the sibling's trigger set, never its deliverable list.
+  **No `recurrence:` date joins that sibling:** its finding is the gate redding a NEGATED
+  sentence, and a negated sentence did not re-occur. A neighbouring shape in the same
+  false-positive family did, which is a new defect and files as one.
+  **Specified 2026-09-22:** the second horn — the gate reads neither direction nor negation, the
+  valve with a stated cause is the contract for both shapes, the finding prints the clause that
+  fired and the help text branches on it; the iceboxed sibling is left to close's moot sweep.
+  **Cost while deferred:** every entry that names itself as an upstream blocker pays one red and
+  one valve, and the surface teaching the repair teaches three wrong ones.
+  recurrence: precondition-gate-direction-blindness 2026-09-20
+  Filed 2026-08-24 to the gap inbox by scope, which reproduced the red; drained and promoted
+  2026-08-25 at close, which read the gate's four help lines first-hand and corrected the filing;
+  promoted into `queue-kit-unwrap` 2026-09-22 by operator direction (lead-relayed).
+
+- **recurrence-line-never-ages** [spec: SPEC-recurrence-age.md] — a dated `recurrence:` line
+  counts as a live icebox trigger with no age limb, so one recurrence pins a low-cost entry out
+  of the icebox indefinitely, even after later re-measurements fail to reproduce it.
+  queue-kit/SPEC.md §The icebox tier lists a dated `recurrence:` line among live triggers and ages
+  only the entry itself (`QUEUE_KIT_ICEBOX_AGE_DAYS`), never the recurrence date.
+  **Attested once:** `worktree-isolated-agent-report-lost-to-a-failed-peer-send` recurred
+  2026-08-26, did not reproduce 2026-09-16 or 2026-09-21, was re-costed `event/low`, and stayed
+  Deferred on that one date until `delegation-seams` landed it. The instance, not a recurrence.
+  **Specified 2026-09-22:** the age limb, on the newest recurrence date against the tier's own
+  `QUEUE_KIT_ICEBOX_AGE_DAYS` (no knob minted); the worklist prints the date its window reads;
+  the scope pre-emption count and the recurrence KPI keep reading every date as history.
+  **Cost while deferred:** each close's eviction re-judges such entries by hand and keeps them.
+  Filed 2026-09-21 to the gap inbox at `release-declaration-coupling`'s close eviction; promoted at
+  the next scope's intake the same day, and into `queue-kit-unwrap` 2026-09-22 by operator
+  direction (lead-relayed).
+
+- **queue-recovery-pickaxe-wrong-oracle** [spec: SPEC-queue-citations.md] — every surface that
+  tells a reader how to recover an evicted queue body names `git log -S`, which is blind to
+  exactly the eviction it documents.
+  **Measured, not reasoned, at this close.** `-S` fires only when a literal's occurrence *count*
+  changes, and an eviction that leaves the slug behind changes none — a `## Done` move to a bare
+  slug line, an icebox one-liner, or any body that spelled its own slug once. Two probes: this
+  iteration's own Done move (`4bea9ceb`) leaves the count at 5 before and 5 after, so `-S` does
+  not list the evicting commit at all and its newest hit is an unrelated earlier commit; and on a
+  real icebox eviction, `-S'scratch-execution-allowlist-bar'` returns 3 commits where `-G`
+  returns 5 (6 against 10 when re-run 2026-09-22). `-G` matches diff content and reaches both.
+  **The live sites, re-verified 2026-09-22:** queue-kit/SPEC.md §The icebox tier, this file's
+  `## Icebox` preamble, and one body recovery recipe; `check-queue-entry-budget`'s help text no
+  longer carries `-S`, and two gap-inbox phrase pickaxes elsewhere in this file are correct uses.
+  **It does not re-open `queue-entry-evidence-tier`'s narrowing, and that is deliberate.** That
+  entry ruled recovery solved and signalling the gap, on a 2026-08-02 measurement of the
+  *compression* case — a shrinking body whose slug count does drop, where `-S` genuinely worked.
+  The case that fails is *eviction*. The narrowing stands; only the oracle spelling is wrong.
+  **Re-derived independently twice inside one iteration**, which is the cost showing rather than
+  an argument for it: scope hit it while counting recurrence-stamping commits (the record notes
+  `-S` undercounted and `-G` surfaced nine more), and this close hit it again re-verifying a gap
+  bullet whose own recovery command was the broken one. Neither derivation had a doc to read.
+  **Specified 2026-09-22:** one owner for the recipe (§The icebox tier, spelled `-G`), the
+  preamble pointing at it, and a `check-queue-hygiene` axis red on an inline `git log -S` recipe
+  over the queue file — the body recipes are where the wrong spelling recurs, and no owner reaches
+  them.
+  **Cost while deferred:** a session sent to recover an evicted body runs the documented command,
+  gets a short list that does not contain the evicting commit, and reads the absence as the
+  content never having existed — a silent wrong answer, not a visible failure.
+  Filed 2026-08-17 by close, from re-verifying a gap-inbox bullet; both probes were run before
+  the claim was asserted and the compression-vs-eviction split checked against the entry it
+  would otherwise have contradicted. Promoted into `queue-kit-unwrap` 2026-09-22 (operator
+  direction, lead-relayed).
+
+- **queue-citation-line-number-stales-within-its-own-session** [spec: SPEC-queue-citations.md]
+  — a `path:line` cite in a queue body goes stale when the cited file changes above the line, and
+  nothing reads it; stale on write when the citing session edits that file itself.
+  **Recurred 2026-09-21, across iterations:** `shell-cwd-anchor-clause-has-no-oracle` cited
+  `gate-sdk/lib/test-hermetic.sh` at lines that moved +4 when `bespoke-test-path-knob-pinning`
+  inserted a block above them; corrected by hand grep at `scratch-hermeticity`'s close.
+  **Specified 2026-09-22:** the citation rule — a queue body cites another file by `§Section`, a
+  symbol beside its path, or a quoted literal, never by line number — with a `check-queue-hygiene`
+  axis on the `<path>:<n>` token; the eight live cites are rewritten in that commit. Cites of
+  other queue records become heading links under `SPEC-queue-headings.md`, per the operator's
+  direction that heading anchors cover queue records only (2026-09-22, lead-relayed).
+  **Cost while deferred:** each instance costs a later reader a wrong resolution until a hand grep.
+  Filed 2026-09-08 by close from the gap inbox and iceboxed; returned to Deferred 2026-09-21 at
+  that scope's intake on the real recurrence above (gap bullet dated 2026-09-21, filed after
+  `scratch-hermeticity`'s close), and promoted into `queue-kit-unwrap` 2026-09-22.
+  Body before eviction: `git log -p -G'<slug>' -- TASK-QUEUE.md`.
+  **DISTINCT from `docs-cmd-retired-path-blind-to-queue`**, where the whole cited path is retired.
+  recurrence: queue-citation-line-number-stales-within-its-own-session 2026-09-21
+
+- **markdown-hard-wrap-unowned-and-ungated** [spec: SPEC-md-unwrap.md] — this repo's markdown
+  hard-wrapping convention is unowned, bimodal and load-bearing for a gate whose manifest does not
+  say so, and under enforcement-first the unwrap and its oracle land in one unit or neither does.
+  **Measured at 2026-09-10 and RE-VERIFIED at this scope's HEAD.** `TRAJECTORY.md` is ungated —
+  `check-queue-wrap`'s manifest reads `couples=TASK-QUEUE.md` and nothing else — and it is bimodal:
+  46 lines at 79-81 columns, 94 at 92-100, 5 over 100, of 319. Two conventions inside one file.
+  **The gate's real load is written nowhere, and that is the defect under the formatting one.**
+  `check-queue-wrap`'s stated ground (so a runaway never reflows to column 0) is the weak one; its
+  actual load is being the DENOMINATOR of `check-queue-entry-budget`, which measures an entry's
+  extent in LINES against `QUEUE_KIT_ENTRY_LINE_CAP`. Nothing records that coupling, so a session
+  reads the weak ground, judges it thin, and deregisters a gate holding up a sibling.
+  **Six arms measure in lines and all six re-unit to CODE POINTS**, which is the precondition for
+  dropping any cap: `always_loaded.rs`, `overhead_meter.rs`, `scan_prompts.rs`, `footprint.rs`,
+  `port_blockers.rs`, `queue_entry_budget.rs`. `md_index.rs` counts lines CORRECTLY — navigation,
+  not measurement — and is left alone. Unit ruled `lead, own-authority` 2026-09-10: code points,
+  because `cplen` in `queue_wrap.rs` is the in-tree precedent, bytes penalise the em-dashes and
+  section marks this prose is full of, and words need a tokenizer decision.
+  **Corrected at spec 2026-09-22 by reading each module:** `overhead_meter.rs` (transcript bytes),
+  `scan_prompts.rs` (a shell-command log) and `port_blockers.rs` (`.sh` files) measure no markdown
+  by lines; the real set is the context-kit meter, ratchet, brevity gate (`brevity.rs`, missed
+  above) and footprint, plus `queue_entry_budget.rs`.
+  **The `.metric/` history BREAKS on the unit change** — record the discontinuity and re-baseline in
+  the same unit, or the first post-change close reads a tenfold phantom win. (At spec: no
+  `.metric/` series holds a line count; the tracked baseline and ceiling rows do.)
+  **`check-tag-lead-line` is a PURE COMPENSATOR for wrapping** and becomes deletable rather than
+  merely deregisterable once an entry is one line, every governed tag sitting on the only line its
+  readers scan. The `recurrence:` declaration is then the last line-led construct (`ruled:` is
+  already retired), and the operator's move is to convert it to a bracketed tag beside
+  `blocked-by`, `roadmap`, `spec` and `precondition-ok`, all of which `queue.rs` already scans
+  positionally — after which nothing in the queue is line-scoped by design.
+  **The new gate is the INVERSE of `check-queue-wrap`** — red when a prose paragraph is broken
+  across lines — and both ship, each consumer registering the one it wants. That also answers the
+  fixture-rot exposure. Enforcement-first is the operator's own correction here, and it corrected
+  the lead: a convention with no oracle is the shape this repo refuses, so stop-maintaining-wrap is
+  not a free half. That gate inherits `check-queue-wrap`'s two-tag discount: a deferred lead line's
+  cost and surface tags go unmeasured (queue-kit/SPEC.md §check-queue-wrap).
+  **Specified 2026-09-22:** canon-kit's `check-md-unwrapped` and its `--emit md-unwrap` remedy
+  sharing one block scanner (a soft-break gate measures no width, so no discount is inherited); a
+  selectable entry cap (`<n>cp`, `<n>lines` or `off`), this repo binding code points at the old
+  bound; the context-kit measures in code points, their baseline and ceiling rows carrying a unit
+  suffix that records the discontinuity; the rewrite of every tracked markdown file but this one,
+  which unwraps in `SPEC-queue-headings.md`'s conversion. That amendment keeps
+  `check-tag-lead-line` and the `recurrence:` declaration, because under the heading grammar an
+  entry is never one line — the operator's move above is escalated to the lead, not overruled.
+  **Operator direction 2026-09-22 (lead-relayed):** tracked markdown carries no artificial line
+  cap; a tool needing a line-capped form gets one generated from the uncapped tracked file.
+  **Cost while deferred:** not low, and deliberately not claimed to be — this step alone rewrites
+  every governed markdown file in the tree and ships a new gate.
+  Surfaced 2026-09-10 by the operator through the consult channel in a lead session, relayed by that
+  lead into the gap inbox of `packer-port-terminal-cut`'s close and promoted at this scope. The full
+  probed body is recoverable: `git log -p -S'bimodal, and load-bearing' -- .workflow/gap-inbox.md`.
+
+- **entry-line-cap-has-no-line-axis-relief** [spec: SPEC-md-unwrap.md]
+  — an entry at `QUEUE_KIT_ENTRY_LINE_CAP` buys room for a mandated write by
+  compressing prose a later reader needed, and nothing offers relief on the LINE
+  axis or rules that the trade is intended.
+  **Re-measured at this close off `check-queue-entry-budget`'s verbose headroom
+  read, and the squeezed set has GROWN since the filing:** FOUR entries sit at
+  exactly 0 lines of headroom — `record-stamp-encoding-compression`,
+  `companion-toolkit-profile`, `heterogeneous-agent-delegation` and
+  `worktree-isolated-agent-report-lost-to-a-failed-peer-send` (landed since) — with two more at
+  1 and four at 2. The 2026-09-20 scope bullet that witnessed it named three at
+  0, one at 1 and one at 2.
+  **The witness is first-hand:** that scope had to land an operator-ruled
+  admission filter onto an entry at 0 headroom and compressed three load-bearing
+  paragraphs to make room, so the ruling shipped at three lines rather than the
+  two paragraphs its own gap bullet had costed.
+  **DISTINCT from `record-stamp-encoding-compression`, cited here rather than
+  re-filed.** That entry names both axes itself and its remedy is re-encoding
+  record STAMPS — which frees columns in stamp lines, never five lines of
+  paragraph prose. Its column axis is witnessed three times; its line axis had no
+  witness until 2026-09-20. No `recurrence:` date joins it: today's instance is
+  in its CLASS and outside its REMEDY, a neighbouring shape in the same family,
+  which files as a new finding on the same discrimination
+  `precondition-gate-direction-blindness` applies to its own sibling.
+  **DISTINCT from `icebox-eviction-line-budget-squeeze`** (the icebox tier's
+  one-line grammar against the column cap) and from
+  `lead-line-blocked-by-spec-tag-width-collision` (a lead line's COLUMN width).
+  **Deliverable — rule one of two, neither authored:** a line-axis relief the
+  owner entry does not propose (a discount class, a relocation rule, or a cap
+  read against entry class); or a recorded ruling that compression at the cap IS
+  the intended trade, so a squeezed session stops reading it as a defect.
+  **Specified 2026-09-22:** the LINE axis goes — the cap re-units to code points, a measure no
+  reflow moves, at the old bound, and the unit is consumer config with `off` a valid value. The
+  residue, whether compression at the cap is the intended trade and which measure should bound a
+  record, is the operator's separate challenge (operator direction 2026-09-22, lead-relayed) and
+  is not ruled here; a lead-grantable per-record exception is escalated to the lead.
+  **Cost while deferred:** every mandated write onto an entry at the cap pays in
+  prose, and the payment is invisible afterwards — the entry reads as though it
+  was always that terse.
+  Filed 2026-09-20 by close's drain as the second-order half of that scope
+  bullet; owner lookup ran over `line cap`, `headroom`, `entry budget` and
+  `squeeze` across the pool and returned the three entries distinguished above
+  and no owner. Promoted into `queue-kit-unwrap` 2026-09-22 by operator direction (lead-relayed).
+
+- **queue-entry-shape-slugs-headings-links** [spec: SPEC-queue-headings.md] — the operator's
+  queue-shape sequence: ratchet slug length, make each task a third-level heading, then make every
+  cross-task reference a real link and retire the bold-code typographic convention. Steps two
+  through five of the 2026-09-10 sequence, whose ORDER IS BINDING.
+  blocked-by: markdown-hard-wrap-unowned-and-ungated
+  **That line is bare, not the bracketed tag, deliberately:** the tag beside the spec tag measures
+  128 columns against the 100-column wrap budget — the collision
+  `lead-line-blocked-by-spec-tag-width-collision` records — so the order rides section order and
+  the amendment's merge-order header, as that entry's attested precedent did.
+  **Slug length first, and step two MUST precede step four**, because once slugs are anchors every
+  rename is a breaking change. Measured 2026-09-10: 419 slugs spanning 17 to 64 characters, only 2
+  at or below 20, 234 in the 31-to-40 band, 83 over 40. Ruled `lead, own-authority` 2026-09-10 on
+  the operator's delegation: KEEP KEBAB and cap the length, moving the description to the body —
+  the heading becomes the anchor and GitHub manufactures the kebab form anyway, so heading, anchor
+  and `blocked-by` target become ONE STRING IN THREE ROLES with zero transformation, and
+  `is_slug_head`/`is_slug_byte` already parse kebab. A prose title is the two-sources defect in
+  friendlier clothes. **A RATCHET, NOT A CAP:** red on a NEW or RENAMED slug over 30 and grandfather
+  the rest — a hard cap would evict 317 of 419.
+  **Third-level headings, operator 2026-09-10.** That heading level is unused in `TASK-QUEUE.md`, 0
+  occurrences, the title being one hash and sections two. Slugs are already one global unique
+  namespace across active, deferred, icebox and sub-tasks, gated by `check-task-names`, and the Done
+  line carries the slug verbatim — so a fragment reference becomes a PERMANENT ANCHOR surviving
+  every section move, Done included. **Constraint:** the heading is the BARE slug with tags on the
+  body, because GitHub derives anchors from heading TEXT and a tag inside the heading breaks the
+  anchor the moment the tag changes. **Buys:** `--emit md-index` over the queue becomes a derived
+  roster for free, `check-md-refs` gains roughly 420 verifiable anchor targets, and the icebox
+  tier's no-subsections rule goes MOOT rather than violated — its ground was that grouping is
+  presentation, and under this change the heading is identity.
+  **References as links, operator 2026-09-10.** `check-md-refs` already validates that internal
+  links resolve; nothing demands that a reference BE one. `check-queue-slug-liveness` detects
+  references by TYPOGRAPHY — the bold-code form — and `ENV.local.md` carries a hand-written
+  workaround because a BINARY NAME could not wear that markup without redding the gate: the attested
+  cost of overloading prose markup as a reference marker. Demanding a clickable link separates prose
+  from references and retires the convention.
+  **Specified 2026-09-22:** `QUEUE_KIT_SLUG_MAX` in `check-task-conservation` (240 of 310 live
+  slugs exceed 30 at spec); `### <slug>` entries whose lead line is the first line under the
+  heading; declarations as paragraphs of their own; `check-task-names` assertion R demanding a
+  link for a live reference and backticks for a retired one (the queue is outside
+  `check-md-refs`' manifest set, so the queue gate holds it); the prose-surface claim and the
+  roadmap projection as links; a `--emit queue-migrate` arm; this file's conversion and unwrap
+  and `check-queue-wrap`'s deregistration. **Two departures, escalated to the lead:** Done stays
+  a bare bullet (close clears Done every iteration, so its anchor would not be permanent), and
+  `recurrence:` stays a declaration (the hard-wrap entry's recorded operator move).
+  **Cost while deferred:** bounded and mechanical but wide — everything keying on the column-zero
+  moves to heading detection: `is_top_level_bullet`, `is_bullet`, `live_slugs`, the section
+  scanners, `check-task-conservation`, `queue-index`, `queue-counts`, `icebox-candidates` and the
+  roadmap walk — and, found at spec, nine independent holders across five kits.
+  Surfaced 2026-09-10 as above; full body via
+  `git log -p -S'TASKS BECOME THIRD-LEVEL HEADINGS' -- .workflow/gap-inbox.md`.
+  **Operator direction 2026-09-22 (lead-relayed), into `queue-kit-unwrap`:** records such as tasks
+  become link-referenceable headings.
+
+- **icebox-eviction-line-budget-squeeze** [spec: SPEC-queue-headings.md] — the icebox tier's
+  one-line grammar and `check-queue-wrap`'s column cap are jointly unsatisfiable above a slug
+  length nothing bounds, and nothing says so at the point of eviction.
+  **Attested first-hand at the 2026-08-25 close, three failed attempts rather than predicted.**
+  Evicting `spec-embedded-source-criterion-4-membership` (icebox) — a 44-character slug — left 31
+  columns after the then-mandatory design-pending-tagged lead prefix. All three candidate
+  sentences describing the question redded `check-queue-wrap`, and the line that landed says only
+  "Its port sizing stays unruled." The tier's contract calls for a self-contained sentence; at 31
+  columns that is not achievable, and the grammar gives no relief — `check-queue-entry-budget`
+  assertion B makes an icebox entry EXACTLY one line, so wrapping is a violation and not a
+  workaround.
+  **Why it stays invisible until a session hits it:** the slug is chosen at filing time and the
+  eviction is paid iterations later by a different session, so the two constraints never meet in
+  one edit until they collide.
+  **Deliverable — rule one of three.** Exempt the icebox lead line from `check-queue-wrap` (the
+  run-away-reflow hazard the cap exists for does not apply to a line the tools key on by its
+  `- ` lead); or cap slug length at filing, which is enforceable and retroactively expensive; or
+  state at queue-kit/SPEC.md §The icebox tier that a long-slugged entry's pointer degrades to a
+  bare classification and that this is accepted, so a later session stops re-deriving it.
+  **DISTINCT from `queue-entry-grammar-single-owner`** (icebox), which is two entry grammars
+  disagreeing; this is one grammar whose own two constraints cannot both be met.
+  **DISTINCT from `spec-embedded-source-criterion-4-membership`** (icebox), cited here as the
+  instance and deliberately not re-filed: that slug's finding is a criterion-4 classification
+  question, untouched and still carried in the icebox, while this entry's finding is the eviction
+  grammar that could not describe it.
+  **IT RECURRED 2026-09-03, on the second of the two branches the cost line names — the one that
+  leaves no gate round-trip behind.** The `parser-and-enum-adapter-cuts-with-graph-hotfix` close
+  ruled `worktree-cleanliness-assertion-scopes-to-checkout` icebox-eligible on the merits and then
+  DECLINED the eviction, because that 52-character slug leaves 22 columns after the mandatory
+  prefix and no sentence in 22 columns is the self-contained one the tier's contract asks for. So
+  the eviction was abandoned rather than degraded, which is the silent bias this entry predicted.
+  Both branches are now attested; the 2026-09-17 loosening (no design-pending tag) moved the
+  threshold 17 columns without removing it.
+  **Specified 2026-09-22:** discharged by this repo deregistering `check-queue-wrap` when the queue
+  unwraps under the heading grammar — no width budget remains. For a consumer keeping that gate,
+  §check-queue-wrap states the collision and names `QUEUE_KIT_SLUG_MAX` as its relief: the second
+  candidate above, without its retroactive cost because the ratchet grandfathers.
+  **Cost while deferred:** low and paid at eviction — a session either spends three gate
+  round-trips discovering the budget, or declines an otherwise-eligible eviction because it cannot
+  describe it, which silently biases the tier against exactly the heavily-specified entries the
+  tier was built to drain.
+  Surfaced 2026-08-25 at the `turn-end-liveness-seam-and-worktree-cause` close and filed to the
+  gap inbox there; promoted 2026-08-25 at this scope's drain of that inbox, and into
+  `queue-kit-unwrap` 2026-09-22 by operator direction (lead-relayed).
+  recurrence: icebox-eviction-line-budget-squeeze 2026-09-03
+
+- **lead-line-blocked-by-spec-tag-width-collision** [spec: SPEC-queue-headings.md]
+  — an active lead line cannot carry both a spec tag and a blocked-by tag once the slugs are
+  long, because queue-kit/SPEC.md §check-queue-wrap discounts only a deferred lead line's cost
+  and surface tags, and refuses discounting the repeating blocked-by tag.
+  **Attested once:** promoting `couples-dynamic-root-resolution` needed 38 columns for its bold
+  lead, 45 for the blocked-by tag naming `couples-glob-semantics-unowned` and 18 for the shortest
+  legal spec tag, 101 against the 100-column budget before any prose (recounted at close). The
+  spec stage dropped the blocker tag and carried the merge order in the amendment header, so the
+  structured blocker a first-unblocked selection reads was lost for the promoted dependent.
+  **Why design-pending:** a bounded spec-tag discount, a continuation-line home for the
+  blocker (which §check-tag-lead-line forbids today), or a slug-length cap are each a grammar call.
+  **DISTINCT from `icebox-eviction-line-budget-squeeze`**, which is the icebox tier's one-line
+  grammar against the same cap. Both share the unbounded slug length, so a scope may bundle them.
+  **SECOND ATTESTATION 2026-09-20, and it WIDENS the premise above rather than repeating it.** That
+  scope promoted `readme-front-door-is-adopter-facing-and-outside-every-sweep` with NO spec tag at
+  all, and the blocked-by tag alone measured 130 columns against the budget — so the collision needs
+  only two long slugs, not a spec tag beside the blocker. Same disposition as the attested case: the
+  tag was dropped and the block written into the dependent's prose, where no selection reads it. A
+  third instance is this iteration's own `queue-entry-shape-slugs-headings-links`.
+  **Specified 2026-09-22:** discharged by the heading grammar plus this repo deregistering
+  `check-queue-wrap` — tags sit on an unwrapped lead line with no width budget. For a consumer
+  keeping that gate, §check-queue-wrap states the collision and names the slug ratchet as relief.
+  **Cost while deferred:** a dependent promoted beside its blocker loses the tag its selection
+  reads, and the order survives only in amendment prose.
+  recurrence: lead-line-blocked-by-spec-tag-width-collision 2026-09-20
+  Filed 2026-09-15 to the gap inbox at that spec stage, measured by `check-queue-wrap`'s red at its
+  promotion commit; drained and promoted the same day at close, and into `queue-kit-unwrap`
+  2026-09-22 by operator direction (lead-relayed).
+
 ## Technical Debt
 
 - **queue-backlog-vocabulary-undeclared** — the tree uses "queue" for the governed file and its
@@ -129,42 +453,6 @@
   §check-fence-run item 4 owns the variable list and names no passthrough.
   **DISTINCT from `fence-execution-gate` (landed)**, which built the gate this member cannot reach.
 
-- **queue-citation-line-number-stales-within-its-own-session** [cost: event/low] [surface: queue-kit]
-  — a `path:line` cite in a queue body goes stale when the cited file changes above the line, and
-  nothing reads it; stale on write when the citing session edits that file itself.
-  **Recurred 2026-09-21, across iterations:** `shell-cwd-anchor-clause-has-no-oracle` cited
-  `gate-sdk/lib/test-hermetic.sh` at lines that moved +4 when `bespoke-test-path-knob-pinning`
-  inserted a block above them; corrected by hand grep at `scratch-hermeticity`'s close.
-  **Why not obviously gateable:** resolving a cite to its referent is semantic; the decidable half
-  is a cite whose file changed above the cited line since the cite landed. The no-gate
-  alternative: cite by content, never by number.
-  **Cost while deferred:** each instance costs a later reader a wrong resolution until a hand grep.
-  Filed 2026-09-08 by close from the gap inbox and iceboxed; returned to Deferred 2026-09-21 at
-  this scope's intake on the real recurrence above (gap bullet dated 2026-09-21, filed after
-  `scratch-hermeticity`'s close). Body before eviction: `git log -p -S'<slug>' -- TASK-QUEUE.md`.
-  **DISTINCT from `docs-cmd-retired-path-blind-to-queue`**, where the whole cited path is retired.
-  Feature — a gate or a citation rule either way; `/spec` authors and promotes it. Operator
-  direction 2026-09-22 (lead-relayed): into `queue-kit-unwrap`; heading anchors cover queue
-  records only.
-  recurrence: queue-citation-line-number-stales-within-its-own-session 2026-09-21
-
-- **recurrence-line-never-ages** [cost: event/low] [surface: queue-kit] — a dated `recurrence:`
-  line counts as a live icebox trigger with no age limb, so one recurrence pins a low-cost entry
-  out of the icebox indefinitely, even after later re-measurements fail to reproduce it.
-  queue-kit/SPEC.md §The icebox tier lists a dated `recurrence:` line among live triggers and ages
-  only the entry itself (`QUEUE_KIT_ICEBOX_AGE_DAYS`), never the recurrence date.
-  **Attested once:** `worktree-isolated-agent-report-lost-to-a-failed-peer-send` recurred
-  2026-08-26, did not reproduce 2026-09-16 or 2026-09-21, was re-costed `event/low`, and stayed
-  Deferred on that one date until `delegation-seams` landed it. The instance, not a recurrence.
-  **Deliverable — rule one of two:** an age limb on the recurrence date mirroring the icebox age
-  knob, or a stated refusal naming why a single recurrence stays live forever.
-  **Cost while deferred:** each close's eviction re-judges such entries by hand and keeps them.
-  Filed 2026-09-21 to the gap inbox at `release-declaration-coupling`'s close eviction; promoted at
-  the next scope's intake the same day. Owner lookup ran over `recurrence:`, `live trigger` and
-  `age limb`; §The icebox tier owns the trigger list and states no age rule for it.
-  Feature — an age limb mints a knob and a refusal narrows the tier's contract; `/spec` authors and
-  promotes it. Operator direction 2026-09-22 (lead-relayed): into `queue-kit-unwrap`.
-
 - **disclaimer-beside-its-own-restatement** [cost: event/low] [surface: canon-kit] — a surface
   that disclaims carrying a rule ("stated there and not restated here") in the same sentence that
   carries it is asserted by nothing, and the disclaimer tells every sweep the copy is not one.
@@ -207,47 +495,6 @@
   Filed 2026-09-20 to the gap inbox by the lead of `adopter-floor-door-remainder`; promoted at
   the 2026-09-21 scope intake, a late record that says so. Owner lookup ran over
   `no-change`, `landing site`, `lead decision` and `transport` and found no owner.
-
-- **entry-line-cap-has-no-line-axis-relief** [cost: event/low] [surface: queue-kit]
-  — an entry at `QUEUE_KIT_ENTRY_LINE_CAP` buys room for a mandated write by
-  compressing prose a later reader needed, and nothing offers relief on the LINE
-  axis or rules that the trade is intended.
-  **Re-measured at this close off `check-queue-entry-budget`'s verbose headroom
-  read, and the squeezed set has GROWN since the filing:** FOUR entries sit at
-  exactly 0 lines of headroom — `record-stamp-encoding-compression`,
-  `companion-toolkit-profile`, `heterogeneous-agent-delegation` and
-  `worktree-isolated-agent-report-lost-to-a-failed-peer-send` (landed since) — with two more at
-  1 and four at 2. The 2026-09-20 scope bullet that witnessed it named three at
-  0, one at 1 and one at 2.
-  **The witness is first-hand:** that scope had to land an operator-ruled
-  admission filter onto an entry at 0 headroom and compressed three load-bearing
-  paragraphs to make room, so the ruling shipped at three lines rather than the
-  two paragraphs its own gap bullet had costed.
-  **DISTINCT from `record-stamp-encoding-compression`, cited here rather than
-  re-filed.** That entry names both axes itself and its remedy is re-encoding
-  record STAMPS — which frees columns in stamp lines, never five lines of
-  paragraph prose. Its column axis is witnessed three times; its line axis had no
-  witness until 2026-09-20. No `recurrence:` date joins it: today's instance is
-  in its CLASS and outside its REMEDY, a neighbouring shape in the same family,
-  which files as a new finding on the same discrimination
-  `precondition-gate-direction-blindness` applies to its own sibling.
-  **DISTINCT from `icebox-eviction-line-budget-squeeze`** (the icebox tier's
-  one-line grammar against the column cap) and from
-  `lead-line-blocked-by-spec-tag-width-collision` (a lead line's COLUMN width).
-  **Deliverable — rule one of two, neither authored:** a line-axis relief the
-  owner entry does not propose (a discount class, a relocation rule, or a cap
-  read against entry class); or a recorded ruling that compression at the cap IS
-  the intended trade, so a squeezed session stops reading it as a defect.
-  **Cost while deferred:** every mandated write onto an entry at the cap pays in
-  prose, and the payment is invisible afterwards — the entry reads as though it
-  was always that terse.
-  Filed 2026-09-20 by close's drain as the second-order half of that scope
-  bullet; owner lookup ran over `line cap`, `headroom`, `entry budget` and
-  `squeeze` across the pool and returned the three entries distinguished above
-  and no owner.
-  **Reshaped by operator direction 2026-09-22 (lead-relayed), into `queue-kit-unwrap`:** unwrapped
-  entries have no line axis, and the hard-wrap entry re-units the cap to code points; the residue is
-  whether compression at that cap is the intended trade. `/spec` discharges or authors it.
 
 - **stage-evidence-prefix-doubles-a-separator** [cost: event/low] [surface: lifecycle-kit]
   — `check-stage-evidence`'s path relativizer composes its not-under arm from
@@ -534,86 +781,6 @@
   2026-09-11 at build on canon-kit/SPEC.md:239-250's corpus-versus-increment test — ruled `lead,
   own-authority` 2026-09-11 through the lead's message channel, that lead reversing its own Done
   instruction of the same date after verifying the grounds at source.
-
-- **markdown-hard-wrap-unowned-and-ungated** [cost: once/high] [surface: queue-kit] — this repo's markdown hard-wrapping
-  convention is unowned, bimodal and load-bearing for a gate whose manifest does not say so, and
-  under enforcement-first the unwrap and its oracle land in one unit or neither does.
-  **Measured at 2026-09-10 and RE-VERIFIED at this scope's HEAD.** `TRAJECTORY.md` is ungated —
-  `check-queue-wrap`'s manifest reads `couples=TASK-QUEUE.md` and nothing else — and it is bimodal:
-  46 lines at 79-81 columns, 94 at 92-100, 5 over 100, of 319. Two conventions inside one file.
-  **The gate's real load is written nowhere, and that is the defect under the formatting one.**
-  `check-queue-wrap`'s stated ground (so a runaway never reflows to column 0) is the weak one; its
-  actual load is being the DENOMINATOR of `check-queue-entry-budget`, which measures an entry's
-  extent in LINES against `QUEUE_KIT_ENTRY_LINE_CAP`. Nothing records that coupling, so a session
-  reads the weak ground, judges it thin, and deregisters a gate holding up a sibling.
-  **Six arms measure in lines and all six re-unit to CODE POINTS**, which is the precondition for
-  dropping any cap: `always_loaded.rs`, `overhead_meter.rs`, `scan_prompts.rs`, `footprint.rs`,
-  `port_blockers.rs`, `queue_entry_budget.rs`. `md_index.rs` counts lines CORRECTLY — navigation,
-  not measurement — and is left alone. Unit ruled `lead, own-authority` 2026-09-10: code points,
-  because `cplen` in `queue_wrap.rs` is the in-tree precedent, bytes penalise the em-dashes and
-  section marks this prose is full of, and words need a tokenizer decision.
-  **The `.metric/` history BREAKS on the unit change** — record the discontinuity and re-baseline in
-  the same unit, or the first post-change close reads a tenfold phantom win.
-  **`check-tag-lead-line` is a PURE COMPENSATOR for wrapping** and becomes deletable rather than
-  merely deregisterable once an entry is one line, every governed tag sitting on the only line its
-  readers scan. The `recurrence:` declaration is then the last line-led construct (`ruled:` is
-  already retired), and the operator's move is to convert it to a bracketed tag beside
-  `blocked-by`, `roadmap`, `spec` and `precondition-ok`, all of which `queue.rs` already scans
-  positionally — after which nothing in the queue is line-scoped by design.
-  **The new gate is the INVERSE of `check-queue-wrap`** — red when a prose paragraph is broken
-  across lines — and both ship, each consumer registering the one it wants. That also answers the
-  fixture-rot exposure. Enforcement-first is the operator's own correction here, and it corrected
-  the lead: a convention with no oracle is the shape this repo refuses, so stop-maintaining-wrap is
-  not a free half. That gate inherits `check-queue-wrap`'s two-tag discount: a deferred lead line's
-  cost and surface tags go unmeasured (queue-kit/SPEC.md §check-queue-wrap).
-  **Cost while deferred:** not low, and deliberately not claimed to be — this step alone rewrites
-  every governed markdown file in the tree and ships a new gate.
-  Surfaced 2026-09-10 by the operator through the consult channel in a lead session, relayed by that
-  lead into the gap inbox of `packer-port-terminal-cut`'s close and promoted at this scope. The full
-  probed body is recoverable: `git log -p -S'bimodal, and load-bearing' -- .workflow/gap-inbox.md`.
-  **Operator direction 2026-09-22 (lead-relayed), into `queue-kit-unwrap`:** tracked markdown
-  carries no artificial line cap; a tool needing a line-capped form gets one generated from the
-  uncapped tracked file. Feature (a new gate); `/spec` authors and promotes it.
-
-- **queue-entry-shape-slugs-headings-links** [cost: once/low] [surface: queue-kit] — the operator's queue-shape sequence:
-  ratchet slug length, make each task a third-level heading, then make every cross-task reference a
-  real link and retire the bold-code typographic convention. Steps two through five of the
-  2026-09-10 sequence, whose ORDER IS BINDING.
-  blocked-by: markdown-hard-wrap-unowned-and-ungated
-  **Slug length first, and step two MUST precede step four**, because once slugs are anchors every
-  rename is a breaking change. Measured 2026-09-10: 419 slugs spanning 17 to 64 characters, only 2
-  at or below 20, 234 in the 31-to-40 band, 83 over 40. Ruled `lead, own-authority` 2026-09-10 on
-  the operator's delegation: KEEP KEBAB and cap the length, moving the description to the body —
-  the heading becomes the anchor and GitHub manufactures the kebab form anyway, so heading, anchor
-  and `blocked-by` target become ONE STRING IN THREE ROLES with zero transformation, and
-  `is_slug_head`/`is_slug_byte` already parse kebab. A prose title is the two-sources defect in
-  friendlier clothes. **A RATCHET, NOT A CAP:** red on a NEW or RENAMED slug over 30 and grandfather
-  the rest — a hard cap would evict 317 of 419.
-  **Third-level headings, operator 2026-09-10.** That heading level is unused in `TASK-QUEUE.md`, 0
-  occurrences, the title being one hash and sections two. Slugs are already one global unique
-  namespace across active, deferred, icebox and sub-tasks, gated by `check-task-names`, and the Done
-  line carries the slug verbatim — so a fragment reference becomes a PERMANENT ANCHOR surviving
-  every section move, Done included. **Constraint:** the heading is the BARE slug with tags on the
-  body, because GitHub derives anchors from heading TEXT and a tag inside the heading breaks the
-  anchor the moment the tag changes. **Buys:** `--emit md-index` over the queue becomes a derived
-  roster for free, `check-md-refs` gains roughly 420 verifiable anchor targets, and the icebox
-  tier's no-subsections rule goes MOOT rather than violated — its ground was that grouping is
-  presentation, and under this change the heading is identity.
-  **References as links, operator 2026-09-10.** `check-md-refs` already validates that internal
-  links resolve; nothing demands that a reference BE one. `check-queue-slug-liveness` detects
-  references by TYPOGRAPHY — the bold-code form — and `ENV.local.md` carries a hand-written
-  workaround because a BINARY NAME could not wear that markup without redding the gate: the attested
-  cost of overloading prose markup as a reference marker. Demanding a clickable link separates prose
-  from references and retires the convention.
-  **Cost while deferred:** bounded and mechanical but wide — everything keying on the column-zero
-  moves to heading detection: `is_top_level_bullet`, `is_bullet`, `live_slugs`, the section
-  scanners, `check-task-conservation`, `queue-index`, `queue-counts`, `icebox-candidates` and the
-  roadmap walk.
-  Surfaced 2026-09-10 as above; full body via
-  `git log -p -S'TASKS BECOME THIRD-LEVEL HEADINGS' -- .workflow/gap-inbox.md`.
-  **Operator direction 2026-09-22 (lead-relayed), into `queue-kit-unwrap`:** records such as tasks
-  become link-referenceable headings. Re-verified at scope: 0 third-level headings in this file.
-  Feature (a slug ratchet and a heading grammar); `/spec` authors and promotes it.
 
 - **install-smoke-leg-names-mix-two-axes** [cost: event/low] [surface: .github] — the `install-smoke` legs in
   `.github/workflows/gates.yml` spend one suffix slot on two different axes, and two tracked
@@ -1385,44 +1552,6 @@
   **Held Deferred:** the `--from` arm, this entry's whole deliverable, is excluded by the
   enhancement admission filter (operator direction 2026-09-21, lead-relayed).
 
-- **queue-recovery-pickaxe-wrong-oracle** [cost: event/high] [surface: queue-kit] — every surface that tells a reader how
-  to recover an evicted queue body names `git log -S`, which is blind to exactly the eviction it
-  documents.
-  **Measured, not reasoned, at this close.** `-S` fires only when a literal's occurrence *count*
-  changes, and an eviction that leaves the slug behind changes none — a `## Done` move to a bare
-  slug line, an icebox one-liner, or any body that spelled its own slug once. Two probes: this
-  iteration's own Done move (`4bea9ceb`) leaves the count at 5 before and 5 after, so `-S` does
-  not list the evicting commit at all and its newest hit is an unrelated earlier commit; and on a
-  real icebox eviction, `-S'scratch-execution-allowlist-bar'` returns 3 commits where `-G`
-  returns 5. `-G` matches diff content and reaches both.
-  **Three surfaces carry the wrong spelling**, which is why this is one unit rather than a typo
-  (a fourth, `queue-entry-evidence-tier`'s body, left with that entry at its 2026-09-17 landing):
-  this file's `## Icebox` preamble, queue-kit/SPEC.md §The
-  icebox tier, and `check-queue-entry-budget`'s own help text. **Re-verified 2026-09-22 at
-  scope:** the help text no longer carries `-S` (`git grep` over `native/src` is empty); the live
-  sites are the preamble, queue-kit/SPEC.md §The icebox tier and body recovery recipes here.
-  **It does not re-open `queue-entry-evidence-tier`'s narrowing, and that is deliberate.** That
-  entry ruled recovery solved and signalling the gap, on a 2026-08-02 measurement of the
-  *compression* case — a shrinking body whose slug count does drop, where `-S` genuinely worked.
-  The case that fails is *eviction*. The narrowing stands; only the oracle spelling is wrong.
-  **Re-derived independently twice inside one iteration**, which is the cost showing rather than
-  an argument for it: scope hit it while counting recurrence-stamping commits (the record notes
-  `-S` undercounted and `-G` surfaced nine more), and this close hit it again re-verifying a gap
-  bullet whose own recovery command was the broken one. Neither derivation had a doc to read.
-  **Not started here, per Enforcement-first:** the fix and the gate that catches it land in one
-  unit, and the gate half looks cheap — a literal-pattern check over the governed doc set for a
-  `-S` prescribed as a body-recovery recipe. What is owed is whether that gate earns its slot
-  against a four-line prose fix, which is the design call this entry holds.
-  **Cost while deferred:** a session sent to recover an evicted body runs the documented command,
-  gets a short list that does not contain the evicting commit, and reads the absence as the
-  content never having existed — a silent wrong answer, not a visible failure.
-  Class: mints a governed name and lands a gate, so canon-kit's litmus makes it a **feature**.
-  Filed 2026-08-17 by close, from re-verifying a gap-inbox bullet; both probes were run before
-  the claim was asserted and the compression-vs-eviction split checked against the entry it
-  would otherwise have contradicted.
-  Operator direction 2026-09-22 (lead-relayed): into `queue-kit-unwrap`; `/spec` authors and
-  promotes it.
-
 - **settings-hook-command-path-gate** [cost: event/high] [surface: context-kit] — a hook registration in
   `.claude/settings.json` whose `command` names a renamed or deleted script reds nowhere and
   fails silently at run time.
@@ -1519,91 +1648,6 @@
   which is exactly how the raw-vs-skeleton one survived.
   Filed 2026-08-23 by build; drained at that iteration's close, which re-counted the citations
   and confirmed no gate matches them.
-
-- **precondition-gate-direction-blindness** [cost: event/low] [surface: queue-kit] — `check-queue-prose-precondition`
-  reds an entry whose prose says the entry IS the blocker, and three of the four remedies it
-  prints are false for that shape.
-  **Reproduced at this iteration's scope rather than predicted.** Promoting
-  `worktree-reclamation-cause-falsification` to Technical Debt red the member on a paragraph
-  reading "UPSTREAM of <slug>" and "two sibling amendments are blocked on", where the entry held
-  no precondition of its own and was pickable first by construction.
-  **The remedy list is the sharper half, and it was read off the gate at this drain.** The four
-  lines it prints are: tag the real blocker, move the entry to Deferred, rephrase past-tense, or
-  take the `[precondition-ok:]` valve. For an entry naming ITSELF as the upstream, a blocker tag
-  asserts a blocker that does not exist, past-tense rephrasing falsifies an unrun experiment, and
-  a move to Deferred undoes an operator-ruled promotion. Only the valve is true, so the gate's
-  own help text steers a session toward writing something false unless it stops to reason.
-  **Direction, not negation — and the filing's "they do not share a fix" FELL at the drain.**
-  `precondition-gate-negation-false-positive` is the NEGATED shape ("not gated on", "no longer
-  waiting on") against a bare-substring alternation; this is the unnegated, affirmative sentence
-  whose subject is the blocker rather than the blocked, and no phrase-set calibration reaches it.
-  But that entry's third candidate deliverable — declare the valve the intended answer and widen
-  queue-kit/SPEC.md's calibration paragraph to say so — is this entry's second horn verbatim. The
-  two are distinct in TRIGGER and overlap in REMEDY, so whichever is taken first should take
-  both; the filing's claim was read against the sibling's trigger set, never its deliverable list.
-  **No `recurrence:` date joins that sibling:** its finding is the gate redding a NEGATED
-  sentence, and a negated sentence did not re-occur. A neighbouring shape in the same
-  false-positive family did, which is a new defect and files as one.
-  **Deliverable — rule one of two:** the gate attempts a direction read at all (an author-subject
-  test, not a phrase set); or the honest answer is that it cannot, the valve plus a stated cause
-  IS the contract, and queue-kit/SPEC.md's calibration paragraph says so — it currently justifies
-  the blocking grade on a bounded FP scope naming neither this shape nor the negated one.
-  **Cost while deferred:** every entry that names itself as an upstream blocker pays one red and
-  one valve, and the surface teaching the repair teaches three wrong ones.
-  recurrence: precondition-gate-direction-blindness 2026-09-20
-  Filed 2026-08-24 to the gap inbox by scope, which reproduced the red; drained and promoted
-  2026-08-25 at close, which read the gate's four help lines first-hand and corrected the filing.
-  Feature — either horn changes the gate's asserted behavior or its SPEC contract; `/spec` authors
-  and promotes it. Operator direction 2026-09-22 (lead-relayed): into `queue-kit-unwrap`.
-
-- **icebox-eviction-line-budget-squeeze** [cost: event/low] [surface: queue-kit] — the icebox tier's one-line grammar
-  and `check-queue-wrap`'s column cap are jointly unsatisfiable above a slug length nothing
-  bounds, and nothing says so at the point of eviction.
-  **Attested first-hand at the 2026-08-25 close, three failed attempts rather than predicted.**
-  Evicting `spec-embedded-source-criterion-4-membership` (icebox) — a 44-character slug — left 31
-  columns after the then-mandatory design-pending-tagged lead prefix. All three candidate
-  sentences describing the question redded `check-queue-wrap`, and the line that landed says only
-  "Its port sizing stays unruled." The tier's contract calls for a self-contained sentence; at 31
-  columns that is not achievable, and the grammar gives no relief — `check-queue-entry-budget`
-  assertion B makes an icebox entry EXACTLY one line, so wrapping is a violation and not a
-  workaround.
-  **Why it stays invisible until a session hits it:** the slug is chosen at filing time and the
-  eviction is paid iterations later by a different session, so the two constraints never meet in
-  one edit until they collide.
-  **Deliverable — rule one of three.** Exempt the icebox lead line from `check-queue-wrap` (the
-  run-away-reflow hazard the cap exists for does not apply to a line the tools key on by its
-  `- ` lead); or cap slug length at filing, which is enforceable and retroactively expensive; or
-  state at queue-kit/SPEC.md §The icebox tier that a long-slugged entry's pointer degrades to a
-  bare classification and that this is accepted, so a later session stops re-deriving it.
-  **DISTINCT from `queue-entry-grammar-single-owner`** (icebox), which is two entry grammars
-  disagreeing; this is one grammar whose own two constraints cannot both be met.
-  **DISTINCT from `spec-embedded-source-criterion-4-membership`** (icebox), cited here as the
-  instance and deliberately not re-filed: that slug's finding is a criterion-4 classification
-  question, untouched and still carried in the icebox, while this entry's finding is the eviction
-  grammar that could not describe it. The two share nothing but the eviction that surfaced one
-  while performing the other, so no `recurrence:` date is owed on it.
-  **Cost while deferred:** low and paid at eviction — a session either spends three gate
-  round-trips discovering the budget, or declines an otherwise-eligible eviction because it cannot
-  describe it, which silently biases the tier against exactly the heavily-specified entries the
-  tier was built to drain.
-  Surfaced 2026-08-25 at the `turn-end-liveness-seam-and-worktree-cause` close and filed to the
-  gap inbox there; promoted 2026-08-25 at this scope's drain of that inbox.
-  **IT RECURRED 2026-09-03, on the second of the two branches the cost line names — the one that
-  leaves no gate round-trip behind.** The `parser-and-enum-adapter-cuts-with-graph-hotfix` close
-  ruled `worktree-cleanliness-assertion-scopes-to-checkout` icebox-eligible on the merits (its own
-  cost line reads low and self-correcting, no roadmap tag, no live trigger, and its mitigation had
-  already landed) and then DECLINED the eviction, because that 52-character slug leaves 22 columns
-  after the mandatory prefix and no sentence in 22 columns is the self-contained one the tier's
-  contract asks for. So the eviction was abandoned rather than degraded, which is the silent bias
-  this entry predicted: the entry stays in Deferred carrying a costed body, and nothing in the tree
-  records why except this paragraph. The first attestation cost three gate round-trips and landed a
-  thin line; this one cost one round-trip and landed no line at all. Both branches are now
-  attested, which retires the "predicted" half of the deliverable — the three candidate rulings
-  stand unchanged and none of them is chosen here.
-  **Reshaped by operator direction 2026-09-22 (lead-relayed), into `queue-kit-unwrap`:** past the
-  2026-09-17 loosening (no design-pending tag, +17 columns), unwrapped markdown leaves the one-line
-  grammar no column cap; `/spec` confirms the hard-wrap and entry-shape amendments discharge it.
-  recurrence: icebox-eviction-line-budget-squeeze 2026-09-03
 
 - **site-health-issue-venue-unwanted** [cost: event/low] [surface: site-kit] — the site-health probe files issues on
   the public repo for failures the iteration lifecycle resolves anyway, and the operator does not
@@ -1799,34 +1843,6 @@
   `native/src/spec.rs` lines 197 and 215.
   Filed 2026-09-15 by `couples-field-semantics`' spec into the gap inbox; drained and promoted
   2026-09-15 at close.
-
-- **lead-line-blocked-by-spec-tag-width-collision** [cost: event/low] [surface: queue-kit]
-  — an active lead line cannot carry both a spec tag and a blocked-by tag once the slugs are
-  long, because queue-kit/SPEC.md §check-queue-wrap discounts only a deferred lead line's cost
-  and surface tags, and refuses discounting the repeating blocked-by tag.
-  **Attested once:** promoting `couples-dynamic-root-resolution` needed 38 columns for its bold
-  lead, 45 for the blocked-by tag naming `couples-glob-semantics-unowned` and 18 for the shortest
-  legal spec tag, 101 against the 100-column budget before any prose (recounted at close). The
-  spec stage dropped the blocker tag and carried the merge order in the amendment header, so the
-  structured blocker a first-unblocked selection reads was lost for the promoted dependent.
-  **Why design-pending:** a bounded spec-tag discount, a continuation-line home for the
-  blocker (which §check-tag-lead-line forbids today), or a slug-length cap are each a grammar call.
-  **DISTINCT from `icebox-eviction-line-budget-squeeze`**, which is the icebox tier's one-line
-  grammar against the same cap. Both share the unbounded slug length, so a scope may bundle them.
-  **SECOND ATTESTATION 2026-09-20, and it WIDENS the premise above rather than repeating it.** This
-  scope promoted `readme-front-door-is-adopter-facing-and-outside-every-sweep` with NO spec tag at
-  all, and the blocked-by tag alone measured 130 columns against the budget — so the collision needs
-  only two long slugs, not a spec tag beside the blocker as the lead line here still says. Same
-  disposition as the attested case, for want of another: the tag was dropped and the block written
-  into the dependent's prose, where no selection reads it.
-  **Cost while deferred:** a dependent promoted beside its blocker loses the tag its selection
-  reads, and the order survives only in amendment prose.
-  recurrence: lead-line-blocked-by-spec-tag-width-collision 2026-09-20
-  Filed 2026-09-15 to the gap inbox at that spec stage, measured by `check-queue-wrap`'s red at its
-  promotion commit; drained and promoted the same day at close.
-  **Reshaped by operator direction 2026-09-22 (lead-relayed), into `queue-kit-unwrap`:** with tags
-  on a heading's body and no column cap, the collision has no budget left; `/spec` confirms it
-  discharges with the hard-wrap and entry-shape amendments or authors the residue.
 
 - **close-surface-row-trackedness-undeclared** [cost: event/low] [surface: lifecycle-kit]
   — a close-surface roster row does not say whether its path is tracked or gitignored, so a
