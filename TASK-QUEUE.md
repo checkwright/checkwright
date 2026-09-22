@@ -196,11 +196,12 @@
   owner entry does not propose (a discount class, a relocation rule, or a cap
   read against entry class); or a recorded ruling that compression at the cap IS
   the intended trade, so a squeezed session stops reading it as a defect.
-  **Specified 2026-09-22:** the LINE axis goes — the cap re-units to code points, a measure no
-  reflow moves, at the old bound, and the unit is consumer config with `off` a valid value. The
-  residue, whether compression at the cap is the intended trade and which measure should bound a
-  record, is the operator's separate challenge (operator direction 2026-09-22, lead-relayed) and
-  is not ruled here; a lead-grantable per-record exception is escalated to the lead.
+  **MOOT, superseded by the unwrap (operator direction 2026-09-22, lead-relayed: where a strategic
+  unit removes the need for tactical line-limit logic, the tactical entry is unnecessary work):**
+  no work of its own. `SPEC-md-unwrap.md` removes the LINE axis — the cap re-units to code points,
+  a measure no reflow moves, at the old bound — and the cap's measure is consumer config with
+  `off` valid, per the operator's earlier directions. **No residue survives.** Exits to Done in
+  that amendment's merge commit.
   **Cost while deferred:** every mandated write onto an entry at the cap pays in
   prose, and the payment is invisible afterwards — the entry reads as though it
   was always that terse.
@@ -294,10 +295,11 @@
   the eviction was abandoned rather than degraded, which is the silent bias this entry predicted.
   Both branches are now attested; the 2026-09-17 loosening (no design-pending tag) moved the
   threshold 17 columns without removing it.
-  **Specified 2026-09-22:** discharged by this repo deregistering `check-queue-wrap` when the queue
-  unwraps under the heading grammar — no width budget remains. For a consumer keeping that gate,
-  §check-queue-wrap states the collision and names `QUEUE_KIT_SLUG_MAX` as its relief: the second
-  candidate above, without its retroactive cost because the ratchet grandfathers.
+  **MOOT, superseded by the unwrap (operator direction 2026-09-22, lead-relayed):** no work of its
+  own — once the queue unwraps (in `SPEC-queue-headings.md`'s conversion) and `check-queue-wrap`
+  is deregistered, no width budget remains. **The one residue that survives unwrapping** is a
+  consumer that keeps the wrap gate: that amendment's delta 7 states the collision in
+  §check-queue-wrap and names `QUEUE_KIT_SLUG_MAX` as its relief. Exits to Done at that merge.
   **Cost while deferred:** low and paid at eviction — a session either spends three gate
   round-trips discovering the budget, or declines an otherwise-eligible eviction because it cannot
   describe it, which silently biases the tier against exactly the heavily-specified entries the
@@ -326,9 +328,11 @@
   only two long slugs, not a spec tag beside the blocker. Same disposition as the attested case: the
   tag was dropped and the block written into the dependent's prose, where no selection reads it. A
   third instance is this iteration's own `queue-entry-shape-slugs-headings-links`.
-  **Specified 2026-09-22:** discharged by the heading grammar plus this repo deregistering
-  `check-queue-wrap` — tags sit on an unwrapped lead line with no width budget. For a consumer
-  keeping that gate, §check-queue-wrap states the collision and names the slug ratchet as relief.
+  **MOOT, superseded by the unwrap (operator direction, 2026-09-22, lead-relayed):** no work of
+  its own — tags sit on an unwrapped lead line with no width budget once `check-queue-wrap` is
+  deregistered. **The one residue that survives unwrapping** is a consumer that keeps the wrap
+  gate: `SPEC-queue-headings.md`'s delta 7 states it and names the slug ratchet as its relief.
+  Exits to Done at that merge.
   **Cost while deferred:** a dependent promoted beside its blocker loses the tag its selection
   reads, and the order survives only in amendment prose.
   recurrence: lead-line-blocked-by-spec-tag-width-collision 2026-09-20
