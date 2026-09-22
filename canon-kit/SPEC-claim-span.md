@@ -6,7 +6,7 @@
 
 The two refused shapes. A code-point reach on the paragraph was weighed and refused: a reach cuts a sentence at an arbitrary point, and arm C would then find or miss a cardinal by where the cut fell rather than by what the sentence says. A stated reason to keep the paragraph alone was refused because the paragraph is right for some trees and not others, which is the case for a knob and not for a kit constant.
 
-**Measured at authoring (2026-09-22).** `git grep -n -E "^<!-- measured: " -- ':!*/gate-tests/*'` finds five full-line markers outside fixtures. Four are `gate-substrates=native` (`CONTRIBUTING.md`, `SECURITY.md`, `docs/methodology.md`, `docs/positioning.md`), a non-cardinal value, so arm C never reads their span. The fifth, `canon-kit/SPEC.md` §check-measured-claim, is the grammar specimen inside a fence, with its generated mirror in `docs/canon-kit/SPEC.md`. So binding `sentence` here moves no verdict on this tree.
+**Measured at authoring (2026-09-22).** `git grep -n -E "^<!-- measured: " -- ':!*/gate-tests/*'` finds six full-line markers outside fixtures. Four are `gate-substrates=native` (`CONTRIBUTING.md`, `SECURITY.md`, `docs/methodology.md`, `docs/positioning.md`), a non-cardinal value, so arm C never reads their span. The other two, `canon-kit/SPEC.md` §check-measured-claim and its generated mirror `docs/canon-kit/SPEC.md`, are the grammar specimen inside a fence, so neither is a marker arm C reads at all. So binding `sentence` here moves no verdict on this tree.
 
 ## What changes
 

@@ -92,7 +92,7 @@ no surface rosters which gates carry a same-line or same-paragraph matching wind
 
 **Joins `consumer-policy-seam`** — operator direction 2026-09-22, lead-relayed; reshaped by [consumer-policy-rule-absent](#consumer-policy-rule-absent), since a claim-span reach is a baked calibration, so it goes after it.
 
-**Specified 2026-09-22:** the full-line span is the knob `CANON_KIT_MEASURED_SPAN`, `paragraph`, `sentence` or `off`, default `paragraph` so no adopter's verdict moves, and this repo binds `sentence`. A code-point reach is refused because it cuts a sentence arbitrarily. Re-measured: the five full-line markers outside fixtures are four `gate-substrates=native` and one fenced specimen, so the binding moves no verdict here.
+**Specified 2026-09-22:** the full-line span is the knob `CANON_KIT_MEASURED_SPAN`, `paragraph`, `sentence` or `off`, default `paragraph` so no adopter's verdict moves, and this repo binds `sentence`. A code-point reach is refused because it cuts a sentence arbitrarily. Re-measured: the six full-line markers outside fixtures are four `gate-substrates=native` and two copies (canon-kit/SPEC.md and its generated mirror) of one fenced specimen, so the binding moves no verdict here.
 
 **Cost while deferred:** an adopter writing a cardinal-valued full-line marker above an unwrapped paragraph gets a binding whose agreement is near-accidental. Filed 2026-09-22 by build batch 2 as inferred from source; measured at this close and narrowed. **DISTINCT from `line-window-gates-unaudited`** (Done 2026-09-22), whose closed roster of three windows that audit discharged; this is a fourth gate it flagged and did not audit. Owner lookup ran `measured-claim` and `paragraph` over the queue — no owner.
 
