@@ -1,15 +1,1 @@
 # contract: lifecycle-kit/SPEC.md §The survey record — carried surveys, one block per survey; boundary-truncated, cited only behind a passing witness.
-
-## 2026-09-22 align — Do the four canon-gate-precision amendments' self-stated measurements and Existing-sections rosters hold against the tree, and does README.md/CLAUDE.md drift from the kits' shape?
-- corpus: SPEC-seam-reach.md canon-kit/SPEC-kit-ref-resolution.md canon-kit/SPEC-inline-marker.md canon-kit/SPEC-threshold-shape.md README.md CLAUDE.md
-- oracle: native/target/release/checkwright-gates --run
-- rev: ec73146851fc7e61ec970a3e069ef8ce386c2e29
-- finding: One defect found and fixed: seam-reach's SPEC.md census (git ls-files '*.md' | grep -v -E '^(docs/|[a-z-]+-kit/|gate-sdk/)') actually lists thirteen scripts/gate-tests/ SPEC.md fixtures besides installer/SPEC.md; added a fixture exclusion so the stated command matches the claim (commit ec731468). Every other re-run measurement in all four amendments (hex-token counts, families grep, GATE_SDK_UPGRADE_ stem, dated-attribution probe incl. the lead-comma second pass, 317-slug grep, PROSE_TELL defaults-only grep, MEASURED_MARKER grep) matched exactly. Existing-sections-updated rosters cross-checked against 'git grep' for check-provenance-seam, check-kit-ref-liveness, MEASURED_MARKER/measured:, and the five PROSE_TELL knobs: no missing update target found (extra hits were pre-existing registrations, generated projections, or unrelated coincidental matches). All six TASK-QUEUE.md entries the amendments name carry the matching [spec:] tag. check-stage-entry assertion D is clean (no live Inferred-not-run markers). A parallel worktree audit-sweep found no drift between README.md's kit table and the tree, nor between CLAUDE.md's stated conventions and a sampled cross-section of kits (canon-kit, gate-sdk, guard-kit, evidence-kit, delegation-kit, site-kit, doctrine-kit), including on the axes this iteration's amendments could disturb (all four remain unapplied prose with zero native/src/ footprint). Full battery: 129/129 green after the fix.
-- inferred: seam-reach's installer/SPEC.md job/run-id count (fourteen) and hex-token count (seven) at authoring, taken from the amendment's own prose rather than re-counted; kit-ref-resolution's scratch probe claiming the family narrowing reds nothing tree-wide, taken on the amendment's word
-
-## 2026-09-22 build — Which kit SPEC lines quote a value only this tree's knob files set?
-- corpus: */SPEC.md scripts/*.knobs native/src/knobs/*.rs
-- oracle: grep -F each value scripts/*.knobs sets over the kit SPECs, then judge each hit against the kit table default
-- rev: dd71faff1a2431d516858aa169b24e77544340c8
-- finding: Swept in build: canon-kit Layout and five other sections, gate-sdk measured-claims script (8 lines), evidence-suite ids, projection roster page, install-platforms instance, graph theme, enforce carrier; eight other kit SPECs' this-repo-sets values. Declined: gate-sdk harness-template port disposition's retired plugin-file names (kept as the ruling's record), kit table defaults, specimens, RELEASING.md/SECURITY.md citations (no knob value).
-- inferred: none
