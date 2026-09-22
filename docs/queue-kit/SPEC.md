@@ -120,6 +120,21 @@ on text the same iteration is about to rewrite. It stays a default rather than
 a rule — the array is consumer config, and a consumer whose iterations do not
 mix the two kinds reorders it freely.
 
+### Queue and backlog
+
+The two words name two halves of one thing, and each owns its half. **Queue**
+is the governed file and its drain mechanics: the sections and entry grammar a
+parser selects work by, the counts the `queue-counts` arm reports, the
+drain-entry exemption, and the per-entry caps (`QUEUE_KIT_ENTRY_LINE_CAP`).
+**Backlog** is the accumulating mass of unlanded work read as a quantity over
+time: its growth and its aging, which drift-kit trends (drift-kit/SPEC.md
+`kpi-gate-backlog`, the backlog-aging findings) and the closing stage reviews
+and evicts. A queue mechanic is judged against the file as it stands; a backlog
+reading is judged against its trend. Collapsing the two would lose that
+distinction and leave `kpi-gate-backlog` naming something other than the
+backlog. The file's own name is not vocabulary at all: it is consumer config
+(`QUEUE_KIT_QUEUE_FILE`), so renaming it moves a knob and no word.
+
 ### The icebox tier
 
 The deferred pool has an intake asymmetry the delivery doctrine itself creates:

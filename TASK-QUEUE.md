@@ -246,21 +246,6 @@
 
 ## Technical Debt
 
-- **queue-backlog-vocabulary-undeclared** — the tree uses "queue" for the governed file and its
-  drain mechanics (`--emit queue-counts`, the drain-entry assertion, `QUEUE_KIT_ENTRY_LINE_CAP`)
-  and "backlog" for the accumulating mass and its aging (`kpi-gate-backlog`, the backlog-aging
-  findings), and no doc states which word owns which half.
-  **Re-verified at this scope:** queue-kit/SPEC.md and lifecycle-kit/SPEC.md still carry usages
-  only, no definition. **Deliverable:** one section in queue-kit/SPEC.md declaring the split and
-  its ground. It salvages an operator-declined rename of the queue file (operator direction,
-  2026-09-18): collapsing the two words would cost the live distinction and leave
-  `kpi-gate-backlog` naming something other than the backlog, and the path was always consumer
-  config (`QUEUE_KIT_QUEUE_FILE`).
-  **Cost while deferred:** each reader infers the distinction, and a rename proposal can recur.
-  Filed 2026-09-18 to the gap inbox by the lead after `external-install-evidence`'s close;
-  promoted 2026-09-22 into `queue-kit-unwrap` by operator direction (lead-relayed). Debt: it
-  declares two names the tree already carries and mints none.
-
 ## Deferred
 
 - **shell-textual-absoluteness-single-dialect** [cost: event/low] [surface: gate-sdk] — tracked
@@ -2075,5 +2060,6 @@
 - queue-citation-line-number-stales-within-its-own-session
 - recurrence-line-never-ages
 - precondition-gate-direction-blindness
+- queue-backlog-vocabulary-undeclared
 
 ## Lessons Learned
