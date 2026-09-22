@@ -8,3 +8,6 @@ so its second line continues the first.
 
 > A quoted paragraph that
 > wraps inside the quote.
+
+A paragraph whose next line looks like a declaration,
+note: but this tree declares no lead, so the line is an ordinary soft break.

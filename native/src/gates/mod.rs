@@ -657,7 +657,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-md-unwrapped",
         md_unwrapped::run,
         &[],
-        &["CANON_KIT_UNWRAP_GLOBS", "CANON_KIT_UNWRAP_EXCLUDE"],
+        &["CANON_KIT_UNWRAP_GLOBS", "CANON_KIT_UNWRAP_EXCLUDE", "CANON_KIT_UNWRAP_DECLARATION_LEADS"],
         "canon-kit",
         &[("git", "")],
     ),

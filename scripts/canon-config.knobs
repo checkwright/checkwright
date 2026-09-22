@@ -120,3 +120,7 @@ CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA[] = BSD
 # comment-tier-exempt: this repo keeps its tracked markdown unwrapped, one line per paragraph, the queue and its shipped template included; gate-test fixtures are held out because a fixture's line shape is the input under test — consumer editorial scope, never a kit literal (the provenance seam)
 CANON_KIT_UNWRAP_GLOBS[] = *.md
 CANON_KIT_UNWRAP_EXCLUDE[] = */gate-tests/*
+# comment-tier-exempt: the three line leads this repo's own readers key on — lifecycle-kit's ruling-staleness probe reads `ruling:` and `discharge:`, and the close-surface roster reads `close-surface:`; the unwrap joining one onto the paragraph above disarms its reader, so each opens a block here
+CANON_KIT_UNWRAP_DECLARATION_LEADS[] = ruling:
+CANON_KIT_UNWRAP_DECLARATION_LEADS[] = discharge:
+CANON_KIT_UNWRAP_DECLARATION_LEADS[] = close-surface:

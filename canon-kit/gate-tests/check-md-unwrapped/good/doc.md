@@ -40,3 +40,6 @@ break.
 
     indented code
     stays as it is
+
+A paragraph line.
+note: a declared lead opens its own block, so the line above never joins it

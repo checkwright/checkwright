@@ -1,2 +1,4 @@
 # spec: canon-kit/SPEC.md §check-md-unwrapped — the fixture opts its markdown into the governed set
 CANON_KIT_UNWRAP_GLOBS[] = *.md
+# spec: canon-kit/SPEC.md §check-md-unwrapped — the declared lead the good tree's doc opens a block with
+CANON_KIT_UNWRAP_DECLARATION_LEADS[] = note:

@@ -2,7 +2,7 @@
 // remedy: every soft break the gate's scanner finds is joined onto its predecessor
 use crate::gates::md_unwrapped;
 
-pub const KNOBS: &[&str] = &[];
+pub const KNOBS: &[&str] = &["CANON_KIT_UNWRAP_DECLARATION_LEADS"];
 
 const USAGE: &str = "usage: --emit md-unwrap [--write] <file>…";
 
@@ -12,6 +12,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     if files.is_empty() || files.iter().any(|f| f.starts_with("--")) {
         return Err(USAGE.to_string());
     }
+    let leads = md_unwrapped::declaration_leads()?;
     let mut out = String::new();
     let mut failed: Vec<String> = Vec::new();
     for f in files {
@@ -22,7 +23,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
                 continue;
             }
         };
-        let joined = md_unwrapped::unwrap(&text);
+        let joined = md_unwrapped::unwrap(&text, &leads);
         if !write {
             out.push_str(&joined);
         } else if joined != text {

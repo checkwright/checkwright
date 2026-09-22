@@ -8,18 +8,6 @@
 
 ## New Features
 
-### md-unwrap-folds-declarations
-
-[spec: SPEC-unwrap-declarations.md]
-
-`--emit md-unwrap` joins a line-start declaration (`ruling:`, `discharge:`, `close-surface:`) onto the paragraph above it, because canon-kit/SPEC.md §check-md-unwrapped's block scanner models only CommonMark block starts. The join changes no rendering, but it hides the declaration from every reader that keys on a line start. Attested once: the unwrap of TRAJECTORY.md folded its `discharge:` and `ruling:` lines into the ruling paragraph, so the ruling-staleness probe read the admission filter as an undeclared condition. Two-space hard breaks restored them; they are still in the file. The arm's postcondition checks only the gate's own verdict, and the probe is advisory, so nothing redded.
-
-**Deliverable:** a configured declaration-lead set that the scanner treats as a block start. The arm then never joins such a line and the gate never reds it. Add a fixture row for each. A new knob is a new name, so this needs an amendment.
-
-**Ruled at spec (2026-09-22):** `CANON_KIT_UNWRAP_DECLARATION_LEADS`, an array defaulting to empty. The attested leads are another kit's vocabulary, so none ships as a canon-kit literal. This repo binds `ruling:`, `discharge:` and `close-surface:`.
-
-**Cost while deferred:** the next unwrap of a declaring surface silently disarms that surface's reader. Filed 2026-09-22 to the gap inbox at `queue-kit-unwrap`'s close; promoted at the next iteration's scope intake, so the record is late and says so. Owner: canon-kit/SPEC.md §check-md-unwrapped, which names no declaration line.
-
 ## Technical Debt
 
 ### line-window-gates-unaudited
@@ -1687,5 +1675,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - amendment-refusal-acceptance-parity
 - install-smoke-powershell-demo-runs-before-bash-strip
 - fence-run-fixed-env-hides-user-gem-dir
+- md-unwrap-folds-declarations
 
 ## Lessons Learned

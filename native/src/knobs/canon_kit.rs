@@ -55,6 +55,7 @@ pub const KIT: Kit = Kit {
         Row::indexed("CANON_KIT_MDREF_EXCLUDE", &[]),
         Row::indexed("CANON_KIT_UNWRAP_GLOBS", &[]),
         Row::indexed("CANON_KIT_UNWRAP_EXCLUDE", &[]),
+        Row::indexed("CANON_KIT_UNWRAP_DECLARATION_LEADS", &[]),
         Row::indexed("CANON_KIT_RESTATEMENT_PAGES", &[]),
         Row::indexed(
             "CANON_KIT_FENCE_PROGRAMS",
