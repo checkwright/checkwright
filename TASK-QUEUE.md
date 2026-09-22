@@ -126,6 +126,22 @@ installer/SPEC.md §The install boundary rules a shipped PowerShell file's code 
 
 **Cost while deferred:** an adopter writing a cardinal-valued full-line marker above an unwrapped paragraph gets a binding whose agreement is near-accidental. Filed 2026-09-22 by build batch 2 as inferred from source; measured at this close and narrowed. **DISTINCT from `line-window-gates-unaudited`** (Done 2026-09-22), whose closed roster of three windows that audit discharged; this is a fourth gate it flagged and did not audit. Owner lookup ran `measured-claim` and `paragraph` over the queue — no owner.
 
+### matching-window-roster-absent
+
+[cost: event/low] [surface: gate-sdk]
+
+no surface rosters which gates carry a same-line or same-paragraph matching window, so auditing the class means re-deriving the roster off `native/src/gates` and the pattern files each time. The residue is spread across four surfaces: canon-kit/SPEC.md and gate-sdk/SPEC.md carry the three audited windows' verdicts in three sections, and [msg-uuid-reach-unbounded](#msg-uuid-reach-unbounded) and [measured-claim-span-unbounded](#measured-claim-span-unbounded) carry a fourth and fifth candidate.
+
+**Deliverable — rule one of two:** a DERIVED roster (a `.gate` descriptor field the binary reads, or an `--emit` arm over the pattern files and the gate modules — never a hand-kept list, which derivation-first forbids), or a stated refusal naming why the class has no decidable oracle.
+
+**Probed at promotion:** three windows are named constants — `MARKER_REACH` (`knob_citation.rs`), `SPAN_CAP` (`queue_prose_precondition.rs`), `WINDOW` (`assertion_strength.rs`) — while the msg-uuid window is a regex `.*` in a pattern file and measured-claim's is a paragraph walk, so a constant-name scan alone reaches three of five.
+
+**Inferred, not run:** that a descriptor field or an emit arm can decide 'carries a matching window' for the other two shapes — establish it by reading the audited modules' window code for a common shape.
+
+**DISTINCT from** the two entries above, each owning one window's calibration and discharged by fixing it; this owns the missing surface that would have led an auditor to either.
+
+**Cost while deferred:** the next auditor re-derives the roster from source. Filed 2026-09-22 to the gap inbox by `install-first-contact`'s close, captured as knowledge friction during `line-window-gates-unaudited`'s audit, and promoted at the next scope's intake, so the record is late and says so. Owner lookup ran `matching window`, `same-line window` and `window roster` over the tracked docs — no owner.
+
 ### smoke-registry-omission-blind
 
 [cost: event/low] [surface: gate-sdk]
@@ -677,10 +693,6 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 **Why design-pending:** the ruling fixes the DIRECTION and not the grammar. Open: which components take the new encoding and in what order, whether the change is a migration or a read-both-write-new window, and what each date-reading gate asserts across it — a wrong answer reds every governed surface at once.
 
 **Cost while deferred:** low and bounded — every entry needing discrimination keeps buying it with text against the entry budget. Filed 2026-09-01 by close under CLAUDE.md §Housekeeping's operator-directed exception; it rides no cut and is no hotfix.
-
-**DISTINCT from `queue-citation-line-number-stales-within-its-own-session`** (Done), where the cited file lives and only its line number drifts; here the whole path is retired.
-
-**Cost while deferred:** each kit-library retirement can strand a queue citation that reads live until a hand grep finds it. Filed 2026-09-14 by `config-seam-second-cut`'s close into the gap inbox, from its stale-identifier-after-retirement audit; promoted at this iteration's scope.
 
 ### local-only-files-write-back-untriggered
 
