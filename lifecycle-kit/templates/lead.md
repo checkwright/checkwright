@@ -52,6 +52,7 @@ One qualification, because `--simulate` runs every matching entry-preflight comm
 - **A claim carries its tier**: measured (the command, and when it ran), inferred, or expected. A grant also carries whether it is spent, read off its target's current state at relay time.
 - **A fix travels as the constraint it must meet**, never as the mechanism. The stage session holds the oracle and finds the mechanism.
 - **A rule travels only to a role it binds.** Before relaying one, read whose role its owning surface names.
+- **Operator answers that seem to conflict go back to the operator as that question**, never reconciled by inference and relayed as their words.
 
 What the lead rules alone is scope, envelope and priority: the things no gate can decide and no grep can answer.
 
