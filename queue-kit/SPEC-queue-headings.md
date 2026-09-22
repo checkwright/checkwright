@@ -30,7 +30,7 @@ This amendment pairs three entries.
 
 ### (1) The slug-length ratchet: `QUEUE_KIT_SLUG_MAX` {mechanical}
 
-**Not yet applied.** This lands first, before any heading exists, so no grandfathered slug is renamed into an anchor. Add to §Layout and configuration:
+**Applied.** This lands first, before any heading exists, so no grandfathered slug is renamed into an anchor. Add to §Layout and configuration:
 
 > - `QUEUE_KIT_SLUG_MAX` — default `30`, or `off`: the code-point ceiling on a slug that enters the live set. A slug live at `HEAD` is grandfathered at any length. A rename is a new slug, so it is bound.
 

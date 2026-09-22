@@ -361,6 +361,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "QUEUE_KIT_DEFERRED_SECTION",
             "QUEUE_KIT_ICEBOX_SECTION",
             "QUEUE_KIT_DONE_SECTION",
+            "QUEUE_KIT_SLUG_MAX",
         ],
         "queue-kit",
         &[("git", "")],

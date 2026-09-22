@@ -26,6 +26,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("QUEUE_KIT_ENTRY_CAP", "4300cp"),
         Row::scalar("QUEUE_KIT_ENTRY_CREDIT_MAX", "2150cp"),
         Row::scalar("QUEUE_KIT_ICEBOX_AGE_DAYS", "30"),
+        Row::scalar("QUEUE_KIT_SLUG_MAX", "30"),
         Row::indexed("QUEUE_KIT_REQUIRED_SECTIONS", REQUIRED_SECTIONS),
         Row::indexed("QUEUE_KIT_PROSE_LEADS", &["Protocol:"]),
         Row::indexed("QUEUE_KIT_PROSE_SURFACE_GLOBS", &[]),
@@ -81,6 +82,11 @@ fn validate(v: &Values) -> Vec<String> {
     for n in ["QUEUE_KIT_ENTRY_CAP", "QUEUE_KIT_ENTRY_CREDIT_MAX"] {
         if let Some(Err(e)) = scalar(v, n).map(crate::queue::parse_size) {
             errs.push(format!("{} must be <n>cp, <n>lines or off: {}", n, e));
+        }
+    }
+    if let Some(s) = scalar(v, "QUEUE_KIT_SLUG_MAX") {
+        if s != "off" && !positive(s) {
+            errs.push(format!("QUEUE_KIT_SLUG_MAX must be a positive integer or off (got '{}')", s));
         }
     }
     if scalar(v, "QUEUE_KIT_ICEBOX_SECTION") == scalar(v, "QUEUE_KIT_DEFERRED_SECTION") {

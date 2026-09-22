@@ -148,6 +148,7 @@
 - `check-surface-ratchet` — sizes are now code points, and a ceiling row without the `cp` suffix exits 2 as a line-unit row. Re-stamp with `bash gate-sdk/bin/run-gates.sh --emit always-loaded --ceiling` and commit the file.
 - `check-brevity` — the per-bullet budget is now `CONTEXT_KIT_BREVITY_CAP` in code points (default `330`), so a bullet joined onto one line no longer passes on its line count. A bullet near the old four-line budget may land either side; the finding names its size.
 - `check-lifecycle-registration` — the block `--install-lifecycle` writes is now one line per paragraph, so an installed block reds as stale after upgrading. Re-run `--install-lifecycle` on the gate binary and commit the agent file.
+- `check-task-conservation` — gains assertion B, the slug ratchet: a slug entering the live set (new, or renamed) longer than `QUEUE_KIT_SLUG_MAX` code points (default `30`) now reds; slugs already live are grandfathered. Shorten the new slug before it lands, or set the knob to `off`.
 
 ## Renamed knobs
 

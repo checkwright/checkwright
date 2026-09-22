@@ -29,9 +29,39 @@ fn diff(head: &str, work: &str, sec: &queue::Sections) -> (usize, Vec<String>) {
     (conserved, lost)
 }
 
+// spec: queue-kit/SPEC.md §check-task-conservation — assertion B: a slug entering the live set (absent
+// from HEAD's live and done sets) is at most `max` code points; a slug live at HEAD is grandfathered
+fn over_ceiling(head: &str, work: &str, sec: &queue::Sections, max: usize) -> Vec<(String, usize)> {
+    let mut known: HashSet<String> = queue::live_slugs(head, sec).into_iter().collect();
+    known.extend(queue::done_slugs(head, sec));
+    queue::live_slugs(work, sec)
+        .into_iter()
+        .filter(|s| !known.contains(s))
+        .map(|s| {
+            let n = s.chars().count();
+            (s, n)
+        })
+        .filter(|(_, n)| *n > max)
+        .collect()
+}
+
 pub fn run(args: &[String]) -> i32 {
     let sec = match queue::Sections::with_done() {
         Ok(s) => s,
+        Err(e) => {
+            eprintln!("check-task-conservation: {}", e);
+            return 2;
+        }
+    };
+    let max = match queue::knob_scalar("QUEUE_KIT_SLUG_MAX") {
+        Ok(v) if v == "off" => None,
+        Ok(v) => match v.parse::<usize>() {
+            Ok(n) => Some(n),
+            Err(_) => {
+                eprintln!("check-task-conservation: QUEUE_KIT_SLUG_MAX is not a positive integer or off: {}", v);
+                return 2;
+            }
+        },
         Err(e) => {
             eprintln!("check-task-conservation: {}", e);
             return 2;
@@ -88,8 +118,11 @@ pub fn run(args: &[String]) -> i32 {
     };
 
     let (conserved, lost) = diff(&head, &work, &sec);
+    let long = max.map(|m| over_ceiling(&head, &work, &sec, m)).unwrap_or_default();
+    let mut red = false;
 
     if !lost.is_empty() {
+        red = true;
         println!("check-task-conservation: live slug(s) present at HEAD but gone from the working");
         println!("tree — neither live nor done (a lost task; the absence class diff-review misses):");
         for s in &lost {
@@ -97,6 +130,17 @@ pub fn run(args: &[String]) -> i32 {
         }
         println!("  help: restore the entry, or move its slug to the done section if it completed.");
         println!("        A rename must move the old slug to done and sweep every [blocked-by:] ref.");
+    }
+    if let (false, Some(m)) = (long.is_empty(), max) {
+        red = true;
+        println!("check-task-conservation: new or renamed slug(s) over the {}-code-point ceiling", m);
+        println!("(QUEUE_KIT_SLUG_MAX; a slug live at HEAD is grandfathered, a new one is not):");
+        for (s, n) in &long {
+            println!("  {} ({} code points, ceiling {})", s, n, m);
+        }
+        println!("  help: shorten the slug before it lands — it becomes the entry's heading and anchor.");
+    }
+    if red {
         return 1;
     }
 
@@ -144,5 +188,20 @@ mod tests {
         assert_eq!(diff(head, "## Icebox\n- **a** x\n", &sections()), (1, vec![]));
         let (_, lost) = diff(head, "## Done\n- **a** — x\n", &sections());
         assert_eq!(lost, vec!["a".to_string()]);
+    }
+
+    // spec: queue-kit/SPEC.md §check-task-conservation — assertion B binds a new slug and a rename,
+    // and grandfathers a long slug already live (or done) at HEAD
+    #[test]
+    fn only_a_slug_new_to_head_is_held_to_the_ceiling() {
+        let head = "## New Features\n- **grandfathered-long-slug** x\n## Done\n- done-long-slug\n";
+        let work = "## New Features\n- **grandfathered-long-slug** x\n- **brand-new-long-slug** y\n\
+                    - **short** z\n- **done-long-slug** w\n## Done\n";
+        assert_eq!(
+            over_ceiling(head, work, &sections(), 10),
+            vec![("brand-new-long-slug".to_string(), 19)]
+        );
+        assert!(over_ceiling(head, work, &sections(), 19).is_empty());
+        assert!(over_ceiling("", "## New Features\n- **abc** x\n", &sections(), 3).is_empty());
     }
 }
