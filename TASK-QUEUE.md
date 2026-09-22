@@ -82,24 +82,6 @@ site-kit's fixture-suite fence stays unmarked for `check-fence-run`, so the comm
 
 **Cost while deferred:** a consumer widening the knob with a multi-level glob governs fixture prose as manifest content, or enumerates single-level globs around the gap; and both configured expansions (`CANON_KIT_MANIFEST_FILES`, `CANON_KIT_PROSE_SURFACE_GLOBS`) still call `walk::glob_files`, so a `**` there stats every entry under `target/` and a concurrent cargo build can exit-2 every manifest reader on a clean tree. Repair route: `walk::glob_corpus` (gate-sdk/SPEC.md §The port-candidate criteria). Re-verified 2026-09-22 at scope: `native/src/spec.rs` lines 179 and 197. Filed 2026-09-15 by `couples-field-semantics`' spec into the gap inbox; drained and promoted 2026-09-15 at close.
 
-### amendment-refusal-acceptance-parity
-
-an amendment's refusal rationale can claim an acceptance criterion asserts something that criterion does not say. The `--dry-run` amendment refused a gate on the stated ground that the behavioral property was asserted directly instead, in D8, as *each mutating verb's* `--dry-run` leaving the tree object unchanged. D8's own ordered specification listed one verb, not each. Two sections of one governing document said different things about what that document accepts.
-
-**The contradiction, not the coverage, is what earns the entry.** A build session reading either section in isolation would have been correct and would have shipped a different acceptor — the wide reading builds three assertions, the narrow one builds one. Build read D8's explicit list and built to it, which is the conservative call and the right one, since widening asserted behavior is envelope-shaped. But which acceptor shipped turned on which section the builder happened to open.
-
-**It passed spec and align.** Neither stage caught a self-falsifying document, which is what makes this a methodology gap rather than one amendment's typo: the acceptance section is the contract, the refusal section argues *from* it, and nothing compares the two.
-
-**Gap generalization — the class that should have caught it.** The nearest sibling is [intra-file-pendency-contradiction-scan](#intra-file-pendency-contradiction-scan), which scans one file for a slug whose tense disagrees between two sections. Same family — a governed file falsifying itself, decidable with no tree comparison — on a different axis: that one is about tense, this about the scope of an acceptance claim. Cited rather than folded, because collapsing them would hand one gate two unrelated vocabularies.
-
-**Why design-pending:** the decidable predicate is not obvious. "A refusal section citing an acceptance item must quote it" is checkable but is ceremony; comparing a paraphrase against the criterion it paraphrases is a judgment no scanner makes. The honest middle — a refusal may cite an acceptance item by identifier and may not restate its content — is a change to the amendment format, which is doctrine rather than a gate.
-
-**Cost while deferred:** any amendment can argue a refusal from a claim about its own acceptance that no stage verifies, and the failure is silent — both readings pass every gate, and the divergence surfaces only as a coverage gap found after the amendment is deleted.
-
-**Closing this takes both halves, and the ruling folds the fix in here rather than into a unit of its own.** Lead-ruled 2026-08-08: a separate entry for the one-assertion fix would let the cheap half close on its own and quietly leave the expensive one — that the document cleared both spec and align carrying the contradiction — as nobody's. Enforcement-first, applied to a finding rather than a gate: the fix and what explains it land together. Closure therefore requires **both** (1) the missing `--dry-run` assertion in the consumer smoke and (2) removal of the stated bound in `installer/SPEC.md` §The verbs. **Premise corrected 2026-09-22 at scope:** `init --dry-run` is already held there (installer/SPEC.md §The verbs, the classifier paragraph), and the bound now names `update --dry-run` as the unheld verb, so the claim that `update` execing `init` makes one arm cover both is false. What remains is an `update --dry-run` arm, then the bound's removal.
-
-**The tree is honest today, only narrower than the refusal argued.** The capability-liveness sweep at this close found zero governed surfaces still carrying the wide claim, so nothing published overclaims; what is missing is the assertion, not a correction. Filed 2026-08-08 by close, draining the gap inbox; found at build. The coverage half was escalated as an envelope call and folded in here on the lead's ruling the same day.
-
 ### docs-link-red-remedy-first
 
 `check-docs-link-convention` reds on the most ordinary thing a docs subpage author writes, and leads with the diagnosis.
@@ -1744,6 +1726,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 ## Done
 
+- amendment-refusal-acceptance-parity
 - install-smoke-powershell-demo-runs-before-bash-strip
 
 ## Lessons Learned
