@@ -892,7 +892,7 @@ The repository carries one semver line, applied as git tags, with the kits movin
 
 The declaration is one line, `Release channel: **<value>**`, and it lives on docs/install.md §Upgrading, where an adopter reads it; this section owns its rule and names no value, so the page is the channel's one statement.
 
-The two admissible values are `preview` and `stable`. That line is prose a reader sees and a token a gate reads — read off a line of its own rather than a bracketed tag, the same one-line-declaration shape queue-kit's `roadmap-summary:` uses and for the same reason.
+The two admissible values are `preview` and `stable`. That line is prose a reader sees and a token a gate reads — read off a line of its own rather than a bracketed tag, the one-line-declaration shape the `close-surface:` lines take (lifecycle-kit/SPEC.md §The close-surface roster).
 
 The channel is a statement about **audience and support expectations**, not a second artifact stream. While it reads `preview` the version line is 0.x, and breaking changes ride minors under the pre-1.0 qualifier below. The tag rhythm under `preview` is an artifact of internal iteration rather than a stability signal: the tags are preview-channel iteration artifacts, and a launch announcement is a separate, later event. The channel flips to `stable` at `v1.0.0`, the same deliberate cut this section calls the first stability promise — now with a surface that says so before a reader infers it from tag density.
 
