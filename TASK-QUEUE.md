@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### line-window-gates-unaudited
-
-`check-knob-citation`'s same-line default leg bound unrelated knobs once paragraphs became one line, and queue-kit-unwrap recalibrated it to a 100-code-point forward reach. No one has audited the other gates whose precision rests on a same-line window (the `check-manifest-count` wedge, `check-prose-tells`, the msg-patterns account pattern) for the wider unit. None of them reds today.
-
-**Deliverable:** per gate, a measured over-firing read on the unwrapped tree, and a recalibration or a stated reason the line is still the right unit.
-
-**Cost while deferred:** silent over-firing on a future long paragraph. Filed 2026-09-22 to the gap inbox by queue-kit-unwrap's build batch 3. Promoted at close because →fix is an audit of three gates. Owner lookup ran over `same-line` and `co-occur` in canon-kit/SPEC.md, gate-sdk/SPEC.md and the audit roster and found no owner.
-
 ### manifest-files-configured-branch-unpruned
 
 `spec::manifest_files`' configured branch (`CANON_KIT_MANIFEST_FILES` non-empty) applies no prune set, where the default branch's walks prune `GATE_SDK_PRUNE_DIRS` and canon-kit/SPEC.md §The shared spec adapters rules that `comment_surface`'s configured branch narrow exactly as its default does. So a configured value cannot say `**` without admitting `gate-tests/` fixtures; this repo's single-level globs in `scripts/canon-config.knobs` stand in for the prune. Verified 2026-09-15 at close: the configured branch is `glob_files` plus an `is_file` test, with no `path_pruned` filter.
@@ -1663,5 +1655,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - fence-run-fixed-env-hides-user-gem-dir
 - md-unwrap-folds-declarations
 - docs-link-red-remedy-first
+- line-window-gates-unaudited
 
 ## Lessons Learned
