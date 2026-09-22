@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### manifest-files-configured-branch-unpruned
-
-`spec::manifest_files`' configured branch (`CANON_KIT_MANIFEST_FILES` non-empty) applies no prune set, where the default branch's walks prune `GATE_SDK_PRUNE_DIRS` and canon-kit/SPEC.md §The shared spec adapters rules that `comment_surface`'s configured branch narrow exactly as its default does. So a configured value cannot say `**` without admitting `gate-tests/` fixtures; this repo's single-level globs in `scripts/canon-config.knobs` stand in for the prune. Verified 2026-09-15 at close: the configured branch is `glob_files` plus an `is_file` test, with no `path_pruned` filter.
-
-**Why design-pending:** the repair narrows a corpus shared by roughly ten readers (`check-md-refs`, `check-docs-cmd`, `check-manifest-count`, `check-prose-enum` and the claim gates among them), so canon-kit/SPEC.md §The causal-completeness check item 5 binds: each reader's red condition is enumerated, a zero-count reader such as `check-install-claim` being the attested inversion. Whether any consumer relies on the unpruned form is unprobed.
-
-**Cost while deferred:** a consumer widening the knob with a multi-level glob governs fixture prose as manifest content, or enumerates single-level globs around the gap; and both configured expansions (`CANON_KIT_MANIFEST_FILES`, `CANON_KIT_PROSE_SURFACE_GLOBS`) still call `walk::glob_files`, so a `**` there stats every entry under `target/` and a concurrent cargo build can exit-2 every manifest reader on a clean tree. Repair route: `walk::glob_corpus` (gate-sdk/SPEC.md §The port-candidate criteria). Re-verified 2026-09-22 at scope: `native/src/spec.rs` lines 179 and 197. Filed 2026-09-15 by `couples-field-semantics`' spec into the gap inbox; drained and promoted 2026-09-15 at close.
-
 ## Deferred
 
 ### consumer-policy-rule-absent
@@ -1656,5 +1648,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - md-unwrap-folds-declarations
 - docs-link-red-remedy-first
 - line-window-gates-unaudited
+- manifest-files-configured-branch-unpruned
 
 ## Lessons Learned

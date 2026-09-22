@@ -171,12 +171,15 @@ pub fn canonical_specs_sorted(root: &str) -> Result<Vec<String>, String> {
 // spec: canon-kit/SPEC.md §The shared spec adapters — `spec_manifest_files`, all three branches in the
 // one place the cohort calls. The `CLAUDE.md` find is neither `templates/`-filtered nor
 // kit-root pruned while the other two are; the asymmetry is reproduced, not tidied.
+// spec: canon-kit/SPEC.md §The shared spec adapters — both configured branches expand through
+// `glob_corpus`, so a consumer's `**` narrows by the shared prune set exactly as the default
+// branch's walks do rather than admitting fixture trees and a concurrent build's output
 pub fn manifest_files(root: &str) -> Result<Vec<PathBuf>, String> {
     let mut out: Vec<PathBuf> = Vec::new();
     let manifest_globs = knob_array("CANON_KIT_MANIFEST_FILES")?;
     let rootp = Path::new(root);
     if !manifest_globs.is_empty() {
-        for f in walk::glob_files(rootp, &manifest_globs)? {
+        for f in walk::glob_corpus(rootp, &manifest_globs)? {
             if f.is_file() {
                 out.push(f);
             }
@@ -194,7 +197,7 @@ pub fn manifest_files(root: &str) -> Result<Vec<PathBuf>, String> {
     }
     let prose_globs = knob_array("CANON_KIT_PROSE_SURFACE_GLOBS")?;
     if !prose_globs.is_empty() {
-        for f in walk::glob_files(rootp, &prose_globs)? {
+        for f in walk::glob_corpus(rootp, &prose_globs)? {
             if f.is_file() && slot_free(&f)? {
                 out.push(f);
             }
