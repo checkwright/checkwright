@@ -4,9 +4,4 @@
 
 ---
 
-stage-contract-drain scope ae8954fc 2026-09-22 e4f77151
-stage-contract-drain spec aa5f488d 2026-09-22 cf69e900
-stage-contract-drain build a5188fce 2026-09-22 bbef8985
-stage-contract-drain build a3d82159 2026-09-22 9231c81d
-stage-contract-drain validate a49ea034 2026-09-22 8ee7667d
-stage-contract-drain close a5dadd54 2026-09-22 443b224c
+— scope a354bbe0 2026-09-22 b78d6308
