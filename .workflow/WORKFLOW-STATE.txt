@@ -9,3 +9,4 @@ canon-gate-precision spec aad5ac8d 2026-09-22 d56b5138
 canon-gate-precision align a61909fb 2026-09-22 38ec0eeb
 canon-gate-precision build acdc423c 2026-09-22 6531d5c6
 canon-gate-precision build a803caa9 2026-09-22 91471b25
+canon-gate-precision validate a8cc67e0 2026-09-22 0da083e6
