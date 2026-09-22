@@ -4,4 +4,4 @@
 
 ---
 
-— scope ae8954fc 2026-09-22 e4f77151
+stage-contract-drain scope ae8954fc 2026-09-22 e4f77151

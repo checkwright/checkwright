@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: stage-contract-drain
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [README.md](README.md) maps the kits.
 
@@ -9,6 +9,16 @@
 ## New Features
 
 ## Technical Debt
+
+### stage-evidence-prefix-doubles-a-separator
+
+`check-stage-evidence`'s path relativizer composes its not-under arm from `git rev-parse --show-prefix`, which prints a TRAILING slash, onto a path with a separator already between them.
+
+**Latent rather than live:** the doubled separator is collapsed downstream by `walk::normalize_abs`, so no verdict is wrong today. Removing the second separator is a behaviour change to a COMPARED value, which wants its own measurement. **Re-verified at this scope:** the `--show-prefix` call is still at `native/src/gates/stage_evidence.rs` line 100.
+
+**Deliverable:** measure what the compared value is on each arm, then either trim the prefix at the site or state at the site that the collapse is relied on.
+
+**Cost while deferred:** none paid today; the exposure is a later edit to `normalize_abs`'s collapse turning a latent defect live with nothing asserting the coupling. Filed 2026-09-20 by close's drain; promoted 2026-09-22 into `stage-contract-drain` by operator direction (lead-relayed). Debt: it converges one site on behaviour the SPEC already states and mints no name.
 
 ## Deferred
 
@@ -29,6 +39,8 @@ a kit feature that encodes a policy, such as record-size capping, ships this pro
 scope aggregates explicit inbound citations (converge, subsume, block; lifecycle-kit/templates/stages/scope.md), but it has no semantic test for when one Deferred entry makes another obsolete even though neither cites the other. A tactical entry therefore gets ranked as work when a strategic sibling would moot it. Live instance: queue-kit-unwrap's scope recommended three line-cap fixes and left `markdown-hard-wrap-unowned-and-ungated`, which mooted them, to its own iteration. The operator reversed that choice.
 
 **Deliverable:** a scope-template step and its SPEC contract that pair each candidate against the strategic entries that could make it obsolete, with a written verdict (mooted / reshaped / independent) in the unit-set escalation.
+
+**Operator exception to the enhancement admission filter** (2026-09-22 scope, lead-relayed), because the operator already reversed a misranking this gap caused. Admitted to `stage-contract-drain`, for /spec to author and promote.
 
 **Cost while deferred:** every scope can rank tactical work that is already mooted. Filed 2026-09-22 to the gap inbox by the lead as an operator direction. Promoted at close because →fix would change the scope contract, which is a spec amendment. Owner lookup ran over `supersed`, `obsolete`, `subsume` and `strategic` in scope.md and found no owner.
 
@@ -98,6 +110,8 @@ tracked shell sites test a path for absoluteness by a leading `/` alone, so a ca
 
 a stage session can land its work commits before running its own `--enter-stage`, and nothing reds it: `check-stage-evidence` catches a stamp committed after the work it preceded, never work preceding the stamp, and a same-stage re-entry finds the cursor already on its stage. Measured 2026-09-22 by `git log`: canon-gate-precision's second build session merged two amendments, then stamped at the second merge's head. The first instance, one iteration earlier and also on the cheaper tier, was discarded at scope because §check-stage-evidence states the limit; the recurrence shows that stating the limit did not stop it.
 
+**Operator exception to the enhancement admission filter** (2026-09-22 scope, lead-relayed), because the recurrence is judged. Admitted to `stage-contract-drain`, for /spec to author and promote.
+
 **Deliverable — rule one of two:** an oracle asserting that a session's work commits follow its own entry stamp (inferred: commits carry no session id, so how the oracle ties a commit to a session is the open question), or a stamp-first line carried in the dispatch path the cheaper tier reads. **Cost while deferred:** the stamp's recorded head postdates the stage's work, so the stamp misplaces where that session's work began. Filed 2026-09-22 to the gap inbox by the canon-gate-precision lead as a recurrence judgment; promoted at its close because →fix needs a new oracle or a dispatch-path ruling. Owner lookup ran over `stamp` and `newly introduced` in lifecycle-kit/SPEC.md; §check-stage-evidence owns the assertion and its limit.
 
 ### doc-path-hardcoded-reads
@@ -154,21 +168,11 @@ a lead decision whose content is "make no change" is invisible to every later st
 
 **Deliverable — rule one of two, neither authored:** a no-change decision appends its resolution to the gap bullet that raised it, so the drain reads a closed question; or the lead template states that "nothing further is owed" is never the lead's to assert about a durable record it did not read. The lead journal is scratch and is not the answer.
 
+**Held Deferred by the enhancement admission filter** (2026-09-22 scope, operator reading, lead-relayed): both options are new lead-protocol rules, and neither meets any of the filter's three criteria.
+
 **Cost while deferred:** the next no-change ruling on a threshold-bearing question is re-derived by a session that may not rule it.
 
 **DISTINCT from [record-stamp-encoding-compression](#record-stamp-encoding-compression) and `precondition-gate-direction-blindness`**, the entries the instance happened on; this is the lead protocol's landing rule. Filed 2026-09-20 to the gap inbox by the lead of `adopter-floor-door-remainder`; promoted at the 2026-09-21 scope intake, a late record that says so. Owner lookup ran over `no-change`, `landing site`, `lead decision` and `transport` and found no owner.
-
-### stage-evidence-prefix-doubles-a-separator
-
-[cost: event/low] [surface: lifecycle-kit]
-
-`check-stage-evidence`'s path relativizer composes its not-under arm from `git rev-parse --show-prefix`, which prints a TRAILING slash, onto a path with a separator already between them.
-
-**Latent rather than live, and that is why it is filed rather than fixed:** the doubled separator is collapsed downstream by `walk::normalize_abs`, so no verdict is wrong today. Removing the second separator is a behaviour change to a COMPARED value, which wants its own measurement rather than a drive-by edit at a close.
-
-**Deliverable:** measure what the compared value is on each arm, then either trim the prefix at the site or state at the site that the collapse is relied on.
-
-**Cost while deferred:** none paid today; the exposure is a later edit to `normalize_abs`'s collapse turning a latent defect live with nothing asserting the coupling. Filed 2026-09-20 by close's drain, noticed at the build that routed the site's prefix strip onto `walk::rel_under` and left as found; owner lookup ran over `show-prefix`, `separator` and `stage-evidence` across the pool and returned no owner.
 
 ### delta-instruction-batch-dependence-unmarked
 
@@ -183,6 +187,8 @@ a spec amendment can state a delta instruction in the unconditional voice when i
 **Deliverable — neither candidate authored:** a delta-authoring rule that a batch-dependent instruction names its condition; or a spec-stage check that a delta citing a sibling unit's deliverable states what happens when both land together.
 
 **DISTINCT from every live entry**, and the owner sweep over `delta`, `amendment`, `batch` and `unconditional` found none: [amendment-refusal-acceptance-parity](#amendment-refusal-acceptance-parity) concerns an amendment's REFUSAL rationale rather than its instruction voice, and [amendment-dod-sibling-dependence](#amendment-dod-sibling-dependence) concerns a DoD item depending on an unnamed sibling rather than a delta's voice.
+
+**Held Deferred by the enhancement admission filter** (2026-09-22 scope, operator reading, lead-relayed): both candidates are new, either an authoring rule or a spec-stage check, and neither meets any of the filter's three criteria.
 
 **Cost while deferred:** once/low to rule, plus whatever the rule costs to gate; until then every batch-dependent delta needs a lead present to invert it. Filed 2026-09-20 by the iteration lead to the gap inbox at the build batch-2 dispatch, where inverting the instruction was the act that surfaced it; drained and promoted 2026-09-20 at close.
 
@@ -209,6 +215,8 @@ a spec amendment can state a delta instruction in the unconditional voice when i
 **Re-verified at the drain:** the unit test `a_marker_is_read_only_at_line_start` passes and asserts a mid-line `**Inferred, not run:**` reads as `None`; a line opening with a split spelling fails both `strip_prefix` arms.
 
 **Why design-pending:** lifecycle-kit/SPEC.md §templates/stages/ rules a mid-line mention prose, not a marker, and the test pins it. Refusing a bold unbackticked mid-line spelling as a malformed marker narrows that rule, and prose mentions in an amendment would red.
+
+**Admitted to `stage-contract-drain`** (2026-09-22 scope, operator direction, lead-relayed) as a fail-open repair of an existing gate, outside the enhancement admission filter; /spec authors and promotes it.
 
 **Cost while deferred:** a misplaced marker's claim reaches build unrun, and only the author's own line-start discipline holds. Filed 2026-09-18 to the gap inbox at declined-target-audit's align; promoted at its close drain. Owner lookup: `inferred marker`, `inferred_marker`, `scan_markers`, `malformed marker` — none.
 
@@ -285,6 +293,8 @@ on native Windows the harness's `PowerShell` tool is on by default beside `Bash`
 **Why design-pending:** the remedies are (a) exempt git-generated subjects in `check-stamp-subject` on `check-commit-subject`'s precedent, or (b) keep the red and name the merge-time remedy, a scoped subject supplied with `git merge -m`. Either narrows or holds the landed envelope, so an envelope ruling is owed at this entry's scope.
 
 **Inferred, not run:** that `git merge -m` with a scoped subject clears both gates on a stamp-carrying merge.
+
+**Admitted to `stage-contract-drain`** (2026-09-22 scope, operator direction, lead-relayed), outside the enhancement admission filter because it reconciles two landed gates and adds no capability; /spec authors and promotes it and runs the marker above.
 
 **Cost while deferred:** none here, where internal work commits direct to master; a multi-operator consumer's stamp-carrying merge is blocked until reworded. Filed 2026-09-19 to the gap inbox at `lifecycle-contract-drain`'s build, promoted at its close drain by lead decision. Owner lookup: `stamp-subject`, `merge subject`, `git-generated` — no entry matched.
 
@@ -819,6 +829,8 @@ a close-surface roster row does not say whether its path is tracked or gitignore
 **Why design-pending:** whether the field names the tier, the trackedness bit, or nothing at all — the constraint living in the protocol template instead — is a grammar call, and `check-close-surfaces` reads the same rows.
 
 **DISTINCT from `delegated-read-blind-to-gitignored-capture`, Done 2026-09-16**, which ruled the general constraint onto the protocol template; this is one emitter withholding a fact its reader needs, and it stands whether or not any sweep is ever delegated.
+
+**Held Deferred by the enhancement admission filter** (2026-09-22 scope, operator reading, lead-relayed): a new row-grammar field, which meets none of the filter's three criteria.
 
 **Cost while deferred:** every delegating session re-derives the bit, and one that skips the derivation delegates a read returning absence for content. Filed 2026-09-16 to the gap inbox by the spec stage, weighed as that iteration's second candidate owner and refused there for repairing one instance of a general class; drained and promoted at close, which falsified half its premise.
 
