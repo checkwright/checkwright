@@ -5,3 +5,4 @@
 ---
 
 consumer-policy-seam scope a2cd1cd7 2026-09-22 b1436cee
+consumer-policy-seam spec adca4265 2026-09-22 317ca5d4
