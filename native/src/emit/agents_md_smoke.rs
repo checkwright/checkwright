@@ -361,25 +361,24 @@ fn battery_is_green(consumer: &str) -> Result<(), Outcome> {
     ]))
 }
 
-// spec: context-kit/SPEC.md §Testing — assertion 2: `always-loaded` measures a surface count equal
-// to `AGENTS.md`'s line count, which is what proves it read the converted file and not the default.
+// spec: context-kit/SPEC.md §Testing — assertion 2: `always-loaded` measures a surface size equal
+// to `AGENTS.md`'s own, in the meter's code points, which proves it read the converted file.
 fn always_loaded_measures_the_agent_file(consumer: &str) -> Result<(), Outcome> {
     let agent = format!("{}/AGENTS.md", consumer);
-    let lines = std::fs::read_to_string(&agent)
-        .map_err(|e| Outcome::Refuse(format!("{}: cannot read {}: {}", NAME, agent, e)))?
-        .matches('\n')
-        .count();
+    let size = std::fs::read(&agent)
+        .map(|b| super::always_loaded::cp_of(&b))
+        .map_err(|e| Outcome::Refuse(format!("{}: cannot read {}: {}", NAME, agent, e)))?;
     let done = spawn(
         r#"cd "$1" && exec bash gate-sdk/bin/run-gates.sh --emit always-loaded"#,
         &[consumer],
     )?;
     let out = String::from_utf8_lossy(done.stdout()).into_owned();
-    if compiled(&format!("surfaces {}( |·)", lines))?.is_match(&out) {
+    if compiled(&format!("surfaces {}cp( |·)", size))?.is_match(&out) {
         return Ok(());
     }
     Err(fail(format!(
-        "always-loaded did not measure the AGENTS.md surface ({}l): {}",
-        lines,
+        "always-loaded did not measure the AGENTS.md surface ({}cp): {}",
+        size,
         out.trim_end()
     )))
 }
@@ -395,7 +394,7 @@ fn footprint_measures_the_agent_file(consumer: &str) -> Result<(), Outcome> {
     let head = compiled(r"^\| \*\*total\*\*")?;
     let total: Vec<&str> = out.lines().filter(|l| head.is_match(l)).collect();
     let joined = total.join("\n");
-    if compiled(r"\*\*total\*\* \| [1-9][0-9]*l")?.is_match(&joined) {
+    if compiled(r"\*\*total\*\* \| [1-9][0-9]*cp")?.is_match(&joined) {
         return Ok(());
     }
     Err(fail(format!(
