@@ -228,9 +228,15 @@ removed rather than added.
   that drifted into the icebox would silently drop a public commitment;
   included, it reds.
 - **The narrative is recoverable, not discarded.** The commit that iceboxes an
-  entry necessarily contains the removed body in its own diff, so recovery is
-  `git log -p -S'<slug>' -- <queue-file>` — a pickaxe that depends on no
-  commit-message convention. Nothing is copied into the queue to point at it.
+  entry necessarily contains the removed body in its own diff, so
+  recovery is `git log -p -G'<slug>' -- <queue-file>`, which depends on no
+  commit-message convention. It is `-G`, which matches diff lines, and never
+  `-S`, which lists a commit only when the slug's occurrence count changes. An
+  eviction or a Done move keeps the slug in the file, so its count is
+  unchanged and `-S` does not list the evicting commit. `-G` also lists every
+  earlier commit that touched a line naming the slug. The evicting commit is
+  the newest of them that removes the body. Nothing is copied into the queue
+  to point at it.
   **Recovery is mandatory before any ruling on the entry**, not merely
   available: the lead line is a one-clause summary that carries neither the
   deliverable nor the blocking design question, so promoting a dormant entry,
@@ -1549,18 +1555,31 @@ is the one place the port changes what an arbitrarily large input would do.
 
 ### check-queue-hygiene
 
-Invariant: the queue contains only tasks, tags, and section structure — no
-HTML comments (provenance belongs in git history), no exact-duplicate
-non-blank non-`---` lines (copy-paste artifacts), no column-0 prose (every
-column-0 line is a heading, a bullet, `---`, or a configured
-`QUEUE_KIT_PROSE_LEADS` token — the shape that carries protocol duplication
-is banned, not semantic duplication, which is not mechanizable).
+Invariant: the queue contains only tasks, tags, and section structure, and its
+prose points at nothing by a coordinate that goes stale. No HTML comments
+(provenance belongs in git history). No exact-duplicate non-blank non-`---`
+lines (copy-paste artifacts). No column-0 prose: every column-0 line is a
+heading, a bullet, `---`, or a configured `QUEUE_KIT_PROSE_LEADS` token,
+because the shape that carries protocol duplication is banned while semantic
+duplication is not mechanizable. **No line-number citation**: a `<path>:<n>`
+or `<path>:<n>-<m>` token, whose path ends in a dot-extension, is red, and a
+queue body cites another file by `§Section`, by a symbol beside its path, or
+by a quoted literal. **No count pickaxe over the queue file**: an inline code
+span holding a `git log` command with `-S` and the queue file as its path is
+red, since §The icebox tier's recovery is `-G`.
 
 Calibration: indented lines are never flagged on the prose axis; the
 lead-token allowance is a whole-line lead match, not a substring. Division of
 labour with `check-queue-sections`: hygiene owns line *shape* (what a column-0
 line may be), the sections gate owns heading *presence* (that each required
-`##` heading exists exactly once) — neither subsumes the other.
+`##` heading exists exactly once) — neither subsumes the other. The citation
+axes are lexical and bounded. A line number spelled in prose ("lines 642 and
+669") passes, and so does a `-S` pickaxe over another file, which is correct
+wherever the literal leaves that file. The queue file is matched by the
+configured name's basename, so a recipe written with the default path or with
+`<queue-file>` both read. There is no valve, which matches the other axes. A
+false positive is rephrased, since the axes read prose and every hit has a
+stable spelling available.
 
 The duplicate arm's commonest true positive is a **wrapped fragment**: promoting
 several entries in one commit gives them a shared sentence whose wrapping lands

@@ -7,6 +7,9 @@
 - **alpha-feature** — build the alpha surface. [blocked-by: beta-feature]
 - **beta-feature** — the prerequisite groundwork.
   - **beta-subtask** — a nested unit of beta.
+- **citation-style-check** — recovery is queue-kit/SPEC.md §The icebox tier, and the fold lives
+  in `native/src/gates/memory_off.rs` `memory_dir_default()`; an evicted gap-inbox phrase stays
+  recoverable via `git log -p -S'a filed phrase' -- .workflow/gap-inbox.md`.
 
 ## Technical Debt
 

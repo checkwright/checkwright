@@ -62,58 +62,6 @@
   the next scope's intake the same day, and into `queue-kit-unwrap` 2026-09-22 by operator
   direction (lead-relayed).
 
-- **queue-recovery-pickaxe-wrong-oracle** [spec: SPEC-queue-citations.md] — every surface that
-  tells a reader how to recover an evicted queue body names `git log -S`, which is blind to
-  exactly the eviction it documents.
-  **Measured, not reasoned, at this close.** `-S` fires only when a literal's occurrence *count*
-  changes, and an eviction that leaves the slug behind changes none — a `## Done` move to a bare
-  slug line, an icebox one-liner, or any body that spelled its own slug once. Two probes: this
-  iteration's own Done move (`4bea9ceb`) leaves the count at 5 before and 5 after, so `-S` does
-  not list the evicting commit at all and its newest hit is an unrelated earlier commit; and on a
-  real icebox eviction, `-S'scratch-execution-allowlist-bar'` returns 3 commits where `-G`
-  returns 5 (6 against 10 when re-run 2026-09-22). `-G` matches diff content and reaches both.
-  **The live sites, re-verified 2026-09-22:** queue-kit/SPEC.md §The icebox tier, this file's
-  `## Icebox` preamble, and one body recovery recipe; `check-queue-entry-budget`'s help text no
-  longer carries `-S`, and two gap-inbox phrase pickaxes elsewhere in this file are correct uses.
-  **It does not re-open `queue-entry-evidence-tier`'s narrowing, and that is deliberate.** That
-  entry ruled recovery solved and signalling the gap, on a 2026-08-02 measurement of the
-  *compression* case — a shrinking body whose slug count does drop, where `-S` genuinely worked.
-  The case that fails is *eviction*. The narrowing stands; only the oracle spelling is wrong.
-  **Re-derived independently twice inside one iteration**, which is the cost showing rather than
-  an argument for it: scope hit it while counting recurrence-stamping commits (the record notes
-  `-S` undercounted and `-G` surfaced nine more), and this close hit it again re-verifying a gap
-  bullet whose own recovery command was the broken one. Neither derivation had a doc to read.
-  **Specified 2026-09-22:** one owner for the recipe (§The icebox tier, spelled `-G`), the
-  preamble pointing at it, and a `check-queue-hygiene` axis red on an inline `git log -S` recipe
-  over the queue file — the body recipes are where the wrong spelling recurs, and no owner reaches
-  them.
-  **Cost while deferred:** a session sent to recover an evicted body runs the documented command,
-  gets a short list that does not contain the evicting commit, and reads the absence as the
-  content never having existed — a silent wrong answer, not a visible failure.
-  Filed 2026-08-17 by close, from re-verifying a gap-inbox bullet; both probes were run before
-  the claim was asserted and the compression-vs-eviction split checked against the entry it
-  would otherwise have contradicted. Promoted into `queue-kit-unwrap` 2026-09-22 (operator
-  direction, lead-relayed).
-
-- **queue-citation-line-number-stales-within-its-own-session** [spec: SPEC-queue-citations.md]
-  — a `path:line` cite in a queue body goes stale when the cited file changes above the line, and
-  nothing reads it; stale on write when the citing session edits that file itself.
-  **Recurred 2026-09-21, across iterations:** `shell-cwd-anchor-clause-has-no-oracle` cited
-  `gate-sdk/lib/test-hermetic.sh` at lines that moved +4 when `bespoke-test-path-knob-pinning`
-  inserted a block above them; corrected by hand grep at `scratch-hermeticity`'s close.
-  **Specified 2026-09-22:** the citation rule — a queue body cites another file by `§Section`, a
-  symbol beside its path, or a quoted literal, never by line number — with a `check-queue-hygiene`
-  axis on the `<path>:<n>` token; the eight live cites are rewritten in that commit. Cites of
-  other queue records become heading links under `SPEC-queue-headings.md`, per the operator's
-  direction that heading anchors cover queue records only (2026-09-22, lead-relayed).
-  **Cost while deferred:** each instance costs a later reader a wrong resolution until a hand grep.
-  Filed 2026-09-08 by close from the gap inbox and iceboxed; returned to Deferred 2026-09-21 at
-  that scope's intake on the real recurrence above (gap bullet dated 2026-09-21, filed after
-  `scratch-hermeticity`'s close), and promoted into `queue-kit-unwrap` 2026-09-22.
-  Body before eviction: `git log -p -G'<slug>' -- TASK-QUEUE.md`.
-  **DISTINCT from `docs-cmd-retired-path-blind-to-queue`**, where the whole cited path is retired.
-  recurrence: queue-citation-line-number-stales-within-its-own-session 2026-09-21
-
 - **markdown-hard-wrap-unowned-and-ungated** [spec: SPEC-md-unwrap.md] — this repo's markdown
   hard-wrapping convention is unowned, bimodal and load-bearing for a gate whose manifest does not
   say so, and under enforcement-first the unwrap and its oracle land in one unit or neither does.
@@ -666,9 +614,10 @@
   `delegation-kit/bin/run-{budget,dispatch}-guard-tests.sh` were deleted at `7a4da575`
   (2026-08-31, their coverage absorbed into `native_crate`). The battery has been green over them
   for sixteen days.
-  **Probed at promotion, not inferred:** `native/src/gates/evidence_baseline.rs:314-327` iterates
-  the configured suites and never the rows; `.workflow/validate-evidence.txt` carries no line for
-  either name, so a row removal would stale no recorded evidence.
+  **Probed at promotion, not inferred:** `native/src/gates/evidence_baseline.rs` `run()`, its
+  loop over the configured suites, iterates the suites and never the rows;
+  `.workflow/validate-evidence.txt` carries no line for either name, so a row removal would
+  stale no recorded evidence.
   **DISTINCT from `evidence-baseline-orphan-suite-row`** (icebox), whose subject is the unread rows
   themselves — the instance this entry's fix would catch — and which this drain re-observed rather
   than re-fired. **Adjacent to `gate-spec-claim-assertion-parity`** (icebox, ruled a human-audit
@@ -788,9 +737,10 @@
   Surfaced 2026-09-10 by the iteration lead at the operator's ask — rescued out of a gitignored
   journal into `packer-port-terminal-cut`'s gap inbox, promoted 2026-09-10 at scope on a fresh
   roster read, specified 2026-09-11 at spec with its scope narrowed to one leg, and demoted
-  2026-09-11 at build on canon-kit/SPEC.md:239-250's corpus-versus-increment test — ruled `lead,
-  own-authority` 2026-09-11 through the lead's message channel, that lead reversing its own Done
-  instruction of the same date after verifying the grounds at source.
+  2026-09-11 at build on canon-kit/SPEC.md §Merging an amendment (on task completion), step 4's
+  corpus-versus-increment test — ruled `lead, own-authority` 2026-09-11 through the lead's message
+  channel, that lead reversing its own Done instruction of the same date after verifying the
+  grounds at source.
 
 - **install-smoke-leg-names-mix-two-axes** [cost: event/low] [surface: .github] — the `install-smoke` legs in
   `.github/workflows/gates.yml` spend one suffix slot on two different axes, and two tracked
@@ -1230,8 +1180,8 @@
   **Cost while deferred — not zero, and this is the entry's sharpest fact.**
   `README.md`:16-17 and `docs/index.md`:17-18 both already assert, on the first
   screen, "It complements the workflow you already run. Keep your spec process, your
-  prompts, your harness." — and docs/orchestration.md:22-23 makes the same move for
-  orchestration ("It complements your orchestration setup; it does not replace it"),
+  prompts, your harness." — and docs/orchestration.md, its "It complements your orchestration
+  setup; it does not replace it" sentence, makes the same move for orchestration,
   a third site found 2026-08-02 at scope. **No queue or roadmap entry backs any of
   the three with a tested consumer.** Not false — "complements" is far weaker than
   "integrates with X" — but *published and unproven*, in a project whose whole pitch
@@ -1734,9 +1684,9 @@
   drive-lettered root and yields one spelling, an MSYS shell reads the `/c/…` spelling and yields
   another. Only one can match the directory the harness itself creates, so on Windows at most one
   of the three sites is right and nothing here says which.
-  **The three sites, verified 2026-08-30:** `native/src/gates/memory_off.rs:26-29` (a char fold
-  over the raw repo root) and `scripts/session-context.sh:91` /
-  `context-kit/templates/session-context.sh:86` (`tr '/.' '-'`, same fold).
+  **The three sites, verified 2026-08-30:** `native/src/gates/memory_off.rs` `memory_dir_default()`
+  (a char fold over the raw repo root) and `scripts/session-context.sh`, its `tr '/.' '-'` fold, /
+  `context-kit/templates/session-context.sh`, the same fold.
   **Why it promotes rather than fixing or iceboxing.** →fix fails on evidence, not on effort: the
   missing fact is *which spelling the harness uses on Windows*, an observation of another program
   on a host this tree has none of, and no command on a Linux box produces it — writing a fold
@@ -1788,13 +1738,13 @@
   2026-09-04: FOUR cuts want four refs against a 66-column base that holds ONE — two shortest
   legal refs measure 117. Two more hosts REFUSED; four per-cut Done-bound entries taken instead.
   **The gain is the ENCODING, not the list, and the entry says so because the format already has
-  the list.** queue-kit/SPEC.md:440-442 already defines
-  `recurrence: <slug> <YYYY-MM-DD> [<YYYY-MM-DD>…]`, multiple dates on one line today.
-  **A second interaction dissolves with it.** queue-kit/SPEC.md:449-456 grounds the self-naming
-  slug field partly in `check-queue-hygiene` rejecting exact-duplicate lines, naming same-day
-  recurrence on two entries as "exactly the case the declaration exists to record". Under a
-  minute-bearing stamp those two lines stop colliding at all, so one of that field's two stated
-  grounds is retired by the encoding rather than argued against.
+  the list.** queue-kit/SPEC.md §The tag algebra, the `recurrence:` declaration paragraph, defines
+  `recurrence: <slug> <YYYY-MM-DD> [<YYYY-MM-DD>…]`, multiple dates on one line today. **A second
+  interaction dissolves with it.** queue-kit/SPEC.md §The tag algebra, the self-naming-slug
+  paragraph, grounds the field partly in `check-queue-hygiene` rejecting exact-duplicate lines,
+  naming same-day recurrence on two entries as "exactly the case the declaration exists to
+  record". Under a minute-bearing stamp those two lines stop colliding at all, so one of that
+  field's two stated grounds is retired by the encoding rather than argued against.
   **The costs, probed rather than listed, because a reader meeting this cold should price it.**
   Date stamps span `recurrence:` and `ruled:` declarations, filed-prose provenance lines, gap-inbox
   bullets, survey-record headings and WORKFLOW-STATE stamps; the evidence manifest's trailing date
@@ -1824,7 +1774,7 @@
   **Why design-pending:** the candidate trims a trailing line suffix before the shape test and
   reads the queue's live sections, and the alternative is a stated reason the queue stays out.
   Which, and whether the queue's retired-work citations then need an exemption, is the call.
-  **DISTINCT from the iceboxed `queue-citation-line-number-stales-within-its-own-session`**, where
+  **DISTINCT from `queue-citation-line-number-stales-within-its-own-session`** (Done), where
   the cited file lives and only its line number drifts; here the whole path is retired.
   **Cost while deferred:** each kit-library retirement can strand a queue citation that reads live
   until a hand grep finds it.
@@ -1920,7 +1870,7 @@
   `[roadmap:]` commitment rides on it, and no named event is waiting to
   promote it. Still live work — a legal `[blocked-by:]` target, conserved on
   the way in and on the way back out. The removed body is recoverable from
-  the evicting commit (`git log -p -S'<slug>' -- TASK-QUEUE.md`).
+  the evicting commit (queue-kit/SPEC.md §The icebox tier).
 
 - **fixture-suites-never-run-history-less** — No leg runs fixtures history-less.
 - **lead-held-block-no-sanctioned-surface** — No route records a lead-held block.
@@ -2170,5 +2120,8 @@
 - **lead-agent-id-compaction-defense** — each claim still wants its own probe.
 
 ## Done
+
+- queue-recovery-pickaxe-wrong-oracle
+- queue-citation-line-number-stales-within-its-own-session
 
 ## Lessons Learned
