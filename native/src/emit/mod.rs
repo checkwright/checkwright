@@ -32,6 +32,7 @@ pub mod kpi;
 pub mod lesson_sink;
 pub mod md_index;
 pub mod md_section;
+pub mod md_unwrap;
 pub mod parse_gates_log;
 pub mod overhead_meter;
 pub mod pack_installer;
@@ -366,6 +367,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-md-section",
         Arm::Emit(md_section::emit),
         md_section::KNOBS,
+    ),
+    // spec: canon-kit/SPEC.md §check-md-unwrapped — the gate's remedy, reading no knob: its
+    // operands are the files, and the scanner is the gate's own
+    (
+        "--emit-md-unwrap",
+        Arm::Emit(md_unwrap::emit),
+        md_unwrap::KNOBS,
     ),
     // spec: context-kit/SPEC.md §Index-first reading — the public-surface dispatcher: the extractor
     // seam survives the port, so the two knobs that resolve it are declared beside the prune set.

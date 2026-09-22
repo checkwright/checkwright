@@ -426,9 +426,10 @@ widening the knob widens what fires the gate (gate-sdk/SPEC.md §The `# graph:`
 manifest). The clause is stated once here rather than on each bullet it reaches —
 `CANON_KIT_SPEC_NAME`, `CANON_KIT_AMENDMENT_GLOB`, `CANON_KIT_MANIFEST_FILES`,
 `CANON_KIT_PROSE_SURFACE_GLOBS`, `CANON_KIT_MEASURED_SURFACE_GLOBS`,
-`CANON_KIT_COMMENT_SURFACE`, `CANON_KIT_PROSE_TELL_GLOBS` and
-`CANON_KIT_SEAM_SURFACE_GLOBS` — because it is one fact about the mechanism and
-not eight facts about eight knobs. Which knobs it
+`CANON_KIT_COMMENT_SURFACE`, `CANON_KIT_PROSE_TELL_GLOBS`,
+`CANON_KIT_SEAM_SURFACE_GLOBS`, `CANON_KIT_UNWRAP_GLOBS` and
+`CANON_KIT_UNWRAP_EXCLUDE` — because it is one fact about the mechanism and
+not ten facts about ten knobs. Which knobs it
 reaches is derived from the walks rather than listed as policy, so a knob added
 later is reached with no edit here; **`CANON_KIT_DUP_SURFACES` is deliberately not
 among them**, and that is a verdict rather than an omission — its members are read
@@ -524,6 +525,7 @@ Knobs:
 - `CANON_KIT_MDREF_EXCLUDE` — array of globs, default empty: manifest-set docs
   `check-md-refs` skips (a consumer's generated documentation whose links a
   build tool owns).
+- `CANON_KIT_UNWRAP_GLOBS` / `CANON_KIT_UNWRAP_EXCLUDE` — arrays of git pathspecs, default empty: the tracked markdown `check-md-unwrapped` holds to one line per paragraph, less the excluded paths. An empty include set is the clean skip, since which files a tree keeps unwrapped is its own editorial choice (§check-md-unwrapped).
 - `CANON_KIT_RESTATEMENT_PAGES` — array of globs, default empty: the pages
   `check-docs-restatement-parity` holds to the `README.md` beside each. Which
   pages restate a source is one site's layout, so no spelling ships as a kit
@@ -2755,7 +2757,7 @@ bracket-then-paren link shape (a `]` immediately followed by a parenthesized
 target) without stripping code spans, so a literal markdown link written in
 governed prose is scanned as a real link even inside inline backticks; to name
 such a link in prose without tripping the gate, separate the `]` and the `(`
-(a space, or a line break — the scan is per-line). The amendment `SPEC-*.md`
+(a space). The amendment `SPEC-*.md`
 files escape only by lying outside the scanned doc set, not by any code-span
 exemption. Links are this gate's charge; the sibling `check-docs-cmd` takes the
 invoked commands and env knobs written inside fences and backticks, over the
@@ -2796,6 +2798,22 @@ knob, so its battery is a no-op on it, and a vendoring consumer's knob is `0`
 either way, so no consumer-smoke run distinguishes a knob-gated prune from an unconditional one.
 The sibling `gate-tests/check-spec-dod-singleton.test.sh` carries the same
 prune's canonical-spec half for the same reason.
+
+### check-md-unwrapped
+
+Invariant: in the governed markdown set, no paragraph is broken across physical lines. Each paragraph, list-item paragraph and block-quote paragraph is one line, however long. A consumer that wraps registers queue-kit's `check-queue-wrap` instead, and a consumer that does neither registers neither. Which convention a tree keeps is its own choice, and this gate is the oracle for one of them.
+
+**The block scanner.** A line is a **soft break**, and red, when it is non-blank and continues the paragraph the previous line opened. That is, it opens no block, and the previous line is paragraph text in the same container. A line **opens a block** when it is an ATX heading, a fence delimiter, a table row (`|`-led), a thematic break or setext underline (`---`, `***`, `___`, `===`), a list-item marker (`-`, `*`, `+`, or `<digits>.`/`<digits>)` followed by a space, at any indent), a block-quote marker `>` whose quoted content itself opens a block, an HTML block start (`<` followed by a tag name, `!--` or `/`), or a link-reference definition (`[label]:`). The interiors of fences, HTML blocks (a comment runs to its `-->`, and any other HTML block runs to a blank line) and a leading `---`-delimited front-matter block are outside the grammar. A line after one ending in a hard break (two spaces, or a backslash outside code) is deliberate and exempt. Inside a block quote, the comparison is made on the quoted content. The scanner is a CommonMark subset: an indented code block is read only where no list is open, and lazy continuation inside nested containers is joined onto the innermost open paragraph, so a non-indented line under a list item continues that item. Anything the subset does not model is an honest limit, and the fixture pair pins what it does model.
+
+**Corpus.** Tracked files matching `CANON_KIT_UNWRAP_GLOBS` less those matching `CANON_KIT_UNWRAP_EXCLUDE`, with git pathspec semantics and both default empty. An empty include set is a clean skip whose clean line names the unset knob, because which files a tree keeps unwrapped is its own editorial choice and a kit literal would presume a layout. Gate-test fixtures are the canonical exclusion: a fixture's line shape is the input under test.
+
+**Findings** name file, line and the first code points of the offending line, and the help text prints the arm's command. **Fail-closed:** an unreadable file or an unresolved knob exits 2.
+
+**`--emit md-unwrap [--write] <file>…`** is the gate's remedy and shares its scanner. Each soft break is joined onto its predecessor with one space, and the continuation's indentation, or its `>` prefix inside a quote, is dropped. The arm prints the rewritten text, or with `--write` rewrites each file in place, checked, naming a failed path at exit 2. It is a non-gate arm (gate-sdk/SPEC.md §The non-gate arm). Its postcondition is the gate's clean verdict on its own output, and a unit test holds it over both fixture trees. A join never crosses a blank line, a block start or an exempt interior, so it changes no rendering the subset models.
+
+**A tool that needs a line-capped form** reads one generated from the uncapped tracked file, rostered and freshness-gated as every generated projection is. It is never a hand-wrapped tracked copy. No such reader exists in this repo today, so the rule has no instance here.
+
+**The width-straddling readers stay.** `check-manifest-count`'s wrapped-paragraph arm, `check-unmarked-claim`'s flattened paragraph, `check-spec-pointer`'s prose-citation join and `check-scratch-citation`'s paragraph accumulator each cross a line break so that a wrapped token still matches. Over an unwrapped corpus each is the identity, and each is still correct for a consumer that wraps. Removing them is refused, because a kit gate may not assume its consumer's convention.
 
 ### The reference-link grammar
 

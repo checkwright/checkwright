@@ -85,6 +85,7 @@ check-spec-derivable-section
 check-spec-embedded-source
 check-spec-fence-balance
 check-md-refs
+check-md-unwrapped
 check-docs-link-convention
 check-docs-cname-parity
 check-docs-highlight-coverage

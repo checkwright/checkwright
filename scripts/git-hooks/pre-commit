@@ -348,6 +348,10 @@ if staged_matches '*SPEC*.md' '*README.md' '*CLAUDE.md' '*CLAUDE.md' '*README.md
     run_gate check-md-refs native/target/release/checkwright-gates check-md-refs
 fi
 
+if staged_matches '*.md' 'scripts/canon-config.knobs' 'native/src/gates/md_unwrapped.rs' 'native/src/spec.rs' 'native/src/programs.rs'; then
+    run_gate check-md-unwrapped native/target/release/checkwright-gates check-md-unwrapped
+fi
+
 if staged_matches '*docs/*.md' '*docs/*/index.md' '*docs/posts/*.md' 'scripts/canon-config.knobs' 'native/src/gates/docs_link_convention.rs' 'native/src/fresh.rs'; then
     run_gate check-docs-link-convention native/target/release/checkwright-gates check-docs-link-convention
 fi

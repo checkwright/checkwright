@@ -27,6 +27,7 @@ check-knob-default-coupling
 check-manifest-count
 check-manifest-temporal
 check-md-refs
+check-md-unwrapped
 check-measured-claim
 check-payload-claim
 check-prose-enum

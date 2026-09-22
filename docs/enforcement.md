@@ -111,6 +111,7 @@ leaves its section absent.
 | [canon-kit](canon-kit/index.md) | check-spec-embedded-source | precommit |
 | [canon-kit](canon-kit/index.md) | check-spec-fence-balance | precommit |
 | [canon-kit](canon-kit/index.md) | check-md-refs | precommit |
+| [canon-kit](canon-kit/index.md) | check-md-unwrapped | precommit |
 | [canon-kit](canon-kit/index.md) | check-docs-link-convention | precommit |
 | [site-kit](site-kit/index.md) | check-docs-cname-parity | precommit |
 | [site-kit](site-kit/index.md) | check-docs-highlight-coverage | precommit |

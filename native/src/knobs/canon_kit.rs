@@ -53,6 +53,8 @@ pub const KIT: Kit = Kit {
         Row::scalar("CANON_KIT_GLOSSARY_FILE", "GLOSSARY.md"),
         Row::indexed("CANON_KIT_DUP_SURFACES", &["VISION.md"]),
         Row::indexed("CANON_KIT_MDREF_EXCLUDE", &[]),
+        Row::indexed("CANON_KIT_UNWRAP_GLOBS", &[]),
+        Row::indexed("CANON_KIT_UNWRAP_EXCLUDE", &[]),
         Row::indexed("CANON_KIT_RESTATEMENT_PAGES", &[]),
         Row::indexed(
             "CANON_KIT_FENCE_PROGRAMS",

@@ -55,6 +55,7 @@ reads the tag syntax [queue-kit](../queue-kit/) defines.
    check-tracking-claim         # a path's tracking status in prose agrees with git
    check-prose-enum             # partial enumeration of a governed set
    check-md-refs                # internal markdown links resolve
+   check-md-unwrapped           # needs an unwrapped markdown set (no paragraph broken across lines)
    check-install-claim          # one declared primary install transport, led with everywhere
    check-payload-claim          # one declared payload-disclosure class, asserted nowhere else
    check-spec-fence-balance     # even fence counts, parsers never desync

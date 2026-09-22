@@ -1,0 +1,2 @@
+# spec: canon-kit/SPEC.md §check-md-unwrapped — the fixture opts its markdown into the governed set
+CANON_KIT_UNWRAP_GLOBS[] = *.md

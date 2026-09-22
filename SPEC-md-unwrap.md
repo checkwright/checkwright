@@ -32,7 +32,7 @@ This amendment does four things.
 
 ### (1) canon-kit: `check-md-unwrapped` and `--emit md-unwrap` {design-bearing}
 
-**Not yet applied.** Add a canon-kit section `### check-md-unwrapped` after §check-md-refs:
+**Applied.** Add a canon-kit section `### check-md-unwrapped` after §check-md-refs:
 
 > Invariant: in the governed markdown set, no paragraph is broken across physical lines. Each paragraph, list-item paragraph and block-quote paragraph is one line, however long. A consumer that wraps registers queue-kit's `check-queue-wrap` instead, and a consumer that does neither registers neither. Which convention a tree keeps is its own choice, and this gate is the oracle for one of them.
 >

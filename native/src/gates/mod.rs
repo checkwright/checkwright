@@ -73,6 +73,7 @@ pub mod lifecycle_registration;
 pub mod manifest_count;
 pub mod manifest_temporal;
 pub mod md_refs;
+pub mod md_unwrapped;
 pub mod measured_claim;
 pub mod memory_off;
 pub mod merge_attrs;
@@ -635,6 +636,16 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_MDREF_EXCLUDE",
             "CANON_KIT_DOCS_BLOB_REF",
         ],
+        "canon-kit",
+        &[("git", "")],
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — an empty read-root set: the corpus is `git
+    // ls-files` over the two pathspec knobs, so no walk exists for the recorder to observe
+    (
+        "check-md-unwrapped",
+        md_unwrapped::run,
+        &[],
+        &["CANON_KIT_UNWRAP_GLOBS", "CANON_KIT_UNWRAP_EXCLUDE"],
         "canon-kit",
         &[("git", "")],
     ),
