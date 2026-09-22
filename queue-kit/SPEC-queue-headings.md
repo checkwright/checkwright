@@ -69,6 +69,7 @@ Each surface that names the three as declarations re-phrases to the tag form. Th
 - drift-kit/SPEC.md §Bundled KPIs `kpi-incident-recurrence`, `drift-kit/README.md`, the `recurrence:` comment in `drift-kit/templates/kpis.list` and `scripts/kpis.list`, and the smoke queue in `drift-kit/smoke/install.sh`.
 - installer/SPEC.md's comparison with the `roadmap-summary:` shape.
 - `queue-kit/checks/check-roadmap-fresh.gate`'s `# spec:` line.
+- Root `README.md`'s kit table, queue-kit's cell: its tag-algebra list ("blocked-by/spec/drain-exempt/roadmap/observed-by/cost/surface/precondition-ok") gains `recurrence`, `roadmap-summary` and `not-icebox-eligible`, now first-class tags under §The tag algebra rather than body declarations the summary omitted them as.
 
 Each binding keeps its one clause and gains no grounds.
 
@@ -88,7 +89,7 @@ Callers, each moved onto those adapters: `native/src/emit/queue_index.rs` (index
 
 **Not yet applied.** Each kit that cannot depend on queue-kit re-implements the entry predicate, and both ends cite §The queue format. Each member moves to "`### <slug>`, or `#### <slug>` for a sub-task, in a task section". Its value is its own unit test and fixture pair going green on a heading-form queue:
 
-- canon-kit: `native/src/spec.rs` `queue_slugs` (read by `todo_task_liveness.rs` and `deprecation_task.rs`), `native/src/gates/amendment_queue.rs` (the `[spec:]` tag is read off the lead line under a heading, not off a `- ` bullet), and `native/src/gates/provenance_seam.rs` `lead_slugs` (heading slugs plus bare done slugs). canon-kit/SPEC.md §check-provenance-seam's queue-slug arm, "bullet whose lead is a bold slug or a bare slug", becomes "entry heading or bare done slug".
+- canon-kit: `native/src/spec.rs` `queue_slugs` (read by `todo_task_liveness.rs` and `deprecation_task.rs`), `native/src/gates/amendment_queue.rs` (the `[spec:]` tag is read off the lead line under a heading, not off a `- ` bullet), and `native/src/gates/provenance_seam.rs` `lead_slugs` (heading slugs plus bare done slugs). canon-kit/SPEC.md §check-provenance-seam's queue-slug arm, "bullet whose lead is a bold slug or a bare slug", becomes "entry heading or bare done slug". §The shared spec adapters' description of that same `queue_slugs` walk, "a bold lead-in bullet in an active or design-pending section … and a done slug for a bare-slug bullet outside them", becomes "an entry heading in an active or design-pending section … and a done slug for a bare-slug bullet outside them".
 - gate-sdk: `native/src/gates/gate_exemption_tasks.rs`. In gate-sdk/SPEC.md §check-gate-exemption-tasks, the live-slug predicate sentence becomes the heading predicate. The "four independent holders" paragraph is re-derived from this amendment's probe, and its count becomes the holders that build a live-slug set: `spec.rs` `queue_slugs`, the crate's queue module, drift-kit's `kpi-queue-net-delta` pool, lifecycle-kit's gap-capture resolver, `check-provenance-seam`'s queue-slug arm, evidence-kit's baseline liveness, and this gate.
 - evidence-kit: `native/src/gates/evidence_baseline.rs` `queue_entries`.
 - drift-kit: `native/src/emit/kpi/queue_net_delta.rs` `bold_lead_slug` and `native/src/emit/kpi/deferred_age.rs` `is_entry_lead`. `kpi/task_split.rs` reads the unchanged done grammar and stays.
@@ -119,7 +120,7 @@ Callers, each moved onto those adapters: `native/src/emit/queue_index.rs` (index
 This repo's conversion, in one commit after deltas 2 to 5 land in code:
 
 - `--emit queue-migrate --write TASK-QUEUE.md`, then `--emit md-unwrap --write TASK-QUEUE.md` for the preambles.
-- The 44 live-slug citations become links (members by the probe above; each one's value is `[<slug>](#<slug>)`, or backticks where its slug has left the live set since).
+- The live-slug citations become links (44 at authoring; the conversion re-runs the probe above rather than trusting that frozen count, since this file's own authoring already moved it, and takes whatever it currently finds). Each member's value is `[<slug>](#<slug>)`, or backticks where its slug has left the live set since.
 - `TASK-QUEUE.md` is removed from `CANON_KIT_UNWRAP_EXCLUDE` in `scripts/canon-config.knobs`, and `check-queue-wrap` is removed from `scripts/gates.list`, with the pre-commit hook regenerated.
 - `queue-kit/templates/TASK-QUEUE.md` is migrated (its `### Someday` deleted), and it stays battery-clean as written.
 - The queue-shaped fixtures are migrated with the arm: the pairs of `check-task-names`, `check-tag-lead-line`, `check-roadmap-fresh`, `check-queue-slug-liveness`, `check-queue-prose-precondition`, `check-queue-hygiene`, `check-queue-entry-budget` and `check-deferred-board-tags`; gate-sdk's `check-gate-exemption-tasks`; evidence-kit's `check-evidence-baseline`; canon-kit's `check-provenance-seam`, `check-deprecation-task`, `check-todo-task-liveness` and `check-amendment-queue`; lifecycle-kit's `check-scratch-citation`, `check-lesson-disposition` and `check-stage-entry`; and the inline queues in their `.test.sh` scripts. Each pair's `expect.txt` moves only where a reported line number moved. `check-queue-wrap`'s own pair stays in the bullet form it tests, because the kit still ships that gate.
@@ -153,7 +154,7 @@ Rosters from the reader sweep named above, `git grep -n -E "\- \*\*<slug>\*\*|- 
 - `native/src/emit/queue_index.rs`, `queue_counts.rs`, `entry_history.rs` and the other in-crate callers delta 3 names (delta 3).
 - `native/src/knobs/queue_kit.rs` and `native/src/gates/mod.rs` — the ratchet knob (delta 1).
 - `native/src/gates/task_conservation.rs` and its constructed scenario (delta 1).
-- `canon-kit/SPEC.md` — §check-provenance-seam's queue-slug arm (delta 4).
+- `canon-kit/SPEC.md` — §check-provenance-seam's queue-slug arm and §The shared spec adapters' `queue_slugs` description (delta 4).
 - `native/src/spec.rs`, `native/src/gates/amendment_queue.rs` and `native/src/gates/provenance_seam.rs` (delta 4).
 - `gate-sdk/SPEC.md` — §check-gate-exemption-tasks, its predicate sentence and holder-count paragraph (delta 4).
 - `native/src/gates/gate_exemption_tasks.rs` (delta 4).

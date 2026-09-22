@@ -86,7 +86,7 @@ The fixture pair of `check-queue-entry-budget` moves to the new knob. `bad/` kee
 
 **Not yet applied.**
 
-- §The always-loaded meter: "the summed line count" becomes "the summed code-point count", measured with the same count delta 3 defines (trimmed non-blank lines plus one per break), over the surfaces and over the hook body's stdout. The baseline row becomes `<total>cp <surface>cp <baseline-commit>`. **A row whose figures carry no `cp` suffix is a line-unit row from before the re-unit.** The bare reading then prints `baseline in retired line unit — re-stamp with --update-baseline` in place of a delta, and exits 0. That discontinuity is recorded where the reader meets it, never as a phantom fall. `--growth` reports net code points.
+- §The always-loaded meter: "the summed line count" becomes "the summed code-point count", measured with the same count delta 3 defines (trimmed non-blank lines plus one per break), over the surfaces and over the hook body's stdout. The baseline row becomes `<total>cp <surface>cp <baseline-commit>`. **A row whose figures carry no `cp` suffix is a line-unit row from before the re-unit.** The bare reading then prints `baseline in retired line unit — re-stamp with --update-baseline` in place of a delta, and exits 0. That discontinuity is recorded where the reader meets it, never as a phantom fall. `--growth` reports net code points. §Layout and configuration's `CONTEXT_KIT_HOOK_CMD` bullet, "the command whose output line count approximates the steady-state hook body", becomes "the command whose output code-point count approximates the steady-state hook body", the same re-unit its cited section now measures in.
 - §The surface ratchet: "size = newline count, the meter's measure" becomes "size = the meter's code-point count". The ceiling rows become `<n>cp <path>`, and a row without the suffix exits 2, naming `--emit always-loaded --ceiling` as the re-stamp.
 - §The brevity gate: the per-bullet budget is in code points. `CONTEXT_KIT_BREVITY_BUDGET` is retired for `CONTEXT_KIT_BREVITY_CAP`, a positive integer of code points, default `330`. Every governed bullet the four-line budget admitted with a pointer measures at most 327 code points (2026-09-22), so the re-unit keeps the bound. The first honest limit is replaced by: "**The unit is the code point.** A bullet is measured the way the meter measures a surface, so joining or wrapping its lines moves nothing, and the apparatus still measures one quantity." The finding line reports code points.
 - §bin/footprint: the Numbers ruling becomes "Code-point counts are exact". The cell reads `<n>cp · ~<t>t`, and both tiers count with the meter's measure.
@@ -115,6 +115,8 @@ Wiring: `native/src/emit/always_loaded.rs` (the measure, the row grammar and the
 Add to §The tag algebra:
 
 > - `[cap-credit: +<n><unit> <YYYY-MM-DD> <grantor> <reason>]` — a per-entry size credit on a deferred entry, raising that entry's limit under §check-queue-entry-budget assertion A to `QUEUE_KIT_ENTRY_CAP` plus `<n>`. `<unit>` is the cap's own (`cp` or `lines`). `<grantor>` names the granting role in the consumer's own authority vocabulary, and the kit enumerates none. `<reason>` is non-empty and states what the cap would otherwise have cost. At most one per entry, lead-line-scoped. Written only on a grant by the role §check-queue-entry-budget names. **Honest limit:** no gate can tell a granted credit from a self-issued one, which is the inline-direction limit this algebra already states. The grant date and grantor put the claim where a later close reads it.
+
+Root `README.md`'s kit table, queue-kit's cell, gains `cap-credit` to its tag-algebra list alongside the other named tags.
 
 Add to §Layout and configuration:
 
@@ -164,6 +166,7 @@ Rosters from the module reads above, `git grep -n -E "ENTRY_LINE_CAP|BREVITY_BUD
 - `canon-kit/README.md`, its gate roster (delta 1).
 - `canon-kit/smoke/install.sh` (delta 1).
 - `queue-kit/SPEC.md` — §check-queue-wrap and §check-queue-hygiene (deltas 2 and 3); §The queue format's sentence "which also caps the entry's total length", §Layout and configuration, §check-queue-entry-budget, §The queue-index arm and §The tag algebra's `recurrence:` ceiling sentence (delta 3); §The tag algebra's new `[cap-credit:]` bullet, §Layout and configuration's credit knob, and §check-queue-entry-budget's assertion A, split and *Why the cap is not widened* paragraphs (delta 6).
+- Root `README.md` — the kit table's queue-kit cell, its tag-algebra list gaining `cap-credit` (delta 6).
 - `native/src/gates/queue_entry_budget.rs` (deltas 3 and 6).
 - `native/src/gates/tag_lead_line.rs`, its class-table row, and queue-kit/SPEC.md §check-tag-lead-line's governed set (delta 6).
 - `queue-kit/gate-tests/check-queue-entry-budget.test.sh`, new (deltas 3 and 6).
@@ -173,7 +176,7 @@ Rosters from the module reads above, `git grep -n -E "ENTRY_LINE_CAP|BREVITY_BUD
 - `queue-kit/gate-tests/check-queue-entry-budget/` — both fixture knob files set the old name (delta 3).
 - `queue-kit/gate-tests/entry-history.test.sh` (delta 3).
 - `lifecycle-kit/SPEC.md` — §Layout and configuration, the two knob bullets citing "`QUEUE_KIT_ENTRY_LINE_CAP`'s posture" as their calibration precedent (delta 3).
-- `context-kit/SPEC.md` — §The always-loaded meter, §The surface ratchet, §The brevity gate (its one-budget paragraph included), §bin/footprint, §The consumer footprint where it reads the meter's unit, and §Layout and configuration, whose knob bullet and malformed-config sentence name the budget (deltas 2 and 4).
+- `context-kit/SPEC.md` — §The always-loaded meter, §The surface ratchet, §The brevity gate (its one-budget paragraph included), §bin/footprint, §The consumer footprint where it reads the meter's unit, and §Layout and configuration, whose knob bullet and malformed-config sentence name the budget, and whose `CONTEXT_KIT_HOOK_CMD` bullet names the hook measure (deltas 2 and 4).
 - `drift-kit/SPEC.md` — §Bundled KPIs, `kpi-always-loaded` (delta 4).
 - `native/src/emit/always_loaded.rs` (delta 4).
 - `native/src/gates/surface_ratchet.rs` (delta 4).
