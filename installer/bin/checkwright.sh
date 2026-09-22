@@ -35,7 +35,7 @@ done
 INSTALLER="$(cd "$(dirname "$SELF")/.." && pwd)"
 PAYLOAD="$INSTALLER/payload"
 [ -d "$PAYLOAD" ] || die "this package carries no payload" \
-    "the bootstrap runs the gate binary out of the package's own payload/, assembled at pack time — run it from an installed package, not from a source checkout."
+    "the bootstrap runs the gate binary out of the package's own payload/, assembled at pack time; run it from an installed package, not from a source checkout."
 
 # spec: installer/SPEC.md §The gate binary — the detector's whole input, factored out so a refusal
 # can name what the host was detected AS rather than only that it mapped to nothing
@@ -105,7 +105,7 @@ select_artifact() {
                     ;;
                 *)
                     die "this host, detected as $(host_shape), did not identify its C library, and every Linux artifact this payload carries is linked against glibc" \
-                        "neither 'getconf GNU_LIBC_VERSION' nor 'ldd --version' identified a GNU libc here, and no musl loader was found under /lib — so nothing establishes that a glibc build would run, and this refuses rather than handing you one that may die in the loader. Install GNU libc's getconf or ldd so the probe can answer."
+                        "neither 'getconf GNU_LIBC_VERSION' nor 'ldd --version' identified a GNU libc here, and no musl loader was found under /lib, so nothing establishes that a glibc build would run, and this refuses rather than handing you one that may die in the loader. Install GNU libc's getconf or ldd so the probe can answer."
                     ;;
             esac
             ;;
@@ -127,7 +127,7 @@ select_artifact() {
     done
     [ "$sel_count" -eq 1 ] && [ -f "$sel_src/$sel_name.sha256" ] \
         || die "the payload declares $sel_target but carries no complete artifact for it" \
-           "a declared target whose binary or .sha256 sidecar is missing is a publisher defect you cannot act on — refusing rather than running a battery that silently shrank." 1
+           "a declared target whose binary or .sha256 sidecar is missing is a publisher defect you cannot act on; refusing rather than running a battery that silently shrank." 1
     ARTIFACT="$sel_src/$sel_name"
 }
 

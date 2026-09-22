@@ -104,7 +104,7 @@ function Select-Artifact {
             }
             default {
                 Die "this host, detected as $shape, did not identify its C library, and every Linux artifact this payload carries is linked against glibc" `
-                    "neither 'getconf GNU_LIBC_VERSION' nor 'ldd --version' identified a GNU libc here, and no musl loader was found under /lib — so nothing establishes that a glibc build would run, and this refuses rather than handing you one that may die in the loader. Install GNU libc's getconf or ldd so the probe can answer."
+                    "neither 'getconf GNU_LIBC_VERSION' nor 'ldd --version' identified a GNU libc here, and no musl loader was found under /lib, so nothing establishes that a glibc build would run, and this refuses rather than handing you one that may die in the loader. Install GNU libc's getconf or ldd so the probe can answer."
             }
         }
     }
@@ -119,7 +119,7 @@ function Select-Artifact {
         Where-Object { $_.Name -notlike '*.sha256' } | Sort-Object Name)
     if ($names.Count -ne 1 -or -not (Test-Path -LiteralPath ($names[0].FullName + '.sha256') -PathType Leaf)) {
         Die "the payload declares $Target but carries no complete artifact for it" `
-            'a declared target whose binary or .sha256 sidecar is missing is a publisher defect you cannot act on — refusing rather than running a battery that silently shrank.' 1
+            'a declared target whose binary or .sha256 sidecar is missing is a publisher defect you cannot act on; refusing rather than running a battery that silently shrank.' 1
     }
     return [pscustomobject]@{ Path = $names[0].FullName; Sidecar = $names[0].FullName + '.sha256' }
 }
@@ -140,7 +140,7 @@ $INSTALLER = Resolve-InstallerRoot
 $PAYLOAD = Join-Path $INSTALLER 'payload'
 if (-not (Test-Path -LiteralPath $PAYLOAD -PathType Container)) {
     Die 'this package carries no payload' `
-        "the bootstrap runs the gate binary out of the package's own payload/, assembled at pack time — run it from an installed package, not from a source checkout."
+        "the bootstrap runs the gate binary out of the package's own payload/, assembled at pack time; run it from an installed package, not from a source checkout."
 }
 
 $selected = Select-Artifact -Payload $PAYLOAD -Target (Get-HostTarget)
