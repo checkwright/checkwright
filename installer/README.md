@@ -10,27 +10,13 @@ What it is not: a dependency channel. Nothing resolves at your build time and th
 
 ## Before you run it
 
-Each transport carries its own requirement, and each belongs to the delivery path alone. The Release tarball needs `curl`, `tar` and either hasher (`sha256sum`, or the `shasum` stock macOS ships instead); npm needs Node, for `npx`. The gate battery this vendors uses none of them, and no delivery-path tool joins the toolchain roster.
+Each transport carries its own requirement, and each belongs to the delivery path alone. The Release tarball needs `curl`, `tar` and either hasher (`sha256sum`, or the `shasum` stock macOS ships instead) on macOS and Linux, and nothing Windows 10 and later does not ship on Windows; npm needs Node, for `npx`. The gate battery this vendors uses none of them, and no delivery-path tool joins the toolchain roster.
 
 The toolchain the battery *does* assert, with its version floors, is on the install page. `checkwright doctor` renders it as an exit status and `init` gates on that before any file is written, so a machine below the floor is refused rather than half-installed.
 
 ## Quick start
 
-From a clean git repository, at its root. Pick a version off the [releases](https://github.com/checkwright/checkwright/releases) page and substitute it for `X.Y.Z`. Unpack outside the repository: `init` refuses a worktree that is not clean, and an extracted `package/` in your root is exactly what makes it unclean.
-
-```bash
-cw="$(mktemp -d)"
-curl -fsSL -o "$cw/checkwright-X.Y.Z.tgz" \
-  https://github.com/checkwright/checkwright/releases/download/vX.Y.Z/checkwright-X.Y.Z.tgz
-curl -fsSL -o "$cw/checkwright-X.Y.Z.tgz.sha256" \
-  https://github.com/checkwright/checkwright/releases/download/vX.Y.Z/checkwright-X.Y.Z.tgz.sha256
-( cd "$cw" \
-  && { sha256sum -c checkwright-X.Y.Z.tgz.sha256 \
-       || shasum -a 256 -c checkwright-X.Y.Z.tgz.sha256; } \
-  && tar -xzf checkwright-X.Y.Z.tgz )
-
-sh "$cw/package/bin/checkwright.sh" init
-```
+From a clean git repository, at its root, follow the Release tarball recipe for your system on the install page: [macOS and Linux](https://checkwright.dev/install.html#macos-and-linux) or [Windows](https://checkwright.dev/install.html#windows). It unpacks outside the repository, because `init` refuses a worktree that is not clean.
 
 With Node already present the same install is one command, `npx checkwright init` — same payload, same `init`, same `checkwright.lock`; only the fetch differs.
 

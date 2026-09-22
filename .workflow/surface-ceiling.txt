@@ -26,8 +26,8 @@
 1356cp docs/evidence-kit/index.md
 1524cp docs/gate-sdk/index.md
 1280cp docs/guard-kit/index.md
-5024cp docs/index.md
-13890cp docs/install.md
+5125cp docs/index.md
+16078cp docs/install.md
 1547cp docs/kits.md
 1399cp docs/lifecycle-kit/index.md
 3849cp docs/methodology.md
@@ -50,7 +50,7 @@
 2509cp docs/posts/2026-07-25-checkwright-v0-14-0.md
 4815cp docs/posts/2026-07-25-checkwright-v0-15-0.md
 8910cp docs/posts/2026-07-26-checkwright-v0-16-0.md
-3776cp docs/posts/2026-07-27-checkwright-v0-17-0.md
+3775cp docs/posts/2026-07-27-checkwright-v0-17-0.md
 4930cp docs/posts/2026-07-31-checkwright-v0-18-0.md
 4745cp docs/posts/2026-07-31-checkwright-v0-19-0.md
 3886cp docs/posts/2026-08-01-checkwright-v0-20-0.md
@@ -61,7 +61,7 @@
 6598cp docs/posts/2026-08-23-checkwright-v0-25-0.md
 1444cp docs/queue-kit/index.md
 757cp docs/releases.md
-26068cp docs/site-architecture.md
+27150cp docs/site-architecture.md
 2168cp docs/site-kit/index.md
 2437cp docs/value.md
 2616cp drift-kit/templates/close-knowledge.md

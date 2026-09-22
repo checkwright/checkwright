@@ -10,7 +10,7 @@ An adopter's first contact assumes a developer toolchain. `docs/index.md`'s quic
 
 ### (1) `docs/install.md`: the adopter path first, one section per OS {design-bearing}
 
-**Not yet applied.** Rewrite the page in this order. Headings are fixed, and prose is proposed text that build may tighten.
+**Applied.** Rewrite the page in this order. Headings are fixed, and prose is proposed text that build may tighten.
 
 1. **The opening paragraph** keeps its first three sentences (vendored, committed, the one compiled piece). Replace the second paragraph with: "Pick your system below. Each path downloads a release, checks it against its published digest, unpacks it outside your repository, and runs `init`, with no runtime to install first. With Node on the machine, `npx checkwright init` does the same install in one command (§With Node)." Keep the footprint-page sentence.
 2. **`## Install`**, carrying the `<!-- install-primary: tarball -->` declaration (moved from §Quick start), then: "Start from a clean git repository. Pick a version from the [releases](https://github.com/checkwright/checkwright/releases) page and put it in place of `X.Y.Z`, once, on the recipe's first line." Then its subsections:
@@ -58,11 +58,11 @@ An adopter's first contact assumes a developer toolchain. `docs/index.md`'s quic
 5. **`## Requirements`**, moved here and retitled in prose (not heading) as the reference for contributors and for anyone checking a platform. It keeps the platforms block with its sentence and legend, the toolchain block with its sentence, the hasher and docs-site Ruby sentence, and the `--emit env-probe` self-check. The last paragraph, "Both blocks change your machine…", moves with the two remedy blocks, into the OS section that holds each.
 6. **`## Going further`**, unchanged.
 
-**Inferred, cannot run before build:** `check-install-claim` assertion B still passes on the new `## Install` section, whose earliest transport line is the declared tarball's — the section does not exist until build writes it; build runs the battery on it.
+**Ran at build:** `check-install-claim` passes on the new `## Install` section. It redded installer/README.md §Quick start once, on the hyphenated "Release-tarball" this delta's text proposed, which the transport vocabulary does not match; the landed sentence spells "Release tarball".
 
 ### (2) `docs/index.md`: the landing page leads without Node {mechanical}
 
-**Not yet applied.** Replace the paragraph beginning "Try it with Node on the machine" and its fence with:
+**Applied.** Replace the paragraph beginning "Try it with Node on the machine" and its fence with:
 
 > Install it with no runtime first: [macOS and Linux](install.md#macos-and-linux) or [Windows](install.md#windows), each a download, a checksum and one command from the root of a clean repository. `demo` in place of `init` runs the whole arc in a scratch repository of its own and removes it, and `uninstall` takes the install back out.
 >
@@ -72,11 +72,11 @@ followed by today's fence, unchanged.
 
 ### (3) `installer/README.md`: point at the per-OS recipes {mechanical}
 
-**Not yet applied.** In §Before you run it, rewrite the transport sentence as: "The Release tarball needs `curl`, `tar` and either hasher (`sha256sum`, or the `shasum` stock macOS ships instead) on macOS and Linux, and nothing Windows 10 and later does not ship on Windows; npm needs Node, for `npx`." In §Quick start, replace the recipe fence and the paragraph above it with: "From a clean git repository, at its root, follow the Release-tarball recipe for your system on the install page: [macOS and Linux](https://checkwright.dev/install.html#macos-and-linux) or [Windows](https://checkwright.dev/install.html#windows). It unpacks outside the repository, because `init` refuses a worktree that is not clean." The npx sentence and the paragraphs after it stay. A second copy of each recipe here is what this delta removes: installer/README.md already restated the one recipe the page carried.
+**Applied.** In §Before you run it, rewrite the transport sentence as: "The Release tarball needs `curl`, `tar` and either hasher (`sha256sum`, or the `shasum` stock macOS ships instead) on macOS and Linux, and nothing Windows 10 and later does not ship on Windows; npm needs Node, for `npx`." In §Quick start, replace the recipe fence and the paragraph above it with: "From a clean git repository, at its root, follow the Release-tarball recipe for your system on the install page: [macOS and Linux](https://checkwright.dev/install.html#macos-and-linux) or [Windows](https://checkwright.dev/install.html#windows). It unpacks outside the repository, because `init` refuses a worktree that is not clean." The npx sentence and the paragraphs after it stay. A second copy of each recipe here is what this delta removes: installer/README.md already restated the one recipe the page carried.
 
 ### (4) installer/SPEC.md: two recipes on one shape {design-bearing}
 
-**Not yet applied.** In §The dependency boundary, rewrite the paragraph beginning "**The tarball recipe's shape.**" as:
+**Applied.** In §The dependency boundary, rewrite the paragraph beginning "**The tarball recipe's shape.**" as:
 
 > **The tarball recipe's shape.** The install page carries one recipe per system, macOS and Linux in `sh` and Windows in PowerShell, and each is four steps — download, verify, extract, run — rather than a `curl … | sh` or `irm … | iex` one-liner, because an unreviewed remote script fed straight to a shell is the counter-pattern of the claim the page opens with. Each unpacks outside the repository, because `init` refuses a worktree that is not clean. The version is set once, on the recipe's first line. The Windows recipe names `tar.exe` under the system directory, because the `windows-remedy` block puts Git's `usr\bin` ahead of it on `PATH`, and Git's GNU `tar` reads a drive-letter path as a remote host. It runs the bootstrap under `powershell -ExecutionPolicy Bypass`, scoped to that one process, because Windows' default policy refuses a downloaded script. The `package/` prefix is `npm pack`'s doing: npm builds the asset on the release runner, and consuming it needs no Node. **The checksum's honest limit:** it travels from the same origin over the same encrypted session as the tarball, so verifying it catches a corrupted or truncated download and is no evidence that the release host was uncompromised; the property carrying that is a build attestation, which the npm channel's `--provenance` mints and this channel does not.
 
@@ -90,7 +90,7 @@ In the paragraph beginning "**The install page's requirement blocks, and why eac
 
 ### (5) The two install blocks and their witnesses {design-bearing}
 
-**Not yet applied.** Wrap each install fence from delta 1 in a marker pair, `<!-- unix-install:begin -->` / `<!-- unix-install:end -->` and `<!-- windows-install:begin -->` / `<!-- windows-install:end -->`, on the remedy blocks' grammar (one fence per pair, markers on their own lines).
+**Applied.** Wrap each install fence from delta 1 in a marker pair, `<!-- unix-install:begin -->` / `<!-- unix-install:end -->` and `<!-- windows-install:begin -->` / `<!-- windows-install:end -->`, on the remedy blocks' grammar (one fence per pair, markers on their own lines).
 
 - **The baseline Linux leg** (`install-smoke` today) gains a step after its pack. It makes a clean scratch consumer, sets `v` to the packed version and `cw` to a scratch directory, and copies the packed tarball there as `checkwright-$v.tgz` beside a `.sha256` written by `sha256sum` in the release job's format. It extracts the `unix-install` block by its markers, the way the PowerShell leg extracts `windows-remedy`, reds by name on an empty extraction, and runs the block under `sh` from the consumer's root. It asserts exit 0 and a `checkwright.lock` in the consumer.
 - **The PowerShell bootstrap's leg** (`install-smoke-powershell` today) gains the same step after its existing init, reading the `windows-install` block and running it under `pwsh` with `$v` and `$cw` set. The block's own last line starts Windows PowerShell 5.1. It asserts the same two things.
@@ -108,7 +108,7 @@ Add a row for the two install blocks to `docs/site-architecture.md` §Generated 
 
 ### (6) The install-failure template names both recipes {mechanical}
 
-**Not yet applied.** In `.github/ISSUE_TEMPLATE/install-failure.yml`, the Transport dropdown's `Release tarball (curl, sha256sum, tar)` option becomes two:
+**Applied.** In `.github/ISSUE_TEMPLATE/install-failure.yml`, the Transport dropdown's `Release tarball (curl, sha256sum, tar)` option becomes two:
 
 ```
         - Release tarball, macOS or Linux (curl, sha256sum or shasum, tar)
@@ -117,7 +117,7 @@ Add a row for the two install blocks to `docs/site-architecture.md` §Generated 
 
 ### (7) Retarget the remedy-block citations {mechanical}
 
-**Not yet applied.** Every tracked citation of `docs/install.md §Requirements` that names a remedy block, rather than the platform or toolchain block, is retargeted to the OS section now holding it (`§macOS and Linux` or `§Windows`). The members, from `git grep -n "install.md §Requirements"` and `grep -n "Requirement" docs/site-architecture.md` read line by line: the comments at `.github/workflows/gates.yml` lines 382, 1246, 1268 and 1582-1584, and the remedy-block row of `docs/site-architecture.md` (line 58, "Requirements section carries two more marker blocks"). The other `§Requirements` citations name the platform block, the toolchain block or the bash floor, and they still resolve.
+**Applied.** Every tracked citation of `docs/install.md §Requirements` that names a remedy block, rather than the platform or toolchain block, is retargeted to the OS section now holding it (`§macOS and Linux` or `§Windows`). The members, from `git grep -n "install.md §Requirements"` and `grep -n "Requirement" docs/site-architecture.md` read line by line: the comments at `.github/workflows/gates.yml` lines 382, 1246, 1268 and 1582-1584, and the remedy-block row of `docs/site-architecture.md` (line 58, "Requirements section carries two more marker blocks"). The other `§Requirements` citations name the platform block, the toolchain block or the bash floor, and they still resolve.
 
 ## Producers and consumers
 

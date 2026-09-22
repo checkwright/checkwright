@@ -17,7 +17,8 @@ body:
       description: How the payload reached your machine.
       options:
         - npx checkwright init (npm)
-        - Release tarball (curl, sha256sum, tar)
+        - Release tarball, macOS or Linux (curl, sha256sum or shasum, tar)
+        - Release tarball, Windows (PowerShell)
         - Manual vendoring
     validations:
       required: true

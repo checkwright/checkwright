@@ -7,11 +7,147 @@ nav_order: 3
 
 This page gets the kits into your repository, keeps them current, and takes them out again. Checkwright is vendored: `init` copies the kit source into your tree and commits it, so what governs your repository is committed and reviewable. The gate binary is the one compiled piece, and it is checked against a published digest before anything runs.
 
-You can fetch it two ways, and both run the same `init` and leave the same result. The Release tarball is the primary path, because it adds no runtime dependency. Have Node? Then `npx checkwright init` does the same install in one command, and it carries a build attestation the tarball cannot. See the [footprint page](footprint.md) for what each kit costs your agent's context.
+Pick your system below. Each path downloads a release, checks it against its published digest, unpacks it outside your repository, and runs `init`, with no runtime to install first. With Node on the machine, `npx checkwright init` does the same install in one command (§With Node). See the [footprint page](footprint.md) for what each kit costs your agent's context.
+
+## Install
+
+<!-- install-primary: tarball -->
+
+Start from a clean git repository. Pick a version from the [releases](https://github.com/checkwright/checkwright/releases) page and put it in place of `X.Y.Z`, once, on the recipe's first line.
+
+### macOS and Linux
+
+You need git, `curl`, `tar`, and `sha256sum` or the `shasum` macOS ships.
+
+On macOS, stock bash is 3.2, below the floor. If your profile owes `bash` (§Requirements), run this block. It installs Homebrew's bash and puts it first on your `PATH`, now and in `~/.zprofile`. If your login shell is bash, use `~/.bash_profile` instead:
+
+<!-- macos-remedy:begin -->
+
+```sh
+brew install bash
+echo "export PATH=\"$(brew --prefix)/bin:\$PATH\"" >> ~/.zprofile
+export PATH="$(brew --prefix)/bin:$PATH"
+```
+
+<!-- macos-remedy:end -->
+
+This block changes your machine, not your repository, so `checkwright uninstall` does not undo it. Why the floor is what it is: [installer/SPEC.md](installer/SPEC.md#requirements) and context-kit's [env-probe](context-kit/SPEC.md#binenv-probe).
+
+Download the release:
+
+```sh
+v=X.Y.Z
+cw="$(mktemp -d)"   # unpack outside the repository
+curl -fsSLo "$cw/checkwright-$v.tgz" "https://github.com/checkwright/checkwright/releases/download/v$v/checkwright-$v.tgz"
+curl -fsSLo "$cw/checkwright-$v.tgz.sha256" "https://github.com/checkwright/checkwright/releases/download/v$v/checkwright-$v.tgz.sha256"
+```
+
+Then verify, extract and run `init` from your repository root:
+
+<!-- unix-install:begin -->
+
+```sh
+( cd "$cw" \
+  && { sha256sum -c "checkwright-$v.tgz.sha256" || shasum -a 256 -c "checkwright-$v.tgz.sha256"; } \
+  && tar -xzf "checkwright-$v.tgz" )
+sh "$cw/package/bin/checkwright.sh" init   # from your repository root
+```
+
+<!-- unix-install:end -->
+
+To verify, `git show --stat HEAD` lists everything the install brought in. Run the commands `init` prints to finish the setup.
+
+To uninstall, `sh "$cw/package/bin/checkwright.sh" uninstall` reverses it in one commit, from the same version you installed; download it again if `$cw` is gone.
+
+### Windows
+
+You need Git for Windows. Then run this block in PowerShell. It puts Git's `usr\bin` and `bin` on your `PATH`, for this session and every later one:
+
+<!-- windows-remedy:begin -->
+
+```powershell
+$git = Split-Path (Split-Path (Split-Path ((git --exec-path) -replace '/', '\')))
+[Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + ";$git\usr\bin;$git\bin", 'User')
+$env:PATH = "$git\usr\bin;$git\bin;$env:PATH"
+```
+
+<!-- windows-remedy:end -->
+
+This block changes your machine, not your repository, so `checkwright uninstall` does not undo it. Why: [installer/SPEC.md](installer/SPEC.md#requirements). PowerShell, `Get-FileHash` and `tar.exe` ship with Windows 10 and later, so there is nothing else to install.
+
+Download the release, in PowerShell:
+
+```powershell
+$v = 'X.Y.Z'
+$cw = Join-Path ([IO.Path]::GetTempPath()) ([IO.Path]::GetRandomFileName())
+New-Item -ItemType Directory $cw | Out-Null
+$ProgressPreference = 'SilentlyContinue'
+$url = "https://github.com/checkwright/checkwright/releases/download/v$v/checkwright-$v.tgz"
+Invoke-WebRequest $url -OutFile "$cw\checkwright-$v.tgz" -UseBasicParsing
+Invoke-WebRequest "$url.sha256" -OutFile "$cw\checkwright-$v.tgz.sha256" -UseBasicParsing
+```
+
+Then verify, extract and run `init` from your repository root:
+
+<!-- windows-install:begin -->
+
+```powershell
+$want = (Get-Content -Raw "$cw\checkwright-$v.tgz.sha256").Split(' ')[0]
+if ((Get-FileHash "$cw\checkwright-$v.tgz" -Algorithm SHA256).Hash -ne $want) { throw 'checksum mismatch: download both files again' }
+& "$env:SystemRoot\System32\tar.exe" -xzf "$cw\checkwright-$v.tgz" -C $cw
+powershell -NoProfile -ExecutionPolicy Bypass -File "$cw\package\bin\checkwright.ps1" init
+```
+
+<!-- windows-install:end -->
+
+Verify as above. To uninstall, run the same last line with `uninstall` in place of `init`.
+
+### With Node
+
+`npx checkwright init` runs the same `init` from the npm package, and it carries a build attestation the tarball cannot ([installer/SPEC.md](installer/SPEC.md#the-dependency-boundary)). `npx checkwright demo` runs the whole arc in a scratch repository first.
+
+### Choosing a profile
+
+`init` vendors the kits, writes a `gates.list` and the config files they read, records the install in `checkwright.lock`, and makes one commit. It ends by printing the commands that finish the setup; run them. Add `demo` in place of `init` to watch the whole arc — install, a green battery, one mistyped link caught, the fix — in a scratch repository first; it installs nothing.
+
+Choose a profile with `--profile`:
+
+- `starter` — the gate SDK on its own;
+- `delegation` — adds the kits for agent sessions;
+- `prose` — adds canon-kit, for a repository of documents;
+- `full` — everything.
+
+Moving to a profile that contains yours only adds. `init` refuses outside a git work tree, on a dirty worktree (`--no-commit` stages instead of committing), or when `checkwright doctor` finds a missing tool. Re-running it is safe: it reports files you have edited instead of overwriting them, unless you pass `--force`. `--dry-run` prints the plan and writes nothing.
+
+## Managing
+
+`checkwright <verb>` below means the last line of your install recipe with `<verb>` in place of `init`, or `npx checkwright <verb>`. Each verb answers in its exit status, so a CI step can gate on it.
+
+- `checkwright doctor` checks this machine against §Requirements and reports what is installed.
+- `checkwright diff` lists the vendored files you have changed. Exit `0` means none.
+- `checkwright update` upgrades the install to the version you are running.
+- `checkwright uninstall` reverses the install in one commit.
+
+`uninstall` removes only files `init` wrote and you left untouched. It keeps and reports any you edited, and never removes a file you wrote. Run it with `--dry-run` first to see the plan.
+
+The pre-commit hook is a local backstop anyone can skip. Make the gate battery a required status check in CI, so a red battery blocks the merge, and keep that check where the authors it holds cannot edit it.
+
+## Upgrading
+
+Release channel: **preview**
+
+While the channel reads `preview`, versions are `0.x`, a minor may break things, and every GitHub Release is marked pre-release, so none shows as Latest. Take a release from the releases list, or name an explicit version. Never rely on the Latest pointer.
+
+An upgrade has two phases:
+
+1. Run `checkwright update` from the new version, then run the commands it prints. If a kit now ships a `.knobs` config in place of a `*-config.sh`, move your settings into the `.knobs` file and delete the old one.
+2. Run the full battery. The gates that go red are your worklist. The release note says why each one moved.
+
+Every release note opens with **In brief**: a few plain bullets on what you get and whether you must act. Its **Tightened gates**, **Renamed knobs** and **Behavior changes** sections list what you reconcile. Each says "None." when there is nothing. All notes are on the [releases page](releases.md). The bump rules and the note grammar: [Versioning](installer/SPEC.md#versioning) and [The upgrade contract](installer/SPEC.md#the-upgrade-contract).
 
 ## Requirements
 
-Checkwright runs on Linux, macOS and native Windows. Windows Subsystem for Linux (WSL) is served by the Linux line. Install is possible only where a prebuilt gate binary is published:
+This section is the reference for contributors and for anyone checking a platform. Checkwright runs on Linux, macOS and native Windows, with Windows Subsystem for Linux (WSL) served by the Linux line. Install is possible only where a prebuilt gate binary is published:
 
 <!-- platforms:begin -->
 
@@ -38,93 +174,7 @@ Put these tools on your `PATH`. A bullet marked `@contributor` is only for build
 
 <!-- toolchain:end -->
 
-`init` also needs `sha256sum` or `shasum` to verify the binary, and refuses without one. The tarball path needs `curl` and `tar`; the npm path needs Node. To publish a docs site with site-kit's render-fidelity gate, you also need Ruby with the `kramdown-parser-gfm` gem. To check your machine, run the gate binary with `--emit env-probe`: it writes an untracked `ENV.local.md` with each tool's version and verdict.
-
-On macOS, stock bash is 3.2, below the floor. If your profile owes `bash`, run this block. It installs Homebrew's bash and puts it first on your `PATH`, now and in `~/.zprofile`. If your login shell is bash, use `~/.bash_profile` instead:
-
-<!-- macos-remedy:begin -->
-
-```sh
-brew install bash
-echo "export PATH=\"$(brew --prefix)/bin:\$PATH\"" >> ~/.zprofile
-export PATH="$(brew --prefix)/bin:$PATH"
-```
-
-<!-- macos-remedy:end -->
-
-On native Windows, install Git for Windows, then run this block in PowerShell. It puts Git's `usr\bin` and `bin` on your `PATH`, for this session and every later one:
-
-<!-- windows-remedy:begin -->
-
-```powershell
-$git = Split-Path (Split-Path (Split-Path ((git --exec-path) -replace '/', '\')))
-[Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + ";$git\usr\bin;$git\bin", 'User')
-$env:PATH = "$git\usr\bin;$git\bin;$env:PATH"
-```
-
-<!-- windows-remedy:end -->
-
-Both blocks change your machine, not your repository, so `checkwright uninstall` does not undo them. Why each floor is what it is: [installer/SPEC.md](installer/SPEC.md#requirements) and context-kit's [env-probe](context-kit/SPEC.md#binenv-probe).
-
-## Quick start
-
-<!-- install-primary: tarball -->
-
-Start from a clean git repository. Pick a version from the [releases](https://github.com/checkwright/checkwright/releases) page and put it in place of `X.Y.Z`. Download, verify, extract, then run:
-
-```bash
-cw="$(mktemp -d)"   # unpack outside the repository
-curl -fsSL -o "$cw/checkwright-X.Y.Z.tgz" \
-  https://github.com/checkwright/checkwright/releases/download/vX.Y.Z/checkwright-X.Y.Z.tgz
-curl -fsSL -o "$cw/checkwright-X.Y.Z.tgz.sha256" \
-  https://github.com/checkwright/checkwright/releases/download/vX.Y.Z/checkwright-X.Y.Z.tgz.sha256
-( cd "$cw" \
-  && { sha256sum -c checkwright-X.Y.Z.tgz.sha256 \
-       || shasum -a 256 -c checkwright-X.Y.Z.tgz.sha256; } \
-  && tar -xzf checkwright-X.Y.Z.tgz )
-
-sh "$cw/package/bin/checkwright.sh" demo  # optional, from anywhere: installs nothing
-sh "$cw/package/bin/checkwright.sh" init  # from your repository root
-```
-
-`demo` runs the whole arc — install, a green battery, one mistyped link caught, the fix — in a scratch repository of its own, then removes it. Unpack outside your repository: `init` refuses a worktree that is not clean. With Node, the same install is one command, `npx checkwright init`.
-
-`init` vendors the kits, writes a `gates.list` and the config files they read, records the install in `checkwright.lock`, and makes one commit. It ends by printing the commands that finish the setup; run them.
-
-Choose a profile with `--profile`:
-
-- `starter` — the gate SDK on its own;
-- `delegation` — adds the kits for agent sessions;
-- `prose` — adds canon-kit, for a repository of documents;
-- `full` — everything.
-
-Moving to a profile that contains yours only adds. `init` refuses outside a git work tree, on a dirty worktree (`--no-commit` stages instead of committing), or when `checkwright doctor` finds a missing tool. Re-running it is safe: it reports files you have edited instead of overwriting them, unless you pass `--force`. `--dry-run` prints the plan and writes nothing.
-
-## Managing
-
-Each verb answers in its exit status, so a CI step can gate on it.
-
-- `checkwright doctor` checks this machine against the requirements above and reports what is installed.
-- `checkwright diff` lists the vendored files you have changed. Exit `0` means none.
-- `checkwright update` upgrades the install to the version you are running.
-- `checkwright uninstall` reverses the install in one commit.
-
-`uninstall` removes only files `init` wrote and you left untouched. It keeps and reports any you edited, and never removes a file you wrote. Run it with `--dry-run` first to see the plan.
-
-The pre-commit hook is a local backstop anyone can skip. Make the gate battery a required status check in CI, so a red battery blocks the merge, and keep that check where the authors it holds cannot edit it.
-
-## Upgrading
-
-Release channel: **preview**
-
-While the channel reads `preview`, versions are `0.x`, a minor may break things, and every GitHub Release is marked pre-release, so none shows as Latest. Take a release from the releases list, or name an explicit version. Never rely on the Latest pointer.
-
-An upgrade has two phases:
-
-1. Run `checkwright update` from the new version, then run the commands it prints. If a kit now ships a `.knobs` config in place of a `*-config.sh`, move your settings into the `.knobs` file and delete the old one.
-2. Run the full battery. The gates that go red are your worklist. The release note says why each one moved.
-
-Every release note opens with **In brief**: a few plain bullets on what you get and whether you must act. Its **Tightened gates**, **Renamed knobs** and **Behavior changes** sections list what you reconcile. Each says "None." when there is nothing. All notes are on the [releases page](releases.md). The bump rules and the note grammar: [Versioning](installer/SPEC.md#versioning) and [The upgrade contract](installer/SPEC.md#the-upgrade-contract).
+`init` also needs `sha256sum` or `shasum` to verify the binary, and refuses without one; on macOS and Linux the tarball path needs `curl` and `tar` besides, and the npm path needs Node. To publish a docs site with site-kit's render-fidelity gate, you also need Ruby with the `kramdown-parser-gfm` gem. To check your machine, run the gate binary with `--emit env-probe`: it writes an untracked `ENV.local.md` with each tool's version and verdict.
 
 ## Going further
 

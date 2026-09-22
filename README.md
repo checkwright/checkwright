@@ -30,7 +30,7 @@ Where the project is heading, and what moves an item: [`ROADMAP.md`](ROADMAP.md)
 
 ## Quick start
 
-Vendors a kit profile into a clean git repo and commits it. The primary path is the **release tarball** — download it and its `.sha256` off the [releases](https://github.com/checkwright/checkwright/releases) page, verify, extract, run `init` — which needs nothing beyond a GNU userland; `npx checkwright init` is the same vendoring over npm, for a consumer who already has Node. Both recipes, with profiles and requirements: [docs/install.md](docs/install.md) §Quick start.
+Vendors a kit profile into a clean git repo and commits it. The primary path is the **release tarball** — download it and its `.sha256` off the [releases](https://github.com/checkwright/checkwright/releases) page, verify, extract, run `init` — which needs no runtime installed first, with one recipe for macOS and Linux and one for Windows; `npx checkwright init` is the same vendoring over npm, for a consumer who already has Node. The recipes, with profiles and requirements: [docs/install.md](docs/install.md) §Install.
 
 ## The premise
 

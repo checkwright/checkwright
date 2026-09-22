@@ -142,7 +142,9 @@ jobs:
       - name: install smoke, judged against the recorded baseline
         env:
           INSTALLER_SMOKE_TMP_DIR: ${{ runner.temp }}
+          INSTALLER_SMOKE_TARBALL_OUT: ${{ runner.temp }}/page-install/pack
         run: |
+          mkdir -p "$INSTALLER_SMOKE_TARBALL_OUT"
           log="$RUNNER_TEMP/installer-smoke.log"
           # The suite's own non-zero is an input to the comparison, not a verdict,
           # so -e is lifted across it and the status read from PIPESTATUS — tee's
@@ -160,6 +162,42 @@ jobs:
           # leaves no binary, and this line then reports the missing binary instead of a per-arm
           # baseline diff. Both are red and the tee'd log above still says which arm broke.
           bash gate-sdk/bin/run-gates.sh --diff-baseline installer_smoke "$log" "$rc"
+
+      # The page's `unix-install` block, run verbatim (docs/site-architecture.md
+      # §Generated projections and their freshness gates, the install-blocks row).
+      # The tarball is the one the smoke above packed and handed out through
+      # INSTALLER_SMOKE_TARBALL_OUT, placed where the page's fetch fence would
+      # have put it beside a digest in the release job's format.
+      - name: run the page's unix-install block against the packed tarball
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/page-install"
+          tarballs=("$work"/pack/checkwright-*.tgz)
+          [ -f "${tarballs[0]}" ] || { echo "::error::the smoke handed out no packed tarball"; exit 1; }
+          v="${tarballs[0]##*/checkwright-}"; v="${v%.tgz}"
+          cw="$work/cw"
+          mkdir -p "$cw" "$work/consumer"
+          cp "${tarballs[0]}" "$cw/checkwright-$v.tgz"
+          ( cd "$cw" && sha256sum "checkwright-$v.tgz" > "checkwright-$v.tgz.sha256" )
+          block="$(awk '
+            $0 == "<!-- unix-install:end -->" { f = 0 }
+            f && NF && $0 !~ /^```/ { print }
+            $0 == "<!-- unix-install:begin -->" { f = 1 }
+          ' docs/install.md)"
+          if [ -z "$block" ]; then
+            echo "::error::docs/install.md carries no unix-install block; this leg runs the page's install and has none to run"
+            exit 1
+          fi
+          printf '== docs/install.md unix-install block ==\n%s\n' "$block"
+          git -C "$work/consumer" init -q
+          git -C "$work/consumer" config user.email 'smoke@example.invalid'
+          git -C "$work/consumer" config user.name 'page install smoke'
+          export v cw
+          ( cd "$work/consumer" && sh -c "$block" ) \
+            || { echo "::error::the page's unix-install block exited non-zero"; exit 1; }
+          [ -f "$work/consumer/checkwright.lock" ] \
+            || { echo "::error::the page's unix-install block exited 0 but wrote no checkwright.lock"; exit 1; }
+          echo "the page's unix-install block installed into a clean consumer"
 
   # The native Windows sibling, and the first thing this repository has ever run
   # on a non-Linux host. It was shaped as an instrument before an assertion,
@@ -379,7 +417,7 @@ jobs:
           exit 0
 
       # **This step is the ADOPTER's own step performed.** Like the macOS legs, it
-      # runs docs/install.md §Requirements' own block: it reads `windows-remedy`
+      # runs docs/install.md §Windows' own block: it reads `windows-remedy`
       # with the macOS legs' awk program and runs the body verbatim under
       # PowerShell, the shell a native-Windows adopter types it into. The block
       # installs no floor member — `shellcheck` is a conditional member `starter`
@@ -617,6 +655,8 @@ jobs:
             echo "PWSH_SCRATCH=$(cygpath -w "$tmp")"
             echo "PWSH_TARGET=$host"
             echo "PWSH_BIN=$bin"
+            echo "PWSH_TARBALL=$(cygpath -w "${tarballs[0]}")"
+            echo "PWSH_VERSION=$version"
           } >> "$GITHUB_ENV"
 
       # The leg proper. Each of the five steps is asserted on an observable that
@@ -981,6 +1021,58 @@ jobs:
           if ($script:fails -gt 0) { Write-Host "$($script:fails) assertion(s) failed"; exit 1 }
           Write-Host "git ran the sh hooks with no bash on PATH, and they both passed and refused"
 
+      # The page's `windows-install` block, run verbatim (docs/site-architecture.md
+      # §Generated projections and their freshness gates, the install-blocks row),
+      # against the tarball the pack step built, placed where the page's fetch
+      # fence would have put it. The remedy block runs first, as an adopter
+      # following §Windows top to bottom in one session would.
+      - name: run the page's windows-install block against the packed tarball
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) { $PSNativeCommandUseErrorActionPreference = $false }
+          function Get-PageBlock([string] $name) {
+              $body = @()
+              $inBlock = $false
+              foreach ($line in (Get-Content -LiteralPath docs/install.md)) {
+                  if ($line -eq "<!-- ${name}:end -->") { $inBlock = $false }
+                  if ($inBlock -and $line.Trim() -and $line -notmatch '^```') { $body += $line }
+                  if ($line -eq "<!-- ${name}:begin -->") { $inBlock = $true }
+              }
+              if ($body.Count -eq 0) {
+                  Write-Host "::error::docs/install.md carries no $name block; this leg runs the page's block and has none to run"
+                  exit 1
+              }
+              Write-Host "== docs/install.md $name block =="
+              $body | ForEach-Object { Write-Host $_ }
+              return ($body -join "`n")
+          }
+          $remedy = Get-PageBlock 'windows-remedy'
+          $install = Get-PageBlock 'windows-install'
+          Invoke-Expression $remedy | Out-Host
+          $v = $env:PWSH_VERSION
+          $cw = Join-Path $env:PWSH_SCRATCH 'page-install'
+          New-Item -ItemType Directory -Force -Path $cw | Out-Null
+          Copy-Item -LiteralPath $env:PWSH_TARBALL -Destination "$cw\checkwright-$v.tgz"
+          $hex = (Get-FileHash -LiteralPath "$cw\checkwright-$v.tgz" -Algorithm SHA256).Hash.ToLowerInvariant()
+          [IO.File]::WriteAllText("$cw\checkwright-$v.tgz.sha256", "$hex  checkwright-$v.tgz`n")
+          $consumer = Join-Path $env:PWSH_SCRATCH 'page-install-consumer'
+          New-Item -ItemType Directory -Force -Path $consumer | Out-Null
+          git -C $consumer init -q
+          git -C $consumer config user.email 'smoke@example.invalid'
+          git -C $consumer config user.name 'page install smoke'
+          Push-Location $consumer
+          try {
+              Invoke-Expression $install | Out-Host
+              $code = $LASTEXITCODE
+          } finally { Pop-Location }
+          if ($code -ne 0) { Write-Host "::error::the page's windows-install block exited $code"; exit 1 }
+          if (-not (Test-Path -LiteralPath (Join-Path $consumer 'checkwright.lock'))) {
+              Write-Host "::error::the page's windows-install block exited 0 but wrote no checkwright.lock"
+              exit 1
+          }
+          Write-Host "the page's windows-install block installed into a clean consumer under Windows PowerShell"
+
   # The RELEASE-SHAPED PRODUCER, and its whole reason for existing is that no leg
   # which builds from the host it runs on can ever discharge a roster join.
   # gate-sdk/SPEC.md §Consumer payload admits a triple to native/targets.list only
@@ -1133,8 +1225,8 @@ jobs:
       # installs the declared floor rather than working around its absence.
       #
       # **Read this as scaffolding, which is what separates it from the macOS
-      # install-smoke leg's remedy step below.** That step runs §Requirements'
-      # own macOS block; this one is the producer's own prerequisite and is held to
+      # install-smoke leg's remedy step below.** That step runs docs/install.md
+      # §macOS and Linux's own macOS block; this one is the producer's own prerequisite and is held to
       # what this job's path executes — bash for the library's accessors, and the
       # GNU userland for `build-native.sh`'s `grep -aoEhf -` and `sort -u`. `shellcheck` is
       # deliberately absent: nothing this job runs invokes it (both files carry
@@ -1243,12 +1335,12 @@ jobs:
 
       # **Read this step as the assertion, not as scaffolding**, as the Windows
       # legs' run of the page's `windows-remedy` block is. It performs
-      # exactly the adopter action docs/install.md §Requirements documents for a
+      # exactly the adopter action docs/install.md §macOS and Linux documents for a
       # Mac. The whole value of this leg is that the documented remedy stops
       # being a reading and becomes a run, so a leg reaching green by installing
       # something the page does not name would be measuring a host no adopter has.
       #
-      # **This step runs §Requirements' macOS block verbatim, so the leg has no
+      # **This step runs §macOS and Linux's own block verbatim, so the leg has no
       # package set of its own.** Do not add a formula here: a leg that needs one
       # the block lacks is the page's defect, fixed in the block — a leg that
       # installed it anyway would go green over an adopter path that stayed
@@ -1265,7 +1357,7 @@ jobs:
       # is the adopter's next terminal — a login zsh with no inherited `PATH` —
       # resolving `bash`, the member the block installs, anywhere but
       # `$(brew --prefix)/bin`: the block's profile line is what must persist the
-      # ordering (docs/install.md §Requirements). Where Homebrew's prefix is
+      # ordering (docs/install.md §macOS and Linux). Where Homebrew's prefix is
       # `/usr/local`, `/etc/paths` already leads with its `bin`, so on an Intel
       # host that probe holds with or without the profile line. The third refusal
       # is the one that reds a dropped line on either architecture: it sources
@@ -1330,7 +1422,7 @@ jobs:
       # so read this step first when the leg goes red.
       #
       # It runs AFTER the install above deliberately: what it reports is then the
-      # `PATH` an adopter who followed §Requirements actually has. Probing the
+      # `PATH` an adopter who followed §macOS and Linux actually has. Probing the
       # stock image instead would measure a host nobody following the page is on.
       # `BASH_VERSION` beside `command -v bash` is the check that the ordering
       # took — the stock interpreter is 3.2 and the floor is 4.3, so those two
@@ -1579,9 +1671,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      # The adopter action docs/install.md §Requirements documents for a Mac,
+      # The adopter action docs/install.md §macOS and Linux documents for a Mac,
       # performed rather than read — the arm64 sibling's step header owns the
-      # whole argument, including why this step runs §Requirements' macOS block
+      # whole argument, including why this step runs §macOS and Linux's own block
       # verbatim and why no formula is added here. This is a second run of the
       # same block on a second host, which is the point: the page names no
       # architecture, so a remedy proved on arm64 alone is proved on half the
@@ -1642,7 +1734,7 @@ jobs:
           exit 0
 
       # Reporting only, never fails, and it runs AFTER the install so what it
-      # reports is the `PATH` an adopter following §Requirements actually has —
+      # reports is the `PATH` an adopter following §macOS and Linux actually has —
       # the arm64 sibling's probe header owns both reasons. Read this step first
       # when the leg goes red.
       #

@@ -312,7 +312,7 @@ jobs:
     # with no Node on the adopter's machine. It carries no `environment:` gate —
     # attaching assets to this repository's own Release is neither irreversible nor
     # external, and gating it would hold the primary channel behind the secondary
-    # channel's approval. Its capability story is docs/install.md §Requirements.
+    # channel's approval. Its capability story is docs/install.md §Install.
     permissions:
       contents: write
     steps:

@@ -11,7 +11,9 @@ It is for the maintainer of a repository coding agents write most of, who has to
 
 **It complements the workflow you already run.** Keep your spec process, your prompts, your harness. Add Checkwright where a claim has to be mechanically proven rather than asserted: the instructions shape, the gates enforce. Why that split is the whole design is the layer model on [Where Checkwright sits](positioning.md).
 
-Try it with Node on the machine; [Install](install.md) covers the other ways to fetch it. `demo` installs nothing: it runs the whole arc in a scratch repository of its own and removes it. The three lines after it are the real install, run from the root of a clean repository, and its reversal.
+Install it with no runtime first: [macOS and Linux](install.md#macos-and-linux) or [Windows](install.md#windows), each a download, a checksum and one command from the root of a clean repository. `demo` in place of `init` runs the whole arc in a scratch repository of its own and removes it, and `uninstall` takes the install back out.
+
+With Node on the machine, the same arc is one command each:
 
 ```bash
 npx checkwright demo        # needs no repository: install, a caught defect, the fix

@@ -165,6 +165,11 @@ tarballs=("$SCRATCH"/*.tgz)
 shopt -u nullglob
 [[ ${#tarballs[@]} -eq 1 ]] || fail "expected exactly one tarball, found ${#tarballs[@]}"
 TARBALL="${tarballs[0]}"
+# spec: installer/SPEC.md §The consumer smoke — INSTALLER_SMOKE_TARBALL_OUT hands the packed tarball out before the scratch teardown, so a caller runs the install page's own block against these bytes without packing or hashing a second artifact
+if [[ -n "${INSTALLER_SMOKE_TARBALL_OUT:-}" ]]; then
+    [[ -d "$INSTALLER_SMOKE_TARBALL_OUT" ]] || blocked "tarball hand-out not a directory: $INSTALLER_SMOKE_TARBALL_OUT"
+    cp "$TARBALL" "$INSTALLER_SMOKE_TARBALL_OUT/" || fail "could not hand the packed tarball out to $INSTALLER_SMOKE_TARBALL_OUT"
+fi
 
 # spec: installer/SPEC.md §The consumer smoke — steering the roster at this host alone removes pack's declared-target-with-no-artifact refusal from every ordinary path in this smoke, so the case is PLANTED rather than left with no witness: that refusal is the one reader here whose verdict reds on FINDING a target instead of on finding none, so a narrowing that removes its subject cannot be cleared by inspection the way the others can
 PLANT_OUT="$SCRATCH/planted-pack"
