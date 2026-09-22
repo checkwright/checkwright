@@ -54,6 +54,7 @@ struct Cfg {
     lesson_evidence: String,
     survey_record: String,
     lead_journal: String,
+    dispatch_marker: String,
     boundary_truncate: Vec<String>,
     boundary_preserve: Vec<String>,
     boundary_require: Vec<String>,
@@ -88,6 +89,7 @@ fn cfg() -> Result<Cfg, String> {
         lesson_evidence: walk::knob_scalar("LIFECYCLE_KIT_LESSON_EVIDENCE_FILE")?,
         survey_record: walk::knob_scalar("LIFECYCLE_KIT_SURVEY_RECORD_FILE")?,
         lead_journal: walk::knob_scalar("LIFECYCLE_KIT_LEAD_JOURNAL_FILE")?,
+        dispatch_marker: walk::knob_scalar("LIFECYCLE_KIT_DISPATCH_MARKER_FILE")?,
         boundary_truncate: walk::knob_array("LIFECYCLE_KIT_BOUNDARY_TRUNCATE")?,
         boundary_preserve: walk::knob_array("LIFECYCLE_KIT_BOUNDARY_PRESERVE")?,
         boundary_require: walk::knob_array("LIFECYCLE_KIT_BOUNDARY_REQUIRE")?,
@@ -146,6 +148,9 @@ fn usage(stages: &[String]) -> String {
          run-gates.sh --enter-stage [--simulate] --rename <name>  (rename the iteration: queue \
          header + column 1 of every stamp)\n       run-gates.sh --enter-stage [--simulate] \
          --open-lead-journal  (open the lead journal under a heading keyed on the cursor)\n       \
+         run-gates.sh --enter-stage --dispatch <stage>  (the lead: pre-flight, then declare a \
+         stage-session dispatch)\n       run-gates.sh --enter-stage --dispatch-withdraw <stage>  \
+         (withdraw a dispatch whose session ended without entering)\n       \
          run-gates.sh --enter-stage [-h|--help]",
         stages.join(" ")
     )
@@ -175,6 +180,10 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
     };
     let say = Say { sim };
 
+    let op = rest.first().map(String::as_str);
+    if op == Some(DISPATCH) || op == Some(DISPATCH_WITHDRAW) {
+        return dispatch_form(&c, sim, rest);
+    }
     if rest.first().map(String::as_str) == Some("--rename") {
         return rename(&c, &say, &rest[1..]);
     }
@@ -185,6 +194,96 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
 }
 
 const OPEN_LEAD_JOURNAL: &str = "--open-lead-journal";
+const DISPATCH: &str = "--dispatch";
+const DISPATCH_WITHDRAW: &str = "--dispatch-withdraw";
+
+fn marker_file(c: &Cfg) -> String {
+    format!("{}/{}", c.tmpdir.trim_end_matches('/'), c.dispatch_marker)
+}
+
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — one line naming `stage` leaves the marker, and
+// an emptied marker is deleted; `Ok(false)` when no line names it
+fn discharge_marker(c: &Cfg, stage: &str) -> Result<bool, String> {
+    let path = marker_file(c);
+    if !Path::new(&path).is_file() {
+        return Ok(false);
+    }
+    let text = std::fs::read_to_string(&path).map_err(|e| format!("cannot read {}: {}", path, e))?;
+    let Some(kept) = stages::marker_without(&text, stage) else {
+        return Ok(false);
+    };
+    if kept.is_empty() {
+        std::fs::remove_file(&path).map_err(|e| format!("cannot remove {}: {}", path, e))?;
+    } else {
+        write_file(&path, &format!("{}\n", kept.join("\n")))?;
+    }
+    Ok(true)
+}
+
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — --dispatch and --dispatch-withdraw: the lead's
+// declaration and its withdrawal, writing scratch only and never lifecycle state
+fn dispatch_form(c: &Cfg, sim: bool, rest: &[String]) -> Result<i32, String> {
+    let form = rest[0].as_str();
+    if sim {
+        eprintln!(
+            "enter-stage: {} takes no '--simulate' — it writes scratch only, and --dispatch runs \
+             the simulate itself. Nothing written.",
+            form
+        );
+        eprintln!("{}", usage(&c.stages));
+        return Ok(2);
+    }
+    if rest.len() != 2 || rest[1].is_empty() {
+        eprintln!("enter-stage: {} takes exactly one <stage> — nothing written.", form);
+        eprintln!("{}", usage(&c.stages));
+        return Ok(2);
+    }
+    let stage = &rest[1];
+    if !stages::stage_known(&c.stages, stage) {
+        eprintln!(
+            "enter-stage: '{}' is not a lifecycle stage ({})",
+            stage,
+            c.stages.join(" ")
+        );
+        eprintln!("{}", usage(&c.stages));
+        return Ok(2);
+    }
+    let path = marker_file(c);
+    if form == DISPATCH_WITHDRAW {
+        if discharge_marker(c, stage)? {
+            println!(
+                "enter-stage: withdrew one '{}' dispatch declaration from {} (scratch; nothing \
+                 tracked written).",
+                stage, path
+            );
+        } else {
+            println!(
+                "enter-stage: {} holds no '{}' dispatch declaration — no-op, nothing written.",
+                path, stage
+            );
+        }
+        return Ok(0);
+    }
+    let code = stamp(c, &Say { sim: true }, &rest[1..])?;
+    if code != 0 {
+        eprintln!(
+            "enter-stage: --dispatch '{}' refused by the pre-flight above — nothing declared.",
+            stage
+        );
+        return Ok(code);
+    }
+    std::fs::create_dir_all(&c.tmpdir)
+        .map_err(|e| format!("cannot create the scratch dir {}: {}", c.tmpdir, e))?;
+    append_line(&path, stage)?;
+    println!(
+        "enter-stage: declared a '{}' stage-session dispatch in {} — the session's own \
+         --enter-stage {} discharges it; until then a commit adding no stamp reds \
+         (check-dispatch-entry). If the session ends without entering, run --enter-stage \
+         --dispatch-withdraw {}.",
+        stage, path, stage, stage
+    );
+    Ok(0)
+}
 
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — --open-lead-journal: the lead journal's opener,
 // not stage motion — no stamp, no pre-flight, no queue write, nothing tracked
@@ -1120,6 +1219,17 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
         append_line(&c.state, &stamp_line)?;
     }
     scratch.clear();
+    let discharged = match discharge_marker(c, &stage) {
+        Ok(d) => d,
+        Err(e) => {
+            eprintln!(
+                "enter-stage: the stamp landed, but its dispatch declaration could not be \
+                 discharged ({}) — run --enter-stage --dispatch-withdraw {}.",
+                e, stage
+            );
+            false
+        }
+    };
 
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the consumption rides the write, not the
     // match: this tool writes no ledger line ever, it rewrites the state token of exactly one line
@@ -1195,6 +1305,13 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
         );
         println!("  next: commit {}, hook enabled.", c.state);
         println!("  subject: {}", stages::entry_subject(&stage));
+    }
+    if discharged {
+        println!(
+            "  note: discharged one '{}' dispatch declaration from {}.",
+            stage,
+            marker_file(c)
+        );
     }
     if !truncated.is_empty() {
         println!(
@@ -2228,6 +2345,7 @@ mod tests {
             lesson_evidence: String::new(),
             survey_record: String::new(),
             lead_journal: "lead-journal.md".into(),
+            dispatch_marker: "stage-dispatch.txt".into(),
             boundary_truncate: vec![],
             boundary_preserve: vec![],
             boundary_require: vec![],

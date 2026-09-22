@@ -14,6 +14,7 @@ pub mod brevity;
 pub mod close_surfaces;
 pub mod comment_tier;
 pub mod commit_subject;
+pub mod dispatch_entry;
 pub mod doctrine_registration;
 pub mod door_binding;
 pub mod deferred_board_tags;
@@ -1697,6 +1698,22 @@ pub const REGISTRY: &[GateEntry] = &[
         stamp_subject::run,
         &[],
         &["LIFECYCLE_KIT_STATE_FILE", "LIFECYCLE_KIT_STAGES"],
+        "lifecycle-kit",
+        &[("git", "")],
+    ),
+    // spec: lifecycle-kit/SPEC.md §check-dispatch-entry — the marker, the staged path set and
+    // check-stamp-subject's added-stamp read, all through git or scratch: the empty-walk-root shape
+    (
+        "check-dispatch-entry",
+        dispatch_entry::run,
+        &[],
+        &[
+            "GATE_SDK_TMP_DIR",
+            "LIFECYCLE_KIT_DISPATCH_MARKER_FILE",
+            "LIFECYCLE_KIT_GAP_INBOX_FILE",
+            "LIFECYCLE_KIT_STATE_FILE",
+            "LIFECYCLE_KIT_STAGES",
+        ],
         "lifecycle-kit",
         &[("git", "")],
     ),

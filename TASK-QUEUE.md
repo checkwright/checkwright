@@ -20,18 +20,6 @@ scope aggregates explicit inbound citations (converge, subsume, block; lifecycle
 
 **Cost while deferred:** every scope can rank tactical work that is already mooted. Filed 2026-09-22 to the gap inbox by the lead as an operator direction. Promoted at close because →fix would change the scope contract, which is a spec amendment. Owner lookup ran over `supersed`, `obsolete`, `subsume` and `strategic` in scope.md and found no owner.
 
-### build-work-before-entry-stamp
-
-[spec: SPEC-dispatch-entry.md] [recurrence: 2026-09-22]
-
-a stage session can land its work commits before running its own `--enter-stage`, and nothing reds it: `check-stage-evidence` catches a stamp committed after the work it preceded, never work preceding the stamp, and a same-stage re-entry finds the cursor already on its stage. Measured 2026-09-22 by `git log`: canon-gate-precision's second build session merged two amendments, then stamped at the second merge's head. The first instance, one iteration earlier and also on the cheaper tier, was discarded at scope because §check-stage-evidence states the limit; the recurrence shows that stating the limit did not stop it.
-
-**Operator exception to the enhancement admission filter** (2026-09-22 scope, lead-relayed), because the recurrence is judged. Admitted to `stage-contract-drain`, for /spec to author and promote.
-
-**Ruled at spec (2026-09-22):** the oracle, tied to the dispatch rather than the session. The lead declares each stage session with `--enter-stage --dispatch <stage>`, a scratch marker line the session's stamp removes, and a new commit-msg gate `check-dispatch-entry` reds a commit adding no stamp while a line stands. The stamp-first line was refused because every stage template already carries it and both recurrences ran with it in context. A commit-time session-id tie was refused: committing workers of a stage session and the boundary skills never stamp, so it false-fires on sanctioned work. Lifecycle-kit alone; no delegation-kit surface changes.
-
-**Cost while deferred:** the stamp's recorded head postdates the stage's work, so the stamp misplaces where that session's work began. Filed 2026-09-22 to the gap inbox by the canon-gate-precision lead as a recurrence judgment; promoted at its close because →fix needs a new oracle or a dispatch-path ruling. Owner lookup ran over `stamp` and `newly introduced` in lifecycle-kit/SPEC.md; §check-stage-evidence owns the assertion and its limit.
-
 ### lead-no-change-decision-has-no-landing-site
 
 [spec: SPEC-no-change-landing.md]
@@ -1855,5 +1843,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 ## Done
 
 - stamp-subject-merge-carve-out-unruled
+- build-work-before-entry-stamp
 
 ## Lessons Learned

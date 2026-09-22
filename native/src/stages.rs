@@ -137,6 +137,27 @@ pub fn last_added_stamp_over<'a>(after: &'a str, befores: &[&str], stages: &[Str
         .rfind(|l| !prior.contains(l) && stage_known(stages, stamp_stage(l)))
 }
 
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the dispatch marker's lines, one stage each;
+// its writer and check-dispatch-entry read this one spelling
+pub fn marker_lines(text: &str) -> Vec<&str> {
+    text.lines().map(str::trim).filter(|l| !l.is_empty()).collect()
+}
+
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the marker with one line naming `stage`
+// removed; `None` when no line names it
+pub fn marker_without(text: &str, stage: &str) -> Option<Vec<String>> {
+    let lines = marker_lines(text);
+    let at = lines.iter().position(|l| *l == stage)?;
+    Some(
+        lines
+            .iter()
+            .enumerate()
+            .filter(|(i, _)| *i != at)
+            .map(|(_, l)| l.to_string())
+            .collect(),
+    )
+}
+
 pub fn stamp_stage(line: &str) -> &str {
     line.split_whitespace().nth(1).unwrap_or("")
 }
@@ -216,6 +237,16 @@ pub fn header_only(text: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — a discharge removes one line naming the
+    // stage, never every such line, and leaves a marker naming no such line alone
+    #[test]
+    fn a_marker_discharge_removes_exactly_one_line_naming_the_stage() {
+        assert_eq!(marker_lines("build\n\n  spec \n"), vec!["build", "spec"]);
+        assert_eq!(marker_without("build\nspec\nbuild\n", "build"), Some(vec!["spec".to_string(), "build".to_string()]));
+        assert_eq!(marker_without("build\n", "build"), Some(Vec::new()));
+        assert_eq!(marker_without("spec\n", "build"), None);
+    }
 
     // spec: lifecycle-kit/SPEC.md §The state machine — the start is the *first* stamp's head, never
     // the cursor's, and every malformed or absent head reads as no commit

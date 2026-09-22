@@ -1,0 +1,4 @@
+feat(lifecycle-kit): land the amendment
+
+The same work commit under a standing build declaration, now adding the
+build stamp: the dispatched session has entered in this commit.

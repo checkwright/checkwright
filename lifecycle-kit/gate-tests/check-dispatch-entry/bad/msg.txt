@@ -1,0 +1,4 @@
+feat(lifecycle-kit): land the amendment
+
+A build session a lead dispatched lands its work before running its own
+--enter-stage: the declaration stands and the commit adds no stamp.

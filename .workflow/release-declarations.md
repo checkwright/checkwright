@@ -156,6 +156,7 @@
 - `check-gate-exemption-tasks` — a live slug is an entry heading, so a queue still in the bullet shape resolves no `# until:` or `# port-until:` slug; migrate the queue.
 - `check-deprecation-task` — a live slug is an entry heading, so a queue still in the bullet shape resolves no marker's task; migrate the queue.
 - `check-todo-task-liveness` — a live slug is an entry heading, so a queue still in the bullet shape resolves no `TODO(task:)` slug; migrate the queue.
+- `check-dispatch-entry` — new, lifecycle-kit, commit-msg tier: while a lead-dispatched stage session has not entered, a commit that adds no stamp reds (a commit staging the gap inbox alone excepted). Register it, regenerate your hooks with `--emit git-hooks --write`, and have your lead dispatch through `--enter-stage --dispatch <stage>`; without a lead nothing declares a dispatch and the gate is inert.
 
 ## Renamed knobs
 
@@ -175,6 +176,7 @@
 
 ## Behavior changes
 
+- **`--enter-stage --dispatch <stage>` and `--enter-stage --dispatch-withdraw <stage>`** — two new forms, with the knob `LIFECYCLE_KIT_DISPATCH_MARKER_FILE` (default `stage-dispatch.txt`, inside `GATE_SDK_TMP_DIR`): `--dispatch` runs the `--simulate` pre-flight and, when it would proceed, appends the stage to that scratch marker; every stamp removes one line naming its stage; `--dispatch-withdraw` removes one for a session that ended without entering. `lifecycle-kit/templates/lead.md` now gates each stage-session dispatch with `--dispatch` instead of `--simulate`; a lead binding that restates the old step should take the template's.
 - **`check-crate-arms`** — gains a third arm: whenever the crate's source stamp misses, after clippy and the tests, it runs `--run-gate-tests` over every fixture suite `--emit fixture-suites` lists, through the binary `GATE_SDK_NATIVE_BIN` names, and a failing suite reds the gate. The gate is `install: never`, so this reaches you only if you registered it by hand over a crate of your own: expect the added wall-clock of your suites on a commit that touches the crate, rebuild the binary before reading a suite's red, and if a fixture case of yours runs this gate, pin `GATE_SDK_KIT_DIRS` in that case's knob file to a root with no `gate-tests/`.
 - **`lifecycle-kit/templates/stages/close.md`** — gains step 8, *Review the audit roster*, where `LIFECYCLE_KIT_AUDIT_ROSTER_FILE` names one; the old steps 8–12 are now 9–13. A binding that cites a close step by number (the brevity pass is now step 11) must move its reference, and a binding that ran its own audit-roster review sub-step should delete it in favour of the template step and declare the roster `close-surface: <path> advisory`.
 - **`.workflow/release-declarations.md`** — replaces `<workflow-dir>/tightened-gates.txt` as the accumulating declaration surface, and carries all three declaration-bearing sections as release-note bullets rather than bare gate names; `--upgrade-smoke` at an untagged `TO` reads its Tightened-gates section. If your tree keeps the old file, move each name to a `` - `check-name` `` bullet under `## Tightened gates` in the new file, keep a `# contract:` first line, and delete the old file.

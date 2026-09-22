@@ -1,0 +1,6 @@
+# <message-file> <marker> <staged-state> <head-state> <staged-paths>
+msg.txt
+marker.txt
+staged.txt
+head.txt
+paths.txt

@@ -45,5 +45,7 @@ run_gate check-commit-subject native/target/release/checkwright-gates check-comm
 
 run_gate check-stamp-subject native/target/release/checkwright-gates check-stamp-subject "$msg_file"
 
+run_gate check-dispatch-entry native/target/release/checkwright-gates check-dispatch-entry "$msg_file"
+
 printf 'commit-msg: %d gate(s) passed.\n' "$_ran"
 exit 0

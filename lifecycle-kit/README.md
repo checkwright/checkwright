@@ -30,10 +30,11 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    check-scratch-citation       # no permanent surface points a reader into per-iteration scratch
    check-gap-inbox-neutrality   # inert until a gap is filed (--emit file-gap)
    check-stamp-subject          # commit-msg tier: a stamp commit's subject scope is its stage
+   check-dispatch-entry         # commit-msg tier: inert until a lead declares a dispatch (--enter-stage --dispatch)
    ```
    <!-- gate-roster:end -->
 
-   They resolve through gate-sdk's registry path (your gates dir first, then each kit's `checks/`), and their `# graph:` manifests put them in the generated pre-commit hook (`check-stamp-subject` in the commit-msg hook), written by `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names.
+   They resolve through gate-sdk's registry path (your gates dir first, then each kit's `checks/`), and their `# graph:` manifests put them in the generated pre-commit hook (`check-stamp-subject` and `check-dispatch-entry` in the commit-msg hook), written by `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names.
 
 2. Give the queue file its header and each evidence file its skeleton — the stage-stamp file and the lesson-disposition file (`LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, both boundary-reset to their header). The queue header line:
 

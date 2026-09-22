@@ -105,6 +105,7 @@ pub const KIT: Kit = Kit {
         ),
         Row::scalar("LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE", "0"),
         Row::scalar("LIFECYCLE_KIT_LEAD_JOURNAL_FILE", "lead-journal.md"),
+        Row::scalar("LIFECYCLE_KIT_DISPATCH_MARKER_FILE", "stage-dispatch.txt"),
         Row::indexed("LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS", &["*/SPEC.md"]),
         Row::scalar("LIFECYCLE_KIT_RULING_RECORD", ""),
         Row::indexed("LIFECYCLE_KIT_RULING_CITERS", &[]),
@@ -154,6 +155,7 @@ fn validate(v: &Values) -> Vec<String> {
         "LIFECYCLE_KIT_GAP_INBOX_FILE",
         "LIFECYCLE_KIT_SURVEY_RECORD_FILE",
         "LIFECYCLE_KIT_LEAD_JOURNAL_FILE",
+        "LIFECYCLE_KIT_DISPATCH_MARKER_FILE",
     ] {
         if scalar(v, n).is_some_and(str::is_empty) {
             errs.push(format!("{} is empty", n));
