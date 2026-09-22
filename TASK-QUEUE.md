@@ -155,9 +155,13 @@
   selectable entry cap (`<n>cp`, `<n>lines` or `off`), this repo binding code points at the old
   bound; the context-kit measures in code points, their baseline and ceiling rows carrying a unit
   suffix that records the discontinuity; the rewrite of every tracked markdown file but this one,
-  which unwraps in `SPEC-queue-headings.md`'s conversion. That amendment keeps
-  `check-tag-lead-line` and the `recurrence:` declaration, because under the heading grammar an
-  entry is never one line — the operator's move above is escalated to the lead, not overruled.
+  which unwraps in `SPEC-queue-headings.md`'s conversion; and a lead-grantable per-record
+  `[cap-credit:]` bounded by `QUEUE_KIT_ENTRY_CREDIT_MAX` (`off` valid) and stale once unneeded
+  (operator direction 2026-09-22, lead-relayed: the cap should not be rigid where exceeding it
+  avoids information loss). That amendment keeps `check-tag-lead-line` and, per the operator's
+  answer on the move above (direction 2026-09-22, lead-relayed), puts every tag — `recurrence:`
+  as a date array, `roadmap-summary:` and `not-icebox-eligible:` included — on one tag line
+  directly under the heading.
   **Operator direction 2026-09-22 (lead-relayed):** tracked markdown carries no artificial line
   cap; a tool needing a line-capped form gets one generated from the uncapped tracked file.
   **Cost while deferred:** not low, and deliberately not claimed to be — this step alone rewrites
@@ -245,14 +249,16 @@
   cost of overloading prose markup as a reference marker. Demanding a clickable link separates prose
   from references and retires the convention.
   **Specified 2026-09-22:** `QUEUE_KIT_SLUG_MAX` in `check-task-conservation` (240 of 310 live
-  slugs exceed 30 at spec); `### <slug>` entries whose lead line is the first line under the
-  heading; declarations as paragraphs of their own; `check-task-names` assertion R demanding a
-  link for a live reference and backticks for a retired one (the queue is outside
-  `check-md-refs`' manifest set, so the queue gate holds it); the prose-surface claim and the
-  roadmap projection as links; a `--emit queue-migrate` arm; this file's conversion and unwrap
-  and `check-queue-wrap`'s deregistration. **Two departures, escalated to the lead:** Done stays
-  a bare bullet (close clears Done every iteration, so its anchor would not be permanent), and
-  `recurrence:` stays a declaration (the hard-wrap entry's recorded operator move).
+  slugs exceed 30 at spec); `### <slug>` entries with every bracketed tag on ONE tag line
+  directly under the heading and prose after it, the three body declarations converted to tags
+  there and `recurrence:` an array of dates (operator direction 2026-09-22, lead-relayed; the
+  array restates `record-stamp-encoding-compression`'s 2026-09-01 further step);
+  `check-task-names` assertion R demanding a link for a live reference and backticks for a
+  retired one (the queue is outside `check-md-refs`' manifest set, so the queue gate holds it);
+  the prose-surface claim and the roadmap projection as links; a `--emit queue-migrate` arm; this
+  file's conversion and unwrap and `check-queue-wrap`'s deregistration. **Done stays a bare
+  bullet**, links rewritten at the Done move (operator direction 2026-09-22, lead-relayed; close
+  clears Done every iteration, so a Done anchor would not be permanent).
   **Cost while deferred:** bounded and mechanical but wide — everything keying on the column-zero
   moves to heading detection: `is_top_level_bullet`, `is_bullet`, `live_slugs`, the section
   scanners, `check-task-conservation`, `queue-index`, `queue-counts`, `icebox-candidates` and the

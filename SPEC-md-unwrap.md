@@ -6,14 +6,14 @@ This amendment does four things.
 
 1. It ships the oracle: a canon-kit gate that reds a paragraph broken across lines, and a canon-kit arm that performs the join. They share one block scanner, so the gate reds exactly the lines the arm would join.
 2. It re-units every line-counting size measure to **code points**, a measure that reflow does not move. This is the precondition for dropping any width cap.
-3. It makes the queue's per-entry cap a **selectable** measure, with `off` as a valid choice.
+3. It makes the queue's per-entry cap a **selectable** measure, with `off` as a valid choice, and adds a lead-grantable per-record credit (delta 6).
 4. It rewrites this repo's tracked markdown, **except the queue file**. The queue's grammar is line-scoped by design, so the queue unwraps inside `queue-kit/SPEC-queue-headings.md`'s conversion, which rewrites every entry anyway, and `check-queue-wrap` stays registered on it until then.
 
 **Merge order.** This amendment merges before `queue-kit/SPEC-queue-headings.md`, whose entry is blocked on this one's.
 
 **The paired `entry-line-cap-has-no-line-axis-relief` is moot.** Per the operator's direction (2026-09-22, lead-relayed), when a strategic unit removes the need for tactical line-limit logic, the tactical entry is unnecessary work. Delta 3 removes the line axis, and the operator's earlier directions leave the cap's measure to consumer config (`off` included), so no residue survives. The entry pairs here only to exit at this merge.
 
-**The kit posture: both conventions stay supported, and this repo binds one.** A kit ships generic mechanism. `check-queue-wrap` keeps shipping for a consumer that wraps, `check-md-unwrapped` ships for one that does not, and each consumer registers the one it wants, as the entry specified. The same posture governs the record cap, per the operator's directions (2026-09-22, lead-relayed): the kit may support several capping approaches, some consumers will want no cap at all, and this project adopts exactly one. The cap knob therefore takes a unit, and `off` is one of its values (delta 3). This repo binds code points. A lead-grantable per-record exception is **not** in this amendment. It would reverse §check-queue-entry-budget's stated refusal of a conditional cap ("Why the cap is not widened for exceptional content"), which is wider than this unit's envelope, and it is escalated to the lead.
+**The kit posture: both conventions stay supported, and this repo binds one.** A kit ships generic mechanism. `check-queue-wrap` keeps shipping for a consumer that wraps, `check-md-unwrapped` ships for one that does not, and each consumer registers the one it wants, as the entry specified. The same posture governs the record cap, per the operator's directions (2026-09-22, lead-relayed): the kit may support several capping approaches, some consumers will want no cap at all, and this project adopts exactly one. The cap knob therefore takes a unit, and `off` is one of its values (delta 3). This repo binds code points. **A lead-grantable per-record credit is in this amendment** (delta 6), by operator direction (2026-09-22, lead-relayed): "the cap on records should not be rigid as some scenarios may justify exceeding it while risking information loss otherwise. In those scenario, there should an additional lead-grantable credit. If this iteration deals with the machinery of this kind, let's add it." This iteration rebuilds that machinery. The credit revises §check-queue-entry-budget's "Why the cap is not widened for exceptional content". `TRAJECTORY.md` records no ruling on the entry cap, so this is a direction-driven SPEC change, not a reversed ruling. Like the cap, the credit is consumer config, and `off` is valid.
 
 **Why code points.** The unit was ruled lead own-authority on 2026-09-10 and stands. `cplen` in `queue_wrap.rs` is the in-tree precedent. Bytes penalise the em dashes and section marks this prose is full of. Words would need a tokenizer decision. A code-point count of an entry's text, with line breaks counted as one and indentation trimmed, differs between the wrapped and unwrapped forms by essentially nothing. So the measure survives this very rewrite and any later reflow, which a line count cannot.
 
@@ -26,7 +26,7 @@ This amendment does four things.
 - **Rendering hazards are nil.** No tracked markdown line ends in two spaces. The 20 trailing-backslash lines are all shell continuations inside fences. Four files carry a multi-line HTML comment: `.github/pull_request_template.md`, `canon-kit/SPEC.md`, its mirror, and `canon-kit/templates/SPEC-amendment.md`.
 - **Line-led declarations outside the queue already stand alone.** `git grep -n -B1 -A1 -E "^(close-surface|door-contributor):" -- '*.md' ':!docs/' ':!*/gate-tests/*'` shows every `close-surface:` line bounded by blank lines or a fence, so none is a paragraph continuation the join could absorb.
 - **No markdown line-number cite exists outside the queue** (`git grep -n -E "[A-Za-z0-9_./-]+\.md:[0-9]+"` over the tracked tree less the queue, fixtures and Rust test strings finds two example outputs in `README.md` and `docs/index.md`). The queue's eight cites are `queue-kit/SPEC-queue-citations.md`'s.
-- **Calibration of the two re-united caps.** The probe measured each top-level Deferred entry of the queue at HEAD two ways: its non-blank lines less one declaration line per grammar, and delta 3's code-point size over the same lines. The pool has 63 entries at a median of 85 code points per counted line. The four largest (48 or 49 counted lines) measure 3963 to 4211 code points. The same code-point rule over each bullet of `CLAUDE.md`'s two governed brevity sections gives 264 to 327 for the four-line bullets carrying a `§`, and at most 272 for the one-line ones.
+- **Calibration of the two re-united caps.** The probe measured each top-level Deferred entry of the queue at HEAD two ways: its non-blank lines less one declaration line per grammar, and delta 3's code-point size over the same lines. The pool has 63 entries at a median of 85 code points per counted line. The four largest (48 or 49 counted lines) measure 3963 to 4211 code points. Measured with every line counted, which is the form `SPEC-queue-headings.md` leaves once the declarations become tags and the discount retires, the largest is 4268 (the same pool at `83171ebb`). The same code-point rule over each bullet of `CLAUDE.md`'s two governed brevity sections gives 264 to 327 for the four-line bullets carrying a `§`, and at most 272 for the one-line ones.
 
 ## What changes
 
@@ -62,7 +62,7 @@ In §Layout and configuration, add `CANON_KIT_UNWRAP_GLOBS` and `CANON_KIT_UNWRA
 
 **Not yet applied.** In §Layout and configuration, replace the `QUEUE_KIT_ENTRY_LINE_CAP` bullet with:
 
-> - `QUEUE_KIT_ENTRY_CAP` — default `4250cp`: the per-entry size cap `check-queue-entry-budget` assertion A holds over the deferred section, as a count and a unit. `<n>cp` measures code points, `<n>lines` measures counted lines, and `off` disables assertion A while assertions B to E still run. A value outside that grammar is malformed config (exit 2). `lines` is a sound measure only where every line is width-bounded, so choose it beside `check-queue-wrap` and never beside `check-md-unwrapped`.
+> - `QUEUE_KIT_ENTRY_CAP` — default `4300cp`: the per-entry size cap `check-queue-entry-budget` assertion A holds over the deferred section, as a count and a unit. `<n>cp` measures code points, `<n>lines` measures counted lines, and `off` disables assertion A while assertions B to E still run. A value outside that grammar is malformed config (exit 2). `lines` is a sound measure only where every line is width-bounded, so choose it beside `check-queue-wrap` and never beside `check-md-unwrapped`.
 
 Add the retired pair (`QUEUE_KIT_ENTRY_LINE_CAP`, `QUEUE_KIT_ENTRY_CAP`) to `native/src/knobs/queue_kit.rs`'s `retired` table, so a consumer file still setting the old name exits 2 naming the successor (gate-sdk/SPEC.md §The knob file). Validate the new grammar in the table validator.
 
@@ -72,7 +72,7 @@ In §check-queue-entry-budget, assertion (A) becomes:
 
 The calibration paragraph becomes:
 
-> Calibration: `4250cp` is the former default of 50 lines times the deferred pool's median of 85 code points per counted line (2026-09-22), so the re-unit moved the unit and not the bound. The cap's job is to keep compression from regrowing, not to force the initial cut, and it is set at the tail of a real pool. It is a stated policy with a stated purpose, not a derived value, which is why it is a knob. **The unit is the consumer's choice and so is having a cap at all**, because which measure bounds a record is policy rather than mechanism. The kit ships the measures and this repo binds one. The scan is line-local: the cost field's bold lead-in must sit on one line, the same reason a tag must sit on its lead line (§check-tag-lead-line).
+> Calibration: `4300cp` is the former default of 50 lines at the deferred pool's median of 85 code points per counted line (2026-09-22), rounded up so that it admits every entry the line cap admitted, whether the declaration discount applies (largest 4211) or every line is counted (largest 4268). The re-unit moved the unit and not the bound. The cap's job is to keep compression from regrowing, not to force the initial cut, and it is set at the tail of a real pool. It is a stated policy with a stated purpose, not a derived value, which is why it is a knob. **The unit is the consumer's choice and so is having a cap at all**, because which measure bounds a record is policy rather than mechanism. The kit ships the measures and this repo binds one. The scan is line-local: the cost field's bold lead-in must sit on one line, the same reason a tag must sit on its lead line (§check-tag-lead-line).
 
 Every other mention of "counted lines" or "N lines" as the cap's unit in the section moves to "size in the configured unit": the clean-path headroom rows, the `entry-history` rows' two counts, the calibration of the declaration discount ("fixed-shape and width-bounded" becomes "fixed-shape"), and *Why the cap is not widened*. The discount stays **one declaration line per grammar**, measured in the configured unit. `native/src/gates/queue_entry_budget.rs` parses the knob into a unit and a count, measures in it, prints headroom and findings with the unit suffix, and skips (A) under `off`. `native/src/emit/entry_history.rs` reports in the same unit because it calls the same walk. `native/src/emit/queue_index.rs` prints an entry's size in the configured unit in place of `{:>4}l`. §The queue-index arm's "carrying the entry's line count" becomes "carrying the entry's size in the cap's unit", and under `off` it prints code points. §The tag algebra's "Its own ceiling is `check-queue-wrap`'s budget" paragraph on `recurrence:` drops the width clause: an unwrapped line has no width ceiling, and the at-most-one-line rule is what bounds the declaration.
 
@@ -103,14 +103,51 @@ Wiring: `native/src/emit/always_loaded.rs` (the measure, the row grammar and the
 - **Reds the rewrite can surface, owned in the same commit.** Per-line scanners see whole paragraphs for the first time. A link that was split across a wrap is scanned by `check-md-refs` for the first time. A count or claim that straddled a wrap is read whole by the per-line arms. Any finding this surfaces is a real defect the wrap was hiding, and it is fixed, never exempted. An inline `…-exempt` marker now covers its whole paragraph, a widening this amendment accepts: it can only remove findings, and each marker's reason still names its subject.
 - The full battery and every kit's fixture suite run green on the rewrite commit. The rewrite touches every kit's SPEC.
 
+### (6) queue-kit: the lead-grantable cap credit, `[cap-credit:]` and `QUEUE_KIT_ENTRY_CREDIT_MAX` {design-bearing}
+
+**Not yet applied.** This lands with delta 3 or after it. The operator's direction (quoted above) asks for an additional credit on a record the cap would otherwise force into losing information. The decisions below are this amendment's, and each carries its ground.
+
+- **The grant is a tag on the credited entry**, not a line in a separate ledger. Its one machine reader, assertion A, measures that entry, so the grant sits where the measure is taken, travels with the entry through every move, and needs no second file kept in step with the queue. It is lead-line-scoped (§check-tag-lead-line joins it to the governed set). Under `SPEC-queue-headings.md` it rides the tag line.
+- **The amount is additive and bounded.** The credited entry's limit is the cap plus the credit. No single credit may exceed `QUEUE_KIT_ENTRY_CREDIT_MAX`, so a credit relieves an exceptional record without turning into a second, uncapped class.
+- **A credit expires when it is no longer needed.** An entry whose size fits the cap without its credit is red, and the fix is to delete the tag. That keeps every standing credit exceptional and current without an expiry date, which would be a second clock to calibrate.
+- **Who may grant** is the authorizing role §check-queue-entry-budget already names for a split: the iteration lead, or the operator where no lead runs. A session blocked by the cap asks for a credit the same way it asks for a split, stating what would be lost. The grant is written in the commit that relies on it.
+
+Add to §The tag algebra:
+
+> - `[cap-credit: +<n><unit> <YYYY-MM-DD> <grantor> <reason>]` — a per-entry size credit on a deferred entry, raising that entry's limit under §check-queue-entry-budget assertion A to `QUEUE_KIT_ENTRY_CAP` plus `<n>`. `<unit>` is the cap's own (`cp` or `lines`). `<grantor>` names the granting role in the consumer's own authority vocabulary, and the kit enumerates none. `<reason>` is non-empty and states what the cap would otherwise have cost. At most one per entry, lead-line-scoped. Written only on a grant by the role §check-queue-entry-budget names. **Honest limit:** no gate can tell a granted credit from a self-issued one, which is the inline-direction limit this algebra already states. The grant date and grantor put the claim where a later close reads it.
+
+Add to §Layout and configuration:
+
+> - `QUEUE_KIT_ENTRY_CREDIT_MAX` — default `2150cp`, or `off`: the largest `[cap-credit:]` one entry may carry, in the cap's unit. `off` disables credits, and then any credit tag is red. The default is half the default cap, so a credited entry stays within one and a half caps.
+
+In §check-queue-entry-budget, assertion (A) gains:
+
+> A deferred entry carrying a `[cap-credit:]` is held to the cap plus its credit. The credit is red when it is malformed, when its unit differs from the cap's, when it exceeds `QUEUE_KIT_ENTRY_CREDIT_MAX`, when credits are `off` or the cap is `off`, or when the entry fits the cap without it. That last is a **stale** credit, and the fix is to delete the tag. An active entry's credit is inert, since active entries are uncapped. It is checked again if the entry returns to the deferred section.
+
+The headroom rows print a credited entry's headroom against its credited limit, marked `credit +<n>`.
+
+*Why the cap is not widened for exceptional content* is rewritten:
+
+> *Why the cap is not widened by the session that needs the room.* Assertion A's bound is the amendment-inlining line above, not a length preference, so raising the number for everyone moves the number without moving the line, and the entries that would claim an exception are the likeliest ungoverned amendments. An exception is therefore **granted, never taken**. A `[cap-credit:]` is the conditional cap this paragraph once refused, given the one form in which it does not collapse: the authorization is recorded on the entry, bounded by a knob, and withdrawn automatically when the entry no longer needs it. The declaration discount is not that widening either. It changes what the count includes, never the number. **Monotonic ruling accretion** still takes compression by answering and the self-served relocation first. A credit is for the record whose compression would lose information the reader needs, which is the case a blocked session states when it asks.
+
+The split-authorization paragraph ("Splitting the unit…") gains one sentence: the authorizing session may answer the ask with a split, a credit, or a denial, and the split criterion still decides whether a split fits.
+
+Wiring: the knob row and its grammar check in `native/src/knobs/queue_kit.rs` and its declaration in `native/src/gates/mod.rs`; the credit parse, the credited limit, the stale test and the headroom mark in `native/src/gates/queue_entry_budget.rs`; the class-table row in `native/src/gates/tag_lead_line.rs`; and fixture cases. `bad/` holds a stale credit and an over-max credit. `good/` holds a credited entry over the cap and under its credited limit. `.test.sh` covers credits `off` and a unit mismatch. This repo's queue carries no credit at landing.
+
 ## Producers and consumers
 
 - **The unwrap gate** (delta 1). It is produced on every commit touching the governed set: `tier=precommit`, and the corpus knobs are set by this repo (delta 5), so it is live here. Its consumer is the committing session, which runs the arm the help text prints. The findings' fields (file, line, head) are each read by that session to locate the break. The arm's consumers are that session and a consumer adopting the gate, for whom it is the migration path. The two corpus knobs each have a reader, the gate, and the arm reads its operands only.
 - **The capped-form rule** (delta 1). It has no producer today, which the section says. It is a rule for a future reader and mints no mechanism, so point 1 is met by saying there is no instance.
 - **`QUEUE_KIT_ENTRY_CAP`** (delta 3). It is produced by its default here. Its consumers are assertion A, the headroom print, `entry-history` (through the same walk) and the `queue-index` worklist's size column. Each reads both the unit and the count. The retired name's reader is the knob loader's retired table.
 - **The `cp` row suffix** (delta 4). It is produced by `--update-baseline` and `--ceiling`. Its consumers are the meter (legacy detection), the ratchet (legacy refusal) and the staleness mark, which compares the row's surface figure with the surfaces' size at the iteration-start commit, now both in code points.
+- **`[cap-credit:]` and `QUEUE_KIT_ENTRY_CREDIT_MAX`** (delta 6). The tag's producer is the granting role's decision, written by the session that asked, in the commit that relies on it. This repo's default is on, so the path is live. Its consumers:
+  - Assertion A reads the amount, the unit and the tag's presence, for the limit and the stale test.
+  - The headroom print reads the amount.
+  - A later close or scope, and a human, read the date, grantor and reason when they review a standing credit. That is the only reader of those three fields, and it is the reader that inline direction marks already have.
+  - `check-tag-lead-line` reads the tag's placement.
+  - The knob is read by assertion A alone.
 - **`CONTEXT_KIT_BREVITY_CAP`** (delta 4). It is produced by its default here, since `scripts/context-config.knobs` sets no budget. Its consumer is `check-brevity`.
-- **Point 5, narrowing.** Delta 5's exclusion of gate-test fixtures and of the queue narrows nothing any reader counts on: the unwrap gate is new, and no reader asserts a count, a minimum or coverage over its corpus. Under `off`, assertion A reads nothing, and no other reader depends on it: B to E and `entry-history` measure independently. Re-uniting a measure is not a narrowing. Each cap's red condition is named at its re-calibrated value, and on the measured pool that value admits every entry and bullet the old one admitted (delta 3's four largest entries sit at 3963 to 4211, under `4250cp`, and delta 4's largest pointer-carrying bullet is 327, under `330`).
+- **Point 5, narrowing.** Delta 5's exclusion of gate-test fixtures and of the queue narrows nothing any reader counts on: the unwrap gate is new, and no reader asserts a count, a minimum or coverage over its corpus. Under `off`, assertion A reads nothing, and no other reader depends on it: B to E and `entry-history` measure independently. Re-uniting a measure is not a narrowing. Each cap's red condition is named at its re-calibrated value, and on the measured pool that value admits every entry and bullet the old one admitted (delta 3's largest entry is 4211 with the discount and 4268 without, both under `4300cp`, and delta 4's largest pointer-carrying bullet is 327, under `330`).
 - **Point 6.** Delta 5 obliges every file in the resolved corpus to be clean, and the arm's postcondition is that value for each. The generator members are named with theirs.
 
 ## Existing sections updated
@@ -126,11 +163,13 @@ Rosters from the module reads above, `git grep -n -E "ENTRY_LINE_CAP|BREVITY_BUD
 - `canon-kit/gate-tests/check-md-unwrapped/` (delta 1).
 - `canon-kit/README.md`, its gate roster (delta 1).
 - `canon-kit/smoke/install.sh` (delta 1).
-- `queue-kit/SPEC.md` — §check-queue-wrap and §check-queue-hygiene (deltas 2 and 3); §The queue format's sentence "which also caps the entry's total length", §Layout and configuration, §check-queue-entry-budget, §The queue-index arm and §The tag algebra's `recurrence:` ceiling sentence (delta 3).
-- `native/src/gates/queue_entry_budget.rs` (delta 3).
+- `queue-kit/SPEC.md` — §check-queue-wrap and §check-queue-hygiene (deltas 2 and 3); §The queue format's sentence "which also caps the entry's total length", §Layout and configuration, §check-queue-entry-budget, §The queue-index arm and §The tag algebra's `recurrence:` ceiling sentence (delta 3); §The tag algebra's new `[cap-credit:]` bullet, §Layout and configuration's credit knob, and §check-queue-entry-budget's assertion A, split and *Why the cap is not widened* paragraphs (delta 6).
+- `native/src/gates/queue_entry_budget.rs` (deltas 3 and 6).
+- `native/src/gates/tag_lead_line.rs`, its class-table row, and queue-kit/SPEC.md §check-tag-lead-line's governed set (delta 6).
+- `queue-kit/gate-tests/check-queue-entry-budget.test.sh`, new (deltas 3 and 6).
 - `native/src/emit/entry_history.rs` (delta 3).
 - `native/src/emit/queue_index.rs` (delta 3).
-- `native/src/knobs/queue_kit.rs` — the new row, the grammar check and the retired pair (delta 3).
+- `native/src/knobs/queue_kit.rs` — the new row, the grammar check and the retired pair (delta 3), and the credit-max row (delta 6).
 - `queue-kit/gate-tests/check-queue-entry-budget/` — both fixture knob files set the old name (delta 3).
 - `queue-kit/gate-tests/entry-history.test.sh` (delta 3).
 - `lifecycle-kit/SPEC.md` — §Layout and configuration, the two knob bullets citing "`QUEUE_KIT_ENTRY_LINE_CAP`'s posture" as their calibration precedent (delta 3).
@@ -168,10 +207,10 @@ Rosters from the module reads above, `git grep -n -E "ENTRY_LINE_CAP|BREVITY_BUD
 
 ## Definition of Done
 
-- [ ] **Causal completeness.** Every point of canon-kit/SPEC.md §The causal-completeness check holds for the gate, the arm, both corpus knobs, both caps and the row suffix.
+- [ ] **Causal completeness.** Every point of canon-kit/SPEC.md §The causal-completeness check holds for the gate, the arm, both corpus knobs, both caps, the credit and its knob, and the row suffix.
 - [ ] **Instruction surfaces: instruction only.** `close-brevity.md` gains a unit word, with no grounds.
 - [ ] **Merged with no information lost.** Each re-united passage is re-phrased, not appended to. The rewrite joins lines and deletes no word, and the arm's postcondition test holds that.
-- [ ] **Order held.** Deltas 3 and 4 land before delta 5. This amendment merges before `queue-kit/SPEC-queue-headings.md`.
+- [ ] **Order held.** Deltas 3 and 4 land before delta 5, and delta 6 lands with delta 3 or after it. This amendment merges before `queue-kit/SPEC-queue-headings.md`.
 - [ ] **Amendment deleted.** This file is removed on merge (`ls SPEC-*.md`).
 - [ ] **Entries moved.** `markdown-hard-wrap-unowned-and-ungated` and `entry-line-cap-has-no-line-axis-relief` move to Done in the merge commit, at a stage before the drain stage.
 - [ ] **Removals propagated.** `check-amendment-retired-spelling` runs the block above over the tracked tree.
