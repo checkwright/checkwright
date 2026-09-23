@@ -24,20 +24,6 @@ no `gates.yml` step runs guard-kit's `gate-tests/guard-read-path.test.sh` (its v
 
 **Cost while deferred:** if a Windows read adds CR, guard rules misread there, and no leg shows it. Filed 2026-09-19 by the lead at `adopter-floor-native-rungs`' build; promoted 2026-09-23 at scope. Owner lookup: `guard-read-path`, `_guard_lf`, `Windows leg` — none.
 
-### shellcheck-analyser-version-unpinned-in-ci
-
-[observed-by: gates workflow]
-
-one battery member's verdict is a function of the host, so a green local battery is not evidence of a green CI battery. Attested 2026-08-27: the battery read 106/106 locally and the pushed run went red on `check-shellcheck` alone (SC2120 on `gate-sdk/lib/gate.sh`'s `gate_exe_suffix`), which local shellcheck 0.11.0 does not emit and the runner's stock analyser does. The finding was silenced inline; the class is that this member wraps an external analyser whose rule set changes between releases, while every other member is deterministic given the tree.
-
-**Re-verified at promotion (2026-09-23):** nothing in `.github/workflows/gates.yml` installs or pins shellcheck; the development host runs 0.11.0.
-
-**Scope's ruling on the three shapes:** pin the analyser version in the workflow, installed as a digest-verified release, and state the pinned version as the CI verdict's reference where `check-shellcheck`'s contract is specified. Refused: reporting the version the gate ran (it makes skew legible and leaves it in place), and accepting the float (it concedes the promise this entry defends). Admitted on the enhancement filter's supply-chain arm — a floating third-party tool in CI is the gap — and taken this iteration by operator direction, 2026-09-23, lead-relayed.
-
-**Build (2026-09-23):** the `gates` job installs the upstream `v0.11.0` release asset, refused unless its SHA-256 matches the pinned digest, which equals the release's own recorded asset digest; that is also the latest upstream release and the development host's version. §check-shellcheck states the pinned release as the CI verdict's reference and points at the job for its value rather than spelling it. The entry stays active until that run is read.
-
-**Cost while deferred:** the pre-push battery's promise — that a green local run predicts a green remote one — is false for one member, and the failure mode is a burned push. Filed 2026-08-27 by scope; attested by the `windows-adopter-unblock` close's own verifying push.
-
 ## Deferred
 
 ### side-effect-free-read-arms
@@ -1572,5 +1558,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - guard-worktree-scratch-dirs
 - guard-knob-skew-bricks-shell
 - committed-grant-fallthrough-unexplained
+- shellcheck-analyser-version-unpinned-in-ci
 
 ## Lessons Learned
