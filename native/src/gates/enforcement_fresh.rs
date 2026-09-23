@@ -1,10 +1,8 @@
-// spec: gate-sdk/SPEC.md §check-enforcement-fresh — docs/enforcement.md is the byte-fresh
-// projection of the enforcement-map emitter
+// spec: gate-sdk/SPEC.md §check-enforcement-fresh — the enforcement-map page
+// (GATE_SDK_ENFORCEMENT_FILE) is the byte-fresh projection of the enforcement-map emitter
 use crate::emit;
 use crate::fresh;
 use std::path::Path;
-
-const DEFAULT_PROJECTION: &str = "docs/enforcement.md";
 
 pub fn run(args: &[String]) -> i32 {
     match rule(args) {
@@ -17,7 +15,8 @@ pub fn run(args: &[String]) -> i32 {
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let projection = fresh::positional(args, 0, DEFAULT_PROJECTION);
+    let projection = fresh::positional_or_knob(args, 0, "GATE_SDK_ENFORCEMENT_FILE")?;
+    let projection = projection.as_str();
     let emit_src = args.get(1).map(String::as_str).unwrap_or("");
 
     if !Path::new(projection).is_file() {
@@ -47,7 +46,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
         );
         let left = format!("{}\n", emitted.trim_end_matches('\n'));
         fresh::print_capped_diff(&left, &projection_raw);
-        println!("  help: regenerate — bash gate-sdk/bin/run-gates.sh --emit enforcement-map > docs/enforcement.md");
+        println!(
+            "  help: regenerate — bash gate-sdk/bin/run-gates.sh --emit enforcement-map > {}",
+            projection
+        );
         return Ok(1);
     }
     println!(

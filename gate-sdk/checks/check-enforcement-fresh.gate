@@ -1,4 +1,4 @@
-# graph: couples=docs/enforcement.md,knob:GATE_SDK_GATES_DIR/gates.list,knob:GATE_SDK_GATES_DIR/*.sh,kit:*.sh,knob:DRIFT_KIT_KPIS_FILE,knob:CONTEXT_KIT_SETTINGS_FILE,.github/workflows/*.yml,native/src/diff.rs dir=one valve=none tier=precommit
+# graph: couples=knob:GATE_SDK_ENFORCEMENT_FILE,knob:GATE_SDK_GATES_DIR/gates.list,knob:GATE_SDK_GATES_DIR/*.sh,kit:*.sh,knob:DRIFT_KIT_KPIS_FILE,knob:CONTEXT_KIT_SETTINGS_FILE,.github/workflows/*.yml,native/src/diff.rs dir=one valve=none tier=precommit
 # projection: docs/enforcement.md
 # install: on-surface
-# spec: gate-sdk/SPEC.md §check-enforcement-fresh — docs/enforcement.md is the byte-fresh projection of the enforcement-map emitter, which this member calls in-process rather than spawning
+# spec: gate-sdk/SPEC.md §check-enforcement-fresh — the enforcement-map page (GATE_SDK_ENFORCEMENT_FILE) is the byte-fresh projection of the enforcement-map emitter, which this member calls in-process rather than spawning

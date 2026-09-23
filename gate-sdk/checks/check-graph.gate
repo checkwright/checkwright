@@ -1,4 +1,4 @@
-# graph: couples=knob:GATE_SDK_GATES_DIR/gates.list,knob:GATE_SDK_GATES_DIR/*.sh,kit:*.sh,knob:GATE_SDK_HOOKS_DIR/pre-commit,knob:GATE_SDK_HOOKS_DIR/commit-msg,knob:GATE_SDK_GRAPH_ARTIFACT,knob:GATE_SDK_GRAPH_ARTIFACT,knob:GATE_SDK_GRAPH_THEME_DIR/*,knob:GATE_SDK_GATES_DIR/*-config.knobs,SPEC-*.md,*/SPEC-*.md,kit:templates/SPEC-*.md,knob:GATE_SDK_GRAPH_VOCAB dir=one valve=none tier=precommit
+# graph: couples=knob:GATE_SDK_GATES_DIR/gates.list,knob:GATE_SDK_GATES_DIR/*.sh,kit:*.sh,knob:GATE_SDK_HOOKS_DIR/pre-commit,knob:GATE_SDK_HOOKS_DIR/commit-msg,knob:GATE_SDK_GRAPH_ARTIFACT,knob:GATE_SDK_GRAPH_ARTIFACT,knob:GATE_SDK_GRAPH_THEME_DIR/*,knob:GATE_SDK_GATES_DIR/*-config.knobs,*SPEC-*.md,kit:templates/SPEC-*.md,knob:GATE_SDK_GRAPH_VOCAB dir=one valve=none tier=precommit
 # projection: docs/check-graph.html,scripts/git-hooks/pre-commit,scripts/git-hooks/commit-msg
 # install: zero-config
 # spec: gate-sdk/SPEC.md §check-graph — manifest well-formedness, trigger parity, cycle valves, artifact drift, and amendment-body manifest validation (assertion G); the emitter is native/src/emit/graph.rs, reached in process rather than spawned

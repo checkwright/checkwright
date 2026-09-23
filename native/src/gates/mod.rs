@@ -1589,7 +1589,7 @@ pub const REGISTRY: &[GateEntry] = &[
             (".", "glob:lit:*/SPEC.md", "", ""),
             ("?", "", "", "dynamic@src/emit/footprint.rs:90 via emit::footprint::emit"),
         ],
-        &["CONTEXT_KIT_SURFACES"],
+        &["CONTEXT_KIT_SURFACES", "CONTEXT_KIT_FOOTPRINT_FILE"],
         "context-kit",
         &[("date", ""), ("git", "")],
     ),
@@ -1600,6 +1600,7 @@ pub const REGISTRY: &[GateEntry] = &[
         enforcement_fresh::run,
         &[("?", "", "", "dynamic@src/emit/enforcement_map.rs:336 via emit::enforcement_map::emit")],
         &[
+            "GATE_SDK_ENFORCEMENT_FILE",
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_ENFORCE_SCAN_DIR",
             "GATE_SDK_KIT_DIRS",

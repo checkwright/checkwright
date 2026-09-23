@@ -218,6 +218,8 @@ Config: `EVIDENCE_KIT_RUNNER_DOC` (§Layout and configuration); positional form 
 
 Invariant: no stage entry while the evidence producer is still running. It reads `EVIDENCE_KIT_LOCK_FILE` and is green when the lock is absent or names a dead PID, red when it names a live one — printing the blocking run key, so the operator can tell *wait for that run* from *reclaim a lock whose owner is gone*. A lock that does not parse is exit 2: the claim publishes the record whole (§The producer-liveness lock), so an unparseable lock is corruption and never a free reading.
 
+The descriptor couples only `knob:EVIDENCE_KIT_LOCK_FILE`: set mode's directory is the invoker's argument. A consumer's scratch directory is gitignored, so no commit stages a record for a trigger to see.
+
 This is a new gate rather than a fourth assertion on `check-evidence-manifest`, because that gate's charter is manifest *content* — the close-entry green block, the grammar, the stamp coupling — and liveness is a different class. A separate gate also earns its own fixture pair instead of widening an existing gate's charter.
 
 Argument mode `check-producer-liveness [lock-file]` — named as a gate, since the declaring substrate is not part of the grammar — makes it fixture-capable and is how the entry hook points it at the lock (§lifecycle-kit integration); extra arguments are ignored, so the hook's trailing `<queue> <state>` argv passes through harmlessly.

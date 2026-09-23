@@ -1,4 +1,4 @@
-# graph: couples=*SPEC*.md,*README.md,*CLAUDE.md,docs/*.md,knob:GATE_SDK_GATES_DIR/*.sh,knob:CANON_KIT_MANIFEST_FILES,knob:CANON_KIT_PROSE_SURFACE_GLOBS,knob:CANON_KIT_SPEC_NAME dir=one valve=none tier=precommit
+# graph: couples=*SPEC*.md,*README.md,*CLAUDE.md,knob:GATE_SDK_GATES_DIR/*.sh,knob:CANON_KIT_MANIFEST_FILES,knob:CANON_KIT_PROSE_SURFACE_GLOBS,knob:CANON_KIT_SPEC_NAME dir=one valve=none tier=precommit
 # install: on-surface
 # armed-by: CANON_KIT_INSTALL_TRANSPORTS_CMD
 # spec: canon-kit/SPEC.md §check-install-claim — exactly one governed doc declares the primary install transport, and no scanned install section leads with a different one

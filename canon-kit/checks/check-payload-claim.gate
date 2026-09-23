@@ -1,4 +1,4 @@
-# graph: couples=*SPEC*.md,*README.md,*CLAUDE.md,SECURITY.md,docs/*.md,knob:GATE_SDK_GATES_DIR/*.sh,knob:CANON_KIT_MANIFEST_FILES,knob:CANON_KIT_PROSE_SURFACE_GLOBS,knob:CANON_KIT_SPEC_NAME dir=one valve=none tier=precommit
+# graph: couples=*SPEC*.md,*README.md,*CLAUDE.md,SECURITY.md,knob:GATE_SDK_GATES_DIR/*.sh,knob:CANON_KIT_MANIFEST_FILES,knob:CANON_KIT_PROSE_SURFACE_GLOBS,knob:CANON_KIT_SPEC_NAME dir=one valve=none tier=precommit
 # install: on-surface
 # armed-by: CANON_KIT_PAYLOAD_CLAIMS_CMD
 # spec: canon-kit/SPEC.md §check-payload-claim — exactly one governed doc declares what a gate on the vendored payload discloses, and no scanned governed doc asserts a different disclosure class

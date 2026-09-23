@@ -8,26 +8,6 @@
 
 ## New Features
 
-### doc-path-hardcoded-reads
-
-[spec: SPEC-doc-path-couples.md]
-
-eighteen kit-shipped `couples=` literals across thirteen members name a consumer path the member reads that no knob it declares configures, so each trigger stays frozen to this repo's layout and a vendoring adopter's hook never fires on their real file. Re-measured 2026-09-23 by `git grep -n couples= -- '*/checks/*.gate'`: as filed.
-
-**Deliverable:** per member, a knob the code reads and the registry declares (the literal then converts by gate-sdk/SPEC.md §The # graph: manifest's rule), or an undeclared read declared.
-
-**Specified 2026-09-23:** five dispositions, and only two of them mint a name.
-
-- The four action gates couple their walked extension, `*.yml,*.yaml`.
-- Transcribed repo values beside an existing token come off.
-- Default-valued literals become their knob's token. This reverses canon-kit's uncoupled verdict on `CANON_KIT_DUP_SURFACES`, on the manifest's file-knob conversion.
-- The two hard-coded projections mint `CONTEXT_KIT_FOOTPRINT_FILE` and `GATE_SDK_ENFORCEMENT_FILE`.
-- `check-graph`'s amendment-glob cover is re-spelled `*SPEC-*.md`, and `check-producer-liveness`' argv-supplied `.tmp/*.run` comes off with its ground.
-
-The same literal class in the `# projection:` field is filed to the gap inbox.
-
-**Cost while deferred:** those triggers stay pinned to this layout in every vendored tree. Filed 2026-09-22 to the gap inbox from the doc-path-tokens survey's class 4; promoted at close because each member's module needs reading. **DISTINCT from** **[check-graph-trigger-consumer-path-reach](#check-graph-trigger-consumer-path-reach)** (icebox), whose subject is a `couples=` missing `installer/`, not a frozen consumer literal.
-
 ### canon-spec-prune-bakes-docs
 
 [spec: SPEC-spec-prune.md]
@@ -38,7 +18,7 @@ The same literal class in the `# projection:` field is filed to the gap inbox.
 
 **Specified 2026-09-23:** a stated ground. `docs/*` is where canon-kit's own `--emit docs-mirror` writes, so the prune is the kit excluding its own output, and `**/templates` is already the kit's skeleton convention. The mirror root becomes one constant read by the generator, the prune and the registry. The registry's six literal copies are what made the SPEC's "one place" claim false. The filed knob, `SITE_KIT_SCAN_ROOT`, was the wrong one: it is `check-docs-cname-parity`'s `ls-files` root. A knob or derivation is refused, because a registry prune has no `knob:` source. The relocatable mirror root is filed to the gap inbox.
 
-**Cost while deferred:** no adopter exists pre-launch, so the wrong set is read only on this tree, where it is right. Filed 2026-09-22 to the gap inbox by `consumer-policy-seam`'s spec census; promoted 2026-09-23 at its close. **DISTINCT from** [doc-path-hardcoded-reads](#doc-path-hardcoded-reads), whose members are `.gate` `couples=` literals.
+**Cost while deferred:** no adopter exists pre-launch, so the wrong set is read only on this tree, where it is right. Filed 2026-09-22 to the gap inbox by `consumer-policy-seam`'s spec census; promoted 2026-09-23 at its close. **DISTINCT from** `doc-path-hardcoded-reads`, whose members are `.gate` `couples=` literals.
 
 ### pipe-membership-corpus-omits-test-suites
 
@@ -1637,5 +1617,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - ps1-ascii-unheld-at-commit
 - armed-by-content-emptiness-shape
 - smoke-registry-omission-blind
+- doc-path-hardcoded-reads
 
 ## Lessons Learned

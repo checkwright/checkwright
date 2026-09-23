@@ -110,6 +110,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("GATE_SDK_REGISTRY_DOC", "README.md"),
         Row::scalar("GATE_SDK_RUNNER_DOC", "README.md"),
         Row::scalar("GATE_SDK_ENFORCE_SCAN_DIR", "."),
+        Row::scalar("GATE_SDK_ENFORCEMENT_FILE", "docs/enforcement.md").empty_takes_default(),
         Row::scalar("GATE_SDK_GIT_EMAIL_FILE", ""),
         Row::scalar("GATE_SDK_GIT_REMOTES_FILE", ""),
         Row::scalar("GATE_SDK_GH_HOSTS_FILE", ""),

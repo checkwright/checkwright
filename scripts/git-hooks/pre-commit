@@ -110,7 +110,7 @@ if staged_matches 'gate-sdk/smoke/*.sh' 'canon-kit/smoke/*.sh' 'context-kit/smok
     run_gate check-assertion-strength native/target/release/checkwright-gates check-assertion-strength
 fi
 
-if staged_matches '*scripts/gates.list' '*scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' '*scripts/git-hooks/pre-commit' '*scripts/git-hooks/commit-msg' '*docs/check-graph.html' '*docs/check-graph.html' '*scripts/graph-theme/*' '*scripts/*-config.knobs' 'SPEC-*.md' '*/SPEC-*.md' 'gate-sdk/templates/SPEC-*.md' 'canon-kit/templates/SPEC-*.md' 'context-kit/templates/SPEC-*.md' 'delegation-kit/templates/SPEC-*.md' 'doctrine-kit/templates/SPEC-*.md' 'drift-kit/templates/SPEC-*.md' 'evidence-kit/templates/SPEC-*.md' 'guard-kit/templates/SPEC-*.md' 'lifecycle-kit/templates/SPEC-*.md' 'queue-kit/templates/SPEC-*.md' 'site-kit/templates/SPEC-*.md' '*scripts/graph-vocab.knobs' 'scripts/canon-config.knobs' 'scripts/context-config.knobs' 'scripts/delegation-config.knobs' 'scripts/doctrine-config.knobs' 'scripts/drift-config.knobs' 'scripts/evidence-config.knobs' 'scripts/gate-sdk-config.knobs' 'scripts/guard-config.knobs' 'scripts/lifecycle-config.knobs' 'scripts/queue-config.knobs' 'scripts/site-config.knobs' 'native/src/gates/graph.rs' 'native/src/emit/git_hooks.rs' 'native/src/install.rs' 'native/src/emit/graph.rs' 'native/src/graph_vocab.rs'; then
+if staged_matches '*scripts/gates.list' '*scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' '*scripts/git-hooks/pre-commit' '*scripts/git-hooks/commit-msg' '*docs/check-graph.html' '*docs/check-graph.html' '*scripts/graph-theme/*' '*scripts/*-config.knobs' '*SPEC-*.md' 'gate-sdk/templates/SPEC-*.md' 'canon-kit/templates/SPEC-*.md' 'context-kit/templates/SPEC-*.md' 'delegation-kit/templates/SPEC-*.md' 'doctrine-kit/templates/SPEC-*.md' 'drift-kit/templates/SPEC-*.md' 'evidence-kit/templates/SPEC-*.md' 'guard-kit/templates/SPEC-*.md' 'lifecycle-kit/templates/SPEC-*.md' 'queue-kit/templates/SPEC-*.md' 'site-kit/templates/SPEC-*.md' '*scripts/graph-vocab.knobs' 'scripts/canon-config.knobs' 'scripts/context-config.knobs' 'scripts/delegation-config.knobs' 'scripts/doctrine-config.knobs' 'scripts/drift-config.knobs' 'scripts/evidence-config.knobs' 'scripts/gate-sdk-config.knobs' 'scripts/guard-config.knobs' 'scripts/lifecycle-config.knobs' 'scripts/queue-config.knobs' 'scripts/site-config.knobs' 'native/src/gates/graph.rs' 'native/src/emit/git_hooks.rs' 'native/src/install.rs' 'native/src/emit/graph.rs' 'native/src/graph_vocab.rs'; then
     run_gate check-graph native/target/release/checkwright-gates check-graph
 fi
 
@@ -170,7 +170,7 @@ if staged_matches 'docs/install-evidence.md' 'scripts/gates.list' 'native/src/di
     run_gate check-install-evidence-fresh native/target/release/checkwright-gates check-install-evidence-fresh
 fi
 
-if staged_matches 'docs/footprint.md' 'CLAUDE.md' '*/SPEC.md' 'gate-sdk/templates/*.md' 'canon-kit/templates/*.md' 'context-kit/templates/*.md' 'delegation-kit/templates/*.md' 'doctrine-kit/templates/*.md' 'drift-kit/templates/*.md' 'evidence-kit/templates/*.md' 'guard-kit/templates/*.md' 'lifecycle-kit/templates/*.md' 'queue-kit/templates/*.md' 'site-kit/templates/*.md' 'lifecycle-kit/templates/stages/*.md' 'native/src/diff.rs' 'scripts/context-config.knobs' 'native/src/gates/footprint_fresh.rs' 'native/src/fresh.rs' 'native/src/emit/footprint.rs' 'native/src/section.rs'; then
+if staged_matches '*docs/footprint.md' '*CLAUDE.md' '*/SPEC.md' 'gate-sdk/templates/*.md' 'canon-kit/templates/*.md' 'context-kit/templates/*.md' 'delegation-kit/templates/*.md' 'doctrine-kit/templates/*.md' 'drift-kit/templates/*.md' 'evidence-kit/templates/*.md' 'guard-kit/templates/*.md' 'lifecycle-kit/templates/*.md' 'queue-kit/templates/*.md' 'site-kit/templates/*.md' 'lifecycle-kit/templates/stages/*.md' 'native/src/diff.rs' 'scripts/context-config.knobs' 'native/src/gates/footprint_fresh.rs' 'native/src/fresh.rs' 'native/src/emit/footprint.rs' 'native/src/section.rs'; then
     run_gate check-footprint-fresh native/target/release/checkwright-gates check-footprint-fresh
 fi
 
@@ -178,7 +178,7 @@ if staged_matches 'docs/*/SPEC.md' 'docs/*/README.md' 'docs/doctrine-kit/DOCTRIN
     run_gate check-docs-mirror-fresh native/target/release/checkwright-gates check-docs-mirror-fresh
 fi
 
-if staged_matches 'docs/enforcement.md' '*scripts/gates.list' '*scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' '*scripts/kpis.list' '*.claude/settings.json' '.github/workflows/*.yml' 'native/src/diff.rs' 'scripts/canon-config.knobs' 'scripts/context-config.knobs' 'scripts/drift-config.knobs' 'scripts/evidence-config.knobs' 'scripts/gate-sdk-config.knobs' 'scripts/lifecycle-config.knobs' 'native/src/gates/enforcement_fresh.rs' 'native/src/fresh.rs' 'native/src/emit/enforcement_map.rs' 'native/src/programs.rs' 'native/src/emit/kpi/mod.rs'; then
+if staged_matches '*docs/enforcement.md' '*scripts/gates.list' '*scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' '*scripts/kpis.list' '*.claude/settings.json' '.github/workflows/*.yml' 'native/src/diff.rs' 'scripts/canon-config.knobs' 'scripts/context-config.knobs' 'scripts/drift-config.knobs' 'scripts/evidence-config.knobs' 'scripts/gate-sdk-config.knobs' 'scripts/lifecycle-config.knobs' 'native/src/gates/enforcement_fresh.rs' 'native/src/fresh.rs' 'native/src/emit/enforcement_map.rs' 'native/src/programs.rs' 'native/src/emit/kpi/mod.rs'; then
     run_gate check-enforcement-fresh native/target/release/checkwright-gates check-enforcement-fresh
 fi
 
@@ -210,19 +210,19 @@ if staged_matches '*.workflow/*' '.gitignore' 'scripts/gate-sdk-config.knobs' 'n
     run_gate check-workflow-tiering native/target/release/checkwright-gates check-workflow-tiering
 fi
 
-if staged_matches '.github/workflows/*.yml' '.github/workflows/*.yaml' '.github/ISSUE_TEMPLATE/*.yml' 'docs/_config.yml' 'gate-sdk/templates/*.yml' 'canon-kit/templates/*.yml' 'context-kit/templates/*.yml' 'delegation-kit/templates/*.yml' 'doctrine-kit/templates/*.yml' 'drift-kit/templates/*.yml' 'evidence-kit/templates/*.yml' 'guard-kit/templates/*.yml' 'lifecycle-kit/templates/*.yml' 'queue-kit/templates/*.yml' 'site-kit/templates/*.yml' 'gate-sdk/templates/*.yaml' 'canon-kit/templates/*.yaml' 'context-kit/templates/*.yaml' 'delegation-kit/templates/*.yaml' 'doctrine-kit/templates/*.yaml' 'drift-kit/templates/*.yaml' 'evidence-kit/templates/*.yaml' 'guard-kit/templates/*.yaml' 'lifecycle-kit/templates/*.yaml' 'queue-kit/templates/*.yaml' 'site-kit/templates/*.yaml' 'scripts/gate-sdk-config.knobs' 'native/src/gates/action_pinning.rs'; then
+if staged_matches '*.yml' '*.yaml' 'scripts/gate-sdk-config.knobs' 'native/src/gates/action_pinning.rs'; then
     run_gate check-action-pinning native/target/release/checkwright-gates check-action-pinning
 fi
 
-if staged_matches '.github/workflows/*.yml' '.github/workflows/*.yaml' '.github/ISSUE_TEMPLATE/*.yml' 'docs/_config.yml' 'gate-sdk/templates/*.yml' 'canon-kit/templates/*.yml' 'context-kit/templates/*.yml' 'delegation-kit/templates/*.yml' 'doctrine-kit/templates/*.yml' 'drift-kit/templates/*.yml' 'evidence-kit/templates/*.yml' 'guard-kit/templates/*.yml' 'lifecycle-kit/templates/*.yml' 'queue-kit/templates/*.yml' 'site-kit/templates/*.yml' 'gate-sdk/templates/*.yaml' 'canon-kit/templates/*.yaml' 'context-kit/templates/*.yaml' 'delegation-kit/templates/*.yaml' 'doctrine-kit/templates/*.yaml' 'drift-kit/templates/*.yaml' 'evidence-kit/templates/*.yaml' 'guard-kit/templates/*.yaml' 'lifecycle-kit/templates/*.yaml' 'queue-kit/templates/*.yaml' 'site-kit/templates/*.yaml' 'scripts/gate-sdk-config.knobs' 'native/src/gates/action_run_shell.rs' 'native/src/programs.rs'; then
+if staged_matches '*.yml' '*.yaml' 'scripts/gate-sdk-config.knobs' 'native/src/gates/action_run_shell.rs' 'native/src/programs.rs'; then
     run_gate check-action-run-shell native/target/release/checkwright-gates check-action-run-shell
 fi
 
-if staged_matches '.github/workflows/*.yml' '.github/workflows/*.yaml' '.github/ISSUE_TEMPLATE/*.yml' 'docs/_config.yml' 'gate-sdk/templates/*.yml' 'canon-kit/templates/*.yml' 'context-kit/templates/*.yml' 'delegation-kit/templates/*.yml' 'doctrine-kit/templates/*.yml' 'drift-kit/templates/*.yml' 'evidence-kit/templates/*.yml' 'guard-kit/templates/*.yml' 'lifecycle-kit/templates/*.yml' 'queue-kit/templates/*.yml' 'site-kit/templates/*.yml' 'gate-sdk/templates/*.yaml' 'canon-kit/templates/*.yaml' 'context-kit/templates/*.yaml' 'delegation-kit/templates/*.yaml' 'doctrine-kit/templates/*.yaml' 'drift-kit/templates/*.yaml' 'evidence-kit/templates/*.yaml' 'guard-kit/templates/*.yaml' 'lifecycle-kit/templates/*.yaml' 'queue-kit/templates/*.yaml' 'site-kit/templates/*.yaml' 'scripts/gate-sdk-config.knobs' 'native/src/gates/action_gh_repo.rs' 'native/src/actions.rs'; then
+if staged_matches '*.yml' '*.yaml' 'scripts/gate-sdk-config.knobs' 'native/src/gates/action_gh_repo.rs' 'native/src/actions.rs'; then
     run_gate check-action-gh-repo native/target/release/checkwright-gates check-action-gh-repo
 fi
 
-if staged_matches '.github/workflows/*.yml' '.github/workflows/*.yaml' '.github/ISSUE_TEMPLATE/*.yml' 'docs/_config.yml' 'gate-sdk/templates/*.yml' 'canon-kit/templates/*.yml' 'context-kit/templates/*.yml' 'delegation-kit/templates/*.yml' 'doctrine-kit/templates/*.yml' 'drift-kit/templates/*.yml' 'evidence-kit/templates/*.yml' 'guard-kit/templates/*.yml' 'lifecycle-kit/templates/*.yml' 'queue-kit/templates/*.yml' 'site-kit/templates/*.yml' 'gate-sdk/templates/*.yaml' 'canon-kit/templates/*.yaml' 'context-kit/templates/*.yaml' 'delegation-kit/templates/*.yaml' 'doctrine-kit/templates/*.yaml' 'drift-kit/templates/*.yaml' 'evidence-kit/templates/*.yaml' 'guard-kit/templates/*.yaml' 'lifecycle-kit/templates/*.yaml' 'queue-kit/templates/*.yaml' 'site-kit/templates/*.yaml' 'scripts/gate-sdk-config.knobs' 'native/src/gates/action_permissions.rs' 'native/src/actions.rs'; then
+if staged_matches '*.yml' '*.yaml' 'scripts/gate-sdk-config.knobs' 'native/src/gates/action_permissions.rs' 'native/src/actions.rs'; then
     run_gate check-action-permissions native/target/release/checkwright-gates check-action-permissions
 fi
 
@@ -266,7 +266,7 @@ if staged_matches '.gitattributes' 'native/src/knobs/lifecycle_kit.rs' 'scripts/
     run_gate check-merge-attrs native/target/release/checkwright-gates check-merge-attrs
 fi
 
-if staged_matches '*.workflow/*' 'gate-sdk/SPEC.md' 'canon-kit/SPEC.md' 'context-kit/SPEC.md' 'delegation-kit/SPEC.md' 'doctrine-kit/SPEC.md' 'drift-kit/SPEC.md' 'evidence-kit/SPEC.md' 'guard-kit/SPEC.md' 'lifecycle-kit/SPEC.md' 'queue-kit/SPEC.md' 'site-kit/SPEC.md' '.claude/commands/*.md' '.gitignore' 'scripts/gate-sdk-config.knobs' 'scripts/lifecycle-config.knobs' 'native/src/gates/close_surfaces.rs' 'native/src/emit/close_surfaces.rs' 'native/src/programs.rs' 'native/src/stages.rs'; then
+if staged_matches '*.workflow/*' 'gate-sdk/SPEC.md' 'canon-kit/SPEC.md' 'context-kit/SPEC.md' 'delegation-kit/SPEC.md' 'doctrine-kit/SPEC.md' 'drift-kit/SPEC.md' 'evidence-kit/SPEC.md' 'guard-kit/SPEC.md' 'lifecycle-kit/SPEC.md' 'queue-kit/SPEC.md' 'site-kit/SPEC.md' '*/SPEC.md' '*CLAUDE.md' '*doctrine-kit/DOCTRINE.md' '*.claude/commands/*.md' '*TRAJECTORY.md' '.gitignore' 'scripts/gate-sdk-config.knobs' 'scripts/lifecycle-config.knobs' 'native/src/gates/close_surfaces.rs' 'native/src/emit/close_surfaces.rs' 'native/src/programs.rs' 'native/src/stages.rs'; then
     run_gate check-close-surfaces native/target/release/checkwright-gates check-close-surfaces
 fi
 
@@ -278,7 +278,7 @@ if staged_matches '*.workflow/audit-roster.txt' '*TASK-QUEUE.md' '*.workflow/WOR
     run_gate check-audit-roster native/target/release/checkwright-gates check-audit-roster
 fi
 
-if staged_matches 'TASK-QUEUE.md' '*/SPEC.md' 'native/src/knobs/lifecycle_kit.rs' '*TASK-QUEUE.md' '*/SPEC.md' 'scripts/gate-sdk-config.knobs' 'scripts/lifecycle-config.knobs' 'native/src/gates/scratch_citation.rs' 'native/src/spec.rs' 'native/src/stages.rs'; then
+if staged_matches 'native/src/knobs/lifecycle_kit.rs' '*TASK-QUEUE.md' '*/SPEC.md' 'scripts/gate-sdk-config.knobs' 'scripts/lifecycle-config.knobs' 'native/src/gates/scratch_citation.rs' 'native/src/spec.rs' 'native/src/stages.rs'; then
     run_gate check-scratch-citation native/target/release/checkwright-gates check-scratch-citation
 fi
 
@@ -386,11 +386,11 @@ if staged_matches 'docs/install.md' 'native/targets.list' 'installer/bin/checkwr
     run_gate check-install-platforms native/target/release/checkwright-gates check-install-platforms
 fi
 
-if staged_matches '*SPEC*.md' '*README.md' '*CLAUDE.md' 'docs/*.md' '*scripts/*.sh' '*CLAUDE.md' '*README.md' '*CONTRIBUTING.md' '*CODE_OF_CONDUCT.md' '*SECURITY.md' '*RELEASING.md' '*ROADMAP.md' '*TRAJECTORY.md' '*/SPEC.md' '*/README.md' '*reserve/*/README.md' '*doctrine-kit/DOCTRINE.md' '*docs/*.md' '*docs/*/index.md' '*docs/posts/*.md' '*/templates/*.md' '*.claude/agents/*.md' '*SPEC.md' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/install_claim.rs' 'native/src/spec.rs'; then
+if staged_matches '*SPEC*.md' '*README.md' '*CLAUDE.md' '*scripts/*.sh' '*CLAUDE.md' '*README.md' '*CONTRIBUTING.md' '*CODE_OF_CONDUCT.md' '*SECURITY.md' '*RELEASING.md' '*ROADMAP.md' '*TRAJECTORY.md' '*/SPEC.md' '*/README.md' '*reserve/*/README.md' '*doctrine-kit/DOCTRINE.md' '*docs/*.md' '*docs/*/index.md' '*docs/posts/*.md' '*/templates/*.md' '*.claude/agents/*.md' '*SPEC.md' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/install_claim.rs' 'native/src/spec.rs'; then
     run_gate check-install-claim native/target/release/checkwright-gates check-install-claim
 fi
 
-if staged_matches '*SPEC*.md' '*README.md' '*CLAUDE.md' 'SECURITY.md' 'docs/*.md' '*scripts/*.sh' '*CLAUDE.md' '*README.md' '*CONTRIBUTING.md' '*CODE_OF_CONDUCT.md' '*SECURITY.md' '*RELEASING.md' '*ROADMAP.md' '*TRAJECTORY.md' '*/SPEC.md' '*/README.md' '*reserve/*/README.md' '*doctrine-kit/DOCTRINE.md' '*docs/*.md' '*docs/*/index.md' '*docs/posts/*.md' '*/templates/*.md' '*.claude/agents/*.md' '*SPEC.md' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/payload_claim.rs' 'native/src/spec.rs' 'native/src/ere.rs'; then
+if staged_matches '*SPEC*.md' '*README.md' '*CLAUDE.md' 'SECURITY.md' '*scripts/*.sh' '*CLAUDE.md' '*README.md' '*CONTRIBUTING.md' '*CODE_OF_CONDUCT.md' '*SECURITY.md' '*RELEASING.md' '*ROADMAP.md' '*TRAJECTORY.md' '*/SPEC.md' '*/README.md' '*reserve/*/README.md' '*doctrine-kit/DOCTRINE.md' '*docs/*.md' '*docs/*/index.md' '*docs/posts/*.md' '*/templates/*.md' '*.claude/agents/*.md' '*SPEC.md' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/payload_claim.rs' 'native/src/spec.rs' 'native/src/ere.rs'; then
     run_gate check-payload-claim native/target/release/checkwright-gates check-payload-claim
 fi
 
@@ -450,7 +450,7 @@ if staged_matches '*SPEC*.md' '*README.md' '*CLAUDE.md' '*scripts/*.sh' 'gate-sd
     run_gate check-prose-enum native/target/release/checkwright-gates check-prose-enum
 fi
 
-if staged_matches 'docs/*.md' '*docs/*.md' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/prose_tells.rs' 'native/src/ere.rs' 'native/src/spec.rs'; then
+if staged_matches '*docs/*.md' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/prose_tells.rs' 'native/src/ere.rs' 'native/src/spec.rs'; then
     run_gate check-prose-tells native/target/release/checkwright-gates check-prose-tells
 fi
 
@@ -506,7 +506,7 @@ if staged_matches '*CLAUDE.md' 'scripts/context-config.knobs' 'native/src/gates/
     run_gate check-brevity native/target/release/checkwright-gates check-brevity
 fi
 
-if staged_matches '*.workflow/surface-ceiling.txt' 'CLAUDE.md' 'gate-sdk/templates/*.md' 'canon-kit/templates/*.md' 'context-kit/templates/*.md' 'delegation-kit/templates/*.md' 'doctrine-kit/templates/*.md' 'drift-kit/templates/*.md' 'evidence-kit/templates/*.md' 'guard-kit/templates/*.md' 'lifecycle-kit/templates/*.md' 'queue-kit/templates/*.md' 'site-kit/templates/*.md' 'lifecycle-kit/templates/stages/*.md' '.claude/agents/*.md' '.claude/commands/*.md' '*/templates/*.md' '*.claude/agents/*.md' '*.claude/commands/*.md' '*:(exclude)*/gate-tests/*' '*docs/*.md' '*:(exclude)docs/*/SPEC.md' '*:(exclude)docs/*/README.md' '*:(exclude)docs/doctrine-kit/DOCTRINE.md' '*:(exclude)docs/evidence-data.md' '*:(exclude)docs/enforcement.md' '*:(exclude)docs/footprint.md' '*:(exclude)docs/install-evidence.md' 'scripts/context-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/surface_ratchet.rs' 'native/src/emit/always_loaded.rs' 'native/src/programs.rs' 'native/src/section.rs' 'native/src/stages.rs'; then
+if staged_matches '*.workflow/surface-ceiling.txt' '*CLAUDE.md' 'gate-sdk/templates/*.md' 'canon-kit/templates/*.md' 'context-kit/templates/*.md' 'delegation-kit/templates/*.md' 'doctrine-kit/templates/*.md' 'drift-kit/templates/*.md' 'evidence-kit/templates/*.md' 'guard-kit/templates/*.md' 'lifecycle-kit/templates/*.md' 'queue-kit/templates/*.md' 'site-kit/templates/*.md' 'lifecycle-kit/templates/stages/*.md' '*/templates/*.md' '*.claude/agents/*.md' '*.claude/commands/*.md' '*:(exclude)*/gate-tests/*' '*docs/*.md' '*:(exclude)docs/*/SPEC.md' '*:(exclude)docs/*/README.md' '*:(exclude)docs/doctrine-kit/DOCTRINE.md' '*:(exclude)docs/evidence-data.md' '*:(exclude)docs/enforcement.md' '*:(exclude)docs/footprint.md' '*:(exclude)docs/install-evidence.md' 'scripts/context-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/surface_ratchet.rs' 'native/src/emit/always_loaded.rs' 'native/src/programs.rs' 'native/src/section.rs' 'native/src/stages.rs'; then
     run_gate check-surface-ratchet native/target/release/checkwright-gates check-surface-ratchet
 fi
 

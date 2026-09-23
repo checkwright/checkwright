@@ -111,6 +111,13 @@ pub fn positional<'a>(args: &'a [String], n: usize, default: &'a str) -> &'a str
         .unwrap_or(default)
 }
 
+pub fn positional_or_knob(args: &[String], n: usize, knob: &str) -> Result<String, String> {
+    match args.get(n).filter(|a| !a.is_empty()) {
+        Some(a) => Ok(a.clone()),
+        None => crate::walk::knob_scalar(knob),
+    }
+}
+
 // spec: gate-sdk/SPEC.md §The consumer remainder cohort — bash's `${ROOT%/}`
 pub fn strip_trailing_slash(s: &str) -> &str {
     s.strip_suffix('/').unwrap_or(s)

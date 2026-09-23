@@ -69,6 +69,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("CONTEXT_KIT_BREVITY_CAP", "330"),
         Row::scalar("CONTEXT_KIT_BREVITY_POINTER_RE", "§"),
         Row::indexed("CONTEXT_KIT_SURFACES", &["CLAUDE.md"]),
+        Row::scalar("CONTEXT_KIT_FOOTPRINT_FILE", "docs/footprint.md").empty_takes_default(),
         Row::indexed("CONTEXT_KIT_GROWTH_PATHS", &["*.md"]),
         Row::derived("CONTEXT_KIT_BASELINE_FILE", Shape::Scalar, baseline_file, &["GATE_SDK_WORKFLOW_DIR"]),
         Row::derived("CONTEXT_KIT_STATE_FILE", Shape::Scalar, state_file, &["GATE_SDK_WORKFLOW_DIR"]),
