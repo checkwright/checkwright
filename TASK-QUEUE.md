@@ -8,18 +8,6 @@
 
 ## New Features
 
-### stage-exit-no-successor-check
-
-[spec: SPEC-successor-read.md]
-
-every stage template's last step is only the journal's `DONE` append (lifecycle-kit/templates/stages/*.md). So a refusal of the successor's entry surfaces only at the lead's `--enter-stage --dispatch <next>` read, and with no lead it does not surface at all. lifecycle-kit/templates/lead.md already calls that read the backstop and names "the stage template's own last step" as the repair; that sentence is true only of the journal refusal it names. Attested at gate-sdk-blind-spots: align reported done over a malformed cannot-run marker that `--enter-stage --simulate build` refuses.
-
-**Deliverable:** a last step `--enter-stage --simulate <successor>` in each stage template whose successor is known, a stated answer for a trigger-gated successor, and the lead.md sentence made true.
-
-**Specified 2026-09-23:** each stage template reads its successor's entry with `--simulate` after its last commit and before the `DONE` append. The trigger-gated successor is the one the session recommended. A build batch that leaves work active reads none. The lead sentence names the successor read and the journal together.
-
-**Cost while deferred:** a successor-entry refusal costs a resumed session instead of being caught before the report. Filed 2026-09-23 to the gap inbox by the lead; promoted at the close drain because the fix adds a step to six shipped templates. Owner lookup: lifecycle-kit/SPEC.md §templates/stages/, which says nothing about a successor read.
-
 ### lead-capture-dirties-batch
 
 [spec: SPEC-lead-capture.md]
@@ -1642,5 +1630,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - policy-choice-census-residue
 - repo-inherits-policy-defaults
 - cannot-run-marker-late-read
+- stage-exit-no-successor-check
 
 ## Lessons Learned

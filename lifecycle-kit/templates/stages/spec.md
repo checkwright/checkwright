@@ -32,4 +32,6 @@ Because this is a **fresh session** — a fresh prompt cache, on the tier the le
 
 Close by **recommending the next stage**: the trigger-gated audit stage when one of its triggers fired this session (an amendment changing ≥2 components' contracts is one — `check-stage-entry` will demand the audit stamp at the next stage's entry), otherwise the build stage. A `spec` that authored a cross-component amendment should say so rather than let the downstream entry discover it.
 
+**Then read your successor's entry.** After your last commit, run `--enter-stage --simulate <stage>` — the lifecycle arm your first step ran — for the stage you recommended. It runs that stage's entry checks against the tree you leave and writes nothing (lifecycle-kit/SPEC.md §bin/enter-stage.sh). An exit of 1 relays a refusal: fix one your own work caused and run the read again, and carry any other into your report verbatim.
+
 **Last step — the resume journal.** This stage's exit artifact is the resume journal the `--enter-stage` arm named at the stamp; its path is a derivation (lifecycle-kit/SPEC.md §The state machine) and its contract is delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps. Append `DONE` as the file's last line before you report.
