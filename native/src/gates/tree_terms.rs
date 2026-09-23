@@ -2,7 +2,7 @@
 // tracked-files half of the leak guard; the pattern files and their templates are self-exempt)
 use crate::ere::Ere;
 use crate::fresh;
-use crate::gates::commit_msg::{is_pattern, resolve_files};
+use crate::gates::commit_msg::resolve_files;
 use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
@@ -75,7 +75,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
         patterns.extend(
             fresh::file_lines(&text)
                 .into_iter()
-                .filter(|l| is_pattern(l))
+                .filter(|l| fresh::live_line(l))
                 .map(String::from),
         );
     }
@@ -194,7 +194,7 @@ mod tests {
             .expect("the fixture case has no patterns.list");
         fresh::file_lines(&text)
             .into_iter()
-            .filter(|l| is_pattern(l))
+            .filter(|l| fresh::live_line(l))
             .map(|p| Ere::compile(p).expect("a fixture pattern failed to compile"))
             .collect()
     }

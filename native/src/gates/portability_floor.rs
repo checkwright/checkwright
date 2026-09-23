@@ -2,7 +2,6 @@
 // corpus uses a banned non-portable construct without a declared valve
 use crate::ere::Ere;
 use crate::fresh;
-use crate::gates::commit_msg::is_pattern;
 use crate::{proc, programs};
 use crate::walk;
 
@@ -68,7 +67,7 @@ fn resolve_patterns(files: &[String]) -> Result<(Vec<String>, usize), String> {
         patterns.extend(
             fresh::file_lines(&text)
                 .into_iter()
-                .filter(|l| is_pattern(l))
+                .filter(|l| fresh::live_line(l))
                 .map(String::from),
         );
     }

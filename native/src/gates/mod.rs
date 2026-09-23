@@ -1943,7 +1943,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-install-disposition",
         install_disposition::run,
-        &[("?", "", "", "dynamic@src/gates/install_disposition.rs:179")],
+        &[("?", "", "", "dynamic@src/gates/install_disposition.rs:190")],
         &["GATE_SDK_KIT_DIRS"],
         "gate-sdk",
         &[("git", "")],

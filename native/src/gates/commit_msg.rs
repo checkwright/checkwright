@@ -5,15 +5,6 @@ use crate::fresh;
 use crate::walk;
 use std::path::Path;
 
-// spec: gate-sdk/SPEC.md §check-commit-msg — `grep -hEv '^[[:space:]]*(#|$)'`: a pattern line is
-// one that is neither all-whitespace nor whitespace-then-`#`
-// spec: gate-sdk/SPEC.md §check-tree-terms — `pub(super)` so the tracked-files half reads this
-// resolution rather than a second copy of it
-pub(super) fn is_pattern(line: &str) -> bool {
-    let rest = line.trim_start_matches([' ', '\t']);
-    !rest.is_empty() && !rest.starts_with('#')
-}
-
 // spec: gate-sdk/SPEC.md §check-commit-msg — one helper both commit-msg-tier gates print, so the
 // remedy cannot drift apart between two refusals that fire at the same moment
 pub(super) const REISSUE_REMEDY: [&str; 3] = [
@@ -95,7 +86,7 @@ pub fn run(args: &[String]) -> i32 {
         patterns.extend(
             fresh::file_lines(&text)
                 .into_iter()
-                .filter(|l| is_pattern(l))
+                .filter(|l| fresh::live_line(l))
                 .map(String::from),
         );
     }
@@ -154,18 +145,6 @@ pub fn run(args: &[String]) -> i32 {
 mod tests {
     use super::*;
 
-    // spec: gate-sdk/SPEC.md §check-commit-msg — the pattern-file filter drops comments and
-    // blanks with leading whitespace allowed before either
-    #[test]
-    fn a_pattern_line_is_neither_blank_nor_a_comment() {
-        assert!(is_pattern("claude\\.ai/"));
-        assert!(is_pattern("  ^Key: .*"));
-        assert!(!is_pattern(""));
-        assert!(!is_pattern("   \t "));
-        assert!(!is_pattern("# a comment"));
-        assert!(!is_pattern("\t  # an indented comment"));
-    }
-
     // spec: gate-sdk/SPEC.md §check-commit-msg — the remedy names re-issuing and refuses the
     // amend, which is the reflex a message-shaped refusal invites
     #[test]
@@ -187,7 +166,7 @@ mod tests {
             .unwrap_or_else(|e| panic!("cannot read {}: {}", tpl.display(), e));
         let res: Vec<Ere> = text
             .lines()
-            .filter(|l| is_pattern(l))
+            .filter(|l| fresh::live_line(l))
             .map(|p| Ere::compile(p).expect("a shipped pattern failed to compile"))
             .collect();
         let hit = |s: &str| res.iter().any(|r| r.is_match(s));

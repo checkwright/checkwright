@@ -15,7 +15,7 @@ const DECL: &str = "# install:";
 
 // spec: gate-sdk/SPEC.md §check-install-disposition — assertion D: a second line, a knob no static
 // kit declares, or one another kit declares is a finding, so a misspelled arming knob is red rather
-// than a doctor line that can never fire
+// than a doctor line that can never fire; the content form holds each of its knobs to the same rule
 fn armed_by_finding(kit: &str, values: &[String]) -> Option<String> {
     let [value] = values else {
         return (values.len() > 1).then(|| {
@@ -26,15 +26,26 @@ fn armed_by_finding(kit: &str, values: &[String]) -> Option<String> {
             )
         });
     };
-    match crate::knobs::static_owner(value) {
+    match crate::registry::arming_form(value) {
+        crate::registry::Arming::Knob(knob) => knob_finding(kit, knob),
+        crate::registry::Arming::Content(knobs) if knobs.is_empty() => Some(format!(
+            "armed-by '{}' names no knob after it",
+            crate::registry::ARMED_BY_CONTENT
+        )),
+        crate::registry::Arming::Content(knobs) => knobs.into_iter().find_map(|k| knob_finding(kit, k)),
+    }
+}
+
+fn knob_finding(kit: &str, knob: &str) -> Option<String> {
+    match crate::knobs::static_owner(knob) {
         Some(k) if k.root == kit => None,
         Some(k) => Some(format!(
             "armed-by names {}, a {} knob — a gate is armed by a knob of its own kit",
-            value, k.root
+            knob, k.root
         )),
         None => Some(format!(
             "armed-by names '{}', which no static kit declares",
-            if value.is_empty() { "<empty>" } else { value.as_str() }
+            if knob.is_empty() { "<empty>" } else { knob }
         )),
     }
 }
@@ -291,11 +302,12 @@ pub fn run(args: &[String]) -> i32 {
         );
         println!("        '# graph:' directive; register each zero-config gate in its kit's");
         println!(
-            "        smoke/install.sh; give at most one '{} <KNOB>' line, naming a",
-            crate::registry::ARMED_BY
+            "        smoke/install.sh; give at most one '{} [{}] <KNOB>…' line, naming",
+            crate::registry::ARMED_BY,
+            crate::registry::ARMED_BY_CONTENT
         );
         println!(
-            "        declared knob of the gate's own kit; and keep {} free of literal",
+            "        declared knobs of the gate's own kit; and keep {} free of literal",
             RECIPE
         );
         println!("        gate names — it derives the roster (gate-sdk/SPEC.md §The install disposition).");
@@ -351,6 +363,22 @@ mod tests {
         assert!(armed_by_finding("gate-sdk", &one("")).unwrap().contains("<empty>"));
         let two = one("GATE_SDK_PORTABILITY_PATHS").into_iter().chain(one("GATE_SDK_KIT_DIRS")).collect::<Vec<_>>();
         assert!(armed_by_finding("gate-sdk", &two).unwrap().starts_with("2 '# armed-by:' lines"));
+    }
+
+    // spec: gate-sdk/SPEC.md §check-install-disposition — the content form passes over its own
+    // kit's knobs and reds a bare `content`, a foreign knob and an undeclared one in its list
+    #[test]
+    fn a_content_declaration_names_one_or_more_declared_knobs_of_its_own_kit() {
+        let one = |v: &str| vec![v.to_string()];
+        let own = "content GATE_SDK_MSG_PATTERN_FILES GATE_SDK_MSG_PATTERN_FILES_LOCAL";
+        assert_eq!(armed_by_finding("gate-sdk", &one(own)), None);
+        assert!(armed_by_finding("gate-sdk", &one("content")).unwrap().contains("names no knob"));
+        assert!(armed_by_finding("gate-sdk", &one("content GATE_SDK_MSG_PATTERN_FILES SITE_KIT_CNAME"))
+            .unwrap()
+            .contains("a site-kit knob"));
+        assert!(armed_by_finding("gate-sdk", &one("content PROBE_KIT_ARMING"))
+            .unwrap()
+            .contains("no static kit declares"));
     }
 
     // spec: gate-sdk/SPEC.md §check-install-disposition — a `§`-prefixed occurrence is a

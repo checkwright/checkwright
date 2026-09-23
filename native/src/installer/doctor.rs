@@ -142,11 +142,11 @@ fn omitted_block(out: &mut String, list_text: &str) {
     }
 }
 
-// spec: installer/SPEC.md §doctor — the disarmed line: a registry member whose declaration names an
-// arming knob that resolves empty. A member that does not resolve, declares no single knob, or whose
-// knob refuses renders nothing, because the battery reports each at its own run.
+// spec: installer/SPEC.md §doctor — the disarmed line, bare or content form; whatever refuses to
+// resolve or read renders nothing, since the battery reports it at its own run
 fn disarmed_block(
     out: &mut String,
+    root: &std::path::Path,
     list_text: &str,
     decl_dirs: &[String],
     resolve: impl Fn(&str) -> Result<String, String>,
@@ -160,17 +160,57 @@ fn disarmed_block(
             continue;
         };
         let arming = crate::registry::armed_by(&text);
-        let [knob] = arming.as_slice() else {
+        let [value] = arming.as_slice() else {
             continue;
         };
-        if resolve(knob).is_ok_and(|v| v.is_empty()) {
-            let _ = writeln!(
-                out,
-                "  {:<12} {} asserts nothing until {} is set",
-                "disarmed", member, knob
-            );
+        match crate::registry::arming_form(value) {
+            crate::registry::Arming::Knob(knob) => {
+                if resolve(knob).is_ok_and(|v| v.is_empty()) {
+                    let _ = writeln!(
+                        out,
+                        "  {:<12} {} asserts nothing until {} is set",
+                        "disarmed", member, knob
+                    );
+                }
+            }
+            crate::registry::Arming::Content(knobs) if !knobs.is_empty() => {
+                if content_empty(root, &knobs, &resolve) == Some(true) {
+                    let _ = writeln!(
+                        out,
+                        "  {:<12} {} asserts nothing until a file {} names carries a live line",
+                        "disarmed",
+                        member,
+                        knobs.join(" or ")
+                    );
+                }
+            }
+            crate::registry::Arming::Content(_) => {}
         }
     }
+}
+
+// spec: installer/SPEC.md §doctor — `None` is "render nothing": a refusal, or no named file present
+fn content_empty(
+    root: &std::path::Path,
+    knobs: &[&str],
+    resolve: &impl Fn(&str) -> Result<String, String>,
+) -> Option<bool> {
+    let mut present = 0usize;
+    for knob in knobs {
+        let value = resolve(knob).ok()?;
+        for f in value.split_whitespace() {
+            let path = root.join(f);
+            if !path.exists() {
+                continue;
+            }
+            present += 1;
+            let text = std::fs::read(&path).ok()?;
+            if crate::fresh::file_lines(&String::from_utf8_lossy(&text)).into_iter().any(crate::fresh::live_line) {
+                return Some(false);
+            }
+        }
+    }
+    (present > 0).then_some(true)
 }
 
 // spec: installer/SPEC.md §doctor — the tree's own resolution, anchored at its root as the battery
@@ -186,7 +226,7 @@ fn tree_disarmed_block(out: &mut String, root: &std::path::Path, list_text: &str
         return;
     };
     let dirs = crate::registry::resolve_dirs(&gates, &kits);
-    disarmed_block(out, list_text, &dirs, |k| crate::knobs::wire_in(&gates, k));
+    disarmed_block(out, root, list_text, &dirs, |k| crate::knobs::wire_in(&gates, k));
 }
 
 // spec: installer/SPEC.md §doctor — the toolchain block over the selection: an owed member is
@@ -542,16 +582,60 @@ mod tests {
         let list = "# probe-kit\ncheck-alpha\ncheck-beta\ncheck-absent\n";
 
         let mut unset = String::new();
-        disarmed_block(&mut unset, list, &dirs, |_| Ok(String::new()));
+        disarmed_block(&mut unset, &d, list, &dirs, |_| Ok(String::new()));
         let mut set = String::new();
-        disarmed_block(&mut set, list, &dirs, |_| Ok("install.sh".to_string()));
+        disarmed_block(&mut set, &d, list, &dirs, |_| Ok("install.sh".to_string()));
         let mut refused = String::new();
-        disarmed_block(&mut refused, list, &dirs, |_| Err("malformed".to_string()));
+        disarmed_block(&mut refused, &d, list, &dirs, |_| Err("malformed".to_string()));
         let _ = std::fs::remove_dir_all(&d);
 
         assert_eq!(unset, "  disarmed     check-alpha asserts nothing until PROBE_KNOB is set\n");
         assert_eq!(set, "", "an armed member was named");
         assert_eq!(refused, "", "a knob that refuses is the battery's to report");
+    }
+
+    // spec: installer/SPEC.md §doctor — the content form renders disarmed when a named file is
+    // present and none carries a live line, stays silent when the local file alone carries one,
+    // and stays silent when the required file is absent, which is the battery's exit 2
+    #[test]
+    fn a_content_declared_member_is_disarmed_only_by_present_files_with_no_live_line() {
+        let d = std::env::temp_dir().join(format!("checkwright-doctor-content.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(d.join("checks")).expect("scratch");
+        std::fs::write(
+            d.join("checks/check-alpha.gate"),
+            "# install: zero-config\n# armed-by: content PROBE_REQ PROBE_LOCAL\n",
+        )
+        .expect("write");
+        let dirs = vec![d.join("checks").display().to_string()];
+        let list = "check-alpha\n";
+        let resolve = |k: &str| -> Result<String, String> {
+            Ok(match k {
+                "PROBE_REQ" => "req.list".to_string(),
+                _ => "local.list".to_string(),
+            })
+        };
+        let render = || {
+            let mut out = String::new();
+            disarmed_block(&mut out, &d, list, &dirs, resolve);
+            out
+        };
+
+        std::fs::write(d.join("req.list"), "# only a comment\n\n   \t\n  # indented\n").expect("write");
+        let comments_only = render();
+        std::fs::write(d.join("local.list"), "# local\nleak-term\n").expect("write");
+        let local_live = render();
+        std::fs::remove_file(d.join("req.list")).expect("rm");
+        std::fs::remove_file(d.join("local.list")).expect("rm");
+        let required_absent = render();
+        let _ = std::fs::remove_dir_all(&d);
+
+        assert_eq!(
+            comments_only,
+            "  disarmed     check-alpha asserts nothing until a file PROBE_REQ or PROBE_LOCAL names carries a live line\n"
+        );
+        assert_eq!(local_live, "", "the local file's live line arms the member");
+        assert_eq!(required_absent, "", "an absent required file is the battery's to report");
     }
 
     // spec: installer/SPEC.md §The verbs — `--help` answers on its own and an unknown argument is

@@ -83,6 +83,13 @@ pub fn file_lines(s: &str) -> Vec<&str> {
     s.strip_suffix('\n').unwrap_or(s).split('\n').collect()
 }
 
+// spec: gate-sdk/SPEC.md §The install disposition — the live-line filter every pattern roster and
+// the content arming form share: `grep -hEv '^[[:space:]]*(#|$)'`, blanks being space and tab
+pub fn live_line(line: &str) -> bool {
+    let rest = line.trim_start_matches([' ', '\t']);
+    !rest.is_empty() && !rest.starts_with('#')
+}
+
 // spec: gate-sdk/SPEC.md §The diff renderer — the family's `diff … | head -20`, the one place
 // the cap is applied. The renderer returns every hunk; this truncates the rendered report.
 pub fn print_capped_diff(left: &str, right: &str) {
@@ -125,6 +132,16 @@ mod tests {
         assert_eq!(file_lines("a\nb"), vec!["a", "b"]);
         assert_eq!(file_lines("\n"), vec![""]);
         assert!(file_lines("").is_empty());
+    }
+
+    #[test]
+    fn a_live_line_is_neither_blank_nor_a_comment() {
+        assert!(live_line("claude\\.ai/"));
+        assert!(live_line("  ^Key: .*"));
+        assert!(!live_line(""));
+        assert!(!live_line("   \t "));
+        assert!(!live_line("# a comment"));
+        assert!(!live_line("\t  # an indented comment"));
     }
 
     // spec: gate-sdk/SPEC.md §The consumer remainder cohort — `${1:-default}` falls

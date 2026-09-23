@@ -1,3 +1,3 @@
 INSTALL-DISPOSITION: clean
-1 arming declaration(s) naming their kit's own knob
+2 arming declaration(s) naming their kit's own knob
 recipe de-literalization checked: no

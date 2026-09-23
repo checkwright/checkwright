@@ -150,6 +150,26 @@ pub fn armed_by(text: &str) -> Vec<String> {
         .collect()
 }
 
+// spec: gate-sdk/SPEC.md §The install disposition — the leading token of the content form; no knob
+// is named `content`, so the bare form stays unambiguous
+pub const ARMED_BY_CONTENT: &str = "content";
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum Arming<'a> {
+    Knob(&'a str),
+    Content(Vec<&'a str>),
+}
+
+// spec: gate-sdk/SPEC.md §The install disposition — one declaration value's form: `content` and
+// its knob list, else the whole value as a bare knob
+pub fn arming_form(value: &str) -> Arming<'_> {
+    let mut words = value.split_whitespace();
+    if words.next() == Some(ARMED_BY_CONTENT) {
+        return Arming::Content(words.collect());
+    }
+    Arming::Knob(value)
+}
+
 // spec: gate-sdk/SPEC.md §The install disposition — the projection declaration's one reader: the
 // value of every `# projection:` header line, in file order, so a count check and a lone read share it
 pub const PROJECTION: &str = "# projection:";
@@ -681,6 +701,15 @@ pub fn expand_couples(field: &str, kit_roots_rel: &[String]) -> Result<String, S
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn an_arming_value_is_a_bare_knob_or_content_and_its_knobs() {
+        assert_eq!(arming_form("GATE_SDK_PORTABILITY_PATHS"), Arming::Knob("GATE_SDK_PORTABILITY_PATHS"));
+        assert_eq!(arming_form("content A_KNOB B_KNOB"), Arming::Content(vec!["A_KNOB", "B_KNOB"]));
+        assert_eq!(arming_form("content"), Arming::Content(vec![]));
+        assert_eq!(arming_form("contents"), Arming::Knob("contents"));
+        assert_eq!(arming_form(""), Arming::Knob(""));
+    }
 
     #[test]
     fn a_member_line_is_neither_blank_nor_a_comment() {
