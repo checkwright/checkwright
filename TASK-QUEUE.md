@@ -74,16 +74,6 @@ two `couples=` literals fit none of doc-path-couples' five dispositions. `check-
 
 **Cost while deferred:** both stay pinned to this repo's layout. Filed 2026-09-23 to the gap inbox by align's audit of doc-path-couples; promoted at the close drain because each needs a design call. Owner lookup: gate-sdk/SPEC.md §check-reads-couples.
 
-### scope-binding-hand-wipe
-
-[cost: event/low] [surface: lifecycle-kit]
-
-the scope binding's evidence-reset slot (`.claude/commands/scope.md`) tells a session to wipe `.tmp/` by hand, sparing only the session-role marker. `--enter-stage scope` already wipes it and spares the lead journal and `LIFECYCLE_KIT_BOUNDARY_PRESERVE` (lifecycle-kit/SPEC.md §bin/enter-stage.sh). A session that follows the hand step before entry deletes a live lead's journal.
-
-**Deliverable:** the wipe sentences replaced with: "The same entry wipes `.tmp/`, sparing the lead journal and the `LIFECYCLE_KIT_BOUNDARY_PRESERVE` keep-list (lifecycle-kit/SPEC.md §bin/enter-stage.sh), so never wipe it by hand."
-
-**Cost while deferred:** a literal reader of the binding can delete the lead's journal. Filed 2026-09-23 to the gap inbox at scope; promoted at the close drain because the harness permission layer refused the delegated close session's edit under `.claude/`. Owner lookup: lifecycle-kit/SPEC.md §bin/enter-stage.sh; the binding is this repo's.
-
 ### queue-migrate-bold-split
 
 [cost: event/low] [surface: queue-kit]
@@ -1657,5 +1647,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 `check-docs-cmd` assertion (C) misses a retired path cited from the queue, which is outside its manifest corpus and whose `<path>:<line>` token fails the path shape.
 
 ## Done
+
+- scope-binding-hand-wipe
 
 ## Lessons Learned
