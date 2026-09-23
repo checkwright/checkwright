@@ -1158,6 +1158,37 @@ pub fn fixture_case_dirs(gate: &str) -> Vec<PathBuf> {
 mod tests {
     use super::*;
 
+    const ROOTED_CORPUS: &[&str] = &[
+        "/x", "\\x", "//srv", "\\\\srv", "C:/x", "c:\\x", "C:", "C:x", "1:/x", "./x", "x", "", "é:/x", "Ä:\\x",
+    ];
+
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — gate_path_rooted answers path_root's predicate over one
+    // corpus, under bash's default range reading and under a locale-collated one
+    #[test]
+    fn the_shell_absoluteness_predicate_answers_what_path_root_answers() {
+        let lib = Path::new(env!("CARGO_MANIFEST_DIR")).join("../gate-sdk/lib/gate.sh");
+        for (prelude, locale) in [("", None), ("shopt -u globasciiranges; ", Some("en_US.UTF-8"))] {
+            for p in ROOTED_CORPUS {
+                let mut cmd = std::process::Command::new("bash");
+                cmd.arg("-c")
+                    .arg(format!(
+                        "{}source \"$1\" || exit 2; if gate_path_rooted \"$2\"; then echo rooted; else echo relative; fi",
+                        prelude
+                    ))
+                    .arg("bash")
+                    .arg(&lib)
+                    .arg(p);
+                if let Some(l) = locale {
+                    cmd.env("LC_ALL", l);
+                }
+                let out = cmd.output().expect("cannot run the shell library");
+                let got = String::from_utf8_lossy(&out.stdout).trim().to_string();
+                let want = if path_root(p).is_some() { "rooted" } else { "relative" };
+                assert_eq!(got, want, "gate_path_rooted {:?} under {:?}", p, prelude);
+            }
+        }
+    }
+
     // spec: gate-sdk/SPEC.md §port-blockers — the header block ends at the first line that is
     // neither shebang, comment nor blank, which is what stops a declaration being read out of a
     // heredoc literal in a script that writes shell

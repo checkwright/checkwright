@@ -80,12 +80,26 @@ gate_native_bin() {
     _gate_prebinary_knob GATE_SDK_NATIVE_BIN "native/target/release/checkwright-gates$(gate_exe_suffix)"
 }
 
-# spec: gate-sdk/SPEC.md §lib/gate.sh — GATE_SDK_NATIVE_BIN's value as a COMMAND TOKEN rather than as a path: a relative value takes the `./` prefix, because a token carrying no `.` or `/` anchor is a PATH lookup to sh and no command at all to PowerShell. An already-anchored value — rooted, drive-rooted, or already `./` or `../` — is returned unchanged, so the prefix is applied once and never twice
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the shell's one owner of absoluteness, walk::path_root's predicate; POSIX sh because installer/bin/checkwright.sh carries it byte for byte, and the letters are spelled out because a bracket range reads by locale collation where globasciiranges is off
+gate_path_rooted() {  # <path> — 0 when rooted in either dialect, walk::path_root's predicate
+    case "$1" in
+        /* | \\*) return 0 ;;
+        [ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz]:/*) return 0 ;;
+        [ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz]:\\*) return 0 ;;
+    esac
+    return 1
+}
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — GATE_SDK_NATIVE_BIN's value as a COMMAND TOKEN rather than as a path: a relative value takes the `./` prefix, because a token carrying no `.` or `/` anchor is a PATH lookup to sh and no command at all to PowerShell. An already-anchored value — rooted by gate_path_rooted, or already `./` or `../` — is returned unchanged, so the prefix is applied once and never twice
 gate_native_bin_spelled() {
     local b
     b="$(gate_native_bin)"
+    if gate_path_rooted "$b"; then
+        printf '%s\n' "$b"
+        return 0
+    fi
     case "$b" in
-        /* | ./* | ../* | [A-Za-z]:/* | [A-Za-z]:\\*) printf '%s\n' "$b" ;;
+        ./* | ../*) printf '%s\n' "$b" ;;
         *) printf './%s\n' "$b" ;;
     esac
 }
@@ -100,10 +114,7 @@ gate_harness_bin() {
         if [[ -n "$common" && "$git_dir" != "$common" && "${common##*/}" == .git ]]; then
             main="${common%/*}"
             b="$(cd "$main" && gate_native_bin)"
-            case "$b" in
-                /* | [A-Za-z]:/* | [A-Za-z]:\\*) ;;
-                *) b="$main/$b" ;;
-            esac
+            gate_path_rooted "$b" || b="$main/$b"
             if [[ -x "$b" ]]; then
                 printf '%s\n' "$b"
                 return 0
