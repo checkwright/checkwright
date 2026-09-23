@@ -47,7 +47,7 @@ Every binary-backed harness hook is inert inside a worktree-isolated dispatch. T
 5. `--emit knob-roster` still reports the binary absent at exit 2, so the fallback is scoped to the fail-open set;
 6. an absolute pinned `GATE_SDK_NATIVE_BIN` naming nothing takes no fallback.
 
-**Inferred, cannot run before build:** assertion 1 exits 0 against today's front end, which makes it a red-before-green witness. That depends on the sandbox layout delta 4 builds.
+**Inferred, cannot run before build:** assertion 1 exits 0 against today's front end, which makes it a red-before-green witness — that depends on the sandbox layout delta 4 builds.
 
 ### (5) The twin's parity corpus covers the linked layout {design-bearing}
 
