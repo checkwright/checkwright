@@ -39,18 +39,43 @@ pub fn path_pruned(p: &str, prune: &[String]) -> bool {
 // tracked set yields none, on `authoring_tree`'s own degrade; an unresolved knob still fails closed
 pub fn tracked_shell_tree() -> Result<Vec<String>, String> {
     let prune = prune_dirs()?;
-    let bytes = match crate::proc::run(&programs::GIT, &["ls-files", "--", "*.sh"]) {
+    Ok(tracked_matching("*.sh")
+        .into_iter()
+        .filter(|l| !l.ends_with(".test.sh") && !path_pruned(l, &prune))
+        .collect())
+}
+
+// spec: gate-sdk/SPEC.md §check-pipe-membership — the tracked unit-test suites: a `*.test.sh` whose
+// parent directory is named `gate-tests` and whose path above it is unpruned, on the same degrade
+pub fn tracked_suites() -> Result<Vec<String>, String> {
+    let prune = prune_dirs()?;
+    Ok(tracked_matching("*.test.sh")
+        .into_iter()
+        .filter(|l| is_suite(l, &prune))
+        .collect())
+}
+
+fn is_suite(p: &str, prune: &[String]) -> bool {
+    let Some((dir, _)) = p.rsplit_once('/') else {
+        return false;
+    };
+    let (above, name) = dir.rsplit_once('/').unwrap_or(("", dir));
+    name == "gate-tests" && (above.is_empty() || !path_pruned(&format!("{}/", above), prune))
+}
+
+fn tracked_matching(pathspec: &str) -> Vec<String> {
+    let bytes = match crate::proc::run(&programs::GIT, &["ls-files", "--", pathspec]) {
         Ok(c) => match c.stdout() {
             Some(b) => b.to_vec(),
-            None => return Ok(Vec::new()),
+            None => return Vec::new(),
         },
-        Err(_) => return Ok(Vec::new()),
+        Err(_) => return Vec::new(),
     };
-    Ok(String::from_utf8_lossy(&bytes)
+    String::from_utf8_lossy(&bytes)
         .lines()
-        .filter(|l| !l.is_empty() && !l.ends_with(".test.sh") && !path_pruned(l, &prune))
+        .filter(|l| !l.is_empty())
         .map(String::from)
-        .collect())
+        .collect()
 }
 
 // spec: gate-sdk/SPEC.md §port-blockers — the file's own header block, the leading run of shebang,
@@ -1157,6 +1182,22 @@ pub fn fixture_case_dirs(gate: &str) -> Vec<PathBuf> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: gate-sdk/SPEC.md §check-pipe-membership — a suite is a direct child of an unpruned tests
+    // dir; a file inside a case directory, or under a pruned component above, stays out
+    #[test]
+    fn a_suite_is_a_direct_child_of_an_unpruned_tests_dir() {
+        let prune: Vec<String> = ["gate-tests", ".tmp"].iter().map(|s| s.to_string()).collect();
+        assert!(is_suite("gate-sdk/gate-tests/lib-gate.test.sh", &prune));
+        assert!(is_suite("scripts/gate-tests/x.test.sh", &prune));
+        assert!(is_suite("gate-tests/x.test.sh", &prune));
+        assert!(is_suite("tree/gate-tests/clean.test.sh", &prune));
+        assert!(!is_suite("tree/gate-tests/check-x/bad/violating.test.sh", &prune));
+        assert!(!is_suite("gate-sdk/gate-tests/check-x/good/tree/gate-tests/x.test.sh", &prune));
+        assert!(!is_suite(".tmp/gate-tests/x.test.sh", &prune));
+        assert!(!is_suite("gate-sdk/tests/x.test.sh", &prune));
+        assert!(!is_suite("x.test.sh", &prune));
+    }
 
     const ROOTED_CORPUS: &[&str] = &[
         "/x", "\\x", "//srv", "\\\\srv", "C:/x", "c:\\x", "C:", "C:x", "1:/x", "./x", "x", "", "é:/x", "Ä:\\x",

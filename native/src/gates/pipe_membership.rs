@@ -231,9 +231,10 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         return Err("not a git repository — the tracked shell corpus cannot be resolved".into());
     }
     let shell = walk::tracked_shell_tree()?;
+    let suites = walk::tracked_suites()?;
     let mut t = Tally { in_scope: 0, readers: 0 };
     let mut findings: Vec<String> = Vec::new();
-    for f in &shell {
+    for f in shell.iter().chain(&suites) {
         let text = std::fs::read(Path::new(f))
             .map(|b| String::from_utf8_lossy(&b).into_owned())
             .map_err(|e| format!("cannot read {}: {}", f, e))?;
@@ -250,8 +251,9 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         return Ok(1);
     }
     println!(
-        "PIPE-MEMBERSHIP: clean ({} shell file(s) scanned, {} under `pipefail`; {} pipeline(s) into a short-circuiting reader, none fed by a set)",
+        "PIPE-MEMBERSHIP: clean ({} shell file(s) and {} suite(s) scanned, {} under `pipefail`; {} pipeline(s) into a short-circuiting reader, none fed by a set)",
         shell.len(),
+        suites.len(),
         t.in_scope,
         t.readers
     );

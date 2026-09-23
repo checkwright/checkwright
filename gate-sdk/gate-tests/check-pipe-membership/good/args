@@ -1,4 +1,5 @@
-# No positional arguments: the corpus is the tracked shell tree (git ls-files, scoped to this
-# case dir by cwd). Each file is a pipe the predicate leaves alone: an array pipe with no
-# pipefail, an array pipe into a full reader, a one-line producer into a quiet grep, and the
-# loop form of membership.
+# No positional arguments: the corpus is the tracked shell tree plus the tracked suites (git
+# ls-files, scoped to this case dir by cwd). Each file is a pipe the predicate leaves alone: an
+# array pipe with no pipefail, an array pipe into a full reader, a one-line producer into a quiet
+# grep, and the loop form of membership, in a shell file and in a suite. A violating file nested
+# inside a case directory under a tests dir must stay unread.

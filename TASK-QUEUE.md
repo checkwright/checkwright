@@ -8,20 +8,6 @@
 
 ## New Features
 
-### pipe-membership-corpus-omits-test-suites
-
-[spec: SPEC-pipe-suites.md]
-
-`check-pipe-membership` reads `walk::tracked_shell_tree`, which excludes `*.test.sh`, so the tracked suites setting `pipefail` sit outside the gate. Re-measured 2026-09-23: all 108 tracked suites set `pipefail`. The filed "107 of 111" had counted fixture-case files. One of the five historically fixed membership sites was a suite, `gate-sdk/gate-tests/lib-gate.test.sh`.
-
-**Deliverable:** widen the corpus to tracked `*.test.sh`, still excluding the pruned fixture trees, and restate gate-sdk/SPEC.md §check-pipe-membership's corpus sentence.
-
-**Specified 2026-09-23:** dropping the filter alone reaches nothing, because every suite sits under the pruned `gate-tests` component. A suite is therefore a tracked `*.test.sh` whose parent directory is named `gate-tests` and whose path above it is unpruned, read by a `walk.rs` sibling this gate alone unions. The widened gate was run over the 108 suites in a scratch repository and is clean.
-
-**Cost while deferred:** a new membership pipe written in a suite goes unflagged until it flips a verdict under load. Filed 2026-09-22 by build batch 4 of gate-sdk-surface-drain on a lead ruling; promoted at close because §check-pipe-membership states the suites outside its corpus.
-
-**Admitted by operator exception to the enhancement admission filter, operator direction 2026-09-23 (lead-relayed):** a suite-corpus widening reaching none of the filter's arms, it joins `gate-sdk-blind-spots` on the surface that unit already carries, at no extra stage.
-
 ## Technical Debt
 
 ## Deferred
@@ -1607,5 +1593,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - smoke-registry-omission-blind
 - doc-path-hardcoded-reads
 - canon-spec-prune-bakes-docs
+- pipe-membership-corpus-omits-test-suites
 
 ## Lessons Learned

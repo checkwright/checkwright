@@ -164,6 +164,7 @@
 - `check-portability-floor` — gains an ASCII arm: a non-ASCII byte outside a full-line `#` comment in any `.ps1` on your configured install-path corpus now reds, even with an empty construct roster, because Windows PowerShell 5.1 reads a BOM-less script in the ANSI code page. Spell the character by code point (`[char]0x2014`), or move a trailing comment onto its own line; there is no valve.
 - `check-install-disposition` — assertion D accepts and verifies the content form `# armed-by: content <KNOB>…`: a `content` with no knob after it reds, and so does any knob in its list that no static kit declares or that another kit owns. Give each content declaration at least one knob of the gate's own kit.
 - `check-gate-substrate-parity` — gains assertion J, in a publishing tree only (one tracking the crate source): each kit's `smoke/install.sh` registry heredoc must register or declare `# unregistered:` every subcommand that kit owns, and register none it does not. A vendored tree is out of scope and unaffected; a kit author adds each new owned gate to the heredoc.
+- `check-pipe-membership` — now also reads each tests dir's tracked `*.test.sh` suites (a direct child of a `gate-tests/` directory whose path above is unpruned), so a set-fed membership pipe in a suite reds; fixture case trees stay out. Its clean line now counts suites apart (`N shell file(s) and S suite(s) scanned`). Fix a red with the loop form the finding names.
 
 ## Renamed knobs
 
