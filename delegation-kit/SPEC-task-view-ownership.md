@@ -85,7 +85,7 @@ Roster probe: `git grep -n -i "background_tasks\|task view\|task-view\|agent_tra
 
 ## Definition of Done
 
-- [ ] **Causal completeness** — every point of canon-kit/SPEC.md §The causal-completeness check holds for the ownership test.
+- [ ] **Causal completeness** — every point of canon-kit's causal-completeness check holds for the ownership test.
 - [ ] **Instruction surfaces: instruction only** — no template or agent definition changes. The refusal text is unchanged.
 - [ ] **Merged with no information lost** — deltas 2 and 3 re-phrase the passages they refine. The measured stall and the ruled-out alternatives move into §The turn-end liveness hook's prose.
 - [ ] **Live acceptance recorded** — both sides of delta 1's two-sided check pass, and the result is written into the merged SPEC as measured. That settles both inferred premises, and the inferred markers go with it.
