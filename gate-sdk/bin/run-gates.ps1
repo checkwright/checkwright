@@ -111,12 +111,60 @@ switch -CaseSensitive -Regex ($lead) {
     default { $argv = @('--run', '--gates-dir', $lead) }
 }
 
-$bin = Get-NativeBinSpelled -Default "native/target/release/checkwright-gates$exeSuffix"
+function Test-Runnable {
+    param([string] $Path)
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { return $false }
+    if (-not $onWindows) {
+        $mode = (Get-Item -LiteralPath $Path).PSObject.Properties['UnixMode']
+        if ($mode -and $mode.Value -notmatch 'x') { return $false }
+    }
+    return $true
+}
+
+function Resolve-GitDir {
+    param([string] $Path)
+    if (-not $Path) { return $null }
+    $r = Resolve-Path -LiteralPath $Path -ErrorAction SilentlyContinue
+    if (-not $r) { return $null }
+    return $r.ProviderPath.TrimEnd([char[]]@('/', '\'))
+}
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — gate_harness_bin's linked-worktree half: inside a linked worktree whose common dir is <main>/.git, the main checkout's own resolution of the knob, rooted, when runnable; $null otherwise
+function Get-MainCheckoutExe {
+    param([string] $Default)
+    $gd = $null
+    $cd = $null
+    try {
+        $gd = Resolve-GitDir ([string] (& git rev-parse --git-dir 2>$null))
+        $cd = Resolve-GitDir ([string] (& git rev-parse --git-common-dir 2>$null))
+    } catch { return $null }
+    if (-not $cd -or -not $gd -or [string]::Equals($gd, $cd, $cmp)) { return $null }
+    if ((Split-Path -Leaf $cd) -cne '.git') { return $null }
+    $main = Split-Path -Parent $cd
+    Set-Location -LiteralPath $main
+    [Environment]::CurrentDirectory = $main
+    try {
+        $b = Get-NativeBinSpelled -Default $Default
+    } finally {
+        Set-Location -LiteralPath $here
+        [Environment]::CurrentDirectory = $here
+    }
+    $e = if ([System.IO.Path]::IsPathRooted($b)) { $b } else { Join-Path $main $b }
+    if (Test-Runnable $e) { return $e }
+    return $null
+}
+
+$defaultBin = "native/target/release/checkwright-gates$exeSuffix"
+$bin = Get-NativeBinSpelled -Default $defaultBin
 $exe = if ([System.IO.Path]::IsPathRooted($bin)) { $bin } else { Join-Path $here $bin }
-$runnable = Test-Path -LiteralPath $exe -PathType Leaf
-if ($runnable -and -not $onWindows) {
-    $mode = (Get-Item -LiteralPath $exe).PSObject.Properties['UnixMode']
-    if ($mode -and $mode.Value -notmatch 'x') { $runnable = $false }
+$runnable = Test-Runnable $exe
+# spec: gate-sdk/SPEC.md §The harness-integration arm — a fail-open arm, and only one, asks the main checkout before it declines
+if (-not $runnable -and $unavailable -eq 0) {
+    $mainExe = Get-MainCheckoutExe -Default $defaultBin
+    if ($mainExe) {
+        $exe = $mainExe
+        $runnable = $true
+    }
 }
 if (-not $runnable) {
     # comment-tier-exempt: the dash is spelled by code point because Windows PowerShell 5.1 reads a BOM-less script in the ANSI code page, which would turn a literal one into three characters and the message into different bytes from the stub's

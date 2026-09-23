@@ -25,6 +25,16 @@ struct Case {
     stdin: &'static str,
     expect_code: i32,
     expect_text: &'static str,
+    linked: Linked,
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — whether the case runs from a hand-built linked worktree, and
+// whether its main checkout carries a runnable binary at the default path
+#[derive(Clone, Copy, PartialEq)]
+enum Linked {
+    No,
+    MainBin,
+    MainBare,
 }
 
 const ABSENT: &str = "is absent or not executable";
@@ -47,6 +57,7 @@ const fn absent(
         stdin: "",
         expect_code: 2,
         expect_text,
+        linked: Linked::No,
     }
 }
 
@@ -66,11 +77,16 @@ const fn grammar(
         stdin: "",
         expect_code,
         expect_text,
+        linked: Linked::No,
     }
 }
 
+const QUESTION: &str = "{\"tool_input\":{\"to\":\"main\",\"message\":\"Question only\"}}\n";
+const ESCALATION_ADVICE: &str = "Options Recommendation Evidence";
+
 // spec: gate-sdk/SPEC.md §run-gates — the corpus: each exit path, each precedence tier of
-// `GATE_SDK_NATIVE_BIN`, each residual-grammar form, and forwarded stdin
+// `GATE_SDK_NATIVE_BIN`, each residual-grammar form, forwarded stdin, and the linked-worktree
+// resolution on a hand-built layout
 const CORPUS: &[Case] = &[
     Case {
         name: "outside a repository",
@@ -82,6 +98,7 @@ const CORPUS: &[Case] = &[
         stdin: "",
         expect_code: 2,
         expect_text: "run-gates: not inside a git repository",
+        linked: Linked::No,
     },
     absent("binary absent, leading --emit", &[], &[], ABSENT),
     Case {
@@ -183,8 +200,29 @@ const CORPUS: &[Case] = &[
     ),
     Case {
         name: "stdin forwarded to --hook <name>",
-        stdin: "{\"tool_input\":{\"to\":\"main\",\"message\":\"Question only\"}}\n",
-        ..grammar("", &["--hook", "escalation-guard"], 0, "Options Recommendation Evidence")
+        stdin: QUESTION,
+        ..grammar("", &["--hook", "escalation-guard"], 0, ESCALATION_ADVICE)
+    },
+    Case {
+        name: "linked worktree, --hook through the main checkout's binary",
+        argv: &["--hook", "escalation-guard"],
+        stdin: QUESTION,
+        expect_code: 0,
+        linked: Linked::MainBin,
+        ..absent("", &[], &[], ESCALATION_ADVICE)
+    },
+    Case {
+        name: "linked worktree, --emit still reporting the binary absent",
+        linked: Linked::MainBin,
+        ..absent("", &[], &[], ABSENT)
+    },
+    Case {
+        name: "linked worktree, both binaries absent, --hook declining",
+        argv: &["--hook", "escalation-guard"],
+        stdin: QUESTION,
+        expect_code: 0,
+        linked: Linked::MainBare,
+        ..absent("", &[], &[], ABSENT)
     },
 ];
 
@@ -242,7 +280,7 @@ fn check() -> Result<bool, String> {
     let mut clean = true;
     for (i, case) in CORPUS.iter().enumerate() {
         let dir = scratch.0.join(format!("case-{:02}", i));
-        let (stub_arg, twin_arg) = prepare(case, &dir, &sdk, &stub, &twin)?;
+        let (stub_arg, twin_arg) = prepare(case, &dir, &sdk, &stub, &twin, Path::new(&exe))?;
         let mut set: Vec<(String, String)> = vec![(
             "GIT_CEILING_DIRECTORIES".to_string(),
             forward_slashed(scratch.0.display().to_string()),
@@ -338,7 +376,14 @@ fn inherited_knobs() -> Vec<String> {
 // spec: gate-sdk/SPEC.md §run-gates — a case's scratch: a fresh repository vendoring the tree's own
 // `gate-sdk/bin/` and `gate-sdk/lib/`, run by relative path as a user types it; the outside case
 // runs the tree's own pair from a directory no repository contains
-fn prepare(case: &Case, dir: &Path, sdk: &Path, stub: &Path, twin: &Path) -> Result<(String, String), String> {
+fn prepare(
+    case: &Case,
+    dir: &Path,
+    sdk: &Path,
+    stub: &Path,
+    twin: &Path,
+    exe: &Path,
+) -> Result<(String, String), String> {
     std::fs::create_dir_all(dir).map_err(|e| format!("cannot create {}: {}", dir.display(), e))?;
     if !case.in_repo {
         return Ok((
@@ -346,10 +391,10 @@ fn prepare(case: &Case, dir: &Path, sdk: &Path, stub: &Path, twin: &Path) -> Res
             forward_slashed(twin.display().to_string()),
         ));
     }
-    let dir_s = dir.display().to_string();
-    let init = proc::run(&programs::GIT, &["init", "-q", &dir_s])?;
-    if let Some(r) = init.failure_report() {
-        return Err(format!("git init {}: {}", dir_s, r));
+    if case.linked == Linked::No {
+        git_init(dir)?;
+    } else {
+        link(dir, case.linked, exe)?;
     }
     for sub in ["bin", "lib"] {
         let dest = dir.join("gate-sdk").join(sub);
@@ -363,16 +408,63 @@ fn prepare(case: &Case, dir: &Path, sdk: &Path, stub: &Path, twin: &Path) -> Res
         }
     }
     for (rel, body) in case.files {
-        let p = dir.join(rel);
-        if let Some(parent) = p.parent() {
-            std::fs::create_dir_all(parent).map_err(|e| format!("cannot create {}: {}", parent.display(), e))?;
-        }
-        std::fs::write(&p, body).map_err(|e| format!("cannot write {}: {}", p.display(), e))?;
+        write(&dir.join(rel), body)?;
     }
     Ok((
         "gate-sdk/bin/run-gates.sh".to_string(),
         "gate-sdk/bin/run-gates.ps1".to_string(),
     ))
+}
+
+fn git_init(dir: &Path) -> Result<(), String> {
+    let dir_s = dir.display().to_string();
+    let init = proc::run(&programs::GIT, &["init", "-q", &dir_s])?;
+    match init.failure_report() {
+        Some(r) => Err(format!("git init {}: {}", dir_s, r)),
+        None => Ok(()),
+    }
+}
+
+fn write(p: &Path, body: &str) -> Result<(), String> {
+    if let Some(parent) = p.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| format!("cannot create {}: {}", parent.display(), e))?;
+    }
+    std::fs::write(p, body).map_err(|e| format!("cannot write {}: {}", p.display(), e))
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — a linked worktree built by hand on git's documented on-disk
+// format, because a crate source adding one is refused; the main checkout sits beside the case
+// directory
+fn link(dir: &Path, linked: Linked, exe: &Path) -> Result<(), String> {
+    let leaf = dir
+        .file_name()
+        .and_then(|n| n.to_str())
+        .ok_or_else(|| format!("{} has no name", dir.display()))?;
+    let main = dir.with_file_name(format!("{}-main", leaf));
+    git_init(&main)?;
+    let admin = main.join(".git").join("worktrees").join("linked");
+    write(&admin.join("HEAD"), "ref: refs/heads/linked\n")?;
+    write(&admin.join("commondir"), "../..\n")?;
+    write(
+        &admin.join("gitdir"),
+        &format!("{}\n", forward_slashed(dir.join(".git").display().to_string())),
+    )?;
+    write(
+        &dir.join(".git"),
+        &format!("gitdir: {}\n", forward_slashed(admin.display().to_string())),
+    )?;
+    if linked == Linked::MainBin {
+        let bin = main
+            .join("native")
+            .join("target")
+            .join("release")
+            .join(format!("checkwright-gates{}", std::env::consts::EXE_SUFFIX));
+        if let Some(parent) = bin.parent() {
+            std::fs::create_dir_all(parent).map_err(|e| format!("cannot create {}: {}", parent.display(), e))?;
+        }
+        std::fs::copy(exe, &bin).map_err(|e| format!("cannot place {}: {}", bin.display(), e))?;
+    }
+    Ok(())
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — one half's result after the one normalization: CRLF becomes

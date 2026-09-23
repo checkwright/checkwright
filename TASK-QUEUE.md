@@ -8,18 +8,6 @@
 
 ## New Features
 
-### worktree-hook-guards-fail-open
-
-[spec: SPEC-worktree-hook-bin.md]
-
-every binary-backed harness hook is inert inside a worktree-isolated dispatch. `gate-sdk/bin/run-gates.sh` resolves `GATE_SDK_NATIVE_BIN` repo-relative from the worktree's own top level, a linked worktree carries no build output, and `--hook` is on the front end's fail-open set, so the arm exits 0 with its "absent or not executable" line. Measured 2026-09-22 at `consumer-policy-seam`'s spec: an audit-sweep dispatched under `isolation: worktree` spawned six fork children, and each `agent-dispatch-guard` record shows the fail-open allow. Run 2026-09-23 at scope, wider than filed: from a scratch `git worktree add` with no `native/target`, the bash guard, the workflow-state guard and the dispatch guard each exit 0 on a payload each blocks from the main checkout.
-
-**Deliverable:** the hook front end resolves the binary from the main checkout when its cwd is a linked worktree, or a stated refusal to; plus a fixture proving the fork ban fires from inside a linked worktree.
-
-**Specified 2026-09-23:** one gate-sdk accessor, `gate_harness_bin`, answers which binary a harness-integration arm runs. It tries the local door first. Inside a linked worktree whose common dir is `<main>/.git`, it next tries the main checkout's own resolution of the knob. Otherwise it returns the local answer unchanged. The front end's fail-open branch and guard-kit's load both ask it. Every verdict-bearing path keeps resolving locally and failing closed, so delegation-kit's liveness ruling stands for everything this branch does not reach. The ground is that a hook enforces the session's policy, which the main checkout's binary already enforces for the parent. A linked-worktree suite asserts the fork ban, the workflow-state guard and the bash guard firing, with the control and scope cases. The PowerShell twin mirrors it under a parity case.
-
-**Cost while deferred:** the fork ban and the budget guard are advisory for any worktree-isolated agent. Filed 2026-09-22 to the gap inbox by the lead; promoted 2026-09-23 at `consumer-policy-seam`'s close, because the fix picks between two resolution shapes. **DISTINCT from** the icebox's [worktree-dispatch-rebuilds-the-gate-binary](#worktree-dispatch-rebuilds-the-gate-binary) and [worktree-isolated-dispatch-cannot-reach-the-main-checkout](#worktree-isolated-dispatch-cannot-reach-the-main-checkout).
-
 ### shell-textual-absoluteness-single-dialect
 
 [spec: SPEC-path-rooted.md]
@@ -1693,5 +1681,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 `check-docs-cmd` assertion (C) misses a retired path cited from the queue, which is outside its manifest corpus and whose `<path>:<line>` token fails the path shape.
 
 ## Done
+
+- worktree-hook-guards-fail-open
 
 ## Lessons Learned

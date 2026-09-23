@@ -2080,11 +2080,17 @@ if [[ -f "${_guard_root}gate-sdk/lib/gate.sh" ]]; then
     # shellcheck source=../../gate-sdk/lib/gate.sh
     source "${_guard_root}gate-sdk/lib/gate.sh"
 fi
-_guard_bin=''
-declare -F gate_native_bin >/dev/null && _guard_bin="$(gate_native_bin)"
 # spec: guard-kit/SPEC.md §The generic ruleset — the door rules 8 and 23 steer to, resolved once at load through gate-sdk's own accessor rather than rebuilt per message: a steer names the binary GATE_SDK_NATIVE_BIN resolves, so a consumer that vendored the kits elsewhere is still told a command that runs
 _guard_door=''
 declare -F gate_native_bin_spelled >/dev/null && _guard_door="$(gate_native_bin_spelled)"
+# spec: guard-kit/SPEC.md §The guard framework (`lib/guard.sh`) — the binary is gate-sdk's harness answer, which inside a linked worktree may be the main checkout's; that answer is exported so the knob read below reaches the same binary. An older library lacking the accessor keeps the plain knob
+_guard_bin=''
+if declare -F gate_harness_bin >/dev/null; then
+    _guard_bin="$(gate_harness_bin)"
+    [[ "$_guard_bin" == "$_guard_door" ]] || export GATE_SDK_NATIVE_BIN="$_guard_bin"
+elif declare -F gate_native_bin >/dev/null; then
+    _guard_bin="$(gate_native_bin)"
+fi
 # spec: guard-kit/SPEC.md §The guard framework (`lib/guard.sh`) — a fixed literal, because guard_advise renders through the binary this branch has just found missing; it interpolates nothing, so it carries no character JSON must escape
 if ! declare -F gate_knob_values >/dev/null || [[ ! -x "$_guard_bin" ]]; then
     printf '%s\n' '{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"guard-kit'\''s rules did not run on this call: the gate binary its knobs and its payload reads come from is not reachable, so the call takes the harness'\''s own permission path with no steering. Build it: bash gate-sdk/bin/build-native.sh"}}'
