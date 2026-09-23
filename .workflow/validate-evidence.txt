@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+guard-harness-seams gates sha256=5d46e6f774e764e07ec63f07e9d66066d7d47af90d1ae91c41cd7a0d8fb2f289 pass=131 fail=0 ignore=0 verdict=clean 2026-09-23
+guard-harness-seams gate_sdk sha256=9f41a8f3cd884afd41183622624da996ba54683fef12f69592b011c1fab25aef pass=1 fail=0 ignore=0 verdict=clean 2026-09-23
+guard-harness-seams canon_kit sha256=dc6a43104da09a45baf285d375331912d745214796a752b44d9b8ccdeb35ff52 pass=1 fail=0 ignore=0 verdict=clean 2026-09-23
+guard-harness-seams context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-23
+guard-harness-seams delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-23
+guard-harness-seams doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-23
+guard-harness-seams evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-23
+guard-harness-seams guard_kit sha256=6cb4ff2f4bd80b6561bd33590971d82cddcaa430595db7b5b0fefd800ace387b pass=1 fail=0 ignore=0 verdict=clean 2026-09-23
+guard-harness-seams lifecycle_kit sha256=e487054485ddd468158bdd1037828d1baa9f713a80608737ec4d0d59585a86cb pass=1 fail=0 ignore=0 verdict=clean 2026-09-23
+guard-harness-seams queue_kit sha256=5880c4840de8628f0c320fd728dd3e425a92b6d1554f5e56ce403a8d8b13f3c5 pass=1 fail=0 ignore=0 verdict=clean 2026-09-23
+guard-harness-seams site_kit sha256=48d3335dd0d627713fd607013b1cc6a0049e60b8f4a1905b441b7699d4c844c2 pass=1 fail=0 ignore=0 verdict=clean 2026-09-23
+guard-harness-seams scripts sha256=79ed7aac215203e28c16d151e43d18867b9d53aa24afc2c79947e252882e97b7 pass=1 fail=0 ignore=0 verdict=clean 2026-09-23
+guard-harness-seams guard_tests sha256=3d900e1540cdf90a214715305395f53d11f2dd4cb448882d33b4343d789294f3 pass=1 fail=0 ignore=0 verdict=clean 2026-09-23
+guard-harness-seams demo sha256=1ac971eee6551111b00073e151956b50154a9808dd4810c36114614d6d2be83c pass=1 fail=0 ignore=0 verdict=clean 2026-09-23
+guard-harness-seams installer_smoke sha256=3587baef6597be867b0f7848ca7deab41519ec8061beba59de9da34e40e2d1e6 pass=17 fail=0 ignore=0 verdict=clean 2026-09-23
+guard-harness-seams consumer_smoke sha256=79bdf3be6d625b760ca3f5d228e67f3a9339ce3305e806fb8a0f412d618556fa pass=1 fail=0 ignore=0 verdict=clean 2026-09-23
+guard-harness-seams upgrade sha256=78d618fdd7549ba201cd6ec3fef9f34fbd6c973448ecc33a7bfd9a62de04a7fe pass=1 fail=0 ignore=0 verdict=clean 2026-09-23
+guard-harness-seams agents_md_smoke sha256=cf7123ee3f39679aa7db0e2c27394175b435aa028516b04659b60f6144b8bb38 pass=1 fail=0 ignore=0 verdict=clean 2026-09-23
+guard-harness-seams index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-23
+guard-harness-seams native_crate sha256=e571119d65784144a4f9b8a5ba877b4f38f09fa50b9353acedb13ffd2bed119a pass=1 fail=0 ignore=0 verdict=clean 2026-09-23
+guard-harness-seams projection_witness sha256=6e9f54f23e8ecb627045a590e7f4eb6d752dd038b03b33aa2cd6e070b41d2bf7 pass=1 fail=0 ignore=0 verdict=clean 2026-09-23
