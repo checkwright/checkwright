@@ -4,13 +4,4 @@
 
 ---
 
-consumer-policy-seam scope a2cd1cd7 2026-09-22 b1436cee
-consumer-policy-seam spec adca4265 2026-09-22 317ca5d4
-consumer-policy-seam align abad2113 2026-09-22 b43667bd
-consumer-policy-seam spec aeee7c14 2026-09-22 88a8df68
-consumer-policy-seam align a8b612dc 2026-09-23 ba882b7a
-consumer-policy-seam build a99c7a4d 2026-09-23 638723b8
-consumer-policy-seam build a34c7942 2026-09-23 c5241bf9
-consumer-policy-seam build a4f3a85a 2026-09-23 2888e68c
-consumer-policy-seam validate a1e0ace8 2026-09-23 343b291b
-consumer-policy-seam close acc9111b 2026-09-23 069bc1c6
+— scope a83bb997 2026-09-23 17521d0e
