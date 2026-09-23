@@ -17,6 +17,16 @@ die() {
     exit "${3:-2}"
 }
 
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the byte twin of the library's gate_path_rooted, held to it by a crate unit test: this bootstrap cannot source a payload file before it has located the payload
+gate_path_rooted() {  # <path> — 0 when rooted in either dialect, walk::path_root's predicate
+    case "$1" in
+        /* | \\*) return 0 ;;
+        [ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz]:/*) return 0 ;;
+        [ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz]:\\*) return 0 ;;
+    esac
+    return 1
+}
+
 # spec: installer/SPEC.md §The install boundary — step 1: the package's own payload directory,
 # resolved through the symlink chain, because npm installs the bin entry as a link in
 # node_modules/.bin and the unresolved path's parent is node_modules
@@ -27,10 +37,7 @@ SELF="$0"
 while [ -L "$SELF" ]; do
     LINK_DIR="$(cd "$(dirname "$SELF")" && pwd)"
     SELF="$(readlink "$SELF")"
-    case "$SELF" in
-        /*) : ;;
-        *) SELF="$LINK_DIR/$SELF" ;;
-    esac
+    gate_path_rooted "$SELF" || SELF="$LINK_DIR/$SELF"
 done
 INSTALLER="$(cd "$(dirname "$SELF")/.." && pwd)"
 PAYLOAD="$INSTALLER/payload"

@@ -1189,6 +1189,28 @@ mod tests {
         }
     }
 
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — the bootstrap's twin is the library's body byte for byte,
+    // from the definition line through the closing brace, each extracted by name
+    #[test]
+    fn the_bootstrap_carries_the_library_predicate_byte_for_byte() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
+        let body = |rel: &str| -> String {
+            let text = std::fs::read_to_string(root.join(rel)).unwrap_or_else(|e| panic!("{}: {}", rel, e));
+            let lines: Vec<&str> = text
+                .lines()
+                .skip_while(|l| !l.starts_with("gate_path_rooted() {"))
+                .collect();
+            let end = lines
+                .iter()
+                .position(|l| *l == "}")
+                .unwrap_or_else(|| panic!("{} defines no closed gate_path_rooted()", rel));
+            lines[..=end].join("\n")
+        };
+        let lib = body("gate-sdk/lib/gate.sh");
+        assert!(lib.contains("return 0"), "the library's body was not extracted: {:?}", lib);
+        assert_eq!(body("installer/bin/checkwright.sh"), lib);
+    }
+
     // spec: gate-sdk/SPEC.md §port-blockers — the header block ends at the first line that is
     // neither shebang, comment nor blank, which is what stops a declaration being read out of a
     // heredoc literal in a script that writes shell

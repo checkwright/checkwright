@@ -115,7 +115,7 @@ if [[ -z "${GATE_SDK_NATIVE_TARGETS_FILE:-}" ]]; then
     say "roster: no caller knob set, so this run is steered at $HOST_TARGET alone"
 fi
 ROSTER_FILE="$(native gate_native_targets_file)"
-[[ "$ROSTER_FILE" == /* ]] || ROSTER_FILE="$REPO/$ROSTER_FILE"
+native gate_path_rooted "$ROSTER_FILE" || ROSTER_FILE="$REPO/$ROSTER_FILE"
 mapfile -t ROSTER < <(native gate_native_targets)
 [[ ${#ROSTER[@]} -gt 0 ]] \
     || blocked "no declared target at $ROSTER_FILE — there is no platform set to build for."
