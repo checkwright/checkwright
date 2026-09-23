@@ -1588,11 +1588,4 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 ## Done
 
-- stop-hook-task-view-unscoped
-- guard-worktree-scratch-dirs
-- guard-knob-skew-bricks-shell
-- committed-grant-fallthrough-unexplained
-- shellcheck-analyser-version-unpinned-in-ci
-- guard-read-path-windows-unexercised
-
 ## Lessons Learned
