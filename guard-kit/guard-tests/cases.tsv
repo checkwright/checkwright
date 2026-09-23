@@ -23,6 +23,17 @@ block	make lint && /usr/bin/nice -n 5 make build
 fallthrough	time make build
 fallthrough	file /usr/bin/time
 
+# rule 2's arm (d) — an export, leading assignment or env prefix setting a kit
+#          knob to the value it already resolves to. The sandbox exports the
+#          binary knob absolute, so a knob resolving to its default is used; a
+#          differing value, an environment-only setting and a non-knob fall through
+block	export GATE_SDK_WORKFLOW_DIR=.workflow && make build
+block	GATE_SDK_WORKFLOW_DIR=.workflow make build
+block	env GATE_SDK_WORKFLOW_DIR=.workflow make build
+fallthrough	GATE_SDK_WORKFLOW_DIR=elsewhere make build
+fallthrough	GATE_SDK_JOBS=1 make build
+fallthrough	FOO=bar make build
+
 # rule 3 — bare-name scratch redirect
 block	some-runner 2> op.err
 fallthrough	some-runner 2> .tmp/op.err

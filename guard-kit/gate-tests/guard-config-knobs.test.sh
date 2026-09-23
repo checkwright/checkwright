@@ -94,6 +94,26 @@ for pair in "guard_rule_find_glob|find lib -type f|find <dir> -type f | sort" \
     }
 done
 
+# --- rule 2's arm (d): a respelled path names the same file as the knob's resolved value and still
+#     fires, since the generated hooks bake the text; a differing file falls through. The knob file
+#     is exported rather than prefixed, because the arm's own read happens after the sourcing
+printf 'GUARD_KIT_SETTINGS = %s/settings.json\n' "$tmp" >"$tmp/settings-path.knobs"
+: >"$tmp/settings.json"
+: >"$tmp/other.json"
+echo_arm() {  # $1=label $2=command $3=want-rc $4=want-substring
+    checks=$((checks + 1))
+    local out got
+    out="$(export GUARD_KIT_KNOB_FILE="$tmp/settings-path.knobs"; source "$DIR/lib/guard.sh"; guard_rule_git_c_root "$2" 2>&1)"
+    got=$?
+    [[ "$got" == "$3" && "$out" == *"$4"* ]] || {
+        echo "  FAIL [$1]: '$2' gave rc=$got, want $3 carrying '$4': $out"
+        fails=$((fails + 1))
+    }
+}
+echo_arm "knob-echo-verbatim" "GUARD_KIT_SETTINGS=$tmp/settings.json make build" 2 "Run it without the prefix: make build"
+echo_arm "knob-echo-same-file" "GUARD_KIT_SETTINGS=$tmp/./settings.json make build" 2 "check-graph"
+echo_arm "knob-echo-other-file" "GUARD_KIT_SETTINGS=$tmp/other.json make build" 0 ""
+
 # --- the load's two failure answers: an unreachable binary advises, runs no rule and exits 0; a
 #     refused config blocks with the refusal's own text
 load() {  # $1=label $2=want-rc $3=want-substring $4.. = NAME=VALUE environment for the sourcing
@@ -116,5 +136,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "guard-config-knobs.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "guard-config-knobs.test: ok ($checks assertions; GUARD_KIT_SEARCH_TOOLS fires rules 9 and 11 on its own member each and leaves them inert when empty, and each firing corrective names its bare fallback; GUARD_KIT_RO_FORMS grants an added roster member only once declared, and a consumer entry replaces the kit's declaration; the knob load advises and runs no rule on an unreachable binary, and blocks with the refusal on a missing or malformed knob file)"
+echo "guard-config-knobs.test: ok ($checks assertions; GUARD_KIT_SEARCH_TOOLS fires rules 9 and 11 on its own member each and leaves them inert when empty, and each firing corrective names its bare fallback; GUARD_KIT_RO_FORMS grants an added roster member only once declared, and a consumer entry replaces the kit's declaration; rule 2's arm (d) fires on a respelled path naming the knob's resolved file and not on a differing one; the knob load advises and runs no rule on an unreachable binary, and blocks with the refusal on a missing or malformed knob file)"
 exit 0

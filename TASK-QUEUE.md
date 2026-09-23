@@ -8,20 +8,6 @@
 
 ## New Features
 
-### knob-default-export-unsteered
-
-[spec: SPEC-knob-echo.md]
-
-a battery or arm call prefixed `export GATE_SDK_NATIVE_BIN=native/target/release/checkwright-gates &&`, or the same bare env-assign prefix, falls through the guard unsteered and costs an out-of-band decision; 15 of 231 prompting calls at gate-sdk-blind-spots' close carried it. The value is the knob's own default (gate-sdk/SPEC.md §Layout and configuration), so the prefix buys nothing. **Probed at promotion:** both spellings exit 0 from `scripts/bash-guard.sh` with no output; rule 6 catches a standalone assignment only.
-
-**Deliverable:** a generic-ruleset steer that refuses exporting or env-assigning a gate-sdk knob to its default and names the default, or a ruling that the cause is the prose (sessions read "the gate binary at `GATE_SDK_NATIVE_BIN`" as needing the variable set) and that prose fix instead.
-
-**Admitted by operator exception to the enhancement admission filter** (TRAJECTORY.md §The rulings, its exception clause) — `operator direction, 2026-09-23`, lead-relayed. A new rule reaches none of the three arms. The reason, as escalated: this is the pool's only session-class row, a cost every battery-running session pays.
-
-**Specified 2026-09-23:** the steer, as arm (d) of guard-kit rule 2. It blocks an `export`, leading-assignment or `env` prefix that sets any statically owned kit knob to the value it already resolves to, or to another spelling of the same file. It names the value and falls through on a differing override. A respelled path is its sharpest case, because it reds `check-graph` through the baked hook text.
-
-**Cost while deferred:** every session that runs the battery risks a prompt per prefixed call. Filed 2026-09-23 to the gap inbox by gate-sdk-blind-spots' close; promoted 2026-09-23 at the next scope. Owner lookup: `export`, `env-assign`, `knob default` in guard-kit/SPEC.md — none.
-
 ### worktree-gate-execution
 
 [spec: SPEC-isolated-dispatch.md]
@@ -1620,5 +1606,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - cannot-run-marker-late-read
 - stage-exit-no-successor-check
 - lead-capture-dirties-batch
+- knob-default-export-unsteered
 
 ## Lessons Learned

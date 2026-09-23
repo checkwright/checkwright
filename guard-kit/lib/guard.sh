@@ -355,14 +355,67 @@ guard_rule_cd_compound() {
     fi
 }
 
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 2's arm (d), one skeleton segment at a time: the raw command is read only to spell the corrective, since an assignment carrying no quote or expansion is the same text in both views
+_guard_knob_echo() {
+    local raw="$1" seg="$2" shape=lead i=0 w name val out kshape resolved pre post tail respelt=''
+    local -a words asg=()
+    read -ra words <<<"$seg"
+    case "${words[0]:-}" in
+        export) shape='export'; words=("${words[@]:1}") ;;
+        env) shape='env'; words=("${words[@]:1}") ;;
+    esac
+    while ((i < ${#words[@]})) && [[ "${words[i]}" =~ ^[A-Za-z_][A-Za-z0-9_]*= ]]; do
+        asg+=("${words[i]}")
+        ((i++))
+    done
+    ((${#asg[@]})) || return 0
+    case "$shape" in
+        export) ((i == ${#words[@]})) || return 0 ;;
+        lead) ((i < ${#words[@]})) || return 0 ;;
+    esac
+    for w in "${asg[@]}"; do
+        name="${w%%=*}"
+        val="${w#*=}"
+        case "$val" in *SQ* | *DQ* | *'$'* | *'`'* | *\\*) continue ;; esac
+        out="$(gate_knob_values "$name" 2>/dev/null)" || continue
+        IFS=$'\t' read -r _ kshape resolved <<<"$out"
+        [[ "$kshape" == scalar ]] || continue
+        if [[ "$val" != "$resolved" ]]; then
+            [[ -e "$val" && "$val" -ef "$resolved" ]] || continue
+            respelt=" '$val' names the same file as '$resolved' but is not its text, and the generated hooks bake the knob's text, so the battery it prefixes reds check-graph on a stale hook."
+        fi
+        if [[ "$shape" == export && ${#asg[@]} -eq 1 ]]; then
+            w="${seg#"${seg%%[![:space:]]*}"}"
+            w="${w%"${w##*[![:space:]]}"}"
+        fi
+        pre="${raw%%"$w"*}"
+        post="${raw#*"$w"}"
+        post="${post#"${post%%[![:space:]]*}"}"
+        if [[ "$w" == export* ]]; then
+            case "$post" in '&&'* | ';'*) post="${post#&&}"; post="${post#;}"; post="${post#"${post%%[![:space:]]*}"}" ;; esac
+        elif [[ "$shape" == env && ${#asg[@]} -eq 1 ]]; then
+            tail="${pre%"${pre##*[![:space:]]}"}"
+            [[ "$tail" == *env ]] && pre="${tail%env}"
+        fi
+        if [[ -z "$post" ]]; then
+            pre="${pre%"${pre##*[![:space:]]}"}"
+            pre="${pre%&&}"
+            pre="${pre%;}"
+            pre="${pre%"${pre##*[![:space:]]}"}"
+        fi
+        guard_block "drop the '$w' prefix — $name already resolves to '$resolved', so the prefix buys nothing, and the matcher cannot see past an assignment or an export, so it costs an out-of-band permission decision.$respelt Run it without the prefix: $pre$post"
+    done
+}
+
 guard_rule_git_c_root() {
     local cmd seg cmdseg w globals
     cmd="$(guard_skeleton "$1" sq dq hd)"
     if grep -qF "git -C $PWD " <<<"$cmd"; then
         guard_block "drop 'git -C $PWD ' — cwd is the repo root, so the bare 'git <subcommand>' form is allowlisted and resolves on the match; the absolute '-C' spelling matches nothing and costs an out-of-band permission decision. Reserve 'git -C <dir>' for a different repo."
     fi
-    case "$cmd" in *git*-c* | */time* | */nice* | */nohup* | */stdbuf*) ;; *) return 0 ;; esac
+    case "$cmd" in *git*-c* | */time* | */nice* | */nohup* | */stdbuf* | *=*) ;; *) return 0 ;; esac
     while IFS= read -r seg; do
+        case "$seg" in *=*) _guard_knob_echo "$1" "$seg" ;; esac
         cmdseg="$(_guard_command_word "$seg")"
         w="${cmdseg%%[[:space:]]*}"
         if [[ "$w" == git ]] && globals="$(_guard_git_subcommand "$cmdseg" globals)" \
