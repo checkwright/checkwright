@@ -166,24 +166,19 @@ fn present(low: &[u8], m: &[u8]) -> Option<usize> {
 // side in running prose stay ordinary words
 fn adjacent(gap: &[u8]) -> bool {
     const DELIM: &[u8] = b"][,/:().`|";
-    if gap.len() <= 8
-        && gap.iter().all(|c| DELIM.contains(c) || *c == b' ' || *c == b'\t')
-        && gap.iter().any(|c| DELIM.contains(c))
-    {
+    if gap.iter().all(|c| !c.is_ascii_alphabetic()) && gap.iter().any(|c| DELIM.contains(c)) {
         return true;
     }
-    if gap.len() <= 16 {
-        for w in [&b"and"[..], &b"or"[..]] {
-            let mut i = 0usize;
-            while i + w.len() <= gap.len() {
-                if &gap[i..i + w.len()] == w
-                    && gap[..i].iter().all(|c| !c.is_ascii_alphabetic())
-                    && gap[i + w.len()..].iter().all(|c| !c.is_ascii_alphabetic())
-                {
-                    return true;
-                }
-                i += 1;
+    for w in [&b"and"[..], &b"or"[..]] {
+        let mut i = 0usize;
+        while i + w.len() <= gap.len() {
+            if &gap[i..i + w.len()] == w
+                && gap[..i].iter().all(|c| !c.is_ascii_alphabetic())
+                && gap[i + w.len()..].iter().all(|c| !c.is_ascii_alphabetic())
+            {
+                return true;
             }
+            i += 1;
         }
     }
     false
@@ -285,6 +280,18 @@ mod tests {
         }
         for gap in [&b", "[..], &b"/"[..], &b"` `"[..], &b"], ["[..], &b" and "[..], &b", or "[..]] {
             assert!(adjacent(gap), "delimited gap {:?} did not chain", gap);
+        }
+    }
+
+    // spec: canon-kit/SPEC.md §check-prose-enum — the chaining test is structural, so a long
+    // letterless separator chains and a gap carrying a word other than and/or never does
+    #[test]
+    fn a_separator_chains_whatever_its_length_and_never_across_a_word() {
+        for gap in [&b"`,          `"[..], &b"` ),  (              `"[..], &b"`,                and     `"[..], &b" (2), "[..]] {
+            assert!(adjacent(gap), "long letterless gap {:?} did not chain", gap);
+        }
+        for gap in [&b", then "[..], &b" and then "[..], &b" and or "[..]] {
+            assert!(!adjacent(gap), "worded gap {:?} chained", gap);
         }
     }
 }

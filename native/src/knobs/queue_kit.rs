@@ -35,6 +35,10 @@ pub const KIT: Kit = Kit {
             "QUEUE_KIT_PRECONDITION_REGEX",
             "(^|[^a-z])(revisit when|once [^.]*(lands|ships|is (done|ready|merged))|gated on|contingent on|waiting on|pending [a-z]|blocked on)",
         ),
+        Row::scalar(
+            "QUEUE_KIT_PRECONDITION_PAST_REGEX",
+            "(once|when|after)[^.,;]*(landed|shipped|merged|resolved|completed|was [a-z]+ed)",
+        ),
         Row::indexed("QUEUE_KIT_LESSON_TAGS", &[]),
         Row::keyed("QUEUE_KIT_LESSON_SINKS", &[]),
         Row::scalar("QUEUE_KIT_ATTEND_CAP", "3"),
@@ -92,8 +96,10 @@ fn validate(v: &Values) -> Vec<String> {
     if scalar(v, "QUEUE_KIT_ICEBOX_SECTION") == scalar(v, "QUEUE_KIT_DEFERRED_SECTION") {
         errs.push("QUEUE_KIT_ICEBOX_SECTION must not name the deferred section".to_string());
     }
-    if empty("QUEUE_KIT_PRECONDITION_REGEX") {
-        errs.push("QUEUE_KIT_PRECONDITION_REGEX is empty".to_string());
+    for n in ["QUEUE_KIT_PRECONDITION_REGEX", "QUEUE_KIT_PRECONDITION_PAST_REGEX"] {
+        if empty(n) {
+            errs.push(format!("{} is empty", n));
+        }
     }
     if empty_list("QUEUE_KIT_REQUIRED_SECTIONS") && empty("QUEUE_KIT_ICEBOX_SECTION") {
         errs.push("QUEUE_KIT_REQUIRED_SECTIONS is empty".to_string());

@@ -161,16 +161,15 @@ fn validate(v: &Values) -> Vec<String> {
             errs.push(format!("{} is empty", n));
         }
     }
-    for n in [
-        "LIFECYCLE_KIT_SHIM_NGRAM",
-        "LIFECYCLE_KIT_RECURRENCE_THRESHOLD",
-        "LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP",
-    ] {
+    for n in ["LIFECYCLE_KIT_SHIM_NGRAM", "LIFECYCLE_KIT_RECURRENCE_THRESHOLD"] {
         if let Some(s) = scalar(v, n) {
             if !positive(s) {
                 errs.push(format!("{} '{}' is not a positive integer", n, s));
             }
         }
+    }
+    if let Some(s) = scalar(v, "LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP").filter(|s| *s != "off" && !positive(s)) {
+        errs.push(format!("LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP '{}' is neither a positive integer nor off", s));
     }
     if let Some(b) = scalar(v, "LIFECYCLE_KIT_SESSION_BOUNDARY") {
         if b != "stage" && b != "iteration" {

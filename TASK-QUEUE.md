@@ -8,24 +8,6 @@
 
 ## New Features
 
-### policy-choice-census-residue
-
-[spec: SPEC-policy-residue.md]
-
-the `consumer-policy-seam` spec census left eleven members owing a ruling under doctrine-kit/DOCTRINE.md's Policy-as-choice discriminator.
-
-**Eight kit-fixed values**, each SPEC-grounded in terms other than the discriminator's: `check-shellcheck` and `check-action-run-shell`'s `-S warning` floor; `check-prose-tells`' all-caps run of 3 and its contrast and tricolon regexes; `check-provenance-seam`'s 7..40 hex run; `check-queue-prose-precondition`'s past-tense verb list; `check-prose-enum`'s 8- and 16-byte adjacency gaps; `check-fence-run`'s `DEPTH_BACKSTOP=3`; `check-gate-assertions`' cardinal words capped at nine; and the msg-patterns template's account-noun `{0,6}` reach. **Three knobs with no `off`**: `QUEUE_KIT_WRAP_BUDGET`, `LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP` and `LIFECYCLE_KIT_SHIM_NGRAM` validate a positive integer only, where `QUEUE_KIT_ENTRY_CAP` and `QUEUE_KIT_SLUG_MAX` admit `off`.
-
-**Deliverable:** per fixed value, its SPEC ground restated in the discriminator's terms (grammar, contract, external limit, verdict-neutral) or a knob. Per knob, `off` admitted where the gate's other assertions survive it, or a stated ground that the calibration is the gate's whole predicate.
-
-**Specified 2026-09-23:**
-
-- **Knobs.** Two new knobs, `CANON_KIT_PROSE_TELL_ABBR_MIN_LEN` and `QUEUE_KIT_PRECONDITION_PAST_REGEX`, each admitting `off`. `LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP` admits `off`.
-- **Structural bounds and grammar.** `check-prose-enum`'s byte caps give way to its structural chaining bound. `check-gate-assertions` reads the shared cardinal grammar.
-- **Grounds restated.** Every other member takes a ground in the discriminator's terms, and the wrap budget and the shim width are each their gate's whole predicate.
-
-**Cost while deferred:** the Policy-as-choice audit-roster class re-reads the same eleven on every due sweep, and the census sweeps already split on two of them. Filed 2026-09-22 to the gap inbox as two bullets by the spec census; merged and promoted 2026-09-23 at close, because every member is a per-member ruling.
-
 ### cannot-run-marker-late-read
 
 [spec: SPEC-marker-grammar.md]
@@ -110,11 +92,9 @@ a worktree-isolated `audit-sweep` has no gate binary for its oracle arms. `DELEG
 
 ### repo-inherits-policy-defaults
 
-[blocked-by: policy-choice-census-residue]
-
 Policy-as-choice says a consumer holding a choice binds it in its own config and the kit's author is such a consumer, yet this repo inherits most policy knobs' kit defaults silently. **Premise corrected 2026-09-23:** the filing said *every*; this iteration bound its new knobs explicitly (`CANON_KIT_KNOB_CITATION_REACH`, `CANON_KIT_KNOB_CITATION_LITERAL_SPAN`, `CANON_KIT_DEFAULT_COUPLING_WINDOW`, `GATE_SDK_ASSERTION_STRENGTH_WINDOW`, `CANON_KIT_MEASURED_SPAN`), while older ones such as `QUEUE_KIT_WRAP_BUDGET`, `QUEUE_KIT_ENTRY_CAP` and `LIFECYCLE_KIT_SHIM_NGRAM` stay unbound in `scripts/*.knobs`. **Re-verified at promotion:** a grep of `scripts/*.knobs` binds none of those three.
 
-**Deliverable:** a census of kit policy knobs (not layout knobs) whose default this repo relies on, and an explicit binding line per knob, so a later move of a kit default moves no verdict here; or a ruling that inheriting a default is binding it. Blocked on [policy-choice-census-residue](#policy-choice-census-residue), whose rulings may mint knobs or admit `off`, changing the set to bind.
+**Deliverable:** a census of kit policy knobs (not layout knobs) whose default this repo relies on, and an explicit binding line per knob, so a later move of a kit default moves no verdict here; or a ruling that inheriting a default is binding it. It waited on `policy-choice-census-residue`, whose rulings minted knobs and admitted `off`, changing the set to bind.
 
 **Cost while deferred:** a kit default moved toward a more universal value silently moves this repo's verdicts. Filed 2026-09-22 to the gap inbox by `consumer-policy-seam`'s spec; promoted 2026-09-23 at its close, because the census is its own sweep and its alternative is a reading of the doctrine.
 
@@ -1679,5 +1659,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - couples-literals-undisposed
 - suite-corpus-skips-tests-dir
 - unmarked-discharge-vs-span
+- policy-choice-census-residue
 
 ## Lessons Learned

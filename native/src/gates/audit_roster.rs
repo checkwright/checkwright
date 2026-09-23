@@ -36,7 +36,7 @@ struct Stamp {
 
 // spec: lifecycle-kit/SPEC.md §check-audit-roster — the pure half: assertions A, B and C over
 // the text, returning the findings and the current-iteration-checkable stamps for D
-fn check(text: &str, cap: usize, stages: &[String]) -> (Vec<(usize, String)>, Vec<Stamp>, usize) {
+fn check(text: &str, cap: Option<usize>, stages: &[String]) -> (Vec<(usize, String)>, Vec<Stamp>, usize) {
     let mut findings: Vec<(usize, String)> = Vec::new();
     let mut stamps: Vec<Stamp> = Vec::new();
     let mut blocks: Vec<Vec<(usize, &str)>> = Vec::new();
@@ -44,8 +44,8 @@ fn check(text: &str, cap: usize, stages: &[String]) -> (Vec<(usize, String)>, Ve
     let mut in_header = true;
     for (idx, line) in text.lines().enumerate() {
         let fnr = idx + 1;
-        // assertion B: no line exceeds the configured byte cap
-        if line.len() > cap {
+        // assertion B: no line exceeds the configured byte cap, skipped at `off`
+        if let Some(cap) = cap.filter(|c| line.len() > *c) {
             findings.push((
                 fnr,
                 format!("line is {} bytes, over the {}-byte cap", line.len(), cap),
@@ -206,16 +206,22 @@ pub fn run(args: &[String]) -> i32 {
         },
     };
     let cap = match walk::knob_scalar("LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP") {
+        Ok(v) if v == "off" => None,
         Ok(v) => match v.parse::<usize>() {
-            Ok(n) if n > 0 => n,
+            Ok(n) if n > 0 => Some(n),
             _ => {
                 return fail(format!(
-                    "LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP is not a positive integer: {}",
+                    "LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP is neither a positive integer nor off: {}",
                     v
                 ))
             }
         },
         Err(e) => return fail(e),
+    };
+    let held = if cap.is_some() {
+        "grammar, cap and class uniqueness hold"
+    } else {
+        "grammar and class uniqueness hold, no line cap set"
     };
     let stage_roster = match stages::stages() {
         Ok(s) => s,
@@ -278,20 +284,20 @@ pub fn run(args: &[String]) -> i32 {
         for (l, w) in &findings {
             println!("  {}:{}: {}", roster, l, w);
         }
-        println!("  help: each block is 'class:', 'scope:', 'due:', 'last:' and, unless last is 'never', 'corpus:', 'hits:', 'declined:' — one line each, in that order, blocks separated by a blank line; hits a decimal integer, declined the literal 'none' when nothing was set aside, last '<iteration> <stage>' naming a configured stage the state file stamped when it is the current iteration, every line within LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP bytes, and each class once. A sweep replaces its block's attestation lines and sends its narration to the commit message (lifecycle-kit/SPEC.md §The audit roster).");
+        println!("  help: each block is 'class:', 'scope:', 'due:', 'last:' and, unless last is 'never', 'corpus:', 'hits:', 'declined:' — one line each, in that order, blocks separated by a blank line; hits a decimal integer, declined the literal 'none' when nothing was set aside, last '<iteration> <stage>' naming a configured stage the state file stamped when it is the current iteration, every line within LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP bytes unless it is off, and each class once. A sweep replaces its block's attestation lines and sends its narration to the commit message (lifecycle-kit/SPEC.md §The audit roster).");
         return 1;
     }
     if blocks == 0 {
         println!("AUDIT-ROSTER: clean (no class block in {} — inert)", roster);
     } else if hermetic.is_some() {
         println!(
-            "AUDIT-ROSTER: clean ({} block(s) in {}; grammar, cap and class uniqueness hold — hermetic file argument, so no stamp check)",
-            blocks, roster
+            "AUDIT-ROSTER: clean ({} block(s) in {}; {} — hermetic file argument, so no stamp check)",
+            blocks, roster, held
         );
     } else {
         println!(
-            "AUDIT-ROSTER: clean ({} block(s) in {}; grammar, cap and class uniqueness hold, {} current-iteration last stamp(s) checked against the state file)",
-            blocks, roster, d_checked
+            "AUDIT-ROSTER: clean ({} block(s) in {}; {}, {} current-iteration last stamp(s) checked against the state file)",
+            blocks, roster, held, d_checked
         );
     }
     0
@@ -311,7 +317,7 @@ mod tests {
     #[test]
     fn a_never_block_closes_after_four_keys_and_a_swept_one_after_seven() {
         let t = "# contract: x\n\nclass: a\nscope: s\ndue: d\nlast: never\n\nclass: b\nscope: s\ndue: d\nlast: it close\ncorpus: surfaces: x, y\nhits: 3\ndeclined: none\n";
-        let (f, st, n) = check(t, 1500, &stages());
+        let (f, st, n) = check(t, Some(1500), &stages());
         assert!(f.is_empty(), "{:?}", f);
         assert_eq!((st.len(), n), (1, 2));
     }
@@ -319,7 +325,7 @@ mod tests {
     #[test]
     fn a_dropped_due_an_empty_declined_and_a_stray_line_each_red() {
         let t = "class: a\nscope: s\nlast: never\n\nclass: b\nscope: s\ndue: d\nlast: it close\ncorpus: c\nhits: x\ndeclined:\nmore\n";
-        let (f, _, _) = check(t, 1500, &stages());
+        let (f, _, _) = check(t, Some(1500), &stages());
         let w: Vec<&str> = f.iter().map(|x| x.1.as_str()).collect();
         assert!(w
             .iter()
@@ -332,7 +338,7 @@ mod tests {
     #[test]
     fn the_cap_the_stage_roster_and_class_uniqueness_are_asserted() {
         let t = format!("class: a\nscope: {}\ndue: d\nlast: it validate\ncorpus: c\nhits: 1\ndeclined: none\n\nclass: a\nscope: s\ndue: d\nlast: never\n", "x".repeat(40));
-        let (f, _, _) = check(&t, 30, &stages());
+        let (f, _, _) = check(&t, Some(30), &stages());
         let w: Vec<&str> = f.iter().map(|x| x.1.as_str()).collect();
         assert!(w.iter().any(|m| m.contains("over the 30-byte cap")));
         assert!(w.iter().any(|m| m.contains("not a configured stage")));

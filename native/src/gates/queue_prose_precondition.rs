@@ -3,12 +3,10 @@
 use crate::ere::Ere;
 use crate::queue;
 
-// spec: queue-kit/SPEC.md §check-queue-prose-precondition — the three rewrites, patterns baked
-// literally into this member's own source rather than resolved from consumer config: bracket tags
-// and links, then past-tense narration, then the queue's own state name spelled unbracketed
+// spec: queue-kit/SPEC.md §check-queue-prose-precondition — the three rewrites: bracket tags and
+// links, then past-tense narration (`QUEUE_KIT_PRECONDITION_PAST_REGEX`, the one consumer
+// calibration), then the queue's own state name spelled unbracketed; the other two are grammar
 const BRACKET_RE_SRC: &str = "\\[[^]]*\\]";
-const PAST_TENSE_RE_SRC: &str =
-    "(once|when|after)[^.,;]*(landed|shipped|merged|resolved|completed|was [a-z]+ed)";
 const TAG_WORD_RE_SRC: &str = "design-pending";
 
 // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — awk's `gsub`, as a caller-side loop over the
@@ -65,6 +63,17 @@ fn fired_span(b: &str, s: usize, e: usize) -> String {
     whole.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
+// spec: queue-kit/SPEC.md §Layout and configuration — `off` strips nothing, and a value that
+// does not compile is unreadable config, exit 2
+fn past_tense(src: &str) -> Result<Option<Ere>, String> {
+    if src == "off" {
+        return Ok(None);
+    }
+    Ere::compile(src)
+        .map(Some)
+        .map_err(|e| format!("QUEUE_KIT_PRECONDITION_PAST_REGEX failed to compile: {}", e))
+}
+
 fn carries_block_tag(line: &str) -> bool {
     line.contains("[blocked-by:") || line.contains("[precondition-ok:")
 }
@@ -93,8 +102,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         .map_err(|e| format!("QUEUE_KIT_PRECONDITION_REGEX failed to compile: {}", e))?;
     let bracket = Ere::compile(BRACKET_RE_SRC)
         .map_err(|e| format!("the bracket pattern failed to compile: {}", e))?;
-    let past_tense = Ere::compile(PAST_TENSE_RE_SRC)
-        .map_err(|e| format!("the past-tense pattern failed to compile: {}", e))?;
+    let past_tense = past_tense(&queue::knob_scalar("QUEUE_KIT_PRECONDITION_PAST_REGEX")?)?;
     let tag_word = Ere::compile(TAG_WORD_RE_SRC)
         .map_err(|e| format!("the state-name pattern failed to compile: {}", e))?;
 
@@ -113,7 +121,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
         let Some(e) = open.take() else { return Ok(()) };
         let b = e.body.to_ascii_lowercase();
         let b = replace_all(&bracket, &b, " ")?;
-        let b = replace_all(&past_tense, &b, " ")?;
+        let b = match &past_tense {
+            Some(re) => replace_all(re, &b, " ")?,
+            None => b,
+        };
         let b = replace_all(&tag_word, &b, " ")?;
         if e.hasblock {
             return Ok(());
@@ -202,11 +213,33 @@ mod tests {
             replace_all(&bracket, "a gated[x]on b", " ").unwrap(),
             "a gated on b"
         );
-        let past = Ere::compile(PAST_TENSE_RE_SRC).unwrap();
+        let past = past_tense(&shipped_past()).unwrap().expect("the default is a pattern");
         assert_eq!(
             replace_all(&past, "c waitingonce foo landedon d", " ").unwrap(),
             "c waiting on d"
         );
+    }
+
+    fn shipped_past() -> String {
+        match crate::knobs::queue_kit::KIT
+            .rows
+            .iter()
+            .find(|r| r.name == "QUEUE_KIT_PRECONDITION_PAST_REGEX")
+            .map(|r| &r.default)
+        {
+            Some(crate::knobs::Default::Scalar(s)) => s.to_string(),
+            _ => panic!("the past-tense knob is a scalar row"),
+        }
+    }
+
+    // spec: queue-kit/SPEC.md §Layout and configuration — the default strips the shipped phrase
+    // set, `off` strips nothing, and a pattern that does not compile is refused
+    #[test]
+    fn the_past_tense_strip_is_the_knob_and_off_strips_nothing() {
+        let past = past_tense(&shipped_past()).unwrap().expect("the default is a pattern");
+        assert_eq!(replace_all(&past, "x once y landed z", " ").unwrap(), "x   z");
+        assert!(past_tense("off").unwrap().is_none());
+        assert!(past_tense("(unclosed").is_err());
     }
 
     // spec: queue-kit/SPEC.md §check-queue-prose-precondition — the fired-on clause

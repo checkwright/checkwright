@@ -6,10 +6,10 @@ use crate::gates::gate_output::{native_module, resolve_declaration};
 use crate::walk;
 use std::path::Path;
 
-// spec: gate-sdk/SPEC.md §check-gate-assertions — discovery's filters, verbatim from the shell
-// form: a count-word adjacent to an enumeration noun, with one optional word between them
-const COUNT_RX: &str = "(^|[^a-z])(two|three|four|five|six|seven|eight|nine)[[:space:]]+([a-z]+[[:space:]]+)?(assertion|assertions|axes|axis|checks)([^a-z]|$)";
-const WORD_RX: &str = "(two|three|four|five|six|seven|eight|nine)";
+// spec: gate-sdk/SPEC.md §check-gate-assertions — discovery's filters: a count-word adjacent to
+// an enumeration noun, with one optional word between them; the count-word is canon-kit's
+// spelled cardinal, read by `spec::cardinal_word_value`, so this tail is what follows it
+const NOUN_TAIL_RX: &str = "^[[:space:]]+([a-z]+[[:space:]]+)?(assertion|assertions|axes|axis|checks)([^a-z]|$)";
 const FIRST_PAREN_RX: &str = "\\([^)]*\\)";
 const ONE_LABEL_RX: &str = "^\\([A-Za-z0-9]\\)$";
 const LABEL_RX: &str = "\\(([A-Za-z0-9])\\)";
@@ -20,8 +20,7 @@ const LABEL_RX: &str = "\\(([A-Za-z0-9])\\)";
 const MARKER_RX: &str = "(#|//)[[:space:]]*assertion[[:space:]]+[A-Za-z0-9]+:";
 
 struct Rx {
-    count: Ere,
-    word: Ere,
+    tail: Ere,
     paren: Ere,
     one: Ere,
     label: Ere,
@@ -35,8 +34,7 @@ impl Rx {
                 .map_err(|e| format!("check-gate-assertions: cannot compile {}: {}", p, e))
         };
         Ok(Rx {
-            count: c(COUNT_RX)?,
-            word: c(WORD_RX)?,
+            tail: c(NOUN_TAIL_RX)?,
             paren: c(FIRST_PAREN_RX)?,
             one: c(ONE_LABEL_RX)?,
             label: c(LABEL_RX)?,
@@ -51,18 +49,30 @@ struct Contract {
     labels: Vec<String>,
 }
 
-fn word_num(w: &str) -> usize {
-    match w {
-        "two" => 2,
-        "three" => 3,
-        "four" => 4,
-        "five" => 5,
-        "six" => 6,
-        "seven" => 7,
-        "eight" => 8,
-        "nine" => 9,
-        _ => 0,
+// spec: gate-sdk/SPEC.md §check-gate-assertions — the first whole lowercase word that is a
+// spelled cardinal of two or more and is followed by the noun tail; returns the count and the
+// end of the tail match, which consumed one trailing boundary character
+fn count_word(rx: &Rx, low: &str) -> Option<(usize, usize)> {
+    let b = low.as_bytes();
+    let mut i = 0usize;
+    while i < b.len() {
+        if !b[i].is_ascii_lowercase() {
+            i += 1;
+            continue;
+        }
+        let mut j = i;
+        while j < b.len() && b[j].is_ascii_lowercase() {
+            j += 1;
+        }
+        let n = crate::spec::cardinal_word_value(&low[i..j]).and_then(|v| v.parse::<usize>().ok());
+        if let Some(n) = n.filter(|n| *n >= 2) {
+            if let Some((_, e)) = rx.tail.find(&low[j..]) {
+                return Some((n, j + e));
+            }
+        }
+        i = j;
     }
+    None
 }
 
 // spec: gate-sdk/SPEC.md §check-gate-assertions — awk's `/^[[:space:]]*$/` over the paragraph
@@ -98,13 +108,7 @@ fn contract(rx: &Rx, heading: &str, p: &str) -> Option<Contract> {
     // indexes the original-case paragraph with the lowered copy's offsets, sound only because an
     // ASCII lowercase preserves byte length where a Unicode one does not
     let low = p.to_ascii_lowercase();
-    let (ns, ne) = rx.count.find(&low)?;
-    let span = cut(&low, ns, ne);
-    let count = rx
-        .word
-        .find(span)
-        .map(|(a, b)| word_num(cut(span, a, b)))
-        .unwrap_or(0);
+    let (count, ne) = count_word(rx, &low)?;
 
     // spec: gate-sdk/SPEC.md §check-gate-assertions — the second pinned port hazard: the slice
     // starts one position early so the trailing boundary character the pattern consumed survives
@@ -493,6 +497,20 @@ mod tests {
         assert!(contract(&rx, "check-x", "Held on three grounds: (A) one; (B) two.").is_none());
         assert!(contract(&rx, "check-x", "Two axes (see below): (A) one; (B) two.").is_none());
         assert!(contract(&rx, "check-x", "Held on two axes: (A) the only one.").is_none());
+    }
+
+    // spec: gate-sdk/SPEC.md §check-gate-assertions — the count-word is the shared cardinal
+    // grammar, so a contract counted past nine is discovered and a word before it is skipped
+    #[test]
+    fn the_count_word_is_any_spelled_cardinal_of_two_or_more() {
+        let rx = rx();
+        let labels = (b'A'..=b'L').map(|c| format!("({}) x", c as char)).collect::<Vec<_>>().join("; ");
+        let c = contract(&rx, "check-x", &format!("Held on twelve assertions: {}.", labels))
+            .expect("a count past nine is discovered");
+        assert_eq!(c.count, 12);
+        let c = contract(&rx, "check-x", "Held on the four assertions: (A) a; (B) b.").expect("discovered");
+        assert_eq!(c.count, 4);
+        assert!(contract(&rx, "check-x", "Held on one assertion: (A) a; (B) b.").is_none());
     }
 
     // spec: gate-sdk/SPEC.md §check-gate-assertions — the two marker grammars differ on purpose:

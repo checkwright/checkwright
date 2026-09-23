@@ -23,6 +23,15 @@ fn numeric(s: &str) -> Result<f64, String> {
         .map_err(|e| format!("{} is not numeric despite table validation: {}", s, e))
 }
 
+fn abbr_min(s: &str) -> Result<Option<usize>, String> {
+    if s == "off" {
+        return Ok(None);
+    }
+    s.parse::<usize>()
+        .map(Some)
+        .map_err(|e| format!("{} is not an integer despite table validation: {}", s, e))
+}
+
 struct Thresholds {
     emdash_max: f64,
     emdash_max_raw: String,
@@ -32,6 +41,7 @@ struct Thresholds {
     rhythm_cv_min: f64,
     tricolon_max: f64,
     tricolon_max_raw: String,
+    abbr_min: Option<usize>,
 }
 
 // spec: canon-kit/SPEC.md §check-prose-tells — three non-prose surfaces are held out of what
@@ -284,22 +294,25 @@ impl Sink<'_> {
     // spec: canon-kit/SPEC.md §check-prose-tells — assertion D, an all-caps token never expanded
     // anywhere in the file and absent from the allow-list
     fn flush_file(&mut self, file: &str) {
+        // spec: canon-kit/SPEC.md §check-prose-tells — `off` skips assertion D alone
+        let Some(min) = self.th.abbr_min else { return };
         let allow = self.allow.to_vec();
         let buf = self.file_buf.clone();
         let b = buf.as_bytes();
         let mut seen: Vec<String> = Vec::new();
         let mut i = 0usize;
-        while i + 2 < b.len() {
-            let ok = b[i].is_ascii_uppercase()
-                && (b[i + 1].is_ascii_uppercase() || b[i + 1].is_ascii_digit())
-                && (b[i + 2].is_ascii_uppercase() || b[i + 2].is_ascii_digit());
-            if !ok {
+        while i < b.len() {
+            if !b[i].is_ascii_uppercase() {
                 i += 1;
                 continue;
             }
-            let mut j = i + 3;
+            let mut j = i + 1;
             while j < b.len() && (b[j].is_ascii_uppercase() || b[j].is_ascii_digit()) {
                 j += 1;
+            }
+            if j - i < min {
+                i += 1;
+                continue;
             }
             let before = if i > 0 { b[i - 1] } else { b' ' };
             let tok = String::from_utf8_lossy(&b[i..j]).into_owned();
@@ -469,6 +482,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         rhythm_cv_min: numeric(&walk::knob_scalar("CANON_KIT_PROSE_TELL_RHYTHM_CV_MIN")?)?,
         tricolon_max: numeric(&tricolon_max_raw)?,
         tricolon_max_raw,
+        abbr_min: abbr_min(&walk::knob_scalar("CANON_KIT_PROSE_TELL_ABBR_MIN_LEN")?)?,
     };
 
     let contrast_re = Ere::compile("not[^.]*(—|, but)[^.]*it('s| is)")
@@ -518,4 +532,51 @@ fn rule(args: &[String]) -> Result<i32, String> {
         files.len()
     );
     Ok(0)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn abbreviations(buf: &str, min: &str) -> Vec<String> {
+        let th = Thresholds {
+            emdash_max: 0.0,
+            emdash_max_raw: String::new(),
+            contrast_max: 0.0,
+            contrast_max_raw: String::new(),
+            rhythm_min: 0.0,
+            rhythm_cv_min: 0.0,
+            tricolon_max: 0.0,
+            tricolon_max_raw: String::new(),
+            abbr_min: abbr_min(min).expect("a validated value"),
+        };
+        let re = Ere::compile("x").expect("compiles");
+        let mut sink = Sink {
+            th: &th,
+            contrast_re: &re,
+            tricolon_re: &re,
+            phrases: &[],
+            allow: &[],
+            out: Vec::new(),
+            sec_startline: 1,
+            sec_buf: String::new(),
+            file_buf: buf.to_string(),
+            in_gen: false,
+        };
+        sink.flush_file("f.md");
+        sink.out
+            .iter()
+            .map(|l| l.split('"').nth(1).unwrap_or("").to_string())
+            .collect()
+    }
+
+    // spec: canon-kit/SPEC.md §check-prose-tells — assertion D reads all-caps tokens at least
+    // CANON_KIT_PROSE_TELL_ABBR_MIN_LEN long, and `off` skips it
+    #[test]
+    fn the_abbreviation_floor_is_the_knob_and_off_skips_the_assertion() {
+        let buf = " An OK run, a TLA, and a K8S node. ";
+        assert_eq!(abbreviations(buf, "2"), vec!["OK", "TLA", "K8S"]);
+        assert_eq!(abbreviations(buf, "3"), vec!["TLA", "K8S"]);
+        assert!(abbreviations(buf, "off").is_empty());
+    }
 }

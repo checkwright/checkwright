@@ -135,6 +135,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES", "4"),
         Row::scalar("CANON_KIT_PROSE_TELL_RHYTHM_CV_MIN", "0.25"),
         Row::scalar("CANON_KIT_PROSE_TELL_TRICOLON_MAX", "2"),
+        Row::scalar("CANON_KIT_PROSE_TELL_ABBR_MIN_LEN", "3"),
         Row::indexed(
             "CANON_KIT_PROSE_TELL_PHRASES",
             &[
@@ -195,6 +196,12 @@ fn decimal(v: &str) -> bool {
 // one-sentence paragraph
 fn min_sentences(v: &str) -> bool {
     digits(v) && v.parse::<u64>().is_ok_and(|n| n >= 2)
+}
+
+// spec: canon-kit/SPEC.md §Layout and configuration — at one letter every capital is an
+// abbreviation, so the floor is two
+fn abbr_min_len(v: &str) -> bool {
+    v == "off" || (digits(v) && v.parse::<usize>().is_ok_and(|n| n >= 2))
 }
 
 // spec: canon-kit/SPEC.md §Layout and configuration — the mirror root is one tracked directory
@@ -293,7 +300,7 @@ fn validate(v: &Values) -> Vec<String> {
     if empty_list("CANON_KIT_COUNT_COLLECTIONS") {
         errs.push("CANON_KIT_COUNT_COLLECTIONS is empty".to_string());
     }
-    // spec: canon-kit/SPEC.md §check-prose-tells — the five thresholds are validated here, not
+    // spec: canon-kit/SPEC.md §check-prose-tells — the thresholds are validated here, not
     // coerced by the gate: a malformed one refuses every canon-kit gate at exit 2 with the knob
     // named, never reads as zero
     for n in [
@@ -308,6 +315,12 @@ fn validate(v: &Values) -> Vec<String> {
     if let Some(s) = scalar(v, "CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES").filter(|s| !min_sentences(s)) {
         errs.push(format!(
             "CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES must be an integer >= 2 (got '{}')",
+            s
+        ));
+    }
+    if let Some(s) = scalar(v, "CANON_KIT_PROSE_TELL_ABBR_MIN_LEN").filter(|s| !abbr_min_len(s)) {
+        errs.push(format!(
+            "CANON_KIT_PROSE_TELL_ABBR_MIN_LEN must be an integer >= 2 or off (got '{}')",
             s
         ));
     }
@@ -378,6 +391,17 @@ mod tests {
         }
         for bad in ["", "0", "1", "-1", "2.0", "a"] {
             assert!(!min_sentences(bad), "{}", bad);
+        }
+    }
+
+    // spec: canon-kit/SPEC.md §check-prose-tells — the abbreviation floor is two or more, or off
+    #[test]
+    fn the_abbreviation_floor_is_at_least_two_or_off() {
+        for ok in ["2", "3", "10", "off"] {
+            assert!(abbr_min_len(ok), "{}", ok);
+        }
+        for bad in ["", "0", "1", "-1", "2.0", "OFF", "a"] {
+            assert!(!abbr_min_len(bad), "{}", bad);
         }
     }
 }

@@ -291,6 +291,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[
             "QUEUE_KIT_QUEUE_FILE",
             "QUEUE_KIT_PRECONDITION_REGEX",
+            "QUEUE_KIT_PRECONDITION_PAST_REGEX",
             "QUEUE_KIT_ACTIVE_SECTIONS",
             "QUEUE_KIT_DEFERRED_SECTION",
             "QUEUE_KIT_ICEBOX_SECTION",
@@ -783,6 +784,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES",
             "CANON_KIT_PROSE_TELL_RHYTHM_CV_MIN",
             "CANON_KIT_PROSE_TELL_TRICOLON_MAX",
+            "CANON_KIT_PROSE_TELL_ABBR_MIN_LEN",
         ],
         "canon-kit",
         &[("git", "")],

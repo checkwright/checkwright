@@ -4,7 +4,8 @@
 # the cap and class uniqueness, because a fixture's iteration names nothing in the host's state
 # file. This file covers the bare (configured-roster) mode in a sandbox: assertion D against a
 # real queue header and state file, a past iteration's last left unchecked, and the three inert
-# shapes (an empty knob, an absent roster, a header-only roster).
+# shapes (an empty knob, an absent roster, a header-only roster), and the line cap at `off`,
+# which the pair cannot set beside its own default.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -80,9 +81,21 @@ check_case "absent-roster" "$inert" roster.txt 0 "no roster at roster.txt"
 printf '# contract: lifecycle-kit/SPEC.md §The audit roster\n' >"$inert/header.txt"
 check_case "header-only" "$inert" header.txt 0 "no class block"
 
+# --- the line cap at `off`: an over-long line reds at the default and is clean at off ---
+long="$SANDBOX/long"; mkdir -p "$long"
+seed_tree "$long" close
+write_roster "$long" "live-cut close"
+printf '\nclass: long-scope\nscope: %s\ndue: d\nlast: never\n' "$(printf '%1600s' '' | tr ' ' x)" >>"$long/roster.txt"
+check_case "cap-default-reds" "$long" roster.txt 1 "over the 1500-byte cap"
+out="$(cd "$long" && LIFECYCLE_KIT_AUDIT_ROSTER_FILE=roster.txt LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP=off \
+    gate_run check-audit-roster "$DIR/checks" 2>&1)"; rc=$?
+if [[ "$rc" -ne 0 ]] || ! grep -qF "no line cap set" <<<"$out"; then
+    echo "  FAIL [cap-off-clean]: want exit 0 naming no line cap, got $rc -- $out"; fails=$((fails + 1))
+fi
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-audit-roster.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-audit-roster.test.sh: clean (assertion D held, missing, admitting a stamped pre-stamp and skipping a past iteration; empty-knob, absent and header-only inert shapes, 7 cases)"
+echo "check-audit-roster.test.sh: clean (assertion D held, missing, admitting a stamped pre-stamp and skipping a past iteration; empty-knob, absent and header-only inert shapes; the line cap reds at its default and is skipped at off, 9 cases)"
 exit 0

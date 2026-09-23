@@ -1480,7 +1480,12 @@ mod tests {
     // word list and declares `.words()`, unless named here as one value — a heading, a regex
     #[test]
     fn a_whitespace_default_scalar_is_declared_words() {
-        const ONE_VALUE: &[&str] = &["CANON_KIT_DOD_HEADING", "DOCTRINE_KIT_DIGEST_SECTION", "QUEUE_KIT_PRECONDITION_REGEX"];
+        const ONE_VALUE: &[&str] = &[
+            "CANON_KIT_DOD_HEADING",
+            "DOCTRINE_KIT_DIGEST_SECTION",
+            "QUEUE_KIT_PRECONDITION_REGEX",
+            "QUEUE_KIT_PRECONDITION_PAST_REGEX",
+        ];
         let mut undeclared: Vec<&str> = Vec::new();
         for kit in STATIC_KITS {
             for row in kit.rows {
