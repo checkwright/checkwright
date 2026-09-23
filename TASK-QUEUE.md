@@ -12,6 +12,40 @@
 
 ## Deferred
 
+### side-effect-free-read-arms
+
+[cost: event/high] [surface: guard-kit]
+
+shell utilities an agent runs for read-only work can also write: `sed -i`, `find -delete` and `-exec`, awk's `system()`, `tee`, redirects. The operator's shape: block side-effect-capable utilities and steer to side-effect-free arms of the gate binary that can be allowlisted and advertised as their replacements. The seed is gate-sdk's fence-safe arm set, `FENCE_SAFE_ARMS` (gate-sdk/SPEC.md, arms that reach no network and write nowhere). It succeeds guard-kit rule 27's interim read-only Bash allowlist for isolated children, whose advertised set and refusal message are worded to point at these tools later.
+
+**Deliverable:** the arm roster that replaces each blocked read, the guard rules that steer to it, and the allowlist entries. New governed names, so it owes an amendment and passes the enhancement admission filter only on an arm its authoring session argues.
+
+**Cost while deferred:** a read-only shell call keeps a write path the guard must judge per call, and an isolated child's read set stays the interim allowlist. Filed 2026-09-23 to the gap inbox by the lead on an operator direction; the operator recalls earlier discussion and no tracked record was found. Promoted 2026-09-23 at seam-and-stage-residue's close drain: an initiative with new names, never a drain fix. Owner lookup: `side-effect`, `FENCE_SAFE`, `dual-use`, `sed -i` in this file — none. Surface also delegation-kit and gate-sdk.
+
+### guard-worktree-scratch-dirs
+
+[cost: event/low] [surface: guard-kit]
+
+from a linked worktree, guard-kit rules 14, 15 and 19 (B) resolve `GUARD_KIT_SCRATCH_DIRS` against the worktree cwd. The protocol puts an isolated child's liveness record in the main checkout's scratch dir (delegation-kit/templates/agent-execution.md, the never-poll bullet), so the canonical recorded launch writing `<main>/.tmp/<key>.run` is blocked by rule 15, whose corrective names the worktree's `.tmp`, the one home the protocol forbids; rule 14 likewise reads only the worktree's records. Pre-existing, found at this iteration's align while designing rule 27.
+
+**Inferred, not run:** the three rules block or miss the main-checkout record from a linked worktree — run the canonical recorded launch from a scratch linked worktree with the guard wired and read the verdict. The drain re-read the source only: rule 15 compares the path to `<d>/<key>.run` with `<d>` the relative `.tmp`.
+
+**Deliverable:** resolve the scratch-dir members against the main checkout from a linked worktree, on the owning-checkout pattern rule 27 gives its ignored-target test, with a guard-test case run from a linked worktree.
+
+**Cost while deferred:** an isolated child obeying the protocol is refused, or steered to a record the next reader never checks. Filed 2026-09-23 to the gap inbox at align; promoted at this iteration's close drain because the guard's TSV case suites have no linked-worktree harness, so the fix is not test-complete in one drain commit. Owner lookup: `SCRATCH_DIRS`, `rule 27`, `isolated child` in this file — none.
+
+### guard-knob-skew-bricks-shell
+
+[cost: event/low] [surface: guard-kit]
+
+a guard knob-load list that runs ahead of the gate binary wedges the live Bash guard. At this iteration's build a session added a knob name to guard-kit/lib/guard.sh's load list before rebuilding the binary, and every Bash call failed until the file was repaired with the Edit tool and the binary rebuilt. The knob read's failure branch blocks every command, while guard-kit's degradation posture is fail-open but loud (guard-kit/SPEC.md §The guard framework).
+
+**Inferred, not run:** an unknown knob name in the load list, against an older binary, blocks every command — run the guard with a name the binary does not declare in a scratch clone. The drain read the failure branch's `guard_block` and did not wedge its own shell to watch it.
+
+**Deliverable:** an unknown-name failure takes the fail-open path with an advisory naming the skew and the rebuild command, while a genuine config error still blocks. That needs a signal from the binary that tells the two apart.
+
+**Cost while deferred:** a mid-edit skew bricks the session's shell. Filed 2026-09-23 to the gap inbox by the lead from the build journal; promoted at this iteration's close drain because telling skew from a config error needs a binary-side signal, and editing the live guard in a drain risks the wedge it describes. Owner lookup: `knob-load`, `knob load`, `wedge` in this file — none. Surface also gate-sdk.
+
 ### foreign-toolchain-docker-legs
 
 [cost: event/low] [surface: gate-sdk]
@@ -600,10 +634,6 @@ Cites Delta 3 for delta 4's subject.
 
 A filtered run reports as all.
 
-### worktree-dispatch-rebuilds-the-gate-binary
-
-Each dispatch pays a cold build.
-
 ### committed-grant-fallthrough-unexplained
 
 Three bare grants fell through.
@@ -922,7 +952,7 @@ couples= misses installer/.
 
 ### worktree-isolated-dispatch-cannot-reach-the-main-checkout
 
-Bridge undecided.
+An isolated child's capture-tier logs resolve inside its worktree and die with it.
 
 ### cited-object-token-sweep-corpus-narrower-than-the-class
 
@@ -1578,5 +1608,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - lead-capture-dirties-batch
 - knob-default-export-unsteered
 - worktree-gate-execution
+- worktree-dispatch-rebuilds-the-gate-binary
 
 ## Lessons Learned

@@ -214,3 +214,4 @@
 | install-first-contact | sc sp a b v c | 5f/6d | 4 · ≤0d | 27s 3✗ | 131 |
 | consumer-policy-seam | sc sp a b v c | 8f/0d | 5 · ≤1d | 21s clean | 131 |
 | gate-sdk-blind-spots | sc sp a b v c | 12f/2d | 8 · ≤0d | 21s clean | 131 |
+| seam-and-stage-residue | sc sp a b v c | 12f/3d | 8 · ≤0d | 21s clean | 131 |

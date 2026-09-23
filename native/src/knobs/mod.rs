@@ -1625,6 +1625,26 @@ mod tests {
         }
     }
 
+    // spec: gate-sdk/SPEC.md §The knob file — a value's surrounding blanks are unexpressible in a file,
+    // so no default carries one: a consumer can always restate a default verbatim
+    #[test]
+    fn no_default_element_carries_a_surrounding_blank() {
+        let bare = |s: &str| s == s.trim_matches([' ', '\t']);
+        for kit in STATIC_KITS {
+            for row in kit.rows {
+                let elements: Vec<&str> = match &row.default {
+                    Default::Scalar(s) => vec![s],
+                    Default::Indexed(v) => v.to_vec(),
+                    Default::Keyed(v) => v.iter().flat_map(|(k, e)| [*k, *e]).collect(),
+                    Default::Derived(_) => continue,
+                };
+                for e in elements {
+                    assert!(bare(e), "{}'s default element {:?} carries a surrounding blank", row.name, e);
+                }
+            }
+        }
+    }
+
     // spec: gate-sdk/SPEC.md §The knob file — a malformed file value is refused at the kit's first
     // read with every finding
     #[test]

@@ -1,2 +1,2 @@
-# graph: couples=docs/posts/*.md,docs/install.md dir=one valve=none tier=precommit
+# graph: couples=docs/posts/*.md,docs/install.md,.workflow/release-declarations.md dir=one valve=none tier=precommit
 # spec: installer/SPEC.md §The upgrade contract — every release note's Tightened-gates section resolves to an explicit `None` or to a non-empty set of backticked bare gate names; a non-`none` section yielding no tokens is the silently-empty declaration the smoke cannot see

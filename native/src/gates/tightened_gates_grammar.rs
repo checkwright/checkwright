@@ -76,6 +76,30 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
+    // spec: installer/SPEC.md §The upgrade contract — the release declaration surface is held to the
+    // same grammar at every commit; a surface not yet carrying the section, or carrying it empty, is
+    // a declaration still accumulating, never a finding
+    let surface = match args.get(1).filter(|a| !a.is_empty()) {
+        Some(s) => s.clone(),
+        None => format!("{}/release-declarations.md", walk::knob_scalar("GATE_SDK_WORKFLOW_DIR")?),
+    };
+    let surface_read = Path::new(&surface).is_file();
+    if surface_read {
+        let text = read_text(&surface)?;
+        if let SectionVerdict::Unparsed(b) = declaration::section_tokens(&text, SECTION, TokenRule::GateName) {
+            for line in b.iter().filter(|l| l.trim_start().starts_with(['-', '*'])) {
+                errors.push(format!(
+                    "{}: '{}' bullet's lead token is unreadable: {}",
+                    surface,
+                    SECTION,
+                    line.chars().take(72).collect::<String>()
+                ));
+            }
+        }
+    } else if args.get(1).is_some_and(|a| !a.is_empty()) {
+        return Err(format!("declaration surface not found: {}", surface));
+    }
+
     if !errors.is_empty() {
         println!(
             "check-tightened-gates-grammar: {} unreadable tightened-gates declaration(s):",
@@ -88,8 +112,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Ok(1);
     }
     println!(
-        "TIGHTENED-GATES-GRAMMAR: clean ({} release note(s) under {}; {} declare `None`, the rest resolve {} lead token(s))",
-        notes, posts, none, tokens
+        "TIGHTENED-GATES-GRAMMAR: clean ({} release note(s) under {}; {} declare `None`, the rest resolve {} lead token(s); declaration surface {} {})",
+        notes,
+        posts,
+        none,
+        tokens,
+        surface,
+        if surface_read { "read" } else { "absent" }
     );
     Ok(0)
 }

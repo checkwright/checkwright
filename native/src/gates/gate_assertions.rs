@@ -138,14 +138,26 @@ fn contract(rx: &Rx, heading: &str, p: &str) -> Option<Contract> {
     })
 }
 
+// spec: gate-sdk/SPEC.md §check-gate-assertions — a lone descriptor line: one backticked `.gate` or
+// `.sh` path, then a parenthetical, closing on `).`
+fn descriptor_line(p: &str) -> bool {
+    let Some(rest) = p.strip_prefix('`') else {
+        return false;
+    };
+    let Some((path, tail)) = rest.split_once('`') else {
+        return false;
+    };
+    (path.ends_with(".gate") || path.ends_with(".sh")) && tail.starts_with(" (") && p.ends_with(").")
+}
+
 // spec: gate-sdk/SPEC.md §check-gate-assertions — discovery is first-paragraph-scoped: the
-// paragraph is the run of non-blank lines after a `### ` heading, joined with single spaces, and
-// a `## ` heading closes the subsection without opening one
+// paragraph is the run of non-blank lines after a `### ` heading, joined with single spaces, a lone
+// descriptor line skipped, and a `## ` heading closes the subsection without opening one
 fn extract(rx: &Rx, text: &str) -> Vec<Contract> {
     let mut out: Vec<Contract> = Vec::new();
     let mut heading = String::new();
     let mut para = String::new();
-    let (mut started, mut done) = (false, false);
+    let (mut started, mut done, mut lines) = (false, false, 0usize);
     let emit = |h: &str, p: &str, out: &mut Vec<Contract>| {
         if !h.is_empty() {
             if let Some(c) = contract(rx, h, p) {
@@ -175,13 +187,20 @@ fn extract(rx: &Rx, text: &str) -> Vec<Contract> {
                 continue;
             }
             started = true;
+            lines = 1;
             para = line.to_string();
             continue;
         }
         if blank(line) {
-            done = true;
+            if lines == 1 && descriptor_line(&para) {
+                started = false;
+                para.clear();
+            } else {
+                done = true;
+            }
             continue;
         }
+        lines += 1;
         para.push(' ');
         para.push_str(line);
     }
@@ -497,6 +516,20 @@ mod tests {
         assert!(contract(&rx, "check-x", "Held on three grounds: (A) one; (B) two.").is_none());
         assert!(contract(&rx, "check-x", "Two axes (see below): (A) one; (B) two.").is_none());
         assert!(contract(&rx, "check-x", "Held on two axes: (A) the only one.").is_none());
+    }
+
+    // spec: gate-sdk/SPEC.md §check-gate-assertions — a lone descriptor line is skipped and the next
+    // paragraph read; a descriptor opening a longer paragraph is that paragraph's first line
+    #[test]
+    fn a_lone_descriptor_line_defers_discovery_to_the_next_paragraph() {
+        let rx = rx();
+        let spec = |first: &str| {
+            format!("### check-x\n\n{}\n\nHeld on two axes: (A) one; (B) two.\n", first)
+        };
+        assert_eq!(extract(&rx, &spec("`checks/check-x.gate` (`precommit`, binary-dispatched).")).len(), 1);
+        assert_eq!(extract(&rx, &spec("`check-x.sh` (`precommit`).")).len(), 1);
+        assert_eq!(extract(&rx, &spec("`checks/check-x.gate` (`precommit`).\nA second line.")).len(), 0);
+        assert_eq!(extract(&rx, &spec("`checks/check-x.md` (`precommit`).")).len(), 0);
     }
 
     // spec: gate-sdk/SPEC.md §check-gate-assertions — the count-word is the shared cardinal

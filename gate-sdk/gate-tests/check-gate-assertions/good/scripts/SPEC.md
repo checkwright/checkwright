@@ -21,10 +21,13 @@ contract.
 
 ### check-qux
 
+`checks/check-qux.gate` (`precommit`, binary-dispatched).
+
 Invariant: qux is held on two axes: (A) the first thing; (B) the second thing —
 and its markers carry the `//` leader, the one every descriptor-declared
 member's implementation module uses, so this contract proves the grammar reads a
-code marker under either leader and under indentation.
+code marker under either leader and under indentation. It opens on a lone
+descriptor line, so discovery reads this second paragraph.
 
 ### check-noun-filtered
 

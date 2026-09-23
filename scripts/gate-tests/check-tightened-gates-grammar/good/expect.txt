@@ -1,1 +1,2 @@
 TIGHTENED-GATES-GRAMMAR: clean
+declaration surface release-declarations.md read

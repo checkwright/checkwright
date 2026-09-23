@@ -95,7 +95,7 @@ pub const KIT: Kit = Kit {
             "CANON_KIT_SEAM_AUTHORITY_MARKERS",
             &[
                 "operator( |-)(ruled|ruling|direction|directed|decided|ratified|approved|chose)",
-                "lead, ",
+                "lead,[ ]",
                 "own-authority",
                 "ruled",
                 "ratified",

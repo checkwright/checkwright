@@ -14,3 +14,4 @@ trigger token 'docs/(x).md' is not a syntactically valid glob/path
 couples token 'knob:GATE_SDK_KIT_DIRS' names a row declared `.words()`
 couples token 'knob:GATE_SDK_NO_SUCH_DIR/*.md' cannot root its glob: GATE_SDK_NO_SUCH_DIR is no knob a static kit declares
 couples token 'knob:GATE_SDK_PROGRAM_FLOOR/*.md' cannot root its glob: GATE_SDK_PROGRAM_FLOOR's row is indexed
+couples token 'docs/*.md' is repeated

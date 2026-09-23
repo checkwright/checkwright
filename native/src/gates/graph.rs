@@ -311,6 +311,34 @@ fn validate_amend_manifest(file: &str, span: &str, errors: &mut Vec<String>) {
     for (token, why) in root_findings(&couples).into_iter().chain(root_findings(&trigger)) {
         errors.push(format!("{}: {}", where_, root_finding(token, &why)));
     }
+    for (key, token) in repeated_tokens("couples", &couples).into_iter().chain(repeated_tokens("trigger", &trigger)) {
+        errors.push(format!("{}: {}", where_, repeated_finding(key, token)));
+    }
+}
+
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — a token is authored once per field; each repeated
+// token is reported once, read off the authored field before any expansion
+fn repeated_tokens<'a>(key: &'a str, field: &'a str) -> Vec<(&'a str, &'a str)> {
+    let mut seen: Vec<&str> = Vec::new();
+    let mut out: Vec<(&str, &str)> = Vec::new();
+    for t in field.split(',').filter(|t| !t.is_empty()) {
+        if seen.contains(&t) {
+            if !out.iter().any(|(_, o)| *o == t) {
+                out.push((key, t));
+            }
+        } else {
+            seen.push(t);
+        }
+    }
+    out
+}
+
+fn repeated_finding(key: &str, token: &str) -> String {
+    format!(
+        "{} token '{}' is repeated — a repeated token couples nothing a single one does not, and reads \
+         as a second coupling; drop the duplicate",
+        key, token
+    )
 }
 
 // spec: gate-sdk/SPEC.md §check-graph — a `knob:` token whose row is declared `.words()`, read off the
@@ -587,6 +615,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 }
             }
         }
+        for (key, token) in repeated_tokens("couples", &couples).into_iter().chain(repeated_tokens("trigger", &trigger)) {
+            errors.push(format!("MANIFEST: {} {}", script, repeated_finding(key, token)));
+        }
         if unrootable {
             continue;
         }
@@ -788,6 +819,15 @@ mod tests {
     fn an_empty_expansion_contributes_no_surface() {
         assert_eq!(members("").count(), 0);
         assert_eq!(members("a,,b").collect::<Vec<_>>(), vec!["a", "b"]);
+    }
+
+    // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a token repeated any number of times is
+    // reported once, and distinct tokens sharing a prefix are not repeats
+    #[test]
+    fn a_repeated_token_is_reported_once() {
+        assert_eq!(repeated_tokens("couples", "a,b,a,a,c"), vec![("couples", "a")]);
+        assert!(repeated_tokens("couples", "a,a/*,kit:a").is_empty());
+        assert!(repeated_tokens("trigger", "").is_empty());
     }
 
     // spec: gate-sdk/SPEC.md §check-graph — each coverage branch on its own, with a near miss
