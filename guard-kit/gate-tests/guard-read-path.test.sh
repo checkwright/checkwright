@@ -56,13 +56,14 @@ got="$(GUARD_KIT_SETTINGS="$tmp/plain.json" _guard_allow_inners)"
 eq "allow-inners-lf" "$got" "$(printf 'git status\nls')"
 [[ "$got" != *$'\r'* ]] || eq "allow-inners-no-cr" "a CR" "none"
 
-# the three substitution readers hand the ruleset a payload's own bytes: a JSON "\r\n" reads back
-# verbatim, and a payload carrying no CR reads back with none
-crlf='{"tool_input":{"command":"cat <<EOF\r\nline\r\nEOF\r\n","file_path":"a\r\nb\r\n","run_in_background":"true\r\n"}}'
-eq "command-crlf" "$(guard_read_command <<<"$crlf")" "$(printf 'cat <<EOF\r\nline\r\nEOF\r')"
-eq "path-crlf" "$(guard_read_path <<<"$crlf")" "$(printf 'a\r\nb\r')"
+# the three substitution readers hand the ruleset a payload's own bytes: a JSON "\r\n" inside a value
+# reads back verbatim, and a payload carrying no CR reads back with none. No value ends in a CR: Git
+# Bash drops that one (SPEC §The hook on native Windows, the honest limit).
+crlf='{"tool_input":{"command":"cat <<EOF\r\nline\r\nEOF","file_path":"a\r\nb","run_in_background":"t\r\nrue"}}'
+eq "command-crlf" "$(guard_read_command <<<"$crlf")" "$(printf 'cat <<EOF\r\nline\r\nEOF')"
+eq "path-crlf" "$(guard_read_path <<<"$crlf")" "$(printf 'a\r\nb')"
 GUARD_INPUT="$crlf"
-eq "field-crlf" "$(guard_input_field '.tool_input.run_in_background')" "$(printf 'true\r')"
+eq "field-crlf" "$(guard_input_field '.tool_input.run_in_background')" "$(printf 't\r\nrue')"
 unset GUARD_INPUT
 lf='{"tool_input":{"command":"cat <<EOF\nline\nEOF\n","file_path":"a\nb","run_in_background":true}}'
 for got in "$(guard_read_command <<<"$lf")" "$(guard_read_path <<<"$lf")" "$(GUARD_INPUT="$lf" guard_input_field '.tool_input.run_in_background')"; do

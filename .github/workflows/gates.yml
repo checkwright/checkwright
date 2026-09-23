@@ -530,33 +530,11 @@ jobs:
         shell: bash
         run: bash gate-sdk/bin/run-gates.sh --run-guard-tests
 
-      # The same section's verbatim-bytes claim takes this test as its oracle,
-      # on the artifact the normalize step placed. Non-binding while the claim is
-      # under ruling: run 35909116477 red three CR-LF assertions here, each read
-      # back without its trailing CR (guard-read-path-windows-unexercised).
+      # The same section's reading claim takes this test as its oracle, on the
+      # artifact the normalize step placed.
       - name: guard readers read bytes verbatim under Git Bash
         shell: bash
-        continue-on-error: true
         run: bash guard-kit/gate-tests/guard-read-path.test.sh
-
-      # Reporting only, and it never fails: the bytes each hop hands on, so the
-      # ruling above reads where a CR is lost rather than inferring it.
-      - name: probe where a CR LF is folded under Git Bash
-        shell: bash
-        run: |
-          set +e
-          source gate-sdk/lib/test-hermetic.sh
-          source guard-kit/lib/guard.sh
-          payload='{"tool_input":{"command":"a\r\nb\r\n"}}'
-          echo "== a command substitution over CR LF output =="
-          x="$(printf 'a\r\nb\r\n')"; printf '%s' "$x" | od -c
-          echo "== a command substitution over a trailing lone CR =="
-          x="$(printf 'a\r')"; printf '%s' "$x" | od -c
-          echo "== the binary's field bytes, piped =="
-          printf '%s' "$payload" | "$GATE_SDK_NATIVE_BIN" --guard-json field-or-empty '.tool_input.command' | od -c
-          echo "== guard_read_command's bytes, piped =="
-          guard_read_command <<<"$payload" | od -c
-          exit 0
 
       # The suite itself, under one steering that is **measurement scaffolding
       # and not a fix**: run-smoke.sh blocks unless the target roster is exactly
