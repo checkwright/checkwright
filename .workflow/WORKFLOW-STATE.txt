@@ -4,11 +4,4 @@
 
 ---
 
-guard-harness-seams scope ade4efee 2026-09-23 ef343b90
-guard-harness-seams spec adff353e 2026-09-23 8afa7ec8
-guard-harness-seams align a3b744e7 2026-09-23 8437f623
-guard-harness-seams build a5ab0a2e 2026-09-23 6a360a02
-guard-harness-seams build a075fa5a 2026-09-23 1a6e1d1d
-guard-harness-seams build a5252f9e 2026-09-23 6863b4ed
-guard-harness-seams validate a89bfd00 2026-09-23 6e763f5b
-guard-harness-seams close a0df2b1d 2026-09-23 8b293a6e
+— scope aea4684a 2026-09-24 f8254551
