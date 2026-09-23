@@ -161,6 +161,7 @@
 - `check-close-surfaces` — assertion C now reaches every declared path git reports gitignored, not only one under `GATE_SDK_WORKFLOW_DIR`, reading the roster's new `<tracking>` column. Before upgrading, give each gitignored declaration outside your workflow directory a `reclaim=` command.
 - `check-dispatch-entry` — new, lifecycle-kit, commit-msg tier: while a lead-dispatched stage session has not entered, a commit that adds no stamp reds (a commit staging the gap inbox alone excepted). Register it, regenerate your hooks with `--emit git-hooks --write`, and have your lead dispatch through `--enter-stage --dispatch <stage>`; without a lead nothing declares a dispatch and the gate is inert.
 - `check-path-dialect` — gains a shell locality half: a `[[ … == /* ]]` glob test or a `case` alternative that is exactly `/*` reds in any tracked shell file outside `gate_path_rooted`'s own body, because it reads a drive-rooted path as relative. Route the test through `gate_path_rooted "$x"` from `gate-sdk/lib/gate.sh`, or, where the value is not a filesystem path, mark the line `# path-dialect-exempt: <reason>`.
+- `check-portability-floor` — gains an ASCII arm: a non-ASCII byte outside a full-line `#` comment in any `.ps1` on your configured install-path corpus now reds, even with an empty construct roster, because Windows PowerShell 5.1 reads a BOM-less script in the ANSI code page. Spell the character by code point (`[char]0x2014`), or move a trailing comment onto its own line; there is no valve.
 
 ## Renamed knobs
 

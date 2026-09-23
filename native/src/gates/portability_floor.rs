@@ -93,16 +93,8 @@ fn inner(args: &[String]) -> Result<i32, String> {
     // them apart in the detail line is the whole bound on the degradation
     if paths.is_empty() {
         println!(
-            "PORTABILITY-FLOOR: clean (no install-path corpus configured; the assertion is \
-             disabled and nothing was scanned)"
-        );
-        return Ok(0);
-    }
-    if patterns.is_empty() {
-        println!(
-            "PORTABILITY-FLOOR: clean (0 banned construct(s) configured across {} pattern \
-             file(s) present; the corpus is unchecked)",
-            files_present
+            "PORTABILITY-FLOOR: clean (no install-path corpus configured; both arms are disabled \
+             and nothing was scanned)"
         );
         return Ok(0);
     }
@@ -142,8 +134,10 @@ fn inner(args: &[String]) -> Result<i32, String> {
     };
 
     let mut hits: Vec<String> = Vec::new();
+    let mut ascii_hits: Vec<String> = Vec::new();
     let mut scanned = 0usize;
     let mut skipped_binary = 0usize;
+    let mut ps1_checked = 0usize;
     for path in listing.lines() {
         if path.is_empty() || self_exempt(path) {
             continue;
@@ -160,6 +154,15 @@ fn inner(args: &[String]) -> Result<i32, String> {
             continue;
         }
         scanned += 1;
+        if powershell(path) {
+            ps1_checked += 1;
+            for (n, line) in ascii_findings(&bytes) {
+                ascii_hits.push(format!("{}:{}:{}\n    non-ASCII outside a comment", path, n, line));
+            }
+        }
+        if compiled.is_empty() {
+            continue;
+        }
         let text = String::from_utf8_lossy(&bytes).into_owned();
         let lines = fresh::file_lines(&text);
         for (i, line) in lines.iter().enumerate() {
@@ -191,19 +194,94 @@ fn inner(args: &[String]) -> Result<i32, String> {
         println!("        '# portability-declared: <reason>' on that line or the one above,");
         println!("        naming the surface the declaration lives on. An empty reason is a");
         println!("        violation: the field's only reader is whoever reviews the diff.");
+    }
+    if !ascii_hits.is_empty() {
+        println!(
+            "check-portability-floor: PowerShell install-path file(s) carry a non-ASCII byte \
+             outside a full-line comment:"
+        );
+        for h in &ascii_hits {
+            println!("{}", h);
+        }
+        println!("  help: Windows PowerShell 5.1 reads a BOM-less script in the host's ANSI code");
+        println!("        page, so a non-ASCII byte in code changes what the script says and,");
+        println!("        inside a string, where the string ends. Spell the character by code");
+        println!("        point ([char]0x2014), or move a trailing comment onto its own '#' line.");
+        println!("        There is no valve: the byte is a parse failure on that host.");
+    }
+    if !hits.is_empty() || !ascii_hits.is_empty() {
         return Ok(1);
     }
 
+    if compiled.is_empty() {
+        println!(
+            "PORTABILITY-FLOOR: clean (0 banned construct(s) configured across {} pattern \
+             file(s) present, so the construct roster is unchecked; the ASCII arm ran over {} \
+             PowerShell member(s) of {} install-path file(s) scanned under {} configured \
+             pathspec(s), none carrying non-ASCII outside a comment)",
+            files_present,
+            ps1_checked,
+            scanned,
+            paths.len()
+        );
+        return Ok(0);
+    }
     println!(
         "PORTABILITY-FLOOR: clean ({} install-path file(s) scanned under {} configured \
          pathspec(s), {} binary member(s) skipped; none uses one of the {} banned construct(s) \
-         undeclared)",
+         undeclared, and none of its {} PowerShell member(s) carries non-ASCII outside a comment)",
         scanned,
         paths.len(),
         skipped_binary,
-        patterns.len()
+        patterns.len(),
+        ps1_checked
     );
     Ok(0)
+}
+
+// spec: gate-sdk/SPEC.md §check-portability-floor — the ASCII arm reads the members Windows
+// PowerShell runs as scripts, and Windows matches an extension in any case
+fn powershell(path: &str) -> bool {
+    path.len() >= 4
+        && path.is_char_boundary(path.len() - 4)
+        && path[path.len() - 4..].eq_ignore_ascii_case(".ps1")
+}
+
+// spec: gate-sdk/SPEC.md §check-portability-floor — raw bytes, never the lossy text; only a
+// code line opens a here-string, so a `#` line ending `@'` exempts nothing after it
+fn ascii_findings(bytes: &[u8]) -> Vec<(usize, String)> {
+    let mut out = Vec::new();
+    if bytes.is_empty() {
+        return out;
+    }
+    let body = bytes.strip_suffix(b"\n").unwrap_or(bytes);
+    let mut in_here = false;
+    for (i, raw) in body.split(|b| *b == b'\n').enumerate() {
+        let line = raw.strip_suffix(b"\r").unwrap_or(raw);
+        let comment = !in_here
+            && line
+                .iter()
+                .find(|b| **b != b' ' && **b != b'\t')
+                .is_some_and(|b| *b == b'#');
+        if in_here {
+            if line.starts_with(b"\"@") || line.starts_with(b"'@") {
+                in_here = false;
+            }
+        } else if !comment {
+            let end = line
+                .iter()
+                .rposition(|b| !b.is_ascii_whitespace())
+                .map_or(0, |i| i + 1);
+            let tail = &line[..end];
+            if tail.ends_with(b"@\"") || tail.ends_with(b"@'") {
+                in_here = true;
+            }
+        }
+        if !comment && !line.is_ascii() {
+            out.push((i + 1, String::from_utf8_lossy(line).into_owned()));
+        }
+    }
+    out
 }
 
 #[cfg(test)]
@@ -265,5 +343,35 @@ mod tests {
     fn a_nul_bearing_member_is_binary_and_a_script_is_not() {
         assert!(binary(b"\x7fELF\x00\x01"));
         assert!(!binary(b"#!/usr/bin/env bash\nsort -V\n"));
+    }
+
+    fn lines_of(v: Vec<(usize, String)>) -> Vec<usize> {
+        v.into_iter().map(|(n, _)| n).collect()
+    }
+
+    #[test]
+    fn the_ascii_arm_exempts_full_line_comments_outside_a_here_string_only() {
+        let clean = "#!/usr/bin/env pwsh\n# a dash \u{2014} here\n    # indented \u{2014}\n$a = 'x'\n";
+        assert!(ascii_findings(clean.as_bytes()).is_empty());
+        let bad = "$t = \"a \u{2014} b\"\nWrite-Output $t # trailing \u{2014}\n$d = @\"\n\
+                   # inside \u{2014}\n\"@\n# after \u{2014}\n";
+        assert_eq!(lines_of(ascii_findings(bad.as_bytes())), vec![1, 2, 4]);
+    }
+
+    #[test]
+    fn a_bom_reds_line_one_and_only_a_column_zero_closer_ends_a_here_string() {
+        assert_eq!(lines_of(ascii_findings(b"\xEF\xBB\xBF#!/usr/bin/env pwsh\n$a = 1\n")), vec![1]);
+        let comment_opener = "# say @'\r\n# still a comment \u{2014}\r\n";
+        assert!(ascii_findings(comment_opener.as_bytes()).is_empty());
+        let indented_close = "$d = @'\n  '@\n# inside \u{2014}\n'@\n# after \u{2014}\n";
+        assert_eq!(lines_of(ascii_findings(indented_close.as_bytes())), vec![3]);
+    }
+
+    #[test]
+    fn the_powershell_member_test_reads_the_extension_in_any_case() {
+        assert!(powershell("installer/bin/checkwright.ps1"));
+        assert!(powershell("X.PS1"));
+        assert!(!powershell("gate-sdk/bin/run-gates.sh"));
+        assert!(!powershell("ps1"));
     }
 }

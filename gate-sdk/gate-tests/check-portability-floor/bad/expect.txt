@@ -2,3 +2,7 @@ use a banned non-portable construct
 tree/empty-reason-verb:5:relativize() { realpath --relative-to="$PWD" "$1"; }
 tree/too-far-verb:5:manifest() { find "$1" -type f -printf '%P\n'; }
 tree/undeclared-verb:3:newest() { printf '%s\n' "$@" | sort -V | tail -n1; }
+carry a non-ASCII byte outside a full-line comment
+tree/strings.ps1:2:$title = "Checkwright — front end"
+tree/strings.ps1:3:Write-Output $title # trailing — over-refused
+tree/strings.ps1:5:# inside a here-string — string content

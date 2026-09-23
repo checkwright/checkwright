@@ -13,7 +13,7 @@ GATE_SDK_SPEC_BASE_URL = https://checkwright.dev
 GATE_SDK_LINT_EXTRA_DIRS = installer/bin installer/consumer-smoke demo
 
 # spec: gate-sdk/SPEC.md §check-portability-floor — this repo's install-path corpus: the files an adopter's machine actually executes. After the behind-invoke relocation that is `installer/bin` — the two bootstraps, and the whole of the install path written in a shell — plus `gate-sdk/lib/gate.sh`, the one shell `init` leaves behind that the install path runs. Everything else an install performs is Rust and reaches no shell dialect at all. A corpus drawn by directory rather than by reachability is what let a GNU-only primary sit unseen. The vocabulary rides the knob's own default, scripts/portability-patterns.list
-GATE_SDK_PORTABILITY_PATHS = installer/bin gate-sdk/lib/gate.sh gate-sdk/bin/run-gates.sh
+GATE_SDK_PORTABILITY_PATHS = installer/bin gate-sdk/lib/gate.sh gate-sdk/bin/run-gates.sh gate-sdk/bin/run-gates.ps1
 
 # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — this repo builds and hashes the release-shaped artifact in two workflows: the release path, and the CI producer whose artifacts the install-smoke legs install
 GATE_SDK_NATIVE_PUBLISH_WORKFLOW = .github/workflows/publish.yml .github/workflows/gates.yml

@@ -1,1 +1,1 @@
-PORTABILITY-FLOOR: clean (2 install-path file(s) scanned under 1 configured pathspec(s), 0 binary member(s) skipped; none uses one of the 3 banned construct(s) undeclared)
+PORTABILITY-FLOOR: clean (3 install-path file(s) scanned under 1 configured pathspec(s), 0 binary member(s) skipped; none uses one of the 3 banned construct(s) undeclared, and none of its 1 PowerShell member(s) carries non-ASCII outside a comment)

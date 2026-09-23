@@ -1,4 +1,4 @@
 # graph: couples=knob:GATE_SDK_GATES_DIR/portability-patterns.list dir=one valve=none tier=precommit trigger=*
 # install: zero-config
 # armed-by: GATE_SDK_PORTABILITY_PATHS
-# spec: gate-sdk/SPEC.md §check-portability-floor — no file on the configured install-path corpus uses a banned non-portable construct without a declared valve (the roster and the corpus are both consumer config; the pattern files and their templates are self-exempt)
+# spec: gate-sdk/SPEC.md §check-portability-floor — no file on the configured install-path corpus uses a banned non-portable construct without a declared valve, and no PowerShell member of it carries non-ASCII outside a full-line comment (the roster and the corpus are both consumer config; the pattern files and their templates are self-exempt)

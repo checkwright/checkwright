@@ -56,6 +56,18 @@ out="$( cd "$SANDBOX/repo" \
     && gate_env GATE_SDK_PORTABILITY_PATHS=. GATE_SDK_PORTABILITY_PATTERNS="$SANDBOX/repo/absent.list" \
     && gate_run check-portability-floor "$CHECKS" 2>&1 )"; rc=$?
 expect absent-pattern-file 0 '0 banned construct(s) configured' "$rc" "$out"
+expect absent-pattern-file-ascii-ran 0 'the ASCII arm ran over 0 PowerShell member(s)' "$rc" "$out"
+
+# --- the ASCII arm needs no roster, so the same absent pattern file still reds a
+# PowerShell member carrying non-ASCII in code: an emptied roster disables the
+# roster arm alone, never the language fact beside it.
+printf '$t = "a \xe2\x80\x94 b"\n' > "$SANDBOX/repo/front.ps1"
+git -C "$SANDBOX/repo" add front.ps1
+out="$( cd "$SANDBOX/repo" \
+    && gate_env GATE_SDK_PORTABILITY_PATHS=. GATE_SDK_PORTABILITY_PATTERNS="$SANDBOX/repo/absent.list" \
+    && gate_run check-portability-floor "$CHECKS" 2>&1 )"; rc=$?
+expect ascii-arm-under-empty-roster 1 'front.ps1:1:' "$rc" "$out"
+git -C "$SANDBOX/repo" rm -qf front.ps1
 
 # --- the corpus is live under the same configuration: the *same* knob path that
 # disabled the gate above finds the violation when it is set, so the clean above
@@ -105,7 +117,8 @@ out="$( cd "$SANDBOX/repo" \
     && gate_run check-portability-floor "$CHECKS" patterns.list 2>&1 )"; rc=$?
 expect binary-skipped 0 '1 binary member(s) skipped' "$rc" "$out"
 
-# --- record order over the tracked bad/ case: path order, then line order. Read
+# --- record order over the tracked bad/ case: the roster arm's block, then the
+# ASCII arm's, each in path order, then line order. Read
 # off the pair so the corpus has one home. The corpus knob is set here rather
 # than left to the case's own config seam, because the hermetic library pins the
 # tracked knob file empty, so the case's knob file is never read — the case's
@@ -117,11 +130,14 @@ got="$(grep -E '^tree/' <<<"$out")"
 want="$(printf '%s\n' \
     'tree/empty-reason-verb:5:' \
     'tree/too-far-verb:5:' \
-    'tree/undeclared-verb:3:')"
+    'tree/undeclared-verb:3:' \
+    'tree/strings.ps1:2:' \
+    'tree/strings.ps1:3:' \
+    'tree/strings.ps1:5:')"
 if [[ "$rc" -ne 1 ]]; then
     echo "  FAIL [record-order]: want exit 1, got $rc -- $out"; fails=$((fails + 1))
 elif [[ "$(sed 's/^\([^:]*:[0-9]*:\).*/\1/' <<<"$got")" != "$want" ]]; then
-    echo "  FAIL [record-order]: record sequence is not path-then-line order:"
+    echo "  FAIL [record-order]: record sequence is not arm-then-path-then-line order:"
     printf '    %s\n' "$got"
     fails=$((fails + 1))
 fi
@@ -131,8 +147,8 @@ if [[ "$fails" -gt 0 ]]; then
     exit 1
 fi
 if [[ "$unreadable_arm" == run ]]; then
-    echo "check-portability-floor.test.sh: clean (the arms a case dir cannot reach: an unconfigured corpus disabling the assertion in its own sentence, an absent pattern file doing the same, the same knob path finding the violation once set, a GNU escape refused by name at compile, an unreadable pattern file failing closed where an absent one degrades, a binary corpus member skipped-and-counted, and the bad pair's record order — 9 assertions over 7 cases)"
+    echo "check-portability-floor.test.sh: clean (the arms a case dir cannot reach: an unconfigured corpus disabling the assertion in its own sentence, an absent pattern file doing the same to the roster arm alone, the ASCII arm running under that empty roster, the same knob path finding the violation once set, a GNU escape refused by name at compile, an unreadable pattern file failing closed where an absent one degrades, a binary corpus member skipped-and-counted, and the bad pair's record order — 11 assertions over 8 cases)"
 else
-    echo "check-portability-floor.test.sh: clean (the arms a case dir cannot reach: an unconfigured corpus disabling the assertion in its own sentence, an absent pattern file doing the same, the same knob path finding the violation once set, a GNU escape refused by name at compile, a binary corpus member skipped-and-counted, and the bad pair's record order — 7 assertions over 6 cases; the unreadable-pattern-file arm declared a skip above, this account reading a mode-000 file)"
+    echo "check-portability-floor.test.sh: clean (the arms a case dir cannot reach: an unconfigured corpus disabling the assertion in its own sentence, an absent pattern file doing the same to the roster arm alone, the ASCII arm running under that empty roster, the same knob path finding the violation once set, a GNU escape refused by name at compile, a binary corpus member skipped-and-counted, and the bad pair's record order — 9 assertions over 7 cases; the unreadable-pattern-file arm declared a skip above, this account reading a mode-000 file)"
 fi
 exit 0
