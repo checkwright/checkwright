@@ -5,3 +5,4 @@
 ---
 
 seam-and-stage-residue scope a063f02a 2026-09-23 1f183a16
+seam-and-stage-residue spec a392393c 2026-09-23 6b562deb
