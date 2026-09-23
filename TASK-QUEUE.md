@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: guard-harness-seams
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [README.md](README.md) maps the kits.
 
@@ -10,7 +10,75 @@
 
 ## Technical Debt
 
+### guard-worktree-scratch-dirs
+
+from a linked worktree, guard-kit rules 14, 15 and 19 (B) resolve `GUARD_KIT_SCRATCH_DIRS` against the worktree cwd. The protocol puts an isolated child's liveness record in the main checkout's scratch dir (delegation-kit/templates/agent-execution.md, the never-poll bullet), so the canonical recorded launch writing `<main>/.tmp/<key>.run` is blocked by rule 15, whose corrective names the worktree's `.tmp`, the one home the protocol forbids; rule 14 likewise reads only the worktree's records. Pre-existing, found at align while rule 27 was being designed.
+
+**Probed at promotion (2026-09-23):** the consumer bash guard, run with its cwd in a scratch linked worktree over the canonical recorded launch, refused the record written to `<main>/.tmp/probe.run` (exit 2, rule 15's "writes no liveness record" corrective naming the relative `.tmp`) and auto-allowed the same launch recording to the worktree's own `.tmp`.
+
+**Deliverable:** resolve the scratch-dir members against the main checkout from a linked worktree, on the owning-checkout pattern rule 27 gives its ignored-target test, with a guard-test case run from a linked worktree. Debt: it converges the rules on the protocol's stated record home.
+
+**Cost while deferred:** an isolated child obeying the protocol is refused, or steered to a record the next reader never checks. Filed 2026-09-23 to the gap inbox at align; promoted at that iteration's close drain because the guard's TSV case suites have no linked-worktree harness. Owner lookup: `SCRATCH_DIRS`, `rule 27`, `isolated child` in this file — none.
+
+### guard-knob-skew-bricks-shell
+
+a guard knob-load list that runs ahead of the gate binary wedges the live Bash guard. At a build a session added a knob name to guard-kit/lib/guard.sh's load list before rebuilding the binary, and every Bash call failed until the file was repaired with the Edit tool and the binary rebuilt. The knob read's failure branch blocks every command, while guard-kit's degradation posture is fail-open but loud (guard-kit/SPEC.md §The guard framework).
+
+**Probed at promotion (2026-09-23):** `checkwright-gates --emit-knob-values GUARD_KIT_SCRATCH_DIRS GUARD_KIT_NO_SUCH_KNOB_PROBE` exits 2 ("is not a guard-kit knob"), and `guard.sh`'s load treats any non-zero exit as `guard_block`, so an undeclared name blocks every command.
+
+**Deliverable:** an unknown-name failure takes the fail-open path with an advisory naming the skew and the rebuild command, while a genuine config error still blocks. Scope's shape, inside the posture the SPEC already states: on the failure branch only, intersect the load list with the binary's `--emit knob-roster` and fail open when a name is undeclared, so no new exit-code contract is minted and the success path spawns nothing extra.
+
+**Cost while deferred:** a mid-edit skew bricks the session's shell. Filed 2026-09-23 to the gap inbox by the lead from the build journal; promoted at that iteration's close drain because editing the live guard in a drain risks the wedge it describes. Owner lookup: `knob-load`, `knob load`, `wedge` in this file — none. Surface also gate-sdk.
+
+### committed-grant-fallthrough-unexplained
+
+the tracked allowlist's no-argument entries: whether the harness needs them, and why an exact one once failed to resolve. `.claude/settings.json` pairs a no-argument `Bash(<cmd>)` with `Bash(<cmd> *)` for run-gates.sh, the gate binary (with and without the `./` prefix) and their `env GATE_SDK_VERBOSE=1` forms. The repo's model of harness matching says the ` *` form covers the bare command (`--guard-lib-parity allow-match native/target/release/checkwright-gates "native/target/release/checkwright-gates *"` returns true), but that is modeled, not probed — and on 2026-09-07 three bare `bash gate-sdk/bin/run-gates.sh` calls logged as fall-throughs despite the exact no-argument grant, a counterexample nobody explained.
+
+**Deliverable:** probe the real harness once — a bare call under the ` *` entry alone, and a bare call under the exact no-argument entry, each read off the fall-through log — then remove every no-argument entry a ` *` sibling covers, as a narrowing of the tracked settings file. Before removing, check `compare-settings-allow` and guard rule 20 (decorated allowlisted command, which keys on a bare entry) for dependence on those entries. A permission-settings edit is applied on the operator's behalf (CLAUDE.md §Housekeeping), so the build session prepares the diff and the probe plan and does not apply either.
+
+**Not taken:** a guard steer to one binary spelling — a new guard rule, and the bare spelling was allowlisted deliberately at `5e632230`.
+
+**Cost while deferred:** two allowlist lines per command where one may do, and a grant model nobody has verified against the harness. Filed 2026-09-23 to the gap inbox by the lead on an operator direction after seam-and-stage-residue's close, and merged at the next scope into this entry, promoted from the icebox, which it had been since 2026-09-07; one probe settles both.
+
+### guard-read-path-windows-unexercised
+
+[observed-by: gates workflow]
+
+no `gates.yml` step runs guard-kit's `gate-tests/guard-read-path.test.sh` (its verbatim-bytes and no-added-CR assertions) on a Windows leg: fixture suites run only in the Linux `gates` job. `floor-jq-guard-lib` deleted the `_guard_lf` CR strip on the ground that those reads return bytes verbatim, so the Windows half of that claim is unproven.
+
+**Re-verified at promotion (2026-09-23):** `--run-gate-tests` appears once in `.github/workflows/gates.yml`, at the `gates` job.
+
+**Deliverable:** run that suite on a Windows leg. **Reshaped by [instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set](#instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set):** a new step on a binding leg is an unrehearsed binding assertion, so the step lands non-binding or is rehearsed at a push partway through the iteration, never first observed at the close push.
+
+**Cost while deferred:** if a Windows read adds CR, guard rules misread there, and no leg shows it. Filed 2026-09-19 by the lead at `adopter-floor-native-rungs`' build; promoted 2026-09-23 at scope. Owner lookup: `guard-read-path`, `_guard_lf`, `Windows leg` — none.
+
+### shellcheck-analyser-version-unpinned-in-ci
+
+[observed-by: gates workflow]
+
+one battery member's verdict is a function of the host, so a green local battery is not evidence of a green CI battery. Attested 2026-08-27: the battery read 106/106 locally and the pushed run went red on `check-shellcheck` alone (SC2120 on `gate-sdk/lib/gate.sh`'s `gate_exe_suffix`), which local shellcheck 0.11.0 does not emit and the runner's stock analyser does. The finding was silenced inline; the class is that this member wraps an external analyser whose rule set changes between releases, while every other member is deterministic given the tree.
+
+**Re-verified at promotion (2026-09-23):** nothing in `.github/workflows/gates.yml` installs or pins shellcheck; the development host runs 0.11.0.
+
+**Scope's ruling on the three shapes:** pin the analyser version in the workflow, installed as a digest-verified release, and state the pinned version as the CI verdict's reference where `check-shellcheck`'s contract is specified. Refused: reporting the version the gate ran (it makes skew legible and leaves it in place), and accepting the float (it concedes the promise this entry defends). Admitted on the enhancement filter's supply-chain arm — a floating third-party tool in CI is the gap — and taken this iteration by operator direction, 2026-09-23, lead-relayed.
+
+**Cost while deferred:** the pre-push battery's promise — that a green local run predicts a green remote one — is false for one member, and the failure mode is a burned push. Filed 2026-08-27 by scope; attested by the `windows-adopter-unblock` close's own verifying push.
+
 ## Deferred
+
+### stop-hook-task-view-unscoped
+
+[cost: event/high] [surface: delegation-kit]
+
+`subagent-stop-liveness` may refuse a dispatched child's turn end on a shell task that belongs to its parent. At seam-and-stage-residue's close, two backgrounded observer loops in the dispatching session waited on `git worktree list` while five isolated audit-sweep children held locked worktrees. A child reported the hook refused its Stop on a running background shell task after it had stopped its own wait, and the fan-out stalled about ten minutes until the loops exited on their own. The hook's log holds three `decision=refuse` lines beside `verdict=green` in that window — the task-view arm — but logs no task values, so whose task held them is unread.
+
+**Premise open, and it conflicts with a measured claim:** delegation-kit/SPEC.md §What `background_tasks` carries measured the view as spanning the emitting agent's own tree; no measurement put a parent's task in a child's view. First step: one out-of-band payload dump at a child's Stop while the parent holds a running shell task.
+
+**Why a design unit:** the view's elements carry no pid or owner, and the SPEC calls the refuser unconditional, with every narrowing argued on its own grounds; scoping it narrows that contract or adds an ownership key, which is an amendment. **Not taken:** a steer against waiting on worktree reaping — delegation-kit/templates/agent-execution.md already awaits an Agent child by its notification, never by a path on disk.
+
+**Taken this iteration** by operator direction, 2026-09-23, lead-relayed; `/spec` authors the amendment and promotes this entry. A defect, not an enhancement, so the admission filter does not reach it.
+
+**Cost while deferred:** any parent holding a running shell task while a child stops can stall that child's hand-back. Filed 2026-09-23 to the gap inbox by the lead after seam-and-stage-residue's close; filed here 2026-09-23 at the next scope. Owner lookup: `background_tasks`, `subagent-stop`, `SubagentStop` in this file matched [settings-hook-command-path-gate](#settings-hook-command-path-gate), whose subject is a hook registration's path, and the stop hook's icebox neighbour [turn-end-refusal-used-as-a-busy-wait](#turn-end-refusal-used-as-a-busy-wait), whose subject is a session misusing the refusal; both read and ruled distinct.
 
 ### side-effect-free-read-arms
 
@@ -21,30 +89,6 @@ shell utilities an agent runs for read-only work can also write: `sed -i`, `find
 **Deliverable:** the arm roster that replaces each blocked read, the guard rules that steer to it, and the allowlist entries. New governed names, so it owes an amendment and passes the enhancement admission filter only on an arm its authoring session argues.
 
 **Cost while deferred:** a read-only shell call keeps a write path the guard must judge per call, and an isolated child's read set stays the interim allowlist. Filed 2026-09-23 to the gap inbox by the lead on an operator direction; the operator recalls earlier discussion and no tracked record was found. Promoted 2026-09-23 at seam-and-stage-residue's close drain: an initiative with new names, never a drain fix. Owner lookup: `side-effect`, `FENCE_SAFE`, `dual-use`, `sed -i` in this file — none. Surface also delegation-kit and gate-sdk.
-
-### guard-worktree-scratch-dirs
-
-[cost: event/low] [surface: guard-kit]
-
-from a linked worktree, guard-kit rules 14, 15 and 19 (B) resolve `GUARD_KIT_SCRATCH_DIRS` against the worktree cwd. The protocol puts an isolated child's liveness record in the main checkout's scratch dir (delegation-kit/templates/agent-execution.md, the never-poll bullet), so the canonical recorded launch writing `<main>/.tmp/<key>.run` is blocked by rule 15, whose corrective names the worktree's `.tmp`, the one home the protocol forbids; rule 14 likewise reads only the worktree's records. Pre-existing, found at this iteration's align while designing rule 27.
-
-**Inferred, not run:** the three rules block or miss the main-checkout record from a linked worktree — run the canonical recorded launch from a scratch linked worktree with the guard wired and read the verdict. The drain re-read the source only: rule 15 compares the path to `<d>/<key>.run` with `<d>` the relative `.tmp`.
-
-**Deliverable:** resolve the scratch-dir members against the main checkout from a linked worktree, on the owning-checkout pattern rule 27 gives its ignored-target test, with a guard-test case run from a linked worktree.
-
-**Cost while deferred:** an isolated child obeying the protocol is refused, or steered to a record the next reader never checks. Filed 2026-09-23 to the gap inbox at align; promoted at this iteration's close drain because the guard's TSV case suites have no linked-worktree harness, so the fix is not test-complete in one drain commit. Owner lookup: `SCRATCH_DIRS`, `rule 27`, `isolated child` in this file — none.
-
-### guard-knob-skew-bricks-shell
-
-[cost: event/low] [surface: guard-kit]
-
-a guard knob-load list that runs ahead of the gate binary wedges the live Bash guard. At this iteration's build a session added a knob name to guard-kit/lib/guard.sh's load list before rebuilding the binary, and every Bash call failed until the file was repaired with the Edit tool and the binary rebuilt. The knob read's failure branch blocks every command, while guard-kit's degradation posture is fail-open but loud (guard-kit/SPEC.md §The guard framework).
-
-**Inferred, not run:** an unknown knob name in the load list, against an older binary, blocks every command — run the guard with a name the binary does not declare in a scratch clone. The drain read the failure branch's `guard_block` and did not wedge its own shell to watch it.
-
-**Deliverable:** an unknown-name failure takes the fail-open path with an advisory naming the skew and the rebuild command, while a genuine config error still blocks. That needs a signal from the binary that tells the two apart.
-
-**Cost while deferred:** a mid-edit skew bricks the session's shell. Filed 2026-09-23 to the gap inbox by the lead from the build journal; promoted at this iteration's close drain because telling skew from a config error needs a binary-side signal, and editing the live guard in a drain risks the wedge it describes. Owner lookup: `knob-load`, `knob load`, `wedge` in this file — none. Surface also gate-sdk.
 
 ### foreign-toolchain-docker-legs
 
@@ -141,18 +185,6 @@ evidence-kit/SPEC.md §check-evidence-baseline says the suite-coverage arm close
 **Why design-pending:** whether the reverse assertion is a row-level red or an advisory, and how it interacts with the declared no-suites early-out, are the two calls; the SPEC sentence quoted above narrows in the same unit either way.
 
 **Cost while deferred:** a baseline surface whose whole job is a held-constant comparison keeps rows that assert nothing, and the next suite retirement leaves another pair the same way. Filed 2026-09-17 at this iteration's close drain, on re-verification of the bullet the lead filed from validate's observation. Owner lookup: `EVIDENCE_KIT_SUITES`, `validate-baseline`, `suite coverage`, `evidence-baseline`, `orphan` — matched [evidence-baseline-orphan-suite-row](#evidence-baseline-orphan-suite-row), read and ruled distinct above.
-
-### guard-read-path-windows-unexercised
-
-[cost: event/low] [surface: .github]
-
-no `gates.yml` step runs guard-kit's `gate-tests/guard-read-path.test.sh` (its verbatim-bytes and no-added-CR assertions) on a Windows leg: fixture suites run only in the Linux `gates` job. `floor-jq-guard-lib` deleted the `_guard_lf` CR strip on the ground that those reads return bytes verbatim, so the Windows half of that claim is unproven.
-
-**Re-verified at the drain:** `--run-gate-tests` appears once in `.github/workflows/gates.yml`, in the `gates` job; gates run 35455364409's `install-smoke-sh-windows` log has no hit for the test.
-
-**Why promoted, not fixed:** the fix is a Windows workflow step whose outcome is unknown until a Windows run. A red there reopens a landed unit, and the close's one remaining push cannot absorb it.
-
-**Cost while deferred:** if a Windows read adds CR, guard rules misread there, and no leg shows it. Filed 2026-09-19 by the lead at `adopter-floor-native-rungs`' build; promoted at its close drain. Owner lookup: `guard-read-path`, `_guard_lf`, `Windows leg` — none.
 
 ### guard-powershell-tool-unguarded
 
@@ -536,22 +568,6 @@ the site-health probe files issues on the public repo for failures the iteration
 
 **Cost while deferred:** tracker noise on a public repo, and nothing worse — the probe is accurate and self-clearing, so no outage goes unseen while this waits. Filed 2026-08-25 by scope, operator-directed and relayed through the lead; the tree read behind it was re-run here rather than taken on the relay.
 
-### shellcheck-analyser-version-unpinned-in-ci
-
-[cost: event/high] [surface: .github]
-
-one battery member's verdict is a function of the host, so a green local battery is not evidence of a green CI battery.
-
-**Attested 2026-08-27 first-hand and expensively at close.** The full battery read 106/106 locally and the pushed run went RED on `check-shellcheck` alone, with SC2120 against `gate-sdk/lib/gate.sh`'s `gate_exe_suffix`. Local shellcheck is 0.11.0 and does not emit that finding; the `ubuntu-latest` runner's stock shellcheck does. Nothing in `.github/workflows/gates.yml` installs or pins shellcheck, so CI takes whatever the runner image ships and that floats under this repo without a signal.
-
-**The finding was a true positive for the older analyser and a false positive for the code** — `gate_exe_suffix`'s argument-passing callers then lived in `gate-sdk/bin/build-native.sh` and `scripts/pack-installer.sh` alone, so a per-file analysis could not tell an optional-by-contract parameter from an unused one. Silenced inline with a justifying comment, the remedy the gate's own help prescribes. **The class is not that finding.** It is that this member wraps an external analyser whose rule set changes between releases, which makes 106/106 a claim about one machine; every other member is deterministic given the tree.
-
-**DISTINCT from any entry about the gate's own logic** — the gate behaved correctly and reported honestly on both hosts. **DISTINCT from the Windows-host inventory finding that shellcheck is ABSENT there**: absence is graded and visible, a version skew is silent and reverses a verdict.
-
-**Why design-pending:** three uncosted shapes — pin the analyser version in the workflow and state it where the gate's contract is specified; have the gate REPORT the version it ran so two runs are comparable; or accept the float and say in the gate's SPEC section that this member's verdict is host-dependent.
-
-**Cost while deferred:** the pre-push battery's central promise — that a green local run predicts a green remote one — is false for one member, and the failure mode is a burned push. Filed 2026-08-27 by scope into this iteration's ledger, draining the gap inbox; attested 2026-08-27 by the `windows-adopter-unblock` close's own verifying push.
-
 ### harness-project-dir-fold-dialect-unresolved
 
 [cost: event/low] [surface: context-kit] [not-icebox-eligible: 2026-09-10 live CI-leg trigger]
@@ -633,10 +649,6 @@ Cites Delta 3 for delta 4's subject.
 ### battery-timing-file-overwritten-by-only-run
 
 A filtered run reports as all.
-
-### committed-grant-fallthrough-unexplained
-
-Three bare grants fell through.
 
 ### derived-count-literal-in-queue-unscanned
 
