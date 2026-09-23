@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: seam-and-stage-residue
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [README.md](README.md) maps the kits.
 
@@ -9,6 +9,24 @@
 ## New Features
 
 ## Technical Debt
+
+### suite-corpus-skips-tests-dir
+
+`check-pipe-membership`'s suite corpus recognizes a suite by its parent directory's name alone: `native/src/walk.rs` `is_suite` matches a directory named `gate-tests`. That fits the kit layout's `<kit>/gate-tests`, but a consumer whose `GATE_SDK_TESTS_DIR` names another directory has its own suites silently left out, while `run-gate-tests` honours the knob. **Re-verified at promotion:** `is_suite` compares the literal `gate-tests` and reads no knob.
+
+**Deliverable:** match the kit dirs' `gate-tests` or the resolved `GATE_SDK_TESTS_DIR`, with a fixture relocating the tests dir. Debt: it converges on a knob the SPEC already carries.
+
+**Cost while deferred:** an adopter relocating the tests dir loses pipe-membership coverage over their suites, with no red. Filed 2026-09-23 to the gap inbox by gate-sdk-blind-spots' close baked-calibration sweep; promoted 2026-09-23 at the next scope. Owner lookup: `is_suite`, `GATE_SDK_TESTS_DIR`, `gate-tests` in this file — none.
+
+### repo-inherits-policy-defaults
+
+[blocked-by: policy-choice-census-residue]
+
+Policy-as-choice says a consumer holding a choice binds it in its own config and the kit's author is such a consumer, yet this repo inherits most policy knobs' kit defaults silently. **Premise corrected 2026-09-23:** the filing said *every*; this iteration bound its new knobs explicitly (`CANON_KIT_KNOB_CITATION_REACH`, `CANON_KIT_KNOB_CITATION_LITERAL_SPAN`, `CANON_KIT_DEFAULT_COUPLING_WINDOW`, `GATE_SDK_ASSERTION_STRENGTH_WINDOW`, `CANON_KIT_MEASURED_SPAN`), while older ones such as `QUEUE_KIT_WRAP_BUDGET`, `QUEUE_KIT_ENTRY_CAP` and `LIFECYCLE_KIT_SHIM_NGRAM` stay unbound in `scripts/*.knobs`. **Re-verified at promotion:** a grep of `scripts/*.knobs` binds none of those three.
+
+**Deliverable:** a census of kit policy knobs (not layout knobs) whose default this repo relies on, and an explicit binding line per knob, so a later move of a kit default moves no verdict here; or a ruling that inheriting a default is binding it. Blocked on [policy-choice-census-residue](#policy-choice-census-residue), whose rulings may mint knobs or admit `off`, changing the set to bind.
+
+**Cost while deferred:** a kit default moved toward a more universal value silently moves this repo's verdicts. Filed 2026-09-22 to the gap inbox by `consumer-policy-seam`'s spec; promoted 2026-09-23 at its close, because the census is its own sweep and its alternative is a reading of the doctrine.
 
 ## Deferred
 
@@ -20,19 +38,9 @@ a battery or arm call prefixed `export GATE_SDK_NATIVE_BIN=native/target/release
 
 **Deliverable:** a generic-ruleset steer that refuses exporting or env-assigning a gate-sdk knob to its default and names the default, or a ruling that the cause is the prose (sessions read "the gate binary at `GATE_SDK_NATIVE_BIN`" as needing the variable set) and that prose fix instead.
 
-**Enhancement admission filter:** a new rule is new capability reaching none of the three arms, so it stays Deferred without an operator exception.
+**Admitted by operator exception to the enhancement admission filter** (TRAJECTORY.md §The rulings, its exception clause) — `operator direction, 2026-09-23`, lead-relayed. A new rule reaches none of the three arms. The reason, as escalated: this is the pool's only session-class row, a cost every battery-running session pays.
 
 **Cost while deferred:** every session that runs the battery risks a prompt per prefixed call. Filed 2026-09-23 to the gap inbox by gate-sdk-blind-spots' close; promoted 2026-09-23 at the next scope. Owner lookup: `export`, `env-assign`, `knob default` in guard-kit/SPEC.md — none.
-
-### suite-corpus-skips-tests-dir
-
-[cost: event/low] [surface: gate-sdk]
-
-`check-pipe-membership`'s suite corpus recognizes a suite by its parent directory's name alone: `native/src/walk.rs` `is_suite` matches a directory named `gate-tests`. That fits the kit layout's `<kit>/gate-tests`, but a consumer whose `GATE_SDK_TESTS_DIR` names another directory has its own suites silently left out, while `run-gate-tests` honours the knob. **Re-verified at promotion:** `is_suite` compares the literal `gate-tests` and reads no knob.
-
-**Deliverable:** match the kit dirs' `gate-tests` or the resolved `GATE_SDK_TESTS_DIR`, with a fixture relocating the tests dir. Debt: it converges on a knob the SPEC already carries.
-
-**Cost while deferred:** an adopter relocating the tests dir loses pipe-membership coverage over their suites, with no red. Filed 2026-09-23 to the gap inbox by gate-sdk-blind-spots' close baked-calibration sweep; promoted 2026-09-23 at the next scope. Owner lookup: `is_suite`, `GATE_SDK_TESTS_DIR`, `gate-tests` in this file — none.
 
 ### foreign-toolchain-docker-legs
 
@@ -63,6 +71,8 @@ lifecycle-kit/templates/lead.md has the lead commit a gap bullet "at the first m
 a worktree-isolated `audit-sweep` has no gate binary for its oracle arms. `DELEGATION_KIT_READONLY_TYPES` names it, so D2 forces the isolation, and isolation cost (4) forbids building a binary in the worktree. The landed fail-open fallback sends only the harness arms to the main checkout's binary: every verdict-bearing path still resolves locally (gate-sdk/SPEC.md §The harness-integration arm). gate-sdk-blind-spots' spec therefore ran its probe-driven review on unisolated Explore, which cannot journal as it goes. Nothing reads a dispatch's purpose, so the type rule has no gate; that part is inferred, not run.
 
 **Operator direction 2026-09-23, lead-relayed:** audit-sweep in a worktree is the methodology's answer to interruption-safe review work, and the missing gates are its one open challenge. A worktree without gates is acceptable for audit-sweep, which writes nothing but its journal. Make gates fully workable in worktrees if that is feasible; otherwise document the limitation and live with it.
+
+**Admitted by operator exception to the enhancement admission filter** (TRAJECTORY.md §The rulings, its exception clause) — `operator direction, 2026-09-23`, lead-relayed. The deliverable reaches none of the three arms. The reason, as escalated: the operator's own direction above names the missing gates as the one open challenge to interruption-safe review work.
 
 **Deliverable:** a feasibility ruling on running verdict-bearing arms in a linked worktree, then either that path or the limitation stated in delegation-kit/templates/agent-execution.md. Settle the text clash as well: `.claude/agents/audit-sweep.md` §Return contract says the type "owes no resume journal", and the resume-journal bullet keeps journals for agents that change files. Both contradict the direction.
 
@@ -677,16 +687,6 @@ the `consumer-policy-seam` spec census left eleven members owing a ruling under 
 **Deliverable:** per fixed value, its SPEC ground restated in the discriminator's terms (grammar, contract, external limit, verdict-neutral) or a knob. Per knob, `off` admitted where the gate's other assertions survive it, or a stated ground that the calibration is the gate's whole predicate.
 
 **Cost while deferred:** the Policy-as-choice audit-roster class re-reads the same eleven on every due sweep, and the census sweeps already split on two of them. Filed 2026-09-22 to the gap inbox as two bullets by the spec census; merged and promoted 2026-09-23 at close, because every member is a per-member ruling.
-
-### repo-inherits-policy-defaults
-
-[cost: event/low] [surface: scripts]
-
-Policy-as-choice says a consumer holding a choice binds it in its own config and the kit's author is such a consumer, yet this repo inherits most policy knobs' kit defaults silently. **Premise corrected 2026-09-23:** the filing said *every*; this iteration bound its new knobs explicitly (`CANON_KIT_KNOB_CITATION_REACH`, `CANON_KIT_KNOB_CITATION_LITERAL_SPAN`, `CANON_KIT_DEFAULT_COUPLING_WINDOW`, `GATE_SDK_ASSERTION_STRENGTH_WINDOW`, `CANON_KIT_MEASURED_SPAN`), while older ones such as `QUEUE_KIT_WRAP_BUDGET`, `QUEUE_KIT_ENTRY_CAP` and `LIFECYCLE_KIT_SHIM_NGRAM` stay unbound in `scripts/*.knobs`.
-
-**Deliverable:** a census of kit policy knobs (not layout knobs) whose default this repo relies on, and an explicit binding line per knob, so a later move of a kit default moves no verdict here; or a ruling that inheriting a default is binding it.
-
-**Cost while deferred:** a kit default moved toward a more universal value silently moves this repo's verdicts. Filed 2026-09-22 to the gap inbox by `consumer-policy-seam`'s spec; promoted 2026-09-23 at its close, because the census is its own sweep and its alternative is a reading of the doctrine.
 
 ### unmarked-discharge-vs-span
 
