@@ -12,6 +12,50 @@
 
 ## Deferred
 
+### knob-default-export-unsteered
+
+[cost: session/low] [surface: guard-kit]
+
+a battery or arm call prefixed `export GATE_SDK_NATIVE_BIN=native/target/release/checkwright-gates &&`, or the same bare env-assign prefix, falls through the guard unsteered and costs an out-of-band decision; 15 of 231 prompting calls at gate-sdk-blind-spots' close carried it. The value is the knob's own default (gate-sdk/SPEC.md §Layout and configuration), so the prefix buys nothing. **Probed at promotion:** both spellings exit 0 from `scripts/bash-guard.sh` with no output; rule 6 catches a standalone assignment only.
+
+**Deliverable:** a generic-ruleset steer that refuses exporting or env-assigning a gate-sdk knob to its default and names the default, or a ruling that the cause is the prose (sessions read "the gate binary at `GATE_SDK_NATIVE_BIN`" as needing the variable set) and that prose fix instead.
+
+**Enhancement admission filter:** a new rule is new capability reaching none of the three arms, so it stays Deferred without an operator exception.
+
+**Cost while deferred:** every session that runs the battery risks a prompt per prefixed call. Filed 2026-09-23 to the gap inbox by gate-sdk-blind-spots' close; promoted 2026-09-23 at the next scope. Owner lookup: `export`, `env-assign`, `knob default` in guard-kit/SPEC.md — none.
+
+### suite-corpus-skips-tests-dir
+
+[cost: event/low] [surface: gate-sdk]
+
+`check-pipe-membership`'s suite corpus recognizes a suite by its parent directory's name alone: `native/src/walk.rs` `is_suite` matches a directory named `gate-tests`. That fits the kit layout's `<kit>/gate-tests`, but a consumer whose `GATE_SDK_TESTS_DIR` names another directory has its own suites silently left out, while `run-gate-tests` honours the knob. **Re-verified at promotion:** `is_suite` compares the literal `gate-tests` and reads no knob.
+
+**Deliverable:** match the kit dirs' `gate-tests` or the resolved `GATE_SDK_TESTS_DIR`, with a fixture relocating the tests dir. Debt: it converges on a knob the SPEC already carries.
+
+**Cost while deferred:** an adopter relocating the tests dir loses pipe-membership coverage over their suites, with no red. Filed 2026-09-23 to the gap inbox by gate-sdk-blind-spots' close baked-calibration sweep; promoted 2026-09-23 at the next scope. Owner lookup: `is_suite`, `GATE_SDK_TESTS_DIR`, `gate-tests` in this file — none.
+
+### foreign-toolchain-docker-legs
+
+[cost: event/low] [surface: gate-sdk]
+
+this host lacks `pwsh` and `dash`, so the front-end parity check's PowerShell half and every dash-only path first run on CI. At gate-sdk-blind-spots, build changed `gate-sdk/bin/run-gates.ps1` and added a `.ps1` ASCII arm; the Windows legs at close's watched push were their first real run. They passed, but a red would have cost a second push. Docker is available on the development host; a cold daemon start took more than 120s.
+
+**Deliverable:** a contributor-local arm or documented recipe running the pwsh and dash suites in containers, skipping cleanly when Docker is absent. Contributor-only, never an adopter requirement (gate-sdk/SPEC.md §The adopter constraints).
+
+**Enhancement admission filter:** contributor tooling reaching none of the three arms; held Deferred without an operator exception.
+
+**Cost while deferred:** a unit touching a PowerShell or dash path risks a second watched push. Filed 2026-09-23 to the gap inbox on an operator suggestion, lead-relayed, after gate-sdk-blind-spots' close; promoted 2026-09-23 at the next scope. Owner lookup: `docker`, `dash`, `pwsh` in this file — `pwsh` hits only [instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set](#instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set), whose subject is a CI leg's binding transition, not a local run.
+
+### lead-capture-dirties-batch
+
+[cost: event/low] [surface: lifecycle-kit]
+
+lifecycle-kit/templates/lead.md has the lead commit a gap bullet "at the first moment the git index is free of stage-session work", but nothing stops the lead writing the bullet while a batch runs. At gate-sdk-blind-spots build batch 1 the lead's uncommitted `.workflow/gap-inbox.md` made `installer/consumer-smoke/run-smoke.sh` refuse its dirty tree, so that smoke shipped unrun and batch 2 discharged it. The rule governs the commit and not the write.
+
+**Deliverable:** one of: a mid-batch capture held in the lead journal and filed between dispatches; or the gap inbox exempted from clean-tree preconditions. The template sentence says which.
+
+**Cost while deferred:** a mid-batch capture can leave a batch's clean-tree verification unrun. Filed 2026-09-23 to the gap inbox by the lead after gate-sdk-blind-spots' close; promoted 2026-09-23 at the next scope. Owner lookup: lifecycle-kit/templates/lead.md (the commit-the-bullet paragraph), which rules the commit only.
+
 ### worktree-gate-execution
 
 [cost: event/high] [surface: gate-sdk]
