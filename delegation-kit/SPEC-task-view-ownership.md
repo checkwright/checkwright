@@ -20,6 +20,7 @@
 - **The fallback never fails open.** Every running `shell` element counts, which is today's decision, when `agent_transcript_path` is absent, is not a string, or names a file that cannot be read. Scoping is only ever a narrowing off a key the hook actually holds.
 - **Read lazily, once.** The transcript is read only when the view holds at least one running `shell` element, and at most once per firing. The common firing, whose view holds none, reads nothing new.
 - **Nothing new is observable.** The hook logs nothing from the transcript or the view. The log grammar, its field list, the `TASK_REFUSAL` text and the exit contract stay as they are. The file header's "a running harness shell task" becomes "a running harness shell task of its own".
+- **The header's phrase is quoted at the project boundary too, and goes stale with it.** `README.md`'s kit-table row for delegation-kit describes this hook as refusing "over a live recorded producer or a running harness shell task" — the identical words, not a paraphrase. It becomes "a running harness shell task of its own", the same substitution as the header above (§Existing sections updated).
 - **Cases (module tests).** Six rows are added beside the existing five, which stay as they are. The existing rows carry no `agent_transcript_path`, so they now pin the fallback. The new rows:
   - `own` — the id is in a scratch transcript: refuse.
   - `foreign` — the id is not in it: allow, stderr empty.
@@ -52,6 +53,8 @@
   > **The view is scoped where the record set is shared, and the difference is deliberate.** The record set binds every session (the shared-scratch-dir paragraph below), because a record declares a producer, and observers write none. The view makes no producer/observer split, and it spans more than the emitter: a child holding no task of its own was refused on its dispatcher's. The commonest foreign element in a dispatch is the dispatcher's own wait on that child, so an unscoped view turns that wait into a circular one. A dispatcher's recorded producer still refuses the child through the record set. **Honest limit:** the transcript is harness state that no contract covers, the same footing as the payload. A revision that stopped writing task ids there would make every element foreign and fail the arm open on the session's own moved call. The record set is untouched by that, and only a re-run of the two-sided live check catches it.
 - In the paragraph opening **An unreadable payload does not disable enforcement**, the clause "and the task-view condition above is read from the payload, so an unreadable one drops it and leaves the record-set decision" becomes "and the task-view condition above is read from the payload, so an unreadable one drops it and leaves the record-set decision; an unreadable **transcript** leaves the condition unscoped rather than dropping it".
 
+**The activation surface repeats the contract sentence's predicate too, outside this file.** `delegation-kit/README.md`'s optional hook-wiring step carries the same unscoped words the contract sentence above corrects — "or while the payload's `background_tasks` shows a running `shell` task" — and takes the same substitution: "a running `shell` task of its own". `docs/delegation-kit/README.md`, its generated mirror, follows through the regeneration delta 3's roster entry already runs.
+
 ### (3) §What `background_tasks` carries corrects its scope claim
 
 The measured claim is corrected to what the two measurements support. **{mechanical}**
@@ -77,7 +80,9 @@ Roster probe: `git grep -n -i "background_tasks\|task view\|task-view\|agent_tra
 
 - `native/src/hook/stop_liveness.rs` — `shell_task_running`, its call site, the file header and the case module (delta 1).
 - `delegation-kit/SPEC.md` — §The turn-end liveness hook (delta 2) and §What `background_tasks` carries (delta 3).
-- `docs/delegation-kit/SPEC.md` — the generated on-site mirror, regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write` (all deltas).
+- `README.md` — the delegation-kit kit-table row's refusal phrase, the roster probe's own term matched but the authoring roster omitted (delta 1).
+- `delegation-kit/README.md` — the optional hook-wiring step's predicate, the same omission (delta 2).
+- `docs/delegation-kit/SPEC.md` and `docs/delegation-kit/README.md` — the generated on-site mirrors, regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write` (all deltas).
 
 ## Retired spellings
 
