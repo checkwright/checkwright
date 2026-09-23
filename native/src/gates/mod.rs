@@ -2174,7 +2174,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-pipe-membership",
         pipe_membership::run,
         &[],
-        &["GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS"],
+        &["GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS", "GATE_SDK_TESTS_DIR"],
         "gate-sdk",
         &[("git", "")],
     ),

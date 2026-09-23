@@ -1,3 +1,4 @@
 # No positional arguments: the corpus is the tracked shell tree plus the tracked suites (git
 # ls-files, scoped to this case dir by cwd). One file per producer shape, all under pipefail, and
-# a suite among them; the count is asserted so a shape that stopped reddening reds this case.
+# a suite among them; the count is asserted so a shape that stopped reddening reds this case. A
+# second suite sits in the tests dir the case's own knob file relocates to tree/tests.

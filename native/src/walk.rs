@@ -46,21 +46,25 @@ pub fn tracked_shell_tree() -> Result<Vec<String>, String> {
 }
 
 // spec: gate-sdk/SPEC.md §check-pipe-membership — the tracked unit-test suites: a `*.test.sh` whose
-// parent directory is named `gate-tests` and whose path above it is unpruned, on the same degrade
+// parent directory is a kit's `gate-tests` or the resolved `GATE_SDK_TESTS_DIR`, and whose path
+// above it is unpruned, on the same degrade
 pub fn tracked_suites() -> Result<Vec<String>, String> {
     let prune = prune_dirs()?;
+    let tests_dir = knob_scalar("GATE_SDK_TESTS_DIR")?;
+    let tests_dir = tests_dir.trim_end_matches('/');
+    let tests_dir = tests_dir.strip_prefix("./").unwrap_or(tests_dir);
     Ok(tracked_matching("*.test.sh")
         .into_iter()
-        .filter(|l| is_suite(l, &prune))
+        .filter(|l| is_suite(l, &prune, tests_dir))
         .collect())
 }
 
-fn is_suite(p: &str, prune: &[String]) -> bool {
+fn is_suite(p: &str, prune: &[String], tests_dir: &str) -> bool {
     let Some((dir, _)) = p.rsplit_once('/') else {
         return false;
     };
     let (above, name) = dir.rsplit_once('/').unwrap_or(("", dir));
-    name == "gate-tests" && (above.is_empty() || !path_pruned(&format!("{}/", above), prune))
+    (name == "gate-tests" || dir == tests_dir) && (above.is_empty() || !path_pruned(&format!("{}/", above), prune))
 }
 
 fn tracked_matching(pathspec: &str) -> Vec<String> {
@@ -1188,15 +1192,27 @@ mod tests {
     #[test]
     fn a_suite_is_a_direct_child_of_an_unpruned_tests_dir() {
         let prune: Vec<String> = ["gate-tests", ".tmp"].iter().map(|s| s.to_string()).collect();
-        assert!(is_suite("gate-sdk/gate-tests/lib-gate.test.sh", &prune));
-        assert!(is_suite("scripts/gate-tests/x.test.sh", &prune));
-        assert!(is_suite("gate-tests/x.test.sh", &prune));
-        assert!(is_suite("tree/gate-tests/clean.test.sh", &prune));
-        assert!(!is_suite("tree/gate-tests/check-x/bad/violating.test.sh", &prune));
-        assert!(!is_suite("gate-sdk/gate-tests/check-x/good/tree/gate-tests/x.test.sh", &prune));
-        assert!(!is_suite(".tmp/gate-tests/x.test.sh", &prune));
-        assert!(!is_suite("gate-sdk/tests/x.test.sh", &prune));
-        assert!(!is_suite("x.test.sh", &prune));
+        assert!(is_suite("gate-sdk/gate-tests/lib-gate.test.sh", &prune, "scripts/gate-tests"));
+        assert!(is_suite("scripts/gate-tests/x.test.sh", &prune, "scripts/gate-tests"));
+        assert!(is_suite("gate-tests/x.test.sh", &prune, "scripts/gate-tests"));
+        assert!(is_suite("tree/gate-tests/clean.test.sh", &prune, "scripts/gate-tests"));
+        assert!(!is_suite("tree/gate-tests/check-x/bad/violating.test.sh", &prune, "scripts/gate-tests"));
+        assert!(!is_suite("gate-sdk/gate-tests/check-x/good/tree/gate-tests/x.test.sh", &prune, "scripts/gate-tests"));
+        assert!(!is_suite(".tmp/gate-tests/x.test.sh", &prune, "scripts/gate-tests"));
+        assert!(!is_suite("gate-sdk/tests/x.test.sh", &prune, "scripts/gate-tests"));
+        assert!(!is_suite("x.test.sh", &prune, "scripts/gate-tests"));
+    }
+
+    // spec: gate-sdk/SPEC.md §check-pipe-membership — a relocated tests dir holds suites by its
+    // resolved path, beside every kit's `gate-tests`, and a same-named directory elsewhere does not
+    #[test]
+    fn a_relocated_tests_dir_holds_its_suites() {
+        let prune: Vec<String> = ["gate-tests", ".tmp"].iter().map(|s| s.to_string()).collect();
+        assert!(is_suite("ops/tests/x.test.sh", &prune, "ops/tests"));
+        assert!(is_suite("gate-sdk/gate-tests/lib-gate.test.sh", &prune, "ops/tests"));
+        assert!(!is_suite("other/tests/x.test.sh", &prune, "ops/tests"));
+        assert!(!is_suite("ops/tests/check-x/bad/x.test.sh", &prune, "ops/tests"));
+        assert!(!is_suite(".tmp/ops/tests/x.test.sh", &prune, ".tmp/ops/tests"));
     }
 
     const ROOTED_CORPUS: &[&str] = &[

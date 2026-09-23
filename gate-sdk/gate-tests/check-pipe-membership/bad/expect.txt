@@ -1,5 +1,6 @@
-PIPE-MEMBERSHIP: 4 violation(s):
+PIPE-MEMBERSHIP: 5 violation(s):
 tree/array-grep.sh:4 — a set producer (`printf`) feeds a short-circuiting reader (`grep`)
 tree/echo-max-count.sh:4 — a set producer (`echo`) feeds a short-circuiting reader (`grep`)
 tree/loop-head.sh:5 — a set producer (`done`) feeds a short-circuiting reader (`head`)
 tree/gate-tests/membership.test.sh:4 — a set producer (`printf`) feeds a short-circuiting reader (`grep`)
+tree/tests/relocated.test.sh:4 — a set producer (`printf`) feeds a short-circuiting reader (`grep`)

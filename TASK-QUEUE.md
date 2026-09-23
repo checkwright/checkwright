@@ -120,14 +120,6 @@ a worktree-isolated `audit-sweep` has no gate binary for its oracle arms. `DELEG
 
 ## Technical Debt
 
-### suite-corpus-skips-tests-dir
-
-`check-pipe-membership`'s suite corpus recognizes a suite by its parent directory's name alone: `native/src/walk.rs` `is_suite` matches a directory named `gate-tests`. That fits the kit layout's `<kit>/gate-tests`, but a consumer whose `GATE_SDK_TESTS_DIR` names another directory has its own suites silently left out, while `run-gate-tests` honours the knob. **Re-verified at promotion:** `is_suite` compares the literal `gate-tests` and reads no knob.
-
-**Deliverable:** match the kit dirs' `gate-tests` or the resolved `GATE_SDK_TESTS_DIR`, with a fixture relocating the tests dir. Debt: it converges on a knob the SPEC already carries.
-
-**Cost while deferred:** an adopter relocating the tests dir loses pipe-membership coverage over their suites, with no red. Filed 2026-09-23 to the gap inbox by gate-sdk-blind-spots' close baked-calibration sweep; promoted 2026-09-23 at the next scope. Owner lookup: `is_suite`, `GATE_SDK_TESTS_DIR`, `gate-tests` in this file — none.
-
 ### repo-inherits-policy-defaults
 
 [blocked-by: policy-choice-census-residue]
@@ -1697,5 +1689,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - projection-path-literals
 - docs-mirror-root-unrelocatable
 - couples-literals-undisposed
+- suite-corpus-skips-tests-dir
 
 ## Lessons Learned
