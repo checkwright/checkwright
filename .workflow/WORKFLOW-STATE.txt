@@ -11,3 +11,4 @@ gate-sdk-blind-spots build aa49e95f 2026-09-23 2efdfdd5
 gate-sdk-blind-spots build a65f7c06 2026-09-23 87a289d7
 gate-sdk-blind-spots build a31cb007 2026-09-23 00b96394
 gate-sdk-blind-spots validate af045995 2026-09-23 35277a83
+gate-sdk-blind-spots close afa5e70e 2026-09-23 3a2415fe
