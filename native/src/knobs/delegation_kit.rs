@@ -57,6 +57,8 @@ pub const KIT: Kit = Kit {
         Row::derived("DELEGATION_KIT_STOP_LOG", Shape::Scalar, stop_log, &["GATE_SDK_WORKFLOW_DIR"]),
         Row::indexed("DELEGATION_KIT_LIVENESS_CMD", &[]),
         Row::indexed("DELEGATION_KIT_READONLY_TYPES", &[]),
+        Row::indexed("DELEGATION_KIT_MUTATING_TYPES", &[]),
+        Row::scalar("DELEGATION_KIT_REQUIRE_TIER", "off"),
         Row::derived("DELEGATION_KIT_GATE_FILES", Shape::Indexed, gate_files, &["GATE_SDK_GATES_DIR"]),
         Row::derived(
             "DELEGATION_KIT_META_PATHS",
@@ -85,7 +87,8 @@ fn numeric(s: &str) -> bool {
 }
 
 // spec: delegation-kit/SPEC.md §Layout and configuration — a broken delegation config runs no tool:
-// the numeric shapes, the positive fan width, and the emptiness of the roster and the two path sets
+// the numeric shapes, the positive fan width, D5's on|off switch, and the emptiness of the agent
+// dir and the two path sets
 fn validate(v: &Values) -> Vec<String> {
     let mut errs: Vec<String> = Vec::new();
     for n in ["DELEGATION_KIT_PAUSE_PCT", "DELEGATION_KIT_PAUSE_PCT_7D"] {
@@ -100,6 +103,9 @@ fn validate(v: &Values) -> Vec<String> {
     }
     if let Some(s) = scalar(v, "DELEGATION_KIT_FAN_WIDTH").filter(|s| !digits(s) || s.bytes().all(|b| b == b'0')) {
         errs.push(format!("DELEGATION_KIT_FAN_WIDTH must be a positive integer (got '{}')", s));
+    }
+    if let Some(s) = scalar(v, "DELEGATION_KIT_REQUIRE_TIER").filter(|s| !matches!(*s, "on" | "off")) {
+        errs.push(format!("DELEGATION_KIT_REQUIRE_TIER must be on|off (got '{}')", s));
     }
     if scalar(v, "DELEGATION_KIT_AGENT_DIR").is_some_and(str::is_empty) {
         errs.push("DELEGATION_KIT_AGENT_DIR is empty".to_string());

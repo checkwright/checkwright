@@ -3,6 +3,13 @@
 # spec: delegation-kit/SPEC.md §The delegation model — this repo's D2 roster: audit-sweep is dispatched read-only by its own agent-definition description ("it mutates nothing"); stage-session is not read-only and stays off, and a type with no Edit/Write tools is still not exempt from declaring isolation once dispatched read-only (it still reaches git through its shell) — there is none such in this roster today
 DELEGATION_KIT_READONLY_TYPES[] = audit-sweep
 
+# spec: delegation-kit/SPEC.md §The delegation model — this repo's D4 roster: the two types that commit to the shared tree; general-purpose stays off, so an undeclared dispatch takes isolation: worktree
+DELEGATION_KIT_MUTATING_TYPES[] = stage-session
+DELEGATION_KIT_MUTATING_TYPES[] = edit-sweep
+
+# spec: delegation-kit/SPEC.md §The delegation model — D5 on: a dispatch names its model unless its type's definition states one
+DELEGATION_KIT_REQUIRE_TIER = on
+
 # spec: delegation-kit/SPEC.md §usage-verdict — sample the footprint per verdict into the gitignored measurement dir; --emit-usage-trend reports the evolution
 DELEGATION_KIT_USAGE_HISTORY = .metric/usage-history.log
 

@@ -29,7 +29,12 @@ pub const HOOKS: &[(&str, HookFn, &[&str])] = &[
     (
         "agent-dispatch-guard",
         dispatch::run,
-        &["DELEGATION_KIT_READONLY_TYPES"],
+        &[
+            "DELEGATION_KIT_READONLY_TYPES",
+            "DELEGATION_KIT_MUTATING_TYPES",
+            "DELEGATION_KIT_REQUIRE_TIER",
+            "DELEGATION_KIT_AGENT_DIR",
+        ],
     ),
     (
         "subagent-stop-liveness",

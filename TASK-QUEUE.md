@@ -8,36 +8,6 @@
 
 ## New Features
 
-### worktree-gate-execution
-
-[spec: SPEC-isolated-dispatch.md]
-
-a worktree-isolated `audit-sweep` has no gate binary for its oracle arms. `DELEGATION_KIT_READONLY_TYPES` names it, so D2 forces the isolation, and isolation cost (4) forbids building a binary in the worktree. The landed fail-open fallback sends only the harness arms to the main checkout's binary: every verdict-bearing path still resolves locally (gate-sdk/SPEC.md §The harness-integration arm). gate-sdk-blind-spots' spec therefore ran its probe-driven review on unisolated Explore, which cannot journal as it goes.
-
-**Operator direction 2026-09-23, lead-relayed:** audit-sweep in a worktree is the methodology's answer to interruption-safe review work, and the missing gates are its one open challenge. A worktree without gates is acceptable for audit-sweep, which writes nothing but its journal. Make gates fully workable in worktrees if that is feasible; otherwise document the limitation and live with it.
-
-**Admitted by operator exception to the enhancement admission filter** (TRAJECTORY.md §The rulings, its exception clause) — `operator direction, 2026-09-23`, lead-relayed. The deliverable reaches none of the three arms. The reason, as escalated: the operator's own direction above names the missing gates as the one open challenge to interruption-safe review work.
-
-**Operator directions 2026-09-23, lead-relayed, widening the envelope at spec:**
-
-- **Confinement.** A read-only dispatch lands on a type structurally unable to alter the work tree. Its journal, in the main checkout's scratch dir, is its one sanctioned write, and it still reaches the oracle arms and the untracked corpus. A prompt sentence or after-the-fact detection alone does not meet that bar.
-- **The model tier.** It is chosen at dispatch and never inherited, with a stated default for the read-only type and no model-name list in the kit.
-- **The guarantee bar: chokepoint deltas plus a Bash token rule.** After the lead's probe measured the sandbox write-root as the session's project directory, the operator ruled out any sandbox binding. That residue is stated as an honest limit, and no settings or host dependency is touched.
-- **This repo's mutating types.** `DELEGATION_KIT_MUTATING_TYPES` binds `stage-session` and a new tracked `edit-sweep`, never `general-purpose`.
-
-**Deliverable:** a feasibility ruling on running verdict-bearing arms in a linked worktree, then either that path or the limitation stated in delegation-kit/templates/agent-execution.md. Settle the text clash as well: `.claude/agents/audit-sweep.md` §Return contract says the type "owes no resume journal", and the resume-journal bullet keeps journals for agents that change files. Both contradict the direction.
-
-**Specified 2026-09-23:** feasible.
-
-- **The oracle.** A verdict arm in a linked worktree runs the main checkout's binary, linked in only on a matching source stamp and never built. `check-crate-arms` reads the main checkout's cache and refuses on a miss.
-- **The untracked corpus.** It is read by absolute path with the read tools.
-- **D4.** It confines every type outside the mutating roster to isolation. The harness already refuses an isolated child's file-tool writes to the main checkout, as measured.
-- **Rule 27 and the journal.** Rule 27 refuses a shell command naming a main-checkout path outside the scratch dir. The journal is therefore appended by shell, and audit-sweep journals.
-- **D5.** It requires a chosen tier.
-- **Honest limits.** A program-computed write and a knowingly chosen mutating type.
-
-**Cost while deferred:** a review sweep either runs isolated without its oracle or is misrouted to an excerpt-locator that keeps no journal. Filed 2026-09-23 to the gap inbox as three bullets, one from the lead and two carrying the direction; merged and promoted at gate-sdk-blind-spots' close drain. Owner lookup: gate-sdk/SPEC.md §lib/gate.sh (`gate_harness_bin`); delegation-kit/SPEC.md §The delegation model (D2, isolation costs). Neither rules on verdict arms in a worktree.
-
 ## Technical Debt
 
 ## Deferred
@@ -1607,5 +1577,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - stage-exit-no-successor-check
 - lead-capture-dirties-batch
 - knob-default-export-unsteered
+- worktree-gate-execution
 
 ## Lessons Learned

@@ -7,7 +7,7 @@ use std::path::Path;
 // spec: delegation-kit/SPEC.md §check-agent-tier-explicit — the frontmatter is the first
 // `---`-delimited block; a file that does not open one is unscannable and reds by
 // construction, and the field is read only inside that first block, never past its close
-fn has_explicit_model(text: &str) -> bool {
+pub(crate) fn has_explicit_model(text: &str) -> bool {
     let mut lines = text.lines();
     match lines.next() {
         Some("---") => {}
@@ -103,6 +103,26 @@ pub fn run(args: &[String]) -> i32 {
         dir
     );
     0
+}
+
+// spec: delegation-kit/SPEC.md §The delegation model — D5's lookup: the type a definition declares
+// is its first frontmatter block's `name:`, else the file's stem, as the harness names a type
+pub(crate) fn defined_type(text: &str, stem: &str) -> String {
+    let mut lines = text.lines();
+    if lines.next() == Some("---") {
+        for line in lines {
+            if line == "---" {
+                break;
+            }
+            if let Some(rest) = line.strip_prefix("name:") {
+                let name = rest.trim().trim_matches(['"', '\'']);
+                if !name.is_empty() {
+                    return name.to_string();
+                }
+            }
+        }
+    }
+    stem.to_string()
 }
 
 #[cfg(test)]

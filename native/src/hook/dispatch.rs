@@ -1,23 +1,50 @@
 // spec: delegation-kit/SPEC.md §The delegation model — the PreToolUse(Agent) dispatch-shape guard:
-// D1 the fork ban, D2 the read-only isolation claim, D3 the nested-dispatch advisory.
+// D1 the fork ban, D2 the read-only isolation claim, D4 default isolation, D5 the chosen tier, D3
+// the nested-dispatch advisory.
+use crate::gates::agent_tier_explicit;
 use crate::hook;
 use crate::walk;
 use serde_json::Value;
+use std::path::Path;
 
 const NAME: &str = "agent-dispatch-guard";
 
+// spec: delegation-kit/SPEC.md §The delegation model — the configuration the routing reads: D2's
+// roster, D4's roster, D5's switch, and D5's definition lookup, a function so the decision table
+// can fix it without a directory
+struct Config<'a> {
+    readonly: &'a [String],
+    mutating: &'a [String],
+    require_tier: bool,
+    tier_defined: &'a dyn Fn(&str) -> bool,
+}
+
+// spec: delegation-kit/SPEC.md §The delegation model — one knob read: its value, or empty with a
+// note naming the rule it leaves unenforced, so a config fault costs that rule and never the dispatch
+fn read_array(knob: &str, rule: &str, notes: &mut String) -> Vec<String> {
+    match walk::knob_array(knob) {
+        Ok(v) => v,
+        Err(e) => {
+            notes.push_str(&format!("{} went unenforced on this dispatch: {}. ", rule, e));
+            Vec::new()
+        }
+    }
+}
+
 pub fn run(payload: Option<&Value>) -> i32 {
-    // spec: delegation-kit/SPEC.md §The delegation model — an unresolvable roster leaves D2 with an
-    // empty set and earns a note, never a skip of D1, so a config fault cannot wedge a dispatch.
-    let (roster, roster_note) = match walk::knob_array("DELEGATION_KIT_READONLY_TYPES") {
-        Ok(v) => (v, String::new()),
-        Err(e) => (
-            Vec::new(),
-            format!(
-                "D2 (the read-only isolation claim) went unenforced on this dispatch: {}. ",
-                e
-            ),
-        ),
+    // spec: delegation-kit/SPEC.md §The delegation model — an unresolvable roster leaves its rule
+    // with an empty set and earns a note, never a skip of D1, so a config fault cannot wedge a dispatch.
+    let mut notes = String::new();
+    let readonly = read_array("DELEGATION_KIT_READONLY_TYPES", "D2 (the read-only isolation claim)", &mut notes);
+    let mutating = read_array("DELEGATION_KIT_MUTATING_TYPES", "D4 (default isolation)", &mut notes);
+    let tier = walk::knob_scalar("DELEGATION_KIT_REQUIRE_TIER")
+        .and_then(|t| walk::knob_scalar("DELEGATION_KIT_AGENT_DIR").map(|d| (t, d)));
+    let (require_tier, agent_dir) = match tier {
+        Ok((t, d)) => (t == "on", d),
+        Err(e) => {
+            notes.push_str(&format!("D5 (the chosen tier) went unenforced on this dispatch: {}. ", e));
+            (false, String::new())
+        }
     };
     let Some(doc) = payload.filter(|d| d.get("tool_input").is_some_and(Value::is_object)) else {
         return degraded("the hook payload did not parse, or carried no tool_input object");
@@ -25,23 +52,51 @@ pub fn run(payload: Option<&Value>) -> i32 {
 
     let subagent_type = hook::field(Some(doc), &["tool_input", "subagent_type"]);
     let isolation = hook::field(Some(doc), &["tool_input", "isolation"]);
+    let model_named = !hook::field(Some(doc), &["tool_input", "model"]).is_empty();
     let nested = doc.get("agent_id").is_some_and(|v| !v.is_null());
+    let lookup = |ty: &str| tier_defined(&agent_dir, ty);
+    let cfg = Config {
+        readonly: &readonly,
+        mutating: &mutating,
+        require_tier,
+        tier_defined: &lookup,
+    };
 
-    match route(&subagent_type, &isolation, nested, &roster) {
-        "block" if subagent_type == "fork" => return hook::block(NAME, FORK_BAN),
-        "block" => return hook::block(NAME, &read_only_claim(&subagent_type)),
+    match route(&subagent_type, &isolation, nested, model_named, &cfg) {
+        "fork" => return hook::block(NAME, FORK_BAN),
+        "read-only" => return hook::block(NAME, &read_only_claim(&subagent_type)),
+        "isolation" => return hook::block(NAME, &default_isolation(&subagent_type)),
+        "tier" => return hook::block(NAME, &chosen_tier(&subagent_type, &agent_dir)),
         _ => {}
     }
 
-    let notes = if nested {
-        format!("{}{}", roster_note, NESTED)
-    } else {
-        roster_note
-    };
+    if nested {
+        notes.push_str(NESTED);
+    }
     if notes.is_empty() {
         return 0;
     }
     advise(&notes)
+}
+
+// spec: delegation-kit/SPEC.md §The delegation model — D5's lookup: a definition under the agent
+// dir whose declared type is this one and whose frontmatter states `model:`
+fn tier_defined(agent_dir: &str, subagent_type: &str) -> bool {
+    let dir = agent_dir.trim_end_matches('/');
+    if subagent_type.is_empty() || !Path::new(dir).is_dir() {
+        return false;
+    }
+    let Ok(files) = walk::find_files(Path::new(dir), &["md"]) else {
+        return false;
+    };
+    files.iter().any(|f| {
+        let Ok(text) = std::fs::read_to_string(f) else {
+            return false;
+        };
+        let stem = f.file_stem().and_then(|s| s.to_str()).unwrap_or("");
+        agent_tier_explicit::defined_type(&text, stem) == subagent_type
+            && agent_tier_explicit::has_explicit_model(&text)
+    })
 }
 
 fn advise(note: &str) -> i32 {
@@ -52,9 +107,17 @@ fn advise(note: &str) -> i32 {
 // dispatch and names the rules it could not enforce, so the reviewer knows what to check by hand.
 fn degraded(reason: &str) -> i32 {
     advise(&format!(
-        "allowed this dispatch WITHOUT enforcing the fork ban (D1) or the read-only isolation claim (D2) — {}. Check the dispatch by hand: no fork, and a child claimed read-only takes isolation: worktree (delegation-kit/SPEC.md §The delegation model).",
+        "allowed this dispatch WITHOUT enforcing the fork ban (D1), the read-only isolation claim (D2), default isolation (D4) or the chosen tier (D5) — {}. Check the dispatch by hand: no fork, a child claimed read-only or of an undeclared type takes isolation: worktree, and the dispatch names its model unless its type's definition states one (delegation-kit/SPEC.md §The delegation model).",
         reason
     ))
+}
+
+fn type_label(subagent_type: &str) -> String {
+    if subagent_type.is_empty() {
+        "the harness's default type".to_string()
+    } else {
+        format!("'{}'", subagent_type)
+    }
 }
 
 fn read_only_claim(subagent_type: &str) -> String {
@@ -64,15 +127,37 @@ fn read_only_claim(subagent_type: &str) -> String {
     )
 }
 
+fn default_isolation(subagent_type: &str) -> String {
+    format!(
+        "{} is not a declared mutating dispatch type (DELEGATION_KIT_MUTATING_TYPES), and this dispatch is not isolated: a type nobody declared mutating is confined to a worktree by default, so reaching past isolation takes a named choice. Two lawful shapes: add isolation: worktree, where the child reads the main checkout by absolute path and appends its journal by shell under the main checkout's scratch dir; or dispatch a declared mutating type (delegation-kit/SPEC.md §The delegation model).",
+        type_label(subagent_type)
+    )
+}
+
+fn chosen_tier(subagent_type: &str, agent_dir: &str) -> String {
+    format!(
+        "this dispatch names no model, and {} has no definition under {} stating model:, so the child would inherit the dispatcher's tier by default rather than by choice. Name a model for this dispatch, or dispatch a type whose definition states one: selection is affirmative (delegation-kit/templates/agent-execution.md, Match the dispatched model and effort to the unit's shape).",
+        type_label(subagent_type),
+        agent_dir
+    )
+}
+
 // spec: delegation-kit/SPEC.md §The delegation model — the routing the kit's decision table
 // asserts over, kept apart from the messages so the table drives the decision rather than a
-// process. D1 precedes D2: the fork ban is unconditional and its message is the more specific one.
-fn route(subagent_type: &str, isolation: &str, nested: bool, roster: &[String]) -> &'static str {
+// process; the rule order is that section's
+fn route(subagent_type: &str, isolation: &str, nested: bool, model_named: bool, cfg: &Config) -> &'static str {
     if subagent_type == "fork" {
-        return "block";
+        return "fork";
     }
-    if !subagent_type.is_empty() && isolation != "worktree" && roster.iter().any(|t| t == subagent_type) {
-        return "block";
+    let isolated = isolation == "worktree";
+    if !subagent_type.is_empty() && !isolated && cfg.readonly.iter().any(|t| t == subagent_type) {
+        return "read-only";
+    }
+    if !isolated && !cfg.mutating.is_empty() && !cfg.mutating.iter().any(|t| t == subagent_type) {
+        return "isolation";
+    }
+    if cfg.require_tier && !model_named && !(cfg.tier_defined)(subagent_type) {
+        return "tier";
     }
     if nested {
         return "advise";
@@ -107,6 +192,11 @@ mod tests {
             "",
             "an absent isolation must read empty, never 'null'"
         );
+        assert_eq!(
+            hook::field(Some(&plain), &["tool_input", "model"]),
+            "",
+            "an absent model must read empty, so D5 reads it as unnamed"
+        );
         assert!(
             plain.get("agent_id").is_none(),
             "a top-level agent_id is what makes a dispatch nested"
@@ -121,32 +211,46 @@ mod tests {
         let table = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("../delegation-kit/usage-tests/dispatch-guard-cases.tsv");
         let text = std::fs::read_to_string(&table).expect("the kit's decision table must be read");
-        // spec: delegation-kit/SPEC.md §Testing — the driver fixed one roster for the whole table
-        let roster = vec!["ro-type".to_string()];
+        // spec: delegation-kit/SPEC.md §Testing — the driver fixes the configuration: D2's roster
+        // everywhere, and D4's roster, D5's switch and one tier-stating definition behind `armed:`
+        let readonly = vec!["ro-type".to_string()];
+        let mutating = vec!["mut-type".to_string()];
+        let tiered = |t: &str| t == "tiered-type";
+        let none = |_: &str| false;
+        let quiet = Config { readonly: &readonly, mutating: &[], require_tier: false, tier_defined: &none };
+        let bare = Config { readonly: &[], mutating: &[], require_tier: false, tier_defined: &none };
+        let armed = Config { readonly: &readonly, mutating: &mutating, require_tier: true, tier_defined: &tiered };
         let mut ran = 0usize;
         for line in text.lines() {
             if line.trim().is_empty() || line.starts_with('#') {
                 continue;
             }
             let cols: Vec<&str> = line.split('\t').collect();
-            assert!(cols.len() >= 4, "malformed case row: {}", line);
-            let (want, ty, iso, nested) = (cols[0], cols[1], cols[2], cols[3]);
-            let desc = cols.get(4).copied().unwrap_or("");
+            assert!(cols.len() >= 5, "malformed case row: {}", line);
+            let (want, ty, iso, nested, model) = (cols[0], cols[1], cols[2], cols[3], cols[4]);
+            let desc = cols.get(5).copied().unwrap_or("");
             fn dash(v: &str) -> &str { if v == "-" { "" } else { v } }
-            // spec: delegation-kit/SPEC.md §Testing — the table's two sentinels in the type
-            // column: `UNPARSEABLE` is the degraded path, which always advises without reaching
-            // the routing, and a `noroster:` prefix runs the same type against an empty roster
+            // spec: delegation-kit/SPEC.md §Testing — the table's three type-column sentinels;
+            // `UNPARSEABLE` is the degraded path, which advises without reaching the routing
             let got = if ty == "UNPARSEABLE" {
                 "advise"
-            } else if let Some(bare) = ty.strip_prefix("noroster:") {
-                route(bare, dash(iso), dash(nested) == "yes", &[])
             } else {
-                route(dash(ty), dash(iso), dash(nested) == "yes", &roster)
+                let (bare_ty, cfg) = if let Some(t) = ty.strip_prefix("noroster:") {
+                    (t, &bare)
+                } else if let Some(t) = ty.strip_prefix("armed:") {
+                    (t, &armed)
+                } else {
+                    (ty, &quiet)
+                };
+                match route(dash(bare_ty), dash(iso), dash(nested) == "yes", !dash(model).is_empty(), cfg) {
+                    "fork" | "read-only" | "isolation" | "tier" => "block",
+                    other => other,
+                }
             };
             assert_eq!(got, want, "case [{}]: {}", desc, line);
             ran += 1;
         }
-        assert!(ran >= 9, "only {} cases parsed — the table did not load", ran);
+        assert!(ran >= 16, "only {} cases parsed — the table did not load", ran);
     }
 
     // spec: delegation-kit/SPEC.md §The delegation model — the degraded advisory is the same
@@ -156,5 +260,16 @@ mod tests {
         assert_eq!(degraded("the hook payload did not parse, or carried no tool_input object"), 0);
         let no_object = payload(r#"{"tool_input":"not-an-object"}"#);
         assert!(!no_object.get("tool_input").is_some_and(Value::is_object));
+    }
+
+    // spec: delegation-kit/SPEC.md §The delegation model — D5's lookup reads a definition's
+    // declared name before its file stem, and a definition stating no model does not count
+    #[test]
+    fn a_type_counts_as_tiered_only_through_a_definition_stating_model() {
+        assert_eq!(agent_tier_explicit::defined_type("---\nname: sweep\nmodel: x\n---\n", "file"), "sweep");
+        assert_eq!(agent_tier_explicit::defined_type("---\nmodel: x\n---\n", "file"), "file");
+        assert!(!agent_tier_explicit::has_explicit_model("---\nname: sweep\n---\n"));
+        assert!(!tier_defined("/nonexistent-agent-dir-checkwright", "sweep"));
+        assert!(!tier_defined(".claude/agents", ""));
     }
 }
