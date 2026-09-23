@@ -90,6 +90,29 @@ gate_native_bin_spelled() {
     esac
 }
 
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the binary a harness-integration arm runs: the local door when executable; else, inside a linked worktree whose common dir is <main>/.git, the main checkout's own resolution of the knob, rooted, when executable; else the local door unchanged
+gate_harness_bin() {
+    local door git_dir common main b
+    door="$(gate_native_bin_spelled)"
+    if [[ ! -x "$door" ]]; then
+        git_dir="$( { cd "$(git rev-parse --git-dir 2>/dev/null || echo /dev/null)" && pwd -P; } 2>/dev/null )"
+        common="$( { cd "$(git rev-parse --git-common-dir 2>/dev/null || echo /dev/null)" && pwd -P; } 2>/dev/null )"
+        if [[ -n "$common" && "$git_dir" != "$common" && "${common##*/}" == .git ]]; then
+            main="${common%/*}"
+            b="$(cd "$main" && gate_native_bin)"
+            case "$b" in
+                /* | [A-Za-z]:/* | [A-Za-z]:\\*) ;;
+                *) b="$main/$b" ;;
+            esac
+            if [[ -x "$b" ]]; then
+                printf '%s\n' "$b"
+                return 0
+            fi
+        fi
+    fi
+    printf '%s\n' "$door"
+}
+
 # spec: gate-sdk/SPEC.md §Layout and configuration — GATE_SDK_NATIVE_CRATE, its trailing `/` stripped where it resolves
 gate_native_crate() {
     local c
