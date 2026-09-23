@@ -52,18 +52,6 @@ The same literal class in the `# projection:` field is filed to the gap inbox.
 
 **Cost while deferred:** an adopter who empties the pattern file gets a silent clean pass with no doctor warning. Filed 2026-09-22 to the gap inbox by the census discharging `armed-by-census-unrun`; promoted at close because →fix needs a new declaration shape.
 
-### ps1-ascii-unheld-at-commit
-
-[spec: SPEC-ps1-ascii.md]
-
-installer/SPEC.md §Requirements rules a shipped PowerShell file's code ASCII outside its comments — premise corrected 2026-09-23, the filing cited §The install boundary — and nothing local holds it. Windows PowerShell 5.1 decodes a BOM-less script in the host ANSI code page, so a UTF-8 em-dash inside a string literal closes the string and the parse collapses (measured 2026-09-22, run `35753505608`). The only enforcement is the `install-smoke-pwsh-windows` leg.
-
-**Deliverable:** a precommit assertion over the configured install-path corpus's `*.ps1` — non-ASCII outside comments — with the fixture pair the born-native contract requires.
-
-**Specified 2026-09-23:** a byte-level ASCII arm in `check-portability-floor`, over the corpus's `.ps1` members. A full-line `#` comment outside a here-string is exempt. A trailing comment and a block comment over-refuse, stated. There is no valve, and the arm runs even with an empty roster. This repo's corpus binds `gate-sdk/bin/run-gates.ps1`, which is measured clean under the roster. The 24 non-ASCII lines in the two shipped `.ps1` files are all full-line comments.
-
-**Cost while deferred:** the class regresses only into a watched push, against a one-to-two-push iteration budget. Filed 2026-09-22 by build batch 1; promoted at close because →fix needs a new gate arm and a fixture pair.
-
 ### pipe-membership-corpus-omits-test-suites
 
 [spec: SPEC-pipe-suites.md]
@@ -1672,5 +1660,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 - worktree-hook-guards-fail-open
 - shell-textual-absoluteness-single-dialect
+- ps1-ascii-unheld-at-commit
 
 ## Lessons Learned
