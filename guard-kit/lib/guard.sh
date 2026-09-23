@@ -1758,11 +1758,14 @@ _guard_ere_literal() {
     printf '%s' "$out"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 24's cleanness test on one word: the full word carries no '..' component, and the text opening the path does not begin with '/' or '~'; prints what the word reaches past
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 24's cleanness test on one word: the full word carries no '..' component, and the text opening the path is not rooted by gate_path_rooted and does not begin with '~'; prints what the word reaches past
 _guard_unclean_word() {
     case "/$1/" in */../*) printf "'%s', which carries a '..' component" "$1"; return 0 ;; esac
+    if gate_path_rooted "$2"; then
+        printf "'%s', an absolute path" "$1"
+        return 0
+    fi
     case "$2" in
-        /*) printf "'%s', an absolute path" "$1"; return 0 ;;
         '~'*) printf "'%s', a home-relative path" "$1"; return 0 ;;
     esac
     return 1

@@ -318,8 +318,7 @@ git rm -rqf pbtree
 # spec: gate-sdk/SPEC.md §run-gates — reached by invoking the binary rather than the front-end, and
 # that is the finding rather than a shortcut: run-gates.sh refuses a non-repository before it execs,
 # so the front-end cannot reach this branch and a leg run through it would pass on the wrong refusal
-pbt_bin="$( source "$SDK/lib/gate.sh" >/dev/null 2>&1; gate_native_bin )"
-case "$pbt_bin" in /*) ;; *) pbt_bin="$PWD/$pbt_bin" ;; esac
+pbt_bin="$( source "$SDK/lib/gate.sh" >/dev/null 2>&1; b="$(gate_native_bin)"; gate_path_rooted "$b" || b="$PWD/$b"; printf '%s\n' "$b" )"
 nogit="$(mktemp -d)"
 if out="$(cd "$nogit" && "$pbt_bin" --emit-port-blockers --tree 2>&1)"; then
     echo "smoke(port-blockers): --tree did not refuse outside a repository: $out" >&2

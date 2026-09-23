@@ -8,18 +8,6 @@
 
 ## New Features
 
-### shell-textual-absoluteness-single-dialect
-
-[spec: SPEC-path-rooted.md]
-
-tracked shell sites test a path for absoluteness by a leading `/` alone, so a caller-supplied Windows drive-letter path is joined onto a root as if relative. Probe: `git grep -n -E '== /\*|/\*\)' -- '*.sh'`.
-
-**Deliverable:** one shell absoluteness helper both dialects satisfy, the sites routed through it, and the shell half of `check-path-dialect`'s locality arm (today crate-only) holding it.
-
-**Specified 2026-09-23:** `gate_path_rooted` in `gate-sdk/lib/gate.sh` answers exactly what `walk::path_root` answers. The POSIX bootstrap, which cannot source the library, carries a byte twin, and one crate test holds both to `path_root` and to each other. §The path-dialect contract's shared-normalizer refusal is narrowed to converters: a predicate converts nothing, and every other site already sources the library. Re-measured: eight sites, the seven filed plus `gate_native_bin_spelled`, which lacked the leading-`\` arm. One of them, guard rule 24, is a live guard hole: `bash C:/elsewhere/checks/check-x.sh` read clean. `check-path-dialect` gains a shell locality arm clearing only the predicate's own body and the exempt token.
-
-**Cost while deferred:** a wrong root on a Windows adopter host whenever a caller exports a drive-letter path. Filed 2026-09-21 to the gap inbox by gate-sdk-surface-drain's spec session; promoted at its close because →fix needs a new shell-side oracle the cwd-anchor amendment kept out of its envelope.
-
 ### doc-path-hardcoded-reads
 
 [spec: SPEC-doc-path-couples.md]
@@ -1683,5 +1671,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 ## Done
 
 - worktree-hook-guards-fail-open
+- shell-textual-absoluteness-single-dialect
 
 ## Lessons Learned

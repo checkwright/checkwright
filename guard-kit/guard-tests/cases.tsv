@@ -453,6 +453,7 @@ block	rm -rf .tmp/../scratch.txt
 block	rm -rf .tmp/x scratch.txt
 block	bash ../../evil/checks/check-x.sh
 block	bash /elsewhere/checks/check-x.sh
+block	bash C:/elsewhere/checks/check-x.sh
 block	timeout 5 rm -rf .tmp/../scratch.txt
 fallthrough	rm -rf .tmp/x .tmp/y
 fallthrough	rm -rf .tmp/x 2>/dev/null

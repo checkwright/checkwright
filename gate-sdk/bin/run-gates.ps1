@@ -83,7 +83,7 @@ function Get-PrebinaryKnob {
 function Get-NativeBinSpelled {
     param([string] $Default)
     $b = Get-PrebinaryKnob -Name 'GATE_SDK_NATIVE_BIN' -Default $Default
-    if ($b -cmatch '^(/|\./|\.\./|[A-Za-z]:[/\\])') { return $b }
+    if ($b -cmatch '^(/|\\|\./|\.\./|[A-Za-z]:[/\\])') { return $b }
     return "./$b"
 }
 

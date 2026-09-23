@@ -29,7 +29,7 @@ if [[ -z "${GATE_SDK_NATIVE_BIN:-}" ]]; then
     # shellcheck source=./gate.sh
     source "$GATE_SDK_TEST_LIB_DIR/gate.sh"
     _th_bin="$(gate_native_bin)"
-    [[ "$_th_bin" == /* ]] || _th_bin="$_th_root/$_th_bin"
+    gate_path_rooted "$_th_bin" || _th_bin="$_th_root/$_th_bin"
     export GATE_SDK_NATIVE_BIN="$_th_bin"
 fi
 unset _th_root _th_empty _th_empty_knobs _th_kit _th_var _th_bin

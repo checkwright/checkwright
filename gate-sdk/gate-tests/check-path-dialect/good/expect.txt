@@ -1,5 +1,5 @@
 PATH-DIALECT: clean
-8 shell file(s), 6 Rust file(s) scanned
+9 shell file(s), 6 Rust file(s) scanned
 13 producer occurrence(s)
 4 in `cd` position
 2 `Path`-typed
@@ -9,4 +9,5 @@ PATH-DIALECT: clean
 4 primitive spelling(s)
 2 inside the crate's speller
 2 declared out of the filesystem namespace
+3 shell absoluteness test(s) — 2 inside gate_path_rooted, 1 declared out of the filesystem namespace
 1 two-root file(s) anchored

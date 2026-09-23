@@ -100,7 +100,7 @@ bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html
 # because two of the dispatches below run from a sandbox cwd where the knob's repo-relative
 # default resolves to nothing (the rule lib/test-hermetic.sh already applies in the test lane)
 smoke_bin="$(gate_native_bin)"
-[[ "$smoke_bin" == /* ]] || export GATE_SDK_NATIVE_BIN="$PWD/$smoke_bin"
+gate_path_rooted "$smoke_bin" || export GATE_SDK_NATIVE_BIN="$PWD/$smoke_bin"
 unset smoke_bin
 
 # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — exercise the --enter-stage arm end-to-end under .tmp (advisory tooling, no fixture pair). The knob paths are absolute, so the front-end's cd to the git toplevel leaves every one of them resolving where this smoke put it.

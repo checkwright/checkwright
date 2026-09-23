@@ -38,7 +38,7 @@ if [[ ! -x "$BIN" ]]; then
     echo "guard-lib-parity.test: ok (0 assertions; skipped — no gate binary at $BIN, so nothing dispatches to the compiled twins)"
     exit 0
 fi
-[[ "$BIN" == /* ]] || BIN="$(cd "$(dirname "$BIN")" && pwd)/$(basename "$BIN")"
+gate_path_rooted "$BIN" || BIN="$(cd "$(dirname "$BIN")" && pwd)/$(basename "$BIN")"
 
 # Every shape a friction-log line can carry that any of the three primitives decides on:
 # single- and double-quoted spans (including a backslash escape inside a double-quoted one and
