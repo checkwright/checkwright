@@ -10,24 +10,6 @@
 
 ## Technical Debt
 
-### guard-read-path-windows-unexercised
-
-[observed-by: gates workflow]
-
-no `gates.yml` step runs guard-kit's `gate-tests/guard-read-path.test.sh` (its verbatim-bytes and no-added-CR assertions) on a Windows leg: fixture suites run only in the Linux `gates` job. `floor-jq-guard-lib` deleted the `_guard_lf` CR strip on the ground that those reads return bytes verbatim, so the Windows half of that claim is unproven.
-
-**Re-verified at promotion (2026-09-23):** `--run-gate-tests` appears once in `.github/workflows/gates.yml`, at the `gates` job.
-
-**Deliverable:** run that suite on a Windows leg. **Reshaped by [instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set](#instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set):** a new step on a binding leg is an unrehearsed binding assertion, so the step lands non-binding or is rehearsed at a push partway through the iteration, never first observed at the close push.
-
-**Build's pick (2026-09-23):** the rehearsed limb. The step lands binding on `install-smoke-sh-windows`, after the decision table, and is rehearsed at the push partway through the iteration. The non-binding limb would need an expiry to drop its `continue-on-error`, and an expiry keyed to a green run is the shape that entry indicts; no roster exists to derive this step's posture from. The entry stays active until that run is read. **Push direction (lead, 2026-09-23):** push now, as push 1 of the iteration's budget, for both `.github` entries; the lead reports relaying an operator grant given in the lead session, with the step's binding posture and hotfix cost stated to the operator.
-
-**Observed red, run 35909116477:** the step failed 3 of 19 assertions, `command-crlf`, `path-crlf` and `field-crlf`, each reading back without the trailing CR its expectation carries; the no-added-CR assertions passed. **Hotfix (build):** the step is non-binding and a reporting-only probe step beside it prints the bytes at each hop. Run 35910939520 is green with the same three assertions red on the held step. **Measured there:** the binary's field bytes for a `a\r\nb\r\n` command are `a \r \n b \r \n \n`, the same as on Linux. An inner CR LF survives every hop. Git Bash's command substitution strips a trailing CR LF as it strips a trailing newline, so `guard_read_command` hands back `a \r \n b` where Linux hands back `a \r \n b \r`; a lone trailing CR survives on both. So the binary is verbatim everywhere, no reader adds a CR, and only a trailing CR before the final newline is lost, on Git Bash alone, at the readers' own substitutions and at a consumer's `cmd="$(guard_read_command)"`. guard-kit/SPEC.md §The hook on native Windows' "read verbatim everywhere" does not hold at that edge. The claim and the step's final posture are escalated to the lead.
-
-**Lead-relayed operator directions (2026-09-23):** Q1: the simplest fix for now, narrowing the claim; the SPEC states the Git Bash trailing-CR edge as a limit and not as settled design, a cleaner design being wanted soon (the lead files the question of why the guard runs under a shell at all as its own Deferred entry, outside this unit). Q2: one push beyond the budget to land that fix with the step binding again and observe it green before close; a red on it stops and escalates rather than spending hotfix push 2.
-
-**Cost while deferred:** if a Windows read adds CR, guard rules misread there, and no leg shows it. Filed 2026-09-19 by the lead at `adopter-floor-native-rungs`' build; promoted 2026-09-23 at scope. Owner lookup: `guard-read-path`, `_guard_lf`, `Windows leg` — none.
-
 ## Deferred
 
 ### side-effect-free-read-arms
@@ -1563,5 +1545,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - guard-knob-skew-bricks-shell
 - committed-grant-fallthrough-unexplained
 - shellcheck-analyser-version-unpinned-in-ci
+- guard-read-path-windows-unexercised
 
 ## Lessons Learned
