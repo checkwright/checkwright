@@ -276,7 +276,7 @@ fallthrough	grep foo file | awk '{print}'
 # segment is skipped, but at least one roster read must remain
 allow	echo === | grep foo src
 fallthrough	echo a | echo b
-# widened lead: a bare committed allow entry may lead, since it was reviewed —
+# widened lead: the bare form of a committed allow entry may lead, since it was reviewed —
 # but only where something decorates it, so the undecorated form (rule 20's
 # 'fallthrough git status' below) is still never intercepted here
 allow	git status | head
@@ -389,6 +389,10 @@ fallthrough	git status && printf done
 # the bare 'printf' the harness also grants
 block	git status && printf done &
 fallthrough	git status && printf
+# the bare head of an entry whose only '*' is a closing ' *' is a bare lead ('git rm -q *');
+# a lead carrying an argument is not
+block	git rm -q; make build
+fallthrough	git rm -q scratch.txt; make build
 
 # rule 21 — git history-rewrite advisory: amend / commit -F / soft-reset steered;
 #           a plain commit and a non-soft reset pass

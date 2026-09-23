@@ -114,6 +114,24 @@ echo_arm "knob-echo-verbatim" "GUARD_KIT_SETTINGS=$tmp/settings.json make build"
 echo_arm "knob-echo-same-file" "GUARD_KIT_SETTINGS=$tmp/./settings.json make build" 2 "check-graph"
 echo_arm "knob-echo-other-file" "GUARD_KIT_SETTINGS=$tmp/other.json make build" 0 ""
 
+# --- rules 18 and 20 read an entry whose only '*' is a closing ' *' as granting its bare head, which
+#     the harness does: a decorated bare head takes rule 20's steer and a read-only tail rule 18's
+#     grant, an argument-carrying lead and the ':*' and two-star forms are not widened, and a
+#     redirected emitter head is left to rule 25
+printf '{"permissions":{"allow":["Bash(make build *)","Bash(echo *)","Bash(make:*)","Bash(cargo * --x *)"]}}\n' >"$tmp/star.json"
+printf 'GUARD_KIT_SETTINGS = %s/star.json\n' "$tmp" >"$tmp/star.knobs"
+s="$tmp/star.knobs"
+want   "star-redirect"      "$s" guard_rule_allowlist_chain "make build > .tmp/b.log" 2
+want   "star-chain"         "$s" guard_rule_allowlist_chain "make build; touch x" 2
+want   "star-bare"          "$s" guard_rule_allowlist_chain "make build" 0
+want   "star-args"          "$s" guard_rule_allowlist_chain "make build --jobs 2 > .tmp/b.log" 0
+want   "colon-not-widened"  "$s" guard_rule_allowlist_chain "make > .tmp/b.log" 0
+want   "two-star-not-widened" "$s" guard_rule_allowlist_chain "cargo > .tmp/b.log" 0
+want   "emitter-redirect"   "$s" guard_rule_allowlist_chain "echo > notes.md" 0
+want   "emitter-chain"      "$s" guard_rule_allowlist_chain "echo; touch x" 2
+grants "star-ro-tail"       "$s" "make build | head -3" allow
+grants "star-args-ro-tail"  "$s" "make build --jobs 2 | head -3" withheld
+
 # --- the load's two failure answers: an unreachable binary advises, runs no rule and exits 0; a
 #     refused config blocks with the refusal's own text
 load() {  # $1=label $2=want-rc $3=want-substring $4.. = NAME=VALUE environment for the sourcing

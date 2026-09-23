@@ -324,7 +324,7 @@ _guard_allow_inners() {
     done <<<"$_guard_allow_list"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — a segment with its redirects removed and trimmed: what rules 18 and 19 compare against a committed bare allow entry
+# spec: guard-kit/SPEC.md §The generic ruleset — a segment with its redirects removed and trimmed: what rules 18 and 19 compare against the bare form of a committed allow entry
 _guard_segment_core() {
     local seg
     seg="$(sed -E 's/[[:space:]]*[0-9]*(>>?|<)[[:space:]]*(&?[0-9-]+|[^[:space:]]+)?//g' <<<"$1")"
@@ -333,17 +333,22 @@ _guard_segment_core() {
     printf '%s' "$seg"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — true when the segment exactly matches a committed *bare* allow entry (no glob): the reviewed-lead half of rule 18's predicate and rule 20's lead test
+# spec: guard-kit/SPEC.md §The generic ruleset — true when the segment's core is the bare form of a committed allow entry: an entry with no glob, or the head of one whose only '*' is a closing space-led one, which the harness grants bare. _GUARD_BARE_VIA_STAR says which matched. The reviewed-lead half of rule 18's predicate and rule 20's lead test; called directly, so the flag survives
 _guard_is_bare_allow() {
-    local core bl
+    local core bl star=0
+    _GUARD_BARE_VIA_STAR=0
     core="$(_guard_segment_core "$1")"
     [[ -n "$core" ]] || return 1
     _guard_allow_load
     while IFS= read -r bl; do
-        case "$bl" in *'*'*) continue ;; esac
-        [[ "$core" == "$bl" ]] && return 0
+        case "$bl" in
+            *' *') bl="${bl% \*}"; [[ "$bl" != *'*'* && "$core" == "$bl" ]] && star=1 ;;
+            *'*'*) ;;
+            *) [[ "$core" == "$bl" ]] && return 0 ;;
+        esac
     done < <(_guard_allow_inners)
-    return 1
+    [[ "$star" == 1 ]] || return 1
+    _GUARD_BARE_VIA_STAR=1
 }
 
 # spec: guard-kit/SPEC.md §The generic ruleset — the guard_rule_* run below; order is load-bearing
@@ -1379,8 +1384,8 @@ guard_rule_ro_pipeline() {
         _guard_is_banner "$seg" && continue
         [[ "${seg%%[[:space:]]*}" == xargs ]] && { _guard_is_ro_xargs "$seg" || return 0; }
         if ! _guard_is_ro_segment "$seg"; then
-            # spec: guard-kit/SPEC.md §The generic ruleset — rule 18's widened lead: a bare
-            # committed allow entry qualifies, but only where something decorates it
+            # spec: guard-kit/SPEC.md §The generic ruleset — rule 18's widened lead: the bare
+            # form of a committed allow entry qualifies, but only where something decorates it
             [[ "$i" == 0 && "${#segs[@]}" -gt 1 ]] || return 0
             _guard_is_bare_allow "$seg" || return 0
         fi
@@ -1562,13 +1567,12 @@ guard_rule_bounded_wait() {
 
 guard_rule_allowlist_chain() {
     local cmd="$1" inner
-    local -a bare_leads=() pattern_inners=()
+    local -a pattern_inners=()
     _guard_allow_load
     while IFS= read -r inner; do
         pattern_inners+=("$inner")
-        case "$inner" in *'*'*) ;; *) bare_leads+=("$inner") ;; esac
     done < <(_guard_allow_inners)
-    [[ ${#bare_leads[@]} -gt 0 ]] || return 0
+    [[ ${#pattern_inners[@]} -gt 0 ]] || return 0
 
     local skel
     skel="$(guard_skeleton "$cmd" sq dq hd)"
@@ -1582,11 +1586,14 @@ guard_rule_allowlist_chain() {
     local lead_core
     lead_core="$(_guard_segment_core "$lead")"
 
-    local bl matched_lead=0
-    for bl in "${bare_leads[@]}"; do
-        [[ "$lead_core" == "$bl" ]] && { matched_lead=1; break; }
-    done
-    [[ "$matched_lead" == 1 ]] || return 0
+    _guard_is_bare_allow "$lead" || return 0
+    # spec: guard-kit/SPEC.md §The generic ruleset — rule 20's emitter exemption: a redirected emitter whose bare form only a closing ' *' grants is rule 25's to steer
+    if [[ "$_GUARD_BARE_VIA_STAR" == 1 && "$lead" != "$lead_core" ]]; then
+        local e
+        for e in ${GUARD_KIT_APPEND_BINS[@]+"${GUARD_KIT_APPEND_BINS[@]}"}; do
+            [[ "${lead_core%%[[:space:]]*}" == "$e" ]] && return 0
+        done
+    fi
 
     local steer="run '$lead_core' bare — it's a statically allowlisted command, but the decoration (chaining or a redirect) leaves a segment nothing grants, so the whole call falls off the match path and costs an out-of-band permission decision. Run the allowlisted command on its own; issue the rest as separate calls."
 

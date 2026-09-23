@@ -10,22 +10,6 @@
 
 ## Technical Debt
 
-### committed-grant-fallthrough-unexplained
-
-the tracked allowlist's no-argument entries: whether the harness needs them, and why an exact one once failed to resolve. `.claude/settings.json` pairs a no-argument `Bash(<cmd>)` with `Bash(<cmd> *)` for run-gates.sh, the gate binary (with and without the `./` prefix) and their `env GATE_SDK_VERBOSE=1` forms. The repo's model of harness matching says the ` *` form covers the bare command (`--guard-lib-parity allow-match native/target/release/checkwright-gates "native/target/release/checkwright-gates *"` returns true), but that is modeled, not probed — and on 2026-09-07 three bare `bash gate-sdk/bin/run-gates.sh` calls logged as fall-throughs despite the exact no-argument grant, a counterexample nobody explained.
-
-**Deliverable:** probe the real harness once — a bare call under the ` *` entry alone, and a bare call under the exact no-argument entry, each read off the fall-through log — then remove every no-argument entry a ` *` sibling covers, as a narrowing of the tracked settings file. Before removing, check `compare-settings-allow` and guard rule 20 (decorated allowlisted command, which keys on a bare entry) for dependence on those entries. A permission-settings edit is applied on the operator's behalf (CLAUDE.md §Housekeeping), so the build session prepares the diff and the probe plan and does not apply either.
-
-**Not taken:** a guard steer to one binary spelling — a new guard rule, and the bare spelling was allowlisted deliberately at `5e632230`.
-
-**Probed at build (2026-09-23):** the harness was run with `claude -p --safe-mode --setting-sources '' --permission-mode dontAsk --settings <file>`, the one-grant method guard-kit/SPEC.md §The guard framework records for `guard_allow_match`. Each trial ran a bare command, and its `permission_denials` were empty under `Bash(native/target/release/checkwright-gates *)` alone, under the exact `Bash(native/target/release/checkwright-gates)` alone, under `Bash(bash gate-sdk/bin/run-gates.sh *)` alone and under the exact `Bash(bash gate-sdk/bin/run-gates.sh)` alone. A control with no grant denied the bare binary. So a sole closing ` *` grants the bare command, as the model says. That model was already measured for `Bash(git status *)`, so the entry's "modeled, not probed" premise was stale. The 2026-09-07 fall-throughs are no counterexample: the guard logs every call it neither blocks nor grants, allowlisted or not (guard-kit/SPEC.md §The generic ruleset, the fall-through paragraph), and a granted bare call reaches no rule that grants it. The committed file has 16 such pairs, not only the five door pairs above. `compare-settings-allow` and `check-door-binding` do not depend on the bare entries. **Rule 20 does.** It keys on an exact bare entry, and the template guard, run over each allowlist, showed the dependence. Under the committed file it blocks a decorated no-argument lead, such as `bash gate-sdk/bin/run-gates.sh > .tmp/battery.log` or `git status; make build`, with its run-it-bare steer. With the bare entries pruned, the same calls fall through with no steer. The dependence was escalated to the lead at build, with both prepared diffs.
-
-**Direction (operator, 2026-09-23, lead-relayed):** widen rule 20 this iteration, then prune all 16 pairs. The lead attached three constraints; the second is the lead's own addition, not the operator's words. Rule 20 keeps its run-it-bare steer on a decorated no-argument call whose bare form only a sole-closing-` *` entry covers. It fires on no call it leaves alone today. The same design reaches `guard-kit/templates/settings-allow.json`. **Found at build, re-escalated:** the widening that meets the first constraint, a sole-closing-` *` entry's head counted as a bare lead, passes the acceptance rows and the decision table. It breaks the second constraint. The committed file carries 50 sole-closing-` *` entries with no bare sibling, among them `git show`, `cargo test`, `gh run list`, `date`, `mkdir` and `echo`, and the template carries five. Their decorated no-argument calls go from falling through to rule 20's block. `echo > README.md` also trades rule 25's steer for rule 20's weaker one. After the prune a formerly paired entry and a never-paired one have the same shape, so no design reading the allowlist alone meets both constraints.
-
-**Direction (operator, 2026-09-23, lead-relayed, after being shown the 50 never-paired firings):** take the widening and relax the second constraint, with one exemption. A widened head led by a `GUARD_KIT_APPEND_BINS` emitter does not take rule 20's block on a redirect, so rule 25 keeps its steer there.
-
-**Cost while deferred:** two allowlist lines per command where one may do, and a grant model nobody has verified against the harness. Filed 2026-09-23 to the gap inbox by the lead on an operator direction after seam-and-stage-residue's close, and merged at the next scope into this entry, promoted from the icebox, which it had been since 2026-09-07; one probe settles both.
-
 ### guard-read-path-windows-unexercised
 
 [observed-by: gates workflow]
@@ -1583,5 +1567,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - stop-hook-task-view-unscoped
 - guard-worktree-scratch-dirs
 - guard-knob-skew-bricks-shell
+- committed-grant-fallthrough-unexplained
 
 ## Lessons Learned
