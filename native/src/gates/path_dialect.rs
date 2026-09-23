@@ -277,6 +277,9 @@ struct Tally {
     local: usize,
     namespace: usize,
     anchored: usize,
+    shell_abs: usize,
+    shell_rooted: usize,
+    shell_namespace: usize,
 }
 
 // spec: gate-sdk/SPEC.md §check-path-dialect — which containment spelling a line carries: the bare
@@ -457,6 +460,87 @@ fn scan_anchor(path: &str, text: &str, t: &mut Tally, findings: &mut Vec<String>
     ));
 }
 
+// spec: gate-sdk/SPEC.md §check-path-dialect — the rooted glob a single-dialect test spells, bare or
+// with its separator quoted
+const SHELL_ROOTS: &[&str] = &["/*", "\"/\"*", "'/'*"];
+// spec: gate-sdk/SPEC.md §check-path-dialect — the one function whose body is the predicate itself
+const PREDICATE_HEAD: &str = "gate_path_rooted() {";
+
+// spec: gate-sdk/SPEC.md §check-path-dialect — a `[[ ]]` glob test whose right operand is exactly a
+// rooted glob, closed by a blank, `]`, `;` or the end of the line
+fn shell_glob_test(code: &str) -> Option<&'static str> {
+    if !code.contains("[[") {
+        return None;
+    }
+    for op in ["==", "!=", " ="] {
+        for at in hits(code, op, false) {
+            if op == " =" && code.as_bytes().get(at + 2) == Some(&b'=') {
+                continue;
+            }
+            let rest = code[at + op.len()..].trim_start_matches([' ', '\t']);
+            for root in SHELL_ROOTS {
+                if let Some(after) = rest.strip_prefix(root) {
+                    if after.is_empty() || after.starts_with([' ', '\t', ']', ';']) {
+                        return Some("[[ … == /* ]]");
+                    }
+                }
+            }
+        }
+    }
+    None
+}
+
+// spec: gate-sdk/SPEC.md §check-path-dialect — a `case` alternative that is exactly a rooted glob:
+// opened by the line's start, a blank, `(` or `|`, and closed by optional blanks then `)` or `|`
+fn shell_case_arm(code: &str) -> Option<&'static str> {
+    for root in SHELL_ROOTS {
+        for at in hits(code, root, false) {
+            let opened = at == 0 || matches!(code.as_bytes()[at - 1], b' ' | b'\t' | b'(' | b'|');
+            let after = code[at + root.len()..].trim_start_matches([' ', '\t']);
+            if opened && (after.starts_with(')') || after.starts_with('|')) {
+                return Some("case … /*)");
+            }
+        }
+    }
+    None
+}
+
+// spec: gate-sdk/SPEC.md §check-path-dialect — the locality arm's shell half: an absoluteness test
+// spelled in one dialect is a finding outside gate_path_rooted's own body, unless the site declares
+// its value out of the filesystem namespace
+fn scan_shell_locality(path: &str, text: &str, t: &mut Tally, findings: &mut Vec<String>) {
+    let lines = split_file(text, true);
+    let mut in_predicate = false;
+    for (idx, line) in lines.iter().enumerate() {
+        let code = line.code.trim();
+        if code.starts_with(PREDICATE_HEAD) {
+            in_predicate = true;
+        }
+        let form = shell_glob_test(&line.code).or_else(|| shell_case_arm(&line.code));
+        if let Some(form) = form {
+            t.shell_abs += 1;
+            if in_predicate {
+                t.shell_rooted += 1;
+            } else {
+                match namespace_declared(&lines, idx) {
+                    Some(true) => t.shell_namespace += 1,
+                    Some(false) => findings.push(format!(
+                        "{}:{} — `{}` carries a `{}` declaration whose reason is empty, so nothing is declared",
+                        path, idx + 1, form, EXEMPT
+                    )),
+                    None => findings.push(format!(
+                        "{}:{} — `{}` tests absoluteness in one dialect, so a drive-rooted path reads as relative: route it through gate_path_rooted (gate-sdk/lib/gate.sh)",
+                        path, idx + 1, form
+                    )),
+                }
+            }
+        }
+        if in_predicate && code == "}" {
+            in_predicate = false;
+        }
+    }
+}
+
 fn scan_rust(path: &str, text: &str, is_crosser: bool, t: &mut Tally, findings: &mut Vec<String>) {
     let lines = split_file(text, false);
     let mut forms: Vec<&str> = RUST_FORMS.to_vec();
@@ -514,6 +598,9 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         local: 0,
         namespace: 0,
         anchored: 0,
+        shell_abs: 0,
+        shell_rooted: 0,
+        shell_namespace: 0,
     };
     let mut findings: Vec<String> = Vec::new();
 
@@ -522,6 +609,7 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         let text = read(Path::new(f))?;
         scan_shell(f, &text, &mut t, &mut findings);
         scan_anchor(f, &text, &mut t, &mut findings);
+        scan_shell_locality(f, &text, &mut t, &mut findings);
     }
 
     let src = walk::knob_scalar("GATE_SDK_NATIVE_SRC")?;
@@ -559,11 +647,15 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         println!("        `// path-dialect-exempt: <reason>`; a recorded verdict does not clear this arm");
         println!("  help: a shell file composing two roots anchors its cwd with `{}` before its first", ANCHOR);
         println!("        root binding; nothing else clears that arm");
+        println!("  help: a shell absoluteness test asks gate_path_rooted (gate-sdk/lib/gate.sh), which reads");
+        println!("        both dialects; a value outside the filesystem namespace says so with");
+        println!("        `# path-dialect-exempt: <reason>`");
         return Ok(1);
     }
     println!(
-        "PATH-DIALECT: clean ({} shell file(s), {} Rust file(s) scanned; {} producer occurrence(s) — {} in `cd` position, {} `Path`-typed, {} inside the crate's crosser, {} by recorded verdict, {} presence probe(s) binding no value; {} primitive spelling(s) — {} inside the crate's speller, {} declared out of the filesystem namespace; {} two-root file(s) anchored)",
-        shell.len(), rust_files, t.total, t.cd, t.typed, t.crosser, t.verdict, t.probe, t.prim, t.local, t.namespace, t.anchored
+        "PATH-DIALECT: clean ({} shell file(s), {} Rust file(s) scanned; {} producer occurrence(s) — {} in `cd` position, {} `Path`-typed, {} inside the crate's crosser, {} by recorded verdict, {} presence probe(s) binding no value; {} primitive spelling(s) — {} inside the crate's speller, {} declared out of the filesystem namespace; {} shell absoluteness test(s) — {} inside gate_path_rooted, {} declared out of the filesystem namespace; {} two-root file(s) anchored)",
+        shell.len(), rust_files, t.total, t.cd, t.typed, t.crosser, t.verdict, t.probe, t.prim, t.local, t.namespace,
+        t.shell_abs, t.shell_rooted, t.shell_namespace, t.anchored
     );
     Ok(0)
 }
@@ -571,6 +663,63 @@ fn rule(_args: &[String]) -> Result<i32, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: gate-sdk/SPEC.md §check-path-dialect — the shell half reads the two single-dialect forms
+    // and leaves every prefix or containment glob alone
+    #[test]
+    fn the_shell_half_reads_a_rooted_glob_and_no_prefix_glob() {
+        for red in [
+            r#"[[ "$x" == /* ]] || x="$r/$x""#,
+            r#"[[ $x != "/"* ]]"#,
+            r#"[[ $x = /* ]]"#,
+            r#"[[ "$x" == /*]]"#,
+        ] {
+            assert!(shell_glob_test(red).is_some(), "{}", red);
+        }
+        for red in [r#"case "$x" in /*) ;; esac"#, "    /* | ./*) :", "(/*) :", "a | '/'* ) :"] {
+            assert!(shell_case_arm(red).is_some(), "{}", red);
+        }
+        for green in [
+            r#"[[ "$x" == /*/sub ]]"#,
+            r#"[[ "$x" == *"/"* ]]"#,
+            r#"x="/*""#,
+            "    */*) :",
+            r#"    "$d"/*) :"#,
+            "    /dev/*) :",
+            "    https://*|http://*) :",
+            "    */../*) :",
+            "for f in /*; do",
+        ] {
+            assert!(shell_glob_test(green).is_none() && shell_case_arm(green).is_none(), "{}", green);
+        }
+    }
+
+    // spec: gate-sdk/SPEC.md §check-path-dialect — the predicate's own body clears by name, and only
+    // through its closing brace
+    #[test]
+    fn only_the_predicate_body_clears_by_name() {
+        let text = "gate_path_rooted() {  # x\n    case \"$1\" in\n        /* | \\\\*) return 0 ;;\n    esac\n}\ncase \"$y\" in /*) ;; esac\n";
+        let mut t = Tally {
+            cd: 0,
+            typed: 0,
+            crosser: 0,
+            verdict: 0,
+            probe: 0,
+            total: 0,
+            prim: 0,
+            local: 0,
+            namespace: 0,
+            anchored: 0,
+            shell_abs: 0,
+            shell_rooted: 0,
+            shell_namespace: 0,
+        };
+        let mut findings = Vec::new();
+        scan_shell_locality("f.sh", text, &mut t, &mut findings);
+        assert_eq!((t.shell_abs, t.shell_rooted), (2, 1));
+        assert_eq!(findings.len(), 1, "{:?}", findings);
+        assert!(findings[0].starts_with("f.sh:6 "), "{:?}", findings);
+    }
 
     // spec: gate-sdk/SPEC.md §check-path-dialect — the comment split is the comment rule's whole
     // mechanism, and a '#' that is parameter expansion must not end the code half

@@ -85,8 +85,8 @@ const QUESTION: &str = "{\"tool_input\":{\"to\":\"main\",\"message\":\"Question 
 const ESCALATION_ADVICE: &str = "Options Recommendation Evidence";
 
 // spec: gate-sdk/SPEC.md §run-gates — the corpus: each exit path, each precedence tier of
-// `GATE_SDK_NATIVE_BIN`, each residual-grammar form, forwarded stdin, and the linked-worktree
-// resolution on a hand-built layout
+// `GATE_SDK_NATIVE_BIN`, a backslash-rooted value, each residual-grammar form, forwarded stdin,
+// and the linked-worktree resolution on a hand-built layout
 const CORPUS: &[Case] = &[
     Case {
         name: "outside a repository",
@@ -162,6 +162,12 @@ const CORPUS: &[Case] = &[
             (TRACKED, "GATE_SDK_NATIVE_BIN=from-tracked/gates\n"),
         ],
         "./from-gates-dir/gates",
+    ),
+    absent(
+        "GATE_SDK_NATIVE_BIN rooted by a leading backslash, taking no prefix",
+        &[("GATE_SDK_NATIVE_BIN", "\\from-env\\gates")],
+        &[],
+        "but \\from-env\\gates is absent",
     ),
     absent(
         "GATE_SDK_NATIVE_BIN defaulted",

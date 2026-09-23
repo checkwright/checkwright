@@ -2145,7 +2145,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-path-dialect",
         path_dialect::run,
-        &[("?", "", "", "dynamic@src/gates/path_dialect.rs:532")],
+        &[("?", "", "", "dynamic@src/gates/path_dialect.rs:620")],
         &["GATE_SDK_NATIVE_SRC", "GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS"],
         "gate-sdk",
         &[("git", "")],
