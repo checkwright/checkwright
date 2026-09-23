@@ -20,6 +20,8 @@ no `gates.yml` step runs guard-kit's `gate-tests/guard-read-path.test.sh` (its v
 
 **Deliverable:** run that suite on a Windows leg. **Reshaped by [instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set](#instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set):** a new step on a binding leg is an unrehearsed binding assertion, so the step lands non-binding or is rehearsed at a push partway through the iteration, never first observed at the close push.
 
+**Build's pick (2026-09-23):** the rehearsed limb. The step lands binding on `install-smoke-sh-windows`, after the decision table, and is rehearsed at the push partway through the iteration. The non-binding limb would need an expiry to drop its `continue-on-error`, and an expiry keyed to a green run is the shape that entry indicts; no roster exists to derive this step's posture from. The entry stays active until that run is read.
+
 **Cost while deferred:** if a Windows read adds CR, guard rules misread there, and no leg shows it. Filed 2026-09-19 by the lead at `adopter-floor-native-rungs`' build; promoted 2026-09-23 at scope. Owner lookup: `guard-read-path`, `_guard_lf`, `Windows leg` — none.
 
 ### shellcheck-analyser-version-unpinned-in-ci

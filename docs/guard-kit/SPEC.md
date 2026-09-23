@@ -166,7 +166,7 @@ The library has no substrate difference to absorb in what it reads: the binary w
 
 **The honest limit: the harness's `PowerShell` tool is not guarded.** On Windows the harness carries a second shell tool, named `PowerShell`, which is on by default beside `Bash`. A `Bash`-matched hook never sees its calls, so on a Windows host, a command the agent sends through that tool reaches the harness's own permission path unguarded and unlogged, and the friction loop does not measure it. Widening the matcher to `Bash|PowerShell` is refused, because it would run bash-grammar rules over PowerShell commands. A guard over PowerShell-grammar commands is separate work, not this kit's today. A consumer who wants every shell call guarded turns the tool off with the harness's own switch (`CLAUDE_CODE_USE_POWERSHELL_TOOL=0`). That is the consumer's call, and the kit does not recommend it.
 
-**The oracle** is the decision table (§Testing) run under Git Bash on the binding native-Windows install-smoke leg. Every generic rule's firing and non-firing case then executes on the substrate this section claims.
+**The oracle** is the decision table (§Testing) run under Git Bash on the binding native-Windows install-smoke leg. Every generic rule's firing and non-firing case then executes on the substrate this section claims. The verbatim-bytes claim above takes `gate-tests/guard-read-path.test.sh` on the same leg, since a table row cannot carry the CR it asserts on (§Testing).
 
 ## The generic ruleset
 
