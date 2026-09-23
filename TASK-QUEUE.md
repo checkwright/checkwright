@@ -40,18 +40,6 @@ The same literal class in the `# projection:` field is filed to the gap inbox.
 
 **Cost while deferred:** no adopter exists pre-launch, so the wrong set is read only on this tree, where it is right. Filed 2026-09-22 to the gap inbox by `consumer-policy-seam`'s spec census; promoted 2026-09-23 at its close. **DISTINCT from** [doc-path-hardcoded-reads](#doc-path-hardcoded-reads), whose members are `.gate` `couples=` literals.
 
-### armed-by-content-emptiness-shape
-
-[spec: SPEC-armed-by-content.md]
-
-`check-commit-msg` and `check-tree-terms` share `GATE_SDK_MSG_PATTERN_FILES`, a required tracked pattern file, and both pass vacuously when that file trims to no non-comment line. `# armed-by:` reads a knob's resolved value, never a tracked file's parsed content, so `doctor` cannot name this disarmed state. Second instance: `check-provenance-seam` asserts nothing at its defaults, a conjunction one knob's emptiness cannot state.
-
-**Deliverable — rule one of two:** an arming shape reading content emptiness, or a stated refusal naming why a content-emptied pattern file stays outside `doctor`. The ruling covers both shapes.
-
-**Specified 2026-09-23:** a content form is added, `# armed-by: content <KNOB> [<KNOB>…]`. It means the member asserts nothing while no file those knobs name carries a live line — non-empty after leading blanks and not opening with `#`, the one filter the pattern-roster gates share. The two pattern-file gates declare it, and `doctor` renders it. The conjunction is refused: the declaration names emptiness and never a predicate. `check-provenance-seam`'s default is also the state the kit intends for an adopter, so a `doctor` line there would nag every adopter.
-
-**Cost while deferred:** an adopter who empties the pattern file gets a silent clean pass with no doctor warning. Filed 2026-09-22 to the gap inbox by the census discharging `armed-by-census-unrun`; promoted at close because →fix needs a new declaration shape.
-
 ### pipe-membership-corpus-omits-test-suites
 
 [spec: SPEC-pipe-suites.md]
@@ -1661,5 +1649,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - worktree-hook-guards-fail-open
 - shell-textual-absoluteness-single-dialect
 - ps1-ascii-unheld-at-commit
+- armed-by-content-emptiness-shape
 
 ## Lessons Learned

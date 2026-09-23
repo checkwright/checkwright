@@ -796,7 +796,7 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
     [[ "$rc" -eq 0 ]] || { printf '%s\n' "$out" >&2; fail "$profile: doctor exited $rc inside the installed consumer"; }
     grep -q "^  profile      $profile\$" <<<"$out" || fail "$profile: doctor did not report the installed profile"
     # spec: installer/SPEC.md §doctor — a fresh install has written no arming knob, so doctor names at least one registered member disarmed, and every member it names is one this install registered; which member is read off doctor's line rather than named here
-    disarmed="$(sed -n 's/^  disarmed     \([^ ]*\) asserts nothing until .* is set$/\1/p' <<<"$out")"
+    disarmed="$(sed -n 's/^  disarmed     \([^ ]*\) asserts nothing until .*$/\1/p' <<<"$out")"
     [[ -n "$disarmed" ]] || { printf '%s\n' "$out" >&2; fail "$profile: doctor names no disarmed member on a fresh install — every arming knob is still empty, so a declaring member it registered went unreported"; }
     while IFS= read -r member; do
         grep -qxF "$member" <<<"${REGISTRY[$profile]}" \
