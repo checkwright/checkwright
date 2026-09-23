@@ -22,6 +22,8 @@ no `gates.yml` step runs guard-kit's `gate-tests/guard-read-path.test.sh` (its v
 
 **Build's pick (2026-09-23):** the rehearsed limb. The step lands binding on `install-smoke-sh-windows`, after the decision table, and is rehearsed at the push partway through the iteration. The non-binding limb would need an expiry to drop its `continue-on-error`, and an expiry keyed to a green run is the shape that entry indicts; no roster exists to derive this step's posture from. The entry stays active until that run is read. **Push direction (lead, 2026-09-23):** push now, as push 1 of the iteration's budget, for both `.github` entries; the lead reports relaying an operator grant given in the lead session, with the step's binding posture and hotfix cost stated to the operator.
 
+**Observed red, run 35909116477:** the step failed 3 of 19 assertions, `command-crlf`, `path-crlf` and `field-crlf`, each reading back without the trailing CR its expectation carries; the no-added-CR assertions passed. **Inferred, not yet measured:** Git Bash's command substitution folds a CR LF, so the readers' own substitutions and every `cmd="$(guard_read_command)"` consumer drop that CR, and guard-kit/SPEC.md §The hook on native Windows' "read verbatim everywhere" does not hold there. **Hotfix (build):** the step is non-binding and a reporting-only probe step beside it prints the bytes at each hop, so the ruling on the claim reads a measurement. The binding shape and the claim are escalated to the lead.
+
 **Cost while deferred:** if a Windows read adds CR, guard rules misread there, and no leg shows it. Filed 2026-09-19 by the lead at `adopter-floor-native-rungs`' build; promoted 2026-09-23 at scope. Owner lookup: `guard-read-path`, `_guard_lf`, `Windows leg` — none.
 
 ## Deferred
