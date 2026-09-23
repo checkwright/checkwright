@@ -68,7 +68,7 @@
 3752cp drift-kit/templates/economics.md
 4243cp guard-kit/templates/close-triage.md
 4120cp lifecycle-kit/templates/consult.md
-38463cp lifecycle-kit/templates/lead.md
+38940cp lifecycle-kit/templates/lead.md
 2100cp lifecycle-kit/templates/release-sweep.md
 7004cp lifecycle-kit/templates/stages/align.md
 8773cp lifecycle-kit/templates/stages/build.md

@@ -8,18 +8,6 @@
 
 ## New Features
 
-### lead-capture-dirties-batch
-
-[spec: SPEC-lead-capture.md]
-
-lifecycle-kit/templates/lead.md has the lead commit a gap bullet "at the first moment the git index is free of stage-session work", but nothing stops the lead writing the bullet while a batch runs. At gate-sdk-blind-spots build batch 1 the lead's uncommitted `.workflow/gap-inbox.md` made `installer/consumer-smoke/run-smoke.sh` refuse its dirty tree, so that smoke shipped unrun and batch 2 discharged it. The rule governs the commit and not the write.
-
-**Deliverable:** one of: a mid-batch capture held in the lead journal and filed between dispatches; or the gap inbox exempted from clean-tree preconditions. The template sentence says which.
-
-**Specified 2026-09-23:** the capture is held. A capture made while a dispatched stage session is live goes to the lead journal and is filed and committed at the first moment none is. The exemption is refused because it covers one capture channel of two, leaves a batch's `git add` free to sweep the bullet, and is a carve-out the installer's own predicate already refused.
-
-**Cost while deferred:** a mid-batch capture can leave a batch's clean-tree verification unrun. Filed 2026-09-23 to the gap inbox by the lead after gate-sdk-blind-spots' close; promoted 2026-09-23 at the next scope. Owner lookup: lifecycle-kit/templates/lead.md (the commit-the-bullet paragraph), which rules the commit only.
-
 ### knob-default-export-unsteered
 
 [spec: SPEC-knob-echo.md]
@@ -1631,5 +1619,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - repo-inherits-policy-defaults
 - cannot-run-marker-late-read
 - stage-exit-no-successor-check
+- lead-capture-dirties-batch
 
 ## Lessons Learned
