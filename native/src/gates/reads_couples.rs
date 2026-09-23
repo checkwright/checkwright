@@ -289,6 +289,16 @@ fn resolve_filter(
     )))
 }
 
+// spec: gate-sdk/SPEC.md §check-reads-couples — a member's declared prune field, each member a
+// literal or a knob-path token resolved verbatim through the one resolver
+pub(crate) fn declared_prune(pspec: &str) -> Result<Vec<String>, String> {
+    let mut out: Vec<String> = Vec::new();
+    for g in pspec.split(',').filter(|g| !g.is_empty()) {
+        out.extend(crate::registry::knob_paths(g)?);
+    }
+    Ok(out)
+}
+
 // spec: gate-sdk/SPEC.md §check-reads-couples — a tracked file sits under a declared prune when any
 // of its ancestor directories matches a prune glob, which is the same test the walk applies while
 // descending (`walk::dir_prune_matches`), read against the path instead of the directory
@@ -518,8 +528,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 // spec: gate-sdk/SPEC.md §check-reads-couples — the member's own declared prune,
                 // honoured exactly as the global set is: a walk's third dimension is where it refuses
                 // to descend, and a demand over a subtree its own walk skips is that same failure
-                let declared_prune: Vec<String> =
-                    pspec.split(',').filter(|g| !g.is_empty()).map(String::from).collect();
+                let declared_prune: Vec<String> = declared_prune(pspec)?;
                 analyzed += 1;
                 ctx.cover_root(&Demand {
                     root,
@@ -650,8 +659,7 @@ mod tests {
                 let globs: Vec<String> = couples.split(',').map(String::from).collect();
                 let (filter, where_) = resolve_filter(name, root, gates::filter_guard(fspec).1)?
                     .ok_or_else(|| format!("{}'s unguarded filter '{}' did not resolve", name, fspec))?;
-                let declared_prune: Vec<String> =
-                    pspec.split(',').filter(|g| !g.is_empty()).map(String::from).collect();
+                let declared_prune: Vec<String> = declared_prune(pspec)?;
                 let listing = tracked_under(Some(&repo), root)?;
                 ctx.cover_listing(
                     &Demand {

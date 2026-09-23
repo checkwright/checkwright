@@ -70,6 +70,7 @@ pub const KIT: Kit = Kit {
         Row::indexed("CANON_KIT_FENCE_RUN_PROGRAMS", &["git"]),
         Row::indexed("CANON_KIT_RETIRED_SPELLING_EXCLUDE", &[]),
         Row::scalar("CANON_KIT_LINK_ROOT", "docs"),
+        Row::scalar("CANON_KIT_MIRROR_ROOT", "docs"),
         Row::scalar("CANON_KIT_DOCS_BLOB_REF", "master"),
         Row::indexed("CANON_KIT_MANIFEST_FILES", &[]),
         Row::indexed("CANON_KIT_PROSE_SURFACE_GLOBS", &[]),
@@ -196,6 +197,24 @@ fn min_sentences(v: &str) -> bool {
     digits(v) && v.parse::<u64>().is_ok_and(|n| n >= 2)
 }
 
+// spec: canon-kit/SPEC.md §Layout and configuration — the mirror root is one tracked directory
+// below the repository root: a root mirror would overwrite its own sources, and one outside the
+// tree cannot be tracked
+pub(crate) fn mirror_root_refusal(v: &str) -> Option<&'static str> {
+    let t = v.trim_end_matches('/');
+    let t = t.strip_prefix("./").unwrap_or(t);
+    if t.is_empty() || t == "." {
+        return Some("must name a directory below the repository root");
+    }
+    if crate::walk::path_root(t).is_some() {
+        return Some("must be repository-relative, not absolute");
+    }
+    if t.split(['/', '\\']).any(|seg| seg == "..") {
+        return Some("must not carry a '..' segment");
+    }
+    None
+}
+
 // spec: canon-kit/SPEC.md §Layout and configuration — a broken spec config gates nothing: emptiness,
 // the enumerated switches, the numeric ranges, and the icebox apart from the deferred section
 fn validate(v: &Values) -> Vec<String> {
@@ -259,6 +278,9 @@ fn validate(v: &Values) -> Vec<String> {
         if empty(n) {
             errs.push(format!("{} is empty", n));
         }
+    }
+    if let Some((s, why)) = scalar(v, "CANON_KIT_MIRROR_ROOT").and_then(|s| mirror_root_refusal(s).map(|w| (s, w))) {
+        errs.push(format!("CANON_KIT_MIRROR_ROOT {} (got '{}')", why, s));
     }
     // spec: canon-kit/SPEC.md §Layout and configuration — the marker set a reader sees is the base
     // followed by its extra, so the set is empty only when both are
@@ -333,6 +355,18 @@ mod tests {
         }
         for bad in ["", "-1", "1.5", "a", "2 "] {
             assert!(!digits(bad), "{}", bad);
+        }
+    }
+
+    // spec: canon-kit/SPEC.md §Layout and configuration — the mirror root refuses the root itself,
+    // an absolute path and a `..` segment
+    #[test]
+    fn the_mirror_root_is_a_directory_below_the_repository_root() {
+        for ok in ["docs", "docs/ref", "./site/", "site/ref/"] {
+            assert!(mirror_root_refusal(ok).is_none(), "{}", ok);
+        }
+        for bad in ["", ".", "./", "/docs", "C:/docs", "../docs", "docs/../x"] {
+            assert!(mirror_root_refusal(bad).is_some(), "{}", bad);
         }
     }
 

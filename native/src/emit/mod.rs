@@ -239,11 +239,12 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         ],
     ),
     // spec: canon-kit/SPEC.md §The reference-link grammar — the source set is derived from the
-    // tracked tree rather than enumerated, so the only configured value is the blob ref
+    // tracked tree rather than enumerated, so the configured values are the blob ref and the
+    // mirror root
     (
         "--emit-docs-mirror",
         Arm::Emit(docs_mirror::emit),
-        &["CANON_KIT_DOCS_BLOB_REF"],
+        &["CANON_KIT_DOCS_BLOB_REF", "CANON_KIT_MIRROR_ROOT"],
     ),
     // spec: drift-kit/SPEC.md §The published-evidence extractor — the stage roster and the
     // evidence-surface pair are this consumer's vocabulary, so they are knobs; a

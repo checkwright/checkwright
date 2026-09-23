@@ -170,7 +170,7 @@ if staged_matches 'docs/install-evidence.md' 'scripts/gates.list' 'native/src/di
     run_gate check-install-evidence-fresh native/target/release/checkwright-gates check-install-evidence-fresh
 fi
 
-if staged_matches '*docs/footprint.md' '*CLAUDE.md' '*/SPEC.md' 'gate-sdk/templates/*.md' 'canon-kit/templates/*.md' 'context-kit/templates/*.md' 'delegation-kit/templates/*.md' 'doctrine-kit/templates/*.md' 'drift-kit/templates/*.md' 'evidence-kit/templates/*.md' 'guard-kit/templates/*.md' 'lifecycle-kit/templates/*.md' 'queue-kit/templates/*.md' 'site-kit/templates/*.md' 'lifecycle-kit/templates/stages/*.md' 'native/src/diff.rs' 'scripts/context-config.knobs' 'native/src/gates/footprint_fresh.rs' 'native/src/fresh.rs' 'native/src/emit/footprint.rs' 'native/src/section.rs'; then
+if staged_matches '*docs/footprint.md' '*CLAUDE.md' '*/SPEC.md' 'gate-sdk/templates/*.md' 'canon-kit/templates/*.md' 'context-kit/templates/*.md' 'delegation-kit/templates/*.md' 'doctrine-kit/templates/*.md' 'drift-kit/templates/*.md' 'evidence-kit/templates/*.md' 'guard-kit/templates/*.md' 'lifecycle-kit/templates/*.md' 'queue-kit/templates/*.md' 'site-kit/templates/*.md' 'native/src/diff.rs' 'scripts/context-config.knobs' 'native/src/gates/footprint_fresh.rs' 'native/src/fresh.rs' 'native/src/emit/footprint.rs' 'native/src/section.rs'; then
     run_gate check-footprint-fresh native/target/release/checkwright-gates check-footprint-fresh
 fi
 
@@ -178,7 +178,7 @@ if staged_matches 'docs/*/SPEC.md' 'docs/*/README.md' 'docs/doctrine-kit/DOCTRIN
     run_gate check-docs-mirror-fresh native/target/release/checkwright-gates check-docs-mirror-fresh
 fi
 
-if staged_matches '*docs/enforcement.md' '*scripts/gates.list' '*scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' '*scripts/kpis.list' '*.claude/settings.json' '.github/workflows/*.yml' 'native/src/diff.rs' 'scripts/canon-config.knobs' 'scripts/context-config.knobs' 'scripts/drift-config.knobs' 'scripts/evidence-config.knobs' 'scripts/gate-sdk-config.knobs' 'scripts/lifecycle-config.knobs' 'native/src/gates/enforcement_fresh.rs' 'native/src/fresh.rs' 'native/src/emit/enforcement_map.rs' 'native/src/programs.rs' 'native/src/emit/kpi/mod.rs'; then
+if staged_matches '*docs/enforcement.md' '*scripts/gates.list' '*scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' '*scripts/kpis.list' '*.claude/settings.json' '*' 'native/src/diff.rs' 'scripts/canon-config.knobs' 'scripts/context-config.knobs' 'scripts/drift-config.knobs' 'scripts/evidence-config.knobs' 'scripts/gate-sdk-config.knobs' 'scripts/lifecycle-config.knobs' 'native/src/gates/enforcement_fresh.rs' 'native/src/fresh.rs' 'native/src/emit/enforcement_map.rs' 'native/src/programs.rs' 'native/src/emit/kpi/mod.rs'; then
     run_gate check-enforcement-fresh native/target/release/checkwright-gates check-enforcement-fresh
 fi
 
@@ -254,7 +254,7 @@ if staged_matches '*.claude/commands/*.md' 'lifecycle-kit/templates/stages/*.md'
     run_gate check-skill-binding native/target/release/checkwright-gates check-skill-binding
 fi
 
-if staged_matches '*.claude/commands/*.md' '*CLAUDE.md' 'gate-sdk/templates/*.md' 'canon-kit/templates/*.md' 'context-kit/templates/*.md' 'delegation-kit/templates/*.md' 'doctrine-kit/templates/*.md' 'drift-kit/templates/*.md' 'evidence-kit/templates/*.md' 'guard-kit/templates/*.md' 'lifecycle-kit/templates/*.md' 'queue-kit/templates/*.md' 'site-kit/templates/*.md' 'lifecycle-kit/templates/stages/*.md' 'scripts/gate-sdk-config.knobs' 'scripts/lifecycle-config.knobs' 'native/src/gates/shim_restatement.rs'; then
+if staged_matches '*.claude/commands/*.md' '*CLAUDE.md' 'gate-sdk/templates/*.md' 'canon-kit/templates/*.md' 'context-kit/templates/*.md' 'delegation-kit/templates/*.md' 'doctrine-kit/templates/*.md' 'drift-kit/templates/*.md' 'evidence-kit/templates/*.md' 'guard-kit/templates/*.md' 'lifecycle-kit/templates/*.md' 'queue-kit/templates/*.md' 'site-kit/templates/*.md' 'scripts/gate-sdk-config.knobs' 'scripts/lifecycle-config.knobs' 'native/src/gates/shim_restatement.rs'; then
     run_gate check-shim-restatement native/target/release/checkwright-gates check-shim-restatement
 fi
 
@@ -506,7 +506,7 @@ if staged_matches '*CLAUDE.md' 'scripts/context-config.knobs' 'native/src/gates/
     run_gate check-brevity native/target/release/checkwright-gates check-brevity
 fi
 
-if staged_matches '*.workflow/surface-ceiling.txt' '*CLAUDE.md' 'gate-sdk/templates/*.md' 'canon-kit/templates/*.md' 'context-kit/templates/*.md' 'delegation-kit/templates/*.md' 'doctrine-kit/templates/*.md' 'drift-kit/templates/*.md' 'evidence-kit/templates/*.md' 'guard-kit/templates/*.md' 'lifecycle-kit/templates/*.md' 'queue-kit/templates/*.md' 'site-kit/templates/*.md' 'lifecycle-kit/templates/stages/*.md' '*/templates/*.md' '*.claude/agents/*.md' '*.claude/commands/*.md' '*:(exclude)*/gate-tests/*' '*docs/*.md' '*:(exclude)docs/*/SPEC.md' '*:(exclude)docs/*/README.md' '*:(exclude)docs/doctrine-kit/DOCTRINE.md' '*:(exclude)docs/evidence-data.md' '*:(exclude)docs/enforcement.md' '*:(exclude)docs/footprint.md' '*:(exclude)docs/install-evidence.md' 'scripts/context-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/surface_ratchet.rs' 'native/src/emit/always_loaded.rs' 'native/src/programs.rs' 'native/src/section.rs' 'native/src/stages.rs'; then
+if staged_matches '*.workflow/surface-ceiling.txt' '*CLAUDE.md' 'gate-sdk/templates/*.md' 'canon-kit/templates/*.md' 'context-kit/templates/*.md' 'delegation-kit/templates/*.md' 'doctrine-kit/templates/*.md' 'drift-kit/templates/*.md' 'evidence-kit/templates/*.md' 'guard-kit/templates/*.md' 'lifecycle-kit/templates/*.md' 'queue-kit/templates/*.md' 'site-kit/templates/*.md' '*/templates/*.md' '*.claude/agents/*.md' '*.claude/commands/*.md' '*:(exclude)*/gate-tests/*' '*docs/*.md' '*:(exclude)docs/*/SPEC.md' '*:(exclude)docs/*/README.md' '*:(exclude)docs/doctrine-kit/DOCTRINE.md' '*:(exclude)docs/evidence-data.md' '*:(exclude)docs/enforcement.md' '*:(exclude)docs/footprint.md' '*:(exclude)docs/install-evidence.md' 'scripts/context-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/surface_ratchet.rs' 'native/src/emit/always_loaded.rs' 'native/src/programs.rs' 'native/src/section.rs' 'native/src/stages.rs'; then
     run_gate check-surface-ratchet native/target/release/checkwright-gates check-surface-ratchet
 fi
 

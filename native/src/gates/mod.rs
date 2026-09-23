@@ -388,6 +388,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_MIRROR_ROOT",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
@@ -409,6 +410,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_MIRROR_ROOT",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
@@ -449,6 +451,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_MIRROR_ROOT",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_DOD_HEADING",
             "CANON_KIT_DOD_MODE",
@@ -465,6 +468,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_MIRROR_ROOT",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_BANNED_HEADINGS",
             "CANON_KIT_DERIVABLE_DENSITY",
@@ -485,6 +489,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_MIRROR_ROOT",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
@@ -508,6 +513,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_MIRROR_ROOT",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
@@ -544,6 +550,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_MIRROR_ROOT",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
@@ -566,6 +573,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_MIRROR_ROOT",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
@@ -601,6 +609,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_MIRROR_ROOT",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
@@ -623,6 +632,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_KIT_DIRS",
             "GATE_SDK_NATIVE_BIN",
             "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_MIRROR_ROOT",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
@@ -643,6 +653,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_MIRROR_ROOT",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
@@ -673,6 +684,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_MIRROR_ROOT",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
@@ -719,6 +731,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_MIRROR_ROOT",
             "CANON_KIT_AMENDMENT_GLOB",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_EMBED_LANGS",
@@ -824,6 +837,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_MIRROR_ROOT",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
@@ -845,6 +859,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_MIRROR_ROOT",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
@@ -893,6 +908,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_KIT_DIRS",
             "GATE_SDK_WORKFLOW_DIR",
             "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_MIRROR_ROOT",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
@@ -1440,16 +1456,16 @@ pub const REGISTRY: &[GateEntry] = &[
         "-",
         &[("git", "")],
     ),
-    // spec: gate-sdk/SPEC.md §check-reads-couples — a declared root where the walk hangs off a
-    // positional with a literal default, and an empty set for the members that read named files
-    // and list nothing; the mirror emitter's kit listing is single-level, outside the class.
+    // spec: gate-sdk/SPEC.md §check-reads-couples — the orphan sweep's root is the mirror-root
+    // knob's value, so it is `?` as check-docs-link-convention's knob-valued root is; the mirror
+    // emitter's kit listing is single-level, outside the class.
     (
         "check-docs-mirror-fresh",
         docs_mirror_fresh::run,
-        &[(crate::spec::MIRROR_ROOT, "name:lit:SPEC.md,README.md,DOCTRINE.md", "", "")],
+        &[("?", "", "", "dynamic@src/gates/docs_mirror_fresh.rs:68")],
         // spec: gate-sdk/SPEC.md §The non-gate arm — the generator it now calls in-process reads
         // the blob ref, so the comparator declares what its callee reads.
-        &["CANON_KIT_DOCS_BLOB_REF"],
+        &["CANON_KIT_DOCS_BLOB_REF", "CANON_KIT_MIRROR_ROOT"],
         "-",
         &[("date", ""), ("git", "")],
     ),
@@ -2122,6 +2138,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_GLOSSARY_FILE",
             "CANON_KIT_DUP_SURFACES",
             "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_MIRROR_ROOT",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "GATE_SDK_KIT_DIRS",
             "GATE_SDK_PRUNE_DIRS",
@@ -2309,16 +2326,19 @@ fn expanded_knobs() -> &'static [(&'static str, Vec<&'static str>)] {
     static EXPANDED: std::sync::OnceLock<Vec<(&'static str, Vec<&'static str>)>> =
         std::sync::OnceLock::new();
     EXPANDED.get_or_init(|| {
-        // spec: gate-sdk/SPEC.md §check-reads-couples — a guard's selector knob is read by the
-        // resolver exactly as the filter knob is, so the union carries both or a guarded declaration
-        // cannot be evaluated at all
+        // spec: gate-sdk/SPEC.md §check-reads-couples — a guard's selector knob and a knob-path
+        // prune's knob are read by the resolver exactly as the filter knob is, so the union carries
+        // all three or a declaration cannot be evaluated at all
         let mut filters: Vec<&'static str> = REGISTRY
             .iter()
             .flat_map(|(_, _, roots, _, _, _)| {
-                roots
-                    .iter()
-                    .flat_map(|(_, f, _, _)| [filter_knob(f), filter_guard(f).0])
-                    .flatten()
+                roots.iter().flat_map(|(_, f, p, _)| {
+                    [filter_knob(f), filter_guard(f).0].into_iter().flatten().chain(
+                        p.split(',')
+                            .filter_map(|t| t.strip_prefix("knob:"))
+                            .map(crate::registry::knob_token_name),
+                    )
+                })
             })
             .collect();
         filters.sort();
@@ -2612,7 +2632,20 @@ mod tests {
                     if !walked.iter().any(|o| o == r) {
                         continue;
                     }
-                    for g in pspec.split(',').filter(|g| !g.is_empty()) {
+                    // spec: gate-sdk/SPEC.md §check-reads-couples — a knob-path prune is held as the
+                    // case resolved it, a literal as spelled
+                    let globs: Vec<String> = pspec
+                        .split(',')
+                        .filter(|g| !g.is_empty())
+                        .flat_map(|g| {
+                            if g.starts_with("knob:") {
+                                run.resolved.iter().filter(|(t, _)| t == g).map(|(_, v)| v.clone()).collect()
+                            } else {
+                                vec![g.to_string()]
+                            }
+                        })
+                        .collect();
+                    for g in &globs {
                         prunes_held += 1;
                         assert!(
                             run.pruned.iter().any(|o| o == g),
@@ -2691,6 +2724,7 @@ mod tests {
         spawned: Vec<String>,
         pruned: Vec<String>,
         selected: Vec<String>,
+        resolved: Vec<(String, String)>,
     }
 
     // spec: gate-sdk/SPEC.md §lib/gate.sh — a case directory is set on a spawn and never entered,
@@ -2732,6 +2766,7 @@ mod tests {
         let mut spawned: Vec<String> = Vec::new();
         let mut pruned: Vec<String> = Vec::new();
         let mut selected: Vec<String> = Vec::new();
+        let mut resolved: Vec<(String, String)> = Vec::new();
         for line in output.lines() {
             let Some(rest) = line.strip_prefix(&prefix) else {
                 continue;
@@ -2741,6 +2776,10 @@ mod tests {
                 Some(("spawned", program)) => spawned.push(program.to_string()),
                 Some(("pruned", glob)) => pruned.push(glob.to_string()),
                 Some(("selected", sel)) => selected.push(sel.to_string()),
+                Some(("resolved", pair)) => match pair.split_once('\t') {
+                    Some((tok, v)) => resolved.push((tok.to_string(), v.to_string())),
+                    None => panic!("unparseable resolution line: {}", line),
+                },
                 Some(("exit", code)) => rcs.push(
                     code.parse()
                         .unwrap_or_else(|_| panic!("unparseable exit line: {}", line)),
@@ -2765,6 +2804,7 @@ mod tests {
             spawned,
             pruned,
             selected,
+            resolved,
         }
     }
 
@@ -2809,6 +2849,17 @@ mod tests {
             if let Some(sel) = filter_guard(fspec).0 {
                 if walk::knob_scalar(sel).is_ok_and(|v| !v.is_empty()) {
                     block.push_str(&format!("{}\tselected\t{}\n", OBSERVER_SENTINEL, sel));
+                }
+            }
+        }
+        // spec: gate-sdk/SPEC.md §check-reads-couples — a knob-path prune resolves in the case's own
+        // configuration, as the walk resolved it, so the child reports each resolution
+        for (_, _, pspec, _) in entry.2.iter() {
+            for tok in pspec.split(',').filter(|t| t.starts_with("knob:")) {
+                let values = crate::registry::knob_paths(tok)
+                    .unwrap_or_else(|e| panic!("{}'s declared prune does not resolve: {}", name, e));
+                for v in values {
+                    block.push_str(&format!("{}\tresolved\t{}\t{}\n", OBSERVER_SENTINEL, tok, v));
                 }
             }
         }

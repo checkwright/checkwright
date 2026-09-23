@@ -108,33 +108,29 @@ pub fn prune_kit_roots(root: &str, files: Vec<PathBuf>) -> Result<Vec<PathBuf>, 
 // and kit-root pruned. Lifted out of `manifest_files`' default branch rather than written twice.
 pub fn canonical_specs(root: &str) -> Result<Vec<PathBuf>, String> {
     let spec_name = knob("CANON_KIT_SPEC_NAME")?;
-    let prune: Vec<String> = CANON_SPEC_PRUNE.iter().map(|s| s.to_string()).collect();
+    let prune = canon_spec_prune()?;
     let specs = walk::find_named_pruning(Path::new(root), &[spec_name.as_str()], &prune)?;
     prune_kit_roots(root, specs)
 }
 
-// spec: canon-kit/SPEC.md §The shared spec adapters — the kit mirror's own output root, one spelling
-// read by the generator, its freshness comparator and the canonical-spec prune
-macro_rules! mirror_root {
-    () => {
-        "docs"
-    };
-}
-pub(crate) use mirror_root;
-
-macro_rules! templates_prune {
-    () => {
-        "**/templates"
-    };
+// spec: canon-kit/SPEC.md §The shared spec adapters — the kit mirror's output root, read by the
+// generator, its freshness comparator and the canonical-spec prune through this one reader, in the
+// knob-path token's normal form so the registry's declared prune resolves to the same string
+pub fn mirror_root() -> Result<String, String> {
+    let v = knob("CANON_KIT_MIRROR_ROOT")?;
+    let t = v.trim_end_matches('/');
+    Ok(t.strip_prefix("./").unwrap_or(t).to_string())
 }
 
-pub const MIRROR_ROOT: &str = mirror_root!();
+const TEMPLATES_PRUNE: &str = "**/templates";
 
 // spec: canon-kit/SPEC.md §The shared spec adapters — the templates convention and the kit mirror's
-// own output root
-pub const CANON_SPEC_PRUNE: &[&str] = &[templates_prune!(), concat!(mirror_root!(), "/*")];
+// output root, built at run time from the knob
+pub fn canon_spec_prune() -> Result<Vec<String>, String> {
+    Ok(vec![TEMPLATES_PRUNE.to_string(), format!("{}/*", mirror_root()?)])
+}
 
-pub const CANON_SPEC_PRUNE_DECL: &str = concat!(templates_prune!(), ",", mirror_root!(), "/*");
+pub const CANON_SPEC_PRUNE_DECL: &str = "**/templates,knob:CANON_KIT_MIRROR_ROOT/*";
 
 // spec: canon-kit/SPEC.md §The shared spec adapters — `spec_amendments`: the amendment-glob find,
 // `templates/`-filtered and kit-root pruned, selecting by a glob on the basename where
@@ -1522,8 +1518,52 @@ mod tests {
     // cannot disagree about the prune
     #[test]
     fn the_declared_prune_is_the_walked_prune() {
-        assert_eq!(CANON_SPEC_PRUNE_DECL, CANON_SPEC_PRUNE.join(","));
-        assert_eq!(CANON_SPEC_PRUNE[1], format!("{}/*", MIRROR_ROOT));
+        let knobs = crate::knobenv::lock();
+        let d = std::env::temp_dir().join(format!("checkwright-mirror-prune.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(&d).expect("scratch");
+        knobs.set("GATE_SDK_GATES_DIR", &d.display().to_string());
+        knobs.remove("CANON_KIT_KNOB_FILE");
+        knobs.remove("CANON_KIT_MIRROR_ROOT");
+        for value in ["docs", "./site/ref/"] {
+            std::fs::write(d.join("canon-config.knobs"), format!("CANON_KIT_MIRROR_ROOT = {}\n", value)).expect("write");
+            crate::knobs::reset(&knobs);
+            let declared: Vec<String> = CANON_SPEC_PRUNE_DECL
+                .split(',')
+                .flat_map(|t| crate::registry::knob_paths(t).expect("the declared prune resolves"))
+                .collect();
+            assert_eq!(declared, canon_spec_prune().expect("the walked prune builds"), "root {:?}", value);
+        }
+        knobs.remove("GATE_SDK_GATES_DIR");
+        crate::knobs::reset(&knobs);
+        let _ = std::fs::remove_dir_all(&d);
+    }
+
+    // spec: canon-kit/SPEC.md §The shared spec adapters — an adopter spec under the site root is
+    // pruned while the mirror is the site root, and discovered once the mirror moves beneath it
+    #[test]
+    fn a_site_spec_is_discovered_once_the_mirror_moves_beneath_it() {
+        let knobs = crate::knobenv::lock();
+        let d = std::env::temp_dir().join(format!("checkwright-mirror-move.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        let gates = d.join("gates");
+        std::fs::create_dir_all(&gates).expect("scratch");
+        std::fs::create_dir_all(d.join("docs/api")).expect("scratch");
+        std::fs::write(d.join("docs/api/SPEC.md"), "# api\n").expect("write");
+        knobs.set("GATE_SDK_GATES_DIR", &gates.display().to_string());
+        knobs.remove("CANON_KIT_KNOB_FILE");
+        knobs.remove("CANON_KIT_MIRROR_ROOT");
+        let found = |value: &str| {
+            std::fs::write(gates.join("canon-config.knobs"), format!("CANON_KIT_MIRROR_ROOT = {}\n", value)).expect("write");
+            crate::knobs::reset(&knobs);
+            let root = d.display().to_string();
+            canonical_specs(&root).expect("the find runs").len()
+        };
+        assert_eq!(found("docs"), 0, "the mirror root prunes the adopter's own spec");
+        assert_eq!(found("docs/ref"), 1, "a moved mirror leaves the adopter's spec discoverable");
+        knobs.remove("GATE_SDK_GATES_DIR");
+        crate::knobs::reset(&knobs);
+        let _ = std::fs::remove_dir_all(&d);
     }
 
     // spec: canon-kit/SPEC.md §check-manifest-count — the tens are not consecutive with the

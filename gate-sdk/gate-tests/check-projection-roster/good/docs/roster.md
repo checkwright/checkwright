@@ -4,6 +4,7 @@
 
 - **Alpha** <!-- projection: check-alpha --> — the alpha page.
 - **Beta and gamma** <!-- projection: check-beta --> — two outputs, one row.
+- **Delta** <!-- projection: check-delta --> — an output relocated through its knob.
 - **An advisory fan-out** — unkeyed, so unconstrained.
 
 ### A deeper heading stays inside the section

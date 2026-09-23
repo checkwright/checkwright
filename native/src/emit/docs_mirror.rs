@@ -7,15 +7,11 @@ use crate::spec;
 use crate::walk;
 use std::path::Path;
 
-const USAGE: &str = concat!(
-    "\
+const USAGE: &str = "\
 usage: --emit docs-mirror [--write|--list|--emit <src>] [--root <dir>]
-  --write (default) writes every mirror page under <root>/",
-    crate::spec::mirror_root!(),
-    "/; --list prints the
-  source set; --emit prints one page.
-"
-);
+  --write (default) writes every mirror page under <root>/<CANON_KIT_MIRROR_ROOT>/;
+  --list prints the source set; --emit prints one page.
+";
 
 const BLOB_REF_KNOB: &str = "CANON_KIT_DOCS_BLOB_REF";
 
@@ -271,8 +267,9 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         }
         Mode::Write => {
             let srcs = sources(&ctx)?;
+            let mirror = spec::mirror_root()?;
             for src in &srcs {
-                let dest = ctx.under(&format!("{}/{}", spec::MIRROR_ROOT, src));
+                let dest = ctx.under(&format!("{}/{}", mirror, src));
                 if let Some((dir, _)) = dest.rsplit_once('/') {
                     std::fs::create_dir_all(dir)
                         .map_err(|e| format!("cannot create {}: {}", dir, e))?;
@@ -285,7 +282,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
                 "docs-mirror: wrote {} mirror page(s) under {}/{}/\n",
                 srcs.len(),
                 ctx.root,
-                spec::MIRROR_ROOT
+                mirror
             ))
         }
     }

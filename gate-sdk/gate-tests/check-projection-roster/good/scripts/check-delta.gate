@@ -1,0 +1,2 @@
+# graph: couples=knob:GATE_SDK_ENFORCEMENT_FILE dir=one valve=none tier=precommit
+# projection: knob:GATE_SDK_ENFORCEMENT_FILE

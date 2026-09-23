@@ -22,11 +22,29 @@ pub fn run(args: &[String]) -> i32 {
 }
 
 // spec: gate-sdk/SPEC.md §check-projection-roster — the declaring set: every registered member whose
-// header carries `# projection:`, with that member's expanded `couples=` beside it for assertion A
+// header carries `# projection:` resolving to a path on this tree, with its resolved paths, any `kit:`
+// member it carries, and its expanded `couples=` beside them for assertion A
 pub(crate) struct Declaring {
     pub(crate) name: String,
     lines: Vec<String>,
+    paths: Vec<String>,
+    refused: Vec<String>,
     couples: Vec<String>,
+}
+
+// spec: gate-sdk/SPEC.md §The install disposition — each line's members resolved through the one
+// knob-path resolver; a `kit:` member is set aside for assertion A rather than resolved
+fn resolve_lines(lines: &[String]) -> Result<(usize, Vec<String>, Vec<String>), String> {
+    let (mut members, mut paths, mut refused) = (0, Vec::new(), Vec::new());
+    for m in lines.iter().flat_map(|l| l.split(',')).map(str::trim).filter(|m| !m.is_empty()) {
+        members += 1;
+        if m.starts_with("kit:") {
+            refused.push(m.to_string());
+        } else {
+            paths.extend(registry::knob_paths(m)?);
+        }
+    }
+    Ok((members, paths, refused))
 }
 
 pub(crate) fn declaring_gates() -> Result<Vec<Declaring>, String> {
@@ -50,41 +68,51 @@ pub(crate) fn declaring_gates() -> Result<Vec<Declaring>, String> {
         if lines.is_empty() {
             continue;
         }
+        let (members, paths, refused) =
+            resolve_lines(&lines).map_err(|e| format!("cannot resolve {}'s projection: {}", name, e))?;
+        // spec: gate-sdk/SPEC.md §The install disposition — a line whose every member resolves empty
+        // declares no projection on this tree
+        if members > 0 && paths.is_empty() && refused.is_empty() {
+            continue;
+        }
         let fields = registry::manifest_line(&body).map(registry::manifest_fields).unwrap_or_default();
         let couples = registry::expand_couples(&registry::field(&fields, "couples"), &kit_roots)
             .map_err(|e| format!("cannot expand {}'s couples: {}", name, e))?;
         out.push(Declaring {
             name,
             lines,
+            paths,
+            refused,
             couples: couples.split(',').filter(|t| !t.is_empty()).map(String::from).collect(),
         });
     }
     Ok(out)
 }
 
-// spec: gate-sdk/SPEC.md §check-projection-roster — assertion A: one line, a non-empty literal glob
-// list, each glob reached by the gate's own expanded `couples=` under the field's one matcher
+// spec: gate-sdk/SPEC.md §check-projection-roster — assertion A: one line with at least one member,
+// no `kit:` member, each resolved path reached by the gate's own expanded `couples=` under the
+// field's one matcher
 fn declaration_findings(d: &Declaring) -> Vec<String> {
-    let [line] = d.lines.as_slice() else {
+    if d.lines.len() != 1 {
         return vec![format!(
             "{}: {} '{}' lines where a gate declares at most one",
             d.name,
             d.lines.len(),
             registry::PROJECTION
         )];
-    };
-    let globs: Vec<&str> = line.split(',').map(str::trim).filter(|g| !g.is_empty()).collect();
-    if globs.is_empty() {
+    }
+    if d.paths.is_empty() && d.refused.is_empty() {
         return vec![format!("{}: '{}' declares no output path", d.name, registry::PROJECTION)];
     }
     let mut out: Vec<String> = Vec::new();
-    for g in globs {
-        if registry::COUPLES_PREFIXES.iter().any(|p| g.starts_with(p)) {
-            out.push(format!(
-                "{}: projection glob '{}' carries a couples prefix — an output path is the consumer's tree, written literally",
-                d.name, g
-            ));
-        } else if !d.couples.iter().any(|t| registry::couple_matches(g, t)) {
+    for g in &d.refused {
+        out.push(format!(
+            "{}: projection member '{}' carries 'kit:' — an output path is the consumer's tree, never a kit root",
+            d.name, g
+        ));
+    }
+    for g in &d.paths {
+        if !d.couples.iter().any(|t| registry::couple_matches(g, t)) {
             out.push(format!(
                 "{}: projection glob '{}' is not covered by its own couples= — the hook would never re-run the gate on that output",
                 d.name, g
@@ -281,18 +309,24 @@ mod tests {
     }
 
     // spec: gate-sdk/SPEC.md §check-projection-roster — assertion A reads the field's one matcher, and
-    // refuses a prefixed token and a second line
+    // refuses a `kit:` member and a second line
     #[test]
     fn a_projection_glob_is_covered_by_its_own_couples() {
-        let d = |lines: &[&str], couples: &[&str]| Declaring {
-            name: "check-x".to_string(),
-            lines: lines.iter().map(|s| s.to_string()).collect(),
-            couples: couples.iter().map(|s| s.to_string()).collect(),
+        let d = |lines: &[&str], couples: &[&str]| {
+            let lines: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
+            let (_, paths, refused) = resolve_lines(&lines).expect("literal members resolve");
+            Declaring {
+                name: "check-x".to_string(),
+                lines,
+                paths,
+                refused,
+                couples: couples.iter().map(|s| s.to_string()).collect(),
+            }
         };
         assert!(declaration_findings(&d(&["docs/x.md"], &["docs/*.md"])).is_empty());
         assert!(declaration_findings(&d(&["docs/x.md"], &["*docs/x.md"])).is_empty());
         assert!(declaration_findings(&d(&["docs/y.md"], &["docs/x.md"]))[0].contains("not covered"));
-        assert!(declaration_findings(&d(&["knob:X"], &["knob:X"]))[0].contains("couples prefix"));
+        assert!(declaration_findings(&d(&["kit:X"], &["*"]))[0].contains("carries 'kit:'"));
         assert!(declaration_findings(&d(&["a", "b"], &["*"]))[0].contains("2 '# projection:' lines"));
         assert!(declaration_findings(&d(&[""], &["*"]))[0].contains("no output path"));
     }

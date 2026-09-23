@@ -1,4 +1,4 @@
-# graph: couples=knob:CONTEXT_KIT_FOOTPRINT_FILE,knob:CONTEXT_KIT_SURFACES,*/SPEC.md,kit:templates/*.md,lifecycle-kit/templates/stages/*.md,native/src/diff.rs dir=one valve=none tier=precommit
-# projection: docs/footprint.md
+# graph: couples=knob:CONTEXT_KIT_FOOTPRINT_FILE,knob:CONTEXT_KIT_SURFACES,*/SPEC.md,kit:templates/*.md,native/src/diff.rs dir=one valve=none tier=precommit
+# projection: knob:CONTEXT_KIT_FOOTPRINT_FILE
 # install: on-surface
 # spec: context-kit/SPEC.md §check-footprint-fresh — the footprint page (CONTEXT_KIT_FOOTPRINT_FILE) is the byte-fresh projection of the footprint emitter, which this member calls in-process rather than spawning

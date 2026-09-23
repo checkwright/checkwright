@@ -1,3 +1,4 @@
 GATE_SDK_KIT_DIRS = demo-kit
 GATE_SDK_PROJECTION_ROSTER = docs/roster.md
 GATE_SDK_PROJECTION_ROSTER_SECTION = Projections
+GATE_SDK_ENFORCEMENT_FILE = site/enforcement.md

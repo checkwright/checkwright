@@ -8,45 +8,6 @@
 
 ## New Features
 
-### projection-path-literals
-
-[spec: SPEC-knob-paths.md]
-
-the `# projection:` line still carries consumer-path literals: `docs/enforcement.md` on `check-enforcement-fresh`, `docs/footprint.md` on `check-footprint-fresh`, `docs/check-graph.html` and the hook paths on `check-graph`, and `ROADMAP.md` on `check-roadmap-fresh`. gate-sdk/SPEC.md §The install disposition refuses a `knob:` token on that line. Now that those gates' `couples=` name the same paths through knobs, an adopter who relocates one through its knob gets a projection glob that the coupling no longer covers. **Run 2026-09-23 at spec:** with `GATE_SDK_ENFORCEMENT_FILE=site/enforcement.md`, `check-projection-roster` exits 1 on assertion A.
-
-**Deliverable:** the projection grammar admits `knob:` (or derives the line from the knob), with a fixture that relocates a projection.
-
-**Specified 2026-09-23:** the projection line and the registry prune field take a knob-path token. `knob:<NAME>` or `knob:<NAME>/<glob>` resolves to the knob's value verbatim, with no covering conversion, through one resolver, `registry::knob_paths`. The four kit freshness members name their outputs through the knobs their `couples=` already carry. A line that resolves to nothing declares no projection on that tree.
-
-**Cost while deferred:** relocating a projection reds the battery. Filed 2026-09-23 to the gap inbox by gate-sdk-blind-spots' spec, since doc-path-couples converted only the `couples=` half; promoted at the close drain because it is a grammar change. Owner lookup: gate-sdk/SPEC.md §The install disposition (the projection declaration).
-
-### docs-mirror-root-unrelocatable
-
-[spec: SPEC-knob-paths.md]
-
-canon-kit's docs mirror root is one kit spelling, `docs/`: `--emit docs-mirror` writes under it and the canonical-spec finder prunes it. An adopter's own `SPEC.md` at `docs/<dir>/` is therefore invisible to the spec-reading gates, and a site root elsewhere cannot host the mirror. canon-kit/SPEC.md §The shared spec adapters states that limit.
-
-**Deliverable:** a knob that moves the generator and the prune together, plus a `knob:` source for a registry prune declaration (gate-sdk/SPEC.md §check-reads-couples).
-
-**Specified 2026-09-23:** a new knob, `CANON_KIT_MIRROR_ROOT` (default `docs`), moves the generator, the freshness comparator and the canonical-spec prune together. The prune is declared as `knob:CANON_KIT_MIRROR_ROOT/*` through the knob-path token. `CANON_KIT_LINK_ROOT` was weighed and refused: reusing it would leave an adopter's `docs/<dir>/SPEC.md` pruned, and the mirror needs only to sit under the link root.
-
-**Cost while deferred:** none on this tree; an adopter with specs under `docs/` silently loses their discovery. Filed 2026-09-23 to the gap inbox by gate-sdk-blind-spots' spec; promoted at the close drain, since spec-prune ruled no knob and minting one is spec work. Owner lookup: canon-kit/SPEC.md §The shared spec adapters.
-
-### couples-literals-undisposed
-
-[spec: SPEC-knob-paths.md]
-
-two `couples=` literals fit none of doc-path-couples' five dispositions. `check-enforcement-fresh`'s `.github/workflows/*.yml` narrows a marker-grep walk to one directory, though the walk is rooted at `GATE_SDK_ENFORCE_SCAN_DIR` and does not filter to `*.yml`. `lifecycle-kit/templates/stages/*.md` on `check-footprint-fresh` and `check-surface-ratchet` may be a `templates/` carve-out or a frozen literal needing a token; which one was never determined.
-
-**Deliverable:** a disposition for each, with the SPEC's disposition set widened if neither fits.
-
-**Specified 2026-09-23:** no disposition is added.
-
-- The workflow glob under-covers the walk. It becomes `knob:GATE_SDK_ENFORCE_SCAN_DIR/*`, once a `.` root stops producing a dead `*./*` pattern.
-- The stage-templates literal is redundant beside `kit:templates/*.md`, whose `*` crosses `/`, as `--for` confirms. It comes off, along with the same literal on `check-shim-restatement`, whose SPEC sentence claiming otherwise is corrected.
-
-**Cost while deferred:** both stay pinned to this repo's layout. Filed 2026-09-23 to the gap inbox by align's audit of doc-path-couples; promoted at the close drain because each needs a design call. Owner lookup: gate-sdk/SPEC.md §check-reads-couples.
-
 ### unmarked-discharge-vs-span
 
 [spec: SPEC-discharge-span.md]
@@ -1732,5 +1693,9 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 `check-docs-cmd` assertion (C) misses a retired path cited from the queue, which is outside its manifest corpus and whose `<path>:<line>` token fails the path shape.
 
 ## Done
+
+- projection-path-literals
+- docs-mirror-root-unrelocatable
+- couples-literals-undisposed
 
 ## Lessons Learned

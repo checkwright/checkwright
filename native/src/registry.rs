@@ -317,6 +317,15 @@ fn corpus_knob_tokens(resolve_dirs: &[String]) -> Result<Vec<String>, String> {
                 Ok(b) => String::from_utf8_lossy(&b).into_owned(),
                 Err(_) => continue,
             };
+            // spec: gate-sdk/SPEC.md §The install disposition — a `# projection:` knob-path token is a
+            // `knob:` token the descriptor corpus carries
+            tokens.extend(
+                projection(&text)
+                    .iter()
+                    .flat_map(|l| l.split(','))
+                    .filter_map(|t| t.trim().strip_prefix("knob:"))
+                    .map(|r| knob_token_name(r).to_string()),
+            );
             let Some(man) = manifest_line(&text) else {
                 continue;
             };
@@ -679,14 +688,20 @@ fn covering_pattern(member: &str) -> String {
 // the one directory the knob resolves to, then the glob; an empty root is a refusal, since it would
 // re-root the glob at the repository root
 fn rooted_pattern(token: &str) -> Result<String, String> {
+    rooted_path(token, "couples").map(|p| covering_pattern(&p))
+}
+
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — a rooted token's path before any conversion: the
+// knob's value trimmed of a trailing `/` and a leading `./`, `.` read as no prefix, then the glob
+fn rooted_path(token: &str, kind: &str) -> Result<String, String> {
     let Some((name, glob)) = crate::knobs::rooted(token) else {
-        return Err(format!("couples token 'knob:{}' is not rooted", token));
+        return Err(format!("{} token 'knob:{}' is not rooted", kind, token));
     };
     let refuse = |why: String| {
         format!(
-            "couples token 'knob:{}' cannot be expanded: {} — a rooted token is one glob under the \
+            "{} token 'knob:{}' cannot be expanded: {} — a rooted token is one glob under the \
              directory its knob resolves to; treating as failure (not clean)",
-            token, why
+            kind, token, why
         )
     };
     if let Some(why) = crate::knobs::root_refusal(name) {
@@ -695,15 +710,50 @@ fn rooted_pattern(token: &str) -> Result<String, String> {
     if !literal_glob(glob) {
         return Err(refuse(format!("'{}' is not a literal glob", glob)));
     }
-    let root = crate::walk::knob_scalar(name).map_err(&refuse)?;
-    let root = root.trim_end_matches('/');
+    let value = crate::walk::knob_scalar(name).map_err(&refuse)?;
+    let root = value.trim_end_matches('/');
     if root.is_empty() {
         return Err(refuse(format!("{} resolves to no directory", name)));
     }
     if root.contains(',') || root.chars().any(char::is_whitespace) {
         return Err(refuse(format!("{}'s value '{}' carries a comma or whitespace", name, root)));
     }
-    Ok(covering_pattern(&format!("{}/{}", root, glob)))
+    let root = root.strip_prefix("./").unwrap_or(root);
+    if root == "." {
+        return Ok(glob.to_string());
+    }
+    Ok(format!("{}/{}", root, glob))
+}
+
+// spec: gate-sdk/SPEC.md §The install disposition — the knob-path token's one resolver: a literal is
+// itself, `knob:<NAME>` the knob's members and `knob:<NAME>/<glob>` its rooted path, each verbatim,
+// since a declaration naming a place is resolved to the place and never to a covering pattern
+pub fn knob_paths(token: &str) -> Result<Vec<String>, String> {
+    if token.starts_with("kit:") {
+        return Err(format!(
+            "knob-path token '{}' carries 'kit:' — a place a kit gate writes or prunes is the \
+             consumer's tree, never a kit root; treating as failure (not clean)",
+            token
+        ));
+    }
+    let Some(name) = token.strip_prefix("knob:") else {
+        return Ok(vec![token.to_string()]);
+    };
+    if crate::knobs::rooted(name).is_some() {
+        return rooted_path(name, "knob-path").map(|p| vec![p]);
+    }
+    let members = match crate::knobs::reference(name) {
+        (knob, Some(field)) => crate::knobs::project(knob, field),
+        (knob, None) => crate::knobs::refuse_whole_packed(knob).and_then(|_| crate::walk::knob_array(knob)),
+    };
+    members.map_err(|e| {
+        format!(
+            "knob-path token 'knob:{}' could not be resolved: {} — a knob-path token resolves to \
+             the knob's value, and an unresolvable knob would be a lost declaration; treating as \
+             failure (not clean)",
+            name, e
+        )
+    })
 }
 
 // spec: gate-sdk/SPEC.md §The `# graph:` manifest — the couples/trigger expansion every reader
@@ -1160,6 +1210,49 @@ mod tests {
         crate::knobs::reset(&knobs);
         let e = expand_couples("knob:GATE_SDK_WORKFLOW_DIR/*.md", &roots).unwrap_err();
         assert!(e.contains("resolves to no directory"), "{}", e);
+        unscratch(&knobs, &d);
+    }
+
+    // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a `.` root contributes no prefix and a
+    // leading `./` is dropped, so a rooted token over the repository root covers what a walk returns
+    #[test]
+    fn a_dot_root_contributes_no_prefix_to_a_rooted_token() {
+        let knobs = crate::knobenv::lock();
+        let roots = vec!["gate-sdk".to_string()];
+        let d = scratch_corpus(&knobs, "dotroot", "");
+        knobs.remove("GATE_SDK_ENFORCE_SCAN_DIR");
+        for (value, want) in [(".", "*"), ("./", "*"), ("./ops", "*ops/*"), ("./ops/", "*ops/*")] {
+            std::fs::write(d.join("gate-sdk-config.knobs"), format!("GATE_SDK_ENFORCE_SCAN_DIR = {}\n", value))
+                .expect("write");
+            crate::knobs::reset(&knobs);
+            assert_eq!(expand_couples("knob:GATE_SDK_ENFORCE_SCAN_DIR/*", &roots).unwrap(), want, "root {:?}", value);
+        }
+        assert!(couple_matches(".github/workflows/ci.yml", "*"));
+        unscratch(&knobs, &d);
+    }
+
+    // spec: gate-sdk/SPEC.md §The install disposition — the knob-path token resolves verbatim: a
+    // literal to itself, a file knob to its value, a rooted token to its path, and `kit:` refuses
+    #[test]
+    fn a_knob_path_token_resolves_to_the_place_verbatim() {
+        let knobs = crate::knobenv::lock();
+        let d = scratch_corpus(&knobs, "knobpaths", "");
+        knobs.remove("GATE_SDK_ENFORCEMENT_FILE");
+        knobs.remove("GATE_SDK_HOOKS_DIR");
+        std::fs::write(
+            d.join("gate-sdk-config.knobs"),
+            "GATE_SDK_ENFORCEMENT_FILE = site/enforcement.md\nGATE_SDK_HOOKS_DIR = ./hooks/\n",
+        )
+        .expect("write");
+        crate::knobs::reset(&knobs);
+        assert_eq!(knob_paths("docs/x.md").unwrap(), vec!["docs/x.md".to_string()]);
+        assert_eq!(knob_paths("knob:GATE_SDK_ENFORCEMENT_FILE").unwrap(), vec!["site/enforcement.md".to_string()]);
+        assert_eq!(knob_paths("knob:GATE_SDK_HOOKS_DIR/pre-commit").unwrap(), vec!["hooks/pre-commit".to_string()]);
+        assert!(knob_paths("kit:templates/*.md").is_err());
+        assert!(knob_paths("knob:PROBE_ABSENT").is_err());
+        knobs.remove("QUEUE_KIT_ROADMAP_FILE");
+        crate::knobs::reset(&knobs);
+        assert!(knob_paths("knob:QUEUE_KIT_ROADMAP_FILE").unwrap().is_empty(), "an empty value is no place");
         unscratch(&knobs, &d);
     }
 }

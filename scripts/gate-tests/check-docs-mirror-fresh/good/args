@@ -1,3 +1,4 @@
-# Hermetic freshness case: the synthetic docs/ mirror byte-matches the emission.
+# Hermetic freshness case: the synthetic mirror, relocated to docs/ref by the case's own canon
+# knob file, byte-matches the emission, and the adopter spec at docs/api/ is no orphan.
 # The single arg roots the gate at this case dir (its own synthetic source tree).
 .

@@ -1,5 +1,5 @@
-// spec: canon-kit/SPEC.md §The reference-link grammar — docs/<kit>/{SPEC,README}.md and
-// docs/doctrine-kit/DOCTRINE.md are the byte-fresh projection of the docs-mirror arm backing
+// spec: canon-kit/SPEC.md §The reference-link grammar — <mirror root>/<kit>/{SPEC,README}.md and
+// <mirror root>/doctrine-kit/DOCTRINE.md are the byte-fresh projection of the docs-mirror arm backing
 // on-site reference reading; a stale, missing, or orphaned mirror page reds
 use crate::fresh;
 use crate::spec;
@@ -34,12 +34,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Err(format!("not a directory: {}", root));
     }
     let listed = generate(&["--list"], root)?;
+    let mirror = spec::mirror_root()?;
 
     let mut bad: Vec<String> = Vec::new();
     let mut expected: Vec<String> = Vec::new();
     let mut n = 0usize;
     for src in listed.lines() {
-        let dest = format!("{}/{}", spec::MIRROR_ROOT, src);
+        let dest = format!("{}/{}", mirror, src);
         expected.push(dest.clone());
         n += 1;
         let on_disk = format!("{}/{}", root, dest);
@@ -63,7 +64,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // spec: gate-sdk/SPEC.md §The consumer remainder cohort — the walk prunes nothing, because
     // the shell form reached for a bare `find`: a member that never read the prune set neither
     // narrows its corpus by it nor declares it.
-    let docs_root = format!("{}/{}", root, spec::MIRROR_ROOT);
+    let docs_root = format!("{}/{}", root, mirror);
     let mut found: Vec<String> = walk::find_with_prune(Path::new(&docs_root), &|_| false)?
         .into_iter()
         .filter(|p| {
@@ -94,7 +95,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
         println!(
             "  help: regenerate — bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write — and stage {}/.",
-            spec::MIRROR_ROOT
+            mirror
         );
         return Ok(1);
     }
