@@ -59,6 +59,8 @@ In the paragraph opening "Its coverage is split across three oracles", after the
 
 In gate-sdk/SPEC.md §Consumer smoke, the `smoke/install.sh (required)` bullet, after "held so by `check-install-disposition` assertion B.", add: "Its registry heredoc is held to the kit's owned subcommands, each registered or declared `# unregistered:` inside the heredoc, by `check-gate-substrate-parity` assertion J."
 
+In gate-sdk/SPEC.md §Consumer smoke, **The declaration valve** paragraph, "**This grammar now has a sibling on a second roster** — `# unregistered:` in the consumer's own `gates.list` (§Layout and configuration, read by §check-gate-substrate-parity's assertion I)" becomes "**This grammar now has a sibling on a second roster** — `# unregistered:` in the consumer's own `gates.list` (§Layout and configuration, read by §check-gate-substrate-parity's assertions I and J — I in the consumer's registry, J in each kit's smoke registry heredoc)". The two `# unregistered:` sites (the consumer's assembled file, and the kit's own heredoc that assembles it) are one grammar with two readers now, exactly as delta 4's `gates.list` bullet edit above states for the first site.
+
 In docs/site-architecture.md, the new-gate fan-out row "the owning kit's `smoke/install.sh` expected-gate roster, hand-maintained, so a new gate is added there or carries a `smoke-unregistered:` declaration (`gate-sdk/SPEC.md` §Consumer smoke owns which);" becomes "the owning kit's `smoke/install.sh` registry heredoc, where a new gate is registered or declared `# unregistered:` (gated by `check-gate-substrate-parity` assertion J), and an omitted one may also owe a `# smoke-unregistered:` declaration (`gate-sdk/SPEC.md` §Consumer smoke owns which);". The row named the wrong grammar before: an owned member left out of the heredoc always needs `# unregistered:` inside it, and only sometimes the accounting valve.
 
 ## Producers and consumers
@@ -74,7 +76,7 @@ In docs/site-architecture.md, the new-gate fan-out row "the owning kit's `smoke/
 Roster from `git grep -n "assertion I\|# unregistered:\|Eight assertions" gate-sdk/SPEC.md` and `git grep -n "smoke/install.sh\` expected-gate" docs/site-architecture.md`, run 2026-09-23.
 
 - `gate-sdk/SPEC.md` §check-gate-substrate-parity, the usage paragraph, the J bullet and the coverage paragraph (delta 3).
-- `gate-sdk/SPEC.md` §Layout and configuration, the `gates.list` bullet, and §Consumer smoke, the `smoke/install.sh` bullet (delta 4).
+- `gate-sdk/SPEC.md` §Layout and configuration, the `gates.list` bullet, and §Consumer smoke, the `smoke/install.sh` bullet and **The declaration valve** paragraph (delta 4). The third of these was reached by align's own re-run of this roster's stated probe, not by the authoring-time roster.
 - `docs/site-architecture.md`, the new-gate fan-out row (delta 4).
 - `native/src/gates/gate_substrate_parity.rs` and `native/src/registry.rs`, the assertion, the heredoc reader and the unit tests (deltas 1 and 2).
 - `gate-sdk/gate-tests/check-gate-substrate-parity.test.sh` (delta 2).

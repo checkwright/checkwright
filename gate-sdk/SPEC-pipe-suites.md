@@ -52,7 +52,7 @@ Roster from `git grep -n "tracked_shell_tree\|test.sh" gate-sdk/SPEC.md` and `gi
 
 ## Retired spellings
 
-- None — no delta retires a spelling; the removed honest-limit sentence has no second site.
+- `*.test.sh suites are outside the corpus by the corpus rule above.` — the honest-limit sentence delta 3 deletes (delta 3), with no replacing sentence; the paragraph reads on without it. Declared on the same ground the sibling smoke-registry amendment declares its own deleted count phrase: check-amendment-retired-spelling reconciles a declared string against the whole tracked tree regardless of whether a replacement follows it, and this exact sentence has no second site (verified: `git grep -n "outside the corpus by the corpus rule"` finds only its one, now-deleted, occurrence).
 
 ## Definition of Done
 
@@ -61,5 +61,5 @@ Roster from `git grep -n "tracked_shell_tree\|test.sh" gate-sdk/SPEC.md` and `gi
 - [ ] **Merged with no information lost.** The corpus paragraph is re-phrased, not appended to.
 - [ ] **Amendment deleted.** This file is removed on merge (`ls gate-sdk/SPEC-*.md`).
 - [ ] **Entry moved.** `pipe-membership-corpus-omits-test-suites` moves to Done in the merge commit, at a stage before the drain stage.
-- [ ] **Removals propagated.** Nothing retired.
+- [ ] **Removals propagated.** `check-amendment-retired-spelling` is green on the declared spelling.
 - [ ] **Gaps filed.** Any cross-component gap found during the work is filed to the gap inbox.

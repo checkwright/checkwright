@@ -24,13 +24,15 @@
 - `checkwright-gates --reads check-surface-duplication` prints the prune as `**/templates,docs/*`.
 - No canon-kit fixture holds a `docs/<x>/SPEC.md` or a `templates/SPEC.md`.
 
+**Verified at align (2026-09-23), widening delta 1.** The "one place" defect has a fourth instance the authoring probe's own `git grep` would have caught but the disposition above did not enumerate: `native/src/gates/docs_mirror_fresh.rs:41` composes its own `format!("docs/{}", src)` to derive each mirror page's expected path, independently of `docs_mirror.rs`'s copy. Left untouched, delta 2's rewritten sentence — "it has one spelling, which the generator, the walk and every member's registry declaration read" — would be false on merge. Delta 1 below is widened to include this site.
+
 ## What changes
 
 ### (1) One constant for the mirror root, read by the generator, the prune and the registry {design-bearing}
 
 **Not yet applied.**
 
-- **The mirror root.** `native/src/spec.rs` gains the mirror root as a constant (`docs`). `docs_mirror.rs` composes its output path and its `--write` report from that constant, not from the literal.
+- **The mirror root.** `native/src/spec.rs` gains the mirror root as a constant (`docs`). `docs_mirror.rs` composes its output path and its `--write` report from that constant, not from the literal, and `docs_mirror_fresh.rs`'s `rule()` composes its own per-page expected path (line 41) from the same constant rather than transcribing `"docs/{}"` a third time.
 - **The prune.** `CANON_SPEC_PRUNE`'s second member is derived from the mirror root (`<root>/*`).
 - **The registry.** The six registry prune declarations in `native/src/gates/mod.rs` name one `spec` constant holding the comma-joined prune rather than transcribing it.
 - **The test.** A `spec.rs` unit test holds that joined constant equal to `CANON_SPEC_PRUNE`'s members, so the walk and the declaration cannot disagree.
@@ -41,11 +43,11 @@ The comment on `CANON_SPEC_PRUNE` then states the ground in one line: the templa
 
 **Not yet applied.** In canon-kit/SPEC.md §The shared spec adapters, the bullet opening "**The canonical-spec finder prunes the generated on-site mirror**" becomes:
 
-> - **The canonical-spec finder prunes the generated on-site mirror**, as a directory prune beside the `templates/` one it already applies. A prose gate grading a generated page is unfixable at the file — the repair is to the source and the regeneration — so the finding can only be absorbed or ignored. The mirror is excluded because it is **generated**, and the generator is the kit's own: `--emit docs-mirror` writes under one mirror root, and the prune is that root's children. So the path is kit mechanism rather than a consumer's layout, and it has one spelling, which the generator, the walk and every member's registry declaration read. A declared prune narrows a coverage demand, and two spellings could disagree about it (gate-sdk/SPEC.md §check-reads-couples). **The limit that buys:** an adopter's own `SPEC.md` at `<mirror root>/<dir>/` sits in the mirror's namespace and is not discovered. Relocating the root would move the generator and the prune together, and it needs a `knob:` source for a registry prune that gate-sdk does not yet have.
+> - **The canonical-spec finder prunes the generated on-site mirror**, as a directory prune beside the `templates/` one it already applies. A prose gate grading a generated page is unfixable at the file — the repair is to the source and the regeneration — so the finding can only be absorbed or ignored. The mirror is excluded because it is **generated**, and the generator is the kit's own: `--emit docs-mirror` writes under one mirror root, and the prune is that root's children. So the path is kit mechanism rather than a consumer's layout, and it has one spelling, which the generator, the walk, the docs-mirror freshness comparator and every member's registry declaration read. A declared prune narrows a coverage demand, and two spellings could disagree about it (gate-sdk/SPEC.md §check-reads-couples). **The limit that buys:** an adopter's own `SPEC.md` at `<mirror root>/<dir>/` sits in the mirror's namespace and is not discovered. Relocating the root would move the generator and the prune together, and it needs a `knob:` source for a registry prune that gate-sdk does not yet have.
 
 ## Producers and consumers
 
-- **The mirror-root constant** (delta 1). Readers: `docs_mirror.rs` at `--emit docs-mirror`, `canonical_specs` at every finder call, and the six registry rows through the joined constant, which `--reads` prints and `check-reads-couples` consumes. The unit test is its roster-holding reader.
+- **The mirror-root constant** (delta 1). Readers: `docs_mirror.rs` at `--emit docs-mirror`, `docs_mirror_fresh.rs` at every `check-docs-mirror-fresh` run, `canonical_specs` at every finder call, and the six registry rows through the joined constant, which `--reads` prints and `check-reads-couples` consumes. The unit test is its roster-holding reader.
 - **Point 5.** No corpus changes. The prune's members are the same two strings, now spelled once.
 - **Point 6.** Not reached.
 
@@ -54,7 +56,7 @@ The comment on `CANON_SPEC_PRUNE` then states the ground in one line: the templa
 Roster from `git grep -n "CANON_SPEC_PRUNE\|\*\*/templates,docs/\*\|docs/{}" native/src` and `git grep -n "prunes the generated on-site mirror" -- '*.md' ':!docs'`, run 2026-09-23.
 
 - `canon-kit/SPEC.md` §The shared spec adapters (delta 2).
-- `native/src/spec.rs`, `native/src/emit/docs_mirror.rs` and `native/src/gates/mod.rs` (delta 1).
+- `native/src/spec.rs`, `native/src/emit/docs_mirror.rs`, `native/src/gates/docs_mirror_fresh.rs` and `native/src/gates/mod.rs` (delta 1).
 <!-- update-target-exempt: generated mirror, regenerated by its freshness gate's printed command -->
 - `docs/canon-kit/SPEC.md`.
 
