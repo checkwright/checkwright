@@ -499,5 +499,10 @@ fallthrough	xargs bash -c 'x'
 fallthrough	timeout 5 bash -c 'x'
 fallthrough	bash gate-sdk/bin/run-gates.sh --scratch-run .tmp/x.sh
 
+# rule 27 — a main-checkout path from a linked worktree. The table's sandbox is
+#           no linked worktree, so a path outside its root is not the rule's; the
+#           firing rows run from a worktree in gate-tests/worktree-confinement.test.sh
+fallthrough	touch ../outside
+
 # fall-through logging — anything else falls through to the friction log
 fallthrough	make build

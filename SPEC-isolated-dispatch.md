@@ -146,7 +146,7 @@ In the same section, §The turn-end liveness hook's closing narrowing — "That 
 
 ### (4) Confinement at the chokepoints {design-bearing}
 
-**Not yet applied.**
+**The guard half is applied** — rule 27, its predicates, `_guard_ignored`, `GUARD_KIT_WORKTREE_READS`, the template line, the tests and guard-kit/SPEC.md. The selector's two cases sit in `worktree-confinement.test.sh` rather than `guard-config-knobs.test.sh`, because both need the linked worktree that suite builds. **Not yet applied:** D4, and the advertisement on `.claude/agents/audit-sweep.md`.
 
 - **D4, default isolation.** In delegation-kit's `agent-dispatch-guard` (`native/src/hook/dispatch.rs`, beside D1 to D3), D4 runs after D2 and fires when all three hold:
   - `tool_input.isolation` is not `worktree`;

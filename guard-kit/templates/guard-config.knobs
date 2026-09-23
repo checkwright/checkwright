@@ -14,3 +14,6 @@
 
 # spec: guard-kit/SPEC.md §The generic ruleset — declare the write and execute forms of each read-only roster member you add (rule 18's grammar, 'none' when it has none); an undeclared member is withheld, and an entry for a default member replaces the kit's declaration
 # GUARD_KIT_RO_FORMS[md5sum] = none
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 27's admitted read from a linked worktree (default read-only); off admits none, leaving the harness's read tool the one route to a main-checkout file
+# GUARD_KIT_WORKTREE_READS = off

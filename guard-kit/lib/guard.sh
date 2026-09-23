@@ -237,7 +237,7 @@ guard_skeleton() {
     if ((want_body)); then printf '%s' "$got_body"; else printf '%s' "$out"; fi
 }
 
-# spec: guard-kit/SPEC.md §The guard framework — one splitter for every shell consumer that reasons per compound segment (rules 2/4/7/8/12/14/15/17/18/19/20/22/24, the read-compound carve-out), fed a guard_skeleton view so the harness's per-segment boundary set never drifts; the compiled twin holds the other substrate
+# spec: guard-kit/SPEC.md §The guard framework — one splitter for every shell consumer that reasons per compound segment (rules 2/4/7/8/12/14/15/17/18/19/20/22/24/25/26/27, the read-compound carve-out), fed a guard_skeleton view so the harness's per-segment boundary set never drifts; the compiled twin holds the other substrate
 guard_split_compound() {
     sed -E 's/\|\||&&|\|&|;|\|/\n/g' <<<"$1"
 }
@@ -1256,9 +1256,10 @@ guard_rule_truncate_scratch() {
         local all_ignored=1 tgt
         while read -r tgt; do
             [[ -z "$tgt" ]] && continue
-            git check-ignore --quiet -- "$tgt" || { all_ignored=0; break; }
+            _guard_ignored "$tgt" || { all_ignored=0; break; }
         done < <(grep -oE '[0-9]*>>?[[:space:]]*[^[:space:]&|;<]+' <<<"$cmd" \
             | sed -E 's/^[0-9]*>>?[[:space:]]*//')
+        _guard_worktree_refuses "$1" && return 0
         if [[ "$all_ignored" == 1 ]]; then
             guard_allow "truncate gitignored scratch (${GUARD_NAME:-guard} auto-allow)"
         fi
@@ -1343,8 +1344,9 @@ guard_rule_append_scratch() {
     _guard_emitter_unmodelled "$raw" && return 0
     _guard_emitter_write "$(guard_skeleton "$raw" sq dq hd)" || return 0
     for tgt in "${_GUARD_EMITTER_TARGETS[@]}"; do
-        git check-ignore --quiet -- "$tgt" || return 0
+        _guard_ignored "$tgt" || return 0
     done
+    _guard_worktree_refuses "$raw" && return 0
     guard_allow "write to gitignored scratch (${GUARD_NAME:-guard} auto-allow)"
 }
 
@@ -1384,6 +1386,7 @@ guard_rule_ro_pipeline() {
     done
     [[ "$reads" -ge 1 ]] || return 0
     _guard_ro_forms_clear "$raw" "$s" || return 0
+    _guard_worktree_refuses "$raw" && return 0
     guard_allow "read-only search pipeline (${GUARD_NAME:-guard} auto-allow)"
 }
 
@@ -1487,7 +1490,7 @@ _guard_recorded_launch() {
         targets+=("$tgt")
     done < <(_guard_redirect_pairs "$ls")
     for tgt in ${targets[@]+"${targets[@]}"} "$path"; do
-        git check-ignore --quiet -- "$tgt" || return 1
+        _guard_ignored "$tgt" || return 1
     done
     return 0
 }
@@ -1497,6 +1500,7 @@ guard_rule_bounded_wait() {
     # spec: guard-kit/SPEC.md §The guard framework — the raw-command carve-out every auto-allow rule takes, adopted unchanged rather than reasoned about afresh
     grep -qE '\$\(|<\(|>\(' <<<"$raw" && return 0
     case "$raw" in *'`'*) return 0 ;; esac
+    _guard_worktree_refuses "$raw" && return 0
     _guard_recorded_launch "$raw" && guard_allow "recorded launch of an allowlisted command (${GUARD_NAME:-guard} auto-allow)"
     s="$(guard_skeleton "$raw" sq dq hd)"
     grep -q "['\"]" <<<"$s" && return 0
@@ -1609,6 +1613,7 @@ guard_rule_git_rewrite() {
         && grep -qE '(^|[[:space:]])(-F|--file|--amend)\b' <<<"$s"; } \
         || { grep -qE '(^|[[:space:]])git[[:space:]]+reset([[:space:]]|$)' <<<"$s" \
         && grep -qE '(^|[[:space:]])--soft\b' <<<"$s"; }; then
+        _guard_worktree_refuses "$cmd" && return 0
         guard_advise "re-verify volatile git state before this history rewrite (DOCTRINE.md: Re-verify volatile state before a git history rewrite): confirm HEAD with 'git log --oneline -3' before an amend or squash; after a 'git reset --soft' re-stage and verify staged content with 'git show :<path>' before committing (the soft reset keeps the old index snapshot); carry the message in the command ('-m', or '-F -' from a heredoc) — a scratch message file may be another session's, and a leftover lands the wrong message with exit 0; if you must use a file, write it in this same command and read the result back with 'git log -1 --format=%B'; and rewrite the message when amending so it states the combined change."
     fi
 }
@@ -1971,10 +1976,11 @@ _guard_slot_reach() {
     return 1
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rules 4 and 7's grant test on a rewritten command: every segment of its dequoted view matches a committed allow pattern, and rule 24's test finds no reach and can decide; a failed settings read, an unalignable view or an undecidable bound fails, so a rewrite never turns a missing read into an allow
+# spec: guard-kit/SPEC.md §The generic ruleset — rules 4 and 7's grant test on a rewritten command, rule 27's predicate first: every segment of its dequoted view matches a committed allow pattern, and rule 24's test finds no reach and can decide; a failed settings read, an unalignable view or an undecidable bound fails, so a rewrite never turns a missing read into an allow
 _guard_rewrite_granted() {
     local cmd="$1" s v seg inner hit rc=0
     local -a inners=()
+    _guard_worktree_refuses "$cmd" && return 1
     _guard_allow_load
     mapfile -t inners < <(_guard_allow_inners)
     [[ "${#inners[@]}" -ge 1 ]] || return 1
@@ -2062,7 +2068,7 @@ guard_rule_emitter_write() {
             lead="${lead%%[[:space:]]*}"
             unignored=()
             for tgt in "${_GUARD_EMITTER_TARGETS[@]}"; do
-                git check-ignore --quiet -- "$tgt" 2>/dev/null || unignored+=("$tgt")
+                _guard_ignored "$tgt" || unignored+=("$tgt")
             done
             if [[ "${#unignored[@]}" -eq 0 ]]; then
                 guard_block "issue the '$lead' write to '${_GUARD_EMITTER_TARGETS[*]}' as its own call, and the rest of this command as a separate one: alone, that write is granted with no permission decision, while compounded it makes the whole call one the harness decides out of band. If you genuinely need the compound, run it yourself with !<command>."
@@ -2080,7 +2086,7 @@ guard_rule_emitter_write() {
         case "$tgt" in /dev/*) return 0 ;; esac
     done
     for tgt in "${_GUARD_EMITTER_TARGETS[@]}"; do
-        git check-ignore --quiet -- "$tgt" && continue
+        _guard_ignored "$tgt" && continue
         guard_block "don't write '$tgt' through a redirect: git does not ignore it, so no rule grants the write. Use the Write or Edit tool for a file, or the capture arm that owns the surface when the target is one — the tool is reviewable where a redirect is not, and the arm keeps the surface's grammar. If you genuinely need the redirect, run it yourself with !<command>."
     done
 }
@@ -2097,6 +2103,157 @@ guard_rule_shell_wrapper() {
         [[ "${rest%%[[:space:]]*}" == -c ]] || continue
         guard_block "don't wrap a command in '$word -c': the payload sits inside one quoted argument, so neither the allowlist nor any guard rule can read what it runs. Run the payload as the command itself, or, for a body that needs a shell of its own, write it to a scratch script and run it through '$_guard_door --scratch-run <script>'. If you genuinely need the wrapper, run it yourself with !<command>."
     done < <(guard_split_compound "$(guard_skeleton "$1" sq dq hd)")
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 27's roots, resolved once per hook process and so called directly, never in a substitution: the working directory, the session's own worktree root and the main checkout's root, the last two empty outside a linked worktree. The walk up to the nearest .git keeps git unspawned wherever that .git is a directory
+_guard_wt_roots() {
+    [[ -n "${_guard_wt_done:-}" ]] && return 0
+    _guard_wt_done=1
+    _guard_wt_cwd="$(pwd -P)"
+    _guard_wt_own=''
+    _guard_wt_main=''
+    local d="$_guard_wt_cwd" git_dir common
+    while [[ -n "$d" && ! -e "$d/.git" ]]; do d="${d%/*}"; done
+    [[ -n "$d" && -f "$d/.git" ]] || return 0
+    git_dir="$( { cd "$(git rev-parse --git-dir 2>/dev/null || echo /dev/null)" && pwd -P; } 2>/dev/null )"
+    common="$( { cd "$(git rev-parse --git-common-dir 2>/dev/null || echo /dev/null)" && pwd -P; } 2>/dev/null )"
+    [[ -n "$common" && "$git_dir" != "$common" && "${common##*/}" == .git ]] || return 0
+    _guard_wt_main="${common%/*}"
+    _guard_wt_own="$d"
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 27's path resolution: lexical against the working directory, '.' and '..' folded, the filesystem never read
+_guard_lexical_path() {
+    local p="$1" part
+    local -a parts=() stack=()
+    gate_path_rooted "$p" || p="$_guard_wt_cwd/$p"
+    IFS='/' read -ra parts <<<"$p"
+    for part in ${parts[@]+"${parts[@]}"}; do
+        case "$part" in
+            '' | .) ;;
+            ..) ((${#stack[@]})) && unset 'stack[-1]' ;;
+            *) stack+=("$part") ;;
+        esac
+    done
+    local IFS=/
+    printf '/%s' "${stack[*]}"
+}
+
+_guard_under() {
+    [[ "$1" == "$2" || "$1" == "$2"/* ]]
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — true when a resolved path lies in the main checkout and outside the session's own worktree, so a sibling worktree nested there counts as the main checkout's
+_guard_in_main() {
+    [[ -n "$_guard_wt_main" ]] && _guard_under "$1" "$_guard_wt_main" && ! _guard_under "$1" "$_guard_wt_own"
+}
+
+_guard_in_main_scratch() {
+    local d
+    for d in ${GUARD_KIT_SCRATCH_DIRS[@]+"${GUARD_KIT_SCRATCH_DIRS[@]}"}; do
+        _guard_under "$1" "$(_guard_lexical_path "$_guard_wt_main/$d")" && return 0
+    done
+    return 1
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — the ignored-target test rules 16, 17, 19 (B2) and 25 share, asked of the checkout that holds the target: from a linked worktree git answers a main-checkout path as outside the repository, which would refuse the very journal append rule 27's scratch exemption exists for
+_guard_ignored() {
+    local t
+    _guard_wt_roots
+    if [[ -n "$_guard_wt_main" ]]; then
+        t="$(_guard_lexical_path "$1")"
+        if _guard_in_main "$t"; then
+            git -C "$_guard_wt_main" check-ignore --quiet -- "$t" 2>/dev/null
+            return
+        fi
+    fi
+    git check-ignore --quiet -- "$1" 2>/dev/null
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 27's program-bearing exclusion: rule 8's walker rows and every script interpreter, whose write form lives in program text no declaration can describe
+_guard_program_bearing() {
+    local b="${1##*/}" i
+    case "$b" in sed | awk | perl | python | python3) return 0 ;; esac
+    for i in ${GUARD_KIT_SCRIPT_INTERPRETERS[@]+"${GUARD_KIT_SCRIPT_INTERPRETERS[@]}"}; do
+        [[ "$b" == "$i" ]] && return 0
+    done
+    return 1
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 27's admitted read: every segment a roster read in none of its declared write and execute forms, a literal banner tolerated, none led by a program-bearing tool, and every redirect target inert, in the own worktree or under a main-checkout scratch dir
+_guard_worktree_admitted() {
+    local raw="$1" s="$2" seg cw pair tgt reads=0
+    [[ "${GUARD_KIT_WORKTREE_READS:-read-only}" == read-only ]] || return 1
+    _guard_shell_backgrounds "$s" && return 1
+    while IFS= read -r seg; do
+        seg="${seg#"${seg%%[![:space:]]*}"}"
+        [[ -z "$seg" ]] && continue
+        _guard_is_banner "$seg" && continue
+        cw="$(_guard_command_word "$(_guard_segment_core "$seg")")"
+        _guard_program_bearing "${cw%%[[:space:]]*}" && return 1
+        _guard_is_ro_segment "$cw" || return 1
+        reads=$((reads + 1))
+    done < <(guard_split_compound "$s")
+    [[ "$reads" -ge 1 ]] || return 1
+    while IFS= read -r pair; do
+        [[ -z "$pair" ]] && continue
+        pair="${pair#"${pair%%[!0-9]*}"}"
+        tgt="${pair#>}"
+        tgt="${tgt#>}"
+        tgt="${tgt#"${tgt%%[![:space:]]*}"}"
+        case "$tgt" in /dev/null | '&'[0-9-]*) continue ;; esac
+        tgt="$(_guard_lexical_path "$tgt")"
+        _guard_under "$tgt" "$_guard_wt_own" && continue
+        _guard_in_main "$tgt" && _guard_in_main_scratch "$tgt" && continue
+        return 1
+    done < <(_guard_redirect_pairs "$s")
+    _guard_ro_forms_clear "$raw" "$s"
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 27's test, taken by rule 27 and, as a predicate, by every rule whose decision is not a block: true when a linked-worktree session's command carries a path word resolving into the main checkout outside its scratch dirs and is not the admitted read; the first such word and its resolution land in _GUARD_WT_WORD and _GUARD_WT_PATH. Called directly, so the roots cache survives
+_guard_worktree_refuses() {
+    local raw="$1" s v w t line
+    local -a words=() ws=()
+    _GUARD_WT_WORD=''
+    _GUARD_WT_PATH=''
+    _guard_wt_roots
+    [[ -n "$_guard_wt_main" ]] || return 1
+    grep -qE '\$\{|\$\(|<\(|>\(|\$[A-Za-z_]' <<<"$(guard_skeleton "$raw" sq hdq)" && return 1
+    case "$raw" in *'`'*) return 1 ;; esac
+    s="$(guard_skeleton "$raw" sq dq hd)"
+    v="$(_guard_dequoted_view "$raw" "$s")" || v="$s"
+    while IFS= read -r line; do
+        read -ra ws <<<"$line"
+        words+=(${ws[@]+"${ws[@]}"})
+    done <<<"$v"
+    for w in ${words[@]+"${words[@]}"}; do
+        w="${w//$'\x01'/ }"
+        w="${w//$'\x02'/$'\t'}"
+        w="${w//$'\x03'/;}"
+        w="${w//$'\x04'/|}"
+        w="${w//$'\x05'/&}"
+        [[ "$w" =~ ^[0-9]*(\>\>|\>|\<|\&\>|\>\&)(.*)$ ]] && w="${BASH_REMATCH[2]}"
+        [[ "$w" == --?*=* ]] && w="${w#*=}"
+        gate_path_rooted "$w" || case "$w" in .. | ../* | */.. | */../*) ;; *) continue ;; esac
+        t="$(_guard_lexical_path "$w")"
+        _guard_in_main "$t" || continue
+        _guard_in_main_scratch "$t" && continue
+        _GUARD_WT_WORD="$w"
+        _GUARD_WT_PATH="$t"
+        break
+    done
+    [[ -n "$_GUARD_WT_WORD" ]] || return 1
+    _guard_worktree_admitted "$raw" "$s" && return 1
+    return 0
+}
+
+guard_rule_worktree_confinement() {
+    local reads=''
+    _guard_worktree_refuses "$1" || return 0
+    if [[ "${GUARD_KIT_WORKTREE_READS:-read-only}" == read-only ]]; then
+        reads=" a search or read of it as a read-only pipeline, every segment led by one of the read-only roster (${GUARD_KIT_RO_BINS[*]}) in none of its write or execute forms and no segment led by sed, awk or an interpreter, redirecting only to /dev/null, your own worktree or the main checkout's scratch dir;"
+    fi
+    guard_block "'$_GUARD_WT_WORD' reaches the main checkout ($_GUARD_WT_PATH) from this linked worktree, and a shell command naming the main checkout outside its scratch dir is refused here: an isolated session never alters the work tree it was isolated from. Lawful routes: the Read tool for a named file;$reads a history read (git log, git show) in your own worktree, which shares the main checkout's refs and objects; and your journal, appended by shell under the main checkout's ${GUARD_KIT_SCRATCH_DIRS[0]} dir. If the command is genuinely needed, return and have your dispatcher run it in the main checkout."
 }
 
 guard_generic_rules() {
@@ -2127,6 +2284,7 @@ guard_generic_rules() {
     guard_rule_grant_path_slot "$cmd"
     guard_rule_emitter_write "$cmd"
     guard_rule_shell_wrapper "$cmd"
+    guard_rule_worktree_confinement "$cmd"
 }
 
 # spec: guard-kit/SPEC.md §The guard framework (`lib/guard.sh`) — the knob load, once per sourcing and at the tail so both failure answers can use the primitives above: an unreachable binary advises and runs no rule, a refused config blocks with the refusal's own text, and every value lands in the shell variable of its name, so a caller reassigning one after sourcing still steers the rule
@@ -2155,7 +2313,7 @@ fi
 _guard_knob_names=(
     GUARD_KIT_LOG GUARD_KIT_WAKEUP_LOG GUARD_KIT_SETTINGS GUARD_KIT_SETTINGS_LOCAL GUARD_KIT_BREADTH_PROBES
     GUARD_KIT_BREADTH_DECLARED GUARD_KIT_RO_SCRIPTS GUARD_KIT_SCRATCH_DIRS GUARD_KIT_RO_BINS GUARD_KIT_RO_FORMS
-    GUARD_KIT_APPEND_BINS GUARD_KIT_SEARCH_TOOLS GUARD_KIT_SCRIPT_INTERPRETERS
+    GUARD_KIT_APPEND_BINS GUARD_KIT_SEARCH_TOOLS GUARD_KIT_SCRIPT_INTERPRETERS GUARD_KIT_WORKTREE_READS
 )
 if ! _guard_knob_out="$(gate_knob_values "${_guard_knob_names[@]}" 2>/dev/null)"; then
     guard_block "guard-kit could not read its knobs, so no command runs until the config is repaired — $(gate_knob_values "${_guard_knob_names[@]}" 2>&1 >/dev/null). Repair the file with the Edit tool, which this guard does not intercept."
