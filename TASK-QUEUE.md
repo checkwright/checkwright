@@ -8,18 +8,6 @@
 
 ## New Features
 
-### cannot-run-marker-late-read
-
-[spec: SPEC-marker-grammar.md]
-
-`check-stage-entry` assertion D reads cannot-run markers only when the cursor enters the audit-entry stage (`native/src/gates/stage_entry.rs`, `at_audit_entry`), because its residue half, a marker not yet run, is legitimate before build. A marker whose `— <reason>` separator is missing is a spelling defect that a commit-time check could catch. Attested at gate-sdk-blind-spots: spec committed one joined by a period, align's commits passed the battery over it, and only the lead's build dispatch read refused it, which cost one align resume.
-
-**Deliverable:** assertion D split so the marker grammar is held at every commit and the residue at build entry, with fixture cases for both.
-
-**Specified 2026-09-23:** a new assertion (E) inside `check-stage-entry` holds the marker grammar at every firing, whatever the cursor. That covers an empty reason, an empty command and a misplaced spelling. D keeps only the well-formed not-run residue at audit-entry. No new gate is minted, because the gate already fires on every amendment and queue commit.
-
-**Cost while deferred:** a misspelt marker is caught one stage late. Filed 2026-09-23 to the gap inbox by the lead; promoted at the close drain because a gate split is spec work. Owner lookup: lifecycle-kit/SPEC.md §check-stage-entry (assertion D) and §templates/stages/ (the marker grammar).
-
 ### stage-exit-no-successor-check
 
 [spec: SPEC-successor-read.md]
@@ -1653,5 +1641,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - unmarked-discharge-vs-span
 - policy-choice-census-residue
 - repo-inherits-policy-defaults
+- cannot-run-marker-late-read
 
 ## Lessons Learned

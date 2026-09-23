@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Behavioral test of check-stage-entry assertions B, C and D — the
+# Behavioral test of check-stage-entry assertions B, C, D and E — the
 # scenarios the one-pair good/bad harness cannot hold. The good/bad fixture
 # pair (--run-gate-tests) covers assertion A (prerequisite-stamp ordering: a
 # close cursor with no validate stamp); the harness admits only one
@@ -11,11 +11,14 @@
 # assertion C drives four
 # cross-component build-entry scenarios (2-dir amendments ±waiver,
 # single-amendment cross-component body, single-component amendment);
-# assertion D drives seven build-entry marker scenarios (not-run red,
-# reasoned cannot-run clean with its count, empty-reason red, a fenced,
-# backticked mid-line and templates/-stub mention all clean, a marker on an
-# active queue entry red, the same marker on a deferred entry clean, and a
-# bare mid-line and a line-split spelling each red as misplaced).
+# assertion D drives five build-entry marker scenarios (not-run red,
+# reasoned cannot-run clean with its count, a fenced, backticked mid-line and
+# templates/-stub mention all clean, a marker on an active queue entry red,
+# the same marker on a deferred entry clean); assertion E drives five
+# marker-grammar scenarios, four at an align cursor (empty-reason red,
+# command-less not-run red, a bare mid-line and a line-split spelling each red
+# as misplaced, a well-formed not-run marker clean because residue is not
+# yet due) and one at build entry (a malformed marker reported once, as E).
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -313,20 +316,11 @@ check_case "D1 not-run-marker" "$SANDBOX/d1" 1 "widget-service/SPEC-foo.md:2: **
 d_sandbox "$SANDBOX/d2" '- **Inferred, cannot run before build:** the gate reds — the gate is unwritten'
 check_case "D2 cannot-run-with-reason" "$SANDBOX/d2" 0 "1 cannot-run claim(s) carried"
 
-# D3 (bad): a cannot-run marker with an empty reason — refused.
-d_sandbox "$SANDBOX/d3" '**Inferred, cannot run before build:** the gate reds'
-check_case "D3 cannot-run-empty-reason" "$SANDBOX/d3" 1 "SPEC-foo.md:1:"
-
 # D4 (good): a marker inside a fence, a backticked mid-line mention in prose, and a templates/ stub — none a marker.
 d_sandbox "$SANDBOX/d4" $'```\n**Inferred, not run:** fenced — `x`\n```\nprose naming `**Inferred, not run:**` mid-line'
 mkdir -p "$SANDBOX/d4/some-kit/templates"
 printf '**Inferred, not run:** stub — `x`\n' >"$SANDBOX/d4/some-kit/templates/SPEC-amendment.md"
 check_case "D4 fence-prose-stub-not-markers" "$SANDBOX/d4" 0 "STAGE-ENTRY: clean"
-
-# D7 (bad): a bold spelling mid-line, and one a hard wrap splits — each refused as misplaced.
-d_sandbox "$SANDBOX/d7" $'prose naming **Inferred, not run:** mid-line\na claim **Inferred,\nnot run:** wrapped — `x`'
-check_case "D7 mid-line-misplaced" "$SANDBOX/d7" 1 "SPEC-foo.md:1: misplaced marker: prose naming"
-check_case "D7 split-misplaced" "$SANDBOX/d7" 1 "SPEC-foo.md:2: misplaced marker: a claim"
 
 d_queue() {  # $1=dir  $2=debt-section body  $3=deferred-section body — rewrites the queue D5/D6 share
     cat >"$1/TASK-QUEUE.md" <<EOF
@@ -357,9 +351,43 @@ d_sandbox "$SANDBOX/d6" 'no marker here'
 d_queue "$SANDBOX/d6" "" "$marked_entry"
 check_case "D6 deferred-queue-entry-marker-unread" "$SANDBOX/d6" 0 "STAGE-ENTRY: clean"
 
+# --- assertion E: the marker grammar is held whatever the cursor ---
+
+e_sandbox() {  # $1=dir  $2=amendment body — d_sandbox with the cursor at align, away from audit-entry
+    d_sandbox "$1" "$2"
+    cat >"$1/.workflow/WORKFLOW-STATE.txt" <<'EOF'
+---
+
+demo-iteration scope aaaaaaaa 2026-06-01 none
+demo-iteration align bbbbbbbb 2026-06-02 none
+EOF
+}
+
+# E1 (bad): a cannot-run marker with an empty reason — malformed at an align cursor.
+e_sandbox "$SANDBOX/e1" '**Inferred, cannot run before build:** the gate reds'
+check_case "E1 cannot-run-empty-reason" "$SANDBOX/e1" 1 "SPEC-foo.md:1: malformed marker: **Inferred, cannot run before build:**"
+
+# E2 (bad): a not-run marker with no command — malformed at an align cursor.
+e_sandbox "$SANDBOX/e2" '**Inferred, not run:** the arm refuses. run-gates.sh --only x'
+check_case "E2 not-run-no-command" "$SANDBOX/e2" 1 "SPEC-foo.md:1: malformed marker: **Inferred, not run:**"
+
+# E3 (bad): a bold spelling mid-line, and one a hard wrap splits — each misplaced at an align cursor.
+e_sandbox "$SANDBOX/e3" $'prose naming **Inferred, not run:** mid-line\na claim **Inferred,\nnot run:** wrapped — `x`'
+check_case "E3 mid-line-misplaced" "$SANDBOX/e3" 1 "SPEC-foo.md:1: misplaced marker: prose naming"
+check_case "E3 split-misplaced" "$SANDBOX/e3" 1 "SPEC-foo.md:2: misplaced marker: a claim"
+
+# E4 (good): a well-formed not-run marker at an align cursor — the residue is not yet due.
+e_sandbox "$SANDBOX/e4" $'intro\n**Inferred, not run:** the arm refuses — `run-gates.sh --only x`'
+check_case "E4 residue-not-due" "$SANDBOX/e4" 0 "STAGE-ENTRY: clean"
+
+# E5 (bad): a malformed marker at build entry is one finding — E's, never also D's residue.
+d_sandbox "$SANDBOX/e5" '**Inferred, not run:** the arm refuses'
+check_case "E5 malformed-at-audit-entry" "$SANDBOX/e5" 1 "STAGE-ENTRY: 1 prior-stage readiness issue(s)"
+check_case "E5 reported-as-malformed" "$SANDBOX/e5" 1 "SPEC-foo.md:1: malformed marker:"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-stage-entry.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-stage-entry.test.sh: clean (assertion B queue-empty + drain-exempt model + observed-by refusal branch + assertion C cross-component align/waiver + templates-stub exclusion + assertion D inferred-claim residue over amendments and active queue entries + misplaced markers, 18 scenarios)"
+echo "check-stage-entry.test.sh: clean (assertion B queue-empty + drain-exempt model + observed-by refusal branch + assertion C cross-component align/waiver + templates-stub exclusion + assertion D inferred-claim residue over amendments and active queue entries + assertion E marker grammar at every cursor, 20 scenarios)"
 exit 0

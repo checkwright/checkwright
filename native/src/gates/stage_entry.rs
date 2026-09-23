@@ -1,5 +1,5 @@
 // spec: lifecycle-kit/SPEC.md §check-stage-entry — prior-stage invocation-stamp ordering +
-// drain-entry queue-empty + audit-trigger signal + inferred-claim residue
+// drain-entry queue-empty + audit-trigger signal + inferred-claim residue + marker grammar
 use crate::ere::Ere;
 use crate::stages;
 use crate::walk;
@@ -113,7 +113,7 @@ fn knobs(args: &[String]) -> Result<Knobs, String> {
     })
 }
 
-// spec: lifecycle-kit/SPEC.md §check-stage-entry — the tree C and D both scan: prune set applied,
+// spec: lifecycle-kit/SPEC.md §check-stage-entry — the tree C, D and E scan: prune set applied,
 // templates/ paths excluded (a shipped stub is not a live amendment).
 fn live_tree() -> Result<Vec<String>, String> {
     let prune = walk::prune_dirs()?;
@@ -136,32 +136,37 @@ fn basename(p: &str) -> &str {
 
 #[derive(Debug, PartialEq)]
 enum Marker {
-    NotRun,
+    NotRun { command_empty: bool },
     CannotRun { reason_empty: bool },
 }
 
 const NOT_RUN: &str = "**Inferred, not run:**";
 const CANNOT_RUN: &str = "**Inferred, cannot run before build:**";
 
+fn tail_empty(rest: &str) -> bool {
+    rest.rsplit_once(" — ").map(|(_, t)| t.trim()).unwrap_or("").is_empty()
+}
+
 // spec: lifecycle-kit/SPEC.md §check-stage-entry — the marker grammar: line start after optional
-// indentation and one optional `- ` or `> ` lead; the reason is the text after the last ` — `.
+// indentation and one optional `- ` or `> ` lead; either form's tail is the text after the last ` — `.
 fn inferred_marker(line: &str) -> Option<Marker> {
     let s = line.trim_start_matches([' ', '\t']);
     let s = s
         .strip_prefix("- ")
         .or_else(|| s.strip_prefix("> "))
         .unwrap_or(s);
-    if s.starts_with(NOT_RUN) {
-        return Some(Marker::NotRun);
+    if let Some(rest) = s.strip_prefix(NOT_RUN) {
+        return Some(Marker::NotRun {
+            command_empty: tail_empty(rest),
+        });
     }
     let rest = s.strip_prefix(CANNOT_RUN)?;
-    let reason = rest.rsplit_once(" — ").map(|(_, r)| r.trim()).unwrap_or("");
     Some(Marker::CannotRun {
-        reason_empty: reason.is_empty(),
+        reason_empty: tail_empty(rest),
     })
 }
 
-// spec: lifecycle-kit/SPEC.md §check-stage-entry — D's queue read: a line is in scope only inside an
+// spec: lifecycle-kit/SPEC.md §check-stage-entry — D and E's queue read: a line is in scope only inside an
 // entry of an active section, from its entry heading to the line before the next heading of the
 // same or a shallower level, or a `---` rule. Indexed by 0-based line number.
 fn active_entry_lines(text: &str, sections: &[String]) -> Vec<bool> {
@@ -240,12 +245,20 @@ fn bare_spellings(s: &str) -> Vec<usize> {
     out
 }
 
+#[derive(Debug, Default, PartialEq)]
+struct MarkerScan {
+    malformed: Vec<String>,
+    misplaced: Vec<String>,
+    residue: Vec<String>,
+    carried: usize,
+}
+
 // spec: lifecycle-kit/SPEC.md §check-stage-entry — a fence line toggles the window no marker is
-// read inside, and `in_scope` narrows which lines are read. Returns the unrun markers and the
-// misplaced ones as `<line>: <text>`, and the reasoned cannot-run count.
-fn scan_markers(text: &str, in_scope: &dyn Fn(usize) -> bool) -> (Vec<String>, Vec<String>, usize) {
+// read inside, and `in_scope` narrows which lines are read. Findings are `<line>: <text>`; a
+// marker lands in exactly one set.
+fn scan_markers(text: &str, in_scope: &dyn Fn(usize) -> bool) -> MarkerScan {
     let lines: Vec<&str> = text.lines().collect();
-    let (mut unrun, mut misplaced, mut carried, mut fenced) = (Vec::new(), Vec::new(), 0usize, false);
+    let (mut scan, mut fenced) = (MarkerScan::default(), false);
     for (i, line) in lines.iter().enumerate() {
         if is_fence(line) {
             fenced = !fenced;
@@ -257,8 +270,11 @@ fn scan_markers(text: &str, in_scope: &dyn Fn(usize) -> bool) -> (Vec<String>, V
         match inferred_marker(line) {
             Some(Marker::CannotRun {
                 reason_empty: false,
-            }) => carried += 1,
-            Some(_) => unrun.push(format!("{}: {}", i + 1, line)),
+            }) => scan.carried += 1,
+            Some(Marker::NotRun {
+                command_empty: false,
+            }) => scan.residue.push(format!("{}: {}", i + 1, line)),
+            Some(_) => scan.malformed.push(format!("{}: {}", i + 1, line)),
             None => {
                 let mut bad = !bare_spellings(line).is_empty();
                 // spec: lifecycle-kit/SPEC.md §check-stage-entry — a split spelling starts on this
@@ -271,12 +287,12 @@ fn scan_markers(text: &str, in_scope: &dyn Fn(usize) -> bool) -> (Vec<String>, V
                     });
                 }
                 if bad {
-                    misplaced.push(format!("{}: {}", i + 1, line));
+                    scan.misplaced.push(format!("{}: {}", i + 1, line));
                 }
             }
         }
     }
-    (unrun, misplaced, carried)
+    scan
 }
 
 // spec: lifecycle-kit/SPEC.md §check-stage-entry — assertion C's signal, or None.
@@ -501,19 +517,15 @@ pub fn run(args: &[String]) -> i32 {
 
     let ab_fired = !errors.is_empty();
     let at_audit_entry = !k.audit_entry_stage.is_empty() && stage == k.audit_entry_stage;
-    let tree = if at_audit_entry {
-        match live_tree() {
-            Ok(t) => t,
-            Err(e) => {
-                eprintln!(
-                    "check-stage-entry: {} — the check could not run; treating as failure (not clean)",
-                    e
-                );
-                return 2;
-            }
+    let tree = match live_tree() {
+        Ok(t) => t,
+        Err(e) => {
+            eprintln!(
+                "check-stage-entry: {} — the check could not run; treating as failure (not clean)",
+                e
+            );
+            return 2;
         }
-    } else {
-        Vec::new()
     };
 
     // assertion C: audit-entry with a cross-component amendment signal and no audit stamp demands
@@ -543,60 +555,63 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
 
-    // assertion D: audit-entry refuses an on-disk amendment or active queue entry still carrying an
-    // unrun inferred-claim marker, audit stamp or not (lifecycle-kit/SPEC.md §check-stage-entry)
-    let mut d_fired = false;
-    let mut d_misplaced = false;
+    let (mut malformed, mut misplaced, mut residue) = (String::new(), String::new(), String::new());
     let mut carried = 0usize;
-    if at_audit_entry {
-        let mut unrun = String::new();
-        let mut misplaced = String::new();
-        for af in tree
-            .iter()
-            .filter(|p| walk::pattern_match(&k.amendment_glob, basename(p)))
-        {
-            let text = match std::fs::read(af) {
-                Ok(b) => String::from_utf8_lossy(&b).into_owned(),
-                Err(e) => {
-                    eprintln!(
-                        "check-stage-entry: cannot read {}: {} — the check could not run; treating as failure (not clean)",
-                        af, e
-                    );
-                    return 2;
-                }
-            };
-            let (hits, bad, n) = scan_markers(&text, &|_| true);
-            carried += n;
-            for h in hits {
-                unrun.push_str(&format!("\n    {}:{}", af, h));
+    let mut record = |file: &str, scan: MarkerScan| {
+        carried += scan.carried;
+        for h in scan.malformed {
+            malformed.push_str(&format!("\n    {}:{}", file, h.replacen(": ", ": malformed marker: ", 1)));
+        }
+        for h in scan.misplaced {
+            misplaced.push_str(&format!("\n    {}:{}", file, h.replacen(": ", ": misplaced marker: ", 1)));
+        }
+        for h in scan.residue {
+            residue.push_str(&format!("\n    {}:{}", file, h));
+        }
+    };
+    for af in tree
+        .iter()
+        .filter(|p| walk::pattern_match(&k.amendment_glob, basename(p)))
+    {
+        let text = match std::fs::read(af) {
+            Ok(b) => String::from_utf8_lossy(&b).into_owned(),
+            Err(e) => {
+                eprintln!(
+                    "check-stage-entry: cannot read {}: {} — the check could not run; treating as failure (not clean)",
+                    af, e
+                );
+                return 2;
             }
-            for h in bad {
-                misplaced.push_str(&format!("\n    {}:{}", af, h.replacen(": ", ": misplaced marker: ", 1)));
-            }
-        }
-        let scope = active_entry_lines(&qtext, &k.active_sections);
-        let (hits, bad, n) = scan_markers(&qtext, &|i| scope.get(i).copied().unwrap_or(false));
-        carried += n;
-        for h in hits {
-            unrun.push_str(&format!("\n    {}:{}", k.queue, h));
-        }
-        for h in bad {
-            misplaced.push_str(&format!("\n    {}:{}", k.queue, h.replacen(": ", ": misplaced marker: ", 1)));
-        }
-        if !unrun.is_empty() {
-            d_fired = true;
-            errors.push(format!(
-                "entering '{}' but on-disk amendments or active queue entries carry inferred-claim marker(s) nobody ran (a not-run marker, or a cannot-run marker with no reason):{}",
-                stage, unrun
-            ));
-        }
-        if !misplaced.is_empty() {
-            d_misplaced = true;
-            errors.push(format!(
-                "entering '{}' but on-disk amendments or active queue entries carry a bold marker spelling that does not open its line or is split across a line break:{}",
-                stage, misplaced
-            ));
-        }
+        };
+        record(af, scan_markers(&text, &|_| true));
+    }
+    let scope = active_entry_lines(&qtext, &k.active_sections);
+    record(&k.queue, scan_markers(&qtext, &|i| scope.get(i).copied().unwrap_or(false)));
+
+    // assertion E: the marker grammar, whatever the cursor — a marker whose command or reason is
+    // empty, or a misplaced spelling (lifecycle-kit/SPEC.md §check-stage-entry)
+    let e_fired = !malformed.is_empty() || !misplaced.is_empty();
+    if !malformed.is_empty() {
+        errors.push(format!(
+            "on-disk amendments or active queue entries carry a malformed inferred-claim marker — a not-run marker with no ' — <command>' or a cannot-run marker with no ' — <reason>':{}",
+            malformed
+        ));
+    }
+    if !misplaced.is_empty() {
+        errors.push(format!(
+            "on-disk amendments or active queue entries carry a bold marker spelling that does not open its line or is split across a line break:{}",
+            misplaced
+        ));
+    }
+
+    // assertion D: audit-entry refuses an on-disk amendment or active queue entry still carrying a
+    // well-formed not-run marker, audit stamp or not (lifecycle-kit/SPEC.md §check-stage-entry)
+    let d_fired = at_audit_entry && !residue.is_empty();
+    if d_fired {
+        errors.push(format!(
+            "entering '{}' but on-disk amendments or active queue entries carry not-run inferred-claim marker(s) nobody ran:{}",
+            stage, residue
+        ));
     }
 
     if !errors.is_empty() {
@@ -617,8 +632,8 @@ pub fn run(args: &[String]) -> i32 {
         if d_fired {
             println!("  help: at the stage the refused entry leaves the cursor at, run each marker's command, correct the passage or entry to what it returned and delete the marker — or rewrite it to '{} <claim> — <reason>' where the claim's subject does not exist until {}", CANNOT_RUN, k.audit_entry_stage);
         }
-        if d_misplaced {
-            println!("  help: a misplaced marker is fixed at its site — move the marker to open its own line, or write a mention of the spelling in a code span (`{}`)", NOT_RUN);
+        if e_fired {
+            println!("  help: a marker-grammar finding is fixed at its site, in the commit it refuses — write the missing ' — <command>' or ' — <reason>', move a misplaced marker to open its own line, or write a mention of the spelling in a code span (`{}`)", NOT_RUN);
         }
         return 1;
     }
@@ -636,7 +651,7 @@ pub fn run(args: &[String]) -> i32 {
     } else {
         format!("predecessor '{}' stamped", pred)
     };
-    if carried > 0 {
+    if at_audit_entry && carried > 0 {
         detail.push_str(&format!("; {} cannot-run claim(s) carried", carried));
     }
     println!("STAGE-ENTRY: clean ('{}' / '{}' — {})", iter, stage, detail);
@@ -672,9 +687,10 @@ mod tests {
     // backticked mention, and any line inside a fence, is prose
     #[test]
     fn a_marker_is_read_only_at_line_start_and_outside_a_fence() {
-        assert_eq!(inferred_marker("**Inferred, not run:** x — `cmd`"), Some(Marker::NotRun));
-        assert_eq!(inferred_marker("  - **Inferred, not run:** x — `cmd`"), Some(Marker::NotRun));
-        assert_eq!(inferred_marker("> **Inferred, not run:** x"), Some(Marker::NotRun));
+        let run = Some(Marker::NotRun { command_empty: false });
+        assert_eq!(inferred_marker("**Inferred, not run:** x — `cmd`"), run);
+        assert_eq!(inferred_marker("  - **Inferred, not run:** x — `cmd`"), run);
+        assert_eq!(inferred_marker("> **Inferred, not run:** x — `cmd`"), run);
         assert_eq!(inferred_marker("prose **Inferred, not run:** x"), None);
         assert_eq!(inferred_marker("- `**Inferred, not run:**` x"), None);
         assert_eq!(
@@ -692,47 +708,77 @@ mod tests {
         let text = "```\n**Inferred, not run:** a — `c`\n```\n**Inferred, cannot run before build:** b — why\n**Inferred, not run:** d — `c`\n";
         assert_eq!(
             scan_markers(text, &|_| true),
-            (vec!["5: **Inferred, not run:** d — `c`".to_string()], Vec::new(), 1)
+            MarkerScan {
+                residue: vec!["5: **Inferred, not run:** d — `c`".to_string()],
+                carried: 1,
+                ..Default::default()
+            }
         );
     }
 
-    // spec: lifecycle-kit/SPEC.md §check-stage-entry — a bold spelling D does not read as a marker is
+    // spec: lifecycle-kit/SPEC.md §check-stage-entry — either form's tail is the text after its last
+    // spaced em dash, trimmed; an absent separator or nothing after it is an empty tail
+    #[test]
+    fn either_marker_tail_is_read_after_the_last_spaced_em_dash() {
+        let not_run = |empty| Some(Marker::NotRun { command_empty: empty });
+        assert_eq!(inferred_marker("**Inferred, not run:** x — a — `cmd`"), not_run(false));
+        assert_eq!(inferred_marker("**Inferred, not run:** x"), not_run(true));
+        assert_eq!(inferred_marker("**Inferred, not run:** x — "), not_run(true));
+        assert_eq!(inferred_marker("**Inferred, not run:** x—`cmd`"), not_run(true));
+        assert_eq!(inferred_marker("**Inferred, not run:** x. `cmd`"), not_run(true));
+        assert_eq!(
+            inferred_marker("**Inferred, cannot run before build:** x. the gate is unwritten"),
+            Some(Marker::CannotRun { reason_empty: true })
+        );
+        let text = "**Inferred, not run:** a\n**Inferred, cannot run before build:** b\n**Inferred, not run:** c — `x`\n";
+        let scan = scan_markers(text, &|_| true);
+        assert_eq!(
+            scan.malformed,
+            vec![
+                "1: **Inferred, not run:** a".to_string(),
+                "2: **Inferred, cannot run before build:** b".to_string()
+            ]
+        );
+        assert_eq!((scan.residue.len(), scan.carried), (1, 0), "a malformed marker is never also residue");
+    }
+
+    // spec: lifecycle-kit/SPEC.md §check-stage-entry — a bold spelling E does not read as a marker is
     // misplaced: mid-line outside a code span, or split across a line break; a line-start marker is
     // read as before and never also counted as misplaced
     #[test]
     fn a_bold_spelling_that_is_no_marker_is_misplaced() {
-        let (unrun, bad, _) = scan_markers("prose **Inferred, not run:** x\n", &|_| true);
-        assert!(unrun.is_empty());
-        assert_eq!(bad, vec!["1: prose **Inferred, not run:** x".to_string()]);
-        let (_, bad, _) = scan_markers("prose `**Inferred, not run:**` x\nand ``**Inferred, cannot run before build:**`` y\n", &|_| true);
+        let s = scan_markers("prose **Inferred, not run:** x\n", &|_| true);
+        assert!(s.residue.is_empty() && s.malformed.is_empty());
+        assert_eq!(s.misplaced, vec!["1: prose **Inferred, not run:** x".to_string()]);
+        let bad = scan_markers("prose `**Inferred, not run:**` x\nand ``**Inferred, cannot run before build:**`` y\n", &|_| true).misplaced;
         assert!(bad.is_empty(), "{:?}", bad);
-        let (_, bad, _) = scan_markers("a claim **Inferred,\nnot run:** x — `c`\n", &|_| true);
+        let bad = scan_markers("a claim **Inferred,\nnot run:** x — `c`\n", &|_| true).misplaced;
         assert_eq!(bad, vec!["1: a claim **Inferred,".to_string()]);
-        let (_, bad, _) = scan_markers("**Inferred, cannot\nrun before build:** x — why\n", &|_| true);
+        let bad = scan_markers("**Inferred, cannot\nrun before build:** x — why\n", &|_| true).misplaced;
         assert_eq!(bad, vec!["1: **Inferred, cannot".to_string()]);
-        let (unrun, bad, _) = scan_markers("**Inferred, not run:** x — `c`\nnext line\n", &|_| true);
-        assert_eq!((unrun.len(), bad.len()), (1, 0));
-        let (_, bad, _) = scan_markers("a claim **Inferred,\n```\nnot run:** x\n```\n", &|_| true);
+        let s = scan_markers("**Inferred, not run:** x — `c`\nnext line\n", &|_| true);
+        assert_eq!((s.residue.len(), s.misplaced.len()), (1, 0));
+        let bad = scan_markers("a claim **Inferred,\n```\nnot run:** x\n```\n", &|_| true).misplaced;
         assert!(bad.is_empty(), "a split across a fence line is not joined: {:?}", bad);
         assert_eq!(code_spans("a `b` c ``d`e`` `unclosed"), vec![(2, 5), (8, 15)]);
     }
 
-    // spec: lifecycle-kit/SPEC.md §check-stage-entry — D reads a queue marker inside an active
+    // spec: lifecycle-kit/SPEC.md §check-stage-entry — D and E read a queue marker inside an active
     // entry only: a deferred entry's marker, a section preamble's and a fenced one are unread
     #[test]
     fn a_queue_marker_is_read_only_inside_an_active_entry_and_outside_a_fence() {
         let text = "## Technical Debt\n  **Inferred, not run:** preamble — `c`\n### a\n**Inferred, not run:** active — `c`\n#### a-sub\n**Inferred, not run:** sub — `c`\n```\n**Inferred, not run:** fenced — `c`\n```\n## Deferred\n### b\n**Inferred, not run:** deferred — `c`\n";
         let secs = vec!["New Features".to_string(), "Technical Debt".to_string()];
         let scope = active_entry_lines(text, &secs);
-        let (hits, _, n) = scan_markers(text, &|i| scope.get(i).copied().unwrap_or(false));
+        let s = scan_markers(text, &|i| scope.get(i).copied().unwrap_or(false));
         assert_eq!(
-            hits,
+            s.residue,
             vec![
                 "4: **Inferred, not run:** active — `c`".to_string(),
                 "6: **Inferred, not run:** sub — `c`".to_string()
             ]
         );
-        assert_eq!(n, 0);
+        assert_eq!(s.carried, 0);
     }
 
     // spec: lifecycle-kit/SPEC.md §check-stage-entry — `grep -oE` takes every non-overlapping
