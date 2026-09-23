@@ -1,6 +1,7 @@
 // spec: canon-kit/SPEC.md §check-measured-claim — a measured count or extent claim that names
 // an oracle agrees with it
 use crate::spec;
+use crate::spec::MeasuredSpan as Span;
 use crate::walk;
 use std::path::Path;
 
@@ -25,24 +26,6 @@ struct Marker {
     claim: Option<String>,
 }
 
-// spec: canon-kit/SPEC.md §check-measured-claim — `CANON_KIT_MEASURED_SPAN`, the claim a
-// full-line marker binds; an inline marker's span is its own sentence whatever this holds
-#[derive(Clone, Copy)]
-enum Span {
-    Paragraph,
-    Sentence,
-    Off,
-}
-
-fn span() -> Result<Span, String> {
-    match spec::knob_pub("CANON_KIT_MEASURED_SPAN")?.as_str() {
-        "paragraph" => Ok(Span::Paragraph),
-        "sentence" => Ok(Span::Sentence),
-        "off" => Ok(Span::Off),
-        v => Err(format!("CANON_KIT_MEASURED_SPAN must be paragraph|sentence|off (got '{}')", v)),
-    }
-}
-
 fn rule(args: &[String]) -> Result<i32, String> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
@@ -58,7 +41,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Ok(0);
     }
     let roster = spec::measured_claims()?;
-    let span = span()?;
+    let span = spec::measured_span()?;
 
     let mut files: Vec<String> = walk::glob_corpus(Path::new(root), &globs)?
         .into_iter()
@@ -218,13 +201,12 @@ fn block(
         push(line_of(m.at), joined[m.at..m.end].trim(), Some(sentence));
     }
     if let Some(h) = head {
-        let mut cuts = marks.clone();
-        cuts.extend(inline.iter().map(|m| m.sentence));
-        let rest = spec::text_without(&joined, &cuts);
         let claim = match span {
-            Span::Paragraph => Some(rest),
-            Span::Sentence => Some(spec::first_sentence(&rest).to_string()),
             Span::Off => None,
+            _ => {
+                let c = spec::full_line_claim(&joined, span);
+                Some(c.text[c.range.0..c.range.1].to_string())
+            }
         };
         push(h, lines[h].trim(), claim);
     }

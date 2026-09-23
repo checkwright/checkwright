@@ -78,9 +78,33 @@ check_case "uncompilable-ere-fails-closed" 2 "does not compile" uncompilable.kno
 check_case "no-vocabulary-is-clean"      0 "CANON_KIT_CLAIM_CLASSES_CMD unset" off.knobs
 check_case "declared-nothing-is-clean"   0 "declared no claim classes"         nothing.knobs
 
+# A full-line marker discharges exactly the claim it binds, the claim
+# check-measured-claim reads: the span narrows it, off leaves the whole block
+# bound, and a class match above a mid-paragraph marker is in no claim at all.
+for span in paragraph sentence off; do
+    { cat "$SANDBOX/ok.knobs"; echo "CANON_KIT_MEASURED_SPAN = $span"; } >"$SANDBOX/span-$span.knobs"
+done
+cat >"$SANDBOX/SPEC.md" <<'EOF'
+# consumer — SPEC
+
+<!-- measured: row-total=3 -->
+The table holds three rows. The engine is a small shell script.
+EOF
+check_case "span-sentence-leaves-sentence-two-unmarked" 1 "SPEC.md:4  falls in claim class 'engine-substrate'" span-sentence.knobs
+check_case "span-paragraph-discharges-sentence-two"     0 "UNMARKED-CLAIM: clean" span-paragraph.knobs
+check_case "span-off-discharges-the-block"              0 "UNMARKED-CLAIM: clean" span-off.knobs
+cat >"$SANDBOX/SPEC.md" <<'EOF'
+# consumer — SPEC
+
+The engine is a small shell script.
+<!-- measured: row-total=3 -->
+The table holds three rows.
+EOF
+check_case "text-above-a-mid-paragraph-marker-is-unmarked" 1 "SPEC.md:3  falls in claim class 'engine-substrate'" span-paragraph.knobs
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-unmarked-claim.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-unmarked-claim.test.sh: clean (every unreadable roster fails closed; an unset and an empty vocabulary are two distinct clean skips)"
+echo "check-unmarked-claim.test.sh: clean (every unreadable roster fails closed; an unset and an empty vocabulary are two distinct clean skips; a full-line marker discharges the claim its span binds and nothing above it)"
 exit 0

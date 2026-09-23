@@ -527,7 +527,8 @@ pub const REGISTRY: &[GateEntry] = &[
     ),
     // spec: canon-kit/SPEC.md §check-unmarked-claim — born native beside its family, and it
     // derives its corpus from check-measured-claim's glob surface rather than from
-    // `spec::manifest_files`: the knob set is that surface plus the class command
+    // `spec::manifest_files`: the knob set is that surface, the class command and the span
+    // whose claim a full-line marker discharges
     (
         "check-unmarked-claim",
         unmarked_claim::run,
@@ -537,6 +538,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "CANON_KIT_CLAIM_CLASSES_CMD",
             "CANON_KIT_MEASURED_SURFACE_GLOBS",
+            "CANON_KIT_MEASURED_SPAN",
         ],
         "canon-kit",
         &[("git", ""), ("?", "CANON_KIT_CLAIM_CLASSES_CMD")],

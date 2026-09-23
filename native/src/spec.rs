@@ -872,14 +872,52 @@ pub(crate) fn sentence_end(b: &[u8], t: usize) -> bool {
 
 // spec: canon-kit/SPEC.md §check-measured-claim — the `sentence` span: the text's first
 // sentence, its leading whitespace skipped and its terminator kept
-pub fn first_sentence(text: &str) -> &str {
+fn first_sentence_range(text: &str) -> (usize, usize) {
     let b = text.as_bytes();
     let mut s = 0usize;
     while s < b.len() && is_space(b[s]) {
         s += 1;
     }
     let e = (s..b.len()).find(|&t| sentence_end(b, t)).map_or(b.len(), |t| t + 1);
-    &text[s..e]
+    (s, e)
+}
+
+// spec: canon-kit/SPEC.md §check-measured-claim — `CANON_KIT_MEASURED_SPAN`, the claim a
+// full-line marker binds; an inline marker's span is its own sentence whatever this holds
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum MeasuredSpan {
+    Paragraph,
+    Sentence,
+    Off,
+}
+
+pub fn measured_span() -> Result<MeasuredSpan, String> {
+    match knob_pub("CANON_KIT_MEASURED_SPAN")?.as_str() {
+        "paragraph" => Ok(MeasuredSpan::Paragraph),
+        "sentence" => Ok(MeasuredSpan::Sentence),
+        "off" => Ok(MeasuredSpan::Off),
+        v => Err(format!("CANON_KIT_MEASURED_SPAN must be paragraph|sentence|off (got '{}')", v)),
+    }
+}
+
+// spec: canon-kit/SPEC.md §check-unmarked-claim — the claim a full-line marker binds, one
+// reading for both gates: its block less marker text and inline-bound sentences, narrowed to
+// the first sentence at `sentence` and whole at `paragraph` and at `off`
+pub struct BoundClaim {
+    pub text: String,
+    pub range: (usize, usize),
+}
+
+pub fn full_line_claim(block: &str, span: MeasuredSpan) -> BoundClaim {
+    let inline = inline_markers(block);
+    let mut cuts: Vec<(usize, usize)> = inline.iter().map(|m| (m.at, m.end)).collect();
+    cuts.extend(inline.iter().map(|m| m.sentence));
+    let text = text_without(block, &cuts);
+    let range = match span {
+        MeasuredSpan::Sentence => first_sentence_range(&text),
+        MeasuredSpan::Paragraph | MeasuredSpan::Off => (0, text.len()),
+    };
+    BoundClaim { text, range }
 }
 
 // spec: canon-kit/SPEC.md §check-measured-claim — marker text is never part of any claim, and
@@ -1612,6 +1650,10 @@ mod tests {
 
     #[test]
     fn the_first_sentence_ends_at_a_terminator_followed_by_whitespace() {
+        let first_sentence = |t: &'static str| {
+            let (s, e) = first_sentence_range(t);
+            &t[s..e]
+        };
         assert_eq!(first_sentence("   One v1.2 row. Two has 3."), "One v1.2 row.");
         assert_eq!(first_sentence("No terminator"), "No terminator");
         assert_eq!(first_sentence("Ends here."), "Ends here.");

@@ -8,18 +8,6 @@
 
 ## New Features
 
-### unmarked-discharge-vs-span
-
-[spec: SPEC-discharge-span.md]
-
-`check-unmarked-claim` discharges a class match anywhere in a full-line marker's paragraph, while `CANON_KIT_MEASURED_SPAN` at `sentence` narrows `check-measured-claim` arm C to the paragraph's first sentence. So under `sentence` a claim in a later sentence reads as marked though arm C no longer reads it. canon-kit/SPEC.md §check-unmarked-claim states the divergence; whether the discharge should follow the span is unruled.
-
-**Deliverable:** a ruling, and the discharge walk made to follow the span or the divergence grounded as intended.
-
-**Specified 2026-09-23:** a full-line marker discharges exactly the claim it binds, read through one helper both gates share. That claim is the text below the marker, narrowed by the span, and it is the whole block at `off`. A second divergence was found at authoring and is closed with it: a mid-paragraph marker discharged class matches above it at every span.
-
-**Cost while deferred:** nothing reds or passes differently on this tree, whose four full-line markers carry a non-cardinal value; an adopter binding `sentence` gets a discharge wider than the check. Filed 2026-09-23 to the gap inbox by `consumer-policy-seam`'s build; promoted at its close, because the answer is a semantic ruling.
-
 ### policy-choice-census-residue
 
 [spec: SPEC-policy-residue.md]
@@ -1690,5 +1678,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - docs-mirror-root-unrelocatable
 - couples-literals-undisposed
 - suite-corpus-skips-tests-dir
+- unmarked-discharge-vs-span
 
 ## Lessons Learned
