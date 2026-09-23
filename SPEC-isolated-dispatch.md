@@ -21,6 +21,19 @@ The unit's scope carries the directions recorded on its queue entry:
    - **D4.** A new dispatch rule, armed by a consumer's `DELEGATION_KIT_MUTATING_TYPES`, blocks an unisolated dispatch of any type outside that roster.
    - **File-tool writes: the harness's check, kept rather than duplicated.** The harness already refuses an isolated child's file-tool write to any main-checkout path, measured below. A kit hook doing the same would be a second copy that could only disagree.
    - **Rule 27, and the journal.** A new guard-kit rule refuses a Bash command from a linked-worktree session that names a main-checkout path outside the main scratch dir. So an isolated child's one sanctioned write, its journal, goes by a shell append into that scratch dir.
+
+   **Escalated pending design (2026-09-23).** Align's own read probe (above) found rule 27 as drafted over-refuses: Grep and Glob are absent from this harness build's toolset for an isolated child, so a search over the untracked corpus (as opposed to a read of one named path) has no route but Bash, and rule 27 blocks every Bash command naming a main-checkout path outright — a finding against this delta and rule 27's text below.
+
+   **Operator direction, 2026-09-23, lead-relayed, widening rule 27 and this delta's envelope:** "Instead of fully blocking bash we could allow only certain read-only bash commands that we can advertise to sub-agent as available and the error message when running other commands could suggest the same." Concretely, rule 27's read half is no longer a blanket refusal:
+   - it admits a declared set of read-only commands over main-checkout paths for an isolated child, and refuses everything else;
+   - the admitted set is advertised to the child — the read-only agent type's definition and/or the dispatch protocol names it as available;
+   - the refusal message names the admitted set as the lawful alternative (guard-kit already requires every block message to name one);
+   - whether the set is kit-shipped or consumer-bound is checked against doctrine-kit's Policy-as-choice and De-literalization rules, and whichever the owning surfaces rule is what lands;
+   - the write half of rule 27 is unchanged.
+
+   **Addendum, 2026-09-23, lead-relayed, operator DIRECTION: the allowlist is stated interim.** The read-only Bash allowlist above is this unit's whole answer and stands as such — it is explicitly not the operator's longer track, which is side-effect-free tools of this project's own, replacing Bash for read-only agents, seeded from gate-sdk's `FENCE_SAFE_ARMS` set (gate-sdk/SPEC.md §The arm table: no network spawn, writes nowhere but its working tree and stdout). That track is filed by the lead as a Deferred entry, not built in this unit. The redesign owed here (above) states the allowlist as interim and names the future tools track as its planned successor, so the advertised set and the refusal message can later point at those tools instead. Nothing for the tools track is authored here.
+
+   **Not authored here.** Choosing the admitted set's grammar, its owner (kit-shipped vs. consumer knob), and how it composes with D4/D5 and the journal-append path is design work outside align's tier on this dispatch — journaled and escalated for a judgment-tier re-dispatch rather than authored at this tier. The rule 27 spec text below (delta 4) and delta 3's summary above are therefore **unrevised and superseded pending that redesign**; do not treat them as the shipped shape of rule 27's read half.
 4. **The tier is chosen.** A new dispatch rule, D5, is armed by a policy knob. It blocks a dispatch that carries no `model` and whose type has no tracked definition stating `model:`. A read-only type's stated default is its own definition's field.
 
 **Honest limits, stated rather than left to be found**:
@@ -47,7 +60,7 @@ The unit's scope carries the directions recorded on its queue entry:
   - **File-tool writes.** A Write-tool write to the main checkout's root, and one to its scratch dir, was each refused by the harness: "This agent is isolated in the worktree …; Edit the worktree copy of this file instead of the shared-checkout path."
   - **The base.** The child's worktree base was `origin/master`, not the dispatcher's HEAD. That is isolation cost (1)'s default base, in a session loading no project `worktree.baseRef`.
 - **Harness hooks run with the worktree as cwd.** The gate-sdk-blind-spots finding that every binary-backed hook fell open inside an isolated dispatch is that fact seen from its other side.
-- **Inferred, not run:** an isolated child's Read and Grep tools reach a named main-checkout path — `claude -p --setting-sources "" --permission-mode acceptEdits` over a prompt that dispatches one `isolation: worktree` child to Read the first line of an untracked main-checkout file and Grep a gitignored one, reporting each as allowed or refused.
+- **Measured (2026-09-23), by the lead, operator-approved** (`claude -p --setting-sources "" --permission-mode acceptEdits` dispatching one `isolation: worktree` `general-purpose` child to Read an untracked main-checkout file and use its Grep and Glob tools on a gitignored one): Read on a named main-checkout path is **allowed**. Grep and Glob are **absent from this harness build's toolset** — "tool not available in this session" — which is a missing-capability answer, not a path refusal. So a child that needs to *search* the untracked corpus rather than read one named path has no tool for it, and reaches for Bash — which guard rule 27 as drafted refuses outright for any command naming a main-checkout path. **Escalated pending design (2026-09-23)** — see below, after "Confinement is a chokepoint, not a sentence."
 
 ## What changes
 
@@ -123,7 +136,9 @@ In the same section, §The turn-end liveness hook's closing narrowing — "That 
 
   Beside it goes a paragraph stating the ground: D2 holds a named read-only type to isolation, and D4 closes the complement. A type nobody declared mutating is confined by default, so reaching past isolation takes a named choice.
 
-- **The Bash rule.** guard-kit's generic ruleset gains rule 27, `guard_rule_worktree_confinement`, appended so nothing renumbers. From a linked-worktree cwd, it blocks a command carrying a path token, `git -C` target included, that resolves into the main checkout outside the main scratch dir. The corrective names the read tools for a read and the scratch-dir journal for a write.
+- **The Bash rule — superseded pending redesign (see "Escalated pending design", above).** The text below blocks every Bash command naming a main-checkout path, read or write alike. Align's probe found that over-refuses reads: Grep and Glob are absent from an isolated child's toolset, so a Bash-only search over the untracked corpus has no lawful route under this text, and the operator has directed a widened read half (a declared, advertised, read-only command allowlist) that a judgment-tier session still owes. The write half — blocking everything outside the scratch-dir journal append — is unchanged by that direction.
+
+  guard-kit's generic ruleset gains rule 27, `guard_rule_worktree_confinement`, appended so nothing renumbers. From a linked-worktree cwd, it blocks a command carrying a path token, `git -C` target included, that resolves into the main checkout outside the main scratch dir. The corrective names the read tools for a read and the scratch-dir journal for a write.
 
   In guard-kit/SPEC.md §The generic ruleset, append:
 
@@ -215,7 +230,7 @@ Roster from `grep -n "gate_harness_bin\|four harness costs\|not delegable\|owes 
 - `native/src/gates/crate_arms.rs` and `gate-sdk/SPEC.md` §check-crate-arms (delta 2).
 - `delegation-kit/templates/agent-execution.md` (deltas 3 and 6).
 - `delegation-kit/SPEC.md` §The delegation model and §The turn-end liveness hook (deltas 3, 4, 5 and 8).
-- `delegation-kit/SPEC.md` §Resume journal and §Layout and configuration (deltas 4, 5 and 6).
+- `delegation-kit/SPEC.md` §Resume journal, §Layout and configuration and §Testing (deltas 4, 5 and 6).
 - `native/src/hook/dispatch.rs` and `native/src/knobs/delegation_kit.rs` (deltas 4 and 5).
 - `guard-kit/lib/guard.sh`, `guard-kit/SPEC.md` §The generic ruleset and `guard-kit/guard-tests/cases.tsv` (delta 4).
 - `.claude/agents/audit-sweep.md` (delta 6).
