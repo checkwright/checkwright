@@ -630,7 +630,7 @@ every binary-backed harness hook is inert inside a worktree-isolated dispatch. `
 
 **Deliverable:** the hook front end resolves the binary from the main checkout (`git rev-parse --git-common-dir`) when its cwd is a linked worktree, or a stated refusal to; plus a fixture proving the fork ban fires from inside a linked worktree. The choice is design work: a main-checkout binary can be built from a different tree than the worktree's.
 
-**Inferred, not run:** that the bash guard and the workflow-state guard are inert there too — run each from a scratch `git worktree add` with no `native/target`.
+**Run 2026-09-23 at scope, and wider than filed:** from a scratch `git worktree add` with no `native/target`, the bash guard, the workflow-state guard and the dispatch guard each exit 0 on a payload each blocks from the main checkout.
 
 **DISTINCT from** the icebox's [worktree-dispatch-rebuilds-the-gate-binary](#worktree-dispatch-rebuilds-the-gate-binary) (the cold-build cost of the same missing binary) and [worktree-isolated-dispatch-cannot-reach-the-main-checkout](#worktree-isolated-dispatch-cannot-reach-the-main-checkout) (the bridge question); this entry's subject is a guard failing open, which neither names.
 
