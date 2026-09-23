@@ -54,20 +54,6 @@ The same literal class in the `# projection:` field is filed to the gap inbox.
 
 **Admitted by operator exception to the enhancement admission filter, operator direction 2026-09-23 (lead-relayed):** a suite-corpus widening reaching none of the filter's arms, it joins `gate-sdk-blind-spots` on the surface that unit already carries, at no extra stage.
 
-### smoke-registry-omission-blind
-
-[spec: SPEC-smoke-registry.md]
-
-`check-gate-substrate-parity` assertion I holds the *consumer's* `scripts/gates.list` against the binary's owned-subcommand roster, but it reads `gate-sdk/smoke/install.sh`'s embedded registry only when it runs inside the scratch consumer, so in the authoring repo nothing reads that heredoc. `check-action-job-ref` landed in `39e92816` touching every roster site except that one, and the miss surfaced three commits later as three red validate suites, repaired at `d683ada3`.
-
-**Deliverable:** a precommit-tier assertion that every kit's `smoke/install.sh` registry-plus-`# unregistered:` set covers that kit's owned subcommands in the binary registry.
-
-**Specified 2026-09-23:** assertion J in `check-gate-substrate-parity`. It runs assertion I's comparison per kit, against that kit's registry heredoc and its owned members, and is scoped to the publishing tree. The filed inferred claim was run: a heredoc-split probe over all eleven kits against `--list`'s owner column found registered plus declared equal to owned in every kit. drift-kit owns none and carries no heredoc. Finding the heredoc needs one small opener reader beside `registry::members`. The stale "Eight assertions" count, which listed nine, is corrected to ten.
-
-**Cost while deferred:** each new kit-owned subcommand can miss the site, and the catcher stays three validate suites away from the cause. Filed 2026-09-22 by validate.
-
-**Admitted by operator exception to the enhancement admission filter, operator direction 2026-09-23 (lead-relayed):** an authoring-tree assertion reaching none of the filter's arms, it joins `gate-sdk-blind-spots` on the surface that unit already carries, at no extra stage.
-
 ## Technical Debt
 
 ## Deferred
@@ -1650,5 +1636,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - shell-textual-absoluteness-single-dialect
 - ps1-ascii-unheld-at-commit
 - armed-by-content-emptiness-shape
+- smoke-registry-omission-blind
 
 ## Lessons Learned

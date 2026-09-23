@@ -251,6 +251,55 @@ fn registration_parity(
     v
 }
 
+// spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion J for one kit, as a value: the
+// smoke script's text, the roster and the kit's own shell members are everything it reads
+struct SmokeVerdict {
+    registered: usize,
+    declared: usize,
+    findings: Vec<String>,
+}
+
+fn smoke_registry_parity(
+    kit: &str,
+    smoke: &str,
+    text: &str,
+    roster: &[(String, String)],
+    own_shell: &[String],
+) -> SmokeVerdict {
+    let owned: Vec<(String, String)> = roster.iter().filter(|(_, o)| o == kit).cloned().collect();
+    let mut v = SmokeVerdict {
+        registered: 0,
+        declared: 0,
+        findings: Vec::new(),
+    };
+    let bodies = registry::smoke_registry_bodies(text);
+    let body = match bodies.as_slice() {
+        [b] => b,
+        [] if owned.is_empty() => return v,
+        [] => {
+            v.findings.push(format!("no smoke registry: {} carries no `cat … gates.list <<` heredoc, but {} owns {} subcommand(s) — the kit's slice of the scratch consumer's registry is written nowhere a commit can read", smoke, kit, owned.len()));
+            return v;
+        }
+        _ => {
+            v.findings.push(format!("{} smoke registries: {} carries {} `cat … gates.list <<` heredocs where a kit writes its slice of the scratch consumer's registry once", bodies.len(), smoke, bodies.len()));
+            return v;
+        }
+    };
+    let members = registry::members(body);
+    let declarations = registry::unregistered_declarations(body);
+    let reg = registration_parity(smoke, &members, &[], &owned, &declarations, &[kit.to_string()], true);
+    v.declared = reg.declared;
+    v.findings = reg.findings;
+    v.registered = owned.iter().filter(|(n, _)| members.contains(n)).count();
+    for m in &members {
+        if owned.iter().any(|(n, _)| n == m) || own_shell.contains(m) {
+            continue;
+        }
+        v.findings.push(format!("foreign smoke registration: {} registers '{}', which {} does not own — no leg registers another kit's member", smoke, m, kit));
+    }
+    v
+}
+
 // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion G's report, one finding per
 // shape fault, in the gate's existing per-finding shape. One formatter for both corpora, so a
 // malformed declaration reads the same wherever it sits.
@@ -749,6 +798,37 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let unregistered_declared = reg.declared;
     ctx.findings.extend(reg.findings);
 
+    // assertion J: each kit's smoke registry heredoc against the kit's owned subcommands, read in
+    // the publishing tree where assertion I only ever reads it second-hand, inside the scratch
+    // consumer
+    // spec: gate-sdk/SPEC.md §check-gate-substrate-parity
+    let (mut j_kits, mut j_registered, mut j_declared, mut j_smokeless) = (0usize, 0usize, 0usize, 0usize);
+    if publishing {
+        for root in &kit_roots {
+            let root = root.trim_end_matches('/');
+            let kit = root.rsplit('/').next().unwrap_or(root);
+            let smoke = format!("{}/smoke/install.sh", root);
+            if !Path::new(&smoke).is_file() {
+                j_smokeless += 1;
+                continue;
+            }
+            j_kits += 1;
+            let own_shell: Vec<String> = walk::glob_entries(&format!("{}/checks/*.sh", root))
+                .iter()
+                .filter_map(|f| f.rsplit('/').next()?.strip_suffix(".sh").map(String::from))
+                .collect();
+            let v = smoke_registry_parity(kit, &smoke, &read(&smoke)?, &roster, &own_shell);
+            j_registered += v.registered;
+            j_declared += v.declared;
+            ctx.findings.extend(v.findings);
+        }
+    }
+    let j_state = if publishing {
+        format!("assertion J read {j_kits} kit smoke registry script(s), {j_registered} owned member(s) registered there and {j_declared} declared '# unregistered:' with none omitted or foreign, {j_smokeless} kit root(s) shipping no smoke script")
+    } else {
+        "assertion J out of scope here, this tree publishing no kit smoke registry: 0 kit smoke registry script(s) read".to_string()
+    };
+
     // assertion C: every derived substrate-sensitive member carries a disposition in
     // the conservation section — the anti-vacuity assertion, so a new meta-gate over
     // gate source reds until its disposition is recorded
@@ -904,7 +984,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     println!(
-        "GATE-SUBSTRATE-PARITY: clean ({declared} member(s) with one declaration each, {dispatching} of them dispatching to the binary; {noport_declared} of the {declpaths_shell} shell declaration(s) declare '# no-port:' with a cause and {portuntil_declared} declare '# port-until:' with a slug, neither on any descriptor nor both on one declaration; the tracked shell tree beyond that set {tree_state}, {tree_scanned} file(s) read for header-declaration shape and {tree_declared} of them declaring, counted apart from the declaration set so an empty one stays visible; {portuntil_grounded} of those held declaration(s) reach their ground in one hop, the section their own '# spec:' field names stating the hold; {ndesc} descriptor(s) in parity with the {nsub}-subcommand roster ({in_scope} in scope, {out_of_scope} out of scope — an unvendored kit, or a consumer declaration from another tree), {refonly} reference-only; {unregistered_declared} in-scope subcommand(s) unregistered in {list} with a declared reason and none undeclared, the reverse direction empty; {sensitive} substrate-sensitive member(s) all dispositioned; {impl_scanned} implementation source(s) free of manifest-class annotation; {kit_scanned} kit root(s) scanned for an implementation sibling, crate root {crate_dir} outside every kit root; target roster {roster_state} at {roster_file} with {roster_targets} well-formed target(s); publish workflow(s) read: {wf_read_list}; absent: {wf_absent_list}; {wf_matrix} matrix declaration(s) roster-derived across {wf_jobs} job(s) with one producer per digest, {wf_followed_n} called script(s) read one hop deep)",
+        "GATE-SUBSTRATE-PARITY: clean ({declared} member(s) with one declaration each, {dispatching} of them dispatching to the binary; {noport_declared} of the {declpaths_shell} shell declaration(s) declare '# no-port:' with a cause and {portuntil_declared} declare '# port-until:' with a slug, neither on any descriptor nor both on one declaration; the tracked shell tree beyond that set {tree_state}, {tree_scanned} file(s) read for header-declaration shape and {tree_declared} of them declaring, counted apart from the declaration set so an empty one stays visible; {portuntil_grounded} of those held declaration(s) reach their ground in one hop, the section their own '# spec:' field names stating the hold; {ndesc} descriptor(s) in parity with the {nsub}-subcommand roster ({in_scope} in scope, {out_of_scope} out of scope — an unvendored kit, or a consumer declaration from another tree), {refonly} reference-only; {unregistered_declared} in-scope subcommand(s) unregistered in {list} with a declared reason and none undeclared, the reverse direction empty; {j_state}; {sensitive} substrate-sensitive member(s) all dispositioned; {impl_scanned} implementation source(s) free of manifest-class annotation; {kit_scanned} kit root(s) scanned for an implementation sibling, crate root {crate_dir} outside every kit root; target roster {roster_state} at {roster_file} with {roster_targets} well-formed target(s); publish workflow(s) read: {wf_read_list}; absent: {wf_absent_list}; {wf_matrix} matrix declaration(s) roster-derived across {wf_jobs} job(s) with one producer per digest, {wf_followed_n} called script(s) read one hop deep)",
         ndesc = descriptors.len(),
         nsub = roster.len(),
         in_scope = verdict.in_scope,
@@ -1046,6 +1126,49 @@ mod tests {
         );
         assert!(v.findings.is_empty(), "{:?}", v.findings);
         assert_eq!(v.declared, 1);
+    }
+
+    fn smoke(body: &str, roster: &[(&str, &str)], own_shell: &[&str]) -> SmokeVerdict {
+        let text = format!("#!/usr/bin/env bash\ncat >> scripts/gates.list <<'EOF'\n{}EOF\n", body);
+        smoke_registry_parity("kitroot", "kitroot/smoke/install.sh", &text, &rows(roster), &strs(own_shell))
+    }
+
+    const KIT_ROSTER: &[(&str, &str)] =
+        &[("check-one", "kitroot"), ("check-two", "kitroot"), ("check-other", "otherkit")];
+
+    // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion J's forward arm over the whole
+    // owned roster: registered or declared clears, omitted reds, and another kit's member is no
+    // member of this kit's roster at all
+    #[test]
+    fn a_kit_smoke_registry_covers_its_owned_subcommands_and_only_those() {
+        let v = smoke("check-one\n# unregistered: check-two — needs a surface\n", KIT_ROSTER, &[]);
+        assert!(v.findings.is_empty(), "{:?}", v.findings);
+        assert_eq!((v.registered, v.declared), (1, 1));
+
+        let v = smoke("check-one\n", KIT_ROSTER, &[]);
+        assert_eq!(v.findings.len(), 1, "{:?}", v.findings);
+        assert!(v.findings[0].starts_with("registered nowhere: the binary carries 'check-two' and kitroot/smoke/install.sh"));
+
+        let v = smoke("check-one\ncheck-two\ncheck-other\ncheck-shell\n", KIT_ROSTER, &["check-shell"]);
+        assert_eq!(v.findings.len(), 1, "{:?}", v.findings);
+        assert!(v.findings[0].starts_with("foreign smoke registration: kitroot/smoke/install.sh registers 'check-other'"));
+
+        let v = smoke("check-one\ncheck-two\n# unregistered: check-two — stale\n", KIT_ROSTER, &[]);
+        assert!(v.findings.iter().any(|f| f.starts_with("stale unregistered declaration")), "{:?}", v.findings);
+    }
+
+    // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — a kit owning subcommands owes exactly one
+    // registry heredoc, and a kit owning none owes none
+    #[test]
+    fn an_owning_kit_carries_exactly_one_smoke_registry() {
+        let roster = rows(KIT_ROSTER);
+        let none = smoke_registry_parity("kitroot", "s", "#!/usr/bin/env bash\n", &roster, &[]);
+        assert!(none.findings[0].starts_with("no smoke registry: s"), "{:?}", none.findings);
+        let one = "cat >> scripts/gates.list <<'EOF'\ncheck-one\ncheck-two\nEOF\n";
+        let two = smoke_registry_parity("kitroot", "s", &format!("{}{}", one, one), &roster, &[]);
+        assert!(two.findings[0].starts_with("2 smoke registries: s"), "{:?}", two.findings);
+        let owns_none = smoke_registry_parity("emptykit", "s", "#!/usr/bin/env bash\n", &roster, &[]);
+        assert!(owns_none.findings.is_empty());
     }
 
     // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the scope clause is assertion B's, so

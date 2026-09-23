@@ -163,6 +163,7 @@
 - `check-path-dialect` — gains a shell locality half: a `[[ … == /* ]]` glob test or a `case` alternative that is exactly `/*` reds in any tracked shell file outside `gate_path_rooted`'s own body, because it reads a drive-rooted path as relative. Route the test through `gate_path_rooted "$x"` from `gate-sdk/lib/gate.sh`, or, where the value is not a filesystem path, mark the line `# path-dialect-exempt: <reason>`.
 - `check-portability-floor` — gains an ASCII arm: a non-ASCII byte outside a full-line `#` comment in any `.ps1` on your configured install-path corpus now reds, even with an empty construct roster, because Windows PowerShell 5.1 reads a BOM-less script in the ANSI code page. Spell the character by code point (`[char]0x2014`), or move a trailing comment onto its own line; there is no valve.
 - `check-install-disposition` — assertion D accepts and verifies the content form `# armed-by: content <KNOB>…`: a `content` with no knob after it reds, and so does any knob in its list that no static kit declares or that another kit owns. Give each content declaration at least one knob of the gate's own kit.
+- `check-gate-substrate-parity` — gains assertion J, in a publishing tree only (one tracking the crate source): each kit's `smoke/install.sh` registry heredoc must register or declare `# unregistered:` every subcommand that kit owns, and register none it does not. A vendored tree is out of scope and unaffected; a kit author adds each new owned gate to the heredoc.
 
 ## Renamed knobs
 

@@ -37,7 +37,7 @@ Several docs surfaces are generated and byte-gated for freshness; each gate's re
   - `docs/enforcement.md`, which the gate joins as a class-registry member (`bash gate-sdk/bin/run-gates.sh --emit enforcement-map > docs/enforcement.md`);
   - `docs/value.md`'s rollup block, derived from that map (`bash gate-sdk/bin/run-gates.sh --emit value-rollup --write`);
   - `docs/check-graph.html` (`bash gate-sdk/bin/run-gates.sh --emit graph > docs/check-graph.html`);
-  - the owning kit's `smoke/install.sh` expected-gate roster, hand-maintained, so a new gate is added there or carries a `smoke-unregistered:` declaration (`gate-sdk/SPEC.md` §Consumer smoke owns which);
+  - the owning kit's `smoke/install.sh` registry heredoc, registering the gate or declaring it `# unregistered:` (`check-gate-substrate-parity` assertion J); `gate-sdk/SPEC.md` §Consumer smoke rules when an omission also owes `# smoke-unregistered:`;
   - `.workflow/surface-ceiling.txt`, since `check-surface-ratchet` governs the `docs/` pages and `docs/enforcement.md` grows by the new row (`bash gate-sdk/bin/run-gates.sh --emit always-loaded --ceiling`);
   - for a hook-tier gate, the generated hooks (`bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`);
   - for a freshness gate, a `# projection: <outputs>` header line, which makes its keyed row on this roster mandatory (`check-projection-roster` holds both; gate-sdk/SPEC.md §check-projection-roster owns the key).

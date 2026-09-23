@@ -45,6 +45,76 @@ pub fn unregistered_declarations(text: &str) -> Vec<(String, String)> {
     out
 }
 
+// spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion J's heredoc reader: the body of
+// every column-0 `cat` whose `>`/`>>` target's basename is `gates.list` and which opens a `<<`
+// heredoc, in file order, each body running to the line equal to its delimiter
+pub fn smoke_registry_bodies(text: &str) -> Vec<String> {
+    let lines = fresh::file_lines(text);
+    let mut out: Vec<String> = Vec::new();
+    let mut i = 0;
+    while i < lines.len() {
+        let Some((delim, strip_tabs)) = registry_heredoc_opener(lines[i]) else {
+            i += 1;
+            continue;
+        };
+        let mut body: Vec<&str> = Vec::new();
+        i += 1;
+        while i < lines.len() {
+            let l = if strip_tabs { lines[i].trim_start_matches('\t') } else { lines[i] };
+            if l == delim {
+                break;
+            }
+            body.push(lines[i]);
+            i += 1;
+        }
+        out.push(body.join("\n"));
+        i += 1;
+    }
+    out
+}
+
+// spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the opener's delimiter, quotes removed, and
+// whether `<<-` strips the terminator's leading tabs; the redirect and the heredoc in either order
+fn registry_heredoc_opener(line: &str) -> Option<(String, bool)> {
+    let words: Vec<&str> = line.split_whitespace().collect();
+    if words.first() != Some(&"cat") || line.starts_with(char::is_whitespace) {
+        return None;
+    }
+    let (mut target, mut heredoc): (Option<&str>, Option<(String, bool)>) = (None, None);
+    let mut k = 1;
+    while k < words.len() {
+        let w = words[k];
+        if let Some(rest) = w.strip_prefix("<<") {
+            let (rest, strip) = match rest.strip_prefix('-') {
+                Some(r) => (r, true),
+                None => (rest, false),
+            };
+            let raw = if rest.is_empty() {
+                k += 1;
+                words.get(k).copied().unwrap_or("")
+            } else {
+                rest
+            };
+            let d = raw.trim_matches(|c| c == '\'' || c == '"');
+            if !d.is_empty() {
+                heredoc = Some((d.to_string(), strip));
+            }
+        } else if let Some(rest) = w.strip_prefix(">>").or_else(|| w.strip_prefix('>')) {
+            let t = if rest.is_empty() {
+                k += 1;
+                words.get(k).copied().unwrap_or("")
+            } else {
+                rest
+            };
+            target = Some(t.trim_matches(|c| c == '\'' || c == '"'));
+        }
+        k += 1;
+    }
+    let target = target?;
+    (target.rsplit('/').next() == Some("gates.list")).then_some(())?;
+    heredoc
+}
+
 // spec: gate-sdk/SPEC.md §lib/gate.sh — `gate_resolve`: dirs consumer-first, `.sh` beating `.gate`
 // *within* a dir, so a consumer shadowing a ported member with its own shell script still wins
 pub fn resolve(name: &str, dirs: &[String]) -> Option<String> {
@@ -701,6 +771,18 @@ pub fn expand_couples(field: &str, kit_roots_rel: &[String]) -> Result<String, S
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_smoke_registry_body_is_the_gates_list_heredoc_and_nothing_else() {
+        let text = "#!/usr/bin/env bash\nmkdir -p scripts\ncat >> scripts/gates.list <<'EOF'\n# kit\ncheck-a\n\
+                    # unregistered: check-b — why\nEOF\ncat > notes.txt <<'EOF'\ncheck-z\nEOF\n\
+                    printf 'check-y\\n' > \"$q/gates.list\"\n  cat > scripts/gates.list <<EOF\ncheck-x\nEOF\n";
+        let got = smoke_registry_bodies(text);
+        assert_eq!(got, vec!["# kit\ncheck-a\n# unregistered: check-b — why".to_string()]);
+        let other_order = "cat <<\"END\" > gates.list\ncheck-a\nEND\ncat >>scripts/gates.list <<-EOF\ncheck-b\n\tEOF\n";
+        assert_eq!(smoke_registry_bodies(other_order), vec!["check-a".to_string(), "check-b".to_string()]);
+        assert!(smoke_registry_bodies("cat scripts/gates.list\n").is_empty());
+    }
 
     #[test]
     fn an_arming_value_is_a_bare_knob_or_content_and_its_knobs() {

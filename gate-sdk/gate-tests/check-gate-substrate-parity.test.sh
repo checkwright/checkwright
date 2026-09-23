@@ -57,7 +57,7 @@ OUT="$tmp/case-output"
 run_case() {  # run_case <label> <sandbox> <want-rc> <substring>
     local label="$1" d="$2" want="$3" substr="$4" rc
     cases=$((cases + 1))
-    ( cd "$d" && env GATE_SDK_KIT_DIRS=kitroot GATE_SDK_NATIVE_CRATE=crate \
+    ( cd "$d" && env GATE_SDK_KIT_DIRS="${KITDIRS:-kitroot}" GATE_SDK_NATIVE_CRATE=crate \
         GATE_SDK_NATIVE_SRC=impl \
         bash -c 'source "$1"; gate_run check-gate-substrate-parity "$2" scripts conservation.md' \
         bash "$DIR/lib/test-hermetic.sh" "$DIR/checks" ) > "$OUT" 2>&1
@@ -191,9 +191,63 @@ mkdir -p "$G/crate"
 printf 'fn main() {}\n' > "$G/crate/main.src"
 run_case tree-no-repo "$G" 0 '0 file(s) read for header-declaration shape and 0 of them declaring'
 
+# --- H: assertion J, each kit's smoke registry heredoc against the kit's owned subcommands ---
+# Neither fixture case publishes, so the pair cannot reach J, for the reason E names for G's tree
+# half. The kit root is named for a real kit so the binary's owner column answers for it, its
+# descriptors and the consumer's are copied in so assertion B has nothing to say, and every
+# in-scope subcommand is declared unregistered so assertion I is quiet and nothing dispatches.
+REGISTRY_HEREDOC="cat >> scripts/gates.list <<'EOF'
+# site-kit
+$(for g in "$REPO"/site-kit/checks/*.gate; do n="${g##*/}"; printf '%s\n' "${n%.gate}"; done)
+EOF
+"
+smoke_sandbox() {  # smoke_sandbox <label> <smoke-body> [publishing: 1|0]
+    local d g n
+    d="$(make_sandbox "$1")"
+    mkdir -p "$d/site-kit/checks" "$d/site-kit/smoke" "$d/crate"
+    cp "$REPO"/site-kit/checks/*.gate "$d/site-kit/checks/"
+    cp "$REPO"/scripts/*.gate "$d/scripts/"
+    {
+        printf 'check-alpha\n'
+        for g in "$d"/site-kit/checks/*.gate "$d"/scripts/*.gate; do
+            n="${g##*/}"
+            printf '# unregistered: %s — sandbox\n' "${n%.gate}"
+        done
+    } > "$d/scripts/gates.list"
+    printf '#!/usr/bin/env bash\nset -euo pipefail\n%s' "$2" > "$d/site-kit/smoke/install.sh"
+    printf 'fn main() {}\n' > "$d/crate/main.src"
+    git -C "$d" init -q
+    git -C "$d" add scripts site-kit
+    if [[ "${3:-1}" == 1 ]]; then git -C "$d" add crate/main.src; fi
+    printf '%s\n' "$d"
+}
+KITDIRS=site-kit
+H1="$(smoke_sandbox smoke-covered "$REGISTRY_HEREDOC")"
+run_case smoke-covered "$H1" 0 "assertion J read 1 kit smoke registry script(s), 3 owned member(s) registered there and 0 declared"
+H2="$(smoke_sandbox smoke-omits "$(grep -v '^check-docs-render-fidelity$' <<<"$REGISTRY_HEREDOC")
+")"
+run_case smoke-omits "$H2" 1 "registered nowhere: the binary carries 'check-docs-render-fidelity' and site-kit/smoke/install.sh"
+H3="$(smoke_sandbox smoke-foreign "$(sed 's/^# site-kit$/# site-kit\ncheck-graph/' <<<"$REGISTRY_HEREDOC")
+")"
+run_case smoke-foreign "$H3" 1 "foreign smoke registration: site-kit/smoke/install.sh registers 'check-graph'"
+H4="$(smoke_sandbox smoke-stale "$(sed 's/^# site-kit$/# site-kit\n# unregistered: check-docs-cname-parity — stale/' <<<"$REGISTRY_HEREDOC")
+")"
+run_case smoke-stale "$H4" 1 "stale unregistered declaration: site-kit/smoke/install.sh declares 'check-docs-cname-parity'"
+H5="$(smoke_sandbox smoke-no-heredoc 'mkdir -p scripts
+')"
+run_case smoke-no-heredoc "$H5" 1 "no smoke registry: site-kit/smoke/install.sh"
+H6="$(smoke_sandbox smoke-two-heredocs "$REGISTRY_HEREDOC$REGISTRY_HEREDOC")"
+run_case smoke-two-heredocs "$H6" 1 "2 smoke registries: site-kit/smoke/install.sh"
+# The same omission with no tracked crate source: J is the publishing tree's, and says so.
+H7="$(smoke_sandbox smoke-unscoped "$(grep -v '^check-docs-render-fidelity$' <<<"$REGISTRY_HEREDOC")
+" 0)"
+run_case smoke-unscoped "$H7" 0 "assertion J out of scope here" \
+    && expect_absent smoke-unscoped-quiet "registered nowhere"
+unset KITDIRS
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-gate-substrate-parity.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-gate-substrate-parity.test.sh: clean (declaration configurations: no descriptors, where the roster half is the only live half; descriptors present with none dispatching and no roster, where assertion F stays quiet; a consumer dispatching with no crate, which is also assertion G's empty shell-declaration corpus reported as a counted zero; and the publishing counterpart, where the same absent roster reds. Assertion G's tree half adds three: every widened clause driven to a finding over tracked shell files in a publishing sandbox, with a well-formed declaration and a below-header token both correctly silent; the same tree out of scope where no crate source is tracked; and the empty corpus outside any repository — $cases assertions over 7 sandboxes, with assertion B's roster matrix held in the crate unit tests beside the rule)"
+echo "check-gate-substrate-parity.test.sh: clean (declaration configurations: no descriptors, where the roster half is the only live half; descriptors present with none dispatching and no roster, where assertion F stays quiet; a consumer dispatching with no crate, which is also assertion G's empty shell-declaration corpus reported as a counted zero; and the publishing counterpart, where the same absent roster reds. Assertion G's tree half adds three: every widened clause driven to a finding over tracked shell files in a publishing sandbox, with a well-formed declaration and a below-header token both correctly silent; the same tree out of scope where no crate source is tracked; and the empty corpus outside any repository. Assertion J adds seven: a kit smoke registry covering its owned subcommands, then one omitting a member, registering a foreign one, carrying a stale declaration, carrying no heredoc and carrying two, each red, and the omission out of scope where no crate source is tracked — $cases assertions over 14 sandboxes, with assertion B's roster matrix and J's per-kit comparison held in the crate unit tests beside the rule)"
 exit 0
