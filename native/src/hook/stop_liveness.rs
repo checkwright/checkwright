@@ -1,6 +1,6 @@
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the SubagentStop member: it logs one
 // open key=value record per firing, emits no hook JSON, and speaks only through its exit status —
-// 2 with a stderr reason on a refusing reading or a running harness shell task, 0 otherwise.
+// 2 with a stderr reason on a refusing reading or a running harness shell task of its own, 0 otherwise.
 use crate::emit::kpi;
 use crate::hook;
 use crate::{proc, programs};
@@ -153,16 +153,48 @@ const TASK_REFUSAL: &str = "turn-end refused: the harness shows a background she
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — only an object element of an array
 // `background_tasks` with `type` `shell` and `status` `running` counts; anything else in the view
 // contributes nothing, so a malformed view degrades to the record-set decision
+// spec: delegation-kit/SPEC.md §The turn-end liveness hook — of those, only the emitting session's
+// own launches refuse; the transcript is read lazily, once, and an unreadable one leaves the
+// condition unscoped rather than dropping it
 fn shell_task_running(payload: Option<&Value>) -> bool {
-    payload
+    let running: Vec<&Value> = payload
         .and_then(|d| d.get("background_tasks"))
         .and_then(Value::as_array)
-        .is_some_and(|tasks| {
-            tasks.iter().any(|t| {
-                t.get("type").and_then(Value::as_str) == Some("shell")
-                    && t.get("status").and_then(Value::as_str) == Some("running")
-            })
+        .map(|tasks| {
+            tasks
+                .iter()
+                .filter(|t| {
+                    t.get("type").and_then(Value::as_str) == Some("shell")
+                        && t.get("status").and_then(Value::as_str) == Some("running")
+                })
+                .collect()
         })
+        .unwrap_or_default();
+    if running.is_empty() {
+        return false;
+    }
+    let Some(transcript) = payload
+        .and_then(|d| d.get("agent_transcript_path"))
+        .and_then(Value::as_str)
+        .and_then(|p| std::fs::read(p).ok())
+    else {
+        return true;
+    };
+    running.iter().any(|t| match t.get("id").and_then(Value::as_str) {
+        Some(id) if !id.is_empty() => has_whole_token(&transcript, id.as_bytes()),
+        _ => true,
+    })
+}
+
+// spec: delegation-kit/SPEC.md §The turn-end liveness hook — a whole token is bounded on both
+// sides by a byte outside `[A-Za-z0-9_-]` or by the file's start or end
+fn has_whole_token(text: &[u8], token: &[u8]) -> bool {
+    let inner = |b: u8| b.is_ascii_alphanumeric() || b == b'_' || b == b'-';
+    text.windows(token.len()).enumerate().any(|(i, w)| {
+        w == token
+            && (i == 0 || !inner(text[i - 1]))
+            && text.get(i + token.len()).map_or(true, |&b| !inner(b))
+    })
 }
 
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the record's line form: the stamp,
@@ -588,6 +620,51 @@ mod tests {
                 want(&f.stderr, case, &["turn-end refused", "background shell task", "completion notification"]);
             } else {
                 assert!(f.stderr.is_empty(), "case {}: an allow carries no reason", case);
+            }
+        }
+    }
+
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the task view's ownership: a
+    // running `shell` element refuses only when its `id` is a whole token of the emitter's
+    // transcript, and every way of not holding that transcript falls back to refusing
+    #[test]
+    fn only_the_emitting_sessions_own_shell_task_refuses() {
+        let shell = r#"{"id":"t1","type":"shell","status":"running"}"#;
+        let with = |task: &str, transcript: Option<&str>| {
+            let key = transcript
+                .map(|p| format!(r#","agent_transcript_path":{}"#, Value::from(p)))
+                .unwrap_or_default();
+            format!(
+                r#"{{"session_id":"s-1","hook_event_name":"SubagentStop","stop_hook_active":false,"background_tasks":[{}]{}}}"#,
+                task, key
+            )
+        };
+        for (case, body, task, present, rc) in [
+            ("own", r#"{"toolUseResult":{"backgroundTaskId":"t1"}}"#, shell, true, 2),
+            ("foreign", r#"{"toolUseResult":{"backgroundTaskId":"t9"}}"#, shell, true, 0),
+            ("transcript-absent", "", shell, false, 2),
+            ("transcript-unreadable", "", shell, true, 2),
+            ("id-inside-a-longer-token", r#"{"text":"t1x at-t1 t1_"}"#, shell, true, 0),
+            ("id-absent", r#"{"text":"t1"}"#, r#"{"type":"shell","status":"running"}"#, true, 2),
+        ] {
+            let s = Scratch::new(case);
+            let transcript = s.at("agent.jsonl");
+            if case != "transcript-unreadable" {
+                std::fs::write(&transcript, body).expect("transcript");
+            }
+            let src = with(task, present.then_some(transcript.as_str()));
+            let log = s.at(&format!("{}.log", case));
+            let f = fire(payload(&src).as_ref(), &log, Some(&s.reader("ro", 0)), &s.at("runs"));
+            let line = s.log(&format!("{}.log", case));
+            assert_eq!(f.code, rc, "case {}: {}", case, line);
+            let decision = if rc == 2 { "decision=refuse" } else { "decision=allow" };
+            want(&line, case, &["verdict=green", "records=0", decision]);
+            assert!(!line.contains("running"), "case {}: the log carried a value of the view: {}", case, line);
+            assert!(!line.contains(&transcript), "case {}: the log carried the transcript path: {}", case, line);
+            if rc == 0 {
+                assert!(f.stderr.is_empty(), "case {}: an allow carries no reason", case);
+            } else {
+                assert_eq!(f.stderr, TASK_REFUSAL, "case {}", case);
             }
         }
     }

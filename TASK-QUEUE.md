@@ -8,18 +8,6 @@
 
 ## New Features
 
-### stop-hook-task-view-unscoped
-
-[spec: SPEC-task-view-ownership.md]
-
-`subagent-stop-liveness` refuses a dispatched child's turn end on a shell task its parent holds. At seam-and-stage-residue's close, two backgrounded observer loops in the dispatching session stalled a five-child audit fan-out for about ten minutes. In that window the hook's log holds three `decision=refuse` lines beside `verdict=green`, which is the task-view arm.
-
-**Measured at spec (2026-09-23):** a child that made no tool call, dispatched while its parent held one backgrounded loop, took nine task-view refusals in 24 seconds. It was released while the loop was still running, and its own transcript carried none of the parent's task ids. So the view is wider than the emitting session, contrary to delegation-kit/SPEC.md §What `background_tasks` carries.
-
-**Direction:** scope the arm to the emitting session's own launches, read off the transcript that `agent_transcript_path` names, and fall back to the unscoped refusal (operator direction, 2026-09-23, lead-relayed). The amendment holds the design, the ruled-out alternatives and the build's two-sided live check. **Not taken:** a steer against polling for worktree reaping; delegation-kit/templates/agent-execution.md already rules it out.
-
-**Cost while deferred:** any parent holding a running shell task while a child stops can stall that child's hand-back. Filed 2026-09-23 to the gap inbox by the lead after seam-and-stage-residue's close, filed at the next scope and promoted at its spec. Owner lookup: [settings-hook-command-path-gate](#settings-hook-command-path-gate) and [turn-end-refusal-used-as-a-busy-wait](#turn-end-refusal-used-as-a-busy-wait) read and ruled distinct.
-
 ## Technical Debt
 
 ### guard-worktree-scratch-dirs
@@ -1605,5 +1593,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 `check-docs-cmd` assertion (C) misses a retired path cited from the queue, which is outside its manifest corpus and whose `<path>:<line>` token fails the path shape.
 
 ## Done
+
+- stop-hook-task-view-unscoped
 
 ## Lessons Learned
