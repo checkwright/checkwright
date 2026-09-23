@@ -8,6 +8,60 @@
 
 ## New Features
 
+### shell-guard-native-shell
+
+[spec: SPEC-shell-guard.md]
+
+operator direction 2026-09-23 (lead session, lead-relayed): make the bash guard a **shell guard** over the host's native shell, bash or sh on Linux and macOS and PowerShell on Windows. It is one tool that checks shell commands and blocks, warns or rewrites them. The bash guard predates native-Windows support and runs on Windows under Git Bash because the harness's Bash tool does. That is bash emulation, against the intended footprint, where sh and PowerShell appear only as installer front ends forwarding to the gate binary and git only for version control. The operator wants the clean design soon.
+
+**It reopens recorded refusals.** guard-kit/SPEC.md §The hook on native Windows refuses a PowerShell twin and a native hook front, the second on the guard library's permanent-shell ground. The 2026-09-23 direction is confirmed as authority to rewrite both and that ground (operator direction 2026-09-24, lead-relayed): a direction, not a TRAJECTORY ruling.
+
+**Sliced at spec (2026-09-24); this entry is slice 1.** The guard becomes the gate binary's `--hook shell-guard` member. Its parts: a bash reader, the whole generic ruleset ported under the decision tables, rules named with their declared views in a compiled table, and consumer rules as a command the member runs first. The shell library and template retire. The amendment holds the design, the ruled-out alternatives, and the deltas of the four rows folded in with it. Slice 2, the PowerShell reader, stays Deferred as [guard-powershell-tool-unguarded](#guard-powershell-tool-unguarded).
+
+**Cost while deferred:** a Windows adopter's guard keeps depending on Git Bash, and the PowerShell tool stays unguarded. Filed 2026-09-23 to the gap inbox by the lead on the operator's direction; promoted at `guard-harness-seams` close as the direction asked; the hub of `native-shell-guard` at its scope, authored and promoted at its spec.
+
+### guard-rule23-worktree-scratch
+
+[spec: SPEC-shell-guard.md]
+
+guard-kit rule 23 prefix-matches `GUARD_KIT_SCRATCH_DIRS` members as written (`guard-kit/lib/guard.sh`, its scratch-source test), so from a linked worktree `bash <main>/.tmp/x.sh`, a body under the main checkout's scratch dir, is not steered and falls through to the harness. Rules 14, 15, 19 (B) and 27 resolve the member against the main checkout through the per-session scratch homes since `guard-worktree-scratch-dirs`.
+
+**Probed at spec (2026-09-24), from a temporary linked worktree:** `--scratch-run <main>/.tmp/x.sh` exits 2, refusing a target outside the worktree's own scratch dir. The guard lets `bash <main>/.tmp/x.sh` through unsteered.
+
+**Ruled at spec:** the rule's match moves and the runner's root stays, because the runner's root is a fail-closed reach control. From a worktree, the steer names the worktree's own scratch dir (SPEC-shell-guard.md, delta 7). Folded into [shell-guard-native-shell](#shell-guard-native-shell) by operator direction, 2026-09-24 (lead-relayed).
+
+**Cost while deferred:** an isolated session's scratch script runs unechoed and is decided out of band. Filed 2026-09-23 at `guard-harness-seams` build; promoted at its close; paired with the shell-guard amendment at `native-shell-guard`'s spec.
+
+### guard-declares-class-correspondence-ungated
+
+[spec: SPEC-shell-guard.md]
+
+items in guard-kit/SPEC.md §The generic ruleset state the inert quoting classes their rule's `guard_skeleton` call strips (`Declares sq dq hd`), transcribed by hand, and nothing holds the two equal: an edited skeleton call silently stales its SPEC declaration. `check-guard-registration` holds roster, definitions and dispatch only, because a rule has no single value: rule 6 builds two skeletons, rule 18 four, some rules skeletonize inside a helper, and only some items declare.
+
+**Ruled at spec:** the compiled rule table carries each rule's declared views as a set. A rule reads only what it declares, since an undeclared read faults loudly. Every roster item carries one declaration clause, and `check-guard-registration` arm C holds the clause to the table (SPEC-shell-guard.md, deltas 2 and 4). Folded into [shell-guard-native-shell](#shell-guard-native-shell) by operator direction, 2026-09-24 (lead-relayed).
+
+**Cost while deferred:** a skeleton edit leaves a declaration that misstates what a quoted mention does; a reader, not the guard, pays. Filed 2026-09-18 to the gap inbox during `guard-ruleset-registration-lockstep`; promoted at its close drain; paired at `native-shell-guard`'s spec.
+
+### guard-rule-number-intra-kit-citations-ungated
+
+[spec: SPEC-shell-guard.md]
+
+guard-kit cites its own rule numbers everywhere and nothing holds a single citation to the ruleset. **Measured at the rule-17 insertion, 2026-08-23:** 111 `rule N` citations in the kit's own surfaces, and no gate matching any. **Re-counted at spec, 2026-09-24:** about 525 `rules? N` tokens (SPEC 325, `lib/guard.sh` 109, `cases.tsv` 67). One number-bearing roster, the raw-vs-skeleton paragraph, had drifted from the function bodies with no renumber to cause it.
+
+**Ruled at spec:** a rule is identified by its name, and the roster is a bulleted list with no ordinal. Citations name the rule. `check-guard-registration` arm D reds on an unresolved name and on any surviving `rule N` in guard-kit's tree. The raw-vs-skeleton roster becomes each item's declaration, held by arm C (SPEC-shell-guard.md, deltas 1, 2 and 4). Folded into [shell-guard-native-shell](#shell-guard-native-shell) by operator direction, 2026-09-24 (lead-relayed).
+
+**Cost while deferred:** every insertion into the ruleset re-buys a hand sweep whose completeness nothing checks. Filed 2026-08-23 by build; drained at that iteration's close; paired at `native-shell-guard`'s spec.
+
+### guard-rule-number-not-citable-outside-kit
+
+[spec: SPEC-shell-guard.md] [recurrence: 2026-08-29]
+
+a guard-kit rule number is a stable-looking identifier that is not stable: rules renumber on every insertion, and the renumbering sweep never held cross-corpus prose. **Measured:** `ro-bins-write-option-bypass` cited a rule by a number stale twice over. At the 2026-08-29 recurrence, six citations in this file pointed at the wrong rule after one insertion.
+
+**Ruled at spec:** no rule carries a number, so there is no number left to cite. An out-of-kit citation names the rule in the qualified form (`` guard-kit rule `<name>` ``), which `check-guard-registration` arm D resolves over the tracked tree outside the workflow dir. A bare `rule N` outside the kit is not gated. That was measured at spec: the bare form also hits doctrine-kit and canon-kit rule numbers, so its false-positive budget is nonzero, while the qualified form hits nothing else. This dissolves canon-kit/SPEC.md §check-amendment-retired-spelling's renumber slice rather than detecting it, as that section anticipates (SPEC-shell-guard.md, deltas 1 and 2). Folded into [shell-guard-native-shell](#shell-guard-native-shell) by operator direction, 2026-09-24 (lead-relayed).
+
+**Cost while deferred:** a reader follows the number to the wrong rule and reasons from it. Filed 2026-08-22 at align's cross-audit; drained at that iteration's close; paired at `native-shell-guard`'s spec.
+
 ## Technical Debt
 
 ### subagent-stop-phantom-firing
@@ -90,20 +144,6 @@ a surface that disclaims carrying a rule ("stated there and not restated here") 
 
 **Cost while deferred:** each such disclaimer is a licence a later reader trusts, and the copy beside it rots silently. Filed 2026-09-20 to the gap inbox by the close of `adopter-floor-door-remainder`; promoted 2026-09-21 at the next scope's intake, so the record is late and says so. Owner lookup ran over `disclaim`, `not restated here`, `restatement` and the two gates above and found no owner.
 
-### guard-declares-class-correspondence-ungated
-
-[cost: event/low] [surface: guard-kit]
-
-items in guard-kit/SPEC.md §The generic ruleset state the inert quoting classes their rule's `guard_skeleton` call strips (`Declares sq dq hd`), transcribed by hand, and nothing holds the two equal: an edited skeleton call silently stales its SPEC declaration. `check-guard-registration` holds roster, definitions and dispatch only, and the class correspondence stays outside it because a rule has no single value — rule 6 builds two skeletons, rule 18 four, some rules skeletonize inside a helper, and only some items declare. Candidate: a declaration shape each skeleton call can satisfy per member (one declaration per call, keyed to the call), then a fourth-roster assertion over it.
-
-**Re-verified at the drain:** the `Declares` lines sit in the section (e.g. guard-kit/SPEC.md rules at lines 681, 742, 759) and §check-guard-registration's assertions A-D name no class correspondence.
-
-**Why design-pending:** the declaration shape is a SPEC-grammar change across every declaring item plus a gate extension, a spec-stage amendment rather than a drain fix.
-
-**Folded into [shell-guard-native-shell](#shell-guard-native-shell)'s design, operator direction 2026-09-24 (lead-relayed):** /spec authors it within that amendment at `native-shell-guard`, since the `guard_skeleton` call sites move with the port.
-
-**Cost while deferred:** a skeleton edit leaves a declaration that misstates what a quoted mention does; a reader, not the guard, pays. Filed 2026-09-18 to the gap inbox during `guard-ruleset-registration-lockstep`; promoted at its close drain. Owner lookup: `guard_skeleton`, `Declares`, `inert class`, `skeleton call` — none.
-
 ### residency-roster-template-reach-ungated
 
 [cost: event/low] [surface: context-kit]
@@ -140,9 +180,9 @@ on native Windows the harness's `PowerShell` tool is on by default beside `Bash`
 
 **Probed at filing:** the harness tools reference names the tool `PowerShell` and advises matching `Bash|PowerShell`; `grep -rn -i 'powershell tool' guard-kit` finds nothing before guard-kit/SPEC.md §The hook on native Windows, which states the bypass as an honest limit.
 
-**Why design-pending:** a PowerShell-grammar guard needs its own skeleton and splitter, rules that model PowerShell rather than bash, and a decision table on a Windows leg. None of that is designed, and whether a consumer-rule seam belongs on it is open.
+**Slice 2 of [shell-guard-native-shell](#shell-guard-native-shell), sliced at its spec (2026-09-24).** Slice 1 is the `--hook shell-guard` member, which picks a shell reader by `tool_name` and exits clean on a tool it has no reader for. It has a reader seam: views, segments, statements, redirect pairs and the harness view, with each rule declaring the shells it applies to. The consumer-rule command sees every payload. The member's own design is guard-kit/SPEC.md §The shell guard once merged. **Owed here:** a PowerShell reader behind that seam, covering single-quoted, expandable and here-string quoting, its statement and pipeline separators, and its comment forms. Also owed: each generic rule's applicability to PowerShell decided, with the rules that model PowerShell; `--guard-json view` over PowerShell payloads; the `Bash|PowerShell` matcher in `templates/settings-hooks.json`; and a PowerShell decision table run on the native-Windows leg. Then §The hook on native Windows' PowerShell limit retires.
 
-**The PowerShell half of [shell-guard-native-shell](#shell-guard-native-shell), operator direction 2026-09-24 (lead-relayed):** /spec authors it within that amendment at `native-shell-guard`.
+**Why design-pending:** the rule applicability and the PowerShell grammar the reader must model are undesigned. Slice 1 keeps the bash port behaviour-preserving, and builds the seam no wider than its own rules call.
 
 **Cost while deferred:** on a Windows host a command routed through the PowerShell tool bypasses every steer and block, and the close-stage triage never sees it. Filed 2026-09-18 at `windows-adopter-path`'s spec by operator direction (lead-relayed), when `guard-hook-windows-substrate` was designed. Owner lookup: `PowerShell tool`, `USE_POWERSHELL_TOOL`, `Bash|PowerShell` — none.
 
@@ -460,46 +500,6 @@ a hook registration in `.claude/settings.json` whose `command` names a renamed o
 
 **Cost while deferred:** a broken hook is invisible until the behaviour it guards silently stops happening — the failure mode with no red anywhere and no user-visible symptom. Filed 2026-08-22 at spec while surveying context-kit's settings gates; drained at that iteration's close, which re-verified the claim and found the enforcement-map reader it missed.
 
-### guard-rule-number-not-citable-outside-kit
-
-[cost: event/low] [surface: guard-kit] [recurrence: 2026-08-29]
-
-a guard-kit rule number is a stable-looking identifier that is not stable: rules renumber on every insertion, and the renumbering sweep's roster covers SPEC prose, lib comments, the test tables and the runner — **cross-corpus prose has never been in it**.
-
-**Measured, not assumed:** `ro-bins-write-option-bypass` cited the read-only-pipeline rule as "rule 15 ... rule 13 when this entry was filed" while it was in fact 17 — stale twice over, and already stale before the renumbering that moved rules 15-20 to 16-21. That one citation was corrected in place at close 2026-08-22 by naming the rule instead of numbering it; the durable rule is this entry's.
-
-**Two dispositions and neither is free:** sweep cross-corpus prose on every renumber, a corpus nobody has costed; or state in guard-kit/SPEC.md that a rule number is not a citable identifier outside the kit and have every cross-corpus reference name the rule — the way rule 21 already cites DOCTRINE.md by name rather than number, for exactly this reason.
-
-**A SECOND entry's slice now routes to that second disposition — recorded here 2026-09-08, the inbound half of a routing whose outbound half already exists.** `canon-kit/SPEC.md` §check-amendment-retired-spelling rules the RENUMBER slice — the retired `amendment-roster-omission-detection`'s second candidate slice — a stated non-target on a decidability ground: after a renumber the retired and the replacing spellings occupy the SAME token space, so a survivor scan cannot discriminate. That section states the durable fix in its own words ("a cross-corpus citation that names its referent rather than its number has no numeric relation left to decay, which dissolves the slice instead of detecting it"), which is the outbound half. **Its citation here was wrong on BOTH halves until this close** — there is no §The two slices in that SPEC, and its line 362 is about config seeding and carries no pointer; re-read at 2026-09-08 and corrected to the section that owns the ruling. So this entry's second disposition — a cross-corpus citation naming its referent rather than its number — **dissolves that slice instead of detecting it**, and discharges two entries' work rather than one. This entry's own open question (whether a bare `rule N` outside the kit is gateable at all, and at what false-positive budget) is untouched by the routing and is not answered by it.
-
-**Recurred 2026-08-29, and this entry's own citation was one of the six that rotted.** Rule 19's insertion pushed rules 19-23 to 20-24; the renumber sweep held guard-kit but not this file, so five citations of the scratch-execution rule by its pre-insertion number, and this entry's own citation of the history-rewrite advisory by its pre-insertion number, all pointed at the wrong rule. Corrected in place at close, by number rather than by name, because naming them here would silently do the second disposition's work and rewrap five capped entries.
-
-**Why design-pending:** the second is a one-paragraph boundary note plus a sweep of unknown size, and whether a bare "rule N" outside the kit is gateable at all needs a false-positive budget nobody has measured.
-
-**THIS ENTRY AND ITS [guard-rule-number-intra-kit-citations-ungated](#guard-rule-number-intra-kit-citations-ungated) SIBLING WERE THE (D) ISLAND of `citation-liveness-family-convergence`, which landed 2026-09-17 with (A)-(C) only** — grounds relocated here 2026-09-08 from that hub, under `check-queue-entry-budget`'s rule that an unanswered ground moves to the entry already owning its subject. Slices (A)-(C) widened gates that already resolve citations; (D) has no gate to widen and an unmeasured false-positive budget over 111 intra-kit citations, so it stays open here.
-
-**Folded into [shell-guard-native-shell](#shell-guard-native-shell)'s design, operator direction 2026-09-24 (lead-relayed):** the port settles how a rule is cited.
-
-**Cost while deferred:** a reader follows the number to the wrong rule and reasons from it. Filed 2026-08-22 at align's cross-audit; drained at that iteration's close, which found the bullet had named the wrong slug and located the real entry before dispositioning.
-
-### guard-rule-number-intra-kit-citations-ungated
-
-[cost: event/low] [surface: guard-kit]
-
-guard-kit cites its own rule numbers everywhere and nothing holds a single citation to the ruleset.
-
-**Measured at the rule-17 insertion, 2026-08-23**, which shifted rules 17-21 to 18-22: the kit's own surfaces carry 111 `rule N` citations — SPEC.md 63, `lib/guard.sh`'s `spec:` comments 17, `guard-tests/cases.tsv` 28, `bin/run-guard-tests.sh` 3 — and no gate matches any of them. The amendment authoring the change enumerated six sites; the sweep found roughly five times that, and the merge was correct only because the sweep was run instead of the enumeration trusted.
-
-**Worse, one number-bearing roster was already stale and no renumber caused it:** SPEC.md's raw-vs-skeleton paragraph named two rules that carry no raw-command test and omitted three that do, drifting silently from the function bodies until it was re-derived against them at build.
-
-**Why design-pending:** the corpus is bounded and the numbering is derivable from the numbered list, so a gate could assert that every intra-kit `rule N` resolves to an existing item and that the derivable rosters — which rules take the raw command, which read a skeleton — match the bodies. Which claims are derivable and which are prose is the open question.
-
-**DISTINCT from [guard-rule-number-not-citable-outside-kit](#guard-rule-number-not-citable-outside-kit)**, whose dispositions are about cross-corpus prose *outside* the kit and which therefore leaves intra-kit numbers citable and ungated by construction; and from `guard-ruleset-registration-lockstep`, Done 2026-09-18 as `check-guard-registration`, whose subject is the roster/function/dispatch-order triple agreeing, not what cites a rule by number.
-
-**Folded into [shell-guard-native-shell](#shell-guard-native-shell)'s design, operator direction 2026-09-24 (lead-relayed):** /spec authors it within that amendment at `native-shell-guard`, since the port rewrites the kit's 111-citation corpus.
-
-**Cost while deferred:** every insertion into the ruleset re-buys a hand sweep whose completeness nothing checks, and a stale roster reads as authoritative to the next author — which is exactly how the raw-vs-skeleton one survived. Filed 2026-08-23 by build; drained at that iteration's close, which re-counted the citations and confirmed no gate matches them.
-
 ### site-health-issue-venue-unwanted
 
 [cost: event/low] [surface: site-kit] [not-icebox-eligible: 2026-09-21 operator-ruled, cron-armed]
@@ -587,36 +587,6 @@ an operator-ruled `align-waived` line has no sanctioned writer. lifecycle-kit/SP
 **Why design-pending:** the options on record are (a) a stage session carries a pending waiver into its entry commit, (b) a waiver arm on `--enter-stage` that takes a ruling reference and never self-issues, (c) the dispatch worklist channel. Choosing one is a seam ruling between the split posture's lead-writes-nothing rule and the state machine. The help line's recovery is whatever that ruling makes it. Separately, the relay should name the real state path, not the scratch copy.
 
 **Cost while deferred:** each operator-waived align makes someone route around a guard or hand-append, and every assertion-C refusal points its reader at a vanished scratch file. Promoted from the icebox 2026-09-23 at `guard-harness-seams` close on the recurrence. Owner lookup: `waiv`, `align-waived` in this file: only this slug.
-
-### guard-rule23-worktree-scratch
-
-[cost: event/low] [surface: guard-kit]
-
-guard-kit rule 23 prefix-matches `GUARD_KIT_SCRATCH_DIRS` members as written (`guard-kit/lib/guard.sh`, its scratch-source test), so from a linked worktree `bash <main>/.tmp/x.sh`, a body under the main checkout's scratch dir, is not steered and falls through to the harness. Rules 14, 15, 19 (B) and 27 resolve the member against the main checkout through the per-session scratch homes since `guard-worktree-scratch-dirs`. **Probed at the drain:** both helpers read.
-
-**Why design-pending:** the steer target, `--scratch-run`, bounds its target to the front end's working root (guard-kit/SPEC.md §scratch-run), which from a worktree is the worktree. Widening rule 23 alone would steer to a corrective that cannot be followed there. Which side moves, rule 23's match or `--scratch-run`'s root, is the call.
-
-**Inferred, not run:** `--scratch-run` refuses a main-checkout scratch path from a linked worktree — from a worktree, run `bash gate-sdk/bin/run-gates.sh --scratch-run` on a script under the main checkout's `.tmp/`.
-
-**Folded into [shell-guard-native-shell](#shell-guard-native-shell)'s design, operator direction 2026-09-24 (lead-relayed):** /spec authors it within that amendment at `native-shell-guard`, since the port re-implements rule 23's match.
-
-**Cost while deferred:** an isolated session's scratch script runs unechoed and is decided out of band. Filed 2026-09-23 at `guard-harness-seams` build, left out of `guard-worktree-scratch-dirs` on the corrective's reach; promoted at its close. Owner lookup: `rule 23`, `scratch-run`, `linked worktree` in this file: none.
-
-### shell-guard-native-shell
-
-[cost: event/high] [surface: guard-kit]
-
-operator direction 2026-09-23 (lead session, lead-relayed): make the bash guard a **shell guard** over the host's native shell, bash or sh on Linux and macOS and PowerShell on Windows. It is one tool that checks shell commands and blocks, warns or rewrites them. The bash guard predates native-Windows support and runs on Windows under Git Bash because the harness's Bash tool does. That is bash emulation, against the intended footprint, where sh and PowerShell appear only as installer front ends forwarding to the gate binary and git only for version control. The operator wants the clean design soon.
-
-**It reopens recorded refusals.** guard-kit/SPEC.md §The hook on native Windows refuses a PowerShell twin and a native hook front, the second on the guard library's permanent-shell ground. **Probed at the drain:** that section states both. The direction reverses them, so the design owes a SPEC rewrite of that section and of the library's permanent-shell ground, and a consumer-rule seam that is not shell functions.
-
-**DISTINCT from [guard-powershell-tool-unguarded](#guard-powershell-tool-unguarded)**, which guards the PowerShell tool beside an unchanged bash guard. This entry re-architects the guard to be shell-neutral, so its landing would likely supersede that one rather than re-file it.
-
-**Unit set, operator direction 2026-09-24 (lead-relayed):** the hub of `native-shell-guard`, with that entry as its PowerShell half and four rows it reshapes folded into its design: [guard-rule23-worktree-scratch](#guard-rule23-worktree-scratch), [guard-declares-class-correspondence-ungated](#guard-declares-class-correspondence-ungated) and the two rule-number entries. [side-effect-free-read-arms](#side-effect-free-read-arms) stays out. The 2026-09-23 direction is confirmed as authority to rewrite both refusals and §The guard framework's permanent-shell ground: a direction, not a TRAJECTORY ruling. **Overrun risk, carried:** 27 generic rules over a 2381-line `lib/guard.sh`, a consumer-rule seam and a PowerShell reader; /spec slices it and files what slice 1 leaves as Deferred.
-
-**Why design-pending:** a shell-neutral rule model, a PowerShell reader, where the ruleset lives (binary or library), and the consumer-rule seam are all open. Surfaced by `guard-read-path-windows-unexercised`'s Git Bash trailing-CR fold.
-
-**Cost while deferred:** a Windows adopter's guard keeps depending on Git Bash, and the PowerShell tool stays unguarded. Filed 2026-09-23 to the gap inbox by the lead on the operator's direction; promoted at `guard-harness-seams` close as the direction asked. Owner lookup: `shell guard`, `PowerShell`, `Git Bash` in this file: only the DISTINCT entry above.
 
 ## Icebox
 
