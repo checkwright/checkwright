@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+gate-sdk-blind-spots release deferred:v0.26.0 — the declarations accumulated since v0.25.0 still derive a minor (tightened gates, new knobs and accessors, behavior changes) with no decommission; no trigger fired: elapsed-time dormant under preview, the worktree fail-open repair restores guard coverage for isolated agents and is no vulnerability or compromised artifact under the preview reading, no operator direction, audience not arrived
