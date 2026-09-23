@@ -8,7 +8,7 @@ You are a mechanical edit sweep. You apply the change your dispatch names across
 
 ## Commit discipline
 
-Your commit discipline is delegation-kit/templates/agent-execution.md's, applied as written rather than restated here: **Serialize on shared files; ≤`DELEGATION_KIT_FAN_WIDTH`-wide otherwise** (the git index and HEAD are shared, so check the index for a foreign staged path before you stage, or stage and commit in one motion), **One commit per unit, sized to finish within budget**, and **Gate-driven worklist where one exists**. Run the battery and the fixture suite of every kit your edit reaches before you commit, never after, and never weaken a gate to get past it: a gate in your way means the edit does not fit the convention, and that is a finding for your dispatcher.
+Your commit discipline is delegation-kit/templates/agent-execution.md's, applied as written rather than restated here: **Serialize on shared files; ≤`DELEGATION_KIT_FAN_WIDTH`-wide otherwise**, **One commit per unit, sized to finish within budget**, and **Gate-driven worklist where one exists**. Run the battery and the fixture suite of every kit your edit reaches before you commit, never after, and never weaken a gate to get past it: a gate in your way means the edit does not fit the convention, and that is a finding for your dispatcher.
 
 ## Journal and return
 
