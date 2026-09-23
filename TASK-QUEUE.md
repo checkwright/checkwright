@@ -12,6 +12,78 @@
 
 ## Deferred
 
+### worktree-gate-execution
+
+[cost: event/high] [surface: gate-sdk]
+
+a worktree-isolated `audit-sweep` has no gate binary for its oracle arms. `DELEGATION_KIT_READONLY_TYPES` names it, so D2 forces the isolation, and isolation cost (4) forbids building a binary in the worktree. The landed fail-open fallback sends only the harness arms to the main checkout's binary: every verdict-bearing path still resolves locally (gate-sdk/SPEC.md §The harness-integration arm). gate-sdk-blind-spots' spec therefore ran its probe-driven review on unisolated Explore, which cannot journal as it goes. Nothing reads a dispatch's purpose, so the type rule has no gate; that part is inferred, not run.
+
+**Operator direction 2026-09-23, lead-relayed:** audit-sweep in a worktree is the methodology's answer to interruption-safe review work, and the missing gates are its one open challenge. A worktree without gates is acceptable for audit-sweep, which writes nothing but its journal. Make gates fully workable in worktrees if that is feasible; otherwise document the limitation and live with it.
+
+**Deliverable:** a feasibility ruling on running verdict-bearing arms in a linked worktree, then either that path or the limitation stated in delegation-kit/templates/agent-execution.md. Settle the text clash as well: `.claude/agents/audit-sweep.md` §Return contract says the type "owes no resume journal", and the resume-journal bullet keeps journals for agents that change files. Both contradict the direction.
+
+**Cost while deferred:** a review sweep either runs isolated without its oracle or is misrouted to an excerpt-locator that keeps no journal. Filed 2026-09-23 to the gap inbox as three bullets, one from the lead and two carrying the direction; merged and promoted at gate-sdk-blind-spots' close drain. Owner lookup: gate-sdk/SPEC.md §lib/gate.sh (`gate_harness_bin`); delegation-kit/SPEC.md §The delegation model (D2, isolation costs). Neither rules on verdict arms in a worktree.
+
+### stage-exit-no-successor-check
+
+[cost: event/low] [surface: lifecycle-kit]
+
+every stage template's last step is only the journal's `DONE` append (lifecycle-kit/templates/stages/*.md). So a refusal of the successor's entry surfaces only at the lead's `--enter-stage --dispatch <next>` read, and with no lead it does not surface at all. lifecycle-kit/templates/lead.md already calls that read the backstop and names "the stage template's own last step" as the repair, a step no template has. Attested at gate-sdk-blind-spots: align reported done over a malformed cannot-run marker that `--enter-stage --simulate build` refuses.
+
+**Deliverable:** a last step `--enter-stage --simulate <successor>` in each stage template whose successor is known, a stated answer for a trigger-gated successor, and the lead.md sentence made true.
+
+**Cost while deferred:** a successor-entry refusal costs a resumed session instead of being caught before the report. Filed 2026-09-23 to the gap inbox by the lead; promoted at the close drain because the fix adds a step to six shipped templates. Owner lookup: lifecycle-kit/SPEC.md §templates/stages/, which says nothing about a successor read.
+
+### cannot-run-marker-late-read
+
+[cost: event/low] [surface: lifecycle-kit]
+
+`check-stage-entry` assertion D reads cannot-run markers only when the cursor enters the audit-entry stage (`native/src/gates/stage_entry.rs`, `at_audit_entry`), because its residue half, a marker not yet run, is legitimate before build. A marker whose `— <reason>` separator is missing is a spelling defect that a commit-time check could catch. Attested at gate-sdk-blind-spots: spec committed one joined by a period, align's commits passed the battery over it, and only the lead's build dispatch read refused it, which cost one align resume.
+
+**Deliverable:** assertion D split so the marker grammar is held at every commit and the residue at build entry, with fixture cases for both.
+
+**Cost while deferred:** a misspelt marker is caught one stage late. Filed 2026-09-23 to the gap inbox by the lead; promoted at the close drain because a gate split is spec work. Owner lookup: lifecycle-kit/SPEC.md §check-stage-entry (assertion D) and §templates/stages/ (the marker grammar).
+
+### projection-path-literals
+
+[cost: event/low] [surface: gate-sdk]
+
+the `# projection:` line still carries consumer-path literals: `docs/enforcement.md` on `check-enforcement-fresh`, `docs/footprint.md` on `check-footprint-fresh`, `docs/check-graph.html` and the hook paths on `check-graph`, and `ROADMAP.md` on `check-roadmap-fresh`. gate-sdk/SPEC.md §The install disposition refuses a `knob:` token on that line. Now that those gates' `couples=` name the same paths through knobs, an adopter who relocates one through its knob gets a projection glob that the coupling no longer covers, which reds `check-projection-roster` assertion A. That last step is inferred, not run.
+
+**Deliverable:** the projection grammar admits `knob:` (or derives the line from the knob), with a fixture that relocates a projection.
+
+**Cost while deferred:** relocating a projection reds the battery. Filed 2026-09-23 to the gap inbox by gate-sdk-blind-spots' spec, since doc-path-couples converted only the `couples=` half; promoted at the close drain because it is a grammar change. Owner lookup: gate-sdk/SPEC.md §The install disposition (the projection declaration).
+
+### docs-mirror-root-unrelocatable
+
+[cost: event/low] [surface: canon-kit]
+
+canon-kit's docs mirror root is one kit spelling, `docs/`: `--emit docs-mirror` writes under it and the canonical-spec finder prunes it. An adopter's own `SPEC.md` at `docs/<dir>/` is therefore invisible to the spec-reading gates, and a site root elsewhere cannot host the mirror. canon-kit/SPEC.md §The shared spec adapters states that limit.
+
+**Deliverable:** a knob that moves the generator and the prune together, plus a `knob:` source for a registry prune declaration (gate-sdk/SPEC.md §check-reads-couples).
+
+**Cost while deferred:** none on this tree; an adopter with specs under `docs/` silently loses their discovery. Filed 2026-09-23 to the gap inbox by gate-sdk-blind-spots' spec; promoted at the close drain, since spec-prune ruled no knob and minting one is spec work. Owner lookup: canon-kit/SPEC.md §The shared spec adapters.
+
+### couples-literals-undisposed
+
+[cost: event/low] [surface: gate-sdk]
+
+two `couples=` literals fit none of doc-path-couples' five dispositions. `check-enforcement-fresh`'s `.github/workflows/*.yml` narrows a marker-grep walk to one directory, though the walk is rooted at `GATE_SDK_ENFORCE_SCAN_DIR` and does not filter to `*.yml`. `lifecycle-kit/templates/stages/*.md` on `check-footprint-fresh` and `check-surface-ratchet` may be a `templates/` carve-out or a frozen literal needing a token; which one was never determined.
+
+**Deliverable:** a disposition for each, with the SPEC's disposition set widened if neither fits.
+
+**Cost while deferred:** both stay pinned to this repo's layout. Filed 2026-09-23 to the gap inbox by align's audit of doc-path-couples; promoted at the close drain because each needs a design call. Owner lookup: gate-sdk/SPEC.md §check-reads-couples.
+
+### scope-binding-hand-wipe
+
+[cost: event/low] [surface: lifecycle-kit]
+
+the scope binding's evidence-reset slot (`.claude/commands/scope.md`) tells a session to wipe `.tmp/` by hand, sparing only the session-role marker. `--enter-stage scope` already wipes it and spares the lead journal and `LIFECYCLE_KIT_BOUNDARY_PRESERVE` (lifecycle-kit/SPEC.md §bin/enter-stage.sh). A session that follows the hand step before entry deletes a live lead's journal.
+
+**Deliverable:** the wipe sentences replaced with: "The same entry wipes `.tmp/`, sparing the lead journal and the `LIFECYCLE_KIT_BOUNDARY_PRESERVE` keep-list (lifecycle-kit/SPEC.md §bin/enter-stage.sh), so never wipe it by hand."
+
+**Cost while deferred:** a literal reader of the binding can delete the lead's journal. Filed 2026-09-23 to the gap inbox at scope; promoted at the close drain because the harness permission layer refused the delegated close session's edit under `.claude/`. Owner lookup: lifecycle-kit/SPEC.md §bin/enter-stage.sh; the binding is this repo's.
+
 ### queue-migrate-bold-split
 
 [cost: event/low] [surface: queue-kit]
