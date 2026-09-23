@@ -6,3 +6,4 @@
 
 native-shell-guard scope aea4684a 2026-09-24 f8254551
 native-shell-guard spec a39f4f4d 2026-09-24 8d6f6b6c
+native-shell-guard align a7914215 2026-09-24 1c7c3051
