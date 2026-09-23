@@ -375,6 +375,12 @@ fn amendment_findings(root: &str, errors: &mut Vec<String>) -> Result<(), String
     Ok(())
 }
 
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — an expanded field's surfaces; a knob token a
+// consumer left empty contributes none rather than an empty surface
+fn members(field: &str) -> impl Iterator<Item = &str> {
+    field.split(',').filter(|s| !s.is_empty())
+}
+
 // spec: gate-sdk/SPEC.md §check-graph — assertion B's four coverage branches, reproduced verbatim.
 // The field's matcher is branch three alone, and substituting it or the filter matcher for the
 // whole predicate flips verdicts on the live registry.
@@ -534,6 +540,12 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 )),
             }
         }
+        // spec: gate-sdk/SPEC.md §The `# graph:` manifest — emptiness is the authored field's; a
+        // declared knob a consumer left empty expands to nothing and is never a finding
+        if couples.is_empty() {
+            errors.push(format!("MANIFEST: {} couples= is empty", script));
+            continue;
+        }
         // spec: gate-sdk/SPEC.md §check-graph — the `knob:` token's admissibility rule, read against
         // the member's declared set, static names included: a token naming a knob the member does
         // not declare is a finding, never a wider trigger
@@ -612,12 +624,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 script, gen_f
             ));
         }
-        if couples.is_empty() {
-            errors.push(format!("MANIFEST: {} couples= is empty", script));
-            continue;
-        }
-
-        for s in couples.split(',') {
+        for s in members(&couples) {
             if !in_vocab(s, &vocab) {
                 errors.push(format!(
                     "MANIFEST: {} couples surface '{}' not in the declared GRAPH_VOCAB",
@@ -626,7 +633,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             }
         }
         let authored_trigger = if trigger.is_empty() { &couples } else { &trigger };
-        for s in authored_trigger.split(',') {
+        for s in members(authored_trigger) {
             if s == "*" {
                 continue;
             }
@@ -642,18 +649,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
         // after the vocabulary check, which reads the authored field alone
         let derived = registry::derived_couples(c, &cfg.resolve_dirs)?;
         let append = |field: &str| -> String {
-            let mut out = field.to_string();
-            for p in &derived {
-                out.push(',');
-                out.push_str(p);
-            }
-            out
+            members(field).chain(derived.iter().map(String::as_str)).collect::<Vec<_>>().join(",")
         };
         couples = append(&couples);
         if !trigger.is_empty() && trigger != "*" {
             trigger = append(&trigger);
         }
-        let surf: Vec<&str> = couples.split(',').collect();
+        let surf: Vec<&str> = members(&couples).collect();
 
         // assertion B: couples⊆trigger parity
         let trig_set = if trigger.is_empty() {
@@ -779,6 +781,14 @@ fn rule(args: &[String]) -> Result<i32, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a knob token a stock consumer left empty
+    // expands to no surface, never to an empty one a vocabulary or parity check could red
+    #[test]
+    fn an_empty_expansion_contributes_no_surface() {
+        assert_eq!(members("").count(), 0);
+        assert_eq!(members("a,,b").collect::<Vec<_>>(), vec!["a", "b"]);
+    }
 
     // spec: gate-sdk/SPEC.md §check-graph — each coverage branch on its own, with a near miss
     // beside it, so a branch that stops firing reds rather than passing vacuously
