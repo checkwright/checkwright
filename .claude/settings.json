@@ -17,6 +17,8 @@
       "Bash(env GATE_SDK_VERBOSE=1 bash gate-sdk/bin/run-gates.sh *)",
       "Bash(./native/target/release/checkwright-gates)",
       "Bash(./native/target/release/checkwright-gates *)",
+      "Bash(native/target/release/checkwright-gates)",
+      "Bash(native/target/release/checkwright-gates *)",
       "Bash(env GATE_SDK_VERBOSE=1 ./native/target/release/checkwright-gates)",
       "Bash(env GATE_SDK_VERBOSE=1 ./native/target/release/checkwright-gates *)",
       "Bash(bash scripts/check-*.sh)",
