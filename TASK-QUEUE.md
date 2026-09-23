@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: gate-sdk-blind-spots
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [README.md](README.md) maps the kits.
 
@@ -80,6 +80,8 @@ eighteen kit-shipped `couples=` literals across thirteen members name a consumer
 
 **Cost while deferred:** a new membership pipe written in a suite goes unflagged until it flips a verdict under load. Filed 2026-09-22 by build batch 4 of gate-sdk-surface-drain on a lead ruling; promoted at close because §check-pipe-membership states the suites outside its corpus, so the widening is an envelope change for spec, not a drain fix.
 
+**Admitted by operator exception to the enhancement admission filter, operator direction 2026-09-23 (lead-relayed):** a suite-corpus widening reaching none of the filter's arms, it joins `gate-sdk-blind-spots` on the surface that unit already carries, at no extra stage.
+
 ### ps1-ascii-unheld-at-commit
 
 [cost: event/low] [surface: gate-sdk]
@@ -103,6 +105,8 @@ installer/SPEC.md §The install boundary rules a shipped PowerShell file's code 
 **Inferred, not run:** parsing the heredoc out of `smoke/install.sh` needs no new grammar beyond `registry::members` plus the `# unregistered:` reader — establish it by drafting the arm against `gate-sdk/smoke/install.sh` and its ten sibling scripts.
 
 **Cost while deferred:** each new kit-owned subcommand can miss the site, and the catcher stays three validate suites away from the cause. Filed 2026-09-22 by validate. Owner lookup ran `smoke registry`, `substrate-parity` and `roster site` over the queue — [substrate-parity-assertion-c-reach-unannounced](#substrate-parity-assertion-c-reach-unannounced) (icebox) owns assertion C's reach, not assertion I's blind spot, and [non-gate-arm-roster-hand-maintained](#non-gate-arm-roster-hand-maintained) (icebox) owns a different hand-maintained roster; no owner.
+
+**Admitted by operator exception to the enhancement admission filter, operator direction 2026-09-23 (lead-relayed):** an authoring-tree assertion reaching none of the filter's arms, it joins `gate-sdk-blind-spots` on the surface that unit already carries, at no extra stage.
 
 ### disclaimer-beside-its-own-restatement
 
