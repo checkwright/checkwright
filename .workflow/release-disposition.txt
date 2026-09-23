@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+guard-harness-seams release deferred:v0.26.0 — the declarations accumulated since v0.25.0 still derive a minor (this iteration adds four behavior changes: the task view scoped to the emitting session, worktree scratch homes, the knob-skew advisory, closing-star bare leads) with no decommission; no trigger fired: elapsed-time dormant under preview, the guard fixes are no vulnerability or compromised artifact under the preview reading, no operator direction, audience not arrived
