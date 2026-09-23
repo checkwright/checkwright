@@ -34,6 +34,8 @@ one battery member's verdict is a function of the host, so a green local battery
 
 **Scope's ruling on the three shapes:** pin the analyser version in the workflow, installed as a digest-verified release, and state the pinned version as the CI verdict's reference where `check-shellcheck`'s contract is specified. Refused: reporting the version the gate ran (it makes skew legible and leaves it in place), and accepting the float (it concedes the promise this entry defends). Admitted on the enhancement filter's supply-chain arm — a floating third-party tool in CI is the gap — and taken this iteration by operator direction, 2026-09-23, lead-relayed.
 
+**Build (2026-09-23):** the `gates` job installs the upstream `v0.11.0` release asset, refused unless its SHA-256 matches the pinned digest, which equals the release's own recorded asset digest; that is also the latest upstream release and the development host's version. §check-shellcheck states the pinned release as the CI verdict's reference and points at the job for its value rather than spelling it. The entry stays active until that run is read.
+
 **Cost while deferred:** the pre-push battery's promise — that a green local run predicts a green remote one — is false for one member, and the failure mode is a burned push. Filed 2026-08-27 by scope; attested by the `windows-adopter-unblock` close's own verifying push.
 
 ## Deferred

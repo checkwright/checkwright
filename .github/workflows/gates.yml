@@ -55,8 +55,27 @@ jobs:
         run: |
           rustup target add x86_64-pc-windows-msvc
           cargo check --release --manifest-path native/Cargo.toml --target x86_64-pc-windows-msvc
+      # gate-sdk/SPEC.md §check-shellcheck: this pin is the CI verdict's
+      # reference. Bump the version and the upstream asset's digest together.
+      - name: install the pinned shellcheck release, digest-verified
+        env:
+          SHELLCHECK_VERSION: v0.11.0
+          SHELLCHECK_SHA256: 8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198
+        run: |
+          set -euo pipefail
+          dir="$RUNNER_TEMP/shellcheck"
+          asset="shellcheck-$SHELLCHECK_VERSION.linux.x86_64.tar.xz"
+          mkdir -p "$dir"
+          curl -sSfL --retry 3 -o "$dir/$asset" \
+            "https://github.com/koalaman/shellcheck/releases/download/$SHELLCHECK_VERSION/$asset"
+          ( cd "$dir" && printf '%s  %s\n' "$SHELLCHECK_SHA256" "$asset" | sha256sum -c - )
+          tar -xJf "$dir/$asset" -C "$dir"
+          echo "$dir/shellcheck-$SHELLCHECK_VERSION" >> "$GITHUB_PATH"
+          "$dir/shellcheck-$SHELLCHECK_VERSION/shellcheck" --version
       - name: full battery
-        run: bash gate-sdk/bin/run-gates.sh
+        run: |
+          shellcheck --version | grep '^version:'
+          bash gate-sdk/bin/run-gates.sh
       - name: fixture suites (derived from */gate-tests)
         run: |
           suites="$(bash gate-sdk/bin/run-gates.sh --emit fixture-suites)" || exit 2
