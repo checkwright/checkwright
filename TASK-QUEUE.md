@@ -1596,18 +1596,4 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 ## Done
 
-- projection-path-literals
-- docs-mirror-root-unrelocatable
-- couples-literals-undisposed
-- suite-corpus-skips-tests-dir
-- unmarked-discharge-vs-span
-- policy-choice-census-residue
-- repo-inherits-policy-defaults
-- cannot-run-marker-late-read
-- stage-exit-no-successor-check
-- lead-capture-dirties-batch
-- knob-default-export-unsteered
-- worktree-gate-execution
-- worktree-dispatch-rebuilds-the-gate-binary
-
 ## Lessons Learned
