@@ -1658,13 +1658,4 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 ## Done
 
-- worktree-hook-guards-fail-open
-- shell-textual-absoluteness-single-dialect
-- ps1-ascii-unheld-at-commit
-- armed-by-content-emptiness-shape
-- smoke-registry-omission-blind
-- doc-path-hardcoded-reads
-- canon-spec-prune-bakes-docs
-- pipe-membership-corpus-omits-test-suites
-
 ## Lessons Learned
