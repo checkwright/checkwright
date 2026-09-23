@@ -8,6 +8,125 @@
 
 ## New Features
 
+### projection-path-literals
+
+[spec: SPEC-knob-paths.md]
+
+the `# projection:` line still carries consumer-path literals: `docs/enforcement.md` on `check-enforcement-fresh`, `docs/footprint.md` on `check-footprint-fresh`, `docs/check-graph.html` and the hook paths on `check-graph`, and `ROADMAP.md` on `check-roadmap-fresh`. gate-sdk/SPEC.md §The install disposition refuses a `knob:` token on that line. Now that those gates' `couples=` name the same paths through knobs, an adopter who relocates one through its knob gets a projection glob that the coupling no longer covers. **Run 2026-09-23 at spec:** with `GATE_SDK_ENFORCEMENT_FILE=site/enforcement.md`, `check-projection-roster` exits 1 on assertion A.
+
+**Deliverable:** the projection grammar admits `knob:` (or derives the line from the knob), with a fixture that relocates a projection.
+
+**Specified 2026-09-23:** the projection line and the registry prune field take a knob-path token. `knob:<NAME>` or `knob:<NAME>/<glob>` resolves to the knob's value verbatim, with no covering conversion, through one resolver, `registry::knob_paths`. The four kit freshness members name their outputs through the knobs their `couples=` already carry. A line that resolves to nothing declares no projection on that tree.
+
+**Cost while deferred:** relocating a projection reds the battery. Filed 2026-09-23 to the gap inbox by gate-sdk-blind-spots' spec, since doc-path-couples converted only the `couples=` half; promoted at the close drain because it is a grammar change. Owner lookup: gate-sdk/SPEC.md §The install disposition (the projection declaration).
+
+### docs-mirror-root-unrelocatable
+
+[spec: SPEC-knob-paths.md]
+
+canon-kit's docs mirror root is one kit spelling, `docs/`: `--emit docs-mirror` writes under it and the canonical-spec finder prunes it. An adopter's own `SPEC.md` at `docs/<dir>/` is therefore invisible to the spec-reading gates, and a site root elsewhere cannot host the mirror. canon-kit/SPEC.md §The shared spec adapters states that limit.
+
+**Deliverable:** a knob that moves the generator and the prune together, plus a `knob:` source for a registry prune declaration (gate-sdk/SPEC.md §check-reads-couples).
+
+**Specified 2026-09-23:** a new knob, `CANON_KIT_MIRROR_ROOT` (default `docs`), moves the generator, the freshness comparator and the canonical-spec prune together. The prune is declared as `knob:CANON_KIT_MIRROR_ROOT/*` through the knob-path token. `CANON_KIT_LINK_ROOT` was weighed and refused: reusing it would leave an adopter's `docs/<dir>/SPEC.md` pruned, and the mirror needs only to sit under the link root.
+
+**Cost while deferred:** none on this tree; an adopter with specs under `docs/` silently loses their discovery. Filed 2026-09-23 to the gap inbox by gate-sdk-blind-spots' spec; promoted at the close drain, since spec-prune ruled no knob and minting one is spec work. Owner lookup: canon-kit/SPEC.md §The shared spec adapters.
+
+### couples-literals-undisposed
+
+[spec: SPEC-knob-paths.md]
+
+two `couples=` literals fit none of doc-path-couples' five dispositions. `check-enforcement-fresh`'s `.github/workflows/*.yml` narrows a marker-grep walk to one directory, though the walk is rooted at `GATE_SDK_ENFORCE_SCAN_DIR` and does not filter to `*.yml`. `lifecycle-kit/templates/stages/*.md` on `check-footprint-fresh` and `check-surface-ratchet` may be a `templates/` carve-out or a frozen literal needing a token; which one was never determined.
+
+**Deliverable:** a disposition for each, with the SPEC's disposition set widened if neither fits.
+
+**Specified 2026-09-23:** no disposition is added.
+
+- The workflow glob under-covers the walk. It becomes `knob:GATE_SDK_ENFORCE_SCAN_DIR/*`, once a `.` root stops producing a dead `*./*` pattern.
+- The stage-templates literal is redundant beside `kit:templates/*.md`, whose `*` crosses `/`, as `--for` confirms. It comes off, along with the same literal on `check-shim-restatement`, whose SPEC sentence claiming otherwise is corrected.
+
+**Cost while deferred:** both stay pinned to this repo's layout. Filed 2026-09-23 to the gap inbox by align's audit of doc-path-couples; promoted at the close drain because each needs a design call. Owner lookup: gate-sdk/SPEC.md §check-reads-couples.
+
+### unmarked-discharge-vs-span
+
+[spec: SPEC-discharge-span.md]
+
+`check-unmarked-claim` discharges a class match anywhere in a full-line marker's paragraph, while `CANON_KIT_MEASURED_SPAN` at `sentence` narrows `check-measured-claim` arm C to the paragraph's first sentence. So under `sentence` a claim in a later sentence reads as marked though arm C no longer reads it. canon-kit/SPEC.md §check-unmarked-claim states the divergence; whether the discharge should follow the span is unruled.
+
+**Deliverable:** a ruling, and the discharge walk made to follow the span or the divergence grounded as intended.
+
+**Specified 2026-09-23:** a full-line marker discharges exactly the claim it binds, read through one helper both gates share. That claim is the text below the marker, narrowed by the span, and it is the whole block at `off`. A second divergence was found at authoring and is closed with it: a mid-paragraph marker discharged class matches above it at every span.
+
+**Cost while deferred:** nothing reds or passes differently on this tree, whose four full-line markers carry a non-cardinal value; an adopter binding `sentence` gets a discharge wider than the check. Filed 2026-09-23 to the gap inbox by `consumer-policy-seam`'s build; promoted at its close, because the answer is a semantic ruling.
+
+### policy-choice-census-residue
+
+[spec: SPEC-policy-residue.md]
+
+the `consumer-policy-seam` spec census left eleven members owing a ruling under doctrine-kit/DOCTRINE.md's Policy-as-choice discriminator.
+
+**Eight kit-fixed values**, each SPEC-grounded in terms other than the discriminator's: `check-shellcheck` and `check-action-run-shell`'s `-S warning` floor; `check-prose-tells`' all-caps run of 3 and its contrast and tricolon regexes; `check-provenance-seam`'s 7..40 hex run; `check-queue-prose-precondition`'s past-tense verb list; `check-prose-enum`'s 8- and 16-byte adjacency gaps; `check-fence-run`'s `DEPTH_BACKSTOP=3`; `check-gate-assertions`' cardinal words capped at nine; and the msg-patterns template's account-noun `{0,6}` reach. **Three knobs with no `off`**: `QUEUE_KIT_WRAP_BUDGET`, `LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP` and `LIFECYCLE_KIT_SHIM_NGRAM` validate a positive integer only, where `QUEUE_KIT_ENTRY_CAP` and `QUEUE_KIT_SLUG_MAX` admit `off`.
+
+**Deliverable:** per fixed value, its SPEC ground restated in the discriminator's terms (grammar, contract, external limit, verdict-neutral) or a knob. Per knob, `off` admitted where the gate's other assertions survive it, or a stated ground that the calibration is the gate's whole predicate.
+
+**Specified 2026-09-23:**
+
+- **Knobs.** Two new knobs, `CANON_KIT_PROSE_TELL_ABBR_MIN_LEN` and `QUEUE_KIT_PRECONDITION_PAST_REGEX`, each admitting `off`. `LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP` admits `off`.
+- **Structural bounds and grammar.** `check-prose-enum`'s byte caps give way to its structural chaining bound. `check-gate-assertions` reads the shared cardinal grammar.
+- **Grounds restated.** Every other member takes a ground in the discriminator's terms, and the wrap budget and the shim width are each their gate's whole predicate.
+
+**Cost while deferred:** the Policy-as-choice audit-roster class re-reads the same eleven on every due sweep, and the census sweeps already split on two of them. Filed 2026-09-22 to the gap inbox as two bullets by the spec census; merged and promoted 2026-09-23 at close, because every member is a per-member ruling.
+
+### cannot-run-marker-late-read
+
+[spec: SPEC-marker-grammar.md]
+
+`check-stage-entry` assertion D reads cannot-run markers only when the cursor enters the audit-entry stage (`native/src/gates/stage_entry.rs`, `at_audit_entry`), because its residue half, a marker not yet run, is legitimate before build. A marker whose `— <reason>` separator is missing is a spelling defect that a commit-time check could catch. Attested at gate-sdk-blind-spots: spec committed one joined by a period, align's commits passed the battery over it, and only the lead's build dispatch read refused it, which cost one align resume.
+
+**Deliverable:** assertion D split so the marker grammar is held at every commit and the residue at build entry, with fixture cases for both.
+
+**Specified 2026-09-23:** a new assertion (E) inside `check-stage-entry` holds the marker grammar at every firing, whatever the cursor. That covers an empty reason, an empty command and a misplaced spelling. D keeps only the well-formed not-run residue at audit-entry. No new gate is minted, because the gate already fires on every amendment and queue commit.
+
+**Cost while deferred:** a misspelt marker is caught one stage late. Filed 2026-09-23 to the gap inbox by the lead; promoted at the close drain because a gate split is spec work. Owner lookup: lifecycle-kit/SPEC.md §check-stage-entry (assertion D) and §templates/stages/ (the marker grammar).
+
+### stage-exit-no-successor-check
+
+[spec: SPEC-successor-read.md]
+
+every stage template's last step is only the journal's `DONE` append (lifecycle-kit/templates/stages/*.md). So a refusal of the successor's entry surfaces only at the lead's `--enter-stage --dispatch <next>` read, and with no lead it does not surface at all. lifecycle-kit/templates/lead.md already calls that read the backstop and names "the stage template's own last step" as the repair; that sentence is true only of the journal refusal it names. Attested at gate-sdk-blind-spots: align reported done over a malformed cannot-run marker that `--enter-stage --simulate build` refuses.
+
+**Deliverable:** a last step `--enter-stage --simulate <successor>` in each stage template whose successor is known, a stated answer for a trigger-gated successor, and the lead.md sentence made true.
+
+**Specified 2026-09-23:** each stage template reads its successor's entry with `--simulate` after its last commit and before the `DONE` append. The trigger-gated successor is the one the session recommended. A build batch that leaves work active reads none. The lead sentence names the successor read and the journal together.
+
+**Cost while deferred:** a successor-entry refusal costs a resumed session instead of being caught before the report. Filed 2026-09-23 to the gap inbox by the lead; promoted at the close drain because the fix adds a step to six shipped templates. Owner lookup: lifecycle-kit/SPEC.md §templates/stages/, which says nothing about a successor read.
+
+### lead-capture-dirties-batch
+
+[spec: SPEC-lead-capture.md]
+
+lifecycle-kit/templates/lead.md has the lead commit a gap bullet "at the first moment the git index is free of stage-session work", but nothing stops the lead writing the bullet while a batch runs. At gate-sdk-blind-spots build batch 1 the lead's uncommitted `.workflow/gap-inbox.md` made `installer/consumer-smoke/run-smoke.sh` refuse its dirty tree, so that smoke shipped unrun and batch 2 discharged it. The rule governs the commit and not the write.
+
+**Deliverable:** one of: a mid-batch capture held in the lead journal and filed between dispatches; or the gap inbox exempted from clean-tree preconditions. The template sentence says which.
+
+**Specified 2026-09-23:** the capture is held. A capture made while a dispatched stage session is live goes to the lead journal and is filed and committed at the first moment none is. The exemption is refused because it covers one capture channel of two, leaves a batch's `git add` free to sweep the bullet, and is a carve-out the installer's own predicate already refused.
+
+**Cost while deferred:** a mid-batch capture can leave a batch's clean-tree verification unrun. Filed 2026-09-23 to the gap inbox by the lead after gate-sdk-blind-spots' close; promoted 2026-09-23 at the next scope. Owner lookup: lifecycle-kit/templates/lead.md (the commit-the-bullet paragraph), which rules the commit only.
+
+### knob-default-export-unsteered
+
+[spec: SPEC-knob-echo.md]
+
+a battery or arm call prefixed `export GATE_SDK_NATIVE_BIN=native/target/release/checkwright-gates &&`, or the same bare env-assign prefix, falls through the guard unsteered and costs an out-of-band decision; 15 of 231 prompting calls at gate-sdk-blind-spots' close carried it. The value is the knob's own default (gate-sdk/SPEC.md §Layout and configuration), so the prefix buys nothing. **Probed at promotion:** both spellings exit 0 from `scripts/bash-guard.sh` with no output; rule 6 catches a standalone assignment only.
+
+**Deliverable:** a generic-ruleset steer that refuses exporting or env-assigning a gate-sdk knob to its default and names the default, or a ruling that the cause is the prose (sessions read "the gate binary at `GATE_SDK_NATIVE_BIN`" as needing the variable set) and that prose fix instead.
+
+**Admitted by operator exception to the enhancement admission filter** (TRAJECTORY.md §The rulings, its exception clause) — `operator direction, 2026-09-23`, lead-relayed. A new rule reaches none of the three arms. The reason, as escalated: this is the pool's only session-class row, a cost every battery-running session pays.
+
+**Specified 2026-09-23:** the steer, as arm (d) of guard-kit rule 2. It blocks an `export`, leading-assignment or `env` prefix that sets any statically owned kit knob to the value it already resolves to, or to another spelling of the same file. It names the value and falls through on a differing override. A respelled path is its sharpest case, because it reds `check-graph` through the baked hook text.
+
+**Cost while deferred:** every session that runs the battery risks a prompt per prefixed call. Filed 2026-09-23 to the gap inbox by gate-sdk-blind-spots' close; promoted 2026-09-23 at the next scope. Owner lookup: `export`, `env-assign`, `knob default` in guard-kit/SPEC.md — none.
+
 ## Technical Debt
 
 ### suite-corpus-skips-tests-dir
@@ -30,18 +149,6 @@ Policy-as-choice says a consumer holding a choice binds it in its own config and
 
 ## Deferred
 
-### knob-default-export-unsteered
-
-[cost: session/low] [surface: guard-kit]
-
-a battery or arm call prefixed `export GATE_SDK_NATIVE_BIN=native/target/release/checkwright-gates &&`, or the same bare env-assign prefix, falls through the guard unsteered and costs an out-of-band decision; 15 of 231 prompting calls at gate-sdk-blind-spots' close carried it. The value is the knob's own default (gate-sdk/SPEC.md §Layout and configuration), so the prefix buys nothing. **Probed at promotion:** both spellings exit 0 from `scripts/bash-guard.sh` with no output; rule 6 catches a standalone assignment only.
-
-**Deliverable:** a generic-ruleset steer that refuses exporting or env-assigning a gate-sdk knob to its default and names the default, or a ruling that the cause is the prose (sessions read "the gate binary at `GATE_SDK_NATIVE_BIN`" as needing the variable set) and that prose fix instead.
-
-**Admitted by operator exception to the enhancement admission filter** (TRAJECTORY.md §The rulings, its exception clause) — `operator direction, 2026-09-23`, lead-relayed. A new rule reaches none of the three arms. The reason, as escalated: this is the pool's only session-class row, a cost every battery-running session pays.
-
-**Cost while deferred:** every session that runs the battery risks a prompt per prefixed call. Filed 2026-09-23 to the gap inbox by gate-sdk-blind-spots' close; promoted 2026-09-23 at the next scope. Owner lookup: `export`, `env-assign`, `knob default` in guard-kit/SPEC.md — none.
-
 ### foreign-toolchain-docker-legs
 
 [cost: event/low] [surface: gate-sdk]
@@ -53,16 +160,6 @@ this host lacks `pwsh` and `dash`, so the front-end parity check's PowerShell ha
 **Enhancement admission filter:** contributor tooling reaching none of the three arms; held Deferred without an operator exception.
 
 **Cost while deferred:** a unit touching a PowerShell or dash path risks a second watched push. Filed 2026-09-23 to the gap inbox on an operator suggestion, lead-relayed, after gate-sdk-blind-spots' close; promoted 2026-09-23 at the next scope. Owner lookup: `docker`, `dash`, `pwsh` in this file — `pwsh` hits only [instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set](#instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set), whose subject is a CI leg's binding transition, not a local run.
-
-### lead-capture-dirties-batch
-
-[cost: event/low] [surface: lifecycle-kit]
-
-lifecycle-kit/templates/lead.md has the lead commit a gap bullet "at the first moment the git index is free of stage-session work", but nothing stops the lead writing the bullet while a batch runs. At gate-sdk-blind-spots build batch 1 the lead's uncommitted `.workflow/gap-inbox.md` made `installer/consumer-smoke/run-smoke.sh` refuse its dirty tree, so that smoke shipped unrun and batch 2 discharged it. The rule governs the commit and not the write.
-
-**Deliverable:** one of: a mid-batch capture held in the lead journal and filed between dispatches; or the gap inbox exempted from clean-tree preconditions. The template sentence says which.
-
-**Cost while deferred:** a mid-batch capture can leave a batch's clean-tree verification unrun. Filed 2026-09-23 to the gap inbox by the lead after gate-sdk-blind-spots' close; promoted 2026-09-23 at the next scope. Owner lookup: lifecycle-kit/templates/lead.md (the commit-the-bullet paragraph), which rules the commit only.
 
 ### worktree-gate-execution
 
@@ -77,56 +174,6 @@ a worktree-isolated `audit-sweep` has no gate binary for its oracle arms. `DELEG
 **Deliverable:** a feasibility ruling on running verdict-bearing arms in a linked worktree, then either that path or the limitation stated in delegation-kit/templates/agent-execution.md. Settle the text clash as well: `.claude/agents/audit-sweep.md` §Return contract says the type "owes no resume journal", and the resume-journal bullet keeps journals for agents that change files. Both contradict the direction.
 
 **Cost while deferred:** a review sweep either runs isolated without its oracle or is misrouted to an excerpt-locator that keeps no journal. Filed 2026-09-23 to the gap inbox as three bullets, one from the lead and two carrying the direction; merged and promoted at gate-sdk-blind-spots' close drain. Owner lookup: gate-sdk/SPEC.md §lib/gate.sh (`gate_harness_bin`); delegation-kit/SPEC.md §The delegation model (D2, isolation costs). Neither rules on verdict arms in a worktree.
-
-### stage-exit-no-successor-check
-
-[cost: event/low] [surface: lifecycle-kit]
-
-every stage template's last step is only the journal's `DONE` append (lifecycle-kit/templates/stages/*.md). So a refusal of the successor's entry surfaces only at the lead's `--enter-stage --dispatch <next>` read, and with no lead it does not surface at all. lifecycle-kit/templates/lead.md already calls that read the backstop and names "the stage template's own last step" as the repair, a step no template has. Attested at gate-sdk-blind-spots: align reported done over a malformed cannot-run marker that `--enter-stage --simulate build` refuses.
-
-**Deliverable:** a last step `--enter-stage --simulate <successor>` in each stage template whose successor is known, a stated answer for a trigger-gated successor, and the lead.md sentence made true.
-
-**Cost while deferred:** a successor-entry refusal costs a resumed session instead of being caught before the report. Filed 2026-09-23 to the gap inbox by the lead; promoted at the close drain because the fix adds a step to six shipped templates. Owner lookup: lifecycle-kit/SPEC.md §templates/stages/, which says nothing about a successor read.
-
-### cannot-run-marker-late-read
-
-[cost: event/low] [surface: lifecycle-kit]
-
-`check-stage-entry` assertion D reads cannot-run markers only when the cursor enters the audit-entry stage (`native/src/gates/stage_entry.rs`, `at_audit_entry`), because its residue half, a marker not yet run, is legitimate before build. A marker whose `— <reason>` separator is missing is a spelling defect that a commit-time check could catch. Attested at gate-sdk-blind-spots: spec committed one joined by a period, align's commits passed the battery over it, and only the lead's build dispatch read refused it, which cost one align resume.
-
-**Deliverable:** assertion D split so the marker grammar is held at every commit and the residue at build entry, with fixture cases for both.
-
-**Cost while deferred:** a misspelt marker is caught one stage late. Filed 2026-09-23 to the gap inbox by the lead; promoted at the close drain because a gate split is spec work. Owner lookup: lifecycle-kit/SPEC.md §check-stage-entry (assertion D) and §templates/stages/ (the marker grammar).
-
-### projection-path-literals
-
-[cost: event/low] [surface: gate-sdk]
-
-the `# projection:` line still carries consumer-path literals: `docs/enforcement.md` on `check-enforcement-fresh`, `docs/footprint.md` on `check-footprint-fresh`, `docs/check-graph.html` and the hook paths on `check-graph`, and `ROADMAP.md` on `check-roadmap-fresh`. gate-sdk/SPEC.md §The install disposition refuses a `knob:` token on that line. Now that those gates' `couples=` name the same paths through knobs, an adopter who relocates one through its knob gets a projection glob that the coupling no longer covers, which reds `check-projection-roster` assertion A. That last step is inferred, not run.
-
-**Deliverable:** the projection grammar admits `knob:` (or derives the line from the knob), with a fixture that relocates a projection.
-
-**Cost while deferred:** relocating a projection reds the battery. Filed 2026-09-23 to the gap inbox by gate-sdk-blind-spots' spec, since doc-path-couples converted only the `couples=` half; promoted at the close drain because it is a grammar change. Owner lookup: gate-sdk/SPEC.md §The install disposition (the projection declaration).
-
-### docs-mirror-root-unrelocatable
-
-[cost: event/low] [surface: canon-kit]
-
-canon-kit's docs mirror root is one kit spelling, `docs/`: `--emit docs-mirror` writes under it and the canonical-spec finder prunes it. An adopter's own `SPEC.md` at `docs/<dir>/` is therefore invisible to the spec-reading gates, and a site root elsewhere cannot host the mirror. canon-kit/SPEC.md §The shared spec adapters states that limit.
-
-**Deliverable:** a knob that moves the generator and the prune together, plus a `knob:` source for a registry prune declaration (gate-sdk/SPEC.md §check-reads-couples).
-
-**Cost while deferred:** none on this tree; an adopter with specs under `docs/` silently loses their discovery. Filed 2026-09-23 to the gap inbox by gate-sdk-blind-spots' spec; promoted at the close drain, since spec-prune ruled no knob and minting one is spec work. Owner lookup: canon-kit/SPEC.md §The shared spec adapters.
-
-### couples-literals-undisposed
-
-[cost: event/low] [surface: gate-sdk]
-
-two `couples=` literals fit none of doc-path-couples' five dispositions. `check-enforcement-fresh`'s `.github/workflows/*.yml` narrows a marker-grep walk to one directory, though the walk is rooted at `GATE_SDK_ENFORCE_SCAN_DIR` and does not filter to `*.yml`. `lifecycle-kit/templates/stages/*.md` on `check-footprint-fresh` and `check-surface-ratchet` may be a `templates/` carve-out or a frozen literal needing a token; which one was never determined.
-
-**Deliverable:** a disposition for each, with the SPEC's disposition set widened if neither fits.
-
-**Cost while deferred:** both stay pinned to this repo's layout. Filed 2026-09-23 to the gap inbox by align's audit of doc-path-couples; promoted at the close drain because each needs a design call. Owner lookup: gate-sdk/SPEC.md §check-reads-couples.
 
 ### queue-migrate-bold-split
 
@@ -675,28 +722,6 @@ the consumer's local-only companion files have read triggers at three skills and
 **Held Deferred by the enhancement admission filter** (TRAJECTORY.md §The rulings): new template slots are an enhancement that cuts no time-to-first-value, closes no trust gap and produces no external proof.
 
 **Cost while deferred:** local-only surfaces drift until a consult happens to audit them. Filed 2026-09-18 to the gap inbox by the consult that audited the local-only files, after `external-install-evidence`'s close; promoted to Deferred at the next scope.
-
-### policy-choice-census-residue
-
-[cost: event/low] [surface: canon-kit]
-
-the `consumer-policy-seam` spec census left eleven members owing a ruling under doctrine-kit/DOCTRINE.md's Policy-as-choice discriminator.
-
-**Eight kit-fixed values**, each SPEC-grounded in terms other than the discriminator's: `check-shellcheck` and `check-action-run-shell`'s `-S warning` floor; `check-prose-tells`' all-caps run of 3 and its contrast and tricolon regexes; `check-provenance-seam`'s 7..40 hex run; `check-queue-prose-precondition`'s past-tense verb list; `check-prose-enum`'s 8- and 16-byte adjacency gaps; `check-fence-run`'s `DEPTH_BACKSTOP=3`; `check-gate-assertions`' cardinal words capped at nine; and the msg-patterns template's account-noun `{0,6}` reach. **Three knobs with no `off`**: `QUEUE_KIT_WRAP_BUDGET`, `LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP` and `LIFECYCLE_KIT_SHIM_NGRAM` validate a positive integer only, where `QUEUE_KIT_ENTRY_CAP` and `QUEUE_KIT_SLUG_MAX` admit `off`. Re-verified 2026-09-23: `DEPTH_BACKSTOP`, the `{0,6}` reach and all three validators read as filed.
-
-**Deliverable:** per fixed value, its SPEC ground restated in the discriminator's terms (grammar, contract, external limit, verdict-neutral) or a knob. Per knob, `off` admitted where the gate's other assertions survive it, or a stated ground that the calibration is the gate's whole predicate.
-
-**Cost while deferred:** the Policy-as-choice audit-roster class re-reads the same eleven on every due sweep, and the census sweeps already split on two of them. Filed 2026-09-22 to the gap inbox as two bullets by the spec census; merged and promoted 2026-09-23 at close, because every member is a per-member ruling.
-
-### unmarked-discharge-vs-span
-
-[cost: event/low] [surface: canon-kit]
-
-`check-unmarked-claim` discharges a class match anywhere in a full-line marker's paragraph, while `CANON_KIT_MEASURED_SPAN` at `sentence` narrows `check-measured-claim` arm C to the paragraph's first sentence. So under `sentence` a claim in a later sentence reads as marked though arm C no longer reads it. canon-kit/SPEC.md §check-unmarked-claim states the divergence; whether the discharge should follow the span is unruled.
-
-**Deliverable:** a ruling, and the discharge walk made to follow the span or the divergence grounded as intended.
-
-**Cost while deferred:** nothing reds or passes differently on this tree, whose four full-line markers carry a non-cardinal value; an adopter binding `sentence` gets a discharge wider than the check. Filed 2026-09-23 to the gap inbox by `consumer-policy-seam`'s build; promoted at its close, because the answer is a semantic ruling.
 
 ## Icebox
 
