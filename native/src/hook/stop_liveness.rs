@@ -125,6 +125,11 @@ pub fn fire(
     if shell_task_running(payload) {
         decision = "refuse";
     }
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — a harness helper's firing allows on
+    // every arm and keeps its verdict, so `red`, `corrupt` or `unresolved` beside `allow` marks it
+    if harness_helper(payload) {
+        decision = "allow";
+    }
 
     let values = [
         event.as_str(),
@@ -184,6 +189,33 @@ fn shell_task_running(payload: Option<&Value>) -> bool {
         Some(id) if !id.is_empty() => has_whole_token(&transcript, id.as_bytes()),
         _ => true,
     })
+}
+
+// spec: delegation-kit/SPEC.md §The turn-end liveness hook — the helper test: all three marks, each
+// read positively, so an absent key fails its mark
+fn harness_helper(payload: Option<&Value>) -> bool {
+    let Some(d) = payload else {
+        return false;
+    };
+    let untyped = d.get("agent_type").and_then(Value::as_str) == Some("");
+    let transcript_absent = d
+        .get("agent_transcript_path")
+        .and_then(Value::as_str)
+        .filter(|p| !p.is_empty())
+        .is_some_and(|p| {
+            matches!(std::fs::metadata(p), Err(e) if e.kind() == std::io::ErrorKind::NotFound)
+        });
+    let unlisted = match (
+        d.get("agent_id").and_then(Value::as_str).filter(|id| !id.is_empty()),
+        d.get("background_tasks").and_then(Value::as_array),
+    ) {
+        (Some(id), Some(tasks)) => !tasks.iter().any(|t| {
+            t.get("type").and_then(Value::as_str) == Some("subagent")
+                && t.get("id").and_then(Value::as_str) == Some(id)
+        }),
+        _ => false,
+    };
+    untyped && transcript_absent && unlisted
 }
 
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — a whole token is bounded on both
@@ -667,6 +699,81 @@ mod tests {
                 assert_eq!(f.stderr, TASK_REFUSAL, "case {}", case);
             }
         }
+    }
+
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the helper firing/non-firing pair:
+    // over every combination of the three conditions, and over each key absent, only all three
+    // together allow, on the task view and on every refusing reader arm alike
+    #[test]
+    fn only_a_firing_meeting_all_three_helper_conditions_is_a_helper() {
+        let real = "a-real";
+        let with = |agent_type: Option<&str>, transcript: Option<&str>, agent_id: Option<&str>| {
+            let mut d = serde_json::json!({
+                "session_id": "s-1",
+                "hook_event_name": "SubagentStop",
+                "stop_hook_active": false,
+                "background_tasks": [
+                    {"id": real, "type": "subagent", "status": "running"},
+                    {"id": "t1", "type": "shell", "status": "running"},
+                ],
+            });
+            for (k, v) in [("agent_type", agent_type), ("agent_transcript_path", transcript), ("agent_id", agent_id)] {
+                if let Some(v) = v {
+                    d[k] = Value::from(v);
+                }
+            }
+            d.to_string()
+        };
+        for untyped in [false, true] {
+            for absent in [false, true] {
+                for unlisted in [false, true] {
+                    let case = format!("helper-{}{}{}", untyped as u8, absent as u8, unlisted as u8);
+                    let s = Scratch::new(&case);
+                    let transcript = s.at("agent.jsonl");
+                    if !absent {
+                        std::fs::write(&transcript, r#"{"toolUseResult":{"backgroundTaskId":"t1"}}"#).expect("transcript");
+                    }
+                    let src = with(
+                        Some(if untyped { "" } else { "stage-session" }),
+                        Some(&transcript),
+                        Some(if unlisted { "a-help" } else { real }),
+                    );
+                    let helper = untyped && absent && unlisted;
+                    for (arm, code, records) in [("green", 0, false), ("red", 1, true), ("unresolved", 2, false)] {
+                        if records {
+                            s.record("k.run");
+                        }
+                        let log = s.at(&format!("{}.log", arm));
+                        let f = fire(payload(&src).as_ref(), &log, Some(&s.reader(&format!("r-{}", arm), code)), &s.at("runs"));
+                        let line = s.log(&format!("{}.log", arm));
+                        let _ = std::fs::remove_file(s.0.join("runs").join("k.run"));
+                        assert_eq!(f.code, if helper { 0 } else { 2 }, "case {} {}: {}", case, arm, line);
+                        want(&line, &case, &[
+                            &format!("verdict={}", arm),
+                            if helper { "decision=allow" } else { "decision=refuse" },
+                        ]);
+                        assert_eq!(f.stderr.is_empty(), helper, "case {} {}: {}", case, arm, f.stderr);
+                        assert!(!line.contains("stage-session") && !line.contains("a-help"),
+                            "case {} {}: the log carried a payload value: {}", case, arm, line);
+                    }
+                }
+            }
+        }
+        for (case, src) in [
+            ("helper-type-key-absent", with(None, Some("/nonexistent/agent.jsonl"), Some("a-help"))),
+            ("helper-transcript-key-absent", with(Some(""), None, Some("a-help"))),
+            ("helper-id-key-absent", with(Some(""), Some("/nonexistent/agent.jsonl"), None)),
+            ("helper-id-empty", with(Some(""), Some("/nonexistent/agent.jsonl"), Some(""))),
+        ] {
+            let s = Scratch::new(case);
+            let log = s.at("k.log");
+            let f = fire(payload(&src).as_ref(), &log, Some(&s.reader("rk", 0)), &s.at("runs"));
+            assert_eq!(f.code, 2, "case {}: an absent key must fail its condition: {}", case, s.log("k.log"));
+        }
+        let s = Scratch::new("helper-no-view");
+        let bare = r#"{"session_id":"s-1","hook_event_name":"SubagentStop","stop_hook_active":false,"agent_type":"","agent_transcript_path":"/nonexistent/agent.jsonl","agent_id":"a-help"}"#;
+        let f = fire(payload(bare).as_ref(), &s.at("n.log"), Some(&s.reader("rn", 1)), &s.at("runs"));
+        assert_eq!(f.code, 2, "a firing with no view cannot show its id unlisted, so it is no helper: {}", s.log("n.log"));
     }
 
     // spec: delegation-kit/SPEC.md §The turn-end liveness hook — case F4: `unresolved` refuses

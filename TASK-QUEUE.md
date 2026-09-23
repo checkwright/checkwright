@@ -64,18 +64,6 @@ a guard-kit rule number is a stable-looking identifier that is not stable: rules
 
 ## Technical Debt
 
-### subagent-stop-phantom-firing
-
-the turn-end liveness hook logs a `SubagentStop` firing about every 31 seconds that no dispatched child accounts for. **Probed at the drain:** `.workflow/subagent-stop-liveness.log` held 248 firings, and 25 were `decision=refuse` beside `verdict=green`, the task-view pairing delegation-kit/SPEC.md §The turn-end liveness hook names, each while the session held a running shell task. The key set matches a child's, so a discriminator built from keys alone has nothing to key on. A harness helper whose `agent_transcript_path` names the parent's transcript would produce exactly this. **Re-observed at promotion (2026-09-24):** the log, cleared at close, had re-accrued 33 firings at the same cadence under one session id.
-
-**Grant, operator 2026-09-24 (lead-relayed):** one out-of-band read of raw `SubagentStop` payloads, on the precedent of delegation-kit/SPEC.md §What `background_tasks` carries: payloads dumped to gitignored scratch, the registration restored byte-for-byte, the logged grammar untouched. Spent once taken.
-
-**Inferred, cannot run before build:** the phantom firing is a harness helper reading the parent's transcript — the hook is a compiled arm with no shell copy to edit, so the granted read needs a temporary payload-dumping wrapper on its `.claude/settings.json` registration, which build lands and restores.
-
-**Deliverable:** attribute the firing from that read, measure whether a refusal keeps a helper running, and converge the close triage's refusal count (and the hook's refusal, if a helper) on the attributed class, recording the finding in §The turn-end liveness hook. A fix needing a new logged field or knob is a new name: file it, never build it here.
-
-**Cost while deferred:** the close triage reads task-held refusals that overstate stalls, and a helper's refused stops may cost turns. Filed 2026-09-23 at `guard-harness-seams` build; promoted at its close; promoted 2026-09-24 at scope as `native-shell-guard`'s lead unit. Owner lookup: `SubagentStop`, `liveness hook`, `phantom` in this file: none that owns it.
-
 ## Deferred
 
 ### side-effect-free-read-arms
@@ -1569,5 +1557,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 `check-docs-cmd` assertion (C) misses a retired path cited from the queue, which is outside its manifest corpus and whose `<path>:<line>` token fails the path shape.
 
 ## Done
+
+- subagent-stop-phantom-firing
 
 ## Lessons Learned
