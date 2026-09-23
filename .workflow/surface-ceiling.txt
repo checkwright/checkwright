@@ -5,7 +5,7 @@
 1446cp .claude/commands/agent-execution.md
 551cp .claude/commands/align.md
 1148cp .claude/commands/build.md
-8556cp .claude/commands/close.md
+8444cp .claude/commands/close.md
 1759cp .claude/commands/consult.md
 1590cp .claude/commands/economics.md
 4609cp .claude/commands/lead.md
