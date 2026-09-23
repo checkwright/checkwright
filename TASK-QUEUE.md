@@ -1648,6 +1648,4 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 ## Done
 
-- scope-binding-hand-wipe
-
 ## Lessons Learned
