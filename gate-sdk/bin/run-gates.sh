@@ -27,15 +27,19 @@ fi
 # spec: gate-sdk/SPEC.md §run-gates — the binary located and exec'd with the environment this process already carries. $ARM_UNAVAILABLE_STATUS is the status a *dispatch* failure exits — 2 for every arm whose verdict a battery or a session reads, 0 for a harness-integration arm gating a user action, which §The non-gate arm rules must decline rather than wedge the session
 ARM_UNAVAILABLE_STATUS=2
 exec_arm() {
-    local bin
+    local bin why=''
     if [[ "$ARM_UNAVAILABLE_STATUS" -eq 0 ]]; then
         bin="$(gate_harness_bin)"
     else
-        bin="$(gate_native_bin_spelled)"
+        { IFS= read -r bin; IFS= read -r why; } < <(gate_verdict_bin)
     fi
     if [[ ! -x "$bin" ]]; then
         printf 'run-gates: %s dispatches to the native binary, but %s is absent or not ' "$1" "$bin" >&2
-        printf 'executable — it could not run. Build it: bash gate-sdk/bin/build-native.sh\n' >&2
+        if [[ -n "$why" ]]; then
+            printf 'executable — it could not run. In this linked worktree %s; run it in the main checkout rather than building here\n' "$why" >&2
+        else
+            printf 'executable — it could not run. Build it: bash gate-sdk/bin/build-native.sh\n' >&2
+        fi
         exit "$ARM_UNAVAILABLE_STATUS"
     fi
     exec "$bin" "$@"

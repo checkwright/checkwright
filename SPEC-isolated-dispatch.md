@@ -91,7 +91,7 @@ The unit's scope carries the directions recorded on its queue entry:
 
 ### (1) The verdict binary inside a linked worktree {design-bearing}
 
-**Not yet applied.**
+**Applied.** The shared linked-worktree test is factored into `_gate_main_checkout_bin`; a declined link prints a second line naming the refused condition, which the front end's message carries. The parity corpus flips its `--emit` case to the unignored-door refusal and adds a linking case with a worktree `.gitignore`.
 
 - **The function.** `gate-sdk/lib/gate.sh` gains `gate_verdict_bin`. When `gate_native_bin_spelled` is executable, it returns that. Otherwise, inside a linked worktree whose common dir is `<main>/.git` (`gate_harness_bin`'s test), it links the main checkout's own resolution of the knob into the local door path and returns the door. It links only when all four hold:
   - that binary is executable;
@@ -115,7 +115,7 @@ In gate-sdk/SPEC.md §The harness-integration arm, "Every verdict-bearing path k
 
 ### (2) check-crate-arms never builds in a linked worktree {design-bearing}
 
-**Not yet applied.** In `native/src/gates/crate_arms.rs`, inside a linked worktree, a miss in the local cache is looked up in the main checkout's scratch dir under the same record name. The record is keyed on source stamp and toolchain, so sharing it is sound. A miss in both is exit 2, naming the rule, and cargo is never run. In gate-sdk/SPEC.md §check-crate-arms, beside the cache paragraph, add:
+**Applied.** In `native/src/gates/crate_arms.rs`, inside a linked worktree, a miss in the local cache is looked up in the main checkout's scratch dir under the same record name. The record is keyed on source stamp and toolchain, so sharing it is sound. A miss in both is exit 2, naming the rule, and cargo is never run. In gate-sdk/SPEC.md §check-crate-arms, beside the cache paragraph, add:
 
 > **In a linked worktree the cache is read from the main checkout too, and a miss there is a refusal rather than a build**: a worktree is where a delegated read-only session runs, and a build is the mutation isolation exists to prevent (delegation-kit/templates/agent-execution.md, isolation cost (4)).
 

@@ -52,10 +52,19 @@ out="$(in_wt '{"tool_input":{"command":"cd deploy && ls"}}' bash bash-guard.sh)"
 [[ "$rc" -eq 2 ]] || note guard-status "want exit 2 from the bash guard on a blocked command, got $rc -- $out"
 grep -qF 'rules did not run' <<<"$out" && note guard-advisory "the bash guard took the unreachable-binary advisory: $out"
 
-# 5. a verdict-bearing arm takes no fallback and still reports the binary absent at 2
+# 5. a verdict-bearing arm links nothing onto a door path git does not ignore: exit 2, naming why
 out="$(in_wt '' bash gate-sdk/bin/run-gates.sh --emit knob-roster)"; rc=$?
-[[ "$rc" -eq 2 ]] || note emit-status "want exit 2 from --emit in a worktree with no binary, got $rc -- $out"
-grep -qF 'is absent or not executable' <<<"$out" || note emit-text "--emit did not report the binary absent: $out"
+[[ "$rc" -eq 2 ]] || note emit-status "want exit 2 from --emit with an unignored door path, got $rc -- $out"
+grep -qF 'is not gitignored here' <<<"$out" || note emit-text "--emit did not name the unignored door: $out"
+grep -qF 'Build it' <<<"$out" && note emit-remedy "the worktree refusal told the session to build: $out"
+[[ -e "$wt/native/target/release/checkwright-gates$(gate_exe_suffix)" ]] && note emit-linked "a binary was linked onto an unignored door path"
+
+# 7. with the door path ignored and no crate source tracked, the main checkout's installed binary is linked and runs
+printf 'native/target/\n' >"$wt/.gitignore"
+out="$(in_wt '' bash gate-sdk/bin/run-gates.sh --emit knob-values GATE_SDK_NATIVE_BIN)"; rc=$?
+[[ "$rc" -eq 0 ]] || note payload-status "want exit 0 through the linked main binary, got $rc -- $out"
+grep -qF 'GATE_SDK_NATIVE_BIN' <<<"$out" || note payload-text "the linked binary did not answer: $out"
+rm -rf "$wt/native" "$wt/.gitignore"
 
 # 6. an absolute pin naming nothing takes no fallback: the hook declines at 0 on its own line
 out="$( cd "$wt" && GATE_SDK_NATIVE_BIN="$SANDBOX/nowhere/gates" bash gate-sdk/bin/run-gates.sh --hook agent-dispatch-guard <<<'{"tool_input":{"subagent_type":"fork"}}' 2>&1 )"; rc=$?
@@ -70,6 +79,40 @@ grep -qF 'is absent or not executable' <<<"$out" || note control-text "the absen
 
 git -C "$main" worktree remove --force "$wt"
 
+# 8-9. a tree tracking the crate source: a main binary whose source stamp is the worktree's is linked
+#      and runs, one line of skew refuses at 2 without linking, and neither builds
+crate="$SANDBOX/crate"
+mkdir -p "$crate/gate-sdk"
+cp -R "$HERE/gate-sdk/bin" "$HERE/gate-sdk/lib" "$crate/gate-sdk/"
+while IFS= read -r f; do
+    mkdir -p "$crate/${f%/*}"
+    cp "$HERE/$f" "$crate/$f"
+done < <(git -C "$HERE" ls-files native)
+printf 'target/\n' >"$crate/.gitignore"
+git -C "$crate" init -q -b main
+git -C "$crate" -c user.email=t@example.invalid -c user.name=t add -A
+git -C "$crate" -c user.email=t@example.invalid -c user.name=t commit -qm seed
+cwt="$crate/.claude/worktrees/agent-02"
+git -C "$crate" worktree add -q -b agent-branch "$cwt" HEAD
+crate_bin="$crate/native/target/release/checkwright-gates$(gate_exe_suffix)"
+mkdir -p "${crate_bin%/*}"
+cp "$PINNED" "$crate_bin"
+door="$cwt/native/target/release/checkwright-gates$(gate_exe_suffix)"
+
+out="$( cd "$cwt" && unset GATE_SDK_NATIVE_BIN && bash gate-sdk/bin/run-gates.sh --emit knob-values GATE_SDK_NATIVE_BIN 2>&1 )"; rc=$?
+[[ "$rc" -eq 0 ]] || note stamp-match-status "want exit 0 through a stamp-matched main binary, got $rc -- $out"
+[[ -x "$door" ]] || note stamp-match-link "the stamp-matched main binary was not linked at the door path"
+[[ -e "$cwt/native/target/release/deps" ]] && note stamp-match-build "a build ran in the worktree"
+
+rm -f "$door"
+printf '// skew\n' >>"$cwt/native/src/main.rs"
+out="$( cd "$cwt" && unset GATE_SDK_NATIVE_BIN && bash gate-sdk/bin/run-gates.sh --emit knob-values GATE_SDK_NATIVE_BIN 2>&1 )"; rc=$?
+[[ "$rc" -eq 2 ]] || note skew-status "want exit 2 on a skewed crate, got $rc -- $out"
+grep -qF "was not built from this worktree's crate source" <<<"$out" || note skew-text "the refusal did not name the skew: $out"
+[[ -e "$door" ]] && note skew-link "a skewed main binary was linked"
+[[ -e "$cwt/native/target/release/deps" ]] && note skew-build "a build ran in the worktree"
+git -C "$crate" worktree remove --force "$cwt"
+
 [[ "$fails" -eq 0 ]] || { echo "run-gates-linked-worktree.test: $fails assertion(s) failed"; exit 1; }
-echo "run-gates-linked-worktree.test: clean (from a linked worktree with no binary the fork ban, the workflow-state guard and the bash guard fire through the main checkout's binary; --emit still reports it absent at 2; an absolute pin naming nothing takes no fallback; with both absent the hook declines at 0)"
+echo "run-gates-linked-worktree.test: clean (from a linked worktree with no binary the fork ban, the workflow-state guard and the bash guard fire through the main checkout's binary; a verdict arm links the main binary only onto a gitignored door and, where crate source is tracked, only on a matching source stamp, refusing at 2 with the reason otherwise and never building; an absolute pin naming nothing takes no fallback; with both absent the hook declines at 0)"
 exit 0

@@ -129,8 +129,8 @@ function Resolve-GitDir {
     return $r.ProviderPath.TrimEnd([char[]]@('/', '\'))
 }
 
-# spec: gate-sdk/SPEC.md §lib/gate.sh — gate_harness_bin's linked-worktree half: inside a linked worktree whose common dir is <main>/.git, the main checkout's own resolution of the knob, rooted, when runnable; $null otherwise
-function Get-MainCheckoutExe {
+# spec: gate-sdk/SPEC.md §lib/gate.sh — _gate_main_checkout_bin: inside a linked worktree whose common dir is <main>/.git, the main checkout's own resolution of the knob, rooted; $null otherwise
+function Get-MainCheckoutBin {
     param([string] $Default)
     $gd = $null
     $cd = $null
@@ -149,8 +149,72 @@ function Get-MainCheckoutExe {
         Set-Location -LiteralPath $here
         [Environment]::CurrentDirectory = $here
     }
-    $e = if ([System.IO.Path]::IsPathRooted($b)) { $b } else { Join-Path $main $b }
-    if (Test-Runnable $e) { return $e }
+    if ([System.IO.Path]::IsPathRooted($b)) { return $b }
+    return (Join-Path $main $b)
+}
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — gate_harness_bin's linked-worktree half: the main checkout's binary when runnable; $null otherwise
+function Get-MainCheckoutExe {
+    param([string] $Default)
+    $e = Get-MainCheckoutBin -Default $Default
+    if ($e -and (Test-Runnable $e)) { return $e }
+    return $null
+}
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — gate_native_source_stamp, re-held here because the library is bash: the same three git invocations, the manifest hashed from a file because a pipe into a native command appends a line ending
+function Get-SourceStamp {
+    param([string] $Crate)
+    try {
+        $paths = @(& git -C $Crate ls-files 2>$null)
+        if ($LASTEXITCODE -ne 0 -or $paths.Count -eq 0) { return $null }
+        $hashes = @(& git -C $Crate hash-object -- @paths 2>$null)
+        if ($LASTEXITCODE -ne 0 -or $hashes.Count -ne $paths.Count) { return $null }
+        $sb = New-Object System.Text.StringBuilder
+        for ($i = 0; $i -lt $paths.Count; $i++) { [void] $sb.Append("$($hashes[$i]) $($paths[$i])`n") }
+        $tmp = [System.IO.Path]::GetTempFileName()
+        try {
+            [System.IO.File]::WriteAllBytes($tmp, (New-Object System.Text.UTF8Encoding($false)).GetBytes($sb.ToString()))
+            $stamp = [string] (& git hash-object --no-filters -- $tmp 2>$null)
+            if ($LASTEXITCODE -ne 0) { return $null }
+        } finally {
+            Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue
+        }
+    } catch { return $null }
+    if (-not $stamp) { return $null }
+    return $stamp.Trim()
+}
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — gate_verdict_bin's linked-worktree half: the main checkout's binary linked into the door path when the door is gitignored and, in a tree carrying crate source, its source stamp is the tree's; never a build. Returns the refused condition, or $null once the door runs
+function Resolve-VerdictLink {
+    param([string] $Default, [string] $Door, [string] $DoorExe)
+    $mainBin = Get-MainCheckoutBin -Default $Default
+    if (-not $mainBin) { return '' }
+    if (-not (Test-Runnable $mainBin)) { return 'the main checkout has no binary' }
+    $ignored = $false
+    try { & git check-ignore -q -- $Door 2>$null; $ignored = ($LASTEXITCODE -eq 0) } catch { $ignored = $false }
+    if (-not $ignored) { return "$Door is not gitignored here, so a linked binary would enter the tree" }
+    $crate = Get-PrebinaryKnob -Name 'GATE_SDK_NATIVE_CRATE' -Default 'native'
+    if ($crate.EndsWith('/')) { $crate = $crate.Substring(0, $crate.Length - 1) }
+    $tracked = $false
+    if (Test-Path -LiteralPath $crate -PathType Container) {
+        try { $tracked = (@(& git -C $crate ls-files 2>$null).Count -gt 0) } catch { $tracked = $false }
+    }
+    if ($tracked) {
+        $stamp = Get-SourceStamp -Crate $crate
+        $baked = $null
+        try { $baked = [string] (& $mainBin --source-stamp 2>$null | Select-Object -First 1) } catch { $baked = $null }
+        if (-not $stamp -or -not $baked -or $baked.Trim() -cne $stamp) {
+            return "the main checkout's binary was not built from this worktree's crate source"
+        }
+    }
+    $parent = Split-Path -Parent $DoorExe
+    try { New-Item -ItemType Directory -Force -Path $parent | Out-Null } catch { }
+    try {
+        New-Item -ItemType SymbolicLink -Path $DoorExe -Target $mainBin -ErrorAction Stop | Out-Null
+    } catch {
+        try { Copy-Item -LiteralPath $mainBin -Destination $DoorExe -ErrorAction Stop } catch { }
+    }
+    if (-not (Test-Runnable $DoorExe)) { return "the main checkout's binary could not be linked to $Door" }
     return $null
 }
 
@@ -159,18 +223,30 @@ $bin = Get-NativeBinSpelled -Default $defaultBin
 $exe = if ([System.IO.Path]::IsPathRooted($bin)) { $bin } else { Join-Path $here $bin }
 $runnable = Test-Runnable $exe
 # spec: gate-sdk/SPEC.md §The harness-integration arm — a fail-open arm, and only one, asks the main checkout before it declines
+$why = ''
 if (-not $runnable -and $unavailable -eq 0) {
     $mainExe = Get-MainCheckoutExe -Default $defaultBin
     if ($mainExe) {
         $exe = $mainExe
         $runnable = $true
     }
+} elseif (-not $runnable) {
+    $why = Resolve-VerdictLink -Default $defaultBin -Door $bin -DoorExe $exe
+    if ($null -eq $why) {
+        $why = ''
+        $runnable = $true
+    }
 }
 if (-not $runnable) {
     # comment-tier-exempt: the dash is spelled by code point because Windows PowerShell 5.1 reads a BOM-less script in the ANSI code page, which would turn a literal one into three characters and the message into different bytes from the stub's
     $dash = [string][char]0x2014
+    $remedy = if ($why) {
+        "In this linked worktree $why; run it in the main checkout rather than building here"
+    } else {
+        'Build it: bash gate-sdk/bin/build-native.sh'
+    }
     Write-StubError ("run-gates: $($argv[0]) dispatches to the native binary, but $bin is absent or not " +
-        "executable $dash it could not run. Build it: bash gate-sdk/bin/build-native.sh")
+        "executable $dash it could not run. $remedy")
     exit $unavailable
 }
 

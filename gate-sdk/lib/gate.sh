@@ -104,22 +104,57 @@ gate_native_bin_spelled() {
     esac
 }
 
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the binary a harness-integration arm runs: the local door when executable; else, inside a linked worktree whose common dir is <main>/.git, the main checkout's own resolution of the knob, rooted, when executable; else the local door unchanged
+# spec: gate-sdk/SPEC.md §lib/gate.sh — inside a linked worktree whose common dir is <main>/.git, the main checkout's own resolution of the knob, rooted; returns 1 emitting nothing anywhere else
+_gate_main_checkout_bin() {
+    local git_dir common main b
+    git_dir="$( { cd "$(git rev-parse --git-dir 2>/dev/null || echo /dev/null)" && pwd -P; } 2>/dev/null )"
+    common="$( { cd "$(git rev-parse --git-common-dir 2>/dev/null || echo /dev/null)" && pwd -P; } 2>/dev/null )"
+    [[ -n "$common" && "$git_dir" != "$common" && "${common##*/}" == .git ]] || return 1
+    main="${common%/*}"
+    b="$(cd "$main" && gate_native_bin)"
+    gate_path_rooted "$b" || b="$main/$b"
+    printf '%s\n' "$b"
+}
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the binary a harness-integration arm runs: the local door when executable; else, inside a linked worktree, the main checkout's binary when executable; else the local door unchanged
 gate_harness_bin() {
-    local door git_dir common main b
+    local door b
     door="$(gate_native_bin_spelled)"
-    if [[ ! -x "$door" ]]; then
-        git_dir="$( { cd "$(git rev-parse --git-dir 2>/dev/null || echo /dev/null)" && pwd -P; } 2>/dev/null )"
-        common="$( { cd "$(git rev-parse --git-common-dir 2>/dev/null || echo /dev/null)" && pwd -P; } 2>/dev/null )"
-        if [[ -n "$common" && "$git_dir" != "$common" && "${common##*/}" == .git ]]; then
-            main="${common%/*}"
-            b="$(cd "$main" && gate_native_bin)"
-            gate_path_rooted "$b" || b="$main/$b"
-            if [[ -x "$b" ]]; then
-                printf '%s\n' "$b"
-                return 0
-            fi
+    if [[ ! -x "$door" ]] && b="$(_gate_main_checkout_bin)" && [[ -x "$b" ]]; then
+        printf '%s\n' "$b"
+        return 0
+    fi
+    printf '%s\n' "$door"
+}
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the binary a verdict-bearing arm runs: the local door when executable; inside a linked worktree otherwise, the main checkout's binary linked into the door path when the door is gitignored and, in a tree carrying crate source, its source stamp is the tree's. It never builds. A declined link prints the door and then one line naming the refused condition, so the caller fails closed and says why
+gate_verdict_bin() {
+    local door main_bin stamp
+    door="$(gate_native_bin_spelled)"
+    if [[ -x "$door" ]] || ! main_bin="$(_gate_main_checkout_bin)"; then
+        printf '%s\n' "$door"
+        return 0
+    fi
+    if [[ ! -x "$main_bin" ]]; then
+        printf '%s\n%s\n' "$door" "the main checkout has no binary"
+        return 0
+    fi
+    if ! git check-ignore -q -- "$door" 2>/dev/null; then
+        printf '%s\n%s\n' "$door" "$door is not gitignored here, so a linked binary would enter the tree"
+        return 0
+    fi
+    if gate_authoring_tree; then
+        stamp="$(gate_native_source_stamp)" || stamp=''
+        if [[ -z "$stamp" || "$("$main_bin" --source-stamp 2>/dev/null)" != "$stamp" ]]; then
+            printf '%s\n%s\n' "$door" "the main checkout's binary was not built from this worktree's crate source"
+            return 0
         fi
+    fi
+    mkdir -p "$(dirname "$door")" 2>/dev/null
+    ln -s "$main_bin" "$door" 2>/dev/null || cp "$main_bin" "$door" 2>/dev/null
+    if [[ ! -x "$door" ]]; then
+        printf '%s\n%s\n' "$door" "the main checkout's binary could not be linked to $door"
+        return 0
     fi
     printf '%s\n' "$door"
 }

@@ -218,9 +218,16 @@ const CORPUS: &[Case] = &[
         ..absent("", &[], &[], ESCALATION_ADVICE)
     },
     Case {
-        name: "linked worktree, --emit still reporting the binary absent",
+        name: "linked worktree, --emit refusing to link onto an unignored door path",
         linked: Linked::MainBin,
-        ..absent("", &[], &[], ABSENT)
+        ..absent("", &[], &[], "is not gitignored here")
+    },
+    Case {
+        name: "linked worktree, --emit through the main checkout's linked binary",
+        argv: &["--emit", "knob-values", "GATE_SDK_NATIVE_BIN"],
+        expect_code: 0,
+        linked: Linked::MainBin,
+        ..absent("", &[], &[(".gitignore", "native/target/\n")], "GATE_SDK_NATIVE_BIN\tscalar")
     },
     Case {
         name: "linked worktree, both binaries absent, --hook declining",
