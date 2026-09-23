@@ -132,9 +132,34 @@ load "unreachable-binary" 0 '"additionalContext"' GATE_SDK_NATIVE_BIN="$tmp/no-s
 load "missing-knob-file"  2 "GUARD_KIT_KNOB_FILE names $tmp/absent.knobs" GUARD_KIT_KNOB_FILE="$tmp/absent.knobs"
 load "malformed-knob-file" 2 "malformed.knobs:1" GUARD_KIT_KNOB_FILE="$tmp/malformed.knobs"
 
+# --- a load list ahead of the binary: a binary that does not declare one loaded name refuses the
+#     read, and the load fails open with an advise naming the name and the rebuild, running no rule;
+#     the same binary under a malformed knob file declares every other name and still blocks
+real="$(cd "$DIR/.." && cd "$(dirname "$GATE_SDK_NATIVE_BIN")" && pwd -P)/$(basename "$GATE_SDK_NATIVE_BIN")"
+cat >"$tmp/behind-bin" <<EOF
+#!/usr/bin/env bash
+case "\$1" in
+    --emit-knob-values) echo "--emit-knob-values: GUARD_KIT_WORKTREE_READS is not a guard-kit knob" >&2; exit 2 ;;
+    --emit-knob-roster) "$real" --emit-knob-roster | grep -v '^GUARD_KIT_WORKTREE_READS' ;;
+    *) exec "$real" "\$@" ;;
+esac
+EOF
+chmod +x "$tmp/behind-bin"
+load "binary-behind-load"  0 "GUARD_KIT_WORKTREE_READS, which the gate binary" GATE_SDK_NATIVE_BIN="$tmp/behind-bin"
+load "binary-behind-names-rebuild" 0 "build-native.sh" GATE_SDK_NATIVE_BIN="$tmp/behind-bin"
+cat >"$tmp/refusing-bin" <<EOF
+#!/usr/bin/env bash
+case "\$1" in
+    --emit-knob-values) echo "malformed.knobs:1: not a knob line" >&2; exit 2 ;;
+    *) exec "$real" "\$@" ;;
+esac
+EOF
+chmod +x "$tmp/refusing-bin"
+load "declared-refusal-blocks" 2 "malformed.knobs:1" GATE_SDK_NATIVE_BIN="$tmp/refusing-bin"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "guard-config-knobs.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "guard-config-knobs.test: ok ($checks assertions; GUARD_KIT_SEARCH_TOOLS fires rules 9 and 11 on its own member each and leaves them inert when empty, and each firing corrective names its bare fallback; GUARD_KIT_RO_FORMS grants an added roster member only once declared, and a consumer entry replaces the kit's declaration; rule 2's arm (d) fires on a respelled path naming the knob's resolved file and not on a differing one; the knob load advises and runs no rule on an unreachable binary, and blocks with the refusal on a missing or malformed knob file)"
+echo "guard-config-knobs.test: ok ($checks assertions; GUARD_KIT_SEARCH_TOOLS fires rules 9 and 11 on its own member each and leaves them inert when empty, and each firing corrective names its bare fallback; GUARD_KIT_RO_FORMS grants an added roster member only once declared, and a consumer entry replaces the kit's declaration; rule 2's arm (d) fires on a respelled path naming the knob's resolved file and not on a differing one; the knob load advises and runs no rule on an unreachable binary, blocks with the refusal on a missing or malformed knob file, and fails open with an advise naming the name and the rebuild when the binary does not declare a loaded name)"
 exit 0

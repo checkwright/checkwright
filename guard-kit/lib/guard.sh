@@ -2336,6 +2336,20 @@ _guard_knob_names=(
     GUARD_KIT_APPEND_BINS GUARD_KIT_SEARCH_TOOLS GUARD_KIT_SCRIPT_INTERPRETERS GUARD_KIT_WORKTREE_READS
 )
 if ! _guard_knob_out="$(gate_knob_values "${_guard_knob_names[@]}" 2>/dev/null)"; then
+    # spec: guard-kit/SPEC.md §The guard framework (`lib/guard.sh`) — a load list ahead of the binary fails open and loud, read off the binary's own roster on this branch alone, so the success path spawns nothing more
+    _guard_skew=()
+    if _guard_roster="$("$_guard_bin" --emit-knob-roster 2>/dev/null)"; then
+        declare -A _guard_declared=()
+        while IFS=$'\t' read -r _guard_n _; do
+            [[ -n "$_guard_n" ]] && _guard_declared[$_guard_n]=1
+        done <<<"$_guard_roster"
+        for _guard_n in "${_guard_knob_names[@]}"; do
+            [[ -n "${_guard_declared[$_guard_n]:-}" ]] || _guard_skew+=("$_guard_n")
+        done
+    fi
+    if ((${#_guard_skew[@]})); then
+        guard_advise "guard-kit's rules did not run on this call: its knob load names ${_guard_skew[*]}, which the gate binary at $_guard_bin does not declare, so the library is ahead of the binary. The call takes the harness's own permission path with no steering until the binary is rebuilt: bash gate-sdk/bin/build-native.sh"
+    fi
     guard_block "guard-kit could not read its knobs, so no command runs until the config is repaired — $(gate_knob_values "${_guard_knob_names[@]}" 2>&1 >/dev/null). Repair the file with the Edit tool, which this guard does not intercept."
 fi
 declare -A _guard_knob_seen=()

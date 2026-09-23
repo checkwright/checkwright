@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### guard-knob-skew-bricks-shell
-
-a guard knob-load list that runs ahead of the gate binary wedges the live Bash guard. At a build a session added a knob name to guard-kit/lib/guard.sh's load list before rebuilding the binary, and every Bash call failed until the file was repaired with the Edit tool and the binary rebuilt. The knob read's failure branch blocks every command, while guard-kit's degradation posture is fail-open but loud (guard-kit/SPEC.md §The guard framework).
-
-**Probed at promotion (2026-09-23):** `checkwright-gates --emit-knob-values GUARD_KIT_SCRATCH_DIRS GUARD_KIT_NO_SUCH_KNOB_PROBE` exits 2 ("is not a guard-kit knob"), and `guard.sh`'s load treats any non-zero exit as `guard_block`, so an undeclared name blocks every command.
-
-**Deliverable:** an unknown-name failure takes the fail-open path with an advisory naming the skew and the rebuild command, while a genuine config error still blocks. Scope's shape, inside the posture the SPEC already states: on the failure branch only, intersect the load list with the binary's `--emit knob-roster` and fail open when a name is undeclared, so no new exit-code contract is minted and the success path spawns nothing extra.
-
-**Cost while deferred:** a mid-edit skew bricks the session's shell. Filed 2026-09-23 to the gap inbox by the lead from the build journal; promoted at that iteration's close drain because editing the live guard in a drain risks the wedge it describes. Owner lookup: `knob-load`, `knob load`, `wedge` in this file — none. Surface also gate-sdk.
-
 ### committed-grant-fallthrough-unexplained
 
 the tracked allowlist's no-argument entries: whether the harness needs them, and why an exact one once failed to resolve. `.claude/settings.json` pairs a no-argument `Bash(<cmd>)` with `Bash(<cmd> *)` for run-gates.sh, the gate binary (with and without the `./` prefix) and their `env GATE_SDK_VERBOSE=1` forms. The repo's model of harness matching says the ` *` form covers the bare command (`--guard-lib-parity allow-match native/target/release/checkwright-gates "native/target/release/checkwright-gates *"` returns true), but that is modeled, not probed — and on 2026-09-07 three bare `bash gate-sdk/bin/run-gates.sh` calls logged as fall-throughs despite the exact no-argument grant, a counterexample nobody explained.
@@ -1586,5 +1576,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 - stop-hook-task-view-unscoped
 - guard-worktree-scratch-dirs
+- guard-knob-skew-bricks-shell
 
 ## Lessons Learned
