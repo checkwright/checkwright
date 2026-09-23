@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### guard-worktree-scratch-dirs
-
-from a linked worktree, guard-kit rules 14, 15 and 19 (B) resolve `GUARD_KIT_SCRATCH_DIRS` against the worktree cwd. The protocol puts an isolated child's liveness record in the main checkout's scratch dir (delegation-kit/templates/agent-execution.md, the never-poll bullet), so the canonical recorded launch writing `<main>/.tmp/<key>.run` is blocked by rule 15, whose corrective names the worktree's `.tmp`, the one home the protocol forbids; rule 14 likewise reads only the worktree's records. Pre-existing, found at align while rule 27 was being designed.
-
-**Probed at promotion (2026-09-23):** the consumer bash guard, run with its cwd in a scratch linked worktree over the canonical recorded launch, refused the record written to `<main>/.tmp/probe.run` (exit 2, rule 15's "writes no liveness record" corrective naming the relative `.tmp`) and auto-allowed the same launch recording to the worktree's own `.tmp`.
-
-**Deliverable:** resolve the scratch-dir members against the main checkout from a linked worktree, on the owning-checkout pattern rule 27 gives its ignored-target test, with a guard-test case run from a linked worktree. Debt: it converges the rules on the protocol's stated record home.
-
-**Cost while deferred:** an isolated child obeying the protocol is refused, or steered to a record the next reader never checks. Filed 2026-09-23 to the gap inbox at align; promoted at that iteration's close drain because the guard's TSV case suites have no linked-worktree harness. Owner lookup: `SCRATCH_DIRS`, `rule 27`, `isolated child` in this file — none.
-
 ### guard-knob-skew-bricks-shell
 
 a guard knob-load list that runs ahead of the gate binary wedges the live Bash guard. At a build a session added a knob name to guard-kit/lib/guard.sh's load list before rebuilding the binary, and every Bash call failed until the file was repaired with the Edit tool and the binary rebuilt. The knob read's failure branch blocks every command, while guard-kit's degradation posture is fail-open but loud (guard-kit/SPEC.md §The guard framework).
@@ -1595,5 +1585,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 ## Done
 
 - stop-hook-task-view-unscoped
+- guard-worktree-scratch-dirs
 
 ## Lessons Learned

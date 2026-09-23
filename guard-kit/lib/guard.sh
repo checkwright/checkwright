@@ -1016,7 +1016,8 @@ guard_rule_bare_sleep() {
 # spec: guard-kit/SPEC.md §The generic ruleset — rule 14's record reader: the one-line 'pid=<n> run=<key>' grammar is evidence-kit/SPEC.md §The producer-liveness lock's and is read rather than sourced, because a PreToolUse hook cannot depend on a sibling kit being vendored; a record that does not parse yields nothing, so the rule declines on one
 _guard_live_run_records() {
     local d rec line pid
-    for d in ${GUARD_KIT_SCRATCH_DIRS[@]+"${GUARD_KIT_SCRATCH_DIRS[@]}"}; do
+    _guard_scratch_homes
+    for d in ${_GUARD_SCRATCH_HOMES[@]+"${_GUARD_SCRATCH_HOMES[@]}"}; do
         [[ -d "$d" ]] || continue
         for rec in "$d"/*.run; do
             [[ -f "$rec" ]] || continue
@@ -1091,6 +1092,7 @@ guard_rule_git_mutation_under_producer() {
     [[ "${#writes[@]}" -gt 0 ]] || return 0
 
     local -a runs=()
+    _guard_wt_roots
     mapfile -t runs < <(_guard_live_run_records)
     [[ "${#runs[@]}" -gt 0 ]] || return 0
 
@@ -1204,12 +1206,10 @@ _guard_shell_backgrounds() {
 
 # spec: guard-kit/SPEC.md §The generic ruleset — rule 15's record-writing test: at PreToolUse the child has not started and no record can exist yet, so the only observable is whether the launch is going to write one
 _guard_writes_run_record() {
-    local d tgt
+    local tgt
     while read -r tgt; do
         case "$tgt" in *.run) ;; *) continue ;; esac
-        for d in ${GUARD_KIT_SCRATCH_DIRS[@]+"${GUARD_KIT_SCRATCH_DIRS[@]}"}; do
-            case "$tgt" in "$d"/*) return 0 ;; esac
-        done
+        _guard_in_scratch "$tgt" && return 0
     done < <(_guard_redirect_targets "$1")
     return 1
 }
@@ -1246,7 +1246,9 @@ guard_rule_background_no_record() {
         [[ "$depth" -ge 1 ]] && return 0
     done <<<"$span"
     _guard_is_ro_background "$raw" "$s" && return 0
-    guard_block "this call backgrounds a child and writes no liveness record — re-issue it with the record written at the launch, in this spelling: '<command> [<redirects>] & echo \"pid=\$! run=<key>\" > ${GUARD_KIT_SCRATCH_DIRS[0]}/<key>.run; wait; rm -f ${GUARD_KIT_SCRATCH_DIRS[0]}/<key>.run'. The 'wait' keeps the call alive until the child exits, so a backgrounded call's completion notification means the producer finished, and the trailing 'rm -f' retracts the record at exactly that moment. That spelling of an allowlisted command is granted outright, so complying costs no permission decision. The record buys two things nothing else does: it is what gives the tracked-tree-mutation rule its reach, so a commit taken while this child is still writing is refused rather than silently taken; and it is what lets the next arrival tell whether the producer is still writing instead of guessing at a process table. An inline wait loop and a read-only pipeline owe no record; a wait behind a script name cannot be read here and takes the record like any launch. If you genuinely need an unrecorded launch, run it yourself with !<command>."
+    _guard_scratch_homes
+    local home="${_GUARD_SCRATCH_HOMES[0]-}"
+    guard_block "this call backgrounds a child and writes no liveness record — re-issue it with the record written at the launch, in this spelling: '<command> [<redirects>] & echo \"pid=\$! run=<key>\" > $home/<key>.run; wait; rm -f $home/<key>.run'. The 'wait' keeps the call alive until the child exits, so a backgrounded call's completion notification means the producer finished, and the trailing 'rm -f' retracts the record at exactly that moment. That spelling of an allowlisted command is granted outright, so complying costs no permission decision. The record buys two things nothing else does: it is what gives the tracked-tree-mutation rule its reach, so a commit taken while this child is still writing is refused rather than silently taken; and it is what lets the next arrival tell whether the producer is still writing instead of guessing at a process table. An inline wait loop and a read-only pipeline owe no record; a wait behind a script name cannot be read here and takes the record like any launch. If you genuinely need an unrecorded launch, run it yourself with !<command>."
 }
 
 guard_rule_truncate_scratch() {
@@ -1445,8 +1447,9 @@ _guard_recorded_launch() {
     path="${BASH_REMATCH[3]}"
     rmpath="${BASH_REMATCH[5]}"
     [[ -z "$rmpath" || "$rmpath" == "$path" ]] || return 1
-    for d in ${GUARD_KIT_SCRATCH_DIRS[@]+"${GUARD_KIT_SCRATCH_DIRS[@]}"}; do
-        [[ "$path" == "$d/$key.run" ]] && in_scratch=1
+    _guard_scratch_homes
+    for d in ${_GUARD_SCRATCH_HOMES[@]+"${_GUARD_SCRATCH_HOMES[@]}"}; do
+        [[ "$(_guard_lexical_path "$path")" == "$(_guard_lexical_path "$d")/$key.run" ]] && in_scratch=1
     done
     [[ "$in_scratch" == 1 ]] || return 1
     s="$(guard_skeleton "$raw" sq dq hd)"
@@ -1675,7 +1678,7 @@ _guard_interpreter_arm() {
     return 1
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's scratch-source test on one token, the prefix idiom rule 15's record test already uses
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's scratch-source test on one token, a prefix match on the member as written
 _guard_is_scratch_path() {
     local p="$1" d
     for d in ${GUARD_KIT_SCRATCH_DIRS[@]+"${GUARD_KIT_SCRATCH_DIRS[@]}"}; do
@@ -2148,10 +2151,27 @@ _guard_in_main() {
     [[ -n "$_guard_wt_main" ]] && _guard_under "$1" "$_guard_wt_main" && ! _guard_under "$1" "$_guard_wt_own"
 }
 
-_guard_in_main_scratch() {
+# spec: guard-kit/SPEC.md §Layout and configuration — the directory each GUARD_KIT_SCRATCH_DIRS member names for this session, into _GUARD_SCRATCH_HOMES: from a linked worktree a relative member resolves against the main checkout, where the delegation protocol homes a liveness record; elsewhere the member as written. Recomputed per call, so a caller reassigning the knob after sourcing still steers it
+_guard_scratch_homes() {
     local d
+    _guard_wt_roots
+    _GUARD_SCRATCH_HOMES=()
     for d in ${GUARD_KIT_SCRATCH_DIRS[@]+"${GUARD_KIT_SCRATCH_DIRS[@]}"}; do
-        _guard_under "$1" "$(_guard_lexical_path "$_guard_wt_main/$d")" && return 0
+        if [[ -n "$_guard_wt_main" ]] && ! gate_path_rooted "$d"; then
+            _GUARD_SCRATCH_HOMES+=("$(_guard_lexical_path "$_guard_wt_main/$d")")
+        else
+            _GUARD_SCRATCH_HOMES+=("$d")
+        fi
+    done
+}
+
+# spec: guard-kit/SPEC.md §Layout and configuration — true when a path, resolved lexically, lies under one of this session's scratch homes
+_guard_in_scratch() {
+    local t h
+    _guard_scratch_homes
+    t="$(_guard_lexical_path "$1")"
+    for h in ${_GUARD_SCRATCH_HOMES[@]+"${_GUARD_SCRATCH_HOMES[@]}"}; do
+        _guard_under "$t" "$(_guard_lexical_path "$h")" && return 0
     done
     return 1
 }
@@ -2204,7 +2224,7 @@ _guard_worktree_admitted() {
         case "$tgt" in /dev/null | '&'[0-9-]*) continue ;; esac
         tgt="$(_guard_lexical_path "$tgt")"
         _guard_under "$tgt" "$_guard_wt_own" && continue
-        _guard_in_main "$tgt" && _guard_in_main_scratch "$tgt" && continue
+        _guard_in_main "$tgt" && _guard_in_scratch "$tgt" && continue
         return 1
     done < <(_guard_redirect_pairs "$s")
     _guard_ro_forms_clear "$raw" "$s"
@@ -2237,7 +2257,7 @@ _guard_worktree_refuses() {
         gate_path_rooted "$w" || case "$w" in .. | ../* | */.. | */../*) ;; *) continue ;; esac
         t="$(_guard_lexical_path "$w")"
         _guard_in_main "$t" || continue
-        _guard_in_main_scratch "$t" && continue
+        _guard_in_scratch "$t" && continue
         _GUARD_WT_WORD="$w"
         _GUARD_WT_PATH="$t"
         break
