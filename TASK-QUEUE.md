@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: native-shell-guard
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [README.md](README.md) maps the kits.
 
@@ -9,6 +9,18 @@
 ## New Features
 
 ## Technical Debt
+
+### subagent-stop-phantom-firing
+
+the turn-end liveness hook logs a `SubagentStop` firing about every 31 seconds that no dispatched child accounts for. **Probed at the drain:** `.workflow/subagent-stop-liveness.log` held 248 firings, and 25 were `decision=refuse` beside `verdict=green`, the task-view pairing delegation-kit/SPEC.md §The turn-end liveness hook names, each while the session held a running shell task. The key set matches a child's, so a discriminator built from keys alone has nothing to key on. A harness helper whose `agent_transcript_path` names the parent's transcript would produce exactly this. **Re-observed at promotion (2026-09-24):** the log, cleared at close, had re-accrued 33 firings at the same cadence under one session id.
+
+**Grant, operator 2026-09-24 (lead-relayed):** one out-of-band read of raw `SubagentStop` payloads, on the precedent of delegation-kit/SPEC.md §What `background_tasks` carries: payloads dumped to gitignored scratch, the registration restored byte-for-byte, the logged grammar untouched. Spent once taken.
+
+**Inferred, cannot run before build:** the phantom firing is a harness helper reading the parent's transcript — the hook is a compiled arm with no shell copy to edit, so the granted read needs a temporary payload-dumping wrapper on its `.claude/settings.json` registration, which build lands and restores.
+
+**Deliverable:** attribute the firing from that read, measure whether a refusal keeps a helper running, and converge the close triage's refusal count (and the hook's refusal, if a helper) on the attributed class, recording the finding in §The turn-end liveness hook. A fix needing a new logged field or knob is a new name: file it, never build it here.
+
+**Cost while deferred:** the close triage reads task-held refusals that overstate stalls, and a helper's refused stops may cost turns. Filed 2026-09-23 at `guard-harness-seams` build; promoted at its close; promoted 2026-09-24 at scope as `native-shell-guard`'s lead unit. Owner lookup: `SubagentStop`, `liveness hook`, `phantom` in this file: none that owns it.
 
 ## Deferred
 
@@ -88,6 +100,8 @@ items in guard-kit/SPEC.md §The generic ruleset state the inert quoting classes
 
 **Why design-pending:** the declaration shape is a SPEC-grammar change across every declaring item plus a gate extension, a spec-stage amendment rather than a drain fix.
 
+**Folded into [shell-guard-native-shell](#shell-guard-native-shell)'s design, operator direction 2026-09-24 (lead-relayed):** /spec authors it within that amendment at `native-shell-guard`, since the `guard_skeleton` call sites move with the port.
+
 **Cost while deferred:** a skeleton edit leaves a declaration that misstates what a quoted mention does; a reader, not the guard, pays. Filed 2026-09-18 to the gap inbox during `guard-ruleset-registration-lockstep`; promoted at its close drain. Owner lookup: `guard_skeleton`, `Declares`, `inert class`, `skeleton call` — none.
 
 ### residency-roster-template-reach-ungated
@@ -127,6 +141,8 @@ on native Windows the harness's `PowerShell` tool is on by default beside `Bash`
 **Probed at filing:** the harness tools reference names the tool `PowerShell` and advises matching `Bash|PowerShell`; `grep -rn -i 'powershell tool' guard-kit` finds nothing before guard-kit/SPEC.md §The hook on native Windows, which states the bypass as an honest limit.
 
 **Why design-pending:** a PowerShell-grammar guard needs its own skeleton and splitter, rules that model PowerShell rather than bash, and a decision table on a Windows leg. None of that is designed, and whether a consumer-rule seam belongs on it is open.
+
+**The PowerShell half of [shell-guard-native-shell](#shell-guard-native-shell), operator direction 2026-09-24 (lead-relayed):** /spec authors it within that amendment at `native-shell-guard`.
 
 **Cost while deferred:** on a Windows host a command routed through the PowerShell tool bypasses every steer and block, and the close-stage triage never sees it. Filed 2026-09-18 at `windows-adopter-path`'s spec by operator direction (lead-relayed), when `guard-hook-windows-substrate` was designed. Owner lookup: `PowerShell tool`, `USE_POWERSHELL_TOOL`, `Bash|PowerShell` — none.
 
@@ -462,6 +478,8 @@ a guard-kit rule number is a stable-looking identifier that is not stable: rules
 
 **THIS ENTRY AND ITS [guard-rule-number-intra-kit-citations-ungated](#guard-rule-number-intra-kit-citations-ungated) SIBLING WERE THE (D) ISLAND of `citation-liveness-family-convergence`, which landed 2026-09-17 with (A)-(C) only** — grounds relocated here 2026-09-08 from that hub, under `check-queue-entry-budget`'s rule that an unanswered ground moves to the entry already owning its subject. Slices (A)-(C) widened gates that already resolve citations; (D) has no gate to widen and an unmeasured false-positive budget over 111 intra-kit citations, so it stays open here.
 
+**Folded into [shell-guard-native-shell](#shell-guard-native-shell)'s design, operator direction 2026-09-24 (lead-relayed):** the port settles how a rule is cited.
+
 **Cost while deferred:** a reader follows the number to the wrong rule and reasons from it. Filed 2026-08-22 at align's cross-audit; drained at that iteration's close, which found the bullet had named the wrong slug and located the real entry before dispositioning.
 
 ### guard-rule-number-intra-kit-citations-ungated
@@ -477,6 +495,8 @@ guard-kit cites its own rule numbers everywhere and nothing holds a single citat
 **Why design-pending:** the corpus is bounded and the numbering is derivable from the numbered list, so a gate could assert that every intra-kit `rule N` resolves to an existing item and that the derivable rosters — which rules take the raw command, which read a skeleton — match the bodies. Which claims are derivable and which are prose is the open question.
 
 **DISTINCT from [guard-rule-number-not-citable-outside-kit](#guard-rule-number-not-citable-outside-kit)**, whose dispositions are about cross-corpus prose *outside* the kit and which therefore leaves intra-kit numbers citable and ungated by construction; and from `guard-ruleset-registration-lockstep`, Done 2026-09-18 as `check-guard-registration`, whose subject is the roster/function/dispatch-order triple agreeing, not what cites a rule by number.
+
+**Folded into [shell-guard-native-shell](#shell-guard-native-shell)'s design, operator direction 2026-09-24 (lead-relayed):** /spec authors it within that amendment at `native-shell-guard`, since the port rewrites the kit's 111-citation corpus.
 
 **Cost while deferred:** every insertion into the ruleset re-buys a hand sweep whose completeness nothing checks, and a stale roster reads as authoritative to the next author — which is exactly how the raw-vs-skeleton one survived. Filed 2026-08-23 by build; drained at that iteration's close, which re-counted the citations and confirmed no gate matches them.
 
@@ -568,18 +588,6 @@ an operator-ruled `align-waived` line has no sanctioned writer. lifecycle-kit/SP
 
 **Cost while deferred:** each operator-waived align makes someone route around a guard or hand-append, and every assertion-C refusal points its reader at a vanished scratch file. Promoted from the icebox 2026-09-23 at `guard-harness-seams` close on the recurrence. Owner lookup: `waiv`, `align-waived` in this file: only this slug.
 
-### subagent-stop-phantom-firing
-
-[cost: iteration/low] [surface: delegation-kit]
-
-the turn-end liveness hook logs a `SubagentStop` firing about every 31 seconds that no dispatched child accounts for. **Probed at the drain:** `.workflow/subagent-stop-liveness.log` held 248 firings, and 25 were `decision=refuse` beside `verdict=green`, the task-view pairing delegation-kit/SPEC.md §The turn-end liveness hook names, each while the session held a running shell task. The key set matches a child's. A harness helper whose `agent_transcript_path` names the parent's transcript would produce exactly this.
-
-**Inferred, not run:** the phantom firing is a harness helper reading the parent's transcript — log one firing's `agent_type` and `agent_transcript_path` values, which that SPEC section refuses under an operator-class no-values ruling.
-
-**Why design-pending:** attribution needs a value the log withholds by ruling, so the next move is either an operator ruling that admits one field, or a discriminator built from keys alone. If the firing is a helper, a refusal may also keep it running, which is unmeasured.
-
-**Cost while deferred:** the close triage reads task-held refusals that overstate stalls, and a helper's refused stops may cost turns. Filed 2026-09-23 at `guard-harness-seams` build; promoted at its close. →fix failed because attribution is gated on the no-values ruling. Owner lookup: `SubagentStop`, `liveness hook`, `phantom` in this file: none that owns it.
-
 ### guard-rule23-worktree-scratch
 
 [cost: event/low] [surface: guard-kit]
@@ -589,6 +597,8 @@ guard-kit rule 23 prefix-matches `GUARD_KIT_SCRATCH_DIRS` members as written (`g
 **Why design-pending:** the steer target, `--scratch-run`, bounds its target to the front end's working root (guard-kit/SPEC.md §scratch-run), which from a worktree is the worktree. Widening rule 23 alone would steer to a corrective that cannot be followed there. Which side moves, rule 23's match or `--scratch-run`'s root, is the call.
 
 **Inferred, not run:** `--scratch-run` refuses a main-checkout scratch path from a linked worktree — from a worktree, run `bash gate-sdk/bin/run-gates.sh --scratch-run` on a script under the main checkout's `.tmp/`.
+
+**Folded into [shell-guard-native-shell](#shell-guard-native-shell)'s design, operator direction 2026-09-24 (lead-relayed):** /spec authors it within that amendment at `native-shell-guard`, since the port re-implements rule 23's match.
 
 **Cost while deferred:** an isolated session's scratch script runs unechoed and is decided out of band. Filed 2026-09-23 at `guard-harness-seams` build, left out of `guard-worktree-scratch-dirs` on the corrective's reach; promoted at its close. Owner lookup: `rule 23`, `scratch-run`, `linked worktree` in this file: none.
 
@@ -601,6 +611,8 @@ operator direction 2026-09-23 (lead session, lead-relayed): make the bash guard 
 **It reopens recorded refusals.** guard-kit/SPEC.md §The hook on native Windows refuses a PowerShell twin and a native hook front, the second on the guard library's permanent-shell ground. **Probed at the drain:** that section states both. The direction reverses them, so the design owes a SPEC rewrite of that section and of the library's permanent-shell ground, and a consumer-rule seam that is not shell functions.
 
 **DISTINCT from [guard-powershell-tool-unguarded](#guard-powershell-tool-unguarded)**, which guards the PowerShell tool beside an unchanged bash guard. This entry re-architects the guard to be shell-neutral, so its landing would likely supersede that one rather than re-file it.
+
+**Unit set, operator direction 2026-09-24 (lead-relayed):** the hub of `native-shell-guard`, with that entry as its PowerShell half and four rows it reshapes folded into its design: [guard-rule23-worktree-scratch](#guard-rule23-worktree-scratch), [guard-declares-class-correspondence-ungated](#guard-declares-class-correspondence-ungated) and the two rule-number entries. [side-effect-free-read-arms](#side-effect-free-read-arms) stays out. The 2026-09-23 direction is confirmed as authority to rewrite both refusals and §The guard framework's permanent-shell ground: a direction, not a TRAJECTORY ruling. **Overrun risk, carried:** 27 generic rules over a 2381-line `lib/guard.sh`, a consumer-rule seam and a PowerShell reader; /spec slices it and files what slice 1 leaves as Deferred.
 
 **Why design-pending:** a shell-neutral rule model, a PowerShell reader, where the ruleset lives (binary or library), and the consumer-rule seam are all open. Surfaced by `guard-read-path-windows-unexercised`'s Git Bash trailing-CR fold.
 

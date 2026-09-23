@@ -4,4 +4,4 @@
 
 ---
 
-— scope aea4684a 2026-09-24 f8254551
+native-shell-guard scope aea4684a 2026-09-24 f8254551
