@@ -8,6 +8,18 @@
 
 ## New Features
 
+### stop-hook-task-view-unscoped
+
+[spec: SPEC-task-view-ownership.md]
+
+`subagent-stop-liveness` refuses a dispatched child's turn end on a shell task its parent holds. At seam-and-stage-residue's close, two backgrounded observer loops in the dispatching session stalled a five-child audit fan-out for about ten minutes. In that window the hook's log holds three `decision=refuse` lines beside `verdict=green`, which is the task-view arm.
+
+**Measured at spec (2026-09-23):** a child that made no tool call, dispatched while its parent held one backgrounded loop, took nine task-view refusals in 24 seconds. It was released while the loop was still running, and its own transcript carried none of the parent's task ids. So the view is wider than the emitting session, contrary to delegation-kit/SPEC.md §What `background_tasks` carries.
+
+**Direction:** scope the arm to the emitting session's own launches, read off the transcript that `agent_transcript_path` names, and fall back to the unscoped refusal (operator direction, 2026-09-23, lead-relayed). The amendment holds the design, the ruled-out alternatives and the build's two-sided live check. **Not taken:** a steer against polling for worktree reaping; delegation-kit/templates/agent-execution.md already rules it out.
+
+**Cost while deferred:** any parent holding a running shell task while a child stops can stall that child's hand-back. Filed 2026-09-23 to the gap inbox by the lead after seam-and-stage-residue's close, filed at the next scope and promoted at its spec. Owner lookup: [settings-hook-command-path-gate](#settings-hook-command-path-gate) and [turn-end-refusal-used-as-a-busy-wait](#turn-end-refusal-used-as-a-busy-wait) read and ruled distinct.
+
 ## Technical Debt
 
 ### guard-worktree-scratch-dirs
@@ -65,20 +77,6 @@ one battery member's verdict is a function of the host, so a green local battery
 **Cost while deferred:** the pre-push battery's promise — that a green local run predicts a green remote one — is false for one member, and the failure mode is a burned push. Filed 2026-08-27 by scope; attested by the `windows-adopter-unblock` close's own verifying push.
 
 ## Deferred
-
-### stop-hook-task-view-unscoped
-
-[cost: event/high] [surface: delegation-kit]
-
-`subagent-stop-liveness` may refuse a dispatched child's turn end on a shell task that belongs to its parent. At seam-and-stage-residue's close, two backgrounded observer loops in the dispatching session waited on `git worktree list` while five isolated audit-sweep children held locked worktrees. A child reported the hook refused its Stop on a running background shell task after it had stopped its own wait, and the fan-out stalled about ten minutes until the loops exited on their own. The hook's log holds three `decision=refuse` lines beside `verdict=green` in that window — the task-view arm — but logs no task values, so whose task held them is unread.
-
-**Premise open, and it conflicts with a measured claim:** delegation-kit/SPEC.md §What `background_tasks` carries measured the view as spanning the emitting agent's own tree; no measurement put a parent's task in a child's view. First step: one out-of-band payload dump at a child's Stop while the parent holds a running shell task.
-
-**Why a design unit:** the view's elements carry no pid or owner, and the SPEC calls the refuser unconditional, with every narrowing argued on its own grounds; scoping it narrows that contract or adds an ownership key, which is an amendment. **Not taken:** a steer against waiting on worktree reaping — delegation-kit/templates/agent-execution.md already awaits an Agent child by its notification, never by a path on disk.
-
-**Taken this iteration** by operator direction, 2026-09-23, lead-relayed; `/spec` authors the amendment and promotes this entry. A defect, not an enhancement, so the admission filter does not reach it.
-
-**Cost while deferred:** any parent holding a running shell task while a child stops can stall that child's hand-back. Filed 2026-09-23 to the gap inbox by the lead after seam-and-stage-residue's close; filed here 2026-09-23 at the next scope. Owner lookup: `background_tasks`, `subagent-stop`, `SubagentStop` in this file matched [settings-hook-command-path-gate](#settings-hook-command-path-gate), whose subject is a hook registration's path, and the stop hook's icebox neighbour [turn-end-refusal-used-as-a-busy-wait](#turn-end-refusal-used-as-a-busy-wait), whose subject is a session misusing the refusal; both read and ruled distinct.
 
 ### side-effect-free-read-arms
 
