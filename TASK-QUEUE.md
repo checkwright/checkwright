@@ -554,6 +554,58 @@ the consumer's local-only companion files have read triggers at three skills and
 
 **Cost while deferred:** local-only surfaces drift until a consult happens to audit them. Filed 2026-09-18 to the gap inbox by the consult that audited the local-only files, after `external-install-evidence`'s close; promoted to Deferred at the next scope.
 
+### split-posture-waiver-writer
+
+[cost: event/high] [surface: lifecycle-kit] [recurrence: 2026-09-23]
+
+an operator-ruled `align-waived` line has no sanctioned writer. lifecycle-kit/SPEC.md §check-stage-entry (C) and the align template record it in `.workflow/WORKFLOW-STATE.txt`, but the workflow-state guard (`native/src/hook/workflow_state.rs`) blocks every Write/Edit of that file, the bash guard's rewrite path blocks a shell append to it (`native/src/emit/rewrite.rs`, `is_state_file`), and `--enter-stage` has no waiver arm. Only an operator-run shell append lands one today.
+
+**Recurred.** Filed 2026-07-19 as the split-lead posture's gap, where the lead rules the waiver but writes no lifecycle state and a build session carried the line as a piggyback; iceboxed at an age eviction. Re-filed 2026-09-23 at this iteration's spec, recording the operator's align waiver, and the piggyback that worked in July is now guard-blocked for every session.
+
+**Folded in, same help line:** `check-stage-entry`'s assertion-C help (`native/src/gates/stage_entry.rs`, the `record a deliberate waiver` line) prints `k.state`, and `--enter-stage` hands the gate a scratch state under `GATE_SDK_TMP_DIR` on a real entry as well as a simulated one (`native/src/emit/enter_stage.rs`, the candidate-stamp temp build). So the relayed recovery names a file that is gone after the run, and so does every other `k.state` line that relay carries. **Probed at the drain:** both sites read.
+
+**Why design-pending:** the options on record are (a) a stage session carries a pending waiver into its entry commit, (b) a waiver arm on `--enter-stage` that takes a ruling reference and never self-issues, (c) the dispatch worklist channel. Choosing one is a seam ruling between the split posture's lead-writes-nothing rule and the state machine. The help line's recovery is whatever that ruling makes it. Separately, the relay should name the real state path, not the scratch copy.
+
+**Cost while deferred:** each operator-waived align makes someone route around a guard or hand-append, and every assertion-C refusal points its reader at a vanished scratch file. Promoted from the icebox 2026-09-23 at `guard-harness-seams` close on the recurrence. Owner lookup: `waiv`, `align-waived` in this file: only this slug.
+
+### subagent-stop-phantom-firing
+
+[cost: iteration/low] [surface: delegation-kit]
+
+the turn-end liveness hook logs a `SubagentStop` firing about every 31 seconds that no dispatched child accounts for. **Probed at the drain:** `.workflow/subagent-stop-liveness.log` held 248 firings, and 25 were `decision=refuse` beside `verdict=green`, the task-view pairing delegation-kit/SPEC.md §The turn-end liveness hook names, each while the session held a running shell task. The key set matches a child's. A harness helper whose `agent_transcript_path` names the parent's transcript would produce exactly this.
+
+**Inferred, not run:** the phantom firing is a harness helper reading the parent's transcript — log one firing's `agent_type` and `agent_transcript_path` values, which that SPEC section refuses under an operator-class no-values ruling.
+
+**Why design-pending:** attribution needs a value the log withholds by ruling, so the next move is either an operator ruling that admits one field, or a discriminator built from keys alone. If the firing is a helper, a refusal may also keep it running, which is unmeasured.
+
+**Cost while deferred:** the close triage reads task-held refusals that overstate stalls, and a helper's refused stops may cost turns. Filed 2026-09-23 at `guard-harness-seams` build; promoted at its close. →fix failed because attribution is gated on the no-values ruling. Owner lookup: `SubagentStop`, `liveness hook`, `phantom` in this file: none that owns it.
+
+### guard-rule23-worktree-scratch
+
+[cost: event/low] [surface: guard-kit]
+
+guard-kit rule 23 prefix-matches `GUARD_KIT_SCRATCH_DIRS` members as written (`guard-kit/lib/guard.sh`, its scratch-source test), so from a linked worktree `bash <main>/.tmp/x.sh`, a body under the main checkout's scratch dir, is not steered and falls through to the harness. Rules 14, 15, 19 (B) and 27 resolve the member against the main checkout through the per-session scratch homes since `guard-worktree-scratch-dirs`. **Probed at the drain:** both helpers read.
+
+**Why design-pending:** the steer target, `--scratch-run`, bounds its target to the front end's working root (guard-kit/SPEC.md §scratch-run), which from a worktree is the worktree. Widening rule 23 alone would steer to a corrective that cannot be followed there. Which side moves, rule 23's match or `--scratch-run`'s root, is the call.
+
+**Inferred, not run:** `--scratch-run` refuses a main-checkout scratch path from a linked worktree — from a worktree, run `bash gate-sdk/bin/run-gates.sh --scratch-run` on a script under the main checkout's `.tmp/`.
+
+**Cost while deferred:** an isolated session's scratch script runs unechoed and is decided out of band. Filed 2026-09-23 at `guard-harness-seams` build, left out of `guard-worktree-scratch-dirs` on the corrective's reach; promoted at its close. Owner lookup: `rule 23`, `scratch-run`, `linked worktree` in this file: none.
+
+### shell-guard-native-shell
+
+[cost: event/high] [surface: guard-kit]
+
+operator direction 2026-09-23 (lead session, lead-relayed): make the bash guard a **shell guard** over the host's native shell, bash or sh on Linux and macOS and PowerShell on Windows. It is one tool that checks shell commands and blocks, warns or rewrites them. The bash guard predates native-Windows support and runs on Windows under Git Bash because the harness's Bash tool does. That is bash emulation, against the intended footprint, where sh and PowerShell appear only as installer front ends forwarding to the gate binary and git only for version control. The operator wants the clean design soon.
+
+**It reopens recorded refusals.** guard-kit/SPEC.md §The hook on native Windows refuses a PowerShell twin and a native hook front, the second on the guard library's permanent-shell ground. **Probed at the drain:** that section states both. The direction reverses them, so the design owes a SPEC rewrite of that section and of the library's permanent-shell ground, and a consumer-rule seam that is not shell functions.
+
+**DISTINCT from [guard-powershell-tool-unguarded](#guard-powershell-tool-unguarded)**, which guards the PowerShell tool beside an unchanged bash guard. This entry re-architects the guard to be shell-neutral, so its landing would likely supersede that one rather than re-file it.
+
+**Why design-pending:** a shell-neutral rule model, a PowerShell reader, where the ruleset lives (binary or library), and the consumer-rule seam are all open. Surfaced by `guard-read-path-windows-unexercised`'s Git Bash trailing-CR fold.
+
+**Cost while deferred:** a Windows adopter's guard keeps depending on Git Bash, and the PowerShell tool stays unguarded. Filed 2026-09-23 to the gap inbox by the lead on the operator's direction; promoted at `guard-harness-seams` close as the direction asked. Owner lookup: `shell guard`, `PowerShell`, `Git Bash` in this file: only the DISTINCT entry above.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
@@ -645,10 +697,6 @@ Its jq-absent arm never runs anywhere.
 ### hermetic-bin-roster-config
 
 Pinning coverage needs a consumer roster seam.
-
-### split-posture-waiver-writer
-
-A lead-issued waiver stamp has no writer.
 
 ### supervisor-verification-attestation
 
