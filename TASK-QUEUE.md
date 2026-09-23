@@ -8,6 +8,114 @@
 
 ## New Features
 
+### worktree-hook-guards-fail-open
+
+[spec: SPEC-worktree-hook-bin.md]
+
+every binary-backed harness hook is inert inside a worktree-isolated dispatch. `gate-sdk/bin/run-gates.sh` resolves `GATE_SDK_NATIVE_BIN` repo-relative from the worktree's own top level, a linked worktree carries no build output, and `--hook` is on the front end's fail-open set, so the arm exits 0 with its "absent or not executable" line. Measured 2026-09-22 at `consumer-policy-seam`'s spec: an audit-sweep dispatched under `isolation: worktree` spawned six fork children, and each `agent-dispatch-guard` record shows the fail-open allow. Run 2026-09-23 at scope, wider than filed: from a scratch `git worktree add` with no `native/target`, the bash guard, the workflow-state guard and the dispatch guard each exit 0 on a payload each blocks from the main checkout.
+
+**Deliverable:** the hook front end resolves the binary from the main checkout when its cwd is a linked worktree, or a stated refusal to; plus a fixture proving the fork ban fires from inside a linked worktree.
+
+**Specified 2026-09-23:** one gate-sdk accessor, `gate_harness_bin`, answers which binary a harness-integration arm runs. It tries the local door first. Inside a linked worktree whose common dir is `<main>/.git`, it next tries the main checkout's own resolution of the knob. Otherwise it returns the local answer unchanged. The front end's fail-open branch and guard-kit's load both ask it. Every verdict-bearing path keeps resolving locally and failing closed, so delegation-kit's liveness ruling stands for everything this branch does not reach. The ground is that a hook enforces the session's policy, which the main checkout's binary already enforces for the parent. A linked-worktree suite asserts the fork ban, the workflow-state guard and the bash guard firing, with the control and scope cases. The PowerShell twin mirrors it under a parity case.
+
+**Cost while deferred:** the fork ban and the budget guard are advisory for any worktree-isolated agent. Filed 2026-09-22 to the gap inbox by the lead; promoted 2026-09-23 at `consumer-policy-seam`'s close, because the fix picks between two resolution shapes. **DISTINCT from** the icebox's [worktree-dispatch-rebuilds-the-gate-binary](#worktree-dispatch-rebuilds-the-gate-binary) and [worktree-isolated-dispatch-cannot-reach-the-main-checkout](#worktree-isolated-dispatch-cannot-reach-the-main-checkout).
+
+### shell-textual-absoluteness-single-dialect
+
+[spec: SPEC-path-rooted.md]
+
+tracked shell sites test a path for absoluteness by a leading `/` alone, so a caller-supplied Windows drive-letter path is joined onto a root as if relative. Probe: `git grep -n -E '== /\*|/\*\)' -- '*.sh'`.
+
+**Deliverable:** one shell absoluteness helper both dialects satisfy, the sites routed through it, and the shell half of `check-path-dialect`'s locality arm (today crate-only) holding it.
+
+**Specified 2026-09-23:** `gate_path_rooted` in `gate-sdk/lib/gate.sh` answers exactly what `walk::path_root` answers. The POSIX bootstrap, which cannot source the library, carries a byte twin, and one crate test holds both to `path_root` and to each other. §The path-dialect contract's shared-normalizer refusal is narrowed to converters: a predicate converts nothing, and every other site already sources the library. Re-measured: eight sites, the seven filed plus `gate_native_bin_spelled`, which lacked the leading-`\` arm. One of them, guard rule 24, is a live guard hole: `bash C:/elsewhere/checks/check-x.sh` read clean. `check-path-dialect` gains a shell locality arm clearing only the predicate's own body and the exempt token.
+
+**Cost while deferred:** a wrong root on a Windows adopter host whenever a caller exports a drive-letter path. Filed 2026-09-21 to the gap inbox by gate-sdk-surface-drain's spec session; promoted at its close because →fix needs a new shell-side oracle the cwd-anchor amendment kept out of its envelope.
+
+### doc-path-hardcoded-reads
+
+[spec: SPEC-doc-path-couples.md]
+
+eighteen kit-shipped `couples=` literals across thirteen members name a consumer path the member reads that no knob it declares configures, so each trigger stays frozen to this repo's layout and a vendoring adopter's hook never fires on their real file. Re-measured 2026-09-23 by `git grep -n couples= -- '*/checks/*.gate'`: as filed.
+
+**Deliverable:** per member, a knob the code reads and the registry declares (the literal then converts by gate-sdk/SPEC.md §The # graph: manifest's rule), or an undeclared read declared.
+
+**Specified 2026-09-23:** five dispositions, and only two of them mint a name.
+
+- The four action gates couple their walked extension, `*.yml,*.yaml`.
+- Transcribed repo values beside an existing token come off.
+- Default-valued literals become their knob's token. This reverses canon-kit's uncoupled verdict on `CANON_KIT_DUP_SURFACES`, on the manifest's file-knob conversion.
+- The two hard-coded projections mint `CONTEXT_KIT_FOOTPRINT_FILE` and `GATE_SDK_ENFORCEMENT_FILE`.
+- `check-graph`'s amendment-glob cover is re-spelled `*SPEC-*.md`, and `check-producer-liveness`' argv-supplied `.tmp/*.run` comes off with its ground.
+
+The same literal class in the `# projection:` field is filed to the gap inbox.
+
+**Cost while deferred:** those triggers stay pinned to this layout in every vendored tree. Filed 2026-09-22 to the gap inbox from the doc-path-tokens survey's class 4; promoted at close because each member's module needs reading. **DISTINCT from** **[check-graph-trigger-consumer-path-reach](#check-graph-trigger-consumer-path-reach)** (icebox), whose subject is a `couples=` missing `installer/`, not a frozen consumer literal.
+
+### canon-spec-prune-bakes-docs
+
+[spec: SPEC-spec-prune.md]
+
+`native/src/spec.rs`' `CANON_SPEC_PRUNE` bakes `**/templates` and `docs/*` into canonical-spec discovery for every consumer of `spec::canonical_specs`. `docs/*` reads as this repo's generated-mirror location in kit mechanism.
+
+**Deliverable:** a knob carrying the two values as this repo's binding, a derivation from a knob that already names the site root, or a stated ground that `docs/` is kit convention.
+
+**Specified 2026-09-23:** a stated ground. `docs/*` is where canon-kit's own `--emit docs-mirror` writes, so the prune is the kit excluding its own output, and `**/templates` is already the kit's skeleton convention. The mirror root becomes one constant read by the generator, the prune and the registry. The registry's six literal copies are what made the SPEC's "one place" claim false. The filed knob, `SITE_KIT_SCAN_ROOT`, was the wrong one: it is `check-docs-cname-parity`'s `ls-files` root. A knob or derivation is refused, because a registry prune has no `knob:` source. The relocatable mirror root is filed to the gap inbox.
+
+**Cost while deferred:** no adopter exists pre-launch, so the wrong set is read only on this tree, where it is right. Filed 2026-09-22 to the gap inbox by `consumer-policy-seam`'s spec census; promoted 2026-09-23 at its close. **DISTINCT from** [doc-path-hardcoded-reads](#doc-path-hardcoded-reads), whose members are `.gate` `couples=` literals.
+
+### armed-by-content-emptiness-shape
+
+[spec: SPEC-armed-by-content.md]
+
+`check-commit-msg` and `check-tree-terms` share `GATE_SDK_MSG_PATTERN_FILES`, a required tracked pattern file, and both pass vacuously when that file trims to no non-comment line. `# armed-by:` reads a knob's resolved value, never a tracked file's parsed content, so `doctor` cannot name this disarmed state. Second instance: `check-provenance-seam` asserts nothing at its defaults, a conjunction one knob's emptiness cannot state.
+
+**Deliverable — rule one of two:** an arming shape reading content emptiness, or a stated refusal naming why a content-emptied pattern file stays outside `doctor`. The ruling covers both shapes.
+
+**Specified 2026-09-23:** a content form is added, `# armed-by: content <KNOB> [<KNOB>…]`. It means the member asserts nothing while no file those knobs name carries a live line — non-empty after leading blanks and not opening with `#`, the one filter the pattern-roster gates share. The two pattern-file gates declare it, and `doctor` renders it. The conjunction is refused: the declaration names emptiness and never a predicate. `check-provenance-seam`'s default is also the state the kit intends for an adopter, so a `doctor` line there would nag every adopter.
+
+**Cost while deferred:** an adopter who empties the pattern file gets a silent clean pass with no doctor warning. Filed 2026-09-22 to the gap inbox by the census discharging `armed-by-census-unrun`; promoted at close because →fix needs a new declaration shape.
+
+### ps1-ascii-unheld-at-commit
+
+[spec: SPEC-ps1-ascii.md]
+
+installer/SPEC.md §Requirements rules a shipped PowerShell file's code ASCII outside its comments — premise corrected 2026-09-23, the filing cited §The install boundary — and nothing local holds it. Windows PowerShell 5.1 decodes a BOM-less script in the host ANSI code page, so a UTF-8 em-dash inside a string literal closes the string and the parse collapses (measured 2026-09-22, run `35753505608`). The only enforcement is the `install-smoke-pwsh-windows` leg.
+
+**Deliverable:** a precommit assertion over the configured install-path corpus's `*.ps1` — non-ASCII outside comments — with the fixture pair the born-native contract requires.
+
+**Specified 2026-09-23:** a byte-level ASCII arm in `check-portability-floor`, over the corpus's `.ps1` members. A full-line `#` comment outside a here-string is exempt. A trailing comment and a block comment over-refuse, stated. There is no valve, and the arm runs even with an empty roster. This repo's corpus binds `gate-sdk/bin/run-gates.ps1`, which is measured clean under the roster. The 24 non-ASCII lines in the two shipped `.ps1` files are all full-line comments.
+
+**Cost while deferred:** the class regresses only into a watched push, against a one-to-two-push iteration budget. Filed 2026-09-22 by build batch 1; promoted at close because →fix needs a new gate arm and a fixture pair.
+
+### pipe-membership-corpus-omits-test-suites
+
+[spec: SPEC-pipe-suites.md]
+
+`check-pipe-membership` reads `walk::tracked_shell_tree`, which excludes `*.test.sh`, so the tracked suites setting `pipefail` sit outside the gate. Re-measured 2026-09-23: all 108 tracked suites set `pipefail`. The filed "107 of 111" had counted fixture-case files. One of the five historically fixed membership sites was a suite, `gate-sdk/gate-tests/lib-gate.test.sh`.
+
+**Deliverable:** widen the corpus to tracked `*.test.sh`, still excluding the pruned fixture trees, and restate gate-sdk/SPEC.md §check-pipe-membership's corpus sentence.
+
+**Specified 2026-09-23:** dropping the filter alone reaches nothing, because every suite sits under the pruned `gate-tests` component. A suite is therefore a tracked `*.test.sh` whose parent directory is named `gate-tests` and whose path above it is unpruned, read by a `walk.rs` sibling this gate alone unions. The widened gate was run over the 108 suites in a scratch repository and is clean.
+
+**Cost while deferred:** a new membership pipe written in a suite goes unflagged until it flips a verdict under load. Filed 2026-09-22 by build batch 4 of gate-sdk-surface-drain on a lead ruling; promoted at close because §check-pipe-membership states the suites outside its corpus.
+
+**Admitted by operator exception to the enhancement admission filter, operator direction 2026-09-23 (lead-relayed):** a suite-corpus widening reaching none of the filter's arms, it joins `gate-sdk-blind-spots` on the surface that unit already carries, at no extra stage.
+
+### smoke-registry-omission-blind
+
+[spec: SPEC-smoke-registry.md]
+
+`check-gate-substrate-parity` assertion I holds the *consumer's* `scripts/gates.list` against the binary's owned-subcommand roster, but it reads `gate-sdk/smoke/install.sh`'s embedded registry only when it runs inside the scratch consumer, so in the authoring repo nothing reads that heredoc. `check-action-job-ref` landed in `39e92816` touching every roster site except that one, and the miss surfaced three commits later as three red validate suites, repaired at `d683ada3`.
+
+**Deliverable:** a precommit-tier assertion that every kit's `smoke/install.sh` registry-plus-`# unregistered:` set covers that kit's owned subcommands in the binary registry.
+
+**Specified 2026-09-23:** assertion J in `check-gate-substrate-parity`. It runs assertion I's comparison per kit, against that kit's registry heredoc and its owned members, and is scoped to the publishing tree. The filed inferred claim was run: a heredoc-split probe over all eleven kits against `--list`'s owner column found registered plus declared equal to owned in every kit. drift-kit owns none and carries no heredoc. Finding the heredoc needs one small opener reader beside `registry::members`. The stale "Eight assertions" count, which listed nine, is corrected to ten.
+
+**Cost while deferred:** each new kit-owned subcommand can miss the site, and the catcher stays three validate suites away from the cause. Filed 2026-09-22 by validate.
+
+**Admitted by operator exception to the enhancement admission filter, operator direction 2026-09-23 (lead-relayed):** an authoring-tree assertion reaching none of the filter's arms, it joins `gate-sdk-blind-spots` on the surface that unit already carries, at no extra stage.
+
 ## Technical Debt
 
 ## Deferred
@@ -41,72 +149,6 @@ the install page's no-Node path is four steps per system, not one line. A hosted
 **Deliverable:** a ruling on the refusal, then, if it is reversed, the two scripts as twins, a pinned-version line with a freshness gate against the newest tag, and a CI witness that runs each one-liner against a packed payload. `irm` cannot read `file://`, so the PowerShell witness needs a local server or a base-URL override.
 
 **Cost while deferred:** a first-contact adopter copies a four-step recipe where a one-liner would do. Filed 2026-09-22 at spec on the operator's direction (lead session), which chose per-OS recipes for install-path-developer-first this iteration and deferred the one-liner. Owner: installer/SPEC.md §The dependency boundary.
-
-### shell-textual-absoluteness-single-dialect
-
-[cost: event/low] [surface: gate-sdk]
-
-tracked shell sites test a path for absoluteness by a leading `/` alone, so a caller-supplied Windows drive-letter path is joined onto a root as if relative. Sites (re-measured 2026-09-22): `gate-sdk/lib/test-hermetic.sh`, `gate-sdk/smoke/install.sh`, `installer/bin/checkwright.sh`, `installer/consumer-smoke/run-smoke.sh`, `lifecycle-kit/smoke/install.sh`, `guard-kit/lib/guard.sh` and `guard-kit/gate-tests/guard-lib-parity.test.sh`. Probe: `git grep -n -E '== /\*|/\*\)' -- '*.sh'`.
-
-**Deliverable:** one shell absoluteness helper both dialects satisfy, the sites routed through it, and the shell half of `check-path-dialect`'s locality arm (today crate-only) holding it.
-
-**Cost while deferred:** a wrong root on a Windows adopter host whenever a caller exports a drive-letter path. Filed 2026-09-21 to the gap inbox by gate-sdk-surface-drain's spec session; promoted at its close because →fix needs a new shell-side oracle the cwd-anchor amendment kept out of its envelope. Owner lookup ran over `absolute` and `locality` in gate-sdk/SPEC.md; §check-path-dialect owns the crate-side arm and names no shell arm.
-
-### armed-by-content-emptiness-shape
-
-[cost: event/low] [surface: gate-sdk]
-
-`check-commit-msg` and `check-tree-terms` share `GATE_SDK_MSG_PATTERN_FILES`, a required tracked pattern file, and both pass vacuously when that file trims to no non-comment line. `# armed-by:` reads a knob's resolved value, never a tracked file's parsed content (gate-sdk/SPEC.md §The install disposition), so `doctor` cannot name this disarmed state. **Deliverable — rule one of two:** an arming shape reading content emptiness, or a stated refusal naming why a content-emptied pattern file stays outside `doctor`. No design is proposed here.
-
-**Second instance, same limit:** `check-provenance-seam` asserts nothing at the defaults (`CANON_KIT_SCAN_KIT_ROOTS=0` with `CANON_KIT_SEAM_SURFACE_GLOBS` empty), a conjunction one knob's emptiness cannot state; its dead `armed-by:` on the `0|1` switch came off at canon-gate-precision's close. The ruling covers both shapes.
-
-**Cost while deferred:** an adopter who empties the pattern file gets a silent clean pass with no doctor warning, and a default provenance-seam install gets one too. Filed 2026-09-22 to the gap inbox by the census discharging `armed-by-census-unrun`; promoted at close because →fix needs a new declaration shape. Owner lookup ran over `armed-by` in gate-sdk/SPEC.md; §The install disposition owns the declaration.
-
-### doc-path-hardcoded-reads
-
-[cost: event/low] [surface: gate-sdk]
-
-eighteen kit-shipped `couples=` literals across thirteen members name a consumer path the member reads that no knob it declares configures, so each trigger stays frozen to this repo's layout and a vendoring adopter's hook never fires on their real file. Members (re-measured 2026-09-22 by `git grep -n couples= -- '*/checks/*.gate'`): the four `check-action-*` gates (`docs/_config.yml`), `check-install-claim`, `check-payload-claim`, `check-prose-tells` (`docs/*.md`), `check-close-surfaces` (`.claude/commands/*.md`), `check-scratch-citation` (`TASK-QUEUE.md`), `check-footprint-fresh`, `check-enforcement-fresh`, `check-surface-ratchet`, `check-graph`, `check-surface-duplication` (`VISION.md`) and `check-producer-liveness` (`.tmp/*.run`).
-
-**Deliverable:** per member, a knob the code reads and the registry declares (the literal then converts by gate-sdk/SPEC.md §The # graph: manifest's rule), or an undeclared read declared.
-
-**Cost while deferred:** those triggers stay pinned to this layout in every vendored tree. Filed 2026-09-22 to the gap inbox from the doc-path-tokens survey's class 4; promoted at close because each member's module needs reading. **DISTINCT from** **[check-graph-trigger-consumer-path-reach](#check-graph-trigger-consumer-path-reach)** (icebox), whose subject is a `couples=` missing `installer/`, not a frozen consumer literal.
-
-### pipe-membership-corpus-omits-test-suites
-
-[cost: event/low] [surface: gate-sdk]
-
-`check-pipe-membership` reads `walk::tracked_shell_tree`, which excludes `*.test.sh`, so the tracked suites setting `pipefail` sit outside the gate. Measured 2026-09-22 by the filer: 107 of 111 tracked suites set `pipefail`; one of the five historically fixed membership sites was a suite, `gate-sdk/gate-tests/lib-gate.test.sh`. **Deliverable:** widen the corpus to tracked `*.test.sh`, still excluding the pruned fixture trees (their `bad/` cases hold deliberate violations), and restate gate-sdk/SPEC.md §check-pipe-membership's corpus sentence; the landing amendment's own probe over all `*.sh` finds no current site, so the widened gate lands green.
-
-**Cost while deferred:** a new membership pipe written in a suite goes unflagged until it flips a verdict under load. Filed 2026-09-22 by build batch 4 of gate-sdk-surface-drain on a lead ruling; promoted at close because §check-pipe-membership states the suites outside its corpus, so the widening is an envelope change for spec, not a drain fix.
-
-**Admitted by operator exception to the enhancement admission filter, operator direction 2026-09-23 (lead-relayed):** a suite-corpus widening reaching none of the filter's arms, it joins `gate-sdk-blind-spots` on the surface that unit already carries, at no extra stage.
-
-### ps1-ascii-unheld-at-commit
-
-[cost: event/low] [surface: gate-sdk]
-
-installer/SPEC.md §The install boundary rules a shipped PowerShell file's code ASCII, and nothing local holds it: Windows PowerShell 5.1 decodes a BOM-less script in the host ANSI code page, so a UTF-8 em-dash inside a string literal closes the string and the whole parse collapses (measured 2026-09-22, run `35753505608`, `installer/bin/checkwright.ps1`). Re-verified at this drain: no module under `native/src/gates/` asserts a file's content ASCII, and `scripts/portability-patterns.list` carries no such pattern — so the only enforcement is the `install-smoke-pwsh-windows` leg, and a regression costs a watched push to find.
-
-**Deliverable:** a precommit assertion over the configured install-path corpus's `*.ps1` — non-ASCII outside comments — with the fixture pair the born-native contract requires. `check-portability-floor` is the nearest home: its corpus `GATE_SDK_PORTABILITY_PATHS` already reaches `installer/bin`. **The design question the home raises:** that gate's roster is one POSIX ERE per line with neither comment-awareness nor a character-class vocabulary for *non-ASCII*, so the assertion is a module arm beside the roster rather than a roster line.
-
-**Cost while deferred:** the class regresses only into a watched push, against a one-to-two-push iteration budget. Filed 2026-09-22 by build batch 1; promoted at close because →fix needs a new gate arm and a fixture pair, which is build-class work under scope-gated intake. Owner lookup ran `ascii`, `portability-floor` and `code page` over the queue — no owner.
-
-### smoke-registry-omission-blind
-
-[cost: event/low] [surface: gate-sdk]
-
-`check-gate-substrate-parity` assertion I holds the *consumer's* `scripts/gates.list` against the binary's owned-subcommand roster, but it reads `gate-sdk/smoke/install.sh`'s embedded registry only when it runs inside the scratch consumer — so in the authoring repo nothing reads that heredoc at all. Measured this iteration: `check-action-job-ref` landed in `39e92816` touching every roster site except that one, and the miss surfaced three commits later as three red validate suites (`demo`, `consumer_smoke`, `agents_md_smoke`), each failing in that script's ACT 1 hook leg — an expensive, badly-localized signal for a one-line omission, repaired at `d683ada3`. docs/site-architecture.md already rosters the site as hand-maintained, so this is enforcement of a rule already written, not a new rule.
-
-**Deliverable:** a precommit-tier assertion that every kit's `smoke/install.sh` registry-plus-`# unregistered:` set covers that kit's owned subcommands in the binary registry. `check-gate-substrate-parity` is the nearest home — it already owns the roster read (`gates::names_with_owners`), the declaration grammar, and it already runs on the authoring tree.
-
-**One of the two filed inferred claims was run at this drain and holds:** no kit's `smoke/install.sh` currently omits a gate the binary attributes to it, checked across all eleven kits against `--list`'s owner column. Honest limit: the probe tested *mention anywhere in the file*, which is necessary but weaker than the registry-versus-`# unregistered:` split the real assertion would make.
-
-**Inferred, not run:** parsing the heredoc out of `smoke/install.sh` needs no new grammar beyond `registry::members` plus the `# unregistered:` reader — establish it by drafting the arm against `gate-sdk/smoke/install.sh` and its ten sibling scripts.
-
-**Cost while deferred:** each new kit-owned subcommand can miss the site, and the catcher stays three validate suites away from the cause. Filed 2026-09-22 by validate. Owner lookup ran `smoke registry`, `substrate-parity` and `roster site` over the queue — [substrate-parity-assertion-c-reach-unannounced](#substrate-parity-assertion-c-reach-unannounced) (icebox) owns assertion C's reach, not assertion I's blind spot, and [non-gate-arm-roster-hand-maintained](#non-gate-arm-roster-hand-maintained) (icebox) owns a different hand-maintained roster; no owner.
-
-**Admitted by operator exception to the enhancement admission filter, operator direction 2026-09-23 (lead-relayed):** an authoring-tree assertion reaching none of the filter's arms, it joins `gate-sdk-blind-spots` on the surface that unit already carries, at no extra stage.
 
 ### disclaimer-beside-its-own-restatement
 
@@ -625,32 +667,6 @@ the consumer's local-only companion files have read triggers at three skills and
 **Held Deferred by the enhancement admission filter** (TRAJECTORY.md §The rulings): new template slots are an enhancement that cuts no time-to-first-value, closes no trust gap and produces no external proof.
 
 **Cost while deferred:** local-only surfaces drift until a consult happens to audit them. Filed 2026-09-18 to the gap inbox by the consult that audited the local-only files, after `external-install-evidence`'s close; promoted to Deferred at the next scope.
-
-### worktree-hook-guards-fail-open
-
-[cost: event/high] [surface: gate-sdk]
-
-every binary-backed harness hook is inert inside a worktree-isolated dispatch. `gate-sdk/bin/run-gates.sh` resolves `GATE_SDK_NATIVE_BIN` repo-relative from the worktree's own top level, a linked worktree carries no build output, and `--hook` is on the front end's fail-open set, so the arm exits 0 with its "absent or not executable" line. Measured 2026-09-22 at `consumer-policy-seam`'s spec: an audit-sweep dispatched under `isolation: worktree` spawned six fork children, and each `agent-dispatch-guard` record shows the fail-open allow. So the read-only-claim rule that sends a dispatch to a worktree herds it into the one place the fork ban and the budget guard cannot fire. delegation-kit/SPEC.md already repairs this for the turn-end liveness reader alone.
-
-**Deliverable:** the hook front end resolves the binary from the main checkout (`git rev-parse --git-common-dir`) when its cwd is a linked worktree, or a stated refusal to; plus a fixture proving the fork ban fires from inside a linked worktree. The choice is design work: a main-checkout binary can be built from a different tree than the worktree's.
-
-**Run 2026-09-23 at scope, and wider than filed:** from a scratch `git worktree add` with no `native/target`, the bash guard, the workflow-state guard and the dispatch guard each exit 0 on a payload each blocks from the main checkout.
-
-**DISTINCT from** the icebox's [worktree-dispatch-rebuilds-the-gate-binary](#worktree-dispatch-rebuilds-the-gate-binary) (the cold-build cost of the same missing binary) and [worktree-isolated-dispatch-cannot-reach-the-main-checkout](#worktree-isolated-dispatch-cannot-reach-the-main-checkout) (the bridge question); this entry's subject is a guard failing open, which neither names.
-
-**Cost while deferred:** the fork ban and the budget guard are advisory for any worktree-isolated agent. Filed 2026-09-22 to the gap inbox by the lead; promoted 2026-09-23 at `consumer-policy-seam`'s close, because the fix picks between two resolution shapes.
-
-### canon-spec-prune-bakes-docs
-
-[cost: event/low] [surface: canon-kit]
-
-`native/src/spec.rs`'s `CANON_SPEC_PRUNE` bakes `**/templates` and `docs/*` into canonical-spec discovery for every consumer of `spec::canonical_specs`. `docs/*` is this repo's generated-mirror location, a consumer layout path in kit mechanism. An adopter whose site lives elsewhere double-counts its mirror as canonical specs, and one whose real specs sit under `docs/` loses them. Neither canon-kit/SPEC.md nor site-kit/SPEC.md states a ground for the literal.
-
-**Deliverable:** a knob carrying the two values as this repo's binding, a derivation from the knob that already names the site root (`SITE_KIT_SCAN_ROOT`, a cross-kit read to weigh), or a stated ground that `docs/` is kit convention.
-
-**DISTINCT from** [doc-path-hardcoded-reads](#doc-path-hardcoded-reads), whose members are `.gate` `couples=` literals; this is a crate constant on a different reader.
-
-**Cost while deferred:** no adopter exists pre-launch, so the wrong set is read only on this tree, where it is right. Filed 2026-09-22 to the gap inbox by `consumer-policy-seam`'s spec census; promoted 2026-09-23 at its close, because each deliverable either mints a governed name or rules a seam.
 
 ### policy-choice-census-residue
 
