@@ -28,3 +28,6 @@ GATE_SDK_PROJECTION_ROSTER_SECTION = Generated projections and their freshness g
 
 # spec: gate-sdk/SPEC.md §check-assertion-strength — this repo binds the shipped window: the gate reaches zero declaring calls on this tree, so no value moves a verdict here, and binding it keeps the choice this repo's rather than an inherited default
 GATE_SDK_ASSERTION_STRENGTH_WINDOW = 8
+
+# spec: gate-sdk/SPEC.md §check-commit-subject — this repo binds the shipped commit-type roster, the class set its history is written in, so a kit default's move moves no verdict here (Policy-as-choice)
+GATE_SDK_COMMIT_TYPES = feat fix refactor perf docs test build ci chore style

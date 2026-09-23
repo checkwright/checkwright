@@ -90,14 +90,6 @@ a worktree-isolated `audit-sweep` has no gate binary for its oracle arms. `DELEG
 
 ## Technical Debt
 
-### repo-inherits-policy-defaults
-
-Policy-as-choice says a consumer holding a choice binds it in its own config and the kit's author is such a consumer, yet this repo inherits most policy knobs' kit defaults silently. **Premise corrected 2026-09-23:** the filing said *every*; this iteration bound its new knobs explicitly (`CANON_KIT_KNOB_CITATION_REACH`, `CANON_KIT_KNOB_CITATION_LITERAL_SPAN`, `CANON_KIT_DEFAULT_COUPLING_WINDOW`, `GATE_SDK_ASSERTION_STRENGTH_WINDOW`, `CANON_KIT_MEASURED_SPAN`), while older ones such as `QUEUE_KIT_WRAP_BUDGET`, `QUEUE_KIT_ENTRY_CAP` and `LIFECYCLE_KIT_SHIM_NGRAM` stay unbound in `scripts/*.knobs`. **Re-verified at promotion:** a grep of `scripts/*.knobs` binds none of those three.
-
-**Deliverable:** a census of kit policy knobs (not layout knobs) whose default this repo relies on, and an explicit binding line per knob, so a later move of a kit default moves no verdict here; or a ruling that inheriting a default is binding it. It waited on `policy-choice-census-residue`, whose rulings minted knobs and admitted `off`, changing the set to bind.
-
-**Cost while deferred:** a kit default moved toward a more universal value silently moves this repo's verdicts. Filed 2026-09-22 to the gap inbox by `consumer-policy-seam`'s spec; promoted 2026-09-23 at its close, because the census is its own sweep and its alternative is a reading of the doctrine.
-
 ## Deferred
 
 ### foreign-toolchain-docker-legs
@@ -1660,5 +1652,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - suite-corpus-skips-tests-dir
 - unmarked-discharge-vs-span
 - policy-choice-census-residue
+- repo-inherits-policy-defaults
 
 ## Lessons Learned

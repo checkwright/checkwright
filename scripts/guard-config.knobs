@@ -1,4 +1,4 @@
-# spec: guard-kit/SPEC.md §Layout and configuration — this repo's guard-kit consumer knob file; set only what this repo overrides beyond the kit defaults
+# spec: guard-kit/SPEC.md §Layout and configuration — this repo's guard-kit consumer knob file; set what this repo overrides beyond the kit defaults, and the policy rosters it binds
 
 # spec: guard-kit/SPEC.md §check-door-binding — this repo's own surfaces beyond the kit roots that assertion C sweeps: the root README and the served docs tree, each entry a whole tree rather than a page roster so a page added later is swept unedited
 GUARD_KIT_DOOR_ROOTS[] = README.md
@@ -26,3 +26,39 @@ GUARD_KIT_BREADTH_DECLARED[Bash(gh secret *)] = operator-ruled 2026-08-23 out of
 
 # spec: guard-kit/SPEC.md §Layout and configuration — this harness build carries no dedicated Glob or Grep tool in either session class, probed with a ToolSearch selecting both in a main and in a dispatched session, so rules 9 and 11 stay inert and bare find and grep stay the working forms
 GUARD_KIT_SEARCH_TOOLS =
+
+# spec: guard-kit/SPEC.md §Layout and configuration — the policy rosters this repo relies on, bound at the members its guard decides with so a kit default's move moves no decision here (Policy-as-choice); each read-only member keeps its form declaration from the kit's table
+GUARD_KIT_RO_BINS[] = grep
+GUARD_KIT_RO_BINS[] = egrep
+GUARD_KIT_RO_BINS[] = fgrep
+GUARD_KIT_RO_BINS[] = rg
+GUARD_KIT_RO_BINS[] = head
+GUARD_KIT_RO_BINS[] = tail
+GUARD_KIT_RO_BINS[] = cat
+GUARD_KIT_RO_BINS[] = wc
+GUARD_KIT_RO_BINS[] = sort
+GUARD_KIT_RO_BINS[] = uniq
+GUARD_KIT_RO_BINS[] = cut
+GUARD_KIT_RO_BINS[] = tr
+GUARD_KIT_RO_BINS[] = nl
+GUARD_KIT_RO_BINS[] = rev
+GUARD_KIT_RO_BINS[] = tac
+GUARD_KIT_RO_BINS[] = paste
+GUARD_KIT_RO_BINS[] = comm
+GUARD_KIT_RO_BINS[] = column
+GUARD_KIT_RO_BINS[] = diff
+GUARD_KIT_RO_BINS[] = jq
+GUARD_KIT_RO_BINS[] = find
+GUARD_KIT_RO_BINS[] = ls
+GUARD_KIT_RO_BINS[] = xargs
+GUARD_KIT_APPEND_BINS[] = cat
+GUARD_KIT_APPEND_BINS[] = printf
+GUARD_KIT_APPEND_BINS[] = echo
+GUARD_KIT_SCRIPT_INTERPRETERS[] = python
+GUARD_KIT_SCRIPT_INTERPRETERS[] = python3
+GUARD_KIT_SCRIPT_INTERPRETERS[] = node
+GUARD_KIT_SCRIPT_INTERPRETERS[] = deno
+GUARD_KIT_SCRIPT_INTERPRETERS[] = ruby
+GUARD_KIT_SCRIPT_INTERPRETERS[] = perl
+GUARD_KIT_SCRIPT_INTERPRETERS[] = php
+GUARD_KIT_SCRIPT_INTERPRETERS[] = zsh

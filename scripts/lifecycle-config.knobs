@@ -1,4 +1,4 @@
-# spec: lifecycle-kit/SPEC.md §Layout and configuration — this repo's lifecycle-kit consumer knob file: the boundary-truncate and entry-preflight knobs wire evidence-kit's manifest across the seam, the boundary-require knob makes close's release disposition a boundary precondition, the session-boundary posture is set below; every other knob keeps the platform default
+# spec: lifecycle-kit/SPEC.md §Layout and configuration — this repo's lifecycle-kit consumer knob file: the boundary-truncate and entry-preflight knobs wire evidence-kit's manifest across the seam, the boundary-require knob makes close's release disposition a boundary precondition, the session-boundary posture is set below, and the policy calibrations are bound at the foot; every other knob keeps the platform default
 LIFECYCLE_KIT_BOUNDARY_TRUNCATE[] = .workflow/validate-evidence.txt
 LIFECYCLE_KIT_BOUNDARY_TRUNCATE[] = .workflow/release-disposition.txt
 LIFECYCLE_KIT_BOUNDARY_TRUNCATE[] = .workflow/preflight-valve.txt
@@ -56,3 +56,9 @@ LIFECYCLE_KIT_PREDECESSOR[align] = scope
 LIFECYCLE_KIT_PREDECESSOR[build] = scope
 LIFECYCLE_KIT_PREDECESSOR[validate] = build
 LIFECYCLE_KIT_PREDECESSOR[close] = validate
+# spec: lifecycle-kit/SPEC.md §Layout and configuration — the policy calibrations this repo relies on, bound at the values its gates are green at so a kit default's move moves no verdict here (Policy-as-choice)
+LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP = 1500
+LIFECYCLE_KIT_RECURRENCE_THRESHOLD = 2
+LIFECYCLE_KIT_RULING_ORACLE_TIMEOUT = 10
+LIFECYCLE_KIT_SHIM_NGRAM = 9
+LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK = 1
