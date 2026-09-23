@@ -2,6 +2,7 @@
 // docs/doctrine-kit/DOCTRINE.md are the byte-fresh projection of the docs-mirror arm backing
 // on-site reference reading; a stale, missing, or orphaned mirror page reds
 use crate::fresh;
+use crate::spec;
 use crate::walk;
 use std::path::Path;
 
@@ -38,7 +39,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut expected: Vec<String> = Vec::new();
     let mut n = 0usize;
     for src in listed.lines() {
-        let dest = format!("docs/{}", src);
+        let dest = format!("{}/{}", spec::MIRROR_ROOT, src);
         expected.push(dest.clone());
         n += 1;
         let on_disk = format!("{}/{}", root, dest);
@@ -62,7 +63,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // spec: gate-sdk/SPEC.md §The consumer remainder cohort — the walk prunes nothing, because
     // the shell form reached for a bare `find`: a member that never read the prune set neither
     // narrows its corpus by it nor declares it.
-    let docs_root = format!("{}/docs", root);
+    let docs_root = format!("{}/{}", root, spec::MIRROR_ROOT);
     let mut found: Vec<String> = walk::find_with_prune(Path::new(&docs_root), &|_| false)?
         .into_iter()
         .filter(|p| {
@@ -91,7 +92,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
         for b in &bad {
             println!("  {}", b);
         }
-        println!("  help: regenerate — bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write — and stage docs/.");
+        println!(
+            "  help: regenerate — bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write — and stage {}/.",
+            spec::MIRROR_ROOT
+        );
         return Ok(1);
     }
     println!(

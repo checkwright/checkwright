@@ -174,7 +174,7 @@ if staged_matches '*docs/footprint.md' '*CLAUDE.md' '*/SPEC.md' 'gate-sdk/templa
     run_gate check-footprint-fresh native/target/release/checkwright-gates check-footprint-fresh
 fi
 
-if staged_matches 'docs/*/SPEC.md' 'docs/*/README.md' 'docs/doctrine-kit/DOCTRINE.md' '*/SPEC.md' '*/README.md' 'doctrine-kit/DOCTRINE.md' 'native/src/emit/mod.rs' 'scripts/canon-config.knobs' 'native/src/gates/docs_mirror_fresh.rs' 'native/src/fresh.rs' 'native/src/emit/docs_mirror.rs'; then
+if staged_matches 'docs/*/SPEC.md' 'docs/*/README.md' 'docs/doctrine-kit/DOCTRINE.md' '*/SPEC.md' '*/README.md' 'doctrine-kit/DOCTRINE.md' 'native/src/emit/mod.rs' 'scripts/canon-config.knobs' 'native/src/gates/docs_mirror_fresh.rs' 'native/src/fresh.rs' 'native/src/spec.rs' 'native/src/emit/docs_mirror.rs'; then
     run_gate check-docs-mirror-fresh native/target/release/checkwright-gates check-docs-mirror-fresh
 fi
 

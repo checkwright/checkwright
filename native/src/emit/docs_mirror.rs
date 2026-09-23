@@ -3,14 +3,19 @@
 // grammar. Its source set is derived from the tree, so its one knob is a URL prefix.
 use crate::emit::self_repo_prefix;
 use crate::fresh;
+use crate::spec;
 use crate::walk;
 use std::path::Path;
 
-const USAGE: &str = "\
+const USAGE: &str = concat!(
+    "\
 usage: --emit docs-mirror [--write|--list|--emit <src>] [--root <dir>]
-  --write (default) writes every mirror page under <root>/docs/; --list prints the
+  --write (default) writes every mirror page under <root>/",
+    crate::spec::mirror_root!(),
+    "/; --list prints the
   source set; --emit prints one page.
-";
+"
+);
 
 const BLOB_REF_KNOB: &str = "CANON_KIT_DOCS_BLOB_REF";
 
@@ -267,7 +272,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         Mode::Write => {
             let srcs = sources(&ctx)?;
             for src in &srcs {
-                let dest = ctx.under(&format!("docs/{}", src));
+                let dest = ctx.under(&format!("{}/{}", spec::MIRROR_ROOT, src));
                 if let Some((dir, _)) = dest.rsplit_once('/') {
                     std::fs::create_dir_all(dir)
                         .map_err(|e| format!("cannot create {}: {}", dir, e))?;
@@ -277,9 +282,10 @@ pub fn emit(args: &[String]) -> Result<String, String> {
                     .map_err(|e| format!("cannot write {}: {}", dest, e))?;
             }
             Ok(format!(
-                "docs-mirror: wrote {} mirror page(s) under {}/docs/\n",
+                "docs-mirror: wrote {} mirror page(s) under {}/{}/\n",
                 srcs.len(),
-                ctx.root
+                ctx.root,
+                spec::MIRROR_ROOT
             ))
         }
     }

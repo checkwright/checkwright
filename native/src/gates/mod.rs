@@ -168,7 +168,7 @@ pub type GateEntry = (
 // spec: gate-sdk/SPEC.md §check-reads-couples — each branch declares, the fallback under its selector's guard
 const MANIFEST_ROOTS: &[RootDecl] = &[
     (".", "glob:knob:CANON_KIT_MANIFEST_FILES", "", ""),
-    (".", "else:CANON_KIT_MANIFEST_FILES:name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*", ""),
+    (".", "else:CANON_KIT_MANIFEST_FILES:name:knob:CANON_KIT_SPEC_NAME", crate::spec::CANON_SPEC_PRUNE_DECL, ""),
     (".", "else:CANON_KIT_MANIFEST_FILES:name:lit:README.md", "", ""),
     (".", "else:CANON_KIT_MANIFEST_FILES:name:lit:CLAUDE.md", "", ""),
     (".", "glob:knob:CANON_KIT_PROSE_SURFACE_GLOBS", "", ""),
@@ -185,7 +185,7 @@ const COMMENT_SURFACE_ROOTS: &[RootDecl] = &[
 // rather than per walk is what drops the second walk silently.
 const SPEC_POINTER_ROOTS: &[RootDecl] = &[
     (".", "glob:knob:CANON_KIT_MANIFEST_FILES", "", ""),
-    (".", "else:CANON_KIT_MANIFEST_FILES:name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*", ""),
+    (".", "else:CANON_KIT_MANIFEST_FILES:name:knob:CANON_KIT_SPEC_NAME", crate::spec::CANON_SPEC_PRUNE_DECL, ""),
     (".", "else:CANON_KIT_MANIFEST_FILES:name:lit:README.md", "", ""),
     (".", "else:CANON_KIT_MANIFEST_FILES:name:lit:CLAUDE.md", "", ""),
     (".", "glob:knob:CANON_KIT_PROSE_SURFACE_GLOBS", "", ""),
@@ -443,7 +443,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-spec-dod-singleton",
         spec_dod_singleton::run,
-        &[(".", "name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*", "")],
+        &[(".", "name:knob:CANON_KIT_SPEC_NAME", crate::spec::CANON_SPEC_PRUNE_DECL, "")],
         &[
             "GATE_SDK_PRUNE_DIRS",
             "GATE_SDK_PRUNE_EXTRA_DIRS",
@@ -459,7 +459,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-spec-derivable-section",
         spec_derivable_section::run,
-        &[(".", "name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*", "")],
+        &[(".", "name:knob:CANON_KIT_SPEC_NAME", crate::spec::CANON_SPEC_PRUNE_DECL, "")],
         &[
             "GATE_SDK_PRUNE_DIRS",
             "GATE_SDK_PRUNE_EXTRA_DIRS",
@@ -713,7 +713,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-spec-embedded-source",
         spec_embedded_source::run,
-        &[(".", "name:knob:CANON_KIT_AMENDMENT_GLOB", "", ""), (".", "name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*", ""), (".", "name:knob:CANON_KIT_EMBED_LANGS.file-globs", "", "")],
+        &[(".", "name:knob:CANON_KIT_AMENDMENT_GLOB", "", ""), (".", "name:knob:CANON_KIT_SPEC_NAME", crate::spec::CANON_SPEC_PRUNE_DECL, ""), (".", "name:knob:CANON_KIT_EMBED_LANGS.file-globs", "", "")],
         &[
             "GATE_SDK_PRUNE_DIRS",
             "GATE_SDK_PRUNE_EXTRA_DIRS",
@@ -1446,7 +1446,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-docs-mirror-fresh",
         docs_mirror_fresh::run,
-        &[("docs", "name:lit:SPEC.md,README.md,DOCTRINE.md", "", "")],
+        &[(crate::spec::MIRROR_ROOT, "name:lit:SPEC.md,README.md,DOCTRINE.md", "", "")],
         // spec: gate-sdk/SPEC.md §The non-gate arm — the generator it now calls in-process reads
         // the blob ref, so the comparator declares what its callee reads.
         &["CANON_KIT_DOCS_BLOB_REF"],
@@ -2117,7 +2117,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-surface-duplication",
         surface_duplication::run,
-        &[(".", "name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*", "")],
+        &[(".", "name:knob:CANON_KIT_SPEC_NAME", crate::spec::CANON_SPEC_PRUNE_DECL, "")],
         &[
             "CANON_KIT_GLOSSARY_FILE",
             "CANON_KIT_DUP_SURFACES",

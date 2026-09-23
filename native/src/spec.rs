@@ -113,10 +113,28 @@ pub fn canonical_specs(root: &str) -> Result<Vec<PathBuf>, String> {
     prune_kit_roots(root, specs)
 }
 
-// spec: canon-kit/SPEC.md §The shared spec adapters — this walk's two narrowings, as the directory prune both of
-// them are: `templates/` stubs at any depth, and the generated on-site mirror one level under the
-// site directory. Read by both the walk and the member's registry declaration from here.
-pub const CANON_SPEC_PRUNE: &[&str] = &["**/templates", "docs/*"];
+// spec: canon-kit/SPEC.md §The shared spec adapters — the kit mirror's own output root, one spelling
+// read by the generator, its freshness comparator and the canonical-spec prune
+macro_rules! mirror_root {
+    () => {
+        "docs"
+    };
+}
+pub(crate) use mirror_root;
+
+macro_rules! templates_prune {
+    () => {
+        "**/templates"
+    };
+}
+
+pub const MIRROR_ROOT: &str = mirror_root!();
+
+// spec: canon-kit/SPEC.md §The shared spec adapters — the templates convention and the kit mirror's
+// own output root
+pub const CANON_SPEC_PRUNE: &[&str] = &[templates_prune!(), concat!(mirror_root!(), "/*")];
+
+pub const CANON_SPEC_PRUNE_DECL: &str = concat!(templates_prune!(), ",", mirror_root!(), "/*");
 
 // spec: canon-kit/SPEC.md §The shared spec adapters — `spec_amendments`: the amendment-glob find,
 // `templates/`-filtered and kit-root pruned, selecting by a glob on the basename where
@@ -1499,6 +1517,14 @@ fn delimited(b: &[u8], d: u8, nonempty: bool) -> Option<(usize, usize)> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: canon-kit/SPEC.md §The shared spec adapters — the walk and every registry declaration
+    // cannot disagree about the prune
+    #[test]
+    fn the_declared_prune_is_the_walked_prune() {
+        assert_eq!(CANON_SPEC_PRUNE_DECL, CANON_SPEC_PRUNE.join(","));
+        assert_eq!(CANON_SPEC_PRUNE[1], format!("{}/*", MIRROR_ROOT));
+    }
 
     // spec: canon-kit/SPEC.md §check-manifest-count — the tens are not consecutive with the
     // teens, so this is the case position arithmetic over the word list would silently misread

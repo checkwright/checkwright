@@ -8,18 +8,6 @@
 
 ## New Features
 
-### canon-spec-prune-bakes-docs
-
-[spec: SPEC-spec-prune.md]
-
-`native/src/spec.rs`' `CANON_SPEC_PRUNE` bakes `**/templates` and `docs/*` into canonical-spec discovery for every consumer of `spec::canonical_specs`. `docs/*` reads as this repo's generated-mirror location in kit mechanism.
-
-**Deliverable:** a knob carrying the two values as this repo's binding, a derivation from a knob that already names the site root, or a stated ground that `docs/` is kit convention.
-
-**Specified 2026-09-23:** a stated ground. `docs/*` is where canon-kit's own `--emit docs-mirror` writes, so the prune is the kit excluding its own output, and `**/templates` is already the kit's skeleton convention. The mirror root becomes one constant read by the generator, the prune and the registry. The registry's six literal copies are what made the SPEC's "one place" claim false. The filed knob, `SITE_KIT_SCAN_ROOT`, was the wrong one: it is `check-docs-cname-parity`'s `ls-files` root. A knob or derivation is refused, because a registry prune has no `knob:` source. The relocatable mirror root is filed to the gap inbox.
-
-**Cost while deferred:** no adopter exists pre-launch, so the wrong set is read only on this tree, where it is right. Filed 2026-09-22 to the gap inbox by `consumer-policy-seam`'s spec census; promoted 2026-09-23 at its close. **DISTINCT from** `doc-path-hardcoded-reads`, whose members are `.gate` `couples=` literals.
-
 ### pipe-membership-corpus-omits-test-suites
 
 [spec: SPEC-pipe-suites.md]
@@ -1618,5 +1606,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - armed-by-content-emptiness-shape
 - smoke-registry-omission-blind
 - doc-path-hardcoded-reads
+- canon-spec-prune-bakes-docs
 
 ## Lessons Learned
