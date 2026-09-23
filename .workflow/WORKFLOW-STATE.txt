@@ -4,13 +4,4 @@
 
 ---
 
-seam-and-stage-residue scope a063f02a 2026-09-23 1f183a16
-seam-and-stage-residue spec a392393c 2026-09-23 6b562deb
-seam-and-stage-residue align a66756e0 2026-09-23 177118df
-seam-and-stage-residue align afb51781 2026-09-23 8c8b8aa1
-seam-and-stage-residue build a42d36c5 2026-09-23 7a0a4cf8
-seam-and-stage-residue build ae5398ac 2026-09-23 dfd05d29
-seam-and-stage-residue build af3f8ee5 2026-09-23 c4d70cca
-seam-and-stage-residue build a993b52c 2026-09-23 891d0cfd
-seam-and-stage-residue validate a1502dc4 2026-09-23 f971997e
-seam-and-stage-residue close add5121d 2026-09-23 98bcbf21
+— scope ade4efee 2026-09-23 ef343b90
