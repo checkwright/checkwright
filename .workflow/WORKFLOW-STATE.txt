@@ -15,3 +15,4 @@ adopter-onramp build afe0d228 2026-09-24 1c939be9
 adopter-onramp build af7f1fb7 2026-09-24 e945ca46
 adopter-onramp build a907d158 2026-09-24 f87e5867
 adopter-onramp validate a6a3981e 2026-09-24 bb62fb6d
+adopter-onramp close a42c524b 2026-09-24 e60cd16c
