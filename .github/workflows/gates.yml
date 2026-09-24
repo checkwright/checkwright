@@ -565,6 +565,152 @@ jobs:
         shell: bash
         run: bash gate-sdk/bin/run-gates.sh --run-guard-tests
 
+      # Reporting only, and it never fails. It measures whether the liveness
+      # predicate (evidence-kit/SPEC.md §The producer-liveness lock) answers a
+      # Windows process id from a PowerShell launch on this host, against
+      # `Get-Process` as ground truth, and whether the shipped MSYS path answers
+      # its own pids here. Its verdict line decides which predicate is built.
+      - name: producer liveness over Windows process ids (reporting)
+        shell: bash
+        run: |
+          set +e
+          source gate-sdk/lib/gate.sh
+          # The binary and not the front end: `run-gates.sh --only` folds a
+          # member's exit 2 into 1, and this step tells a corrupt record from a
+          # held one.
+          bin="$(gate_native_bin)"
+          rec="$(cygpath -m "$(mktemp -d "${SMOKE_TMP:-/tmp}/liveness.XXXXXX")")"
+          ps_run() { MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL='*' "$@"; }
+          truth() {
+            [[ "$1" =~ ^[0-9]+$ ]] || { echo unknown; return; }
+            ps_run pwsh -NoProfile -Command "if (Get-Process -Id $1 -ErrorAction SilentlyContinue) { 'alive' } else { 'gone' }" | tr -d '\r'
+          }
+          gate() {
+            local out rc
+            out="$("$bin" check-producer-liveness "$1" 2>&1)"
+            rc=$?
+            printf '%s\n' "$out" | sed 's/^/    | /' >&2
+            echo "$rc"
+          }
+          wait_gone() {
+            [[ "$1" =~ ^[0-9]+$ ]] || return 1
+            for _ in $(seq 1 30); do [[ "$(truth "$1")" == gone ]] && return 0; sleep 1; done
+            return 1
+          }
+          wait_file() {
+            for _ in $(seq 1 60); do [[ -s "$1" ]] && return 0; sleep 1; done
+            return 1
+          }
+          pid_of() { sed -n 's/^pid=\([0-9]*\) .*/\1/p' "$1" 2>/dev/null; }
+          declare -A t1 g1 t2 g2 tpid
+          winpids=()
+          # shellcheck disable=SC2329 # reached through the EXIT trap
+          cleanup() {
+            [[ -n "$apid" ]] && kill "$apid" 2>/dev/null
+            for p in "${winpids[@]}"; do
+              ps_run pwsh -NoProfile -Command "Stop-Process -Id $p -Force -ErrorAction SilentlyContinue" >/dev/null 2>&1
+            done
+          }
+          trap cleanup EXIT
+
+          echo "== launch =="
+          sleep 300 >/dev/null 2>&1 &
+          apid=$!
+          printf 'pid=%s run=msys\n' "$apid" > "$rec/a.run"
+          tpid[a]="$(tr -d '\r\n' < "/proc/$apid/winpid" 2>/dev/null)"
+          echo "row (a): msys pid $apid, windows pid ${tpid[a]:-<unread>}"
+          # shellcheck disable=SC2016 # $PID and the backtick escape are PowerShell's
+          write_b='Set-Content -NoNewline -Path %s -Value "pid=$PID run=%s`n"; Start-Sleep 300'
+          # shellcheck disable=SC2059 # the format is the PowerShell command template above
+          ps_run pwsh -NoProfile -Command "$(printf "$write_b" "'$rec/b.run'" pwsh)" </dev/null >/dev/null 2>&1 &
+          # shellcheck disable=SC2059
+          ps_run powershell -NoProfile -Command "$(printf "$write_b" "'$rec/bp.run'" powershell)" </dev/null >/dev/null 2>&1 &
+          cpid="$(ps_run pwsh -NoProfile -Command '(Start-Process pwsh -ArgumentList "-NoProfile","-Command","Start-Sleep 300" -PassThru -WindowStyle Hidden).Id' </dev/null | tr -d '\r\n')"
+          printf 'pid=%s run=detached\n' "$cpid" > "$rec/c.run"
+          for r in b bp; do
+            wait_file "$rec/$r.run" || echo "row ($r): no record appeared within 60s"
+            echo "row ($r) record bytes:"; od -c "$rec/$r.run" 2>&1 | head -n 3
+            tpid[$r]="$(pid_of "$rec/$r.run")"
+          done
+          tpid[c]="$cpid"
+          for p in "${tpid[b]}" "${tpid[bp]}" "${tpid[c]}"; do [[ -n "$p" ]] && winpids+=("$p"); done
+          echo "rows (b) (bp) (c): windows pids ${tpid[b]:-<none>} ${tpid[bp]:-<none>} ${tpid[c]:-<none>}"
+
+          echo "== row (d): PowerShell's default writes, naming the live pid ${tpid[b]:-<none>} =="
+          for sh in pwsh powershell; do
+            ps_run "$sh" -NoProfile -Command "Set-Content -Path '$rec/d-$sh-setcontent.run' -Value 'pid=${tpid[b]} run=default'" </dev/null
+            ps_run "$sh" -NoProfile -Command "'pid=${tpid[b]} run=default' > '$rec/d-$sh-redirect.run'" </dev/null
+          done
+          for f in "$rec"/d-*.run; do echo "$(basename "$f"):"; od -c "$f" | head -n 4; done
+
+          echo "== reading 1, every process running =="
+          for r in a b bp c; do
+            t1[$r]="$(truth "${tpid[$r]}")"; g1[$r]="$(gate "$rec/$r.run")"
+            echo "($r) truth=${t1[$r]} gate=${g1[$r]}"
+          done
+          for f in "$rec"/d-*.run; do
+            echo "(d) $(basename "$f") truth=$(truth "${tpid[b]}") gate=$(gate "$f")"
+          done
+
+          echo "== stop =="
+          kill "$apid" 2>/dev/null; wait "$apid" 2>/dev/null
+          for r in b bp c; do
+            [[ -n "${tpid[$r]}" ]] && ps_run pwsh -NoProfile -Command "Stop-Process -Id ${tpid[$r]} -Force -ErrorAction SilentlyContinue" </dev/null
+          done
+          for r in a b bp c; do
+            [[ -n "${tpid[$r]}" ]] || continue
+            wait_gone "${tpid[$r]}" || echo "($r) ground truth still not gone after 30s"
+          done
+
+          echo "== reading 2, every process stopped =="
+          for r in a b bp c; do
+            t2[$r]="$(truth "${tpid[$r]}")"; g2[$r]="$(gate "$rec/$r.run")"
+            echo "($r) truth=${t2[$r]} gate=${g2[$r]}"
+          done
+          for f in "$rec"/d-*.run; do
+            echo "(d) $(basename "$f") truth=$(truth "${tpid[b]}") gate=$(gate "$f")"
+          done
+
+          echo "== row (e): a job's process once its session exits =="
+          # shellcheck disable=SC2016
+          write_e='Start-Job { Set-Content -NoNewline -Path %s -Value "$PID"; Start-Sleep 300 } | Out-Null; Start-Sleep 10'
+          # shellcheck disable=SC2059
+          ps_run pwsh -NoProfile -Command "$(printf "$write_e" "'$rec/job.pid'")" </dev/null >/dev/null 2>&1
+          epid="$(tr -d '\r\n' < "$rec/job.pid" 2>/dev/null)"
+          [[ -n "$epid" ]] && winpids+=("$epid")
+          e_outcome="unmeasured: the job wrote no pid"
+          if [[ -n "$epid" ]]; then
+            e_outcome=alive
+            start=$SECONDS
+            while (( SECONDS - start <= 15 )); do
+              [[ "$(truth "$epid")" == gone ]] && { e_outcome="gone ($((SECONDS - start))s after its session exited)"; break; }
+              sleep 1
+            done
+          fi
+          echo "(e) job pid ${epid:-<none>} truth=$e_outcome"
+
+          echo "== verdict =="
+          verdict="predicate answers Windows pids"
+          for r in b bp c; do
+            if [[ "${t1[$r]}" != alive || "${t2[$r]}" != gone ]]; then
+              verdict="predicate unmeasured: row ($r) ground truth read ${t1[$r]} then ${t2[$r]}"
+              break
+            fi
+            [[ "${g1[$r]}" == 1 && "${g2[$r]}" == 0 ]] || verdict="predicate misreads Windows pids"
+          done
+          echo "$verdict"
+          if [[ "${t1[a]}" == alive && "${t2[a]}" == gone ]]; then
+            if [[ "${g1[a]}" == 1 && "${g2[a]}" == 0 ]]; then
+              echo "row (a): the shipped path answers its msys pid, held then free"
+            else
+              echo "row (a): the shipped path MISREADS its msys pid: gate ${g1[a]} alive, ${g2[a]} gone"
+            fi
+          else
+            echo "row (a): unmeasured, ground truth read ${t1[a]} then ${t2[a]}"
+          fi
+          echo "row (e): a job's process is $e_outcome"
+          exit 0
+
       # The suite itself, under one steering that is **measurement scaffolding
       # and not a fix**: run-smoke.sh blocks unless the target roster is exactly
       # this host, and this host is not the one declared triple. The re-entry is
@@ -633,6 +779,15 @@ jobs:
   # It is not re-added without a fresh argument; a leg that has run green once is
   # not in the position that bought the exemption.
   #
+  # **It runs once per declared Windows triple, and each entry's posture is
+  # DERIVED.** The matrix is `native-artifacts-roster`'s `pwsh_legs`, the
+  # declaration's Windows entries with the runner and held-ness the
+  # per-target index gives `install-smoke-sh-windows-arm64`, on the Intel macOS
+  # sibling's argument. So an entry is binding exactly while its triple is
+  # joined, and the arm64 entry is `Get-HostTarget`'s `Arm64` arm's running
+  # witness: its fixtures are packed for the rustc host, so a detector answering
+  # the x64 triple there meets the unrostered refusal and reds.
+  #
   # **The setup steps are bash and that is not a breach of the standing "assume no
   # POSIX shell on a host the PowerShell half serves" obligation**, which binds the
   # BOOTSTRAP and not the publisher.
@@ -640,10 +795,18 @@ jobs:
   # What must run on a host with no POSIX shell is the step that invokes
   # checkwright.ps1 — and that step is pwsh, reading only the packed tarball.
   install-smoke-pwsh-windows:
-    runs-on: windows-latest
+    needs: native-artifacts-roster
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.native-artifacts-roster.outputs.pwsh_legs) }}
+    runs-on: ${{ matrix.runner }}
+    continue-on-error: ${{ matrix.held }}
     timeout-minutes: 45
     permissions:
       contents: read
+    env:
+      PWSH_LEG_TARGET: ${{ matrix.target }}
     steps:
       # Before the checkout, for the reason the sibling leg states: every digest
       # comparison below assumes the tree the rest of this repository assumes.
@@ -773,8 +936,8 @@ jobs:
           }
 
           Write-Host "== the host this leg's step-2 assertion is written against =="
-          Check "the runner's own rustc host triple is x86_64-pc-windows-msvc" `
-                ($target -eq 'x86_64-pc-windows-msvc') `
+          Check "the runner's own rustc host triple is this entry's, $env:PWSH_LEG_TARGET" `
+                ($target -eq $env:PWSH_LEG_TARGET) `
                 "it is '$target' — step 2's expected answer moved and this assertion must be re-read, not re-greened"
 
           Write-Host "== step 1: the package's own payload directory =="
@@ -1150,9 +1313,11 @@ jobs:
           $base = 'http://127.0.0.1:8732'
           $srv = Start-Process -FilePath python -ArgumentList '-m', 'http.server', '8732', '--bind', '127.0.0.1', '--directory', $serve -PassThru -WindowStyle Hidden
           try {
+              $ready = $null
               foreach ($i in 1..10) {
-                  try { Invoke-WebRequest "$base/install.ps1" -UseBasicParsing | Out-Null; break } catch { Start-Sleep -Seconds 1 }
+                  try { $ready = Invoke-WebRequest "$base/install.ps1" -UseBasicParsing; break } catch { Start-Sleep -Seconds 1 }
               }
+              if ($null -ne $ready) { Write-Host "the local origin serves install.ps1 as: $($ready.Headers['Content-Type'])" }
               $consumer = Join-Path $env:PWSH_SCRATCH 'one-liner-consumer'
               New-Item -ItemType Directory -Force -Path $consumer | Out-Null
               git -C $consumer init -q
@@ -1173,6 +1338,51 @@ jobs:
               exit 1
           }
           Write-Host "the hosted one-liner installed into a clean consumer under Windows PowerShell"
+
+      # Reporting only, and it never fails on what it measures. The step above
+      # reads a local origin; this one reads the URL docs/install.md's one-liner
+      # names, which GitHub Pages serves under a type it takes no config for, under
+      # the Windows PowerShell 5.1 the page's §Windows sends a stock adopter to.
+      # Its verdict line decides between a witness and a fix (installer/SPEC.md
+      # §The dependency boundary, *The one-line install*).
+      - name: probe the live one-liner under Windows PowerShell 5.1 (reporting)
+        if: ${{ !cancelled() }}
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $ProgressPreference = 'SilentlyContinue'
+          $hit = Select-String -LiteralPath docs/install.md -Pattern '^irm (\S+) \| iex$' | Select-Object -First 1
+          if (-not $hit) {
+              Write-Host "::error::docs/install.md carries no 'irm <url> | iex' line; this probe reads the page's URL and has none to read"
+              exit 1
+          }
+          $url = $hit.Matches[0].Groups[1].Value
+          Write-Host "== $url under PowerShell $($PSVersionTable.PSVersion) ($($PSVersionTable.PSEdition)) =="
+          try {
+              $resp = Invoke-WebRequest $url -UseBasicParsing
+              $bytes = $resp.RawContentStream.ToArray()
+              Write-Host "served content type: $($resp.Headers['Content-Type'])"
+              Write-Host "served length: $($bytes.Length) bytes"
+              $got = Invoke-RestMethod $url
+          } catch {
+              Write-Host "the live URL could not be read: $($_.Exception.Message)"
+              Write-Host "verdict: unmeasured"
+              exit 0
+          }
+          $type = if ($null -eq $got) { '<null>' } else { $got.GetType().FullName }
+          Write-Host "irm yields: $type"
+          $parses = $false
+          if ($got -is [string]) {
+              $utf8 = [Text.Encoding]::UTF8.GetString($bytes)
+              $ascii = '[^\x00-\x7F]'
+              Write-Host "equals the served bytes decoded as UTF-8: $($got -ceq $utf8)"
+              Write-Host "equals them outside non-ASCII characters: $(($got -replace $ascii, '') -ceq ($utf8 -replace $ascii, ''))"
+              try { [void][scriptblock]::Create($got); $parses = $true } catch { Write-Host "does not parse: $($_.Exception.Message)" }
+              Write-Host "parses as a script block: $parses"
+          }
+          if ($parses) { Write-Host "verdict: 5.1 reads the live one-liner as text" }
+          else { Write-Host "verdict: 5.1 does not read the live one-liner as text" }
+          exit 0
 
   # The RELEASE-SHAPED PRODUCER, and its whole reason for existing is that no leg
   # which builds from the host it runs on can ever discharge a roster join.
@@ -1224,6 +1434,9 @@ jobs:
       # it is written in the same loop from the same values, so the two outputs
       # cannot disagree about a platform.
       index: ${{ steps.legs.outputs.index }}
+      # `legs` narrowed to the Windows triples, the hosts the PowerShell bootstrap
+      # serves: `install-smoke-pwsh-windows`' matrix, so that leg names no triple.
+      pwsh_legs: ${{ steps.legs.outputs.pwsh_legs }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
@@ -1275,10 +1488,20 @@ jobs:
             echo "absent or empty, and a producer with no leg measures nothing." >&2
             exit 1
           fi
-          echo "legs=$legs" >> "$GITHUB_OUTPUT"
-          echo "index=$index" >> "$GITHUB_OUTPUT"
+          pwsh_legs="$(jq -c '[.[] | select(.target | endswith("-pc-windows-msvc"))]' <<<"$legs")"
+          if [ "$pwsh_legs" = '[]' ]; then
+            echo "the platform declaration names no Windows triple, so the PowerShell" >&2
+            echo "bootstrap's leg has no host to run on." >&2
+            exit 1
+          fi
+          {
+            echo "legs=$legs"
+            echo "index=$index"
+            echo "pwsh_legs=$pwsh_legs"
+          } >> "$GITHUB_OUTPUT"
           echo "producer legs: $legs"
           echo "declaration index: $index"
+          echo "pwsh legs: $pwsh_legs"
 
   # **A joined leg is binding; a held leg is a measurement.** A red on a joined
   # platform fails this workflow, because the consumer smoke's default host
