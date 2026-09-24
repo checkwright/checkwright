@@ -2,6 +2,7 @@ roster item carries no `(`<name>`)` token right after its bold title
 roster name `alpha` is already taken by an earlier item
 roster item `beta` carries 0 declaration clause(s) where exactly one is owed
 rule `gamma` declares `sq dq hd` where the table holds `raw`, `sq dq hd`
+rule `alpha` names the shells `bash` where the table holds `bash`, `powershell`
 the roster's names in order differ from the rule table's in dispatch order
 a rule cited by number (`rule 2`)
 a rule cited by number (`rule-5`)

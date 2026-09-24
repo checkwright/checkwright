@@ -67,7 +67,7 @@
 2437cp docs/value.md
 2616cp drift-kit/templates/close-knowledge.md
 3752cp drift-kit/templates/economics.md
-4243cp guard-kit/templates/close-triage.md
+4436cp guard-kit/templates/close-triage.md
 4120cp lifecycle-kit/templates/consult.md
 39157cp lifecycle-kit/templates/lead.md
 2100cp lifecycle-kit/templates/release-sweep.md

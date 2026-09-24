@@ -2,7 +2,7 @@
 // resolve, steered to the one it can.
 use super::grants::rewrite_granted;
 use super::{command_word, git_subcommand, GitWalk};
-use crate::guard::engine::{Cmd, Ctx, Decided, Verdict};
+use crate::guard::engine::{Cmd, Ctx, Decided, Shell, Verdict};
 use crate::guard::host::{knob_scalar_value, same_file};
 use crate::guard::reader::View::{SqDqHd, SqDqHdq, SqHdq};
 use crate::guard::reader::{DQ_MARK, SQ_MARK};
@@ -12,8 +12,24 @@ fn block(m: impl Into<String>) -> Decided {
     Ok(Some(Verdict::Block(m.into())))
 }
 
+// spec: guard-kit/SPEC.md §The generic ruleset — rule `cd_compound`'s PowerShell location commands,
+// matched without regard to case.
+const PS_LOCATION: &[&str] =
+    &["cd", "chdir", "sl", "set-location", "pushd", "push-location", "popd", "pop-location"];
+
 pub fn cd_compound(ctx: &Ctx) -> Decided {
     let cmd = ctx.view(ctx.cmd(), SqDqHd)?;
+    if ctx.shell() == Shell::PowerShell {
+        let segs: Vec<String> = ctx.segments(&cmd).into_iter().filter(|s| !trim(s).is_empty()).collect();
+        let hit = segs
+            .iter()
+            .map(|s| head_word(trim_start(s)))
+            .find(|w| PS_LOCATION.contains(&w.to_ascii_lowercase().as_str()));
+        if let Some(w) = hit.filter(|_| segs.len() > 1) {
+            return block(format!("don't use '{}' in a compound command (cwd drift, and the allowlist can't match the compound — the call costs an out-of-band permission decision). Pass absolute paths, or 'git -C <dir>' for git.", w));
+        }
+        return Ok(None);
+    }
     if grep_q("(^|[;&|(])[[:space:]]*cd[[:space:]]", &cmd) && grep_q("[;&|]", &cmd) {
         return block("don't use 'cd' in a compound command (cwd drift, and the allowlist can't match the compound — the call costs an out-of-band permission decision). Pass absolute paths, or 'git -C <dir>' for git.");
     }
@@ -138,10 +154,19 @@ fn knob_echo(raw: &str, seg: &str) -> Option<Verdict> {
 
 pub fn scratch_redirect(ctx: &Ctx) -> Decided {
     let cmd = ctx.view(ctx.cmd(), SqDqHd)?;
-    if grep_q(
-        "(^|[[:space:]])([0-9]*|&)>>?[[:space:]]*[^[:space:]/|&]+\\.(err|out|log)([[:space:]]|$)",
-        &cmd,
-    ) {
+    let bare = match ctx.shell() {
+        Shell::Bash => grep_q(
+            "(^|[[:space:]])([0-9]*|&)>>?[[:space:]]*[^[:space:]/|&]+\\.(err|out|log)([[:space:]]|$)",
+            &cmd,
+        ),
+        // spec: guard-kit/SPEC.md §The generic ruleset — PowerShell's `*` stream operator, and a `\`
+        // in the target a path separator.
+        Shell::PowerShell => grep_q(
+            "(^|[[:space:]])([0-9]*|&|[*])>>?[[:space:]]*[^[:space:]/|&]+\\.(err|out|log)([[:space:]]|$)",
+            &cmd.replace('\\', "/"),
+        ),
+    };
+    if bare {
         return block(format!("don't redirect scratch to a bare repo-root filename (e.g. 2> op.err) — it pollutes cwd and risks a 'git add -A'. Send it to a gitignored scratch dir (e.g. {}/<name>.err).", ctx.host().first_scratch()));
     }
     Ok(None)

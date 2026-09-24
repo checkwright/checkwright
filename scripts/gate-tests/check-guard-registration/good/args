@@ -1,7 +1,7 @@
 # Lockstep case: three roster items, each named and declaring exactly the views
-# its table row holds, in table order; every citation in the kit tree and every
-# qualified one outside it resolves. A list under a later heading is not the
-# roster, a bare or numbered citation outside the kit is not read, and the
-# workflow directory's record is skipped.
+# its table row holds, in table order, one naming the two shells its row holds;
+# every citation in the kit tree and every qualified one outside it resolves. A
+# list under a later heading is not the roster, a bare or numbered citation
+# outside the kit is not read, and the workflow directory's record is skipped.
 guard-kit/SPEC.md
 table.tsv

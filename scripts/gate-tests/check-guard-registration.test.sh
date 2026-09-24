@@ -45,6 +45,15 @@ check_case "declaration-unknown-view" "$tmp/bad-view.md" "table.tsv" 2 "a declar
 printf '### The rule roster\n\n- **Rule** (`alpha`) — Declares `raw, and nothing closes it.\n' >"$tmp/unclosed.md"
 check_case "declaration-unclosed" "$tmp/unclosed.md" "table.tsv" 2 "a declaration clause the grammar cannot read"
 
+printf '### The rule roster\n\n- **Rule** (`alpha`) — Declares `sq dq hd`. Shells `bash` and `zsh`.\n' >"$tmp/bad-shell.md"
+check_case "shells-unknown-shell" "$tmp/bad-shell.md" "table.tsv" 2 "a shells clause the grammar cannot read"
+
+printf '### The rule roster\n\n- **Rule** (`alpha`) — Declares `sq dq hd`. Shells `bash, and nothing closes it.\n' >"$tmp/unclosed-shells.md"
+check_case "shells-unclosed" "$tmp/unclosed-shells.md" "table.tsv" 2 "a shells clause the grammar cannot read"
+
+printf 'alpha\tsq dq hd\tzsh\n' >"$tmp/bad-shell.tsv"
+check_case "table-line-unknown-shell" "guard-kit/SPEC.md" "$tmp/bad-shell.tsv" 2 "a table line of no known shape"
+
 printf 'alpha sq dq hd\n' >"$tmp/no-tab.tsv"
 check_case "table-line-without-tab" "guard-kit/SPEC.md" "$tmp/no-tab.tsv" 2 "a table line of no known shape"
 
@@ -58,5 +67,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-guard-registration.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-guard-registration.test: ok (the good pair is clean here too; an absent roster, a roster with no item, a declaration naming an unknown view or left unclosed, a table line with no tab or an unknown view, and an unreadable spec or table each refuse at exit 2 naming what could not be read)"
+echo "check-guard-registration.test: ok (the good pair is clean here too; an absent roster, a roster with no item, a declaration naming an unknown view or left unclosed, a shells clause naming an unknown shell or left unclosed, a table line with no tab, an unknown view or an unknown shell, and an unreadable spec or table each refuse at exit 2 naming what could not be read)"
 exit 0

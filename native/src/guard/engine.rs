@@ -23,9 +23,27 @@ pub struct Fault {
 
 pub type Decided = Result<Option<Verdict>, Fault>;
 
+// spec: guard-kit/SPEC.md §The generic ruleset — the shells a rule applies to, spelled as an item's
+// shells clause writes them.
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Shell {
     Bash,
+    PowerShell,
+}
+
+impl Shell {
+    pub const ALL: [Shell; 2] = [Shell::Bash, Shell::PowerShell];
+
+    pub fn spelling(self) -> &'static str {
+        match self {
+            Shell::Bash => "bash",
+            Shell::PowerShell => "powershell",
+        }
+    }
+
+    pub fn from_spelling(s: &str) -> Option<Shell> {
+        Shell::ALL.into_iter().find(|sh| sh.spelling() == s)
+    }
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — one row: the rule's name, the shells it applies to,
@@ -49,6 +67,7 @@ impl Cmd {
 
 pub struct Ctx<'a> {
     reader: &'a dyn Reader,
+    shell: Shell,
     rule: &'static Rule,
     host: &'a Host,
     cmd: &'a Cmd,
@@ -61,6 +80,12 @@ impl<'a> Ctx<'a> {
 
     pub fn host(&self) -> &'a Host {
         self.host
+    }
+
+    // spec: guard-kit/SPEC.md §The generic ruleset — the shell `decide` was called with, which an
+    // applied rule reads where its test differs by shell.
+    pub fn shell(&self) -> Shell {
+        self.shell
     }
 
     fn declared(&self, view: View) -> Result<(), Fault> {
@@ -80,6 +105,16 @@ impl<'a> Ctx<'a> {
     pub fn view(&self, c: &Cmd, view: View) -> Result<String, Fault> {
         self.declared(view)?;
         Ok(self.reader.view(&c.0, view).unwrap_or_default())
+    }
+
+    // spec: guard-kit/SPEC.md §The generic ruleset — a raw-command expansion decline, answered by the
+    // reader: bash's own test on the raw command, or under PowerShell any `$` the `sq hdq` view keeps.
+    pub fn expands(&self, c: &Cmd, bash: fn(&str) -> bool) -> Result<bool, Fault> {
+        self.declared(View::Raw)?;
+        Ok(match self.shell {
+            Shell::Bash => bash(&c.0),
+            Shell::PowerShell => self.reader.view(&c.0, View::SqHdq).unwrap_or_default().contains('$'),
+        })
     }
 
     pub fn dequoted(&self, c: &Cmd) -> Result<Option<String>, Fault> {
@@ -124,7 +159,7 @@ impl<'a> Ctx<'a> {
     // under that rule's own declared views.
     pub fn under<T>(&self, rule: &'static str, f: impl FnOnce(&Ctx) -> Result<T, Fault>) -> Result<T, Fault> {
         let row = row(rule);
-        f(&Ctx { reader: self.reader, rule: row, host: self.host, cmd: self.cmd })
+        f(&Ctx { reader: self.reader, shell: self.shell, rule: row, host: self.host, cmd: self.cmd })
     }
 }
 
@@ -139,7 +174,7 @@ pub fn row(name: &str) -> &'static Rule {
 // fault decides nothing and says so loudly.
 pub fn decide(reader: &dyn Reader, shell: Shell, host: &Host, cmd: &Cmd) -> Option<Verdict> {
     for rule in TABLE.iter().filter(|r| r.shells.contains(&shell)) {
-        let ctx = Ctx { reader, rule, host, cmd };
+        let ctx = Ctx { reader, shell, rule, host, cmd };
         match (rule.test)(&ctx) {
             Ok(Some(v)) => return Some(v),
             Ok(None) => {}

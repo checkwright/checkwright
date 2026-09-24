@@ -163,6 +163,8 @@ eq "view-quoted" "$(view 'git commit -m "x --no-verify"' Bash sq dq hd)" "git co
 eq "view-one-operand" "$(view 'git commit -m "x"' Bash 'sq dq hd')" "git commit -m DQ"
 eq "view-raw" "$(view 'echo "a"' Bash raw)" 'echo "a"'
 eq "view-non-bash" "$(view 'echo "a"' Read sq dq hd | wc -c | tr -d ' ')" 0
+eq "view-powershell" "$(view $'@\'\ncd x\n\'@ | git commit -F -' PowerShell sq dq hd)" "HD | git commit -F -"
+eq "view-powershell-quotes" "$(view "rm 'it''s' \"a\`\"b\"" PowerShell sq dq hd)" "rm SQ DQ"
 eq "view-garbage" "$(printf 'not json' | "$BIN" --guard-json view sq dq hd | wc -c | tr -d ' ')" 0
 payload x | "$BIN" --guard-json view body >/dev/null 2>&1
 eq "view-body-usage" "$?" 2

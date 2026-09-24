@@ -12,13 +12,14 @@ mod spelling;
 mod tools;
 
 const BASH: &[Shell] = &[Shell::Bash];
+const BOTH: &[Shell] = &[Shell::Bash, Shell::PowerShell];
 
 use View::{Dequoted, Hdq, Raw, Sq, SqDqHd, SqDqHdq, SqHdq};
 
 pub static TABLE: &[Rule] = &[
-    Rule { name: "cd_compound", shells: BASH, views: &[SqDqHd], test: spelling::cd_compound },
+    Rule { name: "cd_compound", shells: BOTH, views: &[SqDqHd], test: spelling::cd_compound },
     Rule { name: "git_c_root", shells: BASH, views: &[Raw, SqDqHd], test: spelling::git_c_root },
-    Rule { name: "scratch_redirect", shells: BASH, views: &[SqDqHd], test: spelling::scratch_redirect },
+    Rule { name: "scratch_redirect", shells: BOTH, views: &[SqDqHd], test: spelling::scratch_redirect },
     Rule { name: "abs_script", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: spelling::abs_script },
     Rule { name: "abs_prefix", shells: BASH, views: &[SqDqHd], test: spelling::abs_prefix },
     Rule { name: "expansion", shells: BASH, views: &[SqHdq, SqDqHdq], test: spelling::expansion },
@@ -26,12 +27,12 @@ pub static TABLE: &[Rule] = &[
     Rule { name: "sed_file", shells: BASH, views: &[SqDqHd, Dequoted, View::Body], test: tools::sed_file },
     Rule { name: "find_glob", shells: BASH, views: &[Raw, SqDqHd], test: tools::find_glob },
     Rule { name: "cat_file", shells: BASH, views: &[Raw, SqDqHd], test: tools::cat_file },
-    Rule { name: "git_grep", shells: BASH, views: &[Raw, SqDqHd], test: tools::git_grep },
+    Rule { name: "git_grep", shells: BOTH, views: &[Raw, SqDqHd], test: tools::git_grep },
     Rule { name: "pgrep_self_match", shells: BASH, views: &[Raw], test: tools::pgrep_self_match },
     Rule { name: "bare_sleep", shells: BASH, views: &[Raw, SqDqHd], test: tools::bare_sleep },
     Rule {
         name: "git_mutation_under_producer",
-        shells: BASH,
+        shells: BOTH,
         views: &[Raw, SqDqHd],
         test: liveness::git_mutation_under_producer,
     },
@@ -51,8 +52,8 @@ pub static TABLE: &[Rule] = &[
         test: liveness::bounded_wait,
     },
     Rule { name: "allowlist_chain", shells: BASH, views: &[SqDqHd], test: grants::allowlist_chain },
-    Rule { name: "git_rewrite", shells: BASH, views: &[SqDqHd], test: reach::git_rewrite },
-    Rule { name: "rm_tracked", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: reach::rm_tracked },
+    Rule { name: "git_rewrite", shells: BOTH, views: &[SqDqHd], test: reach::git_rewrite },
+    Rule { name: "rm_tracked", shells: BOTH, views: &[Raw, SqDqHd, Dequoted], test: reach::rm_tracked },
     Rule { name: "script_interpreter", shells: BASH, views: &[Raw, SqDqHd], test: reach::script_interpreter },
     Rule {
         name: "grant_path_slot",
@@ -64,7 +65,7 @@ pub static TABLE: &[Rule] = &[
     Rule { name: "shell_wrapper", shells: BASH, views: &[Raw, SqDqHd], test: reach::shell_wrapper },
     Rule {
         name: "worktree_confinement",
-        shells: BASH,
+        shells: BOTH,
         views: &[Raw, SqHdq, SqDqHd, Dequoted],
         test: reach::worktree_confinement,
     },

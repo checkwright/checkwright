@@ -11,7 +11,7 @@ Prose before the roster cites rule `alpha` and rules `beta` and `gamma`, and rul
 
   - **(a) An arm**: its own bold title carries no name token.
 - **Second rule** (`beta`) — Declares `raw`, `sq dq hd` and `dequoted`. Advised; the raw view spells the corrective.
-- **Third rule** (`gamma`) — Declares `sq hdq`, `sq dq hdq`. Granted.
+- **Third rule** (`gamma`) — Declares `sq hdq`, `sq dq hdq`. Shells `bash` and `powershell`. Granted.
 
 ## Testing
 

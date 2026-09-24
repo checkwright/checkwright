@@ -1,9 +1,9 @@
 {
-  "//": "guard-kit hook wiring — merge into .claude/settings.json. The shell-guard is the PreToolUse(Bash) hook, a compiled gate-binary member; the wakeup-guard and the path-guard block are optional (drop a block to skip it). The third block shows the path-shaped guard shape lifecycle-kit's workflow-state-guard is the shipped instance of. Project rules go in a command named by GUARD_KIT_CONSUMER_RULES_CMD in your knob file, never a copied script. On native Windows the harness runs these commands under Git for Windows' bash, so the same wiring serves every host; the `PowerShell` tool's calls are not guarded yet (SPEC §The hook on native Windows).",
+  "//": "guard-kit hook wiring — merge into .claude/settings.json. The shell-guard is the PreToolUse(Bash|PowerShell) hook, a compiled gate-binary member; the wakeup-guard and the path-guard block are optional (drop a block to skip it). The third block shows the path-shaped guard shape lifecycle-kit's workflow-state-guard is the shipped instance of. Project rules go in a command named by GUARD_KIT_CONSUMER_RULES_CMD in your knob file, never a copied script. On native Windows the harness runs these commands under Git for Windows' bash, so the same wiring serves every host; the shell-guard reads both shell tools; a consumer rule command receives both, and reads `tool_name` to tell them apart.",
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Bash",
+        "matcher": "Bash|PowerShell",
         "hooks": [
           { "type": "command", "command": "bash gate-sdk/bin/run-gates.sh --hook shell-guard" }
         ]

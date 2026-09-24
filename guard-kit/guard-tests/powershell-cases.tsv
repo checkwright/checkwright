@@ -1,0 +1,53 @@
+# spec: guard-kit/SPEC.md §Testing — the PowerShell reader's decision table: cases.tsv's grammar and
+# substitutions, each row fed as a PowerShell payload to the same member.
+# Columns: <expected-decision> <TAB> <command>; # and blank lines are ignored.
+
+# rule `cd_compound` — a location command leading a segment of a compound
+block	Set-Location deploy; Get-ChildItem
+block	PUSHD deploy; ls
+fallthrough	cd deploy
+
+# rule `scratch_redirect` — PowerShell's stream operators, and a backslash target is a path
+block	git status > out.log
+block	git status *> out.log
+fallthrough	git status > .tmp/out.log
+fallthrough	git status > .tmp\out.log
+fallthrough	git status 2>&1
+
+# rule `git_grep` — a working-tree search
+block	git grep foo
+fallthrough	git grep foo HEAD
+
+# rule `git_mutation_under_producer`'s decline arm and rule `git_rewrite`
+advise	git commit --amend --no-edit
+fallthrough	git commit -m 'x'
+
+# rule `rm_tracked` — the deletion commands, their parameters, and the git rm force arm
+block	Remove-Item tracked.md
+block	rm tracked.md
+block	remove-item -Recurse scratch.txt,tracked.md
+block	Remove-Item -Path:tracked.md
+block	git rm -f tracked.md
+fallthrough	del scratch.txt
+fallthrough	Remove-Item -Path tracked.md -WhatIf
+fallthrough	Remove-Item -Filter tracked.md scratch.txt
+fallthrough	git rm -q tracked.md
+
+# the reader's grammar — each a command an applied rule blocks if the reader misreads it
+fallthrough	echo 'a''; cd x'
+block	echo 'a'''; cd x'
+fallthrough	echo "a`"; cd x"
+advise	@'@NL@cd x; rm tracked.md@NL@'@ | git commit -F -
+fallthrough	# cd x; ls
+fallthrough	<# cd x; ls #> git status
+fallthrough	git status `; cd x
+block	cd x && git status
+block	cd x || git status
+
+# the Bash-only rules stay inert on a PowerShell call
+fallthrough	cat tracked.md
+fallthrough	echo x >> .tmp/j.md
+fallthrough	Get-ChildItem | Select-Object -First 3
+fallthrough	sleep 5
+fallthrough	bash -c 'ls'
+fallthrough	$x = 1; git status

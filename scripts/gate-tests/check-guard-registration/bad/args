@@ -1,6 +1,7 @@
 # All four assertions fire in one tree: an item with no name token and a
 # repeated name (A), two items swapped against the table and a repeat (B), an
-# item declaring fewer views than its row and one declaring none (C), and a bare
+# item declaring fewer views than its row, one declaring none and one naming no
+# shells where its row holds two (C), and a bare
 # citation to no roster name, a rule cited by number in the kit tree and a
 # qualified citation outside it to a retired name (D).
 guard-kit/SPEC.md

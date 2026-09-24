@@ -80,7 +80,7 @@ pub fn run(payload: &Payload) -> i32 {
             0
         }
         None => {
-            host.log_fallthrough(cmd);
+            host.log_fallthrough(cmd, shell);
             fault.map_or(0, hook::advise)
         }
     }

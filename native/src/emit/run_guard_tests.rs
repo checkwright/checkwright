@@ -41,7 +41,8 @@ fn execute(args: &[String]) -> Result<i32, String> {
     let kit = kit_root()?;
     let cases = positional(args, 0, &format!("{}/guard-tests/cases.tsv", kit));
     let bg_cases = positional(args, 1, &format!("{}/guard-tests/background-cases.tsv", kit));
-    for f in [&cases, &bg_cases] {
+    let ps_cases = positional(args, 2, &format!("{}/guard-tests/powershell-cases.tsv", kit));
+    for f in [&cases, &bg_cases, &ps_cases] {
         if !Path::new(f).is_file() {
             return Err(format!("{}: missing {}", NAME, f));
         }
@@ -55,20 +56,28 @@ fn execute(args: &[String]) -> Result<i32, String> {
         .map(|r| (r[0].clone(), r[1].clone()))
     {
         let cmd = substitute(&cmd, &sandbox.root);
-        let got = decide(&sandbox.root, &log, &cmd, None)?;
+        let got = decide(&sandbox.root, &log, &cmd, None, "Bash")?;
         tally.check(&want, &got, &format!("[--hook shell-guard] {}", cmd));
     }
     for row in rows(&bg_cases, 3)? {
         let (want, rib, cmd) = (row[0].clone(), row[1].clone(), row[2].clone());
         let cmd = substitute(&cmd, &sandbox.root);
-        let got = decide(&sandbox.root, &log, &cmd, Some(&rib))?;
+        let got = decide(&sandbox.root, &log, &cmd, Some(&rib), "Bash")?;
         tally.check(&want, &got, &format!("[--hook shell-guard] [run_in_background={}] {}", rib, cmd));
+    }
+    for (want, cmd) in rows(&ps_cases, 2)?
+        .into_iter()
+        .map(|r| (r[0].clone(), r[1].clone()))
+    {
+        let cmd = substitute(&cmd, &sandbox.root);
+        let got = decide(&sandbox.root, &log, &cmd, None, "PowerShell")?;
+        tally.check(&want, &got, &format!("[--hook shell-guard] [PowerShell] {}", cmd));
     }
 
     if tally.ran == 0 {
         return Err(format!(
-            "{}: no cases parsed from {} / {}",
-            NAME, cases, bg_cases
+            "{}: no cases parsed from {} / {} / {}",
+            NAME, cases, bg_cases, ps_cases
         ));
     }
     if tally.fails > 0 {
@@ -79,7 +88,7 @@ fn execute(args: &[String]) -> Result<i32, String> {
         return Ok(1);
     }
     println!(
-        "{}: ok ({} cases across the generic ruleset and the backgrounding arm)",
+        "{}: ok ({} cases across the generic ruleset, the backgrounding arm and the PowerShell reader)",
         NAME, tally.ran
     );
     Ok(0)
@@ -166,7 +175,7 @@ fn fields(line: &str, width: usize) -> Vec<String> {
 
 // spec: guard-kit/SPEC.md §Testing — one case, spawned from inside the sandbox with the same inputs
 // the harness supplied, driving the `--hook shell-guard` member directly with no front end.
-fn decide(root: &str, log: &str, cmd: &str, background: Option<&str>) -> Result<String, String> {
+fn decide(root: &str, log: &str, cmd: &str, background: Option<&str>, tool: &str) -> Result<String, String> {
     // spec: guard-kit/SPEC.md §Testing — the guard reads its knobs from the binary, and the
     // repo-relative default names nothing from inside the sandbox, so the running binary is exported
     let bin = std::env::current_exe()
@@ -181,7 +190,7 @@ fn decide(root: &str, log: &str, cmd: &str, background: Option<&str>) -> Result<
     let done = proc::run_with_stdin_in(
         &programs::CHECKWRIGHT_GATES.at(bin.clone()),
         &["--hook", "shell-guard"],
-        payload(cmd, background).as_bytes(),
+        payload(cmd, background, tool).as_bytes(),
         &env,
     )?;
     let (code, out) = (
@@ -194,8 +203,8 @@ fn decide(root: &str, log: &str, cmd: &str, background: Option<&str>) -> Result<
 }
 
 // spec: guard-kit/SPEC.md §Testing — the hook payload, `jq -nc`'s construction moved in-crate,
-// carrying the `Bash` tool name the member selects its reader by.
-fn payload(cmd: &str, background: Option<&str>) -> String {
+// carrying the tool name the member selects its reader by.
+fn payload(cmd: &str, background: Option<&str>, tool: &str) -> String {
     let mut input = serde_json::Map::new();
     input.insert("command".to_string(), serde_json::Value::String(cmd.to_string()));
     if background == Some("true") {
@@ -203,7 +212,7 @@ fn payload(cmd: &str, background: Option<&str>) -> String {
     }
     serde_json::Value::Object(
         [
-            ("tool_name".to_string(), serde_json::Value::String("Bash".to_string())),
+            ("tool_name".to_string(), serde_json::Value::String(tool.to_string())),
             ("tool_input".to_string(), serde_json::Value::Object(input)),
         ]
         .into_iter()
@@ -347,14 +356,15 @@ mod tests {
     // spec: guard-kit/SPEC.md §Testing — the backgrounding flag rides beside the command.
     #[test]
     fn the_payload_carries_the_backgrounding_flag_only_when_the_row_sets_it() {
-        assert_eq!(payload("ls", None), r#"{"tool_input":{"command":"ls"},"tool_name":"Bash"}"#);
+        assert_eq!(payload("ls", None, "Bash"), r#"{"tool_input":{"command":"ls"},"tool_name":"Bash"}"#);
         assert_eq!(
-            payload("ls", Some("false")),
+            payload("ls", Some("false"), "Bash"),
             r#"{"tool_input":{"command":"ls"},"tool_name":"Bash"}"#
         );
         assert_eq!(
-            payload("ls", Some("true")),
+            payload("ls", Some("true"), "Bash"),
             r#"{"tool_input":{"command":"ls","run_in_background":true},"tool_name":"Bash"}"#
         );
+        assert_eq!(payload("ls", None, "PowerShell"), r#"{"tool_input":{"command":"ls"},"tool_name":"PowerShell"}"#);
     }
 }

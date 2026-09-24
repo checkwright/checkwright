@@ -30,22 +30,22 @@ git -C "$tmp/cwd" init -q
 printf 'notes.txt\n' >"$tmp/cwd/.gitignore"
 printf 'GUARD_KIT_SCRATCH_DIRS[] = %s/scratch\n' "$tmp" >"$tmp/guard.knobs"
 
-payload() {
+payload() {  # $1=command [$2=tool, default Bash]
     local c="$1"
     c="${c//\\/\\\\}"
     c="${c//\"/\\\"}"
-    printf '{"tool_name":"Bash","tool_input":{"command":"%s"}}' "$c"
+    printf '{"tool_name":"%s","tool_input":{"command":"%s"}}' "${2:-Bash}" "$c"
 }
 
-# 2 = blocked, 0 = not blocked; the block text lands in $tmp/err.
+# 2 = blocked, 0 = not blocked; the block text lands in $tmp/err. $2 names the tool.
 verdict() {
-    (cd "$tmp/cwd" && payload "$1" | GUARD_KIT_KNOB_FILE="$tmp/guard.knobs" GUARD_KIT_LOG="$tmp/friction.log" "$BIN" --hook shell-guard >/dev/null 2>"$tmp/err")
+    (cd "$tmp/cwd" && payload "$1" "${2:-Bash}" | GUARD_KIT_KNOB_FILE="$tmp/guard.knobs" GUARD_KIT_LOG="$tmp/friction.log" "$BIN" --hook shell-guard >/dev/null 2>"$tmp/err")
     echo $?
 }
 
-want() {  # $1=label $2=command $3=want-rc [$4=text the block must not carry]
+want() {  # $1=label $2=command $3=want-rc [$4=text the block must not carry] [$5=tool]
     checks=$((checks + 1))
-    local got; got="$(verdict "$2")"
+    local got; got="$(verdict "$2" "${5:-Bash}")"
     if [[ "$got" != "$3" ]]; then
         echo "  FAIL [$1]: '$2' gave rc=$got, want $3 — $(cat "$tmp/err")"
         fails=$((fails + 1))
@@ -78,6 +78,11 @@ if ! grep -qF "validate-batch" "$tmp/err" || ! grep -qF "$live" "$tmp/err"; then
     echo "  FAIL [names-the-run]: the block did not name the blocking run and pid: $(cat "$tmp/err")"
     fails=$((fails + 1))
 fi
+
+# --- a PowerShell call meets the rule too: git's argv and the record are the same
+#     under both tools, and its expansion decline is the PowerShell reader's any `$`
+want "powershell-commit"    "git commit -m done" 2 "" PowerShell
+want "powershell-expansion" "git commit -m \$msg" 0 "" PowerShell
 
 # --- git's global options are walked, so a decorated invocation is still reached;
 #     a '-c' override is refused by rule `git_c_root` before this rule reads it
@@ -121,5 +126,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "git-mutation-under-producer.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "git-mutation-under-producer.test: ok ($checks assertions; the write set blocks under a live record, read-only git and every conservative direction decline)"
+echo "git-mutation-under-producer.test: ok ($checks assertions; the write set blocks under a live record on a Bash or a PowerShell call, read-only git and every conservative direction decline)"
 exit 0

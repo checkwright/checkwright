@@ -4,7 +4,7 @@ use super::{
     command_word, git_subcommand, has_expansion, inert_target, is_banner, is_ro_segment,
     program_bearing, ro_forms_clear, segment_core, shell_backgrounds, GitWalk,
 };
-use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Verdict};
+use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Shell, Verdict};
 use crate::guard::host::under;
 use crate::guard::reader::View::{SqDqHd, SqHdq};
 use crate::guard::text::{self, grep_q, head_word, trim_start, unsentinel, words};
@@ -29,7 +29,7 @@ pub fn git_rewrite(ctx: &Ctx) -> Decided {
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `rm_tracked`'s test, a block for it and a
 // predicate for rule `bounded_wait`'s arm (B): the first refusal, or none.
 pub fn rm_tracked_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<String>, Fault> {
-    if has_expansion(ctx.raw(c)?) {
+    if ctx.expands(c, has_expansion)? {
         return Ok(None);
     }
     let s = ctx.view(c, SqDqHd)?;
@@ -56,19 +56,79 @@ pub fn rm_tracked_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<String>, Fault> {
             }
             continue;
         }
-        if head_word(seg) != "rm" {
-            continue;
-        }
-        for arg in text::all_words(seg.strip_prefix("rm").unwrap_or(seg)) {
-            if arg.starts_with('-') {
-                continue;
+        let word = head_word(seg);
+        let paths = match ctx.shell() {
+            Shell::Bash if word == "rm" => {
+                text::all_words(&seg[word.len()..]).into_iter().filter(|a| !a.starts_with('-')).map(String::from).collect()
             }
-            if ctx.host().tracked(arg) {
-                return Ok(Some(format!("don't delete the git-tracked path '{a}' with a bare 'rm' — use 'git rm -q {a}': it removes the file and stages exactly that deletion in one motion, so no later 'git add -A' is needed to pick it up (which risks staging a concurrent session's foreign path). An 'rm' of an untracked or gitignored path is untouched. If you genuinely need rm, run it yourself with !<command>.", a = arg)));
+            Shell::PowerShell if PS_DELETE.contains(&word.to_ascii_lowercase().as_str()) => {
+                match ps_delete_paths(&seg[word.len()..]) {
+                    Some(p) => p,
+                    None => continue,
+                }
+            }
+            _ => continue,
+        };
+        for arg in paths {
+            if ctx.host().tracked(&arg) {
+                return Ok(Some(format!("don't delete the git-tracked path '{a}' with a bare '{w}' — use 'git rm -q {a}': it removes the file and stages exactly that deletion in one motion, so no later 'git add -A' is needed to pick it up (which risks staging a concurrent session's foreign path). An '{w}' of an untracked or gitignored path is untouched. If you genuinely need {w}, run it yourself with !<command>.", a = arg, w = word)));
             }
         }
     }
     Ok(None)
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — rule `rm_tracked`'s PowerShell deletion commands,
+// matched without regard to case.
+const PS_DELETE: &[&str] = &["rm", "del", "erase", "ri", "rd", "rmdir", "remove-item"];
+
+// spec: guard-kit/SPEC.md §The generic ruleset — the value-taking parameters whose value is no path.
+const PS_VALUE_PARAMS: &[&str] = &[
+    "filter",
+    "include",
+    "exclude",
+    "stream",
+    "credential",
+    "erroraction",
+    "errorvariable",
+    "warningaction",
+    "warningvariable",
+    "informationaction",
+    "informationvariable",
+    "outvariable",
+    "outbuffer",
+    "pipelinevariable",
+    "progressaction",
+];
+
+// spec: guard-kit/SPEC.md §The generic ruleset — the paths a PowerShell deletion names, each
+// parameter read by its prefix; `None` where a `-WhatIf` prefix makes the segment delete nothing.
+fn ps_delete_paths(args: &str) -> Option<Vec<String>> {
+    let mut out = Vec::new();
+    let mut skip = false;
+    for w in text::all_words(args) {
+        if std::mem::take(&mut skip) {
+            continue;
+        }
+        let Some(param) = w.strip_prefix('-') else {
+            out.extend(w.split(',').filter(|p| !p.is_empty()).map(String::from));
+            continue;
+        };
+        let (name, value) = match param.split_once(':') {
+            Some((n, v)) => (n.to_ascii_lowercase(), Some(v)),
+            None => (param.to_ascii_lowercase(), None),
+        };
+        if name.len() >= 2 && "whatif".starts_with(&name) {
+            return None;
+        }
+        let valued = !name.is_empty() && PS_VALUE_PARAMS.iter().any(|p| p.starts_with(&name));
+        match value {
+            None => skip = valued,
+            Some(v) if !valued => out.extend(v.split(',').filter(|p| !p.is_empty()).map(String::from)),
+            Some(_) => {}
+        }
+    }
+    Some(out)
 }
 
 pub fn rm_tracked(ctx: &Ctx) -> Decided {
@@ -270,7 +330,14 @@ pub fn worktree_refuses(ctx: &Ctx, c: &Cmd) -> Result<Option<(String, String)>, 
     if h.roots().main.is_empty() {
         return Ok(None);
     }
-    if grep_q(r"\$\{|\$\(|<\(|>\(|\$[A-Za-z_]", &ctx.view(c, SqHdq)?) || ctx.raw(c)?.contains('`') {
+    let ps = ctx.shell() == Shell::PowerShell;
+    let live = ctx.view(c, SqHdq)?;
+    let declines = if ps {
+        live.contains('$')
+    } else {
+        grep_q(r"\$\{|\$\(|<\(|>\(|\$[A-Za-z_]", &live) || ctx.raw(c)?.contains('`')
+    };
+    if declines {
         return Ok(None);
     }
     let s = ctx.view(c, SqDqHd)?;
@@ -279,6 +346,12 @@ pub fn worktree_refuses(ctx: &Ctx, c: &Cmd) -> Result<Option<(String, String)>, 
     'lines: for line in v.split('\n') {
         for w in words(line) {
             let mut w = unsentinel(w);
+            if ps {
+                w = w.replace('\\', "/");
+                if w.starts_with("*>") {
+                    w.remove(0);
+                }
+            }
             let digits = w.bytes().take_while(u8::is_ascii_digit).count();
             let after = &w[digits..];
             let op = [">>", ">&", "&>", ">", "<"].iter().find(|o| after.starts_with(*o));
@@ -303,7 +376,7 @@ pub fn worktree_refuses(ctx: &Ctx, c: &Cmd) -> Result<Option<(String, String)>, 
         }
     }
     let Some(hit) = found else { return Ok(None) };
-    if worktree_admitted(ctx, c, &s)? {
+    if !ps && worktree_admitted(ctx, c, &s)? {
         return Ok(None);
     }
     Ok(Some(hit))
@@ -352,7 +425,7 @@ fn worktree_admitted(ctx: &Ctx, c: &Cmd, s: &str) -> Result<bool, Fault> {
 pub fn worktree_confinement(ctx: &Ctx) -> Decided {
     let h = ctx.host();
     let Some((word, path)) = worktree_refuses(ctx, ctx.cmd())? else { return Ok(None) };
-    let reads = if h.worktree_reads == "read-only" {
+    let reads = if h.worktree_reads == "read-only" && ctx.shell() == Shell::Bash {
         format!(" a search or read of it as a read-only pipeline, every segment led by one of the read-only roster ({}) in none of its write or execute forms and no segment led by sed, awk or an interpreter, redirecting only to /dev/null, your own worktree or the main checkout's scratch dir;", h.ro_bins.join(" "))
     } else {
         String::new()

@@ -30,12 +30,13 @@ printf 'GUARD_KIT_SEARCH_TOOLS =\n' >"$SANDBOX/default.knobs"
 printf 'GUARD_KIT_SEARCH_TOOLS =\nGUARD_KIT_WORKTREE_READS = off\n' >"$SANDBOX/off.knobs"
 printf 'GUARD_KIT_SEARCH_TOOLS =\nGUARD_KIT_RO_BINS[] = grep\nGUARD_KIT_RO_BINS[] = awk\nGUARD_KIT_RO_FORMS[awk] = none\n' >"$SANDBOX/awk.knobs"
 
-payload() {
+tool=Bash
+payload() {  # the payload names the tool `tool` holds
     local c="$1"
     c="${c//\\/\\\\}"
     c="${c//\"/\\\"}"
     c="${c//$'\n'/\\n}"
-    printf '{"tool_name":"Bash","tool_input":{"command":"%s"}}' "$c"
+    printf '{"tool_name":"%s","tool_input":{"command":"%s"}}' "$tool" "$c"
 }
 
 decide() {  # $1=knob file $2=command — prints block, allow, fallthrough or other:<rc>
@@ -112,6 +113,17 @@ checks=$((checks + 1))
 decide "$d" "find $main/docs -delete" >/dev/null
 grep -qF "(grep egrep fgrep" "$SANDBOX/err" || { echo "  FAIL [roster-named]: the refusal does not name the loaded roster — $(cat "$SANDBOX/err")"; fails=$((fails + 1)); }
 
+# --- a PowerShell call meets the rule with no admitted read: a backslash is a separator, the
+#     journal append under the main scratch dir falls through, and the corrective omits the read
+tool=PowerShell
+want ps-set-content    "$d" block "Set-Content -Path $main/new.txt -Value x" "$refusal"
+want ps-backslash      "$d" block "Set-Content -Path ..\\..\\..\\new.txt -Value x" "$refusal"
+want ps-journal        "$d" fallthrough "Add-Content -Path $main/.tmp/journal.md -Value x"
+want ps-no-admission   "$d" block "grep -rn foo $main/docs" "$refusal"
+checks=$((checks + 1))
+! grep -qF "read-only pipeline" "$SANDBOX/err" || { echo "  FAIL [ps-no-admitted-read]: the PowerShell refusal offers the admitted read — $(cat "$SANDBOX/err")"; fails=$((fails + 1)); }
+tool=Bash
+
 # --- rules `git_mutation_under_producer`, `background_no_record` and `bounded_wait`'s arm (B) resolve the scratch dirs against the main checkout, the liveness
 #     record's one home: a launch recording there is granted or passes, one recording into the own
 #     worktree is refused naming the main home, and only a main-checkout record holds a git write
@@ -136,5 +148,5 @@ want producer-own      "$r" fallthrough "git commit -m x"
 git -C "$main" worktree remove --force "$wt"
 
 [[ "$fails" -eq 0 ]] || { echo "worktree-confinement.test: $fails of $checks assertion(s) failed"; exit 1; }
-echo "worktree-confinement.test: ok ($checks assertions; from a linked worktree the journal append under the main scratch dir and read-only searches of the main checkout pass, every write naming the main checkout outside its scratch dir is refused with the loaded roster named, a write in the own worktree is not the rule's, 'off' refuses the search and keeps the journal, a program-bearing tool is never admitted, and the liveness record resolves to the main checkout's scratch dir for the launch, its grant and the git-write hold)"
+echo "worktree-confinement.test: ok ($checks assertions; from a linked worktree the journal append under the main scratch dir and read-only searches of the main checkout pass, every write naming the main checkout outside its scratch dir is refused with the loaded roster named, a PowerShell call meets the same refusal with no admitted read, a write in the own worktree is not the rule's, 'off' refuses the search and keeps the journal, a program-bearing tool is never admitted, and the liveness record resolves to the main checkout's scratch dir for the launch, its grant and the git-write hold)"
 exit 0

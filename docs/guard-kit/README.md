@@ -38,7 +38,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
    Your project's own block/steer/allow rules are a command you write, named by `GUARD_KIT_CONSUMER_RULES_CMD` in `guard-config.knobs`: the shell guard runs it before the generic ruleset, on the harness's own hook protocol, and `--guard-json` on the gate binary is its toolkit (guard-kit/SPEC.md §Consumer rules).
 
-2. Wire the hooks — merge `templates/settings-hooks.json` into `.claude/settings.json` (the `shell-guard` on `PreToolUse(Bash)`; the optional `wakeup-guard` on `ScheduleWakeup|CronCreate`; and an optional third block showing the path-shaped shape a consumer kit's own guard registers under — lifecycle-kit's `workflow-state-guard` is the shipped instance).
+2. Wire the hooks — merge `templates/settings-hooks.json` into `.claude/settings.json` (the `shell-guard` on `PreToolUse(Bash|PowerShell)`; the optional `wakeup-guard` on `ScheduleWakeup|CronCreate`; and an optional third block showing the path-shaped shape a consumer kit's own guard registers under — lifecycle-kit's `workflow-state-guard` is the shipped instance).
 
    Then review `templates/settings-allow.json` against guard-kit/SPEC.md §The recommended allowlist, and union the entries you accept into `.claude/settings.json`'s `permissions.allow`.
 

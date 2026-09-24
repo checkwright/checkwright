@@ -1,5 +1,6 @@
 // spec: guard-kit/SPEC.md §Layout and configuration — what the rules read beside the command: the
 // guard's knobs, resolved in process, and the working tree they are asked about.
+use super::engine::Shell;
 use crate::knobs::{self, Value};
 use crate::{proc, programs, walk};
 use std::cell::OnceCell;
@@ -278,11 +279,16 @@ impl Host {
     }
 
     // spec: guard-kit/SPEC.md §The shell guard — the fall-through line, cut to the harness's
-    // analysis bound plus one and encoded so one call stays one decodable line.
-    pub fn log_fallthrough(&self, cmd: &str) {
+    // analysis bound plus one and encoded so one call stays one decodable line; a PowerShell call
+    // leads with its tool name and the one raw tab no encoded command carries.
+    pub fn log_fallthrough(&self, cmd: &str, shell: Shell) {
         use std::io::Write;
         let cut: String = cmd.chars().take(10001).collect();
         let line = cut.replace('\\', "\\\\").replace('\n', "\\n").replace('\t', "\\t");
+        let line = match shell {
+            Shell::Bash => line,
+            Shell::PowerShell => format!("PowerShell\t{}", line),
+        };
         if let Ok(mut f) = std::fs::OpenOptions::new().create(true).append(true).open(&self.log) {
             let _ = writeln!(f, "{}", line);
         }

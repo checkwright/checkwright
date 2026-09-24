@@ -1,8 +1,9 @@
-// spec: guard-kit/SPEC.md §The shell guard — the crate's guard: the reader seam and its bash
-// reader, the allow-match model, and the `--guard-json` reads and renders.
+// spec: guard-kit/SPEC.md §The shell guard — the crate's guard: the reader seam and its bash and
+// PowerShell readers, the allow-match model, and the `--guard-json` reads and renders.
 pub mod bash;
 pub mod engine;
 pub mod host;
+pub mod powershell;
 pub mod reader;
 mod rules;
 pub mod text;
@@ -59,6 +60,7 @@ pub fn json_field(payload: Option<&serde_json::Value>, path: &str, or_empty: boo
 pub fn reader_for(tool: &str) -> Option<(&'static dyn reader::Reader, engine::Shell)> {
     match tool {
         "Bash" => Some((&bash::Bash, engine::Shell::Bash)),
+        "PowerShell" => Some((&powershell::PowerShell, engine::Shell::PowerShell)),
         _ => None,
     }
 }

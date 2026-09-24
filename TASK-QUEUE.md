@@ -8,22 +8,6 @@
 
 ## New Features
 
-### guard-powershell-tool-unguarded
-
-[spec: SPEC-powershell-reader.md]
-
-on native Windows the harness's `PowerShell` tool is on by default beside `Bash`, and guard-kit's hook matches `Bash` alone, so a PowerShell-tool call is neither steered nor logged to the friction log. Widening the matcher is no fix: every generic rule reads bash grammar.
-
-**Probed at filing:** the harness tools reference names the tool `PowerShell` and advises matching `Bash|PowerShell`; `grep -rn -i 'powershell tool' guard-kit` finds nothing before guard-kit/SPEC.md §The hook on native Windows, which states the bypass as an honest limit.
-
-**Slice 2 of `shell-guard-native-shell`, sliced at its spec (2026-09-24).** Slice 1 is the `--hook shell-guard` member, which picks a shell reader by `tool_name` and exits clean on a tool it has no reader for. It has a reader seam: views, segments, statements, redirect pairs and the harness view, with each rule declaring the shells it applies to. The consumer-rule command sees every payload. The member's own design is guard-kit/SPEC.md §The shell guard. **Owed here:** a PowerShell reader behind that seam, covering single-quoted, expandable and here-string quoting, its statement and pipeline separators, and its comment forms. Also owed: each generic rule's applicability to PowerShell decided, with the rules that model PowerShell; `--guard-json view` over PowerShell payloads; the `Bash|PowerShell` matcher in `templates/settings-hooks.json`; and a PowerShell decision table run on the native-Windows leg. Then §The hook on native Windows' PowerShell limit retires.
-
-**Why design-pending:** the rule applicability and the PowerShell grammar the reader must model are undesigned. Slice 1 keeps the bash port behaviour-preserving, and builds the seam no wider than its own rules call.
-
-**Selected for `adopter-onramp` — operator direction 2026-09-24, lead-relayed; the lead unit.** Admitted on the filter's trust arm: a Windows adopter's default-on shell tool bypasses the guard they installed. Re-verified at scope: the matcher is still `Bash` alone and guard-kit/SPEC.md §The hook on native Windows still states the limit. `guard-placeholder-letter-paths` lands first.
-
-**Cost while deferred:** on a Windows host a command routed through the PowerShell tool bypasses every steer and block, and the close-stage triage never sees it. Filed 2026-09-18 at `windows-adopter-path`'s spec by operator direction (lead-relayed), when `guard-hook-windows-substrate` was designed. Owner lookup: `PowerShell tool`, `USE_POWERSHELL_TOOL`, `Bash|PowerShell` — none.
-
 ### queue-migrate-bold-split
 
 [spec: SPEC-bold-lead-in.md]
@@ -1473,5 +1457,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 ## Done
 
 - guard-placeholder-letter-paths
+- guard-powershell-tool-unguarded
 
 ## Lessons Learned

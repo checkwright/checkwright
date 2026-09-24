@@ -1,6 +1,7 @@
 // spec: guard-kit/SPEC.md §check-guard-registration — the rule roster, the crate's rule table and
 // every rule citation agree, fail-closed on a roster, table or corpus it cannot read
 use crate::diff;
+use crate::guard::engine::Shell;
 use crate::guard::reader::View;
 use crate::programs;
 use crate::proc;
@@ -11,6 +12,7 @@ use std::path::Path;
 const NAME: &str = "check-guard-registration";
 const SECTION: &str = "The rule roster";
 const CLAUSE: &str = "Declares `";
+const SHELLS: &str = "Shells `";
 const QUALIFIER: &str = "guard-kit ";
 
 struct Item {
@@ -23,6 +25,7 @@ struct Item {
 struct Row {
     name: String,
     views: Vec<View>,
+    shells: Vec<Shell>,
 }
 
 struct Citation {
@@ -103,9 +106,39 @@ fn rule(args: &[String]) -> Result<i32, String> {
             findings += 1;
             continue;
         }
+        let named = shells_clauses(&it.body, &spec, it.line)?;
+        if named.len() > 1 {
+            println!(
+                "{}:{}: roster item `{}` carries {} shells clauses where at most one is owed",
+                spec,
+                it.line,
+                label,
+                named.len()
+            );
+            declaring = true;
+            findings += 1;
+            continue;
+        }
         let Some(row) = table.iter().find(|r| Some(r.name.as_str()) == it.name.as_deref()) else {
             continue;
         };
+        let applies: BTreeSet<&str> = match named.first() {
+            Some(s) => s.iter().map(|s| s.spelling()).collect(),
+            None => [Shell::Bash.spelling()].into_iter().collect(),
+        };
+        let runs: BTreeSet<&str> = row.shells.iter().map(|s| s.spelling()).collect();
+        if applies != runs {
+            println!(
+                "{}:{}: rule `{}` names the shells {} where the table holds {}",
+                spec,
+                it.line,
+                label,
+                spelled(&applies),
+                spelled(&runs)
+            );
+            declaring = true;
+            findings += 1;
+        }
         let declared: BTreeSet<&str> = clauses[0].iter().map(|v| v.spelling()).collect();
         let held: BTreeSet<&str> = row.views.iter().map(|v| v.spelling()).collect();
         if declared != held {
@@ -122,7 +155,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
     if declaring {
-        println!("  help: carry one `Declares` clause per item naming exactly the views the rule's table row declares");
+        println!("  help: carry one `Declares` clause per item naming exactly the views the rule's table row declares, and a `Shells` clause naming its shells where they are not `bash` alone");
     }
 
     let listed: Vec<&str> = items.iter().filter_map(|it| it.name.as_deref()).collect();
@@ -248,7 +281,7 @@ fn ls(pathspec: &str) -> Result<Vec<String>, String> {
 fn compiled() -> Vec<Row> {
     crate::guard::rule_table()
         .iter()
-        .map(|r| Row { name: r.name.to_string(), views: r.views.to_vec() })
+        .map(|r| Row { name: r.name.to_string(), views: r.views.to_vec(), shells: r.shells.to_vec() })
         .collect()
 }
 
@@ -266,17 +299,22 @@ fn spelled(views: &BTreeSet<&str>) -> String {
     }
 }
 
-// spec: guard-kit/SPEC.md §check-guard-registration — `<name><TAB><view>[; <view>…]`, a blank or
-// `#` line skipped, any other line a refusal
+// spec: guard-kit/SPEC.md §check-guard-registration — `<name><TAB><view>[; <view>…][<TAB><shell>[,
+// <shell>…]]`, an absent third field read as `bash`, a blank or `#` line skipped, any other line a
+// refusal
 fn table_file(text: &str, path: &str) -> Result<Vec<Row>, String> {
     let mut rows = Vec::new();
     for (n, line) in text.lines().enumerate() {
         if line.trim().is_empty() || line.starts_with('#') {
             continue;
         }
-        let bad = || format!("{}:{}: a table line of no known shape ({}) — the gate reads `<name><TAB><view>[; <view>…]`", path, n + 1, line);
-        let (name, views) = line.split_once('\t').ok_or_else(bad)?;
-        if !is_name(name) || views.contains('\t') {
+        let bad = || format!("{}:{}: a table line of no known shape ({}) — the gate reads `<name><TAB><view>[; <view>…][<TAB><shell>[, <shell>…]]`", path, n + 1, line);
+        let (name, rest) = line.split_once('\t').ok_or_else(bad)?;
+        let (views, shells) = match rest.split_once('\t') {
+            Some((v, s)) => (v, Some(s)),
+            None => (rest, None),
+        };
+        if !is_name(name) || shells.is_some_and(|s| s.contains('\t')) {
             return Err(bad());
         }
         let views = views
@@ -284,7 +322,11 @@ fn table_file(text: &str, path: &str) -> Result<Vec<Row>, String> {
             .map(View::from_spelling)
             .collect::<Option<Vec<View>>>()
             .ok_or_else(bad)?;
-        rows.push(Row { name: name.to_string(), views });
+        let shells = match shells {
+            None => vec![Shell::Bash],
+            Some(s) => s.split(", ").map(Shell::from_spelling).collect::<Option<Vec<Shell>>>().ok_or_else(bad)?,
+        };
+        rows.push(Row { name: name.to_string(), views, shells });
     }
     Ok(rows)
 }
@@ -413,7 +455,7 @@ fn declarations(body: &str, path: &str, line: usize) -> Result<Vec<Vec<View>>, S
                 "{}:{}: a declaration clause the grammar cannot read ({}) — the gate reads `Declares` and backticked views joined by `, ` or ` and `",
                 path,
                 line,
-                body[at - CLAUSE.len() + 1..(at + end.max(1)).min(body.len())].trim()
+                body[at + 1 - CLAUSE.len()..(at + end.max(1)).min(body.len())].trim()
             )
         };
         if spans.is_empty() {
@@ -421,6 +463,31 @@ fn declarations(body: &str, path: &str, line: usize) -> Result<Vec<Vec<View>>, S
         }
         let views = spans.iter().map(|s| View::from_spelling(s)).collect::<Option<Vec<View>>>().ok_or_else(unreadable)?;
         out.push(views);
+        from = at + end.max(1);
+    }
+    Ok(out)
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — every shells clause in an item, each parsed to its
+// shells; a clause the grammar cannot read, or a shell the crate does not carry, is a refusal
+fn shells_clauses(body: &str, path: &str, line: usize) -> Result<Vec<Vec<Shell>>, String> {
+    let mut out = Vec::new();
+    let mut from = 0usize;
+    while let Some(off) = body[from..].find(SHELLS) {
+        let at = from + off + SHELLS.len() - 1;
+        let (spans, end) = backticked_list(&body[at..]);
+        let unreadable = || {
+            format!(
+                "{}:{}: a shells clause the grammar cannot read ({}) — the gate reads `Shells` and backticked shells (`bash`, `powershell`) joined by `, ` or ` and `",
+                path,
+                line,
+                body[at + 1 - SHELLS.len()..(at + end.max(1)).min(body.len())].trim()
+            )
+        };
+        if spans.is_empty() {
+            return Err(unreadable());
+        }
+        out.push(spans.iter().map(|s| Shell::from_spelling(s)).collect::<Option<Vec<Shell>>>().ok_or_else(unreadable)?);
         from = at + end.max(1);
     }
     Ok(out)
@@ -545,5 +612,19 @@ mod tests {
         assert!(table_file("alpha raw\n", "t").is_err());
         assert!(table_file("alpha\tdq\n", "t").is_err());
         assert!(table_file("Alpha\traw\n", "t").is_err());
+        assert_eq!(t[0].shells, vec![Shell::Bash]);
+        let s = table_file("alpha\traw\tbash, powershell\n", "t").unwrap();
+        assert_eq!(s[0].shells, vec![Shell::Bash, Shell::PowerShell]);
+        assert!(table_file("alpha\traw\tzsh\n", "t").is_err());
+        assert!(table_file("alpha\traw\tbash\tx\n", "t").is_err());
+    }
+
+    #[test]
+    fn a_shells_clause_reads_the_crate_s_shells_or_refuses() {
+        let s = shells_clauses("Declares `raw`. Shells `bash` and `powershell`. y", "s", 1).unwrap();
+        assert_eq!(s, vec![vec![Shell::Bash, Shell::PowerShell]]);
+        assert!(shells_clauses("Declares `raw`.", "s", 1).unwrap().is_empty());
+        assert!(shells_clauses("Shells `zsh`.", "s", 1).is_err());
+        assert!(shells_clauses("Shells `bash", "s", 1).is_err());
     }
 }

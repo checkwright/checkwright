@@ -1,5 +1,5 @@
-# name<TAB>views, in dispatch order
+# name<TAB>views[<TAB>shells], in dispatch order
 alpha	sq dq hd
 beta	dequoted; raw; sq dq hd
 
-gamma	sq hdq; sq dq hdq
+gamma	sq hdq; sq dq hdq	bash, powershell

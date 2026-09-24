@@ -211,6 +211,26 @@ wrote="$(cat "$wroteLOG" 2>/dev/null)"
     || { echo "FAIL [log-write-encoded]: got '$wrote'"; fails=$((fails + 1)); }
 assert_has log-write-decodes 'clean' "$(hd_run "$wroteLOG")"
 
+# A PowerShell fall-through is read apart: the member writes it tab-marked, and a log mixing both
+# tools reads the Bash-only log's headline and --count, with the PowerShell calls keyed by their
+# lowercased command word in a section of their own.
+psLOG="$sb/ps-wrote.log"
+printf '{"tool_name":"PowerShell","tool_input":{"command":"Get-ChildItem -Recurse"}}' \
+    | GUARD_KIT_LOG="$psLOG" bash gate-sdk/bin/run-gates.sh --hook shell-guard >/dev/null 2>&1
+[[ "$(cat "$psLOG" 2>/dev/null)" == $'PowerShell\tGet-ChildItem -Recurse' ]] \
+    || { echo "FAIL [ps-log-write]: got '$(cat "$psLOG" 2>/dev/null)'"; fails=$((fails + 1)); }
+mixLOG="$sb/mixed.log"
+{ cat "$LOG" "$psLOG"; printf 'PowerShell\t%s\n' 'get-childitem | Select-Object -First 3' 'git log `; x'; } > "$mixLOG"
+mixed="$(run "$mixLOG")"
+[[ "$(grep -F 'prompting call(s)' <<<"$mixed")" == "$(grep -F 'prompting call(s)' <<<"$full")" ]] \
+    || { echo "FAIL [ps-headline]: the mixed log's headline differs from the Bash-only log's"; fails=$((fails + 1)); }
+[[ "$(run --count "$mixLOG")" == "$count" ]] \
+    || { echo "FAIL [ps-count]: the mixed log's --count differs from the Bash-only log's"; fails=$((fails + 1)); }
+assert_has ps-section '3 PowerShell fall-through(s), not ranked against the allowlist' "$mixed"
+assert_has ps-key-folded '2x  get-childitem' "$mixed"
+assert_has ps-key-git '1x  git' "$mixed"
+assert_absent ps-section-absent 'PowerShell fall-through' "$full"
+
 [[ "$fails" -eq 0 ]] || { echo "scan-prompts.test: $fails assertion(s) failed"; exit 1; }
-echo "scan-prompts.test: clean (overlay-only grants stay off the headline and in the promote-or-prune section; a split-and-refused compound counts as a true prompt; the write-shape suffix splits create from append, skips an fd-dup, and never attributes a downstream write to the leading word; a write-redirect call ranks in the allowlist-unreachable section without leaving the headline; a glob absorbing a redirect or an expansion grants neither call; a heredoc body is data to the grant test, the command after its terminator is shell, an unquoted body expands and an over-bound call is unreachable; an explicit log argument overrides the log path alongside --count in either order; an unrecognized dash-prefixed argument is a refusal at exit 2 and '--' still admits a dash-prefixed path)"
+echo "scan-prompts.test: clean (overlay-only grants stay off the headline and in the promote-or-prune section; a split-and-refused compound counts as a true prompt; the write-shape suffix splits create from append, skips an fd-dup, and never attributes a downstream write to the leading word; a write-redirect call ranks in the allowlist-unreachable section without leaving the headline; a glob absorbing a redirect or an expansion grants neither call; a heredoc body is data to the grant test, the command after its terminator is shell, an unquoted body expands and an over-bound call is unreachable; a PowerShell fall-through is logged tab-marked and ranked apart, moving no Bash count; an explicit log argument overrides the log path alongside --count in either order; an unrecognized dash-prefixed argument is a refusal at exit 2 and '--' still admits a dash-prefixed path)"
 exit 0

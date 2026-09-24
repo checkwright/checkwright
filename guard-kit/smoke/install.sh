@@ -89,6 +89,21 @@ if [[ "$rc" -ne 2 || "$msg" != *"'cd'"* ]]; then
     echo "guard-kit/smoke/install.sh: the wired member did not block a compound-cd payload with rule \`cd_compound\`'s steer (exit $rc, want 2): $msg" >&2
     exit 1
 fi
+# spec: guard-kit/SPEC.md §Testing — the merged wiring hands the PowerShell tool to the member, and
+# the member reads that tool's grammar
+if ! jq -e '[.hooks.PreToolUse[] | select(.matcher == "Bash|PowerShell") | .hooks[].command
+             | select(test("--hook shell-guard"))] | length == 1' .claude/settings.json >/dev/null; then
+    echo "guard-kit/smoke/install.sh: the merged wiring carries no Bash|PowerShell matcher group running the shell-guard" >&2
+    exit 1
+fi
+set +e
+msg="$(printf '%s' '{"tool_name":"PowerShell","tool_input":{"command":"Set-Location deploy; Get-ChildItem"}}' | "$door" --hook shell-guard 2>&1 >/dev/null)"
+rc=$?
+set -e
+if [[ "$rc" -ne 2 || "$msg" != *"'Set-Location'"* ]]; then
+    echo "guard-kit/smoke/install.sh: the wired member did not block a PowerShell compound Set-Location payload with rule \`cd_compound\`'s steer (exit $rc, want 2): $msg" >&2
+    exit 1
+fi
 
 # spec: guard-kit/SPEC.md §The recommended allowlist — the ruleset blocks no form the template
 # grants, read from the RESOLVED allowlist so the binary grant is exercised in the spelling an

@@ -15,7 +15,7 @@ use crate::guard::text::{self, grep_q, head_word, trim, trim_start, unsentinel, 
 
 pub fn git_mutation_under_producer(ctx: &Ctx) -> Decided {
     let raw = ctx.raw(ctx.cmd())?;
-    if !raw.contains("git") || has_expansion(raw) {
+    if !raw.contains("git") || ctx.expands(ctx.cmd(), has_expansion)? {
         return Ok(None);
     }
     let s = ctx.view(ctx.cmd(), SqDqHd)?;

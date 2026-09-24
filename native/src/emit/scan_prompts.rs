@@ -302,16 +302,27 @@ pub fn ranking_key(line: &str) -> String {
     guard::reader::unmark(&key)
 }
 
-// spec: guard-kit/SPEC.md §scan-prompts — the three-way split's whole result: the prompting share,
-// the allowlist-unreachable calls within it per key, the overlay-covered share, and the logged
-// denominator. Committed-covered is on neither ranking by construction.
+// spec: guard-kit/SPEC.md §scan-prompts — the three-way split's whole result over the Bash lines:
+// the prompting share, its allowlist-unreachable calls per key, the overlay-covered share and the
+// logged denominator; the PowerShell lines are counted apart.
 pub struct Tally {
     pub prompting: Vec<(String, u64)>,
     pub unreachable: Vec<(String, u64)>,
     pub overlay: Vec<(String, u64)>,
+    pub powershell: Vec<(String, u64)>,
     pub total: u64,
     pub overlay_total: u64,
     pub logged: u64,
+}
+
+// spec: guard-kit/SPEC.md §scan-prompts — a PowerShell line's key: its first segment's first word
+// as the PowerShell reader splits it, lowercased because PowerShell command names ignore case.
+fn powershell_key(line: &str) -> String {
+    use guard::reader::Reader;
+    let ps = guard::powershell::PowerShell;
+    let skel = ps.view(line, guard::reader::View::SqDqHd).unwrap_or_default();
+    let first = ps.segments(&skel).into_iter().next().unwrap_or_default();
+    guard::reader::unmark(word(trim_start(&first)).0).to_lowercase()
 }
 
 fn bump(into: &mut Vec<(String, u64)>, key: &str) {
@@ -335,6 +346,7 @@ pub fn tally(log_text: &str, allow: &[String], overlay: &[String]) -> Tally {
         prompting: Vec::new(),
         unreachable: Vec::new(),
         overlay: Vec::new(),
+        powershell: Vec::new(),
         total: 0,
         overlay_total: 0,
         logged: log_text.bytes().filter(|b| *b == b'\n').count() as u64,
@@ -346,6 +358,16 @@ pub fn tally(log_text: &str, allow: &[String], overlay: &[String]) -> Tally {
         lines.pop();
     }
     for raw in lines {
+        // spec: guard-kit/SPEC.md §scan-prompts — a raw tab marks a PowerShell line, which the grant
+        // test cannot read, so it is keyed apart and on no Bash count.
+        if let Some(("PowerShell", cmd)) = raw.split_once('\t') {
+            let key = powershell_key(&decode(cmd));
+            if !key.is_empty() {
+                bump(&mut t.powershell, &key);
+            }
+            t.logged -= 1;
+            continue;
+        }
         if raw.is_empty() {
             continue;
         }
@@ -439,6 +461,17 @@ fn unreachable_section(rows: &[(String, u64)], total: u64, out: &mut String) {
     rank_section(rows, out);
 }
 
+// spec: guard-kit/SPEC.md §scan-prompts — the PowerShell fall-throughs: after every other section,
+// keyed by command word and never ranked against the allowlist, and absent when there are none.
+fn powershell_section(rows: &[(String, u64)], out: &mut String) {
+    if rows.is_empty() {
+        return;
+    }
+    let p: u64 = rows.iter().map(|(_, n)| n).sum();
+    out.push_str(&format!("\n--- {} PowerShell fall-through(s), not ranked against the allowlist: ---\n", p));
+    rank_section(rows, out);
+}
+
 fn render(log: &str, settings: &str, settings_local: &str, count_only: bool) -> String {
     // spec: guard-kit/SPEC.md §scan-prompts — an absent or empty log is not a clean tree with a
     // ranking of nothing: the count mode answers `0/0` and the report says the log is empty.
@@ -461,6 +494,7 @@ fn render(log: &str, settings: &str, settings_local: &str, count_only: bool) -> 
             t.logged
         ));
         overlay_section(&t, settings_local, &mut out);
+        powershell_section(&t.powershell, &mut out);
         return out;
     }
     let (actionable, unreachable) = partition(&t);
@@ -485,6 +519,7 @@ fn render(log: &str, settings: &str, settings_local: &str, count_only: bool) -> 
     out.push_str("  (c) habit change — a true one-off.\n");
     unreachable_section(&unreachable, unreachable_total, &mut out);
     overlay_section(&t, settings_local, &mut out);
+    powershell_section(&t.powershell, &mut out);
     out.push_str(&format!("\nThen clear the log:  : > {}\n", log));
     out
 }
@@ -619,6 +654,18 @@ mod tests {
         assert_eq!((t.overlay.len(), t.overlay_total), (1, 1));
         assert_eq!(t.overlay[0].0, "npm test");
         assert_eq!(t.logged, 4);
+    }
+
+    // spec: guard-kit/SPEC.md §scan-prompts — a tab-marked line is a PowerShell call: keyed by its
+    // lowercased command word, and on no Bash count
+    #[test]
+    fn a_powershell_line_is_counted_apart_and_moves_no_bash_count() {
+        let bash = "make build\ngit status && rm -rf x\n";
+        let mixed = "PowerShell\tGet-ChildItem -Recurse\nmake build\nPowerShell\tget-childitem | Select-Object -First 3\nPowerShell\tgit log `; x\ngit status && rm -rf x\n";
+        let (b, m) = (tally(bash, &[], &[]), tally(mixed, &[], &[]));
+        assert_eq!((m.prompting.clone(), m.total, m.logged), (b.prompting.clone(), b.total, b.logged));
+        assert_eq!(m.powershell, vec![("get-childitem".to_string(), 2), ("git".to_string(), 1)]);
+        assert_eq!(powershell_key("Remove-Item x\\ny"), "remove-item");
     }
 
     // spec: guard-kit/SPEC.md §scan-prompts — the two reachability shapes, and what is not one: a

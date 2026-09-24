@@ -412,7 +412,7 @@ pub fn cat_file(ctx: &Ctx) -> Decided {
 }
 
 pub fn git_grep(ctx: &Ctx) -> Decided {
-    if !has_search_tool(ctx, "Grep") || has_substitution(ctx.raw(ctx.cmd())?) {
+    if !has_search_tool(ctx, "Grep") || ctx.expands(ctx.cmd(), has_substitution)? {
         return Ok(None);
     }
     let s = ctx.view(ctx.cmd(), SqDqHd)?;
