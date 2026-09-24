@@ -12,6 +12,36 @@
 
 ## Deferred
 
+### install-ps1-octet-under-ps51
+
+[cost: event/high] [surface: installer]
+
+GitHub Pages serves the hosted `install.ps1` as `application/octet-stream` (the `.ps1` extension has no text mapping, and Pages takes no header config); `install.sh` is served `application/x-sh`. Under pwsh 7, `irm` of the live URL yields a `System.String`, so the documented `irm … | iex` one-liner works there. Under Windows PowerShell 5.1, the shell docs/install.md sends a stock Windows adopter to, the live-URL read is unprobed: the CI witness runs `irm | iex` under 5.1 only against a local `python -m http.server`, whose `.ps1` content type it never prints. If 5.1 hands `iex` a byte array for octet-stream, the one-liner fails at the adopter. **Inferred, not run:** the 5.1 behaviour — no Windows host here.
+
+**Deliverable:** the measurement first — print the served content type in `install-smoke-pwsh-windows` and run one 5.1 `irm` of the live URL, asserting a string. Then either a witness recording that 5.1 reads it as text, or a fix: a one-liner spelling that decodes explicitly, or the script served from a surface with a text type.
+
+**Cost while deferred:** a non-technical Windows adopter's first command may fail before any value is seen. Filed 2026-09-24 to the gap inbox after adopter-onramp's close, when the live site first served the script; promoted 2026-09-24 at the next scope. Owner lookup: `octet`, `content type`, `install.ps1` in this file — none; owner installer/SPEC.md and docs/install.md §Windows.
+
+### pages-liquid-break-undetected
+
+[cost: event/high] [surface: site-kit]
+
+`pages-build-deployment` failed on two pushes and nothing in the iteration saw it, so checkwright.dev stayed frozen at an older tree and the hosted install scripts were 404. Cause: Jekyll runs Liquid over every docs page, and the generated mirror of gate-sdk/SPEC.md carried an unbalanced `${{` in inline code. `1fb12fa3` hotfixed the emitter: the docs-mirror arm wraps each mirrored body in a raw block and refuses a source carrying the block's closing tag. `pages-build-deployment` run 36042688147 is green. The detection half is what remains, and two checks miss it. `check-docs-render-fidelity` renders through kramdown only, never Liquid, so a hand-authored docs page with a Liquid-significant token still reds nothing. And the close binding's push watch reads the `gates` workflow alone (`.claude/commands/close.md` push-budget), so a red deployment goes unseen.
+
+**Deliverable:** a Liquid-parse assertion over the published pages, as a renderer contract under site-kit's knob convention, plus a push watch that also reads the push's deployment run. Any new knob owes an amendment.
+
+**Cost while deferred:** the next Liquid-significant token on a docs page freezes the site silently, and the hosted one-liner goes unserved again. Filed 2026-09-24 to the gap inbox after adopter-onramp's close; the fire was hotfixed the same day under operator direction, and this entry, promoted 2026-09-24 at the next scope, is its detection half. Owner lookup: `liquid`, `jekyll`, `pages-build` in this file — none; owner site-kit/SPEC.md §check-docs-render-fidelity and the close binding.
+
+### guard-ordinal-citation-unheld
+
+[cost: event/low] [surface: guard-kit]
+
+guard-kit/SPEC.md §The generic ruleset states "Nothing cites a rule by position", but `check-guard-registration`'s citation arm reads only the backticked-name grammar, so "rule" or "rules" followed by a bare or parenthesized ordinal passes. Attested once: after the name-citation move, rules `allowlist_chain` and `git_rewrite` still read "Placed after the auto-allow rules (16, 17, 18, 19)", and `git_rewrite` read "(20)". Fixed inline at adopter-onramp's close; no positional citation survives in guard-kit/SPEC.md today.
+
+**Deliverable:** an assertion in `check-guard-registration` that reds a rule-noun followed by an ordinal over the guard-kit corpus, with its fixture pair.
+
+**Cost while deferred:** a positional citation rots silently at the next rule insertion. Filed 2026-09-24 to the gap inbox by adopter-onramp's close; promoted 2026-09-24 at the next scope. Owner lookup: `by position`, `ordinal`, `check-guard-registration` in this file — none; owner guard-kit/SPEC.md §check-guard-registration.
+
 ### ps-producer-liveness-record
 
 [cost: event/high] [surface: guard-kit]
