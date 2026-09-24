@@ -4,4 +4,4 @@
 
 ---
 
-— scope aad51032 2026-09-24 d073945c
+hosted-install-path scope aad51032 2026-09-24 d073945c
