@@ -7,6 +7,7 @@ pub mod budget;
 pub mod dispatch;
 pub mod escalation;
 pub mod poll;
+pub mod shell_guard;
 pub mod statusline;
 pub mod stop_liveness;
 pub mod usage;
@@ -46,6 +47,7 @@ pub const HOOKS: &[(&str, HookFn, &[&str])] = &[
         ],
     ),
     ("escalation-guard", escalation::run, &[]),
+    ("shell-guard", shell_guard::run, crate::guard::host::KNOBS),
     ("wakeup-guard", wakeup::run, &["GUARD_KIT_WAKEUP_LOG"]),
     (
         "workflow-state-guard",

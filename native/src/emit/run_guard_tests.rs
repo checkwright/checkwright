@@ -55,19 +55,27 @@ fn execute(args: &[String]) -> Result<i32, String> {
     let log = format!("{}/friction.log", sandbox.shell);
 
     let mut tally = Tally::default();
+    let template = Subject::Template { lib: &lib, guard: &guard };
+    let member_log = format!("{}/friction.log", sandbox.root);
     for (want, cmd) in rows(&cases, 2)?
         .into_iter()
         .map(|r| (r[0].clone(), r[1].clone()))
     {
-        let cmd = substitute(&cmd, &sandbox.shell);
-        let got = decide(&sandbox.shell, &lib, &log, &guard, &cmd, None)?;
-        tally.check(&want, &got, &cmd);
+        let shell_cmd = substitute(&cmd, &sandbox.shell);
+        let got = decide(&sandbox.shell, &log, &template, &shell_cmd, None)?;
+        tally.check(&want, &got, &shell_cmd);
+        let cmd = substitute(&cmd, &sandbox.root);
+        let got = decide(&sandbox.root, &member_log, &Subject::Member, &cmd, None)?;
+        tally.check(&want, &got, &format!("[--hook shell-guard] {}", cmd));
     }
     for row in rows(&bg_cases, 3)? {
         let (want, rib, cmd) = (row[0].clone(), row[1].clone(), row[2].clone());
-        let cmd = substitute(&cmd, &sandbox.shell);
-        let got = decide(&sandbox.shell, &lib, &log, &guard, &cmd, Some(&rib))?;
-        tally.check(&want, &got, &format!("[run_in_background={}] {}", rib, cmd));
+        let shell_cmd = substitute(&cmd, &sandbox.shell);
+        let got = decide(&sandbox.shell, &log, &template, &shell_cmd, Some(&rib))?;
+        tally.check(&want, &got, &format!("[run_in_background={}] {}", rib, shell_cmd));
+        let cmd = substitute(&cmd, &sandbox.root);
+        let got = decide(&sandbox.root, &member_log, &Subject::Member, &cmd, Some(&rib))?;
+        tally.check(&want, &got, &format!("[--hook shell-guard] [run_in_background={}] {}", rib, cmd));
     }
 
     if tally.ran == 0 {
@@ -169,39 +177,62 @@ fn fields(line: &str, width: usize) -> Vec<String> {
     out
 }
 
-// spec: guard-kit/SPEC.md §Testing — one case: the *subject* is still the unchanged
-// `templates/bash-guard.sh`, spawned from inside the sandbox with the same four inputs the shell
-// harness supplied.
+// spec: guard-kit/SPEC.md §Testing — the two subjects every row runs against while both exist: the
+// unchanged `templates/bash-guard.sh` and the `--hook shell-guard` member, which must agree with the
+// table before the wiring moves to it.
+enum Subject<'a> {
+    Template { lib: &'a str, guard: &'a str },
+    Member,
+}
+
+// spec: guard-kit/SPEC.md §Testing — one case, spawned from inside the sandbox with the same inputs
+// the shell harness supplied.
 fn decide(
     root: &str,
-    lib: &str,
     log: &str,
-    guard: &str,
+    subject: &Subject,
     cmd: &str,
     background: Option<&str>,
 ) -> Result<String, String> {
-    // spec: guard-kit/SPEC.md §Testing — the library reads its knobs from the binary, and the
+    // spec: guard-kit/SPEC.md §Testing — the guard reads its knobs from the binary, and the
     // repo-relative default names nothing from inside the sandbox, so the running binary is exported
     let bin = std::env::current_exe()
         .map_err(|e| format!("{}: cannot name the running binary: {}", NAME, e))?;
     let bin = walk::normalize_abs(&bin.to_string_lossy());
-    let script = r#"cd "$1" || exit 2; GUARD_KIT_LIB="$2" GUARD_KIT_LOG="$3" GATE_SDK_NATIVE_BIN="$5" exec bash "$4""#;
-    let done = proc::run_streamed(
-        &programs::BASH,
-        &["-c", script, "bash", root, lib, log, guard, &bin],
-        payload(cmd, background).as_bytes(),
-        Stderr::Discard,
-    )?;
+    let (code, out) = match subject {
+        Subject::Template { lib, guard } => {
+            let script = r#"cd "$1" || exit 2; GUARD_KIT_LIB="$2" GUARD_KIT_LOG="$3" GATE_SDK_NATIVE_BIN="$5" exec bash "$4""#;
+            let done = proc::run_streamed(
+                &programs::BASH,
+                &["-c", script, "bash", root, lib, log, guard, &bin],
+                payload(cmd, background).as_bytes(),
+                Stderr::Discard,
+            )?;
+            (done.code(), String::from_utf8_lossy(done.stdout()).into_owned())
+        }
+        Subject::Member => {
+            let set = [
+                ("GUARD_KIT_LOG".to_string(), log.to_string()),
+                ("GATE_SDK_NATIVE_BIN".to_string(), bin.clone()),
+                ("PWD".to_string(), root.to_string()),
+            ];
+            let env = proc::ChildEnv { set: &set, unset: &[], cwd: Some(Path::new(root)) };
+            let done = proc::run_with_stdin_in(
+                &programs::CHECKWRIGHT_GATES.at(bin.clone()),
+                &["--hook", "shell-guard"],
+                payload(cmd, background).as_bytes(),
+                &env,
+            )?;
+            (done.reported_code(), String::from_utf8_lossy(done.streams().0).into_owned())
+        }
+    };
     // spec: guard-kit/SPEC.md §Testing — the shell form captured the guard in `$( … )`, which
     // strips every trailing newline before the ladder's emptiness arm reads it.
-    let out = String::from_utf8_lossy(done.stdout())
-        .trim_end_matches('\n')
-        .to_string();
-    Ok(classify(done.code(), &out))
+    Ok(classify(code, out.trim_end_matches('\n')))
 }
 
-// spec: guard-kit/SPEC.md §Testing — the hook payload, `jq -nc`'s construction moved in-crate;
-// the section names both fields' readers and that no field is added.
+// spec: guard-kit/SPEC.md §Testing — the hook payload, `jq -nc`'s construction moved in-crate,
+// carrying the `Bash` tool name the member selects its reader by.
 fn payload(cmd: &str, background: Option<&str>) -> String {
     let mut input = serde_json::Map::new();
     input.insert("command".to_string(), serde_json::Value::String(cmd.to_string()));
@@ -209,10 +240,10 @@ fn payload(cmd: &str, background: Option<&str>) -> String {
         input.insert("run_in_background".to_string(), serde_json::Value::Bool(true));
     }
     serde_json::Value::Object(
-        [(
-            "tool_input".to_string(),
-            serde_json::Value::Object(input),
-        )]
+        [
+            ("tool_name".to_string(), serde_json::Value::String("Bash".to_string())),
+            ("tool_input".to_string(), serde_json::Value::Object(input)),
+        ]
         .into_iter()
         .collect(),
     )
@@ -372,14 +403,14 @@ mod tests {
     // spec: guard-kit/SPEC.md §Testing — the backgrounding flag rides beside the command.
     #[test]
     fn the_payload_carries_the_backgrounding_flag_only_when_the_row_sets_it() {
-        assert_eq!(payload("ls", None), r#"{"tool_input":{"command":"ls"}}"#);
+        assert_eq!(payload("ls", None), r#"{"tool_input":{"command":"ls"},"tool_name":"Bash"}"#);
         assert_eq!(
             payload("ls", Some("false")),
-            r#"{"tool_input":{"command":"ls"}}"#
+            r#"{"tool_input":{"command":"ls"},"tool_name":"Bash"}"#
         );
         assert_eq!(
             payload("ls", Some("true")),
-            r#"{"tool_input":{"command":"ls","run_in_background":true}}"#
+            r#"{"tool_input":{"command":"ls","run_in_background":true},"tool_name":"Bash"}"#
         );
     }
 }

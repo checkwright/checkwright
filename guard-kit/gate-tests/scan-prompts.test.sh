@@ -195,7 +195,7 @@ assert_has hd-unquoted-live '1 of them allowlist-unreachable' "$(hd_run "$hdLOG"
 printf 'python3 - %s\n' "$(printf 'x%.0s' $(seq 1 10000))" > "$hdLOG"
 assert_has hd-over-bound '1 of them allowlist-unreachable' "$(hd_run "$hdLOG")"
 
-# The guard's own log write: a heredoc-bearing fall-through through the template guard lands as
+# The guard's own log write: a heredoc-bearing fall-through through the shell-guard member lands as
 # one encoded line, and that line reads back as the command it recorded.
 wroteLOG="$sb/wrote.log"
 hd_cmd="$(printf "python3 - <<'PY'\nprint('a\\\\b;\\tc')\nPY")"
@@ -204,7 +204,7 @@ hd_json="${hd_json//\"/\\\"}"
 hd_json="${hd_json//$'\n'/\\n}"
 hd_json="${hd_json//$'\t'/\\t}"
 printf '{"tool_name":"Bash","tool_input":{"command":"%s"}}' "$hd_json" \
-    | GUARD_KIT_LOG="$wroteLOG" bash guard-kit/templates/bash-guard.sh >/dev/null 2>&1
+    | GUARD_KIT_LOG="$wroteLOG" bash gate-sdk/bin/run-gates.sh --hook shell-guard >/dev/null 2>&1
 wrote="$(cat "$wroteLOG" 2>/dev/null)"
 # shellcheck disable=SC2016
 [[ "$wrote" == 'python3 - <<'\''PY'\''\nprint('\''a\\b;\tc'\'')\nPY' ]] \

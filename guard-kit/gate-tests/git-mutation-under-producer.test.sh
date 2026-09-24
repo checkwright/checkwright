@@ -1,22 +1,23 @@
 #!/usr/bin/env bash
-# Direct unit test of lib/guard.sh's rule 14 — a tracked-tree mutation blocked
+# Direct test of the shell-guard member's rule 14 — a tracked-tree mutation blocked
 # while a recorded producer is still alive. The decision table cannot hold this
 # rule's firing arm: its second conjunct is a *live* PID, and a sandbox carrying
 # one would turn every other git row in that table into a block. The table keeps
 # the decline arm (a dead record present); everything below needs a process the
-# test itself owns.
+# test itself owns. Each case runs the whole ruleset, so a case another rule
+# decides first asserts that the block is not this rule's.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # guard-kit/
-# shellcheck source=../lib/guard.sh
-source "$DIR/lib/guard.sh"
+BIN="$GATE_SDK_NATIVE_BIN"
+[[ -x "$BIN" ]] || { echo "git-mutation-under-producer.test: the gate binary $BIN is absent — build it first"; exit 2; }
+BIN="$(cd "$(dirname "$BIN")" && pwd -P)/$(basename "$BIN")"
 
 fails=0
 checks=0
-tmp="$(mktemp -d)"
+tmp="$(cd "$(mktemp -d)" && pwd -P)"
 live=""
 cleanup() { [[ -n "$live" ]] && kill "$live" 2>/dev/null; rm -rf "$tmp"; }
 trap cleanup EXIT
@@ -24,17 +25,34 @@ trap cleanup EXIT
 sleep 60 &
 live=$!
 
-mkdir -p "$tmp/scratch"
-GUARD_KIT_SCRATCH_DIRS=("$tmp/scratch")
+mkdir -p "$tmp/scratch" "$tmp/cwd"
+git -C "$tmp/cwd" init -q
+printf 'notes.txt\n' >"$tmp/cwd/.gitignore"
+printf 'GUARD_KIT_SCRATCH_DIRS[] = %s/scratch\n' "$tmp" >"$tmp/guard.knobs"
 
-# guard_block exits 2, so each verdict is taken in a subshell: 2 = blocked,
-# 0 = declined and fell through to the rules after it.
-verdict() { ( guard_rule_git_mutation_under_producer "$1" ) >/dev/null 2>&1; echo $?; }
+payload() {
+    local c="$1"
+    c="${c//\\/\\\\}"
+    c="${c//\"/\\\"}"
+    printf '{"tool_name":"Bash","tool_input":{"command":"%s"}}' "$c"
+}
 
-want() {  # $1=label $2=command $3=want-rc
+# 2 = blocked, 0 = not blocked; the block text lands in $tmp/err.
+verdict() {
+    (cd "$tmp/cwd" && payload "$1" | GUARD_KIT_KNOB_FILE="$tmp/guard.knobs" GUARD_KIT_LOG="$tmp/friction.log" "$BIN" --hook shell-guard >/dev/null 2>"$tmp/err")
+    echo $?
+}
+
+want() {  # $1=label $2=command $3=want-rc [$4=text the block must not carry]
     checks=$((checks + 1))
     local got; got="$(verdict "$2")"
-    [[ "$got" == "$3" ]] || { echo "  FAIL [$1]: '$2' gave rc=$got, want $3"; fails=$((fails + 1)); }
+    if [[ "$got" != "$3" ]]; then
+        echo "  FAIL [$1]: '$2' gave rc=$got, want $3 — $(cat "$tmp/err")"
+        fails=$((fails + 1))
+    elif [[ -n "${4:-}" ]] && grep -qF -- "$4" "$tmp/err"; then
+        echo "  FAIL [$1]: '$2' was blocked by the producer rule, which should have declined — $(cat "$tmp/err")"
+        fails=$((fails + 1))
+    fi
 }
 
 # --- no record at all: the rule is inert, whatever the command
@@ -54,14 +72,15 @@ done
 
 # The corrective must name the blocking run so the reader can tell 'wait for
 # that' from 'reclaim a record whose owner is gone'.
-out="$( ( guard_rule_git_mutation_under_producer "git commit -m done" ) 2>&1 )"
+verdict "git commit -m done" >/dev/null
 checks=$((checks + 1))
-if [[ "$out" != *"validate-batch"* || "$out" != *"$live"* ]]; then
-    echo "  FAIL [names-the-run]: the block did not name the blocking run and pid: $out"
+if ! grep -qF "validate-batch" "$tmp/err" || ! grep -qF "$live" "$tmp/err"; then
+    echo "  FAIL [names-the-run]: the block did not name the blocking run and pid: $(cat "$tmp/err")"
     fails=$((fails + 1))
 fi
 
-# --- git's global options are walked, so a decorated invocation is still reached
+# --- git's global options are walked, so a decorated invocation is still reached;
+#     a '-c' override is refused by rule 2 before this rule reads it
 want "global-C"        "git -C . commit -m done" 2
 want "global-c"        "git -c user.name=x commit -m done" 2
 want "global-no-pager" "git --no-pager stash" 2
@@ -76,12 +95,13 @@ for sub in status log diff show rev-parse ls-files branch remote; do
 done
 want "readonly-args" "git log --oneline -3" 0
 
-# --- conservative in this ruleset's established directions
+# --- conservative in this ruleset's established directions: an expansion or a
+#     substitution is refused by rule 6 first, and never by this rule
 want "non-git"          "make build" 0
 want "unknown-subcmd"   "git frobnicate --hard" 0
 want "unknown-global"   "git --frobnicate commit -m done" 0
-want "expansion"        "git commit -m \$MSG" 0
-want "substitution"     "git commit -m \$(date)" 0
+want "expansion"        "git commit -m \$MSG" 2 "validate-batch"
+want "substitution"     "git commit -m \$(date)" 2 "validate-batch"
 want "backtick"         'git commit -m `date`' 0
 # A mutating verb inside a quoted span is not a command: the skeleton view is
 # what makes that true, and a rule reading the raw text would false-block here.

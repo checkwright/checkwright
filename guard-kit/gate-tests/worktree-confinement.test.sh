@@ -1,23 +1,24 @@
 #!/usr/bin/env bash
-# spec: guard-kit/SPEC.md §Testing — rule 27 from the one place it applies, a linked worktree's working tree, which the decision table's sandbox cannot be: the template guard is driven from a scratch worktree this suite adds and removes, over a main checkout it builds
+# spec: guard-kit/SPEC.md §Testing — rule 27 from the one place it applies, a linked worktree's working tree, which the decision table's sandbox cannot be: the shell-guard member is driven from a scratch worktree this suite adds and removes, over a main checkout it builds
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
-HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
 BIN="$GATE_SDK_NATIVE_BIN"
 [[ -x "$BIN" ]] || { echo "worktree-confinement.test: the gate binary $BIN is absent — build it first"; exit 2; }
+BIN="$(cd "$(dirname "$BIN")" && pwd -P)/$(basename "$BIN")"
 
-SANDBOX="$(cd "$(mktemp -d)" && pwd -P)"
+# spec: guard-kit/SPEC.md §The generic ruleset — a path carrying the letters SQ or DQ reads as a
+# skeleton placeholder, so a random sandbox name that spells one is drawn again
+until SANDBOX="$(cd "$(mktemp -d)" && pwd -P)"; [[ "$SANDBOX" != *SQ* && "$SANDBOX" != *DQ* ]]; do
+    rm -rf "$SANDBOX"
+done
 trap 'rm -rf "$SANDBOX"' EXIT
 
 fails=0
 checks=0
 
 main="$SANDBOX/main"
-mkdir -p "$main/gate-sdk" "$main/guard-kit" "$main/docs"
-cp -R "$HERE/gate-sdk/bin" "$HERE/gate-sdk/lib" "$main/gate-sdk/"
-cp -R "$HERE/guard-kit/lib" "$main/guard-kit/"
-cp "$HERE/guard-kit/templates/bash-guard.sh" "$main/bash-guard.sh"
+mkdir -p "$main/docs"
 printf 'foo\n' >"$main/docs/a.md"
 printf '.tmp/\n.claude/worktrees/\n*.local.md\n' >"$main/.gitignore"
 git -C "$main" init -q -b main
@@ -38,12 +39,12 @@ payload() {
     c="${c//\\/\\\\}"
     c="${c//\"/\\\"}"
     c="${c//$'\n'/\\n}"
-    printf '{"tool_input":{"command":"%s"}}' "$c"
+    printf '{"tool_name":"Bash","tool_input":{"command":"%s"}}' "$c"
 }
 
 decide() {  # $1=knob file $2=command — prints block, allow, fallthrough or other:<rc>
     local out rc
-    out="$(cd "$wt" && payload "$2" | GUARD_KIT_KNOB_FILE="$1" GATE_SDK_NATIVE_BIN="$BIN" GUARD_KIT_LOG="$SANDBOX/friction.log" bash bash-guard.sh 2>"$SANDBOX/err")"
+    out="$(cd "$wt" && payload "$2" | GUARD_KIT_KNOB_FILE="$1" GATE_SDK_NATIVE_BIN="$BIN" GUARD_KIT_LOG="$SANDBOX/friction.log" "$BIN" --hook shell-guard 2>"$SANDBOX/err")"
     rc=$?
     if [[ "$rc" -eq 2 ]]; then
         echo block

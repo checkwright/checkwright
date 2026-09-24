@@ -70,8 +70,8 @@ fn no_such_arm(arm: &str) -> ! {
 // spec: guard-kit/SPEC.md §The guard framework — the holder's four classes, so both sides take one
 // spelling; `hd`/`hdq` carry nothing here because the branch reading them is unreachable, and a
 // token outside the four is a malformed corpus rather than a silent no-class.
-fn parse_wants(spec: &str) -> Result<guard::Wants, String> {
-    let mut w = guard::Wants::default();
+fn parse_wants(spec: &str) -> Result<guard::bash::Wants, String> {
+    let mut w = guard::bash::Wants::default();
     if spec == "-" {
         return Ok(w);
     }
@@ -103,7 +103,7 @@ fn guard_lib_parity(args: &[String]) -> i32 {
         // classification: each command beside the view the permission matcher reads.
         Some("harness-view") => {
             for c in &args[1..] {
-                println!("harness-view\t{}\t{}", c, guard::harness_view(c));
+                println!("harness-view\t{}\t{}", c, guard::bash::harness_view(c));
             }
             0
         }
@@ -124,7 +124,7 @@ fn guard_lib_parity(args: &[String]) -> i32 {
         }
         Some("split") => {
             for c in &args[1..] {
-                for (i, seg) in guard::split_compound(c).iter().enumerate() {
+                for (i, seg) in guard::bash::split_compound(c).iter().enumerate() {
                     println!("split\t{}\t{}\t{}", log_encoded(c), i, log_encoded(seg));
                 }
             }
@@ -152,14 +152,14 @@ fn guard_lib_parity(args: &[String]) -> i32 {
                     "skeleton\t{}\t{}\t{}",
                     spec,
                     log_encoded(c),
-                    log_encoded(&guard::skeleton(c, w))
+                    log_encoded(&guard::bash::skeleton(c, w))
                 );
             }
             0
         }
         Some("redirect") => {
             for c in &args[1..] {
-                match guard::redirect_pairs(c) {
+                match guard::bash::redirect_pairs(c) {
                     Ok(pairs) => {
                         for (i, p) in pairs.iter().enumerate() {
                             println!("redirect\t{}\t{}\t{}", log_encoded(c), i, p);

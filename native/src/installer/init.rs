@@ -769,7 +769,17 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
 // spec: installer/SPEC.md §init — every host is told to run the binary init placed, by its
 // root-relative path, because both `sh` and PowerShell run a `./`-prefixed relative path
 fn follow_up_front_end(artifact_dest: &str) -> String {
-    format!("./{}", artifact_dest)
+    command_token(artifact_dest)
+}
+
+// spec: gate-sdk/SPEC.md §lib/gate.sh — `gate_native_bin_spelled`'s rule: a relative binary path as a
+// command token takes the `./` prefix once, and an already-anchored or rooted one is left as it is.
+pub fn command_token(bin: &str) -> String {
+    if crate::walk::path_root(bin).is_some() || bin.starts_with("./") || bin.starts_with("../") {
+        bin.to_string()
+    } else {
+        format!("./{}", bin)
+    }
 }
 
 // spec: installer/SPEC.md §init — the binary init just placed runs at the consumer's root with the

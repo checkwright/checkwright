@@ -50,10 +50,10 @@ fn trim(s: &str) -> &str {
 }
 
 // spec: guard-kit/SPEC.md §scan-prompts — the leading decoration the matcher looks through is the
-// harness view, held once in `guard::harness_view`, so the grant test and the key strip exactly
+// harness view, held once in `guard::bash::harness_view`, so the grant test and the key strip exactly
 // the wrappers the matcher strips.
 fn strip_decoration(c: &str) -> &str {
-    guard::harness_view(c)
+    guard::bash::harness_view(c)
 }
 
 fn word(s: &str) -> (&str, &str) {
@@ -172,7 +172,7 @@ pub fn decode(line: &str) -> String {
 fn without_heredoc_bodies(cmd: &str) -> String {
     let mut out = String::with_capacity(cmd.len());
     let mut at = 0usize;
-    for r in guard::heredoc_extents(cmd) {
+    for r in guard::bash::heredoc_extents(cmd) {
         out.push_str(&cmd[at..r.start]);
         at = r.end;
     }
@@ -185,7 +185,7 @@ fn without_heredoc_bodies(cmd: &str) -> String {
 // whole-string glob spanning a compound the harness would split reads as allowed.
 fn granted(cmd: &str, allow: &[String], overlay: Option<&[String]>) -> bool {
     !allowlist_unreachable(cmd)
-        && guard::split_compound(&quoted_view(&without_heredoc_bodies(cmd)))
+        && guard::bash::split_compound(&quoted_view(&without_heredoc_bodies(cmd)))
             .iter()
             .filter(|seg| !seg.bytes().all(|c| c == b' '))
             .all(|seg| segment_granted(seg, allow, overlay))
@@ -195,7 +195,7 @@ fn granted(cmd: &str, allow: &[String], overlay: Option<&[String]>) -> bool {
 // write-redirect operator normalized to `>` or `>>`, the descriptor dropped and an fd-dup excluded
 // on rule 17's own target test, since an fd-dup is not a redirect to a file.
 fn write_redirects(c: &str) -> Vec<(&'static str, String)> {
-    let pairs = guard::redirect_pairs(c).unwrap_or_default();
+    let pairs = guard::bash::redirect_pairs(c).unwrap_or_default();
     let mut out = Vec::new();
     for pair in pairs {
         let p = pair.trim_start_matches(|ch: char| ch.is_ascii_digit());
@@ -259,9 +259,9 @@ fn backgrounds(structural: &str) -> bool {
 // every segment: an expansion, a write redirect to a target rule 17's own test calls a file, a
 // backgrounding `&`, or a call past the harness's analysis bound.
 fn allowlist_unreachable(line: &str) -> bool {
-    let live = guard::skeleton(line, guard::Wants { sq: true, hdq: true, ..Default::default() });
+    let live = guard::bash::skeleton(line, guard::bash::Wants { sq: true, hdq: true, ..Default::default() });
     let structural =
-        guard::skeleton(line, guard::Wants { sq: true, dq: true, hd: true, ..Default::default() });
+        guard::bash::skeleton(line, guard::bash::Wants { sq: true, dq: true, hd: true, ..Default::default() });
     line.chars().count() > ANALYSIS_BOUND
         || backgrounds(&structural)
         || carries_expansion(&live)
@@ -284,8 +284,8 @@ fn is_write_token(t: &str) -> bool {
 // FIRST segment, so a key can never attribute a write to a command that performs none.
 pub fn ranking_key(line: &str) -> String {
     let skel =
-        guard::skeleton(line, guard::Wants { sq: true, dq: true, hd: true, ..Default::default() });
-    let segs = guard::split_compound(&skel);
+        guard::bash::skeleton(line, guard::bash::Wants { sq: true, dq: true, hd: true, ..Default::default() });
+    let segs = guard::bash::split_compound(&skel);
     let c = trim_start(strip_decoration(segs.first().map_or("", String::as_str)));
     let (t1, rest) = word(c);
     let (t2, _) = word(rest);

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: gate-sdk/SPEC.md §The harness-integration arm — a fail-open arm run inside a linked worktree with no binary of its own dispatches to the main checkout's binary: the fork ban, the workflow-state guard and the bash guard fire from the worktree; with both binaries absent the hook still declines at 0; a verdict-bearing arm still reports the binary absent at 2; and an absolute pin naming nothing takes no fallback
+# spec: gate-sdk/SPEC.md §The harness-integration arm — a fail-open arm run inside a linked worktree with no binary of its own dispatches to the main checkout's binary: the fork ban, the workflow-state guard and the shell guard fire from the worktree; with both binaries absent the hook still declines at 0; a verdict-bearing arm still reports the binary absent at 2; and an absolute pin naming nothing takes no fallback
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -16,10 +16,8 @@ fails=0
 note() { echo "  FAIL [$1]: $2"; fails=$((fails + 1)); }
 
 main="$SANDBOX/main"
-mkdir -p "$main/gate-sdk" "$main/guard-kit"
+mkdir -p "$main/gate-sdk"
 cp -R "$HERE/gate-sdk/bin" "$HERE/gate-sdk/lib" "$main/gate-sdk/"
-cp -R "$HERE/guard-kit/lib" "$main/guard-kit/"
-cp "$HERE/guard-kit/templates/bash-guard.sh" "$main/bash-guard.sh"
 mkdir -p "$main/.workflow"
 : >"$main/.workflow/WORKFLOW-STATE.txt"
 git -C "$main" init -q -b main
@@ -47,10 +45,10 @@ grep -qF 'a fork inherits' <<<"$out" || note fork-text "the fork-ban text is mis
 out="$(in_wt '{"tool_input":{"file_path":".workflow/WORKFLOW-STATE.txt","content":"x"}}' bash gate-sdk/bin/run-gates.sh --hook workflow-state-guard)"; rc=$?
 [[ "$rc" -eq 2 ]] || note state-status "want exit 2 on a state-file Write from a linked worktree, got $rc -- $out"
 
-# 3. the bash guard runs its rules from the worktree rather than advising they did not run
-out="$(in_wt '{"tool_input":{"command":"cd deploy && ls"}}' bash bash-guard.sh)"; rc=$?
-[[ "$rc" -eq 2 ]] || note guard-status "want exit 2 from the bash guard on a blocked command, got $rc -- $out"
-grep -qF 'rules did not run' <<<"$out" && note guard-advisory "the bash guard took the unreachable-binary advisory: $out"
+# 3. the shell guard runs its rules from the worktree through the main checkout's binary
+out="$(in_wt '{"tool_name":"Bash","tool_input":{"command":"cd deploy && ls"}}' bash gate-sdk/bin/run-gates.sh --hook shell-guard)"; rc=$?
+[[ "$rc" -eq 2 ]] || note guard-status "want exit 2 from the shell guard on a blocked command, got $rc -- $out"
+grep -qF "shell-guard: don't use 'cd'" <<<"$out" || note guard-text "the shell guard's block text is missing: $out"
 
 # 5. a verdict-bearing arm links nothing onto a door path git does not ignore: exit 2, naming why
 out="$(in_wt '' bash gate-sdk/bin/run-gates.sh --emit knob-roster)"; rc=$?
@@ -114,5 +112,5 @@ grep -qF "was not built from this worktree's crate source" <<<"$out" || note ske
 git -C "$crate" worktree remove --force "$cwt"
 
 [[ "$fails" -eq 0 ]] || { echo "run-gates-linked-worktree.test: $fails assertion(s) failed"; exit 1; }
-echo "run-gates-linked-worktree.test: clean (from a linked worktree with no binary the fork ban, the workflow-state guard and the bash guard fire through the main checkout's binary; a verdict arm links the main binary only onto a gitignored door and, where crate source is tracked, only on a matching source stamp, refusing at 2 with the reason otherwise and never building; an absolute pin naming nothing takes no fallback; with both absent the hook declines at 0)"
+echo "run-gates-linked-worktree.test: clean (from a linked worktree with no binary the fork ban, the workflow-state guard and the shell guard fire through the main checkout's binary; a verdict arm links the main binary only onto a gitignored door and, where crate source is tracked, only on a matching source stamp, refusing at 2 with the reason otherwise and never building; an absolute pin naming nothing takes no fallback; with both absent the hook declines at 0)"
 exit 0

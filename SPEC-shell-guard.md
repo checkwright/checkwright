@@ -282,6 +282,7 @@ Roster probes, run at authoring over the retired-spelling gate's reconciliation 
 - `guard-kit/gate-tests/consumer-rules.test.sh` — new (delta 8).
 - `guard-kit/smoke/install.sh` — no copy step; it drives the member (delta 9).
 - `native/src/guard.rs` — absorbed into `native/src/guard/` as the bash reader; `json_arm` gains `view` (deltas 3, 5 and 8).
+- `native/src/guard/mod.rs` — the module root the absorption lands in: its `lib/guard.sh` witness constant and the envelope comments follow the library's retirement (deltas 5 and 9).
 - `native/src/hook/mod.rs` — the `shell-guard` row, and its `guard_block`/`guard_advise` comment citations re-pointed (delta 3).
 - `native/src/main.rs` — `--guard-lib-parity` removed, `--guard-json` usage gains `view`, and its `guard_log_fallthrough`/`guard_allow_match`/`_guard_harness_view` comment citations re-pointed (deltas 8 and 9).
 - `native/src/emit/run_guard_tests.rs` — spawns the member (delta 9).

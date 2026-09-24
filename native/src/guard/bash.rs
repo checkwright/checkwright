@@ -1,61 +1,91 @@
-// spec: guard-kit/SPEC.md §The guard framework — the crate's holder of the twinned `lib/guard.sh`
-// primitives the compiled members are composed from, admitted by criterion 6's *unless* clause and
-// held equal by `--guard-lib-parity` (gate-sdk/SPEC.md §The port-candidate criteria).
-use crate::ere::{Ere, EreError};
+// spec: guard-kit/SPEC.md §The guard framework — the bash reader: the one holder of the normalizer,
+// the splitters, the redirect scan and the harness view, which the rules, the `scan-prompts` ranker
+// and `--emit-compare-settings-allow` all call.
+use super::reader::{Reader, View};
+use super::text::{self, is_space, trim_start};
+use crate::ere::EreError;
 
-// spec: guard-kit/SPEC.md §The guard framework — the kit-relative shell library, with two readers:
-// the holder these twins are compared against, and the file whose presence *is* guard-kit being
-// vendored, which is how `kpi-prompt-friction` witnesses the kit (drift-kit/SPEC.md §Bundled KPIs).
-pub const LIB: &str = "lib/guard.sh";
+pub struct Bash;
 
-// spec: guard-kit/SPEC.md §The guard framework — `guard_allow_match`, the settings-allow match
-// core and its one compiled holder: a closing `:*`, or a closing ` *` that is the rule's only `*`,
-// is the head alone or the head, a space, anything.
-pub fn allow_match(s: &str, glob: &str) -> bool {
-    let (body, tail) = match glob.strip_suffix(')').filter(|b| b.ends_with('*')) {
-        Some(b) => (b, ")"),
-        None => (glob, ""),
-    };
-    let head = if let Some(h) = body.strip_suffix(":*") {
-        Some(h.replace(":*", "*"))
-    } else {
-        body.strip_suffix(" *")
-            .filter(|h| !h.contains('*'))
-            .map(String::from)
-    };
-    match head {
-        Some(head) => {
-            crate::walk::glob_match(&format!("{head}{tail}"), s)
-                || crate::walk::glob_match(&format!("{head} *{tail}"), s)
-        }
-        None => crate::walk::glob_match(&glob.replace(":*", "*"), s),
+impl Reader for Bash {
+    fn view(&self, t: &str, view: View) -> Option<String> {
+        let w = |sq, dq, hd, hdq| Wants { sq, dq, hd, hdq };
+        let wants = match view {
+            View::Raw => return Some(t.to_string()),
+            View::Dequoted => return dequoted(t),
+            View::Body => return Some(String::new()),
+            View::Sq => w(true, false, false, false),
+            View::Hdq => w(false, false, false, true),
+            View::SqHdq => w(true, false, false, true),
+            View::SqDqHd => w(true, true, true, false),
+            View::SqDqHdq => w(true, true, false, true),
+        };
+        Some(text::chomp(&skeleton(t, wants)).to_string())
+    }
+
+    fn body(&self, t: &str, k: usize) -> String {
+        let bodies = scan(t, Wants::default()).2;
+        k.checked_sub(1)
+            .and_then(|i| bodies.get(i))
+            .map(|b| text::chomp(b).to_string())
+            .unwrap_or_default()
+    }
+
+    fn segments(&self, t: &str) -> Vec<String> {
+        split_compound(t)
+    }
+
+    fn statements(&self, t: &str) -> Vec<String> {
+        statements(t)
+    }
+
+    fn residue_statements(&self, t: &str) -> Vec<String> {
+        residue_statements(t)
+    }
+
+    fn pipes(&self, t: &str) -> Vec<String> {
+        t.split(['|', '\n']).map(String::from).collect()
+    }
+
+    fn redirect_pairs(&self, t: &str) -> Vec<String> {
+        text::grep_o(REDIRECT_RE_SRC, t)
+    }
+
+    fn heredoc_terms(&self, t: &str) -> Vec<String> {
+        heredoc_terms(t)
+    }
+
+    fn harness_view<'a>(&self, seg: &'a str) -> &'a str {
+        harness_view(seg)
     }
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — `guard_split_compound`: one segment per line,
-// split on the harness's statement separators. `||`, `&&` and `|&` are tested before `|`, which is the
-// leftmost-longest alternation the shell holder's `sed -E` gives for free and a scanner must spell.
+// spec: guard-kit/SPEC.md §The guard framework — the compound split: one segment per line, split on
+// the harness's statement separators. `||`, `&&` and `|&` are tested before `|`, the leftmost-longest
+// alternation a `sed -E` gives for free and a scanner must spell.
 pub fn split_compound(cmd: &str) -> Vec<String> {
+    split_on(cmd, &[b"||", b"&&", b"|&", b";", b"|", b"\n"])
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — the statement split, where a pipe is not a boundary.
+pub fn statements(cmd: &str) -> Vec<String> {
+    split_on(cmd, &[b"||", b"&&", b";", b"\n"])
+}
+
+fn split_on(cmd: &str, seps: &[&[u8]]) -> Vec<String> {
     let b = cmd.as_bytes();
     let mut segs: Vec<Vec<u8>> = vec![Vec::new()];
     let mut i = 0usize;
     while i < b.len() {
-        let sep = if b[i..].starts_with(b"||")
-            || b[i..].starts_with(b"&&")
-            || b[i..].starts_with(b"|&")
-        {
-            2
-        } else if b[i] == b';' || b[i] == b'|' || b[i] == b'\n' {
-            1
-        } else {
-            0
-        };
-        if sep > 0 {
-            segs.push(Vec::new());
-            i += sep;
-        } else {
-            segs.last_mut().expect("one segment is always open").push(b[i]);
-            i += 1;
+        match seps.iter().find(|s| b[i..].starts_with(s)) {
+            Some(s) => {
+                segs.push(Vec::new());
+                i += s.len();
+            }
+            None => {
+                segs.last_mut().expect("one segment is always open").push(b[i]);
+                i += 1;
+            }
         }
     }
     segs.iter()
@@ -63,7 +93,68 @@ pub fn split_compound(cmd: &str) -> Vec<String> {
         .collect()
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — the four inert classes `guard_skeleton` takes
+// spec: guard-kit/SPEC.md §The generic ruleset — the heredoc opener as the terminator scan reads it,
+// which matches from any `<` and so also finds the `<<` a herestring's second `<` begins.
+const TERM_RE_SRC: &str = "<<-?[[:space:]]*(\"[^\"]*\"|'[^']*'|[A-Za-z_][A-Za-z0-9_]*)";
+
+pub fn heredoc_terms(line: &str) -> Vec<String> {
+    text::grep_o(TERM_RE_SRC, line)
+        .into_iter()
+        .map(|t| {
+            let t = t.split_once("<<").map_or(t.as_str(), |(_, r)| r);
+            let t = t.strip_prefix('-').unwrap_or(t);
+            let t = trim_start(t);
+            let t = t.strip_prefix(['"', '\'']).unwrap_or(t);
+            let t = t.strip_suffix(['"', '\'']).unwrap_or(t);
+            t.to_string()
+        })
+        .collect()
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — each statement of a skeleton followed by the residue
+// its own openers produce; a line whose openers sit in more than one statement attributes its residue
+// to none.
+pub fn residue_statements(s: &str) -> Vec<String> {
+    let lines: Vec<&str> = s.split('\n').collect();
+    let at = |i: usize| lines.get(i).copied().unwrap_or("");
+    let mut out = Vec::new();
+    let mut i = 0usize;
+    while i < lines.len() {
+        let line = lines[i];
+        i += 1;
+        let mut residue = String::new();
+        for t in heredoc_terms(line) {
+            let mut next = at(i);
+            if trim_start(next) == "HD" {
+                residue.push('\n');
+                residue.push_str(next);
+                i += 1;
+                next = at(i);
+            }
+            if trim_start(next) != t {
+                break;
+            }
+            residue.push('\n');
+            residue.push_str(next);
+            i += 1;
+        }
+        let parts = statements(line);
+        let carriers = parts.iter().filter(|p| p.contains("<<")).count();
+        for part in parts {
+            if part.bytes().all(is_space) {
+                continue;
+            }
+            if part.contains("<<") && carriers == 1 {
+                out.push(format!("{}{}", part, residue));
+            } else {
+                out.push(part);
+            }
+        }
+    }
+    out
+}
+
+// spec: guard-kit/SPEC.md §The guard framework — the four inert classes the normalizer takes
 #[derive(Clone, Copy, Default, PartialEq, Eq, Debug)]
 pub struct Wants {
     pub sq: bool,
@@ -72,17 +163,8 @@ pub struct Wants {
     pub hdq: bool,
 }
 
-fn is_space(c: u8) -> bool {
-    matches!(c, b' ' | b'\t' | b'\n' | 0x0b | 0x0c | b'\r')
-}
-
-fn trim_start(s: &str) -> &str {
-    let i = s.bytes().position(|c| !is_space(c)).unwrap_or(s.len());
-    &s[i..]
-}
-
-// spec: guard-kit/SPEC.md §The guard framework — the harness view's word cursor: `_guard_hv_pop`'s
-// head word and the blanks after it, over a slice that never carries leading blanks.
+// spec: guard-kit/SPEC.md §The guard framework — the harness view's word cursor: the head word and
+// the blanks after it, over a slice that never carries leading blanks.
 struct Words<'a>(&'a str);
 
 impl<'a> Words<'a> {
@@ -208,7 +290,7 @@ fn is_assignment(w: &str) -> bool {
         && !value.contains(['"', '\''])
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — `_guard_harness_view`: a segment as the permission
+// spec: guard-kit/SPEC.md §The guard framework — the harness view: a segment as the permission
 // matcher reads it, its documented leading wrappers stripped from the head repeatedly. An option a
 // wrapper's walk does not recognize, or a wrapper left with nothing to wrap, stops the strip there.
 pub fn harness_view(seg: &str) -> &str {
@@ -237,9 +319,9 @@ pub fn harness_view(seg: &str) -> &str {
     rest
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — `<<-?[[:space:]]*(<quoted>|<identifier>)`, the
-// opener the holder matches with an anchored ERE. One byte decides the alternative and `[[:space:]]`
-// shares none of their first-character sets, so the greedy run needs no backtracking.
+// spec: guard-kit/SPEC.md §The guard framework — `<<-?[[:space:]]*(<quoted>|<identifier>)`, anchored.
+// One byte decides the alternative and `[[:space:]]` shares none of their first-character sets, so the
+// greedy run needs no backtracking.
 fn heredoc_header(s: &[u8]) -> Option<(usize, &[u8], bool)> {
     if !s.starts_with(b"<<") {
         return None;
@@ -274,7 +356,7 @@ enum State {
     Dq,
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — `guard_skeleton`, the whole machinery
+// spec: guard-kit/SPEC.md §The guard framework — the normalizer, the whole machinery
 pub fn skeleton(cmd: &str, w: Wants) -> String {
     scan(cmd, w).0
 }
@@ -285,7 +367,9 @@ pub fn heredoc_extents(cmd: &str) -> Vec<std::ops::Range<usize>> {
     scan(cmd, Wants::default()).1
 }
 
-fn scan(cmd: &str, w: Wants) -> (String, Vec<std::ops::Range<usize>>) {
+type Scanned = (String, Vec<std::ops::Range<usize>>, Vec<String>);
+
+fn scan(cmd: &str, w: Wants) -> Scanned {
     let b = cmd.as_bytes();
     let n = b.len();
     let mut out: Vec<u8> = Vec::with_capacity(n);
@@ -293,6 +377,7 @@ fn scan(cmd: &str, w: Wants) -> (String, Vec<std::ops::Range<usize>>) {
     let mut state = State::None;
     let mut pending: std::collections::VecDeque<(&[u8], bool)> = std::collections::VecDeque::new();
     let mut extents = Vec::new();
+    let mut bodies = Vec::new();
     let mut i = 0usize;
     while i < n {
         match state {
@@ -407,6 +492,7 @@ fn scan(cmd: &str, w: Wants) -> (String, Vec<std::ops::Range<usize>>) {
                     body.push(b'\n');
                     i = (end + 1).min(n);
                 }
+                bodies.push(String::from_utf8_lossy(&body).into_owned());
                 if !body.is_empty() {
                     if w.hd || (w.hdq && quoted) {
                         out.extend_from_slice(b"HD\n");
@@ -437,159 +523,107 @@ fn scan(cmd: &str, w: Wants) -> (String, Vec<std::ops::Range<usize>>) {
     if !span.is_empty() {
         out.extend_from_slice(&span);
     }
-    (String::from_utf8_lossy(&out).into_owned(), extents)
+    (String::from_utf8_lossy(&out).into_owned(), extents, bodies)
 }
 
-// spec: guard-kit/SPEC.md §The generic ruleset — `_guard_redirect_pairs`' pattern, cited rather
-// than re-expressed: the holder hands it to `grep -oE` and this one to the crate's own matcher
-// (gate-sdk/SPEC.md §The POSIX ERE matcher), so neither side re-spells it.
+// spec: guard-kit/SPEC.md §The generic ruleset — the dequoted view, walked in lockstep with the
+// `sq dq hd` skeleton, a quoted span's blanks and separators held as sentinels; `None` where the two
+// cannot be aligned.
+pub fn dequoted(raw: &str) -> Option<String> {
+    let skel = skeleton(raw, Wants { sq: true, dq: true, hd: true, hdq: false });
+    let s = text::chomp(&skel).as_bytes();
+    let r = raw.as_bytes();
+    let mut out: Vec<u8> = Vec::new();
+    let (mut i, mut j) = (0usize, 0usize);
+    let lit = |c: u8| c == b'"' || c == b'\'' || c == b'\\';
+    let at = |v: &[u8], from: usize, len: usize| v.get(from..(from + len).min(v.len())).unwrap_or(&[]).to_vec();
+    while j < r.len() {
+        let k = r[j..].iter().position(|&c| lit(c)).unwrap_or(r.len() - j);
+        if at(s, i, k) != r[j..j + k] {
+            return None;
+        }
+        out.extend_from_slice(&r[j..j + k]);
+        i += k;
+        j += k;
+        if j >= r.len() {
+            break;
+        }
+        let c = r[j];
+        if c == b'\\' {
+            if at(s, i, 2) != at(r, j, 2) {
+                return None;
+            }
+            out.extend_from_slice(&at(r, j, 2));
+            i += 2;
+            j += 2;
+            continue;
+        }
+        let span: Vec<u8>;
+        if c == b'\'' {
+            if at(s, i, 2) != b"SQ" {
+                return None;
+            }
+            let k = r[j + 1..].iter().position(|&c| c == b'\'')?;
+            span = r[j + 1..j + 1 + k].to_vec();
+            j += k + 2;
+        } else {
+            if at(s, i, 2) != b"DQ" {
+                return None;
+            }
+            let mut k = j + 1;
+            let mut acc: Vec<u8> = Vec::new();
+            loop {
+                let m = r[k..].iter().position(|&c| c == b'"' || c == b'\\')?;
+                acc.extend_from_slice(&r[k..k + m]);
+                k += m;
+                if r[k] != b'\\' {
+                    break;
+                }
+                acc.extend_from_slice(&at(r, k, 2));
+                k += 2;
+                if k > r.len() {
+                    return None;
+                }
+            }
+            span = acc;
+            j = k + 1;
+        }
+        i += 2;
+        if span.contains(&b'\n') {
+            return None;
+        }
+        for b in span {
+            out.push(match b {
+                b' ' => 0x01,
+                b'\t' => 0x02,
+                b';' => 0x03,
+                b'|' => 0x04,
+                b'&' => 0x05,
+                o => o,
+            });
+        }
+    }
+    if i != s.len() {
+        return None;
+    }
+    Some(text::chomp(&String::from_utf8_lossy(&out)).to_string())
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — the redirect-pair pattern, handed to the crate's own
+// matcher (gate-sdk/SPEC.md §The POSIX ERE matcher)
 pub const REDIRECT_RE_SRC: &str = "[0-9]*>>?[[:space:]]*(&[0-9-]+|[^[:space:]|;&<>]+)";
 
 // spec: guard-kit/SPEC.md §The generic ruleset — one match per line, leftmost-longest and
 // non-overlapping, which is `grep -o`'s contract. Line-wise rather than whole-string, because
 // `[[:space:]]` matches a newline and a whole-string scan would join two lines into one pair.
 pub fn redirect_pairs(text: &str) -> Result<Vec<String>, EreError> {
-    let re = Ere::compile(REDIRECT_RE_SRC)?;
-    let mut out = Vec::new();
-    for line in text.split('\n') {
-        let mut pos = 0usize;
-        while let Some(rest) = line.get(pos..) {
-            if rest.is_empty() {
-                break;
-            }
-            match re.find(rest) {
-                None => break,
-                Some((s, e)) if e > s => {
-                    out.push(rest[s..e].to_string());
-                    pos += e;
-                }
-                Some(_) => break,
-            }
-        }
-    }
-    Ok(out)
-}
-
-// spec: guard-kit/SPEC.md §The guard framework (`lib/guard.sh`) — `--guard-json`'s `field` and
-// `field-or-empty` modes; `or_empty` is jq's `// empty`, which fires on false too.
-pub fn json_field(payload: Option<&serde_json::Value>, path: &str, or_empty: bool) -> Option<String> {
-    use serde_json::Value;
-    let v = crate::json::Path::compile(path).ok()?.eval(payload?).ok()?;
-    match v {
-        Value::String(s) => Some(s),
-        Value::Bool(false) if or_empty => None,
-        Value::Bool(_) | Value::Number(_) => Some(v.to_string()),
-        Value::Null | Value::Object(_) | Value::Array(_) => None,
-    }
-}
-
-// spec: guard-kit/SPEC.md §The guard framework — `guard_allow`'s envelope; the braces stay a
-// literal so the key order is the one the library always printed.
-pub fn allow_envelope(reason: &str) -> String {
-    format!(
-        r#"{{"hookSpecificOutput":{{"hookEventName":"PreToolUse","permissionDecision":"allow","permissionDecisionReason":{}}}}}"#,
-        crate::hook::quote(reason)
-    )
-}
-
-// spec: guard-kit/SPEC.md §The guard framework — `guard_rewrite`'s envelope, key order as above
-pub fn rewrite_envelope(cmd: &str, reason: &str) -> String {
-    format!(
-        r#"{{"hookSpecificOutput":{{"hookEventName":"PreToolUse","permissionDecision":"allow","permissionDecisionReason":{},"updatedInput":{{"command":{}}}}}}}"#,
-        crate::hook::quote(reason),
-        crate::hook::quote(cmd)
-    )
-}
-
-// spec: guard-kit/SPEC.md §The guard framework — `--guard-json <mode> [<arg>…]`, the reads and
-// renders `lib/guard.sh` spawns; every mode exits 0 and only a usage error exits 2.
-pub fn json_arm(args: &[String]) -> i32 {
-    let usage = "  usage: checkwright-gates --guard-json field <path> | --guard-json field-or-empty <path> | --guard-json allow-entries <settings-file> | --guard-json advise <msg> | --guard-json allow <reason> | --guard-json rewrite <cmd> <reason>";
-    let arg = |i: usize| args.get(i).map(String::as_str);
-    let out = match (arg(0), arg(1), arg(2)) {
-        (Some(m @ ("field" | "field-or-empty")), Some(path), None) => {
-            let payload = crate::hook::read_payload();
-            json_field(payload.as_ref(), path, m == "field-or-empty").map(|v| vec![v])
-        }
-        (Some("allow-entries"), Some(file), None) => match crate::emit::compare_settings_allow::read_allow(file) {
-            crate::emit::compare_settings_allow::AllowRead::Entries(e) => Some(e),
-            _ => None,
-        },
-        (Some("advise"), Some(msg), None) => Some(vec![crate::hook::advise_envelope(msg)]),
-        (Some("allow"), Some(reason), None) => Some(vec![allow_envelope(reason)]),
-        (Some("rewrite"), Some(cmd), Some(reason)) if args.len() == 3 => {
-            Some(vec![rewrite_envelope(cmd, reason)])
-        }
-        _ => {
-            eprintln!("checkwright-gates: --guard-json needs a mode and exactly its operands — nothing could be read or rendered; treating as failure (not clean)");
-            eprintln!("{}", usage);
-            return 2;
-        }
-    };
-    for line in out.unwrap_or_default() {
-        println!("{}", line);
-    }
-    0
+    crate::ere::Ere::compile(REDIRECT_RE_SRC)?;
+    Ok(text::grep_o(REDIRECT_RE_SRC, text))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    // spec: guard-kit/SPEC.md §The guard framework — the field read's rendering per JSON type,
-    // and the one place `field-or-empty` differs from `field`
-    #[test]
-    fn a_field_renders_each_json_type_as_the_library_reads_it() {
-        let doc: serde_json::Value = serde_json::from_str(
-            r#"{"tool_input":{"command":"a\r\nb","n":4.5,"t":true,"f":false,"z":null,"o":{"k":1},"a":[1]},"arr":["x"]}"#,
-        )
-        .expect("the fixture must parse");
-        let f = |p: &str, e: bool| json_field(Some(&doc), p, e);
-        assert_eq!(f(".tool_input.command", false).as_deref(), Some("a\r\nb"), "a CR is read verbatim");
-        assert_eq!(f(".tool_input.n", false).as_deref(), Some("4.5"));
-        assert_eq!(f(".tool_input.t", true).as_deref(), Some("true"));
-        assert_eq!(f(".tool_input.f", false).as_deref(), Some("false"));
-        assert_eq!(f(".tool_input.f", true), None, "// empty fires on false");
-        assert_eq!(f(".tool_input.z", false), None);
-        assert_eq!(f(".tool_input.o", false), None);
-        assert_eq!(f(".tool_input.a", false), None);
-        assert_eq!(f(".tool_input.missing", false), None);
-        assert_eq!(f(".arr[0]", false).as_deref(), Some("x"));
-        assert_eq!(f(".tool_input[\"command\"]", true).as_deref(), Some("a\r\nb"));
-        assert_eq!(f(".tool_input.command | length", false), None, "a filter reads as absent");
-        assert_eq!(f(".tool_input.command.deeper", false), None, "a type error reads as absent");
-        assert_eq!(json_field(None, ".tool_input.command", true), None);
-    }
-
-    // spec: guard-kit/SPEC.md §The guard framework — the envelopes parse, carry every
-    // interpolated value back unchanged, and keep the key order the library printed
-    #[test]
-    fn every_envelope_serializes_its_values_and_keeps_its_key_order() {
-        let hostile = "a \"quoted\" \\ back\nslash\ttab \u{1}";
-        let allow = allow_envelope(hostile);
-        let v: serde_json::Value = serde_json::from_str(&allow).expect("allow must parse");
-        assert_eq!(v["hookSpecificOutput"]["permissionDecisionReason"], hostile);
-        assert!(allow.starts_with(r#"{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow","permissionDecisionReason":"#));
-        let rw = rewrite_envelope(hostile, "why");
-        let v: serde_json::Value = serde_json::from_str(&rw).expect("rewrite must parse");
-        assert_eq!(v["hookSpecificOutput"]["updatedInput"]["command"], hostile);
-        assert!(rw.ends_with(r#""permissionDecisionReason":"why","updatedInput":{"command":"a \"quoted\" \\ back\nslash\ttab \u0001"}}}"#));
-        let adv = crate::hook::advise_envelope(hostile);
-        let v: serde_json::Value = serde_json::from_str(&adv).expect("advise must parse");
-        assert_eq!(v["hookSpecificOutput"]["additionalContext"], hostile);
-        assert!(!allow.contains('\n') && !rw.contains('\n') && !adv.contains('\n'));
-    }
-
-    // spec: guard-kit/SPEC.md §The guard framework — only a usage error exits 2
-    #[test]
-    fn a_malformed_invocation_is_the_one_exit_2() {
-        let s = |v: &[&str]| v.iter().map(|x| x.to_string()).collect::<Vec<_>>();
-        assert_eq!(json_arm(&s(&[])), 2);
-        assert_eq!(json_arm(&s(&["nope", "x"])), 2);
-        assert_eq!(json_arm(&s(&["rewrite", "only-one"])), 2);
-        assert_eq!(json_arm(&s(&["allow", "a", "b"])), 2);
-        assert_eq!(json_arm(&s(&["allow-entries", "/no/such/settings.json"])), 0);
-    }
 
     const SQDQ: Wants = Wants { sq: true, dq: true, hd: false, hdq: false };
     const HD: Wants = Wants { sq: true, dq: true, hd: true, hdq: false };
@@ -605,35 +639,7 @@ mod tests {
         assert_eq!(split_compound("a & b"), vec!["a & b"]);
         assert_eq!(split_compound("a |& b"), vec!["a ", " b"]);
         assert_eq!(split_compound("a\nb;c\n"), vec!["a", "b", "c", ""]);
-    }
-
-    // spec: guard-kit/SPEC.md §The guard framework — a closing `:*` grants the head alone or the
-    // head and a space, never a glued continuation, in both the inner and the wrapped rule form
-    #[test]
-    fn a_closing_colon_star_is_bounded_by_a_space_or_the_end() {
-        for s in ["touch f", "touch f g"] {
-            assert!(allow_match(s, "touch f:*"), "{s}");
-        }
-        for s in ["touch fg", "touch f-g", "touch f.g"] {
-            assert!(!allow_match(s, "touch f:*"), "{s}");
-        }
-        assert!(!allow_match("python3 -c x", "python3 -:*"));
-        assert!(allow_match("Bash(git status)", "Bash(git status:*)"));
-        assert!(allow_match("Bash(git status --short)", "Bash(git status:*)"));
-        assert!(!allow_match("Bash(git statusx)", "Bash(git status:*)"));
-        assert!(allow_match("touch fg", "touch f*"));
-    }
-
-    // spec: guard-kit/SPEC.md §The guard framework — a closing ` *` that is the rule's only `*`
-    // grants the bare head too; beside another `*` it does not
-    #[test]
-    fn a_sole_trailing_space_star_also_grants_the_bare_head() {
-        assert!(allow_match("git status", "git status *"));
-        assert!(allow_match("Bash(git status)", "Bash(git status *)"));
-        assert!(allow_match("touch f", "touch f *"));
-        assert!(!allow_match("touch fg", "touch f *"));
-        assert!(!allow_match("git -C . status", "git -C * status *"));
-        assert!(allow_match("git -C . status --short", "git -C * status *"));
+        assert_eq!(statements("a | b;c||d |& e"), vec!["a | b", "c", "d |& e"]);
     }
 
     // spec: guard-kit/SPEC.md §The guard framework — placeholder, never deletion
@@ -678,6 +684,8 @@ mod tests {
         assert_eq!(skeleton("cat <<EOF\nnever ends", HD), "cat <<EOF\nHD\n");
         assert_eq!(skeleton("cat <<EOF\nnever ends", SQDQ), "cat <<EOF\nnever ends\n");
         assert_eq!(skeleton("cat <<EOF\nEOF", HD), "cat <<EOF\nEOF");
+        assert_eq!(Bash.body("a <<A <<B\n1\nA\n2\n3\nB", 2), "2\n3");
+        assert_eq!(Bash.body("a <<A\n1\nA", 2), "");
     }
 
     // spec: guard-kit/SPEC.md §scan-prompts — the extent is the body plus its terminator line
@@ -718,5 +726,30 @@ mod tests {
             redirect_pairs("jq . < a.json > b.json").unwrap(),
             vec!["> b.json"]
         );
+    }
+
+    // spec: guard-kit/SPEC.md §The generic ruleset — the dequoted view keeps content, drops quote
+    // characters, holds a quoted span's separators as sentinels, and refuses what it cannot align
+    #[test]
+    fn the_dequoted_view_aligns_with_the_skeleton_or_refuses() {
+        assert_eq!(dequoted("grep 'a b' f").as_deref(), Some("grep a\x01b f"));
+        assert_eq!(dequoted("echo \"x;y\" | wc").as_deref(), Some("echo x\x03y | wc"));
+        assert_eq!(dequoted("echo a\\ b").as_deref(), Some("echo a\\ b"));
+        assert_eq!(dequoted("echo 'open"), None);
+        assert_eq!(dequoted("cat <<EOF\nx\nEOF"), None);
+        assert_eq!(dequoted("echo 'a\nb'"), None);
+    }
+
+    // spec: guard-kit/SPEC.md §The generic ruleset — the terminators, including the one a herestring's
+    // second `<` opens, and each statement carrying only its own residue
+    #[test]
+    fn heredoc_residue_follows_the_one_statement_that_opened_it() {
+        assert_eq!(heredoc_terms("cat <<'EOF' >> f"), vec!["EOF"]);
+        assert_eq!(heredoc_terms("cat <<<\"x\""), vec!["x"]);
+        assert_eq!(
+            residue_statements("cat <<'EOF' >> f; ls\nHD\nEOF"),
+            vec!["cat <<'EOF' >> f\nHD\nEOF", " ls"]
+        );
+        assert_eq!(residue_statements("a && b\n\nc"), vec!["a ", " b", "c"]);
     }
 }
