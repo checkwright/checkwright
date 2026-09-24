@@ -9,7 +9,7 @@ A hook registration in the tracked harness settings file is read by two readers,
 
 **Measured at authoring (2026-09-24):**
 
-- **The live registrations.** `python3 -c` over `.claude/settings.json`'s `hooks` shows three events: `PreToolUse` (four groups, five commands), `SessionStart` (one) and `SubagentStop` (one). Every command token resolves (`ls scripts/session-context.sh gate-sdk/bin/run-gates.sh`). Every `--hook` operand is a `HOOKS` member (`native/src/hook/mod.rs`). The widened gate registers green, so no prune has to land first.
+- **The live registrations.** `python3 -c` over `.claude/settings.json`'s `hooks` shows three events: `PreToolUse` (three groups, four commands), `SessionStart` (one) and `SubagentStop` (one). Every command token resolves (`ls scripts/session-context.sh gate-sdk/bin/run-gates.sh`). Every `--hook` operand is a `HOOKS` member (`native/src/hook/mod.rs`). The widened gate registers green, so no prune has to land first.
 - **The owners.** `head -2 native/src/hook/*.rs` shows each member module's leading `spec:` binding. The agent-budget-guard, agent-dispatch-guard and subagent-stop-liveness modules bind to delegation-kit. The escalation-guard, shell-guard and wakeup-guard modules bind to guard-kit. The workflow-state-guard module binds to lifecycle-kit.
 - **The event order.** `native/Cargo.toml` builds `serde_json` without `preserve_order`, so an object's keys iterate sorted.
 - **The placeholder.** The harness's hooks reference (`https://code.claude.com/docs/en/hooks.md`, *Reference scripts by path*) documents `${CLAUDE_PROJECT_DIR}` as the project root for a hook's command. It also documents an exec form in which `args` carries the argv.
