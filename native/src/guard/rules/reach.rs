@@ -129,12 +129,34 @@ fn interpreter_body(seg: &str, arm: char) -> Option<Body> {
     Some(Body::Stdin)
 }
 
-// spec: guard-kit/SPEC.md §The generic ruleset — the scratch-source test on one token.
-fn is_scratch_path(ctx: &Ctx, p: &str) -> bool {
-    ctx.host()
-        .scratch_prefixes()
+// spec: guard-kit/SPEC.md §The generic ruleset — where a body source sits: under the main checkout's
+// scratch dir seen from a linked worktree, or under a scratch dir the runner here serves.
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum Home {
+    Here,
+    Main,
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — the scratch-source test on one token: a member as
+// written, and from a linked worktree a member of the main checkout or of the session's own
+// worktree, each compared lexically with `..` folded.
+fn scratch_home(ctx: &Ctx, p: &str) -> Option<Home> {
+    let h = ctx.host();
+    let own = h.own_scratch_homes();
+    if !own.is_empty() {
+        let t = h.lexical(p);
+        let main_homes = h.scratch_homes();
+        if main_homes.iter().zip(&own).any(|(m, o)| m != o && under(&t, &h.lexical(m))) {
+            return Some(Home::Main);
+        }
+        if own.iter().any(|o| under(&t, o)) {
+            return Some(Home::Here);
+        }
+    }
+    h.scratch_prefixes()
         .iter()
         .any(|(bare, dotted)| p.starts_with(bare.as_str()) || p.starts_with(dotted.as_str()))
+        .then_some(Home::Here)
 }
 
 fn names_scratch(ctx: &Ctx, s: &str) -> bool {
@@ -144,7 +166,7 @@ fn names_scratch(ctx: &Ctx, s: &str) -> bool {
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `script_interpreter`'s test, a block for it and
 // a predicate for rule `bounded_wait`'s arm (B): the first interpreter taking its body from a scratch
 // path, as its arm, its word and the body source.
-pub fn interpreter_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<(char, String, String)>, Fault> {
+pub fn interpreter_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<(char, String, String, Home)>, Fault> {
     let raw = ctx.raw(c)?;
     if !names_scratch(ctx, raw) || grep_q(r"\$\{|<\(|>\(|\$[A-Za-z_]", raw) {
         return Ok(None);
@@ -159,26 +181,26 @@ pub fn interpreter_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<(char, String, Str
                 continue;
             }
             let Some(arm) = interpreter_arm(ctx, &word) else { continue };
-            let hit = |src: &str| Some((arm, word.clone(), src.to_string()));
+            let hit = |src: &str, home: Home| Some((arm, word.clone(), src.to_string(), home));
             match interpreter_body(&seg, arm) {
                 None => continue,
                 Some(Body::File(p)) => {
-                    if is_scratch_path(ctx, &p) {
-                        return Ok(hit(&p));
+                    if let Some(home) = scratch_home(ctx, &p) {
+                        return Ok(hit(&p, home));
                     }
                 }
                 Some(Body::Stdin) => {
                     for m in text::grep_o("(^|[^<])<[[:space:]]*[^[:space:]<>|;&]+", pipe) {
                         let src = m.strip_prefix(|ch: char| ch != '<').unwrap_or(&m);
                         let src = trim_start(src.strip_prefix('<').unwrap_or(src));
-                        if is_scratch_path(ctx, src) {
-                            return Ok(hit(src));
+                        if let Some(home) = scratch_home(ctx, src) {
+                            return Ok(hit(src, home));
                         }
                     }
                     for prev in &pipes[..i] {
                         for tok in words(prev) {
-                            if is_scratch_path(ctx, tok) {
-                                return Ok(hit(tok));
+                            if let Some(home) = scratch_home(ctx, tok) {
+                                return Ok(hit(tok, home));
                             }
                         }
                     }
@@ -186,7 +208,7 @@ pub fn interpreter_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<(char, String, Str
                 Some(Body::Inline) => {
                     let subst = text::grep_o(r"`[^`]*`|\$\([^)]*\)", raw);
                     if subst.iter().any(|span| names_scratch(ctx, span)) {
-                        return Ok(hit("a command substitution"));
+                        return Ok(hit("a command substitution", Home::Here));
                     }
                 }
             }
@@ -196,8 +218,17 @@ pub fn interpreter_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<(char, String, Str
 }
 
 pub fn script_interpreter(ctx: &Ctx) -> Decided {
-    let Some((arm, word, src)) = interpreter_reach(ctx, ctx.cmd())? else { return Ok(None) };
+    let Some((arm, word, src, home)) = interpreter_reach(ctx, ctx.cmd())? else { return Ok(None) };
     let runner = format!("{} --scratch-run", ctx.host().door);
+    if home == Home::Main {
+        let own = ctx.host().own_scratch_homes().into_iter().next().unwrap_or_default();
+        let lead = if arm == 'a' {
+            format!("run a scratch script through the runner from this linked worktree: write it under the worktree's own scratch dir ({own}) and run '{runner} <script> [args…]' there, since the runner refuses a script under the main checkout's scratch dir from here (guard-kit/SPEC.md §scratch-run). This call takes the program body for '{word}' from '{src}'")
+        } else {
+            format!("scratch execution is bash-only (guard-kit/SPEC.md §scratch-run) and '{word}' is not bash: this call takes its program body from '{src}'. Write the body as a shell script under this linked worktree's own scratch dir ({own}) and run it through '{runner} <script> [args…]' there, since the runner refuses a script under the main checkout's scratch dir from here. The body sits")
+        };
+        return block(format!("{lead} in a scratch dir any session can rewrite, so the body reviewed at the permission decision need not be the body that runs; the runner echoes the body as it executes, which is the compensating control a direct run has none of. A body carried in the command string — a '-c' argument, a heredoc, a herestring — is untouched. If you genuinely need the direct form, run it yourself with !<command>."));
+    }
     if arm == 'a' {
         return block(format!("run a scratch script through the runner: '{runner} <script> [args…]' (guard-kit/SPEC.md §scratch-run). This call takes the program body for '{word}' from '{src}', which sits in a scratch dir any session can rewrite, so the body reviewed at the permission decision need not be the body that runs. The runner is allowlistable and echoes the body as it executes, which is the compensating control a direct run has none of. A body carried in the command string — a '-c' argument, a heredoc, a herestring — is untouched. If you genuinely need the direct form, run it yourself with !<command>."));
     }

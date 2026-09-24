@@ -104,6 +104,13 @@ want off-journal       "$SANDBOX/off.knobs" allow "printf 'x\n' >> $main/.tmp/jo
 # --- a program-bearing tool is never admitted, whatever the roster declares of it
 want awk-declared      "$SANDBOX/awk.knobs" block "awk '{print}' $main/docs/a.md" "$refusal"
 
+# --- rule 23 reads the main checkout's scratch dir from here too, and steers the script to the
+#     worktree's own scratch dir, since the runner refuses a main-checkout path from a worktree;
+#     a script under the worktree's own scratch dir keeps the plain runner steer
+want main-scratch-body "$d" block "bash $main/.tmp/x.sh" "write it under the worktree's own scratch dir ($wt/.tmp)"
+want main-scratch-rel  "$d" block "bash ../../../.tmp/x.sh" "write it under the worktree's own scratch dir ($wt/.tmp)"
+want own-scratch-body  "$d" block "bash .tmp/own.sh" "run a scratch script through the runner: '"
+
 # --- the corrective interpolates the loaded roster rather than carrying a copy
 checks=$((checks + 1))
 decide "$d" "find $main/docs -delete" >/dev/null

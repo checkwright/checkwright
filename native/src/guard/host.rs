@@ -200,6 +200,25 @@ impl Host {
             .collect()
     }
 
+    // spec: guard-kit/SPEC.md §The generic ruleset — from a linked worktree, the directory each scratch
+    // member names in the session's own worktree; none outside one.
+    pub fn own_scratch_homes(&self) -> Vec<String> {
+        let r = self.roots();
+        if r.main.is_empty() {
+            return Vec::new();
+        }
+        self.scratch_dirs
+            .iter()
+            .map(|d| {
+                if walk::path_root(d).is_some() {
+                    self.lexical(d)
+                } else {
+                    self.lexical(&format!("{}/{}", r.own, d))
+                }
+            })
+            .collect()
+    }
+
     pub fn in_scratch(&self, p: &str) -> bool {
         let t = self.lexical(p);
         self.scratch_homes().iter().any(|h| under(&t, &self.lexical(h)))
