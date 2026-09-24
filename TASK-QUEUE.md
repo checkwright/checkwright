@@ -8,6 +8,88 @@
 
 ## New Features
 
+### settings-hook-command-path-gate
+
+[spec: SPEC-hook-registry.md] [recurrence: 2026-09-24]
+
+a hook registration in `.claude/settings.json` whose `command` names a renamed or deleted script reds nowhere and fails silently at run time.
+
+**Probed at the drain, not reasoned:** `check-settings-paths` resolves command tokens for `permissions.allow[]` only (`native/src/gates/settings_paths.rs`, whose `allow_entries` reads `/permissions/allow`); the sole other reader of `/hooks` in the tree is the **emitter** `native/src/emit/enforcement_map.rs`, which renders `PreToolUse` and `SessionStart` command paths into the enforcement map **without resolving them against the tree** — a deleted script still renders a row — and does not read `/hooks/SubagentStop` at all, so this iteration's new registration is invisible to the projection as well as to every gate.
+
+**Recurred 2026-09-24** at `native-shell-guard` build. The Bash hook named `scripts/bash-guard.sh`, which was deleted from the working tree before the registration was swapped to `--hook shell-guard`. The shell guard failed open in every session until the swap, and the swap commit's settings diff shows the old path. A commit-time gate would not have covered that uncommitted window, only the commit that landed it.
+
+**Two halves, and the second is the cheaper one.** Path resolution is the walk `check-settings-paths` already owns, so widening its subject from one JSON pointer to two is a small port-side change; extending the enforcement map's hook-event roster is a docs-projection ruling about what belongs on that page, not a gate.
+
+**Specified 2026-09-24:** `check-settings-paths` widens rather than a second gate being minted. Every `type: command` hook's command path must resolve, and every `--hook` operand must name a member the binary carries. The enforcement map reads every hook event.
+
+**Cost while deferred:** a broken hook is invisible until the behaviour it guards silently stops happening — the failure mode with no red anywhere and no user-visible symptom. Filed 2026-08-22 at spec while surveying context-kit's settings gates; drained at that iteration's close, which re-verified the claim and found the enforcement-map reader it missed.
+
+**Selected for `silent-guard-gaps` — operator direction 2026-09-24, lead-relayed; the lead unit.** Admitted on the filter's trust arm: a guard an adopter relies on goes dark with no signal. Probed at scope: `.claude/settings.json` also registers `SubagentStop`, which the emitter does not read.
+
+### enforcement-map-member-owner
+
+[spec: SPEC-hook-registry.md]
+
+`--emit enforcement-map` attributes every `--hook` member row to gate-sdk and labels it with the front-end path. `hook_sections` (`native/src/emit/enforcement_map.rs`) takes the first slash-bearing token of the hook command, so four Guards rows of `docs/enforcement.md` read `gate-sdk/bin/run-gates.sh`: the `shell-guard` Bash row, two Agent rows and the Write|Edit row. The table cannot tell members apart or credit the owning kit.
+
+**Premise corrected at the drain:** the bullet named the `HOOKS` table's owning kit as the attribution source. The table (`native/src/hook/mod.rs`) carries a name, a function and a knob slice per member, and no owner. The fix needs an owner per member first, either a fourth column or a derivation from the kit SPEC that defines each member. Then the row reads the `--hook` operand as its surface. **Specified 2026-09-24:** a fourth column, held by a unit test to the kit named by the member module's leading `spec:` binding. A member row is headed by its `--hook` operand and credited to that owner.
+
+**Sibling, not a duplicate:** [settings-hook-command-path-gate](#settings-hook-command-path-gate) owns resolving a hook's command path against the tree, and that entry's projection half reads the same `/hooks` parse. A `--hook <member>` registration has two things to resolve: the front end and the member name.
+
+**Cost while deferred:** the published enforcement page credits every guard member to gate-sdk. Filed 2026-09-24 to the gap inbox at `native-shell-guard` build b5b; promoted at that iteration's close. Owner lookup: `enforcement-map`, `hook member`, `member name` in this file: only the sibling above.
+
+**Selected for `silent-guard-gaps` — operator direction 2026-09-24, lead-relayed.** Admitted on the trust arm: the published enforcement map is what an adopter reads to trust what enforces. Batch it with the sibling above; both edit `hook_sections`' `/hooks` parse.
+
+### hook-decline-model-invisible
+
+[spec: SPEC-decline-channel.md]
+
+a hook member's decline (`hook::decline`, `native/src/hook/mod.rs`) writes to stderr at exit 0 with no envelope, so the session model never learns its guard stopped enforcing. gate-sdk/SPEC.md §The harness-integration arm states that channel, so the fix amends it. **Premise corrected at spec:** the harness writes exit-0 stderr to its debug log only, so the operator does not see it either, and today the only caller is the `SubagentStop` member.
+
+**Specified 2026-09-24:** the decline writes the firing event's envelope. On `PreToolUse` that is `additionalContext`. Elsewhere it is `systemMessage`, because a turn-end event has no model channel that does not refuse the stop.
+
+**Cost while deferred:** a member with an unresolved knob fails open silently from the session's side, and the one reader able to repair the knob is never told. Filed 2026-09-24 to the gap inbox at `native-shell-guard`'s close; promoted 2026-09-24 at the next scope, so the record is late and says so. Owner lookup: `hook::decline`, `additionalContext` in this file: none. **Selected for `silent-guard-gaps` — operator direction 2026-09-24, lead-relayed;** admitted on the trust arm.
+
+### workflow-run-path-unresolved
+
+[spec: SPEC-action-run-path.md]
+
+a `.github/workflows` `run:` step naming a deleted script reds nowhere. `gates.yml`'s `install-smoke-sh-windows` leg kept `bash guard-kit/gate-tests/guard-read-path.test.sh` after `native-shell-guard` deleted that file, with the full battery green; that close's stale-identifier audit found it and removed the step. The class is a path-existence read over `run:` bodies.
+
+**Specified 2026-09-24:** a new gate-sdk gate, `check-action-run-path`. It reads `run:` bodies, single-line values included, through §check-action-run-shell's extractor, which becomes shared, and it identifies invocations with canon-kit's check-docs-cmd (A) predicate.
+
+**Cost while deferred:** a deleted script's CI step reds only on the push that runs it, spending a push-budget round. Filed 2026-09-24 to the gap inbox at `native-shell-guard`'s close; promoted 2026-09-24 at the next scope. Owner lookup: `deleted script`, `run: step` in this file: only [settings-hook-command-path-gate](#settings-hook-command-path-gate), a sibling on another surface. **Selected for `silent-guard-gaps` — operator direction 2026-09-24, lead-relayed, as an explicit exception to the enhancement admission filter:** it shares the set's command-path surface, so it rides no extra stage.
+
+### split-posture-waiver-writer
+
+[spec: SPEC-waiver-writer.md] [recurrence: 2026-09-23]
+
+an operator-ruled `align-waived` line has no sanctioned writer. lifecycle-kit/SPEC.md §check-stage-entry (C) and the align template record it in `.workflow/WORKFLOW-STATE.txt`, but the workflow-state guard (`native/src/hook/workflow_state.rs`) blocks every Write/Edit of that file, the shell guard blocks a shell append to it as a redirect into a tracked file, and the `--rewrite` arm refuses it (`native/src/emit/rewrite.rs`, `is_state_file`), and `--enter-stage` has no waiver arm. Only an operator-run shell append lands one today.
+
+**Recurred.** Filed 2026-07-19 as the split-lead posture's gap, where the lead rules the waiver but writes no lifecycle state and a build session carried the line as a piggyback; iceboxed at an age eviction. Re-filed 2026-09-23 at this iteration's spec, recording the operator's align waiver, and the piggyback that worked in July is now guard-blocked for every session.
+
+**Folded in, same help line:** `check-stage-entry`'s assertion-C help (`native/src/gates/stage_entry.rs`, the `record a deliberate waiver` line) prints `k.state`, and `--enter-stage` hands the gate a scratch state under `GATE_SDK_TMP_DIR` on a real entry as well as a simulated one (`native/src/emit/enter_stage.rs`, the candidate-stamp temp build). So the relayed recovery names a file that is gone after the run, and so does every other `k.state` line that relay carries. **Probed at the drain:** both sites read.
+
+**Specified 2026-09-24, option (c):** `--enter-stage --dispatch <stage> --waive <reason>` declares the waiver on the marker, and the entry that consumes that line writes the waiver with its stamp. Options (a) and (b) are refused. Every state-file line the gate prints names the configured file.
+
+**Cost while deferred:** each operator-waived align makes someone route around a guard or hand-append, and every assertion-C refusal points its reader at a vanished scratch file. Promoted from the icebox 2026-09-23 at `guard-harness-seams` close on the recurrence. Owner lookup: `waiv`, `align-waived` in this file: only this slug.
+
+**Selected for `silent-guard-gaps` — operator direction 2026-09-24, lead-relayed.** Debt rather than an enhancement: the SPEC names the record and nothing may write it. Rule it before [unstamped-session-tree-edit](#unstamped-session-tree-edit), whose marker-keyed refusal must let a waiver-bearing entry through.
+
+### unstamped-session-tree-edit
+
+[spec: SPEC-stamp-before-write.md]
+
+a lead-dispatched stage session can do its whole batch without running `--enter-stage`. This happened at `native-shell-guard` build b5, a cheaper-tier session. No stamp records it, and its dispatch-marker line stayed unconsumed until the successor withdrew it. `check-dispatch-entry` is a commit-msg gate by design (lifecycle-kit/SPEC.md §check-dispatch-entry), so it fires at a commit and never at a tree write. The work rode a sibling's stamp, and the per-session audit trail lost it. The same session deleted `scripts/bash-guard.sh` before the hook swap. That opened a fail-open window for every session, recorded as a recurrence on [settings-hook-command-path-gate](#settings-hook-command-path-gate).
+
+**Run at spec:** `grep -n "session_id\|agent_id" native/src/hook/*.rs`. `agent-dispatch-guard` reads a `PreToolUse` payload's `agent_id` (`native/src/hook/dispatch.rs`, the `nested` read), and the `SubagentStop` log shows that `session_id` is the lead's. So a dispatched caller is identified by `agent_id` and `agent_type`, and never by `session_id`.
+
+**Specified 2026-09-24:** the workflow-state guard gains a second rule keyed on the caller: a Write/Edit is refused when the caller's `agent_type` is a configured stage-session type and its `agent_id` carries no stamp. The rule is never keyed on the marker, so the lead, and a stamped sibling's subagents, are outside its reach.
+
+**Cost while deferred:** an unstamped session's edits are indistinguishable in the audit trail from its stamped sibling's. Filed 2026-09-24 to the gap inbox by the `native-shell-guard` lead; promoted at that iteration's close. Owner lookup: `dispatch marker`, `never entered`, `dispatch-withdraw` in this file: none.
+
+**Selected for `silent-guard-gaps` — operator direction 2026-09-24, lead-relayed.** Admitted on the trust arm: a stamp is the record an adopter trusts for who did the work. Its proposed member takes the decline channel [hook-decline-model-invisible](#hook-decline-model-invisible) settles, so rule that one first.
+
 ## Technical Debt
 
 ## Deferred
@@ -420,24 +502,6 @@ governed prose asserts what `.workflow/validate-baseline.txt` holds, and nothing
 
 **Cost while deferred:** low and slow, but it recurs on exactly the readers who most need the file — a cohort pricing criterion 5 reads the prose first. Filed 2026-08-14 by close, from its own gap-inbox drain and staleness review; kept in Deferred at the 2026-08-24 eviction review on the trigger above and on the live slug it names.
 
-### settings-hook-command-path-gate
-
-[cost: event/high] [surface: context-kit] [recurrence: 2026-09-24]
-
-a hook registration in `.claude/settings.json` whose `command` names a renamed or deleted script reds nowhere and fails silently at run time.
-
-**Probed at the drain, not reasoned:** `check-settings-paths` resolves command tokens for `permissions.allow[]` only (`native/src/gates/settings_paths.rs`, whose `allow_entries` reads `/permissions/allow`); the sole other reader of `/hooks` in the tree is the **emitter** `native/src/emit/enforcement_map.rs`, which renders `PreToolUse` and `SessionStart` command paths into the enforcement map **without resolving them against the tree** — a deleted script still renders a row — and does not read `/hooks/SubagentStop` at all, so this iteration's new registration is invisible to the projection as well as to every gate.
-
-**Recurred 2026-09-24** at `native-shell-guard` build. The Bash hook named `scripts/bash-guard.sh`, which was deleted from the working tree before the registration was swapped to `--hook shell-guard`. The shell guard failed open in every session until the swap, and the swap commit's settings diff shows the old path. A commit-time gate would not have covered that uncommitted window, only the commit that landed it.
-
-**Two halves, and the second is the cheaper one.** Path resolution is the walk `check-settings-paths` already owns, so widening its subject from one JSON pointer to two is a small port-side change; extending the enforcement map's hook-event roster is a docs-projection ruling about what belongs on that page, not a gate.
-
-**Why design-pending:** whether the widened subject stays inside `check-settings-paths` or mints a second gate name is canon-kit's new-names litmus, and the projection half is a scope call on the enforcement page that nobody has taken.
-
-**Cost while deferred:** a broken hook is invisible until the behaviour it guards silently stops happening — the failure mode with no red anywhere and no user-visible symptom. Filed 2026-08-22 at spec while surveying context-kit's settings gates; drained at that iteration's close, which re-verified the claim and found the enforcement-map reader it missed.
-
-**Selected for `silent-guard-gaps` — operator direction 2026-09-24, lead-relayed; the lead unit.** Admitted on the filter's trust arm: a guard an adopter relies on goes dark with no signal. Probed at scope: `.claude/settings.json` also registers `SubagentStop`, which the emitter does not read.
-
 ### site-health-issue-venue-unwanted
 
 [cost: event/low] [surface: site-kit] [not-icebox-eligible: 2026-09-21 operator-ruled, cron-armed]
@@ -512,22 +576,6 @@ the consumer's local-only companion files have read triggers at three skills and
 
 **Cost while deferred:** local-only surfaces drift until a consult happens to audit them. Filed 2026-09-18 to the gap inbox by the consult that audited the local-only files, after `external-install-evidence`'s close; promoted to Deferred at the next scope.
 
-### split-posture-waiver-writer
-
-[cost: event/high] [surface: lifecycle-kit] [recurrence: 2026-09-23]
-
-an operator-ruled `align-waived` line has no sanctioned writer. lifecycle-kit/SPEC.md §check-stage-entry (C) and the align template record it in `.workflow/WORKFLOW-STATE.txt`, but the workflow-state guard (`native/src/hook/workflow_state.rs`) blocks every Write/Edit of that file, the shell guard blocks a shell append to it as a redirect into a tracked file, and the `--rewrite` arm refuses it (`native/src/emit/rewrite.rs`, `is_state_file`), and `--enter-stage` has no waiver arm. Only an operator-run shell append lands one today.
-
-**Recurred.** Filed 2026-07-19 as the split-lead posture's gap, where the lead rules the waiver but writes no lifecycle state and a build session carried the line as a piggyback; iceboxed at an age eviction. Re-filed 2026-09-23 at this iteration's spec, recording the operator's align waiver, and the piggyback that worked in July is now guard-blocked for every session.
-
-**Folded in, same help line:** `check-stage-entry`'s assertion-C help (`native/src/gates/stage_entry.rs`, the `record a deliberate waiver` line) prints `k.state`, and `--enter-stage` hands the gate a scratch state under `GATE_SDK_TMP_DIR` on a real entry as well as a simulated one (`native/src/emit/enter_stage.rs`, the candidate-stamp temp build). So the relayed recovery names a file that is gone after the run, and so does every other `k.state` line that relay carries. **Probed at the drain:** both sites read.
-
-**Why design-pending:** the options on record are (a) a stage session carries a pending waiver into its entry commit, (b) a waiver arm on `--enter-stage` that takes a ruling reference and never self-issues, (c) the dispatch worklist channel. Choosing one is a seam ruling between the split posture's lead-writes-nothing rule and the state machine. The help line's recovery is whatever that ruling makes it. Separately, the relay should name the real state path, not the scratch copy.
-
-**Cost while deferred:** each operator-waived align makes someone route around a guard or hand-append, and every assertion-C refusal points its reader at a vanished scratch file. Promoted from the icebox 2026-09-23 at `guard-harness-seams` close on the recurrence. Owner lookup: `waiv`, `align-waived` in this file: only this slug.
-
-**Selected for `silent-guard-gaps` — operator direction 2026-09-24, lead-relayed.** Debt rather than an enhancement: the SPEC names the record and nothing may write it. Rule it before [unstamped-session-tree-edit](#unstamped-session-tree-edit), whose marker-keyed refusal must let a waiver-bearing entry through.
-
 ### guard-placeholder-letter-paths
 
 [cost: event/low] [surface: guard-kit]
@@ -537,50 +585,6 @@ the shell-guard member reads the literal letters `SQ` or `DQ` in a redirect targ
 **Why not fixed at the drain:** a substring test against the raw command cannot tell a placeholder from literal letters. `cmd > .tmp/"$x"` skeletons to `.tmp/DQ`, and a literal `.tmp/DQ` elsewhere in the same raw command would pass the test. The grant would then answer for a target it never read. The sound fix maps placeholders by position: the skeleton hands back its placeholder spans, or uses a token no command text can spell. That is a skeleton-contract change (guard-kit/SPEC.md §The generic ruleset, the skeleton paragraph).
 
 **Cost while deferred:** a launch recorded under a directory whose name spells `SQ` or `DQ` is not granted and costs a permission decision. The direction is fail-closed. Filed 2026-09-24 to the gap inbox at `native-shell-guard` build; promoted at that iteration's close, which re-verified both sites. The bullet's shell-library half is moot, because `guard-kit/lib/guard.sh` retired in that iteration. Owner lookup: `SQ or DQ`, `placeholder` in this file: none.
-
-### enforcement-map-member-owner
-
-[cost: event/low] [surface: gate-sdk]
-
-`--emit enforcement-map` attributes every `--hook` member row to gate-sdk and labels it with the front-end path. `hook_sections` (`native/src/emit/enforcement_map.rs`) takes the first slash-bearing token of the hook command, so four Guards rows of `docs/enforcement.md` read `gate-sdk/bin/run-gates.sh`: the `shell-guard` Bash row, two Agent rows and the Write|Edit row. The table cannot tell members apart or credit the owning kit.
-
-**Premise corrected at the drain:** the bullet named the `HOOKS` table's owning kit as the attribution source. The table (`native/src/hook/mod.rs`) carries a name, a function and a knob slice per member, and no owner. The fix needs an owner per member first, either a fourth column or a derivation from the kit SPEC that defines each member. Then the row reads the `--hook` operand as its surface. Choosing the owner source is a gate-sdk/SPEC.md §enforcement-map ruling. This is also why the drain did not fix it.
-
-**Sibling, not a duplicate:** [settings-hook-command-path-gate](#settings-hook-command-path-gate) owns resolving a hook's command path against the tree, and that entry's projection half reads the same `/hooks` parse. A `--hook <member>` registration has two things to resolve: the front end and the member name.
-
-**Cost while deferred:** the published enforcement page credits every guard member to gate-sdk. Filed 2026-09-24 to the gap inbox at `native-shell-guard` build b5b; promoted at that iteration's close. Owner lookup: `enforcement-map`, `hook member`, `member name` in this file: only the sibling above.
-
-**Selected for `silent-guard-gaps` — operator direction 2026-09-24, lead-relayed.** Admitted on the trust arm: the published enforcement map is what an adopter reads to trust what enforces. Batch it with the sibling above; both edit `hook_sections`' `/hooks` parse.
-
-### unstamped-session-tree-edit
-
-[cost: event/low] [surface: lifecycle-kit]
-
-a lead-dispatched stage session can do its whole batch without running `--enter-stage`. This happened at `native-shell-guard` build b5, a cheaper-tier session. No stamp records it, and its dispatch-marker line stayed unconsumed until the successor withdrew it. `check-dispatch-entry` is a commit-msg gate by design (lifecycle-kit/SPEC.md §check-dispatch-entry), so it fires at a commit and never at a tree write. The work rode a sibling's stamp, and the per-session audit trail lost it. The same session deleted `scripts/bash-guard.sh` before the hook swap. That opened a fail-open window for every session, recorded as a recurrence on [settings-hook-command-path-gate](#settings-hook-command-path-gate).
-
-**Inferred, not run:** a pre-write refusal would have stopped the session before its first edit. A PreToolUse member on Write|Edit|Bash could refuse a tree write from a session whose id carries no stamp while the marker holds a line. Whether a session id is readable at hook time for this, and how it treats the lead's gap-inbox commit, is unestablished — `grep -n session_id native/src/hook/*.rs`
-
-**Why design-pending:** a write-time refusal keyed on the marker reaches every session sharing the tree, the lead included. Where it sits beside `check-dispatch-entry`'s stated honest limits is a lifecycle-kit ruling.
-
-**Cost while deferred:** an unstamped session's edits are indistinguishable in the audit trail from its stamped sibling's. Filed 2026-09-24 to the gap inbox by the `native-shell-guard` lead; promoted at that iteration's close. Owner lookup: `dispatch marker`, `never entered`, `dispatch-withdraw` in this file: none.
-
-**Selected for `silent-guard-gaps` — operator direction 2026-09-24, lead-relayed.** Admitted on the trust arm: a stamp is the record an adopter trusts for who did the work. Its proposed member takes the decline channel [hook-decline-model-invisible](#hook-decline-model-invisible) settles, so rule that one first.
-
-### hook-decline-model-invisible
-
-[cost: event/high] [surface: gate-sdk]
-
-a hook member's decline (`hook::decline`, `native/src/hook/mod.rs`) writes to stderr at exit 0 with no envelope. On a PreToolUse call only the operator's transcript shows it, so the session model never learns its guard stopped enforcing. gate-sdk/SPEC.md §The harness-integration arm states that channel, so the fix amends it. An `additionalContext` advise envelope would reach the model with no verdict change.
-
-**Cost while deferred:** a member with an unresolved knob fails open silently from the session's side, and the one reader able to repair the knob is never told. Filed 2026-09-24 to the gap inbox at `native-shell-guard`'s close; promoted 2026-09-24 at the next scope, so the record is late and says so. Owner lookup: `hook::decline`, `additionalContext` in this file: none. **Selected for `silent-guard-gaps` — operator direction 2026-09-24, lead-relayed;** admitted on the trust arm.
-
-### workflow-run-path-unresolved
-
-[cost: event/low] [surface: gate-sdk]
-
-a `.github/workflows` `run:` step naming a deleted script reds nowhere. `gates.yml`'s `install-smoke-sh-windows` leg kept `bash guard-kit/gate-tests/guard-read-path.test.sh` after `native-shell-guard` deleted that file, with the full battery green; that close's stale-identifier audit found it and removed the step. The class is a path-existence read over `run:` bodies. Candidate homes: check-docs-cmd's (A) invocation predicate over the `run:` extractor that §check-action-run-shell and `native/src/actions.rs` already own.
-
-**Cost while deferred:** a deleted script's CI step reds only on the push that runs it, spending a push-budget round. Filed 2026-09-24 to the gap inbox at `native-shell-guard`'s close; promoted 2026-09-24 at the next scope. Owner lookup: `deleted script`, `run: step` in this file: only [settings-hook-command-path-gate](#settings-hook-command-path-gate), a sibling on another surface. **Selected for `silent-guard-gaps` — operator direction 2026-09-24, lead-relayed, as an explicit exception to the enhancement admission filter:** it shares the set's command-path surface, so it rides no extra stage.
 
 ## Icebox
 
