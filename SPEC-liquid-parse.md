@@ -93,8 +93,8 @@ In site-kit/SPEC.md: a new `## check-docs-liquid-parse` section after §check-do
 - **`site-kit/README.md`:** the gate roster, a prose line beside render-fidelity's, and the dependency sentence: the gate needs ruby with the `liquid` gem.
 - **`site-kit/smoke/install.sh`** registers it beside `check-docs-render-fidelity`, which has the same disposition over the same surface: the smoke writes `docs/`, which is what the registration accounting's predicate asks (gate-sdk/SPEC.md §Consumer smoke).
 - **`.github/workflows/gates.yml`:** the render-fidelity deps step also installs `liquid:4.0.4`, the Pages pin, and its comment names both gates.
-- **installer/SPEC.md §The docs-site tier and `docs/install.md`'s Requirements prose:** the tier needs Ruby with the `kramdown-parser-gfm` gem, and with the `liquid` gem where the consumer registers the Liquid gate.
-- **`docs/site-architecture.md` §Which parser serves which file:** Jekyll runs Liquid over a `docs/` page before kramdown renders it, and the Liquid half is site-kit/SPEC.md §check-docs-liquid-parse's. That page's roster pointer names both site-kit sections.
+- **installer/SPEC.md §Requirements' docs-site-tier bullet and `docs/install.md`'s Requirements prose:** the tier needs Ruby with the `kramdown-parser-gfm` gem, and with the `liquid` gem where the consumer registers the Liquid gate.
+- **`docs/site-architecture.md` §Page-authoring rules' "Which parser serves which file" paragraph:** Jekyll runs Liquid over a `docs/` page before kramdown renders it, and the Liquid half is site-kit/SPEC.md §check-docs-liquid-parse's. That page's roster pointer names both site-kit sections.
 
 ### (4) The push watch reads the deployment run {mechanical}
 
@@ -139,7 +139,7 @@ Roster from reading site-kit/SPEC.md whole; `git grep -l "check-docs-highlight-c
 - site-kit/SPEC.md: the opening paragraph, §Layout and configuration, §Knob defaults and the new §check-docs-liquid-parse (delta 1).
 - `site-kit/checks/check-docs-liquid-parse.gate`, `native/src/gates/docs_liquid_parse.rs` (delta 1).
 - `site-kit/gate-tests/check-docs-liquid-parse/`, `site-kit/gate-tests/check-docs-liquid-parse-parser.test.sh` (delta 2).
-- `scripts/gates.list`, `native/src/knobs/site_kit.rs`, `native/src/gates/mod.rs`, `site-kit/README.md`, `site-kit/smoke/install.sh`, `.github/workflows/gates.yml`, installer/SPEC.md §The docs-site tier, `docs/install.md`, `docs/site-architecture.md` (delta 3).
+- `scripts/gates.list`, `native/src/knobs/site_kit.rs`, `native/src/gates/mod.rs`, `site-kit/README.md`, `site-kit/smoke/install.sh`, `.github/workflows/gates.yml`, installer/SPEC.md §Requirements, `docs/install.md`, `docs/site-architecture.md` (delta 3).
 - `.claude/commands/close.md`, `CLAUDE.md` (delta 4).
 - `.workflow/gap-inbox.md` (delta 5), written at spec.
 - `.workflow/release-declarations.md`, a Tightened gates bullet (delta 1): `check-docs-liquid-parse` is new in site-kit, `on-surface`, with the knob `SITE_KIT_LIQUID_PARSER` defaulting to a ruby Liquid parse. It needs ruby with the `liquid` gem where registered. Every Liquid-processed docs file must parse, so a page carrying an unbalanced `{{` or an unclosed tag reds.
