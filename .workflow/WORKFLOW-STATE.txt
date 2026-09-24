@@ -4,13 +4,4 @@
 
 ---
 
-native-shell-guard scope aea4684a 2026-09-24 f8254551
-native-shell-guard spec a39f4f4d 2026-09-24 8d6f6b6c
-native-shell-guard align a7914215 2026-09-24 1c7c3051
-native-shell-guard build a3421fac 2026-09-24 2f75d332
-native-shell-guard build a5cc5d42 2026-09-24 0c8cb228
-native-shell-guard build a15bb23d 2026-09-24 89a3abc8
-native-shell-guard build a389cc32 2026-09-24 edfdaab9
-native-shell-guard build a0e5965f 2026-09-24 7710dd8a
-native-shell-guard validate abe3d081 2026-09-24 619c23be
-native-shell-guard close a972a324 2026-09-24 1c425705
+— scope aa256a0d 2026-09-24 be185fad
