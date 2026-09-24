@@ -8,6 +8,26 @@
 
 ## New Features
 
+### pages-liquid-break-undetected
+
+[spec: SPEC-liquid-parse.md]
+
+`pages-build-deployment` failed on two pushes and nothing in the iteration saw it, so checkwright.dev stayed frozen at an older tree and the hosted install scripts were 404. Cause: Jekyll runs Liquid over every docs page, and the generated mirror of gate-sdk/SPEC.md carried an unbalanced `${{` in inline code. `1fb12fa3` hotfixed the emitter: the docs-mirror arm wraps each mirrored body in a raw block and refuses a source carrying the block's closing tag. `pages-build-deployment` run 36042688147 is green. The detection half is what remains, and two checks miss it. `check-docs-render-fidelity` renders through kramdown only, never Liquid, so a hand-authored docs page with a Liquid-significant token still reds nothing. And the close binding's push watch reads the `gates` workflow alone (`.claude/commands/close.md` push-budget), so a red deployment goes unseen.
+
+**Deliverable:** a Liquid-parse assertion over the published pages, as a renderer contract under site-kit's knob convention, plus a push watch that also reads the push's deployment run. Any new knob owes an amendment.
+
+**Cost while deferred:** the next Liquid-significant token on a docs page freezes the site silently, and the hosted one-liner goes unserved again. Filed 2026-09-24 to the gap inbox after adopter-onramp's close; the fire was hotfixed the same day under operator direction, and this entry, promoted 2026-09-24 at the next scope, is its detection half. Owner lookup: `liquid`, `jekyll`, `pages-build` in this file — none; owner site-kit/SPEC.md §check-docs-render-fidelity and the close binding. **Selected for `hosted-install-path` — operator direction 2026-09-24, lead-relayed;** a feature; spec authored SPEC-liquid-parse.md and promoted it 2026-09-24.
+
+### ps-producer-liveness-record
+
+[spec: SPEC-ps-producer-record.md] [observed-by: gates workflow]
+
+a producer backgrounded through the PowerShell tool writes no liveness record, so rule `git_mutation_under_producer` cannot see it. Rule `background_no_record` has no PowerShell form: its corrective would steer to a record carrying a Windows process id, and whether the liveness predicate's non-unix arm (`signal_zero` in `native/src/evidence.rs`: Git Bash `kill -0`, then `ps`) answers one on native Windows is unmeasured. guard-kit/SPEC.md §The hook on native Windows states the limit.
+
+**Deliverable:** that measurement on a Windows runner, then the rule's PowerShell form, or a SPEC boundary note stating why none is buildable.
+
+**Cost while deferred:** on a Windows host a PowerShell-launched producer leaves tracked-tree mutations unguarded for its lifetime. Filed 2026-09-24 to the gap inbox by adopter-onramp's build; promoted 2026-09-24 at its close: →fix fails because the missing fact is a native-Windows observation no Linux command produces. Owner lookup: `background_no_record`, `script_interpreter`, `scratch-run` in this file — none; owner guard-kit/SPEC.md rule `background_no_record` and evidence-kit/SPEC.md §The producer-liveness lock. **Selected for `hosted-install-path` — operator direction 2026-09-24, lead-relayed;** a feature; spec authored SPEC-ps-producer-record.md and promoted it 2026-09-24. Spec's reading of the deliverable: a misread predicate is answered by a native Windows leg, which is buildable, so the boundary-note limb is not taken, and the amendment states the act for each measurement outcome. It spans guard-kit, evidence-kit and gate-sdk on both outcomes, so it is cross-component. Done is observed on the `install-smoke-sh-windows` run once the liveness step is binding.
+
 ## Technical Debt
 
 ### install-ps1-octet-under-ps51
@@ -37,26 +57,6 @@ guard-kit/SPEC.md §The generic ruleset states "Nothing cites a rule by position
 **Cost while deferred:** a runtime divergence on a real ARM64 pwsh host surfaces at an adopter, not a run, and since the triple joined at adopter-onramp's close that host is served an artifact through the unwitnessed arm. Filed 2026-09-24 to the gap inbox by adopter-onramp's build; promoted 2026-09-24 at its close. **Selected for `hosted-install-path` — operator direction 2026-09-24, lead-relayed;** debt, since the leg's posture derives from an existing roster and adds no governed name.
 
 ## Deferred
-
-### pages-liquid-break-undetected
-
-[cost: event/high] [surface: site-kit]
-
-`pages-build-deployment` failed on two pushes and nothing in the iteration saw it, so checkwright.dev stayed frozen at an older tree and the hosted install scripts were 404. Cause: Jekyll runs Liquid over every docs page, and the generated mirror of gate-sdk/SPEC.md carried an unbalanced `${{` in inline code. `1fb12fa3` hotfixed the emitter: the docs-mirror arm wraps each mirrored body in a raw block and refuses a source carrying the block's closing tag. `pages-build-deployment` run 36042688147 is green. The detection half is what remains, and two checks miss it. `check-docs-render-fidelity` renders through kramdown only, never Liquid, so a hand-authored docs page with a Liquid-significant token still reds nothing. And the close binding's push watch reads the `gates` workflow alone (`.claude/commands/close.md` push-budget), so a red deployment goes unseen.
-
-**Deliverable:** a Liquid-parse assertion over the published pages, as a renderer contract under site-kit's knob convention, plus a push watch that also reads the push's deployment run. Any new knob owes an amendment.
-
-**Cost while deferred:** the next Liquid-significant token on a docs page freezes the site silently, and the hosted one-liner goes unserved again. Filed 2026-09-24 to the gap inbox after adopter-onramp's close; the fire was hotfixed the same day under operator direction, and this entry, promoted 2026-09-24 at the next scope, is its detection half. Owner lookup: `liquid`, `jekyll`, `pages-build` in this file — none; owner site-kit/SPEC.md §check-docs-render-fidelity and the close binding. **Selected for `hosted-install-path` — operator direction 2026-09-24, lead-relayed;** a feature, so spec authors its amendment and promotes it.
-
-### ps-producer-liveness-record
-
-[cost: event/high] [surface: guard-kit]
-
-a producer backgrounded through the PowerShell tool writes no liveness record, so rule `git_mutation_under_producer` cannot see it. Rule `background_no_record` has no PowerShell form: its corrective would steer to a record carrying a Windows process id, and whether the liveness predicate's non-unix arm (`signal_zero` in `native/src/evidence.rs`: Git Bash `kill -0`, then `ps`) answers one on native Windows is unmeasured. guard-kit/SPEC.md §The hook on native Windows states the limit.
-
-**Deliverable:** that measurement on a Windows runner, then the rule's PowerShell form, or a SPEC boundary note stating why none is buildable.
-
-**Cost while deferred:** on a Windows host a PowerShell-launched producer leaves tracked-tree mutations unguarded for its lifetime. Filed 2026-09-24 to the gap inbox by adopter-onramp's build; promoted 2026-09-24 at its close: →fix fails because the missing fact is a native-Windows observation no Linux command produces. Owner lookup: `background_no_record`, `script_interpreter`, `scratch-run` in this file — none; owner guard-kit/SPEC.md rule `background_no_record` and evidence-kit/SPEC.md §The producer-liveness lock. **Selected for `hosted-install-path` — operator direction 2026-09-24, lead-relayed;** a feature, so spec authors its amendment and promotes it: either limb widens a governed rule's shells clause or rewrites §The hook on native Windows' stated limit, and the PowerShell form adds a recorded-launch spelling. The amendment may also reach evidence-kit's liveness predicate, which would make it cross-component.
 
 ### ps-scratch-script-unsteered
 
