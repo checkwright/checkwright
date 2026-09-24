@@ -8,6 +8,56 @@
 
 ## New Features
 
+### guard-placeholder-letter-paths
+
+[spec: SPEC-placeholder-mark.md]
+
+the shell-guard member reads the literal letters `SQ` or `DQ` in a redirect target or a knob value as the skeleton's quoted-span placeholder. Rule `bounded_wait`'s recorded-launch grant declines on such a target (`native/src/guard/rules/liveness.rs`, the `tgt.contains("SQ")` test) and rule `git_c_root`'s knob echo skips such a value (`native/src/guard/rules/spelling.rs`). So a real path like a `mktemp` name spelling `DQ` is refused a grant. Three guard-kit suites already redraw a `mktemp` name carrying the letters.
+
+**Why not fixed at the drain:** a substring test against the raw command cannot tell a placeholder from literal letters. `cmd > .tmp/"$x"` skeletons to `.tmp/DQ`, and a literal `.tmp/DQ` elsewhere in the same raw command would pass the test. The grant would then answer for a target it never read. The sound fix maps placeholders by position: the skeleton hands back its placeholder spans, or uses a token no command text can spell. That is a skeleton-contract change (guard-kit/SPEC.md §The generic ruleset, the skeleton paragraph).
+
+**Cost while deferred:** a launch recorded under a directory whose name spells `SQ` or `DQ` is not granted and costs a permission decision. The direction is fail-closed. Filed 2026-09-24 to the gap inbox at `native-shell-guard` build; promoted at that iteration's close, which re-verified both sites. The bullet's shell-library half is moot, because `guard-kit/lib/guard.sh` retired in that iteration. Owner lookup: `SQ or DQ`, `placeholder` in this file: none.
+
+**Selected for `adopter-onramp` — operator direction 2026-09-24, lead-relayed.** Reshapes [guard-powershell-tool-unguarded](#guard-powershell-tool-unguarded): the PowerShell reader needs the same quoted-span skeleton, so the positional placeholder contract lands first. Re-verified at scope: `native/src/guard/rules/liveness.rs`:338 still tests the raw target for the letters.
+
+### guard-powershell-tool-unguarded
+
+[spec: SPEC-powershell-reader.md]
+
+on native Windows the harness's `PowerShell` tool is on by default beside `Bash`, and guard-kit's hook matches `Bash` alone, so a PowerShell-tool call is neither steered nor logged to the friction log. Widening the matcher is no fix: every generic rule reads bash grammar.
+
+**Probed at filing:** the harness tools reference names the tool `PowerShell` and advises matching `Bash|PowerShell`; `grep -rn -i 'powershell tool' guard-kit` finds nothing before guard-kit/SPEC.md §The hook on native Windows, which states the bypass as an honest limit.
+
+**Slice 2 of `shell-guard-native-shell`, sliced at its spec (2026-09-24).** Slice 1 is the `--hook shell-guard` member, which picks a shell reader by `tool_name` and exits clean on a tool it has no reader for. It has a reader seam: views, segments, statements, redirect pairs and the harness view, with each rule declaring the shells it applies to. The consumer-rule command sees every payload. The member's own design is guard-kit/SPEC.md §The shell guard. **Owed here:** a PowerShell reader behind that seam, covering single-quoted, expandable and here-string quoting, its statement and pipeline separators, and its comment forms. Also owed: each generic rule's applicability to PowerShell decided, with the rules that model PowerShell; `--guard-json view` over PowerShell payloads; the `Bash|PowerShell` matcher in `templates/settings-hooks.json`; and a PowerShell decision table run on the native-Windows leg. Then §The hook on native Windows' PowerShell limit retires.
+
+**Why design-pending:** the rule applicability and the PowerShell grammar the reader must model are undesigned. Slice 1 keeps the bash port behaviour-preserving, and builds the seam no wider than its own rules call.
+
+**Selected for `adopter-onramp` — operator direction 2026-09-24, lead-relayed; the lead unit.** Admitted on the filter's trust arm: a Windows adopter's default-on shell tool bypasses the guard they installed. Re-verified at scope: the matcher is still `Bash` alone and guard-kit/SPEC.md §The hook on native Windows still states the limit. [guard-placeholder-letter-paths](#guard-placeholder-letter-paths) lands first.
+
+**Cost while deferred:** on a Windows host a command routed through the PowerShell tool bypasses every steer and block, and the close-stage triage never sees it. Filed 2026-09-18 at `windows-adopter-path`'s spec by operator direction (lead-relayed), when `guard-hook-windows-substrate` was designed. Owner lookup: `PowerShell tool`, `USE_POWERSHELL_TOOL`, `Bash|PowerShell` — none.
+
+### queue-migrate-bold-split
+
+[spec: SPEC-bold-lead-in.md]
+
+queue-kit/SPEC.md §The queue-migrate arm starts a new paragraph at any continuation line that opens with a bold lead-in. A wrapped sentence whose next line happens to start with a bold span is therefore cut in two mid-sentence. This happened twelve times in this repo's own conversion, and re-running `--emit queue-migrate` on the pre-conversion queue (`4e205fc2^`) reproduces the splits. queue-kit-unwrap's close joined them by hand.
+
+**Deliverable:** a paragraph-start test that can tell a bold lead-in (for example, a bold span ending in `:` or `.`, or a preceding line that ends a sentence) from a wrapped bold span, with a fixture row for the mid-sentence case.
+
+**Cost while deferred:** an adopter migrating a wrapped queue gets broken paragraphs that no gate reports. Filed 2026-09-22 at queue-kit-unwrap's close drain. Promoted rather than fixed because the rule is the SPEC's own and changing it is a spec amendment. Owner: queue-kit/SPEC.md §The queue-migrate arm. **Selected for `adopter-onramp` — operator direction 2026-09-24, lead-relayed:** a defect on an adopter's migration path.
+
+### install-hosted-one-liner
+
+[spec: SPEC-hosted-install.md]
+
+the install page's no-Node path is four steps per system, not one line. A hosted, tracked bootstrap pair — `curl -fsSL https://checkwright.dev/install.sh | sh` and `irm https://checkwright.dev/install.ps1 | iex` — would fetch a pinned release, verify it and run `init` in one command. installer/SPEC.md §The dependency boundary refuses a piped remote script, because an unreviewed script fed straight to a shell contradicts the page's opening claim. That refusal is SPEC text, never an operator ruling: the 2026-09-22 direction (`d433e268`) chose per-OS recipes and left it in force without ruling on it.
+
+**Refusal reversed — operator direction 2026-09-24, lead-relayed; no `/consult` owed, since no ruling stands on it.** Bound by the operator's standing intent: native installation with minimal external dependencies, no npx-class dependency. Spec rewrites installer/SPEC.md §The dependency boundary. **Selected for `adopter-onramp`,** admitted on the filter's time-to-first-value arm.
+
+**Deliverable:** the two scripts as twins, a pinned-version line with a freshness gate against the newest tag, and a CI witness that runs each one-liner against a packed payload. `irm` cannot read `file://`, so the PowerShell witness needs a local server or a base-URL override.
+
+**Cost while deferred:** a first-contact adopter copies a four-step recipe where a one-liner would do. Filed 2026-09-22 at spec, when the operator's direction for install-path-developer-first chose per-OS recipes and deferred the one-liner. Owner: installer/SPEC.md §The dependency boundary.
+
 ## Technical Debt
 
 ### gate-binary-platform-roster-holes
@@ -66,16 +116,6 @@ this host lacks `pwsh` and `dash`, so the front-end parity check's PowerShell ha
 
 **Cost while deferred:** a unit touching a PowerShell or dash path risks a second watched push. Filed 2026-09-23 to the gap inbox on an operator suggestion, lead-relayed, after gate-sdk-blind-spots' close; promoted 2026-09-23 at the next scope. Owner lookup: `docker`, `dash`, `pwsh` in this file — `pwsh` hits only [instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set](#instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set), whose subject is a CI leg's binding transition, not a local run.
 
-### queue-migrate-bold-split
-
-[cost: event/low] [surface: queue-kit]
-
-queue-kit/SPEC.md §The queue-migrate arm starts a new paragraph at any continuation line that opens with a bold lead-in. A wrapped sentence whose next line happens to start with a bold span is therefore cut in two mid-sentence. This happened twelve times in this repo's own conversion, and re-running `--emit queue-migrate` on the pre-conversion queue (`4e205fc2^`) reproduces the splits. queue-kit-unwrap's close joined them by hand.
-
-**Deliverable:** a paragraph-start test that can tell a bold lead-in (for example, a bold span ending in `:` or `.`, or a preceding line that ends a sentence) from a wrapped bold span, with a fixture row for the mid-sentence case.
-
-**Cost while deferred:** an adopter migrating a wrapped queue gets broken paragraphs that no gate reports. Filed 2026-09-22 at queue-kit-unwrap's close drain. Promoted rather than fixed because the rule is the SPEC's own and changing it is a spec amendment. Owner: queue-kit/SPEC.md §The queue-migrate arm. **Selected for `adopter-onramp` — operator direction 2026-09-24, lead-relayed:** a defect on an adopter's migration path.
-
 ### retired-citation-referent-rule
 
 [cost: event/low] [surface: queue-kit]
@@ -85,18 +125,6 @@ live entries cite retired slugs in prose, and nothing marks them the same way ('
 **Deliverable:** that ruling, and either the axis or a stated reason the close-stage retired-block read is enough.
 
 **Cost while deferred:** a retired citation's referent can be reached only through history. Filed 2026-09-22 to the gap inbox by the lead on an operator question. The one-off sweep it asked for ran at queue-kit-unwrap's close: it found 28 retired rows plus one name-live row, most already marking retirement, and corrected three inline. Promoted for the rule half. Owner: queue-kit/SPEC.md §The tag algebra and §The queue-edges arm; neither rules on the referent.
-
-### install-hosted-one-liner
-
-[cost: event/high] [surface: installer]
-
-the install page's no-Node path is four steps per system, not one line. A hosted, tracked bootstrap pair — `curl -fsSL https://checkwright.dev/install.sh | sh` and `irm https://checkwright.dev/install.ps1 | iex` — would fetch a pinned release, verify it and run `init` in one command. installer/SPEC.md §The dependency boundary refuses a piped remote script, because an unreviewed script fed straight to a shell contradicts the page's opening claim. That refusal is SPEC text, never an operator ruling: the 2026-09-22 direction (`d433e268`) chose per-OS recipes and left it in force without ruling on it.
-
-**Refusal reversed — operator direction 2026-09-24, lead-relayed; no `/consult` owed, since no ruling stands on it.** Bound by the operator's standing intent: native installation with minimal external dependencies, no npx-class dependency. Spec rewrites installer/SPEC.md §The dependency boundary. **Selected for `adopter-onramp`,** admitted on the filter's time-to-first-value arm.
-
-**Deliverable:** the two scripts as twins, a pinned-version line with a freshness gate against the newest tag, and a CI witness that runs each one-liner against a packed payload. `irm` cannot read `file://`, so the PowerShell witness needs a local server or a base-URL override.
-
-**Cost while deferred:** a first-contact adopter copies a four-step recipe where a one-liner would do. Filed 2026-09-22 at spec, when the operator's direction for install-path-developer-first chose per-OS recipes and deferred the one-liner. Owner: installer/SPEC.md §The dependency boundary.
 
 ### disclaimer-beside-its-own-restatement
 
@@ -123,22 +151,6 @@ nothing asserts the roster↔template relation context-kit/SPEC.md §The consume
 **Why design-pending:** the assertable direction is the open question. The ruling forbids the per-template copy, so the negative direction (no template restates a rostered resident obligation) is the one the ruling supports, while the bullet as filed named the positive one (each rostered obligation reaches the templates of the readers it binds). Which the corollary's exception can be expressed in, and whether a grep can tell a sanctioned discharge-differs statement from a restatement, are the two calls. **The worked hard case, found by this close's instruction-tier sweep:** `lifecycle-kit/templates/lead.md`'s journal-disposal block states the kfric obligation's *timing* half and names no channel, which the corollary permits here only because the lead also loads the resident line that does. Any oracle must rule that CLEAN; ruling it a violation is the false positive that would make the check unusable.
 
 **Cost while deferred:** the placement ruling can rot exactly as the obligations it corrected did, with no oracle to catch the next template that ships unserved or doubly served. Filed 2026-09-17 to the gap inbox at build (gate candidate declined under operator direction, 2026-09-17, lead-relayed), promoted at this iteration's close drain. Owner lookup: `Operative residency`, `consumer footprint`, `footprint`, `residency`, `obligation` — none.
-
-### guard-powershell-tool-unguarded
-
-[cost: event/high] [surface: guard-kit]
-
-on native Windows the harness's `PowerShell` tool is on by default beside `Bash`, and guard-kit's hook matches `Bash` alone, so a PowerShell-tool call is neither steered nor logged to the friction log. Widening the matcher is no fix: every generic rule reads bash grammar.
-
-**Probed at filing:** the harness tools reference names the tool `PowerShell` and advises matching `Bash|PowerShell`; `grep -rn -i 'powershell tool' guard-kit` finds nothing before guard-kit/SPEC.md §The hook on native Windows, which states the bypass as an honest limit.
-
-**Slice 2 of `shell-guard-native-shell`, sliced at its spec (2026-09-24).** Slice 1 is the `--hook shell-guard` member, which picks a shell reader by `tool_name` and exits clean on a tool it has no reader for. It has a reader seam: views, segments, statements, redirect pairs and the harness view, with each rule declaring the shells it applies to. The consumer-rule command sees every payload. The member's own design is guard-kit/SPEC.md §The shell guard. **Owed here:** a PowerShell reader behind that seam, covering single-quoted, expandable and here-string quoting, its statement and pipeline separators, and its comment forms. Also owed: each generic rule's applicability to PowerShell decided, with the rules that model PowerShell; `--guard-json view` over PowerShell payloads; the `Bash|PowerShell` matcher in `templates/settings-hooks.json`; and a PowerShell decision table run on the native-Windows leg. Then §The hook on native Windows' PowerShell limit retires.
-
-**Why design-pending:** the rule applicability and the PowerShell grammar the reader must model are undesigned. Slice 1 keeps the bash port behaviour-preserving, and builds the seam no wider than its own rules call.
-
-**Selected for `adopter-onramp` — operator direction 2026-09-24, lead-relayed; the lead unit.** Admitted on the filter's trust arm: a Windows adopter's default-on shell tool bypasses the guard they installed. Re-verified at scope: the matcher is still `Bash` alone and guard-kit/SPEC.md §The hook on native Windows still states the limit. [guard-placeholder-letter-paths](#guard-placeholder-letter-paths) lands first.
-
-**Cost while deferred:** on a Windows host a command routed through the PowerShell tool bypasses every steer and block, and the close-stage triage never sees it. Filed 2026-09-18 at `windows-adopter-path`'s spec by operator direction (lead-relayed), when `guard-hook-windows-substrate` was designed. Owner lookup: `PowerShell tool`, `USE_POWERSHELL_TOOL`, `Bash|PowerShell` — none.
 
 ### config-variant-battery-harness
 
@@ -493,18 +505,6 @@ the consumer's local-only companion files have read triggers at three skills and
 **Held Deferred by the enhancement admission filter** (TRAJECTORY.md §The rulings): new template slots are an enhancement that cuts no time-to-first-value, closes no trust gap and produces no external proof.
 
 **Cost while deferred:** local-only surfaces drift until a consult happens to audit them. Filed 2026-09-18 to the gap inbox by the consult that audited the local-only files, after `external-install-evidence`'s close; promoted to Deferred at the next scope.
-
-### guard-placeholder-letter-paths
-
-[cost: event/low] [surface: guard-kit]
-
-the shell-guard member reads the literal letters `SQ` or `DQ` in a redirect target or a knob value as the skeleton's quoted-span placeholder. Rule `bounded_wait`'s recorded-launch grant declines on such a target (`native/src/guard/rules/liveness.rs`, the `tgt.contains("SQ")` test) and rule `git_c_root`'s knob echo skips such a value (`native/src/guard/rules/spelling.rs`). So a real path like a `mktemp` name spelling `DQ` is refused a grant. Three guard-kit suites already redraw a `mktemp` name carrying the letters.
-
-**Why not fixed at the drain:** a substring test against the raw command cannot tell a placeholder from literal letters. `cmd > .tmp/"$x"` skeletons to `.tmp/DQ`, and a literal `.tmp/DQ` elsewhere in the same raw command would pass the test. The grant would then answer for a target it never read. The sound fix maps placeholders by position: the skeleton hands back its placeholder spans, or uses a token no command text can spell. That is a skeleton-contract change (guard-kit/SPEC.md §The generic ruleset, the skeleton paragraph).
-
-**Cost while deferred:** a launch recorded under a directory whose name spells `SQ` or `DQ` is not granted and costs a permission decision. The direction is fail-closed. Filed 2026-09-24 to the gap inbox at `native-shell-guard` build; promoted at that iteration's close, which re-verified both sites. The bullet's shell-library half is moot, because `guard-kit/lib/guard.sh` retired in that iteration. Owner lookup: `SQ or DQ`, `placeholder` in this file: none.
-
-**Selected for `adopter-onramp` — operator direction 2026-09-24, lead-relayed.** Reshapes [guard-powershell-tool-unguarded](#guard-powershell-tool-unguarded): the PowerShell reader needs the same quoted-span skeleton, so the positional placeholder contract lands first. Re-verified at scope: `native/src/guard/rules/liveness.rs`:338 still tests the raw target for the letters.
 
 ## Icebox
 
