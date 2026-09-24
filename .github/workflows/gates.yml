@@ -2141,7 +2141,7 @@ jobs:
   # carried, as the arm64-Linux sibling carries none of its baseline's extras:
   # this leg is the join predicate's criterion 2 and nothing wider.
   #
-  # **What its first run must show, because no probe off this host could.**
+  # **What a green must show, because no probe off this host could.**
   # Git for Windows' POSIX layer is x86_64-only and runs emulated here, so
   # `uname -m` reports x86_64 on this host exactly as on the x64 one, and the
   # bootstrap's `host_arch` reads the OS's native architecture from the
@@ -2149,7 +2149,8 @@ jobs:
   # every input that decision rests on, and a green is readable as criterion 2
   # only when it shows `rustc -vV` answering an aarch64 Windows host — a rustc
   # emulated as x64 would steer the smoke at the x64 upload and green on the
-  # wrong triple — and the registry value reading `ARM64`. The smoke itself is
+  # wrong triple — and the registry value reading `ARM64`. Run 36016548706, the
+  # run the triple joined on, showed both. The smoke itself is
   # the detector's oracle: its roster is steered at that rustc host alone, so a
   # detector still answering the x64 triple meets the unrostered refusal and
   # reds the leg.
@@ -2158,7 +2159,7 @@ jobs:
     runs-on: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['aarch64-pc-windows-msvc'].runner }}
     continue-on-error: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['aarch64-pc-windows-msvc'].held }}
     # The x64 Windows sibling's ceiling, for its MSYS-fork reason, which an
-    # emulated runtime can only make worse; no arm64 measurement exists yet.
+    # emulated runtime can only make worse; the joining run took 13 minutes.
     timeout-minutes: 90
     permissions:
       contents: read

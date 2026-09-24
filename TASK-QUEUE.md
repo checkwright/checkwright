@@ -40,7 +40,7 @@ a PowerShell script run off a scratch-dir body (`& .tmp\x.ps1`, `.\.tmp\x.ps1`, 
 
 **Deliverable:** a PowerShell bootstrap leg on the arm64 Windows runner, held on the same roster axis as `install-smoke-sh-windows-arm64`.
 
-**Cost while deferred:** a runtime divergence on a real ARM64 pwsh host surfaces at an adopter, not a run. Filed 2026-09-24 to the gap inbox by adopter-onramp's build; promoted 2026-09-24 at its close: →fix fails because the leg mirrors a several-hundred-line CI job that no local host can run, a unit that costs its own watched rounds. Owner lookup: `windows-11-arm`, `Get-HostTarget`, `install-smoke-pwsh` in this file — only the instrument-leg expiry entry, whose subject is the x64 leg's binding transition.
+**Cost while deferred:** a runtime divergence on a real ARM64 pwsh host surfaces at an adopter, not a run, and since the triple joined at adopter-onramp's close that host is served an artifact through the unwitnessed arm. Filed 2026-09-24 to the gap inbox by adopter-onramp's build; promoted 2026-09-24 at its close: →fix fails because the leg mirrors a several-hundred-line CI job that no local host can run, a unit that costs its own watched rounds. Owner lookup: `windows-11-arm`, `Get-HostTarget`, `install-smoke-pwsh` in this file — only the instrument-leg expiry entry, whose subject is the x64 leg's binding transition.
 
 ### side-effect-free-read-arms
 

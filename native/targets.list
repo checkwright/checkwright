@@ -83,14 +83,19 @@
 #     hand-off, sidecar and all — nothing rebuilt, nothing rehashed` — reached
 #     the artifact-present branch at every profile and finished
 #     `INSTALLER-SMOKE: clean`. Both halves, one run, no host-built stand-in.
+#   - The two arm64 lines rest on run 36016548706, one run for both: each
+#     `native-artifacts` leg built its triple on its own runner, and each arm64
+#     install-smoke leg adopted THAT upload from the hand-off, reached the
+#     artifact-present branch (`artifact: <triple> verified in place`) at every
+#     profile and finished `INSTALLER-SMOKE: clean`.
 #
 # This is not a narrowing of the direction — the adopter constraints
 # (gate-sdk/SPEC.md §The adopter constraints) are the direction and this roster
 # is the tree. What keeps the UNROSTERED-HOST refusal the normal
 # path — rather than the dead code the vacuous-green class exists to refuse —
 # is the DECLARED-AND-HELD platform plus the UNDECLARED COMPLEMENT, never the
-# roster's size: a native Windows host meets the refusal as a held platform
-# whose artifact is not yet published, and every host outside docs/install.md
+# roster's size: a host on a held platform meets the refusal as one whose
+# artifact is not yet published, and every host outside docs/install.md
 # §Requirements' declaration block meets it as one the page never declared. A
 # target joins only on the observation above, and never beyond what that
 # section already states.
@@ -117,3 +122,5 @@ x86_64-unknown-linux-gnu
 aarch64-apple-darwin
 x86_64-apple-darwin
 x86_64-pc-windows-msvc
+aarch64-unknown-linux-gnu
+aarch64-pc-windows-msvc
