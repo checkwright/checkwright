@@ -1486,11 +1486,4 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 ## Done
 
-- settings-hook-command-path-gate
-- enforcement-map-member-owner
-- hook-decline-model-invisible
-- workflow-run-path-unresolved
-- split-posture-waiver-writer
-- unstamped-session-tree-edit
-
 ## Lessons Learned
