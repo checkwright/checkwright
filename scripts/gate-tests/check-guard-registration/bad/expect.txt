@@ -6,5 +6,6 @@ rule `alpha` names the shells `bash` where the table holds `bash`, `powershell`
 the roster's names in order differ from the rule table's in dispatch order
 a rule cited by number (`rule 2`)
 a rule cited by number (`rule-5`)
+a rule cited by number (`rules (3`)
 `rule `omega`` names `omega`, which no roster item carries
 `guard-kit rule `retired_name`` names `retired_name`, which no roster item carries

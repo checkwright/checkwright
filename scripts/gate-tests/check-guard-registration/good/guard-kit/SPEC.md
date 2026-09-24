@@ -7,7 +7,7 @@ Prose before the roster cites rule `alpha` and rules `beta` and `gamma`, and rul
 ### The rule roster
 
 - **First rule** (`alpha`) — Declares `sq dq hd`. Blocked.
-  A continuation line citing rule `gamma`'s arm (B).
+  A continuation line citing rule `gamma`'s arm (B) and its clause (2), no ordinal.
 
   - **(a) An arm**: its own bold title carries no name token.
 - **Second rule** (`beta`) — Declares `raw`, `sq dq hd` and `dequoted`. Advised; the raw view spells the corrective.

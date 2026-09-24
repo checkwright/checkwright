@@ -2,7 +2,7 @@
 
 ## The generic ruleset
 
-Prose cites rule `omega`, which no item carries, and rule 2 by number, and rule-5 hyphenated.
+Prose cites rule `omega`, which no item carries, and rule 2 by number, and rule-5 hyphenated, and rules (3, 4) parenthesized.
 
 ### The rule roster
 

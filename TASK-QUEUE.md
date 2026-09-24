@@ -20,14 +20,6 @@ a producer backgrounded through the PowerShell tool writes no liveness record, s
 
 ## Technical Debt
 
-### guard-ordinal-citation-unheld
-
-guard-kit/SPEC.md §The generic ruleset states "Nothing cites a rule by position", but `check-guard-registration`'s citation arm reads only the backticked-name grammar, so "rule" or "rules" followed by a bare or parenthesized ordinal passes. Attested once: after the name-citation move, rules `allowlist_chain` and `git_rewrite` still read "Placed after the auto-allow rules (16, 17, 18, 19)", and `git_rewrite` read "(20)". Fixed inline at adopter-onramp's close; no positional citation survives in guard-kit/SPEC.md today.
-
-**Deliverable:** an assertion in `check-guard-registration` that reds a rule-noun followed by an ordinal over the guard-kit corpus, with its fixture pair.
-
-**Cost while deferred:** a positional citation rots silently at the next rule insertion. Filed 2026-09-24 to the gap inbox by adopter-onramp's close; promoted 2026-09-24 at the next scope. Owner lookup: `by position`, `ordinal`, `check-guard-registration` in this file — none; owner guard-kit/SPEC.md §check-guard-registration. **Selected for `hosted-install-path` — operator direction 2026-09-24, lead-relayed;** debt, since it converges the gate on a rule its SPEC already states.
-
 ## Deferred
 
 ### ps-scratch-script-unsteered
@@ -1430,6 +1422,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 ## Done
 
+- guard-ordinal-citation-unheld
 - install-ps1-octet-under-ps51
 - arm64-pwsh-bootstrap-witness
 - pages-liquid-break-undetected
