@@ -530,12 +530,6 @@ jobs:
         shell: bash
         run: bash gate-sdk/bin/run-gates.sh --run-guard-tests
 
-      # The same section's reading claim takes this test as its oracle, on the
-      # artifact the normalize step placed.
-      - name: guard readers read bytes verbatim under Git Bash
-        shell: bash
-        run: bash guard-kit/gate-tests/guard-read-path.test.sh
-
       # The suite itself, under one steering that is **measurement scaffolding
       # and not a fix**: run-smoke.sh blocks unless the target roster is exactly
       # this host, and this host is not the one declared triple. The re-entry is

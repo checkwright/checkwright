@@ -272,7 +272,7 @@ allow	cat >> .tmp/journal.md 2>&1
 # rule `ro_pipeline` — read-only pipeline auto-allow; a non-roster segment falls through
 allow	grep -rn foo src | head
 fallthrough	grep foo file | awk '{print}'
-# banner tolerance (rules `find_glob` and `cat_file`'s, third caller): a literal echo/printf
+# banner tolerance (rules `find_glob` and `cat_file`'s): a literal echo/printf
 # segment is skipped, but at least one roster read must remain
 allow	echo === | grep foo src
 fallthrough	echo a | echo b
