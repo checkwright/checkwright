@@ -125,7 +125,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash scripts/bash-guard.sh"
+            "command": "bash gate-sdk/bin/run-gates.sh --hook shell-guard"
           }
         ]
       },

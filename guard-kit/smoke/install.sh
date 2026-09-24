@@ -5,7 +5,6 @@
 set -euo pipefail
 : "${SMOKE_KIT_ROOT:?run via run-gates.sh --run-consumer-smoke}"
 
-cp "$SMOKE_KIT_ROOT/templates/bash-guard.sh"     scripts/bash-guard.sh
 cp "$SMOKE_KIT_ROOT/templates/guard-config.knobs" scripts/guard-config.knobs
 
 cat >> scripts/gates.list <<'EOF'
@@ -82,12 +81,12 @@ fi
 } >> .gitignore
 
 set +e
-msg="$(printf '%s' '{"tool_input":{"command":"cd deploy && ls"}}' | bash scripts/bash-guard.sh 2>&1 >/dev/null)"
+msg="$(printf '%s' '{"tool_name":"Bash","tool_input":{"command":"cd deploy && ls"}}' | "$door" --hook shell-guard 2>&1 >/dev/null)"
 rc=$?
 set -e
 # spec: guard-kit/SPEC.md §Testing — the block must be rule `cd_compound`'s, since a knob load the binary refuses also exits 2
 if [[ "$rc" -ne 2 || "$msg" != *"'cd'"* ]]; then
-    echo "guard-kit/smoke/install.sh: installed guard did not block a compound-cd payload with rule \`cd_compound\`'s steer (exit $rc, want 2): $msg" >&2
+    echo "guard-kit/smoke/install.sh: the wired member did not block a compound-cd payload with rule \`cd_compound\`'s steer (exit $rc, want 2): $msg" >&2
     exit 1
 fi
 
@@ -99,11 +98,11 @@ while IFS= read -r entry; do
     cmd="${cmd%)}"
     cmd="${cmd//\*/x}"
     set +e
-    msg="$(jq -cn --arg c "$cmd" '{tool_input:{command:$c}}' | bash scripts/bash-guard.sh 2>&1 >/dev/null)"
+    msg="$(jq -cn --arg c "$cmd" '{tool_name:"Bash",tool_input:{command:$c}}' | "$door" --hook shell-guard 2>&1 >/dev/null)"
     rc=$?
     set -e
     if [[ "$rc" -eq 2 ]]; then
-        echo "guard-kit/smoke/install.sh: the installed guard blocks '$cmd', a form templates/settings-allow.json grants ($entry): $msg" >&2
+        echo "guard-kit/smoke/install.sh: the wired member blocks '$cmd', a form templates/settings-allow.json grants ($entry): $msg" >&2
         exit 1
     fi
 done < <(jq -r '.permissions.allow[]' "$allow")

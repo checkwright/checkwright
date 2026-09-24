@@ -38,7 +38,7 @@ const MARKERS: [(&str, &[&str]); 4] = [
             "PreToolUse",
             "PostToolUse",
             "SessionStart",
-            "bash-guard",
+            "shell-guard",
             "hook error",
         ],
     ),

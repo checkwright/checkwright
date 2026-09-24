@@ -160,7 +160,7 @@ fallthrough	find . -type f > listing.txt
 #           (a literal echo/printf banner between reads is fine); multi-file, piped,
 #           redirected, &&-chained, mixed, and banner-only forms are composition and pass
 block	cat TASK-QUEUE.md
-block	cat -n guard-kit/lib/guard.sh
+block	cat -n guard-kit/SPEC.md
 block	cat a.md; cat b.md
 block	cat a.md; echo ===; cat b.md
 fallthrough	cat a.md; find lib -type f

@@ -96,14 +96,14 @@ pub fn advise_envelope(msg: &str) -> String {
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the escaper the hand-written envelope never had. The
-// envelope's own braces stay a literal so the key order is `guard_advise`'s, which a JSON object
-// does not carry but a reader diffing two substrates' output does.
+// envelope's own braces stay a literal so the key order matches the shell guard's original advise
+// envelope, which a JSON object does not carry but a reader diffing two substrates' output does.
 pub fn quote(s: &str) -> String {
     serde_json::Value::String(s.to_string()).to_string()
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — stderr is the member's block text, which the harness
-// shows, and exit 2 is the harness's block signal; the `<name>: ` prefix is `guard_block`'s.
+// shows, and exit 2 is the harness's block signal; the `<name>: ` prefix matches the shell guard's.
 pub fn block(name: &str, msg: &str) -> i32 {
     eprintln!("{}: {}", name, msg);
     2

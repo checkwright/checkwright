@@ -1233,7 +1233,9 @@ assert_doctor_silent "inside $GUARD_PROFILE" "$C2"
 
 # spec: installer/SPEC.md §The consumer smoke — the installed guard answers a payload with no jq on PATH: an allow envelope is a payload read AND a render, the two things the hook once spawned jq for, and it is neither the unreachable-binary advisory nor the empty stdout a failed render leaves
 guard_payload='{"tool_name":"Bash","tool_input":{"command":"cat one.md two.md"}}'
-out="$( cd "$C2" && printf '%s' "$guard_payload" | PATH="$JQ_PATH" bash "$GUARD_KIT/templates/bash-guard.sh" 2>&1 )"; rc=$?
+guard_bin="$(seam_bin "$C2/$GATES_DIR/gate-sdk-config.knobs")"
+[[ -n "$guard_bin" && -x "$C2/$guard_bin" ]] || fail "no executable gate binary at '${guard_bin:-<unset>}' inside $C2, so the installed $GUARD_KIT hook cannot be driven"
+out="$( cd "$C2" && printf '%s' "$guard_payload" | PATH="$JQ_PATH" "$guard_bin" --hook shell-guard 2>&1 )"; rc=$?
 [[ "$rc" -eq 0 && "$out" == *'"permissionDecision":"allow"'* ]] \
     || { printf '%s\n' "$out" >&2; fail "the installed $GUARD_KIT hook exited $rc on a jq-less machine without an allow envelope for a read-only command — its payload read or its render reached for a program that is not there"; }
 say "$GUARD_KIT hook: answers a payload with an allow envelope, no jq on PATH"

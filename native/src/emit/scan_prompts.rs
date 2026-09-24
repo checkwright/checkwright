@@ -117,8 +117,8 @@ fn segment_granted(seg: &str, allow: &[String], overlay: Option<&[String]>) -> b
 }
 
 // spec: guard-kit/SPEC.md §scan-prompts — the quoted-span view `allowed()` matches on, which is
-// deliberately not `guard_skeleton`'s: a whole quoted span collapses to one token so a separator
-// inside it cannot split the command, and nothing else about the line is normalized.
+// deliberately not the bash reader's skeleton view: a whole quoted span collapses to one token so
+// a separator inside it cannot split the command, and nothing else about the line is normalized.
 fn quoted_view(cmd: &str) -> String {
     fn pass(s: &[u8], q: u8, rep: &[u8]) -> Vec<u8> {
         let mut out: Vec<u8> = Vec::with_capacity(s.len());
@@ -141,10 +141,10 @@ fn quoted_view(cmd: &str) -> String {
 }
 
 // spec: guard-kit/SPEC.md §scan-prompts — the harness asks about every command longer than this,
-// whatever the allowlist says; `guard_log_fallthrough` cuts one character past it
+// whatever the allowlist says; the member's fall-through log line cuts one character past it
 const ANALYSIS_BOUND: usize = 10_000;
 
-// spec: guard-kit/SPEC.md §The shell guard — `guard_log_fallthrough`'s encoding reversed
+// spec: guard-kit/SPEC.md §The shell guard — the member's fall-through log encoding, reversed
 pub fn decode(line: &str) -> String {
     let mut out = String::with_capacity(line.len());
     let mut chars = line.chars().peekable();

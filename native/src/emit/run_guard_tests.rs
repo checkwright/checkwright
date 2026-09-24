@@ -3,25 +3,22 @@
 // which `Arm::Emit` collapses to 0-or-2.
 // spec: gate-sdk/SPEC.md §The non-gate arm — an arm table member rather than a hardcoded
 // top-level flag, because the member is configured: it needs the vendored guard-kit root.
-use crate::proc::{self, Stderr};
+use crate::proc;
 use crate::programs;
 use crate::walk;
 use std::path::Path;
 
 // spec: guard-kit/SPEC.md §Testing — one declared knob; the two omissions are ruled there,
 // `GUARD_KIT_LOG` because the arm overrides it and the guard's own knobs because the spawned
-// child's `lib/guard.sh` reads them from the binary.
+// member reads them from the binary.
 pub const KNOBS: &[&str] = &["GATE_SDK_KIT_DIRS"];
 
 const NAME: &str = "run-guard-tests";
 
 // spec: guard-kit/SPEC.md §Testing — `Drop` is the shell form's `trap 'rm -rf' EXIT`, armed the
 // moment the directory exists so no later refusal can leak it.
-// spec: gate-sdk/SPEC.md §The path-dialect contract — `root` is the crate's spelling, read by the
-// filesystem and `git`; `shell` is the guard's, the one its `$PWD` and every `@ROOT@` row carry.
 struct Sandbox {
     root: String,
-    shell: String,
 }
 
 impl Drop for Sandbox {
@@ -42,39 +39,29 @@ pub fn run(args: &[String]) -> i32 {
 
 fn execute(args: &[String]) -> Result<i32, String> {
     let kit = kit_root()?;
-    let guard = format!("{}/templates/bash-guard.sh", kit);
-    let lib = format!("{}/lib/guard.sh", kit);
     let cases = positional(args, 0, &format!("{}/guard-tests/cases.tsv", kit));
     let bg_cases = positional(args, 1, &format!("{}/guard-tests/background-cases.tsv", kit));
-    for f in [&guard, &lib, &cases, &bg_cases] {
+    for f in [&cases, &bg_cases] {
         if !Path::new(f).is_file() {
             return Err(format!("{}: missing {}", NAME, f));
         }
     }
     let sandbox = build_sandbox()?;
-    let log = format!("{}/friction.log", sandbox.shell);
+    let log = format!("{}/friction.log", sandbox.root);
 
     let mut tally = Tally::default();
-    let template = Subject::Template { lib: &lib, guard: &guard };
-    let member_log = format!("{}/friction.log", sandbox.root);
     for (want, cmd) in rows(&cases, 2)?
         .into_iter()
         .map(|r| (r[0].clone(), r[1].clone()))
     {
-        let shell_cmd = substitute(&cmd, &sandbox.shell);
-        let got = decide(&sandbox.shell, &log, &template, &shell_cmd, None)?;
-        tally.check(&want, &got, &shell_cmd);
         let cmd = substitute(&cmd, &sandbox.root);
-        let got = decide(&sandbox.root, &member_log, &Subject::Member, &cmd, None)?;
+        let got = decide(&sandbox.root, &log, &cmd, None)?;
         tally.check(&want, &got, &format!("[--hook shell-guard] {}", cmd));
     }
     for row in rows(&bg_cases, 3)? {
         let (want, rib, cmd) = (row[0].clone(), row[1].clone(), row[2].clone());
-        let shell_cmd = substitute(&cmd, &sandbox.shell);
-        let got = decide(&sandbox.shell, &log, &template, &shell_cmd, Some(&rib))?;
-        tally.check(&want, &got, &format!("[run_in_background={}] {}", rib, shell_cmd));
         let cmd = substitute(&cmd, &sandbox.root);
-        let got = decide(&sandbox.root, &member_log, &Subject::Member, &cmd, Some(&rib))?;
+        let got = decide(&sandbox.root, &log, &cmd, Some(&rib))?;
         tally.check(&want, &got, &format!("[--hook shell-guard] [run_in_background={}] {}", rib, cmd));
     }
 
@@ -177,55 +164,30 @@ fn fields(line: &str, width: usize) -> Vec<String> {
     out
 }
 
-// spec: guard-kit/SPEC.md §Testing — the two subjects every row runs against while both exist: the
-// unchanged `templates/bash-guard.sh` and the `--hook shell-guard` member, which must agree with the
-// table before the wiring moves to it.
-enum Subject<'a> {
-    Template { lib: &'a str, guard: &'a str },
-    Member,
-}
-
 // spec: guard-kit/SPEC.md §Testing — one case, spawned from inside the sandbox with the same inputs
-// the shell harness supplied.
-fn decide(
-    root: &str,
-    log: &str,
-    subject: &Subject,
-    cmd: &str,
-    background: Option<&str>,
-) -> Result<String, String> {
+// the harness supplied, driving the `--hook shell-guard` member directly with no front end.
+fn decide(root: &str, log: &str, cmd: &str, background: Option<&str>) -> Result<String, String> {
     // spec: guard-kit/SPEC.md §Testing — the guard reads its knobs from the binary, and the
     // repo-relative default names nothing from inside the sandbox, so the running binary is exported
     let bin = std::env::current_exe()
         .map_err(|e| format!("{}: cannot name the running binary: {}", NAME, e))?;
     let bin = walk::normalize_abs(&bin.to_string_lossy());
-    let (code, out) = match subject {
-        Subject::Template { lib, guard } => {
-            let script = r#"cd "$1" || exit 2; GUARD_KIT_LIB="$2" GUARD_KIT_LOG="$3" GATE_SDK_NATIVE_BIN="$5" exec bash "$4""#;
-            let done = proc::run_streamed(
-                &programs::BASH,
-                &["-c", script, "bash", root, lib, log, guard, &bin],
-                payload(cmd, background).as_bytes(),
-                Stderr::Discard,
-            )?;
-            (done.code(), String::from_utf8_lossy(done.stdout()).into_owned())
-        }
-        Subject::Member => {
-            let set = [
-                ("GUARD_KIT_LOG".to_string(), log.to_string()),
-                ("GATE_SDK_NATIVE_BIN".to_string(), bin.clone()),
-                ("PWD".to_string(), root.to_string()),
-            ];
-            let env = proc::ChildEnv { set: &set, unset: &[], cwd: Some(Path::new(root)) };
-            let done = proc::run_with_stdin_in(
-                &programs::CHECKWRIGHT_GATES.at(bin.clone()),
-                &["--hook", "shell-guard"],
-                payload(cmd, background).as_bytes(),
-                &env,
-            )?;
-            (done.reported_code(), String::from_utf8_lossy(done.streams().0).into_owned())
-        }
-    };
+    let set = [
+        ("GUARD_KIT_LOG".to_string(), log.to_string()),
+        ("GATE_SDK_NATIVE_BIN".to_string(), bin.clone()),
+        ("PWD".to_string(), root.to_string()),
+    ];
+    let env = proc::ChildEnv { set: &set, unset: &[], cwd: Some(Path::new(root)) };
+    let done = proc::run_with_stdin_in(
+        &programs::CHECKWRIGHT_GATES.at(bin.clone()),
+        &["--hook", "shell-guard"],
+        payload(cmd, background).as_bytes(),
+        &env,
+    )?;
+    let (code, out) = (
+        done.reported_code(),
+        String::from_utf8_lossy(done.streams().0).into_owned(),
+    );
     // spec: guard-kit/SPEC.md §Testing — the shell form captured the guard in `$( … )`, which
     // strips every trailing newline before the ladder's emptiness arm reads it.
     Ok(classify(code, out.trim_end_matches('\n')))
@@ -286,8 +248,7 @@ fn build_sandbox() -> Result<Sandbox, String> {
     let root = walk::canonicalize(&made)
         .map(|c| walk::normalize_abs(c.strip_prefix(r"\\?\").unwrap_or(&c)))
         .ok_or_else(|| format!("{}: cannot resolve the sandbox {}", NAME, made.display()))?;
-    let mut sandbox = Sandbox { root, shell: String::new() };
-    sandbox.shell = shell_spelling(&sandbox.root)?;
+    let sandbox = Sandbox { root };
     let at = |rel: &str| format!("{}/{}", sandbox.root, rel);
 
     git(&sandbox.root, &["init", "-q"])?;
@@ -328,23 +289,6 @@ fn git(root: &str, args: &[&str]) -> Result<(), String> {
         ));
     }
     Ok(())
-}
-
-// spec: gate-sdk/SPEC.md §The path-dialect contract — the shell crossing idiom: `pwd -P` is the half
-// that crosses, since `cd` with an absolute argument hands the argument back as `$PWD` unconverted.
-fn shell_spelling(root: &str) -> Result<String, String> {
-    let done = proc::run(&programs::BASH, &["-c", r#"cd "$1" && pwd -P"#, "bash", root])?;
-    done.stdout()
-        .map(|o| String::from_utf8_lossy(o).trim_end_matches(['\r', '\n']).to_string())
-        .filter(|s| !s.is_empty())
-        .ok_or_else(|| {
-            format!(
-                "{}: cannot build the sandbox — bash cannot spell {} ({})",
-                NAME,
-                root,
-                done.failure_report().unwrap_or_else(|| "empty answer".to_string())
-            )
-        })
 }
 
 fn mkdir(path: &str) -> Result<(), String> {

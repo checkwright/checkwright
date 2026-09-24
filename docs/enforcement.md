@@ -178,7 +178,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 
 | kit | surface | intercepts |
 | --- | --- | --- |
-| (consumer) | scripts/bash-guard.sh | Bash |
+| [gate-sdk](gate-sdk/index.md) | gate-sdk/bin/run-gates.sh | Bash |
 | [gate-sdk](gate-sdk/index.md) | gate-sdk/bin/run-gates.sh | Agent |
 | [gate-sdk](gate-sdk/index.md) | gate-sdk/bin/run-gates.sh | Agent |
 | [gate-sdk](gate-sdk/index.md) | gate-sdk/bin/run-gates.sh | Write\|Edit |

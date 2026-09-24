@@ -115,8 +115,7 @@ pub fn json_view(payload: Option<&serde_json::Value>, view: reader::View) -> Opt
 }
 
 // spec: guard-kit/SPEC.md §The shell guard — `--guard-json <mode> [<arg>…]`, the reads and
-// renders `lib/guard.sh` spawns and a consumer rule command calls; every mode exits 0 and only a
-// usage error exits 2.
+// renders a consumer rule command calls; every mode exits 0 and only a usage error exits 2.
 pub fn json_arm(args: &[String]) -> i32 {
     let usage = "  usage: checkwright-gates --guard-json field <path> | --guard-json field-or-empty <path> | --guard-json view <view> | --guard-json allow-entries <settings-file> | --guard-json advise <msg> | --guard-json allow <reason> | --guard-json rewrite <cmd> <reason>";
     let arg = |i: usize| args.get(i).map(String::as_str);

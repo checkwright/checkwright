@@ -148,47 +148,9 @@ door_case() {  # $1=label $2=GATE_SDK_NATIVE_BIN value
 door_case "door-relative" "vendor/bin/checkwright-gates"
 door_case "door-absolute" "/opt/checkwright/bin/checkwright-gates"
 
-# --- the library's own load, while the library is live: an unreachable binary advises, runs no rule
-#     and exits 0; a load list ahead of the binary fails open with an advise naming the name and the
-#     rebuild; a refused config blocks with the refusal's own text
-load() {  # $1=label $2=want-rc $3=want-substring $4.. = NAME=VALUE environment for the sourcing
-    local label="$1" want_rc="$2" want_text="$3" out got
-    shift 3
-    checks=$((checks + 1))
-    out="$(env "$@" bash -c 'source "$1/lib/guard.sh"; guard_rule_cat_file "cat README.md"; echo ran' _ "$DIR" 2>&1)"
-    got=$?
-    [[ "$got" == "$want_rc" && "$out" == *"$want_text"* && "$out" != *ran ]] || {
-        echo "  FAIL [$label]: rc=$got, want $want_rc carrying '$want_text' with no rule run: $out"
-        fails=$((fails + 1))
-    }
-}
-load "unreachable-binary" 0 '"additionalContext"' GATE_SDK_NATIVE_BIN="$tmp/no-such-binary"
-load "lib-missing-knob-file"  2 "GUARD_KIT_KNOB_FILE names $tmp/absent.knobs" GUARD_KIT_KNOB_FILE="$tmp/absent.knobs"
-load "lib-malformed-knob-file" 2 "malformed.knobs:1" GUARD_KIT_KNOB_FILE="$tmp/malformed.knobs"
-cat >"$tmp/behind-bin" <<EOF
-#!/usr/bin/env bash
-case "\$1" in
-    --emit-knob-values) echo "--emit-knob-values: GUARD_KIT_WORKTREE_READS is not a guard-kit knob" >&2; exit 2 ;;
-    --emit-knob-roster) "$BIN" --emit-knob-roster | grep -v '^GUARD_KIT_WORKTREE_READS' ;;
-    *) exec "$BIN" "\$@" ;;
-esac
-EOF
-chmod +x "$tmp/behind-bin"
-load "binary-behind-load"  0 "GUARD_KIT_WORKTREE_READS, which the gate binary" GATE_SDK_NATIVE_BIN="$tmp/behind-bin"
-load "binary-behind-names-rebuild" 0 "build-native.sh" GATE_SDK_NATIVE_BIN="$tmp/behind-bin"
-cat >"$tmp/refusing-bin" <<EOF
-#!/usr/bin/env bash
-case "\$1" in
-    --emit-knob-values) echo "malformed.knobs:1: not a knob line" >&2; exit 2 ;;
-    *) exec "$BIN" "\$@" ;;
-esac
-EOF
-chmod +x "$tmp/refusing-bin"
-load "declared-refusal-blocks" 2 "malformed.knobs:1" GATE_SDK_NATIVE_BIN="$tmp/refusing-bin"
-
 if [[ "$fails" -gt 0 ]]; then
     echo "guard-config-knobs.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "guard-config-knobs.test: ok ($checks assertions; GUARD_KIT_SEARCH_TOOLS fires rules \`find_glob\` and \`git_grep\` on its own member each and leaves them inert when empty, and each firing corrective names its bare fallback; GUARD_KIT_RO_FORMS grants an added roster member only once declared, and a consumer entry replaces the kit's declaration; rule `git_c_root`'s arm (d) fires on a respelled path naming the knob's resolved file and not on a differing one; the member blocks with the refusal on a missing or malformed knob file and runs no rule; the steer door is gate_native_bin_spelled's spelling; the library's load advises on an unreachable binary, blocks on a refused config, and fails open naming the rebuild when the binary does not declare a loaded name)"
+echo "guard-config-knobs.test: ok ($checks assertions; GUARD_KIT_SEARCH_TOOLS fires rules \`find_glob\` and \`git_grep\` on its own member each and leaves them inert when empty, and each firing corrective names its bare fallback; GUARD_KIT_RO_FORMS grants an added roster member only once declared, and a consumer entry replaces the kit's declaration; rule `git_c_root`'s arm (d) fires on a respelled path naming the knob's resolved file and not on a differing one; the member blocks with the refusal on a missing or malformed knob file and runs no rule; the steer door is gate_native_bin_spelled's spelling)"
 exit 0

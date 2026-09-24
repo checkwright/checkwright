@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: guard-kit/SPEC.md §compare-settings-allow — the breadth question is guard_allow_match with its arguments swapped, so a local glob that auto-allows a configured probe is reported with that probe as its witness; an empty probe set omits the section entirely rather than printing a clean line, which is what keeps a consumer that declared no vocabulary from reading silence as coverage
+# spec: guard-kit/SPEC.md §compare-settings-allow — the breadth question is guard::allow_match with its arguments swapped, so a local glob that auto-allows a configured probe is reported with that probe as its witness; an empty probe set omits the section entirely rather than printing a clean line, which is what keeps a consumer that declared no vocabulary from reading silence as coverage
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
