@@ -176,7 +176,7 @@ if staged_matches 'docs/*/SPEC.md' 'docs/*/README.md' 'docs/doctrine-kit/DOCTRIN
     run_gate check-docs-mirror-fresh native/target/release/checkwright-gates check-docs-mirror-fresh
 fi
 
-if staged_matches '*docs/enforcement.md' '*scripts/gates.list' '*scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' '*scripts/kpis.list' '*.claude/settings.json' '*' 'native/src/diff.rs' 'scripts/canon-config.knobs' 'scripts/context-config.knobs' 'scripts/drift-config.knobs' 'scripts/evidence-config.knobs' 'scripts/gate-sdk-config.knobs' 'scripts/lifecycle-config.knobs' 'native/src/gates/enforcement_fresh.rs' 'native/src/fresh.rs' 'native/src/emit/enforcement_map.rs' 'native/src/programs.rs' 'native/src/emit/kpi/mod.rs'; then
+if staged_matches '*docs/enforcement.md' '*scripts/gates.list' '*scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' '*scripts/kpis.list' '*.claude/settings.json' '*' 'native/src/diff.rs' 'scripts/canon-config.knobs' 'scripts/context-config.knobs' 'scripts/drift-config.knobs' 'scripts/evidence-config.knobs' 'scripts/gate-sdk-config.knobs' 'scripts/lifecycle-config.knobs' 'native/src/gates/enforcement_fresh.rs' 'native/src/fresh.rs' 'native/src/emit/enforcement_map.rs' 'native/src/programs.rs' 'native/src/emit/kpi/mod.rs' 'native/src/hook/mod.rs'; then
     run_gate check-enforcement-fresh native/target/release/checkwright-gates check-enforcement-fresh
 fi
 
@@ -512,7 +512,7 @@ if staged_matches '*.claude/settings.json' '*scripts/settings-pins.conf' 'script
     run_gate check-settings-pins native/target/release/checkwright-gates check-settings-pins
 fi
 
-if staged_matches '*.claude/settings.json' 'gate-sdk/checks/*.sh' 'canon-kit/checks/*.sh' 'context-kit/checks/*.sh' 'delegation-kit/checks/*.sh' 'doctrine-kit/checks/*.sh' 'drift-kit/checks/*.sh' 'evidence-kit/checks/*.sh' 'guard-kit/checks/*.sh' 'lifecycle-kit/checks/*.sh' 'queue-kit/checks/*.sh' 'site-kit/checks/*.sh' '*scripts/check-*.sh' 'scripts/context-config.knobs' 'native/src/gates/settings_paths.rs'; then
+if staged_matches '*.claude/settings.json' 'gate-sdk/checks/*.sh' 'canon-kit/checks/*.sh' 'context-kit/checks/*.sh' 'delegation-kit/checks/*.sh' 'doctrine-kit/checks/*.sh' 'drift-kit/checks/*.sh' 'evidence-kit/checks/*.sh' 'guard-kit/checks/*.sh' 'lifecycle-kit/checks/*.sh' 'queue-kit/checks/*.sh' 'site-kit/checks/*.sh' '*scripts/check-*.sh' 'scripts/context-config.knobs' 'native/src/gates/settings_paths.rs' 'native/src/hook/mod.rs'; then
     run_gate check-settings-paths native/target/release/checkwright-gates check-settings-paths
 fi
 

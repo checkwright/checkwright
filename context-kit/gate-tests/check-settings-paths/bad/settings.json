@@ -8,5 +8,26 @@
       "Bash(bash */checks/check-*.sh)",
       "Bash(git add *)"
     ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash tools/real-tool.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash tools/removed-hook.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash tools/run-gates.sh --hook no-such-guard"
+          }
+        ]
+      }
+    ]
   }
 }

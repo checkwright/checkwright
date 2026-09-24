@@ -35,13 +35,19 @@ impl Payload {
 
 pub type HookFn = fn(&Payload) -> i32;
 
-// spec: gate-sdk/SPEC.md §The non-gate arm — the member table: the single roster the arm dispatches
-// on and the unknown-member refusal prints. Each row's knob slice is exactly what that member's
-// shell original read, less the knobs a compiled member cannot want.
-pub const HOOKS: &[(&str, HookFn, &[&str])] = &[
+// spec: gate-sdk/SPEC.md §The harness-integration arm — the member table: the single roster the
+// arm dispatches on and the unknown-member refusal prints. Each row's knob slice is exactly what
+// that member's shell original read, less the knobs a compiled member cannot want; its last column
+// is the owning kit, held to the member module's leading `spec:` binding by a unit test below.
+pub const HOOKS: &[(&str, HookFn, &[&str], &str)] = &[
     // spec: delegation-kit/SPEC.md §usage-verdict — the rule runs inside the hook process, so the row
     // declares the rule's own reads rather than a path to it, one roster for both callers
-    ("agent-budget-guard", |p| budget::run(p.value()), verdict::KNOBS),
+    (
+        "agent-budget-guard",
+        |p| budget::run(p.value()),
+        verdict::KNOBS,
+        "delegation-kit",
+    ),
     (
         "agent-dispatch-guard",
         |p| dispatch::run(p.value()),
@@ -51,6 +57,7 @@ pub const HOOKS: &[(&str, HookFn, &[&str])] = &[
             "DELEGATION_KIT_REQUIRE_TIER",
             "DELEGATION_KIT_AGENT_DIR",
         ],
+        "delegation-kit",
     ),
     (
         "subagent-stop-liveness",
@@ -60,14 +67,21 @@ pub const HOOKS: &[(&str, HookFn, &[&str])] = &[
             "DELEGATION_KIT_LIVENESS_CMD",
             "GATE_SDK_TMP_DIR",
         ],
+        "delegation-kit",
     ),
-    ("escalation-guard", |p| escalation::run(p.value()), &[]),
-    ("shell-guard", shell_guard::run, crate::guard::host::KNOBS),
-    ("wakeup-guard", |p| wakeup::run(p.value()), &["GUARD_KIT_WAKEUP_LOG"]),
+    ("escalation-guard", |p| escalation::run(p.value()), &[], "guard-kit"),
+    ("shell-guard", shell_guard::run, crate::guard::host::KNOBS, "guard-kit"),
+    (
+        "wakeup-guard",
+        |p| wakeup::run(p.value()),
+        &["GUARD_KIT_WAKEUP_LOG"],
+        "guard-kit",
+    ),
     (
         "workflow-state-guard",
         |p| workflow_state::run(p.value()),
         &["GATE_SDK_WORKFLOW_DIR"],
+        "lifecycle-kit",
     ),
 ];
 
@@ -77,7 +91,75 @@ pub const HOOKS: &[(&str, HookFn, &[&str])] = &[
 pub const EVERY_HOOK_KNOB: &str = "@every-hook-knob";
 
 pub fn members() -> Vec<&'static str> {
-    HOOKS.iter().map(|(n, _, _)| *n).collect()
+    HOOKS.iter().map(|(n, _, _, _)| *n).collect()
+}
+
+pub fn owner(member: &str) -> Option<&'static str> {
+    HOOKS.iter().find(|(n, _, _, _)| *n == member).map(|(_, _, _, o)| *o)
+}
+
+// spec: context-kit/SPEC.md §check-settings-paths — a hook's tokens: `command` split on ASCII
+// whitespace, or, in the exec form, `command` followed by each `args` element verbatim
+pub fn command_tokens(hook: &Value) -> Vec<&str> {
+    let cmd = hook.get("command").and_then(Value::as_str).unwrap_or("");
+    match hook.get("args").and_then(Value::as_array) {
+        Some(args) => std::iter::once(cmd)
+            .chain(args.iter().filter_map(Value::as_str))
+            .collect(),
+        None => cmd.split_ascii_whitespace().collect(),
+    }
+}
+
+// spec: context-kit/SPEC.md §check-settings-paths — the command token is not always argv[0]: a
+// command may lead with `env NAME=VALUE ...` before the interpreter, and a `bash`/`sh` interpreter
+// word is then skipped too. One walk for the grant reader, the hook reader and the enforcement map.
+pub fn command_index(tok: &[&str]) -> Option<usize> {
+    let mut i = 0usize;
+    if tok.first() == Some(&"env") {
+        i = 1;
+        while i < tok.len() && is_assignment(tok[i]) {
+            i += 1;
+        }
+    }
+    if matches!(tok.get(i), Some(&"bash") | Some(&"sh")) {
+        i += 1;
+    }
+    (i < tok.len()).then_some(i)
+}
+
+fn is_assignment(t: &str) -> bool {
+    let Some(at) = t.find('=') else { return false };
+    let b = t.as_bytes();
+    at > 0 && (b[0].is_ascii_alphabetic() || b[0] == b'_')
+}
+
+pub const FRONT_ENDS: [&str; 2] = ["run-gates.sh", "run-gates.ps1"];
+
+#[derive(Debug, PartialEq)]
+pub enum Registration<'a> {
+    NotAMember,
+    Member(&'a str),
+    NoOperand,
+}
+
+// spec: gate-sdk/SPEC.md §The harness-integration arm — the registration grammar's one parser: a
+// command token with the front end's file name, then `--hook`, then the member operand
+pub fn registration<'a>(tok: &[&'a str]) -> Registration<'a> {
+    let Some(i) = command_index(tok) else {
+        return Registration::NotAMember;
+    };
+    let base = tok[i]
+        .trim_matches(|c| c == '"' || c == '\'')
+        .rsplit(['/', '\\'])
+        .next()
+        .unwrap_or("");
+    if !FRONT_ENDS.contains(&base) || tok.get(i + 1) != Some(&"--hook") {
+        return Registration::NotAMember;
+    }
+    match tok.get(i + 2) {
+        Some(m) => Registration::Member(m),
+        None => Registration::NoOperand,
+    }
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — stdout is the hook-JSON envelope, serialized rather
@@ -150,7 +232,7 @@ pub fn run(args: &[String]) -> i32 {
         eprintln!("  help: this binary carries: {}", members().join(", "));
         return 2;
     };
-    let Some((_, f, _)) = HOOKS.iter().find(|(n, _, _)| n == member) else {
+    let Some((_, f, _, _)) = HOOKS.iter().find(|(n, _, _, _)| n == member) else {
         eprintln!(
             "checkwright-gates: no such hook member: {} — the hook could not run",
             member
@@ -225,6 +307,69 @@ mod tests {
         assert!(!members().contains(&"agent-budget-guards"));
         assert!(!members().contains(&"PreToolUse"));
         assert_eq!(members().len(), HOOKS.len());
+    }
+
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — the owner column is checked against the
+    // member module rather than transcribed: each row's owner is the kit its module's leading
+    // `spec:` binding names, and a member missing from this module list fails rather than passes
+    #[test]
+    fn each_members_owner_is_the_kit_its_module_binds_to() {
+        let modules: &[(&str, &str)] = &[
+            ("agent-budget-guard", include_str!("budget.rs")),
+            ("agent-dispatch-guard", include_str!("dispatch.rs")),
+            ("subagent-stop-liveness", include_str!("stop_liveness.rs")),
+            ("escalation-guard", include_str!("escalation.rs")),
+            ("shell-guard", include_str!("shell_guard.rs")),
+            ("wakeup-guard", include_str!("wakeup.rs")),
+            ("workflow-state-guard", include_str!("workflow_state.rs")),
+        ];
+        for (name, _, _, owner) in HOOKS {
+            let src = modules
+                .iter()
+                .find(|(m, _)| m == name)
+                .unwrap_or_else(|| panic!("member {} names no module in this test", name))
+                .1;
+            let kit = src
+                .lines()
+                .next()
+                .and_then(|l| l.strip_prefix("// spec: "))
+                .and_then(|l| l.split('/').next())
+                .unwrap_or_else(|| panic!("member {}'s module leads with no spec: binding", name));
+            assert_eq!(kit, *owner, "member {}'s owner", name);
+        }
+    }
+
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — the parser both readers of a
+    // registration call: the front end by file name as the command token, then `--hook`
+    #[test]
+    fn a_registration_names_its_member_only_through_the_front_end() {
+        let t = |s: &'static str| s.split_ascii_whitespace().collect::<Vec<_>>();
+        assert_eq!(
+            registration(&t("bash gate-sdk/bin/run-gates.sh --hook shell-guard")),
+            Registration::Member("shell-guard")
+        );
+        assert_eq!(
+            registration(&t("env A=1 bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook x")),
+            Registration::Member("x")
+        );
+        assert_eq!(
+            registration(&t("bash gate-sdk/bin/run-gates.sh --hook")),
+            Registration::NoOperand
+        );
+        assert_eq!(
+            registration(&t("bash gate-sdk/bin/run-gates.sh --run")),
+            Registration::NotAMember
+        );
+        assert_eq!(
+            registration(&t("bash scripts/x.sh --hook shell-guard")),
+            Registration::NotAMember
+        );
+        assert_eq!(registration(&t("")), Registration::NotAMember);
+        let exec: Value = serde_json::from_str(
+            r#"{"command":"bash","args":["gate-sdk/bin/run-gates.sh","--hook","a b"]}"#,
+        )
+        .unwrap();
+        assert_eq!(registration(&command_tokens(&exec)), Registration::Member("a b"));
     }
 
     // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the computed stamp is the one

@@ -8,38 +8,6 @@
 
 ## New Features
 
-### settings-hook-command-path-gate
-
-[spec: SPEC-hook-registry.md] [recurrence: 2026-09-24]
-
-a hook registration in `.claude/settings.json` whose `command` names a renamed or deleted script reds nowhere and fails silently at run time.
-
-**Probed at the drain, not reasoned:** `check-settings-paths` resolves command tokens for `permissions.allow[]` only (`native/src/gates/settings_paths.rs`, whose `allow_entries` reads `/permissions/allow`); the sole other reader of `/hooks` in the tree is the **emitter** `native/src/emit/enforcement_map.rs`, which renders `PreToolUse` and `SessionStart` command paths into the enforcement map **without resolving them against the tree** — a deleted script still renders a row — and does not read `/hooks/SubagentStop` at all, so this iteration's new registration is invisible to the projection as well as to every gate.
-
-**Recurred 2026-09-24** at `native-shell-guard` build. The Bash hook named `scripts/bash-guard.sh`, which was deleted from the working tree before the registration was swapped to `--hook shell-guard`. The shell guard failed open in every session until the swap, and the swap commit's settings diff shows the old path. A commit-time gate would not have covered that uncommitted window, only the commit that landed it.
-
-**Two halves, and the second is the cheaper one.** Path resolution is the walk `check-settings-paths` already owns, so widening its subject from one JSON pointer to two is a small port-side change; extending the enforcement map's hook-event roster is a docs-projection ruling about what belongs on that page, not a gate.
-
-**Specified 2026-09-24:** `check-settings-paths` widens rather than a second gate being minted. Every `type: command` hook's command path must resolve, and every `--hook` operand must name a member the binary carries. The enforcement map reads every hook event.
-
-**Cost while deferred:** a broken hook is invisible until the behaviour it guards silently stops happening — the failure mode with no red anywhere and no user-visible symptom. Filed 2026-08-22 at spec while surveying context-kit's settings gates; drained at that iteration's close, which re-verified the claim and found the enforcement-map reader it missed.
-
-**Selected for `silent-guard-gaps` — operator direction 2026-09-24, lead-relayed; the lead unit.** Admitted on the filter's trust arm: a guard an adopter relies on goes dark with no signal. Probed at scope: `.claude/settings.json` also registers `SubagentStop`, which the emitter does not read.
-
-### enforcement-map-member-owner
-
-[spec: SPEC-hook-registry.md]
-
-`--emit enforcement-map` attributes every `--hook` member row to gate-sdk and labels it with the front-end path. `hook_sections` (`native/src/emit/enforcement_map.rs`) takes the first slash-bearing token of the hook command, so four Guards rows of `docs/enforcement.md` read `gate-sdk/bin/run-gates.sh`: the `shell-guard` Bash row, two Agent rows and the Write|Edit row. The table cannot tell members apart or credit the owning kit.
-
-**Premise corrected at the drain:** the bullet named the `HOOKS` table's owning kit as the attribution source. The table (`native/src/hook/mod.rs`) carries a name, a function and a knob slice per member, and no owner. The fix needs an owner per member first, either a fourth column or a derivation from the kit SPEC that defines each member. Then the row reads the `--hook` operand as its surface. **Specified 2026-09-24:** a fourth column, held by a unit test to the kit named by the member module's leading `spec:` binding. A member row is headed by its `--hook` operand and credited to that owner.
-
-**Sibling, not a duplicate:** [settings-hook-command-path-gate](#settings-hook-command-path-gate) owns resolving a hook's command path against the tree, and that entry's projection half reads the same `/hooks` parse. A `--hook <member>` registration has two things to resolve: the front end and the member name.
-
-**Cost while deferred:** the published enforcement page credits every guard member to gate-sdk. Filed 2026-09-24 to the gap inbox at `native-shell-guard` build b5b; promoted at that iteration's close. Owner lookup: `enforcement-map`, `hook member`, `member name` in this file: only the sibling above.
-
-**Selected for `silent-guard-gaps` — operator direction 2026-09-24, lead-relayed.** Admitted on the trust arm: the published enforcement map is what an adopter reads to trust what enforces. Batch it with the sibling above; both edit `hook_sections`' `/hooks` parse.
-
 ### hook-decline-model-invisible
 
 [spec: SPEC-decline-channel.md]
@@ -58,7 +26,7 @@ a `.github/workflows` `run:` step naming a deleted script reds nowhere. `gates.y
 
 **Specified 2026-09-24:** a new gate-sdk gate, `check-action-run-path`. It reads `run:` bodies, single-line values included, through §check-action-run-shell's extractor, which becomes shared, and it identifies invocations with canon-kit's check-docs-cmd (A) predicate.
 
-**Cost while deferred:** a deleted script's CI step reds only on the push that runs it, spending a push-budget round. Filed 2026-09-24 to the gap inbox at `native-shell-guard`'s close; promoted 2026-09-24 at the next scope. Owner lookup: `deleted script`, `run: step` in this file: only [settings-hook-command-path-gate](#settings-hook-command-path-gate), a sibling on another surface. **Selected for `silent-guard-gaps` — operator direction 2026-09-24, lead-relayed, as an explicit exception to the enhancement admission filter:** it shares the set's command-path surface, so it rides no extra stage.
+**Cost while deferred:** a deleted script's CI step reds only on the push that runs it, spending a push-budget round. Filed 2026-09-24 to the gap inbox at `native-shell-guard`'s close; promoted 2026-09-24 at the next scope. Owner lookup: `deleted script`, `run: step` in this file: only `settings-hook-command-path-gate`, a sibling on another surface. **Selected for `silent-guard-gaps` — operator direction 2026-09-24, lead-relayed, as an explicit exception to the enhancement admission filter:** it shares the set's command-path surface, so it rides no extra stage.
 
 ### split-posture-waiver-writer
 
@@ -80,7 +48,7 @@ an operator-ruled `align-waived` line has no sanctioned writer. lifecycle-kit/SP
 
 [spec: SPEC-stamp-before-write.md]
 
-a lead-dispatched stage session can do its whole batch without running `--enter-stage`. This happened at `native-shell-guard` build b5, a cheaper-tier session. No stamp records it, and its dispatch-marker line stayed unconsumed until the successor withdrew it. `check-dispatch-entry` is a commit-msg gate by design (lifecycle-kit/SPEC.md §check-dispatch-entry), so it fires at a commit and never at a tree write. The work rode a sibling's stamp, and the per-session audit trail lost it. The same session deleted `scripts/bash-guard.sh` before the hook swap. That opened a fail-open window for every session, recorded as a recurrence on [settings-hook-command-path-gate](#settings-hook-command-path-gate).
+a lead-dispatched stage session can do its whole batch without running `--enter-stage`. This happened at `native-shell-guard` build b5, a cheaper-tier session. No stamp records it, and its dispatch-marker line stayed unconsumed until the successor withdrew it. `check-dispatch-entry` is a commit-msg gate by design (lifecycle-kit/SPEC.md §check-dispatch-entry), so it fires at a commit and never at a tree write. The work rode a sibling's stamp, and the per-session audit trail lost it. The same session deleted `scripts/bash-guard.sh` before the hook swap. That opened a fail-open window for every session, recorded as a recurrence on `settings-hook-command-path-gate`.
 
 **Run at spec:** `grep -n "session_id\|agent_id" native/src/hook/*.rs`. `agent-dispatch-guard` reads a `PreToolUse` payload's `agent_id` (`native/src/hook/dispatch.rs`, the `nested` read), and the `SubagentStop` log shows that `session_id` is the lead's. So a dispatched caller is identified by `agent_id` and `agent_type`, and never by `session_id`.
 
@@ -1567,5 +1535,8 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 `check-docs-cmd` assertion (C) misses a retired path cited from the queue, which is outside its manifest corpus and whose `<path>:<line>` token fails the path shape.
 
 ## Done
+
+- settings-hook-command-path-gate
+- enforcement-map-member-owner
 
 ## Lessons Learned

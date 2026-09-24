@@ -215,9 +215,21 @@ fn kpi_section(gates_dir: &str) -> Result<Option<Section>, String> {
     }))
 }
 
-// spec: gate-sdk/SPEC.md §enforcement-map — Guards and Session warnings: PreToolUse / SessionStart
-// command hooks in the tracked harness settings file. This is the `jq` dependency's retirement:
-// the rows come from serde_json, so the battery's own path needs no non-floor program.
+// spec: gate-sdk/SPEC.md §enforcement-map — a member registration is rowed under its member and
+// credited to the member table's owner; any other hook, an unknown operand's included, by its path
+fn hook_row(tokens: &[&str]) -> (String, String) {
+    if let crate::hook::Registration::Member(m) = crate::hook::registration(tokens) {
+        if let Some(owner) = crate::hook::owner(m) {
+            return (owner.to_string(), m.to_string());
+        }
+    }
+    let path = command_path(&tokens.join(" "));
+    (attribute_kit(&path), path)
+}
+
+// spec: gate-sdk/SPEC.md §enforcement-map — Session warnings from the `SessionStart` command hooks
+// and Guards from every other event's, events sorted and hooks in registration order. This is the
+// `jq` dependency's retirement: the rows come from serde_json, so the battery needs no non-floor program.
 fn hook_sections(settings: &str) -> Result<Vec<Section>, String> {
     if settings.is_empty() || !Path::new(settings).is_file() {
         return Ok(Vec::new());
@@ -229,51 +241,39 @@ fn hook_sections(settings: &str) -> Result<Vec<Section>, String> {
         )
     })?;
     let mut out: Vec<Section> = Vec::new();
-
-    let mut guards: Vec<Row> = Vec::new();
-    if let Some(entries) = doc.pointer("/hooks/PreToolUse").and_then(Value::as_array) {
-        for e in entries {
+    let (mut guards, mut warnings): (Vec<Row>, Vec<Row>) = (Vec::new(), Vec::new());
+    let empty = serde_json::Map::new();
+    let events = doc.get("hooks").and_then(Value::as_object).unwrap_or(&empty);
+    for (event, groups) in events {
+        for e in groups.as_array().into_iter().flatten() {
             let matcher = e
                 .get("matcher")
                 .and_then(Value::as_str)
+                .filter(|m| !m.is_empty())
                 .unwrap_or("*")
                 .replace('|', "\\|");
-            for h in e.get("hooks").and_then(Value::as_array).unwrap_or(&vec![]) {
+            for h in e.get("hooks").and_then(Value::as_array).into_iter().flatten() {
                 if h.get("type").and_then(Value::as_str) != Some("command") {
                     continue;
                 }
-                let cmd = h.get("command").and_then(Value::as_str).unwrap_or("");
-                let path = command_path(cmd);
-                guards.push(Row {
-                    kit: attribute_kit(&path),
-                    cells: vec![path, matcher.clone()],
-                });
+                let (kit, surface) = hook_row(&crate::hook::command_tokens(h));
+                if event == "SessionStart" {
+                    warnings.push(Row { kit, cells: vec![surface] });
+                } else {
+                    guards.push(Row {
+                        kit,
+                        cells: vec![surface, event.clone(), matcher.clone()],
+                    });
+                }
             }
         }
     }
     if !guards.is_empty() {
         out.push(Section {
             title: "Guards".into(),
-            columns: vec!["surface".into(), "intercepts".into()],
+            columns: vec!["surface".into(), "event".into(), "intercepts".into()],
             rows: guards,
         });
-    }
-
-    let mut warnings: Vec<Row> = Vec::new();
-    if let Some(entries) = doc.pointer("/hooks/SessionStart").and_then(Value::as_array) {
-        for e in entries {
-            for h in e.get("hooks").and_then(Value::as_array).unwrap_or(&vec![]) {
-                if h.get("type").and_then(Value::as_str) != Some("command") {
-                    continue;
-                }
-                let cmd = h.get("command").and_then(Value::as_str).unwrap_or("");
-                let path = command_path(cmd);
-                warnings.push(Row {
-                    kit: attribute_kit(&path),
-                    cells: vec![path],
-                });
-            }
-        }
     }
     if !warnings.is_empty() {
         out.push(Section {
@@ -413,7 +413,8 @@ fn class_roster(prefix: &str) -> String {
          its server-side backstop. Owner: {}.\n\
          - An **advisory KPI** never blocks; it reports a drift trend into the \
          session-context line. Owner: {}.\n\
-         - A **guard** intercepts a tool call before it runs. Owner: {}.\n\
+         - A **guard** intercepts a harness event — a tool call before it runs, a turn end \
+         before it completes — and can refuse it. Owner: {}.\n\
          - A **session warning** surfaces context when a session opens. Owner: {}.\n\
          - A **validate suite** holds a test baseline that a per-run evidence manifest \
          attests. Owner: {}.\n\
@@ -584,6 +585,44 @@ mod tests {
             Ok(_) => panic!("adopted but broken: unparseable settings must refuse"),
         };
         assert!(err.contains("unparseable"), "the refusal says what is wrong: {}", err);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: gate-sdk/SPEC.md §enforcement-map — every event is read, a member row is headed by its
+    // operand and credited to its owner, and an unknown operand keeps the path attribution
+    #[test]
+    fn every_hook_event_is_rowed_and_a_member_is_credited_to_its_owner() {
+        let dir = std::env::temp_dir().join(format!("enfmap-events-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).expect("scratch dir");
+        let f = dir.join("settings.json");
+        std::fs::write(
+            &f,
+            r#"{"hooks":{
+                "SubagentStop":[{"hooks":[{"type":"command","command":"bash gate-sdk/bin/run-gates.sh --hook subagent-stop-liveness"}]}],
+                "SessionStart":[{"hooks":[{"type":"command","command":"bash scripts/s.sh"}]}],
+                "PreToolUse":[{"matcher":"Write|Edit","hooks":[
+                    {"type":"command","command":"bash gate-sdk/bin/run-gates.sh --hook workflow-state-guard"},
+                    {"type":"command","command":"bash gate-sdk/bin/run-gates.sh --hook no-such-member"},
+                    {"type":"command","command":"bash guard-kit/bin/g.sh"}]}]}}"#,
+        )
+        .expect("write");
+        let s = hook_sections(&f.display().to_string()).expect("parses");
+        let rows = |i: usize| -> Vec<(String, Vec<String>)> {
+            s[i].rows.iter().map(|r| (r.kit.clone(), r.cells.clone())).collect()
+        };
+        let v = |c: &[&str]| c.iter().map(|x| x.to_string()).collect::<Vec<_>>();
+        assert_eq!(s[0].title, "Guards");
+        assert_eq!(
+            rows(0),
+            vec![
+                ("lifecycle-kit".into(), v(&["workflow-state-guard", "PreToolUse", "Write\\|Edit"])),
+                ("gate-sdk".into(), v(&["gate-sdk/bin/run-gates.sh", "PreToolUse", "Write\\|Edit"])),
+                ("guard-kit".into(), v(&["guard-kit/bin/g.sh", "PreToolUse", "Write\\|Edit"])),
+                ("delegation-kit".into(), v(&["subagent-stop-liveness", "SubagentStop", "*"])),
+            ]
+        );
+        assert_eq!(s[1].title, "Session warnings");
+        assert_eq!(rows(1), vec![("(consumer)".into(), v(&["scripts/s.sh"]))]);
         let _ = std::fs::remove_dir_all(&dir);
     }
 

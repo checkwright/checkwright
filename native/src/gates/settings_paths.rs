@@ -1,5 +1,6 @@
-// spec: context-kit/SPEC.md §check-settings-paths — every committed allow-list entry whose
-// command token is a literal repo-relative .sh path resolves in the working tree
+// spec: context-kit/SPEC.md §check-settings-paths — every path the committed settings file tells
+// the harness to run resolves in the working tree, and every `--hook` operand is a member
+use crate::hook::{self, Registration};
 use crate::walk;
 use serde_json::Value;
 
@@ -24,30 +25,8 @@ fn tokens(inner: &str) -> Vec<&str> {
     inner.split_ascii_whitespace().collect()
 }
 
-// spec: context-kit/SPEC.md §check-settings-paths — the command token is not always argv[0]: a
-// grant may lead with `env NAME=VALUE ...` before the interpreter, and one on this tree does;
-// a `bash`/`sh` interpreter word is then skipped too
 fn command_token<'a>(tok: &[&'a str]) -> Option<&'a str> {
-    let mut i = 0usize;
-    if tok.first() == Some(&"env") {
-        i = 1;
-        while i < tok.len() && is_assignment(tok[i]) {
-            i += 1;
-        }
-    }
-    if matches!(tok.get(i), Some(&"bash") | Some(&"sh")) {
-        i += 1;
-    }
-    tok.get(i).copied()
-}
-
-fn is_assignment(t: &str) -> bool {
-    let Some(at) = t.find('=') else { return false };
-    if at == 0 {
-        return false;
-    }
-    let b = t.as_bytes();
-    (b[0].is_ascii_alphabetic() || b[0] == b'_') && at > 0
+    hook::command_index(tok).map(|i| tok[i])
 }
 
 // spec: context-kit/SPEC.md §check-settings-paths — the extraction predicate's one holder; its
@@ -59,6 +38,82 @@ pub fn literal_script_path(entry: &str) -> Option<&str> {
     // pattern, intentionally polymorphic over files that need not exist today; the `*` twin of
     // a literal grant is a separate token and stays in scope
     (cand.ends_with(".sh") && !cand.contains('*')).then_some(cand)
+}
+
+#[derive(Debug, PartialEq)]
+enum HookPath {
+    Literal(String),
+    Placeholder,
+    NoPath,
+}
+
+// spec: context-kit/SPEC.md §check-settings-paths — a hook's candidate carries a `/` whatever its
+// extension; a leading project-root placeholder is stripped, and any other `$` roots it elsewhere
+fn hook_path(cand: &str) -> HookPath {
+    if !cand.contains('/') {
+        return HookPath::NoPath;
+    }
+    let rest = strip_project_root(cand).unwrap_or_else(|| cand.to_string());
+    if rest.contains('$') {
+        return HookPath::Placeholder;
+    }
+    HookPath::Literal(rest)
+}
+
+fn strip_project_root(cand: &str) -> Option<String> {
+    let (quote, body) = match cand.chars().next() {
+        Some(q @ ('"' | '\'')) => (Some(q), &cand[1..]),
+        _ => (None, cand),
+    };
+    let after = body
+        .strip_prefix("${CLAUDE_PROJECT_DIR}")
+        .or_else(|| body.strip_prefix("$CLAUDE_PROJECT_DIR"))?;
+    let (after, quote) = match quote {
+        Some(q) if after.starts_with(q) => (&after[1..], None),
+        other => (after, other),
+    };
+    let rest = after.strip_prefix('/')?;
+    let rest = match quote {
+        Some(q) => rest.strip_suffix(q)?,
+        None => rest,
+    };
+    Some(rest.to_string())
+}
+
+struct HookEntry<'a> {
+    at: String,
+    shown: String,
+    tokens: Vec<&'a str>,
+}
+
+// spec: context-kit/SPEC.md §check-settings-paths — every `type: command` hook under `hooks`,
+// whatever its event; events iterate sorted, groups and hooks in registration order
+fn hook_entries(doc: &Value) -> Vec<HookEntry<'_>> {
+    let mut out = Vec::new();
+    let Some(events) = doc.get("hooks").and_then(Value::as_object) else {
+        return out;
+    };
+    for (event, groups) in events {
+        for (i, g) in groups.as_array().into_iter().flatten().enumerate() {
+            let hooks = g.get("hooks").and_then(Value::as_array);
+            for (j, h) in hooks.into_iter().flatten().enumerate() {
+                if h.get("type").and_then(Value::as_str) != Some("command") {
+                    continue;
+                }
+                let tokens = hook::command_tokens(h);
+                let shown = match h.get("args") {
+                    Some(_) => tokens.join(" "),
+                    None => h.get("command").and_then(Value::as_str).unwrap_or("").to_string(),
+                };
+                out.push(HookEntry {
+                    at: format!("hooks.{}[{}].hooks[{}]", event, i, j),
+                    shown,
+                    tokens,
+                });
+            }
+        }
+    }
+    out
 }
 
 pub fn run(args: &[String]) -> i32 {
@@ -134,9 +189,36 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
 
+    let (mut hooks_checked, mut hooks_skipped, mut bad_member) = (0usize, 0usize, false);
+    for h in hook_entries(&doc) {
+        if let Some(cand) = command_token(&h.tokens) {
+            match hook_path(cand) {
+                HookPath::Literal(p) => {
+                    hooks_checked += 1;
+                    if !std::path::Path::new(&format!("{}/{}", root, p)).is_file() {
+                        dead.push(format!("{}: {} — no such file: {}", h.at, h.shown, p));
+                    }
+                }
+                HookPath::Placeholder => hooks_skipped += 1,
+                HookPath::NoPath => {}
+            }
+        }
+        match hook::registration(&h.tokens) {
+            Registration::Member(m) if !hook::members().contains(&m) => {
+                bad_member = true;
+                dead.push(format!("{}: {} — no such hook member: {}", h.at, h.shown, m));
+            }
+            Registration::NoOperand => {
+                bad_member = true;
+                dead.push(format!("{}: {} — --hook names no member", h.at, h.shown));
+            }
+            _ => {}
+        }
+    }
+
     if !dead.is_empty() {
         println!(
-            "check-settings-paths: {} grants a path that does not resolve in the tree:",
+            "check-settings-paths: {} names a path or hook member that does not resolve:",
             settings_file
         );
         for d in &dead {
@@ -144,13 +226,17 @@ pub fn run(args: &[String]) -> i32 {
         }
         println!("  help: repoint each entry at the path that replaced it, or drop the entry if the");
         println!("        grant is spent — a port that replaces checks/<gate>.sh with <gate>.gate");
-        println!("        strands both the bare form and its '*' twin.");
+        println!("        strands both the bare form and its '*' twin; swap a hook's registration");
+        println!("        before deleting the script it runs, or its guard fails open silently.");
+        if bad_member {
+            println!("  help: this binary carries: {}", hook::members().join(", "));
+        }
         return 1;
     }
 
     println!(
-        "SETTINGS-PATHS: clean ({} literal .sh grant(s) in {} resolve)",
-        checked, settings_file
+        "SETTINGS-PATHS: clean ({} literal .sh grant(s) and {} hook path(s) in {} resolve; {} hook(s) skipped for a placeholder)",
+        checked, hooks_checked, settings_file, hooks_skipped
     );
     0
 }
@@ -187,6 +273,38 @@ mod tests {
             Some("scripts/x.sh")
         );
         assert_eq!(literal_script_path("Bash(scripts/x.sh --flag)"), Some("scripts/x.sh"));
+    }
+
+    #[test]
+    fn a_hook_path_strips_only_the_project_root_placeholder() {
+        let lit = |s: &str| HookPath::Literal(s.to_string());
+        assert_eq!(hook_path("scripts/x.sh"), lit("scripts/x.sh"));
+        assert_eq!(hook_path("scripts/x.py"), lit("scripts/x.py"));
+        assert_eq!(hook_path("${CLAUDE_PROJECT_DIR}/scripts/x.sh"), lit("scripts/x.sh"));
+        assert_eq!(hook_path("$CLAUDE_PROJECT_DIR/scripts/x.sh"), lit("scripts/x.sh"));
+        assert_eq!(hook_path("\"$CLAUDE_PROJECT_DIR\"/scripts/x.sh"), lit("scripts/x.sh"));
+        assert_eq!(hook_path("\"${CLAUDE_PROJECT_DIR}/scripts/x.sh\""), lit("scripts/x.sh"));
+        assert_eq!(hook_path("${CLAUDE_PLUGIN_ROOT}/x.sh"), HookPath::Placeholder);
+        assert_eq!(hook_path("$CLAUDE_PROJECT_DIRX/x.sh"), HookPath::Placeholder);
+        assert_eq!(hook_path("node"), HookPath::NoPath);
+    }
+
+    #[test]
+    fn every_hook_event_is_read_with_its_location() {
+        let doc: Value = serde_json::from_str(
+            r#"{"hooks":{"Stop":[{"hooks":[{"type":"prompt","prompt":"x"},{"type":"command","command":"bash a/b.sh"}]}],
+               "PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"node","args":["c/d.js","--x"]}]}]}}"#,
+        )
+        .unwrap();
+        let got: Vec<(String, String)> =
+            hook_entries(&doc).into_iter().map(|h| (h.at, h.shown)).collect();
+        assert_eq!(
+            got,
+            vec![
+                ("hooks.PreToolUse[0].hooks[0]".to_string(), "node c/d.js --x".to_string()),
+                ("hooks.Stop[0].hooks[1]".to_string(), "bash a/b.sh".to_string()),
+            ]
+        );
     }
 
     #[test]

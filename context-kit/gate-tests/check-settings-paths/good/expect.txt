@@ -1,1 +1,2 @@
-SETTINGS-PATHS: clean (4 literal .sh grant(s)
+SETTINGS-PATHS: clean (4 literal .sh grant(s) and 5 hook path(s)
+1 hook(s) skipped for a placeholder

@@ -12,7 +12,7 @@ Every governed surface in this repo is held by one enforcement class, ordered he
 
 - A **blocking gate** fails the commit (or, at the `align-only` tier, the consistency audit) — the pre-commit hook is its local reach, the CI workflow its server-side backstop. Owner: [`gate-sdk/SPEC.md` §Enforcement tiers](https://github.com/checkwright/checkwright/blob/master/gate-sdk/SPEC.md#enforcement-tiers).
 - An **advisory KPI** never blocks; it reports a drift trend into the session-context line. Owner: [`drift-kit/SPEC.md` §The KPI plugin contract](https://github.com/checkwright/checkwright/blob/master/drift-kit/SPEC.md#the-kpi-plugin-contract).
-- A **guard** intercepts a tool call before it runs. Owner: [`guard-kit/SPEC.md` §The shell guard](https://github.com/checkwright/checkwright/blob/master/guard-kit/SPEC.md#the-shell-guard).
+- A **guard** intercepts a harness event — a tool call before it runs, a turn end before it completes — and can refuse it. Owner: [`guard-kit/SPEC.md` §The shell guard](https://github.com/checkwright/checkwright/blob/master/guard-kit/SPEC.md#the-shell-guard).
 - A **session warning** surfaces context when a session opens. Owner: [`context-kit/SPEC.md` §The session-context hook](https://github.com/checkwright/checkwright/blob/master/context-kit/SPEC.md#the-session-context-hook-template).
 - A **validate suite** holds a test baseline that a per-run evidence manifest attests. Owner: [`evidence-kit/SPEC.md` §Baseline manifest](https://github.com/checkwright/checkwright/blob/master/evidence-kit/SPEC.md#baseline-manifest).
 - A **monitor** watches deployment truth rather than tree truth, so it reds a scheduled run, never a merge. Owner: [`site-kit/SPEC.md` §The monitor boundary](https://github.com/checkwright/checkwright/blob/master/site-kit/SPEC.md#the-monitor-boundary).
@@ -176,12 +176,13 @@ The rows below derive from the class registries — the gate registry, the KPI r
 
 ## Guards
 
-| kit | surface | intercepts |
-| --- | --- | --- |
-| [gate-sdk](gate-sdk/index.md) | gate-sdk/bin/run-gates.sh | Bash |
-| [gate-sdk](gate-sdk/index.md) | gate-sdk/bin/run-gates.sh | Agent |
-| [gate-sdk](gate-sdk/index.md) | gate-sdk/bin/run-gates.sh | Agent |
-| [gate-sdk](gate-sdk/index.md) | gate-sdk/bin/run-gates.sh | Write\|Edit |
+| kit | surface | event | intercepts |
+| --- | --- | --- | --- |
+| [guard-kit](guard-kit/index.md) | shell-guard | PreToolUse | Bash |
+| [delegation-kit](delegation-kit/index.md) | agent-budget-guard | PreToolUse | Agent |
+| [delegation-kit](delegation-kit/index.md) | agent-dispatch-guard | PreToolUse | Agent |
+| [lifecycle-kit](lifecycle-kit/index.md) | workflow-state-guard | PreToolUse | Write\|Edit |
+| [delegation-kit](delegation-kit/index.md) | subagent-stop-liveness | SubagentStop | * |
 
 ## Session warnings
 

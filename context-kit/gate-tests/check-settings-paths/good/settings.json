@@ -12,5 +12,52 @@
       "Bash(: > .workflow/prompt-friction.log)",
       "Bash(rm .tmp/*)"
     ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash tools/real-tool.sh"
+          },
+          {
+            "type": "command",
+            "command": "env DEMO_FLAG=1 bash tools/real-tool.sh"
+          },
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/tools/real-tool.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash",
+            "args": [
+              "tools/real-tool.sh",
+              "--flag"
+            ]
+          },
+          {
+            "type": "command",
+            "command": "bash tools/run-gates.sh --hook shell-guard"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/plugin-hook.sh"
+          },
+          {
+            "type": "prompt",
+            "prompt": "Check the turn is complete."
+          }
+        ]
+      }
+    ]
   }
 }
