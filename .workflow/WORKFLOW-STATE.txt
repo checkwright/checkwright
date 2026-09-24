@@ -8,3 +8,4 @@ hosted-install-path scope aad51032 2026-09-24 d073945c
 hosted-install-path spec a5feb7ec 2026-09-24 7d4f6bc6
 hosted-install-path align a0e41e41 2026-09-24 93f2c95f
 hosted-install-path build ac833a0e 2026-09-24 eee8b067
+hosted-install-path build a7d2a71a 2026-09-24 462d8c71
