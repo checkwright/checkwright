@@ -96,6 +96,17 @@ fn bullet_depth(line: &str) -> usize {
     }
 }
 
+// spec: queue-kit/SPEC.md §The queue-migrate arm — a line opening with a bold span starts a
+// paragraph only as a lead-in: its own span ends in `.` or `:`, or the open paragraph ends a sentence
+fn bold_lead_in(t: &str, open: &str) -> bool {
+    let Some(body) = t.strip_prefix("**") else { return false };
+    if body.find("**").is_some_and(|e| body[..e].ends_with(['.', ':'])) {
+        return true;
+    }
+    let tail = open.trim_end().trim_end_matches(['*', '`', ')', '"', '\'']);
+    open.trim().is_empty() || tail.ends_with(['.', ':', '?', '!'])
+}
+
 fn is_continuation(line: &str) -> bool {
     line.starts_with([' ', '\t']) && !line.trim().is_empty() && queue::bullet_slug(line).is_none()
 }
@@ -228,7 +239,7 @@ pub fn convert(text: &str, sec: &Sections) -> Result<String, String> {
             let t = l.trim();
             if let Some(tag) = declaration_tag(t, &slug, i + 1)? {
                 tags.push(tag);
-            } else if t.starts_with("**") || t.starts_with("- ") || t.starts_with("* ") {
+            } else if t.starts_with("- ") || t.starts_with("* ") || bold_lead_in(t, paras.last().map_or("", |p| p)) {
                 paras.push(t.to_string());
             } else {
                 let cur = paras.last_mut().expect("a paragraph is always open");
@@ -308,6 +319,11 @@ mod tests {
 - **only-tags** [spec: SPEC-b.md]
   — the lead held only tags.
 
+- **wrapped** — a wrap that leaves a
+  **bold phrase** mid-sentence and *ends.*
+  **After a sentence** still opens one. A line with no sentence end, then
+  **Label:** opens one too.
+
 ## Deferred
 
 - **beta** [cost: once/low] [surface: queue-kit] — deferred work.
@@ -357,6 +373,14 @@ a sub-task.
 
 the lead held only tags.
 
+### wrapped
+
+a wrap that leaves a **bold phrase** mid-sentence and *ends.*
+
+**After a sentence** still opens one. A line with no sentence end, then
+
+**Label:** opens one too.
+
 ## Deferred
 
 ### beta
@@ -383,8 +407,8 @@ dormant one-liner.
 ";
 
     // spec: queue-kit/SPEC.md §The queue-migrate arm — every rule the arm names, in one queue: the
-    // heading and sub-task, the declarations folded into the tag line, a bold lead-in opening a
-    // paragraph, the live citation linked, and done, lessons and preambles passing through
+    // heading and sub-task, the declarations on the tag line, a bold lead-in against a wrapped bold
+    // phrase, the live citation linked, and done, lessons and preambles passing through
     #[test]
     fn a_bullet_queue_converts_to_the_heading_grammar() {
         assert_eq!(convert(LEGACY, &sec()).expect("convert"), HEADINGS);

@@ -8,16 +8,6 @@
 
 ## New Features
 
-### queue-migrate-bold-split
-
-[spec: SPEC-bold-lead-in.md]
-
-queue-kit/SPEC.md §The queue-migrate arm starts a new paragraph at any continuation line that opens with a bold lead-in. A wrapped sentence whose next line happens to start with a bold span is therefore cut in two mid-sentence. This happened twelve times in this repo's own conversion, and re-running `--emit queue-migrate` on the pre-conversion queue (`4e205fc2^`) reproduces the splits. queue-kit-unwrap's close joined them by hand.
-
-**Deliverable:** a paragraph-start test that can tell a bold lead-in (for example, a bold span ending in `:` or `.`, or a preceding line that ends a sentence) from a wrapped bold span, with a fixture row for the mid-sentence case.
-
-**Cost while deferred:** an adopter migrating a wrapped queue gets broken paragraphs that no gate reports. Filed 2026-09-22 at queue-kit-unwrap's close drain. Promoted rather than fixed because the rule is the SPEC's own and changing it is a spec amendment. Owner: queue-kit/SPEC.md §The queue-migrate arm. **Selected for `adopter-onramp` — operator direction 2026-09-24, lead-relayed:** a defect on an adopter's migration path.
-
 ### install-hosted-one-liner
 
 [spec: SPEC-hosted-install.md]
@@ -1458,5 +1448,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 - guard-placeholder-letter-paths
 - guard-powershell-tool-unguarded
+- queue-migrate-bold-split
 
 ## Lessons Learned
