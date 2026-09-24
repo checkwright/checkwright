@@ -62,3 +62,5 @@ LIFECYCLE_KIT_RECURRENCE_THRESHOLD = 2
 LIFECYCLE_KIT_RULING_ORACLE_TIMEOUT = 10
 LIFECYCLE_KIT_SHIM_NGRAM = 9
 LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK = 1
+# spec: lifecycle-kit/SPEC.md §check-dispatch-entry — the agent type .claude/agents/stage-session.md declares, the one this repo's lead dispatches every stage session as
+LIFECYCLE_KIT_STAGE_SESSION_TYPES[] = stage-session

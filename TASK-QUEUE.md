@@ -8,20 +8,6 @@
 
 ## New Features
 
-### unstamped-session-tree-edit
-
-[spec: SPEC-stamp-before-write.md]
-
-a lead-dispatched stage session can do its whole batch without running `--enter-stage`. This happened at `native-shell-guard` build b5, a cheaper-tier session. No stamp records it, and its dispatch-marker line stayed unconsumed until the successor withdrew it. `check-dispatch-entry` is a commit-msg gate by design (lifecycle-kit/SPEC.md §check-dispatch-entry), so it fires at a commit and never at a tree write. The work rode a sibling's stamp, and the per-session audit trail lost it. The same session deleted `scripts/bash-guard.sh` before the hook swap. That opened a fail-open window for every session, recorded as a recurrence on `settings-hook-command-path-gate`.
-
-**Run at spec:** `grep -n "session_id\|agent_id" native/src/hook/*.rs`. `agent-dispatch-guard` reads a `PreToolUse` payload's `agent_id` (`native/src/hook/dispatch.rs`, the `nested` read), and the `SubagentStop` log shows that `session_id` is the lead's. So a dispatched caller is identified by `agent_id` and `agent_type`, and never by `session_id`.
-
-**Specified 2026-09-24:** the workflow-state guard gains a second rule keyed on the caller: a Write/Edit is refused when the caller's `agent_type` is a configured stage-session type and its `agent_id` carries no stamp. The rule is never keyed on the marker, so the lead, and a stamped sibling's subagents, are outside its reach.
-
-**Cost while deferred:** an unstamped session's edits are indistinguishable in the audit trail from its stamped sibling's. Filed 2026-09-24 to the gap inbox by the `native-shell-guard` lead; promoted at that iteration's close. Owner lookup: `dispatch marker`, `never entered`, `dispatch-withdraw` in this file: none.
-
-**Selected for `silent-guard-gaps` — operator direction 2026-09-24, lead-relayed.** Admitted on the trust arm: a stamp is the record an adopter trusts for who did the work. Its proposed member takes the decline channel `hook-decline-model-invisible` settles, so rule that one first.
-
 ## Technical Debt
 
 ## Deferred
@@ -1505,5 +1491,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - hook-decline-model-invisible
 - workflow-run-path-unresolved
 - split-posture-waiver-writer
+- unstamped-session-tree-edit
 
 ## Lessons Learned

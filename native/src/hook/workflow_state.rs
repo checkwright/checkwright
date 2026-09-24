@@ -20,10 +20,53 @@ pub fn run(payload: Option<&Value>) -> i32 {
         return degraded();
     }
     let path = hook::field(payload, &["tool_input", "file_path"]);
-    if path.is_empty() || !same_file(&path, &state_file) {
+    if !path.is_empty() && same_file(&path, &state_file) {
+        return hook::block(NAME, &blocked(&state_file));
+    }
+    stamp_before_write(payload)
+}
+
+// spec: lifecycle-kit/SPEC.md §check-dispatch-entry — the second rule, keyed on the caller and never
+// on the dispatch marker: a dispatched stage session writes nothing before its own stamp
+fn stamp_before_write(payload: Option<&Value>) -> i32 {
+    let roster = match walk::knob_array("LIFECYCLE_KIT_STAGE_SESSION_TYPES") {
+        Ok(r) => r,
+        Err(e) => return hook::decline(NAME, &format!("the stamp-before-write rule could not resolve LIFECYCLE_KIT_STAGE_SESSION_TYPES ({})", e), payload),
+    };
+    let agent_type = hook::field(payload, &["agent_type"]);
+    if agent_type.is_empty() || !roster.contains(&agent_type) {
         return 0;
     }
-    hook::block(NAME, &blocked(&state_file))
+    let agent_id = hook::field(payload, &["agent_id"]);
+    if agent_id.is_empty() {
+        return hook::decline(NAME, &format!("the stamp-before-write rule read a '{}' caller with no agent_id, so it cannot tell which stamp is its own", agent_type), payload);
+    }
+    let id = crate::sessions::normalize(&agent_id);
+    let state = match walk::knob_scalar("LIFECYCLE_KIT_STATE_FILE").and_then(|s| {
+        std::fs::read(&s)
+            .map(|b| (s.clone(), String::from_utf8_lossy(&b).into_owned()))
+            .map_err(|e| format!("cannot read {}: {}", s, e))
+    }) {
+        Ok(v) => v,
+        Err(e) => return hook::decline(NAME, &format!("the stamp-before-write rule could not read the state file ({})", e), payload),
+    };
+    if stamped(&state.1, &id) {
+        return 0;
+    }
+    hook::block(NAME, &unstamped(&agent_type, &id, &state.0))
+}
+
+fn stamped(state_text: &str, id: &str) -> bool {
+    crate::stages::data_lines(state_text)
+        .iter()
+        .any(|l| l.split_whitespace().nth(2) == Some(id))
+}
+
+fn unstamped(agent_type: &str, id: &str, state_file: &str) -> String {
+    format!(
+        "this '{}' session ({}) has not entered its stage — no data line of {} carries its id. Run 'bash gate-sdk/bin/run-gates.sh --enter-stage <stage>' first and commit the stamp: the stamp is what records this session's work, and a write made before it lands under no stamp at all. If the entry refuses, that refusal is a gate verdict to escalate, not to write around.",
+        agent_type, id, state_file
+    )
 }
 
 fn state_file() -> Result<String, String> {
@@ -101,6 +144,16 @@ mod tests {
             resolve(&plain),
             resolve(&root.join(".workflow/gap-inbox.md").display().to_string())
         );
+    }
+
+    // spec: lifecycle-kit/SPEC.md §check-dispatch-entry — a caller is stamped when any data line's
+    // session field is its normalized agent_id, a waiver line included; the header is never read
+    #[test]
+    fn a_caller_is_stamped_by_its_normalized_agent_id_in_any_session_field() {
+        let state = "# c demo build a94d72dc\n\n---\n\ndemo scope aaaaaaaa 2026-06-01 none\ndemo build a94d72dc 2026-06-02 none\n";
+        assert!(stamped(state, &crate::sessions::normalize("a94d72dcd2db52dbf")));
+        assert!(!stamped(state, &crate::sessions::normalize("b1b2b3b4c5c6c7c8d")));
+        assert!(!stamped("# x b1b2b3b4\n\n---\n", "b1b2b3b4"));
     }
 
     // spec: lifecycle-kit/SPEC.md §check-stage-entry — a path whose leaf does not yet exist still
