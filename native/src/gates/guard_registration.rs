@@ -426,7 +426,7 @@ fn declarations(body: &str, path: &str, line: usize) -> Result<Vec<Vec<View>>, S
     Ok(out)
 }
 
-// spec: guard-kit/SPEC.md §check-guard-registration — every `[Rr]ules? [0-9]+` token on a line
+// spec: guard-kit/SPEC.md §check-guard-registration — every `[Rr]ules?[ -][0-9]+` token on a line
 fn numbered(line: &str) -> Vec<String> {
     let b = line.as_bytes();
     let mut out = Vec::new();
@@ -441,7 +441,7 @@ fn numbered(line: &str) -> Vec<String> {
         if b.get(j) == Some(&b's') {
             j += 1;
         }
-        if b.get(j) != Some(&b' ') {
+        if !matches!(b.get(j), Some(b' ' | b'-')) {
             continue;
         }
         let digits = b[j + 1..].iter().take_while(|c| c.is_ascii_digit()).count();
@@ -535,7 +535,7 @@ mod tests {
 
     #[test]
     fn a_number_is_read_after_either_case_and_number() {
-        assert_eq!(numbered("Rule 12 and rules 3, 4; ruleset 2; rule x"), vec!["Rule 12", "rules 3"]);
+        assert_eq!(numbered("Rule 12 and rules 3, 4; ruleset 2; rule x; rule-22"), vec!["Rule 12", "rules 3", "rule-22"]);
     }
 
     #[test]

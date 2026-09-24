@@ -216,3 +216,4 @@
 | gate-sdk-blind-spots | sc sp a b v c | 12f/2d | 8 · ≤0d | 21s clean | 131 |
 | seam-and-stage-residue | sc sp a b v c | 12f/3d | 8 · ≤0d | 21s clean | 131 |
 | guard-harness-seams | sc sp a b v c | 3f/4d | 1 · ≤0d | 21s clean | 131 |
+| native-shell-guard | sc sp a b v c | 6f/2d | 1 · ≤0d | 21s clean | 131 |

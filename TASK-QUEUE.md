@@ -422,11 +422,13 @@ governed prose asserts what `.workflow/validate-baseline.txt` holds, and nothing
 
 ### settings-hook-command-path-gate
 
-[cost: event/high] [surface: context-kit]
+[cost: event/high] [surface: context-kit] [recurrence: 2026-09-24]
 
 a hook registration in `.claude/settings.json` whose `command` names a renamed or deleted script reds nowhere and fails silently at run time.
 
 **Probed at the drain, not reasoned:** `check-settings-paths` resolves command tokens for `permissions.allow[]` only (`native/src/gates/settings_paths.rs`, whose `allow_entries` reads `/permissions/allow`); the sole other reader of `/hooks` in the tree is the **emitter** `native/src/emit/enforcement_map.rs`, which renders `PreToolUse` and `SessionStart` command paths into the enforcement map **without resolving them against the tree** — a deleted script still renders a row — and does not read `/hooks/SubagentStop` at all, so this iteration's new registration is invisible to the projection as well as to every gate.
+
+**Recurred 2026-09-24** at `native-shell-guard` build. The Bash hook named `scripts/bash-guard.sh`, which was deleted from the working tree before the registration was swapped to `--hook shell-guard`. The shell guard failed open in every session until the swap, and the swap commit's settings diff shows the old path. A commit-time gate would not have covered that uncommitted window, only the commit that landed it.
 
 **Two halves, and the second is the cheaper one.** Path resolution is the walk `check-settings-paths` already owns, so widening its subject from one JSON pointer to two is a small port-side change; extending the enforcement map's hook-event roster is a docs-projection ruling about what belongs on that page, not a gate.
 
@@ -521,6 +523,40 @@ an operator-ruled `align-waived` line has no sanctioned writer. lifecycle-kit/SP
 **Why design-pending:** the options on record are (a) a stage session carries a pending waiver into its entry commit, (b) a waiver arm on `--enter-stage` that takes a ruling reference and never self-issues, (c) the dispatch worklist channel. Choosing one is a seam ruling between the split posture's lead-writes-nothing rule and the state machine. The help line's recovery is whatever that ruling makes it. Separately, the relay should name the real state path, not the scratch copy.
 
 **Cost while deferred:** each operator-waived align makes someone route around a guard or hand-append, and every assertion-C refusal points its reader at a vanished scratch file. Promoted from the icebox 2026-09-23 at `guard-harness-seams` close on the recurrence. Owner lookup: `waiv`, `align-waived` in this file: only this slug.
+
+### guard-placeholder-letter-paths
+
+[cost: event/low] [surface: guard-kit]
+
+the shell-guard member reads the literal letters `SQ` or `DQ` in a redirect target or a knob value as the skeleton's quoted-span placeholder. Rule `bounded_wait`'s recorded-launch grant declines on such a target (`native/src/guard/rules/liveness.rs`, the `tgt.contains("SQ")` test) and rule `git_c_root`'s knob echo skips such a value (`native/src/guard/rules/spelling.rs`). So a real path like a `mktemp` name spelling `DQ` is refused a grant. Three guard-kit suites already redraw a `mktemp` name carrying the letters.
+
+**Why not fixed at the drain:** a substring test against the raw command cannot tell a placeholder from literal letters. `cmd > .tmp/"$x"` skeletons to `.tmp/DQ`, and a literal `.tmp/DQ` elsewhere in the same raw command would pass the test. The grant would then answer for a target it never read. The sound fix maps placeholders by position: the skeleton hands back its placeholder spans, or uses a token no command text can spell. That is a skeleton-contract change (guard-kit/SPEC.md §The generic ruleset, the skeleton paragraph).
+
+**Cost while deferred:** a launch recorded under a directory whose name spells `SQ` or `DQ` is not granted and costs a permission decision. The direction is fail-closed. Filed 2026-09-24 to the gap inbox at `native-shell-guard` build; promoted at that iteration's close, which re-verified both sites. The bullet's shell-library half is moot, because `guard-kit/lib/guard.sh` retired in that iteration. Owner lookup: `SQ or DQ`, `placeholder` in this file: none.
+
+### enforcement-map-member-owner
+
+[cost: event/low] [surface: gate-sdk]
+
+`--emit enforcement-map` attributes every `--hook` member row to gate-sdk and labels it with the front-end path. `hook_sections` (`native/src/emit/enforcement_map.rs`) takes the first slash-bearing token of the hook command, so four Guards rows of `docs/enforcement.md` read `gate-sdk/bin/run-gates.sh`: the `shell-guard` Bash row, two Agent rows and the Write|Edit row. The table cannot tell members apart or credit the owning kit.
+
+**Premise corrected at the drain:** the bullet named the `HOOKS` table's owning kit as the attribution source. The table (`native/src/hook/mod.rs`) carries a name, a function and a knob slice per member, and no owner. The fix needs an owner per member first, either a fourth column or a derivation from the kit SPEC that defines each member. Then the row reads the `--hook` operand as its surface. Choosing the owner source is a gate-sdk/SPEC.md §enforcement-map ruling. This is also why the drain did not fix it.
+
+**Sibling, not a duplicate:** [settings-hook-command-path-gate](#settings-hook-command-path-gate) owns resolving a hook's command path against the tree, and that entry's projection half reads the same `/hooks` parse. A `--hook <member>` registration has two things to resolve: the front end and the member name.
+
+**Cost while deferred:** the published enforcement page credits every guard member to gate-sdk. Filed 2026-09-24 to the gap inbox at `native-shell-guard` build b5b; promoted at that iteration's close. Owner lookup: `enforcement-map`, `hook member`, `member name` in this file: only the sibling above.
+
+### unstamped-session-tree-edit
+
+[cost: event/low] [surface: lifecycle-kit]
+
+a lead-dispatched stage session can do its whole batch without running `--enter-stage`. This happened at `native-shell-guard` build b5, a cheaper-tier session. No stamp records it, and its dispatch-marker line stayed unconsumed until the successor withdrew it. `check-dispatch-entry` is a commit-msg gate by design (lifecycle-kit/SPEC.md §check-dispatch-entry), so it fires at a commit and never at a tree write. The work rode a sibling's stamp, and the per-session audit trail lost it. The same session deleted `scripts/bash-guard.sh` before the hook swap. That opened a fail-open window for every session, recorded as a recurrence on [settings-hook-command-path-gate](#settings-hook-command-path-gate).
+
+**Inferred, not run:** a pre-write refusal would have stopped the session before its first edit. A PreToolUse member on Write|Edit|Bash could refuse a tree write from a session whose id carries no stamp while the marker holds a line. Whether a session id is readable at hook time for this, and how it treats the lead's gap-inbox commit, is unestablished — `grep -n session_id native/src/hook/*.rs`
+
+**Why design-pending:** a write-time refusal keyed on the marker reaches every session sharing the tree, the lead included. Where it sits beside `check-dispatch-entry`'s stated honest limits is a lifecycle-kit ruling.
+
+**Cost while deferred:** an unstamped session's edits are indistinguishable in the audit trail from its stamped sibling's. Filed 2026-09-24 to the gap inbox by the `native-shell-guard` lead; promoted at that iteration's close. Owner lookup: `dispatch marker`, `never entered`, `dispatch-withdraw` in this file: none.
 
 ## Icebox
 
