@@ -514,7 +514,7 @@ the consumer's local-only companion files have read triggers at three skills and
 
 [cost: event/high] [surface: lifecycle-kit] [recurrence: 2026-09-23]
 
-an operator-ruled `align-waived` line has no sanctioned writer. lifecycle-kit/SPEC.md §check-stage-entry (C) and the align template record it in `.workflow/WORKFLOW-STATE.txt`, but the workflow-state guard (`native/src/hook/workflow_state.rs`) blocks every Write/Edit of that file, the bash guard's rewrite path blocks a shell append to it (`native/src/emit/rewrite.rs`, `is_state_file`), and `--enter-stage` has no waiver arm. Only an operator-run shell append lands one today.
+an operator-ruled `align-waived` line has no sanctioned writer. lifecycle-kit/SPEC.md §check-stage-entry (C) and the align template record it in `.workflow/WORKFLOW-STATE.txt`, but the workflow-state guard (`native/src/hook/workflow_state.rs`) blocks every Write/Edit of that file, the shell guard blocks a shell append to it as a redirect into a tracked file, and the `--rewrite` arm refuses it (`native/src/emit/rewrite.rs`, `is_state_file`), and `--enter-stage` has no waiver arm. Only an operator-run shell append lands one today.
 
 **Recurred.** Filed 2026-07-19 as the split-lead posture's gap, where the lead rules the waiver but writes no lifecycle state and a build session carried the line as a piggyback; iceboxed at an age eviction. Re-filed 2026-09-23 at this iteration's spec, recording the operator's align waiver, and the piggyback that worked in July is now guard-blocked for every session.
 
@@ -1539,12 +1539,5 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 `check-docs-cmd` assertion (C) misses a retired path cited from the queue, which is outside its manifest corpus and whose `<path>:<line>` token fails the path shape.
 
 ## Done
-
-- subagent-stop-phantom-firing
-- shell-guard-native-shell
-- guard-rule23-worktree-scratch
-- guard-declares-class-correspondence-ungated
-- guard-rule-number-intra-kit-citations-ungated
-- guard-rule-number-not-citable-outside-kit
 
 ## Lessons Learned
