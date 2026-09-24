@@ -1,12 +1,12 @@
 // spec: guard-kit/SPEC.md §rewrite — the fixed-text replacement arm: its effect is its command line,
 // it spawns no program, and it prints every span it changed.
 // spec: gate-sdk/SPEC.md §The non-gate arm — a table member and `Arm::Run`: it resolves
-// `GATE_SDK_WORKFLOW_DIR`, and its contract is the 0/1/2 split an emitting arm collapses.
+// `LIFECYCLE_KIT_STATE_FILE`, and its contract is the 0/1/2 split an emitting arm collapses.
 use crate::ere::Ere;
 use std::io::Write;
 use std::path::Path;
 
-pub const KNOBS: &[&str] = &["GATE_SDK_WORKFLOW_DIR"];
+pub const KNOBS: &[&str] = &["LIFECYCLE_KIT_STATE_FILE"];
 
 const NAME: &str = "rewrite";
 const USAGE: &str = "usage: --rewrite [--regex] [--expect <n>] [--] <find> <replace> <file>…";

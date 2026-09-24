@@ -395,7 +395,7 @@ An unrecognized `-`-prefixed argument before `--` is a refusal, wherever it sits
 - it is not an existing regular file, or it is a symlink — both read off the operand as given;
 - its canonical path is not inside the canonical working directory, which the front-end sets to the repository root (both sides resolved through `walk::canonicalize`, gate-sdk/SPEC.md §The crate's crosser, and compared with §scratch-run's boundary test);
 - a component of its path is `.git`, tested on the operand as given and again on its canonical path below the root, so a symlinked directory into `.git` is refused too;
-- it resolves to the lifecycle state file (lifecycle-kit/SPEC.md §check-stage-evidence, the `workflow-state-guard` paragraph), tested with that hook's own predicate, `is_state_file`, and a predicate that cannot resolve `GATE_SDK_WORKFLOW_DIR` is a refusal where the hook advises: a writer that cannot tell whether it is about to write the state file must not write;
+- it resolves to the lifecycle state file (lifecycle-kit/SPEC.md §check-stage-evidence, the `workflow-state-guard` paragraph), tested with that hook's own predicate, `is_state_file`, and a predicate that cannot resolve `LIFECYCLE_KIT_STATE_FILE` is a refusal where the hook advises: a writer that cannot tell whether it is about to write the state file must not write;
 - its content, or the content the rewrite would produce, is not UTF-8 or carries a NUL byte — the matcher is byte-wise, so a match can split a multi-byte character;
 - it names the same canonical file as an earlier operand.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: lifecycle-kit/SPEC.md §check-dispatch-entry — the workflow-state guard's stamp-before-write rule end-to-end through a sandboxed --hook: a configured stage-session caller with no stamp is blocked, a stamped one, a caller of another type and a top-level caller pass, an empty roster is inert, an unreadable state file declines through the advise envelope, and the state-file rule still blocks a stamped caller
+# spec: lifecycle-kit/SPEC.md §check-dispatch-entry — the workflow-state guard's stamp-before-write rule end-to-end through a sandboxed --hook: a configured stage-session caller with no stamp is blocked, a stamped one, a caller of another type and a top-level caller pass, an empty roster is inert, an unreadable state file declines through the advise envelope, and the state-file rule still blocks a stamped caller and follows a relocated LIFECYCLE_KIT_STATE_FILE
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -48,11 +48,19 @@ out="$(hook empty.knobs "$(payload stage-session b1b2b3b4c5c6c7c8d notes.md)")";
 out="$(hook roster.knobs "$(payload stage-session a94d72dcd2db52dbf .workflow/WORKFLOW-STATE.txt)")"; rc=$?
 [[ "$rc" -eq 2 ]] || note first-rule "want exit 2 for a stamped caller writing the state file, got $rc -- $out"
 
+mkdir -p "$sb/stamps"
+cp "$sb/.workflow/WORKFLOW-STATE.txt" "$sb/stamps/STATE.txt"
+printf 'LIFECYCLE_KIT_STATE_FILE = stamps/STATE.txt\n' >"$sb/relocated.knobs"
+out="$(hook relocated.knobs "$(payload - - stamps/STATE.txt)")"; rc=$?
+[[ "$rc" -eq 2 ]] || note relocated "want exit 2 for a write to a state file relocated through LIFECYCLE_KIT_STATE_FILE, got $rc -- $out"
+out="$(hook relocated.knobs "$(payload - - .workflow/WORKFLOW-STATE.txt)")"; rc=$?
+[[ "$rc" -eq 0 && -z "$out" ]] || note relocated-old "want a silent exit 0 for the path the relocated knob left, got $rc -- $out"
+
 printf 'LIFECYCLE_KIT_STAGE_SESSION_TYPES[] = stage-session\nLIFECYCLE_KIT_STATE_FILE = .workflow/absent.txt\n' >"$sb/absent.knobs"
 out="$(hook absent.knobs "$(payload stage-session b1b2b3b4c5c6c7c8d notes.md)")"; rc=$?
 [[ "$rc" -eq 0 ]] || note decline "want exit 0 for an unreadable state file, got $rc -- $out"
 grep -qF '"additionalContext"' <<<"$out" || note decline-envelope "the decline did not write the PreToolUse advise envelope: $out"
 
 [[ "$fails" -eq 0 ]] || { echo "stamp-before-write.test: $fails assertion(s) failed"; exit 1; }
-echo "stamp-before-write.test: clean (an unstamped stage-session caller is blocked naming its id and the remedy; a stamped one, another type, a top-level caller and an empty roster pass silently; an unreadable state file declines through the advise envelope; the state-file rule still blocks a stamped caller)"
+echo "stamp-before-write.test: clean (an unstamped stage-session caller is blocked naming its id and the remedy; a stamped one, another type, a top-level caller and an empty roster pass silently; an unreadable state file declines through the advise envelope; the state-file rule still blocks a stamped caller and follows a relocated LIFECYCLE_KIT_STATE_FILE)"
 exit 0

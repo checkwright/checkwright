@@ -70,7 +70,7 @@ fn unstamped(agent_type: &str, id: &str, state_file: &str) -> String {
 }
 
 fn state_file() -> Result<String, String> {
-    walk::knob_scalar("GATE_SDK_WORKFLOW_DIR").map(|dir| format!("{}/WORKFLOW-STATE.txt", dir))
+    walk::knob_scalar("LIFECYCLE_KIT_STATE_FILE")
 }
 
 // spec: guard-kit/SPEC.md §rewrite — the hook's own predicate, shared with the `--rewrite` arm,

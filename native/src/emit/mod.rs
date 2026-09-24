@@ -626,7 +626,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         scratch_run::KNOBS,
     ),
     // spec: guard-kit/SPEC.md §rewrite — an `Arm::Run` because its contract is the 0/1/2 split an
-    // emitting arm collapses, and a table member because it resolves `GATE_SDK_WORKFLOW_DIR`
+    // emitting arm collapses, and a table member because it resolves `LIFECYCLE_KIT_STATE_FILE`
     (
         "--rewrite",
         Arm::Run(rewrite::run),
