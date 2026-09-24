@@ -674,6 +674,9 @@ pub fn run_with_stdin_in(
     });
     match written {
         Ok(Ok(())) => {}
+        // spec: gate-sdk/SPEC.md §Fail-closed contract — a child that exits before reading all of
+        // its stdin ran, so its status is the verdict and the broken pipe is no spawn failure
+        Ok(Err(e)) if e.kind() == std::io::ErrorKind::BrokenPipe => {}
         Ok(Err(e)) => return Err(spawn_err(e)),
         Err(_) => {
             return Err(format!(

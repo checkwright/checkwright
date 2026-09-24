@@ -49,30 +49,83 @@ pub fn json_field(payload: Option<&serde_json::Value>, path: &str, or_empty: boo
     }
 }
 
+// spec: guard-kit/SPEC.md §The guard framework — the reader a payload's `tool_name` selects, with the
+// shell the rule table filters on; `None` is a tool no reader serves.
+pub fn reader_for(tool: &str) -> Option<(&'static dyn reader::Reader, engine::Shell)> {
+    match tool {
+        "Bash" => Some((&bash::Bash, engine::Shell::Bash)),
+        _ => None,
+    }
+}
+
+// spec: guard-kit/SPEC.md §The guard framework — the command the rules read: `tool_input.command`
+// with its trailing newlines stripped, as the shell guard's command substitution stripped them; an
+// absent or empty command is none.
+pub fn command_of(payload: &serde_json::Value) -> Option<&str> {
+    let cmd = payload.pointer("/tool_input/command")?.as_str()?.trim_end_matches('\n');
+    (!cmd.is_empty()).then_some(cmd)
+}
+
 // spec: guard-kit/SPEC.md §The guard framework — `guard_allow`'s envelope; the braces stay a
 // literal so the key order is the one the library always printed.
 pub fn allow_envelope(reason: &str) -> String {
+    allow_envelope_with(reason, None)
+}
+
+// spec: guard-kit/SPEC.md §Consumer rules — an envelope carrying a consumer fault adds it as
+// `additionalContext`, after every key the library printed.
+pub fn allow_envelope_with(reason: &str, context: Option<&str>) -> String {
     format!(
-        r#"{{"hookSpecificOutput":{{"hookEventName":"PreToolUse","permissionDecision":"allow","permissionDecisionReason":{}}}}}"#,
-        crate::hook::quote(reason)
+        r#"{{"hookSpecificOutput":{{"hookEventName":"PreToolUse","permissionDecision":"allow","permissionDecisionReason":{}{}}}}}"#,
+        crate::hook::quote(reason),
+        context_key(context)
     )
 }
 
 // spec: guard-kit/SPEC.md §The guard framework — the rewrite envelope, key order as above
 pub fn rewrite_envelope(cmd: &str, reason: &str) -> String {
+    rewrite_envelope_with(cmd, reason, None)
+}
+
+pub fn rewrite_envelope_with(cmd: &str, reason: &str, context: Option<&str>) -> String {
     format!(
-        r#"{{"hookSpecificOutput":{{"hookEventName":"PreToolUse","permissionDecision":"allow","permissionDecisionReason":{},"updatedInput":{{"command":{}}}}}}}"#,
+        r#"{{"hookSpecificOutput":{{"hookEventName":"PreToolUse","permissionDecision":"allow","permissionDecisionReason":{},"updatedInput":{{"command":{}}}{}}}}}"#,
         crate::hook::quote(reason),
-        crate::hook::quote(cmd)
+        crate::hook::quote(cmd),
+        context_key(context)
     )
 }
 
+fn context_key(context: Option<&str>) -> String {
+    context.map_or(String::new(), |c| format!(r#","additionalContext":{}"#, crate::hook::quote(c)))
+}
+
+// spec: guard-kit/SPEC.md §Consumer rules — `--guard-json view`: the named view of the payload's
+// command through the reader its tool selects; nothing for a tool no reader serves, a payload that
+// does not parse, or a command a dequoted view cannot be aligned with.
+pub fn json_view(payload: Option<&serde_json::Value>, view: reader::View) -> Option<String> {
+    let p = payload?;
+    let (reader, _) = reader_for(p.get("tool_name")?.as_str()?)?;
+    reader.view(command_of(p)?, view)
+}
+
 // spec: guard-kit/SPEC.md §The guard framework — `--guard-json <mode> [<arg>…]`, the reads and
-// renders `lib/guard.sh` spawns; every mode exits 0 and only a usage error exits 2.
+// renders `lib/guard.sh` spawns and a consumer rule command calls; every mode exits 0 and only a
+// usage error exits 2.
 pub fn json_arm(args: &[String]) -> i32 {
-    let usage = "  usage: checkwright-gates --guard-json field <path> | --guard-json field-or-empty <path> | --guard-json allow-entries <settings-file> | --guard-json advise <msg> | --guard-json allow <reason> | --guard-json rewrite <cmd> <reason>";
+    let usage = "  usage: checkwright-gates --guard-json field <path> | --guard-json field-or-empty <path> | --guard-json view <view> | --guard-json allow-entries <settings-file> | --guard-json advise <msg> | --guard-json allow <reason> | --guard-json rewrite <cmd> <reason>";
     let arg = |i: usize| args.get(i).map(String::as_str);
+    // spec: guard-kit/SPEC.md §Consumer rules — a view is named by its declaration spelling, as one
+    // operand or as its words; `body` names no view of a whole command, since it takes an index.
+    let view = (arg(0) == Some("view"))
+        .then(|| reader::View::from_spelling(&args[1..].join(" ")))
+        .flatten()
+        .filter(|v| *v != reader::View::Body);
     let out = match (arg(0), arg(1), arg(2)) {
+        (Some("view"), Some(_), _) if view.is_some() => {
+            let payload = crate::hook::read_payload();
+            view.and_then(|v| json_view(payload.as_ref(), v)).map(|v| vec![v])
+        }
         (Some(m @ ("field" | "field-or-empty")), Some(path), None) => {
             let payload = crate::hook::read_payload();
             json_field(payload.as_ref(), path, m == "field-or-empty").map(|v| vec![v])
@@ -146,6 +199,42 @@ mod tests {
         assert!(!allow.contains('\n') && !rw.contains('\n') && !adv.contains('\n'));
     }
 
+    // spec: guard-kit/SPEC.md §Consumer rules — the view is the reader's, read off the command as the
+    // member reads it, and nothing for a tool no reader serves or a command there is not
+    #[test]
+    fn a_view_is_read_through_the_tool_s_reader_or_not_at_all() {
+        let doc = |s: &str| serde_json::from_str::<serde_json::Value>(s).expect("the fixture must parse");
+        let bash = doc(r#"{"tool_name":"Bash","tool_input":{"command":"git commit -m \"x\"\n\n"}}"#);
+        assert_eq!(json_view(Some(&bash), reader::View::SqDqHd).as_deref(), Some("git commit -m DQ"));
+        assert_eq!(json_view(Some(&bash), reader::View::Raw).as_deref(), Some("git commit -m \"x\""));
+        let read = doc(r#"{"tool_name":"Read","tool_input":{"command":"ls"}}"#);
+        assert_eq!(json_view(Some(&read), reader::View::Raw), None);
+        let empty = doc(r#"{"tool_name":"Bash","tool_input":{"command":"\n"}}"#);
+        assert_eq!(json_view(Some(&empty), reader::View::Raw), None);
+        assert_eq!(json_view(None, reader::View::Raw), None);
+    }
+
+    // spec: guard-kit/SPEC.md §The generic ruleset — every view reads back from its own spelling
+    #[test]
+    fn a_view_spelling_round_trips() {
+        for v in reader::View::ALL {
+            assert_eq!(reader::View::from_spelling(v.spelling()), Some(v));
+        }
+        assert_eq!(reader::View::from_spelling("dq"), None);
+        assert_eq!(reader::View::from_spelling("hd sq dq"), None);
+    }
+
+    // spec: guard-kit/SPEC.md §Consumer rules — a fault rides after every key the library printed
+    #[test]
+    fn a_fault_context_is_the_envelope_s_last_key() {
+        let a = allow_envelope_with("why", Some("fault"));
+        assert!(a.starts_with(&allow_envelope("why")[..allow_envelope("why").len() - 2]));
+        assert!(a.ends_with(r#","additionalContext":"fault"}}"#));
+        let r = rewrite_envelope_with("c", "why", Some("fault"));
+        assert!(r.ends_with(r#""updatedInput":{"command":"c"},"additionalContext":"fault"}}"#));
+        assert_eq!(allow_envelope_with("why", None), allow_envelope("why"));
+    }
+
     // spec: guard-kit/SPEC.md §The guard framework — only a usage error exits 2
     #[test]
     fn a_malformed_invocation_is_the_one_exit_2() {
@@ -154,6 +243,9 @@ mod tests {
         assert_eq!(json_arm(&s(&["nope", "x"])), 2);
         assert_eq!(json_arm(&s(&["rewrite", "only-one"])), 2);
         assert_eq!(json_arm(&s(&["allow", "a", "b"])), 2);
+        assert_eq!(json_arm(&s(&["view"])), 2);
+        assert_eq!(json_arm(&s(&["view", "body"])), 2);
+        assert_eq!(json_arm(&s(&["view", "dq"])), 2);
         assert_eq!(json_arm(&s(&["allow-entries", "/no/such/settings.json"])), 0);
     }
 

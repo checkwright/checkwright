@@ -15,10 +15,25 @@ pub mod verdict;
 pub mod wakeup;
 pub mod workflow_state;
 
-// spec: gate-sdk/SPEC.md §The non-gate arm — the payload is `Option` rather than a `Value` that
+// spec: gate-sdk/SPEC.md §The non-gate arm — the parse is `Option` rather than a `Value` that
 // might be null, because an absent, empty or unparseable payload is one condition with one
 // consequence: the member's own degraded path, the path each shell member had for a missing jq.
-pub type HookFn = fn(Option<&Value>) -> i32;
+pub struct Payload {
+    bytes: Vec<u8>,
+    value: Option<Value>,
+}
+
+impl Payload {
+    pub fn value(&self) -> Option<&Value> {
+        self.value.as_ref()
+    }
+
+    pub fn bytes(&self) -> &[u8] {
+        &self.bytes
+    }
+}
+
+pub type HookFn = fn(&Payload) -> i32;
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the member table: the single roster the arm dispatches
 // on and the unknown-member refusal prints. Each row's knob slice is exactly what that member's
@@ -26,10 +41,10 @@ pub type HookFn = fn(Option<&Value>) -> i32;
 pub const HOOKS: &[(&str, HookFn, &[&str])] = &[
     // spec: delegation-kit/SPEC.md §usage-verdict — the rule runs inside the hook process, so the row
     // declares the rule's own reads rather than a path to it, one roster for both callers
-    ("agent-budget-guard", budget::run, verdict::KNOBS),
+    ("agent-budget-guard", |p| budget::run(p.value()), verdict::KNOBS),
     (
         "agent-dispatch-guard",
-        dispatch::run,
+        |p| dispatch::run(p.value()),
         &[
             "DELEGATION_KIT_READONLY_TYPES",
             "DELEGATION_KIT_MUTATING_TYPES",
@@ -39,19 +54,19 @@ pub const HOOKS: &[(&str, HookFn, &[&str])] = &[
     ),
     (
         "subagent-stop-liveness",
-        stop_liveness::run,
+        |p| stop_liveness::run(p.value()),
         &[
             "DELEGATION_KIT_STOP_LOG",
             "DELEGATION_KIT_LIVENESS_CMD",
             "GATE_SDK_TMP_DIR",
         ],
     ),
-    ("escalation-guard", escalation::run, &[]),
+    ("escalation-guard", |p| escalation::run(p.value()), &[]),
     ("shell-guard", shell_guard::run, crate::guard::host::KNOBS),
-    ("wakeup-guard", wakeup::run, &["GUARD_KIT_WAKEUP_LOG"]),
+    ("wakeup-guard", |p| wakeup::run(p.value()), &["GUARD_KIT_WAKEUP_LOG"]),
     (
         "workflow-state-guard",
-        workflow_state::run,
+        |p| workflow_state::run(p.value()),
         &["GATE_SDK_WORKFLOW_DIR"],
     ),
 ];
@@ -143,19 +158,27 @@ pub fn run(args: &[String]) -> i32 {
         eprintln!("  help: this binary carries: {}", members().join(", "));
         return 2;
     };
-    f(read_payload().as_ref())
+    f(&read_input())
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the payload read whole and parsed once; a read error,
 // an empty body and a body that is not JSON collapse to `None`, the member's degraded input.
-pub fn read_payload() -> Option<Value> {
+pub fn read_input() -> Payload {
     use std::io::Read;
-    let mut buf = Vec::new();
-    std::io::stdin().read_to_end(&mut buf).ok()?;
-    if buf.iter().all(u8::is_ascii_whitespace) {
-        return None;
+    let mut bytes = Vec::new();
+    if std::io::stdin().read_to_end(&mut bytes).is_err() {
+        return Payload { bytes: Vec::new(), value: None };
     }
-    serde_json::from_slice(&buf).ok()
+    let value = if bytes.iter().all(u8::is_ascii_whitespace) {
+        None
+    } else {
+        serde_json::from_slice(&bytes).ok()
+    };
+    Payload { bytes, value }
+}
+
+pub fn read_payload() -> Option<Value> {
+    read_input().value
 }
 
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the UTC stamp the log line carries,

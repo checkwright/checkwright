@@ -40,6 +40,7 @@ pub const KIT: Kit = Kit {
             &["python", "python3", "node", "deno", "ruby", "perl", "php", "zsh"],
         ),
         Row::scalar("GUARD_KIT_WORKTREE_READS", "read-only"),
+        Row::indexed("GUARD_KIT_CONSUMER_RULES_CMD", &[]),
     ],
     validate: Some(("guard config", validate)),
     open_family: false,

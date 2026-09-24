@@ -17,6 +17,7 @@ pub const KNOBS: &[&str] = &[
     "GUARD_KIT_SEARCH_TOOLS",
     "GUARD_KIT_SCRIPT_INTERPRETERS",
     "GUARD_KIT_WORKTREE_READS",
+    "GUARD_KIT_CONSUMER_RULES_CMD",
     "GATE_SDK_NATIVE_BIN",
     "GATE_SDK_WORKFLOW_DIR",
 ];
@@ -65,6 +66,12 @@ fn keyed(name: &str) -> Result<Vec<(String, String)>, String> {
         Value::Keyed(v) => Ok(v),
         _ => Err(format!("{} is not a keyed knob", name)),
     }
+}
+
+// spec: guard-kit/SPEC.md §Consumer rules — the consumer's rule command, an argv spawned without a
+// shell; empty is no consumer stage.
+pub fn consumer_cmd() -> Result<Vec<String>, String> {
+    list("GUARD_KIT_CONSUMER_RULES_CMD")
 }
 
 impl Host {

@@ -16,6 +16,22 @@ pub enum View {
 }
 
 impl View {
+    pub const ALL: [View; 8] = [
+        View::Raw,
+        View::Sq,
+        View::Hdq,
+        View::SqHdq,
+        View::SqDqHd,
+        View::SqDqHdq,
+        View::Dequoted,
+        View::Body,
+    ];
+
+    // spec: guard-kit/SPEC.md §The generic ruleset — the view a declaration's spelling names.
+    pub fn from_spelling(s: &str) -> Option<View> {
+        View::ALL.into_iter().find(|v| v.spelling() == s)
+    }
+
     // spec: guard-kit/SPEC.md §The generic ruleset — a view spelled as a declaration writes it.
     pub fn spelling(self) -> &'static str {
         match self {
