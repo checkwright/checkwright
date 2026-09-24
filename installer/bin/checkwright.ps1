@@ -58,6 +58,7 @@ function Get-HostShape {
 function Get-HostTarget {
     switch -Regex (Get-HostShape) {
         '^windows/(x64|amd64)$' { return 'x86_64-pc-windows-msvc' }
+        '^windows/arm64$'       { return 'aarch64-pc-windows-msvc' }
         '^linux/x64$'           { return 'x86_64-unknown-linux-gnu' }
         '^linux/arm64$'         { return 'aarch64-unknown-linux-gnu' }
         '^darwin/x64$'          { return 'x86_64-apple-darwin' }

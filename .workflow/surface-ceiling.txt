@@ -28,7 +28,7 @@
 1524cp docs/gate-sdk/index.md
 1265cp docs/guard-kit/index.md
 5290cp docs/index.md
-17236cp docs/install.md
+17589cp docs/install.md
 1547cp docs/kits.md
 1399cp docs/lifecycle-kit/index.md
 3849cp docs/methodology.md

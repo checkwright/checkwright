@@ -31,7 +31,7 @@
 # that table rather than trusting this paragraph if a leg ever fails to find a
 # runner: an unmatched label does not fail fast, it queues.
 #
-# The windows label needs no such probe and is the one line here attested by this
+# The x64 windows label needs no such probe and is the one line here attested by this
 # repository's own runs: `windows-latest` is what both Windows install-smoke legs
 # in .github/workflows/gates.yml have been running on for rounds, so it resolves
 # to a live image by measurement rather than by a table read.
@@ -44,8 +44,15 @@
 # carries a PINNED label that ages, which is a recurring cost and the same one
 # both macOS lines already pay. Naming it here is what stops a later reader
 # reading the pin as an oversight; the re-probe instruction above covers it.
+#
+# The arm64-Windows label is PROBED on the same terms, read 2026-09-24 off
+# actions/runner-images' README: `windows-11-arm` is listed with no preview
+# badge, and it is a pinned label that ages like the arm64-Linux one. Its image
+# readme carries Git for Windows' bash and Rust, which is what the producer and
+# the install-smoke leg on it run.
 x86_64-unknown-linux-gnu  ubuntu-latest
 aarch64-unknown-linux-gnu ubuntu-24.04-arm
 aarch64-apple-darwin      macos-latest
 x86_64-apple-darwin       macos-15-intel
 x86_64-pc-windows-msvc    windows-latest
+aarch64-pc-windows-msvc   windows-11-arm

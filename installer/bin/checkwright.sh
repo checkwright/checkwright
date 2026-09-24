@@ -46,8 +46,20 @@ PAYLOAD="$INSTALLER/payload"
 
 # spec: installer/SPEC.md §The gate binary — the detector's whole input, factored out so a refusal
 # can name what the host was detected AS rather than only that it mapped to nothing
-host_shape() {   # -> `<os>/<arch>` exactly as this host reports itself
-    printf '%s/%s' "$(uname -s 2>/dev/null)" "$(uname -m 2>/dev/null)"
+host_shape() {   # -> `<os>/<arch>` as this host reports itself
+    printf '%s/%s' "$(uname -s 2>/dev/null)" "$(host_arch)"
+}
+
+# spec: installer/SPEC.md §The gate binary — on the Windows family `uname -m` names the emulated
+# POSIX runtime's architecture, so there the OS's own is read from the registry
+host_arch() {   # -> this host's architecture, in `uname -m`'s vocabulary
+    case "$(uname -s 2>/dev/null)" in
+        MINGW*|MSYS*|CYGWIN*)
+            case "$(tr -d '\000' 2>/dev/null < '/proc/registry/HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Control/Session Manager/Environment/PROCESSOR_ARCHITECTURE')" in
+                ARM64) printf 'aarch64'; return ;;
+            esac ;;
+    esac
+    uname -m 2>/dev/null
 }
 
 # spec: installer/SPEC.md §The gate binary — step 2: which published artifact fits this host. Two
@@ -66,6 +78,7 @@ target_of_host() {   # -> the Rust target triple this host is, empty when it map
         # fits this host, so a MinGW/MSYS/Cygwin `uname` — which reports the shell environment and
         # not the toolchain — maps to the msvc triple a Windows build leg would publish
         MINGW*/x86_64|MSYS*/x86_64|CYGWIN*/x86_64) printf 'x86_64-pc-windows-msvc' ;;
+        MINGW*/aarch64|MSYS*/aarch64|CYGWIN*/aarch64) printf 'aarch64-pc-windows-msvc' ;;
         *) : ;;
     esac
 }

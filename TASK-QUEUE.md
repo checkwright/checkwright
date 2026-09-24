@@ -10,20 +10,6 @@
 
 ## Technical Debt
 
-### gate-binary-platform-roster-holes
-
-the shipped platform roster lacks `aarch64-pc-windows-msvc`, the operator's specific ask; the arm64 Linux half was discharged at `52b4b96a` (leg repaired at `644547a6`) and every mechanic it probed lives in `native/targets.list`'s header, `native/runners.list`'s and the leg's own job header. **PRODUCT-class** by the 2026-08-30 witness discriminator: the install path is adopter-facing.
-
-**Probed at promotion (2026-09-24):** actions/runner-images' README lists `windows-11-arm` with no preview badge, and its image readme carries Bash 5.3, Git 2.55.0.windows.5 (`C:\Program Files\Git\bin\bash.exe`) and Rust 1.98.1, so the bash floor the two bootstrap scripts need is on the image. **Runner approved — operator direction 2026-09-24, lead-relayed: `windows-11-arm`.**
-
-**Inferred, cannot run before build:** its minutes are free on a public repo — no run on the label exists yet; the first held leg's run reports its usage.
-
-**Deliverable:** copy `52b4b96a`'s shape — declare the target `held` first (the declaration creates its producer leg and `continue-on-error` derives from the `held` bit, so both legs land non-blocking), map it to `windows-11-arm`, and add its install-smoke consumer leg. Its roster line stays unwritten: the join is the roster header's own predicate, never a queue entry's. No observed-by tag: completion is the tree state, and the close push's run is the first observation of the held legs, not a predicate.
-
-**DISTINCT from [binding-intel-leg-failed-one-run-in-two](#binding-intel-leg-failed-one-run-in-two)**, whose subject is a joined leg's RELIABILITY; this owns which hosts get a binary at all. It widens the roster [held-ci-leg-failure-reddens-a-binding-one](#held-ci-leg-failure-reddens-a-binding-one)'s coupling reaches, and changes nothing in that entry's shape.
-
-**Cost while deferred:** a Windows-on-ARM adopter gets no binary. Surfaced 2026-09-10 by the iteration lead at the operator's ask; narrowed to one leg 2026-09-11 at spec and demoted at build (`lead, own-authority`, 2026-09-11). **Selected for `adopter-onramp` — operator direction 2026-09-24, lead-relayed;** debt, since declaring a target adds no governed name.
-
 ## Deferred
 
 ### side-effect-free-read-arms
@@ -1422,5 +1408,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - install-hosted-one-liner
 - baseline-suite-coverage-arm-one-directional
 - evidence-baseline-orphan-suite-row
+- gate-binary-platform-roster-holes
 
 ## Lessons Learned

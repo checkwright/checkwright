@@ -2125,3 +2125,159 @@ jobs:
           echo "the leg is continue-on-error and a non-zero is why it stays held."
           echo "A zero here is not a roster join: see this job's header for why."
           exit "$rc"
+
+  # The arm64-Windows leg, and criterion 2 of `aarch64-pc-windows-msvc`'s join
+  # predicate: the consumer that installs `native-artifacts`' upload for that
+  # triple on that host. Both exist because docs/install.md §Requirements
+  # declares the triple, for the reason the arm64-Linux sibling's header states.
+  # Its posture is DERIVED off the same per-target index, on the Intel macOS
+  # sibling's argument, and not restated.
+  #
+  # **It is the x64 Windows leg's prelude on the arm64-Linux leg's body.** The
+  # LF checkout, the `cygpath`-translated scratch base and `shell: bash` on every
+  # step are the x64 Windows sibling's, for that header's reasons; the probe,
+  # download, normalize and smoke shape is the arm64-Linux sibling's. The x64
+  # leg's parity, guard-table, remedy-block and platform-behaviour steps are not
+  # carried, as the arm64-Linux sibling carries none of its baseline's extras:
+  # this leg is the join predicate's criterion 2 and nothing wider.
+  #
+  # **What its first run must show, because no probe off this host could.**
+  # Git for Windows' POSIX layer is x86_64-only and runs emulated here, so
+  # `uname -m` reports x86_64 on this host exactly as on the x64 one, and the
+  # bootstrap's `host_arch` reads the OS's native architecture from the
+  # registry instead (installer/SPEC.md §The gate binary). The probe step prints
+  # every input that decision rests on, and a green is readable as criterion 2
+  # only when it shows `rustc -vV` answering an aarch64 Windows host — a rustc
+  # emulated as x64 would steer the smoke at the x64 upload and green on the
+  # wrong triple — and the registry value reading `ARM64`. The smoke itself is
+  # the detector's oracle: its roster is steered at that rustc host alone, so a
+  # detector still answering the x64 triple meets the unrostered refusal and
+  # reds the leg.
+  install-smoke-sh-windows-arm64:
+    needs: [native-artifacts, native-artifacts-roster]
+    runs-on: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['aarch64-pc-windows-msvc'].runner }}
+    continue-on-error: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['aarch64-pc-windows-msvc'].held }}
+    # The x64 Windows sibling's ceiling, for its MSYS-fork reason, which an
+    # emulated runtime can only make worse; no arm64 measurement exists yet.
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    steps:
+      - name: check the tree out with LF line endings
+        shell: bash
+        run: git config --global core.autocrlf false
+
+      # fetch-depth: 0 — the smoke stamps the packed version from `git describe
+      # --tags`, for the reason the baseline Linux leg states.
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          fetch-depth: 0
+
+      # Reporting only, never fails, and read this step FIRST: the job header
+      # names what it must show before a green here counts.
+      - name: probe the runner
+        shell: bash
+        run: |
+          set +e
+          echo "== interpreter =="
+          echo "BASH_VERSION=$BASH_VERSION"
+          uname -a
+          echo "uname -s: $(uname -s)"
+          echo "uname -m: $(uname -m)"
+          echo "== architecture, every input the bootstrap's detector could read =="
+          echo "RUNNER_ARCH=${RUNNER_ARCH:-<unset>}"
+          echo "PROCESSOR_ARCHITECTURE=${PROCESSOR_ARCHITECTURE:-<unset>}"
+          echo "PROCESSOR_ARCHITEW6432=${PROCESSOR_ARCHITEW6432:-<unset>}"
+          echo "PROCESSOR_IDENTIFIER=${PROCESSOR_IDENTIFIER:-<unset>}"
+          reg='/proc/registry/HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Control/Session Manager/Environment/PROCESSOR_ARCHITECTURE'
+          echo "-- the registry value host_arch reads, as octets --"
+          od -c "$reg"; echo "od exited $?"
+          echo "== toolchain, by what PATH actually resolves =="
+          for t in bash git jq awk gawk sed grep sort find realpath cygpath \
+                   sha256sum tar npm node cargo rustc rustup shellcheck ruby; do
+            printf '%-11s %s\n' "$t" "$(command -v "$t" 2>/dev/null || echo '<MISSING>')"
+          done
+          echo "== flavours, against the POSIX floor docs/install.md asserts =="
+          for t in awk sed sort grep find tar; do
+            printf '%-6s %s\n' "$t" "$("$t" --version 2>&1 | head -n1)"
+          done
+          echo "== rust =="
+          rustc -vV
+          rustup show
+          echo "== scratch =="
+          echo "RUNNER_TEMP=$RUNNER_TEMP"
+          echo "cygpath -u  =$(cygpath -u "$RUNNER_TEMP" 2>/dev/null)"
+          exit 0
+
+      # The x64 Windows sibling's step and reason: the scratch base arrives in
+      # Windows spelling and everything below is MSYS bash.
+      - name: resolve the scratch base
+        shell: bash
+        run: |
+          set -uo pipefail
+          tmp="$(cygpath -u "$RUNNER_TEMP" 2>/dev/null || printf '%s' "$RUNNER_TEMP")"
+          echo "SMOKE_TMP=$tmp" >> "$GITHUB_ENV"
+          echo "scratch base $tmp"
+
+      # By PATTERN and not by name, for the reason the siblings state.
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: gate-binary-*
+          path: ${{ runner.temp }}/native-artifacts
+
+      # The x64 Windows sibling's normalize step, whose header owns the whole
+      # argument; the host triple is derived from `rustc -vV` and never spelled.
+      - name: normalize the producer's upload onto the layout pack reads
+        shell: bash
+        run: |
+          set -euo pipefail
+          source gate-sdk/lib/gate.sh
+          art="${SMOKE_TMP:?the scratch base did not resolve}/native-artifacts"
+          binary="$(gate_native_bin)"; binary="${binary##*/}"
+          host="$(rustc -vV | awk '/^host:/{print $2}')"
+          [[ -n "$host" ]] || { echo "rustc reported no host triple"; exit 2; }
+          for d in "$art"/gate-binary-*; do
+            [[ -d "$d" ]] || continue
+            mv "$d" "$art/${d##*/gate-binary-}"
+          done
+          ls -lR "$art"
+          [[ -f "$art/$host/$binary" && -f "$art/$host/$binary.sha256" ]] || {
+            echo "the producer uploaded no complete $host artifact — this leg"
+            echo "exercises a release-shaped artifact and has none to exercise."
+            exit 1
+          }
+          dest="$(gate_native_bin)"
+          mkdir -p "$(dirname "$dest")"
+          cp "$art/$host/$binary" "$dest"
+          chmod +x "$dest"
+          [[ -x "$dest" ]] || { echo "could not place the producer's $host artifact at $dest"; exit 1; }
+          echo "SMOKE_ARTIFACTS=$art" >> "$GITHUB_ENV"
+
+      # The suite, steered exactly as the siblings steer it; the Intel macOS
+      # sibling's step header owns the argument for the steering and for what a
+      # zero here does and does not license.
+      - name: install smoke on an arm64 Windows host
+        shell: bash
+        run: |
+          set +e
+          tmp="${SMOKE_TMP:-}"
+          [[ -d "$tmp" ]] \
+            || { echo "scratch base did not resolve: RUNNER_TEMP=$RUNNER_TEMP -> $tmp"; exit 2; }
+          host="$(rustc -vV | awk '/^host:/{print $2}')"
+          [[ -n "$host" ]] \
+            || { echo "rustc reported no host triple, so the roster cannot be steered"; exit 2; }
+          echo "host triple: $host"
+          roster="$tmp/targets.list"
+          printf '%s\n' "$host" > "$roster"
+          log="$tmp/installer-smoke-windows-arm64.log"
+          GATE_SDK_NATIVE_TARGETS_FILE="$roster" INSTALLER_SMOKE_TMP_DIR="$tmp" \
+            INSTALLER_SMOKE_ARTIFACTS_DIR="$SMOKE_ARTIFACTS" \
+            bash installer/consumer-smoke/run-smoke.sh 2>&1 | tee "$log"
+          rc="${PIPESTATUS[0]}"
+          echo "== verdict =="
+          echo "installer_smoke on arm64 Windows exited $rc"
+          echo "This leg's posture is derived from the platform declaration, so what a"
+          echo "non-zero does is decided there and not by this text: while $host is held"
+          echo "the leg is continue-on-error and a non-zero is why it stays held."
+          echo "A zero here is not a roster join: see this job's header for why."
+          exit "$rc"
