@@ -8,16 +8,6 @@
 
 ## New Features
 
-### pages-liquid-break-undetected
-
-[spec: SPEC-liquid-parse.md]
-
-`pages-build-deployment` failed on two pushes and nothing in the iteration saw it, so checkwright.dev stayed frozen at an older tree and the hosted install scripts were 404. Cause: Jekyll runs Liquid over every docs page, and the generated mirror of gate-sdk/SPEC.md carried an unbalanced `${{` in inline code. `1fb12fa3` hotfixed the emitter: the docs-mirror arm wraps each mirrored body in a raw block and refuses a source carrying the block's closing tag. `pages-build-deployment` run 36042688147 is green. The detection half is what remains, and two checks miss it. `check-docs-render-fidelity` renders through kramdown only, never Liquid, so a hand-authored docs page with a Liquid-significant token still reds nothing. And the close binding's push watch reads the `gates` workflow alone (`.claude/commands/close.md` push-budget), so a red deployment goes unseen.
-
-**Deliverable:** a Liquid-parse assertion over the published pages, as a renderer contract under site-kit's knob convention, plus a push watch that also reads the push's deployment run. Any new knob owes an amendment.
-
-**Cost while deferred:** the next Liquid-significant token on a docs page freezes the site silently, and the hosted one-liner goes unserved again. Filed 2026-09-24 to the gap inbox after adopter-onramp's close; the fire was hotfixed the same day under operator direction, and this entry, promoted 2026-09-24 at the next scope, is its detection half. Owner lookup: `liquid`, `jekyll`, `pages-build` in this file — none; owner site-kit/SPEC.md §check-docs-render-fidelity and the close binding. **Selected for `hosted-install-path` — operator direction 2026-09-24, lead-relayed;** a feature; spec authored SPEC-liquid-parse.md and promoted it 2026-09-24.
-
 ### ps-producer-liveness-record
 
 [spec: SPEC-ps-producer-record.md] [observed-by: gates workflow]
@@ -1442,5 +1432,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 - install-ps1-octet-under-ps51
 - arm64-pwsh-bootstrap-witness
+- pages-liquid-break-undetected
 
 ## Lessons Learned

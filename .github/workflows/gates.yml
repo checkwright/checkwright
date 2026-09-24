@@ -24,18 +24,21 @@ jobs:
           fetch-depth: 0
       # This repo registers check-docs-render-fidelity, whose oracle renders each
       # docs page through ruby's kramdown GFM parser (site-kit/SPEC.md
-      # §check-docs-render-fidelity). The runner ships ruby but not the gem, so
-      # provision it into the system ruby the gate's bare `ruby` resolves. Stays
+      # §check-docs-render-fidelity), and check-docs-liquid-parse, whose oracle
+      # parses each Liquid-processed docs file through ruby's liquid gem at the
+      # Pages pin (site-kit/SPEC.md §check-docs-liquid-parse). The runner ships
+      # ruby but not the gems, so
+      # provision them into the system ruby the gates' bare `ruby` resolves. Stays
       # a bash `run:` (no setup-ruby action) to keep the checkout+bash tamper
       # floor; rides this filled instance, not the generic template, because the
-      # dependency joins the toolchain only for a consumer that registers the gate.
-      - name: render-fidelity gate deps (kramdown GFM parser)
-        run: sudo gem install --no-document kramdown-parser-gfm
+      # dependency joins the toolchain only for a consumer that registers the gates.
+      - name: docs gate deps (kramdown GFM parser, liquid)
+        run: sudo gem install --no-document kramdown-parser-gfm liquid:4.0.4
       # A registry member now dispatches to a compiled subcommand (gate-sdk/SPEC.md
       # §lib/gate.sh), and gate_command is fail-closed on an absent binary — so the
       # release build precedes the battery rather than accompanying it. Stays a bash
       # `run:` on the runner's preinstalled cargo (no setup-rust action) to keep the
-      # checkout+bash tamper floor the kramdown step above states.
+      # checkout+bash tamper floor the docs gate deps step above states.
       - name: build the native gate binary
         run: bash gate-sdk/bin/build-native.sh
       # The standing oracle for the crate's whole unix-only class: `cargo check` does

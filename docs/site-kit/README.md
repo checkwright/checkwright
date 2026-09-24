@@ -7,11 +7,13 @@ generated: true
 <!-- {% raw %} -->
 # site-kit
 
-Deployment-truth governance for a docs site served from the repo (GitHub Pages and the like): gates that hold the tree honest — about the site's host, and about whether each page renders faithfully — and a template that watches the live deployment the tree cannot see.
+Deployment-truth governance for a docs site served from the repo (GitHub Pages and the like): gates that hold the tree honest — about the site's host, and about whether each page renders faithfully and parses under the site's template engine — and a template that watches the live deployment the tree cannot see.
 
 `check-docs-cname-parity` makes the CNAME file the single gated source of truth for the docs host: no tracked file may cite a *configured host alias* other than that host in a `://` URL, so a domain rename is a one-line edit to the CNAME that the gate then propagates. The alias set is consumer config (`SITE_KIT_ALIASES`), never a kit literal — a kit that shipped a project's host names would publish them.
 
 `check-docs-render-fidelity` renders every tracked docs page through the pinned Pages parser (kramdown-GFM) and asserts no fence or heading leakage — the divergence class where a source-green tree ships a garbled site because GitHub Pages' parser is not github.com's. It fails closed when the renderer is absent; the dependency joins a consumer's toolchain only when the gate is registered.
+
+`check-docs-liquid-parse` parses every docs file the Pages build runs Liquid over — the markdown pages, any file carrying front matter, and the layout, include and post templates — through the Liquid parser Pages runs, so one unbalanced `{{` or unclosed tag reds in the tree instead of failing the site's build and freezing the deployment. It fails closed when the parser is absent or cannot detect an error.
 
 `check-docs-highlight-coverage` holds a layout that restyles code highlighting to the theme it restyles: every token class a tracked snapshot says the theme colours must have an override rule, or it keeps the theme's colour — black on a dark code background, for one. It is disarmed until `SITE_KIT_HIGHLIGHT_TOKENS` names the snapshot.
 
@@ -30,10 +32,11 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    check-docs-cname-parity
    check-docs-highlight-coverage
    check-docs-render-fidelity
+   check-docs-liquid-parse
    ```
    <!-- gate-roster:end -->
 
-   Regenerate the hook + graph artifacts: `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names. `check-docs-render-fidelity` needs ruby plus the kramdown-parser-gfm gem (the Pages parser); a consumer without a published docs site simply omits it.
+   Regenerate the hook + graph artifacts: `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names. `check-docs-render-fidelity` needs ruby plus the kramdown-parser-gfm gem (the Pages parser), and `check-docs-liquid-parse` needs ruby with the `liquid` gem; a consumer without a published docs site simply omits both, and one whose host runs no Liquid omits the second.
 
 2. Establish the host source of truth — a CNAME file holding exactly one host line, at the path `SITE_KIT_CNAME` names (site-kit/SPEC.md owns its fallback).
 

@@ -223,7 +223,8 @@ smoke_sandbox() {  # smoke_sandbox <label> <smoke-body> [publishing: 1|0]
 }
 KITDIRS=site-kit
 H1="$(smoke_sandbox smoke-covered "$REGISTRY_HEREDOC")"
-run_case smoke-covered "$H1" 0 "assertion J read 1 kit smoke registry script(s), 3 owned member(s) registered there and 0 declared"
+SITE_OWNED="$(grep -c '^check-' <<<"$REGISTRY_HEREDOC")"
+run_case smoke-covered "$H1" 0 "assertion J read 1 kit smoke registry script(s), $SITE_OWNED owned member(s) registered there and 0 declared"
 H2="$(smoke_sandbox smoke-omits "$(grep -v '^check-docs-render-fidelity$' <<<"$REGISTRY_HEREDOC")
 ")"
 run_case smoke-omits "$H2" 1 "registered nowhere: the binary carries 'check-docs-render-fidelity' and site-kit/smoke/install.sh"

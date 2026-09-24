@@ -11,6 +11,7 @@ cat >> scripts/gates.list <<'EOF'
 check-docs-cname-parity
 check-docs-highlight-coverage
 check-docs-render-fidelity
+check-docs-liquid-parse
 EOF
 
 # spec: gate-sdk/SPEC.md §Consumer smoke — the gated source of truth for the

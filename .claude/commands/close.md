@@ -37,4 +37,4 @@ Otherwise stamp the disposition line's deferral form (lifecycle-kit/SPEC.md §te
 
 Disposition evidence: `.workflow/release-disposition.txt` (committed, boundary-required and boundary-truncated per `scripts/lifecycle-config.knobs`).
 
-**push-budget** — one to two pushes per iteration; up to two hotfix pushes for a red push, unasked, and a third is asked for. Each push is watched to green on the `gates` workflow (`gh run watch`).
+**push-budget** — one to two pushes per iteration; up to two hotfix pushes for a red push, unasked, and a third is asked for. Each push is watched to green on every run it triggers: the `gates` workflow and `pages-build-deployment`. `gh run list --commit <sha>` names both, and `gh run watch <id>` waits on each. A red deployment is a red push.

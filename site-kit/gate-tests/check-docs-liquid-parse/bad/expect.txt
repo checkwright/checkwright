@@ -1,0 +1,2 @@
+docs/span.md: Liquid syntax error (line 3): Variable '{{
+docs/_layouts/default.html: Liquid syntax error (line 5): 'if' tag was never closed

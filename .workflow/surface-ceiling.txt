@@ -5,7 +5,7 @@
 1446cp .claude/commands/agent-execution.md
 551cp .claude/commands/align.md
 1148cp .claude/commands/build.md
-8444cp .claude/commands/close.md
+8591cp .claude/commands/close.md
 1759cp .claude/commands/consult.md
 1590cp .claude/commands/economics.md
 4609cp .claude/commands/lead.md
@@ -13,7 +13,7 @@
 6847cp .claude/commands/scope.md
 1155cp .claude/commands/spec.md
 1204cp .claude/commands/validate.md
-12266cp CLAUDE.md
+12250cp CLAUDE.md
 5785cp canon-kit/templates/SPEC-amendment.md
 2351cp context-kit/templates/close-brevity.md
 36756cp delegation-kit/templates/agent-execution.md
@@ -28,7 +28,7 @@
 1524cp docs/gate-sdk/index.md
 1265cp docs/guard-kit/index.md
 5290cp docs/index.md
-17589cp docs/install.md
+17629cp docs/install.md
 1547cp docs/kits.md
 1399cp docs/lifecycle-kit/index.md
 3849cp docs/methodology.md
@@ -62,8 +62,8 @@
 6598cp docs/posts/2026-08-23-checkwright-v0-25-0.md
 1444cp docs/queue-kit/index.md
 757cp docs/releases.md
-27764cp docs/site-architecture.md
-2168cp docs/site-kit/index.md
+28043cp docs/site-architecture.md
+2417cp docs/site-kit/index.md
 2437cp docs/value.md
 2616cp drift-kit/templates/close-knowledge.md
 3752cp drift-kit/templates/economics.md

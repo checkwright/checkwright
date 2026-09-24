@@ -92,6 +92,7 @@ check-docs-link-convention
 check-docs-cname-parity
 check-docs-highlight-coverage
 check-docs-render-fidelity
+check-docs-liquid-parse
 check-docs-cmd
 check-docs-restatement-parity
 check-fence-command-head

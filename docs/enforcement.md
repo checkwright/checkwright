@@ -105,6 +105,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | [site-kit](site-kit/index.md) | check-docs-cname-parity | precommit |
 | [site-kit](site-kit/index.md) | check-docs-highlight-coverage | precommit |
 | [site-kit](site-kit/index.md) | check-docs-render-fidelity | precommit |
+| [site-kit](site-kit/index.md) | check-docs-liquid-parse | precommit |
 | [canon-kit](canon-kit/index.md) | check-docs-cmd | precommit |
 | [canon-kit](canon-kit/index.md) | check-docs-restatement-parity | precommit |
 | [canon-kit](canon-kit/index.md) | check-fence-command-head | precommit |

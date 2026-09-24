@@ -191,7 +191,7 @@ Put these tools on your `PATH`. A bullet marked `@contributor` is only for build
 
 <!-- toolchain:end -->
 
-`init` also needs `sha256sum` or `shasum` to verify the binary, and refuses without one; on macOS and Linux the tarball path needs `curl` and `tar` besides, and the npm path needs Node. To publish a docs site with site-kit's render-fidelity gate, you also need Ruby with the `kramdown-parser-gfm` gem. To check your machine, run the gate binary with `--emit env-probe`: it writes an untracked `ENV.local.md` with each tool's version and verdict.
+`init` also needs `sha256sum` or `shasum` to verify the binary, and refuses without one; on macOS and Linux the tarball path needs `curl` and `tar` besides, and the npm path needs Node. To publish a docs site with site-kit's render-fidelity gate, you also need Ruby with the `kramdown-parser-gfm` gem, and with the `liquid` gem if you register its Liquid-parse gate. To check your machine, run the gate binary with `--emit env-probe`: it writes an untracked `ENV.local.md` with each tool's version and verdict.
 
 ## Going further
 

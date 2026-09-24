@@ -13,6 +13,12 @@ const RENDERER_BATCH: &[&str] = &[
     r#"require "kramdown"; require "kramdown-parser-gfm"; d = STDIN.read.split("\x00", -1); d.pop; d.each { |s| STDOUT.write(Kramdown::Document.new(s, input: "GFM").to_html); STDOUT.write("\x00") }"#,
 ];
 
+const LIQUID_PARSER: &[&str] = &[
+    "ruby",
+    "-e",
+    r#"require "liquid"; STDOUT.binmode; d = STDIN.binmode.read.split("\x00", -1); d.pop; d.each { |s| begin; Liquid::Template.parse(s.force_encoding("UTF-8"), error_mode: :warn, line_numbers: true); rescue Liquid::Error => e; STDOUT.write(e.message.tr("\x00", " ")); end; STDOUT.write("\x00") }"#,
+];
+
 // spec: site-kit/SPEC.md §Knob defaults — the one conditional default: a consumer who pinned
 // SITE_KIT_RENDERER is never handed this unpinned batch oracle in its place
 fn renderer_batch(resolve: Resolve) -> Result<Value, String> {
@@ -113,6 +119,15 @@ pub const KIT: Kit = Kit {
             shape: Shape::Indexed,
             default: Default::Derived(renderer_batch),
             inputs: &["SITE_KIT_RENDERER"],
+            empty_takes_default: false,
+            packing: None,
+            words: false,
+        },
+        Row {
+            name: "SITE_KIT_LIQUID_PARSER",
+            shape: Shape::Indexed,
+            default: Default::Indexed(LIQUID_PARSER),
+            inputs: &[],
             empty_takes_default: false,
             packing: None,
             words: false,

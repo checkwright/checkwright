@@ -12,6 +12,8 @@ The host gate — `check-docs-cname-parity` — makes the CNAME file the single 
 
 The render gate — `check-docs-render-fidelity` — re-renders every tracked docs page through the Pages parser and asserts the observed leakage classes never reach the published artifact: it verifies the real rendered output rather than trusting that a page reading green on github.com ships intact. The class list and the gate's honest limit live in the kit's [`SPEC.md`](SPEC.md#check-docs-render-fidelity).
 
+The Liquid gate, `check-docs-liquid-parse`, parses every docs file the Pages build runs Liquid over, since one unbalanced Liquid token fails the whole site build. Its corpus and limits live in the kit's [`SPEC.md`](SPEC.md#check-docs-liquid-parse).
+
 The template — `site-health.yml` — is a scheduled probe of the live site (HTTPS, redirects, certificate expiry, and release-body note pointers). It verifies a deployment, not a tree, so it ships as a workflow a consumer copies rather than a gate: the line is where the asserted object lives, and none of what it asserts is in any checkout.
 
 ## Install

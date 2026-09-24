@@ -35,7 +35,7 @@ pub fn run(args: &[String]) -> i32 {
 // spec: site-kit/SPEC.md §check-docs-render-fidelity — a renderer knob is an argv, so the shell
 // form's `"${KNOB[@]}"` is a program plus its arguments; an empty array is the branch the batch
 // knob's conditional default produces and never a program named the empty string
-fn spawn_filter(
+pub(crate) fn spawn_filter(
     ground: &'static str,
     argv: &[String],
     input: &[u8],
@@ -55,7 +55,7 @@ fn spawn_filter(
 // spec: site-kit/SPEC.md §check-docs-render-fidelity — `read -r -d ''`: a record is what a NUL
 // *terminates*, so a trailing fragment the stream never terminated is not a document. That is the
 // property the count assertion grades a truncated renderer by.
-fn nul_records(bytes: &[u8]) -> Vec<Vec<u8>> {
+pub(crate) fn nul_records(bytes: &[u8]) -> Vec<Vec<u8>> {
     let mut out = Vec::new();
     let mut cur: Vec<u8> = Vec::new();
     for b in bytes {
@@ -254,7 +254,7 @@ const NAME: &str = "check-docs-render-fidelity";
 // spec: site-kit/SPEC.md §check-docs-render-fidelity — every underscore-prefixed directory
 // segment excluded, those being Jekyll internals rather than published pages. The shell form's
 // `case "/$p/" in */_*/*)` brackets the path with slashes, so the *basename* is a segment too.
-fn jekyll_internal(p: &str) -> bool {
+pub(crate) fn jekyll_internal(p: &str) -> bool {
     p.split('/').any(|seg| seg.starts_with('_'))
 }
 

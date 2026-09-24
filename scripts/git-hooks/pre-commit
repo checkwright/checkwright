@@ -368,6 +368,10 @@ if staged_matches '*docs/*.md' '*docs/*/index.md' '*docs/posts/*.md' 'scripts/ga
     run_gate check-docs-render-fidelity native/target/release/checkwright-gates check-docs-render-fidelity
 fi
 
+if staged_matches '*docs/*.md' '*docs/*/index.md' '*docs/posts/*.md' '*docs/_layouts/*' '*docs/_includes/*' '*docs/_posts/*' 'scripts/gate-sdk-config.knobs' 'scripts/site-config.knobs' 'native/src/gates/docs_liquid_parse.rs' 'native/src/gates/docs_render_fidelity.rs' 'native/src/fresh.rs' 'native/src/programs.rs'; then
+    run_gate check-docs-liquid-parse native/target/release/checkwright-gates check-docs-liquid-parse
+fi
+
 if staged_matches '*SPEC*.md' '*README.md' '*CLAUDE.md' '*scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' '*CLAUDE.md' '*README.md' '*CONTRIBUTING.md' '*CODE_OF_CONDUCT.md' '*SECURITY.md' '*RELEASING.md' '*ROADMAP.md' '*TRAJECTORY.md' '*/SPEC.md' '*/README.md' '*reserve/*/README.md' '*doctrine-kit/DOCTRINE.md' '*docs/*.md' '*docs/*/index.md' '*docs/posts/*.md' '*/templates/*.md' '*.claude/agents/*.md' '*SPEC.md' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/docs_cmd.rs' 'native/src/gates/manifest_temporal.rs' 'native/src/programs.rs' 'native/src/spec.rs'; then
     run_gate check-docs-cmd native/target/release/checkwright-gates check-docs-cmd
 fi

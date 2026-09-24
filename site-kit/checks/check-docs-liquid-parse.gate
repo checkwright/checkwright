@@ -1,0 +1,3 @@
+# graph: couples=knob:SITE_KIT_DOCS_DIR/*.md,knob:SITE_KIT_DOCS_DIR/*/index.md,knob:SITE_KIT_DOCS_DIR/posts/*.md,knob:SITE_KIT_DOCS_DIR/_layouts/*,knob:SITE_KIT_DOCS_DIR/_includes/*,knob:SITE_KIT_DOCS_DIR/_posts/* dir=one valve=none tier=precommit
+# install: on-surface
+# spec: site-kit/SPEC.md §check-docs-liquid-parse — every tracked docs file the Pages build runs Liquid over (markdown pages, front-matter files, and the _layouts, _includes and _posts templates) parses under the parser SITE_KIT_LIQUID_PARSER names; a parser that fails its probe or returns a short count refuses

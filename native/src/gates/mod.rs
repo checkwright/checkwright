@@ -23,6 +23,7 @@ pub mod deferred_board_tags;
 pub mod deprecation_task;
 pub mod docs_cmd;
 pub mod docs_highlight_coverage;
+pub mod docs_liquid_parse;
 pub mod docs_restatement_parity;
 pub mod fence_command_head;
 pub mod fence_run;
@@ -2050,6 +2051,19 @@ pub const REGISTRY: &[GateEntry] = &[
             ("?", "SITE_KIT_RENDERER_BATCH"),
             ("?", "SITE_KIT_RENDERER"),
         ],
+    ),
+    (
+        "check-docs-liquid-parse",
+        docs_liquid_parse::run,
+        &[],
+        &[
+            "SITE_KIT_DOCS_DIR",
+            "SITE_KIT_LIQUID_PARSER",
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+        ],
+        "site-kit",
+        &[("git", ""), ("?", "SITE_KIT_LIQUID_PARSER")],
     ),
     (
         "check-identity",
