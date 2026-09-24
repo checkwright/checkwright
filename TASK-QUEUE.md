@@ -8,16 +8,6 @@
 
 ## New Features
 
-### ps-producer-liveness-record
-
-[spec: SPEC-ps-producer-record.md] [observed-by: gates workflow]
-
-a producer backgrounded through the PowerShell tool writes no liveness record, so rule `git_mutation_under_producer` cannot see it. Rule `background_no_record` has no PowerShell form: its corrective would steer to a record carrying a Windows process id, and whether the liveness predicate's non-unix arm (`signal_zero` in `native/src/evidence.rs`: Git Bash `kill -0`, then `ps`) answers one on native Windows is unmeasured. guard-kit/SPEC.md §The hook on native Windows states the limit.
-
-**Deliverable:** that measurement on a Windows runner, then the rule's PowerShell form, or a SPEC boundary note stating why none is buildable.
-
-**Cost while deferred:** on a Windows host a PowerShell-launched producer leaves tracked-tree mutations unguarded for its lifetime. Filed 2026-09-24 to the gap inbox by adopter-onramp's build; promoted 2026-09-24 at its close: →fix fails because the missing fact is a native-Windows observation no Linux command produces. Owner lookup: `background_no_record`, `script_interpreter`, `scratch-run` in this file — none; owner guard-kit/SPEC.md rule `background_no_record` and evidence-kit/SPEC.md §The producer-liveness lock. **Selected for `hosted-install-path` — operator direction 2026-09-24, lead-relayed;** a feature; spec authored SPEC-ps-producer-record.md and promoted it 2026-09-24. Spec's reading of the deliverable: a misread predicate is answered by a native Windows leg, which is buildable, so the boundary-note limb is not taken, and the amendment states the act for each measurement outcome. It spans guard-kit, evidence-kit and gate-sdk on both outcomes, so it is cross-component. Done is observed on the `install-smoke-sh-windows` run once the liveness step is binding.
-
 ## Technical Debt
 
 ## Deferred
@@ -30,7 +20,7 @@ a PowerShell script run off a scratch-dir body (`& .tmp\x.ps1`, `.\.tmp\x.ps1`, 
 
 **Deliverable:** a `--scratch-run` path for a PowerShell body and the rule's PowerShell form, or a SPEC boundary note refusing one.
 
-**Cost while deferred:** on a Windows host an approved PowerShell script call can run a body rewritten after approval, with no echo at execution. Filed 2026-09-24 to the gap inbox by adopter-onramp's build; promoted 2026-09-24 at its close: →fix fails because the runner arm is new mechanism, a unit rather than a repair. Owner lookup as for [ps-producer-liveness-record](#ps-producer-liveness-record) — none in this file; owner guard-kit/SPEC.md rule `script_interpreter` and its scratch-run runner.
+**Cost while deferred:** on a Windows host an approved PowerShell script call can run a body rewritten after approval, with no echo at execution. Filed 2026-09-24 to the gap inbox by adopter-onramp's build; promoted 2026-09-24 at its close: →fix fails because the runner arm is new mechanism, a unit rather than a repair. Owner lookup as for `ps-producer-liveness-record` — none in this file; owner guard-kit/SPEC.md §The generic ruleset, rule `script_interpreter` and its scratch-run runner.
 
 ### side-effect-free-read-arms
 
@@ -1422,6 +1412,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 ## Done
 
+- ps-producer-liveness-record
 - guard-ordinal-citation-unheld
 - install-ps1-octet-under-ps51
 - arm64-pwsh-bootstrap-witness
