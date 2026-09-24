@@ -8,3 +8,4 @@ silent-guard-gaps scope aa256a0d 2026-09-24 be185fad
 silent-guard-gaps spec a9ba9909 2026-09-24 89cdd119
 silent-guard-gaps align aa3977fe 2026-09-24 abfdb933
 silent-guard-gaps build ace990cb 2026-09-24 e0bb4266
+silent-guard-gaps build a36df19c 2026-09-24 2eb664a7
