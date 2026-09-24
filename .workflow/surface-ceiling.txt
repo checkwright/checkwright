@@ -16,7 +16,7 @@
 12266cp CLAUDE.md
 5785cp canon-kit/templates/SPEC-amendment.md
 2351cp context-kit/templates/close-brevity.md
-36759cp delegation-kit/templates/agent-execution.md
+36756cp delegation-kit/templates/agent-execution.md
 3397cp delegation-kit/templates/dispatch-checklists.md
 1313cp docs/canon-kit/index.md
 1617cp docs/context-kit/index.md
@@ -26,7 +26,7 @@
 1291cp docs/drift-kit/index.md
 1356cp docs/evidence-kit/index.md
 1524cp docs/gate-sdk/index.md
-1280cp docs/guard-kit/index.md
+1265cp docs/guard-kit/index.md
 5125cp docs/index.md
 16081cp docs/install.md
 1547cp docs/kits.md
