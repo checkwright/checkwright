@@ -115,6 +115,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | (consumer) | check-installer-no-deps | precommit |
 | (consumer) | check-release-bump | precommit |
 | (consumer) | check-release-channel-parity | precommit |
+| (consumer) | check-install-pin | precommit |
 | (consumer) | check-tightened-gates-grammar | precommit |
 | (consumer) | check-release-declaration-parity | precommit |
 | (consumer) | check-release-change-declared | precommit |

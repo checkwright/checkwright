@@ -11,7 +11,19 @@ It is for the maintainer of a repository coding agents write most of, who has to
 
 **It complements the workflow you already run.** Keep your spec process, your prompts, your harness. Add Checkwright where a claim has to be mechanically proven rather than asserted: the instructions shape, the gates enforce. Why that split is the whole design is the layer model on [Where Checkwright sits](positioning.md).
 
-Install it with no runtime first: [macOS and Linux](install.md#macos-and-linux) or [Windows](install.md#windows), each a download, a checksum and one command from the root of a clean repository. `demo` in place of `init` runs the whole arc in a scratch repository of its own and removes it, and `uninstall` takes the install back out.
+Install it with no runtime first, from the root of a clean repository. On [macOS and Linux](install.md#macos-and-linux):
+
+```sh
+curl -fsSL https://checkwright.dev/install.sh | sh
+```
+
+On [Windows](install.md#windows), in PowerShell:
+
+```powershell
+irm https://checkwright.dev/install.ps1 | iex
+```
+
+Each line fetches a pinned release, verifies it and runs `init`. `demo` in place of `init` runs the whole arc in a scratch repository of its own and removes it, and `uninstall` takes the install back out.
 
 With Node on the machine, the same arc is one command each:
 

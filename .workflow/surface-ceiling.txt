@@ -27,8 +27,8 @@
 1356cp docs/evidence-kit/index.md
 1524cp docs/gate-sdk/index.md
 1265cp docs/guard-kit/index.md
-5125cp docs/index.md
-16081cp docs/install.md
+5290cp docs/index.md
+17236cp docs/install.md
 1547cp docs/kits.md
 1399cp docs/lifecycle-kit/index.md
 3849cp docs/methodology.md
@@ -62,7 +62,7 @@
 6598cp docs/posts/2026-08-23-checkwright-v0-25-0.md
 1444cp docs/queue-kit/index.md
 757cp docs/releases.md
-27252cp docs/site-architecture.md
+27764cp docs/site-architecture.md
 2168cp docs/site-kit/index.md
 2437cp docs/value.md
 2616cp drift-kit/templates/close-knowledge.md

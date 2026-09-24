@@ -7,13 +7,13 @@ nav_order: 3
 
 This page gets the kits into your repository, keeps them current, and takes them out again. Checkwright is vendored: `init` copies the kit source into your tree and commits it, so what governs your repository is committed and reviewable. The gate binary is the one compiled piece, and it is checked against a published digest before anything runs.
 
-Pick your system below. Each path downloads a release, checks it against its published digest, unpacks it outside your repository, and runs `init`, with no runtime to install first. With Node on the machine, `npx checkwright init` does the same install in one command (§With Node). See the [footprint page](footprint.md) for what each kit costs your agent's context.
+Pick your system below. One line downloads a release, checks it against its published digest, unpacks it outside your repository, and runs `init`, with no runtime to install first. The same steps follow it one at a time. With Node on the machine, `npx checkwright init` does the same install in one command (§With Node). See the [footprint page](footprint.md) for what each kit costs your agent's context.
 
 ## Install
 
 <!-- install-primary: tarball -->
 
-Start from a clean git repository. Pick a version from the [releases](https://github.com/checkwright/checkwright/releases) page and put it in place of `X.Y.Z`, once, on the recipe's first line.
+Start from a clean git repository. The one line installs the newest release. For the step-by-step recipe, pick a version from the [releases](https://github.com/checkwright/checkwright/releases) page and put it in place of `X.Y.Z`, once, on the recipe's first line.
 
 ### macOS and Linux
 
@@ -33,7 +33,15 @@ export PATH="$(brew --prefix)/bin:$PATH"
 
 This block changes your machine, not your repository, so `checkwright uninstall` does not undo it. Why the floor is what it is: [installer/SPEC.md](installer/SPEC.md#requirements) and context-kit's [env-probe](context-kit/SPEC.md#binenv-probe).
 
-Download the release:
+Then, from your repository root:
+
+```sh
+curl -fsSL https://checkwright.dev/install.sh | sh
+```
+
+The script is `docs/install.sh` in this repository; read it at <https://checkwright.dev/install.sh> before you pipe it. To pass arguments, end the line with `sh -s -- --profile prose`, `sh -s -- demo` or `sh -s -- uninstall`. For `uninstall`, set `CHECKWRIGHT_VERSION` to the version you installed: `curl -fsSL https://checkwright.dev/install.sh | CHECKWRIGHT_VERSION=X.Y.Z sh -s -- uninstall`.
+
+Or step by step. Download the release:
 
 ```sh
 v=X.Y.Z
@@ -75,7 +83,15 @@ $env:PATH = "$git\usr\bin;$git\bin;$env:PATH"
 
 This block changes your machine, not your repository, so `checkwright uninstall` does not undo it. Why: [installer/SPEC.md](installer/SPEC.md#requirements). PowerShell, `Get-FileHash` and `tar.exe` ship with Windows 10 and later, so there is nothing else to install.
 
-Download the release, in PowerShell:
+Then, in PowerShell, from your repository root:
+
+```powershell
+irm https://checkwright.dev/install.ps1 | iex
+```
+
+The script is `docs/install.ps1` in this repository; read it at <https://checkwright.dev/install.ps1> before you pipe it. To pass arguments, run it as a script block: `& ([scriptblock]::Create((irm https://checkwright.dev/install.ps1))) --profile prose`, or `demo`, or `uninstall`. For `uninstall`, set `$env:CHECKWRIGHT_VERSION` to the version you installed first.
+
+Or step by step. Download the release, in PowerShell:
 
 ```powershell
 $v = 'X.Y.Z'
@@ -121,7 +137,7 @@ Moving to a profile that contains yours only adds. `init` refuses outside a git 
 
 ## Managing
 
-`checkwright <verb>` below means the last line of your install recipe with `<verb>` in place of `init`, or `npx checkwright <verb>`. Each verb answers in its exit status, so a CI step can gate on it.
+`checkwright <verb>` below means the one line with `<verb>` as its argument, the last line of your install recipe with `<verb>` in place of `init`, or `npx checkwright <verb>`. Each verb answers in its exit status, so a CI step can gate on it.
 
 - `checkwright doctor` checks this machine against §Requirements and reports what is installed.
 - `checkwright diff` lists the vendored files you have changed. Exit `0` means none.

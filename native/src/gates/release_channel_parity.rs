@@ -215,10 +215,10 @@ fn indent4(lines: &[String]) -> String {
         .join("\n")
 }
 
-// spec: installer/SPEC.md §Versioning — the newest tag by creator date. The shell form silences
-// this probe and lets an unanswerable one yield no version line, so invariant B goes dormant
-// rather than red; the conflation is preserved, because a port proves parity.
-fn newest_tag() -> String {
+// spec: installer/SPEC.md §Versioning — the newest tag by creator date, check-install-pin's reader
+// too. An unanswerable probe yields no version line, so invariant B goes dormant rather than red;
+// the conflation is preserved, because a port proves parity.
+pub(crate) fn newest_tag() -> String {
     proc::run(
         &programs::GIT,
         &[

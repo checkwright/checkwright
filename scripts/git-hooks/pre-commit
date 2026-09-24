@@ -408,6 +408,10 @@ if staged_matches 'docs/install.md' '.github/workflows/publish.yml' 'native/src/
     run_gate check-release-channel-parity native/target/release/checkwright-gates check-release-channel-parity
 fi
 
+if staged_matches 'docs/install.sh' 'docs/install.ps1' 'native/src/gates/install_pin.rs' 'native/src/gates/release_channel_parity.rs' 'native/src/fresh.rs'; then
+    run_gate check-install-pin native/target/release/checkwright-gates check-install-pin
+fi
+
 if staged_matches 'docs/posts/*.md' 'docs/install.md' '.workflow/release-declarations.md' 'native/src/gates/tightened_gates_grammar.rs' 'native/src/declaration.rs' 'native/src/gates/release_bump.rs'; then
     run_gate check-tightened-gates-grammar native/target/release/checkwright-gates check-tightened-gates-grammar
 fi

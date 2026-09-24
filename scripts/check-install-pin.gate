@@ -1,0 +1,2 @@
+# graph: couples=docs/install.sh,docs/install.ps1 dir=one valve=none tier=precommit
+# spec: installer/SPEC.md §The hosted install pin — the hosted install scripts' pin lines agree with each other (A) and with the newest release tag (B)

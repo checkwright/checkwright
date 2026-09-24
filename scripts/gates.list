@@ -103,6 +103,7 @@ check-payload-claim
 check-installer-no-deps
 check-release-bump
 check-release-channel-parity
+check-install-pin
 check-tightened-gates-grammar
 check-release-declaration-parity
 check-release-change-declared

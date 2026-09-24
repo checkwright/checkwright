@@ -218,6 +218,41 @@ jobs:
             || { echo "::error::the page's unix-install block exited 0 but wrote no checkwright.lock"; exit 1; }
           echo "the page's unix-install block installed into a clean consumer"
 
+      # The hosted one-liner, piped into the runner's `/bin/sh` the way an adopter
+      # pipes it (installer/SPEC.md §Requirements, the install blocks' witness).
+      # docs/install.sh is served over a local HTTP origin beside the tarball and
+      # digest the step above placed, laid out as a release, and
+      # CHECKWRIGHT_RELEASE_BASE points the script there. The server is this
+      # witness's tool and no adopter's.
+      - name: run the hosted one-liner against the packed tarball
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/one-liner"
+          placed=("$RUNNER_TEMP"/page-install/cw/checkwright-*.tgz)
+          [ -f "${placed[0]}" ] || { echo "::error::the step above placed no tarball"; exit 1; }
+          v="${placed[0]##*/checkwright-}"; v="${v%.tgz}"
+          mkdir -p "$work/serve/v$v" "$work/consumer"
+          cp "${placed[0]}" "${placed[0]}.sha256" "$work/serve/v$v/"
+          cp docs/install.sh "$work/serve/install.sh"
+          base="http://127.0.0.1:8731"
+          python3 -m http.server 8731 --bind 127.0.0.1 --directory "$work/serve" > "$work/server.log" 2>&1 &
+          srv=$!
+          trap 'kill "$srv" 2>/dev/null || true' EXIT
+          for _ in 1 2 3 4 5 6 7 8 9 10; do
+            curl -fsS -o /dev/null "$base/install.sh" && break
+            sleep 1
+          done
+          git -C "$work/consumer" init -q
+          git -C "$work/consumer" config user.email 'smoke@example.invalid'
+          git -C "$work/consumer" config user.name 'one-liner smoke'
+          echo "== curl -fsSL $base/install.sh | sh, installing v$v =="
+          ( cd "$work/consumer" \
+            && curl -fsSL "$base/install.sh" | CHECKWRIGHT_VERSION="$v" CHECKWRIGHT_RELEASE_BASE="$base" sh ) \
+            || { echo "::error::the hosted one-liner exited non-zero"; exit 1; }
+          [ -f "$work/consumer/checkwright.lock" ] \
+            || { echo "::error::the hosted one-liner exited 0 but wrote no checkwright.lock"; exit 1; }
+          echo "the hosted one-liner installed into a clean consumer under $(readlink -f /bin/sh)"
+
   # The native Windows sibling, and the first thing this repository has ever run
   # on a non-Linux host. It was shaped as an instrument before an assertion,
   # answering as many questions per run as one run can carry, because whether the
@@ -1084,6 +1119,60 @@ jobs:
               exit 1
           }
           Write-Host "the page's windows-install block installed into a clean consumer under Windows PowerShell"
+
+      # The hosted one-liner, `irm … | iex` under Windows PowerShell 5.1 the way an
+      # adopter runs it (installer/SPEC.md §Requirements, the install blocks'
+      # witness). docs/install.ps1 is served over a local HTTP origin beside the
+      # tarball and digest the step above placed, laid out as a release, because
+      # `irm` cannot read file://, and the two overrides point the script there. The page's remedy block runs
+      # first, as it does in the step above, since a step starts from the runner's
+      # PATH and not the one that block persisted.
+      - name: run the hosted one-liner against the packed tarball
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $remedy = @()
+          $inBlock = $false
+          foreach ($line in (Get-Content -LiteralPath docs/install.md)) {
+              if ($line -eq '<!-- windows-remedy:end -->') { $inBlock = $false }
+              if ($inBlock -and $line.Trim() -and $line -notmatch '^```') { $remedy += $line }
+              if ($line -eq '<!-- windows-remedy:begin -->') { $inBlock = $true }
+          }
+          if ($remedy.Count -eq 0) { Write-Host "::error::docs/install.md carries no windows-remedy block"; exit 1 }
+          Invoke-Expression ($remedy -join "`n") | Out-Host
+          $v = $env:PWSH_VERSION
+          $placed = Join-Path $env:PWSH_SCRATCH "page-install\checkwright-$v.tgz"
+          if (-not (Test-Path -LiteralPath "$placed.sha256")) { Write-Host "::error::the step above placed no tarball and digest"; exit 1 }
+          $serve = Join-Path $env:PWSH_SCRATCH 'one-liner-serve'
+          New-Item -ItemType Directory -Force -Path (Join-Path $serve "v$v") | Out-Null
+          Copy-Item -LiteralPath $placed, "$placed.sha256" -Destination "$serve\v$v"
+          Copy-Item -LiteralPath docs\install.ps1 -Destination "$serve\install.ps1"
+          $base = 'http://127.0.0.1:8732'
+          $srv = Start-Process -FilePath python -ArgumentList '-m', 'http.server', '8732', '--bind', '127.0.0.1', '--directory', $serve -PassThru -WindowStyle Hidden
+          try {
+              foreach ($i in 1..10) {
+                  try { Invoke-WebRequest "$base/install.ps1" -UseBasicParsing | Out-Null; break } catch { Start-Sleep -Seconds 1 }
+              }
+              $consumer = Join-Path $env:PWSH_SCRATCH 'one-liner-consumer'
+              New-Item -ItemType Directory -Force -Path $consumer | Out-Null
+              git -C $consumer init -q
+              git -C $consumer config user.email 'smoke@example.invalid'
+              git -C $consumer config user.name 'one-liner smoke'
+              $env:CHECKWRIGHT_VERSION = $v
+              $env:CHECKWRIGHT_RELEASE_BASE = $base
+              Write-Host "== irm $base/install.ps1 | iex, installing v$v under PowerShell $($PSVersionTable.PSVersion) =="
+              Push-Location $consumer
+              try {
+                  irm "$base/install.ps1" | iex
+                  $code = $LASTEXITCODE
+              } finally { Pop-Location }
+          } finally { Stop-Process -Id $srv.Id -Force -ErrorAction SilentlyContinue }
+          if ($code -ne 0) { Write-Host "::error::the hosted one-liner left `$LASTEXITCODE $code"; exit 1 }
+          if (-not (Test-Path -LiteralPath (Join-Path $consumer 'checkwright.lock'))) {
+              Write-Host "::error::the hosted one-liner left `$LASTEXITCODE 0 but wrote no checkwright.lock"
+              exit 1
+          }
+          Write-Host "the hosted one-liner installed into a clean consumer under Windows PowerShell"
 
   # The RELEASE-SHAPED PRODUCER, and its whole reason for existing is that no leg
   # which builds from the host it runs on can ever discharge a roster join.

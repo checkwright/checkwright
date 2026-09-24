@@ -53,6 +53,7 @@ pub mod evidence_manifest;
 pub mod footprint_fresh;
 pub mod front_end_fail_open;
 pub mod install_evidence_fresh;
+pub mod install_pin;
 pub mod install_platforms;
 pub mod install_toolchain;
 pub mod installer_no_deps;
@@ -1558,6 +1559,14 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-release-channel-parity",
         release_channel_parity::run,
+        &[],
+        &[],
+        "-",
+        &[("git", "")],
+    ),
+    (
+        "check-install-pin",
+        install_pin::run,
         &[],
         &[],
         "-",

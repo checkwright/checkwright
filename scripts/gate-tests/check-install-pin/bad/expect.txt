@@ -1,0 +1,2 @@
+invariant A: the twins disagree
+invariant B: install.sh pins 0.20.0, and the newest release is v0.21.0
