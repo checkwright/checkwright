@@ -494,6 +494,15 @@ fn seg_ok(s: &str) -> bool {
 }
 
 fn scan_a(line: &str, ln: usize, out: &mut Vec<Token>) {
+    for e in invoked_tokens(line) {
+        out.push(Token::Path(ln, e));
+    }
+}
+
+// spec: canon-kit/SPEC.md §check-docs-cmd — assertion (A)'s invocation predicate, the one holder
+// its second reader, gate-sdk's check-action-run-path, calls
+pub(crate) fn invoked_tokens(line: &str) -> Vec<String> {
+    let mut out = Vec::new();
     for seg in split_commands(line) {
         let cmd = seg.trim_start();
         let cmd = strip_prompt(cmd);
@@ -516,9 +525,10 @@ fn scan_a(line: &str, ln: usize, out: &mut Vec<Token>) {
             continue;
         }
         if let Some(e) = invoked_script(&exe) {
-            out.push(Token::Path(ln, e));
+            out.push(e);
         }
     }
+    out
 }
 
 // spec: canon-kit/SPEC.md §check-docs-cmd — one fenced line is many commands, split on the

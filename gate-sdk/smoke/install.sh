@@ -50,6 +50,7 @@ check-test-hermetic
 check-workflow-tiering
 check-action-pinning
 check-action-run-shell
+check-action-run-path
 check-action-gh-repo
 check-action-permissions
 check-action-job-ref
@@ -69,7 +70,7 @@ EOF
 # spec: gate-sdk/SPEC.md §Consumer smoke — ship the tracked default pattern list; the local companion is absent, exercising the fresh-clone path
 cp "$SDK/templates/msg-patterns.list" scripts/msg-patterns.list
 
-# spec: gate-sdk/SPEC.md §Consumer smoke — the workflow template installed verbatim (starter-template conformance) is the Actions surface the four check-action-* members above lint
+# spec: gate-sdk/SPEC.md §Consumer smoke — the workflow template installed verbatim (starter-template conformance) is the Actions surface the check-action-* members above lint
 mkdir -p .github/workflows
 cp "$SDK/templates/gates-workflow.yml" .github/workflows/gates.yml
 

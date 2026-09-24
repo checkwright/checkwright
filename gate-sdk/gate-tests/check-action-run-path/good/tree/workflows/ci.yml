@@ -1,0 +1,36 @@
+name: ci
+on: push
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: block scalar invoking a script that resolves
+        run: |
+          # bash scripts/commented-out.sh
+          bash scripts/build.sh --release
+          scripts/build.sh && echo done
+      - name: plain single-line invocation
+        run: bash scripts/build.sh # a trailing YAML comment
+      - name: double-quoted single-line value
+        run: "scripts/build.sh --quiet"
+      - name: single-quoted single-line value
+        run: 'bash ./scripts/build.sh'
+      - name: path in argument position is never an invocation
+        run: cp scripts/build.sh out/generated.sh
+      - name: a $-rooted path is a runtime value, not a token
+        run: |
+          probe="$RUNNER_TEMP"
+          bash "$probe/s.sh"
+          bash ${{ github.workspace }}/scripts/absent.sh
+      - name: literal working-directory
+        working-directory: sub
+        run: bash scripts/inner.sh
+  windows:
+    runs-on: windows-latest
+    steps:
+      - name: unshelled Windows step is skipped, not read
+        run: bash scripts/absent-on-windows.sh
+      - name: pwsh step is skipped, not read
+        shell: pwsh
+        run: |
+          ./scripts/absent-in-pwsh.sh

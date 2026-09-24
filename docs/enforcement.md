@@ -66,6 +66,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | [gate-sdk](gate-sdk/index.md) | check-workflow-tiering | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-action-pinning | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-action-run-shell | precommit |
+| [gate-sdk](gate-sdk/index.md) | check-action-run-path | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-action-gh-repo | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-action-permissions | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-action-job-ref | precommit |

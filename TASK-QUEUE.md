@@ -8,16 +8,6 @@
 
 ## New Features
 
-### workflow-run-path-unresolved
-
-[spec: SPEC-action-run-path.md]
-
-a `.github/workflows` `run:` step naming a deleted script reds nowhere. `gates.yml`'s `install-smoke-sh-windows` leg kept `bash guard-kit/gate-tests/guard-read-path.test.sh` after `native-shell-guard` deleted that file, with the full battery green; that close's stale-identifier audit found it and removed the step. The class is a path-existence read over `run:` bodies.
-
-**Specified 2026-09-24:** a new gate-sdk gate, `check-action-run-path`. It reads `run:` bodies, single-line values included, through §check-action-run-shell's extractor, which becomes shared, and it identifies invocations with canon-kit's check-docs-cmd (A) predicate.
-
-**Cost while deferred:** a deleted script's CI step reds only on the push that runs it, spending a push-budget round. Filed 2026-09-24 to the gap inbox at `native-shell-guard`'s close; promoted 2026-09-24 at the next scope. Owner lookup: `deleted script`, `run: step` in this file: only `settings-hook-command-path-gate`, a sibling on another surface. **Selected for `silent-guard-gaps` — operator direction 2026-09-24, lead-relayed, as an explicit exception to the enhancement admission filter:** it shares the set's command-path surface, so it rides no extra stage.
-
 ### split-posture-waiver-writer
 
 [spec: SPEC-waiver-writer.md] [recurrence: 2026-09-23]
@@ -1529,5 +1519,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - settings-hook-command-path-gate
 - enforcement-map-member-owner
 - hook-decline-model-invisible
+- workflow-run-path-unresolved
 
 ## Lessons Learned

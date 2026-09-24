@@ -1,0 +1,4 @@
+# Reject case: a block-scalar invocation and a single-line plain invocation of
+# an absent script, each beside a resolving one, so a broken body arm shows as a
+# missing finding.
+tree

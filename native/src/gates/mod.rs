@@ -4,6 +4,7 @@ pub mod action_gh_repo;
 pub mod action_job_ref;
 pub mod action_permissions;
 pub mod action_pinning;
+pub mod action_run_path;
 pub mod action_run_shell;
 pub mod amendment_queue;
 pub mod amendment_retired_spelling;
@@ -224,6 +225,14 @@ pub const REGISTRY: &[GateEntry] = &[
         &["GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS"],
         "gate-sdk",
         &[("shellcheck", "")],
+    ),
+    (
+        "check-action-run-path",
+        action_run_path::run,
+        &[(".", "ext:lit:yml,yaml", "", "")],
+        &["GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS"],
+        "gate-sdk",
+        &[],
     ),
     (
         "check-action-gh-repo",

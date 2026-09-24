@@ -1,0 +1,5 @@
+# Accept case: resolving invocations in a block scalar and in every single-line
+# form, a commented-out invocation, a path in argument position, $-rooted and
+# expression-rooted paths, a literal working-directory, and the two skipped
+# dialects (an explicit pwsh step and an unshelled Windows step), each counted.
+tree

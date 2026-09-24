@@ -212,8 +212,12 @@ if staged_matches '*.yml' '*.yaml' 'scripts/gate-sdk-config.knobs' 'native/src/g
     run_gate check-action-pinning native/target/release/checkwright-gates check-action-pinning
 fi
 
-if staged_matches '*.yml' '*.yaml' 'scripts/gate-sdk-config.knobs' 'native/src/gates/action_run_shell.rs' 'native/src/programs.rs'; then
+if staged_matches '*.yml' '*.yaml' 'scripts/gate-sdk-config.knobs' 'native/src/gates/action_run_shell.rs' 'native/src/actions_run.rs' 'native/src/programs.rs'; then
     run_gate check-action-run-shell native/target/release/checkwright-gates check-action-run-shell
+fi
+
+if staged_matches '*.yml' '*.yaml' '*.sh' 'scripts/gate-sdk-config.knobs' 'native/src/gates/action_run_path.rs' 'native/src/actions_run.rs' 'native/src/gates/docs_cmd.rs'; then
+    run_gate check-action-run-path native/target/release/checkwright-gates check-action-run-path
 fi
 
 if staged_matches '*.yml' '*.yaml' 'scripts/gate-sdk-config.knobs' 'native/src/gates/action_gh_repo.rs' 'native/src/actions.rs'; then

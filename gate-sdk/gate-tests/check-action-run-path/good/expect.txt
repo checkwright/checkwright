@@ -1,0 +1,1 @@
+ACTION-RUN-PATH: clean (7 run: body(ies) read, 6 invocation(s) resolved across 1 Actions-shaped file(s) of 1 walked; 0 file(s) skipped by the Actions-shape predicate; skipped: 1 on a non-shell dialect, 1 on an unresolved dialect, 0 escaped double-quoted value(s), 0 quoted value(s) not closed on their line, 0 on a working-directory it cannot resolve, 0 absolute invocation path(s))

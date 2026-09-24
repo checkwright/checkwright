@@ -1,0 +1,2 @@
+tree/workflows/ci.yml:10: run: invokes scripts/deleted-block.sh, which does not resolve under tree
+tree/workflows/ci.yml:12: run: invokes scripts/deleted-plain.sh, which does not resolve under tree

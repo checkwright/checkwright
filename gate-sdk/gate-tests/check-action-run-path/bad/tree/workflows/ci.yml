@@ -1,0 +1,14 @@
+name: ci
+on: push
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: block scalar invoking a deleted script beside a resolving one
+        run: |
+          bash scripts/present.sh
+          bash scripts/deleted-block.sh --flag
+      - name: plain single-line invocation of a deleted script
+        run: bash scripts/deleted-plain.sh
+      - name: plain single-line invocation that resolves
+        run: scripts/present.sh

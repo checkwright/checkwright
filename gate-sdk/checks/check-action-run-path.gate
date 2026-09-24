@@ -1,0 +1,3 @@
+# graph: couples=*.yml,*.yaml,*.sh dir=one valve=none tier=precommit
+# install: zero-config
+# spec: gate-sdk/SPEC.md §check-action-run-path — every repo-relative `.sh` path in invocation position in a shell `run:` body of an Actions-shaped YAML file resolves under the scan root
