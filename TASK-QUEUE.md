@@ -12,6 +12,16 @@
 
 ## Deferred
 
+### docs-liquid-literal-unseen
+
+[cost: event/low] [surface: site-kit]
+
+a balanced Liquid token a docs page means literally (`{{ x }}`, `{% x %}`) parses, so `check-docs-liquid-parse` passes it, and renders as something else, usually blank. `check-docs-render-fidelity` renders through kramdown without Liquid, so it cannot see the loss either (site-kit/SPEC.md §check-docs-liquid-parse states both halves). Probed 2026-09-25 at close: outside raw blocks, only `docs/releases.md` carries tokens, and those are meant as Liquid.
+
+**Deliverable:** a render-side assertion (Liquid-render each page against an empty context and diff against the source outside raw blocks), or a token scan outside raw blocks and the Liquid a page owns, or a SPEC boundary note refusing both.
+
+**Cost while deferred:** a page documenting a template or workflow expression outside a raw block loses its literal text on the live site, silently. Filed 2026-09-24 to the gap inbox by hosted-install-path's build; promoted 2026-09-25 at its close: →fix fails because the assertion is new mechanism, and no live page carries the defect to repair. Owner lookup: `liquid`, `raw block` in this file — only the landed `pages-liquid-break-undetected`, whose subject is a parse break, not a literal token; owner site-kit/SPEC.md §check-docs-liquid-parse.
+
 ### ps-scratch-script-unsteered
 
 [cost: event/high] [surface: guard-kit]
@@ -20,7 +30,7 @@ a PowerShell script run off a scratch-dir body (`& .tmp\x.ps1`, `.\.tmp\x.ps1`, 
 
 **Deliverable:** a `--scratch-run` path for a PowerShell body and the rule's PowerShell form, or a SPEC boundary note refusing one.
 
-**Cost while deferred:** on a Windows host an approved PowerShell script call can run a body rewritten after approval, with no echo at execution. Filed 2026-09-24 to the gap inbox by adopter-onramp's build; promoted 2026-09-24 at its close: →fix fails because the runner arm is new mechanism, a unit rather than a repair. Owner lookup as for `ps-producer-liveness-record` — none in this file; owner guard-kit/SPEC.md §The generic ruleset, rule `script_interpreter` and its scratch-run runner.
+**Cost while deferred:** on a Windows host an approved PowerShell script call can run a body rewritten after approval, with no echo at execution. Filed 2026-09-24 to the gap inbox by adopter-onramp's build; promoted 2026-09-24 at its close: →fix fails because the runner arm is new mechanism, a unit rather than a repair. Owner lookup: none in this file; owner guard-kit/SPEC.md §The generic ruleset, rule `script_interpreter` and its scratch-run runner.
 
 ### side-effect-free-read-arms
 
@@ -67,18 +77,6 @@ a surface that disclaims carrying a rule ("stated there and not restated here") 
 **Deliverable:** a gate, or an assertion joining an existing restatement gate, over that shape. A feature by the new-names litmus, so it owes an amendment and passes the enhancement admission filter only on an arm its authoring session argues.
 
 **Cost while deferred:** each such disclaimer is a licence a later reader trusts, and the copy beside it rots silently. Filed 2026-09-20 to the gap inbox by the close of `adopter-floor-door-remainder`; promoted 2026-09-21 at the next scope's intake, so the record is late and says so. Owner lookup ran over `disclaim`, `not restated here`, `restatement` and the two gates above and found no owner.
-
-### residency-roster-template-reach-ungated
-
-[cost: event/low] [surface: context-kit]
-
-nothing asserts the roster↔template relation context-kit/SPEC.md §The consumer footprint rules: an obligation whose bound actor is any session is carried at the consumer's resident tier and is **not** also restated in the kit templates those sessions load, with one corollary permitting a template statement where the reader's discharge differs and never the channel or disposal-time half alone. The ruling landed this iteration and no oracle reads it, so the next template shipping an unsanctioned restatement — or an obligation losing its only carrier — reds nothing.
-
-**Premise corrected at the drain that promoted this:** the filing bullet credited the no-gate claim to delegation-kit/SPEC.md §Operative residency. That section makes no such claim; it says the opposite ("never a substitute for an oracle where one is buildable"). The claim sits in §Verify after every agent commit, whose honest-limit paragraph asserts §Operative residency owes no gate "the same structural reason" — a supervisor's choice of command leaving no tracked artifact to read. That ground does not reach this defect, which is a grep over tracked files, so **that sentence is what narrows** if this lands.
-
-**Why design-pending:** the assertable direction is the open question. The ruling forbids the per-template copy, so the negative direction (no template restates a rostered resident obligation) is the one the ruling supports, while the bullet as filed named the positive one (each rostered obligation reaches the templates of the readers it binds). Which the corollary's exception can be expressed in, and whether a grep can tell a sanctioned discharge-differs statement from a restatement, are the two calls. **The worked hard case, found by this close's instruction-tier sweep:** `lifecycle-kit/templates/lead.md`'s journal-disposal block states the kfric obligation's *timing* half and names no channel, which the corollary permits here only because the lead also loads the resident line that does. Any oracle must rule that CLEAN; ruling it a violation is the false positive that would make the check unusable.
-
-**Cost while deferred:** the placement ruling can rot exactly as the obligations it corrected did, with no oracle to catch the next template that ships unserved or doubly served. Filed 2026-09-17 to the gap inbox at build (gate candidate declined under operator direction, 2026-09-17, lead-relayed), promoted at this iteration's close drain. Owner lookup: `Operative residency`, `consumer footprint`, `footprint`, `residency`, `obligation` — none.
 
 ### config-variant-battery-harness
 
@@ -437,6 +435,10 @@ the consumer's local-only companion files have read triggers at three skills and
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
+
+### residency-roster-template-reach-ungated
+
+No oracle reads the resident-tier placement rule.
 
 ### fixture-suites-never-run-history-less
 
@@ -1411,11 +1413,5 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 `check-docs-cmd` assertion (C) misses a retired path cited from the queue, which is outside its manifest corpus and whose `<path>:<line>` token fails the path shape.
 
 ## Done
-
-- ps-producer-liveness-record
-- guard-ordinal-citation-unheld
-- install-ps1-octet-under-ps51
-- arm64-pwsh-bootstrap-witness
-- pages-liquid-break-undetected
 
 ## Lessons Learned
