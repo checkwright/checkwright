@@ -1515,9 +1515,15 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-guard-registration",
         guard_registration::run,
         &[],
-        &["GATE_SDK_KIT_DIRS"],
+        &[
+            "GATE_SDK_KIT_DIRS",
+            "GATE_SDK_NATIVE_SRC",
+            "GATE_SDK_WORKFLOW_DIR",
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+        ],
         "-",
-        &[],
+        &[("git", "")],
     ),
     (
         "check-kit-ref-liveness",

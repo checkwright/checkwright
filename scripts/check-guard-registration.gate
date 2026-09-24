@@ -1,2 +1,2 @@
-# graph: couples=guard-kit/SPEC.md,guard-kit/lib/guard.sh dir=one valve=none tier=precommit
-# spec: guard-kit/SPEC.md §check-guard-registration — the generic ruleset's numbered roster, its guard_rule_* definitions and guard_generic_rules' dispatch order agree one-for-one and in order, fail-closed on an unreadable section or dispatcher
+# graph: couples=guard-kit/SPEC.md,native/src/guard/* dir=one valve=none tier=precommit trigger=*
+# spec: guard-kit/SPEC.md §check-guard-registration — the rule roster, the crate's rule table and every rule citation agree, fail-closed on a roster, table or corpus it cannot read

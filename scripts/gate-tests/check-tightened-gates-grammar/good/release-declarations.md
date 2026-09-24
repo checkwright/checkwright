@@ -4,4 +4,4 @@
 
 ## Behavior changes
 
-- **guard-kit rule 2** — an accumulating surface whose Tightened-gates section is still empty.
+- **guard-kit rule `git_c_root`** — an accumulating surface whose Tightened-gates section is still empty.

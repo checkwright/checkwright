@@ -9,15 +9,15 @@
 # spec: guard-kit/SPEC.md §check-door-binding — your own surfaces assertion C sweeps for undeclared doors, each a tracked file or a directory; the kit ships none, and with none set the assertion is inert
 # GUARD_KIT_DOOR_ROOTS[] = README.md
 
-# spec: guard-kit/SPEC.md §Layout and configuration — the dedicated search tools your harness build carries (default Glob and Grep); an empty line drops both, so rules 9 and 11 never steer at a tool the build lacks
+# spec: guard-kit/SPEC.md §Layout and configuration — the dedicated search tools your harness build carries (default Glob and Grep); an empty line drops both, so rules `find_glob` and `git_grep` never steer at a tool the build lacks
 # GUARD_KIT_SEARCH_TOOLS =
 
-# spec: guard-kit/SPEC.md §The generic ruleset — declare the write and execute forms of each read-only roster member you add (rule 18's grammar, 'none' when it has none); an undeclared member is withheld, and an entry for a default member replaces the kit's declaration
+# spec: guard-kit/SPEC.md §The generic ruleset — declare the write and execute forms of each read-only roster member you add (rule `ro_pipeline`'s grammar, 'none' when it has none); an undeclared member is withheld, and an entry for a default member replaces the kit's declaration
 # GUARD_KIT_RO_FORMS[md5sum] = none
 
 # spec: guard-kit/SPEC.md §Consumer rules — your own rules, as a command the guard runs before its generic ruleset: one argv element per line, spawned without a shell; the kit ships none
 # GUARD_KIT_CONSUMER_RULES_CMD[] = bash
 # GUARD_KIT_CONSUMER_RULES_CMD[] = scripts/guard-rules.sh
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 27's admitted read from a linked worktree (default read-only); off admits none, leaving the harness's read tool the one route to a main-checkout file
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `worktree_confinement`'s admitted read from a linked worktree (default read-only); off admits none, leaving the harness's read tool the one route to a main-checkout file
 # GUARD_KIT_WORKTREE_READS = off

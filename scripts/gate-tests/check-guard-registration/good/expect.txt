@@ -1,1 +1,1 @@
-GUARD-REGISTRATION: clean (3 rule(s)
+GUARD-REGISTRATION: clean (3 rule(s): roster, table order, declared views and 6 citation(s) in lockstep)

@@ -28,7 +28,7 @@ The figures are kit-share only — what a kit itself ships. A consumer's own bin
 | --- | --- | --- |
 | canon-kit | — | 5785cp · ~1531t |
 | context-kit | — | 2351cp · ~594t |
-| delegation-kit | — | 40156cp · ~10113t |
+| delegation-kit | — | 40153cp · ~10112t |
 | doctrine-kit | 1819cp · ~463t | — |
 | drift-kit | — | 6368cp · ~1610t |
 | evidence-kit | — | — |
@@ -38,4 +38,4 @@ The figures are kit-share only — what a kit itself ships. A consumer's own bin
 | lifecycle-kit | 301cp · ~76t | 117972cp · ~29754t |
 | queue-kit | — | 1392cp · ~359t |
 | site-kit | — | — |
-| **total** | 2120cp · ~539t | 178267cp · ~45039t |
+| **total** | 2120cp · ~539t | 178264cp · ~45038t |

@@ -1,4 +1,4 @@
-// spec: guard-kit/SPEC.md §The guard framework — the crate's guard: the reader seam and its bash
+// spec: guard-kit/SPEC.md §The shell guard — the crate's guard: the reader seam and its bash
 // reader, the allow-match model, and the `--guard-json` reads and renders.
 pub mod bash;
 pub mod engine;
@@ -7,12 +7,17 @@ pub mod reader;
 mod rules;
 pub mod text;
 
-// spec: guard-kit/SPEC.md §The guard framework — the kit-relative shell library, with two readers:
-// the holder the reader is compared against, and the file whose presence *is* guard-kit being
-// vendored, which is how `kpi-prompt-friction` witnesses the kit (drift-kit/SPEC.md §Bundled KPIs).
-pub const LIB: &str = "lib/guard.sh";
+// spec: drift-kit/SPEC.md §Bundled KPIs — the kit-relative file whose presence *is* guard-kit being
+// vendored, which is how `kpi-prompt-friction` witnesses the kit.
+pub const WITNESS: &str = "templates/guard-config.knobs";
 
-// spec: guard-kit/SPEC.md §The guard framework — the settings-allow match core and its one compiled
+// spec: guard-kit/SPEC.md §check-guard-registration — the rule table as the binary carries it,
+// the gate's in-process subject; the rules module stays private.
+pub fn rule_table() -> &'static [engine::Rule] {
+    rules::TABLE
+}
+
+// spec: guard-kit/SPEC.md §The shell guard — the settings-allow match core and its one compiled
 // holder: a closing `:*`, or a closing ` *` that is the rule's only `*`, is the head alone or the
 // head, a space, anything.
 pub fn allow_match(s: &str, glob: &str) -> bool {
@@ -36,7 +41,7 @@ pub fn allow_match(s: &str, glob: &str) -> bool {
     }
 }
 
-// spec: guard-kit/SPEC.md §The guard framework (`lib/guard.sh`) — `--guard-json`'s `field` and
+// spec: guard-kit/SPEC.md §The shell guard — `--guard-json`'s `field` and
 // `field-or-empty` modes; `or_empty` is jq's `// empty`, which fires on false too.
 pub fn json_field(payload: Option<&serde_json::Value>, path: &str, or_empty: bool) -> Option<String> {
     use serde_json::Value;
@@ -49,7 +54,7 @@ pub fn json_field(payload: Option<&serde_json::Value>, path: &str, or_empty: boo
     }
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — the reader a payload's `tool_name` selects, with the
+// spec: guard-kit/SPEC.md §The shell guard — the reader a payload's `tool_name` selects, with the
 // shell the rule table filters on; `None` is a tool no reader serves.
 pub fn reader_for(tool: &str) -> Option<(&'static dyn reader::Reader, engine::Shell)> {
     match tool {
@@ -58,7 +63,7 @@ pub fn reader_for(tool: &str) -> Option<(&'static dyn reader::Reader, engine::Sh
     }
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — the command the rules read: `tool_input.command`
+// spec: guard-kit/SPEC.md §The shell guard — the command the rules read: `tool_input.command`
 // with its trailing newlines stripped, as the shell guard's command substitution stripped them; an
 // absent or empty command is none.
 pub fn command_of(payload: &serde_json::Value) -> Option<&str> {
@@ -66,7 +71,7 @@ pub fn command_of(payload: &serde_json::Value) -> Option<&str> {
     (!cmd.is_empty()).then_some(cmd)
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — `guard_allow`'s envelope; the braces stay a
+// spec: guard-kit/SPEC.md §The shell guard — `guard_allow`'s envelope; the braces stay a
 // literal so the key order is the one the library always printed.
 pub fn allow_envelope(reason: &str) -> String {
     allow_envelope_with(reason, None)
@@ -82,7 +87,7 @@ pub fn allow_envelope_with(reason: &str, context: Option<&str>) -> String {
     )
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — the rewrite envelope, key order as above
+// spec: guard-kit/SPEC.md §The shell guard — the rewrite envelope, key order as above
 pub fn rewrite_envelope(cmd: &str, reason: &str) -> String {
     rewrite_envelope_with(cmd, reason, None)
 }
@@ -109,7 +114,7 @@ pub fn json_view(payload: Option<&serde_json::Value>, view: reader::View) -> Opt
     reader.view(command_of(p)?, view)
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — `--guard-json <mode> [<arg>…]`, the reads and
+// spec: guard-kit/SPEC.md §The shell guard — `--guard-json <mode> [<arg>…]`, the reads and
 // renders `lib/guard.sh` spawns and a consumer rule command calls; every mode exits 0 and only a
 // usage error exits 2.
 pub fn json_arm(args: &[String]) -> i32 {
@@ -155,7 +160,7 @@ pub fn json_arm(args: &[String]) -> i32 {
 mod tests {
     use super::*;
 
-    // spec: guard-kit/SPEC.md §The guard framework — the field read's rendering per JSON type,
+    // spec: guard-kit/SPEC.md §The shell guard — the field read's rendering per JSON type,
     // and the one place `field-or-empty` differs from `field`
     #[test]
     fn a_field_renders_each_json_type_as_the_library_reads_it() {
@@ -180,7 +185,7 @@ mod tests {
         assert_eq!(json_field(None, ".tool_input.command", true), None);
     }
 
-    // spec: guard-kit/SPEC.md §The guard framework — the envelopes parse, carry every
+    // spec: guard-kit/SPEC.md §The shell guard — the envelopes parse, carry every
     // interpolated value back unchanged, and keep the key order the library printed
     #[test]
     fn every_envelope_serializes_its_values_and_keeps_its_key_order() {
@@ -235,7 +240,7 @@ mod tests {
         assert_eq!(allow_envelope_with("why", None), allow_envelope("why"));
     }
 
-    // spec: guard-kit/SPEC.md §The guard framework — only a usage error exits 2
+    // spec: guard-kit/SPEC.md §The shell guard — only a usage error exits 2
     #[test]
     fn a_malformed_invocation_is_the_one_exit_2() {
         let s = |v: &[&str]| v.iter().map(|x| x.to_string()).collect::<Vec<_>>();
@@ -249,7 +254,7 @@ mod tests {
         assert_eq!(json_arm(&s(&["allow-entries", "/no/such/settings.json"])), 0);
     }
 
-    // spec: guard-kit/SPEC.md §The guard framework — a closing `:*` grants the head alone or the
+    // spec: guard-kit/SPEC.md §The shell guard — a closing `:*` grants the head alone or the
     // head and a space, never a glued continuation, in both the inner and the wrapped rule form
     #[test]
     fn a_closing_colon_star_is_bounded_by_a_space_or_the_end() {
@@ -266,7 +271,7 @@ mod tests {
         assert!(allow_match("touch fg", "touch f*"));
     }
 
-    // spec: guard-kit/SPEC.md §The guard framework — a closing ` *` that is the rule's only `*`
+    // spec: guard-kit/SPEC.md §The shell guard — a closing ` *` that is the rule's only `*`
     // grants the bare head too; beside another `*` it does not
     #[test]
     fn a_sole_trailing_space_star_also_grants_the_bare_head() {

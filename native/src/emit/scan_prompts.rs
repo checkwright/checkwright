@@ -144,7 +144,7 @@ fn quoted_view(cmd: &str) -> String {
 // whatever the allowlist says; `guard_log_fallthrough` cuts one character past it
 const ANALYSIS_BOUND: usize = 10_000;
 
-// spec: guard-kit/SPEC.md §The guard framework — `guard_log_fallthrough`'s encoding reversed
+// spec: guard-kit/SPEC.md §The shell guard — `guard_log_fallthrough`'s encoding reversed
 pub fn decode(line: &str) -> String {
     let mut out = String::with_capacity(line.len());
     let mut chars = line.chars().peekable();
@@ -193,7 +193,7 @@ fn granted(cmd: &str, allow: &[String], overlay: Option<&[String]>) -> bool {
 
 // spec: guard-kit/SPEC.md §scan-prompts — the key's write-shape suffix: the segment's own
 // write-redirect operator normalized to `>` or `>>`, the descriptor dropped and an fd-dup excluded
-// on rule 17's own target test, since an fd-dup is not a redirect to a file.
+// on guard-kit rule `append_scratch`'s own target test, since an fd-dup is not a redirect to a file.
 fn write_redirects(c: &str) -> Vec<(&'static str, String)> {
     let pairs = guard::bash::redirect_pairs(c).unwrap_or_default();
     let mut out = Vec::new();
@@ -216,7 +216,7 @@ fn redirect_op(c: &str) -> &'static str {
     write_redirects(c).first().map_or("", |(op, _)| *op)
 }
 
-// spec: guard-kit/SPEC.md §scan-prompts — rule 6's expansion shapes plus the backtick and output
+// spec: guard-kit/SPEC.md §scan-prompts — guard-kit rule `expansion`'s expansion shapes plus the backtick and output
 // process substitution it does not block, on a view where a single-quoted span and an escaped byte
 // are inert.
 fn carries_expansion(live: &str) -> bool {
@@ -243,7 +243,7 @@ fn carries_expansion(live: &str) -> bool {
     false
 }
 
-// spec: guard-kit/SPEC.md §scan-prompts — rule 15's statement-ending bare `&` on the structural
+// spec: guard-kit/SPEC.md §scan-prompts — guard-kit rule `background_no_record`'s statement-ending bare `&` on the structural
 // view, with `|&` excluded as the separator it is: never after `&`, `>` or `|`, and followed by a
 // blank, a `;` or the end.
 fn backgrounds(structural: &str) -> bool {
@@ -256,7 +256,7 @@ fn backgrounds(structural: &str) -> bool {
 }
 
 // spec: guard-kit/SPEC.md §scan-prompts — the allowlist-reachability verdict, per logged call over
-// every segment: an expansion, a write redirect to a target rule 17's own test calls a file, a
+// every segment: an expansion, a write redirect to a target guard-kit rule `append_scratch`'s own test calls a file, a
 // backgrounding `&`, or a call past the harness's analysis bound.
 fn allowlist_unreachable(line: &str) -> bool {
     let live = guard::bash::skeleton(line, guard::bash::Wants { sq: true, hdq: true, ..Default::default() });
@@ -682,7 +682,7 @@ mod tests {
         assert!(!granted("touch a & touch c", &allow, None));
     }
 
-    // spec: guard-kit/SPEC.md §The guard framework — the three pairs decode; any other backslash, a
+    // spec: guard-kit/SPEC.md §The shell guard — the three pairs decode; any other backslash, a
     // trailing lone one included, stays literal
     #[test]
     fn the_decode_reverses_the_three_pairs_and_leaves_any_other_backslash_literal() {

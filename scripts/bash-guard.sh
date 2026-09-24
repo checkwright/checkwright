@@ -10,14 +10,14 @@ GUARD_KIT_LIB="${GUARD_KIT_LIB:-guard-kit/lib/guard.sh}"
 # shellcheck source=/dev/null  # vendored lib path is resolved at runtime; fail-open above if absent, but the lib's own exit 2 (set-but-missing config) must stay loud
 source "$GUARD_KIT_LIB"
 
-# spec: guard-kit/SPEC.md §The guard framework — cache the payload before the first field is read, so a rule needing a tool-input field beyond the command can reach one
+# spec: guard-kit/SPEC.md §The shell guard — cache the payload before the first field is read, so a rule needing a tool-input field beyond the command can reach one
 guard_read_input || exit 0
 cmd="$(guard_read_command)" || exit 0
 
 # spec: guard-kit/SPEC.md §Consumer rules — project block/steer/allow rules go here, before the generic ruleset
 # copy-divergence: guard_block — the template ships the allow/steer skeleton only; this repo's project rules are blocking ones, so the copy calls guard_block where the template calls neither
 # copy-divergence: guard_skeleton — the template ships no project rule, so it needs no lexical view of its own; every rule this copy adds matches on one, and taking it from the normalizer is what keeps the copy off a sixth private stripping dialect
-# spec: guard-kit/SPEC.md §The guard framework — the project rules take their lexical view from the one normalizer, declaring 'sq dq hd': none of them tests for an expansion, and a heredoc body naming a bypass flag or a scratchpad path is prose, not the executable command
+# spec: guard-kit/SPEC.md §The shell guard — the project rules take their lexical view from the one normalizer, declaring 'sq dq hd': none of them tests for an expansion, and a heredoc body naming a bypass flag or a scratchpad path is prose, not the executable command
 cmd_unquoted="$(guard_skeleton "$cmd" sq dq hd)"
 # spec: CLAUDE.md §This repo is governed by its own kits — a hook bypass is a one-off with cause, so it must stay visible: the allowlisted 'git commit -m *' glob would otherwise auto-allow a trailing bypass flag
 case " $cmd_unquoted " in

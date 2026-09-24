@@ -85,9 +85,9 @@ set +e
 msg="$(printf '%s' '{"tool_input":{"command":"cd deploy && ls"}}' | bash scripts/bash-guard.sh 2>&1 >/dev/null)"
 rc=$?
 set -e
-# spec: guard-kit/SPEC.md §Testing — the block must be rule 1's, since a knob load the binary refuses also exits 2
+# spec: guard-kit/SPEC.md §Testing — the block must be rule `cd_compound`'s, since a knob load the binary refuses also exits 2
 if [[ "$rc" -ne 2 || "$msg" != *"'cd'"* ]]; then
-    echo "guard-kit/smoke/install.sh: installed guard did not block a compound-cd payload with rule 1's steer (exit $rc, want 2): $msg" >&2
+    echo "guard-kit/smoke/install.sh: installed guard did not block a compound-cd payload with rule \`cd_compound\`'s steer (exit $rc, want 2): $msg" >&2
     exit 1
 fi
 

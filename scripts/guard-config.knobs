@@ -28,7 +28,7 @@ GUARD_KIT_BREADTH_DECLARED[Bash(gh secret *)] = operator-ruled 2026-08-23 out of
 GUARD_KIT_CONSUMER_RULES_CMD[] = bash
 GUARD_KIT_CONSUMER_RULES_CMD[] = scripts/guard-rules.sh
 
-# spec: guard-kit/SPEC.md §Layout and configuration — this harness build carries no dedicated Glob or Grep tool in either session class, probed with a ToolSearch selecting both in a main and in a dispatched session, so rules 9 and 11 stay inert and bare find and grep stay the working forms
+# spec: guard-kit/SPEC.md §Layout and configuration — this harness build carries no dedicated Glob or Grep tool in either session class, probed with a ToolSearch selecting both in a main and in a dispatched session, so guard-kit rules `find_glob` and `git_grep` stay inert and bare find and grep stay the working forms
 GUARD_KIT_SEARCH_TOOLS =
 
 # spec: guard-kit/SPEC.md §Layout and configuration — the policy rosters this repo relies on, bound at the members its guard decides with so a kit default's move moves no decision here (Policy-as-choice); each read-only member keeps its form declaration from the kit's table

@@ -1,4 +1,4 @@
-// spec: guard-kit/SPEC.md §The guard framework — the bash reader: the one holder of the normalizer,
+// spec: guard-kit/SPEC.md §The shell guard — the bash reader: the one holder of the normalizer,
 // the splitters, the redirect scan and the harness view, which the rules, the `scan-prompts` ranker
 // and `--emit-compare-settings-allow` all call.
 use super::reader::{Reader, View};
@@ -60,7 +60,7 @@ impl Reader for Bash {
     }
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — the compound split: one segment per line, split on
+// spec: guard-kit/SPEC.md §The shell guard — the compound split: one segment per line, split on
 // the harness's statement separators. `||`, `&&` and `|&` are tested before `|`, the leftmost-longest
 // alternation a `sed -E` gives for free and a scanner must spell.
 pub fn split_compound(cmd: &str) -> Vec<String> {
@@ -154,7 +154,7 @@ pub fn residue_statements(s: &str) -> Vec<String> {
     out
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — the four inert classes the normalizer takes
+// spec: guard-kit/SPEC.md §The shell guard — the four inert classes the normalizer takes
 #[derive(Clone, Copy, Default, PartialEq, Eq, Debug)]
 pub struct Wants {
     pub sq: bool,
@@ -163,7 +163,7 @@ pub struct Wants {
     pub hdq: bool,
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — the harness view's word cursor: the head word and
+// spec: guard-kit/SPEC.md §The shell guard — the harness view's word cursor: the head word and
 // the blanks after it, over a slice that never carries leading blanks.
 struct Words<'a>(&'a str);
 
@@ -195,7 +195,7 @@ fn is_int(w: &str) -> bool {
     is_digits(w.strip_prefix(['+', '-']).unwrap_or(w))
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — `timeout`'s one duration word:
+// spec: guard-kit/SPEC.md §The shell guard — `timeout`'s one duration word:
 // `^([0-9]+\.?[0-9]*|\.[0-9]+)[smhd]?$`.
 fn is_duration(w: &str) -> bool {
     let n = w.strip_suffix(['s', 'm', 'h', 'd']).unwrap_or(w);
@@ -234,7 +234,7 @@ fn walk_timeout(cur: &mut Words) -> bool {
     cur.pop().is_some_and(is_duration)
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — `nice`'s glued adjustments:
+// spec: guard-kit/SPEC.md §The shell guard — `nice`'s glued adjustments:
 // `^(-n[+-]?|--adjustment=[+-]?|-)[0-9]+$`.
 fn walk_nice(cur: &mut Words) -> bool {
     while let Some(w) = cur.peek() {
@@ -277,7 +277,7 @@ fn walk_stdbuf(cur: &mut Words) -> bool {
     true
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — a leading assignment:
+// spec: guard-kit/SPEC.md §The shell guard — a leading assignment:
 // `^[A-Za-z_][A-Za-z0-9_]*=[^"']*$`.
 fn is_assignment(w: &str) -> bool {
     let Some((name, value)) = w.split_once('=') else {
@@ -290,7 +290,7 @@ fn is_assignment(w: &str) -> bool {
         && !value.contains(['"', '\''])
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — the harness view: a segment as the permission
+// spec: guard-kit/SPEC.md §The shell guard — the harness view: a segment as the permission
 // matcher reads it, its documented leading wrappers stripped from the head repeatedly. An option a
 // wrapper's walk does not recognize, or a wrapper left with nothing to wrap, stops the strip there.
 pub fn harness_view(seg: &str) -> &str {
@@ -319,7 +319,7 @@ pub fn harness_view(seg: &str) -> &str {
     rest
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — `<<-?[[:space:]]*(<quoted>|<identifier>)`, anchored.
+// spec: guard-kit/SPEC.md §The shell guard — `<<-?[[:space:]]*(<quoted>|<identifier>)`, anchored.
 // One byte decides the alternative and `[[:space:]]` shares none of their first-character sets, so the
 // greedy run needs no backtracking.
 fn heredoc_header(s: &[u8]) -> Option<(usize, &[u8], bool)> {
@@ -356,7 +356,7 @@ enum State {
     Dq,
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — the normalizer, the whole machinery
+// spec: guard-kit/SPEC.md §The shell guard — the normalizer, the whole machinery
 pub fn skeleton(cmd: &str, w: Wants) -> String {
     scan(cmd, w).0
 }
@@ -515,7 +515,7 @@ fn scan(cmd: &str, w: Wants) -> Scanned {
             }
             continue;
         }
-        // spec: guard-kit/SPEC.md §The guard framework — placeholder, never deletion: a construct
+        // spec: guard-kit/SPEC.md §The shell guard — placeholder, never deletion: a construct
         // that survives the scan is live, so an unrecognized `<` is one byte of the command again.
         out.push(ch);
         i += 1;
@@ -629,7 +629,7 @@ mod tests {
     const HD: Wants = Wants { sq: true, dq: true, hd: true, hdq: false };
     const HDQ: Wants = Wants { sq: true, dq: false, hd: false, hdq: true };
 
-    // spec: guard-kit/SPEC.md §The guard framework — the splitter's separator class and the
+    // spec: guard-kit/SPEC.md §The shell guard — the splitter's separator class and the
     // longest-match rule: `||` is one boundary, not two, and a trailing separator opens a segment
     #[test]
     fn the_splitter_takes_the_longest_separator_and_keeps_the_empty_tail() {
@@ -642,7 +642,7 @@ mod tests {
         assert_eq!(statements("a | b;c||d |& e"), vec!["a | b", "c", "d |& e"]);
     }
 
-    // spec: guard-kit/SPEC.md §The guard framework — placeholder, never deletion
+    // spec: guard-kit/SPEC.md §The shell guard — placeholder, never deletion
     #[test]
     fn the_skeleton_substitutes_the_inert_spans_and_leaves_the_rest_byte_identical() {
         assert_eq!(skeleton("echo 'a;b' && ls", SQDQ), "echo SQ && ls");
@@ -652,7 +652,7 @@ mod tests {
         assert_eq!(skeleton("echo 'unterminated", SQDQ), "echo 'unterminated");
     }
 
-    // spec: guard-kit/SPEC.md §The guard framework — an opener with no line after it has no body
+    // spec: guard-kit/SPEC.md §The shell guard — an opener with no line after it has no body
     #[test]
     fn the_heredoc_opener_survives_verbatim_and_never_becomes_a_placeholder() {
         for c in [
@@ -670,7 +670,7 @@ mod tests {
         assert_eq!(skeleton("cat <<<\"here string\"", HD), "cat <<<DQ");
     }
 
-    // spec: guard-kit/SPEC.md §The guard framework — the body runs to its terminator line, which
+    // spec: guard-kit/SPEC.md §The shell guard — the body runs to its terminator line, which
     // stays live; `hd` blanks every body and `hdq` only a quoted-delimiter one
     #[test]
     fn a_heredoc_body_is_blanked_by_its_class_and_the_terminator_stays_live() {
@@ -700,7 +700,7 @@ mod tests {
         assert!(heredoc_extents("cat <<EOF").is_empty());
     }
 
-    // spec: guard-kit/SPEC.md §The guard framework — the strip walks each wrapper's own grammar,
+    // spec: guard-kit/SPEC.md §The shell guard — the strip walks each wrapper's own grammar,
     // nests, and stops at the wrapper whose arguments it cannot walk or that wraps nothing
     #[test]
     fn the_harness_view_strips_the_documented_wrappers_and_stops_where_a_walk_fails() {

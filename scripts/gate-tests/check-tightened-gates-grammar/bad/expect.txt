@@ -1,2 +1,2 @@
 lead token is unreadable
-release-declarations.md: 'Tightened gates' bullet's lead token is unreadable: - **guard-kit rule 2**
+release-declarations.md: 'Tightened gates' bullet's lead token is unreadable: - **guard-kit rule `git_c_root`**

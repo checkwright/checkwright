@@ -11,7 +11,7 @@ const NAME: &str = "workflow-state-guard";
 pub fn run(payload: Option<&Value>) -> i32 {
     let state_file = match state_file() {
         Ok(v) => v,
-        // spec: guard-kit/SPEC.md §The guard framework — fail-open-but-loud: the rule turns on a
+        // spec: guard-kit/SPEC.md §The shell guard — fail-open-but-loud: the rule turns on a
         // payload field and on path resolution, so a call it cannot judge is allowed with an
         // advisory naming the unenforced rule
         Err(_) => return degraded(),

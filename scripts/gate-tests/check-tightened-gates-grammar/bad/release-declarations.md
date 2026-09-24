@@ -3,8 +3,8 @@
 ## Tightened gates
 
 - `check-gamma` — landed new, well-formed.
-- **guard-kit rule 2** — a bolded lead, the pending-surface shape nothing read at commit.
+- **guard-kit rule `git_c_root`** — a bolded lead, the pending-surface shape nothing read at commit.
 
 ## Behavior changes
 
-- **guard-kit rule 2** — the shape this section takes.
+- **guard-kit rule `git_c_root`** — the shape this section takes.

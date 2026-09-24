@@ -1,4 +1,8 @@
-roster item numbered 4 where 3 is next
-roster item 5 names no guard_rule_* function where exactly one is owed
-the roster's tokens in order differ from guard_generic_rules' calls in order
-guard_rule_delta is defined but never dispatched
+roster item carries no `(`<name>`)` token right after its bold title
+roster name `alpha` is already taken by an earlier item
+roster item `beta` carries 0 declaration clause(s) where exactly one is owed
+rule `gamma` declares `sq dq hd` where the table holds `raw`, `sq dq hd`
+the roster's names in order differ from the rule table's in dispatch order
+a rule cited by number (`rule 2`)
+`rule `omega`` names `omega`, which no roster item carries
+`guard-kit rule `retired_name`` names `retired_name`, which no roster item carries

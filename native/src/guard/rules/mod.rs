@@ -70,7 +70,7 @@ pub static TABLE: &[Rule] = &[
     },
 ];
 
-// spec: guard-kit/SPEC.md §The guard framework — the raw-command carve-out every grant takes: a
+// spec: guard-kit/SPEC.md §The shell guard — the raw-command carve-out every grant takes: a
 // substitution in any spelling.
 fn has_substitution(raw: &str) -> bool {
     grep_q(r"\$\(|<\(|>\(", raw) || raw.contains('`')

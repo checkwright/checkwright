@@ -1,21 +1,21 @@
 # shellcheck shell=bash
-# spec: guard-kit/SPEC.md §The guard framework — hook primitives + generic ruleset; no project rule content
-# no-port: guard-kit/SPEC.md §The guard framework (`lib/guard.sh`) — permanently shell on the extension-point ground that section states: guard-kit/SPEC.md §Consumer rules rules that a consumer's project block/steer/allow rules live in its copy of templates/bash-guard.sh, composed from these primitives, so this library is the API those rules are written against and porting it deletes the extension point — a cut narrows the port and never an extension point. Structural, not a sizing judgment.
+# spec: guard-kit/SPEC.md §The shell guard — hook primitives + generic ruleset; no project rule content
+# no-port: guard-kit/SPEC.md §The shell guard — permanently shell on the extension-point ground that section states: guard-kit/SPEC.md §Consumer rules rules that a consumer's project block/steer/allow rules live in its copy of templates/bash-guard.sh, composed from these primitives, so this library is the API those rules are written against and porting it deletes the extension point — a cut narrows the port and never an extension point. Structural, not a sizing judgment.
 
-# spec: guard-kit/SPEC.md §The guard framework — the payload cache: called directly (never in a substitution, which would kill the global with its subshell) so a rule needing a second field can have one
+# spec: guard-kit/SPEC.md §The shell guard — the payload cache: called directly (never in a substitution, which would kill the global with its subshell) so a rule needing a second field can have one
 guard_read_input() {
     GUARD_INPUT="$(cat 2>/dev/null)" || return 1
     [[ -n "$GUARD_INPUT" ]] || return 1
     return 0
 }
 
-# spec: guard-kit/SPEC.md §The guard framework — every read and render goes through the binary's --guard-json; a spawn that fails prints nothing, which each caller already reads as its fail-open answer
+# spec: guard-kit/SPEC.md §The shell guard — every read and render goes through the binary's --guard-json; a spawn that fails prints nothing, which each caller already reads as its fail-open answer
 _guard_json() {
     [[ -n "${_guard_bin:-}" ]] || return 1
     "$_guard_bin" --guard-json "$@" 2>/dev/null
 }
 
-# spec: guard-kit/SPEC.md §The guard framework — one field of the cached payload by path; an unset or empty GUARD_INPUT and an absent path alike print nothing, which is what keeps a guard that never opted in working unchanged
+# spec: guard-kit/SPEC.md §The shell guard — one field of the cached payload by path; an unset or empty GUARD_INPUT and an absent path alike print nothing, which is what keeps a guard that never opted in working unchanged
 guard_input_field() {
     local v
     [[ -n "${GUARD_INPUT:-}" ]] || return 0
@@ -23,7 +23,7 @@ guard_input_field() {
     printf '%s' "$v"
 }
 
-# spec: guard-kit/SPEC.md §The guard framework — GUARD_INPUT first, stdin otherwise: the fallback is what keeps every consumer copy that never opted in byte-identical
+# spec: guard-kit/SPEC.md §The shell guard — GUARD_INPUT first, stdin otherwise: the fallback is what keeps every consumer copy that never opted in byte-identical
 guard_read_command() {
     local input cmd
     if [[ -n "${GUARD_INPUT:-}" ]]; then
@@ -36,7 +36,7 @@ guard_read_command() {
     printf '%s' "$cmd"
 }
 
-# spec: guard-kit/SPEC.md §The guard framework — the path counterpart of guard_read_command; a call carrying no file_path returns non-zero so a matcher covering it falls through instead of blocking
+# spec: guard-kit/SPEC.md §The shell guard — the path counterpart of guard_read_command; a call carrying no file_path returns non-zero so a matcher covering it falls through instead of blocking
 guard_read_path() {
     local input path
     if [[ -n "${GUARD_INPUT:-}" ]]; then
@@ -69,7 +69,7 @@ guard_rewrite() {
     exit 0
 }
 
-# spec: guard-kit/SPEC.md §The guard framework — cut to the harness's 10,000-character analysis bound plus one, so the ranker can tell an over-bound call, then encoded so one call stays one decodable line
+# spec: guard-kit/SPEC.md §The shell guard — cut to the harness's 10,000-character analysis bound plus one, so the ranker can tell an over-bound call, then encoded so one call stays one decodable line
 guard_log_fallthrough() {
     local bs='\' fline="${1:0:10001}"
     fline="${fline//"$bs"/"$bs$bs"}"
@@ -78,7 +78,7 @@ guard_log_fallthrough() {
     printf '%s\n' "$fline" >>"$GUARD_KIT_LOG" 2>/dev/null || true
 }
 
-# spec: guard-kit/SPEC.md §The guard framework — a closing `:*`, or a closing ` *` that is the rule's only `*` (bare, or before the rule's own `)`), is the head alone or the head, a space, anything
+# spec: guard-kit/SPEC.md §The shell guard — a closing `:*`, or a closing ` *` that is the rule's only `*` (bare, or before the rule's own `)`), is the head alone or the head, a space, anything
 guard_allow_match() {
     local s="$1" glob="$2" tail='' head
     [[ "$glob" == *'*)' ]] && { tail=')'; glob="${glob%)}"; }
@@ -97,7 +97,7 @@ guard_allow_match() {
     [[ "$s" == $head"$tail" || "$s" == $head' '*"$tail" ]]
 }
 
-# spec: guard-kit/SPEC.md §The guard framework — the one context-aware normalizer; a rule names the classes inert for it and every lexical view in the file comes from here
+# spec: guard-kit/SPEC.md §The shell guard — the one context-aware normalizer; a rule names the classes inert for it and every lexical view in the file comes from here
 guard_skeleton() {
     local cmd="$1"
     shift
@@ -237,12 +237,12 @@ guard_skeleton() {
     if ((want_body)); then printf '%s' "$got_body"; else printf '%s' "$out"; fi
 }
 
-# spec: guard-kit/SPEC.md §The guard framework — one splitter for every shell consumer that reasons per compound segment (rules 2/4/7/8/12/14/15/17/18/19/20/22/24/25/26/27, the read-compound carve-out), fed a guard_skeleton view so the harness's per-segment boundary set never drifts; the compiled twin holds the other substrate
+# spec: guard-kit/SPEC.md §The shell guard — one splitter for every shell consumer that reasons per compound segment (rules `git_c_root`, `abs_script`, `brace_glyph`, `sed_file`, `pgrep_self_match`, `git_mutation_under_producer`, `background_no_record`, `append_scratch`, `ro_pipeline`, `bounded_wait`, `allowlist_chain`, `rm_tracked`, `grant_path_slot`, `emitter_write`, `shell_wrapper` and `worktree_confinement`, the read-compound carve-out), fed a guard_skeleton view so the harness's per-segment boundary set never drifts; the compiled twin holds the other substrate
 guard_split_compound() {
     sed -E 's/\|\||&&|\|&|;|\|/\n/g' <<<"$1"
 }
 
-# spec: guard-kit/SPEC.md §The guard framework — the harness view's word step: moves the head word of the caller's cur into its w and drops the blanks after it; non-zero when cur is empty
+# spec: guard-kit/SPEC.md §The shell guard — the harness view's word step: moves the head word of the caller's cur into its w and drops the blanks after it; non-zero when cur is empty
 _guard_hv_pop() {
     [[ -n "$cur" ]] || return 1
     w="${cur%%[[:space:]]*}"
@@ -250,7 +250,7 @@ _guard_hv_pop() {
     cur="${cur#"${cur%%[![:space:]]*}"}"
 }
 
-# spec: guard-kit/SPEC.md §The guard framework — the harness view: a segment as the permission matcher reads it, its documented leading wrappers stripped from the head repeatedly; a classification view and never a grant view, held equal to its compiled twin by --guard-lib-parity
+# spec: guard-kit/SPEC.md §The shell guard — the harness view: a segment as the permission matcher reads it, its documented leading wrappers stripped from the head repeatedly; a classification view and never a grant view, held equal to its compiled twin by --guard-lib-parity
 _guard_harness_view() {
     local rest="${1#"${1%%[![:space:]]*}"}" cur w head
     local dur_re='^([0-9]+\.?[0-9]*|\.[0-9]+)[smhd]?$' int_re='^[+-]?[0-9]+$'
@@ -311,7 +311,7 @@ _guard_allow_load() {
     _guard_allow_list="$(_guard_json allow-entries "$GUARD_KIT_SETTINGS")"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — the committed Bash(...) allow inners, one per line; the fail-open read rules 18 and 19 share, so a failed binary read or a missing settings file emits nothing and every reader declines
+# spec: guard-kit/SPEC.md §The generic ruleset — the committed Bash(...) allow inners, one per line; the fail-open read rules `ro_pipeline` and `bounded_wait` share, so a failed binary read or a missing settings file emits nothing and every reader declines
 _guard_allow_inners() {
     _guard_allow_load
     local e inner
@@ -324,7 +324,7 @@ _guard_allow_inners() {
     done <<<"$_guard_allow_list"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — a segment with its redirects removed and trimmed: what rules 18 and 19 compare against the bare form of a committed allow entry
+# spec: guard-kit/SPEC.md §The generic ruleset — a segment with its redirects removed and trimmed: what rules `ro_pipeline` and `bounded_wait` compare against the bare form of a committed allow entry
 _guard_segment_core() {
     local seg
     seg="$(sed -E 's/[[:space:]]*[0-9]*(>>?|<)[[:space:]]*(&?[0-9-]+|[^[:space:]]+)?//g' <<<"$1")"
@@ -333,7 +333,7 @@ _guard_segment_core() {
     printf '%s' "$seg"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — true when the segment's core is the bare form of a committed allow entry: an entry with no glob, or the head of one whose only '*' is a closing space-led one, which the harness grants bare. _GUARD_BARE_VIA_STAR says which matched. The reviewed-lead half of rule 18's predicate and rule 20's lead test; called directly, so the flag survives
+# spec: guard-kit/SPEC.md §The generic ruleset — true when the segment's core is the bare form of a committed allow entry: an entry with no glob, or the head of one whose only '*' is a closing space-led one, which the harness grants bare. _GUARD_BARE_VIA_STAR says which matched. The reviewed-lead half of rule `ro_pipeline`'s predicate and rule `allowlist_chain`'s lead test; called directly, so the flag survives
 _guard_is_bare_allow() {
     local core bl star=0
     _GUARD_BARE_VIA_STAR=0
@@ -360,7 +360,7 @@ guard_rule_cd_compound() {
     fi
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 2's arm (d), one skeleton segment at a time: the raw command is read only to spell the corrective, since an assignment carrying no quote or expansion is the same text in both views
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `git_c_root`'s arm (d), one skeleton segment at a time: the raw command is read only to spell the corrective, since an assignment carrying no quote or expansion is the same text in both views
 _guard_knob_echo() {
     local raw="$1" seg="$2" shape=lead i=0 w name val out kshape resolved pre post tail respelt=''
     local -a words asg=()
@@ -452,7 +452,7 @@ guard_rule_abs_script() {
         *)             return 0 ;;
     esac
     rest="${rest%%[[:space:]]*}"            # first token = repo-relative script path
-    case "$rest" in *.sh) ;; *) return 0 ;; esac   # only .sh scripts; rule 5 handles the rest
+    case "$rest" in *.sh) ;; *) return 0 ;; esac   # only .sh scripts; rule `abs_prefix` covers the rest
     base="${rest##*/}"
     relcmd="${raw//"$PWD/"/}"               # the rewrite carries the real command, not its skeleton
     for g in "${GUARD_KIT_RO_SCRIPTS[@]}"; do
@@ -492,7 +492,7 @@ guard_rule_expansion() {
 guard_rule_brace_glyph() {
     local cmd="$1" sqstripped resid ph='{}' q="'{}'"
     # spec: guard-kit/SPEC.md §The generic ruleset — 'sq dq hd': '{' is a matcher glyph, not a
-    # shell expansion, so rule 6's reason to keep double-quoted spans live does not carry here.
+    # shell expansion, so rule `expansion`'s reason to keep double-quoted spans live does not carry here.
     sqstripped="$(guard_skeleton "$cmd" sq dq hd)"
     case "$sqstripped" in *'{'*) ;; *) return 0 ;; esac
     resid="${sqstripped//"$ph"/}"
@@ -513,7 +513,7 @@ guard_rule_brace_glyph() {
     guard_block "quote the '{' if it's literal (an unquoted awk/sed program), or write it out if it expands — the harness's matcher refuses every bare '{' glyph before allowlist matching, so the call is decided out of band. A brace inside quotes of either kind, or in a heredoc body, is already inert and never reaches this block."
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 8's one program-then-operands walk: a per-tool option table separates a sed, awk, perl or python segment's program word from its file operands, filling the caller's prog (empty when an option supplied the program, except python's -c, whose text it holds with prog_inline set), inplace and prog_operands; non-zero on an awk, perl or python option the table does not carry, so the caller declines rather than guess
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `sed_file`'s one program-then-operands walk: a per-tool option table separates a sed, awk, perl or python segment's program word from its file operands, filling the caller's prog (empty when an option supplied the program, except python's -c, whose text it holds with prog_inline set), inplace and prog_operands; non-zero on an awk, perl or python option the table does not carry, so the caller declines rather than guess
 _guard_program_operands() {
     local tool="$1" tok skip='' ends=0 have_prog=0 amp='&' bundle letter
     local -a toks
@@ -579,7 +579,7 @@ _guard_program_operands() {
     return 0
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 8's dequoted view: the raw command walked in lockstep with its 'sq dq hd' skeleton, every region decision taken from the skeleton, quote characters removed and each quoted span's blanks and statement separators held as sentinels so a split or a word split cuts exactly where it cuts the skeleton; non-zero where the two cannot be aligned (a heredoc body, an unterminated span, a newline inside quotes)
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `sed_file`'s dequoted view: the raw command walked in lockstep with its 'sq dq hd' skeleton, every region decision taken from the skeleton, quote characters removed and each quoted span's blanks and statement separators held as sentinels so a split or a word split cuts exactly where it cuts the skeleton; non-zero where the two cannot be aligned (a heredoc body, an unterminated span, a newline inside quotes)
 _guard_dequoted_view() {
     local raw="$1" s="$2" out='' i=0 j=0 k rest chunk span c
     local lit="[\"'\\\\]*" dqlit="[\"\\\\]*"
@@ -632,7 +632,7 @@ _guard_dequoted_view() {
     printf '%s' "$out"
 }
 
-# spec: guard-kit/SPEC.md §The guard framework (`lib/guard.sh`) — the directory the kits are vendored under, with its trailing '/', or empty where guard-kit sits at the working directory; assigned by nameref so the load at this file's tail forks nothing
+# spec: guard-kit/SPEC.md §The shell guard — the directory the kits are vendored under, with its trailing '/', or empty where guard-kit sits at the working directory; assigned by nameref so the load at this file's tail forks nothing
 _guard_vendor_root() {
     local -n _gvr_out="$1"
     local lib="${GUARD_KIT_LIB:-guard-kit/lib/guard.sh}"
@@ -640,7 +640,7 @@ _guard_vendor_root() {
     if [[ "$_gvr_out" == */* ]]; then _gvr_out="${_gvr_out%/*}/"; else _gvr_out=""; fi
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 8's awk arm: a pipeline-head awk segment with exactly one file operand whose program is a line range (NR comparisons only) or a markdown heading range, with no action or the print-all one; the steer is chosen by the program's shape
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `sed_file`'s awk arm: a pipeline-head awk segment with exactly one file operand whose program is a line range (NR comparisons only) or a markdown heading range, with no action or the print-all one; the steer is chosen by the program's shape
 _guard_awk_read() {
     local raw="$1" s="$2" v stmt seg prog inplace prog_inline p
     local -a pipes=() prog_operands=()
@@ -668,12 +668,12 @@ _guard_awk_read() {
     done < <(sed -E 's/\|\||&&|;/\n/g' <<<"$v")
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 8's python arm body source: the body of the command's <k>th heredoc opener, with guard_skeleton's own extent
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `sed_file`'s python arm body source: the body of the command's <k>th heredoc opener, with guard_skeleton's own extent
 _guard_heredoc_body() {
     guard_skeleton "$1" "body=$2"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 8's literal-rewrite test on a python body: it writes a file, calls .replace( and carries no computed-text construct; the second argument is 1 for an unquoted-delimiter body, where a '$' is computed text
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `sed_file`'s literal-rewrite test on a python body: it writes a file, calls .replace( and carries no computed-text construct; the second argument is 1 for an unquoted-delimiter body, where a '$' is computed text
 _guard_is_literal_rewrite() {
     local b="$1" q="[\"']" w='(^|[^A-Za-z0-9_])'
     local open_re="open\\(([^)]*,)?[[:space:]]*(mode[[:space:]]*=[[:space:]]*)?${q}[rbtx+]*[wa][rbtx+]*${q}[[:space:]]*[,)]"
@@ -685,7 +685,7 @@ _guard_is_literal_rewrite() {
     return 0
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 8's python arm: a segment leading with python or python3 whose -c argument or stdin heredoc is a literal rewrite
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `sed_file`'s python arm: a segment leading with python or python3 whose -c argument or stdin heredoc is a literal rewrite
 _guard_python_rewrite() {
     local raw="$1" s="$2" v seg prog inplace prog_inline body k=0 live
     local -a prog_operands=() openers=()
@@ -744,7 +744,7 @@ guard_rule_sed_file() {
     _guard_python_rewrite "$cmd" "$s"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — a literal echo/printf banner segment: the natural separator of a batched read (no expansion survives here — rule 6 ran first, the caller bailed on substitution/backtick)
+# spec: guard-kit/SPEC.md §The generic ruleset — a literal echo/printf banner segment: the natural separator of a batched read (no expansion survives here — rule `expansion` ran first, the caller bailed on substitution/backtick)
 _guard_is_banner() {
     local seg="${1#"${1%%[![:space:]]*}"}"
     case "${seg%%[[:space:]]*}" in echo | printf) return 0 ;; *) return 1 ;; esac
@@ -763,7 +763,7 @@ _guard_is_cat_read() {
     [[ "$operands" == 1 ]]
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 18's roster membership test on one command word
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `ro_pipeline`'s roster membership test on one command word
 _guard_on_ro_roster() {
     local b
     for b in "${GUARD_KIT_RO_BINS[@]}"; do
@@ -772,7 +772,7 @@ _guard_on_ro_roster() {
     return 1
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 18's xargs option walk: prints the index of the word naming the command xargs runs, nothing for a bare xargs, and returns non-zero on an option the walk does not recognize
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `ro_pipeline`'s xargs option walk: prints the index of the word naming the command xargs runs, nothing for a bare xargs, and returns non-zero on an option the walk does not recognize
 _guard_xargs_command_index() {
     local tok want_arg=0 i n
     local -a toks
@@ -794,7 +794,7 @@ _guard_xargs_command_index() {
     return 0
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 18's xargs discriminator: xargs runs a command rather than filtering text, so the segment is read-only only when the command it runs is itself on the roster
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `ro_pipeline`'s xargs discriminator: xargs runs a command rather than filtering text, so the segment is read-only only when the command it runs is itself on the roster
 _guard_is_ro_xargs() {
     local seg="${1#"${1%%[![:space:]]*}"}" idx cmdtok
     local -a toks
@@ -829,7 +829,7 @@ _guard_is_read_batch() {
     [[ "$reads" -ge 1 ]]
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rules 9 and 11 fire only toward a dedicated search tool GUARD_KIT_SEARCH_TOOLS declares the harness build carries
+# spec: guard-kit/SPEC.md §The generic ruleset — rules `find_glob` and `git_grep` fire only toward a dedicated search tool GUARD_KIT_SEARCH_TOOLS declares the harness build carries
 _guard_has_search_tool() {
     local t
     for t in ${GUARD_KIT_SEARCH_TOOLS[@]+"${GUARD_KIT_SEARCH_TOOLS[@]}"}; do
@@ -892,7 +892,7 @@ guard_rule_git_grep() {
     guard_block "don't search with 'git grep' over the working tree — use the Grep tool: it returns matching lines (files registered for a later Read) and needs no permission decision at all. If your toolset carries no Grep tool, bare 'grep -rn <pattern> <path>' searches the same working tree. A 'git grep' naming a revision, searching the index (--cached), or piped into a consumer is untouched — those reach beyond the working tree the Grep tool sees. If you genuinely need git grep, run it yourself with !<command>."
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 12's lead test: a leading shell keyword or negation does not change which binary the segment runs, so the loop-headed spelling the rule exists for is reached
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `pgrep_self_match`'s lead test: a leading shell keyword or negation does not change which binary the segment runs, so the loop-headed spelling the rule exists for is reached
 _guard_command_word() {
     local seg="${1#"${1%%[![:space:]]*}"}" tok
     while [[ -n "$seg" ]]; do
@@ -907,7 +907,7 @@ _guard_command_word() {
     printf '%s' "$seg"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 12's pattern operand: the ERE '-f' will scan argv for, a quoted operand read whole across its blanks, prefixed 'i ' under -i or '- ' otherwise, or non-zero where the segment's options cannot be walked without guessing or -x/-v void the self-match argument
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `pgrep_self_match`'s pattern operand: the ERE '-f' will scan argv for, a quoted operand read whole across its blanks, prefixed 'i ' under -i or '- ' otherwise, or non-zero where the segment's options cannot be walked without guessing or -x/-v void the self-match argument
 _guard_pgrep_pattern() {
     local seg="$1" tok rest k pat='' have_f=0 skip=0 icase=- open=''
     local -a toks
@@ -975,7 +975,7 @@ guard_rule_pgrep_self_match() {
     done < <(guard_split_compound "$raw" | tr '&' '\n')
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — the ruleset's one shell-keyword walk, shared by rules 13 and 15: emits '<depth> <cmdpos> <token>' per skeleton token and returns non-zero on an unbalanced do/done so both callers decline rather than guess
+# spec: guard-kit/SPEC.md §The generic ruleset — the ruleset's one shell-keyword walk, shared by rules `bare_sleep` and `background_no_record`: emits '<depth> <cmdpos> <token>' per skeleton token and returns non-zero on an unbalanced do/done so both callers decline rather than guess
 _guard_loop_span() {
     local s tok depth=0 cmdpos=1
     s="$(tr '\n' ';' <<<"$1" | sed -E 's/(\|\||&&|;|\||&|\(|\)|\{|\})/ \1 /g')"
@@ -1004,7 +1004,7 @@ _guard_loop_span() {
     [[ "$depth" -eq 0 ]]
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 13's loop-wrapper span: 'until <cond>; do sleep N; done' is the sanctioned wait, so only a sleep outside every do…done span fires, and an unresolvable span declines
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `bare_sleep`'s loop-wrapper span: 'until <cond>; do sleep N; done' is the sanctioned wait, so only a sleep outside every do…done span fires, and an unresolvable span declines
 guard_rule_bare_sleep() {
     local raw="$1" s span depth cmdpos tok bare=0
     grep -qE '\$\(|<\(|>\(|\$\{|\$[A-Za-z_]' <<<"$raw" && return 0
@@ -1018,7 +1018,7 @@ guard_rule_bare_sleep() {
     guard_block "don't wait by sleeping in the foreground — a wait must end when its condition goes true, not when a duration expires, and a foreground sleep spends a full-price turn doing nothing. Background a command that *exits* on the condition ('run_in_background' wrapping 'until <cond>; do sleep N; done') and take its completion notification: it fires the moment the condition holds and then ends. A dispatched agent is awaited by its own completion notification and never by a path on disk. The harness's event-stream form stays armed to its deadline after its event fires when the command it was armed with is unbounded, so it is the second choice for a single completion. Mind the polarity: 'until' takes a done predicate ('until [ -f marker ]'), while a PID's liveness is a still-running one and takes 'while' ('while kill -0 <pid> 2>/dev/null; do sleep N; done') — inverted, the loop exits at once with the producer still running. Spell that PID as the literal number you read out of the .run record: a '\"\$var\"' expansion in the condition is refused by the expansion rule before this steer can be followed, and the literal form is the one the bounded-wait grant recognizes. A sleep inside a condition loop is untouched — that is the sanctioned form. If you genuinely need the settle, run it yourself with !<command>."
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 14's record reader: the one-line 'pid=<n> run=<key>' grammar is evidence-kit/SPEC.md §The producer-liveness lock's and is read rather than sourced, because a PreToolUse hook cannot depend on a sibling kit being vendored; a record that does not parse yields nothing, so the rule declines on one
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `git_mutation_under_producer`'s record reader: the one-line 'pid=<n> run=<key>' grammar is evidence-kit/SPEC.md §The producer-liveness lock's and is read rather than sourced, because a PreToolUse hook cannot depend on a sibling kit being vendored; a record that does not parse yields nothing, so the rule declines on one
 _guard_live_run_records() {
     local d rec line pid
     _guard_scratch_homes
@@ -1035,7 +1035,7 @@ _guard_live_run_records() {
     done
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 14's subcommand walk: git's global options are consumed so 'git -C dir commit' is reached, and any option this list does not recognize returns non-zero so the segment declines rather than guessing which token is the subcommand
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `git_mutation_under_producer`'s subcommand walk: git's global options are consumed so 'git -C dir commit' is reached, and any option this list does not recognize returns non-zero so the segment declines rather than guessing which token is the subcommand
 _guard_git_subcommand() {
     local seg="$1" mode="${2:-}" tok first=1 expect_arg=0 found=0
     local -a globals=()
@@ -1060,10 +1060,10 @@ _guard_git_subcommand() {
                 --noglob-pathspecs | --icase-pathspecs | --no-optional-locks) globals+=("$tok") ;;
             -*) return 1 ;;
             *)
-                # spec: guard-kit/SPEC.md §The generic ruleset — rule 2's reading of this same walk: 'globals' emits the global option words consumed before the subcommand, one per line, instead of the subcommand
+                # spec: guard-kit/SPEC.md §The generic ruleset — rule `git_c_root`'s reading of this same walk: 'globals' emits the global option words consumed before the subcommand, one per line, instead of the subcommand
                 if [[ "$mode" == globals ]]; then
                     printf '%s\n' ${globals[@]+"${globals[@]}"}
-                # spec: guard-kit/SPEC.md §The generic ruleset — rule 22's force arm reads this same walk: 'args' emits the subcommand and then every word after it, one per line
+                # spec: guard-kit/SPEC.md §The generic ruleset — rule `rm_tracked`'s force arm reads this same walk: 'args' emits the subcommand and then every word after it, one per line
                 elif [[ "$mode" == args ]]; then
                     printf '%s\n' "$tok"
                     found=1
@@ -1106,13 +1106,13 @@ guard_rule_git_mutation_under_producer() {
     guard_block "don't run '${writes[0]}' while a producer you recorded is still running — ${list%; } names a live pid, and a tracked-tree mutation under a live producer is what the wait rule exists to prevent: the run is still writing, so a commit taken now dirties the worktree underneath it and its verdict has to be discarded and re-run. Two exits, both cheap: wait for that producer on its own artifact (loop on the recorded pid's liveness, 'until ! kill -0 <pid> 2>/dev/null; do sleep 5; done', backgrounded so its completion notifies you), or — if the producer has already exited — delete its .run file, which is not a workaround but the statement of fact becoming false and being retracted. Read-only git ('status', 'log', 'diff', 'show') is untouched. If you genuinely need this mutation now, run it yourself with !<command>."
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — every redirect target in a skeleton, one per line: the corpus rules 15 and 18 both read
+# spec: guard-kit/SPEC.md §The generic ruleset — every redirect target in a skeleton, one per line: the corpus rules `background_no_record` and `ro_pipeline` both read
 _guard_redirect_targets() {
     grep -oE '[0-9]*>>?[[:space:]]*[^[:space:]|;&]+' <<<"$1" \
         | sed -E 's/^[0-9]*>>?[[:space:]]*//'
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — the read-only-segment test rules 15, 18 and 19 share, xargs discriminator included because xargs runs a command rather than filtering text; the roster-membership half only, the declared forms being _guard_ro_forms_clear's
+# spec: guard-kit/SPEC.md §The generic ruleset — the read-only-segment test rules `background_no_record`, `ro_pipeline` and `bounded_wait` share, xargs discriminator included because xargs runs a command rather than filtering text; the roster-membership half only, the declared forms being _guard_ro_forms_clear's
 _guard_is_ro_segment() {
     local seg="${1#"${1%%[![:space:]]*}"}" first
     first="${seg%%[[:space:]]*}"
@@ -1121,7 +1121,7 @@ _guard_is_ro_segment() {
     _guard_on_ro_roster "$first"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 18's kit declaration table for the default roster, in the declaration grammar; a binary absent here is undeclared
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `ro_pipeline`'s kit declaration table for the default roster, in the declaration grammar; a binary absent here is undeclared
 _guard_ro_forms_kit() {
     case "$1" in
         sort) printf '%s' '-o --output --compress-program' ;;
@@ -1134,7 +1134,7 @@ _guard_ro_forms_kit() {
     esac
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 18's declared-forms test on one invocation: the consumer's GUARD_KIT_RO_FORMS entry else the kit table, option tokens against the dequoted words and pos:N against the skeleton core's words; non-zero on a matched form, an undeclared member, or any pos:N under xargs (the fourth argument), since xargs appends operands the segment does not show
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `ro_pipeline`'s declared-forms test on one invocation: the consumer's GUARD_KIT_RO_FORMS entry else the kit table, option tokens against the dequoted words and pos:N against the skeleton core's words; non-zero on a matched form, an undeclared member, or any pos:N under xargs (the fourth argument), since xargs appends operands the segment does not show
 _guard_ro_invocation_clear() {
     local bin="$1" forms tok w need pos
     local -a decl=() words=() skel=()
@@ -1177,7 +1177,7 @@ _guard_ro_invocation_clear() {
     return 0
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 18's one declared-forms reader, called by rules 15 (exemption 3), 18 and 19 (clauses c and d) once their segment tests pass; reads the dequoted view aligned segment-for-segment with the skeleton, and withholds where the two cannot be aligned
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `ro_pipeline`'s one declared-forms reader, called by rules `background_no_record` (exemption 3), `ro_pipeline` and `bounded_wait` (clauses c and d) once their segment tests pass; reads the dequoted view aligned segment-for-segment with the skeleton, and withholds where the two cannot be aligned
 _guard_ro_forms_clear() {
     local raw="$1" s="$2" v i cw dcw bin core idx xcmd
     local -a segs=() dsegs=() dtoks=()
@@ -1204,12 +1204,12 @@ _guard_ro_forms_clear() {
     return 0
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 15's shell arm: a statement-ending bare '&' in the skeleton, never the '&&' operator, the '|&' separator or a redirect's fd-dup
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `background_no_record`'s shell arm: a statement-ending bare '&' in the skeleton, never the '&&' operator, the '|&' separator or a redirect's fd-dup
 _guard_shell_backgrounds() {
     grep -qE '(^|[^&>|])&([[:space:]]|;|$)' <<<"$1"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 15's record-writing test: at PreToolUse the child has not started and no record can exist yet, so the only observable is whether the launch is going to write one
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `background_no_record`'s record-writing test: at PreToolUse the child has not started and no record can exist yet, so the only observable is whether the launch is going to write one
 _guard_writes_run_record() {
     local tgt
     while read -r tgt; do
@@ -1219,7 +1219,7 @@ _guard_writes_run_record() {
     return 1
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 15's exemption 3: a child that writes nothing has nothing for a later commit to corrupt, so it owes no record
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `background_no_record`'s exemption 3: a child that writes nothing has nothing for a later commit to corrupt, so it owes no record
 _guard_is_ro_background() {
     local raw="$1" s="$2" tgt seg reads=0
     while read -r tgt; do
@@ -1273,12 +1273,12 @@ guard_rule_truncate_scratch() {
     fi
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 17's redirect scan, operator and target together and fd-dups included: _guard_redirect_targets' target class excludes '&', so it drops an fd-dup target entirely and a rule that must exempt one cannot see it there
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `append_scratch`'s redirect scan, operator and target together and fd-dups included: _guard_redirect_targets' target class excludes '&', so it drops an fd-dup target entirely and a rule that must exempt one cannot see it there
 _guard_redirect_pairs() {
     grep -oE '[0-9]*>>?[[:space:]]*(&[0-9-]+|[^[:space:]|;&<>]+)' <<<"$1"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — the terminator of each heredoc a skeleton line opens, in order and unquoted, one per line; read by rule 17's single-statement test and rule 25's statement split
+# spec: guard-kit/SPEC.md §The generic ruleset — the terminator of each heredoc a skeleton line opens, in order and unquoted, one per line; read by rule `append_scratch`'s single-statement test and rule `emitter_write`'s statement split
 _guard_heredoc_terms() {
     local t
     while IFS= read -r t; do
@@ -1291,7 +1291,7 @@ _guard_heredoc_terms() {
     done < <(grep -oE '<<-?[[:space:]]*("[^"]*"|'\''[^'\'']*'\''|[A-Za-z_][A-Za-z0-9_]*)' <<<"$1")
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 17's single-statement test: guard_skeleton leaves a heredoc's body placeholder and terminator on lines of their own and guard_split_compound emits per line, so one statement is one segment plus exactly the residue that segment's own openers produce, never one segment
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `append_scratch`'s single-statement test: guard_skeleton leaves a heredoc's body placeholder and terminator on lines of their own and guard_split_compound emits per line, so one statement is one segment plus exactly the residue that segment's own openers produce, never one segment
 _guard_only_heredoc_residue() {
     local -a segs=() terms=()
     local t seg i=1
@@ -1312,7 +1312,7 @@ _guard_only_heredoc_residue() {
     [[ "$i" -eq "${#segs[@]}" ]]
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 17 clause (d), read by rules 17 and 25: the substitution and backtick declines run on the 'hdq' view rather than the raw command, because a quoted-delimiter heredoc body cannot substitute (rule 6's own ground, one rule over) while every other region can — rule 6 blocks three of the four substitution spellings and exits 2 first, but not the output-process-substitution one, and a grant may not rest on a coverage claim that is only mostly true
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `append_scratch` clause (d), read by rules `append_scratch` and `emitter_write`: the substitution and backtick declines run on the 'hdq' view rather than the raw command, because a quoted-delimiter heredoc body cannot substitute (rule `expansion`'s own ground, one rule over) while every other region can — rule `expansion` blocks three of the four substitution spellings and exits 2 first, but not the output-process-substitution one, and a grant may not rest on a coverage claim that is only mostly true
 _guard_emitter_unmodelled() {
     local live
     live="$(guard_skeleton "$1" hdq)"
@@ -1321,7 +1321,7 @@ _guard_emitter_unmodelled() {
     return 1
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 17's clauses (0), (a) and (c) and its quoted-target decline on one statement's 'sq dq hd' skeleton, read by rules 17 and 25: fills _GUARD_EMITTER_TARGETS with every target that is neither /dev/null nor an fd-dup, and returns non-zero when the statement is not an emitter write rule 17 can test
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `append_scratch`'s clauses (0), (a) and (c) and its quoted-target decline on one statement's 'sq dq hd' skeleton, read by rules `append_scratch` and `emitter_write`: fills _GUARD_EMITTER_TARGETS with every target that is neither /dev/null nor an fd-dup, and returns non-zero when the statement is not an emitter write rule `append_scratch` can test
 _guard_emitter_write() {
     local s="$1" lead b on_roster=0 pair tgt
     _GUARD_EMITTER_TARGETS=()
@@ -1359,7 +1359,7 @@ guard_rule_append_scratch() {
 
 guard_rule_ro_pipeline() {
     local raw="$1"
-    # spec: guard-kit/SPEC.md §The guard framework — the raw-command carve-out these two tests take
+    # spec: guard-kit/SPEC.md §The shell guard — the raw-command carve-out these two tests take
     grep -qE '\$\(|<\(|>\(' <<<"$raw" && return 0
     case "$raw" in *'`'*) return 0 ;; esac
     local s
@@ -1384,7 +1384,7 @@ guard_rule_ro_pipeline() {
         _guard_is_banner "$seg" && continue
         [[ "${seg%%[[:space:]]*}" == xargs ]] && { _guard_is_ro_xargs "$seg" || return 0; }
         if ! _guard_is_ro_segment "$seg"; then
-            # spec: guard-kit/SPEC.md §The generic ruleset — rule 18's widened lead: the bare
+            # spec: guard-kit/SPEC.md §The generic ruleset — rule `ro_pipeline`'s widened lead: the bare
             # form of a committed allow entry qualifies, but only where something decorates it
             [[ "$i" == 0 && "${#segs[@]}" -gt 1 ]] || return 0
             _guard_is_bare_allow "$seg" || return 0
@@ -1397,7 +1397,7 @@ guard_rule_ro_pipeline() {
     guard_allow "read-only search pipeline (${GUARD_NAME:-guard} auto-allow)"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 19's inert-redirect test: a target that is not /dev/null and not an fd-dup is a write, and a grant may not bless one
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `bounded_wait`'s inert-redirect test: a target that is not /dev/null and not an fd-dup is a write, and a grant may not bless one
 _guard_wait_redirects_inert() {
     local pair tgt
     while IFS= read -r pair; do
@@ -1411,7 +1411,7 @@ _guard_wait_redirects_inert() {
     return 0
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 19's clause (c): the loop condition runs once per iteration, unboundedly often, so it is held to rule 18's segment test plus the two condition forms that are read-only without being roster binaries — the shell tests, and 'kill -0', which asks a PID a question and sends no signal
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `bounded_wait`'s clause (c): the loop condition runs once per iteration, unboundedly often, so it is held to rule `ro_pipeline`'s segment test plus the two condition forms that are read-only without being roster binaries — the shell tests, and 'kill -0', which asks a PID a question and sends no signal
 _guard_is_wait_condition_segment() {
     local seg="$1" core cw first
     _guard_wait_redirects_inert "$seg" || return 1
@@ -1425,7 +1425,7 @@ _guard_is_wait_condition_segment() {
     _guard_is_ro_segment "$cw"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 19's clause (d): every statement after the loop meets rule 18's own test, so the grant covers the compound the measured class is written in and grants nothing rule 18 standing alone would not have granted
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `bounded_wait`'s clause (d): every statement after the loop meets rule `ro_pipeline`'s own test, so the grant covers the compound the measured class is written in and grants nothing rule `ro_pipeline` standing alone would not have granted
 _guard_is_wait_tail_segment() {
     local seg="$1" core
     _guard_wait_redirects_inert "$seg" || return 1
@@ -1436,7 +1436,7 @@ _guard_is_wait_tail_segment() {
     _guard_is_ro_segment "$core"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 19's arm (B), the recorded launch: true when the call is exactly the canonical launch-record-wait spelling and its launched command is granted, bounded and writes only gitignored or inert targets
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `bounded_wait`'s arm (B), the recorded launch: true when the call is exactly the canonical launch-record-wait spelling and its launched command is granted, bounded and writes only gitignored or inert targets
 _guard_recorded_launch() {
     local raw="$1" s live dollars launch ls lv words key path rmpath d tgt pair inner hit=0 rc=0 in_scratch=0
     local -a inners=() targets=()
@@ -1462,7 +1462,7 @@ _guard_recorded_launch() {
     [[ "$s" =~ $sre ]] || return 1
     ls="$(guard_skeleton "$launch" sq dq hd)"
     [[ "${BASH_REMATCH[1]}" == "$ls" && "${BASH_REMATCH[2]}" == "$path" ]] || return 1
-    # spec: guard-kit/SPEC.md §The generic ruleset — rule 19 clause (B3): the one expansion admitted is statement 2's '$!', counted on the view where only a single-quoted '$' is inert
+    # spec: guard-kit/SPEC.md §The generic ruleset — rule `bounded_wait` clause (B3): the one expansion admitted is statement 2's '$!', counted on the view where only a single-quoted '$' is inert
     live="$(guard_skeleton "$raw" sq)"
     dollars="${live//[^\$]/}"
     [[ "${#dollars}" == 1 ]] || return 1
@@ -1486,7 +1486,7 @@ _guard_recorded_launch() {
     [[ "$rc" == 1 ]] || return 1
     _guard_rm_tracked_reach "$raw" >/dev/null && return 1
     _guard_interpreter_reach "$raw" >/dev/null && return 1
-    # spec: guard-kit/SPEC.md §The generic ruleset — rule 19 clause (B2), on rule 17's check-ignore predicate and inert carve-out; the record path takes the test too, so the grant never rests on a scratch dir being ignored
+    # spec: guard-kit/SPEC.md §The generic ruleset — rule `bounded_wait` clause (B2), on rule `append_scratch`'s check-ignore predicate and inert carve-out; the record path takes the test too, so the grant never rests on a scratch dir being ignored
     while IFS= read -r pair; do
         [[ -z "$pair" ]] && continue
         pair="${pair#"${pair%%[!0-9]*}"}"
@@ -1505,17 +1505,17 @@ _guard_recorded_launch() {
 
 guard_rule_bounded_wait() {
     local raw="$1" s view cond body tail seg
-    # spec: guard-kit/SPEC.md §The guard framework — the raw-command carve-out every auto-allow rule takes, adopted unchanged rather than reasoned about afresh
+    # spec: guard-kit/SPEC.md §The shell guard — the raw-command carve-out every auto-allow rule takes, adopted unchanged rather than reasoned about afresh
     grep -qE '\$\(|<\(|>\(' <<<"$raw" && return 0
     case "$raw" in *'`'*) return 0 ;; esac
     _guard_worktree_refuses "$raw" && return 0
     _guard_recorded_launch "$raw" && guard_allow "recorded launch of an allowlisted command (${GUARD_NAME:-guard} auto-allow)"
     s="$(guard_skeleton "$raw" sq dq hd)"
     grep -q "['\"]" <<<"$s" && return 0
-    # spec: guard-kit/SPEC.md §The generic ruleset — rule 19 clause (0): a compound that launches something beside its wait is a producer, not a waiter, and that is rule 15's subject
+    # spec: guard-kit/SPEC.md §The generic ruleset — rule `bounded_wait` clause (0): a compound that launches something beside its wait is a producer, not a waiter, and that is rule `background_no_record`'s subject
     _guard_shell_backgrounds "$s" && return 0
 
-    # spec: guard-kit/SPEC.md §The generic ruleset — rule 19 clause (a), on the ruleset's one shell-keyword walk: the first statement is a while/until loop carrying exactly one balanced do…done span
+    # spec: guard-kit/SPEC.md §The generic ruleset — rule `bounded_wait` clause (a), on the ruleset's one shell-keyword walk: the first statement is a while/until loop carrying exactly one balanced do…done span
     local span depth cmdpos tok dos=0 dones=0 firsttok=''
     span="$(_guard_loop_span "$s")" || return 0
     while read -r depth cmdpos tok; do
@@ -1532,7 +1532,7 @@ guard_rule_bounded_wait() {
     body="${BASH_REMATCH[3]}"
     tail="${BASH_REMATCH[4]:-}"
 
-    # spec: guard-kit/SPEC.md §The generic ruleset — rule 19 clause (b), the rule's safety core: a loop body running anything but sleep is unbounded work executing an unbounded number of times under a grant, and no clause elsewhere would bound it
+    # spec: guard-kit/SPEC.md §The generic ruleset — rule `bounded_wait` clause (b), the rule's safety core: a loop body running anything but sleep is unbounded work executing an unbounded number of times under a grant, and no clause elsewhere would bound it
     local sleeps=0
     local -a btoks
     while IFS= read -r seg; do
@@ -1587,7 +1587,7 @@ guard_rule_allowlist_chain() {
     lead_core="$(_guard_segment_core "$lead")"
 
     _guard_is_bare_allow "$lead" || return 0
-    # spec: guard-kit/SPEC.md §The generic ruleset — rule 20's emitter exemption: a redirected emitter whose bare form only a closing ' *' grants is rule 25's to steer
+    # spec: guard-kit/SPEC.md §The generic ruleset — rule `allowlist_chain`'s emitter exemption: a redirected emitter whose bare form only a closing ' *' grants is rule `emitter_write`'s to steer
     if [[ "$_GUARD_BARE_VIA_STAR" == 1 && "$lead" != "$lead_core" ]]; then
         local e
         for e in ${GUARD_KIT_APPEND_BINS[@]+"${GUARD_KIT_APPEND_BINS[@]}"}; do
@@ -1628,7 +1628,7 @@ guard_rule_git_rewrite() {
     fi
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 22's test, a block for rule 22 and a predicate for rule 19's arm (B): prints the first refusal and returns 0, 1 when no segment force-removes with git rm or deletes a tracked path with rm
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `rm_tracked`'s test, a block for rule `rm_tracked` and a predicate for rule `bounded_wait`'s arm (B): prints the first refusal and returns 0, 1 when no segment force-removes with git rm or deletes a tracked path with rm
 _guard_rm_tracked_reach() {
     local raw="$1" s
     grep -qE '\$\(|<\(|>\(|\$\{|\$[A-Za-z_]' <<<"$raw" && return 1
@@ -1675,7 +1675,7 @@ guard_rule_rm_tracked() {
     return 0
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's interpreter classification: arm (a) is the bash/sh pair the runner already serves, arm (b) the GUARD_KIT_SCRIPT_INTERPRETERS roster, and a word on neither is not a script interpreter at all
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `script_interpreter`'s interpreter classification: arm (a) is the bash/sh pair the runner already serves, arm (b) the GUARD_KIT_SCRIPT_INTERPRETERS roster, and a word on neither is not a script interpreter at all
 _guard_interpreter_arm() {
     local w="${1##*/}" i
     case "$w" in bash | sh) printf 'a'; return 0 ;; esac
@@ -1685,7 +1685,7 @@ _guard_interpreter_arm() {
     return 1
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's scratch-source test on one token, a prefix match on the member as written
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `script_interpreter`'s scratch-source test on one token, a prefix match on the member as written
 _guard_is_scratch_path() {
     local p="$1" d
     for d in ${GUARD_KIT_SCRATCH_DIRS[@]+"${GUARD_KIT_SCRATCH_DIRS[@]}"}; do
@@ -1694,7 +1694,7 @@ _guard_is_scratch_path() {
     return 1
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's cheap bail and its substitution arm's inner test: a scratch dir named anywhere in a string, which every arm of the rule requires
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `script_interpreter`'s cheap bail and its substitution arm's inner test: a scratch dir named anywhere in a string, which every arm of the rule requires
 _guard_names_scratch() {
     local d
     for d in ${GUARD_KIT_SCRATCH_DIRS[@]+"${GUARD_KIT_SCRATCH_DIRS[@]}"}; do
@@ -1703,7 +1703,7 @@ _guard_names_scratch() {
     return 1
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's substitution arm: a command-substitution span naming a scratch path, in both spellings, since rule 6 reaches only the '$(…)' one and a guard that blocks one spelling teaches the spelling rather than the rule
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `script_interpreter`'s substitution arm: a command-substitution span naming a scratch path, in both spellings, since rule `expansion` reaches only the '$(…)' one and a guard that blocks one spelling teaches the spelling rather than the rule
 _guard_substitution_scratch() {
     local span
     while IFS= read -r span; do
@@ -1712,7 +1712,7 @@ _guard_substitution_scratch() {
     return 1
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's body-source resolution: an interpreter takes its program body from a -c/-e argument, from its first bare operand, or from stdin; emits 'inline', 'file <path>' or 'stdin', and returns non-zero on an option this walk cannot size
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `script_interpreter`'s body-source resolution: an interpreter takes its program body from a -c/-e argument, from its first bare operand, or from stdin; emits 'inline', 'file <path>' or 'stdin', and returns non-zero on an option this walk cannot size
 _guard_interpreter_body() {
     local seg="$1" arm="$2" tok rest k skip=0
     local -a toks
@@ -1741,13 +1741,13 @@ _guard_interpreter_body() {
     printf 'stdin'
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's stdin source: a segment's '<' redirect target, never a '<<' heredoc opener, whose body rides in the command string and is the shape the rule deliberately does not fire on
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `script_interpreter`'s stdin source: a segment's '<' redirect target, never a '<<' heredoc opener, whose body rides in the command string and is the shape the rule deliberately does not fire on
 _guard_stdin_redirect() {
     grep -oE '(^|[^<])<[[:space:]]*[^[:space:]<>|;&]+' <<<"$1" \
         | sed -E 's/^[^<]?<[[:space:]]*//'
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's two decisions: arm (a) steers to the runner, arm (b) states the bash-only rule, and both name the runner through _guard_door so a consumer whose binary sits elsewhere is told a command that runs
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `script_interpreter`'s two decisions: arm (a) steers to the runner, arm (b) states the bash-only rule, and both name the runner through _guard_door so a consumer whose binary sits elsewhere is told a command that runs
 _guard_block_interpreter() {
     local arm="$1" word="$2" src="$3" runner
     runner="$_guard_door --scratch-run"
@@ -1757,15 +1757,15 @@ _guard_block_interpreter() {
     guard_block "scratch execution is bash-only (guard-kit/SPEC.md §scratch-run) and '$word' is not bash: this call takes its program body from '$src' under a scratch dir, where no compensating control reaches it. Write the body as a shell script and run it through '$runner <script> [args…]', which echoes the body as it executes; a script whose shebang names a non-bash interpreter is refused there too. A body carried in the command string — a '-c' argument, a heredoc, a herestring — is untouched, because the approver and the friction log both see it verbatim. If you genuinely need the direct run, run it yourself with !<command>."
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's test, a block for rule 23 and a predicate for rule 19's arm (B): prints the first refusal as tab-separated arm, interpreter word and body source and returns 0, 1 when no interpreter takes its body from a scratch path
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `script_interpreter`'s test, a block for rule `script_interpreter` and a predicate for rule `bounded_wait`'s arm (B): prints the first refusal as tab-separated arm, interpreter word and body source and returns 0, 1 when no interpreter takes its body from a scratch path
 _guard_interpreter_reach() {
     local raw="$1" s stmt seg word arm body src tok i j n
     local -a pipes=() ptoks=()
     _guard_names_scratch "$raw" || return 1
-    # spec: guard-kit/SPEC.md §The generic ruleset — rule 23 declines on an expansion (rule 6 blocks those shapes already) but *not* on a backtick, which is the one body-source spelling rule 6 does not reach
+    # spec: guard-kit/SPEC.md §The generic ruleset — rule `script_interpreter` declines on an expansion (rule `expansion` blocks those shapes already) but *not* on a backtick, which is the one body-source spelling rule `expansion` does not reach
     grep -qE '\$\{|<\(|>\(|\$[A-Za-z_]' <<<"$raw" && return 1
     s="$(guard_skeleton "$raw" sq dq hd)"
-    # spec: guard-kit/SPEC.md §The generic ruleset — rule 23 splits statements then pipes rather than calling guard_split_compound: what it needs is dataflow (which segment's stdout is the interpreter's stdin), and the shared splitter erases the separator that tells a pipe from a ';'
+    # spec: guard-kit/SPEC.md §The generic ruleset — rule `script_interpreter` splits statements then pipes rather than calling guard_split_compound: what it needs is dataflow (which segment's stdout is the interpreter's stdin), and the shared splitter erases the separator that tells a pipe from a ';'
     while IFS= read -r stmt; do
         mapfile -t pipes < <(tr '|' '\n' <<<"$stmt")
         n=${#pipes[@]}
@@ -1810,7 +1810,7 @@ guard_rule_script_interpreter() {
     _guard_block_interpreter "$arm" "$word" "$src"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 24's regex literal for one run of a committed pattern: every metacharacter bracketed or escaped, so no pattern text reaches the regex engine as syntax
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `grant_path_slot`'s regex literal for one run of a committed pattern: every metacharacter bracketed or escaped, so no pattern text reaches the regex engine as syntax
 _guard_ere_literal() {
     local s="$1" out='' c k
     for ((k = 0; k < ${#s}; k++)); do
@@ -1826,7 +1826,7 @@ _guard_ere_literal() {
     printf '%s' "$out"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 24's cleanness test on one word: the full word carries no '..' component, and the text opening the path is not rooted by gate_path_rooted and does not begin with '~'; prints what the word reaches past
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `grant_path_slot`'s cleanness test on one word: the full word carries no '..' component, and the text opening the path is not rooted by gate_path_rooted and does not begin with '~'; prints what the word reaches past
 _guard_unclean_word() {
     case "/$1/" in */../*) printf "'%s', which carries a '..' component" "$1"; return 0 ;; esac
     if gate_path_rooted "$2"; then
@@ -1839,7 +1839,7 @@ _guard_unclean_word() {
     return 1
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 24 on one path-slot capture of the sentinel view: the first word is tested in the full shell word carrying it, and every later non-option word must re-match the slot's own token and be clean itself; prints the reach
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `grant_path_slot` on one path-slot capture of the sentinel view: the first word is tested in the full shell word carrying it, and every later non-option word must re-match the slot's own token and be clean itself; prints the reach
 _guard_slot_capture() {
     local sv="$1" off="$2" len="$3" token="$4" start="$5" right="$6"
     local cap firstw pre post word lead rest ext w
@@ -1875,8 +1875,8 @@ _guard_slot_capture() {
     return 1
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 24 on one segment, reading the caller's inners: the skeleton's words say which words are redirects, the dequoted words aligned one-for-one carry the content, the harness view strips the wrappers, and each matching committed pattern carrying a path slot is parsed leftmost-greedy; prints the reach and returns 0, 1 when clean, 2 when the segment cannot be decided
-# spec: guard-kit/SPEC.md §The generic ruleset — the words one segment keeps once its redirects are dropped, read by rule 24 and rule 19's arm (B): the skeleton's words say which words are redirects and the dequoted words aligned one for one carry the content; prints them space-joined, returns 1 when none remain and 2 when the two cannot be aligned or a heredoc opens
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `grant_path_slot` on one segment, reading the caller's inners: the skeleton's words say which words are redirects, the dequoted words aligned one-for-one carry the content, the harness view strips the wrappers, and each matching committed pattern carrying a path slot is parsed leftmost-greedy; prints the reach and returns 0, 1 when clean, 2 when the segment cannot be decided
+# spec: guard-kit/SPEC.md §The generic ruleset — the words one segment keeps once its redirects are dropped, read by rule `grant_path_slot` and rule `bounded_wait`'s arm (B): the skeleton's words say which words are redirects and the dequoted words aligned one for one carry the content; prints them space-joined, returns 1 when none remain and 2 when the two cannot be aligned or a heredoc opens
 _guard_unredirected_words() {
     local k n
     local -a sw=() dw=() kept=()
@@ -1951,7 +1951,7 @@ _guard_slot_segment() {
     return 1
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 24's test, a block for rule 24 and a predicate for rules 4 and 7: prints the reach and returns 0, returns 1 when every matching slot is clean, 2 when the command cannot be decided; 'predicate' reads a segment carrying a quoted statement separator whole rather than skipping it
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `grant_path_slot`'s test, a block for rule `grant_path_slot` and a predicate for rules `abs_script` and `brace_glyph`: prints the reach and returns 0, returns 1 when every matching slot is clean, 2 when the command cannot be decided; 'predicate' reads a segment carrying a quoted statement separator whole rather than skipping it
 _guard_slot_reach() {
     local raw="$1" mode="${2:-}" live s v i dseg rc undecided=0
     local -a inners=() segs=() dsegs=()
@@ -1986,7 +1986,7 @@ _guard_slot_reach() {
     return 1
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rules 4 and 7's grant test on a rewritten command, rule 27's predicate first: every segment of its dequoted view matches a committed allow pattern, and rule 24's test finds no reach and can decide; a failed settings read, an unalignable view or an undecidable bound fails, so a rewrite never turns a missing read into an allow
+# spec: guard-kit/SPEC.md §The generic ruleset — rules `abs_script` and `brace_glyph`'s grant test on a rewritten command, rule `worktree_confinement`'s predicate first: every segment of its dequoted view matches a committed allow pattern, and rule `grant_path_slot`'s test finds no reach and can decide; a failed settings read, an unalignable view or an undecidable bound fails, so a rewrite never turns a missing read into an allow
 _guard_rewrite_granted() {
     local cmd="$1" s v seg inner hit rc=0
     local -a inners=()
@@ -2026,7 +2026,7 @@ guard_rule_grant_path_slot() {
     guard_block "don't reach past a committed grant's path slot — $reach. A Bash rule's '*' spans '/', '..' and whole words, so a grant written for one directory reaches paths its author never named. Spell the path inside the pattern's reach, or, if you genuinely need this command, run it yourself with !<command>."
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 25's statements: a skeleton split on ';', '&&', '||' and newlines, each emitted NUL-terminated and followed by the heredoc residue its own openers produce; a line whose openers sit in more than one statement attributes its residue to none, so each of those fails rule 17's single-statement test
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `emitter_write`'s statements: a skeleton split on ';', '&&', '||' and newlines, each emitted NUL-terminated and followed by the heredoc residue its own openers produce; a line whose openers sit in more than one statement attributes its residue to none, so each of those fails rule `append_scratch`'s single-statement test
 _guard_statements() {
     local -a lines=() parts=() terms=()
     local line part t residue next carriers i=0
@@ -2068,7 +2068,7 @@ guard_rule_emitter_write() {
     case "$raw" in *'>'*) ;; *) return 0 ;; esac
     _guard_emitter_unmodelled "$raw" && return 0
     s="$(guard_skeleton "$raw" sq dq hd)"
-    # spec: guard-kit/SPEC.md §The generic ruleset — rule 25 declines on a backgrounded launch, rule 15's subject, whose canonical spelling writes its liveness record with an emitter
+    # spec: guard-kit/SPEC.md §The generic ruleset — rule `emitter_write` declines on a backgrounded launch, rule `background_no_record`'s subject, whose canonical spelling writes its liveness record with an emitter
     _guard_shell_backgrounds "$s" && return 0
     mapfile -d '' -t stmts < <(_guard_statements "$s")
     if [[ "${#stmts[@]}" -gt 1 ]]; then
@@ -2092,7 +2092,7 @@ guard_rule_emitter_write() {
     fi
     _guard_emitter_write "$s" || return 0
     for tgt in "${_GUARD_EMITTER_TARGETS[@]}"; do
-        # spec: guard-kit/SPEC.md §The generic ruleset — rule 25 arm (b) declines on a device target, which is no file a Write or Edit tool could take
+        # spec: guard-kit/SPEC.md §The generic ruleset — rule `emitter_write` arm (b) declines on a device target, which is no file a Write or Edit tool could take
         case "$tgt" in /dev/*) return 0 ;; esac
     done
     for tgt in "${_GUARD_EMITTER_TARGETS[@]}"; do
@@ -2115,7 +2115,7 @@ guard_rule_shell_wrapper() {
     done < <(guard_split_compound "$(guard_skeleton "$1" sq dq hd)")
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 27's roots, resolved once per hook process and so called directly, never in a substitution: the working directory, the session's own worktree root and the main checkout's root, the last two empty outside a linked worktree. The walk up to the nearest .git keeps git unspawned wherever that .git is a directory
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `worktree_confinement`'s roots, resolved once per hook process and so called directly, never in a substitution: the working directory, the session's own worktree root and the main checkout's root, the last two empty outside a linked worktree. The walk up to the nearest .git keeps git unspawned wherever that .git is a directory
 _guard_wt_roots() {
     [[ -n "${_guard_wt_done:-}" ]] && return 0
     _guard_wt_done=1
@@ -2132,7 +2132,7 @@ _guard_wt_roots() {
     _guard_wt_own="$d"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 27's path resolution: lexical against the working directory, '.' and '..' folded, the filesystem never read
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `worktree_confinement`'s path resolution: lexical against the working directory, '.' and '..' folded, the filesystem never read
 _guard_lexical_path() {
     local p="$1" part
     local -a parts=() stack=()
@@ -2183,7 +2183,7 @@ _guard_in_scratch() {
     return 1
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — the ignored-target test rules 16, 17, 19 (B2) and 25 share, asked of the checkout that holds the target: from a linked worktree git answers a main-checkout path as outside the repository, which would refuse the very journal append rule 27's scratch exemption exists for
+# spec: guard-kit/SPEC.md §The generic ruleset — the ignored-target test rules `truncate_scratch`, `append_scratch`, `bounded_wait`'s arm (B2) and `emitter_write` share, asked of the checkout that holds the target: from a linked worktree git answers a main-checkout path as outside the repository, which would refuse the very journal append rule `worktree_confinement`'s scratch exemption exists for
 _guard_ignored() {
     local t
     _guard_wt_roots
@@ -2197,7 +2197,7 @@ _guard_ignored() {
     git check-ignore --quiet -- "$1" 2>/dev/null
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 27's program-bearing exclusion: rule 8's walker rows and every script interpreter, whose write form lives in program text no declaration can describe
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `worktree_confinement`'s program-bearing exclusion: rule `sed_file`'s walker rows and every script interpreter, whose write form lives in program text no declaration can describe
 _guard_program_bearing() {
     local b="${1##*/}" i
     case "$b" in sed | awk | perl | python | python3) return 0 ;; esac
@@ -2207,7 +2207,7 @@ _guard_program_bearing() {
     return 1
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 27's admitted read: every segment a roster read in none of its declared write and execute forms, a literal banner tolerated, none led by a program-bearing tool, and every redirect target inert, in the own worktree or under a main-checkout scratch dir
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `worktree_confinement`'s admitted read: every segment a roster read in none of its declared write and execute forms, a literal banner tolerated, none led by a program-bearing tool, and every redirect target inert, in the own worktree or under a main-checkout scratch dir
 _guard_worktree_admitted() {
     local raw="$1" s="$2" seg cw pair tgt reads=0
     [[ "${GUARD_KIT_WORKTREE_READS:-read-only}" == read-only ]] || return 1
@@ -2237,7 +2237,7 @@ _guard_worktree_admitted() {
     _guard_ro_forms_clear "$raw" "$s"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 27's test, taken by rule 27 and, as a predicate, by every rule whose decision is not a block: true when a linked-worktree session's command carries a path word resolving into the main checkout outside its scratch dirs and is not the admitted read; the first such word and its resolution land in _GUARD_WT_WORD and _GUARD_WT_PATH. Called directly, so the roots cache survives
+# spec: guard-kit/SPEC.md §The generic ruleset — rule `worktree_confinement`'s test, taken by rule `worktree_confinement` and, as a predicate, by every rule whose decision is not a block: true when a linked-worktree session's command carries a path word resolving into the main checkout outside its scratch dirs and is not the admitted read; the first such word and its resolution land in _GUARD_WT_WORD and _GUARD_WT_PATH. Called directly, so the roots cache survives
 _guard_worktree_refuses() {
     local raw="$1" s v w t line
     local -a words=() ws=()
@@ -2314,17 +2314,17 @@ guard_generic_rules() {
     guard_rule_worktree_confinement "$cmd"
 }
 
-# spec: guard-kit/SPEC.md §The guard framework (`lib/guard.sh`) — the knob load, once per sourcing and at the tail so both failure answers can use the primitives above: an unreachable binary advises and runs no rule, a refused config blocks with the refusal's own text, and every value lands in the shell variable of its name, so a caller reassigning one after sourcing still steers the rule
+# spec: guard-kit/SPEC.md §The shell guard — the knob load, once per sourcing and at the tail so both failure answers can use the primitives above: an unreachable binary advises and runs no rule, a refused config blocks with the refusal's own text, and every value lands in the shell variable of its name, so a caller reassigning one after sourcing still steers the rule
 _guard_root=''
 _guard_vendor_root _guard_root
 if [[ -f "${_guard_root}gate-sdk/lib/gate.sh" ]]; then
     # shellcheck source=../../gate-sdk/lib/gate.sh
     source "${_guard_root}gate-sdk/lib/gate.sh"
 fi
-# spec: guard-kit/SPEC.md §The generic ruleset — the door rules 8 and 23 steer to, resolved once at load through gate-sdk's own accessor rather than rebuilt per message: a steer names the binary GATE_SDK_NATIVE_BIN resolves, so a consumer that vendored the kits elsewhere is still told a command that runs
+# spec: guard-kit/SPEC.md §The generic ruleset — the door rules `sed_file` and `script_interpreter` steer to, resolved once at load through gate-sdk's own accessor rather than rebuilt per message: a steer names the binary GATE_SDK_NATIVE_BIN resolves, so a consumer that vendored the kits elsewhere is still told a command that runs
 _guard_door=''
 declare -F gate_native_bin_spelled >/dev/null && _guard_door="$(gate_native_bin_spelled)"
-# spec: guard-kit/SPEC.md §The guard framework (`lib/guard.sh`) — the binary is gate-sdk's harness answer, which inside a linked worktree may be the main checkout's; that answer is exported so the knob read below reaches the same binary. An older library lacking the accessor keeps the plain knob
+# spec: guard-kit/SPEC.md §The shell guard — the binary is gate-sdk's harness answer, which inside a linked worktree may be the main checkout's; that answer is exported so the knob read below reaches the same binary. An older library lacking the accessor keeps the plain knob
 _guard_bin=''
 if declare -F gate_harness_bin >/dev/null; then
     _guard_bin="$(gate_harness_bin)"
@@ -2332,7 +2332,7 @@ if declare -F gate_harness_bin >/dev/null; then
 elif declare -F gate_native_bin >/dev/null; then
     _guard_bin="$(gate_native_bin)"
 fi
-# spec: guard-kit/SPEC.md §The guard framework (`lib/guard.sh`) — a fixed literal, because guard_advise renders through the binary this branch has just found missing; it interpolates nothing, so it carries no character JSON must escape
+# spec: guard-kit/SPEC.md §The shell guard — a fixed literal, because guard_advise renders through the binary this branch has just found missing; it interpolates nothing, so it carries no character JSON must escape
 if ! declare -F gate_knob_values >/dev/null || [[ ! -x "$_guard_bin" ]]; then
     printf '%s\n' '{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"guard-kit'\''s rules did not run on this call: the gate binary its knobs and its payload reads come from is not reachable, so the call takes the harness'\''s own permission path with no steering. Build it: bash gate-sdk/bin/build-native.sh"}}'
     exit 0
@@ -2343,7 +2343,7 @@ _guard_knob_names=(
     GUARD_KIT_APPEND_BINS GUARD_KIT_SEARCH_TOOLS GUARD_KIT_SCRIPT_INTERPRETERS GUARD_KIT_WORKTREE_READS
 )
 if ! _guard_knob_out="$(gate_knob_values "${_guard_knob_names[@]}" 2>/dev/null)"; then
-    # spec: guard-kit/SPEC.md §The guard framework (`lib/guard.sh`) — a load list ahead of the binary fails open and loud, read off the binary's own roster on this branch alone, so the success path spawns nothing more
+    # spec: guard-kit/SPEC.md §The shell guard — a load list ahead of the binary fails open and loud, read off the binary's own roster on this branch alone, so the success path spawns nothing more
     _guard_skew=()
     if _guard_roster="$("$_guard_bin" --emit-knob-roster 2>/dev/null)"; then
         declare -A _guard_declared=()

@@ -75,7 +75,7 @@ pub fn consumer_cmd() -> Result<Vec<String>, String> {
 }
 
 impl Host {
-    // spec: guard-kit/SPEC.md §The guard framework — the knob load: every value resolved from the
+    // spec: guard-kit/SPEC.md §The shell guard — the knob load: every value resolved from the
     // static table and the consumer's knob file, with no spawn; the first refusal is the answer.
     pub fn load(background: bool) -> Result<Host, String> {
         let door = crate::installer::init::command_token(&knobs::wire("GATE_SDK_NATIVE_BIN")?);
@@ -277,7 +277,7 @@ impl Host {
         out
     }
 
-    // spec: guard-kit/SPEC.md §The guard framework — the fall-through line, cut to the harness's
+    // spec: guard-kit/SPEC.md §The shell guard — the fall-through line, cut to the harness's
     // analysis bound plus one and encoded so one call stays one decodable line.
     pub fn log_fallthrough(&self, cmd: &str) {
         use std::io::Write;

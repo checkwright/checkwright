@@ -4,11 +4,11 @@
 # Every generic rule (guard-kit/SPEC.md §The generic ruleset) has a firing + a
 # non-firing case. Columns are tab-separated; # and blank lines are ignored.
 
-# rule 1 — cd in a compound command
+# rule `cd_compound` — cd in a compound command
 block	cd deploy && ls
 fallthrough	cd deploy
 
-# rule 2 — a prefix spelling that falls off the match path: (a) git -C <repo-root>
+# rule `git_c_root` — a prefix spelling that falls off the match path: (a) git -C <repo-root>
 #          when cwd is the root, (b) a git -c config override among git's global
 #          options, (c) an absolute spelling of a wrapper the matcher strips. A
 #          quoted mention and a wrapper path in argument position are not the command
@@ -23,7 +23,7 @@ block	make lint && /usr/bin/nice -n 5 make build
 fallthrough	time make build
 fallthrough	file /usr/bin/time
 
-# rule 2's arm (d) — an export, leading assignment or env prefix setting a kit
+# rule `git_c_root`'s arm (d) — an export, leading assignment or env prefix setting a kit
 #          knob to the value it already resolves to. The sandbox exports the
 #          binary knob absolute, so a knob resolving to its default is used; a
 #          differing value, an environment-only setting and a non-knob fall through
@@ -34,14 +34,14 @@ fallthrough	GATE_SDK_WORKFLOW_DIR=elsewhere make build
 fallthrough	GATE_SDK_JOBS=1 make build
 fallthrough	FOO=bar make build
 
-# rule 3 — bare-name scratch redirect
+# rule `scratch_redirect` — bare-name scratch redirect
 block	some-runner 2> op.err
 fallthrough	some-runner 2> .tmp/op.err
 
-# rule 4 — absolute-path read-only repo script (rewrite) vs other script (block).
+# rule `abs_script` — absolute-path read-only repo script (rewrite) vs other script (block).
 #          The rewrite emits allow, so it attaches only when the rewritten command
 #          is allowlisted (the sandbox carries both script globs) and stays inside
-#          rule 24's path slots; otherwise the corrective block fires, for an
+#          rule `grant_path_slot`'s path slots; otherwise the corrective block fires, for an
 #          unallowlisted scratch script and for a runner glob reached past its slot
 rewrite	bash @ROOT@/scripts/check-foo.sh
 rewrite	@ROOT@/scripts/check-env.sh --list
@@ -49,7 +49,7 @@ block	bash @ROOT@/scripts/gen-configs.sh
 block	bash @ROOT@/.tmp/check-evil.sh
 block	bash @ROOT@/../evil/checks/check-x.sh
 
-# rule 5 — repo-root absolute prefix (non-script) steered; foreign path untouched.
+# rule `abs_prefix` — repo-root absolute prefix (non-script) steered; foreign path untouched.
 #          The rule declares 'sq dq hd', so a path merely *named* — quoted either
 #          way, or sitting in a heredoc body — is not the executable command.
 block	python3 @ROOT@/tools/report.py
@@ -57,11 +57,11 @@ fallthrough	python3 /other/repo/tools/report.py
 fallthrough	printf '%s' 'the path @ROOT@/tools/report.py is steered'
 fallthrough	printf '%s' "the path @ROOT@/tools/report.py is steered"
 #          The heredoc row lands on `allow` rather than `fallthrough` because
-#          rule 17's create grant reaches it fourteen rules later; a rule-5
+#          rule `append_scratch`'s create grant reaches it fourteen rules later; a rule `abs_prefix`
 #          regression would still read `block`, which is what this row asserts.
 allow	cat <<'EOF' > .tmp/note.md@NL@the path @ROOT@/tools/report.py is steered@NL@EOF
 
-# rule 6 — shell expansion / assignment; single-quoted $ stays literal.
+# rule `expansion` — shell expansion / assignment; single-quoted $ stays literal.
 #          'sq' only: a double-quoted "$x" expands, and so does an
 #          unquoted-delimiter heredoc body — the stated bound on the hd class.
 block	echo $(pwd)
@@ -71,16 +71,16 @@ fallthrough	awk '$1' data.txt
 # cannot expand, and the shell is what guarantees that — so its body is inert
 block	cat <<EOF > .tmp/n.md@NL@value is $(date)@NL@EOF
 allow	cat <<'EOF' > .tmp/n.md@NL@value is $(date)@NL@EOF
-# reaches rule 21's advisory, which is the correct verdict for a commit -F; the
-# point is that rule 6 no longer blocks it before rule 21 is ever consulted
+# reaches rule `git_rewrite`'s advisory, which is the correct verdict for a commit -F; the
+# point is that rule `expansion` no longer blocks it before rule `git_rewrite` is ever consulted
 advise	git commit -F - <<'MSG'@NL@names a $(cmd) in the body@NL@MSG
 
-# rule 7 — unquoted brace glyph: bare {} placeholder rewritten, expansions blocked.
+# rule `brace_glyph` — unquoted brace glyph: bare {} placeholder rewritten, expansions blocked.
 #          'sq dq hd': '{' is a matcher glyph, not an expansion, so a
 #          double-quoted quantifier and a heredoc-body brace are both inert —
 #          the corrective (spell the members) is inapplicable to either.
 #          The placeholder rewrite emits allow, so it attaches only when the
-#          rewritten command is allowlisted and stays inside rule 24's path slots;
+#          rewritten command is allowlisted and stays inside rule `grant_path_slot`'s path slots;
 #          an unallowlisted and an unbounded placeholder block with the quoted-
 #          spelling corrective instead
 block	find . -exec rm {} \;
@@ -96,7 +96,7 @@ allow	grep -rnE "^[a-z]{2,}" src
 allow	cat <<'EOF' > .tmp/note.md@NL@a brace {a,b} in prose@NL@EOF
 block	cat <<'EOF' > a/{b,c}/note.md@NL@prose@NL@EOF
 
-# rule 8 — sed or awk reading a file, or sed rewriting one; a piped-into sed is a
+# rule `sed_file` — sed or awk reading a file, or sed rewriting one; a piped-into sed is a
 #          filter. awk fires on two read shapes, each with one file operand and no
 #          pipe into the segment — a line range (steered to Read) and a markdown
 #          heading range (steered to the section extractor); a transform, a
@@ -130,7 +130,7 @@ fallthrough	perl -pi -e 's/a/b/'
 fallthrough	perl -I lib -pi -e 's/a/b/' notes.md
 fallthrough	perl -ne 'print if /x/' notes.md
 fallthrough	bash gate-sdk/bin/run-gates.sh --rewrite --regex 'a|b' 'c' notes.md
-# rule 8's python arm — an inline body (a quoted heredoc feeding stdin, or a -c argument) that is a
+# rule `sed_file`'s python arm — an inline body (a quoted heredoc feeding stdin, or a -c argument) that is a
 #          literal rewrite; a computed replacement, an import, a read-only body, a '$' in an
 #          unquoted-delimiter body and a module run all pass
 block	python3 - <<'PY'@NL@p = 'notes.md'@NL@s = open(p).read()@NL@assert s.count('old') == 1@NL@s = s.replace('old', 'new')@NL@open(p, 'w').write(s)@NL@PY
@@ -143,7 +143,7 @@ fallthrough	python3 - <<'PY'@NL@s = open('n.md').read()@NL@print(s.replace('a', 
 fallthrough	python3 - <<PY@NL@s = open('n.md').read()@NL@open('n.md', 'w').write(s.replace('cost $5', 'b'))@NL@PY
 fallthrough	python3 -m json.tool notes.json
 
-# rule 9 — listing-only find steered to Glob, alone or as a ';'-batch of listings
+# rule `find_glob` — listing-only find steered to Glob, alone or as a ';'-batch of listings
 #          (a literal banner between them is fine); action-predicate / piped /
 #          redirected / mixed forms untouched
 block	find lib -type f
@@ -156,7 +156,7 @@ fallthrough	find src -type f -exec grep -q foo '{}' ';'
 allow	find . -type f | head
 fallthrough	find . -type f > listing.txt
 
-# rule 10 — bare single-file cat steered to Read, alone or as a ';'-batch of reads
+# rule `cat_file` — bare single-file cat steered to Read, alone or as a ';'-batch of reads
 #           (a literal echo/printf banner between reads is fine); multi-file, piped,
 #           redirected, &&-chained, mixed, and banner-only forms are composition and pass
 block	cat TASK-QUEUE.md
@@ -170,7 +170,7 @@ allow	cat one.md two.md
 allow	cat notes.md | wc -l
 allow	cat header.md > .tmp/combined.md
 
-# rule 11 — working-tree git grep steered to Grep (a path-limited `-- <path>`
+# rule `git_grep` — working-tree git grep steered to Grep (a path-limited `-- <path>`
 #           search is still the working tree); a revision or --cached passes
 block	git grep foo
 block	git grep -i TODO
@@ -178,7 +178,7 @@ block	git grep needle -- src
 fallthrough	git grep foo HEAD
 fallthrough	git grep --cached foo
 
-# rule 12 — self-matching process-liveness predicate: a `pgrep -f` pattern that
+# rule `pgrep_self_match` — self-matching process-liveness predicate: a `pgrep -f` pattern that
 #           matches the command's own text can never go false, since `-f` scans the
 #           harness wrapper's argv, which carries the whole command. A `pgrep`
 #           without `-f`, `-x`/`-v`, and a pattern that does not match its own
@@ -194,19 +194,19 @@ fallthrough	pgrep run-smoke.sh; bash run-smoke.sh
 fallthrough	until ! pgrep -f '[r]un-smoke.sh'; do sleep 5; done
 fallthrough	pgrep -xf run-smoke.sh
 
-# rule 13 — bare foreground sleep steered to a condition wait. The non-firing
+# rule `bare_sleep` — bare foreground sleep steered to a condition wait. The non-firing
 #           cases are the load-bearing ones: a sleep inside an `until … do … done`
 #           loop *is* the sanctioned form, and a quoted mention is inert. Both
 #           are `allow` rather than `fallthrough` because a later auto-allow
-#           grants them outright — rule 17 the append, rule 19 the wait — and
-#           each still proves rule 13 inert, since a block exits 2 at rule 13 and
+#           grants them outright — rule `append_scratch` the append, rule `bounded_wait` the wait — and
+#           each still proves rule `bare_sleep` inert, since a block exits 2 at rule `bare_sleep` and
 #           never reaches an auto-allow six rules later.
 block	sleep 30
 block	sleep 180; echo waited
 allow	until grep -q DONE .tmp/smoke.log; do sleep 5; done
 allow	printf 'sleep 5' >> .tmp/note.txt
 
-# rule 14 — tracked-tree mutation under a live producer. The sandbox's only
+# rule `git_mutation_under_producer` — tracked-tree mutation under a live producer. The sandbox's only
 #           `*.run` record names a dead pid and a non-record file sits beside
 #           it, so every mutating form below declines: the rule's second
 #           conjunct is a *live* record, and read-only git never reaches it at
@@ -217,35 +217,35 @@ fallthrough	git stash
 fallthrough	git -C . commit -m done
 fallthrough	git rev-parse HEAD
 
-# rule 15 — a backgrounded launch that records no producer is blocked. The
+# rule `background_no_record` — a backgrounded launch that records no producer is blocked. The
 #           shell `&` arm lives here because it *is* command text; the harness
 #           flag is tool input and cannot be written in this grammar, so that
 #           arm lives in background-cases.tsv.
 block	bash worker.sh &
 fallthrough	bash worker.sh & printf 'pid=1 run=worker\n' > .tmp/worker.run
-# exemption (3) reads rule 18's declared forms: a backgrounded pipeline writing
+# exemption (3) reads rule `ro_pipeline`'s declared forms: a backgrounded pipeline writing
 # through a member's own option owns work a commit could corrupt
 block	grep -rn foo src | sort -o out.txt &
 fallthrough	grep -rn foo src | head &
 # '|&' pipes stderr too and backgrounds nothing
 fallthrough	make build |& tail -5
 
-# rule 16 — `: > file` truncation auto-allowed iff every target is gitignored
+# rule `truncate_scratch` — `: > file` truncation auto-allowed iff every target is gitignored
 allow	: > scratch.txt
 fallthrough	: > tracked.txt
 
-# rule 17 — a write to gitignored targets auto-allowed, create and append alike.
+# rule `append_scratch` — a write to gitignored targets auto-allowed, create and append alike.
 #           The clauses each get their refusing case, because each is what keeps
 #           the grant from blessing something the redirect alone would: (b) a
 #           target outside the ignore set, (c) a leading command that writes
 #           somewhere other than its stdout, and the single-statement half of
 #           (c) — a second statement on a line of its own, which is what the
 #           heredoc residue must never be confused with.
-#           Targets are relative, as rules 3 and 16's are: the runner drives the
+#           Targets are relative, as rules `scratch_redirect` and `truncate_scratch`'s are: the runner drives the
 #           guard from inside the sandbox, and an `@ROOT@`-absolute target would
-#           meet rule 5's repo-root-prefix block nine rules earlier.
-#           A refused write still reaching rule 25 reads `block` there rather than
-#           `fallthrough`: what these rows assert is that rule 17 did not grant.
+#           meet rule `abs_prefix`'s repo-root-prefix block nine rules earlier.
+#           A refused write still reaching rule `emitter_write` reads `block` there rather than
+#           `fallthrough`: what these rows assert is that rule `append_scratch` did not grant.
 allow	cat >> .tmp/journal.md <<'EOF'@NL@line@NL@EOF
 allow	cat > .tmp/journal.md <<'EOF'@NL@line@NL@EOF
 block	cat >> tracked.md <<'EOF'@NL@line@NL@EOF
@@ -258,7 +258,7 @@ block	printf x >> .tmp/journal.md@NL@rm -rf .tmp/x
 # boundary, so these two rows are the whole holder of the asymmetry.
 allow	cat >> .tmp/journal.md <<'EOF'@NL@a `slug` in prose@NL@EOF
 fallthrough	cat >> .tmp/journal.md <<EOF@NL@a `slug` in prose@NL@EOF
-# the create half rests on rule 16: `: > f` and then `cat >> f` are each already
+# the create half rests on rule `truncate_scratch`: `: > f` and then `cat >> f` are each already
 # granted, so a create adds one permission decision and no capability. Every
 # other clause still holds — a tracked target refuses on the per-target ignore
 # test the append case takes, which is the row that would catch an over-wide grant
@@ -269,15 +269,15 @@ block	cat > tracked.md <<'EOF'@NL@line@NL@EOF
 allow	printf 'x@NL@' >> .tmp/journal.md 2>/dev/null
 allow	cat >> .tmp/journal.md 2>&1
 
-# rule 18 — read-only pipeline auto-allow; a non-roster segment falls through
+# rule `ro_pipeline` — read-only pipeline auto-allow; a non-roster segment falls through
 allow	grep -rn foo src | head
 fallthrough	grep foo file | awk '{print}'
-# banner tolerance (rules 9 and 10's, third caller): a literal echo/printf
+# banner tolerance (rules `find_glob` and `cat_file`'s, third caller): a literal echo/printf
 # segment is skipped, but at least one roster read must remain
 allow	echo === | grep foo src
 fallthrough	echo a | echo b
 # widened lead: the bare form of a committed allow entry may lead, since it was reviewed —
-# but only where something decorates it, so the undecorated form (rule 20's
+# but only where something decorates it, so the undecorated form (rule `allowlist_chain`'s
 # 'fallthrough git status' below) is still never intercepted here
 allow	git status | head
 allow	git status | head -20
@@ -313,7 +313,7 @@ allow	rg foo src | head
 fallthrough	find . -type f | xargs sort -o out.txt
 fallthrough	find . -name '*.txt' | xargs uniq
 
-# rule 19 — a sanctioned wait auto-allowed. Arm (A), the bounded in-turn wait: the
+# rule `bounded_wait` — a sanctioned wait auto-allowed. Arm (A), the bounded in-turn wait: the
 #           grant rows are the two of the four measured calls it is shaped to
 #           cover, both compounds; the refusing rows are one per clause, so no
 #           clause can be deleted without a red. The two named non-targets (`pgrep`
@@ -321,13 +321,13 @@ fallthrough	find . -name '*.txt' | xargs uniq
 #           purpose. Arm (B), the recorded launch, follows arm (A)'s rows.
 allow	until grep -q DONE .tmp/smoke.log; do sleep 20; done; echo waited
 allow	until grep -q DONE .tmp/smoke.log 2>/dev/null; do sleep 30; done; grep -n ERR .tmp/smoke.log
-# the literal-PID liveness wait rule 13's corrective now spells, in both
+# the literal-PID liveness wait rule `bare_sleep`'s corrective now spells, in both
 # polarities — the form the ruleset steers toward, granted rather than prompted
 allow	while kill -0 2147483646 2>/dev/null; do sleep 5; done
 allow	until ! kill -0 2147483646 2>/dev/null; do sleep 5; done
 allow	until [ -f .tmp/marker ]; do sleep 10; done
 # clause (0) — a statement-ending `&` is a launch, not a wait, whatever else the
-# command does. Rule 15 exempts the wait loop, so this row reaches rule 19 and
+# command does. Rule `background_no_record` exempts the wait loop, so this row reaches rule `bounded_wait` and
 # is refused there rather than by an earlier rule's ordering
 fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done &
 # clause (a) — the first statement is not the loop
@@ -338,19 +338,19 @@ fallthrough	until grep -q DONE .tmp/smoke.log; do grep -c x .tmp/smoke.log; slee
 # and a network tool that already has a blocking primitive
 fallthrough	while pgrep worker >/dev/null 2>&1; do sleep 20; done; echo waited
 fallthrough	until gh run view 12 --json status 2>/dev/null | grep -q completed; do sleep 30; done
-# clause (d) — a tail statement rule 18 would not have granted standing alone
+# clause (d) — a tail statement rule `ro_pipeline` would not have granted standing alone
 fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done; git commit -m done
 # clause (e) — a backtick anywhere in the raw command; the `$(…)` spelling is
-# deliberately not a row, since rule 6 blocks it first and the row would pin
+# deliberately not a row, since rule `expansion` blocks it first and the row would pin
 # another rule's verdict
 fallthrough	until grep -q DONE `cat .tmp/f`; do sleep 5; done
 # a non-inert redirect on the loop itself is a write, and a grant may not bless one
 fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done > out.txt
-# clauses (c) and (d) take rule 18's declared forms over the whole call, so a
+# clauses (c) and (d) take rule `ro_pipeline`'s declared forms over the whole call, so a
 # condition or a tail writing through a roster member's own option is refused
 fallthrough	while sort -c -o out.txt data.txt; do sleep 5; done
 fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done; sort -o out.txt .tmp/smoke.log
-# arm (B) — the launch-record-wait spelling rule 15's corrective names, granted for an
+# arm (B) — the launch-record-wait spelling rule `background_no_record`'s corrective names, granted for an
 # allowlisted, bounded launch writing only gitignored targets, with and without the
 # trailing retraction
 allow	bash scripts/check-foo.sh > .tmp/foo.log 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run
@@ -361,8 +361,8 @@ fallthrough	bash scripts/check-foo.sh > .tmp/foo.log 2>&1 & echo "pid=$! run=foo
 # (B1) a launch the allowlist does not grant reaches the harness's own decision
 fallthrough	bash worker.sh > .tmp/worker.log 2>&1 & echo "pid=$! run=worker" > .tmp/worker.run; wait; rm -f .tmp/worker.run
 # (B1) granted launches the later rules refuse, each taken as a predicate: a runner
-# glob reached past its slot (rule 24, which cannot decide the whole call and
-# declines), a scratch script body (rule 23) and a forced git rm (rule 22), the last
+# glob reached past its slot (rule `grant_path_slot`, which cannot decide the whole call and
+# declines), a scratch script body (rule `script_interpreter`) and a forced git rm (rule `rm_tracked`), the last
 # two then blocked at their own rule
 fallthrough	bash ../../evil/checks/check-x.sh > .tmp/x.log 2>&1 & echo "pid=$! run=x" > .tmp/x.run; wait
 block	bash .tmp/checks/check-x.sh > .tmp/x.log 2>&1 & echo "pid=$! run=x" > .tmp/x.run; wait; rm -f .tmp/x.run
@@ -372,11 +372,11 @@ fallthrough	bash scripts/check-foo.sh > tracked.md & echo "pid=$! run=foo" > .tm
 fallthrough	bash scripts/check-foo.sh &> tracked.md & echo "pid=$! run=foo" > .tmp/foo.run; wait
 fallthrough	bash scripts/check-foo.sh &>> tracked.md & echo "pid=$! run=foo" > .tmp/foo.run; wait
 fallthrough	bash scripts/check-foo.sh <> tracked.md & echo "pid=$! run=foo" > .tmp/foo.run; wait
-# (B3) an expansion besides the record's own; rule 24's predicate declines a live '$'
+# (B3) an expansion besides the record's own; rule `grant_path_slot`'s predicate declines a live '$'
 # in the launch too, so this row pins the verdict rather than the clause alone
 fallthrough	scripts/check-foo.sh $1 > .tmp/foo.log & echo "pid=$! run=foo" > .tmp/foo.run; wait
 
-# rule 20 — decorated allowlisted bare lead with an unmatched segment blocked;
+# rule `allowlist_chain` — decorated allowlisted bare lead with an unmatched segment blocked;
 #           chaining steer, redirect steer, and the untouched non-firing cases
 block	git status && rm -rf tmp
 block	git status 2>&1
@@ -394,7 +394,7 @@ fallthrough	git status && printf
 block	git rm -q; make build
 fallthrough	git rm -q scratch.txt; make build
 
-# rule 21 — git history-rewrite advisory: amend / commit -F / soft-reset steered;
+# rule `git_rewrite` — git history-rewrite advisory: amend / commit -F / soft-reset steered;
 #           a plain commit and a non-soft reset pass
 advise	git commit --amend
 advise	git commit --amend --no-edit
@@ -403,7 +403,7 @@ advise	git reset --soft HEAD~1
 fallthrough	git commit -m done
 fallthrough	git reset --hard HEAD~1
 
-# rule 22 — bare rm of a tracked path steers to 'git rm -q'; untracked,
+# rule `rm_tracked` — bare rm of a tracked path steers to 'git rm -q'; untracked,
 #           gitignored, and the already-correct git rm form pass
 block	rm tracked.md
 block	rm -f tracked.md
@@ -411,7 +411,7 @@ block	rm tracked.md; ls
 fallthrough	rm scratch.txt
 fallthrough	rm untracked-nowhere.md
 fallthrough	git rm -q tracked.md
-# rule 22's force arm — a 'git rm' carrying its force flag is blocked whether or
+# rule `rm_tracked`'s force arm — a 'git rm' carrying its force flag is blocked whether or
 #           not a grant matches: standalone, in a short cluster, long, abbreviated
 #           as git's option parser accepts it, behind a global option, and quoted.
 #           A word after '--' is a path, and '--cached' keeps the file
@@ -424,10 +424,10 @@ block	git rm -q '-f' tracked.md
 fallthrough	git rm -q -- -f
 fallthrough	git rm --cached tracked.md
 
-# rule 23 — a script interpreter taking its program body from a scratch dir.
+# rule `script_interpreter` — a script interpreter taking its program body from a scratch dir.
 #           The firing rows are delta 3's probe table promoted from evidence into
 #           fixtures: one per body source, both arms. Targets are relative, as
-#           rules 3, 16 and 17's are — an `@ROOT@`-absolute one would meet rule 5
+#           rules `scratch_redirect`, `truncate_scratch` and `append_scratch`'s are — an `@ROOT@`-absolute one would meet rule `abs_prefix`
 #           eighteen rules earlier.
 # arm (a), bash/sh: the operand form is the steer this rule inherited from a
 #          consumer rule, and the stdin form is the widening the re-key buys it
@@ -440,10 +440,10 @@ block	python3 - < .tmp/x.py
 block	python3 < .tmp/x.py
 block	python3 /dev/stdin < .tmp/x.py
 block	cat .tmp/x.py | python3
-# the backtick substitution — the one spelling rule 6 does not reach, which makes
+# the backtick substitution — the one spelling rule `expansion` does not reach, which makes
 # it the case whose absence would leave a silently teachable spelling. The '$(…)'
-# spelling is deliberately NOT a case: rule 6 blocks it first, so a row here would
-# pin another rule's verdict and go green for the wrong reason the day rule 6 changed
+# spelling is deliberately NOT a case: rule `expansion` blocks it first, so a row here would
+# pin another rule's verdict and go green for the wrong reason the day rule `expansion` changed
 block	python3 -c "`cat .tmp/x.py`"
 # falls through — the body rides in the command string, so the approver and the
 # friction log both see it verbatim and there is nothing to compensate for. This
@@ -458,12 +458,12 @@ fallthrough	printf 'print(1)' | python3
 fallthrough	python3 tools/gen.py
 fallthrough	bash gate-sdk/bin/run-gates.sh --scratch-run .tmp/x.sh
 
-# rule 24 — a committed grant matched only by reaching past its path slot. The
+# rule `grant_path_slot` — a committed grant matched only by reaching past its path slot. The
 #           sandbox carries a scratch 'rm -rf .tmp/*' grant and a
 #           '*/checks/check-*.sh' runner glob: a '..' component, an absolute path,
 #           a second operand outside the slot and a reach behind a stripped wrapper
 #           each block, while a clean slot, a dropped redirect and a declined
-#           backtick fall through. Targets are untracked, so rule 22 never answers
+#           backtick fall through. Targets are untracked, so rule `rm_tracked` never answers
 block	rm -rf .tmp/../scratch.txt
 block	rm -rf .tmp/x scratch.txt
 block	bash ../../evil/checks/check-x.sh
@@ -475,9 +475,9 @@ fallthrough	rm -rf .tmp/x 2>/dev/null
 fallthrough	bash guard-kit/checks/check-x.sh
 fallthrough	rm -rf .tmp/`printf x`/y
 
-# rule 25 — an emitter write the harness cannot grant. Arm (a): a write rule 17
+# rule `emitter_write` — an emitter write the harness cannot grant. Arm (a): a write rule `append_scratch`
 #           grants alone, compounded with another statement, blocks; the same write
-#           alone is rule 17's grant. Arm (b): a lone write to a target git does not
+#           alone is rule `append_scratch`'s grant. Arm (b): a lone write to a target git does not
 #           ignore blocks, while a lead off the emitter roster, a device target and
 #           a backgrounded launch writing its record do not fire. Arm (c): a
 #           compounded write to a target git does not ignore, in or outside the
@@ -494,7 +494,7 @@ fallthrough	bash gate-sdk/bin/run-gates.sh --emit trajectory > docs/x.md
 fallthrough	echo x > /dev/stderr
 fallthrough	make build > .tmp/b.log 2>&1 & echo "pid=$! run=b" > .tmp/b.run; wait; rm -f .tmp/b.run
 
-# rule 26 — a bash -c or sh -c wrapper blocks; a wrapper behind another command
+# rule `shell_wrapper` — a bash -c or sh -c wrapper blocks; a wrapper behind another command
 #           word, and the scratch runner taking a script path, do not fire
 block	bash -c 'git status'
 block	sh -c 'ls'
@@ -503,7 +503,7 @@ fallthrough	xargs bash -c 'x'
 fallthrough	timeout 5 bash -c 'x'
 fallthrough	bash gate-sdk/bin/run-gates.sh --scratch-run .tmp/x.sh
 
-# rule 27 — a main-checkout path from a linked worktree. The table's sandbox is
+# rule `worktree_confinement` — a main-checkout path from a linked worktree. The table's sandbox is
 #           no linked worktree, so a path outside its root is not the rule's; the
 #           firing rows run from a worktree in gate-tests/worktree-confinement.test.sh
 fallthrough	touch ../outside

@@ -156,9 +156,7 @@ if staged_matches '*CLAUDE.md' 'native/src/knobs/lifecycle_kit.rs' 'scripts/gate
     run_gate check-lifecycle-registration native/target/release/checkwright-gates check-lifecycle-registration
 fi
 
-if staged_matches 'guard-kit/SPEC.md' 'guard-kit/lib/guard.sh' 'scripts/gate-sdk-config.knobs' 'native/src/gates/guard_registration.rs' 'native/src/diff.rs'; then
-    run_gate check-guard-registration native/target/release/checkwright-gates check-guard-registration
-fi
+run_gate check-guard-registration native/target/release/checkwright-gates check-guard-registration
 
 run_gate check-kit-ref-liveness native/target/release/checkwright-gates check-kit-ref-liveness
 

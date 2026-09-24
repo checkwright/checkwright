@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: guard-kit/SPEC.md §Testing — rule 27 from the one place it applies, a linked worktree's working tree, which the decision table's sandbox cannot be: the shell-guard member is driven from a scratch worktree this suite adds and removes, over a main checkout it builds
+# spec: guard-kit/SPEC.md §Testing — rule `worktree_confinement` from the one place it applies, a linked worktree's working tree, which the decision table's sandbox cannot be: the shell-guard member is driven from a scratch worktree this suite adds and removes, over a main checkout it builds
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -29,7 +29,7 @@ wt="$main/.claude/worktrees/agent-01"
 git -C "$main" worktree add -q -b agent-branch "$wt" HEAD
 
 # spec: guard-kit/SPEC.md §Testing — the measured isolated toolset carries no Glob or Grep, so the
-# search tools are emptied and rules 9 and 11 leave the searches to rule 27, as they do there
+# search tools are emptied and rules `find_glob` and `git_grep` leave the searches to rule `worktree_confinement`, as they do there
 printf 'GUARD_KIT_SEARCH_TOOLS =\n' >"$SANDBOX/default.knobs"
 printf 'GUARD_KIT_SEARCH_TOOLS =\nGUARD_KIT_WORKTREE_READS = off\n' >"$SANDBOX/off.knobs"
 printf 'GUARD_KIT_SEARCH_TOOLS =\nGUARD_KIT_RO_BINS[] = grep\nGUARD_KIT_RO_BINS[] = awk\nGUARD_KIT_RO_FORMS[awk] = none\n' >"$SANDBOX/awk.knobs"
@@ -104,7 +104,7 @@ want off-journal       "$SANDBOX/off.knobs" allow "printf 'x\n' >> $main/.tmp/jo
 # --- a program-bearing tool is never admitted, whatever the roster declares of it
 want awk-declared      "$SANDBOX/awk.knobs" block "awk '{print}' $main/docs/a.md" "$refusal"
 
-# --- rule 23 reads the main checkout's scratch dir from here too, and steers the script to the
+# --- rule `script_interpreter` reads the main checkout's scratch dir from here too, and steers the script to the
 #     worktree's own scratch dir, since the runner refuses a main-checkout path from a worktree;
 #     a script under the worktree's own scratch dir keeps the plain runner steer
 want main-scratch-body "$d" block "bash $main/.tmp/x.sh" "write it under the worktree's own scratch dir ($wt/.tmp)"
@@ -116,7 +116,7 @@ checks=$((checks + 1))
 decide "$d" "find $main/docs -delete" >/dev/null
 grep -qF "(grep egrep fgrep" "$SANDBOX/err" || { echo "  FAIL [roster-named]: the refusal does not name the loaded roster — $(cat "$SANDBOX/err")"; fails=$((fails + 1)); }
 
-# --- rules 14, 15 and 19 (B) resolve the scratch dirs against the main checkout, the liveness
+# --- rules `git_mutation_under_producer`, `background_no_record` and `bounded_wait`'s arm (B) resolve the scratch dirs against the main checkout, the liveness
 #     record's one home: a launch recording there is granted or passes, one recording into the own
 #     worktree is refused naming the main home, and only a main-checkout record holds a git write
 printf '{"permissions":{"allow":["Bash(make *)"]}}\n' >"$SANDBOX/settings.json"

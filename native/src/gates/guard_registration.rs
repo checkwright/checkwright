@@ -1,19 +1,34 @@
-// spec: guard-kit/SPEC.md §check-guard-registration — the generic ruleset's numbered roster, its
-// guard_rule_* definitions and guard_generic_rules' dispatch order agree one-for-one and in order,
-// fail-closed on an unreadable section or dispatcher
+// spec: guard-kit/SPEC.md §check-guard-registration — the rule roster, the crate's rule table and
+// every rule citation agree, fail-closed on a roster, table or corpus it cannot read
 use crate::diff;
+use crate::guard::reader::View;
+use crate::programs;
+use crate::proc;
 use crate::walk;
 use std::collections::BTreeSet;
+use std::path::Path;
 
 const NAME: &str = "check-guard-registration";
-const SECTION: &str = "The generic ruleset";
-const DISPATCHER: &str = "guard_generic_rules() {";
-const PREFIX: &str = "guard_rule_";
+const SECTION: &str = "The rule roster";
+const CLAUSE: &str = "Declares `";
+const QUALIFIER: &str = "guard-kit ";
 
 struct Item {
-    number: String,
     line: usize,
-    tokens: Vec<String>,
+    name: Option<String>,
+    tokens: usize,
+    body: String,
+}
+
+struct Row {
+    name: String,
+    views: Vec<View>,
+}
+
+struct Citation {
+    line: usize,
+    text: String,
+    names: Vec<String>,
 }
 
 pub fn run(args: &[String]) -> i32 {
@@ -28,103 +43,163 @@ pub fn run(args: &[String]) -> i32 {
 
 fn rule(args: &[String]) -> Result<i32, String> {
     let given = |at: usize| args.get(at).filter(|a| !a.is_empty()).cloned();
-    let (spec, lib) = match (given(0), given(1)) {
-        (Some(s), Some(l)) => (s, l),
-        (s, l) => {
-            let root = kit_root()?;
-            (
-                s.unwrap_or_else(|| format!("{}/SPEC.md", root)),
-                l.unwrap_or_else(|| format!("{}/lib/guard.sh", root)),
-            )
-        }
+    let spec = match given(0) {
+        Some(s) => s,
+        None => format!("{}/SPEC.md", kit_root()?),
     };
-    let spec_text = read(&spec)?;
-    let lib_text = read(&lib)?;
-
-    let items = roster(&spec_text, &spec)?;
-    let calls = dispatch(&lib_text, &lib)?;
-    let defined = definitions(&lib_text);
-
+    let table = match given(1) {
+        Some(f) => table_file(&read(&f)?, &f)?,
+        None => compiled(),
+    };
+    let items = roster(&read(&spec)?, &spec)?;
     let mut findings = 0usize;
 
-    let mut numbering = false;
-    for (i, it) in items.iter().enumerate() {
-        if it.number != (i + 1).to_string() {
+    let mut grammar = false;
+    let mut seen: BTreeSet<&str> = BTreeSet::new();
+    for it in &items {
+        match &it.name {
+            None => {
+                println!(
+                    "{}:{}: roster item carries no `(`<name>`)` token right after its bold title",
+                    spec, it.line
+                );
+                grammar = true;
+                findings += 1;
+            }
+            Some(n) => {
+                if it.tokens != 1 {
+                    println!(
+                        "{}:{}: roster item `{}` carries {} `(`<name>`)` tokens where exactly one is owed",
+                        spec, it.line, n, it.tokens
+                    );
+                    grammar = true;
+                    findings += 1;
+                }
+                if !seen.insert(n) {
+                    println!("{}:{}: roster name `{}` is already taken by an earlier item", spec, it.line, n);
+                    grammar = true;
+                    findings += 1;
+                }
+            }
+        }
+    }
+    if grammar {
+        println!("  help: open each item `- **<title>** (`<name>`) — ` with a distinct name (guard-kit/SPEC.md §The generic ruleset)");
+    }
+
+    let mut declaring = false;
+    for it in &items {
+        let label = it.name.as_deref().unwrap_or("?");
+        let clauses = declarations(&it.body, &spec, it.line)?;
+        if clauses.len() != 1 {
             println!(
-                "{}:{}: roster item numbered {} where {} is next — the items are numbered from 1 with no gap or repeat",
+                "{}:{}: roster item `{}` carries {} declaration clause(s) where exactly one is owed",
                 spec,
                 it.line,
-                it.number,
-                i + 1
+                label,
+                clauses.len()
             );
-            numbering = true;
+            declaring = true;
             findings += 1;
+            continue;
         }
-    }
-    if numbering {
-        println!("  help: renumber §{} so its items run 1..n, and repoint every \"rule N\" citation the renumbering moves", SECTION);
-    }
-
-    let mut tokening = false;
-    for it in &items {
-        if it.tokens.len() != 1 {
-            let named = if it.tokens.is_empty() {
-                "no guard_rule_* function".to_string()
-            } else {
-                format!("{} guard_rule_* functions ({})", it.tokens.len(), it.tokens.join(", "))
-            };
+        let Some(row) = table.iter().find(|r| Some(r.name.as_str()) == it.name.as_deref()) else {
+            continue;
+        };
+        let declared: BTreeSet<&str> = clauses[0].iter().map(|v| v.spelling()).collect();
+        let held: BTreeSet<&str> = row.views.iter().map(|v| v.spelling()).collect();
+        if declared != held {
             println!(
-                "{}:{}: roster item {} names {} where exactly one is owed",
-                spec, it.line, it.number, named
+                "{}:{}: rule `{}` declares {} where the table holds {}",
+                spec,
+                it.line,
+                label,
+                spelled(&declared),
+                spelled(&held)
             );
-            tokening = true;
+            declaring = true;
             findings += 1;
         }
     }
-    if tokening {
-        println!("  help: carry the rule's own `guard_rule_<name>` token right after the item's bold title, and cite another rule by number (guard-kit/SPEC.md §The generic ruleset)");
+    if declaring {
+        println!("  help: carry one `Declares` clause per item naming exactly the views the rule's table row declares");
     }
 
-    let listed: Vec<&str> = items
-        .iter()
-        .filter_map(|it| it.tokens.first().map(String::as_str))
-        .collect();
-    let called: Vec<&str> = calls.iter().map(String::as_str).collect();
-    if listed != called {
+    let listed: Vec<&str> = items.iter().filter_map(|it| it.name.as_deref()).collect();
+    let tabled: Vec<&str> = table.iter().map(|r| r.name.as_str()).collect();
+    if listed != tabled {
         println!(
-            "{}: the roster's tokens in order differ from guard_generic_rules' calls in order (< roster, > dispatch):",
+            "{}: the roster's names in order differ from the rule table's in dispatch order (< roster, > table):",
             spec
         );
-        for l in diff::normal_diff(&listed, &called) {
+        for l in diff::normal_diff(&listed, &tabled) {
             println!("  {}", l);
         }
-        println!("  help: dispatch one call per roster item in roster order — reorder the calls in {} or the items in §{}", lib, SECTION);
+        println!("  help: list one item per table row in dispatch order — reorder §{} or the table, and rename both sides together", SECTION);
         findings += 1;
     }
 
-    let dispatched: BTreeSet<&str> = called.iter().copied().collect();
-    let defined_set: BTreeSet<&str> = defined.iter().map(String::as_str).collect();
-    let mut setting = false;
-    for f in defined_set.difference(&dispatched) {
-        println!("{}: {} is defined but never dispatched by guard_generic_rules", lib, f);
-        setting = true;
-        findings += 1;
+    let names: BTreeSet<&str> = listed.iter().copied().collect();
+    let kit_dir = match Path::new(&spec).parent().map(|p| p.to_string_lossy().into_owned()) {
+        Some(p) if !p.is_empty() => p,
+        _ => ".".to_string(),
+    };
+    let mut inner = ls(&kit_dir)?;
+    let guard_dir = format!("{}/guard", walk::knob_scalar("GATE_SDK_NATIVE_SRC")?.trim_end_matches('/'));
+    if Path::new(&guard_dir).is_dir() {
+        inner.extend(ls(&guard_dir)?);
     }
-    for f in dispatched.difference(&defined_set) {
-        println!("{}: {} is dispatched by guard_generic_rules but never defined", lib, f);
-        setting = true;
-        findings += 1;
+    let workflow = walk::knob_scalar("GATE_SDK_WORKFLOW_DIR")?;
+    let skipped: BTreeSet<String> = if Path::new(&workflow).is_dir() {
+        ls(&workflow)?.into_iter().collect()
+    } else {
+        BTreeSet::new()
+    };
+    let prune = walk::prune_dirs()?;
+    let mut cited = 0usize;
+    let mut citing = false;
+    for file in ls(".")? {
+        let own = inner.contains(&file);
+        if skipped.contains(&file) || (!own && walk::path_pruned(&file, &prune)) {
+            continue;
+        }
+        let Some(text) = corpus_file(&file)? else {
+            continue;
+        };
+        for (n, line) in text.lines().enumerate() {
+            if own {
+                for num in numbered(line) {
+                    println!("{}:{}: a rule cited by number (`{}`) — cite it by name", file, n + 1, num);
+                    citing = true;
+                    findings += 1;
+                }
+            }
+            for c in citations(line, n + 1, own) {
+                cited += 1;
+                for name in &c.names {
+                    if !names.contains(name.as_str()) {
+                        println!(
+                            "{}:{}: `{}` names `{}`, which no roster item carries",
+                            file, c.line, c.text, name
+                        );
+                        citing = true;
+                        findings += 1;
+                    }
+                }
+            }
+        }
     }
-    if setting {
-        println!("  help: define every dispatched rule and dispatch every defined one — a rule defined and never called never runs");
+    if citing {
+        println!("  help: cite a rule as rule `<name>`, qualified as guard-kit rule `<name>` outside guard-kit's tree and the guard module (guard-kit/SPEC.md §The generic ruleset)");
     }
 
     if findings > 0 {
         return Ok(1);
     }
     println!(
-        "GUARD-REGISTRATION: clean ({} rule(s): roster, definitions and dispatch order in lockstep)",
-        items.len()
+        "GUARD-REGISTRATION: clean ({} rule(s): roster, table order, declared views and {} citation(s) in lockstep)",
+        items.len(),
+        cited
     );
     Ok(0)
 }
@@ -135,15 +210,83 @@ fn kit_root() -> Result<String, String> {
     walk::kit_roots_abs()?
         .into_iter()
         .find(|r| r.rsplit('/').next() == Some("guard-kit"))
-        .ok_or_else(|| {
-            "the kit roots name no guard-kit root, so neither the ruleset section nor the library can be found".to_string()
-        })
+        .ok_or_else(|| "the kit roots name no guard-kit root, so the rule roster cannot be found".to_string())
 }
 
 fn read(path: &str) -> Result<String, String> {
     std::fs::read(path)
         .map(|b| String::from_utf8_lossy(&b).into_owned())
         .map_err(|e| format!("cannot read {}: {}", path, e))
+}
+
+// spec: guard-kit/SPEC.md §check-guard-registration — a tracked path the working tree no longer
+// holds, or a directory entry, carries no citation; any other failure to read is a refusal
+fn corpus_file(path: &str) -> Result<Option<String>, String> {
+    let p = Path::new(path);
+    if p.is_dir() {
+        return Ok(None);
+    }
+    match std::fs::read(p) {
+        Ok(b) => Ok(Some(String::from_utf8_lossy(&b).into_owned())),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(e) => Err(format!("cannot read {}: {}", path, e)),
+    }
+}
+
+fn ls(pathspec: &str) -> Result<Vec<String>, String> {
+    let out = proc::run(&programs::GIT, &["ls-files", "--", pathspec])?;
+    match out.stdout() {
+        Some(o) => Ok(String::from_utf8_lossy(o).lines().filter(|l| !l.is_empty()).map(String::from).collect()),
+        None => Err(format!(
+            "git ls-files -- {} exited {} — the citation corpus could not be enumerated",
+            pathspec,
+            out.code().unwrap_or(-1)
+        )),
+    }
+}
+
+fn compiled() -> Vec<Row> {
+    crate::guard::rule_table()
+        .iter()
+        .map(|r| Row { name: r.name.to_string(), views: r.views.to_vec() })
+        .collect()
+}
+
+fn is_name(s: &str) -> bool {
+    let mut c = s.chars();
+    matches!(c.next(), Some('a'..='z')) && c.all(|ch| ch.is_ascii_lowercase() || ch.is_ascii_digit() || ch == '_')
+}
+
+fn spelled(views: &BTreeSet<&str>) -> String {
+    let v: Vec<String> = views.iter().map(|s| format!("`{}`", s)).collect();
+    if v.is_empty() {
+        "nothing".to_string()
+    } else {
+        v.join(", ")
+    }
+}
+
+// spec: guard-kit/SPEC.md §check-guard-registration — `<name><TAB><view>[; <view>…]`, a blank or
+// `#` line skipped, any other line a refusal
+fn table_file(text: &str, path: &str) -> Result<Vec<Row>, String> {
+    let mut rows = Vec::new();
+    for (n, line) in text.lines().enumerate() {
+        if line.trim().is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let bad = || format!("{}:{}: a table line of no known shape ({}) — the gate reads `<name><TAB><view>[; <view>…]`", path, n + 1, line);
+        let (name, views) = line.split_once('\t').ok_or_else(bad)?;
+        if !is_name(name) || views.contains('\t') {
+            return Err(bad());
+        }
+        let views = views
+            .split("; ")
+            .map(View::from_spelling)
+            .collect::<Option<Vec<View>>>()
+            .ok_or_else(bad)?;
+        rows.push(Row { name: name.to_string(), views });
+    }
+    Ok(rows)
 }
 
 fn heading(line: &str) -> Option<&str> {
@@ -154,35 +297,29 @@ fn heading(line: &str) -> Option<&str> {
     line[hashes..].strip_prefix(' ').map(str::trim)
 }
 
-fn lead_number(line: &str) -> Option<&str> {
-    let digits = line.len() - line.trim_start_matches(|c: char| c.is_ascii_digit()).len();
-    if digits == 0 || !line[digits..].starts_with(". ") {
-        return None;
-    }
-    Some(&line[..digits])
-}
-
-fn tokens(text: &str) -> Vec<String> {
-    let mut out: Vec<String> = Vec::new();
-    let bytes = text.as_bytes();
-    let ident = |b: u8| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'_';
+// spec: guard-kit/SPEC.md §check-guard-registration — the `(`<name>`)` tokens an item carries
+// right after a bold title, and the name its lead line opens with
+fn name_tokens(body: &str) -> (Option<String>, usize) {
+    let mut count = 0usize;
     let mut from = 0usize;
-    while let Some(off) = text[from..].find(PREFIX) {
-        let at = from + off;
-        let mut end = at + PREFIX.len();
-        while end < bytes.len() && ident(bytes[end]) {
-            end += 1;
-        }
-        let bounded = at == 0 || !(ident(bytes[at - 1]) || bytes[at - 1].is_ascii_uppercase());
-        if bounded && end > at + PREFIX.len() {
-            let t = text[at..end].to_string();
-            if !out.contains(&t) {
-                out.push(t);
+    while let Some(off) = body[from..].find("** (`") {
+        let at = from + off + "** (`".len();
+        if let Some(end) = body[at..].find("`)") {
+            if is_name(&body[at..at + end]) {
+                count += 1;
             }
         }
-        from = end;
+        from = at;
     }
-    out
+    let lead = body.lines().next().unwrap_or("");
+    let name = lead.strip_prefix("- **").and_then(|rest| {
+        let close = rest.find("** (`")?;
+        let after = &rest[close + "** (`".len()..];
+        let end = after.find("`)")?;
+        let n = &after[..end];
+        (is_name(n) && after[end..].starts_with("`) — ")).then(|| n.to_string())
+    });
+    (name, count)
 }
 
 fn roster(text: &str, path: &str) -> Result<Vec<Item>, String> {
@@ -190,7 +327,11 @@ fn roster(text: &str, path: &str) -> Result<Vec<Item>, String> {
     let mut found = false;
     let mut fence = false;
     let mut items: Vec<Item> = Vec::new();
-    let mut open: Option<(Item, String)> = None;
+    let mut open: Option<(usize, String)> = None;
+    let close = |(line, body): (usize, String)| {
+        let (name, tokens) = name_tokens(&body);
+        Item { line, name, tokens, body }
+    };
     for (n, line) in text.lines().enumerate() {
         if line.trim_start().starts_with("```") {
             fence = !fence;
@@ -210,87 +351,145 @@ fn roster(text: &str, path: &str) -> Result<Vec<Item>, String> {
         if !inside {
             continue;
         }
-        if let Some(num) = lead_number(line) {
-            if let Some((it, body)) = open.take() {
-                items.push(close(it, &body));
+        if line.starts_with("- ") {
+            if let Some(o) = open.take() {
+                items.push(close(o));
             }
-            let item = Item {
-                number: num.to_string(),
-                line: n + 1,
-                tokens: Vec::new(),
-            };
-            open = Some((item, line.to_string()));
+            open = Some((n + 1, line.to_string()));
             continue;
         }
         let continues = line.trim().is_empty() || line.starts_with(|c: char| c.is_whitespace());
         match open.take() {
-            Some((it, mut body)) if continues => {
+            Some((at, mut body)) if continues => {
                 body.push('\n');
                 body.push_str(line);
-                open = Some((it, body));
+                open = Some((at, body));
             }
-            Some((it, body)) => items.push(close(it, &body)),
+            Some(o) => items.push(close(o)),
             None => {}
         }
     }
-    if let Some((it, body)) = open.take() {
-        items.push(close(it, &body));
+    if let Some(o) = open.take() {
+        items.push(close(o));
     }
     if !found {
         return Err(format!("{}: no \"{}\" section heading — the roster is unreadable", path, SECTION));
     }
     if items.is_empty() {
-        return Err(format!("{}: §{} carries no numbered item — the roster is unreadable", path, SECTION));
+        return Err(format!("{}: §{} carries no `- ` item — the roster is unreadable", path, SECTION));
     }
     Ok(items)
 }
 
-fn close(mut it: Item, body: &str) -> Item {
-    it.tokens = tokens(body);
-    it
+// spec: guard-kit/SPEC.md §The generic ruleset — a backticked list after `at`: names or views joined
+// by `, `, ` and ` or `, and `, as the raw spans, with the byte offset the list ends at
+fn backticked_list(s: &str) -> (Vec<&str>, usize) {
+    let mut out = Vec::new();
+    let mut at = 0usize;
+    while let Some(rest) = s[at..].strip_prefix('`') {
+        let Some(end) = rest.find('`') else {
+            break;
+        };
+        out.push(&rest[..end]);
+        at += end + 2;
+        match [", and `", ", `", " and `"].iter().find(|sep| s[at..].starts_with(**sep)) {
+            Some(sep) => at += sep.len() - 1,
+            None => break,
+        }
+    }
+    (out, at)
 }
 
-fn dispatch(text: &str, path: &str) -> Result<Vec<String>, String> {
-    let mut lines = text.lines().enumerate().skip_while(|(_, l)| *l != DISPATCHER);
-    if lines.next().is_none() {
-        return Err(format!("{}: no `{}` definition — the dispatch order is unreadable", path, DISPATCHER));
-    }
-    let mut calls: Vec<String> = Vec::new();
-    for (n, line) in lines {
-        if line == "}" {
-            return Ok(calls);
+// spec: guard-kit/SPEC.md §check-guard-registration — every declaration clause in an item, each
+// parsed to its views; a clause the grammar cannot read is a refusal
+fn declarations(body: &str, path: &str, line: usize) -> Result<Vec<Vec<View>>, String> {
+    let mut out = Vec::new();
+    let mut from = 0usize;
+    while let Some(off) = body[from..].find(CLAUSE) {
+        let at = from + off + CLAUSE.len() - 1;
+        let (spans, end) = backticked_list(&body[at..]);
+        let unreadable = || {
+            format!(
+                "{}:{}: a declaration clause the grammar cannot read ({}) — the gate reads `Declares` and backticked views joined by `, ` or ` and `",
+                path,
+                line,
+                body[at - CLAUSE.len() + 1..(at + end.max(1)).min(body.len())].trim()
+            )
+        };
+        if spans.is_empty() {
+            return Err(unreadable());
         }
-        let t = line.trim();
-        if t.is_empty() || t == "local cmd=\"$1\"" {
+        let views = spans.iter().map(|s| View::from_spelling(s)).collect::<Option<Vec<View>>>().ok_or_else(unreadable)?;
+        out.push(views);
+        from = at + end.max(1);
+    }
+    Ok(out)
+}
+
+// spec: guard-kit/SPEC.md §check-guard-registration — every `[Rr]ules? [0-9]+` token on a line
+fn numbered(line: &str) -> Vec<String> {
+    let b = line.as_bytes();
+    let mut out = Vec::new();
+    let mut i = 0usize;
+    while let Some(off) = line[i..].find("ule") {
+        let at = i + off;
+        i = at + 3;
+        if at == 0 || !matches!(b[at - 1], b'r' | b'R') {
             continue;
         }
-        match t.strip_suffix(" \"$cmd\"") {
-            Some(name)
-                if name.starts_with(PREFIX)
-                    && name.len() > PREFIX.len()
-                    && tokens(name) == [name.to_string()] =>
-            {
-                calls.push(name.to_string())
-            }
-            _ => {
-                return Err(format!(
-                    "{}:{}: a guard_generic_rules line of no known shape ({}) — the gate reads only `guard_rule_<name> \"$cmd\"` calls, the `local cmd=\"$1\"` binding and blanks",
-                    path,
-                    n + 1,
-                    t
-                ))
-            }
+        let mut j = at + 3;
+        if b.get(j) == Some(&b's') {
+            j += 1;
+        }
+        if b.get(j) != Some(&b' ') {
+            continue;
+        }
+        let digits = b[j + 1..].iter().take_while(|c| c.is_ascii_digit()).count();
+        if digits > 0 {
+            out.push(line[at - 1..j + 1 + digits].to_string());
         }
     }
-    Err(format!("{}: `{}` is never closed by a column-0 `}}` — the dispatch order is unreadable", path, DISPATCHER))
+    out
 }
 
-fn definitions(text: &str) -> Vec<String> {
-    text.lines()
-        .filter_map(|l| l.strip_suffix("() {"))
-        .filter(|name| name.starts_with(PREFIX) && tokens(name) == [name.to_string()])
-        .map(str::to_string)
-        .collect()
+// spec: guard-kit/SPEC.md §check-guard-registration — the citations a line carries: the word `rule`
+// or `rules` at a word boundary, then a backticked name list; outside guard-kit's own tree only the
+// qualified form is read
+fn citations(line: &str, n: usize, own: bool) -> Vec<Citation> {
+    let b = line.as_bytes();
+    let mut out = Vec::new();
+    let mut i = 0usize;
+    while let Some(off) = line[i..].find("ule") {
+        let at = i + off;
+        i = at + 3;
+        if at == 0 || !matches!(b[at - 1], b'r' | b'R') {
+            continue;
+        }
+        let start = at - 1;
+        if start > 0 && (b[start - 1].is_ascii_alphanumeric() || b[start - 1] == b'_' || b[start - 1] == b'-') {
+            continue;
+        }
+        let qualified = line[..start].ends_with(QUALIFIER);
+        if !own && !qualified {
+            continue;
+        }
+        let mut j = at + 3;
+        if b.get(j) == Some(&b's') {
+            j += 1;
+        }
+        let Some(rest) = line[j..].strip_prefix(' ') else {
+            continue;
+        };
+        let (spans, end) = backticked_list(rest);
+        let names: Vec<String> = spans.iter().take_while(|s| is_name(s)).map(|s| s.to_string()).collect();
+        if names.is_empty() {
+            continue;
+        }
+        let from = if qualified { start - QUALIFIER.len() } else { start };
+        out.push(Citation { line: n, text: line[from..j + 1 + end].to_string(), names });
+        i = j + 1 + end;
+    }
+    out
 }
 
 #[cfg(test)]
@@ -298,16 +497,53 @@ mod tests {
     use super::*;
 
     #[test]
-    fn a_token_needs_a_name_and_a_word_boundary() {
-        assert_eq!(tokens("`guard_rule_*` and `guard_rule_cd` then _guard_rule_x"), vec!["guard_rule_cd"]);
+    fn an_item_ends_at_the_first_unindented_non_blank_line() {
+        let spec = "## The rule roster\n\n- **a** (`alpha`) — Declares `raw`. x\n  more\n\n  - **(a) arm**: y\n\nProse (`beta`).\n- **b** (`beta`) — Declares `sq`.\n## Next\n- **c** (`gamma`) — z\n";
+        let items = roster(spec, "s").unwrap();
+        assert_eq!(items.len(), 2);
+        assert_eq!(items[0].name.as_deref(), Some("alpha"));
+        assert_eq!(items[0].tokens, 1);
+        assert_eq!(items[1].name.as_deref(), Some("beta"));
     }
 
     #[test]
-    fn an_item_ends_at_the_first_unindented_non_blank_line() {
-        let spec = "## The generic ruleset\n\n1. **a** (`guard_rule_a`) — x\n   more\n\n   `guard_rule_a` again\n\nProse `guard_rule_b`.\n2. **b** (`guard_rule_b`)\n## Next\n3. **c**\n";
-        let items = roster(spec, "s").unwrap();
-        assert_eq!(items.len(), 2);
-        assert_eq!(items[0].tokens, vec!["guard_rule_a"]);
-        assert_eq!(items[1].tokens, vec!["guard_rule_b"]);
+    fn a_lead_needs_its_bold_title_its_name_and_the_dash() {
+        assert_eq!(name_tokens("- **t** (`cd_compound`) — x").0.as_deref(), Some("cd_compound"));
+        assert_eq!(name_tokens("- **t** (`Cd`) — x").0, None);
+        assert_eq!(name_tokens("- **t** — (`cd`) x").0, None);
+        assert_eq!(name_tokens("- **t** (`a`) — x **u** (`b`)").1, 2);
+    }
+
+    #[test]
+    fn a_clause_reads_views_joined_by_comma_and_and() {
+        let d = declarations("x Declares `raw`, `sq dq hd` and `dequoted`. y", "s", 1).unwrap();
+        assert_eq!(d, vec![vec![View::Raw, View::SqDqHd, View::Dequoted]]);
+        assert_eq!(declarations("no clause, and it declares `raw`", "s", 1).unwrap().len(), 0);
+        assert!(declarations("Declares `dq`.", "s", 1).is_err());
+        assert!(declarations("Declares `raw", "s", 1).is_err());
+    }
+
+    #[test]
+    fn a_citation_is_bounded_and_outside_the_kit_qualified() {
+        let c = citations("rules `a`, `b` and `c`'s test, and rule `x` (see prules `z`)", 1, true);
+        assert_eq!(c.iter().map(|c| c.names.clone()).collect::<Vec<_>>(), vec![vec!["a", "b", "c"], vec!["x"]]);
+        assert!(citations("a rule `Bash(x)` and rule `sq dq`", 1, true).is_empty());
+        assert!(citations("rule `cd_compound`", 1, false).is_empty());
+        let q = citations("guard-kit rule `bounded_wait`'s arm (B)", 1, false);
+        assert_eq!(q[0].text, "guard-kit rule `bounded_wait`");
+    }
+
+    #[test]
+    fn a_number_is_read_after_either_case_and_number() {
+        assert_eq!(numbered("Rule 12 and rules 3, 4; ruleset 2; rule x"), vec!["Rule 12", "rules 3"]);
+    }
+
+    #[test]
+    fn a_table_line_is_a_name_a_tab_and_known_views() {
+        let t = table_file("# c\n\nalpha\traw; sq dq hd\n", "t").unwrap();
+        assert_eq!(t[0].views, vec![View::Raw, View::SqDqHd]);
+        assert!(table_file("alpha raw\n", "t").is_err());
+        assert!(table_file("alpha\tdq\n", "t").is_err());
+        assert!(table_file("Alpha\traw\n", "t").is_err());
     }
 }

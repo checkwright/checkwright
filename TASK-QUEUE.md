@@ -24,7 +24,7 @@ operator direction 2026-09-23 (lead session, lead-relayed): make the bash guard 
 
 [spec: SPEC-shell-guard.md]
 
-guard-kit rule 23 prefix-matches `GUARD_KIT_SCRATCH_DIRS` members as written (`guard-kit/lib/guard.sh`, its scratch-source test), so from a linked worktree `bash <main>/.tmp/x.sh`, a body under the main checkout's scratch dir, is not steered and falls through to the harness. Rules 14, 15, 19 (B) and 27 resolve the member against the main checkout through the per-session scratch homes since `guard-worktree-scratch-dirs`.
+guard-kit rule `script_interpreter` prefix-matches `GUARD_KIT_SCRATCH_DIRS` members as written (`guard-kit/lib/guard.sh`, its scratch-source test), so from a linked worktree `bash <main>/.tmp/x.sh`, a body under the main checkout's scratch dir, is not steered and falls through to the harness. guard-kit rules `git_mutation_under_producer`, `background_no_record`, `bounded_wait`'s arm (B) and `worktree_confinement` resolve the member against the main checkout through the per-session scratch homes since `guard-worktree-scratch-dirs`.
 
 **Probed at spec (2026-09-24), from a temporary linked worktree:** `--scratch-run <main>/.tmp/x.sh` exits 2, refusing a target outside the worktree's own scratch dir. The guard lets `bash <main>/.tmp/x.sh` through unsteered.
 
@@ -36,7 +36,7 @@ guard-kit rule 23 prefix-matches `GUARD_KIT_SCRATCH_DIRS` members as written (`g
 
 [spec: SPEC-shell-guard.md]
 
-items in guard-kit/SPEC.md §The generic ruleset state the inert quoting classes their rule's `guard_skeleton` call strips (`Declares sq dq hd`), transcribed by hand, and nothing holds the two equal: an edited skeleton call silently stales its SPEC declaration. `check-guard-registration` holds roster, definitions and dispatch only, because a rule has no single value: rule 6 builds two skeletons, rule 18 four, some rules skeletonize inside a helper, and only some items declare.
+items in guard-kit/SPEC.md §The generic ruleset state the inert quoting classes their rule's `guard_skeleton` call strips (`Declares sq dq hd`), transcribed by hand, and nothing holds the two equal: an edited skeleton call silently stales its SPEC declaration. `check-guard-registration` holds roster, definitions and dispatch only, because a rule has no single value: guard-kit rule `expansion` builds two skeletons, guard-kit rule `ro_pipeline` four, some rules skeletonize inside a helper, and only some items declare.
 
 **Ruled at spec:** the compiled rule table carries each rule's declared views as a set. A rule reads only what it declares, since an undeclared read faults loudly. Every roster item carries one declaration clause, and `check-guard-registration` arm C holds the clause to the table (SPEC-shell-guard.md, deltas 2 and 4). Folded into [shell-guard-native-shell](#shell-guard-native-shell) by operator direction, 2026-09-24 (lead-relayed).
 
@@ -70,7 +70,7 @@ a guard-kit rule number is a stable-looking identifier that is not stable: rules
 
 [cost: event/high] [surface: guard-kit]
 
-shell utilities an agent runs for read-only work can also write: `sed -i`, `find -delete` and `-exec`, awk's `system()`, `tee`, redirects. The operator's shape: block side-effect-capable utilities and steer to side-effect-free arms of the gate binary that can be allowlisted and advertised as their replacements. The seed is gate-sdk's fence-safe arm set, `FENCE_SAFE_ARMS` (gate-sdk/SPEC.md, arms that reach no network and write nowhere). It succeeds guard-kit rule 27's interim read-only Bash allowlist for isolated children, whose advertised set and refusal message are worded to point at these tools later.
+shell utilities an agent runs for read-only work can also write: `sed -i`, `find -delete` and `-exec`, awk's `system()`, `tee`, redirects. The operator's shape: block side-effect-capable utilities and steer to side-effect-free arms of the gate binary that can be allowlisted and advertised as their replacements. The seed is gate-sdk's fence-safe arm set, `FENCE_SAFE_ARMS` (gate-sdk/SPEC.md, arms that reach no network and write nowhere). It succeeds guard-kit rule `worktree_confinement`'s interim read-only Bash allowlist for isolated children, whose advertised set and refusal message are worded to point at these tools later.
 
 **Deliverable:** the arm roster that replaces each blocked read, the guard rules that steer to it, and the allowlist entries. New governed names, so it owes an amendment and passes the enhancement admission filter only on an arm its authoring session argues.
 
@@ -874,7 +874,7 @@ A delta number names no openable file.
 
 ### scratch-grant-backtick-declined
 
-Rule 17's own clause voids its use case.
+guard-kit rule `append_scratch`'s own clause voids its use case.
 
 ### walk-entry-model-unstated
 
@@ -1286,7 +1286,7 @@ Correction density goes unmeasured.
 
 ### probe-evidence-sufficiency
 
-Rule 12 passes a probe that is no evidence.
+guard-kit rule `pgrep_self_match` passes a probe that is no evidence.
 
 ### scratch-citation-skill-surface-reach
 

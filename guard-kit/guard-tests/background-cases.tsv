@@ -1,16 +1,16 @@
-# spec: guard-kit/SPEC.md §Testing — rule 15's harness arm: the backgrounding flag is tool
+# spec: guard-kit/SPEC.md §Testing — rule `background_no_record`'s harness arm: the backgrounding flag is tool
 # input, not command text, so it cannot be written in cases.tsv's decision/command grammar.
 # Columns: <expected-decision> <TAB> <run_in_background> <TAB> <command>.
 #
-# rule 15 — a backgrounded launch that records no producer is blocked. The
+# rule `background_no_record` — a backgrounded launch that records no producer is blocked. The
 #           non-firing cases are the load-bearing ones: an inline record
 #           discharges the obligation, a wait loop is a waiter rather than a
 #           producer, a read-only pipeline owns nothing a commit could corrupt,
 #           and a foreground call never reaches the rule at all. The wait-loop
-#           row is an `allow` rather than a `fallthrough` because rule 19 grants
-#           it two rules later, which still proves rule 15's exemption: a block
+#           row is an `allow` rather than a `fallthrough` because rule `bounded_wait` grants
+#           it two rules later, which still proves rule `background_no_record`'s exemption: a block
 #           would classify as `block`, not `allow`.
-#           It is also where rule 19's indifference to the harness flag is pinned
+#           It is also where rule `bounded_wait`'s indifference to the harness flag is pinned
 #           — the flag backgrounds the call without changing its text, so clause
 #           (0) never sees it.
 block	true	bash worker.sh
@@ -18,6 +18,6 @@ fallthrough	true	bash worker.sh > .tmp/worker.log 2>&1 & printf 'pid=1 run=worke
 allow	true	until grep -q DONE .tmp/worker.log; do sleep 5; done
 allow	true	grep -rn foo src | head
 fallthrough	false	bash worker.sh
-# the canonical launch in harness form: rule 15's exemption (1) lets the record
-# through and rule 19's arm (B) grants it, the flag changing nothing in its text
+# the canonical launch in harness form: rule `background_no_record`'s exemption (1) lets the record
+# through and rule `bounded_wait`'s arm (B) grants it, the flag changing nothing in its text
 allow	true	bash scripts/check-foo.sh > .tmp/foo.log 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run

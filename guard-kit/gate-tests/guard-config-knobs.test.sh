@@ -97,7 +97,7 @@ want "grep-only-git-grep" "$tmp/grep-only.knobs"       "git grep foo" 2 "use the
 want "fallback-find"      "$tmp/defaults.knobs"        "find lib -type f" 2 "find <dir> -type f | sort"
 want "fallback-git-grep"  "$tmp/defaults.knobs"        "git grep foo" 2 "grep -rn <pattern> <path>"
 
-# --- rule 2's arm (d): a respelled path names the same file as the knob's resolved value and still
+# --- rule `git_c_root`'s arm (d): a respelled path names the same file as the knob's resolved value and still
 #     fires, since the generated hooks bake the text; a differing file falls through
 printf 'GUARD_KIT_SETTINGS = %s/settings.json\n' "$tmp" >"$tmp/settings-path.knobs"
 : >"$tmp/settings.json"
@@ -107,10 +107,10 @@ want "knob-echo-verbatim"   "$k" "GUARD_KIT_SETTINGS=$tmp/settings.json make bui
 want "knob-echo-same-file"  "$k" "GUARD_KIT_SETTINGS=$tmp/./settings.json make build" 2 "check-graph"
 want "knob-echo-other-file" "$k" "GUARD_KIT_SETTINGS=$tmp/other.json make build" 0
 
-# --- rules 18 and 20 read an entry whose only '*' is a closing ' *' as granting its bare head, which
-#     the harness does: a decorated bare head takes rule 20's steer and a read-only tail rule 18's
+# --- rules `ro_pipeline` and `allowlist_chain` read an entry whose only '*' is a closing ' *' as granting its bare head, which
+#     the harness does: a decorated bare head takes rule `allowlist_chain`'s steer and a read-only tail rule `ro_pipeline`'s
 #     grant, an argument-carrying lead and the ':*' and two-star forms are not widened, and a
-#     redirected emitter head is left to rule 25
+#     redirected emitter head is left to rule `emitter_write`
 printf '{"permissions":{"allow":["Bash(make build *)","Bash(echo *)","Bash(make:*)","Bash(cargo * --x *)"]}}\n' >"$tmp/star.json"
 printf 'GUARD_KIT_SETTINGS = %s/star.json\n' "$tmp" >"$tmp/star.knobs"
 s="$tmp/star.knobs"
@@ -190,5 +190,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "guard-config-knobs.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "guard-config-knobs.test: ok ($checks assertions; GUARD_KIT_SEARCH_TOOLS fires rules 9 and 11 on its own member each and leaves them inert when empty, and each firing corrective names its bare fallback; GUARD_KIT_RO_FORMS grants an added roster member only once declared, and a consumer entry replaces the kit's declaration; rule 2's arm (d) fires on a respelled path naming the knob's resolved file and not on a differing one; the member blocks with the refusal on a missing or malformed knob file and runs no rule; the steer door is gate_native_bin_spelled's spelling; the library's load advises on an unreachable binary, blocks on a refused config, and fails open naming the rebuild when the binary does not declare a loaded name)"
+echo "guard-config-knobs.test: ok ($checks assertions; GUARD_KIT_SEARCH_TOOLS fires rules \`find_glob\` and \`git_grep\` on its own member each and leaves them inert when empty, and each firing corrective names its bare fallback; GUARD_KIT_RO_FORMS grants an added roster member only once declared, and a consumer entry replaces the kit's declaration; rule `git_c_root`'s arm (d) fires on a respelled path naming the knob's resolved file and not on a differing one; the member blocks with the refusal on a missing or malformed knob file and runs no rule; the steer door is gate_native_bin_spelled's spelling; the library's load advises on an unreachable binary, blocks on a refused config, and fails open naming the rebuild when the binary does not declare a loaded name)"
 exit 0

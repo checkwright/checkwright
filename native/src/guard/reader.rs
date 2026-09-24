@@ -1,4 +1,4 @@
-// spec: guard-kit/SPEC.md §The guard framework — the reader seam: everything the engine and the rules
+// spec: guard-kit/SPEC.md §The shell guard — the reader seam: everything the engine and the rules
 // read of a command comes through this interface, one implementation per shell.
 
 // spec: guard-kit/SPEC.md §The generic ruleset — a view: the command as received, a skeleton named by
@@ -48,12 +48,12 @@ impl View {
 }
 
 pub trait Reader {
-    // spec: guard-kit/SPEC.md §The guard framework — a view of `text`; `None` only for a dequoted view
+    // spec: guard-kit/SPEC.md §The shell guard — a view of `text`; `None` only for a dequoted view
     // the skeleton cannot be aligned with. A skeleton never ends in a newline.
     fn view(&self, text: &str, view: View) -> Option<String>;
     // spec: guard-kit/SPEC.md §The generic ruleset — the body of the `k`th heredoc, counted from one.
     fn body(&self, text: &str, k: usize) -> String;
-    // spec: guard-kit/SPEC.md §The guard framework — the compound split, one segment per boundary.
+    // spec: guard-kit/SPEC.md §The shell guard — the compound split, one segment per boundary.
     fn segments(&self, text: &str) -> Vec<String>;
     // spec: guard-kit/SPEC.md §The generic ruleset — statements, split where a pipe is not a boundary.
     fn statements(&self, text: &str) -> Vec<String>;
@@ -66,6 +66,6 @@ pub trait Reader {
     fn redirect_pairs(&self, text: &str) -> Vec<String>;
     // spec: guard-kit/SPEC.md §The generic ruleset — the terminator of each heredoc a line opens.
     fn heredoc_terms(&self, text: &str) -> Vec<String>;
-    // spec: guard-kit/SPEC.md §The guard framework — a segment as the permission matcher reads it.
+    // spec: guard-kit/SPEC.md §The shell guard — a segment as the permission matcher reads it.
     fn harness_view<'a>(&self, seg: &'a str) -> &'a str;
 }

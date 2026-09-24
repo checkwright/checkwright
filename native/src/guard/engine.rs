@@ -4,7 +4,7 @@ use super::host::Host;
 use super::reader::{Reader, View};
 use super::rules::TABLE;
 
-// spec: guard-kit/SPEC.md §The guard framework — the four decisions a rule can take; each renders as
+// spec: guard-kit/SPEC.md §The shell guard — the four decisions a rule can take; each renders as
 // the envelope the library printed.
 #[derive(Debug, PartialEq, Eq)]
 pub enum Verdict {

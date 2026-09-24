@@ -394,7 +394,7 @@ fn monitor_surface(line: &str) -> Option<String> {
 const CLASS_OWNERS: [(&str, &str, &str); 6] = [
     ("gate-sdk/SPEC.md", "enforcement-tiers", "Enforcement tiers"),
     ("drift-kit/SPEC.md", "the-kpi-plugin-contract", "The KPI plugin contract"),
-    ("guard-kit/SPEC.md", "the-guard-framework-libguardsh", "The guard framework"),
+    ("guard-kit/SPEC.md", "the-shell-guard", "The shell guard"),
     ("context-kit/SPEC.md", "the-session-context-hook-template", "The session-context hook"),
     ("evidence-kit/SPEC.md", "baseline-manifest", "Baseline manifest"),
     ("site-kit/SPEC.md", "the-monitor-boundary", "The monitor boundary"),

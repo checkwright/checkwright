@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Direct test of the shell-guard member's rule 14 — a tracked-tree mutation blocked
+# Direct test of the shell-guard member's rule `git_mutation_under_producer` — a tracked-tree mutation blocked
 # while a recorded producer is still alive. The decision table cannot hold this
 # rule's firing arm: its second conjunct is a *live* PID, and a sandbox carrying
 # one would turn every other git row in that table into a block. The table keeps
@@ -80,7 +80,7 @@ if ! grep -qF "validate-batch" "$tmp/err" || ! grep -qF "$live" "$tmp/err"; then
 fi
 
 # --- git's global options are walked, so a decorated invocation is still reached;
-#     a '-c' override is refused by rule 2 before this rule reads it
+#     a '-c' override is refused by rule `git_c_root` before this rule reads it
 want "global-C"        "git -C . commit -m done" 2
 want "global-c"        "git -c user.name=x commit -m done" 2
 want "global-no-pager" "git --no-pager stash" 2
@@ -96,7 +96,7 @@ done
 want "readonly-args" "git log --oneline -3" 0
 
 # --- conservative in this ruleset's established directions: an expansion or a
-#     substitution is refused by rule 6 first, and never by this rule
+#     substitution is refused by rule `expansion` first, and never by this rule
 want "non-git"          "make build" 0
 want "unknown-subcmd"   "git frobnicate --hard" 0
 want "unknown-global"   "git --frobnicate commit -m done" 0

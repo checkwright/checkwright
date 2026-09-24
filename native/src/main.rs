@@ -67,7 +67,7 @@ fn no_such_arm(arm: &str) -> ! {
     exit(2);
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — the holder's four classes, so both sides take one
+// spec: guard-kit/SPEC.md §The shell guard — the holder's four classes, so both sides take one
 // spelling; `hd`/`hdq` carry nothing here because the branch reading them is unreachable, and a
 // token outside the four is a malformed corpus rather than a silent no-class.
 fn parse_wants(spec: &str) -> Result<guard::bash::Wants, String> {
@@ -87,19 +87,19 @@ fn parse_wants(spec: &str) -> Result<guard::bash::Wants, String> {
     Ok(w)
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — `guard_log_fallthrough`'s encoding, so a
+// spec: guard-kit/SPEC.md §The shell guard — `guard_log_fallthrough`'s encoding, so a
 // newline-bearing command and its view stay one record
 fn log_encoded(s: &str) -> String {
     s.replace('\\', "\\\\").replace('\n', "\\n").replace('\t', "\\t")
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — the standing oracle criterion 6's *unless* clause
+// spec: guard-kit/SPEC.md §The shell guard — the standing oracle criterion 6's *unless* clause
 // owes for the three twinned primitives: this module's classification of one canned corpus,
 // reported as classification and never as an internal representation, the rule a parity arm keeps.
 fn guard_lib_parity(args: &[String]) -> i32 {
     let usage = "  usage: checkwright-gates --guard-lib-parity split <cmd>... | --guard-lib-parity skeleton <wants> <cmd>... | --guard-lib-parity redirect <cmd>... | --guard-lib-parity allow-match <string> <glob>... | --guard-lib-parity harness-view <cmd>...";
     match args.first().map(String::as_str) {
-        // spec: guard-kit/SPEC.md §The guard framework — `_guard_harness_view`'s twin, reported as
+        // spec: guard-kit/SPEC.md §The shell guard — `_guard_harness_view`'s twin, reported as
         // classification: each command beside the view the permission matcher reads.
         Some("harness-view") => {
             for c in &args[1..] {
@@ -107,8 +107,8 @@ fn guard_lib_parity(args: &[String]) -> i32 {
             }
             0
         }
-        // spec: guard-kit/SPEC.md §The guard framework — `guard_allow_match`'s twin, reported as
-        // classification over (string, glob) pairs. The shell holder cannot empty: rule 20 calls it
+        // spec: guard-kit/SPEC.md §The shell guard — `guard_allow_match`'s twin, reported as
+        // classification over (string, glob) pairs. The shell holder cannot empty: guard-kit rule `allowlist_chain` calls it
         // from inside the same permanently-shell file, so this is criterion 6's *unless* clause.
         Some("allow-match") => {
             let mut rest = args[1..].iter();
@@ -298,7 +298,7 @@ fn main() {
         exit(guard_lib_parity(&argv[1..]));
     }
 
-    // spec: guard-kit/SPEC.md §The guard framework — a top-level flag for `--guard-lib-parity`'s
+    // spec: guard-kit/SPEC.md §The shell guard — a top-level flag for `--guard-lib-parity`'s
     // reason: the library passes every value as argv or stdin, so no knob is resolved.
     if first == "--guard-json" {
         exit(guard::json_arm(&argv[1..]));

@@ -25,4 +25,4 @@ Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ## Contracts
 
-The guard decision model and the friction-triage step are defined in the kit's [`SPEC.md`](SPEC.md#the-guard-framework-libguardsh); its [`README.md`](README.md#guard-kit) lists the mechanism. Back to the [kit map](../index.md#the-kits).
+The guard decision model and the friction-triage step are defined in the kit's [`SPEC.md`](SPEC.md#the-shell-guard); its [`README.md`](README.md#guard-kit) lists the mechanism. Back to the [kit map](../index.md#the-kits).

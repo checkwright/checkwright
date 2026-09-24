@@ -175,7 +175,7 @@ fn mkdir_p(path: &str) -> Result<(), String> {
 
 // spec: delegation-kit/SPEC.md §bin/wait-probe — the producer's own pid is recorded at launch and
 // never logged in a trial line: the `<key>.run` record holds it for the lifetime the wait needs, and
-// `check-producer-liveness` and guard rule 14 read the probe's own producers like any other
+// `check-producer-liveness` and guard-kit rule `git_mutation_under_producer` read the probe's own producers like any other
 fn cmd_produce(key: &str, ms: &str) -> Result<i32, String> {
     let p = paths()?;
     mkdir_p(&p.work)?;
@@ -229,7 +229,7 @@ fn cmd_waiter(key: &str, form: &str, pred: &str) -> Result<i32, String> {
 }
 
 // spec: delegation-kit/SPEC.md §bin/wait-probe — the launch record's two-field line is the format
-// `check-producer-liveness` and guard rule 14 read, so the arm parses and writes exactly it
+// `check-producer-liveness` and guard-kit rule `git_mutation_under_producer` read, so the arm parses and writes exactly it
 fn recorded_pid(record: &str) -> Option<String> {
     record.split_whitespace().find_map(|f| {
         let n = f.strip_prefix("pid=")?;

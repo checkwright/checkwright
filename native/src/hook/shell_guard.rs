@@ -1,4 +1,4 @@
-// spec: guard-kit/SPEC.md §The guard framework — the `PreToolUse` shell guard: the consumer's rule
+// spec: guard-kit/SPEC.md §The shell guard — the `PreToolUse` shell guard: the consumer's rule
 // command runs first, then the payload's tool selects a reader, the rule table decides, and a call
 // nothing decided is logged.
 use crate::guard::engine::{self, Cmd, Verdict};
@@ -76,7 +76,7 @@ pub fn run(payload: &Payload) -> i32 {
     }
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — a refused knob read keeps the block, with the
+// spec: guard-kit/SPEC.md §The shell guard — a refused knob read keeps the block, with the
 // refusal's own text: the refused file is the guard's own and its repair tool is never guarded.
 fn refused(e: &str) -> i32 {
     hook::block(

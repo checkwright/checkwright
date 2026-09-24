@@ -28,7 +28,7 @@ The generic ruleset's roster stops being a numbered list, and every citation of 
 - **The roster.** §The generic ruleset's items move under a subsection of their own, `### The rule roster`, whose body is the roster alone, as a **bulleted** list in dispatch order. An item opens `- **<title>** (`<name>`) — `. Nothing in the roster carries an ordinal, so a reader has no number to copy. The widening bullets and the paragraphs before the list stay in the parent section, and the fall-through and sleep paragraphs after it move there too.
 - **The citation grammar.** A citation is the word `rule` or `rules` followed by one or more backticked names, joined by `, ` and/or ` and `: `` rule `ro_pipeline` ``, `` rules `abs_script` and `brace_glyph` ``, and a possessive `` rule `grant_path_slot`'s test ``. Outside guard-kit's own tree and the crate's guard module, a citation is qualified: `` guard-kit rule `git_mutation_under_producer` ``. **Arms keep their letters** (`` rule `bounded_wait`'s arm (B) ``), since an arm is named inside one item.
 - **The sweep.** Every `rule N` / `rules N, M and K` / `Rule N's` citation is rewritten to the name form, over the probe `git grep -nE '[Rr]ules? [0-9]+'` and the roster below. Out-of-kit hits cite guard-kit where the context says so, and the probe also hits doctrine-kit and canon-kit rule numbers, which stay as they are. Each hit is classified from its line (survey 2026-09-24 spec, `.workflow/survey-record.md`). About 525 intra-kit tokens and about 54 out-of-kit guard citations move. Record surfaces are left as written: `.workflow/` files, dated posts under `docs/posts/`, and `TASK-QUEUE.md`'s Done slugs and provenance lines. A record answers what happened.
-- **The prose replacing the ruling.** §The generic ruleset's sentence "An item's number, its function and its dispatch position therefore say one thing three times" and the item-grammar paragraph become: **Replacement text** — **Not yet applied**:
+- **The prose replacing the ruling.** §The generic ruleset's sentence "An item's number, its function and its dispatch position therefore say one thing three times" and the item-grammar paragraph become: **Replacement text** — applied at build (batch b4):
 
   > **A rule is identified by its name.** The roster below lists the rules in dispatch order, and each item carries its name, which is also the identifier of the rule's function in the crate's rule table. Nothing cites a rule by position: an insertion moves no citation, and a rename is the one edit that moves them, which `check-guard-registration`'s arm D reads.
 
@@ -45,6 +45,11 @@ The gate's subject moves from the shell library to the crate's rule table, and i
 - **Fail-closed, exit 2:** an unreadable SPEC, table file or corpus file; an absent §The rule roster, or one with no item; a declaration clause the grammar cannot parse; a table-file line of any other shape; and a failed `git ls-files`.
 - **The clean line** becomes `GUARD-REGISTRATION: clean (<n> rule(s): roster, table order, declared views and <m> citation(s) in lockstep)`.
 - **Fixtures.** The good/bad pair under `scripts/gate-tests/check-guard-registration/` is rebuilt over a synthetic table file: good holds one roster in lockstep, and bad fires A through D. The `.test.sh` keeps the exit-2 shapes: roster absent, a malformed declaration, a malformed table line.
+- **Mechanics ruled at build, merged into guard-kit/SPEC.md §check-guard-registration (batch b4):**
+  - The corpus is `git ls-files` from the working directory. "guard-kit's tree" is the SPEC file's own directory, so a fixture case reads its own files, and the guard module is `guard/` beneath `GATE_SDK_NATIVE_SRC`, absent in a vendored tree. The qualified-only corpus also skips the pruned directories (`GATE_SDK_PRUNE_DIRS`, `GATE_SDK_PRUNE_EXTRA_DIRS`), because the live walk would otherwise read the bad fixture's qualified citation. A tracked path missing from the working tree, or a directory entry, is skipped.
+  - A table file skips blank and `#` lines. The rule table is read through a public accessor, `guard::rule_table()`, and the rules module stays private.
+  - A view spelling the reader does not carry makes a clause unparseable (exit 2). A citation list broken by other words is read up to the break, which is stated as a limit.
+  - The descriptor couples the roster and the table, `couples=guard-kit/SPEC.md,native/src/guard/*`, and takes `trigger=*` because arm D reads every tracked file — the whole-tree reader shape `check-tree-terms` has. Coupling `guard-kit/*` would cover a gate declaration path and make the member substrate-sensitive for text it reads only as citations.
 - **What it still does not hold, stated:** a *bare* out-of-kit citation (`rule `x`` without the qualifier) is not read. The qualifier is the discriminator that stops the gate from claiming another kit's rule vocabulary. Since no rule carries a number, a writer who drops the qualifier still names the rule, and a later rename is the only way such a citation can go stale.
 
 ### (3) The shell guard is a hook member of the gate binary
@@ -147,7 +152,7 @@ Its match resolves `GUARD_KIT_SCRATCH_DIRS` the way rules `git_mutation_under_pr
 - **The match.** From a linked worktree a body source fires when it sits under a scratch member of the main checkout **or** of the session's own worktree, each compared lexically with `..` folded. From the main checkout nothing changes.
 - **The steer.** For a body under the main checkout's scratch dir, the steer from a worktree says to write the script under the worktree's own scratch dir and run it through the runner there. The runner refuses the main checkout's path from a worktree, and a steer to a call that refuses cannot be followed. A body under the worktree's own scratch dir keeps today's steer.
 - **Rows.** `worktree-confinement.test.sh` gains the case `bash <main>/.tmp/x.sh` from the worktree, which blocks, and a check that its corrective names the worktree's own scratch dir. `bash .tmp/own.sh` from the worktree stays blocked with today's steer. The table's sandbox is no worktree, so no `cases.tsv` row moves.
-- **The item's scratch-dir sentence** in §Layout and configuration's `GUARD_KIT_SCRATCH_DIRS` entry ("Rules 3 and 23 read the member as written too") becomes: rule `scratch_redirect` reads the member as written, and rule `script_interpreter` reads it both ways from a worktree. **Not yet applied.**
+- **The item's scratch-dir sentence** in §Layout and configuration's `GUARD_KIT_SCRATCH_DIRS` entry ("Rules 3 and 23 read the member as written too") becomes: rule `scratch_redirect` reads the member as written, and rule `script_interpreter` reads it both ways from a worktree. Applied at build (batch b4).
 
 ### (8) A consumer's rules are a command the guard runs first
 
@@ -221,6 +226,11 @@ The prose merge, ruled here so build carries no design judgment into it. **{desi
   - canon-kit/SPEC.md §check-spec-pointer and §check-prose-enum's `guard_allow` worked example, which is re-worded over names the tree still carries.
   - doctrine-kit/SPEC.md §Out of scope and delegation-kit/SPEC.md's `guard_advise` mention.
 - **The merged text carries no dated provenance**, only the undated rule and its engineering grounds (CLAUDE.md §The provenance seam).
+- **Merged at build (batch b4), with these rulings inside the envelope:**
+  - §The guard framework became §The shell guard, with subsections §The reader and its views and §The fail-open postures. Every `§The guard framework` pointer in the tree was re-pointed.
+  - drift-kit/SPEC.md §Bundled KPIs names a new presence witness for guard-kit: `templates/guard-config.knobs`. That paragraph's own criterion requires a file whose presence is the kit being vendored and that no port cut can delete, and a config template meets it. The code moved in the same commit: `guard::WITNESS` replaces `guard::LIB`, and `kpi-prompt-friction` reads it.
+  - The rename also reached sites outside the roster: the guard entry in `native/src/emit/enforcement_map.rs`'s `CLASS_OWNERS` (its anchor), docs/guard-kit/index.md's anchor, the heading-locator example in canon-kit/SPEC.md §check-spec-pointer, and context-kit's bash-floor `declare -A` list.
+  - §Testing's latency figure was measured this batch: ten calls on a `git status` payload.
 
 ## Producers and consumers
 
@@ -295,7 +305,9 @@ Roster probes, run at authoring over the retired-spelling gate's reconciliation 
 - `native/src/emit/wait_probe.rs` — rule citations to names (delta 1).
 - `native/src/knobs/guard_kit.rs` — rule citations to names, and the `GUARD_KIT_CONSUMER_RULES_CMD` row (deltas 1 and 8).
 - `native/src/emit/overhead_meter.rs` — the hook-name literal (delta 9).
-- `native/src/emit/kpi/prompt_friction.rs` — its permanently-shell comment (delta 9).
+- `native/src/emit/kpi/prompt_friction.rs` — its permanently-shell comment, and the presence witness it reads (deltas 9 and 10).
+- `native/src/emit/enforcement_map.rs` — the guard class owner's section and anchor (delta 10).
+- `docs/guard-kit/index.md` — its link to the renamed section's anchor (delta 10).
 - `native/src/gates/guard_registration.rs` — rewritten to delta 2.
 - `scripts/check-guard-registration.gate` — `couples=` (deltas 2 and 9).
 - `scripts/git-hooks/pre-commit` — regenerated after the `couples=` edit with the command `check-graph` prints on red; it and `docs/check-graph.html` form one projection set (docs/site-architecture.md §Generated projections and their freshness gates) (delta 9).

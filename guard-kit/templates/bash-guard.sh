@@ -10,7 +10,7 @@ GUARD_KIT_LIB="${GUARD_KIT_LIB:-guard-kit/lib/guard.sh}"
 # shellcheck source=/dev/null  # vendored lib path is resolved at runtime; fail-open above if absent, but the lib's own exit 2 (set-but-missing config) must stay loud
 source "$GUARD_KIT_LIB"
 
-# spec: guard-kit/SPEC.md §The guard framework — cache the payload before the first field is read, so a rule needing a tool-input field beyond the command can reach one
+# spec: guard-kit/SPEC.md §The shell guard — cache the payload before the first field is read, so a rule needing a tool-input field beyond the command can reach one
 guard_read_input || exit 0
 cmd="$(guard_read_command)" || exit 0
 

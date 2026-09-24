@@ -5,11 +5,10 @@ use crate::emit::scan_prompts;
 
 const LABEL: &str = "prompt friction";
 
-// spec: drift-kit/SPEC.md §Bundled KPIs — the presence witness is the library, never the surface
-// the measurement reads: `lib/guard.sh` is permanently shell, so no later cut can delete it out
-// from under this row.
+// spec: drift-kit/SPEC.md §Bundled KPIs — the presence witness is guard-kit's config template,
+// never the surface the measurement reads.
 pub fn run(ctx: &Ctx, trend: bool) -> Option<String> {
-    if sibling_tool(&ctx.kit_roots, crate::guard::LIB).is_none() {
+    if sibling_tool(&ctx.kit_roots, crate::guard::WITNESS).is_none() {
         return na("lead", LABEL, "guard-kit absent", trend);
     }
     let (distinct, total) =

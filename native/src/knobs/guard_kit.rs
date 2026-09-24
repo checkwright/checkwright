@@ -49,7 +49,7 @@ pub const KIT: Kit = Kit {
     env_only: &[],
 };
 
-// spec: guard-kit/SPEC.md §Layout and configuration — rule 27's admission selector takes its two
+// spec: guard-kit/SPEC.md §Layout and configuration — guard-kit rule `worktree_confinement`'s admission selector takes its two
 // values only, so a misspelt `off` refuses rather than reads as the default
 fn validate(v: &Values) -> Vec<String> {
     let mut errs: Vec<String> = Vec::new();
