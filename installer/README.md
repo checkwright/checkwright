@@ -16,7 +16,7 @@ The toolchain the battery *does* assert, with its version floors, is on the inst
 
 ## Quick start
 
-From a clean git repository, at its root, follow the Release tarball recipe for your system on the install page: [macOS and Linux](https://checkwright.dev/install.html#macos-and-linux) or [Windows](https://checkwright.dev/install.html#windows). It unpacks outside the repository, because `init` refuses a worktree that is not clean.
+From a clean git repository, at its root, run the one line for your system on the install page: [macOS and Linux](https://checkwright.dev/install.html#macos-and-linux) or [Windows](https://checkwright.dev/install.html#windows). The Release tarball recipe below it is the step-by-step alternative. Either unpacks outside the repository, because `init` refuses a worktree that is not clean.
 
 With Node already present the same install is one command, `npx checkwright init` — same payload, same `init`, same `checkwright.lock`; only the fetch differs.
 

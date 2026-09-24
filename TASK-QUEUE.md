@@ -8,18 +8,6 @@
 
 ## New Features
 
-### install-hosted-one-liner
-
-[spec: SPEC-hosted-install.md]
-
-the install page's no-Node path is four steps per system, not one line. A hosted, tracked bootstrap pair — `curl -fsSL https://checkwright.dev/install.sh | sh` and `irm https://checkwright.dev/install.ps1 | iex` — would fetch a pinned release, verify it and run `init` in one command. installer/SPEC.md §The dependency boundary refuses a piped remote script, because an unreviewed script fed straight to a shell contradicts the page's opening claim. That refusal is SPEC text, never an operator ruling: the 2026-09-22 direction (`d433e268`) chose per-OS recipes and left it in force without ruling on it.
-
-**Refusal reversed — operator direction 2026-09-24, lead-relayed; no `/consult` owed, since no ruling stands on it.** Bound by the operator's standing intent: native installation with minimal external dependencies, no npx-class dependency. Spec rewrites installer/SPEC.md §The dependency boundary. **Selected for `adopter-onramp`,** admitted on the filter's time-to-first-value arm.
-
-**Deliverable:** the two scripts as twins, a pinned-version line with a freshness gate against the newest tag, and a CI witness that runs each one-liner against a packed payload. `irm` cannot read `file://`, so the PowerShell witness needs a local server or a base-URL override.
-
-**Cost while deferred:** a first-contact adopter copies a four-step recipe where a one-liner would do. Filed 2026-09-22 at spec, when the operator's direction for install-path-developer-first chose per-OS recipes and deferred the one-liner. Owner: installer/SPEC.md §The dependency boundary.
-
 ## Technical Debt
 
 ### gate-binary-platform-roster-holes
@@ -1449,5 +1437,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - guard-placeholder-letter-paths
 - guard-powershell-tool-unguarded
 - queue-migrate-bold-split
+- install-hosted-one-liner
 
 ## Lessons Learned
