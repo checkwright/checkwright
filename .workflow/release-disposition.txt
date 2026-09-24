@@ -1,4 +1,3 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
-silent-guard-gaps release deferred:v0.26.0 — the declarations accumulated since v0.25.0 still derive a minor: this iteration adds the check-action-run-path gate, the widened check-settings-paths hook reach, the enforcement map's per-event guard rows, the hook decline's model and operator envelopes, the --waive dispatch form and the stamp-before-write rule, none a decommission. No trigger fired: elapsed time is dormant under preview, no change is a vulnerability or a compromised artifact, there is no operator direction, and the audience has not arrived
