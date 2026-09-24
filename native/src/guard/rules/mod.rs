@@ -38,7 +38,7 @@ pub static TABLE: &[Rule] = &[
     },
     Rule {
         name: "background_no_record",
-        shells: BASH,
+        shells: BOTH,
         views: &[Raw, SqDqHd, Dequoted],
         test: liveness::background_no_record,
     },

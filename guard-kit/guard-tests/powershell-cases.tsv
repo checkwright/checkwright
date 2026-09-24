@@ -22,6 +22,16 @@ fallthrough	git grep foo HEAD
 advise	git commit --amend --no-edit
 fallthrough	git commit -m 'x'
 
+# rule `background_no_record`'s shell form — a detached Start-Process launch; -Wait, -WhatIf and a
+# job are no backgrounding form
+block	Start-Process pwsh -ArgumentList x
+block	start notepad
+block	git status; SAPS pwsh
+fallthrough	Start-Process -Wait pwsh
+fallthrough	Start-Process -wa pwsh
+fallthrough	Start-Process pwsh -WhatIf
+fallthrough	Start-Job { Start-Sleep 60 }
+
 # rule `rm_tracked` — the deletion commands, their parameters, and the git rm force arm
 block	Remove-Item tracked.md
 block	rm tracked.md

@@ -1,0 +1,29 @@
+# spec: guard-kit/SPEC.md §Testing — rule `background_no_record`'s PowerShell harness arm: the
+# background-cases.tsv grammar, each row fed as a PowerShell payload to the same member.
+# Columns: <expected-decision> <TAB> <run_in_background> <TAB> <command>.
+
+# rule `background_no_record` — an unrecorded launch blocks; the canonical LF-terminated record
+# write discharges it, a CRLF or UTF-16 write does not, and neither does one outside the scratch dir
+block	true	pwsh -File tools/build.ps1
+fallthrough	true	Set-Content -NoNewline -Path .tmp/build.run -Value "pid=$PID run=build`n"; try { pwsh -File tools/build.ps1 } finally { Remove-Item .tmp/build.run }
+fallthrough	true	set-content -n .tmp\build.run "pid=$PID run=build`n"; try { pwsh -File tools/build.ps1 } finally { Remove-Item .tmp\build.run }
+block	true	Set-Content -Path .tmp/build.run -Value "pid=$PID run=build`n"; try { pwsh -File tools/build.ps1 } finally { Remove-Item .tmp/build.run }
+block	true	Set-Content -NoNewline -Path .tmp/build.run -Value "pid=$PID run=build"; try { pwsh -File tools/build.ps1 } finally { Remove-Item .tmp/build.run }
+block	true	Set-Content -NoNewline -Encoding Unicode -Path .tmp/build.run -Value "pid=$PID run=build`n"; try { pwsh -File tools/build.ps1 } finally { Remove-Item .tmp/build.run }
+block	true	"pid=$PID run=build" > .tmp/build.run; try { pwsh -File tools/build.ps1 } finally { Remove-Item .tmp/build.run }
+block	true	Set-Content -NoNewline -Path tracked.run -Value "pid=$PID run=build`n"; try { pwsh -File tools/build.ps1 } finally { Remove-Item tracked.run }
+block	true	echo 'Set-Content -NoNewline -Path .tmp/build.run -Value "pid=$PID run=build`n"'; pwsh -File tools/build.ps1
+
+# the `$` decline: only a `$` in a record write's path word, whose target cannot be resolved
+fallthrough	true	Set-Content -NoNewline -Path .tmp/$k.run -Value "pid=$PID run=build`n"; try { pwsh -File tools/build.ps1 } finally { Remove-Item .tmp/$k.run }
+block	true	$env:X = 1; pwsh -File tools/build.ps1
+
+# the inline wait loop owes no record; a loop doing more than sleep is a launch
+fallthrough	true	while (Test-Path .tmp/m) { Start-Sleep 5 }
+fallthrough	true	do { sleep 5 } until (Test-Path .tmp/done)
+fallthrough	true	DO { Start-Sleep -Seconds 5 } While (Get-Process -Id 42 -ErrorAction SilentlyContinue)
+block	true	while (Test-Path .tmp/m) { Remove-Item x; Start-Sleep 5 }
+block	true	while (Test-Path .tmp/m) { Start-Sleep 5 }; git status
+
+# a foreground call carrying no detached launch leaves the rule inert
+fallthrough	false	pwsh -File tools/build.ps1

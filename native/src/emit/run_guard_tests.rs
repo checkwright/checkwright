@@ -42,7 +42,8 @@ fn execute(args: &[String]) -> Result<i32, String> {
     let cases = positional(args, 0, &format!("{}/guard-tests/cases.tsv", kit));
     let bg_cases = positional(args, 1, &format!("{}/guard-tests/background-cases.tsv", kit));
     let ps_cases = positional(args, 2, &format!("{}/guard-tests/powershell-cases.tsv", kit));
-    for f in [&cases, &bg_cases, &ps_cases] {
+    let ps_bg_cases = positional(args, 3, &format!("{}/guard-tests/powershell-background-cases.tsv", kit));
+    for f in [&cases, &bg_cases, &ps_cases, &ps_bg_cases] {
         if !Path::new(f).is_file() {
             return Err(format!("{}: missing {}", NAME, f));
         }
@@ -73,11 +74,17 @@ fn execute(args: &[String]) -> Result<i32, String> {
         let got = decide(&sandbox.root, &log, &cmd, None, "PowerShell")?;
         tally.check(&want, &got, &format!("[--hook shell-guard] [PowerShell] {}", cmd));
     }
+    for row in rows(&ps_bg_cases, 3)? {
+        let (want, rib, cmd) = (row[0].clone(), row[1].clone(), row[2].clone());
+        let cmd = substitute(&cmd, &sandbox.root);
+        let got = decide(&sandbox.root, &log, &cmd, Some(&rib), "PowerShell")?;
+        tally.check(&want, &got, &format!("[--hook shell-guard] [PowerShell] [run_in_background={}] {}", rib, cmd));
+    }
 
     if tally.ran == 0 {
         return Err(format!(
-            "{}: no cases parsed from {} / {} / {}",
-            NAME, cases, bg_cases, ps_cases
+            "{}: no cases parsed from {} / {} / {} / {}",
+            NAME, cases, bg_cases, ps_cases, ps_bg_cases
         ));
     }
     if tally.fails > 0 {
@@ -88,7 +95,7 @@ fn execute(args: &[String]) -> Result<i32, String> {
         return Ok(1);
     }
     println!(
-        "{}: ok ({} cases across the generic ruleset, the backgrounding arm and the PowerShell reader)",
+        "{}: ok ({} cases across the generic ruleset, the backgrounding arm, the PowerShell reader and its backgrounding arm)",
         NAME, tally.ran
     );
     Ok(0)

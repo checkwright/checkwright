@@ -8,7 +8,7 @@ use super::{
     unredirected_words, GitWalk,
 };
 use crate::guard::allow_match;
-use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Verdict};
+use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Shell, Verdict};
 use crate::guard::reader::View::{Sq, SqDqHd};
 use crate::guard::reader::{DQ_MARK, SQ_MARK};
 use crate::guard::text::{self, grep_q, head_word, trim, trim_start, unsentinel, words};
@@ -62,7 +62,182 @@ fn is_ro_background(ctx: &Ctx, s: &str) -> Result<bool, Fault> {
     Ok(reads >= 1 && ro_forms_clear(ctx, ctx.cmd())?)
 }
 
+// spec: guard-kit/SPEC.md §The generic ruleset — rule `background_no_record`'s PowerShell shell form: a
+// segment led by `Start-Process` or an alias, carrying no `-Wait` and no `-WhatIf` by any prefix.
+fn ps_detaches(seg: &str) -> bool {
+    let ws = words(trim_start(seg));
+    let Some(head) = ws.first() else { return false };
+    if !["start-process", "saps", "start"].contains(&head.to_ascii_lowercase().as_str()) {
+        return false;
+    }
+    !ws[1..].iter().any(|w| {
+        let Some(p) = w.strip_prefix('-') else { return false };
+        let (name, value) = match p.split_once(':') {
+            Some((n, v)) => (n.to_ascii_lowercase(), Some(v)),
+            None => (p.to_ascii_lowercase(), None),
+        };
+        let wait = name.len() >= 2 && "wait".starts_with(&name) && !value.is_some_and(|v| v.eq_ignore_ascii_case("$false"));
+        wait || (name.len() >= 2 && "whatif".starts_with(&name))
+    })
+}
+
+struct PsWrite {
+    expands: bool,
+    canonical: bool,
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — rule `background_no_record`'s PowerShell exemption (1):
+// `Set-Content -NoNewline`, a literal scratch `.run` path and an expandable value, and nothing else;
+// `None` on a segment that is no `Set-Content`.
+fn ps_record_write(ctx: &Ctx, seg: &str, raw_segs: &[String]) -> Option<PsWrite> {
+    let seg = trim(seg);
+    let ws = words(seg);
+    if !ws.first()?.eq_ignore_ascii_case("set-content") {
+        return None;
+    }
+    let (mut nonewline, mut path, mut value, mut positional) = (false, None, None, Vec::new());
+    let mut canonical = true;
+    let mut i = 1usize;
+    while i < ws.len() {
+        let w = ws[i];
+        i += 1;
+        let Some(p) = w.strip_prefix('-') else {
+            positional.push(w);
+            continue;
+        };
+        let name = p.to_ascii_lowercase();
+        if !name.is_empty() && "nonewline".starts_with(&name) {
+            nonewline = true;
+        } else if name == "path" || name == "literalpath" {
+            path = ws.get(i).copied();
+            i += 1;
+        } else if name == "value" {
+            value = ws.get(i).copied();
+            i += 1;
+        } else {
+            canonical = false;
+        }
+    }
+    let mut positional = positional.into_iter();
+    let path = path.or_else(|| positional.next());
+    let value = value.or_else(|| positional.next());
+    if positional.next().is_some() {
+        canonical = false;
+    }
+    let path = path.map(|p| p.replace('\\', "/"));
+    let expands = path.as_deref().is_some_and(|p| p.contains('$'));
+    let h = ctx.host();
+    let literal = path.as_deref().is_some_and(|p| {
+        !p.contains(SQ_MARK) && !p.contains(DQ_MARK) && !p.contains(['$', '"', '\'', '`']) && p.ends_with(".run") && h.in_scratch(p)
+    });
+    canonical = canonical && nonewline && literal && value == Some(DQ_MARK) && raw_segs.iter().any(|r| ps_value_ends_newline(r, seg));
+    Some(PsWrite { expands, canonical })
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — the canonical write's value, read off the raw
+// segment that masks to the skeleton's: one expandable string ending in the `` `n `` escape.
+fn ps_value_ends_newline(raw_seg: &str, skel_seg: &str) -> bool {
+    let r = trim(raw_seg);
+    let (Some(open), Some(close)) = (r.find('"'), r.rfind('"')) else { return false };
+    if close <= open || r[open + 1..close].contains('"') {
+        return false;
+    }
+    let masked = format!("{}{}{}", &r[..open], DQ_MARK, &r[close + 1..]);
+    masked == skel_seg && r[open + 1..close].ends_with("`n")
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — rule `background_no_record`'s PowerShell exemption (2):
+// the whole skeleton is one `while (<cond>) { <sleep> }`, `do { <sleep> } while (<cond>)` or
+// `do { <sleep> } until (<cond>)`, its body one statement led by `Start-Sleep` or `sleep`.
+fn ps_wait_loop(ctx: &Ctx, s: &str) -> bool {
+    let s = trim(s);
+    let b = s.as_bytes();
+    let closing = |from: usize, open: u8, close: u8| -> Option<usize> {
+        let mut depth = 0i32;
+        for (k, &c) in b.iter().enumerate().skip(from) {
+            if c == open {
+                depth += 1;
+            } else if c == close {
+                depth -= 1;
+                if depth == 0 {
+                    return Some(k);
+                }
+            }
+        }
+        None
+    };
+    let keyword = |at: usize, kw: &str| -> Option<usize> {
+        let end = at + kw.len();
+        (s.get(at..end)?.eq_ignore_ascii_case(kw) && b.get(end).is_some_and(|c| text::is_space(*c) || matches!(c, b'(' | b'{')))
+            .then_some(end)
+    };
+    let skip = |mut at: usize| {
+        while at < b.len() && text::is_space(b[at]) {
+            at += 1;
+        }
+        at
+    };
+    let sleeps = |body: &str| {
+        let segs: Vec<String> = ctx.segments(body).into_iter().filter(|g| !trim(g).is_empty()).collect();
+        segs.len() == 1 && {
+            let head = head_word(trim(&segs[0])).to_ascii_lowercase();
+            head == "start-sleep" || head == "sleep"
+        }
+    };
+    if let Some(at) = keyword(0, "while") {
+        let open = skip(at);
+        if b.get(open) != Some(&b'(') {
+            return false;
+        }
+        let Some(cond_end) = closing(open, b'(', b')') else { return false };
+        let body_open = skip(cond_end + 1);
+        if b.get(body_open) != Some(&b'{') {
+            return false;
+        }
+        return closing(body_open, b'{', b'}') == Some(b.len() - 1) && sleeps(&s[body_open + 1..b.len() - 1]);
+    }
+    let Some(at) = keyword(0, "do") else { return false };
+    let body_open = skip(at);
+    if b.get(body_open) != Some(&b'{') {
+        return false;
+    }
+    let Some(body_close) = closing(body_open, b'{', b'}') else { return false };
+    let tail = skip(body_close + 1);
+    let Some(after) = keyword(tail, "while").or_else(|| keyword(tail, "until")) else { return false };
+    let open = skip(after);
+    b.get(open) == Some(&b'(')
+        && closing(open, b'(', b')') == Some(b.len() - 1)
+        && sleeps(&s[body_open + 1..body_close])
+}
+
+fn ps_background_no_record(ctx: &Ctx) -> Decided {
+    let h = ctx.host();
+    let s = ctx.view(ctx.cmd(), SqDqHd)?;
+    let segs = ctx.segments(&s);
+    if !(h.background || segs.iter().any(|g| ps_detaches(g))) {
+        return Ok(None);
+    }
+    let raw_segs = ctx.segments(ctx.raw(ctx.cmd())?);
+    let mut recorded = false;
+    for g in &segs {
+        if let Some(w) = ps_record_write(ctx, g, &raw_segs) {
+            if w.expands {
+                return Ok(None);
+            }
+            recorded |= w.canonical;
+        }
+    }
+    if recorded || ps_wait_loop(ctx, &s) {
+        return Ok(None);
+    }
+    let home = h.scratch_homes().into_iter().next().unwrap_or_default();
+    Ok(Some(Verdict::Block(format!("this PowerShell call backgrounds a process and writes no liveness record — re-issue it with the record written first, in this spelling: 'Set-Content -NoNewline -Path {h}/<key>.run -Value \"pid=$PID run=<key>`n\"; try {{ <command> }} finally {{ Remove-Item {h}/<key>.run }}'. $PID is the process running the command, so the record reads held exactly while the command runs, and the -NoNewline with the trailing `n is what makes the record parse: a plain Set-Content or a '>' writes a CRLF record, which reads as corrupt. Give a Start-Process launch -Wait inside that spelling rather than leaving it detached. The record is what gives the tracked-tree-mutation rule its reach, so a commit taken while this process is still writing is refused rather than silently taken. An inline wait loop ('while (<cond>) {{ Start-Sleep 5 }}') owes no record. No guard grant applies under PowerShell, so the spelling costs one permission decision. If you genuinely need an unrecorded launch, run it yourself with !<command>.", h = home))))
+}
+
 pub fn background_no_record(ctx: &Ctx) -> Decided {
+    if ctx.shell() == Shell::PowerShell {
+        return ps_background_no_record(ctx);
+    }
     let h = ctx.host();
     if has_expansion(ctx.raw(ctx.cmd())?) {
         return Ok(None);

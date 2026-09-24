@@ -568,12 +568,13 @@ jobs:
         shell: bash
         run: bash gate-sdk/bin/run-gates.sh --run-guard-tests
 
-      # Reporting only, and it never fails. It measures whether the liveness
-      # predicate (evidence-kit/SPEC.md §The producer-liveness lock) answers a
-      # Windows process id from a PowerShell launch on this host, against
-      # `Get-Process` as ground truth, and whether the shipped MSYS path answers
-      # its own pids here. Its verdict line decides which predicate is built.
-      - name: producer liveness over Windows process ids (reporting)
+      # Binding. The oracle for this host's liveness predicate over both pid
+      # namespaces (evidence-kit/SPEC.md §The producer-liveness lock), against
+      # `Get-Process` as ground truth, and for the record guard-kit rule
+      # `background_no_record`'s PowerShell corrective spells: a Windows pid
+      # from a PowerShell launch and an MSYS pid each read held then free, a
+      # PowerShell default write reads corrupt, and a job dies with its session.
+      - name: producer liveness over Windows process ids
         shell: bash
         run: |
           set +e
@@ -605,7 +606,7 @@ jobs:
             return 1
           }
           pid_of() { sed -n 's/^pid=\([0-9]*\) .*/\1/p' "$1" 2>/dev/null; }
-          declare -A t1 g1 t2 g2 tpid
+          declare -A t1 g1 t2 g2 tpid gd1 gd2
           winpids=()
           # shellcheck disable=SC2329 # reached through the EXIT trap
           cleanup() {
@@ -652,7 +653,8 @@ jobs:
             echo "($r) truth=${t1[$r]} gate=${g1[$r]}"
           done
           for f in "$rec"/d-*.run; do
-            echo "(d) $(basename "$f") truth=$(truth "${tpid[b]}") gate=$(gate "$f")"
+            d="$(basename "$f")"; gd1[$d]="$(gate "$f")"
+            echo "(d) $d truth=$(truth "${tpid[b]}") gate=${gd1[$d]}"
           done
 
           echo "== stop =="
@@ -666,12 +668,17 @@ jobs:
           done
 
           echo "== reading 2, every process stopped =="
+          # An MSYS pid that numerically names a live Windows process reads
+          # held through the native leg, the PID-reuse case the SPEC accepts.
+          acoll="$(truth "$apid")"
+          echo "(a) msys pid $apid as a windows pid: $acoll"
           for r in a b bp c; do
             t2[$r]="$(truth "${tpid[$r]}")"; g2[$r]="$(gate "$rec/$r.run")"
             echo "($r) truth=${t2[$r]} gate=${g2[$r]}"
           done
           for f in "$rec"/d-*.run; do
-            echo "(d) $(basename "$f") truth=$(truth "${tpid[b]}") gate=$(gate "$f")"
+            d="$(basename "$f")"; gd2[$d]="$(gate "$f")"
+            echo "(d) $d truth=$(truth "${tpid[b]}") gate=${gd2[$d]}"
           done
 
           echo "== row (e): a job's process once its session exits =="
@@ -693,26 +700,36 @@ jobs:
           echo "(e) job pid ${epid:-<none>} truth=$e_outcome"
 
           echo "== verdict =="
-          verdict="predicate answers Windows pids"
-          for r in b bp c; do
+          misread=0
+          for r in a b bp c; do
+            want2=0
+            [[ "$r" == a && "$acoll" == alive ]] && want2=1
             if [[ "${t1[$r]}" != alive || "${t2[$r]}" != gone ]]; then
-              verdict="predicate unmeasured: row ($r) ground truth read ${t1[$r]} then ${t2[$r]}"
-              break
-            fi
-            [[ "${g1[$r]}" == 1 && "${g2[$r]}" == 0 ]] || verdict="predicate misreads Windows pids"
-          done
-          echo "$verdict"
-          if [[ "${t1[a]}" == alive && "${t2[a]}" == gone ]]; then
-            if [[ "${g1[a]}" == 1 && "${g2[a]}" == 0 ]]; then
-              echo "row (a): the shipped path answers its msys pid, held then free"
+              echo "::error::row ($r) measured nothing: ground truth read ${t1[$r]} then ${t2[$r]}"
+              misread=1
+            elif [[ "${g1[$r]}" != 1 || "${g2[$r]}" != "$want2" ]]; then
+              echo "::error::row ($r) misread: gate ${g1[$r]} alive, ${g2[$r]} gone, where 1 then $want2 is owed"
+              misread=1
             else
-              echo "row (a): the shipped path MISREADS its msys pid: gate ${g1[a]} alive, ${g2[a]} gone"
+              echo "row ($r): held then free, as owed"
             fi
+          done
+          dn=0
+          for d in "${!gd1[@]}"; do
+            dn=$((dn + 1))
+            if [[ "${gd1[$d]}" != 2 || "${gd2[$d]}" != 2 ]]; then
+              echo "::error::row (d) $d read ${gd1[$d]} then ${gd2[$d]}, where corrupt (2) is owed"
+              misread=1
+            fi
+          done
+          (( dn == 4 )) || { echo "::error::row (d) wrote $dn of its 4 records"; misread=1; }
+          if [[ "$e_outcome" == gone* ]]; then
+            echo "row (e): a job's process is $e_outcome, so a job is no backgrounding form"
           else
-            echo "row (a): unmeasured, ground truth read ${t1[a]} then ${t2[a]}"
+            echo "::error::row (e): a job's process is $e_outcome, so a job outlives its session"
+            misread=1
           fi
-          echo "row (e): a job's process is $e_outcome"
-          exit 0
+          exit "$misread"
 
       # The suite itself, under one steering that is **measurement scaffolding
       # and not a fix**: run-smoke.sh blocks unless the target roster is exactly

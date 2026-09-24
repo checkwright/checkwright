@@ -315,8 +315,8 @@ pub enum PidProbe {
 }
 
 // spec: evidence-kit/SPEC.md §The producer-liveness lock — the pid grammar, then signal 0: on unix
-// `kill(2)` reads EPERM as held and ESRCH as gone; gate-sdk/SPEC.md §Fail-closed contract owns the
-// per-platform route.
+// `kill(2)` reads EPERM as held and ESRCH as gone; on Windows the native leg asks first and the MSYS
+// legs answer behind it; gate-sdk/SPEC.md §Fail-closed contract owns the per-platform route.
 pub fn pid_alive(pid: &str) -> Result<bool, PidProbe> {
     if pid.is_empty() || pid.starts_with('0') || !pid.bytes().all(|b| b.is_ascii_digit()) {
         return Ok(false);
@@ -346,6 +346,10 @@ fn signal_zero(pid: &str) -> Result<bool, PidProbe> {
 
 #[cfg(not(unix))]
 fn signal_zero(pid: &str) -> Result<bool, PidProbe> {
+    #[cfg(windows)]
+    if windows_pid_held(pid) {
+        return Ok(true);
+    }
     let signalled = crate::proc::run(&programs::BASH, &["-c", "kill -0 \"$1\"", "bash", pid])
         .map_err(PidProbe::Unanswered)?;
     if signalled.code() == Some(0) {
@@ -358,6 +362,43 @@ fn signal_zero(pid: &str) -> Result<bool, PidProbe> {
     }
     let listed = crate::proc::run(&programs::PS, &["-p", pid]).map_err(PidProbe::Unanswered)?;
     Ok(listed.code() == Some(0))
+}
+
+#[cfg(windows)]
+mod kernel32 {
+    pub type Handle = *mut core::ffi::c_void;
+    pub const PROCESS_QUERY_LIMITED_INFORMATION: u32 = 0x1000;
+    pub const STILL_ACTIVE: u32 = 259;
+    pub const ERROR_ACCESS_DENIED: i32 = 5;
+
+    #[link(name = "kernel32")]
+    extern "system" {
+        pub fn OpenProcess(access: u32, inherit: i32, pid: u32) -> Handle;
+        pub fn GetExitCodeProcess(process: Handle, code: *mut u32) -> i32;
+        pub fn CloseHandle(handle: Handle) -> i32;
+    }
+}
+
+// spec: evidence-kit/SPEC.md §The producer-liveness lock — the native leg, run first: a process that
+// opens and has not exited, or whose exit code cannot be read, is held, and so is one the open is
+// denied; any other answer defers to the MSYS legs.
+#[cfg(windows)]
+fn windows_pid_held(pid: &str) -> bool {
+    let Ok(n) = pid.parse::<u32>() else {
+        return false;
+    };
+    // spec: gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency — sound because
+    // the calls take integers, a stack-local out-parameter and a handle this function closes itself
+    unsafe {
+        let handle = kernel32::OpenProcess(kernel32::PROCESS_QUERY_LIMITED_INFORMATION, 0, n);
+        if handle.is_null() {
+            return std::io::Error::last_os_error().raw_os_error() == Some(kernel32::ERROR_ACCESS_DENIED);
+        }
+        let mut code = 0u32;
+        let read = kernel32::GetExitCodeProcess(handle, &mut code);
+        kernel32::CloseHandle(handle);
+        read == 0 || code == kernel32::STILL_ACTIVE
+    }
 }
 
 #[cfg(test)]
@@ -386,5 +427,14 @@ mod tests {
         assert_eq!(state_stage("h\n---\n"), None);
         assert_eq!(state_stage("h\nit close s3 d\n"), None);
         assert_eq!(state_stage("h\n---\nlonely\n"), None);
+    }
+
+    // spec: evidence-kit/SPEC.md §The producer-liveness lock — the native leg answers the Windows
+    // namespace: this process is held and an id no process carries is not
+    #[cfg(windows)]
+    #[test]
+    fn the_native_leg_reads_a_windows_pid() {
+        assert!(windows_pid_held(&std::process::id().to_string()));
+        assert!(!windows_pid_held("2147483646"));
     }
 }
