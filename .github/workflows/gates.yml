@@ -621,8 +621,6 @@ jobs:
           sleep 300 >/dev/null 2>&1 &
           apid=$!
           printf 'pid=%s run=msys\n' "$apid" > "$rec/a.run"
-          tpid[a]="$(tr -d '\r\n' < "/proc/$apid/winpid" 2>/dev/null)"
-          echo "row (a): msys pid $apid, windows pid ${tpid[a]:-<unread>}"
           # shellcheck disable=SC2016 # $PID and the backtick escape are PowerShell's
           write_b='Set-Content -NoNewline -Path %s -Value "pid=$PID run=%s`n"; Start-Sleep 300'
           # shellcheck disable=SC2059 # the format is the PowerShell command template above
@@ -646,6 +644,16 @@ jobs:
             ps_run "$sh" -NoProfile -Command "'pid=${tpid[b]} run=default' > '$rec/d-$sh-redirect.run'" </dev/null
           done
           for f in "$rec"/d-*.run; do echo "$(basename "$f"):"; od -c "$f" | head -n 4; done
+
+          # Read straight after the `&`, the winpid can name the forked stub
+          # that exits once `exec` starts `sleep`, so it is re-read until the
+          # ground truth answers alive for the process that runs.
+          for _ in $(seq 1 10); do
+            tpid[a]="$(tr -d '\r\n' < "/proc/$apid/winpid" 2>/dev/null)"
+            [[ "$(truth "${tpid[a]}")" == alive ]] && break
+            sleep 1
+          done
+          echo "row (a): msys pid $apid, windows pid ${tpid[a]:-<unread>}"
 
           echo "== reading 1, every process running =="
           for r in a b bp c; do
