@@ -12,6 +12,36 @@
 
 ## Deferred
 
+### ps-producer-liveness-record
+
+[cost: event/high] [surface: guard-kit]
+
+a producer backgrounded through the PowerShell tool writes no liveness record, so rule `git_mutation_under_producer` cannot see it. Rule `background_no_record` has no PowerShell form: its corrective would steer to a record carrying a Windows process id, and whether the liveness predicate's non-unix arm (`signal_zero` in `native/src/evidence.rs`: Git Bash `kill -0`, then `ps`) answers one on native Windows is unmeasured. guard-kit/SPEC.md §The hook on native Windows states the limit.
+
+**Deliverable:** that measurement on a Windows runner, then the rule's PowerShell form, or a SPEC boundary note stating why none is buildable.
+
+**Cost while deferred:** on a Windows host a PowerShell-launched producer leaves tracked-tree mutations unguarded for its lifetime. Filed 2026-09-24 to the gap inbox by adopter-onramp's build; promoted 2026-09-24 at its close: →fix fails because the missing fact is a native-Windows observation no Linux command produces. Owner lookup: `background_no_record`, `script_interpreter`, `scratch-run` in this file — none; owner guard-kit/SPEC.md rule `background_no_record` and evidence-kit/SPEC.md §The producer-liveness lock.
+
+### ps-scratch-script-unsteered
+
+[cost: event/high] [surface: guard-kit]
+
+a PowerShell script run off a scratch-dir body (`& .tmp\x.ps1`, `.\.tmp\x.ps1`, `pwsh -File .tmp/x.ps1`) is unsteered. Rule `script_interpreter` has no PowerShell form because its corrective names the `--scratch-run` runner, which echoes and runs a bash body only. guard-kit/SPEC.md §The hook on native Windows states the limit.
+
+**Deliverable:** a `--scratch-run` path for a PowerShell body and the rule's PowerShell form, or a SPEC boundary note refusing one.
+
+**Cost while deferred:** on a Windows host an approved PowerShell script call can run a body rewritten after approval, with no echo at execution. Filed 2026-09-24 to the gap inbox by adopter-onramp's build; promoted 2026-09-24 at its close: →fix fails because the runner arm is new mechanism, a unit rather than a repair. Owner lookup as for [ps-producer-liveness-record](#ps-producer-liveness-record) — none in this file; owner guard-kit/SPEC.md rule `script_interpreter` and its scratch-run runner.
+
+### arm64-pwsh-bootstrap-witness
+
+[cost: event/low] [surface: installer]
+
+`installer/bin/checkwright.ps1`'s `^windows/arm64$` `Get-HostTarget` arm, mapping to `aarch64-pc-windows-msvc`, has no running witness: `install-smoke-pwsh-windows` runs on `windows-latest` only, and no leg runs the PowerShell bootstrap on `windows-11-arm`. Its spelling rests on a local pwsh probe (`Architecture::Arm64` prints `Arm64`; `switch -Regex` is case-insensitive) and `check-install-platforms`' static set.
+
+**Deliverable:** a PowerShell bootstrap leg on the arm64 Windows runner, held on the same roster axis as `install-smoke-sh-windows-arm64`.
+
+**Cost while deferred:** a runtime divergence on a real ARM64 pwsh host surfaces at an adopter, not a run. Filed 2026-09-24 to the gap inbox by adopter-onramp's build; promoted 2026-09-24 at its close: →fix fails because the leg mirrors a several-hundred-line CI job that no local host can run, a unit that costs its own watched rounds. Owner lookup: `windows-11-arm`, `Get-HostTarget`, `install-smoke-pwsh` in this file — only the instrument-leg expiry entry, whose subject is the x64 leg's binding transition.
+
 ### side-effect-free-read-arms
 
 [cost: event/high] [surface: guard-kit]
@@ -1401,13 +1431,5 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 `check-docs-cmd` assertion (C) misses a retired path cited from the queue, which is outside its manifest corpus and whose `<path>:<line>` token fails the path shape.
 
 ## Done
-
-- guard-placeholder-letter-paths
-- guard-powershell-tool-unguarded
-- queue-migrate-bold-split
-- install-hosted-one-liner
-- baseline-suite-coverage-arm-one-directional
-- evidence-baseline-orphan-suite-row
-- gate-binary-platform-roster-holes
 
 ## Lessons Learned

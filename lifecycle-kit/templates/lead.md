@@ -39,11 +39,11 @@ The lead never hand-derives prior-stage completeness — reading WORKFLOW-STATE 
 
 Where the operator rules the audit unwarranted, dispatch the gated stage with `--dispatch <stage> --waive <the ruling>`: the entering session records it, and the dispatch prompt relays it as the operator's direction.
 
-**That read is a step rather than one of two options, and the ground is what it catches.** A would-be refusal naming a predecessor's missing resume journal is relayed while the session that owed it is still at its most likely to be resumable; unrun, the same finding arrives at the next stage's entry, by which time the owing session is usually gone and its reasoning with it. The recoveries that cost a round trip and the losses that cost a whole stage's reasoning are separated by exactly this read, which is one command.
+**That read is a step rather than one of two options, and the ground is what it catches.** A would-be refusal naming a predecessor's missing resume journal is relayed while the session that owed it is still at its most likely to be resumable; unrun, the same finding arrives at the next stage's entry, by which time the owing session is usually gone and its reasoning with it.
 
 **Its limit is stated with it, because a step whose failure mode is unstated reads as a guarantee.** It moves detection from the next stage's entry to just before the next stage's dispatch — earlier by one dispatch and by no more. It does not reach a session that ends between the lead's two reads, and where no lead runs it does not exist at all. The repair that reaches every stage session on every path is the stage template's own close — its successor read and its journal (lifecycle-kit/SPEC.md §templates/stages/); this is the backstop.
 
-**Mandatory is not sufficient.** The step lands *after* the completion notification is in hand, never instead of waiting for it: it composes with the dispatch precondition above and never substitutes for it. A cleared `--simulate` authorizes nothing on its own, which the precondition says in its own words and the next paragraph explains.
+**Mandatory is not sufficient.** The step lands *after* the completion notification is in hand, never instead of waiting for it: it composes with the dispatch precondition above and never substitutes for it. A cleared `--simulate` authorizes nothing on its own.
 
 **That rule and the precondition above answer different questions, and reading them as one makes the pair unusable.** This one is a *gating* rule: *may stage N+1 proceed?* — a question about preconditions the machinery owns, which `--simulate` answers correctly and cheaply and which the lead must not re-derive by hand. The precondition is a *liveness* rule: *is stage N over?* — which no instantaneous read answers at all. `--simulate` keeps its whole job; what it is not is evidence that the prior stage is over.
 
@@ -55,6 +55,7 @@ One qualification, because `--simulate` runs every matching entry-preflight comm
 - **A fix travels as the constraint it must meet**, never as the mechanism. The stage session holds the oracle and finds the mechanism.
 - **A rule travels only to a role it binds.** Before relaying one, read whose role its owning surface names.
 - **Operator answers that seem to conflict go back to the operator as that question**, never reconciled by inference and relayed as their words.
+- **The upward relay too**: before routing a stage escalation to the operator, probe its cheap premises — above all one about the operator's own rulings — and relay what the probe returned.
 
 What the lead rules alone is scope, envelope and priority: the things no gate can decide and no grep can answer.
 
