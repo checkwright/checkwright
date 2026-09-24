@@ -75,6 +75,74 @@ for argv in "--simulate --dispatch validate" "--dispatch validate extra" "--disp
 done
 [[ -e "$sb/scratch/stage-dispatch.txt" ]] && note usage-write "a refused form wrote the marker"
 
+# --- --waive: a cross-component build entry with no align stamp, the waiver declared by the
+# dispatcher and written by the entry that consumes it ---
+seed_waiver() {  # $1=sandbox subdir; the cursor is 'spec', amendments span two component dirs
+    local sb="$1"
+    seed "$sb"
+    printf '# contract: lifecycle-kit/SPEC.md §check-stage-evidence\n\n---\n\ndemo scope aaaaaaaa 2026-06-01 none\ndemo spec bbbbbbbb 2026-06-02 none\n' \
+        >"$sb/.workflow/WORKFLOW-STATE.txt"
+    mkdir -p "$sb/widget-service" "$sb/panel-facade"
+    : >"$sb/widget-service/SPEC.md"; : >"$sb/widget-service/SPEC-foo.md"
+    : >"$sb/panel-facade/SPEC.md"; : >"$sb/panel-facade/SPEC-bar.md"
+}
+sb="$SANDBOX/waive"; seed_waiver "$sb"
+before="$(state_of "$sb")"
+out="$(run_enter "$sb" --dispatch build)"; rc=$?
+[[ "$rc" -eq 1 ]] || note waive-unwaived "want exit 1 for a plain cross-component build dispatch, got $rc -- $out"
+grep -qF -- '--dispatch build --waive' <<<"$out" || note waive-help "assertion C's help does not name the waiver form: $out"
+grep -qF 'scratch/' <<<"$out" && note waive-help-path "a refusal names the scratch candidate state: $out"
+for argv in "--dispatch validate --waive ruled" "--dispatch build --waive" "--dispatch build --waive  "; do
+    # shellcheck disable=SC2086
+    out="$(run_enter "$sb" $argv)"; rc=$?
+    [[ "$rc" -eq 2 ]] || note "waive-usage [$argv]" "want exit 2, got $rc -- $out"
+done
+out="$(run_enter "$sb" --dispatch build --waive "$(printf 'two\nlines')")"; rc=$?
+[[ "$rc" -eq 2 ]] || note waive-newline "want exit 2 for a reason spanning a line break, got $rc -- $out"
+[[ -e "$sb/scratch/stage-dispatch.txt" ]] && note waive-usage-write "a refused --waive form wrote the marker"
+out="$(run_enter "$sb" --dispatch build --waive the operator ruled it)"; rc=$?
+[[ "$rc" -eq 0 ]] || note waive-declare "want exit 0 for a declared waiver, got $rc -- $out"
+[[ "$(cat "$sb/scratch/stage-dispatch.txt" 2>/dev/null)" == "build align-waived the operator ruled it" ]] \
+    || note waive-line "the marker line is not '<stage> <token> <reason>': $(cat "$sb/scratch/stage-dispatch.txt" 2>/dev/null)"
+[[ "$(state_of "$sb")" == "$before" ]] || note waive-declare-state "--dispatch --waive wrote the state file"
+out="$(run_enter "$sb" --dispatch build)"; rc=$?
+[[ "$rc" -eq 0 ]] || note waive-plain-after "a plain build dispatch beside a declared waiver was refused: $rc -- $out"
+out="$(run_enter "$sb" build)"; rc=$?
+[[ "$rc" -eq 0 ]] || note waive-entry "want exit 0 from the waived entry, got $rc -- $out"
+tail -n 2 "$sb/.workflow/WORKFLOW-STATE.txt" | head -n 1 | grep -qE '^demo align-waived deadbeef [0-9-]+ none$' \
+    || note waive-written "the waiver line does not sit immediately before the stamp: $(tail -n 2 "$sb/.workflow/WORKFLOW-STATE.txt")"
+tail -n 1 "$sb/.workflow/WORKFLOW-STATE.txt" | grep -qE '^demo build deadbeef [0-9-]+ none$' \
+    || note waive-stamp "the stamp is not the last line: $(tail -n 1 "$sb/.workflow/WORKFLOW-STATE.txt")"
+grep -qF '  body: align-waived: the operator ruled it' <<<"$out" || note waive-body "the report carries no body: line with the reason: $out"
+[[ "$(cat "$sb/scratch/stage-dispatch.txt" 2>/dev/null)" == "build" ]] \
+    || note waive-prefer "the entry did not consume the waiver-bearing line ahead of the bare one: $(cat "$sb/scratch/stage-dispatch.txt" 2>/dev/null)"
+run_enter "$sb" --dispatch-withdraw build >/dev/null
+[[ -e "$sb/scratch/stage-dispatch.txt" ]] && note waive-withdraw "the withdrawal left the marker on disk"
+run_enter "$sb" --dispatch build --waive a second ruling >/dev/null
+( cd "$sb" && gate_env LIFECYCLE_KIT_KNOB_FILE="$sb/lifecycle-config.knobs" GATE_SDK_TMP_DIR=scratch \
+    LIFECYCLE_KIT_SESSION_ID=cafef00d02 && gate_arm_run --enter-stage build >/dev/null 2>&1 )
+[[ "$(grep -c ' align-waived ' "$sb/.workflow/WORKFLOW-STATE.txt")" -eq 1 ]] \
+    || note waive-once "an iteration already carrying a waiver got a second one"
+
+# --- a refused entry writes neither line and leaves the waiver-bearing marker whole ---
+sb="$SANDBOX/waive-refused"; seed_waiver "$sb"
+run_enter "$sb" --dispatch build --waive ruled >/dev/null
+printf '# contract: lifecycle-kit/SPEC.md §check-stage-evidence\n\n---\n\ndemo spec bbbbbbbb 2026-06-02 none\n' \
+    >"$sb/.workflow/WORKFLOW-STATE.txt"
+before="$(state_of "$sb")"
+out="$(run_enter "$sb" build)"; rc=$?
+[[ "$rc" -eq 1 ]] || note waive-refused "want exit 1 from an entry missing its predecessor, got $rc -- $out"
+[[ "$(state_of "$sb")" == "$before" ]] || note waive-refused-state "a refused entry wrote the state file"
+[[ "$(cat "$sb/scratch/stage-dispatch.txt" 2>/dev/null)" == "build align-waived ruled" ]] \
+    || note waive-refused-marker "a refused entry changed the marker: $(cat "$sb/scratch/stage-dispatch.txt" 2>/dev/null)"
+
+# --- a roster with no audit stage has no waiver token, and --waive is refused ---
+sb="$SANDBOX/waive-none"; seed_waiver "$sb"
+printf 'LIFECYCLE_KIT_AUDIT_STAGE =\n' >"$sb/lifecycle-config.knobs"
+out="$(run_enter "$sb" --dispatch build --waive ruled)"; rc=$?
+[[ "$rc" -eq 2 ]] || note waive-no-token "want exit 2 with no waiver token, got $rc -- $out"
+[[ -e "$sb/scratch/stage-dispatch.txt" ]] && note waive-no-token-write "a refused --waive wrote the marker"
+
 [[ "$fails" -eq 0 ]] || { echo "dispatch-marker.test: $fails assertion(s) failed"; exit 1; }
-echo "dispatch-marker.test: clean (--dispatch declares after a clear pre-flight and never after a refused one, each stamp discharges one line and an emptied marker is removed, --dispatch-withdraw removes one or no-ops, and --simulate, surplus and unknown-stage forms are usage errors writing nothing)"
+echo "dispatch-marker.test: clean (--dispatch declares after a clear pre-flight and never after a refused one, each stamp discharges one line and an emptied marker is removed, --dispatch-withdraw removes one or no-ops, --simulate, surplus and unknown-stage forms are usage errors writing nothing, and --waive declares a waiver the consuming entry writes ahead of its stamp, once per iteration, preferring the waiver-bearing line, refused off the audit entry stage, with no token, or with an empty or multi-line reason, and never written by a refused entry)"
 exit 0

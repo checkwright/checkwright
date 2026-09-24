@@ -55,6 +55,8 @@ struct Cfg {
     survey_record: String,
     lead_journal: String,
     dispatch_marker: String,
+    audit_entry_stage: String,
+    waiver_token: String,
     boundary_truncate: Vec<String>,
     boundary_preserve: Vec<String>,
     boundary_require: Vec<String>,
@@ -90,6 +92,8 @@ fn cfg() -> Result<Cfg, String> {
         survey_record: walk::knob_scalar("LIFECYCLE_KIT_SURVEY_RECORD_FILE")?,
         lead_journal: walk::knob_scalar("LIFECYCLE_KIT_LEAD_JOURNAL_FILE")?,
         dispatch_marker: walk::knob_scalar("LIFECYCLE_KIT_DISPATCH_MARKER_FILE")?,
+        audit_entry_stage: walk::knob_scalar("LIFECYCLE_KIT_AUDIT_ENTRY_STAGE")?,
+        waiver_token: walk::knob_scalar("LIFECYCLE_KIT_WAIVER_TOKEN")?,
         boundary_truncate: walk::knob_array("LIFECYCLE_KIT_BOUNDARY_TRUNCATE")?,
         boundary_preserve: walk::knob_array("LIFECYCLE_KIT_BOUNDARY_PRESERVE")?,
         boundary_require: walk::knob_array("LIFECYCLE_KIT_BOUNDARY_REQUIRE")?,
@@ -148,8 +152,9 @@ fn usage(stages: &[String]) -> String {
          run-gates.sh --enter-stage [--simulate] --rename <name>  (rename the iteration: queue \
          header + column 1 of every stamp)\n       run-gates.sh --enter-stage [--simulate] \
          --open-lead-journal  (open the lead journal under a heading keyed on the cursor)\n       \
-         run-gates.sh --enter-stage --dispatch <stage>  (the lead: pre-flight, then declare a \
-         stage-session dispatch)\n       run-gates.sh --enter-stage --dispatch-withdraw <stage>  \
+         run-gates.sh --enter-stage --dispatch <stage> [--waive <reason…>]  (the dispatcher: \
+         pre-flight, then declare a stage-session dispatch, optionally carrying a user-ruled \
+         audit waiver)\nrun-gates.sh --enter-stage --dispatch-withdraw <stage>  \
          (withdraw a dispatch whose session ended without entering)\n       \
          run-gates.sh --enter-stage [-h|--help]",
         stages.join(" ")
@@ -190,12 +195,13 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
     if rest.first().map(String::as_str) == Some(OPEN_LEAD_JOURNAL) {
         return open_lead_journal(&c, &say, rest);
     }
-    stamp(&c, &say, rest)
+    stamp(&c, &say, rest, None)
 }
 
 const OPEN_LEAD_JOURNAL: &str = "--open-lead-journal";
 const DISPATCH: &str = "--dispatch";
 const DISPATCH_WITHDRAW: &str = "--dispatch-withdraw";
+const WAIVE: &str = "--waive";
 
 fn marker_file(c: &Cfg) -> String {
     format!("{}/{}", c.tmpdir.trim_end_matches('/'), c.dispatch_marker)
@@ -209,7 +215,7 @@ fn discharge_marker(c: &Cfg, stage: &str) -> Result<bool, String> {
         return Ok(false);
     }
     let text = std::fs::read_to_string(&path).map_err(|e| format!("cannot read {}: {}", path, e))?;
-    let Some(kept) = stages::marker_without(&text, stage) else {
+    let Some((kept, _)) = stages::marker_without(&text, stage, &c.waiver_token) else {
         return Ok(false);
     };
     if kept.is_empty() {
@@ -218,6 +224,35 @@ fn discharge_marker(c: &Cfg, stage: &str) -> Result<bool, String> {
         write_file(&path, &format!("{}\n", kept.join("\n")))?;
     }
     Ok(true)
+}
+
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the waiver the entry of `stage` would consume
+// off the marker, read before the stamp so its pre-flight candidate carries it
+fn marker_waiver(c: &Cfg, stage: &str) -> Option<String> {
+    let text = std::fs::read_to_string(marker_file(c)).ok()?;
+    stages::marker_waiver(&text, stage, &c.waiver_token)
+}
+
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — `--waive <reason…>`: the reason is the rest of
+// the argv joined with single spaces; `Err` carries the refusal, exit 2 and nothing written
+fn waive_reason(c: &Cfg, stage: &str, words: &[String]) -> Result<String, String> {
+    if c.waiver_token.is_empty() {
+        return Err("--waive has no waiver token to write — LIFECYCLE_KIT_WAIVER_TOKEN is empty, as it is on a roster with no audit stage".into());
+    }
+    if stage != c.audit_entry_stage {
+        return Err(format!(
+            "--waive declares an audit waiver, which only the entry of '{}' (LIFECYCLE_KIT_AUDIT_ENTRY_STAGE) reads — not '{}'",
+            c.audit_entry_stage, stage
+        ));
+    }
+    let reason = words.join(" ");
+    if reason.contains(['\n', '\r']) {
+        return Err("--waive <reason> spans a line break — the marker holds one declaration per line".into());
+    }
+    if reason.trim().is_empty() {
+        return Err("--waive takes a reason — the ruling the waiver records".into());
+    }
+    Ok(reason.split_whitespace().collect::<Vec<_>>().join(" "))
 }
 
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — --dispatch and --dispatch-withdraw: the lead's
@@ -233,7 +268,8 @@ fn dispatch_form(c: &Cfg, sim: bool, rest: &[String]) -> Result<i32, String> {
         eprintln!("{}", usage(&c.stages));
         return Ok(2);
     }
-    if rest.len() != 2 || rest[1].is_empty() {
+    let waiving = form == DISPATCH && rest.get(2).map(String::as_str) == Some(WAIVE);
+    if (rest.len() != 2 && !waiving) || rest.get(1).map_or(true, |s| s.is_empty()) {
         eprintln!("enter-stage: {} takes exactly one <stage> — nothing written.", form);
         eprintln!("{}", usage(&c.stages));
         return Ok(2);
@@ -264,7 +300,19 @@ fn dispatch_form(c: &Cfg, sim: bool, rest: &[String]) -> Result<i32, String> {
         }
         return Ok(0);
     }
-    let code = stamp(c, &Say { sim: true }, &rest[1..])?;
+    let waiver = if waiving {
+        match waive_reason(c, stage, &rest[3..]) {
+            Ok(r) => Some(r),
+            Err(e) => {
+                eprintln!("enter-stage: {} — nothing written.", e);
+                eprintln!("{}", usage(&c.stages));
+                return Ok(2);
+            }
+        }
+    } else {
+        None
+    };
+    let code = stamp(c, &Say { sim: true }, &rest[1..2], waiver.as_deref())?;
     if code != 0 {
         eprintln!(
             "enter-stage: --dispatch '{}' refused by the pre-flight above — nothing declared.",
@@ -274,7 +322,11 @@ fn dispatch_form(c: &Cfg, sim: bool, rest: &[String]) -> Result<i32, String> {
     }
     std::fs::create_dir_all(&c.tmpdir)
         .map_err(|e| format!("cannot create the scratch dir {}: {}", c.tmpdir, e))?;
-    append_line(&path, stage)?;
+    let line = match &waiver {
+        Some(r) => format!("{} {} {}", stage, c.waiver_token, r),
+        None => stage.to_string(),
+    };
+    append_line(&path, &line)?;
     println!(
         "enter-stage: declared a '{}' stage-session dispatch in {} — the session's own \
          --enter-stage {} discharges it; until then a commit adding no stamp reds \
@@ -282,6 +334,13 @@ fn dispatch_form(c: &Cfg, sim: bool, rest: &[String]) -> Result<i32, String> {
          --dispatch-withdraw {}.",
         stage, path, stage, stage
     );
+    if let Some(r) = &waiver {
+        println!(
+            "  note: the declaration carries an audit waiver ('{}': {}) — that entry records it \
+             ahead of its stamp.",
+            c.waiver_token, r
+        );
+    }
     Ok(0)
 }
 
@@ -635,7 +694,7 @@ fn surplus_refusal(rest: &[String]) -> Option<String> {
     })
 }
 
-fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
+fn stamp(c: &Cfg, say: &Say, rest: &[String], declared: Option<&str>) -> Result<i32, String> {
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — refuse before parsing anything, so the
     // fail-closed rule reaches the argument the tool cannot act on rather than dropping it
     if let Some(msg) = surplus_refusal(rest) {
@@ -723,6 +782,27 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
         }
     }
 
+    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the dispatcher's declared waiver is written
+    // by the entry consuming it, ahead of its stamp, unless the iteration already carries one; a
+    // boundary entry is never an audit entry and records none
+    let waiver = if first {
+        None
+    } else {
+        declared.map(str::to_string).or_else(|| marker_waiver(c, &stage))
+    };
+    let already_waived = stages::data_lines(&state_text).iter().any(|l| {
+        let f: Vec<&str> = l.split_whitespace().collect();
+        f.first() == Some(&stamp_iter.as_str()) && f.get(1) == Some(&c.waiver_token.as_str())
+    });
+    let waiver_line = waiver
+        .as_ref()
+        .filter(|_| !already_waived)
+        .map(|_| format!("{} {} {} {} {}", stamp_iter, c.waiver_token, id, today, head_at));
+    let appended = match &waiver_line {
+        Some(w) => format!("{}\n{}", w, stamp_line),
+        None => stamp_line.clone(),
+    };
+
     let scratch = Scratch::new(&c.tmpdir, "")?;
     let tmpstate = scratch.path("state");
     let tmpqueue = scratch.path("queue");
@@ -745,7 +825,7 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
         if !s.is_empty() && !s.ends_with('\n') {
             s.push('\n');
         }
-        s.push_str(&stamp_line);
+        s.push_str(&appended);
         s.push('\n');
         write_file(&tmpstate, &s)?;
         &c.queue
@@ -1190,6 +1270,13 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
                 valve.used
             ));
         }
+        if let (Some(w), Some(r)) = (&waiver_line, &waiver) {
+            say.out(&format!(
+                "the entry would record the declared audit waiver '{}' ahead of its stamp; its \
+                 reason: {}",
+                w, r
+            ));
+        }
         println!(
             "enter-stage (simulate): entry to '{}' would proceed — no stamp, nothing written.",
             stage
@@ -1216,7 +1303,7 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
         // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the live stamp is an append, never a
         // rewrite of the pre-flight temp copy: a concurrent session's stamp landing between the
         // copy and the write would be lost by a whole-file move
-        append_line(&c.state, &stamp_line)?;
+        append_line(&c.state, &appended)?;
     }
     scratch.clear();
     let discharged = match discharge_marker(c, &stage) {
@@ -1303,8 +1390,24 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
              touches it).",
             stamp_line, stage
         );
+        if let (Some(w), Some(r)) = (&waiver_line, &waiver) {
+            println!(
+                "  note: recorded the dispatcher's audit waiver '{}' ahead of the stamp; its reason: \
+                 {}",
+                w, r
+            );
+        } else if let Some(r) = &waiver {
+            println!(
+                "  note: the consumed declaration carried an audit waiver ({}), and '{}' already \
+                 carries a '{}' line — nothing more recorded.",
+                r, stamp_iter, c.waiver_token
+            );
+        }
         println!("  next: commit {}, hook enabled.", c.state);
         println!("  subject: {}", stages::entry_subject(&stage));
+        if let (Some(_), Some(r)) = (&waiver_line, &waiver) {
+            println!("  body: {}: {}", c.waiver_token, r);
+        }
     }
     if discharged {
         println!(
@@ -2346,6 +2449,8 @@ mod tests {
             survey_record: String::new(),
             lead_journal: "lead-journal.md".into(),
             dispatch_marker: "stage-dispatch.txt".into(),
+            audit_entry_stage: "build".into(),
+            waiver_token: "align-waived".into(),
             boundary_truncate: vec![],
             boundary_preserve: vec![],
             boundary_require: vec![],

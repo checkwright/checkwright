@@ -8,22 +8,6 @@
 
 ## New Features
 
-### split-posture-waiver-writer
-
-[spec: SPEC-waiver-writer.md] [recurrence: 2026-09-23]
-
-an operator-ruled `align-waived` line has no sanctioned writer. lifecycle-kit/SPEC.md §check-stage-entry (C) and the align template record it in `.workflow/WORKFLOW-STATE.txt`, but the workflow-state guard (`native/src/hook/workflow_state.rs`) blocks every Write/Edit of that file, the shell guard blocks a shell append to it as a redirect into a tracked file, and the `--rewrite` arm refuses it (`native/src/emit/rewrite.rs`, `is_state_file`), and `--enter-stage` has no waiver arm. Only an operator-run shell append lands one today.
-
-**Recurred.** Filed 2026-07-19 as the split-lead posture's gap, where the lead rules the waiver but writes no lifecycle state and a build session carried the line as a piggyback; iceboxed at an age eviction. Re-filed 2026-09-23 at this iteration's spec, recording the operator's align waiver, and the piggyback that worked in July is now guard-blocked for every session.
-
-**Folded in, same help line:** `check-stage-entry`'s assertion-C help (`native/src/gates/stage_entry.rs`, the `record a deliberate waiver` line) prints `k.state`, and `--enter-stage` hands the gate a scratch state under `GATE_SDK_TMP_DIR` on a real entry as well as a simulated one (`native/src/emit/enter_stage.rs`, the candidate-stamp temp build). So the relayed recovery names a file that is gone after the run, and so does every other `k.state` line that relay carries. **Probed at the drain:** both sites read.
-
-**Specified 2026-09-24, option (c):** `--enter-stage --dispatch <stage> --waive <reason>` declares the waiver on the marker, and the entry that consumes that line writes the waiver with its stamp. Options (a) and (b) are refused. Every state-file line the gate prints names the configured file.
-
-**Cost while deferred:** each operator-waived align makes someone route around a guard or hand-append, and every assertion-C refusal points its reader at a vanished scratch file. Promoted from the icebox 2026-09-23 at `guard-harness-seams` close on the recurrence. Owner lookup: `waiv`, `align-waived` in this file: only this slug.
-
-**Selected for `silent-guard-gaps` — operator direction 2026-09-24, lead-relayed.** Debt rather than an enhancement: the SPEC names the record and nothing may write it. Rule it before [unstamped-session-tree-edit](#unstamped-session-tree-edit), whose marker-keyed refusal must let a waiver-bearing entry through.
-
 ### unstamped-session-tree-edit
 
 [spec: SPEC-stamp-before-write.md]
@@ -1520,5 +1504,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - enforcement-map-member-owner
 - hook-decline-model-invisible
 - workflow-run-path-unresolved
+- split-posture-waiver-writer
 
 ## Lessons Learned

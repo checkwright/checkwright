@@ -137,25 +137,56 @@ pub fn last_added_stamp_over<'a>(after: &'a str, befores: &[&str], stages: &[Str
         .rfind(|l| !prior.contains(l) && stage_known(stages, stamp_stage(l)))
 }
 
-// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the dispatch marker's lines, one stage each;
-// its writer and check-dispatch-entry read this one spelling
-pub fn marker_lines(text: &str) -> Vec<&str> {
+fn marker_raw(text: &str) -> Vec<&str> {
     text.lines().map(str::trim).filter(|l| !l.is_empty()).collect()
 }
 
+fn marker_stage(line: &str) -> &str {
+    line.split_whitespace().next().unwrap_or("")
+}
+
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — a waiver-bearing line is `<stage>
+// <waiver-token> <reason>`; `Some(reason)` for one, `None` for a bare line or an empty token
+fn marker_reason(line: &str, token: &str) -> Option<String> {
+    let f: Vec<&str> = line.split_whitespace().collect();
+    (!token.is_empty() && f.get(1) == Some(&token)).then(|| f[2..].join(" "))
+}
+
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the stage each marker line names, read off its
+// first field; its writer and check-dispatch-entry read this one spelling
+pub fn marker_lines(text: &str) -> Vec<&str> {
+    marker_raw(text).into_iter().map(marker_stage).collect()
+}
+
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the line a discharge of `stage` removes: a
+// waiver-bearing one before a bare one
+fn marker_pick(lines: &[&str], stage: &str, token: &str) -> Option<usize> {
+    let named = |l: &&str| marker_stage(l) == stage;
+    lines
+        .iter()
+        .position(|l| named(l) && marker_reason(l, token).is_some())
+        .or_else(|| lines.iter().position(named))
+}
+
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the waiver reason the entry of `stage` would
+// consume, read without removing anything
+pub fn marker_waiver(text: &str, stage: &str, token: &str) -> Option<String> {
+    let lines = marker_raw(text);
+    marker_pick(&lines, stage, token).and_then(|at| marker_reason(lines[at], token))
+}
+
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the marker with one line naming `stage`
-// removed; `None` when no line names it
-pub fn marker_without(text: &str, stage: &str) -> Option<Vec<String>> {
-    let lines = marker_lines(text);
-    let at = lines.iter().position(|l| *l == stage)?;
-    Some(
-        lines
-            .iter()
-            .enumerate()
-            .filter(|(i, _)| *i != at)
-            .map(|(_, l)| l.to_string())
-            .collect(),
-    )
+// removed, and that line's waiver reason if it bore one; `None` when no line names it
+pub fn marker_without(text: &str, stage: &str, token: &str) -> Option<(Vec<String>, Option<String>)> {
+    let lines = marker_raw(text);
+    let at = marker_pick(&lines, stage, token)?;
+    let kept = lines
+        .iter()
+        .enumerate()
+        .filter(|(i, _)| *i != at)
+        .map(|(_, l)| l.to_string())
+        .collect();
+    Some((kept, marker_reason(lines[at], token)))
 }
 
 pub fn stamp_stage(line: &str) -> &str {
@@ -243,9 +274,25 @@ mod tests {
     #[test]
     fn a_marker_discharge_removes_exactly_one_line_naming_the_stage() {
         assert_eq!(marker_lines("build\n\n  spec \n"), vec!["build", "spec"]);
-        assert_eq!(marker_without("build\nspec\nbuild\n", "build"), Some(vec!["spec".to_string(), "build".to_string()]));
-        assert_eq!(marker_without("build\n", "build"), Some(Vec::new()));
-        assert_eq!(marker_without("spec\n", "build"), None);
+        assert_eq!(marker_without("build\nspec\nbuild\n", "build", "align-waived"), Some((vec!["spec".to_string(), "build".to_string()], None)));
+        assert_eq!(marker_without("build\n", "build", "align-waived"), Some((Vec::new(), None)));
+        assert_eq!(marker_without("spec\n", "build", "align-waived"), None);
+    }
+
+    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — a waiver-bearing line names its stage in
+    // its first field, a discharge takes it ahead of a bare line naming the same stage, and an
+    // empty token reads every line as bare
+    #[test]
+    fn a_waiver_bearing_line_is_read_by_its_first_field_and_discharged_first() {
+        let m = "build\nbuild align-waived the operator ruled it\nspec\n";
+        assert_eq!(marker_lines(m), vec!["build", "build", "spec"]);
+        assert_eq!(marker_waiver(m, "build", "align-waived").as_deref(), Some("the operator ruled it"));
+        assert_eq!(marker_waiver(m, "spec", "align-waived"), None);
+        assert_eq!(
+            marker_without(m, "build", "align-waived"),
+            Some((vec!["build".to_string(), "spec".to_string()], Some("the operator ruled it".to_string())))
+        );
+        assert_eq!(marker_waiver(m, "build", ""), None);
     }
 
     // spec: lifecycle-kit/SPEC.md §The state machine — the start is the *first* stamp's head, never

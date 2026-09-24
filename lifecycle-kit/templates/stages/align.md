@@ -6,7 +6,7 @@ The `align` (spec-alignment) stage of an iteration. Cross-spec audit, then *<con
 
 Run `align` only when one fires: (1) phase start, before the first implementation task; (2) a multi-component spec ambiguity surfaces during build; (3) this iteration's **authoring stage** (scope by default, or the dedicated authoring stage where the roster splits one out) authored an amendment changing ≥2 components' contracts. None firing → the prior stage advances directly to `build` (align skipped; the advance still needs user approval per the stage-line rule). The arriving stage stamps its own entry as its first step (above).
 
-Trigger 3 is mechanized at build entry: `check-stage-entry` assertion C blocks the build entry when the on-disk amendments carry a cross-component signal and no `<iter> align` stamp exists. To skip the audit anyway, the user must explicitly rule it unwarranted and a `<iter> align-waived <session> <date> <head>` line is recorded in `.workflow/WORKFLOW-STATE.txt` — never self-issued by the entering build session (lifecycle-kit/SPEC.md §check-stage-entry).
+Trigger 3 is mechanized at build entry: `check-stage-entry` assertion C blocks the build entry when the on-disk amendments carry a cross-component signal and no `<iter> align` stamp exists. To skip the audit anyway, the user must explicitly rule it unwarranted. The dispatcher then declares the waiver with `--enter-stage --dispatch <stage> --waive <the ruling>`, and the build session's own entry records it. The entering build session never issues it (lifecycle-kit/SPEC.md §check-stage-entry).
 
 ## Session ritual
 

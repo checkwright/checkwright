@@ -84,6 +84,10 @@ fn stamp_present(text: &str, iter: &str, stage: &str) -> bool {
 struct Knobs {
     queue: String,
     state: String,
+    // spec: lifecycle-kit/SPEC.md §check-stage-entry — the file a finding or help line names: the
+    // configured state file, never the positional, which under --enter-stage is a scratch
+    // candidate the run deletes
+    state_name: String,
     stage_set: Vec<String>,
     predecessor: Vec<(String, String)>,
     drain: String,
@@ -100,6 +104,7 @@ fn knobs(args: &[String]) -> Result<Knobs, String> {
     Ok(Knobs {
         queue: knob_or(args, 0, "LIFECYCLE_KIT_QUEUE_FILE")?,
         state: knob_or(args, 1, "LIFECYCLE_KIT_STATE_FILE")?,
+        state_name: walk::knob_scalar("LIFECYCLE_KIT_STATE_FILE")?,
         stage_set: stages::stages()?,
         predecessor: walk::knob_map("LIFECYCLE_KIT_PREDECESSOR")?,
         drain: walk::knob_scalar("LIFECYCLE_KIT_DRAIN_STAGE")?,
@@ -428,7 +433,7 @@ pub fn run(args: &[String]) -> i32 {
     if stage.is_empty() {
         println!(
             "STAGE-ENTRY: could not parse the entered stage — no stamp line in {}",
-            k.state
+            k.state_name
         );
         println!("  help: the entered stage is the last '<iter> <stage> <session-id> <YYYY-MM-DD> <head>' stamp; run the stage skill (it stamps as its first step)");
         return 1;
@@ -441,7 +446,7 @@ pub fn run(args: &[String]) -> i32 {
         );
         println!(
             "  help: the last stamp in {} must name one of the configured lifecycle stages",
-            k.state
+            k.state_name
         );
         return 1;
     }
@@ -454,7 +459,7 @@ pub fn run(args: &[String]) -> i32 {
     if !pred.is_empty() && !stamp_present(&stext, &iter, &pred) {
         errors.push(format!(
             "entering '{}' but no '{} {}' stamp in {} — the mandatory predecessor stage was never invoked (run /{}, or correct the entry stamp)",
-            stage, iter, pred, k.state, pred
+            stage, iter, pred, k.state_name, pred
         ));
     }
 
@@ -625,9 +630,9 @@ pub fn run(args: &[String]) -> i32 {
             println!("  {}", e);
         }
         if c_fired {
-            println!("  help: a cross-component {} entry must run /{} (stamps '{} {} <session> <date> <head>'), or — on an explicit user ruling, never self-issued by the entering session — record a deliberate waiver line '{} {} <session> <date> <head>' in {}", k.audit_entry_stage, k.audit_stage, iter, k.audit_stage, iter, k.waiver, k.state);
+            println!("  help: a cross-component {} entry must run /{} (stamps '{} {} <session> <date> <head>'), or — on an explicit user ruling, never self-issued by the entering session — the dispatcher declares the waiver with '--enter-stage --dispatch {} --waive <the ruling>' and this entry then records its '{} {} <session> <date> <head>' line in {}", k.audit_entry_stage, k.audit_stage, iter, k.audit_stage, k.audit_entry_stage, iter, k.waiver, k.state_name);
         } else if ab_fired {
-            println!("  help: a stage entry re-verifies the prior stage's static exit — invoke the predecessor skill (it stamps {}) and drain the active queue before entering {}", k.state, k.drain);
+            println!("  help: a stage entry re-verifies the prior stage's static exit — invoke the predecessor skill (it stamps {}) and drain the active queue before entering {}", k.state_name, k.drain);
         }
         if d_fired {
             println!("  help: at the stage the refused entry leaves the cursor at, run each marker's command, correct the passage or entry to what it returned and delete the marker — or rewrite it to '{} <claim> — <reason>' where the claim's subject does not exist until {}", CANNOT_RUN, k.audit_entry_stage);
