@@ -46,7 +46,7 @@ Every other rule stays Bash-only, and each class has its own ground:
 - **`body`.** The `k`th here-string's content.
 - **The harness view.** The identity. No wrapper strip is documented for the PowerShell matcher, and no rule that applies to PowerShell reads this view.
 
-**The placeholders.** The reader spells its placeholders through the same constants `bash.rs` uses, so it keeps whichever placeholder contract the bash reader has. Which one that is depends on the sibling unit `guard-placeholder-letter-paths` (SPEC-placeholder-mark.md):
+**The placeholders.** The reader spells its placeholders through the same constants `bash.rs` uses, so it keeps whichever placeholder contract the bash reader has. Which one that is depends on the sibling unit `guard-placeholder-letter-paths` (merged into guard-kit/SPEC.md §The reader and its views):
 
 - **Landed first, or ahead of this unit in the same batch,** which is the lead's stated order: the NUL-led marks, with the control-byte refusal covering PowerShell commands as well.
 - **Not landed:** the bare letters, carrying that unit's defect into this reader until it lands. Nothing in this unit needs re-editing when it does.
@@ -216,7 +216,7 @@ Roster from `git grep -n "PreToolUse(Bash)\|Bash\` matcher\|honest limit: the ha
 - [ ] **Causal completeness.** Every point of canon-kit/SPEC.md §The causal-completeness check holds for the reader, the log line and the shells clause.
 - [ ] **Instruction surfaces: instruction only.** The `settings-hooks.json` comment and the close-triage sentence carry no grounds.
 - [ ] **Merged with no information lost.** Each SPEC edit re-phrases the passage it refines, and the ruling's grounds land in the item-grammar paragraph.
-- [ ] **Amendment deleted.** This file is removed on merge (`ls guard-kit/SPEC-*.md`), and SPEC-placeholder-mark.md's filename citation of it is repointed if that file is still on disk.
+- [ ] **Amendment deleted.** This file is removed on merge (`ls guard-kit/SPEC-*.md`), the sibling placeholder-mark amendment that cited it by filename having merged already.
 - [ ] **Entry moved.** `guard-powershell-tool-unguarded` moves to Done in the merge commit, at a stage before the drain stage.
 - [ ] **Removals propagated.** Not reached.
 - [x] **Gaps filed at spec.** The two gaps of delta 7.

@@ -14,11 +14,7 @@ BIN="$(cd "$(dirname "$BIN")" && pwd -P)/$(basename "$BIN")"
 
 fails=0
 checks=0
-# spec: guard-kit/SPEC.md §The generic ruleset — a value carrying the letters SQ or DQ reads as a
-# skeleton placeholder, so a random scratch name that spells one is drawn again
-until tmp="$(cd "$(mktemp -d)" && pwd -P)"; [[ "$tmp" != *SQ* && "$tmp" != *DQ* ]]; do
-    rm -rf "$tmp"
-done
+tmp="$(cd "$(mktemp -d)" && pwd -P)"
 trap 'rm -rf "$tmp"' EXIT
 mkdir -p "$tmp/cwd"
 git -C "$tmp/cwd" init -q
@@ -173,9 +169,19 @@ eq "view-body-usage" "$?" 2
 payload x | "$BIN" --guard-json view dq >/dev/null 2>&1
 eq "view-unknown-usage" "$?" 2
 
+# --- a raw control byte could forge the reader's own marks: the member blocks naming it, before any
+#     rule and with no fall-through, and view prints nothing
+forged='{"tool_name":"Bash","tool_input":{"command":"make build \u0001 x"}}'
+eq "control-byte-status" "$(member "$tmp/none.knobs" "$forged")" 2
+has "control-byte-named" "$tmp/err" "0x01"
+has "control-byte-escape" "$tmp/err" "printf '\\x01'"
+checks=$((checks + 1))
+[[ ! -e "$tmp/friction.log" ]] || fail "control-byte-no-fallthrough" "a fall-through was logged: $(cat "$tmp/friction.log")"
+eq "control-byte-view" "$(printf '%s' "$forged" | "$BIN" --guard-json view sq dq hd | wc -c | tr -d ' ')" 0
+
 if [[ "$fails" -gt 0 ]]; then
     echo "consumer-rules.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "consumer-rules.test: ok ($checks assertions; the consumer command reads the payload bytes as received with the working directory and environment inherited, a block and a decision are relayed verbatim ahead of the generic ruleset, an empty result falls through to it, a fault — non-zero-non-2 exit, unparseable or non-object stdout, a command that cannot start — rides the ruleset's own answer and never silences it, an empty knob runs no stage; --guard-json field reads bytes verbatim and view prints the named view through the tool's reader, nothing for a tool no reader serves)"
+echo "consumer-rules.test: ok ($checks assertions; the consumer command reads the payload bytes as received with the working directory and environment inherited, a block and a decision are relayed verbatim ahead of the generic ruleset, an empty result falls through to it, a fault — non-zero-non-2 exit, unparseable or non-object stdout, a command that cannot start — rides the ruleset's own answer and never silences it, an empty knob runs no stage; --guard-json field reads bytes verbatim and view prints the named view through the tool's reader, nothing for a tool no reader serves; a raw control byte is blocked by name before any rule)"
 exit 0

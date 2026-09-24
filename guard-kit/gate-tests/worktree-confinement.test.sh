@@ -7,11 +7,7 @@ BIN="$GATE_SDK_NATIVE_BIN"
 [[ -x "$BIN" ]] || { echo "worktree-confinement.test: the gate binary $BIN is absent — build it first"; exit 2; }
 BIN="$(cd "$(dirname "$BIN")" && pwd -P)/$(basename "$BIN")"
 
-# spec: guard-kit/SPEC.md §The generic ruleset — a path carrying the letters SQ or DQ reads as a
-# skeleton placeholder, so a random sandbox name that spells one is drawn again
-until SANDBOX="$(cd "$(mktemp -d)" && pwd -P)"; [[ "$SANDBOX" != *SQ* && "$SANDBOX" != *DQ* ]]; do
-    rm -rf "$SANDBOX"
-done
+SANDBOX="$(cd "$(mktemp -d)" && pwd -P)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
 fails=0

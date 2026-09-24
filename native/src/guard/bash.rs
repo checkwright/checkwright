@@ -1,7 +1,7 @@
 // spec: guard-kit/SPEC.md §The shell guard — the bash reader: the one holder of the normalizer,
 // the splitters, the redirect scan and the harness view, which the rules, the `scan-prompts` ranker
 // and `--emit-compare-settings-allow` all call.
-use super::reader::{Reader, View};
+use super::reader::{Reader, View, DQ_MARK, HD_MARK, SQ_MARK};
 use super::text::{self, is_space, trim_start};
 use crate::ere::EreError;
 
@@ -94,8 +94,9 @@ fn split_on(cmd: &str, seps: &[&[u8]]) -> Vec<String> {
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — the heredoc opener as the terminator scan reads it,
-// which matches from any `<` and so also finds the `<<` a herestring's second `<` begins.
-const TERM_RE_SRC: &str = "<<-?[[:space:]]*(\"[^\"]*\"|'[^']*'|[A-Za-z_][A-Za-z0-9_]*)";
+// which matches from any `<` and so also finds the `<<` a herestring's second `<` begins; a
+// placeholder there is a word, so a quoted herestring opens one as a bare-word herestring does.
+const TERM_RE_SRC: &str = "<<-?[[:space:]]*(\"[^\"]*\"|'[^']*'|\u{0}?[A-Za-z_][A-Za-z0-9_]*)";
 
 pub fn heredoc_terms(line: &str) -> Vec<String> {
     text::grep_o(TERM_RE_SRC, line)
@@ -125,7 +126,7 @@ pub fn residue_statements(s: &str) -> Vec<String> {
         let mut residue = String::new();
         for t in heredoc_terms(line) {
             let mut next = at(i);
-            if trim_start(next) == "HD" {
+            if trim_start(next) == HD_MARK {
                 residue.push('\n');
                 residue.push_str(next);
                 i += 1;
@@ -392,7 +393,7 @@ fn scan(cmd: &str, w: Wants) -> Scanned {
                         span.push(b'\'');
                         i += k + 1;
                         if w.sq {
-                            out.extend_from_slice(b"SQ");
+                            out.extend_from_slice(SQ_MARK.as_bytes());
                         } else {
                             out.extend_from_slice(&span);
                         }
@@ -420,7 +421,7 @@ fn scan(cmd: &str, w: Wants) -> Scanned {
                 span.push(b'"');
                 i += 1;
                 if w.dq {
-                    out.extend_from_slice(b"DQ");
+                    out.extend_from_slice(DQ_MARK.as_bytes());
                 } else {
                     out.extend_from_slice(&span);
                 }
@@ -495,7 +496,8 @@ fn scan(cmd: &str, w: Wants) -> Scanned {
                 bodies.push(String::from_utf8_lossy(&body).into_owned());
                 if !body.is_empty() {
                     if w.hd || (w.hdq && quoted) {
-                        out.extend_from_slice(b"HD\n");
+                        out.extend_from_slice(HD_MARK.as_bytes());
+                        out.push(b'\n');
                     } else {
                         out.extend_from_slice(&body);
                     }
@@ -560,14 +562,14 @@ pub fn dequoted(raw: &str) -> Option<String> {
         }
         let span: Vec<u8>;
         if c == b'\'' {
-            if at(s, i, 2) != b"SQ" {
+            if at(s, i, SQ_MARK.len()) != SQ_MARK.as_bytes() {
                 return None;
             }
             let k = r[j + 1..].iter().position(|&c| c == b'\'')?;
             span = r[j + 1..j + 1 + k].to_vec();
             j += k + 2;
         } else {
-            if at(s, i, 2) != b"DQ" {
+            if at(s, i, DQ_MARK.len()) != DQ_MARK.as_bytes() {
                 return None;
             }
             let mut k = j + 1;
@@ -588,7 +590,7 @@ pub fn dequoted(raw: &str) -> Option<String> {
             span = acc;
             j = k + 1;
         }
-        i += 2;
+        i += DQ_MARK.len();
         if span.contains(&b'\n') {
             return None;
         }
@@ -645,11 +647,22 @@ mod tests {
     // spec: guard-kit/SPEC.md §The shell guard — placeholder, never deletion
     #[test]
     fn the_skeleton_substitutes_the_inert_spans_and_leaves_the_rest_byte_identical() {
-        assert_eq!(skeleton("echo 'a;b' && ls", SQDQ), "echo SQ && ls");
-        assert_eq!(skeleton("echo \"a && b\" | wc -l", SQDQ), "echo DQ | wc -l");
+        assert_eq!(skeleton("echo 'a;b' && ls", SQDQ), format!("echo {SQ_MARK} && ls"));
+        assert_eq!(skeleton("echo \"a && b\" | wc -l", SQDQ), format!("echo {DQ_MARK} | wc -l"));
         assert_eq!(skeleton("echo 'a;b' && ls", Wants::default()), "echo 'a;b' && ls");
-        assert_eq!(skeleton("grep -oE \"a\\\"b\" file", SQDQ), "grep -oE DQ file");
+        assert_eq!(skeleton("grep -oE \"a\\\"b\" file", SQDQ), format!("grep -oE {DQ_MARK} file"));
         assert_eq!(skeleton("echo 'unterminated", SQDQ), "echo 'unterminated");
+    }
+
+    // spec: guard-kit/SPEC.md §The reader and its views — command text that spells a placeholder's
+    // letters is read as written, and only a real span carries the mark
+    #[test]
+    fn the_placeholder_letters_in_command_text_are_not_a_placeholder() {
+        let s = skeleton("cmd > .tmp/DQ.log 'SQ' HD", HD);
+        assert_eq!(s, format!("cmd > .tmp/DQ.log {SQ_MARK} HD"));
+        assert_eq!(s.matches('\0').count(), 1);
+        assert_eq!(dequoted("echo DQ 'a b'").as_deref(), Some("echo DQ a\x01b"));
+        assert_eq!(heredoc_terms(&format!("cat <<<{DQ_MARK}")), vec![DQ_MARK]);
     }
 
     // spec: guard-kit/SPEC.md §The shell guard — an opener with no line after it has no body
@@ -667,7 +680,7 @@ mod tests {
         ] {
             assert_eq!(skeleton(c, HD), c, "opener {:?} did not survive", c);
         }
-        assert_eq!(skeleton("cat <<<\"here string\"", HD), "cat <<<DQ");
+        assert_eq!(skeleton("cat <<<\"here string\"", HD), format!("cat <<<{DQ_MARK}"));
     }
 
     // spec: guard-kit/SPEC.md §The shell guard — the body runs to its terminator line, which
@@ -675,13 +688,13 @@ mod tests {
     #[test]
     fn a_heredoc_body_is_blanked_by_its_class_and_the_terminator_stays_live() {
         let c = "python3 - <<'PY'\nprint('a;b' | c)\nPY\nls";
-        assert_eq!(skeleton(c, HD), "python3 - <<'PY'\nHD\nPY\nls");
-        assert_eq!(skeleton(c, HDQ), "python3 - <<'PY'\nHD\nPY\nls");
+        assert_eq!(skeleton(c, HD), format!("python3 - <<'PY'\n{HD_MARK}\nPY\nls"));
+        assert_eq!(skeleton(c, HDQ), format!("python3 - <<'PY'\n{HD_MARK}\nPY\nls"));
         assert_eq!(skeleton(c, SQDQ), "python3 - <<'PY'\nprint('a;b' | c)\nPY\nls");
         assert_eq!(skeleton("cat <<EOF\n$HOME\nEOF", HDQ), "cat <<EOF\n$HOME\nEOF");
-        assert_eq!(skeleton("cat <<-EOF\nx\n\tEOF", HD), "cat <<-EOF\nHD\n\tEOF");
-        assert_eq!(skeleton("a <<A <<B\n1\nA\n2\nB", HD), "a <<A <<B\nHD\nA\nHD\nB");
-        assert_eq!(skeleton("cat <<EOF\nnever ends", HD), "cat <<EOF\nHD\n");
+        assert_eq!(skeleton("cat <<-EOF\nx\n\tEOF", HD), format!("cat <<-EOF\n{HD_MARK}\n\tEOF"));
+        assert_eq!(skeleton("a <<A <<B\n1\nA\n2\nB", HD), format!("a <<A <<B\n{HD_MARK}\nA\n{HD_MARK}\nB"));
+        assert_eq!(skeleton("cat <<EOF\nnever ends", HD), format!("cat <<EOF\n{HD_MARK}\n"));
         assert_eq!(skeleton("cat <<EOF\nnever ends", SQDQ), "cat <<EOF\nnever ends\n");
         assert_eq!(skeleton("cat <<EOF\nEOF", HD), "cat <<EOF\nEOF");
         assert_eq!(Bash.body("a <<A <<B\n1\nA\n2\n3\nB", 2), "2\n3");
@@ -747,8 +760,8 @@ mod tests {
         assert_eq!(heredoc_terms("cat <<'EOF' >> f"), vec!["EOF"]);
         assert_eq!(heredoc_terms("cat <<<\"x\""), vec!["x"]);
         assert_eq!(
-            residue_statements("cat <<'EOF' >> f; ls\nHD\nEOF"),
-            vec!["cat <<'EOF' >> f\nHD\nEOF", " ls"]
+            residue_statements(&format!("cat <<'EOF' >> f; ls\n{HD_MARK}\nEOF")),
+            vec![format!("cat <<'EOF' >> f\n{HD_MARK}\nEOF"), " ls".to_string()]
         );
         assert_eq!(residue_statements("a && b\n\nc"), vec!["a ", " b", "c"]);
     }

@@ -10,6 +10,7 @@ use super::{
 use crate::guard::allow_match;
 use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Verdict};
 use crate::guard::reader::View::{Sq, SqDqHd};
+use crate::guard::reader::{DQ_MARK, SQ_MARK};
 use crate::guard::text::{self, grep_q, head_word, trim, trim_start, unsentinel, words};
 
 pub fn git_mutation_under_producer(ctx: &Ctx) -> Decided {
@@ -166,7 +167,7 @@ fn loop_parts(view: &str) -> Option<(String, String, String)> {
 
 // spec: guard-kit/SPEC.md §The generic ruleset — the recorded launch's tail after its `&`:
 // ` echo <quoted> > <path>; wait[; rm -f <path>]`, the quoted record either the literal
-// `"pid=$! run=<key>"` or its `DQ` placeholder. The key, the record path and the removed path.
+// `"pid=$! run=<key>"` or its `dq` placeholder. The key, the record path and the removed path.
 fn launch_tail(t: &str, placeholder: bool) -> Option<(String, String, String)> {
     let b = t.as_bytes();
     let mut i = 0usize;
@@ -206,7 +207,7 @@ fn launch_tail(t: &str, placeholder: bool) -> Option<(String, String, String)> {
         return None;
     }
     let key = if placeholder {
-        if !lit(&mut i, "DQ") {
+        if !lit(&mut i, DQ_MARK) {
             return None;
         }
         String::new()
@@ -335,7 +336,7 @@ fn recorded_launch(ctx: &Ctx) -> Result<bool, Fault> {
         if inert_target(tgt) {
             continue;
         }
-        if tgt.contains("SQ") || tgt.contains("DQ") {
+        if tgt.contains(SQ_MARK) || tgt.contains(DQ_MARK) {
             return Ok(false);
         }
         targets.push(tgt.to_string());

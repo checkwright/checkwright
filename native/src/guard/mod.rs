@@ -105,13 +105,16 @@ fn context_key(context: Option<&str>) -> String {
     context.map_or(String::new(), |c| format!(r#","additionalContext":{}"#, crate::hook::quote(c)))
 }
 
-// spec: guard-kit/SPEC.md §Consumer rules — `--guard-json view`: the named view of the payload's
-// command through the reader its tool selects; nothing for a tool no reader serves, a payload that
-// does not parse, or a command a dequoted view cannot be aligned with.
+// spec: guard-kit/SPEC.md §Consumer rules — `--guard-json view`: nothing for each case that section
+// lists, or for a dequoted view the skeleton cannot be aligned with.
 pub fn json_view(payload: Option<&serde_json::Value>, view: reader::View) -> Option<String> {
     let p = payload?;
     let (reader, _) = reader_for(p.get("tool_name")?.as_str()?)?;
-    reader.view(command_of(p)?, view)
+    let cmd = command_of(p)?;
+    if reader::control_byte(cmd).is_some() {
+        return None;
+    }
+    reader.view(cmd, view).map(|v| reader::unmark(&v))
 }
 
 // spec: guard-kit/SPEC.md §The shell guard — `--guard-json <mode> [<arg>…]`, the reads and
@@ -216,6 +219,20 @@ mod tests {
         let empty = doc(r#"{"tool_name":"Bash","tool_input":{"command":"\n"}}"#);
         assert_eq!(json_view(Some(&empty), reader::View::Raw), None);
         assert_eq!(json_view(None, reader::View::Raw), None);
+        let forged = doc(r#"{"tool_name":"Bash","tool_input":{"command":"echo \u0001 'x'"}}"#);
+        assert_eq!(json_view(Some(&forged), reader::View::Raw), None);
+        assert_eq!(json_view(Some(&forged), reader::View::SqDqHd), None);
+    }
+
+    // spec: guard-kit/SPEC.md §The shell guard — every C0 byte but tab, line feed and carriage return
+    // is refused, and the refusal names the first one
+    #[test]
+    fn a_control_byte_is_found_and_the_whitespace_controls_are_not() {
+        assert_eq!(reader::control_byte("a\tb\r\nc"), None);
+        assert_eq!(reader::control_byte("a\u{0}SQ"), Some(0));
+        assert_eq!(reader::control_byte("a\u{1f}b\u{1}"), Some(0x1f));
+        assert_eq!(reader::control_byte("a\u{7f}"), None);
+        assert_eq!(reader::unmark(&format!("x {} y", reader::DQ_MARK)), "x DQ y");
     }
 
     // spec: guard-kit/SPEC.md §The generic ruleset — every view reads back from its own spelling

@@ -299,7 +299,7 @@ pub fn ranking_key(line: &str) -> String {
         key.push(' ');
         key.push_str(op);
     }
-    key
+    guard::reader::unmark(&key)
 }
 
 // spec: guard-kit/SPEC.md §scan-prompts — the three-way split's whole result: the prompting share,
@@ -547,6 +547,7 @@ mod tests {
         assert_eq!(ranking_key("sudo timeout 30 git log"), "sudo");
         assert_eq!(ranking_key("timeout 30 git log"), "git log");
         assert_eq!(ranking_key("time -p nice -n 5 git log --oneline"), "git log");
+        assert_eq!(ranking_key("git \"log\" -1"), "git DQ", "a placeholder keys as its two letters");
     }
 
     // spec: guard-kit/SPEC.md §scan-prompts — the grant test reads the harness view: a stripped

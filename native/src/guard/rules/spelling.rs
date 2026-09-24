@@ -5,6 +5,7 @@ use super::{command_word, git_subcommand, GitWalk};
 use crate::guard::engine::{Cmd, Ctx, Decided, Verdict};
 use crate::guard::host::{knob_scalar_value, same_file};
 use crate::guard::reader::View::{SqDqHd, SqDqHdq, SqHdq};
+use crate::guard::reader::{DQ_MARK, SQ_MARK};
 use crate::guard::text::{grep_q, head_word, trim, trim_end, trim_start, words};
 
 fn block(m: impl Into<String>) -> Decided {
@@ -95,7 +96,7 @@ fn knob_echo(raw: &str, seg: &str) -> Option<Verdict> {
     }
     for w0 in &asg {
         let (name, val) = w0.split_once('=').unwrap_or((w0, ""));
-        if ["SQ", "DQ", "$", "`", "\\"].iter().any(|n| val.contains(n)) {
+        if [SQ_MARK, DQ_MARK, "$", "`", "\\"].iter().any(|n| val.contains(n)) {
             continue;
         }
         let Some(resolved) = knob_scalar_value(name) else { continue };

@@ -3,6 +3,7 @@
 // nothing decided is logged.
 use crate::guard::engine::{self, Cmd, Verdict};
 use crate::guard::host::{self, Host};
+use crate::guard::reader;
 use crate::hook::{self, Payload};
 use crate::{proc, programs};
 use serde_json::Value;
@@ -44,6 +45,9 @@ pub fn run(payload: &Payload) -> i32 {
     let (Some((reader, shell)), Some(cmd)) = (selected, crate::guard::command_of(p)) else {
         return fault.map_or(0, hook::advise);
     };
+    if let Some(c) = reader::control_byte(cmd) {
+        return control_byte_block(c, fault);
+    }
     let background = matches!(
         p.pointer("/tool_input/run_in_background"),
         Some(Value::Bool(true))
@@ -52,7 +56,13 @@ pub fn run(payload: &Payload) -> i32 {
         Ok(h) => h,
         Err(e) => return refused(&e),
     };
-    match engine::decide(reader, shell, &host, &Cmd::new(cmd)) {
+    let verdict = engine::decide(reader, shell, &host, &Cmd::new(cmd)).map(|v| match v {
+        Verdict::Block(m) => Verdict::Block(reader::unmark(&m)),
+        Verdict::Advise(m) => Verdict::Advise(reader::unmark(&m)),
+        Verdict::Allow(r) => Verdict::Allow(reader::unmark(&r)),
+        Verdict::Rewrite(c, r) => Verdict::Rewrite(reader::unmark(&c), reader::unmark(&r)),
+    });
+    match verdict {
         Some(Verdict::Block(m)) => {
             let code = hook::block(NAME, &m);
             if let Some(f) = fault {
@@ -83,6 +93,19 @@ fn refused(e: &str) -> i32 {
         NAME,
         &format!("guard-kit could not read its knobs, so no command runs until the config is repaired — {}. Repair the file with the Edit tool, which this guard does not intercept.", e),
     )
+}
+
+// spec: guard-kit/SPEC.md §The shell guard — a raw control byte could forge one of the reader's own
+// marks, so the command is refused before any rule reads it.
+fn control_byte_block(c: u8, fault: Option<&str>) -> i32 {
+    let code = hook::block(
+        NAME,
+        &format!("this command carries the raw control byte 0x{:02x}, which no shell needs and which could forge the guard's own marks, so no rule reads it — write the byte as an escape the shell expands (printf '\\x{:02x}'), or remove it.", c, c),
+    );
+    if let Some(f) = fault {
+        eprintln!("{}: {}", NAME, f);
+    }
+    code
 }
 
 // spec: guard-kit/SPEC.md §Consumer rules — the harness's own hook protocol, spoken by the consumer's

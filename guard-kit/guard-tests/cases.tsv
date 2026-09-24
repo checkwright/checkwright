@@ -355,6 +355,10 @@ fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done; sort -o out.txt
 # trailing retraction
 allow	bash scripts/check-foo.sh > .tmp/foo.log 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run
 allow	scripts/check-foo.sh --all > .tmp/foo.log & echo "pid=$! run=foo" > .tmp/foo.run; wait
+# a target spelling a placeholder's letters is read as written; a quoted target is a real
+# placeholder, whose path the grant never read
+allow	bash scripts/check-foo.sh > .tmp/DQ.log 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run
+fallthrough	bash scripts/check-foo.sh > ".tmp/foo.log" 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run
 # (B0) the shape: a record whose filename does not carry its key, and no wait
 fallthrough	bash scripts/check-foo.sh > .tmp/foo.log 2>&1 & echo "pid=$! run=foo" > .tmp/bar.run; wait
 fallthrough	bash scripts/check-foo.sh > .tmp/foo.log 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run

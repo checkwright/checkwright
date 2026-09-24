@@ -47,6 +47,24 @@ impl View {
     }
 }
 
+// spec: guard-kit/SPEC.md §The reader and its views — the skeleton's placeholders: NUL, then the
+// class's two letters. Every reader emits these and every rule tests these, never the bare letters.
+pub const SQ_MARK: &str = "\0SQ";
+pub const DQ_MARK: &str = "\0DQ";
+pub const HD_MARK: &str = "\0HD";
+
+// spec: guard-kit/SPEC.md §The reader and its views — a skeleton-derived string as it leaves the
+// process: each placeholder prints as its two letters.
+pub fn unmark(s: &str) -> String {
+    s.replace('\0', "")
+}
+
+// spec: guard-kit/SPEC.md §The shell guard — the first C0 control byte a command carries other than
+// tab, line feed and carriage return; such a command is blocked before any rule reads it.
+pub fn control_byte(s: &str) -> Option<u8> {
+    s.bytes().find(|&c| c < 0x20 && !matches!(c, b'\t' | b'\n' | b'\r'))
+}
+
 pub trait Reader {
     // spec: guard-kit/SPEC.md §The shell guard — a view of `text`; `None` only for a dequoted view
     // the skeleton cannot be aligned with. A skeleton never ends in a newline.

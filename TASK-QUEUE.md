@@ -8,18 +8,6 @@
 
 ## New Features
 
-### guard-placeholder-letter-paths
-
-[spec: SPEC-placeholder-mark.md]
-
-the shell-guard member reads the literal letters `SQ` or `DQ` in a redirect target or a knob value as the skeleton's quoted-span placeholder. Rule `bounded_wait`'s recorded-launch grant declines on such a target (`native/src/guard/rules/liveness.rs`, the `tgt.contains("SQ")` test) and rule `git_c_root`'s knob echo skips such a value (`native/src/guard/rules/spelling.rs`). So a real path like a `mktemp` name spelling `DQ` is refused a grant. Three guard-kit suites already redraw a `mktemp` name carrying the letters.
-
-**Why not fixed at the drain:** a substring test against the raw command cannot tell a placeholder from literal letters. `cmd > .tmp/"$x"` skeletons to `.tmp/DQ`, and a literal `.tmp/DQ` elsewhere in the same raw command would pass the test. The grant would then answer for a target it never read. The sound fix maps placeholders by position: the skeleton hands back its placeholder spans, or uses a token no command text can spell. That is a skeleton-contract change (guard-kit/SPEC.md §The generic ruleset, the skeleton paragraph).
-
-**Cost while deferred:** a launch recorded under a directory whose name spells `SQ` or `DQ` is not granted and costs a permission decision. The direction is fail-closed. Filed 2026-09-24 to the gap inbox at `native-shell-guard` build; promoted at that iteration's close, which re-verified both sites. The bullet's shell-library half is moot, because `guard-kit/lib/guard.sh` retired in that iteration. Owner lookup: `SQ or DQ`, `placeholder` in this file: none.
-
-**Selected for `adopter-onramp` — operator direction 2026-09-24, lead-relayed.** Reshapes [guard-powershell-tool-unguarded](#guard-powershell-tool-unguarded): the PowerShell reader needs the same quoted-span skeleton, so the positional placeholder contract lands first. Re-verified at scope: `native/src/guard/rules/liveness.rs`:338 still tests the raw target for the letters.
-
 ### guard-powershell-tool-unguarded
 
 [spec: SPEC-powershell-reader.md]
@@ -32,7 +20,7 @@ on native Windows the harness's `PowerShell` tool is on by default beside `Bash`
 
 **Why design-pending:** the rule applicability and the PowerShell grammar the reader must model are undesigned. Slice 1 keeps the bash port behaviour-preserving, and builds the seam no wider than its own rules call.
 
-**Selected for `adopter-onramp` — operator direction 2026-09-24, lead-relayed; the lead unit.** Admitted on the filter's trust arm: a Windows adopter's default-on shell tool bypasses the guard they installed. Re-verified at scope: the matcher is still `Bash` alone and guard-kit/SPEC.md §The hook on native Windows still states the limit. [guard-placeholder-letter-paths](#guard-placeholder-letter-paths) lands first.
+**Selected for `adopter-onramp` — operator direction 2026-09-24, lead-relayed; the lead unit.** Admitted on the filter's trust arm: a Windows adopter's default-on shell tool bypasses the guard they installed. Re-verified at scope: the matcher is still `Bash` alone and guard-kit/SPEC.md §The hook on native Windows still states the limit. `guard-placeholder-letter-paths` lands first.
 
 **Cost while deferred:** on a Windows host a command routed through the PowerShell tool bypasses every steer and block, and the close-stage triage never sees it. Filed 2026-09-18 at `windows-adopter-path`'s spec by operator direction (lead-relayed), when `guard-hook-windows-substrate` was designed. Owner lookup: `PowerShell tool`, `USE_POWERSHELL_TOOL`, `Bash|PowerShell` — none.
 
@@ -1483,5 +1471,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 `check-docs-cmd` assertion (C) misses a retired path cited from the queue, which is outside its manifest corpus and whose `<path>:<line>` token fails the path shape.
 
 ## Done
+
+- guard-placeholder-letter-paths
 
 ## Lessons Learned

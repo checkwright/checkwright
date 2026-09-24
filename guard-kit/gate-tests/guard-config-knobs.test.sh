@@ -16,11 +16,7 @@ BIN="$(cd "$(dirname "$BIN")" && pwd -P)/$(basename "$BIN")"
 
 fails=0
 checks=0
-# spec: guard-kit/SPEC.md §The generic ruleset — a value carrying the letters SQ or DQ reads as a
-# skeleton placeholder, so a random scratch name that spells one is drawn again
-until tmp="$(cd "$(mktemp -d)" && pwd -P)"; [[ "$tmp" != *SQ* && "$tmp" != *DQ* ]]; do
-    rm -rf "$tmp"
-done
+tmp="$(cd "$(mktemp -d)" && pwd -P)"
 trap 'rm -rf "$tmp"' EXIT
 mkdir -p "$tmp/cwd"
 git -C "$tmp/cwd" init -q
@@ -106,6 +102,11 @@ k="$tmp/settings-path.knobs"
 want "knob-echo-verbatim"   "$k" "GUARD_KIT_SETTINGS=$tmp/settings.json make build" 2 "Run it without the prefix: make build"
 want "knob-echo-same-file"  "$k" "GUARD_KIT_SETTINGS=$tmp/./settings.json make build" 2 "check-graph"
 want "knob-echo-other-file" "$k" "GUARD_KIT_SETTINGS=$tmp/other.json make build" 0
+# a value spelling a placeholder's letters is read as written, so it is steered like any other
+mkdir -p "$tmp/SQ"
+: >"$tmp/SQ/settings.json"
+printf 'GUARD_KIT_SETTINGS = %s/SQ/settings.json\n' "$tmp" >"$tmp/letters-path.knobs"
+want "knob-echo-letters"    "$tmp/letters-path.knobs" "GUARD_KIT_SETTINGS=$tmp/SQ/./settings.json make build" 2 "check-graph"
 
 # --- rules `ro_pipeline` and `allowlist_chain` read an entry whose only '*' is a closing ' *' as granting its bare head, which
 #     the harness does: a decorated bare head takes rule `allowlist_chain`'s steer and a read-only tail rule `ro_pipeline`'s

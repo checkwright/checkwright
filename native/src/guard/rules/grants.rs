@@ -9,6 +9,7 @@ use super::{
 use crate::guard::allow_match;
 use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Verdict};
 use crate::guard::reader::View::{Hdq, SqDqHd, SqHdq};
+use crate::guard::reader::HD_MARK;
 use crate::guard::text::{self, grep_q, head_word, trim, trim_start, unsentinel, words};
 use crate::walk;
 
@@ -67,7 +68,7 @@ fn only_heredoc_residue(ctx: &Ctx, s: &str) -> bool {
     let mut i = 1usize;
     for t in ctx.heredoc_terms(&segs[0]) {
         let mut seg = at(i);
-        if seg == "HD" {
+        if seg == HD_MARK {
             i += 1;
             seg = at(i);
         }
