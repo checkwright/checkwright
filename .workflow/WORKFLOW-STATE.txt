@@ -11,3 +11,4 @@ native-shell-guard build a3421fac 2026-09-24 2f75d332
 native-shell-guard build a5cc5d42 2026-09-24 0c8cb228
 native-shell-guard build a15bb23d 2026-09-24 89a3abc8
 native-shell-guard build a389cc32 2026-09-24 edfdaab9
+native-shell-guard build a0e5965f 2026-09-24 7710dd8a
