@@ -168,6 +168,12 @@ fn emit_one(ctx: &Ctx, src: &str) -> Result<String, String> {
     };
 
     let text = fresh::read_captured(&ctx.under(src))?;
+    if carries_raw_close(&text) {
+        return Err(format!(
+            "{}: carries a Liquid raw-block closing tag, which would end the mirror's raw block early",
+            src
+        ));
+    }
     let mut out = String::new();
     out.push_str("---\n");
     out.push_str(&format!("title: {}\n", title));
@@ -185,11 +191,30 @@ fn emit_one(ctx: &Ctx, src: &str) -> Result<String, String> {
         "<!-- door-contributor: a generated mirror of a kit's own contributor source; every door on \
          the page is that source's, and the banner above is the regeneration recipe -->\n",
     );
+    out.push_str(RAW_OPEN);
     for line in fresh::file_lines(&text) {
         out.push_str(&rewrite_line(ctx, srcdir, line));
         out.push('\n');
     }
+    out.push_str(RAW_CLOSE);
     Ok(out)
+}
+
+// spec: canon-kit/SPEC.md §The reference-link grammar — the body is a Liquid raw block, its tags
+// inside HTML comments so a markdown-only reader renders nothing for them
+const RAW_OPEN: &str = "<!-- {% raw %} -->\n";
+const RAW_CLOSE: &str = "<!-- {% endraw %} -->\n";
+
+fn carries_raw_close(text: &str) -> bool {
+    let mut rest = text;
+    while let Some(i) = rest.find("{%") {
+        let tag = rest[i + 2..].trim_start_matches('-').trim_start();
+        if tag.starts_with("endraw") {
+            return true;
+        }
+        rest = &rest[i + 2..];
+    }
+    false
 }
 
 // spec: canon-kit/SPEC.md §The reference-link grammar — every mirrored source path, repo-relative,
@@ -313,5 +338,16 @@ mod tests {
         assert_eq!(relative_to("/r", &walk::normalize_abs("/r/a/./b")), "a/b");
         assert_eq!(relative_to("/r/x", &walk::normalize_abs("/r/x/../y")), "../y");
         assert_eq!(relative_to("/r", &walk::normalize_abs("/r")), ".");
+    }
+
+    // spec: canon-kit/SPEC.md §The reference-link grammar — a source may carry any Liquid-looking
+    // text except the raw block's closing tag, in either whitespace-control spelling
+    #[test]
+    fn only_a_raw_close_tag_is_refused() {
+        assert!(!carries_raw_close("runs-on: `${{ matrix.runner }}` and an unbalanced `${{`"));
+        assert!(!carries_raw_close("{% raw %} and {% include x %}"));
+        assert!(carries_raw_close("a {% endraw %} here"));
+        assert!(carries_raw_close("a {%- endraw -%} here"));
+        assert!(RAW_OPEN.starts_with("<!--") && RAW_CLOSE.trim_end().ends_with("-->"));
     }
 }
