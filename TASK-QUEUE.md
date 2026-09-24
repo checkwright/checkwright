@@ -30,16 +30,6 @@ a producer backgrounded through the PowerShell tool writes no liveness record, s
 
 ## Technical Debt
 
-### install-ps1-octet-under-ps51
-
-GitHub Pages serves the hosted `install.ps1` as `application/octet-stream` (the `.ps1` extension has no text mapping, and Pages takes no header config); `install.sh` is served `application/x-sh`. Under pwsh 7, `irm` of the live URL yields a `System.String`, so the documented `irm … | iex` one-liner works there. Under Windows PowerShell 5.1, the shell docs/install.md sends a stock Windows adopter to, the live-URL read is unprobed: the CI witness runs `irm | iex` under 5.1 only against a local `python -m http.server`, whose `.ps1` content type it never prints. If 5.1 hands `iex` a byte array for octet-stream, the one-liner fails at the adopter.
-
-**Inferred, cannot run before build:** the 5.1 behaviour — no Windows host here, and the leg's run is the probe.
-
-**Deliverable:** the measurement first — print the served content type in `install-smoke-pwsh-windows` and run one 5.1 `irm` of the live URL, asserting a string. Then either a witness recording that 5.1 reads it as text, or a fix: a one-liner spelling that decodes explicitly, or the script served from a surface with a text type.
-
-**Cost while deferred:** a non-technical Windows adopter's first command may fail before any value is seen. Filed 2026-09-24 to the gap inbox after adopter-onramp's close, when the live site first served the script; promoted 2026-09-24 at the next scope. Owner lookup: `octet`, `content type`, `install.ps1` in this file — none; owner installer/SPEC.md and docs/install.md §Windows. **Selected for `hosted-install-path`, its lead unit — operator direction 2026-09-24, lead-relayed;** debt, since a CI probe step adds no governed name, and a fix that would is routed back to spec.
-
 ### guard-ordinal-citation-unheld
 
 guard-kit/SPEC.md §The generic ruleset states "Nothing cites a rule by position", but `check-guard-registration`'s citation arm reads only the backticked-name grammar, so "rule" or "rules" followed by a bare or parenthesized ordinal passes. Attested once: after the name-citation move, rules `allowlist_chain` and `git_rewrite` still read "Placed after the auto-allow rules (16, 17, 18, 19)", and `git_rewrite` read "(20)". Fixed inline at adopter-onramp's close; no positional citation survives in guard-kit/SPEC.md today.
@@ -47,14 +37,6 @@ guard-kit/SPEC.md §The generic ruleset states "Nothing cites a rule by position
 **Deliverable:** an assertion in `check-guard-registration` that reds a rule-noun followed by an ordinal over the guard-kit corpus, with its fixture pair.
 
 **Cost while deferred:** a positional citation rots silently at the next rule insertion. Filed 2026-09-24 to the gap inbox by adopter-onramp's close; promoted 2026-09-24 at the next scope. Owner lookup: `by position`, `ordinal`, `check-guard-registration` in this file — none; owner guard-kit/SPEC.md §check-guard-registration. **Selected for `hosted-install-path` — operator direction 2026-09-24, lead-relayed;** debt, since it converges the gate on a rule its SPEC already states.
-
-### arm64-pwsh-bootstrap-witness
-
-`installer/bin/checkwright.ps1`'s `^windows/arm64$` `Get-HostTarget` arm, mapping to `aarch64-pc-windows-msvc`, has no running witness: `install-smoke-pwsh-windows` runs on `windows-latest` only, and no leg runs the PowerShell bootstrap on `windows-11-arm`. Its spelling rests on a local pwsh probe (`Architecture::Arm64` prints `Arm64`; `switch -Regex` is case-insensitive) and `check-install-platforms`' static set. Re-verified at promotion (2026-09-24): `.github/workflows/gates.yml` carries `install-smoke-sh-windows-arm64` and no pwsh leg on that runner.
-
-**Deliverable:** a PowerShell bootstrap leg on the arm64 Windows runner, held on the same roster axis as `install-smoke-sh-windows-arm64`. It mirrors `install-smoke-pwsh-windows`, so it lands after [install-ps1-octet-under-ps51](#install-ps1-octet-under-ps51)'s probe and carries it.
-
-**Cost while deferred:** a runtime divergence on a real ARM64 pwsh host surfaces at an adopter, not a run, and since the triple joined at adopter-onramp's close that host is served an artifact through the unwitnessed arm. Filed 2026-09-24 to the gap inbox by adopter-onramp's build; promoted 2026-09-24 at its close. **Selected for `hosted-install-path` — operator direction 2026-09-24, lead-relayed;** debt, since the leg's posture derives from an existing roster and adds no governed name.
 
 ## Deferred
 
@@ -1457,5 +1439,8 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 `check-docs-cmd` assertion (C) misses a retired path cited from the queue, which is outside its manifest corpus and whose `<path>:<line>` token fails the path shape.
 
 ## Done
+
+- install-ps1-octet-under-ps51
+- arm64-pwsh-bootstrap-witness
 
 ## Lessons Learned
