@@ -24,24 +24,6 @@ the shipped platform roster lacks `aarch64-pc-windows-msvc`, the operator's spec
 
 **Cost while deferred:** a Windows-on-ARM adopter gets no binary. Surfaced 2026-09-10 by the iteration lead at the operator's ask; narrowed to one leg 2026-09-11 at spec and demoted at build (`lead, own-authority`, 2026-09-11). **Selected for `adopter-onramp` — operator direction 2026-09-24, lead-relayed;** debt, since declaring a target adds no governed name.
 
-### baseline-suite-coverage-arm-one-directional
-
-evidence-kit/SPEC.md §check-evidence-baseline says the suite-coverage arm closes the failure of a suite "silently ceasing to run — dropped from the roster, or renamed under a config edit". The arm asserts one direction only: every `EVIDENCE_KIT_SUITES` entry carries a baseline row. A *rename* is caught, because the new name is rowless; a *pure drop* is not, because nothing reads a row whose suite left the roster. So the prose claims an enforcement the gate does not deliver.
-
-**Attested, and the counterexample is in the tree:** `.workflow/validate-baseline.txt`:88-89 still lists `budget_guard_tests` and `dispatch_guard_tests`, re-verified at promotion (2026-09-24); their producers were deleted at `7a4da575` (2026-08-31), coverage absorbed into `native_crate`.
-
-**Probed at filing, not inferred:** `native/src/gates/evidence_baseline.rs` `run()` iterates the configured suites and never the rows; `.workflow/validate-evidence.txt` carries no line for either name, so a row removal stales no recorded evidence.
-
-**DISTINCT from [evidence-baseline-orphan-suite-row](#evidence-baseline-orphan-suite-row)**, whose subject is the two unread rows themselves — the instance this fix reds — promoted beside it so both land in one commit. **Adjacent to [gate-spec-claim-assertion-parity](#gate-spec-claim-assertion-parity)** (icebox, ruled a human-audit class): this is one concrete instance with a mechanical oracle, not that class.
-
-**Deliverable:** the reverse assertion, a row whose suite is not in the roster reds, with the fixture pair; the interaction with the declared no-suites early-out settled in the gate. Debt: it converges the gate on the enforcement its SPEC already claims.
-
-**Cost while deferred:** a baseline surface whose whole job is a held-constant comparison keeps rows that assert nothing. Filed 2026-09-17 at close drain, on re-verification of the lead's validate-stage bullet. **Selected for `adopter-onramp` — operator direction 2026-09-24, lead-relayed.**
-
-### evidence-baseline-orphan-suite-row
-
-`.workflow/validate-baseline.txt` carries rows for `budget_guard_tests` and `dispatch_guard_tests`, suites whose producers were deleted at `7a4da575`, so two rows assert nothing. **Deliverable:** delete both rows in the commit that lands [baseline-suite-coverage-arm-one-directional](#baseline-suite-coverage-arm-one-directional)'s reverse assertion, which reds them. **Cost while deferred:** a held-constant comparison surface carries dead rows. Promoted from the icebox 2026-09-24 at scope. **Selected for `adopter-onramp` — operator direction 2026-09-24, lead-relayed.**
-
 ## Deferred
 
 ### side-effect-free-read-arms
@@ -1438,5 +1420,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - guard-powershell-tool-unguarded
 - queue-migrate-bold-split
 - install-hosted-one-liner
+- baseline-suite-coverage-arm-one-directional
+- evidence-baseline-orphan-suite-row
 
 ## Lessons Learned

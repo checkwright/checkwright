@@ -306,9 +306,8 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
 
-    // spec: evidence-kit/SPEC.md §check-evidence-baseline — every configured suite carries at
-    // least one baseline row; the roster is EVIDENCE_KIT_SUITES, so a suite acquires and drops
-    // the obligation with no edit here, and a suite set that will not resolve is unjudgeable
+    // spec: evidence-kit/SPEC.md §check-evidence-baseline — suite coverage in both directions
+    // against EVIDENCE_KIT_SUITES; an empty roster disarms both
     let suites = match walk::knob_array("EVIDENCE_KIT_SUITES") {
         Ok(s) => s,
         Err(e) => {
@@ -332,6 +331,15 @@ pub fn run(args: &[String]) -> i32 {
                 ));
             }
         }
+        let mut orphans: Vec<&str> = covered.iter().copied().filter(|c| !suites.iter().any(|s| s == c)).collect();
+        orphans.sort_unstable();
+        orphans.dedup();
+        for o in orphans {
+            errors.push(format!(
+                "baseline row(s) for suite '{}', which is not a configured suite — nothing runs it, so its rows assert nothing; delete them",
+                o
+            ));
+        }
     }
 
     let flip = match flip_causation(&baseline, &state, &rows, &mut errors) {
@@ -351,7 +359,7 @@ pub fn run(args: &[String]) -> i32 {
         for e in &errors {
             println!("  {}", e);
         }
-        println!("  help: each line is '{}'; a fail/ignore carries a live blocking slug; a row held red that passed at the iteration start carries reproduces-at=<rev> naming a commit at or before that start where its red reproduces (else it is a regression to fix); every configured suite owes at least one row, bought by configuring a parser rather than by hand-authoring rows; the baseline is edited by human commit only, and moving a row stales every evidence line recorded against the old baseline, so re-run the suite with --run-validate and commit a fresh line in the evidence manifest before the close entry (evidence-kit/SPEC.md §check-evidence-manifest)", GRAMMAR);
+        println!("  help: each line is '{}'; a fail/ignore carries a live blocking slug; a row held red that passed at the iteration start carries reproduces-at=<rev> naming a commit at or before that start where its red reproduces (else it is a regression to fix); every configured suite owes at least one row, bought by configuring a parser rather than by hand-authoring rows, and a row whose suite left the roster is deleted; the baseline is edited by human commit only, and moving a row stales every evidence line recorded against the old baseline, so re-run the suite with --run-validate and commit a fresh line in the evidence manifest before the close entry (evidence-kit/SPEC.md §check-evidence-manifest)", GRAMMAR);
         return 1;
     }
     println!(

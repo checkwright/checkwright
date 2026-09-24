@@ -1,4 +1,4 @@
-# spec: evidence-kit/SPEC.md §check-evidence-baseline — `ghost` is configured and carries no row, which is the suite-coverage violation this half of the pair holds beside the missing-slug one
+# spec: evidence-kit/SPEC.md §check-evidence-baseline — `ghost` is configured and carries no row, and the baseline's `dropped` row names no configured suite — the suite-coverage arm's two directions, held beside the missing-slug violation
 EVIDENCE_KIT_SUITES[] = gates
 EVIDENCE_KIT_SUITES[] = unit
 EVIDENCE_KIT_SUITES[] = ghost

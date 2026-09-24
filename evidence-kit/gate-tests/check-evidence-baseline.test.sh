@@ -2,7 +2,8 @@
 # Behavioral test of check-evidence-baseline — the slug-liveness and
 # scenario-coverage branches the one good/bad pair (grammar) cannot hold: a Done
 # slug is stale-red, an unknown slug is red, a permanent marker is accepted, a
-# configured scenario glob asserts manifest↔disk set equality both ways, and the
+# configured scenario glob asserts manifest↔disk set equality both ways, a row whose
+# suite left a non-empty roster is red, and the
 # flip assertion judges reproduces-at against a scratch repository's iteration start.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
@@ -80,8 +81,8 @@ elif ! grep -qF "no baseline line" <<<"$out"; then
     echo "  FAIL: coverage gap wrong finding: $out"; fails=$((fails + 1))
 fi
 
-# G — a consumer configuring NO suites disarms the suite-coverage arm at a
-#     declared early-out, rather than falling through the live assertions.
+# G — a consumer configuring NO suites disarms the suite-coverage arm, both
+#     directions, at a declared early-out: the row below names no configured suite.
 _nosuites_cfg() {
     local d="$tmp/nosuites"; mkdir -p "$d/scripts"
     printf 'EVIDENCE_KIT_SUITES =\n' >"$d/scripts/evidence-config.knobs"
@@ -92,6 +93,23 @@ _nosuites_cfg() {
 }
 if ! out="$(_nosuites_cfg)" || ! grep -qF "0 configured suite(s)" <<<"$out"; then
     echo "  FAIL: an empty suite roster did not disarm cleanly at the declared early-out: $out"; fails=$((fails + 1))
+fi
+
+# G2 — a suite dropped from a non-empty roster leaves its row naming no configured
+#      suite, which is red alone, with every configured suite still covered.
+_dropped_cfg() {
+    local d="$tmp/dropped"; mkdir -p "$d/scripts"
+    printf 'EVIDENCE_KIT_SUITES[] = gates\n' >"$d/scripts/evidence-config.knobs"
+    printf '# fixture\ngates gates pass\ngone gone pass\n' >"$d/base.txt"
+    ( cd "$d" && unset EVIDENCE_KIT_KNOB_FILE \
+        && gate_env GATE_SDK_GATES_DIR=scripts \
+        && gate_run check-evidence-baseline "$DIR/checks" base.txt 2>&1 )
+}
+out="$(_dropped_cfg)"; rc=$?
+if [[ "$rc" -ne 1 ]]; then
+    echo "  FAIL: a row whose suite left the roster exited $rc, want 1: $out"; fails=$((fails + 1))
+elif ! grep -qF "suite 'gone', which is not a configured suite" <<<"$out" || grep -qF "carries no baseline row" <<<"$out"; then
+    echo "  FAIL: the dropped-suite case reddened on the wrong finding: $out"; fails=$((fails + 1))
 fi
 
 # H — a suite roster the knob file cannot resolve is exit 2, never a clean run.
@@ -185,5 +203,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-evidence-baseline.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-evidence-baseline.test: ok (done-stale + unknown + pass-with-slug + coverage-gap rejected; live-slug + permanent-marker accepted; no-suites disarms, unresolvable suites fail closed; a scenario under a pruned directory reached; flip assertion over positional and knob state)"
+echo "check-evidence-baseline.test: ok (done-stale + unknown + pass-with-slug + coverage-gap rejected; live-slug + permanent-marker accepted; no-suites disarms, a dropped suite's row rejected, unresolvable suites fail closed; a scenario under a pruned directory reached; flip assertion over positional and knob state)"
 exit 0

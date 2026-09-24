@@ -1,2 +1,3 @@
 requires a blocking slug
 configured suite 'ghost' carries no baseline row
+suite 'dropped', which is not a configured suite
