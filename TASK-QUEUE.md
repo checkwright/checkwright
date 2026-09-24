@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: adopter-onramp
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [README.md](README.md) maps the kits.
 
@@ -9,6 +9,38 @@
 ## New Features
 
 ## Technical Debt
+
+### gate-binary-platform-roster-holes
+
+the shipped platform roster lacks `aarch64-pc-windows-msvc`, the operator's specific ask; the arm64 Linux half was discharged at `52b4b96a` (leg repaired at `644547a6`) and every mechanic it probed lives in `native/targets.list`'s header, `native/runners.list`'s and the leg's own job header. **PRODUCT-class** by the 2026-08-30 witness discriminator: the install path is adopter-facing.
+
+**Probed at promotion (2026-09-24):** actions/runner-images' README lists `windows-11-arm` with no preview badge, and its image readme carries Bash 5.3, Git 2.55.0.windows.5 (`C:\Program Files\Git\bin\bash.exe`) and Rust 1.98.1, so the bash floor the two bootstrap scripts need is on the image. **Runner approved — operator direction 2026-09-24, lead-relayed: `windows-11-arm`.**
+
+**Inferred, cannot run before build:** its minutes are free on a public repo — no run on the label exists yet; the first held leg's run reports its usage.
+
+**Deliverable:** copy `52b4b96a`'s shape — declare the target `held` first (the declaration creates its producer leg and `continue-on-error` derives from the `held` bit, so both legs land non-blocking), map it to `windows-11-arm`, and add its install-smoke consumer leg. Its roster line stays unwritten: the join is the roster header's own predicate, never a queue entry's. No observed-by tag: completion is the tree state, and the close push's run is the first observation of the held legs, not a predicate.
+
+**DISTINCT from [binding-intel-leg-failed-one-run-in-two](#binding-intel-leg-failed-one-run-in-two)**, whose subject is a joined leg's RELIABILITY; this owns which hosts get a binary at all. It widens the roster [held-ci-leg-failure-reddens-a-binding-one](#held-ci-leg-failure-reddens-a-binding-one)'s coupling reaches, and changes nothing in that entry's shape.
+
+**Cost while deferred:** a Windows-on-ARM adopter gets no binary. Surfaced 2026-09-10 by the iteration lead at the operator's ask; narrowed to one leg 2026-09-11 at spec and demoted at build (`lead, own-authority`, 2026-09-11). **Selected for `adopter-onramp` — operator direction 2026-09-24, lead-relayed;** debt, since declaring a target adds no governed name.
+
+### baseline-suite-coverage-arm-one-directional
+
+evidence-kit/SPEC.md §check-evidence-baseline says the suite-coverage arm closes the failure of a suite "silently ceasing to run — dropped from the roster, or renamed under a config edit". The arm asserts one direction only: every `EVIDENCE_KIT_SUITES` entry carries a baseline row. A *rename* is caught, because the new name is rowless; a *pure drop* is not, because nothing reads a row whose suite left the roster. So the prose claims an enforcement the gate does not deliver.
+
+**Attested, and the counterexample is in the tree:** `.workflow/validate-baseline.txt`:88-89 still lists `budget_guard_tests` and `dispatch_guard_tests`, re-verified at promotion (2026-09-24); their producers were deleted at `7a4da575` (2026-08-31), coverage absorbed into `native_crate`.
+
+**Probed at filing, not inferred:** `native/src/gates/evidence_baseline.rs` `run()` iterates the configured suites and never the rows; `.workflow/validate-evidence.txt` carries no line for either name, so a row removal stales no recorded evidence.
+
+**DISTINCT from [evidence-baseline-orphan-suite-row](#evidence-baseline-orphan-suite-row)**, whose subject is the two unread rows themselves — the instance this fix reds — promoted beside it so both land in one commit. **Adjacent to [gate-spec-claim-assertion-parity](#gate-spec-claim-assertion-parity)** (icebox, ruled a human-audit class): this is one concrete instance with a mechanical oracle, not that class.
+
+**Deliverable:** the reverse assertion, a row whose suite is not in the roster reds, with the fixture pair; the interaction with the declared no-suites early-out settled in the gate. Debt: it converges the gate on the enforcement its SPEC already claims.
+
+**Cost while deferred:** a baseline surface whose whole job is a held-constant comparison keeps rows that assert nothing. Filed 2026-09-17 at close drain, on re-verification of the lead's validate-stage bullet. **Selected for `adopter-onramp` — operator direction 2026-09-24, lead-relayed.**
+
+### evidence-baseline-orphan-suite-row
+
+`.workflow/validate-baseline.txt` carries rows for `budget_guard_tests` and `dispatch_guard_tests`, suites whose producers were deleted at `7a4da575`, so two rows assert nothing. **Deliverable:** delete both rows in the commit that lands [baseline-suite-coverage-arm-one-directional](#baseline-suite-coverage-arm-one-directional)'s reverse assertion, which reds them. **Cost while deferred:** a held-constant comparison surface carries dead rows. Promoted from the icebox 2026-09-24 at scope. **Selected for `adopter-onramp` — operator direction 2026-09-24, lead-relayed.**
 
 ## Deferred
 
@@ -42,7 +74,7 @@ queue-kit/SPEC.md §The queue-migrate arm starts a new paragraph at any continua
 
 **Deliverable:** a paragraph-start test that can tell a bold lead-in (for example, a bold span ending in `:` or `.`, or a preceding line that ends a sentence) from a wrapped bold span, with a fixture row for the mid-sentence case.
 
-**Cost while deferred:** an adopter migrating a wrapped queue gets broken paragraphs that no gate reports. Filed 2026-09-22 at queue-kit-unwrap's close drain. Promoted rather than fixed because the rule is the SPEC's own and changing it is a spec amendment. Owner: queue-kit/SPEC.md §The queue-migrate arm.
+**Cost while deferred:** an adopter migrating a wrapped queue gets broken paragraphs that no gate reports. Filed 2026-09-22 at queue-kit-unwrap's close drain. Promoted rather than fixed because the rule is the SPEC's own and changing it is a spec amendment. Owner: queue-kit/SPEC.md §The queue-migrate arm. **Selected for `adopter-onramp` — operator direction 2026-09-24, lead-relayed:** a defect on an adopter's migration path.
 
 ### retired-citation-referent-rule
 
@@ -58,11 +90,13 @@ live entries cite retired slugs in prose, and nothing marks them the same way ('
 
 [cost: event/high] [surface: installer]
 
-the install page's no-Node path is four steps per system, not one line. A hosted, tracked bootstrap pair — `curl -fsSL https://checkwright.dev/install.sh | sh` and `irm https://checkwright.dev/install.ps1 | iex` — would fetch a pinned release, verify it and run `init` in one command. installer/SPEC.md §The dependency boundary refuses a piped remote script, because an unreviewed script fed straight to a shell contradicts the page's opening claim, and that refusal stands until this entry rules otherwise.
+the install page's no-Node path is four steps per system, not one line. A hosted, tracked bootstrap pair — `curl -fsSL https://checkwright.dev/install.sh | sh` and `irm https://checkwright.dev/install.ps1 | iex` — would fetch a pinned release, verify it and run `init` in one command. installer/SPEC.md §The dependency boundary refuses a piped remote script, because an unreviewed script fed straight to a shell contradicts the page's opening claim. That refusal is SPEC text, never an operator ruling: the 2026-09-22 direction (`d433e268`) chose per-OS recipes and left it in force without ruling on it.
 
-**Deliverable:** a ruling on the refusal, then, if it is reversed, the two scripts as twins, a pinned-version line with a freshness gate against the newest tag, and a CI witness that runs each one-liner against a packed payload. `irm` cannot read `file://`, so the PowerShell witness needs a local server or a base-URL override.
+**Refusal reversed — operator direction 2026-09-24, lead-relayed; no `/consult` owed, since no ruling stands on it.** Bound by the operator's standing intent: native installation with minimal external dependencies, no npx-class dependency. Spec rewrites installer/SPEC.md §The dependency boundary. **Selected for `adopter-onramp`,** admitted on the filter's time-to-first-value arm.
 
-**Cost while deferred:** a first-contact adopter copies a four-step recipe where a one-liner would do. Filed 2026-09-22 at spec on the operator's direction (lead session), which chose per-OS recipes for install-path-developer-first this iteration and deferred the one-liner. Owner: installer/SPEC.md §The dependency boundary.
+**Deliverable:** the two scripts as twins, a pinned-version line with a freshness gate against the newest tag, and a CI witness that runs each one-liner against a packed payload. `irm` cannot read `file://`, so the PowerShell witness needs a local server or a base-URL override.
+
+**Cost while deferred:** a first-contact adopter copies a four-step recipe where a one-liner would do. Filed 2026-09-22 at spec, when the operator's direction for install-path-developer-first chose per-OS recipes and deferred the one-liner. Owner: installer/SPEC.md §The dependency boundary.
 
 ### disclaimer-beside-its-own-restatement
 
@@ -90,22 +124,6 @@ nothing asserts the roster↔template relation context-kit/SPEC.md §The consume
 
 **Cost while deferred:** the placement ruling can rot exactly as the obligations it corrected did, with no oracle to catch the next template that ships unserved or doubly served. Filed 2026-09-17 to the gap inbox at build (gate candidate declined under operator direction, 2026-09-17, lead-relayed), promoted at this iteration's close drain. Owner lookup: `Operative residency`, `consumer footprint`, `footprint`, `residency`, `obligation` — none.
 
-### baseline-suite-coverage-arm-one-directional
-
-[cost: event/low] [surface: evidence-kit]
-
-evidence-kit/SPEC.md §check-evidence-baseline says the suite-coverage arm closes the failure of a suite "silently ceasing to run — dropped from the roster, or renamed under a config edit". The arm asserts one direction only: every `EVIDENCE_KIT_SUITES` entry carries a baseline row. A *rename* is caught, because the new name is rowless; a *pure drop* is not, because nothing reads a row whose suite left the roster. So the prose claims an enforcement the gate does not deliver.
-
-**Attested, and the counterexample is in the tree:** `.workflow/validate-baseline.txt` still lists `budget_guard_tests` and `dispatch_guard_tests`, whose producers `delegation-kit/bin/run-{budget,dispatch}-guard-tests.sh` were deleted at `7a4da575` (2026-08-31, their coverage absorbed into `native_crate`). The battery has been green over them for sixteen days.
-
-**Probed at promotion, not inferred:** `native/src/gates/evidence_baseline.rs` `run()`, its loop over the configured suites, iterates the suites and never the rows; `.workflow/validate-evidence.txt` carries no line for either name, so a row removal would stale no recorded evidence.
-
-**DISTINCT from [evidence-baseline-orphan-suite-row](#evidence-baseline-orphan-suite-row)** (icebox), whose subject is the unread rows themselves — the instance this entry's fix would catch — and which this drain re-observed rather than re-fired. **Adjacent to [gate-spec-claim-assertion-parity](#gate-spec-claim-assertion-parity)** (icebox, ruled a human-audit class): this is one concrete instance with a mechanical oracle, not that class.
-
-**Why design-pending:** whether the reverse assertion is a row-level red or an advisory, and how it interacts with the declared no-suites early-out, are the two calls; the SPEC sentence quoted above narrows in the same unit either way.
-
-**Cost while deferred:** a baseline surface whose whole job is a held-constant comparison keeps rows that assert nothing, and the next suite retirement leaves another pair the same way. Filed 2026-09-17 at this iteration's close drain, on re-verification of the bullet the lead filed from validate's observation. Owner lookup: `EVIDENCE_KIT_SUITES`, `validate-baseline`, `suite coverage`, `evidence-baseline`, `orphan` — matched [evidence-baseline-orphan-suite-row](#evidence-baseline-orphan-suite-row), read and ruled distinct above.
-
 ### guard-powershell-tool-unguarded
 
 [cost: event/high] [surface: guard-kit]
@@ -117,6 +135,8 @@ on native Windows the harness's `PowerShell` tool is on by default beside `Bash`
 **Slice 2 of `shell-guard-native-shell`, sliced at its spec (2026-09-24).** Slice 1 is the `--hook shell-guard` member, which picks a shell reader by `tool_name` and exits clean on a tool it has no reader for. It has a reader seam: views, segments, statements, redirect pairs and the harness view, with each rule declaring the shells it applies to. The consumer-rule command sees every payload. The member's own design is guard-kit/SPEC.md §The shell guard. **Owed here:** a PowerShell reader behind that seam, covering single-quoted, expandable and here-string quoting, its statement and pipeline separators, and its comment forms. Also owed: each generic rule's applicability to PowerShell decided, with the rules that model PowerShell; `--guard-json view` over PowerShell payloads; the `Bash|PowerShell` matcher in `templates/settings-hooks.json`; and a PowerShell decision table run on the native-Windows leg. Then §The hook on native Windows' PowerShell limit retires.
 
 **Why design-pending:** the rule applicability and the PowerShell grammar the reader must model are undesigned. Slice 1 keeps the bash port behaviour-preserving, and builds the seam no wider than its own rules call.
+
+**Selected for `adopter-onramp` — operator direction 2026-09-24, lead-relayed; the lead unit.** Admitted on the filter's trust arm: a Windows adopter's default-on shell tool bypasses the guard they installed. Re-verified at scope: the matcher is still `Bash` alone and guard-kit/SPEC.md §The hook on native Windows still states the limit. [guard-placeholder-letter-paths](#guard-placeholder-letter-paths) lands first.
 
 **Cost while deferred:** on a Windows host a command routed through the PowerShell tool bypasses every steer and block, and the close-stage triage never sees it. Filed 2026-09-18 at `windows-adopter-path`'s spec by operator direction (lead-relayed), when `guard-hook-windows-substrate` was designed. Owner lookup: `PowerShell tool`, `USE_POWERSHELL_TOOL`, `Bash|PowerShell` — none.
 
@@ -135,26 +155,6 @@ nothing shipped lets a customer run the battery under a named config-seam varian
 **Cost while deferred:** an adopter evaluating a knob edits the seam, commits, and learns from the next red; the preview cohort's false-positive dispositions have no cheap rehearsal. Filed 2026-09-11 by consult as a direct entry, the test gap the operator named there.
 
 **Held Deferred by the enhancement admission filter, operator direction 2026-09-21 (lead-relayed):** a shipped adopter arm reaching none of the three arms.
-
-### gate-binary-platform-roster-holes
-
-[cost: once/low] [surface: native]
-
-the shipped platform roster held four joined triples and two more the installed base plainly wants; **one of the two is discharged and this entry is what is left of it.**
-
-**PRODUCT-class** by the 2026-08-30 witness discriminator — the install path is adopter-facing, so the machinery-class icebox default does not reach this and it stays ordinary scope intake.
-
-**DISCHARGED 2026-09-11 at `52b4b96a`, leg repaired at `644547a6`: `aarch64-unknown-linux-gnu` is DECLARED HELD**, with its probed runner mapping and an `install-smoke-sh-linux-arm64` consumer leg. Its roster line is deliberately unwritten — the join is the roster header's own predicate and never a queue entry's — and every mechanic that unit probed now lives where it belongs rather than here: the declaration-before-mapping ordering in `native/targets.list`'s header, the pinned-label cost in `native/runners.list`'s, and the answered floor question in the leg's own job header.
-
-**WHAT REMAINS IS `aarch64-pc-windows-msvc` ALONE**, and it is the operator's specific ask. Unpriced and unprejudged: its cost turns on whether GitHub's ARM Windows runners have reached general availability — re-probe actions/runner-images' table rather than trusting any paragraph — and on a runner decision that is the operator's rather than a session's.
-
-**THE ROUTE IS WORKED NOW, which is what the discharged half bought this one.** A platform is declared `held` FIRST: the declaration is what creates its producer leg, the runner mapping is only looked up once a declared target exists, and `continue-on-error` derives from the `held` bit so both legs land non-blocking on a red-averse master. Whoever takes this half copies `52b4b96a`'s shape; nothing in it was arm64-Linux-specific but the label and the floor probe.
-
-**The `observed-by` tag is DROPPED and the drop is a judgment, not a lapse.** That tag declares a completion predicate that is an observation of a remote run rather than a tree state, and its one reader of the value is a scope stage at promotion. This half's completion is a TREE state — declare, map, add the leg, which is exactly what the discharged half landed green before any run existed — and no `gates` run produces it until that work exists, so the producer field would be unreadable for its only named reader.
-
-**DISTINCT from [binding-intel-leg-failed-one-run-in-two](#binding-intel-leg-failed-one-run-in-two)**, whose subject is a joined leg's RELIABILITY; this owns which hosts get a binary at all.
-
-**Cost while deferred: bounded, and one leg now rather than two** — one build leg and one smoke leg, plus a platform floor if the ARM Windows image does not carry the class the two bootstrap scripts already bootstrap. Runner availability is the open question here rather than the known non-blocker it was for arm64 Linux. Surfaced 2026-09-10 by the iteration lead at the operator's ask — rescued out of a gitignored journal into `packer-port-terminal-cut`'s gap inbox, promoted 2026-09-10 at scope on a fresh roster read, specified 2026-09-11 at spec with its scope narrowed to one leg, and demoted 2026-09-11 at build on canon-kit/SPEC.md §Merging an amendment (on task completion), step 4's corpus-versus-increment test — ruled `lead, own-authority` 2026-09-11 through the lead's message channel, that lead reversing its own Done instruction of the same date after verifying the grounds at source.
 
 ### instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set
 
@@ -504,6 +504,8 @@ the shell-guard member reads the literal letters `SQ` or `DQ` in a redirect targ
 
 **Cost while deferred:** a launch recorded under a directory whose name spells `SQ` or `DQ` is not granted and costs a permission decision. The direction is fail-closed. Filed 2026-09-24 to the gap inbox at `native-shell-guard` build; promoted at that iteration's close, which re-verified both sites. The bullet's shell-library half is moot, because `guard-kit/lib/guard.sh` retired in that iteration. Owner lookup: `SQ or DQ`, `placeholder` in this file: none.
 
+**Selected for `adopter-onramp` — operator direction 2026-09-24, lead-relayed.** Reshapes [guard-powershell-tool-unguarded](#guard-powershell-tool-unguarded): the PowerShell reader needs the same quoted-span skeleton, so the positional placeholder contract lands first. Re-verified at scope: `native/src/guard/rules/liveness.rs`:338 still tests the raw target for the letters.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
@@ -811,10 +813,6 @@ Walk drops symlinks unstated; tree has none.
 ### prune-set-matches-walk-root-ancestors
 
 A leaf above the root prunes it all.
-
-### evidence-baseline-orphan-suite-row
-
-A row for a retired suite is unread.
 
 ### port-archaeology-restatement-residue
 
