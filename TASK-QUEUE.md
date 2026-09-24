@@ -8,16 +8,6 @@
 
 ## New Features
 
-### hook-decline-model-invisible
-
-[spec: SPEC-decline-channel.md]
-
-a hook member's decline (`hook::decline`, `native/src/hook/mod.rs`) writes to stderr at exit 0 with no envelope, so the session model never learns its guard stopped enforcing. gate-sdk/SPEC.md §The harness-integration arm states that channel, so the fix amends it. **Premise corrected at spec:** the harness writes exit-0 stderr to its debug log only, so the operator does not see it either, and today the only caller is the `SubagentStop` member.
-
-**Specified 2026-09-24:** the decline writes the firing event's envelope. On `PreToolUse` that is `additionalContext`. Elsewhere it is `systemMessage`, because a turn-end event has no model channel that does not refuse the stop. **Widened 2026-09-24, a scope-oracle decision relayed by the lead:** the front end's absent-binary `--hook` decline (`exec_arm` in `run-gates.sh` and `run-gates.ps1`) is in this unit, as the amendment's delta 2. It writes a fixed `systemMessage` envelope, and validate checks both sites.
-
-**Cost while deferred:** a member with an unresolved knob fails open silently from the session's side, and the one reader able to repair the knob is never told. Filed 2026-09-24 to the gap inbox at `native-shell-guard`'s close; promoted 2026-09-24 at the next scope, so the record is late and says so. Owner lookup: `hook::decline`, `additionalContext` in this file: none. **Selected for `silent-guard-gaps` — operator direction 2026-09-24, lead-relayed;** admitted on the trust arm.
-
 ### workflow-run-path-unresolved
 
 [spec: SPEC-action-run-path.md]
@@ -56,7 +46,7 @@ a lead-dispatched stage session can do its whole batch without running `--enter-
 
 **Cost while deferred:** an unstamped session's edits are indistinguishable in the audit trail from its stamped sibling's. Filed 2026-09-24 to the gap inbox by the `native-shell-guard` lead; promoted at that iteration's close. Owner lookup: `dispatch marker`, `never entered`, `dispatch-withdraw` in this file: none.
 
-**Selected for `silent-guard-gaps` — operator direction 2026-09-24, lead-relayed.** Admitted on the trust arm: a stamp is the record an adopter trusts for who did the work. Its proposed member takes the decline channel [hook-decline-model-invisible](#hook-decline-model-invisible) settles, so rule that one first.
+**Selected for `silent-guard-gaps` — operator direction 2026-09-24, lead-relayed.** Admitted on the trust arm: a stamp is the record an adopter trusts for who did the work. Its proposed member takes the decline channel `hook-decline-model-invisible` settles, so rule that one first.
 
 ## Technical Debt
 
@@ -1538,5 +1528,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 - settings-hook-command-path-gate
 - enforcement-map-member-owner
+- hook-decline-model-invisible
 
 ## Lessons Learned

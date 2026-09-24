@@ -1,6 +1,6 @@
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the SubagentStop member: it logs one
-// open key=value record per firing, emits no hook JSON, and speaks only through its exit status —
-// 2 with a stderr reason on a refusing reading or a running harness shell task of its own, 0 otherwise.
+// open key=value record per firing and speaks through its exit status — 2 with a stderr reason on a
+// refusing reading or a running shell task of its own, else 0 — plus a knob-fault decline's envelope.
 use crate::emit::kpi;
 use crate::hook;
 use crate::{proc, programs};
@@ -43,15 +43,15 @@ pub struct Firing {
 pub fn run(payload: Option<&Value>) -> i32 {
     let log = match walk::knob_scalar("DELEGATION_KIT_STOP_LOG") {
         Ok(v) => v,
-        Err(e) => return hook::decline("subagent-stop-liveness", &e),
+        Err(e) => return hook::decline("subagent-stop-liveness", &e, payload),
     };
     let liveness_cmd = match walk::knob_array("DELEGATION_KIT_LIVENESS_CMD") {
         Ok(v) => v,
-        Err(e) => return hook::decline("subagent-stop-liveness", &e),
+        Err(e) => return hook::decline("subagent-stop-liveness", &e, payload),
     };
     let run_dir = match walk::knob_scalar("GATE_SDK_TMP_DIR") {
         Ok(v) => v,
-        Err(e) => return hook::decline("subagent-stop-liveness", &e),
+        Err(e) => return hook::decline("subagent-stop-liveness", &e, payload),
     };
     let reader = reader_argv(&liveness_cmd, &run_dir);
     let firing = fire(payload, &log, reader.as_deref(), &run_dir);
@@ -62,8 +62,8 @@ pub fn run(payload: Option<&Value>) -> i32 {
 }
 
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the firing itself, the reader argv
-// already resolved and `None` where nothing resolved. Nothing here writes stdout: this member emits
-// no hook JSON on any path, and a byte there would be a decision it never makes.
+// already resolved and `None` where nothing resolved. Nothing here writes stdout: a firing emits no
+// hook JSON on any path, and a byte there would be a decision it never makes.
 pub fn fire(
     payload: Option<&Value>,
     log: &str,

@@ -25,7 +25,50 @@ struct Case {
     stdin: &'static str,
     expect_code: i32,
     expect_text: &'static str,
+    expect_stdout: Stdout,
     linked: Linked,
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — what a case holds the bash stub's stdout to, beside the text
+// it must carry: the absent-binary `--hook` decline owes one `systemMessage` envelope, and every
+// other fail-open path owes none
+#[derive(Clone, Copy, PartialEq)]
+enum Stdout {
+    Unchecked,
+    Empty,
+    SystemMessage,
+}
+
+impl Stdout {
+    fn label(self) -> &'static str {
+        match self {
+            Stdout::Unchecked => "unchecked",
+            Stdout::Empty => "empty",
+            Stdout::SystemMessage => "one systemMessage envelope",
+        }
+    }
+
+    fn holds(self, out: &[u8]) -> bool {
+        match self {
+            Stdout::Unchecked => true,
+            Stdout::Empty => out.is_empty(),
+            Stdout::SystemMessage => {
+                let text = String::from_utf8_lossy(out);
+                let Some(line) = text.strip_suffix('\n').filter(|l| !l.contains('\n')) else {
+                    return false;
+                };
+                match serde_json::from_str::<serde_json::Value>(line) {
+                    Ok(serde_json::Value::Object(o)) => {
+                        o.len() == 1
+                            && o.get("systemMessage")
+                                .and_then(|v| v.as_str())
+                                .is_some_and(|m| !m.is_empty())
+                    }
+                    _ => false,
+                }
+            }
+        }
+    }
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — whether the case runs from a hand-built linked worktree, and
@@ -57,6 +100,7 @@ const fn absent(
         stdin: "",
         expect_code: 2,
         expect_text,
+        expect_stdout: Stdout::Unchecked,
         linked: Linked::No,
     }
 }
@@ -77,6 +121,7 @@ const fn grammar(
         stdin: "",
         expect_code,
         expect_text,
+        expect_stdout: Stdout::Unchecked,
         linked: Linked::No,
     }
 }
@@ -98,6 +143,7 @@ const CORPUS: &[Case] = &[
         stdin: "",
         expect_code: 2,
         expect_text: "run-gates: not inside a git repository",
+        expect_stdout: Stdout::Unchecked,
         linked: Linked::No,
     },
     absent("binary absent, leading --emit", &[], &[], ABSENT),
@@ -105,17 +151,20 @@ const CORPUS: &[Case] = &[
         name: "binary absent, leading --hook",
         argv: &["--hook", "escalation-guard"],
         expect_code: 0,
+        expect_stdout: Stdout::SystemMessage,
         ..absent("", &[], &[], ABSENT)
     },
     Case {
         name: "binary absent, leading --HOOK, which is no fail-open name",
         argv: &["--HOOK", "escalation-guard"],
+        expect_stdout: Stdout::Empty,
         ..absent("", &[], &[], ABSENT)
     },
     Case {
         name: "binary absent, leading --statusline",
         argv: &["--statusline"],
         expect_code: 0,
+        expect_stdout: Stdout::Empty,
         ..absent("", &[], &[], ABSENT)
     },
     absent(
@@ -234,6 +283,7 @@ const CORPUS: &[Case] = &[
         argv: &["--hook", "escalation-guard"],
         stdin: QUESTION,
         expect_code: 0,
+        expect_stdout: Stdout::SystemMessage,
         linked: Linked::MainBare,
         ..absent("", &[], &[], ABSENT)
     },
@@ -312,12 +362,16 @@ fn check() -> Result<bool, String> {
         let mut twin_argv: Vec<&str> = vec!["-NoProfile", "-NonInteractive", "-File", twin_arg.as_str()];
         twin_argv.extend(case.argv);
         let bash = Transcript::of(&programs::BASH, &bash_argv, case, &env)?;
-        if bash.code != case.expect_code || !bash.text().contains(case.expect_text) {
+        if bash.code != case.expect_code
+            || !bash.text().contains(case.expect_text)
+            || !case.expect_stdout.holds(&bash.stdout)
+        {
             return Err(format!(
-                "case '{}': the bash stub did not do what the case names (want exit {} carrying {:?}), so the corpus exercised nothing\n{}",
+                "case '{}': the bash stub did not do what the case names (want exit {} carrying {:?}, stdout {}), so the corpus exercised nothing\n{}",
                 case.name,
                 case.expect_code,
                 case.expect_text,
+                case.expect_stdout.label(),
                 bash.render("bash")
             ));
         }
@@ -587,6 +641,19 @@ mod tests {
         assert!(d.starts_with("stdout line 2:"), "{}", d);
         assert!(d.ends_with("(powershell)"), "{}", d);
         assert!(t(2, "").first_difference(&t(0, ""), "pwsh").expect("diverges").starts_with("exit 2"));
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — the decline's stdout is one line, one field, a non-empty
+    // message; anything more or less is a stub that did not decline the way the case names
+    #[test]
+    fn the_stdout_expectation_holds_the_decline_envelope_exactly() {
+        assert!(Stdout::SystemMessage.holds(b"{\"systemMessage\":\"off\"}\n"));
+        assert!(!Stdout::SystemMessage.holds(b"{\"systemMessage\":\"off\"}"));
+        assert!(!Stdout::SystemMessage.holds(b"{\"systemMessage\":\"\"}\n"));
+        assert!(!Stdout::SystemMessage.holds(b"{\"systemMessage\":\"a\",\"x\":1}\n"));
+        assert!(!Stdout::SystemMessage.holds(b"{\"systemMessage\":\"a\"}\n{}\n"));
+        assert!(Stdout::Empty.holds(b"") && !Stdout::Empty.holds(b"\n"));
+        assert!(Stdout::Unchecked.holds(b"anything"));
     }
 
     // spec: gate-sdk/SPEC.md §run-gates — Windows PowerShell joins the host set on Windows alone

@@ -191,15 +191,28 @@ pub fn block(name: &str, msg: &str) -> i32 {
     2
 }
 
-// spec: gate-sdk/SPEC.md §The non-gate arm — the member's own face of the fail-open rule: a guard
-// that cannot run declines loudly rather than wedging the session. The front-end holds the two
-// causes it can see; this holds the one only the member can, an unresolvable declared knob.
-pub fn decline(name: &str, reason: &str) -> i32 {
-    eprintln!(
+// spec: gate-sdk/SPEC.md §The harness-integration arm — the member's own face of the fail-open
+// rule: a guard that cannot run declines rather than wedging the session. The front-end holds the
+// cause it can see; this holds the one only the member can, an unresolvable declared knob.
+pub fn decline(name: &str, reason: &str, payload: Option<&Value>) -> i32 {
+    let text = format!(
         "{}: {} — the rule could not be enforced on this call and the call was allowed.",
         name, reason
     );
+    println!("{}", decline_envelope(&text, payload));
+    eprintln!("{}", text);
     0
+}
+
+// spec: gate-sdk/SPEC.md §The harness-integration arm — the firing event's envelope: the advise
+// envelope reaches the model on `PreToolUse`; elsewhere the universal `systemMessage` reaches the
+// operator, a turn-end event having no model channel that does not refuse the stop
+pub fn decline_envelope(text: &str, payload: Option<&Value>) -> String {
+    if field(payload, &["hook_event_name"]) == "PreToolUse" {
+        advise_envelope(text)
+    } else {
+        format!(r#"{{"systemMessage":{}}}"#, quote(text))
+    }
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — one field of the payload by object path, rendered as
@@ -307,6 +320,26 @@ mod tests {
         assert!(!members().contains(&"agent-budget-guards"));
         assert!(!members().contains(&"PreToolUse"));
         assert_eq!(members().len(), HOOKS.len());
+    }
+
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — a decline speaks through the firing
+    // event's envelope and never through a verdict: exit 0, and the event read off the payload
+    #[test]
+    fn a_decline_writes_the_firing_events_envelope() {
+        let doc = |ev: &str| -> Value {
+            serde_json::from_str(&format!(r#"{{"hook_event_name":"{}"}}"#, ev)).unwrap()
+        };
+        let pre = doc("PreToolUse");
+        let adv: Value =
+            serde_json::from_str(&decline_envelope("m: \"k\" unset", Some(&pre))).unwrap();
+        assert_eq!(adv["hookSpecificOutput"]["hookEventName"], "PreToolUse");
+        assert_eq!(adv["hookSpecificOutput"]["additionalContext"], "m: \"k\" unset");
+        assert!(adv.get("systemMessage").is_none());
+        for p in [Some(&doc("SubagentStop")), None] {
+            let sys: Value = serde_json::from_str(&decline_envelope("t", p)).unwrap();
+            assert_eq!(sys, serde_json::json!({"systemMessage": "t"}));
+        }
+        assert_eq!(decline("m", "r", None), 0);
     }
 
     // spec: gate-sdk/SPEC.md §The harness-integration arm — the owner column is checked against the

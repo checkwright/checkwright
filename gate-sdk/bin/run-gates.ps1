@@ -21,6 +21,14 @@ function Write-StubError {
     $err.Flush()
 }
 
+function Write-StubLine {
+    param([string] $Text)
+    $bytes = (New-Object System.Text.UTF8Encoding($false)).GetBytes($Text + "`n")
+    $out = [Console]::OpenStandardOutput()
+    $out.Write($bytes, 0, $bytes.Length)
+    $out.Flush()
+}
+
 $onWindows = [System.IO.Path]::DirectorySeparatorChar -eq '\'
 $SDK = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).ProviderPath
 
@@ -247,6 +255,10 @@ if (-not $runnable) {
     }
     Write-StubError ("run-gates: $($argv[0]) dispatches to the native binary, but $bin is absent or not " +
         "executable $dash it could not run. $remedy")
+    # spec: gate-sdk/SPEC.md §The harness-integration arm — exit-0 stderr reaches the harness's debug log alone, so the fail-open --hook decline speaks through the one envelope every hook event accepts
+    if ($argv[0] -ceq '--hook') {
+        Write-StubLine -Text '{"systemMessage":"run-gates: the gate binary is absent or not executable, so every hook guard in this tree is off and each guarded call is allowed. Build it: bash gate-sdk/bin/build-native.sh"}'
+    }
     exit $unavailable
 }
 

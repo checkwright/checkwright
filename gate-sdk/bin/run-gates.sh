@@ -40,6 +40,10 @@ exec_arm() {
         else
             printf 'executable — it could not run. Build it: bash gate-sdk/bin/build-native.sh\n' >&2
         fi
+        # spec: gate-sdk/SPEC.md §The harness-integration arm — exit-0 stderr reaches the harness's debug log alone, so the fail-open --hook decline speaks through the one envelope every hook event accepts
+        if [[ "$1" == --hook ]]; then
+            printf '%s\n' '{"systemMessage":"run-gates: the gate binary is absent or not executable, so every hook guard in this tree is off and each guarded call is allowed. Build it: bash gate-sdk/bin/build-native.sh"}'
+        fi
         exit "$ARM_UNAVAILABLE_STATUS"
     fi
     exec "$bin" "$@"

@@ -57,7 +57,7 @@ pub const USAGE: &str = r#"usage: run-gates.sh [gates-dir]                run ev
           through on stdin, the hook-JSON envelope (where the member emits one)
           comes back on stdout, and the exit status is the harness's own
           allow/block signal. Where the binary is absent or its configuration
-          cannot be resolved, this arm declines with a diagnostic on stderr and
+          cannot be resolved, this arm declines through a hook envelope and
           exit 0 rather than blocking every guarded tool call.
   --statusline  renders the status line for the harness's statusLine hook and
           rewrites the usage snapshot; declines like --hook when unavailable.
