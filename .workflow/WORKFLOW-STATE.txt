@@ -9,3 +9,4 @@ adopter-onramp spec a273964d 2026-09-24 7140ddb3
 adopter-onramp align af774101 2026-09-24 a8a4a44c
 adopter-onramp build a6ab661e 2026-09-24 b7239793
 adopter-onramp build adaa828b 2026-09-24 7971d150
+adopter-onramp build a2499a07 2026-09-24 0c1b877f
