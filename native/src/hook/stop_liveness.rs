@@ -241,6 +241,7 @@ fn append_record(log: &str, stamp: &str, values: &[&str]) {
         line.push_str(v);
     }
     line.push('\n');
+    let log = &walk::capture_path(log);
     if let Some(dir) = std::path::Path::new(log).parent() {
         if !dir.as_os_str().is_empty() {
             let _ = std::fs::create_dir_all(dir);

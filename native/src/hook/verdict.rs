@@ -201,7 +201,8 @@ fn append_sample(cfg: &Config, snap: &Snapshot, login_at: i64, verdict: &str) {
             snap.tokens_in, snap.tokens_out
         ));
     }
-    let path = std::path::Path::new(&cfg.history);
+    let history = walk::capture_path(&cfg.history);
+    let path = std::path::Path::new(&history);
     if let Some(dir) = path.parent() {
         if !dir.as_os_str().is_empty() {
             let _ = std::fs::create_dir_all(dir);
@@ -332,7 +333,7 @@ pub fn verdict(args: &[String]) -> (String, i32) {
     } else {
         0
     };
-    let rolled = match previous_boundary(&cfg.history) {
+    let rolled = match previous_boundary(&walk::capture_path(&cfg.history)) {
         Some(prev) => int(&snap.resets_at) != prev && int(&snap.updated_at) > prev,
         None => false,
     };

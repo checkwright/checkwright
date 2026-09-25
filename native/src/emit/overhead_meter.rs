@@ -245,7 +245,7 @@ fn measure(target: Target, log: &str) -> Result<String, String> {
         "{} {} total={} gov={} gate={} pct={}",
         today, session8, c.total, gov, c.gate, p
     );
-    rewrite_keyed(std::path::Path::new(log), &session8, &line)
+    rewrite_keyed(std::path::Path::new(&crate::walk::capture_path(log)), &session8, &line)
         .map_err(|e| format!("cannot write {}: {}", log, e))?;
 
     Ok(format!(

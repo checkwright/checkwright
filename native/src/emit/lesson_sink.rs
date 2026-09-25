@@ -68,7 +68,7 @@ fn fallback(tag: &str, body: &[u8]) -> Result<i32, String> {
     let mut f = std::fs::OpenOptions::new()
         .create(true)
         .append(true)
-        .open(&path)
+        .open(walk::capture_path(&path))
         .map_err(|e| format!("cannot open the harvest file {}: {}", path, e))?;
     f.write_all(body)
         .map_err(|e| format!("cannot append to the harvest file {}: {}", path, e))?;

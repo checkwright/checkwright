@@ -13,7 +13,7 @@ pub fn run(payload: Option<&Value>) -> i32 {
     // spec: guard-kit/SPEC.md §wakeup-guard — the deny stands even where the log path does not
     // resolve: the block is unconditional, so a knob fault costs the record and not the rule
     if let Ok(log) = walk::knob_scalar("GUARD_KIT_WAKEUP_LOG") {
-        append_attempt(&log, payload);
+        append_attempt(&walk::capture_path(&log), payload);
     }
     hook::block(NAME, DENIAL)
 }

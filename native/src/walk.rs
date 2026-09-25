@@ -471,6 +471,39 @@ fn toplevel_args(anchor: &[&str]) -> Result<Option<String>, String> {
         .map(|s| normalize_abs(&s)))
 }
 
+// spec: gate-sdk/SPEC.md §The crate's crosser — the main checkout's root when the working directory
+// is a linked worktree whose common dir's leaf is `.git`; none anywhere else, a failed spawn included
+pub fn main_checkout_root() -> Option<String> {
+    let c = crate::proc::run(&programs::GIT, &["rev-parse", "--git-dir", "--git-common-dir"]).ok()?;
+    let out = String::from_utf8_lossy(c.stdout()?).into_owned();
+    let here = cwd().ok()?;
+    let mut lines = out.lines();
+    let git_dir = canonicalize(abs_against(&here, lines.next()?))?;
+    let common = canonicalize(abs_against(&here, lines.next()?))?;
+    linked_main(&git_dir, &common)
+}
+
+fn linked_main(git_dir: &str, common: &str) -> Option<String> {
+    let bare = |p: &str| p.strip_prefix(r"\\?\").unwrap_or(p).trim_end_matches(['/', '\\']).to_string();
+    let (git_dir, common) = (bare(git_dir), bare(common));
+    let (main, leaf) = common.rsplit_once(['/', '\\'])?;
+    (git_dir != common && leaf == ".git" && !main.is_empty()).then(|| normalize_abs(main))
+}
+
+// spec: gate-sdk/SPEC.md §The workflow directory — capture has one home per clone: a relative
+// capture path from a linked worktree resolves against the main checkout; any other value is returned
+// as given, for the caller's own resolution
+pub fn capture_path(value: &str) -> String {
+    capture_path_in(value, main_checkout_root().as_deref())
+}
+
+fn capture_path_in(value: &str, main: Option<&str>) -> String {
+    match main {
+        Some(m) if path_root(value).is_none() && !value.is_empty() => abs_against(m, value),
+        _ => value.to_string(),
+    }
+}
+
 // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the authoring predicate both port gates
 // scope by, held here so it is shared rather than spelled twice: tracked *source* under the crate
 // root, so build output cannot read as authorship, and every refusal degrades to false
@@ -1186,6 +1219,29 @@ pub fn fixture_case_dirs(gate: &str) -> Vec<PathBuf> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: gate-sdk/SPEC.md §The crate's crosser — linked only when the two dirs differ and the
+    // common dir's leaf is `.git`; a bare repository's worktree and the main checkout itself are not
+    #[test]
+    fn a_main_checkout_is_named_only_from_a_linked_worktree() {
+        assert_eq!(linked_main("/r/.git/worktrees/w", "/r/.git").as_deref(), Some("/r"));
+        assert_eq!(linked_main("/r/.git/worktrees/w/", "/r/.git/").as_deref(), Some("/r"));
+        assert_eq!(linked_main(r"\\?\C:\r\.git\worktrees\w", r"\\?\C:\r\.git").as_deref(), Some("C:/r"));
+        assert_eq!(linked_main("/r/.git", "/r/.git"), None);
+        assert_eq!(linked_main("/r.git/worktrees/w", "/r.git"), None);
+        assert_eq!(linked_main("/.git/worktrees/w", "/.git"), None);
+    }
+
+    // spec: gate-sdk/SPEC.md §The workflow directory — only a relative value moves, and only from a
+    // linked worktree
+    #[test]
+    fn a_capture_path_moves_only_when_relative_and_linked() {
+        assert_eq!(capture_path_in(".workflow/x.log", Some("/r")), "/r/.workflow/x.log");
+        assert_eq!(capture_path_in("./.metric/y.log", Some("C:/r")), "C:/r/.metric/y.log");
+        assert_eq!(capture_path_in("/abs/x.log", Some("/r")), "/abs/x.log");
+        assert_eq!(capture_path_in(".workflow/x.log", None), ".workflow/x.log");
+        assert_eq!(capture_path_in("", Some("/r")), "");
+    }
 
     // spec: gate-sdk/SPEC.md §check-pipe-membership — a suite is a direct child of an unpruned tests
     // dir; a file inside a case directory, or under a pruned component above, stays out

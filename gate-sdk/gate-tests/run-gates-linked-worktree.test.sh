@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: gate-sdk/SPEC.md §The harness-integration arm — a fail-open arm run inside a linked worktree with no binary of its own dispatches to the main checkout's binary: the fork ban, the workflow-state guard and the shell guard fire from the worktree; with both binaries absent the hook still declines at 0; a verdict-bearing arm still reports the binary absent at 2; and an absolute pin naming nothing takes no fallback
+# spec: gate-sdk/SPEC.md §The harness-integration arm — a fail-open arm run inside a linked worktree with no binary of its own dispatches to the main checkout's binary: the fork ban, the workflow-state guard and the shell guard fire from the worktree; with both binaries absent the hook still declines at 0; a verdict-bearing arm still reports the binary absent at 2; an absolute pin naming nothing takes no fallback; and a capture write lands in the main checkout (gate-sdk/SPEC.md §The workflow directory)
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -62,7 +62,27 @@ printf 'native/target/\n' >"$wt/.gitignore"
 out="$(in_wt '' bash gate-sdk/bin/run-gates.sh --emit knob-values GATE_SDK_NATIVE_BIN)"; rc=$?
 [[ "$rc" -eq 0 ]] || note payload-status "want exit 0 through the linked main binary, got $rc -- $out"
 grep -qF 'GATE_SDK_NATIVE_BIN' <<<"$out" || note payload-text "the linked binary did not answer: $out"
+
+# 10. a capture write from the worktree lands in the main checkout's capture tier and none in the worktree's
+out="$(in_wt '' bash gate-sdk/bin/run-gates.sh --emit kfric 'a worktree fact' 'a surface')"; rc=$?
+[[ "$rc" -eq 0 ]] || note kfric-status "want exit 0 from --emit kfric in a linked worktree, got $rc -- $out"
+grep -qF 'a worktree fact ← a surface' "$main/.workflow/knowledge-friction.log" 2>/dev/null || note kfric-home "the worktree's kfric line is not in the main checkout's log"
+[[ -e "$wt/.workflow/knowledge-friction.log" ]] && note kfric-worktree "the worktree's kfric line landed in the worktree"
+
+# 11. the lesson sink with no sink configured stages into the main checkout's harvest file
+out="$(in_wt 'a worktree lesson' bash gate-sdk/bin/run-gates.sh --lesson-sink probe)"; rc=$?
+[[ "$rc" -eq 0 ]] || note sink-status "want exit 0 from --lesson-sink in a linked worktree, got $rc -- $out"
+grep -qF 'a worktree lesson' "$main/.workflow/probe-harvest.md" 2>/dev/null || note sink-home "the worktree's lesson is not in the main checkout's harvest file"
+[[ -e "$wt/.workflow/probe-harvest.md" ]] && note sink-worktree "the worktree's lesson landed in the worktree"
 rm -rf "$wt/native" "$wt/.gitignore"
+
+# 12. the control: from the main checkout both writers keep their own root
+out="$( cd "$main" && unset GATE_SDK_NATIVE_BIN && bash gate-sdk/bin/run-gates.sh --emit kfric 'a main fact' 'a surface' 2>&1 )"; rc=$?
+[[ "$rc" -eq 0 ]] || note kfric-main-status "want exit 0 from --emit kfric in the main checkout, got $rc -- $out"
+grep -qF 'a main fact ← a surface' "$main/.workflow/knowledge-friction.log" 2>/dev/null || note kfric-main "the main checkout's kfric line is not in its own log"
+out="$( cd "$main" && unset GATE_SDK_NATIVE_BIN && bash gate-sdk/bin/run-gates.sh --lesson-sink probe <<<'a main lesson' 2>&1 )"; rc=$?
+[[ "$rc" -eq 0 ]] || note sink-main-status "want exit 0 from --lesson-sink in the main checkout, got $rc -- $out"
+grep -qF 'a main lesson' "$main/.workflow/probe-harvest.md" 2>/dev/null || note sink-main "the main checkout's lesson is not in its own harvest file"
 
 # 6. an absolute pin naming nothing takes no fallback: the hook declines at 0 on its own line
 out="$( cd "$wt" && GATE_SDK_NATIVE_BIN="$SANDBOX/nowhere/gates" bash gate-sdk/bin/run-gates.sh --hook agent-dispatch-guard <<<'{"tool_input":{"subagent_type":"fork"}}' 2>&1 )"; rc=$?
@@ -112,5 +132,5 @@ grep -qF "was not built from this worktree's crate source" <<<"$out" || note ske
 git -C "$crate" worktree remove --force "$cwt"
 
 [[ "$fails" -eq 0 ]] || { echo "run-gates-linked-worktree.test: $fails assertion(s) failed"; exit 1; }
-echo "run-gates-linked-worktree.test: clean (from a linked worktree with no binary the fork ban, the workflow-state guard and the shell guard fire through the main checkout's binary; a verdict arm links the main binary only onto a gitignored door and, where crate source is tracked, only on a matching source stamp, refusing at 2 with the reason otherwise and never building; an absolute pin naming nothing takes no fallback; with both absent the hook declines at 0)"
+echo "run-gates-linked-worktree.test: clean (from a linked worktree with no binary the fork ban, the workflow-state guard and the shell guard fire through the main checkout's binary; a verdict arm links the main binary only onto a gitignored door and, where crate source is tracked, only on a matching source stamp, refusing at 2 with the reason otherwise and never building; an absolute pin naming nothing takes no fallback; with both absent the hook declines at 0; a kfric line and a fallback lesson written from the worktree land in the main checkout, and from the main checkout in its own)"
 exit 0

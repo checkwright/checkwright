@@ -356,7 +356,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         kept: Vec::new(),
         dates: StampDates::default(),
     };
-    if let Ok(b) = std::fs::read(&r.log) {
+    if let Ok(b) = std::fs::read(crate::walk::capture_path(&r.log)) {
         r.kept = String::from_utf8_lossy(&b)
             .lines()
             .map(str::to_string)
@@ -611,14 +611,15 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     // spec: drift-kit/SPEC.md §The stage-economics meter — the log is touched only where a row was
     // emitted, so a run that priced nothing neither creates nor rewrites it.
     if rows > 0 {
-        if let Some(dir) = std::path::Path::new(&log).parent() {
+        let at = crate::walk::capture_path(&log);
+        if let Some(dir) = std::path::Path::new(&at).parent() {
             let _ = std::fs::create_dir_all(dir);
         }
         let mut body = r.kept.join("\n");
         if !body.is_empty() {
             body.push('\n');
         }
-        std::fs::write(&log, body).map_err(|e| format!("cannot write {}: {}", log, e))?;
+        std::fs::write(&at, body).map_err(|e| format!("cannot write {}: {}", log, e))?;
     }
     head.push_str(&r.out);
     Ok(head)

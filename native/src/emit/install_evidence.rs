@@ -16,7 +16,8 @@ const UNROSTERED: &str = "unrostered";
 const EMPTY_CELL: &str = "·";
 
 // spec: drift-kit/SPEC.md §The install-observation record — the record's path resolves against the
-// repo root exactly as the capture arm resolves it, so writer and reader cannot diverge on it.
+// repo root exactly as the capture arm resolves it in the main checkout, so writer and reader cannot
+// diverge there; a reader keeps its own root (gate-sdk/SPEC.md §The workflow directory).
 pub fn record_path() -> Result<(String, String), String> {
     super::file_survey::anchored("DRIFT_KIT_INSTALL_RECORD")
 }

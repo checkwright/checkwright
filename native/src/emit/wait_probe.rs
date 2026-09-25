@@ -309,13 +309,14 @@ fn cmd_record(key: &str, form: &str, ms: &str) -> Result<i32, String> {
         "form={} predicate={} producer_ms={} waiter_exit={} marker_at_ms={} waiter_at_ms={} producer_alive_at_exit={} class={}\n",
         form, pred, ms, waiter_exit, marker_at, waiter_at, alive, class
     );
-    if let Some(dir) = std::path::Path::new(&p.evidence).parent() {
+    let evidence = walk::capture_path(&p.evidence);
+    if let Some(dir) = std::path::Path::new(&evidence).parent() {
         mkdir_p(&dir.display().to_string())?;
     }
     let mut f = std::fs::OpenOptions::new()
         .create(true)
         .append(true)
-        .open(&p.evidence)
+        .open(&evidence)
         .map_err(|e| format!("cannot open the evidence file {}: {}", p.evidence, e))?;
     f.write_all(line.as_bytes())
         .map_err(|e| format!("cannot append to {}: {}", p.evidence, e))?;

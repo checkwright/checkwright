@@ -194,7 +194,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     let fields = &argv[1..];
     validate(k, fields)?;
 
-    let (record, spelled) = super::file_survey::anchored("DRIFT_KIT_INSTALL_RECORD")?;
+    let (record, spelled) = super::file_survey::anchored_capture("DRIFT_KIT_INSTALL_RECORD")?;
     let path = std::path::Path::new(&record);
     if let Some(dir) = path.parent() {
         let _ = std::fs::create_dir_all(dir);

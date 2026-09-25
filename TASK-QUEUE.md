@@ -36,20 +36,6 @@ the close-stage triage templates read a capture log, triage it, then truncate it
 
 **Cost while deferred:** one close per iteration risks dropping a concurrent session's capture. Filed 2026-08-18; returned from the icebox 2026-09-25 by consult, both templates re-read.
 
-### worktree-isolated-dispatch-cannot-reach-the-main-checkout
-
-[spec: SPEC-capture-home.md] [recurrence: 2026-09-25]
-
-an isolated child's capture-tier writes resolve inside its own worktree and die with it. Reproduced 2026-09-25 by an isolated audit dispatch: the guard wrote its `prompt-friction.log` under the worktree's `.workflow/`, where the reap deletes it, so close's triage never reads a worktree session's friction or liveness capture.
-
-**Deliverable:** capture-tier writers resolve the main checkout's workflow directory when the writer runs in a linked worktree (`git rev-parse --git-common-dir` is the seam), with a fixture, and the rule at delegation-kit/SPEC.md §The delegation model beside the isolation costs.
-
-**Taken as a feature — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the rule binds every capture writer, a contract other components must honor, so /spec authors it. Scope read the seam as present: `native/src/guard/host.rs` already resolves the main checkout through `--git-common-dir` for confinement, while the friction log's path resolves under `GATE_SDK_WORKFLOW_DIR` from the working directory.
-
-**Spec (2026-09-25):** the premise re-ran live at spec, where an isolated child's worktree held both its friction and liveness logs. The rule sits in gate-sdk §The workflow directory, and delegation-kit §The delegation model states the write half beside its untracked-read ruling. The numbered isolation costs live in the agent-execution template, which needs no change. Eleven writers adopt one `walk` helper, which also replaces `crate_arms.rs`'s private copy of the predicate.
-
-**Cost while deferred:** every isolated dispatch's capture is lost, and the KPIs that read it undercount exactly the sessions the protocol says to isolate. Filed 2026-08-25; returned from the icebox 2026-09-25 by consult on a live reproduction.
-
 ## Technical Debt
 
 ### wait-mandate-template-spelling-unreachable
@@ -1508,6 +1494,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 ## Done
 
+- worktree-isolated-dispatch-cannot-reach-the-main-checkout
 - dod-size-figure-stales-in-iteration
 - craft-rule-step-has-no-reader
 - agent-file-paragraph-sections-ungoverned

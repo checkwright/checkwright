@@ -32,7 +32,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     if fields.len() != 2 || fields.iter().any(String::is_empty) {
         return Err(USAGE.to_string());
     }
-    let (log, spelled) = super::file_survey::anchored("DRIFT_KIT_KNOWLEDGE_LOG")?;
+    let (log, spelled) = super::file_survey::anchored_capture("DRIFT_KIT_KNOWLEDGE_LOG")?;
     let path = std::path::Path::new(&log);
     if let Some(dir) = path.parent() {
         let _ = std::fs::create_dir_all(dir);

@@ -163,12 +163,8 @@ impl Host {
             if d.is_empty() || !std::path::Path::new(&format!("{}/.git", d)).is_file() {
                 return r;
             }
-            let git_dir = rev_parse(&cwd, "--git-dir");
-            let common = rev_parse(&cwd, "--git-common-dir");
-            if common.is_empty() || git_dir == common || !common.ends_with("/.git") {
-                return r;
-            }
-            r.main = common[..common.len() - "/.git".len()].to_string();
+            let Some(main) = walk::main_checkout_root() else { return r };
+            r.main = main;
             r.own = d;
             r
         })
@@ -292,7 +288,8 @@ impl Host {
             Shell::Bash => line,
             Shell::PowerShell => format!("PowerShell\t{}", line),
         };
-        if let Ok(mut f) = std::fs::OpenOptions::new().create(true).append(true).open(&self.log) {
+        let log = walk::capture_path(&self.log);
+        if let Ok(mut f) = std::fs::OpenOptions::new().create(true).append(true).open(&log) {
             let _ = writeln!(f, "{}", line);
         }
     }
@@ -323,20 +320,6 @@ pub fn under(a: &str, b: &str) -> bool {
 
 fn git_ok(args: &[&str]) -> bool {
     proc::run(&programs::GIT, args).is_ok_and(|c| c.code() == Some(0))
-}
-
-fn rev_parse(cwd: &str, flag: &str) -> String {
-    let Ok(c) = proc::run(&programs::GIT, &["rev-parse", flag]) else {
-        return String::new();
-    };
-    let Some(o) = c.stdout() else { return String::new() };
-    let p = String::from_utf8_lossy(o).trim_end_matches(['\n', '\r']).to_string();
-    if p.is_empty() {
-        return String::new();
-    }
-    walk::canonicalize(walk::abs_against(cwd, &p))
-        .map(|c| walk::normalize_abs(c.strip_prefix(r"\\?\").unwrap_or(&c)))
-        .unwrap_or_default()
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — the rules' `$PWD`: the inherited logical spelling

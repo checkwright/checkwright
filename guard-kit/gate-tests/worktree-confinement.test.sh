@@ -147,8 +147,23 @@ mkdir -p "$wt/.tmp"
 printf 'pid=%s run=own-live\n' "$live" >"$wt/.tmp/own-live.run"
 want producer-own      "$r" fallthrough "git commit -m x"
 
+# --- the fall-through log at its relative default lands in the main checkout's capture tier from
+#     the worktree (gate-sdk/SPEC.md §The workflow directory), and in its own from the main checkout
+mkdir -p "$main/.workflow" "$wt/.workflow"
+fallthrough_at() {  # $1=directory $2=command
+    (cd "$1" && payload "$2" | GUARD_KIT_KNOB_FILE="$d" GATE_SDK_NATIVE_BIN="$BIN" "$BIN" --hook shell-guard >/dev/null 2>&1)
+}
+checks=$((checks + 1))
+fallthrough_at "$wt" "touch from-the-worktree.txt"
+grep -qF "from-the-worktree" "$main/.workflow/prompt-friction.log" 2>/dev/null || { echo "  FAIL [log-main-home]: the worktree's fall-through is not in the main checkout's log"; fails=$((fails + 1)); }
+checks=$((checks + 1))
+[[ -e "$wt/.workflow/prompt-friction.log" ]] && { echo "  FAIL [log-not-worktree]: the worktree's fall-through landed in the worktree's log"; fails=$((fails + 1)); }
+checks=$((checks + 1))
+fallthrough_at "$main" "touch from-the-main-checkout.txt"
+grep -qF "from-the-main-checkout" "$main/.workflow/prompt-friction.log" 2>/dev/null || { echo "  FAIL [log-main-own]: the main checkout's fall-through is not in its own log"; fails=$((fails + 1)); }
+
 git -C "$main" worktree remove --force "$wt"
 
 [[ "$fails" -eq 0 ]] || { echo "worktree-confinement.test: $fails of $checks assertion(s) failed"; exit 1; }
-echo "worktree-confinement.test: ok ($checks assertions; from a linked worktree the journal append under the main scratch dir and read-only searches of the main checkout pass, every write naming the main checkout outside its scratch dir is refused with the loaded roster named, a PowerShell call meets the same refusal with no admitted read and has a main-checkout scratch body steered to the own scratch dir, a write in the own worktree is not the rule's, 'off' refuses the search and keeps the journal, a program-bearing tool is never admitted, and the liveness record resolves to the main checkout's scratch dir for the launch, its grant and the git-write hold)"
+echo "worktree-confinement.test: ok ($checks assertions; from a linked worktree the journal append under the main scratch dir and read-only searches of the main checkout pass, every write naming the main checkout outside its scratch dir is refused with the loaded roster named, a PowerShell call meets the same refusal with no admitted read and has a main-checkout scratch body steered to the own scratch dir, a write in the own worktree is not the rule's, 'off' refuses the search and keeps the journal, a program-bearing tool is never admitted, and the liveness record resolves to the main checkout's scratch dir for the launch, its grant and the git-write hold, and a fall-through at the relative log default lands in the main checkout's log)"
 exit 0

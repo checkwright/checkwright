@@ -45,21 +45,6 @@ fn cache_path(tmp_dir: &str, crate_dir: &str) -> String {
     format!("{}/crate-arms-{}.green", tmp_dir, id)
 }
 
-// spec: gate-sdk/SPEC.md §check-crate-arms — the main checkout's root when the working directory is
-// a linked worktree whose common dir is `<main>/.git`; None anywhere else
-fn main_checkout_root() -> Option<String> {
-    let c = proc::run(&programs::GIT, &["rev-parse", "--git-dir", "--git-common-dir"]).ok()?;
-    let out = String::from_utf8_lossy(c.stdout()?).into_owned();
-    let mut lines = out.lines();
-    let here = walk::cwd().ok()?;
-    let git_dir = walk::canonicalize(walk::abs_against(&here, lines.next()?))?;
-    let common = walk::canonicalize(walk::abs_against(&here, lines.next()?))?;
-    let common = common.strip_prefix(r"\\?\").unwrap_or(&common).trim_end_matches(['/', '\\']);
-    let git_dir = git_dir.strip_prefix(r"\\?\").unwrap_or(&git_dir).trim_end_matches(['/', '\\']);
-    let (main, leaf) = common.rsplit_once(['/', '\\'])?;
-    (git_dir != common && leaf == ".git").then(|| main.to_string())
-}
-
 // spec: gate-sdk/SPEC.md §check-crate-arms — one arm's spawn and its report: the merged capture is
 // read whatever the status, because for these two the *failing* run is the one whose report has to
 // print, and a command substitution's value keeps exactly one trailing newline when echoed back
@@ -186,7 +171,7 @@ pub fn run(_args: &[String]) -> i32 {
 
     // spec: gate-sdk/SPEC.md §check-crate-arms — in a linked worktree the main checkout's record
     // answers a local miss, and a miss there refuses rather than builds
-    if let Some(main) = main_checkout_root() {
+    if let Some(main) = walk::main_checkout_root() {
         let shared = walk::abs_against(&main, &cache);
         if !key.is_empty() {
             if let Ok(recorded) = std::fs::read_to_string(&shared) {

@@ -140,7 +140,7 @@ Headings keep their text, so every `§` citation into them still resolves. Befor
 
 ### (10) Stamp the ceiling {mechanical}
 
-**Applied over the unmoved sections; re-stamped after deltas 6 to 9.** After deltas 3 to 9, run the worklist spelling from delta 1 and write one `<n> <path>` row per governed file with findings into `.workflow/prose-bound-ceiling.txt`. The five sections contribute none. `check-prose-bounds` is then green at the rows, and every later edit that moves a count moves its row. The sibling amendments `SPEC-capture-drain.md` and `SPEC-capture-home.md` merge into governed SPECs too. If either merges before this delta, the stamp absorbs its count. If it merges after, its merge commit moves the rows it changes, and the gate refuses that commit until it does.
+**Applied over the unmoved sections; re-stamped after deltas 6 to 9.** After deltas 3 to 9, run the worklist spelling from delta 1 and write one `<n> <path>` row per governed file with findings into `.workflow/prose-bound-ceiling.txt`. The five sections contribute none. `check-prose-bounds` is then green at the rows, and every later edit that moves a count moves its row. The sibling amendment `SPEC-capture-drain.md` merges into governed SPECs too, as the capture-home rule did (gate-sdk/SPEC.md §The workflow directory). A sibling merged before this delta has its count absorbed by the stamp. One merged after moves the rows it changes in its merge commit, and the gate refuses that commit until it does.
 
 ## Producers and consumers
 

@@ -40,12 +40,23 @@ pub fn positionals<'a>(args: &'a [String], what: &str) -> Result<&'a [String], S
 // comment-tier-exempt: the configured spelling rides back beside the resolved path because the
 // refusals print it, and an absolute path no knob carries is not what a reader can act on
 pub fn anchored(knob: &str) -> Result<(String, String), String> {
+    let configured = walk::knob_scalar(knob)?;
+    Ok((anchor(&configured)?, configured))
+}
+
+// spec: gate-sdk/SPEC.md §The workflow directory — a capture knob's path: the main checkout's from a
+// linked worktree, else anchored as a tracked record path is
+pub fn anchored_capture(knob: &str) -> Result<(String, String), String> {
+    let configured = walk::knob_scalar(knob)?;
+    Ok((anchor(&walk::capture_path(&configured))?, configured))
+}
+
+fn anchor(p: &str) -> Result<String, String> {
     let root = match walk::toplevel_opt()? {
         Some(t) => t,
         None => walk::cwd()?,
     };
-    let configured = walk::knob_scalar(knob)?;
-    Ok((walk::abs_against(&root, &configured), configured))
+    Ok(walk::abs_against(&root, p))
 }
 
 // spec: lifecycle-kit/SPEC.md §The survey record — `rev` is machine-stamped because it is the field
