@@ -24,16 +24,6 @@ the SPEC tier is unreadable as a specification by size, and a derived profile pl
 
 ## Technical Debt
 
-### wait-mandate-template-spelling-unreachable
-
-the in-turn wait the delegation protocol mandates, `while kill -0 "$pid"`, is refused by guard-kit's own expansion rule, while the literal-PID spelling is auto-allowed; the template and the agent definitions carry the refused form.
-
-**Deliverable:** the template and the agent definitions spell the wait in the form the guard grants, and the two SPECs cite one spelling.
-
-**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** it converges the spelling on the grant the guard already makes, adding no name. Premise re-verified at scope: `.claude/agents/stage-session.md` still carries `"$pid"`, and the guard refused `$VAR` expansions in the scope session itself.
-
-**Cost while deferred:** every adopter following the protocol literally meets a refusal on its first wait. Filed 2026-08-29; returned from the icebox 2026-09-25 by consult, the refusal re-probed.
-
 ## Deferred
 
 ### docs-liquid-literal-unseen
@@ -1480,6 +1470,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 ## Done
 
+- wait-mandate-template-spelling-unreachable
 - close-triage-log-reclaim-loss-window
 - worktree-isolated-dispatch-cannot-reach-the-main-checkout
 - dod-size-figure-stales-in-iteration
