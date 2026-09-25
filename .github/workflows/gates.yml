@@ -1653,29 +1653,47 @@ jobs:
           retention-days: 7
 
   # The macOS sibling, and the second non-Linux host this repository runs on.
-  # **It is binding: its red fails this workflow.** Read that as a different
-  # assertion from the Linux leg's rather than the same one spelled twice — the
+  # **Its posture is DERIVED**, off `native-artifacts-roster`'s per-target index
+  # at `aarch64-apple-darwin`, on the argument install-smoke-sh-macos-intel's
+  # own header gives for its own triple: a held producer's failure otherwise
+  # fails this workflow through a binding consumer whenever the consumer's
+  # posture is hard-coded rather than read — the coupling
+  # `held-ci-leg-failure-reddens-a-binding-one` filed, and this leg closes by
+  # deriving instead of hard-coding. While `aarch64-apple-darwin` stays
+  # `joined` (docs/install.md §Requirements) this leg is binding exactly as
+  # before — its red still fails this workflow — and read that as a different
+  # assertion from the Linux leg's rather than the same one spelled twice: the
   # Linux leg is binding through `--diff-baseline installer_smoke`, against a
   # recorded baseline, where this leg has no baseline and is binding on its own
   # exit status. Do not read this posture onto the WINDOWS sibling above, which is
   # still an instrument; the two legs are no longer the same shape.
   #
   # **The runner label floats, and read the honest limit with it.**
-  # `macos-latest` matches `ubuntu-latest` and `windows-latest` beside it because
-  # this leg's subject is the platform an adopter meets *today*, and a pinned
-  # label would freeze this leg against a host adopters have already left.
-  # The consequence is that `macos-latest` is **arm64**, so this leg measures
-  # arm64 and nothing else. Do not read one green arm64 run as a macOS claim: an
-  # Intel leg is a separate job this one neither buys nor blocks.
+  # `native-artifacts-roster` resolves `aarch64-apple-darwin` to `macos-latest`
+  # (native/runners.list), which matches `ubuntu-latest` and `windows-latest`
+  # beside it because this leg's subject is the platform an adopter meets
+  # *today*, and a pinned label would freeze this leg against a host adopters
+  # have already left. The consequence is that `macos-latest` is **arm64**, so
+  # this leg measures arm64 and nothing else. Do not read one green arm64 run
+  # as a macOS claim: an Intel leg is a separate job this one neither buys nor
+  # blocks.
   #
-  # **It no longer builds the artifact it exercises.** `needs: native-artifacts`
-  # and the download below are what make this leg one half of the join predicate
-  # native/targets.list's header states, rather than an adopter-path measurement
-  # that licenses nothing: the bytes it installs are the release-shaped
-  # producer's, moved and never re-derived.
+  # **It no longer builds the artifact it exercises.** `needs:
+  # [native-artifacts, native-artifacts-roster]` and the download below are
+  # what make this leg one half of the join predicate native/targets.list's
+  # header states, rather than an adopter-path measurement that licenses
+  # nothing: the bytes it installs are the release-shaped producer's, moved
+  # and never re-derived.
+  #
+  # **Every step below now names `shell: bash`**, for the reason
+  # install-smoke-sh-macos-intel's own header states in full: a `runs-on` that
+  # is an expression cannot be read by any tree-local reader, so
+  # check-action-run-shell cannot derive this job's dialect and an unnamed
+  # shell here is a red rather than a silence.
   install-smoke-sh-macos:
-    needs: native-artifacts
-    runs-on: macos-latest
+    needs: [native-artifacts, native-artifacts-roster]
+    runs-on: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['aarch64-apple-darwin'].runner }}
+    continue-on-error: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['aarch64-apple-darwin'].held }}
     # Measured, not predicted: this leg took **20m12s** on run `34038127178`, over
     # a cold Homebrew install and a cold `cargo` build — which is exactly the case
     # this figure was widened for, so the measurement already covers the worst
@@ -1727,6 +1745,7 @@ jobs:
       # alone to resolve `bash` to the prefix — after proving the same zsh
       # without it does not, so the probe cannot pass vacuously.
       - name: install the bash docs/install.md names, and PATH-order it
+        shell: bash
         run: |
           set +e
           block="$(awk '
@@ -1789,6 +1808,7 @@ jobs:
       # took — the stock interpreter is 3.2 and the floor is 4.3, so those two
       # disagreeing is itself the finding.
       - name: probe the runner
+        shell: bash
         run: |
           set +e
           echo "== interpreter =="
@@ -1856,6 +1876,7 @@ jobs:
       # `Cargo.lock` alone restores only the dependencies it does not need. A leg
       # that needs the crate compiled on its host has the producer leg for that.
       - name: normalize the producer's upload onto the layout pack reads
+        shell: bash
         run: |
           set -euo pipefail
           source gate-sdk/lib/gate.sh
@@ -1925,6 +1946,7 @@ jobs:
       # above says so in as many words. The VERDICT above it never depended on that
       # ground and is untouched.
       - name: install smoke on a macOS host
+        shell: bash
         run: |
           set +e
           # The explicit steering below is now REDUNDANT with the smoke's own
@@ -1947,8 +1969,10 @@ jobs:
           rc="${PIPESTATUS[0]}"
           echo "== verdict =="
           echo "installer_smoke on macOS exited $rc"
-          echo "This leg is binding: a non-zero here fails the workflow."
-          echo "A zero here is not a roster join: see this step's header for why."
+          echo "This leg's posture is derived from the platform declaration, so what a"
+          echo "non-zero does is decided there and not by this text: while $host is"
+          echo "joined the leg is binding and a non-zero here fails the workflow."
+          echo "A zero here is not a roster join: see this job's header for why."
           exit "$rc"
 
   # The INTEL macOS sibling, and the second half of `x86_64-apple-darwin`'s join
@@ -1969,10 +1993,11 @@ jobs:
   # exactly once, silently, in the direction of a joined platform whose smoke red
   # reds nothing.
   #
-  # **It therefore mints no new instance of the deferred
-  # `held-ci-leg-failure-reddens-a-binding-one` entry.** That entry is about a
-  # HELD producer defeating held-ness through a BINDING consumer; this consumer
-  # is held exactly while its producer is, so the pair moves together.
+  # **It therefore mints no new instance of `held-ci-leg-failure-reddens-a-
+  # binding-one`, closed alongside the arm64 sibling's own read at
+  # `aarch64-apple-darwin`.** That entry was about a HELD producer defeating
+  # held-ness through a BINDING consumer; this consumer is held exactly while
+  # its producer is, so the pair moves together.
   #
   # **The triple spelled below is a READ of the declaration rather than a second
   # assertion of support.** The download-by-pattern rule the sibling states avoids
