@@ -8,3 +8,4 @@ non-gate-arm-contract scope afa8268a 2026-09-25 380cf8d2
 non-gate-arm-contract spec ac8f88ec 2026-09-26 3db5c9d2
 non-gate-arm-contract align a3739218 2026-09-26 e5d4e14e
 non-gate-arm-contract build a6e9b111 2026-09-26 53f61136
+non-gate-arm-contract build ae53b069 2026-09-26 6667353a
