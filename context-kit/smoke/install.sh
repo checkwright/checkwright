@@ -74,6 +74,18 @@ if bash gate-sdk/bin/run-gates.sh --emit queue-index >/dev/null 2>&1 \
     exit 1
 fi
 
+# spec: context-kit/SPEC.md §Testing — a stage-rules command that cannot run is reported in the block's place, and the hook still exits zero
+mkdir -p .tmp
+printf -- '---\nsmoke-iteration build smoke0001 2000-01-01 0000000\n' > .tmp/smoke-state.txt
+rules_out="$(CONTEXT_KIT_STATE_FILE=.tmp/smoke-state.txt CONTEXT_KIT_STAGE_RULES=no-such-stage-rules-command \
+    bash scripts/session-context.sh </dev/null 2>/dev/null)"; rc=$?
+rm -f .tmp/smoke-state.txt
+if [[ "$rc" -ne 0 ]] || ! grep -q 'craft rules unavailable: the CONTEXT_KIT_STAGE_RULES command exited 127' <<<"$rules_out"; then
+    echo "context-kit/smoke/install.sh: a broken stage-rules command was not reported (exit $rc)" >&2
+    printf '%s\n' "$rules_out" >&2
+    exit 1
+fi
+
 bash "$SDK/bin/run-gates.sh" --emit always-loaded --update-baseline >/dev/null
 if [[ ! -f .workflow/always-loaded-baseline.txt ]]; then
     echo "context-kit/smoke/install.sh: always-loaded --update-baseline wrote no baseline" >&2

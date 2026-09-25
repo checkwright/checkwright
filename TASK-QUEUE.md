@@ -62,16 +62,6 @@ the in-turn wait the delegation protocol mandates, `while kill -0 "$pid"`, is re
 
 **Cost while deferred:** every adopter following the protocol literally meets a refusal on its first wait. Filed 2026-08-29; returned from the icebox 2026-09-25 by consult, the refusal re-probed.
 
-### craft-rule-step-has-no-reader
-
-`context-kit/templates/session-context.sh` renders the stage-rules block under `2>/dev/null … || true`, so a broken `CONTEXT_KIT_STAGE_RULES` knob drops the block silently and reds nothing.
-
-**Deliverable:** the hook reports a knob that names no readable file, and a fixture pins the report.
-
-**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** a report on a knob the SPEC already names, adding no name; it joins because the unit set carries context-kit through `agent-file-paragraph-sections-ungoverned`.
-
-**Cost while deferred:** a session opens without its craft rules and no surface says so. Filed 2026-09-03; returned from the icebox 2026-09-25 by consult, the template re-read.
-
 ### dod-size-figure-stales-in-iteration
 
 an amendment's definition-of-done carries a size figure spec wrote at promotion, and nothing re-reads it as the iteration moves; the figure ages inside its own iteration.
@@ -1528,6 +1518,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 ## Done
 
+- craft-rule-step-has-no-reader
 - agent-file-paragraph-sections-ungoverned
 - amendment-prose-misnumbers-its-delta
 - bridged-arm-spawned-program-set-unheld

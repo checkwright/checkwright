@@ -127,8 +127,13 @@ EOF
 
 # spec: context-kit/SPEC.md §The session-context hook — step 8 suppressed for a lead (executor-facing)
 if [[ "$role" != lead && -n "$stage" && -n "$STAGE_RULES" ]]; then
-    rules_block="$(bash -c "$STAGE_RULES \"\$1\"" stage-rules "$stage" 2>/dev/null)" || true
-    if [[ -n "$rules_block" ]]; then
+    rules_rc=0
+    rules_block="$(bash -c "$STAGE_RULES \"\$1\"" stage-rules "$stage" 2>/dev/null)" || rules_rc=$?
+    # spec: context-kit/SPEC.md §The session-context hook — step 8 reports a configured command that fails rather than dropping the block silently
+    if [[ "$rules_rc" -ne 0 ]]; then
+        echo
+        echo "⚠ craft rules unavailable: the CONTEXT_KIT_STAGE_RULES command exited $rules_rc — fix the knob (context-kit/SPEC.md §Layout and configuration)."
+    elif [[ -n "$rules_block" ]]; then
         echo
         echo "Craft rules for the $stage stage — follow the doctrine link before the matching action:"
         echo "$rules_block"
