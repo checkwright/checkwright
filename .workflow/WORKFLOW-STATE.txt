@@ -4,4 +4,4 @@
 
 ---
 
-— scope add9cb38 2026-09-25 84b92a74
+powershell-scratch-runner scope add9cb38 2026-09-25 84b92a74

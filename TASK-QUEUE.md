@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: powershell-scratch-runner
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [README.md](README.md) maps the kits.
 
@@ -10,17 +10,17 @@
 
 ## Technical Debt
 
-## Deferred
-
 ### trailer-ban-help-overruled
-
-[cost: once/low] [surface: gate-sdk]
 
 `check-commit-msg`'s refusal help text tells the consumer the Co-Authored-By trailer "is a footer convention, not a leak — do not ban it" (`native/src/gates/commit_msg.rs`, the pattern-set help lines), and the shipped `gate-sdk/templates/msg-patterns.list` header repeats it as a rule. The pattern file is the consumer's own policy seam (gate-sdk/SPEC.md §check-commit-msg, the reach-is-a-policy paragraph), so a consumer that chose a trailer ban gets a red telling it its own rule is wrong.
 
-**Deliverable:** the help text names the pattern set only; the template comment states the trailer's absence as the shipped default, not a rule; §check-commit-msg states a trailer ban as a consumer-selectable class (Policy-as-choice) and that the ban also scans the tree through `check-tree-terms`, the shared reader §Layout and configuration already names.
+**Deliverable:** the help text names the pattern set only; the template comment states leaving the trailer unbanned as the shipped default, not a rule; §check-commit-msg states a trailer ban as a consumer-selectable class (Policy-as-choice) and that the ban also scans the tree through `check-tree-terms`, the shared reader §Layout and configuration already names.
+
+**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** it converges the gate on the policy seam its SPEC already names, adding no name.
 
 **Cost while deferred:** a consumer that bans the trailer is argued against by the kit on every refusal. Filed 2026-09-25 to the gap inbox after push-need-accounting's close; promoted 2026-09-25 at the next scope. Premise re-verified: the bullet's "also unstated" half is half-wrong, as the SPEC already names both readers of one pattern set; only the trailer-ban consequence is unstated. Owner lookup: `trailer`, `msg-patterns`, `MSG_PATTERN`, `commit-msg` in this file — only the iceboxed [co-authored-by-trailer-attribution](#co-authored-by-trailer-attribution), whose subject is the trailer's model literal, not the ban policy; owner gate-sdk/SPEC.md §check-commit-msg.
+
+## Deferred
 
 ### docs-liquid-literal-unseen
 
@@ -34,11 +34,15 @@ a balanced Liquid token a docs page means literally (`{{ x }}`, `{% x %}`) parse
 
 ### ps-scratch-script-unsteered
 
-[cost: event/high] [surface: guard-kit]
+[cost: event/high] [surface: guard-kit] [observed-by: gates workflow]
 
 a PowerShell script run off a scratch-dir body (`& .tmp\x.ps1`, `.\.tmp\x.ps1`, `pwsh -File .tmp/x.ps1`) is unsteered. Rule `script_interpreter` has no PowerShell form because its corrective names the `--scratch-run` runner, which echoes and runs a bash body only. guard-kit/SPEC.md §The hook on native Windows states the limit.
 
 **Deliverable:** a `--scratch-run` path for a PowerShell body and the rule's PowerShell form, or a SPEC boundary note refusing one.
+
+**Taken as a feature — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the new PowerShell runner path, authored and paired by /spec; the cheaper arm-(b) block steering to the bash runner was offered and not chosen. It passes the enhancement admission filter on the trust arm (scope's judgment): it closes a gap in the guard's approval model on the native-Windows adopter constraint.
+
+**Push need (2026-09-25, inside the budget):** one mid-iteration push, since this host has no `pwsh` and the native-Windows install-smoke leg is the runner's first real run; with the closing push, 2 against 2.
 
 **Cost while deferred:** on a Windows host an approved PowerShell script call can run a body rewritten after approval, with no echo at execution. Filed 2026-09-24 to the gap inbox by adopter-onramp's build; promoted 2026-09-24 at its close: →fix fails because the runner arm is new mechanism, a unit rather than a repair. Owner lookup: none in this file; owner guard-kit/SPEC.md §The generic ruleset, rule `script_interpreter` and its scratch-run runner.
 
