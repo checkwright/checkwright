@@ -4,7 +4,7 @@ Spec discipline for agent-authored components: one canonical spec per component,
 
 Why: when a coding agent authors the specs, design rationale gets re-derived under build pressure unless it is captured up front, and a parallel copy of any gated fact is an un-gateable second source that drifts silently. The remedy is a lifecycle (amendments authored up front, merged and deleted at build) plus gates over the mechanically-decidable copy failures — a doubled Definition-of-Done, a banned-heading code dump, a fenced block that verbatim-copies a source file, a glossary definition restated on another surface, a feature task with no amendment. See [SPEC.md](SPEC.md) for the full contracts.
 
-An installer-vendored tree does not carry this file. The payload withholds each kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
+This file ships in the installer payload, which withholds each kit's `SPEC.md` and its `smoke/`. Every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
 
 ## Install
 
@@ -60,10 +60,10 @@ The lifecycle is prose discipline the gates enforce; there is no runtime tool. A
 
 ## Test
 
-Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names, where `init` places it. In PowerShell, spell the line `./scripts/checkwright-gates <arm>` at the repository root, with `.exe` on native Windows:
 
 <!-- fence-runnable -->
-```bash
-. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --run-gate-tests canon-kit/gate-tests canon-kit/checks
 ```

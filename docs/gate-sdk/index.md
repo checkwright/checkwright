@@ -16,14 +16,14 @@ The steps are the kit README's [Quick start](README.md#quick-start) section. `ch
 
 ## Quick start
 
-Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names; with no arm at all it runs the full battery:
+Run these arms as the kit [README](README.md#quick-start) spells them, PowerShell included:
 
-```bash
-. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --run-gate-tests gate-sdk/gate-tests gate-sdk/checks
 "$gates" --install-hooks       # opt this clone into the hook
 ```
 
 ## Contracts
 
-The gate contracts — the output, fail-closed, fixture-pair, and self-lint disciplines every gate keeps — are defined in the kit's [`SPEC.md`](SPEC.md#the-gate-model); its [`README.md`](README.md#gate-sdk) lists the mechanism. Both ship inside the vendored `gate-sdk/` directory. Back to the [kit map](../index.md#the-kits) or the [install guide](../install.md).
+The gate contracts — the output, fail-closed, fixture-pair, and self-lint disciplines every gate keeps — are defined in the kit's [`SPEC.md`](SPEC.md#the-gate-model); its [`README.md`](README.md#gate-sdk) lists the mechanism. The README ships in the vendored `gate-sdk/` directory; the SPEC is published here. Back to the [kit map](../index.md#the-kits) or the [install guide](../install.md).

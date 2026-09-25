@@ -7,11 +7,11 @@ generated: true
 <!-- {% raw %} -->
 # delegation-kit
 
-Safe delegated-`Agent` execution for budget-bounded sessions. A supervisor dispatches sub-agents that are cheap to spawn and expensive to trust; this kit packages the supervisor-side protocol plus the two mechanizable pieces — a trustworthy budget verdict (`usage-verdict`) and a commit-shape gate over gate tampering (`check-gate-tamper`).
+Safe delegated-`Agent` execution for budget-bounded sessions. A supervisor dispatches sub-agents that are cheap to spawn and expensive to trust; this kit packages the supervisor-side protocol plus the pieces of it a machine can hold: a trustworthy budget verdict (`usage-verdict`), the gates and the opt-in hooks the [Install](#install) steps wire.
 
-Why: three failure surfaces dominate delegation. **Shared mutable state** — two committing agents race the git index and one sweeps the other's staged files under the wrong message (the index and HEAD are shared for *every* committing agent, disjoint source files notwithstanding). **Interrupted long units** — a usage-window wall fires mid-flight and the uncommitted investigation dies with the session. **Untrustworthy self-reports** — a sub-agent's "passed" claim, or a gate quietly weakened to make its commit pass. The protocol closes all three; `usage-verdict` and `check-gate-tamper` are its mechanical floors. See [SPEC.md](SPEC.md) for the full contracts.
+Why: three failure surfaces dominate delegation. **Shared mutable state** — two committing agents race the git index and one sweeps the other's staged files under the wrong message (the index and HEAD are shared for *every* committing agent, disjoint source files notwithstanding). **Interrupted long units** — a usage-window wall fires mid-flight and the uncommitted investigation dies with the session. **Untrustworthy self-reports** — a sub-agent's "passed" claim, or a gate quietly weakened to make its commit pass. The protocol closes all three, and those pieces are its mechanical floors. See [SPEC.md](SPEC.md) for the full contracts.
 
-An installer-vendored tree does not carry this file. The payload withholds each kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
+This file ships in the installer payload, which withholds each kit's `SPEC.md` and its `smoke/`. Every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
 
 ## Install
 
@@ -43,10 +43,10 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
 ## Use
 
-Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
+Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names, where `init` places it. In PowerShell, spell each line `./scripts/checkwright-gates <arm>` at the repository root, with `.exe` on native Windows:
 
-```bash
-. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --usage-verdict            # budget verdict: exit 0 OK/RESET-OK, 1 PAUSE, 2 STALE
 "$gates" --usage-verdict <snapshot> # verdict for an explicit usage.txt (test injection)
 "$gates" --emit usage-trend          # footprint trend over the sample log (needs DELEGATION_KIT_USAGE_HISTORY)
@@ -60,11 +60,11 @@ With `DELEGATION_KIT_USAGE_HISTORY` set, `usage-verdict` logs one sample per cal
 
 ## Test
 
-Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+Run this arm the same way:
 
 <!-- fence-runnable -->
-```bash
-. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --run-gate-tests delegation-kit/gate-tests delegation-kit/checks  # every gate's fixture pair
 ```
 

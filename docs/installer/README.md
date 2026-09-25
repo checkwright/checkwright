@@ -7,7 +7,7 @@ generated: true
 <!-- {% raw %} -->
 # Checkwright
 
-The activation path for **Checkwright** — a coding-agent-assisted delivery methodology shipped as installable kits: a self-testing gate SDK for prose/spec/config surfaces, an evidence-stamped iteration lifecycle designed for stateless agent sessions, and token-economics-aware context management.
+The activation path for **Checkwright** — a coding-agent-assisted delivery methodology shipped as installable kits, each listed in the [kit reference](https://checkwright.dev/kits.html).
 
 ## What this package is
 
@@ -17,7 +17,7 @@ What it is not: a dependency channel. Nothing resolves at your build time and th
 
 ## Before you run it
 
-Each transport carries its own requirement, and each belongs to the delivery path alone. The Release tarball needs `curl`, `tar` and either hasher (`sha256sum`, or the `shasum` stock macOS ships instead) on macOS and Linux, and nothing Windows 10 and later does not ship on Windows; npm needs Node, for `npx`. The gate battery this vendors uses none of them, and no delivery-path tool joins the toolchain roster.
+Each transport carries its own requirement, and each belongs to the delivery path alone. The Release tarball needs `curl`, `tar` and either hasher (`sha256sum`, or the `shasum` stock macOS ships instead) on macOS and Linux, and on Windows 10 and later only what the OS ships; npm needs Node, for `npx`. The gate battery this vendors uses none of them, and no delivery-path tool joins the toolchain roster.
 
 The toolchain the battery *does* assert, with its version floors, is on the install page. `checkwright doctor` renders it as an exit status and `init` gates on that before any file is written, so a machine below the floor is refused rather than half-installed.
 

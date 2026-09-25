@@ -4,7 +4,7 @@ The experience-packaging rung: the cross-kit delivery doctrine the other kits en
 
 The deliverable — [`DOCTRINE.md`](DOCTRINE.md) — carries each rule as its statement, why it holds under coding-agent work, and a pointer to the kit mechanism that enforces it. It is referenced in place, never copy-installed: a consumer's always-loaded agent file gains a one-line-per-rule digest and a markdown link to the vendored doctrine, and re-vendoring the kit *is* the doctrine upgrade. See [SPEC.md](SPEC.md#the-doctrine-deliverable) for why that reference-not-copy boundary is the mechanism.
 
-An installer-vendored tree does not carry this file. The payload withholds each kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
+This file ships in the installer payload, which withholds each kit's `SPEC.md` and its `smoke/`. Every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
 
 The installer — the gate binary's `--install-doctrine` arm — inserts or replaces the reference block between fixed markers, idempotently. It does not carry the digest: each bullet is derived from the summary its rule states in a `*Digest:*` trailer, so the digest names every methodology rule by construction and a rule cannot land in the doctrine but miss the block every consumer installs. The gate — `check-doctrine-registration` — holds the block honest: it asserts the always-loaded file carries the markdown link *and* keeps its methodology-rule digest in per-rule lockstep with the doctrine (each rule digested or declared trimmed, no digest bullet orphaned), and that each rule carries its one well-formed per-rule trailer — `*Stages:*` routing on the craft register, `*Digest:*` on the methodology register — fail-closed when a scanned file or heading is missing.
 
@@ -16,10 +16,11 @@ The doctrine ships the rule *statements* only. Each kit's SPEC owns its mechanis
 
 Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
-1. Install the reference block — with your always-loaded agent file present, run this arm on the gate binary `GATE_SDK_NATIVE_BIN` names:
+1. Install the reference block — with your always-loaded agent file present, run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names, where `init` places it. In PowerShell, spell the line `./scripts/checkwright-gates <arm>` at the repository root, with `.exe` on native Windows:
 
-   ```
-   --install-doctrine
+   ```sh
+   gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
+   "$gates" --install-doctrine
    ```
 
    It writes (or updates) the `## Delivery doctrine` block in `CLAUDE.md`, linking `doctrine-kit/DOCTRINE.md`. A harness-less consumer can paste the marker block by hand instead — the installer is only its generator. Point `DOCTRINE_KIT_AGENT_FILE` / `DOCTRINE_KIT_DOCTRINE_FILE` at your own paths if they differ from the defaults.
@@ -38,10 +39,10 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
 ## Test
 
-Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+Run this arm the same way:
 
 <!-- fence-runnable -->
-```bash
-. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --run-gate-tests doctrine-kit/gate-tests doctrine-kit/checks
 ```

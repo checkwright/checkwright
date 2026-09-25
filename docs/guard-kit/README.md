@@ -11,7 +11,7 @@ Permission-friction reduction for coding-agent sessions. A `PreToolUse` guard de
 
 Why: a command no allowlist entry matches is decided **out of band** — by interrupting a human, or by a model asked to judge the call — and that decision is invisible to the agent either way, so it cannot notice, count, or fix the friction it causes. The cost is paid per call, out of the operator's attention or out of latency and tokens, and compounds as the command surface grows. The kit closes the loop by making the fall-through set — exactly the commands nothing granted — the one thing that *is* recorded. See [SPEC.md](SPEC.md) for the framework, the generic ruleset, what the steering buys, and the triage criterion.
 
-An installer-vendored tree does not carry this file. The payload withholds each kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
+This file ships in the installer payload, which withholds each kit's `SPEC.md` and its `smoke/`. Every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
 
 Most of what guard-kit ships is not a gate: its surfaces are hook members of the gate binary and templates. It registers exactly one, which holds the door binding its own steer messages and its settings templates depend on — and, over the surfaces `GUARD_KIT_DOOR_ROOTS` names, holds a door on your own pages to a declared audience.
 
@@ -47,28 +47,28 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
 4. Splice `templates/close-triage.md` into your close-stage skill (it fills lifecycle-kit's `housekeeping` slot, close step 4).
 
-Configuration is a knob file — override any knob in `guard-config.knobs`, one `NAME = value`, `NAME[] = element` or `NAME[key] = value` line each (gate-sdk/SPEC.md §The knob file), and `--emit knob-roster` on the gate binary `GATE_SDK_NATIVE_BIN` names prints every default (log paths, settings paths, `GUARD_KIT_CONSUMER_RULES_CMD`, `GUARD_KIT_RO_SCRIPTS`, `GUARD_KIT_RO_BINS`, `GUARD_KIT_RO_FORMS`, `GUARD_KIT_SCRATCH_DIRS`, `GUARD_KIT_SEARCH_TOOLS`, `GUARD_KIT_BREADTH_PROBES`, `GUARD_KIT_BREADTH_DECLARED`, `GUARD_KIT_DOOR_ROOTS`); defaults are this repo's layout, and the probe set, the declaration map and the door-root set all default to empty because their contents are your project's vocabulary, not the kit's. Drop a tool from `GUARD_KIT_SEARCH_TOOLS` (guard-kit/SPEC.md §Layout and configuration) when your harness build does not carry it, so the `find` and `git grep` steers never name a tool that is not there. A member you add to `GUARD_KIT_RO_BINS` also takes a `GUARD_KIT_RO_FORMS` declaration of its write and execute forms (guard-kit/SPEC.md §The generic ruleset, rule `ro_pipeline`), or the read-only pipeline grant withholds it.
+Configuration is a knob file — override any knob in `guard-config.knobs`, one `NAME = value`, `NAME[] = element` or `NAME[key] = value` line each (gate-sdk/SPEC.md §The knob file). `--emit knob-roster` on the gate binary `GATE_SDK_NATIVE_BIN` names prints every default, and guard-kit/SPEC.md §Layout and configuration owns each. Defaults are this repo's layout; a knob whose contents are your project's vocabulary defaults to empty. Drop a tool from `GUARD_KIT_SEARCH_TOOLS` when your harness build does not carry it, so the `find` and `git grep` steers never name a tool that is not there. A member you add to `GUARD_KIT_RO_BINS` also takes a `GUARD_KIT_RO_FORMS` declaration of its write and execute forms (guard-kit/SPEC.md §The generic ruleset, rule `ro_pipeline`), or the read-only pipeline grant withholds it.
 
 ## Use
 
-Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
+Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names, where `init` places it. In PowerShell, spell each line `./scripts/checkwright-gates <arm>` at the repository root, with `.exe` on native Windows:
 
-```bash
-. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --emit scan-prompts          # rank what nothing granted, filtered by the allowlist
 "$gates" --emit scan-prompts --count  # <patterns>/<occurrences> token (drift KPI)
 "$gates" --emit compare-settings-allow  # local-overlay entries a committed glob already grants, those a probe proves too broad, and those naming a script that does not exist
 "$gates" --rewrite [--regex] [--expect <n>] [--] <find> <replace> <file>…  # replace text in tracked files, printing every changed span
 ```
 
-`--emit scan-prompts` takes an optional log path, which overrides `GUARD_KIT_LOG` and composes with `--count` in either order; `--` ends option processing, so a log path spelled with a leading dash is still reachable. An unrecognized `-`-prefixed argument is a refusal at exit 2 — there is no per-arm `--help`, because a non-gate arm's usage lives here and under the gate binary's `--help`.
+`--emit scan-prompts` takes an optional log path, which overrides `GUARD_KIT_LOG` and composes with `--count` in either order; `--` ends option processing, so a log path spelled with a leading dash is still reachable. An unrecognized `-`-prefixed argument, `--help` included, is a refusal that prints the arm's usage at exit 2.
 
 ## Test
 
-Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+Run this arm the same way:
 
-```bash
-. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --run-guard-tests    # decision-table over the generic ruleset
 ```
 <!-- {% endraw %} -->

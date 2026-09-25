@@ -4,9 +4,9 @@ Drift reporting for coding-agent sessions. Gates block what a single diff makes 
 
 Advisory by construction: the report exits 0, never fails a session, and reads **trend, not level** — a KPI's absolute value is noise; its direction across sessions is the signal. See [SPEC.md](SPEC.md) for the report frame, the plugin contract, the bundled KPI set, and the knowledge-friction loop.
 
-An installer-vendored tree does not carry this file. The payload withholds each kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
+This file ships in the installer payload, which withholds each kit's `SPEC.md` and its `smoke/`. Every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
 
-Like [guard-kit](../guard-kit/), drift-kit registers **no gates**: its surface is a set of advisory `--emit` arms and a KPI registry, so nothing joins `gates.list`. It follows gate-sdk's resolution and smoke conventions without depending on its registry.
+drift-kit registers **no gates**: its surface is a set of advisory `--emit` arms and a KPI registry, so nothing joins `gates.list`. It follows gate-sdk's resolution and smoke conventions without depending on its registry.
 
 ## Install
 
@@ -29,15 +29,15 @@ Configuration follows the established kit pattern — override any knob in `drif
 
 `kpi-knowledge-friction` measures re-derivations a session had to make because no doc owned the fact (drift-kit/SPEC.md §The knowledge-friction loop). It shows `n/a` until you install the capture half:
 
-1. Add one bullet to your always-loaded instructions file: *the moment you catch yourself re-deriving a fact off a non-owning surface, append* `<date> <fact> ← <surface>` *to `.workflow/knowledge-friction.log`.* That bullet is the loop's only hook — earn its cost by the log actually filling. The `--emit kfric [--] "<fact>" "<surface>"` arm on the gate binary `GATE_SDK_NATIVE_BIN` names is the shipped affordance that stamps that grammar prompt-free — both fields required non-empty in that order, `--` files one beginning with a dash, and no per-arm `--help`: the usage is here and in the SPEC. Raw append stays legal (drift-kit/SPEC.md §The knowledge-friction loop).
+1. Add one bullet to your always-loaded instructions file: *the moment you catch yourself re-deriving a fact off a non-owning surface, append* `<date> <fact> ← <surface>` *to `.workflow/knowledge-friction.log`.* That bullet is the loop's only hook — earn its cost by the log actually filling. The `--emit kfric [--] "<fact>" "<surface>"` arm on the gate binary `GATE_SDK_NATIVE_BIN` names is the shipped affordance that stamps that grammar prompt-free — both fields required non-empty in that order, `--` files one beginning with a dash, and a refusal, `--help` included, prints the usage at exit 2. Raw append stays legal (drift-kit/SPEC.md §The knowledge-friction loop).
 2. Gitignore the log (per-iteration scratch) and its drain companions (`.workflow/*.drain`, `.workflow/*.drain.part`), and splice `templates/close-knowledge.md` into your close skill so each entry is re-verified, becomes the tiering edit or the correction that outcome selects, and the drained log is removed — its reclaim path.
 
 ## Use
 
-Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
+Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names, where `init` places it. In PowerShell, spell each line `./scripts/checkwright-gates <arm>` at the repository root, with `.exe` on native Windows:
 
-```bash
-. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --emit drift-report          # full report: lead/lag rows under the honesty labels
 "$gates" --emit drift-report --trend  # one compact line (fragments joined with ·)
 "$gates" --emit trajectory   # governed-trajectory table (one row per closed iteration)
@@ -62,9 +62,9 @@ A KPI plugin is `kpi-<name>.sh`, resolved through `kpis.list` against your KPI d
 
 ## Test
 
-Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+Run this arm the same way, from a source clone or a hand-vendored copy: it installs each kit from its `smoke/`, which the installer payload withholds.
 
-```bash
-. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --run-consumer-smoke drift-kit   # report contract: sections, per-KPI rows, degradation, one-line --trend
 ```

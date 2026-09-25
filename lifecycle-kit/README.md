@@ -1,10 +1,10 @@
 # lifecycle-kit
 
-The iteration stage state machine for coding-agent-assisted delivery: a `## Iteration: <name>` header line in the task queue naming the iteration, an evidence file of `<iteration> <stage> <session-id> <date> <head>` stamps whose **last stamp is the current stage** and whose `<head>` binds each stamp to the commit it was taken at, stage skills (scope/align/build/validate/close by default — stages are config), and gates that make skipping a stage, or claiming one without running its skill, fail the commit.
+The iteration stage state machine for coding-agent-assisted delivery: stage skills, an evidence file of stamps whose **last stamp is the current stage**, and gates that fail the commit when a stage is skipped or claimed without running its skill. The stamp grammar, the queue's iteration header and the configurable stage roster are [SPEC.md](SPEC.md) §The state machine's.
 
 Why: a stateless agent session doesn't reliably re-read process prose. So the process state lives in two files a gate can read, and every stage skill stamps its invocation as its first step (mechanized by the `--enter-stage <stage>` arm on the gate binary `GATE_SDK_NATIVE_BIN` names, so the misformat-prone hand ritual is one command). That stamp *is* the stage transition — there is no second copy of the cursor to keep in sync, and stage motion writes no queue at all. `check-stage-evidence` verifies the stamp file's grammar and that every stamp belongs to the header's iteration; `check-stage-entry` verifies the predecessor stamp, the drained queue at validate entry, and, at build entry, the cross-component audit trigger and no unrun inferred-claim marker. See [SPEC.md](SPEC.md) for the full contracts.
 
-An installer-vendored tree does not carry this file. The payload withholds each kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
+This file ships in the installer payload, which withholds each kit's `SPEC.md` and its `smoke/`. Every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
 
 The linear stage walk is the default; the gate-legal ways to leave it — abandon, split, reopen — compose existing mechanism with no new tooling ([SPEC.md](SPEC.md) §Deviation transitions).
 
@@ -62,10 +62,10 @@ After install the battery is red at `check-stage-evidence` until your first `/sc
 
 ## Use
 
-Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
+Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names, where `init` places it. In PowerShell, spell each line `./scripts/checkwright-gates <arm>` at the repository root, with `.exe` on native Windows:
 
-```bash
-. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --enter-stage <stage>          # stamp a stage entry (the transition itself)
 "$gates" --install-lifecycle    # (re)write the registration and merge-attribute blocks
 "$gates" --emit file-gap "<gap>"   # route a work-shaped finding to the gap inbox
@@ -77,14 +77,14 @@ Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 `--emit session-id` is [SPEC.md](SPEC.md) §bin/session-id.sh's derivation order, which `--enter-stage` reads for you: reach for it directly only where a session writes an id itself, as `templates/lead.md`'s session-role marker step does. It takes no argument and resolves no knob. **The front-end route reads the cwd `bin/run-gates.sh` cds to** — the git toplevel — so a caller standing elsewhere whose sessions dir is the cwd-slugged default invokes the binary's `--emit-session-id` arm directly instead, which is what `--enter-stage` does.
 
-The two survey arms are the capture and citation affordances of [SPEC.md](SPEC.md) §The survey record, reached through gate-sdk's battery front-end, which locates the gate binary for them. `--` ends option processing for either, and a positional beginning with `-` without it is a refusal — the shape half of gate-sdk/SPEC.md §The bin/-tool contract, which outlives the port.
+The two survey arms are the capture and citation affordances of [SPEC.md](SPEC.md) §The survey record. `--` ends option processing for either, and a positional beginning with `-` without it, `--help` included, is a refusal that prints the arm's usage at exit 2 (gate-sdk/SPEC.md §The bin/-tool contract).
 
 ## Test
 
-Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+Run this arm the same way:
 
 <!-- fence-runnable -->
-```bash
-. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --run-gate-tests lifecycle-kit/gate-tests lifecycle-kit/checks
 ```

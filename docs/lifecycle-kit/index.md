@@ -16,10 +16,10 @@ The steps are the kit README's [Install](README.md#install) section. `checkwrigh
 
 ## Quick start
 
-Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
+Run these arms as the kit [README](README.md#use) spells them, PowerShell included:
 
-```bash
-. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --enter-stage <stage>          # stamp a stage entry (the transition itself)
 "$gates" --run-gate-tests lifecycle-kit/gate-tests lifecycle-kit/checks
 ```

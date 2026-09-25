@@ -12,7 +12,7 @@ Deployment-truth governance for a docs site served from the repo (GitHub Pages a
 
 The template — `templates/site-health.yml` — is a scheduled probe of the live site (apex/www/http HTTPS, redirects, certificate expiry, release-body note pointers, and theme highlight-class drift against that snapshot). It verifies a *deployment*, not a tree, so it ships as a workflow a consumer copies, never a gate: the line is where the asserted object lives, and none of what it asserts is in any checkout. See [SPEC.md](SPEC.md#the-monitor-boundary) for why that boundary is load-bearing.
 
-An installer-vendored tree does not carry this file. The payload withholds each kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
+This file ships in the installer payload, which withholds each kit's `SPEC.md` and its `smoke/`. Every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
 
 ## Install
 
@@ -41,9 +41,9 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
 ## Test
 
-Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names, where `init` places it. In PowerShell, spell the line `./scripts/checkwright-gates <arm>` at the repository root, with `.exe` on native Windows:
 
-```bash
-. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --run-gate-tests site-kit/gate-tests site-kit/checks
 ```

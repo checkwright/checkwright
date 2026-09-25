@@ -22,11 +22,11 @@ The steps are the kit README's [Install](README.md#install) section. `checkwrigh
 
 ## Quick start
 
-Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+Run this arm as the kit [README](README.md#install) spells it, PowerShell included:
 
 <!-- fence-runnable -->
-```bash
-. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --run-gate-tests doctrine-kit/gate-tests doctrine-kit/checks
 ```
 

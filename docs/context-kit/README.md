@@ -11,7 +11,7 @@ Token-economics-aware context management for stateless agent sessions: an index-
 
 Why: a stateless session pays for context twice. The *on-demand* cost is opening a whole SPEC or source file when one section was needed — the index tools cut that ("index, then read the one you need"). The *standing* cost is the always-loaded surface (the instructions file, the session-start hook output) where every added line is a recurring per-session tax that grows silently, because no single session sees the trend — the meter, the gate, and the close-stage pass make that growth visible and actionable. See [SPEC.md](SPEC.md) for the full contracts.
 
-An installer-vendored tree does not carry this file. The payload withholds each kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
+This file ships in the installer payload, which withholds each kit's `SPEC.md` and its `smoke/`. Every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
 
 ## Install
 
@@ -30,7 +30,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    ```
    <!-- gate-roster:end -->
 
-   They resolve through gate-sdk's registry path (your gates dir first, then each kit's `checks/`), and their `# graph:` manifests put them in the generated pre-commit hook, which `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names writes. The memory-off gates are inert until you opt in — `check-settings-pins` skips clean with no pins file, so create `settings-pins.conf` (one `<path> = <expected JSON>` per line, the path a dot/bracket path expression rather than an arbitrary `jq` filter — SPEC.md §check-settings-pins) naming the keys to hold, e.g. the auto-memory-disabling ones. `check-settings-paths` needs no manifest: it reads the same settings file and holds every allow-list grant naming a literal `.sh` path, and every hook's script path, against the tree, and every `--hook` operand against the binary's member table. `check-footprint-fresh` byte-gates a committed `docs/footprint.md` against the footprint emitter it calls in-process; register it when you publish that projection. `check-surface-ratchet` arms once you stamp its ceilings — `--emit always-loaded --ceiling` on the gate binary, committed — and reds thereafter on a governed surface that grew past its row without a deliberate re-stamp (SPEC.md §The surface ratchet).
+   They resolve through gate-sdk's registry path (your gates dir first, then each kit's `checks/`), and their `# graph:` manifests put them in the generated pre-commit hook, which `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names writes. Three of them wait on a step of yours: `check-settings-pins` skips clean until you create `settings-pins.conf` naming the settings keys to hold, such as the auto-memory-disabling ones (SPEC.md §check-settings-pins); `check-footprint-fresh` is for when you publish the footprint page; and `check-surface-ratchet` arms once you commit the ceilings `--emit always-loaded --ceiling` stamps (SPEC.md §The surface ratchet).
 
 2. Wire the session-start hook — copy `templates/session-context.sh` into your gates dir, edit its `[EDIT ME]` sections (layout judgment, not mechanism), and merge `templates/settings-sessionstart.json` into `.claude/settings.json`.
 
@@ -42,10 +42,10 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
 ## Use
 
-Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
+Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names, where `init` places it. In PowerShell, spell each line `./scripts/checkwright-gates <arm>` at the repository root, with `.exe` on native Windows:
 
-```bash
-. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --emit md-index [paths…]            # markdown heading index + first sentences
 "$gates" --emit md-section <file> <heading>  # print one section by heading
 "$gates" --emit pub-index [paths…]           # public API surface (per-language extractors; ships rust, ts)
@@ -57,10 +57,10 @@ Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
 
 ## Test
 
-Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names:
+Run these arms the same way:
 
-```bash
-. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --run-gate-tests context-kit/gate-tests context-kit/checks  # the gate fixture pairs
 "$gates" --run-index-tests                               # the advisory tools vs golden output
 ```

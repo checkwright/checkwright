@@ -24,7 +24,7 @@ Enforcement runs in three concentric tiers, each an outer backstop for the one i
 
 The design contracts, the manifest grammar, and each component's full contract live in [SPEC.md](SPEC.md).
 
-An installer-vendored tree does not carry this file. The payload withholds each kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (SPEC.md §Consumer payload).
+This file ships in the installer payload, which withholds each kit's `SPEC.md` and its `smoke/`. Every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (SPEC.md §Consumer payload).
 
 ## Quick start
 
@@ -46,16 +46,17 @@ EOF
 mkdir -p .workflow docs
 ```
 
-Then run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names; with no arm at all it runs the full battery:
+Then run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names, where `init` places it. In PowerShell, spell each line `./scripts/checkwright-gates <arm>` at the repository root, with `.exe` on native Windows:
 
-```bash
-. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --emit git-hooks --write          # generate the hooks
 "$gates" --emit graph > scripts/CHECK-GRAPH.html   # the coupling graph
 "$gates" --emit enforcement-map > docs/enforcement.md # the enforcement map (regenerate on any class-registry change)
 "$gates" --emit port-blockers --tree        # the port report over the tracked shell tree
 "$gates" --install-hooks                    # opt in this clone
 
+"$gates" --run                              # the full battery
 "$gates" --only check-graph                 # one gate's verdict
 "$gates" --for scripts/gates.list           # the gates coupling to a path
 "$gates" --run-gate-tests gate-sdk/gate-tests gate-sdk/checks  # the kit's own tests

@@ -4,13 +4,13 @@ A held-constant test baseline and a committed per-run evidence manifest for the 
 
 The gates: `check-evidence-baseline` (baseline grammar, blocking-slug liveness, scenario coverage, flip causation), `check-evidence-manifest` (manifest grammar and, where lifecycle drives the tree, close-entry green block + validate-stamp coupling), `check-battery-roster` (the runner doc's battery block against the suite roster) and `check-producer-liveness` (no stage entry while the producer is still running). The tools that drive it are both non-gate arms of the gate binary, reached through gate-sdk's front end: `--run-validate` (the codified spine that runs the suites and records evidence) and `--diff-baseline` (the situational runtime diff). See [SPEC.md](SPEC.md) for the full contracts.
 
-An installer-vendored tree does not carry this file. The payload withholds each kit's `SPEC.md` and its `smoke/`, and every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
+This file ships in the installer payload, which withholds each kit's `SPEC.md` and its `smoke/`. Every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
 
 ## Install
 
 Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
-1. Register the gates — add to your `gates.list`:
+1. Register the gates — add each to your `gates.list` except `check-producer-liveness`, which step 6 wires at stage entry instead:
 
    <!-- gate-roster:begin -->
    ```
@@ -43,10 +43,10 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
 ## Test
 
-Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names:
+Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names, where `init` places it. In PowerShell, spell the line `./scripts/checkwright-gates <arm>` at the repository root, with `.exe` on native Windows:
 
 <!-- fence-runnable -->
-```bash
-. "${GATE_SDK_ROOT:-gate-sdk}/lib/gate.sh" && gates="$(gate_native_bin_spelled)"
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --run-gate-tests evidence-kit/gate-tests evidence-kit/checks
 ```

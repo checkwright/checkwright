@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### kit-readme-validity-pass
-
-the twelve kit READMEs carry three classes of false or unrunnable statement. (1) Every `Use`/`Test` fence spells the sourcing idiom, which needs bash ≥ 4.3 (`gate-sdk/lib/gate.sh`'s `local -n`), while starter and prose adopters are told they reach no bash and no PowerShell spelling exists; `init` prints `./scripts/checkwright-gates <arm>` (installer/SPEC.md §init), which every README should spell instead. (2) Eleven READMEs say "An installer-vendored tree does not carry this file", but the payload withholds only `SPEC.md` and `smoke/` (gate-sdk/SPEC.md §Consumer payload) and the README is packed. (3) Single false claims: drift-kit's "Like guard-kit, drift-kit registers no gates" (guard-kit registers `check-door-binding`); delegation-kit's "the two mechanizable pieces" against three gates and three guards; evidence-kit's `check-producer-liveness` inside the "add to your `gates.list`" block; doctrine-kit's fence holding a bare `--install-doctrine` flag; installer/README.md's stale three-kit description and its "nothing Windows 10 and later does not ship" double negative.
-
-**Deliverable:** the fixes above, plus a pointer-not-list pass on the openers the audit flagged (lifecycle-kit's ~75-word opener, queue-kit's 12-tag enumeration, guard-kit's ~180-word knob paragraph, context-kit's ~200-word paragraph). The per-README finding list is in this entry's filing commit.
-
-**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** each fix brings a README to what `init` and §Consumer payload already say, adding no name.
-
-**Cost while deferred:** a starter adopter copies a command their floor cannot run, and reads a payload claim the installer contradicts. Filed 2026-09-25 by consult as a direct entry, from the same operator-directed audit.
-
 ## Deferred
 
 ### docs-liquid-literal-unseen
@@ -1407,5 +1397,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - template-registry-population-predicate
 - gate-sdk-framework-brevity
 - non-gate-arm-roster-hand-maintained
+- kit-readme-validity-pass
 
 ## Lessons Learned
