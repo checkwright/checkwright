@@ -34,16 +34,6 @@ the framework-level remainder of gate-sdk/SPEC.md after `gate-sdk-framework-brev
 
 **Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-25 at scope from spec-brevity-residue, filed that day.
 
-### emit-per-arm-help-residue
-
-five `--emit` members still answer `-h`/`--help` with their usage on stdout at exit 0: `docs-mirror`, `roadmap`, `queue-index`, `entry-history` and `port-blockers`. gate-sdk/SPEC.md §The non-gate arm puts an `--emit-` member's usage at its shape refusal, at exit 2, and calls a per-arm help flag a second home for one sentence; every other member refuses `--help`.
-
-**Deliverable:** the five refuse `--help` like the rest, printing their usage at the shape refusal, with a release declaration and a bad fixture.
-
-**Promoted as debt, conform branch — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** narrowing the shipped `--help` is directed; the change converges on the rule the section already states, so it adds no name. Re-verified at scope: all five exit 0 on `--help`, while `session-id` and `queue-flow` exit 2.
-
-**Cost while deferred:** one question gets two answers across one family. Filed 2026-09-25 to the gap inbox by gate-sdk-framework-brevity's build; promoted 2026-09-25 at its close.
-
 ### canonicalize-extended-length-prefix
 
 the caller roster gate-sdk/SPEC.md §The path-dialect contract gives for `walk::canonicalize` (whose Windows answer carries the `\\?\` prefix) omits `pack_installer.rs` and `run_guard_tests.rs`, and the second strips the prefix itself before composing paths from the root.
@@ -1423,5 +1413,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 ## Done
 
 - non-gate-arm-testing-floor-unstated
+- emit-per-arm-help-residue
 
 ## Lessons Learned

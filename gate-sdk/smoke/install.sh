@@ -211,17 +211,13 @@ grep -Eq "check-smoke-tokenizer +lines=$pb_decl_lines +c2=" <<<"$out" || {
 if pb_run --nope >/dev/null 2>&1; then
     echo "smoke(port-blockers): an unrecognized argument was not refused" >&2; exit 1
 fi
-# spec: gate-sdk/SPEC.md §The bin/-tool contract — help before arity: -h/--help as the *first*
-# argument prints usage at exit 0 whatever follows it, which the arm adopts rather than repairing.
-# First is load-bearing: a --gates-dir ahead of it is an unrecognized argument, not a help request.
-pb_help() { bash "$SDK/bin/run-gates.sh" --emit port-blockers "$@"; }
-pb_help --help >/dev/null || { echo "smoke(port-blockers): --help did not exit 0" >&2; exit 1; }
-pb_help --help --group >/dev/null || {
-    echo "smoke(port-blockers): --help stopped winning over what follows it" >&2; exit 1; }
-if pb_help --gates-dir "$pb" --help >/dev/null 2>&1; then
-    echo "smoke(port-blockers): help was honoured from a position the contract does not give it" >&2
-    exit 1
+# spec: gate-sdk/SPEC.md §port-blockers — --help is an unrecognized argument in any position, and
+# its refusal carries the usage on stderr, through the front-end a caller reaches it by
+if err="$(bash "$SDK/bin/run-gates.sh" --emit port-blockers --help --group 2>&1 >/dev/null)"; then
+    echo "smoke(port-blockers): --help was not refused" >&2; exit 1
 fi
+grep -q '^usage: run-gates.sh --emit port-blockers' <<<"$err" || {
+    echo "smoke(port-blockers): the --help refusal did not carry the usage: $err" >&2; exit 1; }
 # spec: gate-sdk/SPEC.md §port-blockers — the missing-registry refusal, structurally absent from
 # every in-crate test: a registry arm handed a directory with no gates.list refuses rather than
 # reporting an empty battery

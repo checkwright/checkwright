@@ -44,7 +44,6 @@ usage: run-gates.sh --emit port-blockers [--gates-dir <dir>] [--group | --tree]
   --gates-dir    the registry the two registry arms walk, and what scopes
                  this arm's own declared-knob union. --tree needs none and
                  takes none: its corpus is the tree, not the registry.
-  -h, --help     this text.
 
 The first two arms walk the gate registry and answer for the battery; --tree
 walks the tracked shell tree and answers for the project. A registry arm
@@ -74,13 +73,9 @@ struct Args {
     gates_dir: Option<String>,
 }
 
-// spec: gate-sdk/SPEC.md §The bin/-tool contract — `-h`/`--help` as the first argument prints usage
-// at exit 0 **whatever follows it**: the help-before-arity ordering is what that contract decides,
-// and a port that refused help-plus-extra would be a silent behaviour change.
-fn parse(args: &[String]) -> Result<Option<Args>, String> {
-    if matches!(args.first().map(String::as_str), Some("-h") | Some("--help")) {
-        return Ok(None);
-    }
+// spec: gate-sdk/SPEC.md §The non-gate arm — `-h`/`--help` is no per-arm help flag: it is an
+// unrecognized argument like any other, and the refusal carries the usage.
+fn parse(args: &[String]) -> Result<Args, String> {
     let mut mode: Option<Mode> = None;
     let mut gates_dir: Option<String> = None;
     let mut i = 0usize;
@@ -102,7 +97,7 @@ fn parse(args: &[String]) -> Result<Option<Args>, String> {
                 }
                 i += 1;
             }
-            _ => return Err(USAGE.to_string()),
+            other => return Err(format!("unrecognized argument: {}\n{}", other, USAGE)),
         }
         i += 1;
     }
@@ -112,14 +107,11 @@ fn parse(args: &[String]) -> Result<Option<Args>, String> {
     if mode == Mode::Tree && gates_dir.is_some() {
         return Err(USAGE.to_string());
     }
-    Ok(Some(Args { mode, gates_dir }))
+    Ok(Args { mode, gates_dir })
 }
 
 pub fn emit(args: &[String]) -> Result<String, String> {
-    let parsed = match parse(args)? {
-        Some(a) => a,
-        None => return Ok(USAGE.to_string()),
-    };
+    let parsed = parse(args)?;
     match parsed.mode {
         Mode::Tree => tree(),
         m => registry_arm(m, parsed.gates_dir),
@@ -707,15 +699,15 @@ fn render_group(
 mod tests {
     use super::*;
 
-    // spec: gate-sdk/SPEC.md §The bin/-tool contract — help before arity, and an unrecognized
-    // argument refused rather than absorbed. The tool has no positionals, so a bare word is
-    // unrecognized on the same footing as an unknown flag.
+    // spec: gate-sdk/SPEC.md §port-blockers — an unrecognized argument is refused rather than
+    // absorbed, `--help` among them. The tool has no positionals, so a bare word is unrecognized on
+    // the same footing as an unknown flag.
     #[test]
-    fn help_wins_over_everything_that_follows_and_a_stray_word_refuses() {
-        assert!(parse(&["--help".into(), "--group".into()])
-            .expect("help refused")
-            .is_none());
-        assert!(parse(&["-h".into()]).expect("help refused").is_none());
+    fn help_and_a_stray_word_refuse_with_the_usage() {
+        for help in ["--help", "-h"] {
+            let err = parse(&[help.into(), "--group".into()]).err().expect("help must refuse");
+            assert!(err.starts_with(&format!("unrecognized argument: {}\nusage:", help)), "{}", err);
+        }
         assert!(parse(&["--bogus".into()]).is_err());
         assert!(parse(&["group".into()]).is_err());
         assert!(parse(&["--group".into(), "--tree".into()]).is_err());
@@ -728,11 +720,10 @@ mod tests {
     fn the_tree_arm_refuses_a_registry_it_never_reads() {
         assert!(parse(&["--gates-dir".into(), "scripts".into(), "--tree".into()]).is_err());
         let a = parse(&["--gates-dir".into(), "scripts".into(), "--group".into()])
-            .expect("a scoped group arm refused")
-            .expect("a scoped group arm read as help");
+            .expect("a scoped group arm refused");
         assert_eq!(a.gates_dir.as_deref(), Some("scripts"));
         assert!(a.mode == Mode::Group);
-        let d = parse(&[]).expect("the default arm refused").expect("help");
+        let d = parse(&[]).expect("the default arm refused");
         assert!(d.mode == Mode::Default && d.gates_dir.is_none());
     }
 

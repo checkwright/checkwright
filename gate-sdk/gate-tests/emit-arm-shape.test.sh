@@ -49,6 +49,14 @@ has help err "unrecognized option: --help"
 has help err "usage: --emit file-survey"
 usage_once help
 
+# The same holds for a member parsing its own flags: its `--help` lands on its own refusal.
+for arm in docs-mirror roadmap queue-index entry-history port-blockers; do
+    run "help-$arm" 2 "--emit-$arm" --help
+    has "help-$arm" err "--help"
+    usage_once "help-$arm"
+    [[ -s "$scratch/help-$arm.out" ]] && note "help-$arm" "a refused --help printed on stdout"
+done
+
 # A free-text reader refuses a dash-led operand rather than reading it as an empty reading.
 for arm in md-index pub-index stage-rules ruling-staleness close-surfaces; do
     run "dash-$arm" 2 "--emit-$arm" --help

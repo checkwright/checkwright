@@ -24,7 +24,6 @@ enum Mode {
     Index,
     Extent,
     Candidates,
-    Help,
 }
 
 struct Args {
@@ -60,10 +59,6 @@ fn parse(args: &[String]) -> Result<Args, String> {
                 a.mode = Mode::Candidates;
                 i += 1;
             }
-            "-h" | "--help" => {
-                a.mode = Mode::Help;
-                i += 1;
-            }
             other if other.starts_with('-') => {
                 return Err(format!("unknown option: {}\n{}", other, USAGE));
             }
@@ -78,9 +73,6 @@ fn parse(args: &[String]) -> Result<Args, String> {
 
 pub fn emit(args: &[String]) -> Result<String, String> {
     let a = parse(args)?;
-    if let Mode::Help = a.mode {
-        return Ok(USAGE.to_string());
-    }
     let file = if a.file.is_empty() {
         queue::knob_scalar("QUEUE_KIT_QUEUE_FILE")?
     } else {
@@ -89,7 +81,6 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     let text = std::fs::read_to_string(&file).map_err(|e| format!("file not found: {}: {}", file, e))?;
 
     match a.mode {
-        Mode::Help => unreachable!(),
         Mode::Extent => extent(&text, &a.slug),
         Mode::Candidates => candidates(&text),
         Mode::Index => index(&text, a.collapse),
@@ -477,6 +468,16 @@ fn candidates(text: &str) -> Result<String, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: gate-sdk/SPEC.md §The non-gate arm — `--help` is no per-arm help flag: it is the
+    // member's shape refusal, which carries the usage
+    #[test]
+    fn help_is_a_refusal_carrying_the_usage() {
+        for help in ["--help", "-h"] {
+            let err = emit(&[help.to_string()]).expect_err("help must refuse");
+            assert!(err.contains(help) && err.contains(USAGE), "{}", err);
+        }
+    }
 
     // spec: queue-kit/SPEC.md §The queue-index arm — the rendering cases: the title is the summary
     // with a link rendered as its text, the multi-tag tag line, the drain-exempt echo, the empty

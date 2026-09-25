@@ -30,7 +30,6 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     let mut file = String::new();
     for a in args {
         match a.as_str() {
-            "-h" | "--help" => return Ok(USAGE.to_string()),
             other if other.starts_with('-') => {
                 return Err(format!("unknown option: {}\n{}", other, USAGE))
             }
@@ -176,8 +175,18 @@ fn short(sha: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::{count_of, short};
+    use super::{count_of, emit, short, USAGE};
     use crate::queue::Unit::{self, Cp, Lines};
+
+    // spec: gate-sdk/SPEC.md §The non-gate arm — `--help` is no per-arm help flag: it is the
+    // member's shape refusal, which carries the usage
+    #[test]
+    fn help_is_a_refusal_carrying_the_usage() {
+        for help in ["--help", "-h"] {
+            let err = emit(&[help.to_string()]).expect_err("help must refuse");
+            assert!(err.contains(help) && err.contains(USAGE), "{}", err);
+        }
+    }
 
     fn count(q: &str, slug: &str, unit: Unit) -> Option<usize> {
         count_of(q, &sections(), slug, unit)

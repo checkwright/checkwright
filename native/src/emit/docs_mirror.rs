@@ -19,7 +19,6 @@ enum Mode {
     Write,
     List,
     One(String),
-    Help,
 }
 
 fn parse(args: &[String]) -> Result<(Mode, String), String> {
@@ -42,7 +41,6 @@ fn parse(args: &[String]) -> Result<(Mode, String), String> {
                     .unwrap_or_else(|| ".".to_string());
                 i += 1;
             }
-            "-h" | "--help" => mode = Mode::Help,
             other => return Err(format!("unknown argument: {}\n{}", other, USAGE)),
         }
         i += 1;
@@ -266,13 +264,9 @@ fn context(root: &str) -> Result<Ctx, String> {
 // (`--write`) exactly as the one shell tool did.
 pub fn emit(args: &[String]) -> Result<String, String> {
     let (mode, root) = parse(args)?;
-    if let Mode::Help = mode {
-        return Ok(USAGE.to_string());
-    }
     let ctx = context(&root)?;
 
     match mode {
-        Mode::Help => unreachable!(),
         Mode::List => {
             let mut out = String::new();
             for s in sources(&ctx)? {
@@ -316,6 +310,16 @@ pub fn emit(args: &[String]) -> Result<String, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: gate-sdk/SPEC.md §The non-gate arm — `--help` is no per-arm help flag: it is the
+    // member's shape refusal, which carries the usage
+    #[test]
+    fn help_is_a_refusal_carrying_the_usage() {
+        for help in ["--help", "-h"] {
+            let err = emit(&[help.to_string()]).expect_err("help must refuse");
+            assert!(err.contains(help) && err.contains(USAGE), "{}", err);
+        }
+    }
 
     // spec: canon-kit/SPEC.md §The reference-link grammar — the mirrored set is exactly one
     // directory level of SPEC/README plus the doctrine deliverable, so a nested or root-level

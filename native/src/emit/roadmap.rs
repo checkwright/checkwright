@@ -15,7 +15,6 @@ const PLACEHOLDER: &str = "_Nothing is queued under this horizon._";
 enum Mode {
     Emit,
     Write,
-    Help,
 }
 
 fn parse(args: &[String]) -> Result<(Mode, String), String> {
@@ -25,7 +24,6 @@ fn parse(args: &[String]) -> Result<(Mode, String), String> {
         match a.as_str() {
             "--emit" => mode = Mode::Emit,
             "--write" => mode = Mode::Write,
-            "-h" | "--help" => mode = Mode::Help,
             other if other.starts_with('-') => {
                 return Err(format!("unknown option: {}\n{}", other, USAGE))
             }
@@ -92,10 +90,6 @@ fn body(entries: &[RoadmapEntry], horizons: &[String], base: &str) -> String {
 
 pub fn emit(args: &[String]) -> Result<String, String> {
     let (mode, file) = parse(args)?;
-    if let Mode::Help = mode {
-        return Ok(USAGE.to_string());
-    }
-
     let file = if file.is_empty() {
         queue::knob_scalar("QUEUE_KIT_QUEUE_FILE")?
     } else {
@@ -156,6 +150,16 @@ pub fn end(name: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: gate-sdk/SPEC.md §The non-gate arm — `--help` is no per-arm help flag: it is the
+    // member's shape refusal, which carries the usage
+    #[test]
+    fn help_is_a_refusal_carrying_the_usage() {
+        for help in ["--help", "-h"] {
+            let err = emit(&[help.to_string()]).expect_err("help must refuse");
+            assert!(err.contains(help) && err.contains(USAGE), "{}", err);
+        }
+    }
 
     fn entry(tags: usize, field: &str, slug: &str, sums: usize, summary: &str) -> RoadmapEntry {
         RoadmapEntry {

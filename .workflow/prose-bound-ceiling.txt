@@ -6,7 +6,7 @@
 43 doctrine-kit/SPEC.md
 160 drift-kit/SPEC.md
 119 evidence-kit/SPEC.md
-1198 gate-sdk/SPEC.md
+1197 gate-sdk/SPEC.md
 307 guard-kit/SPEC.md
 174 installer/SPEC.md
 419 lifecycle-kit/SPEC.md
