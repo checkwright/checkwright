@@ -5,3 +5,4 @@
 ---
 
 gate-sdk-framework-brevity scope a00df7b4 2026-09-25 43aacd91
+gate-sdk-framework-brevity build ac18885b 2026-09-25 a889c89c
