@@ -1079,11 +1079,11 @@ pub const VALUES_USAGE: &str = "usage: --emit knob-values <NAME>...";
 
 pub fn values(args: &[String]) -> Result<String, String> {
     if args.is_empty() {
-        return Err("needs at least one static knob name".to_string());
+        return Err(format!("needs at least one static knob name\n{}", VALUES_USAGE));
     }
     let mut out = String::new();
     for name in args {
-        let (_, row) = static_row(name)?;
+        let (_, row) = static_row(name).map_err(|e| format!("{}\n{}", e, VALUES_USAGE))?;
         let (v, _) = resolve(name)?;
         render(&mut out, row, v);
     }

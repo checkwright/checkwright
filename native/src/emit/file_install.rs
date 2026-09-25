@@ -177,7 +177,8 @@ fn replace_in_place(body: &str, k: &Kind, want: &str, new: &str) -> Option<Strin
 }
 
 pub fn emit(args: &[String]) -> Result<String, String> {
-    let argv = super::file_survey::positionals(args, "field")?;
+    let argv =
+        super::file_survey::positionals(args, "field").map_err(|e| format!("{}\n{}", e, USAGE))?;
     let name = argv.first().ok_or_else(|| USAGE.to_string())?;
     let k = kind(name).ok_or_else(|| {
         format!(

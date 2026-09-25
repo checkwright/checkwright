@@ -31,13 +31,15 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     for a in args {
         match a.as_str() {
             "-h" | "--help" => return Ok(USAGE.to_string()),
-            other if other.starts_with('-') => return Err(format!("unknown option: {}", other)),
+            other if other.starts_with('-') => {
+                return Err(format!("unknown option: {}\n{}", other, USAGE))
+            }
             other if slug.is_empty() => slug = other.to_string(),
             other => file = other.to_string(),
         }
     }
     if slug.is_empty() {
-        return Err("entry-history needs a <slug>".to_string());
+        return Err(format!("entry-history needs a <slug>\n{}", USAGE));
     }
     let sec_cfg = queue::Sections::active_and_deferred()?;
     let unit = queue_entry_budget::display_unit(queue_entry_budget::cap()?);

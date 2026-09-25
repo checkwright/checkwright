@@ -170,7 +170,7 @@ pub enum Arm {
 
 // spec: gate-sdk/SPEC.md §The bin/-tool contract — an `--emit-` member's argument grammar: `Flags`
 // names every token the member reads, none for one taking no argument; `Parsed` is a member parsing
-// its own argv, with the usage block its refusal prints.
+// its own argv, with the usage block its shape refusal prints.
 pub enum Grammar {
     Flags(&'static [&'static str]),
     Parsed(&'static str),
@@ -190,23 +190,15 @@ impl Grammar {
     }
 }
 
-// spec: gate-sdk/SPEC.md §The bin/-tool contract — the dispatcher's one refusal for an `--emit-`
-// member: a token a `Flags` grammar does not name is refused before the member runs, and every
-// refusal carries the usage block once, the member's own error already carrying it or not.
+// spec: gate-sdk/SPEC.md §The bin/-tool contract — a token a `Flags` grammar does not name is
+// refused before the member runs; a `Parsed` member's refusal prints as the member spelled it.
 pub fn dispatch(arm: &str, f: EmitFn, grammar: &Grammar, args: &[String]) -> Result<String, String> {
-    let usage = grammar.usage(arm);
     if let Grammar::Flags(flags) = grammar {
         if let Some(a) = args.iter().find(|a| !flags.contains(&a.as_str())) {
-            return Err(format!("{}: unrecognized argument: {}\n{}", arm, a, usage));
+            return Err(format!("{}: unrecognized argument: {}\n{}", arm, a, grammar.usage(arm)));
         }
     }
-    f(args).map_err(|e| {
-        if e.contains(&usage) {
-            format!("{}: {}", arm, e)
-        } else {
-            format!("{}: {}\n{}", arm, e, usage)
-        }
-    })
+    f(args).map_err(|e| format!("{}: {}", arm, e))
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the registry union sentinel, owned beside `knobs`
@@ -898,9 +890,6 @@ mod tests {
         panic!("the dispatcher ran a member whose argv it should have refused")
     }
 
-    fn refuses(_: &[String]) -> Result<String, String> {
-        Err("unrecognized option: --help".to_string())
-    }
 
     // spec: gate-sdk/SPEC.md §The bin/-tool contract — a surplus token is refused before the member
     // runs, and a declared flag is not
@@ -917,16 +906,17 @@ mod tests {
         assert_eq!(dispatch("--emit-x", ok, &one, &["--write".to_string()]), Ok("doc".to_string()));
     }
 
-    // spec: gate-sdk/SPEC.md §The bin/-tool contract — a member's refusal carries its usage block
-    // exactly once, whether or not the member's own error already spelled it
+    // spec: gate-sdk/SPEC.md §The bin/-tool contract — a `Parsed` member's shape refusal carries the
+    // usage block it spelled, once, and its runtime refusal prints its cause alone
     #[test]
-    fn a_parsed_refusal_carries_the_usage_block_once() {
+    fn a_parsed_refusal_prints_as_the_member_spelled_it() {
         let g = Grammar::Parsed("usage: --emit x <arg>");
-        let err = dispatch("--emit-x", refuses, &g, &["--help".to_string()]).expect_err("refusal");
+        let shape = |_: &[String]| Err("unrecognized option: --help\nusage: --emit x <arg>".to_string());
+        let err = dispatch("--emit-x", shape, &g, &["--help".to_string()]).expect_err("refusal");
         assert_eq!(err, "--emit-x: unrecognized option: --help\nusage: --emit x <arg>");
-        let spelled = |_: &[String]| Err("usage: --emit x <arg>".to_string());
-        let err = dispatch("--emit-x", spelled, &g, &[]).expect_err("refusal");
-        assert_eq!(err.matches("usage:").count(), 1, "{}", err);
+        let runtime = |_: &[String]| Err("not a git repository".to_string());
+        let err = dispatch("--emit-x", runtime, &g, &[]).expect_err("refusal");
+        assert_eq!(err, "--emit-x: not a git repository");
     }
 
     // spec: gate-sdk/SPEC.md §The bin/-tool contract — every emitting row declares a usage block that

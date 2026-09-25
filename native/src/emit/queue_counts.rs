@@ -29,12 +29,14 @@ fn parse(args: &[String]) -> Result<Args, String> {
             "--by" => {
                 let v = args.get(i + 1).cloned().unwrap_or_default();
                 if v.is_empty() || v.starts_with('-') {
-                    return Err("--by needs a <tag>".to_string());
+                    return Err(format!("--by needs a <tag>\n{}", USAGE));
                 }
                 a.by = Some(v);
                 i += 2;
             }
-            other if other.starts_with('-') => return Err(format!("unknown option: {}", other)),
+            other if other.starts_with('-') => {
+                return Err(format!("unknown option: {}\n{}", other, USAGE))
+            }
             other => {
                 a.file = other.to_string();
                 i += 1;

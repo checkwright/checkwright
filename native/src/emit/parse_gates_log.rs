@@ -22,7 +22,10 @@ fn tail(line: &str) -> Option<String> {
 // spec: evidence-kit/SPEC.md §The evidence adapters — the log is the arm's only positional
 pub fn emit(args: &[String]) -> Result<String, String> {
     let log = args.first().map(String::as_str).unwrap_or("");
-    if log.is_empty() || !std::path::Path::new(log).is_file() {
+    if log.is_empty() {
+        return Err(format!("needs a <log>\n{}", USAGE));
+    }
+    if !std::path::Path::new(log).is_file() {
         return Err(format!("log not found: {}", log));
     }
     let text = super::read_text(log)?;

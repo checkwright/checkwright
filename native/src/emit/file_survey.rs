@@ -95,7 +95,7 @@ fn stage() -> Result<String, String> {
 }
 
 pub fn emit(args: &[String]) -> Result<String, String> {
-    let fields = positionals(args, "field")?;
+    let fields = positionals(args, "field").map_err(|e| format!("{}\n{}", e, USAGE))?;
     if fields.len() != 5 || fields.iter().any(String::is_empty) {
         return Err(USAGE.to_string());
     }

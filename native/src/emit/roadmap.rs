@@ -27,7 +27,7 @@ fn parse(args: &[String]) -> Result<(Mode, String), String> {
             "--write" => mode = Mode::Write,
             "-h" | "--help" => mode = Mode::Help,
             other if other.starts_with('-') => {
-                return Err(format!("unknown option: {}", other))
+                return Err(format!("unknown option: {}\n{}", other, USAGE))
             }
             other => file = other.to_string(),
         }

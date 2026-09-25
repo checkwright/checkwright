@@ -28,7 +28,8 @@ pub(super) fn append_creating(path: &std::path::Path, body: &str) -> std::io::Re
 }
 
 pub fn emit(args: &[String]) -> Result<String, String> {
-    let fields = super::file_survey::positionals(args, "field")?;
+    let fields =
+        super::file_survey::positionals(args, "field").map_err(|e| format!("{}\n{}", e, USAGE))?;
     if fields.len() != 2 || fields.iter().any(String::is_empty) {
         return Err(USAGE.to_string());
     }

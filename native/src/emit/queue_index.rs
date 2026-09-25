@@ -65,7 +65,7 @@ fn parse(args: &[String]) -> Result<Args, String> {
                 i += 1;
             }
             other if other.starts_with('-') => {
-                return Err(format!("unknown option: {}", other));
+                return Err(format!("unknown option: {}\n{}", other, USAGE));
             }
             other => {
                 a.file = other.to_string();
@@ -270,7 +270,7 @@ fn index(text: &str, collapse: bool) -> Result<String, String> {
 
 fn extent(text: &str, slug: &str) -> Result<String, String> {
     if slug.is_empty() {
-        return Err("--extent needs a <slug>".to_string());
+        return Err(format!("--extent needs a <slug>\n{}", USAGE));
     }
     let lines: Vec<&str> = text.lines().collect();
     for (i, line) in lines.iter().enumerate() {

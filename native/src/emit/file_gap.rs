@@ -94,7 +94,8 @@ fn cursor() -> Result<(String, bool), String> {
 }
 
 pub fn emit(args: &[String]) -> Result<String, String> {
-    let fields = super::file_survey::positionals(args, "prose")?;
+    let fields =
+        super::file_survey::positionals(args, "prose").map_err(|e| format!("{}\n{}", e, USAGE))?;
     if fields.len() != 1 || fields[0].is_empty() {
         return Err(USAGE.to_string());
     }

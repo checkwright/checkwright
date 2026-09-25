@@ -70,11 +70,11 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     let (driver, log) = match (args.first(), args.get(1)) {
         (Some(d), Some(l)) if !d.is_empty() && !l.is_empty() => (d.as_str(), l.as_str()),
         _ => {
-            return Err(
+            return Err(format!(
                 "needs a driver and a log — the driver is the consumer's own file, so the arm holds \
-                 no default for it"
-                    .to_string(),
-            )
+                 no default for it\n{}",
+                USAGE
+            ))
         }
     };
     if !std::path::Path::new(log).is_file() {

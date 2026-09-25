@@ -43,7 +43,7 @@ fn parse(args: &[String]) -> Result<(Mode, String), String> {
                 i += 1;
             }
             "-h" | "--help" => mode = Mode::Help,
-            other => return Err(format!("unknown argument: {}", other)),
+            other => return Err(format!("unknown argument: {}\n{}", other, USAGE)),
         }
         i += 1;
     }
@@ -283,7 +283,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         }
         Mode::One(src) => {
             if src.is_empty() {
-                return Err("--emit needs a source path".to_string());
+                return Err(format!("--emit needs a source path\n{}", USAGE));
             }
             if !Path::new(&ctx.under(&src)).is_file() {
                 return Err(format!("source not found: {}", ctx.under(&src)));

@@ -29,7 +29,7 @@ fn headings<'a>(text: &'a str, needle: &str) -> Vec<&'a str> {
 }
 
 pub fn emit(args: &[String]) -> Result<String, String> {
-    let rest = positionals(args, "substring")?;
+    let rest = positionals(args, "substring").map_err(|e| format!("{}\n{}", e, USAGE))?;
     let needle = match rest.first() {
         Some(n) if rest.len() == 1 && !n.is_empty() => n,
         _ => return Err(USAGE.to_string()),

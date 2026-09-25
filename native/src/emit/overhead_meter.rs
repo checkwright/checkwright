@@ -207,7 +207,8 @@ fn target(given: Option<&str>, i: &crate::sessions::Inputs) -> Target {
 }
 
 pub fn emit(args: &[String]) -> Result<String, String> {
-    let given = super::file_survey::positionals(args, "transcript")?;
+    let given = super::file_survey::positionals(args, "transcript")
+        .map_err(|e| format!("{}\n{}", e, USAGE))?;
     if given.len() > 1 {
         return Err(USAGE.to_string());
     }
