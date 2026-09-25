@@ -83,7 +83,7 @@ Once the open is authorized and before dispatching scope, the lead obtains the o
 
 Scope's proposed unit set returns as an ordinary four-header escalation, and the lead routes it like any scope/queue change — ruled by the operator, or by the lead only where the answer is derivable from the governed surfaces (the routing rule the escalation protocol below already states).
 
-A unit-set escalation whose Recommendation lacks its `Composition:` line or its `Supersession:` lines (lifecycle-kit/templates/stages/scope.md, the composition test and the supersession pass) goes back to scope before it is routed: it is never relayed to the operator and never ruled, and a relay carries the verdict verbatim. The check is presence, not quality — whether a stands-alone argument persuades is for the party ruling on the set, and a lead grading it would be the lead-authored judgment on the unit set this section refuses. Returning an escalation that carries no verdict selects nothing: it asks for the test's output before anyone rules on the set.
+A unit-set escalation whose Recommendation lacks its `Composition:` line, its `Supersession:` lines or its `Push need:` line (lifecycle-kit/templates/stages/scope.md, the composition test, the supersession pass and the push count) goes back to scope before it is routed: it is never relayed to the operator and never ruled, and a relay carries the verdict verbatim. The check is presence, not quality — whether a stands-alone argument persuades is for the party ruling on the set, and a lead grading it would be the lead-authored judgment on the unit set this section refuses. Returning an escalation that carries no verdict selects nothing: it asks for the test's output before anyone rules on the set.
 
 ## Closing an iteration
 

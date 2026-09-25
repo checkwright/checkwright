@@ -8,20 +8,6 @@
 
 ## New Features
 
-### push-need-uncounted-at-scope
-
-[spec: SPEC-push-need.md]
-
-nothing counts how many pushes a unit set needs against the close binding's `push-budget` slot before the set is ruled. lifecycle-kit/SPEC.md §The state machine places an `observed-by` iteration's first push early and deliberately names no count, and scope's unit-set escalation states no push need, so an overrun surfaces only at close, as an operator ask.
-
-**Attested at hosted-install-path:** two units reached done only through a Windows CI run during build (a `ps-producer-record` measurement, and a binding step plus its hotfix), so build spent the whole ordinary budget before close's own push: `ce35711c`, `00dba701`, hotfix `a9133bd8`, then the granted close push `d1fdb228`. Three of the last 25 master `gates` runs were red, each a Windows leg's first run of new code.
-
-**Deliverable:** scope's unit-set escalation states the set's push need (each `observed-by` entry, and each unit whose change a remote run executes first) against the consumer's budget, and ruling the set rules it. The amendment refuses the other limb, a measurement-push class in the binding.
-
-**Admitted by operator exception to the enhancement admission filter (TRAJECTORY.md §The rulings) — operator direction 2026-09-25, lead-relayed:** the filter reaches this entry and the exception admits it. The operator stated no reason; the grounds shown when granting it were scope's escalation: the cost attested three times in five days, three red master `gates` runs each a Windows leg's first run of new code.
-
-**Cost while deferred:** one operator interrupt per iteration whose units need remote-only observations, and a spent watched push per red first run. Filed 2026-09-25 to the gap inbox by hosted-install-path's close; promoted 2026-09-25 at the next scope, so the record is late and says so. Owner lookup: `push-budget`, `push budget`, `observed-by` in this file — none owns the count; the placement rule and the `push-budget` slot are its owners.
-
 ## Technical Debt
 
 ### held-ci-leg-failure-reddens-a-binding-one
@@ -90,7 +76,7 @@ this host lacks `pwsh` and `dash`, so the front-end parity check's PowerShell ha
 
 **Enhancement admission filter:** contributor tooling reaching none of the three arms; held Deferred without an operator exception.
 
-**Cost while deferred:** a unit touching a PowerShell or dash path risks a second watched push. Filed 2026-09-23 to the gap inbox on an operator suggestion, lead-relayed, after gate-sdk-blind-spots' close; promoted 2026-09-23 at the next scope. Owner lookup: `docker`, `dash`, `pwsh` in this file — `pwsh` hits only [instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set](#instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set), whose subject is a CI leg's binding transition, not a local run.
+**Cost while deferred:** a unit touching a PowerShell or dash path risks a second watched push. Filed 2026-09-23 to the gap inbox on an operator suggestion, lead-relayed, after gate-sdk-blind-spots' close; promoted 2026-09-23 at the next scope. Owner lookup: `docker`, `dash`, `pwsh` in this file — `pwsh` hits only `instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set`, whose subject is a CI leg's binding transition, not a local run.
 
 ### retired-citation-referent-rule
 
@@ -131,24 +117,6 @@ nothing shipped lets a customer run the battery under a named config-seam varian
 **Cost while deferred:** an adopter evaluating a knob edits the seam, commits, and learns from the next red; the preview cohort's false-positive dispositions have no cheap rehearsal. Filed 2026-09-11 by consult as a direct entry, the test gap the operator named there.
 
 **Held Deferred by the enhancement admission filter, operator direction 2026-09-21 (lead-relayed):** a shipped adopter arm reaching none of the three arms.
-
-### instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set
-
-[cost: event/high] [surface: .github] [recurrence: 2026-09-25]
-
-an instrument leg's `continue-on-error` is dropped by an argued expiry that fires on the leg running green ONCE, so widening the leg afterwards re-creates, silently, the never-run condition the exemption existed for.
-
-**ATTESTED, and the cost was the exact one the exemption was written to avoid.** `install-smoke-pwsh-windows` carried the expiry "drop this line on the run it is first observed green and not before". It fired on an EIGHT-check leg; a later delta rewrote the leg to THIRTEEN, so five brand-new assertions executed for the first time anywhere on a leg that was by then BINDING. Two defects in the thirteenth reddened master at `ab676c7b`. The exemption's own stated ground was that "its first run was that code's first run and a binding red would have spent a watched push on the very defect the leg exists to surface" — and it spent precisely that push, against a one-to-two-push iteration budget.
-
-**BOTH DEFECTS ARE FIXED and this entry is deliberately the residue.** `74d94c94` provisioned the leg to the floor and cast the bare `-match` whose `System.Object[]` killed the step; `install-smoke-pwsh-windows` is SUCCESS at `273a9d76` in run `34346492761`, re-verified at this scope. Master is green and nothing needs reverting — what survives is the keying.
-
-**Why design-pending, a real fork with no obviously right limb:** an expiry keyed to *the assertion set unchanged* needs a stable identity for that set, which the live leg spells as inline PowerShell rather than as anything a scanner can count; a re-arm obligation on the widening session is a prose rule no gate reads and the same class this tree keeps refusing; and the third reading — that widening a binding leg is simply owed a rehearsal round like any other new code — costs a push per widening, which the budget above is what bounds. The shape reaches every `continue-on-error` instrument leg in `.github/workflows/gates.yml`, not this one.
-
-**A FOURTH LIMB, ATTESTED RATHER THAN PROPOSED — `lead, own-authority` 2026-09-09 through the lead's message channel.** An exemption whose posture is DERIVED — `continue-on-error` read out of a per-target roster index rather than hand-carried — makes the binding transition happen on the run that licenses it with no edit, and is rehearsed by construction, the green run licensing the join being the same assertion set. Witness: `install-smoke-sh-windows` carried verbatim the expiry this entry indicts; this iteration's build replaced it with the derived read, and run 34394922502 shows `native-artifacts (x86_64-pc-windows-msvc, windows-latest, false)` with both Windows legs binding and no hand edit. **Its BOUND, where the limb is weaker than it looks:** the derived posture needs a roster carrying a held/joined axis. Platform-target legs have one; an instrument leg with no target roster — the PowerShell bootstrap leg among them — does not, so the limb may resolve the platform subset and leave the shape stated above only partly answered. It is also the limb doctrine favours on its face, derivation-first. **Next step, filed and NOT started:** re-measure the remaining `continue-on-error` legs against this limb — which have a roster to derive from. That is a survey, so scope-gated intake puts pricing it in scope's hands.
-
-**Mooted by [push-need-uncounted-at-scope](#push-need-uncounted-at-scope) (2026-09-25 scope, operator direction lead-relayed):** the transition half is discharged, every `continue-on-error` now derived; the widening residue is that entry's subject, so this leaves with its landing.
-
-**Cost while deferred:** every widening of a leg that has already expired its exemption is an unrehearsed binding assertion set, and the failure mode is a spent watched push — the scarcest resource an iteration has. Filed 2026-09-09 to the gap inbox by the close of `behind-invoke-relocation`, which no stage of that iteration could drain; promoted 2026-09-09 at this iteration's scope intake, so the record is late and says so.
 
 ### plugin-marketplace
 
@@ -1411,5 +1379,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 ## Done
 
 - binding-intel-leg-failed-one-run-in-two
+- push-need-uncounted-at-scope
+- instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set
 
 ## Lessons Learned
