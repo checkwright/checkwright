@@ -4,4 +4,4 @@
 
 ---
 
-— scope a00df7b4 2026-09-25 43aacd91
+gate-sdk-framework-brevity scope a00df7b4 2026-09-25 43aacd91

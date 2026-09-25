@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: gate-sdk-framework-brevity
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [README.md](README.md) maps the kits.
 
@@ -9,6 +9,106 @@
 ## New Features
 
 ## Technical Debt
+
+### gate-sdk-framework-brevity
+
+gate-sdk/SPEC.md is about 204k words and the first slice passed only its port-candidate criteria and first cohort, so the SPEC cannot take its pass in one iteration; this is its framework half, about 37k words: §The provenance seam, §Layout and configuration, §The path-dialect contract, §The workflow directory, §The bin/-tool contract, §The gate model, §Enforcement tiers, §The install disposition, §The non-gate arm with its harness-integration arm, §What the dispatch seam does not settle, §The adopter constraints and §The extensibility model.
+
+**Deliverable:** the three moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) applied to those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm. A contract sentence stays. The sibling debt entries that edit these sections land first, so the pass reads their text.
+
+**Promoted as debt, split from spec-brevity-residue — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the moves run under gates that already exist and add no name. The rest of gate-sdk stays on the residue entry.
+
+**Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-25 at scope from spec-brevity-residue, filed that day.
+
+### kit-readme-validity-pass
+
+the twelve kit READMEs carry three classes of false or unrunnable statement. (1) Every `Use`/`Test` fence spells the sourcing idiom, which needs bash ≥ 4.3 (`gate-sdk/lib/gate.sh`'s `local -n`), while starter and prose adopters are told they reach no bash and no PowerShell spelling exists; `init` prints `./scripts/checkwright-gates <arm>` (installer/SPEC.md §init), which every README should spell instead. (2) Eleven READMEs say "An installer-vendored tree does not carry this file", but the payload withholds only `SPEC.md` and `smoke/` (gate-sdk/SPEC.md §Consumer payload) and the README is packed. (3) Single false claims: drift-kit's "Like guard-kit, drift-kit registers no gates" (guard-kit registers `check-door-binding`); delegation-kit's "the two mechanizable pieces" against three gates and three guards; evidence-kit's `check-producer-liveness` inside the "add to your `gates.list`" block; doctrine-kit's fence holding a bare `--install-doctrine` flag; installer/README.md's stale three-kit description and its "nothing Windows 10 and later does not ship" double negative.
+
+**Deliverable:** the fixes above, plus a pointer-not-list pass on the openers the audit flagged (lifecycle-kit's ~75-word opener, queue-kit's 12-tag enumeration, guard-kit's ~180-word knob paragraph, context-kit's ~200-word paragraph). The per-README finding list is in this entry's filing commit.
+
+**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** each fix brings a README to what `init` and §Consumer payload already say, adding no name.
+
+**Cost while deferred:** a starter adopter copies a command their floor cannot run, and reads a payload claim the installer contradicts. Filed 2026-09-25 by consult as a direct entry, from the same operator-directed audit.
+
+### fixture-runner-checks-dir-fails-open
+
+the fixture runner silently drops an explicitly named checks directory that does not exist (`run_gate_tests.rs`, a fail-open its own comment admits), so a mistyped path runs the fixtures against nothing and blames the corpus.
+
+**Deliverable:** refuse a named directory that is absent, with a fixture.
+
+**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** it brings the runner under the fail-closed contract. Re-verified at scope: `run_gate_tests.rs` filters named members through `is_dir()` beside the comment carrying the fail-open.
+
+**Cost while deferred:** every kit's fixture suite rides a runner that can pass on a typo. Filed 2026-08-24; returned from the icebox 2026-09-25 by consult, the branch re-read.
+
+### bin-argv-shape-residual-member
+
+`--run-gate-tests` treats its first argument as the tests directory with no `-h` or `--` handling (`run_gate_tests.rs`), so `--run-gate-tests --help` fails as a missing directory while the bin/-tool contract (gate-sdk/SPEC.md §The bin/-tool contract) reads as complete.
+
+**Deliverable:** the arm takes the contract's argument shape, with a bad fixture.
+
+**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** it brings the arm to a contract already stated. Re-verified at scope: `--run-gate-tests --help` prints `no fixture tree at --help`. It lands with [surplus-arg-drop-in-six-emit-arms](#surplus-arg-drop-in-six-emit-arms), which converges on the same contract.
+
+**Cost while deferred:** one arm breaks the contract its kit states. Filed 2026-08-13; returned from the icebox 2026-09-25 by consult, the arm re-read.
+
+### surplus-arg-drop-in-six-emit-arms
+
+fourteen emit modules take `_args` and ignore them (`session_id.rs` is one), so a bogus or surplus argument exits 0 with no refusal, against the bin/-tool contract's argument shape.
+
+**Deliverable:** one surplus-argument refusal in the emit dispatcher, and a bad fixture.
+
+**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** it enforces an argument shape the contract already states. Re-verified at scope: `--emit session-id bogus-surplus` exits 0. It lands with [emit-arm-usage-unreachable](#emit-arm-usage-unreachable), since one dispatcher refusal that prints the arm's usage closes both.
+
+**Cost while deferred:** a misspelt invocation reads as success. Filed 2026-09-08; returned from the icebox 2026-09-25 by consult, the modules re-grepped.
+
+### emit-arm-usage-unreachable
+
+gate-sdk/SPEC.md contradicts itself on where an `--emit` member's usage lives: §The bin/-tool contract says it is not in the front end's help and lives at the member's shape refusal, which prints the usage block at exit 2; §The non-gate arm says it lives in `bin/run-gates.sh`'s help and the owning kit's README, and refuses a per-arm help flag. Behaviour matches neither: `--emit file-survey --help` refuses at exit 2 with no usage block.
+
+**Deliverable:** §The non-gate arm's sentence brought to §The bin/-tool contract's rule, and every `--emit` member's shape refusal printing its usage block at exit 2, with a bad fixture. No `--emit --help` or per-arm help flag.
+
+**Reshaped and promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the filed deliverable, a per-arm `--help`, would reverse §The non-gate arm's refusal of a second home, which is a contract change; converging on the rule §The bin/-tool contract already states adds no name. Scope and the lead both ran the `file-survey` probe.
+
+**Cost while deferred:** an adopter learns an arm's arguments by failing it, and the failure does not even say. Filed 2026-09-03; returned from the icebox 2026-09-25 by consult, the usage text re-read.
+
+### non-gate-arm-roster-hand-maintained
+
+gate-sdk/SPEC.md §The non-gate arm hand-lists the flags `main.rs` hardcodes; accurate today and held by nothing, against derivation-first.
+
+**Deliverable:** the hand list deleted and the SPEC citing the arm roster the binary already prints (an unknown `--emit` arm's refusal lists every carried arm).
+
+**Promoted as debt on its derivation branch — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the parity-assertion branch would add a name and re-triage the entry. It is the restatement cut [gate-sdk-framework-brevity](#gate-sdk-framework-brevity) makes in the same section, so the two land together.
+
+**Cost while deferred:** the next arm added stales the list. Filed 2026-09-03; returned from the icebox 2026-09-25 by consult as a contributor-reader exception voided by the rule.
+
+### upgrade-smoke-refuses-inside-a-worktree
+
+`--upgrade-smoke` tests `.git` with `is_dir()` (`upgrade_smoke.rs`) and answers "not a git repository" inside any linked worktree, where `.git` is a file.
+
+**Deliverable:** resolve through `git rev-parse --git-dir`, with a worktree fixture.
+
+**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** a defect fix adding no name. Re-verified at scope: the `is_dir()` test still guards the repository check.
+
+**Cost while deferred:** an adopter on a worktree cannot run the upgrade smoke. Filed 2026-08-29; returned from the icebox 2026-09-25 by consult, the test re-read.
+
+### consumer-smoke-accounting-spelling-unpinned
+
+the consumer smoke's accounting unions two spellings of a count (`run_consumer_smoke.rs`) and no test covers the union; its trigger, the smoke's port, has fired.
+
+**Deliverable:** a unit test over the accounting, or one spelling.
+
+**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** test coverage on a shipped behaviour, adding no name.
+
+**Cost while deferred:** a miscount in the smoke's completion line. Filed 2026-08-07; returned from the icebox 2026-09-25 by consult on the fired trigger.
+
+### template-registry-population-predicate
+
+a third `.list` template, `gate-sdk/templates/portability-patterns.list`, landed 2026-09-07 with no sibling directory; it is the event the template registry's population predicate named, and the native-declaration check over it was not verified.
+
+**Deliverable:** the registry check run over the third template, its declaration verified or corrected.
+
+**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** a verification over an existing check, adding no name.
+
+**Cost while deferred:** a template the parity gate may not see. Filed 2026-08-02; returned from the icebox 2026-09-25 by consult on the named trigger having fired.
 
 ## Deferred
 
@@ -372,16 +472,6 @@ the front door's install-and-demo block cannot be followed as printed, and its p
 
 **Cost while deferred:** every first-time visitor is handed an instruction they cannot run and a proof they cannot reproduce, on the two pages that decide whether they try it. Filed 2026-09-25 by consult as a direct entry, from a customer-docs validity audit the operator directed; the operator had flagged the block as confusing on reading it.
 
-### kit-readme-validity-pass
-
-[cost: event/low] [surface: gate-sdk]
-
-the twelve kit READMEs carry three classes of false or unrunnable statement. (1) Every `Use`/`Test` fence spells the sourcing idiom, which needs bash ≥ 4.3 (`gate-sdk/lib/gate.sh`'s `local -n`), while starter and prose adopters are told they reach no bash and no PowerShell spelling exists; `init` prints `./scripts/checkwright-gates <arm>` (installer/SPEC.md §init), which every README should spell instead. (2) Eleven READMEs say "An installer-vendored tree does not carry this file", but the payload withholds only `SPEC.md` and `smoke/` (gate-sdk/SPEC.md §Consumer payload) and the README is packed. (3) Single false claims: drift-kit's "Like guard-kit, drift-kit registers no gates" (guard-kit registers `check-door-binding`); delegation-kit's "the two mechanizable pieces" against three gates and three guards; evidence-kit's `check-producer-liveness` inside the "add to your `gates.list`" block; doctrine-kit's fence holding a bare `--install-doctrine` flag; installer/README.md's stale three-kit description and its "nothing Windows 10 and later does not ship" double negative.
-
-**Deliverable:** the fixes above, plus a pointer-not-list pass on the openers the audit flagged (lifecycle-kit's ~75-word opener, queue-kit's 12-tag enumeration, guard-kit's ~180-word knob paragraph, context-kit's ~200-word paragraph). The per-README finding list is in this entry's filing commit.
-
-**Cost while deferred:** a starter adopter copies a command their floor cannot run, and reads a payload claim the installer contradicts. Filed 2026-09-25 by consult as a direct entry, from the same operator-directed audit.
-
 ### docs-secondary-clarity-pass
 
 [cost: event/low] [surface: docs]
@@ -396,9 +486,11 @@ the secondary customer pages carry validity slips and undefined internal vocabul
 
 [cost: session/high] [surface: gate-sdk]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk (217k words, its port sections excepted), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk's remainder after [gate-sdk-framework-brevity](#gate-sdk-framework-brevity) (§Per-component contracts at about 107k words, the Porting cohort records, §The `# graph:` manifest, §Meta-gate conservation for the binary substrate, §Consumer payload, §Consumer smoke), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
 
-**Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration. Not a wholesale cut: a contract sentence stays.
+**Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
+
+**Split 2026-09-25 at scope, operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework half was promoted as its own debt entry; this entry keeps the rest.
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
@@ -542,26 +634,6 @@ a smoke that re-runs the battery inside its sandbox inherits no evidence-kit sco
 
 **Cost while deferred:** a false clean in the evidence record. Filed 2026-08-18; returned from the icebox 2026-09-25 by consult, the smoke re-grepped.
 
-### template-registry-population-predicate
-
-[cost: once/low] [surface: gate-sdk] [recurrence: 2026-09-25]
-
-the template registry's population predicate was contingent on a third `.list` template appearing; `gate-sdk/templates/portability-patterns.list` landed 2026-09-07 with no sibling directory, and the native-declaration check over it was not verified.
-
-**Deliverable:** the registry check run over the third template, its declaration verified or corrected.
-
-**Cost while deferred:** a template the parity gate may not see. Filed 2026-08-02; returned from the icebox 2026-09-25 by consult on the named trigger having fired.
-
-### upgrade-smoke-refuses-inside-a-worktree
-
-[cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
-
-`--upgrade-smoke` tests `.git` with `is_dir()` (`upgrade_smoke.rs`) and answers "not a git repository" inside any linked worktree, where `.git` is a file.
-
-**Deliverable:** resolve through `git rev-parse --git-dir`, with a worktree fixture.
-
-**Cost while deferred:** an adopter on a worktree cannot run the upgrade smoke. Filed 2026-08-29; returned from the icebox 2026-09-25 by consult, the test re-read.
-
 ### release-asset-claim-class-owner
 
 [cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
@@ -571,26 +643,6 @@ a "the release ships an asset" claim has no gate, and the class now has a second
 **Deliverable:** an owner for the class (the release-note gate, or a §Consumer payload assertion the publish workflow's artifact list satisfies), with a fixture.
 
 **Cost while deferred:** two public claims about what a release carries, held by nothing. Filed 2026-08-07; returned from the icebox 2026-09-25 by consult on the second instance.
-
-### bin-argv-shape-residual-member
-
-[cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
-
-`--run-gate-tests` treats its first argument as the tests directory with no `-h` or `--` handling (`run_gate_tests.rs`), so `--run-gate-tests --help` fails as a missing directory while the bin/-tool contract (gate-sdk/SPEC.md §The bin/-tool contract) reads as complete.
-
-**Deliverable:** the arm takes the contract's argument shape, with a bad fixture.
-
-**Cost while deferred:** one arm breaks the contract its kit states. Filed 2026-08-13; returned from the icebox 2026-09-25 by consult, the arm re-read.
-
-### fixture-runner-checks-dir-fails-open
-
-[cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
-
-the fixture runner silently drops an explicitly named checks directory that does not exist (`run_gate_tests.rs`, a fail-open its own comment admits), so a mistyped path runs the fixtures against nothing and blames the corpus.
-
-**Deliverable:** refuse a named directory that is absent, with a fixture.
-
-**Cost while deferred:** every kit's fixture suite rides a runner that can pass on a typo. Filed 2026-08-24; returned from the icebox 2026-09-25 by consult, the branch re-read.
 
 ### enter-stage-refusal-help-contradicts-its-guard
 
@@ -632,16 +684,6 @@ the caller roster gate-sdk/SPEC.md §The path-dialect contract gives for the `\\
 
 **Cost while deferred:** a Windows root with the prefix is handled three ways. Filed 2026-08-30; returned from the icebox 2026-09-25 by consult, the callers re-grepped.
 
-### surplus-arg-drop-in-six-emit-arms
-
-[cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
-
-fourteen emit modules take `_args` and ignore them (`session_id.rs` is one), so a bogus or surplus argument exits 0 with no refusal, against the bin/-tool contract's argument shape.
-
-**Deliverable:** one surplus-argument refusal in the emit dispatcher, and a bad fixture.
-
-**Cost while deferred:** a misspelt invocation reads as success. Filed 2026-09-08; returned from the icebox 2026-09-25 by consult, the modules re-grepped.
-
 ### non-gate-arm-testing-floor-unstated
 
 [cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
@@ -651,26 +693,6 @@ a non-gate arm's testing floor is unstated, and four ship with no test module (`
 **Deliverable:** the floor stated at gate-sdk/SPEC.md §The non-gate arm, and the four arms brought to it.
 
 **Cost while deferred:** an arm can change behaviour with nothing red. Filed 2026-09-03; returned from the icebox 2026-09-25 by consult, the modules re-checked.
-
-### non-gate-arm-roster-hand-maintained
-
-[cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
-
-gate-sdk/SPEC.md §The non-gate arm hand-lists the flags `main.rs` hardcodes; accurate today and held by nothing, against derivation-first.
-
-**Deliverable:** the roster derived (the help arm prints it and the SPEC cites the arm), or a parity assertion.
-
-**Cost while deferred:** the next arm added stales the list. Filed 2026-09-03; returned from the icebox 2026-09-25 by consult as a contributor-reader exception voided by the rule.
-
-### emit-arm-usage-unreachable
-
-[cost: once/low] [surface: gate-sdk] [recurrence: 2026-09-25]
-
-gate-sdk/SPEC.md says an emit arm's usage lives in the front end's help, and the runner's usage text carries only a generic `--emit` line; an arm's usage prints only on a refusal.
-
-**Deliverable:** `--emit --help` (or `--emit <arm> --help`) prints the arm's usage, and the SPEC sentence matches.
-
-**Cost while deferred:** an adopter learns an arm's arguments by failing it. Filed 2026-09-03; returned from the icebox 2026-09-25 by consult, the usage text re-read.
 
 ### crate-arms-relink-under-worker-pool
 
@@ -751,16 +773,6 @@ RELEASING.md's step-4 opener bundles the drain and the close stamp as one commit
 **Deliverable:** the opener rewritten to the body's order.
 
 **Cost while deferred:** a release session follows whichever half it reads first. Filed 2026-08-06; returned from the icebox 2026-09-25 by consult, the step re-read.
-
-### consumer-smoke-accounting-spelling-unpinned
-
-[cost: once/low] [surface: gate-sdk] [recurrence: 2026-09-25]
-
-the consumer smoke's accounting unions two spellings of a count (`run_consumer_smoke.rs`) and no test covers the union; its trigger, the smoke's port, has fired.
-
-**Deliverable:** a unit test over the accounting, or one spelling.
-
-**Cost while deferred:** a miscount in the smoke's completion line. Filed 2026-08-07; returned from the icebox 2026-09-25 by consult on the fired trigger.
 
 ### queue-provenance-restates-git-history
 
