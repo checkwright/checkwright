@@ -4,8 +4,8 @@
 - corpus: .github/workflows docs/install.md
 - oracle: grep -n continue-on-error .github/workflows/*.yml; grep -n '(joined)\|(held)' docs/install.md
 - rev: 6492a7ed011d58eab71c4580704962b0e5381d2b
-- finding: Every continue-on-error in the workflows is derived (per-target roster index, pwsh_legs, matrix.held); none is hand-carried. All six declared targets are joined, so no held producer exists at HEAD. install-smoke-sh-macos is the one consumer leg whose binding posture is hard-coded rather than read from the index.
-- inferred: GitHub Actions treating a failed continue-on-error matrix job as satisfied for needs is from memory, not run
+- finding: Every continue-on-error in the workflows is derived (per-target roster index, pwsh_legs, matrix.held); none is hand-carried. All six declared targets are joined, so no held producer exists at HEAD. install-smoke-sh-macos is the one consumer leg whose binding posture is hard-coded rather than read from the index. A failed continue-on-error matrix leg satisfies needs: run 34200226768's held darwin native-artifacts legs failed and install-smoke-macos still ran (measured at spec, gh run view).
+- inferred: none
 
 ## 2026-09-25 scope — Which deferred entries pass the enhancement admission filter, and how do they rank?
 - corpus: TASK-QUEUE.md
