@@ -23,9 +23,9 @@ pub const KNOBS: &[&str] = &[
 
 const IDENTITY: &str = "check-identity";
 
-// spec: gate-sdk/SPEC.md §The bin/-tool contract — the member takes no positional, so the shape
-// refusal has no free text to bind on and only the option half binds; usage itself lives on this
-// arm's own front-end `case` arm, which the class gives every member holding one.
+// spec: gate-sdk/SPEC.md §The bin/-tool contract — the member takes no argument, so any token is
+// a refusal before either knob resolves; usage itself lives on this arm's own front-end `case` arm,
+// which the class gives every member holding one.
 const USAGE: &str = "usage: run-gates.sh --install-hooks
   Takes no argument: the whole input is the GATE_SDK_* configuration.";
 
@@ -40,7 +40,11 @@ pub fn run(args: &[String]) -> i32 {
 }
 
 fn dispatch(args: &[String]) -> Result<i32, String> {
-    super::file_survey::positionals(args, "argument").map_err(|e| format!("{}\n{}", e, USAGE))?;
+    let surplus = super::file_survey::positionals(args, "argument")
+        .map_err(|e| format!("{}\n{}", e, USAGE))?;
+    if let Some(a) = surplus.first() {
+        return Err(format!("takes no arguments (got: {})\n{}", a, USAGE));
+    }
 
     // spec: gate-sdk/SPEC.md §install-hooks — both knobs are resolved before any wiring, the order
     // the shell form read them in, so a configuration failure refuses without half-installing.
@@ -175,5 +179,16 @@ mod tests {
     fn a_flag_refuses_with_the_usage_before_any_wiring() {
         let err = dispatch(&["--help".to_string()]).expect_err("--help must refuse");
         assert!(err.contains("--help") && err.contains(USAGE), "{}", err);
+    }
+
+    // spec: gate-sdk/SPEC.md §The bin/-tool contract — a surplus positional, bare or after `--`,
+    // refuses before any wiring rather than reading as a successful opt-in
+    #[test]
+    fn a_bare_positional_refuses_with_the_usage_before_any_wiring() {
+        for argv in [vec!["foo"], vec!["--", "foo"]] {
+            let args: Vec<String> = argv.iter().map(|s| s.to_string()).collect();
+            let err = dispatch(&args).expect_err("a positional must refuse");
+            assert!(err.contains("got: foo") && err.contains(USAGE), "{}", err);
+        }
     }
 }

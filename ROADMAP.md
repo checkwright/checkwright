@@ -23,16 +23,18 @@ Adoption evidence, mostly. A rung promotes when someone hits the friction it des
 <!-- roadmap:begin -->
 ### now
 
-_Nothing is queued under this horizon._
+- [design-partner-preview](TASK-QUEUE.md#design-partner-preview) *(adoption)* — A small observed preview measuring first green, first useful red and retention on real installs.
+- [demo-catches-a-done-claim](TASK-QUEUE.md#demo-catches-a-done-claim) *(adoption)* — The first-minute demo catches a task marked done with no evidence behind it.
 
 ### next
 
+- [plugin-marketplace](TASK-QUEUE.md#plugin-marketplace) *(ecosystem)* — The stage skills and guards installable as a harness plugin.
 - [companion-toolkit-profile](TASK-QUEUE.md#companion-toolkit-profile) *(ecosystem)* — Gate a tree whose specs another toolkit's workflow wrote.
 - [gate-authoring-sdk-surface](TASK-QUEUE.md#gate-authoring-sdk-surface) *(ecosystem)* — Author a gate in any language behind one substrate-neutral descriptor.
+- [ci-one-line-action](TASK-QUEUE.md#ci-one-line-action) *(adoption)* — Wire the gate battery into CI in one line, with reds annotated on the pull request.
 
 ### later
 
-- [plugin-marketplace](TASK-QUEUE.md#plugin-marketplace) *(ecosystem)* — The stage skills and guards installable as a harness plugin.
 - [benchmark-ab-experiment](TASK-QUEUE.md#benchmark-ab-experiment) *(adoption)* — A controlled experiment measuring drift with and without governance.
 - [hosted-attestation-service](TASK-QUEUE.md#hosted-attestation-service) *(commercial)* — Gate runs verified by a neutral party no committing agent can touch.
 - [heterogeneous-agent-delegation](TASK-QUEUE.md#heterogeneous-agent-delegation) *(ecosystem)* — Dispatch a stage to any vendor's coding agent, gated identically.

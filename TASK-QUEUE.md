@@ -84,7 +84,7 @@ nothing shipped lets a customer run the battery under a named config-seam varian
 
 ### plugin-marketplace
 
-[roadmap: later/ecosystem] [cost: once/low] [surface: installer] [roadmap-summary: The stage skills and guards installable as a harness plugin.]
+[roadmap: next/ecosystem] [cost: once/low] [surface: installer] [roadmap-summary: The stage skills and guards installable as a harness plugin.]
 
 harness plugin packaging. Harness plugin/marketplace packaging of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped surface parity. Design against the live manifest format at promotion — the plugin substrate moves fast (the scope-session-routing ruling applies).
 
@@ -172,7 +172,7 @@ the interop rung. Govern a tree whose specs an **external spec-authoring toolkit
 
 ### design-partner-preview
 
-[cost: event/low] [surface: drift-kit]
+[roadmap: now/adoption] [cost: event/low] [surface: drift-kit] [roadmap-summary: A small observed preview measuring first green, first useful red and retention on real installs.]
 
 a narrow external preview before any broad announcement: a preview cohort whose composition is ruled in the operator's private brief, installs observed live rather than by written feedback, instrumented for time-to-first-green, first useful red, false-positive dispositions, and 7/30-day retention per kit. It is the first rung on this queue whose deliverable is **evidence from outside this tree** rather than a tree change.
 
@@ -396,7 +396,7 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 ### ci-one-line-action
 
-[cost: event/high] [surface: gate-sdk]
+[roadmap: next/adoption] [cost: event/high] [surface: gate-sdk] [roadmap-summary: Wire the gate battery into CI in one line, with reds annotated on the pull request.]
 
 the CI story is a copy-out template: `gate-sdk/templates/gates-workflow.yml` exists, `init` does not seed it, no versioned Action lets a workflow say `uses:` in one line, and the battery emits no SARIF, so a red never reaches the pull-request checks tab as an annotation. docs/install.md tells an adopter to make the battery a required status check and leaves them to copy the template by hand. Same-seat entrants ship an Action and SARIF (consult's landscape refresh, 2026-09-25).
 
@@ -406,7 +406,7 @@ the CI story is a copy-out template: `gate-sdk/templates/gates-workflow.yml` exi
 
 ### demo-catches-a-done-claim
 
-[cost: event/high] [surface: installer]
+[roadmap: now/adoption] [cost: event/high] [surface: installer] [roadmap-summary: The first-minute demo catches a task marked done with no evidence behind it.]
 
 the headline promises that unsupported *done* claims become failing checks, and `demo`'s caught defect is a mistyped relative link (installer/SPEC.md §demo, act 3). The failure the headline names is now a mainstream, measured one (false success claims are a large share of agent failures in the 2026 literature; consult's landscape refresh), and the first minute never shows it.
 
@@ -626,9 +626,11 @@ the shipped `site-kit/templates/site-health.yml` takes one curl sample and files
 
 ### absence-statement-grammar
 
-[cost: once/low] [surface: queue-kit] [recurrence: 2026-09-25]
+[cost: once/low] [surface: queue-kit] [recurrence: 2026-09-25, 2026-09-26]
 
 when to state an absence, and how, is unruled, and the public ROADMAP.md prints the emitter's placeholder sentence (`roadmap.rs`) for an empty horizon.
+
+**Recurred 2026-09-26 on the ledger surfaces.** TRAJECTORY.md's two sections each carried one sentence stating that nothing stood there, restating what `--emit ruling-staleness` derives; non-gate-arm-contract's close deleted both. The queue's empty-section convention is held by shape, not meaning: re-run at that close, a Done section holding only `- none` or an indented `  None` passes `check-task-names` and `check-queue-hygiene`. Candidates: a `check-prose-tells` arm redding a section whose whole body is one negative-existential sentence, over a consumer-configured ledger-surface glob, off by default and never all markdown (a SPEC's 'takes no knobs' is contract); and a placeholder-slug denylist in `check-task-names`. Such a gate exempts generated regions, which the emitter's own grammar governs.
 
 **Deliverable:** the grammar ruled at doctrine-kit, and the roadmap emitter's empty-horizon line brought to it.
 
@@ -703,6 +705,68 @@ unpinned runner-image labels change the CI floor with no tree edit: `ubuntu-late
 **Deliverable:** a pin-or-ride decision per label before 2026-10-19, and each workflow brought to it; a ride states which run first witnesses the new image.
 
 **Cost while deferred:** the first push after 2026-10-19 runs on an image no push has tried, and a red there costs a hotfix push. Filed 2026-09-25 to the gap inbox by the lead from the notices on gate-sdk-framework-brevity's closing push; promoted 2026-09-25 at the next iteration's scope from the carried bullet. Owner lookup: `ubuntu`, `runner image`, `image label` in this file — none.
+
+### roadmap-horizon-motion-unowned
+
+[cost: event/low] [surface: lifecycle-kit]
+
+a roadmap horizon moves only when a `/consult` happens to re-tag it. The consult binding (`.claude/commands/consult.md`) reads ROADMAP.md only as a projection and names no tag reconciliation; the roadmap arm prints an empty horizon as information (queue-kit/SPEC.md §The roadmap arm); scope reads the tag only as a ranking input; and no drain retires a tagged entry. `check-roadmap-fresh` compares the projection with the tags, never the tags with direction, so it stays green throughout. Attested: the 2026-09-25 consult refresh ranked three entries and tagged none, and now/ stood empty until an operator-directed re-tag at non-gate-arm-contract's close.
+
+**Deliverable:** close raises a consult-owed signal on a vacant now/ horizon or a landed tagged entry, feeding [consult-inbox](#consult-inbox), and the consult binding reconciles tags on any direction change.
+
+**Cost while deferred:** the public roadmap lags direction until an operator-started consult notices. Filed 2026-09-26 to the gap inbox by the lead on an operator question; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because the signal is new mechanism on two surfaces. Re-verified at the drain: the consult binding's one roadmap hit is the projection sentence, and `--emit roadmap` printed now/ empty before the re-tag. Owner lookup: `horizon`, `consult-owed` in this file — no entry about motion.
+
+### hook-members-off-test-floor
+
+[cost: event/low] [surface: gate-sdk]
+
+`native/src/hook/shell_guard.rs` and `native/src/hook/budget.rs` carry no `#[cfg(test)]` module. The arm-test floor (gate-sdk/SPEC.md §The non-gate arm) binds the file implementing an arm-table row, and `--hook`'s row resolves to `hook/mod.rs`, which has one. shell-guard is driven by `--run-guard-tests`; `budget.rs` is reached only through the verdict it relays.
+
+**Deliverable:** a ruling on whether a dispatched member owes the floor, then the two members brought to it or the SPEC stating why not.
+
+**Cost while deferred:** a member can change behaviour with nothing red. Filed 2026-09-26 to the gap inbox by non-gate-arm-contract's spec census; promoted 2026-09-26 at its close: →fix fails because the deliverable opens on a ruling the section does not settle. Re-verified at the drain: `grep -c 'cfg(test)'` is 0 for both files and 1 for `hook/mod.rs`. Owner lookup: `shell_guard`, `budget.rs`, `arm-test floor`, `dispatched member` in this file — none.
+
+### consult-inbox
+
+[cost: event/high] [surface: lifecycle-kit]
+
+nothing queues work owed to `/consult`. Its only automatic trigger is `--emit ruling-staleness`, which the scope and close bindings read and the consult binding does not, so an operator-class reversal a stage finds, a threshold entry declined twice, a direction question misnamed as a ruling, or a vacant roadmap now/ horizon is relayed live or lost.
+
+**Deliverable, on an operator direction (2026-09-26, lead session, not a ruling):** a separate committed inbox drained only by `/consult`, each item ruled, re-classed back to the queue, or discarded with cause; the consult binding's entry-reading adds it after TRAJECTORY.md; the session-context hook surfaces its count, advisory and never blocking a stage. Items are public-safe; one needing private context points at a private-brief section rather than restating it. It stays apart from the gap inbox because the drain owners differ: close cannot rule a consult item, so a mixed inbox would stall close's drain. Open for /spec: age escalation, and whether close forwards consult-class gap bullets. First consumer: [roadmap-horizon-motion-unowned](#roadmap-horizon-motion-unowned)'s signal.
+
+**Cost while deferred:** a consult-owed item survives only if a live session relays it. Filed 2026-09-26 to the gap inbox by the lead; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because a new committed surface with new governed names owes an amendment. Re-verified at the drain: `ruling-staleness` appears in the scope binding and the close template, not in either consult surface. Owner lookup: `consult inbox`, `consult-inbox` in this file — none.
+
+### consult-inbox-drain-trigger
+
+[cost: event/low] [surface: delegation-kit] [blocked-by: consult-inbox]
+
+the consult inbox needs a drain trigger and a status cue, on an operator direction (2026-09-26, lead session, not a ruling). (a) A status-line counter for the consult inbox, and optionally the gap inbox, through delegation-kit's statusline counter group, which takes its counts from the queue-counts arm today (`native/src/hook/statusline.rs`); the inbox path comes from a knob, since delegation-kit may not name a lifecycle-kit path. (b) The two consults split by trigger: an operator-started consult stays interactive, and the lead dispatches one for inbox items only while no stage session is live, because a consult writes TRAJECTORY.md and the queue. The dispatched consult re-classes or discards an item alone, with cause, and escalates a ruling-class item to the lead as a four-header block for the operator. Batching thresholds (count or age) are consumer-bound, off by default.
+
+**Deliverable:** both halves, with the open question stated in lifecycle-kit/SPEC.md §The steering vocabulary rather than assumed: whether an operator answer relayed through the lead into a dispatched consult is a ruling.
+
+**Cost while deferred:** the inbox, once it lands, is drained only when an operator remembers it. Filed 2026-09-26 to the gap inbox by the lead, extending the consult-inbox bullet; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails on the same amendment ground. Re-verified at the drain: `statusline.rs` reads `queue_counts::emit`. Owner lookup: `statusline counter`, `counter group` in this file — none.
+
+### spec-narration-unratcheted
+
+[cost: event/high] [surface: canon-kit]
+
+undated, marker-free narrative of how a rule was reached passes every prose gate: `check-manifest-temporal` catches trigger words, `check-provenance-seam` dates, hashes, slugs and attributions, `check-prose-bounds` length and repetition, and canon-kit/SPEC.md §check-prose-bounds states the gap as its own honest limit. No kit SPEC carries a size ratchet either: `.workflow/surface-ceiling.txt` holds the always-loaded surfaces and the amendment template. So close's brevity pass, a judgment, is the sole backstop, and gate-sdk/SPEC.md stood at 186,812 words after this iteration's brevity unit.
+
+**Deliverable:** one or both of (1) surface-ratchet rows for every kit SPEC, so growth is a deliberate re-stamp in the growing commit; (2) narration tells calibrated against the corpus and added to `CANON_KIT_TEMPORAL_MARKERS_EXTRA`. The risk in (2) is false positives: the SPECs use 'measured' and 'attested' legitimately to ground a rule.
+
+**Cost while deferred:** kit SPECs grow by accretion between brevity passes, and every reader pays. Filed 2026-09-26 to the gap inbox by the lead on an operator question; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because either candidate is a calibration needing a corpus measurement. Re-verified at the drain: `wc -w gate-sdk/SPEC.md` is 186,812, and no kit `SPEC.md` row is in the ceiling file. Owner lookup: `surface-ceiling`, `narration`, `size ratchet` in this file — none.
+
+### lead-writes-during-live-stage
+
+[cost: event/low] [surface: lifecycle-kit]
+
+the lead template's capture rule (lifecycle-kit/templates/lead.md §Stamps are authoritative) bounds only tracked captures while a dispatched stage session is live. During non-gate-arm-contract's validate the lead created a linked worktree at `.tmp/probe-wt` for a read probe, and removed validate's live reproduction worktrees after calling them obsolete without reading their provenance; the operator instructed the removal on that description.
+
+**Deliverable:** the lead template bars any lead mutation of the checkout or a linked worktree while a stage session is live, gitignored scratch included, a probe running after the stage or outside the checkout; and it requires a worktree's provenance to be read before it is called stale.
+
+**Cost while deferred:** a lead can destroy a live stage's evidence on a description nobody checked. Filed 2026-09-26 to the gap inbox by the lead on its own error; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because the rule widens a shipped template's contract and its scope is a design call. Re-verified at the drain: the removal is recorded in both the validate and lead journals. The filer's inferred cause, that the probe worktree reddened validate's first upgrade suite, did not reproduce: `--upgrade-smoke` ran clean with a linked worktree at `.tmp/probe-wt`. The gitignored-scratch clause therefore rests on no attested harm.
+
+**Inferred, not run:** concurrent lead activity in that worktree, rather than its presence, caused the one-off red — `bash gate-sdk/bin/run-gates.sh --upgrade-smoke` while a second session runs the battery inside a linked worktree under `.tmp/`
 
 ## Icebox
 

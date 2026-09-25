@@ -13,9 +13,5 @@ Each paragraph carries two declarations the ruling-staleness probe reads (lifecy
 
 ## The objectives
 
-No pivot is running. The constraints the substrate pivot left behind are business as usual, owned by gate-sdk/SPEC.md §The adopter constraints.
-
 ## The rulings
-
-No standing ruling. Scope ranks the deferred pool by lifecycle-kit/templates/stages/scope.md's own rule, unfiltered.
 
