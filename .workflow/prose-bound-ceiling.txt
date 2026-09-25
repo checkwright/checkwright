@@ -3,7 +3,7 @@
 131 context-kit/SPEC.md
 290 delegation-kit/SPEC.md
 46 doctrine-kit/DOCTRINE.md
-44 doctrine-kit/SPEC.md
+43 doctrine-kit/SPEC.md
 160 drift-kit/SPEC.md
 119 evidence-kit/SPEC.md
 1446 gate-sdk/SPEC.md
