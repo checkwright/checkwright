@@ -388,6 +388,416 @@ the secondary customer pages carry validity slips and undefined internal vocabul
 
 **Cost while deferred:** low per page and slow, paid by the reader who has already passed the front door. Filed 2026-09-25 by consult as a direct entry, from the same audit; split from the front-door entry because its pages do not decide the first install.
 
+### prune-set-matches-walk-root-ancestors
+
+[cost: event/high] [surface: context-kit] [recurrence: 2026-09-25]
+
+the walk's prune set matches path components anywhere in an absolute path, not only below the walk root: `path_pruned` in `native/src/emit/mod.rs` tests `/<leaf>/` against the full path, and the default set carries `target`, `build`, `dist` and `worktrees`. A consumer whose checkout sits under a directory carrying any of those names gets an empty md and pub index, silently.
+
+**Deliverable:** prune relative to the walk root, a fixture whose root path carries a default leaf, and the boundary stated at context-kit/SPEC.md §Layout and configuration.
+
+**Cost while deferred:** an adopter under `~/build/` or `~/dist/` sees the index arms return nothing and no red says why. Filed 2026-09-02; returned from the icebox 2026-09-25 by consult, the walk re-read and the match still absolute.
+
+### worktree-isolated-dispatch-cannot-reach-the-main-checkout
+
+[cost: iteration/high] [surface: delegation-kit] [recurrence: 2026-09-25]
+
+an isolated child's capture-tier writes resolve inside its own worktree and die with it. Reproduced 2026-09-25 by an isolated audit dispatch: the guard wrote its `prompt-friction.log` under the worktree's `.workflow/`, where the reap deletes it, so close's triage never reads a worktree session's friction or liveness capture.
+
+**Deliverable:** capture-tier writers resolve the main checkout's workflow directory when the writer runs in a linked worktree (`git rev-parse --git-common-dir` is the seam), with a fixture, and the rule at delegation-kit/SPEC.md §The delegation model beside the isolation costs.
+
+**Cost while deferred:** every isolated dispatch's capture is lost, and the KPIs that read it undercount exactly the sessions the protocol says to isolate. Filed 2026-08-25; returned from the icebox 2026-09-25 by consult on a live reproduction.
+
+### enforcement-first-load-trigger
+
+[cost: iteration/high] [surface: lifecycle-kit] [recurrence: 2026-09-25]
+
+the enforcement-first rule has no load trigger: no stage template under `lifecycle-kit/templates/` names it at the moment a finding is discovered, so the doctrine's "the fix and the gate land in one unit" is read only when a session happens to open DOCTRINE.md.
+
+**Deliverable:** the build and close templates load the rule at the discovery step (a one-line pointer, not a copy), and the doctrine's residency claim names that trigger.
+
+**Cost while deferred:** a fix lands without its gate in any stage that did not read the doctrine, which is the class the rule exists to close. Filed 2026-08-03; returned from the icebox 2026-09-25 by consult, the templates re-grepped at zero occurrences.
+
+### survey-witness-composed-from-unvalidated-corpus
+
+[cost: event/high] [surface: lifecycle-kit] [recurrence: 2026-09-25]
+
+`--emit file-survey` composes its witness from the raw corpus argument: `file_survey.rs` builds the oracle over whatever corpus string it was handed, so a prose corpus yields a witness that passes vacuously — `git diff --quiet` over prose exits 0, and the record certifies "unchanged" for a corpus nothing measured.
+
+**Deliverable:** the arm validates the corpus (paths that resolve, or a named oracle class), refuses a prose corpus with the usage line, and a bad fixture pins it; lifecycle-kit/SPEC.md §The survey record states the corpus grammar.
+
+**Cost while deferred:** a later stage buys a survey on a witness that was never an oracle. Filed 2026-09-06; returned from the icebox 2026-09-25 by consult on a reproduced false clean.
+
+### consumer-guard-rule-coverage
+
+[cost: event/high] [surface: guard-kit] [recurrence: 2026-09-25]
+
+consumer-only guard rules are untested: the three destructive rules in `scripts/guard-rules.sh` (`--no-verify`, the harness temp path, `git clean -x`) have no test case, and guard-kit ships no lane in which a consumer tests its own rules.
+
+**Deliverable:** a consumer-rule test lane in the guard test runner (`--run-guard-tests` over a consumer rules file with its cases), this repo's three rules covered, and the lane named at guard-kit/SPEC.md §The generic ruleset.
+
+**Cost while deferred:** the demonstration tree's most destructive guards are the ones nothing verifies, and an adopter writing a rule has no way to prove it fires. Filed 2026-08-13; returned from the icebox 2026-09-25 by consult, the case files re-checked at zero.
+
+### tarball-build-attestation
+
+[cost: event/high] [surface: installer] [recurrence: 2026-09-25]
+
+the primary install channel carries no build provenance: the Release tarball ships a digest, which proves transfer, and docs/install.md states the tarball "cannot" carry an attestation where the npm package does. A GitHub artifact attestation on the tarball is a workflow step, not a platform limit.
+
+**Deliverable:** the publish workflow attests the tarball, the shell installers verify it where the verifier is present and say so where it is not, and the install page's claim is corrected; installer/SPEC.md §The dependency boundary owns the rule.
+
+**Cost while deferred:** the channel most adopters take is the one with no provenance, on a project whose pitch is verified claims. Filed 2026-07-26; returned from the icebox 2026-09-25 by consult as a trust gap on a public claim.
+
+### contributor-writeback-disposition
+
+[cost: event/high] [surface: CONTRIBUTING.md] [recurrence: 2026-09-25]
+
+CONTRIBUTING.md promises an inbound issue or pull request a disposition within one iteration, and the scope binding caps each lane at five per iteration; the sixth inbound item is promised what the machine cannot deliver. The "pre-launch, dormant" ground has lapsed: releases are public.
+
+**Deliverable:** either the cap carried on the public promise or a lane that honours it, and the disposition record named; CONTRIBUTING.md and the scope binding agree.
+
+**Cost while deferred:** the first contributor past the cap reads a promise the tree breaks. Filed 2026-07-31; returned from the icebox 2026-09-25 by consult, the promise and the cap re-read.
+
+### comment-tier-surface-excludes-ci-workflows
+
+[cost: event/high] [surface: canon-kit] [recurrence: 2026-09-25]
+
+the CI workflow files' comments are ungated by corpus: `comment_surface` in `native/src/spec.rs` builds the governed set from `sh`, `gate` and `rs` files plus the tracked workflow-dir tier, and `CANON_KIT_COMMENT_SURFACE` in `scripts/canon-config.knobs` names no `.yml`. Measured when filed: 866 violations against 928 full-line comments across `gates.yml`, `publish.yml` and `site-health.yml` — the whole comment corpus, so this is a surface question before it is a sweep. `comment_tier.rs`'s classifier already styles YAML (its fall-through is `#`).
+
+**Deliverable:** the surface widened to actions-shaped YAML (found by content through `actions_shaped` in `actions_run.rs`, or by knob, never by a hard-coded path), the three workflows swept to directive comments, and the first reading of `check-spec-pointer` sized, since it shares the surface primitive.
+
+**Cost while deferred:** every workflow edit adds ungoverned prose to the public demonstration tree. Filed 2026-09-09 on an operator direction to widen and sweep; iceboxed as machinery-class; returned 2026-09-25 by consult as the paradigm of the rule that nothing is exempt as unread by adopters.
+
+### agent-file-paragraph-sections-ungoverned
+
+[cost: session/low] [surface: context-kit] [recurrence: 2026-09-25]
+
+`check-brevity` budgets the agent file's bullet rules and skips its paragraph sections (context-kit/SPEC.md §check-brevity states the exclusion), so CLAUDE.md's paragraphs grow unbudgeted while the ratchet holds only the whole-file ceiling.
+
+**Deliverable:** a per-paragraph bound in the same gate, or the stated reason the ratchet suffices, with a fixture either way.
+
+**Cost while deferred:** paid by every session, since the file is always loaded. Filed 2026-09-13; returned from the icebox 2026-09-25 by consult as a corpus exclusion of the paradigm's shape.
+
+### craft-rule-step-has-no-reader
+
+[cost: session/low] [surface: context-kit] [recurrence: 2026-09-25]
+
+`context-kit/templates/session-context.sh` renders the stage-rules block under `2>/dev/null … || true`, so a broken `CONTEXT_KIT_STAGE_RULES` knob drops the block silently and reds nothing.
+
+**Deliverable:** the hook reports a knob that names no readable file, and a fixture pins the report.
+
+**Cost while deferred:** a session opens without its craft rules and no surface says so. Filed 2026-09-03; returned from the icebox 2026-09-25 by consult, the template re-read.
+
+### close-triage-log-reclaim-loss-window
+
+[cost: iteration/low] [surface: guard-kit] [recurrence: 2026-09-25]
+
+the close-stage triage templates read a capture log, triage it, then truncate it with `: >`, so a line appended between the read and the truncate is lost unread (`guard-kit/templates/close-triage.md`, `drift-kit/templates/close-knowledge.md`).
+
+**Deliverable:** truncate to the offset read rather than to zero, or rotate the file before reading; the templates and the reclaim rule at guard-kit/SPEC.md agree.
+
+**Cost while deferred:** one close per iteration risks dropping a concurrent session's capture. Filed 2026-08-18; returned from the icebox 2026-09-25 by consult, both templates re-read.
+
+### gate-tests-suite-identity-in-evidence
+
+[cost: iteration/low] [surface: evidence-kit] [recurrence: 2026-09-25]
+
+the evidence manifest's digest covers the suite's log bytes only (`run_validate.rs`), and the success line names no kit, so two suites with identical output share one hash while evidence-kit/SPEC.md §Baseline manifest says the digest "pins which run".
+
+**Deliverable:** the suite identity (kit and runner arguments) folded into the digest or carried beside it, and the SPEC's claim brought to what the digest proves.
+
+**Cost while deferred:** the attestation payload the paid rung would countersign cannot distinguish two suites. Filed 2026-08-01; returned from the icebox 2026-09-25 by consult, the hash input re-read.
+
+### recurrence-declaration-grammar-ungated
+
+[cost: iteration/low] [surface: queue-kit] [recurrence: 2026-09-25]
+
+no gate checks a `[recurrence:]` array's date shape: `recurrence_dates` in `native/src/queue.rs` drops a token that is not a date silently, so a mistyped stamp undercounts the scope pre-emption threshold and the icebox age limb.
+
+**Deliverable:** a `check-queue-hygiene` axis refusing a malformed recurrence token, with a bad fixture.
+
+**Cost while deferred:** a counted rule fires late on a typo nothing reports. Filed 2026-08-26; returned from the icebox 2026-09-25 by consult, the parser re-read.
+
+### stage-cursor-unread-by-index-check
+
+[cost: iteration/low] [surface: lifecycle-kit] [recurrence: 2026-09-25]
+
+a post-stamp commit by a superseded stage session is outside every gate: the index check reads a clean index and not the cursor, and lifecycle-kit/SPEC.md §check-stage-evidence records that a commit from a session whose stage has been left is not caught.
+
+**Deliverable:** the commit-time hook reads the cursor and refuses a stage-scoped commit whose stage is not the cursor's, or the SPEC states why the window is accepted.
+
+**Cost while deferred:** a stale session can commit into a stage it no longer holds. Filed 2026-08-31; returned from the icebox 2026-09-25 by consult as a machinery-class exception voided by the rule.
+
+### dod-size-figure-stales-in-iteration
+
+[cost: iteration/low] [surface: canon-kit] [recurrence: 2026-09-25]
+
+an amendment's definition-of-done carries a size figure spec wrote at promotion, and nothing re-reads it as the iteration moves; the figure ages inside its own iteration.
+
+**Deliverable:** the figure derived at read (the amendment cites the oracle, not the number), or the size line dropped from the DoD grammar.
+
+**Cost while deferred:** a build reads a stale bound as its target. Filed 2026-09-07; returned from the icebox 2026-09-25 by consult, having been iceboxed over a live trigger on the machinery-class ground.
+
+### one-motion-commit-race-remains-open
+
+[cost: session/low] [surface: CLAUDE.md] [recurrence: 2026-09-25]
+
+CLAUDE.md offers "stage and commit in one motion" as the shared-index remedy, and the filing measured that `git add … && git commit` still races a concurrent stage; `git commit -o <paths>` (the only-paths form) closes it and is steered nowhere.
+
+**Deliverable:** the always-loaded line names the only-paths form, the guard steers `add`-then-`commit` to it, and the delegation protocol's shared-index bullet agrees.
+
+**Cost while deferred:** every session reads a remedy that does not close the race it is offered for. Filed 2026-08-27; returned from the icebox 2026-09-25 by consult, the line re-read.
+
+### wait-mandate-template-spelling-unreachable
+
+[cost: session/low] [surface: delegation-kit] [recurrence: 2026-09-25]
+
+the in-turn wait the delegation protocol mandates, `while kill -0 "$pid"`, is refused by guard-kit's own expansion rule, while the literal-PID spelling is auto-allowed; the template and the agent definitions carry the refused form.
+
+**Deliverable:** the template and the agent definitions spell the wait in the form the guard grants, and the two SPECs cite one spelling.
+
+**Cost while deferred:** every adopter following the protocol literally meets a refusal on its first wait. Filed 2026-08-29; returned from the icebox 2026-09-25 by consult, the refusal re-probed.
+
+### nested-battery-env-inheritance-invisible
+
+[cost: event/low] [surface: evidence-kit] [recurrence: 2026-09-25]
+
+a smoke that re-runs the battery inside its sandbox inherits no evidence-kit scoping and reads clean: `installer/consumer-smoke/run-smoke.sh` re-executes batteries in three places with no `EVIDENCE_KIT` reference, so a scoped nested run can record `verdict=clean` for a battery the outer run never scoped.
+
+**Deliverable:** the nested run inherits or refuses the scope, and a fixture pins the refusal.
+
+**Cost while deferred:** a false clean in the evidence record. Filed 2026-08-18; returned from the icebox 2026-09-25 by consult, the smoke re-grepped.
+
+### template-registry-population-predicate
+
+[cost: once/low] [surface: gate-sdk] [recurrence: 2026-09-25]
+
+the template registry's population predicate was contingent on a third `.list` template appearing; `gate-sdk/templates/portability-patterns.list` landed 2026-09-07 with no sibling directory, and the native-declaration check over it was not verified.
+
+**Deliverable:** the registry check run over the third template, its declaration verified or corrected.
+
+**Cost while deferred:** a template the parity gate may not see. Filed 2026-08-02; returned from the icebox 2026-09-25 by consult on the named trigger having fired.
+
+### upgrade-smoke-refuses-inside-a-worktree
+
+[cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
+
+`--upgrade-smoke` tests `.git` with `is_dir()` (`upgrade_smoke.rs`) and answers "not a git repository" inside any linked worktree, where `.git` is a file.
+
+**Deliverable:** resolve through `git rev-parse --git-dir`, with a worktree fixture.
+
+**Cost while deferred:** an adopter on a worktree cannot run the upgrade smoke. Filed 2026-08-29; returned from the icebox 2026-09-25 by consult, the test re-read.
+
+### release-asset-claim-class-owner
+
+[cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
+
+a "the release ships an asset" claim has no gate, and the class now has a second instance: gate-sdk/SPEC.md §Consumer payload, filed after this entry, alongside the install page's.
+
+**Deliverable:** an owner for the class (the release-note gate, or a §Consumer payload assertion the publish workflow's artifact list satisfies), with a fixture.
+
+**Cost while deferred:** two public claims about what a release carries, held by nothing. Filed 2026-08-07; returned from the icebox 2026-09-25 by consult on the second instance.
+
+### bin-argv-shape-residual-member
+
+[cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
+
+`--run-gate-tests` treats its first argument as the tests directory with no `-h` or `--` handling (`run_gate_tests.rs`), so `--run-gate-tests --help` fails as a missing directory while the bin/-tool contract (gate-sdk/SPEC.md §The bin/-tool contract) reads as complete.
+
+**Deliverable:** the arm takes the contract's argument shape, with a bad fixture.
+
+**Cost while deferred:** one arm breaks the contract its kit states. Filed 2026-08-13; returned from the icebox 2026-09-25 by consult, the arm re-read.
+
+### fixture-runner-checks-dir-fails-open
+
+[cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
+
+the fixture runner silently drops an explicitly named checks directory that does not exist (`run_gate_tests.rs`, a fail-open its own comment admits), so a mistyped path runs the fixtures against nothing and blames the corpus.
+
+**Deliverable:** refuse a named directory that is absent, with a fixture.
+
+**Cost while deferred:** every kit's fixture suite rides a runner that can pass on a typo. Filed 2026-08-24; returned from the icebox 2026-09-25 by consult, the branch re-read.
+
+### enter-stage-refusal-help-contradicts-its-guard
+
+[cost: event/low] [surface: lifecycle-kit] [recurrence: 2026-09-25]
+
+`--enter-stage`'s refusal (`enter_stage.rs`) advises performing the stamp by hand, the close binding says never to force the entry, and the workflow-state guard (`workflow_state.rs`) blocks the hand write.
+
+**Deliverable:** the refusal names the remedy the guard admits, and a fixture pins the text.
+
+**Cost while deferred:** the one line a refused adopter reads tells them to do what the hook blocks. Filed 2026-08-26; returned from the icebox 2026-09-25 by consult, the three surfaces re-read.
+
+### uninstall-artifact-ownership-asymmetry
+
+[cost: event/low] [surface: installer] [recurrence: 2026-09-25]
+
+installer/SPEC.md §Consumer payload says the compiled artifact is never the adopter's, while §uninstall has the verb keep-and-report it on a hash mismatch, and `uninstall.rs` references no artifact at all; the two sections give opposite answers and the verb follows neither cleanly.
+
+**Deliverable:** one ownership rule for the artifact, the verb implementing it, and a fixture.
+
+**Cost while deferred:** an uninstall leaves the binary or reports it as edited. Filed 2026-08-28; returned from the icebox 2026-09-25 by consult, the two sections re-read.
+
+### installer-graph-artifact-literal
+
+[cost: event/low] [surface: installer] [recurrence: 2026-09-25]
+
+`init` hardcodes `CHECK-GRAPH.html` (`native/src/installer/init.rs`) where the resolver owns the path through `GATE_SDK_GRAPH_ARTIFACT`, so an adopter's re-run writes the graph to the default path and ignores their knob.
+
+**Deliverable:** `init` resolves the artifact path through the knob, with a fixture.
+
+**Cost while deferred:** a re-run overwrites a path the adopter moved away from. Filed 2026-08-21; returned from the icebox 2026-09-25 by consult, the literal re-grepped.
+
+### canonicalize-extended-length-prefix
+
+[cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
+
+the caller roster gate-sdk/SPEC.md §The path-dialect contract gives for the `\\?\` prefix strip omits `pack_installer.rs`, `crate_arms.rs` and `run_guard_tests.rs`, the last of which strips the prefix itself rather than through the shared helper.
+
+**Deliverable:** every caller routed through the helper, the roster derived or corrected, and a fixture on the self-stripping site.
+
+**Cost while deferred:** a Windows root with the prefix is handled three ways. Filed 2026-08-30; returned from the icebox 2026-09-25 by consult, the callers re-grepped.
+
+### surplus-arg-drop-in-six-emit-arms
+
+[cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
+
+fourteen emit modules take `_args` and ignore them (`session_id.rs` is one), so a bogus or surplus argument exits 0 with no refusal, against the bin/-tool contract's argument shape.
+
+**Deliverable:** one surplus-argument refusal in the emit dispatcher, and a bad fixture.
+
+**Cost while deferred:** a misspelt invocation reads as success. Filed 2026-09-08; returned from the icebox 2026-09-25 by consult, the modules re-grepped.
+
+### non-gate-arm-testing-floor-unstated
+
+[cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
+
+a non-gate arm's testing floor is unstated, and four ship with no test module (`value_rollup.rs`, `usage_trend.rs`, `install_hooks.rs`, `md_unwrap.rs`).
+
+**Deliverable:** the floor stated at gate-sdk/SPEC.md §The non-gate arm, and the four arms brought to it.
+
+**Cost while deferred:** an arm can change behaviour with nothing red. Filed 2026-09-03; returned from the icebox 2026-09-25 by consult, the modules re-checked.
+
+### non-gate-arm-roster-hand-maintained
+
+[cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
+
+gate-sdk/SPEC.md §The non-gate arm hand-lists the flags `main.rs` hardcodes; accurate today and held by nothing, against derivation-first.
+
+**Deliverable:** the roster derived (the help arm prints it and the SPEC cites the arm), or a parity assertion.
+
+**Cost while deferred:** the next arm added stales the list. Filed 2026-09-03; returned from the icebox 2026-09-25 by consult as a contributor-reader exception voided by the rule.
+
+### emit-arm-usage-unreachable
+
+[cost: once/low] [surface: gate-sdk] [recurrence: 2026-09-25]
+
+gate-sdk/SPEC.md says an emit arm's usage lives in the front end's help, and the runner's usage text carries only a generic `--emit` line; an arm's usage prints only on a refusal.
+
+**Deliverable:** `--emit --help` (or `--emit <arm> --help`) prints the arm's usage, and the SPEC sentence matches.
+
+**Cost while deferred:** an adopter learns an arm's arguments by failing it. Filed 2026-09-03; returned from the icebox 2026-09-25 by consult, the usage text re-read.
+
+### crate-arms-relink-under-worker-pool
+
+[cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
+
+`check-crate-arms` rebuilds and relinks the binary it is running in; under the worker pool that is a write to a running executable.
+
+**Deliverable:** the gate builds to a scratch target or compares stamps without linking, with a fixture.
+
+**Cost while deferred:** a crate-touching commit can race its own gate. Filed 2026-08-23; returned from the icebox 2026-09-25 by consult as a contributor-only exception voided by the rule.
+
+### battery-timing-file-overwritten-by-only-run
+
+[cost: event/low] [surface: drift-kit] [recurrence: 2026-09-25]
+
+the runner writes `gate-timings.txt` from whatever subset ran (`runner.rs`), so a `--only` run overwrites the battery's timing file, and `kpi-gate-runtime` reports the subset as the battery total with no partial-sample check.
+
+**Deliverable:** the runner marks a filtered run, the KPI reads the mark, and a fixture pins the refusal to sum a subset.
+
+**Cost while deferred:** a confident wrong number on an evidence page. Filed 2026-09-07; returned from the icebox 2026-09-25 by consult, both sites re-read.
+
+### gate-timing-baseline-comparability
+
+[cost: once/low] [surface: drift-kit] [recurrence: 2026-09-25]
+
+`.workflow/gate-timing-baseline.txt` has no reader in `native/src` or `scripts`; its named trigger, a second substrate port, has fired.
+
+**Deliverable:** a comparer arm, or the file retired from the workflow directory with its declaration.
+
+**Cost while deferred:** a tracked baseline nothing compares against. Filed 2026-08-02; returned from the icebox 2026-09-25 by consult on the fired trigger.
+
+### derived-count-literal-in-queue-unscanned
+
+[cost: event/low] [surface: canon-kit] [recurrence: 2026-09-25]
+
+the queue file is absent from `CANON_KIT_MANIFEST_FILES` (`scripts/canon-config.knobs`), so a derived count spelt as a literal in an entry reaches no scan.
+
+**Deliverable:** the queue added to the manifest corpus, or the reason it is excluded stated at the knob.
+
+**Cost while deferred:** queue prose carries counts that stale unseen. Filed 2026-09-07; returned from the icebox 2026-09-25 by consult as a corpus exclusion.
+
+### site-health-probe-no-retry-on-transient
+
+[cost: event/low] [surface: site-kit] [recurrence: 2026-09-25]
+
+the shipped `site-kit/templates/site-health.yml` takes one curl sample and files an issue on a single non-200; a transient is a wrong red on a public tracker. Sibling of [site-health-issue-venue-unwanted](#site-health-issue-venue-unwanted), whose subject is the venue; this one is the sample.
+
+**Deliverable:** a bounded retry before the failure path, in the template and the copy.
+
+**Cost while deferred:** one transient files a public issue. Filed 2026-08-27; returned from the icebox 2026-09-25 by consult, the template re-read.
+
+### absence-statement-grammar
+
+[cost: once/low] [surface: queue-kit] [recurrence: 2026-09-25]
+
+when to state an absence, and how, is unruled, and the public ROADMAP.md prints the emitter's placeholder sentence (`roadmap.rs`) for an empty horizon.
+
+**Deliverable:** the grammar ruled at doctrine-kit, and the roadmap emitter's empty-horizon line brought to it.
+
+**Cost while deferred:** a placeholder on a public page. Filed 2026-07-31 on an operator direction; returned from the icebox 2026-09-25 by consult, the page re-read.
+
+### scratch-auto-allow-no-decoration-steer
+
+[cost: event/low] [surface: guard-kit] [recurrence: 2026-09-25]
+
+the guard declines a chained scratch append (`grants.rs`) and steers only allowlisted leads to the decorated form, so the most frequent write the protocol asks for costs a permission decision with no steer for everyone else.
+
+**Deliverable:** the decline names the granted spelling, with a fixture.
+
+**Cost while deferred:** a permission prompt per journal line. Filed 2026-09-04; returned from the icebox 2026-09-25 by consult, the grant re-read.
+
+### release-drain-ordering-contradiction
+
+[cost: event/low] [surface: RELEASING.md] [recurrence: 2026-09-25]
+
+RELEASING.md's step-4 opener bundles the drain and the close stamp as one commit, and the step's body separates them; a public runbook that contradicts itself.
+
+**Deliverable:** the opener rewritten to the body's order.
+
+**Cost while deferred:** a release session follows whichever half it reads first. Filed 2026-08-06; returned from the icebox 2026-09-25 by consult, the step re-read.
+
+### consumer-smoke-accounting-spelling-unpinned
+
+[cost: once/low] [surface: gate-sdk] [recurrence: 2026-09-25]
+
+the consumer smoke's accounting unions two spellings of a count (`run_consumer_smoke.rs`) and no test covers the union; its trigger, the smoke's port, has fired.
+
+**Deliverable:** a unit test over the accounting, or one spelling.
+
+**Cost while deferred:** a miscount in the smoke's completion line. Filed 2026-08-07; returned from the icebox 2026-09-25 by consult on the fired trigger.
+
+### queue-provenance-restates-git-history
+
+[cost: once/low] [surface: TASK-QUEUE.md] [recurrence: 2026-09-25]
+
+queue provenance prose restates what `git log` answers; the ruled sweep is small, ten route-phrase hits remaining when re-counted.
+
+**Deliverable:** the ten sites cut to the fact the entry needs, and the writing rule at queue-kit/SPEC.md §The queue format.
+
+**Cost while deferred:** low; paid by every reader of those entries. Filed 2026-09-09; returned from the icebox 2026-09-25 by consult, the count re-run.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
@@ -404,37 +814,13 @@ No leg runs fixtures history-less.
 
 No route records a lead-held block.
 
-### agent-file-paragraph-sections-ungoverned
-
-Brevity gate skips paragraphs.
-
 ### survey-record-filed-after-the-fact
 
 Order to the work goes wholly unread.
 
-### amendment-prose-misnumbers-its-delta
-
-Cites Delta 3 for delta 4's subject.
-
-### battery-timing-file-overwritten-by-only-run
-
-A filtered run reports as all.
-
-### derived-count-literal-in-queue-unscanned
-
-No corpus reaches the queue file.
-
-### bridged-arm-spawned-program-set-unheld
-
-Declared set unheld; shape ships.
-
 ### icebox-drops-a-bought-census
 
 No dormant home for a measured payload.
-
-### surplus-arg-drop-in-six-emit-arms
-
-Six emit arms drop surplus args at 0.
 
 ### inline-source-literal-ungateable
 
@@ -443,18 +829,6 @@ Fence-only oracle; no rename pending.
 ### turn-end-refusal-used-as-a-busy-wait
 
 Sessions busy-wait via the stop hook.
-
-### site-health-probe-no-retry-on-transient
-
-A single non-200 files an issue.
-
-### non-gate-arm-roster-hand-maintained
-
-The arm class's flag list is ungated.
-
-### craft-rule-step-has-no-reader
-
-A broken stage-rules knob reds nothing.
 
 ### runtime-dir-two-tier-detector
 
@@ -475,10 +849,6 @@ Hook over-firing is accepted, not a defect.
 ### metric-dir-admission-unstated
 
 Ad-hoc scripts persist in .metric/.
-
-### stage-economics-smoke-jq-arm-dormant
-
-Its jq-absent arm never runs anywhere.
 
 ### hermetic-bin-roster-config
 
@@ -504,17 +874,9 @@ Scope can do spec's job and stay green.
 
 Tamper-evidence wanted only by a hosted rung.
 
-### md-section-near-miss-match
-
-Empty on a near miss; correct on an exact query.
-
 ### operator-authored-unit-set
 
 The contract omits operator-authored unit sets.
-
-### tarball-build-attestation
-
-The checksum proves transfer only; docs agree.
 
 ### action-run-shell-scan-predicate
 
@@ -544,14 +906,6 @@ The two share a noun, not a meaning.
 
 GitHub's notifications are the sweep.
 
-### amendment-done-move-assertions
-
-Zero cost while merges are hand-checked.
-
-### guard-advise-jq-dependency
-
-Needs jq; the one consumer works around it.
-
 ### survey-record-extension-tier-hybrid
 
 Paid only by a future workflow author.
@@ -560,14 +914,6 @@ Paid only by a future workflow author.
 
 A declined branch; only optionality owed.
 
-### pack-installer-payload-kit-set-anchor
-
-Latent --root trap, no caller.
-
-### installer-jq-usability-probe
-
-Broken-but-present jq is unobserved.
-
 ### rendered-site-link-monitor
 
 Rendered-site link rot waits on a launch crawl.
@@ -575,14 +921,6 @@ Rendered-site link rot waits on a launch crawl.
 ### kit-index-page-vocabulary-ungated
 
 Index-page enums are ungated.
-
-### absence-statement-grammar
-
-When to state absence, and how, is unruled.
-
-### contributor-writeback-disposition
-
-Write-back is dormant pre-launch.
 
 ### context-pressure-signal
 
@@ -620,18 +958,6 @@ Truncation inflates the scan only.
 
 Out-of-tree copies are unreachable.
 
-### queue-entry-grammar-single-owner
-
-Two entry grammars disagree, latently.
-
-### installer-artifact-omission-residue
-
-An omission update strands a binary.
-
-### installer-graph-artifact-literal
-
-Init literalises a resolver-owned path.
-
 ### doctrine-rule-number-citation-liveness
 
 A renumber stales citations.
@@ -660,18 +986,6 @@ A skipped re-run stamp points the cursor back.
 
 Seven redirected shapes stay ungranted.
 
-### canonicalize-extended-length-prefix
-
-A Windows `\\?\` root is unconverted.
-
-### stage-cursor-unread-by-index-check
-
-A clean index hides who holds the stage.
-
-### crate-arms-relink-under-worker-pool
-
-It relinks the binary it runs in.
-
 ### build-native-obligation-unconditional
 
 A crate-free commit still rebuilds.
@@ -680,33 +994,13 @@ A crate-free commit still rebuilds.
 
 A library-mediated spawn reads clean.
 
-### bridged-arm-requirements-undeclared
-
-`--needs` omits what an arm spawns.
-
-### delta-citation-unresolvable
-
-A delta number names no openable file.
-
-### scratch-grant-backtick-declined
-
-guard-kit rule `append_scratch`'s own clause voids its use case.
-
 ### walk-entry-model-unstated
 
 Walk drops symlinks unstated; tree has none.
 
-### prune-set-matches-walk-root-ancestors
-
-A leaf above the root prunes it all.
-
 ### port-archaeology-restatement-residue
 
 Prose narrates deleted shell forms.
-
-### non-gate-arm-testing-floor-unstated
-
-A new arm's testing floor is unstated.
 
 ### prune-set-convergence-question
 
@@ -716,18 +1010,6 @@ Two kits' prune sets diverge, unruled.
 
 Its anti-cycle premise died unreplaced.
 
-### emit-arm-usage-unreachable
-
-Prints only on a refusal; lead-ruled 2026-09-03.
-
-### check-graph-trigger-consumer-path-reach
-
-couples= misses installer/.
-
-### worktree-isolated-dispatch-cannot-reach-the-main-checkout
-
-An isolated child's capture-tier logs resolve inside its worktree and die with it.
-
 ### cited-object-token-sweep-corpus-narrower-than-the-class
 
 Corpus unruled.
@@ -736,73 +1018,25 @@ Corpus unruled.
 
 Dormant until a consumer acts on it.
 
-### worktree-cleanliness-assertion-scopes-to-checkout
-
-Reds on foreign dirt.
-
-### release-record-retired-knob
-
-A removal's basis may not name its own knob.
-
 ### friction-key-segment-selection-unruled
 
 Which segment to key is unruled.
-
-### scratch-auto-allow-no-decoration-steer
-
-Chained writes lose the steer.
-
-### cost-series-limb-unreadable-inside-close
-
-Close cannot price its open row.
 
 ### post-build-instrument-edit-unowned
 
 No stage owns a post-build tree edit.
 
-### dod-size-figure-stales-in-iteration
-
-Spec's promotion ages its own DoD size.
-
-### portability-count-on-two-surfaces
-
-Hand-spelled census; both true today.
-
-### wrap-budget-caps-lead-line-tags
-
-A long slug's tag neither fits nor wraps.
-
 ### smoke-roster-guard-precedes-hand-off
 
 Guard stricter than its stated reason.
-
-### edges-retired-block-name-clash
-
-A live gate name inflates a retired slug.
-
-### lead-report-is-an-ungated-terminal-act
-
-May close holding unfiled work.
 
 ### smoke-report-array-carrier-mangling-unexplained
 
 Witness now needs design.
 
-### gate-timing-baseline-comparability
-
-Timing baseline has no comparer.
-
-### amendment-landing-citation-assertions
-
-Landing citations go unvalidated.
-
 ### root-doc-roster-registration-parity
 
 Only one root-doc roster is enforced.
-
-### enforcement-first-load-trigger
-
-No stage loads the enforcement-first rule.
 
 ### self-revert-reminder-expectation
 
@@ -820,10 +1054,6 @@ Tree steers unpaired; the kit's are templated.
 
 Essay-sink reclaim can never fire.
 
-### release-drain-ordering-contradiction
-
-Step 4 opener contradicts its body.
-
 ### amendment-dod-sibling-dependence
 
 DoD items depend on unnamed siblings.
@@ -835,10 +1065,6 @@ Unspelled recurrences file as new.
 ### section-prose-outlives-its-entries
 
 Section preambles outlive Clear-Done.
-
-### amendment-roster-stale-by-construction
-
-Sweep rosters stale mid-iteration.
 
 ### unregistered-gate-fixture-coverage
 
@@ -856,33 +1082,13 @@ A bare retry mislabels staged work.
 
 Superseded survey blocks look live.
 
-### consumer-smoke-accounting-spelling-unpinned
-
-Dual-spelling count unpinned.
-
 ### release-runbook-identity-diagnosis
 
 Account check is prose, not a step.
 
-### dispatch-cited-evidence-unverified
-
-A sweep's quotations go unverified.
-
-### queue-provenance-restates-git-history
-
-Provenance prose restates git log.
-
-### comment-tier-surface-excludes-ci-workflows
-
-Workflow comments go ungated.
-
 ### consult-rulings-outside-the-authority-roster
 
 Consult readings lack a slot.
-
-### lead-ruling-reopen-authority-unstated
-
-Who reopens a lead ruling is open.
 
 ### ruling-record-prose-staleness-unreachable
 
@@ -891,10 +1097,6 @@ Old rulings evade the probe.
 ### close-surface-reclaim-uncoupled-from-read
 
 Reclaim may wipe unread rows.
-
-### iceboxed-recurrence-judgment-unrecordable
-
-No room for a recurrence stamp.
 
 ### post-scope-admission-has-no-promotion-route
 
@@ -911,18 +1113,6 @@ Keep-list lists names only.
 ### validate-suite-wall-clock-unowned
 
 Serial smoke suites cost ~16 minutes.
-
-### overlay-only-oracle-grants-uncommitted
-
-Oracle grants live off-tree.
-
-### close-triage-log-reclaim-loss-window
-
-Truncate after read drops appends.
-
-### nested-battery-env-inheritance-invisible
-
-A scoped nested run reads clean.
 
 ### enforcement-first-behavioral-regressions
 
@@ -956,10 +1146,6 @@ Merits argued before a rule's reach is set.
 
 YAML template copies mirror by hand.
 
-### gate-tests-suite-identity-in-evidence
-
-Two suites can share one hash.
-
 ### template-spec-restatement-reach
 
 No gate holds a SPEC off its template.
@@ -967,10 +1153,6 @@ No gate holds a SPEC off its template.
 ### amendment-deletion-content-completeness
 
 Merges can drop rationale unheld.
-
-### template-registry-population-predicate
-
-A name collision would red parity.
 
 ### lead-line-parser-conformance
 
@@ -992,10 +1174,6 @@ Criterion 4 reads two ways.
 
 C can shrink unannounced.
 
-### promotion-commitment-stamp-latency
-
-At-ceiling stamps wait on promotion.
-
 ### recurrence-threshold-counts-dates-not-incidences
 
 Same-day firings merge.
@@ -1008,10 +1186,6 @@ Parallel appends share one file.
 
 Trigger is scope-only.
 
-### recurrence-declaration-grammar-ungated
-
-Declaration grammar has no gate.
-
 ### scratch-citation-introducer-form-reach
 
 Copula pointers evade the scan.
@@ -1019,10 +1193,6 @@ Copula pointers evade the scan.
 ### threshold-entry-escalation-travel-unruled
 
 Rider or competitor, unruled.
-
-### one-motion-commit-race-remains-open
-
-add-then-commit still races.
 
 ### amendment-target-delta-correspondence-unverified
 
@@ -1056,10 +1226,6 @@ Account check unenforced.
 
 Waiters exit early.
 
-### readonly-dispatch-type-cannot-see-gitignored-surfaces
-
-No ignored files.
-
 ### kfric-second-field-direction-inverted
 
 Surface field names the owner.
@@ -1067,14 +1233,6 @@ Surface field names the owner.
 ### baseline-self-certification-unasserted
 
 Self-served verdicts unasserted.
-
-### wait-mandate-template-spelling-unreachable
-
-Mandated spelling is refused.
-
-### upgrade-smoke-refuses-inside-a-worktree
-
-Refuses where .git is a file.
 
 ### pre-grammar-disposition-authority-ambiguity
 
@@ -1112,10 +1270,6 @@ Wait and throughput are unmeasured.
 
 When to read cap headroom is unruled.
 
-### dispatch-unreadable-target-fallback
-
-Blind sweeps echo the prompt as PASS.
-
 ### queue-write-side-verb
 
 The queue has no write-side verb.
@@ -1127,10 +1281,6 @@ No owner for a close blocked by a red push.
 ### expected-permission-mode-undeclared
 
 No surface states the expected mode.
-
-### consumer-guard-rule-coverage
-
-Consumer-only guard rules are untested.
 
 ### scan-prompts-blocking-half-blind
 
@@ -1184,10 +1334,6 @@ The metric dir accretes leftovers.
 
 No roster maps bin tools to kits.
 
-### queue-lib-dead-derivation
-
-Three queue-lib regexes have no live reader.
-
 ### gate-test-in-tree-invoker-ruling
 
 Is a gate-test an in-tree caller?
@@ -1195,10 +1341,6 @@ Is a gate-test an in-tree caller?
 ### survey-oracle-liveness-unasserted
 
 An oracle may name a wiped path.
-
-### survey-witness-composed-from-unvalidated-corpus
-
-Prose corpora pass clean.
 
 ### stage-completion-unattested
 
@@ -1240,10 +1382,6 @@ Amendment counts skip the shipped oracle.
 
 A cut scores as one.
 
-### deleted-runner-anchors-across-ten-entries
-
-Entries cite deleted runners.
-
 ### port-created-failure-mode-refusal-unruled
 
 Port-made refusals unruled.
@@ -1251,10 +1389,6 @@ Port-made refusals unruled.
 ### removal-propagation-site-argued-out-of-scope
 
 Found sites argued away.
-
-### wait-form-unallowlistable-by-construction
-
-No grant reaches the wait.
 
 ### icebox-trigger-blind-to-retired-carrier
 
@@ -1268,10 +1402,6 @@ Grep misses paraphrases.
 
 Any dirty path blocks the smoke.
 
-### append-grant-decline-cause-unlogged
-
-Decline cause truncated from the log.
-
 ### spec-internal-identifier-prefix-drift
 
 SPECs cite internal names, not knobs.
@@ -1284,17 +1414,9 @@ extra lint dirs skip the commit hook, CI-only.
 
 release gate hand-lists note sections.
 
-### release-asset-claim-class-owner
-
-a release-ships-an-asset claim has no gate.
-
 ### knob-default-accessor-singularity
 
 no gate bars re-spelling a knob default.
-
-### bin-argv-shape-residual-member
-
-one bin arm skips the argv-shape contract.
 
 ### docs-corpus-derivation-manifest-divergence
 
@@ -1308,10 +1430,6 @@ no roster reads a consumer-declared gate.
 
 waiting rule misses a lone waiter loop.
 
-### crate-toolchain-grant-uncommitted
-
-overlay keeps cargo grants ruled out.
-
 ### prose-uniqueness-claim-unchecked
 
 no gate checks a prose uniqueness claim.
@@ -1324,21 +1442,9 @@ kit SPEC layout trees are hand-kept.
 
 expansion rule misses backtick substitution.
 
-### fixture-runner-checks-dir-fails-open
-
-bad checks-dir arg drops silently.
-
-### enter-stage-refusal-help-contradicts-its-guard
-
-help contradicts its hook.
-
 ### artifact-substitution-remedy-has-no-end-to-end-arm
 
 untested end to end.
-
-### uninstall-artifact-ownership-asymmetry
-
-uninstall leaves init's artifact.
 
 ### readme-bin-roster-underived
 
@@ -1369,5 +1475,41 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 `check-docs-cmd` assertion (C) misses a retired path cited from the queue, which is outside its manifest corpus and whose `<path>:<line>` token fails the path shape.
 
 ## Done
+
+- amendment-prose-misnumbers-its-delta
+- bridged-arm-spawned-program-set-unheld
+- stage-economics-smoke-jq-arm-dormant
+- md-section-near-miss-match
+- amendment-done-move-assertions
+- guard-advise-jq-dependency
+- pack-installer-payload-kit-set-anchor
+- installer-jq-usability-probe
+- queue-entry-grammar-single-owner
+- installer-artifact-omission-residue
+- bridged-arm-requirements-undeclared
+- delta-citation-unresolvable
+- scratch-grant-backtick-declined
+- check-graph-trigger-consumer-path-reach
+- worktree-cleanliness-assertion-scopes-to-checkout
+- release-record-retired-knob
+- cost-series-limb-unreadable-inside-close
+- portability-count-on-two-surfaces
+- wrap-budget-caps-lead-line-tags
+- edges-retired-block-name-clash
+- lead-report-is-an-ungated-terminal-act
+- amendment-landing-citation-assertions
+- amendment-roster-stale-by-construction
+- dispatch-cited-evidence-unverified
+- lead-ruling-reopen-authority-unstated
+- iceboxed-recurrence-judgment-unrecordable
+- overlay-only-oracle-grants-uncommitted
+- promotion-commitment-stamp-latency
+- readonly-dispatch-type-cannot-see-gitignored-surfaces
+- dispatch-unreadable-target-fallback
+- queue-lib-dead-derivation
+- deleted-runner-anchors-across-ten-entries
+- wait-form-unallowlistable-by-construction
+- append-grant-decline-cause-unlogged
+- crate-toolchain-grant-uncommitted
 
 ## Lessons Learned
