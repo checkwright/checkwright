@@ -90,6 +90,7 @@ pub mod portability_floor;
 pub mod projection_roster;
 pub mod producer_liveness;
 pub mod prose_enum;
+pub mod prose_bounds;
 pub mod prose_tells;
 pub mod provenance_seam;
 pub mod queue_entry_budget;
@@ -796,6 +797,25 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_PROSE_TELL_RHYTHM_CV_MIN",
             "CANON_KIT_PROSE_TELL_TRICOLON_MAX",
             "CANON_KIT_PROSE_TELL_ABBR_MIN_LEN",
+        ],
+        "canon-kit",
+        &[("git", "")],
+    ),
+    // spec: canon-kit/SPEC.md §check-prose-bounds — `?` because the scan root is the member's own
+    // first argument with a default; the ceiling is one named file, read rather than walked
+    (
+        "check-prose-bounds",
+        prose_bounds::run,
+        &[(".", "glob:knob:CANON_KIT_PROSE_BOUND_GLOBS", "", "")],
+        &[
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+            "CANON_KIT_PROSE_BOUND_GLOBS",
+            "CANON_KIT_PROSE_BOUND_SENTENCE_MAX",
+            "CANON_KIT_PROSE_BOUND_PARAGRAPH_MAX",
+            "CANON_KIT_PROSE_BOUND_REPEAT_WORDS",
+            "CANON_KIT_PROSE_BOUND_REPEAT_MIN",
+            "CANON_KIT_PROSE_BOUND_CEILING_FILE",
         ],
         "canon-kit",
         &[("git", "")],

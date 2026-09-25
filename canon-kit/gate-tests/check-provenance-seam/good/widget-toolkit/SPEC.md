@@ -1,7 +1,7 @@
 # widget-toolkit — a kit SPEC stating mechanism only
 
-The widget scan is fast (measured 2026-08-30: two battery cycles). A dated
-attestation is written as a specimen — *verified 2026-08-30: the three sites are
+The widget scan is fast (two battery cycles). A dated attestation is
+written as a specimen — *verified YYYY-MM-DD: the three sites are
 …* — and names no authority.
 
 `WIDGET_TOOLKIT_AGENT_FILE` defaults to `CLAUDE.md`, the harness's agent file.

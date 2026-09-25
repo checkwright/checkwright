@@ -1,0 +1,3 @@
+# graph: couples=knob:CANON_KIT_PROSE_BOUND_GLOBS,knob:CANON_KIT_PROSE_BOUND_CEILING_FILE dir=one valve=none tier=precommit
+# install: on-surface
+# spec: canon-kit/SPEC.md §check-prose-bounds — sentence, unit and repeated-phrase bounds over the consumer-configured prose, under an optional per-file ceiling, with the prose-bound-exempt valve

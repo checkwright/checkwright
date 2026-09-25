@@ -60,6 +60,7 @@ gates check-manifest-temporal pass
 gates check-manifest-count pass
 gates check-prose-enum pass
 gates check-prose-tells pass
+gates check-prose-bounds pass
 gates check-knob-citation pass
 gates check-knob-default-coupling pass
 gates check-comment-tier pass

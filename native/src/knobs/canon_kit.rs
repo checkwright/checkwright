@@ -153,6 +153,12 @@ pub const KIT: Kit = Kit {
             &["API", "CLI", "URL", "HTML", "CSS", "JSON", "YAML", "CI", "SDK", "SSO", "DNS", "HTTPS"],
         ),
         Row::indexed("CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA", &[]),
+        Row::indexed("CANON_KIT_PROSE_BOUND_GLOBS", &[]),
+        Row::scalar("CANON_KIT_PROSE_BOUND_SENTENCE_MAX", "45"),
+        Row::scalar("CANON_KIT_PROSE_BOUND_PARAGRAPH_MAX", "200"),
+        Row::scalar("CANON_KIT_PROSE_BOUND_REPEAT_WORDS", "6"),
+        Row::scalar("CANON_KIT_PROSE_BOUND_REPEAT_MIN", "3"),
+        Row::scalar("CANON_KIT_PROSE_BOUND_CEILING_FILE", ""),
     ],
     validate: Some(("spec config", validate)),
     open_family: false,
@@ -330,7 +336,24 @@ fn validate(v: &Values) -> Vec<String> {
             s
         ));
     }
+    // spec: canon-kit/SPEC.md §check-prose-bounds — each bound but the unit floor takes `off`
+    for (n, floor) in [
+        ("CANON_KIT_PROSE_BOUND_SENTENCE_MAX", 1),
+        ("CANON_KIT_PROSE_BOUND_PARAGRAPH_MAX", 1),
+        ("CANON_KIT_PROSE_BOUND_REPEAT_WORDS", 3),
+    ] {
+        if let Some(s) = scalar(v, n).filter(|s| !at_least_or_off(s, floor)) {
+            errs.push(format!("{} must be an integer >= {} or off (got '{}')", n, floor, s));
+        }
+    }
+    if let Some(s) = scalar(v, "CANON_KIT_PROSE_BOUND_REPEAT_MIN").filter(|s| !at_least_or_off(s, 2) || *s == "off") {
+        errs.push(format!("CANON_KIT_PROSE_BOUND_REPEAT_MIN must be an integer >= 2 (got '{}')", s));
+    }
     errs
+}
+
+fn at_least_or_off(v: &str, floor: u64) -> bool {
+    v == "off" || (digits(v) && v.parse::<u64>().is_ok_and(|n| n >= floor))
 }
 
 #[cfg(test)]
@@ -392,6 +415,18 @@ mod tests {
         for bad in ["", "0", "1", "-1", "2.0", "a"] {
             assert!(!min_sentences(bad), "{}", bad);
         }
+    }
+
+    // spec: canon-kit/SPEC.md §check-prose-bounds — a bound is an integer at its floor or above, or off
+    #[test]
+    fn a_prose_bound_is_at_least_its_floor_or_off() {
+        for ok in ["1", "45", "off"] {
+            assert!(at_least_or_off(ok, 1), "{}", ok);
+        }
+        for bad in ["", "0", "-1", "4.5", "OFF"] {
+            assert!(!at_least_or_off(bad, 1), "{}", bad);
+        }
+        assert!(!at_least_or_off("2", 3));
     }
 
     // spec: canon-kit/SPEC.md §check-prose-tells — the abbreviation floor is two or more, or off

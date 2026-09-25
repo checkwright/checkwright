@@ -15,7 +15,10 @@ The keyed wire reads, for example, `spec=scope` and
 
 The cap landed in `4f2a9c1e`, which a reviewer can read.
 
+The widget scan is fast (measured 2026-08-30: two battery cycles).
+
 ```text
+The widget scan is fast (measured 2026-08-30: two battery cycles).
 The keyed wire reads `spec=scope` and `align=spec`.
 The operator ruled (2026-08-12, consult) that it stays that way.
 CLAUDE.md §Delivery doctrine and CLAUDE.md's ban

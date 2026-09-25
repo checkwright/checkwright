@@ -742,6 +742,119 @@ pub fn walk_prose_multi(
     Ok(())
 }
 
+// spec: canon-kit/SPEC.md §The shared spec adapters — the prose unit's line tests and the
+// sentence split, one rule for §check-prose-tells and §check-prose-bounds
+fn lstrip_blank(s: &str) -> &str {
+    s.trim_start_matches([' ', '\t'])
+}
+
+pub fn is_table_row(s: &str) -> bool {
+    lstrip_blank(s).starts_with('|')
+}
+
+// spec: canon-kit/SPEC.md §The shared spec adapters — a list item opens a unit of its own, so a
+// bullet run is never one paragraph
+pub fn is_list_item(s: &str) -> bool {
+    let t = lstrip_blank(s).as_bytes();
+    if t.is_empty() {
+        return false;
+    }
+    if matches!(t[0], b'-' | b'*' | b'+') {
+        return t.len() > 1 && (t[1] == b' ' || t[1] == b'\t');
+    }
+    let mut i = 0usize;
+    while i < t.len() && t[i].is_ascii_digit() {
+        i += 1;
+    }
+    i > 0 && i + 1 < t.len() && t[i] == b'.' && (t[i + 1] == b' ' || t[i + 1] == b'\t')
+}
+
+pub fn prose_heading_level(s: &str) -> usize {
+    let t = lstrip_blank(s).as_bytes();
+    let mut i = 0usize;
+    while i < t.len() && t[i] == b'#' {
+        i += 1;
+    }
+    if i == 0 || i > 6 || i >= t.len() || !(t[i] == b' ' || t[i] == b'\t') {
+        return 0;
+    }
+    i
+}
+
+// spec: gate-sdk/SPEC.md §lib/inject.sh — a marker is the line's whole trimmed content; prose naming one opens nothing.
+pub fn is_gen_marker(s: &str, suffix: &str) -> bool {
+    let inner = match s
+        .trim()
+        .strip_prefix("<!--")
+        .and_then(|t| t.strip_suffix("-->"))
+    {
+        Some(t) => t.trim(),
+        None => return false,
+    };
+    match inner.strip_suffix(suffix) {
+        Some(name) => {
+            !name.is_empty()
+                && name
+                    .bytes()
+                    .all(|c| c.is_ascii_alphanumeric() || c == b'_' || c == b'-')
+        }
+        None => false,
+    }
+}
+
+// spec: canon-kit/SPEC.md §The shared spec adapters — a run of `.`, `!` or `?` followed by
+// whitespace or the span's end closes a sentence; each span is trimmed, its terminal run left out
+pub fn sentence_spans(p: &str) -> Vec<(usize, usize)> {
+    let b = p.as_bytes();
+    let mut out: Vec<(usize, usize)> = Vec::new();
+    let mut push = |s: usize, e: usize| {
+        let mut s = s;
+        let mut e = e;
+        while s < e && matches!(b[s], b' ' | b'\t') {
+            s += 1;
+        }
+        while e > s && matches!(b[e - 1], b' ' | b'\t') {
+            e -= 1;
+        }
+        if e > s {
+            out.push((s, e));
+        }
+    };
+    let mut start = 0usize;
+    let mut i = 0usize;
+    while i < b.len() {
+        if matches!(b[i], b'.' | b'!' | b'?') {
+            let mut j = i;
+            while j < b.len() && matches!(b[j], b'.' | b'!' | b'?') {
+                j += 1;
+            }
+            if j < b.len() && (b[j] == b' ' || b[j] == b'\t') {
+                push(start, i);
+                start = j + 1;
+                i = j + 1;
+                continue;
+            }
+            let mut k = j;
+            while k < b.len() && (b[k] == b' ' || b[k] == b'\t') {
+                k += 1;
+            }
+            if k == b.len() {
+                push(start, i);
+                start = b.len();
+                i = b.len();
+                continue;
+            }
+        }
+        i += 1;
+    }
+    push(start, b.len());
+    out
+}
+
+pub fn word_count(s: &str) -> usize {
+    s.split([' ', '\t']).filter(|w| !w.is_empty()).count()
+}
+
 // spec: canon-kit/SPEC.md §The shared spec adapters — the fence and blank-line shapes the awk driver
 // tests, byte-wise on POSIX space as awk matches them
 pub fn is_fence_line(line: &str) -> bool {

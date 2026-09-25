@@ -117,6 +117,7 @@ check-unmarked-claim
 check-tracking-claim
 check-prose-enum
 check-prose-tells
+check-prose-bounds
 check-knob-citation
 check-knob-default-coupling
 check-comment-tier

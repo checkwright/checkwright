@@ -1,0 +1,3 @@
+CLAUDE.md:9: [B] unit of 215 words > 200 (§Housekeeping)
+SPEC.md:5: [A] sentence of 52 words > 45 (§The scan)
+SPEC.md:9: [C] a phrase of 6 or more words recurs in 3 or more units: "and per the provenance seam it never lands as a kit literal" (§Knobs)

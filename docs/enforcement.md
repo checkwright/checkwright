@@ -129,6 +129,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | [canon-kit](canon-kit/index.md) | check-tracking-claim | precommit |
 | [canon-kit](canon-kit/index.md) | check-prose-enum | precommit |
 | [canon-kit](canon-kit/index.md) | check-prose-tells | precommit |
+| [canon-kit](canon-kit/index.md) | check-prose-bounds | precommit |
 | [canon-kit](canon-kit/index.md) | check-knob-citation | precommit |
 | [canon-kit](canon-kit/index.md) | check-knob-default-coupling | precommit |
 | [canon-kit](canon-kit/index.md) | check-comment-tier | precommit |

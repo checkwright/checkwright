@@ -23,7 +23,7 @@ This amendment lands a gate for each move and applies the moves to the first fiv
 
 ### (1) `check-prose-bounds` {design-bearing}
 
-**Not yet applied.** A new canon-kit gate: `canon-kit/checks/check-prose-bounds.gate`, `native/src/gates/prose_bounds.rs`, its row in `native/src/gates/mod.rs`, and a `good/`+`bad/` fixture pair under `canon-kit/gate-tests/check-prose-bounds/`, with `check-prose-bounds.test.sh` for the arms a pair cannot spell. It is born native. The descriptor takes `check-prose-tells`' shape: `tier=precommit`, `# install: on-surface`, and couples `knob:CANON_KIT_PROSE_BOUND_GLOBS` and `knob:CANON_KIT_PROSE_BOUND_CEILING_FILE`.
+**Applied.** The four unit line tests (list item, heading, table row, generated-region marker) moved to `native/src/spec.rs` with the split, so both gates cut a unit by one rule. C lists overlapping phrase windows as the one longer phrase they cover. A new canon-kit gate: `canon-kit/checks/check-prose-bounds.gate`, `native/src/gates/prose_bounds.rs`, its row in `native/src/gates/mod.rs`, and a `good/`+`bad/` fixture pair under `canon-kit/gate-tests/check-prose-bounds/`, with `check-prose-bounds.test.sh` for the arms a pair cannot spell. It is born native. The descriptor takes `check-prose-tells`' shape: `tier=precommit`, `# install: on-surface`, and couples `knob:CANON_KIT_PROSE_BOUND_GLOBS` and `knob:CANON_KIT_PROSE_BOUND_CEILING_FILE`.
 
 The new section, after §check-prose-tells in canon-kit/SPEC.md:
 
@@ -59,7 +59,7 @@ canon-kit/SPEC.md §Per-component contracts' bespoke unit-test roster gains `che
 
 ### (2) The knobs {mechanical}
 
-**Not yet applied.** `native/src/knobs/canon_kit.rs` gains six rows and their validation:
+**Applied.** `native/src/knobs/canon_kit.rs` gains six rows and their validation:
 
 - `CANON_KIT_PROSE_BOUND_GLOBS` — array, default empty.
 - `CANON_KIT_PROSE_BOUND_SENTENCE_MAX` — default `45`; a positive integer or `off`.
@@ -76,7 +76,7 @@ The corpus-knob paragraph's list of knobs that widen a gate's trigger gains `CAN
 
 ### (3) The dated arm of `check-provenance-seam` {design-bearing}
 
-**Not yet applied.** In `native/src/gates/provenance_seam.rs` and canon-kit/SPEC.md §check-provenance-seam. A kit SPEC now carries no date at all, outside a fence.
+**Applied.** The `dated` findings inside deltas 6 and 7's sections (one in §The first cohort, three in §The consumer smoke) had their dates dropped, ground kept, when the arm landed, because the arm reds per finding and the battery stays green at every commit; deltas 6 and 7 still own those sections' moves. The dated-attribution bullet's "a date with no marker passes" sentence was a missed site, rewritten to hand that sentence to the new arm. In `native/src/gates/provenance_seam.rs` and canon-kit/SPEC.md §check-provenance-seam. A kit SPEC now carries no date at all, outside a fence.
 
 **The rule.** gate-sdk/SPEC.md §The provenance seam's second paragraph (the one opening "The seam decides the voice, never the content.") keeps its first two sentences and replaces the rest with:
 
@@ -102,7 +102,7 @@ The `dated` findings inside the five sections are deltas 6 and 7's.
 
 ### (4) An agent file's paragraphs take the same bound {mechanical}
 
-**Not yet applied.** context-kit/SPEC.md §The brevity gate's closing sentence, "Prose outside any bullet — the paragraph sections of an agent file — is outside the gate's grammar.", becomes:
+**Applied.** context-kit/SPEC.md §The brevity gate's closing sentence, "Prose outside any bullet — the paragraph sections of an agent file — is outside the gate's grammar.", becomes:
 
 > Prose outside any bullet, an agent file's paragraph sections, is outside this gate's grammar. Its length is bounded by canon-kit's `check-prose-bounds`, where a consumer lists the agent file in that gate's corpus (canon-kit/SPEC.md §check-prose-bounds).
 
@@ -110,7 +110,7 @@ This repo lists `CLAUDE.md` in the corpus (delta 5). CLAUDE.md's two sentences o
 
 ### (5) This repo's binding {mechanical}
 
-**Not yet applied.**
+**Applied.**
 
 - `scripts/canon-config.knobs` sets `CANON_KIT_PROSE_BOUND_GLOBS` to `*/SPEC.md`, `doctrine-kit/DOCTRINE.md` and `CLAUDE.md`, and `CANON_KIT_PROSE_BOUND_CEILING_FILE` to `.workflow/prose-bound-ceiling.txt`. It binds the four bounds at their defaults in its policy-calibration block, as it binds the prose-tell thresholds.
 - `.workflow/prose-bound-ceiling.txt` is tracked, headed `# contract: canon-kit/SPEC.md §check-prose-bounds — <findings> <path>`. It is written last, by delta 10.
@@ -140,7 +140,7 @@ Headings keep their text, so every `§` citation into them still resolves. Befor
 
 ### (10) Stamp the ceiling {mechanical}
 
-**Not yet applied.** After deltas 3 to 9, run the worklist spelling from delta 1 and write one `<n> <path>` row per governed file with findings into `.workflow/prose-bound-ceiling.txt`. The five sections contribute none. `check-prose-bounds` is then green at the rows, and every later edit that moves a count moves its row. The sibling amendments `SPEC-capture-drain.md` and `SPEC-capture-home.md` merge into governed SPECs too. If either merges before this delta, the stamp absorbs its count. If it merges after, its merge commit moves the rows it changes, and the gate refuses that commit until it does.
+**Applied over the unmoved sections; re-stamped after deltas 6 to 9.** After deltas 3 to 9, run the worklist spelling from delta 1 and write one `<n> <path>` row per governed file with findings into `.workflow/prose-bound-ceiling.txt`. The five sections contribute none. `check-prose-bounds` is then green at the rows, and every later edit that moves a count moves its row. The sibling amendments `SPEC-capture-drain.md` and `SPEC-capture-home.md` merge into governed SPECs too. If either merges before this delta, the stamp absorbs its count. If it merges after, its merge commit moves the rows it changes, and the gate refuses that commit until it does.
 
 ## Producers and consumers
 

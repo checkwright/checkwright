@@ -16,25 +16,11 @@ the SPEC tier is unreadable as a specification by size, and a derived profile pl
 
 **Deliverable:** the gates for three moves, and the moves applied to the first five sections: re-punctuate run-on sentences and separate bullet runs (a sentence-length ceiling for governed prose, or a stated reason none); move dated archaeology and refusal narrative to the commits that own it, leaving the undated rule and its grounds (the provenance seam already rules this; the gate is the missing half); collapse per-bullet restatements to one lead-in. The sections: gate-sdk §The port-candidate criteria and §The first cohort, installer §The consumer smoke, delegation-kit §Testing, canon-kit's and guard-kit's §Layout and configuration. Not a wholesale cut: a contract sentence stays. The rest of the tier is [spec-brevity-residue](#spec-brevity-residue).
 
-**Taken as a feature, split — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the gates add names, so /spec authors and pairs it; the five sections above land this iteration and the per-SPEC remainder was split out. It absorbs the icebox entry `port-archaeology-restatement-residue`, a class-(2) instance inside gate-sdk's port sections, retired to Done at pairing. It reshapes [agent-file-paragraph-sections-ungoverned](#agent-file-paragraph-sections-ungoverned): one bound serves both corpora, so this gate's design goes first.
+**Taken as a feature, split — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the gates add names, so /spec authors and pairs it; the five sections above land this iteration and the per-SPEC remainder was split out. It absorbs the icebox entry `port-archaeology-restatement-residue`, a class-(2) instance inside gate-sdk's port sections, retired to Done at pairing. It reshapes `agent-file-paragraph-sections-ungoverned`: one bound serves both corpora, so this gate's design goes first.
 
 **Spec (2026-09-25):** SPEC-prose-bounds.md, which also pairs agent-file-paragraph-sections-ungoverned. A new canon-kit gate, `check-prose-bounds`, bounds sentences and units and flags a phrase repeated across a section's units, under a per-file ceiling that holds the residue. A `dated` arm on `check-provenance-seam` is the archaeology half: a kit SPEC carries no date, and gate-sdk §The provenance seam's dated-measurement allowance is rewritten to match. The amendment changes canon-kit's, gate-sdk's and context-kit's contracts, so the audit stage is owed.
 
 **Cost while deferred:** paid by every session that opens a SPEC section and every adopter who reads one on the site; the sampled sections cost a reader three to five times the words their rules need. Filed 2026-09-25 by consult as a direct entry, from the operator-directed brevity audit of project assets.
-
-### agent-file-paragraph-sections-ungoverned
-
-[spec: SPEC-prose-bounds.md] [recurrence: 2026-09-25]
-
-`check-brevity` budgets the agent file's bullet rules and skips its paragraph sections (context-kit/SPEC.md §check-brevity states the exclusion), so CLAUDE.md's paragraphs grow unbudgeted while the ratchet holds only the whole-file ceiling.
-
-**Deliverable:** a per-paragraph bound in the same gate, or the stated reason the ratchet suffices, with a fixture either way.
-
-**Taken as a feature — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** a bound in the gate's grammar is a new name, so /spec authors it beside [spec-tier-brevity-pass](#spec-tier-brevity-pass), whose paragraph and sentence bound it shares.
-
-**Spec (2026-09-25):** read through the direction's one bound. The paragraph and sentence bound lives once, in canon-kit's `check-prose-bounds`, and this repo lists CLAUDE.md in that gate's corpus; a second copy in `check-brevity` would state one bound twice. context-kit §The brevity gate points there, and the fixture is an agent-file paragraph in that gate's `bad/`. CLAUDE.md measures no paragraph over 200 words and two sentences over 45.
-
-**Cost while deferred:** paid by every session, since the file is always loaded. Filed 2026-09-13; returned from the icebox 2026-09-25 by consult as a corpus exclusion of the paradigm's shape.
 
 ### close-triage-log-reclaim-loss-window
 
@@ -82,7 +68,7 @@ the in-turn wait the delegation protocol mandates, `while kill -0 "$pid"`, is re
 
 **Deliverable:** the hook reports a knob that names no readable file, and a fixture pins the report.
 
-**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** a report on a knob the SPEC already names, adding no name; it joins because the unit set carries context-kit through [agent-file-paragraph-sections-ungoverned](#agent-file-paragraph-sections-ungoverned).
+**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** a report on a knob the SPEC already names, adding no name; it joins because the unit set carries context-kit through `agent-file-paragraph-sections-ungoverned`.
 
 **Cost while deferred:** a session opens without its craft rules and no surface says so. Filed 2026-09-03; returned from the icebox 2026-09-25 by consult, the template re-read.
 
@@ -1542,6 +1528,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 ## Done
 
+- agent-file-paragraph-sections-ungoverned
 - amendment-prose-misnumbers-its-delta
 - bridged-arm-spawned-program-set-unheld
 - stage-economics-smoke-jq-arm-dormant

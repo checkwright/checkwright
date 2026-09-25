@@ -134,6 +134,12 @@ CANON_KIT_UNWRAP_DECLARATION_LEADS[] = ruling:
 CANON_KIT_UNWRAP_DECLARATION_LEADS[] = discharge:
 CANON_KIT_UNWRAP_DECLARATION_LEADS[] = close-surface:
 
+# comment-tier-exempt: this repo bounds its specification tier and its always-loaded agent file, held at a committed ceiling while the brevity pass drains the residue — consumer editorial scope, never a kit literal (the provenance seam)
+CANON_KIT_PROSE_BOUND_GLOBS[] = */SPEC.md
+CANON_KIT_PROSE_BOUND_GLOBS[] = doctrine-kit/DOCTRINE.md
+CANON_KIT_PROSE_BOUND_GLOBS[] = CLAUDE.md
+CANON_KIT_PROSE_BOUND_CEILING_FILE = .workflow/prose-bound-ceiling.txt
+
 # spec: canon-kit/SPEC.md §Layout and configuration — the policy calibrations this repo relies on, bound at the values its gates are green at so a kit default's move moves no verdict here: the kit's author is a consumer that binds its own (Policy-as-choice). CANON_KIT_SEAM_AUTHORITY_MARKERS stays inherited because its default member `lead, ` ends in a blank a knob file cannot express
 CANON_KIT_COMMENT_RUN_CAP = 3
 CANON_KIT_COUNT_WEDGE_WORDS = 2
@@ -150,6 +156,10 @@ CANON_KIT_PROSE_TELL_TRICOLON_MAX = 2
 CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES = 4
 CANON_KIT_PROSE_TELL_RHYTHM_CV_MIN = 0.25
 CANON_KIT_PROSE_TELL_ABBR_MIN_LEN = 3
+CANON_KIT_PROSE_BOUND_SENTENCE_MAX = 45
+CANON_KIT_PROSE_BOUND_PARAGRAPH_MAX = 200
+CANON_KIT_PROSE_BOUND_REPEAT_WORDS = 6
+CANON_KIT_PROSE_BOUND_REPEAT_MIN = 3
 CANON_KIT_BANNED_HEADINGS[] = Directory Structure
 CANON_KIT_BANNED_HEADINGS[] = Public API
 CANON_KIT_BANNED_HEADINGS[] = Cargo.toml Dependencies

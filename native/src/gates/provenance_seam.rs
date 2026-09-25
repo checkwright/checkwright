@@ -126,7 +126,7 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         for l in &sink.out {
             println!("{}", l);
         }
-        println!("  help: dated-attribution — delete the attribution and keep the rule; agent-file-pointer or private-surface — state the rule the pointer stood for, or cite the kit SPEC section that owns it; queue-slug — name what the slug denoted, or rename a freshly filed slug; hex-reference — delete the object name and state the fact it labelled; consumer-roster — name the knob rather than quote its configured roster (gate-sdk/SPEC.md §The provenance seam)");
+        println!("  help: dated-attribution — delete the attribution and keep the rule; dated — state the measurement undated as the rule's ground, or spell a specimen's date YYYY-MM-DD; agent-file-pointer or private-surface — state the rule the pointer stood for, or cite the kit SPEC section that owns it; queue-slug — name what the slug denoted, or rename a freshly filed slug; hex-reference — delete the object name and state the fact it labelled; consumer-roster — name the knob rather than quote its configured roster (gate-sdk/SPEC.md §The provenance seam)");
         return Ok(1);
     }
     let mut notes: Vec<&str> = Vec::new();
@@ -287,7 +287,8 @@ impl ProseSink for Seam<'_> {
 
 impl Seam<'_> {
     // spec: canon-kit/SPEC.md §check-provenance-seam — arm A: an ISO date and an authority marker
-    // in one sentence, the sentence ending at `.`, `?`, `!` or `;` before whitespace
+    // in one sentence, the sentence ending at `.`, `?`, `!` or `;` before whitespace; a dated
+    // sentence with no marker is the `dated` arm's
     fn dated_attribution(&self, j: &Joined, hits: &mut Vec<(usize, String)>) {
         let b = j.text.as_bytes();
         let mut start = 0usize;
@@ -300,13 +301,12 @@ impl Seam<'_> {
                 let sentence = &j.text[start..stop];
                 if let Some(d) = iso_date(sentence) {
                     let low = sentence.to_ascii_lowercase();
-                    if let Some((name, _)) = self.markers.iter().find(|(_, re)| re.is_match(&low)) {
-                        let lead = start + sentence.len() - sentence.trim_start().len();
-                        hits.push((
-                            j.line_at(lead),
-                            format!("dated-attribution: {} with marker '{}'", d, name),
-                        ));
-                    }
+                    let lead = start + sentence.len() - sentence.trim_start().len();
+                    let msg = match self.markers.iter().find(|(_, re)| re.is_match(&low)) {
+                        Some((name, _)) => format!("dated-attribution: {} with marker '{}'", d, name),
+                        None => format!("dated: {}", d),
+                    };
+                    hits.push((j.line_at(lead), msg));
                 }
                 start = stop;
             }

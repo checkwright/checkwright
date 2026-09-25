@@ -464,6 +464,10 @@ if staged_matches '*docs/*.md' 'scripts/canon-config.knobs' 'scripts/gate-sdk-co
     run_gate check-prose-tells native/target/release/checkwright-gates check-prose-tells
 fi
 
+if staged_matches '*/SPEC.md' '*doctrine-kit/DOCTRINE.md' '*CLAUDE.md' '*.workflow/prose-bound-ceiling.txt' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/prose_bounds.rs' 'native/src/spec.rs'; then
+    run_gate check-prose-bounds native/target/release/checkwright-gates check-prose-bounds
+fi
+
 if staged_matches '*SPEC*.md' '*README.md' '*CLAUDE.md' '*CLAUDE.md' '*README.md' '*CONTRIBUTING.md' '*CODE_OF_CONDUCT.md' '*SECURITY.md' '*RELEASING.md' '*ROADMAP.md' '*TRAJECTORY.md' '*/SPEC.md' '*/README.md' '*reserve/*/README.md' '*doctrine-kit/DOCTRINE.md' '*docs/*.md' '*docs/*/index.md' '*docs/posts/*.md' '*/templates/*.md' '*.claude/agents/*.md' '*SPEC.md' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/knob_citation.rs' 'native/src/spec.rs'; then
     run_gate check-knob-citation native/target/release/checkwright-gates check-knob-citation
 fi

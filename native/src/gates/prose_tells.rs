@@ -64,64 +64,6 @@ fn strip_code(s: &str) -> String {
     String::from_utf8_lossy(&out).into_owned()
 }
 
-fn lstrip(s: &str) -> &str {
-    s.trim_start_matches([' ', '\t'])
-}
-
-fn is_table(s: &str) -> bool {
-    lstrip(s).starts_with('|')
-}
-
-// spec: canon-kit/SPEC.md §check-prose-tells — a markdown list item is its own unit rather than
-// flowing prose, so the paragraph and section assertions never lump two items into one span
-fn is_list_item(s: &str) -> bool {
-    let t = lstrip(s).as_bytes();
-    if t.is_empty() {
-        return false;
-    }
-    if matches!(t[0], b'-' | b'*' | b'+') {
-        return t.len() > 1 && (t[1] == b' ' || t[1] == b'\t');
-    }
-    let mut i = 0usize;
-    while i < t.len() && t[i].is_ascii_digit() {
-        i += 1;
-    }
-    i > 0 && i + 1 < t.len() && t[i] == b'.' && (t[i + 1] == b' ' || t[i + 1] == b'\t')
-}
-
-fn heading_level(s: &str) -> usize {
-    let t = lstrip(s).as_bytes();
-    let mut i = 0usize;
-    while i < t.len() && t[i] == b'#' {
-        i += 1;
-    }
-    if i == 0 || i > 6 || i >= t.len() || !(t[i] == b' ' || t[i] == b'\t') {
-        return 0;
-    }
-    i
-}
-
-// spec: gate-sdk/SPEC.md §lib/inject.sh — a marker is the line's whole trimmed content; prose naming one opens nothing.
-fn gen_marker(s: &str, suffix: &str) -> bool {
-    let inner = match s
-        .trim()
-        .strip_prefix("<!--")
-        .and_then(|t| t.strip_suffix("-->"))
-    {
-        Some(t) => t.trim(),
-        None => return false,
-    };
-    match inner.strip_suffix(suffix) {
-        Some(name) => {
-            !name.is_empty()
-                && name
-                    .bytes()
-                    .all(|c| c.is_ascii_alphanumeric() || c == b'_' || c == b'-')
-        }
-        None => false,
-    }
-}
-
 fn count_matches(re: &Ere, hay: &str) -> usize {
     let mut n = 0usize;
     let mut pos = 0usize;
@@ -144,49 +86,10 @@ fn count_matches(re: &Ere, hay: &str) -> usize {
     n
 }
 
-// spec: canon-kit/SPEC.md §check-prose-tells — assertion E's sentence split: a run of terminal
-// punctuation followed by whitespace, or ending the span
+// spec: canon-kit/SPEC.md §check-prose-tells — assertion E's per-sentence word counts over the
+// shared split
 fn split_sentences(p: &str) -> Vec<usize> {
-    let b = p.as_bytes();
-    let mut segs: Vec<String> = Vec::new();
-    let mut cur: Vec<u8> = Vec::new();
-    let mut i = 0usize;
-    while i < b.len() {
-        if matches!(b[i], b'.' | b'!' | b'?') {
-            let mut j = i;
-            while j < b.len() && matches!(b[j], b'.' | b'!' | b'?') {
-                j += 1;
-            }
-            if j < b.len() && (b[j] == b' ' || b[j] == b'\t') {
-                segs.push(String::from_utf8_lossy(&cur).into_owned());
-                cur.clear();
-                i = j + 1;
-                continue;
-            }
-            let mut k = j;
-            while k < b.len() && (b[k] == b' ' || b[k] == b'\t') {
-                k += 1;
-            }
-            if k == b.len() {
-                segs.push(String::from_utf8_lossy(&cur).into_owned());
-                cur.clear();
-                i = b.len();
-                continue;
-            }
-        }
-        cur.push(b[i]);
-        i += 1;
-    }
-    segs.push(String::from_utf8_lossy(&cur).into_owned());
-    let mut out = Vec::new();
-    for seg in segs {
-        let t = seg.trim_matches([' ', '\t']);
-        if t.is_empty() {
-            continue;
-        }
-        out.push(t.split([' ', '\t']).filter(|w| !w.is_empty()).count().max(1));
-    }
-    out
+    spec::sentence_spans(p).into_iter().map(|(s, e)| spec::word_count(&p[s..e]).max(1)).collect()
 }
 
 struct Sink<'a> {
@@ -371,18 +274,18 @@ impl spec::ProseSink for Sink<'_> {
     // closes the section span, and any head stays out of the paragraph and file buffers
     fn on_line(&mut self, file: &str, fnr: usize, raw: &str) {
         let s = self;
-        if gen_marker(raw, ":begin") {
+        if spec::is_gen_marker(raw, ":begin") {
             s.in_gen = true;
             return;
         }
-        if gen_marker(raw, ":end") {
+        if spec::is_gen_marker(raw, ":end") {
             s.in_gen = false;
             return;
         }
         if s.in_gen {
             return;
         }
-        let lvl = heading_level(raw);
+        let lvl = spec::prose_heading_level(raw);
         if lvl > 0 {
             if lvl <= 2 {
                 let f = file.to_string();
@@ -391,11 +294,11 @@ impl spec::ProseSink for Sink<'_> {
             }
             return;
         }
-        if is_table(raw) {
+        if spec::is_table_row(raw) {
             return;
         }
         let clean = strip_code(raw);
-        if is_list_item(raw) {
+        if spec::is_list_item(raw) {
             s.sec_buf.push_str(" .");
             s.file_buf.push_str(" .");
         }
@@ -413,13 +316,13 @@ impl spec::ProseSink for Sink<'_> {
             return;
         }
         let first = &para.line[0];
-        if heading_level(first) > 0 || is_table(first) {
+        if spec::prose_heading_level(first) > 0 || spec::is_table_row(first) {
             return;
         }
         let mut ustart = 1usize;
         let mut units: Vec<(usize, usize)> = Vec::new();
         for i in 2..=n {
-            if is_list_item(&para.line[i - 1]) {
+            if spec::is_list_item(&para.line[i - 1]) {
                 units.push((ustart, i - 1));
                 ustart = i;
             }

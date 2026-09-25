@@ -1,0 +1,3 @@
+# spec: canon-kit/SPEC.md §check-prose-bounds — the fixture governs one spec and one agent file at the bundled bounds, with no ceiling
+CANON_KIT_PROSE_BOUND_GLOBS[] = SPEC.md
+CANON_KIT_PROSE_BOUND_GLOBS[] = CLAUDE.md

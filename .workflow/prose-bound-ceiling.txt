@@ -1,0 +1,14 @@
+# contract: canon-kit/SPEC.md §check-prose-bounds — <findings> <path>
+261 canon-kit/SPEC.md
+131 context-kit/SPEC.md
+328 delegation-kit/SPEC.md
+46 doctrine-kit/DOCTRINE.md
+44 doctrine-kit/SPEC.md
+160 drift-kit/SPEC.md
+119 evidence-kit/SPEC.md
+1669 gate-sdk/SPEC.md
+318 guard-kit/SPEC.md
+313 installer/SPEC.md
+419 lifecycle-kit/SPEC.md
+165 queue-kit/SPEC.md
+49 site-kit/SPEC.md

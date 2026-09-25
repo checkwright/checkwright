@@ -2,7 +2,7 @@
 # Behavioral test of the config-driven paths the one-pair good/bad harness cannot
 # hold: the kit-roots-off default, an absent queue file, the _EXTRA marker union,
 # the fence skip as an absence (expect.txt asserts presence only), the fail-closed
-# config arms, and a seam surface's corpus and arm set.
+# config arms, the dated arm beside an attribution, and a seam surface's corpus and arm set.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -69,25 +69,36 @@ check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4=output  $5=rc
 out="$(run "$SANDBOX/off.knobs")"; rc=$?
 check_case "kit-roots-off" 0 "CANON_KIT_SCAN_KIT_ROOTS is 0" "$out" "$rc"
 
-# The bundled markers do not know "signed off", so only the slug trips — once, the
-# fenced copy adding nothing.
+# The bundled markers do not know "signed off", so the date trips the dated arm and
+# the slug trips its own — once each, the fenced copy adding nothing.
 out="$(run "$SANDBOX/on.knobs")"; rc=$?
 check_case "slug-trips" 1 "widget-toolkit/SPEC.md:5  queue-slug: sprocket-rework-unit" "$out" "$rc"
-if [[ "$(grep -c '  widget-toolkit/SPEC.md:' <<<"$out")" -ne 1 ]]; then
-    echo "  FAIL [fence-skipped]: want exactly one finding, the fenced copies adding none:"
+check_case "dated-trips" 1 "widget-toolkit/SPEC.md:3  dated: 2026-08-12" "$out" "$rc"
+if [[ "$(grep -c '  widget-toolkit/SPEC.md:' <<<"$out")" -ne 2 ]]; then
+    echo "  FAIL [fence-skipped]: want exactly two findings, the fenced copies adding none:"
     printf '    %s\n' "$out"; fails=$((fails + 1))
 fi
 
 # The extra unions onto the bundled base: the consumer's marker now dates an
-# attribution, and the base's slug finding still stands beside it.
+# attribution, which the dated arm then leaves alone, and the base's slug finding
+# still stands beside it.
 out="$(run "$SANDBOX/extra.knobs")"; rc=$?
 check_case "extra-union" 1 "widget-toolkit/SPEC.md:3  dated-attribution: 2026-08-12 with marker 'signed off'" "$out" "$rc"
 check_case "extra-keeps-base" 1 "queue-slug: sprocket-rework-unit" "$out" "$rc"
+if grep -qF "  dated: " <<<"$out"; then
+    echo "  FAIL [attribution-not-dated]: a sentence the dated-attribution arm reports takes no dated finding:"
+    printf '    %s\n' "$out"; fails=$((fails + 1))
+fi
 
 # An absent queue file switches the slug arm off and says so; the other arms judge.
 mv "$SANDBOX/TASK-QUEUE.md" "$SANDBOX/queue.off"
 out="$(run "$SANDBOX/on.knobs")"; rc=$?
+check_case "absent-queue-others-judge" 1 "widget-toolkit/SPEC.md:3  dated: 2026-08-12" "$out" "$rc"
+cp "$SANDBOX/widget-toolkit/SPEC.md" "$SANDBOX/spec.keep"
+grep -v '2026-08-12' "$SANDBOX/spec.keep" >"$SANDBOX/widget-toolkit/SPEC.md"
+out="$(run "$SANDBOX/on.knobs")"; rc=$?
 check_case "absent-queue" 0 "queue-slug arm off: no queue file" "$out" "$rc"
+mv "$SANDBOX/spec.keep" "$SANDBOX/widget-toolkit/SPEC.md"
 mv "$SANDBOX/queue.off" "$SANDBOX/TASK-QUEUE.md"
 
 # Fail-closed: a marker that does not compile, and a slug floor that is not positive.
@@ -121,5 +132,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-provenance-seam.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-provenance-seam.test.sh: clean (kit-roots-off default + fence skip + _EXTRA union + absent queue file + malformed marker + non-positive slug floor + seam surface at kit-roots off, roster arm off)"
+echo "check-provenance-seam.test.sh: clean (kit-roots-off default + fence skip + dated arm + _EXTRA union + absent queue file + malformed marker + non-positive slug floor + seam surface at kit-roots off, roster arm off)"
 exit 0

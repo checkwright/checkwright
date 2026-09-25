@@ -185,7 +185,7 @@ The pointer default is any `§`, not a single doc name like `HANDBOOK §`: "cite
 - **The unit is the code point.** A bullet is measured the way the meter measures a surface, so joining or wrapping its lines moves nothing, and the apparatus still measures one quantity.
 - **The pointer conjunct reads `§` by default**, so a bullet pointing at a document by path alone passes on it. `CONTEXT_KIT_BREVITY_POINTER_RE` is the consumer's lever; widening it to a path pattern also matches a bullet whose *subject* is a file, which is most of a housekeeping section, so the default is the conservative setting.
 
-Prose outside any bullet — the paragraph sections of an agent file — is outside the gate's grammar.
+Prose outside any bullet, an agent file's paragraph sections, is outside this gate's grammar. Its length is bounded by canon-kit's `check-prose-bounds`, where a consumer lists the agent file in that gate's corpus (canon-kit/SPEC.md §check-prose-bounds).
 
 ## The surface ratchet
 
