@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+non-gate-arm-contract gates sha256=483713c9bffa3e5ecab8e25f500f89708cd3bf4049611efdf25a92f1867266d7 pass=135 fail=0 ignore=0 verdict=clean 2026-09-26
+non-gate-arm-contract gate_sdk sha256=754fceb4addff652c31443cc80edb7fd86da22a6751d6a985b726be116728b35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+non-gate-arm-contract canon_kit sha256=1fe227c7d8c11db8a86ada929e9fcad7e090d0db00dc146d46c284cdd32420dc pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+non-gate-arm-contract context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+non-gate-arm-contract delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+non-gate-arm-contract doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+non-gate-arm-contract evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+non-gate-arm-contract guard_kit sha256=01d94b4120e133665e01946fe44d31a730d2c6cdfd1570e5ce6b96a7a1b30e1b pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+non-gate-arm-contract lifecycle_kit sha256=f3a8d77f2d38f716eeb72cd82f0c6d313adb17ea7d522760b30f147e36a031a0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+non-gate-arm-contract queue_kit sha256=5880c4840de8628f0c320fd728dd3e425a92b6d1554f5e56ce403a8d8b13f3c5 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+non-gate-arm-contract site_kit sha256=b9a84e84d67dad5a63ae7ce34aecdc472ffbe13d06d01cc02f04bfca5b5de2ae pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+non-gate-arm-contract scripts sha256=3b4f627186b5c83c3d57c67777cb011d312901b5705f8eaf51c806bc5ee37264 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+non-gate-arm-contract guard_tests sha256=50af7da51cc1a15eb9e72dea81613ec0b82b4b73a8faba1987ef537271e9ee9a pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+non-gate-arm-contract demo sha256=e94cea4333fad1c15a9dbadfebd60eb38af3a1a7a637f26c2ca73345b6c8b713 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+non-gate-arm-contract installer_smoke sha256=816867118a82ba8ef1300937de7d83dc877ffd1f797cc46ae6f1dedda16aa764 pass=17 fail=0 ignore=0 verdict=clean 2026-09-26
+non-gate-arm-contract consumer_smoke sha256=6cb43bf85efb21c70b1d99d02dbd0f175e1c57c97931ae433928d905fe7f45d7 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+non-gate-arm-contract upgrade sha256=4aa3f84646f1d71e62688f9f680fe80793522e6aefeaf42dff9282574d9b4357 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+non-gate-arm-contract agents_md_smoke sha256=4d17fa8c0dd825f55aa3c533d967ec0d5b4f27e0007e8c44e2d04934970b9d38 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+non-gate-arm-contract index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+non-gate-arm-contract native_crate sha256=ce001e20171f5d984999193dd3de32a73965d67d4ec75e6be02e46d61276ba14 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+non-gate-arm-contract projection_witness sha256=4000bbe87942a445140752ef57cecc698dcde5687916f45b68c5af745e4374c8 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
