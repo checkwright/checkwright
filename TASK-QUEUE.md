@@ -392,6 +392,16 @@ the secondary customer pages carry validity slips and undefined internal vocabul
 
 **Cost while deferred:** low per page and slow, paid by the reader who has already passed the front door. Filed 2026-09-25 by consult as a direct entry, from the same audit; split from the front-door entry because its pages do not decide the first install.
 
+### spec-tier-brevity-pass
+
+[cost: session/high] [surface: gate-sdk]
+
+the SPEC tier is unreadable as a specification by size, and a derived profile plus a sampled classification say what the size is made of. The twelve kit SPECs and the doctrine total about 564k words; 575 paragraphs exceed 200 words and 113 exceed 400; a quarter of all sentences exceed 45 words; about 1,150 sentences are provenance-shaped (refused, measured, attested, honest limit). gate-sdk/SPEC.md alone is 217k words with a 4,465-word paragraph. Sampled classification of the 44 longest paragraphs across six SPECs found CONTRACT the plurality class everywhere (51–75%), so this is not filler: the cost is (1) run-on structure — bullet runs with no blank line read as one paragraph, and lifecycle-kit/SPEC.md §templates/lead.md opens with one ~900-word colon-chained sentence bundling nine sub-contracts; (2) archaeology pockets — gate-sdk §The port-candidate criteria and §The first cohort (55–78% non-contract, dated instrument runs), installer §The consumer smoke's round-by-round debugging log (92%), delegation-kit §Testing (four narrative paragraphs); (3) restatement pockets — canon-kit §Layout and configuration re-derives the provenance-seam rule eleven times, guard-kit §Layout and configuration at 22% restatement. The profile script and the sampled tables are in this entry's filing commit; [port-archaeology-restatement-residue](#port-archaeology-restatement-residue) (icebox) is one instance of class (2).
+
+**Deliverable:** a per-SPEC pass in three moves, each gated: re-punctuate run-on sentences and separate bullet runs (a sentence-length ceiling for governed prose, or a stated reason none); move dated archaeology and refusal narrative to the commits that own it, leaving the undated rule and its grounds (the provenance seam already rules this; the gate is the missing half); collapse per-bullet restatements to one lead-in. Order by the profile: gate-sdk's port sections, then installer's smoke, delegation's testing, canon's and guard's layout sections. Not a wholesale cut: a contract sentence stays.
+
+**Cost while deferred:** paid by every session that opens a SPEC section and every adopter who reads one on the site; the sampled sections cost a reader three to five times the words their rules need. Filed 2026-09-25 by consult as a direct entry, from the operator-directed brevity audit of project assets.
+
 ### ci-one-line-action
 
 [cost: event/high] [surface: gate-sdk]
