@@ -25,7 +25,17 @@ fn fail(problem: &str, help: &str) -> i32 {
     1
 }
 
-pub fn run(_args: &[String]) -> i32 {
+// spec: gate-sdk/SPEC.md §The harness-integration arm — this arm's callers (a timer's log, the refresh
+// spawn, a session) all read its status, so a surplus argument, `--help` included, refuses at
+// exit 2 before a file is read or curl is spawned; the spelling follows `run_validate::dispatch`.
+pub fn run(args: &[String]) -> i32 {
+    if let Some(a) = args.first() {
+        eprintln!(
+            "usage-poller: takes no argument (got: {}) — usage: run-gates.sh --help",
+            a
+        );
+        return 2;
+    }
     let knob = |name: &str| walk::knob_scalar(name).unwrap_or_default();
     let usage::Paths { usage_file, cred_file, account_config } = usage::paths().unwrap_or_default();
     let endpoint = knob("DELEGATION_KIT_USAGE_ENDPOINT");
@@ -182,5 +192,13 @@ mod tests {
             r#"{"five_hour":{"utilization":"1"},"rate_limits":{"five_hour":{"used_percentage":"2"}}}"#,
         );
         assert_eq!(axis(&both, "five_hour").0, "1");
+    }
+
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — a surplus argument, `--help` included, refuses
+    // at exit 2 before any file is read or curl is spawned
+    #[test]
+    fn a_surplus_argument_refuses_at_exit_2() {
+        assert_eq!(run(&["--bogus".to_string()]), 2);
+        assert_eq!(run(&["--help".to_string()]), 2);
     }
 }

@@ -30,7 +30,20 @@ const BG_WARM: u16 = 136;
 const BG_COOL: u16 = 28;
 const BG_EMPTY: u16 = 238;
 
-pub fn run(_args: &[String]) -> i32 {
+// spec: gate-sdk/SPEC.md §The harness-integration arm — the harness discards this arm's status,
+// so a surplus argument drops rather than refuses; this pure helper names what was dropped,
+// `None` for an empty argv, for the one stderr reader, a hand run.
+fn dropped_argv_line(args: &[String]) -> Option<String> {
+    if args.is_empty() {
+        return None;
+    }
+    Some(format!("ignored argument(s): {}", args.join(" ")))
+}
+
+pub fn run(args: &[String]) -> i32 {
+    if let Some(line) = dropped_argv_line(args) {
+        eprintln!("statusline: {}", line);
+    }
     let payload = hook::read_payload();
     let usage::Paths { usage_file, cred_file, account_config } = usage::paths().unwrap_or_default();
 
@@ -303,5 +316,16 @@ mod tests {
         assert_eq!(slug("Opus 5 (1M context)"), "opus");
         assert_eq!(slug("claude-3.5"), "claude35");
         assert_eq!(slug(""), "");
+    }
+
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — an empty argv names nothing, and a surplus one,
+    // `--help` included, is named on the one line `run` writes to stderr
+    #[test]
+    fn dropped_argv_is_named_only_when_nonempty() {
+        assert_eq!(dropped_argv_line(&[]), None);
+        assert_eq!(
+            dropped_argv_line(&["--bogus".to_string(), "--help".to_string()]),
+            Some("ignored argument(s): --bogus --help".to_string())
+        );
     }
 }

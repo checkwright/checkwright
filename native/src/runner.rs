@@ -61,9 +61,11 @@ pub const USAGE: &str = r#"usage: run-gates.sh [gates-dir]                run ev
           exit 0 rather than blocking every guarded tool call.
   --statusline  renders the status line for the harness's statusLine hook and
           rewrites the usage snapshot; declines like --hook when unavailable.
+          Takes no argument, and names one on stderr and ignores it.
   --usage-poll  runs one poll cycle against the usage source and rewrites the
           snapshot. Its caller is a refresh command or a session rather than a
           gate on a tool call, so it refuses with exit 2 when unavailable.
+          Takes no argument, and refuses one with exit 2.
   --usage-verdict  emits one budget verdict line on stdout from the usage
           snapshot: exit 0 OK / RESET-OK, 1 PAUSE, 2 STALE or unreadable
           (budget-unknown, which never blocks delegation). Two optional

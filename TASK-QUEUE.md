@@ -8,20 +8,6 @@
 
 ## New Features
 
-### harness-arm-argv-unstated
-
-[spec: SPEC-harness-arm-argv.md]
-
-`--usage-poll` and `--statusline` ignore their argv, so a surplus or misspelt argument is dropped at exit 0. gate-sdk/SPEC.md §The harness-integration arm states argv for `--hook` alone, and `--statusline` is in the fail-open set, so whether either may refuse an argument is unstated. Refusing one could blank the status line on an argument the harness appends.
-
-**Deliverable:** the section states each arm's argv, either refusal at exit 2 or dropped under fail-open with the ground, and the arms plus a unit test follow it.
-
-**Taken into non-gate-arm-contract — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** /spec authors its amendment and promotes it, with `non-gate-arm-testing-floor-unstated` on the same section.
-
-**Specified 2026-09-26:** `--usage-poll` refuses any argument at exit 2 before it polls, and `--statusline` drops one, names it on stderr and renders as before. The ground is the channel each arm's caller reads, so the section's open fail-open question stays open.
-
-**Cost while deferred:** a mistyped flag to either arm reads as success. Filed 2026-09-25 to the gap inbox by gate-sdk-framework-brevity's build, which also named `--run-validate`; that member was fixed at this close. Promoted 2026-09-25 at its close. →fix fails because the fail-open reading is a SPEC decision a close cannot take. Re-verified at the drain: `--usage-poll --bogus` and `--statusline --bogus` both exit 0. Owner lookup: `statusline`, `usage-poll` in this file — none.
-
 ## Technical Debt
 
 ### gate-sdk-remainder-brevity
@@ -1414,5 +1400,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 - non-gate-arm-testing-floor-unstated
 - emit-per-arm-help-residue
+- harness-arm-argv-unstated
 
 ## Lessons Learned
