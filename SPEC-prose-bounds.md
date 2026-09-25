@@ -132,11 +132,11 @@ Headings keep their text, so every `§` citation into them still resolves. Befor
 
 ### (8) The three moves in delegation-kit §Testing {design-bearing}
 
-**Not yet applied.** delegation-kit/SPEC.md §Testing keeps each test's subject and its reason. Its four narrative paragraphs become statements of what each test pins. The acceptance is delta 6's.
+**Applied.** delegation-kit/SPEC.md §Testing keeps each test's subject and its reason. Its four narrative paragraphs become statements of what each test pins. The acceptance is delta 6's.
 
 ### (9) The three moves in canon-kit's and guard-kit's §Layout and configuration {design-bearing}
 
-**Not yet applied.** In each section, a clause stated on each knob bullet becomes one lead-in above the roster. In canon-kit that clause is the provenance-seam ground several bullets restate in their own words ("so no spelling ships as a kit literal", "per the provenance seam it never lands as a kit literal"), and in guard-kit it is the repeated "default empty, in which case …". Each bullet keeps its knob, shape, default and reader. The acceptance is delta 6's. Delta 2's bullet lands in the collapsed form.
+**Applied.** In each section, a clause stated on each knob bullet becomes one lead-in above the roster. In canon-kit that clause is the provenance-seam ground several bullets restate in their own words ("so no spelling ships as a kit literal", "per the provenance seam it never lands as a kit literal"), and in guard-kit it is the repeated "default empty, in which case …". Each bullet keeps its knob, shape, default and reader. The acceptance is delta 6's. Delta 2's bullet lands in the collapsed form.
 
 ### (10) Stamp the ceiling {mechanical}
 
