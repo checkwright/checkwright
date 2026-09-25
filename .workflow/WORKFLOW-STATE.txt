@@ -6,3 +6,4 @@
 
 spec-brevity-first-slice scope ac5760d2 2026-09-25 7463d3c7
 spec-brevity-first-slice spec a725670c 2026-09-25 b2faadac
+spec-brevity-first-slice align a6edc28a 2026-09-25 0665ba0e
