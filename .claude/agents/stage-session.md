@@ -13,7 +13,7 @@ Your stage skill already carries a build-time question triage (for the build sta
 **Escalate to the lead** (do not act until answered):
 
 - A change to an amendment's **envelope** — narrowing or widening asserted behavior, or any user-facing semantics the amendment did not already settle.
-- A **scope or queue** change: adding, dropping, splitting, deferring, or re-prioritizing a task; naming or renaming the iteration.
+- A **scope or queue** change: adding, dropping, splitting, deferring, or re-prioritizing a task.
 - **Reversing, demoting or re-scoping a recorded ruling or a stated objective** — this one is **operator-class**, so it escalates however well-grounded your finding and however urgent the fix, and the lead relays it rather than ruling it. TRAJECTORY.md owns the rule and its honest limit; this roster only routes it.
 - An **ambiguity the governing specs do not resolve**, where only precedent would decide it — the owner doc is ground truth and history answers what happened, never what is correct (CLAUDE.md §Delivery doctrine, spec-over-precedent).
 - A **cross-component gap** you cannot close from the specs alone this session.
