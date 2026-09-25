@@ -8,6 +8,34 @@
 
 ## New Features
 
+### harness-arm-argv-unstated
+
+[spec: SPEC-harness-arm-argv.md]
+
+`--usage-poll` and `--statusline` ignore their argv, so a surplus or misspelt argument is dropped at exit 0. gate-sdk/SPEC.md §The harness-integration arm states argv for `--hook` alone, and `--statusline` is in the fail-open set, so whether either may refuse an argument is unstated. Refusing one could blank the status line on an argument the harness appends.
+
+**Deliverable:** the section states each arm's argv, either refusal at exit 2 or dropped under fail-open with the ground, and the arms plus a unit test follow it.
+
+**Taken into non-gate-arm-contract — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** /spec authors its amendment and promotes it, with [non-gate-arm-testing-floor-unstated](#non-gate-arm-testing-floor-unstated) on the same section.
+
+**Specified 2026-09-26:** `--usage-poll` refuses any argument at exit 2 before it polls, and `--statusline` drops one, names it on stderr and renders as before. The ground is the channel each arm's caller reads, so the section's open fail-open question stays open.
+
+**Cost while deferred:** a mistyped flag to either arm reads as success. Filed 2026-09-25 to the gap inbox by gate-sdk-framework-brevity's build, which also named `--run-validate`; that member was fixed at this close. Promoted 2026-09-25 at its close. →fix fails because the fail-open reading is a SPEC decision a close cannot take. Re-verified at the drain: `--usage-poll --bogus` and `--statusline --bogus` both exit 0. Owner lookup: `statusline`, `usage-poll` in this file — none.
+
+### non-gate-arm-testing-floor-unstated
+
+[spec: SPEC-arm-test-floor.md] [recurrence: 2026-09-25]
+
+a non-gate arm's testing floor is unstated, and four ship with no test module (`value_rollup.rs`, `usage_trend.rs`, `install_hooks.rs`, `md_unwrap.rs`).
+
+**Deliverable:** the floor stated at gate-sdk/SPEC.md §The non-gate arm, and the four arms brought to it.
+
+**Taken into non-gate-arm-contract — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the floor is a new rule beside the section's "owes no fixture pair" sentence, so /spec authors it and promotes this entry. Not push-needing: the four arms' tests run locally.
+
+**Specified 2026-09-26:** an arm owes a `#[cfg(test)]` module in its own file, and a census test beside the arm table reds a row whose file has none. `usage_trend.rs`'s coverage lives in `usage_tests.rs`, so its two argv refusals move into its own module.
+
+**Cost while deferred:** an arm can change behaviour with nothing red. Filed 2026-09-03; returned from the icebox 2026-09-25 by consult, the modules re-checked.
+
 ## Technical Debt
 
 ### gate-sdk-remainder-brevity
@@ -604,18 +632,6 @@ installer/SPEC.md §Consumer payload says the compiled artifact is never the ado
 
 **Cost while deferred:** a re-run overwrites a path the adopter moved away from. Filed 2026-08-21; returned from the icebox 2026-09-25 by consult, the literal re-grepped.
 
-### non-gate-arm-testing-floor-unstated
-
-[cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
-
-a non-gate arm's testing floor is unstated, and four ship with no test module (`value_rollup.rs`, `usage_trend.rs`, `install_hooks.rs`, `md_unwrap.rs`).
-
-**Deliverable:** the floor stated at gate-sdk/SPEC.md §The non-gate arm, and the four arms brought to it.
-
-**Taken into non-gate-arm-contract — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the floor is a new rule beside the section's "owes no fixture pair" sentence, so /spec authors it and promotes this entry. Not push-needing: the four arms' tests run locally.
-
-**Cost while deferred:** an arm can change behaviour with nothing red. Filed 2026-09-03; returned from the icebox 2026-09-25 by consult, the modules re-checked.
-
 ### crate-arms-relink-under-worker-pool
 
 [cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
@@ -745,18 +761,6 @@ unpinned runner-image labels change the CI floor with no tree edit: `ubuntu-late
 **Deliverable:** a pin-or-ride decision per label before 2026-10-19, and each workflow brought to it; a ride states which run first witnesses the new image.
 
 **Cost while deferred:** the first push after 2026-10-19 runs on an image no push has tried, and a red there costs a hotfix push. Filed 2026-09-25 to the gap inbox by the lead from the notices on gate-sdk-framework-brevity's closing push; promoted 2026-09-25 at the next iteration's scope from the carried bullet. Owner lookup: `ubuntu`, `runner image`, `image label` in this file — none.
-
-### harness-arm-argv-unstated
-
-[cost: session/low] [surface: gate-sdk]
-
-`--usage-poll` and `--statusline` ignore their argv, so a surplus or misspelt argument is dropped at exit 0. gate-sdk/SPEC.md §The harness-integration arm states argv for `--hook` alone, and `--statusline` is in the fail-open set, so whether either may refuse an argument is unstated. Refusing one could blank the status line on an argument the harness appends.
-
-**Deliverable:** the section states each arm's argv, either refusal at exit 2 or dropped under fail-open with the ground, and the arms plus a unit test follow it.
-
-**Taken into non-gate-arm-contract — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** /spec authors its amendment and promotes it, with [non-gate-arm-testing-floor-unstated](#non-gate-arm-testing-floor-unstated) on the same section.
-
-**Cost while deferred:** a mistyped flag to either arm reads as success. Filed 2026-09-25 to the gap inbox by gate-sdk-framework-brevity's build, which also named `--run-validate`; that member was fixed at this close. Promoted 2026-09-25 at its close. →fix fails because the fail-open reading is a SPEC decision a close cannot take. Re-verified at the drain: `--usage-poll --bogus` and `--statusline --bogus` both exit 0. Owner lookup: `statusline`, `usage-poll` in this file — none.
 
 ## Icebox
 
