@@ -350,18 +350,6 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 **Cost while deferred:** low and bounded — every entry needing discrimination keeps buying it with text against the entry budget. Filed 2026-09-01 by close under CLAUDE.md §Housekeeping's operator-directed exception; it rides no cut and is no hotfix.
 
-### local-only-files-write-back-untriggered
-
-[cost: event/low] [surface: lifecycle-kit]
-
-the consumer's local-only companion files have read triggers at three skills and no write-back trigger. A consult audit found the private brief still carrying forward memory for two shipped rungs, its truncate-on-landing rule run by no stage (close's lesson drain routes only private-rule discards there); the ops runbook's desired-state verifier had no recorded run and no tracked trigger; and `check-queue-slug-liveness` reads the prose-surface globs by bold code only, so a plain-code retired slug on a local-only surface passed every battery.
-
-**Owed:** (a) a close drain step truncating the consumer's private-brief forward memory for each unit shipped, as a template slot naming the consumer's surface; (b) a slot in release-sweep or close's audit classes running the consumer's out-of-tree state verifier, slot-bound and never a path literal; (c) weigh a retired-slug arm over plain code on the local-only globs.
-
-**Refused in the consult:** leaving `/consult` as the only maintenance channel.
-
-**Cost while deferred:** local-only surfaces drift until a consult happens to audit them. Filed 2026-09-18 to the gap inbox by the consult that audited the local-only files, after `external-install-evidence`'s close; promoted to Deferred at the next scope.
-
 ### front-door-demo-unreachable
 
 [cost: event/high] [surface: docs]
@@ -1440,12 +1428,10 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 `check-docs-cmd` assertion (C) misses a retired path cited from the queue, which is outside its manifest corpus and whose `<path>:<line>` token fails the path shape.
 
-## Done
+### local-only-files-write-back-untriggered
 
-- non-gate-arm-testing-floor-unstated
-- emit-per-arm-help-residue
-- harness-arm-argv-unstated
-- canonicalize-extended-length-prefix
-- gate-sdk-remainder-brevity
+The consumer's local-only companion files (private brief, ops runbook) have read triggers but no write-back trigger, so shipped-unit forward memory and an out-of-tree state verifier drift until a consult audits them; owed are close and release-sweep template slots for both, and a retired-slug arm over plain code on the local-only globs.
+
+## Done
 
 ## Lessons Learned
