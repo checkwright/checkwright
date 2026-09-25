@@ -118,7 +118,7 @@ This repo lists `CLAUDE.md` in the corpus (delta 5). CLAUDE.md's two sentences o
 
 ### (6) The three moves in gate-sdk §The port-candidate criteria and §The first cohort {design-bearing}
 
-**Not yet applied.** Both sections of gate-sdk/SPEC.md take the three moves. Afterwards neither section has a `check-prose-bounds` finding or a `check-provenance-seam` finding.
+**Applied.** Both sections of gate-sdk/SPEC.md take the three moves. Afterwards neither section has a `check-prose-bounds` finding or a `check-provenance-seam` finding.
 
 - **Keep** every criterion, its test and its engineering ground, and every rule the cohort selection states.
 - **Send to history** the dated oracle runs, the per-member accounts of how a port went, and the retirement-record narration of shell forms since deleted. The commits that landed them already carry them. This absorbs `port-archaeology-restatement-residue`, retired to Done at this amendment's pairing.
