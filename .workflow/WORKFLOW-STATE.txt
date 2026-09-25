@@ -10,3 +10,4 @@ gate-sdk-framework-brevity build a1e7c616 2026-09-25 1800a66a
 gate-sdk-framework-brevity build a47fee27 2026-09-25 a4696125
 gate-sdk-framework-brevity validate ad2d6a9b 2026-09-25 095cc147
 gate-sdk-framework-brevity validate aae65f7e 2026-09-25 521f9c41
+gate-sdk-framework-brevity close a420efc2 2026-09-25 58c27837
