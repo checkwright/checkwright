@@ -21,3 +21,6 @@
 
 # spec: guard-kit/SPEC.md §The generic ruleset — rule `worktree_confinement`'s admitted read from a linked worktree (default read-only); off admits none, leaving the harness's read tool the one route to a main-checkout file
 # GUARD_KIT_WORKTREE_READS = off
+
+# spec: guard-kit/SPEC.md §Layout and configuration — the PowerShell host the scratch runner hands a .ps1 body to (default empty, which is off); name pwsh or powershell, bare or as a path
+# GUARD_KIT_SCRATCH_POWERSHELL = pwsh

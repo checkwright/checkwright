@@ -122,6 +122,8 @@ want ps-journal        "$d" fallthrough "Add-Content -Path $main/.tmp/journal.md
 want ps-no-admission   "$d" block "grep -rn foo $main/docs" "$refusal"
 checks=$((checks + 1))
 ! grep -qF "read-only pipeline" "$SANDBOX/err" || { echo "  FAIL [ps-no-admitted-read]: the PowerShell refusal offers the admitted read — $(cat "$SANDBOX/err")"; fails=$((fails + 1)); }
+# rule `script_interpreter`'s PowerShell form steers a main-checkout scratch body to the worktree's own scratch dir
+want ps-main-scratch   "$d" block "& $main/.tmp/x.ps1" "own scratch dir ($wt/.tmp)"
 tool=Bash
 
 # --- rules `git_mutation_under_producer`, `background_no_record` and `bounded_wait`'s arm (B) resolve the scratch dirs against the main checkout, the liveness
@@ -148,5 +150,5 @@ want producer-own      "$r" fallthrough "git commit -m x"
 git -C "$main" worktree remove --force "$wt"
 
 [[ "$fails" -eq 0 ]] || { echo "worktree-confinement.test: $fails of $checks assertion(s) failed"; exit 1; }
-echo "worktree-confinement.test: ok ($checks assertions; from a linked worktree the journal append under the main scratch dir and read-only searches of the main checkout pass, every write naming the main checkout outside its scratch dir is refused with the loaded roster named, a PowerShell call meets the same refusal with no admitted read, a write in the own worktree is not the rule's, 'off' refuses the search and keeps the journal, a program-bearing tool is never admitted, and the liveness record resolves to the main checkout's scratch dir for the launch, its grant and the git-write hold)"
+echo "worktree-confinement.test: ok ($checks assertions; from a linked worktree the journal append under the main scratch dir and read-only searches of the main checkout pass, every write naming the main checkout outside its scratch dir is refused with the loaded roster named, a PowerShell call meets the same refusal with no admitted read and has a main-checkout scratch body steered to the own scratch dir, a write in the own worktree is not the rule's, 'off' refuses the search and keeps the journal, a program-bearing tool is never admitted, and the liveness record resolves to the main checkout's scratch dir for the launch, its grant and the git-write hold)"
 exit 0

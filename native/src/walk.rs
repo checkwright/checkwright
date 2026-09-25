@@ -910,7 +910,7 @@ fn has_meta(s: &str) -> bool {
 // spec: gate-sdk/SPEC.md §Porting to Rust does not retire dialect exposure — the descent's one
 // speller. `Path::join` appends `MAIN_SEP`, which is not the declared dialect's separator, and the
 // fs answering it is what makes the wrong spelling survive to a `/`-splitting reader.
-fn child(dir: &Path, name: &str) -> PathBuf {
+pub fn child(dir: &Path, name: &str) -> PathBuf {
     let d = dir.display().to_string();
     if d.is_empty() {
         return PathBuf::from(name);

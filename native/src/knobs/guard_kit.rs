@@ -40,6 +40,7 @@ pub const KIT: Kit = Kit {
             &["python", "python3", "node", "deno", "ruby", "perl", "php", "zsh"],
         ),
         Row::scalar("GUARD_KIT_WORKTREE_READS", "read-only"),
+        Row::scalar("GUARD_KIT_SCRATCH_POWERSHELL", ""),
         Row::indexed("GUARD_KIT_CONSUMER_RULES_CMD", &[]),
     ],
     validate: Some(("guard config", validate)),
@@ -50,11 +51,20 @@ pub const KIT: Kit = Kit {
 };
 
 // spec: guard-kit/SPEC.md §Layout and configuration — guard-kit rule `worktree_confinement`'s admission selector takes its two
-// values only, so a misspelt `off` refuses rather than reads as the default
+// values only, so a misspelt `off` refuses rather than reads as the default; the PowerShell host is
+// empty or a program named `pwsh` or `powershell`, read as `PATH` names it
 fn validate(v: &Values) -> Vec<String> {
     let mut errs: Vec<String> = Vec::new();
     if let Some(s) = scalar(v, "GUARD_KIT_WORKTREE_READS").filter(|s| !matches!(*s, "read-only" | "off")) {
         errs.push(format!("GUARD_KIT_WORKTREE_READS must be read-only|off (got '{}')", s));
+    }
+    if let Some(s) = scalar(v, "GUARD_KIT_SCRATCH_POWERSHELL")
+        .filter(|s| !s.is_empty() && !matches!(crate::programs::name_of(s).as_str(), "pwsh" | "powershell"))
+    {
+        errs.push(format!(
+            "GUARD_KIT_SCRATCH_POWERSHELL must be empty, or name pwsh or powershell (got '{}')",
+            s
+        ));
     }
     errs
 }

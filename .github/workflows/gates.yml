@@ -568,6 +568,26 @@ jobs:
         shell: bash
         run: bash gate-sdk/bin/run-gates.sh --run-guard-tests
 
+      # Binding. The oracle for the scratch runner's two paths on the host the
+      # PowerShell path exists for (guard-kit/SPEC.md §scratch-run): Git for
+      # Windows' bash runs the bash path, the window case included, on the
+      # artifact the normalize step placed, and the per-host cases run under
+      # pwsh and Windows PowerShell 5.1 both. A host missing from PATH would
+      # skip its cases green, so the step reds unless both ran.
+      - name: scratch runner under both PowerShells
+        shell: bash
+        run: |
+          set -uo pipefail
+          source gate-sdk/lib/gate.sh
+          out="$(GATE_SDK_NATIVE_BIN="$PWD/$(gate_native_bin)" bash guard-kit/gate-tests/scratch-run.test.sh 2>&1)"
+          rc=$?
+          printf '%s\n' "$out"
+          [[ "$rc" -eq 0 ]] || exit "$rc"
+          grep -qF "PowerShell hosts run: pwsh powershell)" <<<"$out" || {
+            echo "::error::the scratch runner's PowerShell cases did not run under both pwsh and powershell"
+            exit 1
+          }
+
       # Binding. The oracle for this host's liveness predicate over both pid
       # namespaces (evidence-kit/SPEC.md §The producer-liveness lock), against
       # `Get-Process` as ground truth, and for the record guard-kit rule

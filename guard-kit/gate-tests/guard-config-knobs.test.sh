@@ -25,7 +25,7 @@ payload() {
     local c="$1"
     c="${c//\\/\\\\}"
     c="${c//\"/\\\"}"
-    printf '{"tool_name":"Bash","tool_input":{"command":"%s"}}' "$c"
+    printf '{"tool_name":"%s","tool_input":{"command":"%s"}}' "${TOOL:-Bash}" "$c"
 }
 
 # One member call under a knob file, from a scratch checkout: stdout to $tmp/out, stderr to
@@ -127,6 +127,19 @@ want   "emitter-chain"      "$s" "echo; touch x" 2 "run 'echo' $steer"
 grants "star-ro-tail"       "$s" "make build | head -3" allow
 grants "star-args-ro-tail"  "$s" "make build --jobs 2 | head -3" withheld
 
+# --- GUARD_KIT_SCRATCH_POWERSHELL: set, rule `script_interpreter`'s arm (c) steers a PowerShell
+#     scratch body to the runner's PowerShell path, the door spelled as a PowerShell command; empty,
+#     it names the knob and steers to a bash body; a value naming no PowerShell host refuses every call
+printf 'GUARD_KIT_SCRATCH_POWERSHELL = pwsh\n' >"$tmp/ps-host.knobs"
+printf 'GUARD_KIT_SCRATCH_POWERSHELL = python3\n' >"$tmp/ps-bad.knobs"
+TOOL=PowerShell want "ps-host-steer"  "$tmp/ps-host.knobs"  "& .tmp/x.ps1" 2 "' --scratch-run <script>.ps1 [args…]'"
+TOOL=PowerShell want "ps-host-door"   "$tmp/ps-host.knobs"  "& .tmp/x.ps1" 2 "'& '"
+checks=$((checks + 1))
+grep -qF "is off in this project" "$tmp/err" && { echo "  FAIL [ps-host-no-off-text]: the knob-off steer rode a set knob: $(cat "$tmp/err")"; fails=$((fails + 1)); }
+TOOL=PowerShell want "ps-host-off"    "$tmp/defaults.knobs" "& .tmp/x.ps1" 2 "GUARD_KIT_SCRATCH_POWERSHELL is empty"
+TOOL=PowerShell want "ps-host-off-bash-body" "$tmp/defaults.knobs" "& .tmp/x.ps1" 2 "Write the body as a bash script"
+want "ps-host-refused" "$tmp/ps-bad.knobs" "git status" 2 "GUARD_KIT_SCRATCH_POWERSHELL must be empty, or name pwsh or powershell (got 'python3')"
+
 # --- a refused config blocks with the refusal's own text, and no rule runs
 printf 'GUARD_KIT_SEARCH_TOOLS\n' >"$tmp/malformed.knobs"
 want "missing-knob-file"   "$tmp/absent.knobs"    "cat README.md" 2 "GUARD_KIT_KNOB_FILE names $tmp/absent.knobs"
@@ -153,5 +166,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "guard-config-knobs.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "guard-config-knobs.test: ok ($checks assertions; GUARD_KIT_SEARCH_TOOLS fires rules \`find_glob\` and \`git_grep\` on its own member each and leaves them inert when empty, and each firing corrective names its bare fallback; GUARD_KIT_RO_FORMS grants an added roster member only once declared, and a consumer entry replaces the kit's declaration; rule `git_c_root`'s arm (d) fires on a respelled path naming the knob's resolved file and not on a differing one; the member blocks with the refusal on a missing or malformed knob file and runs no rule; the steer door is gate_native_bin_spelled's spelling)"
+echo "guard-config-knobs.test: ok ($checks assertions; GUARD_KIT_SEARCH_TOOLS fires rules \`find_glob\` and \`git_grep\` on its own member each and leaves them inert when empty, and each firing corrective names its bare fallback; GUARD_KIT_RO_FORMS grants an added roster member only once declared, and a consumer entry replaces the kit's declaration; rule \`git_c_root\`'s arm (d) fires on a respelled path naming the knob's resolved file and not on a differing one; GUARD_KIT_SCRATCH_POWERSHELL steers a PowerShell scratch body to the runner's PowerShell path when set, to a bash body when empty, and refuses a value naming no PowerShell host; the member blocks with the refusal on a missing or malformed knob file and runs no rule; the steer door is gate_native_bin_spelled's spelling)"
 exit 0

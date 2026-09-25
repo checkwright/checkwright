@@ -138,6 +138,15 @@ pub fn rm_tracked(ctx: &Ctx) -> Decided {
     }
 }
 
+// spec: guard-kit/SPEC.md §The generic ruleset — a path word as the rule compares it: under
+// PowerShell `\` folds to `/`, rule `worktree_confinement`'s precedent.
+fn path_word(ctx: &Ctx, w: &str) -> String {
+    match ctx.shell() {
+        Shell::PowerShell => w.replace('\\', "/"),
+        Shell::Bash => w.to_string(),
+    }
+}
+
 // spec: guard-kit/SPEC.md §The generic ruleset — the interpreter classification: arm (a) the bash/sh
 // pair the runner serves, arm (b) the interpreter roster.
 fn interpreter_arm(ctx: &Ctx, w: &str) -> Option<char> {
@@ -148,10 +157,35 @@ fn interpreter_arm(ctx: &Ctx, w: &str) -> Option<char> {
     ctx.host().interpreters.iter().any(|i| i == w).then_some('b')
 }
 
+// spec: guard-kit/SPEC.md §The rule roster — arm (c)'s host word: the final path component less a
+// trailing `.exe`, compared without regard to case under PowerShell.
+fn powershell_host(ctx: &Ctx, w: &str) -> bool {
+    let base = w.rsplit('/').next().unwrap_or(w);
+    match ctx.shell() {
+        Shell::PowerShell => {
+            let b = base.to_ascii_lowercase();
+            matches!(b.strip_suffix(".exe").unwrap_or(&b), "pwsh" | "powershell")
+        }
+        Shell::Bash => matches!(base.strip_suffix(".exe").unwrap_or(base), "pwsh" | "powershell"),
+    }
+}
+
 enum Body {
     Inline,
     File(String),
     Stdin,
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — a redirect word in either reader's grammar: `Some`
+// with whether it stands alone and so takes the next word as its target.
+fn redirect_word(tok: &str) -> Option<bool> {
+    let t = tok.trim_start_matches(|c: char| c.is_ascii_digit() || c == '*' || c == '&');
+    let op = t.strip_prefix(">>").or_else(|| t.strip_prefix('>')).or_else(|| t.strip_prefix('<'));
+    let lead = tok.len() - t.len();
+    match op {
+        Some(rest) if lead <= 1 || tok.starts_with("&>") => Some(rest.is_empty()),
+        _ => None,
+    }
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — an interpreter takes its program body from a -c/-e
@@ -163,8 +197,6 @@ fn interpreter_body(seg: &str, arm: char) -> Option<Body> {
             skip = false;
             continue;
         }
-        let digit_op = |op: &str| tok.len() == 1 + op.len() && tok.as_bytes()[0].is_ascii_digit() && &tok[1..] == op;
-        let digit_glued = |op: char| tok.len() >= 2 && tok.as_bytes()[0].is_ascii_digit() && tok[1..].starts_with(op);
         match tok {
             "-c" | "--command" | "-m" | "--module" => return Some(Body::Inline),
             "-e" | "--eval" => {
@@ -173,10 +205,8 @@ fn interpreter_body(seg: &str, arm: char) -> Option<Body> {
                 }
             }
             "-" | "/dev/stdin" | "/dev/fd/0" => return Some(Body::Stdin),
-            "<" | ">" | ">>" | "&>" | "&>>" => skip = true,
-            _ if digit_op(">") || digit_op(">>") || digit_op("<") => skip = true,
-            _ if tok.starts_with('<') || tok.starts_with('>') || digit_glued('>') || digit_glued('<') => {}
             "--" => {}
+            _ if redirect_word(tok).is_some() => skip = redirect_word(tok) == Some(true),
             _ if tok.starts_with('-') => {
                 let rest = &tok[1..];
                 if rest.starts_with('-') || !rest.chars().all(|c| "BEIOilnstuvx".contains(c)) {
@@ -184,6 +214,76 @@ fn interpreter_body(seg: &str, arm: char) -> Option<Body> {
                 }
             }
             _ => return Some(Body::File(tok.to_string())),
+        }
+    }
+    Some(Body::Stdin)
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — a PowerShell host's options, each matched by a prefix
+// of its name without regard to case; the first three carry the body, the valued ones skip their
+// value, and the order settles a prefix two names share.
+const PS_BODY_OPTS: &[&str] = &["file", "command", "encodedcommand"];
+const PS_VALUED_OPTS: &[&str] = &[
+    "executionpolicy",
+    "workingdirectory",
+    "windowstyle",
+    "outputformat",
+    "inputformat",
+    "configurationname",
+    "configurationfile",
+    "custompipename",
+    "settingsfile",
+    "psconsolefile",
+    "version",
+];
+const PS_SWITCHES: &[&str] = &[
+    "noprofile",
+    "nologo",
+    "noninteractive",
+    "noexit",
+    "interactive",
+    "login",
+    "sta",
+    "mta",
+    "noprofileloadtime",
+];
+
+// spec: guard-kit/SPEC.md §The rule roster — the host's own CLI grammar: `-File`'s operand or the
+// first bare word is the body, `-Command` and `-EncodedCommand` carry it inline, a `-` after `-File`
+// or `-Command` or no body word at all is stdin, and any other option declines.
+fn powershell_body(seg: &str) -> Option<Body> {
+    let toks = words(seg);
+    let mut i = 1usize;
+    while i < toks.len() {
+        let tok = toks[i];
+        i += 1;
+        if let Some(alone) = redirect_word(tok) {
+            i += usize::from(alone);
+            continue;
+        }
+        if tok == "-" {
+            return Some(Body::Stdin);
+        }
+        let Some(name) = tok.strip_prefix('-').map(str::to_ascii_lowercase) else {
+            return Some(Body::File(tok.to_string()));
+        };
+        let is = |full: &str| !name.is_empty() && full.starts_with(name.as_str());
+        match PS_BODY_OPTS.iter().find(|o| is(o)) {
+            Some(&"file") => {
+                return match toks.get(i) {
+                    Some(&"-") => Some(Body::Stdin),
+                    Some(w) => Some(Body::File(w.to_string())),
+                    None => None,
+                }
+            }
+            Some(&"command") if toks.get(i) == Some(&"-") => return Some(Body::Stdin),
+            Some(_) => return Some(Body::Inline),
+            None => {}
+        }
+        if matches!(name.as_str(), "ep" | "wd") || PS_VALUED_OPTS.iter().any(|o| is(o)) {
+            i += 1;
+        } else if !PS_SWITCHES.iter().any(|o| is(o)) {
+            return None;
         }
     }
     Some(Body::Stdin)
@@ -201,10 +301,11 @@ pub enum Home {
 // written, and from a linked worktree a member of the main checkout or of the session's own
 // worktree, each compared lexically with `..` folded.
 fn scratch_home(ctx: &Ctx, p: &str) -> Option<Home> {
+    let p = path_word(ctx, p);
     let h = ctx.host();
     let own = h.own_scratch_homes();
     if !own.is_empty() {
-        let t = h.lexical(p);
+        let t = h.lexical(&p);
         let main_homes = h.scratch_homes();
         if main_homes.iter().zip(&own).any(|(m, o)| m != o && under(&t, &h.lexical(m))) {
             return Some(Home::Main);
@@ -220,29 +321,75 @@ fn scratch_home(ctx: &Ctx, p: &str) -> Option<Home> {
 }
 
 fn names_scratch(ctx: &Ctx, s: &str) -> bool {
+    let s = path_word(ctx, s);
     ctx.host().scratch_prefixes().iter().any(|(bare, _)| s.contains(bare.as_str()))
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — the bash expansion decline: a substitution is a
+// body source this rule reads, so only the parameter and process forms decline.
+fn declines_expansion(raw: &str) -> bool {
+    grep_q(r"\$\{|<\(|>\(|\$[A-Za-z_]", raw)
+}
+
+pub type Reach = (char, String, String, Home);
+
+// spec: guard-kit/SPEC.md §The rule roster — arm (c) case 2, the PowerShell invocation forms: the
+// call or dot-source operator before a scratch path, a scratch path in command position, and
+// `Invoke-Expression` in a segment or behind a producer naming one.
+fn powershell_form(ctx: &Ctx, seg: &str, producers: &[String]) -> Option<Reach> {
+    let toks = words(seg);
+    let word = *toks.first()?;
+    let hit = |src: &str, home: Home| Some(('c', word.to_string(), src.to_string(), home));
+    if matches!(word, "&" | ".") {
+        let next = toks.get(1)?;
+        return scratch_home(ctx, next).and_then(|home| hit(next, home));
+    }
+    if let Some(home) = scratch_home(ctx, word) {
+        return hit(word, home);
+    }
+    if !matches!(word.to_ascii_lowercase().as_str(), "invoke-expression" | "iex") {
+        return None;
+    }
+    let sources = toks[1..].iter().copied().chain(producers.iter().flat_map(|p| words(p)));
+    for tok in sources {
+        if let Some(home) = scratch_home(ctx, tok) {
+            return hit(tok, home);
+        }
+    }
+    None
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `script_interpreter`'s test, a block for it and
 // a predicate for rule `bounded_wait`'s arm (B): the first interpreter taking its body from a scratch
 // path, as its arm, its word and the body source.
-pub fn interpreter_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<(char, String, String, Home)>, Fault> {
+pub fn interpreter_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<Reach>, Fault> {
     let raw = ctx.raw(c)?;
-    if !names_scratch(ctx, raw) || grep_q(r"\$\{|<\(|>\(|\$[A-Za-z_]", raw) {
+    if !names_scratch(ctx, raw) || ctx.expands(c, declines_expansion)? {
         return Ok(None);
     }
+    let ps = ctx.shell() == Shell::PowerShell;
     let s = ctx.view(c, SqDqHd)?;
     for stmt in ctx.statements(&s) {
         let pipes = ctx.pipes(&stmt);
         for (i, pipe) in pipes.iter().enumerate() {
             let seg = command_word(pipe);
-            let word = head_word(&seg).to_string();
+            let word = path_word(ctx, head_word(&seg));
             if word.is_empty() {
                 continue;
             }
-            let Some(arm) = interpreter_arm(ctx, &word) else { continue };
+            if ps {
+                if let Some(r) = powershell_form(ctx, &seg, &pipes[..i]) {
+                    return Ok(Some(r));
+                }
+            }
+            let (arm, body) = if powershell_host(ctx, &word) {
+                ('c', powershell_body(&seg))
+            } else {
+                let Some(arm) = interpreter_arm(ctx, &word) else { continue };
+                (arm, interpreter_body(&seg, arm))
+            };
             let hit = |src: &str, home: Home| Some((arm, word.clone(), src.to_string(), home));
-            match interpreter_body(&seg, arm) {
+            match body {
                 None => continue,
                 Some(Body::File(p)) => {
                     if let Some(home) = scratch_home(ctx, &p) {
@@ -265,34 +412,68 @@ pub fn interpreter_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<(char, String, Str
                         }
                     }
                 }
-                Some(Body::Inline) => {
+                Some(Body::Inline) if !ps => {
                     let subst = text::grep_o(r"`[^`]*`|\$\([^)]*\)", raw);
                     if subst.iter().any(|span| names_scratch(ctx, span)) {
                         return Ok(hit("a command substitution", Home::Here));
                     }
                 }
+                Some(Body::Inline) => {}
             }
         }
     }
     Ok(None)
 }
 
+// spec: guard-kit/SPEC.md §The shell guard — the steer door as the deciding reader's shell runs it:
+// under PowerShell the call operator before the door single-quoted, any `'` doubled.
+fn runner(ctx: &Ctx) -> String {
+    let door = &ctx.host().door;
+    match ctx.shell() {
+        Shell::PowerShell => format!("& '{}' --scratch-run", door.replace('\'', "''")),
+        Shell::Bash => format!("{} --scratch-run", door),
+    }
+}
+
 pub fn script_interpreter(ctx: &Ctx) -> Decided {
     let Some((arm, word, src, home)) = interpreter_reach(ctx, ctx.cmd())? else { return Ok(None) };
-    let runner = format!("{} --scratch-run", ctx.host().door);
+    let runner = runner(ctx);
+    let host = &ctx.host().scratch_powershell;
+    let ps_on = arm == 'c' && !host.is_empty();
+    let inline = if arm == 'c' {
+        "A body carried in the command string — a '-Command' argument, a here-string — is untouched"
+    } else {
+        "A body carried in the command string — a '-c' argument, a heredoc, a herestring — is untouched"
+    };
+    let off = if arm == 'c' && host.is_empty() {
+        "the PowerShell scratch path is off in this project (GUARD_KIT_SCRATCH_POWERSHELL is empty; guard-kit/SPEC.md §scratch-run), and "
+    } else {
+        ""
+    };
     if home == Home::Main {
         let own = ctx.host().own_scratch_homes().into_iter().next().unwrap_or_default();
-        let lead = if arm == 'a' {
-            format!("run a scratch script through the runner from this linked worktree: write it under the worktree's own scratch dir ({own}) and run '{runner} <script> [args…]' there, since the runner refuses a script under the main checkout's scratch dir from here (guard-kit/SPEC.md §scratch-run). This call takes the program body for '{word}' from '{src}'")
+        let lead = if arm == 'a' || ps_on {
+            let script = if ps_on { "<script>.ps1" } else { "<script>" };
+            format!("run a scratch script through the runner from this linked worktree: write it under the worktree's own scratch dir ({own}) and run '{runner} {script} [args…]' there, since the runner refuses a script under the main checkout's scratch dir from here (guard-kit/SPEC.md §scratch-run). This call takes the program body for '{word}' from '{src}'")
+        } else if arm == 'c' {
+            format!("{off}this call takes the program body for '{word}' from '{src}'. Write the body as a bash script under this linked worktree's own scratch dir ({own}) and run it through '{runner} <script> [args…]' there, since the runner refuses a script under the main checkout's scratch dir from here. The body sits")
         } else {
-            format!("scratch execution is bash-only (guard-kit/SPEC.md §scratch-run) and '{word}' is not bash: this call takes its program body from '{src}'. Write the body as a shell script under this linked worktree's own scratch dir ({own}) and run it through '{runner} <script> [args…]' there, since the runner refuses a script under the main checkout's scratch dir from here. The body sits")
+            format!("scratch execution runs in bash, or in PowerShell where the project names a host (guard-kit/SPEC.md §scratch-run), and '{word}' is neither: this call takes its program body from '{src}'. Write the body as a shell script under this linked worktree's own scratch dir ({own}) and run it through '{runner} <script> [args…]' there, since the runner refuses a script under the main checkout's scratch dir from here. The body sits")
         };
-        return block(format!("{lead} in a scratch dir any session can rewrite, so the body reviewed at the permission decision need not be the body that runs; the runner echoes the body as it executes, which is the compensating control a direct run has none of. A body carried in the command string — a '-c' argument, a heredoc, a herestring — is untouched. If you genuinely need the direct form, run it yourself with !<command>."));
+        return block(format!("{lead} in a scratch dir any session can rewrite, so the body reviewed at the permission decision need not be the body that runs; the runner echoes the body as it executes, which is the compensating control a direct run has none of. {inline}. If you genuinely need the direct form, run it yourself with !<command>."));
     }
-    if arm == 'a' {
-        return block(format!("run a scratch script through the runner: '{runner} <script> [args…]' (guard-kit/SPEC.md §scratch-run). This call takes the program body for '{word}' from '{src}', which sits in a scratch dir any session can rewrite, so the body reviewed at the permission decision need not be the body that runs. The runner is allowlistable and echoes the body as it executes, which is the compensating control a direct run has none of. A body carried in the command string — a '-c' argument, a heredoc, a herestring — is untouched. If you genuinely need the direct form, run it yourself with !<command>."));
+    if arm == 'a' || ps_on {
+        let (script, runs) = if ps_on {
+            ("<script>.ps1", format!(", which echoes the body and runs it under the project's PowerShell host ({host})"))
+        } else {
+            ("<script>", String::new())
+        };
+        return block(format!("run a scratch script through the runner: '{runner} {script} [args…]'{runs} (guard-kit/SPEC.md §scratch-run). This call takes the program body for '{word}' from '{src}', which sits in a scratch dir any session can rewrite, so the body reviewed at the permission decision need not be the body that runs. The runner is allowlistable and echoes the body as it executes, which is the compensating control a direct run has none of. {inline}. If you genuinely need the direct form, run it yourself with !<command>."));
     }
-    block(format!("scratch execution is bash-only (guard-kit/SPEC.md §scratch-run) and '{word}' is not bash: this call takes its program body from '{src}' under a scratch dir, where no compensating control reaches it. Write the body as a shell script and run it through '{runner} <script> [args…]', which echoes the body as it executes; a script whose shebang names a non-bash interpreter is refused there too. A body carried in the command string — a '-c' argument, a heredoc, a herestring — is untouched, because the approver and the friction log both see it verbatim. If you genuinely need the direct run, run it yourself with !<command>."))
+    if arm == 'c' {
+        return block(format!("{off}this call takes the program body for '{word}' from '{src}' under a scratch dir, where no compensating control reaches it. Write the body as a bash script under the scratch dir and run it through '{runner} <script> [args…]', which echoes the body as it executes. {inline}, because the approver and the friction log both see it verbatim. If you genuinely need the direct run, run it yourself with !<command>."));
+    }
+    block(format!("scratch execution runs in bash, or in PowerShell where the project names a host (guard-kit/SPEC.md §scratch-run), and '{word}' is neither: this call takes its program body from '{src}' under a scratch dir, where no compensating control reaches it. Write the body as a shell script and run it through '{runner} <script> [args…]', which echoes the body as it executes; a script whose shebang names a non-bash interpreter is refused there too. {inline}, because the approver and the friction log both see it verbatim. If you genuinely need the direct run, run it yourself with !<command>."))
 }
 
 pub fn shell_wrapper(ctx: &Ctx) -> Decided {

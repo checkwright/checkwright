@@ -43,6 +43,24 @@ fallthrough	Remove-Item -Path tracked.md -WhatIf
 fallthrough	Remove-Item -Filter tracked.md scratch.txt
 fallthrough	git rm -q tracked.md
 
+# rule `script_interpreter` — a scratch body run by an invocation form or a host, the knob empty;
+# the runner taking the path as its argument is no body source
+block	& .tmp/x.ps1
+block	.\.tmp\x.ps1
+block	. .tmp/x.ps1
+block	.tmp/x.ps1 a
+block	pwsh -File .tmp/x.ps1
+block	pwsh -nop -f .tmp\x.ps1
+block	powershell -NoProfile -ExecutionPolicy Bypass .tmp/x.ps1
+block	Get-Content -Raw .tmp/x.ps1 | iex
+block	bash .tmp/x.sh
+block	python3 .tmp/x.py
+fallthrough	& tools/build.ps1
+fallthrough	pwsh -File tools/build.ps1
+fallthrough	pwsh -Command 'Get-Date'
+fallthrough	pwsh -Bogus .tmp/x.ps1
+fallthrough	& ./gate-sdk/bin/run-gates.sh --scratch-run .tmp/x.ps1
+
 # the reader's grammar — each a command an applied rule blocks if the reader misreads it
 fallthrough	echo 'a''; cd x'
 block	echo 'a'''; cd x'

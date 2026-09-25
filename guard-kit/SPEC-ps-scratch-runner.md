@@ -33,7 +33,7 @@ No delta rests on Windows PowerShell 5.1's documented behaviour. Delta 2 keeps t
 
 ### (1) The runner executes the bytes it echoed {design-bearing}
 
-**Not yet applied.** In `native/src/emit/scratch_run.rs` and guard-kit/SPEC.md §scratch-run.
+**Applied at build; the merge waits on the Windows leg being read.** In `native/src/emit/scratch_run.rs` and guard-kit/SPEC.md §scratch-run.
 
 After the containment test passes and the body is read, and **before the echo**, the runner writes those bytes to a **snapshot**:
 
@@ -55,7 +55,7 @@ The replacement text for §scratch-run, one paragraph after **Fail-closed on rea
 
 ### (2) The PowerShell path {design-bearing}
 
-**Not yet applied.** In `native/src/emit/scratch_run.rs` and guard-kit/SPEC.md §scratch-run.
+**Applied at build; the merge waits on the Windows leg being read.** In `native/src/emit/scratch_run.rs` and guard-kit/SPEC.md §scratch-run.
 
 **The interpreter comes from the file, and the extension decides it.**
 
@@ -89,7 +89,7 @@ The **Content-agnostic generic mechanism** paragraph's "no kit knob is added" be
 
 ### (3) The knob {mechanical}
 
-**Not yet applied.**
+**Applied at build; the merge waits on the Windows leg being read.**
 
 - **The knob table.** `native/src/knobs/guard_kit.rs` gains `Row::scalar("GUARD_KIT_SCRATCH_POWERSHELL", "")`.
 - **The validator** refuses a non-empty value whose program name, as `programs::name_of` reads it (the final path component, less the host's executable suffix), is neither `pwsh` nor `powershell`. The message is `GUARD_KIT_SCRATCH_POWERSHELL must be empty, or name pwsh or powershell (got '<value>')`. A refused value blocks every guarded call and refuses the runner, which is §The shell guard's loud posture for a refused knob read.
@@ -103,7 +103,7 @@ The **Content-agnostic generic mechanism** paragraph's "no kit knob is added" be
 
 ### (4) Rule `script_interpreter` gains its PowerShell form and a PowerShell arm {design-bearing}
 
-**Not yet applied.** In guard-kit/SPEC.md §The rule roster, item `script_interpreter`, and in `native/src/guard/rules/reach.rs` and `native/src/guard/rules/mod.rs`. The item gains `Shells \`bash\` and \`powershell\`.`, and its table row names `BOTH`. Its declarations are unchanged: the expansion decline reads through `ctx.expands`, which the `raw` declaration covers (§The generic ruleset, the expansion decline).
+**Applied at build; the merge waits on the Windows leg being read.** In guard-kit/SPEC.md §The rule roster, item `script_interpreter`, and in `native/src/guard/rules/reach.rs` and `native/src/guard/rules/mod.rs`. The item gains `Shells \`bash\` and \`powershell\`.`, and its table row names `BOTH`. Its declarations are unchanged: the expansion decline reads through `ctx.expands`, which the `raw` declaration covers (§The generic ruleset, the expansion decline).
 
 **A third arm, (c), the PowerShell body.** It is checked before arm (b), so a consumer that lists `pwsh` in `GUARD_KIT_SCRIPT_INTERPRETERS` still meets (c). It fires in either of two cases.
 
@@ -152,7 +152,7 @@ Each falls through.
 
 ### (5) The ruled classes and the native-Windows section {mechanical}
 
-**Not yet applied.**
+**Applied at build; the merge waits on the Windows leg being read.**
 
 - **guard-kit/SPEC.md §The generic ruleset.** The two-part test's second half gains the vocabulary this rule reads: "…a roster of cmdlet names and their built-in aliases, **or the shell's own invocation grammar — the call and dot-source operators, a path in command position, and its hosts' command-line options** — which is shell-substrate knowledge this section's clause already admits." The fourth bullet of the ruled classes, "The harm rule whose PowerShell form needs mechanism the kit does not have (rule `script_interpreter`)…", is deleted, since no rule is left in that class.
 - **guard-kit/SPEC.md §The hook on native Windows, *What a PowerShell call meets*.** The **honest limit** sentence becomes: "A PowerShell script run off a scratch-dir body meets rule `script_interpreter`, whose steer names the runner's PowerShell path where the project names a host (`GUARD_KIT_SCRATCH_POWERSHELL`) and a bash body under the runner where it names none (§scratch-run)."
@@ -160,7 +160,7 @@ Each falls through.
 
 ### (6) The tests {mechanical}
 
-**Not yet applied.**
+**Applied at build; the merge waits on the Windows leg being read.**
 
 - **`guard-kit/guard-tests/powershell-cases.tsv`** gains a `# rule \`script_interpreter\`` block, run under the table's default knobs, so the knob is empty:
   - `block`:
@@ -209,7 +209,7 @@ Each falls through.
 
 ### (7) The native-Windows witness {design-bearing}
 
-**Not yet applied.** `.github/workflows/gates.yml`, job `install-smoke-sh-windows`, gains a binding step after `guard decision table under Git Bash`: **scratch runner under both PowerShells**, `shell: bash`, run on the artifact the normalize step placed. It runs `bash guard-kit/gate-tests/scratch-run.test.sh` with `GATE_SDK_NATIVE_BIN` set to the placed artifact. Git for Windows' bash then runs the bash path, the window case included, and the per-host cases run under both `pwsh` and Windows PowerShell 5.1, since the runner carries both. The step's comment names what it is the oracle for: the runner's two paths on the host the PowerShell path exists for.
+**Applied at build; the merge waits on the Windows leg being read.** `.github/workflows/gates.yml`, job `install-smoke-sh-windows`, gains a binding step after `guard decision table under Git Bash`: **scratch runner under both PowerShells**, `shell: bash`, run on the artifact the normalize step placed. It runs `bash guard-kit/gate-tests/scratch-run.test.sh` with `GATE_SDK_NATIVE_BIN` set to the placed artifact. Git for Windows' bash then runs the bash path, the window case included, and the per-host cases run under both `pwsh` and Windows PowerShell 5.1, since the runner carries both. The step's comment names what it is the oracle for: the runner's two paths on the host the PowerShell path exists for.
 
 The `gates` job's fixture-suites step on `ubuntu-latest` already runs this file. That runner carries `pwsh`, as its front-end parity step spawns it on every push, so the pwsh 7 cases also run there on the same push.
 

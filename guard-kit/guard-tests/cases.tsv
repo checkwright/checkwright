@@ -461,6 +461,13 @@ fallthrough	printf 'print(1)' | python3
 # argument to a tracked script rather than as a body
 fallthrough	python3 tools/gen.py
 fallthrough	bash gate-sdk/bin/run-gates.sh --scratch-run .tmp/x.sh
+# arm (c) under Bash: a PowerShell host taking its body from a scratch path, by -File, as its
+# first bare word and with a suffix; a tracked body and an inline command fall through
+block	pwsh -File .tmp/x.ps1
+block	pwsh .tmp/x.ps1
+block	powershell.exe -f .tmp/x.ps1
+fallthrough	pwsh -File tools/x.ps1
+fallthrough	pwsh -c 'Get-Date'
 
 # rule `grant_path_slot` — a committed grant matched only by reaching past its path slot. The
 #           sandbox carries a scratch 'rm -rf .tmp/*' grant and a
