@@ -10,7 +10,7 @@ A kit ships generic mechanism only — the two barred classes, the consumer-conf
 
 ## This repo is governed by its own kits
 
-The gates in [`scripts/gates.list`](scripts/gates.list) run on this tree — dogfooding is day-one, not optional, though *which* gates register is a tuning decision here as for any consumer (`operator 2026-09-10`). Every command below runs the gate binary at `GATE_SDK_NATIVE_BIN` (`bash gate-sdk/bin/run-gates.sh <arm>` resolves it); before committing, run the full battery (`--run`) and the fixture suite of every kit the edit *reaches* — for a shared `native/src` module, every kit whose gates it implements, never the kit you edited; runner per kit in [README.md](README.md) §This repo, governed.
+The gates in [`scripts/gates.list`](scripts/gates.list) run on this tree — dogfooding is day-one and total, nothing exempt as unread by adopters (`operator 2026-09-25`), though *which* gates register is a tuning decision here as for any consumer (`operator 2026-09-10`). Every command below runs the gate binary at `GATE_SDK_NATIVE_BIN` (`bash gate-sdk/bin/run-gates.sh <arm>` resolves it); before committing, run the full battery (`--run`) and the fixture suite of every kit the edit *reaches* — for a shared `native/src` module, every kit whose gates it implements, never the kit you edited; runner per kit in [README.md](README.md) §This repo, governed.
 
 The git index is shared with any concurrent session: check `git status` for a foreign staged path before `git add`, or stage and commit in one motion.
 
@@ -58,13 +58,13 @@ The cross-kit delivery rules live in [doctrine-kit/DOCTRINE.md](doctrine-kit/DOC
 
 ## Agent execution (all stages)
 
-Delegation is pre-authorized for read-heavy audits and mechanical rename/merge sweeps — no ask needed. **Full protocol: `/agent-execution`.** The safety rules, resume-journal mechanics, verify-after-commit set, and gate-driven worklist load behind that trigger, so they are not resident here.
+Delegation is pre-authorized for read-heavy audits and mechanical rename/merge sweeps. **Full protocol: `/agent-execution`.** The safety rules, resume-journal mechanics, verify-after-commit set, and gate-driven worklist load behind that trigger, so they are not resident here.
 
 ## Housekeeping
 
 - `.tmp/` is gitignored disposable scratch the scope boundary wipes; `.metric/` is gitignored persistent, account-bearing measurement, **never committed**; `.workflow/` holds tracked projections beside gitignored capture (gate-sdk/SPEC.md §The workflow directory).
 - Local-only and gitignored: `BRIEF.local.md` (private brief), `ENV.local.md` (machine profile, context-kit/SPEC.md §bin/env-probe) and `OPS.local.md`. Consult `OPS.local.md` before any domain, repo-settings, release or push work; run its account step before **any GitHub write**, per write, never per session.
-- `reserve/` holds the crates.io name-reservation placeholder — do not develop in it (the npm name is the `installer/` package below).
+- `reserve/` holds the crates.io name-reservation placeholder — do not develop in it.
 - `native/` is the gate binary's Rust crate and **not a kit** (no `checks/`, no `smoke/`). The commit-time obligation is `bash gate-sdk/bin/build-native.sh` **plus** the battery; neither discharges the other, and an editor diagnostic discharges neither (gate-sdk/SPEC.md §Porting a gate to the binary substrate).
 - The governed repo-meta pinned in `scripts/core-files.list` is tracked and gated like any doc; the fixture is the unit of contribution, so edit the guide, not GitHub UI settings.
 - `ROADMAP.md` is a generated root projection of this queue's curated `[roadmap:]` tags — never hand-edit its marker block.

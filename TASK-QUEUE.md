@@ -28,7 +28,7 @@ a balanced Liquid token a docs page means literally (`{{ x }}`, `{% x %}`) parse
 
 shell utilities an agent runs for read-only work can also write: `sed -i`, `find -delete` and `-exec`, awk's `system()`, `tee`, redirects. The operator's shape: block side-effect-capable utilities and steer to side-effect-free arms of the gate binary that can be allowlisted and advertised as their replacements. The seed is gate-sdk's fence-safe arm set, `FENCE_SAFE_ARMS` (gate-sdk/SPEC.md, arms that reach no network and write nowhere). It succeeds guard-kit rule `worktree_confinement`'s interim read-only Bash allowlist for isolated children, whose advertised set and refusal message are worded to point at these tools later.
 
-**Deliverable:** the arm roster that replaces each blocked read, the guard rules that steer to it, and the allowlist entries. New governed names, so it owes an amendment and passes the enhancement admission filter only on an arm its authoring session argues.
+**Deliverable:** the arm roster that replaces each blocked read, the guard rules that steer to it, and the allowlist entries. New governed names, so it owes an amendment.
 
 **Cost while deferred:** a read-only shell call keeps a write path the guard must judge per call, and an isolated child's read set stays the interim allowlist. Filed 2026-09-23 to the gap inbox by the lead on an operator direction; the operator recalls earlier discussion and no tracked record was found. Promoted 2026-09-23 at seam-and-stage-residue's close drain: an initiative with new names, never a drain fix. Owner lookup: `side-effect`, `FENCE_SAFE`, `dual-use`, `sed -i` in this file — none. Surface also delegation-kit and gate-sdk.
 
@@ -39,8 +39,6 @@ shell utilities an agent runs for read-only work can also write: `sed -i`, `find
 this host lacks `pwsh` and `dash`, so the front-end parity check's PowerShell half and every dash-only path first run on CI. At gate-sdk-blind-spots, build changed `gate-sdk/bin/run-gates.ps1` and added a `.ps1` ASCII arm; the Windows legs at close's watched push were their first real run. They passed, but a red would have cost a second push. Docker is available on the development host; a cold daemon start took more than 120s.
 
 **Deliverable:** a contributor-local arm or documented recipe running the pwsh and dash suites in containers, skipping cleanly when Docker is absent. Contributor-only, never an adopter requirement (gate-sdk/SPEC.md §The adopter constraints).
-
-**Enhancement admission filter:** contributor tooling reaching none of the three arms; held Deferred without an operator exception.
 
 **Cost while deferred:** a unit touching a PowerShell or dash path risks a second watched push. Filed 2026-09-23 to the gap inbox on an operator suggestion, lead-relayed, after gate-sdk-blind-spots' close; promoted 2026-09-23 at the next scope. Owner lookup: `docker`, `dash`, `pwsh` in this file — `pwsh` hits only `instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set`, whose subject is a CI leg's binding transition, not a local run.
 
@@ -66,7 +64,7 @@ a surface that disclaims carrying a rule ("stated there and not restated here") 
 
 **Why reachable when general restatement is not:** the predicate is a disclaimer phrase co-located with a content clause — does the sentence around it name the rule's substance rather than only its owner. `check-surface-duplication` and `check-shim-restatement` hold restatement for their own corpora; neither reads a disclaimer.
 
-**Deliverable:** a gate, or an assertion joining an existing restatement gate, over that shape. A feature by the new-names litmus, so it owes an amendment and passes the enhancement admission filter only on an arm its authoring session argues.
+**Deliverable:** a gate, or an assertion joining an existing restatement gate, over that shape. A feature by the new-names litmus, so it owes an amendment.
 
 **Cost while deferred:** each such disclaimer is a licence a later reader trusts, and the copy beside it rots silently. Filed 2026-09-20 to the gap inbox by the close of `adopter-floor-door-remainder`; promoted 2026-09-21 at the next scope's intake, so the record is late and says so. Owner lookup ran over `disclaim`, `not restated here`, `restatement` and the two gates above and found no owner.
 
@@ -83,8 +81,6 @@ nothing shipped lets a customer run the battery under a named config-seam varian
 **Refused:** repurposing the smoke scripts, which are install recipes read as text by the install-disposition gate and bound to this repo's harness; a shipped directory of shell tests, which widens the interpreter surface the adopter constraints shrink.
 
 **Cost while deferred:** an adopter evaluating a knob edits the seam, commits, and learns from the next red; the preview cohort's false-positive dispositions have no cheap rehearsal. Filed 2026-09-11 by consult as a direct entry, the test gap the operator named there.
-
-**Held Deferred by the enhancement admission filter, operator direction 2026-09-21 (lead-relayed):** a shipped adopter arm reaching none of the three arms.
 
 ### plugin-marketplace
 
@@ -126,7 +122,7 @@ foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a fore
 
 **Demand-gated — demand attested (2026-07-23):** the operator holds working foreign-vendor subscriptions and wants read-heavy delegation routed to them for budget headroom, and with three vendors live the N-keyed oracle seam is no longer hypothetical. First slice at promotion: a foreign-CLI executor for the already-pre-authorized read-heavy audit / mechanical-sweep class over a spawned non-interactive CLI process, one adapter per vendor as consumer config — not full stage dispatch.
 
-**Excluded by the enhancement admission filter (2026-09-19 scope):** idle budget headroom, its strongest ground, is none of the three arms; only an operator exception admits it. Its citers ([companion-toolkit-profile](#companion-toolkit-profile), the credential-swap entries) block on none of it.
+**Its citers** ([companion-toolkit-profile](#companion-toolkit-profile), the credential-swap entries) block on none of it.
 
 **Design-memory amendment (2026-07-25):** the TUI relay buys no session resume or token efficiency — both live in the vendor's session store (stateless APIs, the same on-disk transcript replayed against the same server-side prompt cache), so interactive-vs-headless is rendering, not state. Headless warm-resume by session id and JSONL turn events ship on the vendors probed, which makes (1) plumbing.
 
@@ -168,7 +164,7 @@ the interop rung. Govern a tree whose specs an **external spec-authoring toolkit
 
 **Intake provenance:** never declined or costed — the opportunities half of the same operator-commissioned review whose *weaknesses* half filed six launch-facing rungs 2026-07-23, all since landed; the growth half fell outside that intake's stated "top pre-announcement gaps" filter rather than being missed, so the gap is the absent record.
 
-**Enhancement admission filter, engaged 2026-09-20 at scope:** strongest ground is the reputational carry below, and it reaches no arm — the trust arm means a gap in what an adopter must trust, not a claim weaker than its proof; discharge it by qualifying the claim.
+**The cheap alternative, recorded at the 2026-09-20 scope:** discharge the reputational carry below by qualifying the front-door claim rather than proving it.
 
 **Cost while deferred — not zero, and this is the entry's sharpest fact.** `README.md`:16-17 and `docs/index.md`:17-18 both already assert, on the first screen, "It complements the workflow you already run. Keep your spec process, your prompts, your harness." — and docs/orchestration.md, its "It complements your orchestration setup; it does not replace it" sentence, makes the same move for orchestration, a third site found 2026-08-02 at scope. **No queue or roadmap entry backs any of the three with a tested consumer.** Not false — "complements" is far weaker than "integrates with X" — but *published and unproven*, in a project whose whole pitch is that claims are mechanically proven rather than asserted. The carry is reputational and front-door-resident, accruing on every reader rather than with time. Surfaced 2026-08-02 at close, intake pass over the review's unfiled half.
 
@@ -220,7 +216,7 @@ a gate-authoring SDK. `.gate` as the substrate-neutral surface. **Operator-surfa
 
 **Cost while deferred:** each further port hardens substrate-specific assumptions by habit rather than by ruling, and the cheapest moment to keep the seam neutral is before the second language exists — not after.
 
-**Enhancement admission filter, engaged 2026-09-20 at scope:** its strongest ground is the cost-while-deferred line above — each further port hardening substrate assumptions by habit — and that is an internal design cost, none of the three arms: it neither cuts time-to-first-value, closes a trust or supply-chain gap, nor produces external proof. Only an operator exception admits it. **Unlike [heterogeneous-agent-delegation](#heterogeneous-agent-delegation), one citer does block on it:** [gate-tamper-exemption-reader-substrate](#gate-tamper-exemption-reader-substrate) is design-pending precisely on the ruling this entry holds, so declining this entry holds that one too — a cost the decline carries knowingly, not a reason to admit it. Filed 2026-08-02 by build, on an operator ruling, during `native-gate-dispatch-seam`.
+**One citer blocks on it:** [gate-tamper-exemption-reader-substrate](#gate-tamper-exemption-reader-substrate) is design-pending precisely on the ruling this entry holds, so deferring this entry holds that one too. Filed 2026-08-02 by build, on an operator ruling, during `native-gate-dispatch-seam`.
 
 ### gate-tamper-exemption-reader-substrate
 
@@ -359,8 +355,6 @@ the consumer's local-only companion files have read triggers at three skills and
 **Owed:** (a) a close drain step truncating the consumer's private-brief forward memory for each unit shipped, as a template slot naming the consumer's surface; (b) a slot in release-sweep or close's audit classes running the consumer's out-of-tree state verifier, slot-bound and never a path literal; (c) weigh a retired-slug arm over plain code on the local-only globs.
 
 **Refused in the consult:** leaving `/consult` as the only maintenance channel.
-
-**Held Deferred by the enhancement admission filter** (TRAJECTORY.md §The rulings): new template slots are an enhancement that cuts no time-to-first-value, closes no trust gap and produces no external proof.
 
 **Cost while deferred:** local-only surfaces drift until a consult happens to audit them. Filed 2026-09-18 to the gap inbox by the consult that audited the local-only files, after `external-install-evidence`'s close; promoted to Deferred at the next scope.
 

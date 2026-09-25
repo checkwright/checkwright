@@ -17,7 +17,5 @@ No pivot is running. The constraints the substrate pivot left behind are busines
 
 ## The rulings
 
-**While the project is unlaunched, an enhancement enters an iteration only where it cuts time-to-first-value, closes a trust or supply-chain gap, or produces external proof; every other enhancement stays Deferred.** This overrides lifecycle-kit/templates/stages/scope.md's pool ranking (**Rank the pool by what deferral costs and what landing buys**), which admits whatever it ranks: the filter runs ahead of the rank, and the rank orders what passes. It reaches enhancements only — work adding no capability was never in its scope and needs no exception recorded for it. Work serving the adopter constraints (gate-sdk/SPEC.md §The adopter constraints) qualifies under the first two arms (install, try, uninstall on a git-only floor is time-to-first-value; a digest-verified prebuilt payload is trust work), so a scope session weighs such rungs' ordering, never their admissibility. It admits an explicit operator exception, carried with its reason on the queue entry it admits. Grounds: the project is exposed to adopters only once the queue's Deferred section is near-empty — the Icebox is not counted — and a reported issue can be answered; new capability breeds new gaps, so it stays out while that section drains. Refused: keeping the rule on the local-only brief, where it bound scope through an untracked read and nothing ever checked its discharge.  
-discharge: enhancement-admission-filter  manual five external installs have been observed  
-ruling: the enhancement admission filter  the unlaunched enhancement rule
+No standing ruling. Scope ranks the deferred pool by lifecycle-kit/templates/stages/scope.md's own rule, unfiltered.
 
