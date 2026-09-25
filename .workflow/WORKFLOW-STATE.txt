@@ -8,3 +8,4 @@ powershell-scratch-runner scope add9cb38 2026-09-25 84b92a74
 powershell-scratch-runner spec aa7b0cc7 2026-09-25 7456f252
 powershell-scratch-runner align-waived a506e229 2026-09-25 28fdd5b1
 powershell-scratch-runner build a506e229 2026-09-25 28fdd5b1
+powershell-scratch-runner build a8beb49e 2026-09-25 fed7dde5
