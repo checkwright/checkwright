@@ -62,16 +62,6 @@ the in-turn wait the delegation protocol mandates, `while kill -0 "$pid"`, is re
 
 **Cost while deferred:** every adopter following the protocol literally meets a refusal on its first wait. Filed 2026-08-29; returned from the icebox 2026-09-25 by consult, the refusal re-probed.
 
-### dod-size-figure-stales-in-iteration
-
-an amendment's definition-of-done carries a size figure spec wrote at promotion, and nothing re-reads it as the iteration moves; the figure ages inside its own iteration.
-
-**Deliverable:** the figure derived at read (the amendment cites the oracle, not the number), or the size line dropped from the DoD grammar.
-
-**Promoted as debt for investigation — operator direction 2026-09-25, lead-relayed (not a /consult ruling), over scope's recommendation to retire:** either deliverable converges on names the tree carries (`check-queue-entry-budget`'s printed headroom), so no amendment is owed unless the investigation finds a new name is needed, which re-triages it. Scope's probe found no home for the figure: `canon-kit/templates/SPEC-amendment.md`'s Definition of Done has no size line, and no stage template or SPEC instructs one. The filing bullet (2026-09-07 close) names the practice: spec states a measured queue-entry size in a DoD item, then its own promoting commit grows that entry. Build finds whether any surface still invites that, and lands the authoring rule or records that none is owed.
-
-**Cost while deferred:** a build reads a stale bound as its target. Filed 2026-09-07; returned from the icebox 2026-09-25 by consult, having been iceboxed over a live trigger on the machinery-class ground.
-
 ## Deferred
 
 ### docs-liquid-literal-unseen
@@ -1518,6 +1508,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 ## Done
 
+- dod-size-figure-stales-in-iteration
 - craft-rule-step-has-no-reader
 - agent-file-paragraph-sections-ungoverned
 - amendment-prose-misnumbers-its-delta
