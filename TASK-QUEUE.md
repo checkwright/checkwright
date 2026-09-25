@@ -358,6 +358,36 @@ the consumer's local-only companion files have read triggers at three skills and
 
 **Cost while deferred:** local-only surfaces drift until a consult happens to audit them. Filed 2026-09-18 to the gap inbox by the consult that audited the local-only files, after `external-install-evidence`'s close; promoted to Deferred at the next scope.
 
+### front-door-demo-unreachable
+
+[cost: event/high] [surface: docs]
+
+the front door's install-and-demo block cannot be followed as printed, and its proof block matches no install path. `docs/index.md` (the same block on `README.md`) prints the curl and irm one-liners, then says "`demo` in place of `init`" — but neither printed line contains `init`, and a verb reaches the shell installer only through `sh -s -- demo` (`docs/install.sh` usage line) or the PowerShell scriptblock form (`docs/install.ps1`); only the npx line on the page carries a working demo spelling. "What that buys you" then shows battery output no path produces: `check-stage-evidence` is `# install: on-surface`, so `init` never registers it; the default profile is `starter` (gate-sdk only) while `check-md-refs` is canon-kit's; and the printed strings match neither `md_refs.rs`'s nor `runner.rs`'s real output. `demo` installs `full`, which owes bash ≥ 4.3 (installer/SPEC.md §demo), so it is refused on stock macOS and on Windows without the PATH step, and no page says so. The uninstall one-liner needs `CHECKWRIGHT_VERSION` set, unsaid on the index.
+
+**Deliverable:** one demo-first block on the index and README carrying all three spellings and the bash note, then the install block with all three spellings and a pointer for arguments; the proof block replaced by output captured from a real `demo` act 3 (the consumer smoke's demo arm is the source) or labelled illustrative with the profile and setup that produce it; docs/install.md's four demo descriptions collapsed to one paragraph under §Install, its default profile stated, and its irm-with-argument sentence corrected; `installer/README.md` showing `npx checkwright demo` and `--profile`. The eight cross-page restatement clusters the audit mapped (opener trio, one-liner summary, demo description, harness independence, "this page owns no contract", payload-withholding paragraph, roadmap provenance, kit rosters) each take one owner and the rest point — the cluster map is in this entry's filing commit.
+
+**Cost while deferred:** every first-time visitor is handed an instruction they cannot run and a proof they cannot reproduce, on the two pages that decide whether they try it. Filed 2026-09-25 by consult as a direct entry, from a customer-docs validity audit the operator directed; the operator had flagged the block as confusing on reading it.
+
+### kit-readme-validity-pass
+
+[cost: event/low] [surface: gate-sdk]
+
+the twelve kit READMEs carry three classes of false or unrunnable statement. (1) Every `Use`/`Test` fence spells the sourcing idiom, which needs bash ≥ 4.3 (`gate-sdk/lib/gate.sh`'s `local -n`), while starter and prose adopters are told they reach no bash and no PowerShell spelling exists; `init` prints `./scripts/checkwright-gates <arm>` (installer/SPEC.md §init), which every README should spell instead. (2) Eleven READMEs say "An installer-vendored tree does not carry this file", but the payload withholds only `SPEC.md` and `smoke/` (gate-sdk/SPEC.md §Consumer payload) and the README is packed. (3) Single false claims: drift-kit's "Like guard-kit, drift-kit registers no gates" (guard-kit registers `check-door-binding`); delegation-kit's "the two mechanizable pieces" against three gates and three guards; evidence-kit's `check-producer-liveness` inside the "add to your `gates.list`" block; doctrine-kit's fence holding a bare `--install-doctrine` flag; installer/README.md's stale three-kit description and its "nothing Windows 10 and later does not ship" double negative.
+
+**Deliverable:** the fixes above, plus a pointer-not-list pass on the openers the audit flagged (lifecycle-kit's ~75-word opener, queue-kit's 12-tag enumeration, guard-kit's ~180-word knob paragraph, context-kit's ~200-word paragraph). The per-README finding list is in this entry's filing commit.
+
+**Cost while deferred:** a starter adopter copies a command their floor cannot run, and reads a payload claim the installer contradicts. Filed 2026-09-25 by consult as a direct entry, from the same operator-directed audit.
+
+### docs-secondary-clarity-pass
+
+[cost: event/low] [surface: docs]
+
+the secondary customer pages carry validity slips and undefined internal vocabulary. Validity: docs/orchestration.md names the wrong actor for the post-commit battery (the supervisor re-runs it, delegation-kit/SPEC.md §Verify after every agent commit) and overclaims `check-gate-tamper`; it calls the budget guard standing when it is an optional hook; docs/kits.md keeps "evidence pages join this map when their kits land" beside the evidence-kit row; docs/methodology.md's hand-listed kit axes omit site-kit and doctrine-kit; the v0.25.0 post's upgrade recipe contradicts `checkwright update`; docs/positioning.md cites an unverifiable upstream issue number; SECURITY.md cites `.claude/commands/close.md`, says "vendored, not installed" against the site's own vocabulary, and asks for "the tag or commit you copied". Clarity: docs/orchestration.md's lead walkthrough uses routing/judgment tier, intent oracle, ruling roster and re-tier undefined and narrates the project's earlier posture; docs/positioning.md states the AGENTS.md claim three times behind a history opener and leaves "provenance seam" unglossed; the value and footprint tables carry an installer row and an unexplained "(consumer)" row; docs/enforcement.md's "this repo" reads as the adopter's on checkwright.dev; CONTRIBUTING.md's "that era" and "iteration boundary" have no referent for an outside reader.
+
+**Deliverable:** each slip corrected at its owner (the generated pages at their emitter), each undefined term glossed on first use or the sentence cut, and the history openers deleted. The ranked list with lines is in this entry's filing commit.
+
+**Cost while deferred:** low per page and slow, paid by the reader who has already passed the front door. Filed 2026-09-25 by consult as a direct entry, from the same audit; split from the front-door entry because its pages do not decide the first install.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
