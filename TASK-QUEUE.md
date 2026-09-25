@@ -8,6 +8,20 @@
 
 ## New Features
 
+### push-need-uncounted-at-scope
+
+[spec: SPEC-push-need.md]
+
+nothing counts how many pushes a unit set needs against the close binding's `push-budget` slot before the set is ruled. lifecycle-kit/SPEC.md §The state machine places an `observed-by` iteration's first push early and deliberately names no count, and scope's unit-set escalation states no push need, so an overrun surfaces only at close, as an operator ask.
+
+**Attested at hosted-install-path:** two units reached done only through a Windows CI run during build (a `ps-producer-record` measurement, and a binding step plus its hotfix), so build spent the whole ordinary budget before close's own push: `ce35711c`, `00dba701`, hotfix `a9133bd8`, then the granted close push `d1fdb228`. Three of the last 25 master `gates` runs were red, each a Windows leg's first run of new code.
+
+**Deliverable:** scope's unit-set escalation states the set's push need (each `observed-by` entry, and each unit whose change a remote run executes first) against the consumer's budget, and ruling the set rules it. The amendment refuses the other limb, a measurement-push class in the binding.
+
+**Admitted by operator exception to the enhancement admission filter (TRAJECTORY.md §The rulings) — operator direction 2026-09-25, lead-relayed:** the filter reaches this entry and the exception admits it. The operator stated no reason; the grounds shown when granting it were scope's escalation: the cost attested three times in five days, three red master `gates` runs each a Windows leg's first run of new code.
+
+**Cost while deferred:** one operator interrupt per iteration whose units need remote-only observations, and a spent watched push per red first run. Filed 2026-09-25 to the gap inbox by hosted-install-path's close; promoted 2026-09-25 at the next scope, so the record is late and says so. Owner lookup: `push-budget`, `push budget`, `observed-by` in this file — none owns the count; the placement rule and the `push-budget` slot are its owners.
+
 ## Technical Debt
 
 ### held-ci-leg-failure-reddens-a-binding-one
@@ -20,13 +34,17 @@ a held producer leg's failure fails the workflow through a binding consumer leg,
 
 **Deliberately left open by the hotfix.** The operator was offered the wider option that also decouples a held producer's failure from the binding smoke and chose the narrow bootstrap fix over it, so `de662aca` removes the observed TRIGGER and leaves this COUPLING untouched and filed.
 
-**Why the smallest mechanical shape is not the answer.** Falling back to a host build when the upload is absent would void criterion 2 of the join predicate `native/targets.list`'s header states — a platform install-smoke leg green having CONSUMED that upload, with no host-built stand-in anywhere in it. Whether the leg should degrade or stay binding on its producer is an envelope question no surface settles.
+**Why the smallest mechanical shape is not the answer.** Falling back to a host build when the upload is absent would void criterion 2 of the join predicate `native/targets.list`'s header states — a platform install-smoke leg green having CONSUMED that upload, with no host-built stand-in anywhere in it.
+
+**Envelope settled at spec (2026-09-25) by the governing surfaces: the consumer's posture is its producer's.** Degrading is the fallback criterion 2 refuses, and a consumer bound regardless of its producer is this entry's coupling. Reading the posture — `runs-on` and `continue-on-error`, as the siblings do — from the index at `aarch64-apple-darwin` holds the consumer exactly while its producer is held, as `install-smoke-sh-macos-intel`'s header states for its own pair. Run `34200226768` shows held producer legs failing and `install-smoke-macos` still running, to failure, so a failed held leg satisfies `needs:`. `native/runners.list` gives that triple the leg's current `macos-latest`; the derived runner owes `shell: bash` on the leg's four `run:` steps. The landing commit rewrites the leg's header, which declares it binding, and the Intel leg's citation of this slug.
 
 **Re-verified at promotion (2026-09-25, survey record):** every `continue-on-error` in `.github/workflows` is derived; `install-smoke-sh-macos` (`.github/workflows/gates.yml`:1676) is the one consumer leg whose binding posture is hard-coded rather than read from `native-artifacts-roster`'s per-target index, as its five sibling legs read theirs. All six declared targets are joined (docs/install.md §Requirements), so no held producer exists at HEAD and the coupling is dormant.
 
 **Deliverable:** that leg reads its posture from the per-target index, so a held producer's consumer is held with it; observed green on a `gates` run.
 
-**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** deriving the posture converges on the siblings' shipped read. The lead's probe shown to the operator: the earlier decline was a hotfix-time choice, not a TRAJECTORY ruling. The degrade-or-stay-binding envelope question above stays open, for /spec to settle.
+**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** deriving the posture converges on the siblings' shipped read. The lead's probe shown to the operator: the earlier decline was a hotfix-time choice, not a TRAJECTORY ruling.
+
+**Push need (2026-09-25, inside the budget):** one push at its build, after the landing commit, to read the `gates` run; with the closing push, 2 against the close binding's 1–2.
 
 **Cost while deferred:** every future held platform inherits it, and a red master traceable to a leg nobody declared binding costs a fresh diagnosis. Filed 2026-09-08 by close from the gap inbox; promoted 2026-09-25 at scope.
 
@@ -409,20 +427,6 @@ the consumer's local-only companion files have read triggers at three skills and
 **Held Deferred by the enhancement admission filter** (TRAJECTORY.md §The rulings): new template slots are an enhancement that cuts no time-to-first-value, closes no trust gap and produces no external proof.
 
 **Cost while deferred:** local-only surfaces drift until a consult happens to audit them. Filed 2026-09-18 to the gap inbox by the consult that audited the local-only files, after `external-install-evidence`'s close; promoted to Deferred at the next scope.
-
-### push-need-uncounted-at-scope
-
-[cost: event/high] [surface: lifecycle-kit]
-
-nothing counts how many pushes a unit set needs against the close binding's `push-budget` slot before the set is ruled. lifecycle-kit/SPEC.md §The state machine places an `observed-by` iteration's first push early and deliberately names no count, and scope's unit-set escalation states no push need, so an overrun surfaces only at close, as an operator ask.
-
-**Attested at hosted-install-path:** two units reached done only through a Windows CI run during build (a `ps-producer-record` measurement, and a binding step plus its hotfix), so build spent the whole ordinary budget before close's own push: `ce35711c`, `00dba701`, hotfix `a9133bd8`, then the granted close push `d1fdb228`. Three of the last 25 master `gates` runs were red, each a Windows leg's first run of new code.
-
-**Deliverable:** scope's unit-set escalation states the set's push need (each `observed-by` entry, and each unit widening a binding CI leg, which is a remote first run) against the consumer's budget; or the binding names a measurement-push class. A new escalation line is a new governed name, so it owes an amendment.
-
-**Admitted by operator exception to the enhancement admission filter (TRAJECTORY.md §The rulings) — operator direction 2026-09-25, lead-relayed:** the filter reaches this entry and the exception admits it. The operator stated no reason; the grounds shown when granting it were scope's escalation: the cost attested three times in five days, three red master `gates` runs each a Windows leg's first run of new code.
-
-**Cost while deferred:** one operator interrupt per iteration whose units need remote-only observations, and a spent watched push per red first run. Filed 2026-09-25 to the gap inbox by hosted-install-path's close; promoted 2026-09-25 at the next scope, so the record is late and says so. Owner lookup: `push-budget`, `push budget`, `observed-by` in this file — none owns the count; the placement rule and the `push-budget` slot are its owners.
 
 ## Icebox
 
