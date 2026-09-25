@@ -10,3 +10,4 @@ spec-brevity-first-slice align a6edc28a 2026-09-25 0665ba0e
 spec-brevity-first-slice build a31d1976 2026-09-25 e1cfdd2b
 spec-brevity-first-slice build a512001a 2026-09-25 a751b6a6
 spec-brevity-first-slice build af88a3a9 2026-09-25 63c2f440
+spec-brevity-first-slice validate a20087d8 2026-09-25 c23910f6
