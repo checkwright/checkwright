@@ -20,16 +20,6 @@ the framework-level remainder of gate-sdk/SPEC.md after `gate-sdk-framework-brev
 
 **Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-25 at scope from spec-brevity-residue, filed that day.
 
-### canonicalize-extended-length-prefix
-
-the caller roster gate-sdk/SPEC.md §The path-dialect contract gives for `walk::canonicalize` (whose Windows answer carries the `\\?\` prefix) omits `pack_installer.rs` and `run_guard_tests.rs`, and the second strips the prefix itself before composing paths from the root.
-
-**Deliverable:** the roster corrected to every caller, the self-stripping site's rule stated there (or routed through one strip helper), and a unit test on the strip.
-
-**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** it brings the roster to the callers the tree has. Re-verified at scope: `crate_arms.rs`, named when filed, no longer calls `walk::canonicalize`, so it leaves the roster.
-
-**Cost while deferred:** a Windows root with the prefix is handled two ways and the stated roster is short. Filed 2026-08-30; returned from the icebox 2026-09-25 by consult, the callers re-grepped.
-
 ## Deferred
 
 ### docs-liquid-literal-unseen
@@ -1401,5 +1391,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - non-gate-arm-testing-floor-unstated
 - emit-per-arm-help-residue
 - harness-arm-argv-unstated
+- canonicalize-extended-length-prefix
 
 ## Lessons Learned
