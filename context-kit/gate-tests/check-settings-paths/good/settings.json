@@ -9,7 +9,7 @@
       "Bash(bash */checks/check-*.sh)",
       "Bash(git add *)",
       "Bash(shellcheck *)",
-      "Bash(: > .workflow/prompt-friction.log)",
+      "Bash(: > .workflow/scratch.log)",
       "Bash(rm .tmp/*)"
     ]
   },

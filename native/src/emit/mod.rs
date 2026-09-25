@@ -4,6 +4,7 @@
 use crate::programs;
 pub mod agents_md_smoke;
 pub mod always_loaded;
+pub mod capture_drain;
 pub mod cite_survey;
 pub mod close_surfaces;
 pub mod compare_settings_allow;
@@ -423,6 +424,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-scan-prompts",
         Arm::Emit(scan_prompts::emit),
         scan_prompts::KNOBS,
+    ),
+    // spec: gate-sdk/SPEC.md §The workflow directory — the rotation drain every close triage runs
+    // before reading a capture log, a table member so the front end's one `--emit` grant covers it
+    (
+        "--emit-capture-drain",
+        Arm::Emit(capture_drain::emit),
+        capture_drain::KNOBS,
     ),
     // spec: guard-kit/SPEC.md §compare-settings-allow — the settings-allow advisory, a table
     // member on the forced-family test: its four knobs are consumer configuration.

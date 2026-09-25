@@ -30,12 +30,12 @@ The figures are kit-share only — what a kit itself ships. A consumer's own bin
 | context-kit | — | 2351cp · ~594t |
 | delegation-kit | — | 40153cp · ~10112t |
 | doctrine-kit | 1819cp · ~463t | — |
-| drift-kit | — | 6368cp · ~1610t |
+| drift-kit | — | 6450cp · ~1630t |
 | evidence-kit | — | — |
 | gate-sdk | — | — |
-| guard-kit | — | 4436cp · ~1124t |
+| guard-kit | — | 4394cp · ~1114t |
 | installer | — | — |
 | lifecycle-kit | 301cp · ~76t | 119699cp · ~30189t |
 | queue-kit | — | 1392cp · ~359t |
 | site-kit | — | — |
-| **total** | 2120cp · ~539t | 180184cp · ~45521t |
+| **total** | 2120cp · ~539t | 180224cp · ~45531t |

@@ -36,7 +36,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/), then:
 
    Then review `templates/settings-allow.json` against guard-kit/SPEC.md §The recommended allowlist, and union the entries you accept into `.claude/settings.json`'s `permissions.allow`.
 
-3. Gitignore the two scratch logs (`.workflow/prompt-friction.log`, `.workflow/wakeup-attempts.log`) — both are per-iteration, cleared at close.
+3. Gitignore the two scratch logs (`.workflow/prompt-friction.log`, `.workflow/wakeup-attempts.log`) and their drain companions (`.workflow/*.drain`, `.workflow/*.drain.part`) — both logs are per-iteration, drained at close.
 
 4. Splice `templates/close-triage.md` into your close-stage skill (it fills lifecycle-kit's `housekeeping` slot, close step 4).
 

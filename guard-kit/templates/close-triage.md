@@ -1,11 +1,11 @@
 **Tooling-friction triage** — the recurring close-stage step that keeps the permission-friction loop a habit, not a one-off cleanup. Splice this into lifecycle-kit's close `housekeeping` slot (step 4), the prompt-friction row's.
 
-1. **Rank what nothing granted.** Run `--emit scan-prompts` on the gate binary `GATE_SDK_NATIVE_BIN` names — it filters the friction log against the committed allowlist and the harness's built-in read-only auto-allows, then ranks the survivors by command pattern.
+1. **Rank what nothing granted.** Run `--emit capture-drain .workflow/prompt-friction.log` on the gate binary `GATE_SDK_NATIVE_BIN` names, then `--emit scan-prompts` over the path it printed — it filters the drain against the committed allowlist and the harness's built-in read-only auto-allows, then ranks the survivors by command pattern.
 2. **Resolve each recurring pattern by the triage criterion** — never default to the allowlist:
    - **Allowlist** (`Bash(...)` in the committed settings) when the command is safe *and already in the form to reinforce* — static, glob-matched.
    - **Guard rule** when a *better form exists* (steer to it) or the decision needs logic a static glob cannot express.
    - **Habit change** (a noted convention) for a true one-off. Caution: an allowlist entry can *mask* a steering opportunity — before blessing a form, confirm it is the one to reinforce. **Diagnose before you reach for the allowlist.** A pattern can rank high while already being granted: an allowlist entry matches a *bare* command, so a call that chains (`&&`, `;`), redirects, or expands breaks the match and is decided out of band anyway. Check a ranked pattern against the committed allowlist first — if it is already there, the finding is (c) habit change, and adding coverage buys nothing while reading as a fix. A row in the PowerShell section takes the same criterion. Its allowlist entry is spelled `PowerShell(…)`, and its guard-rule disposition is a PowerShell reading of the generic rule it matches.
-3. **Review the wakeup log** if the wakeup-guard is wired: read `.workflow/wakeup-attempts.log`, act on any surfaced intent, then delete it.
+3. **Review the wakeup log** if the wakeup-guard is wired: drain it with `--emit capture-drain .workflow/wakeup-attempts.log`, read the printed path, act on any surfaced intent, then rerun that with `--done`.
 4. **Prune and narrow the local overlay.** Run `--emit compare-settings-allow` on the same binary — it reports three sets, and each has its own disposition.
    - **Redundant**: remove every listed `settings.local.json` entry (a committed glob already grants it).
    - **Dead path**: remove every listed entry — it grants a script that does not exist.
@@ -14,6 +14,6 @@
    - **Not content-pinned**: an entry naming a *script path* rather than a fixed command grants whatever that file says at run time, so its meaning changes whenever the file does — and a path under the gitignored scratch dir is rewritable by any session. Read the shape, not the literal: it reads as a specific command until one notices the target is writable. Such a run has a sanctioned form already — the `--scratch-run` arm, whose echo-at-execution is the compensating control (§scratch-run) — so route the run through the runner and remove the direct-path grant. Removing instances without applying this criterion re-arms for the next one.
 
    Then, by judgment, prune the remaining one-off exact-string local entries and promote recurring safe patterns to the committed `settings.json` as globs. A high-impact edit waits for the **consumer's** explicit confirmation, and a session with no consumer present prepares the diff and hands it up; the impact classes are guard-kit/SPEC.md §compare-settings-allow's.
-5. **Clear the friction log** — its named reclaim path: `: > .workflow/prompt-friction.log`. Run each clear as its own bare command: the allowlist entry is an exact string, so compounding it (`&&`, `;`, a trailing `echo`/`wc`) breaks the match and buys the very out-of-band decision this step just triaged away.
+5. **Clear the drained friction log** — its named reclaim path: `--emit capture-drain --done .workflow/prompt-friction.log`.
 
 Goal: the local set stays small, every durable pattern lives in the committed, reviewable allowlist, and no local glob auto-allows a command you declared bad.

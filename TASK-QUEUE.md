@@ -22,20 +22,6 @@ the SPEC tier is unreadable as a specification by size, and a derived profile pl
 
 **Cost while deferred:** paid by every session that opens a SPEC section and every adopter who reads one on the site; the sampled sections cost a reader three to five times the words their rules need. Filed 2026-09-25 by consult as a direct entry, from the operator-directed brevity audit of project assets.
 
-### close-triage-log-reclaim-loss-window
-
-[spec: SPEC-capture-drain.md] [recurrence: 2026-09-25]
-
-the close-stage triage templates read a capture log, triage it, then truncate it with `: >`, so a line appended between the read and the truncate is lost unread (`guard-kit/templates/close-triage.md`, `drift-kit/templates/close-knowledge.md`).
-
-**Deliverable:** truncate to the offset read rather than to zero, or rotate the file before reading; the templates and the reclaim rule at guard-kit/SPEC.md agree.
-
-**Taken as a feature — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** an offset-truncating reclaim or a rotated file is a new name, so /spec authors it; it joins because the brevity pass edits guard-kit/SPEC.md.
-
-**Spec (2026-09-25):** rotation, through a new `--emit capture-drain` arm. Offset truncation rewrites the file in place, so a line appended during the rewrite is lost the same way. The rule moves to gate-sdk §The workflow directory for every log a close reads before draining. That also reaches the wakeup log and this repo's essay-harvest sink, which share the shape. lifecycle-kit's close-surface derivation folds a drain file into its log's row.
-
-**Cost while deferred:** one close per iteration risks dropping a concurrent session's capture. Filed 2026-08-18; returned from the icebox 2026-09-25 by consult, both templates re-read.
-
 ## Technical Debt
 
 ### wait-mandate-template-spelling-unreachable
@@ -1494,6 +1480,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 ## Done
 
+- close-triage-log-reclaim-loss-window
 - worktree-isolated-dispatch-cannot-reach-the-main-checkout
 - dod-size-figure-stales-in-iteration
 - craft-rule-step-has-no-reader

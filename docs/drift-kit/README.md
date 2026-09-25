@@ -37,7 +37,7 @@ Configuration follows the established kit pattern — override any knob in `drif
 `kpi-knowledge-friction` measures re-derivations a session had to make because no doc owned the fact (drift-kit/SPEC.md §The knowledge-friction loop). It shows `n/a` until you install the capture half:
 
 1. Add one bullet to your always-loaded instructions file: *the moment you catch yourself re-deriving a fact off a non-owning surface, append* `<date> <fact> ← <surface>` *to `.workflow/knowledge-friction.log`.* That bullet is the loop's only hook — earn its cost by the log actually filling. The `--emit kfric [--] "<fact>" "<surface>"` arm on the gate binary `GATE_SDK_NATIVE_BIN` names is the shipped affordance that stamps that grammar prompt-free — both fields required non-empty in that order, `--` files one beginning with a dash, and no per-arm `--help`: the usage is here and in the SPEC. Raw append stays legal (drift-kit/SPEC.md §The knowledge-friction loop).
-2. Gitignore the log (per-iteration scratch), and splice `templates/close-knowledge.md` into your close skill so each entry is re-verified, becomes the tiering edit or the correction that outcome selects, and the log is cleared — its reclaim path.
+2. Gitignore the log (per-iteration scratch) and its drain companions (`.workflow/*.drain`, `.workflow/*.drain.part`), and splice `templates/close-knowledge.md` into your close skill so each entry is re-verified, becomes the tiering edit or the correction that outcome selects, and the drained log is removed — its reclaim path.
 
 ## Use
 

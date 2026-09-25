@@ -1,11 +1,11 @@
 # contract: context-kit/SPEC.md §The surface ratchet
 7496cp .claude/agents/audit-sweep.md
 2368cp .claude/agents/edit-sweep.md
-8471cp .claude/agents/stage-session.md
+8437cp .claude/agents/stage-session.md
 1446cp .claude/commands/agent-execution.md
 551cp .claude/commands/align.md
 1148cp .claude/commands/build.md
-8573cp .claude/commands/close.md
+8657cp .claude/commands/close.md
 1759cp .claude/commands/consult.md
 1590cp .claude/commands/economics.md
 4609cp .claude/commands/lead.md
@@ -13,7 +13,7 @@
 6847cp .claude/commands/scope.md
 1155cp .claude/commands/spec.md
 1204cp .claude/commands/validate.md
-12250cp CLAUDE.md
+12243cp CLAUDE.md
 5785cp canon-kit/templates/SPEC-amendment.md
 2351cp context-kit/templates/close-brevity.md
 36756cp delegation-kit/templates/agent-execution.md
@@ -65,9 +65,9 @@
 28043cp docs/site-architecture.md
 2417cp docs/site-kit/index.md
 2437cp docs/value.md
-2616cp drift-kit/templates/close-knowledge.md
+2698cp drift-kit/templates/close-knowledge.md
 3752cp drift-kit/templates/economics.md
-4436cp guard-kit/templates/close-triage.md
+4394cp guard-kit/templates/close-triage.md
 4120cp lifecycle-kit/templates/consult.md
 39161cp lifecycle-kit/templates/lead.md
 2100cp lifecycle-kit/templates/release-sweep.md

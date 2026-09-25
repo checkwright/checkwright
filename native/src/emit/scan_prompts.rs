@@ -520,8 +520,17 @@ fn render(log: &str, settings: &str, settings_local: &str, count_only: bool) -> 
     unreachable_section(&unreachable, unreachable_total, &mut out);
     overlay_section(&t, settings_local, &mut out);
     powershell_section(&t.powershell, &mut out);
-    out.push_str(&format!("\nThen clear the log:  : > {}\n", log));
+    out.push_str(&closing_line(log));
     out
+}
+
+// spec: gate-sdk/SPEC.md §The workflow directory — a read log drains by rotation, so the closing
+// line names the drain's removal after a drain was ranked, and the drain itself otherwise
+fn closing_line(log: &str) -> String {
+    match log.strip_suffix(".drain") {
+        Some(stem) => format!("\nThen remove the drained log:  --emit capture-drain --done {}\n", stem),
+        None => format!("\nDrain the log before triaging it:  --emit capture-drain {}\n", log),
+    }
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the log positional selects the rule's input corpus
@@ -570,6 +579,19 @@ mod tests {
 
     fn argv(a: &[&str]) -> Vec<String> {
         a.iter().map(|s| s.to_string()).collect()
+    }
+
+    // spec: gate-sdk/SPEC.md §The workflow directory — the closing line never names a truncate
+    #[test]
+    fn the_closing_line_names_the_drain_never_a_truncate() {
+        assert_eq!(
+            closing_line(".workflow/p.log.drain"),
+            "\nThen remove the drained log:  --emit capture-drain --done .workflow/p.log\n"
+        );
+        assert_eq!(
+            closing_line(".workflow/p.log"),
+            "\nDrain the log before triaging it:  --emit capture-drain .workflow/p.log\n"
+        );
     }
 
     // spec: guard-kit/SPEC.md §scan-prompts — the key's two tokens: the leading binary, and a

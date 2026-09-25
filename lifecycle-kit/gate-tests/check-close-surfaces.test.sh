@@ -64,9 +64,19 @@ printf 'notes/\n' >>"$outside/.gitignore"
 mkdir -p "$outside/notes"; printf 'x\n' >"$outside/notes/scratch.log"
 check_case "ignored-outside-workflow-without-reclaim" "$outside" 1 "'close-surface: notes/scratch.log' is capture-tier"
 
+# --- a declared log's drain companions fold into its row; a drain beside no declared log does not ---
+drained="$SANDBOX/drained"
+seed_repo "$drained" "close-surface: .workflow/capture.log advisory reclaim=: > .workflow/capture.log"
+printf '.workflow/*.drain\n.workflow/*.drain.part\n' >>"$drained/.gitignore"
+printf 'a drained line\n' >"$drained/.workflow/capture.log.drain"
+printf 'a crashed line\n' >"$drained/.workflow/capture.log.drain.part"
+check_case "declared-log-with-drain" "$drained" 0 "CLOSE-SURFACES: clean"
+printf 'x\n' >"$drained/.workflow/stray.log.drain"
+check_case "drain-of-undeclared-log" "$drained" 1 ".workflow/stray.log.drain"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-close-surfaces.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-close-surfaces.test.sh: clean (undeclared capture, declared-without-reclaim, the satisfied case, and a gitignored declared path outside the workflow dir, 4 cases)"
+echo "check-close-surfaces.test.sh: clean (undeclared capture, declared-without-reclaim, the satisfied case, a gitignored declared path outside the workflow dir, a declared log's drain folded into its row, and a drain beside no declared log reported, 6 cases)"
 exit 0

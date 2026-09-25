@@ -78,6 +78,8 @@ fi
 {
     echo '.workflow/prompt-friction.log'
     echo '.workflow/wakeup-attempts.log'
+    echo '.workflow/*.drain'
+    echo '.workflow/*.drain.part'
 } >> .gitignore
 
 set +e

@@ -120,16 +120,41 @@ fn row_state(base: &str, locator: &str) -> &'static str {
         None => (locator, false),
     };
     let p = joined(base, file);
-    if !Path::new(&p).exists() {
+    let own = Path::new(&p).exists();
+    if section {
+        return if own { "-" } else { "absent" };
+    }
+    // spec: lifecycle-kit/SPEC.md §The close-surfaces emit arm — a drain an unfinished triage left
+    // behind shows on its log's row, so the next close walks it
+    if DRAIN_SUFFIXES.iter().any(|s| holds_content(&format!("{}{}", p, s))) {
+        return "non-empty";
+    }
+    if !own {
         return "absent";
     }
-    if section {
-        return "-";
+    if holds_content(&p) {
+        "non-empty"
+    } else {
+        "empty"
     }
-    match std::fs::read(&p) {
-        Ok(b) if stages::header_only(&String::from_utf8_lossy(&b)) => "empty",
-        _ => "non-empty",
+}
+
+// spec: gate-sdk/SPEC.md §The workflow directory — a capture log's two drain companions
+const DRAIN_SUFFIXES: [&str; 2] = [".drain", ".drain.part"];
+
+fn holds_content(p: &str) -> bool {
+    match std::fs::read(p) {
+        Ok(b) => !stages::header_only(&String::from_utf8_lossy(&b)),
+        Err(_) => Path::new(p).exists(),
     }
+}
+
+// spec: lifecycle-kit/SPEC.md §The close-surface roster — a drain companion of a declared log is
+// part of that log's row, never a surface of its own
+fn drain_of_declared(rel: &str, declared: &[String]) -> bool {
+    DRAIN_SUFFIXES
+        .iter()
+        .any(|s| rel.strip_suffix(s).is_some_and(|stem| declared.iter().any(|d| d == stem)))
 }
 
 fn row_file(locator: &str) -> &str {
@@ -231,7 +256,7 @@ pub fn derive(args: &[String]) -> Result<Roster, String> {
     if Path::new(&wf_path).is_dir() {
         for (name, _) in walk::list_dir(Path::new(&wf_path))? {
             let rel = format!("{}/{}", workflow_dir, name);
-            if !Path::new(&joined(&base, &rel)).is_file() {
+            if !Path::new(&joined(&base, &rel)).is_file() || drain_of_declared(&rel, &declared) {
                 continue;
             }
             let ci = proc::run(&programs::GIT, &["-C", &base, "check-ignore", "-q", "--", &rel])?;
@@ -336,7 +361,21 @@ mod tests {
         assert_eq!(row_state(&base, "data.md"), "non-empty");
         assert_eq!(row_state(&base, "data.md#Deferred"), "-");
         assert_eq!(row_state(&base, "missing.md#Deferred"), "absent");
+        std::fs::write(dir.join("zero.log.drain"), "left behind\n").expect("w");
+        assert_eq!(row_state(&base, "zero.log"), "non-empty", "a left drain shows on its row");
+        std::fs::write(dir.join("gone.log.drain.part"), "crashed\n").expect("w");
+        assert_eq!(row_state(&base, "gone.log"), "non-empty", "a part shows on an absent log's row");
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The close-surface roster — only a companion of a declared log folds
+    #[test]
+    fn a_drain_companion_folds_only_into_a_declared_row() {
+        let declared = vec![".workflow/a.log".to_string()];
+        assert!(drain_of_declared(".workflow/a.log.drain", &declared));
+        assert!(drain_of_declared(".workflow/a.log.drain.part", &declared));
+        assert!(!drain_of_declared(".workflow/b.log.drain", &declared));
+        assert!(!drain_of_declared(".workflow/a.log", &declared));
     }
 
     // spec: lifecycle-kit/SPEC.md §The close-surfaces emit arm — tracked, ignored and untracked each
