@@ -832,6 +832,16 @@ queue provenance prose restates what `git log` answers; the ruled sweep is small
 
 **Cost while deferred:** low; paid by every reader of those entries. Filed 2026-09-09; returned from the icebox 2026-09-25 by consult, the count re-run.
 
+### entry-refusal-invites-evasion
+
+[cost: event/low] [surface: lifecycle-kit]
+
+`check-stage-entry`'s refusal help for assertion C (cross-component audit trigger) and assertion D (inferred-claim residue) names the remedy but not the evasion, and a spec session took the evasion for both: it respelled a docs-mirror update target as prose so the roster token no longer resolved, where lifecycle-kit/SPEC.md §check-stage-entry names that case and its valve (a dispatcher `--waive` on an explicit user ruling); and it deleted an honest limit together with its `Inferred, not run` marker, leaving an overclaiming reason. The lead caught both by diff review; nothing mechanical did.
+
+**Deliverable:** assertion C's help (`native/src/gates/stage_entry.rs`) and the spec template's causal-completeness step state that respelling a roster token is not a remedy; assertion D's help states that a claim no delta rests on is kept as a documented honest limit rather than deleted; a fixture pins each help line.
+
+**Cost while deferred:** the next refused entry reads a help line that leaves the cheaper evasion open, and only a reviewing lead catches it. Filed 2026-09-25 to the gap inbox after powershell-scratch-runner's spec; promoted 2026-09-25 at the next iteration's scope from the carried bullet. Owner lookup: `respell`, `assertion C`, `assertion D`, `honest limit` in this file — none; [enter-stage-refusal-help-contradicts-its-guard](#enter-stage-refusal-help-contradicts-its-guard) shares the surface, but its subject is `--enter-stage`'s own refusal text.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
