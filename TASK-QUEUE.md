@@ -40,16 +40,6 @@ gate-sdk/SPEC.md §The non-gate arm hand-lists the flags `main.rs` hardcodes; ac
 
 **Cost while deferred:** the next arm added stales the list. Filed 2026-09-03; returned from the icebox 2026-09-25 by consult as a contributor-reader exception voided by the rule.
 
-### template-registry-population-predicate
-
-a third `.list` template, `gate-sdk/templates/portability-patterns.list`, landed 2026-09-07 with no sibling directory; it is the event the template registry's population predicate named, and the native-declaration check over it was not verified.
-
-**Deliverable:** the registry check run over the third template, its declaration verified or corrected.
-
-**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** a verification over an existing check, adding no name.
-
-**Cost while deferred:** a template the parity gate may not see. Filed 2026-08-02; returned from the icebox 2026-09-25 by consult on the named trigger having fired.
-
 ## Deferred
 
 ### docs-liquid-literal-unseen
@@ -1434,5 +1424,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - fixture-runner-checks-dir-fails-open
 - upgrade-smoke-refuses-inside-a-worktree
 - consumer-smoke-accounting-spelling-unpinned
+- template-registry-population-predicate
 
 ## Lessons Learned
