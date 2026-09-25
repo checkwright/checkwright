@@ -128,8 +128,7 @@ pub fn run(args: &[String]) -> i32 {
             println!("{}", h);
         }
         println!("  help: rewrite the message to remove the leaked term; the pattern set is");
-        println!("        GATE_SDK_MSG_PATTERN_FILES (+ the local list). The Co-Authored-By");
-        println!("        trailer is a footer convention, not a leak — do not ban it.");
+        println!("        GATE_SDK_MSG_PATTERN_FILES (+ the local list).");
         print_reissue_remedy();
         return 1;
     }

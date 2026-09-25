@@ -1,1 +1,2 @@
 matches a banned pattern
+GATE_SDK_MSG_PATTERN_FILES (+ the local list).

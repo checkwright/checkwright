@@ -8,7 +8,8 @@
 /(home|Users)/[A-Za-z0-9._-]+
 
 # The Claude Code promo URL — the marketing link that ends a generated PR body.
-# The Co-Authored-By trailer is a footer convention, not a leak: do not ban it.
+# The shipped default leaves the Co-Authored-By trailer unbanned; a consumer
+# that bans it adds its own pattern here (gate-sdk/SPEC.md §check-commit-msg).
 claude\.com/claude-code
 
 # Session-reference class — a harness-injected trailer referencing an internal

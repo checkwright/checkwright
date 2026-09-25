@@ -28,16 +28,6 @@ a PowerShell script run off a scratch-dir body (`& .tmp\x.ps1`, `.\.tmp\x.ps1`, 
 
 ## Technical Debt
 
-### trailer-ban-help-overruled
-
-`check-commit-msg`'s refusal help text tells the consumer the Co-Authored-By trailer "is a footer convention, not a leak — do not ban it" (`native/src/gates/commit_msg.rs`, the pattern-set help lines), and the shipped `gate-sdk/templates/msg-patterns.list` header repeats it as a rule. The pattern file is the consumer's own policy seam (gate-sdk/SPEC.md §check-commit-msg, the reach-is-a-policy paragraph), so a consumer that chose a trailer ban gets a red telling it its own rule is wrong.
-
-**Deliverable:** the help text names the pattern set only; the template comment states leaving the trailer unbanned as the shipped default, not a rule; §check-commit-msg states a trailer ban as a consumer-selectable class (Policy-as-choice) and that the ban also scans the tree through `check-tree-terms`, the shared reader §Layout and configuration already names.
-
-**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** it converges the gate on the policy seam its SPEC already names, adding no name.
-
-**Cost while deferred:** a consumer that bans the trailer is argued against by the kit on every refusal. Filed 2026-09-25 to the gap inbox after push-need-accounting's close; promoted 2026-09-25 at the next scope. Premise re-verified: the bullet's "also unstated" half is half-wrong, as the SPEC already names both readers of one pattern set; only the trailer-ban consequence is unstated. Owner lookup: `trailer`, `msg-patterns`, `MSG_PATTERN`, `commit-msg` in this file — only the iceboxed [co-authored-by-trailer-attribution](#co-authored-by-trailer-attribution), whose subject is the trailer's model literal, not the ban policy; owner gate-sdk/SPEC.md §check-commit-msg.
-
 ## Deferred
 
 ### docs-liquid-literal-unseen
@@ -1371,5 +1361,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 `check-docs-cmd` assertion (C) misses a retired path cited from the queue, which is outside its manifest corpus and whose `<path>:<line>` token fails the path shape.
 
 ## Done
+
+- trailer-ban-help-overruled
 
 ## Lessons Learned
