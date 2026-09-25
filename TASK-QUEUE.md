@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: non-gate-arm-contract
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [README.md](README.md) maps the kits.
 
@@ -9,6 +9,36 @@
 ## New Features
 
 ## Technical Debt
+
+### gate-sdk-remainder-brevity
+
+the framework-level remainder of gate-sdk/SPEC.md after `gate-sdk-framework-brevity`, about 26k words: §The `# graph:` manifest, §Meta-gate conservation for the binary substrate, §Consumer payload and §Consumer smoke. The Porting cohort records and §Per-component contracts stay on [spec-brevity-residue](#spec-brevity-residue).
+
+**Deliverable:** the three moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) applied to those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm. A contract sentence stays, including the facts sibling entries cite there: the §Consumer payload disclosure ruling, the `check-gate-tamper` row, and the release-asset claim.
+
+**Promoted as debt, split from spec-brevity-residue — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the moves run under gates that already exist and add no name.
+
+**Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-25 at scope from spec-brevity-residue, filed that day.
+
+### emit-per-arm-help-residue
+
+five `--emit` members still answer `-h`/`--help` with their usage on stdout at exit 0: `docs-mirror`, `roadmap`, `queue-index`, `entry-history` and `port-blockers`. gate-sdk/SPEC.md §The non-gate arm puts an `--emit-` member's usage at its shape refusal, at exit 2, and calls a per-arm help flag a second home for one sentence; every other member refuses `--help`.
+
+**Deliverable:** the five refuse `--help` like the rest, printing their usage at the shape refusal, with a release declaration and a bad fixture.
+
+**Promoted as debt, conform branch — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** narrowing the shipped `--help` is directed; the change converges on the rule the section already states, so it adds no name. Re-verified at scope: all five exit 0 on `--help`, while `session-id` and `queue-flow` exit 2.
+
+**Cost while deferred:** one question gets two answers across one family. Filed 2026-09-25 to the gap inbox by gate-sdk-framework-brevity's build; promoted 2026-09-25 at its close.
+
+### canonicalize-extended-length-prefix
+
+the caller roster gate-sdk/SPEC.md §The path-dialect contract gives for `walk::canonicalize` (whose Windows answer carries the `\\?\` prefix) omits `pack_installer.rs` and `run_guard_tests.rs`, and the second strips the prefix itself before composing paths from the root.
+
+**Deliverable:** the roster corrected to every caller, the self-stripping site's rule stated there (or routed through one strip helper), and a unit test on the strip.
+
+**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** it brings the roster to the callers the tree has. Re-verified at scope: `crate_arms.rs`, named when filed, no longer calls `walk::canonicalize`, so it leaves the roster.
+
+**Cost while deferred:** a Windows root with the prefix is handled two ways and the stated roster is short. Filed 2026-08-30; returned from the icebox 2026-09-25 by consult, the callers re-grepped.
 
 ## Deferred
 
@@ -390,7 +420,7 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
-**Split 2026-09-25 at scope, operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework half was promoted as its own debt entry; this entry keeps the rest.
+**Split 2026-09-25 at scope, operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework half was promoted as its own debt entry; this entry keeps the rest. **Split again 2026-09-25 at the next scope, on the same class of direction:** §The `# graph:` manifest, §Meta-gate conservation, §Consumer payload and §Consumer smoke left as [gate-sdk-remainder-brevity](#gate-sdk-remainder-brevity), so gate-sdk's remainder here is the Porting records and §Per-component contracts.
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
@@ -574,16 +604,6 @@ installer/SPEC.md §Consumer payload says the compiled artifact is never the ado
 
 **Cost while deferred:** a re-run overwrites a path the adopter moved away from. Filed 2026-08-21; returned from the icebox 2026-09-25 by consult, the literal re-grepped.
 
-### canonicalize-extended-length-prefix
-
-[cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
-
-the caller roster gate-sdk/SPEC.md §The path-dialect contract gives for the `\\?\` prefix strip omits `pack_installer.rs`, `crate_arms.rs` and `run_guard_tests.rs`, the last of which strips the prefix itself rather than through the shared helper.
-
-**Deliverable:** every caller routed through the helper, the roster derived or corrected, and a fixture on the self-stripping site.
-
-**Cost while deferred:** a Windows root with the prefix is handled three ways. Filed 2026-08-30; returned from the icebox 2026-09-25 by consult, the callers re-grepped.
-
 ### non-gate-arm-testing-floor-unstated
 
 [cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
@@ -591,6 +611,8 @@ the caller roster gate-sdk/SPEC.md §The path-dialect contract gives for the `\\
 a non-gate arm's testing floor is unstated, and four ship with no test module (`value_rollup.rs`, `usage_trend.rs`, `install_hooks.rs`, `md_unwrap.rs`).
 
 **Deliverable:** the floor stated at gate-sdk/SPEC.md §The non-gate arm, and the four arms brought to it.
+
+**Taken into non-gate-arm-contract — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the floor is a new rule beside the section's "owes no fixture pair" sentence, so /spec authors it and promotes this entry. Not push-needing: the four arms' tests run locally.
 
 **Cost while deferred:** an arm can change behaviour with nothing red. Filed 2026-09-03; returned from the icebox 2026-09-25 by consult, the modules re-checked.
 
@@ -714,15 +736,15 @@ no CI leg runs the native crate's unit tests on native Windows. `.github/workflo
 
 **Cost while deferred:** a Windows adopter's close drain could fail with exit 2, and nobody sees it until an adopter reports it. Filed 2026-09-25 to the gap inbox by spec-brevity-first-slice's build; promoted 2026-09-25 at its close. →fix fails because a new CI leg is new mechanism, and only a push can witness it. Re-verified at the drain: `grep 'cargo test' .github/workflows/*.yml` returns nothing. Owner lookup: `cargo test`, `msvc`, `unit tests on` in this file — none; [foreign-toolchain-docker-legs](#foreign-toolchain-docker-legs) covers local pwsh and dash runs, not crate unit tests.
 
-### emit-per-arm-help-residue
+### runner-image-label-migration
 
-[cost: session/low] [surface: gate-sdk]
+[cost: event/high] [surface: gate-sdk]
 
-five `--emit` members still answer `-h`/`--help` with their usage on stdout at exit 0: `docs-mirror`, `roadmap`, `queue-index`, `entry-history` and `port-blockers`. gate-sdk/SPEC.md §The non-gate arm puts an `--emit-` member's usage at its shape refusal, at exit 2, and calls a per-arm help flag a second home for one sentence; every other member refuses `--help`.
+unpinned runner-image labels change the CI floor with no tree edit: `ubuntu-latest`, used by several jobs in `gates.yml`, `publish.yml` and `site-health.yml`, moves to Ubuntu 26 from 2026-10-19, and `windows-11-arm` moved to Visual Studio 2026 by default from 2026-09-21 (a push after it ran green).
 
-**Deliverable:** a ruling first, since retiring the five narrows shipped behaviour a consumer script may call; then either the five refuse `--help` like the rest, with a release declaration, or the SPEC names them as a stated exception.
+**Deliverable:** a pin-or-ride decision per label before 2026-10-19, and each workflow brought to it; a ride states which run first witnesses the new image.
 
-**Cost while deferred:** one question gets two answers across one family. Filed 2026-09-25 to the gap inbox by gate-sdk-framework-brevity's build; promoted 2026-09-25 at its close. →fix fails because the change needs a ruling a close cannot make. Re-verified at the drain: `--emit <member> --help` exits 0 with usage on stdout for all five. Owner lookup: `per-arm help`, `help flag`, `own -h` in this file — none.
+**Cost while deferred:** the first push after 2026-10-19 runs on an image no push has tried, and a red there costs a hotfix push. Filed 2026-09-25 to the gap inbox by the lead from the notices on gate-sdk-framework-brevity's closing push; promoted 2026-09-25 at the next iteration's scope from the carried bullet. Owner lookup: `ubuntu`, `runner image`, `image label` in this file — none.
 
 ### harness-arm-argv-unstated
 
@@ -731,6 +753,8 @@ five `--emit` members still answer `-h`/`--help` with their usage on stdout at e
 `--usage-poll` and `--statusline` ignore their argv, so a surplus or misspelt argument is dropped at exit 0. gate-sdk/SPEC.md §The harness-integration arm states argv for `--hook` alone, and `--statusline` is in the fail-open set, so whether either may refuse an argument is unstated. Refusing one could blank the status line on an argument the harness appends.
 
 **Deliverable:** the section states each arm's argv, either refusal at exit 2 or dropped under fail-open with the ground, and the arms plus a unit test follow it.
+
+**Taken into non-gate-arm-contract — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** /spec authors its amendment and promotes it, with [non-gate-arm-testing-floor-unstated](#non-gate-arm-testing-floor-unstated) on the same section.
 
 **Cost while deferred:** a mistyped flag to either arm reads as success. Filed 2026-09-25 to the gap inbox by gate-sdk-framework-brevity's build, which also named `--run-validate`; that member was fixed at this close. Promoted 2026-09-25 at its close. →fix fails because the fail-open reading is a SPEC decision a close cannot take. Re-verified at the drain: `--usage-poll --bogus` and `--statusline --bogus` both exit 0. Owner lookup: `statusline`, `usage-poll` in this file — none.
 
