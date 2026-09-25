@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: push-need-accounting
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [README.md](README.md) maps the kits.
 
@@ -9,6 +9,26 @@
 ## New Features
 
 ## Technical Debt
+
+### held-ci-leg-failure-reddens-a-binding-one
+
+[observed-by: gates workflow]
+
+a held producer leg's failure fails the workflow through a binding consumer leg, so held-ness is defeated for the pair, and the binding leg's measurement goes to zero rather than degrading.
+
+**Every premise verified at HEAD 2026-09-08 and measured on a live run.** `native-artifacts` carries `continue-on-error: ${{ matrix.held }}` over a derived matrix; `install-smoke-sh-macos` needs it and is binding. The coupling is the normalize step, which exits 1 when the host's artifact is absent — and it aborts BEFORE the smoke runs, so a down producer yields no measurement at all rather than a degraded one. Measured on run `34200226768`, where that step printed "the producer uploaded no complete aarch64-apple-darwin artifact" and those legs were the run's only failures.
+
+**Deliberately left open by the hotfix.** The operator was offered the wider option that also decouples a held producer's failure from the binding smoke and chose the narrow bootstrap fix over it, so `de662aca` removes the observed TRIGGER and leaves this COUPLING untouched and filed.
+
+**Why the smallest mechanical shape is not the answer.** Falling back to a host build when the upload is absent would void criterion 2 of the join predicate `native/targets.list`'s header states — a platform install-smoke leg green having CONSUMED that upload, with no host-built stand-in anywhere in it. Whether the leg should degrade or stay binding on its producer is an envelope question no surface settles.
+
+**Re-verified at promotion (2026-09-25, survey record):** every `continue-on-error` in `.github/workflows` is derived; `install-smoke-sh-macos` (`.github/workflows/gates.yml`:1676) is the one consumer leg whose binding posture is hard-coded rather than read from `native-artifacts-roster`'s per-target index, as its five sibling legs read theirs. All six declared targets are joined (docs/install.md §Requirements), so no held producer exists at HEAD and the coupling is dormant.
+
+**Deliverable:** that leg reads its posture from the per-target index, so a held producer's consumer is held with it; observed green on a `gates` run.
+
+**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** deriving the posture converges on the siblings' shipped read. The lead's probe shown to the operator: the earlier decline was a hotfix-time choice, not a TRAJECTORY ruling. The degrade-or-stay-binding envelope question above stays open, for /spec to settle.
+
+**Cost while deferred:** every future held platform inherits it, and a red master traceable to a leg nobody declared binding costs a fresh diagnosis. Filed 2026-09-08 by close from the gap inbox; promoted 2026-09-25 at scope.
 
 ## Deferred
 
@@ -108,51 +128,9 @@ an instrument leg's `continue-on-error` is dropped by an argued expiry that fire
 
 **A FOURTH LIMB, ATTESTED RATHER THAN PROPOSED — `lead, own-authority` 2026-09-09 through the lead's message channel.** An exemption whose posture is DERIVED — `continue-on-error` read out of a per-target roster index rather than hand-carried — makes the binding transition happen on the run that licenses it with no edit, and is rehearsed by construction, the green run licensing the join being the same assertion set. Witness: `install-smoke-sh-windows` carried verbatim the expiry this entry indicts; this iteration's build replaced it with the derived read, and run 34394922502 shows `native-artifacts (x86_64-pc-windows-msvc, windows-latest, false)` with both Windows legs binding and no hand edit. **Its BOUND, where the limb is weaker than it looks:** the derived posture needs a roster carrying a held/joined axis. Platform-target legs have one; an instrument leg with no target roster — the PowerShell bootstrap leg among them — does not, so the limb may resolve the platform subset and leave the shape stated above only partly answered. It is also the limb doctrine favours on its face, derivation-first. **Next step, filed and NOT started:** re-measure the remaining `continue-on-error` legs against this limb — which have a roster to derive from. That is a survey, so scope-gated intake puts pricing it in scope's hands.
 
-**DISTINCT from [binding-intel-leg-failed-one-run-in-two](#binding-intel-leg-failed-one-run-in-two)**, which owns a leg already binding failing non-deterministically with no cause a finished run can reach; this owns the transition INTO binding being keyed to the wrong predicate.
+**Mooted by [push-need-uncounted-at-scope](#push-need-uncounted-at-scope) (2026-09-25 scope, operator direction lead-relayed):** the transition half is discharged, every `continue-on-error` now derived; the widening residue is that entry's subject, so this leaves with its landing.
 
 **Cost while deferred:** every widening of a leg that has already expired its exemption is an unrehearsed binding assertion set, and the failure mode is a spent watched push — the scarcest resource an iteration has. Filed 2026-09-09 to the gap inbox by the close of `behind-invoke-relocation`, which no stage of that iteration could drain; promoted 2026-09-09 at this iteration's scope intake, so the record is late and says so.
-
-### binding-intel-leg-failed-one-run-in-two
-
-[cost: event/high] [surface: .github]
-
-a leg this project made binding failed one of its first two runs, non-deterministically, in a way no finished run can diagnose; master is green and nothing needs reverting.
-
-**Read the resolution first.** Master went red at `adb7379f` and GREEN again at `7329b319`, the very next commit, with `install-smoke-sh-macos-intel` PASSING the second time on the same code path and the same three declared targets. What is left is the leg, not a fire.
-
-**What failed.** In run 34267324532 (job 102200720560), the upgrade arm's pack step: the packer as it then was, `scripts/pack-installer.sh`, exited non-zero in 1.6 seconds having printed NOTHING — `run-smoke.sh`:877 echoes `PACK_OUT` to stderr and `PACK_OUT` was empty. Every other arm on that leg passed (main, toolchain-free, jq-less), and the SIBLING arm64 leg ran the same upgrade arm on the same commit with the same three declared targets and finished clean.
-
-**No cause is asserted.** Regression, a host condition of the `macos-15-intel` runner, and a transient are all open. The leg was green on the immediately prior run 34245261556 at `held=true`, so the failure itself is new; the roster count cannot be the cause, since both macOS legs carry the identical count and only one failed.
-
-**Scratch witness landed** (`install-smoke-slow-leg`): read a recurrence against the upgrade arm's `scratch witness` lines — near-zero free space beside the failed pack confirms exhaustion.
-
-**Ruled 2026-09-08 by the lead, own-authority: CARRY it, do not unbind** — unbinding would reverse this iteration's own delivered predicate on a single sample, and the sibling-leg control already excludes the roster count as the cause.
-
-**DISTINCT in subject from `pack-step-dirty-tree-predicate-unscoped`**, whose subject is that refusal's SCOPE alone; this entry's is a red binding leg and what to do about it. The joined cut answered the silence incidentally — one refusal formatter, so the arm has no exit path that prints nothing — and the diagnosis of THIS firing stays here, because a signal-killed process prints nothing whatever the code does. That silence is what made the red unreadable from a finished run, and its firing here is the recurrence that retired entry carried. `lead, own-authority` 2026-09-10 by escalation reply, relayed by the lead, NOT the operator's.
-
-**Cost while deferred:** a re-run is the only diagnosis available, and the next firing costs another one. Filed 2026-09-08 to the gap inbox by the close of `intel-macos-roster-join`, which no stage of that iteration could drain; promoted 2026-09-09 at this iteration's scope intake, so the record is late and says so.
-
-**Joins `install-smoke-slow-leg` — operator direction, 2026-09-17, lead-relayed:** its scratch witness only, riding that unit's `run-smoke.sh` upgrade arm; green in 12 master runs since.
-
-**Re-costed iteration/high to event/high — operator direction, 2026-09-17, lead-relayed:** the cost is per firing, and the leg passed in the last 20 master `gates` runs.
-
-### held-ci-leg-failure-reddens-a-binding-one
-
-[cost: event/high] [surface: .github]
-
-a held producer leg's failure fails the workflow through a binding consumer leg, so held-ness is defeated for the pair, and the binding leg's measurement goes to zero rather than degrading.
-
-**Every premise verified at HEAD 2026-09-08 and measured on a live run.** `native-artifacts` carries `continue-on-error: ${{ matrix.held }}` over a derived matrix (`.github/workflows/gates.yml`:737, :739); `install-smoke-sh-macos` at :858 needs it and is binding, stated twice (:838 "It is binding: its red fails this workflow", and again at :1064). The coupling is the normalize step at :1012-1016, which exits 1 when the host's artifact is absent — and it aborts BEFORE the smoke runs, so a down producer yields no measurement at all rather than a degraded one. Measured on run `34200226768`, where that step printed "the producer uploaded no complete aarch64-apple-darwin artifact" and those legs were the run's only failures.
-
-**Second cost, in the same shape.** The leg used to buy an adopter-path measurement from a host build; after delta 5 it consumes the producer's upload and buys nothing when the producer is down.
-
-**Deliberately left open by the hotfix, which is the discriminator against its sibling bullet.** The operator was offered the wider option that also decouples a held producer's failure from the binding smoke and chose the narrow bootstrap fix over it, so `de662aca` removes the observed TRIGGER and leaves this COUPLING untouched and filed.
-
-**Why the smallest mechanical shape is not the answer.** Falling back to a host build when the upload is absent would void criterion 2 of the join predicate `native/targets.list`'s header states — a platform install-smoke leg green having CONSUMED that upload, with no host-built stand-in anywhere in it — so the six-line edit trades away the evidence the leg exists to buy. Whether the leg should degrade or stay binding on its producer is an envelope question no surface settles.
-
-**Cost while deferred:** every future held platform inherits it, so widening the roster widens the coupling, and a red master traceable to a leg nobody declared binding costs a fresh diagnosis.
-
-**ITS OBSERVED TRIGGER CLEARED HOURS AFTER FILING, and the correction is recorded rather than left to rot.** Run `34209082851` at `d433fd4a` has BOTH darwin producer legs green, so the normalize step passes and the coupling is dormant at HEAD; `install-smoke-sh-macos` is red on a different, downstream defect. What the run does NOT show is the coupling repaired — it shows the one trigger that had fired going away. The entry stays deferred on the structural ground its cost field states, that every future held platform inherits it, and NOT on a red master. Filed 2026-09-08 by close from the gap inbox. Promoted rather than fixed because it is an envelope question the operator has already declined once in its wider form; promoted rather than iceboxed because the coupling is structural and inherited, which no single green run retires.
 
 ### plugin-marketplace
 
@@ -441,6 +419,8 @@ nothing counts how many pushes a unit set needs against the close binding's `pus
 **Attested at hosted-install-path:** two units reached done only through a Windows CI run during build (a `ps-producer-record` measurement, and a binding step plus its hotfix), so build spent the whole ordinary budget before close's own push: `ce35711c`, `00dba701`, hotfix `a9133bd8`, then the granted close push `d1fdb228`. Three of the last 25 master `gates` runs were red, each a Windows leg's first run of new code.
 
 **Deliverable:** scope's unit-set escalation states the set's push need (each `observed-by` entry, and each unit widening a binding CI leg, which is a remote first run) against the consumer's budget; or the binding names a measurement-push class. A new escalation line is a new governed name, so it owes an amendment.
+
+**Admitted by operator exception to the enhancement admission filter (TRAJECTORY.md §The rulings) — operator direction 2026-09-25, lead-relayed:** the filter reaches this entry and the exception admits it. The operator stated no reason; the grounds shown when granting it were scope's escalation: the cost attested three times in five days, three red master `gates` runs each a Windows leg's first run of new code.
 
 **Cost while deferred:** one operator interrupt per iteration whose units need remote-only observations, and a spent watched push per red first run. Filed 2026-09-25 to the gap inbox by hosted-install-path's close; promoted 2026-09-25 at the next scope, so the record is late and says so. Owner lookup: `push-budget`, `push budget`, `observed-by` in this file — none owns the count; the placement rule and the `push-budget` slot are its owners.
 
@@ -1425,5 +1405,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 `check-docs-cmd` assertion (C) misses a retired path cited from the queue, which is outside its manifest corpus and whose `<path>:<line>` token fails the path shape.
 
 ## Done
+
+- binding-intel-leg-failed-one-run-in-two
 
 ## Lessons Learned
