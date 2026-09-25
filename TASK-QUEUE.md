@@ -1408,15 +1408,4 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 ## Done
 
-- surplus-arg-drop-in-six-emit-arms
-- emit-arm-usage-unreachable
-- bin-argv-shape-residual-member
-- fixture-runner-checks-dir-fails-open
-- upgrade-smoke-refuses-inside-a-worktree
-- consumer-smoke-accounting-spelling-unpinned
-- template-registry-population-predicate
-- gate-sdk-framework-brevity
-- non-gate-arm-roster-hand-maintained
-- kit-readme-validity-pass
-
 ## Lessons Learned
