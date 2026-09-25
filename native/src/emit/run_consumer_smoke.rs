@@ -487,23 +487,8 @@ fn account(scratch: &str, host: &str, roots: &[String]) -> Result<Accounting, Ou
         .map_err(|_| env(format!("no gate registry at {} after install", list)))?;
     let registered: BTreeSet<String> = registry::members(&text).into_iter().collect();
 
-    let mut shipped: BTreeMap<String, String> = BTreeMap::new();
-    let mut kit_root: BTreeMap<String, String> = BTreeMap::new();
-    for r in roots {
-        let kit = basename(r);
-        kit_root.insert(kit.clone(), r.clone());
-        let checks = format!("{}/{}/checks", scratch, kit);
-        let entries = walk::list_dir(Path::new(&checks)).unwrap_or_default();
-        for ext in [".sh", ".gate"] {
-            for (name, _) in &entries {
-                if let Some(stem) = name.strip_suffix(ext) {
-                    if stem.starts_with("check-") {
-                        shipped.insert(stem.to_string(), kit.clone());
-                    }
-                }
-            }
-        }
-    }
+    let shipped = shipped_gates(scratch, roots);
+    let kit_root: BTreeMap<String, String> = roots.iter().map(|r| (basename(r), r.clone())).collect();
 
     let mut reasons: BTreeMap<String, (String, String)> = BTreeMap::new();
     for r in roots {
@@ -583,6 +568,23 @@ fn account(scratch: &str, host: &str, roots: &[String]) -> Result<Accounting, Ou
     Ok(acct)
 }
 
+// spec: gate-sdk/SPEC.md §Consumer smoke — the shipped set, keyed by gate name over both declaration
+// spellings, so a gate declared as `.sh` and `.gate` at once is one gate and one probe
+fn shipped_gates(scratch: &str, roots: &[String]) -> BTreeMap<String, String> {
+    let mut shipped: BTreeMap<String, String> = BTreeMap::new();
+    for r in roots {
+        let kit = basename(r);
+        let checks = format!("{}/{}/checks", scratch, kit);
+        for (name, _) in walk::list_dir(Path::new(&checks)).unwrap_or_default() {
+            let stem = name.strip_suffix(".sh").or_else(|| name.strip_suffix(".gate"));
+            if let Some(stem) = stem.filter(|s| s.starts_with("check-")) {
+                shipped.insert(stem.to_string(), kit.clone());
+            }
+        }
+    }
+    shipped
+}
+
 // spec: gate-sdk/SPEC.md §Consumer smoke — a probe the harness could not dispatch ends the run at
 // exit 2 naming the tree, rather than entering the corroboration table as a verdict
 fn step_probe(p: Probe) -> Result<i32, Outcome> {
@@ -646,6 +648,29 @@ mod tests {
             probe(&tree, &dir, "check-ported"),
             Ok(Probe::HarnessError(_))
         ));
+        let _ = std::fs::remove_dir_all(&base);
+    }
+
+    // spec: gate-sdk/SPEC.md §Consumer smoke — the union over both declaration spellings counts a
+    // gate once however many spellings declare it, and counts a non-`check-` file never
+    #[test]
+    fn the_shipped_set_counts_a_gate_once_across_both_spellings() {
+        let base = std::env::temp_dir().join(format!("csmoke-shipped.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&base);
+        let checks = base.join("alpha-kit/checks");
+        let other = base.join("beta-kit/checks");
+        std::fs::create_dir_all(&checks).unwrap();
+        std::fs::create_dir_all(&other).unwrap();
+        for f in ["check-shell.sh", "check-native.gate", "check-both.sh", "check-both.gate", "helper.sh", "check-x.md"] {
+            std::fs::write(checks.join(f), "").unwrap();
+        }
+        std::fs::write(other.join("check-beta.gate"), "").unwrap();
+        let roots = vec!["/host/alpha-kit".to_string(), "/host/beta-kit".to_string()];
+        let shipped = shipped_gates(&base.display().to_string(), &roots);
+        let names: Vec<&str> = shipped.keys().map(String::as_str).collect();
+        assert_eq!(names, ["check-beta", "check-both", "check-native", "check-shell"]);
+        assert_eq!(shipped["check-both"], "alpha-kit");
+        assert_eq!(shipped["check-beta"], "beta-kit");
         let _ = std::fs::remove_dir_all(&base);
     }
 

@@ -40,16 +40,6 @@ gate-sdk/SPEC.md §The non-gate arm hand-lists the flags `main.rs` hardcodes; ac
 
 **Cost while deferred:** the next arm added stales the list. Filed 2026-09-03; returned from the icebox 2026-09-25 by consult as a contributor-reader exception voided by the rule.
 
-### consumer-smoke-accounting-spelling-unpinned
-
-the consumer smoke's accounting unions two spellings of a count (`run_consumer_smoke.rs`) and no test covers the union; its trigger, the smoke's port, has fired.
-
-**Deliverable:** a unit test over the accounting, or one spelling.
-
-**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** test coverage on a shipped behaviour, adding no name.
-
-**Cost while deferred:** a miscount in the smoke's completion line. Filed 2026-08-07; returned from the icebox 2026-09-25 by consult on the fired trigger.
-
 ### template-registry-population-predicate
 
 a third `.list` template, `gate-sdk/templates/portability-patterns.list`, landed 2026-09-07 with no sibling directory; it is the event the template registry's population predicate named, and the native-declaration check over it was not verified.
@@ -1443,5 +1433,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - bin-argv-shape-residual-member
 - fixture-runner-checks-dir-fails-open
 - upgrade-smoke-refuses-inside-a-worktree
+- consumer-smoke-accounting-spelling-unpinned
 
 ## Lessons Learned
