@@ -94,6 +94,8 @@ harness plugin packaging. Harness plugin/marketplace packaging of the stage skil
 
 **Open question a promoting scope answers first — deliberately undecided here.** Whether the marketplace package vendors kits at all, or merely registers the skills and delegates all vendoring to the installer's `init`. Under the second answer it stops being a distribution channel and becomes a **discovery surface**, and `checkwright.lock` ceases to be a contract it must *honour* and becomes one it must not *violate* — the materially cheaper answer, and the one that dissolves most of the sequencing risk above. It is not settled here because it is downstream of this entry's standing ruling that the plugin substrate moves fast and the design must be made against the live manifest format at promotion; deciding it now would be deciding it against a format that will have moved. Recorded 2026-07-26 by close (`activation-path`).
 
+**The format has settled, and it answers the question.** A cross-vendor plugin packaging standard reached 1.0 (consult's landscape refresh, 2026-09-25), adopted by several harnesses with org-managed enable/block lists, and it excludes hooks from its portable core. So the package is a discovery surface registering the skills, vendoring stays with `init`, and the gates stay in the binary outside every harness — the cheaper answer above, now with a stable target.
+
 **Cost while deferred:** zero mechanism rots — the install-ownership contract this must package against is already written and maintained by the installer's `init`; what is foregone is a discovery surface, and the plugin substrate's motion means a design taken early would be retaken at promotion anyway. Surfaced 2026-07-09 in adoption-track's split; evidence artifact retained: upstream Claude Code issue #75214 (project config can't lift the Task ask-first default), surfaced dogfooding the delegation nudge 2026-07-07.
 
 ### benchmark-ab-experiment
@@ -162,9 +164,9 @@ the interop rung. Govern a tree whose specs an **external spec-authoring toolkit
 
 **Seam re-verified clean:** no tracked file names an external spec toolkit.
 
-**Intake provenance:** never declined or costed — the opportunities half of the same operator-commissioned review whose *weaknesses* half filed six launch-facing rungs 2026-07-23, all since landed; the growth half fell outside that intake's stated "top pre-announcement gaps" filter rather than being missed, so the gap is the absent record.
-
 **The cheap alternative, recorded at the 2026-09-20 scope:** discharge the reputational carry below by qualifying the front-door claim rather than proving it.
+
+**First slice, from consult's landscape refresh (2026-09-25):** the leading spec toolkits now carry extension catalogs where deterministic gate extensions are listed and found, and the seat is being filled by small entries inside that distribution. The slice that buys discovery is a catalog extension plus a companion recipe for the second toolkit, packaged outside the kits the way `installer/` is, so no kit literal names a vendor and the seam holds; it is also the tested consumer the front-door claim owes.
 
 **Cost while deferred — not zero, and this is the entry's sharpest fact.** `README.md`:16-17 and `docs/index.md`:17-18 both already assert, on the first screen, "It complements the workflow you already run. Keep your spec process, your prompts, your harness." — and docs/orchestration.md, its "It complements your orchestration setup; it does not replace it" sentence, makes the same move for orchestration, a third site found 2026-08-02 at scope. **No queue or roadmap entry backs any of the three with a tested consumer.** Not false — "complements" is far weaker than "integrates with X" — but *published and unproven*, in a project whose whole pitch is that claims are mechanically proven rather than asserted. The carry is reputational and front-door-resident, accruing on every reader rather than with time. Surfaced 2026-08-02 at close, intake pass over the review's unfiled half.
 
@@ -183,6 +185,8 @@ a narrow external preview before any broad announcement: a preview cohort whose 
 **Expected FIRST FINDING, not a precondition:** today's quick start is curl, sha256sum, tar and `bash … init` from a repository root; macOS needs GNU bash and coreutils by adopter action; native Windows needs Git for Windows. That is why the merged channel gives the installer no delta — those host-floor facts are an output of the observation, not an input.
 
 **Refused, grounds carried forward:** parking behind `native-windows-bash-floor` (landed 2026-09-18) or the git-only-floor discharge (the trigger is what the preview measures); the icebox (the highest cost-while-deferred in the intake).
+
+**Consult recommendation, 2026-09-25:** promote at the next scope. The enhancement admission filter that gated the queue behind the Deferred drain is retired, the tree half has read zero since it landed, and every adoption claim in the landscape refresh is queued behind an observed install; the binding cost is operator hours, which a scope can schedule beside a tree unit.
 
 **Cost while deferred — still the highest of its intake, and now the more exposed half.** Every claim that would be strongest with external evidence still rests on internal dogfooding, and the channel that would carry it is built and reading zero: the published page states an honest `0` on every pass while the volume of unattested governed surface keeps growing. Deferring also silently defers [benchmark-ab-experiment](#benchmark-ab-experiment), since running that first would fix the wrong metrics. Surfaced 2026-08-02 at close, in the same intake pass, as the review's fourth-ranked item.
 
@@ -387,6 +391,26 @@ the secondary customer pages carry validity slips and undefined internal vocabul
 **Deliverable:** each slip corrected at its owner (the generated pages at their emitter), each undefined term glossed on first use or the sentence cut, and the history openers deleted. The ranked list with lines is in this entry's filing commit.
 
 **Cost while deferred:** low per page and slow, paid by the reader who has already passed the front door. Filed 2026-09-25 by consult as a direct entry, from the same audit; split from the front-door entry because its pages do not decide the first install.
+
+### ci-one-line-action
+
+[cost: event/high] [surface: gate-sdk]
+
+the CI story is a copy-out template: `gate-sdk/templates/gates-workflow.yml` exists, `init` does not seed it, no versioned Action lets a workflow say `uses:` in one line, and the battery emits no SARIF, so a red never reaches the pull-request checks tab as an annotation. docs/install.md tells an adopter to make the battery a required status check and leaves them to copy the template by hand. Same-seat entrants ship an Action and SARIF (consult's landscape refresh, 2026-09-25).
+
+**Deliverable:** a versioned Action in this repository the workflow references by tag, `init` seeding the workflow file into the consumer (or printing the one line), and a SARIF emitter arm off the runner's verdict; installer/SPEC.md §init and gate-sdk/SPEC.md §Consumer smoke own the contract, the consumer smoke exercises the seeded workflow.
+
+**Cost while deferred:** the pull-request check is where a maintainer first sees a red, so the first useful red — the preview's second metric — has no path an adopter can wire in one line. Filed 2026-09-25 by consult as a direct entry, third of the refresh's ranked actions.
+
+### demo-catches-a-done-claim
+
+[cost: event/high] [surface: installer]
+
+the headline promises that unsupported *done* claims become failing checks, and `demo`'s caught defect is a mistyped relative link (installer/SPEC.md §demo, act 3). The failure the headline names is now a mainstream, measured one (false success claims are a large share of agent failures in the 2026 literature; consult's landscape refresh), and the first minute never shows it.
+
+**Deliverable:** act 3 commits a task marked done with no validate evidence and the battery reds on `check-stage-evidence`, keeping the link defect as a second act or dropping it; the demo installs a profile that carries the gate, or the act authors the on-surface registration it needs; the consumer smoke's demo arm asserts the new red; the front door's proof block is the captured output ([front-door-demo-unreachable](#front-door-demo-unreachable) owes that block, so the two land together or this one first).
+
+**Cost while deferred:** the demo proves a claim the front door does not make and never the one it does. Filed 2026-09-25 by consult as a direct entry, fifth of the refresh's ranked actions; a release after it ends the visible cadence gap.
 
 ### prune-set-matches-walk-root-ancestors
 
