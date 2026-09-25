@@ -5,3 +5,4 @@
 ---
 
 non-gate-arm-contract scope afa8268a 2026-09-25 380cf8d2
+non-gate-arm-contract spec ac8f88ec 2026-09-26 3db5c9d2
