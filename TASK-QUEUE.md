@@ -10,30 +10,6 @@
 
 ## Technical Debt
 
-### held-ci-leg-failure-reddens-a-binding-one
-
-[observed-by: gates workflow]
-
-a held producer leg's failure fails the workflow through a binding consumer leg, so held-ness is defeated for the pair, and the binding leg's measurement goes to zero rather than degrading.
-
-**Every premise verified at HEAD 2026-09-08 and measured on a live run.** `native-artifacts` carries `continue-on-error: ${{ matrix.held }}` over a derived matrix; `install-smoke-sh-macos` needs it and is binding. The coupling is the normalize step, which exits 1 when the host's artifact is absent — and it aborts BEFORE the smoke runs, so a down producer yields no measurement at all rather than a degraded one. Measured on run `34200226768`, where that step printed "the producer uploaded no complete aarch64-apple-darwin artifact" and those legs were the run's only failures.
-
-**Deliberately left open by the hotfix.** The operator was offered the wider option that also decouples a held producer's failure from the binding smoke and chose the narrow bootstrap fix over it, so `de662aca` removes the observed TRIGGER and leaves this COUPLING untouched and filed.
-
-**Why the smallest mechanical shape is not the answer.** Falling back to a host build when the upload is absent would void criterion 2 of the join predicate `native/targets.list`'s header states — a platform install-smoke leg green having CONSUMED that upload, with no host-built stand-in anywhere in it.
-
-**Envelope settled at spec (2026-09-25) by the governing surfaces: the consumer's posture is its producer's.** Degrading is the fallback criterion 2 refuses, and a consumer bound regardless of its producer is this entry's coupling. Reading the posture — `runs-on` and `continue-on-error`, as the siblings do — from the index at `aarch64-apple-darwin` holds the consumer exactly while its producer is held, as `install-smoke-sh-macos-intel`'s header states for its own pair. Run `34200226768` shows held producer legs failing and `install-smoke-macos` still running, to failure, so a failed held leg satisfies `needs:`. `native/runners.list` gives that triple the leg's current `macos-latest`; the derived runner owes `shell: bash` on the leg's four `run:` steps. The landing commit rewrites the leg's header, which declares it binding, and the Intel leg's citation of this slug.
-
-**Re-verified at promotion (2026-09-25, survey record):** every `continue-on-error` in `.github/workflows` is derived; `install-smoke-sh-macos` (`.github/workflows/gates.yml`:1676) is the one consumer leg whose binding posture is hard-coded rather than read from `native-artifacts-roster`'s per-target index, as its five sibling legs read theirs. All six declared targets are joined (docs/install.md §Requirements), so no held producer exists at HEAD and the coupling is dormant.
-
-**Deliverable:** that leg reads its posture from the per-target index, so a held producer's consumer is held with it; observed green on a `gates` run.
-
-**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** deriving the posture converges on the siblings' shipped read. The lead's probe shown to the operator: the earlier decline was a hotfix-time choice, not a TRAJECTORY ruling.
-
-**Push need (2026-09-25, inside the budget):** one push at its build, after the landing commit, to read the `gates` run; with the closing push, 2 against the close binding's 1–2.
-
-**Cost while deferred:** every future held platform inherits it, and a red master traceable to a leg nobody declared binding costs a fresh diagnosis. Filed 2026-09-08 by close from the gap inbox; promoted 2026-09-25 at scope.
-
 ## Deferred
 
 ### docs-liquid-literal-unseen
@@ -1381,5 +1357,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - binding-intel-leg-failed-one-run-in-two
 - push-need-uncounted-at-scope
 - instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set
+- held-ci-leg-failure-reddens-a-binding-one
 
 ## Lessons Learned
