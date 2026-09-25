@@ -800,7 +800,7 @@ Armed and short-circuit are the firing/non-firing pair over the same stub, so th
 - token deltas and weekly headroom on the report;
 - the fail-closed refusals (knob unset, history missing), each read off the arm's own `Err`;
 - the zero-segment **reading**, which stays a document at exit 0 rather than collapsing into the misuse code;
-- the three argv-shape behaviours the front-end arm owns, which exist in one substrate only.
+- the `--` escape reaching a dash-led history path. The shape refusal and its `--help` instance are the arm's own test module's (gate-sdk/SPEC.md §The non-gate arm).
 
 **Its needles are exact golden strings, and its segment counts are anchored on the reporter's own two-space indentation.** Loosening a needle into a pattern weakens the assertion, and that indentation is load-bearing rather than cosmetic.
 

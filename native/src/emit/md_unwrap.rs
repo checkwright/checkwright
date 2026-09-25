@@ -39,3 +39,18 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     }
     Ok(out)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // spec: canon-kit/SPEC.md §check-md-unwrapped — a malformed argv refuses before the knob read,
+    // so none reaches a file
+    #[test]
+    fn a_malformed_argv_refuses_with_the_usage() {
+        for args in [&[][..], &["--write"], &["--help"], &["a.md", "--b.md"]] {
+            let argv: Vec<String> = args.iter().map(|a| a.to_string()).collect();
+            assert_eq!(emit(&argv).expect_err("a malformed argv must refuse"), USAGE, "{:?}", args);
+        }
+    }
+}

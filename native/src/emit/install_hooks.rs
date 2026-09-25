@@ -164,3 +164,16 @@ fn identity_rung(gates_dir: &str) -> i32 {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // spec: gate-sdk/SPEC.md §The bin/-tool contract — the option half refuses before either knob
+    // resolves, so a stray flag wires nothing
+    #[test]
+    fn a_flag_refuses_with_the_usage_before_any_wiring() {
+        let err = dispatch(&["--help".to_string()]).expect_err("--help must refuse");
+        assert!(err.contains("--help") && err.contains(USAGE), "{}", err);
+    }
+}

@@ -574,22 +574,8 @@ fn the_kits_trend_fixture_reports_its_segments() {
         read
     );
 
-    // spec: gate-sdk/SPEC.md §The bin/-tool contract — the three behaviours this port ADDS, which
-    // exist in one substrate only and are therefore asserted here rather than compared: the shape
-    // refusal, the `--help` instance of it that the shell absorbed as a path, and the `--` escape.
-    let flag = usage_trend::emit(&["--help".to_string()]).expect_err("[--help]: want a refusal");
-    assert!(
-        flag.contains("unrecognized option: --help") && flag.contains("usage: run-gates.sh --emit"),
-        "[--help]: the refusal must name the flag and print the usage block: {}",
-        flag
-    );
-    let dashed = usage_trend::emit(&["-notapath".to_string()])
-        .expect_err("[shape refusal]: want a refusal");
-    assert!(
-        dashed.contains("unrecognized option: -notapath"),
-        "[shape refusal]: {}",
-        dashed
-    );
+    // spec: gate-sdk/SPEC.md §The bin/-tool contract — the `--` escape this port added, reaching a
+    // dash-led copy of the fixture history.
     let escape = dir.join("--dashed.log");
     std::fs::copy(&history, &escape).expect("the dash-led fixture must be copyable");
     let escaped = usage_trend::emit(&["--".to_string(), text(&escape)])

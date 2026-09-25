@@ -156,3 +156,41 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     }
     Ok(text)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn join() -> Join {
+        let key = |c: &str, k: &str| (format!("{}|{}", c, k), String::new());
+        Join {
+            classes: vec!["gate".into(), "hook".into()],
+            counts: vec![key("gate", "b"), key("gate", "z"), key("hook", "y"), key("gate", "z"), key("hook", "z")],
+            kits: vec!["b".into(), "a".into()],
+            always: Vec::new(),
+            triggered: Vec::new(),
+            total_always: String::new(),
+            total_triggered: String::new(),
+        }
+    }
+
+    #[test]
+    fn an_absent_tier_is_the_em_dash_and_a_present_one_its_token_figure() {
+        assert_eq!(token_cell(0, 0), "\u{2014}");
+        assert_eq!(token_cell(3, 0), "~0t");
+        assert_eq!(token_cell(1, 4099), "~1024t");
+    }
+
+    #[test]
+    fn the_axis_keeps_the_footprint_order_then_each_enforcement_only_kit_once_sorted() {
+        assert_eq!(axis(&join()), vec!["b", "a", "y", "z"]);
+    }
+
+    #[test]
+    fn a_count_is_per_class_and_kit() {
+        let j = join();
+        assert_eq!(count_of(&j, "gate", "z"), 2);
+        assert_eq!(count_of(&j, "hook", "z"), 1);
+        assert_eq!(count_of(&j, "hook", "b"), 0);
+    }
+}

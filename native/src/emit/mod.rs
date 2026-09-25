@@ -1,6 +1,6 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — the ported arms. Each owes no descriptor, no
-// registration and no fixture pair, and owes a named caller instead: a regen command, a
-// comparator calling `emit()`, a stage step, a gate reaching it in process.
+// registration and no fixture pair; it owes a test module in its own file, and a named caller: a
+// regen command, a comparator calling `emit()`, a stage step, a gate reaching it in process.
 use crate::programs;
 pub mod agents_md_smoke;
 pub mod always_loaded;
@@ -939,6 +939,54 @@ mod tests {
                 );
             }
         }
+    }
+
+    // spec: gate-sdk/SPEC.md §The non-gate arm — the testing floor's census: each row's function
+    // resolves to its file, and that file carries a test module. Presence, never coverage.
+    #[test]
+    fn every_arm_table_row_resolves_to_a_file_with_a_test_module() {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+        let src = std::fs::read_to_string(root.join("emit/mod.rs")).expect("the arm table's file reads");
+        let start = src.find("pub const ARMS:").expect("the arm table's declaration");
+        let end = start + src[start..].find("\n];").expect("the arm table's close");
+        let table = &src[start..end];
+        let mut rows = 0;
+        let mut offending: Vec<String> = Vec::new();
+        for token in ["Arm::Emit(", "Arm::Run("] {
+            for (at, _) in table.match_indices(token) {
+                rows += 1;
+                let path: String = table[at + token.len()..]
+                    .chars()
+                    .take_while(|c| c.is_ascii_alphanumeric() || *c == '_' || *c == ':')
+                    .collect();
+                let segs: Vec<&str> = path.split("::").collect();
+                let module = match segs.split_last() {
+                    Some((_, ["crate", rest @ ..])) => rest.join("/"),
+                    Some((_, rest)) => format!("emit/{}", rest.join("/")),
+                    None => String::new(),
+                };
+                let file = [format!("{}.rs", module), format!("{}/mod.rs", module)]
+                    .into_iter()
+                    .map(|f| root.join(f))
+                    .find(|f| f.is_file());
+                let tested = file.as_ref().and_then(|f| std::fs::read_to_string(f).ok()).is_some_and(|t| {
+                    t.lines().any(|l| l.trim_start().starts_with("#[cfg(test)]"))
+                });
+                if !tested {
+                    let shown = file.map_or_else(
+                        || format!("{}.rs (absent)", module),
+                        |f| f.strip_prefix(&root).unwrap_or(&f).display().to_string(),
+                    );
+                    offending.push(format!("{} -> {}", path, shown));
+                }
+            }
+        }
+        assert_eq!(rows, ARMS.len(), "the census read {} rows of the {} the table holds", rows, ARMS.len());
+        assert!(
+            offending.is_empty(),
+            "arm-table rows whose file carries no #[cfg(test)] module:\n  {}",
+            offending.join("\n  ")
+        );
     }
 
     #[test]

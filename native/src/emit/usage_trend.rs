@@ -338,3 +338,22 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         report.trim_end_matches('\n')
     ))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // spec: gate-sdk/SPEC.md §The bin/-tool contract — the shape refusal this port added, and its
+    // `--help` instance the shell absorbed as a path; both fail before the history knob is read
+    #[test]
+    fn a_dash_led_operand_refuses_with_the_usage() {
+        let flag = emit(&["--help".to_string()]).expect_err("[--help]: want a refusal");
+        assert!(
+            flag.contains("unrecognized option: --help") && flag.contains("usage: run-gates.sh --emit"),
+            "[--help]: the refusal must name the flag and print the usage block: {}",
+            flag
+        );
+        let dashed = emit(&["-notapath".to_string()]).expect_err("[shape refusal]: want a refusal");
+        assert!(dashed.contains("unrecognized option: -notapath"), "[shape refusal]: {}", dashed);
+    }
+}
