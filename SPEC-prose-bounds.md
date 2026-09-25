@@ -128,7 +128,7 @@ Headings keep their text, so every `§` citation into them still resolves. Befor
 
 ### (7) The three moves in installer §The consumer smoke {design-bearing}
 
-**Not yet applied.** installer/SPEC.md §The consumer smoke keeps what the smoke asserts, how it runs and what a red means. The round-by-round debugging log and the dated cost measurement go to history. The same acceptance holds as in delta 6: no finding from either gate in the section, and every normative sentence accounted for. installer/SPEC.md is a declared seam surface, so its three dated lines are `dated` findings until this delta lands.
+**Applied.** installer/SPEC.md §The consumer smoke keeps what the smoke asserts, how it runs and what a red means. The round-by-round debugging log and the dated cost measurement go to history. The same acceptance holds as in delta 6: no finding from either gate in the section, and every normative sentence accounted for. installer/SPEC.md is a declared seam surface, so its three dated lines are `dated` findings until this delta lands.
 
 ### (8) The three moves in delegation-kit §Testing {design-bearing}
 

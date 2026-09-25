@@ -8,7 +8,7 @@
 119 evidence-kit/SPEC.md
 1669 gate-sdk/SPEC.md
 307 guard-kit/SPEC.md
-313 installer/SPEC.md
+174 installer/SPEC.md
 419 lifecycle-kit/SPEC.md
 165 queue-kit/SPEC.md
 49 site-kit/SPEC.md
