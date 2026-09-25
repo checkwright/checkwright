@@ -268,7 +268,7 @@ if staged_matches '.gitattributes' 'native/src/knobs/lifecycle_kit.rs' 'scripts/
     run_gate check-merge-attrs native/target/release/checkwright-gates check-merge-attrs
 fi
 
-if staged_matches '*.workflow/*' 'gate-sdk/SPEC.md' 'canon-kit/SPEC.md' 'context-kit/SPEC.md' 'delegation-kit/SPEC.md' 'doctrine-kit/SPEC.md' 'drift-kit/SPEC.md' 'evidence-kit/SPEC.md' 'guard-kit/SPEC.md' 'lifecycle-kit/SPEC.md' 'queue-kit/SPEC.md' 'site-kit/SPEC.md' '*/SPEC.md' '*CLAUDE.md' '*doctrine-kit/DOCTRINE.md' '*.claude/commands/*.md' '*TRAJECTORY.md' '.gitignore' 'scripts/gate-sdk-config.knobs' 'scripts/lifecycle-config.knobs' 'native/src/gates/close_surfaces.rs' 'native/src/emit/close_surfaces.rs' 'native/src/programs.rs' 'native/src/stages.rs'; then
+if staged_matches '*.workflow/*' 'gate-sdk/SPEC.md' 'canon-kit/SPEC.md' 'context-kit/SPEC.md' 'delegation-kit/SPEC.md' 'doctrine-kit/SPEC.md' 'drift-kit/SPEC.md' 'evidence-kit/SPEC.md' 'guard-kit/SPEC.md' 'lifecycle-kit/SPEC.md' 'queue-kit/SPEC.md' 'site-kit/SPEC.md' '*/SPEC.md' '*CLAUDE.md' '*doctrine-kit/DOCTRINE.md' '*.claude/commands/*.md' '*TRAJECTORY.md' '.gitignore' 'scripts/gate-sdk-config.knobs' 'scripts/lifecycle-config.knobs' 'native/src/gates/close_surfaces.rs' 'native/src/emit/close_surfaces.rs' 'native/src/programs.rs' 'native/src/stages.rs' 'native/src/emit/file_survey.rs'; then
     run_gate check-close-surfaces native/target/release/checkwright-gates check-close-surfaces
 fi
 

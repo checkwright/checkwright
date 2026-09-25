@@ -379,6 +379,8 @@ fn timeout_secs() -> Result<u64, String> {
 // about to retire, so the citing report answers "what would go stale" for a retirement the record
 // does not yet carry. With no operand the report covers exactly the fired conditions.
 pub fn emit(args: &[String]) -> Result<String, String> {
+    let args = super::file_survey::positionals(args, "ruling name")
+        .map_err(|e| format!("{}\n{}", e, USAGE))?;
     let record = walk::knob_scalar("LIFECYCLE_KIT_RULING_RECORD")?;
     let record = record.trim_matches(WS).to_string();
     if record.is_empty() {

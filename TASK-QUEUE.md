@@ -386,7 +386,7 @@ the secondary customer pages carry validity slips and undefined internal vocabul
 
 [cost: session/high] [surface: gate-sdk]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk's remainder after `gate-sdk-framework-brevity` (§Per-component contracts at about 107k words, the Porting cohort records, §The `# graph:` manifest, §Meta-gate conservation for the binary substrate, §Consumer payload, §Consumer smoke), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk's remainder, its framework half landed as `gate-sdk-framework-brevity` (§Per-component contracts at about 107k words, the Porting cohort records, §The `# graph:` manifest, §Meta-gate conservation for the binary substrate, §Consumer payload, §Consumer smoke), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
@@ -713,6 +713,26 @@ no CI leg runs the native crate's unit tests on native Windows. `.github/workflo
 **Deliverable:** a Windows leg that runs the crate's unit tests, or a narrower one running only the modules that pin a platform claim, with its cost against the push budget stated. Or a SPEC boundary note refusing the leg and keeping the honest limit.
 
 **Cost while deferred:** a Windows adopter's close drain could fail with exit 2, and nobody sees it until an adopter reports it. Filed 2026-09-25 to the gap inbox by spec-brevity-first-slice's build; promoted 2026-09-25 at its close. →fix fails because a new CI leg is new mechanism, and only a push can witness it. Re-verified at the drain: `grep 'cargo test' .github/workflows/*.yml` returns nothing. Owner lookup: `cargo test`, `msvc`, `unit tests on` in this file — none; [foreign-toolchain-docker-legs](#foreign-toolchain-docker-legs) covers local pwsh and dash runs, not crate unit tests.
+
+### emit-per-arm-help-residue
+
+[cost: session/low] [surface: gate-sdk]
+
+five `--emit` members still answer `-h`/`--help` with their usage on stdout at exit 0: `docs-mirror`, `roadmap`, `queue-index`, `entry-history` and `port-blockers`. gate-sdk/SPEC.md §The non-gate arm puts an `--emit-` member's usage at its shape refusal, at exit 2, and calls a per-arm help flag a second home for one sentence; every other member refuses `--help`.
+
+**Deliverable:** a ruling first, since retiring the five narrows shipped behaviour a consumer script may call; then either the five refuse `--help` like the rest, with a release declaration, or the SPEC names them as a stated exception.
+
+**Cost while deferred:** one question gets two answers across one family. Filed 2026-09-25 to the gap inbox by gate-sdk-framework-brevity's build; promoted 2026-09-25 at its close. →fix fails because the change needs a ruling a close cannot make. Re-verified at the drain: `--emit <member> --help` exits 0 with usage on stdout for all five. Owner lookup: `per-arm help`, `help flag`, `own -h` in this file — none.
+
+### harness-arm-argv-unstated
+
+[cost: session/low] [surface: gate-sdk]
+
+`--usage-poll` and `--statusline` ignore their argv, so a surplus or misspelt argument is dropped at exit 0. gate-sdk/SPEC.md §The harness-integration arm states argv for `--hook` alone, and `--statusline` is in the fail-open set, so whether either may refuse an argument is unstated. Refusing one could blank the status line on an argument the harness appends.
+
+**Deliverable:** the section states each arm's argv, either refusal at exit 2 or dropped under fail-open with the ground, and the arms plus a unit test follow it.
+
+**Cost while deferred:** a mistyped flag to either arm reads as success. Filed 2026-09-25 to the gap inbox by gate-sdk-framework-brevity's build, which also named `--run-validate`; that member was fixed at this close. Promoted 2026-09-25 at its close. →fix fails because the fail-open reading is a SPEC decision a close cannot take. Re-verified at the drain: `--usage-poll --bogus` and `--statusline --bogus` both exit 0. Owner lookup: `statusline`, `usage-poll` in this file — none.
 
 ## Icebox
 

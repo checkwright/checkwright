@@ -105,6 +105,8 @@ pub fn render(text: &str, stage: &str, path: &str) -> String {
 // overriding the knob, the shell precedence unchanged; the optional positional is kept because the
 // gate and the installer it matches still take theirs (gate-sdk/SPEC.md §The non-gate arm)
 pub fn emit(args: &[String]) -> Result<String, String> {
+    let args = super::file_survey::positionals(args, "stage")
+        .map_err(|e| format!("{}\n{}", e, USAGE))?;
     let stage = match args.first().filter(|a| !a.is_empty()) {
         Some(s) => s.clone(),
         None => return Err(USAGE.to_string()),

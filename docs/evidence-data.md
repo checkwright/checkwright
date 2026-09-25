@@ -223,3 +223,4 @@
 | push-need-accounting | sc sp · b v c | 2f/1d | 1 · ≤0d | 21s clean | 134 |
 | powershell-scratch-runner | sc sp · b v c | 3f/2d | 1 · ≤0d | 21s clean | 134 |
 | spec-brevity-first-slice | sc sp a b v c | 4f/3d | 3 · ≤0d | 21s clean | 135 |
+| gate-sdk-framework-brevity | sc · · b v c | 0f/3d | 0 | 21s clean | 135 |

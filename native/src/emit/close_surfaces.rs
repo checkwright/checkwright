@@ -295,7 +295,14 @@ pub fn derive(args: &[String]) -> Result<Roster, String> {
 // it as zero surfaces: a resolved-empty derivation is an answer, never an error.
 pub const USAGE: &str = "usage: --emit close-surfaces [scan-root]";
 
+// spec: gate-sdk/SPEC.md §The bin/-tool contract — the shape refusal sits here and not in
+// `derive`, which the gate also calls with its own argv.
 pub fn emit(args: &[String]) -> Result<String, String> {
+    let args = super::file_survey::positionals(args, "scan-root")
+        .map_err(|e| format!("{}\n{}", e, USAGE))?;
+    if let Some(surplus) = args.get(1) {
+        return Err(format!("unexpected argument: {} — it takes one scan-root\n{}", surplus, USAGE));
+    }
     let r = derive(args)?;
     if r.rows.is_empty() {
         return Ok(String::new());

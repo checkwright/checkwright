@@ -127,7 +127,7 @@ fn index_one(text: &str) -> String {
 // count, the heading rows, then a blank line — after the last block too, which the shell form's
 // unconditional trailing `echo ""` is what makes true.
 pub fn emit(args: &[String]) -> Result<String, String> {
-    let paths = targets(args)?;
+    let paths = targets(args, USAGE)?;
     let root = walk::toplevel_opt()?;
     let mut out = String::new();
     for file in corpus(&paths, &["*.md"])? {

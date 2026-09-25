@@ -49,6 +49,18 @@ has help err "unrecognized option: --help"
 has help err "usage: --emit file-survey"
 usage_once help
 
+# A free-text reader refuses a dash-led operand rather than reading it as an empty reading.
+for arm in md-index pub-index stage-rules ruling-staleness close-surfaces; do
+    run "dash-$arm" 2 "--emit-$arm" --help
+    has "dash-$arm" err "unrecognized option: --help"
+    usage_once "dash-$arm"
+done
+
+# A one-operand member refuses a surplus second one rather than dropping it.
+run cs-surplus 2 --emit-close-surfaces . surplus
+has cs-surplus err "unexpected argument: surplus"
+usage_once cs-surplus
+
 # A member whose own refusal already spells its usage is not handed it twice.
 run spelled 2 --emit-md-section
 usage_once spelled
@@ -71,5 +83,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "emit-arm-shape.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "emit-arm-shape.test.sh: clean (a surplus and a misspelt argument are refused before the member runs, --help is a refusal, every shape refusal prints its usage once and a runtime one none, and a bare invocation of an argument-free member still runs; $checks invocations)"
+echo "emit-arm-shape.test.sh: clean (a surplus and a misspelt argument are refused before the member runs, a free-text reader refuses a dash-led operand, --help is a refusal, every shape refusal prints its usage once and a runtime one none, and a bare invocation of an argument-free member still runs; $checks invocations)"
 exit 0

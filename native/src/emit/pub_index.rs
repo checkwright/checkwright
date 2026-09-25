@@ -146,7 +146,7 @@ fn block(rel: &str, rows: &[String]) -> String {
 }
 
 pub fn emit(args: &[String]) -> Result<String, String> {
-    let paths = targets(args)?;
+    let paths = targets(args, USAGE)?;
     let root = crate::walk::toplevel_opt()?;
     let dir = crate::walk::knob_scalar("CONTEXT_KIT_PUB_LANG_DIR")?;
     // spec: context-kit/SPEC.md §Layout and configuration — an empty `CONTEXT_KIT_PUB_LANGS` means *derive

@@ -83,9 +83,15 @@ fn config() -> Result<Cfg, Refusal> {
 }
 
 // spec: evidence-kit/SPEC.md §bin/run-validate.sh — the whole input arrives as knobs, so the
-// member takes no positional at all: there is no free text for the argv-shape
-// refusal or the `--` escape to bind on, and usage lives in the front-end.
-fn dispatch(_args: &[String]) -> Result<i32, Refusal> {
+// member takes no argument and any word is refused before the lock is claimed: a `--help` read as
+// nothing would start a full producer run. Usage lives in the front-end.
+fn dispatch(args: &[String]) -> Result<i32, Refusal> {
+    if let Some(a) = args.first() {
+        return Err(guard(format!(
+            "takes no arguments (got: {}) — usage: run-gates.sh --help",
+            a
+        )));
+    }
     let cfg = config()?;
 
     if cfg.suites.is_empty() {
@@ -397,6 +403,15 @@ fn append_line(path: &str, line: &str) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn an_argument_is_refused_before_any_config_is_read() {
+        for word in ["--help", "--nope", "suite"] {
+            let err = dispatch(&[word.to_string()]).expect_err("an argument ran the spine");
+            assert_eq!(err.code, 2);
+            assert!(err.message.contains(word), "{}", err.message);
+        }
+    }
 
     // spec: evidence-kit/SPEC.md §Evidence manifest — the fold's two halves, which no gate holds:
     // this iteration's prior line is dropped for a suite the run covered and kept for one it did

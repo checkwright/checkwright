@@ -101,7 +101,10 @@ pub fn self_repo_prefix(reference: &str) -> String {
 
 // spec: context-kit/SPEC.md §Index-first reading — the index walk both index arms share, sited
 // here on `self_repo_prefix`'s reading: one traversal-exclusion set, so one copy of the walk.
-pub fn targets(args: &[String]) -> Result<Vec<String>, String> {
+// spec: gate-sdk/SPEC.md §The bin/-tool contract — the paths are free text, so a dash-led one is
+// a shape refusal carrying the calling member's usage.
+pub fn targets(args: &[String], usage: &str) -> Result<Vec<String>, String> {
+    let args = file_survey::positionals(args, "path").map_err(|e| format!("{}\n{}", e, usage))?;
     if args.is_empty() {
         return Ok(vec![match crate::walk::toplevel_opt()? {
             Some(t) => t,
