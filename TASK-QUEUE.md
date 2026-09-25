@@ -96,7 +96,7 @@ nothing shipped lets a customer run the battery under a named config-seam varian
 
 ### instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set
 
-[cost: event/high] [surface: .github]
+[cost: event/high] [surface: .github] [recurrence: 2026-09-25]
 
 an instrument leg's `continue-on-error` is dropped by an argued expiry that fires on the leg running green ONCE, so widening the leg afterwards re-creates, silently, the never-run condition the exemption existed for.
 
@@ -431,6 +431,18 @@ the consumer's local-only companion files have read triggers at three skills and
 **Held Deferred by the enhancement admission filter** (TRAJECTORY.md §The rulings): new template slots are an enhancement that cuts no time-to-first-value, closes no trust gap and produces no external proof.
 
 **Cost while deferred:** local-only surfaces drift until a consult happens to audit them. Filed 2026-09-18 to the gap inbox by the consult that audited the local-only files, after `external-install-evidence`'s close; promoted to Deferred at the next scope.
+
+### push-need-uncounted-at-scope
+
+[cost: event/high] [surface: lifecycle-kit]
+
+nothing counts how many pushes a unit set needs against the close binding's `push-budget` slot before the set is ruled. lifecycle-kit/SPEC.md §The state machine places an `observed-by` iteration's first push early and deliberately names no count, and scope's unit-set escalation states no push need, so an overrun surfaces only at close, as an operator ask.
+
+**Attested at hosted-install-path:** two units reached done only through a Windows CI run during build (a `ps-producer-record` measurement, and a binding step plus its hotfix), so build spent the whole ordinary budget before close's own push: `ce35711c`, `00dba701`, hotfix `a9133bd8`, then the granted close push `d1fdb228`. Three of the last 25 master `gates` runs were red, each a Windows leg's first run of new code.
+
+**Deliverable:** scope's unit-set escalation states the set's push need (each `observed-by` entry, and each unit widening a binding CI leg, which is a remote first run) against the consumer's budget; or the binding names a measurement-push class. A new escalation line is a new governed name, so it owes an amendment.
+
+**Cost while deferred:** one operator interrupt per iteration whose units need remote-only observations, and a spent watched push per red first run. Filed 2026-09-25 to the gap inbox by hosted-install-path's close; promoted 2026-09-25 at the next scope, so the record is late and says so. Owner lookup: `push-budget`, `push budget`, `observed-by` in this file — none owns the count; the placement rule and the `push-budget` slot are its owners.
 
 ## Icebox
 
