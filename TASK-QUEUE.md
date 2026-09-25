@@ -40,16 +40,6 @@ gate-sdk/SPEC.md §The non-gate arm hand-lists the flags `main.rs` hardcodes; ac
 
 **Cost while deferred:** the next arm added stales the list. Filed 2026-09-03; returned from the icebox 2026-09-25 by consult as a contributor-reader exception voided by the rule.
 
-### upgrade-smoke-refuses-inside-a-worktree
-
-`--upgrade-smoke` tests `.git` with `is_dir()` (`upgrade_smoke.rs`) and answers "not a git repository" inside any linked worktree, where `.git` is a file.
-
-**Deliverable:** resolve through `git rev-parse --git-dir`, with a worktree fixture.
-
-**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** a defect fix adding no name. Re-verified at scope: the `is_dir()` test still guards the repository check.
-
-**Cost while deferred:** an adopter on a worktree cannot run the upgrade smoke. Filed 2026-08-29; returned from the icebox 2026-09-25 by consult, the test re-read.
-
 ### consumer-smoke-accounting-spelling-unpinned
 
 the consumer smoke's accounting unions two spellings of a count (`run_consumer_smoke.rs`) and no test covers the union; its trigger, the smoke's port, has fired.
@@ -1452,5 +1442,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - emit-arm-usage-unreachable
 - bin-argv-shape-residual-member
 - fixture-runner-checks-dir-fails-open
+- upgrade-smoke-refuses-inside-a-worktree
 
 ## Lessons Learned

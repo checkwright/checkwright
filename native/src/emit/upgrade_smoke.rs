@@ -232,15 +232,12 @@ fn smoke() -> Result<String, Fail> {
 
 // spec: gate-sdk/SPEC.md §upgrade-smoke — `GATE_SDK_UPGRADE_REPO` empty means *derive it*: the
 // enclosing repo's toplevel, the value the deleted driver computed inline.
-// spec: gate-sdk/SPEC.md §upgrade-smoke — `-d "$REPO/.git"` is carried across **verbatim**, refusal
-// included: it refuses inside a linked worktree, where `.git` is a pointer file, and settling that
-// live `upgrade-smoke-refuses-inside-a-worktree` fork is design work a port does not do.
 fn resolve_repo() -> Result<String, Fail> {
     let mut repo = knob("GATE_SDK_UPGRADE_REPO")?;
     if repo.is_empty() {
         repo = walk::toplevel_opt().unwrap_or(None).unwrap_or_default();
     }
-    if repo.is_empty() || !Path::new(&format!("{}/.git", repo)).is_dir() {
+    if repo.is_empty() || !is_toplevel(&repo) {
         let shown = if repo.is_empty() { "<unset>" } else { &repo };
         return Err(broken(one(format!(
             "{}: GATE_SDK_UPGRADE_REPO is not a git repository: {}",
@@ -248,6 +245,15 @@ fn resolve_repo() -> Result<String, Fail> {
         ))));
     }
     Ok(repo)
+}
+
+// spec: gate-sdk/SPEC.md §upgrade-smoke — the repo predicate is git's own answer, a work tree's
+// toplevel, so a linked worktree, whose `.git` is a pointer file, is a repository like a main checkout
+fn is_toplevel(repo: &str) -> bool {
+    match proc::run(&programs::GIT, &["-C", repo, "rev-parse", "--show-cdup"]) {
+        Ok(c) => c.stdout().map(|o| o.iter().all(u8::is_ascii_whitespace)).unwrap_or(false),
+        Err(_) => false,
+    }
 }
 
 // spec: gate-sdk/SPEC.md §upgrade-smoke — `GATE_SDK_UPGRADE_FROM` empty means *derive it*: the
@@ -938,6 +944,41 @@ mod tests {
 
     // spec: gate-sdk/SPEC.md §upgrade-smoke — the argv question binds zero times: the member takes
     // no positional and no flag, so anything is a refusal
+    // spec: gate-sdk/SPEC.md §upgrade-smoke — the worktree fixture: a linked worktree's toplevel is
+    // a repository, and a subdirectory of either checkout is not
+    #[test]
+    fn a_linked_worktree_is_a_repository_and_a_subdirectory_is_not() {
+        let dir = std::env::temp_dir().join(format!("cw-upgrade-wt-{}", std::process::id()));
+        std::fs::remove_dir_all(&dir).ok();
+        let main = dir.join("main");
+        std::fs::create_dir_all(main.join("sub")).expect("the scratch checkout must be creatable");
+        let m = main.to_string_lossy().into_owned();
+        let wt = dir.join("linked").to_string_lossy().into_owned();
+        let git = |args: &[&str]| {
+            let c = proc::run(&programs::GIT, args).expect("git must be spawnable");
+            c.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string())
+                .unwrap_or_else(|| panic!("git {:?} failed", args))
+        };
+        git(&["init", "-q", &m]);
+        git(&["-C", &m, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "--allow-empty", "-m", "seed"]);
+        // spec: gate-sdk/SPEC.md §upgrade-smoke — the linked worktree is written as the three files
+        // git reads, registering it in the scratch repository alone, never through a spawned add
+        let admin = main.join(".git/worktrees/linked");
+        std::fs::create_dir_all(&admin).expect("the worktree admin dir must be creatable");
+        std::fs::create_dir_all(&wt).expect("the worktree dir must be creatable");
+        let head = git(&["-C", &m, "rev-parse", "HEAD"]);
+        std::fs::write(admin.join("HEAD"), format!("{}\n", head)).expect("w");
+        std::fs::write(admin.join("commondir"), "../..\n").expect("w");
+        std::fs::write(admin.join("gitdir"), format!("{}/.git\n", wt)).expect("w");
+        std::fs::write(format!("{}/.git", wt), format!("gitdir: {}\n", admin.display())).expect("w");
+        assert_eq!(git(&["-C", &wt, "rev-parse", "HEAD"]), head, "the fixture is no linked worktree");
+        assert!(is_toplevel(&m), "the main checkout was refused");
+        assert!(is_toplevel(&wt), "the linked worktree was refused");
+        assert!(!is_toplevel(&main.join("sub").to_string_lossy()), "a subdirectory was taken for a toplevel");
+        assert!(!is_toplevel(&dir.to_string_lossy()), "a directory outside any repository was accepted");
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
     #[test]
     fn the_member_takes_no_arguments() {
         assert_eq!(run(&["--anything".to_string()]), 2);
