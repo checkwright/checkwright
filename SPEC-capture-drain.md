@@ -26,7 +26,7 @@ Offset truncation, the entry's other option, was weighed and refused: cutting a 
 
 **Not yet applied.** In gate-sdk/SPEC.md §The workflow directory, the header paragraph's first two sentences become:
 
-> **The header requirement follows tracking, and it must.** Local capture drains by emptying the file, whether by rotation or by truncation, and either way leaves no header. A header requirement on that tier would fight the tier's own reclaim mechanism.
+> **The header requirement follows tracking, and it must.** Local capture drains by emptying the file, whether by rotation or by truncation, and either way leaves no header.
 
 A paragraph follows it:
 

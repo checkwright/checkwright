@@ -16,7 +16,7 @@ This amendment lands a gate for each move and applies the moves to the first fiv
 - **The five sections at the same bounds**, long sentences then long units: §The port-candidate criteria 111 and 23; §The first cohort 77 and 9; §The consumer smoke 126 and 13; delegation-kit §Testing 30 and 6; canon-kit §Layout and configuration 22 and 4; guard-kit §Layout and configuration 9 and 1.
 - **The agent file** has no unit over 200 words and two sentences over 45 (54 and 50 words).
 - **Repetition**: a six-word phrase, code spans and path tokens dropped, recurring in three or more units of one section occurs 201 times across 29 sections of the tier. It hits canon-kit §Layout and configuration's per-bullet provenance-seam clause and gate-sdk §The port-candidate criteria's retirement-record narration of deleted shell forms. The agent file has none.
-- **Dates**: `git grep -n -E` for an ISO date over the seam corpus finds 17 lines. They are 12 in gate-sdk/SPEC.md (one in §The first cohort), 3 in installer/SPEC.md (all in §The consumer smoke), 2 in delegation-kit/SPEC.md, and one each in lifecycle-kit/SPEC.md (a specimen) and site-kit/SPEC.md. canon-kit's `check-provenance-seam` `good/` fixture carries a lawful dated measurement.
+- **Dates**: `git grep -n -E` for an ISO date over the seam corpus finds 19 lines. They are 12 in gate-sdk/SPEC.md (one in §The first cohort), 3 in installer/SPEC.md (all in §The consumer smoke), 2 in delegation-kit/SPEC.md, and one each in lifecycle-kit/SPEC.md (a specimen) and site-kit/SPEC.md. canon-kit's `check-provenance-seam` `good/` fixture carries a lawful dated measurement.
 - **The environment override reaches an empty value**, as gate-sdk/SPEC.md §The knob file states ("an exported empty value included"). `CANON_KIT_PROSE_TELL_EMDASH_MAX= bash gate-sdk/bin/run-gates.sh --only check-prose-tells` refused `got ''` at exit 2, so the file's value did not apply. The worklist spelling in delta 1 therefore needs no new operand.
 
 ## What changes
@@ -78,7 +78,7 @@ The corpus-knob paragraph's list of knobs that widen a gate's trigger gains `CAN
 
 **Not yet applied.** In `native/src/gates/provenance_seam.rs` and canon-kit/SPEC.md §check-provenance-seam. A kit SPEC now carries no date at all, outside a fence.
 
-**The rule.** gate-sdk/SPEC.md §The provenance seam's third paragraph keeps its first two sentences and replaces the rest with:
+**The rule.** gate-sdk/SPEC.md §The provenance seam's second paragraph (the one opening "The seam decides the voice, never the content.") keeps its first two sentences and replaces the rest with:
 
 > A kit SPEC carries no date. A measurement that grounds a rule is stated undated, as the ground: the figure and the run that produced it are the landing commit's. A measurement a reader must be able to trust as current carries a `measured:` marker, which an oracle keeps true (canon-kit/SPEC.md §check-measured-claim). A dated figure is neither: it reads as live and is true only of one tree on one day. A specimen spells its date as a placeholder (`YYYY-MM-DD`), or sits in a fence. A change to data a kit writes into a consumer's tree names the release that carried it, never a landing date.
 
