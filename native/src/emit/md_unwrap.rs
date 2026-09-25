@@ -4,7 +4,7 @@ use crate::gates::md_unwrapped;
 
 pub const KNOBS: &[&str] = &["CANON_KIT_UNWRAP_DECLARATION_LEADS"];
 
-const USAGE: &str = "usage: --emit md-unwrap [--write] <file>…";
+pub const USAGE: &str = "usage: --emit md-unwrap [--write] <file>…";
 
 pub fn emit(args: &[String]) -> Result<String, String> {
     let write = args.first().is_some_and(|a| a == "--write");

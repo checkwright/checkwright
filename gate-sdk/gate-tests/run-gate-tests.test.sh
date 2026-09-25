@@ -80,6 +80,27 @@ out="$(run_tree "$t")"; rc=$?
 assert_rc  both "$rc" 0
 assert_has both 'GATE-TESTS: clean' "$out"
 
+# The argument shape (§The bin/-tool contract): both positions are paths, so a
+# leading flag is a refusal printing the usage block rather than a tree the
+# runner cannot find, and `--` admits a path however it is spelled.
+out="$(gate_arm_run --run-gate-tests --help 2>&1)"; rc=$?
+assert_rc  help-flag "$rc" 2
+assert_has help-flag 'unrecognized option: --help' "$out"
+assert_has help-flag 'usage: run-gates.sh --run-gate-tests' "$out"
+assert_absent help-flag 'no fixture tree at' "$out"
+out="$(gate_arm_run --run-gate-tests -- "$t" "$scratch/checks" 2>&1)"; rc=$?
+assert_rc  separator "$rc" 0
+
+# A named checks dir that does not exist is refused, naming it: dropped, it would
+# empty the search path and blame every gate's resolution instead.
+out="$(gate_arm_run --run-gate-tests "$t" "$scratch/no-such-checks" 2>&1)"; rc=$?
+assert_rc  absent-checks "$rc" 2
+assert_has absent-checks "no checks dir at $scratch/no-such-checks" "$out"
+assert_absent absent-checks 'resolves in none of' "$out"
+out="$(gate_arm_run --run-gate-tests "$t" "$scratch/checks" "$scratch/no-such-checks" 2>&1)"; rc=$?
+assert_rc  absent-second-checks "$rc" 2
+assert_has absent-second-checks "no checks dir at $scratch/no-such-checks" "$out"
+
 # Row 4 — the single-line case is untouched: the tightening must not regress the
 # shape nearly every tracked expect file uses.
 t="$(mk_tree single 'good ok' '' 'alpha fired' 'alpha fired')"
@@ -224,5 +245,5 @@ seen="$(cat "$scratch/env-probe.seen" 2>/dev/null)"
 }
 
 [[ "$fails" -eq 0 ]] || { echo "run-gate-tests.test: $fails assertion(s) failed"; exit 1; }
-echo "run-gate-tests.test: clean (expect.txt is a per-line conjunction, order-independent, blanks inert, all missing lines named; the output contract is asserted at runtime on both cases; scratch writes land outside the case dir on both dispatch spellings)"
+echo "run-gate-tests.test: clean (a leading flag and an absent named checks dir are refused, -- admits a path; expect.txt is a per-line conjunction, order-independent, blanks inert, all missing lines named; the output contract is asserted at runtime on both cases; scratch writes land outside the case dir on both dispatch spellings)"
 exit 0

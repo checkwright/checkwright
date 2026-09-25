@@ -293,6 +293,8 @@ pub fn derive(args: &[String]) -> Result<Roster, String> {
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — an empty roster prints nothing and the caller reads
 // it as zero surfaces: a resolved-empty derivation is an answer, never an error.
+pub const USAGE: &str = "usage: --emit close-surfaces [scan-root]";
+
 pub fn emit(args: &[String]) -> Result<String, String> {
     let r = derive(args)?;
     if r.rows.is_empty() {

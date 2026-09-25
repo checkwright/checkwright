@@ -13,7 +13,7 @@ const BOARD_TAGS: [&str; 2] = ["cost", "surface"];
 // spec: queue-kit/SPEC.md §The icebox tier — the low class, the icebox's partition of the cost set
 const LOW_CLASS: [&str; 2] = ["event/low", "once/low"];
 
-const USAGE: &str = "\
+pub const USAGE: &str = "\
 usage: --emit queue-index [--collapse-deferred] [--extent <slug>] [--icebox-candidates] [queue-file]
   default: header + active (• ready / ✗ blocked) + deferred titles and board tags + icebox tally;
   --collapse-deferred: deferred tally; --extent <slug>: \"<start> <end>\";

@@ -3,6 +3,8 @@
 // the arm's own argv tail, the mechanism §The queue-index arm already uses for its three modes.
 use crate::queue::{self, Sections};
 
+pub const USAGE: &str = "usage: --emit queue-edges [--inbound <slug>] [queue-file]";
+
 struct Args {
     target: String,
     file: String,

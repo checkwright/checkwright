@@ -10,7 +10,7 @@ pub const KNOBS: &[&str] = &[
     "QUEUE_KIT_DONE_SECTION",
 ];
 
-const USAGE: &str = "usage: --emit queue-migrate [--write] <file>";
+pub const USAGE: &str = "usage: --emit queue-migrate [--write] <file>";
 
 // spec: queue-kit/SPEC.md §The queue-migrate arm — the three body declarations that become tags
 const DECLARATIONS: [&str; 3] = ["recurrence:", "roadmap-summary:", "not-icebox-eligible:"];

@@ -5,6 +5,8 @@ use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
+pub const USAGE: &str = "usage: --emit ruling-staleness [\"<ruling name>\"…]";
+
 const WS: [char; 5] = [' ', '\t', '\x0b', '\x0c', '\r'];
 
 // spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — the declared roster; the arm's own

@@ -5,6 +5,8 @@ use super::pub_lang;
 use super::{corpus, read_text, relative, targets};
 use std::path::Path;
 
+pub const USAGE: &str = "usage: --emit pub-index [paths…]";
+
 pub const KNOBS: &[&str] = &[
     "CONTEXT_KIT_PRUNE_DIRS",
     "CONTEXT_KIT_PUB_LANGS",

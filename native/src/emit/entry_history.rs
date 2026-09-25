@@ -4,7 +4,7 @@ use crate::emit::queue_migrate;
 use crate::gates::queue_entry_budget;
 use crate::queue;
 
-const USAGE: &str = "\
+pub const USAGE: &str = "\
 usage: --emit entry-history <slug> [queue-file]
   one row per commit in which the entry's COUNTED extent fell, newest first:
   \"<commit>  <before> -> <after>  <subject>\". Advisory — it reports commits and

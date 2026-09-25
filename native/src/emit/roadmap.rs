@@ -4,7 +4,7 @@
 use crate::marker;
 use crate::queue::{self, RoadmapEntry, Sections};
 
-const USAGE: &str = "\
+pub const USAGE: &str = "\
 usage: --emit roadmap [--emit|--write] [queue-file]
   --emit (default): print the generated block, the surface check-roadmap-fresh byte-compares.
   --write: splice that block between QUEUE_KIT_ROADMAP_FILE's markers, touching nothing outside them.

@@ -319,10 +319,7 @@ fn knob(name: &str) -> Result<String, String> {
     crate::walk::knob_scalar(name)
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
-    if !args.is_empty() {
-        return Err("usage: --emit stage-economics   (it takes no argument)".to_string());
-    }
+pub fn emit(_args: &[String]) -> Result<String, String> {
     let state_file = knob("DRIFT_KIT_STATE_FILE")?;
     let price_table = knob("DRIFT_KIT_PRICE_TABLE")?;
     let var = |n: &str| std::env::var(n).unwrap_or_default();

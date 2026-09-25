@@ -9,6 +9,7 @@ use crate::walk;
 // spec: gate-sdk/SPEC.md §The non-gate arm — one declared knob: a hardcoded top-level flag would
 // hide the read from the knob-file derivation
 pub const KNOBS: &[&str] = &["DOCTRINE_KIT_DOCTRINE_FILE"];
+pub const USAGE: &str = "usage: --emit stage-rules <stage> [doctrine-file]";
 
 // spec: doctrine-kit/SPEC.md §stage-rules — kit mechanism (the kit ships `DOCTRINE.md`), never
 // config: what crosses to a consumer is the rule content in that file, not this heading
@@ -106,7 +107,7 @@ pub fn render(text: &str, stage: &str, path: &str) -> String {
 pub fn emit(args: &[String]) -> Result<String, String> {
     let stage = match args.first().filter(|a| !a.is_empty()) {
         Some(s) => s.clone(),
-        None => return Err("usage: --emit stage-rules <stage> [doctrine-file]".to_string()),
+        None => return Err(USAGE.to_string()),
     };
     let path = match args.get(1).filter(|a| !a.is_empty()) {
         Some(p) => p.clone(),

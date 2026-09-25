@@ -12,7 +12,7 @@ pub const KNOBS: &[&str] = &[
     "LIFECYCLE_KIT_FIRST_STAGE",
 ];
 
-const USAGE: &str = "usage: --emit file-gap [--] \"<gap prose>\"\n  appends one dated bullet to the committed gap inbox; \"--\" files prose beginning with \"-\"";
+pub const USAGE: &str = "usage: --emit file-gap [--] \"<gap prose>\"\n  appends one dated bullet to the committed gap inbox; \"--\" files prose beginning with \"-\"";
 
 // spec: lifecycle-kit/SPEC.md §The committed gap inbox — the contract header seeded on a fresh
 // consumer's first filing, byte-identical to the line close's drain truncates back to.

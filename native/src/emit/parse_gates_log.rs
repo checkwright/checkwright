@@ -3,6 +3,7 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — an empty roster of the *happens to read nothing*
 // kind: the log path arrives on argv and the arm resolves no kit knob
 pub const KNOBS: &[&str] = &[];
+pub const USAGE: &str = "usage: --emit parse-gates-log <log>";
 
 // spec: gate-sdk/SPEC.md §run-gates — the tail grammar this reads is gate-sdk's, and the tails
 // print only under GATE_SDK_VERBOSE, which is why EVIDENCE_KIT_RUN_gates sets it

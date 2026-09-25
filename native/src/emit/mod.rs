@@ -161,11 +161,52 @@ pub fn read_text(path: &str) -> Result<String, String> {
 pub type EmitFn = fn(&[String]) -> Result<String, String>;
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — a non-gate arm either renders a document or returns an
-// exit code; the class the table keys is *non-gate*, not *emitting*. The variant is a return shape
-// and nothing else — no declared-knob union keys on it.
+// exit code; the class the table keys is *non-gate*, not *emitting*. The variant is a return shape,
+// and an emitting one carries its argument grammar — no declared-knob union keys on either.
 pub enum Arm {
-    Emit(EmitFn),
+    Emit(EmitFn, Grammar),
     Run(fn(&[String]) -> i32),
+}
+
+// spec: gate-sdk/SPEC.md §The bin/-tool contract — an `--emit-` member's argument grammar: `Flags`
+// names every token the member reads, none for one taking no argument; `Parsed` is a member parsing
+// its own argv, with the usage block its refusal prints.
+pub enum Grammar {
+    Flags(&'static [&'static str]),
+    Parsed(&'static str),
+}
+
+impl Grammar {
+    pub fn usage(&self, arm: &str) -> String {
+        let name = arm.strip_prefix("--emit-").unwrap_or(arm);
+        match self {
+            Grammar::Parsed(block) => block.to_string(),
+            Grammar::Flags([]) => format!("usage: --emit {}   (it takes no argument)", name),
+            Grammar::Flags(flags) => {
+                let opts: Vec<String> = flags.iter().map(|f| format!("[{}]", f)).collect();
+                format!("usage: --emit {} {}", name, opts.join(" "))
+            }
+        }
+    }
+}
+
+// spec: gate-sdk/SPEC.md §The bin/-tool contract — the dispatcher's one refusal for an `--emit-`
+// member: a token a `Flags` grammar does not name is refused before the member runs, and every
+// refusal carries the usage block once, the member's own error already carrying it or not.
+pub fn dispatch(arm: &str, f: EmitFn, grammar: &Grammar, args: &[String]) -> Result<String, String> {
+    let usage = grammar.usage(arm);
+    if let Grammar::Flags(flags) = grammar {
+        if let Some(a) = args.iter().find(|a| !flags.contains(&a.as_str())) {
+            return Err(format!("{}: unrecognized argument: {}\n{}", arm, a, usage));
+        }
+    }
+    f(args).map_err(|e| {
+        if e.contains(&usage) {
+            format!("{}: {}", arm, e)
+        } else {
+            format!("{}: {}\n{}", arm, e, usage)
+        }
+    })
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the registry union sentinel, owned beside `knobs`
@@ -178,7 +219,7 @@ pub const EVERY_REGISTERED_KNOB: &str = "@every-registered-knob";
 pub const ARMS: &[(&str, Arm, &[&str])] = &[
     (
         "--emit-footprint",
-        Arm::Emit(footprint::emit),
+        Arm::Emit(footprint::emit, Grammar::Flags(&[])),
         &["CONTEXT_KIT_SURFACES"],
     ),
     // spec: lifecycle-kit/SPEC.md §The close-surfaces emit arm — the class's first member that is
@@ -186,7 +227,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // reads it, so there is no comparator and must not be.
     (
         "--emit-close-surfaces",
-        Arm::Emit(close_surfaces::emit),
+        Arm::Emit(close_surfaces::emit, Grammar::Parsed(close_surfaces::USAGE)),
         &[
             "GATE_SDK_KIT_DIRS",
             "GATE_SDK_PRUNE_DIRS",
@@ -201,12 +242,12 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // ruling; nothing stores its two reports, for the roster arm's reason above.
     (
         "--emit-ruling-staleness",
-        Arm::Emit(ruling_staleness::emit),
+        Arm::Emit(ruling_staleness::emit, Grammar::Parsed(ruling_staleness::USAGE)),
         ruling_staleness::KNOBS,
     ),
     (
         "--emit-enforcement-map",
-        Arm::Emit(enforcement_map::emit),
+        Arm::Emit(enforcement_map::emit, Grammar::Flags(&[])),
         &[
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_ENFORCE_SCAN_DIR",
@@ -224,7 +265,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // reads both sibling emitters live, so it declares the union of what they read.
     (
         "--emit-value-rollup",
-        Arm::Emit(value_rollup::emit),
+        Arm::Emit(value_rollup::emit, Grammar::Flags(&["--write"])),
         &[
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_ENFORCE_SCAN_DIR",
@@ -244,7 +285,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // mirror root
     (
         "--emit-docs-mirror",
-        Arm::Emit(docs_mirror::emit),
+        Arm::Emit(docs_mirror::emit, Grammar::Parsed(docs_mirror::USAGE)),
         &["CANON_KIT_DOCS_BLOB_REF", "CANON_KIT_MIRROR_ROOT"],
     ),
     // spec: drift-kit/SPEC.md §The published-evidence extractor — the stage roster and the
@@ -252,7 +293,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // stage name in the crate would ship one project's lifecycle as everyone's
     (
         "--emit-trajectory",
-        Arm::Emit(trajectory::emit),
+        Arm::Emit(trajectory::emit, Grammar::Flags(&["--human"])),
         &[
             "DRIFT_KIT_TRAJECTORY_SURFACES",
             "DRIFT_KIT_GATES_FILE",
@@ -265,7 +306,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // one table entry serves check-roadmap-fresh's caller too, and that one validates it.
     (
         "--emit-roadmap",
-        Arm::Emit(roadmap::emit),
+        Arm::Emit(roadmap::emit, Grammar::Parsed(roadmap::USAGE)),
         &[
             "QUEUE_KIT_QUEUE_FILE",
             "QUEUE_KIT_ACTIVE_SECTIONS",
@@ -282,7 +323,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // construction. Values are knobs; documents are paths.
     (
         "--emit-graph",
-        Arm::Emit(graph::emit),
+        Arm::Emit(graph::emit, Grammar::Flags(&[])),
         &[
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_KIT_DIRS",
@@ -300,14 +341,14 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // whose `--write` operand writes both, on `--emit-docs-mirror`'s precedent
     (
         "--emit-git-hooks",
-        Arm::Emit(git_hooks::emit),
+        Arm::Emit(git_hooks::emit, Grammar::Parsed(git_hooks::USAGE)),
         git_hooks::KNOBS,
     ),
     // spec: queue-kit/SPEC.md §The queue-index arm — the class's first *query* member as well as a
     // generator, and configured: a hardcoded flag would hide its reads from the knob-file derivation
     (
         "--emit-queue-index",
-        Arm::Emit(queue_index::emit),
+        Arm::Emit(queue_index::emit, Grammar::Parsed(queue_index::USAGE)),
         &[
             "QUEUE_KIT_QUEUE_FILE",
             "QUEUE_KIT_ACTIVE_SECTIONS",
@@ -323,7 +364,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // usage error, the absence of a 1 being the member's whole point
     (
         "--emit-entry-history",
-        Arm::Emit(entry_history::emit),
+        Arm::Emit(entry_history::emit, Grammar::Parsed(entry_history::USAGE)),
         &[
             "QUEUE_KIT_QUEUE_FILE",
             "QUEUE_KIT_ENTRY_CAP",
@@ -337,7 +378,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // section, and the arm must not acquire a read it does not make.
     (
         "--emit-queue-counts",
-        Arm::Emit(queue_counts::emit),
+        Arm::Emit(queue_counts::emit, Grammar::Parsed(queue_counts::USAGE)),
         &[
             "QUEUE_KIT_QUEUE_FILE",
             "QUEUE_KIT_ACTIVE_SECTIONS",
@@ -350,7 +391,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // two arms rather than one with a fourth mode.
     (
         "--emit-queue-edges",
-        Arm::Emit(queue_edges::emit),
+        Arm::Emit(queue_edges::emit, Grammar::Parsed(queue_edges::USAGE)),
         &[
             "QUEUE_KIT_QUEUE_FILE",
             "QUEUE_KIT_ACTIVE_SECTIONS",
@@ -362,7 +403,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // queue-kit runs once, configured by the section vocabulary it rewrites within
     (
         "--emit-queue-migrate",
-        Arm::Emit(queue_migrate::emit),
+        Arm::Emit(queue_migrate::emit, Grammar::Parsed(queue_migrate::USAGE)),
         queue_migrate::KNOBS,
     ),
     // spec: context-kit/SPEC.md §Index-first reading — the markdown structural index. A table
@@ -370,28 +411,28 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // would hide from the knob-file derivation.
     (
         "--emit-md-index",
-        Arm::Emit(md_index::emit),
+        Arm::Emit(md_index::emit, Grammar::Parsed(md_index::USAGE)),
         md_index::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §The non-gate arm — the class's first member whose row exists for
     // reachability rather than for configuration, its declared roster being empty.
     (
         "--emit-md-section",
-        Arm::Emit(md_section::emit),
+        Arm::Emit(md_section::emit, Grammar::Parsed(md_section::USAGE)),
         md_section::KNOBS,
     ),
     // spec: canon-kit/SPEC.md §check-md-unwrapped — the gate's remedy, reading no knob: its
     // operands are the files, and the scanner is the gate's own
     (
         "--emit-md-unwrap",
-        Arm::Emit(md_unwrap::emit),
+        Arm::Emit(md_unwrap::emit, Grammar::Parsed(md_unwrap::USAGE)),
         md_unwrap::KNOBS,
     ),
     // spec: context-kit/SPEC.md §Index-first reading — the public-surface dispatcher: the extractor
     // seam survives the port, so the two knobs that resolve it are declared beside the prune set.
     (
         "--emit-pub-index",
-        Arm::Emit(pub_index::emit),
+        Arm::Emit(pub_index::emit, Grammar::Parsed(pub_index::USAGE)),
         pub_index::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §port-blockers — the port oracle: three arms over two corpora, whose
@@ -399,7 +440,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // hardcoded flag because it reads five structural knobs and an arbitrary sixth.
     (
         "--emit-port-blockers",
-        Arm::Emit(port_blockers::emit),
+        Arm::Emit(port_blockers::emit, Grammar::Parsed(port_blockers::USAGE)),
         port_blockers::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — the `?` census, a projection over registry
@@ -407,14 +448,14 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // `no_such_arm` prints, so an arm outside it is one a mistyped `--emit` cannot be steered to.
     (
         "--emit-reads-census",
-        Arm::Emit(reads_census::emit),
+        Arm::Emit(reads_census::emit, Grammar::Flags(&[])),
         reads_census::KNOBS,
     ),
     // spec: drift-kit/SPEC.md §The report skeleton — the collator, a table member rather than a
     // top-level flag: it reads its own knobs and its members' guard-kit knobs.
     (
         "--emit-drift-report",
-        Arm::Emit(drift_report::emit),
+        Arm::Emit(drift_report::emit, Grammar::Flags(&["--trend"])),
         drift_report::KNOBS,
     ),
     // spec: guard-kit/SPEC.md §scan-prompts — the ranker, a table member on the forced-family
@@ -422,21 +463,21 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // flag would hide from the knob-file derivation, and its free-text positional keeps the shape refusal.
     (
         "--emit-scan-prompts",
-        Arm::Emit(scan_prompts::emit),
+        Arm::Emit(scan_prompts::emit, Grammar::Parsed(scan_prompts::USAGE)),
         scan_prompts::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §The workflow directory — the rotation drain every close triage runs
     // before reading a capture log, a table member so the front end's one `--emit` grant covers it
     (
         "--emit-capture-drain",
-        Arm::Emit(capture_drain::emit),
+        Arm::Emit(capture_drain::emit, Grammar::Parsed(capture_drain::USAGE)),
         capture_drain::KNOBS,
     ),
     // spec: guard-kit/SPEC.md §compare-settings-allow — the settings-allow advisory, a table
     // member on the forced-family test: its four knobs are consumer configuration.
     (
         "--emit-compare-settings-allow",
-        Arm::Emit(compare_settings_allow::emit),
+        Arm::Emit(compare_settings_allow::emit, Grammar::Parsed(compare_settings_allow::USAGE)),
         compare_settings_allow::KNOBS,
     ),
     // spec: context-kit/SPEC.md §The always-loaded meter — the context meter, a table member
@@ -444,7 +485,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // its three modes arrive as operands, the shape `--hook` and `--wait-probe` already carry.
     (
         "--emit-always-loaded",
-        Arm::Emit(always_loaded::emit),
+        Arm::Emit(always_loaded::emit, Grammar::Parsed(always_loaded::USAGE)),
         always_loaded::KNOBS,
     ),
     // spec: lifecycle-kit/SPEC.md §The survey record — the capture affordance, whose free-text
@@ -452,7 +493,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // to the front-end: the hazard belongs to the argument and the help belongs to the substrate.
     (
         "--emit-file-survey",
-        Arm::Emit(file_survey::emit),
+        Arm::Emit(file_survey::emit, Grammar::Parsed(file_survey::USAGE)),
         file_survey::KNOBS,
     ),
     // spec: lifecycle-kit/SPEC.md §The committed gap inbox — the mid-iteration capture affordance,
@@ -460,7 +501,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // cross the port with the argument, the help arm retires to the front-end.
     (
         "--emit-file-gap",
-        Arm::Emit(file_gap::emit),
+        Arm::Emit(file_gap::emit, Grammar::Parsed(file_gap::USAGE)),
         file_gap::KNOBS,
     ),
     // spec: drift-kit/SPEC.md §The knowledge-friction loop — the capture affordance, riding the same
@@ -468,7 +509,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // the argument, the help arm retires to the front-end.
     (
         "--emit-kfric",
-        Arm::Emit(kfric::emit),
+        Arm::Emit(kfric::emit, Grammar::Parsed(kfric::USAGE)),
         kfric::KNOBS,
     ),
     // spec: drift-kit/SPEC.md §The install-observation record — the observation-capture affordance,
@@ -476,7 +517,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // port with the argument, the help arm retires to the front-end.
     (
         "--emit-file-install",
-        Arm::Emit(file_install::emit),
+        Arm::Emit(file_install::emit, Grammar::Parsed(file_install::USAGE)),
         file_install::KNOBS,
     ),
     // spec: drift-kit/SPEC.md §The install-evidence projection — the public half of the same
@@ -484,7 +525,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // the gates file because it classifies a red's gate name against that roster.
     (
         "--emit-install-evidence",
-        Arm::Emit(install_evidence::emit),
+        Arm::Emit(install_evidence::emit, Grammar::Flags(&["--human"])),
         install_evidence::KNOBS,
     ),
     // spec: drift-kit/SPEC.md §The overhead meter — an `Arm::Emit` on the variant's own test: the
@@ -492,7 +533,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // costs nothing. `--emit-kfric`'s shape — a document returned, a line appended beside it.
     (
         "--emit-overhead-meter",
-        Arm::Emit(overhead_meter::emit),
+        Arm::Emit(overhead_meter::emit, Grammar::Parsed(overhead_meter::USAGE)),
         overhead_meter::KNOBS,
     ),
     // spec: drift-kit/SPEC.md §The stage-economics meter — an `Arm::Emit` on the variant's own
@@ -500,7 +541,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // the meter's own seven knobs, every one of them a row of drift-kit's table.
     (
         "--emit-stage-economics",
-        Arm::Emit(stage_economics::emit),
+        Arm::Emit(stage_economics::emit, Grammar::Flags(&[])),
         stage_economics::KNOBS,
     ),
     // spec: drift-kit/SPEC.md §The queue-flow arm — an `Arm::Emit` because exit is always 0 bar a
@@ -508,14 +549,14 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // file whose history the windows are read from.
     (
         "--emit-queue-flow",
-        Arm::Emit(queue_flow::emit),
+        Arm::Emit(queue_flow::emit, Grammar::Parsed(queue_flow::USAGE)),
         queue_flow::KNOBS,
     ),
     // spec: lifecycle-kit/SPEC.md §The survey record — the citation affordance: it derives no stage
     // and stamps no rev, so its sibling's state-file knob is deliberately off this roster.
     (
         "--emit-cite-survey",
-        Arm::Emit(cite_survey::emit),
+        Arm::Emit(cite_survey::emit, Grammar::Parsed(cite_survey::USAGE)),
         cite_survey::KNOBS,
     ),
     // spec: doctrine-kit/SPEC.md §stage-rules — an `Arm::Emit` because the contract is a document
@@ -523,7 +564,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // through the generic `--emit <name>` composer rather than a front-end branch of its own
     (
         "--emit-stage-rules",
-        Arm::Emit(stage_rules::emit),
+        Arm::Emit(stage_rules::emit, Grammar::Parsed(stage_rules::USAGE)),
         stage_rules::KNOBS,
     ),
     // spec: lifecycle-kit/SPEC.md §bin/session-id.sh — an empty-roster member whose roster must
@@ -531,7 +572,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // lifecycle-kit's static table, so a declared row would be an undeclared-name refusal
     (
         "--emit-session-id",
-        Arm::Emit(session_id::emit),
+        Arm::Emit(session_id::emit, Grammar::Flags(&[])),
         session_id::KNOBS,
     ),
     // spec: canon-kit/SPEC.md §check-prose-enum — the bundled enum-set emitter, an `Arm::Emit`:
@@ -539,30 +580,30 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // non-gate arm — a **two-kit** declared roster
     (
         "--emit-enum-sets",
-        Arm::Emit(enum_sets::emit),
+        Arm::Emit(enum_sets::emit, Grammar::Flags(&[])),
         enum_sets::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §The non-gate arm — the static knob table published, an `Arm::Emit`
     // whose roster is empty by construction: the arm takes no knob and reads no file
-    ("--emit-knob-roster", Arm::Emit(crate::knobs::emit), &[]),
+    ("--emit-knob-roster", Arm::Emit(crate::knobs::emit, Grammar::Flags(&[])), &[]),
     // spec: gate-sdk/SPEC.md §The non-gate arm — the resolved static values, the one producer the
     // shell couples expander and every shell knob read take; its roster is its argv's closure
     (
         "--emit-knob-values",
-        Arm::Emit(crate::knobs::values),
+        Arm::Emit(crate::knobs::values, Grammar::Parsed(crate::knobs::VALUES_USAGE)),
         &[crate::knobs::ARGV_STATIC_KNOBS],
     ),
     // spec: gate-sdk/SPEC.md §lib/gate.sh — the fixture-suite roster the workflows loop over
     (
         "--emit-fixture-suites",
-        Arm::Emit(crate::registry::emit_fixture_suites),
+        Arm::Emit(crate::registry::emit_fixture_suites, Grammar::Flags(&[])),
         &["GATE_SDK_KIT_DIRS", "GATE_SDK_GATES_DIR"],
     ),
     // spec: gate-sdk/SPEC.md §The non-gate arm — the kit roots, derived from the gate-sdk root
     // locator, for the shell callers that still need the set
     (
         "--emit-kit-roots",
-        Arm::Emit(crate::walk::emit_kit_roots),
+        Arm::Emit(crate::walk::emit_kit_roots, Grammar::Flags(&[])),
         &["GATE_SDK_KIT_DIRS"],
     ),
     // spec: evidence-kit/SPEC.md §Layout and configuration — the two parser adapters, reached as
@@ -570,12 +611,12 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // sdk/SPEC.md §The non-gate arm — both rosters are empty of the `--emit-md-section` kind, not
     (
         "--emit-parse-gates-log",
-        Arm::Emit(parse_gates_log::emit),
+        Arm::Emit(parse_gates_log::emit, Grammar::Parsed(parse_gates_log::USAGE)),
         parse_gates_log::KNOBS,
     ),
     (
         "--emit-parse-smoke-log",
-        Arm::Emit(parse_smoke_log::emit),
+        Arm::Emit(parse_smoke_log::emit, Grammar::Parsed(parse_smoke_log::USAGE)),
         parse_smoke_log::KNOBS,
     ),
     // spec: context-kit/SPEC.md §bin/env-probe — an action that reports, so an `Arm::Emit`: both
@@ -583,7 +624,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // is a row of context-kit's table.
     (
         "--emit-env-probe",
-        Arm::Emit(env_probe::emit),
+        Arm::Emit(env_probe::emit, Grammar::Flags(&[])),
         env_probe::KNOBS,
     ),
     // spec: delegation-kit/SPEC.md §Trend reporter — an `Arm::Emit` settled by the *absence* of a
@@ -591,7 +632,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // spelling rides with the family, so no new front-end `case` arm is owed.
     (
         "--emit-usage-trend",
-        Arm::Emit(usage_trend::emit),
+        Arm::Emit(usage_trend::emit, Grammar::Parsed(usage_trend::USAGE)),
         usage_trend::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §run-gates — the battery runner: the class's first member
@@ -851,6 +892,60 @@ mod tests {
         }
         assert!(fence_safe("--emit-knob-roster"));
         assert!(!fence_safe("--emit"));
+    }
+
+    fn never_runs(_: &[String]) -> Result<String, String> {
+        panic!("the dispatcher ran a member whose argv it should have refused")
+    }
+
+    fn refuses(_: &[String]) -> Result<String, String> {
+        Err("unrecognized option: --help".to_string())
+    }
+
+    // spec: gate-sdk/SPEC.md §The bin/-tool contract — a surplus token is refused before the member
+    // runs, and a declared flag is not
+    #[test]
+    fn a_flags_grammar_refuses_every_token_it_does_not_name() {
+        let none = Grammar::Flags(&[]);
+        let err = dispatch("--emit-x", never_runs, &none, &["bogus".to_string()]).expect_err("surplus");
+        assert!(err.contains("unrecognized argument: bogus"), "{}", err);
+        assert!(err.ends_with("usage: --emit x   (it takes no argument)"), "{}", err);
+        let one = Grammar::Flags(&["--write"]);
+        let err = dispatch("--emit-x", never_runs, &one, &["--write".into(), "-w".into()]).expect_err("-w");
+        assert!(err.contains("unrecognized argument: -w\nusage: --emit x [--write]"), "{}", err);
+        let ok = |_: &[String]| Ok("doc".to_string());
+        assert_eq!(dispatch("--emit-x", ok, &one, &["--write".to_string()]), Ok("doc".to_string()));
+    }
+
+    // spec: gate-sdk/SPEC.md §The bin/-tool contract — a member's refusal carries its usage block
+    // exactly once, whether or not the member's own error already spelled it
+    #[test]
+    fn a_parsed_refusal_carries_the_usage_block_once() {
+        let g = Grammar::Parsed("usage: --emit x <arg>");
+        let err = dispatch("--emit-x", refuses, &g, &["--help".to_string()]).expect_err("refusal");
+        assert_eq!(err, "--emit-x: unrecognized option: --help\nusage: --emit x <arg>");
+        let spelled = |_: &[String]| Err("usage: --emit x <arg>".to_string());
+        let err = dispatch("--emit-x", spelled, &g, &[]).expect_err("refusal");
+        assert_eq!(err.matches("usage:").count(), 1, "{}", err);
+    }
+
+    // spec: gate-sdk/SPEC.md §The bin/-tool contract — every emitting row declares a usage block that
+    // names its own member, so no row's refusal can print another member's grammar
+    #[test]
+    fn every_emitting_row_declares_its_own_usage() {
+        for (arm, variant, _) in ARMS {
+            if let Arm::Emit(_, g) = variant {
+                let name = arm.strip_prefix("--emit-").expect("an Arm::Emit row spells --emit-<name>");
+                let first = g.usage(arm).lines().next().unwrap_or_default().to_string();
+                assert!(
+                    first.starts_with("usage:") && first.contains(&format!("--emit {} ", name))
+                        || first.ends_with(&format!("--emit {}", name)),
+                    "{} declares a usage block naming another grammar: {}",
+                    arm,
+                    first
+                );
+            }
+        }
     }
 
     #[test]

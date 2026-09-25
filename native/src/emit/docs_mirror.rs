@@ -7,7 +7,7 @@ use crate::spec;
 use crate::walk;
 use std::path::Path;
 
-const USAGE: &str = "\
+pub const USAGE: &str = "\
 usage: --emit docs-mirror [--write|--list|--emit <src>] [--root <dir>]
   --write (default) writes every mirror page under <root>/<CANON_KIT_MIRROR_ROOT>/;
   --list prints the source set; --emit prints one page.

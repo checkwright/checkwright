@@ -24,7 +24,7 @@ pub const KNOBS: &[&str] = &[
     super::EVERY_REGISTERED_KNOB,
 ];
 
-const USAGE: &str = "\
+pub const USAGE: &str = "\
 usage: run-gates.sh --emit port-blockers [--gates-dir <dir>] [--group | --tree]
 
   (no arm)       criterion 7: every registered gate's external-program

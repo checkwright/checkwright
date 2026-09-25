@@ -7,7 +7,7 @@ use super::file_survey::{anchored, positionals};
 
 pub const KNOBS: &[&str] = &["LIFECYCLE_KIT_SURVEY_RECORD_FILE"];
 
-const USAGE: &str = "usage: --emit cite-survey [--] \"<heading-substring>\"\n  emits the one matching block of the survey record as an inline-ready snippet";
+pub const USAGE: &str = "usage: --emit cite-survey [--] \"<heading-substring>\"\n  emits the one matching block of the survey record as an inline-ready snippet";
 
 // spec: lifecycle-kit/SPEC.md §The survey record — the block's five fields in record order; a line
 // outside this set is not part of the snippet, which is what keeps a pasted citation the witness

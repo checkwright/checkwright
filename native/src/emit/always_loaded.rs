@@ -20,7 +20,7 @@ pub const KNOBS: &[&str] = &[
 
 // spec: context-kit/SPEC.md §The always-loaded meter — the usage an unrecognized mode operand
 // prints, the half of the bin/-tool contract that does not retire to the front-end.
-const USAGE: &str = "usage: --emit always-loaded [--growth | --update-baseline | --ceiling]\n  bare: the total, its per-part split, the delta since the baseline and the surfaces' delta since the iteration start; --growth: per-file net growth since the iteration start, else since the baseline commit; --update-baseline: rewrite the baseline row; --ceiling: rewrite the ceiling file to current sizes";
+pub const USAGE: &str = "usage: --emit always-loaded [--growth | --update-baseline | --ceiling]\n  bare: the total, its per-part split, the delta since the baseline and the surfaces' delta since the iteration start; --growth: per-file net growth since the iteration start, else since the baseline commit; --update-baseline: rewrite the baseline row; --ceiling: rewrite the ceiling file to current sizes";
 
 const BASELINE_HEADER: &str = "# contract: context-kit/SPEC.md §The always-loaded meter";
 

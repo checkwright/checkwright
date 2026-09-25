@@ -16,6 +16,11 @@ pub const KNOBS: &[&str] = &[
 
 const NAME: &str = "run-gate-tests";
 
+const USAGE: &str = "usage: run-gates.sh --run-gate-tests [--] [<tests-dir> [<checks-dir>...]]
+  <tests-dir> defaults to GATE_SDK_TESTS_DIR; each <checks-dir> must exist, and the set replaces
+  the resolved gate-declaration dirs. \"--\" ends option processing, so a path beginning with
+  \"-\" is still reachable.";
+
 // spec: gate-sdk/SPEC.md §run-gate-tests — the invoker-root resolutions, taken once before the
 // pair loop: the gate-declaration dirs and the dispatch binary resolve here, while a case's knob
 // *values* resolve inside the case dir.
@@ -30,7 +35,16 @@ struct Harness {
     case_tmp: String,
 }
 
+// spec: gate-sdk/SPEC.md §The bin/-tool contract — both positions are paths, so a dash-led one is
+// a refusal printing the usage block and `--` admits one; the scan is the class's first member's.
 pub fn run(args: &[String]) -> i32 {
+    let args = match super::file_survey::positionals(args, "path") {
+        Ok(a) => a,
+        Err(e) => {
+            eprintln!("{}: {}\n{}", NAME, e, USAGE);
+            return 2;
+        }
+    };
     let harness = match setup(args) {
         Ok(h) => h,
         Err(e) => {
@@ -62,14 +76,20 @@ fn tests_dir(args: &[String]) -> Result<String, String> {
 fn setup(args: &[String]) -> Result<Harness, String> {
     let here = walk::cwd()?;
     let sdk = sdk_root()?;
+    // spec: gate-sdk/SPEC.md §run-gate-tests — the second position replaces the resolved default,
+    // and a named member that is not a directory is a refusal, since dropping it empties the search
+    // path with no line naming the argument
     let requested: Vec<String> = if args.len() > 1 {
+        if let Some(absent) = args[1..].iter().find(|d| !Path::new(d.as_str()).is_dir()) {
+            return Err(format!(
+                "{}: no checks dir at {} — a named gate-declaration dir must exist\n{}",
+                NAME, absent, USAGE
+            ));
+        }
         args[1..].to_vec()
     } else {
         check_dirs(&sdk)?
     };
-    // spec: gate-sdk/SPEC.md §run-gate-tests — the second position replaces the resolved default
-    // and drops a non-existent member silently; that fail-open is carried rather than fixed, the
-    // entry named there owning it.
     let gate_dirs: Vec<String> = requested
         .iter()
         .filter(|d| Path::new(d.as_str()).is_dir())

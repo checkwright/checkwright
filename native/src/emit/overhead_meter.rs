@@ -11,7 +11,7 @@ pub const KNOBS: &[&str] = &[
     "DRIFT_KIT_OVERHEAD_LOG",
 ];
 
-const USAGE: &str =
+pub const USAGE: &str =
     "usage: --emit overhead-meter [transcript.jsonl | session8]\n  session8: a stamp's \
      eight-character session id, looked up under DRIFT_KIT_SESSIONS_DIR\n  bare: a top-level \
      session's own transcript; a delegated session must pass the operand";

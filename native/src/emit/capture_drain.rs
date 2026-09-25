@@ -5,7 +5,7 @@ use std::io::Write;
 
 pub const KNOBS: &[&str] = &[];
 
-const USAGE: &str = "usage: --emit capture-drain [--done] [--] <log>\n  moves every unread line of <log> into <log>.drain, leaves <log> present and empty, and prints the drain's path when it holds a line; --done removes <log>.drain";
+pub const USAGE: &str = "usage: --emit capture-drain [--done] [--] <log>\n  moves every unread line of <log> into <log>.drain, leaves <log> present and empty, and prints the drain's path when it holds a line; --done removes <log>.drain";
 
 pub fn emit(args: &[String]) -> Result<String, String> {
     let (done, log) = parse(args)?;

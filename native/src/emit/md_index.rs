@@ -6,6 +6,7 @@ use crate::section;
 use crate::walk;
 
 pub const KNOBS: &[&str] = &["CONTEXT_KIT_PRUNE_DIRS"];
+pub const USAGE: &str = "usage: --emit md-index [paths…]";
 
 // spec: context-kit/SPEC.md §Index-first reading — this index's own heading rule, `^#{1,6}[ \t]+`,
 // narrower than `section::heading_level`'s unbounded run and POSIX-space class and local for that

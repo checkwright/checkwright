@@ -4,6 +4,7 @@
 use crate::section;
 
 pub const KNOBS: &[&str] = &[];
+pub const USAGE: &str = "usage: --emit md-section <file.md> \"<heading>\"";
 
 // spec: context-kit/SPEC.md §Index-first reading — the query normalisation: a leading `§` is
 // tolerated so a spec citation pastes directly, surrounding blanks go, and the compare is
@@ -62,7 +63,7 @@ fn locate(lines: &[&str], query: &str) -> Option<(usize, usize)> {
 pub fn emit(args: &[String]) -> Result<String, String> {
     let (file, query) = match (args.first(), args.get(1)) {
         (Some(f), Some(q)) if !f.is_empty() && !q.is_empty() => (f, q),
-        _ => return Err("usage: --emit md-section <file.md> \"<heading>\"".to_string()),
+        _ => return Err(USAGE.to_string()),
     };
     if !std::path::Path::new(file).is_file() {
         return Err(format!("file not found: {}", file));

@@ -5,7 +5,7 @@
 
 pub const KNOBS: &[&str] = &["DRIFT_KIT_KNOWLEDGE_LOG"];
 
-const USAGE: &str = "usage: --emit kfric [--] \"<fact re-derived>\" \"<surface it was read from>\"\n  appends one dated line to the knowledge-friction log; \"--\" files a field beginning with \"-\"";
+pub const USAGE: &str = "usage: --emit kfric [--] \"<fact re-derived>\" \"<surface it was read from>\"\n  appends one dated line to the knowledge-friction log; \"--\" files a field beginning with \"-\"";
 
 // spec: drift-kit/SPEC.md §The knowledge-friction loop — the line grammar is the log's contract, so
 // it is stamped here byte for byte and the same string is returned as the arm's confirmation.

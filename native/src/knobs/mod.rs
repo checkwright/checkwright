@@ -1075,9 +1075,11 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
 // static knob in the invoking tree, in the roster's grammar; its declared set is its argv's closure
 pub const ARGV_STATIC_KNOBS: &str = "@argv-static-knobs";
 
+pub const VALUES_USAGE: &str = "usage: --emit knob-values <NAME>...";
+
 pub fn values(args: &[String]) -> Result<String, String> {
     if args.is_empty() {
-        return Err("needs at least one static knob name — usage: --emit knob-values <NAME>...".to_string());
+        return Err("needs at least one static knob name".to_string());
     }
     let mut out = String::new();
     for name in args {

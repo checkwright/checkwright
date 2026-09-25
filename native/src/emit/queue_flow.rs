@@ -14,19 +14,17 @@ pub const KNOBS: &[&str] = &[
 
 const DEFAULT_WINDOWS: usize = 5;
 
-fn usage() -> String {
-    "usage: --emit queue-flow [<n>]   (<n> a positive integer, the trailing windows; default 5)"
-        .to_string()
-}
+pub const USAGE: &str =
+    "usage: --emit queue-flow [<n>]   (<n> a positive integer, the trailing windows; default 5)";
 
 fn windows_arg(args: &[String]) -> Result<usize, String> {
     match args {
         [] => Ok(DEFAULT_WINDOWS),
         [n] => match n.parse::<usize>() {
             Ok(v) if v > 0 && n.bytes().all(|b| b.is_ascii_digit()) => Ok(v),
-            _ => Err(usage()),
+            _ => Err(USAGE.to_string()),
         },
-        _ => Err(usage()),
+        _ => Err(USAGE.to_string()),
     }
 }
 

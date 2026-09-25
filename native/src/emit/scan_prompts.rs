@@ -14,7 +14,7 @@ pub const KNOBS: &[&str] = &[
 
 // spec: gate-sdk/SPEC.md §The bin/-tool contract — the usage a refusal prints, since the `-h`/
 // `--help` half retires to the front-end and the shape half does not.
-const USAGE: &str = "usage: --emit scan-prompts [--count] [--] [<log>]\n  ranks the friction log's prompting calls; \"--\" admits a log path beginning with \"-\"";
+pub const USAGE: &str = "usage: --emit scan-prompts [--count] [--] [<log>]\n  ranks the friction log's prompting calls; \"--\" admits a log path beginning with \"-\"";
 
 // spec: guard-kit/SPEC.md §scan-prompts — the harness's own built-in read-only auto-allows, a
 // public and harness-wide vocabulary rather than any consumer's, so they are kit literals and

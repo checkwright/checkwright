@@ -5,7 +5,7 @@
 
 pub const KNOBS: &[&str] = &["DRIFT_KIT_INSTALL_RECORD"];
 
-const USAGE: &str = "usage: --emit file-install [--] <kind> <field>...\n  \
+pub const USAGE: &str = "usage: --emit file-install [--] <kind> <field>...\n  \
      install <id> <profile> <floor> <ttfg>\n  \
      red <id> <gate> <verdict> <disposition> <behaviour>\n  \
      checkin <id> <day> <kit> <retained>\n  \
@@ -259,7 +259,7 @@ mod tests {
     }
 
     // spec: drift-kit/SPEC.md §The install-observation record — `--help` is a refusal rather than
-    // usage: a non-gate arm's usage lives in the front-end's own help and in the kit's README.
+    // usage, the dispatcher printing the usage block beneath it.
     #[test]
     fn a_help_flag_is_a_refusal_rather_than_a_capture() {
         for flag in ["-h", "--help"] {

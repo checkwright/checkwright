@@ -268,13 +268,13 @@ fn main() {
     // function, so the comparator and the rollup join call it in-process rather than through this.
     if let Some(arm) = emit::lookup(first) {
         match arm {
-            emit::Arm::Emit(f) => match f(&argv[1..]) {
+            emit::Arm::Emit(f, grammar) => match emit::dispatch(first, *f, grammar, &argv[1..]) {
                 Ok(doc) => {
                     print!("{}", doc);
                     exit(0);
                 }
                 Err(e) => {
-                    eprintln!("checkwright-gates: {}: {}", first, e);
+                    eprintln!("checkwright-gates: {}", e);
                     exit(2);
                 }
             },

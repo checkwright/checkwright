@@ -3,6 +3,8 @@
 // and the argv tail otherwise stays the optional queue file the rule itself consumes.
 use crate::queue::{self, Sections};
 
+pub const USAGE: &str = "usage: --emit queue-counts [--by <tag>] [queue-file]";
+
 // spec: queue-kit/SPEC.md §The queue-counts arm — an absent input appears rather than vanishing, so
 // a partition value is always present: a field tag's first lead-line value, a bare tag's own name,
 // or `(none)`.

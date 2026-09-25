@@ -10,7 +10,7 @@ pub const KNOBS: &[&str] = &[
     registry::EVERY_COUPLES_KNOB,
 ];
 
-const USAGE: &str = "usage: --emit git-hooks pre-commit|commit-msg|--write";
+pub const USAGE: &str = "usage: --emit git-hooks pre-commit|commit-msg|--write";
 
 // spec: gate-sdk/SPEC.md §gen-pre-commit — each header names the binary the hook bakes as its
 // regeneration and install door

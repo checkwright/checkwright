@@ -17,7 +17,7 @@ pub const KNOBS: &[&str] = &[
 // spec: gate-sdk/SPEC.md §The bin/-tool contract — the usage a shape refusal prints, the
 // `-h`/`--help` half having retired to the front-end. It names the `--` escape because the refusal
 // it accompanies is the only reason a caller would reach for one.
-const USAGE: &str = "usage: run-gates.sh --emit usage-trend [--] [history-file]
+pub const USAGE: &str = "usage: run-gates.sh --emit usage-trend [--] [history-file]
   [history-file] overrides DELEGATION_KIT_USAGE_HISTORY, for test injection.
   \"--\" ends option processing, so a path beginning with \"-\" is still reachable.";
 

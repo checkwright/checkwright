@@ -4,6 +4,7 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — an empty roster of the *happens to read nothing*
 // kind; the driver is this product's file, so it is an operand rather than a crate literal
 pub const KNOBS: &[&str] = &[];
+pub const USAGE: &str = "usage: --emit parse-smoke-log <driver.sh> <log>";
 
 // spec: evidence-kit/SPEC.md §Layout and configuration — a header is a top-level `printf` of a
 // `\n`-terminated literal with no redirect, named up to its parenthetical; an empty literal and a
@@ -70,8 +71,8 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         (Some(d), Some(l)) if !d.is_empty() && !l.is_empty() => (d.as_str(), l.as_str()),
         _ => {
             return Err(
-                "usage: --emit parse-smoke-log <driver.sh> <log> — the driver is the consumer's \
-                 own file, so the arm holds no default for it"
+                "needs a driver and a log — the driver is the consumer's own file, so the arm holds \
+                 no default for it"
                     .to_string(),
             )
         }

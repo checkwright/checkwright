@@ -8,7 +8,7 @@ use crate::walk;
 
 pub const KNOBS: &[&str] = &["LIFECYCLE_KIT_SURVEY_RECORD_FILE", "LIFECYCLE_KIT_STATE_FILE"];
 
-const USAGE: &str = "usage: --emit file-survey [--] \"<question>\" \"<corpus>\" \"<oracle>\" \"<inferred>\" \"<finding>\"\n  appends one dated block to the survey record; \"--\" files a field beginning with \"-\"";
+pub const USAGE: &str = "usage: --emit file-survey [--] \"<question>\" \"<corpus>\" \"<oracle>\" \"<inferred>\" \"<finding>\"\n  appends one dated block to the survey record; \"--\" files a field beginning with \"-\"";
 
 // spec: lifecycle-kit/SPEC.md §The survey record — the never-named stage the queue header already
 // uses, stamped when the cursor is absent.

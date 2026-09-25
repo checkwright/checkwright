@@ -30,46 +30,6 @@ the twelve kit READMEs carry three classes of false or unrunnable statement. (1)
 
 **Cost while deferred:** a starter adopter copies a command their floor cannot run, and reads a payload claim the installer contradicts. Filed 2026-09-25 by consult as a direct entry, from the same operator-directed audit.
 
-### fixture-runner-checks-dir-fails-open
-
-the fixture runner silently drops an explicitly named checks directory that does not exist (`run_gate_tests.rs`, a fail-open its own comment admits), so a mistyped path runs the fixtures against nothing and blames the corpus.
-
-**Deliverable:** refuse a named directory that is absent, with a fixture.
-
-**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** it brings the runner under the fail-closed contract. Re-verified at scope: `run_gate_tests.rs` filters named members through `is_dir()` beside the comment carrying the fail-open.
-
-**Cost while deferred:** every kit's fixture suite rides a runner that can pass on a typo. Filed 2026-08-24; returned from the icebox 2026-09-25 by consult, the branch re-read.
-
-### bin-argv-shape-residual-member
-
-`--run-gate-tests` treats its first argument as the tests directory with no `-h` or `--` handling (`run_gate_tests.rs`), so `--run-gate-tests --help` fails as a missing directory while the bin/-tool contract (gate-sdk/SPEC.md §The bin/-tool contract) reads as complete.
-
-**Deliverable:** the arm takes the contract's argument shape, with a bad fixture.
-
-**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** it brings the arm to a contract already stated. Re-verified at scope: `--run-gate-tests --help` prints `no fixture tree at --help`. It lands with [surplus-arg-drop-in-six-emit-arms](#surplus-arg-drop-in-six-emit-arms), which converges on the same contract.
-
-**Cost while deferred:** one arm breaks the contract its kit states. Filed 2026-08-13; returned from the icebox 2026-09-25 by consult, the arm re-read.
-
-### surplus-arg-drop-in-six-emit-arms
-
-fourteen emit modules take `_args` and ignore them (`session_id.rs` is one), so a bogus or surplus argument exits 0 with no refusal, against the bin/-tool contract's argument shape.
-
-**Deliverable:** one surplus-argument refusal in the emit dispatcher, and a bad fixture.
-
-**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** it enforces an argument shape the contract already states. Re-verified at scope: `--emit session-id bogus-surplus` exits 0. It lands with [emit-arm-usage-unreachable](#emit-arm-usage-unreachable), since one dispatcher refusal that prints the arm's usage closes both.
-
-**Cost while deferred:** a misspelt invocation reads as success. Filed 2026-09-08; returned from the icebox 2026-09-25 by consult, the modules re-grepped.
-
-### emit-arm-usage-unreachable
-
-gate-sdk/SPEC.md contradicts itself on where an `--emit` member's usage lives: §The bin/-tool contract says it is not in the front end's help and lives at the member's shape refusal, which prints the usage block at exit 2; §The non-gate arm says it lives in `bin/run-gates.sh`'s help and the owning kit's README, and refuses a per-arm help flag. Behaviour matches neither: `--emit file-survey --help` refuses at exit 2 with no usage block.
-
-**Deliverable:** §The non-gate arm's sentence brought to §The bin/-tool contract's rule, and every `--emit` member's shape refusal printing its usage block at exit 2, with a bad fixture. No `--emit --help` or per-arm help flag.
-
-**Reshaped and promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the filed deliverable, a per-arm `--help`, would reverse §The non-gate arm's refusal of a second home, which is a contract change; converging on the rule §The bin/-tool contract already states adds no name. Scope and the lead both ran the `file-survey` probe.
-
-**Cost while deferred:** an adopter learns an arm's arguments by failing it, and the failure does not even say. Filed 2026-09-03; returned from the icebox 2026-09-25 by consult, the usage text re-read.
-
 ### non-gate-arm-roster-hand-maintained
 
 gate-sdk/SPEC.md §The non-gate arm hand-lists the flags `main.rs` hardcodes; accurate today and held by nothing, against derivation-first.
@@ -1487,5 +1447,10 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 `check-docs-cmd` assertion (C) misses a retired path cited from the queue, which is outside its manifest corpus and whose `<path>:<line>` token fails the path shape.
 
 ## Done
+
+- surplus-arg-drop-in-six-emit-arms
+- emit-arm-usage-unreachable
+- bin-argv-shape-residual-member
+- fixture-runner-checks-dir-fails-open
 
 ## Lessons Learned

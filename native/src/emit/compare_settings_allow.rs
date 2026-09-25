@@ -18,7 +18,7 @@ pub const KNOBS: &[&str] = &[
 // spec: gate-sdk/SPEC.md §The bin/-tool contract — the usage the operand refusal prints. An
 // `--emit-` member gets no front-end `case` arm and so no named help line, which is why the usage
 // lives at the member's own shape refusal rather than retiring to the substrate.
-const USAGE: &str = "usage: --emit compare-settings-allow [--count]";
+pub const USAGE: &str = "usage: --emit compare-settings-allow [--count]";
 
 const REDUNDANCY_HEADER: &str =
     "=== settings allowlist redundancy (advisory \u{2014} prune candidates) ===";
