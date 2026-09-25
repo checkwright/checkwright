@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+gate-sdk-framework-brevity gates sha256=5bafae342bbd314ce554e55a25d2934eaba69dc6f1da37f2607dd653a0602df9 pass=135 fail=0 ignore=0 verdict=clean 2026-09-25
+gate-sdk-framework-brevity gate_sdk sha256=754fceb4addff652c31443cc80edb7fd86da22a6751d6a985b726be116728b35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-25
+gate-sdk-framework-brevity canon_kit sha256=1fe227c7d8c11db8a86ada929e9fcad7e090d0db00dc146d46c284cdd32420dc pass=1 fail=0 ignore=0 verdict=clean 2026-09-25
+gate-sdk-framework-brevity context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-25
+gate-sdk-framework-brevity delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-25
+gate-sdk-framework-brevity doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-25
+gate-sdk-framework-brevity evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-25
+gate-sdk-framework-brevity guard_kit sha256=01d94b4120e133665e01946fe44d31a730d2c6cdfd1570e5ce6b96a7a1b30e1b pass=1 fail=0 ignore=0 verdict=clean 2026-09-25
+gate-sdk-framework-brevity lifecycle_kit sha256=f3a8d77f2d38f716eeb72cd82f0c6d313adb17ea7d522760b30f147e36a031a0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-25
+gate-sdk-framework-brevity queue_kit sha256=5880c4840de8628f0c320fd728dd3e425a92b6d1554f5e56ce403a8d8b13f3c5 pass=1 fail=0 ignore=0 verdict=clean 2026-09-25
+gate-sdk-framework-brevity site_kit sha256=b9a84e84d67dad5a63ae7ce34aecdc472ffbe13d06d01cc02f04bfca5b5de2ae pass=1 fail=0 ignore=0 verdict=clean 2026-09-25
+gate-sdk-framework-brevity scripts sha256=3b4f627186b5c83c3d57c67777cb011d312901b5705f8eaf51c806bc5ee37264 pass=1 fail=0 ignore=0 verdict=clean 2026-09-25
+gate-sdk-framework-brevity guard_tests sha256=50af7da51cc1a15eb9e72dea81613ec0b82b4b73a8faba1987ef537271e9ee9a pass=1 fail=0 ignore=0 verdict=clean 2026-09-25
+gate-sdk-framework-brevity demo sha256=4310d28bc8b99f3a0f866184ecf91b722e93aae8565d41342b0af257e5315c1d pass=1 fail=0 ignore=0 verdict=clean 2026-09-25
+gate-sdk-framework-brevity installer_smoke sha256=1a3fa91927eed42c443ab524efead61e056fb44aa711af7fbb9d4ba7962076d7 pass=17 fail=0 ignore=0 verdict=clean 2026-09-25
+gate-sdk-framework-brevity consumer_smoke sha256=58ddb79b352b5978d32c7a1f61f5461d005256af38c7c2e6a86a40a30305deb8 pass=1 fail=0 ignore=0 verdict=clean 2026-09-25
+gate-sdk-framework-brevity upgrade sha256=0aea61252f337cccb5bc59ea1757ae49a20d5717750623018e9d8bc474dd1827 pass=1 fail=0 ignore=0 verdict=clean 2026-09-25
+gate-sdk-framework-brevity agents_md_smoke sha256=c8dc091717e46c8585bbe3cec5ce9db8c2ac3a02d06f0a00af1337775ce00a9b pass=1 fail=0 ignore=0 verdict=clean 2026-09-25
+gate-sdk-framework-brevity index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-25
+gate-sdk-framework-brevity native_crate sha256=9a474f6f5af88351e62eb107ab1b86240a52ff4b9e0489b70c9b0987590b0128 pass=1 fail=0 ignore=0 verdict=clean 2026-09-25
+gate-sdk-framework-brevity projection_witness sha256=4000bbe87942a445140752ef57cecc698dcde5687916f45b68c5af745e4374c8 pass=1 fail=0 ignore=0 verdict=clean 2026-09-25
