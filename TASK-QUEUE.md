@@ -8,20 +8,6 @@
 
 ## New Features
 
-### spec-tier-brevity-pass
-
-[spec: SPEC-prose-bounds.md]
-
-the SPEC tier is unreadable as a specification by size, and a derived profile plus a sampled classification say what the size is made of. The twelve kit SPECs and the doctrine total about 564k words; 575 paragraphs exceed 200 words and 113 exceed 400; a quarter of all sentences exceed 45 words; about 1,150 sentences are provenance-shaped (refused, measured, attested, honest limit). gate-sdk/SPEC.md alone is 217k words with a 4,465-word paragraph. Sampled classification of the 44 longest paragraphs across six SPECs found CONTRACT the plurality class everywhere (51–75%), so this is not filler: the cost is (1) run-on structure — bullet runs with no blank line read as one paragraph, and lifecycle-kit/SPEC.md §templates/lead.md opens with one ~900-word colon-chained sentence bundling nine sub-contracts; (2) archaeology pockets — gate-sdk §The port-candidate criteria and §The first cohort (55–78% non-contract, dated instrument runs), installer §The consumer smoke's round-by-round debugging log (92%), delegation-kit §Testing (four narrative paragraphs); (3) restatement pockets — canon-kit §Layout and configuration re-derives the provenance-seam rule eleven times, guard-kit §Layout and configuration at 22% restatement. The profile script and the sampled tables are in this entry's filing commit; the icebox entry `port-archaeology-restatement-residue` was one instance of class (2).
-
-**Deliverable:** the gates for three moves, and the moves applied to the first five sections: re-punctuate run-on sentences and separate bullet runs (a sentence-length ceiling for governed prose, or a stated reason none); move dated archaeology and refusal narrative to the commits that own it, leaving the undated rule and its grounds (the provenance seam already rules this; the gate is the missing half); collapse per-bullet restatements to one lead-in. The sections: gate-sdk §The port-candidate criteria and §The first cohort, installer §The consumer smoke, delegation-kit §Testing, canon-kit's and guard-kit's §Layout and configuration. Not a wholesale cut: a contract sentence stays. The rest of the tier is [spec-brevity-residue](#spec-brevity-residue).
-
-**Taken as a feature, split — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the gates add names, so /spec authors and pairs it; the five sections above land this iteration and the per-SPEC remainder was split out. It absorbs the icebox entry `port-archaeology-restatement-residue`, a class-(2) instance inside gate-sdk's port sections, retired to Done at pairing. It reshapes `agent-file-paragraph-sections-ungoverned`: one bound serves both corpora, so this gate's design goes first.
-
-**Spec (2026-09-25):** SPEC-prose-bounds.md, which also pairs agent-file-paragraph-sections-ungoverned. A new canon-kit gate, `check-prose-bounds`, bounds sentences and units and flags a phrase repeated across a section's units, under a per-file ceiling that holds the residue. A `dated` arm on `check-provenance-seam` is the archaeology half: a kit SPEC carries no date, and gate-sdk §The provenance seam's dated-measurement allowance is rewritten to match. The amendment changes canon-kit's, gate-sdk's and context-kit's contracts, so the audit stage is owed.
-
-**Cost while deferred:** paid by every session that opens a SPEC section and every adopter who reads one on the site; the sampled sections cost a reader three to five times the words their rules need. Filed 2026-09-25 by consult as a direct entry, from the operator-directed brevity audit of project assets.
-
 ## Technical Debt
 
 ## Deferred
@@ -410,7 +396,7 @@ the secondary customer pages carry validity slips and undefined internal vocabul
 
 [cost: session/high] [surface: gate-sdk]
 
-the per-SPEC remainder of [spec-tier-brevity-pass](#spec-tier-brevity-pass)'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry lands. In the filing profile's order, by size: gate-sdk (217k words, its port sections excepted), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry lands. In the filing profile's order, by size: gate-sdk (217k words, its port sections excepted), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice lands; one SPEC, or a batch of the small ones, per iteration. Not a wholesale cut: a contract sentence stays.
 
@@ -1470,6 +1456,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 ## Done
 
+- spec-tier-brevity-pass
 - wait-mandate-template-spelling-unreachable
 - close-triage-log-reclaim-loss-window
 - worktree-isolated-dispatch-cannot-reach-the-main-checkout
