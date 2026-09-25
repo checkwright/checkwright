@@ -1354,9 +1354,4 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 
 ## Done
 
-- binding-intel-leg-failed-one-run-in-two
-- push-need-uncounted-at-scope
-- instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set
-- held-ci-leg-failure-reddens-a-binding-one
-
 ## Lessons Learned

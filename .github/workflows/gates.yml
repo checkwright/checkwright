@@ -1657,8 +1657,7 @@ jobs:
   # at `aarch64-apple-darwin`, on the argument install-smoke-sh-macos-intel's
   # own header gives for its own triple: a held producer's failure otherwise
   # fails this workflow through a binding consumer whenever the consumer's
-  # posture is hard-coded rather than read — the coupling
-  # `held-ci-leg-failure-reddens-a-binding-one` filed, and this leg closes by
+  # posture is hard-coded rather than read, a coupling this leg closes by
   # deriving instead of hard-coding. While `aarch64-apple-darwin` stays
   # `joined` (docs/install.md §Requirements) this leg is binding exactly as
   # before — its red still fails this workflow — and read that as a different

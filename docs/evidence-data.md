@@ -220,3 +220,4 @@
 | silent-guard-gaps | sc sp a b v c | 7f/1d | 5 · ≤0d | 21s clean | 132 |
 | adopter-onramp | sc sp a b v c | 7f/2d | 4 · ≤0d | 21s clean | 133 |
 | hosted-install-path | sc sp a b v c | 4f/2d | 2 · ≤1d | 21s clean | 134 |
+| push-need-accounting | sc sp · b v c | 2f/1d | 1 · ≤0d | 21s clean | 134 |
