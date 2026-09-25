@@ -38,9 +38,13 @@ a balanced Liquid token a docs page means literally (`{{ x }}`, `{% x %}`) parse
 
 a PowerShell script run off a scratch-dir body (`& .tmp\x.ps1`, `.\.tmp\x.ps1`, `pwsh -File .tmp/x.ps1`) is unsteered. Rule `script_interpreter` has no PowerShell form because its corrective names the `--scratch-run` runner, which echoes and runs a bash body only. guard-kit/SPEC.md §The hook on native Windows states the limit.
 
-**Deliverable:** a `--scratch-run` path for a PowerShell body and the rule's PowerShell form, or a SPEC boundary note refusing one.
+**Deliverable:** a `--scratch-run` path for a PowerShell body and the rule's PowerShell form, and a runner that executes the bytes it echoed.
 
 **Taken as a feature — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the new PowerShell runner path, authored and paired by /spec; the cheaper arm-(b) block steering to the bash runner was offered and not chosen. It passes the enhancement admission filter on the trust arm (scope's judgment): it closes a gap in the guard's approval model on the native-Windows adopter constraint.
+
+**Consumer-selected — operator direction 2026-09-25, lead-relayed:** a guard-kit knob names the PowerShell host, empty and off by default. Off, the rule blocks a scratch `.ps1` run and steers to a bash body under the runner; set, the runner echoes the `.ps1` and runs it under the named host. §scratch-run's refusal of a second interpreter is re-grounded rather than kept: PowerShell is the harness's own second shell, the echo covers it unchanged, and it adds no capability a bash body under the runner lacks. Always-on was declined because it makes the host an owed program `doctor` fails without.
+
+**The re-read window folds in — operator direction 2026-09-25, lead-relayed:** the runner echoes the body, then hands its interpreter the path, which re-reads the file (the gap-inbox bullet of 2026-09-25 filed by this unit's spec). The runner executes the exact bytes it echoed, on both paths. Local docker carries a pwsh image for probing; native Windows PowerShell 5.1 still first runs on the Windows leg.
 
 **Push need (2026-09-25, inside the budget):** one mid-iteration push, since this host has no `pwsh` and the native-Windows install-smoke leg is the runner's first real run; with the closing push, 2 against 2.
 
