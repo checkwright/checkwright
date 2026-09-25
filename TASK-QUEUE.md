@@ -8,6 +8,24 @@
 
 ## New Features
 
+### ps-scratch-script-unsteered
+
+[spec: SPEC-ps-scratch-runner.md] [observed-by: gates workflow]
+
+a PowerShell script run off a scratch-dir body (`& .tmp\x.ps1`, `.\.tmp\x.ps1`, `pwsh -File .tmp/x.ps1`) is unsteered. Rule `script_interpreter` has no PowerShell form because its corrective names the `--scratch-run` runner, which echoes and runs a bash body only. guard-kit/SPEC.md §The hook on native Windows states the limit.
+
+**Deliverable:** a `--scratch-run` path for a PowerShell body and the rule's PowerShell form, and a runner that executes the bytes it echoed.
+
+**Taken as a feature — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the new PowerShell runner path, authored and paired by /spec; the cheaper arm-(b) block steering to the bash runner was offered and not chosen. It passes the enhancement admission filter on the trust arm (scope's judgment): it closes a gap in the guard's approval model on the native-Windows adopter constraint.
+
+**Consumer-selected — operator direction 2026-09-25, lead-relayed:** a guard-kit knob names the PowerShell host, empty and off by default. Off, the rule blocks a scratch `.ps1` run and steers to a bash body under the runner; set, the runner echoes the `.ps1` and runs it under the named host. §scratch-run's refusal of a second interpreter is re-grounded rather than kept: PowerShell is the harness's own second shell, the echo covers it unchanged, and it adds no capability a bash body under the runner lacks. Always-on was declined because it makes the host an owed program `doctor` fails without.
+
+**The re-read window folds in — operator direction 2026-09-25, lead-relayed:** the runner echoes the body, then hands its interpreter the path, which re-reads the file (the gap-inbox bullet of 2026-09-25 filed by this unit's spec). The runner executes the exact bytes it echoed, on both paths. Local docker carries a pwsh image for probing; native Windows PowerShell 5.1 still first runs on the Windows leg.
+
+**Push need (2026-09-25, inside the budget):** one mid-iteration push, since this host has no `pwsh` and the native-Windows install-smoke leg is the runner's first real run; with the closing push, 2 against 2. Re-judged at spec: the local pwsh container runs the pwsh 7 cases before that push, but Windows PowerShell 5.1, the Windows path dialect and Git Bash are measured only on the leg, so the mid-iteration push stays owed.
+
+**Cost while deferred:** on a Windows host an approved PowerShell script call can run a body rewritten after approval, with no echo at execution. Filed 2026-09-24 to the gap inbox by adopter-onramp's build; promoted 2026-09-24 at its close: →fix fails because the runner arm is new mechanism, a unit rather than a repair. Owner lookup: none in this file; owner guard-kit/SPEC.md §The generic ruleset, rule `script_interpreter` and its scratch-run runner. Spec authored guard-kit/SPEC-ps-scratch-runner.md and promoted it 2026-09-25: single-component (guard-kit and its crate modules), so no audit stage is owed. Done is observed on the `install-smoke-sh-windows` run once its scratch-runner step is green.
+
 ## Technical Debt
 
 ### trailer-ban-help-overruled
@@ -31,24 +49,6 @@ a balanced Liquid token a docs page means literally (`{{ x }}`, `{% x %}`) parse
 **Deliverable:** a render-side assertion (Liquid-render each page against an empty context and diff against the source outside raw blocks), or a token scan outside raw blocks and the Liquid a page owns, or a SPEC boundary note refusing both.
 
 **Cost while deferred:** a page documenting a template or workflow expression outside a raw block loses its literal text on the live site, silently. Filed 2026-09-24 to the gap inbox by hosted-install-path's build; promoted 2026-09-25 at its close: →fix fails because the assertion is new mechanism, and no live page carries the defect to repair. Owner lookup: `liquid`, `raw block` in this file — only the landed `pages-liquid-break-undetected`, whose subject is a parse break, not a literal token; owner site-kit/SPEC.md §check-docs-liquid-parse.
-
-### ps-scratch-script-unsteered
-
-[cost: event/high] [surface: guard-kit] [observed-by: gates workflow]
-
-a PowerShell script run off a scratch-dir body (`& .tmp\x.ps1`, `.\.tmp\x.ps1`, `pwsh -File .tmp/x.ps1`) is unsteered. Rule `script_interpreter` has no PowerShell form because its corrective names the `--scratch-run` runner, which echoes and runs a bash body only. guard-kit/SPEC.md §The hook on native Windows states the limit.
-
-**Deliverable:** a `--scratch-run` path for a PowerShell body and the rule's PowerShell form, and a runner that executes the bytes it echoed.
-
-**Taken as a feature — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the new PowerShell runner path, authored and paired by /spec; the cheaper arm-(b) block steering to the bash runner was offered and not chosen. It passes the enhancement admission filter on the trust arm (scope's judgment): it closes a gap in the guard's approval model on the native-Windows adopter constraint.
-
-**Consumer-selected — operator direction 2026-09-25, lead-relayed:** a guard-kit knob names the PowerShell host, empty and off by default. Off, the rule blocks a scratch `.ps1` run and steers to a bash body under the runner; set, the runner echoes the `.ps1` and runs it under the named host. §scratch-run's refusal of a second interpreter is re-grounded rather than kept: PowerShell is the harness's own second shell, the echo covers it unchanged, and it adds no capability a bash body under the runner lacks. Always-on was declined because it makes the host an owed program `doctor` fails without.
-
-**The re-read window folds in — operator direction 2026-09-25, lead-relayed:** the runner echoes the body, then hands its interpreter the path, which re-reads the file (the gap-inbox bullet of 2026-09-25 filed by this unit's spec). The runner executes the exact bytes it echoed, on both paths. Local docker carries a pwsh image for probing; native Windows PowerShell 5.1 still first runs on the Windows leg.
-
-**Push need (2026-09-25, inside the budget):** one mid-iteration push, since this host has no `pwsh` and the native-Windows install-smoke leg is the runner's first real run; with the closing push, 2 against 2.
-
-**Cost while deferred:** on a Windows host an approved PowerShell script call can run a body rewritten after approval, with no echo at execution. Filed 2026-09-24 to the gap inbox by adopter-onramp's build; promoted 2026-09-24 at its close: →fix fails because the runner arm is new mechanism, a unit rather than a repair. Owner lookup: none in this file; owner guard-kit/SPEC.md §The generic ruleset, rule `script_interpreter` and its scratch-run runner.
 
 ### side-effect-free-read-arms
 
