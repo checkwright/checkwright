@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### gate-sdk-remainder-brevity
-
-the framework-level remainder of gate-sdk/SPEC.md after `gate-sdk-framework-brevity`, about 26k words: §The `# graph:` manifest, §Meta-gate conservation for the binary substrate, §Consumer payload and §Consumer smoke. The Porting cohort records and §Per-component contracts stay on [spec-brevity-residue](#spec-brevity-residue).
-
-**Deliverable:** the three moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) applied to those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm. A contract sentence stays, including the facts sibling entries cite there: the §Consumer payload disclosure ruling, the `check-gate-tamper` row, and the release-asset claim.
-
-**Promoted as debt, split from spec-brevity-residue — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the moves run under gates that already exist and add no name.
-
-**Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-25 at scope from spec-brevity-residue, filed that day.
-
 ## Deferred
 
 ### docs-liquid-literal-unseen
@@ -400,7 +390,7 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
-**Split 2026-09-25 at scope, operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework half was promoted as its own debt entry; this entry keeps the rest. **Split again 2026-09-25 at the next scope, on the same class of direction:** §The `# graph:` manifest, §Meta-gate conservation, §Consumer payload and §Consumer smoke left as [gate-sdk-remainder-brevity](#gate-sdk-remainder-brevity), so gate-sdk's remainder here is the Porting records and §Per-component contracts.
+**Split 2026-09-25 at scope, operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework half was promoted as its own debt entry; this entry keeps the rest. **Split again 2026-09-25 at the next scope, on the same class of direction:** §The `# graph:` manifest, §Meta-gate conservation, §Consumer payload and §Consumer smoke left as `gate-sdk-remainder-brevity`, so gate-sdk's remainder here is the Porting records and §Per-component contracts.
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
@@ -1392,5 +1382,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - emit-per-arm-help-residue
 - harness-arm-argv-unstated
 - canonicalize-extended-length-prefix
+- gate-sdk-remainder-brevity
 
 ## Lessons Learned
