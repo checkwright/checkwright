@@ -522,7 +522,7 @@ pub fn authoring_tree(crate_dir: &str) -> bool {
 
 // spec: gate-sdk/SPEC.md §The crate's crosser — the crate's only `std::fs::canonicalize`, and the
 // one producer that hands its answer back unconverted; the UNC clause there rules why, and what
-// the two callers may assume.
+// each caller must hold.
 pub fn canonicalize(p: impl AsRef<Path>) -> Option<String> {
     fs::canonicalize(p).ok().map(|c| c.display().to_string())
 }
