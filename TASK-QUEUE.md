@@ -396,9 +396,9 @@ the secondary customer pages carry validity slips and undefined internal vocabul
 
 [cost: session/high] [surface: gate-sdk]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry lands. In the filing profile's order, by size: gate-sdk (217k words, its port sections excepted), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk (217k words, its port sections excepted), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
 
-**Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice lands; one SPEC, or a batch of the small ones, per iteration. Not a wholesale cut: a contract sentence stays.
+**Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration. Not a wholesale cut: a contract sentence stays.
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
@@ -781,6 +781,26 @@ queue provenance prose restates what `git log` answers; the ruled sweep is small
 **Deliverable:** assertion C's help (`native/src/gates/stage_entry.rs`) and the spec template's causal-completeness step state that respelling a roster token is not a remedy; assertion D's help states that a claim no delta rests on is kept as a documented honest limit rather than deleted; a fixture pins each help line.
 
 **Cost while deferred:** the next refused entry reads a help line that leaves the cheaper evasion open, and only a reviewing lead catches it. Filed 2026-09-25 to the gap inbox after powershell-scratch-runner's spec; promoted 2026-09-25 at the next iteration's scope from the carried bullet. Owner lookup: `respell`, `assertion C`, `assertion D`, `honest limit` in this file — none; [enter-stage-refusal-help-contradicts-its-guard](#enter-stage-refusal-help-contradicts-its-guard) shares the surface, but its subject is `--enter-stage`'s own refusal text.
+
+### isolated-tracked-capture-lost
+
+[cost: event/low] [surface: lifecycle-kit]
+
+a gap bullet or survey block filed by an isolated read-only child is lost with its worktree. `--emit file-gap` and `--emit file-survey` resolve their tracked records through `file_survey::anchored`, which anchors on the worktree's own `git rev-parse --show-toplevel`, so the write lands in the worktree's `.workflow/gap-inbox.md` or `survey-record.md`. gate-sdk/SPEC.md §The workflow directory moves gitignored capture to the main checkout and leaves a tracked write to "the child's own commit", which a read-only child never makes, so the harness reaps it uncommitted.
+
+**Deliverable:** a ruling on the tracked capture channels under isolation: route the write to the main checkout, as `anchored_capture` does for gitignored capture, or refuse under isolation with a steer to hand the finding back. Then the arm change, a unit test from a linked worktree, and the sentence in the owning SPEC sections (lifecycle-kit/SPEC.md §The committed gap inbox and §The survey record).
+
+**Cost while deferred:** a finding an isolated audit child files through the sanctioned channel disappears silently, and its caller believes it was filed. Filed 2026-09-25 to the gap inbox by spec-brevity-first-slice's spec while surveying capture writers; promoted 2026-09-25 at its close. →fix fails because the two remedies change the arms' behaviour differently and need a ruling first. Re-verified at the drain: `file_gap.rs` and `file_survey.rs` call `anchored`, not `anchored_capture`. Owner lookup: `file-gap`, `file-survey`, `anchored`, `isolated child` in this file — none.
+
+### crate-tests-unrun-on-windows
+
+[cost: event/low] [surface: gate-sdk]
+
+no CI leg runs the native crate's unit tests on native Windows. `.github/workflows/gates.yml` only runs `cargo check` for the `x86_64-pc-windows-msvc` target, and no workflow runs `cargo test` at all, so a unit test pinning a Windows filesystem behaviour is not witnessed on Windows. First instance: `--emit capture-drain` renames a log that is still open for append, and gate-sdk/SPEC.md §The workflow directory records that as an unmeasured honest limit.
+
+**Deliverable:** a Windows leg that runs the crate's unit tests, or a narrower one running only the modules that pin a platform claim, with its cost against the push budget stated. Or a SPEC boundary note refusing the leg and keeping the honest limit.
+
+**Cost while deferred:** a Windows adopter's close drain could fail with exit 2, and nobody sees it until an adopter reports it. Filed 2026-09-25 to the gap inbox by spec-brevity-first-slice's build; promoted 2026-09-25 at its close. →fix fails because a new CI leg is new mechanism, and only a push can witness it. Re-verified at the drain: `grep 'cargo test' .github/workflows/*.yml` returns nothing. Owner lookup: `cargo test`, `msvc`, `unit tests on` in this file — none; [foreign-toolchain-docker-legs](#foreign-toolchain-docker-legs) covers local pwsh and dash runs, not crate unit tests.
 
 ## Icebox
 
@@ -1455,49 +1475,5 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 `check-docs-cmd` assertion (C) misses a retired path cited from the queue, which is outside its manifest corpus and whose `<path>:<line>` token fails the path shape.
 
 ## Done
-
-- spec-tier-brevity-pass
-- wait-mandate-template-spelling-unreachable
-- close-triage-log-reclaim-loss-window
-- worktree-isolated-dispatch-cannot-reach-the-main-checkout
-- dod-size-figure-stales-in-iteration
-- craft-rule-step-has-no-reader
-- agent-file-paragraph-sections-ungoverned
-- amendment-prose-misnumbers-its-delta
-- bridged-arm-spawned-program-set-unheld
-- stage-economics-smoke-jq-arm-dormant
-- md-section-near-miss-match
-- amendment-done-move-assertions
-- guard-advise-jq-dependency
-- pack-installer-payload-kit-set-anchor
-- installer-jq-usability-probe
-- queue-entry-grammar-single-owner
-- installer-artifact-omission-residue
-- bridged-arm-requirements-undeclared
-- delta-citation-unresolvable
-- scratch-grant-backtick-declined
-- check-graph-trigger-consumer-path-reach
-- worktree-cleanliness-assertion-scopes-to-checkout
-- release-record-retired-knob
-- cost-series-limb-unreadable-inside-close
-- portability-count-on-two-surfaces
-- wrap-budget-caps-lead-line-tags
-- edges-retired-block-name-clash
-- lead-report-is-an-ungated-terminal-act
-- amendment-landing-citation-assertions
-- amendment-roster-stale-by-construction
-- dispatch-cited-evidence-unverified
-- lead-ruling-reopen-authority-unstated
-- iceboxed-recurrence-judgment-unrecordable
-- overlay-only-oracle-grants-uncommitted
-- promotion-commitment-stamp-latency
-- readonly-dispatch-type-cannot-see-gitignored-surfaces
-- dispatch-unreadable-target-fallback
-- queue-lib-dead-derivation
-- deleted-runner-anchors-across-ten-entries
-- wait-form-unallowlistable-by-construction
-- append-grant-decline-cause-unlogged
-- crate-toolchain-grant-uncommitted
-- port-archaeology-restatement-residue
 
 ## Lessons Learned
