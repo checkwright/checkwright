@@ -176,13 +176,13 @@ assert_absent only-widened-bound 'g_unreg saw:' "$out"
 # The binary holds two rosters and the emit path used to fall through to the gate
 # one, so the moment-of-miss diagnostic confirmed a wrong mental model instead of
 # correcting it. Read rather than diffed: the roster printed must be the arm set,
-# the gate set must be absent from it entirely, and the section that owns the roster
-# must be cited.
+# the gate set must be absent from it entirely, and the section that owns the arm
+# contract must be cited.
 out="$(bash "$RUN" --emit no-such-arm-at-all 2>&1)"; rc=$?
 assert_rc     emit-miss "$rc" 2
 assert_has    emit-miss 'no such --emit arm: --emit-no-such-arm-at-all'          "$out"
 assert_has    emit-miss '--emit-docs-mirror'                                     "$out"
-assert_has    emit-miss 'gate-sdk/SPEC.md §The non-gate arm owns the arm roster' "$out"
+assert_has    emit-miss 'gate-sdk/SPEC.md §The non-gate arm owns the arm contract' "$out"
 assert_absent emit-miss 'check-shellcheck'                                       "$out"
 
 [[ "$fails" -eq 0 ]] || { echo "run-arm-contract.test: $fails assertion(s) failed"; exit 1; }

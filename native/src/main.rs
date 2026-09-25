@@ -57,14 +57,14 @@ fn no_such_gate(name: &str) -> ! {
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the emit path's own miss. The binary holds two
 // rosters and a mistyped arm reaching the gate one is handed the roster that cannot contain what
-// it meant; this prints the arm roster, no gate name, and cites the section that owns it.
+// it meant; this prints the emit family off the table, no gate name, and cites the arm contract.
 fn no_such_arm(arm: &str) -> ! {
     eprintln!(
         "checkwright-gates: no such --emit arm: {} — the arm could not run; treating as failure (not clean)",
         arm
     );
     eprintln!("  help: this binary carries: {}", emit::emit_names().join(", "));
-    eprintln!("  help: gate-sdk/SPEC.md §The non-gate arm owns the arm roster");
+    eprintln!("  help: gate-sdk/SPEC.md §The non-gate arm owns the arm contract");
     exit(2);
 }
 

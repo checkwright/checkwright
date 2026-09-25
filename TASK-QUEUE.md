@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### gate-sdk-framework-brevity
-
-gate-sdk/SPEC.md is about 204k words and the first slice passed only its port-candidate criteria and first cohort, so the SPEC cannot take its pass in one iteration; this is its framework half, about 37k words: §The provenance seam, §Layout and configuration, §The path-dialect contract, §The workflow directory, §The bin/-tool contract, §The gate model, §Enforcement tiers, §The install disposition, §The non-gate arm with its harness-integration arm, §What the dispatch seam does not settle, §The adopter constraints and §The extensibility model.
-
-**Deliverable:** the three moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) applied to those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm. A contract sentence stays. The sibling debt entries that edit these sections land first, so the pass reads their text.
-
-**Promoted as debt, split from spec-brevity-residue — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the moves run under gates that already exist and add no name. The rest of gate-sdk stays on the residue entry.
-
-**Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-25 at scope from spec-brevity-residue, filed that day.
-
 ### kit-readme-validity-pass
 
 the twelve kit READMEs carry three classes of false or unrunnable statement. (1) Every `Use`/`Test` fence spells the sourcing idiom, which needs bash ≥ 4.3 (`gate-sdk/lib/gate.sh`'s `local -n`), while starter and prose adopters are told they reach no bash and no PowerShell spelling exists; `init` prints `./scripts/checkwright-gates <arm>` (installer/SPEC.md §init), which every README should spell instead. (2) Eleven READMEs say "An installer-vendored tree does not carry this file", but the payload withholds only `SPEC.md` and `smoke/` (gate-sdk/SPEC.md §Consumer payload) and the README is packed. (3) Single false claims: drift-kit's "Like guard-kit, drift-kit registers no gates" (guard-kit registers `check-door-binding`); delegation-kit's "the two mechanizable pieces" against three gates and three guards; evidence-kit's `check-producer-liveness` inside the "add to your `gates.list`" block; doctrine-kit's fence holding a bare `--install-doctrine` flag; installer/README.md's stale three-kit description and its "nothing Windows 10 and later does not ship" double negative.
@@ -29,16 +19,6 @@ the twelve kit READMEs carry three classes of false or unrunnable statement. (1)
 **Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** each fix brings a README to what `init` and §Consumer payload already say, adding no name.
 
 **Cost while deferred:** a starter adopter copies a command their floor cannot run, and reads a payload claim the installer contradicts. Filed 2026-09-25 by consult as a direct entry, from the same operator-directed audit.
-
-### non-gate-arm-roster-hand-maintained
-
-gate-sdk/SPEC.md §The non-gate arm hand-lists the flags `main.rs` hardcodes; accurate today and held by nothing, against derivation-first.
-
-**Deliverable:** the hand list deleted and the SPEC citing the arm roster the binary already prints (an unknown `--emit` arm's refusal lists every carried arm).
-
-**Promoted as debt on its derivation branch — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the parity-assertion branch would add a name and re-triage the entry. It is the restatement cut [gate-sdk-framework-brevity](#gate-sdk-framework-brevity) makes in the same section, so the two land together.
-
-**Cost while deferred:** the next arm added stales the list. Filed 2026-09-03; returned from the icebox 2026-09-25 by consult as a contributor-reader exception voided by the rule.
 
 ## Deferred
 
@@ -416,7 +396,7 @@ the secondary customer pages carry validity slips and undefined internal vocabul
 
 [cost: session/high] [surface: gate-sdk]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk's remainder after [gate-sdk-framework-brevity](#gate-sdk-framework-brevity) (§Per-component contracts at about 107k words, the Porting cohort records, §The `# graph:` manifest, §Meta-gate conservation for the binary substrate, §Consumer payload, §Consumer smoke), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk's remainder after `gate-sdk-framework-brevity` (§Per-component contracts at about 107k words, the Porting cohort records, §The `# graph:` manifest, §Meta-gate conservation for the binary substrate, §Consumer payload, §Consumer smoke), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
@@ -1425,5 +1405,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - upgrade-smoke-refuses-inside-a-worktree
 - consumer-smoke-accounting-spelling-unpinned
 - template-registry-population-predicate
+- gate-sdk-framework-brevity
+- non-gate-arm-roster-hand-maintained
 
 ## Lessons Learned
