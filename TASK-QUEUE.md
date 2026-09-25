@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: spec-brevity-first-slice
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [README.md](README.md) maps the kits.
 
@@ -9,6 +9,36 @@
 ## New Features
 
 ## Technical Debt
+
+### wait-mandate-template-spelling-unreachable
+
+the in-turn wait the delegation protocol mandates, `while kill -0 "$pid"`, is refused by guard-kit's own expansion rule, while the literal-PID spelling is auto-allowed; the template and the agent definitions carry the refused form.
+
+**Deliverable:** the template and the agent definitions spell the wait in the form the guard grants, and the two SPECs cite one spelling.
+
+**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** it converges the spelling on the grant the guard already makes, adding no name. Premise re-verified at scope: `.claude/agents/stage-session.md` still carries `"$pid"`, and the guard refused `$VAR` expansions in the scope session itself.
+
+**Cost while deferred:** every adopter following the protocol literally meets a refusal on its first wait. Filed 2026-08-29; returned from the icebox 2026-09-25 by consult, the refusal re-probed.
+
+### craft-rule-step-has-no-reader
+
+`context-kit/templates/session-context.sh` renders the stage-rules block under `2>/dev/null … || true`, so a broken `CONTEXT_KIT_STAGE_RULES` knob drops the block silently and reds nothing.
+
+**Deliverable:** the hook reports a knob that names no readable file, and a fixture pins the report.
+
+**Promoted as debt — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** a report on a knob the SPEC already names, adding no name; it joins because the unit set carries context-kit through [agent-file-paragraph-sections-ungoverned](#agent-file-paragraph-sections-ungoverned).
+
+**Cost while deferred:** a session opens without its craft rules and no surface says so. Filed 2026-09-03; returned from the icebox 2026-09-25 by consult, the template re-read.
+
+### dod-size-figure-stales-in-iteration
+
+an amendment's definition-of-done carries a size figure spec wrote at promotion, and nothing re-reads it as the iteration moves; the figure ages inside its own iteration.
+
+**Deliverable:** the figure derived at read (the amendment cites the oracle, not the number), or the size line dropped from the DoD grammar.
+
+**Promoted as debt for investigation — operator direction 2026-09-25, lead-relayed (not a /consult ruling), over scope's recommendation to retire:** either deliverable converges on names the tree carries (`check-queue-entry-budget`'s printed headroom), so no amendment is owed unless the investigation finds a new name is needed, which re-triages it. Scope's probe found no home for the figure: `canon-kit/templates/SPEC-amendment.md`'s Definition of Done has no size line, and no stage template or SPEC instructs one. The filing bullet (2026-09-07 close) names the practice: spec states a measured queue-entry size in a DoD item, then its own promoting commit grows that entry. Build finds whether any surface still invites that, and lands the authoring rule or records that none is owed.
+
+**Cost while deferred:** a build reads a stale bound as its target. Filed 2026-09-07; returned from the icebox 2026-09-25 by consult, having been iceboxed over a live trigger on the machinery-class ground.
 
 ## Deferred
 
@@ -398,9 +428,21 @@ the secondary customer pages carry validity slips and undefined internal vocabul
 
 the SPEC tier is unreadable as a specification by size, and a derived profile plus a sampled classification say what the size is made of. The twelve kit SPECs and the doctrine total about 564k words; 575 paragraphs exceed 200 words and 113 exceed 400; a quarter of all sentences exceed 45 words; about 1,150 sentences are provenance-shaped (refused, measured, attested, honest limit). gate-sdk/SPEC.md alone is 217k words with a 4,465-word paragraph. Sampled classification of the 44 longest paragraphs across six SPECs found CONTRACT the plurality class everywhere (51–75%), so this is not filler: the cost is (1) run-on structure — bullet runs with no blank line read as one paragraph, and lifecycle-kit/SPEC.md §templates/lead.md opens with one ~900-word colon-chained sentence bundling nine sub-contracts; (2) archaeology pockets — gate-sdk §The port-candidate criteria and §The first cohort (55–78% non-contract, dated instrument runs), installer §The consumer smoke's round-by-round debugging log (92%), delegation-kit §Testing (four narrative paragraphs); (3) restatement pockets — canon-kit §Layout and configuration re-derives the provenance-seam rule eleven times, guard-kit §Layout and configuration at 22% restatement. The profile script and the sampled tables are in this entry's filing commit; [port-archaeology-restatement-residue](#port-archaeology-restatement-residue) (icebox) is one instance of class (2).
 
-**Deliverable:** a per-SPEC pass in three moves, each gated: re-punctuate run-on sentences and separate bullet runs (a sentence-length ceiling for governed prose, or a stated reason none); move dated archaeology and refusal narrative to the commits that own it, leaving the undated rule and its grounds (the provenance seam already rules this; the gate is the missing half); collapse per-bullet restatements to one lead-in. Order by the profile: gate-sdk's port sections, then installer's smoke, delegation's testing, canon's and guard's layout sections. Not a wholesale cut: a contract sentence stays.
+**Deliverable:** the gates for three moves, and the moves applied to the first five sections: re-punctuate run-on sentences and separate bullet runs (a sentence-length ceiling for governed prose, or a stated reason none); move dated archaeology and refusal narrative to the commits that own it, leaving the undated rule and its grounds (the provenance seam already rules this; the gate is the missing half); collapse per-bullet restatements to one lead-in. The sections: gate-sdk §The port-candidate criteria and §The first cohort, installer §The consumer smoke, delegation-kit §Testing, canon-kit's and guard-kit's §Layout and configuration. Not a wholesale cut: a contract sentence stays. The rest of the tier is [spec-brevity-residue](#spec-brevity-residue).
+
+**Taken as a feature, split — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the gates add names, so /spec authors and pairs it; the five sections above land this iteration and the per-SPEC remainder was split out. It absorbs [port-archaeology-restatement-residue](#port-archaeology-restatement-residue) (icebox), a class-(2) instance inside gate-sdk's port sections, which /spec retires at pairing. It reshapes [agent-file-paragraph-sections-ungoverned](#agent-file-paragraph-sections-ungoverned): one bound serves both corpora, so this gate's design goes first.
 
 **Cost while deferred:** paid by every session that opens a SPEC section and every adopter who reads one on the site; the sampled sections cost a reader three to five times the words their rules need. Filed 2026-09-25 by consult as a direct entry, from the operator-directed brevity audit of project assets.
+
+### spec-brevity-residue
+
+[cost: session/high] [surface: gate-sdk]
+
+the per-SPEC remainder of [spec-tier-brevity-pass](#spec-tier-brevity-pass)'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry lands. In the filing profile's order, by size: gate-sdk (217k words, its port sections excepted), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
+
+**Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice lands; one SPEC, or a batch of the small ones, per iteration. Not a wholesale cut: a contract sentence stays.
+
+**Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
 ### ci-one-line-action
 
@@ -439,6 +481,8 @@ the walk's prune set matches path components anywhere in an absolute path, not o
 an isolated child's capture-tier writes resolve inside its own worktree and die with it. Reproduced 2026-09-25 by an isolated audit dispatch: the guard wrote its `prompt-friction.log` under the worktree's `.workflow/`, where the reap deletes it, so close's triage never reads a worktree session's friction or liveness capture.
 
 **Deliverable:** capture-tier writers resolve the main checkout's workflow directory when the writer runs in a linked worktree (`git rev-parse --git-common-dir` is the seam), with a fixture, and the rule at delegation-kit/SPEC.md §The delegation model beside the isolation costs.
+
+**Taken as a feature — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the rule binds every capture writer, a contract other components must honor, so /spec authors it. Scope read the seam as present: `native/src/guard/host.rs` already resolves the main checkout through `--git-common-dir` for confinement, while the friction log's path resolves under `GATE_SDK_WORKFLOW_DIR` from the working directory.
 
 **Cost while deferred:** every isolated dispatch's capture is lost, and the KPIs that read it undercount exactly the sessions the protocol says to isolate. Filed 2026-08-25; returned from the icebox 2026-09-25 by consult on a live reproduction.
 
@@ -510,17 +554,9 @@ the CI workflow files' comments are ungated by corpus: `comment_surface` in `nat
 
 **Deliverable:** a per-paragraph bound in the same gate, or the stated reason the ratchet suffices, with a fixture either way.
 
+**Taken as a feature — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** a bound in the gate's grammar is a new name, so /spec authors it beside [spec-tier-brevity-pass](#spec-tier-brevity-pass), whose paragraph and sentence bound it shares.
+
 **Cost while deferred:** paid by every session, since the file is always loaded. Filed 2026-09-13; returned from the icebox 2026-09-25 by consult as a corpus exclusion of the paradigm's shape.
-
-### craft-rule-step-has-no-reader
-
-[cost: session/low] [surface: context-kit] [recurrence: 2026-09-25]
-
-`context-kit/templates/session-context.sh` renders the stage-rules block under `2>/dev/null … || true`, so a broken `CONTEXT_KIT_STAGE_RULES` knob drops the block silently and reds nothing.
-
-**Deliverable:** the hook reports a knob that names no readable file, and a fixture pins the report.
-
-**Cost while deferred:** a session opens without its craft rules and no surface says so. Filed 2026-09-03; returned from the icebox 2026-09-25 by consult, the template re-read.
 
 ### close-triage-log-reclaim-loss-window
 
@@ -529,6 +565,8 @@ the CI workflow files' comments are ungated by corpus: `comment_surface` in `nat
 the close-stage triage templates read a capture log, triage it, then truncate it with `: >`, so a line appended between the read and the truncate is lost unread (`guard-kit/templates/close-triage.md`, `drift-kit/templates/close-knowledge.md`).
 
 **Deliverable:** truncate to the offset read rather than to zero, or rotate the file before reading; the templates and the reclaim rule at guard-kit/SPEC.md agree.
+
+**Taken as a feature — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** an offset-truncating reclaim or a rotated file is a new name, so /spec authors it; it joins because the brevity pass edits guard-kit/SPEC.md.
 
 **Cost while deferred:** one close per iteration risks dropping a concurrent session's capture. Filed 2026-08-18; returned from the icebox 2026-09-25 by consult, both templates re-read.
 
@@ -562,16 +600,6 @@ a post-stamp commit by a superseded stage session is outside every gate: the ind
 
 **Cost while deferred:** a stale session can commit into a stage it no longer holds. Filed 2026-08-31; returned from the icebox 2026-09-25 by consult as a machinery-class exception voided by the rule.
 
-### dod-size-figure-stales-in-iteration
-
-[cost: iteration/low] [surface: canon-kit] [recurrence: 2026-09-25]
-
-an amendment's definition-of-done carries a size figure spec wrote at promotion, and nothing re-reads it as the iteration moves; the figure ages inside its own iteration.
-
-**Deliverable:** the figure derived at read (the amendment cites the oracle, not the number), or the size line dropped from the DoD grammar.
-
-**Cost while deferred:** a build reads a stale bound as its target. Filed 2026-09-07; returned from the icebox 2026-09-25 by consult, having been iceboxed over a live trigger on the machinery-class ground.
-
 ### one-motion-commit-race-remains-open
 
 [cost: session/low] [surface: CLAUDE.md] [recurrence: 2026-09-25]
@@ -581,16 +609,6 @@ CLAUDE.md offers "stage and commit in one motion" as the shared-index remedy, an
 **Deliverable:** the always-loaded line names the only-paths form, the guard steers `add`-then-`commit` to it, and the delegation protocol's shared-index bullet agrees.
 
 **Cost while deferred:** every session reads a remedy that does not close the race it is offered for. Filed 2026-08-27; returned from the icebox 2026-09-25 by consult, the line re-read.
-
-### wait-mandate-template-spelling-unreachable
-
-[cost: session/low] [surface: delegation-kit] [recurrence: 2026-09-25]
-
-the in-turn wait the delegation protocol mandates, `while kill -0 "$pid"`, is refused by guard-kit's own expansion rule, while the literal-PID spelling is auto-allowed; the template and the agent definitions carry the refused form.
-
-**Deliverable:** the template and the agent definitions spell the wait in the form the guard grants, and the two SPECs cite one spelling.
-
-**Cost while deferred:** every adopter following the protocol literally meets a refusal on its first wait. Filed 2026-08-29; returned from the icebox 2026-09-25 by consult, the refusal re-probed.
 
 ### nested-battery-env-inheritance-invisible
 
