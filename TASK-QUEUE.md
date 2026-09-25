@@ -8,6 +8,62 @@
 
 ## New Features
 
+### spec-tier-brevity-pass
+
+[spec: SPEC-prose-bounds.md]
+
+the SPEC tier is unreadable as a specification by size, and a derived profile plus a sampled classification say what the size is made of. The twelve kit SPECs and the doctrine total about 564k words; 575 paragraphs exceed 200 words and 113 exceed 400; a quarter of all sentences exceed 45 words; about 1,150 sentences are provenance-shaped (refused, measured, attested, honest limit). gate-sdk/SPEC.md alone is 217k words with a 4,465-word paragraph. Sampled classification of the 44 longest paragraphs across six SPECs found CONTRACT the plurality class everywhere (51–75%), so this is not filler: the cost is (1) run-on structure — bullet runs with no blank line read as one paragraph, and lifecycle-kit/SPEC.md §templates/lead.md opens with one ~900-word colon-chained sentence bundling nine sub-contracts; (2) archaeology pockets — gate-sdk §The port-candidate criteria and §The first cohort (55–78% non-contract, dated instrument runs), installer §The consumer smoke's round-by-round debugging log (92%), delegation-kit §Testing (four narrative paragraphs); (3) restatement pockets — canon-kit §Layout and configuration re-derives the provenance-seam rule eleven times, guard-kit §Layout and configuration at 22% restatement. The profile script and the sampled tables are in this entry's filing commit; the icebox entry `port-archaeology-restatement-residue` was one instance of class (2).
+
+**Deliverable:** the gates for three moves, and the moves applied to the first five sections: re-punctuate run-on sentences and separate bullet runs (a sentence-length ceiling for governed prose, or a stated reason none); move dated archaeology and refusal narrative to the commits that own it, leaving the undated rule and its grounds (the provenance seam already rules this; the gate is the missing half); collapse per-bullet restatements to one lead-in. The sections: gate-sdk §The port-candidate criteria and §The first cohort, installer §The consumer smoke, delegation-kit §Testing, canon-kit's and guard-kit's §Layout and configuration. Not a wholesale cut: a contract sentence stays. The rest of the tier is [spec-brevity-residue](#spec-brevity-residue).
+
+**Taken as a feature, split — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the gates add names, so /spec authors and pairs it; the five sections above land this iteration and the per-SPEC remainder was split out. It absorbs the icebox entry `port-archaeology-restatement-residue`, a class-(2) instance inside gate-sdk's port sections, retired to Done at pairing. It reshapes [agent-file-paragraph-sections-ungoverned](#agent-file-paragraph-sections-ungoverned): one bound serves both corpora, so this gate's design goes first.
+
+**Spec (2026-09-25):** SPEC-prose-bounds.md, which also pairs agent-file-paragraph-sections-ungoverned. A new canon-kit gate, `check-prose-bounds`, bounds sentences and units and flags a phrase repeated across a section's units, under a per-file ceiling that holds the residue. A `dated` arm on `check-provenance-seam` is the archaeology half: a kit SPEC carries no date, and gate-sdk §The provenance seam's dated-measurement allowance is rewritten to match. The amendment changes canon-kit's, gate-sdk's and context-kit's contracts, so the audit stage is owed.
+
+**Cost while deferred:** paid by every session that opens a SPEC section and every adopter who reads one on the site; the sampled sections cost a reader three to five times the words their rules need. Filed 2026-09-25 by consult as a direct entry, from the operator-directed brevity audit of project assets.
+
+### agent-file-paragraph-sections-ungoverned
+
+[spec: SPEC-prose-bounds.md] [recurrence: 2026-09-25]
+
+`check-brevity` budgets the agent file's bullet rules and skips its paragraph sections (context-kit/SPEC.md §check-brevity states the exclusion), so CLAUDE.md's paragraphs grow unbudgeted while the ratchet holds only the whole-file ceiling.
+
+**Deliverable:** a per-paragraph bound in the same gate, or the stated reason the ratchet suffices, with a fixture either way.
+
+**Taken as a feature — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** a bound in the gate's grammar is a new name, so /spec authors it beside [spec-tier-brevity-pass](#spec-tier-brevity-pass), whose paragraph and sentence bound it shares.
+
+**Spec (2026-09-25):** read through the direction's one bound. The paragraph and sentence bound lives once, in canon-kit's `check-prose-bounds`, and this repo lists CLAUDE.md in that gate's corpus; a second copy in `check-brevity` would state one bound twice. context-kit §The brevity gate points there, and the fixture is an agent-file paragraph in that gate's `bad/`. CLAUDE.md measures no paragraph over 200 words and two sentences over 45.
+
+**Cost while deferred:** paid by every session, since the file is always loaded. Filed 2026-09-13; returned from the icebox 2026-09-25 by consult as a corpus exclusion of the paradigm's shape.
+
+### close-triage-log-reclaim-loss-window
+
+[spec: SPEC-capture-drain.md] [recurrence: 2026-09-25]
+
+the close-stage triage templates read a capture log, triage it, then truncate it with `: >`, so a line appended between the read and the truncate is lost unread (`guard-kit/templates/close-triage.md`, `drift-kit/templates/close-knowledge.md`).
+
+**Deliverable:** truncate to the offset read rather than to zero, or rotate the file before reading; the templates and the reclaim rule at guard-kit/SPEC.md agree.
+
+**Taken as a feature — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** an offset-truncating reclaim or a rotated file is a new name, so /spec authors it; it joins because the brevity pass edits guard-kit/SPEC.md.
+
+**Spec (2026-09-25):** rotation, through a new `--emit capture-drain` arm. Offset truncation rewrites the file in place, so a line appended during the rewrite is lost the same way. The rule moves to gate-sdk §The workflow directory for every log a close reads before draining. That also reaches the wakeup log and this repo's essay-harvest sink, which share the shape. lifecycle-kit's close-surface derivation folds a drain file into its log's row.
+
+**Cost while deferred:** one close per iteration risks dropping a concurrent session's capture. Filed 2026-08-18; returned from the icebox 2026-09-25 by consult, both templates re-read.
+
+### worktree-isolated-dispatch-cannot-reach-the-main-checkout
+
+[spec: SPEC-capture-home.md] [recurrence: 2026-09-25]
+
+an isolated child's capture-tier writes resolve inside its own worktree and die with it. Reproduced 2026-09-25 by an isolated audit dispatch: the guard wrote its `prompt-friction.log` under the worktree's `.workflow/`, where the reap deletes it, so close's triage never reads a worktree session's friction or liveness capture.
+
+**Deliverable:** capture-tier writers resolve the main checkout's workflow directory when the writer runs in a linked worktree (`git rev-parse --git-common-dir` is the seam), with a fixture, and the rule at delegation-kit/SPEC.md §The delegation model beside the isolation costs.
+
+**Taken as a feature — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the rule binds every capture writer, a contract other components must honor, so /spec authors it. Scope read the seam as present: `native/src/guard/host.rs` already resolves the main checkout through `--git-common-dir` for confinement, while the friction log's path resolves under `GATE_SDK_WORKFLOW_DIR` from the working directory.
+
+**Spec (2026-09-25):** the premise re-ran live at spec, where an isolated child's worktree held both its friction and liveness logs. The rule sits in gate-sdk §The workflow directory, and delegation-kit §The delegation model states the write half beside its untracked-read ruling. The numbered isolation costs live in the agent-execution template, which needs no change. Eleven writers adopt one `walk` helper, which also replaces `crate_arms.rs`'s private copy of the predicate.
+
+**Cost while deferred:** every isolated dispatch's capture is lost, and the KPIs that read it undercount exactly the sessions the protocol says to isolate. Filed 2026-08-25; returned from the icebox 2026-09-25 by consult on a live reproduction.
+
 ## Technical Debt
 
 ### wait-mandate-template-spelling-unreachable
@@ -422,18 +478,6 @@ the secondary customer pages carry validity slips and undefined internal vocabul
 
 **Cost while deferred:** low per page and slow, paid by the reader who has already passed the front door. Filed 2026-09-25 by consult as a direct entry, from the same audit; split from the front-door entry because its pages do not decide the first install.
 
-### spec-tier-brevity-pass
-
-[cost: session/high] [surface: gate-sdk]
-
-the SPEC tier is unreadable as a specification by size, and a derived profile plus a sampled classification say what the size is made of. The twelve kit SPECs and the doctrine total about 564k words; 575 paragraphs exceed 200 words and 113 exceed 400; a quarter of all sentences exceed 45 words; about 1,150 sentences are provenance-shaped (refused, measured, attested, honest limit). gate-sdk/SPEC.md alone is 217k words with a 4,465-word paragraph. Sampled classification of the 44 longest paragraphs across six SPECs found CONTRACT the plurality class everywhere (51–75%), so this is not filler: the cost is (1) run-on structure — bullet runs with no blank line read as one paragraph, and lifecycle-kit/SPEC.md §templates/lead.md opens with one ~900-word colon-chained sentence bundling nine sub-contracts; (2) archaeology pockets — gate-sdk §The port-candidate criteria and §The first cohort (55–78% non-contract, dated instrument runs), installer §The consumer smoke's round-by-round debugging log (92%), delegation-kit §Testing (four narrative paragraphs); (3) restatement pockets — canon-kit §Layout and configuration re-derives the provenance-seam rule eleven times, guard-kit §Layout and configuration at 22% restatement. The profile script and the sampled tables are in this entry's filing commit; [port-archaeology-restatement-residue](#port-archaeology-restatement-residue) (icebox) is one instance of class (2).
-
-**Deliverable:** the gates for three moves, and the moves applied to the first five sections: re-punctuate run-on sentences and separate bullet runs (a sentence-length ceiling for governed prose, or a stated reason none); move dated archaeology and refusal narrative to the commits that own it, leaving the undated rule and its grounds (the provenance seam already rules this; the gate is the missing half); collapse per-bullet restatements to one lead-in. The sections: gate-sdk §The port-candidate criteria and §The first cohort, installer §The consumer smoke, delegation-kit §Testing, canon-kit's and guard-kit's §Layout and configuration. Not a wholesale cut: a contract sentence stays. The rest of the tier is [spec-brevity-residue](#spec-brevity-residue).
-
-**Taken as a feature, split — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the gates add names, so /spec authors and pairs it; the five sections above land this iteration and the per-SPEC remainder was split out. It absorbs [port-archaeology-restatement-residue](#port-archaeology-restatement-residue) (icebox), a class-(2) instance inside gate-sdk's port sections, which /spec retires at pairing. It reshapes [agent-file-paragraph-sections-ungoverned](#agent-file-paragraph-sections-ungoverned): one bound serves both corpora, so this gate's design goes first.
-
-**Cost while deferred:** paid by every session that opens a SPEC section and every adopter who reads one on the site; the sampled sections cost a reader three to five times the words their rules need. Filed 2026-09-25 by consult as a direct entry, from the operator-directed brevity audit of project assets.
-
 ### spec-brevity-residue
 
 [cost: session/high] [surface: gate-sdk]
@@ -473,18 +517,6 @@ the walk's prune set matches path components anywhere in an absolute path, not o
 **Deliverable:** prune relative to the walk root, a fixture whose root path carries a default leaf, and the boundary stated at context-kit/SPEC.md §Layout and configuration.
 
 **Cost while deferred:** an adopter under `~/build/` or `~/dist/` sees the index arms return nothing and no red says why. Filed 2026-09-02; returned from the icebox 2026-09-25 by consult, the walk re-read and the match still absolute.
-
-### worktree-isolated-dispatch-cannot-reach-the-main-checkout
-
-[cost: iteration/high] [surface: delegation-kit] [recurrence: 2026-09-25]
-
-an isolated child's capture-tier writes resolve inside its own worktree and die with it. Reproduced 2026-09-25 by an isolated audit dispatch: the guard wrote its `prompt-friction.log` under the worktree's `.workflow/`, where the reap deletes it, so close's triage never reads a worktree session's friction or liveness capture.
-
-**Deliverable:** capture-tier writers resolve the main checkout's workflow directory when the writer runs in a linked worktree (`git rev-parse --git-common-dir` is the seam), with a fixture, and the rule at delegation-kit/SPEC.md §The delegation model beside the isolation costs.
-
-**Taken as a feature — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** the rule binds every capture writer, a contract other components must honor, so /spec authors it. Scope read the seam as present: `native/src/guard/host.rs` already resolves the main checkout through `--git-common-dir` for confinement, while the friction log's path resolves under `GATE_SDK_WORKFLOW_DIR` from the working directory.
-
-**Cost while deferred:** every isolated dispatch's capture is lost, and the KPIs that read it undercount exactly the sessions the protocol says to isolate. Filed 2026-08-25; returned from the icebox 2026-09-25 by consult on a live reproduction.
 
 ### enforcement-first-load-trigger
 
@@ -545,30 +577,6 @@ the CI workflow files' comments are ungated by corpus: `comment_surface` in `nat
 **Deliverable:** the surface widened to actions-shaped YAML (found by content through `actions_shaped` in `actions_run.rs`, or by knob, never by a hard-coded path), the three workflows swept to directive comments, and the first reading of `check-spec-pointer` sized, since it shares the surface primitive.
 
 **Cost while deferred:** every workflow edit adds ungoverned prose to the public demonstration tree. Filed 2026-09-09 on an operator direction to widen and sweep; iceboxed as machinery-class; returned 2026-09-25 by consult as the paradigm of the rule that nothing is exempt as unread by adopters.
-
-### agent-file-paragraph-sections-ungoverned
-
-[cost: session/low] [surface: context-kit] [recurrence: 2026-09-25]
-
-`check-brevity` budgets the agent file's bullet rules and skips its paragraph sections (context-kit/SPEC.md §check-brevity states the exclusion), so CLAUDE.md's paragraphs grow unbudgeted while the ratchet holds only the whole-file ceiling.
-
-**Deliverable:** a per-paragraph bound in the same gate, or the stated reason the ratchet suffices, with a fixture either way.
-
-**Taken as a feature — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** a bound in the gate's grammar is a new name, so /spec authors it beside [spec-tier-brevity-pass](#spec-tier-brevity-pass), whose paragraph and sentence bound it shares.
-
-**Cost while deferred:** paid by every session, since the file is always loaded. Filed 2026-09-13; returned from the icebox 2026-09-25 by consult as a corpus exclusion of the paradigm's shape.
-
-### close-triage-log-reclaim-loss-window
-
-[cost: iteration/low] [surface: guard-kit] [recurrence: 2026-09-25]
-
-the close-stage triage templates read a capture log, triage it, then truncate it with `: >`, so a line appended between the read and the truncate is lost unread (`guard-kit/templates/close-triage.md`, `drift-kit/templates/close-knowledge.md`).
-
-**Deliverable:** truncate to the offset read rather than to zero, or rotate the file before reading; the templates and the reclaim rule at guard-kit/SPEC.md agree.
-
-**Taken as a feature — operator direction 2026-09-25, lead-relayed (not a /consult ruling):** an offset-truncating reclaim or a rotated file is a new name, so /spec authors it; it joins because the brevity pass edits guard-kit/SPEC.md.
-
-**Cost while deferred:** one close per iteration risks dropping a concurrent session's capture. Filed 2026-08-18; returned from the icebox 2026-09-25 by consult, both templates re-read.
 
 ### gate-tests-suite-identity-in-evidence
 
@@ -1059,10 +1067,6 @@ A library-mediated spawn reads clean.
 ### walk-entry-model-unstated
 
 Walk drops symlinks unstated; tree has none.
-
-### port-archaeology-restatement-residue
-
-Prose narrates deleted shell forms.
 
 ### prune-set-convergence-question
 
@@ -1573,5 +1577,6 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 - wait-form-unallowlistable-by-construction
 - append-grant-decline-cause-unlogged
 - crate-toolchain-grant-uncommitted
+- port-archaeology-restatement-residue
 
 ## Lessons Learned
