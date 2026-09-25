@@ -49,6 +49,7 @@
       "Bash(git ls-files *)",
       "Bash(git rev-list --count *)",
       "Bash(git merge-base *)",
+      "Bash(git config remote.origin.url)",
       "Bash(cargo test *)",
       "Bash(cargo clippy *)",
       "Bash(cargo build *)",
