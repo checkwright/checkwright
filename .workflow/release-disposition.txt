@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+powershell-scratch-runner release deferred:v0.26.0 — the declarations since v0.25.0 still derive a minor (this iteration adds the GUARD_KIT_SCRATCH_POWERSHELL knob, widens rule script_interpreter to PowerShell and runs the scratch runner's echoed bytes), no decommission; no trigger fired: elapsed time dormant under preview, the echo-to-exec window closed is a same-user compensating-control gap and not a vulnerability or compromised artifact, no operator direction, no audience arrived

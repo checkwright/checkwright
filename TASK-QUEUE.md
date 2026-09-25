@@ -34,7 +34,7 @@ shell utilities an agent runs for read-only work can also write: `sed -i`, `find
 
 ### foreign-toolchain-docker-legs
 
-[cost: event/low] [surface: gate-sdk]
+[cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
 
 this host lacks `pwsh` and `dash`, so the front-end parity check's PowerShell half and every dash-only path first run on CI. At gate-sdk-blind-spots, build changed `gate-sdk/bin/run-gates.ps1` and added a `.ps1` ASCII arm; the Windows legs at close's watched push were their first real run. They passed, but a red would have cost a second push. Docker is available on the development host; a cold daemon start took more than 120s.
 
@@ -43,6 +43,8 @@ this host lacks `pwsh` and `dash`, so the front-end parity check's PowerShell ha
 **Enhancement admission filter:** contributor tooling reaching none of the three arms; held Deferred without an operator exception.
 
 **Cost while deferred:** a unit touching a PowerShell or dash path risks a second watched push. Filed 2026-09-23 to the gap inbox on an operator suggestion, lead-relayed, after gate-sdk-blind-spots' close; promoted 2026-09-23 at the next scope. Owner lookup: `docker`, `dash`, `pwsh` in this file — `pwsh` hits only `instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set`, whose subject is a CI leg's binding transition, not a local run.
+
+**Recurred 2026-09-25, and the recurrence left a working recipe in scratch that the boundary wipes.** `powershell-scratch-runner`'s build needed a local pwsh for the scratch runner's seam file and improvised one: the host's pwsh binary will not run inside the `mcr.microsoft.com/powershell` image (host glibc newer than the image's), so a `pwsh` shim on `PATH` ran the image's own pwsh — `docker run --rm -i --network none -v /tmp:/tmp -v "$PWD:$PWD" -w "$PWD" <image> pwsh "$@"`, the tree and `/tmp` mounted at their own paths so a path the runner hands the host resolves inside the container. That shim is this entry's deliverable in miniature; the dash half and the Docker-absent skip remain.
 
 ### retired-citation-referent-rule
 
@@ -1343,8 +1345,5 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 `check-docs-cmd` assertion (C) misses a retired path cited from the queue, which is outside its manifest corpus and whose `<path>:<line>` token fails the path shape.
 
 ## Done
-
-- trailer-ban-help-overruled
-- ps-scratch-script-unsteered
 
 ## Lessons Learned
