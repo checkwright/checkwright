@@ -11,3 +11,4 @@ non-gate-arm-contract build a6e9b111 2026-09-26 53f61136
 non-gate-arm-contract build ae53b069 2026-09-26 6667353a
 non-gate-arm-contract build a13cf93f 2026-09-26 74f7a7e2
 non-gate-arm-contract validate ada9afa9 2026-09-26 8035b09f
+non-gate-arm-contract close ab45317d 2026-09-26 954f5212
