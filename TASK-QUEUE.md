@@ -18,7 +18,7 @@ the CI story is a copy-out template: `gate-sdk/templates/gates-workflow.yml` exi
 
 **Promoted 2026-09-26 at spec:** the filing's "references by tag" is a full-SHA ref with the tag as a trailing comment, the form check-action-pinning holds. The SARIF "arm" is a `--run` reporting knob, because the Action pays one download per binary execution. Contract owners are corrected in the amendment. It spans gate-sdk and installer.
 
-**Push need (2026-09-26, operator direction lead-relayed, ruling set B at front-door-release's scope with the overrun stated):** one mid-iteration push, since only a remote run executes the Action; with the closing push and the v0.26.0 tag push the set needs 3 against a budget of 2.
+**Push need (2026-09-26, operator direction lead-relayed, ruling set B at front-door-release's scope with the overrun stated):** one mid-iteration push, since only a remote run executes the Action. With the closing push, the v0.26.0 tag push, and the push of the post-tag drain commit that moves the hosted pin, the set needs 4 against a budget of 2. The fourth was granted by the operator's direction at spec (2026-09-26, lead-relayed), so `demo` works on the live front door this iteration.
 
 ### front-door-verb-unreleased
 
@@ -30,7 +30,7 @@ the front door (README.md and docs/index.md under Try it first, docs/install.md,
 
 **Promoted 2026-09-26 at spec:** the form is a gate enforcing a release trigger: a `none` or `deferred:` disposition reds while an unreleased verb is advertised. Refused alternatives and the probes are in the amendment.
 
-**Push need (2026-09-26, operator direction lead-relayed):** the v0.26.0 tag push at close, which this iteration cuts on the operator's direction so the advertised `demo` verb reaches the pin; counted in [ci-one-line-action](#ci-one-line-action)'s overrun line.
+**Push need (2026-09-26, operator direction lead-relayed):** the v0.26.0 tag push at close, which this iteration cuts on the operator's direction so the advertised `demo` verb reaches the pin. It also needs the push of the post-tag drain commit that moves the hosted pin, granted by the operator's direction at spec. Both are counted in [ci-one-line-action](#ci-one-line-action)'s overrun line.
 
 ## Technical Debt
 

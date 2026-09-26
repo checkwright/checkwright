@@ -99,13 +99,24 @@ In the crate, the recipe writes the file from a template in `native/src/installe
 
 ### (6) The workflow gates' install ground {design-bearing}
 
-**Not yet applied — open question to the lead** on the dispositions of `check-action-pinning` and `check-action-permissions`. The text below is the recommended option, which keeps them.
+**Not yet applied.** **Decided 2026-09-26, the intent oracle's answer relayed by the lead (a decision, not operator direction): all six `check-action-*` gates stay `on-surface`.** Moving `check-action-pinning` and `check-action-permissions` to `zero-config` is outside this unit's envelope, because it adds gates to every adopter's battery and owes a tightened-gate release note. It is filed as a costed gap. The decision's conditions are the three edits below: the definition moves, every stale ground moves, and the seed is green by construction (delta 5's smoke arm).
 
-In gate-sdk/SPEC.md §check-action-run-path, "`install: on-surface`, because the subject is the adopter's own workflows, which `init` never writes (§The install disposition), the disposition of every `check-action-*` sibling." becomes:
+In gate-sdk/SPEC.md §The install disposition, the first two bullets become:
 
-> `install: on-surface`, the disposition of every `check-action-*` sibling (§The install disposition): the subject is the `run:` bodies of the adopter's own workflows, and the workflow `init` seeds carries none (installer/SPEC.md §What init seeds).
+> - **`zero-config`** — every surface the gate reads is one `init` writes and the adopter does not author, so it registers in a fresh consumer.
+> - **`on-surface`** — the gate's subject is one the adopter authors (a glossary, a docs host, a stage attestation, their own workflows), so it arms when that surface exists rather than at install. `init` may seed one member of such a subject, as it seeds a CI workflow. That member is held at the publisher, where the installer's smoke runs the gate over it green, not in the adopter's battery (installer/SPEC.md §The consumer smoke).
 
-In §The install disposition, the `on-surface` bullet's parenthesis "(a glossary, a docs host, a stage attestation, their own workflows)" becomes "(a glossary, a docs host, a stage attestation, their own workflows beside the one `init` seeds, which the installer's smoke holds)".
+The refined rule holds because a disposition decides what a fresh battery asserts over the adopter's tree. A gate over a mostly adopter-authored subject, armed because `init` seeded one member, would also assert over every file the adopter already keeps there. Its first red would then be a new rule reaching content `init` never wrote, which is the arming the `on-surface` class exists to defer. The seeded member is the publisher's output, and the publisher's smoke is where its correctness is owed.
+
+In §check-action-run-path, "`install: on-surface`, because the subject is the adopter's own workflows, which `init` never writes (§The install disposition), the disposition of every `check-action-*` sibling." becomes:
+
+> `install: on-surface`, the disposition of every `check-action-*` sibling (§The install disposition): the subject is the adopter's own workflows. The workflow `init` seeds carries no `run:` body, so this gate has nothing to read there.
+
+§check-action-pinning and §check-action-permissions each state no install ground today and borrow §check-action-run-path's. Each gains one closing sentence, after its tier sentence:
+
+> `install: on-surface` (§The install disposition). The workflow `init` seeds is a member of this gate's subject, so the installer's smoke runs this gate over it and expects green (installer/SPEC.md §The consumer smoke).
+
+§check-action-run-shell and §check-action-gh-repo read `run:` bodies, which the seed does not carry, and state no install ground, so they take no edit. §check-action-job-ref's `# install: on-surface` is armed by its pattern knob and states no workflow ground, so it takes no edit either. All six `.gate` descriptors keep `# install: on-surface`.
 
 ### (7) The template points at the seed {mechanical}
 
@@ -163,9 +174,9 @@ installer/README.md §Quick start's `init` paragraph, "vendors the selected prof
 
 ## Existing sections updated
 
-Roster probes: `git grep -n "never writes (§The install disposition)"` and `git grep -n "gates-workflow"` over the tracked tree, and `grep -n "^# install:" gate-sdk/checks/check-action-*.gate`.
+Roster probes: `git grep -n -i "own workflows\|never writes"` over the tracked `*.md` and `*.gate` files, `--emit md-section` over each `check-action-*` section grepped for `install`, and `git grep -n "gates-workflow"` over the tracked tree, and `grep -n "^# install:" gate-sdk/checks/check-action-*.gate`.
 
-- `gate-sdk/SPEC.md` — §run-gates and §Layout and configuration (delta 1); §Consumer smoke (delta 2); §check-action-run-path and §The install disposition (delta 6); §templates/gates-workflow.yml and §Enforcement tiers (delta 7).
+- `gate-sdk/SPEC.md` — §run-gates and §Layout and configuration (delta 1); §Consumer smoke (delta 2); §The install disposition, §check-action-run-path, §check-action-pinning and §check-action-permissions (delta 6); §templates/gates-workflow.yml and §Enforcement tiers (delta 7).
 - `native/src/knobs/gate_sdk.rs`, `native/src/runner.rs`, a new `native/src/sarif.rs` (delta 1).
 - The `--run-consumer-smoke` arm's source (delta 2).
 - `installer/action.yml`, `scripts/core-files.list`, installer/SPEC.md §Layout and the new §The CI action (delta 3).
