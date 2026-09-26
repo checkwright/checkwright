@@ -20,16 +20,6 @@ the runner and library sections of gate-sdk/SPEC.md under §Per-component contra
 
 **Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-26 at scope from spec-brevity-residue, filed 2026-09-25; the word census is this scope's survey record.
 
-### derived-count-literal-in-queue-unscanned
-
-[recurrence: 2026-09-25]
-
-the queue file is absent from `CANON_KIT_MANIFEST_FILES` (`scripts/canon-config.knobs`), so a derived count spelt as a literal in an entry reaches no scan.
-
-**Deliverable:** the queue added to the manifest corpus, or the reason it is excluded stated at the knob.
-
-**Cost while deferred:** queue prose carries counts that stale unseen. Filed 2026-09-07; returned from the icebox 2026-09-25 by consult as a corpus exclusion; promoted 2026-09-26 at scope on an operator direction, lead-relayed (not a /consult ruling). Re-verified at scope: no `CANON_KIT_MANIFEST_FILES` row names `TASK-QUEUE.md`.
-
 ## Deferred
 
 ### absence-statement-gate-arms
@@ -1375,5 +1365,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - front-door-demo-unreachable
 - demo-catches-a-done-claim
 - spec-narration-unratcheted
+- derived-count-literal-in-queue-unscanned
 
 ## Lessons Learned
