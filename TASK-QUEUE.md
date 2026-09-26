@@ -1374,9 +1374,4 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 ## Done
 
-- front-door-verb-unreleased
-- ci-one-line-action
-- registry-assertion-duplicated
-- gate-sdk-meta-gate-brevity
-
 ## Lessons Learned
