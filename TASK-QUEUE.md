@@ -694,6 +694,16 @@ a gate's printed finding or help line reaches an adopter's installed tree, yet a
 
 **Cost while deferred:** a doubled red on one fault, and two gates to keep in step. Filed 2026-09-26 to the gap inbox by the done-claim-demo validate; promoted 2026-09-26 at its close: →fix fails because choosing the owner is a design call against the in-process-wrap rationale gate-sdk/SPEC.md §The consumer remainder cohort carries. Re-verified at the drain: `scripts/gate-sdk-config.knobs` binds `GATE_SDK_REGISTRY_DOC = docs/kits.md`; `native/src/gates/docs_kit_parity.rs` defaults its registry to `docs/kits.md` and calls `kit_registration::run_captured`; both gates sit in `scripts/gates.list`. Owner lookup: `kit-registration`, `docs-kit-parity`, `registry` in this file — none; owner gate-sdk/SPEC.md §check-kit-registration.
 
+### front-door-verb-unreleased
+
+[cost: event/high] [surface: installer]
+
+the front door (README.md and docs/index.md under Try it first, docs/install.md, installer/README.md) advertises `sh -s -- demo`, the PowerShell script-block form and `npx checkwright demo` as runnable now, while `docs/install.sh` and `docs/install.ps1` pin 0.25.0 and that tag carries no `demo` verb, so every advertised demo command fails until a release carries it. installer/SPEC.md §The one-line install holds the pin to a published tag; nothing holds the verbs the front door advertises to the pinned release's verb set.
+
+**Deliverable:** a gate or a release-policy trigger holding every verb the front-door routes advertise to the pinned release's verb set, the form chosen by the authoring stage, with the release that carries `demo`.
+
+**Cost while deferred:** while the channel is preview, every release deferral leaves the live site's first command broken, and the preview cohort meets it first. Surfaced 2026-09-26 by the done-claim-demo close, which deferred the release carrying the verb as v0.26.0; promoted 2026-09-26 at scope from the carried gap inbox. Re-verified at scope: both hosted scripts pin 0.25.0, `git grep -w demo v0.25.0 -- installer/ native/src/installer` finds nothing, and npm's latest is 0.25.0. Owner lookup: `pinned release`, `front door`, `verb set` in this file — none live; owner installer/SPEC.md §The one-line install.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
