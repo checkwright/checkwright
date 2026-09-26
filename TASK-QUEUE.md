@@ -1390,10 +1390,4 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 ## Done
 
-- survey-witness-composed-from-unvalidated-corpus
-- isolated-tracked-capture-lost
-- stage-cursor-unread-by-index-check
-- gate-sdk-tooling-brevity
-- crate-tests-windows-failures
-
 ## Lessons Learned
