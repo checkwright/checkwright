@@ -20,18 +20,6 @@ the CI story is a copy-out template: `gate-sdk/templates/gates-workflow.yml` exi
 
 **Push need (2026-09-26, operator direction lead-relayed, ruling set B at front-door-release's scope with the overrun stated):** one mid-iteration push, since only a remote run executes the Action. With the closing push, the v0.26.0 tag push, and the push of the post-tag drain commit that moves the hosted pin, the set needs 4 against a budget of 2. The fourth was granted by the operator's direction at spec (2026-09-26, lead-relayed), so `demo` works on the live front door this iteration.
 
-### front-door-verb-unreleased
-
-[spec: SPEC-door-verbs.md]
-
-the front door (README.md and docs/index.md under Try it first, docs/install.md, installer/README.md) advertises `sh -s -- demo`, the PowerShell script-block form and `npx checkwright demo` as runnable now, while `docs/install.sh` and `docs/install.ps1` pin 0.25.0 and that tag carries no `demo` verb, so every advertised demo command fails until a release carries it. Nothing holds the verbs the front door advertises to the pinned release's verb set.
-
-**Deliverable:** the repo-local gate `check-front-door-verbs` holding route-advertised verbs to the pinned tag's `installer/README.md` verb table, and that table to the binary's `VERBS`, admitting a verb the pin lacks while the iteration carries no release disposition; the close binding naming the trigger. The release carrying `demo` is a close's release disposition, not this entry's completion, so no remote run observes it.
-
-**Promoted 2026-09-26 at spec:** the form is a gate enforcing a release trigger: a `none` or `deferred:` disposition reds while an unreleased verb is advertised. Refused alternatives and the probes are in the amendment.
-
-**Push need (2026-09-26, operator direction lead-relayed):** the v0.26.0 tag push at close, which this iteration cuts on the operator's direction so the advertised `demo` verb reaches the pin. It also needs the push of the post-tag drain commit that moves the hosted pin, granted by the operator's direction at spec. Both are counted in [ci-one-line-action](#ci-one-line-action)'s overrun line.
-
 ## Technical Debt
 
 ### gate-sdk-meta-gate-brevity
@@ -1395,5 +1383,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 The consumer's local-only companion files (private brief, ops runbook) have read triggers but no write-back trigger, so shipped-unit forward memory and an out-of-tree state verifier drift until a consult audits them; owed are close and release-sweep template slots for both, and a retired-slug arm over plain code on the local-only globs.
 
 ## Done
+
+- front-door-verb-unreleased
 
 ## Lessons Learned
