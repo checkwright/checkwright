@@ -6,9 +6,11 @@ nav_order: 4
 
 # Value
 
-Checkwright's promise is a trade: mechanized consistency enforcement in exchange for a bounded, measured context footprint. This page sets the benefit and the cost side by side — every governed surface a kit ships, against the tokens that kit spends of a consumer's context budget — so the exchange is legible before you vendor.
+Checkwright's promise is a trade: mechanized consistency enforcement in exchange for a bounded, measured context footprint. This page sets the two side by side, per kit, so the exchange is legible before you install.
 
-The benefit half is the count of governed surfaces each kit holds, split by how hard each promise is kept; the [Enforcement map](enforcement.md) names every surface behind those counts and defines the classes. The cost half is the per-kit token footprint; the [Footprint](footprint.md) page shows how it is measured and what it excludes. Neither figure is maintained by hand — both are joined live from the same emitters that own the detail pages, so this rollup cannot drift from what the kits enforce or what they cost.
+The benefit half is the count of governed surfaces each kit holds, split by how hard each promise is kept; the [Enforcement map](enforcement.md) names every surface behind those counts and defines the classes. The cost half is the per-kit token footprint; the [Footprint](footprint.md) page shows how it is measured and what it excludes. Both are joined live from the emitters behind those pages, so this rollup cannot drift from them.
+
+The rows follow the footprint's roster, so `installer`, the install tool, has a row but is not a kit. The `(consumer)` row counts what Checkwright's own repository runs from outside its kits.
 
 A third generated projection sits beside those two: the [coupling graph](check-graph.html) renders every gate against the surfaces its `# graph:` manifest couples — the same manifests the pre-commit hook is generated from — so you can see what fires when a given path changes.
 

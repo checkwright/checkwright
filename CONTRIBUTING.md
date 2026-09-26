@@ -1,6 +1,6 @@
 # Contributing to Checkwright
 
-Checkwright is a monorepo of gate kits that a coding agent and its supervisor run against their own delivery work. Its contribution surface is built for the failure mode of that era — a repo drowning in low-triage-value issues and PRs. The defense is mechanical: **the fixture is the unit of contribution.** A report a gate can verify costs near-zero to triage; everything else routes through the inlets below.
+Checkwright is a monorepo of gate kits that a coding agent and its supervisor run against their own delivery work. Its contribution surface is built for a failure mode agent-written contributions make common — a repo drowning in low-triage-value issues and PRs. The defense is mechanical: **the fixture is the unit of contribution.** A report a gate can verify costs near-zero to triage; everything else routes through the inlets below.
 
 ## Where to file what
 
@@ -22,7 +22,7 @@ Every gate ships a `good/`+`bad/` fixture pair (see [gate-sdk/SPEC.md](gate-sdk/
 
 Submit that case as a pull request. The CI backstop ([gate-sdk/SPEC.md](gate-sdk/SPEC.md) §templates/gates-workflow.yml) runs the full battery and every fixture runner over it, so the pair *is* the reproduction — no prose repro steps, no maintainer setup. File a gate-defect issue only when you cannot craft the fixture, and it must still name the gate, the exact gate output, and the expected-versus-actual verdict.
 
-A filed issue is swept at an iteration boundary and given exactly one disposition — promoted into the work queue or closed with cause. It is never left linked-but-unqueued: the queue is the only place work waits.
+Maintainer work runs in iterations, bounded units of work, and each opens with a triage sweep of open issues and PRs; the point between two iterations is the **iteration boundary** this page names. A filed issue is swept at the next boundary and given exactly one disposition — promoted into the work queue or closed with cause. It is never left linked-but-unqueued: the queue is the only place work waits.
 
 ## Pull requests
 

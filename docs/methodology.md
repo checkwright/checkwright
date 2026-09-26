@@ -26,7 +26,7 @@ What runs under any harness, what rides configuration and what stays harness-nat
 
 ## Why kits
 
-Checkwright is not a monolith. It is a set of kits, each owning one axis of the problem — the lint framework, the iteration lifecycle, the task queue, the spec discipline, permission friction, delegation, context economics, drift, and evidence. A kit is vendored into your repository whole and governs it from the inside. You adopt the ones that pay for themselves and leave the rest.
+Checkwright is not a monolith. It is a set of kits, each owning one axis of the problem; the [Kit Reference](kits.md) names each kit and its axis. Installing a kit copies it into your repository whole, where it governs the tree from the inside. You adopt the ones that pay for themselves and leave the rest.
 
 This repository governs itself with the kits from day one — the same gates that ship to you run on the tree that builds them. A methodology that its own authors will not run is a slide deck; this one is dogfooded or it is nothing.
 

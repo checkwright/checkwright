@@ -24,6 +24,8 @@ The figures are kit-share only — what a kit itself ships. A consumer's own bin
 
 ## Per-kit footprint
 
+Every top-level directory carrying a `SPEC.md` takes a row, kit or not, and one that ships nothing into context shows an empty tier in both columns.
+
 | kit | always-loaded | load-triggered |
 | --- | --- | --- |
 | canon-kit | — | 5785cp · ~1531t |
