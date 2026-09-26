@@ -7,3 +7,4 @@
 porting-records-brevity scope aa0f2c23 2026-09-26 f0e26f7e
 porting-records-brevity spec a4a61652 2026-09-26 3850eaab
 porting-records-brevity align a7db2e52 2026-09-26 6d5ac4c9
+porting-records-brevity build a6cc66fa 2026-09-26 3610c524
