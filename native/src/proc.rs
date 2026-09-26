@@ -199,7 +199,7 @@ fn spawn_resolution<F: Fn(&std::path::Path) -> bool>(
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the resolution as a pure function of its three
 // inputs, because the arms that matter cannot execute on the host that develops them: the caller
 // reads the environment, this decides, and a test supplies both halves
-fn resolve_on_path<F: Fn(&std::path::Path) -> bool>(
+pub(crate) fn resolve_on_path<F: Fn(&std::path::Path) -> bool>(
     program: &str,
     path: Option<&std::ffi::OsStr>,
     pathext: Option<&str>,

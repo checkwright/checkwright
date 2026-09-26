@@ -118,6 +118,16 @@ pub const KIT: Kit = Kit {
         Row::scalar("GATE_SDK_UPGRADE_REPO", ""),
         Row::scalar("GATE_SDK_UPGRADE_FROM", ""),
         Row::scalar("GATE_SDK_UPGRADE_TO", "HEAD").empty_takes_default(),
+        // spec: gate-sdk/SPEC.md §with-foreign-shells — digest-pinned, so a moved tag never changes
+        // what a run copies; empty provisions no shell from that image
+        Row::scalar(
+            "GATE_SDK_FOREIGN_PWSH_IMAGE",
+            "mcr.microsoft.com/powershell:latest@sha256:810c4f1e0c9d23022c3ec18c50a6205ee4b60766f1739d329b2948df1fd7d5b0",
+        ),
+        Row::scalar(
+            "GATE_SDK_FOREIGN_DASH_IMAGE",
+            "debian:stable-slim@sha256:5bc3287b25407c965a30f38e32603dc253a3869e1b12a21ac09bfc27fd8b13ce",
+        ),
         Row::scalar("GATE_SDK_GRAPH_MAX_EDGES", "100000").empty_takes_default(),
         Row::scalar("GATE_SDK_NATIVE_CRATE", "native").empty_takes_default(),
         Row::scalar("GATE_SDK_NATIVE_PUBLISH_WORKFLOW", ".github/workflows/publish.yml").empty_takes_default().words(),

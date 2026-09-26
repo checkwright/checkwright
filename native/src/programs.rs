@@ -64,6 +64,10 @@ roster! {
     UNAME = "uname", "contributor";
     PWSH = "pwsh", "contributor";
     POWERSHELL = "powershell", "contributor";
+    #[cfg(target_os = "linux")]
+    DOCKER = "docker", "contributor";
+    #[cfg(target_os = "linux")]
+    DASH = "dash", "contributor";
     CHECKWRIGHT_GATES = env!("CARGO_PKG_NAME"), "";
 }
 

@@ -22,6 +22,7 @@ pub mod file_gap;
 pub mod file_install;
 pub mod file_survey;
 pub mod footprint;
+pub mod foreign_shells;
 pub mod front_end_parity;
 pub mod git_hooks;
 pub mod graph;
@@ -814,6 +815,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Run(front_end_parity::run),
         front_end_parity::KNOBS,
     ),
+    // spec: gate-sdk/SPEC.md §with-foreign-shells — an `Arm::Run` because the wrapped command's
+    // status passes through and exit 2 is the arm's own
+    (
+        "--with-foreign-shells",
+        Arm::Run(foreign_shells::run),
+        foreign_shells::KNOBS,
+    ),
 ];
 
 // spec: gate-sdk/SPEC.md §The harness-integration arm — the fail-open set, the arms a front-end
@@ -869,11 +877,11 @@ mod tests {
     // spec: gate-sdk/SPEC.md §The harness-integration arm — a renamed or deleted fail-open arm reds
     // here, before a stub's copy can name an arm the binary no longer dispatches
     // spec: gate-sdk/SPEC.md §The non-gate arm — the crate's network spawners, the arms reaching
-    // `curl` and `npm`, are never fence-safe: admitting one reds here rather than in an adopter's
-    // scratch
+    // `curl`, `npm` and `docker`, are never fence-safe: admitting one reds here rather than in an
+    // adopter's scratch
     #[test]
     fn no_network_spawning_arm_is_fence_safe() {
-        const NETWORK_ARMS: &[&str] = &["--usage-poll", "--pack-installer"];
+        const NETWORK_ARMS: &[&str] = &["--usage-poll", "--pack-installer", "--with-foreign-shells"];
         for arm in NETWORK_ARMS {
             assert!(lookup(arm).is_some(), "{} names no arm-table row", arm);
             assert!(!fence_safe(arm), "{} spawns a network program and is fence-safe", arm);

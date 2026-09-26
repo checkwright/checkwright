@@ -20,7 +20,7 @@ no CI leg runs the native crate's unit tests on native Windows. `.github/workflo
 
 **Specified 2026-09-26:** a `crate-tests-windows` job runs the whole suite on each Windows triple, off the critical path. It reports rather than judges until a run is green, so the push need stays one. A failure reaches the run's annotations as one warning per triple, which close already reads, and build files the flip to the derived posture.
 
-**Cost while deferred:** a Windows adopter's close drain could fail with exit 2, and nobody sees it until an adopter reports it. Filed 2026-09-25 to the gap inbox by spec-brevity-first-slice's build; promoted 2026-09-25 at its close. →fix fails because a new CI leg is new mechanism, and only a push can witness it. Re-verified at the drain: `grep 'cargo test' .github/workflows/*.yml` returns nothing. Owner lookup: `cargo test`, `msvc`, `unit tests on` in this file — none; [foreign-toolchain-docker-legs](#foreign-toolchain-docker-legs) covers local pwsh and dash runs, not crate unit tests.
+**Cost while deferred:** a Windows adopter's close drain could fail with exit 2, and nobody sees it until an adopter reports it. Filed 2026-09-25 to the gap inbox by spec-brevity-first-slice's build; promoted 2026-09-25 at its close. →fix fails because a new CI leg is new mechanism, and only a push can witness it. Re-verified at the drain: `grep 'cargo test' .github/workflows/*.yml` returns nothing. Owner lookup: `cargo test`, `msvc`, `unit tests on` in this file — none; `foreign-toolchain-docker-legs` covers local pwsh and dash runs, not crate unit tests.
 
 ### release-asset-claim-class-owner
 
@@ -33,18 +33,6 @@ a "the release ships an asset" claim has no gate, and the class now has a second
 **Specified 2026-09-26:** §Consumer payload declares the asset set in a `release-assets:` line, and a consumer-registered, born-native `check-release-assets` holds the line's grammar and the publish workflow's call at every commit. Inside `pack` at a tag, it holds the output directory to the line, so a mismatch fails before any Release exists. The newest published Release predates the archive scheme, so no monitor reads the published history.
 
 **Cost while deferred:** two public claims about what a release carries, held by nothing. Filed 2026-08-07; returned from the icebox 2026-09-25 by consult on the second instance.
-
-### foreign-toolchain-docker-legs
-
-[spec: SPEC-foreign-shells.md] [recurrence: 2026-09-25]
-
-this host lacks `pwsh` and `dash`, so the front-end parity check's PowerShell half and every dash-only path first run on CI. At gate-sdk-blind-spots, build changed `gate-sdk/bin/run-gates.ps1` and added a `.ps1` ASCII arm; the Windows legs at close's watched push were their first real run. They passed, but a red would have cost a second push. Docker is available on the development host; a cold daemon start took more than 120s.
-
-**Deliverable:** a contributor-local arm or documented recipe running the pwsh and dash suites in containers, skipping cleanly when Docker is absent. Contributor-only, never an adopter requirement (gate-sdk/SPEC.md §The adopter constraints).
-
-**Specified 2026-09-26:** an `Arm::Run`, `--with-foreign-shells <command>...`, copies `pwsh` and `dash` out of digest-pinned images and runs the command natively with them, and `sh` as dash, on `PATH`. A container run cannot start the host-built gate binary the suites spawn. It skips at exit 0 without Docker or off Linux. Measured at spec: the parity check and the installer smoke both ran clean that way on this host.
-
-**Cost while deferred:** a unit touching a PowerShell or dash path risks a second watched push. Filed 2026-09-23 to the gap inbox on an operator suggestion, lead-relayed, after gate-sdk-blind-spots' close; promoted 2026-09-23 at the next scope. Recurred 2026-09-25, when a build improvised a `pwsh` container shim the boundary wiped. Owner lookup: `docker`, `dash`, `pwsh` in this file — `pwsh` hits only `instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set`, whose subject is a CI leg's binding transition, not a local run.
 
 ## Technical Debt
 
@@ -78,7 +66,7 @@ the x86_64-linux artifact's glibc floor follows its floating build image: `publi
 
 **Deliverable:** pin the linux build leg to a named image, or measure the shipped artifact's highest required `GLIBC_` symbol version and state it as the floor with a gate or publish-time check holding it; either way docs/install.md §Requirements states the floor.
 
-**Cost while deferred:** an adopter on an older glibc meets a loader failure the installer's libc check does not predict. Filed 2026-09-26 to the gap inbox by runner-image-label-migration's build; promoted 2026-09-26 at porting-records-brevity's close: →fix fails because pin-or-state is a design choice over a label that unit ruled to ride, and the floor is a property of a CI-built artifact this host does not build. Owner lookup: `glibc`, `runners.list` in this file — only [foreign-toolchain-docker-legs](#foreign-toolchain-docker-legs), whose glibc mention is a host-versus-container pwsh mismatch, not the shipped floor; owner installer/SPEC.md.
+**Cost while deferred:** an adopter on an older glibc meets a loader failure the installer's libc check does not predict. Filed 2026-09-26 to the gap inbox by runner-image-label-migration's build; promoted 2026-09-26 at porting-records-brevity's close: →fix fails because pin-or-state is a design choice over a label that unit ruled to ride, and the floor is a property of a CI-built artifact this host does not build. Owner lookup: `glibc`, `runners.list` in this file — only `foreign-toolchain-docker-legs`, whose glibc mention is a host-versus-container pwsh mismatch, not the shipped floor; owner installer/SPEC.md.
 
 ### docs-liquid-literal-unseen
 
@@ -1399,5 +1387,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 ## Done
 
 - hook-members-off-test-floor
+- foreign-toolchain-docker-legs
 
 ## Lessons Learned
