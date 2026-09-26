@@ -8,6 +8,68 @@
 
 ## New Features
 
+### customer-docs-quality-standard
+
+[spec: SPEC-docs-standard.md]
+
+the front door and the install page repeat themselves and bury the per-OS path, and no page-level quality rule states or gates it. (1) docs/index.md links one target several times on a page: docs/kits.md in Start here and The kits, docs/orchestration.md in What that buys you and Positioning, docs/install.md in Try it first, Install and Start here. (2) The SSOT rule is doctrine, but nothing states the page-level rules (a page split into sub-pages carries no overlap within a page and no duplication across pages) or gates them. (3) docs/install.md gives no clear per-OS prerequisites and install path; collapsible sections could hide manual steps and the OSes not selected. (4) Its Requirements section is overcrowded: a table, with contributor requirements (jq, cargo) apart from adopter prerequisites. Its platform and toolchain lists are hand-authored marker blocks, read by `check-install-platforms`, `check-install-toolchain` and the gates workflow's roster step, so the change reaches those readers. (5) The Install sections of docs/index.md and docs/install.md open on a clean-git-repository claim that reads as new-repo-only, against the existing-project path. (6) Compatible, tested and supported OS versions: docs/install.md names only Windows 10 and later, nothing for macOS or Linux (related: [glibc-floor-unstated](#glibc-floor-unstated)).
+
+**Operator direction (2026-09-26, lead session, not a ruling):** this is the next iteration's theme, with [one-product-statement](#one-product-statement) riding it.
+
+**Deliverable:** the page-level standard stated in docs/site-architecture.md with a gate or a stated reason none is buildable, and (1) to (6) repaired at their owners.
+
+**Taken for /spec 2026-09-27 at gate-sdk-tail-docs-standard's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, the theme; authored first, since [glibc-floor-unstated](#glibc-floor-unstated) and [install-fetch-asset-names](#install-fetch-asset-names) rewrite the same install page. Probed at scope: (1), (5) and (6) hold as filed. Re-probed at spec: (2) to (4) hold. (4)'s *generated blocks, so the change reaches their emitter* was wrong and is corrected above: the blocks are hand-authored and gate-read.
+
+**Push need (2026-09-27, inside the budget):** one mid-iteration push, shared with glibc-floor-unstated's floor step. The amendment's delta 4 changes the `native-artifacts-roster` step's reader, which only a gates run executes. The closing push is the second of two against the close binding's `push-budget`.
+
+**Cost while deferred:** every first-time reader meets the duplication and the missing per-OS path on the two pages that decide an install. Filed 2026-09-26 to the gap inbox by the lead on the operator's direction; promoted 2026-09-26 at capture-integrity-brevity's close: →fix fails because a page-level standard is new rule content and the direction makes it an iteration's theme. DISTINCT from [docs-secondary-clarity-pass](#docs-secondary-clarity-pass), whose subject is validity slips and undefined vocabulary on the secondary pages. Owner lookup: `docs quality`, `per-OS`, `collapsib`, `Requirements` in this file — only glibc-floor-unstated; owner docs/site-architecture.md.
+
+### glibc-floor-unstated
+
+[spec: SPEC-docs-standard.md]
+
+the x86_64-linux artifact's glibc floor follows its floating build image: `publish.yml`'s build matrix reads `native/runners.list`'s `ubuntu-latest`, so a release built during the Ubuntu 26 rollout (2026-10-19 to 11-19) may land on either image and raise the floor silently. No surface states a glibc floor: installer/SPEC.md names only the musl/glibc split, and docs/install.md §Requirements names no libc.
+
+**Deliverable:** pin the linux build leg to a named image, or measure the shipped artifact's highest required `GLIBC_` symbol version and state it as the floor with a gate or publish-time check holding it; either way docs/install.md §Requirements states the floor.
+
+**Taken for /spec 2026-09-27 at gate-sdk-tail-docs-standard's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, reshaped by [customer-docs-quality-standard](#customer-docs-quality-standard)'s Requirements rework, whose item (6) needs this floor.
+
+**Authored at spec 2026-09-27, measure route:** v0.26.0's two linux-gnu archives need `GLIBC_2.39`. The shared build body, `scripts/ci-build-artifact.sh`, measures each artifact against the floor the platforms table states, on the release leg and on the gates workflow's `native-artifacts` producer alike. So a floor change is observed on every push, and no half waits for a tag; scope's pin-route note assumed otherwise. The Linux legs keep their runner labels. Lowering the floor is filed to the gap inbox as a separate unit.
+
+**Push need (2026-09-27, inside the budget):** the mid-iteration push customer-docs-quality-standard names, read for the floor step on the four measured build legs.
+
+**Cost while deferred:** an adopter on an older glibc meets a loader failure the installer's libc check does not predict. Filed 2026-09-26 to the gap inbox by runner-image-label-migration's build; promoted 2026-09-26 at porting-records-brevity's close: →fix fails because pin-or-state is a design choice over a label that unit ruled to ride, and the floor is a property of a CI-built artifact this host does not build. Owner lookup: `glibc`, `runners.list` in this file — only `foreign-toolchain-docker-legs`, whose glibc mention is a host-versus-container pwsh mismatch, not the shipped floor; owner installer/SPEC.md.
+
+### one-product-statement
+
+[spec: SPEC-product-statement.md]
+
+Checkwright is described two ways. Measured 2026-09-26: the GitHub repo About, `installer/package.json` and `reserve/crates/Cargo.toml` carry the older methodology wording ("A coding-agent-assisted delivery methodology as installable kits: …"), while README.md and docs/index.md open on "Verification for coding-agent delivery" and the verification-layer framing. No SPEC governs the About.
+
+**Operator direction (2026-09-26, lead session, not a ruling):** rides with [customer-docs-quality-standard](#customer-docs-quality-standard) as the next iteration's theme; the operator asks whether a gate should hold it.
+
+**Deliverable:** one source for the product statement, the tracked copies generated from it and freshness-gated, and the live About's drift placed on the monitor side of site-kit/SPEC.md's gate/monitor boundary (it is a network read, and changing it is a GitHub write).
+
+**Taken for /spec 2026-09-27 at gate-sdk-tail-docs-standard's scope, operator direction lead-relayed (not a /consult ruling):** unit set A. Re-read at scope: the About, `installer/package.json` and `reserve/crates/Cargo.toml` all carry the methodology wording.
+
+**Authored at spec 2026-09-27:** the About re-read with `gh api`. Three more copies were found: `docs/_config.yml`'s `description`, which is every page's default meta description, and the openers of `installer/README.md` and `reserve/crates/README.md`. The answer to the operator's question is yes, a freshness gate over the generated copies, with a monitor arm for the About.
+
+**Cost while deferred:** a reader meets two products on the repo page, the package registries and the site. Filed 2026-09-26 to the gap inbox by the lead on the operator's direction; promoted 2026-09-26 at capture-integrity-brevity's close: →fix fails because choosing the one statement and its source is a design call with a GitHub write in it. Owner lookup: `product statement`, `package.json`, `About` in this file — none.
+
+### install-fetch-asset-names
+
+[spec: SPEC-asset-names.md]
+
+the install page's step-by-step recipes (docs/install.md, unix and Windows blocks) and the hosted scripts (`docs/install.sh`, `docs/install.ps1`) spell the Release tarball and sidecar names themselves (`checkwright-<version>.tgz` and its `.sha256`), and the install smoke legs spell the layout a third time; nothing compares them with the release-assets declaration in gate-sdk/SPEC.md §Consumer payload, which now holds the publish output alone.
+
+**Deliverable:** the fetch surfaces derive their asset names from the declaration, or a gate holds them equal to it.
+
+**Taken for /spec 2026-09-27 at gate-sdk-tail-docs-standard's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, reshaped by [customer-docs-quality-standard](#customer-docs-quality-standard), which rewrites the per-OS recipes first.
+
+**Authored at spec 2026-09-27:** a gate, as `check-install-pin`'s third invariant. The surfaces are held to the **pinned** release's declaration, since the pin trails the tag. The smoke legs are left out, because a leg whose name drifts from the page's already reds at push. The invariant reads raw page text, so the order against customer-docs-quality-standard does not matter.
+
+**Cost while deferred:** a declaration-and-publish rename reds only at the tag's pack job, leaving these four surfaces fetching a name no Release carries once the pin moves, so an adopter's one-line install breaks. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's spec as the honest limit release-asset-claim-class-owner's amendment named; promoted 2026-09-26 at its close: →fix fails because derive-or-gate is a design choice across four surfaces. Re-verified at the drain: `docs/install.sh` (`cw_tgz=`) and `docs/install.ps1` (`$tgz =`) spell `checkwright-<version>.tgz`. Owner lookup: `install.sh`, `install.ps1`, `tarball name`, `sidecar` in this file — none live; owner gate-sdk/SPEC.md §Consumer payload.
+
 ## Technical Debt
 
 ### gate-sdk-tail-brevity
@@ -31,34 +93,6 @@ the secondary customer pages carry validity slips and undefined internal vocabul
 **Cost while deferred:** low per page and slow, paid by the reader who has already passed the front door. Filed 2026-09-25 by consult as a direct entry, from the same audit; split from the front-door entry because its pages do not decide the first install.
 
 ## Deferred
-
-### customer-docs-quality-standard
-
-[cost: event/high] [surface: docs]
-
-the front door and the install page repeat themselves and bury the per-OS path, and no page-level quality rule states or gates it. (1) docs/index.md links one target several times on a page: docs/kits.md in Start here and The kits, docs/orchestration.md in What that buys you and Positioning, docs/install.md in Try it first, Install and Start here. (2) The SSOT rule is doctrine, but nothing states the page-level rules (a page split into sub-pages carries no overlap within a page and no duplication across pages) or gates them. (3) docs/install.md gives no clear per-OS prerequisites and install path; collapsible sections could hide manual steps and the OSes not selected. (4) Its Requirements section is overcrowded: a table, with contributor requirements (jq, cargo) apart from adopter prerequisites; its platform and toolchain lists are generated marker blocks, so the change reaches their emitter. (5) The Install sections of docs/index.md and docs/install.md open on a clean-git-repository claim that reads as new-repo-only, against the existing-project path. (6) Compatible, tested and supported OS versions: docs/install.md names only Windows 10 and later, nothing for macOS or Linux (related: [glibc-floor-unstated](#glibc-floor-unstated)).
-
-**Operator direction (2026-09-26, lead session, not a ruling):** this is the next iteration's theme, with [one-product-statement](#one-product-statement) riding it.
-
-**Deliverable:** the page-level standard stated in docs/site-architecture.md with a gate or a stated reason none is buildable, and (1) to (6) repaired at their owners, generated blocks at their emitter.
-
-**Taken for /spec 2026-09-27 at gate-sdk-tail-docs-standard's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, the theme; authored first, since [glibc-floor-unstated](#glibc-floor-unstated) and [install-fetch-asset-names](#install-fetch-asset-names) rewrite the same install page. Probed at scope: (1), (5) and (6) hold as filed.
-
-**Cost while deferred:** every first-time reader meets the duplication and the missing per-OS path on the two pages that decide an install. Filed 2026-09-26 to the gap inbox by the lead on the operator's direction; promoted 2026-09-26 at capture-integrity-brevity's close: →fix fails because a page-level standard is new rule content and the direction makes it an iteration's theme. Not re-verified item by item; the claims are the operator's reading of the live pages. DISTINCT from [docs-secondary-clarity-pass](#docs-secondary-clarity-pass), whose subject is validity slips and undefined vocabulary on the secondary pages. Owner lookup: `docs quality`, `per-OS`, `collapsib`, `Requirements` in this file — only glibc-floor-unstated; owner docs/site-architecture.md.
-
-### one-product-statement
-
-[cost: event/low] [surface: docs]
-
-Checkwright is described two ways. Measured 2026-09-26: the GitHub repo About, `installer/package.json` and `reserve/crates/Cargo.toml` carry the older methodology wording ("A coding-agent-assisted delivery methodology as installable kits: …"), while README.md and docs/index.md open on "Verification for coding-agent delivery" and the verification-layer framing. No SPEC governs the About.
-
-**Operator direction (2026-09-26, lead session, not a ruling):** rides with [customer-docs-quality-standard](#customer-docs-quality-standard) as the next iteration's theme; the operator asks whether a gate should hold it.
-
-**Deliverable:** one source for the product statement, the tracked copies generated from it and freshness-gated, and the live About's drift placed on the monitor side of site-kit/SPEC.md's gate/monitor boundary (it is a network read, and changing it is a GitHub write).
-
-**Taken for /spec 2026-09-27 at gate-sdk-tail-docs-standard's scope, operator direction lead-relayed (not a /consult ruling):** unit set A. Re-read at scope: the About, `installer/package.json` and `reserve/crates/Cargo.toml` all carry the methodology wording.
-
-**Cost while deferred:** a reader meets two products on the repo page, the package registries and the site. Filed 2026-09-26 to the gap inbox by the lead on the operator's direction; promoted 2026-09-26 at capture-integrity-brevity's close: →fix fails because choosing the one statement and its source is a design call with a GitHub write in it. The About text is the filer's measurement, not re-read. Owner lookup: `product statement`, `package.json`, `About` in this file — none.
 
 ### shellcheck-extra-dirs-trigger
 
@@ -101,18 +135,6 @@ doctrine-kit/DOCTRINE.md's Absence statements rule has an audit-roster class and
 **Deliverable:** per arm, a knob, an assertion and a `good/`+`bad/` fixture pair, or a SPEC boundary note refusing it.
 
 **Cost while deferred:** an absence sentence on a ledger is found only by the close audit sweep. No live instance exists: the queue's and the ruling record's empty sections are headings alone. Filed 2026-09-26 to the gap inbox by absence-statement-grammar's amendment, which costed the arms without building them; promoted 2026-09-26 at its close: →fix fails because each arm is new mechanism with a knob, and no live instance needs repair. Owner lookup: `absence`, `placeholder` in this file — none live; owner doctrine-kit/DOCTRINE.md Absence statements, with the arms in canon-kit/SPEC.md §check-prose-tells and queue-kit/SPEC.md §check-task-names. Surface also queue-kit.
-
-### glibc-floor-unstated
-
-[cost: event/low] [surface: installer]
-
-the x86_64-linux artifact's glibc floor follows its floating build image: `publish.yml`'s build matrix reads `native/runners.list`'s `ubuntu-latest`, so a release built during the Ubuntu 26 rollout (2026-10-19 to 11-19) may land on either image and raise the floor silently. No surface states a glibc floor: installer/SPEC.md names only the musl/glibc split, and docs/install.md §Requirements names no libc.
-
-**Deliverable:** pin the linux build leg to a named image, or measure the shipped artifact's highest required `GLIBC_` symbol version and state it as the floor with a gate or publish-time check holding it; either way docs/install.md §Requirements states the floor.
-
-**Taken for /spec 2026-09-27 at gate-sdk-tail-docs-standard's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, reshaped by [customer-docs-quality-standard](#customer-docs-quality-standard)'s Requirements rework, whose item (6) needs this floor. A pinned image is observed only at the next tag's publish run, so a pin route splits that observation off as a deferred half.
-
-**Cost while deferred:** an adopter on an older glibc meets a loader failure the installer's libc check does not predict. Filed 2026-09-26 to the gap inbox by runner-image-label-migration's build; promoted 2026-09-26 at porting-records-brevity's close: →fix fails because pin-or-state is a design choice over a label that unit ruled to ride, and the floor is a property of a CI-built artifact this host does not build. Owner lookup: `glibc`, `runners.list` in this file — only `foreign-toolchain-docker-legs`, whose glibc mention is a host-versus-container pwsh mismatch, not the shipped floor; owner installer/SPEC.md.
 
 ### docs-liquid-literal-unseen
 
@@ -665,18 +687,6 @@ the lead template's capture rule (lifecycle-kit/templates/lead.md §Stamps are a
 **Cost while deferred:** a lead can destroy a live stage's evidence on a description nobody checked. Filed 2026-09-26 to the gap inbox by the lead on its own error; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because the rule widens a shipped template's contract and its scope is a design call. Re-verified at the drain: the removal is recorded in both the validate and lead journals. The filer's inferred cause, that the probe worktree reddened validate's first upgrade suite, did not reproduce: `--upgrade-smoke` ran clean with a linked worktree at `.tmp/probe-wt`. The gitignored-scratch clause therefore rests on no attested harm.
 
 **Inferred, not run:** concurrent lead activity in that worktree, rather than its presence, caused the one-off red — `bash gate-sdk/bin/run-gates.sh --upgrade-smoke` while a second session runs the battery inside a linked worktree under `.tmp/`
-
-### install-fetch-asset-names
-
-[cost: event/low] [surface: docs]
-
-the install page's step-by-step recipes (docs/install.md, unix and Windows blocks) and the hosted scripts (`docs/install.sh`, `docs/install.ps1`) spell the Release tarball and sidecar names themselves (`checkwright-<version>.tgz` and its `.sha256`), and the install smoke legs spell the layout a third time; nothing compares them with the release-assets declaration in gate-sdk/SPEC.md §Consumer payload, which now holds the publish output alone.
-
-**Deliverable:** the fetch surfaces derive their asset names from the declaration, or a gate holds them equal to it.
-
-**Taken for /spec 2026-09-27 at gate-sdk-tail-docs-standard's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, reshaped by [customer-docs-quality-standard](#customer-docs-quality-standard), which rewrites the per-OS recipes first.
-
-**Cost while deferred:** a declaration-and-publish rename reds only at the tag's pack job, leaving these four surfaces fetching a name no Release carries once the pin moves, so an adopter's one-line install breaks. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's spec as the honest limit release-asset-claim-class-owner's amendment named; promoted 2026-09-26 at its close: →fix fails because derive-or-gate is a design choice across four surfaces. Re-verified at the drain: `docs/install.sh` (`cw_tgz=`) and `docs/install.ps1` (`$tgz =`) spell `checkwright-<version>.tgz`. Owner lookup: `install.sh`, `install.ps1`, `tarball name`, `sidecar` in this file — none live; owner gate-sdk/SPEC.md §Consumer payload.
 
 ### crate-tests-other-triples
 
