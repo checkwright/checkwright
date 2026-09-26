@@ -1392,12 +1392,4 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 ## Done
 
-- absence-statement-grammar
-- crate-arms-relink-under-worker-pool
-- enforcement-first-load-trigger
-- enter-stage-refusal-help-contradicts-its-guard
-- entry-refusal-invites-evasion
-- gate-sdk-porting-brevity
-- runner-image-label-migration
-
 ## Lessons Learned
