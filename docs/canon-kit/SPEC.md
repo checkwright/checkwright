@@ -801,7 +801,7 @@ The worklist behind a ceiling is the gate run with the knob emptied in the envir
 
 **Fail-closed (exit 2):** a threshold the knob table refuses; a ceiling file named but absent or unreadable; a row that does not parse, or a second row for one path.
 
-**Honest limits.** A paraphrased restatement shares no phrase and passes C. A word count is not reading time. Under a ceiling, a commit that removes one finding and adds another in the same file keeps the count and passes. Undated narrative of how a rule was reached passes all three assertions; the dated half is §check-provenance-seam's.
+**Honest limits.** A paraphrased restatement shares no phrase and passes C. A word count is not reading time. Under a ceiling, a commit that removes one finding and adds another in the same file keeps the count and passes. Undated narrative of how a rule was reached passes all three assertions. The dated half is §check-provenance-seam's, and the rest is the close-stage brevity pass's, which a consumer's surface ratchet over its specs brings forward to the growing commit (context-kit/SPEC.md §The surface ratchet).
 
 Producer: the generated pre-commit hook and `run-gates.sh`, on a commit touching a governed file or the ceiling file. Consumer: the committing session through the output contract. Each field is read at the one scan and nothing persists. `good/` holds a bounded agent file and a bounded spec with a valved long sentence; `bad/` trips A, B and C, one of them in an agent file's paragraph section. `check-prose-bounds.test.sh` holds the ceiling arms: equal, above, below, missing row, stray row, duplicate row and the absent file.
 

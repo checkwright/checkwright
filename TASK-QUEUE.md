@@ -18,16 +18,6 @@ the headline promises that unsupported *done* claims become failing checks, and 
 
 **Promoted 2026-09-26 at spec:** the filing named `check-stage-evidence` as the red. Probed at spec, it is `on-surface`, so a `full` install never registers it, and it asserts stamp grammar, not evidence. The member that reds is evidence-kit's `zero-config` `check-evidence-manifest`, assertion C, which the amendment states with its probe.
 
-### spec-narration-unratcheted
-
-[spec: SPEC-spec-ratchet.md]
-
-undated, marker-free narrative of how a rule was reached passes every prose gate: `check-manifest-temporal` catches trigger words, `check-provenance-seam` dates, hashes, slugs and attributions, `check-prose-bounds` length and repetition, and canon-kit/SPEC.md §check-prose-bounds states the gap as its own honest limit. No component SPEC carries a size ratchet either, so close's brevity pass, a judgment, is the sole backstop.
-
-**Deliverable:** every component `SPEC.md` under this repo's surface ratchet, so growth is a deliberate re-stamp in the growing commit.
-
-**Promoted 2026-09-26 at spec:** of the filing's two candidates, the ratchet ships and narration tells in `CANON_KIT_TEMPORAL_MARKERS_EXTRA` are refused on a corpus measurement, whose counts the amendment carries. Filed 2026-09-26 to the gap inbox by the lead on an operator question.
-
 ## Technical Debt
 
 ### gate-sdk-runner-brevity
@@ -1401,5 +1391,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 The consumer's local-only companion files (private brief, ops runbook) have read triggers but no write-back trigger, so shipped-unit forward memory and an out-of-tree state verifier drift until a consult audits them; owed are close and release-sweep template slots for both, and a retired-slug arm over plain code on the local-only globs.
 
 ## Done
+
+- spec-narration-unratcheted
 
 ## Lessons Learned

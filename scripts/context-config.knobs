@@ -40,6 +40,9 @@ CONTEXT_KIT_RATCHET_PATHS[] = :(exclude)docs/enforcement.md
 CONTEXT_KIT_RATCHET_PATHS[] = :(exclude)docs/footprint.md
 CONTEXT_KIT_RATCHET_PATHS[] = :(exclude)docs/install-evidence.md
 
+# comment-tier-exempt: every component SPEC, so its growth between brevity passes shows in the growing commit; the docs/ mirrors and gate-tests/ fixtures are excluded above
+CONTEXT_KIT_RATCHET_PATHS[] = */SPEC.md
+
 # spec: context-kit/SPEC.md §Layout and configuration — the policy calibrations this repo relies on, bound at the values its gates are green at so a kit default's move moves no verdict here (Policy-as-choice)
 CONTEXT_KIT_BREVITY_CAP = 330
 CONTEXT_KIT_BREVITY_POINTER_RE = §
