@@ -11,7 +11,7 @@ The iteration stage state machine for coding-agent-assisted delivery: stage skil
 
 Why: a stateless agent session doesn't reliably re-read process prose. So the process state lives in two files a gate can read, and every stage skill stamps its invocation as its first step (mechanized by the `--enter-stage <stage>` arm on the gate binary `GATE_SDK_NATIVE_BIN` names, so the misformat-prone hand ritual is one command). That stamp *is* the stage transition — there is no second copy of the cursor to keep in sync, and stage motion writes no queue at all. `check-stage-evidence` verifies the stamp file's grammar and that every stamp belongs to the header's iteration; `check-stage-entry` verifies the predecessor stamp, the drained queue at validate entry, and, at build entry, the cross-component audit trigger and no unrun inferred-claim marker. See [SPEC.md](SPEC.md) for the full contracts.
 
-This file ships in the installer payload, which withholds each kit's `SPEC.md` and its `smoke/`. Every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
+This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is gate-sdk/SPEC.md §Consumer payload.
 
 The linear stage walk is the default; the gate-legal ways to leave it — abandon, split, reopen — compose existing mechanism with no new tooling ([SPEC.md](SPEC.md) §Deviation transitions).
 

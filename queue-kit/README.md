@@ -4,7 +4,7 @@ A git-native, agent-readable task tracker: one Markdown file where `##` sections
 
 Why: an agent picks work by *parsing*, not reading — so everything selection trusts (section position, slugs, tags) must be grammar a gate can enforce, and everything a human writes freely (task prose) must stay off the parse path. Drift between what the prose says and what the parser sees is the failure mode; all but three of the gates each close one instance of it — a tag written off its tag line, a duplicate slug, a live reference left unlinked, a lost task, a forward precondition stated in prose but never tagged. The three exceptions hold a different axis: projection freshness, and the deferred pool's filing contract — its per-entry budget and its tag-line board tags. See [SPEC.md](SPEC.md) for the full contracts.
 
-This file ships in the installer payload, which withholds each kit's `SPEC.md` and its `smoke/`. Every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
+This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is gate-sdk/SPEC.md §Consumer payload.
 
 ## Install
 

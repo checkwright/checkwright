@@ -10,7 +10,7 @@ Agent orchestration frameworks answer *who works on what, and when*. They fan a 
 
 Checkwright is that second answer. It makes *done* mechanically decidable, so a supervisor (human or agent) can trust a completed unit of work without reading all of it. That is the prerequisite the orchestration story quietly assumes: coordination is only worth scaling once each coordinated result is checkable. Checkwright therefore sits **beneath** an orchestrator, not beside it — the verification layer a coordination layer stacks on. It complements your orchestration setup; it does not replace it.
 
-This page positions Checkwright as that verification layer. It owns no contract — each mechanism below is owned by the kit that enforces it, cited downward so the invariant stays in one place.
+This page positions Checkwright as that verification layer.
 
 ## The mechanisms
 

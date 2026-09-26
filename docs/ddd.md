@@ -10,7 +10,7 @@ Domain-driven design asks a team to speak one **ubiquitous language** — a sing
 
 That divergence is exactly the failure Checkwright exists to stop. A ubiquitous language is the kind of discipline prose alone cannot hold when stateless agent sessions do the writing — a fresh session was not in the room when the team chose the canonical term, so it reaches for whichever synonym reads well. But vocabulary consistency is mechanically decidable: whether a banned word appears in the tree is a question a program can answer. So it belongs to a gate, not to a reviewer's memory.
 
-This page positions Checkwright as the enforcement layer for a ubiquitous language. It owns no contract — each mechanism below is owned by the kit that enforces it, cited downward so the invariant stays in one place.
+This page positions Checkwright as the enforcement layer for a ubiquitous language.
 
 ## The mechanisms
 

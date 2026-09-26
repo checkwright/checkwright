@@ -2,35 +2,45 @@
 
 [![gates](https://github.com/checkwright/checkwright/actions/workflows/gates.yml/badge.svg)](https://github.com/checkwright/checkwright/actions/workflows/gates.yml) [![release](https://img.shields.io/github/v/tag/checkwright/checkwright?label=release)](https://github.com/checkwright/checkwright/releases)
 
-**Verification for coding-agent delivery.** Checkwright is the verification layer under agent orchestration: spec drift, skipped stages, and unsupported *done* claims become failing checks before a merge, instead of review findings after one. It ships as installable kits — harness-independent gates plus an evidence-stamped iteration lifecycle designed for stateless agent sessions.
+**Verification for coding-agent delivery.** Checkwright is the verification layer under agent orchestration: spec drift, skipped stages, and unsupported *done* claims become failing checks before a merge, instead of review findings after one. It ships as installable kits: gates plus an evidence-stamped iteration lifecycle designed for stateless agent sessions.
 
-**For the maintainer of a repository coding agents write most of**, who has to answer at merge time whether the work is actually done, and cannot answer it by reading every diff.
+Who it is for, how it complements the workflow you already run, and a done claim it catches: <https://checkwright.dev>, the same pages served in-repo under [`docs/`](docs/index.md).
 
-**It complements the workflow you already run.** Keep your spec process, your prompts, your harness. Add Checkwright where a claim has to be mechanically proven rather than asserted: the instructions shape, the gates enforce. Why that split is the whole design: [Where Checkwright sits](docs/positioning.md).
+## Try it first
 
-## What that buys you
+`demo` runs the whole arc in a scratch repository of its own and removes it, without touching yours; [docs/install.md](docs/install.md) §Install says what each act does. It installs the `full` profile, which needs bash 4.3 or later: on stock macOS run the Homebrew bash step there first, and on Windows the Git for Windows step.
 
-**Before.** A session finishes a task and marks it done; the evidence is the session's own say-so. A page keeps citing a spec section that a rename moved out from under it. Both commits go in green, and the next stateless session reads both as ground truth.
-
-**After.** Neither commit lands:
-
-```text
-===== check-md-refs =====
-check-md-refs: dangling reference in the governed doc set
-  docs/guide.md:71 -> SPEC.md §Retry budget — no such section
-FAIL: check-md-refs
-===== check-stage-evidence =====
-check-stage-evidence: a task reached Done with no validate stamp this iteration
-FAIL: check-stage-evidence
+```sh
+curl -fsSL https://checkwright.dev/install.sh | sh -s -- demo                  # macOS and Linux
 ```
 
-Nothing there is a review opinion: each finding is cheap, mechanically decidable, and low-false-positive by construction, which is what lets it block a commit rather than open a thread. The semantic residue — is this design right, does the evidence earn the claim — stays with the human or the agent, undiluted.
+```powershell
+& ([scriptblock]::Create((irm https://checkwright.dev/install.ps1))) demo      # Windows, in PowerShell
+```
 
-Where the project is heading, and what moves an item: [`ROADMAP.md`](ROADMAP.md), generated from the queue entries a maintainer marked for the page and freshness-gated on every commit. What is already *ruled* — the operator's standing overrides of business as usual — is [`TRAJECTORY.md`](TRAJECTORY.md), hand-authored rather than generated. Docs live at <https://checkwright.dev> — the same pages served in-repo under [`docs/`](docs/index.md).
+```sh
+npx checkwright demo                                                           # with Node
+```
 
-## Quick start
+## Install
 
-Vendors a kit profile into a clean git repo and commits it. The primary path is the **release tarball** — download it and its `.sha256` off the [releases](https://github.com/checkwright/checkwright/releases) page, verify, extract, run `init` — which needs no runtime installed first, with one line for macOS and Linux and one for Windows, each fetching a pinned release, verifying it and running `init`; `npx checkwright init` is the same vendoring over npm, for a consumer who already has Node. The recipes, with profiles and requirements: [docs/install.md](docs/install.md) §Install.
+From the root of a clean git repository, the same three routes without `demo` install the kits as one commit, the first two from the Release tarball:
+
+```sh
+curl -fsSL https://checkwright.dev/install.sh | sh                             # macOS and Linux
+```
+
+```powershell
+irm https://checkwright.dev/install.ps1 | iex                                  # Windows, in PowerShell
+```
+
+```sh
+npx checkwright init                                                           # with Node
+```
+
+Profiles, the other verbs and how to pass them arguments: [docs/install.md](docs/install.md) §Install.
+
+Where the project is heading, and what moves an item: [`ROADMAP.md`](ROADMAP.md). What is already *ruled* — the operator's standing overrides of business as usual — is [`TRAJECTORY.md`](TRAJECTORY.md), hand-authored rather than generated.
 
 ## The premise
 
@@ -38,21 +48,7 @@ When coding agents do the writing, discipline does not hold: conventions live in
 
 ## Kits
 
-| Kit | What it is |
-|---|---|
-| [gate-sdk/](gate-sdk/) | A self-testing lint framework for prose/spec/config surfaces: the gate contracts (output, fail-closed, fixture-pair, self-lint), the fixture runner, `# graph:` coupling manifests, and a generated pre-commit hook. |
-| [lifecycle-kit/](lifecycle-kit/) | The iteration stage state machine for stateless agent sessions: an iteration header + evidence-stamp file (its last stamp the stage cursor), stage-skill templates (scope/align/build/validate/close by default, plus an optional trigger-gated authoring stage — stages are config), and the gates that make skipping a stage — or clearing a lesson without dispositioning it — fail the commit. |
-| [queue-kit/](queue-kit/) | A git-native, agent-readable task tracker: the TASK-QUEUE format, one slug namespace, the tag algebra over tasks (blocked-by/spec/drain-exempt/roadmap/observed-by/cost/surface/cap-credit/recurrence/roadmap-summary/not-icebox-eligible/precondition-ok) and over Lessons Learned (an in-iteration attention channel plus consumer-named harvest tags), the queue-reading arms the binary carries (queue-kit/SPEC.md rosters them), the `roadmap` one projecting the curated entries onto a generated public page, and the gates that hold the grammar an agent selects work by. |
-| [canon-kit/](canon-kit/) | Spec discipline for agent-authored components: one canonical spec per component, deltas as short-lived amendment files, a content-tiering star topology (one owner per fact; cite, never restate), and gates over the copy-shaped failure modes. |
-| [guard-kit/](guard-kit/) | Permission-friction tooling for agent sessions: a `PreToolUse` shell guard (block/steer/rewrite/auto-allow) with a harness-generic ruleset, a prompt-source scanner, tracked-vs-local allowlist curation, an optional wakeup-guard, and a close-stage friction-triage step. Registers `check-door-binding`. |
-| [delegation-kit/](delegation-kit/) | Safe delegated-agent execution for budget-bounded sessions: the supervisor protocol (serialize on the shared git index, one commit per unit, resume journal, verify after every agent commit), a trustworthy budget verdict (`usage-verdict`), a `SubagentStop` turn-end hook that refuses a turn ended over a live recorded producer or a running harness shell task of its own, and `check-gate-tamper` — a commit-shape gate blocking the two attested gate-weakening shapes. |
-| [context-kit/](context-kit/) | Token-economics-aware context management: the index-first reading arms (`--emit md-index`/`md-section`/`pub-index`), a session-start hook that assembles a compact brief, an always-loaded meter with its committed baseline, and `check-brevity` over its governed always-loaded sections. |
-| [drift-kit/](drift-kit/) | Advisory drift reporting for stateless sessions: a `--emit drift-report` arm that collates pluggable KPIs from the other kits' governed surfaces under lead/lag honesty labels, a KPI plugin registry, a one-line trend summary the session hook injects, and the knowledge-friction loop. Registers no gates. |
-| [evidence-kit/](evidence-kit/) | A held-constant test baseline and a committed per-run evidence manifest for validate: a stage stamp proves a stage was invoked, this proves it produced its green result. The versioned manifest (`# contract: evidence-manifest v1`) is a wire contract an external verifier can consume; ships the `--run-validate` spine and the `--diff-baseline` runtime diff, and gates over baseline grammar/slug-liveness and manifest grammar/close-entry coupling. |
-| [site-kit/](site-kit/) | Deployment-truth governance for a repo-served docs site: `check-docs-cname-parity` makes the CNAME file the single gated source of truth for the docs host (no tracked file cites a configured alias in a URL; the alias set is consumer config), `check-docs-render-fidelity` re-renders every tracked docs page through the Pages parser and reds on the observed leakage classes, `check-docs-liquid-parse` reds a docs file whose Liquid would fail the Pages build, and a `site-health.yml` template scheduled-probes the live deployment (HTTPS, redirects, cert expiry, and release-body note pointers) as a monitor, never a gate. |
-| [doctrine-kit/](doctrine-kit/) | The experience-packaging rung: the cross-kit delivery doctrine the other kits enforce piecemeal, stated once in a customer-deliverable `DOCTRINE.md` — referenced by link into a consumer's always-loaded agent file (re-vendor to upgrade, never copy-installed), installed by the gate binary's `--install-doctrine` arm, and held present by `check-doctrine-registration`. Ships the rule statements only; each kit's SPEC owns its mechanism, so no private rule content crosses the seam. |
-
-Every kit ships its own fixtures, README, and SPEC. The repo is a monorepo — a kit is split out only if it earns independent adoption.
+The kits, in reading order with a line on each: the [Kit Reference](docs/kits.md). Every kit ships its own fixtures, README, and SPEC in its own top-level directory. The repo is a monorepo — a kit is split out only if it earns independent adoption.
 
 ## This repo, governed
 

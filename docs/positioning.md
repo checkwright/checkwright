@@ -6,7 +6,7 @@ nav_child_order: 3
 
 # Where Checkwright sits
 
-A coding agent runs inside a stack of layers, and where a tool sits in that stack decides what it can and cannot promise. This page places Checkwright in that stack — the verification layer under agent orchestration, subordinate to the harness that runs the model — and states honestly which harnesses it runs under and which it merely adapts to. It owns no contract; each invariant below is owned by the kit that enforces it, cited downward so it stays in one place.
+A coding agent runs inside a stack of layers, and where a tool sits in that stack decides what it can and cannot promise. This page places Checkwright in that stack — the verification layer under agent orchestration, subordinate to the harness that runs the model — and states honestly which harnesses it runs under and which it merely adapts to.
 
 ## The layer model
 

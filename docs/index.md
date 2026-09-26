@@ -11,52 +11,66 @@ It is for the maintainer of a repository coding agents write most of, who has to
 
 **It complements the workflow you already run.** Keep your spec process, your prompts, your harness. Add Checkwright where a claim has to be mechanically proven rather than asserted: the instructions shape, the gates enforce. Why that split is the whole design is the layer model on [Where Checkwright sits](positioning.md).
 
-Install it with no runtime first, from the root of a clean repository. On [macOS and Linux](install.md#macos-and-linux):
+## Try it first
+
+`demo` runs the whole arc in a scratch repository of its own and removes it, without touching yours; [Install](install.md#install) says what each act does. It installs the `full` profile, which needs bash 4.3 or later: on stock macOS run the [Homebrew bash step](install.md#macos-and-linux) first, and on Windows the [Git for Windows step](install.md#windows).
 
 ```sh
-curl -fsSL https://checkwright.dev/install.sh | sh
+curl -fsSL https://checkwright.dev/install.sh | sh -s -- demo                  # macOS and Linux
 ```
-
-On [Windows](install.md#windows), in PowerShell:
 
 ```powershell
-irm https://checkwright.dev/install.ps1 | iex
+& ([scriptblock]::Create((irm https://checkwright.dev/install.ps1))) demo      # Windows, in PowerShell
 ```
 
-Each line fetches a pinned release, verifies it and runs `init`. `demo` in place of `init` runs the whole arc in a scratch repository of its own and removes it, and `uninstall` takes the install back out.
-
-With Node on the machine, the same arc is one command each:
-
-```bash
-npx checkwright demo        # needs no repository: install, a caught defect, the fix
-npx checkwright init        # adds the kits as one commit
-git show --stat HEAD        # everything the install brought in
-npx checkwright uninstall   # takes it back out, or delete the directory
+```sh
+npx checkwright demo                                                           # with Node
 ```
+
+## Install
+
+From the root of a clean git repository, the same three routes without `demo` install the kits as one commit, the first two from the Release tarball:
+
+```sh
+curl -fsSL https://checkwright.dev/install.sh | sh                             # macOS and Linux
+```
+
+```powershell
+irm https://checkwright.dev/install.ps1 | iex                                  # Windows, in PowerShell
+```
+
+```sh
+npx checkwright init                                                           # with Node
+```
+
+Profiles, the other verbs and how to pass them arguments: [Install](install.md#install).
 
 ## What that buys you
 
-**Before.** A session finishes a task and marks it done; the evidence is the session's own say-so. A page keeps citing a spec section that a rename moved out from under it. Both commits go in green, and the next stateless session reads both as ground truth.
+**Before.** A session finishes a task, moves it to Done and stamps the iteration validated and closed; the evidence is the session's own say-so. The commit goes in green, and the next stateless session reads it as ground truth.
 
-**After.** Neither commit lands:
+**After.** The battery reds on the claim. This is `demo`'s third act as it prints, trimmed of its remedy, help and spec text:
+
+<!-- demo-proof:begin -->
 
 ```text
-===== check-md-refs =====
-check-md-refs: dangling reference in the governed doc set
-  docs/guide.md:71 -> SPEC.md §Retry budget — no such section
-FAIL: check-md-refs
-===== check-stage-evidence =====
-check-stage-evidence: a task reached Done with no validate stamp this iteration
-FAIL: check-stage-evidence
+  An agent reports task add-login-page done: it moves the task to Done and stamps
+  validate and close for iteration first-release, but no test run was ever recorded.
+
+  | ===== check-evidence-manifest =====
+  | EVIDENCE-MANIFEST: 1 issue(s) coupling .workflow/validate-evidence.txt to .workflow/WORKFLOW-STATE.txt:
+  |   iteration 'first-release' has a validate stamp but no evidence line — validate ran and recorded nothing
+  |   FAIL: check-evidence-manifest (exit 1)
+  → caught. Registered as a hook, this would have refused the commit.
 ```
+
+<!-- demo-proof:end -->
 
 Nothing there is a review opinion. Each finding is cheap and mechanically decidable, which is what earns it the right to block a commit rather than open a thread; the semantic residue stays with the human or the agent, undiluted.
 
 That is what **verification under delegation** means, and it is the prerequisite for scaling agent [orchestration](orchestration.md) past the point where a human reads every hop: coordination is only worth parallelizing once each coordinated result is checkable.
 
-The enforcement core carries no harness dependency. No gate reads a harness surface, so the battery runs under any coding-agent harness, any CI, or none. Only the always-loaded convention adapts, riding whichever agent file your harness reads by configuration rather than a port, per the [tiered compatibility claim](positioning.md#the-tiered-compatibility-claim).
-
-These pages orient and sequence. They own no contracts — each contract lives in the kit that enforces it, and a page here cites downward rather than restating an invariant.
+Which harnesses it runs under, and what adapts to yours: the [tiered compatibility claim](positioning.md#the-tiered-compatibility-claim).
 
 ## Start here
 
@@ -65,7 +79,7 @@ These pages orient and sequence. They own no contracts — each contract lives i
 3. [Value](value.md) — what each kit enforces set against what it costs your context budget, joined from the registries; drills down to the [enforcement map](enforcement.md) and the [footprint](footprint.md).
 4. [Coupling graph](check-graph.html) — which content surfaces each gate binds together, emitted from the per-gate manifests.
 5. The [Kit Reference](kits.md) — one page per kit, in reading order.
-6. [Roadmap](https://github.com/checkwright/checkwright/blob/master/ROADMAP.md) — where the project is heading and what moves an item, generated from the queue entries a maintainer marked for the page and freshness-gated on every commit.
+6. [Roadmap](https://github.com/checkwright/checkwright/blob/master/ROADMAP.md) — where the project is heading and what moves an item.
 7. [Announcing Checkwright](posts/2026-07-09-announcing-checkwright.md) — the launch note.
 
 ## The kits
@@ -74,7 +88,7 @@ One page per kit, in reading order — each kit assumes the machinery of the one
 
 ## Positioning
 
-Where Checkwright sits against practices you may already run — one page per angle, positioning only, each owning no contract and citing the enforcing kit downward.
+Where Checkwright sits against practices you may already run, one page per angle.
 
 - [Where Checkwright sits](positioning.md) — the layer model: Checkwright as layer-4 content beneath a closed harness prompt, plus its tiered harness-compatibility claim and memory-off position.
 - [Domain-driven design](ddd.md) — Checkwright as the enforcement layer for a ubiquitous language: banned synonyms, comment and naming directives, and one home per definition.

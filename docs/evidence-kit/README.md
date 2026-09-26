@@ -11,7 +11,7 @@ A held-constant test baseline and a committed per-run evidence manifest for the 
 
 The gates: `check-evidence-baseline` (baseline grammar, blocking-slug liveness, scenario coverage, flip causation), `check-evidence-manifest` (manifest grammar and, where lifecycle drives the tree, close-entry green block + validate-stamp coupling), `check-battery-roster` (the runner doc's battery block against the suite roster) and `check-producer-liveness` (no stage entry while the producer is still running). The tools that drive it are both non-gate arms of the gate binary, reached through gate-sdk's front end: `--run-validate` (the codified spine that runs the suites and records evidence) and `--diff-baseline` (the situational runtime diff). See [SPEC.md](SPEC.md) for the full contracts.
 
-This file ships in the installer payload, which withholds each kit's `SPEC.md` and its `smoke/`. Every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
+This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is gate-sdk/SPEC.md §Consumer payload.
 
 ## Install
 

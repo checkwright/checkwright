@@ -17,7 +17,7 @@ Enforcement runs in three concentric tiers, each an outer backstop for the one i
 
 The design contracts, the manifest grammar, and each component's full contract live in [SPEC.md](SPEC.md).
 
-This file ships in the installer payload, which withholds each kit's `SPEC.md` and its `smoke/`. Every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (SPEC.md §Consumer payload).
+This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is SPEC.md §Consumer payload.
 
 ## Quick start
 

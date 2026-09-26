@@ -22,8 +22,7 @@ A gate earns its place only when it is cheap, rarely wrong, and guards a real fa
 
 ## The enforcement core carries no harness dependency
 
-<!-- measured: gate-substrates=native -->
-The part that does the blocking (the gate battery) is a prebuilt binary, with bash left in the library and tooling around it, over a coreutils toolchain. No gate reads a harness surface, so the enforcement core runs under any coding-agent harness, under any CI, or under no harness at all: there is no harness dependency in the layer that must be trustworthy. The shaping layer (the always-loaded convention the agent reads each session) rides whichever agent file your harness already loads (`CLAUDE.md`, `AGENTS.md`, or another) by configuration rather than a port, and that path is exercised by a shipped smoke, not merely asserted. Only the harness-native skill bindings and settings residue are adapter work. The honest, tiered split — what is portable, what is configurable, and what stays harness-native — is drawn on [Where Checkwright sits](positioning.md#the-tiered-compatibility-claim).
+What runs under any harness, what rides configuration and what stays harness-native is drawn once, on [Where Checkwright sits](positioning.md#the-tiered-compatibility-claim).
 
 ## Why kits
 

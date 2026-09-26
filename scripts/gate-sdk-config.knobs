@@ -9,6 +9,9 @@ GATE_SDK_GRAPH_EXTERNAL_REFS = https://checkwright.dev https://github.com/checkw
 # spec: gate-sdk/SPEC.md §Layout and configuration — where this project publishes the SPEC sections its shipped gate pointers name. The value is the publisher's own and never a kit literal, which is why it lives here beside the host the external-ref sanction already carries: the packer stamps it into the payload and init writes it into a vendored tree's own knob seam, so a consumer whose kit SPECs the payload withholds still reaches the invariant a red gate names
 GATE_SDK_SPEC_BASE_URL = https://checkwright.dev
 
+# spec: gate-sdk/SPEC.md §check-kit-registration — this repo's kit registry is the Kit Reference page; the root README points at it rather than restating it
+GATE_SDK_REGISTRY_DOC = docs/kits.md
+
 # spec: gate-sdk/SPEC.md §check-shellcheck — this repo ships shell under no kit root: the installer's two bootstraps, its consumer smoke, the runnable adoption walkthrough, and the hosted one-line install script `docs/install.sh`, the only direct `*.sh` member of `docs`; name them so the lint that governs every other script in the tree governs these too. Each directory is named on its own because the gate globs *.sh per named directory and does not descend
 GATE_SDK_LINT_EXTRA_DIRS = installer/bin installer/consumer-smoke demo docs
 

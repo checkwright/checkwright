@@ -18,7 +18,7 @@ The toolchain the battery *does* assert, with its version floors, is on the inst
 
 From a clean git repository, at its root, run the one line for your system on the install page: [macOS and Linux](https://checkwright.dev/install.html#macos-and-linux) or [Windows](https://checkwright.dev/install.html#windows). The Release tarball recipe below it is the step-by-step alternative. Either unpacks outside the repository, because `init` refuses a worktree that is not clean.
 
-With Node already present the same install is one command, `npx checkwright init` — same payload, same `init`, same `checkwright.lock`; only the fetch differs.
+With Node already present the same install is one command, `npx checkwright init` — same payload, same `init`, same `checkwright.lock`; only the fetch differs. `npx checkwright init --profile prose` picks a profile (§Choosing a profile below), and `npx checkwright demo` shows the adoption arc in a scratch repository first, without touching yours ([what it runs](https://checkwright.dev/install.html#install)).
 
 `init` vendors the selected profile's kit directories, writes a `gates.list` seeded with each kit's starting gates alongside the config seam those kits need, and makes **one commit** naming the profile and the version. It ends by printing the commands that finish the setup, each with its reason — deliberately not copied here, because what `init` prints is `init`'s to say (`installer/SPEC.md` §init).
 

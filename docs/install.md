@@ -7,13 +7,15 @@ nav_order: 3
 
 This page gets the kits into your repository, keeps them current, and takes them out again. Checkwright is vendored: `init` copies the kit source into your tree and commits it, so what governs your repository is committed and reviewable. The gate binary is the one compiled piece, and it is checked against a published digest before anything runs.
 
-Pick your system below. One line downloads a release, checks it against its published digest, unpacks it outside your repository, and runs `init`, with no runtime to install first. The same steps follow it one at a time. With Node on the machine, `npx checkwright init` does the same install in one command (§With Node). See the [footprint page](footprint.md) for what each kit costs your agent's context.
+Pick your system below. See the [footprint page](footprint.md) for what each kit costs your agent's context.
 
 ## Install
 
 <!-- install-primary: tarball -->
 
-Start from a clean git repository. The one line installs the newest release. For the step-by-step recipe, pick a version from the [releases](https://github.com/checkwright/checkwright/releases) page and put it in place of `X.Y.Z`, once, on the recipe's first line.
+Start from a clean git repository. One line downloads the newest Release tarball, checks it against its published digest, unpacks it outside your repository, and runs `init`, with no runtime to install first. The step-by-step recipe after it does the same one step at a time: pick a version from the [releases](https://github.com/checkwright/checkwright/releases) page and put it in place of `X.Y.Z`, once, on the recipe's first line. With Node on the machine, `npx checkwright init` does the same install in one command (§With Node).
+
+**Try it first.** `demo` in place of `init` runs the whole arc in a scratch repository of its own and removes it, without touching yours: it installs the `full` profile, runs the battery green, commits a task marked done with no evidence behind it and shows the claim caught, then withdraws the claim and runs green again. Its spellings are `sh -s -- demo` on the macOS and Linux line or the script-block form with `demo` on Windows; with Node, `npx checkwright demo`. `full` owes `bash` 4.3 or later (§Requirements). On stock macOS run the Homebrew bash block below first; on Windows, the `PATH` block.
 
 ### macOS and Linux
 
@@ -120,13 +122,13 @@ Verify as above. To uninstall, run the same last line with `uninstall` in place 
 
 ### With Node
 
-`npx checkwright init` runs the same `init` from the npm package, and it carries a build attestation the tarball cannot ([installer/SPEC.md](installer/SPEC.md#the-dependency-boundary)). `npx checkwright demo` runs the whole arc in a scratch repository first.
+`npx checkwright init` runs the same `init` from the npm package, and it carries a build attestation the tarball cannot ([installer/SPEC.md](installer/SPEC.md#the-dependency-boundary)).
 
 ### Choosing a profile
 
-`init` vendors the kits, writes a `gates.list` and the config files they read, records the install in `checkwright.lock`, and makes one commit. It ends by printing the commands that finish the setup; run them. Add `demo` in place of `init` to watch the whole arc — install, a green battery, one mistyped link caught, the fix — in a scratch repository first; it installs nothing.
+`init` vendors the kits, writes a `gates.list` and the config files they read, records the install in `checkwright.lock`, and makes one commit. It ends by printing the commands that finish the setup; run them.
 
-Choose a profile with `--profile`:
+Choose a profile with `--profile`. With none, a first install takes `starter` and a re-run keeps the profile the install recorded:
 
 - `starter` — the gate SDK on its own;
 - `delegation` — adds the kits for agent sessions;
@@ -137,7 +139,7 @@ Moving to a profile that contains yours only adds. `init` refuses outside a git 
 
 ## Managing
 
-`checkwright <verb>` below means the one line with `<verb>` as its argument, the last line of your install recipe with `<verb>` in place of `init`, or `npx checkwright <verb>`. Each verb answers in its exit status, so a CI step can gate on it.
+`checkwright <verb>` below means the one line with `<verb>` as its argument (`sh -s -- <verb>` on macOS and Linux, the script-block form on Windows, since `irm … | iex` takes none), the last line of your install recipe with `<verb>` in place of `init`, or `npx checkwright <verb>`. Each verb answers in its exit status, so a CI step can gate on it.
 
 - `checkwright doctor` checks this machine against §Requirements and reports what is installed.
 - `checkwright diff` lists the vendored files you have changed. Exit `0` means none.

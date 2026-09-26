@@ -120,7 +120,7 @@ if staged_matches '*scripts/gates.list' 'gate-sdk/checks/*.sh' 'canon-kit/checks
     run_gate check-kit-enum native/target/release/checkwright-gates check-kit-enum
 fi
 
-if staged_matches '*README.md' 'gate-sdk/gate-tests/*' 'canon-kit/gate-tests/*' 'context-kit/gate-tests/*' 'delegation-kit/gate-tests/*' 'doctrine-kit/gate-tests/*' 'drift-kit/gate-tests/*' 'evidence-kit/gate-tests/*' 'guard-kit/gate-tests/*' 'lifecycle-kit/gate-tests/*' 'queue-kit/gate-tests/*' 'site-kit/gate-tests/*' 'scripts/gate-sdk-config.knobs' 'native/src/gates/kit_registration.rs' 'native/src/programs.rs'; then
+if staged_matches '*docs/kits.md' 'gate-sdk/gate-tests/*' 'canon-kit/gate-tests/*' 'context-kit/gate-tests/*' 'delegation-kit/gate-tests/*' 'doctrine-kit/gate-tests/*' 'drift-kit/gate-tests/*' 'evidence-kit/gate-tests/*' 'guard-kit/gate-tests/*' 'lifecycle-kit/gate-tests/*' 'queue-kit/gate-tests/*' 'site-kit/gate-tests/*' 'scripts/gate-sdk-config.knobs' 'native/src/gates/kit_registration.rs' 'native/src/programs.rs'; then
     run_gate check-kit-registration native/target/release/checkwright-gates check-kit-registration
 fi
 

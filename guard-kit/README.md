@@ -4,7 +4,7 @@ Permission-friction reduction for coding-agent sessions. A `PreToolUse` guard de
 
 Why: a command no allowlist entry matches is decided **out of band** — by interrupting a human, or by a model asked to judge the call — and that decision is invisible to the agent either way, so it cannot notice, count, or fix the friction it causes. The cost is paid per call, out of the operator's attention or out of latency and tokens, and compounds as the command surface grows. The kit closes the loop by making the fall-through set — exactly the commands nothing granted — the one thing that *is* recorded. See [SPEC.md](SPEC.md) for the framework, the generic ruleset, what the steering buys, and the triage criterion.
 
-This file ships in the installer payload, which withholds each kit's `SPEC.md` and its `smoke/`. Every `SPEC.md` link on this page is repointed at the location `GATE_SDK_SPEC_BASE_URL` names when the payload is packed; with no base set the link stays relative (gate-sdk/SPEC.md §Consumer payload).
+This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is gate-sdk/SPEC.md §Consumer payload.
 
 Most of what guard-kit ships is not a gate: its surfaces are hook members of the gate binary and templates. It registers exactly one, which holds the door binding its own steer messages and its settings templates depend on — and, over the surfaces `GUARD_KIT_DOOR_ROOTS` names, holds a door on your own pages to a declared audience.
 

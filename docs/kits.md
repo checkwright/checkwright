@@ -6,7 +6,7 @@ nav_order: 5
 
 # Kit Reference
 
-One page per kit. Each page orients and sequences; it owns no contract — the contract lives in the kit that enforces it, and the page cites downward.
+One page per kit.
 
 ## The kits
 

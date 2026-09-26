@@ -2,7 +2,7 @@
 
 ## Iteration: done-claim-demo
 
-  The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [README.md](README.md) maps the kits.
+  The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
 ---
 
@@ -19,16 +19,6 @@ the runner and library sections of gate-sdk/SPEC.md under §Per-component contra
 **Promoted as debt, split from spec-brevity-residue — operator direction 2026-09-26, lead-relayed (not a /consult ruling):** the moves run under gates that already exist and add no name. The cut is the one an adopter reads first: the runner, its library and the upgrade path.
 
 **Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-26 at scope from spec-brevity-residue, filed 2026-09-25; the word census is this scope's survey record.
-
-### front-door-demo-unreachable
-
-the front door's install-and-demo block cannot be followed as printed, and its proof block matches no install path. `docs/index.md` (the same block on `README.md`) prints the curl and irm one-liners, then says "`demo` in place of `init`" — but neither printed line contains `init`, and a verb reaches the shell installer only through `sh -s -- demo` (`docs/install.sh` usage line) or the PowerShell scriptblock form (`docs/install.ps1`); only the npx line on the page carries a working demo spelling. "What that buys you" then shows battery output no path produces: `check-stage-evidence` is `# install: on-surface`, so `init` never registers it; the default profile is `starter` (gate-sdk only) while `check-md-refs` is canon-kit's; and the printed strings match neither `md_refs.rs`'s nor `runner.rs`'s real output. `demo` installs `full`, which owes bash ≥ 4.3 (installer/SPEC.md §demo), so it is refused on stock macOS and on Windows without the PATH step, and no page says so. The uninstall one-liner needs `CHECKWRIGHT_VERSION` set, unsaid on the index.
-
-**Deliverable:** one demo-first block on the index and README carrying all three spellings and the bash note, then the install block with all three spellings and a pointer for arguments; the proof block replaced by output captured from a real `demo` act 3 (the consumer smoke's demo arm is the source) or labelled illustrative with the profile and setup that produce it; docs/install.md's four demo descriptions collapsed to one paragraph under §Install, its default profile stated, and its irm-with-argument sentence corrected; `installer/README.md` showing `npx checkwright demo` and `--profile`. The eight cross-page restatement clusters the audit mapped (opener trio, one-liner summary, demo description, harness independence, "this page owns no contract", payload-withholding paragraph, roadmap provenance, kit rosters) each take one owner and the rest point — the cluster map is in this entry's filing commit.
-
-**Promoted 2026-09-26 at scope, operator direction lead-relayed (not a /consult ruling):** its proof block is captured from `demo-catches-a-done-claim`'s new act 3, so it lands with or after that entry. Re-verified at scope: `docs/index.md` still reads "`demo` in place of `init`" under one-liners carrying no `init`.
-
-**Cost while deferred:** every first-time visitor is handed an instruction they cannot run and a proof they cannot reproduce, on the two pages that decide whether they try it. Filed 2026-09-25 by consult as a direct entry, from a customer-docs validity audit the operator directed; the operator had flagged the block as confusing on reading it.
 
 ### derived-count-literal-in-queue-unscanned
 
@@ -224,7 +214,7 @@ a narrow external preview before any broad announcement: a preview cohort whose 
 
 **Refused, grounds carried forward:** parking behind `native-windows-bash-floor` (landed 2026-09-18) or the git-only-floor discharge (the trigger is what the preview measures); the icebox (the highest cost-while-deferred in the intake).
 
-**Held deferred 2026-09-26 at scope, operator direction lead-relayed (not a ruling):** re-offered at the next scope, after [front-door-demo-unreachable](#front-door-demo-unreachable) and `demo-catches-a-done-claim` repair the front door the cohort would meet.
+**Held deferred 2026-09-26 at scope, operator direction lead-relayed (not a ruling):** re-offered at the next scope, after `front-door-demo-unreachable` and `demo-catches-a-done-claim` repair the front door the cohort would meet.
 
 **Consult recommendation, 2026-09-25:** promote at the next scope. The enhancement admission filter that gated the queue behind the Deferred drain is retired, the tree half has read zero since it landed, and every adoption claim in the landscape refresh is queued behind an observed install; the binding cost is operator hours, which a scope can schedule beside a tree unit.
 
@@ -1382,6 +1372,7 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 ## Done
 
+- front-door-demo-unreachable
 - demo-catches-a-done-claim
 - spec-narration-unratcheted
 

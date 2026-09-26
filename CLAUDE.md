@@ -1,6 +1,6 @@
 # CLAUDE.md — Checkwright
 
-Checkwright packages a coding-agent-assisted delivery methodology as installable kits; the kit map is [README.md](README.md). The **local-only, untracked** companion brief `BRIEF.local.md` carries the seam boundary, identity/namespace ownership and forward design memory — read it before roadmap or seam work.
+Checkwright packages a coding-agent-assisted delivery methodology as installable kits; the kit map is [docs/kits.md](docs/kits.md). The **local-only, untracked** companion brief `BRIEF.local.md` carries the seam boundary, identity/namespace ownership and forward design memory — read it before roadmap or seam work.
 
 This repo is public: no local paths, private repo/project names, accounts, or internal session/commit references in tracked files or commit messages — including the harness's default `Claude-Session:` commit trailer.
 

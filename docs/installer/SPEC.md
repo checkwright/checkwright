@@ -570,6 +570,7 @@ The value arm's fix is the link and never the corpus. The tree the second run se
 
 - exit 0 and the `DEMO: clean` line;
 - a `FAIL:` verdict line between the act 3 and act 4 banners, so the red is read from the output rather than inferred from the verb's own exit;
+- every line of the `demo-proof` block on `docs/index.md` present in that output, so the front page's act 3 is a copy this run re-reads rather than a transcript that drifts;
 - that consumer's tree object and `git status --porcelain` identical before and after;
 - the `DEMO_TMP_DIR` directory empty afterwards;
 - `checkwright demo extra` refused at exit 2 with the usage line.
