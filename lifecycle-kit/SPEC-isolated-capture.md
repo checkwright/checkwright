@@ -11,7 +11,7 @@
 **Measured at authoring (2026-09-26):**
 
 - **Both arms anchor on their own top level.** `grep -n "anchored" native/src/emit/file_gap.rs native/src/emit/file_survey.rs` shows the inbox resolved at `file_gap.rs:104`, the record at `file_survey.rs:108`, and `anchored` resolving against `walk::toplevel_opt` (`file_survey.rs:42-60`). No tracked-record writer calls `anchored_capture`.
-- **The only other `anchored` caller is a reader.** `grep -rn "file_survey::anchored" native/src` finds `native/src/emit/install_evidence.rs`, which reads `DRIFT_KIT_INSTALL_RECORD` to render a projection and writes no record.
+- **The only other `anchored` caller is a reader.** `grep -rn "file_survey::anchored(" native/src` — the open paren excludes `anchored_capture` — finds only the three `file_gap.rs` call sites above and `native/src/emit/install_evidence.rs`, which reads `DRIFT_KIT_INSTALL_RECORD` to render a projection and writes no record.
 - **A harness isolation worktree is a linked worktree of the main clone.** `git worktree list` during this session showed an isolated child's worktree under `.claude/worktrees/agent-<id>` beside the main checkout, which is the shape `main_checkout_root` answers `Some` for.
 
 ## What changes
