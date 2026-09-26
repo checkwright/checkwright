@@ -13,3 +13,10 @@
 - rev: 2c6490910fd56ea8ee34c6323c2fe8002a954adc
 - finding: demo is route-advertised at 10 sites: README.md 14, 18, 22; docs/index.md 19, 23, 27; docs/install.md 18 (twice), 44; installer/README.md 21. Every other route token is a released verb (init, doctor, diff, update, uninstall), a flag (--profile, --help), or the <verb> placeholder at docs/install.md 142.
 - inferred: none
+
+## 2026-09-26 build — Which facts do other tracked surfaces cite into gate-sdk/SPEC.md's meta-gate sections (check-gate-output through check-gate-exemption-tasks, less check-crate-arms)?
+- corpus: . ':(exclude)docs/gate-sdk/SPEC.md' ':(exclude)docs/check-graph.html'
+- oracle: git grep -n for each section name spelled with its section sign, read against the section text
+- rev: b294fd5f7ff1326a55e2f02f05d9daa16da1e269
+- finding: Every citing site resolves to a stated sentence except implementation comments in native/src/gates citing literal regex or awk spellings the prose states only as policy, and native/src/hook/stop_liveness.rs citing check-test-hermetic for a scratch-root naming fact the section never held. Outside the slice, gate-sdk/SPEC.md cites check-install-disposition for live-tree parity proved (criterion 4), check-gate-assertions for its self-auditing port, and run-gate-tests cited a version-skew residual assertion B no longer carries.
+- inferred: none
