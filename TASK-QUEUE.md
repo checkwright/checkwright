@@ -44,6 +44,18 @@ a post-stamp commit by a superseded stage session is outside every gate: the ind
 
 **Cost while deferred:** a stale session can commit into a stage it no longer holds. Filed 2026-08-31; returned from the icebox 2026-09-25 by consult as a machinery-class exception voided by the rule.
 
+### crate-tests-windows-failures
+
+[spec: SPEC-windows-crate-tests.md]
+
+the crate's unit tests fail 37 of 1166 on both Windows triples (run 36254992168: 1128 passed, 37 failed, 1 ignored, the same set on x86_64 and aarch64). Judged against gate-sdk/SPEC.md §The path-dialect contract, 32 are test portability, 2 are a gap in the Windows job's environment (no ShellCheck), and 3 are product defects at two printed spellings. The filing's four classes missed eleven `hook::stop_liveness` shebang-stub failures, which have nothing to do with bash resolution.
+
+**Deliverable:** the six fix classes of the amendment, until one `crate-tests-windows` run is green on both triples.
+
+**Taken into this iteration 2026-09-26 at spec, operator direction lead-relayed (not a /consult ruling):** the unit set widened to include this entry, with the per-class calls left to the amendment; [crate-tests-windows-flip](#crate-tests-windows-flip) stays Deferred.
+
+**Cost while deferred:** [crate-tests-windows-flip](#crate-tests-windows-flip) stays blocked, and a new Windows regression is one warning among 37. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's build off the job's first run; promoted 2026-09-26 at its close on the lead's decision that the reporting-only job leaves nothing red this iteration: →fix fails because four failure classes each need a portability-versus-defect call. Re-verified at the drain: run 36226045247's x86_64 annotation reads `37 test(s) FAILED`. Owner lookup: `crate-tests`, `backslash`, `WSL launcher` in this file — [harness-project-dir-fold-dialect-unresolved](#harness-project-dir-fold-dialect-unresolved) is a guard fold, unrelated; owner gate-sdk/SPEC.md §check-crate-arms.
+
 ## Technical Debt
 
 ### gate-sdk-tooling-brevity
@@ -681,16 +693,6 @@ the native crate's unit tests run on x86_64 Linux (the battery) and on the two W
 **Deliverable:** a `cargo test` leg per remaining triple, or a stated ruling in gate-sdk/SPEC.md §check-crate-arms that those triples need none.
 
 **Cost while deferred:** a platform-specific regression on those hosts reaches no test. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's spec; promoted 2026-09-26 at its close: →fix fails because a new CI leg is a unit scope must admit. Re-verified at the drain: `git grep 'cargo test' .github/workflows` returns only `crate-tests-windows`. Owner lookup: `cargo test`, `unit tests`, `apple-darwin`, `aarch64-unknown` in this file — none; owner gate-sdk/SPEC.md §check-crate-arms.
-
-### crate-tests-windows-failures
-
-[cost: event/high] [surface: native]
-
-the crate's unit tests fail 37 of 1151 on both Windows triples (first `crate-tests-windows` run, identical set on x86_64 and aarch64). Four classes: tests asserting slash-joined paths where Windows joins with a backslash (drift_report plugin path, enter_stage wipe names, four knobs refusal texts, four proc resolution cases, install and installer::recipe queue_source); a `bash` spawned by bare name reaching the System32 WSL launcher or a non-Win32 image (ere's bash oracle, walk's gate_path_rooted parity, ten hook::stop_liveness cases, knobs::gate_sdk's pre-binary accessors, main.rs's source-stamp shell parity); emit::rewrite's sandbox seeding an illegal Windows filename (eight cases); and gates::tests' programs and roots observations, where `check-action-run-shell` exits 2 on its good fixture.
-
-**Deliverable:** each failure triaged as a test-portability fix or a product defect and fixed, until one run is green on both triples.
-
-**Cost while deferred:** [crate-tests-windows-flip](#crate-tests-windows-flip) stays blocked, and a new Windows regression is one warning among 37. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's build off the job's first run; promoted 2026-09-26 at its close on the lead's decision that the reporting-only job leaves nothing red this iteration: →fix fails because four failure classes each need a portability-versus-defect call. Re-verified at the drain: run 36226045247's x86_64 annotation reads `37 test(s) FAILED`. Owner lookup: `crate-tests`, `backslash`, `WSL launcher` in this file — [harness-project-dir-fold-dialect-unresolved](#harness-project-dir-fold-dialect-unresolved) is a guard fold, unrelated; owner gate-sdk/SPEC.md §check-crate-arms.
 
 ### crate-tests-windows-flip
 
