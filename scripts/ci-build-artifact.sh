@@ -43,6 +43,79 @@ bash gate-sdk/bin/build-native.sh --target "$target"
 out="$outdir/$target"
 mkdir -p "$out"
 cp "$crate/target/$target/release/$binary" "$out/$binary"
+
+# spec: gate-sdk/SPEC.md §Consumer payload — the artifact's OS floor is measured and held equal to the floor the platforms table declares for its target, before any digest exists, so a refused artifact never gets a sidecar
+platforms_page=docs/install.md
+
+floor_refuse() {
+    printf 'floor %s: %s\n' "$target" "$1" >&2
+    exit 1
+}
+
+# spec: docs/site-architecture.md §Generated projections and their freshness gates — the row whose first backticked run is the target, and the declared floor token in it
+row="$(awk -v t="$target" '
+    /^<!-- platforms:begin -->$/ { inb = 1; next }
+    /^<!-- platforms:end -->$/   { inb = 0; next }
+    inb && /^[ \t]*\|/ && !done && match($0, /`[^`]+`/) {
+        if (substr($0, RSTART + 1, RLENGTH - 2) == t) { print; done = 1 }
+    }
+' "$platforms_page")"
+[ -n "$row" ] || floor_refuse "$platforms_page's platforms table has no row for this target, so a built target exceeds what the page declares"
+
+floor_token() {
+    printf '%s\n' "$row" | awk -v lead="$1 " '{
+        if (match($0, lead "[0-9][0-9.]*")) print substr($0, RSTART + length(lead), RLENGTH - length(lead))
+    }'
+}
+
+# spec: gate-sdk/SPEC.md §Consumer payload — compared as numbers with trailing zero components dropped, so 11 equals 11.0
+floor_cmp_awk='function cmp(a, b,   x, y, n, m, k, i) {
+    n = split(a, x, "."); m = split(b, y, "."); k = n > m ? n : m
+    for (i = 1; i <= k; i++) if (x[i] + 0 != y[i] + 0) return (x[i] + 0 < y[i] + 0) ? -1 : 1
+    return 0
+}'
+
+case "$target" in
+    *-unknown-linux-gnu) floor_lead=glibc floor_tool=readelf ;;
+    *-apple-darwin)      floor_lead=macOS floor_tool=otool ;;
+    *)                   floor_lead='' floor_tool='' ;;
+esac
+if [ -z "$floor_tool" ]; then
+    echo "floor $target: declared only, measured nothing"
+else
+    declared="$(floor_token "$floor_lead")"
+    [ -n "$declared" ] || floor_refuse "its $platforms_page row states no '$floor_lead <version>' Minimum, so there is nothing to hold the artifact to"
+    command -v "$floor_tool" >/dev/null 2>&1 || floor_refuse "'$floor_tool' is not on PATH, so the artifact's floor cannot be measured"
+    if [ "$floor_tool" = readelf ]; then
+        measured="$(readelf -V --wide "$out/$binary" | awk "$floor_cmp_awk"'
+            /^Version needs section/ { inb = 1; next }
+            /^Version .* section/    { inb = 0 }
+            inb {
+                for (i = 1; i <= NF; i++) if ($i ~ /^GLIBC_[0-9]/) {
+                    v = substr($i, 7)
+                    if (best == "" || cmp(v, best) > 0) best = v
+                }
+            }
+            END { print best }
+        ')"
+    else
+        measured="$(otool -l "$out/$binary" | awk '
+            $1 == "cmd" { mode = $2 }
+            found == "" && mode == "LC_BUILD_VERSION" && $1 == "minos" { found = $2 }
+            found == "" && mode == "LC_VERSION_MIN_MACOSX" && $1 == "version" { found = $2 }
+            END { print found }
+        ')"
+    fi
+    [ -n "$measured" ] || floor_refuse "'$floor_tool' found no $floor_lead floor in the artifact, and the step never passes unmeasured"
+    if ! awk -v a="$measured" -v b="$declared" "$floor_cmp_awk"' BEGIN { exit cmp(a, b) != 0 }'; then
+        floor_refuse "the artifact needs $floor_lead $measured while $platforms_page declares $floor_lead $declared.
+  Pin this target's runner in native/runners.list to an image with the older library, or
+  raise the row's Minimum cell to $floor_lead $measured, a support narrowing the release
+  declaration surface declares under Behavior changes."
+    fi
+    echo "floor $target: $floor_lead $measured measured, equal to the declared $floor_lead $declared"
+fi
+
 if command -v sha256sum >/dev/null 2>&1; then
     ( cd "$out" && sha256sum "$binary" > "$binary.sha256" )
 else

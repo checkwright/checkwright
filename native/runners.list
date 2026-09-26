@@ -57,6 +57,8 @@
 # `ubuntu-latest` install-smoke-sh-linux leg: their subject is the platform an
 # adopter meets today (.github/workflows/gates.yml's macOS leg header). The
 # first witness of a migrated image is the first gates run whose leg logs it.
+# A ride that raises an artifact's OS floor reds the shared build body
+# (scripts/ci-build-artifact.sh), which is where pin-or-raise is decided.
 # Every other Linux job in .github/workflows/ builds and measures no adopter
 # platform, so it PINS `ubuntu-24.04`: a `-latest` label moves it with no tree
 # edit and, through a weeks-long rollout, varies run to run. Move those pins as
