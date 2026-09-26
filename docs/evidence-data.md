@@ -228,3 +228,4 @@
 | porting-records-brevity | sc sp a b v c | 1f/2d | 1 · ≤0d | 21s clean | 135 |
 | native-contracts-brevity | sc sp a b v c | 5f/0d | 3 · ≤0d | 21s clean | 136 |
 | done-claim-demo | sc sp a b v c | 3f/0d | 2 · ≤0d | 28s 1✗ | 136 |
+| front-door-release | sc sp a b v c | 4f/2d | 2 · ≤0d | 21s clean | 137 |
