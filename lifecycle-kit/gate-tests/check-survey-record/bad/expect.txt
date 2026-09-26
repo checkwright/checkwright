@@ -4,4 +4,5 @@ expected the '- oracle:' line here, found '- rev:'
 valve carries no reason
 empty inferred
 block is missing its '- inferred:' line
+corpus word (all carries a character the shell or git would read
 help:

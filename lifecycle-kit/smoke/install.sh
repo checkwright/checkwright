@@ -73,11 +73,11 @@ cat > .workflow/WORKFLOW-STATE.txt <<EOF
 EOF
 
 # spec: lifecycle-kit/SPEC.md §check-survey-record — file a real block off the seed commit so the
-# gate's registration exercises its actual grammar + rev-existence assertions, not the absent-record
+# gate's registration exercises its actual grammar, rev-existence and corpus-match assertions, not the absent-record
 # inert pass (the optional-surface case that gate is designed never to redden on)
 bash "$SDK/bin/run-gates.sh" --emit file-survey \
     "smoke: does a freshly vendored install leave a survey record check-survey-record can parse" \
-    ".workflow/survey-record.md" \
+    "." \
     "bash gate-sdk/bin/run-gates.sh --for .workflow/survey-record.md" \
     "none" \
     "yes — a filed block naming the seed commit parses clean" >/dev/null
@@ -301,7 +301,7 @@ cmp -s "$av/record.before" "$av/record.md" \
 
 # spec: lifecycle-kit/SPEC.md §The survey record — the other half of that seam: a SET consumer knob
 # actually reaches the arm's write, which the refusal above cannot show
-emit_run file-survey "smoke: does a set record knob reach the arm" c o e f >/dev/null
+emit_run file-survey "smoke: does a set record knob reach the arm" . o e f >/dev/null
 grep -q -- '— smoke: does a set record knob reach the arm$' "$av/record.md" \
     || { echo "smoke(argv): a set LIFECYCLE_KIT_SURVEY_RECORD_FILE did not reach the file-survey arm" >&2; exit 1; }
 

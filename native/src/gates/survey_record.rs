@@ -1,11 +1,130 @@
 // spec: lifecycle-kit/SPEC.md §check-survey-record — every survey block carries its whole
-// witness: the five keys in order, a full-sha rev naming a real commit, a non-empty corpus
-// and a non-empty oracle and inferred
+// witness: the five keys in order, a full-sha rev naming a real commit, a corpus in the grammar
+// whose pathspecs match at that rev, and a non-empty oracle and inferred
 use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
 const WANT: [&str; 5] = ["corpus", "oracle", "rev", "finding", "inferred"];
+
+// spec: lifecycle-kit/SPEC.md §The survey record — `corpus` is spliced verbatim into a shell-run
+// witness, so a pathspec the shell or git would read rather than receive is quoted
+#[derive(Debug, PartialEq)]
+pub enum Corpus {
+    None,
+    Pathspecs(Vec<String>),
+}
+
+fn needs_quote(c: char) -> bool {
+    c.is_whitespace() || "'\"\\`$|&;<>(){}!#~*?[]".contains(c)
+}
+
+// spec: lifecycle-kit/SPEC.md §The survey record — the grammar the capture arm and this gate
+// both hold: the literal `none` alone, or space-separated pathspecs, single-quoted where needed
+pub fn parse_corpus(value: &str) -> Result<Corpus, String> {
+    let chars: Vec<char> = value.chars().collect();
+    let mut words: Vec<(String, bool)> = Vec::new();
+    let mut i = 0usize;
+    while i < chars.len() {
+        if chars[i].is_whitespace() {
+            i += 1;
+            continue;
+        }
+        if chars[i] == '\'' {
+            let Some(len) = chars[i + 1..].iter().position(|&c| c == '\'') else {
+                return Err(format!(
+                    "corpus opens a single quote it never closes: {}",
+                    chars[i..].iter().collect::<String>()
+                ));
+            };
+            let inner: String = chars[i + 1..i + 1 + len].iter().collect();
+            i += len + 2;
+            if inner.is_empty() {
+                return Err("corpus carries an empty quoted pathspec ''".to_string());
+            }
+            if i < chars.len() && !chars[i].is_whitespace() {
+                return Err(format!(
+                    "corpus pathspec '{}' runs into the next character — separate pathspecs with a space",
+                    inner
+                ));
+            }
+            words.push((inner, true));
+            continue;
+        }
+        let start = i;
+        while i < chars.len() && !chars[i].is_whitespace() {
+            i += 1;
+        }
+        let word: String = chars[start..i].iter().collect();
+        if word.starts_with(':') || word.chars().any(needs_quote) {
+            return Err(format!(
+                "corpus word {} carries a character the shell or git would read (a quote, a shell metacharacter, a glob character or pathspec magic) — single-quote a pathspec that needs it, and move scoping prose to 'finding'",
+                word
+            ));
+        }
+        words.push((word, false));
+    }
+    if words.iter().any(|(w, quoted)| !quoted && w == "none") {
+        return if words.len() == 1 {
+            Ok(Corpus::None)
+        } else {
+            Err("corpus puts 'none' beside a pathspec — 'none' stands alone, for a survey over no tree corpus".to_string())
+        };
+    }
+    if words.is_empty() {
+        return Err("empty corpus — the witness has no pathspec to diff".to_string());
+    }
+    Ok(Corpus::Pathspecs(words.into_iter().map(|(w, _)| w).collect()))
+}
+
+fn git_in<'a>(dir: Option<&'a str>, rest: &[&'a str]) -> Vec<&'a str> {
+    let mut argv: Vec<&str> = match dir {
+        Some(d) => vec!["-C", d],
+        None => Vec::new(),
+    };
+    argv.extend_from_slice(rest);
+    argv
+}
+
+// spec: lifecycle-kit/SPEC.md §The survey record — every pathspec matches a path in the tree at
+// `rev`; each is probed alone, because an exclude or a glob beside a matching pathspec would
+// otherwise ride its neighbour's match
+pub fn unmatched(dir: Option<&str>, rev: &str, pathspecs: &[String]) -> Result<Vec<String>, String> {
+    let hashed = proc::run_with_stdin(
+        &programs::GIT,
+        &git_in(dir, &["hash-object", "-t", "tree", "--stdin"]),
+        b"",
+    )?;
+    let empty = match hashed.stdout() {
+        Some(o) => String::from_utf8_lossy(o).trim().to_string(),
+        None => {
+            return Err(format!(
+                "git could not name the empty tree to probe the corpus against: {}",
+                hashed.failure_report().unwrap_or_default()
+            ))
+        }
+    };
+    let mut missed = Vec::new();
+    for p in pathspecs {
+        let c = proc::run(
+            &programs::GIT,
+            &git_in(dir, &["diff-tree", "-r", "--quiet", &empty, rev, "--", p]),
+        )?;
+        match c.code() {
+            Some(1) => {}
+            Some(0) => missed.push(p.clone()),
+            _ => {
+                return Err(format!(
+                    "git could not resolve the corpus pathspec '{}' at {}: {}",
+                    p,
+                    rev,
+                    c.failure_report().unwrap_or_default()
+                ))
+            }
+        }
+    }
+    Ok(missed)
+}
 
 fn is_space(c: char) -> bool {
     c == ' ' || c == '\t' || c == '\r' || c == '\u{b}' || c == '\u{c}'
@@ -65,7 +184,10 @@ struct Block {
     keys: Vec<(String, String, usize)>,
     tokens: Vec<(usize, String)>,
     exempt: bool,
+    corpus: Option<(usize, Vec<String>)>,
 }
+
+type RevProbe = (usize, String, Option<(usize, Vec<String>)>);
 
 fn finish(
     blk: &mut Option<Block>,
@@ -148,7 +270,7 @@ pub fn run(args: &[String]) -> i32 {
     };
 
     let mut raw: Vec<(usize, String)> = Vec::new();
-    let mut revs: Vec<(usize, String)> = Vec::new();
+    let mut revs: Vec<RevProbe> = Vec::new();
     let mut tokens: Vec<(usize, String)> = Vec::new();
     let mut blocks = 0usize;
     let mut blk: Option<Block> = None;
@@ -161,6 +283,7 @@ pub fn run(args: &[String]) -> i32 {
                 keys: Vec::new(),
                 tokens: Vec::new(),
                 exempt: false,
+                corpus: None,
             });
             blocks += 1;
             continue;
@@ -185,8 +308,12 @@ pub fn run(args: &[String]) -> i32 {
             continue;
         };
         b.keys.push((key.clone(), val.clone(), fnr));
-        if key == "corpus" && val.is_empty() {
-            raw.push((fnr, "empty corpus — the witness has no pathspec to diff".to_string()));
+        if key == "corpus" {
+            match parse_corpus(&val) {
+                Ok(Corpus::Pathspecs(ps)) => b.corpus = Some((fnr, ps)),
+                Ok(Corpus::None) => {}
+                Err(e) => raw.push((fnr, e)),
+            }
         }
         if key == "oracle" && val.is_empty() {
             raw.push((fnr, "empty oracle — write the grounding command, or the literal 'none' (which marks the block a note, not a re-usable survey)".to_string()));
@@ -198,7 +325,7 @@ pub fn run(args: &[String]) -> i32 {
         }
         if key == "rev" {
             if is_full_sha(&val) {
-                revs.push((fnr, val));
+                revs.push((fnr, val, b.corpus.clone()));
             } else {
                 raw.push((fnr, format!("rev is not a full 40-hex sha: '{}'", val)));
             }
@@ -221,20 +348,36 @@ pub fn run(args: &[String]) -> i32 {
     // wrong-rev case the 40-hex shape cannot: a sha the tree does not carry makes
     // 'git diff <rev>..HEAD' fail rather than witness anything
     let mut probed = 0usize;
+    let mut matched = 0usize;
     let mut tokens_probed = 0usize;
     if probe_rev {
-        for (line, rev) in &revs {
+        for (line, rev, corpus) in &revs {
             let spec = format!("{}^{{commit}}", rev);
             let ok = proc::run(&programs::GIT, &["cat-file", "-e", &spec])
                 .map(|c| c.stdout().is_some())
                 .unwrap_or(false);
-            if ok {
-                probed += 1;
-            } else {
+            if !ok {
                 findings.push(format!(
                     "{}:{}: rev names no commit in this repository: {}",
                     record, line, rev
                 ));
+                continue;
+            }
+            probed += 1;
+            // spec: lifecycle-kit/SPEC.md §check-survey-record — the arm's filing probe repeated
+            // against the commit the block names, once that commit has resolved
+            let Some((corpus_line, pathspecs)) = corpus else { continue };
+            match unmatched(None, rev, pathspecs) {
+                Ok(missed) => {
+                    matched += pathspecs.len() - missed.len();
+                    for p in missed {
+                        findings.push(format!(
+                            "{}:{}: corpus pathspec '{}' matches no path at rev {} — the witness would certify a corpus it never read",
+                            record, corpus_line, p, rev
+                        ));
+                    }
+                }
+                Err(e) => findings.push(format!("{}:{}: {}", record, corpus_line, e)),
             }
         }
         // spec: lifecycle-kit/SPEC.md §check-survey-record — the same probe over a wider corpus:
@@ -263,18 +406,18 @@ pub fn run(args: &[String]) -> i32 {
         for f in &findings {
             println!("  {}", f);
         }
-        println!("  help: each '## <date> <stage> — <question>' block carries exactly five lines — '- corpus:', '- oracle:', '- rev:', '- finding:', '- inferred:' — in that order, with a non-empty corpus, a non-empty oracle (the literal 'none' is the honest form for a survey no oracle grounds), a full 40-hex rev naming a real commit, and a non-empty inferred listing each claim the survey reasoned to without running a command (the literal 'none' for a survey that inferred nothing). Every git-object-shaped token in the other four fields must name a real object too — an identifier you did not read is not a citation — and one that names none on purpose takes a '<!-- survey-token-exempt: <reason> -->' line on its block, reason mandatory. File blocks with 'bash gate-sdk/bin/run-gates.sh --emit file-survey \"<question>\" \"<corpus>\" \"<oracle>\" \"<inferred>\" \"<finding>\"', which stamps the rev itself.");
+        println!("  help: each '## <date> <stage> — <question>' block carries exactly five lines — '- corpus:', '- oracle:', '- rev:', '- finding:', '- inferred:' — in that order, with a corpus that is either the literal 'none' (a survey over no tree corpus) or space-separated git pathspecs — single-quoted where one carries a quote, a shell metacharacter, a glob character or pathspec magic — each matching a path in the tree at rev, scoping prose going to the finding, a non-empty oracle (the literal 'none' is the honest form for a survey no oracle grounds), a full 40-hex rev naming a real commit, and a non-empty inferred listing each claim the survey reasoned to without running a command (the literal 'none' for a survey that inferred nothing). Every git-object-shaped token in the other four fields must name a real object too — an identifier you did not read is not a citation — and one that names none on purpose takes a '<!-- survey-token-exempt: <reason> -->' line on its block, reason mandatory. File blocks with 'bash gate-sdk/bin/run-gates.sh --emit file-survey \"<question>\" \"<corpus>\" \"<oracle>\" \"<inferred>\" \"<finding>\"', which stamps the rev itself.");
         return 1;
     }
 
     if probe_rev {
         println!(
-            "SURVEY-RECORD: clean ({} block(s) in {}; grammar holds, {} rev(s) name a real commit and {} cited token(s) name a real object)",
-            blocks, record, probed, tokens_probed
+            "SURVEY-RECORD: clean ({} block(s) in {}; grammar holds, {} rev(s) name a real commit, {} corpus pathspec(s) match a path at their rev and {} cited token(s) name a real object)",
+            blocks, record, probed, matched, tokens_probed
         );
     } else {
         println!(
-            "SURVEY-RECORD: clean ({} block(s) in {}; grammar holds — hermetic file argument, so no rev-existence probe)",
+            "SURVEY-RECORD: clean ({} block(s) in {}; grammar holds — hermetic file argument, so neither the rev-existence nor the corpus-match probe)",
             blocks, record
         );
     }

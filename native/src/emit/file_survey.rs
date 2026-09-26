@@ -2,6 +2,7 @@
 // survey, the grammar stamped by the producer rather than by its author.
 // spec: gate-sdk/SPEC.md §The non-gate arm — a table member and not a hardcoded flag, because the
 // arm reads two consumer knobs, which a hardcoded flag would hide from the knob-file derivation.
+use crate::gates::survey_record::{self, Corpus};
 use crate::programs;
 use crate::stages;
 use crate::walk;
@@ -102,7 +103,19 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     let (question, corpus, oracle, inferred, finding) = (
         &fields[0], &fields[1], &fields[2], &fields[3], &fields[4],
     );
+    let shape = survey_record::parse_corpus(corpus).map_err(|e| format!("{}\n{}", e, USAGE))?;
     let rev = head_rev()?;
+    if let Corpus::Pathspecs(pathspecs) = &shape {
+        let missed = survey_record::unmatched(None, &rev, pathspecs)
+            .map_err(|e| format!("{} — nothing was filed\n{}", e, USAGE))?;
+        if !missed.is_empty() {
+            return Err(format!(
+                "corpus pathspec(s) matching no path tracked at HEAD: {} — scoping prose belongs in the finding, and a survey over no tree corpus takes the corpus none\n{}",
+                missed.iter().map(|p| format!("'{}'", p)).collect::<Vec<_>>().join(" "),
+                USAGE
+            ));
+        }
+    }
     let stage = stage()?;
     let today = super::kpi::today_iso();
     let (record, spelled) = anchored("LIFECYCLE_KIT_SURVEY_RECORD_FILE")?;
@@ -127,6 +140,11 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         eprintln!(
             "file-survey: oracle \"none\" — this block is a note, not a re-usable survey: a later \
              stage may read it for orientation and must re-derive before relying on it."
+        );
+    } else if shape == Corpus::None {
+        eprintln!(
+            "file-survey: the witness a later stage runs — corpus none, so re-run: {}",
+            oracle
         );
     } else {
         eprintln!(
@@ -185,6 +203,74 @@ mod tests {
         assert!(emit(&argv(&["q", "c", "o", "i"])).is_err());
         assert!(emit(&argv(&["q", "c", "o", "", "f"])).is_err());
         assert!(emit(&argv(&[])).is_err());
+    }
+
+    fn ps(a: &[&str]) -> Corpus {
+        Corpus::Pathspecs(argv(a))
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The survey record — the accepted forms: bare paths, `.`, a quoted
+    // glob, a quoted exclude, and `none` alone
+    #[test]
+    fn the_corpus_grammar_accepts_quoted_pathspecs_and_none_alone() {
+        assert_eq!(survey_record::parse_corpus("TASK-QUEUE.md gate-sdk/SPEC.md"), Ok(ps(&["TASK-QUEUE.md", "gate-sdk/SPEC.md"])));
+        assert_eq!(survey_record::parse_corpus("."), Ok(ps(&["."])));
+        assert_eq!(survey_record::parse_corpus("'*.gate'  ':!docs'"), Ok(ps(&["*.gate", ":!docs"])));
+        assert_eq!(survey_record::parse_corpus("'a dir/x y.md'"), Ok(ps(&["a dir/x y.md"])));
+        assert_eq!(survey_record::parse_corpus("none"), Ok(Corpus::None));
+        assert_eq!(survey_record::parse_corpus("'none'"), Ok(ps(&["none"])));
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The survey record — each grammar refusal, and the arm refusing
+    // before it reads HEAD or writes anything
+    #[test]
+    fn the_corpus_grammar_refuses_prose_open_quotes_and_none_beside_a_pathspec() {
+        for bad in [
+            "TASK-QUEUE.md (all sections)",
+            "*/SPEC.md",
+            ":!docs",
+            "'open",
+            "'a'b",
+            "''",
+            "none TASK-QUEUE.md",
+            "",
+        ] {
+            assert!(survey_record::parse_corpus(bad).is_err(), "{:?} parsed", bad);
+            let err = emit(&argv(&["q", bad, "o", "i", "f"])).expect_err("a bad corpus was filed");
+            assert!(err.contains("usage: --emit file-survey"), "no usage on {:?}: {}", bad, err);
+        }
+    }
+
+    fn git(dir: &str, args: &[&str]) -> String {
+        let mut a: Vec<&str> = vec!["-C", dir, "-c", "user.name=t", "-c", "user.email=t@t", "-c", "commit.gpgsign=false"];
+        a.extend_from_slice(args);
+        let out = crate::proc::run(&programs::GIT, &a).expect("git runs");
+        String::from_utf8_lossy(out.stdout().unwrap_or_else(|| panic!("git {:?} failed", args))).trim().to_string()
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The survey record — every pathspec matches a path at the rev,
+    // probed one at a time, so magic and globs resolve and prose words are named back
+    #[test]
+    fn each_pathspec_must_match_a_path_at_the_rev() {
+        let dir = std::env::temp_dir().join(format!("cw-survey-corpus-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(dir.join("docs")).unwrap();
+        std::fs::create_dir_all(dir.join("kit")).unwrap();
+        std::fs::write(dir.join("TASK-QUEUE.md"), "q\n").unwrap();
+        std::fs::write(dir.join("docs/page.md"), "d\n").unwrap();
+        std::fs::write(dir.join("kit/a.gate"), "g\n").unwrap();
+        let d = walk::normalize_abs(&dir.display().to_string());
+        git(&d, &["init", "-q"]);
+        git(&d, &["add", "."]);
+        git(&d, &["commit", "-q", "-m", "seed"]);
+        let rev = git(&d, &["rev-parse", "HEAD"]);
+        let missed = survey_record::unmatched(
+            Some(&d),
+            &rev,
+            &argv(&["TASK-QUEUE.md", ".", ":!docs", "*.gate", ":(glob)**/*.md", "kit/", "the", "survey"]),
+        );
+        let _ = std::fs::remove_dir_all(&dir);
+        assert_eq!(missed, Ok(argv(&["the", "survey"])));
     }
 
     // spec: lifecycle-kit/SPEC.md §The survey record — `-h`/`--help` retires to the front-end, and

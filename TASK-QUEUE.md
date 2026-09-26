@@ -8,18 +8,6 @@
 
 ## New Features
 
-### survey-witness-composed-from-unvalidated-corpus
-
-[spec: SPEC-survey-corpus.md] [recurrence: 2026-09-25]
-
-`--emit file-survey` composes its witness from the raw corpus argument: `file_survey.rs` builds the oracle over whatever corpus string it was handed, so a prose corpus yields a witness that passes vacuously — `git diff --quiet` over prose exits 0, and the record certifies "unchanged" for a corpus nothing measured.
-
-**Deliverable:** the corpus grammar (shell-quoted pathspecs each matching a tracked path, or `none`) stated in lifecycle-kit/SPEC.md §The survey record, the arm refusing a corpus outside it, and `check-survey-record` holding it with a bad fixture. The icebox neighbour is not folded in; the amendment says why.
-
-**Taken for /spec 2026-09-26 at capture-integrity-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set B, authored with [isolated-tracked-capture-lost](#isolated-tracked-capture-lost), which changes the same capture arms; the icebox's [survey-oracle-liveness-unasserted](#survey-oracle-liveness-unasserted) neighbours the corpus grammar and may fold in.
-
-**Cost while deferred:** a later stage buys a survey on a witness that was never an oracle. Filed 2026-09-06; returned from the icebox 2026-09-25 by consult on a reproduced false clean.
-
 ### isolated-tracked-capture-lost
 
 [spec: SPEC-isolated-capture.md]
@@ -1403,5 +1391,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 The consumer's local-only companion files (private brief, ops runbook) have read triggers but no write-back trigger, so shipped-unit forward memory and an out-of-tree state verifier drift until a consult audits them; owed are close and release-sweep template slots for both, and a retired-slug arm over plain code on the local-only globs.
 
 ## Done
+
+- survey-witness-composed-from-unvalidated-corpus
 
 ## Lessons Learned
