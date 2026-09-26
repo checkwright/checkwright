@@ -22,6 +22,8 @@ no CI leg ran the native crate's unit tests on native Windows, so a unit test pi
 
 **Landed 2026-09-26, run unread:** the job and the merged amendment landed in the build commit that stated each half's CI spelling in gate-sdk/SPEC.md §check-crate-arms. That commit moved the entry to Done before its run was read, so it is restored here until the read is recorded.
 
+**Run read 2026-09-26, the first push of the iteration:** on both triples 1113 tests pass, 37 fail and 1 is ignored, the same failing set on each. The job took under three minutes per triple against its 30-minute timeout, off the critical path. Each triple raised its one warning annotation naming the count and the first ten failures, as specified. The capture-drain tests, this entry's first instance, pass on both. The 37 failures are filed to the gap inbox for triage.
+
 **Cost while deferred:** a Windows adopter's close drain could fail with exit 2, and nobody sees it until an adopter reports it. Filed 2026-09-25 to the gap inbox by spec-brevity-first-slice's build; promoted 2026-09-25 at its close.
 
 ## Deferred
