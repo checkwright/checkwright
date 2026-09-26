@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### gate-sdk-native-brevity
-
-the native-substrate sections of gate-sdk/SPEC.md: §The non-gate arm and §The port-candidate criteria under §Porting a gate to the binary substrate, and §port-blockers, §build-native and §check-crate-arms under §Per-component contracts; about 25.7k words. The rest of §Per-component contracts stays on [spec-brevity-residue](#spec-brevity-residue).
-
-**Deliverable:** the three moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) applied to those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm. A contract sentence stays, including a fact a sibling entry or another SPEC cites there.
-
-**Promoted as debt, split from spec-brevity-residue — operator direction 2026-09-26, lead-relayed (not a /consult ruling):** the moves run under gates that already exist and add no name.
-
-**Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-26 at scope from spec-brevity-residue, filed 2026-09-25.
-
 ### crate-tests-unrun-on-windows
 
 [observed-by: gates.yml crate-tests-windows]
@@ -406,7 +396,7 @@ the secondary customer pages carry validity slips and undefined internal vocabul
 
 [cost: session/high] [surface: gate-sdk]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk's remainder (§Per-component contracts, less the subsections [gate-sdk-native-brevity](#gate-sdk-native-brevity) takes; its framework, remainder and porting slices landed as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity` and `gate-sdk-porting-brevity`), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk's remainder (§Per-component contracts; its framework, remainder, porting and native-contracts slices landed as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity` and `gate-sdk-native-brevity`), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
@@ -1377,5 +1367,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - hook-members-off-test-floor
 - foreign-toolchain-docker-legs
 - release-asset-claim-class-owner
+- gate-sdk-native-brevity
 
 ## Lessons Learned
