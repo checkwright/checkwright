@@ -427,7 +427,11 @@ pub fn run(args: &[String]) -> i32 {
 mod tests {
     use super::*;
 
+    // spec: gate-sdk/SPEC.md §The crate's crosser — `canonical` is the producer's answer as `run`
+    // hands it to `execute`, compared only against the operands' own canonical answers; `root` is
+    // its stripped spelling, the one the seeds are composed from
     struct Sandbox {
+        canonical: String,
         root: String,
     }
 
@@ -436,11 +440,9 @@ mod tests {
             let dir = std::env::temp_dir().join(format!("cw-rewrite-{}-{}", tag, std::process::id()));
             let _ = std::fs::remove_dir_all(&dir);
             std::fs::create_dir_all(&dir).expect("cannot create the sandbox");
-            Sandbox {
-                root: crate::walk::canonicalize(&dir)
-                    .map(|c| crate::walk::normalize_abs(crate::walk::strip_extended_prefix(&c)))
-                    .expect("the sandbox must resolve"),
-            }
+            let canonical = crate::walk::canonicalize(&dir).expect("the sandbox must resolve");
+            let root = crate::walk::normalize_abs(crate::walk::strip_extended_prefix(&canonical));
+            Sandbox { canonical, root }
         }
         fn file(&self, name: &str, body: &[u8]) -> String {
             let p = crate::walk::child(std::path::Path::new(&self.root), name).display().to_string();
@@ -451,7 +453,7 @@ mod tests {
             let argv: Vec<String> = args.iter().map(|s| s.to_string()).collect();
             let (mut out, mut err) = (Vec::new(), Vec::new());
             let never = |_: &str| Ok(false);
-            let rc = execute(&argv, &self.root, &never, &mut out, &mut err);
+            let rc = execute(&argv, &self.canonical, &never, &mut out, &mut err);
             (
                 rc,
                 String::from_utf8_lossy(&out).into_owned(),
@@ -566,7 +568,7 @@ mod tests {
         let argv: Vec<String> = ["x", "y", f.as_str()].iter().map(|s| s.to_string()).collect();
         let (mut out, mut err) = (Vec::new(), Vec::new());
         let broken = |_: &str| Err("no knob".to_string());
-        assert_eq!(execute(&argv, &sb.root, &broken, &mut out, &mut err), 2);
+        assert_eq!(execute(&argv, &sb.canonical, &broken, &mut out, &mut err), 2);
         assert_eq!(read(&f), b"x\n");
     }
 

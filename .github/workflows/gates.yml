@@ -1769,6 +1769,12 @@ jobs:
           "$dir/shellcheck.exe" --version
           echo "$win" >> "$GITHUB_PATH"
 
+      # gate-sdk/SPEC.md §check-crate-arms: the registry-coverage tests spawn the
+      # host binary, which `cargo test --target` never builds.
+      - name: build the host gate binary the registry-coverage tests spawn
+        shell: bash
+        run: bash gate-sdk/bin/build-native.sh
+
       - name: run the crate's unit tests for ${{ matrix.target }}
         shell: bash
         env:

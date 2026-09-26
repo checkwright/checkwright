@@ -900,10 +900,11 @@ mod tests {
     ];
 
     // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — one bash over the whole cross product,
-    // every pattern and subject crossing in argv, never interpolated into the script
-    const BASH_CAPTURE: &str = r#"n=$1; shift
-subjects=("${@:1:n}"); shift "$n"
-for p in "$@"; do
+    // every pattern and subject crossing on stdin, never interpolated into the script
+    const BASH_CAPTURE: &str = r#"mapfile -t in
+n=${in[0]}
+subjects=("${in[@]:1:n}")
+for p in "${in[@]:n+1}"; do
   for s in "${subjects[@]}"; do
     [[ $s =~ $p ]]; rc=$?
     if [ "$rc" -eq 0 ]; then printf 'm\t%s\t%s\n' "${BASH_REMATCH[0]}" "${BASH_REMATCH[1]}"
@@ -921,14 +922,20 @@ done"#;
                 }
             }
         }
-        let n = CAPTURE_SUBJECTS.len().to_string();
-        let mut argv: Vec<&str> = vec!["-c", BASH_CAPTURE, "_", &n];
-        argv.extend(CAPTURE_SUBJECTS.iter().copied());
-        argv.extend(patterns.iter().map(String::as_str));
-        let out = crate::proc::run_with_env(
+        let mut input = format!("{}\n", CAPTURE_SUBJECTS.len());
+        for line in CAPTURE_SUBJECTS.iter().copied().chain(patterns.iter().map(String::as_str)) {
+            assert!(!line.contains('\n'), "a case crossing stdin must be one line: {:?}", line);
+            input.push_str(line);
+            input.push('\n');
+        }
+        let out = crate::proc::run_with_stdin_in(
             &crate::programs::BASH,
-            &argv,
-            &[("LC_ALL".to_string(), "C".to_string())],
+            &["-c", BASH_CAPTURE],
+            input.as_bytes(),
+            &crate::proc::ChildEnv {
+                set: &[("LC_ALL".to_string(), "C".to_string())],
+                ..Default::default()
+            },
         )
         .expect("cannot run bash — the differential oracle is not optional");
         let stdout = out
