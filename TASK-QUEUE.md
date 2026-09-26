@@ -8,18 +8,6 @@
 
 ## New Features
 
-### ci-one-line-action
-
-[spec: SPEC-ci-action.md] [roadmap: next/adoption] [observed-by: this repository's gates workflow on a master push] [roadmap-summary: Wire the gate battery into CI in one line, with reds annotated on the pull request.]
-
-the CI story is a copy-out template: `gate-sdk/templates/gates-workflow.yml` exists, `init` does not seed it, no versioned Action lets a workflow say `uses:` in one line, and the battery emits no SARIF, so a red never reaches the pull-request checks tab as an annotation. The template also runs the committed binary, which is the installing host's target, so a tree installed on macOS fails its first Linux run. Same-seat entrants ship an Action and SARIF (consult's landscape refresh, 2026-09-25).
-
-**Deliverable:** a composite Action at `installer/action.yml`, running the release its tree's lock names through `docs/install.sh`; `init` seeding a workflow that calls it, SHA-pinned; the runner writing SARIF under an environment-only knob, uploaded by the Action; the installer's consumer smoke holding the seed and gate-sdk's kit smoke reading the SARIF log.
-
-**Promoted 2026-09-26 at spec:** the filing's "references by tag" is a full-SHA ref with the tag as a trailing comment, the form check-action-pinning holds. The SARIF "arm" is a `--run` reporting knob, because the Action pays one download per binary execution. Contract owners are corrected in the amendment. It spans gate-sdk and installer.
-
-**Push need (2026-09-26, operator direction lead-relayed, ruling set B at front-door-release's scope with the overrun stated):** one mid-iteration push, since only a remote run executes the Action. With the closing push, the v0.26.0 tag push, and the push of the post-tag drain commit that moves the hosted pin, the set needs 4 against a budget of 2. The fourth was granted by the operator's direction at spec (2026-09-26, lead-relayed), so `demo` works on the live front door this iteration.
-
 ## Technical Debt
 
 ### gate-sdk-meta-gate-brevity
@@ -1385,5 +1373,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 ## Done
 
 - front-door-verb-unreleased
+- ci-one-line-action
 
 ## Lessons Learned

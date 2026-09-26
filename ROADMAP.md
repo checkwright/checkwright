@@ -27,7 +27,6 @@ Adoption evidence, mostly. A rung promotes when someone hits the friction it des
 
 ### next
 
-- [ci-one-line-action](TASK-QUEUE.md#ci-one-line-action) *(adoption)* — Wire the gate battery into CI in one line, with reds annotated on the pull request.
 - [plugin-marketplace](TASK-QUEUE.md#plugin-marketplace) *(ecosystem)* — The stage skills and guards installable as a harness plugin.
 - [companion-toolkit-profile](TASK-QUEUE.md#companion-toolkit-profile) *(ecosystem)* — Gate a tree whose specs another toolkit's workflow wrote.
 - [gate-authoring-sdk-surface](TASK-QUEUE.md#gate-authoring-sdk-surface) *(ecosystem)* — Author a gate in any language behind one substrate-neutral descriptor.
