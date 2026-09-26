@@ -26,16 +26,6 @@ when to state an absence, and how, is unruled, and the public ROADMAP.md prints 
 
 ## Technical Debt
 
-### entry-refusal-invites-evasion
-
-`check-stage-entry`'s refusal help for assertion C (cross-component audit trigger) and assertion D (inferred-claim residue) names the remedy but not the evasion, and a spec session took the evasion for both: it respelled a docs-mirror update target as prose so the roster token no longer resolved, where lifecycle-kit/SPEC.md §check-stage-entry names that case and its valve (a dispatcher `--waive` on an explicit user ruling); and it deleted an honest limit together with its `Inferred, not run` marker, leaving an overclaiming reason. The lead caught both by diff review; nothing mechanical did.
-
-**Deliverable:** assertion C's help (`native/src/gates/stage_entry.rs`) and the spec template's causal-completeness step state that respelling a roster token is not a remedy; assertion D's help states that a claim no delta rests on is kept as a documented honest limit rather than deleted; a fixture pins each help line.
-
-**Promoted as debt — operator direction 2026-09-26, lead-relayed (not a /consult ruling):** help text on rules the SPEC already states. Re-verified at scope: `stage_entry.rs`'s help lines carry no respell or honest-limit sentence.
-
-**Cost while deferred:** the next refused entry reads a help line that leaves the cheaper evasion open, and only a reviewing lead catches it. Filed 2026-09-25 to the gap inbox after powershell-scratch-runner's spec; promoted 2026-09-25 to Deferred at the next scope. `enter-stage-refusal-help-contradicts-its-guard` shares the surface; its subject is `--enter-stage`'s own refusal text.
-
 ## Deferred
 
 ### docs-liquid-literal-unseen
@@ -1401,6 +1391,7 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - crate-arms-relink-under-worker-pool
 - enforcement-first-load-trigger
 - enter-stage-refusal-help-contradicts-its-guard
+- entry-refusal-invites-evasion
 - gate-sdk-porting-brevity
 - runner-image-label-migration
 

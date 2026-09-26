@@ -10,11 +10,13 @@
 # drain entry (exit 1, named separately and citing its own remedy);
 # assertion C drives four
 # cross-component build-entry scenarios (2-dir amendments ±waiver,
-# single-amendment cross-component body, single-component amendment);
+# single-amendment cross-component body, single-component amendment) and
+# pins its help's respell-is-not-a-remedy line;
 # assertion D drives five build-entry marker scenarios (not-run red,
 # reasoned cannot-run clean with its count, a fenced, backticked mid-line and
 # templates/-stub mention all clean, a marker on an active queue entry red,
-# the same marker on a deferred entry clean); assertion E drives five
+# the same marker on a deferred entry clean) and pins its help's
+# keep-the-honest-limit line; assertion E drives five
 # marker-grammar scenarios, four at an align cursor (empty-reason red,
 # command-less not-run red, a bare mid-line and a line-split spelling each red
 # as misplaced, a well-formed not-run marker clean because residue is not
@@ -261,6 +263,7 @@ demo-iteration scope aaaaaaaa 2026-06-01 none
 demo-iteration build bbbbbbbb 2026-06-02 none
 EOF
 check_case "C3 single-amendment-cross-component" "$c3" 1 "cross-component amendment signal"
+check_case "C3 help-respell-not-a-remedy" "$c3" 1 "Respelling a body token so it stops resolving (a generated mirror named in prose, say) is not a remedy: the token is the amendment's reach"
 
 # C4 (good): a single-component amendment (own dir only) — no signal.
 c4="$SANDBOX/c4"
@@ -311,6 +314,7 @@ EOF
 # D1 (bad): a not-run marker — refused, naming the file and line.
 d_sandbox "$SANDBOX/d1" $'intro\n**Inferred, not run:** the arm refuses — `run-gates.sh --only x`'
 check_case "D1 not-run-marker" "$SANDBOX/d1" 1 "widget-service/SPEC-foo.md:2: **Inferred, not run:**"
+check_case "D1 help-keep-honest-limit" "$SANDBOX/d1" 1 "A claim no delta rests on keeps its honest limit, stated in prose, when the marker goes: never delete the limit with the marker"
 
 # D2 (good): a cannot-run marker with a reason — clean, the count in the detail.
 d_sandbox "$SANDBOX/d2" '- **Inferred, cannot run before build:** the gate reds — the gate is unwritten'

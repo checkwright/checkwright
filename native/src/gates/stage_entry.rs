@@ -630,12 +630,12 @@ pub fn run(args: &[String]) -> i32 {
             println!("  {}", e);
         }
         if c_fired {
-            println!("  help: a cross-component {} entry must run /{} (stamps '{} {} <session> <date> <head>'), or — on an explicit user ruling, never self-issued by the entering session — the dispatcher declares the waiver with '--enter-stage --dispatch {} --waive <the ruling>' and this entry then records its '{} {} <session> <date> <head>' line in {}", k.audit_entry_stage, k.audit_stage, iter, k.audit_stage, k.audit_entry_stage, iter, k.waiver, k.state_name);
+            println!("  help: a cross-component {} entry must run /{} (stamps '{} {} <session> <date> <head>'), or — on an explicit user ruling, never self-issued by the entering session — the dispatcher declares the waiver with '--enter-stage --dispatch {} --waive <the ruling>' and this entry then records its '{} {} <session> <date> <head>' line in {}. Respelling a body token so it stops resolving (a generated mirror named in prose, say) is not a remedy: the token is the amendment's reach", k.audit_entry_stage, k.audit_stage, iter, k.audit_stage, k.audit_entry_stage, iter, k.waiver, k.state_name);
         } else if ab_fired {
             println!("  help: a stage entry re-verifies the prior stage's static exit — invoke the predecessor skill (it stamps {}) and drain the active queue before entering {}", k.state_name, k.drain);
         }
         if d_fired {
-            println!("  help: at the stage the refused entry leaves the cursor at, run each marker's command, correct the passage or entry to what it returned and delete the marker — or rewrite it to '{} <claim> — <reason>' where the claim's subject does not exist until {}", CANNOT_RUN, k.audit_entry_stage);
+            println!("  help: at the stage the refused entry leaves the cursor at, run each marker's command, correct the passage or entry to what it returned and delete the marker — or rewrite it to '{} <claim> — <reason>' where the claim's subject does not exist until {}. A claim no delta rests on keeps its honest limit, stated in prose, when the marker goes: never delete the limit with the marker", CANNOT_RUN, k.audit_entry_stage);
         }
         if e_fired {
             println!("  help: a marker-grammar finding is fixed at its site, in the commit it refuses — write the missing ' — <command>' or ' — <reason>', move a misplaced marker to open its own line, or write a mention of the spelling in a code span (`{}`)", NOT_RUN);
