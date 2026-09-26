@@ -8,6 +8,44 @@
 
 ## New Features
 
+### crate-tests-unrun-on-windows
+
+[spec: SPEC-windows-crate-tests.md]
+
+no CI leg runs the native crate's unit tests on native Windows. `.github/workflows/gates.yml` only runs `cargo check` for the `x86_64-pc-windows-msvc` target, and no workflow runs `cargo test` at all, so a unit test pinning a Windows filesystem behaviour is not witnessed on Windows. First instance: `--emit capture-drain` renames a log that is still open for append, and gate-sdk/SPEC.md §The workflow directory records that as an unmeasured honest limit.
+
+**Deliverable:** a Windows leg that runs the crate's unit tests, or a narrower one running only the modules that pin a platform claim, with its cost against the push budget stated. Or a SPEC boundary note refusing the leg and keeping the honest limit.
+
+**Push need (2026-09-26, inside the budget):** one push, the closing one when the leg lands in the last build batch, since only a remote Windows run executes the leg.
+
+**Specified 2026-09-26:** a `crate-tests-windows` job runs the whole suite on each Windows triple, off the critical path. It reports rather than judges until a run is green, so the push need stays one. A failure reaches the run's annotations as one warning per triple, which close already reads, and build files the flip to the derived posture.
+
+**Cost while deferred:** a Windows adopter's close drain could fail with exit 2, and nobody sees it until an adopter reports it. Filed 2026-09-25 to the gap inbox by spec-brevity-first-slice's build; promoted 2026-09-25 at its close. →fix fails because a new CI leg is new mechanism, and only a push can witness it. Re-verified at the drain: `grep 'cargo test' .github/workflows/*.yml` returns nothing. Owner lookup: `cargo test`, `msvc`, `unit tests on` in this file — none; [foreign-toolchain-docker-legs](#foreign-toolchain-docker-legs) covers local pwsh and dash runs, not crate unit tests.
+
+### release-asset-claim-class-owner
+
+[spec: SPEC-release-assets.md] [recurrence: 2026-09-25]
+
+a "the release ships an asset" claim has no gate, and the class now has a second instance: gate-sdk/SPEC.md §Consumer payload, filed after this entry, alongside the install page's.
+
+**Deliverable:** an owner for the class (the release-note gate, or a §Consumer payload assertion the publish workflow's artifact list satisfies), with a fixture.
+
+**Specified 2026-09-26:** §Consumer payload declares the asset set in a `release-assets:` line, and a consumer-registered, born-native `check-release-assets` holds the line's grammar and the publish workflow's call at every commit. Inside `pack` at a tag, it holds the output directory to the line, so a mismatch fails before any Release exists. The newest published Release predates the archive scheme, so no monitor reads the published history.
+
+**Cost while deferred:** two public claims about what a release carries, held by nothing. Filed 2026-08-07; returned from the icebox 2026-09-25 by consult on the second instance.
+
+### foreign-toolchain-docker-legs
+
+[spec: SPEC-foreign-shells.md] [recurrence: 2026-09-25]
+
+this host lacks `pwsh` and `dash`, so the front-end parity check's PowerShell half and every dash-only path first run on CI. At gate-sdk-blind-spots, build changed `gate-sdk/bin/run-gates.ps1` and added a `.ps1` ASCII arm; the Windows legs at close's watched push were their first real run. They passed, but a red would have cost a second push. Docker is available on the development host; a cold daemon start took more than 120s.
+
+**Deliverable:** a contributor-local arm or documented recipe running the pwsh and dash suites in containers, skipping cleanly when Docker is absent. Contributor-only, never an adopter requirement (gate-sdk/SPEC.md §The adopter constraints).
+
+**Specified 2026-09-26:** an `Arm::Run`, `--with-foreign-shells <command>...`, copies `pwsh` and `dash` out of digest-pinned images and runs the command natively with them, and `sh` as dash, on `PATH`. A container run cannot start the host-built gate binary the suites spawn. It skips at exit 0 without Docker or off Linux. Measured at spec: the parity check and the installer smoke both ran clean that way on this host.
+
+**Cost while deferred:** a unit touching a PowerShell or dash path risks a second watched push. Filed 2026-09-23 to the gap inbox on an operator suggestion, lead-relayed, after gate-sdk-blind-spots' close; promoted 2026-09-23 at the next scope. Recurred 2026-09-25, when a build improvised a `pwsh` container shim the boundary wiped. Owner lookup: `docker`, `dash`, `pwsh` in this file — `pwsh` hits only `instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set`, whose subject is a CI leg's binding transition, not a local run.
+
 ## Technical Debt
 
 ### hook-members-off-test-floor
@@ -71,18 +109,6 @@ shell utilities an agent runs for read-only work can also write: `sed -i`, `find
 **Deliverable:** the arm roster that replaces each blocked read, the guard rules that steer to it, and the allowlist entries. New governed names, so it owes an amendment.
 
 **Cost while deferred:** a read-only shell call keeps a write path the guard must judge per call, and an isolated child's read set stays the interim allowlist. Filed 2026-09-23 to the gap inbox by the lead on an operator direction; the operator recalls earlier discussion and no tracked record was found. Promoted 2026-09-23 at seam-and-stage-residue's close drain: an initiative with new names, never a drain fix. Owner lookup: `side-effect`, `FENCE_SAFE`, `dual-use`, `sed -i` in this file — none. Surface also delegation-kit and gate-sdk.
-
-### foreign-toolchain-docker-legs
-
-[cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
-
-this host lacks `pwsh` and `dash`, so the front-end parity check's PowerShell half and every dash-only path first run on CI. At gate-sdk-blind-spots, build changed `gate-sdk/bin/run-gates.ps1` and added a `.ps1` ASCII arm; the Windows legs at close's watched push were their first real run. They passed, but a red would have cost a second push. Docker is available on the development host; a cold daemon start took more than 120s.
-
-**Deliverable:** a contributor-local arm or documented recipe running the pwsh and dash suites in containers, skipping cleanly when Docker is absent. Contributor-only, never an adopter requirement (gate-sdk/SPEC.md §The adopter constraints).
-
-**Cost while deferred:** a unit touching a PowerShell or dash path risks a second watched push. Filed 2026-09-23 to the gap inbox on an operator suggestion, lead-relayed, after gate-sdk-blind-spots' close; promoted 2026-09-23 at the next scope. Owner lookup: `docker`, `dash`, `pwsh` in this file — `pwsh` hits only `instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set`, whose subject is a CI leg's binding transition, not a local run.
-
-**Recurred 2026-09-25, and the recurrence left a working recipe in scratch that the boundary wipes.** `powershell-scratch-runner`'s build needed a local pwsh for the scratch runner's seam file and improvised one: the host's pwsh binary will not run inside the `mcr.microsoft.com/powershell` image (host glibc newer than the image's), so a `pwsh` shim on `PATH` ran the image's own pwsh — `docker run --rm -i --network none -v /tmp:/tmp -v "$PWD:$PWD" -w "$PWD" <image> pwsh "$@"`, the tree and `/tmp` mounted at their own paths so a path the runner hands the host resolves inside the container. That shim is this entry's deliverable in miniature; the dash half and the Docker-absent skip remain.
 
 ### retired-citation-referent-rule
 
@@ -552,16 +578,6 @@ a smoke that re-runs the battery inside its sandbox inherits no evidence-kit sco
 
 **Cost while deferred:** a false clean in the evidence record. Filed 2026-08-18; returned from the icebox 2026-09-25 by consult, the smoke re-grepped.
 
-### release-asset-claim-class-owner
-
-[cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
-
-a "the release ships an asset" claim has no gate, and the class now has a second instance: gate-sdk/SPEC.md §Consumer payload, filed after this entry, alongside the install page's.
-
-**Deliverable:** an owner for the class (the release-note gate, or a §Consumer payload assertion the publish workflow's artifact list satisfies), with a fixture.
-
-**Cost while deferred:** two public claims about what a release carries, held by nothing. Filed 2026-08-07; returned from the icebox 2026-09-25 by consult on the second instance.
-
 ### uninstall-artifact-ownership-asymmetry
 
 [cost: event/low] [surface: installer] [recurrence: 2026-09-25]
@@ -661,18 +677,6 @@ a gap bullet or survey block filed by an isolated read-only child is lost with i
 **Deliverable:** a ruling on the tracked capture channels under isolation: route the write to the main checkout, as `anchored_capture` does for gitignored capture, or refuse under isolation with a steer to hand the finding back. Then the arm change, a unit test from a linked worktree, and the sentence in the owning SPEC sections (lifecycle-kit/SPEC.md §The committed gap inbox and §The survey record).
 
 **Cost while deferred:** a finding an isolated audit child files through the sanctioned channel disappears silently, and its caller believes it was filed. Filed 2026-09-25 to the gap inbox by spec-brevity-first-slice's spec while surveying capture writers; promoted 2026-09-25 at its close. →fix fails because the two remedies change the arms' behaviour differently and need a ruling first. Re-verified at the drain: `file_gap.rs` and `file_survey.rs` call `anchored`, not `anchored_capture`. Owner lookup: `file-gap`, `file-survey`, `anchored`, `isolated child` in this file — none.
-
-### crate-tests-unrun-on-windows
-
-[cost: event/low] [surface: gate-sdk]
-
-no CI leg runs the native crate's unit tests on native Windows. `.github/workflows/gates.yml` only runs `cargo check` for the `x86_64-pc-windows-msvc` target, and no workflow runs `cargo test` at all, so a unit test pinning a Windows filesystem behaviour is not witnessed on Windows. First instance: `--emit capture-drain` renames a log that is still open for append, and gate-sdk/SPEC.md §The workflow directory records that as an unmeasured honest limit.
-
-**Deliverable:** a Windows leg that runs the crate's unit tests, or a narrower one running only the modules that pin a platform claim, with its cost against the push budget stated. Or a SPEC boundary note refusing the leg and keeping the honest limit.
-
-**Push need (2026-09-26, inside the budget):** one push, the closing one when the leg lands in the last build batch, since only a remote Windows run executes the leg.
-
-**Cost while deferred:** a Windows adopter's close drain could fail with exit 2, and nobody sees it until an adopter reports it. Filed 2026-09-25 to the gap inbox by spec-brevity-first-slice's build; promoted 2026-09-25 at its close. →fix fails because a new CI leg is new mechanism, and only a push can witness it. Re-verified at the drain: `grep 'cargo test' .github/workflows/*.yml` returns nothing. Owner lookup: `cargo test`, `msvc`, `unit tests on` in this file — none; [foreign-toolchain-docker-legs](#foreign-toolchain-docker-legs) covers local pwsh and dash runs, not crate unit tests.
 
 ### roadmap-horizon-motion-unowned
 
