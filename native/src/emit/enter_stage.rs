@@ -29,7 +29,9 @@ const UNNAMED: &str = "—";
 // terms and recover the same way, so the recovery is one string rather than two that must be
 // kept in step
 const HELP_PREFLIGHT: &str =
-    "resolve the finding above, or (to override deliberately) perform the stamp by hand.";
+    "resolve the finding above at its source and re-run enter-stage, or escalate it where it is \
+     not yours to clear. A hand-written stamp is the operator's override, never a session's: the \
+     workflow-state guard blocks it.";
 
 pub fn run(args: &[String]) -> i32 {
     match dispatch(args) {

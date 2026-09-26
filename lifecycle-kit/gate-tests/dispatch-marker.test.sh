@@ -133,6 +133,10 @@ before="$(state_of "$sb")"
 out="$(run_enter "$sb" build)"; rc=$?
 [[ "$rc" -eq 1 ]] || note waive-refused "want exit 1 from an entry missing its predecessor, got $rc -- $out"
 [[ "$(state_of "$sb")" == "$before" ]] || note waive-refused-state "a refused entry wrote the state file"
+grep -qF 'help: resolve the finding above at its source and re-run enter-stage, or escalate it' <<<"$out" \
+    || note waive-refused-help "the check-stage-entry refusal does not name the session's remedy: $out"
+grep -qF "A hand-written stamp is the operator's override, never a session's" <<<"$out" \
+    || note waive-refused-hand "the refusal does not rule the hand stamp out for a session: $out"
 [[ "$(cat "$sb/scratch/stage-dispatch.txt" 2>/dev/null)" == "build align-waived ruled" ]] \
     || note waive-refused-marker "a refused entry changed the marker: $(cat "$sb/scratch/stage-dispatch.txt" 2>/dev/null)"
 

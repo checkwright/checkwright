@@ -146,6 +146,8 @@ grep -qF "carries no 'armed' line for 'demo-iteration build'" <<<"$out" \
     || note unarmed-why "the refusal did not say the ledger carries no matching arming: $out"
 grep -qF 'only a later stage can clear' <<<"$out" \
     || note unarmed-cause "the refusal's valve help did not name its single sanctioned cause: $out"
+grep -qF "help: resolve the finding above at its source and re-run enter-stage, or escalate it where it is not yours to clear. A hand-written stamp is the operator's override, never a session's: the workflow-state guard blocks it." <<<"$out" \
+    || note unarmed-help "the pre-flight refusal's help is not the session's remedy: $out"
 
 # --- --simulate reports the would-be admission and leaves the ledger byte-identical ---
 sm="$(seed simulate 'demo-iteration build armed the reason a simulate must relay

@@ -26,16 +26,6 @@ when to state an absence, and how, is unruled, and the public ROADMAP.md prints 
 
 ## Technical Debt
 
-### enter-stage-refusal-help-contradicts-its-guard
-
-`--enter-stage`'s refusal (`enter_stage.rs`) advises performing the stamp by hand, the close binding says never to force the entry, and the workflow-state guard (`workflow_state.rs`) blocks the hand write.
-
-**Deliverable:** the refusal names the remedy the guard admits, and a fixture pins the text.
-
-**Promoted as debt — operator direction 2026-09-26, lead-relayed (not a /consult ruling):** the text converges on the guard the tree already carries. Re-verified at scope: the refusal constant still reads "perform the stamp by hand".
-
-**Cost while deferred:** the one line a refused adopter reads tells them to do what the hook blocks. Filed 2026-08-26; returned from the icebox 2026-09-25 by consult, the three surfaces re-read.
-
 ### entry-refusal-invites-evasion
 
 `check-stage-entry`'s refusal help for assertion C (cross-component audit trigger) and assertion D (inferred-claim residue) names the remedy but not the evasion, and a spec session took the evasion for both: it respelled a docs-mirror update target as prose so the roster token no longer resolved, where lifecycle-kit/SPEC.md §check-stage-entry names that case and its valve (a dispatcher `--waive` on an explicit user ruling); and it deleted an honest limit together with its `Inferred, not run` marker, leaving an overclaiming reason. The lead caught both by diff review; nothing mechanical did.
@@ -44,7 +34,7 @@ when to state an absence, and how, is unruled, and the public ROADMAP.md prints 
 
 **Promoted as debt — operator direction 2026-09-26, lead-relayed (not a /consult ruling):** help text on rules the SPEC already states. Re-verified at scope: `stage_entry.rs`'s help lines carry no respell or honest-limit sentence.
 
-**Cost while deferred:** the next refused entry reads a help line that leaves the cheaper evasion open, and only a reviewing lead catches it. Filed 2026-09-25 to the gap inbox after powershell-scratch-runner's spec; promoted 2026-09-25 to Deferred at the next scope. [enter-stage-refusal-help-contradicts-its-guard](#enter-stage-refusal-help-contradicts-its-guard) shares the surface; its subject is `--enter-stage`'s own refusal text.
+**Cost while deferred:** the next refused entry reads a help line that leaves the cheaper evasion open, and only a reviewing lead catches it. Filed 2026-09-25 to the gap inbox after powershell-scratch-runner's spec; promoted 2026-09-25 to Deferred at the next scope. `enter-stage-refusal-help-contradicts-its-guard` shares the surface; its subject is `--enter-stage`'s own refusal text.
 
 ## Deferred
 
@@ -1410,6 +1400,7 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 - crate-arms-relink-under-worker-pool
 - enforcement-first-load-trigger
+- enter-stage-refusal-help-contradicts-its-guard
 - gate-sdk-porting-brevity
 - runner-image-label-migration
 
