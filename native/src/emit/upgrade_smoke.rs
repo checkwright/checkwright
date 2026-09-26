@@ -960,6 +960,9 @@ mod tests {
                 .unwrap_or_else(|| panic!("git {:?} failed", args))
         };
         git(&["init", "-q", &m]);
+        // comment-tier-exempt: auto maintenance stays off, since the seed commit's detached run
+        // prunes the worktree admin dir below while it is still half-written
+        git(&["-C", &m, "config", "maintenance.auto", "false"]);
         git(&["-C", &m, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "--allow-empty", "-m", "seed"]);
         // spec: gate-sdk/SPEC.md §upgrade-smoke — the linked worktree is written as the three files
         // git reads, registering it in the scratch repository alone, never through a spawned add

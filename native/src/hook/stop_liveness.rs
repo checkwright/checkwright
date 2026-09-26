@@ -410,8 +410,8 @@ mod tests {
     const PAYLOAD: &str = r#"{"session_id":"s-1","transcript_path":"/x/y.jsonl","hook_event_name":"SubagentStop","stop_hook_active":false}"#;
     const CONTINUING: &str = r#"{"session_id":"s-1","hook_event_name":"SubagentStop","stop_hook_active":true}"#;
 
-    // spec: gate-sdk/SPEC.md §check-test-hermetic — one scratch root per case, named for the case,
-    // so parallel tests never share a run dir or a log
+    // comment-tier-exempt: one scratch root per case, named for the case, so parallel tests never
+    // share a run dir or a log
     struct Scratch(std::path::PathBuf);
 
     impl Scratch {
