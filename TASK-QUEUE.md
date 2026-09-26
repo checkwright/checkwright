@@ -26,18 +26,6 @@ when to state an absence, and how, is unruled, and the public ROADMAP.md prints 
 
 ## Technical Debt
 
-### runner-image-label-migration
-
-unpinned runner-image labels change the CI floor with no tree edit: `ubuntu-latest`, used by several jobs in `gates.yml`, `publish.yml` and `site-health.yml` and by site-kit's shipped `templates/site-health.yml`, moves to Ubuntu 26 from 2026-10-19, and `windows-11-arm` (`native/runners.list`) moved to Visual Studio 2026 by default from 2026-09-21 (a push after it ran green).
-
-**Deliverable:** a pin-or-ride decision per label before 2026-10-19, and each workflow brought to it; a ride states which run first witnesses the new image.
-
-**Promoted as debt — operator direction 2026-09-26, lead-relayed (not a /consult ruling):** a label decision adds no name. Re-verified at scope: both migration notices are annotations on the last master `gates` run.
-
-**Push need (2026-09-26, inside the budget):** one mid-iteration push, since a remote run is the first to execute a workflow label change; its batch's push serves it, and the closing push is the second of two.
-
-**Cost while deferred:** the first push after 2026-10-19 runs on an image no push has tried, and a red there costs a hotfix push. Filed 2026-09-25 to the gap inbox by the lead from the notices on gate-sdk-framework-brevity's closing push; promoted 2026-09-25 to Deferred at the next scope. Owner lookup: `ubuntu`, `runner image`, `image label` in this file — none.
-
 ### enforcement-first-load-trigger
 
 no build or close template under `lifecycle-kit/templates/` points at the enforcement-first rule at the moment a finding is discovered. The always-loaded digest carries the rule's one line, but the body behind it (name the defect class and the mechanism that catches it; a green instance fix is the stop signal to ask) is read only when a session opens DOCTRINE.md.
@@ -1432,5 +1420,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 - crate-arms-relink-under-worker-pool
 - gate-sdk-porting-brevity
+- runner-image-label-migration
 
 ## Lessons Learned
