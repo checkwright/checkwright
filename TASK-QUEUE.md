@@ -20,16 +20,6 @@ the gate-sdk/SPEC.md sections under §Per-component contracts from §check-kit-e
 
 **Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-27 at scope from spec-brevity-residue, filed 2026-09-25; the word census is this scope's survey record.
 
-### docs-secondary-clarity-pass
-
-the secondary customer pages carry validity slips and undefined internal vocabulary. Validity: docs/orchestration.md names the wrong actor for the post-commit battery (the supervisor re-runs it, delegation-kit/SPEC.md §Verify after every agent commit) and overclaims `check-gate-tamper`; it calls the budget guard standing when it is an optional hook; docs/kits.md keeps "evidence pages join this map when their kits land" beside the evidence-kit row; docs/methodology.md's hand-listed kit axes omit site-kit and doctrine-kit; the v0.25.0 post's upgrade recipe contradicts `checkwright update`; docs/positioning.md cites an unverifiable upstream issue number; SECURITY.md cites `.claude/commands/close.md`, says "vendored, not installed" against the site's own vocabulary, and asks for "the tag or commit you copied". Clarity: docs/orchestration.md's lead walkthrough uses routing/judgment tier, intent oracle, ruling roster and re-tier undefined and narrates the project's earlier posture; docs/positioning.md states the AGENTS.md claim three times behind a history opener and leaves "provenance seam" unglossed; the value and footprint tables carry an installer row and an unexplained "(consumer)" row; docs/enforcement.md's "this repo" reads as the adopter's on checkwright.dev; CONTRIBUTING.md's "that era" and "iteration boundary" have no referent for an outside reader.
-
-**Deliverable:** each slip corrected at its owner (the generated pages at their emitter), each undefined term glossed on first use or the sentence cut, and the history openers deleted. The ranked list with lines is in this entry's filing commit.
-
-**Promoted as debt 2026-09-27 at gate-sdk-tail-docs-standard's scope, operator direction lead-relayed (not a /consult ruling), unit set A:** corrections on names the specs already carry. Where `customer-docs-quality-standard`'s page-level standard lands first, these pages are corrected against it.
-
-**Cost while deferred:** low per page and slow, paid by the reader who has already passed the front door. Filed 2026-09-25 by consult as a direct entry, from the same audit; split from the front-door entry because its pages do not decide the first install.
-
 ## Deferred
 
 ### shellcheck-extra-dirs-trigger
@@ -1360,5 +1350,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - glibc-floor-unstated
 - one-product-statement
 - install-fetch-asset-names
+- docs-secondary-clarity-pass
 
 ## Lessons Learned
