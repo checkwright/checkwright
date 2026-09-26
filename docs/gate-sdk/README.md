@@ -118,7 +118,7 @@ check-template-registry-parity
 
 ## Requirements
 
-The toolchain contract lives in `docs/install.md` §Requirements: the roster, each pinned floor, and the construct that forces it. `check-install-toolchain` holds that page to `native/src/toolfloor.rs`, the roster's owner, so the requirement has one statement and no copy.
+The toolchain contract is the table in `docs/install.md` §Requirements, with the contributor's rows in `CONTRIBUTING.md`: the roster and each pinned floor. The constructs that force each floor are installer/SPEC.md §Requirements'. `check-install-toolchain` holds both tables to `native/src/toolfloor.rs`, the roster's owner, so the requirement has one statement and no copy.
 
 ## License
 

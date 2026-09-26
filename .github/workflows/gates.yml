@@ -339,11 +339,11 @@ jobs:
   #   - `GATE_SDK_NATIVE_BIN`'s default derives its suffix from
   #     `gate_exe_suffix`, so the knob names the artifact cargo actually emits
   #     inside an installed consumer and not only on this tree.
-  #   - `shellcheck`'s bullet in docs/install.md §Requirements justified an
+  #   - `shellcheck`'s entry in docs/install.md §Requirements justified an
   #     ADOPTER floor member with contributor-only language, so nothing told an
   #     adopter why `init` refuses without it. Round 3 measured that refusal
   #     here; the member is now owed only where a registered gate needs it, and
-  #     the bullet states where each platform takes it from. PRODUCED was
+  #     the page states where each platform takes it from. PRODUCED was
   #     discharged by that same round — the artifact built natively and packed —
   #     so only EXERCISED is still owed.
   # All three are CONFIRMED discharged by round 4 (run 33068870024): the step
@@ -1551,11 +1551,12 @@ jobs:
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
-      # The declaration block's line grammar is owned by docs/site-architecture.md
+      # The declaration table's row grammar is owned by docs/site-architecture.md
       # §Generated projections and their freshness gates, and this awk is one of
-      # its two readers — the other being the gate that holds the block and the
-      # roster in lockstep. Same shape scripts/gates.list already ships: one
-      # grammar with one owner, read from bash here and from the binary there.
+      # its readers — beside the gate that holds the table and the roster in
+      # lockstep, and the shared build body that reads a row's Minimum cell. Same
+      # shape scripts/gates.list already ships: one grammar with one owner, read
+      # from bash here and from the binary there.
       - name: derive the producer legs from the platform declaration
         id: legs
         run: |
@@ -1585,12 +1586,15 @@ jobs:
           done < <(awk '
             /^<!-- platforms:begin -->$/ { inb = 1; next }
             /^<!-- platforms:end -->$/   { inb = 0; next }
-            inb && /^- `/ {
+            inb && /^[ \t]*\|/ {
               if (!match($0, /`[^`]+`/)) next
               t = substr($0, RSTART + 1, RLENGTH - 2)
-              rest = substr($0, RSTART + RLENGTH)
-              s = ""
-              if (match(rest, /^ \([^)]*\)/)) s = substr(rest, RSTART + 2, RLENGTH - 3)
+              row = $0
+              sub(/[ \t]+$/, "", row)
+              sub(/\|$/, "", row)
+              n = split(row, cell, "|")
+              s = cell[n]
+              gsub(/^[ \t]+|[ \t]+$/, "", s)
               print t "\t" s
             }
           ' docs/install.md)

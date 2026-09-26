@@ -28,10 +28,21 @@ A filed issue is swept at an iteration boundary and given exactly one dispositio
 
 <!-- measured: gate-substrates=native -->
 - **Build the gate binary before you commit.** Every gate in this tree dispatches to a compiled subcommand, so `bash gate-sdk/bin/build-native.sh` is its own step and **`cargo test` does not discharge it** — the test harness is a different artifact from the binary the battery runs, so a full green test run leaves `check-gate-binary-fresh` red on a stale build ([gate-sdk/SPEC.md](gate-sdk/SPEC.md) §check-gate-binary-fresh). A fresh clone cannot commit until it has built once.
-- **Battery-green in CI.** Run it locally first: the bare gate binary at `GATE_SDK_NATIVE_BIN` for the full battery, then the fixture runners the [README](README.md) lists — one of which builds and tests the `native/` crate, so a local run wants the whole toolchain roster in [docs/install.md](docs/install.md) §Requirements, `cargo` included. A red PR is not reviewed until it is green.
+- **Battery-green in CI.** Run it locally first: the bare gate binary at `GATE_SDK_NATIVE_BIN` for the full battery, then the fixture runners the [README](README.md) lists — one of which builds and tests the `native/` crate, so a local run wants the adopter toolchain in [docs/install.md](docs/install.md) §Requirements plus the contributor tools below it, `cargo` included. A red PR is not reviewed until it is green.
 - **Fix the tree, never weaken the gate.** A PR that relaxes a gate to pass instead of fixing what it caught is the defect, not the fix — this is check-gate-tamper's doctrine ([delegation-kit/SPEC.md](delegation-kit/SPEC.md) §Verify after every agent commit). A gate change lands with the fixture that proves it and the reasoning in the PR body.
 - **DCO sign-off on every commit.** Sign each commit (`git commit -s` adds the `Signed-off-by:` line); it certifies the [Developer Certificate of Origin](https://developercertificate.org/). There is no CLA and no bot — the sign-off is checked in review.
 - **Every PR gets one disposition at a boundary.** A swept PR is merged (battery-green and in-convention), closed with cause, or reviewed with findings — where the findings that warrant design or follow-on work become queued entries. A PR is never left reviewed-but-actionless.
+
+Building Checkwright needs these tools beyond an adopter's:
+
+<!-- toolchain:begin -->
+
+| Tool | Version | Needed by | Why |
+|---|---|---|---|
+| `jq` | — | contributors | guard-kit's smoke recipe and the installer's consumer smoke read JSON with it |
+| `cargo` | ≥ 1.71 | contributors | builds the `native/` crate before every commit (*Build the gate binary* above), at the highest MSRV in its resolved dependency graph |
+
+<!-- toolchain:end -->
 
 ## Larger changes
 

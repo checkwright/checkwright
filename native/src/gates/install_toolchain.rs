@@ -1,18 +1,24 @@
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the
-// install page's toolchain list holds whole-element parity (name, floor, implementation token,
-// audience) with the probe roster, both directions
+// spec: docs/site-architecture.md §Generated projections and their freshness gates — the two
+// toolchain tables hold whole-element parity with the probe roster, each row on its audience's page
 use crate::fresh;
+use crate::toolfloor::{CONTRIBUTOR, KIT_JOIN, REGISTERED};
 use std::collections::BTreeMap;
 use std::path::Path;
 
 const DEFAULT_INSTALL_MD: &str = "docs/install.md";
+const DEFAULT_CONTRIBUTING_MD: &str = "CONTRIBUTING.md";
 const BEGIN: &str = "<!-- toolchain:begin -->";
 const END: &str = "<!-- toolchain:end -->";
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the floor
-// and the audience each carry a leading sigil, so this positional reader cannot mistake an
-// audience for an implementation token
+// spec: docs/site-architecture.md §Generated projections and their freshness gates — the Version
+// cell's floor lead, its field separator, and its spelling for neither axis
 const GE: &str = "≥";
-const AT: &str = "@";
+const SEP: &str = ", ";
+const NEITHER: &str = "—";
+// spec: docs/site-architecture.md §Generated projections and their freshness gates — the
+// Needed-by cell's rendering of each audience that names no kit
+const EVERY_PROFILE: &str = "every profile";
+const CONTRIBUTORS: &str = "contributors";
+const REGISTERED_GATES: &str = "registered gates";
 
 pub fn run(args: &[String]) -> i32 {
     match rule(args) {
@@ -24,12 +30,36 @@ pub fn run(args: &[String]) -> i32 {
     }
 }
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the
-// bullet's parenthetical carries the roster token verbatim, so each side normalizes to one
-// `name:min:impl:audience` quadruple and parity is a set comparison rather than a mapping table
-fn listed_quads(text: &str) -> Vec<String> {
+// spec: docs/site-architecture.md §Generated projections and their freshness gates — no cell
+// carries `|`, so a row's cells are its `|`-delimited runs inside the outer pipes, each trimmed
+fn cells(line: &str) -> Vec<String> {
+    let body = line.trim();
+    let body = body.strip_prefix('|').unwrap_or(body);
+    let body = body.strip_suffix('|').unwrap_or(body);
+    body.split('|').map(|c| c.trim().to_string()).collect()
+}
+
+// spec: docs/site-architecture.md §Generated projections and their freshness gates — the first
+// cell is one backticked name, so the header and delimiter rows are never rows
+fn backticked_name(cell: &str) -> Option<&str> {
+    let inner = cell.strip_prefix('`')?.strip_suffix('`')?;
+    if inner.is_empty() || inner.contains('`') {
+        return None;
+    }
+    Some(inner)
+}
+
+struct Row {
+    name: String,
+    // spec: docs/site-architecture.md §Generated projections and their freshness gates — the
+    // Version and Needed-by cells as `render` spells them, compared verbatim
+    cells: String,
+    contributor: bool,
+}
+
+fn listed_rows(text: &str) -> Vec<Row> {
     let mut inb = false;
-    let mut out: Vec<String> = Vec::new();
+    let mut out: Vec<Row> = Vec::new();
     for line in text.lines() {
         if line == BEGIN {
             inb = true;
@@ -39,51 +69,22 @@ fn listed_quads(text: &str) -> Vec<String> {
             inb = false;
             continue;
         }
-        if !inb || !line.starts_with("- `") {
+        if !inb || !line.trim_start().starts_with('|') {
             continue;
         }
-        let (name, rest) = match backticked(line) {
-            Some(v) => v,
-            None => continue,
+        let cells = cells(line);
+        let Some(name) = cells.first().and_then(|c| backticked_name(c)) else {
+            continue;
         };
-        let (mut min, mut imp, mut aud) = (String::new(), String::new(), String::new());
-        if let Some(inner) = parenthetical(rest) {
-            for f in inner.split(',') {
-                let f = f.trim_matches(|c: char| c.is_whitespace());
-                if f.is_empty() {
-                    continue;
-                }
-                if let Some(v) = f.strip_prefix(GE) {
-                    min = v.trim_matches(|c: char| c.is_whitespace()).to_string();
-                } else if let Some(v) = f.strip_prefix(AT) {
-                    aud = v.trim_matches(|c: char| c.is_whitespace()).to_string();
-                } else {
-                    imp = f.to_string();
-                }
-            }
-        }
-        out.push(format!("{}:{}:{}:{}", name, min, imp, aud));
+        let version = cells.get(1).map(String::as_str).unwrap_or("");
+        let needed = cells.get(2).map(String::as_str).unwrap_or("");
+        out.push(Row {
+            name: name.to_string(),
+            cells: format!("| {} | {} |", version, needed),
+            contributor: needed == CONTRIBUTORS,
+        });
     }
     out
-}
-
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — awk's
-// `match($0, /`[^`]+`/)`: the first backticked run, and everything after it
-fn backticked(line: &str) -> Option<(&str, &str)> {
-    let open = line.find('`')?;
-    let close = open + 1 + line[open + 1..].find('`')?;
-    if close == open + 1 {
-        return None;
-    }
-    Some((&line[open + 1..close], &line[close + 1..]))
-}
-
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — awk's
-// `match(rest, /^ \([^)]*\)/)`: a parenthetical immediately after the name, or none
-fn parenthetical(rest: &str) -> Option<&str> {
-    let body = rest.strip_prefix(" (")?;
-    let close = body.find(')')?;
-    Some(&body[..close])
 }
 
 // spec: docs/site-architecture.md §Generated projections and their freshness gates — the roster
@@ -101,39 +102,36 @@ fn roster_quad(element: &str, derived: &[String]) -> (String, String) {
     )
 }
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the bullet
-// parenthetical an element demands, `(none)` when unconstrained
+// spec: docs/site-architecture.md §Generated projections and their freshness gates — the Version
+// and Needed-by cells an element demands
 fn render(quad: &str) -> String {
     let mut it = quad.splitn(4, ':');
     it.next();
     let min = it.next().unwrap_or("");
     let imp = it.next().unwrap_or("");
     let aud = it.next().unwrap_or("");
-    let mut desc = String::new();
+    let mut version: Vec<String> = Vec::new();
     if !min.is_empty() {
-        desc = format!("{} {}", GE, min);
+        version.push(format!("{} {}", GE, min));
     }
     if !imp.is_empty() {
-        if !desc.is_empty() {
-            desc.push_str(", ");
-        }
-        desc.push_str(imp);
+        version.push(imp.to_string());
     }
-    if !aud.is_empty() {
-        if !desc.is_empty() {
-            desc.push_str(", ");
-        }
-        desc.push_str(AT);
-        desc.push_str(aud);
-    }
-    if desc.is_empty() {
-        "(none)".to_string()
+    let version = if version.is_empty() {
+        NEITHER.to_string()
     } else {
-        format!("({})", desc)
-    }
+        version.join(SEP)
+    };
+    let needed = match aud {
+        "" => EVERY_PROFILE.to_string(),
+        CONTRIBUTOR => CONTRIBUTORS.to_string(),
+        REGISTERED => REGISTERED_GATES.to_string(),
+        kits => kits.split(KIT_JOIN).collect::<Vec<&str>>().join(SEP),
+    };
+    format!("| {} | {} |", version, needed)
 }
 
-// spec: context-kit/SPEC.md §bin/env-probe — the roster is the crate's own, so the second
+// spec: context-kit/SPEC.md §bin/env-probe — the roster is the crate's own, so the third
 // positional is an *override* rather than the ordinary path to it: a hermetic fixture needs a
 // roster it can author, or the divergence cases are unreachable without editing the kit's own.
 fn elements_of(roster: Option<&String>) -> Result<(Vec<String>, String), String> {
@@ -152,29 +150,31 @@ fn elements_of(roster: Option<&String>) -> Result<(Vec<String>, String), String>
     Ok((elements, path.clone()))
 }
 
+fn page_rows(page: &str) -> Result<Vec<Row>, String> {
+    if !Path::new(page).is_file() {
+        return Err(format!("toolchain page not found: {}", page));
+    }
+    let text = fresh::read_captured(page)?;
+    if !text.contains(BEGIN) {
+        return Err(format!("no toolchain marker block ({}) in {}", BEGIN, page));
+    }
+    Ok(listed_rows(&text))
+}
+
 fn rule(args: &[String]) -> Result<i32, String> {
     let install_md = fresh::positional(args, 0, DEFAULT_INSTALL_MD);
+    let contributing_md = fresh::positional(args, 1, DEFAULT_CONTRIBUTING_MD);
 
-    if !Path::new(install_md).is_file() {
-        return Err(format!("install page not found: {}", install_md));
-    }
-    let install_text = fresh::read_captured(install_md)?;
-    if !install_text.contains(BEGIN) {
+    let install_rows = page_rows(install_md)?;
+    let contributing_rows = page_rows(contributing_md)?;
+    if install_rows.is_empty() && contributing_rows.is_empty() {
         return Err(format!(
-            "no toolchain marker block ({}) in {}",
-            BEGIN, install_md
+            "marker blocks present but no '| `tool` | … |' rows in {} or {}",
+            install_md, contributing_md
         ));
     }
 
-    let listed = listed_quads(&install_text);
-    if listed.is_empty() {
-        return Err(format!(
-            "marker block present but no '- `tool`' bullets in {}",
-            install_md
-        ));
-    }
-
-    let (elements, roster) = elements_of(args.get(1))?;
+    let (elements, roster) = elements_of(args.get(2))?;
     if elements.is_empty() {
         return Err(format!("PROBE_SET array is empty in {}", roster));
     }
@@ -190,7 +190,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         if d.is_empty() {
             return Err(format!(
                 "the roster carries a '{}' audience and no kit root under this tree satisfies its \
-                 predicate — the page's bullet cannot be compared against nothing",
+                 predicate — the page's row cannot be compared against nothing",
                 crate::toolfloor::DERIVED
             ));
         }
@@ -202,12 +202,26 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut roster_by_name: BTreeMap<String, String> = BTreeMap::new();
     for e in &elements {
         let (name, quad) = roster_quad(e, &derived);
-        roster_by_name.insert(name, quad);
+        roster_by_name.insert(name, render(&quad));
     }
+
+    let mut findings: Vec<String> = Vec::new();
     let mut listed_by_name: BTreeMap<String, String> = BTreeMap::new();
-    for q in &listed {
-        let name = q.split(':').next().unwrap_or("").to_string();
-        listed_by_name.insert(name, q.clone());
+    for (page, rows) in [(install_md, &install_rows), (contributing_md, &contributing_rows)] {
+        for r in rows {
+            // spec: docs/site-architecture.md §Generated projections and their freshness gates — a
+            // contributors row only in CONTRIBUTING.md, every other row only on the install page
+            let home = if r.contributor { contributing_md } else { install_md };
+            if page != home {
+                findings.push(format!(
+                    "a row on the wrong page: {} belongs in {}, not {}",
+                    r.name, home, page
+                ));
+            }
+            if listed_by_name.insert(r.name.clone(), r.cells.clone()).is_some() {
+                findings.push(format!("listed twice: {}", r.name));
+            }
+        }
     }
 
     // spec: gate-sdk/SPEC.md §The kit-roots `gate_kit_roots` cohort — the union in byte order,
@@ -216,16 +230,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
     names.sort();
     names.dedup();
 
-    let mut findings: Vec<String> = Vec::new();
     for n in names {
         match (roster_by_name.get(n), listed_by_name.get(n)) {
             (None, _) => findings.push(format!("listed but not probed: {}", n)),
             (Some(_), None) => findings.push(format!("probed but not listed: {}", n)),
             (Some(r), Some(l)) if r != l => findings.push(format!(
                 "constraint mismatch: {} — roster says {}, page says {}",
-                n,
-                render(r),
-                render(l)
+                n, r, l
             )),
             _ => {}
         }
@@ -233,26 +244,30 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     if !findings.is_empty() {
         println!(
-            "check-install-toolchain: {} toolchain list and {} PROBE_SET disagree:",
-            install_md, roster
+            "check-install-toolchain: the toolchain tables in {} and {} and {} PROBE_SET disagree:",
+            install_md, contributing_md, roster
         );
         for f in &findings {
             println!("  {}", f);
         }
-        println!("  help: each bullet in the toolchain marker block renders its roster element");
+        println!("  help: each row renders its roster element verbatim —");
         println!(
-            "        verbatim — `- \\`tool\\` ({} <min-version>, <impl-token>, {}<audience>) — …`, any",
-            GE, AT
+            "        `| \\`tool\\` | {} <floor>{}<impl-token> | <needed by> | <why> |`, the Version cell",
+            GE, SEP
         );
-        println!("        field dropped where the element leaves it empty. Add the missing tool's");
-        println!("        bullet, drop the stale one, or correct the parenthetical.");
+        println!(
+            "        `{}` where the element sets neither, and a `{}` row only in {}.",
+            NEITHER, CONTRIBUTORS, contributing_md
+        );
+        println!("        Add the missing tool's row, drop the stale one, correct its cells, or move it.");
         return Ok(1);
     }
 
     println!(
-        "INSTALL-TOOLCHAIN: clean ({} roster element(s) in name+floor+impl+audience parity between {} and {} PROBE_SET)",
+        "INSTALL-TOOLCHAIN: clean ({} roster element(s) in name+floor+impl+audience parity between {} + {} and {} PROBE_SET, each row on its audience's page)",
         roster_by_name.len(),
         install_md,
+        contributing_md,
         roster
     );
     Ok(0)
@@ -272,7 +287,7 @@ mod tests {
         assert_eq!(roster_quad("cargo:1.71::contributor", &[]).1, "cargo:1.71::contributor");
         assert_eq!(roster_quad("sort::coreutils", &[]).1, "sort::coreutils:");
         // spec: context-kit/SPEC.md §bin/env-probe — a derived element normalizes to the kit list
-        // it resolves to, which is the quadruple the page's bullet is held to
+        // it resolves to, which is the quadruple the page's row is held to
         let derived = ["alpha-kit".to_string(), "beta-kit".to_string()];
         assert_eq!(
             roster_quad("bash:4.3::derived", &derived).1,
@@ -281,23 +296,27 @@ mod tests {
     }
 
     // spec: docs/site-architecture.md §Generated projections and their freshness gates — the
-    // audience's sigil is what keeps the positional reader honest
+    // header and delimiter rows skipped, each cell trimmed
     #[test]
-    fn the_page_side_reads_each_axis_by_its_sigil() {
+    fn the_page_side_reads_each_row_off_its_cells() {
         let text = format!(
-            "{}\n- `cargo` (≥ 1.71, gnu, @contributor) — x.\n- `jq` — y.\n{}\n",
+            "{}\n| Tool | Version | Needed by | Why |\n|---|---|---|---|\n|  `cargo` |  ≥ 1.71, gnu | contributors | x |\n| `jq` | — | every profile | y |\n{}\n",
             BEGIN, END
         );
-        assert_eq!(
-            listed_quads(&text),
-            vec!["cargo:1.71:gnu:contributor".to_string(), "jq:::".to_string()]
-        );
+        let rows = listed_rows(&text);
+        assert_eq!(rows.len(), 2);
+        assert_eq!(rows[0].name, "cargo");
+        assert_eq!(rows[0].cells, "| ≥ 1.71, gnu | contributors |");
+        assert!(rows[0].contributor);
+        assert_eq!(rows[1].cells, render("jq:::"));
+        assert!(!rows[1].contributor);
     }
 
     #[test]
-    fn an_unconstrained_element_renders_as_none() {
-        assert_eq!(render("jq:::"), "(none)");
-        assert_eq!(render("bash:4.0::"), "(≥ 4.0)");
-        assert_eq!(render("git:::contributor"), "(@contributor)");
+    fn render_spells_the_two_cells_an_element_demands() {
+        assert_eq!(render("jq:::"), "| — | every profile |");
+        assert_eq!(render("bash:4.0::"), "| ≥ 4.0 | every profile |");
+        assert_eq!(render("git:::contributor"), "| — | contributors |");
+        assert_eq!(render("bash:4.3:gnu:a-kit+b-kit"), "| ≥ 4.3, gnu | a-kit, b-kit |");
     }
 }

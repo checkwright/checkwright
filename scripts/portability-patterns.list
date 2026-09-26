@@ -6,8 +6,8 @@
 # Files named portability-patterns* are self-exempt from the scan.
 #
 # A live site is marked '# portability-declared: <reason>' on that line or the one
-# above, and the reason names docs/install.md §Requirements, where the dependency
-# is declared to adopters. The roster is generic portability knowledge and carries
+# above, and the reason names installer/SPEC.md §Requirements, where the dependency
+# is declared. The roster is generic portability knowledge and carries
 # no project term, which is what lets it ship tracked.
 
 # find(1) primaries GNU-only: BSD find has neither.

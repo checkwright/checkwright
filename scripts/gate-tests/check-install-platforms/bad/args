@@ -3,7 +3,8 @@
 # hold that is nonetheless published (C, both halves), and arm E in BOTH
 # directions — each detector emits `aarch64-unknown-linux-gnu` while the page
 # declares it nowhere, and the page declares `aarch64-pc-windows-msvc` while
-# neither detector can ever emit it. Arm D still reports, on the red path as
+# neither detector can ever emit it. That last row also leaves its Minimum cell
+# empty, a support claim with no floor. Arm D still reports, on the red path as
 # well as the clean one.
 install.md
 targets.list

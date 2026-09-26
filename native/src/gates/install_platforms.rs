@@ -42,11 +42,11 @@ enum State {
 struct Decl {
     triple: String,
     state: State,
+    minimum: String,
 }
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the triple is
-// the line's first backticked run and the state is the parenthetical read to its first `)`, the
-// same positional shape check-install-toolchain's bullets take, so one grammar serves both blocks
+// spec: docs/site-architecture.md §Generated projections and their freshness gates — a row carries
+// a backticked run, its first the triple, the Minimum its second cell and the state its last cell
 fn declarations(text: &str) -> Vec<Decl> {
     let mut inb = false;
     let mut out: Vec<Decl> = Vec::new();
@@ -59,45 +59,50 @@ fn declarations(text: &str) -> Vec<Decl> {
             inb = false;
             continue;
         }
-        if !inb || !line.starts_with("- `") {
+        if !inb || !line.trim_start().starts_with('|') {
             continue;
         }
-        let Some((triple, rest)) = backticked(line) else {
+        let Some(triple) = backticked(line) else {
             continue;
         };
-        let state = match parenthetical(rest) {
-            None => State::Unreadable("no join state in a parenthetical".to_string()),
-            Some(p) if p.trim() == JOINED => State::Joined,
-            Some(p) => match p.trim().strip_prefix(HELD) {
-                Some(cause) => State::Held(cause.trim().to_string()),
-                None => State::Unreadable(format!("unknown join state `{}`", p.trim())),
-            },
+        let cells = cells(line);
+        let last = cells.last().map(String::as_str).unwrap_or("");
+        let state = if last == JOINED {
+            State::Joined
+        } else if let Some(cause) = last.strip_prefix(HELD) {
+            State::Held(cause.trim().to_string())
+        } else if last.is_empty() {
+            State::Unreadable("no join state in the Status cell".to_string())
+        } else {
+            State::Unreadable(format!("unknown join state `{}`", last))
         };
         out.push(Decl {
             triple: triple.to_string(),
             state,
+            minimum: cells.get(1).cloned().unwrap_or_default(),
         });
     }
     out
 }
 
 // spec: docs/site-architecture.md §Generated projections and their freshness gates — the first
-// backticked run, and everything after it
-fn backticked(line: &str) -> Option<(&str, &str)> {
+// backticked run
+fn backticked(line: &str) -> Option<&str> {
     let open = line.find('`')?;
     let close = open + 1 + line[open + 1..].find('`')?;
     if close == open + 1 {
         return None;
     }
-    Some((&line[open + 1..close], &line[close + 1..]))
+    Some(&line[open + 1..close])
 }
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — a
-// parenthetical immediately after the triple, read to its first `)`, so it carries no nested one
-fn parenthetical(rest: &str) -> Option<&str> {
-    let body = rest.strip_prefix(" (")?;
-    let close = body.find(')')?;
-    Some(&body[..close])
+// spec: docs/site-architecture.md §Generated projections and their freshness gates — no cell
+// carries `|`, so a row's cells are its `|`-delimited runs inside the outer pipes, each trimmed
+fn cells(line: &str) -> Vec<String> {
+    let body = line.trim();
+    let body = body.strip_prefix('|').unwrap_or(body);
+    let body = body.strip_suffix('|').unwrap_or(body);
+    body.split('|').map(|c| c.trim().to_string()).collect()
 }
 
 // spec: gate-sdk/SPEC.md §Consumer payload — one target triple per live line, `#`-comments and
@@ -258,7 +263,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let decls = declarations(&install_text);
     if decls.is_empty() {
         return Err(format!(
-            "marker block present but no '- `<triple>` (<state>)' declarations in {}",
+            "marker block present but no '| <system> | <minimum> | `<triple>` | <state> |' rows in {}",
             install_md
         ));
     }
@@ -277,6 +282,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     for d in &decls {
         let on_roster = listed.contains(&d.triple);
+        // spec: docs/site-architecture.md §Generated projections and their freshness gates — a
+        // support claim with no OS floor is half a claim
+        if d.minimum.is_empty() {
+            findings.push(format!("an empty Minimum cell: {}", d.triple));
+        }
         match &d.state {
             // spec: gate-sdk/SPEC.md §Consumer payload — arm A: a `joined` declaration flipped
             // ahead of the roster write
@@ -372,10 +382,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
             println!("  omitted on each held platform: {}", per_held);
         }
         println!("  detected triples: {}", detector_report);
-        println!("  help: every declared platform is `(joined)` — a live line in the roster — or");
-        println!("        `(held: <precondition>)` naming the run that would join it and absent");
-        println!("        from the roster, and every roster line is a declared `joined`. Flip the");
-        println!("        declaration and write the roster line together, or drop the roster line.");
+        println!("  help: every row's Status cell is `joined` — a live line in the roster — or");
+        println!("        `held: <precondition>` naming the run that would join it and absent from");
+        println!("        the roster, and every roster line is a declared `joined`. Flip the Status");
+        println!("        cell and write the roster line together, or drop the roster line. Every");
+        println!("        row's Minimum cell states the platform's OS floor.");
         println!("        Each detector's emitted triple set equals the declared set: a triple it");
         println!("        detects is declared, and a triple declared is one it can reach.");
         return Ok(1);
@@ -403,17 +414,29 @@ mod tests {
         format!("{}\n\n{}\n\n{}\n", BEGIN, body, END)
     }
 
-    // spec: docs/site-architecture.md §Generated projections and their freshness gates — the state
-    // sits on the bullet's own first line and continuation lines are prose the reader never sees
+    const HEAD: &str = "| System | Minimum | Binary | Status |\n|---|---|---|---|\n";
+
+    // spec: docs/site-architecture.md §Generated projections and their freshness gates — the
+    // header and delimiter rows carry no backticked run, and a line outside the table is prose
     #[test]
-    fn a_continuation_line_is_prose_and_never_a_second_declaration() {
-        let text = block(
-            "- `x86_64-unknown-linux-gnu` (joined) — Linux on x86-64.\n  `aarch64-apple-darwin` is not declared here.",
-        );
+    fn only_a_row_carrying_a_triple_is_a_declaration() {
+        let text = block(&format!(
+            "{}| Linux on x86-64 | glibc 2.39 | `x86_64-unknown-linux-gnu` | joined |\n`aarch64-apple-darwin` is not declared here.",
+            HEAD
+        ));
         let d = declarations(&text);
         assert_eq!(d.len(), 1);
         assert_eq!(d[0].triple, "x86_64-unknown-linux-gnu");
+        assert_eq!(d[0].minimum, "glibc 2.39");
         assert!(matches!(d[0].state, State::Joined));
+    }
+
+    // spec: docs/site-architecture.md §Generated projections and their freshness gates — an empty
+    // Minimum cell survives parsing as an empty one, which `rule` reds
+    #[test]
+    fn an_empty_minimum_cell_stays_empty() {
+        let text = block(&format!("{}|  Linux |  | `x86_64-unknown-linux-gnu` | joined |", HEAD));
+        assert!(declarations(&text)[0].minimum.is_empty());
     }
 
     // spec: docs/site-architecture.md §Generated projections and their freshness gates — a hold
@@ -421,7 +444,10 @@ mod tests {
     // empty one rather than as an absent state
     #[test]
     fn a_held_state_carries_its_precondition_and_an_empty_one_stays_empty() {
-        let text = block("- `aarch64-apple-darwin` (held: a green leg) — Apple silicon.\n- `x86_64-apple-darwin` (held:) — Intel.");
+        let text = block(&format!(
+            "{}| Apple silicon | macOS 11 | `aarch64-apple-darwin` | held: a green leg |\n| Intel | macOS 10.12 | `x86_64-apple-darwin` | held: |",
+            HEAD
+        ));
         let d = declarations(&text);
         match &d[0].state {
             State::Held(c) => assert_eq!(c, "a green leg"),
@@ -437,7 +463,10 @@ mod tests {
     // states and no third, so a third spelling is a finding rather than a silently ignored bullet
     #[test]
     fn a_third_join_state_is_unreadable_rather_than_dropped() {
-        let text = block("- `x86_64-pc-windows-msvc` (planned) — no.\n- `i686-unknown-linux-gnu` — no parenthetical at all.");
+        let text = block(&format!(
+            "{}| Windows | Windows 10 | `x86_64-pc-windows-msvc` | planned |\n| Linux | glibc 2.17 | `i686-unknown-linux-gnu` | |",
+            HEAD
+        ));
         let d = declarations(&text);
         assert_eq!(d.len(), 2);
         assert!(matches!(d[0].state, State::Unreadable(_)));

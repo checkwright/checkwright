@@ -4,16 +4,11 @@
 
 <!-- platforms:begin -->
 
-- `x86_64-unknown-linux-gnu` (joined) — declared joined while the roster carries
-  no such live line: the declaration flipped ahead of the roster write, arm A.
-- `aarch64-apple-darwin` (held:) — held with the precondition left empty, which
-  is the silently granted hold arm C's first half refuses.
-- `x86_64-apple-darwin` (held: a green producer leg consumed by a platform smoke leg) — held
-  and yet a live roster line: the roster write whose declaration flip was
-  forgotten, arm C's second half.
-- `aarch64-pc-windows-msvc` (held: a green producer leg consumed by a platform smoke leg) — held
-  with everything arms A through D ask for, and yet neither detector can ever
-  emit it: a support claim the installer could not honour if it wanted to, which
-  is arm E's reverse direction.
+| System | Minimum | Binary | Status |
+|---|---|---|---|
+| Linux on x86-64 | glibc 2.39 | `x86_64-unknown-linux-gnu` | joined |
+| macOS on Apple silicon | macOS 11 | `aarch64-apple-darwin` | held: |
+| macOS on Intel | macOS 10.12 | `x86_64-apple-darwin` | held: a green producer leg consumed by a platform smoke leg |
+| Windows on ARM64 | | `aarch64-pc-windows-msvc` | held: a green producer leg consumed by a platform smoke leg |
 
 <!-- platforms:end -->

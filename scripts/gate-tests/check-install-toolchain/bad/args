@@ -1,11 +1,12 @@
 # Under-declaration case, the one this gate's derived audience exists to catch: the
 # name sets agree exactly, so the pre-widening name-set assertion passes this fixture.
 # gamma-kit ships a bash-shebang file under its `bin/`, so the derivation puts it in
-# the audience, while the page's bullet still names two kits — an adopter selecting
+# the audience, while the page's row still names two kits — an adopter selecting
 # gamma-kit would be told they owe no bash and then fail at first use.
 #
 # The fixture reds on a MEASUREMENT of the tree, not on a second literal, so it cannot
 # be made green by editing both sides: dropping gamma-kit's surface or naming it on
 # the page are the only two fixes, which is the property the whole unit is for.
 install.md
+CONTRIBUTING.md
 probe.sh

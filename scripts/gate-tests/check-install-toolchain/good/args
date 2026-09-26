@@ -1,7 +1,8 @@
-# Parity case: every bullet's parenthetical renders its roster element verbatim —
-# a bare name, a floor, an implementation token, and both axes comma-joined. The
-# roster's `jq:` proves an empty trailing field parses as the unconstrained `jq`.
-# Two args steer the gate onto hermetic fixture copies of each surface.
+# Parity case: every row renders its roster element verbatim across the two
+# pages — an unconstrained member, a floor, an implementation token, both axes
+# comma-joined, and a contributors row placed in CONTRIBUTING.md. The roster's
+# `git:` proves an empty trailing field parses as the unconstrained `git`.
+# Three args steer the gate onto hermetic fixture copies of each surface.
 #
 # The `bash` element's audience is `derived`, so the gate resolves it over this case
 # dir's synthetic kits (named by scripts/gate-sdk-config.knobs, read at cwd) and
@@ -10,4 +11,5 @@
 # so a green line needs both; delta-kit qualifies under neither, so the green is not
 # the vacuous one a predicate matching everything would also give.
 install.md
+CONTRIBUTING.md
 probe.sh
