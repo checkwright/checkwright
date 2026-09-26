@@ -10,3 +10,4 @@ capture-integrity-brevity align a6ebeca2 2026-09-26 1c2c8593
 capture-integrity-brevity build abe297d2 2026-09-26 7b104389
 capture-integrity-brevity build a437219e 2026-09-26 784e86a6
 capture-integrity-brevity build a7ea70e1 2026-09-26 bd8a70e5
+capture-integrity-brevity validate a5817be3 2026-09-26 4e56bd49
