@@ -1764,9 +1764,9 @@ pub const REGISTRY: &[GateEntry] = &[
         "gate-sdk",
         &[("git", "")],
     ),
-    // spec: gate-sdk/SPEC.md §The second budget batch — two members with no joint proof, each its
-    // own unit: the first reads one message file and walks nothing, the empty-walk-root shape; the
-    // second lists every kit's `checks/` through one glob anchored at its own positional scan root.
+    // spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — no joint
+    // proof: the first reads one message file and walks nothing; the second lists every kit's
+    // `checks/` through one glob anchored at its own positional scan root.
     (
         "check-commit-subject",
         commit_subject::run,
@@ -1824,9 +1824,9 @@ pub const REGISTRY: &[GateEntry] = &[
         "gate-sdk",
         &[],
     ),
-    // spec: gate-sdk/SPEC.md §The third budget batch — two members with no joint proof, each its
-    // own unit: the first walks each resolved memory dir, one in every case a fixture can build;
-    // the second's tracked set is a subprocess read, which enters no walk roster in either.
+    // spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — no joint
+    // proof: the first walks each resolved memory dir, one in every case a fixture can build; the
+    // second's tracked set is a subprocess read, which enters no walk roster in either.
     (
         "check-memory-off",
         memory_off::run,
@@ -1851,9 +1851,9 @@ pub const REGISTRY: &[GateEntry] = &[
         "gate-sdk",
         &[("git", "")],
     ),
-    // spec: gate-sdk/SPEC.md §The fourth budget batch — members with no joint proof, each its own
-    // unit. None declares a walk root: two resolve a corpus by pathname expansion and the third
-    // by `git ls-files`, and §check-reads-couples rules both outside the walk class.
+    // spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — no joint
+    // proof, and no walk root: two resolve a corpus by pathname expansion and the third by `git
+    // ls-files`, and §check-reads-couples rules both outside the walk class.
     // spec: gate-sdk/SPEC.md §check-graph — the coupling-graph auditor. `?` as its walk root for
     // the reason its shell original was classified `?`: assertion G's scan root is the member's own
     // first argument with a default, the variable-first-argument shape §check-reads-couples calls

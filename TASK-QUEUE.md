@@ -26,16 +26,6 @@ when to state an absence, and how, is unruled, and the public ROADMAP.md prints 
 
 ## Technical Debt
 
-### gate-sdk-porting-brevity
-
-the cohort and batch records of gate-sdk/SPEC.md §Porting a gate to the binary substrate, from §The first cohort, and the rule that selects the next through §What is retained, and where the second port stands: about 27k words. §The port-candidate criteria, §The non-gate arm and §Per-component contracts stay on [spec-brevity-residue](#spec-brevity-residue).
-
-**Deliverable:** the three moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) applied to those subsections under `check-prose-bounds` and `check-provenance-seam`'s dated arm. A contract sentence stays, including a fact a sibling entry or another SPEC cites there.
-
-**Promoted as debt, split from spec-brevity-residue — operator direction 2026-09-26, lead-relayed (not a /consult ruling):** the moves run under gates that already exist and add no name.
-
-**Cost while deferred:** paid by every session that opens one of these subsections and every adopter who reads it on the site. Split 2026-09-26 at scope from spec-brevity-residue, filed 2026-09-25.
-
 ### runner-image-label-migration
 
 unpinned runner-image labels change the CI floor with no tree edit: `ubuntu-latest`, used by several jobs in `gates.yml`, `publish.yml` and `site-health.yml` and by site-kit's shipped `templates/site-health.yml`, moves to Ubuntu 26 from 2026-10-19, and `windows-11-arm` (`native/runners.list`) moved to Visual Studio 2026 by default from 2026-09-21 (a push after it ran green).
@@ -446,7 +436,7 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
-**Split 2026-09-25 at scope, operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework half was promoted as its own debt entry; this entry keeps the rest. **Split again 2026-09-25 at the next scope, on the same class of direction:** §The `# graph:` manifest, §Meta-gate conservation, §Consumer payload and §Consumer smoke left as `gate-sdk-remainder-brevity`, so gate-sdk's remainder here is the Porting records and §Per-component contracts. **Split a third time 2026-09-26 at scope, operator direction lead-relayed (not a /consult ruling):** the Porting cohort and batch records left as [gate-sdk-porting-brevity](#gate-sdk-porting-brevity), so gate-sdk's remainder here is §The port-candidate criteria, §The non-gate arm and §Per-component contracts.
+**Split 2026-09-25 at scope, operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework half was promoted as its own debt entry; this entry keeps the rest. **Split again 2026-09-25 at the next scope, on the same class of direction:** §The `# graph:` manifest, §Meta-gate conservation, §Consumer payload and §Consumer smoke left as `gate-sdk-remainder-brevity`, so gate-sdk's remainder here is the Porting records and §Per-component contracts. **Split a third time 2026-09-26 at scope, operator direction lead-relayed (not a /consult ruling):** the Porting cohort and batch records left as `gate-sdk-porting-brevity`, so gate-sdk's remainder here is §The port-candidate criteria, §The non-gate arm and §Per-component contracts.
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
@@ -1441,5 +1431,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 ## Done
 
 - crate-arms-relink-under-worker-pool
+- gate-sdk-porting-brevity
 
 ## Lessons Learned
