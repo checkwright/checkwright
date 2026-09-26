@@ -14,7 +14,7 @@
 1155cp .claude/commands/spec.md
 1204cp .claude/commands/validate.md
 12421cp CLAUDE.md
-253493cp canon-kit/SPEC.md
+256074cp canon-kit/SPEC.md
 5785cp canon-kit/templates/SPEC-amendment.md
 128514cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
@@ -25,12 +25,12 @@
 1613cp docs/context-kit/index.md
 4025cp docs/ddd.md
 1311cp docs/delegation-kit/index.md
-2298cp docs/doctrine-kit/index.md
+2277cp docs/doctrine-kit/index.md
 1285cp docs/drift-kit/index.md
 1351cp docs/evidence-kit/index.md
-1514cp docs/gate-sdk/index.md
+1472cp docs/gate-sdk/index.md
 1259cp docs/guard-kit/index.md
-5475cp docs/index.md
+5138cp docs/index.md
 12853cp docs/install.md
 1415cp docs/kits.md
 1395cp docs/lifecycle-kit/index.md
@@ -66,7 +66,7 @@
 229102cp docs/posts/2026-09-26-checkwright-v0-26-0.md
 1440cp docs/queue-kit/index.md
 757cp docs/releases.md
-29341cp docs/site-architecture.md
+30279cp docs/site-architecture.md
 2412cp docs/site-kit/index.md
 2437cp docs/value.md
 35405cp doctrine-kit/SPEC.md

@@ -33,6 +33,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    check-todo-task-liveness     # resolves TODO(task:) slugs against the queue
    check-docs-cmd               # invoked paths + kit knobs in docs resolve
    check-docs-restatement-parity # needs restating pages (their code tokens held to the README beside each)
+   check-docs-page-repeat       # needs declared pages (no link target or long sentence stated twice on one)
    check-fence-command-head     # every shell-fence command starts with a word that can run
    check-fence-run              # every shell fence marked runnable runs and exits as declared
    check-knob-citation          # knob values stated only in the owning SPEC

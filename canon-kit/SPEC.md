@@ -133,6 +133,8 @@ Knobs:
 - `CANON_KIT_MDREF_EXCLUDE` — array of globs, default empty: manifest-set docs `check-md-refs` skips (a consumer's generated documentation whose links a build tool owns).
 - `CANON_KIT_UNWRAP_GLOBS` / `CANON_KIT_UNWRAP_EXCLUDE` — arrays of git pathspecs, default empty: the tracked markdown `check-md-unwrapped` holds to one line per paragraph, less the excluded paths. An empty include set is the clean skip, since which files a tree keeps unwrapped is its own editorial choice. `CANON_KIT_UNWRAP_DECLARATION_LEADS` — array of line leads, default empty: a line whose content starts with a member opens a block, so the gate never reds it and `--emit md-unwrap` never joins it. A member that is empty is malformed config (§check-md-unwrapped).
 - `CANON_KIT_RESTATEMENT_PAGES` — array of globs, default empty: the pages `check-docs-restatement-parity` holds to the `README.md` beside each.
+- `CANON_KIT_PAGE_REPEAT_PAGES` — the pages `check-docs-page-repeat` holds, an array of globs, empty by default.
+- `CANON_KIT_PAGE_REPEAT_MIN_WORDS` — default `8`: the shortest sentence `check-docs-page-repeat`'s arm B counts.
 - `CANON_KIT_FENCE_PROGRAMS` — array of program names a shell fence may start a command with, default a bundled generic utility set (`cat`, `grep`, `git`, …; `--emit knob-roster` prints it whole). Read by `check-fence-command-head`. The toolchain a tree's recipes name, a compiler, a fetch tool or a package manager, rides the extra.
 - `CANON_KIT_FENCE_RUN_PROGRAMS` — array of program names a fence `check-fence-run` executes may start a command with, default `("git")`. It is the whole set, not an extra over `CANON_KIT_FENCE_PROGRAMS`: every name in it is a program that runs with the scratch's network reach, so the default admits only the one program the fixed environment confines to local protocols. A vocabulary rather than a walk filter, so it takes no `knob:` couples token, on the fence-program pair's own ground.
 - `CANON_KIT_RETIRED_SPELLING_EXCLUDE` — array of globs, default empty: tracked paths held out of `check-amendment-retired-spelling`'s reconciliation corpus. Which surfaces are **history-bearing** is a consumer fact: a work queue, a ruling record and a scratch directory are named by that consumer's own configuration. A retired spelling survives in all three legitimately, because that is what a history surface is for. **The empty default is the conservative one, not a fail-open.** The exclusion can only ever remove findings, so a consumer that configures nothing gets a noisier gate rather than a blinder one.
@@ -642,6 +644,20 @@ Invariant: every arm token and kit-knob token a declared restating page carries 
 **Red** is one finding per missing token, naming the page, the line, the token and its source. The clean line counts pages and tokens, so an armed corpus whose pages carry no code tokens reads `0 token(s)` rather than passing unseen. `tier=precommit`: a drift is restorable in the commit that causes it, by editing the page. The descriptor couples `knob:CANON_KIT_RESTATEMENT_PAGES` and `*/README.md`, the sources. `install: zero-config`: the empty default scans nothing.
 
 **The honest limit.** The gate catches a renamed or removed arm or knob. It cannot catch a changed install *step* told in prose, which is why such prose is removed rather than left for a gate that cannot read it.
+
+### check-docs-page-repeat
+
+Invariant: no declared page states a relative link target, or a sentence of `CANON_KIT_PAGE_REPEAT_MIN_WORDS` words or more, twice.
+
+- **Corpus:** files matching `CANON_KIT_PAGE_REPEAT_PAGES`, an array of globs expanded like every canon-kit glob knob, default empty. An empty expansion is a clean `0 page(s)`.
+- **Prose only.** Fenced blocks, HTML comments, the front-matter block and table rows (a line whose first non-blank character is `|`) are skipped. A table is a record set, and a registry table links one target per row by design.
+- **Arm A — a repeated link.** The link extractor is §check-md-refs' bracket-then-paren match. A target with a scheme, a `mailto:` target and a pure `#anchor` are out of scope. The target is compared as written, path and fragment together, after a leading `./` is dropped, so two sections of one page are two targets.
+- **Arm B — a repeated sentence.** A prose line is split into sentences after a `.`, `!` or `?` followed by whitespace. A link reduces to its text and a heading, list or quote marker is dropped. Case and runs of whitespace are folded. A sentence of at least `CANON_KIT_PAGE_REPEAT_MIN_WORDS` words (default `8`) that occurs again on the page is a repeat.
+- **Valve:** `page-repeat-exempt: <reason>` on the later occurrence's line or the one above, in the shared exempt window (§The shared spec adapters). The reason is mandatory: a valve without one exempts nothing, and the finding names it.
+
+**Red** is one finding per later occurrence, naming the page, its line, the first occurrence's line and the repeated target or sentence. Each arm carries its own `help:` line. A link's is *link the first mention and make the later one plain text or an in-page anchor*. A sentence's is *state it once and point back to it*. The clean line counts pages, links and sentences. **Exit 2:** an unreadable page, or a `CANON_KIT_PAGE_REPEAT_MIN_WORDS` that is not a positive integer. `tier=precommit`, `install: zero-config`, armed by `CANON_KIT_PAGE_REPEAT_PAGES`.
+
+**Deliberately not asserted: a page-grain link rule, or a repeat across pages.** A page citing several sections of one README downward is the anchored shape §check-docs-link-convention requires, so the grain is the target, fragment included. A restatement across pages is usually a paraphrase, which no scanner decides.
 
 ### check-fence-command-head
 

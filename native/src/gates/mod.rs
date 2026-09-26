@@ -24,6 +24,7 @@ pub mod deprecation_task;
 pub mod docs_cmd;
 pub mod docs_highlight_coverage;
 pub mod docs_liquid_parse;
+pub mod docs_page_repeat;
 pub mod docs_restatement_parity;
 pub mod fence_command_head;
 pub mod fence_run;
@@ -613,6 +614,20 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "GATE_SDK_KIT_DIRS",
             "CANON_KIT_RESTATEMENT_PAGES",
+        ],
+        "canon-kit",
+        &[],
+    ),
+    // spec: canon-kit/SPEC.md §check-docs-page-repeat — the page corpus is the knob's glob walk
+    (
+        "check-docs-page-repeat",
+        docs_page_repeat::run,
+        &[(".", "glob:knob:CANON_KIT_PAGE_REPEAT_PAGES", "", "")],
+        &[
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+            "CANON_KIT_PAGE_REPEAT_PAGES",
+            "CANON_KIT_PAGE_REPEAT_MIN_WORDS",
         ],
         "canon-kit",
         &[],

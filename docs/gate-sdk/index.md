@@ -16,7 +16,7 @@ The steps are the kit README's [Quick start](README.md#quick-start) section. `ch
 
 ## Quick start
 
-Run these arms as the kit [README](README.md#quick-start) spells them, PowerShell included:
+Run these arms as the kit README spells them, PowerShell included:
 
 ```sh
 gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
@@ -26,4 +26,4 @@ gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 
 ## Contracts
 
-The gate contracts — the output, fail-closed, fixture-pair, and self-lint disciplines every gate keeps — are defined in the kit's [`SPEC.md`](SPEC.md#the-gate-model); its [`README.md`](README.md#gate-sdk) lists the mechanism. The README ships in the vendored `gate-sdk/` directory; the SPEC is published here. Back to the [kit map](../index.md#the-kits) or the [install guide](../install.md).
+The gate contracts — the output, fail-closed, fixture-pair, and self-lint disciplines every gate keeps — are defined in the kit's [`SPEC.md`](SPEC.md#the-gate-model); its [`README.md`](README.md#gate-sdk) lists the mechanism. The README ships in the vendored `gate-sdk/` directory; the SPEC is published here. Back to the [kit map](../index.md#the-kits) or the install guide.

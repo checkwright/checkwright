@@ -167,7 +167,7 @@ fn link_targets(text: &str) -> Vec<String> {
     out
 }
 
-fn line_link_targets(line: &str, out: &mut Vec<String>) {
+pub(crate) fn line_link_targets(line: &str, out: &mut Vec<String>) {
     let b = line.as_bytes();
     let mut i = 0usize;
     while i + 1 < b.len() {

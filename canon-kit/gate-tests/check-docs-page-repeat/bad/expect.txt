@@ -1,0 +1,2 @@
+site/page.md:7: link target `guide.md#install` first stated at line 3
+site/page.md:8: sentence "run the gate before every single commit you make here" first stated at line 5

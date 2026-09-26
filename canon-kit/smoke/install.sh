@@ -18,6 +18,7 @@ check-comment-tier
 check-deprecation-task
 check-docs-cmd
 check-docs-link-convention
+check-docs-page-repeat
 check-docs-restatement-parity
 check-fence-command-head
 check-fence-run

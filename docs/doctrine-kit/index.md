@@ -22,7 +22,7 @@ The steps are the kit README's [Install](README.md#install) section. `checkwrigh
 
 ## Quick start
 
-Run this arm as the kit [README](README.md#install) spells it, PowerShell included:
+Run this arm as the kit README spells it, PowerShell included:
 
 <!-- fence-runnable -->
 ```sh

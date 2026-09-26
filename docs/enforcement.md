@@ -108,6 +108,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | [site-kit](site-kit/index.md) | check-docs-liquid-parse | precommit |
 | [canon-kit](canon-kit/index.md) | check-docs-cmd | precommit |
 | [canon-kit](canon-kit/index.md) | check-docs-restatement-parity | precommit |
+| [canon-kit](canon-kit/index.md) | check-docs-page-repeat | precommit |
 | [canon-kit](canon-kit/index.md) | check-fence-command-head | precommit |
 | (consumer) | check-install-toolchain | precommit |
 | (consumer) | check-install-platforms | precommit |

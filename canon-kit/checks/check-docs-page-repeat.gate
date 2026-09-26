@@ -1,0 +1,4 @@
+# graph: couples=knob:CANON_KIT_PAGE_REPEAT_PAGES dir=one valve=none tier=precommit
+# install: zero-config
+# armed-by: CANON_KIT_PAGE_REPEAT_PAGES
+# spec: canon-kit/SPEC.md §check-docs-page-repeat — no declared page states a relative link target, or a sentence of CANON_KIT_PAGE_REPEAT_MIN_WORDS words or more, twice
