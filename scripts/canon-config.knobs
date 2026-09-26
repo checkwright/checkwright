@@ -39,6 +39,9 @@ CANON_KIT_MANIFEST_FILES[] = docs/posts/*.md
 # comment-tier-exempt: dated posts under docs/posts/ are immutable published artifacts whose dated narrative is their nature — a heading name cannot address a whole-file class, so the path valve exempts them from temporal-narration governance and retired-path citation while link and fenced-command resolution still apply
 CANON_KIT_TEMPORAL_EXEMPT_PATHS[] = docs/posts/*
 
+# comment-tier-exempt: this note's Renamed-knobs section must lead each removal with the removed knob backticked, which check-docs-cmd's knob assertion reds because the knob left the code; the whole-doc valve is that gate's only one
+CANON_KIT_MDREF_EXCLUDE[] = docs/posts/2026-09-26-checkwright-v0-26-0.md
+
 # comment-tier-exempt: this repo's ruling-record idiom, extending the bundled marker set rather than replacing it — a spelling of one project's ruling-record dialect is consumer config for the same provenance-seam reason the transport and payload-disclosure vocabularies below are; the first three catch the appended-correction shape TRAJECTORY.md's completion-time contract retires, and the fourth catches a ruling labelled finished and kept as a fixture, which is the failure that contract exists to end; the broader 'is spent' was measured safe and narrowed anyway, because a marker that constrains how the rule itself may be written is a marker that will be valved
 CANON_KIT_TEMPORAL_MARKERS_EXTRA[] = correction appended
 CANON_KIT_TEMPORAL_MARKERS_EXTRA[] = stands unstruck

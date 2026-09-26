@@ -63,6 +63,7 @@
 25092cp docs/posts/2026-08-14-checkwright-v0-23-0.md
 12217cp docs/posts/2026-08-21-checkwright-v0-24-0.md
 6598cp docs/posts/2026-08-23-checkwright-v0-25-0.md
+229102cp docs/posts/2026-09-26-checkwright-v0-26-0.md
 1440cp docs/queue-kit/index.md
 757cp docs/releases.md
 28270cp docs/site-architecture.md
@@ -76,7 +77,7 @@
 1002849cp gate-sdk/SPEC.md
 301516cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
-265212cp installer/SPEC.md
+265209cp installer/SPEC.md
 389608cp lifecycle-kit/SPEC.md
 4120cp lifecycle-kit/templates/consult.md
 39161cp lifecycle-kit/templates/lead.md
