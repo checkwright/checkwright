@@ -8,24 +8,6 @@
 
 ## New Features
 
-### crate-tests-windows-failures
-
-[spec: SPEC-windows-crate-tests.md]
-
-the crate's unit tests fail 37 of 1166 on both Windows triples (run 36254992168: 1128 passed, 37 failed, 1 ignored, the same set on x86_64 and aarch64). Judged against gate-sdk/SPEC.md §The path-dialect contract, 32 are test portability, 2 are a gap in the Windows job's environment (no ShellCheck), and 3 are product defects at two printed spellings. The filing's four classes missed eleven `hook::stop_liveness` shebang-stub failures, which have nothing to do with bash resolution.
-
-**Deliverable:** the six fix classes of the amendment, until one `crate-tests-windows` run is green on both triples.
-
-**Taken into this iteration 2026-09-26 at spec, operator direction lead-relayed (not a /consult ruling):** the unit set widened to include this entry, with the per-class calls left to the amendment; [crate-tests-windows-flip](#crate-tests-windows-flip) stays Deferred.
-
-**Push need (2026-09-26, inside the budget):** one mid-iteration build push, its watched gates run reading crate-tests-windows green on x86_64 and aarch64; no local Windows host reaches it.
-
-**Push need (2026-09-26, operator direction in the lead session):** up to two further build pushes past the first, the first run having read crate-tests-windows at 10 failures of 1171 on both triples.
-
-**Re-scoped (2026-09-26, operator direction in the lead session):** closed on what landed — the six deltas as built, 35 of the 37 failures fixed including the 3 product defects, both triples reading 2 failures of 1171 in run 36264222274. The green-on-both-triples predicate is **not met**; the residue, the registry-coverage pair stopping at check-gate-binary-fresh's shebang stub, is deferred through its gap-inbox bullet, which blocks crate-tests-windows-flip.
-
-**Cost while deferred:** [crate-tests-windows-flip](#crate-tests-windows-flip) stays blocked, and a new Windows regression is one warning among 37. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's build off the job's first run; promoted 2026-09-26 at its close on the lead's decision that the reporting-only job leaves nothing red this iteration: →fix fails because four failure classes each need a portability-versus-defect call. Re-verified at the drain: run 36226045247's x86_64 annotation reads `37 test(s) FAILED`. Owner lookup: `crate-tests`, `backslash`, `WSL launcher` in this file — [harness-project-dir-fold-dialect-unresolved](#harness-project-dir-fold-dialect-unresolved) is a guard fold, unrelated; owner gate-sdk/SPEC.md §check-crate-arms.
-
 ## Technical Debt
 
 ## Deferred
@@ -660,7 +642,7 @@ the native crate's unit tests run on x86_64 Linux (the battery) and on the two W
 
 `crate-tests-windows` in `.github/workflows/gates.yml` carries a hard-coded `continue-on-error: true`; once one run is green on both triples it moves to the `matrix.held` expression `install-smoke-pwsh-windows` reads, and the reports-until-green sentences leave gate-sdk/SPEC.md §check-crate-arms and the capture-drain limit in §The workflow directory.
 
-**Deliverable:** that flip and those deletions, in one commit, after [crate-tests-windows-failures](#crate-tests-windows-failures) lands.
+**Deliverable:** that flip and those deletions, in one commit, after `crate-tests-windows-failures` lands.
 
 **Cost while deferred:** a Windows crate-test failure passes every run as a warning only close reads. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's build as the follow-up crate-tests-unrun-on-windows' amendment ordered; promoted 2026-09-26 at its close: →fix fails because the job has no green run yet. Re-verified at the drain: the job in `gates.yml` reads `continue-on-error: true`. Owner lookup: as for its blocker — none.
 
@@ -1366,5 +1348,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - isolated-tracked-capture-lost
 - stage-cursor-unread-by-index-check
 - gate-sdk-tooling-brevity
+- crate-tests-windows-failures
 
 ## Lessons Learned
