@@ -672,6 +672,46 @@ the lead template's capture rule (lifecycle-kit/templates/lead.md §Stamps are a
 
 **Inferred, not run:** concurrent lead activity in that worktree, rather than its presence, caused the one-off red — `bash gate-sdk/bin/run-gates.sh --upgrade-smoke` while a second session runs the battery inside a linked worktree under `.tmp/`
 
+### install-fetch-asset-names
+
+[cost: event/low] [surface: docs]
+
+the install page's step-by-step recipes (docs/install.md, unix and Windows blocks) and the hosted scripts (`docs/install.sh`, `docs/install.ps1`) spell the Release tarball and sidecar names themselves (`checkwright-<version>.tgz` and its `.sha256`), and the install smoke legs spell the layout a third time; nothing compares them with the release-assets declaration in gate-sdk/SPEC.md §Consumer payload, which now holds the publish output alone.
+
+**Deliverable:** the fetch surfaces derive their asset names from the declaration, or a gate holds them equal to it.
+
+**Cost while deferred:** a declaration-and-publish rename reds only at the tag's pack job, leaving these four surfaces fetching a name no Release carries once the pin moves, so an adopter's one-line install breaks. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's spec as the honest limit release-asset-claim-class-owner's amendment named; promoted 2026-09-26 at its close: →fix fails because derive-or-gate is a design choice across four surfaces. Re-verified at the drain: `docs/install.sh` (`cw_tgz=`) and `docs/install.ps1` (`$tgz =`) spell `checkwright-<version>.tgz`. Owner lookup: `install.sh`, `install.ps1`, `tarball name`, `sidecar` in this file — none live; owner gate-sdk/SPEC.md §Consumer payload.
+
+### crate-tests-other-triples
+
+[cost: event/low] [surface: .github]
+
+the native crate's unit tests run on x86_64 Linux (the battery) and on the two Windows triples (`crate-tests-windows`); the two macOS triples and `aarch64-unknown-linux-gnu` only lint the crate under clippy in `native-artifacts`, so a unit test pinning a macOS or arm64 behaviour never runs there.
+
+**Deliverable:** a `cargo test` leg per remaining triple, or a stated ruling in gate-sdk/SPEC.md §check-crate-arms that those triples need none.
+
+**Cost while deferred:** a platform-specific regression on those hosts reaches no test. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's spec; promoted 2026-09-26 at its close: →fix fails because a new CI leg is a unit scope must admit. Re-verified at the drain: `git grep 'cargo test' .github/workflows` returns only `crate-tests-windows`. Owner lookup: `cargo test`, `unit tests`, `apple-darwin`, `aarch64-unknown` in this file — none; owner gate-sdk/SPEC.md §check-crate-arms.
+
+### crate-tests-windows-failures
+
+[cost: event/high] [surface: native]
+
+the crate's unit tests fail 37 of 1151 on both Windows triples (first `crate-tests-windows` run, identical set on x86_64 and aarch64). Four classes: tests asserting slash-joined paths where Windows joins with a backslash (drift_report plugin path, enter_stage wipe names, four knobs refusal texts, four proc resolution cases, install and installer::recipe queue_source); a `bash` spawned by bare name reaching the System32 WSL launcher or a non-Win32 image (ere's bash oracle, walk's gate_path_rooted parity, ten hook::stop_liveness cases, knobs::gate_sdk's pre-binary accessors, main.rs's source-stamp shell parity); emit::rewrite's sandbox seeding an illegal Windows filename (eight cases); and gates::tests' programs and roots observations, where `check-action-run-shell` exits 2 on its good fixture.
+
+**Deliverable:** each failure triaged as a test-portability fix or a product defect and fixed, until one run is green on both triples.
+
+**Cost while deferred:** [crate-tests-windows-flip](#crate-tests-windows-flip) stays blocked, and a new Windows regression is one warning among 37. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's build off the job's first run; promoted 2026-09-26 at its close on the lead's decision that the reporting-only job leaves nothing red this iteration: →fix fails because four failure classes each need a portability-versus-defect call. Re-verified at the drain: run 36226045247's x86_64 annotation reads `37 test(s) FAILED`. Owner lookup: `crate-tests`, `backslash`, `WSL launcher` in this file — [harness-project-dir-fold-dialect-unresolved](#harness-project-dir-fold-dialect-unresolved) is a guard fold, unrelated; owner gate-sdk/SPEC.md §check-crate-arms.
+
+### crate-tests-windows-flip
+
+[cost: event/high] [surface: .github]
+
+`crate-tests-windows` in `.github/workflows/gates.yml` carries a hard-coded `continue-on-error: true`; once one run is green on both triples it moves to the `matrix.held` expression `install-smoke-pwsh-windows` reads, and the reports-until-green sentences leave gate-sdk/SPEC.md §check-crate-arms and the capture-drain limit in §The workflow directory.
+
+**Deliverable:** that flip and those deletions, in one commit, after [crate-tests-windows-failures](#crate-tests-windows-failures) lands.
+
+**Cost while deferred:** a Windows crate-test failure passes every run as a warning only close reads. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's build as the follow-up crate-tests-unrun-on-windows' amendment ordered; promoted 2026-09-26 at its close: →fix fails because the job has no green run yet. Re-verified at the drain: the job in `gates.yml` reads `continue-on-error: true`. Owner lookup: as for its blocker — none.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
@@ -1349,11 +1389,5 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 The consumer's local-only companion files (private brief, ops runbook) have read triggers but no write-back trigger, so shipped-unit forward memory and an out-of-tree state verifier drift until a consult audits them; owed are close and release-sweep template slots for both, and a retired-slug arm over plain code on the local-only globs.
 
 ## Done
-
-- hook-members-off-test-floor
-- foreign-toolchain-docker-legs
-- release-asset-claim-class-owner
-- gate-sdk-native-brevity
-- crate-tests-unrun-on-windows
 
 ## Lessons Learned
