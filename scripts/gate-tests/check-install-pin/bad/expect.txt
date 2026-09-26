@@ -1,2 +1,5 @@
 invariant A: the twins disagree
 invariant B: install.sh pins 0.20.0, and the newest release is v0.21.0
+invariant C: install.sh:9: 'checkwright-{version}.tar.gz' is no asset of the pinned release
+invariant C: install.md spells no asset name
+invariant C: the fetched asset 'checkwright-{version}.tgz' has no 'checkwright-{version}.tgz.sha256' sidecar

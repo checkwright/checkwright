@@ -8,20 +8,6 @@
 
 ## New Features
 
-### install-fetch-asset-names
-
-[spec: SPEC-asset-names.md]
-
-the install page's step-by-step recipes (docs/install.md, unix and Windows blocks) and the hosted scripts (`docs/install.sh`, `docs/install.ps1`) spell the Release tarball and sidecar names themselves (`checkwright-<version>.tgz` and its `.sha256`), and the install smoke legs spell the layout a third time; nothing compares them with the release-assets declaration in gate-sdk/SPEC.md §Consumer payload, which now holds the publish output alone.
-
-**Deliverable:** the fetch surfaces derive their asset names from the declaration, or a gate holds them equal to it.
-
-**Taken for /spec 2026-09-27 at gate-sdk-tail-docs-standard's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, reshaped by `customer-docs-quality-standard`, which rewrites the per-OS recipes first.
-
-**Authored at spec 2026-09-27:** a gate, as `check-install-pin`'s third invariant. The surfaces are held to the **pinned** release's declaration, since the pin trails the tag. The smoke legs are left out, because a leg whose name drifts from the page's already reds at push. The invariant reads raw page text, so the order against customer-docs-quality-standard does not matter.
-
-**Cost while deferred:** a declaration-and-publish rename reds only at the tag's pack job, leaving these four surfaces fetching a name no Release carries once the pin moves, so an adopter's one-line install breaks. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's spec as the honest limit release-asset-claim-class-owner's amendment named; promoted 2026-09-26 at its close: →fix fails because derive-or-gate is a design choice across four surfaces. Re-verified at the drain: `docs/install.sh` (`cw_tgz=`) and `docs/install.ps1` (`$tgz =`) spell `checkwright-<version>.tgz`. Owner lookup: `install.sh`, `install.ps1`, `tarball name`, `sidecar` in this file — none live; owner gate-sdk/SPEC.md §Consumer payload.
-
 ## Technical Debt
 
 ### gate-sdk-tail-brevity
@@ -1373,5 +1359,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - customer-docs-quality-standard
 - glibc-floor-unstated
 - one-product-statement
+- install-fetch-asset-names
 
 ## Lessons Learned

@@ -1,3 +1,4 @@
-# install-sh install-ps1 version-line — the version is passed explicitly so the
-# fixture is stable against this repository's own tag line moving.
-install.sh install.ps1 0.21.0
+# install-sh install-ps1 install-md pinned-doc version-line — the pinned declaration
+# and the version are passed explicitly so the fixture is stable against this
+# repository's own tags moving.
+install.sh install.ps1 install.md pinned-SPEC.md 0.21.0

@@ -4,7 +4,7 @@ use crate::{fresh, registry, walk};
 use std::collections::BTreeSet;
 use std::path::Path;
 
-const DEFAULT_DOC: &str = "gate-sdk/SPEC.md";
+pub(crate) const DEFAULT_DOC: &str = "gate-sdk/SPEC.md";
 const OPEN: &str = "<!-- release-assets:";
 const CLOSE: &str = "-->";
 const USAGE: &str = "usage: check-release-assets [<doc> <workflow>] [--dist <dir> <version>]";
@@ -60,7 +60,7 @@ fn parse(args: &[String]) -> Result<Args, String> {
 
 // spec: gate-sdk/SPEC.md §check-release-assets — a declaration is a full line, opened at column
 // zero and closed at its end; its templates are the whitespace-separated words between
-fn declaration(line: &str) -> Option<Vec<&str>> {
+pub(crate) fn declaration(line: &str) -> Option<Vec<&str>> {
     let body = line.trim_end().strip_prefix(OPEN)?.strip_suffix(CLOSE)?;
     Some(body.split_whitespace().collect())
 }

@@ -2366,7 +2366,7 @@ Producers and consumers: the arm's caller is the session changing a PowerShell t
 
 **Refused: a monitor over published Releases.** Releases published before the archive scheme attach their binary flat, so a monitor would need a roster of exempt Releases, a maintained copy that holds nothing. The publish half holds every Release the current workflow creates, the set the prose claims.
 
-**Honest limits.** The publish half runs only at a tag, so a declaration that drifts from `publish.yml`'s naming is red at that tag's `pack` job, not at the commit that moved it. That still stops before any Release exists, and the cost is a failed release run. The wiring check reads the call's text, not whether its step runs. A surface that spells an asset name for its own use, such as the install page's recipes or the hosted install scripts, is not compared with the declaration.
+**Honest limits.** The publish half runs only at a tag, so a declaration that drifts from `publish.yml`'s naming is red at that tag's `pack` job, not at the commit that moved it. That still stops before any Release exists, and the cost is a failed release run. The wiring check reads the call's text, not whether its step runs. The surfaces that spell an asset name to fetch it, the install page's recipes and the hosted install scripts, are held to the pinned release's declaration by installer/SPEC.md §The hosted install pin, invariant C.
 
 ### gen-pre-commit
 

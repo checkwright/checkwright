@@ -979,14 +979,19 @@ The derivable half is gated: `check-release-bump` (this repo's `scripts/`, a com
 
 ### The hosted install pin
 
-Each hosted install script (§The dependency boundary, *The one-line install*) names one version, on one pin line: `pin='X.Y.Z'` in `docs/install.sh` and `$pin = 'X.Y.Z'` in `docs/install.ps1`. `check-install-pin` (this repo's `scripts/`) holds two invariants:
+The one-line install's two scripts and docs/install.md's step-by-step recipes fetch one pinned release (§The dependency boundary, *The one-line install*). Each script names that release's version on one pin line: `pin='X.Y.Z'` in `docs/install.sh` and `$pin = 'X.Y.Z'` in `docs/install.ps1`. All three **fetch surfaces** spell the names of the assets they download. `check-install-pin` (this repo's `scripts/`) holds three invariants:
 
 - **Invariant A — the twins agree.** Each script carries exactly one pin line of its grammar, and the two pins are equal.
 - **Invariant B — the pin is the newest release.** The pin equals the newest tag by creator date, read by the same reader `check-release-channel-parity` uses, so the one question has one answer.
+- **Invariant C — the fetched names are the pinned release's.** An **asset token** is a maximal run of `[A-Za-z0-9._{}$-]` containing `.tgz` or `.tar.gz`, with each variable reference in it (`$name`, `${name}`) read as `{version}`. Each fetch surface carries at least one asset token. Each token equals a template of the release-assets declaration (gate-sdk/SPEC.md §Consumer payload) as the tag `v<pin>` carries it, `<pin>` being `docs/install.sh`'s. For each matched template not itself ending `.sha256`, that declaration also carries the template with `.sha256` appended, since every surface names the digest by that suffix.
 
-The gate fails closed, exit 2, on a missing or duplicated pin line, on a pin that is not `<major>.<minor>.<patch>`, and on a newest tag that does not parse as that triple. A repository with no tags has no version line, so B is dormant there, and the clean line says so. A shallow CI checkout carries no tags and meets the same dormancy. Its positional form, `check-install-pin [install-sh install-ps1 [version]]`, points it at a fixture pair with the version passed explicitly, so the fixture holds still as the tags move.
+C reads the declaration at the pinned tag, not in the tree. The pin trails the tag, so a rename that has landed but not shipped leaves the surfaces correctly fetching the old names. C fires in the commit that moves the pin, which must carry the surfaces' new names with it.
+
+The gate fails closed, exit 2, on a missing or duplicated pin line, on a pin that is not `<major>.<minor>.<patch>`, and on a newest tag that does not parse as that triple. It also exits 2 on an unreadable fetch surface, on a pinned tag that exists and carries no declaring doc, and on a declaring doc carrying no `release-assets` line or more than one. A repository with no tags has no version line, so B is dormant there, and the clean line says so. Where `v<pin>` does not resolve, C is dormant too. A shallow CI checkout carries no tags and meets both dormancies. Its positional form, `check-install-pin [install-sh install-ps1 install-md pinned-doc [version]]`, points it at a fixture pair: the pinned declaration is read from the file `pinned-doc` and the version is passed explicitly, so the fixture holds still as the tags move.
 
 **Why the pin trails the tag rather than leading it.** Pages deploys on every master push, and a release's assets exist only after its tag's `publish` run. A pin moved before the tag would, for that window, name a release the one-liner cannot download. Moved after the tag, it is at worst one release stale, and every release it names exists.
+
+**Honest limits.** A name assembled from parts, such as `"checkwright-" + $v + ".tgz"`, is no token, so C cannot see it. The install-smoke legs spell the tarball as well and are left out, because a leg that places a name the page's install block does not read reds that leg at push.
 
 ### The front door's verbs
 

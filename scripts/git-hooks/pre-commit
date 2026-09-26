@@ -420,7 +420,7 @@ if staged_matches 'docs/install.md' '.github/workflows/publish.yml' 'native/src/
     run_gate check-release-channel-parity native/target/release/checkwright-gates check-release-channel-parity
 fi
 
-if staged_matches 'docs/install.sh' 'docs/install.ps1' 'native/src/gates/install_pin.rs' 'native/src/gates/release_channel_parity.rs' 'native/src/fresh.rs'; then
+if staged_matches 'docs/install.sh' 'docs/install.ps1' 'docs/install.md' 'gate-sdk/SPEC.md' 'native/src/gates/install_pin.rs' 'native/src/gates/release_assets.rs' 'native/src/gates/release_channel_parity.rs' 'native/src/fresh.rs' 'native/src/programs.rs'; then
     run_gate check-install-pin native/target/release/checkwright-gates check-install-pin
 fi
 
