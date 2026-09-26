@@ -7,3 +7,4 @@
 gate-sdk-tail-docs-standard scope ab200ab0 2026-09-27 cc1add18
 gate-sdk-tail-docs-standard spec afc9ec94 2026-09-27 2079ee75
 gate-sdk-tail-docs-standard align a449fcea 2026-09-27 5468a75d
+gate-sdk-tail-docs-standard build aa19d03d 2026-09-27 8f389241
