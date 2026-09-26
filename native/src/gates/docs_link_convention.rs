@@ -32,7 +32,7 @@ fn target_head(raw: &str) -> &str {
     raw.split(' ').next().unwrap_or("")
 }
 
-// spec: gate-sdk/SPEC.md §The fourth budget batch — `realpath -m --relative-to=.`: lexical
+// spec: canon-kit/SPEC.md §check-docs-link-convention — `realpath -m --relative-to=.`: lexical
 // normalization that keeps a leading `..`, since the target need not exist
 fn normalize_rel(p: &str) -> String {
     let mut stack: Vec<&str> = Vec::new();
@@ -55,8 +55,8 @@ fn normalize_rel(p: &str) -> String {
     }
 }
 
-// spec: gate-sdk/SPEC.md §The fourth budget batch — the same call for an absolute join: normalize,
-// then express the result against the invoking directory, which is what `--relative-to=.` does
+// spec: canon-kit/SPEC.md §check-docs-link-convention — the same call for an absolute join:
+// normalize, then express the result against the invoking directory, as `--relative-to=.` does
 fn relative_to(abs: &str, here: &str) -> String {
     let a: Vec<&str> = abs.split('/').filter(|s| !s.is_empty()).collect();
     let h: Vec<&str> = here.split('/').filter(|s| !s.is_empty()).collect();
@@ -266,7 +266,7 @@ mod tests {
         assert_eq!(target_head("p.md \"a title\""), "p.md");
     }
 
-    // spec: gate-sdk/SPEC.md §The fourth budget batch — the `..` join keeps climbing past the
+    // spec: canon-kit/SPEC.md §check-docs-link-convention — the `..` join keeps climbing past the
     // start, which is what makes an off-root target expressible at all
     #[test]
     fn the_normalizer_keeps_a_leading_climb_and_collapses_the_rest() {

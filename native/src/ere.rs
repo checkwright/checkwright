@@ -614,8 +614,8 @@ impl Parser<'_> {
         }
     }
 
-    // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — delta (3)'s refusal, named by what the
-    // consumer wrote: a backreference and a GNU word-boundary form each say so
+    // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — the unsupported-construct refusal, named
+    // by what the consumer wrote: a backreference and a GNU word-boundary form each say so
     fn parse_escape(&mut self) -> Result<Node, EreError> {
         let e = match self.at(1) {
             Some(e) => e,
@@ -755,7 +755,7 @@ impl Parser<'_> {
     }
 }
 
-// spec: gate-sdk/SPEC.md §The POSIX ERE matcher — delta (4): the acceptance oracle is a
+// spec: gate-sdk/SPEC.md §The POSIX ERE matcher — the acceptance oracle is a
 // differential run against the shell's own awk, because a hand-written engine is the one
 // component whose author cannot write both sides of a unit test and learn anything
 #[cfg(test)]
@@ -998,7 +998,7 @@ done"#;
         assert!(EreCapture::compile("(\\w+)").is_err());
     }
 
-    // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — delta (3): the refusals awk would
+    // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — the refusals awk would
     // silently accept, which is why they cannot be asserted differentially
     #[test]
     fn a_gnu_extension_is_refused_by_name_rather_than_read_as_a_literal() {
@@ -1019,7 +1019,7 @@ done"#;
         }
     }
 
-    // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — delta (2): the one assertion the
+    // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — leftmost-longest: the one assertion the
     // differential corpus above would also carry, stated alone because it is the whole
     // reason the engine is leftmost-longest rather than leftmost-first
     #[test]

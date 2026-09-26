@@ -12,6 +12,26 @@
 
 ## Deferred
 
+### absence-statement-gate-arms
+
+[cost: event/low] [surface: canon-kit]
+
+doctrine-kit/DOCTRINE.md's Absence statements rule has an audit-roster class and no gate. Two arms are narrow enough to decide mechanically: (a) a `check-prose-tells` arm redding a section whose whole body is one negative-existential sentence, over a consumer-configured surface glob, off by default and never all markdown, exempting generated regions; (b) a placeholder-slug denylist in `check-task-names`, since a queue section holding only a `none` bullet or an indented None passes `check-task-names` and `check-queue-hygiene` today. The roster class calls the rule un-gateable as a whole; these arms take only the shapes that need no judgment of whether a reader must know the question was considered.
+
+**Deliverable:** per arm, a knob, an assertion and a `good/`+`bad/` fixture pair, or a SPEC boundary note refusing it.
+
+**Cost while deferred:** an absence sentence on a ledger is found only by the close audit sweep. No live instance exists: the queue's and the ruling record's empty sections are headings alone. Filed 2026-09-26 to the gap inbox by absence-statement-grammar's amendment, which costed the arms without building them; promoted 2026-09-26 at its close: →fix fails because each arm is new mechanism with a knob, and no live instance needs repair. Owner lookup: `absence`, `placeholder` in this file — none live; owner doctrine-kit/DOCTRINE.md Absence statements, with the arms in canon-kit/SPEC.md §check-prose-tells and queue-kit/SPEC.md §check-task-names. Surface also queue-kit.
+
+### glibc-floor-unstated
+
+[cost: event/low] [surface: installer]
+
+the x86_64-linux artifact's glibc floor follows its floating build image: `publish.yml`'s build matrix reads `native/runners.list`'s `ubuntu-latest`, so a release built during the Ubuntu 26 rollout (2026-10-19 to 11-19) may land on either image and raise the floor silently. No surface states a glibc floor: installer/SPEC.md names only the musl/glibc split, and docs/install.md §Requirements names no libc.
+
+**Deliverable:** pin the linux build leg to a named image, or measure the shipped artifact's highest required `GLIBC_` symbol version and state it as the floor with a gate or publish-time check holding it; either way docs/install.md §Requirements states the floor.
+
+**Cost while deferred:** an adopter on an older glibc meets a loader failure the installer's libc check does not predict. Filed 2026-09-26 to the gap inbox by runner-image-label-migration's build; promoted 2026-09-26 at porting-records-brevity's close: →fix fails because pin-or-state is a design choice over a label that unit ruled to ride, and the floor is a property of a CI-built artifact this host does not build. Owner lookup: `glibc`, `runners.list` in this file — only [foreign-toolchain-docker-legs](#foreign-toolchain-docker-legs), whose glibc mention is a host-versus-container pwsh mismatch, not the shipped floor; owner installer/SPEC.md.
+
 ### docs-liquid-literal-unseen
 
 [cost: event/low] [surface: site-kit]
@@ -374,11 +394,11 @@ the secondary customer pages carry validity slips and undefined internal vocabul
 
 [cost: session/high] [surface: gate-sdk]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk's remainder, its framework half landed as `gate-sdk-framework-brevity` (§Per-component contracts at about 107k words, the Porting cohort records, §The `# graph:` manifest, §Meta-gate conservation for the binary substrate, §Consumer payload, §Consumer smoke), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk's remainder (§The port-candidate criteria, §The non-gate arm, §Per-component contracts; its framework, remainder and porting slices landed as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity` and `gate-sdk-porting-brevity`), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
-**Split 2026-09-25 at scope, operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework half was promoted as its own debt entry; this entry keeps the rest. **Split again 2026-09-25 at the next scope, on the same class of direction:** §The `# graph:` manifest, §Meta-gate conservation, §Consumer payload and §Consumer smoke left as `gate-sdk-remainder-brevity`, so gate-sdk's remainder here is the Porting records and §Per-component contracts. **Split a third time 2026-09-26 at scope, operator direction lead-relayed (not a /consult ruling):** the Porting cohort and batch records left as `gate-sdk-porting-brevity`, so gate-sdk's remainder here is §The port-candidate criteria, §The non-gate arm and §Per-component contracts.
+**Split three times, 2026-09-25 to 09-26 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder and porting slices each left as their own debt entry, all since landed.
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 

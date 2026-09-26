@@ -39,6 +39,12 @@ SMOKE_BEGIN="<!-- doctrine-kit:begin -->"
 SMOKE_END="<!-- doctrine-kit:end -->"
 smoke_block() { awk -v b="$SMOKE_BEGIN" -v e="$SMOKE_END" '$0 == e { inb = 0 } inb; $0 == b { inb = 1 }' CLAUDE.md; }
 
+# spec: doctrine-kit/SPEC.md §install-doctrine — the link paragraph is emitted as one line, so a consumer registering an unwrapped-markdown gate installs green rather than red until a rejoin
+if [[ "$(smoke_block | awk '/^## / { h = 1; next } h && NF { n++; next } h && n { exit } END { print n + 0 }')" != "1" ]]; then
+    echo "doctrine smoke: the installed link paragraph is not a single line — the digest intro was hard-wrapped" >&2
+    exit 1
+fi
+
 # spec: doctrine-kit/SPEC.md §install-doctrine — the declared-trim round-trip's acceptor. The marker module has no gate surface of its own (gate-sdk/SPEC.md §lib/inject.sh), so its read half and this installer's preservation rule are exercised here: declare a trim in the block the installer just emitted, re-run the installer, and hold that the marker survived *in the trimmed bullet's position* with the bullet gone and the gate green
 mapfile -t SMOKE_RULES < <(smoke_block | awk '/^- \*\*/ { sub(/^- \*\*/, ""); sub(/\*\*.*/, ""); print }')
 if [[ ${#SMOKE_RULES[@]} -lt 2 ]]; then

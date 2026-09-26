@@ -106,12 +106,11 @@ fn digest(doctrine_file: &str, rules: &[Rule]) -> Vec<String> {
         "## Delivery doctrine".to_string(),
         String::new(),
         format!(
-            "The cross-kit delivery rules live in [{}]({}) — re-vendor",
+            "The cross-kit delivery rules live in [{}]({}) — re-vendor to upgrade. The \
+             always-loaded maintenance rules, one line each; the doctrine adds an \
+             engineering-craft section behind the link:",
             doctrine_file, doctrine_file
         ),
-        "to upgrade. The always-loaded maintenance rules, one line each; the doctrine adds"
-            .to_string(),
-        "an engineering-craft section behind the link:".to_string(),
         String::new(),
     ];
     for r in rules {
