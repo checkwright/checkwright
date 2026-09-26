@@ -10,6 +10,11 @@ const NAME: &str = "agent-budget-guard";
 // The arm-unavailable path the spawn error stood for is the front-end's, which fails open.
 pub fn run(_payload: Option<&Value>) -> i32 {
     let (verdict, code) = hook::verdict::verdict(&[]);
+    relay(&verdict, code)
+}
+
+// spec: delegation-kit/SPEC.md §The delegation model — only the verdict's PAUSE status blocks
+fn relay(verdict: &str, code: i32) -> i32 {
     if code == 1 {
         return hook::block(NAME, &format!("{}\n{}", verdict, CORRECTIVE));
     }
@@ -19,3 +24,31 @@ pub fn run(_payload: Option<&Value>) -> i32 {
 // spec: delegation-kit/SPEC.md §The delegation model — the block's corrective half, carried verbatim
 // off the shell member: it names the axis-to-window mapping and the two knobs that raise it.
 const CORRECTIVE: &str = "corrective: the verdict names the axis that fired — a 5h PAUSE clears when that window resets (hours); a 7-day PAUSE costs days, so pause delegation and let the supervisor carry the week. The full delegation protocol is /agent-execution. To override deliberately, raise the matching knob (DELEGATION_KIT_PAUSE_PCT for 5h, DELEGATION_KIT_PAUSE_PCT_7D for the weekly axis) via the .claude/settings.local.json env block, which the hook re-reads per fire (delegation-kit/SPEC.md §The delegation model).";
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // spec: delegation-kit/SPEC.md §The delegation model — PAUSE (1) blocks at the harness's block
+    // status; OK (0) and STALE (2) advise and let the dispatch through
+    #[test]
+    fn only_a_pause_verdict_blocks_the_dispatch() {
+        assert_eq!(relay("PAUSE 5h 91%", 1), 2);
+        assert_eq!(relay("OK 5h 12%", 0), 0);
+        assert_eq!(relay("STALE usage file 40m old", 2), 0);
+    }
+
+    // spec: delegation-kit/SPEC.md §The delegation model — every knob the corrective tells the
+    // reader to raise is one the verdict rule reads, so the override it names takes effect
+    #[test]
+    fn the_corrective_names_only_knobs_the_verdict_reads() {
+        let named: Vec<&str> = CORRECTIVE
+            .split(|c: char| !(c.is_ascii_uppercase() || c.is_ascii_digit() || c == '_'))
+            .filter(|w| w.starts_with("DELEGATION_KIT_"))
+            .collect();
+        assert!(named.len() >= 2, "the corrective names both axes' knobs: {:?}", named);
+        for knob in named {
+            assert!(hook::verdict::KNOBS.contains(&knob), "{} is not a verdict knob", knob);
+        }
+    }
+}

@@ -126,14 +126,65 @@ fn consumer_stage(argv: &[String], input: &[u8]) -> Stage {
         Err(e) => return fault(format!("could not run: {}", e)),
     };
     let (out, err) = done.streams();
-    match done.code() {
-        Some(2) => Stage::Block(err.to_vec()),
-        Some(0) if out.iter().all(u8::is_ascii_whitespace) => Stage::Pass,
+    match classify(done.code(), out, err) {
+        Ok(stage) => stage,
+        Err(what) => fault(what.unwrap_or_else(|| format!("was killed (status {})", done.reported_code()))),
+    }
+}
+
+// spec: guard-kit/SPEC.md §Consumer rules — the consumer's exit read as the harness reads a hook's;
+// a fault is described here, or left `None` for a kill whose status only the caller holds.
+fn classify(code: Option<i32>, out: &[u8], err: &[u8]) -> Result<Stage, Option<String>> {
+    match code {
+        Some(2) => Ok(Stage::Block(err.to_vec())),
+        Some(0) if out.iter().all(u8::is_ascii_whitespace) => Ok(Stage::Pass),
         Some(0) => match serde_json::from_slice::<Value>(out) {
-            Ok(Value::Object(_)) => Stage::Decide(out.to_vec()),
-            _ => fault("exited 0 with stdout that is not a JSON object".to_string()),
+            Ok(Value::Object(_)) => Ok(Stage::Decide(out.to_vec())),
+            _ => Err(Some("exited 0 with stdout that is not a JSON object".to_string())),
         },
-        Some(n) => fault(format!("exited {}", n)),
-        None => fault(format!("was killed (status {})", done.reported_code())),
+        Some(n) => Err(Some(format!("exited {}", n))),
+        None => Err(None),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // spec: guard-kit/SPEC.md §Consumer rules — each exit the consumer can give lands on one stage;
+    // a block relays the consumer's stderr and a decision its stdout, byte for byte
+    #[test]
+    fn the_consumer_exit_selects_the_stage() {
+        assert!(matches!(classify(Some(2), b"", b"no\n"), Ok(Stage::Block(e)) if e == b"no\n"));
+        assert!(matches!(classify(Some(0), b" \n", b""), Ok(Stage::Pass)));
+        let obj = br#"{"decision":"block"}"#;
+        assert!(matches!(classify(Some(0), obj, b""), Ok(Stage::Decide(o)) if o == obj));
+        for out in [&b"[1]"[..], b"allow", b"\"s\""] {
+            assert!(matches!(classify(Some(0), out, b""), Err(Some(m)) if m.contains("not a JSON object")));
+        }
+        assert!(matches!(classify(Some(1), b"", b""), Err(Some(m)) if m == "exited 1"));
+        assert!(matches!(classify(None, b"", b""), Err(None)));
+    }
+
+    // spec: guard-kit/SPEC.md §Consumer rules — no configured command is no consumer stage
+    #[test]
+    fn an_empty_consumer_command_passes() {
+        assert!(matches!(consumer_stage(&[], b"{}"), Stage::Pass));
+    }
+
+    // spec: guard-kit/SPEC.md §The shell guard — a raw control byte and a refused knob read both
+    // block, a consumer fault beside them notwithstanding
+    #[test]
+    fn a_control_byte_and_a_refused_knob_read_block() {
+        assert_eq!(control_byte_block(0x01, None), 2);
+        assert_eq!(control_byte_block(0x1b, Some("the consumer rule command exited 1")), 2);
+        assert_eq!(refused("the knob file is unreadable"), 2);
+    }
+
+    // spec: guard-kit/SPEC.md §The shell guard — a call with no parseable payload exits 0 before
+    // any knob or consumer command is read
+    #[test]
+    fn a_missing_payload_is_let_through() {
+        assert_eq!(run(&Payload { bytes: Vec::new(), value: None }), 0);
     }
 }

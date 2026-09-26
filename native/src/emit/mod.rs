@@ -942,7 +942,8 @@ mod tests {
     }
 
     // spec: gate-sdk/SPEC.md §The non-gate arm — the testing floor's census: each row's function
-    // resolves to its file, and that file carries a test module. Presence, never coverage.
+    // resolves to its file, and that file carries a test module, and so does each `--hook` member's.
+    // Presence, never coverage.
     #[test]
     fn every_arm_table_row_resolves_to_a_file_with_a_test_module() {
         let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
@@ -982,9 +983,37 @@ mod tests {
             }
         }
         assert_eq!(rows, ARMS.len(), "the census read {} rows of the {} the table holds", rows, ARMS.len());
+        let hooks = std::fs::read_to_string(root.join("hook/mod.rs")).expect("the member table's file reads");
+        let start = hooks.find("pub const HOOKS:").expect("the member table's declaration");
+        let end = start + hooks[start..].find("\n];").expect("the member table's close");
+        let mut members = 0;
+        for (at, _) in hooks[start..end].match_indices("::run") {
+            members += 1;
+            let module: String = hooks[start..start + at]
+                .chars()
+                .rev()
+                .take_while(|c| c.is_ascii_alphanumeric() || *c == '_')
+                .collect::<Vec<_>>()
+                .into_iter()
+                .rev()
+                .collect();
+            let file = root.join(format!("hook/{}.rs", module));
+            let tested = std::fs::read_to_string(&file)
+                .is_ok_and(|t| t.lines().any(|l| l.trim_start().starts_with("#[cfg(test)]")));
+            if !tested {
+                offending.push(format!("--hook {}::run -> hook/{}.rs", module, module));
+            }
+        }
+        assert_eq!(
+            members,
+            crate::hook::HOOKS.len(),
+            "the census read {} members of the {} the hook table holds",
+            members,
+            crate::hook::HOOKS.len()
+        );
         assert!(
             offending.is_empty(),
-            "arm-table rows whose file carries no #[cfg(test)] module:\n  {}",
+            "arm-table rows and --hook members whose file carries no #[cfg(test)] module:\n  {}",
             offending.join("\n  ")
         );
     }

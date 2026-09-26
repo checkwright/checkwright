@@ -48,16 +48,6 @@ this host lacks `pwsh` and `dash`, so the front-end parity check's PowerShell ha
 
 ## Technical Debt
 
-### hook-members-off-test-floor
-
-`native/src/hook/shell_guard.rs` and `native/src/hook/budget.rs` carry no `#[cfg(test)]` module. The arm-test floor (gate-sdk/SPEC.md §The non-gate arm) binds the file implementing an arm-table row, and `--hook`'s row resolves to `hook/mod.rs`, which has one. shell-guard is driven by `--run-guard-tests`; `budget.rs` is reached only through the verdict it relays.
-
-**Deliverable:** each `HOOKS` row's module carries a `#[cfg(test)]` module exercising its member's rule, the arm-table unit test also resolves `HOOKS` rows and reds a member file with none, and §The non-gate arm says so in one sentence. It lands before [gate-sdk-native-brevity](#gate-sdk-native-brevity) passes that section.
-
-**Ruled 2026-09-26 at scope — operator direction, lead-relayed (not a /consult ruling):** a dispatched member owes the floor. Promoted as debt: it takes the section's rule that a crate test elsewhere never stands in for the arm's own module at its word, and adds no name.
-
-**Cost while deferred:** a member can change behaviour with nothing red. Filed 2026-09-26 by non-gate-arm-contract's spec census; promoted 2026-09-26 at scope. Re-verified at scope: `grep -c 'cfg(test)'` is 0 for both files and 1 for `hook/mod.rs`.
-
 ### gate-sdk-native-brevity
 
 the native-substrate sections of gate-sdk/SPEC.md: §The non-gate arm and §The port-candidate criteria under §Porting a gate to the binary substrate, and §port-blockers, §build-native and §check-crate-arms under §Per-component contracts; about 25.7k words. The rest of §Per-component contracts stays on [spec-brevity-residue](#spec-brevity-residue).
@@ -1407,5 +1397,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 The consumer's local-only companion files (private brief, ops runbook) have read triggers but no write-back trigger, so shipped-unit forward memory and an out-of-tree state verifier drift until a consult audits them; owed are close and release-sweep template slots for both, and a retired-slug arm over plain code on the local-only globs.
 
 ## Done
+
+- hook-members-off-test-floor
 
 ## Lessons Learned
