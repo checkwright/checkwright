@@ -4,11 +4,4 @@
 
 ---
 
-porting-records-brevity scope aa0f2c23 2026-09-26 f0e26f7e
-porting-records-brevity spec a4a61652 2026-09-26 3850eaab
-porting-records-brevity align a7db2e52 2026-09-26 6d5ac4c9
-porting-records-brevity build a6cc66fa 2026-09-26 3610c524
-porting-records-brevity build a4ca6189 2026-09-26 0711dba8
-porting-records-brevity build a7fa736b 2026-09-26 c58654b0
-porting-records-brevity validate aec2430b 2026-09-26 bdaf520f
-porting-records-brevity close af0baa22 2026-09-26 894f835f
+— scope a3d1eaf1 2026-09-26 b622f7fd
