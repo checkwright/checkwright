@@ -28,7 +28,7 @@ runs:
         echo "sarif=$sarif" >> "$GITHUB_OUTPUT"
         v="$CHECKWRIGHT_ACTION_VERSION"
         if [ -z "$v" ] && [ -f checkwright.lock ]; then
-          v="$(sed -n 's/^  "version": "\([^"]*\)",$/\1/p' checkwright.lock)"
+          v="$(sed -n 's/^  "version": "\([^"]*\)",\{0,1\}$/\1/p' checkwright.lock)"
         fi
         if [ -z "$v" ]; then
           echo "::error::no checkwright.lock names a version here; set the action's 'version' input to the release to run"
