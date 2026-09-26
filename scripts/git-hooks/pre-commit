@@ -428,6 +428,10 @@ if staged_matches '.workflow/release-declarations.md' 'gate-sdk/bin/*' 'canon-ki
     run_gate check-release-change-declared native/target/release/checkwright-gates check-release-change-declared
 fi
 
+if staged_matches 'gate-sdk/SPEC.md' '.github/workflows/publish.yml' '*native/targets.list' 'scripts/gate-sdk-config.knobs' 'native/src/gates/release_assets.rs' 'native/src/fresh.rs'; then
+    run_gate check-release-assets native/target/release/checkwright-gates check-release-assets
+fi
+
 if staged_matches '.github/workflows/*.yml' '.github/workflows/*.yaml' 'native/src/gates/npm_publish_spec.rs' 'native/src/fresh.rs'; then
     run_gate check-npm-publish-spec native/target/release/checkwright-gates check-npm-publish-spec
 fi

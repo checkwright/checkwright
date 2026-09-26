@@ -135,6 +135,7 @@ pub mod test_hermetic;
 pub mod tightened_gates_grammar;
 pub mod release_declaration_parity;
 pub mod release_change_declared;
+pub mod release_assets;
 pub mod tracking_claim;
 pub mod tree_terms;
 pub mod unmarked_claim;
@@ -1473,6 +1474,14 @@ pub const REGISTRY: &[GateEntry] = &[
         &["GATE_SDK_KIT_DIRS"],
         "-",
         &[("git", "")],
+    ),
+    (
+        "check-release-assets",
+        release_assets::run,
+        &[],
+        &["GATE_SDK_NATIVE_PUBLISH_WORKFLOW", "GATE_SDK_NATIVE_TARGETS_FILE"],
+        "-",
+        &[],
     ),
     // spec: gate-sdk/SPEC.md §The consumer remainder cohort — the rest of the consumer's own
     // gates directory, every member on the `-` sentinel. The two that declare a knob declare

@@ -22,18 +22,6 @@ no CI leg runs the native crate's unit tests on native Windows. `.github/workflo
 
 **Cost while deferred:** a Windows adopter's close drain could fail with exit 2, and nobody sees it until an adopter reports it. Filed 2026-09-25 to the gap inbox by spec-brevity-first-slice's build; promoted 2026-09-25 at its close. →fix fails because a new CI leg is new mechanism, and only a push can witness it. Re-verified at the drain: `grep 'cargo test' .github/workflows/*.yml` returns nothing. Owner lookup: `cargo test`, `msvc`, `unit tests on` in this file — none; `foreign-toolchain-docker-legs` covers local pwsh and dash runs, not crate unit tests.
 
-### release-asset-claim-class-owner
-
-[spec: SPEC-release-assets.md] [recurrence: 2026-09-25]
-
-a "the release ships an asset" claim has no gate, and the class now has a second instance: gate-sdk/SPEC.md §Consumer payload, filed after this entry, alongside the install page's.
-
-**Deliverable:** an owner for the class (the release-note gate, or a §Consumer payload assertion the publish workflow's artifact list satisfies), with a fixture.
-
-**Specified 2026-09-26:** §Consumer payload declares the asset set in a `release-assets:` line, and a consumer-registered, born-native `check-release-assets` holds the line's grammar and the publish workflow's call at every commit. Inside `pack` at a tag, it holds the output directory to the line, so a mismatch fails before any Release exists. The newest published Release predates the archive scheme, so no monitor reads the published history.
-
-**Cost while deferred:** two public claims about what a release carries, held by nothing. Filed 2026-08-07; returned from the icebox 2026-09-25 by consult on the second instance.
-
 ## Technical Debt
 
 ### gate-sdk-native-brevity
@@ -1388,5 +1376,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 - hook-members-off-test-floor
 - foreign-toolchain-docker-legs
+- release-asset-claim-class-owner
 
 ## Lessons Learned

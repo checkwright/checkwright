@@ -108,6 +108,7 @@ check-install-pin
 check-tightened-gates-grammar
 check-release-declaration-parity
 check-release-change-declared
+check-release-assets
 check-npm-publish-spec
 check-manifest-temporal
 check-manifest-count

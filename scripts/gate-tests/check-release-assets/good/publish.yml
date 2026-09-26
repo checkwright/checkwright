@@ -1,0 +1,5 @@
+jobs:
+  pack:
+    steps:
+      - run: |
+          bash gate-sdk/bin/run-gates.sh --only check-release-assets -- --dist "$out" "$version"

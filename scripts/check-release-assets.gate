@@ -1,0 +1,2 @@
+# graph: couples=gate-sdk/SPEC.md,.github/workflows/publish.yml,knob:GATE_SDK_NATIVE_TARGETS_FILE dir=one valve=none tier=precommit
+# spec: gate-sdk/SPEC.md §check-release-assets — the Release's asset set is declared once in §Consumer payload, and each tag's pack output is held to it before its Release exists

@@ -1,0 +1,1 @@
+RELEASE-ASSETS: clean (3 template(s) declared in payload.md, the publish half wired in publish.yml; dist carries exactly the 4 declared asset(s) for version 0.1.0)

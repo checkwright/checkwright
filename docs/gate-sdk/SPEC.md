@@ -1672,7 +1672,9 @@ The sentence each README carries, naming the withholding and the knob with no ho
 
 Per-artifact sidecars are used rather than a combined `SHA256SUMS` or a JSON manifest, because an attestation's subject list is `{name, digest}` pairs. A sidecar maps onto a subject one-to-one, so a build attestation can later land beside these files with no migration and no digest changing. A manifest would mint a schema and a version key for the same information.
 
-The Release publishes each target's binary and sidecar alongside the tarball as one archive, `checkwright-gates-<version>-<target>.tar.gz`, because Release assets are flat. Inside it both files keep their payload names, so the sidecar verifies with `sha256sum -c` once extracted and no second spelling of the digest's subject is minted. What that publication buys is that the digest an installer verifies against has a source outside the payload it travels in; a digest shipped only alongside its own artifact certifies nothing.
+**A Release carries the tarball, its sidecar, and one archive per roster target**, `checkwright-gates-<version>-<target>.tar.gz`, holding that target's binary and sidecar under their payload names, because Release assets are flat. Once extracted, the sidecar verifies with `sha256sum -c`, so no second spelling of the digest's subject is minted. The digest an installer checks therefore has a source outside the payload it travels in, and a digest shipped only beside its own artifact certifies nothing. The line below declares the set, and §check-release-assets holds each tag's set to it before its Release exists. A Release published before the line carries what its own tag's workflow attached.
+
+<!-- release-assets: checkwright-{version}.tgz checkwright-{version}.tgz.sha256 checkwright-gates-{version}-{target}.tar.gz -->
 
 **What the digest proves, at its honest bound.** It is a transfer- and substitution-integrity claim: the artifact in the payload is byte-identical to the one the release built. It is **not** evidence the build host was uncompromised. What that floor does not provide is a reproducible build, and a build attestation is the outstanding ground: the checksum proves transfer only. Withholding the sources changes what that attestation is worth: with sources withheld it is the consumer's only remaining basis for trust.
 
@@ -2292,6 +2294,26 @@ Producers and consumers: the arm's caller is the session changing a PowerShell t
 **Consumer-declared, and why.** Only the repository that authors kits deletes a kit `bin/` tool or edits a kit template; an adopter's tree receives those changes at upgrade and never makes them. So no kit ships the gate, and it reads the surface path the way §The declaration cohort's members do, through `GATE_SDK_WORKFLOW_DIR`.
 
 **Honest limits.** The gate checks that a path is **named**, not that the bullet's prose is right. It cannot check the Tightened-gates half of the both-sections rule, because no derivation maps a template to the gates that read it; that half is held by the producer and by the upgrade smoke, and only for gates that actually red. A copied-out template outside the claimed set, a template edit anywhere else, and any semantic change stay on §upgrade-smoke's producer clause.
+
+### check-release-assets
+
+**What a Release carries is declared once and held at the tag, before the Release exists.** §Consumer payload carries the declaration, a full-line `<!-- release-assets: <template>... -->` comment. Each whitespace-separated template names one asset. `{version}` stands for the tag's version and is required. A template also carrying `{target}` names one asset per target-roster line (`GATE_SDK_NATIVE_TARGETS_FILE`). No other placeholder, and no `/`, is admitted. The gate is consumer-declared in this repo's `scripts/` at `tier=precommit`, compiled like the release gates beside it.
+
+- **Battery half.** Exactly one declaration line in the declaring doc, every template well-formed, no two templates alike. The publish workflow (`GATE_SDK_NATIVE_PUBLISH_WORKFLOW`) carries a line invoking this gate with `--dist`. Each is a finding naming the doc or workflow and the remedy. A doc with no declaration is a finding, not a refusal, because nothing owning the claim is the defect this gate exists for.
+- **The wiring read.** The knob is a word list, so the call may sit in any workflow it names, and every named workflow must be readable. A `#`-led line is not a call, since a commented step never runs.
+- **Publish half, `--dist <dir> <version>`.** The directory's entries, read non-recursively, equal the declaration expanded over `<version>` and the roster. It reports one finding per declared asset absent and one per entry declared by nothing, a subdirectory included. It runs in `publish.yml`'s `pack` job after the per-target archives are written. A red there fails `pack`, so the `release` job attaches nothing.
+- **What the publish half expands.** Every well-formed template on every declaration line, so a doc carrying a stray second line is still compared rather than skipped. The roster is read only under `--dist`.
+- **Exit 2.** An absent or unreadable declaring doc or workflow, an unreadable `<dir>`, an empty `<version>` or one carrying whitespace or `/`, and a roster that resolves empty.
+
+**Argument mode (fixture capability):** `check-release-assets [<doc> <workflow>] [--dist <dir> <version>]`. With no positional, the doc is `gate-sdk/SPEC.md` and the workflow is the knob's. The fixture pair runs both halves in one case, with the roster pinned by the case's knob file. `good/` holds a declaration with a `{target}` template and one without, a workflow carrying the call, and a matching directory. `bad/` holds a second declaration line, a template missing `{version}`, a workflow with no call, a directory missing one target's archive, and an undeclared file. A declaring doc with no declaration, and each exit-2 path, are pinned by the module's unit tests, since a case can hold one verdict.
+
+**Its own class, not a second axis of `check-payload-claim`.** That gate matches sentences against a vocabulary of disclosure classes (canon-kit/SPEC.md §check-payload-claim). An asset set is an enumeration whose truth is a build product, and no sentence pattern can hold it. So it is not a second claim axis, and the claim-registry trigger that section records does not fire.
+
+**Consumer-declared, and why.** Only the repository that publishes the payload has a publish workflow and a Release; an adopter receives both and publishes neither. So no kit ships the gate. It reads two existing gate-sdk knobs and mints none.
+
+**Refused: a monitor over published Releases.** Releases published before the archive scheme attach their binary flat, so a monitor would need a roster of exempt Releases, a maintained copy that holds nothing. The publish half holds every Release the current workflow creates, the set the prose claims.
+
+**Honest limits.** The publish half runs only at a tag, so a declaration that drifts from `publish.yml`'s naming is red at that tag's `pack` job, not at the commit that moved it. That still stops before any Release exists, and the cost is a failed release run. The wiring check reads the call's text, not whether its step runs. A surface that spells an asset name for its own use, such as the install page's recipes or the hosted install scripts, is not compared with the declaration.
 
 ### gen-pre-commit
 

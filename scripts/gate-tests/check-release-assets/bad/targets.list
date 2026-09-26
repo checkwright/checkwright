@@ -1,0 +1,4 @@
+# Hermetic fixture roster: two live targets, and dist/ carries the archive of
+# only the first.
+x86_64-unknown-linux-gnu
+aarch64-apple-darwin

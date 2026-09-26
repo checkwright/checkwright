@@ -120,6 +120,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | (consumer) | check-tightened-gates-grammar | precommit |
 | (consumer) | check-release-declaration-parity | precommit |
 | (consumer) | check-release-change-declared | precommit |
+| (consumer) | check-release-assets | precommit |
 | (consumer) | check-npm-publish-spec | precommit |
 | [canon-kit](canon-kit/index.md) | check-manifest-temporal | precommit |
 | [canon-kit](canon-kit/index.md) | check-manifest-count | precommit |

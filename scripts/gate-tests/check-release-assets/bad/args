@@ -1,0 +1,3 @@
+# declaring-doc publish-workflow --dist <dir> <version>: both halves in one
+# case, the target roster pinned by this case's own knob file.
+payload.md publish.yml --dist dist 0.1.0
