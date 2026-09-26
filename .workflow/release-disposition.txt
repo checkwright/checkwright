@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+front-door-release release v0.26.0 — minor: the declarations since v0.25.0 derive a minor and no decommission; released on two triggers, explicit operator direction (lead-relayed at scope, recorded at 462823e2) and a front-door verb the pinned v0.25.0 lacks (demo)
