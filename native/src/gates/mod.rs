@@ -1493,13 +1493,9 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-docs-kit-parity",
         docs_kit_parity::run,
         &[("docs", "glob:lit:*/index.md", "", "")],
-        &[
-            "GATE_SDK_KIT_DIRS",
-            "GATE_SDK_REGISTRY_DOC",
-            "GATE_SDK_RUNNER_DOC",
-        ],
+        &[],
         "-",
-        &[("git", "")],
+        &[],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — the orphan sweep's root is the mirror-root
     // knob's value, so it is `?` as check-docs-link-convention's knob-valued root is; the mirror

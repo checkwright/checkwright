@@ -140,7 +140,7 @@ if staged_matches 'gate-sdk/smoke/install.sh' 'canon-kit/smoke/install.sh' 'cont
     run_gate check-smoke-entry-guard native/target/release/checkwright-gates check-smoke-entry-guard
 fi
 
-if staged_matches 'docs/kits.md' 'docs/*/index.md' 'gate-sdk/gate-tests/*' 'canon-kit/gate-tests/*' 'context-kit/gate-tests/*' 'delegation-kit/gate-tests/*' 'doctrine-kit/gate-tests/*' 'drift-kit/gate-tests/*' 'evidence-kit/gate-tests/*' 'guard-kit/gate-tests/*' 'lifecycle-kit/gate-tests/*' 'queue-kit/gate-tests/*' 'site-kit/gate-tests/*' 'scripts/gate-sdk-config.knobs' 'native/src/gates/docs_kit_parity.rs' 'native/src/fresh.rs' 'native/src/gates/kit_registration.rs'; then
+if staged_matches 'docs/*/index.md' 'native/src/gates/docs_kit_parity.rs' 'native/src/fresh.rs'; then
     run_gate check-docs-kit-parity native/target/release/checkwright-gates check-docs-kit-parity
 fi
 

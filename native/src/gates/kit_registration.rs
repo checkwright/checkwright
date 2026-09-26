@@ -18,13 +18,10 @@ fn read_doc(path: &str) -> Result<String, String> {
         .map_err(|e| format!("cannot read {} ({})", path, e))
 }
 
-// spec: gate-sdk/SPEC.md §The consumer remainder cohort — the dispatch signature, retained
-// unchanged so the registry entry, `--list` and every existing caller are untouched. The rule
-// itself lives behind `run_captured`, whose one reader is `check-docs-kit-parity`'s wrapper.
 pub fn run(args: &[String]) -> i32 {
     let mut out: Vec<String> = Vec::new();
     let mut err: Vec<String> = Vec::new();
-    let rc = run_captured(args, &mut out, &mut err);
+    let rc = rule(args, &mut out, &mut err);
     for l in &out {
         println!("{}", l);
     }
@@ -34,10 +31,7 @@ pub fn run(args: &[String]) -> i32 {
     rc
 }
 
-// spec: gate-sdk/SPEC.md §The consumer remainder cohort — the capturing entry point a compiled
-// wrapper needs: `check-docs-kit-parity` re-frames this verdict three ways by exit code, which
-// it cannot do while the report goes to the process's own streams.
-pub fn run_captured(args: &[String], stdout: &mut Vec<String>, stderr: &mut Vec<String>) -> i32 {
+fn rule(args: &[String], stdout: &mut Vec<String>, stderr: &mut Vec<String>) -> i32 {
     let repo_root = match toplevel() {
         Some(r) => r,
         None => {

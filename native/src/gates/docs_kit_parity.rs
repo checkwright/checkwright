@@ -1,14 +1,14 @@
-// spec: gate-sdk/SPEC.md §check-kit-registration — docs/kits.md carries a registry row for
-// every kit root (this consumer re-scopes that invariant onto the Kit Reference page; wrapper,
-// not mechanism) and every docs kit page carries the nav child block
+// spec: docs/site-architecture.md §Site chrome and the nav contract — every kit page beside the
+// Kit Reference page carries the nav child block; the kit rows on that page are
+// check-kit-registration's, through the knob this repo binds
 use crate::fresh;
-use crate::gates::kit_registration;
 use crate::walk;
 use std::path::Path;
 
 const DEFAULT_REGISTRY: &str = "docs/kits.md";
-// spec: gate-sdk/SPEC.md §check-kit-registration — POSIX `[[:space:]]` minus the newline the
-// record separator already consumed, so a CRLF front matter reads as the shell form read it
+// spec: docs/site-architecture.md §Site chrome and the nav contract — POSIX `[[:space:]]` minus
+// the newline the record separator already consumed, so a CRLF front matter reads as the shell
+// form read it
 const SPACE: [char; 5] = [' ', '\t', '\r', '\x0b', '\x0c'];
 
 fn trim(s: &str) -> &str {
@@ -25,8 +25,9 @@ pub fn run(args: &[String]) -> i32 {
     }
 }
 
-// spec: gate-sdk/SPEC.md §check-kit-registration — the nav child block: front matter nesting the
-// page under the Kit Reference parent, `nav_parent: kits` plus a `nav_child_order` slot
+// spec: docs/site-architecture.md §Site chrome and the nav contract — the nav child block: front
+// matter nesting the page under the Kit Reference parent, `nav_parent: kits` plus a
+// `nav_child_order` slot
 fn has_nav_block(text: &str) -> bool {
     let mut fm = false;
     let (mut parent, mut order) = (false, false);
@@ -62,8 +63,8 @@ fn has_nav_block(text: &str) -> bool {
     parent && order
 }
 
-// spec: gate-sdk/SPEC.md §check-kit-registration — `dirname`, on the shell's own terms: the
-// path up to the last '/', '.' when there is none
+// spec: docs/site-architecture.md §Site chrome and the nav contract — `dirname`, on the shell's
+// own terms: the path up to the last '/', '.' when there is none
 fn dirname(p: &str) -> String {
     match p.rfind('/') {
         None => ".".to_string(),
@@ -74,42 +75,23 @@ fn dirname(p: &str) -> String {
 
 fn rule(args: &[String]) -> Result<i32, String> {
     let reg = fresh::positional(args, 0, DEFAULT_REGISTRY);
-
-    // spec: gate-sdk/SPEC.md §The consumer remainder cohort — the wrapped rule is called, never
-    // spawned; the shell form's combined capture is the two sinks in order, which never
-    // interleave: a refusal arm writes only stderr and the report arm only stdout.
-    let mut out: Vec<String> = Vec::new();
-    let mut err: Vec<String> = Vec::new();
-    let rc = kit_registration::run_captured(&[reg.to_string()], &mut out, &mut err);
-    let combined = out
-        .into_iter()
-        .chain(err)
-        .collect::<Vec<String>>()
-        .join("\n");
-
-    if rc == 2 {
-        eprintln!("{}", combined);
-        return Ok(2);
-    }
-    if rc != 0 {
-        println!(
-            "check-docs-kit-parity: a kit root is missing its row in the docs index ({}):",
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — a missing page or a sweep finding no kit page
+    // is a refusal, since either would otherwise read as a clean nav
+    if !Path::new(reg).is_file() {
+        return Err(format!(
+            "Kit Reference page not found: {} — the check could not run; treating as failure (not clean)",
             reg
-        );
-        println!("{}", combined);
-        println!(
-            "  help: add the kit's '[<kit>](<kit>/index.md)' row to {} (docs/<kit>/ is",
-            reg
-        );
-        println!(
-            "        the kit's docs page dir), so a landed kit cannot fall out of the docs site."
-        );
-        return Ok(1);
+        ));
     }
-
-    let base = dirname(reg);
+    let pages = walk::glob_files(Path::new(&dirname(reg)), &["*/index.md".to_string()])?;
+    if pages.is_empty() {
+        return Err(format!(
+            "no kit page (<dir>/index.md) beside {} — the check could not run; treating as failure (not clean)",
+            reg
+        ));
+    }
     let mut navbad: Vec<String> = Vec::new();
-    for idx in walk::glob_files(Path::new(&base), &["*/index.md".to_string()])? {
+    for idx in &pages {
         let p = idx.display().to_string();
         let text = fresh::read_captured(&p)?;
         if !has_nav_block(&text) {
@@ -127,7 +109,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     println!(
-        "DOCS-KIT-PARITY: clean ({} registers every kit root; every docs kit page carries the nav child block)",
+        "DOCS-KIT-PARITY: clean ({} kit page(s) beside {} each carry the nav child block)",
+        pages.len(),
         reg
     );
     Ok(0)
@@ -137,8 +120,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
 mod tests {
     use super::*;
 
-    // spec: gate-sdk/SPEC.md §check-kit-registration — both keys, inside the first front-matter
-    // block, or the page holds no nav slot
+    // spec: docs/site-architecture.md §Site chrome and the nav contract — both keys, inside the
+    // first front-matter block, or the page holds no nav slot
     #[test]
     fn the_nav_block_needs_both_keys_inside_the_front_matter() {
         assert!(has_nav_block("---\nnav_parent: kits\nnav_child_order: 3\n---\n"));

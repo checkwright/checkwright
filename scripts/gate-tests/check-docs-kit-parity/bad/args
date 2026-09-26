@@ -1,4 +1,3 @@
-# Registry doc missing the gate-sdk row. The wrapped gate resolves kit roots
-# from the real repo and re-checks README.md for the fixture-runner lines (which
-# are complete), so only the docs-index registry assertion trips.
-scripts/gate-tests/check-docs-kit-parity/bad/docs-index.md
+# No args: this case's docs/queue-kit page carries 'nav_parent: kits' but no
+# 'nav_child_order' slot, beside a lifecycle-kit page carrying both — only the
+# queue-kit page trips the nav child block sweep.

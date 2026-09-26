@@ -20,16 +20,6 @@ the meta-gate sections of gate-sdk/SPEC.md under §Per-component contracts: §ch
 
 **Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-26 at scope from spec-brevity-residue, filed 2026-09-25; the word census is this scope's survey record.
 
-### registry-assertion-duplicated
-
-`check-kit-registration`'s registry assertion now runs twice over `docs/kits.md`: this repo binds `GATE_SDK_REGISTRY_DOC` there, and `check-docs-kit-parity` still wraps `check-kit-registration` in-process against the same doc, so one missing kit row reds both gates.
-
-**Deliverable:** one owner for the registry assertion — the wrapper narrowed to its nav-child-block sweep with its bad fixture moved to that assertion, or the knob returned to a doc the wrapper does not re-scope — and docs/site-architecture.md's sentence on the parity gate matching.
-
-**Promoted as debt 2026-09-26 at scope, operator direction lead-relayed (not a /consult ruling):** both options converge on names the specs already carry and add none; build picks between them against the in-process-wrap rationale. Re-verified at scope: the knob binding, `docs_kit_parity.rs`'s `kit_registration::run_captured` call and both `gates.list` rows stand as filed.
-
-**Cost while deferred:** a doubled red on one fault, and two gates to keep in step. Filed 2026-09-26 to the gap inbox by the done-claim-demo validate; promoted 2026-09-26 at its close: →fix fails because choosing the owner is a design call against the in-process-wrap rationale gate-sdk/SPEC.md §The consumer remainder cohort carries. Re-verified at the drain: `scripts/gate-sdk-config.knobs` binds `GATE_SDK_REGISTRY_DOC = docs/kits.md`; `native/src/gates/docs_kit_parity.rs` defaults its registry to `docs/kits.md` and calls `kit_registration::run_captured`; both gates sit in `scripts/gates.list`. Owner lookup: `kit-registration`, `docs-kit-parity`, `registry` in this file — none; owner gate-sdk/SPEC.md §check-kit-registration.
-
 ## Deferred
 
 ### absence-statement-gate-arms
@@ -1374,5 +1364,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 - front-door-verb-unreleased
 - ci-one-line-action
+- registry-assertion-duplicated
 
 ## Lessons Learned
