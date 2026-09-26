@@ -8,7 +8,7 @@
 
 # spec: installer/SPEC.md §The dependency boundary — the whole body is one function called on the last line, so a truncated fetch defines nothing and runs nothing
 checkwright_install() {
-    pin='0.25.0'
+    pin='0.26.0'
     set -u
     cw_version="${CHECKWRIGHT_VERSION:-$pin}"
     cw_base="${CHECKWRIGHT_RELEASE_BASE:-https://github.com/checkwright/checkwright/releases/download}"

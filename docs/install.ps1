@@ -9,7 +9,7 @@
 # spec: installer/SPEC.md §The dependency boundary — the whole body is one function called on the last line, so a truncated fetch defines nothing and runs nothing; every preference it sets is scoped to that function, so none leaks into the reader's session
 # spec: installer/SPEC.md §The dependency boundary — it never calls `exit`, which under `iex` would close the reader's own session: the bootstrap's status is left in $LASTEXITCODE, and a failed step throws
 function Install-Checkwright {
-    $pin = '0.25.0'
+    $pin = '0.26.0'
     Set-StrictMode -Version Latest
     $ErrorActionPreference = 'Stop'
     $ProgressPreference = 'SilentlyContinue'
