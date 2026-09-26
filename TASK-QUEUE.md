@@ -8,20 +8,6 @@
 
 ## New Features
 
-### crate-tests-unrun-on-windows
-
-[spec: SPEC-windows-crate-tests.md]
-
-no CI leg runs the native crate's unit tests on native Windows. `.github/workflows/gates.yml` only runs `cargo check` for the `x86_64-pc-windows-msvc` target, and no workflow runs `cargo test` at all, so a unit test pinning a Windows filesystem behaviour is not witnessed on Windows. First instance: `--emit capture-drain` renames a log that is still open for append, and gate-sdk/SPEC.md §The workflow directory records that as an unmeasured honest limit.
-
-**Deliverable:** a Windows leg that runs the crate's unit tests, or a narrower one running only the modules that pin a platform claim, with its cost against the push budget stated. Or a SPEC boundary note refusing the leg and keeping the honest limit.
-
-**Push need (2026-09-26, inside the budget):** one push, the closing one when the leg lands in the last build batch, since only a remote Windows run executes the leg.
-
-**Specified 2026-09-26:** a `crate-tests-windows` job runs the whole suite on each Windows triple, off the critical path. It reports rather than judges until a run is green, so the push need stays one. A failure reaches the run's annotations as one warning per triple, which close already reads, and build files the flip to the derived posture.
-
-**Cost while deferred:** a Windows adopter's close drain could fail with exit 2, and nobody sees it until an adopter reports it. Filed 2026-09-25 to the gap inbox by spec-brevity-first-slice's build; promoted 2026-09-25 at its close. →fix fails because a new CI leg is new mechanism, and only a push can witness it. Re-verified at the drain: `grep 'cargo test' .github/workflows/*.yml` returns nothing. Owner lookup: `cargo test`, `msvc`, `unit tests on` in this file — none; `foreign-toolchain-docker-legs` covers local pwsh and dash runs, not crate unit tests.
-
 ## Technical Debt
 
 ### gate-sdk-native-brevity
@@ -1377,5 +1363,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - hook-members-off-test-floor
 - foreign-toolchain-docker-legs
 - release-asset-claim-class-owner
+- crate-tests-unrun-on-windows
 
 ## Lessons Learned

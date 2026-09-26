@@ -1492,8 +1492,9 @@ jobs:
       # it is written in the same loop from the same values, so the two outputs
       # cannot disagree about a platform.
       index: ${{ steps.legs.outputs.index }}
-      # `legs` narrowed to the Windows triples, the hosts the PowerShell bootstrap
-      # serves: `install-smoke-pwsh-windows`' matrix, so that leg names no triple.
+      # `legs` narrowed to the Windows triples: the matrix of both
+      # `install-smoke-pwsh-windows` and `crate-tests-windows`, so neither names
+      # a triple.
       pwsh_legs: ${{ steps.legs.outputs.pwsh_legs }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
@@ -1672,6 +1673,47 @@ jobs:
           path: ${{ runner.temp }}/artifact/${{ matrix.target }}/
           if-no-files-found: error
           retention-days: 7
+
+  # check-crate-arms' test half on each Windows triple, where a test pinning a
+  # Windows filesystem or process behaviour runs where that behaviour lives. It
+  # reports rather than judges until one run is green on both triples, and close
+  # reads its one-per-triple warning (gate-sdk/SPEC.md §check-crate-arms).
+  crate-tests-windows:
+    needs: native-artifacts-roster
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.native-artifacts-roster.outputs.pwsh_legs) }}
+    runs-on: ${{ matrix.runner }}
+    continue-on-error: true
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: check the tree out with LF line endings
+        shell: bash
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+      - name: run the crate's unit tests for ${{ matrix.target }}
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          set -o pipefail
+          cargo test --release --manifest-path native/Cargo.toml --target "$TARGET" 2>&1 | tee "$RUNNER_TEMP/crate-tests.log"
+
+      - name: annotate the failing tests for ${{ matrix.target }}
+        if: failure()
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          failed="$(tr -d '\r' < "$RUNNER_TEMP/crate-tests.log" | sed -n -E 's/^test (.*) \.\.\. FAILED$/\1/p')"
+          count="$(printf '%s' "$failed" | grep -c . || true)"
+          first="$(printf '%s\n' "$failed" | head -n 10 | paste -sd ' ' -)"
+          echo "::warning title=crate-tests-windows ($TARGET)::$count test(s) FAILED on $TARGET; first ten: ${first:-none, so the run failed outside a test}; the job log carries the rest."
 
   # The macOS sibling, and the second non-Linux host this repository runs on.
   # **Its posture is DERIVED**, off `native-artifacts-roster`'s per-target index
