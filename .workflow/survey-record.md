@@ -1,1 +1,8 @@
 # contract: lifecycle-kit/SPEC.md §The survey record — carried surveys, one block per survey; boundary-truncated, cited only behind a passing witness.
+
+## 2026-09-27 scope — Which deferred entries rank first for this iteration, what does spec-brevity-residue's gate-sdk tail still owe, and which entries pair by supersession with the ranked set?
+- corpus: TASK-QUEUE.md gate-sdk/SPEC.md docs/index.md docs/install.md
+- oracle: bash gate-sdk/bin/run-gates.sh --emit queue-edges
+- rev: a2cb017166f661947af86d26fdced954bf52359c
+- finding: Tier 1 (session/iteration): spec-brevity-residue (session/high, gate-sdk) leads; one-motion-commit-race-remains-open (session/low, CLAUDE.md), heterogeneous-agent-delegation, gate-tests-suite-identity-in-evidence and recurrence-declaration-grammar-ungated (iteration/low) share no surface with it. No deferred entry reaches the recurrence threshold of 2; none carries observed-by. Roadmap now/ is design-partner-preview, trigger unfired (docs/install-evidence.md reads 0 installs; v0.26.0 published). gate-sdk tail slice: check-kit-enum through templates/gates-workflow.yml, about 26.6k words, the last gate-sdk slice. Mean-filed 3.0. Supersession: seeded-ci-gates-on-surface reshaped by the tail slice (check-action-pinning, check-action-permissions sit in it); glibc-floor-unstated and install-fetch-asset-names reshaped by customer-docs-quality-standard (both write docs/install.md Requirements or recipes). Theme premises probed: docs/index.md links install.md 5 times, kits.md and orchestration.md twice each; both Install sections open on a clean git repository; install.md names Windows 10 only; package.json, reserve Cargo.toml and the live About carry the methodology wording.
+- inferred: none
