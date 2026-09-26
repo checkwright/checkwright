@@ -8,6 +8,30 @@
 
 ## New Features
 
+### ci-one-line-action
+
+[spec: SPEC-ci-action.md] [roadmap: next/adoption] [observed-by: this repository's gates workflow on a master push] [roadmap-summary: Wire the gate battery into CI in one line, with reds annotated on the pull request.]
+
+the CI story is a copy-out template: `gate-sdk/templates/gates-workflow.yml` exists, `init` does not seed it, no versioned Action lets a workflow say `uses:` in one line, and the battery emits no SARIF, so a red never reaches the pull-request checks tab as an annotation. The template also runs the committed binary, which is the installing host's target, so a tree installed on macOS fails its first Linux run. Same-seat entrants ship an Action and SARIF (consult's landscape refresh, 2026-09-25).
+
+**Deliverable:** a composite Action at `installer/action.yml`, running the release its tree's lock names through `docs/install.sh`; `init` seeding a workflow that calls it, SHA-pinned; the runner writing SARIF under an environment-only knob, uploaded by the Action; the installer's consumer smoke holding the seed and gate-sdk's kit smoke reading the SARIF log.
+
+**Promoted 2026-09-26 at spec:** the filing's "references by tag" is a full-SHA ref with the tag as a trailing comment, the form check-action-pinning holds. The SARIF "arm" is a `--run` reporting knob, because the Action pays one download per binary execution. Contract owners are corrected in the amendment. It spans gate-sdk and installer.
+
+**Push need (2026-09-26, operator direction lead-relayed, ruling set B at front-door-release's scope with the overrun stated):** one mid-iteration push, since only a remote run executes the Action; with the closing push and the v0.26.0 tag push the set needs 3 against a budget of 2.
+
+### front-door-verb-unreleased
+
+[spec: SPEC-door-verbs.md]
+
+the front door (README.md and docs/index.md under Try it first, docs/install.md, installer/README.md) advertises `sh -s -- demo`, the PowerShell script-block form and `npx checkwright demo` as runnable now, while `docs/install.sh` and `docs/install.ps1` pin 0.25.0 and that tag carries no `demo` verb, so every advertised demo command fails until a release carries it. Nothing holds the verbs the front door advertises to the pinned release's verb set.
+
+**Deliverable:** the repo-local gate `check-front-door-verbs` holding route-advertised verbs to the pinned tag's `installer/README.md` verb table, and that table to the binary's `VERBS`, admitting a verb the pin lacks while the iteration carries no release disposition; the close binding naming the trigger. The release carrying `demo` is a close's release disposition, not this entry's completion, so no remote run observes it.
+
+**Promoted 2026-09-26 at spec:** the form is a gate enforcing a release trigger: a `none` or `deferred:` disposition reds while an unreleased verb is advertised. Refused alternatives and the probes are in the amendment.
+
+**Push need (2026-09-26, operator direction lead-relayed):** the v0.26.0 tag push at close, which this iteration cuts on the operator's direction so the advertised `demo` verb reaches the pin; counted in [ci-one-line-action](#ci-one-line-action)'s overrun line.
+
 ## Technical Debt
 
 ### gate-sdk-meta-gate-brevity
@@ -402,18 +426,6 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
-### ci-one-line-action
-
-[roadmap: next/adoption] [cost: event/high] [surface: gate-sdk] [observed-by: this repository's gates workflow on a master push] [roadmap-summary: Wire the gate battery into CI in one line, with reds annotated on the pull request.]
-
-the CI story is a copy-out template: `gate-sdk/templates/gates-workflow.yml` exists, `init` does not seed it, no versioned Action lets a workflow say `uses:` in one line, and the battery emits no SARIF, so a red never reaches the pull-request checks tab as an annotation. docs/install.md tells an adopter to make the battery a required status check and leaves them to copy the template by hand. Same-seat entrants ship an Action and SARIF (consult's landscape refresh, 2026-09-25).
-
-**Deliverable:** a versioned Action in this repository the workflow references by tag, `init` seeding the workflow file into the consumer (or printing the one line), and a SARIF emitter arm off the runner's verdict; installer/SPEC.md §init and gate-sdk/SPEC.md §Consumer smoke own the contract, the consumer smoke exercises the seeded workflow.
-
-**Push need (2026-09-26, operator direction lead-relayed, ruling set B at front-door-release's scope with the overrun stated):** one mid-iteration push, since only a remote run executes the Action; with the closing push and the v0.26.0 tag push the set needs 3 against a budget of 2.
-
-**Cost while deferred:** the pull-request check is where a maintainer first sees a red, so the first useful red — the preview's second metric — has no path an adopter can wire in one line. Filed 2026-09-25 by consult as a direct entry, third of the refresh's ranked actions.
-
 ### prune-set-matches-walk-root-ancestors
 
 [cost: event/high] [surface: context-kit] [recurrence: 2026-09-25]
@@ -705,18 +717,6 @@ a gate's printed finding or help line reaches an adopter's installed tree, yet a
 **Deliverable:** each site re-pointed at the binary `GATE_SDK_NATIVE_BIN` names, or declared contributor-facing, and a check-door-binding assertion over gate-module output strings holding it.
 
 **Cost while deferred:** an adopter following a red's remedy runs a path their tree lacks. Filed 2026-09-26 to the gap inbox by the done-claim-demo build (check-evidence-manifest's assertion-C remedy, fixed at the drain); promoted 2026-09-26 at its close: →fix fails because the holding assertion is new mechanism and some sites (the prose-bounds worklist, the smoke-entry guard) need a contributor-or-adopter call each. Re-verified at the drain: `git grep 'run-gates.sh' native/src/gates` over `println!`/`format!` lines returns fifteen sites before the fix. Owner lookup: `door`, `run-gates.sh`, `remedy` in this file — none live; owner guard-kit/SPEC.md §check-door-binding.
-
-### front-door-verb-unreleased
-
-[cost: event/high] [surface: installer]
-
-the front door (README.md and docs/index.md under Try it first, docs/install.md, installer/README.md) advertises `sh -s -- demo`, the PowerShell script-block form and `npx checkwright demo` as runnable now, while `docs/install.sh` and `docs/install.ps1` pin 0.25.0 and that tag carries no `demo` verb, so every advertised demo command fails until a release carries it. installer/SPEC.md §The one-line install holds the pin to a published tag; nothing holds the verbs the front door advertises to the pinned release's verb set.
-
-**Deliverable:** a gate or a release-policy trigger holding every verb the front-door routes advertise to the pinned release's verb set, the form chosen by the authoring stage. The release carrying `demo` is a close's release disposition, not this entry's completion, so no remote run observes it.
-
-**Push need (2026-09-26, operator direction lead-relayed):** the v0.26.0 tag push at close, which this iteration cuts on the operator's direction so the advertised `demo` verb reaches the pin; counted in [ci-one-line-action](#ci-one-line-action)'s overrun line.
-
-**Cost while deferred:** while the channel is preview, every release deferral leaves the live site's first command broken, and the preview cohort meets it first. Surfaced 2026-09-26 by the done-claim-demo close, which deferred the release carrying the verb as v0.26.0; promoted 2026-09-26 at scope from the carried gap inbox. Re-verified at scope: both hosted scripts pin 0.25.0, `native/src/installer/demo.rs` is absent at v0.25.0 and `git grep -w demo v0.25.0 -- installer/ native/src/installer` finds nothing (a wider grep over `native` hits only queue test fixtures naming an iteration `demo`), and npm's latest is 0.25.0. Owner lookup: `pinned release`, `front door`, `verb set` in this file — none live; owner installer/SPEC.md §The one-line install.
 
 ## Icebox
 
