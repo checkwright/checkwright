@@ -5,3 +5,4 @@
 ---
 
 front-door-release scope aaadbbc2 2026-09-26 b28221e1
+front-door-release spec a2b92323 2026-09-26 462823e2
