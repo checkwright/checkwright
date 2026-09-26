@@ -1099,13 +1099,16 @@ mod tests {
 
     impl Scratch {
         fn new(tag: &str) -> Scratch {
-            let d = std::env::temp_dir().join(format!("checkwright-knobs-{}.{}", tag, std::process::id()));
+            let d = crate::walk::child(
+                &std::env::temp_dir(),
+                &format!("checkwright-knobs-{}.{}", tag, std::process::id()),
+            );
             let _ = std::fs::remove_dir_all(&d);
             std::fs::create_dir_all(&d).expect("scratch");
             Scratch(d)
         }
         fn write(&self, rel: &str, body: &str) -> String {
-            let p = self.0.join(rel);
+            let p = crate::walk::child(&self.0, rel);
             std::fs::write(&p, body).expect("write");
             p.display().to_string()
         }

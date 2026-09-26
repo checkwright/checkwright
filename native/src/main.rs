@@ -291,8 +291,6 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use std::process::Command;
-
     // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the executed cross-substrate
     // coupling for the stamp, the shape check-knob-default-coupling's disposition sets:
     // the baked constant against the shell library's computation of the same thing
@@ -304,19 +302,17 @@ mod tests {
         let crate_dir = env!("CARGO_MANIFEST_DIR");
         let root = crate::walk::toplevel_in(crate_dir).expect("cannot resolve the repo toplevel");
 
-        let out = Command::new("bash")
-            .arg("-c")
-            .arg("source gate-sdk/lib/gate.sh; gate_native_source_stamp")
-            .current_dir(&root)
-            .env("GATE_SDK_NATIVE_CRATE", crate_dir)
-            .output()
-            .expect("cannot run the shell stamp computation");
-        assert!(
-            out.status.success(),
-            "gate_native_source_stamp failed: {}",
-            String::from_utf8_lossy(&out.stderr).trim()
-        );
-        let shell = String::from_utf8_lossy(&out.stdout).trim().to_string();
+        let out = crate::proc::run_with_env_in(
+            &crate::programs::BASH,
+            &["-c", "source gate-sdk/lib/gate.sh; gate_native_source_stamp"],
+            &[("GATE_SDK_NATIVE_CRATE".to_string(), crate_dir.to_string())],
+            Some(std::path::Path::new(&root)),
+        )
+        .expect("cannot run the shell stamp computation");
+        let stdout = out.stdout().unwrap_or_else(|| {
+            panic!("gate_native_source_stamp failed: {}", out.failure_report().unwrap_or_default())
+        });
+        let shell = String::from_utf8_lossy(stdout).trim().to_string();
         assert!(!shell.is_empty(), "gate_native_source_stamp emitted nothing");
         assert_eq!(
             env!("CHECKWRIGHT_SOURCE_STAMP"),

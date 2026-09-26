@@ -197,15 +197,14 @@ mod tests {
     // sources the library under this process's environment
     fn accessor(call: &str) -> String {
         let lib = Path::new(env!("CARGO_MANIFEST_DIR")).join("../gate-sdk/lib/gate.sh");
-        let out = std::process::Command::new("bash")
-            .arg("-c")
-            .arg(format!("source \"$1\" && {}", call))
-            .arg("bash")
-            .arg(&lib)
-            .output()
+        let script = format!("source \"$1\" && {}", call);
+        let lib = lib.to_string_lossy();
+        let out = crate::proc::run(&crate::programs::BASH, &["-c", &script, "bash", &lib])
             .expect("cannot run the shell library");
-        assert!(out.status.success(), "{} failed: {}", call, String::from_utf8_lossy(&out.stderr));
-        String::from_utf8_lossy(&out.stdout).trim_end_matches('\n').to_string()
+        let stdout = out
+            .stdout()
+            .unwrap_or_else(|| panic!("{} failed: {}", call, out.failure_report().unwrap_or_default()));
+        String::from_utf8_lossy(stdout).trim_end_matches('\n').to_string()
     }
 
     fn resolved(name: &str) -> String {

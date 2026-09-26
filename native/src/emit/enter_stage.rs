@@ -1942,7 +1942,7 @@ fn wipe(dir: &str, preserve: &[String]) -> Wiped {
         if base == ".gitkeep" || preserve.contains(&base) {
             continue;
         }
-        let child = root.join(&base);
+        let child = walk::child(root, &base);
         let mut failed: Vec<String> = Vec::new();
         remove_member(&child, is_dir, &mut failed);
         if failed.is_empty() {
@@ -1964,7 +1964,7 @@ fn remove_member(p: &Path, is_dir: bool, failed: &mut Vec<String>) {
         // one filesystem-walking module, and `list_dir` sorts, which keeps the report order stable
         if let Ok(kids) = walk::list_dir(p) {
             for (base, kid_dir) in kids {
-                remove_member(&p.join(&base), kid_dir, failed);
+                remove_member(&walk::child(p, &base), kid_dir, failed);
             }
         }
     }

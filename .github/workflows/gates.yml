@@ -12,6 +12,12 @@ on:
   pull_request:
     branches: [master]
 
+# gate-sdk/SPEC.md §check-shellcheck: the one ShellCheck version this workflow
+# pins, read by each job that installs the analyser. Bump it together with
+# every installing step's own asset digest.
+env:
+  SHELLCHECK_VERSION: v0.11.0
+
 jobs:
   gates:
     # Pinned, not `-latest`: native/runners.list's header owns which Linux jobs pin.
@@ -62,11 +68,10 @@ jobs:
         run: |
           rustup target add x86_64-pc-windows-msvc
           cargo check --release --manifest-path native/Cargo.toml --target x86_64-pc-windows-msvc
-      # gate-sdk/SPEC.md §check-shellcheck: this pin is the CI verdict's
-      # reference. Bump the version and the upstream asset's digest together.
+      # gate-sdk/SPEC.md §check-shellcheck: this install is the CI verdict's
+      # reference, at the workflow's SHELLCHECK_VERSION.
       - name: install the pinned shellcheck release, digest-verified
         env:
-          SHELLCHECK_VERSION: v0.11.0
           SHELLCHECK_SHA256: 8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198
         run: |
           set -euo pipefail
@@ -1742,6 +1747,27 @@ jobs:
         run: git config --global core.autocrlf false
 
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+      # gate-sdk/SPEC.md §check-shellcheck: the crate's registry-coverage tests
+      # observe check-action-run-shell's cases, which spawn the analyser. Upstream
+      # ships one x86_64 Windows asset; the aarch64 leg runs it under emulation.
+      # Expand-Archive because the zip is not tar's format and pwsh is on both images.
+      - name: install the pinned shellcheck release, digest-verified
+        shell: bash
+        env:
+          SHELLCHECK_SHA256: 8a4e35ab0b331c85d73567b12f2a444df187f483e5079ceffa6bda1faa2e740e
+        run: |
+          set -euo pipefail
+          dir="$RUNNER_TEMP/shellcheck"
+          asset="shellcheck-$SHELLCHECK_VERSION.zip"
+          mkdir -p "$dir"
+          curl -sSfL --retry 3 -o "$dir/$asset" \
+            "https://github.com/koalaman/shellcheck/releases/download/$SHELLCHECK_VERSION/$asset"
+          ( cd "$dir" && printf '%s  %s\n' "$SHELLCHECK_SHA256" "$asset" | sha256sum -c - )
+          win="$(cygpath -w "$dir")"
+          pwsh -NoProfile -Command "Expand-Archive -LiteralPath '$win\\$asset' -DestinationPath '$win' -Force"
+          "$dir/shellcheck.exe" --version
+          echo "$win" >> "$GITHUB_PATH"
 
       - name: run the crate's unit tests for ${{ matrix.target }}
         shell: bash

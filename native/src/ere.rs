@@ -921,18 +921,20 @@ done"#;
                 }
             }
         }
-        let out = Command::new("bash")
-            .arg("-c")
-            .arg(BASH_CAPTURE)
-            .arg("_")
-            .arg(CAPTURE_SUBJECTS.len().to_string())
-            .args(CAPTURE_SUBJECTS)
-            .args(&patterns)
-            .env("LC_ALL", "C")
-            .output()
-            .expect("cannot run bash — the differential oracle is not optional");
-        assert!(out.status.success(), "bash failed: {}", String::from_utf8_lossy(&out.stderr));
-        let stdout = String::from_utf8_lossy(&out.stdout);
+        let n = CAPTURE_SUBJECTS.len().to_string();
+        let mut argv: Vec<&str> = vec!["-c", BASH_CAPTURE, "_", &n];
+        argv.extend(CAPTURE_SUBJECTS.iter().copied());
+        argv.extend(patterns.iter().map(String::as_str));
+        let out = crate::proc::run_with_env(
+            &crate::programs::BASH,
+            &argv,
+            &[("LC_ALL".to_string(), "C".to_string())],
+        )
+        .expect("cannot run bash — the differential oracle is not optional");
+        let stdout = out
+            .stdout()
+            .map(String::from_utf8_lossy)
+            .unwrap_or_else(|| panic!("bash failed: {}", out.failure_report().unwrap_or_default()));
         let mut lines = stdout.split('\n');
         let mut compared = 0usize;
         let mut divergences: Vec<String> = Vec::new();

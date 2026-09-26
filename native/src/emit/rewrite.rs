@@ -437,11 +437,13 @@ mod tests {
             let _ = std::fs::remove_dir_all(&dir);
             std::fs::create_dir_all(&dir).expect("cannot create the sandbox");
             Sandbox {
-                root: crate::walk::canonicalize(&dir).expect("the sandbox must resolve"),
+                root: crate::walk::canonicalize(&dir)
+                    .map(|c| crate::walk::normalize_abs(crate::walk::strip_extended_prefix(&c)))
+                    .expect("the sandbox must resolve"),
             }
         }
         fn file(&self, name: &str, body: &[u8]) -> String {
-            let p = format!("{}/{}", self.root, name);
+            let p = crate::walk::child(std::path::Path::new(&self.root), name).display().to_string();
             std::fs::write(&p, body).expect("cannot seed a sandbox file");
             p
         }

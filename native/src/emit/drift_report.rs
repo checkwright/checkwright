@@ -251,7 +251,7 @@ mod tests {
     fn a_consumer_plugin_shadows_the_built_in_of_the_same_name() {
         let dir = std::env::temp_dir().join(format!("cw-kpi-{}", std::process::id()));
         std::fs::create_dir_all(&dir).expect("cannot make the fixture dir");
-        let shadow = dir.join("kpi-task-split.sh");
+        let shadow = crate::walk::child(&dir, "kpi-task-split.sh");
         std::fs::write(&shadow, "#!/bin/sh\n").expect("cannot write the fixture plugin");
         let dirs = vec![dir.display().to_string()];
 

@@ -440,14 +440,25 @@ mod tests {
             p
         }
         // spec: delegation-kit/SPEC.md §The turn-end liveness hook — a reader stub is written the
-        // way the contract requires a shell override to be written: its own shebang and its own
-        // executable bit, because no interpreter word is prepended to it
-        fn stub(&self, name: &str, body: &str) -> String {
-            self.script(name, &format!("#!/usr/bin/env bash\n{}\n", body))
+        // way the contract requires an override to be written, one the host starts with no
+        // interpreter word prepended: a shebang script with its own bit on unix, a `.cmd` elsewhere
+        #[cfg(unix)]
+        fn stub(&self, name: &str, code: i32, record: Option<(&str, &str)>) -> String {
+            let write = record
+                .map(|(path, line)| format!("printf '%s\\n' '{}' > '{}'\n", line, path))
+                .unwrap_or_default();
+            self.script(name, &format!("#!/usr/bin/env bash\n{}exit {}\n", write, code))
+        }
+        #[cfg(not(unix))]
+        fn stub(&self, name: &str, code: i32, record: Option<(&str, &str)>) -> String {
+            let write = record
+                .map(|(path, line)| format!("(echo {})> \"{}\"\r\n", line, path))
+                .unwrap_or_default();
+            self.script(&format!("{}.cmd", name), &format!("@echo off\r\n{}exit /b {}\r\n", write, code))
         }
         // comment-tier-exempt: a reader stub's resolved argv, one per exit class — the case table's own shape
         fn reader(&self, name: &str, code: i32) -> Vec<String> {
-            let p = self.stub(name, &format!("exit {}", code));
+            let p = self.stub(name, code, None);
             reader_argv(&[p], &self.at("runs")).expect("an executable stub must resolve")
         }
         fn record(&self, name: &str) {
@@ -808,10 +819,7 @@ mod tests {
     #[test]
     fn the_record_set_is_counted_after_the_reader_ran() {
         let s = Scratch::new("race");
-        let path = s.stub(
-            "reader-race",
-            &format!("printf 'pid=1 run=r\\n' > {}/r.run\nexit 2", s.at("runs")),
-        );
+        let path = s.stub("reader-race", 2, Some((&s.at("runs/r.run"), "pid=1 run=r")));
         let stub = reader_argv(std::slice::from_ref(&path), &s.at("runs")).expect("an executable stub must resolve");
         let f = fire(payload(PAYLOAD).as_ref(), &s.at("race.log"), Some(&stub), &s.at("runs"));
         assert_eq!(f.code, 2, "{}", s.log("race.log"));
@@ -874,7 +882,7 @@ mod tests {
     #[test]
     fn an_override_is_spawned_with_no_interpreter_word_and_owes_its_own_bit() {
         let s = Scratch::new("override-argv");
-        let exec = s.stub("with-bit", "exit 0");
+        let exec = s.stub("with-bit", 0, None);
         assert_eq!(
             reader_argv(std::slice::from_ref(&exec), "/run/dir").expect("an executable override must resolve"),
             vec![exec.clone(), "/run/dir".to_string()],
@@ -883,6 +891,9 @@ mod tests {
 
         let plain = s.at("no-bit");
         std::fs::write(&plain, "#!/usr/bin/env bash\nexit 0\n").expect("stub must be writable");
+        // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — off unix `is_executable` is file-ness,
+        // so no file lacks the bit and this half has no premise there
+        #[cfg(unix)]
         assert!(
             reader_argv(std::slice::from_ref(&plain), "/run/dir").is_none(),
             "an override without the executable bit cannot be spawned, so it resolves to no reader"

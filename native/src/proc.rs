@@ -1246,8 +1246,8 @@ pub(crate) mod tests {
         let both_exist =
             |p: &Path| p == Path::new("/opt/nodejs/npm") || p == Path::new("/opt/nodejs/npm.CMD");
         assert_eq!(
-            resolve_on_path("npm", Some(&path), Some(""), both_exist),
-            Some("/opt/nodejs/npm.CMD".to_string()),
+            resolve_on_path("npm", Some(&path), Some(""), both_exist).as_deref().map(folded),
+            Some(folded("/opt/nodejs/npm.CMD")),
             "the extensionless sh script beat the .CMD shim beside it, which is the resolution \
              CreateProcessW cannot run"
         );
@@ -1260,8 +1260,10 @@ pub(crate) mod tests {
         let path = std::env::join_paths(["/opt/bin"]).expect("cannot join a PATH");
         assert_eq!(
             resolve_on_path("cargo", Some(&path), Some(""), |p: &Path| p
-                == Path::new("/opt/bin/cargo")),
-            Some("/opt/bin/cargo".to_string()),
+                == Path::new("/opt/bin/cargo"))
+            .as_deref()
+            .map(folded),
+            Some(folded("/opt/bin/cargo")),
             "the bare name stopped being a candidate, so a caller naming cargo.exe and a Unix \
              host no longer resolve through the same loop"
         );
@@ -1302,8 +1304,10 @@ pub(crate) mod tests {
     fn an_empty_path_entry_still_means_the_working_directory() {
         let path = std::env::join_paths(["", "/opt/bin"]).expect("cannot join a PATH");
         assert_eq!(
-            resolve_on_path("cargo", Some(&path), None, |p: &Path| p == Path::new("./cargo")),
-            Some("./cargo".to_string())
+            resolve_on_path("cargo", Some(&path), None, |p: &Path| p == Path::new("./cargo"))
+                .as_deref()
+                .map(folded),
+            Some(folded("./cargo"))
         );
     }
 
@@ -1459,8 +1463,10 @@ pub(crate) mod tests {
         ];
         assert_eq!(
             resolve_outside_system_dir("bash", &dirs, None, None, |p: &Path| p
-                == Path::new("/opt/bin/bash")),
-            Ok("/opt/bin/bash".to_string()),
+                == Path::new("/opt/bin/bash"))
+            .as_deref()
+            .map(folded),
+            Ok(folded("/opt/bin/bash")),
             "the repair changed the resolution on a platform that has no system directory"
         );
     }

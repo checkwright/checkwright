@@ -252,13 +252,6 @@ fn classify(rc: i32, out: &str) -> String {
     "unknown".to_string()
 }
 
-// spec: gate-sdk/SPEC.md §The crate's crosser — `walk::canonicalize` hands the extended-length
-// prefix back unconverted; a caller that only compares its answer against itself may keep it, and
-// this one may not (see the call site below), so the strip is a pure, tested step of its own.
-fn strip_extended_prefix(c: &str) -> &str {
-    c.strip_prefix(r"\\?\").unwrap_or(c)
-}
-
 // spec: guard-kit/SPEC.md §Testing — the sandbox's five preconditions, each a case's precondition
 // rather than scenery: the section enumerates them and says what turns green for the wrong reason
 // when a harness builds four.
@@ -270,7 +263,7 @@ fn build_sandbox() -> Result<Sandbox, String> {
     // string concatenation (`at`, below), so it must be stripped, unlike a caller that only
     // compares this producer's answer against its own.
     let root = walk::canonicalize(&made)
-        .map(|c| walk::normalize_abs(strip_extended_prefix(&c)))
+        .map(|c| walk::normalize_abs(walk::strip_extended_prefix(&c)))
         .ok_or_else(|| format!("{}: cannot resolve the sandbox {}", NAME, made.display()))?;
     let sandbox = Sandbox { root };
     let at = |rel: &str| format!("{}/{}", sandbox.root, rel);
@@ -327,15 +320,6 @@ fn write(path: &str, body: &str) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    // spec: gate-sdk/SPEC.md §The crate's crosser — the strip removes exactly the verbatim
-    // prefix and leaves a prefix-free root untouched.
-    #[test]
-    fn strip_extended_prefix_removes_only_the_verbatim_marker() {
-        assert_eq!(strip_extended_prefix(r"\\?\C:\repo"), r"C:\repo");
-        assert_eq!(strip_extended_prefix(r"C:\repo"), r"C:\repo");
-        assert_eq!(strip_extended_prefix("/c/repo"), "/c/repo");
-    }
 
     // spec: guard-kit/SPEC.md §Testing — the ladder's order is the assertion, not its arms.
     #[test]

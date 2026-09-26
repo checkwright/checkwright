@@ -105,7 +105,9 @@ pub fn queue_source(payload: &Path, kits: &[String]) -> Option<String> {
         if needs_queue(kit) {
             needs = true;
         }
-        let candidate = payload.join(kit).join("templates/TASK-QUEUE.md");
+        let candidate = ["templates", "TASK-QUEUE.md"]
+            .iter()
+            .fold(crate::walk::child(payload, kit), |d, seg| crate::walk::child(&d, seg));
         if tpl.is_empty() && candidate.is_file() {
             tpl = candidate.to_string_lossy().into_owned();
         }

@@ -527,6 +527,12 @@ pub fn canonicalize(p: impl AsRef<Path>) -> Option<String> {
     fs::canonicalize(p).ok().map(|c| c.display().to_string())
 }
 
+// spec: gate-sdk/SPEC.md §The crate's crosser — the UNC clause's second lawful property, owned
+// beside its producer: a caller that composes onto `canonicalize`'s answer strips it first.
+pub fn strip_extended_prefix(c: &str) -> &str {
+    c.strip_prefix(r"\\?\").unwrap_or(c)
+}
+
 // spec: gate-sdk/SPEC.md §The path-dialect contract — absoluteness is a two-dialect question, and
 // this is its single owner: `Some("")` is separator-rooted, `Some("D:")` drive-rooted, `None`
 // relative.
@@ -1271,6 +1277,15 @@ mod tests {
         assert!(!is_suite(".tmp/ops/tests/x.test.sh", &prune, ".tmp/ops/tests"));
     }
 
+    // spec: gate-sdk/SPEC.md §The crate's crosser — the strip removes exactly the verbatim
+    // prefix and leaves a prefix-free root untouched.
+    #[test]
+    fn strip_extended_prefix_removes_only_the_verbatim_marker() {
+        assert_eq!(strip_extended_prefix(r"\\?\C:\repo"), r"C:\repo");
+        assert_eq!(strip_extended_prefix(r"C:\repo"), r"C:\repo");
+        assert_eq!(strip_extended_prefix("/c/repo"), "/c/repo");
+    }
+
     const ROOTED_CORPUS: &[&str] = &[
         "/x", "\\x", "//srv", "\\\\srv", "C:/x", "c:\\x", "C:", "C:x", "1:/x", "./x", "x", "", "é:/x", "Ä:\\x",
     ];
@@ -1282,20 +1297,16 @@ mod tests {
         let lib = Path::new(env!("CARGO_MANIFEST_DIR")).join("../gate-sdk/lib/gate.sh");
         for (prelude, locale) in [("", None), ("shopt -u globasciiranges; ", Some("en_US.UTF-8"))] {
             for p in ROOTED_CORPUS {
-                let mut cmd = std::process::Command::new("bash");
-                cmd.arg("-c")
-                    .arg(format!(
-                        "{}source \"$1\" || exit 2; if gate_path_rooted \"$2\"; then echo rooted; else echo relative; fi",
-                        prelude
-                    ))
-                    .arg("bash")
-                    .arg(&lib)
-                    .arg(p);
-                if let Some(l) = locale {
-                    cmd.env("LC_ALL", l);
-                }
-                let out = cmd.output().expect("cannot run the shell library");
-                let got = String::from_utf8_lossy(&out.stdout).trim().to_string();
+                let script = format!(
+                    "{}source \"$1\" || exit 2; if gate_path_rooted \"$2\"; then echo rooted; else echo relative; fi",
+                    prelude
+                );
+                let lib = lib.to_string_lossy();
+                let env: Vec<(String, String)> =
+                    locale.map(|l| ("LC_ALL".to_string(), l.to_string())).into_iter().collect();
+                let out = crate::proc::run_with_env(&crate::programs::BASH, &["-c", &script, "bash", &lib, p], &env)
+                    .expect("cannot run the shell library");
+                let got = String::from_utf8_lossy(out.streams().0).trim().to_string();
                 let want = if path_root(p).is_some() { "rooted" } else { "relative" };
                 assert_eq!(got, want, "gate_path_rooted {:?} under {:?}", p, prelude);
             }
