@@ -9,11 +9,11 @@ nav_order: 1
 
 It is for the maintainer of a repository coding agents write most of, who has to answer at merge time whether the work is actually done and cannot answer it by reading every diff.
 
-**It complements the workflow you already run.** Keep your spec process, your prompts, your harness. Add Checkwright where a claim has to be mechanically proven rather than asserted: the instructions shape, the gates enforce. Why that split is the whole design is the layer model on [Where Checkwright sits](positioning.md).
+**It complements the workflow you already run.** Keep your spec process, your prompts, your harness. Add Checkwright where a claim has to be mechanically proven rather than asserted: the instructions shape, the gates enforce. Why that split is the whole design: [Positioning](#positioning).
 
 ## Try it first
 
-`demo` runs the whole arc in a scratch repository of its own and removes it, without touching yours; [Install](install.md#install) says what each act does. It installs the `full` profile, which needs bash 4.3 or later: on stock macOS run the [Homebrew bash step](install.md#macos-and-linux) first, and on Windows the [Git for Windows step](install.md#windows).
+`demo` runs the whole arc in a scratch repository of its own and removes it, without touching yours; what it does and what it needs first: [Try it first](install.md#try-it-first).
 
 ```sh
 curl -fsSL https://checkwright.dev/install.sh | sh -s -- demo                  # macOS and Linux
@@ -29,7 +29,7 @@ npx checkwright demo                                                           #
 
 ## Install
 
-From the root of a clean git repository, the same three routes without `demo` install the kits as one commit, the first two from the Release tarball:
+From your repository's root, in a new project or an existing one with every change committed, the same three routes without `demo` install the kits as one commit, the first two from the Release tarball:
 
 ```sh
 curl -fsSL https://checkwright.dev/install.sh | sh                             # macOS and Linux
@@ -43,7 +43,7 @@ irm https://checkwright.dev/install.ps1 | iex                                  #
 npx checkwright init                                                           # with Node
 ```
 
-Profiles, the other verbs and how to pass them arguments: [Install](install.md#install).
+Per-system prerequisites, profiles and the other verbs: [Install and upgrade](install.md).
 
 ## What that buys you
 
@@ -68,19 +68,17 @@ Profiles, the other verbs and how to pass them arguments: [Install](install.md#i
 
 Nothing there is a review opinion. Each finding is cheap and mechanically decidable, which is what earns it the right to block a commit rather than open a thread; the semantic residue stays with the human or the agent, undiluted.
 
-That is what **verification under delegation** means, and it is the prerequisite for scaling agent [orchestration](orchestration.md) past the point where a human reads every hop: coordination is only worth parallelizing once each coordinated result is checkable.
+That is what **verification under delegation** means, and it is the prerequisite for scaling agent orchestration past the point where a human reads every hop: coordination is only worth parallelizing once each coordinated result is checkable.
 
 Which harnesses it runs under, and what adapts to yours: the [tiered compatibility claim](positioning.md#the-tiered-compatibility-claim).
 
 ## Start here
 
 1. [Why Checkwright](methodology.md) — the delivery-methodology essay: what goes wrong when agents write, and the shape of the remedy.
-2. [Install](install.md) — vendoring the kits into your repo and the upgrade contract.
-3. [Value](value.md) — what each kit enforces set against what it costs your context budget, joined from the registries; drills down to the [enforcement map](enforcement.md) and the [footprint](footprint.md).
-4. [Coupling graph](check-graph.html) — which content surfaces each gate binds together, emitted from the per-gate manifests.
-5. The [Kit Reference](kits.md) — one page per kit, in reading order.
-6. [Roadmap](https://github.com/checkwright/checkwright/blob/master/ROADMAP.md) — where the project is heading and what moves an item.
-7. [Announcing Checkwright](posts/2026-07-09-announcing-checkwright.md) — the launch note.
+2. [Value](value.md) — what each kit enforces set against what it costs your context budget, joined from the registries; drills down to the [enforcement map](enforcement.md) and the [footprint](footprint.md).
+3. [Coupling graph](check-graph.html) — which content surfaces each gate binds together, emitted from the per-gate manifests.
+4. [Roadmap](https://github.com/checkwright/checkwright/blob/master/ROADMAP.md) — where the project is heading and what moves an item.
+5. [Announcing Checkwright](posts/2026-07-09-announcing-checkwright.md) — the launch note.
 
 ## The kits
 

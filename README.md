@@ -8,7 +8,7 @@ Who it is for, how it complements the workflow you already run, and a done claim
 
 ## Try it first
 
-`demo` runs the whole arc in a scratch repository of its own and removes it, without touching yours; [docs/install.md](docs/install.md) §Install says what each act does. It installs the `full` profile, which needs bash 4.3 or later: on stock macOS run the Homebrew bash step there first, and on Windows the Git for Windows step.
+`demo` runs the whole arc in a scratch repository of its own and removes it, without touching yours; what it does and what it needs first: [docs/install.md](docs/install.md) §Try it first.
 
 ```sh
 curl -fsSL https://checkwright.dev/install.sh | sh -s -- demo                  # macOS and Linux
@@ -24,7 +24,7 @@ npx checkwright demo                                                           #
 
 ## Install
 
-From the root of a clean git repository, the same three routes without `demo` install the kits as one commit, the first two from the Release tarball:
+From your repository's root, in a new project or an existing one with every change committed, the same three routes without `demo` install the kits as one commit, the first two from the Release tarball:
 
 ```sh
 curl -fsSL https://checkwright.dev/install.sh | sh                             # macOS and Linux
