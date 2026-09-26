@@ -80,7 +80,12 @@ pub const HOOKS: &[(&str, HookFn, &[&str], &str)] = &[
     (
         "workflow-state-guard",
         |p| workflow_state::run(p.value()),
-        &["LIFECYCLE_KIT_STAGE_SESSION_TYPES", "LIFECYCLE_KIT_STATE_FILE"],
+        &[
+            "LIFECYCLE_KIT_STAGE_SESSION_TYPES",
+            "LIFECYCLE_KIT_STATE_FILE",
+            "LIFECYCLE_KIT_STAGES",
+            "GATE_SDK_TMP_DIR",
+        ],
         "lifecycle-kit",
     ),
 ];

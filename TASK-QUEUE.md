@@ -8,18 +8,6 @@
 
 ## New Features
 
-### stage-cursor-unread-by-index-check
-
-[spec: SPEC-superseded-write.md] [recurrence: 2026-09-25]
-
-a post-stamp commit by a superseded stage session is outside every gate: the index check reads a clean index and not the cursor, and lifecycle-kit/SPEC.md §check-dispatch-entry records that a session landing work under another stage's name is outside that gate.
-
-**Deliverable:** the workflow-state guard refuses a `Write` or `Edit` outside the scratch dir by a stage session whose stage the cursor has left, and the SPEC states why no commit-time refusal is buildable (chosen at spec 2026-09-26, an authoring-stage decision).
-
-**Taken for /spec 2026-09-26 at capture-integrity-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set B; the authoring stage picks the hook refusal or the stated window.
-
-**Cost while deferred:** a stale session can commit into a stage it no longer holds. Filed 2026-08-31; returned from the icebox 2026-09-25 by consult as a machinery-class exception voided by the rule.
-
 ### crate-tests-windows-failures
 
 [spec: SPEC-windows-crate-tests.md]
@@ -1382,5 +1370,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 - survey-witness-composed-from-unvalidated-corpus
 - isolated-tracked-capture-lost
+- stage-cursor-unread-by-index-check
 
 ## Lessons Learned

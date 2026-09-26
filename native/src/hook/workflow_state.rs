@@ -50,16 +50,71 @@ fn stamp_before_write(payload: Option<&Value>) -> i32 {
         Ok(v) => v,
         Err(e) => return hook::decline(NAME, &format!("the stamp-before-write rule could not read the state file ({})", e), payload),
     };
-    if stamped(&state.1, &id) {
+    if !stamped(&state.1, &id) {
+        return hook::block(NAME, &unstamped(&agent_type, &id, &state.0));
+    }
+    superseded_stage(payload, &agent_type, &id, &state.1)
+}
+
+// spec: lifecycle-kit/SPEC.md §check-dispatch-entry — the third rule: a stamped caller whose own
+// stage the cursor has left writes only under the scratch dir, where its resume journal lives
+fn superseded_stage(payload: Option<&Value>, agent_type: &str, id: &str, state_text: &str) -> i32 {
+    let stages = match crate::stages::stages() {
+        Ok(s) => s,
+        Err(e) => return hook::decline(NAME, &format!("the superseded-stage rule could not resolve LIFECYCLE_KIT_STAGES ({})", e), payload),
+    };
+    let Some(own) = caller_stage(state_text, id, &stages) else { return 0 };
+    let cursor = crate::stages::current_stage(state_text);
+    if own == cursor {
         return 0;
     }
-    hook::block(NAME, &unstamped(&agent_type, &id, &state.0))
+    if !crate::stages::stage_known(&stages, &cursor) {
+        return hook::decline(NAME, &format!("the superseded-stage rule read a cursor '{}' that is not a configured stage", cursor), payload);
+    }
+    let tmp = match walk::knob_scalar("GATE_SDK_TMP_DIR") {
+        Ok(t) if !t.trim().is_empty() => t,
+        Ok(_) => return hook::decline(NAME, "the superseded-stage rule read an empty GATE_SDK_TMP_DIR", payload),
+        Err(e) => return hook::decline(NAME, &format!("the superseded-stage rule could not resolve GATE_SDK_TMP_DIR ({})", e), payload),
+    };
+    let path = hook::field(payload, &["tool_input", "file_path"]);
+    if !path.is_empty() && under(&path, &tmp) {
+        return 0;
+    }
+    hook::block(NAME, &left_stage(agent_type, id, &own, &cursor, &tmp))
 }
 
 fn stamped(state_text: &str, id: &str) -> bool {
     crate::stages::data_lines(state_text)
         .iter()
         .any(|l| l.split_whitespace().nth(2) == Some(id))
+}
+
+// spec: lifecycle-kit/SPEC.md §check-dispatch-entry — the caller's stage is its last stamp's, so a
+// waiver line carrying its id is not a stage it entered
+fn caller_stage(state_text: &str, id: &str, stages: &[String]) -> Option<String> {
+    crate::stages::data_lines(state_text)
+        .into_iter()
+        .rfind(|l| {
+            l.split_whitespace().nth(2) == Some(id)
+                && crate::stages::stage_known(stages, crate::stages::stamp_stage(l))
+        })
+        .map(|l| crate::stages::stamp_stage(l).to_string())
+}
+
+// spec: lifecycle-kit/SPEC.md §check-dispatch-entry — a `..` component is never inside the scratch
+// dir, because the resolved prefix it would climb out of is compared before the climb
+fn under(path: &str, dir: &str) -> bool {
+    !Path::new(path)
+        .components()
+        .any(|c| matches!(c, std::path::Component::ParentDir))
+        && resolve(path).starts_with(resolve(dir))
+}
+
+fn left_stage(agent_type: &str, id: &str, own: &str, cursor: &str, tmp: &str) -> String {
+    format!(
+        "this '{}' session ({}) entered '{}', and the cursor has moved to '{}': a later stage holds the tree. Answer through your report, and the live stage session lands the change. Your resume journal under the scratch dir ({}) stays writable.",
+        agent_type, id, own, cursor, tmp
+    )
 }
 
 fn unstamped(agent_type: &str, id: &str, state_file: &str) -> String {
@@ -94,24 +149,29 @@ fn degraded() -> i32 {
 // path, a `./` prefix and a path through a symlinked directory all name one file, and a textual
 // match catches only the spelling it was written against.
 // spec: gate-sdk/SPEC.md §The crate's crosser — the resolution goes through `walk::canonicalize`,
-// the crate's only one; `readlink -f` resolves an existing parent with a missing leaf, so the
-// parent carries the crossing and the leaf is rejoined after it.
+// the crate's only one; the nearest existing ancestor carries the crossing and the missing tail is
+// rejoined after it, so a Write creating a file in a directory not yet made still resolves.
 fn resolve(p: &str) -> PathBuf {
-    let path = Path::new(p);
-    if let Some(c) = walk::canonicalize(path) {
-        return PathBuf::from(c);
-    }
-    if let (Some(parent), Some(leaf)) = (path.parent(), path.file_name()) {
-        let parent = if parent.as_os_str().is_empty() {
-            Path::new(".")
-        } else {
-            parent
-        };
-        if let Some(c) = walk::canonicalize(parent) {
-            return PathBuf::from(c).join(leaf);
+    let mut cur = Path::new(p);
+    let mut tail: Vec<&std::ffi::OsStr> = Vec::new();
+    loop {
+        if let Some(c) = walk::canonicalize(cur) {
+            let mut out = PathBuf::from(c);
+            out.extend(tail.iter().rev());
+            return out;
+        }
+        match (cur.parent(), cur.file_name()) {
+            (Some(parent), Some(leaf)) => {
+                tail.push(leaf);
+                cur = if parent.as_os_str().is_empty() {
+                    Path::new(".")
+                } else {
+                    parent
+                };
+            }
+            _ => return PathBuf::from(p.strip_prefix("./").unwrap_or(p)),
         }
     }
-    PathBuf::from(p.strip_prefix("./").unwrap_or(p))
 }
 
 fn blocked(state_file: &str) -> String {
@@ -154,6 +214,34 @@ mod tests {
         assert!(stamped(state, &crate::sessions::normalize("a94d72dcd2db52dbf")));
         assert!(!stamped(state, &crate::sessions::normalize("b1b2b3b4c5c6c7c8d")));
         assert!(!stamped("# x b1b2b3b4\n\n---\n", "b1b2b3b4"));
+    }
+
+    // spec: lifecycle-kit/SPEC.md §check-dispatch-entry — the caller's stage is its last stamp's,
+    // a waiver line carrying its id is skipped, and an unstamped id has none
+    #[test]
+    fn a_callers_stage_is_its_last_stamp_and_a_waiver_line_is_not_one() {
+        let stages: Vec<String> = ["scope", "spec", "align", "build"].iter().map(|s| s.to_string()).collect();
+        let state = "# c\n\n---\n\ndemo scope aaaaaaaa 2026-06-01 none\ndemo spec aaaaaaaa 2026-06-01 none\ndemo align-waived aaaaaaaa 2026-06-02 none\ndemo build bbbbbbbb 2026-06-02 none\n";
+        assert_eq!(caller_stage(state, "aaaaaaaa", &stages).as_deref(), Some("spec"));
+        assert_eq!(caller_stage(state, "bbbbbbbb", &stages).as_deref(), Some("build"));
+        assert_eq!(caller_stage(state, "cccccccc", &stages), None);
+    }
+
+    // spec: lifecycle-kit/SPEC.md §check-dispatch-entry — a path inside the scratch dir is under it
+    // even where the directory does not exist yet, and a `..` climbing out of it never is
+    #[test]
+    fn a_scratch_path_is_under_the_scratch_dir_and_a_climb_out_is_not() {
+        let root = PathBuf::from(
+            walk::canonicalize(Path::new(env!("CARGO_MANIFEST_DIR")).join(".."))
+                .expect("the repo root must resolve"),
+        );
+        let tmp = root.join("no-such-scratch-here").display().to_string();
+        let deep = root.join("no-such-scratch-here/a/b/journal.md").display().to_string();
+        let out = root.join("no-such-scratch-here/../TASK-QUEUE.md").display().to_string();
+        let beside = root.join("TASK-QUEUE.md").display().to_string();
+        assert!(under(&deep, &tmp));
+        assert!(!under(&out, &tmp));
+        assert!(!under(&beside, &tmp));
     }
 
     // spec: lifecycle-kit/SPEC.md §check-stage-entry — a path whose leaf does not yet exist still
