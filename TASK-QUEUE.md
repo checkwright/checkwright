@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: native-contracts-brevity
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [README.md](README.md) maps the kits.
 
@@ -9,6 +9,26 @@
 ## New Features
 
 ## Technical Debt
+
+### hook-members-off-test-floor
+
+`native/src/hook/shell_guard.rs` and `native/src/hook/budget.rs` carry no `#[cfg(test)]` module. The arm-test floor (gate-sdk/SPEC.md §The non-gate arm) binds the file implementing an arm-table row, and `--hook`'s row resolves to `hook/mod.rs`, which has one. shell-guard is driven by `--run-guard-tests`; `budget.rs` is reached only through the verdict it relays.
+
+**Deliverable:** each `HOOKS` row's module carries a `#[cfg(test)]` module exercising its member's rule, the arm-table unit test also resolves `HOOKS` rows and reds a member file with none, and §The non-gate arm says so in one sentence. It lands before [gate-sdk-native-brevity](#gate-sdk-native-brevity) passes that section.
+
+**Ruled 2026-09-26 at scope — operator direction, lead-relayed (not a /consult ruling):** a dispatched member owes the floor. Promoted as debt: it takes the section's rule that a crate test elsewhere never stands in for the arm's own module at its word, and adds no name.
+
+**Cost while deferred:** a member can change behaviour with nothing red. Filed 2026-09-26 by non-gate-arm-contract's spec census; promoted 2026-09-26 at scope. Re-verified at scope: `grep -c 'cfg(test)'` is 0 for both files and 1 for `hook/mod.rs`.
+
+### gate-sdk-native-brevity
+
+the native-substrate sections of gate-sdk/SPEC.md: §The non-gate arm and §The port-candidate criteria under §Porting a gate to the binary substrate, and §port-blockers, §build-native and §check-crate-arms under §Per-component contracts; about 25.7k words. The rest of §Per-component contracts stays on [spec-brevity-residue](#spec-brevity-residue).
+
+**Deliverable:** the three moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) applied to those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm. A contract sentence stays, including a fact a sibling entry or another SPEC cites there.
+
+**Promoted as debt, split from spec-brevity-residue — operator direction 2026-09-26, lead-relayed (not a /consult ruling):** the moves run under gates that already exist and add no name.
+
+**Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-26 at scope from spec-brevity-residue, filed 2026-09-25.
 
 ## Deferred
 
@@ -394,11 +414,11 @@ the secondary customer pages carry validity slips and undefined internal vocabul
 
 [cost: session/high] [surface: gate-sdk]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk's remainder (§The port-candidate criteria, §The non-gate arm, §Per-component contracts; its framework, remainder and porting slices landed as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity` and `gate-sdk-porting-brevity`), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk's remainder (§Per-component contracts, less the subsections [gate-sdk-native-brevity](#gate-sdk-native-brevity) takes; its framework, remainder and porting slices landed as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity` and `gate-sdk-porting-brevity`), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
-**Split three times, 2026-09-25 to 09-26 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder and porting slices each left as their own debt entry, all since landed.
+**Split four times, 2026-09-25 to 09-26 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder and porting slices each left as their own debt entry, all since landed; the native-contracts slice is the fourth.
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
@@ -650,6 +670,8 @@ no CI leg runs the native crate's unit tests on native Windows. `.github/workflo
 
 **Deliverable:** a Windows leg that runs the crate's unit tests, or a narrower one running only the modules that pin a platform claim, with its cost against the push budget stated. Or a SPEC boundary note refusing the leg and keeping the honest limit.
 
+**Push need (2026-09-26, inside the budget):** one push, the closing one when the leg lands in the last build batch, since only a remote Windows run executes the leg.
+
 **Cost while deferred:** a Windows adopter's close drain could fail with exit 2, and nobody sees it until an adopter reports it. Filed 2026-09-25 to the gap inbox by spec-brevity-first-slice's build; promoted 2026-09-25 at its close. →fix fails because a new CI leg is new mechanism, and only a push can witness it. Re-verified at the drain: `grep 'cargo test' .github/workflows/*.yml` returns nothing. Owner lookup: `cargo test`, `msvc`, `unit tests on` in this file — none; [foreign-toolchain-docker-legs](#foreign-toolchain-docker-legs) covers local pwsh and dash runs, not crate unit tests.
 
 ### roadmap-horizon-motion-unowned
@@ -661,16 +683,6 @@ a roadmap horizon moves only when a `/consult` happens to re-tag it. The consult
 **Deliverable:** close raises a consult-owed signal on a vacant now/ horizon or a landed tagged entry, feeding [consult-inbox](#consult-inbox), and the consult binding reconciles tags on any direction change.
 
 **Cost while deferred:** the public roadmap lags direction until an operator-started consult notices. Filed 2026-09-26 to the gap inbox by the lead on an operator question; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because the signal is new mechanism on two surfaces. Re-verified at the drain: the consult binding's one roadmap hit is the projection sentence, and `--emit roadmap` printed now/ empty before the re-tag. Owner lookup: `horizon`, `consult-owed` in this file — no entry about motion.
-
-### hook-members-off-test-floor
-
-[cost: event/low] [surface: gate-sdk]
-
-`native/src/hook/shell_guard.rs` and `native/src/hook/budget.rs` carry no `#[cfg(test)]` module. The arm-test floor (gate-sdk/SPEC.md §The non-gate arm) binds the file implementing an arm-table row, and `--hook`'s row resolves to `hook/mod.rs`, which has one. shell-guard is driven by `--run-guard-tests`; `budget.rs` is reached only through the verdict it relays.
-
-**Deliverable:** a ruling on whether a dispatched member owes the floor, then the two members brought to it or the SPEC stating why not.
-
-**Cost while deferred:** a member can change behaviour with nothing red. Filed 2026-09-26 to the gap inbox by non-gate-arm-contract's spec census; promoted 2026-09-26 at its close: →fix fails because the deliverable opens on a ruling the section does not settle. Re-verified at the drain: `grep -c 'cfg(test)'` is 0 for both files and 1 for `hook/mod.rs`. Owner lookup: `shell_guard`, `budget.rs`, `arm-test floor`, `dispatched member` in this file — none.
 
 ### consult-inbox
 
