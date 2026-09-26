@@ -230,16 +230,20 @@ fn hook_row(tokens: &[&str]) -> (String, String) {
 // spec: gate-sdk/SPEC.md §enforcement-map — Session warnings from the `SessionStart` command hooks
 // and Guards from every other event's, events sorted and hooks in registration order. This is the
 // `jq` dependency's retirement: the rows come from serde_json, so the battery needs no non-floor program.
-fn hook_sections(settings: &str) -> Result<Vec<Section>, String> {
+fn hook_sections(settings: &str, set: bool) -> Result<Vec<Section>, String> {
     if settings.is_empty() || !Path::new(settings).is_file() {
         return Ok(Vec::new());
     }
-    let doc: Value = serde_json::from_str(&read_file(settings)?).map_err(|e| {
-        format!(
-            "CONTEXT_KIT_SETTINGS_FILE unparseable: {}: {}",
-            settings, e
-        )
-    })?;
+    let doc: Value = match serde_json::from_str(&read_file(settings)?) {
+        Ok(v) => v,
+        Err(_) if !set => return Ok(Vec::new()),
+        Err(e) => {
+            return Err(format!(
+                "CONTEXT_KIT_SETTINGS_FILE unparseable: {}: {}",
+                settings, e
+            ))
+        }
+    };
     let mut out: Vec<Section> = Vec::new();
     let (mut guards, mut warnings): (Vec<Row>, Vec<Row>) = (Vec::new(), Vec::new());
     let empty = serde_json::Map::new();
@@ -437,7 +441,8 @@ pub fn measure() -> Result<EnforcementMap, String> {
     if let Some(s) = kpi_section(&gates_dir)? {
         sections.push(s);
     }
-    sections.extend(hook_sections(&settings)?);
+    let (_, settings_origin) = crate::knobs::resolve(SETTINGS_KNOB)?;
+    sections.extend(hook_sections(&settings, settings_origin.is_set())?);
     if let Some(s) = suite_section()? {
         sections.push(s);
     }
@@ -569,20 +574,26 @@ mod tests {
         std::fs::create_dir_all(&dir).expect("scratch dir");
         let missing = dir.join("no-such-settings.json");
         assert!(
-            hook_sections(&missing.display().to_string())
+            hook_sections(&missing.display().to_string(), false)
                 .expect("an absent settings file must not refuse")
                 .is_empty(),
             "not adopted: an absent settings file drops both hook sections"
         );
         assert!(
-            hook_sections("").expect("an empty knob must not refuse").is_empty(),
+            hook_sections("", false).expect("an empty knob must not refuse").is_empty(),
             "an empty settings knob is the same not-adopted case"
         );
         let bad = dir.join("bad-settings.json");
         std::fs::write(&bad, "{ not json\n").expect("write");
-        let err = match hook_sections(&bad.display().to_string()) {
+        assert!(
+            hook_sections(&bad.display().to_string(), false)
+                .expect("an unparseable default-path file must not refuse")
+                .is_empty(),
+            "a stray default-path file degrades to the not-adopted case"
+        );
+        let err = match hook_sections(&bad.display().to_string(), true) {
             Err(e) => e,
-            Ok(_) => panic!("adopted but broken: unparseable settings must refuse"),
+            Ok(_) => panic!("adopted but broken: unparseable set settings must refuse"),
         };
         assert!(err.contains("unparseable"), "the refusal says what is wrong: {}", err);
         let _ = std::fs::remove_dir_all(&dir);
@@ -606,7 +617,7 @@ mod tests {
                     {"type":"command","command":"bash guard-kit/bin/g.sh"}]}]}}"#,
         )
         .expect("write");
-        let s = hook_sections(&f.display().to_string()).expect("parses");
+        let s = hook_sections(&f.display().to_string(), true).expect("parses");
         let rows = |i: usize| -> Vec<(String, Vec<String>)> {
             s[i].rows.iter().map(|r| (r.kit.clone(), r.cells.clone())).collect()
         };

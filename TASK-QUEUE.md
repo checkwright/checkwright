@@ -12,6 +12,40 @@
 
 ## Deferred
 
+### customer-docs-quality-standard
+
+[cost: event/high] [surface: docs]
+
+the front door and the install page repeat themselves and bury the per-OS path, and no page-level quality rule states or gates it. (1) docs/index.md links one target several times on a page: docs/kits.md in Start here and The kits, docs/orchestration.md in What that buys you and Positioning, docs/install.md in Try it first, Install and Start here. (2) The SSOT rule is doctrine, but nothing states the page-level rules (a page split into sub-pages carries no overlap within a page and no duplication across pages) or gates them. (3) docs/install.md gives no clear per-OS prerequisites and install path; collapsible sections could hide manual steps and the OSes not selected. (4) Its Requirements section is overcrowded: a table, with contributor requirements (jq, cargo) apart from adopter prerequisites; its platform and toolchain lists are generated marker blocks, so the change reaches their emitter. (5) The Install sections of docs/index.md and docs/install.md open on a clean-git-repository claim that reads as new-repo-only, against the existing-project path. (6) Compatible, tested and supported OS versions: docs/install.md names only Windows 10 and later, nothing for macOS or Linux (related: [glibc-floor-unstated](#glibc-floor-unstated)).
+
+**Operator direction (2026-09-26, lead session, not a ruling):** this is the next iteration's theme, with [one-product-statement](#one-product-statement) riding it.
+
+**Deliverable:** the page-level standard stated in docs/site-architecture.md with a gate or a stated reason none is buildable, and (1) to (6) repaired at their owners, generated blocks at their emitter.
+
+**Cost while deferred:** every first-time reader meets the duplication and the missing per-OS path on the two pages that decide an install. Filed 2026-09-26 to the gap inbox by the lead on the operator's direction; promoted 2026-09-26 at capture-integrity-brevity's close: →fix fails because a page-level standard is new rule content and the direction makes it an iteration's theme. Not re-verified item by item; the claims are the operator's reading of the live pages. DISTINCT from [docs-secondary-clarity-pass](#docs-secondary-clarity-pass), whose subject is validity slips and undefined vocabulary on the secondary pages. Owner lookup: `docs quality`, `per-OS`, `collapsib`, `Requirements` in this file — only glibc-floor-unstated; owner docs/site-architecture.md.
+
+### one-product-statement
+
+[cost: event/low] [surface: docs]
+
+Checkwright is described two ways. Measured 2026-09-26: the GitHub repo About, `installer/package.json` and `reserve/crates/Cargo.toml` carry the older methodology wording ("A coding-agent-assisted delivery methodology as installable kits: …"), while README.md and docs/index.md open on "Verification for coding-agent delivery" and the verification-layer framing. No SPEC governs the About.
+
+**Operator direction (2026-09-26, lead session, not a ruling):** rides with [customer-docs-quality-standard](#customer-docs-quality-standard) as the next iteration's theme; the operator asks whether a gate should hold it.
+
+**Deliverable:** one source for the product statement, the tracked copies generated from it and freshness-gated, and the live About's drift placed on the monitor side of site-kit/SPEC.md's gate/monitor boundary (it is a network read, and changing it is a GitHub write).
+
+**Cost while deferred:** a reader meets two products on the repo page, the package registries and the site. Filed 2026-09-26 to the gap inbox by the lead on the operator's direction; promoted 2026-09-26 at capture-integrity-brevity's close: →fix fails because choosing the one statement and its source is a design call with a GitHub write in it. The About text is the filer's measurement, not re-read. Owner lookup: `product statement`, `package.json`, `About` in this file — none.
+
+### shellcheck-extra-dirs-trigger
+
+[cost: event/low] [surface: gate-sdk]
+
+`check-shellcheck`'s generated-hook trigger never fires on a directory only `GATE_SDK_LINT_EXTRA_DIRS` adds: the knob is a `.words()` row, which `check-graph` refuses as a `knob:` couples token, so an edit there is linted by the full battery and CI but not at commit. gate-sdk/SPEC.md §check-shellcheck states the limit.
+
+**Deliverable:** a manifest token that expands a word-list knob into trigger globs, or a boundary note ruling the late tier acceptable.
+
+**Cost while deferred:** a consumer's lint findings in knob-added dirs arrive one tier late. Filed 2026-09-26 to the gap inbox by gate-sdk-tooling-brevity; promoted 2026-09-26 at capture-integrity-brevity's close: →fix fails because a new manifest token is a contract change to `check-graph`. Re-verified: `GATE_SDK_LINT_EXTRA_DIRS` is declared `.words()` in `native/src/knobs/gate_sdk.rs`, and the descriptor couples only `knob:GATE_SDK_GATES_DIR/*.sh,kit:*.sh`. Owner lookup: `LINT_EXTRA`, `word-list` in this file — none; owner gate-sdk/SPEC.md §check-shellcheck.
+
 ### seeded-ci-gates-on-surface
 
 [cost: event/low] [surface: gate-sdk]
@@ -400,7 +434,7 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
-**Split seven times, 2026-09-25 to 09-26 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder, porting, native-contracts, runner and meta-gate slices each left as their own debt entry, all since landed; the tooling slice is the seventh.
+**Split seven times, 2026-09-25 to 09-26 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder, porting, native-contracts, runner, meta-gate and tooling slices each left as their own debt entry, all since landed.
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
@@ -636,13 +670,25 @@ the native crate's unit tests run on x86_64 Linux (the battery) and on the two W
 
 **Cost while deferred:** a platform-specific regression on those hosts reaches no test. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's spec; promoted 2026-09-26 at its close: →fix fails because a new CI leg is a unit scope must admit. Re-verified at the drain: `git grep 'cargo test' .github/workflows` returns only `crate-tests-windows`. Owner lookup: `cargo test`, `unit tests`, `apple-darwin`, `aarch64-unknown` in this file — none; owner gate-sdk/SPEC.md §check-crate-arms.
 
+### windows-fresh-fixture-stub
+
+[cost: event/high] [surface: gate-sdk]
+
+`crate-tests-windows` still fails 2 of 1171 on both Windows triples: the registry-coverage pair (`every_registry_member_declares_the_programs_it_spawns` and `_roots_it_walks`) stops at `check-gate-binary-fresh`, whose good and bad fixtures set `GATE_SDK_NATIVE_BIN = ./stub-bin`, a bash-shebang stub Windows cannot start (os error 193). No static stub serves both hosts under one knob value: probed, a shebang-less stub fails on unix at spawn (os error 8); inferred, a `.cmd` stub's line 1 is echoed under `cmd /c` as the stdout line the gate reads as its stamp.
+
+**Inferred, not run:** past it, `check-docs-render-fidelity` and `check-docs-liquid-parse` exit 2 on Windows for want of the ruby gems the gates job installs, and registry members 116 to 140 are unobserved there.
+
+**Deliverable:** a design ruling and its landing: the spawn funnel resolving `PATHEXT` on an extensionless path (reverses gate-sdk/SPEC.md §check-graph's pass-through rule), or the registry observer pinning a host-startable `GATE_SDK_NATIVE_BIN`; then the members past it observed green.
+
+**Cost while deferred:** `crate-tests-windows` stays report-only, so a Windows crate-test regression passes every run as a warning. The operator's cut-and-defer residue of `crate-tests-windows-failures` (operator direction 2026-09-26, lead session). Filed 2026-09-26 to the gap inbox by its build; promoted 2026-09-26 at capture-integrity-brevity's close: →fix fails because both remedies are design-bearing and one reverses a stated rule. Re-verified: run 36264222274 reads 1169 passed, 2 failed, the pair above, on both triples. Owner lookup: `stub-bin`, `gate-binary-fresh`, `PATHEXT` in this file — none; owner gate-sdk/SPEC.md §check-gate-binary-fresh.
+
 ### crate-tests-windows-flip
 
-[cost: event/high] [surface: .github]
+[blocked-by: windows-fresh-fixture-stub] [cost: event/high] [surface: .github]
 
 `crate-tests-windows` in `.github/workflows/gates.yml` carries a hard-coded `continue-on-error: true`; once one run is green on both triples it moves to the `matrix.held` expression `install-smoke-pwsh-windows` reads, and the reports-until-green sentences leave gate-sdk/SPEC.md §check-crate-arms and the capture-drain limit in §The workflow directory.
 
-**Deliverable:** that flip and those deletions, in one commit, after `crate-tests-windows-failures` lands.
+**Deliverable:** that flip and those deletions, in one commit, after [windows-fresh-fixture-stub](#windows-fresh-fixture-stub) lands.
 
 **Cost while deferred:** a Windows crate-test failure passes every run as a warning only close reads. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's build as the follow-up crate-tests-unrun-on-windows' amendment ordered; promoted 2026-09-26 at its close: →fix fails because the job has no green run yet. Re-verified at the drain: the job in `gates.yml` reads `continue-on-error: true`. Owner lookup: as for its blocker — none.
 

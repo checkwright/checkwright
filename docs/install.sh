@@ -1,6 +1,7 @@
 #!/bin/sh
 # spec: installer/SPEC.md §The dependency boundary — the one-line install: docs/install.md's recipe for one pinned release, and nothing else
 # spec: installer/SPEC.md §The hosted install pin — `pin` is the only version this script names, held to docs/install.ps1 and to the newest tag by check-install-pin
+# no-port: installer/SPEC.md §The install boundary — this file's whole body is `bootstrap`-disposition steps: it fetches, verifies and unpacks the first artifact and hands off to its bootstrap, which the binary cannot do for itself
 #
 # usage: curl -fsSL https://checkwright.dev/install.sh | sh -s -- [verb] [args...]
 #   CHECKWRIGHT_VERSION       the release to install (default: the pin below)

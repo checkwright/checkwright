@@ -647,7 +647,7 @@ Invariant: every arm token and kit-knob token a declared restating page carries 
 
 Invariant: every command in a `bash`, `sh` or `shell` fence of the governed doc set starts with a word that can run when the fence is pasted, as written, into a shell at the repository root. A reader copies a shell fence whole, so a line that opens on an arm's flag — the binary's name left to the prose above it — fails at the reader's prompt with no gate having seen it. `check-docs-cmd` (A) resolves an invoked script path and says nothing of a head that is no path at all; this gate is the other half.
 
-**Command position is gate-sdk's scanner's**, the one the port report reads (gate-sdk/SPEC.md §port-blockers): the first word of each command after `;`, `&`, `|`, `&&`, `||`, a newline or a subshell or group opener, and after a resuming reserved word (`if`, `then`, `do`, `!`, …) or an assignment prefix. A heredoc body, a `case` pattern, a continuation line and a quoted word are never a head; a command inside `$(…)` is, and is judged like any other. **A head runs when it is** one of these, in order:
+**Command position is the crate's shell scanner's** (`native/src/bashscan.rs`), the one the port report reads (gate-sdk/SPEC.md §port-blockers): the first word of each command after `;`, `&`, `|`, `&&`, `||`, a newline or a subshell or group opener, and after a resuming reserved word (`if`, `then`, `do`, `!`, …) or an assignment prefix. A heredoc body, a `case` pattern, a continuation line and a quoted word are never a head; a command inside `$(…)` is, and is judged like any other. **A head runs when it is** one of these, in order:
 
 - a word beginning with `-` **never** runs: a flag names no command, and no valve below admits it;
 - an **expansion** — a `$`-led or backquoted word, quoted or bare — whose value the fence's reader holds, so `"$gates"` and `"$(tool)"` both run;
@@ -667,7 +667,7 @@ Anything else reds, a bare program name the configured set lacks included, which
 
 ### check-fence-run
 
-Invariant: every shell fence a governed doc marks runnable passes a narrowed static pass, then runs, and exits with the status it declares. `check-fence-command-head` shows that a fence's command head can run and nothing else, so a wrong operand or an unassigned variable passes it. This gate executes the fences a doc opts in, and it is `tier=align-only`: it runs in the full battery and stays out of the generated pre-commit hook, the class gate-sdk/SPEC.md §check-graph reserves for gates pre-commit cannot afford.
+Invariant: every shell fence a governed doc marks runnable passes a narrowed static pass, then runs, and exits with the status it declares. `check-fence-command-head` shows that a fence's command head can run and nothing else, so a wrong operand or an unassigned variable passes it. This gate executes the fences a doc opts in, and it is `tier=align-only` (gate-sdk/SPEC.md §The `# graph:` manifest): it runs in the full battery and stays out of the generated pre-commit hook.
 
 **The marker.** A doc marks a `bash`, `sh` or `shell` fence runnable with a `<!-- fence-runnable -->` line **immediately above** the fence's opening line, or declares a non-zero status with `<!-- fence-runnable: exit=<n> -->` for a fence that shows a failure (`n` a decimal from 0 to 255; the default is 0). With no marker a fence is not runnable, so a tree that marks nothing executes nothing. A misspelled marker that silently disarms is the failure a marker exists to prevent, so the marker is judged strictly, and each of these reds:
 
