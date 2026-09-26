@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+front-door-release gates sha256=102bff18d348b7df060c7fe9e8a6b26c7a9d10ccdfde9c85d6d43038a0b9bb64 pass=137 fail=0 ignore=0 verdict=clean 2026-09-26
+front-door-release gate_sdk sha256=754fceb4addff652c31443cc80edb7fd86da22a6751d6a985b726be116728b35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+front-door-release canon_kit sha256=1fe227c7d8c11db8a86ada929e9fcad7e090d0db00dc146d46c284cdd32420dc pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+front-door-release context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+front-door-release delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+front-door-release doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+front-door-release evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+front-door-release guard_kit sha256=01d94b4120e133665e01946fe44d31a730d2c6cdfd1570e5ce6b96a7a1b30e1b pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+front-door-release lifecycle_kit sha256=f3a8d77f2d38f716eeb72cd82f0c6d313adb17ea7d522760b30f147e36a031a0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+front-door-release queue_kit sha256=5880c4840de8628f0c320fd728dd3e425a92b6d1554f5e56ce403a8d8b13f3c5 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+front-door-release site_kit sha256=b9a84e84d67dad5a63ae7ce34aecdc472ffbe13d06d01cc02f04bfca5b5de2ae pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+front-door-release scripts sha256=d1a774051734b776989af78b8f387a07649579f4c7492afbf45caa5fc67cb35a pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+front-door-release guard_tests sha256=50af7da51cc1a15eb9e72dea81613ec0b82b4b73a8faba1987ef537271e9ee9a pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+front-door-release demo sha256=e0242bb1b271a7e83f300f008dac2901962da2eceb7312fe0652ab4173689975 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+front-door-release installer_smoke sha256=cd204c4cbec2f138927ac2c1f4fd6985d2501ec2fc421ba7f5458f7d30521af4 pass=18 fail=0 ignore=0 verdict=clean 2026-09-26
+front-door-release consumer_smoke sha256=a36dd08e3ef24516be97b85d9fac85e30271321e4adf4f02b706146814e201a3 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+front-door-release upgrade sha256=414e0de2dd3401adaa4590d0994a83293e35c6eadf91d412340b234b72ac9b48 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+front-door-release agents_md_smoke sha256=03b1fbbd048e0bcbe8743c313606df786804013e04f4b13c9f72b1c03c582fbf pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+front-door-release index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+front-door-release native_crate sha256=402d17ba357a39b4e38b4845812220df821d37c511146d1c4297037e0735077e pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
+front-door-release projection_witness sha256=9af202e1d1365e277421b7d91b6482baa5ebf31aab948045da8e3640c89c7385 pass=1 fail=0 ignore=0 verdict=clean 2026-09-26
