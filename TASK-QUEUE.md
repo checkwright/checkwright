@@ -54,6 +54,8 @@ the crate's unit tests fail 37 of 1166 on both Windows triples (run 36254992168:
 
 **Taken into this iteration 2026-09-26 at spec, operator direction lead-relayed (not a /consult ruling):** the unit set widened to include this entry, with the per-class calls left to the amendment; [crate-tests-windows-flip](#crate-tests-windows-flip) stays Deferred.
 
+**Push need (2026-09-26, inside the budget):** one mid-iteration build push, its watched gates run reading crate-tests-windows green on x86_64 and aarch64; no local Windows host reaches it.
+
 **Cost while deferred:** [crate-tests-windows-flip](#crate-tests-windows-flip) stays blocked, and a new Windows regression is one warning among 37. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's build off the job's first run; promoted 2026-09-26 at its close on the lead's decision that the reporting-only job leaves nothing red this iteration: →fix fails because four failure classes each need a portability-versus-defect call. Re-verified at the drain: run 36226045247's x86_64 annotation reads `37 test(s) FAILED`. Owner lookup: `crate-tests`, `backslash`, `WSL launcher` in this file — [harness-project-dir-fold-dialect-unresolved](#harness-project-dir-fold-dialect-unresolved) is a guard fold, unrelated; owner gate-sdk/SPEC.md §check-crate-arms.
 
 ## Technical Debt
