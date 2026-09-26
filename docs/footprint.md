@@ -29,7 +29,7 @@ The figures are kit-share only — what a kit itself ships. A consumer's own bin
 | canon-kit | — | 5785cp · ~1531t |
 | context-kit | — | 2351cp · ~594t |
 | delegation-kit | — | 40200cp · ~10124t |
-| doctrine-kit | 1819cp · ~463t | — |
+| doctrine-kit | 1991cp · ~506t | — |
 | drift-kit | — | 6450cp · ~1630t |
 | evidence-kit | — | — |
 | gate-sdk | — | — |
@@ -38,4 +38,4 @@ The figures are kit-share only — what a kit itself ships. A consumer's own bin
 | lifecycle-kit | 301cp · ~76t | 120114cp · ~30294t |
 | queue-kit | — | 1392cp · ~359t |
 | site-kit | — | — |
-| **total** | 2120cp · ~539t | 180686cp · ~45647t |
+| **total** | 2292cp · ~582t | 180686cp · ~45647t |

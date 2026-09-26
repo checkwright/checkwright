@@ -160,11 +160,13 @@ absent "bypass-slug"      "$out" "unmarked"
 absent "bypass-leadprose" "$out" "LEADPROSE"
 absent "bypass-bodyprose" "$out" "BODYPROSE"
 
-# An empty horizon still gets its heading, carrying the placeholder.
+# An empty horizon still gets its heading, and is its heading alone: past it and
+# its blank line comes the next heading or the block's end.
 queue only-soon "[roadmap: soon/alpha] $decl"
 out="$(emit)"
-want "empty-heading"     "$out" "### someday"
-want "empty-placeholder" "$out" "_Nothing is queued under this horizon._"
+want "empty-heading" "$out" "### someday"
+after="$(grep -A2 -x -F -- '### someday' <<<"$out" | tail -n +2)"
+[[ -z "$after" || "$after" == $'\n### '* ]] || { echo "  FAIL [empty-heading-alone]: '### someday' is followed by more than its blank line:"; printf '    %s\n' "$after"; fails=$((fails + 1)); }
 
 # The written block ends on a blank line before the :end marker — without it the
 # Pages parser leaves the list open and renders the marker inside the last <li>.
@@ -208,5 +210,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "roadmap.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "roadmap.test.sh: clean (assertion B: valid, unknown horizon/track, unparseable field, duplicate tag, untagged; assertion C: missing/duplicate summary, dead marking, independent findings reported together; emit whitelist: summary/body/cost prose excluded, each bullet linked, done excluded, unmarked entry contributes nothing, empty-horizon placeholder; --write splice bounds + trailing blank; empty-page skip; half-configured vocabulary; 41 checks)"
+echo "roadmap.test.sh: clean (assertion B: valid, unknown horizon/track, unparseable field, duplicate tag, untagged; assertion C: missing/duplicate summary, dead marking, independent findings reported together; emit whitelist: summary/body/cost prose excluded, each bullet linked, done excluded, unmarked entry contributes nothing, empty horizon is its heading alone; --write splice bounds + trailing blank; empty-page skip; half-configured vocabulary; 41 checks)"
 exit 0

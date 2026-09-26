@@ -46,6 +46,7 @@ The cross-kit delivery rules live in [doctrine-kit/DOCTRINE.md](doctrine-kit/DOC
 - **Scope-gated intake** — a mid-session initiative is filed as a costed Deferred entry by default, never started; work enters only through scope — or through an operator-ruled hotfix of an impacting failure, minimal and test-and-doc-complete in one commit.
 - **Probe-before-assertion** — a claim one cheap command would settle is probed over the corpus the claim ranges over before it is asserted; relaying an unverified premise is asserting it.
 - **Policy-as-choice** — a kit ships a calibration as a consumer-selectable set, off among them, never its author's one choice; each consumer binds its own.
+- **Absence statements** — state an absence only where a reader must know it was considered, and then as a token; elsewhere omit it: an empty section is its heading alone.
 <!-- doctrine-kit:end -->
 
 ## Conventions established in gate-sdk (keep every kit consistent)

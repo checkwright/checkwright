@@ -8,22 +8,6 @@
 
 ## New Features
 
-### absence-statement-grammar
-
-[spec: SPEC-absence-grammar.md] [recurrence: 2026-09-25, 2026-09-26]
-
-when to state an absence, and how, is unruled, and the public ROADMAP.md prints the emitter's placeholder sentence (`roadmap.rs`) for an empty horizon.
-
-**Recurred 2026-09-26 on the ledger surfaces.** TRAJECTORY.md's two sections each carried one sentence stating that nothing stood there, restating what `--emit ruling-staleness` derives; non-gate-arm-contract's close deleted both. The queue's empty-section convention is held by shape, not meaning: re-run at that close, a Done section holding only `- none` or an indented `  None` passes `check-task-names` and `check-queue-hygiene`.
-
-**Deliverable:** the grammar ruled at doctrine-kit, and the roadmap emitter's empty-horizon line brought to it.
-
-**Taken into porting-records-brevity at its recurrence threshold — operator direction 2026-09-26, lead-relayed (not a /consult ruling):** a grammar and a possible gate arm are new names, so /spec authors its amendment and promotes this entry. Not push-needing. Re-verified at scope: ROADMAP.md has no empty horizon today, so no placeholder is live.
-
-**Specified 2026-09-26:** methodology rule 14, Absence statements, with two branches (a token where a reader must know the question was considered, omission where the structure shows it, a generated section always the latter) and its digest; the roadmap arm's empty horizon becomes its heading alone; an `absence-statement` audit-roster class is the cadence. The two gate arms the recurrence named, a prose-tells arm and a placeholder-slug denylist, are costed in the gap inbox rather than built: neither has a live instance to catch.
-
-**Cost while deferred:** a placeholder on a public page. Filed 2026-07-31 on an operator direction; returned from the icebox 2026-09-25 by consult, the page re-read.
-
 ## Technical Debt
 
 ## Deferred
@@ -1388,6 +1372,7 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 ## Done
 
+- absence-statement-grammar
 - crate-arms-relink-under-worker-pool
 - enforcement-first-load-trigger
 - enter-stage-refusal-help-contradicts-its-guard

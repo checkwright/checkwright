@@ -95,3 +95,8 @@ last: spec-brevity-first-slice close
 corpus: git diff 7463d3c7..89fee730 over native/src (prose_bounds.rs and capture_drain.rs new; knobs/canon_kit.rs, provenance_seam.rs, walk.rs, spec.rs, crate_arms.rs, prose_tells.rs, close_surfaces.rs, guard/host.rs changed) and the three changed templates, each literal bound and pattern read; delegated to a worktree, the verdict read back in the close session
 hits: 0
 declined: check-prose-bounds' five policy values are knobs taking off; their validator floors are contract invariants a repeated phrase needs; the three-phrase display cap is verdict-neutral; the .drain and .drain.part suffixes are kit-shipped grammar; the other module diffs hoist helpers and add no literal; the templates only swap reclaim commands
+
+class: absence-statement
+scope: a sentence stating that nothing stands in a section, or a placeholder bullet (none, a dash) under a heading whose empty body already says so, on governed prose, the queue or the ruling record, per doctrine-kit/DOCTRINE.md Absence statements; un-gateable, since whether a reader must know a question was considered is judgment. Corpus: the sections the iteration's range emptied or reduced to one line, from git diff <base>..HEAD over those surfaces, each read for a body that only re-says its heading's absence. A None token in a hand-authored checklist or a declaration grammar is clean; a generated block is its emitter's and out of reach. Fix by deleting the sentence, or reducing it to the token where the section is a checklist, never by rewording it.
+due: an iteration that empties a section of governed prose, the queue or the ruling record; an emitter gaining an empty case
+last: never

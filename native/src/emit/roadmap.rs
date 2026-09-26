@@ -10,8 +10,6 @@ usage: --emit roadmap [--emit|--write] [queue-file]
   --write: splice that block between QUEUE_KIT_ROADMAP_FILE's markers, touching nothing outside them.
 ";
 
-const PLACEHOLDER: &str = "_Nothing is queued under this horizon._";
-
 enum Mode {
     Emit,
     Write,
@@ -33,17 +31,16 @@ fn parse(args: &[String]) -> Result<(Mode, String), String> {
     Ok((mode, file))
 }
 
-// spec: queue-kit/SPEC.md §The roadmap arm — every configured horizon gets its heading whether or
-// not the queue fills it: an empty horizon is information, and a section that vanishes when it
-// empties reads as a page that forgot it. The order is the knob array's own, never a sort.
+// spec: queue-kit/SPEC.md §The roadmap arm — every configured horizon gets its heading, in the
+// knob array's own order; an empty horizon is its heading alone, one blank line between horizons.
 fn body(entries: &[RoadmapEntry], horizons: &[String], base: &str) -> String {
     let mut out = String::new();
     for (i, h) in horizons.iter().enumerate() {
         if i > 0 {
             out.push('\n');
         }
-        out.push_str(&format!("### {}\n\n", h));
-        let mut n = 0usize;
+        out.push_str(&format!("### {}\n", h));
+        let mut bullets = String::new();
         for e in entries {
             if e.slug.is_empty() || e.tags != 1 {
                 continue;
@@ -70,15 +67,14 @@ fn body(entries: &[RoadmapEntry], horizons: &[String], base: &str) -> String {
             if e.summaries != 1 || e.summary.is_empty() {
                 continue;
             }
-            out.push_str(&format!(
+            bullets.push_str(&format!(
                 "- [{}]({}#{}) *({})* — {}\n",
                 e.slug, base, e.slug, track, e.summary
             ));
-            n += 1;
         }
-        if n == 0 {
-            out.push_str(PLACEHOLDER);
+        if !bullets.is_empty() {
             out.push('\n');
+            out.push_str(&bullets);
         }
     }
     // comment-tier-exempt: load-bearing blank — kramdown ends a list only on a blank
@@ -175,15 +171,25 @@ mod tests {
         vec!["soon".to_string(), "someday".to_string()]
     }
 
-    // spec: queue-kit/SPEC.md §The roadmap arm — an empty horizon still gets its heading and the
-    // placeholder, and the block ends on a blank line the kramdown list needs
+    // spec: queue-kit/SPEC.md §The roadmap arm — an empty horizon is its heading alone, and the
+    // block ends on one blank line the kramdown list needs
     #[test]
     fn every_configured_horizon_gets_a_heading_in_the_knobs_own_order() {
         let e = vec![entry(1, "soon/alpha", "a-thing", 1, "A public sentence.")];
         assert_eq!(
             body(&e, &horizons(), "TASK-QUEUE.md"),
-            "### soon\n\n- [a-thing](TASK-QUEUE.md#a-thing) *(alpha)* — A public sentence.\n\n### someday\n\n\
-             _Nothing is queued under this horizon._\n\n"
+            "### soon\n\n- [a-thing](TASK-QUEUE.md#a-thing) *(alpha)* — A public sentence.\n\n\
+             ### someday\n\n"
+        );
+    }
+
+    #[test]
+    fn an_empty_horizon_before_a_filled_one_is_its_heading_and_one_blank_line() {
+        let e = vec![entry(1, "someday/alpha", "a-thing", 1, "A public sentence.")];
+        assert_eq!(
+            body(&e, &horizons(), "TASK-QUEUE.md"),
+            "### soon\n\n### someday\n\n- [a-thing](TASK-QUEUE.md#a-thing) *(alpha)* — \
+             A public sentence.\n\n"
         );
     }
 
@@ -212,7 +218,7 @@ mod tests {
             entry(1, "elsewhere/alpha", "other-horizon", 1, "s"),
         ];
         let out = body(&e, &horizons(), "TASK-QUEUE.md");
-        assert!(out.contains("### soon\n\n_Nothing is queued"), "{}", out);
+        assert!(out.starts_with("### soon\n\n### someday\n"), "{}", out);
         for slug in [
             "two-tags",
             "no-slash",
