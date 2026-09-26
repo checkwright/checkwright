@@ -4,4 +4,4 @@
 
 ---
 
-— scope ab200ab0 2026-09-27 cc1add18
+gate-sdk-tail-docs-standard scope ab200ab0 2026-09-27 cc1add18

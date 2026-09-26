@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: gate-sdk-tail-docs-standard
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,26 @@
 ## New Features
 
 ## Technical Debt
+
+### gate-sdk-tail-brevity
+
+the gate-sdk/SPEC.md sections under §Per-component contracts from §check-kit-enum to the end of the file (§check-kit-enum through §templates/gates-workflow.yml, the action, commit, tiering, portability and template-parity gates among them); about 26.6k words, gate-sdk's last slice. The other SPECs stay on [spec-brevity-residue](#spec-brevity-residue).
+
+**Deliverable:** the three moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) applied to those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm. A contract sentence stays, including a fact a sibling entry or another SPEC cites there.
+
+**Promoted as debt, split from spec-brevity-residue — operator direction 2026-09-27, lead-relayed (not a /consult ruling), unit set A at gate-sdk-tail-docs-standard's scope:** the moves run under gates that already exist and add no name. [seeded-ci-gates-on-surface](#seeded-ci-gates-on-surface) edits §check-action-pinning and §check-action-permissions later; it stays deferred and lands on the passed text.
+
+**Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-27 at scope from spec-brevity-residue, filed 2026-09-25; the word census is this scope's survey record.
+
+### docs-secondary-clarity-pass
+
+the secondary customer pages carry validity slips and undefined internal vocabulary. Validity: docs/orchestration.md names the wrong actor for the post-commit battery (the supervisor re-runs it, delegation-kit/SPEC.md §Verify after every agent commit) and overclaims `check-gate-tamper`; it calls the budget guard standing when it is an optional hook; docs/kits.md keeps "evidence pages join this map when their kits land" beside the evidence-kit row; docs/methodology.md's hand-listed kit axes omit site-kit and doctrine-kit; the v0.25.0 post's upgrade recipe contradicts `checkwright update`; docs/positioning.md cites an unverifiable upstream issue number; SECURITY.md cites `.claude/commands/close.md`, says "vendored, not installed" against the site's own vocabulary, and asks for "the tag or commit you copied". Clarity: docs/orchestration.md's lead walkthrough uses routing/judgment tier, intent oracle, ruling roster and re-tier undefined and narrates the project's earlier posture; docs/positioning.md states the AGENTS.md claim three times behind a history opener and leaves "provenance seam" unglossed; the value and footprint tables carry an installer row and an unexplained "(consumer)" row; docs/enforcement.md's "this repo" reads as the adopter's on checkwright.dev; CONTRIBUTING.md's "that era" and "iteration boundary" have no referent for an outside reader.
+
+**Deliverable:** each slip corrected at its owner (the generated pages at their emitter), each undefined term glossed on first use or the sentence cut, and the history openers deleted. The ranked list with lines is in this entry's filing commit.
+
+**Promoted as debt 2026-09-27 at gate-sdk-tail-docs-standard's scope, operator direction lead-relayed (not a /consult ruling), unit set A:** corrections on names the specs already carry. Where [customer-docs-quality-standard](#customer-docs-quality-standard)'s page-level standard lands first, these pages are corrected against it.
+
+**Cost while deferred:** low per page and slow, paid by the reader who has already passed the front door. Filed 2026-09-25 by consult as a direct entry, from the same audit; split from the front-door entry because its pages do not decide the first install.
 
 ## Deferred
 
@@ -22,6 +42,8 @@ the front door and the install page repeat themselves and bury the per-OS path, 
 
 **Deliverable:** the page-level standard stated in docs/site-architecture.md with a gate or a stated reason none is buildable, and (1) to (6) repaired at their owners, generated blocks at their emitter.
 
+**Taken for /spec 2026-09-27 at gate-sdk-tail-docs-standard's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, the theme; authored first, since [glibc-floor-unstated](#glibc-floor-unstated) and [install-fetch-asset-names](#install-fetch-asset-names) rewrite the same install page. Probed at scope: (1), (5) and (6) hold as filed.
+
 **Cost while deferred:** every first-time reader meets the duplication and the missing per-OS path on the two pages that decide an install. Filed 2026-09-26 to the gap inbox by the lead on the operator's direction; promoted 2026-09-26 at capture-integrity-brevity's close: →fix fails because a page-level standard is new rule content and the direction makes it an iteration's theme. Not re-verified item by item; the claims are the operator's reading of the live pages. DISTINCT from [docs-secondary-clarity-pass](#docs-secondary-clarity-pass), whose subject is validity slips and undefined vocabulary on the secondary pages. Owner lookup: `docs quality`, `per-OS`, `collapsib`, `Requirements` in this file — only glibc-floor-unstated; owner docs/site-architecture.md.
 
 ### one-product-statement
@@ -33,6 +55,8 @@ Checkwright is described two ways. Measured 2026-09-26: the GitHub repo About, `
 **Operator direction (2026-09-26, lead session, not a ruling):** rides with [customer-docs-quality-standard](#customer-docs-quality-standard) as the next iteration's theme; the operator asks whether a gate should hold it.
 
 **Deliverable:** one source for the product statement, the tracked copies generated from it and freshness-gated, and the live About's drift placed on the monitor side of site-kit/SPEC.md's gate/monitor boundary (it is a network read, and changing it is a GitHub write).
+
+**Taken for /spec 2026-09-27 at gate-sdk-tail-docs-standard's scope, operator direction lead-relayed (not a /consult ruling):** unit set A. Re-read at scope: the About, `installer/package.json` and `reserve/crates/Cargo.toml` all carry the methodology wording.
 
 **Cost while deferred:** a reader meets two products on the repo page, the package registries and the site. Filed 2026-09-26 to the gap inbox by the lead on the operator's direction; promoted 2026-09-26 at capture-integrity-brevity's close: →fix fails because choosing the one statement and its source is a design call with a GitHub write in it. The About text is the filer's measurement, not re-read. Owner lookup: `product statement`, `package.json`, `About` in this file — none.
 
@@ -85,6 +109,8 @@ doctrine-kit/DOCTRINE.md's Absence statements rule has an audit-roster class and
 the x86_64-linux artifact's glibc floor follows its floating build image: `publish.yml`'s build matrix reads `native/runners.list`'s `ubuntu-latest`, so a release built during the Ubuntu 26 rollout (2026-10-19 to 11-19) may land on either image and raise the floor silently. No surface states a glibc floor: installer/SPEC.md names only the musl/glibc split, and docs/install.md §Requirements names no libc.
 
 **Deliverable:** pin the linux build leg to a named image, or measure the shipped artifact's highest required `GLIBC_` symbol version and state it as the floor with a gate or publish-time check holding it; either way docs/install.md §Requirements states the floor.
+
+**Taken for /spec 2026-09-27 at gate-sdk-tail-docs-standard's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, reshaped by [customer-docs-quality-standard](#customer-docs-quality-standard)'s Requirements rework, whose item (6) needs this floor. A pinned image is observed only at the next tag's publish run, so a pin route splits that observation off as a deferred half.
 
 **Cost while deferred:** an adopter on an older glibc meets a loader failure the installer's libc check does not predict. Filed 2026-09-26 to the gap inbox by runner-image-label-migration's build; promoted 2026-09-26 at porting-records-brevity's close: →fix fails because pin-or-state is a design choice over a label that unit ruled to ride, and the floor is a property of a CI-built artifact this host does not build. Owner lookup: `glibc`, `runners.list` in this file — only `foreign-toolchain-docker-legs`, whose glibc mention is a host-versus-container pwsh mismatch, not the shipped floor; owner installer/SPEC.md.
 
@@ -416,25 +442,15 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 **Cost while deferred:** low and bounded — every entry needing discrimination keeps buying it with text against the entry budget. Filed 2026-09-01 by close under CLAUDE.md §Housekeeping's operator-directed exception; it rides no cut and is no hotfix.
 
-### docs-secondary-clarity-pass
-
-[cost: event/low] [surface: docs]
-
-the secondary customer pages carry validity slips and undefined internal vocabulary. Validity: docs/orchestration.md names the wrong actor for the post-commit battery (the supervisor re-runs it, delegation-kit/SPEC.md §Verify after every agent commit) and overclaims `check-gate-tamper`; it calls the budget guard standing when it is an optional hook; docs/kits.md keeps "evidence pages join this map when their kits land" beside the evidence-kit row; docs/methodology.md's hand-listed kit axes omit site-kit and doctrine-kit; the v0.25.0 post's upgrade recipe contradicts `checkwright update`; docs/positioning.md cites an unverifiable upstream issue number; SECURITY.md cites `.claude/commands/close.md`, says "vendored, not installed" against the site's own vocabulary, and asks for "the tag or commit you copied". Clarity: docs/orchestration.md's lead walkthrough uses routing/judgment tier, intent oracle, ruling roster and re-tier undefined and narrates the project's earlier posture; docs/positioning.md states the AGENTS.md claim three times behind a history opener and leaves "provenance seam" unglossed; the value and footprint tables carry an installer row and an unexplained "(consumer)" row; docs/enforcement.md's "this repo" reads as the adopter's on checkwright.dev; CONTRIBUTING.md's "that era" and "iteration boundary" have no referent for an outside reader.
-
-**Deliverable:** each slip corrected at its owner (the generated pages at their emitter), each undefined term glossed on first use or the sentence cut, and the history openers deleted. The ranked list with lines is in this entry's filing commit.
-
-**Cost while deferred:** low per page and slow, paid by the reader who has already passed the front door. Filed 2026-09-25 by consult as a direct entry, from the same audit; split from the front-door entry because its pages do not decide the first install.
-
 ### spec-brevity-residue
 
 [cost: session/high] [surface: gate-sdk]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk's remainder (§Per-component contracts from §check-kit-enum to the end; its framework, remainder, porting, native-contracts, runner, meta-gate and tooling slices landed as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity` and `gate-sdk-tooling-brevity`), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk's last slice, §check-kit-enum to the end, is [gate-sdk-tail-brevity](#gate-sdk-tail-brevity) (its framework, remainder, porting, native-contracts, runner, meta-gate and tooling slices landed as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity` and `gate-sdk-tooling-brevity`); then lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
-**Split seven times, 2026-09-25 to 09-26 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder, porting, native-contracts, runner, meta-gate and tooling slices each left as their own debt entry, all since landed.
+**Split eight times, 2026-09-25 to 09-27 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder, porting, native-contracts, runner, meta-gate and tooling slices each left as their own debt entry, all since landed; the tail slice is the eighth.
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
@@ -657,6 +673,8 @@ the lead template's capture rule (lifecycle-kit/templates/lead.md §Stamps are a
 the install page's step-by-step recipes (docs/install.md, unix and Windows blocks) and the hosted scripts (`docs/install.sh`, `docs/install.ps1`) spell the Release tarball and sidecar names themselves (`checkwright-<version>.tgz` and its `.sha256`), and the install smoke legs spell the layout a third time; nothing compares them with the release-assets declaration in gate-sdk/SPEC.md §Consumer payload, which now holds the publish output alone.
 
 **Deliverable:** the fetch surfaces derive their asset names from the declaration, or a gate holds them equal to it.
+
+**Taken for /spec 2026-09-27 at gate-sdk-tail-docs-standard's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, reshaped by [customer-docs-quality-standard](#customer-docs-quality-standard), which rewrites the per-OS recipes first.
 
 **Cost while deferred:** a declaration-and-publish rename reds only at the tag's pack job, leaving these four surfaces fetching a name no Release carries once the pin moves, so an adopter's one-line install breaks. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's spec as the honest limit release-asset-claim-class-owner's amendment named; promoted 2026-09-26 at its close: →fix fails because derive-or-gate is a design choice across four surfaces. Re-verified at the drain: `docs/install.sh` (`cw_tgz=`) and `docs/install.ps1` (`$tgz =`) spell `checkwright-<version>.tgz`. Owner lookup: `install.sh`, `install.ps1`, `tarball name`, `sidecar` in this file — none live; owner gate-sdk/SPEC.md §Consumer payload.
 
