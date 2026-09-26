@@ -416,6 +416,10 @@ if staged_matches 'docs/install.sh' 'docs/install.ps1' 'native/src/gates/install
     run_gate check-install-pin native/target/release/checkwright-gates check-install-pin
 fi
 
+if staged_matches 'README.md' 'docs/index.md' 'docs/install.md' 'installer/README.md' 'docs/install.sh' 'docs/install.ps1' '.workflow/release-disposition.txt' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'scripts/queue-config.knobs' 'native/src/gates/front_door_verbs.rs' 'native/src/gates/install_pin.rs' 'native/src/gates/release_bump.rs' 'native/src/fresh.rs' 'native/src/programs.rs' 'native/src/queue.rs' 'native/src/stages.rs' 'native/src/installer/mod.rs'; then
+    run_gate check-front-door-verbs native/target/release/checkwright-gates check-front-door-verbs
+fi
+
 if staged_matches 'docs/posts/*.md' 'docs/install.md' '.workflow/release-declarations.md' 'native/src/gates/tightened_gates_grammar.rs' 'native/src/declaration.rs' 'native/src/gates/release_bump.rs'; then
     run_gate check-tightened-gates-grammar native/target/release/checkwright-gates check-tightened-gates-grammar
 fi

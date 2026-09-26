@@ -100,6 +100,12 @@ fn collect_dispositions(file: &str) -> Vec<String> {
     out
 }
 
+// spec: lifecycle-kit/SPEC.md §templates/stages/ — the release-disposition file's one derivation,
+// read by this gate and check-front-door-verbs
+pub(crate) fn disposition_file() -> Result<String, String> {
+    Ok(format!("{}/release-disposition.txt", walk::knob_scalar("GATE_SDK_WORKFLOW_DIR")?))
+}
+
 // spec: lifecycle-kit/SPEC.md §templates/stages/ — the disposition line grammar this gate reads:
 // a bare iteration slug, the literal keyword, then the value
 fn is_disposition(line: &str) -> bool {
@@ -141,7 +147,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         .unwrap_or(DEFAULT_POSTS);
     let disposition = match args.get(1).filter(|a| !a.is_empty()) {
         Some(a) => a.clone(),
-        None => format!("{}/release-disposition.txt", walk::knob_scalar("GATE_SDK_WORKFLOW_DIR")?),
+        None => disposition_file()?,
     };
     let disposition = disposition.as_str();
     if !Path::new(posts).is_dir() {

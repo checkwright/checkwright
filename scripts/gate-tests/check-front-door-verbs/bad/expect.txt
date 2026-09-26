@@ -1,0 +1,3 @@
+page.md:4: `demo` is advertised, and the pinned release pinned.md lacks it while iteration fixture-iteration's disposition is deferred:v9.9.9
+page.md:7: `frobnicate` is advertised, and neither the pinned release pinned.md nor the binary's VERBS carries it
+readme.md: the verb table lacks `uninstall`, which the binary's VERBS carries

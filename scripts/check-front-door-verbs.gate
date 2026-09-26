@@ -1,0 +1,2 @@
+# graph: couples=README.md,docs/index.md,docs/install.md,installer/README.md,docs/install.sh,docs/install.ps1,.workflow/release-disposition.txt dir=one valve=none tier=precommit
+# spec: installer/SPEC.md §The front door's verbs — the verb table is the binary's roster (A), and every route-advertised verb is in the pinned release's table, or pending this iteration's release (B)

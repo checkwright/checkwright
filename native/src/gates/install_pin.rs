@@ -19,7 +19,7 @@ pub fn run(args: &[String]) -> i32 {
 
 // spec: installer/SPEC.md §The hosted install pin — `<major>.<minor>.<patch>`, each a run of ASCII
 // digits, with no prefix and no suffix
-fn is_triple(v: &str) -> bool {
+pub(crate) fn is_triple(v: &str) -> bool {
     let fields: Vec<&str> = v.split('.').collect();
     fields.len() == 3
         && fields
@@ -30,7 +30,7 @@ fn is_triple(v: &str) -> bool {
 // spec: installer/SPEC.md §The hosted install pin — a pin line is any line whose trimmed form opens
 // on the script's pin variable and an `=`; exactly one such line is admissible, and it must be the
 // single-quoted triple
-fn pin_of(path: &str, text: &str, name: &str) -> Result<String, String> {
+pub(crate) fn pin_of(path: &str, text: &str, name: &str) -> Result<String, String> {
     let lines: Vec<(usize, &str)> = fresh::file_lines(text)
         .into_iter()
         .enumerate()

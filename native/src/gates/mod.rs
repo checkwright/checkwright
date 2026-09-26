@@ -52,6 +52,7 @@ pub mod enforcement_fresh;
 pub mod evidence_baseline;
 pub mod evidence_manifest;
 pub mod footprint_fresh;
+pub mod front_door_verbs;
 pub mod front_end_fail_open;
 pub mod install_evidence_fresh;
 pub mod install_pin;
@@ -1599,6 +1600,14 @@ pub const REGISTRY: &[GateEntry] = &[
         install_pin::run,
         &[],
         &[],
+        "-",
+        &[("git", "")],
+    ),
+    (
+        "check-front-door-verbs",
+        front_door_verbs::run,
+        &[],
+        &["QUEUE_KIT_QUEUE_FILE"],
         "-",
         &[("git", "")],
     ),
