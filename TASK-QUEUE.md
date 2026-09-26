@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: front-door-release
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,26 @@
 ## New Features
 
 ## Technical Debt
+
+### gate-sdk-meta-gate-brevity
+
+the meta-gate sections of gate-sdk/SPEC.md under §Per-component contracts: §check-gate-output, §check-gate-fail-closed, §check-gate-fixture-coverage, §check-gate-assertions, §check-gate-substrate-parity, §check-gate-binary-fresh, §check-install-disposition, §check-test-hermetic, §check-path-dialect, §check-pipe-membership, §check-front-end-fail-open, §check-assertion-strength and §check-gate-exemption-tasks; about 25.5k words. The rest of §Per-component contracts stays on [spec-brevity-residue](#spec-brevity-residue).
+
+**Deliverable:** the three moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) applied to those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm. A contract sentence stays, including a fact a sibling entry or another SPEC cites there.
+
+**Promoted as debt, split from spec-brevity-residue — operator direction 2026-09-26, lead-relayed (not a /consult ruling):** the moves run under gates that already exist and add no name. The cut is the one no deferred or icebox deliverable edits, so no pairing reshapes it.
+
+**Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-26 at scope from spec-brevity-residue, filed 2026-09-25; the word census is this scope's survey record.
+
+### registry-assertion-duplicated
+
+`check-kit-registration`'s registry assertion now runs twice over `docs/kits.md`: this repo binds `GATE_SDK_REGISTRY_DOC` there, and `check-docs-kit-parity` still wraps `check-kit-registration` in-process against the same doc, so one missing kit row reds both gates.
+
+**Deliverable:** one owner for the registry assertion — the wrapper narrowed to its nav-child-block sweep with its bad fixture moved to that assertion, or the knob returned to a doc the wrapper does not re-scope — and docs/site-architecture.md's sentence on the parity gate matching.
+
+**Promoted as debt 2026-09-26 at scope, operator direction lead-relayed (not a /consult ruling):** both options converge on names the specs already carry and add none; build picks between them against the in-process-wrap rationale. Re-verified at scope: the knob binding, `docs_kit_parity.rs`'s `kit_registration::run_captured` call and both `gates.list` rows stand as filed.
+
+**Cost while deferred:** a doubled red on one fault, and two gates to keep in step. Filed 2026-09-26 to the gap inbox by the done-claim-demo validate; promoted 2026-09-26 at its close: →fix fails because choosing the owner is a design call against the in-process-wrap rationale gate-sdk/SPEC.md §The consumer remainder cohort carries. Re-verified at the drain: `scripts/gate-sdk-config.knobs` binds `GATE_SDK_REGISTRY_DOC = docs/kits.md`; `native/src/gates/docs_kit_parity.rs` defaults its registry to `docs/kits.md` and calls `kit_registration::run_captured`; both gates sit in `scripts/gates.list`. Owner lookup: `kit-registration`, `docs-kit-parity`, `registry` in this file — none; owner gate-sdk/SPEC.md §check-kit-registration.
 
 ## Deferred
 
@@ -194,7 +214,7 @@ a narrow external preview before any broad announcement: a preview cohort whose 
 
 **Refused, grounds carried forward:** parking behind `native-windows-bash-floor` (landed 2026-09-18) or the git-only-floor discharge (the trigger is what the preview measures); the icebox (the highest cost-while-deferred in the intake).
 
-**Held deferred 2026-09-26 at scope, operator direction lead-relayed (not a ruling):** re-offered at the next scope, after `front-door-demo-unreachable` and `demo-catches-a-done-claim` repair the front door the cohort would meet. Both landed 2026-09-26 on master, but the published release lacks the `demo` verb, so an installing cohort meets the repaired front door only from the next tag.
+**Held deferred 2026-09-26 at scope, operator direction lead-relayed (not a ruling):** re-offered at the next scope, after `front-door-demo-unreachable` and `demo-catches-a-done-claim` repair the front door the cohort would meet. Both landed 2026-09-26 on master, but the published release lacks the `demo` verb, so an installing cohort meets the repaired front door only from the next tag. **Held again 2026-09-26 at front-door-release's scope, operator direction lead-relayed (not a ruling):** deferred until v0.26.0, which this iteration's close cuts on the same direction, publishes; it then re-promotes on the first observed install, as stated above.
 
 **Consult recommendation, 2026-09-25:** promote at the next scope. The enhancement admission filter that gated the queue behind the Deferred drain is retired, the tree half has read zero since it landed, and every adoption claim in the landscape refresh is queued behind an observed install; the binding cost is operator hours, which a scope can schedule beside a tree unit.
 
@@ -374,21 +394,23 @@ the secondary customer pages carry validity slips and undefined internal vocabul
 
 [cost: session/high] [surface: gate-sdk]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk's remainder (§Per-component contracts less its runner and library subsections; its framework, remainder, porting, native-contracts and runner slices landed as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity` and `gate-sdk-runner-brevity`), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk's remainder (§Per-component contracts less its runner and library subsections and the ones [gate-sdk-meta-gate-brevity](#gate-sdk-meta-gate-brevity) takes; its framework, remainder, porting, native-contracts and runner slices landed as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity` and `gate-sdk-runner-brevity`), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
-**Split five times, 2026-09-25 to 09-26 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder, porting, native-contracts and runner slices each left as their own debt entry, all since landed.
+**Split six times, 2026-09-25 to 09-26 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder, porting, native-contracts and runner slices each left as their own debt entry, all since landed; the meta-gate slice is the sixth.
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
 ### ci-one-line-action
 
-[roadmap: next/adoption] [cost: event/high] [surface: gate-sdk] [roadmap-summary: Wire the gate battery into CI in one line, with reds annotated on the pull request.]
+[roadmap: next/adoption] [cost: event/high] [surface: gate-sdk] [observed-by: this repository's gates workflow on a master push] [roadmap-summary: Wire the gate battery into CI in one line, with reds annotated on the pull request.]
 
 the CI story is a copy-out template: `gate-sdk/templates/gates-workflow.yml` exists, `init` does not seed it, no versioned Action lets a workflow say `uses:` in one line, and the battery emits no SARIF, so a red never reaches the pull-request checks tab as an annotation. docs/install.md tells an adopter to make the battery a required status check and leaves them to copy the template by hand. Same-seat entrants ship an Action and SARIF (consult's landscape refresh, 2026-09-25).
 
 **Deliverable:** a versioned Action in this repository the workflow references by tag, `init` seeding the workflow file into the consumer (or printing the one line), and a SARIF emitter arm off the runner's verdict; installer/SPEC.md §init and gate-sdk/SPEC.md §Consumer smoke own the contract, the consumer smoke exercises the seeded workflow.
+
+**Push need (2026-09-26, operator direction lead-relayed, ruling set B at front-door-release's scope with the overrun stated):** one mid-iteration push, since only a remote run executes the Action; with the closing push and the v0.26.0 tag push the set needs 3 against a budget of 2.
 
 **Cost while deferred:** the pull-request check is where a maintainer first sees a red, so the first useful red — the preview's second metric — has no path an adopter can wire in one line. Filed 2026-09-25 by consult as a direct entry, third of the refresh's ranked actions.
 
@@ -684,16 +706,6 @@ a gate's printed finding or help line reaches an adopter's installed tree, yet a
 
 **Cost while deferred:** an adopter following a red's remedy runs a path their tree lacks. Filed 2026-09-26 to the gap inbox by the done-claim-demo build (check-evidence-manifest's assertion-C remedy, fixed at the drain); promoted 2026-09-26 at its close: →fix fails because the holding assertion is new mechanism and some sites (the prose-bounds worklist, the smoke-entry guard) need a contributor-or-adopter call each. Re-verified at the drain: `git grep 'run-gates.sh' native/src/gates` over `println!`/`format!` lines returns fifteen sites before the fix. Owner lookup: `door`, `run-gates.sh`, `remedy` in this file — none live; owner guard-kit/SPEC.md §check-door-binding.
 
-### registry-assertion-duplicated
-
-[cost: event/low] [surface: gate-sdk]
-
-`check-kit-registration`'s registry assertion now runs twice over `docs/kits.md`: this repo binds `GATE_SDK_REGISTRY_DOC` there, and `check-docs-kit-parity` still wraps `check-kit-registration` in-process against the same doc, so one missing kit row reds both gates.
-
-**Deliverable:** one owner for the registry assertion — the wrapper narrowed to its nav-child-block sweep with its bad fixture moved to that assertion, or the knob returned to a doc the wrapper does not re-scope — and docs/site-architecture.md's sentence on the parity gate matching.
-
-**Cost while deferred:** a doubled red on one fault, and two gates to keep in step. Filed 2026-09-26 to the gap inbox by the done-claim-demo validate; promoted 2026-09-26 at its close: →fix fails because choosing the owner is a design call against the in-process-wrap rationale gate-sdk/SPEC.md §The consumer remainder cohort carries. Re-verified at the drain: `scripts/gate-sdk-config.knobs` binds `GATE_SDK_REGISTRY_DOC = docs/kits.md`; `native/src/gates/docs_kit_parity.rs` defaults its registry to `docs/kits.md` and calls `kit_registration::run_captured`; both gates sit in `scripts/gates.list`. Owner lookup: `kit-registration`, `docs-kit-parity`, `registry` in this file — none; owner gate-sdk/SPEC.md §check-kit-registration.
-
 ### front-door-verb-unreleased
 
 [cost: event/high] [surface: installer]
@@ -702,7 +714,9 @@ the front door (README.md and docs/index.md under Try it first, docs/install.md,
 
 **Deliverable:** a gate or a release-policy trigger holding every verb the front-door routes advertise to the pinned release's verb set, the form chosen by the authoring stage. The release carrying `demo` is a close's release disposition, not this entry's completion, so no remote run observes it.
 
-**Cost while deferred:** while the channel is preview, every release deferral leaves the live site's first command broken, and the preview cohort meets it first. Surfaced 2026-09-26 by the done-claim-demo close, which deferred the release carrying the verb as v0.26.0; promoted 2026-09-26 at scope from the carried gap inbox. Re-verified at scope: both hosted scripts pin 0.25.0, `git grep -w demo v0.25.0 -- installer/ native/src/installer` finds nothing, and npm's latest is 0.25.0. Owner lookup: `pinned release`, `front door`, `verb set` in this file — none live; owner installer/SPEC.md §The one-line install.
+**Push need (2026-09-26, operator direction lead-relayed):** the v0.26.0 tag push at close, which this iteration cuts on the operator's direction so the advertised `demo` verb reaches the pin; counted in [ci-one-line-action](#ci-one-line-action)'s overrun line.
+
+**Cost while deferred:** while the channel is preview, every release deferral leaves the live site's first command broken, and the preview cohort meets it first. Surfaced 2026-09-26 by the done-claim-demo close, which deferred the release carrying the verb as v0.26.0; promoted 2026-09-26 at scope from the carried gap inbox. Re-verified at scope: both hosted scripts pin 0.25.0, `native/src/installer/demo.rs` is absent at v0.25.0 and `git grep -w demo v0.25.0 -- installer/ native/src/installer` finds nothing (a wider grep over `native` hits only queue test fixtures naming an iteration `demo`), and npm's latest is 0.25.0. Owner lookup: `pinned release`, `front door`, `verb set` in this file — none live; owner installer/SPEC.md §The one-line install.
 
 ## Icebox
 
