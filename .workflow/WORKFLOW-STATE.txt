@@ -4,11 +4,4 @@
 
 ---
 
-capture-integrity-brevity scope ac5742ae 2026-09-26 c279d4fa
-capture-integrity-brevity spec ac20adc8 2026-09-26 c5ce1d6f
-capture-integrity-brevity align a6ebeca2 2026-09-26 1c2c8593
-capture-integrity-brevity build abe297d2 2026-09-26 7b104389
-capture-integrity-brevity build a437219e 2026-09-26 784e86a6
-capture-integrity-brevity build a7ea70e1 2026-09-26 bd8a70e5
-capture-integrity-brevity validate a5817be3 2026-09-26 4e56bd49
-capture-integrity-brevity close ada12285 2026-09-26 4e3bee7f
+— scope ab200ab0 2026-09-27 cc1add18
