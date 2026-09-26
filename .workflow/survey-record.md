@@ -13,3 +13,10 @@
 - rev: d7fc17a1a195b7057a6b809e3e33f32e59038404
 - finding: gate-sdk/SPEC.md holds 170375 words. The runner and library cut (lib/gate.sh 5814, lib/inject.sh 839, lib/declaration.sh 1805, lib/test-hermetic.sh 928, run-gates 7979, run-gate-tests 3198, run-consumer-smoke 86, upgrade-smoke 5368, with-foreign-shells 853) totals 26870. The meta-gate cut (check-shellcheck through check-gate-exemption-tasks, less check-crate-arms) totals 26819. Either is near the native-contracts slice's 25.7k.
 - inferred: none
+
+## 2026-09-26 align — Does appending */SPEC.md to CONTEXT_KIT_RATCHET_PATHS (SPEC-spec-ratchet delta 1) pull in docs/*/SPEC.md mirrors or gate-tests/ fixture SPEC.md files?
+- corpus: scripts/context-config.knobs
+- oracle: git ls-files -- '*/templates/*.md' '.claude/agents/*.md' '.claude/commands/*.md' ':(exclude)*/gate-tests/*' 'docs/*.md' ':(exclude)docs/*/SPEC.md' ':(exclude)docs/*/README.md' ':(exclude)docs/doctrine-kit/DOCTRINE.md' ':(exclude)docs/evidence-data.md' ':(exclude)docs/enforcement.md' ':(exclude)docs/footprint.md' ':(exclude)docs/install-evidence.md' '*/SPEC.md'
+- rev: a1161ba127b3adc31157cb216268ff507ac06abc
+- finding: No. The array's existing :(exclude)*/gate-tests/* and :(exclude)docs/*/SPEC.md entries apply globally across the whole pathspec set passed to one 'git ls-files --' invocation, regardless of position, so appending */SPEC.md at the end (as delta 1 directs) yields exactly the 12 canonical kit SPECs the amendment's own measurement names, plus the pre-existing governed surfaces — no gate-tests fixture or docs mirror SPEC.md leaks in.
+- inferred: none
