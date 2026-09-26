@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: done-claim-demo
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [README.md](README.md) maps the kits.
 
@@ -9,6 +9,36 @@
 ## New Features
 
 ## Technical Debt
+
+### gate-sdk-runner-brevity
+
+the runner and library sections of gate-sdk/SPEC.md under §Per-component contracts: §lib/gate.sh, §lib/inject.sh, §lib/declaration.sh, §lib/test-hermetic.sh, §run-gates, §run-gate-tests, §run-consumer-smoke, §upgrade-smoke and §with-foreign-shells; about 26.9k words. The rest of §Per-component contracts stays on [spec-brevity-residue](#spec-brevity-residue).
+
+**Deliverable:** the three moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) applied to those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm. A contract sentence stays, including a fact a sibling entry or another SPEC cites there.
+
+**Promoted as debt, split from spec-brevity-residue — operator direction 2026-09-26, lead-relayed (not a /consult ruling):** the moves run under gates that already exist and add no name. The cut is the one an adopter reads first: the runner, its library and the upgrade path.
+
+**Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-26 at scope from spec-brevity-residue, filed 2026-09-25; the word census is this scope's survey record.
+
+### front-door-demo-unreachable
+
+the front door's install-and-demo block cannot be followed as printed, and its proof block matches no install path. `docs/index.md` (the same block on `README.md`) prints the curl and irm one-liners, then says "`demo` in place of `init`" — but neither printed line contains `init`, and a verb reaches the shell installer only through `sh -s -- demo` (`docs/install.sh` usage line) or the PowerShell scriptblock form (`docs/install.ps1`); only the npx line on the page carries a working demo spelling. "What that buys you" then shows battery output no path produces: `check-stage-evidence` is `# install: on-surface`, so `init` never registers it; the default profile is `starter` (gate-sdk only) while `check-md-refs` is canon-kit's; and the printed strings match neither `md_refs.rs`'s nor `runner.rs`'s real output. `demo` installs `full`, which owes bash ≥ 4.3 (installer/SPEC.md §demo), so it is refused on stock macOS and on Windows without the PATH step, and no page says so. The uninstall one-liner needs `CHECKWRIGHT_VERSION` set, unsaid on the index.
+
+**Deliverable:** one demo-first block on the index and README carrying all three spellings and the bash note, then the install block with all three spellings and a pointer for arguments; the proof block replaced by output captured from a real `demo` act 3 (the consumer smoke's demo arm is the source) or labelled illustrative with the profile and setup that produce it; docs/install.md's four demo descriptions collapsed to one paragraph under §Install, its default profile stated, and its irm-with-argument sentence corrected; `installer/README.md` showing `npx checkwright demo` and `--profile`. The eight cross-page restatement clusters the audit mapped (opener trio, one-liner summary, demo description, harness independence, "this page owns no contract", payload-withholding paragraph, roadmap provenance, kit rosters) each take one owner and the rest point — the cluster map is in this entry's filing commit.
+
+**Promoted 2026-09-26 at scope, operator direction lead-relayed (not a /consult ruling):** its proof block is captured from [demo-catches-a-done-claim](#demo-catches-a-done-claim)'s new act 3, so it lands with or after that entry. Re-verified at scope: `docs/index.md` still reads "`demo` in place of `init`" under one-liners carrying no `init`.
+
+**Cost while deferred:** every first-time visitor is handed an instruction they cannot run and a proof they cannot reproduce, on the two pages that decide whether they try it. Filed 2026-09-25 by consult as a direct entry, from a customer-docs validity audit the operator directed; the operator had flagged the block as confusing on reading it.
+
+### derived-count-literal-in-queue-unscanned
+
+[recurrence: 2026-09-25]
+
+the queue file is absent from `CANON_KIT_MANIFEST_FILES` (`scripts/canon-config.knobs`), so a derived count spelt as a literal in an entry reaches no scan.
+
+**Deliverable:** the queue added to the manifest corpus, or the reason it is excluded stated at the knob.
+
+**Cost while deferred:** queue prose carries counts that stale unseen. Filed 2026-09-07; returned from the icebox 2026-09-25 by consult as a corpus exclusion; promoted 2026-09-26 at scope on an operator direction, lead-relayed (not a /consult ruling). Re-verified at scope: no `CANON_KIT_MANIFEST_FILES` row names `TASK-QUEUE.md`.
 
 ## Deferred
 
@@ -194,6 +224,8 @@ a narrow external preview before any broad announcement: a preview cohort whose 
 
 **Refused, grounds carried forward:** parking behind `native-windows-bash-floor` (landed 2026-09-18) or the git-only-floor discharge (the trigger is what the preview measures); the icebox (the highest cost-while-deferred in the intake).
 
+**Held deferred 2026-09-26 at scope, operator direction lead-relayed (not a ruling):** re-offered at the next scope, after [front-door-demo-unreachable](#front-door-demo-unreachable) and [demo-catches-a-done-claim](#demo-catches-a-done-claim) repair the front door the cohort would meet.
+
 **Consult recommendation, 2026-09-25:** promote at the next scope. The enhancement admission filter that gated the queue behind the Deferred drain is retired, the tree half has read zero since it landed, and every adoption claim in the landscape refresh is queued behind an observed install; the binding cost is operator hours, which a scope can schedule beside a tree unit.
 
 **Cost while deferred — still the highest of its intake, and now the more exposed half.** Every claim that would be strongest with external evidence still rests on internal dogfooding, and the channel that would carry it is built and reading zero: the published page states an honest `0` on every pass while the volume of unattested governed surface keeps growing. Deferring also silently defers [benchmark-ab-experiment](#benchmark-ab-experiment), since running that first would fix the wrong metrics. Surfaced 2026-08-02 at close, in the same intake pass, as the review's fourth-ranked item.
@@ -358,16 +390,6 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 **Cost while deferred:** low and bounded — every entry needing discrimination keeps buying it with text against the entry budget. Filed 2026-09-01 by close under CLAUDE.md §Housekeeping's operator-directed exception; it rides no cut and is no hotfix.
 
-### front-door-demo-unreachable
-
-[cost: event/high] [surface: docs]
-
-the front door's install-and-demo block cannot be followed as printed, and its proof block matches no install path. `docs/index.md` (the same block on `README.md`) prints the curl and irm one-liners, then says "`demo` in place of `init`" — but neither printed line contains `init`, and a verb reaches the shell installer only through `sh -s -- demo` (`docs/install.sh` usage line) or the PowerShell scriptblock form (`docs/install.ps1`); only the npx line on the page carries a working demo spelling. "What that buys you" then shows battery output no path produces: `check-stage-evidence` is `# install: on-surface`, so `init` never registers it; the default profile is `starter` (gate-sdk only) while `check-md-refs` is canon-kit's; and the printed strings match neither `md_refs.rs`'s nor `runner.rs`'s real output. `demo` installs `full`, which owes bash ≥ 4.3 (installer/SPEC.md §demo), so it is refused on stock macOS and on Windows without the PATH step, and no page says so. The uninstall one-liner needs `CHECKWRIGHT_VERSION` set, unsaid on the index.
-
-**Deliverable:** one demo-first block on the index and README carrying all three spellings and the bash note, then the install block with all three spellings and a pointer for arguments; the proof block replaced by output captured from a real `demo` act 3 (the consumer smoke's demo arm is the source) or labelled illustrative with the profile and setup that produce it; docs/install.md's four demo descriptions collapsed to one paragraph under §Install, its default profile stated, and its irm-with-argument sentence corrected; `installer/README.md` showing `npx checkwright demo` and `--profile`. The eight cross-page restatement clusters the audit mapped (opener trio, one-liner summary, demo description, harness independence, "this page owns no contract", payload-withholding paragraph, roadmap provenance, kit rosters) each take one owner and the rest point — the cluster map is in this entry's filing commit.
-
-**Cost while deferred:** every first-time visitor is handed an instruction they cannot run and a proof they cannot reproduce, on the two pages that decide whether they try it. Filed 2026-09-25 by consult as a direct entry, from a customer-docs validity audit the operator directed; the operator had flagged the block as confusing on reading it.
-
 ### docs-secondary-clarity-pass
 
 [cost: event/low] [surface: docs]
@@ -382,11 +404,11 @@ the secondary customer pages carry validity slips and undefined internal vocabul
 
 [cost: session/high] [surface: gate-sdk]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk's remainder (§Per-component contracts; its framework, remainder, porting and native-contracts slices landed as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity` and `gate-sdk-native-brevity`), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk's remainder (§Per-component contracts, less the subsections [gate-sdk-runner-brevity](#gate-sdk-runner-brevity) takes; its framework, remainder, porting and native-contracts slices landed as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity` and `gate-sdk-native-brevity`), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
-**Split four times, 2026-09-25 to 09-26 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder and porting slices each left as their own debt entry, all since landed; the native-contracts slice is the fourth.
+**Split five times, 2026-09-25 to 09-26 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder, porting and native-contracts slices each left as their own debt entry, all since landed; the runner slice is the fifth.
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
@@ -559,16 +581,6 @@ the runner writes `gate-timings.txt` from whatever subset ran (`runner.rs`), so 
 **Deliverable:** a comparer arm, or the file retired from the workflow directory with its declaration.
 
 **Cost while deferred:** a tracked baseline nothing compares against. Filed 2026-08-02; returned from the icebox 2026-09-25 by consult on the fired trigger.
-
-### derived-count-literal-in-queue-unscanned
-
-[cost: event/low] [surface: canon-kit] [recurrence: 2026-09-25]
-
-the queue file is absent from `CANON_KIT_MANIFEST_FILES` (`scripts/canon-config.knobs`), so a derived count spelt as a literal in an entry reaches no scan.
-
-**Deliverable:** the queue added to the manifest corpus, or the reason it is excluded stated at the knob.
-
-**Cost while deferred:** queue prose carries counts that stale unseen. Filed 2026-09-07; returned from the icebox 2026-09-25 by consult as a corpus exclusion.
 
 ### site-health-probe-no-retry-on-transient
 

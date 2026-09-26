@@ -75,7 +75,7 @@
 9104cp lifecycle-kit/templates/stages/build.md
 21431cp lifecycle-kit/templates/stages/close.md
 19305cp lifecycle-kit/templates/stages/scope.md
-9131cp lifecycle-kit/templates/stages/spec.md
+9269cp lifecycle-kit/templates/stages/spec.md
 6058cp lifecycle-kit/templates/stages/validate.md
 2765cp lifecycle-kit/templates/upgrade.md
 1392cp queue-kit/templates/TASK-QUEUE.md
