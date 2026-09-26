@@ -250,7 +250,7 @@ native/runners.list's ride paragraph gains one sentence: a ride that raises an a
 
 ## Existing sections updated
 
-Roster probes, each over the tracked tree: `git grep -n` for each of the eight marker names and for the anchors `install.md#` and `index.md#the-kits`; `git grep -l -F` for `(joined)`, `@contributor` and `@registered`; and the read-only reader sweep above, over `.github/workflows/`, `native/src/`, `scripts/`, `installer/` and every SPEC.
+Roster probes, each over the tracked tree: `git grep -n` for each of the seven marker names and for the anchors `install.md#` and `index.md#the-kits`; `git grep -l -F` for `(joined)`, `@contributor` and `@registered`; and the read-only reader sweep above, over `.github/workflows/`, `native/src/`, `scripts/`, `installer/` and every SPEC.
 
 - `docs/site-architecture.md` — §Page-authoring rules (delta 1); the install-platforms parity row (deltas 4 and 9); the install-toolchain parity row (delta 5); the remedy-blocks and install-blocks rows (delta 6).
 - `canon-kit/SPEC.md` — the new §check-docs-page-repeat and §Layout and configuration's two knob rows (delta 2).
