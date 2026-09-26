@@ -1,5 +1,7 @@
-# No args: the gate runs against the repo's own README.md (both registry and
-# runner doc), which registers every gate_kit_roots kit and names every
-# fixture-runner line — the invariant the gate keeps true, so the good case is
-# self-maintaining as kits are added. README links the bare kit dir; bad/ covers
-# the '](<kit>/index.md)' page form assertion A also accepts.
+# No args: the gate reads this case's own knob file, scripts/gate-sdk-config.knobs,
+# which binds GATE_SDK_REGISTRY_DOC to the repo's real kit registry (docs/kits.md)
+# and leaves GATE_SDK_RUNNER_DOC at its README.md default. Both register every
+# gate_kit_roots kit and name every fixture-runner line — the invariant the gate
+# keeps true, so the good case is self-maintaining as kits are added. The
+# registry links the '](<kit>/index.md)' page form; bad/ covers the bare
+# '](<kit>/)' form assertion A also accepts.

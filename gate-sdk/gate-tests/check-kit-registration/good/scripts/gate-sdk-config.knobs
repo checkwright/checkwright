@@ -1,0 +1,2 @@
+# spec: gate-sdk/SPEC.md §run-gate-tests — fixture config: the case resolves knobs inside its own dir, so it binds the registry doc this repo's consumer config binds; move it with scripts/gate-sdk-config.knobs
+GATE_SDK_REGISTRY_DOC = docs/kits.md
