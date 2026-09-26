@@ -8,6 +8,42 @@
 
 ## New Features
 
+### survey-witness-composed-from-unvalidated-corpus
+
+[spec: SPEC-survey-corpus.md] [recurrence: 2026-09-25]
+
+`--emit file-survey` composes its witness from the raw corpus argument: `file_survey.rs` builds the oracle over whatever corpus string it was handed, so a prose corpus yields a witness that passes vacuously — `git diff --quiet` over prose exits 0, and the record certifies "unchanged" for a corpus nothing measured.
+
+**Deliverable:** the corpus grammar (shell-quoted pathspecs each matching a tracked path, or `none`) stated in lifecycle-kit/SPEC.md §The survey record, the arm refusing a corpus outside it, and `check-survey-record` holding it with a bad fixture. The icebox neighbour is not folded in; the amendment says why.
+
+**Taken for /spec 2026-09-26 at capture-integrity-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set B, authored with [isolated-tracked-capture-lost](#isolated-tracked-capture-lost), which changes the same capture arms; the icebox's [survey-oracle-liveness-unasserted](#survey-oracle-liveness-unasserted) neighbours the corpus grammar and may fold in.
+
+**Cost while deferred:** a later stage buys a survey on a witness that was never an oracle. Filed 2026-09-06; returned from the icebox 2026-09-25 by consult on a reproduced false clean.
+
+### isolated-tracked-capture-lost
+
+[spec: SPEC-isolated-capture.md]
+
+a gap bullet or survey block filed by an isolated read-only child is lost with its worktree. `--emit file-gap` and `--emit file-survey` resolve their tracked records through `file_survey::anchored`, which anchors on the worktree's own `git rev-parse --show-toplevel`, so the write lands in the worktree's `.workflow/gap-inbox.md` or `survey-record.md`. gate-sdk/SPEC.md §The workflow directory moves gitignored capture to the main checkout and leaves a tracked write to "the child's own commit", which a read-only child never makes, so the harness reaps it uncommitted.
+
+**Deliverable:** both arms refuse in a linked worktree with a steer to hand the finding back (routing refused at spec 2026-09-26, an authoring-stage decision), a unit test from a linked worktree, and the sentences in lifecycle-kit/SPEC.md §The committed gap inbox and §The survey record and gate-sdk/SPEC.md §The workflow directory.
+
+**Taken for /spec 2026-09-26 at capture-integrity-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set B; the authoring stage rules route-or-refuse. Re-verified at scope: `file_gap.rs` and `file_survey.rs` still resolve their tracked records through `anchored`, not `anchored_capture`.
+
+**Cost while deferred:** a finding an isolated audit child files through the sanctioned channel disappears silently, and its caller believes it was filed. Filed 2026-09-25 to the gap inbox by spec-brevity-first-slice's spec while surveying capture writers; promoted 2026-09-25 at its close. →fix fails because the two remedies change the arms' behaviour differently and need a ruling first. Re-verified at the drain: `file_gap.rs` and `file_survey.rs` call `anchored`, not `anchored_capture`. Owner lookup: `file-gap`, `file-survey`, `anchored`, `isolated child` in this file — none.
+
+### stage-cursor-unread-by-index-check
+
+[spec: SPEC-superseded-write.md] [recurrence: 2026-09-25]
+
+a post-stamp commit by a superseded stage session is outside every gate: the index check reads a clean index and not the cursor, and lifecycle-kit/SPEC.md §check-dispatch-entry records that a session landing work under another stage's name is outside that gate.
+
+**Deliverable:** the workflow-state guard refuses a `Write` or `Edit` outside the scratch dir by a stage session whose stage the cursor has left, and the SPEC states why no commit-time refusal is buildable (chosen at spec 2026-09-26, an authoring-stage decision).
+
+**Taken for /spec 2026-09-26 at capture-integrity-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set B; the authoring stage picks the hook refusal or the stated window.
+
+**Cost while deferred:** a stale session can commit into a stage it no longer holds. Filed 2026-08-31; returned from the icebox 2026-09-25 by consult as a machinery-class exception voided by the rule.
+
 ## Technical Debt
 
 ### gate-sdk-tooling-brevity
@@ -424,18 +460,6 @@ the walk's prune set matches path components anywhere in an absolute path, not o
 
 **Cost while deferred:** an adopter under `~/build/` or `~/dist/` sees the index arms return nothing and no red says why. Filed 2026-09-02; returned from the icebox 2026-09-25 by consult, the walk re-read and the match still absolute.
 
-### survey-witness-composed-from-unvalidated-corpus
-
-[cost: event/high] [surface: lifecycle-kit] [recurrence: 2026-09-25]
-
-`--emit file-survey` composes its witness from the raw corpus argument: `file_survey.rs` builds the oracle over whatever corpus string it was handed, so a prose corpus yields a witness that passes vacuously — `git diff --quiet` over prose exits 0, and the record certifies "unchanged" for a corpus nothing measured.
-
-**Deliverable:** the arm validates the corpus (paths that resolve, or a named oracle class), refuses a prose corpus with the usage line, and a bad fixture pins it; lifecycle-kit/SPEC.md §The survey record states the corpus grammar.
-
-**Taken for /spec 2026-09-26 at capture-integrity-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set B, authored with [isolated-tracked-capture-lost](#isolated-tracked-capture-lost), which changes the same capture arms; the icebox's [survey-oracle-liveness-unasserted](#survey-oracle-liveness-unasserted) neighbours the corpus grammar and may fold in.
-
-**Cost while deferred:** a later stage buys a survey on a witness that was never an oracle. Filed 2026-09-06; returned from the icebox 2026-09-25 by consult on a reproduced false clean.
-
 ### consumer-guard-rule-coverage
 
 [cost: event/high] [surface: guard-kit] [recurrence: 2026-09-25]
@@ -495,18 +519,6 @@ no gate checks a `[recurrence:]` array's date shape: `recurrence_dates` in `nati
 **Deliverable:** a `check-queue-hygiene` axis refusing a malformed recurrence token, with a bad fixture.
 
 **Cost while deferred:** a counted rule fires late on a typo nothing reports. Filed 2026-08-26; returned from the icebox 2026-09-25 by consult, the parser re-read.
-
-### stage-cursor-unread-by-index-check
-
-[cost: iteration/low] [surface: lifecycle-kit] [recurrence: 2026-09-25]
-
-a post-stamp commit by a superseded stage session is outside every gate: the index check reads a clean index and not the cursor, and lifecycle-kit/SPEC.md §check-stage-evidence records that a commit from a session whose stage has been left is not caught.
-
-**Deliverable:** the commit-time hook reads the cursor and refuses a stage-scoped commit whose stage is not the cursor's, or the SPEC states why the window is accepted.
-
-**Taken for /spec 2026-09-26 at capture-integrity-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set B; the authoring stage picks the hook refusal or the stated window.
-
-**Cost while deferred:** a stale session can commit into a stage it no longer holds. Filed 2026-08-31; returned from the icebox 2026-09-25 by consult as a machinery-class exception voided by the rule.
 
 ### one-motion-commit-race-remains-open
 
@@ -607,18 +619,6 @@ queue provenance prose restates what `git log` answers; the ruled sweep is small
 **Deliverable:** the ten sites cut to the fact the entry needs, and the writing rule at queue-kit/SPEC.md §The queue format.
 
 **Cost while deferred:** low; paid by every reader of those entries. Filed 2026-09-09; returned from the icebox 2026-09-25 by consult, the count re-run.
-
-### isolated-tracked-capture-lost
-
-[cost: event/low] [surface: lifecycle-kit]
-
-a gap bullet or survey block filed by an isolated read-only child is lost with its worktree. `--emit file-gap` and `--emit file-survey` resolve their tracked records through `file_survey::anchored`, which anchors on the worktree's own `git rev-parse --show-toplevel`, so the write lands in the worktree's `.workflow/gap-inbox.md` or `survey-record.md`. gate-sdk/SPEC.md §The workflow directory moves gitignored capture to the main checkout and leaves a tracked write to "the child's own commit", which a read-only child never makes, so the harness reaps it uncommitted.
-
-**Deliverable:** a ruling on the tracked capture channels under isolation: route the write to the main checkout, as `anchored_capture` does for gitignored capture, or refuse under isolation with a steer to hand the finding back. Then the arm change, a unit test from a linked worktree, and the sentence in the owning SPEC sections (lifecycle-kit/SPEC.md §The committed gap inbox and §The survey record).
-
-**Taken for /spec 2026-09-26 at capture-integrity-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set B; the authoring stage rules route-or-refuse. Re-verified at scope: `file_gap.rs` and `file_survey.rs` still resolve their tracked records through `anchored`, not `anchored_capture`.
-
-**Cost while deferred:** a finding an isolated audit child files through the sanctioned channel disappears silently, and its caller believes it was filed. Filed 2026-09-25 to the gap inbox by spec-brevity-first-slice's spec while surveying capture writers; promoted 2026-09-25 at its close. →fix fails because the two remedies change the arms' behaviour differently and need a ruling first. Re-verified at the drain: `file_gap.rs` and `file_survey.rs` call `anchored`, not `anchored_capture`. Owner lookup: `file-gap`, `file-survey`, `anchored`, `isolated child` in this file — none.
 
 ### roadmap-horizon-motion-unowned
 
