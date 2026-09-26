@@ -4,11 +4,4 @@
 
 ---
 
-native-contracts-brevity scope a3d1eaf1 2026-09-26 b622f7fd
-native-contracts-brevity spec ab4400a4 2026-09-26 2a54cee1
-native-contracts-brevity align a638124e 2026-09-26 59adc82e
-native-contracts-brevity build ab4e6efa 2026-09-26 dc6f1e51
-native-contracts-brevity build a303040d 2026-09-26 fba9552b
-native-contracts-brevity build ae00d779 2026-09-26 421fdf1b
-native-contracts-brevity validate afce6c7f 2026-09-26 95cd197c
-native-contracts-brevity close aa2f2af6 2026-09-26 bef1dd56
+— scope a1437271 2026-09-26 8211cdfc
