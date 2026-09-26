@@ -8,45 +8,13 @@
 
 ## New Features
 
-### customer-docs-quality-standard
-
-[spec: SPEC-docs-standard.md]
-
-the front door and the install page repeat themselves and bury the per-OS path, and no page-level quality rule states or gates it. (1) docs/index.md links one target several times on a page: docs/kits.md in Start here and The kits, docs/orchestration.md in What that buys you and Positioning, docs/install.md in Try it first, Install and Start here. (2) The SSOT rule is doctrine, but nothing states the page-level rules (a page split into sub-pages carries no overlap within a page and no duplication across pages) or gates them. (3) docs/install.md gives no clear per-OS prerequisites and install path; collapsible sections could hide manual steps and the OSes not selected. (4) Its Requirements section is overcrowded: a table, with contributor requirements (jq, cargo) apart from adopter prerequisites. Its platform and toolchain lists are hand-authored marker blocks, read by `check-install-platforms`, `check-install-toolchain` and the gates workflow's roster step, so the change reaches those readers. (5) The Install sections of docs/index.md and docs/install.md open on a clean-git-repository claim that reads as new-repo-only, against the existing-project path. (6) Compatible, tested and supported OS versions: docs/install.md names only Windows 10 and later, nothing for macOS or Linux (related: [glibc-floor-unstated](#glibc-floor-unstated)).
-
-**Operator direction (2026-09-26, lead session, not a ruling):** this is the next iteration's theme, with [one-product-statement](#one-product-statement) riding it.
-
-**Deliverable:** the page-level standard stated in docs/site-architecture.md with a gate or a stated reason none is buildable, and (1) to (6) repaired at their owners.
-
-**Taken for /spec 2026-09-27 at gate-sdk-tail-docs-standard's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, the theme; authored first, since [glibc-floor-unstated](#glibc-floor-unstated) and [install-fetch-asset-names](#install-fetch-asset-names) rewrite the same install page. Probed at scope: (1), (5) and (6) hold as filed. Re-probed at spec: (2) to (4) hold. (4)'s *generated blocks, so the change reaches their emitter* was wrong and is corrected above: the blocks are hand-authored and gate-read.
-
-**Push need (2026-09-27, inside the budget):** one mid-iteration push, shared with glibc-floor-unstated's floor step. The amendment's delta 4 changes the `native-artifacts-roster` step's reader, which only a gates run executes. The closing push is the second of two against the close binding's `push-budget`.
-
-**Cost while deferred:** every first-time reader meets the duplication and the missing per-OS path on the two pages that decide an install. Filed 2026-09-26 to the gap inbox by the lead on the operator's direction; promoted 2026-09-26 at capture-integrity-brevity's close: →fix fails because a page-level standard is new rule content and the direction makes it an iteration's theme. DISTINCT from [docs-secondary-clarity-pass](#docs-secondary-clarity-pass), whose subject is validity slips and undefined vocabulary on the secondary pages. Owner lookup: `docs quality`, `per-OS`, `collapsib`, `Requirements` in this file — only glibc-floor-unstated; owner docs/site-architecture.md.
-
-### glibc-floor-unstated
-
-[spec: SPEC-docs-standard.md]
-
-the x86_64-linux artifact's glibc floor follows its floating build image: `publish.yml`'s build matrix reads `native/runners.list`'s `ubuntu-latest`, so a release built during the Ubuntu 26 rollout (2026-10-19 to 11-19) may land on either image and raise the floor silently. No surface states a glibc floor: installer/SPEC.md names only the musl/glibc split, and docs/install.md §Requirements names no libc.
-
-**Deliverable:** pin the linux build leg to a named image, or measure the shipped artifact's highest required `GLIBC_` symbol version and state it as the floor with a gate or publish-time check holding it; either way docs/install.md §Requirements states the floor.
-
-**Taken for /spec 2026-09-27 at gate-sdk-tail-docs-standard's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, reshaped by [customer-docs-quality-standard](#customer-docs-quality-standard)'s Requirements rework, whose item (6) needs this floor.
-
-**Authored at spec 2026-09-27, measure route:** v0.26.0's two linux-gnu archives need `GLIBC_2.39`. The shared build body, `scripts/ci-build-artifact.sh`, measures each artifact against the floor the platforms table states, on the release leg and on the gates workflow's `native-artifacts` producer alike. So a floor change is observed on every push, and no half waits for a tag; scope's pin-route note assumed otherwise. The Linux legs keep their runner labels. Lowering the floor is filed to the gap inbox as a separate unit.
-
-**Push need (2026-09-27, inside the budget):** the mid-iteration push customer-docs-quality-standard names, read for the floor step on the four measured build legs.
-
-**Cost while deferred:** an adopter on an older glibc meets a loader failure the installer's libc check does not predict. Filed 2026-09-26 to the gap inbox by runner-image-label-migration's build; promoted 2026-09-26 at porting-records-brevity's close: →fix fails because pin-or-state is a design choice over a label that unit ruled to ride, and the floor is a property of a CI-built artifact this host does not build. Owner lookup: `glibc`, `runners.list` in this file — only `foreign-toolchain-docker-legs`, whose glibc mention is a host-versus-container pwsh mismatch, not the shipped floor; owner installer/SPEC.md.
-
 ### one-product-statement
 
 [spec: SPEC-product-statement.md]
 
 Checkwright is described two ways. Measured 2026-09-26: the GitHub repo About, `installer/package.json` and `reserve/crates/Cargo.toml` carry the older methodology wording ("A coding-agent-assisted delivery methodology as installable kits: …"), while README.md and docs/index.md open on "Verification for coding-agent delivery" and the verification-layer framing. No SPEC governs the About.
 
-**Operator direction (2026-09-26, lead session, not a ruling):** rides with [customer-docs-quality-standard](#customer-docs-quality-standard) as the next iteration's theme; the operator asks whether a gate should hold it.
+**Operator direction (2026-09-26, lead session, not a ruling):** rides with `customer-docs-quality-standard` as the next iteration's theme; the operator asks whether a gate should hold it.
 
 **Deliverable:** one source for the product statement, the tracked copies generated from it and freshness-gated, and the live About's drift placed on the monitor side of site-kit/SPEC.md's gate/monitor boundary (it is a network read, and changing it is a GitHub write).
 
@@ -64,7 +32,7 @@ the install page's step-by-step recipes (docs/install.md, unix and Windows block
 
 **Deliverable:** the fetch surfaces derive their asset names from the declaration, or a gate holds them equal to it.
 
-**Taken for /spec 2026-09-27 at gate-sdk-tail-docs-standard's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, reshaped by [customer-docs-quality-standard](#customer-docs-quality-standard), which rewrites the per-OS recipes first.
+**Taken for /spec 2026-09-27 at gate-sdk-tail-docs-standard's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, reshaped by `customer-docs-quality-standard`, which rewrites the per-OS recipes first.
 
 **Authored at spec 2026-09-27:** a gate, as `check-install-pin`'s third invariant. The surfaces are held to the **pinned** release's declaration, since the pin trails the tag. The smoke legs are left out, because a leg whose name drifts from the page's already reds at push. The invariant reads raw page text, so the order against customer-docs-quality-standard does not matter.
 
@@ -88,7 +56,7 @@ the secondary customer pages carry validity slips and undefined internal vocabul
 
 **Deliverable:** each slip corrected at its owner (the generated pages at their emitter), each undefined term glossed on first use or the sentence cut, and the history openers deleted. The ranked list with lines is in this entry's filing commit.
 
-**Promoted as debt 2026-09-27 at gate-sdk-tail-docs-standard's scope, operator direction lead-relayed (not a /consult ruling), unit set A:** corrections on names the specs already carry. Where [customer-docs-quality-standard](#customer-docs-quality-standard)'s page-level standard lands first, these pages are corrected against it.
+**Promoted as debt 2026-09-27 at gate-sdk-tail-docs-standard's scope, operator direction lead-relayed (not a /consult ruling), unit set A:** corrections on names the specs already carry. Where `customer-docs-quality-standard`'s page-level standard lands first, these pages are corrected against it.
 
 **Cost while deferred:** low per page and slow, paid by the reader who has already passed the front door. Filed 2026-09-25 by consult as a direct entry, from the same audit; split from the front-door entry because its pages do not decide the first install.
 
@@ -1417,5 +1385,8 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 The consumer's local-only companion files (private brief, ops runbook) have read triggers but no write-back trigger, so shipped-unit forward memory and an out-of-tree state verifier drift until a consult audits them; owed are close and release-sweep template slots for both, and a retired-slug arm over plain code on the local-only globs.
 
 ## Done
+
+- customer-docs-quality-standard
+- glibc-floor-unstated
 
 ## Lessons Learned

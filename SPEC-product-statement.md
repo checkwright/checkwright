@@ -68,7 +68,7 @@ The arm lives in the crate's emit table beside `--emit value-rollup`, the preced
 - `installer/README.md`'s opener becomes *The activation path for **Checkwright**, whose kits are listed in the [kit reference](https://checkwright.dev/kits.html).*
 - `reserve/crates/README.md`'s opener becomes *This crate name is reserved for **Checkwright** (<https://checkwright.dev>).*
 
-The act is the same whichever order this and [customer-docs-quality-standard](TASK-QUEUE.md#customer-docs-quality-standard) land in. That entry rewrites README.md's and docs/index.md's §Try it first and §Install and docs/index.md's §Start here, none of which holds the statement's line.
+The act is the same whichever order this and `customer-docs-quality-standard` land in. That entry rewrites README.md's and docs/index.md's §Try it first and §Install and docs/index.md's §Start here, none of which holds the statement's line.
 
 ### (3) The gate: `check-product-statement-fresh` {design-bearing}
 

@@ -64,7 +64,7 @@ The positional form becomes `check-install-pin [install-sh install-ps1 install-m
   - `bad/` carries a script spelling `checkwright-$v.tar.gz`, a page with no token, and a pinned doc whose tarball template has no sidecar template.
 - The module's unit tests hold the tokenizer: a path-joined token, a backslash-joined one, a `${name}` form, and a `$tgz.sha256` suffix that is no token.
 
-The act is the same whichever order this and [customer-docs-quality-standard](../TASK-QUEUE.md#customer-docs-quality-standard) land in. That entry rebuilds the page and folds its recipes into collapsed blocks, but C reads the page's raw text, where the recipes' tokens stand either way.
+The act is the same whichever order this and `customer-docs-quality-standard` land in. That entry rebuilds the page and folds its recipes into collapsed blocks, but C reads the page's raw text, where the recipes' tokens stand either way.
 
 ### (3) The declaration's two readers point at each other {mechanical}
 
