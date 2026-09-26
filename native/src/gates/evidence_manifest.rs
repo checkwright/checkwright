@@ -175,7 +175,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // assertion C: a validate stamp demands ≥1 evidence line, re-armed only once the cursor has
     // advanced past validate (the entry stamp precedes the suites)
     if have_validate && stage != "validate" && !have_line_for_iter {
-        errors.push(format!("iteration '{}' has a validate stamp but no evidence line — validate ran and recorded nothing (run bash gate-sdk/bin/run-gates.sh --run-validate)", iter));
+        errors.push(format!("iteration '{}' has a validate stamp but no evidence line — validate ran and recorded nothing (run --run-validate on the binary GATE_SDK_NATIVE_BIN names)", iter));
     }
 
     // assertion A: a close-entry cursor requires the full green block — every configured suite a

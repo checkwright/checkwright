@@ -194,7 +194,7 @@ a narrow external preview before any broad announcement: a preview cohort whose 
 
 **Refused, grounds carried forward:** parking behind `native-windows-bash-floor` (landed 2026-09-18) or the git-only-floor discharge (the trigger is what the preview measures); the icebox (the highest cost-while-deferred in the intake).
 
-**Held deferred 2026-09-26 at scope, operator direction lead-relayed (not a ruling):** re-offered at the next scope, after `front-door-demo-unreachable` and `demo-catches-a-done-claim` repair the front door the cohort would meet.
+**Held deferred 2026-09-26 at scope, operator direction lead-relayed (not a ruling):** re-offered at the next scope, after `front-door-demo-unreachable` and `demo-catches-a-done-claim` repair the front door the cohort would meet. Both landed 2026-09-26 on master, but the published release lacks the `demo` verb, so an installing cohort meets the repaired front door only from the next tag.
 
 **Consult recommendation, 2026-09-25:** promote at the next scope. The enhancement admission filter that gated the queue behind the Deferred drain is retired, the tree half has read zero since it landed, and every adoption claim in the landscape refresh is queued behind an observed install; the binding cost is operator hours, which a scope can schedule beside a tree unit.
 
@@ -506,7 +506,7 @@ a smoke that re-runs the battery inside its sandbox inherits no evidence-kit sco
 
 [cost: event/low] [surface: installer] [recurrence: 2026-09-25]
 
-installer/SPEC.md §Consumer payload says the compiled artifact is never the adopter's, while §uninstall has the verb keep-and-report it on a hash mismatch, and `uninstall.rs` references no artifact at all; the two sections give opposite answers and the verb follows neither cleanly.
+installer/SPEC.md §The gate binary says the compiled artifact is never the adopter's, while §uninstall has the verb keep-and-report it on a hash mismatch, and `uninstall.rs` references no artifact at all; the two sections give opposite answers and the verb follows neither cleanly.
 
 **Deliverable:** one ownership rule for the artifact, the verb implementing it, and a fixture.
 
@@ -673,6 +673,26 @@ the crate's unit tests fail 37 of 1151 on both Windows triples (first `crate-tes
 **Deliverable:** that flip and those deletions, in one commit, after [crate-tests-windows-failures](#crate-tests-windows-failures) lands.
 
 **Cost while deferred:** a Windows crate-test failure passes every run as a warning only close reads. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's build as the follow-up crate-tests-unrun-on-windows' amendment ordered; promoted 2026-09-26 at its close: →fix fails because the job has no green run yet. Re-verified at the drain: the job in `gates.yml` reads `continue-on-error: true`. Owner lookup: as for its blocker — none.
+
+### gate-output-contributor-door
+
+[cost: event/low] [surface: guard-kit]
+
+a gate's printed finding or help line reaches an adopter's installed tree, yet about fourteen `println!`/`format!` sites under `native/src/gates/` still name `bash gate-sdk/bin/run-gates.sh` as the command to run (the install-lifecycle and install-doctrine remedies, the roadmap and value-rollup regenerators, the file-gap, file-survey and cite-survey arms, among them); an adopter's door is the binary `GATE_SDK_NATIVE_BIN` names. `check-door-binding` reads kit READMEs, templates, `lib/` and `bin/` and never a compiled gate's strings, so nothing reds.
+
+**Deliverable:** each site re-pointed at the binary `GATE_SDK_NATIVE_BIN` names, or declared contributor-facing, and a check-door-binding assertion over gate-module output strings holding it.
+
+**Cost while deferred:** an adopter following a red's remedy runs a path their tree lacks. Filed 2026-09-26 to the gap inbox by the done-claim-demo build (check-evidence-manifest's assertion-C remedy, fixed at the drain); promoted 2026-09-26 at its close: →fix fails because the holding assertion is new mechanism and some sites (the prose-bounds worklist, the smoke-entry guard) need a contributor-or-adopter call each. Re-verified at the drain: `git grep 'run-gates.sh' native/src/gates` over `println!`/`format!` lines returns fifteen sites before the fix. Owner lookup: `door`, `run-gates.sh`, `remedy` in this file — none live; owner guard-kit/SPEC.md §check-door-binding.
+
+### registry-assertion-duplicated
+
+[cost: event/low] [surface: gate-sdk]
+
+`check-kit-registration`'s registry assertion now runs twice over `docs/kits.md`: this repo binds `GATE_SDK_REGISTRY_DOC` there, and `check-docs-kit-parity` still wraps `check-kit-registration` in-process against the same doc, so one missing kit row reds both gates.
+
+**Deliverable:** one owner for the registry assertion — the wrapper narrowed to its nav-child-block sweep with its bad fixture moved to that assertion, or the knob returned to a doc the wrapper does not re-scope — and docs/site-architecture.md's sentence on the parity gate matching.
+
+**Cost while deferred:** a doubled red on one fault, and two gates to keep in step. Filed 2026-09-26 to the gap inbox by the done-claim-demo validate; promoted 2026-09-26 at its close: →fix fails because choosing the owner is a design call against the in-process-wrap rationale gate-sdk/SPEC.md §The consumer remainder cohort carries. Re-verified at the drain: `scripts/gate-sdk-config.knobs` binds `GATE_SDK_REGISTRY_DOC = docs/kits.md`; `native/src/gates/docs_kit_parity.rs` defaults its registry to `docs/kits.md` and calls `kit_registration::run_captured`; both gates sit in `scripts/gates.list`. Owner lookup: `kit-registration`, `docs-kit-parity`, `registry` in this file — none; owner gate-sdk/SPEC.md §check-kit-registration.
 
 ## Icebox
 
