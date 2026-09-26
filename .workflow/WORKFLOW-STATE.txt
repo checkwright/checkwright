@@ -5,3 +5,4 @@
 ---
 
 done-claim-demo scope a1437271 2026-09-26 8211cdfc
+done-claim-demo spec afa131bf 2026-09-26 7b1bc3b6
