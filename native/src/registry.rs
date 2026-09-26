@@ -10,10 +10,17 @@ use std::path::Path;
 // spec: gate-sdk/SPEC.md §lib/gate.sh — `gates_list_members`: every line that is neither blank
 // nor a comment, in file order
 pub fn members(text: &str) -> Vec<String> {
+    member_lines(text).into_iter().map(|(_, l)| l.to_string()).collect()
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — each member with its 1-based registry line, the location a
+// red member with no finding line of its own takes in the SARIF log
+pub fn member_lines(text: &str) -> Vec<(usize, &str)> {
     fresh::file_lines(text)
-        .iter()
-        .filter(|l| !l.trim_start().starts_with('#') && !l.trim().is_empty())
-        .map(|l| (*l).to_string())
+        .into_iter()
+        .enumerate()
+        .filter(|(_, l)| !l.trim_start().starts_with('#') && !l.trim().is_empty())
+        .map(|(i, l)| (i + 1, l))
         .collect()
 }
 

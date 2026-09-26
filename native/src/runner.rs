@@ -5,6 +5,7 @@ use crate::gates;
 use crate::proc;
 use crate::programs::{self, Program};
 use crate::registry;
+use crate::sarif;
 use crate::walk;
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -147,8 +148,10 @@ binary and execs it.
 
 GATE_SDK_VERBOSE (any non-empty value) restores the per-gate banner roll the
 quiet-green output contract suppresses; GATE_SDK_JOBS sets the worker count
-(default: the machine's parallelism; 1 restores a serial run). Per-gate timings
-land in $GATE_SDK_TMP_DIR/gate-timings.txt (default .tmp/)."#;
+(default: the machine's parallelism; 1 restores a serial run);
+GATE_SDK_SARIF_FILE names a file the run also writes its verdict to as a SARIF
+2.1.0 log, the exit status unchanged unless that file cannot be written (exit 2).
+Per-gate timings land in $GATE_SDK_TMP_DIR/gate-timings.txt (default .tmp/)."#;
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the arm's own reads, plus the sentinel standing for
 // the reads of every member the argv can dispatch
@@ -483,18 +486,20 @@ pub const SPEC_LINE_PREFIX: &str = "    spec: ";
 // descriptor that resolved it and only on a red; a descriptor carrying no `# spec:` line
 // contributes nothing rather than a blank line
 fn invariant(d: &Dispatch, name: &str) -> String {
-    let Some(src) = registry::resolve(name, d.resolve_dirs) else {
-        return String::new();
-    };
-    let Ok(text) = std::fs::read_to_string(&src) else {
-        return String::new();
-    };
-    let Some(body) = text
+    match declared(d, name) {
+        Some(inv) => format!("\n{}{}", SPEC_LINE_PREFIX, inv.text),
+        None => String::new(),
+    }
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — the invariant as the verdict line and the SARIF rule both
+// carry it: the located pointer with its one-line statement, and the published location alone
+fn declared(d: &Dispatch, name: &str) -> Option<sarif::Invariant> {
+    let src = registry::resolve(name, d.resolve_dirs)?;
+    let text = std::fs::read_to_string(&src).ok()?;
+    let body = text
         .lines()
-        .find_map(|l| l.trim_start().strip_prefix("# spec:"))
-    else {
-        return String::new();
-    };
+        .find_map(|l| l.trim_start().strip_prefix("# spec:"))?;
     let body = body.trim();
     // spec: canon-kit/SPEC.md §check-spec-pointer — the directive's payload: the significant head
     // ends at the em-dash prose tail, which is the one-line statement printed verbatim
@@ -506,23 +511,27 @@ fn invariant(d: &Dispatch, name: &str) -> String {
         Some((p, f)) => (p.trim(), f.trim()),
         None => (head, ""),
     };
-    let located = resolved_location(path, frag, d.spec_base_url);
-    if tail.is_empty() {
-        format!("\n{}{}", SPEC_LINE_PREFIX, located)
+    let (located, published) = resolved_location(path, frag, d.spec_base_url);
+    let text = if tail.is_empty() {
+        located.clone()
     } else {
-        format!("\n{}{} — {}", SPEC_LINE_PREFIX, located, tail)
-    }
+        format!("{} — {}", located, tail)
+    };
+    Some(sarif::Invariant {
+        text,
+        help_uri: published.then_some(located),
+    })
 }
 
 // spec: gate-sdk/SPEC.md §Layout and configuration — `GATE_SDK_SPEC_BASE_URL`: empty resolves in
 // the tree, set resolves a `<dir>/SPEC.md §<heading>` pointer to `<base>/<dir>/SPEC#<anchor>`, and
 // a pointer the mirror does not publish keeps its repo-relative spelling
-fn resolved_location(path: &str, frag: &str, base: &str) -> String {
+fn resolved_location(path: &str, frag: &str, base: &str) -> (String, bool) {
     let in_tree = || {
         if frag.is_empty() {
-            path.to_string()
+            (path.to_string(), false)
         } else {
-            format!("{} §{}", path, frag)
+            (format!("{} §{}", path, frag), false)
         }
     };
     if base.is_empty() {
@@ -539,7 +548,7 @@ fn resolved_location(path: &str, frag: &str, base: &str) -> String {
         url.push('#');
         url.push_str(&crate::spec::anchor_slug(frag));
     }
-    url
+    (url, true)
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — one member, run as a child process; the in-process call is
@@ -819,6 +828,7 @@ pub fn run(args: &[String]) -> i32 {
         spec_base_url: &spec_base_url,
     };
 
+    let sarif_path = std::env::var(sarif::KNOB).unwrap_or_default();
     let outcomes = dispatch_all(&d, &selected);
     let _ = std::fs::remove_dir_all(&scratch);
 
@@ -852,17 +862,41 @@ pub fn run(args: &[String]) -> i32 {
         .filter(|(_, o)| o.failed)
         .map(|(s, _)| s.name.as_str())
         .collect();
-    if failed.is_empty() {
+    let code = if failed.is_empty() {
         println!("All {} gates passed.", selected.len());
-        return 0;
+        0
+    } else {
+        println!(
+            "{} of {} gates FAILED: {}",
+            failed.len(),
+            selected.len(),
+            failed.join(" ")
+        );
+        1
+    };
+    // spec: gate-sdk/SPEC.md §run-gates — the SARIF log is written once after the verdict lines,
+    // and only an unwritable path changes the exit status
+    if !sarif_path.is_empty() {
+        let lines = registry::member_lines(&list_text);
+        let members: Vec<sarif::Member> = selected
+            .iter()
+            .zip(&outcomes)
+            .map(|(s, o)| sarif::Member {
+                name: &s.name,
+                registry_line: lines.iter().find(|(_, n)| *n == s.name).map(|(l, _)| *l),
+                failed: o.failed,
+                tail: &o.tail,
+                output: &o.output,
+                invariant: if o.failed { declared(&d, &s.name) } else { None },
+            })
+            .collect();
+        let body = sarif::render(&list, &members, &|p| Path::new(p).is_file());
+        if let Err(e) = sarif::write(&sarif_path, &body) {
+            eprintln!("{}: {}", TOOL, e);
+            return 2;
+        }
     }
-    println!(
-        "{} of {} gates FAILED: {}",
-        failed.len(),
-        selected.len(),
-        failed.join(" ")
-    );
-    1
+    code
 }
 
 fn trim_trailing_newlines(b: &[u8]) -> &[u8] {
@@ -942,33 +976,37 @@ mod tests {
     // its repo-relative spelling rather than naming a page that is not there
     #[test]
     fn a_pointer_resolves_to_the_mirror_only_where_the_mirror_publishes_one() {
+        let resolved = |p: &str, f: &str, b: &str| resolved_location(p, f, b).0;
+        assert!(!resolved_location("gate-sdk/SPEC.md", "X", "").1);
+        assert!(resolved_location("gate-sdk/SPEC.md", "X", "https://example.test").1);
+        assert!(!resolved_location("vendor/gate-sdk/SPEC.md", "X", "https://example.test").1);
         assert_eq!(
-            resolved_location("gate-sdk/SPEC.md", "Consumer payload", ""),
+            resolved("gate-sdk/SPEC.md", "Consumer payload", ""),
             "gate-sdk/SPEC.md §Consumer payload"
         );
-        assert_eq!(resolved_location("gate-sdk/SPEC.md", "", ""), "gate-sdk/SPEC.md");
+        assert_eq!(resolved("gate-sdk/SPEC.md", "", ""), "gate-sdk/SPEC.md");
         assert_eq!(
-            resolved_location("gate-sdk/SPEC.md", "Consumer payload", "https://example.test"),
+            resolved("gate-sdk/SPEC.md", "Consumer payload", "https://example.test"),
             "https://example.test/gate-sdk/SPEC#consumer-payload"
         );
         // comment-tier-exempt: a trailing slash is a local property of a hand-written knob value
         assert_eq!(
-            resolved_location("gate-sdk/SPEC.md", "", "https://example.test/"),
+            resolved("gate-sdk/SPEC.md", "", "https://example.test/"),
             "https://example.test/gate-sdk/SPEC"
         );
         assert_eq!(
-            resolved_location("canon-kit/SPEC.md", "bin/env-probe — the floor", "https://example.test"),
+            resolved("canon-kit/SPEC.md", "bin/env-probe — the floor", "https://example.test"),
             format!(
                 "https://example.test/canon-kit/SPEC#{}",
                 crate::spec::anchor_slug("bin/env-probe — the floor")
             )
         );
         assert_eq!(
-            resolved_location("vendor/gate-sdk/SPEC.md", "X", "https://example.test"),
+            resolved("vendor/gate-sdk/SPEC.md", "X", "https://example.test"),
             "vendor/gate-sdk/SPEC.md §X"
         );
         assert_eq!(
-            resolved_location("docs/site-architecture.md", "X", "https://example.test"),
+            resolved("docs/site-architecture.md", "X", "https://example.test"),
             "docs/site-architecture.md §X"
         );
     }

@@ -2,7 +2,7 @@
 // payload into the consumer's repository and commits it, so what governs their tree afterwards is
 // committed, auditable source rather than something resolved at their build time.
 use crate::programs;
-use super::{lock, profile, recipe, refuse, Package, Refusal, AGENT_FILE, GATES_DIR, QUEUE_FILE};
+use super::{lock, profile, recipe, refuse, workflow, Package, Refusal, AGENT_FILE, GATES_DIR, QUEUE_FILE};
 use crate::{install, sha256, toolfloor};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
@@ -488,6 +488,36 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
                 recipe::write_queue(&src, &root, QUEUE_FILE).map_err(|e| refuse(e, "", 2))?;
             }
             r.record(QUEUE_FILE, None);
+        }
+    }
+
+    // spec: installer/SPEC.md §What init seeds — the CI workflow is create-once like the queue
+    // file, and a package that cannot name a fetchable action seeds nothing and says why
+    if !root.join(workflow::PATH).is_file() {
+        let mut repository = read_package_field(pkg, &["repository", "url"]);
+        if repository.is_empty() {
+            repository = read_package_field(pkg, &["repository"]);
+        }
+        let branch = super::git_capture(&root, &["symbolic-ref", "--quiet", "--short", "HEAD"])
+            .ok()
+            .map(|b| b.trim().to_string())
+            .filter(|b| !b.is_empty());
+        match workflow::body(&repository, &commit, &version, branch.as_deref()) {
+            Ok(body) => {
+                if !f.dry {
+                    let target = root.join(workflow::PATH);
+                    if let Some(parent) = target.parent() {
+                        std::fs::create_dir_all(parent).map_err(|e| {
+                            refuse(format!("could not seed {}: {}", workflow::PATH, e), "", 2)
+                        })?;
+                    }
+                    std::fs::write(&target, body).map_err(|e| {
+                        refuse(format!("could not seed {}: {}", workflow::PATH, e), "", 2)
+                    })?;
+                }
+                r.record(workflow::PATH, None);
+            }
+            Err(why) => println!("init: {} not seeded — {}.", workflow::PATH, why),
         }
     }
 

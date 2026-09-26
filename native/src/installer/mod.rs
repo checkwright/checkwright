@@ -10,6 +10,7 @@ pub mod profile;
 pub mod recipe;
 pub mod uninstall;
 pub mod update;
+pub mod workflow;
 
 use crate::programs;
 use crate::{proc, walk};

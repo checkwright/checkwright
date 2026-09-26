@@ -16,8 +16,11 @@ jobs:
   gates:
     # Pinned, not `-latest`: native/runners.list's header owns which Linux jobs pin.
     runs-on: ubuntu-24.04
+    # security-events: write — the battery's SARIF log is uploaded to code
+    # scanning, which is how a red reaches a pull request as an annotation.
     permissions:
       contents: read
+      security-events: write
     steps:
       # fetch-depth: 0 — check-trajectory-fresh reads the full commit graph.
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
@@ -77,9 +80,20 @@ jobs:
           echo "$dir/shellcheck-$SHELLCHECK_VERSION" >> "$GITHUB_PATH"
           "$dir/shellcheck-$SHELLCHECK_VERSION/shellcheck" --version
       - name: full battery
+        env:
+          GATE_SDK_SARIF_FILE: ${{ runner.temp }}/gates.sarif
         run: |
           shellcheck --version | grep '^version:'
           bash gate-sdk/bin/run-gates.sh
+      # Presentation, never the verdict (installer/SPEC.md §The CI action): the
+      # job's status stays the battery's, so a refused upload cannot red it.
+      - name: upload the battery's SARIF log
+        if: always()
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        with:
+          sarif_file: ${{ runner.temp }}/gates.sarif
+          category: checkwright-gates
       - name: fixture suites (derived from */gate-tests)
         run: |
           suites="$(bash gate-sdk/bin/run-gates.sh --emit fixture-suites)" || exit 2
@@ -256,6 +270,39 @@ jobs:
           [ -f "$work/consumer/checkwright.lock" ] \
             || { echo "::error::the hosted one-liner exited 0 but wrote no checkwright.lock"; exit 1; }
           echo "the hosted one-liner installed into a clean consumer under $(readlink -f /bin/sh)"
+
+      # The CI action's witness (installer/SPEC.md §The CI action), run through
+      # `uses: ./installer` on the one-liner's consumer. The release layout is
+      # served again, left running for the job, since the step above stopped its
+      # server; CHECKWRIGHT_RELEASE_BASE points the action's install.sh there.
+      - name: serve the packed release for the CI action
+        run: |
+          set -euo pipefail
+          nohup python3 -m http.server 8731 --bind 127.0.0.1 --directory "$RUNNER_TEMP/one-liner/serve" \
+            > "$RUNNER_TEMP/one-liner/action-server.log" 2>&1 &
+          for _ in 1 2 3 4 5 6 7 8 9 10; do
+            curl -fsS -o /dev/null http://127.0.0.1:8731/install.sh && exit 0
+            sleep 1
+          done
+          echo "::error::the release layout is not being served for the CI action"
+          exit 1
+      - name: run the CI action on the one-liner's consumer
+        id: action
+        uses: ./installer
+        with:
+          path: ${{ runner.temp }}/one-liner/consumer
+          upload-sarif: 'false'
+        env:
+          CHECKWRIGHT_RELEASE_BASE: http://127.0.0.1:8731
+      - name: the CI action wrote a one-run SARIF log
+        env:
+          SARIF: ${{ steps.action.outputs.sarif }}
+        run: |
+          set -euo pipefail
+          [ -f "$SARIF" ] || { echo "::error::the CI action's sarif output names no file: $SARIF"; exit 1; }
+          jq -e '.runs | length == 1' "$SARIF" > /dev/null \
+            || { echo "::error::the CI action's SARIF log does not hold exactly one run"; exit 1; }
+          echo "the CI action wrote $SARIF with one run and $(jq '.runs[0].results | length' "$SARIF") result(s)"
 
   # The native Windows sibling, and the first thing this repository has ever run
   # on a non-Linux host. It was shaped as an instrument before an assertion,

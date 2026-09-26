@@ -148,7 +148,7 @@ Moving to a profile that contains yours only adds. `init` refuses outside a git 
 
 `uninstall` removes only files `init` wrote and you left untouched. It keeps and reports any you edited, and never removes a file you wrote. Run it with `--dry-run` first to see the plan.
 
-The pre-commit hook is a local backstop anyone can skip. Make the gate battery a required status check in CI, so a red battery blocks the merge, and keep that check where the authors it holds cannot edit it.
+The pre-commit hook is a local backstop anyone can skip. `init` also commits `.github/workflows/gates.yml`, which runs the battery on every push and pull request at the release you installed and marks each red on the pull request. Make its check required, so a red battery blocks the merge, and keep that check where the authors it holds cannot edit it.
 
 ## Upgrading
 

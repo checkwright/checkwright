@@ -272,7 +272,9 @@ fn pass(sdk: &str, roots: &[String], teardown: &mut Teardown, sink: &Sink, verbo
                 VERDICT, kit
             )]);
         }
-        let (rc, out) = step!(battery(scratch));
+        let log = format!("{}/.git/consumer-smoke.sarif", scratch);
+        let _ = std::fs::remove_file(&log);
+        let (rc, out) = step!(battery_with(scratch, &[(crate::sarif::KNOB.to_string(), log.clone())]));
         if rc == 0 {
             step!(restore(scratch));
             return Outcome::Fail(vec![
@@ -291,6 +293,16 @@ fn pass(sdk: &str, roots: &[String], teardown: &mut Teardown, sink: &Sink, verbo
                     VERDICT, kit, expected
                 ),
                 out,
+            ]);
+        }
+        if !sarif_names(&log, &expected) {
+            step!(restore(scratch));
+            return Outcome::Fail(vec![
+                format!(
+                    "{}: FAIL — {} violation fired, but the SARIF log at {} holds no result with rule id {}",
+                    VERDICT, kit, log, expected
+                ),
+                "  help: the --run arm writes the log GATE_SDK_SARIF_FILE names; see gate-sdk/SPEC.md §run-gates.".to_string(),
             ]);
         }
         step!(restore(scratch));
@@ -318,10 +330,14 @@ fn pass(sdk: &str, roots: &[String], teardown: &mut Teardown, sink: &Sink, verbo
 // front-end, spawned in its tree with both streams merged; the output is carried with its trailing
 // newlines stripped, as a command substitution holds it
 fn battery(scratch: &str) -> Result<(i32, String), Outcome> {
+    battery_with(scratch, &[])
+}
+
+fn battery_with(scratch: &str, env_extra: &[(String, String)]) -> Result<(i32, String), Outcome> {
     let m = proc::run_merged_in(
         &programs::BASH,
         &["gate-sdk/bin/run-gates.sh"],
-        &[],
+        env_extra,
         Some(Path::new(scratch)),
     )
     .map_err(env)?;
@@ -331,6 +347,24 @@ fn battery(scratch: &str) -> Result<(i32, String), Outcome> {
             .trim_end_matches('\n')
             .to_string(),
     ))
+}
+
+// spec: gate-sdk/SPEC.md §Consumer smoke — the violation run's SARIF log holds a result carrying
+// the expected gate's rule id
+fn sarif_names(log: &str, gate: &str) -> bool {
+    let Ok(text) = std::fs::read_to_string(log) else {
+        return false;
+    };
+    let Ok(doc) = serde_json::from_str::<serde_json::Value>(&text) else {
+        return false;
+    };
+    doc["runs"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|r| r["results"].as_array())
+        .flatten()
+        .any(|r| r["ruleId"] == gate)
 }
 
 // spec: gate-sdk/SPEC.md §Consumer smoke — the positive green token, matched on the summary line's

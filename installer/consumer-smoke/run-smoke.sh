@@ -933,6 +933,11 @@ for profile in "${PROFILES[@]}"; do
     [[ "$(git -C "$C" rev-parse 'HEAD^{tree}')" == "$SEED" && -z "$(git -C "$C" status --porcelain)" ]] \
         || fail "$profile: init --dry-run wrote to the consumer"
     assert_install "$profile" "$C"
+    # spec: installer/SPEC.md §The consumer smoke — the seeded workflow is kept out of the consumer the reversal below removes, so the seed arm after this loop reads what init wrote on every profile
+    SEED_COPY="$SCRATCH/seed-$profile/.github/workflows"
+    mkdir -p "$SEED_COPY" || fail "$profile: could not keep the seeded workflow for the seed arm"
+    [[ ! -f "$C/.github/workflows/gates.yml" ]] || cp "$C/.github/workflows/gates.yml" "$SEED_COPY/" \
+        || fail "$profile: could not keep the seeded workflow for the seed arm"
     assert_plan_parity "$profile" "$PLAN" "$C/checkwright.lock"
     [[ "$profile" == "$PROFILE_DERIVED" ]] && SEEDED="$(seeded_paths "$C/checkwright.lock")"
     assert_value "$profile" "$C"
@@ -957,6 +962,27 @@ for pair in "${ORDER[@]}"; do
     contains "${REGISTRY[$b]}" "gate-roster monotonicity, $a ⊆ $b" "${REGISTRY[$a]}"
 done
 say "gate rosters are monotone across every comparable pair of installed registries"
+
+# spec: installer/SPEC.md §The consumer smoke — the seed arm: the workflow init seeded on every profile names the packed repository, commit and version, and the workflow gates the payload's own binary carries are green over it; the uninstall half is the reversal's tree-object equality above, which a seed left behind would red
+printf 'seed arm (the CI workflow init seeded, every profile)\n'
+SEED_SLUG="$(jq -r '.repository.url // .repository // ""' "$PKG_ROOT/package.json" | sed -E 's#^(git\+)?https://github\.com/##; s#\.git$##')"
+SEED_COMMIT="$(jq -r '.checkwright.commit // ""' "$PKG_ROOT/package.json")"
+[[ -n "$SEED_SLUG" && "$SEED_COMMIT" =~ ^[0-9a-f]{40}$ ]] \
+    || blocked "seed arm: the packed package.json names no repository slug or no stamped commit, so there is no step to expect"
+SEED_STEP="uses: $SEED_SLUG/installer@$SEED_COMMIT # v$VERSION"
+SEED_BIN="$PKG_ROOT/payload/artifact/$HOST_TARGET/$NATIVE_BIN"
+[[ -x "$SEED_BIN" ]] || blocked "seed arm: the packed payload carries no executable $HOST_TARGET binary at $SEED_BIN to run the workflow gates with"
+for profile in "${PROFILES[@]}"; do
+    seeded="$SCRATCH/seed-$profile/.github/workflows/gates.yml"
+    [[ -f "$seeded" ]] || fail "$profile: init seeded no .github/workflows/gates.yml"
+    grep -qF -- "$SEED_STEP" "$seeded" \
+        || { cat "$seeded" >&2; fail "$profile: the seeded workflow does not carry the step '$SEED_STEP'"; }
+    for gate in check-action-pinning check-action-permissions; do
+        out="$( cd "$SCRATCH/seed-$profile" && "$SEED_BIN" "$gate" 2>&1 )" \
+            || { printf '%s\n' "$out" >&2; fail "$profile: $gate is not green over the workflow init seeded"; }
+    done
+done
+say "seed: ${#PROFILES[@]} profile(s) seeded the workflow calling $SEED_SLUG/installer at the packed commit, pinning and permissions green over each"
 
 # spec: installer/SPEC.md §The consumer smoke — the demo arm: the verb run once, through the installed package's entry point, from inside a consumer init just wrote, so a verb that wrote into the invoking tree reds on that tree's object and status, and one that left its scratch behind reds on the harness-owned DEMO_TMP_DIR it was pointed at
 printf 'demo arm (checkwright demo from the packed package, inside an installed %s consumer)\n' "$PROFILE_MIN"

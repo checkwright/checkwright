@@ -29,6 +29,7 @@ mod programs;
 mod queue;
 mod registry;
 mod runner;
+mod sarif;
 mod section;
 mod sessions;
 mod sha256;

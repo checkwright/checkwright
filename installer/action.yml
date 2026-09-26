@@ -1,0 +1,43 @@
+# spec: installer/SPEC.md §The CI action — the battery of an installed tree, run by the published binary at the lock's version, its reds uploaded as SARIF
+name: Checkwright gates
+description: Run the Checkwright gate battery of an installed tree at the release its checkwright.lock names, and upload each red as SARIF.
+inputs:
+  path:
+    description: The installed tree, relative to the workspace or absolute.
+    default: .
+  version:
+    description: A release to run in place of the lock's, for a tree vendored without the installer.
+    default: ''
+  upload-sarif:
+    description: Upload the SARIF log to code scanning ('true' or 'false').
+    default: 'true'
+outputs:
+  sarif:
+    description: The SARIF log's path.
+    value: ${{ steps.battery.outputs.sarif }}
+runs:
+  using: composite
+  steps:
+    - id: battery
+      shell: bash
+      working-directory: ${{ inputs.path }}
+      env:
+        CHECKWRIGHT_ACTION_VERSION: ${{ inputs.version }}
+      run: |
+        sarif="$RUNNER_TEMP/checkwright-gates.sarif"
+        echo "sarif=$sarif" >> "$GITHUB_OUTPUT"
+        v="$CHECKWRIGHT_ACTION_VERSION"
+        if [ -z "$v" ] && [ -f checkwright.lock ]; then
+          v="$(sed -n 's/^  "version": "\([^"]*\)",$/\1/p' checkwright.lock)"
+        fi
+        if [ -z "$v" ]; then
+          echo "::error::no checkwright.lock names a version here; set the action's 'version' input to the release to run"
+          exit 2
+        fi
+        GATE_SDK_SARIF_FILE="$sarif" CHECKWRIGHT_VERSION="$v" sh "$GITHUB_ACTION_PATH/../docs/install.sh" --run
+    - if: always() && inputs.upload-sarif == 'true'
+      uses: github/codeql-action/upload-sarif@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+      continue-on-error: true
+      with:
+        sarif_file: ${{ steps.battery.outputs.sarif }}
+        category: checkwright-gates

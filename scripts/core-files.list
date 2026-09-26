@@ -33,6 +33,8 @@ RELEASING.md
 # CI backstop: the workflow template + this repo's filled instance (§ci-backstop).
 gate-sdk/templates/gates-workflow.yml
 .github/workflows/gates.yml
+# The CI action init's seeded workflow calls (installer/SPEC.md §The CI action).
+installer/action.yml
 
 # Live-site monitoring (not a gate): the scheduled deployment probe.
 .github/workflows/site-health.yml

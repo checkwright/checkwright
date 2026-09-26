@@ -178,7 +178,13 @@ pub const KIT: Kit = Kit {
     open_family: false,
     families: &[],
     retired: &[("GATE_SDK_GRAPH_THEME", "GATE_SDK_GRAPH_THEME_DIR")],
-    env_only: &["GATE_SDK_GATES_DIR", "GATE_SDK_ROOT", "GATE_SDK_JOBS", "GATE_SDK_VERBOSE"],
+    env_only: &[
+        "GATE_SDK_GATES_DIR",
+        "GATE_SDK_ROOT",
+        "GATE_SDK_JOBS",
+        "GATE_SDK_VERBOSE",
+        "GATE_SDK_SARIF_FILE",
+    ],
 };
 
 #[cfg(test)]

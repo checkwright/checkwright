@@ -11,7 +11,8 @@
 #
 # Copied out like every gate-sdk template. Checkout + bash only: no caching, no
 # matrix, no third-party actions, so the surface an agent could tamper with
-# stays minimal and reviewable. To adopt: copy to .github/workflows/gates.yml,
+# stays minimal and reviewable. A tree `init` installed already carries a
+# workflow; to adopt this one instead, copy it to .github/workflows/gates.yml,
 # set your default-branch name below, add a step per non-gate-tests runner
 # (guard tests, a language test suite) after the derived fixture step, and
 # require this workflow's status check before merge (branch-protection recipe:
