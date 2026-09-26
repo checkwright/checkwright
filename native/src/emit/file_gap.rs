@@ -100,6 +100,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         return Err(USAGE.to_string());
     }
     let prose = &fields[0];
+    super::file_survey::refuse_in_linked_worktree("LIFECYCLE_KIT_GAP_INBOX_FILE")?;
 
     let (inbox, spelled) = super::file_survey::anchored("LIFECYCLE_KIT_GAP_INBOX_FILE")?;
     let path = std::path::Path::new(&inbox);

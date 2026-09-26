@@ -8,18 +8,6 @@
 
 ## New Features
 
-### isolated-tracked-capture-lost
-
-[spec: SPEC-isolated-capture.md]
-
-a gap bullet or survey block filed by an isolated read-only child is lost with its worktree. `--emit file-gap` and `--emit file-survey` resolve their tracked records through `file_survey::anchored`, which anchors on the worktree's own `git rev-parse --show-toplevel`, so the write lands in the worktree's `.workflow/gap-inbox.md` or `survey-record.md`. gate-sdk/SPEC.md §The workflow directory moves gitignored capture to the main checkout and leaves a tracked write to "the child's own commit", which a read-only child never makes, so the harness reaps it uncommitted.
-
-**Deliverable:** both arms refuse in a linked worktree with a steer to hand the finding back (routing refused at spec 2026-09-26, an authoring-stage decision), a unit test from a linked worktree, and the sentences in lifecycle-kit/SPEC.md §The committed gap inbox and §The survey record and gate-sdk/SPEC.md §The workflow directory.
-
-**Taken for /spec 2026-09-26 at capture-integrity-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set B; the authoring stage rules route-or-refuse. Re-verified at scope: `file_gap.rs` and `file_survey.rs` still resolve their tracked records through `anchored`, not `anchored_capture`.
-
-**Cost while deferred:** a finding an isolated audit child files through the sanctioned channel disappears silently, and its caller believes it was filed. Filed 2026-09-25 to the gap inbox by spec-brevity-first-slice's spec while surveying capture writers; promoted 2026-09-25 at its close. →fix fails because the two remedies change the arms' behaviour differently and need a ruling first. Re-verified at the drain: `file_gap.rs` and `file_survey.rs` call `anchored`, not `anchored_capture`. Owner lookup: `file-gap`, `file-survey`, `anchored`, `isolated child` in this file — none.
-
 ### stage-cursor-unread-by-index-check
 
 [spec: SPEC-superseded-write.md] [recurrence: 2026-09-25]
@@ -1393,5 +1381,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 ## Done
 
 - survey-witness-composed-from-unvalidated-corpus
+- isolated-tracked-capture-lost
 
 ## Lessons Learned

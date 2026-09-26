@@ -7,3 +7,4 @@
 ## Behavior changes
 
 - **`--emit file-survey`** — the arm now refuses at exit 2, filing nothing, a corpus outside the grammar above or naming a pathspec that matches no path tracked at HEAD, and names each unmatched pathspec. File the pathspecs the survey read, single-quoted where needed, or `none`; a `none` corpus's witness hint prints the oracle re-run alone.
+- **`--emit file-gap`** and **`--emit file-survey`** — both now refuse at exit 2, writing nothing, when run in a linked worktree, where the tracked line would be lost with an uncommitted worktree. An isolated child hands the finding back to its dispatcher, who files it from the main checkout; a session that works and commits in a linked worktree appends the line by hand in the record's grammar.

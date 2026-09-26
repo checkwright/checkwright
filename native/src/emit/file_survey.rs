@@ -52,6 +52,28 @@ pub fn anchored_capture(knob: &str) -> Result<(String, String), String> {
     Ok((anchor(&walk::capture_path(&configured))?, configured))
 }
 
+// spec: lifecycle-kit/SPEC.md §The committed gap inbox — the two tracked capture arms refuse in a
+// linked worktree rather than route: a line written there reaches the backlog only through a
+// commit that worktree makes, which an isolated child never does
+pub fn refuse_in_linked_worktree(knob: &str) -> Result<(), String> {
+    let record = walk::knob_scalar(knob)?;
+    linked_worktree_refusal(walk::main_checkout_root().as_deref(), &record)
+}
+
+fn linked_worktree_refusal(main: Option<&str>, record: &str) -> Result<(), String> {
+    match main {
+        None => Ok(()),
+        Some(m) => Err(format!(
+            "this checkout is a linked worktree of `{}`, so a `{}` line written here reaches the \
+             backlog only through a commit this worktree makes and merges back. An isolated child \
+             hands the finding back to its dispatcher, who files it from the main checkout. A \
+             session that commits from this worktree appends the line by hand in the record's \
+             grammar.",
+            m, record
+        )),
+    }
+}
+
 fn anchor(p: &str) -> Result<String, String> {
     let root = match walk::toplevel_opt()? {
         Some(t) => t,
@@ -104,6 +126,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         &fields[0], &fields[1], &fields[2], &fields[3], &fields[4],
     );
     let shape = survey_record::parse_corpus(corpus).map_err(|e| format!("{}\n{}", e, USAGE))?;
+    refuse_in_linked_worktree("LIFECYCLE_KIT_SURVEY_RECORD_FILE")?;
     let rev = head_rev()?;
     if let Corpus::Pathspecs(pathspecs) = &shape {
         let missed = survey_record::unmatched(None, &rev, pathspecs)
@@ -203,6 +226,19 @@ mod tests {
         assert!(emit(&argv(&["q", "c", "o", "i"])).is_err());
         assert!(emit(&argv(&["q", "c", "o", "", "f"])).is_err());
         assert!(emit(&argv(&[])).is_err());
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The committed gap inbox — a linked worktree refuses with the
+    // hand-back steer, and a main checkout (or a bare repository's worktree, which the resolver
+    // answers none for) files; the run from a real worktree is gate-tests/capture-linked-worktree.test.sh
+    #[test]
+    fn a_linked_worktree_refuses_with_the_hand_back_steer() {
+        assert_eq!(linked_worktree_refusal(None, ".workflow/gap-inbox.md"), Ok(()));
+        let err = linked_worktree_refusal(Some("/r"), ".workflow/gap-inbox.md")
+            .expect_err("a linked worktree filed");
+        for want in ["linked worktree of `/r`", "`.workflow/gap-inbox.md` line", "hands the finding back to its dispatcher", "appends the line by hand"] {
+            assert!(err.contains(want), "the refusal lacks {:?}: {}", want, err);
+        }
     }
 
     fn ps(a: &[&str]) -> Corpus {
