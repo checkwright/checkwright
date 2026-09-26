@@ -5,3 +5,4 @@
 ---
 
 capture-integrity-brevity scope ac5742ae 2026-09-26 c279d4fa
+capture-integrity-brevity spec ac20adc8 2026-09-26 c5ce1d6f
