@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: porting-records-brevity
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [README.md](README.md) maps the kits.
 
@@ -9,6 +9,58 @@
 ## New Features
 
 ## Technical Debt
+
+### gate-sdk-porting-brevity
+
+the cohort and batch records of gate-sdk/SPEC.md §Porting a gate to the binary substrate, from §The first cohort, and the rule that selects the next through §What is retained, and where the second port stands: about 27k words. §The port-candidate criteria, §The non-gate arm and §Per-component contracts stay on [spec-brevity-residue](#spec-brevity-residue).
+
+**Deliverable:** the three moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) applied to those subsections under `check-prose-bounds` and `check-provenance-seam`'s dated arm. A contract sentence stays, including a fact a sibling entry or another SPEC cites there.
+
+**Promoted as debt, split from spec-brevity-residue — operator direction 2026-09-26, lead-relayed (not a /consult ruling):** the moves run under gates that already exist and add no name.
+
+**Cost while deferred:** paid by every session that opens one of these subsections and every adopter who reads it on the site. Split 2026-09-26 at scope from spec-brevity-residue, filed 2026-09-25.
+
+### runner-image-label-migration
+
+unpinned runner-image labels change the CI floor with no tree edit: `ubuntu-latest`, used by several jobs in `gates.yml`, `publish.yml` and `site-health.yml` and by site-kit's shipped `templates/site-health.yml`, moves to Ubuntu 26 from 2026-10-19, and `windows-11-arm` (`native/runners.list`) moved to Visual Studio 2026 by default from 2026-09-21 (a push after it ran green).
+
+**Deliverable:** a pin-or-ride decision per label before 2026-10-19, and each workflow brought to it; a ride states which run first witnesses the new image.
+
+**Promoted as debt — operator direction 2026-09-26, lead-relayed (not a /consult ruling):** a label decision adds no name. Re-verified at scope: both migration notices are annotations on the last master `gates` run.
+
+**Push need (2026-09-26, inside the budget):** one mid-iteration push, since a remote run is the first to execute a workflow label change; its batch's push serves it, and the closing push is the second of two.
+
+**Cost while deferred:** the first push after 2026-10-19 runs on an image no push has tried, and a red there costs a hotfix push. Filed 2026-09-25 to the gap inbox by the lead from the notices on gate-sdk-framework-brevity's closing push; promoted 2026-09-25 to Deferred at the next scope. Owner lookup: `ubuntu`, `runner image`, `image label` in this file — none.
+
+### enforcement-first-load-trigger
+
+no build or close template under `lifecycle-kit/templates/` points at the enforcement-first rule at the moment a finding is discovered. The always-loaded digest carries the rule's one line, but the body behind it (name the defect class and the mechanism that catches it; a green instance fix is the stop signal to ask) is read only when a session opens DOCTRINE.md.
+
+**Deliverable:** the build and close templates point at the rule's body at their discovery step, one line each, never a copy.
+
+**Promoted as debt, reshaped — operator direction 2026-09-26, lead-relayed (not a /consult ruling):** the premise is corrected and the half asking the doctrine's residency claim to name the trigger is dropped, since no such claim exists. Re-verified at scope: `grep -i enforcement-first lifecycle-kit/templates/ .claude/commands/` returns nothing, and the digest line sits in CLAUDE.md §Delivery doctrine.
+
+**Cost while deferred:** a fix lands without its gate in a stage that read only the digest line. Filed 2026-08-03; returned from the icebox 2026-09-25 by consult, the templates re-grepped at zero occurrences.
+
+### enter-stage-refusal-help-contradicts-its-guard
+
+`--enter-stage`'s refusal (`enter_stage.rs`) advises performing the stamp by hand, the close binding says never to force the entry, and the workflow-state guard (`workflow_state.rs`) blocks the hand write.
+
+**Deliverable:** the refusal names the remedy the guard admits, and a fixture pins the text.
+
+**Promoted as debt — operator direction 2026-09-26, lead-relayed (not a /consult ruling):** the text converges on the guard the tree already carries. Re-verified at scope: the refusal constant still reads "perform the stamp by hand".
+
+**Cost while deferred:** the one line a refused adopter reads tells them to do what the hook blocks. Filed 2026-08-26; returned from the icebox 2026-09-25 by consult, the three surfaces re-read.
+
+### entry-refusal-invites-evasion
+
+`check-stage-entry`'s refusal help for assertion C (cross-component audit trigger) and assertion D (inferred-claim residue) names the remedy but not the evasion, and a spec session took the evasion for both: it respelled a docs-mirror update target as prose so the roster token no longer resolved, where lifecycle-kit/SPEC.md §check-stage-entry names that case and its valve (a dispatcher `--waive` on an explicit user ruling); and it deleted an honest limit together with its `Inferred, not run` marker, leaving an overclaiming reason. The lead caught both by diff review; nothing mechanical did.
+
+**Deliverable:** assertion C's help (`native/src/gates/stage_entry.rs`) and the spec template's causal-completeness step state that respelling a roster token is not a remedy; assertion D's help states that a claim no delta rests on is kept as a documented honest limit rather than deleted; a fixture pins each help line.
+
+**Promoted as debt — operator direction 2026-09-26, lead-relayed (not a /consult ruling):** help text on rules the SPEC already states. Re-verified at scope: `stage_entry.rs`'s help lines carry no respell or honest-limit sentence.
+
+**Cost while deferred:** the next refused entry reads a help line that leaves the cheaper evasion open, and only a reviewing lead catches it. Filed 2026-09-25 to the gap inbox after powershell-scratch-runner's spec; promoted 2026-09-25 to Deferred at the next scope. [enter-stage-refusal-help-contradicts-its-guard](#enter-stage-refusal-help-contradicts-its-guard) shares the surface; its subject is `--enter-stage`'s own refusal text.
 
 ## Deferred
 
@@ -378,7 +430,7 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
-**Split 2026-09-25 at scope, operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework half was promoted as its own debt entry; this entry keeps the rest. **Split again 2026-09-25 at the next scope, on the same class of direction:** §The `# graph:` manifest, §Meta-gate conservation, §Consumer payload and §Consumer smoke left as `gate-sdk-remainder-brevity`, so gate-sdk's remainder here is the Porting records and §Per-component contracts.
+**Split 2026-09-25 at scope, operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework half was promoted as its own debt entry; this entry keeps the rest. **Split again 2026-09-25 at the next scope, on the same class of direction:** §The `# graph:` manifest, §Meta-gate conservation, §Consumer payload and §Consumer smoke left as `gate-sdk-remainder-brevity`, so gate-sdk's remainder here is the Porting records and §Per-component contracts. **Split a third time 2026-09-26 at scope, operator direction lead-relayed (not a /consult ruling):** the Porting cohort and batch records left as [gate-sdk-porting-brevity](#gate-sdk-porting-brevity), so gate-sdk's remainder here is §The port-candidate criteria, §The non-gate arm and §Per-component contracts.
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
@@ -411,16 +463,6 @@ the walk's prune set matches path components anywhere in an absolute path, not o
 **Deliverable:** prune relative to the walk root, a fixture whose root path carries a default leaf, and the boundary stated at context-kit/SPEC.md §Layout and configuration.
 
 **Cost while deferred:** an adopter under `~/build/` or `~/dist/` sees the index arms return nothing and no red says why. Filed 2026-09-02; returned from the icebox 2026-09-25 by consult, the walk re-read and the match still absolute.
-
-### enforcement-first-load-trigger
-
-[cost: iteration/high] [surface: lifecycle-kit] [recurrence: 2026-09-25]
-
-the enforcement-first rule has no load trigger: no stage template under `lifecycle-kit/templates/` names it at the moment a finding is discovered, so the doctrine's "the fix and the gate land in one unit" is read only when a session happens to open DOCTRINE.md.
-
-**Deliverable:** the build and close templates load the rule at the discovery step (a one-line pointer, not a copy), and the doctrine's residency claim names that trigger.
-
-**Cost while deferred:** a fix lands without its gate in any stage that did not read the doctrine, which is the class the rule exists to close. Filed 2026-08-03; returned from the icebox 2026-09-25 by consult, the templates re-grepped at zero occurrences.
 
 ### survey-witness-composed-from-unvalidated-corpus
 
@@ -532,16 +574,6 @@ a "the release ships an asset" claim has no gate, and the class now has a second
 
 **Cost while deferred:** two public claims about what a release carries, held by nothing. Filed 2026-08-07; returned from the icebox 2026-09-25 by consult on the second instance.
 
-### enter-stage-refusal-help-contradicts-its-guard
-
-[cost: event/low] [surface: lifecycle-kit] [recurrence: 2026-09-25]
-
-`--enter-stage`'s refusal (`enter_stage.rs`) advises performing the stamp by hand, the close binding says never to force the entry, and the workflow-state guard (`workflow_state.rs`) blocks the hand write.
-
-**Deliverable:** the refusal names the remedy the guard admits, and a fixture pins the text.
-
-**Cost while deferred:** the one line a refused adopter reads tells them to do what the hook blocks. Filed 2026-08-26; returned from the icebox 2026-09-25 by consult, the three surfaces re-read.
-
 ### uninstall-artifact-ownership-asymmetry
 
 [cost: event/low] [surface: installer] [recurrence: 2026-09-25]
@@ -561,16 +593,6 @@ installer/SPEC.md §Consumer payload says the compiled artifact is never the ado
 **Deliverable:** `init` resolves the artifact path through the knob, with a fixture.
 
 **Cost while deferred:** a re-run overwrites a path the adopter moved away from. Filed 2026-08-21; returned from the icebox 2026-09-25 by consult, the literal re-grepped.
-
-### crate-arms-relink-under-worker-pool
-
-[cost: event/low] [surface: gate-sdk] [recurrence: 2026-09-25]
-
-`check-crate-arms` rebuilds and relinks the binary it is running in; under the worker pool that is a write to a running executable.
-
-**Deliverable:** the gate builds to a scratch target or compares stamps without linking, with a fixture.
-
-**Cost while deferred:** a crate-touching commit can race its own gate. Filed 2026-08-23; returned from the icebox 2026-09-25 by consult as a contributor-only exception voided by the rule.
 
 ### battery-timing-file-overwritten-by-only-run
 
@@ -622,6 +644,8 @@ when to state an absence, and how, is unruled, and the public ROADMAP.md prints 
 
 **Deliverable:** the grammar ruled at doctrine-kit, and the roadmap emitter's empty-horizon line brought to it.
 
+**Taken into porting-records-brevity at its recurrence threshold — operator direction 2026-09-26, lead-relayed (not a /consult ruling):** a grammar and a possible gate arm are new names, so /spec authors its amendment and promotes this entry. Not push-needing. Re-verified at scope: ROADMAP.md has no empty horizon today, so no placeholder is live.
+
 **Cost while deferred:** a placeholder on a public page. Filed 2026-07-31 on an operator direction; returned from the icebox 2026-09-25 by consult, the page re-read.
 
 ### scratch-auto-allow-no-decoration-steer
@@ -654,16 +678,6 @@ queue provenance prose restates what `git log` answers; the ruled sweep is small
 
 **Cost while deferred:** low; paid by every reader of those entries. Filed 2026-09-09; returned from the icebox 2026-09-25 by consult, the count re-run.
 
-### entry-refusal-invites-evasion
-
-[cost: event/low] [surface: lifecycle-kit]
-
-`check-stage-entry`'s refusal help for assertion C (cross-component audit trigger) and assertion D (inferred-claim residue) names the remedy but not the evasion, and a spec session took the evasion for both: it respelled a docs-mirror update target as prose so the roster token no longer resolved, where lifecycle-kit/SPEC.md §check-stage-entry names that case and its valve (a dispatcher `--waive` on an explicit user ruling); and it deleted an honest limit together with its `Inferred, not run` marker, leaving an overclaiming reason. The lead caught both by diff review; nothing mechanical did.
-
-**Deliverable:** assertion C's help (`native/src/gates/stage_entry.rs`) and the spec template's causal-completeness step state that respelling a roster token is not a remedy; assertion D's help states that a claim no delta rests on is kept as a documented honest limit rather than deleted; a fixture pins each help line.
-
-**Cost while deferred:** the next refused entry reads a help line that leaves the cheaper evasion open, and only a reviewing lead catches it. Filed 2026-09-25 to the gap inbox after powershell-scratch-runner's spec; promoted 2026-09-25 at the next iteration's scope from the carried bullet. Owner lookup: `respell`, `assertion C`, `assertion D`, `honest limit` in this file — none; [enter-stage-refusal-help-contradicts-its-guard](#enter-stage-refusal-help-contradicts-its-guard) shares the surface, but its subject is `--enter-stage`'s own refusal text.
-
 ### isolated-tracked-capture-lost
 
 [cost: event/low] [surface: lifecycle-kit]
@@ -683,16 +697,6 @@ no CI leg runs the native crate's unit tests on native Windows. `.github/workflo
 **Deliverable:** a Windows leg that runs the crate's unit tests, or a narrower one running only the modules that pin a platform claim, with its cost against the push budget stated. Or a SPEC boundary note refusing the leg and keeping the honest limit.
 
 **Cost while deferred:** a Windows adopter's close drain could fail with exit 2, and nobody sees it until an adopter reports it. Filed 2026-09-25 to the gap inbox by spec-brevity-first-slice's build; promoted 2026-09-25 at its close. →fix fails because a new CI leg is new mechanism, and only a push can witness it. Re-verified at the drain: `grep 'cargo test' .github/workflows/*.yml` returns nothing. Owner lookup: `cargo test`, `msvc`, `unit tests on` in this file — none; [foreign-toolchain-docker-legs](#foreign-toolchain-docker-legs) covers local pwsh and dash runs, not crate unit tests.
-
-### runner-image-label-migration
-
-[cost: event/high] [surface: gate-sdk]
-
-unpinned runner-image labels change the CI floor with no tree edit: `ubuntu-latest`, used by several jobs in `gates.yml`, `publish.yml` and `site-health.yml`, moves to Ubuntu 26 from 2026-10-19, and `windows-11-arm` moved to Visual Studio 2026 by default from 2026-09-21 (a push after it ran green).
-
-**Deliverable:** a pin-or-ride decision per label before 2026-10-19, and each workflow brought to it; a ride states which run first witnesses the new image.
-
-**Cost while deferred:** the first push after 2026-10-19 runs on an image no push has tried, and a red there costs a hotfix push. Filed 2026-09-25 to the gap inbox by the lead from the notices on gate-sdk-framework-brevity's closing push; promoted 2026-09-25 at the next iteration's scope from the carried bullet. Owner lookup: `ubuntu`, `runner image`, `image label` in this file — none.
 
 ### roadmap-horizon-motion-unowned
 
@@ -1433,5 +1437,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 The consumer's local-only companion files (private brief, ops runbook) have read triggers but no write-back trigger, so shipped-unit forward memory and an out-of-tree state verifier drift until a consult audits them; owed are close and release-sweep template slots for both, and a retired-slug arm over plain code on the local-only globs.
 
 ## Done
+
+- crate-arms-relink-under-worker-pool
 
 ## Lessons Learned
