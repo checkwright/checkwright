@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: capture-integrity-brevity
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,16 @@
 ## New Features
 
 ## Technical Debt
+
+### gate-sdk-tooling-brevity
+
+the gate-sdk/SPEC.md sections under §Per-component contracts from §upgrade-smoke through §check-shellcheck (§upgrade-smoke, §with-foreign-shells, §check-release-change-declared, §check-release-assets, §gen-pre-commit, §install-hooks, §build-native, §port-blockers, §check-shellcheck) and from §check-graph through §check-enforcement-fresh (§check-graph, §check-reads-couples, §projection-witness, §enforcement-map, §check-enforcement-fresh); about 27.7k words. The rest of §Per-component contracts, §check-kit-enum to the end, stays on [spec-brevity-residue](#spec-brevity-residue).
+
+**Deliverable:** the three moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) applied to those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm. A contract sentence stays, including a fact a sibling entry or another SPEC cites there.
+
+**Promoted as debt, split from spec-brevity-residue — operator direction 2026-09-26, lead-relayed (not a /consult ruling), unit set B at capture-integrity-brevity's scope:** the moves run under gates that already exist and add no name. The deferred and icebox entries naming these sections mention them only in passing, so no pairing reshapes the cut.
+
+**Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-26 at scope from spec-brevity-residue, filed 2026-09-25; the word census is this scope's survey record.
 
 ## Deferred
 
@@ -396,11 +406,11 @@ the secondary customer pages carry validity slips and undefined internal vocabul
 
 [cost: session/high] [surface: gate-sdk]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk's remainder (§Per-component contracts less its runner and library subsections and its meta-gate sections; its framework, remainder, porting, native-contracts, runner and meta-gate slices landed as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity` and `gate-sdk-meta-gate-brevity`), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk's remainder (§Per-component contracts less its runner and library subsections, its meta-gate sections and the ones [gate-sdk-tooling-brevity](#gate-sdk-tooling-brevity) takes; its framework, remainder, porting, native-contracts, runner and meta-gate slices landed as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity` and `gate-sdk-meta-gate-brevity`), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
-**Split six times, 2026-09-25 to 09-26 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder, porting, native-contracts and runner slices each left as their own debt entry, all since landed; the meta-gate slice is the sixth.
+**Split seven times, 2026-09-25 to 09-26 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder, porting, native-contracts, runner and meta-gate slices each left as their own debt entry, all since landed; the tooling slice is the seventh.
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
@@ -421,6 +431,8 @@ the walk's prune set matches path components anywhere in an absolute path, not o
 `--emit file-survey` composes its witness from the raw corpus argument: `file_survey.rs` builds the oracle over whatever corpus string it was handed, so a prose corpus yields a witness that passes vacuously — `git diff --quiet` over prose exits 0, and the record certifies "unchanged" for a corpus nothing measured.
 
 **Deliverable:** the arm validates the corpus (paths that resolve, or a named oracle class), refuses a prose corpus with the usage line, and a bad fixture pins it; lifecycle-kit/SPEC.md §The survey record states the corpus grammar.
+
+**Taken for /spec 2026-09-26 at capture-integrity-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set B, authored with [isolated-tracked-capture-lost](#isolated-tracked-capture-lost), which changes the same capture arms; the icebox's [survey-oracle-liveness-unasserted](#survey-oracle-liveness-unasserted) neighbours the corpus grammar and may fold in.
 
 **Cost while deferred:** a later stage buys a survey on a witness that was never an oracle. Filed 2026-09-06; returned from the icebox 2026-09-25 by consult on a reproduced false clean.
 
@@ -491,6 +503,8 @@ no gate checks a `[recurrence:]` array's date shape: `recurrence_dates` in `nati
 a post-stamp commit by a superseded stage session is outside every gate: the index check reads a clean index and not the cursor, and lifecycle-kit/SPEC.md §check-stage-evidence records that a commit from a session whose stage has been left is not caught.
 
 **Deliverable:** the commit-time hook reads the cursor and refuses a stage-scoped commit whose stage is not the cursor's, or the SPEC states why the window is accepted.
+
+**Taken for /spec 2026-09-26 at capture-integrity-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set B; the authoring stage picks the hook refusal or the stated window.
 
 **Cost while deferred:** a stale session can commit into a stage it no longer holds. Filed 2026-08-31; returned from the icebox 2026-09-25 by consult as a machinery-class exception voided by the rule.
 
@@ -601,6 +615,8 @@ queue provenance prose restates what `git log` answers; the ruled sweep is small
 a gap bullet or survey block filed by an isolated read-only child is lost with its worktree. `--emit file-gap` and `--emit file-survey` resolve their tracked records through `file_survey::anchored`, which anchors on the worktree's own `git rev-parse --show-toplevel`, so the write lands in the worktree's `.workflow/gap-inbox.md` or `survey-record.md`. gate-sdk/SPEC.md §The workflow directory moves gitignored capture to the main checkout and leaves a tracked write to "the child's own commit", which a read-only child never makes, so the harness reaps it uncommitted.
 
 **Deliverable:** a ruling on the tracked capture channels under isolation: route the write to the main checkout, as `anchored_capture` does for gitignored capture, or refuse under isolation with a steer to hand the finding back. Then the arm change, a unit test from a linked worktree, and the sentence in the owning SPEC sections (lifecycle-kit/SPEC.md §The committed gap inbox and §The survey record).
+
+**Taken for /spec 2026-09-26 at capture-integrity-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set B; the authoring stage rules route-or-refuse. Re-verified at scope: `file_gap.rs` and `file_survey.rs` still resolve their tracked records through `anchored`, not `anchored_capture`.
 
 **Cost while deferred:** a finding an isolated audit child files through the sanctioned channel disappears silently, and its caller believes it was filed. Filed 2026-09-25 to the gap inbox by spec-brevity-first-slice's spec while surveying capture writers; promoted 2026-09-25 at its close. →fix fails because the two remedies change the arms' behaviour differently and need a ruling first. Re-verified at the drain: `file_gap.rs` and `file_survey.rs` call `anchored`, not `anchored_capture`. Owner lookup: `file-gap`, `file-survey`, `anchored`, `isolated child` in this file — none.
 
