@@ -16,6 +16,8 @@ Build runs one fresh session per task. Prefer a session reset at a task boundary
 
 Build-time question triage — who rules, and where the ruling lives: a question *within the amendment's envelope* (calibration, mechanics) is ruled in-session and written into the spec text being merged — a ruling that lives only in conversation evaporates. A *change to the envelope* (narrowing or widening asserted behavior, user-facing semantics) stops and surfaces to the user — never pick a "conservative alternative" silently. A *cross-component causal gap* is not a TODO: stop, resolve it this session, update the spec.
 
+**A defect or redundancy you find mid-build owes its catcher** — read the rule body before the fix lands (doctrine-kit/DOCTRINE.md, Enforcement-first).
+
 **Instruction-surface edits carry the instruction only.** Grounds → the mechanism's owning section, same commit; history → the commit message (doctrine-kit/DOCTRINE.md, Content-tiering / SSOT).
 
 **Don't re-buy the roster the stage before you already bought.** Where implementing a task sends you across a corpus — every call site of a helper, every spec citing a name — read the survey record first: a block whose heading answers your question, whose corpus is unmoved since its recorded rev and whose oracle still returns the same verdict, is cited rather than re-surveyed, and one whose witness fails narrows the dispatch to what moved. File the surveys you buy (lifecycle-kit/SPEC.md §The survey record).

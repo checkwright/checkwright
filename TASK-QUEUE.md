@@ -26,16 +26,6 @@ when to state an absence, and how, is unruled, and the public ROADMAP.md prints 
 
 ## Technical Debt
 
-### enforcement-first-load-trigger
-
-no build or close template under `lifecycle-kit/templates/` points at the enforcement-first rule at the moment a finding is discovered. The always-loaded digest carries the rule's one line, but the body behind it (name the defect class and the mechanism that catches it; a green instance fix is the stop signal to ask) is read only when a session opens DOCTRINE.md.
-
-**Deliverable:** the build and close templates point at the rule's body at their discovery step, one line each, never a copy.
-
-**Promoted as debt, reshaped — operator direction 2026-09-26, lead-relayed (not a /consult ruling):** the premise is corrected and the half asking the doctrine's residency claim to name the trigger is dropped, since no such claim exists. Re-verified at scope: `grep -i enforcement-first lifecycle-kit/templates/ .claude/commands/` returns nothing, and the digest line sits in CLAUDE.md §Delivery doctrine.
-
-**Cost while deferred:** a fix lands without its gate in a stage that read only the digest line. Filed 2026-08-03; returned from the icebox 2026-09-25 by consult, the templates re-grepped at zero occurrences.
-
 ### enter-stage-refusal-help-contradicts-its-guard
 
 `--enter-stage`'s refusal (`enter_stage.rs`) advises performing the stamp by hand, the close binding says never to force the entry, and the workflow-state guard (`workflow_state.rs`) blocks the hand write.
@@ -1419,6 +1409,7 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 ## Done
 
 - crate-arms-relink-under-worker-pool
+- enforcement-first-load-trigger
 - gate-sdk-porting-brevity
 - runner-image-label-migration
 

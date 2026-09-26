@@ -72,8 +72,8 @@
 39161cp lifecycle-kit/templates/lead.md
 2100cp lifecycle-kit/templates/release-sweep.md
 6939cp lifecycle-kit/templates/stages/align.md
-8952cp lifecycle-kit/templates/stages/build.md
-21359cp lifecycle-kit/templates/stages/close.md
+9104cp lifecycle-kit/templates/stages/build.md
+21431cp lifecycle-kit/templates/stages/close.md
 19305cp lifecycle-kit/templates/stages/scope.md
 8940cp lifecycle-kit/templates/stages/spec.md
 6058cp lifecycle-kit/templates/stages/validate.md
