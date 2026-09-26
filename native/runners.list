@@ -49,7 +49,18 @@
 # actions/runner-images' README: `windows-11-arm` is listed with no preview
 # badge, and it is a pinned label that ages like the arm64-Linux one. Its image
 # readme carries Git for Windows' bash and Rust, which is what the producer and
-# the install-smoke leg on it run.
+# the install-smoke leg on it run. Ride its Visual Studio 2026 default rather
+# than pin the `windows-11-vs2026-arm` test label, whose lifetime nothing states:
+# the first run whose leg on it logs the VS 2026 image is the first witness.
+#
+# Every `-latest` line here RIDES its image migrations, as do the hard-coded
+# `ubuntu-latest` install-smoke-sh-linux leg: their subject is the platform an
+# adopter meets today (.github/workflows/gates.yml's macOS leg header). The
+# first witness of a migrated image is the first gates run whose leg logs it.
+# Every other Linux job in .github/workflows/ builds and measures no adopter
+# platform, so it PINS `ubuntu-24.04`: a `-latest` label moves it with no tree
+# edit and, through a weeks-long rollout, varies run to run. Move those pins as
+# one deliberate edit, whose own push is the new image's witness.
 x86_64-unknown-linux-gnu  ubuntu-latest
 aarch64-unknown-linux-gnu ubuntu-24.04-arm
 aarch64-apple-darwin      macos-latest

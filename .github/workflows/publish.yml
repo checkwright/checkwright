@@ -33,7 +33,8 @@ permissions: {}
 
 jobs:
   roster:
-    runs-on: ubuntu-latest
+    # Pinned, not `-latest`: native/runners.list's header owns which Linux jobs pin.
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     outputs:
@@ -156,7 +157,7 @@ jobs:
 
   pack:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     steps:
@@ -266,7 +267,7 @@ jobs:
 
   npm:
     needs: pack
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # The environment is where the operator attaches approval to the publish;
     # its name and required secret are desired state in the ops runbook.
     environment: npm-publish
@@ -307,7 +308,7 @@ jobs:
 
   release:
     needs: [build, pack]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # The primary delivery channel: the same bytes the npm job publishes, reachable
     # with no Node on the adopter's machine. It carries no `environment:` gate —
     # attaching assets to this repository's own Release is neither irreversible nor

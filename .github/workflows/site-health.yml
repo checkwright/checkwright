@@ -29,7 +29,8 @@ permissions:
 
 jobs:
   probe:
-    runs-on: ubuntu-latest
+    # Pinned, not `-latest`: native/runners.list's header owns which Linux jobs pin.
+    runs-on: ubuntu-24.04
     steps:
       # docs/CNAME is the single gated source of truth for the apex host
       # (docs-cname-parity); reading it here gives the monitor a cutover for free.
