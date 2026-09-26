@@ -1372,10 +1372,4 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 ## Done
 
-- front-door-demo-unreachable
-- demo-catches-a-done-claim
-- spec-narration-unratcheted
-- derived-count-literal-in-queue-unscanned
-- gate-sdk-runner-brevity
-
 ## Lessons Learned
