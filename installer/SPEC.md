@@ -979,6 +979,21 @@ The gate fails closed, exit 2, on a missing or duplicated pin line, on a pin tha
 
 **Why the pin trails the tag rather than leading it.** Pages deploys on every master push, and a release's assets exist only after its tag's `publish` run. A pin moved before the tag would, for that window, name a release the one-liner cannot download. Moved after the tag, it is at worst one release stale, and every release it names exists.
 
+### The front door's verbs
+
+Every route on the front door resolves to the newest release, so a verb the front door advertises must be one that release carries. `check-front-door-verbs` (this repo's `scripts/`) holds two invariants:
+
+- **Invariant A — the verb table is the binary's roster.** The first-column code spans of `installer/README.md`'s verb table (the table whose header row's first cell is `verb`) equal, as a set, the verbs the binary's own `VERBS` carries, read in-process. The table is the npm package's README, so a release carries its own verb set in a file every tag holds.
+- **Invariant B — an advertised verb is released.** A **route** is `sh -s --`, `install.ps1)))`, `npx checkwright`, or `checkwright` opening a code span. The token after a route, inside a code span or a fenced code line on a front-door page, is an advertised verb when it matches `[a-z][a-z0-9-]*`. A leading-dash token is a flag and advertises the default verb, and a placeholder such as `<verb>` advertises none. The front-door pages are `README.md`, `docs/index.md`, `docs/install.md` and `installer/README.md`. Each advertised verb must be in the **pinned set**: invariant A's table read at the tag `v<pin>`, where `<pin>` is §The hosted install pin's value.
+
+The pinned set is read from the table rather than from `VERBS` at the tag because a tag predating `VERBS` carries none, and a dormancy keyed to that absence would green the very defect the gate exists for.
+
+**The pending admission.** A verb B would red is admitted while it is in `VERBS` and `.workflow/release-disposition.txt` carries no line for the iteration the queue header names. It is also admitted when that line's field is a release, `vX.Y.Z`, because that release is cut from this tree. A `none` or `deferred:` field reds it. The admission makes B a release trigger held at the close's disposition commit: an advertised verb the pinned release lacks leaves the close two remedies, releasing or withdrawing the advertisement. A verb in neither `VERBS` nor the pinned set is never admitted, since no release will carry it. Holding B at every commit instead would red the tree from the build that lands a verb until the close's drain moves the pin, so no build could commit through it.
+
+The gate fails closed, exit 2, on an unreadable page and on a verb table that is absent or empty at HEAD or at the tag. It also fails closed on a tag that exists and carries no `installer/README.md`, and on this iteration's disposition line when its field parses as none of the three forms. The pin's own refusals are §The hosted install pin's. Where the tag `v<pin>` does not resolve, as in a shallow checkout, B is dormant and the clean line says so. A still runs. Its positional form, `check-front-door-verbs [readme pinned-readme disposition queue page...]`, points it at a fixture tree, where the pinned table is read from a file so the fixture holds still as the tags move.
+
+**Honest limits.** A verb named in a code span apart from its route, as in "or `demo`", is out of reach. The gate holds the release decision, not the live site: between a push carrying a new advertisement and the close's tag, the site advertises a verb the one-liner cannot run. The pin moves in the commit after the tag (RELEASING.md step 4), so the live one-liner reaches the new release on the push carrying that commit.
+
 ## The upgrade contract
 
 An upgrade runs in two phases.
