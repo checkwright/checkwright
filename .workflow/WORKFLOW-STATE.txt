@@ -4,12 +4,4 @@
 
 ---
 
-done-claim-demo scope a1437271 2026-09-26 8211cdfc
-done-claim-demo spec afa131bf 2026-09-26 7b1bc3b6
-done-claim-demo align ae04a998 2026-09-26 2778c863
-done-claim-demo build a6546a76 2026-09-26 f5906b7a
-done-claim-demo build a8b62a96 2026-09-26 c1214dcb
-done-claim-demo build a04f60ee 2026-09-26 856d75d4
-done-claim-demo validate ac7a0558 2026-09-26 fd740c8c
-done-claim-demo validate a7b79ef0 2026-09-26 4a43b793
-done-claim-demo close a4aa581f 2026-09-26 f80bc02b
+— scope aaadbbc2 2026-09-26 b28221e1
