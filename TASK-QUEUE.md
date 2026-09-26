@@ -20,6 +20,20 @@ the native-substrate sections of gate-sdk/SPEC.md: §The non-gate arm and §The 
 
 **Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-26 at scope from spec-brevity-residue, filed 2026-09-25.
 
+### crate-tests-unrun-on-windows
+
+[observed-by: gates.yml crate-tests-windows]
+
+no CI leg ran the native crate's unit tests on native Windows, so a unit test pinning a Windows filesystem behaviour was not witnessed there. First instance: `--emit capture-drain` renames a log that is still open for append, and gate-sdk/SPEC.md §The workflow directory records that as an unmeasured honest limit.
+
+**Deliverable:** the `crate-tests-windows` job of `.github/workflows/gates.yml`, and the read of its first run on both Windows triples: the pass count per triple, any failure annotation, and the job's wall-clock against its timeout and the critical path.
+
+**Push need (2026-09-26, inside the budget):** one push, the closing one when the leg lands in the last build batch, since only a remote Windows run executes the leg.
+
+**Landed 2026-09-26, run unread:** the job and the merged amendment landed in the build commit that stated each half's CI spelling in gate-sdk/SPEC.md §check-crate-arms. That commit moved the entry to Done before its run was read, so it is restored here until the read is recorded.
+
+**Cost while deferred:** a Windows adopter's close drain could fail with exit 2, and nobody sees it until an adopter reports it. Filed 2026-09-25 to the gap inbox by spec-brevity-first-slice's build; promoted 2026-09-25 at its close.
+
 ## Deferred
 
 ### absence-statement-gate-arms
@@ -1363,6 +1377,5 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - hook-members-off-test-floor
 - foreign-toolchain-docker-legs
 - release-asset-claim-class-owner
-- crate-tests-unrun-on-windows
 
 ## Lessons Learned
