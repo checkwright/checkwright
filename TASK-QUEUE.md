@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### gate-sdk-tail-brevity
-
-the gate-sdk/SPEC.md sections under §Per-component contracts from §check-kit-enum to the end of the file (§check-kit-enum through §templates/gates-workflow.yml, the action, commit, tiering, portability and template-parity gates among them); about 26.6k words, gate-sdk's last slice. The other SPECs stay on [spec-brevity-residue](#spec-brevity-residue).
-
-**Deliverable:** the three moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) applied to those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm. A contract sentence stays, including a fact a sibling entry or another SPEC cites there.
-
-**Promoted as debt, split from spec-brevity-residue — operator direction 2026-09-27, lead-relayed (not a /consult ruling), unit set A at gate-sdk-tail-docs-standard's scope:** the moves run under gates that already exist and add no name. [seeded-ci-gates-on-surface](#seeded-ci-gates-on-surface) edits §check-action-pinning and §check-action-permissions later; it stays deferred and lands on the passed text.
-
-**Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-27 at scope from spec-brevity-residue, filed 2026-09-25; the word census is this scope's survey record.
-
 ## Deferred
 
 ### shellcheck-extra-dirs-trigger
@@ -396,11 +386,11 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 [cost: session/high] [surface: gate-sdk]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk's last slice, §check-kit-enum to the end, is [gate-sdk-tail-brevity](#gate-sdk-tail-brevity) (its framework, remainder, porting, native-contracts, runner, meta-gate and tooling slices landed as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity` and `gate-sdk-tooling-brevity`); then lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk landed in eight slices, as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity`, `gate-sdk-tooling-brevity` and `gate-sdk-tail-brevity`; then lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
-**Split eight times, 2026-09-25 to 09-27 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder, porting, native-contracts, runner, meta-gate and tooling slices each left as their own debt entry, all since landed; the tail slice is the eighth.
+**Split eight times, 2026-09-25 to 09-27 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder, porting, native-contracts, runner, meta-gate, tooling and tail slices each left as their own debt entry, all since landed.
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
@@ -1351,5 +1341,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - one-product-statement
 - install-fetch-asset-names
 - docs-secondary-clarity-pass
+- gate-sdk-tail-brevity
 
 ## Lessons Learned
