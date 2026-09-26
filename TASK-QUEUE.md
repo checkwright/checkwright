@@ -24,16 +24,6 @@ the crate's unit tests fail 37 of 1166 on both Windows triples (run 36254992168:
 
 ## Technical Debt
 
-### gate-sdk-tooling-brevity
-
-the gate-sdk/SPEC.md sections under §Per-component contracts from §upgrade-smoke through §check-shellcheck (§upgrade-smoke, §with-foreign-shells, §check-release-change-declared, §check-release-assets, §gen-pre-commit, §install-hooks, §build-native, §port-blockers, §check-shellcheck) and from §check-graph through §check-enforcement-fresh (§check-graph, §check-reads-couples, §projection-witness, §enforcement-map, §check-enforcement-fresh); about 27.7k words. The rest of §Per-component contracts, §check-kit-enum to the end, stays on [spec-brevity-residue](#spec-brevity-residue).
-
-**Deliverable:** the three moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) applied to those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm. A contract sentence stays, including a fact a sibling entry or another SPEC cites there.
-
-**Promoted as debt, split from spec-brevity-residue — operator direction 2026-09-26, lead-relayed (not a /consult ruling), unit set B at capture-integrity-brevity's scope:** the moves run under gates that already exist and add no name. The deferred and icebox entries naming these sections mention them only in passing, so no pairing reshapes the cut.
-
-**Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-26 at scope from spec-brevity-residue, filed 2026-09-25; the word census is this scope's survey record.
-
 ## Deferred
 
 ### seeded-ci-gates-on-surface
@@ -420,7 +410,7 @@ the secondary customer pages carry validity slips and undefined internal vocabul
 
 [cost: session/high] [surface: gate-sdk]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk's remainder (§Per-component contracts less its runner and library subsections, its meta-gate sections and the ones [gate-sdk-tooling-brevity](#gate-sdk-tooling-brevity) takes; its framework, remainder, porting, native-contracts, runner and meta-gate slices landed as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity` and `gate-sdk-meta-gate-brevity`), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk's remainder (§Per-component contracts from §check-kit-enum to the end; its framework, remainder, porting, native-contracts, runner, meta-gate and tooling slices landed as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity` and `gate-sdk-tooling-brevity`), lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
@@ -1371,5 +1361,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - survey-witness-composed-from-unvalidated-corpus
 - isolated-tracked-capture-lost
 - stage-cursor-unread-by-index-check
+- gate-sdk-tooling-brevity
 
 ## Lessons Learned
