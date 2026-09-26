@@ -1,1 +1,8 @@
 # contract: lifecycle-kit/SPEC.md §The survey record — carried surveys, one block per survey; boundary-truncated, cited only behind a passing witness.
+
+## 2026-09-26 scope — Which deferred entries rank first for this iteration, which gate-sdk sections does spec-brevity-residue still owe, and what fills the set on the most-rowed surface?
+- corpus: TASK-QUEUE.md gate-sdk/SPEC.md
+- oracle: bash gate-sdk/bin/run-gates.sh --emit queue-edges
+- rev: 525e167a1e5fac17321f01167534647c9c9eac8e
+- finding: Tier 1 (session/iteration class): spec-brevity-residue (session/high, gate-sdk) leads; one-motion-commit-race-remains-open (CLAUDE.md), gate-tests-suite-identity-in-evidence (evidence-kit), recurrence-declaration-grammar-ungated (queue-kit) and stage-cursor-unread-by-index-check (lifecycle-kit) share no surface with it. No deferred entry carries two recurrence dates; no entry carries observed-by. gate-sdk per-component sections not yet passed: upgrade-smoke through check-shellcheck (about 16.4k words) and check-graph through templates/gates-workflow.yml (about 37.8k), two slices: upgrade-smoke through check-enforcement-fresh (about 27.7k), then check-kit-enum to the end (about 26.5k). Slice names touched by no deferred or icebox deliverable beyond independent mentions. Every other gate-sdk row is design-pending, so joining one walks spec. lifecycle-kit carries the most board rows (7), all needing a ruling; survey-witness-composed-from-unvalidated-corpus and isolated-tracked-capture-lost share file_survey.rs. design-partner-preview: v0.26.0 is published and docs/install-evidence.md reads zero installs, so its re-promotion trigger has not fired.
+- inferred: none
