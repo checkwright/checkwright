@@ -30,14 +30,15 @@ pub const VERBS: &[(&str, Verb)] = &[
 ];
 
 // spec: installer/SPEC.md §What init seeds — the consumer-layout names the verbs write against,
-// which are gate-sdk's and canon-kit's own defaults. They live here rather than in one arm because
-// uninstall trims a span out of the same agent file init wrote it into.
+// which are the owning kits' own defaults, held here because a second verb reads what init wrote:
+// uninstall trims the agent file, demo stages its claim in the queue and state file.
 pub const GATES_DIR: &str = "scripts";
 // spec: installer/SPEC.md §Profiles — the payload's one reserved sibling of the kit roots: the
 // packer writes the prebuilt binaries there, so it is a payload directory that is not a kit
 pub const ARTIFACT_DIR: &str = "artifact";
 pub const AGENT_FILE: &str = "CLAUDE.md";
 pub const QUEUE_FILE: &str = "TASK-QUEUE.md";
+pub const STATE_FILE: &str = ".workflow/WORKFLOW-STATE.txt";
 
 // spec: installer/SPEC.md §init — the rule that an install's size is never bounded by the host's
 // argv width: every git call naming the whole roster goes through `git_batched`, so the batching is

@@ -8,16 +8,6 @@
 
 ## New Features
 
-### demo-catches-a-done-claim
-
-[spec: SPEC-done-claim-demo.md] [roadmap: now/adoption] [roadmap-summary: The first-minute demo catches a task marked done with no evidence behind it.]
-
-the headline promises that unsupported *done* claims become failing checks, and `demo`'s caught defect is a mistyped relative link (installer/SPEC.md §demo, act 3). The failure the headline names is now a mainstream, measured one (false success claims are a large share of agent failures in the 2026 literature; consult's landscape refresh), and the first minute never shows it.
-
-**Deliverable:** act 3 commits a task marked done, with validate and close stamps and no evidence, and the `full` battery reds on it; act 4 withdraws the claim; the link defect leaves the demo and stays on the consumer smoke's value arm; the smoke's demo arm reads the red in the output. [front-door-demo-unreachable](#front-door-demo-unreachable) captures its proof block from the new act 3, so the two land together or this one first.
-
-**Promoted 2026-09-26 at spec:** the filing named `check-stage-evidence` as the red. Probed at spec, it is `on-surface`, so a `full` install never registers it, and it asserts stamp grammar, not evidence. The member that reds is evidence-kit's `zero-config` `check-evidence-manifest`, assertion C, which the amendment states with its probe.
-
 ## Technical Debt
 
 ### gate-sdk-runner-brevity
@@ -36,7 +26,7 @@ the front door's install-and-demo block cannot be followed as printed, and its p
 
 **Deliverable:** one demo-first block on the index and README carrying all three spellings and the bash note, then the install block with all three spellings and a pointer for arguments; the proof block replaced by output captured from a real `demo` act 3 (the consumer smoke's demo arm is the source) or labelled illustrative with the profile and setup that produce it; docs/install.md's four demo descriptions collapsed to one paragraph under §Install, its default profile stated, and its irm-with-argument sentence corrected; `installer/README.md` showing `npx checkwright demo` and `--profile`. The eight cross-page restatement clusters the audit mapped (opener trio, one-liner summary, demo description, harness independence, "this page owns no contract", payload-withholding paragraph, roadmap provenance, kit rosters) each take one owner and the rest point — the cluster map is in this entry's filing commit.
 
-**Promoted 2026-09-26 at scope, operator direction lead-relayed (not a /consult ruling):** its proof block is captured from [demo-catches-a-done-claim](#demo-catches-a-done-claim)'s new act 3, so it lands with or after that entry. Re-verified at scope: `docs/index.md` still reads "`demo` in place of `init`" under one-liners carrying no `init`.
+**Promoted 2026-09-26 at scope, operator direction lead-relayed (not a /consult ruling):** its proof block is captured from `demo-catches-a-done-claim`'s new act 3, so it lands with or after that entry. Re-verified at scope: `docs/index.md` still reads "`demo` in place of `init`" under one-liners carrying no `init`.
 
 **Cost while deferred:** every first-time visitor is handed an instruction they cannot run and a proof they cannot reproduce, on the two pages that decide whether they try it. Filed 2026-09-25 by consult as a direct entry, from a customer-docs validity audit the operator directed; the operator had flagged the block as confusing on reading it.
 
@@ -234,7 +224,7 @@ a narrow external preview before any broad announcement: a preview cohort whose 
 
 **Refused, grounds carried forward:** parking behind `native-windows-bash-floor` (landed 2026-09-18) or the git-only-floor discharge (the trigger is what the preview measures); the icebox (the highest cost-while-deferred in the intake).
 
-**Held deferred 2026-09-26 at scope, operator direction lead-relayed (not a ruling):** re-offered at the next scope, after [front-door-demo-unreachable](#front-door-demo-unreachable) and [demo-catches-a-done-claim](#demo-catches-a-done-claim) repair the front door the cohort would meet.
+**Held deferred 2026-09-26 at scope, operator direction lead-relayed (not a ruling):** re-offered at the next scope, after [front-door-demo-unreachable](#front-door-demo-unreachable) and `demo-catches-a-done-claim` repair the front door the cohort would meet.
 
 **Consult recommendation, 2026-09-25:** promote at the next scope. The enhancement admission filter that gated the queue behind the Deferred drain is retired, the tree half has read zero since it landed, and every adoption claim in the landscape refresh is queued behind an observed install; the binding cost is operator hours, which a scope can schedule beside a tree unit.
 
@@ -1392,6 +1382,7 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 ## Done
 
+- demo-catches-a-done-claim
 - spec-narration-unratcheted
 
 ## Lessons Learned

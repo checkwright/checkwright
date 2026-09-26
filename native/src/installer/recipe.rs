@@ -1,7 +1,7 @@
 // spec: installer/SPEC.md §What init seeds — the crate's owner of the per-kit install recipe:
 // the starting gate roster a kit registers in a fresh consumer, and the seam surfaces those gates
 // need. Two output channels, and the difference between them is who writes the file.
-use super::{AGENT_FILE, GATES_DIR};
+use super::{AGENT_FILE, GATES_DIR, STATE_FILE};
 use std::path::Path;
 
 // spec: installer/SPEC.md §What init seeds — seed what is absent, plan what must be claimed: a
@@ -194,15 +194,14 @@ pub fn seed(kit: &str, kit_payload: &Path, root: &Path, dry: bool) -> Result<Vec
         "lifecycle-kit" => {
             seed_absent(
                 root,
-                ".workflow/WORKFLOW-STATE.txt",
+                STATE_FILE,
                 "# contract: lifecycle-kit/SPEC.md §check-stage-evidence\n# One data line per stage-skill invocation: <iteration> <stage> <session-id> <date> <head>.\n\n---\n\n",
                 dry,
                 &mut out,
             )?;
         }
         // spec: installer/SPEC.md §What init seeds — this kit has an arm because a gate init
-        // registers reads the block it writes; that is the whole test, and why no lifecycle-kit arm
-        // sits beside it.
+        // registers reads the block it writes; that is the whole test.
         // spec: doctrine-kit/SPEC.md §install-doctrine — the block is the kit's own installer's to
         // write, and that installer is this binary's `--install-doctrine` arm, called in-process.
         "doctrine-kit" => {

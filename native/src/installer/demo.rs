@@ -1,7 +1,7 @@
 // spec: installer/SPEC.md §demo — the adoption arc run out of the package's own payload into a
-// scratch repository of its own: install, a clean battery, a caught defect, the fix. Exit status is
-// the verdict: 0 every act held, 1 an act did not, 2 the harness could not be stood up.
-use super::{GATES_DIR, Package};
+// scratch repository of its own: install, a clean battery, a caught done claim, the claim
+// withdrawn. Exit status is the verdict: 0 every act held, 1 an act did not, 2 no harness.
+use super::{GATES_DIR, Package, QUEUE_FILE, STATE_FILE};
 use crate::walkthrough::{self as show, banner, ends_with_newline, say, Scratch};
 use crate::{proc, programs};
 use std::path::{Path, PathBuf};
@@ -11,19 +11,20 @@ const USAGE: &[&str] = &[
     "usage: checkwright demo",
     "",
     "Shows the adoption arc without touching your repository: installs the full",
-    "profile into a scratch repository of its own, runs the battery green, plants",
-    "one mistyped link and shows it caught, fixes it and runs green again, then",
-    "removes the scratch. Exit status is the verdict: 0 every step held.",
+    "profile into a scratch repository of its own, runs the battery green, commits",
+    "a task marked done with no evidence behind it and shows the claim caught,",
+    "withdraws it and runs green again, then removes the scratch. Exit status is",
+    "the verdict: 0 every step held.",
 ];
 
-// spec: installer/SPEC.md §demo — the consumer smoke's value-arm defect, one mistyped relative
-// link in a README beside the page it meant; the fix is the link and never the corpus
-const DEFECT_PAGE: &str = "docs/README.md";
-const DEFECT: &str = "# Handbook\n\nStart with [the style guide](style-guid.md).\n";
-const FIXED: &str = "# Handbook\n\nStart with [the style guide](style-guide.md).\n";
-const TARGET_PAGE: &str = "docs/style-guide.md";
-const TARGET: &str = "# Style guide\n\nWrite plainly, and link what you cite.\n";
-const DEFECT_NAME: &str = "README.md";
+// spec: installer/SPEC.md §demo — what an agent claiming done writes: an iteration named in the
+// queue header, a task under Done the seeded queue does not carry, then a validate and a close
+// stamp, each stage on a session token of its own
+const ITERATION: &str = "first-release";
+const TASK: &str = "add-login-page";
+const STAMPS: [(&str, &str); 2] = [("validate", "demo-validate"), ("close", "demo-close")];
+const ITERATION_HEADER: &str = "## Iteration:";
+const DONE_HEADING: &str = "## Done";
 
 // spec: installer/SPEC.md §demo — the three exit classes as a type, so a finding about the arc
 // cannot be raised on a precondition's spelling or the reverse
@@ -69,7 +70,7 @@ pub fn run(args: &[String]) -> i32 {
     match walkthrough(&pkg, &mut scratch) {
         Outcome::Clean => {
             banner("DEMO: clean — the adoption arc behaved, and your repository was not touched");
-            say("install → clean pass → defect caught → fix → green");
+            say("install → clean pass → done claim caught → withdrawn → green");
             say("To adopt for real, run `checkwright init` inside your repository.");
             0
         }
@@ -114,22 +115,31 @@ fn walkthrough(pkg: &Package, scratch: &mut Scratch) -> Outcome {
     }
     say(&green);
 
-    banner("ACT 3 — A defect is caught before it lands");
-    say(&format!("A page links to its neighbour with a typo: {} → style-guid.md.", DEFECT_PAGE));
-    step!(write(&repo, TARGET_PAGE, TARGET));
-    step!(write(&repo, DEFECT_PAGE, DEFECT));
-    step!(commit(&repo, "handbook"));
+    banner("ACT 3 — A done claim with no evidence is caught");
+    say(&format!("An agent reports task {} done: it moves the task to Done and stamps", TASK));
+    say(&format!("validate and close for iteration {}, but no test run was ever recorded.", ITERATION));
+    let queue = step!(read(&repo, QUEUE_FILE));
+    let state = step!(read(&repo, STATE_FILE));
+    let head = step!(git(&repo, &["rev-parse", "--short", "HEAD"]));
+    let today = crate::emit::kpi::iso_day(crate::emit::kpi::now_epoch().div_euclid(86_400));
+    let (claimed_queue, claimed_state) = step!(claim(&queue, &state, head.trim(), &today).map_err(refuse));
+    step!(write(&repo, QUEUE_FILE, &claimed_queue));
+    step!(write(&repo, STATE_FILE, &claimed_state));
+    step!(commit(&repo, &format!("done: {}", TASK)));
     let (rc, out) = step!(battery(pkg, &repo));
     if rc == 0 {
-        return Outcome::Fail("the mistyped link did not turn the battery red".into());
+        return Outcome::Fail("the done claim did not turn the battery red".into());
     }
     let quoted: Vec<Vec<String>> = show::failed_gates(&out)
         .iter()
         .map(|g| show::excerpt(&out, g))
         .collect();
-    if !quoted.iter().flatten().any(|l| l.contains(DEFECT_NAME)) {
+    if !quoted.iter().flatten().any(|l| l.contains(ITERATION)) {
         print!("{}", ends_with_newline(&out));
-        return Outcome::Fail(format!("the battery went red without naming {}", DEFECT_NAME));
+        return Outcome::Fail(format!(
+            "the battery went red without naming the claimed iteration {}",
+            ITERATION
+        ));
     }
     for block in &quoted {
         println!();
@@ -139,14 +149,16 @@ fn walkthrough(pkg: &Package, scratch: &mut Scratch) -> Outcome {
     }
     say("→ caught. Registered as a hook, this would have refused the commit.");
 
-    banner("ACT 4 — Fix, re-run, green");
-    step!(write(&repo, DEFECT_PAGE, FIXED));
-    step!(commit(&repo, "fix the link"));
+    banner("ACT 4 — Withdraw the claim, re-run, green");
+    say("The queue and state file go back to what they said before the claim.");
+    step!(write(&repo, QUEUE_FILE, &queue));
+    step!(write(&repo, STATE_FILE, &state));
+    step!(commit(&repo, &format!("withdraw the done claim on {}", TASK)));
     let (rc, out) = step!(battery(pkg, &repo));
     let green = step!(green_line(&out));
     if rc != 0 || green.is_empty() {
         print!("{}", ends_with_newline(&out));
-        return Outcome::Fail("the battery did not return to green after the fix".into());
+        return Outcome::Fail("the battery did not return to green after the claim was withdrawn".into());
     }
     say(&green);
 
@@ -161,13 +173,18 @@ fn green_line(out: &str) -> Result<String, Outcome> {
     show::green_line(out).map_err(refuse)
 }
 
-// spec: installer/SPEC.md §demo — `DEMO_TMP_DIR` when set, else the platform's temp directory; the
-// directory is made in-process, since `mktemp` is a contributor program this verb may not spawn
+// spec: installer/SPEC.md §demo — `DEMO_TMP_DIR` when set, else the platform's temp directory; a
+// relative base resolves against the invoking directory, since every act spawns inside the scratch
+fn scratch_base(set: Option<std::ffi::OsString>, here: &str) -> PathBuf {
+    let base = set.filter(|v| !v.is_empty()).map(PathBuf::from).unwrap_or_else(std::env::temp_dir);
+    PathBuf::from(crate::walk::abs_against(here, &base.to_string_lossy()))
+}
+
+// spec: installer/SPEC.md §demo — the directory is made in-process, since `mktemp` is a
+// contributor program this verb may not spawn
 fn make_scratch(scratch: &mut Scratch) -> Result<PathBuf, Outcome> {
-    let base = std::env::var_os("DEMO_TMP_DIR")
-        .filter(|v| !v.is_empty())
-        .map(PathBuf::from)
-        .unwrap_or_else(std::env::temp_dir);
+    let here = crate::walk::cwd().map_err(Outcome::Refuse)?;
+    let base = scratch_base(std::env::var_os("DEMO_TMP_DIR"), &here);
     let stamp = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map(|d| d.as_nanos())
@@ -195,6 +212,41 @@ fn make_scratch(scratch: &mut Scratch) -> Result<PathBuf, Outcome> {
     )))
 }
 
+// spec: installer/SPEC.md §demo — the claim staged over the seeded queue and state file; a seed
+// with no iteration header or no Done section cannot stage the act, the harness's failure and not
+// the arc's
+fn claim(queue: &str, state: &str, head: &str, date: &str) -> Result<(String, String), String> {
+    let mut lines: Vec<String> = queue.lines().map(str::to_string).collect();
+    let header = lines.iter().position(|l| l.starts_with(ITERATION_HEADER)).ok_or_else(|| {
+        format!("the seeded {} carries no '{}' header to name the iteration in", QUEUE_FILE, ITERATION_HEADER)
+    })?;
+    lines[header] = format!("{} {}", ITERATION_HEADER, ITERATION);
+    let done = lines.iter().position(|l| l.trim_end() == DONE_HEADING).ok_or_else(|| {
+        format!("the seeded {} carries no '{}' section to record the task under", QUEUE_FILE, DONE_HEADING)
+    })?;
+    let at = if lines.get(done + 1).is_some_and(|l| l.is_empty()) { done + 2 } else { done + 1 };
+    let mut insert = vec![format!("- {}", TASK)];
+    if at == done + 1 {
+        insert.insert(0, String::new());
+    }
+    if lines.get(at).is_some_and(|l| !l.starts_with("- ")) {
+        insert.push(String::new());
+    }
+    lines.splice(at..at, insert);
+    let mut claimed_queue = lines.join("\n");
+    claimed_queue.push('\n');
+    let mut claimed_state = if state.is_empty() { String::new() } else { ends_with_newline(state) };
+    for (stage, session) in STAMPS {
+        claimed_state.push_str(&format!("{} {} {} {} {}\n", ITERATION, stage, session, date, head));
+    }
+    Ok((claimed_queue, claimed_state))
+}
+
+fn read(repo: &Path, rel: &str) -> Result<String, Outcome> {
+    std::fs::read_to_string(repo.join(rel))
+        .map_err(|e| Outcome::Refuse(format!("cannot read the seeded {}: {}", rel, e)))
+}
+
 fn write(repo: &Path, rel: &str, body: &str) -> Result<(), Outcome> {
     let path = repo.join(rel);
     if let Some(parent) = path.parent() {
@@ -204,26 +256,26 @@ fn write(repo: &Path, rel: &str, body: &str) -> Result<(), Outcome> {
     std::fs::write(&path, body).map_err(|e| Outcome::Refuse(format!("cannot write {}: {}", rel, e)))
 }
 
-fn git(repo: &Path, args: &[&str]) -> Result<(), Outcome> {
+fn git(repo: &Path, args: &[&str]) -> Result<String, Outcome> {
     let root = repo.to_string_lossy().into_owned();
     let mut argv: Vec<&str> = vec!["-C", &root];
     argv.extend_from_slice(args);
     let done = proc::run(&programs::GIT, &argv).map_err(refuse)?;
-    match done.failure_report() {
-        None => Ok(()),
-        Some(r) => Err(Outcome::Refuse(format!(
+    match done.stdout() {
+        Some(out) => Ok(String::from_utf8_lossy(out).into_owned()),
+        None => Err(Outcome::Refuse(format!(
             "git {} failed in the scratch repository — {}",
             args.join(" "),
-            r
+            done.failure_report().unwrap_or_default()
         ))),
     }
 }
 
-// spec: installer/SPEC.md §demo — the defect is committed past any hook, because the battery run
+// spec: installer/SPEC.md §demo — the claim is committed past any hook, because the battery run
 // below is what the act shows catching it
 fn commit(repo: &Path, message: &str) -> Result<(), Outcome> {
     git(repo, &["add", "-A"])?;
-    git(repo, &["commit", "-q", "--no-verify", "-m", message])
+    git(repo, &["commit", "-q", "--no-verify", "-m", message]).map(|_| ())
 }
 
 // spec: installer/SPEC.md §demo — act 1 is the adopter's own `init`, spawned from this very
@@ -269,5 +321,44 @@ mod tests {
     #[test]
     fn a_source_checkout_gets_the_no_payload_refusal() {
         assert_eq!(super::run(&[]), 2);
+    }
+
+    // spec: installer/SPEC.md §demo — act 3 names the iteration, heads Done with the task, appends
+    // a validate then a close stamp on distinct sessions, and touches nothing else
+    #[test]
+    fn the_claim_names_the_iteration_records_the_task_and_stamps_validate_then_close() {
+        let queue = "# q\n\n## Iteration: —\n\n---\n\n## Done\n\n- old-slug\n\n## Lessons Learned\n";
+        let state = "# contract\n\n---\n\n";
+        let (q, s) = super::claim(queue, state, "abc1234", "2026-01-02").unwrap();
+        assert_eq!(
+            q,
+            "# q\n\n## Iteration: first-release\n\n---\n\n## Done\n\n- add-login-page\n- old-slug\n\n## Lessons Learned\n"
+        );
+        assert_eq!(
+            s,
+            "# contract\n\n---\n\nfirst-release validate demo-validate 2026-01-02 abc1234\n\
+             first-release close demo-close 2026-01-02 abc1234\n"
+        );
+        let (q, _) = super::claim("## Iteration: —\n## Done\n## Lessons Learned\n", "", "abc1234", "2026-01-02").unwrap();
+        assert_eq!(q, "## Iteration: first-release\n## Done\n\n- add-login-page\n\n## Lessons Learned\n");
+    }
+
+    // spec: installer/SPEC.md §demo — a relative DEMO_TMP_DIR resolves against the invoking
+    // directory, so the door each act spawns inside the scratch is never a relative path
+    #[test]
+    fn a_relative_scratch_base_resolves_against_the_invoking_directory() {
+        let rooted = |p: std::path::PathBuf| crate::walk::path_root(&p.to_string_lossy()).is_some();
+        let got = super::scratch_base(Some("rel/base".into()), "/invoked/here");
+        assert_eq!(got, std::path::PathBuf::from("/invoked/here/rel/base"));
+        assert!(rooted(super::scratch_base(Some("/abs/base".into()), "/invoked/here")));
+        assert!(rooted(super::scratch_base(Some("".into()), "/invoked/here")));
+        assert!(rooted(super::scratch_base(None, "/invoked/here")));
+    }
+
+    // spec: installer/SPEC.md §demo — a seeded queue act 3 cannot stage is an env refusal
+    #[test]
+    fn a_queue_with_no_header_or_no_done_section_cannot_stage_the_claim() {
+        assert!(super::claim("## Done\n", "", "abc1234", "2026-01-02").is_err());
+        assert!(super::claim("## Iteration: —\n", "", "abc1234", "2026-01-02").is_err());
     }
 }
