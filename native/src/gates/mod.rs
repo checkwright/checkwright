@@ -66,6 +66,7 @@ pub mod npm_publish_spec;
 pub mod release_channel_parity;
 pub mod trajectory_fresh;
 pub mod value_rollup_fresh;
+pub mod product_statement_fresh;
 pub mod gap_inbox_neutrality;
 pub mod hook_exec_bit;
 pub mod identity;
@@ -1673,6 +1674,14 @@ pub const REGISTRY: &[GateEntry] = &[
         ],
         "-",
         &[("date", ""), ("git", "")],
+    ),
+    (
+        "check-product-statement-fresh",
+        product_statement_fresh::run,
+        &[],
+        &[],
+        "-",
+        &[],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — the emitter's kit-roster glob and its per-kit
     // templates walk; its good/ case stages one kit, so the `?` is held to one iteration of that loop

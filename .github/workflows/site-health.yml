@@ -6,7 +6,7 @@
 # inside it: a failed probe opens (or updates, never duplicates) a site-health
 # issue and reds this run, never a merge. Recovery self-clears (a green run
 # closes the open issue). No README badge, by the standing ruling.
-# enforce: class=monitor live docs-site deployment — apex/www/http HTTPS, redirects, cert expiry, release-body note pointers, each published Release's prerelease flag against its own version line, and theme highlight-class drift against the tracked snapshot
+# enforce: class=monitor live docs-site deployment — apex/www/http HTTPS, redirects, cert expiry, release-body note pointers, each published Release's prerelease flag against its own version line, theme highlight-class drift against the tracked snapshot, and the repository About against the product statement
 name: site-health
 
 on:
@@ -320,6 +320,31 @@ jobs:
             fi
             rm -f "$css" "$css_err"
           fi
+
+          # 9. the repository About carries the product statement. The plain
+          #    rendering is installer/package.json's description, which
+          #    check-product-statement-fresh holds, so this arm renders nothing
+          #    (docs/site-architecture.md §Generated projections and their
+          #    freshness gates). Repo-local convention, so it stays out of
+          #    site-kit's template.
+          about_err="$(mktemp)"
+          about="$(gh api 'repos/{owner}/{repo}' --jq '.description // ""' 2>"$about_err")"
+          about_rc=$?
+          statement="$(jq -r '.description' installer/package.json)"
+          jq_rc=$?
+          if [ "$about_rc" -ne 0 ]; then
+            failures+=("about: could not read the repository About (gh exit $about_rc): $(tr '\n' ' ' < "$about_err")")
+            echo "about: not compared (the About read failed)"
+          elif [ "$jq_rc" -ne 0 ] || [ -z "$statement" ] || [ "$statement" = null ]; then
+            failures+=("about: could not read installer/package.json's description (jq exit $jq_rc)")
+            echo "about: not compared (the statement read failed)"
+          elif [ "$about" = "$statement" ]; then
+            echo "about: compared, the About carries the product statement"
+          else
+            failures+=("about: the repository About differs from the product statement"$'\n'"  About:     $about"$'\n'"  statement: $statement"$'\n'"  remedy: gh repo edit --description with the statement, under OPS.local.md's account step")
+            echo "about: compared, the About differs"
+          fi
+          rm -f "$about_err"
 
           # DoD hook: a workflow_dispatch with force_fail=true exercises the issue
           # path on demand without waiting for a real outage.

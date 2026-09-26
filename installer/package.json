@@ -1,7 +1,7 @@
 {
   "name": "checkwright",
   "version": "0.0.0",
-  "description": "Vendors pinned Checkwright kit source into your repository and commits it — a coding-agent-assisted delivery methodology (gate SDK, evidence-stamped lifecycle, agent context economics).",
+  "description": "Verification for coding-agent delivery. Checkwright is the verification layer under agent orchestration: spec drift, skipped stages, and unsupported done claims become failing checks before a merge, instead of review findings after one.",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",

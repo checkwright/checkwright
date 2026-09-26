@@ -7,7 +7,7 @@ generated: true
 <!-- {% raw %} -->
 # Checkwright
 
-The activation path for **Checkwright** — a coding-agent-assisted delivery methodology shipped as installable kits, each listed in the [kit reference](https://checkwright.dev/kits.html).
+The activation path for **Checkwright**, whose kits are listed in the [kit reference](https://checkwright.dev/kits.html).
 
 ## What this package is
 

@@ -41,6 +41,7 @@ pub mod pack_installer;
 pub mod parse_smoke_log;
 pub mod projection_witness;
 pub mod port_blockers;
+pub mod product_statement;
 pub mod pub_index;
 pub mod pub_lang;
 pub mod queue_counts;
@@ -275,6 +276,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
             "EVIDENCE_KIT_RUN_*",
             "CONTEXT_KIT_SURFACES",
         ],
+    ),
+    // spec: docs/site-architecture.md §Generated projections and their freshness gates — a
+    // repo-local projection beside the value rollup; its source and sites are this repo's paths
+    (
+        "--emit-product-statement",
+        Arm::Emit(product_statement::emit, Grammar::Flags(&["--write"])),
+        &[],
     ),
     // spec: canon-kit/SPEC.md §The reference-link grammar — the source set is derived from the
     // tracked tree rather than enumerated, so the configured values are the blob ref and the

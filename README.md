@@ -2,7 +2,13 @@
 
 [![gates](https://github.com/checkwright/checkwright/actions/workflows/gates.yml/badge.svg)](https://github.com/checkwright/checkwright/actions/workflows/gates.yml) [![release](https://img.shields.io/github/v/tag/checkwright/checkwright?label=release)](https://github.com/checkwright/checkwright/releases)
 
-**Verification for coding-agent delivery.** Checkwright is the verification layer under agent orchestration: spec drift, skipped stages, and unsupported *done* claims become failing checks before a merge, instead of review findings after one. It ships as installable kits: gates plus an evidence-stamped iteration lifecycle designed for stateless agent sessions.
+<!-- product-statement:begin -->
+
+**Verification for coding-agent delivery.** Checkwright is the verification layer under agent orchestration: spec drift, skipped stages, and unsupported *done* claims become failing checks before a merge, instead of review findings after one.
+
+<!-- product-statement:end -->
+
+It ships as installable kits: gates plus an evidence-stamped iteration lifecycle designed for stateless agent sessions.
 
 Who it is for, how it complements the workflow you already run, and a done claim it catches: <https://checkwright.dev>, the same pages served in-repo under [`docs/`](docs/index.md).
 

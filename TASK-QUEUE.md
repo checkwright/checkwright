@@ -8,22 +8,6 @@
 
 ## New Features
 
-### one-product-statement
-
-[spec: SPEC-product-statement.md]
-
-Checkwright is described two ways. Measured 2026-09-26: the GitHub repo About, `installer/package.json` and `reserve/crates/Cargo.toml` carry the older methodology wording ("A coding-agent-assisted delivery methodology as installable kits: …"), while README.md and docs/index.md open on "Verification for coding-agent delivery" and the verification-layer framing. No SPEC governs the About.
-
-**Operator direction (2026-09-26, lead session, not a ruling):** rides with `customer-docs-quality-standard` as the next iteration's theme; the operator asks whether a gate should hold it.
-
-**Deliverable:** one source for the product statement, the tracked copies generated from it and freshness-gated, and the live About's drift placed on the monitor side of site-kit/SPEC.md's gate/monitor boundary (it is a network read, and changing it is a GitHub write).
-
-**Taken for /spec 2026-09-27 at gate-sdk-tail-docs-standard's scope, operator direction lead-relayed (not a /consult ruling):** unit set A. Re-read at scope: the About, `installer/package.json` and `reserve/crates/Cargo.toml` all carry the methodology wording.
-
-**Authored at spec 2026-09-27:** the About re-read with `gh api`. Three more copies were found: `docs/_config.yml`'s `description`, which is every page's default meta description, and the openers of `installer/README.md` and `reserve/crates/README.md`. The answer to the operator's question is yes, a freshness gate over the generated copies, with a monitor arm for the About.
-
-**Cost while deferred:** a reader meets two products on the repo page, the package registries and the site. Filed 2026-09-26 to the gap inbox by the lead on the operator's direction; promoted 2026-09-26 at capture-integrity-brevity's close: →fix fails because choosing the one statement and its source is a design call with a GitHub write in it. Owner lookup: `product statement`, `package.json`, `About` in this file — none.
-
 ### install-fetch-asset-names
 
 [spec: SPEC-asset-names.md]
@@ -1388,5 +1372,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 - customer-docs-quality-standard
 - glibc-floor-unstated
+- one-product-statement
 
 ## Lessons Learned

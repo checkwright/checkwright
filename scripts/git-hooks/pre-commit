@@ -184,6 +184,10 @@ if staged_matches 'docs/value.md' 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/
     run_gate check-value-rollup-fresh native/target/release/checkwright-gates check-value-rollup-fresh
 fi
 
+if staged_matches 'scripts/product-statement.conf' 'README.md' 'docs/index.md' 'docs/_config.yml' 'installer/package.json' 'reserve/crates/Cargo.toml' 'native/src/gates/product_statement_fresh.rs' 'native/src/emit/product_statement.rs' 'native/src/fresh.rs'; then
+    run_gate check-product-statement-fresh native/target/release/checkwright-gates check-product-statement-fresh
+fi
+
 if staged_matches '*scripts/git-hooks/*' 'scripts/gate-sdk-config.knobs' 'native/src/gates/hook_exec_bit.rs' 'native/src/fresh.rs' 'native/src/programs.rs'; then
     run_gate check-hook-exec-bit native/target/release/checkwright-gates check-hook-exec-bit
 fi

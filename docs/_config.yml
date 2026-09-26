@@ -1,5 +1,5 @@
 title: Checkwright
-description: A coding-agent-assisted delivery methodology, packaged as installable kits.
+description: "Verification for coding-agent delivery. Checkwright is the verification layer under agent orchestration: spec drift, skipped stages, and unsupported done claims become failing checks before a merge, instead of review findings after one."
 theme: jekyll-theme-primer
 
 # GitHub Pages enables these by default; declaring them keeps a local build faithful.

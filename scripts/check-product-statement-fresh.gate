@@ -1,0 +1,3 @@
+# graph: couples=scripts/product-statement.conf,README.md,docs/index.md,docs/_config.yml,installer/package.json,reserve/crates/Cargo.toml dir=one valve=none tier=precommit
+# projection: README.md,docs/index.md,docs/_config.yml,installer/package.json,reserve/crates/Cargo.toml
+# spec: docs/site-architecture.md §Generated projections and their freshness gates — every product-statement site carries the rendering scripts/product-statement.conf gives it

@@ -57,6 +57,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | (consumer) | check-docs-mirror-fresh | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-enforcement-fresh | precommit |
 | (consumer) | check-value-rollup-fresh | precommit |
+| (consumer) | check-product-statement-fresh | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-hook-exec-bit | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-exec-bit | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-tree-terms | precommit |
@@ -227,5 +228,5 @@ The rows below derive from the class registries — the gate registry, the KPI r
 
 | kit | surface |
 | --- | --- |
-| (consumer) | live docs-site deployment — apex/www/http HTTPS, redirects, cert expiry, release-body note pointers, each published Release's prerelease flag against its own version line, and theme highlight-class drift against the tracked snapshot |
+| (consumer) | live docs-site deployment — apex/www/http HTTPS, redirects, cert expiry, release-body note pointers, each published Release's prerelease flag against its own version line, theme highlight-class drift against the tracked snapshot, and the repository About against the product statement |
 

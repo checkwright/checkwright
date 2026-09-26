@@ -5,7 +5,11 @@ nav_order: 1
 
 # Checkwright
 
+<!-- product-statement:begin -->
+
 **Verification for coding-agent delivery.** Checkwright is the verification layer under agent orchestration: spec drift, skipped stages, and unsupported *done* claims become failing checks before a merge, instead of review findings after one.
+
+<!-- product-statement:end -->
 
 It is for the maintainer of a repository coding agents write most of, who has to answer at merge time whether the work is actually done and cannot answer it by reading every diff.
 

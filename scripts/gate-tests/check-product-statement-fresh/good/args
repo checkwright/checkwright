@@ -1,0 +1,2 @@
+# source, then the sites; each site's rendering follows its extension.
+product-statement.conf README.md index.md _config.yml package.json Cargo.toml
