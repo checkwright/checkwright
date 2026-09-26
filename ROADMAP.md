@@ -23,8 +23,8 @@ Adoption evidence, mostly. A rung promotes when someone hits the friction it des
 <!-- roadmap:begin -->
 ### now
 
-- [design-partner-preview](TASK-QUEUE.md#design-partner-preview) *(adoption)* — A small observed preview measuring first green, first useful red and retention on real installs.
 - [demo-catches-a-done-claim](TASK-QUEUE.md#demo-catches-a-done-claim) *(adoption)* — The first-minute demo catches a task marked done with no evidence behind it.
+- [design-partner-preview](TASK-QUEUE.md#design-partner-preview) *(adoption)* — A small observed preview measuring first green, first useful red and retention on real installs.
 
 ### next
 

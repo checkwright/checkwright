@@ -8,6 +8,26 @@
 
 ## New Features
 
+### demo-catches-a-done-claim
+
+[spec: SPEC-done-claim-demo.md] [roadmap: now/adoption] [roadmap-summary: The first-minute demo catches a task marked done with no evidence behind it.]
+
+the headline promises that unsupported *done* claims become failing checks, and `demo`'s caught defect is a mistyped relative link (installer/SPEC.md §demo, act 3). The failure the headline names is now a mainstream, measured one (false success claims are a large share of agent failures in the 2026 literature; consult's landscape refresh), and the first minute never shows it.
+
+**Deliverable:** act 3 commits a task marked done, with validate and close stamps and no evidence, and the `full` battery reds on it; act 4 withdraws the claim; the link defect leaves the demo and stays on the consumer smoke's value arm; the smoke's demo arm reads the red in the output. [front-door-demo-unreachable](#front-door-demo-unreachable) captures its proof block from the new act 3, so the two land together or this one first.
+
+**Promoted 2026-09-26 at spec:** the filing named `check-stage-evidence` as the red. Probed at spec, it is `on-surface`, so a `full` install never registers it, and it asserts stamp grammar, not evidence. The member that reds is evidence-kit's `zero-config` `check-evidence-manifest`, assertion C, which the amendment states with its probe.
+
+### spec-narration-unratcheted
+
+[spec: SPEC-spec-ratchet.md]
+
+undated, marker-free narrative of how a rule was reached passes every prose gate: `check-manifest-temporal` catches trigger words, `check-provenance-seam` dates, hashes, slugs and attributions, `check-prose-bounds` length and repetition, and canon-kit/SPEC.md §check-prose-bounds states the gap as its own honest limit. No component SPEC carries a size ratchet either, so close's brevity pass, a judgment, is the sole backstop.
+
+**Deliverable:** every component `SPEC.md` under this repo's surface ratchet, so growth is a deliberate re-stamp in the growing commit.
+
+**Promoted 2026-09-26 at spec:** of the filing's two candidates, the ratchet ships and narration tells in `CANON_KIT_TEMPORAL_MARKERS_EXTRA` are refused on a corpus measurement, whose counts the amendment carries. Filed 2026-09-26 to the gap inbox by the lead on an operator question.
+
 ## Technical Debt
 
 ### gate-sdk-runner-brevity
@@ -422,16 +442,6 @@ the CI story is a copy-out template: `gate-sdk/templates/gates-workflow.yml` exi
 
 **Cost while deferred:** the pull-request check is where a maintainer first sees a red, so the first useful red — the preview's second metric — has no path an adopter can wire in one line. Filed 2026-09-25 by consult as a direct entry, third of the refresh's ranked actions.
 
-### demo-catches-a-done-claim
-
-[roadmap: now/adoption] [cost: event/high] [surface: installer] [roadmap-summary: The first-minute demo catches a task marked done with no evidence behind it.]
-
-the headline promises that unsupported *done* claims become failing checks, and `demo`'s caught defect is a mistyped relative link (installer/SPEC.md §demo, act 3). The failure the headline names is now a mainstream, measured one (false success claims are a large share of agent failures in the 2026 literature; consult's landscape refresh), and the first minute never shows it.
-
-**Deliverable:** act 3 commits a task marked done with no validate evidence and the battery reds on `check-stage-evidence`, keeping the link defect as a second act or dropping it; the demo installs a profile that carries the gate, or the act authors the on-surface registration it needs; the consumer smoke's demo arm asserts the new red; the front door's proof block is the captured output ([front-door-demo-unreachable](#front-door-demo-unreachable) owes that block, so the two land together or this one first).
-
-**Cost while deferred:** the demo proves a claim the front door does not make and never the one it does. Filed 2026-09-25 by consult as a direct entry, fifth of the refresh's ranked actions; a release after it ends the visible cadence gap.
-
 ### prune-set-matches-walk-root-ancestors
 
 [cost: event/high] [surface: context-kit] [recurrence: 2026-09-25]
@@ -661,16 +671,6 @@ the consult inbox needs a drain trigger and a status cue, on an operator directi
 **Deliverable:** both halves, with the open question stated in lifecycle-kit/SPEC.md §The steering vocabulary rather than assumed: whether an operator answer relayed through the lead into a dispatched consult is a ruling.
 
 **Cost while deferred:** the inbox, once it lands, is drained only when an operator remembers it. Filed 2026-09-26 to the gap inbox by the lead, extending the consult-inbox bullet; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails on the same amendment ground. Re-verified at the drain: `statusline.rs` reads `queue_counts::emit`. Owner lookup: `statusline counter`, `counter group` in this file — none.
-
-### spec-narration-unratcheted
-
-[cost: event/high] [surface: canon-kit]
-
-undated, marker-free narrative of how a rule was reached passes every prose gate: `check-manifest-temporal` catches trigger words, `check-provenance-seam` dates, hashes, slugs and attributions, `check-prose-bounds` length and repetition, and canon-kit/SPEC.md §check-prose-bounds states the gap as its own honest limit. No kit SPEC carries a size ratchet either: `.workflow/surface-ceiling.txt` holds the always-loaded surfaces and the amendment template. So close's brevity pass, a judgment, is the sole backstop, and gate-sdk/SPEC.md stood at 186,812 words after this iteration's brevity unit.
-
-**Deliverable:** one or both of (1) surface-ratchet rows for every kit SPEC, so growth is a deliberate re-stamp in the growing commit; (2) narration tells calibrated against the corpus and added to `CANON_KIT_TEMPORAL_MARKERS_EXTRA`. The risk in (2) is false positives: the SPECs use 'measured' and 'attested' legitimately to ground a rule.
-
-**Cost while deferred:** kit SPECs grow by accretion between brevity passes, and every reader pays. Filed 2026-09-26 to the gap inbox by the lead on an operator question; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because either candidate is a calibration needing a corpus measurement. Re-verified at the drain: `wc -w gate-sdk/SPEC.md` is 186,812, and no kit `SPEC.md` row is in the ceiling file. Owner lookup: `surface-ceiling`, `narration`, `size ratchet` in this file — none.
 
 ### lead-writes-during-live-stage
 
