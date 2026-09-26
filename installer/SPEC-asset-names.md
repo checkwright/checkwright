@@ -4,6 +4,8 @@ The one-line install's two hosted scripts and the install page's step-by-step re
 
 **The ruling: a gate, as a third invariant of `check-install-pin`.** The surfaces cannot derive their names at run time, because a hosted script is served verbatim and knows nothing but its pin. Generating them would make two hand-reviewed install scripts into projections to save three string literals. `check-install-pin` already reads both scripts and resolves their pin, and the declaration that binds them is the **pinned release's**, not the tree's. The pin trails the tag (§The hosted install pin), so between a rename landing and the tag, the scripts must still fetch the old names. A gate reading the tree's declaration would red exactly that correct state. Read at `v<pin>`, the invariant fires where the names really move: the commit that moves the pin.
 
+**The seam.** The unit is repo-local. `check-install-pin` is this repository's gate, and it reads gate-sdk's declaration grammar without changing it. No kit ships the invariant.
+
 **Refused.**
 
 - **A new gate.** Its surfaces, its pin and its dormancy are `check-install-pin`'s, and a second gate would re-read all three.

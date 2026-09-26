@@ -8,6 +8,7 @@ Checkwright is described two ways. README.md and docs/index.md open on *Verifica
 - **The copies are generated**, each in the rendering its format needs. `--emit product-statement --write` writes them, and `check-product-statement-fresh` holds them at commit.
 - **Two openers stop restating instead of being generated.** `installer/README.md` and `reserve/crates/README.md` describe their own package and link the project, where they now characterize it. Removing a copy outranks gating it.
 - **The About is a network read and a GitHub write**, so a precommit gate cannot reach it. It sits on the monitor side of site-kit/SPEC.md §The monitor boundary: this repo's `site-health.yml` copy gains a consumer-local arm comparing it with the generated plain rendering. It is set once by hand, under OPS.local.md's account step.
+- **The seam.** All of it is this repository's. The source, the arm, the gate and the About arm are repo-local, and no kit ships the convention, which is why the About arm stays out of site-kit's template. The statement is public product copy, not private rule content.
 
 **Refused.**
 

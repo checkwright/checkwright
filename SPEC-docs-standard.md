@@ -10,6 +10,10 @@ Two queue entries pair it: [customer-docs-quality-standard](TASK-QUEUE.md#custom
 - **Requirements stays one section and moves above Install.** It is where an adopter answers *can I install here*, which comes before *how*. It keeps its heading, so every `docs/install.md §Requirements` citation in the tree stays true. Both of its marker blocks become tables, and the contributor-only tools leave the page for `CONTRIBUTING.md`.
 - **The step-by-step recipes collapse, the one-liners and remedy blocks stay visible.** A `<details markdown="1">` block renders its markdown under the site's parser, and every reader of the recipes' marker blocks reads raw lines, so a collapsed block changes no reader.
 - **The Linux floor is measured, not pinned.** The x86_64 Linux build leg keeps riding `ubuntu-latest` (native/runners.list's recorded ride). The shared build body measures each artifact's floor and refuses one that differs from the page's, so an image migration that raises the floor reds the first push that meets it. Pin-or-raise is decided there, with the evidence in hand.
+- **The seam.**
+  - Kit mechanism: `check-docs-page-repeat` and its two knobs, shipped by canon-kit and off by default, and gate-sdk/SPEC.md §Consumer payload's generic floor sentence.
+  - This repository's own: the corpus binding, the page rule's text in docs/site-architecture.md, the two install-page gates and their table grammars, the build body's floor step, and every floor value.
+  - No private rule content is involved.
 
 **Refused.**
 
