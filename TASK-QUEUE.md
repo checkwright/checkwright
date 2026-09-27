@@ -36,20 +36,6 @@ the next release would publish no glibc Linux gate binary: platform-prerequisite
 
 **Cost while deferred:** `crate-tests-windows` stays report-only, so a Windows crate-test regression passes every run as a warning. The operator's cut-and-defer residue of `crate-tests-windows-failures` (operator direction 2026-09-26, lead session). Filed 2026-09-26 to the gap inbox by its build; promoted 2026-09-26 at capture-integrity-brevity's close: →fix fails because both remedies are design-bearing and one reverses a stated rule. Re-verified: run 36264222274 reads 1169 passed, 2 failed, the pair above, on both triples. Owner lookup: `stub-bin`, `gate-binary-fresh`, `PATHEXT` in this file — none; owner gate-sdk/SPEC.md §check-gate-binary-fresh.
 
-### foreign-spec-lifecycle-unowned
-
-[spec: SPEC-foreign-lifecycle.md]
-
-a lifecycle stage machine over a foreign spec workflow is unowned: `check-stage-entry` assertion C's cross-component signal is `LIFECYCLE_KIT_CONTRACT_TOKENS` (default `SPEC.md`, `proto/`), so a tree whose specs Spec Kit or OpenSpec writes, left unbound, never fires it and skips the align audit with no red. The amendment glob matches a basename only, so no knob value selects OpenSpec's in-flight deltas apart from its capability specs, both named `spec.md`.
-
-**Deliverable:** the lifecycle binding for a foreign layout — the contract tokens and pointer reach — stated for each supported toolkit, with a companion fixture proving the audit fires.
-
-**Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling), against scope's recommendation to hold it:** the `prose` profile the extension installs carries no lifecycle-kit, so the amendment says which profile or recipe a foreign-layout lifecycle adopter takes. It reshapes [lead-clause-heading-family](#lead-clause-heading-family), since both move `check-spec-pointer`'s reach over a foreign layout.
-
-**Route directed at spec 2026-09-27, operator direction lead-relayed (not a /consult ruling):** a path-aware amendment glob, an OpenSpec lifecycle layer bound to in-flight change deltas with a companion fixture proving the audit fires, Spec Kit stated as unbindable, and `full` plus the recipe as the adopter's profile. Measured at spec: the pointer's reach needs no binding, since both toolkits' specs are markdown and the recipes already govern them, so [lead-clause-heading-family](#lead-clause-heading-family) stands as filed.
-
-**Cost while deferred:** a lifecycle adopter on a foreign layout meets a silent audit skip. Correction (2) of companion-toolkit-profile's 2026-08-02 survey; its build half fitted the prose profile only. Filed 2026-09-27 to the gap inbox at that entry's demotion; promoted 2026-09-27 at companion-catalog-extension's close: →fix fails because the binding is new mechanism. Re-verified: the knob's default reads `SPEC.md`, `proto/`, and companion/SPEC.md names no lifecycle binding. Owner lookup: `CONTRACT_TOKENS`, `foreign`, `Spec Kit` in this file — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (its body is now the catalog submission alone); owner lifecycle-kit/SPEC.md §The state machine.
-
 ## Technical Debt
 
 ### crate-tests-windows-flip
@@ -70,7 +56,7 @@ a lifecycle stage machine over a foreign spec workflow is unowned: `check-stage-
 
 docs/spec-toolkits.md says four defect classes "fail at commit and in CI" and never states what that guarantees: the pre-commit hook is skippable with `--no-verify`, so the guarantee is CI run as a required status check under branch protection, and the page does not say so. It also leaves unsaid that the four classes are document hygiene, not spec-to-code conformance. The operator found the page unconvincing (operator direction 2026-09-27, lead session).
 
-**Deliverable:** the page states the guarantee and its setup (the seeded CI workflow as a required status check), names the four classes as document hygiene and not conformance, and keeps its limit that the extension's commands and hook are agent-followed. Where [foreign-spec-lifecycle-unowned](#foreign-spec-lifecycle-unowned) lands a lifecycle binding in the same set, the page states what that adds and for which profile.
+**Deliverable:** the page states the guarantee and its setup (the seeded CI workflow as a required status check), names the four classes as document hygiene and not conformance, and keeps its limit that the extension's commands and hook are agent-followed. Where `foreign-spec-lifecycle-unowned` lands a lifecycle binding in the same set, the page states what that adds and for which profile.
 
 **Promoted as debt 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** a page edit stating facts the specs already carry. Precondition (4) of the catalog submission.
 
@@ -1534,5 +1520,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 - install-platform-release-gap
 - consumer-scratch-unignored
+- foreign-spec-lifecycle-unowned
 
 ## Lessons Learned
