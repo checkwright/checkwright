@@ -7,11 +7,11 @@ generated: true
 <!-- {% raw %} -->
 # queue-kit
 
-A git-native, agent-readable task tracker: one Markdown file where `##` sections are queues, `### <slug>` headings are the tasks — each kebab-case slug the task's handle and link anchor — and square-bracket tags on the line under each heading are the state machine ([SPEC.md](SPEC.md) §The tag algebra owns the tag set). Gates hold the grammar a coding agent selects work by, and the arms under [Use](#use) read and project the file.
+A git-native, agent-readable task tracker: one Markdown file where `##` sections are queues, `### <slug>` headings are the tasks — each kebab-case slug the task's handle and link anchor — and square-bracket tags on the line under each heading are the state machine ([SPEC.md §The tag algebra](SPEC.md#the-tag-algebra) owns the tag set). Gates hold the grammar a coding agent selects work by, and the arms under [Use](#use) read and project the file.
 
 Why: an agent picks work by *parsing*, not reading — so everything selection trusts (section position, slugs, tags) must be grammar a gate can enforce, and everything a human writes freely (task prose) must stay off the parse path. Drift between what the prose says and what the parser sees is the failure mode; all but three of the gates each close one instance of it — a tag written off its tag line, a duplicate slug, a live reference left unlinked, a lost task, a forward precondition stated in prose but never tagged. The three exceptions hold a different axis: projection freshness, and the deferred pool's filing contract — its per-entry budget and its tag-line board tags. See [SPEC.md](SPEC.md) for the full contracts.
 
-This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is gate-sdk/SPEC.md §Consumer payload.
+This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is [gate-sdk/SPEC.md §Consumer payload](https://github.com/checkwright/checkwright/blob/master/gate-sdk/SPEC.md#consumer-payload).
 
 ## Install
 

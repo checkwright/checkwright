@@ -4,7 +4,7 @@ Spec discipline for agent-authored components: one canonical spec per component,
 
 Why: when a coding agent authors the specs, design rationale gets re-derived under build pressure unless it is captured up front, and a parallel copy of any gated fact is an un-gateable second source that drifts silently. The remedy is a lifecycle (amendments authored up front, merged and deleted at build) plus gates over the mechanically-decidable copy failures — a doubled Definition-of-Done, a banned-heading code dump, a fenced block that verbatim-copies a source file, a glossary definition restated on another surface, a feature task with no amendment. See [SPEC.md](SPEC.md) for the full contracts.
 
-This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is gate-sdk/SPEC.md §Consumer payload.
+This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is [gate-sdk/SPEC.md §Consumer payload](https://github.com/checkwright/checkwright/blob/master/gate-sdk/SPEC.md#consumer-payload).
 
 ## Install
 
@@ -27,6 +27,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required); the queue-facing gate
    check-docs-cmd               # invoked paths + kit knobs in docs resolve
    check-docs-restatement-parity # needs restating pages (their code tokens held to the README beside each)
    check-docs-page-repeat       # needs declared pages (no link target or long sentence stated twice on one)
+   check-citation-link          # needs declared pages (every section citation links its section)
    check-fence-command-head     # every shell-fence command starts with a word that can run
    check-fence-run              # every shell fence marked runnable runs and exits as declared
    check-knob-citation          # knob values stated only in the owning SPEC

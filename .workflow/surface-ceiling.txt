@@ -14,7 +14,7 @@
 1155cp .claude/commands/spec.md
 1204cp .claude/commands/validate.md
 12421cp CLAUDE.md
-257054cp canon-kit/SPEC.md
+259913cp canon-kit/SPEC.md
 5785cp canon-kit/templates/SPEC-amendment.md
 130077cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
@@ -23,7 +23,7 @@
 3397cp delegation-kit/templates/dispatch-checklists.md
 1308cp docs/canon-kit/index.md
 1613cp docs/context-kit/index.md
-4025cp docs/ddd.md
+4189cp docs/ddd.md
 1311cp docs/delegation-kit/index.md
 2277cp docs/doctrine-kit/index.md
 1285cp docs/drift-kit/index.md
@@ -31,12 +31,12 @@
 1472cp docs/gate-sdk/index.md
 1259cp docs/guard-kit/index.md
 5202cp docs/index.md
-15834cp docs/install.md
+15858cp docs/install.md
 1344cp docs/kits.md
 1395cp docs/lifecycle-kit/index.md
 3007cp docs/methodology.md
-10763cp docs/orchestration.md
-10773cp docs/positioning.md
+11044cp docs/orchestration.md
+10910cp docs/positioning.md
 1869cp docs/posts/2026-07-09-announcing-checkwright.md
 1034cp docs/posts/2026-07-14-checkwright-v0-1-0.md
 6422cp docs/posts/2026-07-17-checkwright-v0-2-0.md
@@ -65,8 +65,8 @@
 6598cp docs/posts/2026-08-23-checkwright-v0-25-0.md
 229102cp docs/posts/2026-09-26-checkwright-v0-26-0.md
 1440cp docs/queue-kit/index.md
-757cp docs/releases.md
-34129cp docs/site-architecture.md
+789cp docs/releases.md
+37692cp docs/site-architecture.md
 2412cp docs/site-kit/index.md
 2431cp docs/value.md
 35405cp doctrine-kit/SPEC.md
@@ -91,4 +91,4 @@
 2765cp lifecycle-kit/templates/upgrade.md
 163675cp queue-kit/SPEC.md
 1392cp queue-kit/templates/TASK-QUEUE.md
-59554cp site-kit/SPEC.md
+61471cp site-kit/SPEC.md

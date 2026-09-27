@@ -135,6 +135,7 @@ Knobs:
 - `CANON_KIT_RESTATEMENT_PAGES` — array of globs, default empty: the pages `check-docs-restatement-parity` holds to the `README.md` beside each.
 - `CANON_KIT_PAGE_REPEAT_PAGES` — the pages `check-docs-page-repeat` holds, an array of globs, empty by default.
 - `CANON_KIT_PAGE_REPEAT_MIN_WORDS` — default `8`: the shortest sentence `check-docs-page-repeat`'s arm B counts.
+- `CANON_KIT_CITATION_LINK_PAGES` — the pages `check-citation-link` holds, an array of globs, empty by default.
 - `CANON_KIT_FENCE_PROGRAMS` — array of program names a shell fence may start a command with, default a bundled generic utility set (`cat`, `grep`, `git`, …; `--emit knob-roster` prints it whole). Read by `check-fence-command-head`. The toolchain a tree's recipes name, a compiler, a fetch tool or a package manager, rides the extra.
 - `CANON_KIT_FENCE_RUN_PROGRAMS` — array of program names a fence `check-fence-run` executes may start a command with, default `("git")`. It is the whole set, not an extra over `CANON_KIT_FENCE_PROGRAMS`: every name in it is a program that runs with the scratch's network reach, so the default admits only the one program the fixed environment confines to local protocols. A vocabulary rather than a walk filter, so it takes no `knob:` couples token, on the fence-program pair's own ground.
 - `CANON_KIT_RETIRED_SPELLING_EXCLUDE` — array of globs, default empty: tracked paths held out of `check-amendment-retired-spelling`'s reconciliation corpus. Which surfaces are **history-bearing** is a consumer fact: a work queue, a ruling record and a scratch directory are named by that consumer's own configuration. A retired spelling survives in all three legitimately, because that is what a history surface is for. **The empty default is the conservative one, not a fail-open.** The exclusion can only ever remove findings, so a consumer that configures nothing gets a noisier gate rather than a blinder one.
@@ -658,6 +659,20 @@ Invariant: no declared page states a relative link target, or a sentence of `CAN
 **Red** is one finding per later occurrence, naming the page, its line, the first occurrence's line and the repeated target or sentence. Each arm carries its own `help:` line. A link's is *link the first mention and make the later one plain text or an in-page anchor*. A sentence's is *state it once and point back to it*. The clean line counts pages, links and sentences. **Exit 2:** an unreadable page, or a `CANON_KIT_PAGE_REPEAT_MIN_WORDS` that is not a positive integer. `tier=precommit`, `install: zero-config`, armed by `CANON_KIT_PAGE_REPEAT_PAGES`.
 
 **Deliberately not asserted: a page-grain link rule, or a repeat across pages.** A page citing several sections of one README downward is the anchored shape §check-docs-link-convention requires, so the grain is the target, fragment included. A restatement across pages is usually a paraphrase, which no scanner decides.
+
+### check-citation-link
+
+Invariant: on a declared page, every section citation sits in a link's text, and a link whose text carries a citation targets the section it names.
+
+- **Corpus:** files matching `CANON_KIT_CITATION_LINK_PAGES`, an array of globs expanded like every canon-kit glob knob, default empty. An empty expansion is a clean `0 page(s)`.
+- **A citation** is a `§` §check-spec-pointer's prose-citation reader finds in one of its three forms, read through the same reader, so this gate and that one cannot disagree on what a citation is. Form is shape alone here: an adjacent `.md` path is a citation whether or not the tree tracks it, since resolution is §check-spec-pointer's charge. The placeholder rule holds for every form, and the code-span rule for the bare form. Fenced blocks, HTML comments and the front-matter block are skipped.
+- **Arm A — an unlinked citation.** A citation whose `§` lies outside every link's text is a finding. A link followed by `§` is one, since its heading is not linked. **Admitted:** a later mention, whose text at the citation's start begins with the text of a citation link ending earlier on the page. The compare drops backticks and folds whitespace, and the character after the match is no letter or digit. That is the plain-text later mention §check-docs-page-repeat requires.
+- **Arm B — a link that misses its section.** A link whose text carries a citation must carry a `#anchor`. The anchor must be the heading slug of the link text after the `§` (up to the next `§`), or begin with that slug and a `-`. The second form admits a citation naming a heading by its lead clause, as §check-spec-pointer admits it. The slug is §check-md-refs' heading slug. Whether the anchor exists is §check-md-refs' finding and is not repeated here.
+- **Valve:** `citation-link-exempt: <reason>` on the citation's line or the one above, in the shared exempt window (§The shared spec adapters). The reason is mandatory, and a valve without one exempts nothing.
+
+**Red** is one finding per citation, naming the page, the line and the citation. Arm A's `help:` line is *make the citation a link to its section*, printing the link form with the anchor on its target. Arm B's is *point the link at the section its text names*. The clean line counts pages, linked citations, admitted later mentions and valved citations. **Exit 2:** an unreadable page. `tier=precommit`, `install: zero-config`, armed by `CANON_KIT_CITATION_LINK_PAGES`.
+
+**Deliberately not asserted: the link target's file against the citation's path.** A README targets `SPEC.md`, a docs page the mirror, and an off-site citation a blob URL, so agreement needs a resolution per target shape. The anchor is where a renamed section leaves a stale link.
 
 ### check-fence-command-head
 

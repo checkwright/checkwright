@@ -1,0 +1,4 @@
+# graph: couples=knob:CANON_KIT_CITATION_LINK_PAGES dir=one valve=none tier=precommit
+# install: zero-config
+# armed-by: CANON_KIT_CITATION_LINK_PAGES
+# spec: canon-kit/SPEC.md §check-citation-link — on a page CANON_KIT_CITATION_LINK_PAGES declares, every section citation sits in a link's text, and a link whose text carries a citation targets the section it names

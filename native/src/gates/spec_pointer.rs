@@ -315,32 +315,90 @@ fn prose_citations(
         let f = p.display().to_string();
         let rel = rel_of(root, &f);
         let text = spec::read_text(p)?;
-        let mut fence = false;
-        let mut para: Vec<(usize, String)> = Vec::new();
-        for (idx, raw) in text.lines().enumerate() {
-            if spec::is_fence_line(raw) {
-                flush(&f, &rel, tracked, &mut para, &mut out);
-                fence = !fence;
-                continue;
+        for para in paragraphs(&text) {
+            for site in sites(&para.joined) {
+                if let Some((start, path)) = site.path {
+                    if tracked.contains(path.as_str()) {
+                        out.push(Cite {
+                            file: f.clone(),
+                            line: para.line_of(start),
+                            path: Some(path),
+                            frag: site.frag,
+                        });
+                    }
+                    continue;
+                }
+                let mut at_line = site.at;
+                if let Some((start, target)) = &site.link {
+                    at_line = *start;
+                    if let Some(path) =
+                        link_path(&rel, target).filter(|p| tracked.contains(p.as_str()))
+                    {
+                        out.push(Cite {
+                            file: f.clone(),
+                            line: para.line_of(*start),
+                            path: Some(path),
+                            frag: site.frag,
+                        });
+                        continue;
+                    }
+                }
+                if site.bare {
+                    out.push(Cite {
+                        file: f.clone(),
+                        line: para.line_of(at_line),
+                        path: None,
+                        frag: site.frag,
+                    });
+                }
             }
-            if fence || spec::is_blank(raw) {
-                flush(&f, &rel, tracked, &mut para, &mut out);
-                continue;
-            }
-            para.push((idx + 1, raw.to_string()));
         }
-        flush(&f, &rel, tracked, &mut para, &mut out);
     }
     Ok(out)
 }
 
-fn flush(
-    file: &str,
-    rel: &str,
-    tracked: &HashSet<&str>,
-    para: &mut Vec<(usize, String)>,
-    out: &mut Vec<Cite>,
-) {
+// spec: canon-kit/SPEC.md §check-spec-pointer — one prose paragraph, its physical lines joined with
+// one space, each line's start offset kept so a joined offset reports on its physical line
+pub(crate) struct Para {
+    pub(crate) lines: Vec<usize>,
+    pub(crate) joined: String,
+    lstart: Vec<usize>,
+}
+
+impl Para {
+    pub(crate) fn line_of(&self, at: usize) -> usize {
+        let mut li = 0usize;
+        for (i, s) in self.lstart.iter().enumerate() {
+            if *s <= at {
+                li = i;
+            }
+        }
+        self.lines[li]
+    }
+}
+
+// spec: canon-kit/SPEC.md §check-spec-pointer — the blank-line paragraph join, fenced code skipped
+pub(crate) fn paragraphs(text: &str) -> Vec<Para> {
+    let mut out: Vec<Para> = Vec::new();
+    let mut fence = false;
+    let mut para: Vec<(usize, &str)> = Vec::new();
+    for (idx, raw) in text.lines().enumerate() {
+        if spec::is_fence_line(raw) {
+            join_para(&mut para, &mut out);
+            fence = !fence;
+            continue;
+        }
+        if fence || spec::is_blank(raw) {
+            join_para(&mut para, &mut out);
+            continue;
+        }
+        para.push((idx + 1, raw));
+    }
+    join_para(&mut para, &mut out);
+    out
+}
+
+fn join_para(para: &mut Vec<(usize, &str)>, out: &mut Vec<Para>) {
     if para.is_empty() {
         return;
     }
@@ -358,64 +416,53 @@ fn flush(
             joined.push_str(text);
         }
     }
-    let line_of = |at: usize| {
-        let mut li = 0usize;
-        for (i, s) in lstart.iter().enumerate() {
-            if *s <= at {
-                li = i;
-            }
-        }
-        para[li].0
-    };
+    out.push(Para {
+        lines: para.iter().map(|(n, _)| *n).collect(),
+        joined,
+        lstart,
+    });
+    para.clear();
+}
+
+// spec: canon-kit/SPEC.md §check-spec-pointer — one § in a joined paragraph, read by shape alone:
+// the `.md` path adjacent to it, else the link closing before it, and whether its bare reading
+// passes the placeholder and code-span rules
+pub(crate) struct Site {
+    pub(crate) at: usize,
+    pub(crate) frag: String,
+    pub(crate) path: Option<(usize, String)>,
+    pub(crate) link: Option<(usize, String)>,
+    pub(crate) bare: bool,
+}
+
+pub(crate) fn sites(joined: &str) -> Vec<Site> {
     let b = joined.as_bytes();
-    let mut cites: Vec<Cite> = Vec::new();
+    let mut out: Vec<Site> = Vec::new();
     for (at, _) in joined.match_indices('§') {
         let frag = joined[at + "§".len()..].to_string();
         let gap = back_space(b, at);
-        if let Some((start, path)) = adjacent_path(b, gap) {
-            if tracked.contains(path.as_str()) {
-                cites.push(Cite {
-                    file: file.to_string(),
-                    line: line_of(start),
-                    path: Some(path),
-                    frag,
-                });
-            }
-            continue;
-        }
-        let mut at_line = at;
-        if let Some((start, target)) = link_target(b, gap) {
-            at_line = start;
-            if let Some(path) = link_path(rel, &target).filter(|p| tracked.contains(p.as_str())) {
-                cites.push(Cite {
-                    file: file.to_string(),
-                    line: line_of(start),
-                    path: Some(path),
-                    frag,
-                });
-                continue;
-            }
-        }
+        let path = adjacent_path(b, gap);
+        let link = if path.is_none() { link_target(b, gap) } else { None };
         // spec: canon-kit/SPEC.md §check-spec-pointer — a fragment not opening with a letter, a
         // digit or a backtick is a placeholder or the mark itself, and so is a § quoted inside a
         // code span
         let in_span = b[..at].iter().filter(|&&c| c == b'`').count() % 2 == 1;
-        if !in_span
-            && frag
-                .chars()
-                .next()
-                .is_some_and(|c| c.is_alphanumeric() || c == '`')
-        {
-            cites.push(Cite {
-                file: file.to_string(),
-                line: line_of(at_line),
-                path: None,
-                frag,
-            });
-        }
+        let bare = !in_span && opens_heading(&frag);
+        out.push(Site {
+            at,
+            frag,
+            path,
+            link,
+            bare,
+        });
     }
-    out.extend(cites);
-    para.clear();
+    out
+}
+
+pub(crate) fn opens_heading(frag: &str) -> bool {
+    frag.chars()
+        .next()
+        .is_some_and(|c| c.is_alphanumeric() || c == '`')
 }
 
 fn back_space(b: &[u8], mut k: usize) -> usize {

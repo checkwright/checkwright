@@ -19,7 +19,7 @@ So the deployment probe is *monitoring*, not a gate: it ships as `templates/site
 
 ## Layout and configuration
 
-The kit is vendored beside gate-sdk (conventionally at `site-kit/`); its gate is registered in the consumer's `gates.list` by name and resolves through gate-sdk's multi-kit path. `check-docs-cname-parity` registers where a docs site with a gated host exists; a consumer without one simply omits it. `check-docs-highlight-coverage` registers anywhere, because it is disarmed until `SITE_KIT_HIGHLIGHT_TOKENS` names a snapshot, and a site whose layout restyles code highlighting arms it. `check-docs-liquid-parse` registers where a docs site is built by Jekyll, and a consumer whose host runs no Liquid omits it.
+The kit is vendored beside gate-sdk (conventionally at `site-kit/`); its gate is registered in the consumer's `gates.list` by name and resolves through gate-sdk's multi-kit path. `check-docs-cname-parity` registers where a docs site with a gated host exists; a consumer without one simply omits it. `check-docs-highlight-coverage` registers anywhere, because it is disarmed until `SITE_KIT_HIGHLIGHT_TOKENS` names a snapshot, and a site whose layout restyles code highlighting arms it. `check-docs-liquid-parse` registers where a docs site is built by Jekyll, and a consumer whose host runs no Liquid omits it. `check-docs-collapsible` registers where a docs site built by the Pages parser exists, as `check-docs-render-fidelity` does.
 
 Config is a **knob file**: write a `site-config.knobs` in the gates dir (or point `SITE_KIT_KNOB_FILE` elsewhere) setting any knob §Knob defaults lists; defaults fill what the file leaves unset. The grammar, the `.local` overlay, the environment-over-file precedence for a scalar, and the refusals — a set `SITE_KIT_KNOB_FILE` that does not exist, a left-behind `site-config.sh`, a non-empty file named by the retired `SITE_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob file's.
 
@@ -33,7 +33,7 @@ site-kit's knobs are **static**: the binary resolves them in process from its ow
 - `SITE_KIT_ALIASES` — array, default empty: every reachable host that is *not* the cited docs host and must therefore never appear in a `://` URL in the tree. Rule content by nature, so it is consumer config — a kit literal carrying it would publish a project's host names across the provenance seam.
 - `SITE_KIT_SCAN_ROOT` — the `git ls-files` root the gate walks, default `.`.
 - `SITE_KIT_EXEMPT_PATHS` — array of path globs skipped during the scan, default `("*/gate-tests/*" "*docs/posts/*")`: fixture trees deliberately cite aliases, and dated posts are immutable published artifacts.
-- `SITE_KIT_DOCS_DIR` — the docs-site root `check-docs-render-fidelity` walks for tracked markdown pages and `check-docs-liquid-parse` walks for the files Liquid runs over, default `docs`.
+- `SITE_KIT_DOCS_DIR` — the docs-site root `check-docs-render-fidelity` and `check-docs-collapsible` walk for tracked markdown pages and `check-docs-liquid-parse` walks for the files Liquid runs over, default `docs`.
 - `SITE_KIT_HIGHLIGHT_TOKENS` — the tracked snapshot of the token classes the site theme's highlight CSS colours, default empty, which disarms `check-docs-highlight-coverage`. Which theme a site uses and which classes it colours is one project's content, so the list is consumer config.
 - `SITE_KIT_HIGHLIGHT_OVERRIDES` — array of pathspecs listing the tracked files whose CSS overrides the theme, default `("docs/_layouts/*.html")`.
 - `SITE_KIT_HIGHLIGHT_SCOPE` — the selector the theme scopes its highlight classes under, default `.highlight`.
@@ -129,6 +129,22 @@ The good/bad pair carries the three classes, a raw-wrapped workflow expression, 
 - **Version fidelity.** The default parses with whichever `liquid` the host resolves. §check-docs-render-fidelity's exact-pin recipe applies unchanged — a `bundle exec` form whose lock pins `liquid` to the version the `github-pages` gem resolves — and the kit does not fetch the pin at gate time, for the hermetic-oracle reason that section gives.
 - **Over-reading.** A file `_config.yml` excludes, or a post Jekyll would not render, is still read; a finding there is a false red, cleared by the same raw block.
 - **Other markdown extensions.** A front-matter-less page with a markdown extension other than `.md` is not read.
+
+## check-docs-collapsible
+
+`checks/check-docs-collapsible.gate` (`precommit`, binary-dispatched, `install: on-surface`), its rule in `native/src/gates/docs_collapsible.rs`. Invariant: every collapsible region on a tracked page under `SITE_KIT_DOCS_DIR` renders its body as markdown, names what it holds, and hides no heading.
+
+- **Corpus:** §check-docs-render-fidelity's page set, the same `git ls-files` enumeration with underscore-prefixed segments excluded.
+- **A region** opens at a line whose first non-blank text is `<details` and closes at a `</details>`, counted by depth so a nested region is its own region. Fenced blocks, HTML comments and the front-matter block are skipped.
+- **Assertions**, one finding each:
+  - the opening tag carries `markdown="1"` or `markdown="block"`, since without it the Pages parser passes the body through raw;
+  - a `<summary>` element with non-empty text follows the opening tag on its own line or on the next non-blank line;
+  - no ATX or setext heading sits inside the region, since a heading a link targets must not be hidden;
+  - every region closes before the page ends.
+
+**Red** names the page, the opening line and the assertion; the `help:` line names the region's form. **Clean** counts pages and regions; a page with none is clean. **Exit 2:** not a git repository, a docs dir not found, or an unreadable page, in that order, the refusal order §check-docs-render-fidelity states. **No valve:** a raw body and an unlabelled region have no legitimate case, and a region that must hold a heading is a section to leave open. **No renderer** is needed; the check reads source only, so it runs where Ruby is absent.
+
+**Honest limit:** the gate holds the form, not the choice. Whether a region hides the primary path is review's.
 
 ## check-docs-highlight-coverage
 

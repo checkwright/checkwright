@@ -13,6 +13,7 @@ pub mod agent_tier_explicit;
 pub mod assertion_strength;
 pub mod audit_roster;
 pub mod brevity;
+pub mod citation_link;
 pub mod close_surfaces;
 pub mod comment_tier;
 pub mod commit_subject;
@@ -47,6 +48,7 @@ pub mod commit_msg;
 pub mod docs_link_convention;
 pub mod docs_kit_parity;
 pub mod docs_mirror_fresh;
+pub mod docs_collapsible;
 pub mod docs_render_fidelity;
 pub mod docs_nav_reachable;
 pub mod enforcement_fresh;
@@ -633,6 +635,19 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "CANON_KIT_PAGE_REPEAT_PAGES",
             "CANON_KIT_PAGE_REPEAT_MIN_WORDS",
+        ],
+        "canon-kit",
+        &[],
+    ),
+    // spec: canon-kit/SPEC.md §check-citation-link — the page corpus is the knob's glob walk
+    (
+        "check-citation-link",
+        citation_link::run,
+        &[(".", "glob:knob:CANON_KIT_CITATION_LINK_PAGES", "", "")],
+        &[
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+            "CANON_KIT_CITATION_LINK_PAGES",
         ],
         "canon-kit",
         &[],
@@ -2117,6 +2132,18 @@ pub const REGISTRY: &[GateEntry] = &[
             ("?", "SITE_KIT_RENDERER_BATCH"),
             ("?", "SITE_KIT_RENDERER"),
         ],
+    ),
+    (
+        "check-docs-collapsible",
+        docs_collapsible::run,
+        &[],
+        &[
+            "SITE_KIT_DOCS_DIR",
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+        ],
+        "site-kit",
+        &[("git", "")],
     ),
     (
         "check-docs-liquid-parse",

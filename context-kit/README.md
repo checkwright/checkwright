@@ -4,7 +4,7 @@ Token-economics-aware context management for stateless agent sessions: an index-
 
 Why: a stateless session pays for context twice. The *on-demand* cost is opening a whole SPEC or source file when one section was needed — the index tools cut that ("index, then read the one you need"). The *standing* cost is the always-loaded surface (the instructions file, the session-start hook output) where every added line is a recurring per-session tax that grows silently, because no single session sees the trend — the meter, the gate, and the close-stage pass make that growth visible and actionable. See [SPEC.md](SPEC.md) for the full contracts.
 
-This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is gate-sdk/SPEC.md §Consumer payload.
+This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is [gate-sdk/SPEC.md §Consumer payload](https://github.com/checkwright/checkwright/blob/master/gate-sdk/SPEC.md#consumer-payload).
 
 ## Install
 
@@ -23,7 +23,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required); the meter's default h
    ```
    <!-- gate-roster:end -->
 
-   They resolve through gate-sdk's registry path (your gates dir first, then each kit's `checks/`), and their `# graph:` manifests put them in the generated pre-commit hook, which `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names writes. Three of them wait on a step of yours: `check-settings-pins` skips clean until you create `settings-pins.conf` naming the settings keys to hold, such as the auto-memory-disabling ones (SPEC.md §check-settings-pins); `check-footprint-fresh` is for when you publish the footprint page; and `check-surface-ratchet` arms once you commit the ceilings `--emit always-loaded --ceiling` stamps (SPEC.md §The surface ratchet).
+   They resolve through gate-sdk's registry path (your gates dir first, then each kit's `checks/`), and their `# graph:` manifests put them in the generated pre-commit hook, which `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names writes. Three of them wait on a step of yours: `check-settings-pins` skips clean until you create `settings-pins.conf` naming the settings keys to hold, such as the auto-memory-disabling ones ([SPEC.md §check-settings-pins](SPEC.md#check-settings-pins)); `check-footprint-fresh` is for when you publish the footprint page; and `check-surface-ratchet` arms once you commit the ceilings `--emit always-loaded --ceiling` stamps ([SPEC.md §The surface ratchet](SPEC.md#the-surface-ratchet)).
 
 2. Wire the session-start hook — copy `templates/session-context.sh` into your gates dir, edit its `[EDIT ME]` sections (layout judgment, not mechanism), and merge `templates/settings-sessionstart.json` into `.claude/settings.json`.
 

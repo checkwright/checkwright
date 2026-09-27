@@ -372,6 +372,10 @@ if staged_matches '*docs/*.md' '*docs/*/index.md' '*docs/posts/*.md' 'scripts/ga
     run_gate check-docs-render-fidelity native/target/release/checkwright-gates check-docs-render-fidelity
 fi
 
+if staged_matches '*docs/*.md' '*docs/*/index.md' '*docs/posts/*.md' 'scripts/gate-sdk-config.knobs' 'scripts/site-config.knobs' 'native/src/gates/docs_collapsible.rs' 'native/src/gates/docs_render_fidelity.rs' 'native/src/fresh.rs' 'native/src/programs.rs' 'native/src/spec.rs'; then
+    run_gate check-docs-collapsible native/target/release/checkwright-gates check-docs-collapsible
+fi
+
 if staged_matches '*docs/*.md' '*docs/*/index.md' '*docs/posts/*.md' '*docs/_layouts/*' '*docs/_includes/*' '*docs/_posts/*' 'scripts/gate-sdk-config.knobs' 'scripts/site-config.knobs' 'native/src/gates/docs_liquid_parse.rs' 'native/src/gates/docs_render_fidelity.rs' 'native/src/fresh.rs' 'native/src/programs.rs'; then
     run_gate check-docs-liquid-parse native/target/release/checkwright-gates check-docs-liquid-parse
 fi
@@ -386,6 +390,10 @@ fi
 
 if staged_matches '*docs/*.md' '*docs/*/index.md' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/docs_page_repeat.rs' 'native/src/gates/md_refs.rs' 'native/src/spec.rs'; then
     run_gate check-docs-page-repeat native/target/release/checkwright-gates check-docs-page-repeat
+fi
+
+if staged_matches '*docs/*.md' '*docs/*/index.md' '*/README.md' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/citation_link.rs' 'native/src/gates/spec_pointer.rs' 'native/src/spec.rs'; then
+    run_gate check-citation-link native/target/release/checkwright-gates check-citation-link
 fi
 
 if staged_matches '*SPEC*.md' '*README.md' '*CLAUDE.md' '*scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' '*CLAUDE.md' '*README.md' '*CONTRIBUTING.md' '*CODE_OF_CONDUCT.md' '*SECURITY.md' '*RELEASING.md' '*ROADMAP.md' '*TRAJECTORY.md' '*/SPEC.md' '*/README.md' '*reserve/*/README.md' '*doctrine-kit/DOCTRINE.md' '*docs/*.md' '*docs/*/index.md' '*docs/posts/*.md' '*/templates/*.md' '*.claude/agents/*.md' '*SPEC.md' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/fence_command_head.rs' 'native/src/bashscan.rs' 'native/src/programs.rs' 'native/src/spec.rs'; then

@@ -15,16 +15,16 @@ A **gate** is a small program checking one invariant across one or more governed
 - `bin/run-gates.sh` — the aggregate battery: every gate in your `gates.list`, one shot, per-gate timings. Two selectors narrow it without losing the knob files or the output contract: `--only <name>...` runs the gates you name (in registry order; an unregistered name is a refusal), and `--for <path>...` runs the gates coupling to the paths you name, exactly as the generated hook would. On a native-Windows host with no bash on `PATH`, its PowerShell twin `bin/run-gates.ps1` takes the same arguments.
 - the `--run-gate-tests` arm — the golden-fixture runner: every gate proves it accepts a `good/` case and rejects a `bad/` case with the right error text.
 - the `--run-consumer-smoke` arm — the end-to-end check no fixture makes: builds a fresh scratch consumer, runs each vendored kit's `smoke/` installer, and asserts the battery is green under zero config (then red on each kit's crafted violation). Each kit ships a `smoke/` directory to join the party.
-- the `--emit git-hooks` and `--install-hooks` arms — the `pre-commit` and `commit-msg` hooks *generated* from per-gate `# graph:` coupling manifests (`tier=precommit` vs `tier=commit-msg`); adding a gate to a hook is manifest-only, so hook membership cannot drift. A manifest's trigger reach is read with `--for`, never off the field ([SPEC.md](SPEC.md) §Reading a `couples=` field's reach).
+- the `--emit git-hooks` and `--install-hooks` arms — the `pre-commit` and `commit-msg` hooks *generated* from per-gate `# graph:` coupling manifests (`tier=precommit` vs `tier=commit-msg`); adding a gate to a hook is manifest-only, so hook membership cannot drift. A manifest's trigger reach is read with `--for`, never off the field ([SPEC.md §Reading a `couples=` field's reach](SPEC.md#reading-a-couples-fields-reach)).
 - `bin/build-native.sh` — the one spelling of the crate build for the binary substrate: resolves the crate from `GATE_SDK_NATIVE_CRATE`, passes trailing arguments to cargo (so a per-target build reuses it), and returns cargo's own exit code. Every reader of that command cites this script rather than copying it.
 - `checks/` — the meta-gates that hold the family to its own standard: ShellCheck self-lint, the output contract, the fail-closed contract, fixture coverage, SPEC↔code assertion coupling, exemption-list hygiene, and manifest / hook / graph-artifact freshness (`check-graph`).
 - `templates/check-skeleton.sh` — the copy-paste skeleton a new gate starts from; `templates/gates-workflow.yml` — the CI workflow a consumer copies to `.github/workflows/gates.yml`.
 
-Enforcement runs in three concentric tiers, each an outer backstop for the one inside it: the generated `pre-commit` hook, the local and bypassable inner tier; `run-gates.sh`'s pre-push full battery, whole-tree before the work leaves the machine; and the CI workflow, the server-side backstop that catches a `--no-verify` or a clone that never opted in. Only CI is a guarantee — see SPEC.md §Enforcement tiers for the full definition, including the deferred hosted-attestation rung beyond these three (so CI cannot be edited away in the same change) that is out of scope here.
+Enforcement runs in three concentric tiers, each an outer backstop for the one inside it: the generated `pre-commit` hook, the local and bypassable inner tier; `run-gates.sh`'s pre-push full battery, whole-tree before the work leaves the machine; and the CI workflow, the server-side backstop that catches a `--no-verify` or a clone that never opted in. Only CI is a guarantee — see [SPEC.md §Enforcement tiers](SPEC.md#enforcement-tiers) for the full definition, including the deferred hosted-attestation rung beyond these three (so CI cannot be edited away in the same change) that is out of scope here.
 
 The design contracts, the manifest grammar, and each component's full contract live in [SPEC.md](SPEC.md).
 
-This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is SPEC.md §Consumer payload.
+This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is [SPEC.md §Consumer payload](SPEC.md#consumer-payload).
 
 ## Quick start
 
@@ -118,7 +118,7 @@ check-template-registry-parity
 
 ## Requirements
 
-The toolchain contract is the table in `docs/install.md` §Requirements, with the contributor's rows in `CONTRIBUTING.md`: the roster and each pinned floor. The constructs that force each floor are installer/SPEC.md §Requirements'. `check-install-toolchain` holds both tables to `native/src/toolfloor.rs`, the roster's owner, so the requirement has one statement and no copy.
+The toolchain contract is the table in [`docs/install.md` §Requirements](https://github.com/checkwright/checkwright/blob/master/docs/install.md#requirements), with the contributor's rows in `CONTRIBUTING.md`: the roster and each pinned floor. The constructs that force each floor are [installer/SPEC.md §Requirements](https://github.com/checkwright/checkwright/blob/master/installer/SPEC.md#requirements)'. `check-install-toolchain` holds both tables to `native/src/toolfloor.rs`, the roster's owner, so the requirement has one statement and no copy.
 
 ## License
 

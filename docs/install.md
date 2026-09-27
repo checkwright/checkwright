@@ -75,17 +75,17 @@ There is no supported path today: a compiled gate is a subcommand of the publish
 
 <!-- install-primary: tarball -->
 
-Run the one line for your system from your repository's root, in a new project or an existing one with every change committed: `init` makes one commit and refuses a dirty worktree. The line downloads the newest Release tarball, checks it against its published digest, unpacks it outside your repository and runs `init`, with no runtime to install first. A step-by-step form sits under each line. For it, pick a version from the [releases](https://github.com/checkwright/checkwright/releases) page and put it in place of `X.Y.Z` on its first line. With Node, `npx checkwright init` does the same (§With Node).
+Run the one line for your system from your repository's root, in a new project or an existing one with every change committed: `init` makes one commit and refuses a dirty worktree. The line downloads the newest Release tarball, checks it against its published digest, unpacks it outside your repository and runs `init`, with no runtime to install first. A step-by-step form sits under each line. For it, pick a version from the [releases](https://github.com/checkwright/checkwright/releases) page and put it in place of `X.Y.Z` on its first line. With Node, `npx checkwright init` does the same ([With Node](#with-node)).
 
 ### Try it first
 
-`demo` in place of `init` runs the whole arc in a scratch repository of its own and removes it, without touching yours: it installs the `full` profile, runs the battery green, commits a task marked done with no evidence behind it and shows the claim caught, then withdraws the claim and runs green again. Its spellings are `sh -s -- demo` on the macOS and Linux line or the script-block form with `demo` on Windows; with Node, `npx checkwright demo`. `full` owes `bash` 4.3 or later (§Requirements). On stock macOS run the Homebrew bash block below first; on Windows, the `PATH` block.
+`demo` in place of `init` runs the whole arc in a scratch repository of its own and removes it, without touching yours: it installs the `full` profile, runs the battery green, commits a task marked done with no evidence behind it and shows the claim caught, then withdraws the claim and runs green again. Its spellings are `sh -s -- demo` on the macOS and Linux line or the script-block form with `demo` on Windows; with Node, `npx checkwright demo`. `full` owes `bash` 4.3 or later ([Requirements](#requirements)). On stock macOS run the Homebrew bash block below first; on Windows, the `PATH` block.
 
 ### macOS and Linux
 
-**You need** the tools §Requirements lists for installing on Linux and macOS.
+**You need** the tools Requirements lists for installing on Linux and macOS.
 
-On macOS, stock bash is 3.2, below the floor. If your profile owes `bash` (§Requirements), run this block, which installs Homebrew's bash and puts it first on your `PATH`, now and in `~/.zprofile`. If your login shell is bash, use `~/.bash_profile` instead. The floor's grounds are in [installer/SPEC.md](installer/SPEC.md#requirements) and context-kit's [env-probe](context-kit/SPEC.md#binenv-probe).
+On macOS, stock bash is 3.2, below the floor. If your profile owes `bash` (Requirements), run this block, which installs Homebrew's bash and puts it first on your `PATH`, now and in `~/.zprofile`. If your login shell is bash, use `~/.bash_profile` instead. The floor's grounds are in [installer/SPEC.md](installer/SPEC.md#requirements) and context-kit's [env-probe](context-kit/SPEC.md#binenv-probe).
 
 <!-- macos-remedy:begin -->
 
@@ -138,7 +138,7 @@ To uninstall, `sh "$cw/package/bin/checkwright.sh" uninstall` reverses it in one
 
 ### Windows
 
-**You need** the tools §Requirements lists for installing on Windows, where the minimum Windows version is stated too. Git for Windows' bash is also what runs any shell gate you write ([Writing your own shell gates](#writing-your-own-shell-gates)).
+**You need** the tools Requirements lists for installing on Windows, where the minimum Windows version is stated too. Git for Windows' bash is also what runs any shell gate you write ([Writing your own shell gates](#writing-your-own-shell-gates)).
 
 Run this block in PowerShell first. It puts Git's `usr\bin` and `bin` on your `PATH`, for this session and every later one:
 
@@ -194,7 +194,7 @@ Verify as above. To uninstall, run the same last line with `uninstall` in place 
 
 ### With Node
 
-`npx checkwright init` runs the same `init` from the npm package, and it carries a build attestation the tarball cannot ([installer/SPEC.md](installer/SPEC.md#the-dependency-boundary)). `init` verifies the gate binary with `sha256sum` or `shasum`, and refuses without one. It needs Node 8.2 or later (§Requirements).
+`npx checkwright init` runs the same `init` from the npm package, and it carries a build attestation the tarball cannot ([installer/SPEC.md](installer/SPEC.md#the-dependency-boundary)). `init` verifies the gate binary with `sha256sum` or `shasum`, and refuses without one. It needs Node 8.2 or later (Requirements).
 
 ### Choosing a profile
 
@@ -213,7 +213,7 @@ Moving to a profile that contains yours only adds. `init` refuses outside a git 
 
 `checkwright <verb>` below means the one line with `<verb>` as its argument (`sh -s -- <verb>` on macOS and Linux, the script-block form on Windows, since `irm … | iex` takes none), the last line of your install recipe with `<verb>` in place of `init`, or `npx checkwright <verb>`. Each verb answers in its exit status, so a CI step can gate on it.
 
-- `checkwright doctor` checks this machine against §Requirements and reports what is installed.
+- `checkwright doctor` checks this machine against Requirements and reports what is installed.
 - `checkwright diff` lists the vendored files you have changed. Exit `0` means none.
 - `checkwright update` upgrades the install to the version you are running.
 - `checkwright uninstall` reverses the install in one commit.

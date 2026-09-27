@@ -59,6 +59,7 @@ pub const KIT: Kit = Kit {
         Row::indexed("CANON_KIT_RESTATEMENT_PAGES", &[]),
         Row::indexed("CANON_KIT_PAGE_REPEAT_PAGES", &[]),
         Row::scalar("CANON_KIT_PAGE_REPEAT_MIN_WORDS", "8"),
+        Row::indexed("CANON_KIT_CITATION_LINK_PAGES", &[]),
         Row::indexed(
             "CANON_KIT_FENCE_PROGRAMS",
             &[

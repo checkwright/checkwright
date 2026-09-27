@@ -11,9 +11,9 @@ The activation path for **Checkwright**, whose kits are listed in the [kit refer
 
 ## What this package is
 
-A one-shot vendoring installer. It copies pinned kit source out of its own payload into your repository and commits it, then prints the commands that finish the setup. What governs your tree afterwards is committed and auditable: every gate arrives with its declaration and the one-line invariant that declaration carries, its `# spec:` pointer, and its `good/`+`bad/` fixture pair, and a gate whose implementation is compiled arrives as a digest-verified binary rather than as source. The specification section behind each pointer is published rather than packed (gate-sdk/SPEC.md §Consumer payload, which rules that and bounds it).
+A one-shot vendoring installer. It copies pinned kit source out of its own payload into your repository and commits it, then prints the commands that finish the setup. What governs your tree afterwards is committed and auditable: every gate arrives with its declaration and the one-line invariant that declaration carries, its `# spec:` pointer, and its `good/`+`bad/` fixture pair, and a gate whose implementation is compiled arrives as a digest-verified binary rather than as source. The specification section behind each pointer is published rather than packed ([gate-sdk/SPEC.md §Consumer payload](https://github.com/checkwright/checkwright/blob/master/gate-sdk/SPEC.md#consumer-payload), which rules that and bounds it).
 
-What it is not: a dependency channel. Nothing resolves at your build time and the installer writes no dependency reference, no registry lockfile entry and no install-time lifecycle script — the contract and what it costs are `installer/SPEC.md` §The dependency boundary.
+What it is not: a dependency channel. Nothing resolves at your build time and the installer writes no dependency reference, no registry lockfile entry and no install-time lifecycle script — the contract and what it costs are [`installer/SPEC.md` §The dependency boundary](SPEC.md#the-dependency-boundary).
 
 ## Before you run it
 
@@ -25,9 +25,9 @@ The toolchain the battery *does* assert, with its version floors, is on the inst
 
 From your repository's root, in a new project or an existing one with every change committed, run the one line for your system on the install page: [macOS and Linux](https://checkwright.dev/install.html#macos-and-linux) or [Windows](https://checkwright.dev/install.html#windows). The Release tarball recipe below it is the step-by-step alternative. Either unpacks outside the repository, because `init` refuses a worktree that is not clean.
 
-With Node already present the same install is one command, `npx checkwright init` — same payload, same `init`, same `checkwright.lock`; only the fetch differs. `npx checkwright init --profile prose` picks a profile (§Choosing a profile below), and `npx checkwright demo` shows the adoption arc in a scratch repository first, without touching yours ([what it runs](https://checkwright.dev/install.html#install)).
+With Node already present the same install is one command, `npx checkwright init` — same payload, same `init`, same `checkwright.lock`; only the fetch differs. `npx checkwright init --profile prose` picks a profile ([Choosing a profile](#choosing-a-profile) below), and `npx checkwright demo` shows the adoption arc in a scratch repository first, without touching yours ([what it runs](https://checkwright.dev/install.html#install)).
 
-`init` vendors the selected profile's kit directories, writes a `gates.list` seeded with each kit's starting gates alongside the config seam those kits need and a CI workflow, and makes **one commit** naming the profile and the version. It ends by printing the commands that finish the setup, each with its reason — deliberately not copied here, because what `init` prints is `init`'s to say (`installer/SPEC.md` §init).
+`init` vendors the selected profile's kit directories, writes a `gates.list` seeded with each kit's starting gates alongside the config seam those kits need and a CI workflow, and makes **one commit** naming the profile and the version. It ends by printing the commands that finish the setup, each with its reason — deliberately not copied here, because what `init` prints is `init`'s to say ([`installer/SPEC.md` §init](SPEC.md#init)).
 
 Re-running is idempotent and non-destructive. `init` reads the per-file hash `checkwright.lock` recorded: a file still at its recorded hash is rewritten, and one you have changed since is **reported rather than overwritten** unless you pass `--force`. `--dry-run` prints the file plan and the manifest and writes nothing.
 

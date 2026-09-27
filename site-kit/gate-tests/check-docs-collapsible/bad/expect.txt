@@ -1,0 +1,4 @@
+docs/regions.md:3: region opens without markdown="1"
+docs/regions.md:9: region carries no <summary>
+docs/regions.md:14: region hides a heading
+docs/regions.md:20: region is never closed

@@ -14,6 +14,7 @@ check-amendment-retired-spelling
 check-spec-dod-singleton
 check-spec-derivable-section
 check-spec-embedded-source
+check-citation-link
 check-comment-tier
 check-deprecation-task
 check-docs-cmd

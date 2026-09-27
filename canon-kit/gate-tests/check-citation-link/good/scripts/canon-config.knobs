@@ -1,0 +1,2 @@
+# spec: canon-kit/SPEC.md §check-citation-link — fixture consumer config: every page under site/ is declared
+CANON_KIT_CITATION_LINK_PAGES[] = site/*.md

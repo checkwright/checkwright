@@ -18,7 +18,7 @@ One queue entry pairs it: [companion-toolkit-profile](TASK-QUEUE.md#companion-to
 - **The extension installs its own release.** Its install command runs the one-line install with `CHECKWRIGHT_VERSION` set to the version its `extension.yml` carries, so a listing installs the kits it was tested with.
 - **The version is stamped at pack time.** The tracked `extension.yml` carries `version: "0.0.0"`, as `installer/package.json` does, and the pack step writes the tag's version into the packed copy. A tracked version would be a second version line to bump by hand.
 - **The toolkits' own tools are oracles, run locally at build and on every push.** A gates-workflow job installs the pinned Spec Kit CLI, then installs the packed extension through the archive path a catalog install takes. The same job validates the OpenSpec fixture with the pinned OpenSpec CLI. The entry's oracle is the build session's local run of the same commands. The job's first green is read by the closing push's watch, so no push beyond the entry's recorded push need is spent.
-- **The front door's `README.md` is this unit's to convert.** Its citations become links and it joins `CANON_KIT_CITATION_LINK_PAGES` here, as [docs-ux-authoring-rules](TASK-QUEUE.md#docs-ux-authoring-rules) states.
+- **The front door's `README.md` is this unit's to convert.** Its citations become links and it joins `CANON_KIT_CITATION_LINK_PAGES` here, as `docs-ux-authoring-rules` states.
 
 **Refused.**
 
@@ -154,7 +154,7 @@ The build session runs the same three steps locally before the entry moves, with
 
 ### (9) The landing pages {design-bearing}
 
-**Not yet applied.** Its act depends on whether [docs-ux-authoring-rules](TASK-QUEUE.md#docs-ux-authoring-rules) has landed its delta 2 (the citation gate and its knob) when this delta lands:
+**Not yet applied.** Its act depends on whether `docs-ux-authoring-rules` has landed its delta 2 (the citation gate and its knob) when this delta lands:
 
 - **It has:** write and polish every page below under its rules and gates, and add `README.md` to `CANON_KIT_CITATION_LINK_PAGES` in `scripts/canon-config.knobs`.
 - **It has not:** write every page below to the rules as that amendment states them, and leave the binding to it. Its delta 4 then adds `README.md`, since the front door is already converted.

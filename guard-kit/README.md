@@ -4,7 +4,7 @@ Permission-friction reduction for coding-agent sessions. A `PreToolUse` guard de
 
 Why: a command no allowlist entry matches is decided **out of band** — by interrupting a human, or by a model asked to judge the call — and that decision is invisible to the agent either way, so it cannot notice, count, or fix the friction it causes. The cost is paid per call, out of the operator's attention or out of latency and tokens, and compounds as the command surface grows. The kit closes the loop by making the fall-through set — exactly the commands nothing granted — the one thing that *is* recorded. See [SPEC.md](SPEC.md) for the framework, the generic ruleset, what the steering buys, and the triage criterion.
 
-This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is gate-sdk/SPEC.md §Consumer payload.
+This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is [gate-sdk/SPEC.md §Consumer payload](https://github.com/checkwright/checkwright/blob/master/gate-sdk/SPEC.md#consumer-payload).
 
 Most of what guard-kit ships is not a gate: its surfaces are hook members of the gate binary and templates. It registers exactly one, which holds the door binding its own steer messages and its settings templates depend on — and, over the surfaces `GUARD_KIT_DOOR_ROOTS` names, holds a door on your own pages to a declared audience.
 
@@ -30,17 +30,17 @@ Vendor the kit beside [gate-sdk](../gate-sdk/), then:
 
    No guard script is copied: the shell guard, the optional wakeup-guard and escalation-guard are binary arms, wired by pointing a hook's `command` field at `bash gate-sdk/bin/run-gates.sh --hook shell-guard` (or `--hook wakeup-guard`, `--hook escalation-guard`). Where the binary is absent the front end fails open and the guard steers nothing.
 
-   Your project's own block/steer/allow rules are a command you write, named by `GUARD_KIT_CONSUMER_RULES_CMD` in `guard-config.knobs`: the shell guard runs it before the generic ruleset, on the harness's own hook protocol, and `--guard-json` on the gate binary is its toolkit (guard-kit/SPEC.md §Consumer rules).
+   Your project's own block/steer/allow rules are a command you write, named by `GUARD_KIT_CONSUMER_RULES_CMD` in `guard-config.knobs`: the shell guard runs it before the generic ruleset, on the harness's own hook protocol, and `--guard-json` on the gate binary is its toolkit ([guard-kit/SPEC.md §Consumer rules](SPEC.md#consumer-rules)).
 
 2. Wire the hooks — merge `templates/settings-hooks.json` into `.claude/settings.json` (the `shell-guard` on `PreToolUse(Bash|PowerShell)`; the optional `wakeup-guard` on `ScheduleWakeup|CronCreate`; and an optional third block showing the path-shaped shape a consumer kit's own guard registers under — lifecycle-kit's `workflow-state-guard` is the shipped instance).
 
-   Then review `templates/settings-allow.json` against guard-kit/SPEC.md §The recommended allowlist, and union the entries you accept into `.claude/settings.json`'s `permissions.allow`.
+   Then review `templates/settings-allow.json` against [guard-kit/SPEC.md §The recommended allowlist](SPEC.md#the-recommended-allowlist), and union the entries you accept into `.claude/settings.json`'s `permissions.allow`.
 
 3. Gitignore the two scratch logs (`.workflow/prompt-friction.log`, `.workflow/wakeup-attempts.log`) and their drain companions (`.workflow/*.drain`, `.workflow/*.drain.part`) — both logs are per-iteration, drained at close.
 
 4. Splice `templates/close-triage.md` into your close-stage skill (it fills lifecycle-kit's `housekeeping` slot, close step 4).
 
-Configuration is a knob file — override any knob in `guard-config.knobs`, one `NAME = value`, `NAME[] = element` or `NAME[key] = value` line each (gate-sdk/SPEC.md §The knob file). `--emit knob-roster` on the gate binary `GATE_SDK_NATIVE_BIN` names prints every default, and guard-kit/SPEC.md §Layout and configuration owns each. Defaults are this repo's layout; a knob whose contents are your project's vocabulary defaults to empty. Drop a tool from `GUARD_KIT_SEARCH_TOOLS` when your harness build does not carry it, so the `find` and `git grep` steers never name a tool that is not there. A member you add to `GUARD_KIT_RO_BINS` also takes a `GUARD_KIT_RO_FORMS` declaration of its write and execute forms (guard-kit/SPEC.md §The generic ruleset, rule `ro_pipeline`), or the read-only pipeline grant withholds it.
+Configuration is a knob file — override any knob in `guard-config.knobs`, one `NAME = value`, `NAME[] = element` or `NAME[key] = value` line each ([gate-sdk/SPEC.md §The knob file](https://github.com/checkwright/checkwright/blob/master/gate-sdk/SPEC.md#the-knob-file)). `--emit knob-roster` on the gate binary `GATE_SDK_NATIVE_BIN` names prints every default, and [guard-kit/SPEC.md §Layout and configuration](SPEC.md#layout-and-configuration) owns each. Defaults are this repo's layout; a knob whose contents are your project's vocabulary defaults to empty. Drop a tool from `GUARD_KIT_SEARCH_TOOLS` when your harness build does not carry it, so the `find` and `git grep` steers never name a tool that is not there. A member you add to `GUARD_KIT_RO_BINS` also takes a `GUARD_KIT_RO_FORMS` declaration of its write and execute forms ([guard-kit/SPEC.md §The generic ruleset](SPEC.md#the-generic-ruleset), rule `ro_pipeline`), or the read-only pipeline grant withholds it.
 
 ## Use
 

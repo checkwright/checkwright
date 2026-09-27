@@ -22,20 +22,6 @@ the lead template's capture rule (lifecycle-kit/templates/lead.md §Stamps are a
 
 **Cost while deferred:** a lead can destroy a live stage's evidence on a description nobody checked. Filed 2026-09-26 to the gap inbox by the lead on its own error; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because the rule widens a shipped template's contract and its scope is a design call. Re-verified at the drain: the removal is recorded in both the validate and lead journals.
 
-### docs-ux-authoring-rules
-
-[spec: SPEC-docs-ux.md]
-
-the site has no authoring rules for page and section naming, citation form or collapsible regions, so its UX improves only when an operator notices a page. The standing direction, operator direction 2026-09-27 (lead session, verbatim): "we should continue enhancing documentation with proper page names, section named, links, collapsable regions, aiming for superb human and LLM UX/UI. We should not be afraid to acknowledge mistakes and redo it the right way." Its first measured instance is citation form: rendered prose cites sections as bare text, such as docs/install.md's "(§With Node)" and TRAJECTORY.md's plain-text SPEC section citations. Links are the chosen form (operator direction, 2026-09-27, lead session) because `check-md-refs` resolves a link's file and anchor. A path-qualified bare citation is resolved by `check-spec-pointer`'s prose-citation pass, but a path-less one only asserts that some governed file carries the heading as a prefix, so a citation aimed at the wrong file passes.
-
-**Deliverable:** page-authoring rules in docs/site-architecture.md for page and section naming, link-form citations and collapsible-region use, each with a gate where one binds, and the § citations on rendered surfaces converted to links. Which surfaces count as rendered, and whether kit SPECs are in range, is scope's.
-
-**Taken for /spec 2026-09-27 at companion-catalog-extension's scope, operator direction lead-relayed (not a /consult ruling), unit set B; range decided at scope:** the hand-authored `docs/` pages and the kit READMEs convert by hand; the kit SPECs are out of range, since their site mirrors are generated. It lands before the companion's landing-page polish.
-
-**Corrected at spec:** the census outside fences is 46 lines on the docs pages (six of them `docs/enforcement.md`'s, already links) and 52 on the twelve READMEs, and 2,129 on the kit SPECs, whose mirror-time link rendering is filed to the gap inbox. The front door's `README.md` converts with [companion-toolkit-profile](#companion-toolkit-profile)'s landing-page polish.
-
-**Cost while deferred:** readers found each cited section by hand, and path-less citations were held to liveness alone. Filed 2026-09-27 to the gap inbox as two bullets by platform-prerequisite-floors' lead (the unlinked citations and the direction's missing home), merged here at its close: →fix fails because the rules are new governed names. Re-verified: `git grep -c '§'` reads seven on docs/install.md; `<details` appears on docs/install.md and docs/site-architecture.md only, and no page-authoring rule governs it. Owner lookup: `unlinked`, `section link`, `cross-ref`, `collaps` in this file — no entry on the subject; owner docs/site-architecture.md and canon-kit/SPEC.md §check-spec-pointer.
-
 ### companion-toolkit-profile
 
 [roadmap: next/ecosystem] [spec: SPEC-companion.md] [precondition-ok: the gated clause binds the submission half, which stays deferred after this slice] [roadmap-summary: Gate a tree whose specs another toolkit's workflow wrote.]
@@ -50,7 +36,7 @@ the interop rung. Govern a tree whose specs an **external spec-authoring toolkit
 
 **First slice (consult, 2026-09-25):** a catalog extension plus a companion recipe for the second toolkit, packaged outside the kits the way `installer/` is.
 
-**Taken for /spec 2026-09-27 at companion-catalog-extension's scope, operator direction lead-relayed (not a /consult ruling), unit set B, split:** the first slice's build half — extension package, recipe, tested consumer, and the pages the catalog entry links to, polished under [docs-ux-authoring-rules](#docs-ux-authoring-rules), which lands first. The submission stays here, gated on a published tag carrying the extension (the catalog installs from a tagged archive, submitted as an issue) and on [design-partner-preview](#design-partner-preview)'s observed install.
+**Taken for /spec 2026-09-27 at companion-catalog-extension's scope, operator direction lead-relayed (not a /consult ruling), unit set B, split:** the first slice's build half — extension package, recipe, tested consumer, and the pages the catalog entry links to, polished under `docs-ux-authoring-rules`, which lands first. The submission stays here, gated on a published tag carrying the extension (the catalog installs from a tagged archive, submitted as an issue) and on [design-partner-preview](#design-partner-preview)'s observed install.
 
 **Settled at spec (2026-09-27), measured on scratch trees with the published prose profile:** each toolkit's recipe is a few lines of existing knobs plus one dropped gate for Spec Kit, so correction (1) held for the prose profile. Correction (3)'s two gates stayed green on both trees. Correction (2), a lifecycle stage machine over a foreign workflow, is outside this slice and stays open here.
 
@@ -1427,5 +1413,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 The consumer's local-only companion files (private brief, ops runbook) have read triggers but no write-back trigger, so shipped-unit forward memory and an out-of-tree state verifier drift until a consult audits them; owed are close and release-sweep template slots for both, and a retired-slug arm over plain code on the local-only globs.
 
 ## Done
+
+- docs-ux-authoring-rules
 
 ## Lessons Learned
