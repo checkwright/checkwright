@@ -70,6 +70,25 @@ pub fn files_under(dir: &Path) -> Result<Vec<String>, String> {
     Ok(out)
 }
 
+// spec: installer/SPEC.md §The manifest — the gate binary's path is owned by the seam file's
+// `GATE_SDK_NATIVE_BIN`, never a stored copy, so every verb asking where the binary is reads it here.
+pub fn seam_binary(root: &std::path::Path, seam: &str) -> Option<String> {
+    if seam.is_empty() {
+        return None;
+    }
+    let text = std::fs::read_to_string(root.join(seam)).ok()?;
+    let rel = crate::knobfile::parse(&text, seam)
+        .ok()?
+        .into_iter()
+        .find(|e| e.name == "GATE_SDK_NATIVE_BIN" && e.form == crate::knobfile::Form::Scalar)?
+        .value;
+    let rel = rel.as_str();
+    if rel.is_empty() || !root.join(rel).is_file() {
+        return None;
+    }
+    Some(rel.to_string())
+}
+
 // spec: installer/SPEC.md §The verbs — every refusal carries the verb's own prefix, an optional
 // `help:` line and an exit status, which is the published idiom rather than a second one.
 #[derive(Debug)]

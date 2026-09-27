@@ -9,7 +9,7 @@ const USAGE: &[&str] = &[
     "",
     "Removes the files init recorded in checkwright.lock and commits the removal.",
     "Nothing outside that roster is touched. A file you have edited since",
-    "init wrote it is kept and reported; --force removes it anyway.",
+    "init wrote it is kept and reported, except the gate binary, which is never yours; --force removes it anyway.",
 ];
 
 struct Flags {
@@ -75,6 +75,26 @@ fn by_top_dir(paths: &[String]) -> Vec<String> {
     out
 }
 
+type Row = (String, String, Option<String>);
+
+// spec: installer/SPEC.md §uninstall — a matching hash is init's to remove, a differing one yours
+// to keep, a path off the tree a no-op, and the gate binary's row removed whatever its hash.
+fn partition(
+    rows: Vec<Row>,
+    artifact: Option<&str>,
+    force: bool,
+) -> (Vec<String>, Vec<(String, String)>, Vec<String>) {
+    let (mut remove, mut keep, mut gone) = (Vec::new(), Vec::new(), Vec::new());
+    for (p, h, now) in rows {
+        match now {
+            None => gone.push(p),
+            Some(now) if force || now == h || artifact == Some(p.as_str()) => remove.push(p),
+            Some(_) => keep.push((p, h)),
+        }
+    }
+    (remove, keep, gone)
+}
+
 fn residual(keep: &[(String, String)]) -> String {
     let mut e = lock::Emit::new();
     for (p, h) in keep {
@@ -135,11 +155,6 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
         .collect();
     let gates_list = manifest.own_file(&format!("{}/gates.list", GATES_DIR));
 
-    // spec: installer/SPEC.md §uninstall — the removal rule is the ownership claim seen from the
-    // other side and needs no new data: a hash that still matches marks a file init's to remove, one
-    // that differs marks yours to keep, and a path already off the tree is a no-op.
-    let (mut remove_set, mut keep, mut gone) = (Vec::new(), Vec::new(), Vec::new());
-    let mut roster: BTreeSet<String> = BTreeSet::new();
     let entries: Vec<(String, String, bool)> = manifest
         .files()
         .into_iter()
@@ -148,6 +163,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
             (p, h, present)
         })
         .collect();
+    let roster: BTreeSet<String> = entries.iter().map(|e| e.0.clone()).collect();
     let present: Vec<_> = if f.force {
         Vec::new()
     } else {
@@ -158,18 +174,26 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
             .collect()
     };
     let mut hashes = lock::hash_all(&present).into_iter();
-    for (p, h, present) in entries {
-        roster.insert(p.clone());
-        if !present {
-            gone.push(p);
-            continue;
-        }
-        if f.force || hashes.next().unwrap_or_default() == h {
-            remove_set.push(p);
-        } else {
-            keep.push((p, h));
-        }
-    }
+    let rows: Vec<Row> = entries
+        .into_iter()
+        .map(|(p, h, present)| {
+            let now = match (present, f.force) {
+                (false, _) => None,
+                (true, true) => Some(String::new()),
+                (true, false) => Some(hashes.next().unwrap_or_default()),
+            };
+            (p, h, now)
+        })
+        .collect();
+    let artifact = if manifest.artifact().0.is_empty() {
+        None
+    } else {
+        super::seam_binary(
+            &root,
+            &manifest.own_file(&format!("{}/gate-sdk-config.knobs", GATES_DIR)),
+        )
+    };
+    let (remove_set, keep, gone) = partition(rows, artifact.as_deref(), f.force);
 
     // spec: installer/SPEC.md §uninstall — the agent file is the one entry that is a span rather
     // than a file, so the branch keeping it still owes the doctrine block a removal: that block is
@@ -434,6 +458,34 @@ mod tests {
         assert_eq!(lines.len(), 2);
         assert!(lines[0].contains("checkwright.lock") && lines[0].ends_with("1 file(s)"));
         assert!(lines[1].contains("gate-sdk/") && lines[1].ends_with("2 file(s)"));
+    }
+
+    fn row(p: &str, recorded: &str, now: Option<&str>) -> Row {
+        (p.to_string(), recorded.to_string(), now.map(String::from))
+    }
+
+    // spec: installer/SPEC.md §uninstall — the gate binary is removed whatever its hash, and the
+    // exemption rests on a resolved artifact path alone: with none, its row meets the hash rule.
+    #[test]
+    fn the_artifact_row_is_removed_whatever_its_hash() {
+        let bin = "scripts/checkwright-gates";
+        let rows = || {
+            vec![
+                row(bin, "aaa", Some("bbb")),
+                row("gate-sdk/edited.sh", "ccc", Some("ddd")),
+                row("gate-sdk/intact.sh", "eee", Some("eee")),
+                row("gate-sdk/gone.sh", "fff", None),
+            ]
+        };
+        let (remove, keep, gone) = partition(rows(), Some(bin), false);
+        assert_eq!(remove, vec![bin.to_string(), "gate-sdk/intact.sh".to_string()]);
+        assert_eq!(keep, vec![("gate-sdk/edited.sh".to_string(), "ccc".to_string())]);
+        assert_eq!(gone, vec!["gate-sdk/gone.sh".to_string()]);
+
+        let (remove, keep, _) = partition(rows(), None, false);
+        assert_eq!(remove, vec!["gate-sdk/intact.sh".to_string()]);
+        assert_eq!(keep.len(), 2);
+        assert_eq!(keep[0].0, bin);
     }
 
     // spec: installer/SPEC.md §The verbs — `--help` answers on its own and an unknown argument is

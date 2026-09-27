@@ -22,18 +22,6 @@ the CI workflow files' comments are ungated by corpus: `comment_surface` in `nat
 
 **Cost while deferred:** every workflow edit adds ungoverned prose to the public demonstration tree. Filed 2026-09-09 on an operator direction to widen and sweep; iceboxed as machinery-class; returned 2026-09-25 by consult as the paradigm of the rule that nothing is exempt as unread by adopters.
 
-### uninstall-artifact-ownership-asymmetry
-
-[spec: SPEC-artifact-ownership.md] [recurrence: 2026-09-25]
-
-installer/SPEC.md §The gate binary says the compiled artifact is never the adopter's, while §uninstall has the verb keep-and-report it on a hash mismatch, and `uninstall.rs` references no artifact at all; the two sections give opposite answers and the verb follows neither cleanly.
-
-**Deliverable:** the amendment's rule that the binary is never the adopter's in any verb: `uninstall` removes its row whatever its hash, the three sections agree, and a unit test and the consumer smoke's seam arm hold it.
-
-**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction lead-relayed (not a /consult ruling):** choosing between the two sections' answers is user-facing semantics. The amendment takes §The gate binary's answer, because a kept binary would be rewritten by the next `init` anyway. It lands before [installer-contract-brevity](#installer-contract-brevity) passes §The gate binary.
-
-**Cost while deferred:** an uninstall leaves the binary or reports it as edited. Filed 2026-08-28; returned from the icebox 2026-09-25 by consult, the two sections re-read.
-
 ### crate-tests-other-triples
 
 [spec: SPEC-crate-tests-unix.md]
@@ -96,7 +84,7 @@ the installer/SPEC.md sections an install reads first: §The dependency boundary
 
 **Deliverable:** the three moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) applied to those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm. A contract sentence stays, including a fact a sibling entry or another SPEC cites there.
 
-**Promoted as debt, split from spec-brevity-residue ahead of its filing order, operator direction 2026-09-27, lead-relayed (not a /consult ruling), at platform-prerequisite-floors's scope:** the moves run under gates that already exist and add no name, and the theme rewrites these sections anyway, so the pass joins without adding a stage. [prerequisite-floor-versions](#prerequisite-floor-versions) and [uninstall-artifact-ownership-asymmetry](#uninstall-artifact-ownership-asymmetry) edit §Requirements and §The gate binary, so they land first and the pass runs over their text.
+**Promoted as debt, split from spec-brevity-residue ahead of its filing order, operator direction 2026-09-27, lead-relayed (not a /consult ruling), at platform-prerequisite-floors's scope:** the moves run under gates that already exist and add no name, and the theme rewrites these sections anyway, so the pass joins without adding a stage. [prerequisite-floor-versions](#prerequisite-floor-versions) and `uninstall-artifact-ownership-asymmetry` edit §Requirements and §The gate binary, so they land first and the pass runs over their text.
 
 **Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-27 at scope from spec-brevity-residue, filed 2026-09-25; the word census is this scope's survey record.
 
@@ -1437,5 +1425,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 The consumer's local-only companion files (private brief, ops runbook) have read triggers but no write-back trigger, so shipped-unit forward memory and an out-of-tree state verifier drift until a consult audits them; owed are close and release-sweep template slots for both, and a retired-slug arm over plain code on the local-only globs.
 
 ## Done
+
+- uninstall-artifact-ownership-asymmetry
 
 ## Lessons Learned

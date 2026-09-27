@@ -386,7 +386,7 @@ pub fn diagnose(selection: Option<&Selection>) -> Report {
             let (target, digest) = manifest.artifact();
             if !target.is_empty() {
                 let seam = manifest.own_file(&format!("{}/gate-sdk-config.knobs", GATES_DIR));
-                let bin = seam_binary(&root, &seam);
+                let bin = super::seam_binary(&root, &seam);
                 // spec: installer/SPEC.md §doctor — an artifact finding reports without setting
                 // the verdict, deliberately: the status is the toolchain contract init gates on, so
                 // failing it here would block the re-run that is this finding's own remedy.
@@ -439,23 +439,6 @@ pub fn diagnose(selection: Option<&Selection>) -> Report {
     }
     out.push_str("\nDOCTOR: clean\n");
     Report { out, err, code: 0 }
-}
-
-fn seam_binary(root: &std::path::Path, seam: &str) -> Option<String> {
-    if seam.is_empty() {
-        return None;
-    }
-    let text = std::fs::read_to_string(root.join(seam)).ok()?;
-    let rel = crate::knobfile::parse(&text, seam)
-        .ok()?
-        .into_iter()
-        .find(|e| e.name == "GATE_SDK_NATIVE_BIN" && e.form == crate::knobfile::Form::Scalar)?
-        .value;
-    let rel = rel.as_str();
-    if rel.is_empty() || !root.join(rel).is_file() {
-        return None;
-    }
-    Some(rel.to_string())
 }
 
 pub fn run(args: &[String]) -> i32 {
