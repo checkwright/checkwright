@@ -10,3 +10,4 @@ companion-catalog-extension align a629528c 2026-09-27 8a4a4471
 companion-catalog-extension build a839fe3f 2026-09-27 22f63ea4
 companion-catalog-extension build aa8a560e 2026-09-27 1f56185f
 companion-catalog-extension build a755bfab 2026-09-27 a617bb1f
+companion-catalog-extension validate a4c1f4ef 2026-09-27 ae56d577
