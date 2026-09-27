@@ -65,6 +65,7 @@
 12217cp docs/posts/2026-08-21-checkwright-v0-24-0.md
 6598cp docs/posts/2026-08-23-checkwright-v0-25-0.md
 229102cp docs/posts/2026-09-26-checkwright-v0-26-0.md
+9813cp docs/posts/2026-09-27-checkwright-v0-27-0.md
 1440cp docs/queue-kit/index.md
 789cp docs/releases.md
 38515cp docs/site-architecture.md
