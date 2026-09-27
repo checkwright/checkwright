@@ -1,4 +1,3 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
-platform-prerequisite-floors release deferred:v0.27.0 — a minor (tightened gates and behavior changes accumulated since v0.26.0, this iteration's musl Linux binary, renamed Linux archives and prerequisite floors among them), held because no release trigger fired: no major (the archive rename is a declared breaking change riding a minor under the pre-1.0 qualifier, and nothing was decommissioned), no security or supply-chain fix, no operator direction, no front-door verb the pinned v0.26.0 lacks, no audience arrival, and the elapsed-time limb is dormant while the channel reads preview
