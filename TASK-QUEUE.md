@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: companion-catalog-extension
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,16 @@
 ## New Features
 
 ## Technical Debt
+
+### lifecycle-template-brevity
+
+lifecycle-kit/SPEC.md's §templates/stages/ and §templates/lead.md, about 7.9k words; §templates/lead.md is six lines of about 2.1k words and opens with a ~900-word sentence. The rest of lifecycle-kit and the other SPECs stay on [spec-brevity-residue](#spec-brevity-residue).
+
+**Deliverable:** the three moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) applied to those two sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm. A contract sentence stays, including a fact a template, a sibling entry or another SPEC cites there.
+
+**Promoted as debt, split from spec-brevity-residue — operator direction 2026-09-27, lead-relayed (not a /consult ruling), unit set B at companion-catalog-extension's scope:** the moves run under gates that already exist and add no name. [lead-writes-during-live-stage](#lead-writes-during-live-stage) edits the lead template's contract in the same set; its amendment lands first and this pass runs on the amended text.
+
+**Cost while deferred:** paid by every stage and lead session that opens either section and every adopter who reads it on the site. Split 2026-09-27 at scope from spec-brevity-residue, filed 2026-09-25; the word census is in this entry's promotion commit.
 
 ## Deferred
 
@@ -186,19 +196,19 @@ first-class support for swapping the Anthropic OAuth credential out from under i
 
 the interop rung. Govern a tree whose specs an **external spec-authoring toolkit produced** — a consumer profile for when the specs Checkwright gates were written by a second toolkit's workflow, not by this one's `spec` stage. It cashes the claim below.
 
-**The design is already decided and is not what this entry holds.** Two rulings on record settle it: `prose-profile` (retired) ruled a profile ships as an adapter delivered as optional consumer config and never as a kit literal, and [heterogeneous-agent-delegation](#heterogeneous-agent-delegation) rules a kit literal naming a vendor crosses the provenance seam outright. So the shape is a consumer-side profile over a declared artifact layout — the `check-graph` / `graph-vocab` pattern — with per-toolkit specifics in consumer config. What is open is the *substance*: which lifecycle assumptions break when the amendment set is authored elsewhere, and whether a tested two-toolkit consumer is buildable without a kit ever naming one.
+**The shape is decided:** `prose-profile` (retired) ruled a profile ships as optional consumer config, never a kit literal, and [heterogeneous-agent-delegation](#heterogeneous-agent-delegation) rules a kit literal naming a vendor crosses the provenance seam. So it is a consumer-side profile over a declared artifact layout, the `check-graph` / `graph-vocab` pattern. Open is the substance: which lifecycle assumptions break when amendments are authored elsewhere.
 
-**Survey run 2026-08-02 at scope — three corrections, so a spec pass starts here.** (1) *Cheaper than filed:* the load-bearing knobs already exist as consumer config (`CANON_KIT_SPEC_NAME`, `_AMENDMENT_GLOB`, `_QUEUE_FILE`, `_DOD_MODE`; `LIFECYCLE_KIT_AMENDMENT_GLOB`, `_CONTRACT_TOKENS`). The work is *proving them sufficient*, not inventing a profile format. (2) *The sharpest break is a silent one:* `check-stage-entry` assertion C reads literal `SPEC.md`/`proto/` substrings inside amendment bodies as its cross-component signal, so a foreign layout makes it **never fire** — the align audit is skipped with no red. An interop consumer is not merely unsupported, it is silently under-gated. `check-spec-pointer` breaks the same way on non-markdown artifacts. (3) *The deepest coupling is process, not config:* `check-spec-derivable-section`/`check-spec-embedded-source` assume the canonical-spec-plus-short-lived-amendment model itself, which a toolkit keeping many living per-feature specs does not fit at any knob setting.
+**Survey 2026-08-02 at scope, three corrections.** (1) The load-bearing knobs exist (`CANON_KIT_SPEC_NAME`, `_AMENDMENT_GLOB`, `_QUEUE_FILE`, `_DOD_MODE`; `LIFECYCLE_KIT_AMENDMENT_GLOB`, `_CONTRACT_TOKENS`): the work is proving them sufficient, not a profile format. (2) `check-stage-entry` assertion C's cross-component signal is `LIFECYCLE_KIT_CONTRACT_TOKENS` (default `SPEC.md`, `proto/`), so a foreign layout left unbound never fires it and skips the align audit with no red; `check-spec-pointer` breaks the same way on non-markdown artifacts. (3) `check-spec-derivable-section`/`check-spec-embedded-source` assume the canonical-spec-plus-amendment model, which many living per-feature specs fit at no knob setting.
 
-**The discharge pattern already exists in-tree.** docs/positioning.md §The tiered compatibility claim says "This is tested, not asserted" and cites context-kit's `--agents-md-smoke` arm. That is the shape the three claims below owe.
+**Discharge pattern:** docs/positioning.md §The tiered compatibility claim is "tested, not asserted" through context-kit's `--agents-md-smoke`. Seam clean: no tracked file names an external spec toolkit. The 2026-09-20 alternative, qualifying the claim instead, is answered by the `catalog-then-plugin` ruling, whose slice is the tested consumer.
 
-**Seam re-verified clean:** no tracked file names an external spec toolkit.
+**First slice (consult, 2026-09-25):** a catalog extension plus a companion recipe for the second toolkit, packaged outside the kits the way `installer/` is.
 
-**The cheap alternative, recorded at the 2026-09-20 scope:** discharge the reputational carry below by qualifying the front-door claim rather than proving it.
+**Taken for /spec 2026-09-27 at companion-catalog-extension's scope, operator direction lead-relayed (not a /consult ruling), unit set B, split:** the first slice's build half — extension package, recipe, tested consumer, and the pages the catalog entry links to, polished under [docs-ux-authoring-rules](#docs-ux-authoring-rules), which lands first. The submission stays here, gated on a published tag carrying the extension (the catalog installs from a tagged archive, submitted as an issue) and on [design-partner-preview](#design-partner-preview)'s observed install.
 
-**First slice, from consult's landscape refresh (2026-09-25):** the leading spec toolkits now carry extension catalogs where deterministic gate extensions are listed and found, and the seat is being filled by small entries inside that distribution. The slice that buys discovery is a catalog extension plus a companion recipe for the second toolkit, packaged outside the kits the way `installer/` is, so no kit literal names a vendor and the seam holds; it is also the tested consumer the front-door claim owes.
+**Push need (2026-09-27, inside the budget):** the release tag push beside the closing push, since the submission needs the extension on a published tag; close's release policy decides the cut.
 
-**Cost while deferred — not zero, and this is the entry's sharpest fact.** `README.md`:16-17 and `docs/index.md`:17-18 both already assert, on the first screen, "It complements the workflow you already run. Keep your spec process, your prompts, your harness." — and docs/orchestration.md, its "It complements your orchestration setup; it does not replace it" sentence, makes the same move for orchestration, a third site found 2026-08-02 at scope. **No queue or roadmap entry backs any of the three with a tested consumer.** Not false — "complements" is far weaker than "integrates with X" — but *published and unproven*, in a project whose whole pitch is that claims are mechanically proven rather than asserted. The carry is reputational and front-door-resident, accruing on every reader rather than with time. Surfaced 2026-08-02 at close, intake pass over the review's unfiled half.
+**Cost while deferred — not zero.** `README.md` points at the claim and docs/index.md asserts on the first screen "It complements the workflow you already run", with docs/orchestration.md making the same move for orchestration; no tested consumer backs any of them. Not false, but published and unproven in a project whose pitch is mechanical proof — a reputational carry on every reader. Surfaced 2026-08-02 at close, intake pass over the review's unfiled half.
 
 ### design-partner-preview
 
@@ -386,11 +396,11 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 [cost: session/high] [surface: lifecycle-kit]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk landed in eight slices, as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity`, `gate-sdk-tooling-brevity` and `gate-sdk-tail-brevity`; then lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted; its contract sections landed as `installer-contract-brevity`), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk landed in eight slices, as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity`, `gate-sdk-tooling-brevity` and `gate-sdk-tail-brevity`; then lifecycle-kit (61k; its §templates/stages/ and §templates/lead.md are [lifecycle-template-brevity](#lifecycle-template-brevity)), installer (48.5k, the smoke excepted; its contract sections landed as `installer-contract-brevity`), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
-**Split nine times, 2026-09-25 to 09-27 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder, porting, native-contracts, runner, meta-gate, tooling and tail slices each left as their own debt entry, all since landed; the ninth, installer's contract sections, left ahead of lifecycle-kit because the platform-prerequisite-floors theme rewrites them.
+**Split ten times, 2026-09-25 to 09-27 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder, porting, native-contracts, runner, meta-gate, tooling and tail slices each left as their own debt entry, all since landed; the ninth, installer's contract sections, left ahead of lifecycle-kit because the platform-prerequisite-floors theme rewrites them; the tenth is lifecycle-kit's template sections.
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
@@ -572,6 +582,8 @@ the lead template's capture rule (lifecycle-kit/templates/lead.md §Stamps are a
 
 **Deliverable:** the lead template bars any lead mutation of the checkout or a linked worktree while a stage session is live, gitignored scratch included, a probe running after the stage or outside the checkout; and it requires a worktree's provenance to be read before it is called stale.
 
+**Taken for /spec 2026-09-27 at companion-catalog-extension's scope, operator direction lead-relayed (not a /consult ruling):** unit set B; its amendment lands before [lifecycle-template-brevity](#lifecycle-template-brevity) passes the lead template's section.
+
 **Cost while deferred:** a lead can destroy a live stage's evidence on a description nobody checked. Filed 2026-09-26 to the gap inbox by the lead on its own error; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because the rule widens a shipped template's contract and its scope is a design call. Re-verified at the drain: the removal is recorded in both the validate and lead journals. The filer's inferred cause, that the probe worktree reddened validate's first upgrade suite, did not reproduce: `--upgrade-smoke` ran clean with a linked worktree at `.tmp/probe-wt`. The gitignored-scratch clause therefore rests on no attested harm.
 
 **Inferred, not run:** concurrent lead activity in that worktree, rather than its presence, caused the one-off red — `bash gate-sdk/bin/run-gates.sh --upgrade-smoke` while a second session runs the battery inside a linked worktree under `.tmp/`
@@ -667,6 +679,8 @@ shell-guard splits a compounded emitter write out of a compound (rule `emitter_w
 the site has no authoring rules for page and section naming, citation form or collapsible regions, so its UX improves only when an operator notices a page. The standing direction, operator direction 2026-09-27 (lead session, verbatim): "we should continue enhancing documentation with proper page names, section named, links, collapsable regions, aiming for superb human and LLM UX/UI. We should not be afraid to acknowledge mistakes and redo it the right way." Its first measured instance is citation form: rendered prose cites sections as bare text, such as docs/install.md's "(§With Node)" and TRAJECTORY.md's plain-text SPEC section citations. Links are the chosen form (operator direction, 2026-09-27, lead session) because `check-md-refs` resolves a link's file and anchor. A path-qualified bare citation is resolved by `check-spec-pointer`'s prose-citation pass, but a path-less one only asserts that some governed file carries the heading as a prefix, so a citation aimed at the wrong file passes.
 
 **Deliverable:** page-authoring rules in docs/site-architecture.md for page and section naming, link-form citations and collapsible-region use, each with a gate where one binds, and the § citations on rendered surfaces converted to links. Which surfaces count as rendered, and whether kit SPECs are in range, is scope's.
+
+**Taken for /spec 2026-09-27 at companion-catalog-extension's scope, operator direction lead-relayed (not a /consult ruling), unit set B; range decided at scope:** the hand-authored `docs/` pages and the kit READMEs convert by hand (about 50 and 64 `§`-bearing lines); the kit SPECs (about 2,100 lines) are out of range, since their site mirrors are generated and a mirror-time link rendering is a derivation /spec costs or files. It lands before the companion's landing-page polish.
 
 **Cost while deferred:** readers find each cited section by hand, path-less citations stay liveness-gated only, and no gate prompts a redo. Filed 2026-09-27 to the gap inbox as two bullets by platform-prerequisite-floors' lead (the unlinked citations and the direction's missing home), merged here at its close: →fix fails because the rules are new governed names. Re-verified: `git grep -c '§'` reads seven on docs/install.md; `<details` appears on docs/install.md and docs/site-architecture.md only, and no page-authoring rule governs it. Owner lookup: `unlinked`, `section link`, `cross-ref`, `collaps` in this file — no entry on the subject; owner docs/site-architecture.md and canon-kit/SPEC.md §check-spec-pointer.
 

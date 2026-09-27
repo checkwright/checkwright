@@ -4,4 +4,4 @@
 
 ---
 
-— scope a330ad95 2026-09-27 de5bf105
+companion-catalog-extension scope a330ad95 2026-09-27 de5bf105
