@@ -582,9 +582,11 @@ the consult inbox needs a drain trigger and a status cue, on an operator directi
 
 ### gate-output-contributor-door
 
-[cost: event/low] [surface: guard-kit]
+[cost: event/low] [surface: guard-kit] [recurrence: 2026-09-27]
 
 a gate's printed finding or help line reaches an adopter's installed tree, yet about fourteen `println!`/`format!` sites under `native/src/gates/` still name `bash gate-sdk/bin/run-gates.sh` as the command to run (the install-lifecycle and install-doctrine remedies, the roadmap and value-rollup regenerators, the file-gap, file-survey and cite-survey arms, among them); an adopter's door is the binary `GATE_SDK_NATIVE_BIN` names. `check-door-binding` reads kit READMEs, templates, `lib/` and `bin/` and never a compiled gate's strings, so nothing reds.
+
+**Recurred 2026-09-27, observed in a consumer:** in a scratch prose install of v0.26.0, `check-graph`'s red printed its hook and graph regenerators in the bash spelling (`native/src/gates/graph.rs`, three sites), while `./scripts/checkwright-gates --emit git-hooks --write` and `--emit graph` ran there. A starter or prose install owes no bash (installer/SPEC.md §Requirements), and run-gates.sh needs bash 4.3, which stock macOS lacks, so the remedy is unrunnable on such a host, not only misrouted.
 
 **Deliverable:** each site re-pointed at the binary `GATE_SDK_NATIVE_BIN` names, or declared contributor-facing, and a check-door-binding assertion over gate-module output strings holding it.
 
@@ -711,6 +713,130 @@ docs/install.md defines `joined` as "a binary is published for that system", but
 **Deliverable:** the page's definition and the gate's binding reconciled, with a gate that reds a `joined` row or Minimum the pinned release does not serve while the release disposition is `none` or deferred, in `check-front-door-verbs`' shape.
 
 **Cost while deferred:** an adopter on a newly joined system, or below the old floor, follows the page and meets the pinned release's refusal or a glibc load error; the live instance lasts until the next tag. Filed 2026-09-27 to the gap inbox at platform-prerequisite-floors' close; promoted 2026-09-27 at the next iteration's scope: →fix fails because the gate is new mechanism. Re-verified: `gh release view v0.26.0` lists only the two `-linux-gnu` Linux archives, and docs/install.md's table reads the musl triples `joined`. Owner lookup: `joined`, `front-door-verbs`, `platform` in this file's headings — none; owner installer/SPEC.md §Versioning, with the platforms-block contract docs/site-architecture.md states.
+
+### spec-mirror-citation-links
+
+[cost: event/low] [surface: canon-kit]
+
+the kit SPECs' on-site mirrors render their section citations as plain text, so a reader finds each cited section by hand and a path-less citation stays liveness-gated only. The docs-mirror arm (`native/src/emit/docs_mirror.rs`) rewrites link targets and nothing else.
+
+**Deliverable:** citation rendering at mirror time in that arm, each citation resolved through `check-spec-pointer`'s resolver into a relative link to the mirrored section, so every citation is reached with no hand conversion and no drift.
+
+**Cost while deferred:** every site reader of a SPEC follows its citations by hand. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's spec, split from `docs-ux-authoring-rules`, whose range was the hand-authored pages and READMEs; promoted 2026-09-27 at its close: →fix fails because the rendering is new mechanism in a shipped arm. Re-verified: the scope survey's oracle over the thirteen tracked `*/SPEC.md` counts 2,157 citation lines outside fences at the close, and the arm's `rewrite_line` rewrites `](` targets only. Owner lookup: `docs_mirror`, `mirror`, `citation` in this file — none; owner canon-kit/SPEC.md §The reference-link grammar.
+
+### consumer-scratch-unignored
+
+[cost: event/high] [surface: installer]
+
+a battery run dirties an adopter's worktree: in a tree `init --profile prose` (v0.26.0) just wrote, `./scripts/checkwright-gates --run` leaves `.tmp/gate-timings.txt` untracked and unignored, since init seeds no ignore rule for `GATE_SDK_TMP_DIR` and the consumer has no root `.gitignore`. The next `init` or `update` then refuses a dirty worktree, and a habitual `git add -A` commits the timing file.
+
+**Deliverable:** init seeding an ignore line for the scratch directory, or the battery writing its timings elsewhere in a consumer — the unit's design call — with the consumer smoke asserting a clean worktree after a battery run.
+
+**Cost while deferred:** every adopter's first battery run leaves a file that blocks the next `update`. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's spec, observed in a scratch Spec Kit tree; promoted 2026-09-27 at its close: →fix fails because the bullet leaves the shape a design call. Re-verified: no `.gitignore` write under `installer/` or the init path, and the runner writes `gate-timings.txt` under `GATE_SDK_TMP_DIR`. Owner lookup: `gate-timings`, `GATE_SDK_TMP_DIR`, `gitignore` in this file — [battery-timing-file-overwritten-by-only-run](#battery-timing-file-overwritten-by-only-run), DISTINCT (the file's contents, not its tracking); owner installer/SPEC.md.
+
+### lead-clause-heading-family
+
+[cost: event/low] [surface: canon-kit]
+
+`check-spec-pointer`'s lead-clause admission holds no citation of a heading family whose titles share a lead clause: over an OpenSpec spec, where every requirement heading reads `Requirement: <name>`, a prose citation `§Requirement: Account lockout` resolves through the lead clause `Requirement` although no such requirement exists. A linked citation is held by `check-md-refs`' anchor check, so the loss is the bare-prose form only.
+
+**Deliverable:** the lead-clause rule calibrated (for instance, admitting it only when the full fragment matches no heading's prefix and the lead clause is unique in the file), with a fixture site in each case of the pair.
+
+**Cost while deferred:** a companion adopter's bare-prose requirement citation dangles unseen. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's spec, reproduced in a scratch OpenSpec tree; promoted 2026-09-27 at its close: →fix fails because the calibration is a verdict change on a shipped gate with more than one candidate rule. Re-verified: `Heading::prefix_of` in `native/src/gates/spec_pointer.rs` admits a boundary-anchored prefix of `lead_clause`, which is `Requirement` for such a heading. Owner lookup: `lead clause`, `spec-pointer`, `OpenSpec` in this file — none; owner canon-kit/SPEC.md §check-spec-pointer.
+
+### worktree-crate-commit-red
+
+[cost: event/low] [surface: gate-sdk]
+
+a session editing the crate in a linked worktree cannot land its commit there. `cargo test --release` reds on `every_registry_member_declares_the_roots_it_walks` and `_the_programs_it_spawns`, which run `check-crate-arms` over its fixtures, and that gate refuses at exit 2 in a linked worktree with no recorded green stamp. And the generated pre-commit hook reds `check-gate-binary-fresh` with `git could not hash the tracked source under native`, while `run-gates.sh --run` over the same staged tree passed that gate a minute earlier.
+
+**Inferred, not run:** the hook's red comes from the index and git-dir variables git exports into a hook meeting `git -C native ls-files` in the freshness stamp.
+
+**Deliverable:** the crate's test arm and the hook green in a linked worktree, or the refusal stated as the contract with the tests pinning it.
+
+**Cost while deferred:** a worktree session's crate commit rests on a main-checkout re-run. Filed 2026-09-27 to the gap inbox as two bullets by the front-door hotfix; promoted 2026-09-27 at companion-catalog-extension's close: →fix fails because the hook cause is unprobed and the test's shape is a contract call. Re-verified: `native/src/gates/crate_arms.rs` refuses in a linked worktree lacking a stamp. Owner lookup: `linked worktree`, `gate-binary-fresh`, `crate-arms` in this file — [windows-fresh-fixture-stub](#windows-fresh-fixture-stub), DISTINCT (the same test pair, red on Windows for a stub it cannot start); owner gate-sdk/SPEC.md §check-crate-arms.
+
+### piped-install-argument-witness
+
+[cost: event/low] [surface: installer]
+
+no CI leg runs an argument form docs/install.md tells an adopter to type through the piped bootstrap: `.github/workflows/gates.yml` pipes `install.sh` and `install.ps1` with no arguments only, and profiles are exercised only as `init --profile <p>` against the bootstrap directly, which is how the flags-first examples shipped. `check-front-door-verbs` now reds a flag-led route statically, but nothing executes the page's argument examples.
+
+**Deliverable:** a step on each leg piping the served `docs/install.sh` and `docs/install.ps1` with `init --profile starter` beside the bare line.
+
+**Cost while deferred:** a broken argument form reaches adopters with every leg green. Filed 2026-09-27 to the gap inbox by the front-door hotfix; promoted 2026-09-27 at companion-catalog-extension's close: →fix fails because the PowerShell 5.1 script-block leg cannot be witnessed on this host and a red would spend a hotfix push from an allocated budget. Re-verified: the one-liner step runs `curl … | … sh` with no argument. Owner lookup: `piped`, `one-liner`, `irm` in this file — none; owner installer/SPEC.md §Requirements.
+
+### hotfix-agent-definition
+
+[cost: event/low] [surface: delegation-kit]
+
+no tracked agent definition exists for the operator-ruled hotfix path of the scope-gated intake rule. A lead dispatching one picks general-purpose and restates standing policy in the prompt (not a stage, no stage entry, no queue or state writes, one test-and-doc-complete commit, the battery and every reached kit suite, stop on a design question, the gap-inbox disposition): the policy-is-config tell (lifecycle-kit/templates/lead.md §Policy is config, not prose). `agent-dispatch-guard` confines an undeclared type to a worktree, where this repo's hook reds and `--emit file-gap` refuses, so the 2026-09-27 front-door hotfix needed a second dispatch to land.
+
+**Deliverable:** a hotfix agent definition under `.claude/agents/` carrying that policy, declared in `DELEGATION_KIT_MUTATING_TYPES`, and the lead template naming the dispatch shape.
+
+**Cost while deferred:** every hotfix costs a restated prompt and a second dispatch. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's lead; promoted 2026-09-27 at its close: →fix fails because the definition is a new governed name. Owner lookup: `hotfix`, `agents/`, `MUTATING_TYPES` in this file — none; owner delegation-kit/SPEC.md, with [worktree-crate-commit-red](#worktree-crate-commit-red) as the worktree half.
+
+### musl-smoke-build-wrapper
+
+[cost: event/low] [surface: installer]
+
+the consumer smoke's build leg needs a musl standard library: since the musl join, a Linux host maps to `x86_64-unknown-linux-musl`, and a host with a system toolchain and no rustup cannot build it (E0463). The route that works: run the tracked `scripts/ci-build-artifact.sh x86_64-unknown-linux-musl <dir>` inside `docker rust:latest` over a git clone of the tree (not `git archive`, since `build.rs` stamps from git), passing `safe.directory` and chowning the output back; then run the smoke on the host with `INSTALLER_SMOKE_ARTIFACTS_DIR=<dir>`, reusing an artifact only while `native/` has no diff since its build commit and its sha256 matches the sidecar. Only the docker wrapper was scratch, swept at the boundary.
+
+**Deliverable:** a tracked maintainer wrapper yielding that hand-off directory, named in installer/SPEC.md §The consumer smoke.
+
+**Cost while deferred:** each maintainer without a musl target re-derives the route before a local validate. Filed 2026-09-27 to the gap inbox by the front-door hotfix, with an addendum on the recovered route (re-proved at companion-catalog-extension's build, installer smoke 20/20); promoted 2026-09-27 at its close: →fix fails because the wrapper is a new tracked script. Re-verified: this host's sysroot carries only the gnu std, `command -v rustup` finds nothing, and the section names no docker route. Owner lookup: `musl`, `ARTIFACTS_DIR`, `docker` in this file — [install-platform-release-gap](#install-platform-release-gap) and [musl-dev-binary](#musl-dev-binary), DISTINCT (publishing; the dev binary); owner installer/SPEC.md §The consumer smoke.
+
+### readme-spec-links-offsite
+
+[cost: event/low] [surface: gate-sdk]
+
+a kit README's citation of another kit's SPEC section links off-site to the GitHub blob, since `check-packed-links` reds a relative `../<kit>/SPEC.md` link (the payload withholds every SPEC) and the packer rewrites only a README's own SPEC link; so its docs mirror sends readers to GitHub where an on-site mirror of that SPEC exists.
+
+**Deliverable:** the pack-time rewrite widened to `../<leaf>/SPEC.md[#frag]` for a packed leaf, giving on-site targets on the mirror and published ones in the payload.
+
+**Cost while deferred:** about fourteen README citations leave the site. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's docs-ux build; promoted 2026-09-27 at its close: →fix fails because the rewrite bound is a packer contract change. Re-verified: 14 blob-SPEC link lines across the twelve top-level READMEs. Owner lookup: `packed-links`, `blob`, `rewrite` in this file — none; owner gate-sdk/SPEC.md §check-packed-links. Related: [spec-mirror-citation-links](#spec-mirror-citation-links).
+
+### foreign-spec-lifecycle-unowned
+
+[cost: event/low] [surface: lifecycle-kit]
+
+a lifecycle stage machine over a foreign spec workflow is unowned: `check-stage-entry` assertion C's cross-component signal is `LIFECYCLE_KIT_CONTRACT_TOKENS` (default `SPEC.md`, `proto/`), so a tree whose specs Spec Kit or OpenSpec writes, left unbound, never fires it and skips the align audit with no red; `check-spec-pointer` breaks the same way on non-markdown artifacts.
+
+**Deliverable:** the lifecycle binding for a foreign layout — the contract tokens and pointer reach — stated for each supported toolkit, with a companion fixture proving the audit fires.
+
+**Cost while deferred:** a lifecycle adopter on a foreign layout meets a silent audit skip. Correction (2) of companion-toolkit-profile's 2026-08-02 survey; its build half fitted the prose profile only. Filed 2026-09-27 to the gap inbox at that entry's demotion; promoted 2026-09-27 at companion-catalog-extension's close: →fix fails because the binding is new mechanism. Re-verified: the knob's default reads `SPEC.md`, `proto/`, and companion/SPEC.md names no lifecycle binding. Owner lookup: `CONTRACT_TOKENS`, `foreign`, `Spec Kit` in this file — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (its body is now the catalog submission alone); owner lifecycle-kit/SPEC.md §The state machine.
+
+### citation-link-root-docs-range
+
+[cost: event/low] [surface: canon-kit]
+
+`check-citation-link`'s `CANON_KIT_CITATION_LINK_PAGES` binding (`docs/*.md`, `docs/*/index.md`, `*/README.md`, `README.md`) leaves out the other root docs GitHub renders; TRAJECTORY.md carries plain section citations, one written unlinked by the docs-ux build batch itself. With it, each ruling could be anchored by a header whose slug is its primary ruling name, so a citation links `TRAJECTORY.md#<name>` as queue slugs do; no tracked file cites that file by anchor today, citers using the ruling name the ruling-staleness probe sweeps.
+
+**Deliverable:** the binding widened to GitHub-rendered root docs (TRAJECTORY.md, ROADMAP.md and the like), excluding agent-loaded surfaces such as CLAUDE.md where links grow the always-loaded meter; and the ruling-header option costed with it, never as its own unit (operator direction, 2026-09-27, lead session). Against the headers: the record format is lifecycle-kit's, a ruling may declare several names while a header carries one slug, and the file shrinks toward empty.
+
+**Cost while deferred:** a root-doc reader hunts cited sections by hand. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's lead, on an operator direction to file rather than widen mid-iteration, with an addendum; promoted 2026-09-27 at its close: →fix fails because the widening is a ruled deferral. Re-verified: `scripts/canon-config.knobs` binds the four globs, and TRAJECTORY.md lines 4, 12 and 18 carry `§`. Owner lookup: `citation-link`, `CITATION_LINK_PAGES`, `TRAJECTORY.md#` in this file — none; owner canon-kit/SPEC.md §check-citation-link, with lifecycle-kit/SPEC.md §The ruling-staleness probe.
+
+### musl-dev-binary
+
+[cost: event/high] [surface: gate-sdk]
+
+a maintainer's Linux dev binary could be the static musl build, so the battery and the generated hooks run the bytes adopters install. Operator direction, 2026-09-27 (lead session): filed as a costed idea, not work.
+
+**Inferred, not run:** the prior iteration's spec measurement — battery 139/139 with the musl binary at the canonical path, 15.41s against 14.47–14.89s for gnu (about +4%); crate tests 1196 pass, 4.99s against 4.58s.
+
+**Deliverable:** `build-native.sh` and `check-gate-binary-fresh` building and stamping a musl dev binary, macOS and Windows staying on their native runners.
+
+**Cost while deferred:** the dogfood battery runs a binary adopters on Linux never receive; adopting it, every native rebuild needs docker or a host musl target. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's lead; promoted 2026-09-27 at its close: →fix fails because the operator filed it as an idea, not work. Re-verified: this host's sysroot carries no musl std. Owner lookup: `musl`, `build-native`, `dev binary` in this file — [musl-smoke-build-wrapper](#musl-smoke-build-wrapper), DISTINCT (the smoke's hand-off only); owner gate-sdk/SPEC.md §Porting a gate to the binary substrate.
+
+### site-video-poster-rule
+
+[cost: event/low] [surface: site-kit]
+
+the site has no rule for video, and the operator wants short intro and demo videos (direction 2026-09-27, the implementation delegated to the lead). Lead decision: host them on the reserved YouTube channel, a discovery channel fitting `catalog-then-plugin`'s distribution grounds that keeps video bytes out of every clone; a page shows a local poster image linking out, never an iframe player, so the site keeps zero third-party requests at page load.
+
+**Deliverable:** a page-authoring rule in docs/site-architecture.md admitting only the poster-link form, a gate reding an `<iframe>` or a third-party `src=` in docs pages, and first homes on docs/spec-toolkits.md and the front door.
+
+**Cost while deferred:** a video lands with no rule, and an embed would add the site's first third-party request. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's lead; promoted 2026-09-27 at its close: →fix fails because the gate is new mechanism. Re-verified: `docs/_layouts/default.html` loads only local assets, and `check-docs-render-fidelity` lists `iframe` as a known tag without refusing it. Owner lookup: `video`, `iframe`, `YouTube` in this file — none; owner docs/site-architecture.md §Page-authoring rules.
 
 ## Icebox
 

@@ -232,3 +232,4 @@
 | capture-integrity-brevity | sc sp a b v c | 5f/3d | 4 · ≤0d | 21s clean | 137 |
 | gate-sdk-tail-docs-standard | sc sp a b v c | 5f/1d | 3 · ≤0d | 28s 1✗ | 139 |
 | platform-prerequisite-floors | sc sp a b v c | 7f/3d | 5 · ≤0d | 21s clean | 139 |
+| companion-catalog-extension | sc sp a b v c | 2f/1d | 3 · ≤0d | 21s clean | 141 |
