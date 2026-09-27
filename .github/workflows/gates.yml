@@ -1385,6 +1385,14 @@ jobs:
           "$dir/shellcheck.exe" --version
           echo "$win" >> "$GITHUB_PATH"
 
+      # spec: gate-sdk/SPEC.md §check-crate-arms — the docs gates' gems, in the ruby their bare `ruby` resolves
+      - name: install the docs gates' gems
+        shell: bash
+        run: |
+          set -euo pipefail
+          ruby -S gem install --no-document kramdown-parser-gfm liquid:4.0.4
+          ruby -e 'require "kramdown-parser-gfm"; require "liquid"; puts "ruby #{RUBY_VERSION}, liquid #{Liquid::VERSION}"'
+
       # spec: gate-sdk/SPEC.md §check-crate-arms — the host binary the registry-coverage tests spawn
       - name: build the host gate binary the registry-coverage tests spawn
         shell: bash

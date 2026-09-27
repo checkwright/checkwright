@@ -90,11 +90,12 @@ fn cargo_target_dir(resolve: Resolve) -> Result<Value, String> {
 
 // spec: gate-sdk/SPEC.md §Layout and configuration — the host's executable suffix, the standard
 // library's constant for the platform the binary was built for, which is the one it runs on
+pub(crate) fn host_native_bin() -> String {
+    format!("native/target/release/checkwright-gates{}", std::env::consts::EXE_SUFFIX)
+}
+
 fn native_bin(_resolve: Resolve) -> Result<Value, String> {
-    Ok(Value::Scalar(format!(
-        "native/target/release/checkwright-gates{}",
-        std::env::consts::EXE_SUFFIX
-    )))
+    Ok(Value::Scalar(host_native_bin()))
 }
 
 const GATES: &[&str] = &["GATE_SDK_GATES_DIR"];

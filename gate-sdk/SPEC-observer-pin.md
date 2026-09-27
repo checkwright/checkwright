@@ -15,7 +15,7 @@ The registry coverage tests fail on both Windows triples, and at one case: `chec
 
 ### (1) The observer hands every case the host binary {mechanical}
 
-**Not yet applied.** In `native/src/gates/mod.rs`, `observe_in_case` adds `GATE_SDK_NATIVE_BIN` to the child-scoped environment slice it already passes `proc::run_merged_in`, beside the marker, the member's name and `GATE_SDK_ROOT`. The value is the host binary's absolute path, resolved in the parent against the same repository root `GATE_SDK_ROOT` is absolutized against. The slice is child-scoped, so no `knobenv` write is made and the environment-serialization rule is untouched. The value outranks the case's own knob file, including `check-gate-binary-fresh`'s pin, on every host.
+**Applied** in the landing commit. In `native/src/gates/mod.rs`, `observe_in_case` adds `GATE_SDK_NATIVE_BIN` to the child-scoped environment slice it already passes `proc::run_merged_in`, beside the marker, the member's name and `GATE_SDK_ROOT`. The value is the host binary's absolute path, resolved in the parent against the same repository root `GATE_SDK_ROOT` is absolutized against. The slice is child-scoped, so no `knobenv` write is made and the environment-serialization rule is untouched. The value outranks the case's own knob file, including `check-gate-binary-fresh`'s pin, on every host.
 
 In gate-sdk/SPEC.md §lib/gate.sh (the paragraph beginning **The registry coverage tests are where the rule bites**), the sentence "The member's name, a marker and an absolute `GATE_SDK_ROOT` ride that call's child-scoped environment slice, so the child reads the case's own knob files from its working directory and finds the kits from the locator, as §run-gate-tests hands them to a case." becomes:
 
@@ -23,7 +23,7 @@ In gate-sdk/SPEC.md §lib/gate.sh (the paragraph beginning **The registry covera
 
 ### (2) The Windows job installs the docs gates' gems {mechanical}
 
-**Not yet applied.** In `.github/workflows/gates.yml`, `crate-tests-windows` gains the `crate-tests-unix` step "install the docs gates' gems", placed after its ShellCheck step and before the host build, and carrying the same `# spec:` directive. The step runs `gem install --no-document kramdown-parser-gfm liquid:4.0.4` in the ruby its bare `ruby` resolves, then prints the ruby and liquid versions. The unix step's writability test and `sudo` arm have no Windows meaning, so this step drops them.
+**Applied** in the landing commit, the step spelling its install `ruby -S gem` so the gem runs from the bare `ruby`'s own bin directory with no `.cmd` lookup under Git Bash. In `.github/workflows/gates.yml`, `crate-tests-windows` gains the `crate-tests-unix` step "install the docs gates' gems", placed after its ShellCheck step and before the host build, and carrying the same `# spec:` directive. The step runs `gem install --no-document kramdown-parser-gfm liquid:4.0.4` in the ruby its bare `ruby` resolves, then prints the ruby and liquid versions. The unix step's writability test and `sudo` arm have no Windows meaning, so this step drops them.
 
 In gate-sdk/SPEC.md §check-crate-arms, "The unix legs also install the ShellCheck and gems the `gates` job installs, whose absence exits the same members 2." becomes "Every leg also installs the ShellCheck and gems the `gates` job installs, whose absence exits the same members 2."
 

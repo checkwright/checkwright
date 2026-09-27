@@ -2876,11 +2876,16 @@ mod tests {
         let observer = format!("{}::a_registry_member_run_inside_its_case_dir", module);
         // spec: gate-sdk/SPEC.md §Layout and configuration — the locator absolutized for the child, as
         // §run-gate-tests hands it to a case
-        let sdk = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../gate-sdk");
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
+        let sdk = root.join("gate-sdk");
+        // spec: gate-sdk/SPEC.md §lib/gate.sh — the host binary overrides a case's own pin: the
+        // observer asserts reach, which no pin moves, and a pinned stub need not start on every host
+        let bin = root.join(crate::knobs::gate_sdk::host_native_bin());
         let env = vec![
             (OBSERVER_MARKER.to_string(), "1".to_string()),
             (OBSERVER_MEMBER.to_string(), name.to_string()),
             ("GATE_SDK_ROOT".to_string(), walk::normalize_abs(&sdk.display().to_string())),
+            ("GATE_SDK_NATIVE_BIN".to_string(), walk::normalize_abs(&bin.display().to_string())),
         ];
         let merged = crate::proc::run_merged_in(
             &programs::Program::consumer("test", exe),
