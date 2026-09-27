@@ -730,6 +730,16 @@ nothing enforces gate-sdk/SPEC.md §The port-candidate criteria's rule that ever
 
 **Cost while deferred:** each literal publishes this repo's configuration as every adopter's mechanism, and instances surface only by chance. Filed 2026-09-27 to the gap inbox by platform-prerequisite-floors' lead; promoted at its close: →fix fails because the gate is new mechanism over an unsized corpus. Re-verified: the rule's sentence appears in gate-sdk/SPEC.md and its site mirror alone, with no gate section enforcing it. Owner lookup: `literal`, `hardcod` in this file's headings — [knob-default-accessor-singularity](#knob-default-accessor-singularity), DISTINCT (it bars re-spelling an existing knob's default; this bars a consumer value with no knob); owner gate-sdk/SPEC.md §The port-candidate criteria.
 
+### install-platform-release-gap
+
+[cost: event/low] [surface: installer]
+
+docs/install.md defines `joined` as "a binary is published for that system", but `check-install-platforms` binds `joined` to a live `native/targets.list` line, so the two diverge between a platform join and the next tag. The two `*-linux-musl` triples joined at platform-prerequisite-floors while the newest release, v0.26.0, publishes only `*-linux-gnu` archives, and that close stamped `deferred:v0.27.0`. `check-front-door-verbs` holds the analogous claim for a verb the pinned release lacks; nothing holds it for a platform row or its Minimum.
+
+**Deliverable:** the page's definition and the gate's binding reconciled, with a gate that reds a `joined` row or Minimum the pinned release does not serve while the release disposition is `none` or deferred, in `check-front-door-verbs`' shape.
+
+**Cost while deferred:** an adopter on a newly joined system, or below the old floor, follows the page and meets the pinned release's refusal or a glibc load error; the live instance lasts until the next tag. Filed 2026-09-27 to the gap inbox at platform-prerequisite-floors' close; promoted 2026-09-27 at the next iteration's scope: →fix fails because the gate is new mechanism. Re-verified: `gh release view v0.26.0` lists only the two `-linux-gnu` Linux archives, and docs/install.md's table reads the musl triples `joined`. Owner lookup: `joined`, `front-door-verbs`, `platform` in this file's headings — none; owner installer/SPEC.md §Versioning, with the platforms-block contract docs/site-architecture.md states.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
