@@ -1,0 +1,4 @@
+schema: spec-driven
+
+context: |
+  A command-line tool that exports release notes from a git history.

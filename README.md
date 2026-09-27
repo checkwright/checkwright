@@ -10,11 +10,11 @@
 
 It ships as installable kits: gates plus an evidence-stamped iteration lifecycle designed for stateless agent sessions.
 
-Who it is for, how it complements the workflow you already run, and a done claim it catches: <https://checkwright.dev>, the same pages served in-repo under [`docs/`](docs/index.md).
+Who it is for, how it [complements the workflow you already run](docs/spec-toolkits.md), and a done claim it catches: <https://checkwright.dev>, the same pages served in-repo under [`docs/`](docs/index.md).
 
 ## Try it first
 
-`demo` runs the whole arc in a scratch repository of its own and removes it, without touching yours; what it does and what it needs first: [docs/install.md](docs/install.md) §Try it first.
+`demo` runs the whole arc in a scratch repository of its own and removes it, without touching yours; what it does and what it needs first: [`docs/install.md` §Try it first](docs/install.md#try-it-first).
 
 ```sh
 curl -fsSL https://checkwright.dev/install.sh | sh -s -- demo                  # macOS and Linux
@@ -44,7 +44,7 @@ irm https://checkwright.dev/install.ps1 | iex                                  #
 npx checkwright init                                                           # with Node
 ```
 
-Profiles, the other verbs and how to pass them arguments: [docs/install.md](docs/install.md) §Install.
+Profiles, the other verbs and how to pass them arguments: [`docs/install.md` §Install](docs/install.md#install).
 
 Where the project is heading, and what moves an item: [`ROADMAP.md`](ROADMAP.md). What is already *ruled* — the operator's standing overrides of business as usual — is [`TRAJECTORY.md`](TRAJECTORY.md), hand-authored rather than generated.
 
@@ -89,7 +89,7 @@ bash gate-sdk/bin/run-gates.sh --projection-witness                             
 ```
 <!-- battery-roster:end -->
 
-The last line, `--run-demo`, is the adoption walkthrough, and it runs from a checkout because it copies the kits out of this tree: against a throwaway consumer repo, touching no tree but its own, it vendors the kits, passes the battery clean, introduces a defect and shows the gate that blocks it, then drops the defect and goes green again. A checkout tracks no binary, so `bash gate-sdk/bin/build-native.sh` builds one first. The arm is specified in [gate-sdk/SPEC.md](gate-sdk/SPEC.md) §Consumer smoke.
+The last line, `--run-demo`, is the adoption walkthrough, and it runs from a checkout because it copies the kits out of this tree: against a throwaway consumer repo, touching no tree but its own, it vendors the kits, passes the battery clean, introduces a defect and shows the gate that blocks it, then drops the defect and goes green again. A checkout tracks no binary, so `bash gate-sdk/bin/build-native.sh` builds one first. The arm is specified in [`gate-sdk/SPEC.md` §Consumer smoke](gate-sdk/SPEC.md#consumer-smoke).
 
 The gate binary's `--install-hooks` arm opts this clone into the generated pre-commit and commit-msg hooks. The repo also runs lifecycle-kit's own iteration state machine — [`TASK-QUEUE.md`](TASK-QUEUE.md) carries the iteration header, one iteration per hardening or roadmap unit.
 

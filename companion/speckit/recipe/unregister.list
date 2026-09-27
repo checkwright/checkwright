@@ -1,0 +1,2 @@
+# spec: companion/SPEC.md §The Spec Kit recipe — each gate named below is dropped from the consumer's scripts/gates.list
+check-fence-command-head

@@ -15,6 +15,7 @@
 # one rule and an exception would be a second; the sibling SPEC page is NOT
 # listed, being reached from the install page's pointer.
 docs/installer/README.md
+docs/companion/README.md
 docs/evidence-data.md
 docs/install-evidence.md
 docs/site-architecture.md

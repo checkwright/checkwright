@@ -29,6 +29,7 @@ Every top-level directory carrying a `SPEC.md` takes a row, kit or not, and one 
 | kit | always-loaded | load-triggered |
 | --- | --- | --- |
 | canon-kit | — | 5785cp · ~1531t |
+| companion | — | — |
 | context-kit | — | 2351cp · ~594t |
 | delegation-kit | — | 40200cp · ~10124t |
 | doctrine-kit | 1991cp · ~506t | — |

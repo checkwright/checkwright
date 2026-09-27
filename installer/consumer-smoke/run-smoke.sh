@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: installer/SPEC.md §The consumer smoke — builds the host gate binary, packs the package around it, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (init --dry-run writing nothing and planning the file set the real run then records, once per profile, once more over a consumer already holding every seeded surface and once over deleted seeds whose recorded hashes are stale, each re-seed recorded at what it wrote and none reported changed → install → every command init printed in its follow-up block resolves in the payload just written with every flag it names accepted → green battery → manifest agrees with the tree, a disagreement whose own operands are hashes failing at exit 1 as a verdict about the consumer while one that reached the comparison malformed refuses at exit 2 as a precondition of this harness → the seeded queue satisfies queue-kit's section contract, or none is seeded where none is owed — which of the two is owed read from the package through the --install queue-source op rather than derived a second time here → idempotent re-run → doctor clean, naming a registered member disarmed → a planted prose defect caught and cleared → diff clean → update --dry-run planning a deleted file's restore and writing nothing → uninstall back to the pre-init tree object) plus the four profile-lattice assertions and the value assertion over the loop (some profile below the maximum catches that defect) (every named kit resolves, exactly one minimum and one maximum, the maximum is the payload-derived profile, and gate rosters are monotone across every comparable pair of the registries the installs wrote), an artifact-less refusal leg driving the packer's own artifact-free output and asserting that init, doctor, diff and a bare invocation all meet one bootstrap refusal that names the platform, carries a remedy and writes nothing, a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, whose first hop asserts a non-zero live-member count and a placed artifact in the consumer's registry before asserting the worktree is clean — so cleanliness is evidence over a hop that rewrote something rather than over one that rewrote nothing, a cross-version reversal arm carrying an unedited consumer across those same three versions and back to its pre-init tree object, so removability is asserted after a payload changed shape and the roster is asserted to cover an upgrade hop's write set rather than a first init's alone, a demo arm running checkwright demo once from inside an installed consumer and asserting it green, a FAIL: verdict line inside its act 3, every line of the front page's proof block in its output, the invoking tree object and worktree unchanged, its scratch torn down and an operand refused at exit 2, a toolchain-free arm driving doctor and a full init with cargo and rustc masked off PATH, a jq-less arm asserting that diff, uninstall and init at the lattice minimum and at a guard-kit profile run clean with no jq on PATH, that the installed guard hook answers a payload there, and that doctor names jq nowhere, a bash-less arm installing every profile whose kit set owes no bash, running each printed follow-up command and committing through the installed hooks once clean and once refused with no bash on PATH, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it over a tampered gate binary, a narrowing arm re-running init at a smaller profile so files[] outlives kits, and an artifact arm driving the selection outcomes a single install cannot show — the unrostered host's refusal, the tampered artifact's and the declared-but-absent target's, asserted to differ in message and remedy rather than only in exit status; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
+# spec: installer/SPEC.md §The consumer smoke — builds the host gate binary, packs the package around it, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (init --dry-run writing nothing and planning the file set the real run then records, once per profile, once more over a consumer already holding every seeded surface and once over deleted seeds whose recorded hashes are stale, each re-seed recorded at what it wrote and none reported changed → install → every command init printed in its follow-up block resolves in the payload just written with every flag it names accepted → green battery → manifest agrees with the tree, a disagreement whose own operands are hashes failing at exit 1 as a verdict about the consumer while one that reached the comparison malformed refuses at exit 2 as a precondition of this harness → the seeded queue satisfies queue-kit's section contract, or none is seeded where none is owed — which of the two is owed read from the package through the --install queue-source op rather than derived a second time here → idempotent re-run → doctor clean, naming a registered member disarmed → a planted prose defect caught and cleared → diff clean → update --dry-run planning a deleted file's restore and writing nothing → uninstall back to the pre-init tree object) plus the four profile-lattice assertions and the value assertion over the loop (some profile below the maximum catches that defect) (every named kit resolves, exactly one minimum and one maximum, the maximum is the payload-derived profile, and gate rosters are monotone across every comparable pair of the registries the installs wrote), an artifact-less refusal leg driving the packer's own artifact-free output and asserting that init, doctor, diff and a bare invocation all meet one bootstrap refusal that names the platform, carries a remedy and writes nothing, a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, whose first hop asserts a non-zero live-member count and a placed artifact in the consumer's registry before asserting the worktree is clean — so cleanliness is evidence over a hop that rewrote something rather than over one that rewrote nothing, a cross-version reversal arm carrying an unedited consumer across those same three versions and back to its pre-init tree object, so removability is asserted after a payload changed shape and the roster is asserted to cover an upgrade hop's write set rather than a first init's alone, a demo arm running checkwright demo once from inside an installed consumer and asserting it green, a FAIL: verdict line inside its act 3, every line of the front page's proof block in its output, the invoking tree object and worktree unchanged, its scratch torn down and an operand refused at exit 2, a companion arm applying each companion recipe through the landing page's block to a prose install on its fixture tree and asserting the battery green and each planted defect red by the gate that owns it, and the Spec Kit recipe once more through the extension's install command, a toolchain-free arm driving doctor and a full init with cargo and rustc masked off PATH, a jq-less arm asserting that diff, uninstall and init at the lattice minimum and at a guard-kit profile run clean with no jq on PATH, that the installed guard hook answers a payload there, and that doctor names jq nowhere, a bash-less arm installing every profile whose kit set owes no bash, running each printed follow-up command and committing through the installed hooks once clean and once refused with no bash on PATH, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it over a tampered gate binary, a narrowing arm re-running init at a smaller profile so files[] outlives kits, and an artifact arm driving the selection outcomes a single install cannot show — the unrostered host's refusal, the tampered artifact's and the declared-but-absent target's, asserted to differ in message and remedy rather than only in exit status; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
 # no-port: installer/SPEC.md §The consumer smoke, The port disposition — ruled 2026-08-31 by the operator in consult. This is the repo's own acceptance harness for the installer and rides no payload: the --pack-installer arm assembles the tarball and the npm package out of the kit roots and never out of installer/consumer-smoke/, so no adopter receives or runs it, and its only callers are the evidence-kit installer_smoke validate suite and the gates workflow. It is the same shape gate-sdk/SPEC.md §Consumer smoke, The port disposition declares on its leg 3 — a smoke executed by no adopter path — reached one step further, for a harness the payload does not even carry; and it drives cargo, the packer and init as black boxes across every profile, so a crate-side form would test the binary from inside the binary. Structural, not a sizing judgment: its size was measured at the ruling and is not the ground.
 set -uo pipefail
 
@@ -1022,6 +1022,95 @@ grep -q 'usage: checkwright demo' <<<"$out" \
     || { printf '%s\n' "$out" >&2; fail "demo arm: checkwright demo extra refused without the usage line"; }
 say "demo extra: refused at exit 2 with the usage line"
 
+# spec: installer/SPEC.md §The consumer smoke — the companion arm: each recipe under companion/ applied by the landing page's own block to a prose install on its fixture tree, asserted green, then each planted defect asserted red by the gate that owns it
+COMPANION="$REPO/companion"
+COMPANION_PROFILE=prose
+# spec: companion/SPEC.md §The tested claim — the claimed gates, spelled here as the claim's oracle so a fixture tree missing a defect directory reds rather than shrinking the claim
+COMPANION_CLAIMED=(check-md-refs check-spec-pointer check-spec-fence-balance check-docs-cmd)
+COMPANION_EXT_RECIPE=.specify/extensions/checkwright/recipe
+companion_block() {   # $1 = a markdown file -> the companion-recipe block's lines, fences and blank lines dropped
+    awk '
+        $0 == "<!-- companion-recipe:end -->" { f = 0 }
+        f && NF && $0 !~ /^```/ { print }
+        $0 == "<!-- companion-recipe:begin -->" { f = 1 }
+    ' "$1"
+}
+COMPANION_PAGE_BLOCK="$(companion_block "$REPO/docs/spec-toolkits.md")"
+[[ -n "$COMPANION_PAGE_BLOCK" ]] \
+    || fail "companion arm: docs/spec-toolkits.md carries no companion-recipe block, so there is no documented procedure to run"
+COMPANION_CMD_BLOCK="$(companion_block "$COMPANION/speckit/commands/install.md")"
+[[ -n "$COMPANION_CMD_BLOCK" ]] \
+    || fail "companion arm: companion/speckit/commands/install.md carries no companion-recipe block, so the extension's install command has no procedure to run"
+# spec: installer/SPEC.md §The consumer smoke — the command's copy is the page's block opened by one recipe= line, held equal here so the two documented copies cannot drift apart while only one is run per recipe
+[[ "$(head -n 1 <<<"$COMPANION_CMD_BLOCK")" == "recipe=$COMPANION_EXT_RECIPE" ]] \
+    || fail "companion arm: the install command's block does not open with recipe=$COMPANION_EXT_RECIPE"
+[[ "$(tail -n +2 <<<"$COMPANION_CMD_BLOCK")" == "$COMPANION_PAGE_BLOCK" ]] \
+    || { diff <(printf '%s\n' "$COMPANION_PAGE_BLOCK") <(tail -n +2 <<<"$COMPANION_CMD_BLOCK") >&2; fail "companion arm: the install command's block differs from the landing page's past its recipe= line"; }
+mapfile -t COMPANION_TOOLKITS < <(for d in "$COMPANION"/*/recipe/; do d="${d%/recipe/}"; printf '%s\n' "${d##*/}"; done)
+[[ ${#COMPANION_TOOLKITS[@]} -gt 0 ]] || fail "companion arm: no recipe directory under companion/*/recipe/"
+COMPANION_DONE=()
+companion_consumer() {   # $1 = toolkit, $2 = label -> a consumer holding the toolkit's fixture layout, prose installed, hooks on; echoed
+    local c out
+    c="$(consumer "companion-$2")" || return 1
+    cp -R "$COMPANION/fixtures/$1/layout/." "$c/" || return 1
+    if [[ -n "${3:-}" ]]; then
+        mkdir -p "$c/${3%/recipe}" && cp -R "$COMPANION/$1/." "$c/${3%/recipe}/" || return 1
+    fi
+    git -C "$c" add -A && git -C "$c" commit -q -m "the toolkit's tree" || return 1
+    out="$( cd "$c" && PATH="$RUN_PATH" "${ENTRY[@]}" init --profile "$COMPANION_PROFILE" 2>&1 )" \
+        || { printf '%s\n' "$out" >&2; return 1; }
+    out="$( cd "$c" && ./scripts/checkwright-gates --install-hooks 2>&1 )" \
+        || { printf '%s\n' "$out" >&2; return 1; }
+    printf '%s' "$c"
+}
+companion_green() {   # $1 = label, $2 = consumer dir, $3 = the block to run -> asserts the block committed and the battery is green
+    local head out rc summary
+    head="$(git -C "$2" rev-parse HEAD)"
+    out="$( cd "$2" && sh -c "$3" 2>&1 )"; rc=$?
+    [[ "$rc" -eq 0 ]] || { printf '%s\n' "$out" >&2; fail "companion arm, $1: the recipe block exited $rc"; }
+    [[ "$(git -C "$2" rev-parse HEAD)" != "$head" ]] || fail "companion arm, $1: the recipe block exited 0 and committed nothing"
+    [[ -z "$(git -C "$2" status --porcelain)" ]] \
+        || { git -C "$2" status --porcelain >&2; fail "companion arm, $1: the recipe block left the worktree dirty"; }
+    out="$( cd "$2" && ./scripts/checkwright-gates --run 2>&1 )"; rc=$?
+    summary="$(grep -m1 -E '^All [0-9]+ gates passed\.$' <<<"$out")"
+    [[ "$rc" -eq 0 && -n "$summary" ]] \
+        || { printf '%s\n' "$out" >&2; fail "companion arm, $1: the battery is not green after the recipe (exit $rc)"; }
+    say "$1: the recipe block committed, and the battery reads '$summary'"
+}
+companion_arm() {   # $1 = toolkit
+    local tk="$1" c d gate out rc
+    [[ -d "$COMPANION/$tk/recipe" ]] || fail "companion arm: this arm names $tk, and companion/$tk/recipe/ does not exist"
+    [[ -d "$COMPANION/fixtures/$tk/layout" ]] || fail "companion arm: companion/fixtures/$tk/layout/ does not exist, so the $tk recipe has no tree to govern"
+    for gate in "${COMPANION_CLAIMED[@]}"; do
+        [[ -d "$COMPANION/fixtures/$tk/defects/$gate" ]] \
+            || fail "companion arm, $tk: no defects/$gate/ under companion/fixtures/$tk/, so the claim that $gate catches its class in a $tk tree is untested"
+    done
+    c="$(companion_consumer "$tk" "$tk")" || fail "companion arm, $tk: could not install the $COMPANION_PROFILE profile on the fixture tree"
+    companion_green "$tk, the landing page's block" "$c" "recipe='$COMPANION/$tk/recipe'
+$COMPANION_PAGE_BLOCK"
+    for d in "$COMPANION/fixtures/$tk/defects"/*/; do
+        gate="${d%/}"; gate="${gate##*/}"
+        cp -R "$d." "$c/" || fail "companion arm, $tk: could not plant defects/$gate/"
+        out="$( cd "$c" && ./scripts/checkwright-gates --run 2>&1 )"; rc=$?
+        [[ "$rc" -ne 0 ]] && grep -qE "^  FAIL: $gate( |$)" <<<"$out" \
+            || { printf '%s\n' "$out" >&2; fail "companion arm, $tk: the battery did not red $gate on its planted defect (exit $rc)"; }
+        git -C "$c" checkout -q -- . && git -C "$c" clean -fdq \
+            || fail "companion arm, $tk: could not restore the consumer after defects/$gate/"
+        [[ -z "$(git -C "$c" status --porcelain)" ]] || fail "companion arm, $tk: the consumer is not clean after restoring defects/$gate/"
+        say "$tk: defects/$gate/ reds $gate"
+    done
+    COMPANION_DONE+=("$tk")
+}
+printf 'companion arm: speckit (the Spec Kit recipe on its fixture tree, through the landing page and the extension command)\n'
+companion_arm speckit
+c="$(companion_consumer speckit speckit-command "$COMPANION_EXT_RECIPE")" \
+    || fail "companion arm, speckit: could not install the $COMPANION_PROFILE profile beside the extension's files"
+companion_green "speckit, the install command's block" "$c" "$COMPANION_CMD_BLOCK"
+printf 'companion arm: openspec (the OpenSpec recipe on its fixture tree, through the landing page)\n'
+companion_arm openspec
+[[ "$(printf '%s\n' "${COMPANION_DONE[@]}" | sort)" == "$(printf '%s\n' "${COMPANION_TOOLKITS[@]}" | sort)" ]] \
+    || fail "companion arm: the recipe directories are [${COMPANION_TOOLKITS[*]}] and the arm ran [${COMPANION_DONE[*]}]; a recipe with no arm header is untested"
+
 # spec: installer/SPEC.md §The consumer smoke — the held-seed parity arm: a fresh consumer already holding every surface init seeds, which is the one state where a seed's absence guard decides and a plan that predicted the seed a second way would name files the run never writes
 printf 'plan parity over held seeds (%s)\n' "$PROFILE_DERIVED"
 [[ -n "$SEEDED" ]] || fail "the $PROFILE_DERIVED install recorded no seeded surface, so the held-seed arm would plant nothing"
@@ -1779,5 +1868,5 @@ PROVENANCE="the gate binary this run built"
 [[ -z "$PREBUILT_DIR" ]] || PROVENANCE="the gate binary adopted from the hand-off, unrebuilt"
 
 # spec: evidence-kit/SPEC.md §Layout and configuration — this line is the run's COMPLETION MARKER, derived positionally. A header printed after this line would silently become the marker and demote this one to an arm — the one hazard of that rule, and no gate catches it
-printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access, each carrying %s, each put in front of a real prose defect (caught by %s) and each reversed back to its pre-init tree object, with gate rosters monotone across every comparable pair of the registries those installs wrote, plus the artifact-less %s leg driving a payload the packer itself produced with no artifact and asserting one refusal for init, doctor, diff and a bare invocation alike, naming the platform and writing nothing, the demo arm running checkwright demo green inside an installed consumer with its act 3 red read off a FAIL: line, the front-page proof block found in its output and that consumer unchanged and its scratch torn down, the extracted-tarball arm with node/npm masked and reversed the same way, the toolchain-free arm driving doctor and a full init with cargo/rustc masked, the jq-less arm asserting diff, uninstall and a lattice-minimum and a guard-kit init run clean with no jq on PATH, the installed guard hook answering a payload and doctor naming jq nowhere, the bash-less arm installing every profile that owes no bash and committing through its hooks clean and refused with no bash on PATH, the two-hop cross-version upgrade arm carrying the relinquish and re-add, the cross-version reversal arm reversing an unedited consumer back to its pre-init tree object after those same three hops, the same-version seam arm and the protection branch chained onto it over a tampered gate binary, the narrowing arm re-running init at a smaller profile so files[] outlives kits, and the artifact arm driving the three selection outcomes on a mutated copy of that payload, with its two refusals asserted to differ in message and remedy, and the bootstrap'\''s shasum fallback verifying and refusing with sha256sum masked wherever the host carries shasum)\n' "${#PROFILES[@]}" "$PROVENANCE" "${VALUE_RED[*]}" "$BARE_PROFILE"
+printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access, each carrying %s, each put in front of a real prose defect (caught by %s) and each reversed back to its pre-init tree object, with gate rosters monotone across every comparable pair of the registries those installs wrote, plus the artifact-less %s leg driving a payload the packer itself produced with no artifact and asserting one refusal for init, doctor, diff and a bare invocation alike, naming the platform and writing nothing, the demo arm running checkwright demo green inside an installed consumer with its act 3 red read off a FAIL: line, the front-page proof block found in its output and that consumer unchanged and its scratch torn down, the companion arm applying each spec-toolkit recipe on its fixture tree green and catching each planted defect by its own gate, the extracted-tarball arm with node/npm masked and reversed the same way, the toolchain-free arm driving doctor and a full init with cargo/rustc masked, the jq-less arm asserting diff, uninstall and a lattice-minimum and a guard-kit init run clean with no jq on PATH, the installed guard hook answering a payload and doctor naming jq nowhere, the bash-less arm installing every profile that owes no bash and committing through its hooks clean and refused with no bash on PATH, the two-hop cross-version upgrade arm carrying the relinquish and re-add, the cross-version reversal arm reversing an unedited consumer back to its pre-init tree object after those same three hops, the same-version seam arm and the protection branch chained onto it over a tampered gate binary, the narrowing arm re-running init at a smaller profile so files[] outlives kits, and the artifact arm driving the three selection outcomes on a mutated copy of that payload, with its two refusals asserted to differ in message and remedy, and the bootstrap'\''s shasum fallback verifying and refusing with sha256sum masked wherever the host carries shasum)\n' "${#PROFILES[@]}" "$PROVENANCE" "${VALUE_RED[*]}" "$BARE_PROFILE"
 exit 0

@@ -27,7 +27,7 @@ Compatibility here is tiered, not blanket — the honest split matters more than
 - **Tier one — runs anywhere.** The gate battery is a prebuilt binary, with bash left in the library and tooling around it, over a coreutils toolchain. No gate reads a harness surface, so the battery runs under any harness, under any CI, or under no harness at all. This is the layer that does the enforcing, and it has no harness dependency to compromise.
 - **Tier two — configurable at the core, Claude-Code-native at the edges.** The always-loaded agent file is **configuration, not a port**: [the next section](#running-under-an-agentsmd-harness) runs the kits under an `AGENTS.md` harness. What stays genuinely Claude-Code-native is the residue with no cross-harness target: the stage-skill auto-load bindings (the `.claude/` shims that point a `/build` at its template — one binding, not the mechanism, which is plain markdown run by path) and the settings pins, the session-hook wiring, and memory-off enforcement (no standard cross-harness settings surface exists to port them to).
 
-The division is deliberate. The part that must be portable — enforcement — is; only the harness-native bindings and settings residue are adapter work.
+The division is deliberate. The part that must be portable — enforcement — is; only the harness-native bindings and settings residue are adapter work. The enforcement tier is tested beside two spec-authoring toolkits, each governed by a recipe on a tree in its own layout: [Spec Kit and OpenSpec](spec-toolkits.md).
 
 ## Running under an AGENTS.md harness
 

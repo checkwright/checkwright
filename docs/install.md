@@ -1,5 +1,6 @@
 ---
 title: Install
+nav_id: install
 nav_order: 3
 ---
 
@@ -200,7 +201,7 @@ Verify as above. To uninstall, run the same last line with `uninstall` in place 
 
 `init` vendors the kits, writes a `gates.list` and the config files they read, records the install in `checkwright.lock`, and makes one commit. It ends by printing the commands that finish the setup; run them.
 
-Choose a profile with `--profile`. With none, a first install takes `starter` and a re-run keeps the profile the install recorded:
+Choose a profile with `--profile`. If another toolkit writes your specs, take `prose` and fit it with [Spec Kit and OpenSpec](spec-toolkits.md). With none, a first install takes `starter` and a re-run keeps the profile the install recorded:
 
 - `starter` — the gate SDK on its own;
 - `delegation` — adds the kits for agent sessions;

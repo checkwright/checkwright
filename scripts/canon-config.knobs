@@ -15,6 +15,8 @@ CANON_KIT_SEAM_PRIVATE_SURFACES[] = BRIEF.local.md
 
 # comment-tier-exempt: installer/ is repo-root-governed rather than a kit, yet its SPEC is published on the repository and the docs mirror, so the provenance arms hold it as this tree's own seam surface
 CANON_KIT_SEAM_SURFACE_GLOBS[] = installer/SPEC.md
+# comment-tier-exempt: companion/ is repo-root-governed on the same terms, and its SPEC is published the same two ways
+CANON_KIT_SEAM_SURFACE_GLOBS[] = companion/SPEC.md
 
 # comment-tier-exempt: deliberate-absence rulings may narrate what the kit excludes — an "Out of scope" section states what a kit does not carry and why, so the whole section is exempt from the temporal-narration gate
 CANON_KIT_TEMPORAL_EXEMPT_SECTIONS[] = Out of scope
@@ -31,6 +33,7 @@ CANON_KIT_MANIFEST_FILES[] = TRAJECTORY.md
 CANON_KIT_MANIFEST_FILES[] = */SPEC.md
 CANON_KIT_MANIFEST_FILES[] = */README.md
 CANON_KIT_MANIFEST_FILES[] = reserve/*/README.md
+CANON_KIT_MANIFEST_FILES[] = companion/*/README.md
 CANON_KIT_MANIFEST_FILES[] = doctrine-kit/DOCTRINE.md
 CANON_KIT_MANIFEST_FILES[] = docs/*.md
 CANON_KIT_MANIFEST_FILES[] = docs/*/index.md
@@ -75,10 +78,11 @@ CANON_KIT_RESTATEMENT_PAGES[] = docs/*/index.md
 CANON_KIT_PAGE_REPEAT_PAGES[] = docs/*.md
 CANON_KIT_PAGE_REPEAT_PAGES[] = docs/*/index.md
 
-# comment-tier-exempt: the hand-authored pages whose section citations are links (docs/site-architecture.md §Page-authoring rules): the site pages and the top-level READMEs; the dated posts and the generated mirrors stay out, and the front door joins with its own conversion
+# comment-tier-exempt: the hand-authored pages whose section citations are links (docs/site-architecture.md §Page-authoring rules): the site pages, the front door and the top-level READMEs; the dated posts and the generated mirrors stay out
 CANON_KIT_CITATION_LINK_PAGES[] = docs/*.md
 CANON_KIT_CITATION_LINK_PAGES[] = docs/*/index.md
 CANON_KIT_CITATION_LINK_PAGES[] = */README.md
+CANON_KIT_CITATION_LINK_PAGES[] = README.md
 
 # comment-tier-exempt: this repo's measured-claim oracle and the surface its markers are read from — the keys and the facts behind them are consumer config for the same provenance-seam reason the transport and payload vocabularies are, and the surface is the governed manifest set widened by the stage-skill shims, which carry governed prose no other surface reaches (the prose surface excludes them by an ownership decision about copy shape, which is not the ownership this gate's rule needs), and by the work queue, which takes the marker without taking the manifest tier's bare-cardinal ban (canon-kit/SPEC.md §check-manifest-count)
 CANON_KIT_MEASURED_CLAIMS_CMD[] = bash
@@ -109,6 +113,8 @@ CANON_KIT_ENUM_SETS_CMD[] = enum-sets
 # comment-tier-exempt: the slot-free kit-template and agent-definition surfaces this repo governs — the finder includes a candidate iff it bears no binding slot, so slot-bearing templates (lead.md, the stage skills, agent-execution.md) self-exclude; the stage-skill shims under .claude/commands/ stay out (they are consumer bindings, governed by check-skill-binding/check-shim-restatement)
 CANON_KIT_PROSE_SURFACE_GLOBS[] = */templates/*.md
 CANON_KIT_PROSE_SURFACE_GLOBS[] = .claude/agents/*.md
+# comment-tier-exempt: the Spec Kit extension's agent commands, slot-free instruction prose this repo ships under companion/
+CANON_KIT_PROSE_SURFACE_GLOBS[] = companion/speckit/commands/*.md
 
 # comment-tier-exempt: this repo's governed-source surface, set so the corpus arrives through the knob the descriptors couple to rather than through the kit's default branch. The knob-file glob is the one widening past the kit default branch, which scans no `.knobs`: a static kit's consumer knob file carries `#` comments the tier governs, and the gate's default comment style reads them
 CANON_KIT_COMMENT_SURFACE[] = **/*.sh
@@ -119,13 +125,14 @@ CANON_KIT_COMMENT_SURFACE[] = **/*.knobs
 # spec: canon-kit/SPEC.md §check-comment-tier
 CANON_KIT_COMMENT_ACTIONS = on
 
-# comment-tier-exempt: the programs this repo's shell fences name beyond the bundled generic utility set — the crate toolchain its contributor battery runs, the fetch and checksum tools its install recipes use, and the package manager one platform's install recipe names, and the npm runner the one-command install uses; a tree's toolchain is its own vocabulary, never a kit literal (the provenance seam)
+# comment-tier-exempt: the programs this repo's shell fences name beyond the bundled generic utility set — the crate toolchain its contributor battery runs, the fetch and checksum tools its install recipes use, and the package manager one platform's install recipe names, the npm runner the one-command install uses, and the Spec Kit CLI the companion extension installs through; a tree's toolchain is its own vocabulary, never a kit literal (the provenance seam)
 CANON_KIT_FENCE_PROGRAMS_EXTRA[] = cargo
 CANON_KIT_FENCE_PROGRAMS_EXTRA[] = curl
 CANON_KIT_FENCE_PROGRAMS_EXTRA[] = sha256sum
 CANON_KIT_FENCE_PROGRAMS_EXTRA[] = shasum
 CANON_KIT_FENCE_PROGRAMS_EXTRA[] = brew
 CANON_KIT_FENCE_PROGRAMS_EXTRA[] = npx
+CANON_KIT_FENCE_PROGRAMS_EXTRA[] = specify
 
 # comment-tier-exempt: this repo's reader-facing prose surfaces for check-prose-tells — the hand-authored top-level docs living pages only; the single-level docs/*.md glob deliberately excludes the generated kit mirror (docs/<kit>/) and the immutable dated posts (docs/posts/), since a prose gate forcing edits to generated or immutable pages contradicts them; consumer editorial scope, never a kit literal (the provenance seam)
 CANON_KIT_PROSE_TELL_GLOBS[] = docs/*.md
@@ -142,9 +149,10 @@ CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA[] = CONTRIBUTING
 CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA[] = GNU
 CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA[] = BSD
 
-# comment-tier-exempt: this repo keeps its tracked markdown unwrapped, one line per paragraph, the queue and its shipped template included; gate-test fixtures are held out because a fixture's line shape is the input under test — consumer editorial scope, never a kit literal (the provenance seam)
+# comment-tier-exempt: this repo keeps its tracked markdown unwrapped, one line per paragraph, the queue and its shipped template included; gate-test fixtures and the companion fixture trees are held out because a fixture's line shape is the input under test — consumer editorial scope, never a kit literal (the provenance seam)
 CANON_KIT_UNWRAP_GLOBS[] = *.md
 CANON_KIT_UNWRAP_EXCLUDE[] = */gate-tests/*
+CANON_KIT_UNWRAP_EXCLUDE[] = companion/fixtures/*
 # comment-tier-exempt: the three line leads this repo's own readers key on — lifecycle-kit's ruling-staleness probe reads `ruling:` and `discharge:`, and the close-surface roster reads `close-surface:`; the unwrap joining one onto the paragraph above disarms its reader, so each opens a block here
 CANON_KIT_UNWRAP_DECLARATION_LEADS[] = ruling:
 CANON_KIT_UNWRAP_DECLARATION_LEADS[] = discharge:

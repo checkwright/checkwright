@@ -13,7 +13,7 @@ nav_order: 1
 
 It is for the maintainer of a repository coding agents write most of, who has to answer at merge time whether the work is actually done and cannot answer it by reading every diff.
 
-**It complements the workflow you already run.** Keep your spec process, your prompts, your harness. Add Checkwright where a claim has to be mechanically proven rather than asserted: the instructions shape, the gates enforce. Why that split is the whole design: [Positioning](#positioning).
+**It [complements the workflow you already run](spec-toolkits.md).** Keep your spec process, your prompts, your harness. Add Checkwright where a claim has to be mechanically proven rather than asserted: the instructions shape, the gates enforce. Why that split is the whole design: [Positioning](#positioning).
 
 ## Try it first
 

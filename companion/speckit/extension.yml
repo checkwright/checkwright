@@ -1,0 +1,38 @@
+schema_version: "1.0"
+
+extension:
+  id: "checkwright"
+  name: "Checkwright"
+  version: "0.0.0"
+  description: "Deterministic gates over your specs and repository: broken links, dangling section citations, unclosed fences and missing scripts fail at commit and in CI."
+  author: "Checkwright"
+  repository: "https://github.com/checkwright/checkwright"
+  license: "Apache-2.0"
+  homepage: "https://checkwright.dev"
+
+requires:
+  speckit_version: ">=1.0.12"
+  tools:
+    - name: "git"
+      required: true
+
+provides:
+  commands:
+    - name: "speckit.checkwright.install"
+      file: "commands/install.md"
+      description: "Install Checkwright's gates and apply the Spec Kit recipe"
+    - name: "speckit.checkwright.check"
+      file: "commands/check.md"
+      description: "Run Checkwright's gate battery and report its verdict"
+
+hooks:
+  after_implement:
+    command: "speckit.checkwright.check"
+    optional: true
+    prompt: "Run Checkwright's gates over the implementation?"
+    description: "Run the gate battery after implement"
+
+tags:
+  - "quality"
+  - "gates"
+  - "docs"

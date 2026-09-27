@@ -254,6 +254,71 @@ jobs:
             || { echo "::error::the CI action's SARIF log does not hold exactly one run"; exit 1; }
           echo "the CI action wrote $SARIF with one run and $(jq '.runs[0].results | length' "$SARIF") result(s)"
 
+  # spec: companion/SPEC.md §The toolkit legs — the toolkits' own tools at their pins, as oracles over the extension and the OpenSpec fixture
+  companion-toolkits:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22'
+
+      # spec: companion/SPEC.md §The component — toolkits.list is the one place a pin is spelled
+      - name: read the toolkit pins
+        run: |
+          set -euo pipefail
+          pin() { awk -v t="$1" -v f="$2" '$1 == t { print $f; found = 1 } END { exit !found }' companion/toolkits.list; }
+          sp="$(pin speckit 2)"; sv="$(pin speckit 3)"
+          op="$(pin openspec 2)"; ov="$(pin openspec 3)"
+          printf '%s\n' "SPECKIT_PACKAGE=$sp" "SPECKIT_VERSION=$sv" "OPENSPEC_PACKAGE=$op" "OPENSPEC_VERSION=$ov" >> "$GITHUB_ENV"
+
+      - name: install the packed extension with the pinned Spec Kit CLI
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet "$SPECKIT_PACKAGE==$SPECKIT_VERSION"
+          work="$RUNNER_TEMP/speckit"
+          mkdir -p "$work/serve" "$work/tree"
+          bash scripts/ci-pack-extension.sh 0.0.0 "$work/serve"
+          git -C "$work/tree" init -q
+          ( cd "$work/tree" && specify init --here --non-interactive --integration claude --script sh )
+          base="http://127.0.0.1:8733"
+          python -m http.server 8733 --bind 127.0.0.1 --directory "$work/serve" > "$work/server.log" 2>&1 &
+          srv=$!
+          trap 'kill "$srv" 2>/dev/null || true' EXIT
+          for _ in 1 2 3 4 5 6 7 8 9 10; do
+            curl -fsS -o /dev/null "$base/checkwright-companion-0.0.0.zip" && break
+            sleep 1
+          done
+          ( cd "$work/tree" && printf 'y\n' | specify extension add checkwright --from "$base/checkwright-companion-0.0.0.zip" ) \
+            || { echo "::error::specify extension add exited non-zero on the packed extension"; exit 1; }
+          installed="$work/tree/.specify/extensions/checkwright"
+          [ -f "$installed/extension.yml" ] || { echo "::error::the install wrote no $installed/extension.yml"; exit 1; }
+          [ -f "$installed/recipe/unregister.list" ] || { echo "::error::the install carried no recipe/ into $installed"; exit 1; }
+          grep -q 'speckit.checkwright.check' "$work/tree/.specify/extensions.yml" \
+            || { echo "::error::the after_implement hook is not registered in .specify/extensions.yml"; exit 1; }
+          echo "Spec Kit $SPECKIT_VERSION installed the packed extension and registered its hook"
+
+      - name: the extension's Spec Kit floor is the pinned version
+        run: |
+          set -euo pipefail
+          floor="$(awk -F'"' '/^  speckit_version:/ { print $2 }' companion/speckit/extension.yml)"
+          [ "$floor" = ">=$SPECKIT_VERSION" ] \
+            || { echo "::error::extension.yml requires speckit_version '$floor', where the pin in companion/toolkits.list is $SPECKIT_VERSION"; exit 1; }
+          echo "requires.speckit_version is $floor"
+
+      - name: validate the OpenSpec fixture with the pinned OpenSpec CLI
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/openspec"
+          mkdir -p "$work"
+          cp -R companion/fixtures/openspec/layout/. "$work/"
+          ( cd "$work" && npx --yes "$OPENSPEC_PACKAGE@$OPENSPEC_VERSION" validate --all --strict --no-interactive )
+
   # spec: installer/SPEC.md §The consumer smoke — the CI legs; the native Windows legs
   install-smoke-sh-windows:
     needs: [native-artifacts, native-artifacts-roster]

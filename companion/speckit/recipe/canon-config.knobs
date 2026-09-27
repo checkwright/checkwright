@@ -1,0 +1,2 @@
+# spec: companion/SPEC.md §The Spec Kit recipe — appended to the consumer's scripts/canon-config.knobs
+CANON_KIT_PROSE_SURFACE_GLOBS[] = specs/**/*.md
