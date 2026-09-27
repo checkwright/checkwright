@@ -4,6 +4,7 @@
 
 - `check-survey-record` — a survey block's `corpus` must now be the literal `none` or space-separated git pathspecs, single-quoted where one carries a quote, a shell metacharacter, a glob character or pathspec magic, and in bare mode each pathspec must match a path at the block's `rev`. A block whose corpus is prose, carries an unquoted glob, or names nothing reds; rewrite its corpus to the pathspecs the survey read (scoping prose moves to `finding`), or `none` for a survey over no tree corpus.
 - `check-docs-page-repeat` — new canon-kit gate: no page declared in `CANON_KIT_PAGE_REPEAT_PAGES` states a relative link target, or a sentence of `CANON_KIT_PAGE_REPEAT_MIN_WORDS` words or more, twice. It arms only where you set the corpus knob; register it and set the knob to hold your docs pages, then make each later repeat plain text or an in-page anchor.
+- `check-gate-substrate-parity` — reds after upgrading through assertion I, which holds every gate the binary carries for a kit you vendor to be registered in your `gates.list` or declared `# unregistered:` there. If you vendor canon-kit, the new `check-docs-page-repeat` is such a gate: register it, or declare `# unregistered: check-docs-page-repeat — <reason>`.
 
 ## Behavior changes
 
