@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### spec-toolkits-guarantee
-
-docs/spec-toolkits.md says four defect classes "fail at commit and in CI" and never states what that guarantees: the pre-commit hook is skippable with `--no-verify`, so the guarantee is CI run as a required status check under branch protection, and the page does not say so. It also leaves unsaid that the four classes are document hygiene, not spec-to-code conformance. The operator found the page unconvincing (operator direction 2026-09-27, lead session).
-
-**Deliverable:** the page states the guarantee and its setup (the seeded CI workflow as a required status check), names the four classes as document hygiene and not conformance, and keeps its limit that the extension's commands and hook are agent-followed. Where `foreign-spec-lifecycle-unowned` lands a lifecycle binding in the same set, the page states what that adds and for which profile.
-
-**Promoted as debt 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** a page edit stating facts the specs already carry. Precondition (4) of the catalog submission.
-
-**Cost while deferred:** the catalog's one-shot exposure lands on a page whose claim a skeptical reader cannot place. Filed 2026-09-27 to the gap inbox by the lead after companion-catalog-extension's close. Re-verified: the page carries no `required`, `--no-verify` or branch-protection sentence. Owner lookup: `spec-toolkits`, `guarantee` in this file — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (the submission this gates); owner companion/SPEC.md.
-
 ### catalog-landing-docs-polish
 
 the pages a Spec Kit catalog visitor reaches are not yet polished for that one-shot exposure: the extension's `repository` and `homepage` (README.md, docs/index.md), its README (companion/speckit/README.md), and the landing page with the install page it routes to (docs/spec-toolkits.md, docs/install.md). The `catalog-then-plugin` ruling puts their polish before the submission; the page-authoring rules and the one-product statement have landed, so what remains is the polish itself (operator direction 2026-09-27, lead session).
@@ -208,7 +198,7 @@ the interop rung's submission half. The build half landed at companion-catalog-e
 
 **Deliverable:** the Spec Kit community-catalog submission, filed as the catalog's Extension Submission issue with its `download_url` naming the `checkwright-companion-<version>.zip` Release asset; the extension's README and the landing page then gain the catalog's install form.
 
-**Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **Ranked behind four preconditions the operator set on 2026-09-27:** `crate-tests-windows-flip`, since red jobs inside a green run read as ignored failures; `linux-glibc-artifacts`; [catalog-landing-docs-polish](#catalog-landing-docs-polish); and [spec-toolkits-guarantee](#spec-toolkits-guarantee).
+**Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **Ranked behind four preconditions the operator set on 2026-09-27:** `crate-tests-windows-flip`, since red jobs inside a green run read as ignored failures; `linux-glibc-artifacts`; [catalog-landing-docs-polish](#catalog-landing-docs-polish); and `spec-toolkits-guarantee`.
 
 **Push need (2026-09-27, inside the budget):** the release tag push beside the closing push, since the submission needs the extension on a published tag; close's release policy decides the cut.
 
@@ -1482,5 +1472,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - windows-fresh-fixture-stub
 - linux-glibc-artifacts
 - crate-tests-windows-flip
+- spec-toolkits-guarantee
 
 ## Lessons Learned

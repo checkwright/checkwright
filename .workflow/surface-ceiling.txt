@@ -32,7 +32,7 @@
 1472cp docs/gate-sdk/index.md
 1259cp docs/guard-kit/index.md
 5222cp docs/index.md
-16441cp docs/install.md
+16301cp docs/install.md
 1344cp docs/kits.md
 1395cp docs/lifecycle-kit/index.md
 3007cp docs/methodology.md
@@ -69,14 +69,14 @@
 789cp docs/releases.md
 39578cp docs/site-architecture.md
 2412cp docs/site-kit/index.md
-6084cp docs/spec-toolkits.md
+6778cp docs/spec-toolkits.md
 2477cp docs/value.md
 35405cp doctrine-kit/SPEC.md
 141064cp drift-kit/SPEC.md
 2698cp drift-kit/templates/close-knowledge.md
 3752cp drift-kit/templates/economics.md
 93540cp evidence-kit/SPEC.md
-934084cp gate-sdk/SPEC.md
+933745cp gate-sdk/SPEC.md
 301516cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
 275418cp installer/SPEC.md

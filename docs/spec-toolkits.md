@@ -19,6 +19,10 @@ With the recipe applied, four kinds of defect in your specs fail at commit and i
 
 A citation's path is read from the repository root, so write `specs/001-login/spec.md §Assumptions`, not `spec.md §Assumptions`. The second form is skipped rather than checked. <!-- citation-link-exempt: examples of the two citation forms, not citations -->
 
+These four are document hygiene: they hold your specs together as documents. None of them checks that your code does what a spec says.
+
+The pre-commit hook catches them early, but `git commit --no-verify` skips it. The guarantee is CI. `init` commits a workflow that runs the battery on every push and pull request, and once you make its check required in your branch protection, a red battery blocks the merge. [Managing](install.md#managing) says where to keep that check.
+
 ## Spec Kit
 
 Add the extension from a Checkwright release, with `X.Y.Z` the release's version:
@@ -83,7 +87,7 @@ From the repository root, in `sh` (on Windows, Git for Windows' `sh`), with `rec
 
 It appends the recipe's knob lines to your gate configuration, drops the gates the recipe names from `scripts/gates.list`, regenerates the pre-commit hook and the coupling graph, and runs the battery. On green it commits the `scripts/` directory; on red it stops before the commit and each red gate names its fix.
 
-Running lifecycle-kit's stage machine as well? Install `full` instead of `prose`, and on OpenSpec apply `companion/openspec/lifecycle/` with the same block, fetching its `lifecycle-config.knobs` and `unregister.list` as you fetched the recipe. Spec Kit has no lifecycle layer ([companion/SPEC.md §The lifecycle layer](companion/SPEC.md#the-lifecycle-layer)).
+Running lifecycle-kit's stage machine as well? Install `full` instead of `prose`, and on OpenSpec apply `companion/openspec/lifecycle/` with the same block, fetching its `lifecycle-config.knobs` and `unregister.list` as you fetched the recipe. The layer lets the stage machine read OpenSpec's in-flight changes, so a change touching two capabilities owes the align stage before build. Spec Kit has no lifecycle layer ([companion/SPEC.md §The lifecycle layer](companion/SPEC.md#the-lifecycle-layer)).
 
 ## What is tested
 
@@ -93,5 +97,6 @@ Every push installs the profile on a tree in each toolkit's layout, applies the 
 
 - Spec Kit ships no validator, so the Spec Kit test tree follows the structure of its templates at the pinned version, and nothing checks it further.
 - The extension's two commands and its hook are instructions your agent follows. No test runs an agent through them; the tests run the recipe block they contain.
+- A required check stops a skipped hook, not an author who edits the workflow.
 - The Windows route is documented and not run.
 - A pinned version says nothing about the next one.
