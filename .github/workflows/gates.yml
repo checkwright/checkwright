@@ -1,9 +1,4 @@
-# Filled instance of gate-sdk/templates/gates-workflow.yml — this repo's CI
-# backstop. The full battery, then the fixture suites derived from the
-# gate-tests dirs on disk (--emit fixture-suites — no hand-list to drift from
-# CLAUDE.md's battery), then the non-gate-tests runners. Checkout + bash only.
-# Scope + neutrality boundary: see the template header and gate-sdk/SPEC.md
-# §Enforcement tiers.
+# spec: gate-sdk/SPEC.md §templates/gates-workflow.yml — this repo's filled instance
 name: gates
 
 on:
@@ -12,64 +7,35 @@ on:
   pull_request:
     branches: [master]
 
-# gate-sdk/SPEC.md §check-shellcheck: the one ShellCheck version this workflow
-# pins, read by each job that installs the analyser. Bump it together with
-# every installing step's own asset digest.
+# spec: gate-sdk/SPEC.md §check-shellcheck — the one pinned analyser version; bump it with each asset digest
 env:
   SHELLCHECK_VERSION: v0.11.0
 
 jobs:
   gates:
-    # Pinned, not `-latest`: native/runners.list's header owns which Linux jobs pin.
+    # comment-tier-exempt: pinned, not -latest; native/runners.list's header owns which Linux jobs pin
     runs-on: ubuntu-24.04
-    # security-events: write — the battery's SARIF log is uploaded to code
-    # scanning, which is how a red reaches a pull request as an annotation.
+    # spec: installer/SPEC.md §The CI action — security-events carries the battery's SARIF upload
     permissions:
       contents: read
       security-events: write
     steps:
-      # fetch-depth: 0 — check-trajectory-fresh reads the full commit graph.
+      # spec: gate-sdk/SPEC.md §templates/gates-workflow.yml — the full history
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           fetch-depth: 0
-      # This repo registers check-docs-render-fidelity, whose oracle renders each
-      # docs page through ruby's kramdown GFM parser (site-kit/SPEC.md
-      # §check-docs-render-fidelity), and check-docs-liquid-parse, whose oracle
-      # parses each Liquid-processed docs file through ruby's liquid gem at the
-      # Pages pin (site-kit/SPEC.md §check-docs-liquid-parse). The runner ships
-      # ruby but not the gems, so
-      # provision them into the system ruby the gates' bare `ruby` resolves. Stays
-      # a bash `run:` (no setup-ruby action) to keep the checkout+bash tamper
-      # floor; rides this filled instance, not the generic template, because the
-      # dependency joins the toolchain only for a consumer that registers the gates.
+      # spec: gate-sdk/SPEC.md §Consumer smoke — CI tool provisioning rides the filled instance
       - name: docs gate deps (kramdown GFM parser, liquid)
         run: sudo gem install --no-document kramdown-parser-gfm liquid:4.0.4
-      # A registry member now dispatches to a compiled subcommand (gate-sdk/SPEC.md
-      # §lib/gate.sh), and gate_command is fail-closed on an absent binary — so the
-      # release build precedes the battery rather than accompanying it. Stays a bash
-      # `run:` on the runner's preinstalled cargo (no setup-rust action) to keep the
-      # checkout+bash tamper floor the docs gate deps step above states.
+      # spec: gate-sdk/SPEC.md §check-crate-arms — CI's build step stays, ahead of the battery
       - name: build the native gate binary
         run: bash gate-sdk/bin/build-native.sh
-      # The standing oracle for the crate's whole unix-only class: `cargo check` does
-      # not link, so no MSVC linker is needed and a Linux runner can answer whether
-      # the crate compiles for Windows; `rustup target add` fetches a precompiled std.
-      # The next un-gated `std::os::unix` use reds on the commit that adds it rather
-      # than on a Windows adopter's machine. Three limits ship with it. A compiler
-      # halts at its first error batch, so a green proves the crate compiles and a red
-      # names one batch — never the full set, so this cannot prove absence. It proves
-      # compilation, NOT correctness: `proc.rs`'s `PATH` split compiles cleanly for
-      # this triple and is wrong there. And it is NOT a gate and must not become one —
-      # it needs `rustup` and network, which this repo's contributor floor does not
-      # carry (context-kit/SPEC.md §bin/env-probe), and a registry member that cannot
-      # run in a contributor's tree reds for the wrong reason. It rides this job, so
-      # it costs no additional push and no additional workflow run.
+      # spec: gate-sdk/SPEC.md §check-crate-arms — the Windows cross-check, compilation and not a gate
       - name: cross-check the crate compiles for Windows
         run: |
           rustup target add x86_64-pc-windows-msvc
           cargo check --release --manifest-path native/Cargo.toml --target x86_64-pc-windows-msvc
-      # gate-sdk/SPEC.md §check-shellcheck: this install is the CI verdict's
-      # reference, at the workflow's SHELLCHECK_VERSION.
+      # spec: gate-sdk/SPEC.md §check-shellcheck — this install is the CI verdict's reference
       - name: install the pinned shellcheck release, digest-verified
         env:
           SHELLCHECK_SHA256: 8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198
@@ -90,8 +56,7 @@ jobs:
         run: |
           shellcheck --version | grep '^version:'
           bash gate-sdk/bin/run-gates.sh
-      # Presentation, never the verdict (installer/SPEC.md §The CI action): the
-      # job's status stays the battery's, so a refused upload cannot red it.
+      # spec: installer/SPEC.md §The CI action — the SARIF upload is presentation, never the verdict
       - name: upload the battery's SARIF log
         if: always()
         continue-on-error: true
@@ -111,76 +76,25 @@ jobs:
           exit $rc
       - name: guard-kit decision table
         run: bash gate-sdk/bin/run-gates.sh --run-guard-tests
-      # The front-end twin's held comparison (gate-sdk/SPEC.md §run-gates). It is
-      # not a battery member because the battery's host may carry no PowerShell;
-      # it rides this leg too so a divergence reds on the leg every push runs
-      # first, not only on the binding Windows leg.
+      # spec: gate-sdk/SPEC.md §run-gates — the front-end twin's held comparison
       - name: front-end parity, bash stub against its PowerShell twin
         run: bash gate-sdk/bin/run-gates.sh --run-front-end-parity
 
-  # The activation path, exercised server-side. It is a job rather than a step in
-  # `gates` because it asserts a different thing — that an adopter's install
-  # works, not that this tree is clean — and because the per-platform siblings
-  # join here as further jobs. Both are below, and each one's own header says what
-  # it asserts rather than this comment: the postures genuinely differ per leg —
-  # an instrument whose product is its log, a leg binding on its own exit status,
-  # a leg held non-binding while its platform's join predicate is still open, and
-  # this job binding against a recorded baseline.
-  # **Read a posture off its own leg, never off a count here.** This comment used
-  # to enumerate them and went stale twice doing it — once when the PowerShell leg
-  # landed and once when a second macOS leg did, at which point "the macOS leg"
-  # stopped naming a unique job and the two macOS legs no longer shared a posture.
-  # A count restated where the headers already own it is the second spelling this
-  # group has no reader for. A leg on a further platform is bought by the entry
-  # that wants it, never implied by this group.
-  #
-  # Not a matrix, and specifically **not derived from native/targets.list**. That
-  # roster is the artifact commitment, and a smoke leg on a platform is exactly
-  # what has to run *before* that platform may join it (gate-sdk/SPEC.md
-  # §Consumer payload). Deriving this matrix from the roster would close the
-  # loop: no platform could ever earn the run that qualifies it.
+  # spec: installer/SPEC.md §The consumer smoke — the CI legs; this one is judged against the baseline
   install-smoke-sh-linux:
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
-      # fetch-depth: 0 — the smoke stamps the packed version from the newest tag
-      # (`git describe --tags`), and a shallow checkout carries none, so without
-      # it the arm silently exercises the fallback version instead of a real one.
+      # spec: installer/SPEC.md §The consumer smoke — every leg checks out full history
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           fetch-depth: 0
 
-      # **This leg is green against a recorded baseline, never green simpliciter,
-      # and the distinction is the whole reason it is shaped this way.** The
-      # suite's status is captured rather than obeyed, and the verdict comes from
-      # --diff-baseline, which reds only where the observed result *deviates* from
-      # .workflow/validate-baseline.txt. That shape is not an artifact of the one
-      # ruled failure it was built around — the stub cut repaired that arm and
-      # every row now records `pass` — it is what lets a ruled outcome be held
-      # without a leg that must be remembered to be re-enabled. Reading this step
-      # as a plain smoke run would misread both what it asserts and what a red
-      # here means.
-      #
-      # **What a green here does and does not say.** The suite is on a per-arm
-      # parser, so each printed arm of the smoke is its own baseline scenario and
-      # the diff reds when an arm that is baselined `pass` comes back red *or
-      # absent* (evidence-kit/SPEC.md §Baseline manifest). Every arm is baselined
-      # `pass`, so an abort anywhere reds not only the arm that failed but every
-      # arm it skipped. That is the coverage this leg lacked
-      # while the whole suite was one `exit-code` scenario, where every outcome
-      # read clean and a green meant nothing. Still read the log: a green says the
-      # arms the run reached behaved as recorded, not that the install path is
-      # sound on a platform this leg does not run.
-      #
-      # The generated hooks are POSIX sh (gate-sdk/SPEC.md §gen-pre-commit), and the
-      # smoke below commits through them under the runner's `/bin/sh`. Printing what
-      # that link resolves to is what makes this leg's green a strict-shell proof
-      # rather than a bash one; read it off the log.
+      # spec: gate-sdk/SPEC.md §gen-pre-commit — the hooks are POSIX sh; the next step names the /bin/sh they run under
       - name: name the shell the hooks run under
         run: readlink -f /bin/sh
-      # Stays a bash `run:` on the runner's preinstalled toolchain (no setup-node,
-      # no setup-rust) to keep the checkout+bash tamper floor the steps above state.
+      # spec: installer/SPEC.md §The consumer smoke — the baseline Linux leg is judged against the recorded baseline
       - name: install smoke, judged against the recorded baseline
         env:
           INSTALLER_SMOKE_TMP_DIR: ${{ runner.temp }}
@@ -188,28 +102,14 @@ jobs:
         run: |
           mkdir -p "$INSTALLER_SMOKE_TARBALL_OUT"
           log="$RUNNER_TEMP/installer-smoke.log"
-          # The suite's own non-zero is an input to the comparison, not a verdict,
-          # so -e is lifted across it and the status read from PIPESTATUS — tee's
-          # own zero would otherwise be the only status this shell ever sees.
           set +e
           bash installer/consumer-smoke/run-smoke.sh 2>&1 | tee "$log"
           rc="${PIPESTATUS[0]}"
           set -e
           echo "installer_smoke exited $rc; the verdict below is the baseline diff, not that status"
-          # The verdict is the `--diff-baseline` arm, and the binary it needs is built by
-          # the smoke's OWN first arm above (installer/consumer-smoke/run-smoke.sh, `build (the
-          # host gate binary the main payload carries)`) on this runner's preinstalled cargo — not
-          # by the `gates` job, which is a separate job with a separate workspace. The residual is
-          # named rather than discovered on a watched push: a smoke that blocks BEFORE that arm
-          # leaves no binary, and this line then reports the missing binary instead of a per-arm
-          # baseline diff. Both are red and the tee'd log above still says which arm broke.
           bash gate-sdk/bin/run-gates.sh --diff-baseline installer_smoke "$log" "$rc"
 
-      # The page's `unix-install` block, run verbatim (docs/site-architecture.md
-      # §Generated projections and their freshness gates, the install-blocks row).
-      # The tarball is the one the smoke above packed and handed out through
-      # INSTALLER_SMOKE_TARBALL_OUT, placed where the page's fetch fence would
-      # have put it beside a digest in the release job's format.
+      # spec: docs/site-architecture.md §Generated projections and their freshness gates — the install blocks
       - name: run the page's unix-install block against the packed tarball
         run: |
           set -euo pipefail
@@ -241,12 +141,7 @@ jobs:
             || { echo "::error::the page's unix-install block exited 0 but wrote no checkwright.lock"; exit 1; }
           echo "the page's unix-install block installed into a clean consumer"
 
-      # The hosted one-liner, piped into the runner's `/bin/sh` the way an adopter
-      # pipes it (installer/SPEC.md §Requirements, the install blocks' witness).
-      # docs/install.sh is served over a local HTTP origin beside the tarball and
-      # digest the step above placed, laid out as a release, and
-      # CHECKWRIGHT_RELEASE_BASE points the script there. The server is this
-      # witness's tool and no adopter's.
+      # spec: installer/SPEC.md §Requirements — the install blocks' witness, the one-liner under /bin/sh
       - name: run the hosted one-liner against the packed tarball
         run: |
           set -euo pipefail
@@ -276,10 +171,7 @@ jobs:
             || { echo "::error::the hosted one-liner exited 0 but wrote no checkwright.lock"; exit 1; }
           echo "the hosted one-liner installed into a clean consumer under $(readlink -f /bin/sh)"
 
-      # The CI action's witness (installer/SPEC.md §The CI action), run through
-      # `uses: ./installer` on the one-liner's consumer. The release layout is
-      # served again, left running for the job, since the step above stopped its
-      # server; CHECKWRIGHT_RELEASE_BASE points the action's install.sh there.
+      # spec: installer/SPEC.md §The CI action — its witness, through uses: ./installer
       - name: serve the packed release for the CI action
         run: |
           set -euo pipefail
@@ -309,114 +201,27 @@ jobs:
             || { echo "::error::the CI action's SARIF log does not hold exactly one run"; exit 1; }
           echo "the CI action wrote $SARIF with one run and $(jq '.runs[0].results | length' "$SARIF") result(s)"
 
-  # The native Windows sibling, and the first thing this repository has ever run
-  # on a non-Linux host. It was shaped as an instrument before an assertion,
-  # answering as many questions per run as one run can carry, because whether the
-  # crate built and the vendored battery ran under Git for Windows' bash was
-  # unmeasured. **Both are now measured**: round 21 (run 34267324532) built the
-  # binary, packed, installed from the tarball offline, held the profile invariant
-  # and printed `battery: All 12 gates passed` natively. The reporting-only probe
-  # steps below are kept on that history rather than on a live unknown — each is
-  # a question this leg would otherwise buy a round to re-ask the day it reds.
-  #
-  # **It does not ride the baseline diff the Linux leg above uses, deliberately.**
-  # That baseline's `installer_smoke` rows are per-arm and were recorded from a
-  # Linux run, so they are a claim about how those arms behave *there*. A second
-  # platform that fails differently, judged against the first platform's record,
-  # would report deviations that are platform difference rather than regression —
-  # the baseline is held-constant per scenario, and one scenario name cannot hold
-  # two populations at once.
-  #
-  # **What still stands between this leg and `native/targets.list`, corrected
-  # 2026-08-27 at scope against the tree rather than carried.** gate-sdk/SPEC.md
-  # §Consumer payload admits a triple only on a green run that produced *and
-  # exercised* the artifact. The three SOURCE facts that once said this leg could
-  # not do that at all have all shipped, and are recorded as discharged so a
-  # later session does not re-derive them as live:
-  #   - `installer/bin/checkwright.sh`'s `target_of_host()` now maps `MINGW*`,
-  #     `MSYS*` and `CYGWIN*` on x86_64 to `x86_64-pc-windows-msvc`, so a Windows
-  #     host selects the artifact instead of being refused as unrostered.
-  #   - `GATE_SDK_NATIVE_BIN`'s default derives its suffix from
-  #     `gate_exe_suffix`, so the knob names the artifact cargo actually emits
-  #     inside an installed consumer and not only on this tree.
-  #   - `shellcheck`'s entry in docs/install.md §Requirements justified an
-  #     ADOPTER floor member with contributor-only language, so nothing told an
-  #     adopter why `init` refuses without it. Round 3 measured that refusal
-  #     here; the member is now owed only where a registered gate needs it, and
-  #     the page states where each platform takes it from. PRODUCED was
-  #     discharged by that same round — the artifact built natively and packed —
-  #     so only EXERCISED is still owed.
-  # All three are CONFIRMED discharged by round 4 (run 33068870024): the step
-  # below cleared the toolchain and `init` vendored and committed for the first
-  # time ever on a Windows host. What remains is NOT merely the run — round 4
-  # named a fourth blocker, and this line said "one run" twice before and was
-  # wrong both times:
-  #   - On MSYS the installed consumer's root is carried in WINDOWS spelling, so
-  #     `run-gates.sh`'s RESOLVE_DIRS came out as
-  #     `/D:\a\_temp\...\consumer-starter.../gate-sdk/checks` — a POSIX `/` on a
-  #     `D:\` path — and all 10 gates reported `unresolved`. The starter profile
-  #     vendors gate-sdk alone and its whole shipped roster is `.gate`
-  #     descriptors with no shell fallback, so nothing ran at all.
-  # gate-sdk/SPEC.md §Consumer payload is explicit that removing a blocker grants
-  # nothing, and this leg has now spent three rounds proving that clause the hard
-  # way. PRODUCED is discharged; EXERCISED is what is owed, and placing the
-  # artifact in a consumer that then invokes zero gates is not exercising it.
-  #
-  # **It now installs the producer's upload rather than a stand-in it built here,
-  # which is what makes a green readable against the join predicate at all.**
-  # §Consumer payload admits a triple on ONE run carrying a release-shaped
-  # producer AND a consumer that installed that producer's own bytes. Until this
-  # rewiring the leg built the binary on the host it ran on, so its green could
-  # only ever have been half of a predicate whose other half nothing connected to
-  # it — the same shape the two macOS legs were repaired into, arriving here.
-  #
-  # **Its posture is DERIVED, for the reason the Intel macOS sibling's header
-  # states in full and this one does not restate.** `runs-on` and
-  # `continue-on-error` are read out of `native-artifacts-roster`'s per-target
-  # index at this leg's triple, so docs/install.md §Requirements' declaration
-  # decides both. That replaces a hard-coded `continue-on-error: true` carrying a
-  # standing instruction to remember to drop it — the maintained copy that goes
-  # wrong exactly once, silently, in the direction of a joined platform whose
-  # smoke red reds nothing. The day the declaration flips this triple to
-  # `joined`, this leg becomes binding with nobody remembering to make it so.
-  #
-  # **Every `run:` names `shell: bash`.** GitHub's default `run:` shell on a
-  # Windows runner is `pwsh`, so a step here that omitted the key would run
-  # PowerShell over a bash body. check-action-run-shell now *requires* the key on
-  # a Windows step rather than assuming bash (gate-sdk/SPEC.md
-  # §check-action-run-shell), so the habit this comment used to describe is the
-  # mechanism: `shell: bash` selects Git-for-Windows bash and keeps the runner
-  # and the gate agreeing on what this text is.
+  # spec: installer/SPEC.md §The consumer smoke — the CI legs; the native Windows legs
   install-smoke-sh-windows:
     needs: [native-artifacts, native-artifacts-roster]
     runs-on: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['x86_64-pc-windows-msvc'].runner }}
     continue-on-error: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['x86_64-pc-windows-msvc'].held }}
-    # MSYS emulates fork on every process spawn and this suite spawns thousands,
-    # so the 272 seconds it takes on a Linux developer machine
-    # (installer/SPEC.md §The consumer smoke) is not the number to plan from.
+    # spec: installer/SPEC.md §The consumer smoke — MSYS emulates fork, hence the widest ceiling
     timeout-minutes: 90
     permissions:
       contents: read
     steps:
-      # Before the checkout, so the tree is written with the line endings every
-      # gate, digest and `git status --porcelain` comparison in this repository
-      # assumes. Git for Windows sets core.autocrlf=true in its system config and
-      # --global outranks it.
+      # spec: gate-sdk/SPEC.md §Consumer payload — a Windows leg sets LF line endings before the checkout
       - name: check the tree out with LF line endings
         shell: bash
         run: git config --global core.autocrlf false
 
-      # fetch-depth: 0 — the smoke stamps the packed version from `git describe
-      # --tags`, for the reason the Linux leg above states.
+      # spec: installer/SPEC.md §The consumer smoke — every leg checks out full history
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           fetch-depth: 0
 
-      # Reporting only, and it never fails. Every claim this project makes about
-      # Windows is currently a reading rather than a measurement, and this step is
-      # where that stops being true — it is worth more than the suite below on the
-      # first run, because a suite that dies at its preflight says nothing about
-      # the host and this says it all at once.
+      # spec: installer/SPEC.md §The consumer smoke — probe steps report and never fail
       - name: probe the runner
         shell: bash
         run: |
@@ -447,13 +252,7 @@ jobs:
           echo "TMPDIR=${TMPDIR:-<unset>}"
           exit 0
 
-      # The scratch base arrives in Windows spelling and everything below is
-      # handled by MSYS bash, so it is translated exactly once and handed on.
-      # The artifact name is printed and never exported: an exported
-      # `GATE_SDK_NATIVE_BIN` outranks the knob file `init` writes into each
-      # consumer, so a repo-relative export would resolve inside the consumer
-      # tree. A later step needing the name derives it with `gate_native_bin`,
-      # the suffix's one owner.
+      # spec: installer/SPEC.md §The consumer smoke — the scratch base translated once; the artifact name never exported
       - name: resolve the host's artifact name and scratch base
         shell: bash
         run: |
@@ -463,12 +262,7 @@ jobs:
           echo "SMOKE_TMP=$tmp" >> "$GITHUB_ENV"
           echo "artifact name $(gate_native_bin); scratch base $tmp"
 
-      # Reporting only, and it never fails. The suite stops at the first defect
-      # it meets, and the questions that actually decide how many round-trips
-      # this leg costs sit *behind* that point — each of them otherwise a run to
-      # buy on its own, bought here in one and ahead of the suite. None is
-      # answerable from a Linux machine, which is why they are probed rather
-      # than reasoned about.
+      # spec: installer/SPEC.md §The consumer smoke — probe steps report and never fail
       - name: probe the platform behaviours the suite depends on
         shell: bash
         run: |
@@ -490,12 +284,6 @@ jobs:
           shim="$probe/host/node_modules/.bin/probe-cli"
           if [[ -x "$shim" ]]; then echo "[[ -x ]] holds on the shim"; else echo "[[ -x ]] FAILS on the shim"; fi
           "$shim" || echo "the shim would not execute — installer/bin/checkwright.sh is unreachable this way"
-          # `ln -s` is what the jq-less arm's mask farm is built out of, and MSYS is
-          # widely held to deep-copy rather than link. The arm no longer depends on
-          # the answer — it keeps every jq-free PATH directory on PATH instead of
-          # relocating it — but the answer is a standing unknown that costs a round
-          # to buy later and nothing to buy here, and a COPY is what makes a farmed
-          # binary unable to find its runtime library beside it.
           echo "== ln -s, which the jq-less mask farm is made of =="
           ln -s "$(command -v git)" "$probe/git-link" 2>&1
           if [[ -L "$probe/git-link" ]]; then
@@ -526,14 +314,7 @@ jobs:
           fi
           exit 0
 
-      # **This step is the ADOPTER's own step performed.** Like the macOS legs, it
-      # runs docs/install.md §Windows' own block: it reads `windows-remedy`
-      # with the macOS legs' awk program and runs the body verbatim under
-      # PowerShell, the shell a native-Windows adopter types it into. The block
-      # installs no floor member — `shellcheck` is a conditional member `starter`
-      # does not owe and `jq` a contributor one — and the runner image may carry them anyway,
-      # so this leg asserts nothing about their absence. An empty extraction reds
-      # by name.
+      # spec: installer/SPEC.md §The consumer smoke — a remedy step runs the page's block verbatim
       - name: run the page's windows-remedy block
         shell: bash
         run: |
@@ -552,31 +333,13 @@ jobs:
           echo "block exited $?"
           exit 0
 
-      # By PATTERN and not by name, for the reason the macOS siblings state: a
-      # name would spell this host's triple in a workflow step, and a platform
-      # literal in CI is a second spelling of the support commitment
-      # native/targets.list is supposed to be the only surface for. The job-level
-      # expression above is a read of the declaration and is a different thing.
+      # spec: installer/SPEC.md §The consumer smoke — the producer's upload, downloaded by pattern
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: gate-binary-*
           path: ${{ runner.temp }}/native-artifacts
 
-      # Strips the artifact-name prefix to leave `<artifacts>/<target>/`, the
-      # layout the --pack-installer arm reads and INSTALLER_SMOKE_ARTIFACTS_DIR
-      # is specified against — the macOS siblings' step, on the one host where its
-      # base path cannot be `$RUNNER_TEMP` directly: that arrives in Windows
-      # spelling and every glob and `mv` below is MSYS bash's, so the already
-      # translated `$SMOKE_TMP` is what this walks. The download action is handed
-      # the untranslated form because it is not bash.
-      #
-      # The host triple is derived from `rustc -vV` and never spelled, so this
-      # step asserts nothing about which platform it is on — it demands only that
-      # the producer uploaded a complete artifact for whatever host it woke up on.
-      #
-      # The copy below places that artifact as this tree's own gate binary, for
-      # the reason the arm64 macOS sibling's normalize step states in full and
-      # this header does not restate.
+      # spec: installer/SPEC.md §The consumer smoke — normalized and placed as the tree's own gate binary
       - name: normalize the producer's upload onto the layout pack reads
         shell: bash
         run: |
@@ -603,30 +366,17 @@ jobs:
           [[ -x "$dest" ]] || { echo "could not place the producer's $host artifact at $dest"; exit 1; }
           echo "SMOKE_ARTIFACTS=$art" >> "$GITHUB_ENV"
 
-      # The front-end twin's held comparison on the platform the twin exists for
-      # (gate-sdk/SPEC.md §run-gates): this host carries Git-for-Windows bash and
-      # PowerShell both, so it measures the pair where a native-Windows adopter
-      # meets them, and it is the one run measuring the twin under Windows
-      # PowerShell 5.1. It runs the producer's artifact the step above placed.
+      # spec: gate-sdk/SPEC.md §run-gates — the twin's parity where a native-Windows adopter meets it
       - name: front-end parity, bash stub against its PowerShell twin
         shell: bash
         run: bash gate-sdk/bin/run-gates.sh --run-front-end-parity
 
-      # guard-kit/SPEC.md §The hook on native Windows claims Git for Windows'
-      # bash serves the hook with no second implementation; this is that claim's
-      # oracle. The decision table runs under Git Bash, on the producer's
-      # artifact the normalize step placed, so every generic rule's firing and
-      # non-firing case executes on the substrate the section claims.
+      # spec: guard-kit/SPEC.md §The hook on native Windows — the decision table under Git Bash is its oracle
       - name: guard decision table under Git Bash
         shell: bash
         run: bash gate-sdk/bin/run-gates.sh --run-guard-tests
 
-      # Binding. The oracle for the scratch runner's two paths on the host the
-      # PowerShell path exists for (guard-kit/SPEC.md §scratch-run): Git for
-      # Windows' bash runs the bash path, the window case included, on the
-      # artifact the normalize step placed, and the per-host cases run under
-      # pwsh and Windows PowerShell 5.1 both. A host missing from PATH would
-      # skip its cases green, so the step reds unless both ran.
+      # spec: guard-kit/SPEC.md §scratch-run — binding; reds unless both PowerShell hosts ran their cases
       - name: scratch runner under both PowerShells
         shell: bash
         run: |
@@ -641,20 +391,13 @@ jobs:
             exit 1
           }
 
-      # Binding. The oracle for this host's liveness predicate over both pid
-      # namespaces (evidence-kit/SPEC.md §The producer-liveness lock), against
-      # `Get-Process` as ground truth, and for the record guard-kit rule
-      # `background_no_record`'s PowerShell corrective spells: a Windows pid
-      # from a PowerShell launch and an MSYS pid each read held then free, a
-      # PowerShell default write reads corrupt, and a job dies with its session.
+      # spec: evidence-kit/SPEC.md §The producer-liveness lock — binding, against Get-Process as ground truth
       - name: producer liveness over Windows process ids
         shell: bash
         run: |
           set +e
           source gate-sdk/lib/gate.sh
-          # The binary and not the front end: `run-gates.sh --only` folds a
-          # member's exit 2 into 1, and this step tells a corrupt record from a
-          # held one.
+          # comment-tier-exempt: the binary, not the front end, whose --only folds a member's exit 2 into 1
           bin="$(gate_native_bin)"
           rec="$(cygpath -m "$(mktemp -d "${SMOKE_TMP:-/tmp}/liveness.XXXXXX")")"
           ps_run() { MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL='*' "$@"; }
@@ -718,9 +461,7 @@ jobs:
           done
           for f in "$rec"/d-*.run; do echo "$(basename "$f"):"; od -c "$f" | head -n 4; done
 
-          # Read straight after the `&`, the winpid can name the forked stub
-          # that exits once `exec` starts `sleep`, so it is re-read until the
-          # ground truth answers alive for the process that runs.
+          # comment-tier-exempt: a winpid read right after the & can name the forked stub, so it is re-read
           for _ in $(seq 1 10); do
             tpid[a]="$(tr -d '\r\n' < "/proc/$apid/winpid" 2>/dev/null)"
             [[ "$(truth "${tpid[a]}")" == alive ]] && break
@@ -749,8 +490,7 @@ jobs:
           done
 
           echo "== reading 2, every process stopped =="
-          # An MSYS pid that numerically names a live Windows process reads
-          # held through the native leg, the PID-reuse case the SPEC accepts.
+          # spec: evidence-kit/SPEC.md §The producer-liveness lock — the accepted PID-reuse case
           acoll="$(truth "$apid")"
           echo "(a) msys pid $apid as a windows pid: $acoll"
           for r in a b bp c; do
@@ -812,25 +552,11 @@ jobs:
           fi
           exit "$misread"
 
-      # The suite itself, under one steering that is **measurement scaffolding
-      # and not a fix**: run-smoke.sh blocks unless the target roster is exactly
-      # this host, and this host is not the one declared triple. The re-entry is
-      # the one installer/SPEC.md §The consumer smoke records — steer this
-      # smoke's pack at the host alone while the published payload still commits
-      # to what it commits to. The pack arm copies the steered file verbatim
-      # into the payload, so the packed roster is this host's and no second copy
-      # is read anywhere downstream.
-      #
-      # The verdict states the join RULE conditioned on the declaration rather
-      # than a flat reading of this leg's posture, for the Intel sibling's reason:
-      # the posture is derived, so a flat sentence here would be the maintained
-      # copy the job header refuses.
+      # spec: installer/SPEC.md §The consumer smoke — each platform leg steers the roster at its host
       - name: install smoke on a native Windows host
         shell: bash
         run: |
           set +e
-          # Both resolutions are asserted rather than assumed: an instrument that
-          # cascades from a silently empty variable reports the wrong defect.
           tmp="${SMOKE_TMP:-}"
           [[ -d "$tmp" ]] \
             || { echo "scratch base did not resolve: RUNNER_TEMP=$RUNNER_TEMP -> $tmp"; exit 2; }
@@ -855,46 +581,8 @@ jobs:
           echo "spent and a red here is a support commitment broken."
           exit "$rc"
 
-  # The pwsh bootstrap's leg (installer/SPEC.md §The install boundary). No other leg substitutes for it.
-  #
-  # **What it asserts.** Both halves of §The install boundary's two-part oracle.
-  # BOOTSTRAP PARITY: the five steps that section specifies, each on its own
-  # observable, including all three selection outcomes — two of which now refuse,
-  # told apart by message and remedy rather than by exit status — and a real
-  # `--install place-artifact` that performs a placement. PAYLOAD COVERAGE: a whole
-  # `checkwright init` completing through this bootstrap into a scratch consumer.
-  # The second half was owed WITH THE RELOCATION rather than dropped, and it is
-  # owed no longer: the relocation minted the `--init` arm, so step 5's dashless
-  # verb prefix now reaches a program that implements it and a completion is
-  # reachable for the first time. Read the two as distinct — a session sizing a new
-  # leg needs to know which of them it is adding.
-  #
-  # **This leg is BINDING, and it was non-binding for exactly one run.** The
-  # continue-on-error it carried was argued rather than inherited: the bootstrap
-  # this job drives had never executed anywhere, because the repository that
-  # authored it has no PowerShell to run it on, so its first run was that code's
-  # first run and a binding red would have spent a watched push on the very defect
-  # the leg exists to surface. That reason carried its own expiry — drop the line
-  # on the first run observed green — and the expiry fired: run `34142337941`
-  # concluded this job `success` with all eight checks `ok`, so the line is gone.
-  # It is not re-added without a fresh argument; a leg that has run green once is
-  # not in the position that bought the exemption.
-  #
-  # **It runs once per declared Windows triple, and each entry's posture is
-  # DERIVED.** The matrix is `native-artifacts-roster`'s `pwsh_legs`, the
-  # declaration's Windows entries with the runner and held-ness the
-  # per-target index gives `install-smoke-sh-windows-arm64`, on the Intel macOS
-  # sibling's argument. So an entry is binding exactly while its triple is
-  # joined, and the arm64 entry is `Get-HostTarget`'s `Arm64` arm's running
-  # witness: its fixtures are packed for the rustc host, so a detector answering
-  # the x64 triple there meets the unrostered refusal and reds.
-  #
-  # **The setup steps are bash and that is not a breach of the standing "assume no
-  # POSIX shell on a host the PowerShell half serves" obligation**, which binds the
-  # BOOTSTRAP and not the publisher.
-  # Assembling a payload is the packer's job and the packer is bash (§The packer).
-  # What must run on a host with no POSIX shell is the step that invokes
-  # checkwright.ps1 — and that step is pwsh, reading only the packed tarball.
+  # spec: installer/SPEC.md §The install boundary — the pwsh bootstrap's leg: parity and payload coverage
+  # spec: installer/SPEC.md §The consumer smoke — its posture, derived per declared Windows triple
   install-smoke-pwsh-windows:
     needs: native-artifacts-roster
     strategy:
@@ -909,24 +597,17 @@ jobs:
     env:
       PWSH_LEG_TARGET: ${{ matrix.target }}
     steps:
-      # Before the checkout, for the reason the sibling leg states: every digest
-      # comparison below assumes the tree the rest of this repository assumes.
+      # spec: gate-sdk/SPEC.md §Consumer payload — a Windows leg sets LF line endings before the checkout
       - name: check the tree out with LF line endings
         shell: bash
         run: git config --global core.autocrlf false
 
-      # fetch-depth: 0 — the pack step stamps its version from `git describe
-      # --tags`, and a shallow checkout carries none.
+      # spec: installer/SPEC.md §The consumer smoke — every leg checks out full history
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           fetch-depth: 0
 
-      # The same roster steering the Windows leg above takes, for the same reason
-      # and with the same standing: MEASUREMENT SCAFFOLDING, NOT A ROSTER WIDENING.
-      # It packs a locally built, digest-verified artifact for this host while the
-      # published payload still commits only to what native/targets.list declares.
-      # This leg performs no join and no surface claims native Windows support on
-      # the strength of it.
+      # spec: installer/SPEC.md §The consumer smoke — each platform leg steers the roster at its host
       - name: build an artifact and pack a payload for this host
         shell: bash
         run: |
@@ -943,8 +624,6 @@ jobs:
           mkdir -p "$art"
           bash gate-sdk/bin/build-native.sh || { echo "the crate would not build on this host"; exit 2; }
           cp "$crate/target/release/$bin" "$art/$bin" || exit 2
-          # The sidecar is emitted once, where the bytes are produced; pack
-          # re-verifies it and the bootstrap verifies it again before executing.
           ( cd "$art" && sha256sum "$bin" > "$bin.sha256" ) || exit 2
           roster="$tmp/targets.list"
           printf '%s\n' "$host" > "$roster"
@@ -959,8 +638,6 @@ jobs:
           [[ ${#tarballs[@]} -eq 1 ]] || { echo "expected one tarball, found ${#tarballs[@]}"; exit 2; }
           mkdir -p "$tmp/pkg"
           tar -xzf "${tarballs[0]}" -C "$tmp/pkg" || exit 2
-          # Handed on in WINDOWS spelling: everything below this step is pwsh
-          # reading real paths, not MSYS bash reading translated ones.
           {
             echo "PWSH_PKG=$(cygpath -w "$tmp/pkg/package")"
             echo "PWSH_SCRATCH=$(cygpath -w "$tmp")"
@@ -970,21 +647,12 @@ jobs:
             echo "PWSH_VERSION=$version"
           } >> "$GITHUB_ENV"
 
-      # The leg proper. Each of the five steps is asserted on an observable that
-      # distinguishes IT rather than on the run merely succeeding, because a
-      # bootstrap that failed step 2 and one that failed step 4 both exit non-zero.
-      # The fixtures are minimal packages — the bootstrap reads bin/ and
-      # payload/artifact/ and nothing else, so a kit tree would be cost with no
-      # assertion behind it.
+      # spec: installer/SPEC.md §The install boundary — each step asserted on the observable that distinguishes it
       - name: drive the PowerShell bootstrap through its five steps and a whole init
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          # Pinned on the CALLER too, not only inside the bootstrap: this step is the
-          # thing standing in for an adopter's shim, so if it re-quoted the tokens it
-          # hands over, the step-5 assertion would never reach the bootstrap intact.
-          # The second pin keeps a native non-zero exit a STATUS rather than a thrown
-          # exception, which is what lets the refusal assertions read $LASTEXITCODE.
+          # comment-tier-exempt: pinned on the caller too, which stands in for an adopter's shim
           if (Test-Path Variable:PSNativeCommandArgumentPassing) { $PSNativeCommandArgumentPassing = 'Standard' }
           if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) { $PSNativeCommandUseErrorActionPreference = $false }
           $pkg = $env:PWSH_PKG
@@ -992,22 +660,11 @@ jobs:
           $target = $env:PWSH_TARGET
           $binname = $env:PWSH_BIN
           $script:fails = 0
-          # `$cond` is [object] and not [bool] on cause, not taste. PowerShell's
-          # `-match` returns a bool for a scalar left operand and the FILTERED
-          # COLLECTION for a collection one, so a call site whose subject came back
-          # empty hands this function an `Object[]` — which a [bool] parameter refuses
-          # with a binding exception, killing the leg mid-run. That is the reverse of
-          # fail-closed: the assertion that would have named the cause never prints,
-          # and neither does the verdict block. `if` treats an empty collection as
-          # false and a populated one as true, which is the reading every call site
-          # already means. Attested: run 34335610469 died at the follow-up-block
-          # assertion after the BAD line above it had already printed the diagnosis.
+          # comment-tier-exempt: [object], since -match on a collection returns one a [bool] parameter refuses
           function Check([string] $label, [object] $cond, [string] $detail) {
               if ($cond) { Write-Host "ok   $label" }
               else { Write-Host "BAD  $label -- $detail"; $script:fails++ }
           }
-          # A minimal package: the real bootstrap, and an artifact tree the caller
-          # may then break in exactly one way.
           function New-Fixture([string] $name) {
               $root = Join-Path $scratch $name
               if (Test-Path $root) { Remove-Item -Recurse -Force $root }
@@ -1019,12 +676,7 @@ jobs:
               Copy-Item -Recurse -Force (Join-Path $src '*') $dst
               return $root
           }
-          # The call operator and NOT Start-Process. Start-Process joins -ArgumentList
-          # into one string and re-quotes it, so the step-5 assertion below would be
-          # measuring Start-Process's quoting rather than the bootstrap's forwarding —
-          # it could fail on a correct bootstrap, or pass on a broken one. `&` under
-          # the Standard passing mode pinned above hands each element across as its
-          # own argument, which is the path an adopter's shim actually takes.
+          # comment-tier-exempt: the call operator, not Start-Process, which re-quotes -ArgumentList
           function Invoke-Bootstrap([string] $root, [string[]] $bootArgs) {
               $out = Join-Path $scratch 'out.txt'
               $err = Join-Path $scratch 'err.txt'
@@ -1048,12 +700,7 @@ jobs:
           Check "a package with no payload is named as such" `
                 ($r.Code -eq 2 -and $r.Err -match 'carries no payload') "exit $($r.Code): $($r.Err)"
 
-          # Outcomes 1 and 3 both REFUSE now: selection keeps three outcomes and only
-          # one of them proceeds, because nothing remains behind the invoke for an
-          # artifact-less host to proceed into. So neither is asserted on its exit
-          # status alone — the pair below asserts each one's own message and remedy
-          # and then asserts that the two differ, which is the bound the POSIX half's
-          # own smoke leg asserts from the other side of the parity.
+          # spec: installer/SPEC.md §The install boundary — step 3's two refusals, told apart by message and remedy
           Write-Host "== step 2 and step 3, outcome 1: a host off the roster is refused =="
           $f = New-Fixture 'fx-offroster'
           Set-Content -LiteralPath (Join-Path $f 'payload/artifact/targets.list') -Value 'nosuch-triple-for-any-host'
@@ -1084,9 +731,6 @@ jobs:
 
           Write-Host "== step 5: the verified artifact is executed with argv forwarded verbatim =="
           $f = New-Fixture 'fx-run'
-          # A token carrying spaces and a quote, echoed back by the binary's own
-          # parse refusal: PowerShell's default binder splits and re-quotes, so a
-          # half that forwarded loosely reports 'a' here and not the whole token.
           $r = Invoke-Bootstrap $f @('--install','place-artifact','a b "c"')
           Check "the artifact ran and received the caller's token unaltered" `
                 ($r.Code -eq 2 -and $r.Err -match [regex]::Escape("got 'a b ""c""'")) "exit $($r.Code): $($r.Err)"
@@ -1095,10 +739,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path (Join-Path $root 'scripts') | Out-Null
           $src = (Join-Path $f "payload/artifact/$target/$binname")
           $digest = (Get-FileHash -LiteralPath $src -Algorithm SHA256).Hash.ToLowerInvariant()
-          # The dest name is DERIVED from the artifact name the setup step resolved,
-          # never spelled again here: gate_exe_suffix owns the suffix, and a literal
-          # twin beside a derivation is what double-suffixed this repo's other
-          # Windows leg until it was found by hand.
+          # spec: gate-sdk/SPEC.md §lib/gate.sh — gate_exe_suffix owns the suffix, so the dest name is derived
           $dest = "scripts/$binname"
           $r = Invoke-Bootstrap $f @('--install','place-artifact','--root',$root,'--src',$src,
                                      '--dest',$dest,
@@ -1110,27 +751,10 @@ jobs:
           Check "the placement actually wrote the artifact" `
                 (Test-Path -LiteralPath (Join-Path $root $dest)) "nothing was written"
 
-          # Payload coverage, and it runs against the WHOLE extracted package rather
-          # than a New-Fixture minimal one: init vendors kit source out of payload/
-          # and seeds a consumer, so a fixture carrying only bin/ and
-          # payload/artifact/ has nothing for it to install. The invocation is
-          # dashless on purpose — `init`, not `--init` — because step 5's prefix rule
-          # is what makes the verb reachable and asserting the prefixed spelling
-          # would route around the very rule this half must agree with the other on.
+          # spec: installer/SPEC.md §The install boundary — payload coverage: a whole dashless init
           Write-Host "== payload coverage: a whole checkwright init completes through this bootstrap =="
-          # init spawns `bash` once, for the hook generator that does not port
-          # (installer/SPEC.md §The install boundary), and `doctor` holds the whole
-          # toolchain floor an adopter is told to have. Provisioning the runner up to
-          # that floor is this leg's job and hiding a shortfall is not.
-          #
-          # Windows searches the system directory BEFORE PATH, so the floor probes
-          # resolve their members outside that directory (context-kit/SPEC.md
-          # §bin/env-probe), and Git's userland on PATH is that resolution's
-          # precondition, since the resolver walks PATH and reaches nothing PATH
-          # never carried. This leg puts nothing on PATH itself: docs/install.md's
-          # `windows-remedy` block is run verbatim, as an adopter following the
-          # page would, and its session line is what orders Git's `usr\bin` and
-          # `bin` here. An empty extraction reds by name.
+          # spec: context-kit/SPEC.md §bin/env-probe — Windows searches the system directory before PATH
+          # spec: installer/SPEC.md §The consumer smoke — a remedy step runs the page's block verbatim
           $remedy = @()
           $inBlock = $false
           foreach ($line in (Get-Content -LiteralPath docs/install.md)) {
@@ -1146,18 +770,6 @@ jobs:
           $remedy | ForEach-Object { Write-Host $_ }
           Invoke-Expression ($remedy -join "`n") | Out-Host
           Write-Host "block exited $LASTEXITCODE"
-          # The floor's roster is the binary's and never this file's, so the assertion
-          # asks `doctor` rather than enumerating members here — a second copy would
-          # drift the moment the roster moves. Asserting it BEFORE init also puts the
-          # diagnosis where a reader needs it: a runner image that stops shipping a
-          # member reds by name with doctor's own table inline, instead of surfacing
-          # one assertion later as an opaque init refusal.
-          #
-          # The adopter's next terminal is asked first: a child whose PATH is the
-          # one Windows composes for a new process, the machine value followed by
-          # the user value the block appended to, with nothing this session
-          # prepended. A green here is the block's persistence measured; the
-          # session's own doctor below is its ordering.
           $pwshExe = (Get-Command pwsh -CommandType Application | Select-Object -First 1).Source
           $sessionPath = $env:PATH
           $env:PATH = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User')
@@ -1188,28 +800,19 @@ jobs:
           Check "the dashless verb reached the artifact as --init and the install completed" `
                 ($icode -eq 0 -and $initOut -match 'INIT: vendored \d+ kit') `
                 "exit $icode out=$initOut err=$initErr"
-          # The follow-up block is init's own last output, so its absence means the
-          # verb exited 0 somewhere short of its end.
           Check "init printed the follow-up block an adopter reads next" `
                 ($initOut -match '(?m)^next:') "out=$initOut"
           $lockPath = Join-Path $consumer 'checkwright.lock'
           $lock = $null
           if (Test-Path -LiteralPath $lockPath) { $lock = (Get-Content -Raw -LiteralPath $lockPath | ConvertFrom-Json) }
-          # This is the payload-coverage assertion proper: the binary the bootstrap
-          # verified at step 4 is the one the install placed and recorded.
           Check "the manifest records the artifact for the target this host resolved to" `
                 ($null -ne $lock -and $lock.artifact.target -eq $target) `
                 "manifest target '$(if ($null -ne $lock) { $lock.artifact.target } else { '<no manifest>' })' against host '$target'"
-          # init commits what it vendored, so a green here is also the Windows
-          # evidence for every git call behind the invoke — the batching included.
           Check "init committed the vendoring and left the consumer worktree clean" `
                 ((git -C $consumer log --oneline -1) -match 'vendor Checkwright kits' -and -not (git -C $consumer status --porcelain)) `
                 "log=$(git -C $consumer log --oneline -1) status=$(git -C $consumer status --porcelain)"
 
-          # The demo verb's Windows oracle (installer/SPEC.md §demo): the full
-          # battery it runs has only been measured on POSIX hosts, and this is the
-          # one leg a PowerShell adopter's path takes. Run from the consumer above,
-          # so a verb that wrote into its invoking tree would also show here.
+          # spec: installer/SPEC.md §demo — the demo verb's oracle on a PowerShell adopter's path
           Write-Host "== demo: the adoption arc from the package, in a scratch repository =="
           $mout = Join-Path $scratch 'demo-out.txt'
           Push-Location $consumer
@@ -1231,21 +834,8 @@ jobs:
           if ($script:fails -gt 0) { Write-Host "$($script:fails) assertion(s) failed"; exit 1 }
           Write-Host "the PowerShell bootstrap answered all five steps and carried an install end to end"
 
-      # The generated hooks stay one POSIX sh implementation on native Windows because
-      # git runs them under the shell Git for Windows bundles, whatever PATH carries
-      # (gate-sdk/SPEC.md §gen-pre-commit). This step is that claim's oracle, in the
-      # consumer the step above initialised: it strips every directory holding a
-      # bash.exe from PATH first, so a green cannot be a PATH bash serving the hook.
-      # The system directory is spared, since its bash.exe, where one exists, is
-      # the WSL launcher and not a shell; git stays reachable through its own
-      # `cmd` launcher directory, which holds no bash. The hooks are wired by
-      # running the `--install-hooks` line init printed (installer/SPEC.md §init),
-      # which names the binary init placed by its `./`-prefixed root-relative path,
-      # so PowerShell executing it is the oracle for that spelling on this host;
-      # then a clean change must commit with the pre-commit
-      # hook's passed line, and a change binding an uncrossed repository root in a
-      # shell file must be refused by name by check-path-dialect, a precommit
-      # member that runs on every commit.
+      # spec: gate-sdk/SPEC.md §gen-pre-commit — the hooks stay POSIX sh on native Windows; this is the oracle
+      # comment-tier-exempt: the system directory is spared, its bash.exe being the WSL launcher
       - name: commit through the generated hooks with no bash on PATH
         shell: pwsh
         run: |
@@ -1332,11 +922,7 @@ jobs:
           if ($script:fails -gt 0) { Write-Host "$($script:fails) assertion(s) failed"; exit 1 }
           Write-Host "git ran the sh hooks with no bash on PATH, and they both passed and refused"
 
-      # The page's `windows-install` block, run verbatim (docs/site-architecture.md
-      # §Generated projections and their freshness gates, the install-blocks row),
-      # against the tarball the pack step built, placed where the page's fetch
-      # fence would have put it. The remedy block runs first, as an adopter
-      # following §Windows top to bottom in one session would.
+      # spec: docs/site-architecture.md §Generated projections and their freshness gates — the install blocks
       - name: run the page's windows-install block against the packed tarball
         shell: pwsh
         run: |
@@ -1384,13 +970,7 @@ jobs:
           }
           Write-Host "the page's windows-install block installed into a clean consumer under Windows PowerShell"
 
-      # The hosted one-liner, `irm … | iex` under Windows PowerShell 5.1 the way an
-      # adopter runs it (installer/SPEC.md §Requirements, the install blocks'
-      # witness). docs/install.ps1 is served over a local HTTP origin beside the
-      # tarball and digest the step above placed, laid out as a release, because
-      # `irm` cannot read file://, and the two overrides point the script there. The page's remedy block runs
-      # first, as it does in the step above, since a step starts from the runner's
-      # PATH and not the one that block persisted.
+      # spec: installer/SPEC.md §Requirements — the install blocks' witness, irm | iex under PowerShell 5.1
       - name: run the hosted one-liner against the packed tarball
         shell: powershell
         run: |
@@ -1440,15 +1020,7 @@ jobs:
           }
           Write-Host "the hosted one-liner installed into a clean consumer under Windows PowerShell"
 
-      # The live one-liner under the Windows PowerShell 5.1 the page's §Windows
-      # sends a stock adopter to. The step above reads a local origin; this one
-      # reads the URL docs/install.md's one-liner names, served as
-      # `application/octet-stream` (installer/SPEC.md §The dependency boundary,
-      # *The one-line install*). 5.1's `irm` decodes that body as a string in a
-      # single-byte charset, so a non-ASCII byte arrives changed: the witness
-      # holds that `irm` yields a string that parses, and that every line the
-      # decode changes is a comment line. An unread URL is a check that could not
-      # run, and reds.
+      # spec: installer/SPEC.md §The dependency boundary — the live one-liner reads as text under 5.1
       - name: the live one-liner reads as text under Windows PowerShell 5.1
         if: ${{ !cancelled() }}
         shell: powershell
@@ -1494,69 +1066,21 @@ jobs:
           if ($bad -gt 0) { exit 1 }
           Write-Host "5.1 reads the live one-liner as a string that parses, changed on comment lines only"
 
-  # The RELEASE-SHAPED PRODUCER, and its whole reason for existing is that no leg
-  # which builds from the host it runs on can ever discharge a roster join.
-  # gate-sdk/SPEC.md §Consumer payload admits a triple to native/targets.list only
-  # on a green run that PRODUCED AND EXERCISED its artifact, and it classifies a
-  # consumer smoke's host build as a harness stand-in rather than that rule
-  # relaxing — so the macOS leg below could go green forever and license nothing.
-  # **Ruled by the operator 2026-09-07**, through the lead's question relay in a
-  # lead session and lead-relayed: buy a release-shaped producer first. This job
-  # is that producer. The build command, the sidecar's format and the directory
-  # layout are .github/workflows/publish.yml's build leg's, so what CI exercises
-  # is what a release would publish; a job that built the binary a different way
-  # would measure a different artifact and discharge nothing.
-  #
-  # **That ground is true by construction, and the surface that makes it so is
-  # named here rather than left to inspection.** `scripts/ci-build-artifact.sh`
-  # is the artifact body and `scripts/ci-macos-floor.sh` the runner floor; both
-  # workflows call both. Before they were scripts the claim above was a promise
-  # two copies had to keep, and they had already stopped keeping it: the release
-  # leg carried no macOS floor at all and hashed with a bare `sha256sum`, which
-  # stock macOS does not ship. Read a second copy of either body here as the
-  # defect, not as a convenience — it is how a release comes to publish an
-  # artifact CI never measured.
-  #
-  # **The matrix is the DECLARATION, not the roster.** It derives from
-  # docs/install.md §Requirements' `platforms:begin` block — joined and held
-  # platforms alike. Deriving it from native/targets.list would build only what is
-  # already joined and measure nothing, which is the whole point of the job. CI
-  # measures every documented platform; publish builds only the joined ones, and
-  # that asymmetry is the mechanism by which a held platform can ever stop being
-  # held. What licenses the write it feeds is native/targets.list's own header.
-  #
-  # **Nothing here cross-compiles.** Every leg's runner is that target's own
-  # platform (native/runners.list), so `--target` names the host triple and
-  # `rustup target add` is a no-op — native/targets.list refuses a cross-build
-  # because it would publish an artifact no run has ever executed, and a producer
-  # that cross-built would hand that same artifact to the smoke.
+  # spec: gate-sdk/SPEC.md §Consumer payload — the release-shaped producer: one build body, no cross-build
+  # spec: installer/SPEC.md §The consumer smoke — the producer's matrix is the declaration, not the roster
   native-artifacts-roster:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
     outputs:
       legs: ${{ steps.legs.outputs.legs }}
-      # The same two facts `legs` already carries, indexed by target instead of
-      # listed. It exists because a GitHub Actions expression can index an object
-      # and cannot filter an array, and a job outside this matrix — the Intel
-      # install-smoke leg below — needs one platform's runner and held-ness at
-      # JOB level, where no matrix context exists. Nothing derives it separately:
-      # it is written in the same loop from the same values, so the two outputs
-      # cannot disagree about a platform.
+      # spec: installer/SPEC.md §The consumer smoke — the per-target index a job-level expression reads
       index: ${{ steps.legs.outputs.index }}
-      # `legs` narrowed to the Windows triples: the matrix of both
-      # `install-smoke-pwsh-windows` and `crate-tests-windows`, so neither names
-      # a triple.
       pwsh_legs: ${{ steps.legs.outputs.pwsh_legs }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
-      # The declaration table's row grammar is owned by docs/site-architecture.md
-      # §Generated projections and their freshness gates, and this awk is one of
-      # its readers — beside the gate that holds the table and the roster in
-      # lockstep, and the shared build body that reads a row's Minimum cell. Same
-      # shape scripts/gates.list already ships: one grammar with one owner, read
-      # from bash here and from the binary there.
+      # spec: docs/site-architecture.md §Generated projections and their freshness gates — the declaration's rows
       - name: derive the producer legs from the platform declaration
         id: legs
         run: |
@@ -1618,14 +1142,7 @@ jobs:
           echo "declaration index: $index"
           echo "pwsh legs: $pwsh_legs"
 
-  # **A joined leg is binding; a held leg is a measurement.** A red on a joined
-  # platform fails this workflow, because the consumer smoke's default host
-  # steering gave up the incidental assertion that the SHIPPED roster is packable
-  # and this job is what replaces it — directly rather than by coincidence. A red
-  # on a held platform is the reason that platform stays held, not a reason master
-  # goes red: a held triple is on no roster, so nothing ships on its strength. It
-  # is also where the runner label is likeliest to be stale, and an unmatched
-  # label does not fail fast, it queues — hence the timeout beside it.
+  # spec: installer/SPEC.md §The consumer smoke — a joined producer leg binds, a held one measures
   native-artifacts:
     needs: native-artifacts-roster
     strategy:
@@ -1638,17 +1155,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      # The Windows analogue of the macOS floor step below, and it lands before
-      # the checkout because that is what it is about. This repository pins no
-      # line endings in .gitattributes, and Git for Windows sets
-      # `core.autocrlf=true` in its system config — so a Windows leg's checkout
-      # writes CRLF into every tracked text file, and `bash
-      # scripts/ci-build-artifact.sh` then reads a script whose every line ends in
-      # a byte bash folds into the last word. It dies on `set -euo pipefail`,
-      # having compiled nothing. `--global` outranks the system config, which is
-      # why this is the spelling both Windows install-smoke legs above already
-      # use. Read it the way the floor step's own header asks to be read: a
-      # prerequisite of this job's path, not a support claim.
+      # spec: gate-sdk/SPEC.md §Consumer payload — the shared bootstrap: LF line endings before the checkout
       - name: check the tree out with LF line endings
         if: runner.os == 'Windows'
         shell: bash
@@ -1656,61 +1163,20 @@ jobs:
 
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
-      # A macOS runner's stock `/bin/bash` is 3.2 and the step below sources
-      # `gate-sdk/lib/gate.sh`, whose accessors use bash 4.3 namerefs. Without
-      # this step both darwin legs die inside that library, having compiled
-      # nothing, which is what run 34200226768 measured. The floor is not new:
-      # docs/install.md §Requirements already declares `bash (>= 4.3)`, so this
-      # installs the declared floor rather than working around its absence.
-      #
-      # **Read this as scaffolding, which is what separates it from the macOS
-      # install-smoke leg's remedy step below.** That step runs docs/install.md
-      # §macOS and Linux's own macOS block; this one is the producer's own prerequisite and is held to
-      # what this job's path executes — bash for the library's accessors, and the
-      # GNU userland for `build-native.sh`'s `grep -aoEhf -` and `sort -u`. `shellcheck` is
-      # deliberately absent: nothing this job runs invokes it (both files carry
-      # `# shellcheck` directives and no call), and the sibling installs it
-      # because `init` refuses without it on an install path this job never
-      # walks. Adding it here would state a claim this job does not make. The
-      # package set now lives in `scripts/ci-macos-floor.sh`, shared with
-      # publish.yml's build leg, which owes the same prerequisite for the same
-      # reason and had none — and the install-smoke leg's step is deliberately
-      # NOT folded in, because those two package sets answer to different
-      # surfaces and a merge would make one of them stop answering.
-      #
-      # Measured on run 34200226768 rather than predicted, because the cold-brew
-      # cost is the one this step could plausibly break: the sibling's install of
-      # four formulae — one more than the floor script's set — took **7 seconds** on
-      # `macos-latest`, against this job's 30-minute ceiling and a 43-second
-      # crate build. The ceiling is left alone on that measurement.
+      # spec: gate-sdk/SPEC.md §Consumer payload — the shared bootstrap: the floor this job's path executes
       - name: install the bash floor and GNU userland this job's path needs
         if: runner.os == 'macOS'
         shell: bash
         run: bash scripts/ci-macos-floor.sh
 
-      # `shell: bash` for the reason publish.yml's build leg states: this job's
-      # `runs-on` is an expression, so no tree-local reader can state its runner,
-      # and the day a Windows target is declared the default `run:` shell there is
-      # pwsh. Stays a bash `run:` on the runner's preinstalled cargo (no
-      # setup-rust action) to keep this workflow's checkout+bash tamper floor.
-      #
-      # The body is `scripts/ci-build-artifact.sh` and publish.yml's build leg
-      # calls the same script with the same two arguments, which is what makes
-      # this job's header claim structural. It takes the target and an output
-      # directory rather than reading `RUNNER_TEMP`, so the body a tag will run
-      # is runnable — and is run — on a developer machine before the push. The
-      # digest it emits is this artifact's only computation anywhere in the run.
+      # spec: gate-sdk/SPEC.md §Consumer payload — one build body with publish.yml's build leg, one digest
       - name: build the gate binary for ${{ matrix.target }}
         shell: bash
         env:
           TARGET: ${{ matrix.target }}
         run: bash scripts/ci-build-artifact.sh "$TARGET" "$RUNNER_TEMP/artifact"
 
-      # check-crate-arms' lint half, run on this leg's own target and after the
-      # artifact build rather than inside it, so a warning reds the leg and never
-      # changes what a release publishes. Only the Windows leg compiles the crate's
-      # `cfg(not(unix))` code, which is where this holds the dead-code class no
-      # other target can see (gate-sdk/SPEC.md §check-crate-arms).
+      # spec: gate-sdk/SPEC.md §check-crate-arms — the lint half, on this leg's own target
       - name: lint the crate for ${{ matrix.target }} at -D warnings
         shell: bash
         env:
@@ -1721,19 +1187,12 @@ jobs:
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          # Named for its target and carrying the target directory, so a
-          # `pattern:` download lands exactly the layout the pack arm reads
-          # once the artifact-name prefix is stripped — the same naming
-          # publish.yml's build leg uses, since the consumers are the same shape.
           name: gate-binary-${{ matrix.target }}
           path: ${{ runner.temp }}/artifact/${{ matrix.target }}/
           if-no-files-found: error
           retention-days: 7
 
-  # check-crate-arms' test half on each Windows triple, where a test pinning a
-  # Windows filesystem or process behaviour runs where that behaviour lives. It
-  # reports rather than judges until one run is green on both triples, and close
-  # reads its one-per-triple warning (gate-sdk/SPEC.md §check-crate-arms).
+  # spec: gate-sdk/SPEC.md §check-crate-arms — the test half on each Windows triple, reporting until green
   crate-tests-windows:
     needs: native-artifacts-roster
     strategy:
@@ -1752,10 +1211,7 @@ jobs:
 
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
-      # gate-sdk/SPEC.md §check-shellcheck: the crate's registry-coverage tests
-      # observe check-action-run-shell's cases, which spawn the analyser. Upstream
-      # ships one x86_64 Windows asset; the aarch64 leg runs it under emulation.
-      # Expand-Archive because the zip is not tar's format and pwsh is on both images.
+      # spec: gate-sdk/SPEC.md §check-shellcheck — the registry-coverage tests spawn the pinned analyser
       - name: install the pinned shellcheck release, digest-verified
         shell: bash
         env:
@@ -1773,8 +1229,7 @@ jobs:
           "$dir/shellcheck.exe" --version
           echo "$win" >> "$GITHUB_PATH"
 
-      # gate-sdk/SPEC.md §check-crate-arms: the registry-coverage tests spawn the
-      # host binary, which `cargo test --target` never builds.
+      # spec: gate-sdk/SPEC.md §check-crate-arms — the host binary the registry-coverage tests spawn
       - name: build the host gate binary the registry-coverage tests spawn
         shell: bash
         run: bash gate-sdk/bin/build-native.sh
@@ -1798,97 +1253,22 @@ jobs:
           first="$(printf '%s\n' "$failed" | head -n 10 | paste -sd ' ' -)"
           echo "::warning title=crate-tests-windows ($TARGET)::$count test(s) FAILED on $TARGET; first ten: ${first:-none, so the run failed outside a test}; the job log carries the rest."
 
-  # The macOS sibling, and the second non-Linux host this repository runs on.
-  # **Its posture is DERIVED**, off `native-artifacts-roster`'s per-target index
-  # at `aarch64-apple-darwin`, on the argument install-smoke-sh-macos-intel's
-  # own header gives for its own triple: a held producer's failure otherwise
-  # fails this workflow through a binding consumer whenever the consumer's
-  # posture is hard-coded rather than read, a coupling this leg closes by
-  # deriving instead of hard-coding. While `aarch64-apple-darwin` stays
-  # `joined` (docs/install.md §Requirements) this leg is binding exactly as
-  # before — its red still fails this workflow — and read that as a different
-  # assertion from the Linux leg's rather than the same one spelled twice: the
-  # Linux leg is binding through `--diff-baseline installer_smoke`, against a
-  # recorded baseline, where this leg has no baseline and is binding on its own
-  # exit status. Do not read this posture onto the WINDOWS sibling above, which is
-  # still an instrument; the two legs are no longer the same shape.
-  #
-  # **The runner label floats, and read the honest limit with it.**
-  # `native-artifacts-roster` resolves `aarch64-apple-darwin` to `macos-latest`
-  # (native/runners.list), which matches `ubuntu-latest` and `windows-latest`
-  # beside it because this leg's subject is the platform an adopter meets
-  # *today*, and a pinned label would freeze this leg against a host adopters
-  # have already left. The consequence is that `macos-latest` is **arm64**, so
-  # this leg measures arm64 and nothing else. Do not read one green arm64 run
-  # as a macOS claim: an Intel leg is a separate job this one neither buys nor
-  # blocks.
-  #
-  # **It no longer builds the artifact it exercises.** `needs:
-  # [native-artifacts, native-artifacts-roster]` and the download below are
-  # what make this leg one half of the join predicate native/targets.list's
-  # header states, rather than an adopter-path measurement that licenses
-  # nothing: the bytes it installs are the release-shaped producer's, moved
-  # and never re-derived.
-  #
-  # **Every step below now names `shell: bash`**, for the reason
-  # install-smoke-sh-macos-intel's own header states in full: a `runs-on` that
-  # is an expression cannot be read by any tree-local reader, so
-  # check-action-run-shell cannot derive this job's dialect and an unnamed
-  # shell here is a red rather than a silence.
+  # spec: installer/SPEC.md §The consumer smoke — the CI legs; derived posture, the producer's upload
   install-smoke-sh-macos:
     needs: [native-artifacts, native-artifacts-roster]
     runs-on: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['aarch64-apple-darwin'].runner }}
     continue-on-error: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['aarch64-apple-darwin'].held }}
-    # Measured, not predicted: this leg took **20m12s** on run `34038127178`, over
-    # a cold Homebrew install and a cold `cargo` build — which is exactly the case
-    # this figure was widened for, so the measurement already covers the worst
-    # start. The ~2.2x headroom left over it is deliberate now the leg is binding:
-    # a timeout that reds `master` on runner variance costs more than a long leg,
-    # so widen this before you narrow it. Do NOT copy the Windows leg's 90 — that
-    # figure buys MSYS emulating `fork` on every one of this suite's thousands of
-    # spawns, which macOS, whose spawns are native, does not pay.
+    # spec: installer/SPEC.md §The consumer smoke — widen a leg's ceiling before narrowing it
     timeout-minutes: 45
     permissions:
       contents: read
     steps:
-      # fetch-depth: 0 — the smoke stamps the packed version from `git describe
-      # --tags`, for the reason the Linux leg above states.
+      # spec: installer/SPEC.md §The consumer smoke — every leg checks out full history
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           fetch-depth: 0
 
-      # **Read this step as the assertion, not as scaffolding**, as the Windows
-      # legs' run of the page's `windows-remedy` block is. It performs
-      # exactly the adopter action docs/install.md §macOS and Linux documents for a
-      # Mac. The whole value of this leg is that the documented remedy stops
-      # being a reading and becomes a run, so a leg reaching green by installing
-      # something the page does not name would be measuring a host no adopter has.
-      #
-      # **This step runs §macOS and Linux's own block verbatim, so the leg has no
-      # package set of its own.** Do not add a formula here: a leg that needs one
-      # the block lacks is the page's defect, fixed in the block — a leg that
-      # installed it anyway would go green over an adopter path that stayed
-      # broken for everyone who ran exactly what the page prints.
-      #
-      # The body keeps to bash 3.2, since it runs before the block has installed
-      # a newer bash. The block's own lines never fail the step: a brew that did
-      # not land is read off the probe below, where it appears as the
-      # `<MISSING>` or the BSD flavour it actually is. The first refusal is an
-      # empty extraction — with no block there is no remedy to perform. The
-      # `PATH` entries the block prepended are persisted last to first, because
-      # the runner puts each `$GITHUB_PATH` line ahead of the ones before it.
-      # That carry is the runner's and no adopter has it, so the second refusal
-      # is the adopter's next terminal — a login zsh with no inherited `PATH` —
-      # resolving `bash`, the member the block installs, anywhere but
-      # `$(brew --prefix)/bin`: the block's profile line is what must persist the
-      # ordering (docs/install.md §macOS and Linux). Where Homebrew's prefix is
-      # `/usr/local`, `/etc/paths` already leads with its `bin`, so on an Intel
-      # host that probe holds with or without the profile line. The third refusal
-      # is the one that reds a dropped line on either architecture: it sources
-      # only what the block appended to `~/.zprofile`, in a zsh reading no
-      # startup file under a `PATH` with no Homebrew entry, and requires that
-      # alone to resolve `bash` to the prefix — after proving the same zsh
-      # without it does not, so the probe cannot pass vacuously.
+      # spec: installer/SPEC.md §The consumer smoke — a remedy step runs the page's block verbatim
       - name: install the bash docs/install.md names, and PATH-order it
         shell: bash
         run: |
@@ -1941,17 +1321,7 @@ jobs:
           fi
           exit 0
 
-      # Reporting only, and it never fails. It is what makes a red suite below
-      # readable, which matters more now that the suite is binding: a suite dying
-      # at its preflight says nothing about the host, and this says it all at once,
-      # so read this step first when the leg goes red.
-      #
-      # It runs AFTER the install above deliberately: what it reports is then the
-      # `PATH` an adopter who followed §macOS and Linux actually has. Probing the
-      # stock image instead would measure a host nobody following the page is on.
-      # `BASH_VERSION` beside `command -v bash` is the check that the ordering
-      # took — the stock interpreter is 3.2 and the floor is 4.3, so those two
-      # disagreeing is itself the finding.
+      # spec: installer/SPEC.md §The consumer smoke — probe steps report and never fail
       - name: probe the runner
         shell: bash
         run: |
@@ -1983,43 +1353,13 @@ jobs:
           echo "TMPDIR=${TMPDIR:-<unset>}"
           exit 0
 
-      # The artifact this leg installs is the `native-artifacts` producer's, not
-      # this host's. Downloaded by PATTERN rather than by name because a name
-      # would have to spell this host's triple in the workflow, and a platform
-      # literal in CI is a second spelling of the support commitment
-      # native/targets.list is supposed to be the only surface for.
+      # spec: installer/SPEC.md §The consumer smoke — the producer's upload, downloaded by pattern
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: gate-binary-*
           path: ${{ runner.temp }}/native-artifacts
 
-      # A `pattern:` download lands one directory per artifact name, so the
-      # prefix comes off to leave `<artifacts>/<target>/` — the layout
-      # the --pack-installer arm reads and the one INSTALLER_SMOKE_ARTIFACTS_DIR is
-      # specified against. Nothing is rehashed on the way: the sidecar that
-      # arrives is the sidecar the producer emitted beside the bytes, which is
-      # what keeps one producer per digest across this new hop.
-      #
-      # **The copy below places the producer's upload as this tree's own gate
-      # binary, and no leg here compiles the crate.** The producer's upload
-      # becomes this tree's gate binary because `run-gates.sh`'s `exec_arm`
-      # dispatches the suite's `--pack-installer` call to whatever sits at
-      # `gate_native_bin`'s path, and with `INSTALLER_SMOKE_ARTIFACTS_DIR` set the
-      # suite itself never builds one. The producer leg on this same runner label
-      # already compiled this commit cold on this run, so a compile here would
-      # repeat that build and catch nothing a compile has not already caught.
-      # This is not the case installer/SPEC.md §The packer's publish-path refusal
-      # rules on: nothing packed on this leg is ever published, and the leg
-      # installs these exact bytes into its scratch consumer regardless, so
-      # running them once, off the producer's upload, is the whole assertion.
-      #
-      # **Do not add a build cache here.** The crate is nearly all of a cold
-      # compile and changes on most pushes (`native/src`, `native/Cargo.toml`'s
-      # one dependency): in run 35214069775 the dependencies finished in 3 to 11
-      # seconds and the crate took the rest, so a cache keyed on the crate's
-      # sources misses on every push that touches it and a cache keyed on
-      # `Cargo.lock` alone restores only the dependencies it does not need. A leg
-      # that needs the crate compiled on its host has the producer leg for that.
+      # spec: installer/SPEC.md §The consumer smoke — normalized and placed as the tree's own gate binary
       - name: normalize the producer's upload onto the layout pack reads
         shell: bash
         run: |
@@ -2046,61 +1386,12 @@ jobs:
           [[ -x "$dest" ]] || { echo "could not place the producer's $host artifact at $dest"; exit 1; }
           echo "SMOKE_ARTIFACTS=$art" >> "$GITHUB_ENV"
 
-      # The suite itself, under one steering that is **measurement scaffolding and
-      # not a fix**, exactly as the Windows sibling's is. It is a precondition
-      # rather than a preference: `native/targets.list` names platforms this host
-      # is not — the condition stated rather than counted, so it does not have to
-      # be re-read every time the roster widens — and the smoke refuses any roster
-      # that is not this host alone, at a guard sitting AHEAD of its artifact
-      # hand-off branch which does not consult it
-      # (installer/consumer-smoke/run-smoke.sh; installer/SPEC.md §The consumer
-      # smoke). So a smoke pointed at the tracked roster fails on the roster
-      # before it reaches anything this leg is measuring — a failure that looks
-      # exactly like the platform finding this leg exists to collect.
-      #
-      # **The ground above was measured on both paths rather than reasoned about,
-      # and it is not the ground this paragraph used to give.** It argued from
-      # §Consumer payload's rule about a smoke *building its artifact from the
-      # host it runs on*, which this leg stopped doing when it started installing
-      # the producer's upload. The refusal is unchanged either way: pointed at the
-      # tracked roster, the smoke refuses identically with a complete
-      # multi-target hand-off set and with none. The subject is a smoke pointed at
-      # the roster, not a caller-unsteered one — with no knob set the smoke steers
-      # itself at the host and does not refuse, which is what the redundancy note
-      # in the step body below is about.
-      #
-      # **A zero here licenses NO line in `native/targets.list`**, and the clause
-      # is quoted here rather than left in the SPEC to be found. §Consumer payload
-      # admits a triple only on a green run that PRODUCED AND EXERCISED its
-      # artifact, and it goes on to rule that removing a blocker is not the
-      # granting of a permission — naming this exact misreading, that an iteration
-      # making a target *possible* invites its next reader to read the removal of
-      # a blocker as the arrival of a permission. This leg is that iteration. The
-      # discriminator is sharper still, and it is the **PAIR**: §Consumer payload
-      # admits a triple only on ONE run carrying a release-shaped producer AND a
-      # consumer that installed that producer's upload, so this job is one half of
-      # the predicate and can never be the whole of it. A green here proves the
-      # consumer half held on this host; the producer half is `native-artifacts`'
-      # leg for the same triple on the same run, and a line is licensed by the two
-      # together or by nothing.
-      #
-      # **Read the repair no wider than it was made.** What was corrected here is
-      # this paragraph's stated GROUND, which had gone false: it argued from the
-      # smoke building its artifact from the host it runs on, and this leg stopped
-      # doing that when it started consuming the producer's upload — the job header
-      # above says so in as many words. The VERDICT above it never depended on that
-      # ground and is untouched.
+      # spec: installer/SPEC.md §The consumer smoke — each platform leg steers the roster at its host
       - name: install smoke on a macOS host
         shell: bash
         run: |
           set +e
-          # The explicit steering below is now REDUNDANT with the smoke's own
-          # default, which derives the same one-line roster when the caller sets
-          # no knob (installer/SPEC.md §The consumer smoke). It is kept rather
-          # than dropped because it is the tree's one live witness for the
-          # caller-override branch: the Linux leg exercises the default, this one
-          # exercises the override, and neither path is then reached only in a
-          # fixture.
+          # spec: installer/SPEC.md §The consumer smoke — the explicit steering is the override branch's witness
           host="$(rustc -vV | awk '/^host:/{print $2}')"
           [[ -n "$host" ]] \
             || { echo "rustc reported no host triple, so the roster cannot be steered"; exit 2; }
@@ -2120,98 +1411,21 @@ jobs:
           echo "A zero here is not a roster join: see this job's header for why."
           exit "$rc"
 
-  # The INTEL macOS sibling, and the second half of `x86_64-apple-darwin`'s join
-  # predicate. `native-artifacts` already produces that triple's artifact on its
-  # own `macos-15-intel` leg; what has never existed is a consumer that installs
-  # THAT upload on THAT host. This job is it, and it is the whole reason the
-  # index above exists.
-  #
-  # **Its posture is DERIVED, and that is the load-bearing property.** Both
-  # `runs-on` and `continue-on-error` are read out of `native-artifacts-roster`'s
-  # per-target index at this leg's own triple, so the platform declaration in
-  # docs/install.md §Requirements decides them and nothing here does. A held
-  # platform's leg is `continue-on-error` for the reason `native-artifacts`'
-  # header already gives — a red on a held platform is why it stays held, not a
-  # reason master goes red — and the day that page flips this triple to
-  # `joined`, this leg becomes binding with nobody remembering to make it so. A
-  # hard-coded `continue-on-error: true` is the maintained copy that goes wrong
-  # exactly once, silently, in the direction of a joined platform whose smoke red
-  # reds nothing.
-  #
-  # **It therefore mints no new instance of `held-ci-leg-failure-reddens-a-
-  # binding-one`, closed alongside the arm64 sibling's own read at
-  # `aarch64-apple-darwin`.** That entry was about a HELD producer defeating
-  # held-ness through a BINDING consumer; this consumer is held exactly while
-  # its producer is, so the pair moves together.
-  #
-  # **The triple spelled below is a READ of the declaration rather than a second
-  # assertion of support.** The download-by-pattern rule the sibling states avoids
-  # *asserting* a platform in CI; this expression *reads* one, at job-resolution
-  # time, where no matrix context exists. If the triple ever leaves the
-  # declaration the index yields nothing, this job cannot resolve a runner, and
-  # the workflow reds — loudly, which is the right direction for a support
-  # retraction that forgot its leg.
-  #
-  # It is no longer the only such read: `install-smoke-sh-windows` takes its own
-  # posture from the same index at `x86_64-pc-windows-msvc`, on the same argument,
-  # since that triple joined the declaration as `held`. The remaining bare
-  # spellings of it — the `gates` job's cross-check and the PowerShell leg's host
-  # assertion — are a different case rather than a counter-example: neither reads
-  # or writes a roster commitment. One names the target it compiles for and the
-  # other asserts the host it woke up on.
-  #
-  # **The predicate this leg was built for is discharged, and the mechanism
-  # above is what discharged it.** This leg could never join its own target —
-  # criterion 1 is `native-artifacts`' and criterion 2 is this leg's, and the
-  # write into native/targets.list was a later session's on a run that carried
-  # both. That run happened, that write landed, and the flip to `joined` made
-  # this leg and its producer binding with no edit anywhere in this file. The
-  # derived posture is therefore demonstrated rather than argued, which is the
-  # reason to keep reading `runs-on` and `continue-on-error` out of the
-  # declaration rather than a reason the hold is missed.
-  #
-  # **So what a zero here licenses has changed with it.** While the triple was
-  # held, a zero was criterion 2 of a join predicate and licensed nothing on
-  # its own. That predicate is spent: a zero is now this workflow's standing
-  # assertion that the published Intel artifact still installs on an Intel
-  # host, and a red is a support commitment broken rather than a platform that
-  # has not joined yet.
-  #
-  # **Every step below names `shell: bash`, and the derived runner is why.** A
-  # `runs-on` that is an expression cannot be read by any tree-local reader, so
-  # nothing can state this job's shell dialect from the file — the same argument
-  # `native-artifacts` and publish.yml's build leg already carry, arriving here
-  # for a job whose runner is derived rather than matrixed. It is enforced:
-  # check-action-run-shell refuses to lint a `run:` whose dialect it cannot
-  # derive, so an unnamed shell here is a red rather than a silence.
+  # spec: installer/SPEC.md §The consumer smoke — the CI legs; derived posture, the producer's upload
   install-smoke-sh-macos-intel:
     needs: [native-artifacts, native-artifacts-roster]
     runs-on: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['x86_64-apple-darwin'].runner }}
     continue-on-error: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['x86_64-apple-darwin'].held }}
-    # Carried from the arm64 sibling rather than re-derived: same suite, same
-    # cold Homebrew install, and no Intel measurement exists yet to narrow
-    # against. That sibling's timeout header owns why widening beats narrowing,
-    # and it is not restated here.
     timeout-minutes: 45
     permissions:
       contents: read
     steps:
-      # fetch-depth: 0 — the smoke stamps the packed version from `git describe
-      # --tags`, for the reason the Linux leg states.
+      # spec: installer/SPEC.md §The consumer smoke — every leg checks out full history
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           fetch-depth: 0
 
-      # The adopter action docs/install.md §macOS and Linux documents for a Mac,
-      # performed rather than read — the arm64 sibling's step header owns the
-      # whole argument, including why this step runs §macOS and Linux's own block
-      # verbatim and why no formula is added here. This is a second run of the
-      # same block on a second host, which is the point: the page names no
-      # architecture, so a remedy proved on arm64 alone is proved on half the
-      # Macs it is written for.
-      #
-      # Its failure posture and its bash 3.2 body are the sibling's, for the
-      # sibling's reasons.
+      # spec: installer/SPEC.md §The consumer smoke — a remedy step runs the page's block verbatim
       - name: install the bash docs/install.md names, and PATH-order it
         shell: bash
         run: |
@@ -2264,15 +1478,7 @@ jobs:
           fi
           exit 0
 
-      # Reporting only, never fails, and it runs AFTER the install so what it
-      # reports is the `PATH` an adopter following §macOS and Linux actually has —
-      # the arm64 sibling's probe header owns both reasons. Read this step first
-      # when the leg goes red.
-      #
-      # `uname -m` earns its place on THIS leg specifically: it is the one line
-      # that says whether the Intel runner label actually delivered an Intel
-      # host, and a leg silently running under Rosetta or on arm64 hardware would
-      # measure the platform it was built to distinguish itself from.
+      # spec: installer/SPEC.md §The consumer smoke — probe steps report and never fail
       - name: probe the runner
         shell: bash
         run: |
@@ -2305,26 +1511,13 @@ jobs:
           echo "TMPDIR=${TMPDIR:-<unset>}"
           exit 0
 
-      # By PATTERN and not by name, for the reason the arm64 sibling states: a
-      # name would spell this host's triple in a workflow step, and a platform
-      # literal in CI is a second spelling of the support commitment
-      # native/targets.list is supposed to be the only surface for. The job-level
-      # expression above is a read of the declaration and is a different thing.
+      # spec: installer/SPEC.md §The consumer smoke — the producer's upload, downloaded by pattern
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: gate-binary-*
           path: ${{ runner.temp }}/native-artifacts
 
-      # Strips the artifact-name prefix to leave `<artifacts>/<target>/`, the
-      # layout the --pack-installer arm reads and INSTALLER_SMOKE_ARTIFACTS_DIR
-      # is specified against. The host triple is derived from `rustc -vV` and never
-      # spelled, so this step asserts nothing about which platform it is on — it
-      # demands only that the producer uploaded a complete artifact for whatever
-      # host it woke up on, which on this leg is the assertion that matters.
-      #
-      # The copy below places that artifact as this tree's own gate binary, for
-      # the reason the arm64 sibling's normalize step states in full and this
-      # header does not restate.
+      # spec: installer/SPEC.md §The consumer smoke — normalized and placed as the tree's own gate binary
       - name: normalize the producer's upload onto the layout pack reads
         shell: bash
         run: |
@@ -2351,26 +1544,7 @@ jobs:
           [[ -x "$dest" ]] || { echo "could not place the producer's $host artifact at $dest"; exit 1; }
           echo "SMOKE_ARTIFACTS=$art" >> "$GITHUB_ENV"
 
-      # The suite, steered exactly as the arm64 sibling steers it — that step's
-      # header owns the whole argument for the steering and for what a zero here
-      # does and does not license, and none of it is restated. Two facts are this
-      # leg's own.
-      #
-      # The steering is not the tree's override witness here: the sibling already
-      # is one, and this leg copies it rather than diverging, because a
-      # gratuitous divergence that reds would cost the NEXT iteration the join
-      # this leg exists to buy.
-      #
-      # And the verdict now carries the sibling's binding reading. The old
-      # divergence was a divergence from a HELD posture — a non-zero that did
-      # not fail the workflow, read as the reason the triple was still absent
-      # from native/targets.list — and its ground went with the hold when the
-      # declaration flipped. What the verdict does NOT copy from the sibling is
-      # a flat "this leg is binding": that leg's posture is hard-coded and this
-      # one's is derived, so stating the binding outcome flatly here would mint
-      # exactly the maintained copy this job's header refuses. It states the
-      # rule instead, conditioned on the join state, and so cannot go stale
-      # against a declaration that moves back.
+      # spec: installer/SPEC.md §The consumer smoke — each platform leg steers the roster at its host
       - name: install smoke on an Intel macOS host
         shell: bash
         run: |
@@ -2394,63 +1568,21 @@ jobs:
           echo "A zero here is not a roster join: see this job's header for why."
           exit "$rc"
 
-  # The arm64-Linux leg, and criterion 2 of `aarch64-unknown-linux-gnu`'s join
-  # predicate. `native-artifacts` produces that triple's artifact on its own
-  # `ubuntu-24.04-arm` leg the moment the platform declaration names the triple;
-  # this job is the consumer that installs THAT upload on THAT host. Neither
-  # exists before the declaration does — the roster job derives both from
-  # docs/install.md §Requirements — so a runner mapping alone would have created
-  # nothing.
-  #
-  # **Its posture is DERIVED**, off `native-artifacts-roster`'s per-target index at
-  # this leg's own triple, for the reason the Intel macOS sibling's header states
-  # in full and this one does not restate. While the declaration holds this triple
-  # both this leg and its producer are `continue-on-error`, which is what lets the
-  # pair land on a red-averse master without risking a binding green; the day that
-  # page flips the triple to `joined`, both become binding with nobody remembering
-  # to make it so.
-  #
-  # **It carries no platform-floor step, and that is now a MEASUREMENT rather than
-  # an open question.** The baseline Linux leg needs none because `ubuntu-latest`
-  # ships the floor docs/install.md §Requirements declares; the arm64 image is a
-  # different image and whether it does likewise was not derivable from this tree,
-  # so this leg's first run was bought as the probe. Run 34543644528 answered it:
-  # the probe step below reported no `<MISSING>` member — GNU awk, sed, sort, grep,
-  # find and realpath, plus bash, git, jq, tar, npm, node, cargo, rustc, rustup,
-  # shellcheck and both hashers — so `ubuntu-24.04-arm` ships the declared floor
-  # and no step of `scripts/ci-macos-floor.sh`'s shape is owed here. That is the
-  # cheap outcome native/targets.list's header priced the other side of ("one on a
-  # class they do not costs its own floor first"); re-read the probe rather than
-  # this paragraph if the image ever changes under the pinned label.
-  #
-  # **Every step names `shell: bash`**, for the reason the Intel sibling states: a
-  # `runs-on` that is an expression cannot be read by any tree-local reader, so
-  # nothing can state this job's dialect from the file, and check-action-run-shell
-  # refuses to lint a `run:` whose dialect it cannot derive.
+  # spec: installer/SPEC.md §The consumer smoke — the CI legs; derived posture, the producer's upload
   install-smoke-sh-linux-arm64:
     needs: [native-artifacts, native-artifacts-roster]
     runs-on: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['aarch64-unknown-linux-gnu'].runner }}
     continue-on-error: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['aarch64-unknown-linux-gnu'].held }}
-    # Carried from the baseline Linux leg's cousins rather than re-derived: same
-    # suite, same cold cargo build, and no arm64 measurement exists yet to narrow
-    # against. The macOS sibling's timeout header owns why widening beats
-    # narrowing, and it is not restated here.
     timeout-minutes: 45
     permissions:
       contents: read
     steps:
-      # fetch-depth: 0 — the smoke stamps the packed version from `git describe
-      # --tags`, for the reason the baseline Linux leg states.
+      # spec: installer/SPEC.md §The consumer smoke — every leg checks out full history
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           fetch-depth: 0
 
-      # Reporting only, never fails, and read this step FIRST when the leg reds:
-      # on this leg specifically it is what says whether the arm64 image carries
-      # the floor docs/install.md §Requirements declares, which is the open
-      # question the job header names. `uname -m` earns its place for the Intel
-      # sibling's reason pointed the other way — it says whether the label
-      # actually delivered an arm64 host.
+      # spec: installer/SPEC.md §The consumer smoke — probe steps report and never fail
       - name: probe the runner
         shell: bash
         run: |
@@ -2478,29 +1610,13 @@ jobs:
           echo "RUNNER_TEMP=$RUNNER_TEMP"
           exit 0
 
-      # By PATTERN and not by name, for the reason the siblings state: a name would
-      # spell this host's triple in a workflow step, and a platform literal in CI is
-      # a second spelling of the support commitment native/targets.list is supposed
-      # to be the only surface for. The job-level expression above is a read of the
-      # declaration and is a different thing.
+      # spec: installer/SPEC.md §The consumer smoke — the producer's upload, downloaded by pattern
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: gate-binary-*
           path: ${{ runner.temp }}/native-artifacts
 
-      # Strips the artifact-name prefix to leave `<artifacts>/<target>/`, the layout
-      # the --pack-installer arm reads and INSTALLER_SMOKE_ARTIFACTS_DIR is
-      # specified against. The host triple is derived from `rustc -vV` and never
-      # spelled, so this step asserts nothing about which platform it is on.
-      #
-      # The copy below places that artifact as this tree's own gate binary, for
-      # the reason the arm64 macOS sibling's normalize step states in full and
-      # this header does not restate. It is what carries this leg's own
-      # load-bearing obligation forward from the deleted probe step, measured on
-      # this leg's first run (34543644528, job 103092038391): with
-      # `INSTALLER_SMOKE_ARTIFACTS_DIR` set the suite never builds a binary, so
-      # something on this leg has to place one at `gate_native_bin`'s path before
-      # the pack step's dispatch runs.
+      # spec: installer/SPEC.md §The consumer smoke — normalized and placed as the tree's own gate binary
       - name: normalize the producer's upload onto the layout pack reads
         shell: bash
         run: |
@@ -2527,12 +1643,7 @@ jobs:
           [[ -x "$dest" ]] || { echo "could not place the producer's $host artifact at $dest"; exit 1; }
           echo "SMOKE_ARTIFACTS=$art" >> "$GITHUB_ENV"
 
-      # The suite, steered exactly as the Intel macOS sibling steers it — that
-      # step's header owns the whole argument for the steering and for what a zero
-      # here does and does not license, and none of it is restated. The verdict
-      # states the RULE conditioned on the join state rather than a flat posture,
-      # for that sibling's reason: this leg's posture is derived, so a flat
-      # statement here would mint the maintained copy the derivation refuses.
+      # spec: installer/SPEC.md §The consumer smoke — each platform leg steers the roster at its host
       - name: install smoke on an arm64 Linux host
         shell: bash
         run: |
@@ -2556,40 +1667,12 @@ jobs:
           echo "A zero here is not a roster join: see this job's header for why."
           exit "$rc"
 
-  # The arm64-Windows leg, and criterion 2 of `aarch64-pc-windows-msvc`'s join
-  # predicate: the consumer that installs `native-artifacts`' upload for that
-  # triple on that host. Both exist because docs/install.md §Requirements
-  # declares the triple, for the reason the arm64-Linux sibling's header states.
-  # Its posture is DERIVED off the same per-target index, on the Intel macOS
-  # sibling's argument, and not restated.
-  #
-  # **It is the x64 Windows leg's prelude on the arm64-Linux leg's body.** The
-  # LF checkout, the `cygpath`-translated scratch base and `shell: bash` on every
-  # step are the x64 Windows sibling's, for that header's reasons; the probe,
-  # download, normalize and smoke shape is the arm64-Linux sibling's. The x64
-  # leg's parity, guard-table, remedy-block and platform-behaviour steps are not
-  # carried, as the arm64-Linux sibling carries none of its baseline's extras:
-  # this leg is the join predicate's criterion 2 and nothing wider.
-  #
-  # **What a green must show, because no probe off this host could.**
-  # Git for Windows' POSIX layer is x86_64-only and runs emulated here, so
-  # `uname -m` reports x86_64 on this host exactly as on the x64 one, and the
-  # bootstrap's `host_arch` reads the OS's native architecture from the
-  # registry instead (installer/SPEC.md §The gate binary). The probe step prints
-  # every input that decision rests on, and a green is readable as criterion 2
-  # only when it shows `rustc -vV` answering an aarch64 Windows host — a rustc
-  # emulated as x64 would steer the smoke at the x64 upload and green on the
-  # wrong triple — and the registry value reading `ARM64`. Run 36016548706, the
-  # run the triple joined on, showed both. The smoke itself is
-  # the detector's oracle: its roster is steered at that rustc host alone, so a
-  # detector still answering the x64 triple meets the unrostered refusal and
-  # reds the leg.
+  # spec: installer/SPEC.md §The consumer smoke — the CI legs; the native Windows legs, and what a green must show
   install-smoke-sh-windows-arm64:
     needs: [native-artifacts, native-artifacts-roster]
     runs-on: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['aarch64-pc-windows-msvc'].runner }}
     continue-on-error: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['aarch64-pc-windows-msvc'].held }}
-    # The x64 Windows sibling's ceiling, for its MSYS-fork reason, which an
-    # emulated runtime can only make worse; the joining run took 13 minutes.
+    # spec: installer/SPEC.md §The consumer smoke — MSYS emulates fork, hence the widest ceiling
     timeout-minutes: 90
     permissions:
       contents: read
@@ -2598,14 +1681,12 @@ jobs:
         shell: bash
         run: git config --global core.autocrlf false
 
-      # fetch-depth: 0 — the smoke stamps the packed version from `git describe
-      # --tags`, for the reason the baseline Linux leg states.
+      # spec: installer/SPEC.md §The consumer smoke — every leg checks out full history
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           fetch-depth: 0
 
-      # Reporting only, never fails, and read this step FIRST: the job header
-      # names what it must show before a green here counts.
+      # spec: installer/SPEC.md §The consumer smoke — probe steps report and never fail
       - name: probe the runner
         shell: bash
         run: |
@@ -2640,8 +1721,7 @@ jobs:
           echo "cygpath -u  =$(cygpath -u "$RUNNER_TEMP" 2>/dev/null)"
           exit 0
 
-      # The x64 Windows sibling's step and reason: the scratch base arrives in
-      # Windows spelling and everything below is MSYS bash.
+      # spec: installer/SPEC.md §The consumer smoke — the scratch base translated once
       - name: resolve the scratch base
         shell: bash
         run: |
@@ -2650,14 +1730,13 @@ jobs:
           echo "SMOKE_TMP=$tmp" >> "$GITHUB_ENV"
           echo "scratch base $tmp"
 
-      # By PATTERN and not by name, for the reason the siblings state.
+      # spec: installer/SPEC.md §The consumer smoke — the producer's upload, downloaded by pattern
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: gate-binary-*
           path: ${{ runner.temp }}/native-artifacts
 
-      # The x64 Windows sibling's normalize step, whose header owns the whole
-      # argument; the host triple is derived from `rustc -vV` and never spelled.
+      # spec: installer/SPEC.md §The consumer smoke — normalized and placed as the tree's own gate binary
       - name: normalize the producer's upload onto the layout pack reads
         shell: bash
         run: |
@@ -2684,9 +1763,7 @@ jobs:
           [[ -x "$dest" ]] || { echo "could not place the producer's $host artifact at $dest"; exit 1; }
           echo "SMOKE_ARTIFACTS=$art" >> "$GITHUB_ENV"
 
-      # The suite, steered exactly as the siblings steer it; the Intel macOS
-      # sibling's step header owns the argument for the steering and for what a
-      # zero here does and does not license.
+      # spec: installer/SPEC.md §The consumer smoke — each platform leg steers the roster at its host
       - name: install smoke on an arm64 Windows host
         shell: bash
         run: |

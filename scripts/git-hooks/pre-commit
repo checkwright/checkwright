@@ -492,19 +492,19 @@ if staged_matches 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegatio
     run_gate check-knob-default-coupling native/target/release/checkwright-gates check-knob-default-coupling
 fi
 
-if staged_matches '*.sh' '*.gate' '*.rs' '*.workflow/*' '**.sh' '**.gate' '**.rs' '**.knobs' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/comment_tier.rs' 'native/src/spec.rs'; then
+if staged_matches '*.sh' '*.gate' '*.rs' '*.workflow/*' '**.sh' '**.gate' '**.rs' '**.knobs' '*.yml' '*.yaml' '*on' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/comment_tier.rs' 'native/src/spec.rs'; then
     run_gate check-comment-tier native/target/release/checkwright-gates check-comment-tier
 fi
 
-if staged_matches '*SPEC*.md' '*README.md' '*CLAUDE.md' '*.sh' '*.gate' '*.rs' '*.workflow/*' '*CLAUDE.md' '*README.md' '*CONTRIBUTING.md' '*CODE_OF_CONDUCT.md' '*SECURITY.md' '*RELEASING.md' '*ROADMAP.md' '*TRAJECTORY.md' '*/SPEC.md' '*/README.md' '*reserve/*/README.md' '*doctrine-kit/DOCTRINE.md' '*docs/*.md' '*docs/*/index.md' '*docs/posts/*.md' '*/templates/*.md' '*.claude/agents/*.md' '*SPEC.md' '**.sh' '**.gate' '**.rs' '**.knobs' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/spec_pointer.rs' 'native/src/programs.rs' 'native/src/spec.rs'; then
+if staged_matches '*SPEC*.md' '*README.md' '*CLAUDE.md' '*.sh' '*.gate' '*.rs' '*.workflow/*' '*CLAUDE.md' '*README.md' '*CONTRIBUTING.md' '*CODE_OF_CONDUCT.md' '*SECURITY.md' '*RELEASING.md' '*ROADMAP.md' '*TRAJECTORY.md' '*/SPEC.md' '*/README.md' '*reserve/*/README.md' '*doctrine-kit/DOCTRINE.md' '*docs/*.md' '*docs/*/index.md' '*docs/posts/*.md' '*/templates/*.md' '*.claude/agents/*.md' '*SPEC.md' '**.sh' '**.gate' '**.rs' '**.knobs' '*.yml' '*.yaml' '*on' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/spec_pointer.rs' 'native/src/programs.rs' 'native/src/spec.rs'; then
     run_gate check-spec-pointer native/target/release/checkwright-gates check-spec-pointer
 fi
 
-if staged_matches '*.sh' '*.gate' '*.rs' '*.workflow/*' '*TASK-QUEUE.md' '**.sh' '**.gate' '**.rs' '**.knobs' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/todo_task_liveness.rs' 'native/src/spec.rs'; then
+if staged_matches '*.sh' '*.gate' '*.rs' '*.workflow/*' '*TASK-QUEUE.md' '**.sh' '**.gate' '**.rs' '**.knobs' '*.yml' '*.yaml' '*on' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/todo_task_liveness.rs' 'native/src/spec.rs'; then
     run_gate check-todo-task-liveness native/target/release/checkwright-gates check-todo-task-liveness
 fi
 
-if staged_matches '*.sh' '*.gate' '*.rs' '*.workflow/*' '*TASK-QUEUE.md' '**.sh' '**.gate' '**.rs' '**.knobs' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/deprecation_task.rs' 'native/src/spec.rs'; then
+if staged_matches '*.sh' '*.gate' '*.rs' '*.workflow/*' '*TASK-QUEUE.md' '**.sh' '**.gate' '**.rs' '**.knobs' '*.yml' '*.yaml' '*on' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'native/src/gates/deprecation_task.rs' 'native/src/spec.rs'; then
     run_gate check-deprecation-task native/target/release/checkwright-gates check-deprecation-task
 fi
 

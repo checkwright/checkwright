@@ -1,11 +1,4 @@
-# Scheduled probe of the live docs site — monitoring, NOT a gate. It verifies a
-# deployment, not a tree, so it reds on causes no commit produced (DNS, a Pages
-# incident, a stalled cert renewal), breaking both the low-false-positive gate
-# contract and the CI backstop's checkout+bash hermeticity — see
-# gate-sdk/SPEC.md §Enforcement tiers. It therefore lives beside gates.yml, never
-# inside it: a failed probe opens (or updates, never duplicates) a site-health
-# issue and reds this run, never a merge. Recovery self-clears (a green run
-# closes the open issue). No README badge, by the standing ruling.
+# spec: site-kit/SPEC.md §templates/site-health.yml — this repo's filled instance
 # enforce: class=monitor live docs-site deployment — apex/www/http HTTPS, redirects, cert expiry, release-body note pointers, each published Release's prerelease flag against its own version line, theme highlight-class drift against the tracked snapshot, and the repository About against the product statement
 name: site-health
 
@@ -19,49 +12,31 @@ on:
         type: boolean
         default: false
 
-# A permissions: block is an allowlist, not an addition — every scope it omits is
-# none. issues:write carries the open/update/close path; contents:read is what
-# lets the probe read the tag list and the Release bodies. Without it those reads
-# 404, which reads like "no such Release" rather than "not permitted".
+# spec: site-kit/SPEC.md §templates/site-health.yml — the permissions block is an allowlist
 permissions:
   issues: write
   contents: read
 
 jobs:
   probe:
-    # Pinned, not `-latest`: native/runners.list's header owns which Linux jobs pin.
+    # comment-tier-exempt: pinned, not -latest; native/runners.list's header owns which Linux jobs pin
     runs-on: ubuntu-24.04
     steps:
-      # docs/CNAME is the single gated source of truth for the apex host
-      # (docs-cname-parity); reading it here gives the monitor a cutover for free.
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
       - name: probe live site
         id: probe
         env:
-          # Alternate .com redirect host — a bare public hostname, never a URL
-          # literal (docs-cname-parity bars the alias in ://url form); the probe
-          # builds the URL from this at run time.
           ALT_DOMAIN: checkwright.com
-          # Release-note pointer arm (#6). Step-level workflow env, not
-          # SITE_KIT_* knobs — this file is copied and edited, never sourced.
-          # The host is deliberately absent: docs/CNAME stays its single source,
-          # so a rename is still a one-file edit.
           RELEASE_NOTE_GLOB: 'docs/posts/*.md'
           RELEASE_NOTE_TAG_KEY: 'release'
-          # Path only, {slug} = note filename minus extension. The bare form, not
-          # /posts/{slug}.html: the generator emits the .html form and the host
-          # also serves this one, which is what RELEASING.md pins bodies to.
+          # spec: RELEASING.md §The procedure — step 6 writes Release bodies to this bare form
           RELEASE_NOTE_URL_PATH: '/posts/{slug}'
-          # Theme-drift arm (#8): the Pages theme stylesheet, and the snapshot
-          # SITE_KIT_HIGHLIGHT_TOKENS names in scripts/site-config.knobs.
           HIGHLIGHT_CSS_PATH: '/assets/css/style.css'
           HIGHLIGHT_TOKENS_FILE: 'scripts/highlight-tokens.list'
           FORCE_FAIL: ${{ inputs.force_fail }}
           GH_TOKEN: ${{ github.token }}
         run: |
-          # A probe expects individual checks to fail; -e would abort the battery
-          # on the first red, so disable it and collect failures explicitly.
           set +e
           set -uo pipefail
 
@@ -74,35 +49,27 @@ jobs:
 
           failures=()
 
-          # 1. apex answers 200 over HTTPS; curl validates the cert at handshake,
-          #    so a TLS fault also reds here.
           code="$(curl -sS -m 20 -o /dev/null -w '%{http_code}' "https://$apex/")"
           [ "$code" = 200 ] || failures+=("apex https did not answer 200 (got '$code')")
 
-          # 2. www 301s to the apex.
           read -r code loc < <(curl -sS -m 20 -o /dev/null -w '%{http_code} %{redirect_url}' "https://www.$apex/") || true
           case "${code}::${loc}" in
             301::*"//$apex/"*) ;;
             *) failures+=("www did not 301 to apex (got '$code' -> '$loc')") ;;
           esac
 
-          # 3. http:// 301s to https:// — proves Enforce-HTTPS has not silently flipped.
           read -r code loc < <(curl -sS -m 20 -o /dev/null -w '%{http_code} %{redirect_url}' "http://$apex/") || true
           case "${code}::${loc}" in
             301::https://*) ;;
             *) failures+=("http did not 301 to https (got '$code' -> '$loc')") ;;
           esac
 
-          # 4. the .com alternate 301s to the apex, request path kept.
           read -r code loc < <(curl -sS -m 20 -o /dev/null -w '%{http_code} %{redirect_url}' "https://$ALT_DOMAIN/install.html") || true
           case "${code}::${loc}" in
             301::*"//$apex/install.html"*) ;;
             *) failures+=("$ALT_DOMAIN did not 301 to apex keeping path (got '$code' -> '$loc')") ;;
           esac
 
-          # 5. certificate expiry >= 14 days — the real payload. Pages renews ~30d
-          #    out, so inside 14 days means renewal has silently stalled. curl -v
-          #    prints the handshake's "expire date:", keeping this curl-only.
           expire="$(curl -sSv -m 20 "https://$apex/" 2>&1 >/dev/null | sed -n 's/^\* *expire date: //p' | head -1)"
           if [ -z "$expire" ]; then
             failures+=("could not read certificate expiry for $apex")
@@ -116,12 +83,7 @@ jobs:
             fi
           fi
 
-          # 6. every tracked release note naming an existing tag has a Release
-          #    whose body points at that note, and every apex URL that body
-          #    carries resolves. The two assertions run over two different
-          #    strings — presence over the URL derived here, resolution over the
-          #    URLs the body actually carries — and collapsing them re-opens the
-          #    defects this arm exists for (site-kit/SPEC.md §templates/site-health.yml).
+          # spec: site-kit/SPEC.md §templates/site-health.yml — the release-body arm
           notes=()
           shopt -s nullglob
           for f in $RELEASE_NOTE_GLOB; do
@@ -132,19 +94,11 @@ jobs:
             failures+=("release-note glob matched nothing: '$RELEASE_NOTE_GLOB' — set the RELEASE_NOTE_* env above, or delete this arm")
           fi
 
-          # The tag list comes from the API, never `git tag`: checkout fetches no
-          # tags at depth 1, so a git-driven arm finds zero released notes and
-          # reads green forever. --paginate concatenates the pages' arrays, so
-          # count by streaming the names — --jq 'length' returns the last page's
-          # count, which understates exactly once pagination starts to matter.
+          # spec: site-kit/SPEC.md §templates/site-health.yml — the tag list comes from the API, paginated
           tag_err="$(mktemp)"
           tags="$(gh api --paginate 'repos/{owner}/{repo}/tags' --jq '.[].name' 2>"$tag_err")"
           tag_rc=$?
           if [ "$tag_rc" -ne 0 ]; then
-            # Asserted on the call's own exit status, never inferred from the
-            # count below: this step runs under `set +e`, so a failed call yields
-            # an empty tag list and a zero exit, every note then reads "not yet
-            # released", and the arm reports a clean run forever.
             failures+=("could not read the tag list (gh exit $tag_rc): $(tr '\n' ' ' < "$tag_err")")
             tags=""
           fi
@@ -154,21 +108,13 @@ jobs:
           n_found="${#notes[@]}"; n_keyed=0; n_released=0; n_checked=0
           for f in "${notes[@]:-}"; do
             [ -n "$f" ] || continue
-            # Anchored inside the opening front-matter fence — the spelling
-            # check-release-bump ships. A bare ^key: match also hits the body.
             tag="$(awk -v key="$RELEASE_NOTE_TAG_KEY" '
               /^---[[:space:]]*$/ { fm++; next }
               fm == 1 && index($0, key ":") == 1 {
                 v = substr($0, length(key) + 2); sub(/^[[:space:]]+/, "", v); print v; exit
               }' "$f")"
-            # A post carrying no tag key is not a release note. Silent by ruling:
-            # the census line below is how that case stays readable.
             [ -n "$tag" ] || continue
             n_keyed=$(( n_keyed + 1 ))
-            # A note whose tag is not on the remote is a legitimate skip — its
-            # release is deferred. This is why the tag list is not replaceable by
-            # the per-tag lookup below: a 404 there cannot tell that apart from a
-            # tag whose Release is genuinely missing.
             grep -Fxq -- "$tag" <<<"$tags" || continue
             n_released=$(( n_released + 1 ))
 
@@ -186,23 +132,11 @@ jobs:
             rm -f "$rel_err"
             n_checked=$(( n_checked + 1 ))
 
-            # Presence: containment, never equality — the oldest body writes the
-            # .html-suffixed form of its URL. Scheme-qualified, because a
-            # markdown link's visible label repeats the URL scheme-less and would
-            # satisfy a scheme-less match while the link target went unchecked.
             case "$body" in
               *"$want"*) ;;
               *) failures+=("$tag: Release body does not carry the note URL $want") ;;
             esac
 
-            # Resolution: every apex URL as literally written in the body — this
-            # is what catches a trailing-slash URL that presence's containment
-            # lets through. Scheme-anchored so a label is never mistaken for a
-            # target. The trailing punctuation that actually occurs is
-            # markdown-structural, `)` closing a link target and `)**` closing
-            # one inside bold, so the set covers `)` and `*` and strips a run.
-            # Deliberately not filtered to note URLs: a body's other apex links
-            # are covered too.
             while read -r u; do
               [ -n "$u" ] || continue
               case "$u" in
@@ -214,30 +148,14 @@ jobs:
             done < <(grep -oE 'https?://[^[:space:]<>"]+' <<<"$body" | sed -E 's/[).,;:!?*]+$//' | sort -u)
           done
 
-          # Which zero-case a reader is in. A diagnostic, not an assertion — the
-          # rulings above are what make a vacuous pass impossible.
           echo "release-body: $n_found note(s) found, $n_keyed keyed '$RELEASE_NOTE_TAG_KEY:', $n_released released of $n_tags remote tag(s), $n_checked checked"
 
-          # 7. every published Release's prerelease flag agrees with the channel
-          #    its own version line implies (invariant C, installer/SPEC.md §The
-          #    release channel). It lives here rather than in the battery because
-          #    host state is out of a precommit gate's reach by construction —
-          #    the tier ruling RELEASING.md step 6 already makes for the Release
-          #    body, over the same objects. It stays in this repo's copy and out
-          #    of site-kit's template: the declaration it composes is repo-local
-          #    mechanism owned by no kit, so the arm cannot be truer than a
-          #    consumer's own conventions (site-kit/SPEC.md
-          #    §templates/site-health.yml). No new knob — each expectation is
-          #    derived from the tag being looked at.
+          # spec: installer/SPEC.md §The release channel — invariant C, held here as host state
           rel_list_err="$(mktemp)"
-          # Drafts are excluded: unpublished, so they carry no channel claim yet.
           releases="$(gh api --paginate 'repos/{owner}/{repo}/releases' \
             --jq '.[] | select(.draft | not) | "\(.tag_name)\t\(.prerelease)"' 2>"$rel_list_err")"
           rel_list_rc=$?
           if [ "$rel_list_rc" -ne 0 ]; then
-            # Asserted on the call's own exit status for the tag list's reason:
-            # under `set +e` a failed call yields an empty list and a zero exit,
-            # and the arm then reads green over nothing forever.
             failures+=("could not read the Release list (gh exit $rel_list_rc): $(tr '\n' ' ' < "$rel_list_err")")
             releases=""
           fi
@@ -249,28 +167,17 @@ jobs:
             n_rel=$(( n_rel + 1 ))
             major="${rel_tag#v}"; major="${major%%.*}"
             case "$major" in
-              # Fail closed on a tag carrying no version line: it implies no
-              # channel, so letting it through is the arm asserting nothing
-              # while still reporting a clean run.
               ''|*[!0-9]*)
                 failures+=("$rel_tag: Release tag does not parse as a version line, so the channel it implies cannot be derived")
                 continue ;;
             esac
-            # Invariant B's rule, read per Release instead of off the newest tag:
-            # 0.x implies preview, which invariant A pairs with the flag.
             if [ "$major" -eq 0 ]; then want_flag=true; else want_flag=false; fi
             [ "$rel_flag" = "$want_flag" ] || failures+=("$rel_tag: prerelease=$rel_flag, but its version line implies prerelease=$want_flag")
           done <<<"$releases"
 
-          # While the line is 0.x this reports every Release as flagged, and so
-          # no Release is Latest — the declared outcome, not a fault.
           echo "release-channel: $n_rel published Release(s) checked against their own version lines"
 
-          # 8. the classes the live theme stylesheet colours under .highlight
-          #    match the tracked snapshot check-docs-highlight-coverage reads, in
-          #    both directions. On a finding, paste the printed list into the
-          #    snapshot below its header, then add the overrides that gate reds
-          #    on in docs/_layouts/default.html.
+          # spec: site-kit/SPEC.md §templates/site-health.yml — the theme-drift arm
           if [ -z "${HIGHLIGHT_CSS_PATH:-}${HIGHLIGHT_TOKENS_FILE:-}" ]; then
             echo "theme-drift: skipped (HIGHLIGHT_CSS_PATH and HIGHLIGHT_TOKENS_FILE unset)"
           elif [ -z "${HIGHLIGHT_CSS_PATH:-}" ] || [ -z "${HIGHLIGHT_TOKENS_FILE:-}" ]; then
@@ -285,9 +192,6 @@ jobs:
             if [ "$css_rc" -ne 0 ]; then
               failures+=("theme-drift: could not fetch https://$apex$HIGHLIGHT_CSS_PATH (curl exit $css_rc): $(tr '\n' ' ' < "$css_err")")
             else
-              # The extraction rule: rules split at }, kept when the declaration
-              # block sets color, background or background-color; each selector
-              # list split on , and kept when exactly .highlight .<class>.
               extracted="$(tr '\n' ' ' < "$css" | sed -E 's#/\*([^*]|\*+[^*/])*\*+/##g' | awk '
                 BEGIN { RS = "}" }
                 {
@@ -321,12 +225,7 @@ jobs:
             rm -f "$css" "$css_err"
           fi
 
-          # 9. the repository About carries the product statement. The plain
-          #    rendering is installer/package.json's description, which
-          #    check-product-statement-fresh holds, so this arm renders nothing
-          #    (docs/site-architecture.md §Generated projections and their
-          #    freshness gates). Repo-local convention, so it stays out of
-          #    site-kit's template.
+          # spec: docs/site-architecture.md §Generated projections and their freshness gates
           about_err="$(mktemp)"
           about="$(gh api 'repos/{owner}/{repo}' --jq '.description // ""' 2>"$about_err")"
           about_rc=$?
@@ -346,8 +245,6 @@ jobs:
           fi
           rm -f "$about_err"
 
-          # DoD hook: a workflow_dispatch with force_fail=true exercises the issue
-          # path on demand without waiting for a real outage.
           if [ "$FORCE_FAIL" = true ]; then
             failures+=("synthetic failure (force_fail dispatch input)")
           fi
@@ -375,7 +272,6 @@ jobs:
         run: |
           set -euo pipefail
           label=site-health
-          # Idempotent: creates the label on first use, no-ops once it exists.
           gh label create "$label" --color b60205 \
             --description "Live-site monitoring probe failure" 2>/dev/null || true
 
@@ -394,7 +290,6 @@ jobs:
               gh issue create --label "$label" \
                 --title "Site health: live-site probe failed" --body "$body"
             fi
-            # Red this run as the operator's second signal (reds no merge).
             exit 1
           fi
 

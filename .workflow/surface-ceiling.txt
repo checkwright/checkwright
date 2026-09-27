@@ -14,7 +14,7 @@
 1155cp .claude/commands/spec.md
 1204cp .claude/commands/validate.md
 12421cp CLAUDE.md
-256074cp canon-kit/SPEC.md
+257054cp canon-kit/SPEC.md
 5785cp canon-kit/templates/SPEC-amendment.md
 128514cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
@@ -74,10 +74,10 @@
 2698cp drift-kit/templates/close-knowledge.md
 3752cp drift-kit/templates/economics.md
 93540cp evidence-kit/SPEC.md
-930742cp gate-sdk/SPEC.md
+931900cp gate-sdk/SPEC.md
 301516cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
-268922cp installer/SPEC.md
+273342cp installer/SPEC.md
 393970cp lifecycle-kit/SPEC.md
 4120cp lifecycle-kit/templates/consult.md
 39161cp lifecycle-kit/templates/lead.md
@@ -91,4 +91,4 @@
 2765cp lifecycle-kit/templates/upgrade.md
 163675cp queue-kit/SPEC.md
 1392cp queue-kit/templates/TASK-QUEUE.md
-59454cp site-kit/SPEC.md
+59554cp site-kit/SPEC.md

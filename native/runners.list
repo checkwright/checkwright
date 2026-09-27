@@ -55,7 +55,7 @@
 #
 # Every `-latest` line here RIDES its image migrations, as do the hard-coded
 # `ubuntu-latest` install-smoke-sh-linux leg: their subject is the platform an
-# adopter meets today (.github/workflows/gates.yml's macOS leg header). The
+# adopter meets today. The
 # first witness of a migrated image is the first gates run whose leg logs it.
 # A ride that raises an artifact's OS floor reds the shared build body
 # (scripts/ci-build-artifact.sh), which is where pin-or-raise is decided.

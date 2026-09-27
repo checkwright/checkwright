@@ -1,24 +1,4 @@
-# gate-sdk CI backstop — the server-side enforcement tier (gate-sdk/SPEC.md
-# §Enforcement tiers). The local pre-commit hook is opt-in and bypassable by
-# design (`git commit --no-verify`, or a clone that never ran --install-hooks);
-# this workflow is the authoritative outer backstop that closes both gaps on
-# every push and pull request.
-#
-# Scope boundary: consumer-owned CI stops *bypass* — it cannot stop an agent
-# editing this workflow itself in the same change. A tamper-proof verifier
-# (verifier neutrality) is a hosted service's job, out of scope here rather
-# than overclaimed.
-#
-# Copied out like every gate-sdk template. Checkout + bash only: no caching, no
-# matrix, no third-party actions, so the surface an agent could tamper with
-# stays minimal and reviewable. A tree `init` installed already carries a
-# workflow; to adopt this one instead, copy it to .github/workflows/gates.yml,
-# set your default-branch name below, add a step per non-gate-tests runner
-# (guard tests, a language test suite) after the derived fixture step, and
-# require this workflow's status check before merge (branch-protection recipe:
-# the install-page docs). The fixture suites need no hand-list — they derive
-# from your gate-tests dirs (the `--emit fixture-suites` arm). A filled example is this
-# repo's own .github/workflows/gates.yml.
+# spec: gate-sdk/SPEC.md §templates/gates-workflow.yml — copy-out, fill-ins and scope boundary
 name: gates
 
 on:
@@ -30,28 +10,22 @@ on:
 jobs:
   gates:
     runs-on: ubuntu-latest
-    # An allowlist, not an addition: every scope omitted is `none`. The job checks
-    # out and does nothing else against the API, so `contents: read` is exact
-    # (gate-sdk/SPEC.md §check-action-permissions).
+    # spec: gate-sdk/SPEC.md §check-action-permissions
     permissions:
       contents: read
     steps:
-      # fetch-depth: 0 — history-reading gates (e.g. drift-kit's trajectory
-      # extractor) need the full commit graph, not a shallow checkout.
+      # spec: gate-sdk/SPEC.md §templates/gates-workflow.yml — the full history
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           fetch-depth: 0
-      # The door has one owner, GATE_SDK_NATIVE_BIN. A CI runner has a checkout
-      # and no install, so it reads that knob through gate-sdk's own library and
-      # carries the result to the later steps rather than naming a path itself.
+      # spec: gate-sdk/SPEC.md §lib/gate.sh — gate_native_bin_spelled spells the door
       - name: resolve the gate binary
         run: |
           . gate-sdk/lib/gate.sh
           echo "GATES=$(gate_native_bin_spelled)" >> "$GITHUB_ENV"
       - name: full battery
         run: "$GATES"
-      # Every dir with a gate-tests/ tree, run against its sibling checks/ — no
-      # hand-list to drift as kits are added or renamed.
+      # spec: gate-sdk/SPEC.md §templates/gates-workflow.yml — suites derived, never hand-listed
       - name: fixture suites (derived from */gate-tests)
         run: |
           suites="$("$GATES" --emit fixture-suites)" || exit 2
@@ -62,7 +36,4 @@ jobs:
             "$GATES" --run-gate-tests "$tests" $checks || rc=1
           done <<<"$suites"
           exit $rc
-      # PLACEHOLDER — add one step per non-gate-tests runner your CLAUDE.md
-      # names (a guard-test runner, a language test suite), e.g.
-      #   - name: guard-kit decision table
-      #     run: "$GATES" --run-guard-tests
+      # spec: gate-sdk/SPEC.md §templates/gates-workflow.yml — add one step here per further runner

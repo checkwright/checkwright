@@ -1,6 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-action-run-shell — the `run:` extractor, held in shared code
 // because it has two consumers, that gate and §check-action-run-path
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 pub struct Refusal {
     pub line: usize,
@@ -662,6 +662,30 @@ pub fn actions_shaped(text: &str) -> bool {
     records(text)
         .iter()
         .any(|l| l.starts_with("jobs:") || l.starts_with("runs:"))
+}
+
+pub struct ActionsFiles {
+    pub walked: usize,
+    pub files: Vec<(PathBuf, String)>,
+}
+
+// spec: canon-kit/SPEC.md §The shared spec adapters — the one walk-and-predicate every reader of
+// the actions-shaped corpus calls, so no two of them can disagree about its membership; an
+// unwalkable root or an unreadable file is the `Err` every caller turns into exit 2
+pub fn actions_files(root: &Path) -> Result<ActionsFiles, String> {
+    let walked = crate::walk::find_files(root, &["yml", "yaml"])?;
+    let mut out = ActionsFiles {
+        walked: walked.len(),
+        files: Vec::new(),
+    };
+    for f in walked {
+        let text = std::fs::read_to_string(&f)
+            .map_err(|e| format!("cannot read {} ({})", f.display(), e))?;
+        if actions_shaped(&text) {
+            out.files.push((f, text));
+        }
+    }
+    Ok(out)
 }
 
 pub fn print_refusal(name: &str, doing: &str, file: &Path, r: &Refusal) -> i32 {

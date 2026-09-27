@@ -1,0 +1,2 @@
+# this YAML carries no top-level jobs: or runs: key, so it is not actions-shaped and its prose is never read
+title: fixture

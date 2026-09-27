@@ -1,26 +1,5 @@
-# The installer package's publish channel. A version tag is the only trigger and
-# the only version input, so nothing publishes from a laptop and no file carries a
-# version to edit — the first publish rides an operator-authorized release under
-# RELEASING.md §The procedure.
-#
-# The job split is load-bearing, not tidiness: `pack` assembles and stamps the
-# tarball once and uploads it as the run's artifact, and every delivery channel is
-# a sibling job that `needs: pack` and consumes that one artifact. Add a channel as
-# a job; never weld a second publish into an existing one, which would give two
-# channels two assemblies to disagree about.
-#
-# `roster` + `build` are a stage ahead of the assembly, not a fourth channel: they
-# produce the per-target gate binaries the payload carries. The platform set they
-# build is never spelled here — it is read from the target roster
-# (gate-sdk/SPEC.md §Consumer payload), so the matrix declaration carries no
-# platform literal and widening the roster needs no workflow rewrite.
-#
-# Each digest is computed exactly once, where its bytes are produced, and moved
-# thereafter — a second `sha256sum` on a later job is what lets a published digest
-# and an installed digest diverge while both look computed
-# (check-gate-substrate-parity assertion F).
-#
-# Every `uses:` ref is a full 40-hex SHA — check-action-pinning walks this file.
+# spec: RELEASING.md §The procedure — step 5: the tag is the only trigger; one pack, each channel a sibling job
+# spec: gate-sdk/SPEC.md §Consumer payload — the roster-derived matrix, each digest computed once
 name: publish
 
 on:
@@ -28,12 +7,11 @@ on:
     tags:
       - 'v[0-9]*'
 
-# Read-only by default; each job widens only what it needs.
 permissions: {}
 
 jobs:
   roster:
-    # Pinned, not `-latest`: native/runners.list's header owns which Linux jobs pin.
+    # comment-tier-exempt: pinned, not -latest; native/runners.list's header owns which Linux jobs pin
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -42,20 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
-      # The roster declares platform *support*; this step adds the one thing a
-      # build needs and support does not — which runner hosts each target. That
-      # mapping is a runner selection, so it may name a platform where the matrix
-      # declaration may not, and a target it has no entry for fails the release
-      # here rather than building somewhere wrong.
-      #
-      # The map is a tracked file read through gate_native_runner rather than an
-      # inline `declare -A` here, because it has a second reader: the
-      # `native-artifacts` producer in .github/workflows/gates.yml derives its
-      # matrix from the same file. Two workflows each carrying their own copy is
-      # how a release comes to build a target on one runner class while CI
-      # measured it on another — invisible until a published artifact behaves
-      # differently from the one that was exercised. The refusal below is
-      # unchanged by the move; only where the pair comes from changed.
+      # spec: gate-sdk/SPEC.md §Layout and configuration — GATE_SDK_NATIVE_RUNNERS_FILE, the one runner map
       - name: derive the build legs from the target roster
         id: legs
         run: |
@@ -88,16 +53,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      # The Windows day the paragraph below anticipates, met with a step rather
-      # than with a reading — and it is the same lesson that paragraph already
-      # records against the macOS day: reasoning about the *shell* a future runner
-      # picks says nothing about the *tree* it checks out. This repository pins no
-      # line endings in .gitattributes and Git for Windows sets
-      # `core.autocrlf=true` in its system config, so a Windows leg's checkout
-      # writes CRLF into every tracked text file and the build body below reads a
-      # script whose every line ends in a byte bash folds into the last word. That
-      # is again a failure reachable only from a tag. The CI producer carries the
-      # identical step for the identical reason.
+      # spec: gate-sdk/SPEC.md §Consumer payload — the shared bootstrap: a Windows leg checks out LF
       - name: check the tree out with LF line endings
         if: runner.os == 'Windows'
         shell: bash
@@ -105,41 +61,13 @@ jobs:
 
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
-      # Stays a bash `run:` on the runner's preinstalled cargo (no setup-rust
-      # action) to keep the checkout+bash tamper floor .github/workflows/gates.yml
-      # states. Since the settings cohort the crate carries dependencies, so a leg
-      # is no longer network-free: every leg fetches the tracked lock's crates from
-      # the registry on a cold cache, and no cargo cache is provisioned here.
-      # This job's `runs-on` is an expression, so no tree-local reader can state
-      # its runner — and on the day the roster gains a Windows target this leg's
-      # runner becomes `windows-latest`, where GitHub's default `run:` shell is
-      # `pwsh`. `shell: bash` is what keeps the body below running as written,
-      # and it selects Git-for-Windows bash there, as the Windows leg of
-      # .github/workflows/gates.yml already does.
-      #
-      # **The day a macOS target was declared arrived before that Windows day,
-      # and this leg had nothing ready for it.** The paragraph above reasoned
-      # about the shell a future runner would pick and not about the userland it
-      # would ship: a `macos-latest` runner's `bash` is 3.2, `gate-sdk/lib/gate.sh`
-      # sources with a bash 4.2 unary in its knob defaults, and stock macOS has
-      # `shasum` and no `sha256sum`. So this leg would have died on its first
-      # executed line, having compiled nothing — a failure reachable only from a
-      # tag, which is the worst place to find one. The floor step below is what
-      # closes it, and it is the CI producer's own step body rather than a copy.
+      # spec: gate-sdk/SPEC.md §Consumer payload — the shared bootstrap: the floor a macOS leg needs
       - name: install the bash floor and GNU userland this leg's path needs
         if: runner.os == 'macOS'
         shell: bash
         run: bash scripts/ci-macos-floor.sh
 
-      # The body is `scripts/ci-build-artifact.sh`, and
-      # .github/workflows/gates.yml's `native-artifacts` producer calls the same
-      # script with the same two arguments. That producer exists to measure what
-      # a release would publish, so the two legs sharing one body is what makes
-      # its claim structural instead of a promise two copies had to keep — and
-      # they had already stopped keeping it, which is what the floor step above
-      # records. The digest the script emits is this artifact's only computation
-      # anywhere in the release; every later hop moves the file, so a published
-      # digest and an installed digest cannot diverge.
+      # spec: gate-sdk/SPEC.md §Consumer payload — one build body with the CI producer, one digest
       - name: build the gate binary for ${{ matrix.target }}
         shell: bash
         env:
@@ -148,8 +76,6 @@ jobs:
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          # The artifact is named for its target and carries the target directory,
-          # so a merged download lands exactly the layout the pack arm reads.
           name: gate-binary-${{ matrix.target }}
           path: ${{ runner.temp }}/artifact/${{ matrix.target }}/
           if-no-files-found: error
@@ -168,17 +94,7 @@ jobs:
           pattern: gate-binary-*
           path: ${{ runner.temp }}/artifact
 
-      # The assemble step below dispatches the payload assembler as a table arm
-      # of the gate binary, and this is the one job that had no build — the
-      # consumer smoke builds before it packs, and the macOS install-smoke legs
-      # adopt a compiled binary from the build legs' hand-off. So the binary is
-      # built here, on the runner's preinstalled cargo, which is the disposition
-      # the `build:` job's own comment above already records for this workflow.
-      # It compiles bytes this job checked out at the tag, so the
-      # checkout-plus-bash tamper floor is intact, and it is the tooling binary
-      # rather than a payload artifact: the payload still carries only what the
-      # `build:` matrix produced. installer/SPEC.md §The packer owns the route
-      # and the refused alternative.
+      # spec: installer/SPEC.md §The packer — ROUTE 1: the tooling binary the assemble step dispatches to
       - name: build the gate binary this job's assemble step dispatches to
         run: bash gate-sdk/bin/build-native.sh
 
@@ -189,13 +105,7 @@ jobs:
           set -euo pipefail
           version="${TAG#v}"
 
-          # A `pattern:` download lands each artifact in its own directory when
-          # several match and directly in `path:` when exactly one does, so the
-          # shape on disk is not something this workflow can assert. The roster
-          # is, and the pack arm reads `<artifacts>/<target>/`, so normalize
-          # onto that from whichever shape arrived. The unreachable case fails
-          # loudly and prints the tree: packing a release with a binary silently
-          # missing is the one outcome worse than a red run.
+          # comment-tier-exempt: download-artifact lands one dir per artifact when several match, flat when one does
           source gate-sdk/lib/gate.sh
           art="$RUNNER_TEMP/artifact"
           binary="$(gate_native_bin)"; binary="${binary##*/}"; binary="${binary%.exe}"
@@ -215,18 +125,14 @@ jobs:
             fi
           done < <(gate_native_targets)
 
-          # The pack step refuses a dirty path inside the payload's footprint —
-          # installer/, the kit roots, and the target roster it copies — so its
-          # scratch and its output both live outside the checkout rather than
-          # depending on where inside it they would have landed.
+          # spec: installer/SPEC.md §The packer — the footprint refusal; scratch and output outside the checkout
           out="$RUNNER_TEMP/dist"
           mkdir -p "$out"
           INSTALLER_PACK_TMP_DIR="$RUNNER_TEMP" \
             bash gate-sdk/bin/run-gates.sh --pack-installer \
               --version "$version" --out "$out" --artifacts "$art"
 
-          # The tag is the whole of the version derivation, so prove the packed
-          # artifact carries it rather than trusting that the stamp ran.
+          # spec: RELEASING.md §The procedure — step 5: a stamp that disagrees with the tag is refused
           tarball="$(ls "$out"/*.tgz)"
           packed="$(tar -xzOf "$tarball" package/package.json | jq -r '.version')"
           if [ "$packed" != "$version" ]; then
@@ -234,21 +140,11 @@ jobs:
             exit 1
           fi
 
-          # The tarball's digest is computed here, where its bytes are produced,
-          # and every later job moves the file rather than re-deriving it. What it
-          # proves is bounded and stated on the install page: same origin, same TLS
-          # session, so it catches corruption and truncation, never a compromised
-          # host.
+          # spec: gate-sdk/SPEC.md §Consumer payload — the digest, computed where the bytes are produced
           ( cd "$out" && sha256sum "$(basename "$tarball")" > "$(basename "$tarball").sha256" )
           echo "packed $(basename "$tarball") at version $packed"
 
-          # The Release's per-target assets are archived here, in the one job that
-          # holds the roster, rather than again in the job that attaches them —
-          # duplicating the normalization is how the release job came to carry
-          # this same defect unnoticed. Release assets are flat, so each target's
-          # pair travels as one archive named for version and target, and the
-          # sidecar keeps the name it verifies against. No outer digest: a second
-          # `sha256sum` here is a second producer in this job.
+          # spec: gate-sdk/SPEC.md §Consumer payload — one archive per roster target, archived where the roster is held
           stage="$RUNNER_TEMP/release-archives"
           while IFS= read -r target; do
             name="$binary$(gate_exe_suffix "$target")"
@@ -270,14 +166,11 @@ jobs:
   npm:
     needs: pack
     runs-on: ubuntu-24.04
-    # The environment is where the operator attaches approval to the publish;
-    # its name and required secret are desired state in the ops runbook.
+    # spec: RELEASING.md §The procedure — step 5: the npm job waits on its approval environment
     environment: npm-publish
     permissions:
       contents: read
-      # npm mints its provenance attestation through GitHub's OIDC issuer; without
-      # this the publish still lands but carries no attestation, which is the whole
-      # of what this channel adds over a hand-uploaded tarball.
+      # comment-tier-exempt: npm mints its provenance attestation through GitHub's OIDC issuer
       id-token: write
     steps:
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
@@ -295,8 +188,7 @@ jobs:
             echo "repository configuration, carried as desired state in the ops runbook." >&2
             exit 1
           fi
-          # npm expands the variable when it reads the file, so the token itself
-          # never lands on disk.
+          # comment-tier-exempt: npm expands the variable when it reads the file, so the token never lands on disk
           printf '//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}\n' > ~/.npmrc
 
           tarballs=(dist/*.tgz)
@@ -304,24 +196,16 @@ jobs:
             echo "expected exactly one tarball, got ${#tarballs[@]}" >&2
             exit 1
           fi
-          # An npm spec containing a slash is read as a GitHub
-          # owner/repo shorthand unless it is unambiguously a path.
+          # spec: RELEASING.md §The publish spec
           npm publish --provenance --access public "$PWD/${tarballs[0]}"
 
   release:
     needs: [build, pack]
     runs-on: ubuntu-24.04
-    # The primary delivery channel: the same bytes the npm job publishes, reachable
-    # with no Node on the adopter's machine. It carries no `environment:` gate —
-    # attaching assets to this repository's own Release is neither irreversible nor
-    # external, and gating it would hold the primary channel behind the secondary
-    # channel's approval. Its capability story is docs/install.md §Install.
+    # spec: RELEASING.md §The procedure — step 5: the primary channel, held behind no approval
     permissions:
       contents: write
     steps:
-      # The Release body is composed from the tagged tree, so the job reads the
-      # two inputs of that derivation and nothing else. Non-cone patterns, because
-      # cone mode refuses a file path.
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           sparse-checkout-cone-mode: false
@@ -340,17 +224,14 @@ jobs:
           # spec: gate-sdk/SPEC.md §check-action-gh-repo — the sparse checkout carries a remote, but GH_REPO names the target repository explicitly rather than leaning on it
           GH_REPO: ${{ github.repository }}
           TAG: ${{ github.ref_name }}
-          # Keep equal to .github/workflows/site-health.yml's release-body arm,
-          # which reds on its next run if the body this step writes drifts from it.
+          # comment-tier-exempt: keep equal to site-health.yml's release-body env, which reds on a drifted body
           RELEASE_NOTE_GLOB: 'docs/posts/*.md'
           RELEASE_NOTE_TAG_KEY: 'release'
           RELEASE_NOTE_URL_PATH: '/posts/{slug}'
         run: |
           set -euo pipefail
 
-          # Resolve the tag's release note before anything is created: a tag with
-          # no note, or with two, fails here and never publishes a Release without
-          # its pointer (RELEASING.md §The procedure step 6).
+          # spec: RELEASING.md §The procedure — step 6: exactly one note per tag, resolved before the Release exists
           apex="$(tr -d '[:space:]' < docs/CNAME)"
           if [ -z "$apex" ]; then
             echo "docs/CNAME is empty — cannot derive the release note's URL" >&2
@@ -387,13 +268,7 @@ jobs:
           name="$(basename "${tarballs[0]}")"
           assets=("dist/$name" "dist/$name.sha256")
 
-          # The per-target binaries are published here so the digest an adopter's
-          # installer verifies against has a source outside the payload it travels
-          # in — a digest shipped only alongside its own artifact certifies nothing.
-          # They arrive archived per target and version, the binary and its
-          # sidecar inside under their payload names: this job checks out only
-          # the release note's inputs, so it holds no roster to normalize an
-          # artifact layout against, and pack — which does — is where that happens.
+          # spec: gate-sdk/SPEC.md §Consumer payload — the per-target archives, a digest source outside the payload
           for f in dist/*; do
             case "${f##*/}" in
               "$name"|"$name.sha256") continue ;;
@@ -406,10 +281,6 @@ jobs:
             exit 1
           fi
 
-          # Create the Release with its body if the tag has none yet, so the assets
-          # and the note pointer are on it from the moment it exists. On a re-run,
-          # rewrite the body only when it lacks the URL: that repairs an empty body
-          # and keeps a hand-edited one that still points at the note.
           # spec: installer/SPEC.md §Versioning — the declared release channel is `preview`, so the Release states that posture; check-release-channel-parity holds the two in agreement
           if ! gh release view "$TAG" >/dev/null 2>&1; then
             gh release create "$TAG" --title "$TAG" --prerelease --notes-file "$body"

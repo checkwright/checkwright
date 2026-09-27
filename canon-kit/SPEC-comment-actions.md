@@ -16,13 +16,13 @@
 
 ### (1) The comment surface gains an actions tier behind `CANON_KIT_COMMENT_ACTIONS` {design-bearing}
 
-**Not yet applied.** A new scalar knob, `CANON_KIT_COMMENT_ACTIONS`, takes `off` (the default) or `on`. Any other value refuses at exit 2 and names the knob and its two values. With `on`, `comment_surface` adds every actions-shaped YAML file under the root to the selected set in both branches, before the `templates/` rule, the kit-root prune and the sort. So every narrowing the corpus defines applies to the tier, as canon-kit/SPEC.md §The shared spec adapters requires of each branch. A file both a glob and the tier select appears once. With `off`, nothing is added and the surface is unchanged.
+**Applied at build; the merge waits on the mid-iteration push's `gates` run being read.** A new scalar knob, `CANON_KIT_COMMENT_ACTIONS`, takes `off` (the default) or `on`. Any other value refuses at exit 2 and names the knob and its two values. With `on`, `comment_surface` adds every actions-shaped YAML file under the root to the selected set in both branches, before the `templates/` rule, the kit-root prune and the sort. So every narrowing the corpus defines applies to the tier, as canon-kit/SPEC.md §The shared spec adapters requires of each branch. A file both a glob and the tier select appears once. With `off`, nothing is added and the surface is unchanged.
 
 The tier is found by one helper, `actions_run::actions_files(root)`, which runs the walk and predicate `check-action-run-shell` and `check-action-run-path` each run today. Those two gates call it too, so the three readers cannot disagree about which files are actions-shaped. The helper keeps the gates' fail-closed behaviour: an unreadable file or an unwalkable root is exit 2 for every caller.
 
 ### (2) The knob is rostered and this repo binds it {mechanical}
 
-**Not yet applied.**
+**Applied at build; the merge waits on the mid-iteration push's `gates` run being read.**
 - `native/src/knobs/canon_kit.rs` gains `Row::scalar("CANON_KIT_COMMENT_ACTIONS", "off")` beside `CANON_KIT_COMMENT_SURFACE`.
 - In canon-kit/SPEC.md §Layout and configuration, the comment-surface bullet gains, after the `CANON_KIT_COMMENT_SURFACE` clause:
 
@@ -33,19 +33,19 @@ The tier is found by one helper, `actions_run::actions_files(root)`, which runs 
 
 ### (3) The two workflow valves join the built-in roster {mechanical}
 
-**Not yet applied.** `gh-repo-exempt:` and `action-permissions-exempt:` join `SHELL_COLON` in `native/src/gates/comment_tier.rs`, for the reason `path-dialect-exempt:` is there: each is kit mechanism, read at its own site by the gate whose section mints it. Without them, the first legitimate valve in a governed workflow reds as prose. canon-kit/SPEC.md §check-comment-tier's machine-directive list gains, after the `door-contributor:` clause:
+**Applied at build; the merge waits on the mid-iteration push's `gates` run being read.** `gh-repo-exempt:` and `action-permissions-exempt:` join `SHELL_COLON` in `native/src/gates/comment_tier.rs`, for the reason `path-dialect-exempt:` is there: each is kit mechanism, read at its own site by the gate whose section mints it. Without them, the first legitimate valve in a governed workflow reds as prose. canon-kit/SPEC.md §check-comment-tier's machine-directive list gains, after the `door-contributor:` clause:
 
 > `gh-repo-exempt: <reason>` and `action-permissions-exempt: <reason>` are read at their own site by `check-action-gh-repo` and `check-action-permissions` and join the built-in roster on the same ground, gate-sdk/SPEC.md §check-action-gh-repo and §check-action-permissions;
 
 ### (4) The readers declare and couple the new walk {mechanical}
 
-**Not yet applied.**
+**Applied at build; the merge waits on the mid-iteration push's `gates` run being read.**
 - `COMMENT_SURFACE_ROOTS` and `SPEC_POINTER_ROOTS` in `native/src/gates/mod.rs` each gain the unconditional root `(".", "ext:lit:yml,yaml", "", "")`. The walk runs only under `on`, and an unconditional declaration over-approximates it, which `check-reads-couples` accepts: it asserts observed ⊆ declared. The `else:` guard is the wrong form, because it marks a walk taken when a selector resolves empty, and this walk is taken when one resolves `on`.
 - The four descriptors (`canon-kit/checks/check-comment-tier.gate`, `check-spec-pointer.gate`, `check-todo-task-liveness.gate`, `check-deprecation-task.gate`) add `*.yml,*.yaml,knob:CANON_KIT_COMMENT_ACTIONS` to `couples=`. The generated hooks and the graph artifact are regenerated with the commands `check-graph` prints.
 
 ### (5) The SPEC states the tier {mechanical}
 
-**Not yet applied.** In canon-kit/SPEC.md §The shared spec adapters, the governed-comment-surface sentence "Its file set spans **both gate declaration spellings, the ported implementation, and the workflow directory's tracked tier**: `*.sh`, the `*.gate` descriptor, `*.rs`, and every tracked member of `GATE_SDK_WORKFLOW_DIR` whatever its extension." becomes:
+**Applied at build; the merge waits on the mid-iteration push's `gates` run being read.** In canon-kit/SPEC.md §The shared spec adapters, the governed-comment-surface sentence "Its file set spans **both gate declaration spellings, the ported implementation, and the workflow directory's tracked tier**: `*.sh`, the `*.gate` descriptor, `*.rs`, and every tracked member of `GATE_SDK_WORKFLOW_DIR` whatever its extension." becomes:
 
 > Its file set spans **both gate declaration spellings, the ported implementation, the workflow directory's tracked tier** and, under `CANON_KIT_COMMENT_ACTIONS=on`, every actions-shaped YAML file: `*.sh`, the `*.gate` descriptor, `*.rs`, every tracked member of `GATE_SDK_WORKFLOW_DIR` whatever its extension, and each file `actions_run::actions_files` returns, the same set `check-action-run-shell` lints.
 
@@ -55,13 +55,13 @@ In §check-comment-tier's calibration paragraph, the sentence opening "The defau
 
 ### (6) The fixture pair exercises the tier {mechanical}
 
-**Not yet applied.** `check-comment-tier`'s `bad/` case gains an actions-shaped workflow carrying a prose comment, with a case-local knob file binding `CANON_KIT_COMMENT_ACTIONS = on`. Its `good/` case gains, under the same binding, an actions-shaped workflow whose comments are directives, a `run: |` body with a `# shellcheck disable=` line, and a non-actions `.yml` carrying prose, which is not read. A crate unit test in `spec.rs` asserts three things: `off` adds nothing, `on` adds exactly the `actions_files` set, and any other value refuses.
+**Applied at build; the merge waits on the mid-iteration push's `gates` run being read.** `check-comment-tier`'s `bad/` case gains an actions-shaped workflow carrying a prose comment, with a case-local knob file binding `CANON_KIT_COMMENT_ACTIONS = on`. Its `good/` case gains, under the same binding, an actions-shaped workflow whose comments are directives, a `run: |` body with a `# shellcheck disable=` line, and a non-actions `.yml` carrying prose, which is not read. A crate unit test in `spec.rs` asserts three things: `off` adds nothing, `on` adds exactly the `actions_files` set, and any other value refuses.
 
-**Inferred, cannot run before build:** the classifier's heredoc skip matches a heredoc whose terminator is indented inside a `run:` body, and if it does not, the lines after such a heredoc are skipped, a coverage loss rather than a false red — only the new `good/` case, which build adds with an indented heredoc, exercises the skip on a workflow, and build fixes the skip if that case shows the loss.
+Run at build: the classifier's heredoc skip trims both sides of a line before comparing it with the terminator, so it matches a terminator indented inside a `run:` body. The `bad/` case flags a prose line after an indented heredoc and the `good/` case skips the body, so no skip fix was owed.
 
 ### (7) This repo's actions-shaped files are swept to directives {design-bearing}
 
-**Not yet applied.** The five files with findings are swept until `check-comment-tier` is clean: `.github/workflows/gates.yml`, `publish.yml`, `site-health.yml`, `gate-sdk/templates/gates-workflow.yml` and `site-kit/templates/site-health.yml`. Each comment run takes the first rule that fits it:
+**Applied at build; the merge waits on the mid-iteration push's `gates` run being read.** The five files with findings are swept until `check-comment-tier` is clean: `.github/workflows/gates.yml`, `publish.yml`, `site-health.yml`, `gate-sdk/templates/gates-workflow.yml` and `site-kit/templates/site-health.yml`. Each comment run takes the first rule that fits it:
 
 1. **Restates** the step's name, its code, or a SPEC section it could cite instead: delete it.
 2. **Carries a why a SPEC section owns**: replace it with a one-line `# spec: <SPEC> §<section>` binding. Where the pointer would sit on a `run:` line or a `uses:` line, it goes on the line above the step.

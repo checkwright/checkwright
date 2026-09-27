@@ -229,7 +229,8 @@ pub fn manifest_files(root: &str) -> Result<Vec<PathBuf>, String> {
 pub fn comment_surface(root: &str, with_templates: bool) -> Result<Vec<String>, String> {
     let rootp = Path::new(root);
     let globs = knob_array("CANON_KIT_COMMENT_SURFACE")?;
-    let selected: Vec<PathBuf> = if globs.is_empty() {
+    let actions = comment_actions()?;
+    let mut selected: Vec<PathBuf> = if globs.is_empty() {
         walk::find_files(rootp, &["sh", "gate", "rs"])?
     } else {
         // spec: canon-kit/SPEC.md §check-comment-tier — the prune set bounds the `**` descent and
@@ -240,6 +241,13 @@ pub fn comment_surface(root: &str, with_templates: bool) -> Result<Vec<String>, 
             .filter(|f| f.is_file() && !walk::path_pruned(&f.display().to_string(), &prune))
             .collect()
     };
+    if actions {
+        for (f, _) in crate::actions_run::actions_files(rootp)?.files {
+            if !selected.contains(&f) {
+                selected.push(f);
+            }
+        }
+    }
     let found: Vec<PathBuf> = selected
         .into_iter()
         .filter(|p| with_templates || !under_templates(&p.display().to_string()))
@@ -254,6 +262,16 @@ pub fn comment_surface(root: &str, with_templates: bool) -> Result<Vec<String>, 
     out.sort();
     out.extend(workflow_tier(root)?);
     Ok(out)
+}
+
+// spec: canon-kit/SPEC.md §Layout and configuration — `CANON_KIT_COMMENT_ACTIONS` is `off` or `on`,
+// and any other value refuses rather than resolving to either
+fn comment_actions() -> Result<bool, String> {
+    match knob("CANON_KIT_COMMENT_ACTIONS")?.as_str() {
+        "off" => Ok(false),
+        "on" => Ok(true),
+        v => Err(format!("CANON_KIT_COMMENT_ACTIONS must be off|on (got '{}')", v)),
+    }
 }
 
 // spec: canon-kit/SPEC.md §check-spec-pointer — the workflow directory's tracked tier,
@@ -1712,6 +1730,51 @@ mod tests {
         };
         assert_eq!(found("docs"), 0, "the mirror root prunes the adopter's own spec");
         assert_eq!(found("docs/ref"), 1, "a moved mirror leaves the adopter's spec discoverable");
+        knobs.remove("GATE_SDK_GATES_DIR");
+        crate::knobs::reset(&knobs);
+        let _ = std::fs::remove_dir_all(&d);
+    }
+
+    // spec: canon-kit/SPEC.md §The shared spec adapters — the actions tier adds nothing under `off`,
+    // exactly `actions_files`' set under `on`, and any other value refuses
+    #[test]
+    fn the_actions_tier_is_the_actions_files_set_under_on_only() {
+        let knobs = crate::knobenv::lock();
+        let d = std::env::temp_dir().join(format!("checkwright-comment-actions.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        let gates = d.join("gates");
+        let tree = d.join("tree");
+        std::fs::create_dir_all(&gates).expect("scratch");
+        std::fs::create_dir_all(tree.join(".github/workflows")).expect("scratch");
+        std::fs::write(tree.join(".github/workflows/ci.yml"), "jobs:\n  j: {}\n").expect("write");
+        std::fs::write(tree.join("action.yaml"), "runs:\n  using: composite\n").expect("write");
+        std::fs::write(tree.join("config.yml"), "title: not actions-shaped\n").expect("write");
+        std::fs::write(tree.join("a.sh"), "echo\n").expect("write");
+        knobs.set("GATE_SDK_GATES_DIR", &gates.display().to_string());
+        knobs.remove("CANON_KIT_KNOB_FILE");
+        knobs.remove("CANON_KIT_COMMENT_SURFACE");
+        let root = tree.display().to_string();
+        let surface = |value: &str| {
+            knobs.set("CANON_KIT_COMMENT_ACTIONS", value);
+            crate::knobs::reset(&knobs);
+            comment_surface(&root, true)
+        };
+        let mut actions: Vec<String> = crate::actions_run::actions_files(Path::new(&root))
+            .expect("the walk runs")
+            .files
+            .into_iter()
+            .map(|(f, _)| f.display().to_string())
+            .collect();
+        actions.sort();
+        assert_eq!(actions.len(), 2, "the two actions-shaped files, and not config.yml: {:?}", actions);
+        let off = surface("off").expect("off resolves");
+        let on = surface("on").expect("on resolves");
+        assert!(off.iter().all(|f| !actions.contains(f)), "off added an actions file: {:?}", off);
+        let mut added: Vec<String> = on.iter().filter(|f| !off.contains(f)).cloned().collect();
+        added.sort();
+        assert_eq!(added, actions, "on added something other than the actions_files set");
+        assert!(surface("yes").is_err(), "a value other than off or on resolved");
+        knobs.remove("CANON_KIT_COMMENT_ACTIONS");
         knobs.remove("GATE_SDK_GATES_DIR");
         crate::knobs::reset(&knobs);
         let _ = std::fs::remove_dir_all(&d);

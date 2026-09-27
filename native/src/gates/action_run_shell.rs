@@ -1,10 +1,9 @@
 // spec: gate-sdk/SPEC.md §check-action-run-shell — every GitHub Actions `run:` literal block
 // scalar in an Actions-shaped YAML file is ShellCheck-clean at -S warning under the dialect the
 // step actually runs, as the wrapper criterion 7's worked example ports to
-use crate::actions_run::{actions_shaped, dialect_of, extract, print_refusal, records, Item, Runner};
+use crate::actions_run::{actions_files, dialect_of, extract, print_refusal, records, ActionsFiles, Item, Runner};
 use crate::{proc, programs};
-use crate::walk;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 const NAME: &str = "check-action-run-shell";
 
@@ -86,37 +85,20 @@ fn lint_block(
     Ok(())
 }
 
-fn scan(files: &[PathBuf], work: &Path) -> Result<Tally, i32> {
+fn scan(found: &ActionsFiles, work: &Path) -> Result<Tally, i32> {
     let mut tally = Tally {
-        walked: 0,
+        walked: found.walked,
         subject: 0,
-        skipped_files: 0,
+        skipped_files: found.walked - found.files.len(),
         linted: 0,
         plain: 0,
         skipped_dialect: 0,
         findings: Vec::new(),
         unresolved: Vec::new(),
     };
-    for f in files {
-        tally.walked += 1;
-        let text = match std::fs::read_to_string(f) {
-            Ok(t) => t,
-            Err(e) => {
-                eprintln!(
-                    "{}: cannot read {} ({}) — the check could not run; treating as failure (not clean)",
-                    NAME,
-                    f.display(),
-                    e
-                );
-                return Err(2);
-            }
-        };
-        if !actions_shaped(&text) {
-            tally.skipped_files += 1;
-            continue;
-        }
+    for (f, text) in &found.files {
         tally.subject += 1;
-        let ex = match extract(&text) {
+        let ex = match extract(text) {
             Ok(ex) => ex,
             Err(r) => return Err(print_refusal(NAME, "linting", f, &r)),
         };
@@ -190,7 +172,7 @@ pub fn run(args: &[String]) -> i32 {
         return refuse_absent_program();
     }
 
-    let files = match walk::find_files(Path::new(scanroot), &["yml", "yaml"]) {
+    let found = match actions_files(Path::new(scanroot)) {
         Ok(f) => f,
         Err(e) => {
             eprintln!(
@@ -201,7 +183,7 @@ pub fn run(args: &[String]) -> i32 {
         }
     };
 
-    if files.is_empty() {
+    if found.walked == 0 {
         println!(
             "ACTION-RUN-SHELL: clean (no YAML under {} — 0 run: block(s) to lint)",
             scanroot
@@ -215,7 +197,7 @@ pub fn run(args: &[String]) -> i32 {
         eprintln!("{}: could not create a scratch dir ({})", NAME, e);
         return 2;
     }
-    let outcome = scan(&files, &work);
+    let outcome = scan(&found, &work);
     let _ = std::fs::remove_dir_all(&work);
 
     let tally = match outcome {

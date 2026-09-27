@@ -1,0 +1,23 @@
+# spec: some/SPEC.md §workflow — an actions-shaped workflow's comments are directives
+name: fixture
+on: push
+
+# enforce: class=monitor fixture surface — the monitor marker is blessed by name
+jobs:
+  j:
+    runs-on: ubuntu-latest
+    # action-permissions-exempt: the workflow valve is blessed by name
+    steps:
+      # spec: some/SPEC.md §step — a pointer sits on the line above the step it binds
+      - name: body
+        env:
+          # gh-repo-exempt: the second workflow valve is blessed by name
+          GH_TOKEN: fixture
+        run: |
+          # shellcheck disable=SC2034
+          unused=1
+          cat <<'EOF'
+          # this hash sits inside an indented heredoc body and is not a comment
+          EOF
+          # comment-tier-exempt: a genuinely local note read after the indented terminator
+          echo done

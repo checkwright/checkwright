@@ -1,9 +1,9 @@
 // spec: gate-sdk/SPEC.md §check-action-run-path — every repo-relative `.sh` path in invocation
 // position in a shell `run:` body of an Actions-shaped YAML file resolves under the scan root
-use crate::actions_run::{actions_shaped, dialect_of, extract, print_refusal, Item, Runner};
+use crate::actions_run::{actions_files, dialect_of, extract, print_refusal, ActionsFiles, Item, Runner};
 use crate::gates::docs_cmd;
 use crate::walk;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 const NAME: &str = "check-action-run-path";
 
@@ -80,28 +80,15 @@ fn read_line(file: &Path, ln: usize, text: &str, base: &str, tally: &mut Tally) 
     }
 }
 
-fn scan(files: &[PathBuf], root: &str) -> Result<Tally, i32> {
-    let mut tally = Tally::default();
-    for f in files {
-        tally.walked += 1;
-        let text = match std::fs::read_to_string(f) {
-            Ok(t) => t,
-            Err(e) => {
-                eprintln!(
-                    "{}: cannot read {} ({}) — the check could not run; treating as failure (not clean)",
-                    NAME,
-                    f.display(),
-                    e
-                );
-                return Err(2);
-            }
-        };
-        if !actions_shaped(&text) {
-            tally.skipped_files += 1;
-            continue;
-        }
-        tally.subject += 1;
-        let ex = match extract(&text) {
+fn scan(found: &ActionsFiles, root: &str) -> Result<Tally, i32> {
+    let mut tally = Tally {
+        walked: found.walked,
+        subject: found.files.len(),
+        skipped_files: found.walked - found.files.len(),
+        ..Tally::default()
+    };
+    for (f, text) in &found.files {
+        let ex = match extract(text) {
             Ok(ex) => ex,
             Err(r) => return Err(print_refusal(NAME, "reading", f, &r)),
         };
@@ -155,7 +142,7 @@ pub fn run(args: &[String]) -> i32 {
         return 2;
     }
 
-    let files = match walk::find_files(Path::new(scanroot), &["yml", "yaml"]) {
+    let found = match actions_files(Path::new(scanroot)) {
         Ok(f) => f,
         Err(e) => {
             eprintln!(
@@ -166,7 +153,7 @@ pub fn run(args: &[String]) -> i32 {
         }
     };
 
-    if files.is_empty() {
+    if found.walked == 0 {
         println!(
             "ACTION-RUN-PATH: clean (no YAML under {} — 0 run: bodies to read)",
             scanroot
@@ -174,7 +161,7 @@ pub fn run(args: &[String]) -> i32 {
         return 0;
     }
 
-    let tally = match scan(&files, scanroot) {
+    let tally = match scan(&found, scanroot) {
         Ok(t) => t,
         Err(code) => return code,
     };

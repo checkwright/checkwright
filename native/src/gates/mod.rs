@@ -182,10 +182,13 @@ const MANIFEST_ROOTS: &[RootDecl] = &[
     (".", "glob:knob:CANON_KIT_PROSE_SURFACE_GLOBS", "", ""),
 ];
 
-// spec: canon-kit/SPEC.md §The shared spec adapters — `spec::comment_surface`'s two runtime branches
+// spec: canon-kit/SPEC.md §The shared spec adapters — `spec::comment_surface`'s two runtime branches,
+// and the actions tier declared unconditionally because the walk it over-approximates is guarded by a
+// selector resolving `on`, which the `else:` form cannot spell
 const COMMENT_SURFACE_ROOTS: &[RootDecl] = &[
     (".", "glob:knob:CANON_KIT_COMMENT_SURFACE", "", ""),
     (".", "else:CANON_KIT_COMMENT_SURFACE:ext:lit:sh,gate,rs", "", ""),
+    (".", "ext:lit:yml,yaml", "", ""),
 ];
 
 // spec: gate-sdk/SPEC.md §check-reads-couples — `MANIFEST_ROOTS` and `COMMENT_SURFACE_ROOTS`
@@ -199,6 +202,7 @@ const SPEC_POINTER_ROOTS: &[RootDecl] = &[
     (".", "glob:knob:CANON_KIT_PROSE_SURFACE_GLOBS", "", ""),
     (".", "glob:knob:CANON_KIT_COMMENT_SURFACE", "", ""),
     (".", "else:CANON_KIT_COMMENT_SURFACE:ext:lit:sh,gate,rs", "", ""),
+    (".", "ext:lit:yml,yaml", "", ""),
 ];
 
 // spec: evidence-kit/SPEC.md §check-producer-liveness — the unix predicate is one `kill(2)` call
@@ -937,6 +941,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_WORKFLOW_DIR",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_COMMENT_SURFACE",
+            "CANON_KIT_COMMENT_ACTIONS",
             "CANON_KIT_COMMENT_MACHINE",
             "CANON_KIT_COMMENT_REASON",
             "CANON_KIT_COMMENT_POSITIONAL",
@@ -966,6 +971,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
             "CANON_KIT_COMMENT_SURFACE",
+            "CANON_KIT_COMMENT_ACTIONS",
             "CANON_KIT_COMMENT_WHITELIST",
         ],
         "canon-kit",
@@ -985,6 +991,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_WORKFLOW_DIR",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_COMMENT_SURFACE",
+            "CANON_KIT_COMMENT_ACTIONS",
             "CANON_KIT_QUEUE_FILE",
             "CANON_KIT_ACTIVE_SECTIONS",
             "CANON_KIT_DEFERRED_SECTION",
@@ -1063,6 +1070,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_WORKFLOW_DIR",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_COMMENT_SURFACE",
+            "CANON_KIT_COMMENT_ACTIONS",
             "CANON_KIT_DEPRECATION_MARKERS",
             "CANON_KIT_QUEUE_FILE",
             "CANON_KIT_ACTIVE_SECTIONS",
