@@ -1358,11 +1358,4 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 ## Done
 
-- customer-docs-quality-standard
-- glibc-floor-unstated
-- one-product-statement
-- install-fetch-asset-names
-- docs-secondary-clarity-pass
-- gate-sdk-tail-brevity
-
 ## Lessons Learned
