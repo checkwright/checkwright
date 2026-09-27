@@ -284,7 +284,7 @@ jobs:
           work="$RUNNER_TEMP/speckit"
           mkdir -p "$work/serve" "$work/tree"
           bash scripts/ci-pack-extension.sh 0.0.0 "$work/serve"
-          ( cd "$work/tree" && specify init --here --non-interactive --integration claude --script sh )
+          ( cd "$work/tree" && specify init --here --non-interactive --integration claude --script sh --ignore-agent-tools )
           base="http://127.0.0.1:8733"
           python -m http.server 8733 --bind 127.0.0.1 --directory "$work/serve" > "$work/server.log" 2>&1 &
           srv=$!

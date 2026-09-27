@@ -103,7 +103,7 @@ A Spec Kit archive install looks for `extension.yml` at the archive's root or in
 
 The toolkits' own tools are oracles, and nothing here re-implements their schemas. The `companion-toolkits` job in `.github/workflows/gates.yml` reads `toolkits.list` and:
 
-1. installs the pinned `specify-cli`, runs `specify init --here --non-interactive --integration claude --script sh` in an empty scratch directory, since the non-interactive init refuses a non-empty one, and packs the extension at version `0.0.0`. It serves the zip from a local web server and installs it with `specify extension add checkwright --from <url>`, answering the trust prompt. It asserts exit 0, `.specify/extensions/checkwright/extension.yml` and the recipe present, and the hook registered in `.specify/extensions.yml`;
+1. installs the pinned `specify-cli`, runs `specify init --here --non-interactive --integration claude --script sh --ignore-agent-tools` in an empty scratch directory, since the non-interactive init refuses a non-empty one and a runner carrying no `claude` CLI, and packs the extension at version `0.0.0`. It serves the zip from a local web server and installs it with `specify extension add checkwright --from <url>`, answering the trust prompt. It asserts exit 0, `.specify/extensions/checkwright/extension.yml` and the recipe present, and the hook registered in `.specify/extensions.yml`;
 2. asserts that `extension.yml`'s `requires.speckit_version` is `>=` the pinned version;
 3. runs the pinned `openspec validate --all --strict` inside a copy of `fixtures/openspec/layout/`.
 
