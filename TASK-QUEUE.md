@@ -8,20 +8,6 @@
 
 ## New Features
 
-### lead-writes-during-live-stage
-
-[spec: SPEC-lead-writes.md]
-
-the lead template's capture rule (lifecycle-kit/templates/lead.md §Stamps are authoritative) bounds only tracked captures while a dispatched stage session is live. During non-gate-arm-contract's validate the lead created a linked worktree at `.tmp/probe-wt` for a read probe, and removed validate's live reproduction worktrees after calling them obsolete without reading their provenance; the operator instructed the removal on that description.
-
-**Deliverable:** the lead template bars any lead mutation of the checkout or a linked worktree while a stage session is live, gitignored scratch included, a probe running after the stage or outside the checkout; and it requires a worktree's provenance to be read before it is called stale.
-
-**Taken for /spec 2026-09-27 at companion-catalog-extension's scope, operator direction lead-relayed (not a /consult ruling):** unit set B; its amendment lands before [lifecycle-template-brevity](#lifecycle-template-brevity) passes the lead template's section.
-
-**Grounds settled at spec:** the scratch clause rests on the removal and on a lead's liveness record under a scratch directory, which blocks every session's `git` writes while its pid lives (guard-kit/SPEC.md §The generic ruleset). The one-off upgrade-suite red stays unexplained: the probe worktree's presence did not reproduce it, concurrent lead activity in that worktree was never run, and no delta rests on either.
-
-**Cost while deferred:** a lead can destroy a live stage's evidence on a description nobody checked. Filed 2026-09-26 to the gap inbox by the lead on its own error; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because the rule widens a shipped template's contract and its scope is a design call. Re-verified at the drain: the removal is recorded in both the validate and lead journals.
-
 ## Technical Debt
 
 ### lifecycle-template-brevity
@@ -30,7 +16,7 @@ lifecycle-kit/SPEC.md's §templates/stages/ and §templates/lead.md, about 7.9k 
 
 **Deliverable:** the three moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) applied to those two sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm. A contract sentence stays, including a fact a template, a sibling entry or another SPEC cites there.
 
-**Promoted as debt, split from spec-brevity-residue — operator direction 2026-09-27, lead-relayed (not a /consult ruling), unit set B at companion-catalog-extension's scope:** the moves run under gates that already exist and add no name. [lead-writes-during-live-stage](#lead-writes-during-live-stage) edits the lead template's contract in the same set; its amendment lands first and this pass runs on the amended text.
+**Promoted as debt, split from spec-brevity-residue — operator direction 2026-09-27, lead-relayed (not a /consult ruling), unit set B at companion-catalog-extension's scope:** the moves run under gates that already exist and add no name. `lead-writes-during-live-stage` edits the lead template's contract in the same set; its amendment lands first and this pass runs on the amended text.
 
 **Cost while deferred:** paid by every stage and lead session that opens either section and every adopter who reads it on the site. Split 2026-09-27 at scope from spec-brevity-residue, filed 2026-09-25; the word census is in this entry's promotion commit.
 
@@ -1407,5 +1393,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 ## Done
 
 - docs-ux-authoring-rules
+- lead-writes-during-live-stage
 
 ## Lessons Learned

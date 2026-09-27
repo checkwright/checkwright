@@ -80,9 +80,9 @@
 301516cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
 269827cp installer/SPEC.md
-393970cp lifecycle-kit/SPEC.md
+395104cp lifecycle-kit/SPEC.md
 4120cp lifecycle-kit/templates/consult.md
-39161cp lifecycle-kit/templates/lead.md
+40033cp lifecycle-kit/templates/lead.md
 2100cp lifecycle-kit/templates/release-sweep.md
 6939cp lifecycle-kit/templates/stages/align.md
 9104cp lifecycle-kit/templates/stages/build.md
