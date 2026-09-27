@@ -6,8 +6,9 @@
 # copy of it to tell "this platform was never committed to" (a refusal that names
 # the platform and asks nothing of the adopter) from "committed to, artifact
 # missing" (a refusal that names a broken payload). Both refuse; neither proceeds.
-# Every Linux line is a static musl artifact, so a Linux host's C library does
-# not enter selection.
+# Each Linux architecture carries two lines: a glibc artifact the bootstrap
+# prefers where it runs, and a static musl artifact that runs on any Linux
+# kernel at its floor (installer/SPEC.md §Selection).
 #
 # WHAT LICENSES A LINE HERE, stated mechanically so the session that observes
 # the green executes rather than re-derives. A target <T> joins when ONE run,
@@ -90,6 +91,14 @@
 #     leg adopted THAT upload from the hand-off, reached the artifact-present
 #     branch at every profile and finished `INSTALLER-SMOKE: clean`; the x86_64
 #     leg also ran the artifact on an alpine and a glibc 2.36 debian host.
+#   - The two gnu lines rest on run 36350318698, one run for both: each
+#     `native-artifacts` leg built its triple on its pinned ubuntu-24.04 image
+#     and measured `glibc 2.39`, equal to the declared floor, and each Linux
+#     install-smoke leg, steered at its gnu triple, adopted THAT upload from the
+#     hand-off, reached the artifact-present branch at every profile and
+#     finished `INSTALLER-SMOKE: clean`, its fallback cases passing to the musl
+#     line; the x86_64 leg's gnu artifact exited non-zero on the alpine and the
+#     glibc 2.36 debian host, where selection passes to that fallback.
 #
 # This is not a narrowing of the direction — the adopter constraints
 # (gate-sdk/SPEC.md §The adopter constraints) are the direction and this roster
@@ -126,3 +135,5 @@ x86_64-apple-darwin
 x86_64-pc-windows-msvc
 aarch64-unknown-linux-musl
 aarch64-pc-windows-msvc
+x86_64-unknown-linux-gnu
+aarch64-unknown-linux-gnu

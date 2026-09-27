@@ -16,8 +16,8 @@ An install is possible only on a system below, where a prebuilt gate binary is p
 
 | System | Minimum | Binary | Status |
 |---|---|---|---|
-| Linux on x86-64 (glibc), and WSL | glibc 2.39 | `x86_64-unknown-linux-gnu` | held: the gates run that builds this triple and installs it on its Linux leg |
-| Linux on arm64 (glibc) | glibc 2.39 | `aarch64-unknown-linux-gnu` | held: the gates run that builds this triple and installs it on its Linux leg |
+| Linux on x86-64 (glibc), and WSL | glibc 2.39 | `x86_64-unknown-linux-gnu` | joined |
+| Linux on arm64 (glibc) | glibc 2.39 | `aarch64-unknown-linux-gnu` | joined |
 | Linux on x86-64 (any C library) | Linux 3.2 | `x86_64-unknown-linux-musl` | joined |
 | Linux on arm64 (any C library) | Linux 4.1 | `aarch64-unknown-linux-musl` | joined |
 | macOS on Apple silicon | macOS 11 | `aarch64-apple-darwin` | joined |

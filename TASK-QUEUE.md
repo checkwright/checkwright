@@ -8,20 +8,6 @@
 
 ## New Features
 
-### linux-glibc-artifacts
-
-[spec: SPEC-linux-glibc.md]
-
-the next release would publish no glibc Linux gate binary: platform-prerequisite-floors replaced the two `*-linux-gnu` lines of `native/targets.list` with the `*-linux-musl` pair, over the hybrid that would publish both. The operator wants glibc artifacts published beside musl before the next tag (operator direction 2026-09-27, lead-relayed at companion-catalog-extension's close), and v0.27.0 is held on it.
-
-**Deliverable:** the gnu triples back in `native/targets.list` and `native/runners.list` beside musl, joined under that file's predicate; the installer's host-to-artifact choice between them on a Linux host; docs/install.md's platforms table and the release declarations to match.
-
-**Cost while deferred:** docs/spec-toolkits.md, live and linked from the front door, sends adopters to Release assets no tag yet carries, since v0.26.0 predates `companion/`, and that tag waits on this. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's close; promoted 2026-09-27 at the next iteration's scope. Re-verified: `native/targets.list` lists only the musl Linux triples, and `gh release view v0.26.0` lists only the gnu Linux archives. Owner lookup: `glibc`, `linux-gnu`, `targets.list` in this file — `install-platform-release-gap`, [musl-dev-binary](#musl-dev-binary) and [musl-smoke-build-wrapper](#musl-smoke-build-wrapper), DISTINCT (the page-to-gate binding; the dev binary; the smoke's hand-off); owner gate-sdk/SPEC.md §Consumer payload. Surface also gate-sdk.
-
-**Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** the amendment settles the host-to-artifact choice and the declaration rows in one, with `install-platform-release-gap`'s gate reading the table it settles.
-
-**Push need (2026-09-27, overrun granted by operator direction, lead-relayed):** the mid-iteration observation push, shared with `windows-fresh-fixture-stub`, that joins the gnu lines under the file's predicate; then the release tag beside the closing push, since v0.27.0 is held on this.
-
 ## Technical Debt
 
 ### crate-tests-windows-flip
@@ -236,7 +222,7 @@ the interop rung's submission half. The build half landed at companion-catalog-e
 
 **Deliverable:** the Spec Kit community-catalog submission, filed as the catalog's Extension Submission issue with its `download_url` naming the `checkwright-companion-<version>.zip` Release asset; the extension's README and the landing page then gain the catalog's install form.
 
-**Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **Ranked behind four preconditions the operator set on 2026-09-27:** [crate-tests-windows-flip](#crate-tests-windows-flip), since red jobs inside a green run read as ignored failures; [linux-glibc-artifacts](#linux-glibc-artifacts); [catalog-landing-docs-polish](#catalog-landing-docs-polish); and [spec-toolkits-guarantee](#spec-toolkits-guarantee).
+**Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **Ranked behind four preconditions the operator set on 2026-09-27:** [crate-tests-windows-flip](#crate-tests-windows-flip), since red jobs inside a green run read as ignored failures; `linux-glibc-artifacts`; [catalog-landing-docs-polish](#catalog-landing-docs-polish); and [spec-toolkits-guarantee](#spec-toolkits-guarantee).
 
 **Push need (2026-09-27, inside the budget):** the release tag push beside the closing push, since the submission needs the extension on a published tag; close's release policy decides the cut.
 
@@ -1508,5 +1494,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - consumer-scratch-unignored
 - foreign-spec-lifecycle-unowned
 - windows-fresh-fixture-stub
+- linux-glibc-artifacts
 
 ## Lessons Learned
