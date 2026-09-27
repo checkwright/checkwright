@@ -5,3 +5,4 @@
 ---
 
 catalog-submission-preconditions scope a1b5f427 2026-09-27 44fc60c2
+catalog-submission-preconditions spec a16592c4 2026-09-27 adbf4a1d
