@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: catalog-submission-preconditions
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,40 @@
 ## New Features
 
 ## Technical Debt
+
+### crate-tests-windows-flip
+
+[blocked-by: windows-fresh-fixture-stub] [observed-by: gates]
+
+`crate-tests-windows` in `.github/workflows/gates.yml` carries a hard-coded `continue-on-error: true`; once one run is green on both triples it moves to the `matrix.held` expression `install-smoke-pwsh-windows` reads, and the reports-until-green sentences leave gate-sdk/SPEC.md §check-crate-arms and the capture-drain limit in §The workflow directory.
+
+**Deliverable:** that flip and those deletions, in one commit, after [windows-fresh-fixture-stub](#windows-fresh-fixture-stub) lands.
+
+**Promoted as debt 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** the flip converges the job on the `matrix.held` convention and adds no name. Precondition (1) of the catalog submission, on the operator's ground that red jobs inside a green run read as ignored failures.
+
+**Push need (2026-09-27, overrun granted by operator direction, lead-relayed):** the mid-iteration observation push [windows-fresh-fixture-stub](#windows-fresh-fixture-stub) spends supplies the green run this reads; the flip rides the closing push.
+
+**Cost while deferred:** a Windows crate-test failure passes every run as a warning only close reads. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's build as the follow-up crate-tests-unrun-on-windows' amendment ordered; promoted 2026-09-26 at its close: →fix fails because the job has no green run yet. Re-verified 2026-09-27 at scope: `gates.yml` reads `continue-on-error: true`, and run 36338295147 still fails the registry pair on both triples.
+
+### spec-toolkits-guarantee
+
+docs/spec-toolkits.md says four defect classes "fail at commit and in CI" and never states what that guarantees: the pre-commit hook is skippable with `--no-verify`, so the guarantee is CI run as a required status check under branch protection, and the page does not say so. It also leaves unsaid that the four classes are document hygiene, not spec-to-code conformance. The operator found the page unconvincing (operator direction 2026-09-27, lead session).
+
+**Deliverable:** the page states the guarantee and its setup (the seeded CI workflow as a required status check), names the four classes as document hygiene and not conformance, and keeps its limit that the extension's commands and hook are agent-followed. Where [foreign-spec-lifecycle-unowned](#foreign-spec-lifecycle-unowned) lands a lifecycle binding in the same set, the page states what that adds and for which profile.
+
+**Promoted as debt 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** a page edit stating facts the specs already carry. Precondition (4) of the catalog submission.
+
+**Cost while deferred:** the catalog's one-shot exposure lands on a page whose claim a skeptical reader cannot place. Filed 2026-09-27 to the gap inbox by the lead after companion-catalog-extension's close. Re-verified: the page carries no `required`, `--no-verify` or branch-protection sentence. Owner lookup: `spec-toolkits`, `guarantee` in this file — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (the submission this gates); owner companion/SPEC.md.
+
+### catalog-landing-docs-polish
+
+the pages a Spec Kit catalog visitor reaches are not yet polished for that one-shot exposure: the extension's `repository` and `homepage` (README.md, docs/index.md), its README (companion/speckit/README.md), and the landing page with the install page it routes to (docs/spec-toolkits.md, docs/install.md). The `catalog-then-plugin` ruling puts their polish before the submission; the page-authoring rules and the one-product statement have landed, so what remains is the polish itself (operator direction 2026-09-27, lead session).
+
+**Deliverable:** a catalog visitor's read through those five pages against docs/site-architecture.md §Page-authoring rules, each finding fixed on the page or filed costed. It runs last in the set, after the platforms table, the guarantee statement and the lifecycle binding have changed those pages.
+
+**Promoted as debt 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** convergence on the landed page-authoring rules, adding no name; bounded to the pages the extension manifest and the landing page link. Precondition (3) of the catalog submission.
+
+**Cost while deferred:** the listing sends its visitors to pages no reader-journey pass has read. Filed 2026-09-27 to the gap inbox by the lead after companion-catalog-extension's close. Owner lookup: `polish`, `landing page` in this file — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (the submission); owner docs/site-architecture.md §Page-authoring rules.
 
 ## Deferred
 
@@ -568,17 +602,11 @@ the consult inbox needs a drain trigger and a status cue, on an operator directi
 
 **Deliverable:** a design ruling and its landing: the spawn funnel resolving `PATHEXT` on an extensionless path (reverses gate-sdk/SPEC.md §check-graph's pass-through rule), or the registry observer pinning a host-startable `GATE_SDK_NATIVE_BIN`; then the members past it observed green.
 
+**Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** the design ruling is the amendment's; [crate-tests-windows-flip](#crate-tests-windows-flip) follows its observed green.
+
+**Push need (2026-09-27, overrun granted by operator direction, lead-relayed):** one mid-iteration observation push, shared with [linux-glibc-artifacts](#linux-glibc-artifacts), since no local run reaches a Windows host.
+
 **Cost while deferred:** `crate-tests-windows` stays report-only, so a Windows crate-test regression passes every run as a warning. The operator's cut-and-defer residue of `crate-tests-windows-failures` (operator direction 2026-09-26, lead session). Filed 2026-09-26 to the gap inbox by its build; promoted 2026-09-26 at capture-integrity-brevity's close: →fix fails because both remedies are design-bearing and one reverses a stated rule. Re-verified: run 36264222274 reads 1169 passed, 2 failed, the pair above, on both triples. Owner lookup: `stub-bin`, `gate-binary-fresh`, `PATHEXT` in this file — none; owner gate-sdk/SPEC.md §check-gate-binary-fresh.
-
-### crate-tests-windows-flip
-
-[blocked-by: windows-fresh-fixture-stub] [cost: event/high] [surface: .github]
-
-`crate-tests-windows` in `.github/workflows/gates.yml` carries a hard-coded `continue-on-error: true`; once one run is green on both triples it moves to the `matrix.held` expression `install-smoke-pwsh-windows` reads, and the reports-until-green sentences leave gate-sdk/SPEC.md §check-crate-arms and the capture-drain limit in §The workflow directory.
-
-**Deliverable:** that flip and those deletions, in one commit, after [windows-fresh-fixture-stub](#windows-fresh-fixture-stub) lands.
-
-**Cost while deferred:** a Windows crate-test failure passes every run as a warning only close reads. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's build as the follow-up crate-tests-unrun-on-windows' amendment ordered; promoted 2026-09-26 at its close: →fix fails because the job has no green run yet. Re-verified at the drain: the job in `gates.yml` reads `continue-on-error: true`. Owner lookup: as for its blocker — none.
 
 ### gate-output-contributor-door
 
@@ -712,6 +740,8 @@ docs/install.md defines `joined` as "a binary is published for that system", but
 
 **Deliverable:** the page's definition and the gate's binding reconciled, with a gate that reds a `joined` row or Minimum the pinned release does not serve while the release disposition is `none` or deferred, in `check-front-door-verbs`' shape.
 
+**Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** bundled with [linux-glibc-artifacts](#linux-glibc-artifacts), whose table shape it reads, so that one lands first.
+
 **Cost while deferred:** an adopter on a newly joined system, or below the old floor, follows the page and meets the pinned release's refusal or a glibc load error; the live instance lasts until the next tag. Filed 2026-09-27 to the gap inbox at platform-prerequisite-floors' close; promoted 2026-09-27 at the next iteration's scope: →fix fails because the gate is new mechanism. Re-verified: `gh release view v0.26.0` lists only the two `-linux-gnu` Linux archives, and docs/install.md's table reads the musl triples `joined`. Owner lookup: `joined`, `front-door-verbs`, `platform` in this file's headings — none; owner installer/SPEC.md §Versioning, with the platforms-block contract docs/site-architecture.md states.
 
 ### spec-mirror-citation-links
@@ -731,6 +761,8 @@ the kit SPECs' on-site mirrors render their section citations as plain text, so 
 a battery run dirties an adopter's worktree: in a tree `init --profile prose` (v0.26.0) just wrote, `./scripts/checkwright-gates --run` leaves `.tmp/gate-timings.txt` untracked and unignored, since init seeds no ignore rule for `GATE_SDK_TMP_DIR` and the consumer has no root `.gitignore`. The next `init` or `update` then refuses a dirty worktree, and a habitual `git add -A` commits the timing file.
 
 **Deliverable:** init seeding an ignore line for the scratch directory, or the battery writing its timings elsewhere in a consumer — the unit's design call — with the consumer smoke asserting a clean worktree after a battery run.
+
+**Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** a catalog adopter's first battery run meets it, so it rides the set that readies the listing.
 
 **Cost while deferred:** every adopter's first battery run leaves a file that blocks the next `update`. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's spec, observed in a scratch Spec Kit tree; promoted 2026-09-27 at its close: →fix fails because the bullet leaves the shape a design call. Re-verified: no `.gitignore` write under `installer/` or the init path, and the runner writes `gate-timings.txt` under `GATE_SDK_TMP_DIR`. Owner lookup: `gate-timings`, `GATE_SDK_TMP_DIR`, `gitignore` in this file — [battery-timing-file-overwritten-by-only-run](#battery-timing-file-overwritten-by-only-run), DISTINCT (the file's contents, not its tracking); owner installer/SPEC.md.
 
@@ -804,6 +836,8 @@ a lifecycle stage machine over a foreign spec workflow is unowned: `check-stage-
 
 **Deliverable:** the lifecycle binding for a foreign layout — the contract tokens and pointer reach — stated for each supported toolkit, with a companion fixture proving the audit fires.
 
+**Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling), against scope's recommendation to hold it:** the `prose` profile the extension installs carries no lifecycle-kit, so the amendment says which profile or recipe a foreign-layout lifecycle adopter takes. It reshapes [lead-clause-heading-family](#lead-clause-heading-family), since both move `check-spec-pointer`'s reach over a foreign layout.
+
 **Cost while deferred:** a lifecycle adopter on a foreign layout meets a silent audit skip. Correction (2) of companion-toolkit-profile's 2026-08-02 survey; its build half fitted the prose profile only. Filed 2026-09-27 to the gap inbox at that entry's demotion; promoted 2026-09-27 at companion-catalog-extension's close: →fix fails because the binding is new mechanism. Re-verified: the knob's default reads `SPEC.md`, `proto/`, and companion/SPEC.md names no lifecycle binding. Owner lookup: `CONTRACT_TOKENS`, `foreign`, `Spec Kit` in this file — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (its body is now the catalog submission alone); owner lifecycle-kit/SPEC.md §The state machine.
 
 ### citation-link-root-docs-range
@@ -848,25 +882,9 @@ the next release would publish no glibc Linux gate binary: platform-prerequisite
 
 **Cost while deferred:** docs/spec-toolkits.md, live and linked from the front door, sends adopters to Release assets no tag yet carries, since v0.26.0 predates `companion/`, and that tag waits on this. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's close; promoted 2026-09-27 at the next iteration's scope. Re-verified: `native/targets.list` lists only the musl Linux triples, and `gh release view v0.26.0` lists only the gnu Linux archives. Owner lookup: `glibc`, `linux-gnu`, `targets.list` in this file — [install-platform-release-gap](#install-platform-release-gap), [musl-dev-binary](#musl-dev-binary) and [musl-smoke-build-wrapper](#musl-smoke-build-wrapper), DISTINCT (the page-to-gate binding; the dev binary; the smoke's hand-off); owner gate-sdk/SPEC.md §Consumer payload. Surface also gate-sdk.
 
-### spec-toolkits-guarantee
+**Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** the amendment settles the host-to-artifact choice and the declaration rows in one, with [install-platform-release-gap](#install-platform-release-gap)'s gate reading the table it settles.
 
-[cost: event/high] [surface: docs]
-
-docs/spec-toolkits.md says four defect classes "fail at commit and in CI" and never states what that guarantees: the pre-commit hook is skippable with `--no-verify`, so the guarantee is CI run as a required status check under branch protection, and the page does not say so. It also leaves unsaid that the four classes are document hygiene, not spec-to-code conformance. The operator found the page unconvincing (operator direction 2026-09-27, lead session).
-
-**Deliverable:** the page states the guarantee and its setup (the seeded CI workflow as a required status check), names the four classes as document hygiene and not conformance, and keeps its limit that the extension's commands and hook are agent-followed.
-
-**Cost while deferred:** the catalog's one-shot exposure lands on a page whose claim a skeptical reader cannot place. Filed 2026-09-27 to the gap inbox by the lead after companion-catalog-extension's close, as precondition (4) of the catalog submission; promoted 2026-09-27 at the next iteration's scope. Re-verified: the page carries no `required`, `--no-verify` or branch-protection sentence. Owner lookup: `spec-toolkits`, `guarantee` in this file — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (the submission this gates); owner companion/SPEC.md. Surface also companion.
-
-### catalog-landing-docs-polish
-
-[cost: event/high] [surface: docs]
-
-the pages a Spec Kit catalog visitor reaches are not yet polished for that one-shot exposure: the extension's `repository` and `homepage` (README.md, docs/index.md), its README (companion/speckit/README.md), and the landing page with the install page it routes to (docs/spec-toolkits.md, docs/install.md). The `catalog-then-plugin` ruling puts their polish before the submission; the page-authoring rules and the one-product statement have landed, so what remains is the polish itself (operator direction 2026-09-27, lead session).
-
-**Deliverable:** a catalog visitor's read through those five pages against docs/site-architecture.md §Page-authoring rules, each finding fixed on the page or filed costed.
-
-**Cost while deferred:** the listing sends its visitors to pages no reader-journey pass has read. Filed 2026-09-27 to the gap inbox by the lead after companion-catalog-extension's close, as precondition (3) of the catalog submission; promoted 2026-09-27 at the next iteration's scope, bounded to the pages the extension manifest and the landing page link. Owner lookup: `polish`, `landing page` in this file — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (the submission); owner docs/site-architecture.md §Page-authoring rules. Surface also companion.
+**Push need (2026-09-27, overrun granted by operator direction, lead-relayed):** the mid-iteration observation push, shared with [windows-fresh-fixture-stub](#windows-fresh-fixture-stub), that joins the gnu lines under the file's predicate; then the release tag beside the closing push, since v0.27.0 is held on this.
 
 ## Icebox
 

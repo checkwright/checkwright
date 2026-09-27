@@ -4,4 +4,4 @@
 
 ---
 
-— scope a1b5f427 2026-09-27 44fc60c2
+catalog-submission-preconditions scope a1b5f427 2026-09-27 44fc60c2
