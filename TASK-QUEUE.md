@@ -60,6 +60,20 @@ a battery run dirties an adopter's worktree: in a tree `init --profile prose` (v
 
 **Cost while deferred:** every adopter's first battery run leaves a file that blocks the next `update`. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's spec, observed in a scratch Spec Kit tree; promoted 2026-09-27 at its close: →fix fails because the bullet leaves the shape a design call. Re-verified: no `.gitignore` write under `installer/` or the init path, and the runner writes `gate-timings.txt` under `GATE_SDK_TMP_DIR`. Owner lookup: `gate-timings`, `GATE_SDK_TMP_DIR`, `gitignore` in this file — [battery-timing-file-overwritten-by-only-run](#battery-timing-file-overwritten-by-only-run), DISTINCT (the file's contents, not its tracking); owner installer/SPEC.md.
 
+### foreign-spec-lifecycle-unowned
+
+[spec: SPEC-foreign-lifecycle.md]
+
+a lifecycle stage machine over a foreign spec workflow is unowned: `check-stage-entry` assertion C's cross-component signal is `LIFECYCLE_KIT_CONTRACT_TOKENS` (default `SPEC.md`, `proto/`), so a tree whose specs Spec Kit or OpenSpec writes, left unbound, never fires it and skips the align audit with no red. The amendment glob matches a basename only, so no knob value selects OpenSpec's in-flight deltas apart from its capability specs, both named `spec.md`.
+
+**Deliverable:** the lifecycle binding for a foreign layout — the contract tokens and pointer reach — stated for each supported toolkit, with a companion fixture proving the audit fires.
+
+**Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling), against scope's recommendation to hold it:** the `prose` profile the extension installs carries no lifecycle-kit, so the amendment says which profile or recipe a foreign-layout lifecycle adopter takes. It reshapes [lead-clause-heading-family](#lead-clause-heading-family), since both move `check-spec-pointer`'s reach over a foreign layout.
+
+**Route directed at spec 2026-09-27, operator direction lead-relayed (not a /consult ruling):** a path-aware amendment glob, an OpenSpec lifecycle layer bound to in-flight change deltas with a companion fixture proving the audit fires, Spec Kit stated as unbindable, and `full` plus the recipe as the adopter's profile. Measured at spec: the pointer's reach needs no binding, since both toolkits' specs are markdown and the recipes already govern them, so [lead-clause-heading-family](#lead-clause-heading-family) stands as filed.
+
+**Cost while deferred:** a lifecycle adopter on a foreign layout meets a silent audit skip. Correction (2) of companion-toolkit-profile's 2026-08-02 survey; its build half fitted the prose profile only. Filed 2026-09-27 to the gap inbox at that entry's demotion; promoted 2026-09-27 at companion-catalog-extension's close: →fix fails because the binding is new mechanism. Re-verified: the knob's default reads `SPEC.md`, `proto/`, and companion/SPEC.md names no lifecycle binding. Owner lookup: `CONTRACT_TOKENS`, `foreign`, `Spec Kit` in this file — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (its body is now the catalog submission alone); owner lifecycle-kit/SPEC.md §The state machine.
+
 ## Technical Debt
 
 ### crate-tests-windows-flip
@@ -839,18 +853,6 @@ a kit README's citation of another kit's SPEC section links off-site to the GitH
 **Deliverable:** the pack-time rewrite widened to `../<leaf>/SPEC.md[#frag]` for a packed leaf, giving on-site targets on the mirror and published ones in the payload.
 
 **Cost while deferred:** about fourteen README citations leave the site. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's docs-ux build; promoted 2026-09-27 at its close: →fix fails because the rewrite bound is a packer contract change. Re-verified: 14 blob-SPEC link lines across the twelve top-level READMEs. Owner lookup: `packed-links`, `blob`, `rewrite` in this file — none; owner gate-sdk/SPEC.md §check-packed-links. Related: [spec-mirror-citation-links](#spec-mirror-citation-links).
-
-### foreign-spec-lifecycle-unowned
-
-[cost: event/low] [surface: lifecycle-kit]
-
-a lifecycle stage machine over a foreign spec workflow is unowned: `check-stage-entry` assertion C's cross-component signal is `LIFECYCLE_KIT_CONTRACT_TOKENS` (default `SPEC.md`, `proto/`), so a tree whose specs Spec Kit or OpenSpec writes, left unbound, never fires it and skips the align audit with no red; `check-spec-pointer` breaks the same way on non-markdown artifacts.
-
-**Deliverable:** the lifecycle binding for a foreign layout — the contract tokens and pointer reach — stated for each supported toolkit, with a companion fixture proving the audit fires.
-
-**Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling), against scope's recommendation to hold it:** the `prose` profile the extension installs carries no lifecycle-kit, so the amendment says which profile or recipe a foreign-layout lifecycle adopter takes. It reshapes [lead-clause-heading-family](#lead-clause-heading-family), since both move `check-spec-pointer`'s reach over a foreign layout.
-
-**Cost while deferred:** a lifecycle adopter on a foreign layout meets a silent audit skip. Correction (2) of companion-toolkit-profile's 2026-08-02 survey; its build half fitted the prose profile only. Filed 2026-09-27 to the gap inbox at that entry's demotion; promoted 2026-09-27 at companion-catalog-extension's close: →fix fails because the binding is new mechanism. Re-verified: the knob's default reads `SPEC.md`, `proto/`, and companion/SPEC.md names no lifecycle binding. Owner lookup: `CONTRACT_TOKENS`, `foreign`, `Spec Kit` in this file — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (its body is now the catalog submission alone); owner lifecycle-kit/SPEC.md §The state machine.
 
 ### citation-link-root-docs-range
 
