@@ -726,8 +726,8 @@ pub fn dir_prune_matches(root: &str, dir: &Path, prune_globs: &[String]) -> bool
 }
 
 // spec: gate-sdk/SPEC.md §check-reads-couples — component-wise with `**`, the discipline
-// `walk::glob_files` uses, so a declared prune glob reads as the walker reads a path
-fn dir_glob_match(glob: &str, path: &str) -> bool {
+// `walk::glob_files` uses, so a declared glob reads as the walker reads a path
+pub fn dir_glob_match(glob: &str, path: &str) -> bool {
     let gs: Vec<&str> = glob.split('/').filter(|c| !c.is_empty()).collect();
     let ps: Vec<&str> = path.split('/').filter(|c| !c.is_empty()).collect();
     dir_glob_walk(&gs, &ps)

@@ -11,10 +11,11 @@ The companion package puts Checkwright's gates over a repository whose specs ano
 
 ## The component
 
-`companion/` is repo-root-governed and not a kit. It carries no `checks/` and no `smoke/`, so no kit-root resolver admits it and no install payload carries it. It adds no kit mechanism: each recipe is consumer config, written in knobs the `prose` profile already reads. The toolkits' names live here, on the docs pages and on the front door, and never in a kit SPEC or a kit literal ([gate-sdk/SPEC.md §The provenance seam](../gate-sdk/SPEC.md#the-provenance-seam)).
+`companion/` is repo-root-governed and not a kit. It carries no `checks/` and no `smoke/`, so no kit-root resolver admits it and no install payload carries it. It adds no kit mechanism: each recipe is consumer config in knobs the `prose` profile reads, and the lifecycle layer is config in knobs lifecycle-kit reads. The toolkits' names live here, on the docs pages and on the front door, and never in a kit SPEC or a kit literal ([gate-sdk/SPEC.md §The provenance seam](../gate-sdk/SPEC.md#the-provenance-seam)).
 
 - `toolkits.list` pins each toolkit, one `<toolkit> <package> <version>` line each. The toolkit name keys the line, the package is what the toolkit leg installs, and the version is what it pins and asserts (§The toolkit legs).
 - `<toolkit>/recipe/` holds a recipe (§Recipes).
+- `openspec/lifecycle/` holds OpenSpec's lifecycle layer (§The lifecycle layer).
 - `speckit/` is the Spec Kit extension around its recipe (§The Spec Kit extension). The directory is not named after the toolkit's repository, and a page links that repository at its root only, because `check-kit-ref-liveness` reds a `<name>-kit` path segment that names no kit root.
 - `fixtures/<toolkit>/` holds the fixture tree and its planted defects (§The fixtures).
 
@@ -56,6 +57,15 @@ Measured on `openspec init --tools claude --no-animation --no-copilot-cloud .`, 
 
 **One convention, and no dropped gate for it.** OpenSpec specs often repeat a scenario title under two requirements, which `check-spec-pointer`'s one-title-per-file rule reds. A citation of the second title binds to the first, so the rule holds for any spec that is cited. The recipe keeps the gate, and the landing page states the convention: a title is unique within its spec.
 
+### The lifecycle layer
+
+An adopter who runs lifecycle-kit's stage machine installs `full`, the one profile carrying both lifecycle-kit and canon-kit, applies the toolkit's recipe, then applies `<toolkit>/lifecycle/` with the same procedure. The layer binds the knobs that let `check-stage-entry` see the toolkit's in-flight work as amendments, so a cross-component build entry owes an align stamp. The directory is not named `recipe/`, so the companion arm's toolkit roster, read from `*/recipe/`, does not take it for a third toolkit.
+
+- **OpenSpec.** `openspec/lifecycle/` binds the amendment glob to in-flight change deltas by path, the roster basename to `spec.md` and the contract token to `spec.md`. A change touching two capabilities fires the audit, and so does a delta citing another capability's spec. An archived change sits one level deeper, under `openspec/changes/archive/`, and is no amendment. A queue entry's `[spec:]` ref names the change's `proposal.md` by repo-relative path.
+- **Spec Kit: no layer.** A feature's directory persists after it ships and the current feature is the branch's name, so nothing on disk marks a spec as in flight. A glob over `specs/*/spec.md` would demand the audit at every build entry once two features exist. `check-stage-entry` therefore sees no amendment in a Spec Kit tree, and the align trigger there is the authoring stage's own recommendation.
+
+`check-spec-pointer`'s reach needs no layer. Both toolkits' specs are markdown, and each recipe already brings them into the governed set.
+
 ## The tested claim
 
 The recipes are proved against four defect classes per toolkit, each caught by a named gate:
@@ -74,11 +84,11 @@ A recipe may drop a gate only where a toolkit idiom reds it. Dropping one of the
 `fixtures/<toolkit>/layout/` is a tree in the toolkit's layout at its pin, authored here. Its section structure follows the toolkit's own templates, and no template text is copied, so the tree tests the same gates and ships no third-party text. It carries every idiom a recipe line answers, so a dropped line reds the arm's green leg or lets a planted defect pass. It also carries cross-file links and at least one repo-relative section citation that resolves.
 
 - **Spec Kit:** `.specify/memory/constitution.md`; a `.specify/scripts/bash/` script with ordinary comments and a `/*` absoluteness test; and one feature under `specs/001-release-notes/` with `spec.md`, `plan.md` and `tasks.md`, whose `tasks.md` carries the `bash` fence of `Task:` lines.
-- **OpenSpec:** `openspec/config.yaml`; one capability spec under `openspec/specs/`; and one change under `openspec/changes/` with a proposal, tasks and a delta whose MODIFIED requirement carries a `(Previously: …)` line.
+- **OpenSpec:** `openspec/config.yaml`; one capability spec under `openspec/specs/`; and one change under `openspec/changes/` with a proposal, tasks and a delta whose MODIFIED requirement carries a `(Previously: …)` line. A lifecycle overlay under `fixtures/openspec/lifecycle/` adds a second capability to that change, at a build cursor with no align stamp.
 
 `fixtures/<toolkit>/defects/<gate>/` holds, per claimed gate, the files that replace their layout counterparts to plant that gate's defect. OpenSpec's `check-spec-pointer` defect is a scenario title carried twice in one spec, and its `check-md-refs` defect adds an anchored link to a missing requirement.
 
-The OpenSpec layout passes `openspec validate --all --strict` at the pin, so the toolkit is its own fixture's oracle. This repository prunes every directory named `fixtures` from its own walks (`GATE_SDK_PRUNE_EXTRA_DIRS` in `scripts/gate-sdk-config.knobs`), since the trees carry each red on purpose. The companion arm governs them instead, inside a scratch consumer ([installer/SPEC.md §The consumer smoke](../installer/SPEC.md#the-consumer-smoke)).
+The OpenSpec layout passes `openspec validate --all --strict` at the pin, with and without the lifecycle overlay, so the toolkit is its own fixture's oracle. This repository prunes every directory named `fixtures` from its own walks (`GATE_SDK_PRUNE_EXTRA_DIRS` in `scripts/gate-sdk-config.knobs`), since the trees carry each red on purpose. The companion arm governs them instead, inside a scratch consumer ([installer/SPEC.md §The consumer smoke](../installer/SPEC.md#the-consumer-smoke)).
 
 ## The Spec Kit extension
 
@@ -112,7 +122,7 @@ The toolkits' own tools are oracles, and nothing here re-implements their schema
 
 1. installs the pinned `specify-cli`, runs `specify init --here --non-interactive --integration claude --script sh --ignore-agent-tools` in an empty scratch directory, since the non-interactive init refuses a non-empty one and a runner carrying no `claude` CLI, and packs the extension at version `0.0.0`. It serves the zip from a local web server and installs it with `specify extension add checkwright --from <url>`, answering the trust prompt. It asserts exit 0, `.specify/extensions/checkwright/extension.yml` and the recipe present, and the hook registered in `.specify/extensions.yml`;
 2. asserts that `extension.yml`'s `requires.speckit_version` is `>=` the pinned version;
-3. runs the pinned `openspec validate --all --strict` inside a copy of `fixtures/openspec/layout/`.
+3. runs the pinned `openspec validate --all --strict` inside a copy of `fixtures/openspec/layout/`, then again with the lifecycle overlay's `openspec/` copied over it.
 
 A pin moves by editing its `toolkits.list` line, and the job then proves the new version on the next push.
 
@@ -122,4 +132,5 @@ A pin moves by editing its `toolkits.list` line, and the job then proves the new
 - The agent-run parts of the extension, its command bodies and its hook, are exercised by no harness. The toolkit leg proves the archive installs, and the companion arm runs the install command's recipe block, but no run follows an agent through either command.
 - The Windows route is documented and not run.
 - A pinned toolkit version says nothing about the next one.
+- A change whose two in-flight deltas sit under one capability in two changes fires the OpenSpec layer's audit, since each delta's directory is a component. So does a delta citing its own capability's spec, which sits outside the delta's directory. The align waiver is the valve. On Spec Kit the audit trigger is not machine-held.
 <!-- {% endraw %} -->

@@ -10,8 +10,9 @@
 # drain entry (exit 1, named separately and citing its own remedy);
 # assertion C drives four
 # cross-component build-entry scenarios (2-dir amendments ±waiver,
-# single-amendment cross-component body, single-component amendment) and
-# pins its help's respell-is-not-a-remedy line;
+# single-amendment cross-component body, single-component amendment), pins its
+# help's respell-is-not-a-remedy line, and drives a path-shaped amendment glob
+# both ways (two in-flight deltas red, an archived delta one level deeper clean);
 # assertion D drives five build-entry marker scenarios (not-run red,
 # reasoned cannot-run clean with its count, a fenced, backticked mid-line and
 # templates/-stub mention all clean, a marker on an active queue entry red,
@@ -296,6 +297,26 @@ demo-iteration build bbbbbbbb 2026-06-02 none
 EOF
 check_case "C5 templates-stub-not-counted" "$c5" 0 "STAGE-ENTRY: clean"
 
+# C6 (bad): an amendment glob carrying `/` matches by path — two in-flight deltas
+# under one change, in two directories, are two components.
+c6="$SANDBOX/c6"
+build_queue "$c6"
+mkdir -p "$c6/.workflow" "$c6/changes/c1/specs/alpha" "$c6/changes/c1/specs/beta"
+: >"$c6/changes/c1/specs/alpha/delta.md"; : >"$c6/changes/c1/specs/beta/delta.md"
+cp "$c5/.workflow/WORKFLOW-STATE.txt" "$c6/.workflow/"
+export LIFECYCLE_KIT_AMENDMENT_GLOB='changes/*/specs/*/delta.md'
+check_case "C6 path-glob-two-dirs" "$c6" 1 "changes/c1/specs/alpha changes/c1/specs/beta"
+
+# C7 (good): the same glob does not reach a delta one level deeper, so an
+# archived delta beside one in-flight delta is no second component.
+c7="$SANDBOX/c7"
+build_queue "$c7"
+mkdir -p "$c7/.workflow" "$c7/changes/c1/specs/alpha" "$c7/changes/archive/c0/specs/beta"
+: >"$c7/changes/c1/specs/alpha/delta.md"; : >"$c7/changes/archive/c0/specs/beta/delta.md"
+cp "$c5/.workflow/WORKFLOW-STATE.txt" "$c7/.workflow/"
+check_case "C7 path-glob-archived-not-counted" "$c7" 0 "STAGE-ENTRY: clean"
+unset LIFECYCLE_KIT_AMENDMENT_GLOB
+
 # --- assertion D: a build entry refuses an amendment still carrying an unrun inferred-claim marker ---
 
 d_sandbox() {  # $1=dir  $2=amendment body — a single-component amendment at build entry
@@ -393,5 +414,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-stage-entry.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-stage-entry.test.sh: clean (assertion B queue-empty + drain-exempt model + observed-by refusal branch + assertion C cross-component align/waiver + templates-stub exclusion + assertion D inferred-claim residue over amendments and active queue entries + assertion E marker grammar at every cursor, 20 scenarios)"
+echo "check-stage-entry.test.sh: clean (assertion B queue-empty + drain-exempt model + observed-by refusal branch + assertion C cross-component align/waiver + templates-stub exclusion + path-shaped amendment glob + assertion D inferred-claim residue over amendments and active queue entries + assertion E marker grammar at every cursor, 22 scenarios)"
 exit 0

@@ -170,17 +170,19 @@ enum Kind {
 
 // spec: gate-sdk/SPEC.md §check-reads-couples — one filter token put to a file exactly as the walker
 // the kind names puts it: `glob_files`' root-relative component match, `find_named`/`-name`'s
-// basename match, or `find_files`' extension test
+// basename match, or `find_files`' extension test; a `name:` token carrying `/` is put as a glob
 fn filter_token_selects(kind: &Kind, tok: &str, root: &str, path: &str) -> bool {
     match kind {
         Kind::Ext => path.contains('.') && path.rsplit('.').next() == Some(tok),
-        Kind::Name => walk::pattern_match(tok, path.rsplit('/').next().unwrap_or(path)),
-        Kind::Glob => {
+        Kind::Name if !tok.contains('/') => {
+            walk::pattern_match(tok, path.rsplit('/').next().unwrap_or(path))
+        }
+        Kind::Name | Kind::Glob => {
             let rel = match root {
                 "." => path,
                 r => walk::rel_under(r, path).unwrap_or(path),
             };
-            glob_path_match(tok, rel)
+            walk::dir_glob_match(tok, rel)
         }
     }
 }
@@ -310,28 +312,8 @@ fn under_declared_prune(root: &str, path: &str, prune_globs: &[String]) -> bool 
     let comps: Vec<&str> = rel.split('/').collect();
     (1..comps.len()).any(|n| {
         let dir = comps[..n].join("/");
-        prune_globs.iter().any(|g| glob_path_match(g, &dir))
+        prune_globs.iter().any(|g| walk::dir_glob_match(g, &dir))
     })
-}
-
-// spec: gate-sdk/SPEC.md §check-reads-couples — `walk::glob_files`' own component-wise match, `**`
-// included, so a declared glob selects exactly the files the walk it stands for selects
-fn glob_path_match(glob: &str, path: &str) -> bool {
-    let gs: Vec<&str> = glob.split('/').filter(|c| !c.is_empty()).collect();
-    let ps: Vec<&str> = path.split('/').filter(|c| !c.is_empty()).collect();
-    glob_walk(&gs, &ps)
-}
-
-fn glob_walk(gs: &[&str], ps: &[&str]) -> bool {
-    match (gs.first(), ps.first()) {
-        (None, None) => true,
-        (None, Some(_)) => false,
-        (Some(&"**"), _) => {
-            glob_walk(&gs[1..], ps) || (!ps.is_empty() && glob_walk(gs, &ps[1..]))
-        }
-        (Some(_), None) => false,
-        (Some(g), Some(p)) => walk::pattern_match(g, p) && glob_walk(&gs[1..], &ps[1..]),
-    }
 }
 
 struct Ctx {
@@ -600,6 +582,20 @@ fn rule(args: &[String]) -> Result<i32, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: gate-sdk/SPEC.md §check-reads-couples — a `name:` token with no `/` keeps the basename
+    // match, and one carrying `/` is put to the root-relative path component-wise, as `glob:` is
+    #[test]
+    fn a_name_token_carrying_a_slash_selects_by_path() {
+        let n = Kind::Name;
+        assert!(filter_token_selects(&n, "SPEC-*.md", ".", "a/b/SPEC-x.md"));
+        assert!(!filter_token_selects(&n, "SPEC-*.md", ".", "a/b/spec.md"));
+        let tok = "changes/*/specs/*/delta.md";
+        assert!(filter_token_selects(&n, tok, ".", "changes/c1/specs/cap/delta.md"));
+        assert!(!filter_token_selects(&n, tok, ".", "changes/archive/c1/specs/cap/delta.md"));
+        assert!(!filter_token_selects(&n, tok, ".", "specs/cap/delta.md"));
+        assert!(filter_token_selects(&n, "**/delta.md", "x", "x/changes/c/delta.md"));
+    }
 
     // spec: gate-sdk/SPEC.md §check-reads-couples — a configured tree never analyzes a guarded branch,
     // so every guarded root's coverage runs here with its selector resolved empty over the kit's own

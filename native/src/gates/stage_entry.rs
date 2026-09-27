@@ -139,6 +139,16 @@ fn basename(p: &str) -> &str {
     p.rsplit('/').next().unwrap_or(p)
 }
 
+// spec: lifecycle-kit/SPEC.md §Layout and configuration — a glob with no `/` matches the
+// basename; one carrying `/` matches the repo-relative path component by component
+fn is_amendment(glob: &str, p: &str) -> bool {
+    if glob.contains('/') {
+        walk::dir_glob_match(glob, p)
+    } else {
+        walk::pattern_match(glob, basename(p))
+    }
+}
+
 #[derive(Debug, PartialEq)]
 enum Marker {
     NotRun { command_empty: bool },
@@ -318,7 +328,7 @@ fn audit_signal(k: &Knobs, rel: &[String]) -> Result<Option<String>, String> {
                 roster.push(d);
             }
         }
-        if walk::pattern_match(&k.amendment_glob, &base(p)) {
+        if is_amendment(&k.amendment_glob, p) {
             let d = dir(p);
             if !amend_dirs.contains(&d) {
                 amend_dirs.push(d);
@@ -576,7 +586,7 @@ pub fn run(args: &[String]) -> i32 {
     };
     for af in tree
         .iter()
-        .filter(|p| walk::pattern_match(&k.amendment_glob, basename(p)))
+        .filter(|p| is_amendment(&k.amendment_glob, p))
     {
         let text = match std::fs::read(af) {
             Ok(b) => String::from_utf8_lossy(&b).into_owned(),

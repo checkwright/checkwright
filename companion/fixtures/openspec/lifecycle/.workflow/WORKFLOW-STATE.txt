@@ -1,0 +1,5 @@
+---
+
+release-digest scope aaaaaaaa 2026-06-01 none
+release-digest spec bbbbbbbb 2026-06-02 none
+release-digest build cccccccc 2026-06-03 none

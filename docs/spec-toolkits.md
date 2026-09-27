@@ -83,9 +83,11 @@ From the repository root, in `sh` (on Windows, Git for Windows' `sh`), with `rec
 
 It appends the recipe's knob lines to your gate configuration, drops the gates the recipe names from `scripts/gates.list`, regenerates the pre-commit hook and the coupling graph, and runs the battery. On green it commits the `scripts/` directory; on red it stops before the commit and each red gate names its fix.
 
+Running lifecycle-kit's stage machine as well? Install `full` instead of `prose`, and on OpenSpec apply `companion/openspec/lifecycle/` with the same block, fetching its `lifecycle-config.knobs` and `unregister.list` as you fetched the recipe. Spec Kit has no lifecycle layer ([companion/SPEC.md §The lifecycle layer](companion/SPEC.md#the-lifecycle-layer)).
+
 ## What is tested
 
-Every push installs the profile on a tree in each toolkit's layout, applies the recipe with the block above, and asserts the battery green. It then plants each of the four defects and asserts the gate that owns it reds. The same run installs the extension with Spec Kit's own command and validates the OpenSpec tree with OpenSpec's own validator. The versions tested are pinned in [`companion/toolkits.list`](https://github.com/checkwright/checkwright/blob/master/companion/toolkits.list). The recipes, the fixture trees and their design are under [`companion/`](companion/SPEC.md).
+Every push installs the profile on a tree in each toolkit's layout, applies the recipe with the block above, and asserts the battery green. It then plants each of the four defects and asserts the gate that owns it reds. The same run installs the extension with Spec Kit's own command and validates the OpenSpec tree with OpenSpec's own validator. On OpenSpec it also applies the lifecycle layer to a `full` install and asserts that a change touching two capabilities demands the align stage. The versions tested are pinned in [`companion/toolkits.list`](https://github.com/checkwright/checkwright/blob/master/companion/toolkits.list). The recipes, the fixture trees and their design are under [`companion/`](companion/SPEC.md).
 
 ## Limits
 

@@ -342,6 +342,8 @@ jobs:
           mkdir -p "$work"
           cp -R companion/fixtures/openspec/layout/. "$work/"
           ( cd "$work" && npx --yes "$OPENSPEC_PACKAGE@$OPENSPEC_VERSION" validate --all --strict --no-interactive )
+          cp -R companion/fixtures/openspec/lifecycle/openspec/. "$work/openspec/"
+          ( cd "$work" && npx --yes "$OPENSPEC_PACKAGE@$OPENSPEC_VERSION" validate --all --strict --no-interactive )
 
   # spec: installer/SPEC.md §The consumer smoke — the CI legs; the native Windows legs
   install-smoke-sh-windows:
