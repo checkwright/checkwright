@@ -35,7 +35,7 @@ A joined leg's red fails the workflow. That is the posture every derived leg rea
 - **A test-portability or CI-environment failure that one follow-up commit fixes:** build fixes it inside this unit, and that commit's push is the oracle.
 - **A failure one commit cannot fix:** the leg takes `crate-tests-windows`' reporting posture (`continue-on-error: true` and the annotation) through a `reports` field that `unix_legs` carries for that triple alone. The failing set is filed to the gap inbox as that triple's flip entry, in `crate-tests-windows-flip`'s shape. A held-back leg is named in gate-sdk/SPEC.md §check-crate-arms beside the Windows job's reporting sentence.
 
-**Inferred, cannot run before build:** each image's toolchain builds the crate for its own triple, the four ShellCheck assets run on their runners, a Homebrew or system ruby on each image accepts the gem install, and the crate's tests pass on macOS and arm64 Linux — only the landing push's run answers these, and no macOS or arm64 host exists before it.
+**Ran at the landing push's run:** every image's toolchain built the crate for its own triple, the four ShellCheck assets ran, and each image's ruby took the gem install (3.2 on both Linux images, 3.4 and 3.3 on the two macOS ones). The tests passed on both musl legs. Both macOS legs failed one test, the bash capture oracle, because macOS's `regcomp` breaks the leftmost rule. That is the first act's case: one commit compiles that oracle out on macOS (gate-sdk/SPEC.md §The POSIX ERE matcher), and its push is the oracle.
 
 ### (3) The SPEC names the new CI spelling {mechanical}
 

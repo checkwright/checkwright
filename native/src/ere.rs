@@ -882,18 +882,22 @@ mod tests {
 
     // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — prefixes and suffixes that compete with
     // the group for the same bytes are the cases the subpattern rule exists to arbitrate
+    #[cfg(not(target_os = "macos"))]
     const CAPTURE_PREFIXES: &[&str] = &[
         "", "a*", "^", "^a*", "[ab]*", "a", "ab?", "x?", ".*", "[[:alpha:]]*", "^x", "a?",
         "a{0,2}", "[^c]*", "[ab]{0,3}", "b*a?",
     ];
+    #[cfg(not(target_os = "macos"))]
     const CAPTURE_GROUPS: &[&str] = &[
         "(a*)", "(a+)", "()", "(bcd?)", "(ab?)", "([0-9]+)", "([a-c]*)", "(.*)", "(a?b?)",
         "(^a)", "(a$)", "(b*)", "(a*b*)", "([ab]*)", "(a{1,2})", "(b?)", "(.)", "([^b]*)",
         "(a*$)", "(ab*)", "(.*b)", "([[:digit:]]*)", "(b?c?)",
     ];
+    #[cfg(not(target_os = "macos"))]
     const CAPTURE_SUFFIXES: &[&str] = &[
         "", "a*", "$", "a*$", "b", "c", "bcd", "[b-d]*", "d*$", ".*", "a?b?", "b?c?d?",
     ];
+    #[cfg(not(target_os = "macos"))]
     const CAPTURE_SUBJECTS: &[&str] = &[
         "", "a", "aa", "aaa", "ab", "abc", "abcd", "abbcd", "aabb", "xab", "b", "ba", "123",
         "pid 42", "abab", "cab", "bcd", "xaaab", "held by pid 77",
@@ -901,6 +905,7 @@ mod tests {
 
     // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — one bash over the whole cross product,
     // every pattern and subject crossing on stdin, never interpolated into the script
+    #[cfg(not(target_os = "macos"))]
     const BASH_CAPTURE: &str = r#"mapfile -t in
 n=${in[0]}
 subjects=("${in[@]:1:n}")
@@ -912,6 +917,9 @@ for p in "${in[@]:n+1}"; do
   done
 done"#;
 
+    // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — the bash oracle runs only where the host
+    // regcomp honours the leftmost rule, which macOS's does not
+    #[cfg(not(target_os = "macos"))]
     #[test]
     fn the_one_group_capture_agrees_with_bash_rematch_on_a_generated_cross_product() {
         let mut patterns: Vec<String> = Vec::new();
