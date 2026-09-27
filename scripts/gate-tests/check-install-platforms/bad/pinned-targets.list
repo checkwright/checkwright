@@ -1,0 +1,4 @@
+# Hermetic stand-in for the target roster at the pinned release's tag. It
+# publishes the glibc triple, at the older floor its page states, and not the
+# joined Windows triple.
+x86_64-unknown-linux-gnu

@@ -10,6 +10,7 @@ target_of_host() {
         Linux/aarch64) printf 'aarch64-unknown-linux-gnu' ;;
         Darwin/arm64)  printf 'aarch64-apple-darwin' ;;
         Darwin/x86_64) printf 'x86_64-apple-darwin' ;;
+        MINGW*/x86_64) printf 'x86_64-pc-windows-msvc' ;;
         *) : ;;
     esac
 }

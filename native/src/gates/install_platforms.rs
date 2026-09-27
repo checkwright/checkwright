@@ -3,6 +3,9 @@
 // lockstep, with each held platform's omitted count and each detector's triple count printed
 // spec: installer/SPEC.md §Requirements — arm F holds the page's prerequisites block against the
 // system families the platform block declares
+// spec: installer/SPEC.md §The front door's verbs — arm G holds each `joined` row to the pinned
+// release, admitting an unserved row as pending while this iteration will release
+use super::pinned_release;
 use crate::fresh;
 use crate::registry;
 use crate::walk;
@@ -377,11 +380,86 @@ fn omitted_report(held: &[&str]) -> String {
     }
 }
 
+// spec: installer/SPEC.md §The front door's verbs — the pinned release arm G holds `joined` to:
+// its roster, read at the gate's own roster path, and its install page
+struct Pinned {
+    label: String,
+    roster: Vec<String>,
+    page: String,
+}
+
+// spec: docs/site-architecture.md §Generated projections and their freshness gates — arm G's four
+// inputs from files, or resolved live, where an unresolvable tag leaves the arm dormant
+fn pinned_input(
+    args: &[String],
+    install_md: &str,
+    roster: &str,
+) -> Result<Option<(Pinned, String, String)>, String> {
+    if args.len() == 8 {
+        let p = Pinned {
+            label: args[4].clone(),
+            roster: roster_triples(&pinned_release::read(&args[4])?),
+            page: pinned_release::read(&args[5])?,
+        };
+        return Ok(Some((p, args[6].clone(), args[7].clone())));
+    }
+    if args.len() > 4 {
+        return Err("usage: check-install-platforms [install.md roster sh-bootstrap ps1-bootstrap [pinned-roster pinned-page disposition queue]]".to_string());
+    }
+    let Some(tag) = pinned_release::pinned_tag()? else {
+        return Ok(None);
+    };
+    let p = Pinned {
+        roster: roster_triples(&pinned_release::show_at(&tag, roster)?),
+        page: pinned_release::show_at(&tag, install_md)?,
+        label: tag,
+    };
+    let (disposition, queue) = pinned_release::live_paths()?;
+    Ok(Some((p, disposition, queue)))
+}
+
+// spec: installer/SPEC.md §The front door's verbs — arm G: a `joined` row names a triple the pinned
+// release publishes, at the Minimum the pinned release's page states; the Minimum half is dormant
+// while the pinned page's block does not parse as the table
+fn unserved(decls: &[Decl], pinned: &Pinned) -> (Vec<(String, String)>, bool) {
+    let pinned_decls = declarations(&pinned.page);
+    let minimum_live = !pinned_decls.is_empty();
+    let mut out: Vec<(String, String)> = Vec::new();
+    for d in decls.iter().filter(|d| matches!(d.state, State::Joined)) {
+        if !pinned.roster.contains(&d.triple) {
+            out.push((
+                d.triple.clone(),
+                format!("declared `joined`, and the pinned release {} publishes no {}", pinned.label, d.triple),
+            ));
+            continue;
+        }
+        if !minimum_live {
+            continue;
+        }
+        match pinned_decls.iter().find(|p| p.triple == d.triple) {
+            Some(p) if p.minimum == d.minimum => {}
+            Some(p) => out.push((
+                d.triple.clone(),
+                format!(
+                    "declared `joined` at Minimum `{}`, and the pinned release {} states `{}` for {}",
+                    d.minimum, pinned.label, p.minimum, d.triple
+                ),
+            )),
+            None => out.push((
+                d.triple.clone(),
+                format!("declared `joined`, and the pinned release {}'s page states no Minimum for {}", pinned.label, d.triple),
+            )),
+        }
+    }
+    (out, minimum_live)
+}
+
 fn rule(args: &[String]) -> Result<i32, String> {
     let install_md = fresh::positional(args, 0, DEFAULT_INSTALL_MD);
     let roster = fresh::positional(args, 1, DEFAULT_ROSTER);
     let bash_path = fresh::positional(args, 2, DEFAULT_BASH_BOOTSTRAP);
     let pwsh_path = fresh::positional(args, 3, DEFAULT_PWSH_BOOTSTRAP);
+    let pinned = pinned_input(args, install_md, roster)?;
 
     if !Path::new(install_md).is_file() {
         return Err(format!("install page not found: {}", install_md));
@@ -511,6 +589,37 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let declared_families = families(&install_text);
     findings.extend(prerequisite_findings(&prereqs, &declared_families));
 
+    // spec: installer/SPEC.md §The front door's verbs — arm G's finding is admitted as pending
+    // while this iteration will release, and reds while its disposition withholds one
+    let mut pending: Vec<String> = Vec::new();
+    let mut g_red = false;
+    let g_state = match &pinned {
+        None => "arm G dormant — the pinned tag does not resolve here".to_string(),
+        Some((p, disposition_path, queue_path)) => {
+            let (iteration, disp) = pinned_release::iteration_disposition(disposition_path, queue_path)?;
+            let (unserved_rows, minimum_live) = unserved(&decls, p);
+            for (triple, why) in unserved_rows {
+                match &disp {
+                    pinned_release::Disposition::Withheld(field) => {
+                        g_red = true;
+                        findings.push(format!("{} while iteration {}'s disposition is {}", why, iteration, field));
+                    }
+                    _ => {
+                        if !pending.contains(&triple) {
+                            pending.push(triple);
+                        }
+                    }
+                }
+            }
+            format!(
+                "arm G against the pinned release {}{}{}",
+                p.label,
+                if minimum_live { "" } else { ", its Minimum half dormant — the pinned page carries no platform table" },
+                if pending.is_empty() { String::new() } else { format!(", pending release: {}", pending.join(" ")) }
+            )
+        }
+    };
+
     // spec: installer/SPEC.md §The gate binary — the count rides the clean line on the same
     // vacuous-pass ground arm D stands on: a source scan whose extraction quietly stops matching
     // reports an empty set as agreement, and a number is what makes that visible without an audit
@@ -547,11 +656,16 @@ fn rule(args: &[String]) -> Result<i32, String> {
         println!("        Every prerequisites row states a Minimum (`any` where nothing forces");
         println!("        one) and a Needed-for cell opening `required` or `optional: <condition>`,");
         println!("        and every declared system family is named by some row's Needed-for cell.");
+        if g_red {
+            println!("        A `joined` row names a triple the pinned release publishes, at the Minimum");
+            println!("        its page states: release so the pin carries the row, or return the row");
+            println!("        to `held`.");
+        }
         return Ok(1);
     }
 
     println!(
-        "INSTALL-PLATFORMS: clean ({} declared platform(s) in {}, {} joined in lockstep with {} both directions, {} held with a stated precondition{}{}; both host detectors emit exactly the declared set — {}; omitted count is the registry members dispatching to the gate binary; {} prerequisite(s) each with a Minimum and a required/optional marker, naming every declared family — {})",
+        "INSTALL-PLATFORMS: clean ({} declared platform(s) in {}, {} joined in lockstep with {} both directions, {} held with a stated precondition{}{}; both host detectors emit exactly the declared set — {}; omitted count is the registry members dispatching to the gate binary; {} prerequisite(s) each with a Minimum and a required/optional marker, naming every declared family — {}; {})",
         decls.len(),
         install_md,
         joined,
@@ -561,7 +675,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
         per_held,
         detector_report,
         prereqs.len(),
-        declared_families.join(", ")
+        declared_families.join(", "),
+        g_state
     );
     Ok(0)
 }
@@ -712,6 +827,34 @@ mod tests {
         assert!(half_triples_in(no_fallback, "f", &[&BASH_DETECTOR, &BASH_FALLBACK])
             .unwrap_err()
             .contains("`fallback_of_target`"));
+    }
+
+    // spec: installer/SPEC.md §The front door's verbs — arm G: a joined triple the pinned roster
+    // lacks, a joined Minimum the pinned page states otherwise, a held row never read, and the
+    // Minimum half dormant against a pinned page with no table
+    #[test]
+    fn arm_g_holds_joined_rows_to_the_pinned_release() {
+        let page = block(&format!(
+            "{}| Linux | glibc 2.39 | `x86_64-unknown-linux-gnu` | joined |\n| Linux | Linux 3.2 | `x86_64-unknown-linux-musl` | joined |\n| Linux | glibc 2.39 | `aarch64-unknown-linux-gnu` | held: a run |",
+            HEAD
+        ));
+        let decls = declarations(&page);
+        let pinned = |page: String| Pinned {
+            label: "v1.0.0".to_string(),
+            roster: vec!["x86_64-unknown-linux-gnu".to_string()],
+            page,
+        };
+        let table = block(&format!("{}| Linux | glibc 2.17 | `x86_64-unknown-linux-gnu` | joined |", HEAD));
+        let (rows, live) = unserved(&decls, &pinned(table));
+        assert!(live);
+        assert_eq!(rows.len(), 2, "{:?}", rows);
+        assert!(rows[0].1.contains("states `glibc 2.17`"));
+        assert!(rows[1].1.contains("publishes no x86_64-unknown-linux-musl"));
+        let bullets = format!("{}\n- `x86_64-unknown-linux-gnu` (joined) — Linux\n{}\n", BEGIN, END);
+        let (rows, live) = unserved(&decls, &pinned(bullets));
+        assert!(!live);
+        assert_eq!(rows.len(), 1, "{:?}", rows);
+        assert_eq!(rows[0].0, "x86_64-unknown-linux-musl");
     }
 
     fn prereq_block(body: &str) -> String {

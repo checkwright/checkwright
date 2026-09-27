@@ -404,7 +404,7 @@ if staged_matches 'docs/install.md' 'CONTRIBUTING.md' 'gate-sdk/*.sh' 'canon-kit
     run_gate check-install-toolchain native/target/release/checkwright-gates check-install-toolchain
 fi
 
-if staged_matches 'docs/install.md' 'native/targets.list' 'installer/bin/checkwright.sh' 'installer/bin/checkwright.ps1' 'scripts/gate-sdk-config.knobs' 'native/src/gates/install_platforms.rs' 'native/src/fresh.rs'; then
+if staged_matches 'docs/install.md' 'native/targets.list' 'installer/bin/checkwright.sh' 'installer/bin/checkwright.ps1' 'docs/install.sh' '.workflow/release-disposition.txt' 'TASK-QUEUE.md' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'scripts/queue-config.knobs' 'native/src/gates/install_platforms.rs' 'native/src/gates/pinned_release.rs' 'native/src/fresh.rs'; then
     run_gate check-install-platforms native/target/release/checkwright-gates check-install-platforms
 fi
 
@@ -432,7 +432,7 @@ if staged_matches 'docs/install.sh' 'docs/install.ps1' 'docs/install.md' 'gate-s
     run_gate check-install-pin native/target/release/checkwright-gates check-install-pin
 fi
 
-if staged_matches 'README.md' 'docs/index.md' 'docs/install.md' 'installer/README.md' 'docs/install.sh' 'docs/install.ps1' '.workflow/release-disposition.txt' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'scripts/queue-config.knobs' 'native/src/gates/front_door_verbs.rs' 'native/src/gates/install_pin.rs' 'native/src/gates/release_bump.rs' 'native/src/fresh.rs' 'native/src/programs.rs' 'native/src/queue.rs' 'native/src/stages.rs' 'native/src/installer/mod.rs'; then
+if staged_matches 'README.md' 'docs/index.md' 'docs/install.md' 'installer/README.md' 'docs/install.sh' 'docs/install.ps1' '.workflow/release-disposition.txt' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'scripts/queue-config.knobs' 'native/src/gates/front_door_verbs.rs' 'native/src/gates/pinned_release.rs' 'native/src/installer/mod.rs'; then
     run_gate check-front-door-verbs native/target/release/checkwright-gates check-front-door-verbs
 fi
 

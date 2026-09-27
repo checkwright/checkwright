@@ -10,7 +10,10 @@ checkwright.ps1 detects x86_64-unknown-linux-musl and install.md declares it now
 install.md declares aarch64-pc-windows-msvc and checkwright.sh can never detect it
 install.md declares aarch64-pc-windows-msvc and checkwright.ps1 can never detect it
 omitted on each held platform: aarch64-apple-darwin omits 2 member(s)
-detected triples: checkwright.sh emits 5, checkwright.ps1 emits 5
+detected triples: checkwright.sh emits 6, checkwright.ps1 emits 6
 a prerequisite with no Minimum: `sh`
 a prerequisite neither `required` nor `optional: <condition>`: Ruby
 a declared system no prerequisite row names: Windows
+declared `joined` at Minimum `glibc 2.39`, and the pinned release pinned-targets.list states `glibc 2.17` for x86_64-unknown-linux-gnu while iteration fixture-iteration's disposition is deferred:v9.9.9
+declared `joined`, and the pinned release pinned-targets.list publishes no x86_64-pc-windows-msvc while iteration fixture-iteration's disposition is deferred:v9.9.9
+release so the pin carries the row, or return the row

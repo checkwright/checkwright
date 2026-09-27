@@ -126,9 +126,9 @@ CONTRIBUTING.md's pull-request bullet "On Linux the consumer smoke builds the mu
 
 ### (6) `check-install-platforms` holds `joined` to the pinned release {design-bearing}
 
-**Not yet applied.** `check-install-platforms` gains **arm G**. For each `joined` row, with `<pin>` the pinned version and `v<pin>` its tag:
+**Applied**, landing `install-platform-release-gap`. `check-install-platforms` gains **arm G**. For each `joined` row, with `<pin>` the pinned version and `v<pin>` its tag:
 
-- **Triple.** The row's triple must be a line of the target roster at `v<pin>`, read by `git show v<pin>:<roster>`, where `<roster>` is `GATE_SDK_NATIVE_TARGETS_FILE`'s value. The roster at a tag is that tag's published asset set, which `check-release-assets` holds.
+- **Triple.** The row's triple must be a line of the target roster at `v<pin>`, read by `git show v<pin>:<roster>`, where `<roster>` is the gate's own roster operand (default `native/targets.list`), never `GATE_SDK_NATIVE_TARGETS_FILE`, whose value a smoke narrows. The roster at a tag is that tag's published asset set, which `check-release-assets` holds.
 - **Minimum.** When the page at `v<pin>` carries the platform block in the table grammar, the row's Minimum cell must equal that tagged page's Minimum for the same triple. When the tagged block does not parse as the table, this half is dormant, and the clean line says so. v0.26.0's bullet grammar is that case, and every tag from the next release on carries the table.
 
 A finding is **admitted as pending**, listed on the clean line, while `.workflow/release-disposition.txt` carries no line for the iteration the queue header names, or a `vX.Y.Z` field. It **reds** while that field is `none` or `deferred:vX.Y.Z`. Where `v<pin>` does not resolve, as in a shallow checkout, the arm is dormant and the clean line says so. Its help line names the remedies: release so the pin carries the row, or return the row to `held`.

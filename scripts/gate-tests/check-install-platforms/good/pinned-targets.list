@@ -1,0 +1,4 @@
+# Hermetic stand-in for the target roster at the pinned release's tag. It lacks
+# the static triple the page declares `joined`, which arm G admits as pending
+# while the queue's iteration carries no withholding disposition.
+x86_64-unknown-linux-gnu

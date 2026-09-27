@@ -8,6 +8,7 @@ function Get-HostTarget {
         '^linux/arm64$'  { return 'aarch64-unknown-linux-gnu' }
         '^darwin/arm64$' { return 'aarch64-apple-darwin' }
         '^darwin/x64$'   { return 'x86_64-apple-darwin' }
+        '^windows/x64$'  { return 'x86_64-pc-windows-msvc' }
     }
     return ''
 }

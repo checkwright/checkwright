@@ -16,23 +16,11 @@ the next release would publish no glibc Linux gate binary: platform-prerequisite
 
 **Deliverable:** the gnu triples back in `native/targets.list` and `native/runners.list` beside musl, joined under that file's predicate; the installer's host-to-artifact choice between them on a Linux host; docs/install.md's platforms table and the release declarations to match.
 
-**Cost while deferred:** docs/spec-toolkits.md, live and linked from the front door, sends adopters to Release assets no tag yet carries, since v0.26.0 predates `companion/`, and that tag waits on this. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's close; promoted 2026-09-27 at the next iteration's scope. Re-verified: `native/targets.list` lists only the musl Linux triples, and `gh release view v0.26.0` lists only the gnu Linux archives. Owner lookup: `glibc`, `linux-gnu`, `targets.list` in this file — [install-platform-release-gap](#install-platform-release-gap), [musl-dev-binary](#musl-dev-binary) and [musl-smoke-build-wrapper](#musl-smoke-build-wrapper), DISTINCT (the page-to-gate binding; the dev binary; the smoke's hand-off); owner gate-sdk/SPEC.md §Consumer payload. Surface also gate-sdk.
+**Cost while deferred:** docs/spec-toolkits.md, live and linked from the front door, sends adopters to Release assets no tag yet carries, since v0.26.0 predates `companion/`, and that tag waits on this. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's close; promoted 2026-09-27 at the next iteration's scope. Re-verified: `native/targets.list` lists only the musl Linux triples, and `gh release view v0.26.0` lists only the gnu Linux archives. Owner lookup: `glibc`, `linux-gnu`, `targets.list` in this file — `install-platform-release-gap`, [musl-dev-binary](#musl-dev-binary) and [musl-smoke-build-wrapper](#musl-smoke-build-wrapper), DISTINCT (the page-to-gate binding; the dev binary; the smoke's hand-off); owner gate-sdk/SPEC.md §Consumer payload. Surface also gate-sdk.
 
-**Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** the amendment settles the host-to-artifact choice and the declaration rows in one, with [install-platform-release-gap](#install-platform-release-gap)'s gate reading the table it settles.
+**Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** the amendment settles the host-to-artifact choice and the declaration rows in one, with `install-platform-release-gap`'s gate reading the table it settles.
 
 **Push need (2026-09-27, overrun granted by operator direction, lead-relayed):** the mid-iteration observation push, shared with [windows-fresh-fixture-stub](#windows-fresh-fixture-stub), that joins the gnu lines under the file's predicate; then the release tag beside the closing push, since v0.27.0 is held on this.
-
-### install-platform-release-gap
-
-[spec: SPEC-linux-glibc.md]
-
-docs/install.md defines `joined` as "a binary is published for that system", but `check-install-platforms` binds `joined` to a live `native/targets.list` line, so the two diverge between a platform join and the next tag. The two `*-linux-musl` triples joined at platform-prerequisite-floors while the newest release, v0.26.0, publishes only `*-linux-gnu` archives, and that close stamped `deferred:v0.27.0`. `check-front-door-verbs` holds the analogous claim for a verb the pinned release lacks; nothing holds it for a platform row or its Minimum.
-
-**Deliverable:** the page's definition and the gate's binding reconciled, with a gate that reds a `joined` row or Minimum the pinned release does not serve while the release disposition is `none` or deferred, in `check-front-door-verbs`' shape.
-
-**Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** bundled with [linux-glibc-artifacts](#linux-glibc-artifacts), whose table shape it reads, so that one lands first.
-
-**Cost while deferred:** an adopter on a newly joined system, or below the old floor, follows the page and meets the pinned release's refusal or a glibc load error; the live instance lasts until the next tag. Filed 2026-09-27 to the gap inbox at platform-prerequisite-floors' close; promoted 2026-09-27 at the next iteration's scope: →fix fails because the gate is new mechanism. Re-verified: `gh release view v0.26.0` lists only the two `-linux-gnu` Linux archives, and docs/install.md's table reads the musl triples `joined`. Owner lookup: `joined`, `front-door-verbs`, `platform` in this file's headings — none; owner installer/SPEC.md §Versioning, with the platforms-block contract docs/site-architecture.md states.
 
 ### windows-fresh-fixture-stub
 
@@ -842,7 +830,7 @@ the consumer smoke's build leg needs a musl standard library: since the musl joi
 
 **Deliverable:** a tracked maintainer wrapper yielding that hand-off directory, named in installer/SPEC.md §The consumer smoke.
 
-**Cost while deferred:** each maintainer without a musl target re-derives the route before a local validate. Filed 2026-09-27 to the gap inbox by the front-door hotfix, with an addendum on the recovered route (re-proved at companion-catalog-extension's build, installer smoke 20/20); promoted 2026-09-27 at its close: →fix fails because the wrapper is a new tracked script. Re-verified: this host's sysroot carries only the gnu std, `command -v rustup` finds nothing, and the section names no docker route. Owner lookup: `musl`, `ARTIFACTS_DIR`, `docker` in this file — [install-platform-release-gap](#install-platform-release-gap) and [musl-dev-binary](#musl-dev-binary), DISTINCT (publishing; the dev binary); owner installer/SPEC.md §The consumer smoke.
+**Cost while deferred:** each maintainer without a musl target re-derives the route before a local validate. Filed 2026-09-27 to the gap inbox by the front-door hotfix, with an addendum on the recovered route (re-proved at companion-catalog-extension's build, installer smoke 20/20); promoted 2026-09-27 at its close: →fix fails because the wrapper is a new tracked script. Re-verified: this host's sysroot carries only the gnu std, `command -v rustup` finds nothing, and the section names no docker route. Owner lookup: `musl`, `ARTIFACTS_DIR`, `docker` in this file — `install-platform-release-gap` and [musl-dev-binary](#musl-dev-binary), DISTINCT (publishing; the dev binary); owner installer/SPEC.md §The consumer smoke.
 
 ### readme-spec-links-offsite
 
@@ -1555,5 +1543,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 The consumer's local-only companion files (private brief, ops runbook) have read triggers but no write-back trigger, so shipped-unit forward memory and an out-of-tree state verifier drift until a consult audits them; owed are close and release-sweep template slots for both, and a retired-slug arm over plain code on the local-only globs.
 
 ## Done
+
+- install-platform-release-gap
 
 ## Lessons Learned

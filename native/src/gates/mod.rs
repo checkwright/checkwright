@@ -61,6 +61,7 @@ pub mod install_evidence_fresh;
 pub mod install_pin;
 pub mod install_platforms;
 pub mod install_toolchain;
+pub mod pinned_release;
 pub mod installer_no_deps;
 pub mod guard_registration;
 pub mod kit_ref_liveness;
@@ -1571,13 +1572,15 @@ pub const REGISTRY: &[GateEntry] = &[
     // spec: gate-sdk/SPEC.md §The port-candidate criteria — arm D counts the registry members
     // that dispatch to the binary, so it reads the gates dir and the kit roots the resolve set is
     // built from; both operands stay positional and neither is a knob.
+    // spec: installer/SPEC.md §The front door's verbs — arm G reads the queue header and the
+    // pinned release's tag through git.
     (
         "check-install-platforms",
         install_platforms::run,
         &[],
-        &["GATE_SDK_GATES_DIR", "GATE_SDK_KIT_DIRS"],
+        &["GATE_SDK_GATES_DIR", "GATE_SDK_KIT_DIRS", "QUEUE_KIT_QUEUE_FILE"],
         "-",
-        &[],
+        &[("git", "")],
     ),
     (
         "check-installer-no-deps",

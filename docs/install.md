@@ -27,7 +27,7 @@ An install is possible only on a system below, where a prebuilt gate binary is p
 
 <!-- platforms:end -->
 
-`joined` means a binary is published for that system; `held` means it is supported but not published yet, and names the run that would publish it. On any other system `init` refuses. On Linux, `init` takes the glibc binary where it runs and the static one everywhere else. Windows Subsystem for Linux (WSL) takes the Linux binary.
+`joined` means the current release publishes a binary for that system, at the floor shown; `held` means it is supported but not published yet, and names the run that would publish it. On any other system `init` refuses. On Linux, `init` takes the glibc binary where it runs and the static one everywhere else. Windows Subsystem for Linux (WSL) takes the Linux binary.
 
 ### Installing and running the shipped gates
 
