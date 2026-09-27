@@ -2,26 +2,8 @@
 # Behavioral test of check-stage-entry assertions B, C, D and E — the
 # scenarios the one-pair good/bad harness cannot hold. The good/bad fixture
 # pair (--run-gate-tests) covers assertion A (prerequisite-stamp ordering: a
-# close cursor with no validate stamp); the harness admits only one
-# bad/ dir, so assertion B drives untagged residue at drain entry (exit 1),
-# [drain-exempt:] residue at drain entry (exit 0, reason echoed), an
-# empty-reason tag (exit 1), tagged residue at the drain successor's
-# entry (exit 1 — the no-exemption backstop), and [observed-by:] residue at
-# drain entry (exit 1, named separately and citing its own remedy);
-# assertion C drives four
-# cross-component build-entry scenarios (2-dir amendments ±waiver,
-# single-amendment cross-component body, single-component amendment), pins its
-# help's respell-is-not-a-remedy line, and drives a path-shaped amendment glob
-# both ways (two in-flight deltas red, an archived delta one level deeper clean);
-# assertion D drives five build-entry marker scenarios (not-run red,
-# reasoned cannot-run clean with its count, a fenced, backticked mid-line and
-# templates/-stub mention all clean, a marker on an active queue entry red,
-# the same marker on a deferred entry clean) and pins its help's
-# keep-the-honest-limit line; assertion E drives five
-# marker-grammar scenarios, four at an align cursor (empty-reason red,
-# command-less not-run red, a bare mid-line and a line-split spelling each red
-# as misplaced, a well-formed not-run marker clean because residue is not
-# yet due) and one at build entry (a malformed marker reported once, as E).
+# close cursor with no validate stamp), and the harness admits only one bad/
+# dir. Each scenario's label below is its roster entry.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail

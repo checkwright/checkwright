@@ -180,8 +180,9 @@ fn spawn_resolution<F: Fn(&std::path::Path) -> bool>(
     system_root: Option<&str>,
     exists: F,
 ) -> Result<String, String> {
-    // spec: gate-sdk/SPEC.md §check-graph — an argv[0] carrying a separator is a path the caller
-    // already resolved, never a name for the platform to search, so it passes through untouched
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — an argv[0] carrying a separator is a path
+    // the caller already resolved, never a name for the platform to search, so it passes through
+    // untouched
     if program.contains('/') || program.contains('\\') {
         return Ok(program.to_string());
     }
@@ -1440,7 +1441,7 @@ pub(crate) mod tests {
         );
     }
 
-    // spec: gate-sdk/SPEC.md §check-graph — an argv[0] the caller already resolved passes
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — an argv[0] the caller already resolved passes
     // through: `dispatch`'s and the floor probe's callers hand paths, not names
     #[test]
     fn a_resolved_path_passes_through_the_funnel_untouched() {
