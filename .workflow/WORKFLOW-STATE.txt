@@ -4,13 +4,4 @@
 
 ---
 
-gate-sdk-tail-docs-standard scope ab200ab0 2026-09-27 cc1add18
-gate-sdk-tail-docs-standard spec afc9ec94 2026-09-27 2079ee75
-gate-sdk-tail-docs-standard align a449fcea 2026-09-27 5468a75d
-gate-sdk-tail-docs-standard build aa19d03d 2026-09-27 8f389241
-gate-sdk-tail-docs-standard build aa611f8d 2026-09-27 985edb93
-gate-sdk-tail-docs-standard build a4105c5d 2026-09-27 71887da2
-gate-sdk-tail-docs-standard build ae6594d6 2026-09-27 27c96e28
-gate-sdk-tail-docs-standard validate a4eb2e30 2026-09-27 e6712409
-gate-sdk-tail-docs-standard validate a1bd6454 2026-09-27 cf17189b
-gate-sdk-tail-docs-standard close aa55df20 2026-09-27 26848aa7
+— scope adb89611 2026-09-27 4c5dff8d
