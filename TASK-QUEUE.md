@@ -8,20 +8,6 @@
 
 ## New Features
 
-### comment-tier-surface-excludes-ci-workflows
-
-[spec: SPEC-comment-actions.md] [recurrence: 2026-09-25]
-
-the CI workflow files' comments are ungated by corpus: `comment_surface` in `native/src/spec.rs` builds the governed set from `sh`, `gate` and `rs` files plus the tracked `.workflow/` tier, and `CANON_KIT_COMMENT_SURFACE` in `scripts/canon-config.knobs` names no `.yml`. Measured at spec with the surface widened: 1344 `check-comment-tier` findings over the six actions-shaped files, and 0 for `check-spec-pointer`.
-
-**Deliverable:** the amendment's seven deltas: an actions-shaped tier found by content behind `CANON_KIT_COMMENT_ACTIONS` (kit default `off`, this repo `on`), the two workflow valves blessed, and this repo's five files with findings swept to directives under a local strip-and-compare oracle.
-
-**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** the operator joined it to the iteration, having asked for it on 2026-09-09, 2026-09-25 and again today, under the standing direction "We should aim to have all technical assets covered by our gates" (operator direction, 2026-09-27). Knob or content detection was /spec's call, and the amendment takes content behind a knob so no adopter's workflows red on upgrade. The widening and sweep land before the iteration's new CI legs, so those are written under the gate.
-
-**Push need (2026-09-27, inside the budget):** the swept `gates.yml` runs only on a remote run, so it rides the one mid-iteration push that also serves [linux-musl-artifacts](#linux-musl-artifacts), [glibc-floor-lowering](#glibc-floor-lowering) and [crate-tests-other-triples](#crate-tests-other-triples).
-
-**Cost while deferred:** every workflow edit adds ungoverned prose to the public demonstration tree. Filed 2026-09-09 on an operator direction to widen and sweep; iceboxed as machinery-class; returned 2026-09-25 by consult as the paradigm of the rule that nothing is exempt as unread by adopters.
-
 ### crate-tests-other-triples
 
 [spec: SPEC-crate-tests-unix.md]
@@ -32,7 +18,7 @@ the native crate's unit tests run on x86_64 Linux (the battery) and on the two W
 
 **Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** the theme's "wide platform/OS support" (operator direction, 2026-09-27) wants every published triple tested. Any musl triple [linux-musl-artifacts](#linux-musl-artifacts) adds joins the legs by derivation.
 
-**Push need (2026-09-27, inside the budget):** the new legs run only remotely; they ride the one mid-iteration push [comment-tier-surface-excludes-ci-workflows](#comment-tier-surface-excludes-ci-workflows) names.
+**Push need (2026-09-27, inside the budget):** the new legs run only remotely; they ride the one mid-iteration push `comment-tier-surface-excludes-ci-workflows` names.
 
 **Cost while deferred:** a platform-specific regression on those hosts reaches no test. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's spec; promoted 2026-09-26 at its close: →fix fails because a new CI leg is a unit scope must admit. Owner: gate-sdk/SPEC.md §check-crate-arms.
 
@@ -46,7 +32,7 @@ no `*-linux-musl` gate binary is published: `native/targets.list` carries only t
 
 **Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** the theme's "wide platform/OS support" (operator direction, 2026-09-27). Route ruled at /spec, operator direction 2026-09-27, lead-relayed (not a /consult ruling): the static musl binary serves every Linux host, the Linux contributor's musl standard library for the local consumer smoke accepted.
 
-**Push need (2026-09-27, inside the budget):** the musl legs run only remotely; they ride the one mid-iteration push [comment-tier-surface-excludes-ci-workflows](#comment-tier-surface-excludes-ci-workflows) names, and the join commit rides the close push.
+**Push need (2026-09-27, inside the budget):** the musl legs run only remotely; they ride the one mid-iteration push `comment-tier-surface-excludes-ci-workflows` names, and the join commit rides the close push.
 
 **Cost while deferred:** every musl host is refused. Filed 2026-09-27 at platform-prerequisite-floors's scope, from the lead's probe. Owner: installer/SPEC.md §The gate binary.
 
@@ -1416,5 +1402,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 - uninstall-artifact-ownership-asymmetry
 - prerequisite-floor-versions
+- comment-tier-surface-excludes-ci-workflows
 
 ## Lessons Learned
