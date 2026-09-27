@@ -13,3 +13,4 @@ gate-sdk-tail-docs-standard build a4105c5d 2026-09-27 71887da2
 gate-sdk-tail-docs-standard build ae6594d6 2026-09-27 27c96e28
 gate-sdk-tail-docs-standard validate a4eb2e30 2026-09-27 e6712409
 gate-sdk-tail-docs-standard validate a1bd6454 2026-09-27 cf17189b
+gate-sdk-tail-docs-standard close aa55df20 2026-09-27 26848aa7
