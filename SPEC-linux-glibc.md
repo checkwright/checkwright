@@ -151,7 +151,7 @@ In installer/SPEC.md §The front door's verbs, the **pending admission** paragra
 - **Roster-holding readers of the new names.** Arm E is the one reader holding the detectors' function names, and it names both new functions (delta 1). `host-target.sh` extracts `target_of_host` alone and needs no edit. `scripts/check-install-platforms.gate`'s `couples=` and `# spec:` line gain arm G's inputs (delta 6). No knob is minted.
 - **Point 5.** No corpus narrows. Arm E's detector corpus widens by one function per half, and arm G adds findings.
 - **Point 6.** Delta 3 obliges each gnu triple to join. The members are the two gnu triples, and each one's satisfying value is its declaring commit's runner line and held row, and then its join commit's roster line and `joined` state.
-- **Sibling dependency.** [crate-tests-windows-flip](TASK-QUEUE.md#crate-tests-windows-flip) and [windows-fresh-fixture-stub](TASK-QUEUE.md#windows-fresh-fixture-stub) share the mid-iteration push. Their legs are Windows-only and read no Linux row, so the two units compose in either batch order.
+- **Sibling dependency.** [crate-tests-windows-flip](TASK-QUEUE.md#crate-tests-windows-flip) and `windows-fresh-fixture-stub` share the mid-iteration push. Their legs are Windows-only and read no Linux row, so the two units compose in either batch order.
 
 ## Existing sections updated
 

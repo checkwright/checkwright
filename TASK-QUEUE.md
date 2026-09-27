@@ -20,35 +20,21 @@ the next release would publish no glibc Linux gate binary: platform-prerequisite
 
 **Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** the amendment settles the host-to-artifact choice and the declaration rows in one, with `install-platform-release-gap`'s gate reading the table it settles.
 
-**Push need (2026-09-27, overrun granted by operator direction, lead-relayed):** the mid-iteration observation push, shared with [windows-fresh-fixture-stub](#windows-fresh-fixture-stub), that joins the gnu lines under the file's predicate; then the release tag beside the closing push, since v0.27.0 is held on this.
-
-### windows-fresh-fixture-stub
-
-[spec: SPEC-observer-pin.md]
-
-`crate-tests-windows` still fails 2 of 1171 on both Windows triples: the registry-coverage pair (`every_registry_member_declares_the_programs_it_spawns` and `_roots_it_walks`) stops at `check-gate-binary-fresh`, whose good and bad fixtures set `GATE_SDK_NATIVE_BIN = ./stub-bin`, a bash-shebang stub Windows cannot start, so the member exits 2 and the observer's assertion panics each test at that case. No static stub serves both hosts under one knob value: probed, a shebang-less stub fails on unix at spawn (os error 8). Past it, `crate-tests-windows` installs none of the ruby gems whose absence exits `check-docs-render-fidelity` and `check-docs-liquid-parse` 2, and every later registry member is unobserved on Windows.
-
-**Deliverable:** a design ruling and its landing: the spawn funnel resolving `PATHEXT` on an extensionless path (reverses gate-sdk/SPEC.md §Fail-closed contract's pass-through rule), or the registry observer pinning a host-startable `GATE_SDK_NATIVE_BIN`; then the members past it observed green.
-
-**Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** the design ruling is the amendment's; [crate-tests-windows-flip](#crate-tests-windows-flip) follows its observed green.
-
-**Push need (2026-09-27, overrun granted by operator direction, lead-relayed):** one mid-iteration observation push, shared with [linux-glibc-artifacts](#linux-glibc-artifacts), since no local run reaches a Windows host.
-
-**Cost while deferred:** `crate-tests-windows` stays report-only, so a Windows crate-test regression passes every run as a warning. The operator's cut-and-defer residue of `crate-tests-windows-failures` (operator direction 2026-09-26, lead session). Filed 2026-09-26 to the gap inbox by its build; promoted 2026-09-26 at capture-integrity-brevity's close: →fix fails because both remedies are design-bearing and one reverses a stated rule. Re-verified: run 36264222274 reads 1169 passed, 2 failed, the pair above, on both triples. Owner lookup: `stub-bin`, `gate-binary-fresh`, `PATHEXT` in this file — none; owner gate-sdk/SPEC.md §check-gate-binary-fresh.
+**Push need (2026-09-27, overrun granted by operator direction, lead-relayed):** the mid-iteration observation push, shared with `windows-fresh-fixture-stub`, that joins the gnu lines under the file's predicate; then the release tag beside the closing push, since v0.27.0 is held on this.
 
 ## Technical Debt
 
 ### crate-tests-windows-flip
 
-[blocked-by: windows-fresh-fixture-stub] [observed-by: gates]
+[observed-by: gates]
 
 `crate-tests-windows` in `.github/workflows/gates.yml` carries a hard-coded `continue-on-error: true`; once one run is green on both triples it moves to the `matrix.held` expression `install-smoke-pwsh-windows` reads, and the reports-until-green sentences leave gate-sdk/SPEC.md §check-crate-arms and the capture-drain limit in §The workflow directory.
 
-**Deliverable:** that flip and those deletions, in one commit, after [windows-fresh-fixture-stub](#windows-fresh-fixture-stub) lands.
+**Deliverable:** that flip and those deletions, in one commit, after `windows-fresh-fixture-stub` lands.
 
 **Promoted as debt 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** the flip converges the job on the `matrix.held` convention and adds no name. Precondition (1) of the catalog submission, on the operator's ground that red jobs inside a green run read as ignored failures.
 
-**Push need (2026-09-27, overrun granted by operator direction, lead-relayed):** the mid-iteration observation push [windows-fresh-fixture-stub](#windows-fresh-fixture-stub) spends supplies the green run this reads; the flip rides the closing push.
+**Push need (2026-09-27, overrun granted by operator direction, lead-relayed):** the mid-iteration observation push `windows-fresh-fixture-stub` spends supplies the green run this reads; the flip rides the closing push.
 
 **Cost while deferred:** a Windows crate-test failure passes every run as a warning only close reads. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's build as the follow-up crate-tests-unrun-on-windows' amendment ordered; promoted 2026-09-26 at its close: →fix fails because the job has no green run yet. Re-verified 2026-09-27 at scope: `gates.yml` reads `continue-on-error: true`, and run 36338295147 still fails the registry pair on both triples.
 
@@ -774,7 +760,7 @@ a session editing the crate in a linked worktree cannot land its commit there. `
 
 **Deliverable:** the crate's test arm and the hook green in a linked worktree, or the refusal stated as the contract with the tests pinning it.
 
-**Cost while deferred:** a worktree session's crate commit rests on a main-checkout re-run. Filed 2026-09-27 to the gap inbox as two bullets by the front-door hotfix; promoted 2026-09-27 at companion-catalog-extension's close: →fix fails because the hook cause is unprobed and the test's shape is a contract call. Re-verified: `native/src/gates/crate_arms.rs` refuses in a linked worktree lacking a stamp. Owner lookup: `linked worktree`, `gate-binary-fresh`, `crate-arms` in this file — [windows-fresh-fixture-stub](#windows-fresh-fixture-stub), DISTINCT (the same test pair, red on Windows for a stub it cannot start); owner gate-sdk/SPEC.md §check-crate-arms.
+**Cost while deferred:** a worktree session's crate commit rests on a main-checkout re-run. Filed 2026-09-27 to the gap inbox as two bullets by the front-door hotfix; promoted 2026-09-27 at companion-catalog-extension's close: →fix fails because the hook cause is unprobed and the test's shape is a contract call. Re-verified: `native/src/gates/crate_arms.rs` refuses in a linked worktree lacking a stamp. Owner lookup: `linked worktree`, `gate-binary-fresh`, `crate-arms` in this file — `windows-fresh-fixture-stub`, DISTINCT (the same test pair, red on Windows for a stub it cannot start); owner gate-sdk/SPEC.md §check-crate-arms.
 
 ### piped-install-argument-witness
 
@@ -1521,5 +1507,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - install-platform-release-gap
 - consumer-scratch-unignored
 - foreign-spec-lifecycle-unowned
+- windows-fresh-fixture-stub
 
 ## Lessons Learned
