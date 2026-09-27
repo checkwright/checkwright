@@ -8,6 +8,20 @@
 
 ## New Features
 
+### lead-writes-during-live-stage
+
+[spec: SPEC-lead-writes.md]
+
+the lead template's capture rule (lifecycle-kit/templates/lead.md §Stamps are authoritative) bounds only tracked captures while a dispatched stage session is live. During non-gate-arm-contract's validate the lead created a linked worktree at `.tmp/probe-wt` for a read probe, and removed validate's live reproduction worktrees after calling them obsolete without reading their provenance; the operator instructed the removal on that description.
+
+**Deliverable:** the lead template bars any lead mutation of the checkout or a linked worktree while a stage session is live, gitignored scratch included, a probe running after the stage or outside the checkout; and it requires a worktree's provenance to be read before it is called stale.
+
+**Taken for /spec 2026-09-27 at companion-catalog-extension's scope, operator direction lead-relayed (not a /consult ruling):** unit set B; its amendment lands before [lifecycle-template-brevity](#lifecycle-template-brevity) passes the lead template's section.
+
+**Grounds settled at spec:** the scratch clause rests on the removal and on a lead's liveness record under a scratch directory, which blocks every session's `git` writes while its pid lives (guard-kit/SPEC.md §The generic ruleset). The one-off upgrade-suite red stays unexplained: the probe worktree's presence did not reproduce it, concurrent lead activity in that worktree was never run, and no delta rests on either.
+
+**Cost while deferred:** a lead can destroy a live stage's evidence on a description nobody checked. Filed 2026-09-26 to the gap inbox by the lead on its own error; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because the rule widens a shipped template's contract and its scope is a design call. Re-verified at the drain: the removal is recorded in both the validate and lead journals.
+
 ## Technical Debt
 
 ### lifecycle-template-brevity
@@ -573,20 +587,6 @@ the consult inbox needs a drain trigger and a status cue, on an operator directi
 **Deliverable:** both halves, with the open question stated in lifecycle-kit/SPEC.md §The steering vocabulary rather than assumed: whether an operator answer relayed through the lead into a dispatched consult is a ruling.
 
 **Cost while deferred:** the inbox, once it lands, is drained only when an operator remembers it. Filed 2026-09-26 to the gap inbox by the lead, extending the consult-inbox bullet; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails on the same amendment ground. Re-verified at the drain: `statusline.rs` reads `queue_counts::emit`. Owner lookup: `statusline counter`, `counter group` in this file — none.
-
-### lead-writes-during-live-stage
-
-[cost: event/low] [surface: lifecycle-kit]
-
-the lead template's capture rule (lifecycle-kit/templates/lead.md §Stamps are authoritative) bounds only tracked captures while a dispatched stage session is live. During non-gate-arm-contract's validate the lead created a linked worktree at `.tmp/probe-wt` for a read probe, and removed validate's live reproduction worktrees after calling them obsolete without reading their provenance; the operator instructed the removal on that description.
-
-**Deliverable:** the lead template bars any lead mutation of the checkout or a linked worktree while a stage session is live, gitignored scratch included, a probe running after the stage or outside the checkout; and it requires a worktree's provenance to be read before it is called stale.
-
-**Taken for /spec 2026-09-27 at companion-catalog-extension's scope, operator direction lead-relayed (not a /consult ruling):** unit set B; its amendment lands before [lifecycle-template-brevity](#lifecycle-template-brevity) passes the lead template's section.
-
-**Cost while deferred:** a lead can destroy a live stage's evidence on a description nobody checked. Filed 2026-09-26 to the gap inbox by the lead on its own error; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because the rule widens a shipped template's contract and its scope is a design call. Re-verified at the drain: the removal is recorded in both the validate and lead journals. The filer's inferred cause, that the probe worktree reddened validate's first upgrade suite, did not reproduce: `--upgrade-smoke` ran clean with a linked worktree at `.tmp/probe-wt`. The gitignored-scratch clause therefore rests on no attested harm.
-
-**Inferred, not run:** concurrent lead activity in that worktree, rather than its presence, caused the one-off red — `bash gate-sdk/bin/run-gates.sh --upgrade-smoke` while a second session runs the battery inside a linked worktree under `.tmp/`
 
 ### windows-fresh-fixture-stub
 
