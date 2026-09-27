@@ -27,8 +27,8 @@ Adoption evidence, mostly. A rung promotes when someone hits the friction it des
 
 ### next
 
-- [plugin-marketplace](TASK-QUEUE.md#plugin-marketplace) *(ecosystem)* — The stage skills and guards installable as a harness plugin.
 - [companion-toolkit-profile](TASK-QUEUE.md#companion-toolkit-profile) *(ecosystem)* — Gate a tree whose specs another toolkit's workflow wrote.
+- [plugin-marketplace](TASK-QUEUE.md#plugin-marketplace) *(ecosystem)* — The stage skills and guards installable as a harness plugin.
 - [gate-authoring-sdk-surface](TASK-QUEUE.md#gate-authoring-sdk-surface) *(ecosystem)* — Author a gate in any language behind one substrate-neutral descriptor.
 
 ### later
