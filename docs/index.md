@@ -86,7 +86,7 @@ Which harnesses it runs under, and what adapts to yours: the [tiered compatibili
 
 ## The kits
 
-One page per kit, in reading order — each kit assumes the machinery of the ones above it. The full map, with a one-line gloss per kit, lives on the [Kit Reference](kits.md) page.
+Each kit has its own page, listed in reading order under [Kit Reference](kits.md) in the navigation, and each assumes the machinery of the ones above it. The Kit Reference page glosses every kit in one line.
 
 ## Positioning
 

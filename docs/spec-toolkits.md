@@ -21,7 +21,7 @@ A citation's path is read from the repository root, so write `specs/001-login/sp
 
 These four are document hygiene: they hold your specs together as documents. None of them checks that your code does what a spec says.
 
-The pre-commit hook catches them early, but `git commit --no-verify` skips it. The guarantee is CI. `init` commits a workflow that runs the battery on every push and pull request, and once you make its check required in your branch protection, a red battery blocks the merge. [Managing](install.md#managing) says where to keep that check.
+The pre-commit hook catches them early, but `git commit --no-verify` skips it. The guarantee is CI: `init` commits a workflow that runs the battery, and once its check is required, a red battery blocks the merge ([Requiring the CI check](install.md#requiring-the-ci-check)).
 
 ## Spec Kit
 
@@ -87,11 +87,11 @@ From the repository root, in `sh` (on Windows, Git for Windows' `sh`), with `rec
 
 It appends the recipe's knob lines to your gate configuration, drops the gates the recipe names from `scripts/gates.list`, regenerates the pre-commit hook and the coupling graph, and runs the battery. On green it commits the `scripts/` directory; on red it stops before the commit and each red gate names its fix.
 
-Running lifecycle-kit's stage machine as well? Install `full` instead of `prose`, and on OpenSpec apply `companion/openspec/lifecycle/` with the same block, fetching its `lifecycle-config.knobs` and `unregister.list` as you fetched the recipe. The layer lets the stage machine read OpenSpec's in-flight changes, so a change touching two capabilities owes the align stage before build. Spec Kit has no lifecycle layer ([companion/SPEC.md §The lifecycle layer](companion/SPEC.md#the-lifecycle-layer)).
+Running lifecycle-kit's stage machine as well? Install `full` instead of `prose`, and on OpenSpec apply `companion/openspec/lifecycle/` with the same block, fetching its `lifecycle-config.knobs` and `unregister.list` into a fresh directory as you fetched the recipe. The layer lets the stage machine read OpenSpec's in-flight changes, so a change touching two capabilities owes the align stage before build. Spec Kit has no lifecycle layer ([companion/SPEC.md §The lifecycle layer](companion/SPEC.md#the-lifecycle-layer)).
 
 ## What is tested
 
-Every push installs the profile on a tree in each toolkit's layout, applies the recipe with the block above, and asserts the battery green. It then plants each of the four defects and asserts the gate that owns it reds. The same run installs the extension with Spec Kit's own command and validates the OpenSpec tree with OpenSpec's own validator. On OpenSpec it also applies the lifecycle layer to a `full` install and asserts that a change touching two capabilities demands the align stage. The versions tested are pinned in [`companion/toolkits.list`](https://github.com/checkwright/checkwright/blob/master/companion/toolkits.list). The recipes, the fixture trees and their design are under [`companion/`](companion/SPEC.md).
+Every push to Checkwright's repository installs the profile on a tree in each toolkit's layout, applies the recipe with the block above, and asserts the battery green. It then plants each of the four defects and asserts the gate that owns it reds. The same run installs the extension with Spec Kit's own command and validates the OpenSpec tree with OpenSpec's own validator. On OpenSpec it also applies the lifecycle layer to a `full` install and asserts that a change touching two capabilities demands the align stage. The versions tested are pinned in [`companion/toolkits.list`](https://github.com/checkwright/checkwright/blob/master/companion/toolkits.list). The recipes, the fixture trees and their design are under [`companion/`](companion/SPEC.md).
 
 ## Limits
 

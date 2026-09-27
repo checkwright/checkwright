@@ -223,7 +223,9 @@ Moving to a profile that contains yours only adds. `init` refuses outside a git 
 
 `uninstall` removes only files `init` wrote and you left untouched. It keeps and reports any you edited, and never removes a file you wrote. Run it with `--dry-run` first to see the plan. A remedy block changes your machine and not your repository, so `uninstall` leaves it in place.
 
-The pre-commit hook is a local backstop anyone can skip. `init` also commits `.github/workflows/gates.yml`, which runs the battery on every push and pull request at the release you installed and marks each red on the pull request. Make its check required, so a red battery blocks the merge, and keep that check where the authors it holds cannot edit it.
+### Requiring the CI check
+
+The pre-commit hook is a local backstop anyone can skip. `init` also commits `.github/workflows/gates.yml`, which runs the battery on every push and pull request at the release you installed and marks each red on the pull request. Make its check required in your branch protection, so a red battery blocks the merge, and keep the workflow file where the authors it checks cannot edit it.
 
 ## Upgrading
 

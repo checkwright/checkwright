@@ -31,8 +31,8 @@
 1351cp docs/evidence-kit/index.md
 1472cp docs/gate-sdk/index.md
 1259cp docs/guard-kit/index.md
-5222cp docs/index.md
-16301cp docs/install.md
+5251cp docs/index.md
+16362cp docs/install.md
 1344cp docs/kits.md
 1395cp docs/lifecycle-kit/index.md
 3007cp docs/methodology.md
@@ -69,7 +69,7 @@
 789cp docs/releases.md
 39578cp docs/site-architecture.md
 2412cp docs/site-kit/index.md
-6778cp docs/spec-toolkits.md
+6765cp docs/spec-toolkits.md
 2477cp docs/value.md
 35405cp doctrine-kit/SPEC.md
 141064cp drift-kit/SPEC.md

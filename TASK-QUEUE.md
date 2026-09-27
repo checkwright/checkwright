@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### catalog-landing-docs-polish
-
-the pages a Spec Kit catalog visitor reaches are not yet polished for that one-shot exposure: the extension's `repository` and `homepage` (README.md, docs/index.md), its README (companion/speckit/README.md), and the landing page with the install page it routes to (docs/spec-toolkits.md, docs/install.md). The `catalog-then-plugin` ruling puts their polish before the submission; the page-authoring rules and the one-product statement have landed, so what remains is the polish itself (operator direction 2026-09-27, lead session).
-
-**Deliverable:** a catalog visitor's read through those five pages against docs/site-architecture.md §Page-authoring rules, each finding fixed on the page or filed costed. It runs last in the set, after the platforms table, the guarantee statement and the lifecycle binding have changed those pages.
-
-**Promoted as debt 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** convergence on the landed page-authoring rules, adding no name; bounded to the pages the extension manifest and the landing page link. Precondition (3) of the catalog submission.
-
-**Cost while deferred:** the listing sends its visitors to pages no reader-journey pass has read. Filed 2026-09-27 to the gap inbox by the lead after companion-catalog-extension's close. Owner lookup: `polish`, `landing page` in this file — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (the submission); owner docs/site-architecture.md §Page-authoring rules.
-
 ## Deferred
 
 ### shellcheck-extra-dirs-trigger
@@ -198,7 +188,7 @@ the interop rung's submission half. The build half landed at companion-catalog-e
 
 **Deliverable:** the Spec Kit community-catalog submission, filed as the catalog's Extension Submission issue with its `download_url` naming the `checkwright-companion-<version>.zip` Release asset; the extension's README and the landing page then gain the catalog's install form.
 
-**Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **Ranked behind four preconditions the operator set on 2026-09-27:** `crate-tests-windows-flip`, since red jobs inside a green run read as ignored failures; `linux-glibc-artifacts`; [catalog-landing-docs-polish](#catalog-landing-docs-polish); and `spec-toolkits-guarantee`.
+**Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **Ranked behind four preconditions the operator set on 2026-09-27:** `crate-tests-windows-flip`, since red jobs inside a green run read as ignored failures; `linux-glibc-artifacts`; `catalog-landing-docs-polish`; and `spec-toolkits-guarantee`.
 
 **Push need (2026-09-27, inside the budget):** the release tag push beside the closing push, since the submission needs the extension on a published tag; close's release policy decides the cut.
 
@@ -1473,5 +1463,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - linux-glibc-artifacts
 - crate-tests-windows-flip
 - spec-toolkits-guarantee
+- catalog-landing-docs-polish
 
 ## Lessons Learned
