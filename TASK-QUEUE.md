@@ -188,7 +188,7 @@ the interop rung's submission half. The build half landed at companion-catalog-e
 
 **Deliverable:** the Spec Kit community-catalog submission, filed as the catalog's Extension Submission issue with its `download_url` naming the `checkwright-companion-<version>.zip` Release asset; the extension's README and the landing page then gain the catalog's install form.
 
-**Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install.
+**Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **Ranked behind four preconditions the operator set on 2026-09-27:** [crate-tests-windows-flip](#crate-tests-windows-flip), since red jobs inside a green run read as ignored failures; [linux-glibc-artifacts](#linux-glibc-artifacts); [catalog-landing-docs-polish](#catalog-landing-docs-polish); and [spec-toolkits-guarantee](#spec-toolkits-guarantee).
 
 **Push need (2026-09-27, inside the budget):** the release tag push beside the closing push, since the submission needs the extension on a published tag; close's release policy decides the cut.
 
@@ -837,6 +837,36 @@ the site has no rule for video, and the operator wants short intro and demo vide
 **Deliverable:** a page-authoring rule in docs/site-architecture.md admitting only the poster-link form, a gate reding an `<iframe>` or a third-party `src=` in docs pages, and first homes on docs/spec-toolkits.md and the front door.
 
 **Cost while deferred:** a video lands with no rule, and an embed would add the site's first third-party request. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's lead; promoted 2026-09-27 at its close: →fix fails because the gate is new mechanism. Re-verified: `docs/_layouts/default.html` loads only local assets, and `check-docs-render-fidelity` lists `iframe` as a known tag without refusing it. Owner lookup: `video`, `iframe`, `YouTube` in this file — none; owner docs/site-architecture.md §Page-authoring rules.
+
+### linux-glibc-artifacts
+
+[cost: event/high] [surface: installer]
+
+the next release would publish no glibc Linux gate binary: platform-prerequisite-floors replaced the two `*-linux-gnu` lines of `native/targets.list` with the `*-linux-musl` pair, over the hybrid that would publish both. The operator wants glibc artifacts published beside musl before the next tag (operator direction 2026-09-27, lead-relayed at companion-catalog-extension's close), and v0.27.0 is held on it.
+
+**Deliverable:** the gnu triples back in `native/targets.list` and `native/runners.list` beside musl, joined under that file's predicate; the installer's host-to-artifact choice between them on a Linux host; docs/install.md's platforms table and the release declarations to match.
+
+**Cost while deferred:** docs/spec-toolkits.md, live and linked from the front door, sends adopters to Release assets no tag yet carries, since v0.26.0 predates `companion/`, and that tag waits on this. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's close; promoted 2026-09-27 at the next iteration's scope. Re-verified: `native/targets.list` lists only the musl Linux triples, and `gh release view v0.26.0` lists only the gnu Linux archives. Owner lookup: `glibc`, `linux-gnu`, `targets.list` in this file — [install-platform-release-gap](#install-platform-release-gap), [musl-dev-binary](#musl-dev-binary) and [musl-smoke-build-wrapper](#musl-smoke-build-wrapper), DISTINCT (the page-to-gate binding; the dev binary; the smoke's hand-off); owner gate-sdk/SPEC.md §Consumer payload. Surface also gate-sdk.
+
+### spec-toolkits-guarantee
+
+[cost: event/high] [surface: docs]
+
+docs/spec-toolkits.md says four defect classes "fail at commit and in CI" and never states what that guarantees: the pre-commit hook is skippable with `--no-verify`, so the guarantee is CI run as a required status check under branch protection, and the page does not say so. It also leaves unsaid that the four classes are document hygiene, not spec-to-code conformance. The operator found the page unconvincing (operator direction 2026-09-27, lead session).
+
+**Deliverable:** the page states the guarantee and its setup (the seeded CI workflow as a required status check), names the four classes as document hygiene and not conformance, and keeps its limit that the extension's commands and hook are agent-followed.
+
+**Cost while deferred:** the catalog's one-shot exposure lands on a page whose claim a skeptical reader cannot place. Filed 2026-09-27 to the gap inbox by the lead after companion-catalog-extension's close, as precondition (4) of the catalog submission; promoted 2026-09-27 at the next iteration's scope. Re-verified: the page carries no `required`, `--no-verify` or branch-protection sentence. Owner lookup: `spec-toolkits`, `guarantee` in this file — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (the submission this gates); owner companion/SPEC.md. Surface also companion.
+
+### catalog-landing-docs-polish
+
+[cost: event/high] [surface: docs]
+
+the pages a Spec Kit catalog visitor reaches are not yet polished for that one-shot exposure: the extension's `repository` and `homepage` (README.md, docs/index.md), its README (companion/speckit/README.md), and the landing page with the install page it routes to (docs/spec-toolkits.md, docs/install.md). The `catalog-then-plugin` ruling puts their polish before the submission; the page-authoring rules and the one-product statement have landed, so what remains is the polish itself (operator direction 2026-09-27, lead session).
+
+**Deliverable:** a catalog visitor's read through those five pages against docs/site-architecture.md §Page-authoring rules, each finding fixed on the page or filed costed.
+
+**Cost while deferred:** the listing sends its visitors to pages no reader-journey pass has read. Filed 2026-09-27 to the gap inbox by the lead after companion-catalog-extension's close, as precondition (3) of the catalog submission; promoted 2026-09-27 at the next iteration's scope, bounded to the pages the extension manifest and the landing page link. Owner lookup: `polish`, `landing page` in this file — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (the submission); owner docs/site-architecture.md §Page-authoring rules. Surface also companion.
 
 ## Icebox
 
