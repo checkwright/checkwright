@@ -84,6 +84,12 @@
 #     install-smoke leg adopted THAT upload from the hand-off, reached the
 #     artifact-present branch (`artifact: <triple> verified in place`) at every
 #     profile and finished `INSTALLER-SMOKE: clean`.
+#   - The two musl lines rest on run 36309690552, one run for both: each
+#     `native-artifacts` leg built its triple on its own runner and printed
+#     `static, no loader or shared library needed`, and each Linux install-smoke
+#     leg adopted THAT upload from the hand-off, reached the artifact-present
+#     branch at every profile and finished `INSTALLER-SMOKE: clean`; the x86_64
+#     leg also ran the artifact on an alpine and a glibc 2.36 debian host.
 #
 # This is not a narrowing of the direction — the adopter constraints
 # (gate-sdk/SPEC.md §The adopter constraints) are the direction and this roster
@@ -114,7 +120,9 @@
 # nothing on that path, and one on a class they do not costs its own floor first.
 # gate-sdk/SPEC.md §Consumer payload owns both halves;
 # installer/SPEC.md §The consumer smoke owns the smoke's own side of it.
+x86_64-unknown-linux-musl
 aarch64-apple-darwin
 x86_64-apple-darwin
 x86_64-pc-windows-msvc
+aarch64-unknown-linux-musl
 aarch64-pc-windows-msvc

@@ -16,39 +16,11 @@ the native crate's unit tests run on x86_64 Linux (the battery) and on the two W
 
 **Deliverable:** a `crate-tests-unix` job running `cargo test` on every declared non-Windows triple except the battery's own, its legs derived by the roster job.
 
-**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** the theme's "wide platform/OS support" (operator direction, 2026-09-27) wants every published triple tested. Any musl triple [linux-musl-artifacts](#linux-musl-artifacts) adds joins the legs by derivation.
+**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** the theme's "wide platform/OS support" (operator direction, 2026-09-27) wants every published triple tested. Any musl triple `linux-musl-artifacts` adds joins the legs by derivation.
 
 **Push need (2026-09-27, inside the budget):** the new legs run only remotely; they ride the one mid-iteration push `comment-tier-surface-excludes-ci-workflows` names.
 
 **Cost while deferred:** a platform-specific regression on those hosts reaches no test. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's spec; promoted 2026-09-26 at its close: →fix fails because a new CI leg is a unit scope must admit. Owner: gate-sdk/SPEC.md §check-crate-arms.
-
-### linux-musl-artifacts
-
-[spec: SPEC-linux-musl.md]
-
-no `*-linux-musl` gate binary is published: `native/targets.list` carries only the two linux-gnu triples, installer/SPEC.md §The gate binary refuses a musl host at its libc row, and docs/install.md never names musl, so an Alpine or other musl host is turned away at the install's first step with no route offered.
-
-**Deliverable:** the amendment's static musl artifacts for both Linux triples, declared held with the detectors, roster and libc check moved in one commit, the shared build body holding them static, both Linux install-smoke legs consuming them and a musl and an old-glibc host witnessing them, then the join on the mid-iteration run.
-
-**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** the theme's "wide platform/OS support" (operator direction, 2026-09-27). Route ruled at /spec, operator direction 2026-09-27, lead-relayed (not a /consult ruling): the static musl binary serves every Linux host, the Linux contributor's musl standard library for the local consumer smoke accepted.
-
-**Push need (2026-09-27, inside the budget):** the musl legs run only remotely; they ride the one mid-iteration push `comment-tier-surface-excludes-ci-workflows` names, and the join commit rides the close push.
-
-**Cost while deferred:** every musl host is refused. Filed 2026-09-27 at platform-prerequisite-floors's scope, from the lead's probe. Owner: installer/SPEC.md §The gate binary.
-
-### glibc-floor-lowering
-
-[spec: SPEC-linux-musl.md]
-
-the Linux gate binary needs glibc 2.39: `pidfd_spawnp` and `pidfd_getpid` bind `GLIBC_2.39`, everything else 2.34 or below, measured on v0.26.0's x86_64 and aarch64 linux-gnu archives. So Debian 12, RHEL 9 and Ubuntu 22.04 hosts meet a loader failure.
-
-**Deliverable:** the glibc floor retired rather than lowered, by [linux-musl-artifacts](#linux-musl-artifacts)'s static artifact, which the amendment measured running on glibc 2.36 and 2.35 hosts and which its install-smoke step witnesses on a glibc-2.36 container every run.
-
-**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** /spec measured a musl build and escalated the route. Route ruled at /spec, operator direction 2026-09-27, lead-relayed (not a /consult ruling): musl static served to every Linux host, over an older build image, a glibc-versioned cross toolchain, musl for musl hosts only, and a hybrid.
-
-**Push need (2026-09-27, inside the budget):** rides [linux-musl-artifacts](#linux-musl-artifacts)'s two pushes.
-
-**Cost while deferred:** every evaluator on those distributions is turned away at the install's first step. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's build; promoted 2026-09-27 at its close. Owner: installer/SPEC.md §Requirements.
 
 ## Technical Debt
 
@@ -1403,5 +1375,7 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - uninstall-artifact-ownership-asymmetry
 - prerequisite-floor-versions
 - comment-tier-surface-excludes-ci-workflows
+- linux-musl-artifacts
+- glibc-floor-lowering
 
 ## Lessons Learned

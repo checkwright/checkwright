@@ -15,8 +15,8 @@ An install is possible only on a system below, where a prebuilt gate binary is p
 
 | System | Minimum | Binary | Status |
 |---|---|---|---|
-| Linux on x86-64, and WSL | Linux 3.2 | `x86_64-unknown-linux-musl` | held: one `gates` run carrying a `native-artifacts` green for this triple and a green `install-smoke-sh-linux` that consumed that upload |
-| Linux on arm64 | Linux 4.1 | `aarch64-unknown-linux-musl` | held: one `gates` run carrying a `native-artifacts` green for this triple and a green `install-smoke-sh-linux-arm64` that consumed that upload |
+| Linux on x86-64, and WSL | Linux 3.2 | `x86_64-unknown-linux-musl` | joined |
+| Linux on arm64 | Linux 4.1 | `aarch64-unknown-linux-musl` | joined |
 | macOS on Apple silicon | macOS 11 | `aarch64-apple-darwin` | joined |
 | macOS on Intel | macOS 10.12 | `x86_64-apple-darwin` | joined |
 | Windows on x86-64 | Windows 10 | `x86_64-pc-windows-msvc` | joined |
