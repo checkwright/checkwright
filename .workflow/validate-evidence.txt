@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+companion-catalog-extension gates sha256=8d60d28acfbe613966fa0c05823d400fe5daad129c6bd339b8534f1800b670f3 pass=141 fail=0 ignore=0 verdict=clean 2026-09-27
+companion-catalog-extension gate_sdk sha256=754fceb4addff652c31443cc80edb7fd86da22a6751d6a985b726be116728b35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-27
+companion-catalog-extension canon_kit sha256=c8c86659070467fdef475b9ab59e091b4a29e93a353b0e30a310c03878820242 pass=1 fail=0 ignore=0 verdict=clean 2026-09-27
+companion-catalog-extension context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-27
+companion-catalog-extension delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-27
+companion-catalog-extension doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-27
+companion-catalog-extension evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-27
+companion-catalog-extension guard_kit sha256=01d94b4120e133665e01946fe44d31a730d2c6cdfd1570e5ce6b96a7a1b30e1b pass=1 fail=0 ignore=0 verdict=clean 2026-09-27
+companion-catalog-extension lifecycle_kit sha256=0a16a2be3f1e408582252ab47d92fd8628178950f6367b1711422c95d7a0d8b0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-27
+companion-catalog-extension queue_kit sha256=5880c4840de8628f0c320fd728dd3e425a92b6d1554f5e56ce403a8d8b13f3c5 pass=1 fail=0 ignore=0 verdict=clean 2026-09-27
+companion-catalog-extension site_kit sha256=a2ca733bb2ca535152b4188d3a9b1e15ad84eae97a5268ff2cfe171c8fb97c32 pass=1 fail=0 ignore=0 verdict=clean 2026-09-27
+companion-catalog-extension scripts sha256=49aedef2c95f338de95a7ff54ef51ed9deae9baf39e93d24f6c4c2ed960073e9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-27
+companion-catalog-extension guard_tests sha256=50af7da51cc1a15eb9e72dea81613ec0b82b4b73a8faba1987ef537271e9ee9a pass=1 fail=0 ignore=0 verdict=clean 2026-09-27
+companion-catalog-extension demo sha256=b5884da445a8f5f6938ed11d92c5e01e03dbf033271324ae6a568cf30dc4cc07 pass=1 fail=0 ignore=0 verdict=clean 2026-09-27
+companion-catalog-extension installer_smoke sha256=976f3795e5512e06cbc86cf25abd426a88374d99e186eb91ec1ba52d14799810 pass=20 fail=0 ignore=0 verdict=clean 2026-09-27
+companion-catalog-extension consumer_smoke sha256=560537bdedfc515024707256486ecd9533f355dc8428abc8397aafeb73ea2aa8 pass=1 fail=0 ignore=0 verdict=clean 2026-09-27
+companion-catalog-extension upgrade sha256=576715cf72b42dd05e77e72705ed5b22eb761a6d2b1ff4aeb71b6fd560e7665d pass=1 fail=0 ignore=0 verdict=clean 2026-09-27
+companion-catalog-extension agents_md_smoke sha256=700e278512d7e79e08f3b3f2ee2c7282c8fe7f390823e070634b09583dc772f5 pass=1 fail=0 ignore=0 verdict=clean 2026-09-27
+companion-catalog-extension index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-27
+companion-catalog-extension native_crate sha256=f89fc0e54e506c2363d5e8e8592c3f471319d3f63997a1370968b3c402778c01 pass=1 fail=0 ignore=0 verdict=clean 2026-09-27
+companion-catalog-extension projection_witness sha256=6143ab2257b4c4cfb40244d03d1b24f2f4f2732df06fd7d5a809e631077c7c0c pass=1 fail=0 ignore=0 verdict=clean 2026-09-27
