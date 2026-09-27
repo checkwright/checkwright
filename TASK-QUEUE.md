@@ -1508,8 +1508,4 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 ## Done
 
-- docs-ux-authoring-rules
-- lead-writes-during-live-stage
-- lifecycle-template-brevity
-
 ## Lessons Learned
