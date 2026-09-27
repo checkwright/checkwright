@@ -22,28 +22,6 @@ the lead template's capture rule (lifecycle-kit/templates/lead.md §Stamps are a
 
 **Cost while deferred:** a lead can destroy a live stage's evidence on a description nobody checked. Filed 2026-09-26 to the gap inbox by the lead on its own error; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because the rule widens a shipped template's contract and its scope is a design call. Re-verified at the drain: the removal is recorded in both the validate and lead journals.
 
-### companion-toolkit-profile
-
-[roadmap: next/ecosystem] [spec: SPEC-companion.md] [precondition-ok: the gated clause binds the submission half, which stays deferred after this slice] [roadmap-summary: Gate a tree whose specs another toolkit's workflow wrote.]
-
-the interop rung. Govern a tree whose specs an **external spec-authoring toolkit produced** — a consumer profile for when the specs Checkwright gates were written by a second toolkit's workflow, not by this one's `spec` stage. It cashes the claim below.
-
-**The shape is decided:** `prose-profile` (retired) ruled a profile ships as optional consumer config, never a kit literal, and [heterogeneous-agent-delegation](#heterogeneous-agent-delegation) rules a kit literal naming a vendor crosses the provenance seam. So it is a consumer-side profile over a declared artifact layout, the `check-graph` / `graph-vocab` pattern. Open is the substance: which lifecycle assumptions break when amendments are authored elsewhere.
-
-**Survey 2026-08-02 at scope, three corrections.** (1) The load-bearing knobs exist (`CANON_KIT_SPEC_NAME`, `_AMENDMENT_GLOB`, `_QUEUE_FILE`, `_DOD_MODE`; `LIFECYCLE_KIT_AMENDMENT_GLOB`, `_CONTRACT_TOKENS`): the work is proving them sufficient, not a profile format. (2) `check-stage-entry` assertion C's cross-component signal is `LIFECYCLE_KIT_CONTRACT_TOKENS` (default `SPEC.md`, `proto/`), so a foreign layout left unbound never fires it and skips the align audit with no red; `check-spec-pointer` breaks the same way on non-markdown artifacts. (3) `check-spec-derivable-section`/`check-spec-embedded-source` assume the canonical-spec-plus-amendment model, which many living per-feature specs fit at no knob setting.
-
-**Discharge pattern:** docs/positioning.md §The tiered compatibility claim is "tested, not asserted" through context-kit's `--agents-md-smoke`. No kit literal names an external spec toolkit; the names live in the companion package and its pages. The 2026-09-20 alternative, qualifying the claim instead, is answered by the `catalog-then-plugin` ruling, whose slice is the tested consumer.
-
-**First slice (consult, 2026-09-25):** a catalog extension plus a companion recipe for the second toolkit, packaged outside the kits the way `installer/` is.
-
-**Taken for /spec 2026-09-27 at companion-catalog-extension's scope, operator direction lead-relayed (not a /consult ruling), unit set B, split:** the first slice's build half — extension package, recipe, tested consumer, and the pages the catalog entry links to, polished under `docs-ux-authoring-rules`, which lands first. The submission stays here, gated on a published tag carrying the extension (the catalog installs from a tagged archive, submitted as an issue) and on [design-partner-preview](#design-partner-preview)'s observed install.
-
-**Settled at spec (2026-09-27), measured on scratch trees with the published prose profile:** each toolkit's recipe is a few lines of existing knobs plus one dropped gate for Spec Kit, so correction (1) held for the prose profile. Correction (3)'s two gates stayed green on both trees. Correction (2), a lifecycle stage machine over a foreign workflow, is outside this slice and stays open here.
-
-**Push need (2026-09-27, inside the budget):** the release tag push beside the closing push, since the submission needs the extension on a published tag; close's release policy decides the cut.
-
-**Cost while deferred — not zero.** `README.md` points at the claim and docs/index.md asserts on the first screen "It complements the workflow you already run", with docs/orchestration.md making the same move for orchestration; no tested consumer backs any of them. Not false, but published and unproven in a project whose pitch is mechanical proof — a reputational carry on every reader. Surfaced 2026-08-02 at close, intake pass over the review's unfiled half.
-
 ## Technical Debt
 
 ### lifecycle-template-brevity
@@ -225,6 +203,20 @@ first-class support for swapping the Anthropic OAuth credential out from under i
 **Cost while deferred:** any background swap today silently corrupts the burn projection and can breach the combined budget ceiling with every account reading individually safe; and the login window over-STALEs by ~10x.
 
 **Seam:** all four are generic delegation-kit mechanism — the account-id is already on the `usage.txt` contract; nothing consumer-specific is added. This is the budget-oracle prerequisite cluster heterogeneous-agent-delegation cross-references. Surfaced 2026-07-17 in the release-in-lifecycle session (kfric plus one operator-raised refinement).
+
+### companion-toolkit-profile
+
+[roadmap: next/ecosystem] [cost: event/high] [surface: lifecycle-kit] [roadmap-summary: Gate a tree whose specs another toolkit's workflow wrote.]
+
+the interop rung's submission half. The build half landed at companion-catalog-extension: `companion/` holds the Spec Kit extension and both recipes, the consumer smoke's companion arm proves them, and docs/spec-toolkits.md is their landing page (companion/SPEC.md).
+
+**Deliverable:** the Spec Kit community-catalog submission, filed as the catalog's Extension Submission issue with its `download_url` naming the `checkwright-companion-<version>.zip` Release asset; the extension's README and the landing page then gain the catalog's install form.
+
+**Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install.
+
+**Push need (2026-09-27, inside the budget):** the release tag push beside the closing push, since the submission needs the extension on a published tag; close's release policy decides the cut.
+
+**Cost while deferred:** the extension installs only from a Release URL a reader must already hold, so a Spec Kit user browsing the catalog, where adopters find enforcement extensions, does not find it. Surfaced 2026-08-02 at close; demoted 2026-09-27 at companion-catalog-extension's build, on its amendment's Definition of Done; survey correction (2), a lifecycle stage machine over a foreign workflow, went to the gap inbox.
 
 ### design-partner-preview
 

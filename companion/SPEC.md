@@ -8,7 +8,7 @@ The companion package puts Checkwright's gates over a repository whose specs ano
 
 - `toolkits.list` pins each toolkit, one `<toolkit> <package> <version>` line each. The toolkit name keys the line, the package is what the toolkit leg installs, and the version is what it pins and asserts (§The toolkit legs).
 - `<toolkit>/recipe/` holds a recipe (§Recipes).
-- `speckit/` is the Spec Kit extension around its recipe (§The Spec Kit extension).
+- `speckit/` is the Spec Kit extension around its recipe (§The Spec Kit extension). The directory is not named after the toolkit's repository, and a page links that repository at its root only, because `check-kit-ref-liveness` reds a `<name>-kit` path segment that names no kit root.
 - `fixtures/<toolkit>/` holds the fixture tree and its planted defects (§The fixtures).
 
 ## Recipes
@@ -81,6 +81,7 @@ The OpenSpec layout passes `openspec validate --all --strict` at the pin, so the
 - **`speckit.checkwright.install`** (`commands/install.md`) installs the release this extension version was tested with. It runs the one-line install with `CHECKWRIGHT_VERSION` set to `extension.version`, spelled with the verb, `init --profile prose`, since the line runs `init` only when given no argument. It then runs the commands `init` printed and the recipe block.
 - **`speckit.checkwright.check`** (`commands/check.md`) runs the battery and reports its verdict, each red with its finding and its `help:` line. It fixes nothing unasked.
 - **The `after_implement` hook** is optional and offers the check.
+- **`README.md`** says what the extension adds, how to install it and where the landing page is, which the catalog requires of a listed extension. Its description line in `extension.yml` stays under the catalog's 200 characters.
 
 Each command is an agent instruction. Spec Kit hands the command bodies and the hook to the agent and executes neither, and its claude integration renders the commands as skills.
 
@@ -102,7 +103,7 @@ A Spec Kit archive install looks for `extension.yml` at the archive's root or in
 
 The toolkits' own tools are oracles, and nothing here re-implements their schemas. The `companion-toolkits` job in `.github/workflows/gates.yml` reads `toolkits.list` and:
 
-1. installs the pinned `specify-cli`, runs `specify init --here --non-interactive --integration claude --script sh` in a scratch directory, and packs the extension at version `0.0.0`. It serves the zip from a local web server and installs it with `specify extension add checkwright --from <url>`, answering the trust prompt. It asserts exit 0, `.specify/extensions/checkwright/extension.yml` and the recipe present, and the hook registered in `.specify/extensions.yml`;
+1. installs the pinned `specify-cli`, runs `specify init --here --non-interactive --integration claude --script sh` in an empty scratch directory, since the non-interactive init refuses a non-empty one, and packs the extension at version `0.0.0`. It serves the zip from a local web server and installs it with `specify extension add checkwright --from <url>`, answering the trust prompt. It asserts exit 0, `.specify/extensions/checkwright/extension.yml` and the recipe present, and the hook registered in `.specify/extensions.yml`;
 2. asserts that `extension.yml`'s `requires.speckit_version` is `>=` the pinned version;
 3. runs the pinned `openspec validate --all --strict` inside a copy of `fixtures/openspec/layout/`.
 

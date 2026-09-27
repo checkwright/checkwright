@@ -16,7 +16,7 @@
 12421cp CLAUDE.md
 259913cp canon-kit/SPEC.md
 5785cp canon-kit/templates/SPEC-amendment.md
-12667cp companion/SPEC.md
+13159cp companion/SPEC.md
 130077cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
 269112cp delegation-kit/SPEC.md

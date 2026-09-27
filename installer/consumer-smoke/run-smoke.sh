@@ -1101,12 +1101,12 @@ $COMPANION_PAGE_BLOCK"
     done
     COMPANION_DONE+=("$tk")
 }
-printf 'companion arm: speckit (the Spec Kit recipe on its fixture tree, through the landing page and the extension command)\n'
+printf 'companion arm for speckit (the Spec Kit recipe on its fixture tree, through the landing page and the extension command)\n'
 companion_arm speckit
 c="$(companion_consumer speckit speckit-command "$COMPANION_EXT_RECIPE")" \
     || fail "companion arm, speckit: could not install the $COMPANION_PROFILE profile beside the extension's files"
 companion_green "speckit, the install command's block" "$c" "$COMPANION_CMD_BLOCK"
-printf 'companion arm: openspec (the OpenSpec recipe on its fixture tree, through the landing page)\n'
+printf 'companion arm for openspec (the OpenSpec recipe on its fixture tree, through the landing page)\n'
 companion_arm openspec
 [[ "$(printf '%s\n' "${COMPANION_DONE[@]}" | sort)" == "$(printf '%s\n' "${COMPANION_TOOLKITS[@]}" | sort)" ]] \
     || fail "companion arm: the recipe directories are [${COMPANION_TOOLKITS[*]}] and the arm ran [${COMPANION_DONE[*]}]; a recipe with no arm header is untested"
