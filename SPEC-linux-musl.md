@@ -28,11 +28,11 @@ The Linux gate binary is linked against glibc and binds `GLIBC_2.39`. Debian 12,
 
 ### (1) The crate builds warning-free for musl {mechanical}
 
-**Not yet applied.** In `native/src/hook/wakeup.rs` `local_stamp`, `let t = epoch as libc::time_t;` becomes `let t = epoch as _;`, so the cast's target is inferred from `localtime_r`'s parameter and no deprecated alias is named. `bash gate-sdk/bin/build-native.sh` is owed in the same commit.
+**Applied at build; the merge waits on the mid-iteration push's `gates` run being read.** In `native/src/hook/wakeup.rs` `local_stamp`, `let t = epoch as libc::time_t;` becomes `let t = epoch as _;`, so the cast's target is inferred from `localtime_r`'s parameter and no deprecated alias is named. `bash gate-sdk/bin/build-native.sh` is owed in the same commit.
 
 ### (2) The Linux rows, detectors and roster move to musl, held {design-bearing}
 
-**Not yet applied.** One commit:
+**Applied at build; the merge waits on the mid-iteration push's `gates` run being read.** One commit:
 - **The rows.** In docs/install.md's platform block the two Linux rows become:
   - `| Linux on x86-64, and WSL | Linux 3.2 | `x86_64-unknown-linux-musl` | held: one `gates` run carrying a `native-artifacts` green for this triple and a green `install-smoke-sh-linux` that consumed that upload |`
   - `| Linux on arm64 | Linux 4.1 | `aarch64-unknown-linux-musl` | held: one `gates` run carrying a `native-artifacts` green for this triple and a green `install-smoke-sh-linux-arm64` that consumed that upload |`
@@ -46,7 +46,7 @@ The Linux gate binary is linked against glibc and binds `GLIBC_2.39`. Debian 12,
 
 ### (3) The shared build body holds a musl artifact static {design-bearing}
 
-**Not yet applied.** `scripts/ci-build-artifact.sh`'s floor `case` gains `*-unknown-linux-musl) floor_lead=Linux floor_tool=static ;;`. Under `static` the body does three things:
+**Applied at build; the merge waits on the mid-iteration push's `gates` run being read.** `scripts/ci-build-artifact.sh`'s floor `case` gains `*-unknown-linux-musl) floor_lead=Linux floor_tool=static ;;`. Under `static` the body does three things:
 1. It requires the row's `Linux <version>` token, as it requires the glibc and macOS tokens.
 2. It refuses the artifact unless `readelf -d` lists no `NEEDED` entry and `readelf -l` lists no `INTERP` segment. A dynamically linked musl artifact would need a musl loader on every host, which would break the route.
 3. It prints `floor <target>: static, no loader or shared library needed; Linux <version> declared, not measured`.
@@ -55,7 +55,7 @@ The `*-unknown-linux-gnu` arm stays, as mechanism for any consumer declaring a g
 
 ### (4) The Linux install-smoke legs consume the musl uploads and witness foreign hosts {design-bearing}
 
-**Not yet applied.** In `.github/workflows/gates.yml`:
+**Applied at build; the merge waits on the mid-iteration push's `gates` run being read.** In `.github/workflows/gates.yml`:
 - **`install-smoke-sh-linux`** gains `needs: [native-artifacts, native-artifacts-roster]`. It gains the arm64 Linux leg's download, normalize and hand-off steps (`INSTALLER_SMOKE_ARTIFACTS_DIR`), so it installs the producer's x86_64 upload rather than a binary it built. That makes it the second half of the join predicate for `x86_64-unknown-linux-musl`. It stays binding through its baseline diff. It is the page-install, one-liner and CI-action witness for every Linux adopter, and a red on the served Linux artifact is a red master deserves. The comment at the diff step saying the binary comes from the smoke's own build arm now names the normalize step.
 - **A new step in that leg** runs the normalized artifact's `--list` inside a musl container and inside a glibc-2.36 container: `alpine:3.22` and `debian:12-slim`, each pinned by the digest build resolves when it lands. The step asserts exit 0 and a non-empty listing in each, so every run witnesses the route's claim that one artifact serves musl hosts and glibc hosts below the old floor.
 - **`install-smoke-sh-linux-arm64`**'s `runs-on` and `continue-on-error` keys become `['aarch64-unknown-linux-musl']`. Its probe step's libc report is deleted.
@@ -63,7 +63,7 @@ The `*-unknown-linux-gnu` arm stays, as mechanism for any consumer declaring a g
 
 ### (5) The consumer smoke takes its host triple from the bootstrap's detector {design-bearing}
 
-**Not yet applied.** A new `installer/consumer-smoke/host-target.sh`, POSIX sh. It extracts `host_arch`, `host_shape` and `target_of_host` from `installer/bin/checkwright.sh`, each bounded by its closing brace at column 0 (the shape `check-install-platforms` already pins and fails closed on). It evaluates them and prints `target_of_host`'s answer. It exits 2 on an extraction that finds no function or an unbounded body, and on an empty answer. So the smoke and the bootstrap cannot disagree about which artifact a host takes: the helper holds no mapping of its own. It carries a `no-port` header citing installer/SPEC.md §The consumer smoke's port disposition for `run-smoke.sh`, whose ground (a harness no payload carries) is the same.
+**Applied at build; the merge waits on the mid-iteration push's `gates` run being read.** A new `installer/consumer-smoke/host-target.sh`, POSIX sh. It extracts `host_arch`, `host_shape` and `target_of_host` from `installer/bin/checkwright.sh`, each bounded by its closing brace at column 0 (the shape `check-install-platforms` already pins and fails closed on). It evaluates them and prints `target_of_host`'s answer. It exits 2 on an extraction that finds no function or an unbounded body, and on an empty answer. So the smoke and the bootstrap cannot disagree about which artifact a host takes: the helper holds no mapping of its own. It carries a `no-port` header citing installer/SPEC.md §The consumer smoke's port disposition for `run-smoke.sh`, whose ground (a harness no payload carries) is the same.
 
 In `run-smoke.sh`:
 - `HOST_TARGET` is the helper's answer on every host.
@@ -75,11 +75,11 @@ On macOS and Windows hosts the helper answers the triple `rustc` would have. `ch
 
 ### (6) The contributor floor names the musl standard library {mechanical}
 
-**Not yet applied.** CONTRIBUTING.md's build-the-gate-binary bullet gains: "On Linux the consumer smoke builds the musl target the installer serves, so add its standard library once: `rustup target add x86_64-unknown-linux-musl` (or `aarch64-…` on arm64)." In installer/SPEC.md §The consumer smoke, the preflight paragraph ("`cargo` and `rustc` join the preflight …") is rewritten to state three things. The host triple is the bootstrap detector's answer, through the helper. On Linux the local build is `--target` that musl triple, whose standard library the contributor installs. The hand-off path needs neither compiler nor fallback. The contributor-side toolchain rows are not touched: the standard library is a component of the `cargo` member's toolchain, not a program `PATH` resolves.
+**Applied at build; the merge waits on the mid-iteration push's `gates` run being read.** CONTRIBUTING.md's build-the-gate-binary bullet gains: "On Linux the consumer smoke builds the musl target the installer serves, so add its standard library once: `rustup target add x86_64-unknown-linux-musl` (or `aarch64-…` on arm64)." In installer/SPEC.md §The consumer smoke, the preflight paragraph ("`cargo` and `rustc` join the preflight …") is rewritten to state three things. The host triple is the bootstrap detector's answer, through the helper. On Linux the local build is `--target` that musl triple, whose standard library the contributor installs. The hand-off path needs neither compiler nor fallback. The contributor-side toolchain rows are not touched: the standard library is a component of the `cargo` member's toolchain, not a program `PATH` resolves.
 
 ### (7) The SPECs and headers describe the static Linux artifact {mechanical}
 
-**Not yet applied.**
+**Applied at build; the merge waits on the mid-iteration push's `gates` run being read.**
 - **installer/SPEC.md §The gate binary.** The paragraph "**Neither input answers the libc question, …**" becomes:
 
   > **Neither input answers the libc question, and none is asked.** The Linux artifact is statically linked against musl, so it needs no C library from the host and runs on glibc and musl hosts alike. `uname -s`/`uname -m` and .NET's `OSPlatform`/`OSArchitecture` answer everything selection needs. An earlier glibc-linked artifact made the libc a second selection question with its own refusal row. The static artifact retired both.
@@ -108,7 +108,7 @@ It rides the close push, whose run is then binding on both triples. If the mid-i
 
 ### (9) The release declares the change {mechanical}
 
-**Not yet applied.** `.workflow/release-declarations.md` gets two Behavior changes bullets:
+**Applied at build; the merge waits on the mid-iteration push's `gates` run being read.** `.workflow/release-declarations.md` gets two Behavior changes bullets:
 - The Linux gate binary is now statically linked against musl, published as `x86_64-unknown-linux-musl` and `aarch64-unknown-linux-musl` in place of the two `*-linux-gnu` triples. It runs on any Linux kernel 3.2 or later (4.1 on arm64), whatever the host's C library, where it needed glibc 2.39. A musl host such as Alpine, refused before, is served. `init` and `update` on an existing install replace the recorded gnu binary with the musl one, because the recorded target differs. Nothing to do.
 - The per-target Release archives are renamed with the new triples. A script that downloads a Linux archive by name updates the triple.
 
@@ -128,7 +128,7 @@ It rides the close push, whose run is then binding on both triples. If the mid-i
   - `native/runners.list` names each triple (delta 2), and `native/targets.list` does too after delta 8.
   - `check-install-platforms` fixture pairs stay illustrative and need no row.
   - `host-target.sh` meets `check-shellcheck` and `check-comment-tier` as any shell file does.
-  - `check-gate-substrate-parity` is inferred to read the new file's `no-port` header as it reads `run-smoke.sh`'s. Build confirms that against the gate's verdict.
+  - `check-gate-substrate-parity` reads the new file's `no-port` header as it reads `run-smoke.sh`'s: run at build, `--emit port-blockers --tree` lists it `no-port` and the battery is green.
 - **Point 5: two corpora narrow.**
   - **The retired libc refusal row.** Its readers are the bootstraps' refusal messages, which go with it, and the SPEC table, which delta 7 rewrites. `git grep -in 'musl\|libc' installer/consumer-smoke scripts/gate-tests gate-sdk/gate-tests` finds no smoke arm or fixture that asserts the refusal, so no reader reds on its absence.
   - **The roster's Linux lines, empty between deltas 2 and 8.** Its readers are pack, which refuses only a declared target it lacks and so is monotone; `check-install-platforms`, held green by the rows being `held`; and the publish matrix, which then has no Linux leg. A tag in that window would ship no Linux artifact, which is why delta 2 forbids one.

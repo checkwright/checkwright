@@ -76,12 +76,27 @@ floor_cmp_awk='function cmp(a, b,   x, y, n, m, k, i) {
 }'
 
 case "$target" in
-    *-unknown-linux-gnu) floor_lead=glibc floor_tool=readelf ;;
-    *-apple-darwin)      floor_lead=macOS floor_tool=otool ;;
-    *)                   floor_lead='' floor_tool='' ;;
+    *-unknown-linux-gnu)  floor_lead=glibc floor_tool=readelf ;;
+    *-unknown-linux-musl) floor_lead=Linux floor_tool=static ;;
+    *-apple-darwin)       floor_lead=macOS floor_tool=otool ;;
+    *)                    floor_lead='' floor_tool='' ;;
 esac
 if [ -z "$floor_tool" ]; then
     echo "floor $target: declared only, measured nothing"
+elif [ "$floor_tool" = static ]; then
+    declared="$(floor_token "$floor_lead")"
+    [ -n "$declared" ] || floor_refuse "its $platforms_page row states no '$floor_lead <version>' Minimum, so there is nothing to hold the artifact to"
+    command -v readelf >/dev/null 2>&1 || floor_refuse "'readelf' is not on PATH, so the artifact's linkage cannot be measured"
+    # spec: installer/SPEC.md §Requirements — a Linux artifact that links anything dynamically is refused
+    dynamic="$(readelf -d "$out/$binary")" || floor_refuse "'readelf -d' could not read the artifact"
+    headers="$(readelf -l "$out/$binary")" || floor_refuse "'readelf -l' could not read the artifact"
+    case "$dynamic" in
+        *'(NEEDED)'*) floor_refuse "the artifact lists a NEEDED shared library, so it is not statically linked and would need that library on every Linux host" ;;
+    esac
+    case "$headers" in
+        *INTERP*) floor_refuse "the artifact requests a program interpreter, so it is not statically linked and would need that loader on every Linux host" ;;
+    esac
+    echo "floor $target: static, no loader or shared library needed; $floor_lead $declared declared, not measured"
 else
     declared="$(floor_token "$floor_lead")"
     [ -n "$declared" ] || floor_refuse "its $platforms_page row states no '$floor_lead <version>' Minimum, so there is nothing to hold the artifact to"

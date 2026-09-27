@@ -58,13 +58,15 @@
 # adopter meets today. The
 # first witness of a migrated image is the first gates run whose leg logs it.
 # A ride that raises an artifact's OS floor reds the shared build body
-# (scripts/ci-build-artifact.sh), which is where pin-or-raise is decided.
+# (scripts/ci-build-artifact.sh), which is where pin-or-raise is decided. For
+# the Linux lines a migration cannot raise the floor: the artifact is static,
+# which the build body's static check holds.
 # Every other Linux job in .github/workflows/ builds and measures no adopter
 # platform, so it PINS `ubuntu-24.04`: a `-latest` label moves it with no tree
 # edit and, through a weeks-long rollout, varies run to run. Move those pins as
 # one deliberate edit, whose own push is the new image's witness.
-x86_64-unknown-linux-gnu  ubuntu-latest
-aarch64-unknown-linux-gnu ubuntu-24.04-arm
+x86_64-unknown-linux-musl  ubuntu-latest
+aarch64-unknown-linux-musl ubuntu-24.04-arm
 aarch64-apple-darwin      macos-latest
 x86_64-apple-darwin       macos-15-intel
 x86_64-pc-windows-msvc    windows-latest

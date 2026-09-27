@@ -82,6 +82,7 @@ jobs:
 
   # spec: installer/SPEC.md §The consumer smoke — the CI legs; this one is judged against the baseline
   install-smoke-sh-linux:
+    needs: [native-artifacts, native-artifacts-roster]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -94,6 +95,57 @@ jobs:
       # spec: gate-sdk/SPEC.md §gen-pre-commit — the hooks are POSIX sh; the next step names the /bin/sh they run under
       - name: name the shell the hooks run under
         run: readlink -f /bin/sh
+
+      # spec: installer/SPEC.md §The consumer smoke — the producer's upload, downloaded by pattern
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: gate-binary-*
+          path: ${{ runner.temp }}/native-artifacts
+
+      # spec: installer/SPEC.md §The consumer smoke — normalized and placed as the tree's own gate binary
+      - name: normalize the producer's upload onto the layout pack reads
+        shell: bash
+        run: |
+          set -euo pipefail
+          source gate-sdk/lib/gate.sh
+          art="$RUNNER_TEMP/native-artifacts"
+          binary="$(gate_native_bin)"; binary="${binary##*/}"
+          host="$(sh installer/consumer-smoke/host-target.sh)"
+          for d in "$art"/gate-binary-*; do
+            [[ -d "$d" ]] || continue
+            mv "$d" "$art/${d##*/gate-binary-}"
+          done
+          ls -lR "$art"
+          [[ -f "$art/$host/$binary" && -f "$art/$host/$binary.sha256" ]] || {
+            echo "the producer uploaded no complete $host artifact — this leg"
+            echo "exercises a release-shaped artifact and has none to exercise."
+            exit 1
+          }
+          dest="$(gate_native_bin)"
+          mkdir -p "$(dirname "$dest")"
+          cp "$art/$host/$binary" "$dest"
+          chmod +x "$dest"
+          [[ -x "$dest" ]] || { echo "could not place the producer's $host artifact at $dest"; exit 1; }
+          echo "SMOKE_ARTIFACTS=$art" >> "$GITHUB_ENV"
+          echo "SMOKE_HOST_BIN=$(cd "$(dirname "$dest")" && pwd)/${dest##*/}" >> "$GITHUB_ENV"
+
+      # spec: installer/SPEC.md §Requirements — one static Linux artifact serves musl hosts and glibc hosts below the old floor
+      - name: run the served Linux artifact on a musl host and on a glibc 2.36 host
+        shell: bash
+        run: |
+          set -euo pipefail
+          for image in \
+            alpine@sha256:5291449c3df73caf6ed85e649dec1b9e818b39a5d8c871e97afc13e9cd5e8fa8 \
+            debian@sha256:3783cc01769c7b2b1b83a5c5ad96c815348e28ed7da68e2e3687004faa906251; do
+            echo "== ${image%%@*} =="
+            listing="$(docker run --rm -v "$(dirname "$SMOKE_HOST_BIN"):/gate:ro" "$image" \
+              "/gate/${SMOKE_HOST_BIN##*/}" --list)" \
+              || { echo "::error::the served Linux artifact exited non-zero on ${image%%@*}"; exit 1; }
+            [ -n "$listing" ] \
+              || { echo "::error::the served Linux artifact listed nothing on ${image%%@*}"; exit 1; }
+            echo "listed $(printf '%s\n' "$listing" | wc -l) line(s) on ${image%%@*}"
+          done
+
       # spec: installer/SPEC.md §The consumer smoke — the baseline Linux leg is judged against the recorded baseline
       - name: install smoke, judged against the recorded baseline
         env:
@@ -103,7 +155,8 @@ jobs:
           mkdir -p "$INSTALLER_SMOKE_TARBALL_OUT"
           log="$RUNNER_TEMP/installer-smoke.log"
           set +e
-          bash installer/consumer-smoke/run-smoke.sh 2>&1 | tee "$log"
+          INSTALLER_SMOKE_ARTIFACTS_DIR="$SMOKE_ARTIFACTS" \
+            bash installer/consumer-smoke/run-smoke.sh 2>&1 | tee "$log"
           rc="${PIPESTATUS[0]}"
           set -e
           echo "installer_smoke exited $rc; the verdict below is the baseline diff, not that status"
@@ -118,9 +171,9 @@ jobs:
           [ -f "${tarballs[0]}" ] || { echo "::error::the smoke handed out no packed tarball"; exit 1; }
           v="${tarballs[0]##*/checkwright-}"; v="${v%.tgz}"
           cw="$work/cw"
+          [ -f "${tarballs[0]}.sha256" ] || { echo "::error::the smoke handed out no tarball digest sidecar"; exit 1; }
           mkdir -p "$cw" "$work/consumer"
-          cp "${tarballs[0]}" "$cw/checkwright-$v.tgz"
-          ( cd "$cw" && sha256sum "checkwright-$v.tgz" > "checkwright-$v.tgz.sha256" )
+          cp "${tarballs[0]}" "${tarballs[0]}.sha256" "$cw/"
           block="$(awk '
             $0 == "<!-- unix-install:end -->" { f = 0 }
             f && NF && $0 !~ /^```/ { print }
@@ -1077,6 +1130,7 @@ jobs:
       # spec: installer/SPEC.md §The consumer smoke — the per-target index a job-level expression reads
       index: ${{ steps.legs.outputs.index }}
       pwsh_legs: ${{ steps.legs.outputs.pwsh_legs }}
+      unix_legs: ${{ steps.legs.outputs.unix_legs }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
@@ -1133,14 +1187,25 @@ jobs:
             echo "bootstrap's leg has no host to run on." >&2
             exit 1
           fi
+          # spec: gate-sdk/SPEC.md §check-crate-arms — the battery's own triple is this image's rustc host, never a literal
+          battery_host="$(rustc -vV | awk '/^host:/{print $2}')"
+          if [ -z "$battery_host" ]; then
+            echo "rustc reported no host triple, so the battery's own triple cannot be" >&2
+            echo "told apart from the triples crate-tests-unix owes a leg." >&2
+            exit 1
+          fi
+          unix_legs="$(jq -c --arg b "$battery_host" \
+            '[.[] | select((.target | endswith("-pc-windows-msvc") | not) and .target != $b)]' <<<"$legs")"
           {
             echo "legs=$legs"
             echo "index=$index"
             echo "pwsh_legs=$pwsh_legs"
+            echo "unix_legs=$unix_legs"
           } >> "$GITHUB_OUTPUT"
           echo "producer legs: $legs"
           echo "declaration index: $index"
           echo "pwsh legs: $pwsh_legs"
+          echo "unix legs (battery host $battery_host excluded): $unix_legs"
 
   # spec: installer/SPEC.md §The consumer smoke — a joined producer leg binds, a held one measures
   native-artifacts:
@@ -1252,6 +1317,105 @@ jobs:
           count="$(printf '%s' "$failed" | grep -c . || true)"
           first="$(printf '%s\n' "$failed" | head -n 10 | paste -sd ' ' -)"
           echo "::warning title=crate-tests-windows ($TARGET)::$count test(s) FAILED on $TARGET; first ten: ${first:-none, so the run failed outside a test}; the job log carries the rest."
+
+  # spec: gate-sdk/SPEC.md §check-crate-arms — the test half on every other published non-Windows triple
+  crate-tests-unix:
+    needs: native-artifacts-roster
+    if: needs.native-artifacts-roster.outputs.unix_legs != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.native-artifacts-roster.outputs.unix_legs) }}
+    runs-on: ${{ matrix.runner }}
+    continue-on-error: ${{ matrix.held }}
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+      # spec: gate-sdk/SPEC.md §Consumer payload — the shared bootstrap: the floor this job's path executes
+      - name: install the bash floor and GNU userland this job's path needs
+        if: runner.os == 'macOS'
+        shell: bash
+        run: bash scripts/ci-macos-floor.sh
+
+      # spec: gate-sdk/SPEC.md §check-shellcheck — the registry-coverage tests spawn the pinned analyser
+      - name: install the pinned shellcheck release, digest-verified
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "$(uname -s)/$(uname -m)" in
+            Linux/x86_64)
+              suffix=linux.x86_64
+              sha=8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198 ;;
+            Linux/aarch64)
+              suffix=linux.aarch64
+              sha=12b331c1d2db6b9eb13cfca64306b1b157a86eb69db83023e261eaa7e7c14588 ;;
+            Darwin/arm64)
+              suffix=darwin.aarch64
+              sha=56affdd8de5527894dca6dc3d7e0a99a873b0f004d7aabc30ae407d3f48b0a79 ;;
+            Darwin/x86_64)
+              suffix=darwin.x86_64
+              sha=3c89db4edcab7cf1c27bff178882e0f6f27f7afdf54e859fa041fca10febe4c6 ;;
+            *)
+              echo "no pinned shellcheck asset for $(uname -s)/$(uname -m)" >&2
+              exit 1 ;;
+          esac
+          dir="$RUNNER_TEMP/shellcheck"
+          asset="shellcheck-$SHELLCHECK_VERSION.$suffix.tar.xz"
+          mkdir -p "$dir"
+          curl -sSfL --retry 3 -o "$dir/$asset" \
+            "https://github.com/koalaman/shellcheck/releases/download/$SHELLCHECK_VERSION/$asset"
+          if command -v sha256sum >/dev/null 2>&1; then
+            ( cd "$dir" && printf '%s  %s\n' "$sha" "$asset" | sha256sum -c - )
+          else
+            ( cd "$dir" && printf '%s  %s\n' "$sha" "$asset" | shasum -a 256 -c - )
+          fi
+          tar -xJf "$dir/$asset" -C "$dir"
+          echo "$dir/shellcheck-$SHELLCHECK_VERSION" >> "$GITHUB_PATH"
+          "$dir/shellcheck-$SHELLCHECK_VERSION/shellcheck" --version
+
+      # spec: gate-sdk/SPEC.md §check-crate-arms — the docs gates' gems, in the ruby their bare `ruby` resolves
+      - name: install the docs gates' gems
+        shell: bash
+        run: |
+          set -euo pipefail
+          gem="$(dirname "$(command -v ruby)")/gem"
+          if [ -w "$(ruby -e 'print Gem.dir')" ]; then
+            "$gem" install --no-document kramdown-parser-gfm liquid:4.0.4
+          else
+            sudo "$gem" install --no-document kramdown-parser-gfm liquid:4.0.4
+          fi
+          ruby -e 'require "kramdown-parser-gfm"; require "liquid"; puts "ruby #{RUBY_VERSION}, liquid #{Liquid::VERSION}"'
+
+      # spec: gate-sdk/SPEC.md §check-crate-arms — the host binary the registry-coverage tests spawn
+      - name: build the host gate binary the registry-coverage tests spawn
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          rustup target add "$TARGET"
+          bash gate-sdk/bin/build-native.sh
+
+      - name: run the crate's unit tests for ${{ matrix.target }}
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          set -o pipefail
+          cargo test --release --manifest-path native/Cargo.toml --target "$TARGET" 2>&1 | tee "$RUNNER_TEMP/crate-tests.log"
+
+      - name: annotate the failing tests for ${{ matrix.target }}
+        if: failure()
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          failed="$(tr -d '\r' < "$RUNNER_TEMP/crate-tests.log" | sed -n -E 's/^test (.*) \.\.\. FAILED$/\1/p')"
+          count="$(printf '%s' "$failed" | grep -c . || true)"
+          first="$(printf '%s\n' "$failed" | head -n 10 | paste -sd ' ' -)"
+          echo "::warning title=crate-tests-unix ($TARGET)::$count test(s) FAILED on $TARGET; first ten: ${first:-none, so the run failed outside a test}; the job log carries the rest."
 
   # spec: installer/SPEC.md §The consumer smoke — the CI legs; derived posture, the producer's upload
   install-smoke-sh-macos:
@@ -1571,8 +1735,8 @@ jobs:
   # spec: installer/SPEC.md §The consumer smoke — the CI legs; derived posture, the producer's upload
   install-smoke-sh-linux-arm64:
     needs: [native-artifacts, native-artifacts-roster]
-    runs-on: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['aarch64-unknown-linux-gnu'].runner }}
-    continue-on-error: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['aarch64-unknown-linux-gnu'].held }}
+    runs-on: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['aarch64-unknown-linux-musl'].runner }}
+    continue-on-error: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['aarch64-unknown-linux-musl'].held }}
     timeout-minutes: 45
     permissions:
       contents: read
@@ -1601,9 +1765,6 @@ jobs:
           for t in awk sed sort grep find tar; do
             printf '%-6s %s\n' "$t" "$("$t" --version 2>&1 | head -n1)"
           done
-          echo "== libc, the question the installer's own selection step now asks =="
-          getconf GNU_LIBC_VERSION; echo "getconf GNU_LIBC_VERSION exited $?"
-          ldd --version 2>&1 | head -n1; echo "ldd --version exited $?"
           echo "== rust =="
           rustc -vV
           echo "== scratch =="
@@ -1624,8 +1785,7 @@ jobs:
           source gate-sdk/lib/gate.sh
           art="$RUNNER_TEMP/native-artifacts"
           binary="$(gate_native_bin)"; binary="${binary##*/}"
-          host="$(rustc -vV | awk '/^host:/{print $2}')"
-          [[ -n "$host" ]] || { echo "rustc reported no host triple"; exit 2; }
+          host="$(sh installer/consumer-smoke/host-target.sh)"
           for d in "$art"/gate-binary-*; do
             [[ -d "$d" ]] || continue
             mv "$d" "$art/${d##*/gate-binary-}"
@@ -1648,9 +1808,9 @@ jobs:
         shell: bash
         run: |
           set +e
-          host="$(rustc -vV | awk '/^host:/{print $2}')"
+          host="$(sh installer/consumer-smoke/host-target.sh)"
           [[ -n "$host" ]] \
-            || { echo "rustc reported no host triple, so the roster cannot be steered"; exit 2; }
+            || { echo "the bootstrap's detector gave no host triple, so the roster cannot be steered"; exit 2; }
           echo "host triple: $host"
           roster="$RUNNER_TEMP/targets.list"
           printf '%s\n' "$host" > "$roster"

@@ -6,13 +6,8 @@
 # copy of it to tell "this platform was never committed to" (a refusal that names
 # the platform and asks nothing of the adopter) from "committed to, artifact
 # missing" (a refusal that names a broken payload). Both refuse; neither proceeds.
-# That promise had exactly one violation and it is closed: neither `uname` nor
-# .NET's OSArchitecture can tell glibc from musl, so a musl x86_64 host resolved
-# to a rostered triple, the roster comparison never fired, and the adopter was
-# handed a binary that dies in the dynamic loader. Both bootstraps now answer the
-# libc question at the selection step — musl and an unidentifiable libc each
-# refuse by name — so the sentence above describes a promise without an exception
-# rather than one a reader should assume never had one.
+# Every Linux line is a static musl artifact, so a Linux host's C library does
+# not enter selection.
 #
 # WHAT LICENSES A LINE HERE, stated mechanically so the session that observes
 # the green executes rather than re-derives. A target <T> joins when ONE run,
@@ -68,11 +63,11 @@
 #     missing is a run bought on one, not a machine to buy it on. Measured
 #     2026-08-25. A header claiming the workflows have no runner for a platform
 #     would be reading a fact about this repo as a fact about the world.
-#   - Cross-compiling a target from the Linux runner is refused for the reason
+#   - A build for a target its runner cannot execute is refused for the reason
 #     the bound gives rather than on cost: it would publish an artifact no run
 #     has ever executed. `native-artifacts` therefore builds each target on that
-#     target's own platform (native/runners.list) and never with `--target`
-#     pointed off the host.
+#     target's own platform (native/runners.list). The musl build on its own
+#     architecture's Linux runner is within the rule: that runner executes it.
 #   - WSL is Linux and resolves to this same target, so docs/install.md
 #     §Requirements' Windows-through-WSL route is served by the Linux line and
 #     keeps being served by it. That route is a CHOICE beside native Windows
@@ -83,8 +78,9 @@
 #     hand-off, sidecar and all — nothing rebuilt, nothing rehashed` — reached
 #     the artifact-present branch at every profile and finished
 #     `INSTALLER-SMOKE: clean`. Both halves, one run, no host-built stand-in.
-#   - The two arm64 lines rest on run 36016548706, one run for both: each
-#     `native-artifacts` leg built its triple on its own runner, and each arm64
+#   - The arm64 Windows line rests on run 36016548706, which also joined the
+#     retired arm64 glibc Linux line: each `native-artifacts` leg built its
+#     triple on its own runner, and each arm64
 #     install-smoke leg adopted THAT upload from the hand-off, reached the
 #     artifact-present branch (`artifact: <triple> verified in place`) at every
 #     profile and finished `INSTALLER-SMOKE: clean`.
@@ -118,9 +114,7 @@
 # nothing on that path, and one on a class they do not costs its own floor first.
 # gate-sdk/SPEC.md §Consumer payload owns both halves;
 # installer/SPEC.md §The consumer smoke owns the smoke's own side of it.
-x86_64-unknown-linux-gnu
 aarch64-apple-darwin
 x86_64-apple-darwin
 x86_64-pc-windows-msvc
-aarch64-unknown-linux-gnu
 aarch64-pc-windows-msvc

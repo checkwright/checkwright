@@ -37,7 +37,7 @@ fn local_stamp() -> String {
         return String::new();
     };
     let epoch = now.as_secs() as i64;
-    let t = epoch as libc::time_t;
+    let t = epoch as _;
     // spec: gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency — sound because
     // `tm` is plain integers, zeroed is a valid value, and `localtime_r` writes only the one we own
     let mut tm: libc::tm = unsafe { std::mem::zeroed() };

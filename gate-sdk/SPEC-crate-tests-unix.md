@@ -15,11 +15,11 @@ The crate's unit tests run on the battery's own triple, through `check-crate-arm
 
 ### (1) The roster job derives the unix legs {mechanical}
 
-**Not yet applied.** `native-artifacts-roster` gains a fourth output, `unix_legs`. It is `legs` less the Windows triples and less the battery's own triple. The battery's triple is read in the same step from `rustc -vV`'s `host:` line: the roster job and the `gates` job run on one pinned image, so that line names the triple `check-crate-arms` tests. It is never spelled as a literal. An empty `unix_legs` is written as `[]`, and the new job then has no legs. That is not a refusal, because a roster of Windows and battery-host triples alone has nothing left to test.
+**Applied at build; the merge waits on the mid-iteration push's `gates` run being read.** `native-artifacts-roster` gains a fourth output, `unix_legs`. It is `legs` less the Windows triples and less the battery's own triple. The battery's triple is read in the same step from `rustc -vV`'s `host:` line: the roster job and the `gates` job run on one pinned image, so that line names the triple `check-crate-arms` tests. It is never spelled as a literal. An empty `unix_legs` is written as `[]`, and the new job then has no legs. That is not a refusal, because a roster of Windows and battery-host triples alone has nothing left to test.
 
 ### (2) A `crate-tests-unix` job runs `cargo test` per leg {design-bearing}
 
-**Not yet applied.** A new job in `.github/workflows/gates.yml`, beside `crate-tests-windows`, with `needs: native-artifacts-roster`, a matrix over `unix_legs`, `runs-on: ${{ matrix.runner }}`, `continue-on-error: ${{ matrix.held }}`, `timeout-minutes: 30` and `permissions: contents: read`. Every step names `shell: bash`, because `runs-on` is an expression and `check-action-run-shell` cannot derive the dialect otherwise. Steps, in order:
+**Applied at build; the merge waits on the mid-iteration push's `gates` run being read.** A new job in `.github/workflows/gates.yml`, beside `crate-tests-windows`, with `needs: native-artifacts-roster`, a matrix over `unix_legs`, `runs-on: ${{ matrix.runner }}`, `continue-on-error: ${{ matrix.held }}`, `timeout-minutes: 30` and `permissions: contents: read`. Every step names `shell: bash`, because `runs-on` is an expression and `check-action-run-shell` cannot derive the dialect otherwise. Steps, in order:
 
 1. Checkout, SHA-pinned as the sibling jobs pin it.
 2. On macOS, `bash scripts/ci-macos-floor.sh`: the harness sources `gate-sdk/lib/gate.sh` through the gates it runs, and a macOS image's `/bin/bash` is 3.2.
@@ -39,7 +39,7 @@ A joined leg's red fails the workflow. That is the posture every derived leg rea
 
 ### (3) The SPEC names the new CI spelling {mechanical}
 
-**Not yet applied.** In gate-sdk/SPEC.md §check-crate-arms, the paragraph opening "**Each half has one CI spelling, on a target the battery's host does not build, so neither is the deleted duplicate.**" has the sentence "The `crate-tests-windows` job runs `cargo test --release` on each Windows triple, where a test pinning a Windows filesystem or process behaviour runs beside that behaviour." rewritten as:
+**Applied at build; the merge waits on the mid-iteration push's `gates` run being read.** In gate-sdk/SPEC.md §check-crate-arms, the paragraph opening "**Each half has one CI spelling, on a target the battery's host does not build, so neither is the deleted duplicate.**" has the sentence "The `crate-tests-windows` job runs `cargo test --release` on each Windows triple, where a test pinning a Windows filesystem or process behaviour runs beside that behaviour." rewritten as:
 
 > `cargo test --release` runs on every other published triple, where a test pinning a platform's filesystem or process behaviour runs beside it: `crate-tests-windows` on each Windows triple, and `crate-tests-unix` on each remaining triple except the battery's own, which the roster job reads off the `gates` image's `rustc`. Each builds the host binary first, and the unix legs install the ShellCheck and gems the `gates` job installs.
 

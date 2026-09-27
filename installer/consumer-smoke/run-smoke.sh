@@ -93,19 +93,10 @@ native() {   # $@ = a gate-sdk accessor and its arguments, resolved against the 
 }
 NATIVE_BIN="$(native gate_native_bin)"; NATIVE_BIN="${NATIVE_BIN##*/}"
 NATIVE_CRATE="$(native gate_native_crate)"
-# spec: installer/SPEC.md §The consumer smoke — rustc answers the host triple wherever rustc is present, and on the hand-off path where it is not, the sole target directory in the artifact directory answers it: those bytes were produced FOR a host, so the hand-off carries the fact the toolchain would otherwise have been asked for. Two directories and no rustc is refused rather than guessed, because picking one would exercise an artifact for a platform this machine is not
-HOST_TARGET="$(rustc -vV 2>/dev/null | awk '/^host:/{print $2}')"
-if [[ -z "$HOST_TARGET" && -n "$PREBUILT_DIR" ]]; then
-    handed=()
-    for d in "$PREBUILT_DIR"/*/; do
-        [[ -d "$d" ]] || continue
-        d="${d%/}"; handed+=("${d##*/}")
-    done
-    [[ ${#handed[@]} -eq 1 ]] \
-        || blocked "no rustc on PATH and $PREBUILT_DIR carries ${#handed[@]} target directory/ies — which platform this run exercises cannot be told from that."
-    HOST_TARGET="${handed[0]}"
-fi
-[[ -n "$HOST_TARGET" ]] || blocked "rustc reported no host target — the arm cannot tell which roster line this machine satisfies."
+# spec: installer/SPEC.md §The consumer smoke — the host triple is the bootstrap detector's answer, through the helper, on every host
+HOST_TARGET="$(sh "$REPO/installer/consumer-smoke/host-target.sh")" \
+    || blocked "the bootstrap's detector gave no triple for this host (above) — the arm cannot tell which roster line this machine satisfies."
+RUSTC_HOST="$(rustc -vV 2>/dev/null | awk '/^host:/{print $2}')"
 # spec: installer/SPEC.md §The consumer smoke — the smoke steers its own roster at this host by default, so pack's all-targets demand is satisfied by construction rather than by every caller knowing to narrow it; a caller that already set the knob keeps it, which is what leaves the override branch a live path rather than a fixture-only one
 if [[ -z "${GATE_SDK_NATIVE_TARGETS_FILE:-}" ]]; then
     GATE_SDK_NATIVE_TARGETS_FILE="$SCRATCH/host-targets.list"
@@ -135,9 +126,19 @@ else
     ART="$SCRATCH/artifacts/$HOST_TARGET"
     PACK_ARTIFACTS="$SCRATCH/artifacts"
     mkdir -p "$ART"
-    build_out="$(cd "$REPO" && bash gate-sdk/bin/build-native.sh 2>&1)" \
-        || { printf '%s\n' "$build_out" >&2; blocked "the crate would not compile for $HOST_TARGET."; }
+    # spec: installer/SPEC.md §The consumer smoke — a Linux host builds the musl triple the installer serves, which its own toolchain's host triple is not
+    BUILD_ARGS=()
     BUILT="$REPO/$NATIVE_CRATE/target/release/$NATIVE_BIN"
+    if [[ "$HOST_TARGET" != "$RUSTC_HOST" ]]; then
+        BUILD_ARGS=(--target "$HOST_TARGET")
+        BUILT="$REPO/$NATIVE_CRATE/target/$HOST_TARGET/release/$NATIVE_BIN"
+    fi
+    build_out="$(cd "$REPO" && bash gate-sdk/bin/build-native.sh ${BUILD_ARGS[@]+"${BUILD_ARGS[@]}"} 2>&1)" || {
+        printf '%s\n' "$build_out" >&2
+        [[ ${#BUILD_ARGS[@]} -eq 0 ]] \
+            || blocked "the crate would not compile for $HOST_TARGET. If its standard library is missing, add it once: rustup target add \"$HOST_TARGET\""
+        blocked "the crate would not compile for $HOST_TARGET."
+    }
     [[ -x "$BUILT" ]] || blocked "cargo reported success but there is no executable at $BUILT."
     cp "$BUILT" "$ART/$NATIVE_BIN" || fail "could not stage the built binary for packing"
     # spec: gate-sdk/SPEC.md §Consumer payload — the digest is emitted once, here, where the bytes are produced: pack re-verifies this sidecar and init verifies it again before writing, so both readers check a value neither of them computed
@@ -165,10 +166,12 @@ tarballs=("$SCRATCH"/*.tgz)
 shopt -u nullglob
 [[ ${#tarballs[@]} -eq 1 ]] || fail "expected exactly one tarball, found ${#tarballs[@]}"
 TARBALL="${tarballs[0]}"
-# spec: installer/SPEC.md §The consumer smoke — INSTALLER_SMOKE_TARBALL_OUT hands the packed tarball out before the scratch teardown, so a caller runs the install page's own block against these bytes without packing or hashing a second artifact
+# spec: installer/SPEC.md §The consumer smoke — INSTALLER_SMOKE_TARBALL_OUT hands the packed tarball and its digest sidecar out before the scratch teardown, so a caller runs the install page's own block against these bytes without packing or hashing a second artifact
 if [[ -n "${INSTALLER_SMOKE_TARBALL_OUT:-}" ]]; then
     [[ -d "$INSTALLER_SMOKE_TARBALL_OUT" ]] || blocked "tarball hand-out not a directory: $INSTALLER_SMOKE_TARBALL_OUT"
     cp "$TARBALL" "$INSTALLER_SMOKE_TARBALL_OUT/" || fail "could not hand the packed tarball out to $INSTALLER_SMOKE_TARBALL_OUT"
+    ( cd "$INSTALLER_SMOKE_TARBALL_OUT" && "${HASHER[@]}" "${TARBALL##*/}" > "${TARBALL##*/}.sha256" ) \
+        || fail "could not emit the handed-out tarball's digest sidecar in $INSTALLER_SMOKE_TARBALL_OUT"
 fi
 
 # spec: installer/SPEC.md §The consumer smoke — steering the roster at this host alone removes pack's declared-target-with-no-artifact refusal from every ordinary path in this smoke, so the case is PLANTED rather than left with no witness: that refusal is the one reader here whose verdict reds on FINDING a target instead of on finding none, so a narrowing that removes its subject cannot be cleared by inspection the way the others can
@@ -1688,9 +1691,11 @@ RUN_PATH="$PATH"
 C="$(consumer artifact)" || fail "could not build a scratch consumer for the artifact arm"
 assert_install "$PROFILE_MIN" "$C"
 LOCK="$C/checkwright.lock"
-# spec: installer/SPEC.md §The gate binary — target resolution is asserted against what the toolchain says this host is, not against whatever init selected: the two derivations are independent (uname pair versus rustc's own triple) and only comparing them catches a mapping that resolves confidently to the wrong roster line
+# spec: installer/SPEC.md §The consumer smoke — init's selection is held to the helper's triple, and that triple's architecture to rustc's wherever rustc is present, the one derivation independent of the detector
 [[ "$(jq -r '.artifact.target' "$LOCK")" == "$HOST_TARGET" ]] \
-    || fail "init selected '$(jq -r '.artifact.target' "$LOCK")' where rustc reports this host as $HOST_TARGET"
+    || fail "init selected '$(jq -r '.artifact.target' "$LOCK")' where the bootstrap's detector maps this host to $HOST_TARGET"
+[[ -z "$RUSTC_HOST" || "${RUSTC_HOST%%-*}" == "${HOST_TARGET%%-*}" ]] \
+    || fail "the bootstrap's detector maps this host to $HOST_TARGET where rustc reports its architecture as ${RUSTC_HOST%%-*}"
 [[ "$(jq -r '.artifact.digest' "$LOCK")" == "$(awk 'NR==1{print $1}' "$ART/$NATIVE_BIN.sha256")" ]] \
     || fail "the manifest records a digest other than the one this arm's build leg emitted"
 

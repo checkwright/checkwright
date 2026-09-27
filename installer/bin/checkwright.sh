@@ -70,8 +70,8 @@ host_arch() {   # -> this host's architecture, in `uname -m`'s vocabulary
 # check-install-platforms extracts this detector's triple set from
 target_of_host() {   # -> the Rust target triple this host is, empty when it maps to none
     case "$(host_shape)" in
-        Linux/x86_64)               printf 'x86_64-unknown-linux-gnu' ;;
-        Linux/aarch64|Linux/arm64)  printf 'aarch64-unknown-linux-gnu' ;;
+        Linux/x86_64)               printf 'x86_64-unknown-linux-musl' ;;
+        Linux/aarch64|Linux/arm64)  printf 'aarch64-unknown-linux-musl' ;;
         Darwin/x86_64)              printf 'x86_64-apple-darwin' ;;
         Darwin/arm64)               printf 'aarch64-apple-darwin' ;;
         # spec: installer/SPEC.md §The gate binary — the map answers which *published artifact*
@@ -81,21 +81,6 @@ target_of_host() {   # -> the Rust target triple this host is, empty when it map
         MINGW*/aarch64|MSYS*/aarch64|CYGWIN*/aarch64) printf 'aarch64-pc-windows-msvc' ;;
         *) : ;;
     esac
-}
-
-# spec: installer/SPEC.md §The gate binary — the libc question, answered beside the other refusals
-# rather than inside the detector: two questions, two places, and each verdict rests on a POSITIVE
-# signal, so an unidentifiable libc refuses rather than being read as glibc
-libc_flavour() {   # -> musl | gnu | unknown
-    for libc_ld in /lib/ld-musl-*; do
-        [ -e "$libc_ld" ] && { printf 'musl'; return; }
-    done
-    if getconf GNU_LIBC_VERSION >/dev/null 2>&1 \
-        || ldd --version 2>&1 | grep -qiE 'gnu libc|glibc'; then
-        printf 'gnu'
-        return
-    fi
-    printf 'unknown'
 }
 
 # spec: installer/SPEC.md §The gate binary — step 3: selection keeps three outcomes and only one
@@ -112,24 +97,6 @@ select_artifact() {
     sel_roster="$sel_dir/targets.list"
     [ -f "$sel_roster" ] || die "this payload carries prebuilt gate binaries but no target roster" \
         "the roster is copied verbatim beside them at pack time; artifacts without one cannot be selected from and the payload is broken, not narrower."
-    # spec: installer/SPEC.md §The gate binary — the one case where the roster grep cannot refuse
-    # for us: `uname` cannot tell glibc from musl, so a musl host resolves to a triple that IS on
-    # the roster and would be handed a binary that dies in the dynamic loader
-    case "$sel_target" in
-        *-linux-gnu)
-            case "$(libc_flavour)" in
-                gnu) : ;;
-                musl)
-                    die "this host, detected as $(host_shape), runs a musl C library, and every Linux artifact this payload carries is linked against glibc" \
-                        "musl and glibc are not interchangeable at the dynamic loader, so a glibc build would die there rather than run. This payload carries no musl artifact, so there is no adopter action to take."
-                    ;;
-                *)
-                    die "this host, detected as $(host_shape), did not identify its C library, and every Linux artifact this payload carries is linked against glibc" \
-                        "neither 'getconf GNU_LIBC_VERSION' nor 'ldd --version' identified a GNU libc here, and no musl loader was found under /lib, so nothing establishes that a glibc build would run, and this refuses rather than handing you one that may die in the loader. Install GNU libc's getconf or ldd so the probe can answer."
-                    ;;
-            esac
-            ;;
-    esac
     if [ -z "$sel_target" ] || ! grep -Ev '^[[:space:]]*(#|$)' "$sel_roster" | grep -qxF "$sel_target"; then
         die "this host, detected as $(host_shape), maps to no target this payload declares" \
             "the support roster is fixed at pack time and this platform is not on it, so there is nothing to verify or run here and no adopter action to take."
