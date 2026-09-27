@@ -8,20 +8,6 @@
 
 ## New Features
 
-### crate-tests-other-triples
-
-[spec: SPEC-crate-tests-unix.md]
-
-the native crate's unit tests run on x86_64 Linux (the battery) and on the two Windows triples (`crate-tests-windows`); the two macOS triples and `aarch64-unknown-linux-gnu` only lint the crate under clippy in `native-artifacts`, so a unit test pinning a macOS or arm64 behaviour never runs there.
-
-**Deliverable:** a `crate-tests-unix` job running `cargo test` on every declared non-Windows triple except the battery's own, its legs derived by the roster job.
-
-**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** the theme's "wide platform/OS support" (operator direction, 2026-09-27) wants every published triple tested. Any musl triple `linux-musl-artifacts` adds joins the legs by derivation.
-
-**Push need (2026-09-27, inside the budget):** the new legs run only remotely; they ride the one mid-iteration push `comment-tier-surface-excludes-ci-workflows` names.
-
-**Cost while deferred:** a platform-specific regression on those hosts reaches no test. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's spec; promoted 2026-09-26 at its close: →fix fails because a new CI leg is a unit scope must admit. Owner: gate-sdk/SPEC.md §check-crate-arms.
-
 ## Technical Debt
 
 ### installer-contract-brevity
@@ -1377,5 +1363,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - comment-tier-surface-excludes-ci-workflows
 - linux-musl-artifacts
 - glibc-floor-lowering
+- crate-tests-other-triples
 
 ## Lessons Learned
