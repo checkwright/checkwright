@@ -20,16 +20,6 @@ the installer/SPEC.md sections an install reads first: §The dependency boundary
 
 **Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-27 at scope from spec-brevity-residue, filed 2026-09-25; the word census is this scope's survey record.
 
-### installer-graph-artifact-literal
-
-`init` hardcodes `CHECK-GRAPH.html` (`native/src/installer/init.rs`) where the resolver owns the path through `GATE_SDK_GRAPH_ARTIFACT`, so an adopter's re-run writes the graph to the default path and ignores their knob.
-
-**Deliverable:** `init` resolves the artifact path through the knob, with a fixture.
-
-**Promoted as debt 2026-09-27 at platform-prerequisite-floors's scope, operator direction lead-relayed (not a /consult ruling):** it converges `init` on a knob the resolver already carries. Re-verified at scope: `init.rs` spells the literal at two sites.
-
-**Cost while deferred:** a re-run overwrites a path the adopter moved away from. Filed 2026-08-21; returned from the icebox 2026-09-25 by consult, the literal re-grepped.
-
 ## Deferred
 
 ### shellcheck-extra-dirs-trigger
@@ -1364,5 +1354,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - linux-musl-artifacts
 - glibc-floor-lowering
 - crate-tests-other-triples
+- installer-graph-artifact-literal
 
 ## Lessons Learned
