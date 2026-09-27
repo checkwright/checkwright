@@ -36,18 +36,6 @@ the next release would publish no glibc Linux gate binary: platform-prerequisite
 
 **Cost while deferred:** `crate-tests-windows` stays report-only, so a Windows crate-test regression passes every run as a warning. The operator's cut-and-defer residue of `crate-tests-windows-failures` (operator direction 2026-09-26, lead session). Filed 2026-09-26 to the gap inbox by its build; promoted 2026-09-26 at capture-integrity-brevity's close: →fix fails because both remedies are design-bearing and one reverses a stated rule. Re-verified: run 36264222274 reads 1169 passed, 2 failed, the pair above, on both triples. Owner lookup: `stub-bin`, `gate-binary-fresh`, `PATHEXT` in this file — none; owner gate-sdk/SPEC.md §check-gate-binary-fresh.
 
-### consumer-scratch-unignored
-
-[spec: SPEC-scratch-ignore.md]
-
-a battery run dirties an adopter's worktree: in a tree `init --profile prose` (v0.26.0) just wrote, `./scripts/checkwright-gates --run` leaves `.tmp/gate-timings.txt` untracked and unignored, since init seeds no ignore rule for `GATE_SDK_TMP_DIR` and the consumer has no root `.gitignore`. The next `init` or `update` then refuses a dirty worktree, and a habitual `git add -A` commits the timing file.
-
-**Deliverable:** init seeding an ignore line for the scratch directory, or the battery writing its timings elsewhere in a consumer — the unit's design call — with the consumer smoke asserting a clean worktree after a battery run.
-
-**Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** a catalog adopter's first battery run meets it, so it rides the set that readies the listing.
-
-**Cost while deferred:** every adopter's first battery run leaves a file that blocks the next `update`. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's spec, observed in a scratch Spec Kit tree; promoted 2026-09-27 at its close: →fix fails because the bullet leaves the shape a design call. Re-verified: no `.gitignore` write under `installer/` or the init path, and the runner writes `gate-timings.txt` under `GATE_SDK_TMP_DIR`. Owner lookup: `gate-timings`, `GATE_SDK_TMP_DIR`, `gitignore` in this file — [battery-timing-file-overwritten-by-only-run](#battery-timing-file-overwritten-by-only-run), DISTINCT (the file's contents, not its tracking); owner installer/SPEC.md.
-
 ### foreign-spec-lifecycle-unowned
 
 [spec: SPEC-foreign-lifecycle.md]
@@ -1545,5 +1533,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 ## Done
 
 - install-platform-release-gap
+- consumer-scratch-unignored
 
 ## Lessons Learned
