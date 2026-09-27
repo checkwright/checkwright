@@ -84,20 +84,6 @@ live entries cite retired slugs in prose, and nothing marks them the same way ('
 
 **Cost while deferred:** a retired citation's referent can be reached only through history. Filed 2026-09-22 to the gap inbox by the lead on an operator question. The one-off sweep it asked for ran at queue-kit-unwrap's close: it found 28 retired rows plus one name-live row, most already marking retirement, and corrected three inline. Promoted for the rule half. Owner: queue-kit/SPEC.md §The tag algebra and §The queue-edges arm; neither rules on the referent.
 
-### disclaimer-beside-its-own-restatement
-
-[cost: event/low] [surface: canon-kit]
-
-a surface that disclaims carrying a rule ("stated there and not restated here") in the same sentence that carries it is asserted by nothing, and the disclaimer tells every sweep the copy is not one.
-
-**Attested once, fixed inline:** README.md §This repo, governed restated the commit-time fixture-suite selection rule beside exactly that disclaimer, so correcting CLAUDE.md stranded README's copy; `5e0e10f8` de-literalized it. What survives is the class, not the instance.
-
-**Why reachable when general restatement is not:** the predicate is a disclaimer phrase co-located with a content clause — does the sentence around it name the rule's substance rather than only its owner. `check-surface-duplication` and `check-shim-restatement` hold restatement for their own corpora; neither reads a disclaimer.
-
-**Deliverable:** a gate, or an assertion joining an existing restatement gate, over that shape. A feature by the new-names litmus, so it owes an amendment.
-
-**Cost while deferred:** each such disclaimer is a licence a later reader trusts, and the copy beside it rots silently. Filed 2026-09-20 to the gap inbox by the close of `adopter-floor-door-remainder`; promoted 2026-09-21 at the next scope's intake, so the record is late and says so. Owner lookup ran over `disclaim`, `not restated here`, `restatement` and the two gates above and found no owner.
-
 ### config-variant-battery-harness
 
 [cost: event/high] [surface: gate-sdk]
@@ -734,16 +720,6 @@ no tracked agent definition exists for the operator-ruled hotfix path of the sco
 
 **Cost while deferred:** every hotfix costs a restated prompt and a second dispatch. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's lead; promoted 2026-09-27 at its close: →fix fails because the definition is a new governed name. Owner lookup: `hotfix`, `agents/`, `MUTATING_TYPES` in this file — none; owner delegation-kit/SPEC.md, with [worktree-crate-commit-red](#worktree-crate-commit-red) as the worktree half.
 
-### musl-smoke-build-wrapper
-
-[cost: event/low] [surface: installer]
-
-the consumer smoke's build leg needs a musl standard library: since the musl join, a Linux host maps to `x86_64-unknown-linux-musl`, and a host with a system toolchain and no rustup cannot build it (E0463). The route that works: run the tracked `scripts/ci-build-artifact.sh x86_64-unknown-linux-musl <dir>` inside `docker rust:latest` over a git clone of the tree (not `git archive`, since `build.rs` stamps from git), passing `safe.directory` and chowning the output back; then run the smoke on the host with `INSTALLER_SMOKE_ARTIFACTS_DIR=<dir>`, reusing an artifact only while `native/` has no diff since its build commit and its sha256 matches the sidecar. Only the docker wrapper was scratch, swept at the boundary.
-
-**Deliverable:** a tracked maintainer wrapper yielding that hand-off directory, named in installer/SPEC.md §The consumer smoke.
-
-**Cost while deferred:** each maintainer without a musl target re-derives the route before a local validate. Filed 2026-09-27 to the gap inbox by the front-door hotfix, with an addendum on the recovered route (re-proved at companion-catalog-extension's build, installer smoke 20/20); promoted 2026-09-27 at its close: →fix fails because the wrapper is a new tracked script. Re-verified: this host's sysroot carries only the gnu std, `command -v rustup` finds nothing, and the section names no docker route. Owner lookup: `musl`, `ARTIFACTS_DIR`, `docker` in this file — `install-platform-release-gap` and [musl-dev-binary](#musl-dev-binary), DISTINCT (publishing; the dev binary); owner installer/SPEC.md §The consumer smoke.
-
 ### readme-spec-links-offsite
 
 [cost: event/low] [surface: gate-sdk]
@@ -764,18 +740,6 @@ a kit README's citation of another kit's SPEC section links off-site to the GitH
 
 **Cost while deferred:** a root-doc reader hunts cited sections by hand. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's lead, on an operator direction to file rather than widen mid-iteration, with an addendum; promoted 2026-09-27 at its close: →fix fails because the widening is a ruled deferral. Re-verified: `scripts/canon-config.knobs` binds the four globs, and TRAJECTORY.md lines 4, 12 and 18 carry `§`. Owner lookup: `citation-link`, `CITATION_LINK_PAGES`, `TRAJECTORY.md#` in this file — none; owner canon-kit/SPEC.md §check-citation-link, with lifecycle-kit/SPEC.md §The ruling-staleness probe.
 
-### musl-dev-binary
-
-[cost: event/high] [surface: gate-sdk]
-
-a maintainer's Linux dev binary could be the static musl build, so the battery and the generated hooks run the bytes adopters install. Operator direction, 2026-09-27 (lead session): filed as a costed idea, not work.
-
-**Inferred, not run:** the prior iteration's spec measurement — battery 139/139 with the musl binary at the canonical path, 15.41s against 14.47–14.89s for gnu (about +4%); crate tests 1196 pass, 4.99s against 4.58s.
-
-**Deliverable:** `build-native.sh` and `check-gate-binary-fresh` building and stamping a musl dev binary, macOS and Windows staying on their native runners.
-
-**Cost while deferred:** the dogfood battery runs a binary adopters on Linux never receive; adopting it, every native rebuild needs docker or a host musl target. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's lead; promoted 2026-09-27 at its close: →fix fails because the operator filed it as an idea, not work. Re-verified: this host's sysroot carries no musl std. Owner lookup: `musl`, `build-native`, `dev binary` in this file — [musl-smoke-build-wrapper](#musl-smoke-build-wrapper), DISTINCT (the smoke's hand-off only); owner gate-sdk/SPEC.md §Porting a gate to the binary substrate.
-
 ### site-video-poster-rule
 
 [cost: event/low] [surface: site-kit]
@@ -789,6 +753,10 @@ the site has no rule for video, and the operator wants short intro and demo vide
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
+
+### disclaimer-beside-its-own-restatement
+
+No gate reads a restatement-disclaimer phrase sitting beside a content clause that restates the rule it disclaims.
 
 ### residency-roster-template-reach-ungated
 
@@ -1464,5 +1432,7 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - crate-tests-windows-flip
 - spec-toolkits-guarantee
 - catalog-landing-docs-polish
+- musl-smoke-build-wrapper
+- musl-dev-binary
 
 ## Lessons Learned
