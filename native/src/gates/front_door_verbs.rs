@@ -12,9 +12,8 @@ const INSTALL_SH: &str = "docs/install.sh";
 const PAGES: &[&str] = &["README.md", "docs/index.md", "docs/install.md", "installer/README.md"];
 const ROUTES: &[&str] = &["sh -s --", "install.ps1)))", "npx checkwright"];
 const SPAN_ROUTE: &str = "checkwright";
-// spec: installer/SPEC.md §The dependency boundary — the verb the one-line install runs when no
-// verb is named, which a flag-led route therefore advertises
-const DEFAULT_VERB: &str = "init";
+// spec: installer/SPEC.md §The front door's verbs — the one flag a route may lead with
+const HELP_FLAGS: &[&str] = &["--help", "-h"];
 
 pub fn run(args: &[String]) -> i32 {
     match rule(args) {
@@ -84,6 +83,7 @@ fn code_texts(text: &str) -> Vec<(usize, &str, bool)> {
 #[derive(Debug, PartialEq)]
 enum Tok {
     Verb(String),
+    Flag(String),
     Placeholder,
 }
 
@@ -99,8 +99,10 @@ fn token(after: &str) -> Option<Tok> {
         return None;
     }
     let t = after.split_whitespace().next()?;
-    Some(if t.starts_with('-') {
-        Tok::Verb(DEFAULT_VERB.to_string())
+    Some(if HELP_FLAGS.contains(&t) {
+        Tok::Placeholder
+    } else if t.starts_with('-') {
+        Tok::Flag(t.to_string())
     } else if is_verb(t) {
         Tok::Verb(t.to_string())
     } else {
@@ -242,12 +244,20 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     let mut b_findings: Vec<String> = Vec::new();
+    let mut flag_findings: Vec<String> = Vec::new();
     let mut pending: BTreeSet<String> = BTreeSet::new();
     let mut sites = 0usize;
     for page in &pages {
         let text = read(page)?;
         for (n, code, span) in code_texts(&text) {
             for tok in advertised(code, span) {
+                if let Tok::Flag(f) = &tok {
+                    flag_findings.push(format!(
+                        "  {}:{}: a route leads with `{}`, which reaches the binary as its first argument rather than a verb's",
+                        page, n, f
+                    ));
+                    continue;
+                }
                 let Tok::Verb(v) = tok else { continue };
                 sites += 1;
                 let Some((label, set)) = &pinned_set else { continue };
@@ -274,13 +284,16 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    if !a_findings.is_empty() || !b_findings.is_empty() {
-        println!("{}: the front door advertises a verb its pinned release does not carry, or the verb table is not the binary's roster (installer/SPEC.md §The front door's verbs):", NAME);
-        for f in b_findings.iter().chain(&a_findings) {
+    if !a_findings.is_empty() || !b_findings.is_empty() || !flag_findings.is_empty() {
+        println!("{}: the front door advertises a verb its pinned release does not carry, leads a route with a flag, or the verb table is not the binary's roster (installer/SPEC.md §The front door's verbs):", NAME);
+        for f in b_findings.iter().chain(&flag_findings).chain(&a_findings) {
             println!("{}", f);
         }
         if !b_findings.is_empty() {
             println!("  help: release the verb so the pin carries it (RELEASING.md), or withdraw the advertisement from the page.");
+        }
+        if !flag_findings.is_empty() {
+            println!("  help: name the verb before its flags, as `sh -s -- init --profile prose`: the one-line install runs `init` only on an empty argument list, and the bootstrap forwards a leading flag unchanged.");
         }
         if !a_findings.is_empty() {
             println!("  help: make {}'s verb table list exactly the verbs native/src/installer/mod.rs's VERBS carries.", readme);
@@ -318,8 +331,8 @@ mod tests {
         Tok::Verb(s.to_string())
     }
 
-    // spec: installer/SPEC.md §The front door's verbs — each route, a flag, a placeholder, and a
-    // token outside any code span
+    // spec: installer/SPEC.md §The front door's verbs — each route, a flag, the help flag, a
+    // placeholder, and a token outside any code span
     #[test]
     fn the_route_tokenizer_reads_each_route_a_flag_and_a_placeholder() {
         assert_eq!(verbs("curl -fsSL x | sh -s -- demo   # comment", false), vec![v("demo")]);
@@ -327,7 +340,9 @@ mod tests {
         assert_eq!(verbs("npx checkwright init", true), vec![v("init")]);
         assert_eq!(verbs("checkwright uninstall", true), vec![v("uninstall")]);
         assert_eq!(verbs("checkwright uninstall", false), vec![]);
-        assert_eq!(verbs("sh -s -- --profile full", false), vec![v("init")]);
+        assert_eq!(verbs("sh -s -- --profile full", false), vec![Tok::Flag("--profile".to_string())]);
+        assert_eq!(verbs("sh -s -- init --profile full", false), vec![v("init")]);
+        assert_eq!(verbs("checkwright --help", true), vec![Tok::Placeholder]);
         assert_eq!(verbs("checkwright <verb>", true), vec![Tok::Placeholder]);
         assert_eq!(verbs("checkwright", true), vec![]);
         assert_eq!(verbs("checkwright.lock", true), vec![]);
@@ -363,11 +378,5 @@ mod tests {
         );
         assert!(d("it release soon — b\n").is_err());
         assert!(d("it release deferred:1.2 — b\n").is_err());
-    }
-
-    // spec: installer/SPEC.md §The front door's verbs — the binary's roster is read in-process
-    #[test]
-    fn the_binary_roster_carries_the_default_verb() {
-        assert!(binary_verbs().contains(DEFAULT_VERB));
     }
 }

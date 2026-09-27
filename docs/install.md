@@ -103,7 +103,7 @@ Then, from your repository root:
 curl -fsSL https://checkwright.dev/install.sh | sh
 ```
 
-The script is `docs/install.sh` in this repository; read it at <https://checkwright.dev/install.sh> before you pipe it. To pass arguments, end the line with `sh -s -- --profile prose`, `sh -s -- demo` or `sh -s -- uninstall`. For `uninstall`, set `CHECKWRIGHT_VERSION` to the version you installed: `curl -fsSL https://checkwright.dev/install.sh | CHECKWRIGHT_VERSION=X.Y.Z sh -s -- uninstall`.
+The script is `docs/install.sh` in this repository; read it at <https://checkwright.dev/install.sh> before you pipe it. To pass arguments, name the verb first, since the line runs `init` only when given none: end the line with `sh -s -- init --profile prose`, `sh -s -- demo` or `sh -s -- uninstall`. For `uninstall`, set `CHECKWRIGHT_VERSION` to the version you installed: `curl -fsSL https://checkwright.dev/install.sh | CHECKWRIGHT_VERSION=X.Y.Z sh -s -- uninstall`.
 
 <details markdown="1">
 <summary>Step by step</summary>
@@ -158,7 +158,7 @@ Then, in PowerShell, from your repository root:
 irm https://checkwright.dev/install.ps1 | iex
 ```
 
-The script is `docs/install.ps1` in this repository; read it at <https://checkwright.dev/install.ps1> before you pipe it. To pass arguments, run it as a script block: `& ([scriptblock]::Create((irm https://checkwright.dev/install.ps1))) --profile prose`, or `demo`, or `uninstall`. For `uninstall`, set `$env:CHECKWRIGHT_VERSION` to the version you installed first.
+The script is `docs/install.ps1` in this repository; read it at <https://checkwright.dev/install.ps1> before you pipe it. To pass arguments, run it as a script block, the verb first: `& ([scriptblock]::Create((irm https://checkwright.dev/install.ps1))) init --profile prose`, or `demo`, or `uninstall`. For `uninstall`, set `$env:CHECKWRIGHT_VERSION` to the version you installed first.
 
 <details markdown="1">
 <summary>Step by step</summary>
