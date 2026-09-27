@@ -60,6 +60,34 @@ docs/install.md's toolchain block states no floor for `git`, `curl` or `shellche
 
 **Cost while deferred:** an adopter on an old tool meets a mid-run failure the install page never warned of. Filed 2026-09-27 at platform-prerequisite-floors's scope, from the operator direction above and the lead's probe of the install page. Owner: installer/SPEC.md §Requirements.
 
+### linux-musl-artifacts
+
+[spec: SPEC-linux-musl.md]
+
+no `*-linux-musl` gate binary is published: `native/targets.list` carries only the two linux-gnu triples, installer/SPEC.md §The gate binary refuses a musl host at its libc row, and docs/install.md never names musl, so an Alpine or other musl host is turned away at the install's first step with no route offered.
+
+**Deliverable:** the amendment's static musl artifacts for both Linux triples, declared held with the detectors, roster and libc check moved in one commit, the shared build body holding them static, both Linux install-smoke legs consuming them and a musl and an old-glibc host witnessing them, then the join on the mid-iteration run.
+
+**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** the theme's "wide platform/OS support" (operator direction, 2026-09-27). Route ruled at /spec, operator direction 2026-09-27, lead-relayed (not a /consult ruling): the static musl binary serves every Linux host, the Linux contributor's musl standard library for the local consumer smoke accepted.
+
+**Push need (2026-09-27, inside the budget):** the musl legs run only remotely; they ride the one mid-iteration push [comment-tier-surface-excludes-ci-workflows](#comment-tier-surface-excludes-ci-workflows) names, and the join commit rides the close push.
+
+**Cost while deferred:** every musl host is refused. Filed 2026-09-27 at platform-prerequisite-floors's scope, from the lead's probe. Owner: installer/SPEC.md §The gate binary.
+
+### glibc-floor-lowering
+
+[spec: SPEC-linux-musl.md]
+
+the Linux gate binary needs glibc 2.39: `pidfd_spawnp` and `pidfd_getpid` bind `GLIBC_2.39`, everything else 2.34 or below, measured on v0.26.0's x86_64 and aarch64 linux-gnu archives. So Debian 12, RHEL 9 and Ubuntu 22.04 hosts meet a loader failure.
+
+**Deliverable:** the glibc floor retired rather than lowered, by [linux-musl-artifacts](#linux-musl-artifacts)'s static artifact, which the amendment measured running on glibc 2.36 and 2.35 hosts and which its install-smoke step witnesses on a glibc-2.36 container every run.
+
+**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** /spec measured a musl build and escalated the route. Route ruled at /spec, operator direction 2026-09-27, lead-relayed (not a /consult ruling): musl static served to every Linux host, over an older build image, a glibc-versioned cross toolchain, musl for musl hosts only, and a hybrid.
+
+**Push need (2026-09-27, inside the budget):** rides [linux-musl-artifacts](#linux-musl-artifacts)'s two pushes.
+
+**Cost while deferred:** every evaluator on those distributions is turned away at the install's first step. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's build; promoted 2026-09-27 at its close. Owner: installer/SPEC.md §Requirements.
+
 ## Technical Debt
 
 ### installer-contract-brevity
@@ -689,36 +717,6 @@ a release note's Renamed-knobs removal bullet must lead with the removed knob ba
 **Deliverable:** a valve that admits a removed knob in its sanctioned release-note position, or B reading the removal bullet's grammar, and the v0.26.0 note taken back off the exclude.
 
 **Cost while deferred:** every release that removes a knob buys a whole-doc exclude, and each excluded note loses its link and path checks for good. Filed 2026-09-26 to the gap inbox at front-door-release's close, which excluded the v0.26.0 note for three removed knobs; promoted 2026-09-26 at the next iteration's scope: →fix fails because the valve's shape is a design call on a shipped gate. Re-verified: `scripts/canon-config.knobs` carries the exclude for that note. Owner lookup: `docs-cmd`, `Renamed-knobs`, `MDREF_EXCLUDE` in this file — only the icebox's [docs-cmd-retired-path-blind-to-queue](#docs-cmd-retired-path-blind-to-queue), which is assertion C; owner canon-kit/SPEC.md §check-docs-cmd.
-
-### glibc-floor-lowering
-
-[cost: event/high] [surface: installer]
-
-the Linux gate binary needs glibc 2.39: `pidfd_spawnp` and `pidfd_getpid` bind `GLIBC_2.39`, everything else 2.34 or below, measured on v0.26.0's x86_64 and aarch64 linux-gnu archives. So Debian 12, RHEL 9 and Ubuntu 22.04 hosts meet a loader failure. `glibc-floor-unstated` stated and holds that floor; this entry would lower it. The routes are building the linux-gnu legs on an older image (ubuntu-22.04 gives 2.34 or 2.35, and retires on GitHub's clock) or through a glibc-versioned cross toolchain. Either reverses `native/runners.list`'s ride for those legs.
-
-**Deliverable:** an operator ruling on the route, then the lowered floor landed in the platforms table the shared build body measures against.
-
-**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** /spec measures a musl build first (it compiles, the battery passes, its runtime cost) and escalates the route with that evidence; the preferred candidate is a third route, musl static binaries served to every Linux host, which [linux-musl-artifacts](#linux-musl-artifacts) holds and which would retire the glibc floor rather than lower it.
-
-**Push need (2026-09-27, inside the budget):** the chosen route's build leg runs only remotely; it rides the one mid-iteration push [comment-tier-surface-excludes-ci-workflows](#comment-tier-surface-excludes-ci-workflows) names.
-
-**Cost while deferred:** every evaluator on those distributions is turned away at the install's first step. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's build; promoted 2026-09-27 at its close: →fix fails because both routes reverse a runner choice and want a ruling. Re-verified: `objdump -T` on a local release build lists `GLIBC_2.39` as its newest version, and docs/install.md's platforms table states `glibc 2.39` for both Linux rows. Owner lookup: `glibc`, `runners.list`, `floor` in this file — only the landed `glibc-floor-unstated`; owner installer/SPEC.md §Requirements.
-
-### linux-musl-artifacts
-
-[cost: event/high] [surface: installer]
-
-no `*-linux-musl` gate binary is published: `native/targets.list` carries only the two linux-gnu triples, installer/SPEC.md §The gate binary refuses a musl host at its libc row, and docs/install.md never names musl, so an Alpine or other musl host is turned away at the install's first step with no route offered.
-
-**Inferred, not run:** a statically linked `x86_64-unknown-linux-musl` gate binary also runs on glibc hosts below 2.39 — `docker run --rm -v "$PWD":/w debian:12 /w/<musl artifact> --help`
-
-**Deliverable:** musl artifacts for the Linux triples on the platform roster, built, published and install-smoked, the installer's libc row serving them, and the platforms table naming musl. Whether they also serve glibc hosts is [glibc-floor-lowering](#glibc-floor-lowering)'s route.
-
-**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** the theme's "wide platform/OS support" (operator direction, 2026-09-27); /spec measures the build before glibc-floor-lowering's route is escalated.
-
-**Push need (2026-09-27, inside the budget):** the musl build legs run only remotely; they ride the one mid-iteration push [comment-tier-surface-excludes-ci-workflows](#comment-tier-surface-excludes-ci-workflows) names.
-
-**Cost while deferred:** every musl host is refused. Filed 2026-09-27 at platform-prerequisite-floors's scope, from the lead's probe. Re-verified: `native/targets.list` lists six triples, none musl; installer/SPEC.md's libc table refuses a musl host; docs/install.md has no `musl`. Owner lookup: `musl`, `Alpine` in this file — none; owner installer/SPEC.md §The gate binary.
 
 ### crates-reservation-republish
 
