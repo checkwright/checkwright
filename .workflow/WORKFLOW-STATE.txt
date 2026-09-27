@@ -10,3 +10,4 @@ catalog-submission-preconditions align a6e5545b 2026-09-27 95a519fa
 catalog-submission-preconditions build afeefff6 2026-09-27 8fef6eb2
 catalog-submission-preconditions build aa4a3e70 2026-09-27 36c9f711
 catalog-submission-preconditions build a4f97381 2026-09-27 1f03c76d
+catalog-submission-preconditions build a43adf79 2026-09-27 23180be3
