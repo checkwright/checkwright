@@ -4,11 +4,4 @@
 
 ---
 
-companion-catalog-extension scope a330ad95 2026-09-27 de5bf105
-companion-catalog-extension spec aa5b7789 2026-09-27 8774dc51
-companion-catalog-extension align a629528c 2026-09-27 8a4a4471
-companion-catalog-extension build a839fe3f 2026-09-27 22f63ea4
-companion-catalog-extension build aa8a560e 2026-09-27 1f56185f
-companion-catalog-extension build a755bfab 2026-09-27 a617bb1f
-companion-catalog-extension validate a4c1f4ef 2026-09-27 ae56d577
-companion-catalog-extension close ac43a6f7 2026-09-27 ff5376dd
+— scope a1b5f427 2026-09-27 44fc60c2
