@@ -1400,13 +1400,4 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 ## Done
 
-- uninstall-artifact-ownership-asymmetry
-- prerequisite-floor-versions
-- comment-tier-surface-excludes-ci-workflows
-- linux-musl-artifacts
-- glibc-floor-lowering
-- crate-tests-other-triples
-- installer-graph-artifact-literal
-- installer-contract-brevity
-
 ## Lessons Learned
