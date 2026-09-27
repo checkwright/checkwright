@@ -683,7 +683,7 @@ fn write_timings(path: &Path, order: &[Selected], outcomes: &[Outcome]) {
     }
     body.push_str(&format!("TOTAL {}\n", total));
     if let Some(dir) = path.parent() {
-        let _ = std::fs::create_dir_all(dir);
+        let _ = walk::make_scratch(dir);
     }
     let _ = std::fs::write(path, body);
 }

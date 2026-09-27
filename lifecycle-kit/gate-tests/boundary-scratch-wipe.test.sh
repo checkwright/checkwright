@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the boundary scratch wipe end-to-end through a sandboxed enter-stage: the iteration-boundary entry deletes the scratch dir's members, keeps the .gitkeep and lead-journal kit invariants and every LIFECYCLE_KIT_BOUNDARY_PRESERVE name at the scratch root only (a spared directory whole, a nested keep-name deleted with its ancestors), names the wiped set by immediate child rather than by the nested paths deleted to remove it, names each non-root keep-list entry in its report, raises the undisposed-journal advisory without blocking for every prior segment while exempting the live lead's, and a non-boundary entry wipes no scratch at all
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the boundary scratch wipe end-to-end through a sandboxed enter-stage: the iteration-boundary entry deletes the scratch dir's members, keeps the .gitkeep, self-ignore .gitignore and lead-journal kit invariants and every LIFECYCLE_KIT_BOUNDARY_PRESERVE name at the scratch root only (a spared directory whole, a nested keep-name deleted with its ancestors), names the wiped set by immediate child rather than by the nested paths deleted to remove it, names each non-root keep-list entry in its report, raises the undisposed-journal advisory without blocking for every prior segment while exempting the live lead's, and a non-boundary entry wipes no scratch at all
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -74,7 +74,8 @@ out="$(run_enter "$bnd" scope)"; rc=$?
 [[ "$rc" -eq 0 ]] || note boundary-entry "want exit 0, got $rc -- $out"
 
 [[ -f "$bnd/scratch/.gitkeep" ]]           || note keep-invariant ".gitkeep was deleted (kit invariant)"
-[[ -f "$bnd/scratch/keep-me" ]]            || note keep-listed "the PRESERVE member was deleted"
+[[ "$(cat "$bnd/scratch/.gitignore" 2>/dev/null)" == "*" ]] || note self-ignore "the scratch dir's self-ignore was not written or was wiped (kit invariant)"
+[[ -f "$bnd/scratch/keep-me" ]]           || note keep-listed "the PRESERVE member was deleted"
 [[ -e "$bnd/scratch/mixed-sub" ]]          && note wipe-nested-name "a keep-list basename below the scratch root was spared"
 [[ -e "$bnd/scratch/x" ]]                  && note wipe-nested-gitkeep "a nested .gitkeep kept its ancestors alive"
 [[ -f "$bnd/scratch/kept-dir/deep/file" ]] || note keep-dir-whole "a spared root directory was descended and emptied"
@@ -105,8 +106,9 @@ seed "$non"
 before="$(find "$non/scratch" | sort)"
 out="$(run_enter "$non" build)"; rc=$?
 [[ "$rc" -eq 0 ]] || note nonboundary-entry "want exit 0, got $rc -- $out"
-after="$(find "$non/scratch" | sort)"
-[[ "$before" == "$after" ]] || note nonboundary-scratch "a non-boundary entry changed the scratch dir"
+after="$(find "$non/scratch" ! -path "$non/scratch/.gitignore" | sort)"
+[[ "$before" == "$after" ]] || note nonboundary-scratch "a non-boundary entry changed the scratch dir beyond its self-ignore"
+[[ -f "$non/scratch/.gitignore" ]] || note nonboundary-self-ignore "a stamping entry left the scratch dir without its self-ignore"
 grep -qF 'boundary-wiped' <<<"$out" && note nonboundary-report "a non-boundary entry reported a wipe: $out"
 
 # --- an unset keep-list still spares the invariant ---

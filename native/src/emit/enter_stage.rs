@@ -322,7 +322,7 @@ fn dispatch_form(c: &Cfg, sim: bool, rest: &[String]) -> Result<i32, String> {
         );
         return Ok(code);
     }
-    std::fs::create_dir_all(&c.tmpdir)
+    walk::make_scratch(&c.tmpdir)
         .map_err(|e| format!("cannot create the scratch dir {}: {}", c.tmpdir, e))?;
     let line = match &waiver {
         Some(r) => format!("{} {} {}", stage, c.waiver_token, r),
@@ -402,7 +402,7 @@ fn open_lead_journal(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String>
         return Ok(0);
     }
 
-    std::fs::create_dir_all(&c.tmpdir)
+    walk::make_scratch(&c.tmpdir)
         .map_err(|e| format!("cannot create the scratch dir {}: {}", c.tmpdir, e))?;
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — append, never overwrite: the file is
     // rewritten only when a disposed segment is dropped, and then every other segment is kept
@@ -539,7 +539,7 @@ fn rename(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
         return Ok(2);
     }
 
-    let scratch = Scratch::new(&c.tmpdir, "rename.")?;
+    let scratch = Scratch::new(&c.tmpdir, "rename.", say.sim)?;
     let tq = scratch.path("queue");
     let ts = scratch.path("state");
     write_file(&tq, &new_queue)?;
@@ -805,7 +805,7 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String], declared: Option<&str>) -> Result<
         None => stamp_line.clone(),
     };
 
-    let scratch = Scratch::new(&c.tmpdir, "")?;
+    let scratch = Scratch::new(&c.tmpdir, "", say.sim)?;
     let tmpstate = scratch.path("state");
     let tmpqueue = scratch.path("queue");
     let mut truncated: Vec<String> = Vec::new();
@@ -1330,7 +1330,7 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String], declared: Option<&str>) -> Result<
 
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the boundary scratch wipe, distinct from
     // the truncate above. Runs last so this run's own temporaries are already gone and never
-    // candidates; '.gitkeep' and the lead journal are the invariants a keep-list cannot unset.
+    // candidates; '.gitkeep', '.gitignore' and the lead journal are invariants a keep-list can't unset.
     if first && Path::new(&c.tmpdir).is_dir() {
         let mut keep = c.boundary_preserve.clone();
         keep.push(c.lead_journal.clone());
@@ -1939,7 +1939,7 @@ fn wipe(dir: &str, preserve: &[String]) -> Wiped {
         return out;
     };
     for (base, is_dir) in kids {
-        if base == ".gitkeep" || preserve.contains(&base) {
+        if base == ".gitkeep" || base == ".gitignore" || preserve.contains(&base) {
             continue;
         }
         let child = walk::child(root, &base);
@@ -2120,9 +2120,11 @@ struct Scratch {
 }
 
 impl Scratch {
-    fn new(dir: &str, tag: &str) -> Result<Scratch, String> {
-        std::fs::create_dir_all(dir)
-            .map_err(|e| format!("cannot create the scratch dir {}: {}", dir, e))?;
+    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — `--simulate` writes nothing, so it leaves
+    // no self-ignore behind: its temporaries are gone before it exits
+    fn new(dir: &str, tag: &str, sim: bool) -> Result<Scratch, String> {
+        let made = if sim { std::fs::create_dir_all(dir) } else { walk::make_scratch(dir) };
+        made.map_err(|e| format!("cannot create the scratch dir {}: {}", dir, e))?;
         Ok(Scratch {
             dir: dir.to_string(),
             tag: tag.to_string(),
@@ -2279,6 +2281,7 @@ mod tests {
         std::fs::create_dir_all(dir.join("x/y")).expect("mk");
         std::fs::create_dir_all(dir.join("kept-dir/deep")).expect("mk");
         std::fs::write(dir.join(".gitkeep"), "").expect("w");
+        std::fs::write(dir.join(".gitignore"), "*\n").expect("w");
         std::fs::write(dir.join("keep-me"), "live").expect("w");
         std::fs::write(dir.join("doomed.log"), "stale").expect("w");
         std::fs::write(dir.join("doomed-sub/nested.txt"), "stale").expect("w");
@@ -2288,6 +2291,7 @@ mod tests {
         let keep = ["keep-me".to_string(), "kept-dir".to_string()];
         let wiped = wipe(&dir.display().to_string(), &keep);
         assert!(dir.join(".gitkeep").exists(), "the kit invariant was deleted");
+        assert!(dir.join(".gitignore").exists(), "the scratch dir's self-ignore was deleted");
         assert!(dir.join("keep-me").exists(), "a PRESERVE member was deleted");
         assert!(!dir.join("mixed-sub").exists(), "a nested keep-list basename was spared");
         assert!(!dir.join("x").exists(), "a nested .gitkeep kept its ancestors");

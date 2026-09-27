@@ -149,12 +149,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
 fn scratch() -> Result<String, String> {
     let dir = walk::knob_scalar("GATE_SDK_TMP_DIR")?;
     let here = walk::cwd()?;
-    let base = format!(
-        "{}/{}-{}",
-        walk::abs_against(&here, dir.trim_end_matches('/')),
-        NAME,
-        std::process::id()
-    );
+    let root = walk::abs_against(&here, dir.trim_end_matches('/'));
+    walk::make_scratch(&root).map_err(|e| format!("cannot create scratch root {}: {}", root, e))?;
+    let base = format!("{}/{}-{}", root, NAME, std::process::id());
     let _ = std::fs::remove_dir_all(&base);
     std::fs::create_dir_all(&base)
         .map_err(|e| format!("cannot create scratch base {}: {}", base, e))?;

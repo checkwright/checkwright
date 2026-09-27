@@ -260,7 +260,7 @@ pub fn run(_args: &[String]) -> i32 {
 
     if !key.is_empty() {
         if let Some(parent) = std::path::Path::new(&cache).parent() {
-            if std::fs::create_dir_all(parent).is_ok() {
+            if walk::make_scratch(parent).is_ok() {
                 let _ = std::fs::write(&cache, key.as_bytes());
             }
         }

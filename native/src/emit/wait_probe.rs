@@ -169,6 +169,10 @@ fn non_empty(path: &str) -> bool {
     std::fs::metadata(path).map(|m| m.len() > 0).unwrap_or(false)
 }
 
+fn make_scratch(path: &str) -> Result<(), String> {
+    walk::make_scratch(path).map_err(|e| format!("cannot create {}: {}", path, e))
+}
+
 fn mkdir_p(path: &str) -> Result<(), String> {
     std::fs::create_dir_all(path).map_err(|e| format!("cannot create {}: {}", path, e))
 }
@@ -178,6 +182,7 @@ fn mkdir_p(path: &str) -> Result<(), String> {
 // `check-producer-liveness` and guard-kit rule `git_mutation_under_producer` read the probe's own producers like any other
 fn cmd_produce(key: &str, ms: &str) -> Result<i32, String> {
     let p = paths()?;
+    make_scratch(&p.scratch)?;
     mkdir_p(&p.work)?;
     let marker = format!("{}/{}.marker", p.work, key);
     let t0_path = format!("{}/{}.t0", p.work, key);
@@ -258,6 +263,7 @@ fn exec_wait_body(_argv: &[&str]) -> Result<i32, String> {
 
 fn cmd_arm_local(key: &str, pred: &str) -> Result<i32, String> {
     let p = paths()?;
+    make_scratch(&p.scratch)?;
     let out = format!("{}/{}.local.out", p.work, key);
     let run_path = format!("{}/{}-local.run", p.scratch, key);
     let me = std::env::current_exe()
@@ -475,6 +481,7 @@ fn push_once(seen: &mut Vec<String>, v: &str) {
 // the very defect the instrument's own trials found
 fn cmd_sweep() -> Result<i32, String> {
     let p = paths()?;
+    make_scratch(&p.scratch)?;
     mkdir_p(&p.work)?;
     for ms in SWEEP_MS {
         let key = format!("sweep{}", ms);

@@ -18,9 +18,10 @@ fails=0
 assert_has()    { grep -qF -- "$2" <<<"$3" || { echo "FAIL [$1]: expected present: $2"; fails=$((fails + 1)); }; }
 assert_absent() { grep -qF -- "$2" <<<"$3" && { echo "FAIL [$1]: expected absent: $2"; fails=$((fails + 1)); }; return 0; }
 assert_rc()     { [[ "$2" -eq "$3" ]] || { echo "FAIL [$1]: expected exit $3, got $2"; fails=$((fails + 1)); }; }
-# A run leaves no snapshot behind: nothing dot-led in the scratch dir but what the case put there.
+# A run leaves no snapshot behind: nothing dot-led in the scratch dir but what the case put there
+# and the directory's self-ignore (gate-sdk/SPEC.md §Layout and configuration).
 assert_no_snapshot() {
-    local left; left="$(find "$scratch" -maxdepth 1 -name '.*' ! -name '.' 2>/dev/null)"
+    local left; left="$(find "$scratch" -maxdepth 1 -name '.*' ! -name '.' ! -name .gitignore 2>/dev/null)"
     [[ -z "$left" ]] || { echo "FAIL [$1]: a snapshot remains: $left"; fails=$((fails + 1)); }
 }
 

@@ -207,6 +207,7 @@ pub fn run(args: &[String]) -> i32 {
     let file = path.file_name().map(|f| f.to_string_lossy().into_owned()).unwrap_or_default();
     // spec: guard-kit/SPEC.md §scratch-run — the snapshot is written before the echo, so a
     // snapshot the runner cannot make is a refusal that printed no body.
+    let _ = crate::walk::make_scratch(&scratch_abs);
     let snapshot = match write_snapshot(&parent, &file, &body) {
         Ok(p) => p,
         Err(e) => return refuse(&e),

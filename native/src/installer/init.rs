@@ -569,6 +569,15 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         }
     }
 
+    // spec: installer/SPEC.md §What init seeds — the scratch directory is made, self-ignored, once
+    // the seam names it, and is recorded nowhere: git never sees it
+    if !f.dry {
+        let scratch = knob_at(&root, "GATE_SDK_TMP_DIR")?;
+        if !crate::walk::names_cwd(Path::new(&scratch)) {
+            let _ = crate::walk::make_scratch(root.join(&scratch));
+        }
+    }
+
     // spec: installer/SPEC.md §init — the generated projections are produced by the vendored
     // tools themselves, never restated by the installer: the hook generator and the graph emitter
     // are gate-sdk's, so a consumer's artifacts are the ones their own gate-sdk makes.

@@ -504,6 +504,32 @@ fn capture_path_in(value: &str, main: Option<&str>) -> String {
     }
 }
 
+// spec: gate-sdk/SPEC.md §Layout and configuration — the scratch directory ignores itself: every
+// writer creating it, or a file directly in it, comes through here; the self-ignore is created
+// exclusively, and its failure is not the caller's
+pub fn make_scratch(dir: impl AsRef<Path>) -> std::io::Result<()> {
+    let dir = dir.as_ref();
+    std::fs::create_dir_all(dir)?;
+    if names_cwd(dir) {
+        return Ok(());
+    }
+    if let Ok(mut f) = std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(dir.join(".gitignore"))
+    {
+        use std::io::Write;
+        let _ = f.write_all(b"*\n");
+    }
+    Ok(())
+}
+
+// spec: gate-sdk/SPEC.md §Layout and configuration — a scratch spelling naming the working
+// directory itself, which is never told to ignore itself
+pub fn names_cwd(p: &Path) -> bool {
+    p.components().all(|c| matches!(c, std::path::Component::CurDir))
+}
+
 // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the authoring predicate both port gates
 // scope by, held here so it is shared rather than spelled twice: tracked *source* under the crate
 // root, so build output cannot read as authorship, and every refusal degrades to false
@@ -1247,6 +1273,29 @@ mod tests {
         assert_eq!(capture_path_in("/abs/x.log", Some("/r")), "/abs/x.log");
         assert_eq!(capture_path_in(".workflow/x.log", None), ".workflow/x.log");
         assert_eq!(capture_path_in("", Some("/r")), "");
+    }
+
+    // spec: gate-sdk/SPEC.md §Layout and configuration — the self-ignore is written where absent and
+    // an existing one is left byte-identical
+    #[test]
+    fn the_scratch_dir_ignores_itself_and_keeps_a_consumers_own_ignore() {
+        let base = std::env::temp_dir().join(format!("walk-make-scratch-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&base);
+        let fresh = base.join("fresh/deep");
+        make_scratch(&fresh).expect("the scratch dir must be creatable");
+        assert_eq!(std::fs::read_to_string(fresh.join(".gitignore")).expect("self-ignore"), "*\n");
+        make_scratch(&fresh).expect("a second call must succeed");
+        assert_eq!(std::fs::read_to_string(fresh.join(".gitignore")).expect("self-ignore"), "*\n");
+        let owned = base.join("owned");
+        std::fs::create_dir_all(&owned).expect("mk");
+        std::fs::write(owned.join(".gitignore"), "!keep\n").expect("w");
+        make_scratch(&owned).expect("an existing dir must be accepted");
+        assert_eq!(std::fs::read_to_string(owned.join(".gitignore")).expect("own ignore"), "!keep\n");
+        let _ = std::fs::remove_dir_all(&base);
+        let before = Path::new(".gitignore").exists();
+        make_scratch("").expect("an empty spelling is accepted");
+        make_scratch(".").expect("the working directory is accepted");
+        assert_eq!(Path::new(".gitignore").exists(), before, "the working directory was told to ignore itself");
     }
 
     // spec: gate-sdk/SPEC.md §check-pipe-membership — a suite is a direct child of an unpruned tests

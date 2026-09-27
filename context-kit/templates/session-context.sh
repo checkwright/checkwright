@@ -105,7 +105,7 @@ done
 # spec: context-kit/SPEC.md §The session-context hook — step 6 scratch sweep
 TMP_DIR="${GATE_SDK_TMP_DIR:-.tmp}"
 if [[ -d "$TMP_DIR" ]]; then
-    swept="$(find "$TMP_DIR" -mindepth 1 ! -name .gitkeep -mmin +1440 -depth -print -delete 2>/dev/null | wc -l | tr -d ' ')"
+    swept="$(find "$TMP_DIR" -mindepth 1 ! -name .gitkeep ! -name .gitignore -mmin +1440 -depth -print -delete 2>/dev/null | wc -l | tr -d ' ')"
     if [[ "${swept:-0}" -gt 0 ]]; then
         echo "Tidied $swept stale scratch path(s) from $TMP_DIR/."
         echo

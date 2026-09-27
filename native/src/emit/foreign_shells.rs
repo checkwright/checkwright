@@ -105,6 +105,7 @@ fn provision() -> Result<PathBuf, String> {
     let dash = walk::knob_scalar("GATE_SDK_FOREIGN_DASH_IMAGE")?;
     let tmp = walk::abs_against(&walk::cwd()?, &walk::knob_scalar("GATE_SDK_TMP_DIR")?);
     let dir = Path::new(&tmp).join("foreign-shells").join(key(&pwsh, &dash));
+    walk::make_scratch(&tmp).map_err(|e| format!("cannot create {}: {}", tmp, e))?;
     if dir.join(MARKER).is_file() {
         return Ok(dir.join("bin"));
     }

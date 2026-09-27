@@ -314,7 +314,7 @@ fn resolves(repo: &str, git_ref: &str) -> bool {
 // way the shell form's `cd && pwd` did, because every child below is spawned from another directory
 fn scratch_base() -> Result<String, Fail> {
     let dir = knob("GATE_SDK_TMP_DIR")?;
-    std::fs::create_dir_all(&dir)
+    walk::make_scratch(&dir)
         .map_err(|e| broken(one(format!("{}: cannot create scratch base {}: {}", NAME, dir, e))))?;
     let here = walk::cwd().map_err(|e| broken(one(format!("{}: {}", NAME, e))))?;
     Ok(walk::abs_against(&here, &dir))
