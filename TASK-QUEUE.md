@@ -22,6 +22,20 @@ the lead template's capture rule (lifecycle-kit/templates/lead.md §Stamps are a
 
 **Cost while deferred:** a lead can destroy a live stage's evidence on a description nobody checked. Filed 2026-09-26 to the gap inbox by the lead on its own error; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because the rule widens a shipped template's contract and its scope is a design call. Re-verified at the drain: the removal is recorded in both the validate and lead journals.
 
+### docs-ux-authoring-rules
+
+[spec: SPEC-docs-ux.md]
+
+the site has no authoring rules for page and section naming, citation form or collapsible regions, so its UX improves only when an operator notices a page. The standing direction, operator direction 2026-09-27 (lead session, verbatim): "we should continue enhancing documentation with proper page names, section named, links, collapsable regions, aiming for superb human and LLM UX/UI. We should not be afraid to acknowledge mistakes and redo it the right way." Its first measured instance is citation form: rendered prose cites sections as bare text, such as docs/install.md's "(§With Node)" and TRAJECTORY.md's plain-text SPEC section citations. Links are the chosen form (operator direction, 2026-09-27, lead session) because `check-md-refs` resolves a link's file and anchor. A path-qualified bare citation is resolved by `check-spec-pointer`'s prose-citation pass, but a path-less one only asserts that some governed file carries the heading as a prefix, so a citation aimed at the wrong file passes.
+
+**Deliverable:** page-authoring rules in docs/site-architecture.md for page and section naming, link-form citations and collapsible-region use, each with a gate where one binds, and the § citations on rendered surfaces converted to links. Which surfaces count as rendered, and whether kit SPECs are in range, is scope's.
+
+**Taken for /spec 2026-09-27 at companion-catalog-extension's scope, operator direction lead-relayed (not a /consult ruling), unit set B; range decided at scope:** the hand-authored `docs/` pages and the kit READMEs convert by hand; the kit SPECs are out of range, since their site mirrors are generated. It lands before the companion's landing-page polish.
+
+**Corrected at spec:** the census outside fences is 46 lines on the docs pages (six of them `docs/enforcement.md`'s, already links) and 52 on the twelve READMEs, and 2,129 on the kit SPECs, whose mirror-time link rendering is filed to the gap inbox. The front door's `README.md` converts with [companion-toolkit-profile](#companion-toolkit-profile)'s landing-page polish.
+
+**Cost while deferred:** readers found each cited section by hand, and path-less citations were held to liveness alone. Filed 2026-09-27 to the gap inbox as two bullets by platform-prerequisite-floors' lead (the unlinked citations and the direction's missing home), merged here at its close: →fix fails because the rules are new governed names. Re-verified: `git grep -c '§'` reads seven on docs/install.md; `<details` appears on docs/install.md and docs/site-architecture.md only, and no page-authoring rule governs it. Owner lookup: `unlinked`, `section link`, `cross-ref`, `collaps` in this file — no entry on the subject; owner docs/site-architecture.md and canon-kit/SPEC.md §check-spec-pointer.
+
 ## Technical Debt
 
 ### lifecycle-template-brevity
@@ -671,18 +685,6 @@ shell-guard splits a compounded emitter write out of a compound (rule `emitter_w
 **Deliverable:** a compounded statement that alone matches an exact committed allow entry steered to its own call, in whichever rule owns the shape, with a `good/`+`bad/` fixture pair.
 
 **Cost while deferred:** a session compounding a granted truncation meets an out-of-band decision, which a classifier may deny. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's close; promoted 2026-09-27 at the next iteration's scope: →fix fails because choosing the owning rule is a design call on a shipped guard. Re-verified: a hook payload `grep -c x TASK-QUEUE.md; : > .workflow/subagent-stop-liveness.log` exits 0 with no steer, while the same compound with `echo hi >` is steered. Owner lookup: `compound`, `truncat` in this file — only the icebox's rejected-compound-commit-relabel, DISTINCT (a commit retry); owner guard-kit/SPEC.md §The generic ruleset.
-
-### docs-ux-authoring-rules
-
-[cost: event/low] [surface: docs]
-
-the site has no authoring rules for page and section naming, citation form or collapsible regions, so its UX improves only when an operator notices a page. The standing direction, operator direction 2026-09-27 (lead session, verbatim): "we should continue enhancing documentation with proper page names, section named, links, collapsable regions, aiming for superb human and LLM UX/UI. We should not be afraid to acknowledge mistakes and redo it the right way." Its first measured instance is citation form: rendered prose cites sections as bare text, such as docs/install.md's "(§With Node)" and TRAJECTORY.md's plain-text SPEC section citations. Links are the chosen form (operator direction, 2026-09-27, lead session) because `check-md-refs` resolves a link's file and anchor. A path-qualified bare citation is resolved by `check-spec-pointer`'s prose-citation pass, but a path-less one only asserts that some governed file carries the heading as a prefix, so a citation aimed at the wrong file passes.
-
-**Deliverable:** page-authoring rules in docs/site-architecture.md for page and section naming, link-form citations and collapsible-region use, each with a gate where one binds, and the § citations on rendered surfaces converted to links. Which surfaces count as rendered, and whether kit SPECs are in range, is scope's.
-
-**Taken for /spec 2026-09-27 at companion-catalog-extension's scope, operator direction lead-relayed (not a /consult ruling), unit set B; range decided at scope:** the hand-authored `docs/` pages and the kit READMEs convert by hand (about 50 and 64 `§`-bearing lines); the kit SPECs (about 2,100 lines) are out of range, since their site mirrors are generated and a mirror-time link rendering is a derivation /spec costs or files. It lands before the companion's landing-page polish.
-
-**Cost while deferred:** readers find each cited section by hand, path-less citations stay liveness-gated only, and no gate prompts a redo. Filed 2026-09-27 to the gap inbox as two bullets by platform-prerequisite-floors' lead (the unlinked citations and the direction's missing home), merged here at its close: →fix fails because the rules are new governed names. Re-verified: `git grep -c '§'` reads seven on docs/install.md; `<details` appears on docs/install.md and docs/site-architecture.md only, and no page-authoring rule governs it. Owner lookup: `unlinked`, `section link`, `cross-ref`, `collaps` in this file — no entry on the subject; owner docs/site-architecture.md and canon-kit/SPEC.md §check-spec-pointer.
 
 ### queue-write-side-verb
 
